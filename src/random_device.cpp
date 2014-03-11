@@ -69,16 +69,22 @@ public:
     char buffer[80];
     DWORD type;
     DWORD len;
+    bool found (false);
 
-    // Find the type of the provider
+    // Find the type of a specific provider
     for(DWORD i = 0; ; ++i) {
       len = sizeof(buffer);
       if(!CryptEnumProvidersA(i, NULL, 0, &type, buffer, &len)) {
-        error("Could not find provider name");
+        if (GetLastError() == ERROR_NO_MORE_ITEMS) break;
+        continue;
       }
       if(buffer == provider) {
+        found = true;
         break;
       }
+    }
+    if (!found) {
+      error("Could not find provider name");
     }
 
     if(!CryptAcquireContextA(&hProv, NULL, provider.c_str(), type,
