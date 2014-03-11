@@ -248,7 +248,7 @@ struct unit_normal_distribution
  * \random_distribution. Such a distribution produces random numbers
  * @c x distributed with probability density function
  * \f$\displaystyle p(x) =
- *   \frac{1}{\sqrt{2\pi\sigma}} e^{-\frac{(x-\mu)^2}{2\sigma^2}}
+ *   \frac{1}{\sqrt{2\pi}\sigma} e^{-\frac{(x-\mu)^2}{2\sigma^2}}
  * \f$,
  * where mean and sigma are the parameters of the distribution.
  */
