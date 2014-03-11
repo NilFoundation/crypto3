@@ -230,7 +230,7 @@ struct unit_normal_distribution
     template<class Engine>
     RealType generate_tail(Engine& eng) {
         boost::random::exponential_distribution<RealType> exponential;
-        const RealType tail_start(normal_table<double>::table_x[1]);
+        const RealType tail_start = RealType(normal_table<double>::table_x[1]);
         for(;;) {
             RealType x = exponential(eng)/tail_start;
             RealType y = exponential(eng);
