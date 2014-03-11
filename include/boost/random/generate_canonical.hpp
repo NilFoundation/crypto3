@@ -54,7 +54,6 @@ RealType generate_canonical_impl(URNG& g, boost::mpl::false_ /*is_integral*/)
     using std::floor;
     BOOST_ASSERT((g.min)() == 0);
     BOOST_ASSERT((g.max)() == 1);
-    typedef typename URNG::result_type base_result;
     std::size_t digits = std::numeric_limits<RealType>::digits;
     std::size_t engine_bits = detail::generator_bits<URNG>::value();
     std::size_t b = (std::min)(bits, digits);

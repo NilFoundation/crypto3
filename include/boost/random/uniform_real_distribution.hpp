@@ -36,7 +36,6 @@ T generate_uniform_real(
 {
     for(;;) {
         typedef T result_type;
-        typedef typename Engine::result_type base_result;
         result_type numerator = static_cast<T>(eng() - (eng.min)());
         result_type divisor = static_cast<T>((eng.max)() - (eng.min)());
         BOOST_ASSERT(divisor > 0);
