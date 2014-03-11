@@ -111,18 +111,25 @@ public:
 private:
   void error(const std::string & msg) {
     char buf[80];
+    DWORD error_code = GetLastError();
     DWORD num = FormatMessageA(
       FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
       NULL,
-      GetLastError(),
+      error_code,
       0,
       buf,
       sizeof(buf),
       NULL);
 
-    boost::throw_exception(std::invalid_argument("boost::random_device: " + msg + 
-                                " Cryptopraphic Service Provider " + provider + 
-                                ": " + std::string(&buf[0], &buf[0] + num)));
+    char hex_error[9];
+    hex_error[8] = 0;
+    _snprintf(hex_error, sizeof(hex_error), "%08x", error_code);
+
+    boost::throw_exception(
+        std::invalid_argument(
+            "boost::random_device: " + msg + ": " + hex_error +
+            " " + std::string(&buf[0], &buf[0] + num) + 
+            " (Cryptographic Service Provider: " + provider + ")"));
   }
   const std::string provider;
   HCRYPTPROV hProv;
