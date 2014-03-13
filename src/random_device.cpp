@@ -17,6 +17,8 @@
 #include <boost/throw_exception.hpp>
 #include <boost/assert.hpp>
 #include <boost/detail/workaround.hpp>
+#include <boost/system/system_error.hpp>
+#include <boost/system/error_code.hpp>
 #include <string>
 
 #if !defined(BOOST_NO_INCLASS_MEMBER_INITIALIZATION) && !BOOST_WORKAROUND(BOOST_MSVC, BOOST_TESTED_AT(1600))
@@ -69,7 +71,6 @@ public:
     char buffer[80];
     DWORD type;
     DWORD len;
-    bool found (false);
 
     // Find the type of a specific provider
     for(DWORD i = 0; ; ++i) {
@@ -79,12 +80,8 @@ public:
         continue;
       }
       if(buffer == provider) {
-        found = true;
         break;
       }
-    }
-    if (!found) {
-      error("Could not find provider name");
     }
 
     if(!CryptAcquireContextA(&hProv, NULL, provider.c_str(), type,
@@ -109,27 +106,13 @@ public:
   }
 
 private:
-  void error(const std::string & msg) {
-    char buf[80];
+  void error(const char * msg) {
     DWORD error_code = GetLastError();
-    DWORD num = FormatMessageA(
-      FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-      NULL,
-      error_code,
-      0,
-      buf,
-      sizeof(buf),
-      NULL);
-
-    char hex_error[9];
-    hex_error[8] = 0;
-    _snprintf(hex_error, sizeof(hex_error), "%08x", error_code);
-
     boost::throw_exception(
-        std::invalid_argument(
-            "boost::random_device: " + msg + ": " + hex_error +
-            " " + std::string(&buf[0], &buf[0] + num) + 
-            " (Cryptographic Service Provider: " + provider + ")"));
+      boost::system::system_error(
+        error_code, boost::system::system_category(),
+        std::string("boost::random_device: ") + msg + 
+        " Cryptographic Service Provider " + provider));
   }
   const std::string provider;
   HCRYPTPROV hProv;
@@ -196,10 +179,12 @@ public:
   }
 
 private:
-  void error(const std::string & msg) {
-    boost::throw_exception(std::invalid_argument("boost::random_device: " + msg + 
-                                " random-number pseudo-device " + path + 
-                                ": " + strerror(errno)));
+  void error(const char * msg) {
+    boost::throw_exception(
+      boost::system::system_error(
+        errno, boost::system::system_category(),
+        std::string("boost::random_device: ") + msg + 
+        " random-number pseudo-device " + path));
   }
   const std::string path;
   int fd;
