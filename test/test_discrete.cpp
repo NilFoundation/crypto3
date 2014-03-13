@@ -92,7 +92,7 @@ bool handle_option(int& argc, char**& argv, char opt, T& value) {
 
 int main(int argc, char** argv) {
     int repeat = 10;
-    int max_n = 100000;
+    int max_n = 10000;
     long long trials = 1000000ll;
 
     if(argc > 0) {
