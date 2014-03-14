@@ -117,6 +117,8 @@ run test_old_uniform_int.cpp ;
 run test_old_uniform_int_distribution.cpp /boost//unit_test_framework ;
 run test_beta.cpp ;
 run test_beta_distribution.cpp /boost//unit_test_framework ;
+run test_laplace.cpp ;
+run test_laplace_distribution.cpp /boost//unit_test_framework ;
 
 # run nondet_random_speed.cpp ;
 # run random_device.cpp ;
