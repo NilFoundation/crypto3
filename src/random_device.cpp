@@ -180,9 +180,10 @@ public:
 
 private:
   void error(const char * msg) {
+    int error_code = errno;
     boost::throw_exception(
       boost::system::system_error(
-        errno, boost::system::system_category(),
+        error_code, boost::system::system_category(),
         std::string("boost::random_device: ") + msg + 
         " random-number pseudo-device " + path));
   }
