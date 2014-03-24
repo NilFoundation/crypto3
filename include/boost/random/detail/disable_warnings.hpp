@@ -21,3 +21,8 @@
 #pragma warning(disable:4127)
 #pragma warning(disable:4724)
 #endif
+
+#if defined(BOOST_GCC) && BOOST_GCC >= 40600
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wlogical-op"
+#endif
