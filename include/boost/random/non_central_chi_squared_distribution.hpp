@@ -43,8 +43,9 @@ namespace random {
  * The algorithm is taken from
  *
  *  @blockquote
- *  "Monte Carlo Methods in Financial Engineering", 
- *  Paul Glasserman, p 124
+ *  "Monte Carlo Methods in Financial Engineering", Paul Glasserman,
+ *  2003, XIII, 596 p, Stochastic Modelling and Applied Probability, Vol. 53,
+ *  ISBN 978-0-387-21617-1, p 124, Fig. 3.5.
  *  @endblockquote
  */
 template <typename RealType = double>
