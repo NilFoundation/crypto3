@@ -182,6 +182,21 @@ BOOST_AUTO_TEST_CASE(test_discard2)
 }
 #endif
 
+#ifdef BOOST_RANDOM_DISCARD_MAX
+BOOST_AUTO_TEST_CASE(test_discard_max)
+{
+    boost::uintmax_t val = (std::numeric_limits<boost::uintmax_t>::max)();
+    boost::uintmax_t half = val / 2;
+    BOOST_RANDOM_URNG urng;
+    BOOST_RANDOM_URNG urng2;
+    urng.discard(half);
+    urng.discard(half);
+    urng.discard(val - 2*half);
+    urng2.discard(val);
+    BOOST_CHECK_EQUAL(urng, urng2);
+}
+#endif
+
 BOOST_AUTO_TEST_CASE(test_copy)
 {
     BOOST_RANDOM_URNG urng;

@@ -257,7 +257,7 @@ public:
             std::fill_n(out + 1, n - 1, digit_t(0));
             return;
         }
-        boost::uintmax_t i = bits - 1;
+        boost::uintmax_t i = std::numeric_limits<boost::uintmax_t>::digits - 1;
         while(((boost::uintmax_t(1) << i) & exponent) == 0) {
             --i;
         }
