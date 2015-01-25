@@ -37,6 +37,7 @@ doxygen_files =
     lognormal_distribution
     mersenne_twister
     negative_binomial_distribution
+    non_central_chi_squared_distribution
     normal_distribution
     piecewise_constant_distribution
     piecewise_linear_distribution
