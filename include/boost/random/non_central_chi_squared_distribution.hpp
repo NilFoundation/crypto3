@@ -14,6 +14,7 @@
 #ifndef BOOST_RANDOM_NON_CENTRAL_CHI_SQUARED_DISTRIBUTION_HPP
 #define BOOST_RANDOM_NON_CENTRAL_CHI_SQUARED_DISTRIBUTION_HPP
 
+#include <boost/config/no_tr1/cmath.hpp>
 #include <iosfwd>
 #include <istream>
 #include <boost/limits.hpp>
@@ -141,6 +142,7 @@ public:
     template<typename URNG> 
     RealType operator()(URNG& eng) 
     {
+        using std::sqrt;
         if (_param.k() > 1) {
             boost::random::normal_distribution<RealType> n_dist;
             boost::random::chi_squared_distribution<RealType> c_dist(_param.k() - RealType(1));
