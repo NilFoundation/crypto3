@@ -26,8 +26,7 @@ namespace detail {
 
 class polynomial_ops {
 public:
-    // This is my best guess at the size of a hardware register
-    typedef boost::uintptr_t digit_t;
+    typedef unsigned long digit_t;
 
     static void add(std::size_t size, const digit_t * lhs,
                        const digit_t * rhs, digit_t * output)
