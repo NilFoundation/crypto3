@@ -14,6 +14,8 @@ import regex ;
 import os ;
 import path ;
 
+path-constant here : . ;
+
 doxygen_files =
     additive_combine
     bernoulli_distribution
@@ -169,4 +171,5 @@ boostbook standalone :
     <implicit-dependency>reference
     <xsl:param>boost.root=../../../..
     <xsl:param>chunk.section.depth=2
+    <format>pdf:<xsl:param>img.src.path=$(here)/html/
 ;
