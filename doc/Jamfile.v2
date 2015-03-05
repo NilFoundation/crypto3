@@ -29,6 +29,7 @@ doxygen_files =
     extreme_value_distribution
     fisher_f_distribution
     gamma_distribution
+    generate_canonical
     geometric_distribution
     independent_bits
     inversive_congruential
