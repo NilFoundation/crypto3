@@ -121,6 +121,8 @@ run test_laplace.cpp ;
 run test_laplace_distribution.cpp /boost//unit_test_framework ;
 run test_non_central_chi_squared.cpp ;
 run test_non_central_chi_squared_distribution.cpp /boost//unit_test_framework ;
+run test_hyperexponential.cpp ;
+run test_hyperexponential_distribution.cpp /boost//unit_test_framework ;
 
 # run nondet_random_speed.cpp ;
 # run random_device.cpp ;

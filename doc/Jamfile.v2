@@ -31,6 +31,7 @@ doxygen_files =
     gamma_distribution
     generate_canonical
     geometric_distribution
+    hyperexponential_distribution
     independent_bits
     inversive_congruential
     lagged_fibonacci

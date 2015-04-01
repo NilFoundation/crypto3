@@ -75,6 +75,7 @@
 [def __cauchy_distribution [classref boost::random::cauchy_distribution cauchy_distribution]]
 [def __discrete_distribution [classref boost::random::discrete_distribution discrete_distribution]]
 [def __gamma_distribution [classref boost::random::gamma_distribution gamma_distribution]]
+[def __hyperexponential_distribution [classref boost::random::hyperexponential_distribution hyperexponential_distribution]]
 [def __laplace_distribution [classref boost::random::laplace_distribution laplace_distribution]]
 [def __poisson_distribution [classref boost::random::poisson_distribution poisson_distribution]]
 [def __geometric_distribution [classref boost::random::geometric_distribution geometric_distribution]]
