@@ -75,7 +75,7 @@ BOOST_AUTO_TEST_CASE(test_valid_output) {
     for(int n = 0; n < 10; ++n) {
         boost::random::uniform_on_sphere<> dist(n);
         std::vector<double> result = dist(gen);
-        BOOST_TEST(result.size() == n);
+        BOOST_TEST(result.size() == static_cast<std::size_t>(n));
         if(n > 0) {
             double sum_sq = 0;
             for(std::size_t j = 0; j < result.size(); ++j) {
