@@ -176,3 +176,13 @@ boostbook standalone :
     <xsl:param>chunk.section.depth=2
     <format>pdf:<xsl:param>img.src.path=$(here)/html/
 ;
+
+###############################################################################
+alias boostdoc
+    : random
+    :
+    : <dependency>reference
+    : ;
+explicit boostdoc ;
+alias boostrelease ;
+explicit boostrelease ;
