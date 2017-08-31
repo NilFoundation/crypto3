@@ -199,6 +199,70 @@ the generator, for example to re-run a test suite at a later time.]
 
 [endsect]
 
+[section Quasi-Random Number Generator]
+
+A quasi-random number generator is a __UniformRandomNumberGenerator which
+provides a deterministic sequence of quasi-random numbers, based on some
+algorithm and internal state. [classref boost::random::niederreiter_base2
+Niederreiter Base 2] generator is an example of such a [qrng quasi-random
+number generator]. The "quasi" modifier is used to denote more clearly that the
+values produced by such a generator are neither random nor pseudo-random, but
+they form a low discrepancy sequence. The intuitive idea is that a low discrepancy 
+sequence is more evenly distributed than a pseudo random sequence would be.
+For example, if we generate a low discrepancy sequence of 2D points on a square,
+this square would be covered more evenly, and the number of points falling to any
+part of the square would be proportional to the number of points in the whole square.
+Such sequences share some properties of  random variables and in certain applications 
+such as the quasi-Monte Carlo method  their lower discrepancy is an important advantage.
+
+[note Quasi-random sequences are known to give efficient numerical integration 
+rules in many Bayesian statistical problems where the posterior distribution can be 
+transformed into periodic functions on the n-dimensional hypercube.]
+
+Harold Niederreiter gives an extensive overview on random number generation
+and quasi-Monte Carlo methods in his book "Random number generation and
+quasi-Monte Carlo methods, Society for Industrial and Applied Mathematics, 1992". 
+
+In addition to the __UniformRandomNumberGenerator requirements,
+a quasi-random number generator has some additional requirements. In the
+following table, `X` denotes a quasi-random number generator class, and `v` is 
+a const value of `X`.
+
+[table QuasiRandomNumberGenerator requirements
+  [[expression] [return type] [pre/post-condition]]
+  [[`X::dimension()`] [std::size_t] [the dimension of quasi-random domain. It must be no less than 1.
+                        The return value of this function shall not change during the lifetime of the object.]]
+ ]
+
+[note The `operator()` returns a successive element of an n-dimensional (n = `X::dimension()`) vector 
+at each invocation. When all elements are exhausted, `operator()` begins anew with the starting
+element of a subsequent n-dimensional vector.]
+
+Classes which model a quasi-random number generator shall also model
+__EqualityComparable, i.e. implement `operator==`. Two quasi-random number
+generators are defined to be /equivalent/ if they both return an identical
+sequence of numbers starting from a given state.
+
+Classes which model a quasi-random number generator shall also model the
+__Streamable concept, i.e. implement `operator<<` and `operator>>`.
+`operator<<` writes all current state of the quasi-random number generator
+to the given `ostream` so that `operator>>` can restore the state at a later
+time. The state shall be written in a platform-independent manner, but it is
+assumed that the `locales` used for writing and reading be the same. The
+quasi-random number generator with the restored state and the original at
+the just-written state shall be equivalent.
+
+Classes which model a quasi-random number generator should also model the
+__CopyConstructible and __Assignable concepts. However, note that the
+sequences of the original and the copy are strongly correlated (in fact,
+they are identical), which may make them unsuitable for some problem domains.
+Thus, copying quasi-random number generators is discouraged; they should
+always be passed by (non-const) reference.
+
+The classes __niederreiter_base2, __sobol, __faure are models for a quasi-random number generator.
+
+[endsect]
+
 [section Seed Sequence]
 
 A SeedSeq represents a sequence of values that can be used to
