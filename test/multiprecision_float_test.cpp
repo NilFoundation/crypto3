@@ -14,6 +14,7 @@
 #define BOOST_TEST_MAIN
 #include <boost/test/unit_test.hpp>
 
+#include <boost/core/ignore_unused.hpp>
 #include <boost/multiprecision/cpp_bin_float.hpp>
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/multiprecision/debug_adaptor.hpp>
@@ -95,6 +96,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(distributions_test, dist_type, distributions)
    result_type a = (d.min)();
    result_type b = (d.max)();
    typename dist_type::param_type p = d.param();
+   boost::ignore_unused(p);
    d.reset();
    
    std::stringstream ss;
