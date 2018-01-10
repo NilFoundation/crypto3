@@ -61,7 +61,7 @@ BOOST_AUTO_TEST_CASE( test_constructors )
     BOOST_RANDOM_HYPEREXP_CHECK_CLOSE_COLLECTIONS(double, dist.probabilities(), boost::assign::list_of(1.0), tol);
     BOOST_RANDOM_HYPEREXP_CHECK_CLOSE_COLLECTIONS(double, dist.rates(), boost::assign::list_of(1.0), tol);
 
-#ifndef BOOST_NO_CXX11_HDR_INITIALIZER_LIST
+#if !defined(BOOST_NO_CXX11_HDR_INITIALIZER_LIST) && !defined(BOOST_NO_CXX11_UNIFIED_INITIALIZATION_SYNTAX)
     // Test ctor from initializer_list with probabilities and rates
     boost::random::hyperexponential_distribution<> dist_il_p_r = {{1, 2, 3, 4 }, {1, 2, 3, 4}};
     BOOST_CHECK_EQUAL(dist_il_p_r.num_phases(), 4u);
@@ -150,7 +150,7 @@ BOOST_AUTO_TEST_CASE( test_param )
     BOOST_RANDOM_HYPEREXP_CHECK_CLOSE_COLLECTIONS(double, param_default.rates(), boost::assign::list_of(1.0), tol);
     BOOST_CHECK(param != param_default);
     BOOST_CHECK(!(param == param_default));
-#ifndef BOOST_NO_CXX11_HDR_INITIALIZER_LIST
+#if !defined(BOOST_NO_CXX11_HDR_INITIALIZER_LIST) && !defined(BOOST_NO_CXX11_UNIFIED_INITIALIZATION_SYNTAX)
     boost::random::hyperexponential_distribution<>::param_type param_il = {{1, 2, 3, 4 }, {1, 2, 3, 4}};
     BOOST_RANDOM_HYPEREXP_CHECK_CLOSE_COLLECTIONS(double, param_il.probabilities(), boost::assign::list_of(.1)(.2)(.3)(.4), tol);
     BOOST_RANDOM_HYPEREXP_CHECK_CLOSE_COLLECTIONS(double, param_il.rates(), boost::assign::list_of(1.)(2.)(3.)(4.), tol);
