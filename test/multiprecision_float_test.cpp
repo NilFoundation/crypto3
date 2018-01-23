@@ -84,7 +84,6 @@ typedef boost::mpl::list <
    //boost::random::uniform_01<big_float>,  // doesn't respect the concept!  But gets used internally anyway.
    boost::random::uniform_real_distribution<big_float>,
    boost::random::uniform_on_sphere<big_float>,
-   boost::random::uniform_real_distribution<big_float>,
    boost::random::weibull_distribution<big_float>
 > distributions;
 
