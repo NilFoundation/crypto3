@@ -1,4 +1,4 @@
-// Copyright Justinas Vygintas Daugmaudis, 2010.
+// Copyright Justinas Vygintas Daugmaudis, 2010-2018.
 // Use, modification and distribution is subject to the
 // Boost Software License, Version 1.0. (See accompanying
 // file LICENSE-1.0 or http://www.boost.org/LICENSE-1.0)
@@ -26,7 +26,7 @@
 
 // Spatial dimension: 2
 // N: 100
-// Vectors skipped: 4096
+// Vectors skipped: 4095
 static const double niederreiter_base2_02_100[100][2] =
 {
   { 0.0003662109, 0.4705810548 },
@@ -133,7 +133,7 @@ static const double niederreiter_base2_02_100[100][2] =
 
 // Spatial dimension: 7
 // N: 100
-// Vectors skipped: 4096
+// Vectors skipped: 4095
 static const double niederreiter_base2_07_100[100][7] =
 {
   { 0.0003662109, 0.4705810548, 0.6358642580, 0.9561767580, 0.6715087892, 0.9793701174, 0.6053466798 },
@@ -241,7 +241,7 @@ static const double niederreiter_base2_07_100[100][7] =
 
 // Spatial dimension: 16
 // N: 100
-// Vectors skipped: 4096
+// Vectors skipped: 4095
 static const double niederreiter_base2_16_100[100][16] =
 {
   { 0.0003662109, 0.4705810548, 0.6358642580, 0.9561767580, 0.6715087892, 0.9793701174, 0.6053466798, 0.1983642579, 0.2217731476, 0.3769855500, 0.5390644075, 0.4707050325, 0.2744159699, 0.9942340853, 0.5396728517, 0.0626220703 },
@@ -348,25 +348,32 @@ static const double niederreiter_base2_16_100[100][16] =
 
 
 QRNG_VALIDATION_TEST_FUNCTIONS(niederreiter_base2)
+QRNG_VALIDATION_TEST_DISCARD(niederreiter_base2)
 
+BOOST_AUTO_TEST_CASE( check_generator_limits )
+{
+  test_niederreiter_base2_max_seed();
+  test_niederreiter_base2_max_discard();
+  test_niederreiter_base2_max_dimension(BOOST_RANDOM_NIEDERREITER_BASE2_MAX_DIMENSION);
+}
 
 BOOST_AUTO_TEST_CASE( validate_niederreiter_base2 )
 {
-  test_niederreiter_base2_values(niederreiter_base2_02_100, 4096);
-  test_niederreiter_base2_values(niederreiter_base2_07_100, 4096);
-  test_niederreiter_base2_values(niederreiter_base2_16_100, 4096);
+  test_niederreiter_base2_values(niederreiter_base2_02_100, 4095);
+  test_niederreiter_base2_values(niederreiter_base2_07_100, 4095);
+  test_niederreiter_base2_values(niederreiter_base2_16_100, 4095);
 }
 
 BOOST_AUTO_TEST_CASE( validate_niederreiter_base2_seed )
 {
-  test_niederreiter_base2_seed(niederreiter_base2_02_100, 4096);
-  test_niederreiter_base2_seed(niederreiter_base2_07_100, 4096);
-  test_niederreiter_base2_seed(niederreiter_base2_16_100, 4096);
+  test_niederreiter_base2_seed(niederreiter_base2_02_100, 4095);
+  test_niederreiter_base2_seed(niederreiter_base2_07_100, 4095);
+  test_niederreiter_base2_seed(niederreiter_base2_16_100, 4095);
 }
 
 BOOST_AUTO_TEST_CASE( validate_niederreiter_base2_discard )
 {
-  test_niederreiter_base2_discard(niederreiter_base2_02_100, 4096);
-  test_niederreiter_base2_discard(niederreiter_base2_07_100, 4096);
-  test_niederreiter_base2_discard(niederreiter_base2_16_100, 4096);
+  test_niederreiter_base2_discard(niederreiter_base2_02_100, 4095);
+  test_niederreiter_base2_discard(niederreiter_base2_07_100, 4095);
+  test_niederreiter_base2_discard(niederreiter_base2_16_100, 4095);
 }

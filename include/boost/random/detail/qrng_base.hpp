@@ -1,6 +1,6 @@
-/* boost random/detail/quasi_random_number_generator_base.hpp header file
+/* boost random/detail/qrng_base.hpp header file
  *
- * Copyright Justinas Vygintas Daugmaudis 2010-2017
+ * Copyright Justinas Vygintas Daugmaudis 2010-2018
  * Distributed under the Boost Software License, Version 1.0. (See
  * accompanying file LICENSE_1_0.txt or copy at
  * http://www.boost.org/LICENSE_1_0.txt)
@@ -9,12 +9,15 @@
 #ifndef BOOST_RANDOM_DETAIL_QRNG_BASE_HPP
 #define BOOST_RANDOM_DETAIL_QRNG_BASE_HPP
 
-#include <istream>
-#include <ostream>
-
 #include <stdexcept>
 #include <vector>
+#include <limits>
 
+#include <istream>
+#include <ostream>
+#include <sstream>
+
+#include <boost/cstdint.hpp>
 #include <boost/random/detail/operators.hpp>
 
 #include <boost/throw_exception.hpp>
@@ -27,10 +30,18 @@ namespace random {
 
 namespace detail {
 
-template<typename DerivedT, typename LatticeT>
+template <typename T>
+inline bool are_close(T x, T y, T eps) // |x - y| <= eps
+{
+  if (x < y) std::swap(x, y);
+  return !(x - y > eps);
+}
+
+template<typename DerivedT, typename LatticeT, typename SizeT>
 class qrng_base
 {
 public:
+  typedef SizeT size_type;
   typedef typename LatticeT::value_type result_type;
 
   explicit qrng_base(std::size_t dimension)
@@ -50,14 +61,12 @@ public:
   //!Throws: nothing.
   std::size_t dimension() const { return quasi_state.size(); }
 
-  //!Requirements: *this is mutable.
-  //!
   //!Returns: Returns a successive element of an s-dimensional
   //!(s = X::dimension()) vector at each invocation. When all elements are
   //!exhausted, X::operator() begins anew with the starting element of a
   //!subsequent s-dimensional vector.
   //!
-  //!Throws: overflow_error.
+  //!Throws: range_error.
   result_type operator()()
   {
     return curr_elem != dimension() ? load_cached(): next_state();
@@ -70,53 +79,64 @@ public:
       *first = this->operator()();
   }
 
-  //!Requirements: *this is mutable.
-  //!
   //!Effects: Advances *this state as if z consecutive
   //!X::operator() invocations were executed.
   //!
-  //!Throws: overflow_error.
-  void discard(std::size_t z)
+  //!Throws: range_error.
+  void discard(boost::uintmax_t z)
   {
     const std::size_t dimension_value = dimension();
 
-    std::size_t vec_n  = z / dimension_value;
-    std::size_t elem_n = z - vec_n * dimension_value; // z % Dimension
-    std::size_t vec_offset = vec_n + (curr_elem + elem_n) / dimension_value;
-    // Discards vec_offset consecutive s-dimensional vectors
-    discard_vector(vec_offset);
+    // Compiler knows how to optimize subsequent x / y and x % y
+    // statements. In fact, gcc does this even at -O1, so don't
+    // be tempted to "optimize" % via subtraction and multiplication.
+
+    boost::uintmax_t vec_n = z / dimension_value;
+    std::size_t carry = curr_elem + (z % dimension_value);
+
+    vec_n += carry / dimension_value;
+    carry  = carry % dimension_value;
+
+    // Avoid overdiscarding by branchlessly correcting the triple
+    // (D, S + 1, 0) to (D, S, D) (see equality operator)
+    const bool corr = (!carry) & static_cast<bool>(vec_n);
+
+    // Discards vec_n (with correction) consecutive s-dimensional vectors
+    discard_vector(vec_n - static_cast<boost::uintmax_t>(corr));
     // Sets up the proper position of the element-to-read
-    curr_elem += (z - dimension_value * vec_offset);
+    // curr_elem = carry + corr*dimension_value
+    curr_elem = carry ^ (-static_cast<std::size_t>(corr) & dimension_value);
   }
 
-  //!Writes a @c DerivedT to a @c std::ostream.
-  BOOST_RANDOM_DETAIL_OSTREAM_OPERATOR(os, DerivedT, s)
+  //!Writes the textual representation of the generator to a @c std::ostream.
+  BOOST_RANDOM_DETAIL_OSTREAM_OPERATOR(os, qrng_base, s)
   {
     os << s.dimension() << " " << s.seq_count << " " << s.curr_elem;
     return os;
   }
 
-  //!Reads a @c DerivedT from a @c std::istream.
-  BOOST_RANDOM_DETAIL_ISTREAM_OPERATOR(is, DerivedT, s)
+  //!Reads the textual representation of the generator from a @c std::istream.
+  BOOST_RANDOM_DETAIL_ISTREAM_OPERATOR(is, qrng_base, s)
   {
-    std::size_t dim, seed, z;
+    std::size_t dim;
+    size_type seed;
+    boost::uintmax_t z;
     if (is >> dim >> std::ws >> seed >> std::ws >> z) // initialize iff success!
     {
-      if (s.dimension() != dim)
+      if (s.dimension() != prevent_zero_dimension(dim))
       {
-        prevent_zero_dimension(dim);
         s.lattice.resize(dim);
         s.quasi_state.resize(dim);
       }
       // Fast-forward to the correct state
-      s.seed(seed);
-      s.discard(z);
+      s.derived().seed(seed);
+      if (z != 0) s.discard(z);
     }
     return is;
   }
 
-  //!Returns true if the two generators will produce identical sequences.
-  BOOST_RANDOM_DETAIL_EQUALITY_OPERATOR(DerivedT, x, y)
+  //!Returns true if the two generators will produce identical sequences of outputs.
+  BOOST_RANDOM_DETAIL_EQUALITY_OPERATOR(qrng_base, x, y)
   {
     const std::size_t dimension_value = x.dimension();
 
@@ -126,32 +146,38 @@ public:
     // and the last one is curr_elem.
 
     return (dimension_value == y.dimension()) &&
+      are_close(x.seq_count, y.seq_count, static_cast<size_type>(1)) &&
+      // Potential overflows don't matter here, since we've already ascertained
+      // that sequence counts differ by no more than 1, so if they overflow, they
+      // can overflow together.
       (x.seq_count + (x.curr_elem / dimension_value) == y.seq_count + (y.curr_elem / dimension_value)) &&
       (x.curr_elem % dimension_value == y.curr_elem % dimension_value);
   }
 
-  //!Returns true if the two generators will produce different sequences,
-  BOOST_RANDOM_DETAIL_INEQUALITY_OPERATOR(DerivedT)
+  //!Returns true if the two generators will produce different sequences of outputs.
+  BOOST_RANDOM_DETAIL_INEQUALITY_OPERATOR(qrng_base)
 
 protected:
-  DerivedT& derived() throw()
-  {
-    return *static_cast<DerivedT * const>(this);
-  }
+  typedef std::vector<result_type> state_type;
+  typedef typename state_type::iterator state_iterator;
 
-  void reset_state()
+  // Getters
+  size_type curr_seq() const { return seq_count; }
+
+  state_iterator state_begin() { return quasi_state.begin(); }
+  state_iterator state_end() { return quasi_state.end(); }
+
+  // Setters
+  void reset_seq(size_type seq)
   {
-    curr_elem = 0;
-    seq_count = 0;
-    std::fill(quasi_state.begin(), quasi_state.end(), result_type /*zero*/());
+    seq_count = seq;
+    curr_elem = 0u;
   }
 
 private:
-  inline static std::size_t prevent_zero_dimension(std::size_t dimension)
+  DerivedT& derived() throw()
   {
-    if (dimension == 0)
-      boost::throw_exception( std::invalid_argument("qrng_base: zero dimension") );
-    return dimension;
+    return *static_cast<DerivedT * const>(this);
   }
 
   // Load the result from the saved state.
@@ -162,39 +188,64 @@ private:
 
   result_type next_state()
   {
-    derived().compute_next();
-
-    curr_elem = 0;
-    return load_cached();
+    size_type new_seq = seq_count;
+    if (BOOST_LIKELY(++new_seq > seq_count))
+    {
+      derived().compute_seq(new_seq);
+      reset_seq(new_seq);
+      return load_cached();
+    }
+    boost::throw_exception( std::range_error("qrng_base: next_state") );
   }
 
   // Discards z consecutive s-dimensional vectors,
   // and preserves the position of the element-to-read
-  void discard_vector(std::size_t z)
+  void discard_vector(boost::uintmax_t z)
   {
-    std::size_t inc_seq_count = seq_count + z;
-    // Here we check that no overflow occurs before we
-    // begin seeding the new value
-    if (inc_seq_count > seq_count)
-    {
-      std::size_t tmp = curr_elem;
+    const size_type max_z = std::numeric_limits<size_type>::max() - seq_count;
 
-      derived().seed(inc_seq_count);
+    // Don't allow seq_count + z overflows here
+    if (max_z < z)
+      boost::throw_exception( std::range_error("qrng_base: discard_vector") );
 
-      curr_elem = tmp;
-    }
-    else if (inc_seq_count < seq_count) // Increment overflowed?
-    {
-      boost::throw_exception( std::overflow_error("discard_vector") );
-    }
+    std::size_t tmp = curr_elem;
+    derived().seed(seq_count + z);
+    curr_elem = tmp;
   }
 
+  static std::size_t prevent_zero_dimension(std::size_t dimension)
+  {
+    if (dimension == 0)
+      boost::throw_exception( std::invalid_argument("qrng_base: zero dimension") );
+    return dimension;
+  }
+
+  // Member variables are so ordered with the intention
+  // that the typical memory access pattern would be
+  // incremental. Moreover, lattice is put before quasi_state
+  // because we want to construct lattice first. Lattices
+  // can do some kind of dimension sanity check (as in
+  // dimension_assert below), and if that fails then we don't
+  // need to do any more work.
+private:
+  std::size_t curr_elem;
+  size_type seq_count;
 protected:
   LatticeT lattice;
-  std::size_t curr_elem;
-  std::size_t seq_count;
-  std::vector<result_type> quasi_state;
+private:
+  state_type quasi_state;
 };
+
+inline void dimension_assert(const char* generator, std::size_t dim, std::size_t maxdim)
+{
+  if (!dim || dim > maxdim)
+  {
+    std::ostringstream os;
+    os << "The " << generator << " quasi-random number generator only supports dimensions in range [1; "
+      << maxdim << "], but dimension " << dim << " was supplied.";
+    boost::throw_exception( std::invalid_argument(os.str()) );
+  }
+}
 
 }} // namespace detail::random
 

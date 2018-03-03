@@ -1,6 +1,6 @@
 /* boost random/faure.hpp header file
  *
- * Copyright Justinas Vygintas Daugmaudis 2010-2017
+ * Copyright Justinas Vygintas Daugmaudis 2010-2018
  * Distributed under the Boost Software License, Version 1.0. (See
  * accompanying file LICENSE_1_0.txt or copy at
  * http://www.boost.org/LICENSE_1_0.txt)
@@ -11,31 +11,26 @@
 
 #include <boost/random/detail/qrng_base.hpp>
 
+#include <cmath>
 #include <vector>
 #include <algorithm>
 
-#include <cmath>
-
 #include <boost/assert.hpp>
-
-#include <sstream>
-
-//!\file
-//!Describes the quasi-random number generator class template faure.
 
 namespace boost {
 namespace random {
 
 /** @cond */
 namespace detail {
-namespace fr {
+
+namespace qrng_tables {
 
 // There is no particular reason why 187 first primes were chosen
 // to be put into this table. The only reason was, perhaps, that
 // the number of dimensions for Faure generator would be around
-// the same number as the number of dimensions supported by the
-// Sobol qrng.
-struct prime_table
+// the same order of magnitude as the number of dimensions supported
+// by the Sobol qrng.
+struct primes
 {
   typedef unsigned short value_type;
 
@@ -62,56 +57,58 @@ struct prime_table
       1033, 1039, 1049, 1051, 1061, 1063, 1069, 1087, 1091, 1093,
       1097, 1103, 1109, 1117 };
 
-    if (n > prim_a[number_of_primes - 1])
-    {
-      std::ostringstream os;
-      os << "The Faure quasi-random number generator only supports up to "
-        << prim_a[number_of_primes - 1] << " dimensions.";
-      throw std::invalid_argument(os.str());
-    }
+    dimension_assert("Faure", n, prim_a[number_of_primes - 1]);
 
     return *std::lower_bound(prim_a, prim_a + number_of_primes, n);
   }
 };
 
+} // namespace qrng_tables
+
+
+namespace fr {
+
 // Returns the integer part of the logarithm base Base of arg.
 // In erroneous situations, e.g., integer_log(base, 0) the function
 // returns 0 and does not report the error. This is the intended
 // behavior.
-inline std::size_t integer_log(std::size_t base, std::size_t arg)
+template <typename T>
+inline T integer_log(T base, T arg)
 {
-  std::size_t ilog = 0;
-  while( base <= arg )
+  T ilog = T();
+  while (base <= arg)
   {
     arg /= base; ++ilog;
   }
   return ilog;
 }
 
-// Perform exponentiation by squaring
-inline std::size_t integer_pow(std::size_t base, std::size_t exp)
+// Perform exponentiation by squaring (potential for code reuse in multiprecision::powm)
+template <typename T>
+inline T integer_pow(T base, T e)
 {
-  std::size_t result = 1;
-  while (exp)
+  T result = static_cast<T>(1);
+  while (e)
   {
-    if (exp & 1)
+    if (e & static_cast<T>(1))
       result *= base;
-    exp >>= 1;
+    e >>= 1;
     base *= base;
   }
   return result;
 }
 
 // Computes a table of binomial coefficients modulo qs.
-template<typename RealType>
+template<typename RealType, typename SeqSizeT, typename PrimeTable>
 struct binomial_coefficients
 {
   typedef RealType value_type;
+  typedef SeqSizeT size_type;
 
   // Binomial values modulo qs_base will never be bigger than qs_base.
   // We can choose an appropriate integer type to hold modulo values and
   // shave off memory footprint.
-  typedef prime_table::value_type packed_uint_t;
+  typedef typename PrimeTable::value_type packed_uint_t;
 
   // default copy c-tor is fine
 
@@ -122,60 +119,57 @@ struct binomial_coefficients
 
   void resize(std::size_t dimension)
   {
-    qs_base = fr::prime_table::lower_bound(dimension);
-    inv_qs_base = static_cast<RealType>(1) / static_cast<RealType>(qs_base);
+    qs_base = PrimeTable::lower_bound(dimension);
 
     // Throw away previously computed coefficients.
     // This will trigger recomputation on next update
     coeff.clear();
   }
 
-  void update(std::size_t seq, std::vector<RealType>& quasi)
+  template <typename Iterator>
+  void update(size_type seq, Iterator first, Iterator last)
   {
-    if (!quasi.empty())
+    if (first != last)
     {
-      const std::size_t hisum = n_elements(seq);
-      if( coeff.size() != size_hint(hisum) )
-        recompute_tables(hisum);
-  
-      typename std::vector<RealType>::iterator it = quasi.begin();
-  
-      *it = compute_recip(seq, hisum, ytemp.rbegin());
-  
+      const size_type ilog = integer_log(static_cast<size_type>(qs_base), seq);
+      const size_type hisum = ilog + 1;
+      if (coeff.size() != size_hint(hisum)) {
+        ytemp.resize(hisum);
+        compute_coefficients(hisum);
+        qs_pow = integer_pow(static_cast<size_type>(qs_base), ilog);
+      }
+
+      *first = compute_recip(seq, ytemp.rbegin());
+
       // Find other components using the Faure method.
-      ++it;
-      for ( ; it != quasi.end(); ++it)
+      ++first;
+      for ( ; first != last; ++first)
       {
-        *it = RealType();
-        RealType r = inv_qs_base;
-  
-        for (std::size_t i = 0; i != hisum; ++i)
+        *first = RealType();
+        RealType r = static_cast<RealType>(1);
+
+        for (size_type i = 0; i != hisum; ++i)
         {
-          RealType ztemp = RealType();
-          for (std::size_t j = i; j != hisum; ++j)
+          RealType ztemp = ytemp[i] * upper_element(i, i, hisum);
+          for (size_type j = i + 1; j != hisum; ++j)
             ztemp += ytemp[j] * upper_element(i, j, hisum);
-  
+
           // Sum ( J <= I <= HISUM ) ( old ytemp(i) * binom(i,j) ) mod QS.
           ytemp[i] = std::fmod(ztemp, static_cast<RealType>(qs_base));
-          *it += ytemp[i] * r;
-          r *= inv_qs_base;
+          r *= static_cast<RealType>(qs_base);
+          *first += ytemp[i] / r;
         }
       }
     }
   }
 
 private:
-  inline std::size_t n_elements(std::size_t seq) const
-  {
-    return integer_log(qs_base, seq) + 1;
-  }
-
-  inline static std::size_t size_hint(std::size_t n)
+  inline static size_type size_hint(size_type n)
   {
     return n * (n + 1) / 2;
   }
 
-  packed_uint_t& upper_element(std::size_t i, std::size_t j, std::size_t dim)
+  packed_uint_t& upper_element(size_type i, size_type j, size_type dim)
   {
     BOOST_ASSERT( i < dim );
     BOOST_ASSERT( j < dim );
@@ -184,26 +178,26 @@ private:
   }
 
   template<typename Iterator>
-  RealType compute_recip(std::size_t seq, std::size_t n, Iterator out) const
+  RealType compute_recip(size_type seq, Iterator out) const
   {
     // Here we do
     //   Sum ( 0 <= J <= HISUM ) YTEMP(J) * QS**J
     //   Sum ( 0 <= J <= HISUM ) YTEMP(J) / QS**(J+1)
     // in one go
     RealType r = RealType();
-    std::size_t m, k = integer_pow(qs_base, n - 1);
-    for( ; n != 0; --n, ++out, seq = m, k /= qs_base )
+    size_type m, k = qs_pow;
+    for( ; k != 0; ++out, seq = m, k /= qs_base )
     {
       m  = seq % k;
-      RealType v  = (seq - m) / k; // RealType <- IntType
+      RealType v  = (seq - m) / k; // RealType <- size type
       r += v;
-      r *= inv_qs_base;
+      r /= static_cast<RealType>(qs_base);
       *out = v; // saves double dereference
     }
     return r;
   }
 
-  void compute_coefficients(const std::size_t n)
+  void compute_coefficients(const size_type n)
   {
     // Resize and initialize to zero
     coeff.resize(size_hint(n));
@@ -211,16 +205,16 @@ private:
 
     // The first row and the diagonal is assigned to 1
     upper_element(0, 0, n) = 1;
-    for (std::size_t i = 1; i < n; ++i)
+    for (size_type i = 1; i < n; ++i)
     {
       upper_element(0, i, n) = 1;
       upper_element(i, i, n) = 1;
     }
 
     // Computes binomial coefficients MOD qs_base
-    for (std::size_t i = 1; i < n; ++i)
+    for (size_type i = 1; i < n; ++i)
     {
-      for (std::size_t j = i + 1; j < n; ++j)
+      for (size_type j = i + 1; j < n; ++j)
       {
         upper_element(i, j, n) = ( upper_element(i, j-1, n) +
                                    upper_element(i-1, j-1, n) ) % qs_base;
@@ -228,27 +222,25 @@ private:
     }
   }
 
-  void recompute_tables(std::size_t n)
-  {
-    ytemp.resize(n);
-    compute_coefficients(n);
-  }
-
 private:
   packed_uint_t qs_base;
-  RealType inv_qs_base;
 
   // here we cache precomputed data; note that binomial coefficients have
   // to be recomputed iff the integer part of the logarithm of seq changes,
   // which happens relatively rarely.
   std::vector<packed_uint_t> coeff; // packed upper (!) triangular matrix
   std::vector<RealType> ytemp;
+  size_type qs_pow;
 };
 
 }} // namespace detail::fr
+
+typedef detail::qrng_tables::primes default_faure_prime_table;
+
 /** @endcond */
 
-//!class template faure implements a quasi-random number generator as described in
+//!Instantiations of class template faure_engine model a \quasi_random_number_generator.
+//!The faure_engine uses the algorithm described in
 //! \blockquote
 //!Henri Faure,
 //!Discrepance de suites associees a un systeme de numeration (en dimension s),
@@ -265,102 +257,106 @@ private:
 //!Volume 12, Number 4, December 1986, pages 362-376.
 //! \endblockquote
 //!
-//!\attention\b Important: This implementation supports up to 229 dimensions.
-//!
 //!In the following documentation @c X denotes the concrete class of the template
-//!faure returning objects of type @c RealType, u and v are the values of @c X.
+//!faure_engine returning objects of type @c RealType, u and v are the values of @c X.
 //!
 //!Some member functions may throw exceptions of type @c std::bad_alloc.
-//!
-//! \copydoc friendfunctions
-template<typename RealType>
-class faure : public detail::qrng_base<
-                        faure<RealType>
-                      , detail::fr::binomial_coefficients<RealType>
-                      >
+template<typename RealType, typename SeqSizeT, typename PrimeTable = default_faure_prime_table>
+class faure_engine
+  : public detail::qrng_base<
+      faure_engine<RealType, SeqSizeT, PrimeTable>
+    , detail::fr::binomial_coefficients<RealType, SeqSizeT, PrimeTable>
+    , SeqSizeT
+    >
 {
-  typedef faure<RealType> self_t;
+  typedef faure_engine<RealType, SeqSizeT, PrimeTable> self_t;
 
-  typedef detail::fr::binomial_coefficients<RealType> lattice_t;
-  typedef detail::qrng_base<self_t, lattice_t> base_t;
+  typedef detail::fr::binomial_coefficients<RealType, SeqSizeT, PrimeTable> lattice_t;
+  typedef detail::qrng_base<self_t, lattice_t, SeqSizeT> base_t;
 
-  friend class detail::qrng_base<self_t, lattice_t >;
+  friend class detail::qrng_base<self_t, lattice_t, SeqSizeT>;
 
 public:
   typedef RealType result_type;
 
-  /** @copydoc boost::random::niederreiter_base2::min() */
-  static result_type min /** @cond */ BOOST_PREVENT_MACRO_SUBSTITUTION /** @endcond */ () { return static_cast<RealType>(0); }
+  /** @copydoc boost::random::niederreiter_base2_engine::min() */
+  static BOOST_CONSTEXPR result_type min BOOST_PREVENT_MACRO_SUBSTITUTION ()
+  { return static_cast<result_type>(0); }
 
-  /** @copydoc boost::random::niederreiter_base2::max() */
-  static result_type max /** @cond */ BOOST_PREVENT_MACRO_SUBSTITUTION /** @endcond */ () { return static_cast<RealType>(1); }
+  /** @copydoc boost::random::niederreiter_base2_engine::max() */
+  static BOOST_CONSTEXPR result_type max BOOST_PREVENT_MACRO_SUBSTITUTION ()
+  { return static_cast<result_type>(1); }
 
-  //!Effects: Constructs the s-dimensional default Faure quasi-random number generator.
+  //!Effects: Constructs the `s`-dimensional default Faure quasi-random number generator.
   //!
   //!Throws: bad_alloc, invalid_argument.
-  explicit faure(std::size_t s)
+  explicit faure_engine(std::size_t s)
     : base_t(s) // initialize the binomial table here
   {}
 
-  /** @copydetails boost::random::niederreiter_base2::seed()
+  /** @copydetails boost::random::niederreiter_base2_engine::seed(UIntType)
    * Throws: bad_alloc.
    */
-  void seed()
-  {
-    seed(0);
-  }
-
-  /** @copydetails boost::random::niederreiter_base2::seed(std::size_t)
-   * Throws: bad_alloc.
-   */
-  void seed(std::size_t init)
+  void seed(SeqSizeT init = 0)
   {
     compute_seq(init);
-    this->curr_elem = 0;
-    this->seq_count = init;
+    base_t::reset_seq(init);
   }
 
+#ifdef BOOST_RANDOM_DOXYGEN
   //=========================Doxygen needs this!==============================
 
-  //!Requirements: *this is mutable.
-  //!
-  //!Returns: Returns a successive element of an s-dimensional
-  //!(s = X::dimension()) vector at each invocation. When all elements are
-  //!exhausted, X::operator() begins anew with the starting element of a
-  //!subsequent s-dimensional vector.
-  //!
-  //!Throws: bad_alloc.
+  /** @copydoc boost::random::niederreiter_base2_engine::dimension() */
+  std::size_t dimension() const { return base_t::dimension(); }
 
-  // Fixed in Doxygen 1.7.0 -- id 612458: Fixed problem handling @copydoc for function operators.
+  /** @copydoc boost::random::niederreiter_base2_engine::operator()() */
   result_type operator()()
   {
     return base_t::operator()();
   }
 
-  /** @copydoc boost::random::niederreiter_base2::discard(std::size_t)
+  /** @copydoc boost::random::niederreiter_base2_engine::discard(boost::uintmax_t)
    * Throws: bad_alloc.
    */
-  void discard(std::size_t z)
+  void discard(boost::uintmax_t z)
   {
     base_t::discard(z);
   }
 
+  /** Returns true if the two generators will produce identical sequences of outputs. */
+  BOOST_RANDOM_DETAIL_EQUALITY_OPERATOR(faure_engine, x, y)
+  { return static_cast<const base_t&>(x) == y; }
+
+  /** Returns true if the two generators will produce different sequences of outputs. */
+  BOOST_RANDOM_DETAIL_INEQUALITY_OPERATOR(faure_engine)
+
+  /** Writes the textual representation of the generator to a @c std::ostream. */
+  BOOST_RANDOM_DETAIL_OSTREAM_OPERATOR(os, faure_engine, s)
+  { return os << static_cast<const base_t&>(s); }
+
+  /** Reads the textual representation of the generator from a @c std::istream. */
+  BOOST_RANDOM_DETAIL_ISTREAM_OPERATOR(is, faure_engine, s)
+  { return is >> static_cast<base_t&>(s); }
+
+#endif // BOOST_RANDOM_DOXYGEN
+
 private:
 /** @cond hide_private_members */
-  void compute_seq(std::size_t seq)
+  void compute_seq(SeqSizeT seq)
   {
-    this->lattice.update(seq, this->quasi_state);
-  }
-  void compute_next()
-  {
-    compute_seq(++this->seq_count);
+    this->lattice.update(seq, this->state_begin(), this->state_end());
   }
 /** @endcond */
 };
 
-} // namespace random
+/**
+ * @attention This specialization of \faure_engine supports up to 1117 dimensions.
+ *
+ * However, it is possible to provide your own prime table to \faure_engine should the default one be insufficient.
+ */
+typedef faure_engine<double, boost::uint_least64_t, default_faure_prime_table> faure;
 
-typedef random::faure<double> faure;
+} // namespace random
 
 } // namespace boost
 
