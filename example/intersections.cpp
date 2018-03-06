@@ -13,7 +13,7 @@
     [@boost://libs/random/example/intersections.cpp intersections.cpp].
 
     This example demonstrates generating quasi-randomly distributed chord
-    entry and exit points on an '''<code>S<superscript>2</superscript></code>''' sphere.
+    entry and exit points on an S[sup 2] sphere.
 
     First we include the headers we need for __niederreiter_base2
     and __uniform_01 distribution.
@@ -41,6 +41,10 @@ int main()
   std::vector<point_t> points;
   points.reserve(n_points);
 
+  /*<< __niederreiter_base2 produces integers in the range [0, 2[sup 64]-1].
+  However, we want numbers in the range [0, 1). The distribution
+  __uniform_01 performs this transformation.
+  >>*/
   boost::random::uniform_01<double> dist;
 
   for (std::size_t i = 0; i != n_points; ++i)
@@ -57,7 +61,7 @@ int main()
     point_t point_on_sphere(sin_theta*sin_phi, cos_theta, sin_theta*cos_phi);
 
     /*`
-      Here we assume that our sphere is a unit sphere at (0,0,0). If your sphere was
+      Here we assume that our sphere is a unit sphere at origin. If your sphere was
       different then now would be the time to scale and translate the `point_on_sphere`.
     */
 
@@ -65,7 +69,7 @@ int main()
   }
 
   /*`
-    Vector `points` now holds generated 3D points on a unit sphere.
+    Vector `points` now holds generated 3D points on a sphere.
   */
 
   return 0;

@@ -215,12 +215,12 @@ part of the square would be proportional to the number of points in the whole sq
 Such sequences share some properties of  random variables and in certain applications
 such as the quasi-Monte Carlo method their lower discrepancy is an important advantage.
 
-[note Quasi-Monte Carlo method uses a low-discrepancy sequence such as the
+[note The quasi-Monte Carlo method uses a low-discrepancy sequence such as the
 Niederreiter base 2 sequence, the Sobol sequence, or the Faure sequence among the others.
 The advantage of using low-discrepancy sequences is a probabilistically faster rate of
-convergence. Quasi-Monte Carlo has a rate of convergence close to '''<code>O(1/N)</code>''',
+convergence. Quasi-Monte Carlo has a rate of convergence O(log(N)[sup s]/N),
 whereas the rate of convergence for the Monte Carlo method, which uses a pseudo-random sequence,
-is '''<code>O(N<superscript>-0.5</superscript>)</code>'''.]
+is O(N[sup -0.5]).]
 
 Harold Niederreiter gives an extensive overview on random number generation
 and quasi-Monte Carlo methods in his book "Random number generation and
