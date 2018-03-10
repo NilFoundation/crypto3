@@ -18,7 +18,7 @@ namespace boost {
 namespace random {
 
 /** @cond */
-namespace detail {
+namespace qrng_detail {
 namespace nb2 {
 
 // Return the base 2 logarithm for a given bitset v
@@ -137,7 +137,7 @@ struct niederreiter_base2_lattice
       pb.reset(); // pb == 0
       pb.set(pb_degree); // set the proper bit for the pb_degree
 
-      value_type j = static_cast<value_type>(1) << (bit_count - 1);
+      value_type j = high_bit_mask_t<bit_count - 1>::high_bit;
       do
       {
         // Now choose a value of Kj as defined in section 3.3.
@@ -194,7 +194,7 @@ private:
   std::vector<value_type> cj;
 };
 
-} // namespace detail
+} // namespace qrng_detail
 
 typedef detail::qrng_tables::niederreiter_base2 default_niederreiter_base2_table;
 
@@ -227,12 +227,12 @@ typedef detail::qrng_tables::niederreiter_base2 default_niederreiter_base2_table
 //! \f$L=Dimension \times (2^{w} - 1)\f$.
 template<typename UIntType, unsigned w, typename Nb2Table = default_niederreiter_base2_table>
 class niederreiter_base2_engine
-  : public detail::gray_coded_qrng<
-      detail::niederreiter_base2_lattice<UIntType, w, Nb2Table>
+  : public qrng_detail::gray_coded_qrng<
+      qrng_detail::niederreiter_base2_lattice<UIntType, w, Nb2Table>
     >
 {
-  typedef detail::niederreiter_base2_lattice<UIntType, w, Nb2Table> lattice_t;
-  typedef detail::gray_coded_qrng<lattice_t> base_t;
+  typedef qrng_detail::niederreiter_base2_lattice<UIntType, w, Nb2Table> lattice_t;
+  typedef qrng_detail::gray_coded_qrng<lattice_t> base_t;
 
 public:
   //!Effects: Constructs the default `s`-dimensional Niederreiter base 2 quasi-random number generator.

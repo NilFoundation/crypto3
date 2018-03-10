@@ -16,7 +16,7 @@ namespace boost {
 namespace random {
 
 /** @cond */
-namespace detail {
+namespace qrng_detail {
 
 // sobol_lattice sets up the random-number generator to produce a Sobol
 // sequence of at most max dims-dimensional quasi-random vectors.
@@ -99,7 +99,7 @@ private:
   std::vector<value_type> bits;
 };
 
-} // namespace detail
+} // namespace qrng_detail
 
 typedef detail::qrng_tables::sobol default_sobol_table;
 
@@ -131,12 +131,12 @@ typedef detail::qrng_tables::sobol default_sobol_table;
 //!any more values. The length of the low discrepancy sequence is given by \f$L=Dimension \times (2^{w} - 1)\f$.
 template<typename UIntType, unsigned w, typename SobolTables = default_sobol_table>
 class sobol_engine
-  : public detail::gray_coded_qrng<
-      detail::sobol_lattice<UIntType, w, SobolTables>
+  : public qrng_detail::gray_coded_qrng<
+      qrng_detail::sobol_lattice<UIntType, w, SobolTables>
     >
 {
-  typedef detail::sobol_lattice<UIntType, w, SobolTables> lattice_t;
-  typedef detail::gray_coded_qrng<lattice_t> base_t;
+  typedef qrng_detail::sobol_lattice<UIntType, w, SobolTables> lattice_t;
+  typedef qrng_detail::gray_coded_qrng<lattice_t> base_t;
 
 public:
   //!Effects: Constructs the default `s`-dimensional Sobol quasi-random number generator.

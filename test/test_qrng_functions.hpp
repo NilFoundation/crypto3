@@ -145,7 +145,7 @@ template<typename Engine>
 void test_max_seed(std::size_t dim)
 {
   typedef typename Engine::size_type size_type;
-  static const size_type maxseed = std::numeric_limits<size_type>::max();
+  static const size_type maxseed = Engine::max();
 
   Engine eng(dim);
   eng.seed(maxseed-1); // must succeed
@@ -166,7 +166,7 @@ void test_max_discard(std::size_t dim)
 {
   typedef typename Generator::type engine_type;
 
-  static const boost::uintmax_t maxdiscard = dim * Generator::dimlim();
+  static const boost::uintmax_t maxdiscard = dim * engine_type::max();
 
   // Max discard limit
   {
@@ -258,10 +258,6 @@ template <typename IntType, unsigned w> \
 struct gen_engine \
 { \
   typedef boost::random::QRNG##_engine<IntType, w> type; \
-  static BOOST_CONSTEXPR IntType dimlim() { \
-    /* Compute seq length for a single dimension taking into account the actual bit count */ \
-    return type::max() >> (std::numeric_limits<IntType>::digits - w); \
-  } \
 }; \
 \
 inline void test_##QRNG##_max_discard() \

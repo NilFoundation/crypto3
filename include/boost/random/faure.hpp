@@ -57,15 +57,16 @@ struct primes
       1033, 1039, 1049, 1051, 1061, 1063, 1069, 1087, 1091, 1093,
       1097, 1103, 1109, 1117 };
 
-    dimension_assert("Faure", n, prim_a[number_of_primes - 1]);
+    qrng_detail::dimension_assert("Faure", n, prim_a[number_of_primes - 1]);
 
     return *std::lower_bound(prim_a, prim_a + number_of_primes, n);
   }
 };
 
 } // namespace qrng_tables
+} // namespace detail
 
-
+namespace qrng_detail {
 namespace fr {
 
 // Returns the integer part of the logarithm base Base of arg.
@@ -97,6 +98,8 @@ inline T integer_pow(T base, T e)
   }
   return result;
 }
+
+} // namespace fr
 
 // Computes a table of binomial coefficients modulo qs.
 template<typename RealType, typename SeqSizeT, typename PrimeTable>
@@ -131,12 +134,12 @@ struct binomial_coefficients
   {
     if (first != last)
     {
-      const size_type ilog = integer_log(static_cast<size_type>(qs_base), seq);
+      const size_type ilog = fr::integer_log(static_cast<size_type>(qs_base), seq);
       const size_type hisum = ilog + 1;
       if (coeff.size() != size_hint(hisum)) {
         ytemp.resize(hisum);
         compute_coefficients(hisum);
-        qs_pow = integer_pow(static_cast<size_type>(qs_base), ilog);
+        qs_pow = fr::integer_pow(static_cast<size_type>(qs_base), ilog);
       }
 
       *first = compute_recip(seq, ytemp.rbegin());
@@ -233,7 +236,7 @@ private:
   size_type qs_pow;
 };
 
-}} // namespace detail::fr
+} // namespace qrng_detail
 
 typedef detail::qrng_tables::primes default_faure_prime_table;
 
@@ -263,18 +266,18 @@ typedef detail::qrng_tables::primes default_faure_prime_table;
 //!Some member functions may throw exceptions of type @c std::bad_alloc.
 template<typename RealType, typename SeqSizeT, typename PrimeTable = default_faure_prime_table>
 class faure_engine
-  : public detail::qrng_base<
+  : public qrng_detail::qrng_base<
       faure_engine<RealType, SeqSizeT, PrimeTable>
-    , detail::fr::binomial_coefficients<RealType, SeqSizeT, PrimeTable>
+    , qrng_detail::binomial_coefficients<RealType, SeqSizeT, PrimeTable>
     , SeqSizeT
     >
 {
   typedef faure_engine<RealType, SeqSizeT, PrimeTable> self_t;
 
-  typedef detail::fr::binomial_coefficients<RealType, SeqSizeT, PrimeTable> lattice_t;
-  typedef detail::qrng_base<self_t, lattice_t, SeqSizeT> base_t;
+  typedef qrng_detail::binomial_coefficients<RealType, SeqSizeT, PrimeTable> lattice_t;
+  typedef qrng_detail::qrng_base<self_t, lattice_t, SeqSizeT> base_t;
 
-  friend class detail::qrng_base<self_t, lattice_t, SeqSizeT>;
+  friend class qrng_detail::qrng_base<self_t, lattice_t, SeqSizeT>;
 
 public:
   typedef RealType result_type;
@@ -344,6 +347,7 @@ private:
 /** @cond hide_private_members */
   void compute_seq(SeqSizeT seq)
   {
+    qrng_detail::check_seed_sign(seq);
     this->lattice.update(seq, this->state_begin(), this->state_end());
   }
 /** @endcond */

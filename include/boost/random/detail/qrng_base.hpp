@@ -22,20 +22,35 @@
 
 #include <boost/throw_exception.hpp>
 
+#include <boost/mpl/bool.hpp>
+
 //!\file
 //!Describes the quasi-random number generator base class template.
 
 namespace boost {
 namespace random {
 
-namespace detail {
+namespace qrng_detail {
 
-template <typename T>
-inline bool are_close(T x, T y, T eps) // |x - y| <= eps
+// If the seed is a signed integer type, then we need to
+// check that the value is positive:
+template <typename Integer>
+inline void check_seed_sign(const Integer& v, const mpl::true_)
 {
-  if (x < y) std::swap(x, y);
-  return !(x - y > eps);
+  if (v < 0)
+  {
+    boost::throw_exception( std::range_error("seed must be a positive integer") );
+  }
 }
+template <typename Integer>
+inline void check_seed_sign(const Integer&, const mpl::false_) {}
+
+template <typename Integer>
+inline void check_seed_sign(const Integer& v)
+{
+  check_seed_sign(v, mpl::bool_<std::numeric_limits<Integer>::is_signed>());
+}
+
 
 template<typename DerivedT, typename LatticeT, typename SizeT>
 class qrng_base
@@ -103,9 +118,21 @@ public:
 
     // Discards vec_n (with correction) consecutive s-dimensional vectors
     discard_vector(vec_n - static_cast<boost::uintmax_t>(corr));
+
+#ifdef BOOST_MSVC
+#pragma warning(push)
+// disable unary minus operator applied to an unsigned type,
+// result still unsigned.
+#pragma warning(disable:4146)
+#endif
+
     // Sets up the proper position of the element-to-read
     // curr_elem = carry + corr*dimension_value
     curr_elem = carry ^ (-static_cast<std::size_t>(corr) & dimension_value);
+
+#ifdef BOOST_MSVC
+#pragma warning(pop)
+#endif
   }
 
   //!Writes the textual representation of the generator to a @c std::ostream.
@@ -123,6 +150,9 @@ public:
     boost::uintmax_t z;
     if (is >> dim >> std::ws >> seed >> std::ws >> z) // initialize iff success!
     {
+      // Check seed sign before resizing the lattice and/or recomputing state
+      check_seed_sign(seed);
+
       if (s.dimension() != prevent_zero_dimension(dim))
       {
         s.lattice.resize(dim);
@@ -146,7 +176,9 @@ public:
     // and the last one is curr_elem.
 
     return (dimension_value == y.dimension()) &&
-      are_close(x.seq_count, y.seq_count, static_cast<size_type>(1)) &&
+      // |x.seq_count - y.seq_count| <= 1
+      !((x.seq_count < y.seq_count ? y.seq_count - x.seq_count : x.seq_count - y.seq_count)
+          > static_cast<size_type>(1)) &&
       // Potential overflows don't matter here, since we've already ascertained
       // that sequence counts differ by no more than 1, so if they overflow, they
       // can overflow together.
@@ -209,7 +241,7 @@ private:
       boost::throw_exception( std::range_error("qrng_base: discard_vector") );
 
     std::size_t tmp = curr_elem;
-    derived().seed(seq_count + z);
+    derived().seed(static_cast<size_type>(seq_count + z));
     curr_elem = tmp;
   }
 
@@ -247,8 +279,9 @@ inline void dimension_assert(const char* generator, std::size_t dim, std::size_t
   }
 }
 
-}} // namespace detail::random
+} // namespace qrng_detail
 
+} // namespace random
 } // namespace boost
 
 #endif // BOOST_RANDOM_DETAIL_QRNG_BASE_HPP
