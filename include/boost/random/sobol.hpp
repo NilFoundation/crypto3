@@ -32,23 +32,27 @@ struct sobol_lattice
   BOOST_STATIC_ASSERT(w > 0u);
   BOOST_STATIC_CONSTANT(unsigned, bit_count = w);
 
-  // default copy c-tor is fine
+private:
+  typedef std::vector<value_type> container_type;
 
+public:
   explicit sobol_lattice(std::size_t dimension)
   {
     resize(dimension);
   }
+
+  // default copy c-tor is fine
 
   void resize(std::size_t dimension)
   {
     dimension_assert("Sobol", dimension, SobolTables::max_dimension);
 
     // Initialize the bit array
-    bits.resize(bit_count * dimension);
+    container_type cj(bit_count * dimension);
 
     // Initialize direction table in dimension 0
     for (unsigned k = 0; k != bit_count; ++k)
-      bits[dimension*k] = static_cast<value_type>(1);
+      cj[dimension*k] = static_cast<value_type>(1);
 
     // Initialize in remaining dimensions.
     for (std::size_t dim = 1; dim < dimension; ++dim)
@@ -61,7 +65,7 @@ struct sobol_lattice
 
       // set initial values of m from table
       for (unsigned k = 0; k != degree; ++k)
-        bits[dimension*k + dim] = SobolTables::minit(dim-1, k);
+        cj[dimension*k + dim] = SobolTables::minit(dim-1, k);
 
       // Calculate remaining elements for this dimension,
       // as explained in Bratley+Fox, section 2.
@@ -70,11 +74,11 @@ struct sobol_lattice
         unsigned int p_i = poly;
         const std::size_t bit_offset = dimension*j + dim;
 
-        bits[bit_offset] = bits[dimension*(j-degree) + dim];
+        cj[bit_offset] = cj[dimension*(j-degree) + dim];
         for (unsigned k = 0; k != degree; ++k, p_i >>= 1)
         {
           int rem = degree - k;
-          bits[bit_offset] ^= ((p_i & 1) * bits[dimension*(j-rem) + dim]) << rem;
+          cj[bit_offset] ^= ((p_i & 1) * cj[dimension*(j-rem) + dim]) << rem;
         }
       }
     }
@@ -85,18 +89,20 @@ struct sobol_lattice
     {
       const std::size_t bit_offset = dimension * j;
       for (std::size_t dim = 0; dim != dimension; ++dim)
-        bits[bit_offset + dim] <<= p;
+        cj[bit_offset + dim] <<= p;
     }
+
+    bits.swap(cj);
   }
 
-  typename std::vector<value_type>::const_iterator iter_at(std::size_t n) const
+  typename container_type::const_iterator iter_at(std::size_t n) const
   {
     BOOST_ASSERT(!(n > bits.size()));
     return bits.begin() + n;
   }
 
 private:
-  std::vector<value_type> bits;
+  container_type bits;
 };
 
 } // namespace qrng_detail

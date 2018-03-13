@@ -94,6 +94,10 @@ struct niederreiter_base2_lattice
   BOOST_STATIC_ASSERT(w > 0u);
   BOOST_STATIC_CONSTANT(unsigned, bit_count = w);
 
+private:
+  typedef std::vector<value_type> container_type;
+
+public:
   explicit niederreiter_base2_lattice(std::size_t dimension)
   {
     resize(dimension);
@@ -106,7 +110,7 @@ struct niederreiter_base2_lattice
     dimension_assert("Niederreiter base 2", dimension, Nb2Table::max_dimension);
 
     // Initialize the bit array
-    cj.resize(bit_count * dimension);
+    container_type cj(bit_count * dimension);
 
     // Reserve temporary space for lattice computation
     bitset_type v, pb, tmp;
@@ -182,16 +186,18 @@ struct niederreiter_base2_lattice
         }
       } while (j != 0);
     }
+
+    bits.swap(cj);
   }
 
-  typename std::vector<value_type>::const_iterator iter_at(std::size_t n) const
+  typename container_type::const_iterator iter_at(std::size_t n) const
   {
-    BOOST_ASSERT(!(n > cj.size()));
-    return cj.begin() + n;
+    BOOST_ASSERT(!(n > bits.size()));
+    return bits.begin() + n;
   }
 
 private:
-  std::vector<value_type> cj;
+  container_type bits;
 };
 
 } // namespace qrng_detail
