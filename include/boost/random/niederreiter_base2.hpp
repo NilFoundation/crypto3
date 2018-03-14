@@ -37,8 +37,8 @@ bitset_log2(const DynamicBitset& v)
 
 
 // Multiply polynomials over Z_2.
-template <typename DynamicBitset>
-inline void modulo2_multiply(unsigned P, DynamicBitset& v, DynamicBitset& pt)
+template <typename PolynomialT, typename DynamicBitset>
+inline void modulo2_multiply(PolynomialT P, DynamicBitset& v, DynamicBitset& pt)
 {
   pt.reset(); // pt == 0
   for (; P; P >>= 1, v <<= 1)
@@ -118,7 +118,7 @@ public:
     // Compute Niedderreiter base 2 lattice
     for (std::size_t dim = 0; dim != dimension; ++dim)
     {
-      const unsigned int poly = Nb2Table::polynomial(dim);
+      const typename Nb2Table::value_type poly = Nb2Table::polynomial(dim);
       if (poly > std::numeric_limits<value_type>::max()) {
         boost::throw_exception( std::range_error("niederreiter_base2: polynomial value outside the given value type range") );
       }

@@ -57,7 +57,7 @@ public:
     // Initialize in remaining dimensions.
     for (std::size_t dim = 1; dim < dimension; ++dim)
     {
-      const unsigned int poly = SobolTables::polynomial(dim-1);
+      const typename SobolTables::value_type poly = SobolTables::polynomial(dim-1);
       if (poly > std::numeric_limits<value_type>::max()) {
         boost::throw_exception( std::range_error("sobol: polynomial value outside the given value type range") );
       }
@@ -71,7 +71,7 @@ public:
       // as explained in Bratley+Fox, section 2.
       for (unsigned j = degree; j < bit_count; ++j)
       {
-        unsigned int p_i = poly;
+        typename SobolTables::value_type p_i = poly;
         const std::size_t bit_offset = dimension*j + dim;
 
         cj[bit_offset] = cj[dimension*(j-degree) + dim];
