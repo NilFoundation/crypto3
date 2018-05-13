@@ -76,9 +76,9 @@ inline void calculate_v(const DynamicBitset& pb,
   for ( ; r != v.size(); ++r)
   {
     bool term = false;
-    for (int k = -pb_degree; k < 0; ++k)
+    for (typename DynamicBitset::size_type k = 0; k < pb_degree; ++k)
     {
-      term ^= pb.test(k + pb_degree) & v[r + k];
+      term ^= pb.test(k) & v[r + k - pb_degree];
     }
     v[r] = term;
   }

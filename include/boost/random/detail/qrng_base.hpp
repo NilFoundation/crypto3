@@ -24,6 +24,8 @@
 
 #include <boost/mpl/bool.hpp>
 
+#include <boost/random/detail/disable_warnings.hpp>
+
 //!\file
 //!Describes the quasi-random number generator base class template.
 
@@ -283,5 +285,7 @@ inline void dimension_assert(const char* generator, std::size_t dim, std::size_t
 
 } // namespace random
 } // namespace boost
+
+#include <boost/random/detail/enable_warnings.hpp>
 
 #endif // BOOST_RANDOM_DETAIL_QRNG_BASE_HPP

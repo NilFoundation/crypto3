@@ -137,7 +137,7 @@ struct binomial_coefficients
       const size_type ilog = fr::integer_log(static_cast<size_type>(qs_base), seq);
       const size_type hisum = ilog + 1;
       if (coeff.size() != size_hint(hisum)) {
-        ytemp.resize(hisum);
+        ytemp.resize(static_cast<std::size_t>(hisum)); // cast safe because log is small
         compute_coefficients(hisum);
         qs_pow = fr::integer_pow(static_cast<size_type>(qs_base), ilog);
       }
@@ -153,14 +153,14 @@ struct binomial_coefficients
 
         for (size_type i = 0; i != hisum; ++i)
         {
-          RealType ztemp = ytemp[i] * upper_element(i, i, hisum);
+          RealType ztemp = ytemp[static_cast<std::size_t>(i)] * upper_element(i, i, hisum);
           for (size_type j = i + 1; j != hisum; ++j)
-            ztemp += ytemp[j] * upper_element(i, j, hisum);
+            ztemp += ytemp[static_cast<std::size_t>(j)] * upper_element(i, j, hisum);
 
           // Sum ( J <= I <= HISUM ) ( old ytemp(i) * binom(i,j) ) mod QS.
-          ytemp[i] = std::fmod(ztemp, static_cast<RealType>(qs_base));
+          ytemp[static_cast<std::size_t>(i)] = std::fmod(ztemp, static_cast<RealType>(qs_base));
           r *= static_cast<RealType>(qs_base);
-          *first += ytemp[i] / r;
+          *first += ytemp[static_cast<std::size_t>(i)] / r;
         }
       }
     }
@@ -177,7 +177,7 @@ private:
     BOOST_ASSERT( i < dim );
     BOOST_ASSERT( j < dim );
     BOOST_ASSERT( i <= j );
-    return coeff[(i * (2 * dim - i + 1)) / 2 + j - i];
+    return coeff[static_cast<std::size_t>((i * (2 * dim - i + 1)) / 2 + j - i)];
   }
 
   template<typename Iterator>
@@ -192,7 +192,7 @@ private:
     for( ; k != 0; ++out, seq = m, k /= qs_base )
     {
       m  = seq % k;
-      RealType v  = (seq - m) / k; // RealType <- size type
+      RealType v  = static_cast<RealType>((seq - m) / k); // RealType <- size type
       r += v;
       r /= static_cast<RealType>(qs_base);
       *out = v; // saves double dereference
@@ -203,7 +203,7 @@ private:
   void compute_coefficients(const size_type n)
   {
     // Resize and initialize to zero
-    coeff.resize(size_hint(n));
+    coeff.resize(static_cast<std::size_t>(size_hint(n)));
     std::fill(coeff.begin(), coeff.end(), packed_uint_t());
 
     // The first row and the diagonal is assigned to 1

@@ -71,7 +71,7 @@ private:
   BOOST_STATIC_ASSERT(LatticeT::bit_count <= std::numeric_limits<size_type>::digits);
 
   typedef typename mpl::if_c<
-      LatticeT::bit_count < std::numeric_limits<size_type>::digits
+      ((LatticeT::bit_count) < std::numeric_limits<size_type>::digits)
     , check_bit_range
     , check_nothing
   >::type check_bit_range_t;
