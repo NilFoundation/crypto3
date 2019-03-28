@@ -13,6 +13,11 @@
 #include <boost/test/test_tools.hpp>
 #include <boost/test/included/test_exec_monitor.hpp>
 
+#ifndef BOOST_NO_CXX11_CONSTEXPR
+constexpr boost::random_device::result_type const_min = (boost::random_device::min)();
+constexpr boost::random_device::result_type const_max = (boost::random_device::max)();
+#endif
+
 int test_main(int, char**) {
     boost::random_device rng;
     double entropy = rng.entropy();

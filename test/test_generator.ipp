@@ -226,6 +226,11 @@ BOOST_AUTO_TEST_CASE(test_min_max)
     }
 }
 
+#if !defined(BOOST_NO_CXX11_CONSTEXPR)
+constexpr result_type const_min = (BOOST_RANDOM_URNG::min)();
+constexpr result_type const_max = (BOOST_RANDOM_URNG::max)();
+#endif
+
 BOOST_AUTO_TEST_CASE(test_comparison)
 {
     BOOST_RANDOM_URNG urng;
