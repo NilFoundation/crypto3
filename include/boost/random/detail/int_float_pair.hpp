@@ -82,7 +82,7 @@ std::pair<RealType, int> generate_int_float_pair(Engine& eng, boost::mpl::true_)
         }
         r = RealType(u >> (w%m)) * mult;
     }
-    for(std::size_t i = m - w%m; i + m < digits; ++i) {
+    for(std::size_t i = m - w%m; i + m < digits; i += m) {
         base_unsigned u = generate_one_digit(eng, m);
         r += u;
         r *= RealType(0.5)/RealType(base_unsigned(1) << (m - 1));
