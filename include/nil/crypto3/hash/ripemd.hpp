@@ -1,0 +1,294 @@
+//---------------------------------------------------------------------------//
+// Copyright (c) 2018-2019 Nil Foundation
+// Copyright (c) 2018-2019 Mikhail Komarov <nemo@nilfoundation.org>
+//
+// Distributed under the Boost Software License, Version 1.0
+// See accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt
+//---------------------------------------------------------------------------//
+
+#ifndef CRYPTO3_RIPEMD_160_H_
+#define CRYPTO3_RIPEMD_160_H_
+
+#include <nil/crypto3/hash/detail/ripemd/ripemd_policy.hpp>
+#include <nil/crypto3/hash/detail/merkle_damgard_construction.hpp>
+#include <nil/crypto3/hash/detail/merkle_damgard_state_preprocessor.hpp>
+
+namespace nil {
+    namespace crypto3 {
+        namespace hash {
+            template<std::size_t DigestBits>
+            struct basic_ripemd_compressor {
+                typedef detail::ripemd_policy<DigestBits> policy_type;
+
+                constexpr static const std::size_t word_bits = policy_type::word_bits;
+                typedef typename policy_type::word_type word_type;
+
+                constexpr static const std::size_t state_bits = policy_type::state_bits;
+                constexpr static const std::size_t state_words = policy_type::state_words;
+                typedef typename policy_type::state_type state_type;
+
+                constexpr static const std::size_t block_bits = policy_type::block_bits;
+                constexpr static const std::size_t block_words = policy_type::block_words;
+                typedef typename policy_type::block_type block_type;
+            };
+
+            template<std::size_t DigestBits>
+            struct ripemd_compressor : public basic_ripemd_compressor<DigestBits> {
+            };
+
+            template<>
+            struct ripemd_compressor<128> : public basic_ripemd_compressor<128> {
+                void operator()(state_type &state, const block_type &block) {
+                    process_block(state, block);
+                }
+
+            protected:
+                static void process_block(state_type &state, const block_type &block) {
+                    // ripemd works on two 'lines' in parallel
+                    // all variables worked on by line 1 are suffixed with 1
+                    // all variables for line 2 with 2
+
+                    word_type A1 = state[0], B1 = state[1], C1 = state[2], D1 = state[3];
+                    word_type A2 = state[0], B2 = state[1], C2 = state[2], D2 = state[3];
+
+                    // round 1
+                    for (int j = 0; j < 16; ++j) {
+                        policy_type::transform<policy_type::f1>(A1, B1, C1, D1, block[policy_type::r1[j]], 0x00000000,
+                                policy_type::s1[j]);
+                        policy_type::transform<policy_type::f4>(A2, B2, C2, D2, block[policy_type::r2[j]], 0x50a28be6,
+                                policy_type::s2[j]);
+                    }
+                    // round 2
+                    for (int j = 16; j < 32; ++j) {
+                        policy_type::transform<policy_type::f2>(A1, B1, C1, D1, block[policy_type::r1[j]], 0x5a827999,
+                                policy_type::s1[j]);
+                        policy_type::transform<policy_type::f3>(A2, B2, C2, D2, block[policy_type::r2[j]], 0x5c4dd124,
+                                policy_type::s2[j]);
+                    }
+                    // round 3
+                    for (int j = 32; j < 48; ++j) {
+                        policy_type::transform<policy_type::f3>(A1, B1, C1, D1, block[policy_type::r1[j]], 0x6ed9eba1,
+                                policy_type::s1[j]);
+                        policy_type::transform<policy_type::f2>(A2, B2, C2, D2, block[policy_type::r2[j]], 0x6d703ef3,
+                                policy_type::s2[j]);
+                    }
+                    // round 4
+                    for (int j = 48; j < 64; ++j) {
+                        policy_type::transform<policy_type::f4>(A1, B1, C1, D1, block[policy_type::r1[j]], 0x8f1bbcdc,
+                                policy_type::s1[j]);
+                        policy_type::transform<policy_type::f1>(A2, B2, C2, D2, block[policy_type::r2[j]], 0x00000000,
+                                policy_type::s2[j]);
+                    }
+
+                    word_type T = state[1] + C1 + D2;
+                    state[1] = state[2] + D1 + A2;
+                    state[2] = state[3] + A1 + B2;
+                    state[3] = state[0] + B1 + C2;
+                    state[0] = T;
+                }
+            };
+
+            template<>
+            struct ripemd_compressor<160> : public basic_ripemd_compressor<160> {
+                void operator()(state_type &state, const block_type &block) {
+                    process_block(state, block);
+                }
+
+            protected:
+                static void process_block(state_type &state, const block_type &block) {
+                    word_type A1 = state[0], B1 = state[1], C1 = state[2], D1 = state[3], E1 = state[4];
+                    word_type A2 = state[0], B2 = state[1], C2 = state[2], D2 = state[3], E2 = state[4];
+
+                    // round 1
+                    for (int j = 0; j < 16; ++j) {
+                        policy_type::transform<policy_type::f1>(A1, B1, C1, D1, E1, block[policy_type::r1[j]],
+                                0x00000000, policy_type::s1[j]);
+                        policy_type::transform<policy_type::f5>(A2, B2, C2, D2, E2, block[policy_type::r2[j]],
+                                0x50a28be6, policy_type::s2[j]);
+                    }
+                    // round 2
+                    for (int j = 16; j < 32; ++j) {
+                        policy_type::transform<policy_type::f2>(A1, B1, C1, D1, E1, block[policy_type::r1[j]],
+                                0x5a827999, policy_type::s1[j]);
+                        policy_type::transform<policy_type::f4>(A2, B2, C2, D2, E2, block[policy_type::r2[j]],
+                                0x5c4dd124, policy_type::s2[j]);
+                    }
+                    // round 3
+                    for (int j = 32; j < 48; ++j) {
+                        policy_type::transform<policy_type::f3>(A1, B1, C1, D1, E1, block[policy_type::r1[j]],
+                                0x6ed9eba1, policy_type::s1[j]);
+                        policy_type::transform<policy_type::f3>(A2, B2, C2, D2, E2, block[policy_type::r2[j]],
+                                0x6d703ef3, policy_type::s2[j]);
+                    }
+                    // round 4
+                    for (int j = 48; j < 64; ++j) {
+                        policy_type::transform<policy_type::f4>(A1, B1, C1, D1, E1, block[policy_type::r1[j]],
+                                0x8f1bbcdc, policy_type::s1[j]);
+                        policy_type::transform<policy_type::f2>(A2, B2, C2, D2, E2, block[policy_type::r2[j]],
+                                0x7a6d76e9, policy_type::s2[j]);
+                    }
+                    // round 5
+                    for (int j = 64; j < 80; ++j) {
+                        policy_type::transform<policy_type::f5>(A1, B1, C1, D1, E1, block[policy_type::r1[j]],
+                                0xa953fd4e, policy_type::s1[j]);
+                        policy_type::transform<policy_type::f1>(A2, B2, C2, D2, E2, block[policy_type::r2[j]],
+                                0x00000000, policy_type::s2[j]);
+                    }
+
+                    word_type T = state[1] + C1 + D2;
+                    state[1] = state[2] + D1 + E2;
+                    state[2] = state[3] + E1 + A2;
+                    state[3] = state[4] + A1 + B2;
+                    state[4] = state[0] + B1 + C2;
+                    state[0] = T;
+                }
+            };
+
+            template<>
+            struct ripemd_compressor<256> : public basic_ripemd_compressor<256> {
+                void operator()(state_type &state, const block_type &block) {
+                    process_block(state, block);
+                }
+
+            protected:
+                static void process_block(state_type &state, const block_type &block) {
+                    state_type Y;
+                    std::copy(state.begin(), state.end(), Y.begin());
+
+                    // round 1
+                    for (int j = 0; j < 16; ++j) {
+                        policy_type::transform<policy_type::f1>(Y[0], Y[1], Y[2], Y[3], block[policy_type::r1[j]],
+                                0x00000000, policy_type::s1[j]);
+                        policy_type::transform<policy_type::f4>(Y[4], Y[5], Y[6], Y[7], block[policy_type::r2[j]],
+                                0x50a28be6, policy_type::s2[j]);
+                    }
+                    std::swap(Y[0], Y[4]);
+                    // round 2
+                    for (int j = 16; j < 32; ++j) {
+                        policy_type::transform<policy_type::f2>(Y[0], Y[1], Y[2], Y[3], block[policy_type::r1[j]],
+                                0x5a827999, policy_type::s1[j]);
+                        policy_type::transform<policy_type::f3>(Y[4], Y[5], Y[6], Y[7], block[policy_type::r2[j]],
+                                0x5c4dd124, policy_type::s2[j]);
+                    }
+                    std::swap(Y[1], Y[5]);
+                    // round 3
+                    for (int j = 32; j < 48; ++j) {
+                        policy_type::transform<policy_type::f3>(Y[0], Y[1], Y[2], Y[3], block[policy_type::r1[j]],
+                                0x6ed9eba1, policy_type::s1[j]);
+                        policy_type::transform<policy_type::f2>(Y[4], Y[5], Y[6], Y[7], block[policy_type::r2[j]],
+                                0x6d703ef3, policy_type::s2[j]);
+                    }
+                    std::swap(Y[2], Y[6]);
+                    // round 4
+                    for (int j = 48; j < 64; ++j) {
+                        policy_type::transform<policy_type::f4>(Y[0], Y[1], Y[2], Y[3], block[policy_type::r1[j]],
+                                0x8f1bbcdc, policy_type::s1[j]);
+                        policy_type::transform<policy_type::f1>(Y[4], Y[5], Y[6], Y[7], block[policy_type::r2[j]],
+                                0x00000000, policy_type::s2[j]);
+                    }
+                    std::swap(Y[3], Y[7]);
+
+                    for (int i = 0; i < 8; ++i) {
+                        state[i] += Y[i];
+                    }
+                }
+            };
+
+            template<>
+            class ripemd_compressor<320> : public basic_ripemd_compressor<320> {
+            public:
+                void operator()(state_type &state, block_type const &block) {
+                    process_block(state, block);
+                }
+
+            protected:
+                static void process_block(state_type &state, block_type const &block) {
+                    state_type Y;
+                    std::copy(state.begin(), state.end(), Y.begin());
+
+                    // round 1
+                    for (int j = 0; j < 16; ++j) {
+                        policy_type::transform<policy_type::f1>(Y[0], Y[1], Y[2], Y[3], Y[4], block[policy_type::r1[j]],
+                                0x00000000, policy_type::s1[j]);
+                        policy_type::transform<policy_type::f5>(Y[5], Y[6], Y[7], Y[8], Y[9], block[policy_type::r2[j]],
+                                0x50a28be6, policy_type::s2[j]);
+                    }
+                    std::swap(Y[1], Y[6]);
+                    // round 2
+                    for (int j = 16; j < 32; ++j) {
+                        policy_type::transform<policy_type::f2>(Y[0], Y[1], Y[2], Y[3], Y[4], block[policy_type::r1[j]],
+                                0x5a827999, policy_type::s1[j]);
+                        policy_type::transform<policy_type::f4>(Y[5], Y[6], Y[7], Y[8], Y[9], block[policy_type::r2[j]],
+                                0x5c4dd124, policy_type::s2[j]);
+                    }
+                    std::swap(Y[3], Y[8]);
+                    // round 3
+                    for (int j = 32; j < 48; ++j) {
+                        policy_type::transform<policy_type::f3>(Y[0], Y[1], Y[2], Y[3], Y[4], block[policy_type::r1[j]],
+                                0x6ed9eba1, policy_type::s1[j]);
+                        policy_type::transform<policy_type::f3>(Y[5], Y[6], Y[7], Y[8], Y[9], block[policy_type::r2[j]],
+                                0x6d703ef3, policy_type::s2[j]);
+                    }
+                    std::swap(Y[0], Y[5]);
+                    // round 4
+                    for (int j = 48; j < 64; ++j) {
+                        policy_type::transform<policy_type::f4>(Y[0], Y[1], Y[2], Y[3], Y[4], block[policy_type::r1[j]],
+                                0x8f1bbcdc, policy_type::s1[j]);
+                        policy_type::transform<policy_type::f2>(Y[5], Y[6], Y[7], Y[8], Y[9], block[policy_type::r2[j]],
+                                0x7a6d76e9, policy_type::s2[j]);
+                    }
+                    std::swap(Y[2], Y[7]);
+                    // round 5
+                    for (int j = 64; j < 80; ++j) {
+                        policy_type::transform<policy_type::f5>(Y[0], Y[1], Y[2], Y[3], Y[4], block[policy_type::r1[j]],
+                                0xa953fd4e, policy_type::s1[j]);
+                        policy_type::transform<policy_type::f1>(Y[5], Y[6], Y[7], Y[8], Y[9], block[policy_type::r2[j]],
+                                0x00000000, policy_type::s2[j]);
+                    }
+                    std::swap(Y[4], Y[9]);
+
+                    for (int i = 0; i < 10; ++i) {
+                        state[i] += Y[i];
+                    }
+                }
+            };
+
+            /*!
+             * @brief Ripemd. Family of configurable hashes, developed as an open alternative to SHA.
+             *
+             * @ingroup hash
+             *
+             * @tparam DigestBits
+             */
+            template<std::size_t DigestBits>
+            class ripemd {
+                typedef detail::ripemd_policy<DigestBits> policy_type;
+            public:
+                typedef merkle_damgard_construction<stream_endian::little_octet_big_bit, policy_type::digest_bits,
+                                                    typename policy_type::iv_generator,
+                                                    ripemd_compressor<DigestBits>> block_hash_type_;
+#ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES
+                typedef block_hash_type_ block_hash_type;
+#else
+                struct block_hash_type : block_hash_type_ {
+                };
+#endif
+                template<std::size_t ValueBits>
+                struct stream_processor {
+                    typedef merkle_damgard_state_preprocessor<stream_endian::little_octet_big_bit, ValueBits,
+                                                              block_hash_type::word_bits * 2, block_hash_type> type_;
+#ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES
+                    typedef type_ type;
+#else
+                    struct type : type_ {
+                    };
+#endif
+                };
+                typedef typename block_hash_type::digest_type digest_type;
+            };
+        }
+    }
+}
+
+#endif
