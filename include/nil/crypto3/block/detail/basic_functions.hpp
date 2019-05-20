@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_BLOCK_CYPHERS_DETAIL_BASIC_FUNCTIONS_HPP
-#define CRYPTO3_BLOCK_CYPHERS_DETAIL_BASIC_FUNCTIONS_HPP
+#ifndef CRYPTO3_BASIC_FUNCTIONS_HPP
+#define CRYPTO3_BASIC_FUNCTIONS_HPP
 
 #include <vector>
 
@@ -71,4 +71,4 @@ namespace nil {
     }
 } // namespace nil
 
-#endif // CRYPTO3_BLOCK_CYPHERS_DETAIL_BASIC_FUNCTIONS_HPP
+#endif // CRYPTO3_BASIC_FUNCTIONS_HPP

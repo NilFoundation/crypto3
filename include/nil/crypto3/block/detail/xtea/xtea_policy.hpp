@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_BASIC_TWOFISH_POLICY_HPP
-#define CRYPTO3_TWOFISH_POLICY_HPP
+#ifndef CRYPTO3_XTEA_POLICY_HPP
+#define CRYPTO3_XTEA_POLICY_HPP
 
 #include <array>
 

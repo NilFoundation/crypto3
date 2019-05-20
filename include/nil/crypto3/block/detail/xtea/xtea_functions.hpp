@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_TWOFISH_FUNCTIONS_CPP_HPP
-#define CRYPTO3_TWOFISH_FUNCTIONS_CPP_HPP
+#ifndef CRYPTO3_XTEA_FUNCTIONS_CPP_HPP
+#define CRYPTO3_XTEA_FUNCTIONS_CPP_HPP
 
 #include <nil/crypto3/block/detail/basic_functions.hpp>
 

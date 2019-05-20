@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_BLOCK_CIPHERS_THREEFISH_HPP
-#define CRYPTO3_BLOCK_CIPHERS_THREEFISH_HPP
+#ifndef CRYPTO3_THREEFISH_HPP
+#define CRYPTO3_THREEFISH_HPP
 
 #include <nil/crypto3/block/detail/threefish/threefish_policy.hpp>
 
@@ -282,4 +282,4 @@ namespace nil {
     }
 } // namespace nil
 
-#endif // CRYPTO3_BLOCK_CIPHERS_THREEFISH_HPP
+#endif // CRYPTO3_THREEFISH_HPP
