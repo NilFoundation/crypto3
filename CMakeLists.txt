@@ -92,10 +92,6 @@ if(CRYPTO3_HASH_GOST_34_11)
          include/nil/crypto3/hash/gost_3411.hpp
          )
 
-    list(APPEND ${CURRENT_PROJECT_NAME}_GOST_34_11_SOURCES
-         src/gost_3411/gost_3411.cpp
-         )
-
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_GOST_34_11)
     list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
          ${${CURRENT_PROJECT_NAME}_GOST_34_11_HEADERS}
@@ -108,10 +104,6 @@ endif()
 if(CRYPTO3_HASH_KECCAK)
     list(APPEND ${CURRENT_PROJECT_NAME}_KECCAK_HEADERS
          include/nil/crypto3/hash/keccak.hpp
-         )
-
-    list(APPEND ${CURRENT_PROJECT_NAME}_KECCAK_SOURCES
-         src/keccak/keccak.cpp
          )
 
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_KECCAK)
