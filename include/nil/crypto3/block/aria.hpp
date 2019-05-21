@@ -16,7 +16,7 @@
 #include <nil/crypto3/block/detail/stream_endian.hpp>
 
 #include <nil/crypto3/utilities/loadstore.hpp>
-#include <nil/crypto3/utilities/cpuid/cpuid.hpp>
+#include <nil/crypto3/block/detail/cpuid/cpuid.hpp>
 
 namespace nil {
     namespace crypto3 {

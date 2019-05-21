@@ -28,7 +28,7 @@ namespace nil {
                     typedef std::array<word_type, constants_size> transposed_constants_type;
 
                     inline static word_type t_slow(word_type b, const constants_type &constants) {
-                        const word_type t = make_uint32(constants[get_byte(0, b)], constants[get_byte(1, b)],
+                        const word_type t = make_uint_t<32>(constants[get_byte(0, b)], constants[get_byte(1, b)],
                                 constants[get_byte(2, b)], constants[get_byte(3, b)]);
 
                         // L linear transform
@@ -42,7 +42,7 @@ namespace nil {
 
 // Variant of T for key round_constants_words
                     inline static word_type tp(word_type b, const constants_type &constants) {
-                        const uint32_t t = make_uint32(constants[get_byte(0, b)], constants[get_byte(1, b)],
+                        const uint32_t t = make_uint_t<32>(constants[get_byte(0, b)], constants[get_byte(1, b)],
                                 constants[get_byte(2, b)], constants[get_byte(3, b)]);
 
                         // L' linear transform

@@ -69,7 +69,7 @@ namespace nil {
                         const uint8_t y7 = t3 ^t4 ^t5 ^t6 ^t8;
                         const uint8_t y8 = t1 ^t4 ^t5 ^t6 ^t7;
 
-                        return make_uint64(y1, y2, y3, y4, y5, y6, y7, y8);
+                        return make_uint_t<64>(y1, y2, y3, y4, y5, y6, y7, y8);
                     };
 
                     inline uint64_t f(uint64_t v, uint64_t K) {
