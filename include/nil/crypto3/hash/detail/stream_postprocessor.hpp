@@ -20,8 +20,6 @@
 #include <nil/crypto3/hash/detail/type_traits.hpp>
 #include <nil/crypto3/hash/detail/static_digest.hpp>
 
-#include <nil/crypto3/utilities/type_traits/is_iterator.hpp>
-
 namespace nil {
     namespace crypto3 {
         namespace hash {
