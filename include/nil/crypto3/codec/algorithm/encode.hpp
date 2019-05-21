@@ -62,7 +62,8 @@ namespace nil {
          * @param last
          * @return
          */
-        template<typename Encoder, typename InputIterator,
+        template<typename Encoder,
+                 typename InputIterator,
                  typename EncoderState = typename codec::itr_stream_codec_traits<typename Encoder::stream_encoder_type,
                                                                                  InputIterator>::type>
         codec::detail::range_codec_impl<codec::detail::value_codec_impl<EncoderState>> encode(InputIterator first,
@@ -108,7 +109,8 @@ namespace nil {
          * @param r
          * @return
          */
-        template<typename Encoder, typename SinglePassRange,
+        template<typename Encoder,
+                 typename SinglePassRange,
                  typename EncoderState = typename codec::range_stream_codec_traits<
                          typename Encoder::stream_encoder_type, SinglePassRange>::type>
         codec::detail::range_codec_impl<codec::detail::value_codec_impl<EncoderState>> encode(

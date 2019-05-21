@@ -104,7 +104,7 @@ namespace nil {
                         input_block_type block = {0};
                         pack<Endian, value_bits, block_values == 0 ? 0 : input_block_bits / block_values>(first,
                                 first + block_values, block);
-                        seen += input_block_bits;
+                        seen += block_bits;
 
                         out = move(mode_type::process_block(block), out);
 

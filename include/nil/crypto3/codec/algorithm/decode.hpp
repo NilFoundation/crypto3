@@ -61,7 +61,8 @@ namespace nil {
          * @param last
          * @return
          */
-        template<typename Decoder, typename InputIterator,
+        template<typename Decoder,
+                 typename InputIterator,
                  typename StreamDecoder = typename codec::itr_stream_codec_traits<typename Decoder::stream_decoder_type,
                                                                                   InputIterator>::type>
         codec::detail::range_codec_impl<codec::detail::value_codec_impl<StreamDecoder>> decode(InputIterator first,
@@ -108,7 +109,8 @@ namespace nil {
          * @param r
          * @return
          */
-        template<typename Decoder, typename SinglePassRange,
+        template<typename Decoder,
+                 typename SinglePassRange,
                  typename StreamDecoder = typename codec::range_stream_codec_traits<
                          typename Decoder::stream_decoder_type, SinglePassRange>::type>
         codec::detail::range_codec_impl<codec::detail::value_codec_impl<StreamDecoder>> decode(

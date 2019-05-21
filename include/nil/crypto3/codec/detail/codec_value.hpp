@@ -91,13 +91,17 @@ namespace nil {
 
                     template<typename OutputRange>
                     operator OutputRange() const {
+                        std::size_t t = this->se.preprocessor_state().seen %
+                                        mode_type::input_block_bits, s = this->se.preprocessor_state().seen;
+
+
                         if (mode_type::input_block_bits &&
                             this->se.preprocessor_state().seen % mode_type::input_block_bits) {
                             typename mode_type::finalizer_type(mode_type::input_block_bits -
                                                                this->se.preprocessor_state().seen %
-                                                               mode_type::input_block_bits);
+                                                               mode_type::input_block_bits)(this->se);
                         } else {
-                            typename mode_type::finalizer_type(0);
+                            typename mode_type::finalizer_type(0)(this->se);
                         }
 
                         return OutputRange(this->se.cbegin(), this->se.cend());
@@ -108,9 +112,9 @@ namespace nil {
                             this->se.preprocessor_state().seen % mode_type::input_block_bits) {
                             typename mode_type::finalizer_type(mode_type::input_block_bits -
                                                                this->se.preprocessor_state().seen %
-                                                               mode_type::input_block_bits);
+                                                               mode_type::input_block_bits)(this->se);
                         } else {
-                            typename mode_type::finalizer_type(0);
+                            typename mode_type::finalizer_type(0)(this->se);
                         }
 
                         return this->se.data();
@@ -167,9 +171,9 @@ namespace nil {
                             this->se.preprocessor_state().seen % mode_type::input_block_bits) {
                             typename mode_type::finalizer_type(mode_type::input_block_bits -
                                                                this->se.preprocessor_state().seen %
-                                                               mode_type::input_block_bits);
+                                                               mode_type::input_block_bits)(this->se);
                         } else {
-                            typename mode_type::finalizer_type(0);
+                            typename mode_type::finalizer_type(0)(this->se);
                         }
 
                         return std::move(this->se.cbegin(), this->se.cend(), out);
