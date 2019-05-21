@@ -22,8 +22,6 @@
 #include <nil/crypto3/block/cipher_state.hpp>
 #include <nil/crypto3/block/detail/type_traits.hpp>
 
-#include <nil/crypto3/utilities/type_traits/is_iterator.hpp>
-
 namespace nil {
     namespace crypto3 {
         namespace detail {
