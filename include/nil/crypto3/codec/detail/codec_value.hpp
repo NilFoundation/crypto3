@@ -91,10 +91,6 @@ namespace nil {
 
                     template<typename OutputRange>
                     operator OutputRange() const {
-                        std::size_t t = this->se.preprocessor_state().seen %
-                                        mode_type::input_block_bits, s = this->se.preprocessor_state().seen;
-
-
                         if (mode_type::input_block_bits &&
                             this->se.preprocessor_state().seen % mode_type::input_block_bits) {
                             typename mode_type::finalizer_type(mode_type::input_block_bits -

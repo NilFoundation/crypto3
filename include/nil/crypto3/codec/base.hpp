@@ -28,6 +28,11 @@
 namespace nil {
     namespace crypto3 {
         namespace codec {
+            namespace detail {
+                template<bool>
+                struct static_range;
+            }
+
             /*!
              * @brief Base encoder finalizer functor
              * @tparam Version
@@ -36,8 +41,32 @@ namespace nil {
              *
              * @note Finalizer is implemented under assumption it gets applied to the byte storage
              */
-            template<std::size_t Version>
+            template<std::size_t Version, typename = detail::static_range<true>>
             struct base_encode_finalizer {
+                typedef detail::base_policy<Version> policy_type;
+
+                /*!
+                 * @param input_remaining_bits Bits remaining unprocessed in block
+                 */
+                base_encode_finalizer(std::size_t) {
+
+                }
+
+                /*!
+                 * @brief Base encoding padding function. Fills remaining empty bits with '='.
+                 * @tparam T Input container type. Assumed to meet the requirements of Container,
+                 * AllocatorAwareContainer and SequenceContainer concepts.
+                 * @param t
+                 */
+                template<typename T>
+                void operator()(T &t) {
+
+                }
+            };
+
+
+            template<std::size_t Version>
+            struct base_encode_finalizer<Version, detail::static_range<!(Version % 32)>> {
                 typedef detail::base_policy<Version> policy_type;
 
                 /*!
@@ -65,15 +94,35 @@ namespace nil {
             };
 
             /*!
-            * @brief Base decoder finalizer functor
-            * @tparam Version
-            *
-            * Base decoder finalizer
-            *
-            * @note Finalizer is implemented under assumption it gets applied to the byte storage
-            */
-            template<std::size_t Version>
+             * @brief Base decoder finalizer functor
+             * @tparam Version
+             *
+             * Base decoder finalizer
+             *
+             * @note Finalizer is implemented under assumption it gets applied to the byte storage
+             */
+            template<std::size_t Version, typename = detail::static_range<true>>
             struct base_decode_finalizer {
+                typedef detail::base_policy<Version> policy_type;
+
+                base_decode_finalizer(std::size_t) {
+
+                }
+
+                /*!
+                 * @brief Base decoder padding function. Fills remaining empty bits with '='.
+                 * @tparam T Input container type. Assumed to meet the requirements of Container,
+                 * AllocatorAwareContainer and SequenceContainer concepts.
+                 * @param t
+                 */
+                template<typename T>
+                void operator()(T &t) {
+
+                }
+            };
+
+            template<std::size_t Version>
+            struct base_decode_finalizer<Version, detail::static_range<!(Version % 32)>> {
                 typedef detail::base_policy<Version> policy_type;
 
                 /*!
