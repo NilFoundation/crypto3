@@ -42,7 +42,10 @@ namespace nil {
             template<typename Hasher, typename Endian, std::size_t ValueBits, std::size_t LengthBits>
             struct hash_state : public concept_container<typename Hasher::digest_type,
                                                          typename Hasher::template stream_processor<ValueBits>> {
-
+                typedef Hasher hash_type;
+                typedef typename concept_container<typename Hasher::digest_type,
+                                                   typename Hasher::template stream_processor<
+                                                           ValueBits>>::container_type container_type;
             };
         }
     }
