@@ -3,7 +3,11 @@ cmake_minimum_required(VERSION 2.8.11)
 cmake_policy(SET CMP0042 NEW)
 cmake_policy(SET CMP0028 NEW)
 
-cm_project(${CMAKE_WORKSPACE_NAME} codec)
+if(NOT ${CMAKE_WORKSPACE_NAME} STREQUAL crypto3)
+    cm_workspace(crypto3)
+endif()
+
+cm_project(codec WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME})
 
 if(NOT Boost_FOUND)
     cm_find_package(Boost)

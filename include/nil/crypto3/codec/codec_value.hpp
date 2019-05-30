@@ -22,19 +22,6 @@
 namespace nil {
     namespace crypto3 {
         namespace codec {
-            template<typename EncoderMode,
-                     typename SinglePassRange> using range_stream_codec_traits = typename EncoderMode::encoder_type::template stream_processor<
-                    EncoderMode, std::numeric_limits<
-                            typename std::iterator_traits<typename SinglePassRange::iterator>::value_type>::digits +
-                                 std::numeric_limits<typename std::iterator_traits<
-                                         typename SinglePassRange::iterator>::value_type>::is_signed>;
-
-            template<typename EncoderMode,
-                     typename InputIterator> using itr_stream_codec_traits = typename EncoderMode::encoder_type::template stream_processor<
-                    EncoderMode, std::numeric_limits<typename std::iterator_traits<InputIterator>::value_type>::digits +
-                                 std::numeric_limits<
-                                         typename std::iterator_traits<InputIterator>::value_type>::is_signed>;
-
             namespace detail {
                 template<typename CodecState>
                 struct ref_codec_impl {
@@ -63,6 +50,7 @@ namespace nil {
                     typedef CodecStateImpl codec_state_impl_type;
                     typedef typename codec_state_impl_type::codec_state_type codec_state_type;
                     typedef typename codec_state_type::mode_type mode_type;
+                    typedef typename mode_type::finalizer_type finalizer_type;
 
                     template<typename SinglePassRange>
                     range_codec_impl(const SinglePassRange &range, const codec_state_type &ise)
@@ -91,26 +79,24 @@ namespace nil {
 
                     template<typename OutputRange>
                     operator OutputRange() const {
-                        if (mode_type::input_block_bits &&
-                            this->se.preprocessor_state().seen % mode_type::input_block_bits) {
-                            typename mode_type::finalizer_type(mode_type::input_block_bits -
-                                                               this->se.preprocessor_state().seen %
-                                                               mode_type::input_block_bits)(this->se);
+                        std::size_t seen = this->se.data().stats().bits_seen + this->se.cache().stats().bits_seen;
+
+                        if (mode_type::input_block_bits && seen % mode_type::input_block_bits) {
+                            finalizer_type(mode_type::input_block_bits - seen % mode_type::input_block_bits)(this->se);
                         } else {
-                            typename mode_type::finalizer_type(0)(this->se);
+                            finalizer_type(0)(this->se);
                         }
 
                         return OutputRange(this->se.cbegin(), this->se.cend());
                     }
 
                     operator typename codec_state_type::container_type() const {
-                        if (mode_type::input_block_bits &&
-                            this->se.preprocessor_state().seen % mode_type::input_block_bits) {
-                            typename mode_type::finalizer_type(mode_type::input_block_bits -
-                                                               this->se.preprocessor_state().seen %
-                                                               mode_type::input_block_bits)(this->se);
+                        std::size_t seen = this->se.data().stats().bits_seen + this->se.cache().stats().bits_seen;
+
+                        if (mode_type::input_block_bits && seen % mode_type::input_block_bits) {
+                            finalizer_type(mode_type::input_block_bits - seen % mode_type::input_block_bits)(this->se);
                         } else {
-                            typename mode_type::finalizer_type(0)(this->se);
+                            finalizer_type(0)(this->se);
                         }
 
                         return this->se.data();
@@ -120,7 +106,15 @@ namespace nil {
 
                     template<typename Char, typename CharTraits, typename Alloc>
                     operator std::basic_string<Char, CharTraits, Alloc>() const {
-                        return std::to_string(this->result());
+                        std::size_t seen = this->se.data().stats().bits_seen + this->se.cache().stats().bits_seen;
+
+                        if (mode_type::input_block_bits && seen % mode_type::input_block_bits) {
+                            finalizer_type(mode_type::input_block_bits - seen % mode_type::input_block_bits)(this->se);
+                        } else {
+                            finalizer_type(0)(this->se);
+                        }
+
+                        return std::to_string(this->se);
                     }
 
 #endif
@@ -135,6 +129,7 @@ namespace nil {
                     typedef CodecStateImpl codec_state_impl_type;
                     typedef typename codec_state_impl_type::codec_state_type codec_state_type;
                     typedef typename codec_state_type::mode_type mode_type;
+                    typedef typename mode_type::finalizer_type finalizer_type;
 
                     template<typename SinglePassRange>
                     itr_codec_impl(const SinglePassRange &range, OutputIterator out, const codec_state_type &ise)
@@ -163,13 +158,12 @@ namespace nil {
                     }
 
                     operator OutputIterator() const {
-                        if (mode_type::input_block_bits &&
-                            this->se.preprocessor_state().seen % mode_type::input_block_bits) {
-                            typename mode_type::finalizer_type(mode_type::input_block_bits -
-                                                               this->se.preprocessor_state().seen %
-                                                               mode_type::input_block_bits)(this->se);
+                        std::size_t seen = this->se.data().stats().bits_seen + this->se.cache().stats().bits_seen;
+
+                        if (mode_type::input_block_bits && seen % mode_type::input_block_bits) {
+                            finalizer_type(mode_type::input_block_bits - seen % mode_type::input_block_bits)(this->se);
                         } else {
-                            typename mode_type::finalizer_type(0)(this->se);
+                            finalizer_type(0)(this->se);
                         }
 
                         return std::move(this->se.cbegin(), this->se.cend(), out);

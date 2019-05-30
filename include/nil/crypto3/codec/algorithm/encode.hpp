@@ -10,7 +10,8 @@
 #ifndef CRYPTO3_ENCODE_HPP
 #define CRYPTO3_ENCODE_HPP
 
-#include <nil/crypto3/codec/detail/codec_value.hpp>
+#include <nil/crypto3/codec/codec_value.hpp>
+#include <nil/crypto3/codec/codec_state.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -42,7 +43,7 @@ namespace nil {
         template<typename Encoder, typename InputIterator, typename OutputIterator>
         OutputIterator encode(InputIterator first, InputIterator last, OutputIterator out) {
             typedef typename Encoder::stream_encoder_type EncodingMode;
-            typedef typename codec::itr_stream_codec_traits<EncodingMode, InputIterator>::type EncoderState;
+            typedef typename codec::codec_state<EncodingMode> EncoderState;
 
             typedef codec::detail::value_codec_impl<EncoderState> EncoderStateImpl;
             typedef codec::detail::itr_codec_impl<EncoderStateImpl, OutputIterator> EncoderImpl;
@@ -64,8 +65,7 @@ namespace nil {
          */
         template<typename Encoder,
                  typename InputIterator,
-                 typename EncoderState = typename codec::itr_stream_codec_traits<typename Encoder::stream_encoder_type,
-                                                                                 InputIterator>::type>
+                 typename EncoderState = typename codec::codec_state<typename Encoder::stream_encoder_type>>
         codec::detail::range_codec_impl<codec::detail::value_codec_impl<EncoderState>> encode(InputIterator first,
                                                                                               InputIterator last) {
             typedef codec::detail::value_codec_impl<EncoderState> EncoderStateImpl;
@@ -89,8 +89,7 @@ namespace nil {
         template<typename Encoder, typename SinglePassRange, typename OutputIterator>
         OutputIterator encode(const SinglePassRange &rng, OutputIterator out) {
             typedef typename Encoder::stream_encoder_type EncodingMode;
-            typedef typename codec::range_stream_codec_traits<typename Encoder::stream_encoder_type,
-                                                              SinglePassRange>::type EncoderState;
+            typedef typename codec::codec_state<EncodingMode> EncoderState;
 
             typedef codec::detail::value_codec_impl<EncoderState> EncoderStateImpl;
             typedef codec::detail::itr_codec_impl<EncoderStateImpl, OutputIterator> EncoderImpl;
@@ -111,8 +110,7 @@ namespace nil {
          */
         template<typename Encoder,
                  typename SinglePassRange,
-                 typename EncoderState = typename codec::range_stream_codec_traits<
-                         typename Encoder::stream_encoder_type, SinglePassRange>::type>
+                 typename EncoderState = typename codec::codec_state<typename Encoder::stream_encoder_type>>
         codec::detail::range_codec_impl<codec::detail::value_codec_impl<EncoderState>> encode(
                 const SinglePassRange &r) {
 
@@ -120,6 +118,28 @@ namespace nil {
             typedef codec::detail::range_codec_impl<EncoderStateImpl> EncoderImpl;
 
             return EncoderImpl(r, EncoderState());
+        }
+
+        /*!
+         * @brief
+         *
+         * @ingroup codec_algorithms
+         *
+         * @tparam Encoder
+         * @tparam SinglePassRange
+         * @tparam EncoderState
+         * @param r
+         * @return
+         */
+        template<typename Encoder,
+                 typename EncoderState,
+                 typename = typename std::enable_if<codec::detail::is_codec_state<EncoderState>::value>::type>
+        codec::detail::range_codec_impl<codec::detail::value_codec_impl<EncoderState>> encode(const EncoderState &r) {
+
+            typedef codec::detail::value_codec_impl<EncoderState> EncoderStateImpl;
+            typedef codec::detail::range_codec_impl<EncoderStateImpl> EncoderImpl;
+
+            return EncoderImpl(r, r);
         }
     } // namespace crypto3
 } // namespace nil

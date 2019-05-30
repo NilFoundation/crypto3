@@ -16,6 +16,7 @@
 
 #include <nil/crypto3/codec/detail/hex_policy.hpp>
 #include <nil/crypto3/codec/detail/codec_modes.hpp>
+#include <nil/crypto3/codec/detail/block_state_preprocessor.hpp>
 
 #include <nil/crypto3/codec/codec_state.hpp>
 
@@ -158,16 +159,13 @@ namespace nil {
                     return res;
                 }
 
-                template<typename ProcessingMode, std::size_t ValueBits>
+                template<typename ProcessingMode, typename CacheContainer>
                 struct stream_processor {
-                    typedef codec_state<ProcessingMode, stream_endian::little_octet_big_bit, ValueBits,
-                                        CHAR_BIT * CHAR_BIT> type_;
-#ifdef CRYPTO3_CODEC_NO_HIDE_INTERNAL_TYPES
-                    typedef type_ type;
-#else
-                    struct type : type_ {
-                    };
-#endif
+                    template<typename ProcessingParams> using type = block_state_preprocessor<ProcessingMode,
+                                                                                              stream_endian::little_octet_big_bit,
+                                                                                              ProcessingParams::value_bits,
+                                                                                              CHAR_BIT * CHAR_BIT,
+                                                                                              CacheContainer>;
                 };
 
             protected:
