@@ -7,7 +7,11 @@ cm_find_package(CM)
 include(CMDeploy)
 include(CMSetupVersion)
 
-cm_project(${CMAKE_WORKSPACE_NAME} block)
+if(NOT ${CMAKE_WORKSPACE_NAME} STREQUAL crypto3)
+    cm_workspace(crypto3)
+endif()
+
+cm_project(block WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME})
 
 if(NOT Boost_CONTAINER_FOUND OR NOT Boost_FOUND)
     cm_find_package(Boost COMPONENTS container)
@@ -23,7 +27,7 @@ list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
      include/nil/crypto3/block/algorithm/copy_n_if.hpp
 
      include/nil/crypto3/block/block_cipher.hpp
-     include/nil/crypto3/block/cipher_state.hpp
+     include/nil/crypto3/block/cipher_state_preprocessor.hpp
 
      include/nil/crypto3/block/detail/cipher_value.hpp
      include/nil/crypto3/block/detail/stream_endian.hpp
