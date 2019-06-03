@@ -8,9 +8,9 @@ if(NOT Boost_UNIT_TEST_FRAMEWORK_FOUND)
 endif()
 
 cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
-
                        ${CMAKE_WORKSPACE_NAME}::block
-                       ${CMAKE_WORKSPACE_NAME}::utilities
+
+                       concept_container
 
                        ${Boost_LIBRARIES})
 
