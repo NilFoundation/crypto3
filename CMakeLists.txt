@@ -476,8 +476,9 @@ set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES
                       COMPILE_FLAGS "-fvisibility=hidden")
 
 target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PUBLIC
-                      ${CMAKE_WORKSPACE_NAME}::concept_container
                       ${CMAKE_WORKSPACE_NAME}::utilities
+
+                      concept_container
 
                       ${Boost_LIBRARIES})
 
