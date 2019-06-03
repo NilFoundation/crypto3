@@ -3,17 +3,22 @@ cmake_minimum_required(VERSION 2.8.11)
 cmake_policy(SET CMP0042 NEW)
 cmake_policy(SET CMP0028 NEW)
 
-cm_project(${CMAKE_WORKSPACE_NAME} hash)
+if(NOT ${CMAKE_WORKSPACE_NAME} STREQUAL crypto3)
+    cm_workspace(crypto3)
+endif()
+
+cm_project(hash WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME})
 
 cm_find_package(CM)
 include(CMDeploy)
 include(CMSetupVersion)
 
 if(NOT Boost_FOUND)
-    cm_find_package(Boost)
+    cm_find_package(Boost REQUIRED)
 endif()
 
 cm_find_package(${CMAKE_WORKSPACE_NAME}_block)
+cm_find_package(${CMAKE_WORKSPACE_NAME}_utilities)
 
 list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
      include/nil/crypto3/hash/algorithm/hash.hpp
