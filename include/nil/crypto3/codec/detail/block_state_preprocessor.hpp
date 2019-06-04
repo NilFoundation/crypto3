@@ -13,6 +13,8 @@
 #include <array>
 #include <iterator>
 
+#include <nil/concept_container/accumulators/bit_count.hpp>
+
 #include <nil/crypto3/codec/detail/pack.hpp>
 
 #include <nil/crypto3/codec/detail/digest.hpp>
@@ -62,9 +64,10 @@ namespace nil {
 
                 template<typename OutputIterator>
                 inline OutputIterator update_one(value_type value, std::size_t values_remains, OutputIterator out) {
-                    std::size_t i = input_block_bits == 0 ? 0 : seen % input_block_bits;
+                    std::size_t i = input_block_bits == 0 ? 0 : accumulators::extract::bit_count(cache.stats()) %
+                                                                input_block_bits;
                     value_array[i / value_bits] = value;
-                    seen += value_bits;
+                    cache.stats()(value);
                     if (i == input_block_bits - value_bits || values_remains == 1) {
                         // Convert the input into words
                         input_block_type block = {0};
@@ -76,7 +79,7 @@ namespace nil {
 
                         // Reset seen if we don't need to track the length
                         if (!length_bits) {
-                            seen = 0;
+                            cache.stats() = {};
                         }
                     }
                     return out;
@@ -87,7 +90,7 @@ namespace nil {
                     std::size_t n = std::distance(first, last), block_bits =
                             input_block_bits == 0 ? n * value_bits : input_block_bits;
 #ifndef CRYPTO3_CODEC_NO_OPTIMIZATION
-                    for (; n && (seen % block_bits); --n, ++first) {
+                    for (; n && (accumulators::extract::bit_count(cache.stats()) % block_bits); --n, ++first) {
                         out = update_one(*first, n, out);
                     }
                     for (; n >= block_values; n -= block_values, first += block_values) {
@@ -95,13 +98,13 @@ namespace nil {
                         input_block_type block = {0};
                         pack<Endian, value_bits, block_values == 0 ? 0 : input_block_bits / block_values>(first,
                                 first + block_values, block);
-                        seen += block_bits;
+                        cache.stats()(block.begin(), block.end());
 
                         out = move(mode_type::process_block(block), out);
 
                         // Reset seen if we don't need to track the length
                         if (!length_bits) {
-                            seen = 0;
+                            cache.stats() = {};
                         }
                     }
 #endif
@@ -113,20 +116,18 @@ namespace nil {
                 }
 
             public:
-                block_state_preprocessor(CacheContainer &c) : cache(c), value_array(value_array_type()),
-                        seen(c.stats().bits_seen) {
-                    BOOST_ASSERT(c.stats().bits_seen <= value_bits * block_values);
+                block_state_preprocessor(CacheContainer &c) : cache(c), value_array(value_array_type()) {
+                    BOOST_ASSERT(accumulators::extract::bit_count(c.stats()) <= value_bits * block_values);
 
                     pack<Endian, std::numeric_limits<typename CacheContainer::value_type>::digits +
-                                 std::numeric_limits<typename CacheContainer::value_type>::is_signed, value_bits>(c,
-                            value_array);
+                                 std::numeric_limits<typename CacheContainer::value_type>::is_signed, value_bits>(
+                            c.data(), value_array);
                 }
 
                 virtual ~block_state_preprocessor() {
                     pack<Endian, value_bits, std::numeric_limits<typename CacheContainer::value_type>::digits +
                                              std::numeric_limits<typename CacheContainer::value_type>::is_signed>(
-                            value_array, cache);
-                    cache.stats().bits_seen = seen % input_block_bits;
+                            value_array, cache.data());
                 }
 
                 template<typename InputIterator, typename OutputIterator>
@@ -165,14 +166,12 @@ namespace nil {
                 }
 
                 void reset() {
-                    seen = 0;
                     value_array.fill(0);
                 }
 
                 CacheContainer &cache;
 
                 value_array_type value_array;
-                length_type seen;
             };
         }
     }

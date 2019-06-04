@@ -105,8 +105,7 @@ static const std::vector<std::string> base_58_invalid_data = {
 };
 
 static const byte_vector_data_t base32_valid_data = {{
-                                                             "MY======",
-                                                             {0x66}},
+                                                             "MY======",                                         {0x66}},
                                                      {
                                                              "MZXQ====",                                         {0x66, 0x6F}},
                                                      {       "MZXW6===",                                         {0x66, 0x6F, 0x6F}},
@@ -133,7 +132,7 @@ static const byte_vector_data_t base32_valid_data = {{
 BOOST_AUTO_TEST_SUITE(base32_codec_test_suite)
 
     BOOST_DATA_TEST_CASE(base32_single_range_encode, boost::unit_test::data::make(base32_valid_data), array_element) {
-        std::string out = encode<base<32>>(array_element.second);
+       std::string out = encode<base<32>>(array_element.second);
 
         BOOST_CHECK_EQUAL(out, array_element.first);
     }

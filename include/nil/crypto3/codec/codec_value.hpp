@@ -17,6 +17,8 @@
 #include <boost/range/end.hpp>
 #include <boost/range/concepts.hpp>
 
+#include <nil/concept_container/accumulators/bit_count.hpp>
+
 #include <nil/crypto3/codec/detail/digest.hpp>
 
 namespace nil {
@@ -79,7 +81,10 @@ namespace nil {
 
                     template<typename OutputRange>
                     operator OutputRange() const {
-                        std::size_t seen = this->se.data().stats().bits_seen + this->se.cache().stats().bits_seen;
+                        std::size_t seen = boost::accumulators::extract_result<accumulators::tag::bit_count>(
+                                this->se.data().stats()) +
+                                           boost::accumulators::extract_result<accumulators::tag::bit_count>(
+                                                   this->se.cache().stats());
 
                         if (mode_type::input_block_bits && seen % mode_type::input_block_bits) {
                             finalizer_type(mode_type::input_block_bits - seen % mode_type::input_block_bits)(this->se);
@@ -91,7 +96,10 @@ namespace nil {
                     }
 
                     operator typename codec_state_type::container_type() const {
-                        std::size_t seen = this->se.data().stats().bits_seen + this->se.cache().stats().bits_seen;
+                        std::size_t seen = boost::accumulators::extract_result<accumulators::tag::bit_count>(
+                                this->se.data().stats()) +
+                                           boost::accumulators::extract_result<accumulators::tag::bit_count>(
+                                                   this->se.cache().stats());
 
                         if (mode_type::input_block_bits && seen % mode_type::input_block_bits) {
                             finalizer_type(mode_type::input_block_bits - seen % mode_type::input_block_bits)(this->se);
@@ -106,7 +114,10 @@ namespace nil {
 
                     template<typename Char, typename CharTraits, typename Alloc>
                     operator std::basic_string<Char, CharTraits, Alloc>() const {
-                        std::size_t seen = this->se.data().stats().bits_seen + this->se.cache().stats().bits_seen;
+                        std::size_t seen = boost::accumulators::extract_result<accumulators::tag::bit_count>(
+                                this->se.data().stats()) +
+                                           boost::accumulators::extract_result<accumulators::tag::bit_count>(
+                                                   this->se.cache().stats());
 
                         if (mode_type::input_block_bits && seen % mode_type::input_block_bits) {
                             finalizer_type(mode_type::input_block_bits - seen % mode_type::input_block_bits)(this->se);
@@ -158,7 +169,10 @@ namespace nil {
                     }
 
                     operator OutputIterator() const {
-                        std::size_t seen = this->se.data().stats().bits_seen + this->se.cache().stats().bits_seen;
+                        std::size_t seen = boost::accumulators::extract_result<accumulators::tag::bit_count>(
+                                this->se.data().stats()) +
+                                           boost::accumulators::extract_result<accumulators::tag::bit_count>(
+                                                   this->se.cache().stats());
 
                         if (mode_type::input_block_bits && seen % mode_type::input_block_bits) {
                             finalizer_type(mode_type::input_block_bits - seen % mode_type::input_block_bits)(this->se);

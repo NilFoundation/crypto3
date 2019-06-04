@@ -10,7 +10,7 @@ endif()
 cm_project(codec WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME})
 
 if(NOT Boost_FOUND)
-    cm_find_package(Boost)
+    cm_find_package(Boost REQUIRED)
 endif()
 
 list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
@@ -45,7 +45,9 @@ add_library(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE)
 set_property(TARGET ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTY EXPORT_NAME ${CURRENT_PROJECT_NAME})
 
 target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
-                      ${CMAKE_WORKSPACE_NAME}::concept_container)
+                      concept_container
+
+                      ${Boost_LIBRARIES})
 
 target_include_directories(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
                            "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
