@@ -62,15 +62,15 @@ namespace nil {
 
                     template<typename ArgumentPack>
                     inline result_type result(const ArgumentPack &args) const {
-                        result_type result = digest;
+                        result_type res = digest;
 
                         if (input_block_bits && seen % input_block_bits) {
-                            finalizer_type(input_block_bits - seen % input_block_bits)(result);
+                            finalizer_type(input_block_bits - seen % input_block_bits)(res);
                         } else {
-                            finalizer_type(0)(result);
+                            finalizer_type(0)(res);
                         }
 
-                        return result;
+                        return res;
                     }
 
                 protected:
@@ -83,7 +83,7 @@ namespace nil {
                             output_block_type ob = mode_type::process_block(
                                     codec::make_array<std::tuple_size<input_block_type>::value>(cache.begin(),
                                             cache.end()));
-                            std::move(ob.begin(), ob.end(), digest.end());
+                            std::move(ob.begin(), ob.end(), std::inserter(digest, digest.end()));
                             seen += input_value_bits;
                             cache.clear();
                         }
@@ -92,7 +92,7 @@ namespace nil {
                     inline void process(const input_block_type &block) {
                         if (cache.empty()) {
                             output_block_type ob = mode_type::process_block(block);
-                            std::move(ob.begin(), ob.end(), digest.end());
+                            std::move(ob.begin(), ob.end(), std::inserter(digest, digest.end()));
                             seen += input_block_bits;
                         } else {
                             input_block_type b = codec::make_array<std::tuple_size<input_block_type>::value>(
@@ -104,7 +104,7 @@ namespace nil {
 
                             output_block_type ob = mode_type::process_block(block);
 
-                            std::move(ob.begin(), ob.end(), digest.end());
+                            std::move(ob.begin(), ob.end(), std::inserter(digest, digest.end()));
 
                             seen += input_block_bits;
 

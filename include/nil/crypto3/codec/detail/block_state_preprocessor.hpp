@@ -113,11 +113,13 @@ namespace nil {
                 }
 
                 virtual ~block_state_preprocessor() {
-                    input_block_type block = {0};
-                    pack<Endian, value_bits, input_block_bits / block_values>(cache.begin(),
-                            cache.begin() + (seen % input_block_bits), block);
-                    for (const typename input_block_type::value_type &v : block) {
-                        state(v);
+                    if (!cache.empty() && cache != cache_type({0})) {
+                        input_block_type block = {0};
+                        pack<Endian, value_bits, input_block_bits / block_values>(cache.begin(),
+                                cache.begin() + (seen % input_block_bits), block);
+                        for (const typename input_block_type::value_type &v : block) {
+                            state(v);
+                        }
                     }
                 }
 
