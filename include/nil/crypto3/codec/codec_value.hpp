@@ -17,115 +17,108 @@
 #include <boost/range/end.hpp>
 #include <boost/range/concepts.hpp>
 
-#include <nil/concept_container/accumulators/bit_count.hpp>
+#include <boost/accumulators/framework/features.hpp>
 
-#include <nil/crypto3/codec/detail/digest.hpp>
+#include <nil/crypto3/codec/accumulators/codec.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace codec {
             namespace detail {
-                template<typename CodecState>
+                template<typename CodecAccumulator>
                 struct ref_codec_impl {
-                    typedef CodecState codec_state_type;
+                    typedef CodecAccumulator codec_accumulator_type;
+                    typedef typename codec_accumulator_type::type codec_accumulator_set;
 
-                    ref_codec_impl(const codec_state_type &codec_state) : se(codec_state) {
+                    typedef typename CodecAccumulator::mode_type mode_type;
+                    typedef typename mode_type::encoder_type codec_type;
+
+                    ref_codec_impl(const codec_accumulator_set &acc) : accumulator_set(acc) {
 
                     }
 
-                    codec_state_type &se;
+                    codec_accumulator_set &accumulator_set;
                 };
 
-                template<typename CodecState>
+                template<typename CodecAccumulator>
                 struct value_codec_impl {
-                    typedef CodecState codec_state_type;
+                    typedef CodecAccumulator codec_accumulator_type;
+                    typedef typename codec_accumulator_type::type codec_accumulator_set;
 
-                    value_codec_impl(const codec_state_type &codec_state) : se(codec_state) {
+                    typedef typename CodecAccumulator::mode_type mode_type;
+                    typedef typename mode_type::encoder_type codec_type;
+
+                    value_codec_impl(const codec_accumulator_set &acc) : accumulator_set(acc) {
 
                     }
 
-                    mutable codec_state_type se;
+                    mutable codec_accumulator_set accumulator_set;
                 };
 
                 template<typename CodecStateImpl>
                 struct range_codec_impl : public CodecStateImpl {
                     typedef CodecStateImpl codec_state_impl_type;
-                    typedef typename codec_state_impl_type::codec_state_type codec_state_type;
-                    typedef typename codec_state_type::mode_type mode_type;
-                    typedef typename mode_type::finalizer_type finalizer_type;
+
+                    typedef typename codec_state_impl_type::codec_accumulator_type codec_accumulator_type;
+                    typedef typename codec_accumulator_type::type codec_accumulator_set;
+
+                    typedef typename codec_state_impl_type::mode_type mode_type;
+                    typedef typename codec_state_impl_type::codec_type codec_type;
+
+                    typedef typename boost::mpl::apply<codec_accumulator_set, accumulators::tag::codec<
+                            mode_type> >::type::result_type result_type;
 
                     template<typename SinglePassRange>
-                    range_codec_impl(const SinglePassRange &range, const codec_state_type &ise)
+                    range_codec_impl(const SinglePassRange &range, const codec_accumulator_set &ise)
                             : CodecStateImpl(ise) {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange>));
 
                         typedef typename std::iterator_traits<
                                 typename SinglePassRange::iterator>::value_type value_type;
-
                         BOOST_STATIC_ASSERT(std::numeric_limits<value_type>::is_specialized);
+                        typedef typename codec_type::template stream_processor<mode_type, codec_accumulator_set,
+                                                                               std::numeric_limits<value_type>::digits +
+                                                                               std::numeric_limits<
+                                                                                       value_type>::is_signed>::type stream_processor;
 
-                        this->se.insert(this->se.end(), range.begin(), range.end());
+
+                        stream_processor(this->accumulator_set)(range.begin(), range.end());
                     }
 
                     template<typename InputIterator>
-                    range_codec_impl(InputIterator first, InputIterator last, const codec_state_type &ise)
+                    range_codec_impl(InputIterator first, InputIterator last, const codec_accumulator_set &ise)
                             : CodecStateImpl(ise) {
                         BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<InputIterator>));
 
                         typedef typename std::iterator_traits<InputIterator>::value_type value_type;
-
                         BOOST_STATIC_ASSERT(std::numeric_limits<value_type>::is_specialized);
+                        typedef typename codec_type::template stream_processor<mode_type, codec_accumulator_set,
+                                                                               std::numeric_limits<value_type>::digits +
+                                                                               std::numeric_limits<
+                                                                                       value_type>::is_signed>::type stream_processor;
 
-                        this->se.insert(this->se.end(), first, last);
+                        stream_processor(this->accumulator_set)(first, last);
                     }
 
                     template<typename OutputRange>
                     operator OutputRange() const {
-                        std::size_t seen = boost::accumulators::extract_result<accumulators::tag::bit_count>(
-                                this->se.data().stats()) +
-                                           boost::accumulators::extract_result<accumulators::tag::bit_count>(
-                                                   this->se.cache().stats());
-
-                        if (mode_type::input_block_bits && seen % mode_type::input_block_bits) {
-                            finalizer_type(mode_type::input_block_bits - seen % mode_type::input_block_bits)(this->se);
-                        } else {
-                            finalizer_type(0)(this->se);
-                        }
-
-                        return OutputRange(this->se.cbegin(), this->se.cend());
+                        result_type result = accumulators::extract::codec<mode_type>(this->accumulator_set);
+                        return OutputRange(result.cbegin(), result.cend());
                     }
 
-                    operator typename codec_state_type::container_type() const {
-                        std::size_t seen = boost::accumulators::extract_result<accumulators::tag::bit_count>(
-                                this->se.data().stats()) +
-                                           boost::accumulators::extract_result<accumulators::tag::bit_count>(
-                                                   this->se.cache().stats());
+                    operator result_type() const {
+                        return accumulators::extract::codec<mode_type>(this->accumulator_set);
+                    }
 
-                        if (mode_type::input_block_bits && seen % mode_type::input_block_bits) {
-                            finalizer_type(mode_type::input_block_bits - seen % mode_type::input_block_bits)(this->se);
-                        } else {
-                            finalizer_type(0)(this->se);
-                        }
-
-                        return this->se.data();
+                    operator codec_accumulator_set() const {
+                        return this->accumulator_set;
                     }
 
 #ifdef CRYPTO3_ASCII_STRING_CODEC_OUTPUT
 
                     template<typename Char, typename CharTraits, typename Alloc>
                     operator std::basic_string<Char, CharTraits, Alloc>() const {
-                        std::size_t seen = boost::accumulators::extract_result<accumulators::tag::bit_count>(
-                                this->se.data().stats()) +
-                                           boost::accumulators::extract_result<accumulators::tag::bit_count>(
-                                                   this->se.cache().stats());
-
-                        if (mode_type::input_block_bits && seen % mode_type::input_block_bits) {
-                            finalizer_type(mode_type::input_block_bits - seen % mode_type::input_block_bits)(this->se);
-                        } else {
-                            finalizer_type(0)(this->se);
-                        }
-
-                        return std::to_string(this->se);
+                        return std::to_string(accumulators::extract::codec<mode_type>(this->accumulator_set));
                     }
 
 #endif
@@ -138,49 +131,54 @@ namespace nil {
 
                 public:
                     typedef CodecStateImpl codec_state_impl_type;
-                    typedef typename codec_state_impl_type::codec_state_type codec_state_type;
-                    typedef typename codec_state_type::mode_type mode_type;
-                    typedef typename mode_type::finalizer_type finalizer_type;
+
+                    typedef typename codec_state_impl_type::codec_accumulator_type codec_accumulator_type;
+                    typedef typename codec_accumulator_type::type codec_accumulator_set;
+
+                    typedef typename codec_state_impl_type::mode_type mode_type;
+                    typedef typename codec_state_impl_type::codec_type codec_type;
+
+                    typedef typename boost::mpl::apply<codec_accumulator_set, accumulators::tag::codec<
+                            mode_type> >::type::result_type result_type;
 
                     template<typename SinglePassRange>
-                    itr_codec_impl(const SinglePassRange &range, OutputIterator out, const codec_state_type &ise)
+                    itr_codec_impl(const SinglePassRange &range, OutputIterator out, const codec_accumulator_set &ise)
                             : CodecStateImpl(ise), out(std::move(out)) {
                         BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange>));
 
                         typedef typename std::iterator_traits<
                                 typename SinglePassRange::iterator>::value_type value_type;
-
                         BOOST_STATIC_ASSERT(std::numeric_limits<value_type>::is_specialized);
+                        typedef typename codec_type::template stream_processor<mode_type, codec_accumulator_set,
+                                                                               std::numeric_limits<value_type>::digits +
+                                                                               std::numeric_limits<
+                                                                                       value_type>::is_signed>::type stream_processor;
 
-                        this->se.insert(this->se.end(), range.begin(), range.end());
+
+                        stream_processor(this->accumulator_set)(range.begin(), range.end());
                     }
 
                     template<typename InputIterator>
                     itr_codec_impl(InputIterator first, InputIterator last, OutputIterator out,
-                                   const codec_state_type &ise)
+                                   const codec_accumulator_set &ise)
                             : CodecStateImpl(ise), out(std::move(out)) {
                         BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<InputIterator>));
 
                         typedef typename std::iterator_traits<InputIterator>::value_type value_type;
-
                         BOOST_STATIC_ASSERT(std::numeric_limits<value_type>::is_specialized);
+                        typedef typename codec_type::template stream_processor<mode_type, codec_accumulator_set,
+                                                                               std::numeric_limits<value_type>::digits +
+                                                                               std::numeric_limits<
+                                                                                       value_type>::is_signed>::type stream_processor;
 
-                        this->se.insert(this->se.end(), first, last);
+
+                        stream_processor(this->accumulator_set)(first, last);
                     }
 
                     operator OutputIterator() const {
-                        std::size_t seen = boost::accumulators::extract_result<accumulators::tag::bit_count>(
-                                this->se.data().stats()) +
-                                           boost::accumulators::extract_result<accumulators::tag::bit_count>(
-                                                   this->se.cache().stats());
+                        result_type result = accumulators::extract::codec<mode_type>(this->accumulator_set);
 
-                        if (mode_type::input_block_bits && seen % mode_type::input_block_bits) {
-                            finalizer_type(mode_type::input_block_bits - seen % mode_type::input_block_bits)(this->se);
-                        } else {
-                            finalizer_type(0)(this->se);
-                        }
-
-                        return std::move(this->se.cbegin(), this->se.cend(), out);
+                        return std::move(result.cbegin(), result.cend(), out);
                     }
                 };
             }

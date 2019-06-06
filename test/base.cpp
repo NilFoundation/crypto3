@@ -18,9 +18,6 @@
 #include <nil/crypto3/codec/algorithm/encode.hpp>
 #include <nil/crypto3/codec/algorithm/decode.hpp>
 
-#include <nil/crypto3/codec/adaptor/encoded.hpp>
-#include <nil/crypto3/codec/adaptor/decoded.hpp>
-
 #include <nil/crypto3/codec/base.hpp>
 
 using namespace nil::crypto3::codec;
@@ -132,7 +129,7 @@ static const byte_vector_data_t base32_valid_data = {{
 BOOST_AUTO_TEST_SUITE(base32_codec_test_suite)
 
     BOOST_DATA_TEST_CASE(base32_single_range_encode, boost::unit_test::data::make(base32_valid_data), array_element) {
-       std::string out = encode<base<32>>(array_element.second);
+        std::string out = encode<base<32>>(array_element.second);
 
         BOOST_CHECK_EQUAL(out, array_element.first);
     }

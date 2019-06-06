@@ -28,19 +28,6 @@ namespace nil {
 
                     constexpr static const bool value = (1 == sizeof(test<CodecState>(0, 0)));
                 };
-
-                template<typename EncoderMode,
-                         typename SinglePassRange> using range_codec_state_traits = typename EncoderMode::encoder_type::template stream_processor<
-                        EncoderMode, std::numeric_limits<
-                                typename std::iterator_traits<typename SinglePassRange::iterator>::value_type>::digits +
-                                     std::numeric_limits<typename std::iterator_traits<
-                                             typename SinglePassRange::iterator>::value_type>::is_signed>;
-
-                template<typename EncoderMode,
-                         typename InputIterator> using itr_codec_state_traits = typename EncoderMode::encoder_type::template stream_processor<
-                        EncoderMode, std::numeric_limits<typename std::iterator_traits<InputIterator>::value_type>::digits +
-                                     std::numeric_limits<
-                                             typename std::iterator_traits<InputIterator>::value_type>::is_signed>;
             }
         }
     }

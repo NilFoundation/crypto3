@@ -159,13 +159,11 @@ namespace nil {
                     return res;
                 }
 
-                template<typename ProcessingMode, typename CacheContainer>
+                template<typename ProcessingMode, typename StateAccumulator, std::size_t ValueBits>
                 struct stream_processor {
-                    template<typename ProcessingParams> using type = block_state_preprocessor<ProcessingMode,
-                                                                                              stream_endian::little_octet_big_bit,
-                                                                                              ProcessingParams::value_bits,
-                                                                                              CHAR_BIT * CHAR_BIT,
-                                                                                              CacheContainer>;
+                    typedef block_state_preprocessor<ProcessingMode, StateAccumulator,
+                                                     stream_endian::little_octet_big_bit, ValueBits,
+                                                     CHAR_BIT * CHAR_BIT> type;
                 };
 
             protected:

@@ -19,6 +19,7 @@
 #include <nil/crypto3/codec/detail/arithmetic_state_preprocessor.hpp>
 
 #include <nil/crypto3/codec/codec_state.hpp>
+#include <nil/crypto3/codec/accumulators/codec.hpp>
 
 #include <boost/range/begin.hpp>
 #include <boost/range/end.hpp>
@@ -180,12 +181,11 @@ namespace nil {
                     return policy_type::decode_block(encoded);
                 }
 
-                template<typename ProcessingMode, typename>
+                template<typename ProcessingMode, typename StateAccumulator, std::size_t ValueBits>
                 struct stream_processor {
-                    template<typename ProcessingParams> using type = arithmetic_state_preprocessor<ProcessingMode,
-                                                                                                   stream_endian::little_octet_big_bit,
-                                                                                                   ProcessingParams::value_bits,
-                                                                                                   ProcessingMode::input_block_bits>;
+                    typedef arithmetic_state_preprocessor<ProcessingMode, StateAccumulator,
+                                                          stream_endian::little_octet_big_bit, ValueBits,
+                                                          ProcessingMode::input_block_bits> type;
                 };
             };
 
@@ -214,13 +214,11 @@ namespace nil {
                     return policy_type::decode_block(encoded);
                 }
 
-                template<typename ProcessingMode, typename CacheContainer>
+                template<typename ProcessingMode, typename StateAccumulator, std::size_t ValueBits>
                 struct stream_processor {
-                    template<typename ProcessingParams> using type = block_state_preprocessor<ProcessingMode,
-                                                                                              stream_endian::little_octet_big_bit,
-                                                                                              ProcessingParams::value_bits,
-                                                                                              ProcessingMode::input_block_bits,
-                                                                                              CacheContainer>;
+                    typedef block_state_preprocessor<ProcessingMode, StateAccumulator,
+                                                     stream_endian::little_octet_big_bit, ValueBits,
+                                                     ProcessingMode::input_block_bits> type;
                 };
             };
 

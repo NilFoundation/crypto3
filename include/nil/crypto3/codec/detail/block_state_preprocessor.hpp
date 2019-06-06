@@ -13,12 +13,8 @@
 #include <array>
 #include <iterator>
 
-#include <nil/concept_container/accumulators/bit_count.hpp>
-
 #include <nil/crypto3/codec/detail/pack.hpp>
-
 #include <nil/crypto3/codec/detail/digest.hpp>
-#include <nil/crypto3/codec/algorithm/move.hpp>
 
 #include <boost/integer.hpp>
 #include <boost/static_assert.hpp>
@@ -30,8 +26,8 @@ namespace nil {
     namespace crypto3 {
         namespace codec {
             template<typename Mode,
-                     typename Endian, std::size_t ValueBits, std::size_t LengthBits,
-                     typename CacheContainer>
+                     typename StateAccumulator,
+                     typename Endian, std::size_t ValueBits, std::size_t LengthBits>
             struct block_state_preprocessor {
             private:
                 typedef Mode mode_type;
@@ -47,7 +43,7 @@ namespace nil {
                 typedef typename boost::uint_t<value_bits>::least value_type;
                 BOOST_STATIC_ASSERT(input_block_bits % value_bits == 0);
                 constexpr static const std::size_t block_values = input_block_bits / value_bits;
-                typedef std::array<value_type, block_values> value_array_type;
+                typedef std::array<value_type, block_values> cache_type;
 
             private:
 
@@ -62,116 +58,106 @@ namespace nil {
 
                 BOOST_STATIC_ASSERT(!length_bits || value_bits <= length_bits);
 
-                template<typename OutputIterator>
-                inline OutputIterator update_one(value_type value, std::size_t values_remains, OutputIterator out) {
-                    std::size_t i = input_block_bits == 0 ? 0 : accumulators::extract::bit_count(cache.stats()) %
-                                                                input_block_bits;
-                    value_array[i / value_bits] = value;
-                    cache.stats()(value);
-                    if (i == input_block_bits - value_bits || values_remains == 1) {
+                inline void update_one(value_type value) {
+                    std::size_t i = seen % input_block_bits;
+                    cache[i / value_bits] = value;
+                    seen += value_bits;
+                    if (i == input_block_bits - value_bits) {
                         // Convert the input into words
                         input_block_type block = {0};
-                        pack<Endian, value_bits, block_values == 0 ? 0 : input_block_bits / block_values>(
-                                value_array.begin(), value_array.end(), block);
+                        pack<Endian, value_bits, block_values == 0 ? 0 : input_block_bits / block_values>(cache.begin(),
+                                cache.end(), block);
 
                         // Process the block
-                        out = move(mode_type::process_block(block), out);
+                        state(block);
 
                         // Reset seen if we don't need to track the length
                         if (!length_bits) {
-                            cache.stats() = {};
+                            seen = 0;
                         }
                     }
-                    return out;
                 }
 
-                template<typename InputIterator, typename OutputIterator>
-                inline OutputIterator update_n(InputIterator first, InputIterator last, OutputIterator out) {
-                    std::size_t n = std::distance(first, last), block_bits =
-                            input_block_bits == 0 ? n * value_bits : input_block_bits;
+                template<typename InputIterator>
+                inline void update_n(InputIterator first, InputIterator last) {
+                    std::size_t n = std::distance(first, last);
 #ifndef CRYPTO3_CODEC_NO_OPTIMIZATION
-                    for (; n && (accumulators::extract::bit_count(cache.stats()) % block_bits); --n, ++first) {
-                        out = update_one(*first, n, out);
+#pragma clang loop unroll(full)
+                    for (; n && (seen % input_block_bits); --n, ++first) {
+                        update_one(*first);
                     }
                     for (; n >= block_values; n -= block_values, first += block_values) {
                         // Convert the input into words
                         input_block_type block = {0};
-                        pack<Endian, value_bits, block_values == 0 ? 0 : input_block_bits / block_values>(first,
-                                first + block_values, block);
-                        cache.stats()(block.begin(), block.end());
+                        pack<Endian, value_bits, input_block_bits / block_values>(first, first + block_values, block);
+                        seen += value_bits * block_values;
 
-                        out = move(mode_type::process_block(block), out);
+                        state(block);
 
                         // Reset seen if we don't need to track the length
                         if (!length_bits) {
-                            cache.stats() = {};
+                            seen = 0;
                         }
                     }
 #endif
 
+#pragma clang loop unroll(full)
                     for (; n; --n, ++first) {
-                        out = update_one(*first, n, out);
+                        update_one(*first);
                     }
-                    return out;
                 }
 
             public:
-                block_state_preprocessor(CacheContainer &c) : cache(c), value_array(value_array_type()) {
-                    BOOST_ASSERT(accumulators::extract::bit_count(c.stats()) <= value_bits * block_values);
+                block_state_preprocessor(StateAccumulator &s) : state(s), cache(cache_type()), seen(0) {
 
-                    pack<Endian, std::numeric_limits<typename CacheContainer::value_type>::digits +
-                                 std::numeric_limits<typename CacheContainer::value_type>::is_signed, value_bits>(
-                            c.data(), value_array);
                 }
 
                 virtual ~block_state_preprocessor() {
-                    pack<Endian, value_bits, std::numeric_limits<typename CacheContainer::value_type>::digits +
-                                             std::numeric_limits<typename CacheContainer::value_type>::is_signed>(
-                            value_array, cache.data());
-                }
-
-                template<typename InputIterator, typename OutputIterator>
-                OutputIterator operator()(InputIterator b, InputIterator e, OutputIterator out,
-                                          std::random_access_iterator_tag) {
-                    return update_n(b, e, out);
-                }
-
-                template<typename InputIterator, typename OutputIterator, typename Category>
-                OutputIterator operator()(InputIterator first, InputIterator last, OutputIterator out, Category) {
-                    while (first != last) {
-                        out = update_one(*first++, std::distance(first, last), out);
+                    input_block_type block = {0};
+                    pack<Endian, value_bits, input_block_bits / block_values>(cache.begin(),
+                            cache.begin() + (seen % input_block_bits), block);
+                    for (const typename input_block_type::value_type &v : block) {
+                        state(v);
                     }
-                    return out;
                 }
 
-                template<typename ValueType, typename OutputIterator>
-                OutputIterator operator()(const ValueType &value, OutputIterator out) {
-                    return update_one(value, 1, out);
+                template<typename InputIterator>
+                inline void operator()(InputIterator b, InputIterator e, std::random_access_iterator_tag) {
+                    return update_n(b, e);
                 }
 
-                template<typename InputIterator, typename OutputIterator>
-                OutputIterator operator()(InputIterator b, InputIterator e, OutputIterator out) {
+                template<typename InputIterator, typename Category>
+                inline void operator()(InputIterator first, InputIterator last, Category) {
+#pragma clang loop unroll(full)
+                    while (first != last) {
+                        update_one(*first++);
+                    }
+                }
+
+                template<typename ValueType>
+                inline void operator()(const ValueType &value) {
+                    return update_one(value);
+                }
+
+                template<typename InputIterator>
+                inline void operator()(InputIterator b, InputIterator e) {
                     typedef typename std::iterator_traits<InputIterator>::iterator_category cat;
-                    return operator()(b, e, out, cat());
+                    return operator()(b, e, cat());
                 }
 
-                template<typename SinglePassRange, typename OutputRange>
-                OutputRange operator()(const SinglePassRange &c, OutputRange &out) {
-                    return update_n(c.begin(), c.end(), out);
-                }
-
-                template<typename ValueType, typename OutputIterator>
-                OutputIterator operator()(const std::initializer_list<ValueType> &il, OutputIterator out) {
-                    return operator()(il.begin(), il.end(), out);
+                template<typename ValueType>
+                inline void operator()(const std::initializer_list<ValueType> &il) {
+                    return operator()(il.begin(), il.end());
                 }
 
                 void reset() {
-                    value_array.fill(0);
+                    seen = 0;
                 }
 
-                CacheContainer &cache;
+                StateAccumulator &state;
 
-                value_array_type value_array;
+                length_type seen;
+                cache_type cache;
             };
         }
     }

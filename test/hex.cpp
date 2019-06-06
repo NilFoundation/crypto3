@@ -17,9 +17,6 @@
 #include <nil/crypto3/codec/algorithm/encode.hpp>
 #include <nil/crypto3/codec/algorithm/decode.hpp>
 
-#include <nil/crypto3/codec/adaptor/encoded.hpp>
-#include <nil/crypto3/codec/adaptor/decoded.hpp>
-
 #include <nil/crypto3/codec/hex.hpp>
 
 using namespace nil::crypto3;
