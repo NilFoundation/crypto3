@@ -52,7 +52,7 @@ namespace nil {
 
                     template<typename Args>
                     // The constructor takes an argument pack.
-                    codec_impl(const Args &args) : seen(0), cache(cache_type()), digest(result_type()) {
+                    codec_impl(const Args &args) : seen(0) {
                     }
 
                     template<typename ArgumentPack>
@@ -64,7 +64,14 @@ namespace nil {
                     inline result_type result(const ArgumentPack &args) const {
                         result_type res = digest;
 
-                        if (input_block_bits && seen % input_block_bits) {
+                        if (!cache.empty()) {
+                            input_block_type ib = {0};
+                            std::move(cache.begin(), cache.end(), ib.begin());
+                            output_block_type ob = mode_type::process_block(ib);
+                            std::move(ob.begin(), ob.end(), std::inserter(res, res.end()));
+                        }
+
+                        if (seen % input_block_bits) {
                             finalizer_type(input_block_bits - seen % input_block_bits)(res);
                         } else {
                             finalizer_type(0)(res);
@@ -76,24 +83,23 @@ namespace nil {
                 protected:
 
                     inline void process(const input_value_type &value) {
-                        if (cache.size() < cache.max_size()) {
-                            cache.push_back(value);
-                            seen += input_value_bits;
-                        } else {
-                            output_block_type ob = mode_type::process_block(
-                                    codec::make_array<std::tuple_size<input_block_type>::value>(cache.begin(),
-                                            cache.end()));
+                        if (cache.size() == cache.max_size()) {
+                            input_block_type ib = {0};
+                            std::move(cache.begin(), cache.end(), ib.begin());
+                            output_block_type ob = mode_type::process_block(ib);
                             std::move(ob.begin(), ob.end(), std::inserter(digest, digest.end()));
-                            seen += input_value_bits;
+
                             cache.clear();
                         }
+
+                        cache.push_back(value);
+                        seen += input_value_bits;
                     }
 
                     inline void process(const input_block_type &block) {
+                        output_block_type ob;
                         if (cache.empty()) {
-                            output_block_type ob = mode_type::process_block(block);
-                            std::move(ob.begin(), ob.end(), std::inserter(digest, digest.end()));
-                            seen += input_block_bits;
+                            ob = mode_type::process_block(block);
                         } else {
                             input_block_type b = codec::make_array<std::tuple_size<input_block_type>::value>(
                                     cache.begin(), cache.end());
@@ -102,16 +108,14 @@ namespace nil {
 
                             std::copy(block.begin(), itr, b.end());
 
-                            output_block_type ob = mode_type::process_block(block);
-
-                            std::move(ob.begin(), ob.end(), std::inserter(digest, digest.end()));
-
-                            seen += input_block_bits;
+                            ob = mode_type::process_block(block);
 
                             cache.clear();
                             cache.insert(cache.end(), itr, block.end());
-                            seen += input_value_bits * std::distance(itr, block.end());
                         }
+
+                        std::move(ob.begin(), ob.end(), std::inserter(digest, digest.end()));
+                        seen += input_block_bits;
                     }
 
                     std::size_t seen;

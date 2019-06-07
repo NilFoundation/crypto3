@@ -65,8 +65,7 @@ namespace nil {
                     if (i == input_block_bits - value_bits) {
                         // Convert the input into words
                         input_block_type block = {0};
-                        pack<Endian, value_bits, block_values == 0 ? 0 : input_block_bits / block_values>(cache.begin(),
-                                cache.end(), block);
+                        pack<Endian, value_bits, input_block_bits / block_values>(cache.begin(), cache.end(), block);
 
                         // Process the block
                         state(block);
@@ -116,7 +115,7 @@ namespace nil {
                     if (!cache.empty() && cache != cache_type({0})) {
                         input_block_type block = {0};
                         pack<Endian, value_bits, input_block_bits / block_values>(cache.begin(),
-                                cache.begin() + (seen % input_block_bits), block);
+                                cache.begin() + cache.size(), block);
                         for (const typename input_block_type::value_type &v : block) {
                             state(v);
                         }
