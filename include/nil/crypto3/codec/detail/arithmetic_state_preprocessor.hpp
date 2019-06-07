@@ -1,0 +1,108 @@
+//---------------------------------------------------------------------------//
+// Copyright (c) 2018-2019 Nil Foundation
+// Copyright (c) 2018-2019 Mikhail Komarov <nemo@nilfoundation.org>
+//
+// Distributed under the Boost Software License, Version 1.0
+// See accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt
+//---------------------------------------------------------------------------//
+
+#ifndef CRYPTO3_ARITHMETIC_STATE_PREPROCESSOR_HPP
+#define CRYPTO3_ARITHMETIC_STATE_PREPROCESSOR_HPP
+
+#include <array>
+#include <iterator>
+
+#include <nil/crypto3/codec/detail/pack.hpp>
+#include <nil/crypto3/codec/detail/digest.hpp>
+
+#include <boost/integer.hpp>
+#include <boost/static_assert.hpp>
+#include <boost/utility/enable_if.hpp>
+
+#include <boost/range/algorithm/copy.hpp>
+
+namespace nil {
+    namespace crypto3 {
+        namespace codec {
+            template<typename Mode,
+                     typename StateAccumulator,
+                     typename Endian, std::size_t ValueBits, std::size_t LengthBits>
+            struct arithmetic_state_preprocessor {
+            private:
+                typedef Mode mode_type;
+
+                typedef typename mode_type::input_block_type input_block_type;
+                constexpr static const std::size_t input_block_bits = mode_type::input_block_bits;
+
+                typedef typename mode_type::output_block_type output_block_type;
+                constexpr static const std::size_t output_block_bits = mode_type::output_block_bits;
+            public:
+
+                constexpr static const std::size_t value_bits = ValueBits;
+                typedef typename boost::uint_t<value_bits>::least value_type;
+                BOOST_STATIC_ASSERT(input_block_bits % value_bits == 0);
+                constexpr static const std::size_t block_values = input_block_bits / value_bits;
+                typedef std::array<value_type, block_values> value_array_type;
+
+            private:
+
+                constexpr static const std::size_t length_bits = LengthBits;
+                // FIXME: do something more intelligent than capping at 64
+                constexpr static const std::size_t length_type_bits =
+                        length_bits < input_block_bits ? input_block_bits : length_bits > 64 ? 64 : length_bits;
+                typedef typename boost::uint_t<length_type_bits>::least length_type;
+
+                BOOST_STATIC_ASSERT(!length_bits || length_bits % input_block_bits == 0);
+                BOOST_STATIC_ASSERT(output_block_bits % value_bits == 0);
+
+                BOOST_STATIC_ASSERT(!length_bits || value_bits <= length_bits);
+
+            public:
+                arithmetic_state_preprocessor(StateAccumulator &s) : state(s) {
+
+                }
+
+                template<typename InputIterator>
+                inline void operator()(InputIterator b, InputIterator e, std::random_access_iterator_tag) {
+                    input_block_type block;
+                    pack<Endian>(b, e, block);
+                    state(block);
+                }
+
+                template<typename InputIterator, typename Category>
+                inline void operator()(InputIterator first, InputIterator last, Category) {
+                    input_block_type block;
+                    pack<Endian>(first, last, block);
+                    state(block);
+                }
+
+                template<typename ValueType,
+                         typename = typename std::enable_if<
+                                 std::is_same<ValueType, typename input_block_type::value_type>::value>::type>
+                inline void operator()(const ValueType &value) {
+                    state(value);
+                }
+
+                template<typename InputIterator>
+                inline void operator()(InputIterator b, InputIterator e) {
+                    typedef typename std::iterator_traits<InputIterator>::iterator_category cat;
+                    return operator()(b, e, cat());
+                }
+
+                template<typename ValueType>
+                inline void operator()(const std::initializer_list<ValueType> &il) {
+                    return operator()(il.begin(), il.end());
+                }
+
+                void reset() {
+
+                }
+
+                StateAccumulator &state;
+            };
+        }
+    }
+}
+
+#endif //CRYPTO3_BLOCK_STATE_PREPROCESSOR_HPP

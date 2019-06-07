@@ -266,7 +266,7 @@ namespace nil {
 
             template<typename Endianness, int InValueBits, int OutValueBits, typename InputType, typename OutputType>
             inline void pack(const InputType &in, OutputType &out) {
-                pack_n<Endianness, InValueBits, OutValueBits>(in.data(), in.size(), out.data(), out.size());
+                pack_n<Endianness, InValueBits, OutValueBits>(in.begin(), in.size(), out.begin(), out.size());
             }
 
             template<typename Endianness, int InValueBits, int OutValueBits,
@@ -283,7 +283,7 @@ namespace nil {
                      typename =
                      typename std::enable_if<!std::is_arithmetic<OutputType>::value>::type>
             inline void pack(InputIterator first, InputIterator last, OutputType &out) {
-                pack_n<Endianness, InValueBits, OutValueBits>(first, std::distance(first, last), out.data(),
+                pack_n<Endianness, InValueBits, OutValueBits>(first, std::distance(first, last), out.begin(),
                         out.size());
             }
 
@@ -291,7 +291,7 @@ namespace nil {
                      typename InputType,
                      typename Backend, expression_template_option ExpressionTemplates>
             inline void pack(const InputType &in, number<Backend, ExpressionTemplates> &out) {
-                import_bits(out, in);
+                import_bits(out, in.begin(), in.end());
                 BOOST_ASSERT(msb(out) == OutValueBits);
             }
 

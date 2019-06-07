@@ -7,23 +7,18 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_CODEC_MOVE_HPP
-#define CRYPTO3_CODEC_MOVE_HPP
+#ifndef CRYPTO3_OCTET_HPP
+#define CRYPTO3_OCTET_HPP
 
-#include <algorithm>
-
-#include <boost/range/begin.hpp>
-#include <boost/range/end.hpp>
+#include <boost/integer.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace codec {
-            template<typename SinglePassRange, typename OutputIterator>
-            inline OutputIterator move(const SinglePassRange &rng, OutputIterator result) {
-                return std::move(boost::begin(rng), boost::end(rng), result);
-            }
+            constexpr static const std::size_t octet_bits = 8;
+            typedef boost::uint_t<octet_bits>::least octet_type;
         }
     }
 }
 
-#endif //CRYPTO3_CODEC_MOVE_HPP
+#endif //CRYPTO3_OCTET_HPP

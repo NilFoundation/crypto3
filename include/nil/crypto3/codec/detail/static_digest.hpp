@@ -7,19 +7,19 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_CODEC_DIGEST_HPP
-#define CRYPTO3_CODEC_DIGEST_HPP
+#ifndef CRYPTO3_CODEC_STATIC_DIGEST_HPP
+#define CRYPTO3_CODEC_STATIC_DIGEST_HPP
 
 #include <boost/static_assert.hpp>
 #include <boost/assert.hpp>
 
-#include <boost/container/small_vector.hpp>
+#include <array>
+#include <string>
+#include <cstring>
+#include <iostream>
 
 #include <nil/crypto3/codec/detail/octet.hpp>
 #include <nil/crypto3/codec/detail/pack.hpp>
-
-#include <string>
-#include <cstring>
 
 namespace nil {
     namespace crypto3 {
@@ -27,7 +27,7 @@ namespace nil {
 
             /*!
              * The digest class template stores a DigestBits-bit message digest as a sequence of 8-bit octets.
-             * Octets are stored in the smallest unsigned type able to hold 8 bits, hereinafter referred to as
+             * Octets are stored in the smallest std::size_t type able to hold 8 bits, hereinafter referred to as
              * octet_type. DigestBits must be a multiple of 8.
              *
              * It is independent of any particular algorithm; For example sha2<224> and cubehash<224> both produce a
@@ -55,14 +55,15 @@ namespace nil {
              * @tparam DigestBits
              */
 
-            template<std::size_t DigestBits> using digest =
-            boost::container::small_vector<octet_type, DigestBits / octet_bits>;
+            template<std::size_t DigestBits>
+            class static_digest : public std::array<octet_type, DigestBits / octet_bits> {
+
+            };
 
             namespace detail {
                 template<std::size_t DigestBits, typename OutputIterator>
-                OutputIterator to_ascii(const boost::container::small_vector<octet_type, DigestBits / octet_bits> &d,
-                                        OutputIterator it) {
-                    for (std::size_t j = 0; j < d.size(); ++j) {
+                OutputIterator to_ascii(const static_digest<DigestBits> &d, OutputIterator it) {
+                    for (std::size_t j = 0; j < DigestBits / octet_bits; ++j) {
                         octet_type b = d[j];
                         *it++ = "0123456789abcdef"[(b >> 4) & 0xF];
                         *it++ = "0123456789abcdef"[(b >> 0) & 0xF];
@@ -71,14 +72,28 @@ namespace nil {
                 }
 
                 template<std::size_t DigestBits>
-                digest<DigestBits / 4 + 1> c_str(
-                        const boost::container::small_vector<octet_type, DigestBits / octet_bits> &d) {
-                    digest<DigestBits / 4 + 1> s;
-                    to_ascii<DigestBits>(d, std::back_inserter(s));
-                    s.push_back('\0');
+                std::array<char, DigestBits / 4 + 1> c_str(const static_digest<DigestBits> &d) {
+                    std::array<char, DigestBits / 4 + 1> s;
+                    char *p = to_ascii<DigestBits>(d, s.data());
+                    *p++ = '\0';
                     return s;
                 }
             }
+        }
+    }
+}
+
+namespace std {
+    template<std::size_t DigestBits>
+    std::string to_string(const nil::crypto3::codec::static_digest<DigestBits> &d) {
+        std::array<char, DigestBits / 4 + 1> cstr = nil::crypto3::codec::detail::c_str(d);
+        return std::string(cstr.data(), cstr.size() - 1);
+    }
+}
+
+namespace nil {
+    namespace crypto3 {
+        namespace codec {
 
             /*!
              *
@@ -88,10 +103,11 @@ namespace nil {
              * @return Digest containing the first min(NewBits, OldBits) bits of the argument digest followed by max
              * (0, NewBits - OldBits) bits.
              */
-            template<unsigned NewBits, unsigned OldBits>
-            digest<NewBits> resize(const boost::container::small_vector<octet_type, OldBits / octet_bits> &od) {
-                digest<NewBits> nd;
-                unsigned bytes = sizeof(octet_type) * (NewBits < OldBits ? NewBits : OldBits) / octet_bits;
+            template<std::size_t NewBits, std::size_t OldBits>
+            static_digest<NewBits> resize(const static_digest<OldBits> &od) {
+                static_digest<NewBits> nd;
+                nd.fill(0);
+                std::size_t bytes = sizeof(octet_type) * (NewBits < OldBits ? NewBits : OldBits) / octet_bits;
                 std::memcpy(nd.data(), od.data(), bytes);
                 return nd;
             }
@@ -106,74 +122,76 @@ namespace nil {
              * Truncating a message digest generally does not weaken the hash algorithm beyond the
              * amount necessitated by the shorted output size.
              */
-            template<unsigned NewBits, unsigned OldBits>
-            digest<NewBits> truncate(const boost::container::small_vector<octet_type, OldBits / octet_bits> &od) {
+            template<std::size_t NewBits, std::size_t OldBits>
+            static_digest<NewBits> truncate(const static_digest<OldBits> &od) {
                 BOOST_STATIC_ASSERT(NewBits <= OldBits);
                 return resize<NewBits>(od);
             }
 
-            template<unsigned DB1, unsigned DB2>
-            bool operator==(const digest<DB1> &a, const digest<DB2> &b) {
-                unsigned const DB = DB1 < DB2 ? DB2 : DB1;
-                return resize<DB>(a).base_array() == resize<DB>(b).base_array();
+            template<std::size_t DB1, std::size_t DB2>
+            bool operator==(const static_digest<DB1> &a, const static_digest<DB2> &b) {
+                // TODO: Think about size of static_digest. We can't use resize here because
+                //  it's change element which we compare
+                return static_cast<bool>(DB1 == DB2 ? std::equal(std::begin(a), std::end(a), std::begin(b), std::end(b))
+                                                    : 0);
             }
 
-            template<unsigned DB1, unsigned DB2>
-            bool operator!=(const digest<DB1> &a, const digest<DB2> &b) {
+            template<std::size_t DB1, std::size_t DB2>
+            bool operator!=(const static_digest<DB1> &a, const static_digest<DB2> &b) {
                 return !(a == b);
             }
 
-            template<unsigned DB1, unsigned DB2>
-            bool operator<(const digest<DB1> &a, const digest<DB2> &b) {
-                unsigned const DB = DB1 < DB2 ? DB2 : DB1;
-                return resize<DB>(a).base_array() < resize<DB>(b).base_array();
+            template<std::size_t DB1, std::size_t DB2>
+            bool operator<(const static_digest<DB1> &a, const static_digest<DB2> &b) {
+                // #TODO: Implement this right
+                return DB1 < DB2;
             }
 
-            template<unsigned DB1, unsigned DB2>
-            bool operator>(const digest<DB1> &a, const digest<DB2> &b) {
+            template<std::size_t DB1, std::size_t DB2>
+            bool operator>(const static_digest<DB1> &a, const static_digest<DB2> &b) {
                 return b < a;
             }
 
-            template<unsigned DB1, unsigned DB2>
-            bool operator<=(const digest<DB1> &a, const digest<DB2> &b) {
+            template<std::size_t DB1, std::size_t DB2>
+            bool operator<=(const static_digest<DB1> &a, const static_digest<DB2> &b) {
                 return !(b < a);
             }
 
-            template<unsigned DB1, unsigned DB2>
-            bool operator>=(const digest<DB1> &a, const digest<DB2> &b) {
+            template<std::size_t DB1, std::size_t DB2>
+            bool operator>=(const static_digest<DB1> &a, const static_digest<DB2> &b) {
                 return !(b > a);
             }
 
-            template<unsigned DB>
-            bool operator!=(digest<DB> const &a, char const *b) {
+            template<std::size_t DB>
+            bool operator!=(const static_digest<DB> &a, char const *b) {
                 BOOST_ASSERT(std::strlen(b) == DB / 4);
-                return static_cast<bool>(std::strcmp(a.cstring().data(), b));
+                return std::to_string(a) != b;
             }
 
-            template<unsigned DB>
-            bool operator==(digest<DB> const &a, char const *b) {
+            template<std::size_t DB>
+            bool operator==(const static_digest<DB> &a, char const *b) {
                 return !(a != b);
             }
 
-            template<unsigned DB>
-            bool operator!=(char const *b, digest<DB> const &a) {
+            template<std::size_t DB>
+            bool operator!=(char const *b, const static_digest<DB> &a) {
                 return a != b;
             }
 
-            template<unsigned DB>
-            bool operator==(char const *b, digest<DB> const &a) {
+            template<std::size_t DB>
+            bool operator==(char const *b, const static_digest<DB> &a) {
                 return a == b;
             }
 
-            template<unsigned DB>
-            std::ostream &operator<<(std::ostream &sink, digest<DB> const &d) {
-                d.to_ascii(std::ostream_iterator<char>(sink));
+            template<std::size_t DigestBits>
+            std::ostream &operator<<(std::ostream &sink, const static_digest<DigestBits> &d) {
+                detail::to_ascii<DigestBits>(d, std::ostream_iterator<char>(sink));
                 return sink;
             }
 
-            template<unsigned DB>
-            std::istream &operator>>(std::istream &source, digest<DB> &d) {
-                std::array<char, DB / 4> a = {{}};
+            template<std::size_t DigestBits>
+            std::istream &operator>>(std::istream &source, static_digest<DigestBits> &d) {
+                std::array<char, DigestBits / 4> a = {{}};
                 for (unsigned i = 0; i < a.size(); ++i) {
                     char c;
                     if (!source.get(c)) {
@@ -199,12 +217,4 @@ namespace nil {
     }
 } // namespace nil
 
-namespace std {
-    template<std::size_t DigestBits>
-    std::string to_string(const nil::crypto3::codec::digest<DigestBits> &d) {
-        nil::crypto3::codec::digest<DigestBits / 4 + 1> cstr = nil::crypto3::codec::detail::c_str(d);
-        return std::string(cstr.begin(), cstr.begin() + cstr.size() - 1);
-    }
-}
-
-#endif // CRYPTO3_CODEC_DIGEST_HPP
+#endif // CRYPTO3_CODEC_STATIC_DIGEST_HPP

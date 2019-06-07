@@ -21,7 +21,7 @@
 
 #include <boost/utility/result_of.hpp>
 
-#include <nil/crypto3/codec/detail/codec_value.hpp>
+#include <nil/crypto3/codec/codec_value.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -38,7 +38,8 @@ namespace nil {
                 };
 
                 template<typename Decoder, typename SinglePassRange,
-                        typename StreamCodec = typename range_stream_codec_traits<typename Decoder::stream_decoder_type,
+                        typename StreamCodec = typename detail::range_codec_state_traits<typename
+                                Decoder::stream_decoder_type,
                                 SinglePassRange>::type>
                 inline detail::range_codec_impl<detail::ref_codec_impl<StreamCodec>> operator|(SinglePassRange &r,
                                                                                                const decoded<Decoder,
@@ -49,7 +50,7 @@ namespace nil {
                 }
 
                 template<typename Decoder, typename SinglePassRange,
-                        typename StreamCodec = typename range_stream_codec_traits<typename Decoder::stream_decoder_type,
+                        typename StreamCodec = typename detail::range_codec_state_traits<typename Decoder::stream_decoder_type,
                                 SinglePassRange>::type>
                 inline detail::range_codec_impl<detail::ref_codec_impl<StreamCodec>> operator|(const SinglePassRange &r,
                                                                                                const decoded<Decoder,

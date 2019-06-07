@@ -18,9 +18,6 @@
 #include <nil/crypto3/codec/algorithm/encode.hpp>
 #include <nil/crypto3/codec/algorithm/decode.hpp>
 
-#include <nil/crypto3/codec/adaptor/encoded.hpp>
-#include <nil/crypto3/codec/adaptor/decoded.hpp>
-
 #include <nil/crypto3/codec/base.hpp>
 
 using namespace nil::crypto3::codec;
@@ -105,8 +102,7 @@ static const std::vector<std::string> base_58_invalid_data = {
 };
 
 static const byte_vector_data_t base32_valid_data = {{
-                                                             "MY======",
-                                                             {0x66}},
+                                                             "MY======",                                         {0x66}},
                                                      {
                                                              "MZXQ====",                                         {0x66, 0x6F}},
                                                      {       "MZXW6===",                                         {0x66, 0x6F, 0x6F}},

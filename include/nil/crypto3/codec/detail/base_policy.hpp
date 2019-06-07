@@ -238,7 +238,7 @@ namespace nil {
                     typedef typename boost::uint_t<CHAR_BIT>::exact byte_type;
 
                     constexpr static const std::size_t decoded_block_bits = 0;
-                    typedef cpp_int decoded_block_type;
+                    typedef std::vector<byte_type> decoded_block_type;
 
                     constexpr static const std::size_t encoded_block_bits = 0;
                     typedef std::vector<byte_type> encoded_block_type;
@@ -261,8 +261,11 @@ namespace nil {
                 class base_functions<58> : public basic_base_policy<58> {
                 public:
                     static inline encoded_block_type encode_block(const decoded_block_type &plaintext) {
-                        encoded_block_type out = {0};
-                        cpp_int v = plaintext, q = 0, r = 0, cs(constants_size);
+                        encoded_block_type out;
+
+                        cpp_int v = 0, q = 0, r = 0, cs(constants_size);
+
+                        import_bits(v, plaintext.begin(), plaintext.end());
 
                         while (v != 0) {
                             divide_qr(v, cs, q, r);

@@ -21,7 +21,7 @@
 
 #include <boost/utility/result_of.hpp>
 
-#include <nil/crypto3/codec/detail/codec_value.hpp>
+#include <nil/crypto3/codec/codec_value.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -37,23 +37,25 @@ namespace nil {
                     StreamCodec val;
                 };
 
-                template<typename Encoder, typename SinglePassRange,
-                        typename StreamCodec = typename range_stream_codec_traits<typename Encoder::stream_encoder_type,
-                                SinglePassRange>::type>
+                template<typename Encoder,
+                         typename SinglePassRange,
+                         typename StreamCodec = typename detail::range_codec_state_traits<
+                                 typename Encoder::stream_encoder_type, SinglePassRange>::type>
                 inline detail::range_codec_impl<detail::ref_codec_impl<StreamCodec>> operator|(SinglePassRange &r,
                                                                                                const encoded<Encoder,
-                                                                                                       StreamCodec> &f) {
+                                                                                                             StreamCodec> &f) {
                     BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<SinglePassRange>));
 
                     return detail::range_codec_impl<detail::ref_codec_impl<StreamCodec>>(r, f.val);
                 }
 
-                template<typename Encoder, typename SinglePassRange,
-                        typename StreamCodec = typename range_stream_codec_traits<typename Encoder::stream_encoder_type,
-                                SinglePassRange>::type>
+                template<typename Encoder,
+                         typename SinglePassRange,
+                         typename StreamCodec = typename detail::range_codec_state_traits<
+                                 typename Encoder::stream_encoder_type, SinglePassRange>::type>
                 inline detail::range_codec_impl<detail::ref_codec_impl<StreamCodec>> operator|(const SinglePassRange &r,
                                                                                                const encoded<Encoder,
-                                                                                                       StreamCodec> &f) {
+                                                                                                             StreamCodec> &f) {
                     BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange>));
 
                     return detail::range_codec_impl<detail::ref_codec_impl<StreamCodec>>(r, f.val);
