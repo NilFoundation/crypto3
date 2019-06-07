@@ -84,18 +84,26 @@ namespace nil {
                             T0 = policy_type::rotr<4>(R) ^ round_key[2 * i];
                             T1 = R ^ round_key[2 * i + 1];
 
-                            L ^= policy_type::sbox1[get_byte(0, T0)] ^ policy_type::sbox2[get_byte(0, T1)] ^
-                                 policy_type::sbox3[get_byte(1, T0)] ^ policy_type::sbox4[get_byte(1, T1)] ^
-                                 policy_type::sbox5[get_byte(2, T0)] ^ policy_type::sbox6[get_byte(2, T1)] ^
-                                 policy_type::sbox7[get_byte(3, T0)] ^ policy_type::sbox8[get_byte(3, T1)];
+                            L ^= policy_type::sbox1[extract_uint_t<CHAR_BIT>(T0, 0)] ^
+                                 policy_type::sbox2[extract_uint_t<CHAR_BIT>(T1, 0)] ^
+                                 policy_type::sbox3[extract_uint_t<CHAR_BIT>(T0, 1)] ^
+                                 policy_type::sbox4[extract_uint_t<CHAR_BIT>(T1, 1)] ^
+                                 policy_type::sbox5[extract_uint_t<CHAR_BIT>(T0, 2)] ^
+                                 policy_type::sbox6[extract_uint_t<CHAR_BIT>(T1, 2)] ^
+                                 policy_type::sbox7[extract_uint_t<CHAR_BIT>(T0, 3)] ^
+                                 policy_type::sbox8[extract_uint_t<CHAR_BIT>(T1, 3)];
 
                             T0 = policy_type::rotr<4>(L) ^ round_key[2 * i + 2];
                             T1 = L ^ round_key[2 * i + 3];
 
-                            R ^= policy_type::sbox1[get_byte(0, T0)] ^ policy_type::sbox2[get_byte(0, T1)] ^
-                                 policy_type::sbox3[get_byte(1, T0)] ^ policy_type::sbox4[get_byte(1, T1)] ^
-                                 policy_type::sbox5[get_byte(2, T0)] ^ policy_type::sbox6[get_byte(2, T1)] ^
-                                 policy_type::sbox7[get_byte(3, T0)] ^ policy_type::sbox8[get_byte(3, T1)];
+                            R ^= policy_type::sbox1[extract_uint_t<CHAR_BIT>(T0, 0)] ^
+                                 policy_type::sbox2[extract_uint_t<CHAR_BIT>(T1, 0)] ^
+                                 policy_type::sbox3[extract_uint_t<CHAR_BIT>(T0, 1)] ^
+                                 policy_type::sbox4[extract_uint_t<CHAR_BIT>(T1, 1)] ^
+                                 policy_type::sbox5[extract_uint_t<CHAR_BIT>(T0, 2)] ^
+                                 policy_type::sbox6[extract_uint_t<CHAR_BIT>(T1, 2)] ^
+                                 policy_type::sbox7[extract_uint_t<CHAR_BIT>(T0, 3)] ^
+                                 policy_type::sbox8[extract_uint_t<CHAR_BIT>(T1, 3)];
                         }
                     }
 
@@ -108,18 +116,26 @@ namespace nil {
                             T0 = policy_type::rotr<4>(R) ^ round_key[2 * i - 2];
                             T1 = R ^ round_key[2 * i - 1];
 
-                            L ^= policy_type::sbox1[get_byte(0, T0)] ^ policy_type::sbox2[get_byte(0, T1)] ^
-                                 policy_type::sbox3[get_byte(1, T0)] ^ policy_type::sbox4[get_byte(1, T1)] ^
-                                 policy_type::sbox5[get_byte(2, T0)] ^ policy_type::sbox6[get_byte(2, T1)] ^
-                                 policy_type::sbox7[get_byte(3, T0)] ^ policy_type::sbox8[get_byte(3, T1)];
+                            L ^= policy_type::sbox1[extract_uint_t<CHAR_BIT>(T0, 0)] ^
+                                 policy_type::sbox2[extract_uint_t<CHAR_BIT>(T1, 0)] ^
+                                 policy_type::sbox3[extract_uint_t<CHAR_BIT>(T0, 1)] ^
+                                 policy_type::sbox4[extract_uint_t<CHAR_BIT>(T1, 1)] ^
+                                 policy_type::sbox5[extract_uint_t<CHAR_BIT>(T0, 2)] ^
+                                 policy_type::sbox6[extract_uint_t<CHAR_BIT>(T1, 2)] ^
+                                 policy_type::sbox7[extract_uint_t<CHAR_BIT>(T0, 3)] ^
+                                 policy_type::sbox8[extract_uint_t<CHAR_BIT>(T1, 3)];
 
                             T0 = policy_type::rotr<4>(L) ^ round_key[2 * i - 4];
                             T1 = L ^ round_key[2 * i - 3];
 
-                            R ^= policy_type::sbox1[get_byte(0, T0)] ^ policy_type::sbox2[get_byte(0, T1)] ^
-                                 policy_type::sbox3[get_byte(1, T0)] ^ policy_type::sbox4[get_byte(1, T1)] ^
-                                 policy_type::sbox5[get_byte(2, T0)] ^ policy_type::sbox6[get_byte(2, T1)] ^
-                                 policy_type::sbox7[get_byte(3, T0)] ^ policy_type::sbox8[get_byte(3, T1)];
+                            R ^= policy_type::sbox1[extract_uint_t<CHAR_BIT>(T0, 0)] ^
+                                 policy_type::sbox2[extract_uint_t<CHAR_BIT>(T1, 0)] ^
+                                 policy_type::sbox3[extract_uint_t<CHAR_BIT>(T0, 1)] ^
+                                 policy_type::sbox4[extract_uint_t<CHAR_BIT>(T1, 1)] ^
+                                 policy_type::sbox5[extract_uint_t<CHAR_BIT>(T0, 2)] ^
+                                 policy_type::sbox6[extract_uint_t<CHAR_BIT>(T1, 2)] ^
+                                 policy_type::sbox7[extract_uint_t<CHAR_BIT>(T0, 3)] ^
+                                 policy_type::sbox8[extract_uint_t<CHAR_BIT>(T1, 3)];
                         }
                     }
                 };

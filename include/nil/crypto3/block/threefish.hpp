@@ -12,7 +12,7 @@
 
 #include <nil/crypto3/block/detail/threefish/threefish_policy.hpp>
 
-#include <nil/crypto3/block/cipher_state.hpp>
+#include <nil/crypto3/block/cipher_state_preprocessor.hpp>
 #include <nil/crypto3/block/detail/stream_endian.hpp>
 
 #include <boost/cstdint.hpp>

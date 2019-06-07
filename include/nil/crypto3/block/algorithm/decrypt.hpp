@@ -42,8 +42,8 @@ namespace nil {
 
             typedef typename detail::itr_stream_encrypter_traits<BlockCipher, InputIterator>::type CipherState;
 
-            typedef detail::value_encrypter_impl<CipherState> StreamEncrypterImpl;
-            typedef detail::itr_encrypter_impl<StreamEncrypterImpl, OutputIterator> EncrypterImpl;
+            typedef detail::value_encrypter_impl <CipherState> StreamEncrypterImpl;
+            typedef detail::itr_encrypter_impl <StreamEncrypterImpl, OutputIterator> EncrypterImpl;
 
             return EncrypterImpl(first, last, std::move(out), CipherState(BlockCipher(key_first, key_last)));
         }
@@ -60,16 +60,18 @@ namespace nil {
          * @param last
          * @return
          */
-        template<typename BlockCipher, typename InputIterator, typename InputKeyIterator,
+        template<typename BlockCipher,
+                 typename InputIterator,
+                 typename InputKeyIterator,
                  typename CipherState = typename detail::itr_stream_encrypter_traits<
                          typename BlockCipher::stream_encrypter_type, InputIterator>::type>
-        detail::range_encrypter_impl<detail::value_encrypter_impl<CipherState>> decrypt(InputIterator first,
-                                                                                        InputIterator last,
-                                                                                        InputKeyIterator key_first,
-                                                                                        InputKeyIterator key_last) {
+        detail::range_encrypter_impl <detail::value_encrypter_impl<CipherState>> decrypt(InputIterator first,
+                                                                                         InputIterator last,
+                                                                                         InputKeyIterator key_first,
+                                                                                         InputKeyIterator key_last) {
 
-            typedef detail::value_encrypter_impl<CipherState> StreamEncrypterImpl;
-            typedef detail::range_encrypter_impl<StreamEncrypterImpl> EncrypterImpl;
+            typedef detail::value_encrypter_impl <CipherState> StreamEncrypterImpl;
+            typedef detail::range_encrypter_impl <StreamEncrypterImpl> EncrypterImpl;
 
             return EncrypterImpl(first, last, CipherState(BlockCipher(key_first, key_last)));
         }
@@ -92,8 +94,8 @@ namespace nil {
             typedef typename detail::range_stream_encrypter_traits<typename BlockCipher::stream_decrypter_type,
                                                                    SinglePassRange>::type CipherState;
 
-            typedef detail::value_encrypter_impl<CipherState> StreamEncrypterImpl;
-            typedef detail::itr_encrypter_impl<StreamEncrypterImpl, OutputIterator> EncrypterImpl;
+            typedef detail::value_encrypter_impl <CipherState> StreamEncrypterImpl;
+            typedef detail::itr_encrypter_impl <StreamEncrypterImpl, OutputIterator> EncrypterImpl;
 
             return EncrypterImpl(rng, std::move(out), CipherState(BlockCipher(key)));
         }
@@ -109,14 +111,16 @@ namespace nil {
          * @param r
          * @return
          */
-        template<typename BlockCipher, typename SinglePassRange, typename KeyRange,
+        template<typename BlockCipher,
+                 typename SinglePassRange,
+                 typename KeyRange,
                  typename StreamEncrypter = typename detail::range_stream_encrypter_traits<
                          typename BlockCipher::stream_decrypter_type, SinglePassRange>::type>
-        detail::range_encrypter_impl<detail::value_encrypter_impl<StreamEncrypter>> encrypt(const SinglePassRange &r,
-                                                                                            const KeyRange &key) {
+        detail::range_encrypter_impl <detail::value_encrypter_impl<StreamEncrypter>> encrypt(const SinglePassRange &r,
+                                                                                             const KeyRange &key) {
 
-            typedef detail::value_encrypter_impl<StreamEncrypter> StreamEncrypterImpl;
-            typedef detail::range_encrypter_impl<StreamEncrypterImpl> EncrypterImpl;
+            typedef detail::value_encrypter_impl <StreamEncrypter> StreamEncrypterImpl;
+            typedef detail::range_encrypter_impl <StreamEncrypterImpl> EncrypterImpl;
 
             return EncrypterImpl(r, StreamEncrypter(BlockCipher(key)));
         }

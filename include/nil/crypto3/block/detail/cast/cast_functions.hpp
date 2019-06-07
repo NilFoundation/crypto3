@@ -70,8 +70,10 @@ namespace nil {
                      */
                     inline static word_type f1(word_type R, word_type MK, byte_type RK) {
                         const word_type T = rotl_var(MK + R, RK);
-                        return (policy_type::sbox1[get_byte(0, T)] ^ policy_type::sbox2[get_byte(1, T)]) -
-                               policy_type::sbox3[get_byte(2, T)] + policy_type::sbox4[get_byte(3, T)];
+                        return (policy_type::sbox1[extract_uint_t<CHAR_BIT>(T, 0)] ^
+                                policy_type::sbox2[extract_uint_t<CHAR_BIT>(T, 1)]) -
+                               policy_type::sbox3[extract_uint_t<CHAR_BIT>(T, 2)] +
+                               policy_type::sbox4[extract_uint_t<CHAR_BIT>(T, 3)];
                     }
 
 /*
@@ -79,8 +81,10 @@ namespace nil {
 */
                     inline static word_type f2(word_type R, word_type MK, byte_type RK) {
                         const uint32_t T = rotl_var(MK ^ R, RK);
-                        return (policy_type::sbox1[get_byte(0, T)] - policy_type::sbox2[get_byte(1, T)] +
-                                policy_type::sbox3[get_byte(2, T)]) ^ policy_type::sbox4[get_byte(3, T)];
+                        return (policy_type::sbox1[extract_uint_t<CHAR_BIT>(T, 0)] -
+                                policy_type::sbox2[extract_uint_t<CHAR_BIT>(T, 1)] +
+                                policy_type::sbox3[extract_uint_t<CHAR_BIT>(T, 2)]) ^
+                               policy_type::sbox4[extract_uint_t<CHAR_BIT>(T, 3)];
                     }
 
 /*
@@ -88,8 +92,10 @@ namespace nil {
 */
                     inline static word_type f3(word_type R, word_type MK, byte_type RK) {
                         const uint32_t T = rotl_var(MK - R, RK);
-                        return ((policy_type::sbox1[get_byte(0, T)] + policy_type::sbox2[get_byte(1, T)]) ^
-                                policy_type::sbox3[get_byte(2, T)]) - policy_type::sbox4[get_byte(3, T)];
+                        return ((policy_type::sbox1[extract_uint_t<CHAR_BIT>(T, 0)] +
+                                 policy_type::sbox2[extract_uint_t<CHAR_BIT>(T, 1)]) ^
+                                policy_type::sbox3[extract_uint_t<CHAR_BIT>(T, 2)]) -
+                               policy_type::sbox4[extract_uint_t<CHAR_BIT>(T, 3)];
                     }
 
                     inline static void cast_ks(key_schedule_type &K, std::array<word_type, 4> &X) {
@@ -402,8 +408,10 @@ namespace nil {
 */
                     static inline void round1(word_type &out, word_type in, word_type MK, word_type RK) {
                         const word_type T = rotl_var(MK + in, RK);
-                        out ^= (policy_type::sbox1[get_byte(0, T)] ^ policy_type::sbox2[get_byte(1, T)]) -
-                               policy_type::sbox3[get_byte(2, T)] + policy_type::sbox4[get_byte(3, T)];
+                        out ^= (policy_type::sbox1[extract_uint_t<CHAR_BIT>(T, 0)] ^
+                                policy_type::sbox2[extract_uint_t<CHAR_BIT>(T, 1)]) -
+                               policy_type::sbox3[extract_uint_t<CHAR_BIT>(T, 2)] +
+                               policy_type::sbox4[extract_uint_t<CHAR_BIT>(T, 3)];
                     }
 
 /*
@@ -411,8 +419,10 @@ namespace nil {
 */
                     static inline void round2(word_type &out, word_type in, word_type MK, word_type RK) {
                         const word_type T = rotl_var(MK ^ in, RK);
-                        out ^= (policy_type::sbox1[get_byte(0, T)] - policy_type::sbox2[get_byte(1, T)] +
-                                policy_type::sbox3[get_byte(2, T)]) ^ policy_type::sbox4[get_byte(3, T)];
+                        out ^= (policy_type::sbox1[extract_uint_t<CHAR_BIT>(T, 0)] -
+                                policy_type::sbox2[extract_uint_t<CHAR_BIT>(T, 1)] +
+                                policy_type::sbox3[extract_uint_t<CHAR_BIT>(T, 2)]) ^
+                               policy_type::sbox4[extract_uint_t<CHAR_BIT>(T, 3)];
                     }
 
 /*
@@ -420,8 +430,10 @@ namespace nil {
 */
                     static inline void round3(word_type &out, word_type in, word_type MK, word_type RK) {
                         const word_type T = rotl_var(MK - in, RK);
-                        out ^= ((policy_type::sbox1[get_byte(0, T)] + policy_type::sbox2[get_byte(1, T)]) ^
-                                policy_type::sbox3[get_byte(2, T)]) - policy_type::sbox4[get_byte(3, T)];
+                        out ^= ((policy_type::sbox1[extract_uint_t<CHAR_BIT>(T, 0)] +
+                                 policy_type::sbox2[extract_uint_t<CHAR_BIT>(T, 1)]) ^
+                                policy_type::sbox3[extract_uint_t<CHAR_BIT>(T, 2)]) -
+                               policy_type::sbox4[extract_uint_t<CHAR_BIT>(T, 3)];
                     }
 
                     inline static block_type encrypt_block(const block_type &plaintext,

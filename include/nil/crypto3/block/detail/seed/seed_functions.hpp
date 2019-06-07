@@ -12,8 +12,6 @@
 
 #include <nil/crypto3/block/detail/basic_functions.hpp>
 
-#include <nil/crypto3/utilities/loadstore.hpp>
-
 namespace nil {
     namespace crypto3 {
         namespace block {
@@ -27,7 +25,8 @@ namespace nil {
 
                     inline static word_type g(word_type X, const constants_type &s0, const constants_type &s1,
                                               const constants_type &s2, const constants_type &s3) {
-                        return (s0[get_byte(3, X)] ^ s1[get_byte(2, X)] ^ s2[get_byte(1, X)] ^ s3[get_byte(0, X)]);
+                        return (s0[extract_uint_t<CHAR_BIT>(X, 3)] ^ s1[extract_uint_t<CHAR_BIT>(X, 2)] ^
+                                s2[extract_uint_t<CHAR_BIT>(X, 1)] ^ s3[extract_uint_t<CHAR_BIT>(X, 0)]);
                     }
                 };
             }

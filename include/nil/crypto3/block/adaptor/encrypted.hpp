@@ -25,7 +25,10 @@ namespace nil {
             template<typename P, typename It>
             struct transform_iterator_gen {
                 typedef boost::transform_iterator<typename boost::range_detail::default_constructible_unary_fn_gen<P,
-                        typename boost::transform_iterator<P, It>::reference>::type, It> type;
+                                                                                                                   typename boost::transform_iterator<
+                                                                                                                           P,
+                                                                                                                           It>::reference>::type,
+                                                  It> type;
             };
 
             template<class F, class R>
@@ -33,19 +36,21 @@ namespace nil {
                     typename transform_iterator_gen<F, typename boost::range_iterator<R>::type>::type> {
             private:
                 typedef typename transform_iterator_gen<F,
-                        typename boost::range_iterator<R>::type>::type transform_iter_t;
+                                                        typename boost::range_iterator<R>::type>::type transform_iter_t;
 
                 typedef boost::iterator_range<transform_iter_t> base;
 
             public:
                 typedef typename boost::range_detail::default_constructible_unary_fn_gen<F,
-                        typename boost::transform_iterator<F,
-                                typename boost::range_iterator<R>::type>::reference>::type transform_fn_type;
+                                                                                         typename boost::transform_iterator<
+                                                                                                 F,
+                                                                                                 typename boost::range_iterator<
+                                                                                                         R>::type>::reference>::type transform_fn_type;
 
                 typedef R source_range_type;
 
                 encoded_range(transform_fn_type f, R &r) : base(transform_iter_t(boost::begin(r), f),
-                                                                transform_iter_t(boost::end(r), f)) {
+                        transform_iter_t(boost::end(r), f)) {
                 }
             };
 
@@ -78,8 +83,8 @@ namespace nil {
 
         namespace adaptors {
             namespace {
-                const range_detail::forwarder<detail::encode_holder> encoded =
-                        detail::forwarder<detail::encode_holder>();
+                const range_detail::forwarder <detail::encode_holder> encoded = detail::forwarder<
+                        detail::encode_holder>();
             }
 
             template<class UnaryFunction, class SinglePassRange>

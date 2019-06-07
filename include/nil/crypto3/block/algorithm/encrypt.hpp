@@ -61,7 +61,9 @@ namespace nil {
          * @param last
          * @return
          */
-        template<typename BlockCipher, typename InputIterator, typename KeyIterator,
+        template<typename BlockCipher,
+                 typename InputIterator,
+                 typename KeyIterator,
                  typename CipherState = typename detail::itr_stream_encrypter_traits<
                          typename BlockCipher::stream_encrypter_type, InputIterator>::type>
         detail::range_encrypter_impl<detail::value_encrypter_impl<CipherState>> encrypt(InputIterator first,
@@ -110,7 +112,9 @@ namespace nil {
          * @param r
          * @return
          */
-        template<typename BlockCipher, typename SinglePassRange, typename KeyRange,
+        template<typename BlockCipher,
+                 typename SinglePassRange,
+                 typename KeyRange,
                  typename CipherState = typename detail::range_stream_encrypter_traits<
                          typename BlockCipher::stream_encrypter_type, SinglePassRange>::type>
         detail::range_encrypter_impl<detail::value_encrypter_impl<CipherState>> encrypt(const SinglePassRange &r,

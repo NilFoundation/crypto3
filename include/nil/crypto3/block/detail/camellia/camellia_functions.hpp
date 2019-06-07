@@ -51,14 +51,14 @@ namespace nil {
 
                         const uint64_t x = v ^K;
 
-                        const uint8_t t1 = sbox[get_byte(0, x)];
-                        const uint8_t t2 = rotl<1>(sbox[get_byte(1, x)]);
-                        const uint8_t t3 = rotl<7>(sbox[get_byte(2, x)]);
-                        const uint8_t t4 = sbox[rotl<1>(get_byte(3, x))];
-                        const uint8_t t5 = rotl<1>(sbox[get_byte(4, x)]);
-                        const uint8_t t6 = rotl<7>(sbox[get_byte(5, x)]);
-                        const uint8_t t7 = sbox[rotl<1>(get_byte(6, x))];
-                        const uint8_t t8 = sbox[get_byte(7, x)];
+                        const uint8_t t1 = sbox[extract_uint_t<CHAR_BIT>(x, 0)];
+                        const uint8_t t2 = rotl<1>(sbox[extract_uint_t<CHAR_BIT>(x, 1)]);
+                        const uint8_t t3 = rotl<7>(sbox[extract_uint_t<CHAR_BIT>(x, 2)]);
+                        const uint8_t t4 = sbox[rotl<1>(extract_uint_t<CHAR_BIT>(x, 3))];
+                        const uint8_t t5 = rotl<1>(sbox[extract_uint_t<CHAR_BIT>(x, 4)]);
+                        const uint8_t t6 = rotl<7>(sbox[extract_uint_t<CHAR_BIT>(x, 5)]);
+                        const uint8_t t7 = sbox[rotl<1>(extract_uint_t<CHAR_BIT>(x, 6))];
+                        const uint8_t t8 = sbox[extract_uint_t<CHAR_BIT>(x, 7)];
 
                         const uint8_t y1 = t1 ^t3 ^t4 ^t6 ^t7 ^t8;
                         const uint8_t y2 = t1 ^t2 ^t4 ^t5 ^t7 ^t8;
@@ -75,14 +75,14 @@ namespace nil {
                     inline uint64_t f(uint64_t v, uint64_t K) {
                         const uint64_t x = v ^K;
 
-                        return basic_camellia_policy<KeyBits>::sbox1[get_byte(0, x)] ^
-                               basic_camellia_policy<KeyBits>::sbox2[get_byte(1, x)] ^
-                               basic_camellia_policy<KeyBits>::sbox3[get_byte(2, x)] ^
-                               basic_camellia_policy<KeyBits>::sbox4[get_byte(3, x)] ^
-                               basic_camellia_policy<KeyBits>::sbox5[get_byte(4, x)] ^
-                               basic_camellia_policy<KeyBits>::sbox6[get_byte(5, x)] ^
-                               basic_camellia_policy<KeyBits>::sbox7[get_byte(6, x)] ^
-                               basic_camellia_policy<KeyBits>::sbox8[get_byte(7, x)];
+                        return basic_camellia_policy<KeyBits>::sbox1[extract_uint_t<CHAR_BIT>(x, 0)] ^
+                               basic_camellia_policy<KeyBits>::sbox2[extract_uint_t<CHAR_BIT>(x, 1)] ^
+                               basic_camellia_policy<KeyBits>::sbox3[extract_uint_t<CHAR_BIT>(x, 2)] ^
+                               basic_camellia_policy<KeyBits>::sbox4[extract_uint_t<CHAR_BIT>(x, 3)] ^
+                               basic_camellia_policy<KeyBits>::sbox5[extract_uint_t<CHAR_BIT>(x, 4)] ^
+                               basic_camellia_policy<KeyBits>::sbox6[extract_uint_t<CHAR_BIT>(x, 5)] ^
+                               basic_camellia_policy<KeyBits>::sbox7[extract_uint_t<CHAR_BIT>(x, 6)] ^
+                               basic_camellia_policy<KeyBits>::sbox8[extract_uint_t<CHAR_BIT>(x, 7)];
                     }
 
                     inline uint64_t fl(uint64_t v, uint64_t K) {

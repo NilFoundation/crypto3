@@ -25,10 +25,12 @@ namespace nil {
 
                     inline static void tf_e(word_type A, word_type B, word_type &C, word_type &D, word_type RK1,
                                             word_type RK2, const expanded_substitution_type &SB) {
-                        word_type X = SB[get_byte(3, A)] ^SB[256 + get_byte(2, A)] ^SB[512 + get_byte(1, A)] ^
-                                      SB[768 + get_byte(0, A)];
-                        word_type Y = SB[get_byte(0, B)] ^SB[256 + get_byte(3, B)] ^SB[512 + get_byte(2, B)] ^
-                                      SB[768 + get_byte(1, B)];
+                        word_type X = SB[extract_uint_t<CHAR_BIT>(A, 3)] ^SB[256 + extract_uint_t<CHAR_BIT>(A, 2)] ^
+                                      SB[512 + extract_uint_t<CHAR_BIT>(A, 1)] ^
+                                      SB[768 + extract_uint_t<CHAR_BIT>(A, 0)];
+                        word_type Y = SB[extract_uint_t<CHAR_BIT>(B, 0)] ^SB[256 + extract_uint_t<CHAR_BIT>(B, 3)] ^
+                                      SB[512 + extract_uint_t<CHAR_BIT>(B, 2)] ^
+                                      SB[768 + extract_uint_t<CHAR_BIT>(B, 1)];
 
                         X += Y;
                         Y += X;
@@ -42,10 +44,12 @@ namespace nil {
 
                     inline static void tf_d(word_type A, word_type B, word_type &C, word_type &D, word_type RK1,
                                             word_type RK2, const expanded_substitution_type &SB) {
-                        word_type X = SB[get_byte(3, A)] ^SB[256 + get_byte(2, A)] ^SB[512 + get_byte(1, A)] ^
-                                      SB[768 + get_byte(0, A)];
-                        word_type Y = SB[get_byte(0, B)] ^SB[256 + get_byte(3, B)] ^SB[512 + get_byte(2, B)] ^
-                                      SB[768 + get_byte(1, B)];
+                        word_type X = SB[extract_uint_t<CHAR_BIT>(A, 3)] ^SB[256 + extract_uint_t<CHAR_BIT>(A, 2)] ^
+                                      SB[512 + extract_uint_t<CHAR_BIT>(A, 1)] ^
+                                      SB[768 + extract_uint_t<CHAR_BIT>(A, 0)];
+                        word_type Y = SB[extract_uint_t<CHAR_BIT>(B, 0)] ^SB[256 + extract_uint_t<CHAR_BIT>(B, 3)] ^
+                                      SB[512 + extract_uint_t<CHAR_BIT>(B, 2)] ^
+                                      SB[768 + extract_uint_t<CHAR_BIT>(B, 1)];
 
                         X += Y;
                         Y += X;

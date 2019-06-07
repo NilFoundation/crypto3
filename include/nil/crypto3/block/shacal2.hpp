@@ -12,7 +12,7 @@
 
 #include <nil/crypto3/block/detail/shacal/shacal2_policy.hpp>
 
-#include <nil/crypto3/block/cipher_state.hpp>
+#include <nil/crypto3/block/cipher_state_preprocessor.hpp>
 
 #include <boost/static_assert.hpp>
 

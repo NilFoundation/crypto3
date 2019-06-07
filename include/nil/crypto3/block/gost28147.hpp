@@ -15,7 +15,7 @@
 
 #include <nil/crypto3/block/detail/stream_endian.hpp>
 
-#include <nil/crypto3/block/cipher_state.hpp>
+#include <nil/crypto3/block/cipher_state_preprocessor.hpp>
 
 namespace nil {
     namespace crypto3 {

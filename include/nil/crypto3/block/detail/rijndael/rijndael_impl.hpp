@@ -35,7 +35,7 @@ namespace nil {
                         typename policy_type::key_schedule_word_type result = {0};
 #pragma clang loop unroll(full)
                         for (uint8_t i = 0; i < policy_type::word_bytes; ++i) {
-                            result = result << CHAR_BIT | constants[get_byte(i, x)];
+                            result = result << CHAR_BIT | constants[extract_uint_t<CHAR_BIT>(x, i)];
                         }
 
                         return result;

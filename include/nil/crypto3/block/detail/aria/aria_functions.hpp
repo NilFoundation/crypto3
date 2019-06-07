@@ -18,12 +18,27 @@ namespace nil {
             namespace detail {
                 template<std::size_t KeyBits>
                 struct aria_functions : public basic_aria_policy<KeyBits> {
+                    typedef basic_aria_policy<KeyBits> policy_type;
 
-                    inline void fo(word_type &T0, word_type &T1, word_type &T2, word_type &T3) {
-                        T0 = s1[get_byte(0, T0)] ^ s2[get_byte(1, T0)] ^ x1[get_byte(2, T0)] ^ x2[get_byte(3, T0)];
-                        T1 = s1[get_byte(0, T1)] ^ s2[get_byte(1, T1)] ^ x1[get_byte(2, T1)] ^ x2[get_byte(3, T1)];
-                        T2 = s1[get_byte(0, T2)] ^ s2[get_byte(1, T2)] ^ x1[get_byte(2, T2)] ^ x2[get_byte(3, T2)];
-                        T3 = s1[get_byte(0, T3)] ^ s2[get_byte(1, T3)] ^ x1[get_byte(2, T3)] ^ x2[get_byte(3, T3)];
+                    typedef typename policy_type::word_type word_type;
+
+                    inline static void fo(word_type &T0, word_type &T1, word_type &T2, word_type &T3) {
+                        T0 = policy_type::s1[policy_type::extract_uint_t<CHAR_BIT>(T0, 0)] ^
+                             policy_type::s2[policy_type::extract_uint_t<CHAR_BIT>(T0, 1)] ^
+                             policy_type::x1[policy_type::extract_uint_t<CHAR_BIT>(T0, 2)] ^
+                             policy_type::x2[policy_type::extract_uint_t<CHAR_BIT>(T0, 3)];
+                        T1 = policy_type::s1[policy_type::extract_uint_t<CHAR_BIT>(T1, 0)] ^
+                             policy_type::s2[policy_type::extract_uint_t<CHAR_BIT>(T1, 1)] ^
+                             policy_type::x1[policy_type::extract_uint_t<CHAR_BIT>(T1, 2)] ^
+                             policy_type::x2[policy_type::extract_uint_t<CHAR_BIT>(T1, 3)];
+                        T2 = policy_type::s1[policy_type::extract_uint_t<CHAR_BIT>(T2, 0)] ^
+                             policy_type::s2[policy_type::extract_uint_t<CHAR_BIT>(T2, 1)] ^
+                             policy_type::x1[policy_type::extract_uint_t<CHAR_BIT>(T2, 2)] ^
+                             policy_type::x2[policy_type::extract_uint_t<CHAR_BIT>(T2, 3)];
+                        T3 = policy_type::s1[policy_type::extract_uint_t<CHAR_BIT>(T3, 0)] ^
+                             policy_type::s2[policy_type::extract_uint_t<CHAR_BIT>(T3, 1)] ^
+                             policy_type::x1[policy_type::extract_uint_t<CHAR_BIT>(T3, 2)] ^
+                             policy_type::x2[policy_type::extract_uint_t<CHAR_BIT>(T3, 3)];
 
                         T1 ^= T2;
                         T2 ^= T3;
@@ -33,7 +48,7 @@ namespace nil {
                         T1 ^= T2;
 
                         T1 = ((T1 << 8) & 0xFF00FF00) | ((T1 >> 8) & 0x00FF00FF);
-                        T2 = rotr<16>(T2);
+                        T2 = policy_type::rotr<16>(T2);
                         T3 = reverse_bytes(T3);
 
                         T1 ^= T2;
@@ -44,11 +59,23 @@ namespace nil {
                         T1 ^= T2;
                     }
 
-                    inline void fe(word_type &T0, word_type &T1, word_type &T2, word_type &T3) {
-                        T0 = x1[get_byte(0, T0)] ^ x2[get_byte(1, T0)] ^ s1[get_byte(2, T0)] ^ s2[get_byte(3, T0)];
-                        T1 = x1[get_byte(0, T1)] ^ x2[get_byte(1, T1)] ^ s1[get_byte(2, T1)] ^ s2[get_byte(3, T1)];
-                        T2 = x1[get_byte(0, T2)] ^ x2[get_byte(1, T2)] ^ s1[get_byte(2, T2)] ^ s2[get_byte(3, T2)];
-                        T3 = x1[get_byte(0, T3)] ^ x2[get_byte(1, T3)] ^ s1[get_byte(2, T3)] ^ s2[get_byte(3, T3)];
+                    inline static void fe(word_type &T0, word_type &T1, word_type &T2, word_type &T3) {
+                        T0 = policy_type::x1[policy_type::extract_uint_t<CHAR_BIT>(T0, 0)] ^
+                             policy_type::x2[policy_type::extract_uint_t<CHAR_BIT>(T0, 1)] ^
+                             policy_type::s1[policy_type::extract_uint_t<CHAR_BIT>(T0, 2)] ^
+                             policy_type::s2[policy_type::extract_uint_t<CHAR_BIT>(T0, 3)];
+                        T1 = policy_type::x1[policy_type::extract_uint_t<CHAR_BIT>(T1, 0)] ^
+                             policy_type::x2[policy_type::extract_uint_t<CHAR_BIT>(T1, 1)] ^
+                             policy_type::s1[policy_type::extract_uint_t<CHAR_BIT>(T1, 2)] ^
+                             policy_type::s2[policy_type::extract_uint_t<CHAR_BIT>(T1, 3)];
+                        T2 = policy_type::x1[policy_type::extract_uint_t<CHAR_BIT>(T2, 0)] ^
+                             policy_type::x2[policy_type::extract_uint_t<CHAR_BIT>(T2, 1)] ^
+                             policy_type::s1[policy_type::extract_uint_t<CHAR_BIT>(T2, 2)] ^
+                             policy_type::s2[policy_type::extract_uint_t<CHAR_BIT>(T2, 3)];
+                        T3 = policy_type::x1[policy_type::extract_uint_t<CHAR_BIT>(T3, 0)] ^
+                             policy_type::x2[policy_type::extract_uint_t<CHAR_BIT>(T3, 1)] ^
+                             policy_type::s1[policy_type::extract_uint_t<CHAR_BIT>(T3, 2)] ^
+                             policy_type::s2[policy_type::extract_uint_t<CHAR_BIT>(T3, 3)];
 
                         T1 ^= T2;
                         T2 ^= T3;
@@ -58,7 +85,7 @@ namespace nil {
                         T1 ^= T2;
 
                         T3 = ((T3 << 8) & 0xFF00FF00) | ((T3 >> 8) & 0x00FF00FF);
-                        T0 = rotr<16>(T0);
+                        T0 = policy_type::rotr<16>(T0);
                         T1 = reverse_bytes(T1);
 
                         T1 ^= T2;
@@ -71,7 +98,7 @@ namespace nil {
 
                     // n-bit right shift of Y XORed to X
                     template<unsigned int N>
-                    inline void rol128(const word_type X[4], const word_type Y[4], word_type KS[4]) {
+                    inline static void rol128(const word_type X[4], const word_type Y[4], word_type KS[4]) {
                         // MSVC is not generating a "rotate immediate". Constify to help it along.
                         static const unsigned int Q = 4 - (N / 32);
                         static const unsigned int R = N % 32;

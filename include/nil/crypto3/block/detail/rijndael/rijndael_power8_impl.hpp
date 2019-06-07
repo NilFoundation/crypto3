@@ -54,7 +54,8 @@ namespace nil {
 
                 template<std::size_t KeyBitsImpl, std::size_t BlockBitsImpl, typename PolicyType>
                 class rijndael_power8_impl {
-                    BOOST_STATIC_ASSERT(BlockBitsImpl == 128);
+                    BOOST_STATIC_ASSERT(BlockBitsImpl
+                    == 128);
                 };
 
                 template<typename PolicyType>
@@ -62,8 +63,10 @@ namespace nil {
                 protected:
                     typedef PolicyType policy_type;
 
-                    BOOST_STATIC_ASSERT(PolicyType::key_bits == 128);
-                    BOOST_STATIC_ASSERT(PolicyType::block_bits == 128);
+                    BOOST_STATIC_ASSERT(PolicyType::key_bits
+                    == 128);
+                    BOOST_STATIC_ASSERT(PolicyType::block_bits
+                    == 128);
 
                 public:
                     static typename policy_type::block_type encrypt_block(
@@ -144,8 +147,10 @@ namespace nil {
                 protected:
                     typedef PolicyType policy_type;
 
-                    BOOST_STATIC_ASSERT(PolicyType::key_bits == 192);
-                    BOOST_STATIC_ASSERT(PolicyType::block_bits == 128);
+                    BOOST_STATIC_ASSERT(PolicyType::key_bits
+                    == 192);
+                    BOOST_STATIC_ASSERT(PolicyType::block_bits
+                    == 128);
 
                 public:
                     static typename policy_type::block_type encrypt_block(
@@ -233,8 +238,10 @@ namespace nil {
                 protected:
                     typedef PolicyType policy_type;
 
-                    BOOST_STATIC_ASSERT(PolicyType::key_bits == 256);
-                    BOOST_STATIC_ASSERT(PolicyType::block_bits == 128);
+                    BOOST_STATIC_ASSERT(PolicyType::key_bits
+                    == 256);
+                    BOOST_STATIC_ASSERT(PolicyType::block_bits
+                    == 128);
 
                 public:
                     static typename policy_type::block_type encrypt_block(

@@ -24,16 +24,16 @@ namespace nil {
 #define GOST_2ROUND(N1, N2, R1, R2)   \
    do {                               \
    uint32_t T0 = N1 + key_schedule[R1];           \
-   N2 ^= expanded_substitution[get_byte(3, T0)] |      \
-         expanded_substitution[get_byte(2, T0)+256] |  \
-         expanded_substitution[get_byte(1, T0)+512] |  \
-         expanded_substitution[get_byte(0, T0)+768];   \
+   N2 ^= expanded_substitution[extract_uint_t<CHAR_BIT>(T0, 3)] |      \
+         expanded_substitution[extract_uint_t<CHAR_BIT>(T0, 2)+256] |  \
+         expanded_substitution[extract_uint_t<CHAR_BIT>(T0, 1)+512] |  \
+         expanded_substitution[extract_uint_t<CHAR_BIT>(T0, 0)+768];   \
                                       \
    uint32_t T1 = N2 + key_schedule[R2];           \
-   N1 ^= expanded_substitution[get_byte(3, T1)] |      \
-         expanded_substitution[get_byte(2, T1)+256] |  \
-         expanded_substitution[get_byte(1, T1)+512] |  \
-         expanded_substitution[get_byte(0, T1)+768];   \
+   N1 ^= expanded_substitution[extract_uint_t<CHAR_BIT>(T1, 3)] |      \
+         expanded_substitution[extract_uint_t<CHAR_BIT>(T1, 2)+256] |  \
+         expanded_substitution[extract_uint_t<CHAR_BIT>(T1, 1)+512] |  \
+         expanded_substitution[extract_uint_t<CHAR_BIT>(T1, 0)+768];   \
    } while(0)
 
                 template<typename ParamsType>

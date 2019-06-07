@@ -69,10 +69,10 @@ namespace nil {
 
 
                     constexpr static const std::size_t constants_size = rijndael_functions<32,
-                            block_bits>::constants_size;
+                                                                                           block_bits>::constants_size;
                     typedef typename rijndael_functions<32, block_bits>::constants_type constants_type;
                     typedef typename rijndael_functions<32,
-                            block_bits>::prefetched_constants_type prefetched_constants_type;
+                                                        block_bits>::prefetched_constants_type prefetched_constants_type;
 
                     alignas(64) constexpr static const constants_type constants = {
                             0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5, 0x30, 0x01, 0x67, 0x2b, 0xfe, 0xd7, 0xab,
@@ -130,32 +130,32 @@ namespace nil {
                         basic_rijndael_policy<KeyBits, BlockBits>::inverted_constants;
 
                 template<std::size_t KeyBits, std::size_t BlockBits> constexpr typename basic_rijndael_policy<KeyBits,
-                        BlockBits>::shift_offsets_type const
+                                                                                                              BlockBits>::shift_offsets_type const
                         basic_rijndael_policy<KeyBits, BlockBits>::shift_offsets;
 
                 template<std::size_t KeyBits, std::size_t BlockBits> constexpr typename basic_rijndael_policy<KeyBits,
-                        BlockBits>::shift_offsets_type const
+                                                                                                              BlockBits>::shift_offsets_type const
                         basic_rijndael_policy<KeyBits, BlockBits>::inverted_shift_offsets;
 
                 template<std::size_t KeyBits, std::size_t BlockBits> constexpr typename basic_rijndael_policy<KeyBits,
-                        BlockBits>::mm_type const
+                                                                                                              BlockBits>::mm_type const
                         basic_rijndael_policy<KeyBits, BlockBits>::mm;
 
                 template<std::size_t KeyBits, std::size_t BlockBits> constexpr typename basic_rijndael_policy<KeyBits,
-                        BlockBits>::mm_type const
+                                                                                                              BlockBits>::mm_type const
                         basic_rijndael_policy<KeyBits, BlockBits>::inverted_mm;
 
                 template<std::size_t KeyBits, std::size_t BlockBits>
                 struct rijndael_policy : public basic_rijndael_policy<KeyBits, BlockBits> {
                     constexpr static const std::size_t word_bits = basic_rijndael_policy<KeyBits, BlockBits>::word_bits;
                     constexpr static const std::size_t word_bytes = basic_rijndael_policy<KeyBits,
-                            BlockBits>::word_bytes;
+                                                                                          BlockBits>::word_bytes;
                     typedef typename basic_rijndael_policy<KeyBits, BlockBits>::word_type word_type;
 
                     constexpr static const std::size_t block_bits = basic_rijndael_policy<KeyBits,
-                            BlockBits>::block_bits;
+                                                                                          BlockBits>::block_bits;
                     constexpr static const std::size_t block_words = basic_rijndael_policy<KeyBits,
-                            BlockBits>::block_words;
+                                                                                           BlockBits>::block_words;
 
                     constexpr static const std::size_t key_bits = basic_rijndael_policy<KeyBits, BlockBits>::key_bits;
                     constexpr static const std::size_t key_words = basic_rijndael_policy<KeyBits, BlockBits>::key_words;
