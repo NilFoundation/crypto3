@@ -37,7 +37,9 @@ namespace nil {
              *
              * @return
              */
-            template<typename Hasher, typename InputIterator, typename OutputIterator,
+            template<typename Hasher,
+                     typename InputIterator,
+                     typename OutputIterator,
                      typename StreamHash = typename itr_stream_hash_traits<Hasher, InputIterator>::type,
                      typename = typename std::enable_if<detail::is_stream_hash<StreamHash>::value>::type>
             OutputIterator hash(InputIterator first, InputIterator last, OutputIterator out) {
@@ -63,7 +65,9 @@ namespace nil {
              * @param sh
              * @return
              */
-            template<typename Hasher, typename InputIterator, typename OutputIterator,
+            template<typename Hasher,
+                     typename InputIterator,
+                     typename OutputIterator,
                      typename StreamHash = typename itr_stream_hash_traits<Hasher, InputIterator>::type,
                      typename = typename std::enable_if<detail::is_stream_hash<StreamHash>::value>::type>
             OutputIterator hash(InputIterator first, InputIterator last, StreamHash &sh) {
@@ -86,7 +90,8 @@ namespace nil {
              * @param last
              * @return
              */
-            template<typename Hasher, typename InputIterator,
+            template<typename Hasher,
+                     typename InputIterator,
                      typename StreamHash = typename itr_stream_hash_traits<Hasher, InputIterator>::type,
                      typename = typename std::enable_if<detail::is_stream_hash<StreamHash>::value>::type>
             detail::range_hash_impl<Hasher, detail::value_hash_impl<StreamHash>> hash(InputIterator first,
@@ -110,7 +115,8 @@ namespace nil {
              * @param sh
              * @return
              */
-            template<typename Hasher, typename InputIterator,
+            template<typename Hasher,
+                     typename InputIterator,
                      typename StreamHash = typename itr_stream_hash_traits<Hasher, InputIterator>::type,
                      typename = typename std::enable_if<detail::is_stream_hash<StreamHash>::value>::type>
             detail::range_hash_impl<Hasher, detail::ref_hash_impl<StreamHash>> hash(InputIterator first,
@@ -136,7 +142,9 @@ namespace nil {
              * @param out
              * @return
              */
-            template<typename Hasher, typename SinglePassRange, typename OutputIterator,
+            template<typename Hasher,
+                     typename SinglePassRange,
+                     typename OutputIterator,
                      typename StreamHash = typename range_stream_hash_traits<Hasher, SinglePassRange>::type,
                      typename = typename std::enable_if<detail::is_stream_hash<StreamHash>::value>::type>
             OutputIterator hash(const SinglePassRange &rng, OutputIterator out) {
@@ -161,7 +169,9 @@ namespace nil {
              * @param sh
              * @return
              */
-            template<typename Hasher, typename SinglePassRange, typename OutputIterator,
+            template<typename Hasher,
+                     typename SinglePassRange,
+                     typename OutputIterator,
                      typename StreamHash = typename range_stream_hash_traits<Hasher, SinglePassRange>::type,
                      typename = typename std::enable_if<detail::is_stream_hash<StreamHash>::value>::type>
             OutputIterator hash(const SinglePassRange &rng, OutputIterator out, StreamHash &sh) {
@@ -183,7 +193,8 @@ namespace nil {
              * @param r
              * @return
              */
-            template<typename Hasher, typename SinglePassRange,
+            template<typename Hasher,
+                     typename SinglePassRange,
                      typename StreamHash = typename range_stream_hash_traits<Hasher, SinglePassRange>::type,
                      typename = typename std::enable_if<detail::is_stream_hash<StreamHash>::value>::type>
             detail::range_hash_impl<Hasher, detail::value_hash_impl<StreamHash>> hash(const SinglePassRange &r) {
@@ -206,7 +217,8 @@ namespace nil {
              * @param sh
              * @return
              */
-            template<typename Hasher, typename SinglePassRange,
+            template<typename Hasher,
+                     typename SinglePassRange,
                      typename StreamHash = typename range_stream_hash_traits<Hasher, SinglePassRange>::type,
                      typename = typename std::enable_if<detail::is_stream_hash<StreamHash>::value>::type>
             detail::range_hash_impl<Hasher, detail::ref_hash_impl<StreamHash>> hash(const SinglePassRange &rng,

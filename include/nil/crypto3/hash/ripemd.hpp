@@ -287,6 +287,11 @@ namespace nil {
                 };
                 typedef typename block_hash_type::digest_type digest_type;
             };
+
+            typedef ripemd<128> ripemd128;
+            typedef ripemd<160> ripemd160;
+            typedef ripemd<256> ripemd256;
+            typedef ripemd<320> ripemd320;
         }
     }
 }

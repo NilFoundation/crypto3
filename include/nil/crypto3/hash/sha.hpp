@@ -11,6 +11,7 @@
 #define CRYPTO3_HASH_SHA_HPP
 
 #include <nil/crypto3/block/shacal.hpp>
+
 #include <nil/crypto3/hash/detail/davies_meyer_compressor.hpp>
 #include <nil/crypto3/hash/detail/sha_policy.hpp>
 #include <nil/crypto3/hash/detail/state_adder.hpp>

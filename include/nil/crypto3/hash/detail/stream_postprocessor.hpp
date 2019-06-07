@@ -72,8 +72,7 @@ namespace nil {
                 struct range_hash_impl : public StreamHashImpl {
                 public:
                     template<typename SinglePassRange>
-                    range_hash_impl(const SinglePassRange &range,
-                                    const typename StreamHashImpl::stream_hash_type &ish)
+                    range_hash_impl(const SinglePassRange &range, const typename StreamHashImpl::stream_hash_type &ish)
                             : StreamHashImpl(ish) {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<SinglePassRange>));
 

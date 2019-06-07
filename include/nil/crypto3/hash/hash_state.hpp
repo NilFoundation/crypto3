@@ -13,10 +13,10 @@
 #include <array>
 #include <iterator>
 
+#include <nil/concept_container/basic_concept_container.hpp>
+
 #include <nil/crypto3/hash/detail/pack.hpp>
 #include <nil/crypto3/hash/detail/static_digest.hpp>
-
-#include <nil/crypto3/concept_container/concept_container.hpp>
 
 #include <nil/crypto3/utilities/secmem.hpp>
 
@@ -40,10 +40,10 @@ namespace nil {
              * @tparam LengthBits
              */
             template<typename Hasher, typename Endian, std::size_t ValueBits, std::size_t LengthBits>
-            struct hash_state : public concept_container<typename Hasher::digest_type,
+            struct hash_state : public basic_concept_container<typename Hasher::digest_type,
                                                          typename Hasher::template stream_processor<ValueBits>> {
                 typedef Hasher hash_type;
-                typedef typename concept_container<typename Hasher::digest_type,
+                typedef typename basic_concept_container<typename Hasher::digest_type,
                                                    typename Hasher::template stream_processor<
                                                            ValueBits>>::container_type container_type;
             };

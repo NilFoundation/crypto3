@@ -177,13 +177,13 @@ BOOST_AUTO_TEST_SUITE(adler_test_suite)
     }
 
 //    BOOST_AUTO_TEST_CASE(adler_stateful_hash4) {
-//        adler<32>::stream_processor<8>::type se;
+//        adler<32>::stream_processor<8>::type accumulator;
 //
 //        for (unsigned i = 0; i < 1000000; ++i) {
-//            hash<adler<32>>("a", se);
+//            hash<adler<32>>("a", accumulator);
 //        }
 //
-//        adler<32>::digest_type d = se.end_message();
+//        adler<32>::digest_type d = accumulator.end_message();
 //
 //#ifdef CRYPTO3_HASH_SHOW_PROGRESS
 //        std::cout << d << "\n";
@@ -193,14 +193,14 @@ BOOST_AUTO_TEST_SUITE(adler_test_suite)
 //    }
 //
 //    BOOST_AUTO_TEST_CASE(adler_stateful_hash5) {
-//        adler<32>::stream_processor<8>::type se;
+//        adler<32>::stream_processor<8>::type accumulator;
 //        std::string s(1000, 'a');
 //
 //        for (unsigned i = 0; i < 1000000; ++i) {
-//            hash<adler<32>>(s, se);
+//            hash<adler<32>>(s, accumulator);
 //        }
 //
-//        adler<32>::digest_type d = se.end_message();
+//        adler<32>::digest_type d = accumulator.end_message();
 //
 //#ifdef CRYPTO3_HASH_SHOW_PROGRESS
 //        std::cout << d << "\n";
@@ -210,13 +210,13 @@ BOOST_AUTO_TEST_SUITE(adler_test_suite)
 //    }
 //
 //    BOOST_AUTO_TEST_CASE(adler_stateful_hash6) {
-//        adler<32>::stream_processor<8>::type se;
+//        adler<32>::stream_processor<8>::type accumulator;
 //
 //        for (unsigned i = 0; i < 1000000000; ++i) {
-//            hash<adler<32>>("a", se);
+//            hash<adler<32>>("a", accumulator);
 //        }
 //
-//        adler<32>::digest_type d = se.end_message();
+//        adler<32>::digest_type d = accumulator.end_message();
 //
 //#ifdef CRYPTO3_HASH_SHOW_PROGRESS
 //        std::cout << d << "\n";
