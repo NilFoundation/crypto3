@@ -19,7 +19,7 @@
 #include <boost/range/end.hpp>
 #include <boost/range/concepts.hpp>
 
-#include <nil/crypto3/block/cipher_state_preprocessor.hpp>
+#include <nil/crypto3/block/detail/block_state_preprocessor.hpp>
 #include <nil/crypto3/block/detail/type_traits.hpp>
 
 namespace nil {

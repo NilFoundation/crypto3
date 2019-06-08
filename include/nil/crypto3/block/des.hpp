@@ -12,7 +12,7 @@
 
 #include <nil/crypto3/block/detail/des/des_functions.hpp>
 
-#include <nil/crypto3/block/cipher_state_preprocessor.hpp>
+#include <nil/crypto3/block/detail/block_state_preprocessor.hpp>
 #include <nil/crypto3/block/detail/stream_endian.hpp>
 
 namespace nil {

@@ -13,7 +13,7 @@
 #include <nil/crypto3/block/detail/sm4/sm4_policy.hpp>
 #include <nil/crypto3/block/detail/stream_endian.hpp>
 
-#include <nil/crypto3/block/cipher_state_preprocessor.hpp>
+#include <nil/crypto3/block/detail/block_state_preprocessor.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -49,8 +49,8 @@ namespace nil {
 
                 template<template<typename, typename> class Mode, std::size_t ValueBits, typename Padding>
                 struct stream_cipher {
-                    typedef cipher_state<Mode<sm4, Padding>, stream_endian::little_octet_big_bit, ValueBits,
-                                         policy_type::word_bits * 2> type_;
+                    typedef block_state_preprocessor<Mode<sm4, Padding>, stream_endian::little_octet_big_bit,
+                                                             ValueBits, policy_type::word_bits * 2> type_;
 #ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES
                     typedef type_ type;
 #else

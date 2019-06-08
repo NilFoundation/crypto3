@@ -17,7 +17,6 @@ if(NOT Boost_CONTAINER_FOUND OR NOT Boost_FOUND)
     cm_find_package(Boost COMPONENTS container)
 endif()
 
-cm_find_package(${CMAKE_WORKSPACE_NAME}_concept_container)
 cm_find_package(${CMAKE_WORKSPACE_NAME}_utilities)
 
 list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
@@ -477,8 +476,6 @@ set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES
 
 target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PUBLIC
                       ${CMAKE_WORKSPACE_NAME}::utilities
-
-                      concept_container
 
                       ${Boost_LIBRARIES})
 

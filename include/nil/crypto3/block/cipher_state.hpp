@@ -10,9 +10,10 @@
 #ifndef CRYPTO3_CIPHER_STATE_PREPROCESSOR_HPP
 #define CRYPTO3_CIPHER_STATE_PREPROCESSOR_HPP
 
-#include <nil/concept_container/cached_concept_container.hpp>
+#include <boost/accumulators/framework/accumulator_set.hpp>
 
-#include <nil/crypto3/block/cipher_state_preprocessor.hpp>
+#include <nil/crypto3/block/detail/cipher_state_preprocessor.hpp>
+#include <nil/crypto3/block/detail/block_state_preprocessor.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -27,13 +28,16 @@ namespace nil {
              * @tparam ValueBits
              * @tparam LengthBits
              */
-            template<typename Mode, typename Endian, std::size_t ValueBits, std::size_t LengthBits> struct cipher_state
-                    : public cached_concept_container<Mode, cipher_state_preprocessor < Mode, Endian, ValueBits,
-                                                      LengthBits>> {
+            template<typename ProcessingMode>
+            struct codec_accumulator {
+                typedef boost::accumulators::accumulator_set <block::digest<
+                        ProcessingMode::input_block_bits>, boost::accumulators::features<
+                        accumulators::tag::codec < ProcessingMode>>> type;
 
-        };
+                typedef ProcessingMode mode_type;
+            };
+        }
     }
-}
 }
 
 #endif //CRYPTO3_CIPHER_STATE_PREPROCESSOR_HPP

@@ -13,7 +13,7 @@
 #include <boost/range/adaptor/sliced.hpp>
 
 #include <nil/crypto3/block/block_cipher.hpp>
-#include <nil/crypto3/block/cipher_state_preprocessor.hpp>
+#include <nil/crypto3/block/detail/block_state_preprocessor.hpp>
 
 #include <nil/crypto3/block/detail/rijndael/rijndael_policy.hpp>
 #include <nil/crypto3/block/detail/rijndael/rijndael_impl.hpp>
@@ -103,7 +103,7 @@ namespace nil {
 
                 typedef typename std::conditional<
                         BlockBits == 128 && (KeyBits == 128 || KeyBits == 192 || KeyBits == 256),
-                        #if defined(CRYPTO3_HAS_RIJNDAEL_NI)
+#if defined(CRYPTO3_HAS_RIJNDAEL_NI)
                         detail::ni_rijndael_impl<KeyBits, BlockBits, policy_type>,
 #elif defined(CRYPTO3_HAS_RIJNDAEL_SSSE3)
                         detail::rijndael_ssse3_impl<KeyBits, BlockBits, policy_type>,
@@ -113,7 +113,7 @@ namespace nil {
                         detail::rijndael_power8_impl<KeyBits, BlockBits, policy_type>,
 #else
                         detail::rijndael_impl<KeyBits, BlockBits, policy_type>,
-                        #endif
+#endif
                         detail::rijndael_impl<KeyBits, BlockBits, policy_type>>::type impl_type;
 
             public:

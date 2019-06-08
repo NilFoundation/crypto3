@@ -10,7 +10,7 @@
 #ifndef CRYPTO3_BLOCK_CIPHERS_MD4_HPP
 #define CRYPTO3_BLOCK_CIPHERS_MD4_HPP
 
-#include <nil/crypto3/block/cipher_state_preprocessor.hpp>
+#include <nil/crypto3/block/detail/block_state_preprocessor.hpp>
 
 #include <nil/crypto3/block/detail/md4/md4_policy.hpp>
 #include <nil/crypto3/block/detail/stream_endian.hpp>
@@ -56,7 +56,7 @@ namespace nil {
 
                 template<template<typename, typename> class Mode, std::size_t ValueBits, typename Padding>
                 struct stream_cipher {
-                    typedef cipher_state<Mode<md4, Padding>, stream_endian::little_octet_big_bit, ValueBits,
+                    typedef block_state_preprocessor<Mode<md4, Padding>, stream_endian::little_octet_big_bit, ValueBits,
                                          policy_type::word_bits * 2> type_;
 #ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES
                     typedef type_ type;
@@ -66,7 +66,6 @@ namespace nil {
 #endif
                 };
 
-            public:
                 md4(const key_type &k) : key(k) {
 #ifdef CRYPTO3_BLOCK_SHOW_PROGRESS
                     for (unsigned t = 0; t < key_words; ++t) {
