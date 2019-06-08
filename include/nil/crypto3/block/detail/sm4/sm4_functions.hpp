@@ -26,7 +26,7 @@ namespace nil {
                     typedef std::array<word_type, constants_size> transposed_constants_type;
 
                     inline static word_type t_slow(word_type b, const constants_type &constants) {
-                        const word_type t = basic_functions<WordBits>::make_uint_t<32>(
+                        const word_type t = basic_functions<WordBits>::make_uint_t<WordBits>(
                                 constants[basic_functions<WordBits>::extract_uint_t<CHAR_BIT>(b, 0)],
                                 constants[basic_functions<WordBits>::extract_uint_t<CHAR_BIT>(b, 1)],
                                 constants[basic_functions<WordBits>::extract_uint_t<CHAR_BIT>(b, 2)],
@@ -49,7 +49,7 @@ namespace nil {
 
 // Variant of T for key round_constants_words
                     inline static word_type tp(word_type b, const constants_type &constants) {
-                        const uint32_t t = basic_functions<WordBits>::make_uint_t<32>(
+                        const word_type t = basic_functions<WordBits>::make_uint_t<WordBits>(
                                 constants[basic_functions<WordBits>::extract_uint_t<CHAR_BIT>(b, 0)],
                                 constants[basic_functions<WordBits>::extract_uint_t<CHAR_BIT>(b, 1)],
                                 constants[basic_functions<WordBits>::extract_uint_t<CHAR_BIT>(b, 2)],

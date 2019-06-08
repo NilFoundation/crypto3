@@ -98,10 +98,8 @@ namespace nil {
                  typename KeyIterator,
                  typename CipherAccumulator = typename block::block_accumulator<
                          typename BlockCipher::stream_encoder_type>>
-        detail::range_encrypter_impl<detail::value_encrypter_impl<CipherAccumulator>> encrypt(InputIterator first,
-                                                                                              InputIterator last,
-                                                                                              KeyIterator key_first,
-                                                                                              KeyIterator key_last) {
+        block::detail::range_encrypter_impl<block::detail::value_encrypter_impl<CipherAccumulator>> encrypt(
+                InputIterator first, InputIterator last, KeyIterator key_first, KeyIterator key_last) {
             typedef block::detail::value_encrypter_impl<CipherAccumulator> StreamEncrypterImpl;
             typedef block::detail::range_encrypter_impl<StreamEncrypterImpl> EncrypterImpl;
 
@@ -124,8 +122,8 @@ namespace nil {
         template<typename BlockCipher, typename SinglePassRange, typename KeyRange, typename OutputIterator>
         OutputIterator encrypt(const SinglePassRange &rng, const KeyRange &key, OutputIterator out) {
 
-            typedef typename detail::range_stream_encrypter_traits<typename BlockCipher::stream_encrypter_type,
-                                                                   SinglePassRange>::type CipherState;
+            typedef typename block::detail::range_stream_encrypter_traits<typename BlockCipher::stream_encrypter_type,
+                                                                          SinglePassRange>::type CipherState;
 
             typedef block::detail::value_encrypter_impl<CipherState> StreamEncrypterImpl;
             typedef block::detail::itr_encrypter_impl<StreamEncrypterImpl, OutputIterator> EncrypterImpl;
@@ -147,10 +145,10 @@ namespace nil {
         template<typename BlockCipher,
                  typename SinglePassRange,
                  typename KeyRange,
-                 typename CipherState = typename detail::range_stream_encrypter_traits<
+                 typename CipherState = typename block::detail::range_stream_encrypter_traits<
                          typename BlockCipher::stream_encrypter_type, SinglePassRange>::type>
-        detail::range_encrypter_impl<detail::value_encrypter_impl<CipherState>> encrypt(const SinglePassRange &r,
-                                                                                        const KeyRange &key) {
+        block::detail::range_encrypter_impl<detail::value_encrypter_impl<CipherState>> encrypt(const SinglePassRange &r,
+                                                                                               const KeyRange &key) {
 
             typedef block::detail::value_encrypter_impl<CipherState> StreamEncrypterImpl;
             typedef block::detail::range_encrypter_impl<StreamEncrypterImpl> EncrypterImpl;
