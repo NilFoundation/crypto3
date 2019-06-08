@@ -10,7 +10,6 @@
 #ifndef CRYPTO3_SHA3_H_
 #define CRYPTO3_SHA3_H_
 
-#include "hash.hpp"
 #include <nil/crypto3/utilities/secmem.hpp>
 
 #include <nil/crypto3/hash/keccak.hpp>

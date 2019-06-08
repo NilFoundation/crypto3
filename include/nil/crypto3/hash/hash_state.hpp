@@ -10,21 +10,9 @@
 #ifndef CRYPTO3_HASH_STATE_HPP
 #define CRYPTO3_HASH_STATE_HPP
 
-#include <array>
-#include <iterator>
+#include <boost/accumulators/framework/accumulator_set.hpp>
 
-#include <nil/concept_container/basic_concept_container.hpp>
-
-#include <nil/crypto3/hash/detail/pack.hpp>
-#include <nil/crypto3/hash/detail/static_digest.hpp>
-
-#include <nil/crypto3/utilities/secmem.hpp>
-
-#include <boost/integer.hpp>
-#include <boost/static_assert.hpp>
-#include <boost/utility/enable_if.hpp>
-
-#include <boost/range/algorithm/copy.hpp>
+#include <nil/crypto3/hash/accumulators/hash.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -39,13 +27,13 @@ namespace nil {
              * @tparam ValueBits
              * @tparam LengthBits
              */
-            template<typename Hasher, typename Endian, std::size_t ValueBits, std::size_t LengthBits>
-            struct hash_state : public basic_concept_container<typename Hasher::digest_type,
-                                                         typename Hasher::template stream_processor<ValueBits>> {
-                typedef Hasher hash_type;
-                typedef typename basic_concept_container<typename Hasher::digest_type,
-                                                   typename Hasher::template stream_processor<
-                                                           ValueBits>>::container_type container_type;
+            template<typename ProcessingMode>
+            struct hash_accumulator {
+                typedef boost::accumulators::accumulator_set<hash::static_digest<ProcessingMode::output_block_bits>,
+                                                             boost::accumulators::features<
+                                                                     accumulators::tag::hash<ProcessingMode>>> type;
+
+                typedef ProcessingMode mode_type;
             };
         }
     }

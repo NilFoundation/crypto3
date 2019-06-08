@@ -15,8 +15,6 @@
 #include <nil/crypto3/hash/detail/haifa_construction.hpp>
 #include <nil/crypto3/hash/detail/haifa_state_preprocessor.hpp>
 
-#include <nil/crypto3/hash/hash.hpp>
-
 namespace nil {
     namespace crypto3 {
         namespace hash {

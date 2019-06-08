@@ -10,8 +10,6 @@
 #ifndef CRYPTO3_GOST_3411_H_
 #define CRYPTO3_GOST_3411_H_
 
-#include <nil/crypto3/hash/hash.hpp>
-
 #include <nil/crypto3/hash/detail/gost_3411_policy.hpp>
 
 #include <nil/crypto3/block/gost28147.hpp>

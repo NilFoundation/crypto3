@@ -12,8 +12,6 @@
 
 #include <string>
 
-#include <nil/crypto3/hash/hash.hpp>
-
 #include <nil/crypto3/hash/detail/keccak/keccak_functions.hpp>
 #include <nil/crypto3/hash/detail/sponge_state_preprocessor.hpp>
 #include <nil/crypto3/hash/detail/sponge_construction.hpp>
