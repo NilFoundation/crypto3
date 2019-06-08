@@ -27,8 +27,8 @@ list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
 
      include/nil/crypto3/block/block_cipher.hpp
      include/nil/crypto3/block/cipher_state.hpp
+     include/nil/crypto3/block/cipher_value.hpp
 
-     include/nil/crypto3/block/detail/cipher_value.hpp
      include/nil/crypto3/block/detail/stream_endian.hpp
      include/nil/crypto3/block/detail/pack.hpp
      include/nil/crypto3/block/detail/digest.hpp

@@ -33,14 +33,14 @@ namespace nil {
                                 constants[basic_functions<WordBits>::extract_uint_t<CHAR_BIT>(b, 3)]);
 
                         // L linear transform
-                        return t ^ basic_functions<WordBits>::rotl<2>(t) ^ basic_functions<WordBits>::rotl<10>(t) ^
+                        return t ^ (basic_functions<WordBits>::rotl<2>(t)) ^ basic_functions<WordBits>::rotl<10>(t) ^
                                basic_functions<WordBits>::rotl<18>(t) ^ basic_functions<WordBits>::rotl<24>(t);
                     }
 
                     inline static word_type t(word_type b, const transposed_constants_type &constants) {
                         return constants[basic_functions<WordBits>::extract_uint_t<CHAR_BIT>(b, 0)] ^
-                               basic_functions<WordBits>::rotr<8>(
-                                       constants[basic_functions<WordBits>::extract_uint_t<CHAR_BIT>(b, 1)]) ^
+                               (basic_functions<WordBits>::rotr<8>(
+                                       constants[basic_functions<WordBits>::extract_uint_t<CHAR_BIT>(b, 1)])) ^
                                basic_functions<WordBits>::rotr<16>(
                                        constants[basic_functions<WordBits>::extract_uint_t<CHAR_BIT>(b, 2)]) ^
                                basic_functions<WordBits>::rotr<24>(
@@ -56,7 +56,7 @@ namespace nil {
                                 constants[basic_functions<WordBits>::extract_uint_t<CHAR_BIT>(b, 3)]);
 
                         // L' linear transform
-                        return t ^ basic_functions<WordBits>::rotl<13>(t) ^ basic_functions<WordBits>::rotl<23>(t);
+                        return t ^ (basic_functions<WordBits>::rotl<13>(t)) ^ basic_functions<WordBits>::rotl<23>(t);
                     }
                 };
             }

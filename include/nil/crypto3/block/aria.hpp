@@ -12,7 +12,7 @@
 
 #include <nil/crypto3/block/detail/aria/aria_policy.hpp>
 
-#include <nil/crypto3/block/block_state_preprocessor.hpp>
+#include <nil/crypto3/block/detail/block_state_preprocessor.hpp>
 #include <nil/crypto3/block/detail/stream_endian.hpp>
 
 #include <nil/crypto3/block/detail/utilities/cpuid/cpuid.hpp>

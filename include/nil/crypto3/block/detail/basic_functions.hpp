@@ -54,41 +54,41 @@ namespace nil {
                         return make_uint_t({args...});
                     }
 
-                    static word_type shr(word_type x, std::size_t n) {
+                    static inline word_type shr(word_type x, std::size_t n) {
                         return x >> n;
                     }
 
                     template<std::size_t n>
-                    static word_type shr(word_type x) {
+                    static inline word_type shr(word_type x) {
                         BOOST_STATIC_ASSERT(n < word_bits);
                         return x >> n;
                     }
 
-                    static word_type shl(word_type x, std::size_t n) {
+                    static inline word_type shl(word_type x, std::size_t n) {
                         return x << n;
                     }
 
                     template<std::size_t n>
-                    static word_type shl(word_type x) {
+                    static inline word_type shl(word_type x) {
                         BOOST_STATIC_ASSERT(n < word_bits);
                         return x << n;
                     }
 
-                    static word_type rotr(word_type x, std::size_t n) {
+                    static inline word_type rotr(word_type x, std::size_t n) {
                         return shr(x, n) | shl(x, word_bits - n);
                     }
 
                     template<std::size_t n>
-                    static word_type rotr(word_type x) {
+                    static inline word_type rotr(word_type x) {
                         return shr<n>(x) | shl<word_bits - n>(x);
                     }
 
-                    static word_type rotl(word_type x, std::size_t n) {
+                    static inline word_type rotl(word_type x, std::size_t n) {
                         return shl(x, n) | shr(x, word_bits - n);
                     }
 
                     template<std::size_t n>
-                    static word_type rotl(word_type x) {
+                    static inline word_type rotl(word_type x) {
                         return shl<n>(x) | shr<word_bits - n>(x);
                     }
                 };

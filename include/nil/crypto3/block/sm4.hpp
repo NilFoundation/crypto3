@@ -12,8 +12,9 @@
 
 #include <nil/crypto3/block/detail/sm4/sm4_policy.hpp>
 #include <nil/crypto3/block/detail/stream_endian.hpp>
-
 #include <nil/crypto3/block/detail/block_state_preprocessor.hpp>
+
+#include <nil/crypto3/utilities/loadstore.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -128,25 +129,16 @@ namespace nil {
                 }
 
                 void schedule_key(const key_type &key) {
-                    // System parameter or family key
-                    const uint32_t FK[4] = {0xa3b1bac6, 0x56aa3350, 0x677d9197, 0xb27022dc};
-
-                    const uint32_t CK[32] = {
-                            0x00070E15, 0x1C232A31, 0x383F464D, 0x545B6269, 0x70777E85, 0x8C939AA1, 0xA8AFB6BD,
-                            0xC4CBD2D9, 0xE0E7EEF5, 0xFC030A11, 0x181F262D, 0x343B4249, 0x50575E65, 0x6C737A81,
-                            0x888F969D, 0xA4ABB2B9, 0xC0C7CED5, 0xDCE3EAF1, 0xF8FF060D, 0x141B2229, 0x30373E45,
-                            0x4C535A61, 0x686F767D, 0x848B9299, 0xA0A7AEB5, 0xBCC3CAD1, 0xD8DFE6ED, 0xF4FB0209,
-                            0x10171E25, 0x2C333A41, 0x484F565D, 0x646B7279
-                    };
-
                     std::array<word_type, 4> K = {0};
-                    K[0] = load_be<uint32_t>(key, 0) ^ FK[0];
-                    K[1] = load_be<uint32_t>(key, 1) ^ FK[1];
-                    K[2] = load_be<uint32_t>(key, 2) ^ FK[2];
-                    K[3] = load_be<uint32_t>(key, 3) ^ FK[3];
+                    K[0] = load_be<uint32_t>(key, 0) ^ policy_type::fk[0];
+                    K[1] = load_be<uint32_t>(key, 1) ^ policy_type::fk[1];
+                    K[2] = load_be<uint32_t>(key, 2) ^ policy_type::fk[2];
+                    K[3] = load_be<uint32_t>(key, 3) ^ policy_type::fk[3];
 
                     for (size_t i = 0; i != 32; ++i) {
-                        K[i % 4] ^= policy_type::tp(K[(i + 1) % 4] ^ K[(i + 2) % 4] ^ K[(i + 3) % 4] ^ CK[i]);
+                        K[i % 4] ^= policy_type::tp(
+                                K[(i + 1) % 4] ^ K[(i + 2) % 4] ^ K[(i + 3) % 4] ^ policy_type::ck[i],
+                                policy_type::constants);
                         key_schedule[i] = K[i % 4];
                     }
                 }
