@@ -12,8 +12,7 @@
 
 #include <boost/accumulators/framework/accumulator_set.hpp>
 
-#include <nil/crypto3/block/detail/cipher_state_preprocessor.hpp>
-#include <nil/crypto3/block/detail/block_state_preprocessor.hpp>
+#include <nil/crypto3/block/accumulators/block.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -29,10 +28,10 @@ namespace nil {
              * @tparam LengthBits
              */
             template<typename ProcessingMode>
-            struct codec_accumulator {
-                typedef boost::accumulators::accumulator_set <block::digest<
-                        ProcessingMode::input_block_bits>, boost::accumulators::features<
-                        accumulators::tag::codec < ProcessingMode>>> type;
+            struct block_accumulator {
+                typedef boost::accumulators::accumulator_set<block::digest<ProcessingMode::input_block_bits>,
+                                                             boost::accumulators::features<
+                                                                     accumulators::tag::block<ProcessingMode>>> type;
 
                 typedef ProcessingMode mode_type;
             };

@@ -45,10 +45,13 @@ namespace nil {
                 constexpr static const std::size_t key_words = policy_type::key_words;
                 typedef typename policy_type::key_type key_type;
 
-                template<template<typename, typename> class Mode, std::size_t ValueBits, typename Padding>
+                template<template<typename, typename> class Mode,
+                                                      typename StateAccumulator, std::size_t ValueBits,
+                                                      typename Padding>
                 struct stream_cipher {
-                    typedef block_state_preprocessor<Mode<kasumi, Padding>, stream_endian::little_octet_big_bit, ValueBits,
-                                         policy_type::word_bits * 2> type_;
+                    typedef block_state_preprocessor<Mode<kasumi, Padding>, StateAccumulator,
+                                                     stream_endian::little_octet_big_bit, ValueBits,
+                                                     policy_type::word_bits * 2> type_;
 #ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES
                     typedef type_ type;
 #else
@@ -153,7 +156,7 @@ namespace nil {
                 key_schedule_type key_schedule;
 
                 void schedule_key(const key_type &key) {
-                    secure_vector<uint16_t> K(16);
+                    secure_vector <uint16_t> K(16);
                     for (size_t i = 0; i != rounds; ++i) {
                         K[i] = load_be<uint16_t>(key, i);
                         K[i + 8] = K[i] ^ policy_type::round_constants[i];

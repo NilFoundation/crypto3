@@ -66,14 +66,8 @@ namespace nil {
                 template<template<typename, typename> class Mode, std::size_t ValueBits, typename Padding>
                 struct stream_cipher {
                     typedef block_state_preprocessor<Mode<threefish<KeyBits>, Padding>,
-                                                             stream_endian::little_octet_big_bit, ValueBits,
-                                                             policy_type::word_bits * 2> type_;
-#ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES
-                    typedef type_ type;
-#else
-                    struct type : type_ {
-                    };
-#endif
+                                                     stream_endian::little_octet_big_bit, ValueBits,
+                                                     policy_type::word_bits * 2> type;
                 };
 
                 threefish(const key_type &key = key_type(), const tweak_type &tweak = tweak_type()) {

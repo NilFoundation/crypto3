@@ -10,7 +10,8 @@
 #ifndef CRYPTO3_BLOCK_ENCRYPT_HPP
 #define CRYPTO3_BLOCK_ENCRYPT_HPP
 
-#include <nil/crypto3/block/detail/cipher_value.hpp>
+#include <nil/crypto3/block/cipher_value.hpp>
+#include <nil/crypto3/block/cipher_state.hpp>
 
 namespace nil {
     namespace crypto3 {
