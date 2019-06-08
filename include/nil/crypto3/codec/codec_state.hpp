@@ -36,7 +36,7 @@ namespace nil {
              */
             template<typename ProcessingMode>
             struct codec_accumulator {
-                typedef boost::accumulators::accumulator_set<codec::digest<ProcessingMode::input_block_bits>,
+                typedef boost::accumulators::accumulator_set<codec::digest<ProcessingMode::output_block_bits>,
                                                              boost::accumulators::features<
                                                                      accumulators::tag::codec<ProcessingMode>>> type;
 
