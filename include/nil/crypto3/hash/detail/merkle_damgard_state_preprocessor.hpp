@@ -27,10 +27,10 @@ namespace nil {
 // This will do the usual Merkle-Damgård-style strengthening, padding with
 // a 1 bit, then 0 bits as needed, then, if requested, the length.
 //
-            template<typename Endian, unsigned ValueBits, unsigned LengthBits, typename Hasher>
+            template<typename Hash, typename Endian, unsigned ValueBits, unsigned LengthBits>
             class merkle_damgard_state_preprocessor {
             private:
-                typedef Hasher block_hash_type;
+                typedef Hash block_hash_type;
 
                 constexpr static const std::size_t word_bits = block_hash_type::word_bits;
                 typedef typename block_hash_type::word_type word_type;
