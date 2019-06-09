@@ -16,6 +16,9 @@
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
 
+#include <nil/crypto3/block/algorithm/encrypt.hpp>
+#include <nil/crypto3/block/algorithm/decrypt.hpp>
+
 #include <nil/crypto3/block/xtea.hpp>
 
 using namespace nil::crypto3::block;

@@ -143,10 +143,10 @@ namespace nil {
                 gost_28147_89(const key_type &key, const expanded_substitution_type &exp = expanded_substitution_type())
                         : expanded_substitution(exp) {
                     for (size_t i = 0; i != 256; ++i) {
-                        expanded_substitution[i] = policy_type::template rotl<11, uint32_t>(params[0][i]);
-                        expanded_substitution[i + 256] = policy_type::template rotl<19, uint32_t>(params[1][i]);
-                        expanded_substitution[i + 512] = policy_type::template rotl<27, uint32_t>(params[2][i]);
-                        expanded_substitution[i + 768] = policy_type::template rotl<3, uint32_t>(params[3][i]);
+                        expanded_substitution[i] = policy_type::template rotl<11, word_type>(params[0][i]);
+                        expanded_substitution[i + 256] = policy_type::template rotl<19, word_type>(params[1][i]);
+                        expanded_substitution[i + 512] = policy_type::template rotl<27, word_type>(params[2][i]);
+                        expanded_substitution[i + 768] = policy_type::template rotl<3, word_type>(params[3][i]);
                     }
 
                     schedule_key(key);

@@ -15,7 +15,7 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace codec {
+        namespace block {
             namespace detail {
                 template<std::size_t... Indices>
                 struct indices {

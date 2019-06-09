@@ -16,6 +16,9 @@
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
 
+#include <nil/crypto3/block/algorithm/encrypt.hpp>
+#include <nil/crypto3/block/algorithm/decrypt.hpp>
+
 #include <nil/crypto3/block/rijndael.hpp>
 
 using namespace nil::crypto3::block;
@@ -487,6 +490,10 @@ BOOST_AUTO_TEST_SUITE(rijndael_cipher_test_suite)
         BOOST_CHECK_EQUAL(f.cipher_text, f.original_cipher_text);
         f.decrypt();
         BOOST_CHECK_EQUAL(f.plaintext, f.original_plaintext);
+    }
+
+    BOOST_AUTO_TEST_CASE(rijndael_256_256_cipher) {
+
     }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -160,9 +160,10 @@ namespace nil {
                     const word_type KL_H = boost::endian::native_to_big(key[0]);
                     const word_type KL_L = boost::endian::native_to_big(key[1]);
 
-                    const word_type KR_H = (key.size() >= 24) ? load_be<uint64_t>(key, 2) : 0;
-                    const word_type KR_L = (key.size() == 32) ? load_be<uint64_t>(key, 3) : ((key.size() == 24) ? ~KR_H
-                                                                                                                : 0);
+                    const word_type KR_H = (key.size() >= 24) ? boost::endian::native_to_big(key[2]) : 0;
+                    const word_type KR_L = (key.size() == 32) ? boost::endian::native_to_big(key[3]) : ((key.size() ==
+                                                                                                         24) ? ~KR_H
+                                                                                                             : 0);
 
                     word_type D1 = KL_H ^KR_H;
                     word_type D2 = KL_L ^KR_L;

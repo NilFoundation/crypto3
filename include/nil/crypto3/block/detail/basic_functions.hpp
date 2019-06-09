@@ -28,8 +28,6 @@ namespace nil {
 
                     template<std::size_t Size, typename Integer>
                     static inline typename boost::uint_t<Size>::exact extract_uint_t(Integer v, std::size_t position) {
-                        BOOST_ASSERT(std::numeric_limits<Integer>::digits <= position * CHAR_BIT + Size);
-
                         return static_cast<typename boost::uint_t<Size>::exact>(v
                                 >> (((~position) & (sizeof(Integer) - 1)) << 3));
                     }
@@ -51,7 +49,10 @@ namespace nil {
 
                     template<std::size_t Size, typename ...Args>
                     static inline typename boost::uint_t<Size>::exact make_uint_t(Args... args) {
-                        return basic_functions<WordBits>::template make_uint_t<Size, typename std::tuple_element<0,std::tuple<Args...>>::type>({args...});
+                        return basic_functions<WordBits>::template make_uint_t<Size, typename std::tuple_element<0,
+                                                                                                                 std::tuple<
+                                                                                                                         Args...>>::type>(
+                                {args...});
                     }
 
                     static inline word_type shr(word_type x, std::size_t n) {

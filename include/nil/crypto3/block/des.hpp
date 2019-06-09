@@ -192,8 +192,6 @@ namespace nil {
                 }
 
                 inline block_type encrypt_block(const block_type &plaintext) {
-                    block_type out = {0};
-
                     uint64_t T = (policy_type::iptab1[plaintext[0]]) | (policy_type::iptab1[plaintext[1]] << 1) |
                                  (policy_type::iptab1[plaintext[2]] << 2) | (policy_type::iptab1[plaintext[3]] << 3) |
                                  (policy_type::iptab1[plaintext[4]] << 4) | (policy_type::iptab1[plaintext[5]] << 5) |
@@ -221,7 +219,6 @@ namespace nil {
                 }
 
                 inline block_type decrypt_block(const block_type &ciphertext) {
-                    block_type out = {0};
                     uint64_t T = (policy_type::iptab1[ciphertext[0]]) | (policy_type::iptab1[ciphertext[1]] << 1) |
                                  (policy_type::iptab1[ciphertext[2]] << 2) | (policy_type::iptab1[ciphertext[3]] << 3) |
                                  (policy_type::iptab1[ciphertext[4]] << 4) | (policy_type::iptab1[ciphertext[5]] << 5) |

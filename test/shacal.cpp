@@ -27,6 +27,9 @@
 #include <nil/crypto3/block/shacal1.hpp>
 #include <nil/crypto3/block/shacal2.hpp>
 
+#include <nil/crypto3/block/algorithm/encrypt.hpp>
+#include <nil/crypto3/block/algorithm/decrypt.hpp>
+
 using namespace nil::crypto3;
 
 struct state_adder {

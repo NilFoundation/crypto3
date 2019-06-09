@@ -63,9 +63,11 @@ namespace nil {
                 typedef typename policy_type::key_schedule_type key_schedule_type;
                 typedef typename policy_type::tweak_schedule_type tweak_schedule_type;
 
-                template<template<typename, typename> class Mode, std::size_t ValueBits, typename Padding>
+                template<template<typename, typename> class Mode,
+                                                      typename StateAccumulator, std::size_t ValueBits,
+                                                      typename Padding>
                 struct stream_cipher {
-                    typedef block_state_preprocessor<Mode<threefish<KeyBits>, Padding>,
+                    typedef block_state_preprocessor<Mode<threefish<KeyBits>, Padding>, StateAccumulator,
                                                      stream_endian::little_octet_big_bit, ValueBits,
                                                      policy_type::word_bits * 2> type;
                 };
