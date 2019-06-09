@@ -19,7 +19,7 @@ namespace nil {
         namespace block {
             namespace detail {
                 struct idea_policy : idea_functions<16> {
-                    static const std::size_t rounds = 8;
+                    constexpr static const std::size_t rounds = 8;
 
                     constexpr static const std::size_t block_bits = 64;
                     constexpr static const std::size_t block_words = block_bits / word_bits;

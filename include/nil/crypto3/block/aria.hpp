@@ -10,12 +10,14 @@
 #ifndef CRYPTO3_ARIA_H_
 #define CRYPTO3_ARIA_H_
 
+#include <boost/endian/arithmetic.hpp>
+
 #include <nil/crypto3/block/detail/aria/aria_policy.hpp>
 
 #include <nil/crypto3/block/detail/block_state_preprocessor.hpp>
 #include <nil/crypto3/block/detail/stream_endian.hpp>
 
-#include <nil/crypto3/block/detail/utilities/cpuid/cpuid.hpp>
+#include <nil/crypto3/utilities/cpuid/cpuid.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -107,10 +109,10 @@ namespace nil {
                     word_type w2[4];
                     word_type w3[4];
 
-                    w0[0] = load_be<uint32_t>(key, 0);
-                    w0[1] = load_be<uint32_t>(key, 1);
-                    w0[2] = load_be<uint32_t>(key, 2);
-                    w0[3] = load_be<uint32_t>(key, 3);
+                    w0[0] = boost::endian::native_to_big(key[0]);
+                    w0[1] = boost::endian::native_to_big(key[1]);
+                    w0[2] = boost::endian::native_to_big(key[2]);
+                    w0[3] = boost::endian::native_to_big(key[3]);
 
                     w1[0] = w0[0] ^ policy_type::round_constants[CK0][0];
                     w1[1] = w0[1] ^ policy_type::round_constants[CK0][1];
@@ -120,12 +122,12 @@ namespace nil {
                     policy_type::fo(w1[0], w1[1], w1[2], w1[3]);
 
                     if (policy_type::key_bits / 8 == 24 || policy_type::key_bits / 8 == 32) {
-                        w1[0] ^= load_be<uint32_t>(key, 4);
-                        w1[1] ^= load_be<uint32_t>(key, 5);
+                        w1[0] ^= boost::endian::native_to_big(key[4]);
+                        w1[1] ^= boost::endian::native_to_big(key[5]);
                     }
                     if (policy_type::key_bits / 8 == 32) {
-                        w1[2] ^= load_be<uint32_t>(key, 6);
-                        w1[3] ^= load_be<uint32_t>(key, 7);
+                        w1[2] ^= boost::endian::native_to_big(key[6]);
+                        w1[3] ^= boost::endian::native_to_big(key[7]);
                     }
 
                     w2[0] = w1[0] ^ policy_type::round_constants[CK1][0];
@@ -234,7 +236,10 @@ namespace nil {
                         Z |= policy_type::s1[i] | policy_type::s2[i];
                     }
 
-                    word_type t0 = plaintext[0], t1 = plaintext[1], t2 = plaintext[2], t3 = plaintext[3];
+                    word_type t0 = boost::endian::native_to_big(plaintext[0]);
+                    word_type t1 = boost::endian::native_to_big(plaintext[1]);
+                    word_type t2 = boost::endian::native_to_big(plaintext[2]);
+                    word_type t3 = boost::endian::native_to_big(plaintext[3]);
 
                     t0 &= Z;
 

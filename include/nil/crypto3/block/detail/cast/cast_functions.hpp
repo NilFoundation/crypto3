@@ -10,9 +10,9 @@
 #ifndef CRYPTO3_CAST_FUNCTIONS_CPP_HPP
 #define CRYPTO3_CAST_FUNCTIONS_CPP_HPP
 
-#include <nil/crypto3/block/detail/cast/basic_cast_policy.hpp>
+#include <boost/endian/arithmetic.hpp>
 
-#include <nil/crypto3/utilities/loadstore.hpp>
+#include <nil/crypto3/block/detail/cast/basic_cast_policy.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -70,10 +70,10 @@ namespace nil {
                      */
                     inline static word_type f1(word_type R, word_type MK, byte_type RK) {
                         const word_type T = rotl_var(MK + R, RK);
-                        return (policy_type::sbox1[extract_uint_t<CHAR_BIT>(T, 0)] ^
-                                policy_type::sbox2[extract_uint_t<CHAR_BIT>(T, 1)]) -
-                               policy_type::sbox3[extract_uint_t<CHAR_BIT>(T, 2)] +
-                               policy_type::sbox4[extract_uint_t<CHAR_BIT>(T, 3)];
+                        return (policy_type::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(T, 0)] ^
+                                policy_type::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(T, 1)]) -
+                               policy_type::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(T, 2)] +
+                               policy_type::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(T, 3)];
                     }
 
 /*
@@ -81,10 +81,10 @@ namespace nil {
 */
                     inline static word_type f2(word_type R, word_type MK, byte_type RK) {
                         const uint32_t T = rotl_var(MK ^ R, RK);
-                        return (policy_type::sbox1[extract_uint_t<CHAR_BIT>(T, 0)] -
-                                policy_type::sbox2[extract_uint_t<CHAR_BIT>(T, 1)] +
-                                policy_type::sbox3[extract_uint_t<CHAR_BIT>(T, 2)]) ^
-                               policy_type::sbox4[extract_uint_t<CHAR_BIT>(T, 3)];
+                        return (policy_type::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(T, 0)] -
+                                policy_type::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(T, 1)] +
+                                policy_type::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(T, 2)]) ^
+                               policy_type::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(T, 3)];
                     }
 
 /*
@@ -92,10 +92,10 @@ namespace nil {
 */
                     inline static word_type f3(word_type R, word_type MK, byte_type RK) {
                         const uint32_t T = rotl_var(MK - R, RK);
-                        return ((policy_type::sbox1[extract_uint_t<CHAR_BIT>(T, 0)] +
-                                 policy_type::sbox2[extract_uint_t<CHAR_BIT>(T, 1)]) ^
-                                policy_type::sbox3[extract_uint_t<CHAR_BIT>(T, 2)]) -
-                               policy_type::sbox4[extract_uint_t<CHAR_BIT>(T, 3)];
+                        return ((policy_type::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(T, 0)] +
+                                 policy_type::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(T, 1)]) ^
+                                policy_type::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(T, 2)]) -
+                               policy_type::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(T, 3)];
                     }
 
                     inline static void cast_ks(key_schedule_type &K, std::array<word_type, 4> &X) {
@@ -301,10 +301,8 @@ namespace nil {
                     inline static block_type encrypt_block(const block_type &plaintext,
                                                            const key_schedule_type &key_schedule,
                                                            const rotation_key_schedule_type &rkey_schedule) {
-                        block_type out = {0};
-
-                        word_type L, R;
-                        load_be(plaintext.data(), L, R);
+                        word_type L = boost::endian::native_to_big(plaintext[0]);
+                        word_type R = boost::endian::native_to_big(plaintext[1]);
 
                         L ^= policy_type::f1(R, key_schedule[0], rkey_schedule[0]);
                         R ^= policy_type::f2(L, key_schedule[1], rkey_schedule[1]);
@@ -323,17 +321,14 @@ namespace nil {
                         L ^= policy_type::f3(R, key_schedule[14], rkey_schedule[14]);
                         R ^= policy_type::f1(L, key_schedule[15], rkey_schedule[15]);
 
-                        store_be(out.data(), R, L);
-
-                        return out;
+                        return {boost::endian::big_to_native(R), boost::endian::big_to_native(L)};
                     }
 
                     inline static block_type decrypt_block(const block_type &ciphertext,
                                                            const key_schedule_type &key_schedule,
                                                            const rotation_key_schedule_type &rkey_schedule) {
-                        block_type out = {0};
-                        word_type L, R;
-                        load_be(ciphertext.data(), L, R);
+                        word_type L = boost::endian::native_to_big(ciphertext[0]);
+                        word_type R = boost::endian::native_to_big(ciphertext[1]);
 
                         L ^= policy_type::f1(R, key_schedule[15], rkey_schedule[15]);
                         R ^= policy_type::f3(L, key_schedule[14], rkey_schedule[14]);
@@ -352,8 +347,7 @@ namespace nil {
                         L ^= policy_type::f2(R, key_schedule[1], rkey_schedule[1]);
                         R ^= policy_type::f1(L, key_schedule[0], rkey_schedule[0]);
 
-                        store_be(out.data(), R, L);
-                        return out;
+                        return {boost::endian::big_to_native(R), boost::endian::big_to_native(L)};
                     }
 
                     inline static void schedule_key(const key_type &key, key_schedule_type &key_schedule,
@@ -408,10 +402,10 @@ namespace nil {
 */
                     static inline void round1(word_type &out, word_type in, word_type MK, word_type RK) {
                         const word_type T = rotl_var(MK + in, RK);
-                        out ^= (policy_type::sbox1[extract_uint_t<CHAR_BIT>(T, 0)] ^
-                                policy_type::sbox2[extract_uint_t<CHAR_BIT>(T, 1)]) -
-                               policy_type::sbox3[extract_uint_t<CHAR_BIT>(T, 2)] +
-                               policy_type::sbox4[extract_uint_t<CHAR_BIT>(T, 3)];
+                        out ^= (policy_type::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(T, 0)] ^
+                                policy_type::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(T, 1)]) -
+                               policy_type::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(T, 2)] +
+                               policy_type::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(T, 3)];
                     }
 
 /*
@@ -419,10 +413,10 @@ namespace nil {
 */
                     static inline void round2(word_type &out, word_type in, word_type MK, word_type RK) {
                         const word_type T = rotl_var(MK ^ in, RK);
-                        out ^= (policy_type::sbox1[extract_uint_t<CHAR_BIT>(T, 0)] -
-                                policy_type::sbox2[extract_uint_t<CHAR_BIT>(T, 1)] +
-                                policy_type::sbox3[extract_uint_t<CHAR_BIT>(T, 2)]) ^
-                               policy_type::sbox4[extract_uint_t<CHAR_BIT>(T, 3)];
+                        out ^= (policy_type::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(T, 0)] -
+                                policy_type::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(T, 1)] +
+                                policy_type::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(T, 2)]) ^
+                               policy_type::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(T, 3)];
                     }
 
 /*
@@ -430,21 +424,19 @@ namespace nil {
 */
                     static inline void round3(word_type &out, word_type in, word_type MK, word_type RK) {
                         const word_type T = rotl_var(MK - in, RK);
-                        out ^= ((policy_type::sbox1[extract_uint_t<CHAR_BIT>(T, 0)] +
-                                 policy_type::sbox2[extract_uint_t<CHAR_BIT>(T, 1)]) ^
-                                policy_type::sbox3[extract_uint_t<CHAR_BIT>(T, 2)]) -
-                               policy_type::sbox4[extract_uint_t<CHAR_BIT>(T, 3)];
+                        out ^= ((policy_type::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(T, 0)] +
+                                 policy_type::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(T, 1)]) ^
+                                policy_type::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(T, 2)]) -
+                               policy_type::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(T, 3)];
                     }
 
                     inline static block_type encrypt_block(const block_type &plaintext,
                                                            const key_schedule_type &key_schedule,
                                                            const rotation_key_schedule_type &rkey_schedule) {
-                        block_type out = {0};
-
-                        word_type A = load_be<uint32_t>(plaintext.data(), 0);
-                        word_type B = load_be<uint32_t>(plaintext.data(), 1);
-                        word_type C = load_be<uint32_t>(plaintext.data(), 2);
-                        word_type D = load_be<uint32_t>(plaintext.data(), 3);
+                        word_type A = boost::endian::native_to_big(plaintext[0]);
+                        word_type B = boost::endian::native_to_big(plaintext[1]);
+                        word_type C = boost::endian::native_to_big(plaintext[2]);
+                        word_type D = boost::endian::native_to_big(plaintext[3]);
 
                         round1(C, D, key_schedule[0], rkey_schedule[0]);
                         round2(B, C, key_schedule[1], rkey_schedule[1]);
@@ -495,20 +487,19 @@ namespace nil {
                         round2(B, C, key_schedule[45], rkey_schedule[45]);
                         round1(C, D, key_schedule[44], rkey_schedule[44]);
 
-                        store_be(out.data(), A, B, C, D);
-
-                        return out;
+                        return {
+                                boost::endian::big_to_native(A), boost::endian::big_to_native(B),
+                                boost::endian::big_to_native(C), boost::endian::big_to_native(D)
+                        };
                     }
 
                     inline static block_type decrypt_block(const block_type &ciphertext,
                                                            const key_schedule_type &key_schedule,
                                                            const rotation_key_schedule_type &rkey_schedule) {
-                        block_type out = {0};
-
-                        word_type A = load_be<uint32_t>(ciphertext.data(), 0);
-                        word_type B = load_be<uint32_t>(ciphertext.data(), 1);
-                        word_type C = load_be<uint32_t>(ciphertext.data(), 2);
-                        word_type D = load_be<uint32_t>(ciphertext.data(), 3);
+                        word_type A = boost::endian::native_to_big(ciphertext[0]);
+                        word_type B = boost::endian::native_to_big(ciphertext[1]);
+                        word_type C = boost::endian::native_to_big(ciphertext[2]);
+                        word_type D = boost::endian::native_to_big(ciphertext[3]);
 
                         round1(C, D, key_schedule[44], rkey_schedule[44]);
                         round2(B, C, key_schedule[45], rkey_schedule[45]);
@@ -559,9 +550,10 @@ namespace nil {
                         round2(B, C, key_schedule[1], rkey_schedule[1]);
                         round1(C, D, key_schedule[0], rkey_schedule[0]);
 
-                        store_be(out.data(), A, B, C, D);
-
-                        return out;
+                        return {
+                                boost::endian::big_to_native(A), boost::endian::big_to_native(B),
+                                boost::endian::big_to_native(C), boost::endian::big_to_native(D)
+                        };
                     }
 
                     static inline void schedule_key(const key_type &key, key_schedule_type &key_schedule,

@@ -10,6 +10,8 @@
 #ifndef CRYPTO3_SERPENT_H_
 #define CRYPTO3_SERPENT_H_
 
+#include <boost/endian/arithmetic.hpp>
+
 #include <nil/crypto3/block/detail/serpent/serpent_policy.hpp>
 
 #include <nil/crypto3/block/detail/block_state_preprocessor.hpp>
@@ -85,10 +87,10 @@ namespace nil {
                 key_schedule_type key_schedule;
 
                 inline block_type encrypt_block(const block_type &plaintext) {
-                    block_type out = {0};
-
-                    word_type B0, B1, B2, B3;
-                    load_le(plaintext.data(), B0, B1, B2, B3);
+                    word_type B0 = boost::endian::native_to_little(plaintext[0]);
+                    word_type B1 = boost::endian::native_to_little(plaintext[1]);
+                    word_type B2 = boost::endian::native_to_little(plaintext[2]);
+                    word_type B3 = boost::endian::native_to_little(plaintext[3]);
 
                     key_xor(0, B0, B1, B2, B3);
                     SBoxE1(B0, B1, B2, B3);
@@ -187,16 +189,17 @@ namespace nil {
                     SBoxE8(B0, B1, B2, B3);
                     key_xor(32, B0, B1, B2, B3);
 
-                    store_le(out.data(), B0, B1, B2, B3);
-
-                    return out;
+                    return {
+                            boost::endian::little_to_native(B0), boost::endian::little_to_native(B1),
+                            boost::endian::little_to_native(B2), boost::endian::little_to_native(B3)
+                    };
                 }
 
                 inline block_type decrypt_block(const block_type &ciphertext) {
-                    block_type out = {0};
-
-                    word_type B0, B1, B2, B3;
-                    load_le(ciphertext.data(), B0, B1, B2, B3);
+                    word_type B0 = ciphertext[0];
+                    word_type B1 = ciphertext[1];
+                    word_type B2 = ciphertext[2];
+                    word_type B3 = ciphertext[3];
 
                     key_xor(32, B0, B1, B2, B3);
                     SBoxD8(B0, B1, B2, B3);
@@ -295,24 +298,23 @@ namespace nil {
                     SBoxD1(B0, B1, B2, B3);
                     key_xor(0, B0, B1, B2, B3);
 
-                    store_le(out.data(), B0, B1, B2, B3);
-
-                    return out;
+                    return {
+                            boost::endian::little_to_native(B0), boost::endian::little_to_native(B1),
+                            boost::endian::little_to_native(B2), boost::endian::little_to_native(B3)
+                    };
                 }
 
                 void schedule_key(const key_type &key) {
-                    const word_type PHI = 0x9E3779B9;
-
                     std::array<word_type, 140> W = {0};
                     for (size_t i = 0; i != key.size() / 4; ++i) {
-                        W[i] = load_le<uint32_t>(key, i);
+                        W[i] = boost::endian::native_to_little(key[i]);
                     }
 
                     W[key.size() / 4] |= word_type(1) << ((key.size() % 4) * 8);
 
                     for (size_t i = 8; i != 140; ++i) {
-                        word_type wi = W[i - 8] ^W[i - 5] ^W[i - 3] ^W[i - 1] ^PHI ^word_type(i - 8);
-                        W[i] = rotl<11>(wi);
+                        word_type wi = W[i - 8] ^W[i - 5] ^W[i - 3] ^W[i - 1] ^policy_type::phi ^word_type(i - 8);
+                        W[i] = policy_type::template rotl<11>(wi);
                     }
 
                     SBoxE1(W[20], W[21], W[22], W[23]);
@@ -357,6 +359,8 @@ namespace nil {
                     SBoxE8(W[120], W[121], W[122], W[123]);
 
                     key_schedule.assign(W.begin() + 8, W.end());
+
+                    W.fill(0);
                 }
             };
         }

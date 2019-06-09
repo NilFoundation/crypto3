@@ -10,6 +10,8 @@
 #ifndef CRYPTO3_XTEA_H_
 #define CRYPTO3_XTEA_H_
 
+#include <boost/endian/arithmetic.hpp>
+
 #include <nil/crypto3/block/detail/xtea/xtea_policy.hpp>
 
 #include <nil/crypto3/block/detail/block_state_preprocessor.hpp>
@@ -46,10 +48,13 @@ namespace nil {
                 constexpr static const std::size_t key_words = policy_type::key_words;
                 typedef typename policy_type::key_type key_type;
 
-                template<template<typename, typename> class Mode, std::size_t ValueBits, typename Padding>
+                template<template<typename, typename> class Mode,
+                                                      typename StateAccumulator, std::size_t ValueBits,
+                                                      typename Padding>
                 struct stream_cipher {
-                    typedef block_state_preprocessor<Mode<xtea, Padding>, stream_endian::little_octet_big_bit,
-                                                     ValueBits, policy_type::word_bits * 2> type;
+                    typedef block_state_preprocessor<Mode<xtea, Padding>, StateAccumulator,
+                                                     stream_endian::little_octet_big_bit, ValueBits,
+                                                     policy_type::word_bits * 2> type;
                 };
 
                 xtea(const key_type &key) {
@@ -72,41 +77,33 @@ namespace nil {
                 key_schedule_type key_schedule;
 
                 inline block_type encrypt_block(const block_type &plaintext) {
-                    block_type out = {0};
-
-                    word_type L, R;
-                    load_be(plaintext.data(), L, R);
+                    word_type L = boost::endian::native_to_big(plaintext[0]);
+                    word_type R = boost::endian::native_to_big(plaintext[1]);
 
                     for (size_t r = 0; r != rounds; ++r) {
                         L += (((R << 4) ^ (R >> 5)) + R) ^ key_schedule[2 * r];
                         R += (((L << 4) ^ (L >> 5)) + L) ^ key_schedule[2 * r + 1];
                     }
 
-                    store_be(out.data(), L, R);
-
-                    return out;
+                    return {boost::endian::big_to_native(L), boost::endian::big_to_native(R)};
                 }
 
                 inline block_type decrypt_block(const block_type &ciphertext) {
-                    block_type out = {0};
-
-                    word_type L, R;
-                    load_be(ciphertext.data(), L, R);
+                    word_type L = boost::endian::native_to_big(ciphertext[0]);
+                    word_type R = boost::endian::native_to_big(ciphertext[1]);
 
                     for (size_t r = 0; r != rounds; ++r) {
                         R -= (((L << 4) ^ (L >> 5)) + L) ^ key_schedule[63 - 2 * r];
                         L -= (((R << 4) ^ (R >> 5)) + R) ^ key_schedule[62 - 2 * r];
                     }
 
-                    store_be(out.data(), L, R);
-
-                    return out;
+                    return {boost::endian::big_to_native(L), boost::endian::big_to_native(R)};
                 }
 
                 inline void schedule_key(const key_type &key) {
                     std::array<word_type, 4> UK = {0};
                     for (size_t i = 0; i != 4; ++i) {
-                        UK[i] = load_be<uint32_t>(key, i);
+                        UK[i] = boost::endian::native_to_big(key[i]);
                     }
 
                     uint32_t D = 0;

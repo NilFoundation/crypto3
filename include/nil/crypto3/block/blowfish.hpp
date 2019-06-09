@@ -112,7 +112,7 @@ namespace nil {
 
                     const size_t p_salt_offset = (!salt.empty()) ? policy_type::permutations_size % salt.size() : 0;
 
-                    uint32_t L = 0, R = 0;
+                    word_type L = 0, R = 0;
                     generate_sbox(permutations, L, R, salt, 0);
                     generate_sbox(constants, L, R, salt, p_salt_offset);
                 }
@@ -134,7 +134,7 @@ namespace nil {
                             L ^= policy_type::bff(R, constants);
                         }
 
-                        uint32_t T = R;
+                        word_type T = R;
                         R = L ^ permutations[16];
                         L = T ^ permutations[17];
                         box[i] = L;

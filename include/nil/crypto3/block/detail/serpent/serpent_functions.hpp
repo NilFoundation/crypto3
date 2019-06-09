@@ -10,6 +10,8 @@
 #ifndef CRYPTO3_SERPENT_FUNCTIONS_CPP_HPP
 #define CRYPTO3_SERPENT_FUNCTIONS_CPP_HPP
 
+#include <boost/endian/arithmetic.hpp>
+
 #include <nil/crypto3/block/detail/basic_functions.hpp>
 
 namespace nil {

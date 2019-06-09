@@ -13,7 +13,9 @@
 #include <boost/range/adaptor/sliced.hpp>
 
 #include <nil/crypto3/block/block_cipher.hpp>
+
 #include <nil/crypto3/block/detail/block_state_preprocessor.hpp>
+#include <nil/crypto3/block/detail/cipher_modes.hpp>
 
 #include <nil/crypto3/block/detail/rijndael/rijndael_policy.hpp>
 #include <nil/crypto3/block/detail/rijndael/rijndael_impl.hpp>
@@ -145,9 +147,9 @@ namespace nil {
                                                       typename StateAccumulator, std::size_t ValueBits,
                                                       typename Padding>
                 struct stream_cipher {
-                    typedef cipher_state<Mode<rijndael<KeyBits, BlockBits>, Padding>, StateAccumulator,
-                                         stream_endian::little_octet_big_bit, ValueBits,
-                                         policy_type::word_bits * 2> type_;
+                    typedef block_state_preprocessor<Mode<rijndael<KeyBits, BlockBits>, Padding>, StateAccumulator,
+                                                     stream_endian::little_octet_big_bit, ValueBits,
+                                                     policy_type::word_bits * 2> type_;
 #ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES
                     typedef type_ type;
 #else

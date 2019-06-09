@@ -81,98 +81,105 @@ namespace nil {
                 key_schedule_type key_schedule;
 
                 inline block_type encrypt_block(const block_type &plaintext) {
-//                    word_type B0 = load_be<uint32_t>(plaintext.data(), 0);
-//                    word_type B1 = load_be<uint32_t>(plaintext.data(), 1);
-//                    word_type B2 = load_be<uint32_t>(plaintext.data(), 2);
-//                    word_type B3 = load_be<uint32_t>(plaintext.data(), 3);
-
-                    word_type B0 = plaintext[0];
-                    word_type B1 = plaintext[1];
-                    word_type B2 = plaintext[2];
-                    word_type B3 = plaintext[3];
+                    word_type B0 = boost::endian::native_to_big(plaintext[0]);
+                    word_type B1 = boost::endian::native_to_big(plaintext[1]);
+                    word_type B2 = boost::endian::native_to_big(plaintext[2]);
+                    word_type B3 = boost::endian::native_to_big(plaintext[3]);
 
                     for (size_t j = 0; j != policy_type::rounds; j += 2) {
                         word_type T0, T1;
 
                         T0 = B2 ^ key_schedule[2 * j];
-                        T1 = policy_type::g(B2 ^ B3 ^ key_schedule[2 * j + 1]);
-                        T0 = policy_type::g(T1 + T0);
-                        T1 = policy_type::g(T1 + T0);
+                        T1 = policy_type::g(B2 ^ B3 ^ key_schedule[2 * j + 1], policy_type::s0_constants,
+                                policy_type::s1_constants, policy_type::s2_constants, policy_type::s3_constants);
+                        T0 = policy_type::g(T1 + T0, policy_type::s0_constants, policy_type::s1_constants,
+                                policy_type::s2_constants, policy_type::s3_constants);
+                        T1 = policy_type::g(T1 + T0, policy_type::s0_constants, policy_type::s1_constants,
+                                policy_type::s2_constants, policy_type::s3_constants);
                         B1 ^= T1;
                         B0 ^= T0 + T1;
 
                         T0 = B0 ^ key_schedule[2 * j + 2];
-                        T1 = policy_type::g(B0 ^ B1 ^ key_schedule[2 * j + 3]);
-                        T0 = policy_type::g(T1 + T0);
-                        T1 = policy_type::g(T1 + T0);
+                        T1 = policy_type::g(B0 ^ B1 ^ key_schedule[2 * j + 3], policy_type::s0_constants,
+                                policy_type::s1_constants, policy_type::s2_constants, policy_type::s3_constants);
+                        T0 = policy_type::g(T1 + T0, policy_type::s0_constants, policy_type::s1_constants,
+                                policy_type::s2_constants, policy_type::s3_constants);
+                        T1 = policy_type::g(T1 + T0, policy_type::s0_constants, policy_type::s1_constants,
+                                policy_type::s2_constants, policy_type::s3_constants);
                         B3 ^= T1;
                         B2 ^= T0 + T1;
                     }
 
-//                    block_type out = {0};
-//                    store_be(out.data(), B2, B3, B0, B1);
-
-                    return {B2, B3, B0, B1};
+                    return {
+                            boost::endian::big_to_native(B2), boost::endian::big_to_native(B3),
+                            boost::endian::big_to_native(B0), boost::endian::big_to_native(B1)
+                    };
                 }
 
                 inline block_type decrypt_block(const block_type &ciphertext) {
-                    block_type out = {0};
-
-                    word_type B0 = ciphertext[0];
-                    word_type B1 = ciphertext[1];
-                    word_type B2 = ciphertext[2];
-                    word_type B3 = ciphertext[3];
-
-//                    word_type B0 = load_be<uint32_t>(ciphertext.data(), 0);
-//                    word_type B1 = load_be<uint32_t>(ciphertext.data(), 1);
-//                    word_type B2 = load_be<uint32_t>(ciphertext.data(), 2);
-//                    word_type B3 = load_be<uint32_t>(ciphertext.data(), 3);
+                    word_type B0 = boost::endian::native_to_big(ciphertext[0]);
+                    word_type B1 = boost::endian::native_to_big(ciphertext[1]);
+                    word_type B2 = boost::endian::native_to_big(ciphertext[2]);
+                    word_type B3 = boost::endian::native_to_big(ciphertext[3]);
 
                     for (size_t j = 0; j != policy_type::rounds; j += 2) {
                         word_type T0, T1;
 
                         T0 = B2 ^ key_schedule[30 - 2 * j];
-                        T1 = policy_type::g(B2 ^ B3 ^ key_schedule[31 - 2 * j]);
-                        T0 = policy_type::g(T1 + T0);
-                        T1 = policy_type::g(T1 + T0);
+                        T1 = policy_type::g(B2 ^ B3 ^ key_schedule[31 - 2 * j], policy_type::s0_constants,
+                                policy_type::s1_constants, policy_type::s2_constants, policy_type::s3_constants);
+                        T0 = policy_type::g(T1 + T0, policy_type::s0_constants, policy_type::s1_constants,
+                                policy_type::s2_constants, policy_type::s3_constants);
+                        T1 = policy_type::g(T1 + T0, policy_type::s0_constants, policy_type::s1_constants,
+                                policy_type::s2_constants, policy_type::s3_constants);
                         B1 ^= T1;
                         B0 ^= T0 + T1;
 
                         T0 = B0 ^ key_schedule[28 - 2 * j];
-                        T1 = policy_type::g(B0 ^ B1 ^ key_schedule[29 - 2 * j]);
-                        T0 = policy_type::g(T1 + T0);
-                        T1 = policy_type::g(T1 + T0);
+                        T1 = policy_type::g(B0 ^ B1 ^ key_schedule[29 - 2 * j], policy_type::s0_constants,
+                                policy_type::s1_constants, policy_type::s2_constants, policy_type::s3_constants);
+                        T0 = policy_type::g(T1 + T0, policy_type::s0_constants, policy_type::s1_constants,
+                                policy_type::s2_constants, policy_type::s3_constants);
+                        T1 = policy_type::g(T1 + T0, policy_type::s0_constants, policy_type::s1_constants,
+                                policy_type::s2_constants, policy_type::s3_constants);
                         B3 ^= T1;
                         B2 ^= T0 + T1;
                     }
 
-//                    store_be(out.data(), B2, B3, B0, B1);
-
-                    return {B2, B3, B0, B1};
+                    return {
+                            boost::endian::big_to_native(B2), boost::endian::big_to_native(B3),
+                            boost::endian::big_to_native(B0), boost::endian::big_to_native(B1)
+                    };
                 }
 
                 inline void schedule_key(const key_type &key) {
                     std::array<word_type, 4> WK = {0};
 
                     for (size_t i = 0; i != 4; ++i) {
-                        WK[i] = load_be<uint32_t>(key, i);
+                        WK[i] = boost::endian::native_to_big(key[i]);
                     }
 
                     for (size_t i = 0; i != 16; i += 2) {
-                        key_schedule[2 * i] = policy_type::g(WK[0] + WK[2] - policy_type::round_constants[i]);
-                        key_schedule[2 * i + 1] =
-                                policy_type::g(WK[1] - WK[3] + policy_type::round_constants[i]) ^ key_schedule[2 * i];
+                        key_schedule[2 * i] = policy_type::g(WK[0] + WK[2] - policy_type::round_constants[i],
+                                policy_type::s0_constants, policy_type::s1_constants, policy_type::s2_constants,
+                                policy_type::s3_constants);
+                        key_schedule[2 * i + 1] = policy_type::g(WK[1] - WK[3] + policy_type::round_constants[i],
+                                policy_type::s0_constants, policy_type::s1_constants, policy_type::s2_constants,
+                                policy_type::s3_constants) ^ key_schedule[2 * i];
 
                         uint32_t T = (WK[0] & 0xFF) << 24;
-                        WK[0] = (WK[0] >> 8) | (get_byte(3, WK[1]) << 24);
+                        WK[0] = (WK[0] >> 8) | (policy_type::template extract_uint_t<CHAR_BIT>(WK[1], 3) << 24);
                         WK[1] = (WK[1] >> 8) | T;
 
-                        key_schedule[2 * i + 2] = policy_type::g(WK[0] + WK[2] - policy_type::round_constants[i + 1]);
-                        key_schedule[2 * i + 3] = policy_type::g(WK[1] - WK[3] + policy_type::round_constants[i + 1]) ^
-                                                  key_schedule[2 * i + 2];
+                        key_schedule[2 * i + 2] = policy_type::g(WK[0] + WK[2] - policy_type::round_constants[i + 1],
+                                policy_type::s0_constants, policy_type::s1_constants, policy_type::s2_constants,
+                                policy_type::s3_constants);
+                        key_schedule[2 * i + 3] = policy_type::g(WK[1] - WK[3] + policy_type::round_constants[i + 1],
+                                policy_type::s0_constants, policy_type::s1_constants, policy_type::s2_constants,
+                                policy_type::s3_constants) ^ key_schedule[2 * i + 2];
 
-                        T = get_byte(0, WK[3]);
-                        WK[3] = (WK[3] << 8) | get_byte(0, WK[2]);
+                        T = policy_type::template extract_uint_t<CHAR_BIT>(WK[3], 0);
+                        WK[3] = (WK[3] << 8) | policy_type::template extract_uint_t<CHAR_BIT>(WK[2], 0);
                         WK[2] = (WK[2] << 8) | T;
                     }
                 }

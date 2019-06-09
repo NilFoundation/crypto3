@@ -10,6 +10,8 @@
 #ifndef CRYPTO3_GOST_28147_89_H_
 #define CRYPTO3_GOST_28147_89_H_
 
+#include <boost/endian/arithmetic.hpp>
+
 #include <nil/crypto3/block/detail/gost_28147_89/gost_28147_89_policy.hpp>
 #include <nil/crypto3/block/detail/gost_28147_89/gost_28147_89_parameters.hpp>
 
@@ -169,15 +171,13 @@ namespace nil {
 
                 inline void schedule_key(const key_type &key) {
                     for (size_t i = 0; i != key_schedule_size; ++i) {
-                        key_schedule[i] = load_le<uint32_t>(key, i);
+                        key_schedule[i] = boost::endian::native_to_little(key[i]);
                     }
                 }
 
                 inline block_type encrypt_block(const block_type &plaintext) {
-                    block_type out = {0};
-
-                    word_type N1 = load_le<uint32_t>(plaintext.data(), 0);
-                    word_type N2 = load_le<uint32_t>(plaintext.data(), 1);
+                    word_type N1 = boost::endian::native_to_little(plaintext[0]);
+                    word_type N2 = boost::endian::native_to_little(plaintext[1]);
 
                     for (size_t j = 0; j != 3; ++j) {
                         GOST_2ROUND(N1, N2, 0, 1);
@@ -191,16 +191,12 @@ namespace nil {
                     GOST_2ROUND(N1, N2, 3, 2);
                     GOST_2ROUND(N1, N2, 1, 0);
 
-                    store_le(out.data(), N2, N1);
-
-                    return out;
+                    return {boost::endian::little_to_native(N2), boost::endian::little_to_native(N1)};
                 }
 
                 inline block_type decrypt_block(const block_type &ciphertext) {
-                    block_type out = {0};
-
-                    word_type N1 = load_le<uint32_t>(ciphertext.data(), 0);
-                    word_type N2 = load_le<uint32_t>(ciphertext.data(), 1);
+                    word_type N1 = boost::endian::native_to_little(ciphertext[0]);
+                    word_type N2 = boost::endian::native_to_little(ciphertext[1]);
 
                     GOST_2ROUND(N1, N2, 0, 1);
                     GOST_2ROUND(N1, N2, 2, 3);
@@ -214,9 +210,7 @@ namespace nil {
                         GOST_2ROUND(N1, N2, 1, 0);
                     }
 
-                    store_le(out.data(), N2, N1);
-
-                    return out;
+                    return {boost::endian::little_to_native(N2), boost::endian::little_to_native(N1)};
                 }
             };
         }

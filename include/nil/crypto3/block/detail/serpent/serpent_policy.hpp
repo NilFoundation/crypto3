@@ -40,6 +40,7 @@ namespace nil {
                     typedef std::array<std::size_t, block_words> permutations_type;
                     typedef std::array<std::array<std::size_t, block_words / 2>, 8> rotations_type;
 
+                    constexpr static const word_type phi = 0x9E3779B9;
                 };
 
                 template<std::size_t Version>
