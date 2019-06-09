@@ -18,7 +18,7 @@ namespace nil {
     namespace crypto3 {
         namespace block {
             namespace detail {
-                struct sm4_policy : sm4_functions<32> {
+                struct sm4_policy : public sm4_functions<32> {
                     constexpr static const std::size_t rounds = 32;
 
                     constexpr static const std::size_t block_bits = 128;
@@ -35,6 +35,21 @@ namespace nil {
 
                     constexpr static const std::size_t key_schedule_size = 32;
                     typedef std::array<word_type, key_schedule_size> key_schedule_type;
+
+                    constexpr static const std::size_t family_key_size = 4;
+                    typedef std::array<word_type, family_key_size> family_key_type;
+
+                    constexpr static const family_key_type fk = {
+                            0xa3b1bac6, 0x56aa3350, 0x677d9197, 0xb27022dc
+                    };
+
+                    constexpr static const key_schedule_type ck = {
+                            0x00070E15, 0x1C232A31, 0x383F464D, 0x545B6269, 0x70777E85, 0x8C939AA1, 0xA8AFB6BD,
+                            0xC4CBD2D9, 0xE0E7EEF5, 0xFC030A11, 0x181F262D, 0x343B4249, 0x50575E65, 0x6C737A81,
+                            0x888F969D, 0xA4ABB2B9, 0xC0C7CED5, 0xDCE3EAF1, 0xF8FF060D, 0x141B2229, 0x30373E45,
+                            0x4C535A61, 0x686F767D, 0x848B9299, 0xA0A7AEB5, 0xBCC3CAD1, 0xD8DFE6ED, 0xF4FB0209,
+                            0x10171E25, 0x2C333A41, 0x484F565D, 0x646B7279
+                    };
 
                     constexpr static const constants_type constants = {
                             0xD6, 0x90, 0xE9, 0xFE, 0xCC, 0xE1, 0x3D, 0xB7, 0x16, 0xB6, 0x14, 0xC2, 0x28, 0xFB, 0x2C,

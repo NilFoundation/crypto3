@@ -10,9 +10,11 @@
 #ifndef CRYPTO3_MISTY1_H_
 #define CRYPTO3_MISTY1_H_
 
+#include <boost/endian/arithmetic.hpp>
+
 #include <nil/crypto3/block/detail/misty1/misty1_functions.hpp>
 
-#include <nil/crypto3/block/cipher_state.hpp>
+#include <nil/crypto3/block/detail/block_state_preprocessor.hpp>
 #include <nil/crypto3/block/detail/stream_endian.hpp>
 
 namespace nil {
@@ -46,10 +48,13 @@ namespace nil {
                 constexpr static const std::size_t key_words = policy_type::key_words;
                 typedef typename policy_type::key_type key_type;
 
-                template<template<typename, typename> class Mode, std::size_t ValueBits, typename Padding>
+                template<template<typename, typename> class Mode,
+                                                      typename StateAccumulator, std::size_t ValueBits,
+                                                      typename Padding>
                 struct stream_cipher {
-                    typedef cipher_state<Mode<misty1, Padding>, stream_endian::little_octet_big_bit, ValueBits,
-                                         policy_type::word_bits * 2> type_;
+                    typedef block_state_preprocessor<Mode<misty1, Padding>, StateAccumulator,
+                                                     stream_endian::little_octet_big_bit, ValueBits,
+                                                     policy_type::word_bits * 2> type_;
 #ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES
                     typedef type_ type;
 #else
@@ -79,12 +84,10 @@ namespace nil {
                 key_schedule_type encryption_key, decryption_key;
 
                 inline block_type encrypt_block(const block_type &plaintext) {
-                    block_type out = {0};
-
-                    uint16_t B0 = load_be<uint16_t>(plaintext.data(), 0);
-                    uint16_t B1 = load_be<uint16_t>(plaintext.data(), 1);
-                    uint16_t B2 = load_be<uint16_t>(plaintext.data(), 2);
-                    uint16_t B3 = load_be<uint16_t>(plaintext.data(), 3);
+                    uint16_t B0 = boost::endian::native_to_big(plaintext[0]);
+                    uint16_t B1 = boost::endian::native_to_big(plaintext[1]);
+                    uint16_t B2 = boost::endian::native_to_big(plaintext[2]);
+                    uint16_t B3 = boost::endian::native_to_big(plaintext[3]);
 
                     for (size_t j = 0; j != 12; j += 3) {
                         const uint16_t *RK = &encryption_key[8 * j];
@@ -116,18 +119,17 @@ namespace nil {
                     B3 ^= B2 & encryption_key[98];
                     B2 ^= B3 | encryption_key[99];
 
-                    store_be(out, B2, B3, B0, B1);
-
-                    return out;
+                    return {
+                            boost::endian::big_to_native(B2), boost::endian::big_to_native(B3),
+                            boost::endian::big_to_native(B0), boost::endian::big_to_native(B1)
+                    };
                 }
 
                 inline block_type decrypt_block(const block_type &ciphertext) {
-                    block_type out = {0};
-
-                    uint16_t B0 = load_be<uint16_t>(ciphertext.data(), 2);
-                    uint16_t B1 = load_be<uint16_t>(ciphertext.data(), 3);
-                    uint16_t B2 = load_be<uint16_t>(ciphertext.data(), 0);
-                    uint16_t B3 = load_be<uint16_t>(ciphertext.data(), 1);
+                    uint16_t B0 = boost::endian::native_to_big(ciphertext[2]);
+                    uint16_t B1 = boost::endian::native_to_big(ciphertext[3]);
+                    uint16_t B2 = boost::endian::native_to_big(ciphertext[0]);
+                    uint16_t B3 = boost::endian::native_to_big(ciphertext[1]);
 
                     for (size_t j = 0; j != 12; j += 3) {
                         const uint16_t *RK = &decryption_key[8 * j];
@@ -159,15 +161,16 @@ namespace nil {
                     B0 ^= B1 | decryption_key[98];
                     B1 ^= B0 & decryption_key[99];
 
-                    store_be(out.data(), B0, B1, B2, B3);
-
-                    return out;
+                    return {
+                            boost::endian::big_to_native(B0), boost::endian::big_to_native(B1),
+                            boost::endian::big_to_native(B2), boost::endian::big_to_native(B3)
+                    };
                 }
 
                 inline void schedule_key(const key_type &key) {
                     std::array<word_type, 32> schedule = {0};
                     for (size_t i = 0; i != key.size() / 2; ++i) {
-                        schedule[i] = load_be<uint16_t>(key, i);
+                        schedule[i] = boost::endian::native_to_big(key[i]);
                     }
 
                     for (size_t i = 0; i != rounds; ++i) {
@@ -181,6 +184,8 @@ namespace nil {
                         encryption_key[i] = schedule[policy_type::encryption_key_order[i]];
                         decryption_key[i] = schedule[policy_type::decryption_key_order[i]];
                     }
+
+                    schedule.fill(0);
                 }
             };
         }

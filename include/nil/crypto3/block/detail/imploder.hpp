@@ -86,6 +86,7 @@ static void step(InputValue z, OutputValue &x) {
     BOOST_STATIC_ASSERT(sizeof(OutputValue) * CHAR_BIT == OutputBits);
     std::memcpy((char *) &x + k / CHAR_BIT, &z, InputBits / CHAR_BIT);
 }
+
 };
 
 template<typename Endianness, int InputBits, int OutputBits, int k = 0>
@@ -121,8 +122,6 @@ struct imploder<Endian<UnitBits>, InputBits, OutputBits, OutputBits> {
 };
 
 } // namespace detail
-}
-}
-} // namespace nil
+}}} // namespace nil
 
 #endif // CRYPTO3_BLOCK_DETAIL_IMPLODER_HPP

@@ -365,8 +365,8 @@ namespace nil {
                     typedef typename basic_rijndael_ssse3_impl<128, 128, PolicyType>::policy_type policy_type;
                 public:
                     static void schedule_key(const typename policy_type::key_type &input_key,
-                                      typename policy_type::key_schedule_type &encryption_key,
-                                      typename policy_type::key_schedule_type &decryption_key) {
+                                             typename policy_type::key_schedule_type &encryption_key,
+                                             typename policy_type::key_schedule_type &decryption_key) {
                         __m128i rcon = _mm_set_epi32(0x702A9808, 0x4D7C7D81, 0x1F8391B9, 0xAF9DEEB6);
 
                         __m128i key = _mm_loadu_si128(reinterpret_cast<const __m128i *>(input_key.data()));
@@ -403,8 +403,8 @@ namespace nil {
                     typedef typename basic_rijndael_ssse3_impl<192, 128, PolicyType>::policy_type policy_type;
                 public:
                     static void schedule_key(const typename policy_type::key_type &input_key,
-                                      typename policy_type::key_schedule_type &encryption_key,
-                                      typename policy_type::key_schedule_type &decryption_key) {
+                                             typename policy_type::key_schedule_type &encryption_key,
+                                             typename policy_type::key_schedule_type &decryption_key) {
                         __m128i rcon = _mm_set_epi32(0x702A9808, 0x4D7C7D81, 0x1F8391B9, 0xAF9DEEB6);
 
                         __m128i *EK_mm = reinterpret_cast<__m128i *>(encryption_key.data());
@@ -462,8 +462,8 @@ namespace nil {
                     typedef typename basic_rijndael_ssse3_impl<256, 128, PolicyType>::policy_type policy_type;
                 public:
                     static void schedule_key(const typename policy_type::key_type &input_key,
-                                      typename policy_type::key_schedule_type &encryption_key,
-                                      typename policy_type::key_schedule_type &decryption_key) {
+                                             typename policy_type::key_schedule_type &encryption_key,
+                                             typename policy_type::key_schedule_type &decryption_key) {
                         __m128i rcon = _mm_set_epi32(0x702A9808, 0x4D7C7D81, 0x1F8391B9, 0xAF9DEEB6);
 
                         __m128i *EK_mm = reinterpret_cast<__m128i *>(encryption_key.data());

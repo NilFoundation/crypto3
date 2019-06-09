@@ -12,7 +12,7 @@
 
 #include <nil/crypto3/block/detail/threefish/threefish_policy.hpp>
 
-#include <nil/crypto3/block/cipher_state.hpp>
+#include <nil/crypto3/block/detail/block_state_preprocessor.hpp>
 #include <nil/crypto3/block/detail/stream_endian.hpp>
 
 #include <boost/cstdint.hpp>
@@ -63,16 +63,13 @@ namespace nil {
                 typedef typename policy_type::key_schedule_type key_schedule_type;
                 typedef typename policy_type::tweak_schedule_type tweak_schedule_type;
 
-                template<template<typename, typename> class Mode, std::size_t ValueBits, typename Padding>
+                template<template<typename, typename> class Mode,
+                                                      typename StateAccumulator, std::size_t ValueBits,
+                                                      typename Padding>
                 struct stream_cipher {
-                    typedef cipher_state<Mode<threefish<KeyBits>, Padding>, stream_endian::little_octet_big_bit,
-                                         ValueBits, policy_type::word_bits * 2> type_;
-#ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES
-                    typedef type_ type;
-#else
-                    struct type : type_ {
-                    };
-#endif
+                    typedef block_state_preprocessor<Mode<threefish<KeyBits>, Padding>, StateAccumulator,
+                                                     stream_endian::little_octet_big_bit, ValueBits,
+                                                     policy_type::word_bits * 2> type;
                 };
 
                 threefish(const key_type &key = key_type(), const tweak_type &tweak = tweak_type()) {

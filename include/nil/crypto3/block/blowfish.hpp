@@ -14,10 +14,8 @@
 
 #include <nil/crypto3/block/block_cipher.hpp>
 
-#include <nil/crypto3/block/cipher_state.hpp>
+#include <nil/crypto3/block/detail/block_state_preprocessor.hpp>
 #include <nil/crypto3/block/detail/stream_endian.hpp>
-
-#include <nil/crypto3/utilities/loadstore.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -51,10 +49,13 @@ namespace nil {
 
                 constexpr static const std::size_t rounds = policy_type::rounds;
 
-                template<template<typename, typename> class Mode, std::size_t ValueBits, typename Padding>
+                template<template<typename, typename> class Mode,
+                                                      typename StateAccumulator, std::size_t ValueBits,
+                                                      typename Padding>
                 struct stream_cipher {
-                    typedef cipher_state<Mode<blowfish, Padding>, stream_endian::little_octet_big_bit, ValueBits,
-                                         policy_type::word_bits * 2> type_;
+                    typedef block_state_preprocessor<Mode<blowfish, Padding>, StateAccumulator,
+                                                     stream_endian::little_octet_big_bit, ValueBits,
+                                                     policy_type::word_bits * 2> type_;
 #ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES
                     typedef type_ type;
 #else
@@ -111,7 +112,7 @@ namespace nil {
 
                     const size_t p_salt_offset = (!salt.empty()) ? policy_type::permutations_size % salt.size() : 0;
 
-                    uint32_t L = 0, R = 0;
+                    word_type L = 0, R = 0;
                     generate_sbox(permutations, L, R, salt, 0);
                     generate_sbox(constants, L, R, salt, p_salt_offset);
                 }
@@ -133,7 +134,7 @@ namespace nil {
                             L ^= policy_type::bff(R, constants);
                         }
 
-                        uint32_t T = R;
+                        word_type T = R;
                         R = L ^ permutations[16];
                         L = T ^ permutations[17];
                         box[i] = L;

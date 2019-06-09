@@ -13,7 +13,6 @@
 #include <nil/crypto3/block/detail/basic_functions.hpp>
 
 #include <nil/crypto3/utilities/ct_utils.hpp>
-#include <nil/crypto3/utilities/loadstore.hpp>
 
 namespace nil {
     namespace crypto3 {

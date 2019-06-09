@@ -15,8 +15,6 @@
 #include <boost/integer.hpp>
 #include <boost/static_assert.hpp>
 
-#include <nil/crypto3/utilities/loadstore.hpp>
-
 namespace nil {
     namespace crypto3 {
         namespace block {
@@ -28,41 +26,70 @@ namespace nil {
                     constexpr static const std::size_t word_bits = WordBits;
                     typedef typename boost::uint_t<word_bits>::exact word_type;
 
-                    static word_type shr(word_type x, std::size_t n) {
+                    template<std::size_t Size, typename Integer>
+                    static inline typename boost::uint_t<Size>::exact extract_uint_t(Integer v, std::size_t position) {
+                        return static_cast<typename boost::uint_t<Size>::exact>(v
+                                >> (((~position) & (sizeof(Integer) - 1)) << 3));
+                    }
+
+                    template<std::size_t Size, typename T>
+                    static inline typename boost::uint_t<Size>::exact make_uint_t(
+                            const std::initializer_list<T> &args) {
+                        typedef typename std::initializer_list<T>::value_type value_type;
+                        typename boost::uint_t<Size>::exact result = 0;
+
+#pragma clang loop unroll(full)
+                        for (const value_type &itr : args) {
+                            result = static_cast<typename boost::uint_t<Size>::exact>(
+                                    (result << std::numeric_limits<value_type>::digits) | itr);
+                        }
+
+                        return result;
+                    }
+
+                    template<std::size_t Size, typename ...Args>
+                    static inline typename boost::uint_t<Size>::exact make_uint_t(Args... args) {
+                        return basic_functions<WordBits>::template make_uint_t<Size, typename std::tuple_element<0,
+                                                                                                                 std::tuple<
+                                                                                                                         Args...>>::type>(
+                                {args...});
+                    }
+
+                    static inline word_type shr(word_type x, std::size_t n) {
                         return x >> n;
                     }
 
                     template<std::size_t n>
-                    static word_type shr(word_type x) {
+                    static inline word_type shr(word_type x) {
                         BOOST_STATIC_ASSERT(n < word_bits);
                         return x >> n;
                     }
 
-                    static word_type shl(word_type x, std::size_t n) {
+                    static inline word_type shl(word_type x, std::size_t n) {
                         return x << n;
                     }
 
                     template<std::size_t n>
-                    static word_type shl(word_type x) {
+                    static inline word_type shl(word_type x) {
                         BOOST_STATIC_ASSERT(n < word_bits);
                         return x << n;
                     }
 
-                    static word_type rotr(word_type x, std::size_t n) {
+                    static inline word_type rotr(word_type x, std::size_t n) {
                         return shr(x, n) | shl(x, word_bits - n);
                     }
 
                     template<std::size_t n>
-                    static word_type rotr(word_type x) {
+                    static inline word_type rotr(word_type x) {
                         return shr<n>(x) | shl<word_bits - n>(x);
                     }
 
-                    static word_type rotl(word_type x, std::size_t n) {
+                    static inline word_type rotl(word_type x, std::size_t n) {
                         return shl(x, n) | shr(x, word_bits - n);
                     }
 
                     template<std::size_t n>
-                    static word_type rotl(word_type x) {
+                    static inline word_type rotl(word_type x) {
                         return shl<n>(x) | shr<word_bits - n>(x);
                     }
                 };

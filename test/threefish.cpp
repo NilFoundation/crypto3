@@ -17,6 +17,7 @@
 #include <boost/test/data/monomorphic.hpp>
 
 #include <nil/crypto3/block/algorithm/encrypt.hpp>
+#include <nil/crypto3/block/algorithm/decrypt.hpp>
 
 #include <nil/crypto3/block/threefish.hpp>
 
@@ -115,7 +116,7 @@ BOOST_AUTO_TEST_SUITE(threefish_test_suite)
         std::cout << d std::endl;
 #endif
 
-        std::string string_digest = decode<decoder::hex, std::string>(d);
+        std::string string_digest = decode<codec::hex>(d);
 #ifdef CRYPTO3_HASH_THREEFISH_OLD_ROTATION_CONSTANTS
         BOOST_CHECK_EQUAL(string_digest, "408be942494492eab19daa3e96ad19aedfc41f4e55f8a2626c1e46d54547a713"
                        "d43b21f0de1a10881ed5c4adefdad1c4172cd768c8fc28d0dde9df018042fe3e");
@@ -181,7 +182,7 @@ BOOST_AUTO_TEST_SUITE(threefish_test_suite)
         std::cout << d std::endl;
 #endif
 
-        std::string string_digest = decode<decoder::hex, std::string>(d);
+        std::string string_digest = decode<codec::hex>(d);
 #ifdef CRYPTO3_HASH_THREEFISH_OLD_ROTATION_CONSTANTS
         BOOST_CHECK_EQUAL(string_digest, "43cf2a34cb1668e38c2e19ea1757d6b31ac6dead02fea99459d8a0331bdc7273"
                        "a1f7e9495d60402d1f8b43e48a5ac4f9d9d30965835e07f5455b87f963fdbca6"

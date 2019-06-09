@@ -10,9 +10,11 @@
 #ifndef CRYPTO3_CAMELLIA_H_
 #define CRYPTO3_CAMELLIA_H_
 
+#include <boost/endian/arithmetic.hpp>
+
 #include <nil/crypto3/block/detail/camellia/camellia_policy.hpp>
 
-#include <nil/crypto3/block/cipher_state.hpp>
+#include <nil/crypto3/block/detail/block_state_preprocessor.hpp>
 #include <nil/crypto3/block/detail/stream_endian.hpp>
 
 namespace nil {
@@ -49,10 +51,13 @@ namespace nil {
 
                 constexpr static const std::size_t rounds = policy_type::rounds;
 
-                template<template<typename, typename> class Mode, std::size_t ValueBits, typename Padding>
+                template<template<typename, typename> class Mode,
+                                                      typename StateAccumulator, std::size_t ValueBits,
+                                                      typename Padding>
                 struct stream_cipher {
-                    typedef cipher_state<Mode<camellia<Size>, Padding>, stream_endian::little_octet_big_bit, ValueBits,
-                                         policy_type::word_bits * 2> type_;
+                    typedef block_state_preprocessor<Mode<camellia<Size>, Padding>, StateAccumulator,
+                                                     stream_endian::little_octet_big_bit, ValueBits,
+                                                     policy_type::word_bits * 2> type_;
 #ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES
                     typedef type_ type;
 #else
@@ -82,10 +87,8 @@ namespace nil {
                 key_schedule_type key_schedule;
 
                 inline block_type encrypt_block(const block_type &plaintext) {
-                    block_type out = {0};
-
-                    word_type d1, d2;
-                    load_be(plaintext.data(), d1, d2);
+                    word_type d1 = boost::endian::native_to_big(plaintext[0]);
+                    word_type d2 = boost::endian::native_to_big(plaintext[1]);
 
                     const uint64_t *K = key_schedule.data();
 
@@ -111,14 +114,12 @@ namespace nil {
                     d2 ^= *K++;
                     d1 ^= *K++;
 
-                    store_be(out.data() + 16, d2, d1);
+                    return {boost::endian::big_to_native(d2), boost::endian::big_to_native(d1)};
                 }
 
                 inline block_type decrypt_block(const block_type &ciphertext) {
-                    block_type out = {0};
-
-                    word_type d1, d2;
-                    load_be(ciphertext.data(), d1, d2);
+                    word_type d1 = boost::endian::native_to_big(ciphertext[0]);
+                    word_type d2 = boost::endian::native_to_big(ciphertext[1]);
 
                     const uint64_t *K = &key_schedule[key_schedule.size() - 1];
 
@@ -144,7 +145,7 @@ namespace nil {
                     d1 ^= *K--;
                     d2 ^= *K;
 
-                    store_be(out.data(), d2, d1);
+                    return {boost::endian::big_to_native(d2), boost::endian::big_to_native(d1)};
                 }
 
                 inline uint64_t left_rot_hi(uint64_t h, uint64_t l, size_t shift) {
@@ -156,12 +157,13 @@ namespace nil {
                 }
 
                 void schedule_key(const key_type &key) {
-                    const word_type KL_H = load_be<uint64_t>(key, 0);
-                    const word_type KL_L = load_be<uint64_t>(key, 1);
+                    const word_type KL_H = boost::endian::native_to_big(key[0]);
+                    const word_type KL_L = boost::endian::native_to_big(key[1]);
 
-                    const word_type KR_H = (key.size() >= 24) ? load_be<uint64_t>(key, 2) : 0;
-                    const word_type KR_L = (key.size() == 32) ? load_be<uint64_t>(key, 3) : ((key.size() == 24) ? ~KR_H
-                                                                                                                : 0);
+                    const word_type KR_H = (key.size() >= 24) ? boost::endian::native_to_big(key[2]) : 0;
+                    const word_type KR_L = (key.size() == 32) ? boost::endian::native_to_big(key[3]) : ((key.size() ==
+                                                                                                         24) ? ~KR_H
+                                                                                                             : 0);
 
                     word_type D1 = KL_H ^KR_H;
                     word_type D2 = KL_L ^KR_L;

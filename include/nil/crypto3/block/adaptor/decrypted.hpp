@@ -23,8 +23,8 @@ namespace nil {
         // including a wrapped predicate as appropriate.
         template<typename P, typename It>
         struct transform_iterator_gen {
-            typedef transform_iterator<typename default_constructible_unary_fn_gen<P,
-                    typename transform_iterator<P, It>::reference>::type, It> type;
+            typedef transform_iterator<typename default_constructible_unary_fn_gen<P, typename transform_iterator<P,
+                                                                                                                  It>::reference>::type, It> type;
         };
 
         template<class F, class R>
@@ -37,12 +37,13 @@ namespace nil {
 
         public:
             typedef typename default_constructible_unary_fn_gen<F, typename transform_iterator<F,
-                    typename range_iterator<R>::type>::reference>::type transform_fn_type;
+                                                                                               typename range_iterator<
+                                                                                                       R>::type>::reference>::type transform_fn_type;
 
             typedef R source_range_type;
 
             decoded_range(transform_fn_type f, R &r) : base(transform_iter_t(boost::begin(r), f),
-                                                            transform_iter_t(boost::end(r), f)) {
+                    transform_iter_t(boost::end(r), f)) {
             }
         };
 

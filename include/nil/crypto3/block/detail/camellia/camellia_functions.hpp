@@ -12,16 +12,14 @@
 
 #include <nil/crypto3/block/detail/camellia/basic_camellia_policy.hpp>
 
-#include <nil/crypto3/utilities/loadstore.hpp>
-
-#include <nil/crypto3/utilities/loadstore.hpp>
-
 namespace nil {
     namespace crypto3 {
         namespace block {
             namespace detail {
                 template<std::size_t KeyBits>
                 struct camellia_functions : public basic_camellia_policy<KeyBits> {
+                    typedef basic_camellia_policy<KeyBits> policy_type;
+
                     /*
                      * We use the slow byte-wise version of F in the first and last rounds
                      * to help protect against timing attacks
@@ -51,14 +49,20 @@ namespace nil {
 
                         const uint64_t x = v ^K;
 
-                        const uint8_t t1 = sbox[get_byte(0, x)];
-                        const uint8_t t2 = rotl<1>(sbox[get_byte(1, x)]);
-                        const uint8_t t3 = rotl<7>(sbox[get_byte(2, x)]);
-                        const uint8_t t4 = sbox[rotl<1>(get_byte(3, x))];
-                        const uint8_t t5 = rotl<1>(sbox[get_byte(4, x)]);
-                        const uint8_t t6 = rotl<7>(sbox[get_byte(5, x)]);
-                        const uint8_t t7 = sbox[rotl<1>(get_byte(6, x))];
-                        const uint8_t t8 = sbox[get_byte(7, x)];
+                        const uint8_t t1 = sbox[policy_type::template extract_uint_t<CHAR_BIT>(x, 0)];
+                        const uint8_t t2 = policy_type::template rotl<1>(
+                                sbox[policy_type::template extract_uint_t<CHAR_BIT>(x, 1)]);
+                        const uint8_t t3 = policy_type::template rotl<7>(
+                                sbox[policy_type::template extract_uint_t<CHAR_BIT>(x, 2)]);
+                        const uint8_t t4 = sbox[policy_type::template rotl<1>(
+                                policy_type::template extract_uint_t<CHAR_BIT>(x, 3))];
+                        const uint8_t t5 = policy_type::template rotl<1>(
+                                sbox[policy_type::template extract_uint_t<CHAR_BIT>(x, 4)]);
+                        const uint8_t t6 = policy_type::template rotl<7>(
+                                sbox[policy_type::template extract_uint_t<CHAR_BIT>(x, 5)]);
+                        const uint8_t t7 = sbox[policy_type::template rotl<1>(
+                                policy_type::template extract_uint_t<CHAR_BIT>(x, 6))];
+                        const uint8_t t8 = sbox[policy_type::template extract_uint_t<CHAR_BIT>(x, 7)];
 
                         const uint8_t y1 = t1 ^t3 ^t4 ^t6 ^t7 ^t8;
                         const uint8_t y2 = t1 ^t2 ^t4 ^t5 ^t7 ^t8;
@@ -69,20 +73,28 @@ namespace nil {
                         const uint8_t y7 = t3 ^t4 ^t5 ^t6 ^t8;
                         const uint8_t y8 = t1 ^t4 ^t5 ^t6 ^t7;
 
-                        return make_uint_t<64>(y1, y2, y3, y4, y5, y6, y7, y8);
+                        return policy_type::template make_uint_t<64>(y1, y2, y3, y4, y5, y6, y7, y8);
                     };
 
                     inline uint64_t f(uint64_t v, uint64_t K) {
                         const uint64_t x = v ^K;
 
-                        return basic_camellia_policy<KeyBits>::sbox1[get_byte(0, x)] ^
-                               basic_camellia_policy<KeyBits>::sbox2[get_byte(1, x)] ^
-                               basic_camellia_policy<KeyBits>::sbox3[get_byte(2, x)] ^
-                               basic_camellia_policy<KeyBits>::sbox4[get_byte(3, x)] ^
-                               basic_camellia_policy<KeyBits>::sbox5[get_byte(4, x)] ^
-                               basic_camellia_policy<KeyBits>::sbox6[get_byte(5, x)] ^
-                               basic_camellia_policy<KeyBits>::sbox7[get_byte(6, x)] ^
-                               basic_camellia_policy<KeyBits>::sbox8[get_byte(7, x)];
+                        return basic_camellia_policy<KeyBits>::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(x,
+                                0)] ^
+                               basic_camellia_policy<KeyBits>::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(x,
+                                       1)] ^
+                               basic_camellia_policy<KeyBits>::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(x,
+                                       2)] ^
+                               basic_camellia_policy<KeyBits>::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(x,
+                                       3)] ^
+                               basic_camellia_policy<KeyBits>::sbox5[policy_type::template extract_uint_t<CHAR_BIT>(x,
+                                       4)] ^
+                               basic_camellia_policy<KeyBits>::sbox6[policy_type::template extract_uint_t<CHAR_BIT>(x,
+                                       5)] ^
+                               basic_camellia_policy<KeyBits>::sbox7[policy_type::template extract_uint_t<CHAR_BIT>(x,
+                                       6)] ^
+                               basic_camellia_policy<KeyBits>::sbox8[policy_type::template extract_uint_t<CHAR_BIT>(x,
+                                       7)];
                     }
 
                     inline uint64_t fl(uint64_t v, uint64_t K) {
@@ -92,7 +104,7 @@ namespace nil {
                         const uint32_t k1 = static_cast<uint32_t>(K >> 32);
                         const uint32_t k2 = static_cast<uint32_t>(K & 0xFFFFFFFF);
 
-                        x2 ^= rotl<1>(x1 & k1);
+                        x2 ^= policy_type::template rotl<1>(x1 & k1);
                         x1 ^= (x2 | k2);
 
                         return ((static_cast<uint64_t>(x1) << 32) | x2);
@@ -106,7 +118,7 @@ namespace nil {
                         const uint32_t k2 = static_cast<uint32_t>(K & 0xFFFFFFFF);
 
                         x1 ^= (x2 | k2);
-                        x2 ^= rotl<1>(x1 & k1);
+                        x2 ^= policy_type::template rotl<1>(x1 & k1);
 
                         return ((static_cast<uint64_t>(x1) << 32) | x2);
                     }

@@ -10,14 +10,15 @@
 #ifndef CRYPTO3_BLOCK_DECRYPT_HPP
 #define CRYPTO3_BLOCK_DECRYPT_HPP
 
-#include <nil/crypto3/block/detail/cipher_value.hpp>
+#include <nil/crypto3/block/cipher_value.hpp>
+#include <nil/crypto3/block/cipher_state.hpp>
 
 namespace nil {
     namespace crypto3 {
         /*!
          * @defgroup block_algorithms Algorithms
          * @ingroup block
-         * @brief Algorithms are meant to provide encryption interface similar to STL algorithms' one.
+         * @brief Algorithms are meant to provide decryption interface similar to STL algorithms' one.
          */
 
         /*!
@@ -36,16 +37,77 @@ namespace nil {
          *
          * @return
          */
-        template<typename BlockCipher, typename InputIterator, typename InputKeyIterator, typename OutputIterator>
-        OutputIterator decrypt(InputIterator first, InputIterator last, InputKeyIterator key_first,
-                               InputKeyIterator key_last, OutputIterator out) {
+        template<typename BlockCipher, typename InputIterator, typename KeyIterator, typename OutputIterator>
+        OutputIterator decrypt(InputIterator first, InputIterator last, KeyIterator key_first, KeyIterator key_last,
+                               OutputIterator out) {
 
-            typedef typename detail::itr_stream_encrypter_traits<BlockCipher, InputIterator>::type CipherState;
+            typedef typename BlockCipher::stream_decrypter_type EncryptionMode;
+            typedef typename block::block_accumulator<EncryptionMode> CipherAccumulator;
 
-            typedef detail::value_encrypter_impl<CipherState> StreamEncrypterImpl;
-            typedef detail::itr_encrypter_impl<StreamEncrypterImpl, OutputIterator> EncrypterImpl;
+            typedef block::detail::value_cipher_impl <CipherAccumulator> StreamEncrypterImpl;
+            typedef block::detail::itr_cipher_impl <StreamEncrypterImpl, OutputIterator> EncrypterImpl;
 
-            return EncrypterImpl(first, last, std::move(out), CipherState(BlockCipher(key_first, key_last)));
+            return EncrypterImpl(first, last, std::move(out), CiperState(BlockCipher(key_first, key_last)));
+        }
+
+        /*!
+         * @brief
+         *
+         * @ingroup block_algorithms
+         *
+         * @tparam BlockCipher
+         * @tparam InputIterator
+         * @tparam OutputIterator
+         * @tparam StreamEncrypter
+         *
+         * @param first
+         * @param last
+         * @param out
+         *
+         * @return
+         */
+        template<typename BlockCipher,
+                 typename InputIterator,
+                 typename OutputAccumulator = typename block::block_accumulator<
+                         typename BlockCipher::stream_decrypter_type>>
+        OutputAccumulator &decrypt(InputIterator first, InputIterator last, typename OutputAccumulator::type &acc) {
+
+            typedef typename BlockCipher::stream_decrypter_type EncryptionMode;
+            typedef typename block::block_accumulator<EncryptionMode> CipherAccumulator;
+
+            typedef block::detail::ref_cipher_impl <CipherAccumulator> StreamEncrypterImpl;
+            typedef block::detail::range_cipher_impl <StreamEncrypterImpl> EncrypterImpl;
+
+            return EncrypterImpl(first, last, acc);
+        }
+
+        /*!
+         * @brief
+         *
+         * @ingroup block_algorithms
+         *
+         * @tparam BlockCipher
+         * @tparam SinglePassRange
+         * @tparam OutputAccumulator
+         *
+         * @param r
+         * @param acc
+         *
+         * @return
+         */
+        template<typename BlockCipher,
+                 typename SinglePassRange,
+                 typename OutputAccumulator = typename block::block_accumulator<
+                         typename BlockCipher::stream_decrypter_type>>
+        OutputAccumulator &decrypt(const SinglePassRange &r, typename OutputAccumulator::type &acc) {
+
+            typedef typename BlockCipher::stream_decrypter_type EncryptionMode;
+            typedef typename block::block_accumulator<EncryptionMode> CipherAccumulator;
+
+            typedef block::detail::ref_cipher_impl <CipherAccumulator> StreamEncrypterImpl;
+            typedef block::detail::range_cipher_impl <StreamEncrypterImpl> EncrypterImpl;
+
+            return EncrypterImpl(r, acc);
         }
 
         /*!
@@ -60,18 +122,17 @@ namespace nil {
          * @param last
          * @return
          */
-        template<typename BlockCipher, typename InputIterator, typename InputKeyIterator,
-                 typename CipherState = typename detail::itr_stream_encrypter_traits<
-                         typename BlockCipher::stream_encrypter_type, InputIterator>::type>
-        detail::range_encrypter_impl<detail::value_encrypter_impl<CipherState>> decrypt(InputIterator first,
-                                                                                        InputIterator last,
-                                                                                        InputKeyIterator key_first,
-                                                                                        InputKeyIterator key_last) {
+        template<typename BlockCipher,
+                 typename InputIterator,
+                 typename KeyIterator,
+                 typename CipherAccumulator = typename block::block_accumulator<
+                         typename BlockCipher::stream_decrypter_type>>
+        block::detail::range_cipher_impl <block::detail::value_cipher_impl<CipherAccumulator>> decrypt(
+                InputIterator first, InputIterator last, KeyIterator key_first, KeyIterator key_last) {
+            typedef block::detail::value_cipher_impl <CipherAccumulator> StreamEncrypterImpl;
+            typedef block::detail::range_cipher_impl <StreamEncrypterImpl> EncrypterImpl;
 
-            typedef detail::value_encrypter_impl<CipherState> StreamEncrypterImpl;
-            typedef detail::range_encrypter_impl<StreamEncrypterImpl> EncrypterImpl;
-
-            return EncrypterImpl(first, last, CipherState(BlockCipher(key_first, key_last)));
+            return EncrypterImpl(first, last, CipherAccumulator(BlockCipher(key_first, key_last)));
         }
 
         /*!
@@ -82,18 +143,19 @@ namespace nil {
          * @tparam BlockCipher
          * @tparam SinglePassRange
          * @tparam OutputIterator
-         * @tparam StreamEncrypter
+         * @tparam CipherState
          * @param rng
          * @param out
          * @return
          */
         template<typename BlockCipher, typename SinglePassRange, typename KeyRange, typename OutputIterator>
-        OutputIterator encrypt(const SinglePassRange &rng, const KeyRange &key, OutputIterator out) {
-            typedef typename detail::range_stream_encrypter_traits<typename BlockCipher::stream_decrypter_type,
-                                                                   SinglePassRange>::type CipherState;
+        OutputIterator decrypt(const SinglePassRange &rng, const KeyRange &key, OutputIterator out) {
 
-            typedef detail::value_encrypter_impl<CipherState> StreamEncrypterImpl;
-            typedef detail::itr_encrypter_impl<StreamEncrypterImpl, OutputIterator> EncrypterImpl;
+            typedef typename BlockCipher::stream_decrypter_type EncryptionMode;
+            typedef typename block::block_accumulator<EncryptionMode> CipherAccumulator;
+
+            typedef block::detail::value_cipher_impl <CipherAccumulator> StreamEncrypterImpl;
+            typedef block::detail::itr_cipher_impl <StreamEncrypterImpl, OutputIterator> EncrypterImpl;
 
             return EncrypterImpl(rng, std::move(out), CipherState(BlockCipher(key)));
         }
@@ -105,20 +167,22 @@ namespace nil {
          *
          * @tparam BlockCipher
          * @tparam SinglePassRange
-         * @tparam StreamEncrypter
+         * @tparam CipherState
          * @param r
          * @return
          */
-        template<typename BlockCipher, typename SinglePassRange, typename KeyRange,
-                 typename StreamEncrypter = typename detail::range_stream_encrypter_traits<
-                         typename BlockCipher::stream_decrypter_type, SinglePassRange>::type>
-        detail::range_encrypter_impl<detail::value_encrypter_impl<StreamEncrypter>> encrypt(const SinglePassRange &r,
-                                                                                            const KeyRange &key) {
+        template<typename BlockCipher,
+                 typename SinglePassRange,
+                 typename KeyRange,
+                 typename CipherAccumulator = typename block::block_accumulator<
+                         typename BlockCipher::stream_decrypter_type>>
+        block::detail::range_cipher_impl <block::detail::value_cipher_impl<CipherAccumulator>> decrypt(
+                const SinglePassRange &r, const KeyRange &key) {
 
-            typedef detail::value_encrypter_impl<StreamEncrypter> StreamEncrypterImpl;
-            typedef detail::range_encrypter_impl<StreamEncrypterImpl> EncrypterImpl;
+            typedef block::detail::value_cipher_impl <CipherAccumulator> StreamEncrypterImpl;
+            typedef block::detail::range_cipher_impl <StreamEncrypterImpl> EncrypterImpl;
 
-            return EncrypterImpl(r, StreamEncrypter(BlockCipher(key)));
+            return EncrypterImpl(r, CipherState(BlockCipher(key)));
         }
     } // namespace crypto3
 } // namespace nil

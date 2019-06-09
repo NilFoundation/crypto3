@@ -12,9 +12,7 @@
 
 #include <array>
 
-#include <nil/crypto3/block/detail/aria/basic_aria_policy.hpp>
-
-#include <nil/crypto3/utilities/secmem.hpp>
+#include <nil/crypto3/block/detail/aria/aria_functions.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -25,17 +23,17 @@ namespace nil {
                 struct aria_policy;
 
                 template<>
-                struct aria_policy<128> : public basic_aria_policy<128> {
+                struct aria_policy<128> : public aria_functions<128> {
                     constexpr static const std::size_t rounds = 12;
                 };
 
                 template<>
-                struct aria_policy<192> : public basic_aria_policy<192> {
+                struct aria_policy<192> : public aria_functions<192> {
                     constexpr static const std::size_t rounds = 14;
                 };
 
                 template<>
-                struct aria_policy<256> : public basic_aria_policy<256> {
+                struct aria_policy<256> : public aria_functions<256> {
                     constexpr static const std::size_t rounds = 16;
                 };
             }

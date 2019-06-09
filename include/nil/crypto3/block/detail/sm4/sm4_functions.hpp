@@ -12,8 +12,6 @@
 
 #include <nil/crypto3/block/detail/basic_functions.hpp>
 
-#include <nil/crypto3/utilities/loadstore.hpp>
-
 namespace nil {
     namespace crypto3 {
         namespace block {
@@ -28,25 +26,40 @@ namespace nil {
                     typedef std::array<word_type, constants_size> transposed_constants_type;
 
                     inline static word_type t_slow(word_type b, const constants_type &constants) {
-                        const word_type t = make_uint_t<32>(constants[get_byte(0, b)], constants[get_byte(1, b)],
-                                constants[get_byte(2, b)], constants[get_byte(3, b)]);
+                        const word_type t = basic_functions<WordBits>::template make_uint_t<WordBits>(
+                                constants[basic_functions<WordBits>::template extract_uint_t<CHAR_BIT>(b, 0)],
+                                constants[basic_functions<WordBits>::template extract_uint_t<CHAR_BIT>(b, 1)],
+                                constants[basic_functions<WordBits>::template extract_uint_t<CHAR_BIT>(b, 2)],
+                                constants[basic_functions<WordBits>::template extract_uint_t<CHAR_BIT>(b, 3)]);
 
                         // L linear transform
-                        return t ^ rotl<2>(t) ^ rotl<10>(t) ^ rotl<18>(t) ^ rotl<24>(t);
+                        return t ^ (basic_functions<WordBits>::template rotl<2>(t)) ^
+                               basic_functions<WordBits>::template rotl<10>(t) ^
+                               basic_functions<WordBits>::template rotl<18>(t) ^
+                               basic_functions<WordBits>::template rotl<24>(t);
                     }
 
                     inline static word_type t(word_type b, const transposed_constants_type &constants) {
-                        return constants[get_byte(0, b)] ^ rotr<8>(constants[get_byte(1, b)]) ^
-                               rotr<16>(constants[get_byte(2, b)]) ^ rotr<24>(constants[get_byte(3, b)]);
+                        return constants[basic_functions<WordBits>::template extract_uint_t<CHAR_BIT>(b, 0)] ^
+                               (basic_functions<WordBits>::template rotr<8>(
+                                       constants[basic_functions<WordBits>::template extract_uint_t<CHAR_BIT>(b, 1)])) ^
+                               basic_functions<WordBits>::template rotr<16>(
+                                       constants[basic_functions<WordBits>::template extract_uint_t<CHAR_BIT>(b, 2)]) ^
+                               basic_functions<WordBits>::template rotr<24>(
+                                       constants[basic_functions<WordBits>::template extract_uint_t<CHAR_BIT>(b, 3)]);
                     }
 
 // Variant of T for key round_constants_words
                     inline static word_type tp(word_type b, const constants_type &constants) {
-                        const uint32_t t = make_uint_t<32>(constants[get_byte(0, b)], constants[get_byte(1, b)],
-                                constants[get_byte(2, b)], constants[get_byte(3, b)]);
+                        const word_type t = basic_functions<WordBits>::template make_uint_t<WordBits>(
+                                constants[basic_functions<WordBits>::template extract_uint_t<CHAR_BIT>(b, 0)],
+                                constants[basic_functions<WordBits>::template extract_uint_t<CHAR_BIT>(b, 1)],
+                                constants[basic_functions<WordBits>::template extract_uint_t<CHAR_BIT>(b, 2)],
+                                constants[basic_functions<WordBits>::template extract_uint_t<CHAR_BIT>(b, 3)]);
 
                         // L' linear transform
-                        return t ^ rotl<13>(t) ^ rotl<23>(t);
+                        return t ^ (basic_functions<WordBits>::template rotl<13>(t)) ^
+                               basic_functions<WordBits>::template rotl<23>(t);
                     }
                 };
             }

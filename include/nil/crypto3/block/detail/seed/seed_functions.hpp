@@ -10,9 +10,9 @@
 #ifndef CRYPTO3_SEED_FUNCTIONS_CPP_HPP
 #define CRYPTO3_SEED_FUNCTIONS_CPP_HPP
 
-#include <nil/crypto3/block/detail/basic_functions.hpp>
+#include <boost/endian/arithmetic.hpp>
 
-#include <nil/crypto3/utilities/loadstore.hpp>
+#include <nil/crypto3/block/detail/basic_functions.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -27,7 +27,10 @@ namespace nil {
 
                     inline static word_type g(word_type X, const constants_type &s0, const constants_type &s1,
                                               const constants_type &s2, const constants_type &s3) {
-                        return (s0[get_byte(3, X)] ^ s1[get_byte(2, X)] ^ s2[get_byte(1, X)] ^ s3[get_byte(0, X)]);
+                        return (s0[basic_functions<WordBits>::template extract_uint_t<CHAR_BIT>(X, 3)] ^
+                                s1[basic_functions<WordBits>::template extract_uint_t<CHAR_BIT>(X, 2)] ^
+                                s2[basic_functions<WordBits>::template extract_uint_t<CHAR_BIT>(X, 1)] ^
+                                s3[basic_functions<WordBits>::template extract_uint_t<CHAR_BIT>(X, 0)]);
                     }
                 };
             }

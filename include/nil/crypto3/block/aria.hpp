@@ -10,13 +10,14 @@
 #ifndef CRYPTO3_ARIA_H_
 #define CRYPTO3_ARIA_H_
 
+#include <boost/endian/arithmetic.hpp>
+
 #include <nil/crypto3/block/detail/aria/aria_policy.hpp>
 
-#include <nil/crypto3/block/cipher_state.hpp>
+#include <nil/crypto3/block/detail/block_state_preprocessor.hpp>
 #include <nil/crypto3/block/detail/stream_endian.hpp>
 
-#include <nil/crypto3/utilities/loadstore.hpp>
-#include <nil/crypto3/block/detail/cpuid/cpuid.hpp>
+#include <nil/crypto3/utilities/cpuid/cpuid.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -59,16 +60,13 @@ namespace nil {
                 constexpr static const std::size_t rounds = policy_type::rounds;
                 typedef typename policy_type::round_constants_type round_constants_type;
 
-                template<template<typename, typename> class Mode, std::size_t ValueBits, typename Padding>
+                template<template<typename, typename> class Mode,
+                                                      typename StateAccumulator, std::size_t ValueBits,
+                                                      typename Padding>
                 struct stream_cipher {
-                    typedef cipher_state<Mode<aria<Size>, Padding>, stream_endian::little_octet_big_bit, ValueBits,
-                                         policy_type::word_bits * 2> type_;
-#ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES
-                    typedef type_ type;
-#else
-                    struct type : type_ {
-                    };
-#endif
+                    typedef block_state_preprocessor<Mode<aria<Size>, Padding>, StateAccumulator,
+                                                     stream_endian::little_octet_big_bit, ValueBits,
+                                                     policy_type::word_bits * 2> type;
                 };
 
             public:
@@ -111,10 +109,10 @@ namespace nil {
                     word_type w2[4];
                     word_type w3[4];
 
-                    w0[0] = load_be<uint32_t>(key, 0);
-                    w0[1] = load_be<uint32_t>(key, 1);
-                    w0[2] = load_be<uint32_t>(key, 2);
-                    w0[3] = load_be<uint32_t>(key, 3);
+                    w0[0] = boost::endian::native_to_big(key[0]);
+                    w0[1] = boost::endian::native_to_big(key[1]);
+                    w0[2] = boost::endian::native_to_big(key[2]);
+                    w0[3] = boost::endian::native_to_big(key[3]);
 
                     w1[0] = w0[0] ^ policy_type::round_constants[CK0][0];
                     w1[1] = w0[1] ^ policy_type::round_constants[CK0][1];
@@ -124,12 +122,12 @@ namespace nil {
                     policy_type::fo(w1[0], w1[1], w1[2], w1[3]);
 
                     if (policy_type::key_bits / 8 == 24 || policy_type::key_bits / 8 == 32) {
-                        w1[0] ^= load_be<uint32_t>(key, 4);
-                        w1[1] ^= load_be<uint32_t>(key, 5);
+                        w1[0] ^= boost::endian::native_to_big(key[4]);
+                        w1[1] ^= boost::endian::native_to_big(key[5]);
                     }
                     if (policy_type::key_bits / 8 == 32) {
-                        w1[2] ^= load_be<uint32_t>(key, 6);
-                        w1[3] ^= load_be<uint32_t>(key, 7);
+                        w1[2] ^= boost::endian::native_to_big(key[6]);
+                        w1[3] ^= boost::endian::native_to_big(key[7]);
                     }
 
                     w2[0] = w1[0] ^ policy_type::round_constants[CK1][0];
@@ -226,11 +224,11 @@ namespace nil {
                 }
 
                 block_type transform(const block_type &plaintext, const key_schedule_type &schedule) {
-                    // Hit every cache line of S1 and S2
+                    // Hit every state line of S1 and S2
                     const size_t cache_line_size = cpuid::cache_line_size();
 
                     /*
-                    * This initializer ensures Z == 0xFFFFFFFF for any cache line size
+                    * This initializer ensures Z == 0xFFFFFFFF for any state line size
                     * in {32,64,128,256,512}
                     */
                     volatile uint32_t Z = 0x11101010;
@@ -238,9 +236,10 @@ namespace nil {
                         Z |= policy_type::s1[i] | policy_type::s2[i];
                     }
 
-                    block_type out = block_type();
-
-                    word_type t0 = plaintext[0], t1 = plaintext[1], t2 = plaintext[2], t3 = plaintext[3];
+                    word_type t0 = boost::endian::native_to_big(plaintext[0]);
+                    word_type t1 = boost::endian::native_to_big(plaintext[1]);
+                    word_type t2 = boost::endian::native_to_big(plaintext[2]);
+                    word_type t3 = boost::endian::native_to_big(plaintext[3]);
 
                     t0 &= Z;
 
@@ -261,40 +260,40 @@ namespace nil {
                         }
                     }
 
-                    out[0] = static_cast<uint8_t>(policy_type::x1[get_byte(0, t0)]   ) ^
-                             get_byte(0, schedule[4 * rounds]);
-                    out[1] = static_cast<uint8_t>(policy_type::x2[get_byte(1, t0)] >> 8) ^
-                             get_byte(1, schedule[4 * rounds]);
-                    out[2] = static_cast<uint8_t>(policy_type::s1[get_byte(2, t0)]   ) ^
-                             get_byte(2, schedule[4 * rounds]);
-                    out[3] = static_cast<uint8_t>(policy_type::s2[get_byte(3, t0)]   ) ^
-                             get_byte(3, schedule[4 * rounds]);
-                    out[4] = static_cast<uint8_t>(policy_type::x1[get_byte(0, t1)]   ) ^
-                             get_byte(0, schedule[4 * rounds + 1]);
-                    out[5] = static_cast<uint8_t>(policy_type::x2[get_byte(1, t1)] >> 8) ^
-                             get_byte(1, schedule[4 * rounds + 1]);
-                    out[6] = static_cast<uint8_t>(policy_type::s1[get_byte(2, t1)]   ) ^
-                             get_byte(2, schedule[4 * rounds + 1]);
-                    out[7] = static_cast<uint8_t>(policy_type::s2[get_byte(3, t1)]   ) ^
-                             get_byte(3, schedule[4 * rounds + 1]);
-                    out[8] = static_cast<uint8_t>(policy_type::x1[get_byte(0, t2)]   ) ^
-                             get_byte(0, schedule[4 * rounds + 2]);
-                    out[9] = static_cast<uint8_t>(policy_type::x2[get_byte(1, t2)] >> 8) ^
-                             get_byte(1, schedule[4 * rounds + 2]);
-                    out[10] = static_cast<uint8_t>(policy_type::s1[get_byte(2, t2)]   ) ^
-                              get_byte(2, schedule[4 * rounds + 2]);
-                    out[11] = static_cast<uint8_t>(policy_type::s2[get_byte(3, t2)]   ) ^
-                              get_byte(3, schedule[4 * rounds + 2]);
-                    out[12] = static_cast<uint8_t>(policy_type::x1[get_byte(0, t3)]   ) ^
-                              get_byte(0, schedule[4 * rounds + 3]);
-                    out[13] = static_cast<uint8_t>(policy_type::x2[get_byte(1, t3)] >> 8) ^
-                              get_byte(1, schedule[4 * rounds + 3]);
-                    out[14] = static_cast<uint8_t>(policy_type::s1[get_byte(2, t3)]   ) ^
-                              get_byte(2, schedule[4 * rounds + 3]);
-                    out[15] = static_cast<uint8_t>(policy_type::s2[get_byte(3, t3)]   ) ^
-                              get_byte(3, schedule[4 * rounds + 3]);
-
-                    return out;
+                    return {
+                            policy_type::x1[policy_type::extract_uint_t<CHAR_BIT>(t0, 0)] ^
+                            policy_type::extract_uint_t<CHAR_BIT>(schedule[4 * rounds], 0),
+                            policy_type::x2[policy_type::extract_uint_t<CHAR_BIT>(t0, 1)] >> 8 ^
+                            policy_type::extract_uint_t<CHAR_BIT>(schedule[4 * rounds], 1),
+                            policy_type::s1[policy_type::extract_uint_t<CHAR_BIT>(t0, 2)] ^
+                            policy_type::extract_uint_t<CHAR_BIT>(schedule[4 * rounds], 2),
+                            policy_type::s2[policy_type::extract_uint_t<CHAR_BIT>(t0, 3)] ^
+                            policy_type::extract_uint_t<CHAR_BIT>(schedule[4 * rounds], 3),
+                            policy_type::x1[policy_type::extract_uint_t<CHAR_BIT>(t1, 0)] ^
+                            policy_type::extract_uint_t<CHAR_BIT>(schedule[4 * rounds + 1], 0),
+                            policy_type::x2[policy_type::extract_uint_t<CHAR_BIT>(t1, 1)] >> 8 ^
+                            policy_type::extract_uint_t<CHAR_BIT>(schedule[4 * rounds + 1], 1),
+                            policy_type::s1[policy_type::extract_uint_t<CHAR_BIT>(t1, 2)] ^
+                            policy_type::extract_uint_t<CHAR_BIT>(schedule[4 * rounds + 1], 2),
+                            policy_type::s2[policy_type::extract_uint_t<CHAR_BIT>(t1, 3)] ^
+                            policy_type::extract_uint_t<CHAR_BIT>(schedule[4 * rounds + 1], 3),
+                            policy_type::x1[policy_type::extract_uint_t<CHAR_BIT>(t2, 0)] ^
+                            policy_type::extract_uint_t<CHAR_BIT>(schedule[4 * rounds + 2], 0),
+                            policy_type::x2[policy_type::extract_uint_t<CHAR_BIT>(t2, 1)] >> 8 ^
+                            policy_type::extract_uint_t<CHAR_BIT>(schedule[4 * rounds + 2], 1),
+                            policy_type::s1[policy_type::extract_uint_t<CHAR_BIT>(t2, 2)] ^
+                            policy_type::extract_uint_t<CHAR_BIT>(schedule[4 * rounds + 2], 2),
+                            policy_type::s2[policy_type::extract_uint_t<CHAR_BIT>(t2, 3)] ^
+                            policy_type::extract_uint_t<CHAR_BIT>(schedule[4 * rounds + 2], 3),
+                            policy_type::x1[policy_type::extract_uint_t<CHAR_BIT>(t3, 0)] ^
+                            policy_type::extract_uint_t<CHAR_BIT>(schedule[4 * rounds + 3], 0),
+                            policy_type::x2[policy_type::extract_uint_t<CHAR_BIT>(t3, 1)] >> 8 ^
+                            policy_type::extract_uint_t<CHAR_BIT>(schedule[4 * rounds + 3], 1),
+                            policy_type::s1[policy_type::extract_uint_t<CHAR_BIT>(t3, 2)] ^
+                            policy_type::extract_uint_t<CHAR_BIT>(schedule[4 * rounds + 3], 2),
+                            policy_type::s2[policy_type::extract_uint_t<CHAR_BIT>(t3, 3)] ^
+                            policy_type::extract_uint_t<CHAR_BIT>(schedule[4 * rounds + 3], 3)
+                    };
                 }
             };
         }

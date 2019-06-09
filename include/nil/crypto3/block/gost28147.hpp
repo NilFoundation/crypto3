@@ -10,12 +10,13 @@
 #ifndef CRYPTO3_GOST_28147_89_H_
 #define CRYPTO3_GOST_28147_89_H_
 
+#include <boost/endian/arithmetic.hpp>
+
 #include <nil/crypto3/block/detail/gost_28147_89/gost_28147_89_policy.hpp>
 #include <nil/crypto3/block/detail/gost_28147_89/gost_28147_89_parameters.hpp>
 
 #include <nil/crypto3/block/detail/stream_endian.hpp>
-
-#include <nil/crypto3/block/cipher_state.hpp>
+#include <nil/crypto3/block/detail/block_state_preprocessor.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -124,10 +125,13 @@ namespace nil {
                 constexpr static const std::size_t key_words = policy_type::key_words;
                 typedef typename policy_type::key_type key_type;
 
-                template<template<typename, typename> class Mode, std::size_t ValueBits, typename Padding>
+                template<template<typename, typename> class Mode,
+                                                      typename StateAccumulator, std::size_t ValueBits,
+                                                      typename Padding>
                 struct stream_cipher {
-                    typedef cipher_state<Mode<gost_28147_89<ParamsType>, Padding>, stream_endian::little_octet_big_bit,
-                                         ValueBits, policy_type::word_bits * 2> type_;
+                    typedef block_state_preprocessor<Mode<gost_28147_89<ParamsType>, Padding>, StateAccumulator,
+                                                     stream_endian::little_octet_big_bit, ValueBits,
+                                                     policy_type::word_bits * 2> type_;
 #ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES
                     typedef type_ type;
 #else
@@ -139,10 +143,10 @@ namespace nil {
                 gost_28147_89(const key_type &key, const expanded_substitution_type &exp = expanded_substitution_type())
                         : expanded_substitution(exp) {
                     for (size_t i = 0; i != 256; ++i) {
-                        expanded_substitution[i] = policy_type::template rotl<11, uint32_t>(params[0][i]);
-                        expanded_substitution[i + 256] = policy_type::template rotl<19, uint32_t>(params[1][i]);
-                        expanded_substitution[i + 512] = policy_type::template rotl<27, uint32_t>(params[2][i]);
-                        expanded_substitution[i + 768] = policy_type::template rotl<3, uint32_t>(params[3][i]);
+                        expanded_substitution[i] = policy_type::template rotl<11, word_type>(params[0][i]);
+                        expanded_substitution[i + 256] = policy_type::template rotl<19, word_type>(params[1][i]);
+                        expanded_substitution[i + 512] = policy_type::template rotl<27, word_type>(params[2][i]);
+                        expanded_substitution[i + 768] = policy_type::template rotl<3, word_type>(params[3][i]);
                     }
 
                     schedule_key(key);
@@ -167,15 +171,13 @@ namespace nil {
 
                 inline void schedule_key(const key_type &key) {
                     for (size_t i = 0; i != key_schedule_size; ++i) {
-                        key_schedule[i] = load_le<uint32_t>(key, i);
+                        key_schedule[i] = boost::endian::native_to_little(key[i]);
                     }
                 }
 
                 inline block_type encrypt_block(const block_type &plaintext) {
-                    block_type out = {0};
-
-                    word_type N1 = load_le<uint32_t>(plaintext.data(), 0);
-                    word_type N2 = load_le<uint32_t>(plaintext.data(), 1);
+                    word_type N1 = boost::endian::native_to_little(plaintext[0]);
+                    word_type N2 = boost::endian::native_to_little(plaintext[1]);
 
                     for (size_t j = 0; j != 3; ++j) {
                         GOST_2ROUND(N1, N2, 0, 1);
@@ -189,16 +191,12 @@ namespace nil {
                     GOST_2ROUND(N1, N2, 3, 2);
                     GOST_2ROUND(N1, N2, 1, 0);
 
-                    store_le(out.data(), N2, N1);
-
-                    return out;
+                    return {boost::endian::little_to_native(N2), boost::endian::little_to_native(N1)};
                 }
 
                 inline block_type decrypt_block(const block_type &ciphertext) {
-                    block_type out = {0};
-
-                    word_type N1 = load_le<uint32_t>(ciphertext.data(), 0);
-                    word_type N2 = load_le<uint32_t>(ciphertext.data(), 1);
+                    word_type N1 = boost::endian::native_to_little(ciphertext[0]);
+                    word_type N2 = boost::endian::native_to_little(ciphertext[1]);
 
                     GOST_2ROUND(N1, N2, 0, 1);
                     GOST_2ROUND(N1, N2, 2, 3);
@@ -212,9 +210,7 @@ namespace nil {
                         GOST_2ROUND(N1, N2, 1, 0);
                     }
 
-                    store_le(out.data(), N2, N1);
-
-                    return out;
+                    return {boost::endian::little_to_native(N2), boost::endian::little_to_native(N1)};
                 }
             };
         }

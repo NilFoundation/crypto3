@@ -47,7 +47,7 @@ namespace nil {
                             }
                         }
 
-                        for (size_t i = 0; i != key_schedule_size / 4++i) {
+                        for (size_t i = 0; i != key_schedule_size / 4; ++i) {
                             expanded_substitution[i] = mds0[q0[q0[i] ^ S[0]] ^ S[4]];
                             expanded_substitution[256 + i] = mds1[q0[q1[i] ^ S[1]] ^ S[5]];
                             expanded_substitution[512 + i] = mds2[q1[q0[i] ^ S[2]] ^ S[6]];
@@ -60,12 +60,12 @@ namespace nil {
                             word_type Y =
                                     mds0[q0[q0[i + 1] ^ key[12]] ^ key[4]] ^mds1[q0[q1[i + 1] ^ key[13]] ^ key[5]] ^
                                     mds2[q1[q0[i + 1] ^ key[14]] ^ key[6]] ^mds3[q1[q1[i + 1] ^ key[15]] ^ key[7]];
-                            Y = rotl<8>(Y);
+                            Y = policy_type::template rotl<8>(Y);
                             X += Y;
                             Y += X;
 
                             round_key[i] = X;
-                            round_key[i + 1] = rotl<9>(Y);
+                            round_key[i + 1] = policy_type::template rotl<9>(Y);
                         }
 
                         S.fill(0);
@@ -115,12 +115,12 @@ namespace nil {
                                           mds1[q0[q1[q1[i + 1] ^ key[21]] ^ key[13]] ^ key[5]] ^
                                           mds2[q1[q0[q0[i + 1] ^ key[22]] ^ key[14]] ^ key[6]] ^
                                           mds3[q1[q1[q0[i + 1] ^ key[23]] ^ key[15]] ^ key[7]];
-                            Y = rotl<8>(Y);
+                            Y = policy_type::template rotl<8>(Y);
                             X += Y;
                             Y += X;
 
                             round_key[i] = X;
-                            round_key[i + 1] = rotl<9>(Y);
+                            round_key[i + 1] = policy_type::template rotl<9>(Y);
                         }
 
                         S.fill(0);
@@ -170,12 +170,12 @@ namespace nil {
                                           mds1[q0[q1[q1[q0[i + 1] ^ key[29]] ^ key[21]] ^ key[13]] ^ key[5]] ^
                                           mds2[q1[q0[q0[q0[i + 1] ^ key[30]] ^ key[22]] ^ key[14]] ^ key[6]] ^
                                           mds3[q1[q1[q0[q1[i + 1] ^ key[31]] ^ key[23]] ^ key[15]] ^ key[7]];
-                            Y = rotl<8>(Y);
+                            Y = policy_type::template rotl<8>(Y);
                             X += Y;
                             Y += X;
 
                             round_key[i] = X;
-                            round_key[i + 1] = rotl<9>(Y);
+                            round_key[i + 1] = policy_type::template rotl<9>(Y);
                         }
 
                         S.fill(0);

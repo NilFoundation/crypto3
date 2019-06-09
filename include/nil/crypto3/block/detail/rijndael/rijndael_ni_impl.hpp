@@ -14,8 +14,6 @@
 
 #include <wmmintrin.h>
 
-#include <nil/crypto3/utilities/loadstore.hpp>
-
 namespace nil {
     namespace crypto3 {
         namespace block {
@@ -24,6 +22,7 @@ namespace nil {
              */
             namespace detail {
                 CRYPTO3_FUNC_ISA("ssse3,aes")
+
                 __m128i aes_128_key_expansion(__m128i key, __m128i key_with_rcon) {
                     key_with_rcon = _mm_shuffle_epi32(key_with_rcon, _MM_SHUFFLE(3, 3, 3, 3));
                     key = _mm_xor_si128(key, _mm_slli_si128(key, 4));
@@ -33,6 +32,7 @@ namespace nil {
                 }
 
                 CRYPTO3_FUNC_ISA("ssse3,aes")
+
                 void aes_192_key_expansion(__m128i *K1, __m128i *K2, __m128i key2_with_rcon, uint32_t out[],
                                            bool last) {
                     __m128i key1 = *K1;
@@ -63,6 +63,7 @@ namespace nil {
 * The second half of the AES-256 key expansion (other half same as AES-128)
 */
                 CRYPTO3_FUNC_ISA("ssse3,aes")
+
                 __m128i aes_256_key_expansion(__m128i key, __m128i key2) {
                     __m128i key_with_rcon = _mm_aeskeygenassist_si128(key2, 0x00);
                     key_with_rcon = _mm_shuffle_epi32(key_with_rcon, _MM_SHUFFLE(2, 2, 2, 2));
@@ -112,17 +113,20 @@ namespace nil {
 
                 template<std::size_t KeyBitsImpl, std::size_t BlockBitsImpl, typename PolicyType>
                 class ni_rijndael_impl {
-                    BOOST_STATIC_ASSERT(PolicyType::block_bits == 128 && BlockBitsImpl == 128);
+                    BOOST_STATIC_ASSERT(PolicyType::block_bits
+                    == 128 && BlockBitsImpl == 128);
                 };
 
                 template<typename PolicyType>
                 class ni_rijndael_impl<128, 128, PolicyType> {
                     typedef PolicyType policy_type;
 
-                    BOOST_STATIC_ASSERT(PolicyType::key_bits == 128);
+                    BOOST_STATIC_ASSERT(PolicyType::key_bits
+                    == 128);
 
                 public:
                     CRYPTO3_FUNC_ISA("ssse3,aes")
+
                     static typename policy_type::block_type encrypt_block(
                             const typename policy_type::block_type &plaintext,
                             const typename policy_type::key_schedule_type &encryption_key) {
@@ -165,6 +169,7 @@ namespace nil {
                     }
 
                     CRYPTO3_FUNC_ISA("ssse3,aes")
+
                     static typename policy_type::block_type decrypt_block(
                             const typename policy_type::block_type &plaintext,
                             const typename policy_type::key_schedule_type &decryption_key) {
@@ -207,6 +212,7 @@ namespace nil {
                     }
 
                     CRYPTO3_FUNC_ISA("ssse3,aes")
+
                     static void schedule_key(const typename policy_type::key_type &input_key,
                                              typename policy_type::key_schedule_type &encryption_key,
                                              typename policy_type::key_schedule_type &decryption_key) {
@@ -262,11 +268,13 @@ namespace nil {
                 protected:
                     typedef PolicyType policy_type;
 
-                    BOOST_STATIC_ASSERT(PolicyType::key_bits == 192);
+                    BOOST_STATIC_ASSERT(PolicyType::key_bits
+                    == 192);
 
                 public:
 
                     CRYPTO3_FUNC_ISA("ssse3,aes")
+
                     static typename policy_type::block_type encrypt_block(
                             const typename policy_type::block_type &plaintext,
                             const typename policy_type::key_schedule_type &encryption_key) {
@@ -313,6 +321,7 @@ namespace nil {
                     }
 
                     CRYPTO3_FUNC_ISA("ssse3,aes")
+
                     static typename policy_type::block_type decrypt_block(
                             const typename policy_type::block_type &plaintext,
                             const typename policy_type::key_schedule_type &decryption_key) {
@@ -359,6 +368,7 @@ namespace nil {
                     }
 
                     CRYPTO3_FUNC_ISA("ssse3,aes")
+
                     static void schedule_key(const typename policy_type::key_type &input_key,
                                              typename policy_type::key_schedule_type &encryption_key,
                                              typename policy_type::key_schedule_type &decryption_key) {
@@ -409,10 +419,12 @@ namespace nil {
                 protected:
                     typedef PolicyType policy_type;
 
-                    BOOST_STATIC_ASSERT(PolicyType::key_bits == 256);
+                    BOOST_STATIC_ASSERT(PolicyType::key_bits
+                    == 256);
 
                 public:
                     CRYPTO3_FUNC_ISA("ssse3,aes")
+
                     static typename policy_type::block_type encrypt_block(
                             const typename policy_type::block_type &plaintext,
                             const typename policy_type::key_schedule_type &encryption_key) {
@@ -463,6 +475,7 @@ namespace nil {
                     }
 
                     CRYPTO3_FUNC_ISA("ssse3,aes")
+
                     static typename policy_type::block_type decrypt_block(
                             const typename policy_type::block_type &plaintext,
                             const typename policy_type::key_schedule_type &decryption_key) {
@@ -513,6 +526,7 @@ namespace nil {
                     }
 
                     CRYPTO3_FUNC_ISA("ssse3,aes")
+
                     static void schedule_key(const typename policy_type::key_type &input_key,
                                              typename policy_type::key_schedule_type &encryption_key,
                                              typename policy_type::key_schedule_type &decryption_key) {

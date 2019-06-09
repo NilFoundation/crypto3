@@ -16,6 +16,9 @@
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
 
+#include <nil/crypto3/block/algorithm/encrypt.hpp>
+#include <nil/crypto3/block/algorithm/decrypt.hpp>
+
 #include <nil/crypto3/block/aria.hpp>
 
 using namespace nil::crypto3::block;
@@ -30,6 +33,9 @@ BOOST_TEST_DONT_PRINT_LOG_VALUE(byte_vector_data_value)
 
 typedef std::vector<uint8_t> byte_vector_t;
 BOOST_TEST_DONT_PRINT_LOG_VALUE(byte_vector_t)
+
+typedef std::vector<std::string> string_vector_t;
+BOOST_TEST_DONT_PRINT_LOG_VALUE(string_vector_t)
 
 static const byte_vector_data valid_data = {{"Zg==",                                     {0x66}},
                                             {"Zm8=",                                     {0x66, 0x6F}},
@@ -53,7 +59,7 @@ static const byte_vector_data valid_data = {{"Zg==",                            
                                             {"Dw/O2Ul6r5I=",                             {0x0f, 0x0f, 0xce, 0xd9, 0x49, 0x7a, 0xaf, 0x92}},
                                             {"Jw+xiYKADaZA",                             {0x27, 0x0f, 0xb1, 0x89, 0x82, 0x80, 0x0d, 0xa6, 0x40}}};
 
-static const string_data invalid_data = {"ZOOL!isnotvalidbase64", "Neitheris:this?"};
+static const string_vector_t invalid_data = {"ZOOL!isnotvalidbase64", "Neitheris:this?"};
 
 BOOST_AUTO_TEST_SUITE(aria_test_suite)
 
