@@ -33,8 +33,10 @@ namespace nil {
              *
              * @note http://www.merkle.com/papers/Thesis1979.pdf
              */
-            template<typename DigestEndian, int DigestBits, typename IV, typename Compressor,
-                    typename Finalizer = nop_finalizer>
+            template<typename DigestEndian, int DigestBits,
+                     typename IV,
+                     typename Compressor,
+                     typename Finalizer = nop_finalizer>
             class merkle_damgard_construction {
             public:
                 typedef hash::static_digest<DigestBits> digest_type;

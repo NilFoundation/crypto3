@@ -48,7 +48,7 @@ namespace nil {
                 }
 
             private:
-                static void process_block(state_type &state, const block_type &block) {
+                static inline void process_block(state_type &state, const block_type &block) {
                     KeyConverterFunctor k;
                     key_type key = {0};
                     k(key, state);

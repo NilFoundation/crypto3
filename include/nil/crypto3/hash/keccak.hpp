@@ -33,7 +33,8 @@ namespace nil {
                 typedef detail::keccak_1600_functions<DigestBits> policy_type;
             public:
                 typedef sponge_construction<stream_endian::little_octet_big_bit, policy_type::digest_bits,
-                        typename policy_type::iv_generator, keccak_1600_compressor<DigestBits>> block_hash_type_;
+                                            typename policy_type::iv_generator,
+                                            keccak_1600_compressor<DigestBits>> block_hash_type_;
 #ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES
                 typedef block_hash_type_ block_hash_type;
 #else
@@ -43,8 +44,8 @@ namespace nil {
                 template<std::size_t ValueBits>
                 struct stream_processor {
                     typedef sponge_state_preprocessor<stream_endian::little_octet_big_bit, ValueBits,
-                            0, // No length padding!
-                            block_hash_type> type_;
+                                                      0, // No length padding!
+                                                      block_hash_type> type_;
 #ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES
                     typedef type_ type;
 #else

@@ -48,7 +48,7 @@ set(TESTS_NAMES "adler"
     "skein"
     "sm3"
     "static_digest"
-#    "streebog"
+    "streebog"
     "whirlpool")
 
 foreach(TEST_NAME ${TESTS_NAMES})
