@@ -12,8 +12,6 @@
 
 #include <nil/crypto3/block/detail/des/des_policy.hpp>
 
-#include <nil/crypto3/utilities/loadstore.hpp>
-
 namespace nil {
     namespace crypto3 {
         namespace block {
@@ -81,29 +79,29 @@ namespace nil {
                         for (size_t i = 0; i != policy_type::rounds; i += 2) {
                             typename policy_type::word_type T0, T1;
 
-                            T0 = policy_type::rotr<4>(R) ^ round_key[2 * i];
+                            T0 = policy_type::template rotr<4>(R) ^ round_key[2 * i];
                             T1 = R ^ round_key[2 * i + 1];
 
-                            L ^= policy_type::sbox1[extract_uint_t<CHAR_BIT>(T0, 0)] ^
-                                 policy_type::sbox2[extract_uint_t<CHAR_BIT>(T1, 0)] ^
-                                 policy_type::sbox3[extract_uint_t<CHAR_BIT>(T0, 1)] ^
-                                 policy_type::sbox4[extract_uint_t<CHAR_BIT>(T1, 1)] ^
-                                 policy_type::sbox5[extract_uint_t<CHAR_BIT>(T0, 2)] ^
-                                 policy_type::sbox6[extract_uint_t<CHAR_BIT>(T1, 2)] ^
-                                 policy_type::sbox7[extract_uint_t<CHAR_BIT>(T0, 3)] ^
-                                 policy_type::sbox8[extract_uint_t<CHAR_BIT>(T1, 3)];
+                            L ^= policy_type::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(T0, 0)] ^
+                                 policy_type::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(T1, 0)] ^
+                                 policy_type::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(T0, 1)] ^
+                                 policy_type::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(T1, 1)] ^
+                                 policy_type::sbox5[policy_type::template extract_uint_t<CHAR_BIT>(T0, 2)] ^
+                                 policy_type::sbox6[policy_type::template extract_uint_t<CHAR_BIT>(T1, 2)] ^
+                                 policy_type::sbox7[policy_type::template extract_uint_t<CHAR_BIT>(T0, 3)] ^
+                                 policy_type::sbox8[policy_type::template extract_uint_t<CHAR_BIT>(T1, 3)];
 
-                            T0 = policy_type::rotr<4>(L) ^ round_key[2 * i + 2];
+                            T0 = policy_type::template rotr<4>(L) ^ round_key[2 * i + 2];
                             T1 = L ^ round_key[2 * i + 3];
 
-                            R ^= policy_type::sbox1[extract_uint_t<CHAR_BIT>(T0, 0)] ^
-                                 policy_type::sbox2[extract_uint_t<CHAR_BIT>(T1, 0)] ^
-                                 policy_type::sbox3[extract_uint_t<CHAR_BIT>(T0, 1)] ^
-                                 policy_type::sbox4[extract_uint_t<CHAR_BIT>(T1, 1)] ^
-                                 policy_type::sbox5[extract_uint_t<CHAR_BIT>(T0, 2)] ^
-                                 policy_type::sbox6[extract_uint_t<CHAR_BIT>(T1, 2)] ^
-                                 policy_type::sbox7[extract_uint_t<CHAR_BIT>(T0, 3)] ^
-                                 policy_type::sbox8[extract_uint_t<CHAR_BIT>(T1, 3)];
+                            R ^= policy_type::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(T0, 0)] ^
+                                 policy_type::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(T1, 0)] ^
+                                 policy_type::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(T0, 1)] ^
+                                 policy_type::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(T1, 1)] ^
+                                 policy_type::sbox5[policy_type::template extract_uint_t<CHAR_BIT>(T0, 2)] ^
+                                 policy_type::sbox6[policy_type::template extract_uint_t<CHAR_BIT>(T1, 2)] ^
+                                 policy_type::sbox7[policy_type::template extract_uint_t<CHAR_BIT>(T0, 3)] ^
+                                 policy_type::sbox8[policy_type::template extract_uint_t<CHAR_BIT>(T1, 3)];
                         }
                     }
 
@@ -113,29 +111,29 @@ namespace nil {
                         for (size_t i = policy_type::rounds; i != 0; i -= 2) {
                             typename policy_type::word_type T0, T1;
 
-                            T0 = policy_type::rotr<4>(R) ^ round_key[2 * i - 2];
+                            T0 = policy_type::template rotr<4>(R) ^ round_key[2 * i - 2];
                             T1 = R ^ round_key[2 * i - 1];
 
-                            L ^= policy_type::sbox1[extract_uint_t<CHAR_BIT>(T0, 0)] ^
-                                 policy_type::sbox2[extract_uint_t<CHAR_BIT>(T1, 0)] ^
-                                 policy_type::sbox3[extract_uint_t<CHAR_BIT>(T0, 1)] ^
-                                 policy_type::sbox4[extract_uint_t<CHAR_BIT>(T1, 1)] ^
-                                 policy_type::sbox5[extract_uint_t<CHAR_BIT>(T0, 2)] ^
-                                 policy_type::sbox6[extract_uint_t<CHAR_BIT>(T1, 2)] ^
-                                 policy_type::sbox7[extract_uint_t<CHAR_BIT>(T0, 3)] ^
-                                 policy_type::sbox8[extract_uint_t<CHAR_BIT>(T1, 3)];
+                            L ^= policy_type::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(T0, 0)] ^
+                                 policy_type::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(T1, 0)] ^
+                                 policy_type::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(T0, 1)] ^
+                                 policy_type::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(T1, 1)] ^
+                                 policy_type::sbox5[policy_type::template extract_uint_t<CHAR_BIT>(T0, 2)] ^
+                                 policy_type::sbox6[policy_type::template extract_uint_t<CHAR_BIT>(T1, 2)] ^
+                                 policy_type::sbox7[policy_type::template extract_uint_t<CHAR_BIT>(T0, 3)] ^
+                                 policy_type::sbox8[policy_type::template extract_uint_t<CHAR_BIT>(T1, 3)];
 
-                            T0 = policy_type::rotr<4>(L) ^ round_key[2 * i - 4];
+                            T0 = policy_type::template rotr<4>(L) ^ round_key[2 * i - 4];
                             T1 = L ^ round_key[2 * i - 3];
 
-                            R ^= policy_type::sbox1[extract_uint_t<CHAR_BIT>(T0, 0)] ^
-                                 policy_type::sbox2[extract_uint_t<CHAR_BIT>(T1, 0)] ^
-                                 policy_type::sbox3[extract_uint_t<CHAR_BIT>(T0, 1)] ^
-                                 policy_type::sbox4[extract_uint_t<CHAR_BIT>(T1, 1)] ^
-                                 policy_type::sbox5[extract_uint_t<CHAR_BIT>(T0, 2)] ^
-                                 policy_type::sbox6[extract_uint_t<CHAR_BIT>(T1, 2)] ^
-                                 policy_type::sbox7[extract_uint_t<CHAR_BIT>(T0, 3)] ^
-                                 policy_type::sbox8[extract_uint_t<CHAR_BIT>(T1, 3)];
+                            R ^= policy_type::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(T0, 0)] ^
+                                 policy_type::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(T1, 0)] ^
+                                 policy_type::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(T0, 1)] ^
+                                 policy_type::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(T1, 1)] ^
+                                 policy_type::sbox5[policy_type::template extract_uint_t<CHAR_BIT>(T0, 2)] ^
+                                 policy_type::sbox6[policy_type::template extract_uint_t<CHAR_BIT>(T1, 2)] ^
+                                 policy_type::sbox7[policy_type::template extract_uint_t<CHAR_BIT>(T0, 3)] ^
+                                 policy_type::sbox8[policy_type::template extract_uint_t<CHAR_BIT>(T1, 3)];
                         }
                     }
                 };

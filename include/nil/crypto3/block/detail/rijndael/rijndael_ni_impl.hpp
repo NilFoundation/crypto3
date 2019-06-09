@@ -14,8 +14,6 @@
 
 #include <wmmintrin.h>
 
-#include <nil/crypto3/utilities/loadstore.hpp>
-
 namespace nil {
     namespace crypto3 {
         namespace block {

@@ -10,6 +10,8 @@
 #ifndef CRYPTO3_TWOFISH_H_
 #define CRYPTO3_TWOFISH_H_
 
+#include <boost/endian/arithmetic.hpp>
+
 #include <nil/crypto3/block/detail/twofish/twofish_policy.hpp>
 
 #include <nil/crypto3/block/detail/block_state_preprocessor.hpp>
@@ -50,9 +52,11 @@ namespace nil {
                 constexpr static const std::size_t key_words = policy_type::key_words;
                 typedef typename policy_type::key_type key_type;
 
-                template<template<typename, typename> class Mode, std::size_t ValueBits, typename Padding>
+                template<template<typename, typename> class Mode,
+                                                      typename StateAccumulator, std::size_t ValueBits,
+                                                      typename Padding>
                 struct stream_cipher {
-                    typedef block_state_preprocessor<Mode<twofish<KeyBits>, Padding>,
+                    typedef block_state_preprocessor<Mode<twofish<KeyBits>, Padding>, StateAccumulator,
                                                      stream_endian::little_octet_big_bit, ValueBits,
                                                      policy_type::word_bits * 2> type;
                 };
@@ -79,17 +83,17 @@ namespace nil {
                 expanded_substitution_type expanded_substitution;
 
                 inline block_type encrypt_block(const block_type &plaintext) {
-                    block_type out = {0};
-
-                    word_type A, B, C, D;
-                    load_le(plaintext.data(), A, B, C, D);
+                    word_type A = boost::endian::native_to_little(plaintext[0]);
+                    word_type B = boost::endian::native_to_little(plaintext[1]);
+                    word_type C = boost::endian::native_to_little(plaintext[2]);
+                    word_type D = boost::endian::native_to_little(plaintext[3]);
 
                     A ^= round_key[0];
                     B ^= round_key[1];
                     C ^= round_key[2];
                     D ^= round_key[3];
 
-                    for (size_t k = 8; k != 40; k += 4) {
+                    for (size_t k = 8; k != expanded_substitution_size; k += 4) {
                         policy_type::tf_e(A, B, C, D, round_key[k], round_key[k + 1], expanded_substitution);
                         policy_type::tf_e(C, D, A, B, round_key[k + 2], round_key[k + 3], expanded_substitution);
                     }
@@ -99,23 +103,24 @@ namespace nil {
                     A ^= round_key[6];
                     B ^= round_key[7];
 
-                    store_le(out.data(), C, D, A, B);
-
-                    return out;
+                    return {
+                            boost::endian::little_to_native(C), boost::endian::little_to_native(D),
+                            boost::endian::little_to_native(A), boost::endian::little_to_native(B)
+                    };
                 }
 
                 inline block_type decrypt_block(const block_type &ciphertext) {
-                    block_type out = {0};
-
-                    word_type A, B, C, D;
-                    load_le(ciphertext.data(), A, B, C, D);
+                    word_type A = boost::endian::native_to_little(ciphertext[0]);
+                    word_type B = boost::endian::native_to_little(ciphertext[1]);
+                    word_type C = boost::endian::native_to_little(ciphertext[2]);
+                    word_type D = boost::endian::native_to_little(ciphertext[3]);
 
                     A ^= round_key[4];
                     B ^= round_key[5];
                     C ^= round_key[6];
                     D ^= round_key[7];
 
-                    for (size_t k = 40; k != 8; k -= 4) {
+                    for (size_t k = expanded_substitution_size; k != 8; k -= 4) {
                         policy_type::F_D(A, B, C, D, round_key[k - 2], round_key[k - 1], expanded_substitution);
                         policy_type::F_D(C, D, A, B, round_key[k - 4], round_key[k - 3], expanded_substitution);
                     }
@@ -125,9 +130,10 @@ namespace nil {
                     A ^= round_key[2];
                     B ^= round_key[3];
 
-                    store_le(out, C, D, A, B);
-
-                    return out;
+                    return {
+                            boost::endian::little_to_native(C), boost::endian::little_to_native(D),
+                            boost::endian::little_to_native(A), boost::endian::little_to_native(B)
+                    };
                 }
 
                 inline void schedule_key(const key_type &key) {

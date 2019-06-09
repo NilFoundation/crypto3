@@ -47,7 +47,7 @@ namespace nil {
                             }
                         }
 
-                        for (size_t i = 0; i != key_schedule_size / 4++i) {
+                        for (size_t i = 0; i != key_schedule_size / 4; ++i) {
                             expanded_substitution[i] = mds0[q0[q0[i] ^ S[0]] ^ S[4]];
                             expanded_substitution[256 + i] = mds1[q0[q1[i] ^ S[1]] ^ S[5]];
                             expanded_substitution[512 + i] = mds2[q1[q0[i] ^ S[2]] ^ S[6]];

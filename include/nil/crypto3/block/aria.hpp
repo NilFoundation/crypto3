@@ -262,7 +262,7 @@ namespace nil {
 
                     return {
                             policy_type::x1[policy_type::extract_uint_t<CHAR_BIT>(t0, 0)] ^
-                            policy_type::extract_uint_t<CHAR_BIT>(, schedule[4 * rounds], 0),
+                            policy_type::extract_uint_t<CHAR_BIT>(schedule[4 * rounds], 0),
                             policy_type::x2[policy_type::extract_uint_t<CHAR_BIT>(t0, 1)] >> 8 ^
                             policy_type::extract_uint_t<CHAR_BIT>(schedule[4 * rounds], 1),
                             policy_type::s1[policy_type::extract_uint_t<CHAR_BIT>(t0, 2)] ^

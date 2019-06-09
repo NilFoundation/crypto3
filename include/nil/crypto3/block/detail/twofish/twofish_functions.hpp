@@ -18,19 +18,22 @@ namespace nil {
             namespace detail {
                 template<std::size_t KeyBits>
                 struct twofish_functions : public basic_twofish_policy<KeyBits> {
-                    typedef typename basic_twofish_policy<KeyBits>::word_type word_type;
+                    typedef basic_twofish_policy<KeyBits> policy_type;
+                    typedef typename policy_type::word_type word_type;
 
                     typedef typename basic_twofish_policy<
                             KeyBits>::expanded_substitution_type expanded_substitution_type;
 
                     inline static void tf_e(word_type A, word_type B, word_type &C, word_type &D, word_type RK1,
                                             word_type RK2, const expanded_substitution_type &SB) {
-                        word_type X = SB[extract_uint_t<CHAR_BIT>(A, 3)] ^SB[256 + extract_uint_t<CHAR_BIT>(A, 2)] ^
-                                      SB[512 + extract_uint_t<CHAR_BIT>(A, 1)] ^
-                                      SB[768 + extract_uint_t<CHAR_BIT>(A, 0)];
-                        word_type Y = SB[extract_uint_t<CHAR_BIT>(B, 0)] ^SB[256 + extract_uint_t<CHAR_BIT>(B, 3)] ^
-                                      SB[512 + extract_uint_t<CHAR_BIT>(B, 2)] ^
-                                      SB[768 + extract_uint_t<CHAR_BIT>(B, 1)];
+                        word_type X = SB[policy_type::template extract_uint_t<CHAR_BIT>(A, 3)] ^
+                                      SB[256 + policy_type::template extract_uint_t<CHAR_BIT>(A, 2)] ^
+                                      SB[512 + policy_type::template extract_uint_t<CHAR_BIT>(A, 1)] ^
+                                      SB[768 + policy_type::template extract_uint_t<CHAR_BIT>(A, 0)];
+                        word_type Y = SB[policy_type::template extract_uint_t<CHAR_BIT>(B, 0)] ^
+                                      SB[256 + policy_type::template extract_uint_t<CHAR_BIT>(B, 3)] ^
+                                      SB[512 + policy_type::template extract_uint_t<CHAR_BIT>(B, 2)] ^
+                                      SB[768 + policy_type::template extract_uint_t<CHAR_BIT>(B, 1)];
 
                         X += Y;
                         Y += X;
@@ -38,18 +41,20 @@ namespace nil {
                         X += RK1;
                         Y += RK2;
 
-                        C = rotr<1>(C ^ X);
-                        D = rotl<1>(D) ^ Y;
+                        C = policy_type::template rotr<1>(C ^ X);
+                        D = policy_type::template rotl<1>(D) ^ Y;
                     }
 
                     inline static void tf_d(word_type A, word_type B, word_type &C, word_type &D, word_type RK1,
                                             word_type RK2, const expanded_substitution_type &SB) {
-                        word_type X = SB[extract_uint_t<CHAR_BIT>(A, 3)] ^SB[256 + extract_uint_t<CHAR_BIT>(A, 2)] ^
-                                      SB[512 + extract_uint_t<CHAR_BIT>(A, 1)] ^
-                                      SB[768 + extract_uint_t<CHAR_BIT>(A, 0)];
-                        word_type Y = SB[extract_uint_t<CHAR_BIT>(B, 0)] ^SB[256 + extract_uint_t<CHAR_BIT>(B, 3)] ^
-                                      SB[512 + extract_uint_t<CHAR_BIT>(B, 2)] ^
-                                      SB[768 + extract_uint_t<CHAR_BIT>(B, 1)];
+                        word_type X = SB[policy_type::template extract_uint_t<CHAR_BIT>(A, 3)] ^
+                                      SB[256 + policy_type::template extract_uint_t<CHAR_BIT>(A, 2)] ^
+                                      SB[512 + policy_type::template extract_uint_t<CHAR_BIT>(A, 1)] ^
+                                      SB[768 + policy_type::template extract_uint_t<CHAR_BIT>(A, 0)];
+                        word_type Y = SB[policy_type::template extract_uint_t<CHAR_BIT>(B, 0)] ^
+                                      SB[256 + policy_type::template extract_uint_t<CHAR_BIT>(B, 3)] ^
+                                      SB[512 + policy_type::template extract_uint_t<CHAR_BIT>(B, 2)] ^
+                                      SB[768 + policy_type::template extract_uint_t<CHAR_BIT>(B, 1)];
 
                         X += Y;
                         Y += X;
@@ -57,8 +62,8 @@ namespace nil {
                         X += RK1;
                         Y += RK2;
 
-                        C = rotl<1>(C) ^ X;
-                        D = rotr<1>(D ^ Y);
+                        C = policy_type::template rotl<1>(C) ^ X;
+                        D = policy_type::template rotr<1>(D ^ Y);
                     }
                 };
             }

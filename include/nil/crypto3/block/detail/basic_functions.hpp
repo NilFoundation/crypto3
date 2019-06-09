@@ -34,10 +34,10 @@ namespace nil {
                                 >> (((~position) & (sizeof(Integer) - 1)) << 3));
                     }
 
-                    template<std::size_t Size, typename ...Args>
+                    template<std::size_t Size, typename T>
                     static inline typename boost::uint_t<Size>::exact make_uint_t(
-                            const std::initializer_list<Args...> &args) {
-                        typedef typename std::initializer_list<Args ...>::value_type value_type;
+                            const std::initializer_list<T> &args) {
+                        typedef typename std::initializer_list<T>::value_type value_type;
                         typename boost::uint_t<Size>::exact result = 0;
 
 #pragma clang loop unroll(full)
@@ -51,7 +51,7 @@ namespace nil {
 
                     template<std::size_t Size, typename ...Args>
                     static inline typename boost::uint_t<Size>::exact make_uint_t(Args... args) {
-                        return make_uint_t({args...});
+                        return basic_functions<WordBits>::template make_uint_t<Size, typename std::tuple_element<0,std::tuple<Args...>>::type>({args...});
                     }
 
                     static inline word_type shr(word_type x, std::size_t n) {
