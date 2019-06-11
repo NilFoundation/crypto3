@@ -10,7 +10,7 @@
 #ifndef CRYPTO3_HASH_HPP
 #define CRYPTO3_HASH_HPP
 
-#include <nil/crypto3/hash/detail/stream_postprocessor.hpp>
+#include <nil/crypto3/hash/detail/hash_value.hpp>
 
 namespace nil {
     namespace crypto3 {

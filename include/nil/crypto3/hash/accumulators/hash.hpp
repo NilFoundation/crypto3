@@ -26,7 +26,7 @@ namespace nil {
     namespace crypto3 {
         namespace accumulators {
             namespace impl {
-                template<typename Mode, typename Construction>
+                template<typename Mode>
                 struct hash_impl : boost::accumulators::accumulator_base {
                 protected:
                     typedef Mode mode_type;

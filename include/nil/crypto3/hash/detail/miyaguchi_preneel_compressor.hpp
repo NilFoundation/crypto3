@@ -25,7 +25,6 @@ namespace nil {
              */
             template<typename BlockCipher, typename CombineFunction, typename KeyConverterFunctor>
             struct miyaguchi_preneel_compressor {
-            public:
                 typedef BlockCipher block_cipher_type;
 
                 constexpr static const std::size_t word_bits = block_cipher_type::word_bits;
@@ -42,12 +41,11 @@ namespace nil {
                 constexpr static const std::size_t block_words = block_cipher_type::key_words;
                 typedef typename block_cipher_type::block_type block_type;
 
-            public:
                 void operator()(state_type &state, const block_type &block) {
                     process_block(state, block);
                 }
 
-            private:
+            protected:
                 inline static void process_block(state_type &state, const block_type &block) {
                     KeyConverterFunctor k;
                     key_type key = {0};

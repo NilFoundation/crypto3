@@ -27,7 +27,6 @@ namespace nil {
              */
             template<typename BlockCipher, typename CombineFunction>
             struct davies_meyer_compressor {
-            public:
                 typedef BlockCipher block_cipher_type;
 
                 constexpr static const std::size_t word_bits = block_cipher_type::word_bits;

@@ -61,7 +61,6 @@ namespace nil {
                 constexpr static const std::size_t block_words = compressor_functor::block_words;
                 typedef typename compressor_functor::block_type block_type;
 
-            public:
                 template<typename Integer>
                 haifa_construction &update(const block_type &block, Integer seen, Integer finalization = 0) {
                     compressor_functor()(state_, block, seen, finalization);
@@ -85,7 +84,6 @@ namespace nil {
                     return d;
                 }
 
-            public:
                 haifa_construction() {
                     reset();
                 }

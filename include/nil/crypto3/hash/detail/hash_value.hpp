@@ -81,7 +81,7 @@ namespace nil {
 
                         BOOST_STATIC_ASSERT(std::numeric_limits<value_type>::is_specialized);
 
-                        this->sh.update(boost::begin(range), boost::end(range));
+                        this->sh(boost::begin(range), boost::end(range));
                     }
 
                     template<typename InputIterator>
@@ -93,7 +93,7 @@ namespace nil {
 
                         BOOST_STATIC_ASSERT(std::numeric_limits<value_type>::is_specialized);
 
-                        this->sh.update(first, last);
+                        this->sh(first, last);
                     }
 
                     template<typename OutputRange>
@@ -134,7 +134,7 @@ namespace nil {
 
                         BOOST_STATIC_ASSERT(std::numeric_limits<value_type>::is_specialized);
 
-                        this->sh.update(boost::begin(range), boost::end(range));
+                        this->sh(boost::begin(range), boost::end(range));
                     }
 
                     template<typename InputIterator>
@@ -147,7 +147,7 @@ namespace nil {
 
                         BOOST_STATIC_ASSERT(std::numeric_limits<value_type>::is_specialized);
 
-                        this->sh.update(first, last);
+                        this->sh(first, last);
                     }
 
                     operator OutputIterator() const {

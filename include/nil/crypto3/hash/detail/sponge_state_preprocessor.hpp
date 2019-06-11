@@ -24,7 +24,6 @@ namespace nil {
         namespace hash {
             template<typename Hash, typename Endian, unsigned ValueBits, unsigned LengthBits>
             class sponge_state_preprocessor {
-            private:
                 typedef Hash block_hash_type;
 
                 constexpr static const std::size_t word_bits = block_hash_type::word_bits;
@@ -58,7 +57,6 @@ namespace nil {
 
                 BOOST_STATIC_ASSERT(!length_bits || value_bits <= length_bits);
 
-            private:
                 void process_block() {
                     // Convert the input into words
                     block_type block;
@@ -96,7 +94,6 @@ namespace nil {
                     // No appending requested, so nothing to do
                 }
 
-            public:
                 sponge_state_preprocessor &update_one(value_type value) {
                     std::size_t i = seen % block_bits;
                     std::size_t j = i / value_bits;
@@ -136,13 +133,15 @@ namespace nil {
                     return *this;
                 }
 
+            public:
+
                 template<typename InputIterator>
-                sponge_state_preprocessor &update(InputIterator b, InputIterator e, std::random_access_iterator_tag) {
+                void operator()(InputIterator b, InputIterator e, std::random_access_iterator_tag) {
                     return update_n(b, e - b);
                 }
 
                 template<typename InputIterator, typename Category>
-                sponge_state_preprocessor &update(InputIterator first, InputIterator last, Category) {
+                void operator()(InputIterator first, InputIterator last, Category) {
                     while (first != last) {
                         update_one(*first++);
                     }
@@ -150,13 +149,13 @@ namespace nil {
                 }
 
                 template<typename InputIterator>
-                sponge_state_preprocessor &update(InputIterator b, InputIterator e) {
+                void operator()(InputIterator b, InputIterator e) {
                     typedef typename std::iterator_traits<InputIterator>::iterator_category cat;
                     return update(b, e, cat());
                 }
 
                 template<typename ContainerT>
-                sponge_state_preprocessor &update(const ContainerT &c) {
+                void operator()(const ContainerT &c) {
                     return update_n(c.data(), c.size());
                 }
 
@@ -196,7 +195,6 @@ namespace nil {
                     return sponge_state_preprocessor(*this).end_message();
                 }
 
-            public:
                 sponge_state_preprocessor() : value_array(), block_hash(), seen() {
                 }
 
