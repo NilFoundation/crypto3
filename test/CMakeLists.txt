@@ -5,9 +5,9 @@ if(NOT Boost_UNIT_TEST_FRAMEWORK_FOUND)
 endif()
 
 cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
+                       ${CMAKE_WORKSPACE_NAME}::codec
                        ${CMAKE_WORKSPACE_NAME}::hash
-
-                       concept_container
+                       ${CMAKE_WORKSPACE_NAME}::utilities
 
                        ${Boost_LIBRARIES})
 
@@ -37,7 +37,7 @@ set(TESTS_NAMES
     "blowfish"
     "camellia"
     "cast"
-#    "des"
+    #    "des"
     "gost28147"
     "idea"
     "kasumi"
@@ -47,7 +47,7 @@ set(TESTS_NAMES
     "serpent"
     "shacal"
     "sm4"
-    "threefish"
+#    "threefish"
     "twofish"
     "xtea"
     )

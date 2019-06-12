@@ -492,8 +492,4 @@ BOOST_AUTO_TEST_SUITE(rijndael_cipher_test_suite)
         BOOST_CHECK_EQUAL(f.plaintext, f.original_plaintext);
     }
 
-    BOOST_AUTO_TEST_CASE(rijndael_256_256_cipher) {
-
-    }
-
 BOOST_AUTO_TEST_SUITE_END()
