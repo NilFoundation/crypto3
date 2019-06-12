@@ -106,9 +106,9 @@ namespace nil {
                             typename input_block_type::const_iterator itr =
                                     block.begin() + (cache.max_size() - cache.size());
 
-                            std::copy(block.begin(), itr, b.end());
+                            std::move(block.begin(), itr, b.end());
 
-                            ob = mode_type::process_block(block);
+                            ob = mode_type::process_block(b);
 
                             cache.clear();
                             cache.insert(cache.end(), itr, block.end());
