@@ -26,21 +26,21 @@ namespace nil {
     namespace crypto3 {
         namespace accumulators {
             namespace impl {
-                template<typename Mode>
+                template<typename Hash>
                 struct hash_impl : boost::accumulators::accumulator_base {
                 protected:
-                    typedef Mode mode_type;
-                    typedef typename mode_type::finalizer_type finalizer_type;
+                    typedef Hash hash_type;
+                    typedef typename hash_type::finalizer_type finalizer_type;
 
-                    typedef typename mode_type::input_block_type input_block_type;
+                    typedef typename hash_type::input_block_type input_block_type;
                     typedef typename input_block_type::value_type input_value_type;
-                    constexpr static const std::size_t input_block_bits = mode_type::input_block_bits;
+                    constexpr static const std::size_t input_block_bits = hash_type::input_block_bits;
                     constexpr static const std::size_t input_value_bits =
                             input_block_bits / std::tuple_size<input_block_type>::value;
 
-                    typedef typename mode_type::output_block_type output_block_type;
+                    typedef typename hash_type::output_block_type output_block_type;
                     typedef typename output_block_type::value_type output_value_type;
-                    constexpr static const std::size_t output_block_bits = mode_type::output_block_bits;
+                    constexpr static const std::size_t output_block_bits = hash_type::output_block_bits;
                     constexpr static const std::size_t output_value_bits =
                             output_block_bits / std::tuple_size<output_block_type>::value;
 
@@ -67,7 +67,7 @@ namespace nil {
                         if (!cache.empty()) {
                             input_block_type ib = {0};
                             std::move(cache.begin(), cache.end(), ib.begin());
-                            output_block_type ob = mode_type::process_block(ib);
+                            output_block_type ob = hash_type::process_block(ib);
                             std::move(ob.begin(), ob.end(), std::inserter(res, res.end()));
                         }
 
@@ -86,7 +86,7 @@ namespace nil {
                         if (cache.size() == cache.max_size()) {
                             input_block_type ib = {0};
                             std::move(cache.begin(), cache.end(), ib.begin());
-                            output_block_type ob = mode_type::process_block(ib);
+                            output_block_type ob = hash_type::process_block(ib);
                             std::move(ob.begin(), ob.end(), std::inserter(digest, digest.end()));
 
                             cache.clear();
@@ -99,7 +99,7 @@ namespace nil {
                     inline void process(const input_block_type &block) {
                         output_block_type ob;
                         if (cache.empty()) {
-                            ob = mode_type::process_block(block);
+                            ob = hash_type::process_block(block);
                         } else {
                             input_block_type b = hash::make_array<std::tuple_size<input_block_type>::value>(
                                     cache.begin(), cache.end());
@@ -108,7 +108,7 @@ namespace nil {
 
                             std::copy(block.begin(), itr, b.end());
 
-                            ob = mode_type::process_block(block);
+                            ob = hash_type::process_block(block);
 
                             cache.clear();
                             cache.insert(cache.end(), itr, block.end());

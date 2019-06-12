@@ -23,7 +23,7 @@ namespace nil {
         namespace hash {
             template<std::size_t DigestBits> using sha3_compressor = keccak_1600_compressor<DigestBits>;
 
-            template<std::size_t DigestBits>
+            template<std::size_t DigestBits = 512>
             class sha3 {
                 typedef detail::sha3_functions<DigestBits> policy_type;
             public:
@@ -36,11 +36,12 @@ namespace nil {
                 struct block_hash_type : block_hash_type_ {
                 };
 #endif
-                template<std::size_t ValueBits>
+                template<typename StateAccumulator, std::size_t ValueBits>
                 struct stream_processor {
-                    typedef sponge_state_preprocessor<stream_endian::little_octet_big_bit, ValueBits,
-                                                      0, // No length padding!
-                                                      block_hash_type> type_;
+                    typedef sponge_state_preprocessor<block_hash_type, StateAccumulator,
+                                                      stream_endian::little_octet_big_bit, ValueBits,
+                                                      0 // No length padding!
+                                                     > type_;
 #ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES
                     typedef type_ type;
 #else

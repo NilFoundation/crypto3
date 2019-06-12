@@ -213,7 +213,7 @@ Bits    Limit
             private:
                 typedef basic_adler<Bits> octet_hash_type;
             public:
-                template<std::size_t ValueBits>
+                template<typename StateAccumulator, std::size_t ValueBits>
                 struct stream_processor {
                     BOOST_STATIC_ASSERT(ValueBits == 8);
                     typedef octet_hash_type type_;

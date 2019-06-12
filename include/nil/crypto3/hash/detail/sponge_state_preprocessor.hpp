@@ -22,7 +22,9 @@
 namespace nil {
     namespace crypto3 {
         namespace hash {
-            template<typename Hash, typename Endian, unsigned ValueBits, unsigned LengthBits>
+            template<typename Hash,
+                     typename StateAccumulator,
+                     typename Endian, std::size_t ValueBits, std::size_t LengthBits>
             class sponge_state_preprocessor {
                 typedef Hash block_hash_type;
 
@@ -38,10 +40,9 @@ namespace nil {
 
                 constexpr static const std::size_t value_bits = ValueBits;
                 typedef typename boost::uint_t<value_bits>::least value_type;
-                BOOST_STATIC_ASSERT(word_bits
-                % value_bits == 0);
+                BOOST_STATIC_ASSERT(word_bits % value_bits == 0);
                 constexpr static const std::size_t block_values = block_bits / value_bits;
-                typedef std::array <value_type, block_values> value_array_type;
+                typedef std::array<value_type, block_values> value_array_type;
 
             private:
 
@@ -52,8 +53,7 @@ namespace nil {
                 typedef typename boost::uint_t<length_type_bits>::least length_type;
                 constexpr static const std::size_t length_words = length_bits / word_bits;
                 BOOST_STATIC_ASSERT(!length_bits || length_bits % word_bits == 0);
-                BOOST_STATIC_ASSERT(block_bits
-                % value_bits == 0);
+                BOOST_STATIC_ASSERT(block_bits % value_bits == 0);
 
                 BOOST_STATIC_ASSERT(!length_bits || value_bits <= length_bits);
 
@@ -79,7 +79,7 @@ namespace nil {
 
                     // Append length
                     std::array<length_type, 1> length_array = {{length}};
-                    std::array <word_type, length_words> length_words_array;
+                    std::array<word_type, length_words> length_words_array;
                     pack<Endian, length_bits, word_bits>(length_array, length_words_array);
                     for (std::size_t i = length_words; i; --i) {
                         block[block_words - i] = length_words_array[length_words - i];

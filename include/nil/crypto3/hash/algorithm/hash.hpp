@@ -10,7 +10,8 @@
 #ifndef CRYPTO3_HASH_HPP
 #define CRYPTO3_HASH_HPP
 
-#include <nil/crypto3/hash/detail/hash_value.hpp>
+#include <nil/crypto3/hash/hash_value.hpp>
+#include <nil/crypto3/hash/hash_state.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -45,7 +46,7 @@ namespace nil {
              *
              * @ingroup hash_algorithms
              *
-             * @tparam Hasher
+             * @tparam Hash
              * @tparam InputIterator
              * @tparam OutputIterator
              * @tparam StreamHash
@@ -56,15 +57,15 @@ namespace nil {
              *
              * @return
              */
-            template<typename Hasher,
-                     typename InputIterator,
-                     typename OutputIterator,
-                     typename StreamHash = typename itr_stream_hash_traits<Hasher, InputIterator>::type,
-                     typename = typename std::enable_if<detail::is_stream_hash<StreamHash>::value>::type>
+            template<typename Hash, typename InputIterator, typename OutputIterator>
             OutputIterator hash(InputIterator first, InputIterator last, OutputIterator out) {
+                typedef typename hash::hash_accumulator<Hash> HashAccumulator;
+                typedef typename Hash::template stream_processor<HashAccumulator, std::numeric_limits<
+                        typename std::iterator_traits<InputIterator>::value_type>::digits + std::numeric_limits<
+                        typename std::iterator_traits<InputIterator>::value_type>::is_signed>::type StreamHash;
 
                 typedef detail::value_hash_impl<StreamHash> StreamHashImpl;
-                typedef detail::itr_hash_impl<Hasher, StreamHashImpl, OutputIterator> HashImpl;
+                typedef detail::itr_hash_impl<Hash, StreamHashImpl, OutputIterator> HashImpl;
 
                 return HashImpl(first, last, std::move(out), StreamHash());
             }
@@ -74,7 +75,7 @@ namespace nil {
              *
              * @ingroup hash_algorithms
              *
-             * @tparam Hasher
+             * @tparam Hash
              * @tparam InputIterator
              * @tparam OutputIterator
              * @tparam StreamHash
@@ -84,15 +85,17 @@ namespace nil {
              * @param sh
              * @return
              */
-            template<typename Hasher,
+            template<typename Hash,
                      typename InputIterator,
-                     typename OutputIterator,
-                     typename StreamHash = typename itr_stream_hash_traits<Hasher, InputIterator>::type,
-                     typename = typename std::enable_if<detail::is_stream_hash<StreamHash>::value>::type>
-            OutputIterator hash(InputIterator first, InputIterator last, StreamHash &sh) {
+                     typename HashAccumulator = typename hash::hash_accumulator<Hash>>
+            typename HashAccumulator::type &hash(InputIterator first, InputIterator last,
+                                                 typename HashAccumulator::type &sh) {
+                typedef typename Hash::template stream_processor<HashAccumulator, std::numeric_limits<
+                        typename std::iterator_traits<InputIterator>::value_type>::digits + std::numeric_limits<
+                        typename std::iterator_traits<InputIterator>::value_type>::is_signed>::type StreamHash;
 
                 typedef detail::ref_hash_impl<StreamHash> StreamHashImpl;
-                typedef detail::itr_hash_impl<Hasher, StreamHashImpl, OutputIterator> HashImpl;
+                typedef detail::range_hash_impl<Hash, StreamHashImpl> HashImpl;
 
                 return HashImpl(first, last, sh);
             }
@@ -102,21 +105,24 @@ namespace nil {
              *
              * @ingroup hash_algorithms
              *
-             * @tparam Hasher
+             * @tparam Hash
              * @tparam InputIterator
              * @tparam StreamHash
              * @param first
              * @param last
              * @return
              */
-            template<typename Hasher,
+            template<typename Hash,
                      typename InputIterator,
-                     typename StreamHash = typename itr_stream_hash_traits<Hasher, InputIterator>::type,
-                     typename = typename std::enable_if<detail::is_stream_hash<StreamHash>::value>::type>
-            detail::range_hash_impl<Hasher, detail::value_hash_impl<StreamHash>> hash(InputIterator first,
-                                                                                      InputIterator last) {
+                     typename StreamHash = typename Hash::template stream_processor<
+                             typename hash::hash_accumulator<Hash>,
+                             std::numeric_limits<typename std::iterator_traits<InputIterator>::value_type>::digits +
+                             std::numeric_limits<
+                                     typename std::iterator_traits<InputIterator>::value_type>::is_signed>::type>
+            detail::range_hash_impl<Hash, detail::value_hash_impl<StreamHash>> hash(InputIterator first,
+                                                                                    InputIterator last) {
                 typedef detail::value_hash_impl<StreamHash> StreamHashImpl;
-                typedef detail::range_hash_impl<Hasher, StreamHashImpl> HashImpl;
+                typedef detail::range_hash_impl<Hash, StreamHashImpl> HashImpl;
 
                 return HashImpl(first, last, StreamHash());
             }
@@ -126,34 +132,7 @@ namespace nil {
              *
              * @ingroup hash_algorithms
              *
-             * @tparam Hasher
-             * @tparam InputIterator
-             * @tparam StreamHash
-             * @param first
-             * @param last
-             * @param sh
-             * @return
-             */
-            template<typename Hasher,
-                     typename InputIterator,
-                     typename StreamHash = typename itr_stream_hash_traits<Hasher, InputIterator>::type,
-                     typename = typename std::enable_if<detail::is_stream_hash<StreamHash>::value>::type>
-            detail::range_hash_impl<Hasher, detail::ref_hash_impl<StreamHash>> hash(InputIterator first,
-                                                                                    InputIterator last,
-                                                                                    StreamHash &sh) {
-                typedef detail::ref_hash_impl<StreamHash> StreamHashImpl;
-                typedef detail::range_hash_impl<Hasher, StreamHashImpl> HashImpl;
-
-                return HashImpl(first, last, sh);
-
-            }
-
-            /*!
-             * @brief
-             *
-             * @ingroup hash_algorithms
-             *
-             * @tparam Hasher
+             * @tparam Hash
              * @tparam SinglePassRange
              * @tparam OutputIterator
              * @tparam StreamHash
@@ -161,15 +140,17 @@ namespace nil {
              * @param out
              * @return
              */
-            template<typename Hasher,
-                     typename SinglePassRange,
-                     typename OutputIterator,
-                     typename StreamHash = typename range_stream_hash_traits<Hasher, SinglePassRange>::type,
-                     typename = typename std::enable_if<detail::is_stream_hash<StreamHash>::value>::type>
+            template<typename Hash, typename SinglePassRange, typename OutputIterator>
             OutputIterator hash(const SinglePassRange &rng, OutputIterator out) {
+                typedef typename hash::hash_accumulator<Hash> HashAccumulator;
+                typedef typename Hash::template stream_processor<HashAccumulator, std::numeric_limits<
+                        typename std::iterator_traits<typename SinglePassRange::iterator>::value_type>::digits +
+                                                                                  std::numeric_limits<
+                                                                                          typename std::iterator_traits<
+                                                                                                  typename SinglePassRange::iterator>::value_type>::is_signed>::type StreamHash;
 
                 typedef detail::value_hash_impl<StreamHash> StreamHashImpl;
-                typedef detail::itr_hash_impl<Hasher, StreamHashImpl, OutputIterator> HashImpl;
+                typedef detail::itr_hash_impl<Hash, StreamHashImpl, OutputIterator> HashImpl;
 
                 return HashImpl(rng, std::move(out), StreamHash());
             }
@@ -179,7 +160,7 @@ namespace nil {
              *
              * @ingroup hash_algorithms
              *
-             * @tparam Hasher
+             * @tparam Hash
              * @tparam SinglePassRange
              * @tparam OutputIterator
              * @tparam StreamHash
@@ -188,17 +169,20 @@ namespace nil {
              * @param sh
              * @return
              */
-            template<typename Hasher,
+            template<typename Hash,
                      typename SinglePassRange,
-                     typename OutputIterator,
-                     typename StreamHash = typename range_stream_hash_traits<Hasher, SinglePassRange>::type,
-                     typename = typename std::enable_if<detail::is_stream_hash<StreamHash>::value>::type>
-            OutputIterator hash(const SinglePassRange &rng, OutputIterator out, StreamHash &sh) {
+                     typename HashAccumulator = typename hash::hash_accumulator<Hash>>
+            typename HashAccumulator::type &hash(const SinglePassRange &rng, typename HashAccumulator::type &sh) {
+                typedef typename Hash::template stream_processor<HashAccumulator, std::numeric_limits<
+                        typename std::iterator_traits<typename SinglePassRange::iterator>::value_type>::digits +
+                                                                                  std::numeric_limits<
+                                                                                          typename std::iterator_traits<
+                                                                                                  typename SinglePassRange::iterator>::value_type>::is_signed>::type StreamHash;
 
                 typedef detail::ref_hash_impl<StreamHash> StreamHashImpl;
-                typedef detail::itr_hash_impl<Hasher, StreamHashImpl, OutputIterator> HashImpl;
+                typedef detail::range_hash_impl<Hash, StreamHashImpl> HashImpl;
 
-                return HashImpl(rng, std::move(out), sh);
+                return HashImpl(rng, sh);
             }
 
             /*!
@@ -206,46 +190,25 @@ namespace nil {
              *
              * @ingroup hash_algorithms
              *
-             * @tparam Hasher
+             * @tparam Hash
              * @tparam SinglePassRange
              * @tparam StreamHash
              * @param r
              * @return
              */
-            template<typename Hasher,
+            template<typename Hash,
                      typename SinglePassRange,
-                     typename StreamHash = typename range_stream_hash_traits<Hasher, SinglePassRange>::type,
-                     typename = typename std::enable_if<detail::is_stream_hash<StreamHash>::value>::type>
-            detail::range_hash_impl<Hasher, detail::value_hash_impl<StreamHash>> hash(const SinglePassRange &r) {
+                     typename StreamHash = typename Hash::template stream_processor<
+                             typename hash::hash_accumulator<Hash>, std::numeric_limits<typename std::iterator_traits<
+                                     typename SinglePassRange::type>::value_type>::digits + std::numeric_limits<
+                                     typename std::iterator_traits<
+                                             typename SinglePassRange::type>::value_type>::is_signed>::type>
+            detail::range_hash_impl<Hash, detail::value_hash_impl<StreamHash>> hash(const SinglePassRange &r) {
 
                 typedef detail::value_hash_impl<StreamHash> StreamHashImpl;
-                typedef detail::range_hash_impl<Hasher, StreamHashImpl> HashImpl;
+                typedef detail::range_hash_impl<Hash, StreamHashImpl> HashImpl;
 
                 return HashImpl(r, StreamHash());
-            }
-
-            /*!
-             * @brief
-             *
-             * @ingroup hash_algorithms
-             *
-             * @tparam Hasher
-             * @tparam SinglePassRange
-             * @tparam StreamHash
-             * @param rng
-             * @param sh
-             * @return
-             */
-            template<typename Hasher,
-                     typename SinglePassRange,
-                     typename StreamHash = typename range_stream_hash_traits<Hasher, SinglePassRange>::type,
-                     typename = typename std::enable_if<detail::is_stream_hash<StreamHash>::value>::type>
-            detail::range_hash_impl<Hasher, detail::ref_hash_impl<StreamHash>> hash(const SinglePassRange &rng,
-                                                                                    StreamHash &sh) {
-                typedef detail::ref_hash_impl<StreamHash> StreamHashImpl;
-                typedef detail::range_hash_impl<Hasher, StreamHashImpl> HashImpl;
-
-                return HashImpl(rng, sh);
             }
         }
     }

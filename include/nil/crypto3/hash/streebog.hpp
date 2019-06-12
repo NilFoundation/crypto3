@@ -55,32 +55,29 @@ namespace nil {
 
                     copy_mem(A, hN, 8);
 
-                    for(size_t i = 0; i != 8; ++i)
-                    {
+                    for (size_t i = 0; i != 8; ++i) {
                         hN[i] ^= M[i];
                     }
 
-                    for(size_t i = 0; i < 12; ++i)
-                    {
-                        for(size_t j = 0; j != 8; ++j)
+                    for (size_t i = 0; i < 12; ++i) {
+                        for (size_t j = 0; j != 8; ++j) {
                             A[j] ^= force_le(STREEBOG_C[i][j]);
+                        }
                         lps(A);
 
                         lps(hN);
-                        for(size_t j = 0; j != 8; ++j)
+                        for (size_t j = 0; j != 8; ++j) {
                             hN[j] ^= A[j];
+                        }
                     }
 
-                    for(size_t i = 0; i != 8; ++i)
-                    {
+                    for (size_t i = 0; i != 8; ++i) {
                         m_h[i] ^= hN[i] ^ M[i];
                     }
 
-                    if(!last_block)
-                    {
+                    if (!last_block) {
                         uint64_t carry = 0;
-                        for(int i = 0; i < 8; i++)
-                        {
+                        for (int i = 0; i < 8; i++) {
                             const uint64_t m = force_le(M[i]);
                             const uint64_t hi = force_le(m_S[i]);
                             const uint64_t t = hi + m;
@@ -122,11 +119,12 @@ namespace nil {
                 struct block_hash_type : block_hash_type_ {
                 };
 #endif
-                template<std::size_t ValueBits>
+                template<typename StateAccumulator, std::size_t ValueBits>
                 struct stream_processor {
-                    typedef merkle_damgard_state_preprocessor<stream_endian::little_octet_big_bit, ValueBits,
-                                                              0, // No length padding!
-                                                              block_hash_type> type_;
+                    typedef merkle_damgard_state_preprocessor<block_hash_type, StateAccumulator,
+                                                              stream_endian::little_octet_big_bit, ValueBits,
+                                                              0 // No length padding!
+                                                             > type_;
 #ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES
                     typedef type_ type;
 #else

@@ -28,10 +28,11 @@ namespace nil {
 // This will do the usual HAIFA-style strengthening, padding with
 // a 1 bit, then 0 bits as needed, then, if requested, the length.
 //
-            template<typename Hash, typename Endian, unsigned ValueBits, unsigned LengthBits>
+            template<typename Hash, typename StateAccumulator, typename Endian, unsigned ValueBits, unsigned LengthBits>
             class haifa_state_preprocessor {
             protected:
                 typedef Hash block_hash_type;
+                typedef StateAccumulator accumulator_type;
 
                 typedef typename boost::uint_t<CHAR_BIT> byte_type;
 
@@ -203,7 +204,7 @@ namespace nil {
                 }
 
             public:
-                haifa_state_preprocessor() : value_array(), block_hash(), seen() {
+                haifa_state_preprocessor(accumulator_type &acc) : value_array(), block_hash(), seen() {
                 }
 
                 void reset() {

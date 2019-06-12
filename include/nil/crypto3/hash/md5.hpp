@@ -11,6 +11,7 @@
 #define CRYPTO3_HASH_MD5_HPP
 
 #include <nil/crypto3/block/md5.hpp>
+
 #include <nil/crypto3/hash/detail/davies_meyer_compressor.hpp>
 #include <nil/crypto3/hash/detail/md5_policy.hpp>
 #include <nil/crypto3/hash/detail/state_adder.hpp>
@@ -40,10 +41,11 @@ namespace nil {
                 struct block_hash_type : block_hash_type_ {
                 };
 #endif
-                template<std::size_t ValueBits>
+                template<typename StateAccumulator, std::size_t ValueBits>
                 struct stream_processor {
-                    typedef merkle_damgard_state_preprocessor<stream_endian::little_octet_big_bit, ValueBits,
-                                                              block_hash_type::word_bits * 2, block_hash_type> type_;
+                    typedef merkle_damgard_state_preprocessor<block_hash_type, StateAccumulator,
+                                                              stream_endian::little_octet_big_bit, ValueBits,
+                                                              block_hash_type::word_bits * 2> type_;
 #ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES
                     typedef type_ type;
 #else
@@ -53,7 +55,6 @@ namespace nil {
                 };
                 typedef block_hash_type::digest_type digest_type;
             };
-
         }
     }
 } // namespace nil

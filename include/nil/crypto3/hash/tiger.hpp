@@ -32,7 +32,7 @@ namespace nil {
                 constexpr static const std::size_t block_words = policy_type::block_words;
                 typedef typename policy_type::block_type block_type;
 
-                void operator()(state_type &state, const block_type &block) {
+                inline void operator()(state_type &state, const block_type &block) {
                     return process_block(state, block);
                 }
 
@@ -85,10 +85,11 @@ namespace nil {
                 struct block_hash_type : block_hash_type_ {
                 };
 #endif
-                template<std::size_t ValueBits>
+                template<typename StateAccumulator, std::size_t ValueBits>
                 struct stream_processor {
-                    typedef merkle_damgard_state_preprocessor<stream_endian::little_octet_big_bit, ValueBits,
-                                                              block_hash_type::word_bits * 2, block_hash_type> type_;
+                    typedef merkle_damgard_state_preprocessor<block_hash_type, StateAccumulator,
+                                                              stream_endian::little_octet_big_bit, ValueBits,
+                                                              block_hash_type::word_bits * 2> type_;
 #ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES
                     typedef type_ type;
 #else

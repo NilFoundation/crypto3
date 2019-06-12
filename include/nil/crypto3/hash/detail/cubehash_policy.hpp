@@ -52,7 +52,7 @@ namespace nil {
                     constexpr static const std::size_t state_bits = state_words * word_bits;
                     typedef std::array<word_type, state_words> state_type;
 
-                    static void word_swap(word_type &a, word_type &b) {
+                    static inline void word_swap(word_type &a, word_type &b) {
                         word_type t = a;
                         a = b;
                         b = t;
@@ -60,7 +60,7 @@ namespace nil {
 
 #ifdef CRYPTO3_HASH_CUBEHASH_USE_INTRINSICS
 
-                    static void multiword_swap(__m128i &a, __m128i &b) {
+                    static inline void multiword_swap(__m128i &a, __m128i &b) {
                         __m128i t = a;
                         a = b;
                         b = t;
@@ -435,11 +435,11 @@ namespace nil {
                     constexpr static const std::size_t digest_bits = h;
                     typedef hash::static_digest<digest_bits> digest_type;
 
-                    static void transform_r(state_type &state) {
+                    inline static void transform_r(state_type &state) {
                         transform(state, r);
                     }
 
-                    static void transform_10r(state_type &state) {
+                    inline static void transform_10r(state_type &state) {
                         transform(state, 10 * r);
                     }
 
@@ -456,13 +456,13 @@ namespace nil {
                         }
 #else
 
-                        state_type const &operator()() const {
+                        inline state_type const &operator()() const {
                             static state_type const H0 = gen();
                             return H0;
                         }
 
                     private:
-                        static state_type gen() {
+                        inline static state_type gen() {
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
                             printf("Generating static IV for CubeHash%d/%d-%d.\n", r, b, h);
 #endif

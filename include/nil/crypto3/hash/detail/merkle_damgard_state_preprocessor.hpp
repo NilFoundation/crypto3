@@ -27,10 +27,11 @@ namespace nil {
 // This will do the usual Merkle-Damgård-style strengthening, padding with
 // a 1 bit, then 0 bits as needed, then, if requested, the length.
 //
-            template<typename Hash, typename Endian, unsigned ValueBits, unsigned LengthBits>
+            template<typename Hash, typename StateAccumulator, typename Endian, unsigned ValueBits, unsigned LengthBits>
             class merkle_damgard_state_preprocessor {
             protected:
                 typedef Hash block_hash_type;
+                typedef StateAccumulator accumulator_type;
 
                 constexpr static const std::size_t word_bits = block_hash_type::word_bits;
                 typedef typename block_hash_type::word_type word_type;
@@ -200,7 +201,7 @@ namespace nil {
                 }
 
             public:
-                merkle_damgard_state_preprocessor() : value_array(), block_hash(), seen() {
+                merkle_damgard_state_preprocessor(accumulator_type &acc) : value_array(), block_hash(), seen() {
                 }
 
                 void reset() {
@@ -209,6 +210,8 @@ namespace nil {
                 }
 
             private:
+                accumulator_type &acc;
+
                 value_array_type value_array;
                 block_hash_type block_hash;
                 length_type seen;

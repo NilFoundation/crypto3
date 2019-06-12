@@ -147,7 +147,7 @@ namespace nil {
             class crc {
                 typedef basic_crc<Bits, TruncPoly, InitRem, FinalXor, ReflectIn, ReflectRem> octet_hash_type;
             public:
-                template<unsigned ValueBits>
+                template<typename StateAccumulator, std::size_t ValueBits>
                 struct stream_processor {
                     BOOST_STATIC_ASSERT(ValueBits == CHAR_BIT);
                     typedef octet_hash_type type_;

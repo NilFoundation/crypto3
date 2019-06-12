@@ -29,7 +29,6 @@ namespace nil {
 
             template<unsigned r, unsigned b, unsigned h>
             struct cubehash_compressor {
-            public:
                 typedef detail::cubehash_policy<r, b, h> policy_type;
 
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
@@ -43,12 +42,12 @@ namespace nil {
                 constexpr static const std::size_t block_words = policy_type::block_words;
                 typedef typename policy_type::block_type block_type;
 
-                void operator()(state_type &state, block_type const &block) {
+                inline void operator()(state_type &state, block_type const &block) {
                     process_block(state, block);
                 }
 
             protected:
-                static void process_block(state_type &state, const block_type &block) {
+                inline static void process_block(state_type &state, const block_type &block) {
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
                     printf("Xoring the following block to the state:\n");
                     for (unsigned i = 0; i < block.size(); ++i) {
@@ -68,7 +67,7 @@ namespace nil {
                 typedef detail::cubehash_policy<r, b, h> policy_type;
                 typedef typename policy_type::state_type state_type;
 
-                void operator()(state_type &state) const {
+                inline void operator()(state_type &state) const {
                     state[31] ^= 1;
                     policy_type::transform_10r(state);
                 }
@@ -106,11 +105,12 @@ namespace nil {
                 struct block_hash_type : block_hash_type_ {
                 };
 #endif
-                template<std::size_t ValueBits>
+                template<typename StateAccumulator, std::size_t ValueBits>
                 struct stream_processor {
-                    typedef merkle_damgard_state_preprocessor<stream_endian::little_octet_big_bit, ValueBits,
-                                                              0, // No length padding!
-                                                              block_hash_type> type_;
+                    typedef merkle_damgard_state_preprocessor<block_hash_type, StateAccumulator,
+                                                              stream_endian::little_octet_big_bit, ValueBits,
+                                                              0 // No length padding!
+                                                             > type_;
 #ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES
                     typedef type_ type;
 #else
@@ -121,7 +121,7 @@ namespace nil {
                 typedef typename block_hash_type::digest_type digest_type;
             };
 
-            template<unsigned h>
+            template<std::size_t h>
             struct cubehash<h, 0, 0> : cubehash<CRYPTO3_HASH_CUBEHASH_DEFAULT_R, CRYPTO3_HASH_CUBEHASH_DEFAULT_B, h> {
             };
 

@@ -23,18 +23,6 @@
 namespace nil {
     namespace crypto3 {
         namespace hash {
-            template<typename Hasher,
-                     typename SinglePassRange> using range_stream_hash_traits = typename Hasher::template stream_processor<
-                    std::numeric_limits<
-                            typename std::iterator_traits<typename SinglePassRange::iterator>::value_type>::digits +
-                    std::numeric_limits<
-                            typename std::iterator_traits<typename SinglePassRange::iterator>::value_type>::is_signed>;
-
-            template<typename Hasher,
-                     typename InputIterator> using itr_stream_hash_traits = typename Hasher::template stream_processor<
-                    std::numeric_limits<typename std::iterator_traits<InputIterator>::value_type>::digits +
-                    std::numeric_limits<typename std::iterator_traits<InputIterator>::value_type>::is_signed>;
-
             namespace detail {
                 template<typename StreamHash>
                 struct ref_hash_impl {

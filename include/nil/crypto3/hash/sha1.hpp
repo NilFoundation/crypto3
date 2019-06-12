@@ -33,18 +33,20 @@ namespace nil {
                 typedef block::shacal1 block_cipher_type;
             public:
                 typedef merkle_damgard_construction<stream_endian::big_octet_big_bit, policy_type::digest_bits,
-                        policy_type::iv_generator,
-                        davies_meyer_compressor<block_cipher_type, detail::state_adder>> block_hash_type_;
+                                                    policy_type::iv_generator,
+                                                    davies_meyer_compressor<block_cipher_type,
+                                                                            detail::state_adder>> block_hash_type_;
 #ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES
                 typedef block_hash_type_ block_hash_type;
 #else
                 struct block_hash_type : block_hash_type_ {
                 };
 #endif
-                template<std::size_t ValueBits>
+                template<typename StateAccumulator, std::size_t ValueBits>
                 struct stream_processor {
-                    typedef merkle_damgard_state_preprocessor<stream_endian::big_octet_big_bit, ValueBits,
-                            block_hash_type::word_bits * 2, block_hash_type> type_;
+                    typedef merkle_damgard_state_preprocessor<block_hash_type, StateAccumulator,
+                                                              stream_endian::big_octet_big_bit, ValueBits,
+                                                              block_hash_type::word_bits * 2> type_;
 #ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES
                     typedef type_ type;
 #else
