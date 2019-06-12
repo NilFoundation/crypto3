@@ -61,18 +61,16 @@ namespace nil {
                     return *this;
                 }
 
-                template<typename DigestType = digest_type>
-                DigestType end_message() {
-                    DigestType d = digest();
+                digest_type end_message() {
+                    digest_type d = digest();
                     reset();
                     return d;
                 }
 
-                template<typename DigestType = digest_type>
-                DigestType digest() {
+                digest_type digest() {
                     finalizer_functor finalizer;
                     finalizer(state_);
-                    DigestType d;
+                    digest_type d;
                     pack_n<DigestEndian, word_bits, octet_bits>(state_.data(), DigestBits / word_bits, d.data(),
                             DigestBits / octet_bits);
                     return d;

@@ -27,13 +27,13 @@ namespace nil {
              * @tparam ValueBits
              * @tparam LengthBits
              */
-            template<typename ProcessingMode>
+            template<typename Hash>
             struct hash_accumulator {
-                typedef boost::accumulators::accumulator_set<hash::static_digest<ProcessingMode::output_block_bits>,
+                typedef boost::accumulators::accumulator_set<hash::static_digest<Hash::block_hash_type::block_bits>,
                                                              boost::accumulators::features<
-                                                                     accumulators::tag::hash<ProcessingMode>>> type;
+                                                                     accumulators::tag::hash<Hash>>> type;
 
-                typedef ProcessingMode mode_type;
+                typedef Hash hash_type;
             };
         }
     }

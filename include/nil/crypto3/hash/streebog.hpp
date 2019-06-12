@@ -30,7 +30,7 @@ namespace nil {
              */
             template<std::size_t DigestBits>
             class streebog_compressor {
-                typedef detail::streebog_policy<DigestBits> policy_type;
+                typedef detail::streebog_policy <DigestBits> policy_type;
             public:
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
                 typedef typename policy_type::word_type word_type;
@@ -107,12 +107,11 @@ namespace nil {
              */
             template<std::size_t DigestBits>
             class streebog {
-                typedef detail::streebog_policy<DigestBits> policy_type;
+                typedef detail::streebog_policy <DigestBits> policy_type;
 
             public:
                 typedef merkle_damgard_construction<stream_endian::little_octet_big_bit, policy_type::digest_bits,
-                                                    typename policy_type::iv_generator,
-                                                    streebog_compressor<DigestBits>> block_hash_type_;
+                        typename policy_type::iv_generator, streebog_compressor<DigestBits>> block_hash_type_;
 #ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES
                 typedef block_hash_type_ block_hash_type;
 #else
@@ -121,10 +120,15 @@ namespace nil {
 #endif
                 template<typename StateAccumulator, std::size_t ValueBits>
                 struct stream_processor {
-                    typedef merkle_damgard_state_preprocessor<block_hash_type, StateAccumulator,
-                                                              stream_endian::little_octet_big_bit, ValueBits,
-                                                              0 // No length padding!
-                                                             > type_;
+                    struct params {
+                        typedef typename stream_endian::little_octet_big_bit endian;
+
+                        constexpr static const std::size_t value_bits = ValueBits;
+                        constexpr static const std::size_t length_bits = 0;
+                    };
+
+                    typedef merkle_damgard_state_preprocessor <block_hash_type, StateAccumulator, params> type_;
+
 #ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES
                     typedef type_ type;
 #else

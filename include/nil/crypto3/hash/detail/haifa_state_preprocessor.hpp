@@ -26,13 +26,14 @@ namespace nil {
         namespace hash {
 //
 // This will do the usual HAIFA-style strengthening, padding with
-// a 1 bit, then 0 bits as needed, then, if requested, the length.
+// a 1 bit, then 0 bits as needed, then, if requested, the length and the digest bits.
 //
-            template<typename Hash, typename StateAccumulator, typename Endian, unsigned ValueBits, unsigned LengthBits>
+            template<typename Hash, typename StateAccumulator, typename Params>
             class haifa_state_preprocessor {
             protected:
                 typedef Hash block_hash_type;
                 typedef StateAccumulator accumulator_type;
+                typedef Params params_type;
 
                 typedef typename boost::uint_t<CHAR_BIT> byte_type;
 
@@ -44,17 +45,26 @@ namespace nil {
                 typedef typename block_hash_type::block_type block_type;
 
             public:
-                typedef typename block_hash_type::digest_type digest_type;
+                typedef typename params_type::endian endian_type;
 
-                constexpr static const std::size_t value_bits = ValueBits;
+                constexpr static const std::size_t value_bits = params_type::value_bits;
                 typedef typename boost::uint_t<value_bits>::least value_type;
                 BOOST_STATIC_ASSERT(word_bits % value_bits == 0);
                 constexpr static const std::size_t block_values = block_bits / value_bits;
                 typedef std::array<value_type, block_values> value_array_type;
 
+                typedef typename block_hash_type::digest_type digest_type;
+
             protected:
 
-                constexpr static const std::size_t length_bits = LengthBits;
+                constexpr static const std::size_t digest_length_bits = params_type::digest_length_bits;
+                // FIXME: do something more intelligent than capping at 64
+                constexpr static const std::size_t digest_length_type_bits =
+                        digest_length_bits < word_bits ? word_bits : digest_length_bits > 64 ? 64 : digest_length_bits;
+                typedef typename boost::uint_t<digest_length_type_bits>::least digest_length_type;
+                constexpr static const std::size_t digest_length_words = digest_length_bits / word_bits;
+
+                constexpr static const std::size_t length_bits = params_type::length_bits;
                 // FIXME: do something more intelligent than capping at 64
                 constexpr static const std::size_t length_type_bits =
                         length_bits < word_bits ? word_bits : length_bits > 64 ? 64 : length_bits;
@@ -68,7 +78,7 @@ namespace nil {
                 void process_block() {
                     // Convert the input into words
                     block_type block;
-                    pack<Endian, value_bits, word_bits>(value_array, block);
+                    pack<endian_type, value_bits, word_bits>(value_array, block);
 
                     // Process the block
                     block_hash.update(block, seen);
@@ -83,12 +93,12 @@ namespace nil {
                 typename boost::enable_if_c<length_bits && sizeof(Dummy)>::type append_length(length_type length) {
                     // Convert the input into words
                     block_type block;
-                    pack<Endian, value_bits, word_bits>(value_array, block);
+                    pack<endian_type, value_bits, word_bits>(value_array, block);
 
                     // Append length
                     std::array<length_type, 1> length_array = {{length}};
                     std::array<word_type, length_words> length_words_array;
-                    pack<Endian, length_bits, word_bits>(length_array, length_words_array);
+                    pack<endian_type, length_bits, word_bits>(length_array, length_words_array);
                     for (std::size_t i = length_words; i; --i) {
                         block[block_words - i] = length_words_array[length_words - i];
                     }
@@ -123,7 +133,7 @@ namespace nil {
                     for (; n >= block_values; n -= block_values, p += block_values) {
                         // Convert the input into words
                         block_type block;
-                        pack_n<Endian, value_bits, word_bits>(p, block_values, std::begin(block), block_words);
+                        pack_n<endian_type, value_bits, word_bits>(p, block_values, std::begin(block), block_words);
 
                         // Process the block
                         block_hash.update(block, seen);
@@ -179,7 +189,7 @@ namespace nil {
                     update_one(padding_values[0]);
 #else
                     value_type pad = 0;
-                    detail::imploder_step<Endian, 1, value_bits, 0>::step(1, pad);
+                    detail::imploder_step<endian_type, 1, value_bits, 0>::step(1, pad);
                     update_one(pad);
 #endif
 

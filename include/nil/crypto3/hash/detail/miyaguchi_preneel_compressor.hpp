@@ -41,7 +41,7 @@ namespace nil {
                 constexpr static const std::size_t block_words = block_cipher_type::key_words;
                 typedef typename block_cipher_type::block_type block_type;
 
-                void operator()(state_type &state, const block_type &block) {
+                inline void operator()(state_type &state, const block_type &block) {
                     process_block(state, block);
                 }
 

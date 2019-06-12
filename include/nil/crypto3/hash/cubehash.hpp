@@ -107,10 +107,15 @@ namespace nil {
 #endif
                 template<typename StateAccumulator, std::size_t ValueBits>
                 struct stream_processor {
-                    typedef merkle_damgard_state_preprocessor<block_hash_type, StateAccumulator,
-                                                              stream_endian::little_octet_big_bit, ValueBits,
-                                                              0 // No length padding!
-                                                             > type_;
+                    struct params {
+                        typedef typename stream_endian::little_octet_big_bit endian;
+
+                        constexpr static const std::size_t value_bits = ValueBits;
+                        constexpr static const std::size_t length_bits = 0; // No length padding
+                    };
+
+                    typedef merkle_damgard_state_preprocessor<block_hash_type, StateAccumulator, params> type_;
+
 #ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES
                     typedef type_ type;
 #else

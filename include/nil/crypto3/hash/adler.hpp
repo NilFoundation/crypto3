@@ -215,6 +215,10 @@ Bits    Limit
             public:
                 template<typename StateAccumulator, std::size_t ValueBits>
                 struct stream_processor {
+                    struct params {
+
+                    };
+
                     BOOST_STATIC_ASSERT(ValueBits == 8);
                     typedef octet_hash_type type_;
 #ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES

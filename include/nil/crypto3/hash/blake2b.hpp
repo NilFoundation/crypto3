@@ -112,9 +112,17 @@ namespace nil {
 #endif
                 template<typename StateAccumulator, std::size_t ValueBits>
                 struct stream_processor {
-                    typedef haifa_state_preprocessor<block_hash_type, StateAccumulator,
-                                                     stream_endian::little_octet_big_bit, ValueBits,
-                                                     block_hash_type::word_bits> type_;
+                    struct params {
+                        typedef typename stream_endian::little_octet_big_bit endian;
+
+                        constexpr static const std::size_t length_bits = block_hash_type::word_bits;
+                        constexpr static const std::size_t value_bits = ValueBits;
+                        constexpr static const std::size_t digest_length_bits = std::numeric_limits<
+                                typename boost::uint_t<DigestBits>::exact>::digits;
+                    };
+
+                    typedef haifa_state_preprocessor<block_hash_type, StateAccumulator, params> type_;
+
 #ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES
                     typedef type_ type;
 #else
@@ -122,6 +130,7 @@ namespace nil {
                     };
 #endif
                 };
+
                 typedef typename block_hash_type::digest_type digest_type;
             };
         }

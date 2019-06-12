@@ -30,25 +30,18 @@ namespace nil {
                 struct hash_impl : boost::accumulators::accumulator_base {
                 protected:
                     typedef Hash hash_type;
-                    typedef typename hash_type::finalizer_type finalizer_type;
+                    typedef typename hash_type::block_hash_type block_hash_type;
 
-                    typedef typename hash_type::input_block_type input_block_type;
-                    typedef typename input_block_type::value_type input_value_type;
-                    constexpr static const std::size_t input_block_bits = hash_type::input_block_bits;
-                    constexpr static const std::size_t input_value_bits =
-                            input_block_bits / std::tuple_size<input_block_type>::value;
+                    constexpr static const std::size_t block_bits = block_hash_type::block_bits;
+                    typedef typename hash_type::input_block_type block_type;
 
-                    typedef typename hash_type::output_block_type output_block_type;
-                    typedef typename output_block_type::value_type output_value_type;
-                    constexpr static const std::size_t output_block_bits = hash_type::output_block_bits;
-                    constexpr static const std::size_t output_value_bits =
-                            output_block_bits / std::tuple_size<output_block_type>::value;
+                    constexpr static const std::size_t value_bits = block_bits / std::tuple_size<block_type>::value;
+                    typedef typename block_type::value_type value_type;
 
-                    typedef boost::container::static_vector<input_value_type,
-                                                            std::tuple_size<input_block_type>::value> cache_type;
+                    typedef boost::container::static_vector<value_type, std::tuple_size<block_type>::value> cache_type;
 
                 public:
-                    typedef hash::static_digest<output_block_bits> result_type;
+                    typedef typename Hash::digest_type result_type;
 
                     template<typename Args>
                     // The constructor takes an argument pack.
@@ -62,65 +55,54 @@ namespace nil {
 
                     template<typename ArgumentPack>
                     inline result_type result(const ArgumentPack &args) const {
-                        result_type res = digest;
+                        block_hash_type res = construction;
 
                         if (!cache.empty()) {
-                            input_block_type ib = {0};
+                            block_type ib = {0};
                             std::move(cache.begin(), cache.end(), ib.begin());
-                            output_block_type ob = hash_type::process_block(ib);
-                            std::move(ob.begin(), ob.end(), std::inserter(res, res.end()));
+                            res.update(ib);
                         }
 
-                        if (seen % input_block_bits) {
-                            finalizer_type(input_block_bits - seen % input_block_bits)(res);
-                        } else {
-                            finalizer_type(0)(res);
-                        }
-
-                        return res;
+                        return res.end_message();
                     }
 
                 protected:
 
-                    inline void process(const input_value_type &value) {
+                    inline void process(const value_type &value) {
                         if (cache.size() == cache.max_size()) {
-                            input_block_type ib = {0};
+                            block_type ib = {0};
                             std::move(cache.begin(), cache.end(), ib.begin());
-                            output_block_type ob = hash_type::process_block(ib);
-                            std::move(ob.begin(), ob.end(), std::inserter(digest, digest.end()));
+                            construction.update(ib);
 
                             cache.clear();
                         }
 
                         cache.push_back(value);
-                        seen += input_value_bits;
+                        seen += value_bits;
                     }
 
-                    inline void process(const input_block_type &block) {
-                        output_block_type ob;
+                    inline void process(const block_type &block) {
                         if (cache.empty()) {
-                            ob = hash_type::process_block(block);
+                            construction.update(block);
                         } else {
-                            input_block_type b = hash::make_array<std::tuple_size<input_block_type>::value>(
-                                    cache.begin(), cache.end());
-                            typename input_block_type::const_iterator itr =
-                                    block.begin() + (cache.max_size() - cache.size());
+                            block_type b = hash::make_array<std::tuple_size<block_type>::value>(cache.begin(),
+                                    cache.end());
+                            typename block_type::const_iterator itr = block.begin() + (cache.max_size() - cache.size());
 
-                            std::copy(block.begin(), itr, b.end());
+                            std::move(block.begin(), itr, b.end());
 
-                            ob = hash_type::process_block(block);
+                            construction.update(b);
 
                             cache.clear();
                             cache.insert(cache.end(), itr, block.end());
                         }
 
-                        std::move(ob.begin(), ob.end(), std::inserter(digest, digest.end()));
-                        seen += input_block_bits;
+                        seen += block_bits;
                     }
 
                     std::size_t seen;
                     cache_type cache;
-                    result_type digest;
+                    block_hash_type construction;
                 };
             }
 

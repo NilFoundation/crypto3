@@ -27,11 +27,12 @@ namespace nil {
 // This will do the usual Merkle-Damgård-style strengthening, padding with
 // a 1 bit, then 0 bits as needed, then, if requested, the length.
 //
-            template<typename Hash, typename StateAccumulator, typename Endian, unsigned ValueBits, unsigned LengthBits>
+            template<typename Hash, typename StateAccumulator, typename Params>
             class merkle_damgard_state_preprocessor {
             protected:
                 typedef Hash block_hash_type;
                 typedef StateAccumulator accumulator_type;
+                typedef Params params_type;
 
                 constexpr static const std::size_t word_bits = block_hash_type::word_bits;
                 typedef typename block_hash_type::word_type word_type;
@@ -43,7 +44,9 @@ namespace nil {
             public:
                 typedef typename block_hash_type::digest_type digest_type;
 
-                constexpr static const std::size_t value_bits = ValueBits;
+                typedef typename params_type::endian endian_type;
+
+                constexpr static const std::size_t value_bits = params_type::value_bits;
                 typedef typename boost::uint_t<value_bits>::least value_type;
                 BOOST_STATIC_ASSERT(word_bits % value_bits == 0);
                 constexpr static const std::size_t block_values = block_bits / value_bits;
@@ -51,7 +54,7 @@ namespace nil {
 
             protected:
 
-                constexpr static const std::size_t length_bits = LengthBits;
+                constexpr static const std::size_t length_bits = params_type::length_bits;
                 // FIXME: do something more intelligent than capping at 64
                 constexpr static const std::size_t length_type_bits =
                         length_bits < word_bits ? word_bits : length_bits > 64 ? 64 : length_bits;
@@ -65,10 +68,10 @@ namespace nil {
                 void process_block() {
                     // Convert the input into words
                     block_type block;
-                    pack<Endian, value_bits, word_bits>(value_array, block);
+                    pack<endian_type, value_bits, word_bits>(value_array, block);
 
                     // Process the block
-                    block_hash.update(block);
+                    acc(block);
 
                     // Reset seen if we don't need to track the length
                     if (!length_bits) {
@@ -80,18 +83,18 @@ namespace nil {
                 typename boost::enable_if_c<length_bits && sizeof(Dummy)>::type append_length(length_type length) {
                     // Convert the input into words
                     block_type block;
-                    pack<Endian, value_bits, word_bits>(value_array, block);
+                    pack<endian_type, value_bits, word_bits>(value_array, block);
 
                     // Append length
                     std::array<length_type, 1> length_array = {{length}};
                     std::array<word_type, length_words> length_words_array;
-                    pack<Endian, length_bits, word_bits>(length_array, length_words_array);
+                    pack<endian_type, length_bits, word_bits>(length_array, length_words_array);
                     for (std::size_t i = length_words; i; --i) {
                         block[block_words - i] = length_words_array[length_words - i];
                     }
 
                     // Process the last block
-                    block_hash.update(block);
+                    acc(block);
                 }
 
                 template<typename Dummy>
@@ -120,10 +123,10 @@ namespace nil {
                     for (; n >= block_values; n -= block_values, p += block_values) {
                         // Convert the input into words
                         block_type block;
-                        pack_n<Endian, value_bits, word_bits>(p, block_values, std::begin(block), block_words);
+                        pack_n<endian_type, value_bits, word_bits>(p, block_values, std::begin(block), block_words);
 
                         // Process the block
-                        block_hash.update(block);
+                        acc(block);
                         seen += block_bits;
 
                         // Reset seen if we don't need to track the length
@@ -170,13 +173,13 @@ namespace nil {
 
                     // Add a 1 bit
 #ifdef CRYPTO3_HASH_NO_OPTIMIZATION
-                    std::array<bool, ValueBits> padding_bits = {{1}};
+                    std::array<bool, value_bits> padding_bits = {{1}};
                     std::array<value_type, 1> padding_values;
-                    pack<endian, 1, ValueBits>(padding_bits, padding_values);
+                    pack<endian_type, 1, value_bits>(padding_bits, padding_values);
                     update_one(padding_values[0]);
 #else
                     value_type pad = 0;
-                    detail::imploder_step<Endian, 1, value_bits, 0>::step(1, pad);
+                    detail::imploder_step<endian_type, 1, value_bits, 0>::step(1, pad);
                     update_one(pad);
 #endif
 
@@ -201,7 +204,12 @@ namespace nil {
                 }
 
             public:
-                merkle_damgard_state_preprocessor(accumulator_type &acc) : value_array(), block_hash(), seen() {
+                merkle_damgard_state_preprocessor(accumulator_type &acc) : acc(acc), value_array(), block_hash(),
+                        seen() {
+                }
+
+                virtual ~merkle_damgard_state_preprocessor() {
+
                 }
 
                 void reset() {

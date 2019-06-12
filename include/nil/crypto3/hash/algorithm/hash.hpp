@@ -200,9 +200,9 @@ namespace nil {
                      typename SinglePassRange,
                      typename StreamHash = typename Hash::template stream_processor<
                              typename hash::hash_accumulator<Hash>, std::numeric_limits<typename std::iterator_traits<
-                                     typename SinglePassRange::type>::value_type>::digits + std::numeric_limits<
+                                     typename SinglePassRange::iterator>::value_type>::digits + std::numeric_limits<
                                      typename std::iterator_traits<
-                                             typename SinglePassRange::type>::value_type>::is_signed>::type>
+                                             typename SinglePassRange::iterator>::value_type>::is_signed>::type>
             detail::range_hash_impl<Hash, detail::value_hash_impl<StreamHash>> hash(const SinglePassRange &r) {
 
                 typedef detail::value_hash_impl<StreamHash> StreamHashImpl;
