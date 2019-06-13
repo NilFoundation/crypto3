@@ -210,7 +210,7 @@ namespace nil {
                         constexpr static const std::size_t length_bits = 0;
                     };
 
-                    typedef merkle_damgard_state_preprocessor<block_hash_type, StateAccumulator, params> type;
+                    typedef merkle_damgard_state_preprocessor<block_hash_type, StateAccumulator, params> type_;
 
 #ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES
                     typedef type_ type;

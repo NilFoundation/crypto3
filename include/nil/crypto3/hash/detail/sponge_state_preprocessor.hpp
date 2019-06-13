@@ -22,11 +22,11 @@
 namespace nil {
     namespace crypto3 {
         namespace hash {
-            template<typename Hash,
-                     typename StateAccumulator,
-                     typename Endian, std::size_t ValueBits, std::size_t LengthBits>
+            template<typename Hash, typename StateAccumulator, typename Params>
             class sponge_state_preprocessor {
                 typedef Hash block_hash_type;
+                typedef StateAccumulator accumulator_type;
+                typedef Params params_type;
 
                 constexpr static const std::size_t word_bits = block_hash_type::word_bits;
                 typedef typename block_hash_type::word_type word_type;
@@ -36,9 +36,11 @@ namespace nil {
                 typedef typename block_hash_type::block_type block_type;
 
             public:
+                typedef typename params_type::endian endian_type;
+
                 typedef typename block_hash_type::digest_type digest_type;
 
-                constexpr static const std::size_t value_bits = ValueBits;
+                constexpr static const std::size_t value_bits = params_type::value_bits;
                 typedef typename boost::uint_t<value_bits>::least value_type;
                 BOOST_STATIC_ASSERT(word_bits % value_bits == 0);
                 constexpr static const std::size_t block_values = block_bits / value_bits;
@@ -46,7 +48,7 @@ namespace nil {
 
             private:
 
-                constexpr static const std::size_t length_bits = LengthBits;
+                constexpr static const std::size_t length_bits = params_type::digest_length_bits;
                 // FIXME: do something more intelligent than capping at 64
                 constexpr static const std::size_t length_type_bits =
                         length_bits < word_bits ? word_bits : length_bits > 64 ? 64 : length_bits;
@@ -60,7 +62,7 @@ namespace nil {
                 void process_block() {
                     // Convert the input into words
                     block_type block;
-                    pack<Endian, value_bits, word_bits>(value_array, block);
+                    pack<endian_type, value_bits, word_bits>(value_array, block);
 
                     // Process the block
                     block_hash.update(block);
@@ -75,12 +77,12 @@ namespace nil {
                 typename boost::enable_if_c<length_bits && sizeof(Dummy)>::type append_length(length_type length) {
                     // Convert the input into words
                     block_type block;
-                    pack<Endian, value_bits, word_bits>(value_array, block);
+                    pack<endian_type, value_bits, word_bits>(value_array, block);
 
                     // Append length
                     std::array<length_type, 1> length_array = {{length}};
                     std::array<word_type, length_words> length_words_array;
-                    pack<Endian, length_bits, word_bits>(length_array, length_words_array);
+                    pack<endian_type, length_bits, word_bits>(length_array, length_words_array);
                     for (std::size_t i = length_words; i; --i) {
                         block[block_words - i] = length_words_array[length_words - i];
                     }
@@ -115,7 +117,7 @@ namespace nil {
                     for (; n >= block_values; n -= block_values, p += block_values) {
                         // Convert the input into words
                         block_type block;
-                        pack_n<Endian, value_bits, word_bits>(p, block_values, std::begin(block), block_words);
+                        pack_n<endian_type, value_bits, word_bits>(p, block_values, std::begin(block), block_words);
 
                         // Process the block
                         block_hash.update(block);
@@ -159,8 +161,7 @@ namespace nil {
                     return update_n(c.data(), c.size());
                 }
 
-                template<typename DigestType = digest_type>
-                DigestType end_message() {
+                digest_type end_message() {
                     length_type length = seen;
 
                     // Add a 1 bit
@@ -171,7 +172,7 @@ namespace nil {
                     update_one(padding_values[0]);
 #else
                     value_type pad = 0;
-                    detail::imploder_step<Endian, 1, value_bits, 0>::step(1, pad);
+                    detail::imploder_step<endian_type, 1, value_bits, 0>::step(1, pad);
                     update_one(pad);
 #endif
 
@@ -190,8 +191,7 @@ namespace nil {
                     return block_hash.end_message();
                 }
 
-                template<typename DigestType = digest_type>
-                DigestType digest() const {
+                digest_type digest() const {
                     return sponge_state_preprocessor(*this).end_message();
                 }
 
