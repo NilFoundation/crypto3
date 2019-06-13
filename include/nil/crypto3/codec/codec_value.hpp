@@ -23,12 +23,13 @@ namespace nil {
     namespace crypto3 {
         namespace codec {
             namespace detail {
-                template<typename CodecAccumulator>
+                template<typename CodecAccumulatorSet>
                 struct ref_codec_impl {
-                    typedef CodecAccumulator codec_accumulator_type;
-                    typedef typename codec_accumulator_type::type codec_accumulator_set;
+                    typedef CodecAccumulatorSet codec_accumulator_set;
+                    typedef typename boost::mpl::front<
+                            typename codec_accumulator_set::features_type>::type codec_accumulator_type;
 
-                    typedef typename CodecAccumulator::mode_type mode_type;
+                    typedef typename codec_accumulator_type::mode_type mode_type;
                     typedef typename mode_type::codec_type codec_type;
 
                     ref_codec_impl(const codec_accumulator_set &acc) : accumulator_set(acc) {
@@ -38,12 +39,13 @@ namespace nil {
                     codec_accumulator_set &accumulator_set;
                 };
 
-                template<typename CodecAccumulator>
+                template<typename CodecAccumulatorSet>
                 struct value_codec_impl {
-                    typedef CodecAccumulator codec_accumulator_type;
-                    typedef typename codec_accumulator_type::type codec_accumulator_set;
+                    typedef CodecAccumulatorSet codec_accumulator_set;
+                    typedef typename boost::mpl::front<
+                            typename codec_accumulator_set::features_type>::type codec_accumulator_type;
 
-                    typedef typename CodecAccumulator::mode_type mode_type;
+                    typedef typename codec_accumulator_type::mode_type mode_type;
                     typedef typename mode_type::codec_type codec_type;
 
                     value_codec_impl(const codec_accumulator_set &acc) : accumulator_set(acc) {
@@ -58,13 +60,13 @@ namespace nil {
                     typedef CodecStateImpl codec_state_impl_type;
 
                     typedef typename codec_state_impl_type::codec_accumulator_type codec_accumulator_type;
-                    typedef typename codec_accumulator_type::type codec_accumulator_set;
+                    typedef typename codec_state_impl_type::codec_accumulator_set codec_accumulator_set;
 
                     typedef typename codec_state_impl_type::mode_type mode_type;
                     typedef typename codec_state_impl_type::codec_type codec_type;
 
-                    typedef typename boost::mpl::apply<codec_accumulator_set, accumulators::tag::codec<
-                            mode_type> >::type::result_type result_type;
+                    typedef typename boost::mpl::apply<codec_accumulator_set,
+                                                       codec_accumulator_type>::type::result_type result_type;
 
                     template<typename SinglePassRange>
                     range_codec_impl(const SinglePassRange &range, const codec_accumulator_set &ise)
@@ -100,12 +102,13 @@ namespace nil {
 
                     template<typename OutputRange>
                     operator OutputRange() const {
-                        result_type result = accumulators::extract::codec<mode_type>(this->accumulator_set);
+                        result_type result = boost::accumulators::extract_result<codec_accumulator_type>(
+                                this->accumulator_set);
                         return OutputRange(result.cbegin(), result.cend());
                     }
 
                     operator result_type() const {
-                        return accumulators::extract::codec<mode_type>(this->accumulator_set);
+                        return boost::accumulators::extract_result<codec_accumulator_type>(this->accumulator_set);
                     }
 
                     operator codec_accumulator_set() const {
@@ -116,7 +119,8 @@ namespace nil {
 
                     template<typename Char, typename CharTraits, typename Alloc>
                     operator std::basic_string<Char, CharTraits, Alloc>() const {
-                        return std::to_string(accumulators::extract::codec<mode_type>(this->accumulator_set));
+                        return std::to_string(boost::accumulators::extract_result<codec_accumulator_type>(
+                                this->accumulator_set));
                     }
 
 #endif
@@ -131,13 +135,13 @@ namespace nil {
                     typedef CodecStateImpl codec_state_impl_type;
 
                     typedef typename codec_state_impl_type::codec_accumulator_type codec_accumulator_type;
-                    typedef typename codec_accumulator_type::type codec_accumulator_set;
+                    typedef typename codec_state_impl_type::codec_accumulator_set codec_accumulator_set;
 
                     typedef typename codec_state_impl_type::mode_type mode_type;
                     typedef typename codec_state_impl_type::codec_type codec_type;
 
-                    typedef typename boost::mpl::apply<codec_accumulator_set, accumulators::tag::codec<
-                            mode_type> >::type::result_type result_type;
+                    typedef typename boost::mpl::apply<codec_accumulator_set,
+                                                       codec_accumulator_type>::type::result_type result_type;
 
                     template<typename SinglePassRange>
                     itr_codec_impl(const SinglePassRange &range, OutputIterator out, const codec_accumulator_set &ise)
@@ -174,7 +178,8 @@ namespace nil {
                     }
 
                     operator OutputIterator() const {
-                        result_type result = accumulators::extract::codec<mode_type>(this->accumulator_set);
+                        result_type result = boost::accumulators::extract_result<codec_accumulator_type>(
+                                this->accumulator_set);
 
                         return std::move(result.cbegin(), result.cend(), out);
                     }

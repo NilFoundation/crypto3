@@ -47,7 +47,7 @@ namespace nil {
             typedef codec::detail::value_codec_impl<DecoderAccumulator> DecoderStateImpl;
             typedef codec::detail::itr_codec_impl<DecoderStateImpl, OutputIterator> DecoderImpl;
 
-            return DecoderImpl(first, last, std::move(out), typename DecoderAccumulator::type());
+            return DecoderImpl(first, last, std::move(out), DecoderAccumulator());
         }
 
         /*!
@@ -70,7 +70,7 @@ namespace nil {
             typedef codec::detail::value_codec_impl<DecoderAccumuator> DecoderStateImpl;
             typedef codec::detail::range_codec_impl<DecoderStateImpl> DecoderImpl;
 
-            return DecoderImpl(first, last, typename DecoderAccumuator::type());
+            return DecoderImpl(first, last, DecoderAccumuator());
         }
 
         /*!
@@ -92,7 +92,7 @@ namespace nil {
         template<typename Decoder,
                  typename InputIterator,
                  typename OutputAccumulator = typename codec::codec_accumulator<typename Decoder::stream_decoder_type>>
-        OutputAccumulator &decode(InputIterator first, InputIterator last, typename OutputAccumulator::type &acc) {
+        OutputAccumulator &decode(InputIterator first, InputIterator last, OutputAccumulator &acc) {
             typedef typename Decoder::stream_decoder_type DecodingMode;
             typedef typename codec::codec_accumulator<DecodingMode> DecoderAccumulator;
 
@@ -123,7 +123,7 @@ namespace nil {
             typedef codec::detail::value_codec_impl<DecoderAccumulator> DecoderStateImpl;
             typedef codec::detail::itr_codec_impl<DecoderStateImpl, OutputIterator> DecoderImpl;
 
-            return DecoderImpl(rng, std::move(out), typename DecoderAccumulator::type());
+            return DecoderImpl(rng, std::move(out), DecoderAccumulator());
         }
 
         /*!
@@ -141,7 +141,7 @@ namespace nil {
         template<typename Decoder,
                  typename SinglePassRange,
                  typename OutputAccumulator = typename codec::codec_accumulator<typename Decoder::stream_decoder_type>>
-        OutputAccumulator &decode(const SinglePassRange &rng, typename OutputAccumulator::type &out) {
+        OutputAccumulator &decode(const SinglePassRange &rng, OutputAccumulator &out) {
             typedef typename Decoder::stream_decoder_type DecodingMode;
             typedef typename codec::codec_accumulator<DecodingMode> DecoderAccumulator;
 
@@ -171,7 +171,7 @@ namespace nil {
             typedef codec::detail::value_codec_impl<DecoderAccumuator> DecoderStateImpl;
             typedef codec::detail::range_codec_impl<DecoderStateImpl> DecoderImpl;
 
-            return DecoderImpl(r, typename DecoderAccumuator::type());
+            return DecoderImpl(r, DecoderAccumuator());
         }
     } // namespace crypto3
 } // namespace nil
