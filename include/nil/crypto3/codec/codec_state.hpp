@@ -34,14 +34,9 @@ namespace nil {
              *
              * @tparam Mode Codec state preprocessing mode type (e.g. isomorphic_encoding_mode<base64>)
              */
-            template<typename ProcessingMode>
-            struct codec_accumulator {
-                typedef boost::accumulators::accumulator_set<codec::digest<ProcessingMode::output_block_bits>,
-                                                             boost::accumulators::features<
-                                                                     accumulators::tag::codec<ProcessingMode>>> type;
-
-                typedef ProcessingMode mode_type;
-            };
+            template<typename ProcessingMode> using codec_accumulator = boost::accumulators::accumulator_set<
+                    codec::digest<ProcessingMode::output_block_bits>,
+                    boost::accumulators::features<accumulators::tag::codec<ProcessingMode>>>;
         }
     }
 } // namespace nil
