@@ -23,10 +23,15 @@ namespace nil {
     namespace crypto3 {
         namespace hash {
 
-//
-// This will do the usual Merkle-Damgård-style strengthening, padding with
-// a 1 bit, then 0 bits as needed, then, if requested, the length.
-//
+            /*!
+             * @brief This will do the usual Merkle-Damgård-style strengthening,
+             * padding with a 1 bit, then 0 bits as needed, then, if requested,
+             * the length.
+             *
+             * @tparam Hash
+             * @tparam StateAccumulator
+             * @tparam Params
+             */
             template<typename Hash, typename StateAccumulator, typename Params>
             class merkle_damgard_state_preprocessor {
             protected:

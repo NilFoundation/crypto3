@@ -32,13 +32,18 @@ namespace nil {
                     typedef Hash hash_type;
                     typedef typename hash_type::block_hash_type block_hash_type;
 
+                    constexpr static const std::size_t word_bits = block_hash_type::word_bits;
+                    typedef typename block_hash_type::word_type word_type;
+
+                    constexpr static const std::size_t state_bits = block_hash_type::state_bits;
+                    constexpr static const std::size_t state_words = block_hash_type::state_words;
+                    typedef typename block_hash_type::state_type state_type;
+
                     constexpr static const std::size_t block_bits = block_hash_type::block_bits;
-                    typedef typename hash_type::input_block_type block_type;
+                    constexpr static const std::size_t block_words = block_hash_type::block_words;
+                    typedef typename block_hash_type::block_type block_type;
 
-                    constexpr static const std::size_t value_bits = block_bits / std::tuple_size<block_type>::value;
-                    typedef typename block_type::value_type value_type;
-
-                    typedef boost::container::static_vector<value_type, std::tuple_size<block_type>::value> cache_type;
+                    typedef boost::container::static_vector<word_type, block_words> cache_type;
 
                 public:
                     typedef typename Hash::digest_type result_type;
@@ -68,7 +73,7 @@ namespace nil {
 
                 protected:
 
-                    inline void process(const value_type &value) {
+                    inline void process(const word_type &value) {
                         if (cache.size() == cache.max_size()) {
                             block_type ib = {0};
                             std::move(cache.begin(), cache.end(), ib.begin());
@@ -78,15 +83,14 @@ namespace nil {
                         }
 
                         cache.push_back(value);
-                        seen += value_bits;
+                        seen += word_bits;
                     }
 
                     inline void process(const block_type &block) {
                         if (cache.empty()) {
                             construction.update(block);
                         } else {
-                            block_type b = hash::make_array<std::tuple_size<block_type>::value>(cache.begin(),
-                                    cache.end());
+                            block_type b = hash::make_array<block_words>(cache.begin(), cache.end());
                             typename block_type::const_iterator itr = block.begin() + (cache.max_size() - cache.size());
 
                             std::move(block.begin(), itr, b.end());

@@ -24,10 +24,16 @@
 namespace nil {
     namespace crypto3 {
         namespace hash {
-//
-// This will do the usual HAIFA-style strengthening, padding with
-// a 1 bit, then 0 bits as needed, then, if requested, the length and the digest bits.
-//
+
+            /*!
+             * @brief This will do the usual HAIFA-style strengthening, padding with
+             * a 1 bit, then 0 bits as needed, then, if requested, the length and
+             * the digest bits.
+             *
+             * @tparam Hash
+             * @tparam StateAccumulator
+             * @tparam Params
+             */
             template<typename Hash, typename StateAccumulator, typename Params>
             class haifa_state_preprocessor {
             protected:

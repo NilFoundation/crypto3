@@ -215,7 +215,7 @@ Bits    Limit
             public:
                 template<typename StateAccumulator, std::size_t ValueBits>
                 struct stream_processor {
-                    struct params {
+                    struct params_type {
 
                     };
 
