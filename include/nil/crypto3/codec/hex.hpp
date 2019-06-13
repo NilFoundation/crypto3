@@ -161,9 +161,14 @@ namespace nil {
 
                 template<typename ProcessingMode, typename StateAccumulator, std::size_t ValueBits>
                 struct stream_processor {
-                    typedef block_state_preprocessor<ProcessingMode, StateAccumulator,
-                                                     stream_endian::little_octet_big_bit, ValueBits,
-                                                     CHAR_BIT * CHAR_BIT> type;
+                    struct params {
+                        typedef typename stream_endian::little_octet_big_bit endian_type;
+
+                        constexpr static const std::size_t value_bits = ValueBits;
+                        constexpr static const std::size_t length_bits = CHAR_BIT * CHAR_BIT;
+                    };
+
+                    typedef block_state_preprocessor<ProcessingMode, StateAccumulator, params> type;
                 };
 
             protected:

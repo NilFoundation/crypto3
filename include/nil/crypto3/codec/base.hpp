@@ -183,9 +183,14 @@ namespace nil {
 
                 template<typename ProcessingMode, typename StateAccumulator, std::size_t ValueBits>
                 struct stream_processor {
-                    typedef arithmetic_state_preprocessor<ProcessingMode, StateAccumulator,
-                                                          stream_endian::little_octet_big_bit, ValueBits,
-                                                          ProcessingMode::input_block_bits> type;
+                    struct params {
+                        typedef typename stream_endian::little_octet_big_bit endian_type;
+
+                        constexpr static const std::size_t value_bits = ValueBits;
+                        constexpr static const std::size_t length_bits = ProcessingMode::input_block_bits;
+                    };
+
+                    typedef arithmetic_state_preprocessor<ProcessingMode, StateAccumulator, params> type;
                 };
             };
 
@@ -216,9 +221,14 @@ namespace nil {
 
                 template<typename ProcessingMode, typename StateAccumulator, std::size_t ValueBits>
                 struct stream_processor {
-                    typedef block_state_preprocessor<ProcessingMode, StateAccumulator,
-                                                     stream_endian::little_octet_big_bit, ValueBits,
-                                                     ProcessingMode::input_block_bits> type;
+                    struct params {
+                        typedef typename stream_endian::little_octet_big_bit endian_type;
+
+                        constexpr static const std::size_t value_bits = ValueBits;
+                        constexpr static const std::size_t length_bits = ProcessingMode::input_block_bits;
+                    };
+
+                    typedef block_state_preprocessor<ProcessingMode, StateAccumulator, params> type;
                 };
             };
 
