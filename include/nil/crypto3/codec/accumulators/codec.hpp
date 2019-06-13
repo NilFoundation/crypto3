@@ -101,8 +101,8 @@ namespace nil {
                         if (cache.empty()) {
                             ob = mode_type::process_block(block);
                         } else {
-                            input_block_type b = codec::make_array<std::tuple_size<input_block_type>::value>(
-                                    cache.begin(), cache.end());
+                            input_block_type b = codec::make_array<input_block_bits / input_value_bits>(cache.begin(),
+                                    cache.end());
                             typename input_block_type::const_iterator itr =
                                     block.begin() + (cache.max_size() - cache.size());
 
