@@ -24,11 +24,11 @@ namespace nil {
     namespace crypto3 {
         namespace hash {
             namespace detail {
-                template<typename StreamHash>
+                template<typename HashAccumulator>
                 struct ref_hash_impl {
-                    typedef StreamHash stream_hash_type;
+                    typedef HashAccumulator stream_hash_type;
 
-                    ref_hash_impl(const StreamHash &stream_hash) : sh(std::move(stream_hash)) {
+                    ref_hash_impl(const HashAccumulator &stream_hash) : sh(std::move(stream_hash)) {
 
                     }
 
@@ -37,14 +37,14 @@ namespace nil {
                         return sh.digest();
                     }
 
-                    StreamHash &sh;
+                    HashAccumulator &sh;
                 };
 
-                template<typename StreamHash>
+                template<typename HashAccumulator>
                 struct value_hash_impl {
-                    typedef StreamHash stream_hash_type;
+                    typedef HashAccumulator stream_hash_type;
 
-                    value_hash_impl(const StreamHash &stream_hash) : sh(stream_hash) {
+                    value_hash_impl(const HashAccumulator &stream_hash) : sh(stream_hash) {
 
                     }
 
@@ -53,7 +53,7 @@ namespace nil {
                         return sh.end_message();
                     }
 
-                    mutable StreamHash sh;
+                    mutable HashAccumulator sh;
                 };
 
                 template<typename Hasher, typename StreamHashImpl>
