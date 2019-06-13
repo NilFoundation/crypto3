@@ -28,20 +28,21 @@ namespace nil {
         namespace hash {
 
 // Boost.CRC undefs this, so re-define it
-#define BOOST_CRC_PARM_TYPE  typename ::boost::uint_t<Bits>::fast
+#define BOOST_CRC_PARM_TYPE  typename ::boost::uint_t<DigestBits>::fast
 
-            template<unsigned Bits, BOOST_CRC_PARM_TYPE TruncPoly = 0u, BOOST_CRC_PARM_TYPE InitRem = 0u, BOOST_CRC_PARM_TYPE FinalXor = 0u, bool ReflectIn = false, bool ReflectRem = false>
+            template<unsigned DigestBits, BOOST_CRC_PARM_TYPE TruncPoly = 0u, BOOST_CRC_PARM_TYPE InitRem = 0u, BOOST_CRC_PARM_TYPE FinalXor = 0u, bool ReflectIn = false, bool ReflectRem = false>
             class basic_crc {
             public:
-                typedef boost::crc_optimal<Bits, TruncPoly, InitRem, FinalXor, ReflectIn, ReflectRem> crc_computer;
+                typedef boost::crc_optimal<DigestBits, TruncPoly, InitRem, FinalXor, ReflectIn,
+                                           ReflectRem> crc_computer;
                 typedef typename crc_computer::value_type word_type;
 
                 constexpr static const std::size_t value_bits = CHAR_BIT;
                 typedef typename boost::uint_t<value_bits>::least value_type;
 
-                BOOST_STATIC_ASSERT(Bits >= value_bits);
+                BOOST_STATIC_ASSERT(DigestBits >= value_bits);
 
-                constexpr static const std::size_t digest_bits = Bits;
+                constexpr static const std::size_t digest_bits = DigestBits;
                 typedef hash::static_digest<digest_bits> digest_type;
 
             public:
@@ -143,7 +144,7 @@ namespace nil {
              * @tparam ReflectIn
              * @tparam ReflectRem
              */
-            template<unsigned Bits, BOOST_CRC_PARM_TYPE TruncPoly = 0u, BOOST_CRC_PARM_TYPE InitRem = 0u, BOOST_CRC_PARM_TYPE FinalXor = 0u, bool ReflectIn = false, bool ReflectRem = false>
+            template<unsigned DigestBits, BOOST_CRC_PARM_TYPE TruncPoly = 0u, BOOST_CRC_PARM_TYPE InitRem = 0u, BOOST_CRC_PARM_TYPE FinalXor = 0u, bool ReflectIn = false, bool ReflectRem = false>
             class crc {
                 typedef basic_crc<Bits, TruncPoly, InitRem, FinalXor, ReflectIn, ReflectRem> octet_hash_type;
             public:
@@ -158,6 +159,8 @@ namespace nil {
                     };
 #endif
                 };
+
+                constexpr static const std::size_t digest_bits = DigestBits;
                 typedef typename octet_hash_type::digest_type digest_type;
             };
 

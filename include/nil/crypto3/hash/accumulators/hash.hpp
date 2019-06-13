@@ -111,22 +111,22 @@ namespace nil {
             }
 
             namespace tag {
-                template<typename Mode>
+                template<typename Hash>
                 struct hash : boost::accumulators::depends_on<> {
-                    typedef Mode mode_type;
+                    typedef Hash hash_type;
 
                     /// INTERNAL ONLY
                     ///
 
-                    typedef boost::mpl::always<accumulators::impl::hash_impl<Mode>> impl;
+                    typedef boost::mpl::always<accumulators::impl::hash_impl<Hash>> impl;
                 };
             }
 
             namespace extract {
-                template<typename Mode, typename AccumulatorSet>
-                typename boost::mpl::apply<AccumulatorSet, tag::hash<Mode> >::type::result_type hash(
+                template<typename Hash, typename AccumulatorSet>
+                typename boost::mpl::apply<AccumulatorSet, tag::hash<Hash> >::type::result_type hash(
                         const AccumulatorSet &acc) {
-                    return boost::accumulators::extract_result<tag::hash<Mode> >(acc);
+                    return boost::accumulators::extract_result<tag::hash<Hash> >(acc);
                 }
             }
         }

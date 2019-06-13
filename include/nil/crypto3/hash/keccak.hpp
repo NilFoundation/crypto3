@@ -59,6 +59,8 @@ namespace nil {
                     };
 #endif
                 };
+
+                constexpr static const std::size_t digest_bits = DigestBits;
                 typedef typename block_hash_type::digest_type digest_type;
             };
         }

@@ -208,10 +208,10 @@ Bits    Limit
              * @tparam Bit
              * s
              */
-            template<unsigned Bits>
+            template<unsigned DigestBits>
             struct adler {
             private:
-                typedef basic_adler<Bits> octet_hash_type;
+                typedef basic_adler<DigestBits> octet_hash_type;
             public:
                 template<typename StateAccumulator, std::size_t ValueBits>
                 struct stream_processor {
@@ -228,6 +228,8 @@ Bits    Limit
                     };
 #endif
                 };
+
+                constexpr static const std::size_t digest_bits = DigestBits;
                 typedef typename octet_hash_type::digest_type digest_type;
             };
 
