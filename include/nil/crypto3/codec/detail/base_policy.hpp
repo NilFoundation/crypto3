@@ -64,11 +64,19 @@ namespace nil {
                 public:
                     typedef typename boost::uint_t<CHAR_BIT>::exact byte_type;
 
-                    constexpr static const std::size_t decoded_block_bits = 5 * CHAR_BIT;
-                    typedef std::array<byte_type, decoded_block_bits / CHAR_BIT> decoded_block_type;
+                    constexpr static const std::size_t decoded_value_bits = CHAR_BIT;
+                    typedef byte_type decoded_value_type;
 
-                    constexpr static const std::size_t encoded_block_bits = 8 * CHAR_BIT;
-                    typedef std::array<byte_type, encoded_block_bits / CHAR_BIT> encoded_block_type;
+                    constexpr static const std::size_t encoded_value_bits = CHAR_BIT;
+                    typedef byte_type encoded_value_type;
+
+                    constexpr static const std::size_t decoded_block_values = 5;
+                    constexpr static const std::size_t decoded_block_bits = decoded_block_values * decoded_value_bits;
+                    typedef std::array<decoded_value_type, decoded_block_bits / CHAR_BIT> decoded_block_type;
+
+                    constexpr static const std::size_t encoded_block_values = 8;
+                    constexpr static const std::size_t encoded_block_bits = encoded_block_values * encoded_value_bits;
+                    typedef std::array<encoded_value_type, encoded_block_bits / CHAR_BIT> encoded_block_type;
 
                     constexpr static const std::size_t padding_block_bits = 5;
                     constexpr static const std::size_t padding_bits = 6;
@@ -111,11 +119,19 @@ namespace nil {
                 public:
                     typedef typename boost::uint_t<CHAR_BIT>::exact byte_type;
 
-                    constexpr static const std::size_t decoded_block_bits = 3 * CHAR_BIT;
-                    typedef std::array<byte_type, decoded_block_bits / CHAR_BIT> decoded_block_type;
+                    constexpr static const std::size_t decoded_value_bits = CHAR_BIT;
+                    typedef byte_type decoded_value_type;
 
-                    constexpr static const std::size_t encoded_block_bits = 4 * CHAR_BIT;
-                    typedef std::array<byte_type, encoded_block_bits / CHAR_BIT> encoded_block_type;
+                    constexpr static const std::size_t encoded_value_bits = CHAR_BIT;
+                    typedef byte_type encoded_value_type;
+
+                    constexpr static const std::size_t decoded_block_values = 3;
+                    constexpr static const std::size_t decoded_block_bits = decoded_block_values * decoded_value_bits;
+                    typedef std::array<decoded_value_type, decoded_block_bits / CHAR_BIT> decoded_block_type;
+
+                    constexpr static const std::size_t encoded_block_values = 4;
+                    constexpr static const std::size_t encoded_block_bits = encoded_block_values * encoded_value_bits;
+                    typedef std::array<encoded_value_type, encoded_block_bits / CHAR_BIT> encoded_block_type;
 
                     constexpr static const std::size_t padding_block_bits = 6;
                     constexpr static const std::size_t padding_bits = 8;

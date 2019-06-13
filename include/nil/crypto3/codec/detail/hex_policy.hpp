@@ -39,14 +39,24 @@ namespace nil {
                 struct hex_policy {
                     typedef Mode mode_type;
 
+                    typedef typename boost::uint_t<CHAR_BIT>::exact byte_type;
+
                     typedef typename mode_type::constants_type constants_type;
                     constexpr static const constants_type constants = mode_type::constants;
 
-                    constexpr static const std::uint8_t decoded_block_bits = CHAR_BIT;
-                    typedef std::array<std::uint8_t, decoded_block_bits / CHAR_BIT> decoded_block_type;
+                    constexpr static const std::size_t decoded_value_bits = CHAR_BIT;
+                    typedef byte_type decoded_value_type;
 
-                    constexpr static const std::uint8_t encoded_block_bits = 2u * decoded_block_bits;
-                    typedef std::array<std::uint8_t, encoded_block_bits / CHAR_BIT> encoded_block_type;
+                    constexpr static const std::size_t encoded_value_bits = CHAR_BIT;
+                    typedef byte_type encoded_value_type;
+
+                    constexpr static const std::size_t decoded_block_values = 1;
+                    constexpr static const std::size_t decoded_block_bits = decoded_value_bits * decoded_block_values;
+                    typedef std::array<decoded_value_type, decoded_block_values> decoded_block_type;
+
+                    constexpr static const std::size_t encoded_block_values = 2;
+                    constexpr static const std::uint8_t encoded_block_bits = encoded_block_values * encoded_value_bits;
+                    typedef std::array<encoded_value_type, encoded_block_values> encoded_block_type;
                 };
             }
         }

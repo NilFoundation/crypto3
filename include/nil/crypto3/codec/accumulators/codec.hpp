@@ -32,17 +32,17 @@ namespace nil {
                     typedef Mode mode_type;
                     typedef typename mode_type::finalizer_type finalizer_type;
 
-                    typedef typename mode_type::input_block_type input_block_type;
-                    typedef typename input_block_type::value_type input_value_type;
                     constexpr static const std::size_t input_block_bits = mode_type::input_block_bits;
-                    constexpr static const std::size_t input_value_bits =
-                            input_block_bits / std::tuple_size<input_block_type>::value;
+                    typedef typename mode_type::input_block_type input_block_type;
 
-                    typedef typename mode_type::output_block_type output_block_type;
-                    typedef typename output_block_type::value_type output_value_type;
+                    constexpr static const std::size_t input_value_bits = mode_type::input_value_bits;
+                    typedef typename input_block_type::value_type input_value_type;
+
                     constexpr static const std::size_t output_block_bits = mode_type::output_block_bits;
-                    constexpr static const std::size_t output_value_bits =
-                            output_block_bits / std::tuple_size<output_block_type>::value;
+                    typedef typename mode_type::output_block_type output_block_type;
+
+                    constexpr static const std::size_t output_value_bits = mode_type::output_value_bits;
+                    typedef typename output_block_type::value_type output_value_type;
 
                     typedef boost::container::static_vector<input_value_type,
                                                             std::tuple_size<input_block_type>::value> cache_type;
