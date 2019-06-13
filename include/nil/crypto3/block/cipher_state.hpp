@@ -27,14 +27,9 @@ namespace nil {
              * @tparam ValueBits
              * @tparam LengthBits
              */
-            template<typename ProcessingMode>
-            struct block_accumulator {
-                typedef boost::accumulators::accumulator_set<block::digest<ProcessingMode::input_block_bits>,
-                                                             boost::accumulators::features<
-                                                                     accumulators::tag::block<ProcessingMode>>> type;
-
-                typedef ProcessingMode mode_type;
-            };
+            template<typename ProcessingMode> using block_accumulator = boost::accumulators::accumulator_set<
+                    block::digest<ProcessingMode::input_block_bits>,
+                    boost::accumulators::features<accumulators::tag::block<ProcessingMode>>>;
         }
     }
 }

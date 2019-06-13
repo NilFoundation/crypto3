@@ -37,7 +37,7 @@ set(TESTS_NAMES
     "blowfish"
     "camellia"
     "cast"
-#    "des"
+    "des"
     "gost28147"
     "idea"
     "kasumi"

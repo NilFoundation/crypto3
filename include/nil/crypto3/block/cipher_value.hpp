@@ -26,58 +26,60 @@ namespace nil {
     namespace crypto3 {
         namespace block {
             namespace detail {
-                template<typename CodecAccumulator>
+                template<typename CipherAccumulator>
                 struct ref_cipher_impl {
-                    typedef CodecAccumulator cipher_accumulator_type;
-                    typedef typename cipher_accumulator_type::type cipher_accumulator_set;
+                    typedef CipherAccumulator accumulator_set_type;
+                    typedef typename boost::mpl::front<
+                            typename accumulator_set_type::features_type>::type accumulator_type;
 
-                    typedef typename CodecAccumulator::mode_type mode_type;
+                    typedef typename CipherAccumulator::mode_type mode_type;
                     typedef typename mode_type::encoder_type cipher_type;
 
-                    ref_cipher_impl(const cipher_accumulator_set &acc) : accumulator_set(acc) {
+                    ref_cipher_impl(const accumulator_set_type &acc) : accumulator_set(acc) {
 
                     }
 
-                    cipher_accumulator_set &accumulator_set;
+                    accumulator_set_type &accumulator_set;
                 };
 
-                template<typename CodecAccumulator>
+                template<typename CipherAccumulator>
                 struct value_cipher_impl {
-                    typedef CodecAccumulator cipher_accumulator_type;
-                    typedef typename cipher_accumulator_type::type cipher_accumulator_set;
+                    typedef CipherAccumulator accumulator_set_type;
+                    typedef typename boost::mpl::front<
+                            typename accumulator_set_type::features_type>::type accumulator_type;
 
-                    typedef typename CodecAccumulator::mode_type mode_type;
+                    typedef typename CipherAccumulator::mode_type mode_type;
                     typedef typename mode_type::encoder_type cipher_type;
 
-                    value_cipher_impl(const cipher_accumulator_set &acc) : accumulator_set(acc) {
+                    value_cipher_impl(const accumulator_set_type &acc) : accumulator_set(acc) {
 
                     }
 
-                    mutable cipher_accumulator_set accumulator_set;
+                    mutable accumulator_set_type accumulator_set;
                 };
 
-                template<typename CodecStateImpl>
-                struct range_cipher_impl : public CodecStateImpl {
-                    typedef CodecStateImpl cipher_state_impl_type;
+                template<typename CipherStateImpl>
+                struct range_cipher_impl : public CipherStateImpl {
+                    typedef CipherStateImpl cipher_state_impl_type;
 
-                    typedef typename cipher_state_impl_type::cipher_accumulator_type cipher_accumulator_type;
-                    typedef typename cipher_accumulator_type::type cipher_accumulator_set;
+                    typedef typename cipher_state_impl_type::accumulator_type accumulator_type;
+                    typedef typename cipher_state_impl_type::accumulator_set_type accumulator_set_type;
 
                     typedef typename cipher_state_impl_type::mode_type mode_type;
                     typedef typename cipher_state_impl_type::cipher_type cipher_type;
 
-                    typedef typename boost::mpl::apply<cipher_accumulator_set, accumulators::tag::block<
-                            mode_type> >::type::result_type result_type;
+                    typedef typename boost::mpl::apply<accumulator_set_type,
+                                                       accumulator_type>::type::result_type result_type;
 
                     template<typename SinglePassRange>
-                    range_cipher_impl(const SinglePassRange &range, const cipher_accumulator_set &ise)
-                            : CodecStateImpl(ise) {
+                    range_cipher_impl(const SinglePassRange &range, const accumulator_set_type &ise)
+                            : CipherStateImpl(ise) {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange>));
 
                         typedef typename std::iterator_traits<
                                 typename SinglePassRange::iterator>::value_type value_type;
                         BOOST_STATIC_ASSERT(std::numeric_limits<value_type>::is_specialized);
-                        typedef typename cipher_type::template stream_processor<mode_type, cipher_accumulator_set,
+                        typedef typename cipher_type::template stream_processor<mode_type, accumulator_set_type,
                                                                                 std::numeric_limits<
                                                                                         value_type>::digits +
                                                                                 std::numeric_limits<
@@ -88,13 +90,13 @@ namespace nil {
                     }
 
                     template<typename InputIterator>
-                    range_cipher_impl(InputIterator first, InputIterator last, const cipher_accumulator_set &ise)
-                            : CodecStateImpl(ise) {
+                    range_cipher_impl(InputIterator first, InputIterator last, const accumulator_set_type &ise)
+                            : CipherStateImpl(ise) {
                         BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<InputIterator>));
 
                         typedef typename std::iterator_traits<InputIterator>::value_type value_type;
                         BOOST_STATIC_ASSERT(std::numeric_limits<value_type>::is_specialized);
-                        typedef typename cipher_type::template stream_processor<mode_type, cipher_accumulator_set,
+                        typedef typename cipher_type::template stream_processor<mode_type, accumulator_set_type,
                                                                                 std::numeric_limits<
                                                                                         value_type>::digits +
                                                                                 std::numeric_limits<
@@ -105,15 +107,16 @@ namespace nil {
 
                     template<typename OutputRange>
                     operator OutputRange() const {
-                        result_type result = accumulators::extract::block<mode_type>(this->accumulator_set);
+                        result_type result = boost::accumulators::extract_result<accumulator_type>(
+                                this->accumulator_set);
                         return OutputRange(result.cbegin(), result.cend());
                     }
 
                     operator result_type() const {
-                        return accumulators::extract::block<mode_type>(this->accumulator_set);
+                        return boost::accumulators::extract_result<accumulator_type>(this->accumulator_set);
                     }
 
-                    operator cipher_accumulator_set() const {
+                    operator accumulator_set_type() const {
                         return this->accumulator_set;
                     }
 
@@ -121,38 +124,38 @@ namespace nil {
 
                     template<typename Char, typename CharTraits, typename Alloc>
                     operator std::basic_string<Char, CharTraits, Alloc>() const {
-                        return std::to_string(accumulators::extract::cipher<mode_type>(this->accumulator_set));
+                        return std::to_string(boost::accumulators::extract_result<accumulator_type>(this->accumulator_set));
                     }
 
 #endif
                 };
 
-                template<typename CodecStateImpl, typename OutputIterator>
-                struct itr_cipher_impl : public CodecStateImpl {
+                template<typename CipherStateImpl, typename OutputIterator>
+                struct itr_cipher_impl : public CipherStateImpl {
                 private:
                     mutable OutputIterator out;
 
                 public:
-                    typedef CodecStateImpl cipher_state_impl_type;
+                    typedef CipherStateImpl cipher_state_impl_type;
 
-                    typedef typename cipher_state_impl_type::cipher_accumulator_type cipher_accumulator_type;
-                    typedef typename cipher_accumulator_type::type cipher_accumulator_set;
+                    typedef typename cipher_state_impl_type::accumulator_type accumulator_type;
+                    typedef typename cipher_state_impl_type::accumulator_set_type accumulator_set_type;
 
                     typedef typename cipher_state_impl_type::mode_type mode_type;
                     typedef typename cipher_state_impl_type::cipher_type cipher_type;
 
-                    typedef typename boost::mpl::apply<cipher_accumulator_set, accumulators::tag::block<
-                            mode_type> >::type::result_type result_type;
+                    typedef typename boost::mpl::apply<accumulator_set_type,
+                                                       accumulator_type>::type::result_type result_type;
 
                     template<typename SinglePassRange>
-                    itr_cipher_impl(const SinglePassRange &range, OutputIterator out, const cipher_accumulator_set &ise)
-                            : CodecStateImpl(ise), out(std::move(out)) {
+                    itr_cipher_impl(const SinglePassRange &range, OutputIterator out, const accumulator_set_type &ise)
+                            : CipherStateImpl(ise), out(std::move(out)) {
                         BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange>));
 
                         typedef typename std::iterator_traits<
                                 typename SinglePassRange::iterator>::value_type value_type;
                         BOOST_STATIC_ASSERT(std::numeric_limits<value_type>::is_specialized);
-                        typedef typename cipher_type::template stream_processor<mode_type, cipher_accumulator_set,
+                        typedef typename cipher_type::template stream_processor<mode_type, accumulator_set_type,
                                                                                 std::numeric_limits<
                                                                                         value_type>::digits +
                                                                                 std::numeric_limits<
@@ -164,13 +167,13 @@ namespace nil {
 
                     template<typename InputIterator>
                     itr_cipher_impl(InputIterator first, InputIterator last, OutputIterator out,
-                                    const cipher_accumulator_set &ise)
-                            : CodecStateImpl(ise), out(std::move(out)) {
+                                    const accumulator_set_type &ise)
+                            : CipherStateImpl(ise), out(std::move(out)) {
                         BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<InputIterator>));
 
                         typedef typename std::iterator_traits<InputIterator>::value_type value_type;
                         BOOST_STATIC_ASSERT(std::numeric_limits<value_type>::is_specialized);
-                        typedef typename cipher_type::template stream_processor<mode_type, cipher_accumulator_set,
+                        typedef typename cipher_type::template stream_processor<mode_type, accumulator_set_type,
                                                                                 std::numeric_limits<
                                                                                         value_type>::digits +
                                                                                 std::numeric_limits<
@@ -181,7 +184,8 @@ namespace nil {
                     }
 
                     operator OutputIterator() const {
-                        result_type result = accumulators::extract::block<mode_type>(this->accumulator_set);
+                        result_type result = boost::accumulators::extract_result<accumulator_type>(
+                                this->accumulator_set);
 
                         return std::move(result.cbegin(), result.cend(), out);
                     }

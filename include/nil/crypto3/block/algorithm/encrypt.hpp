@@ -70,7 +70,7 @@ namespace nil {
                  typename InputIterator,
                  typename OutputAccumulator = typename block::block_accumulator<
                          typename BlockCipher::stream_encrypter_type>>
-        OutputAccumulator &encrypt(InputIterator first, InputIterator last, typename OutputAccumulator::type &acc) {
+        OutputAccumulator &encrypt(InputIterator first, InputIterator last, OutputAccumulator &acc) {
 
             typedef typename BlockCipher::stream_encrypter_type EncryptionMode;
             typedef typename block::block_accumulator<EncryptionMode> CipherAccumulator;
@@ -99,7 +99,7 @@ namespace nil {
                  typename SinglePassRange,
                  typename OutputAccumulator = typename block::block_accumulator<
                          typename BlockCipher::stream_encrypter_type>>
-        OutputAccumulator &encrypt(const SinglePassRange &r, typename OutputAccumulator::type &acc) {
+        OutputAccumulator &encrypt(const SinglePassRange &r, OutputAccumulator &acc) {
 
             typedef typename BlockCipher::stream_encrypter_type EncryptionMode;
             typedef typename block::block_accumulator<EncryptionMode> CipherAccumulator;
