@@ -167,30 +167,36 @@ namespace nil {
                 typedef typename detail::isomorphic_encoding_mode<base<Version>> stream_encoder_type;
                 typedef typename detail::isomorphic_decoding_mode<base<Version>> stream_decoder_type;
 
-                constexpr static const std::size_t decoded_block_bits = policy_type::decoded_block_bits;
-                typedef typename policy_type::decoded_block_type decoded_block_type;
+                constexpr static const std::size_t encoded_value_bits = policy_type::encoded_value_bits;
+                typedef typename policy_type::encoded_value_type encoded_value_type;
+
+                constexpr static const std::size_t decoded_value_bits = policy_type::decoded_value_bits;
+                typedef typename policy_type::decoded_value_type decoded_value_type;
 
                 constexpr static const std::size_t encoded_block_bits = policy_type::encoded_block_bits;
                 typedef typename policy_type::encoded_block_type encoded_block_type;
 
-                static encoded_block_type encode(const decoded_block_type &plaintext) {
+                constexpr static const std::size_t decoded_block_bits = policy_type::decoded_block_bits;
+                typedef typename policy_type::decoded_block_type decoded_block_type;
+
+                inline static encoded_block_type encode(const decoded_block_type &plaintext) {
                     return policy_type::encode_block(plaintext);
                 }
 
-                static decoded_block_type decode(const encoded_block_type &encoded) {
+                inline static decoded_block_type decode(const encoded_block_type &encoded) {
                     return policy_type::decode_block(encoded);
                 }
 
                 template<typename ProcessingMode, typename StateAccumulator, std::size_t ValueBits>
                 struct stream_processor {
-                    struct params {
+                    struct params_type {
                         typedef typename stream_endian::little_octet_big_bit endian_type;
 
                         constexpr static const std::size_t value_bits = ValueBits;
                         constexpr static const std::size_t length_bits = ProcessingMode::input_block_bits;
                     };
 
-                    typedef arithmetic_state_preprocessor<ProcessingMode, StateAccumulator, params> type;
+                    typedef arithmetic_state_preprocessor<ProcessingMode, StateAccumulator, params_type> type;
                 };
             };
 
@@ -205,30 +211,36 @@ namespace nil {
                 typedef typename detail::isomorphic_encoding_mode<base<Version>> stream_encoder_type;
                 typedef typename detail::isomorphic_decoding_mode<base<Version>> stream_decoder_type;
 
-                constexpr static const std::size_t decoded_block_bits = policy_type::decoded_block_bits;
-                typedef typename policy_type::decoded_block_type decoded_block_type;
+                constexpr static const std::size_t encoded_value_bits = policy_type::encoded_value_bits;
+                typedef typename policy_type::encoded_value_type encoded_value_type;
+
+                constexpr static const std::size_t decoded_value_bits = policy_type::decoded_value_bits;
+                typedef typename policy_type::decoded_value_type decoded_value_type;
 
                 constexpr static const std::size_t encoded_block_bits = policy_type::encoded_block_bits;
                 typedef typename policy_type::encoded_block_type encoded_block_type;
 
-                static encoded_block_type encode(const decoded_block_type &plaintext) {
+                constexpr static const std::size_t decoded_block_bits = policy_type::decoded_block_bits;
+                typedef typename policy_type::decoded_block_type decoded_block_type;
+
+                inline static encoded_block_type encode(const decoded_block_type &plaintext) {
                     return policy_type::encode_block(plaintext);
                 }
 
-                static decoded_block_type decode(const encoded_block_type &encoded) {
+                inline static decoded_block_type decode(const encoded_block_type &encoded) {
                     return policy_type::decode_block(encoded);
                 }
 
                 template<typename ProcessingMode, typename StateAccumulator, std::size_t ValueBits>
                 struct stream_processor {
-                    struct params {
+                    struct params_type {
                         typedef typename stream_endian::little_octet_big_bit endian_type;
 
                         constexpr static const std::size_t value_bits = ValueBits;
                         constexpr static const std::size_t length_bits = ProcessingMode::input_block_bits;
                     };
 
-                    typedef block_state_preprocessor<ProcessingMode, StateAccumulator, params> type;
+                    typedef block_state_preprocessor<ProcessingMode, StateAccumulator, params_type> type;
                 };
             };
 

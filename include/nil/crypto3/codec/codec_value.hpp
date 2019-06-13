@@ -29,7 +29,7 @@ namespace nil {
                     typedef typename codec_accumulator_type::type codec_accumulator_set;
 
                     typedef typename CodecAccumulator::mode_type mode_type;
-                    typedef typename mode_type::encoder_type codec_type;
+                    typedef typename mode_type::codec_type codec_type;
 
                     ref_codec_impl(const codec_accumulator_set &acc) : accumulator_set(acc) {
 
@@ -44,7 +44,7 @@ namespace nil {
                     typedef typename codec_accumulator_type::type codec_accumulator_set;
 
                     typedef typename CodecAccumulator::mode_type mode_type;
-                    typedef typename mode_type::encoder_type codec_type;
+                    typedef typename mode_type::codec_type codec_type;
 
                     value_codec_impl(const codec_accumulator_set &acc) : accumulator_set(acc) {
 
