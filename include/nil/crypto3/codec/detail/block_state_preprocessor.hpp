@@ -38,11 +38,6 @@ namespace nil {
                 constexpr static const std::size_t input_value_bits = mode_type::input_value_bits;
                 typedef typename input_block_type::value_type input_value_type;
 
-                constexpr static const std::size_t output_block_bits = mode_type::output_block_bits;
-                typedef typename mode_type::output_block_type output_block_type;
-
-                constexpr static const std::size_t output_value_bits = mode_type::output_value_bits;
-                typedef typename output_block_type::value_type output_value_type;
             public:
 
                 typedef typename params_type::endian_type endian_type;
@@ -62,7 +57,7 @@ namespace nil {
                 typedef typename boost::uint_t<length_type_bits>::least length_type;
 
                 BOOST_STATIC_ASSERT(!length_bits || length_bits % input_block_bits == 0);
-                BOOST_STATIC_ASSERT(output_block_bits % value_bits == 0);
+                BOOST_STATIC_ASSERT(input_block_bits % value_bits == 0);
 
                 BOOST_STATIC_ASSERT(!length_bits || value_bits <= length_bits);
 
@@ -73,8 +68,7 @@ namespace nil {
                     if (i == input_block_bits - value_bits) {
                         // Convert the input into words
                         input_block_type block = {0};
-                        pack<endian_type, value_bits, input_block_bits / block_values>(cache.begin(), cache.end(),
-                                block);
+                        pack<endian_type, value_bits, input_value_bits>(cache.begin(), cache.end(), block);
 
                         // Process the block
                         state(block);
@@ -98,8 +92,7 @@ namespace nil {
                     for (; n >= block_values; n -= block_values, first += block_values) {
                         // Convert the input into words
                         input_block_type block = {0};
-                        pack<endian_type, value_bits, input_block_bits / block_values>(first, first + block_values,
-                                block);
+                        pack<endian_type, value_bits, input_value_bits>(first, first + block_values, block);
                         seen += value_bits * block_values;
 
                         state(block);
@@ -127,8 +120,8 @@ namespace nil {
                         input_block_type block = {0};
                         typename input_block_type::const_iterator v = block.cbegin();
 
-                        pack<endian_type, value_bits, input_block_bits / block_values>(cache.begin(),
-                                cache.begin() + cache.size(), block);
+                        pack<endian_type, value_bits, input_value_bits>(cache.begin(), cache.begin() + cache.size(),
+                                block);
                         for (length_type itr = seen - (seen % input_block_bits); itr < seen; itr += value_bits) {
                             state(*v++);
                         }
