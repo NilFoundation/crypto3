@@ -11,6 +11,7 @@
 #define CRYPTO3_CODEC_STATE_HPP
 
 #include <boost/accumulators/framework/accumulator_set.hpp>
+#include <boost/accumulators/framework/features.hpp>
 
 #include <nil/crypto3/codec/accumulators/codec.hpp>
 
