@@ -18,8 +18,6 @@
 
 #include <boost/range/concepts.hpp>
 
-#include <boost/accumulators/framework/features.hpp>
-
 #include <nil/crypto3/block/accumulators/block.hpp>
 
 namespace nil {

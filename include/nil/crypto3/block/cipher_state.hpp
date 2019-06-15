@@ -11,6 +11,7 @@
 #define CRYPTO3_CIPHER_STATE_PREPROCESSOR_HPP
 
 #include <boost/accumulators/framework/accumulator_set.hpp>
+#include <boost/accumulators/framework/features.hpp>
 
 #include <nil/crypto3/block/accumulators/block.hpp>
 
