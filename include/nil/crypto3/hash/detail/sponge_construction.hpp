@@ -54,7 +54,7 @@ namespace nil {
                 constexpr static const std::size_t block_words = compressor_functor::block_words;
                 typedef typename compressor_functor::block_type block_type;
 
-                sponge_construction &update(block_type const &block) {
+                sponge_construction &operator()(block_type const &block) {
                     compressor_functor()(state_, block);
                     return *this;
                 }

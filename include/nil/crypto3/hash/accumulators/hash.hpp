@@ -65,7 +65,7 @@ namespace nil {
                         if (!cache.empty()) {
                             block_type ib = {0};
                             std::move(cache.begin(), cache.end(), ib.begin());
-                            res.update(ib);
+                            res(ib);
                         }
 
                         return res.end_message();
@@ -77,7 +77,7 @@ namespace nil {
                         if (cache.size() == cache.max_size()) {
                             block_type ib = {0};
                             std::move(cache.begin(), cache.end(), ib.begin());
-                            construction.update(ib);
+                            construction(ib);
 
                             cache.clear();
                         }
@@ -88,14 +88,14 @@ namespace nil {
 
                     inline void process(const block_type &block) {
                         if (cache.empty()) {
-                            construction.update(block);
+                            construction(block);
                         } else {
                             block_type b = hash::make_array<block_words>(cache.begin(), cache.end());
                             typename block_type::const_iterator itr = block.begin() + (cache.max_size() - cache.size());
 
                             std::move(block.begin(), itr, b.end());
 
-                            construction.update(b);
+                            construction(b);
 
                             cache.clear();
                             cache.insert(cache.end(), itr, block.end());

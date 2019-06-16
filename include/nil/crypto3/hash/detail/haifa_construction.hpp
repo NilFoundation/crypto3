@@ -62,7 +62,7 @@ namespace nil {
                 typedef typename compressor_functor::block_type block_type;
 
                 template<typename Integer>
-                haifa_construction &update(const block_type &block, Integer seen, Integer finalization = 0) {
+                haifa_construction &operator()(const block_type &block, Integer seen, Integer finalization = 0) {
                     compressor_functor()(state_, block, seen, finalization);
                     return *this;
                 }

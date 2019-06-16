@@ -44,13 +44,7 @@ namespace nil {
                         constexpr static const std::size_t value_bits = ValueBits;
                         constexpr static const std::size_t length_bits = 0;
                     };
-                    typedef sponge_state_preprocessor<construction_type, StateAccumulator, params_type> type_;
-#ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES
-                    typedef type_ type;
-#else
-                    struct type : type_ {
-                    };
-#endif
+                    typedef sponge_state_preprocessor<construction_type, StateAccumulator, params_type> type;
                 };
 
                 constexpr static const std::size_t digest_bits = policy_type::digest_bits;

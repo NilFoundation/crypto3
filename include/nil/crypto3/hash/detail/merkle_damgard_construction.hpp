@@ -56,7 +56,7 @@ namespace nil {
                 constexpr static const std::size_t block_words = compressor_functor::block_words;
                 typedef typename compressor_functor::block_type block_type;
 
-                merkle_damgard_construction &update(const block_type &block) {
+                merkle_damgard_construction &operator()(const block_type &block) {
                     compressor_functor()(state_, block);
                     return *this;
                 }

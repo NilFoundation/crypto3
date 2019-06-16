@@ -69,13 +69,7 @@ namespace nil {
                         constexpr static const std::size_t length_bits = construction_type::word_bits * 2;
                     };
 
-                    typedef merkle_damgard_state_preprocessor<construction_type, StateAccumulator, params_type> type_;
-#ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES
-                    typedef type_ type;
-#else
-                    struct type : type_ {
-                    };
-#endif
+                    typedef merkle_damgard_state_preprocessor<construction_type, StateAccumulator, params_type> type;
                 };
 
                 constexpr static const std::size_t digest_bits = policy_type::digest_bits;

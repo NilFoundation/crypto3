@@ -107,6 +107,8 @@ namespace nil {
                     // No appending requested, so nothing to do
                 }
 
+            public:
+
                 merkle_damgard_state_preprocessor &update_one(value_type value) {
                     std::size_t i = seen % block_bits;
                     std::size_t j = i / value_bits;
@@ -145,8 +147,6 @@ namespace nil {
                     }
                     return *this;
                 }
-
-            public:
 
                 template<typename InputIterator>
                 void operator()(InputIterator b, InputIterator e, std::random_access_iterator_tag) {
@@ -209,8 +209,9 @@ namespace nil {
                 }
 
             public:
-                merkle_damgard_state_preprocessor(accumulator_type &acc) : acc(acc), value_array(), block_hash(),
-                        seen() {
+                merkle_damgard_state_preprocessor(const accumulator_type &acc = accumulator_type()) : acc(acc),
+                    value_array(), block_hash(), seen() {
+
                 }
 
                 virtual ~merkle_damgard_state_preprocessor() {

@@ -74,8 +74,6 @@ namespace nil {
                     return d;
                 }
 
-            protected:
-
                 basic_adler &update_one(value_type x) {
                     if (DigestBits < 16) {
                         x %= modulo;
@@ -184,8 +182,6 @@ Bits    Limit
                     return *this;
                 }
 
-            public:
-
                 template<typename InputIterator>
                 basic_adler &operator()(InputIterator b, InputIterator e, std::random_access_iterator_tag) {
                     return update_n(b, e - b);
@@ -202,7 +198,7 @@ Bits    Limit
                 template<typename InputIterator>
                 basic_adler &operator()(InputIterator b, InputIterator e) {
                     typedef typename std::iterator_traits<InputIterator>::iterator_category cat;
-                    return update(b, e, cat());
+                    return operator()(b, e, cat());
                 }
 
             private:
@@ -229,13 +225,7 @@ Bits    Limit
                     };
 
                     BOOST_STATIC_ASSERT(ValueBits == 8);
-                    typedef construction_type type_;
-#ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES
-                    typedef type_ type;
-#else
-                    struct type : type_ {
-                    };
-#endif
+                    typedef construction_type type;
                 };
 
                 constexpr static const std::size_t digest_bits = DigestBits;

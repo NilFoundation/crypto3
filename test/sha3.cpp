@@ -61,10 +61,7 @@ static const std::unordered_map<std::string, std::vector<uint8_t>> byte_data = {
 BOOST_AUTO_TEST_SUITE(sha3_test_suite)
 
     BOOST_DATA_TEST_CASE(sha3_range_itr_hash, boost::unit_test::data::make(byte_data), array_element) {
-        std::vector<uint8_t> out;
-        hash<sha3>(array_element.first, std::back_inserter(out));
 
-        BOOST_CHECK_EQUAL(out, array_element.second);
     }
 
 BOOST_AUTO_TEST_SUITE_END()

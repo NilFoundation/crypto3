@@ -121,14 +121,7 @@ namespace nil {
                                 typename boost::uint_t<DigestBits>::exact>::digits;
                     };
 
-                    typedef haifa_state_preprocessor<construction_type, StateAccumulator, params_type> type_;
-
-#ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES
-                    typedef type_ type;
-#else
-                    struct type : type_ {
-                    };
-#endif
+                    typedef haifa_state_preprocessor<construction_type, StateAccumulator, params_type> type;
                 };
 
                 constexpr static const std::size_t digets_bits = DigestBits;

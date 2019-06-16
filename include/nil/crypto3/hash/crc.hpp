@@ -130,7 +130,7 @@ namespace nil {
                 template<typename InputIterator>
                 basic_crc &operator()(InputIterator b, InputIterator e) {
                     typedef typename std::iterator_traits<InputIterator>::iterator_category cat;
-                    return update(b, e, cat());
+                    return operator()(b, e, cat());
                 }
 
             private:
@@ -162,13 +162,7 @@ namespace nil {
                     };
 
                     BOOST_STATIC_ASSERT(ValueBits == CHAR_BIT);
-                    typedef construction_type type_;
-#ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES
-                    typedef type_ type;
-#else
-                    struct type : type_ {
-                    };
-#endif
+                    typedef construction_type type;
                 };
 
                 constexpr static const std::size_t digest_bits = DigestBits;

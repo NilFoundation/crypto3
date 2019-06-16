@@ -118,6 +118,8 @@ namespace nil {
                     // No appending requested, so nothing to do
                 }
 
+            public:
+
                 haifa_state_preprocessor &update_one(value_type value) {
                     std::size_t i = seen % block_bits;
                     std::size_t j = i / value_bits;
@@ -156,8 +158,6 @@ namespace nil {
                     }
                     return *this;
                 }
-
-            public:
 
                 template<typename InputIterator>
                 void operator()(InputIterator b, InputIterator e, std::random_access_iterator_tag) {
@@ -220,7 +220,8 @@ namespace nil {
                 }
 
             public:
-                haifa_state_preprocessor(accumulator_type &acc) : value_array(), block_hash(), seen() {
+                haifa_state_preprocessor(const accumulator_type &acc = accumulator_type())
+                        : value_array(), block_hash(), seen() {
                 }
 
                 void reset() {
