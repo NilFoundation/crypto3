@@ -58,16 +58,15 @@ namespace nil {
              * @return
              */
             template<typename Hash, typename InputIterator, typename OutputIterator>
-            OutputIterator hash(InputIterator first, InputIterator last, OutputIterator out) {
+            typename std::enable_if<!boost::accumulators::detail::is_accumulator_set<OutputIterator>::value,
+                                    OutputIterator>::type hash(InputIterator first, InputIterator last,
+                                                               OutputIterator out) {
                 typedef typename hash::hash_accumulator<Hash> HashAccumulator;
-                typedef typename Hash::template stream_processor<HashAccumulator, std::numeric_limits<
-                        typename std::iterator_traits<InputIterator>::value_type>::digits + std::numeric_limits<
-                        typename std::iterator_traits<InputIterator>::value_type>::is_signed>::type StreamHash;
 
-                typedef detail::value_hash_impl<StreamHash> StreamHashImpl;
-                typedef detail::itr_hash_impl<Hash, StreamHashImpl, OutputIterator> HashImpl;
+                typedef detail::value_hash_impl<HashAccumulator> StreamHashImpl;
+                typedef detail::itr_hash_impl<StreamHashImpl, OutputIterator> HashImpl;
 
-                return HashImpl(first, last, std::move(out), StreamHash());
+                return HashImpl(first, last, std::move(out), HashAccumulator());
             }
 
             /*!
@@ -88,14 +87,11 @@ namespace nil {
             template<typename Hash,
                      typename InputIterator,
                      typename HashAccumulator = typename hash::hash_accumulator<Hash>>
-            typename HashAccumulator::type &hash(InputIterator first, InputIterator last,
-                                                 typename HashAccumulator::type &sh) {
-                typedef typename Hash::template stream_processor<HashAccumulator, std::numeric_limits<
-                        typename std::iterator_traits<InputIterator>::value_type>::digits + std::numeric_limits<
-                        typename std::iterator_traits<InputIterator>::value_type>::is_signed>::type StreamHash;
-
-                typedef detail::ref_hash_impl<StreamHash> StreamHashImpl;
-                typedef detail::range_hash_impl<Hash, StreamHashImpl> HashImpl;
+            typename std::enable_if<boost::accumulators::detail::is_accumulator_set<HashAccumulator>::value,
+                                    HashAccumulator>::type &hash(InputIterator first, InputIterator last,
+                                                                 HashAccumulator &sh) {
+                typedef detail::ref_hash_impl<HashAccumulator> StreamHashImpl;
+                typedef detail::range_hash_impl<StreamHashImpl> HashImpl;
 
                 return HashImpl(first, last, sh);
             }
@@ -112,19 +108,13 @@ namespace nil {
              * @param last
              * @return
              */
-            template<typename Hash,
-                     typename InputIterator,
-                     typename StreamHash = typename Hash::template stream_processor<
-                             typename hash::hash_accumulator<Hash>,
-                             std::numeric_limits<typename std::iterator_traits<InputIterator>::value_type>::digits +
-                             std::numeric_limits<
-                                     typename std::iterator_traits<InputIterator>::value_type>::is_signed>::type>
-            detail::range_hash_impl<Hash, detail::value_hash_impl<StreamHash>> hash(InputIterator first,
-                                                                                    InputIterator last) {
-                typedef detail::value_hash_impl<StreamHash> StreamHashImpl;
-                typedef detail::range_hash_impl<Hash, StreamHashImpl> HashImpl;
+            template<typename Hash, typename InputIterator, typename HashAccumulator = hash::hash_accumulator<Hash>>
+            detail::range_hash_impl<detail::value_hash_impl<HashAccumulator>> hash(InputIterator first,
+                                                                                   InputIterator last) {
+                typedef detail::value_hash_impl<HashAccumulator> StreamHashImpl;
+                typedef detail::range_hash_impl<StreamHashImpl> HashImpl;
 
-                return HashImpl(first, last, StreamHash());
+                return HashImpl(first, last, HashAccumulator());
             }
 
             /*!
@@ -141,18 +131,14 @@ namespace nil {
              * @return
              */
             template<typename Hash, typename SinglePassRange, typename OutputIterator>
-            OutputIterator hash(const SinglePassRange &rng, OutputIterator out) {
+            typename std::enable_if<!boost::accumulators::detail::is_accumulator_set<OutputIterator>::value,
+                                    OutputIterator>::type hash(const SinglePassRange &rng, OutputIterator out) {
                 typedef typename hash::hash_accumulator<Hash> HashAccumulator;
-                typedef typename Hash::template stream_processor<HashAccumulator, std::numeric_limits<
-                        typename std::iterator_traits<typename SinglePassRange::iterator>::value_type>::digits +
-                                                                                  std::numeric_limits<
-                                                                                          typename std::iterator_traits<
-                                                                                                  typename SinglePassRange::iterator>::value_type>::is_signed>::type StreamHash;
 
-                typedef detail::value_hash_impl<StreamHash> StreamHashImpl;
-                typedef detail::itr_hash_impl<Hash, StreamHashImpl, OutputIterator> HashImpl;
+                typedef detail::value_hash_impl<HashAccumulator> StreamHashImpl;
+                typedef detail::itr_hash_impl<StreamHashImpl, OutputIterator> HashImpl;
 
-                return HashImpl(rng, std::move(out), StreamHash());
+                return HashImpl(rng, std::move(out), HashAccumulator());
             }
 
             /*!
@@ -172,15 +158,10 @@ namespace nil {
             template<typename Hash,
                      typename SinglePassRange,
                      typename HashAccumulator = typename hash::hash_accumulator<Hash>>
-            typename HashAccumulator::type &hash(const SinglePassRange &rng, typename HashAccumulator::type &sh) {
-                typedef typename Hash::template stream_processor<HashAccumulator, std::numeric_limits<
-                        typename std::iterator_traits<typename SinglePassRange::iterator>::value_type>::digits +
-                                                                                  std::numeric_limits<
-                                                                                          typename std::iterator_traits<
-                                                                                                  typename SinglePassRange::iterator>::value_type>::is_signed>::type StreamHash;
-
-                typedef detail::ref_hash_impl<StreamHash> StreamHashImpl;
-                typedef detail::range_hash_impl<Hash, StreamHashImpl> HashImpl;
+            typename std::enable_if<boost::accumulators::detail::is_accumulator_set<HashAccumulator>::value,
+                                    HashAccumulator>::type &hash(const SinglePassRange &rng, HashAccumulator &sh) {
+                typedef detail::ref_hash_impl<HashAccumulator> StreamHashImpl;
+                typedef detail::range_hash_impl<StreamHashImpl> HashImpl;
 
                 return HashImpl(rng, sh);
             }
@@ -196,19 +177,13 @@ namespace nil {
              * @param r
              * @return
              */
-            template<typename Hash,
-                     typename SinglePassRange,
-                     typename StreamHash = typename Hash::template stream_processor<
-                             typename hash::hash_accumulator<Hash>, std::numeric_limits<typename std::iterator_traits<
-                                     typename SinglePassRange::iterator>::value_type>::digits + std::numeric_limits<
-                                     typename std::iterator_traits<
-                                             typename SinglePassRange::iterator>::value_type>::is_signed>::type>
-            detail::range_hash_impl<Hash, detail::value_hash_impl<StreamHash>> hash(const SinglePassRange &r) {
+            template<typename Hash, typename SinglePassRange, typename HashAccumulator = hash::hash_accumulator<Hash>>
+            detail::range_hash_impl<detail::value_hash_impl<HashAccumulator>> hash(const SinglePassRange &r) {
 
-                typedef detail::value_hash_impl<StreamHash> StreamHashImpl;
-                typedef detail::range_hash_impl<Hash, StreamHashImpl> HashImpl;
+                typedef detail::value_hash_impl<HashAccumulator> StreamHashImpl;
+                typedef detail::range_hash_impl<StreamHashImpl> HashImpl;
 
-                return HashImpl(r, StreamHash());
+                return HashImpl(r, HashAccumulator());
             }
         }
     }

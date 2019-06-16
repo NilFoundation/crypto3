@@ -10,14 +10,14 @@
 #ifndef CRYPTO3_ACCUMULATORS_HASH_HPP
 #define CRYPTO3_ACCUMULATORS_HASH_HPP
 
-#include <boost/container/static_vector.hpp>
-
 #include <boost/parameter/value_type.hpp>
 
 #include <boost/accumulators/framework/accumulator_base.hpp>
 #include <boost/accumulators/framework/extractor.hpp>
 #include <boost/accumulators/framework/depends_on.hpp>
 #include <boost/accumulators/framework/parameters/sample.hpp>
+
+#include <boost/container/static_vector.hpp>
 
 #include <nil/crypto3/hash/detail/make_array.hpp>
 #include <nil/crypto3/hash/detail/static_digest.hpp>
@@ -30,18 +30,18 @@ namespace nil {
                 struct hash_impl : boost::accumulators::accumulator_base {
                 protected:
                     typedef Hash hash_type;
-                    typedef typename hash_type::block_hash_type block_hash_type;
+                    typedef typename hash_type::construction_type construction_type;
 
-                    constexpr static const std::size_t word_bits = block_hash_type::word_bits;
-                    typedef typename block_hash_type::word_type word_type;
+                    constexpr static const std::size_t word_bits = construction_type::word_bits;
+                    typedef typename construction_type::word_type word_type;
 
-                    constexpr static const std::size_t state_bits = block_hash_type::state_bits;
-                    constexpr static const std::size_t state_words = block_hash_type::state_words;
-                    typedef typename block_hash_type::state_type state_type;
+                    constexpr static const std::size_t state_bits = construction_type::state_bits;
+                    constexpr static const std::size_t state_words = construction_type::state_words;
+                    typedef typename construction_type::state_type state_type;
 
-                    constexpr static const std::size_t block_bits = block_hash_type::block_bits;
-                    constexpr static const std::size_t block_words = block_hash_type::block_words;
-                    typedef typename block_hash_type::block_type block_type;
+                    constexpr static const std::size_t block_bits = construction_type::block_bits;
+                    constexpr static const std::size_t block_words = construction_type::block_words;
+                    typedef typename construction_type::block_type block_type;
 
                     typedef boost::container::static_vector<word_type, block_words> cache_type;
 
@@ -60,7 +60,7 @@ namespace nil {
 
                     template<typename ArgumentPack>
                     inline result_type result(const ArgumentPack &args) const {
-                        block_hash_type res = construction;
+                        construction_type res = construction;
 
                         if (!cache.empty()) {
                             block_type ib = {0};
@@ -106,7 +106,7 @@ namespace nil {
 
                     std::size_t seen;
                     cache_type cache;
-                    block_hash_type construction;
+                    construction_type construction;
                 };
             }
 

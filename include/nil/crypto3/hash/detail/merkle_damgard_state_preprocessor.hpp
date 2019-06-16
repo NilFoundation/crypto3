@@ -35,19 +35,19 @@ namespace nil {
             template<typename Hash, typename StateAccumulator, typename Params>
             class merkle_damgard_state_preprocessor {
             protected:
-                typedef Hash block_hash_type;
+                typedef Hash construction_type;
                 typedef StateAccumulator accumulator_type;
                 typedef Params params_type;
 
-                constexpr static const std::size_t word_bits = block_hash_type::word_bits;
-                typedef typename block_hash_type::word_type word_type;
+                constexpr static const std::size_t word_bits = construction_type::word_bits;
+                typedef typename construction_type::word_type word_type;
 
-                constexpr static const std::size_t block_bits = block_hash_type::block_bits;
-                constexpr static const std::size_t block_words = block_hash_type::block_words;
-                typedef typename block_hash_type::block_type block_type;
+                constexpr static const std::size_t block_bits = construction_type::block_bits;
+                constexpr static const std::size_t block_words = construction_type::block_words;
+                typedef typename construction_type::block_type block_type;
 
             public:
-                typedef typename block_hash_type::digest_type digest_type;
+                typedef typename construction_type::digest_type digest_type;
 
                 typedef typename params_type::endian endian_type;
 
@@ -226,7 +226,7 @@ namespace nil {
                 accumulator_type &acc;
 
                 value_array_type value_array;
-                block_hash_type block_hash;
+                construction_type block_hash;
                 length_type seen;
             };
         }

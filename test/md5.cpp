@@ -39,7 +39,7 @@ BOOST_TEST_DONT_PRINT_LOG_VALUE(string_data_value)
 typedef std::unordered_map<std::string, std::vector<uint8_t>>::value_type byte_data_value_t;
 BOOST_TEST_DONT_PRINT_LOG_VALUE(byte_data_value_t)
 
-BOOST_TEST_DONT_PRINT_LOG_VALUE(md5::block_hash_type::digest_type)
+BOOST_TEST_DONT_PRINT_LOG_VALUE(md5::construction_type::digest_type)
 
 static const std::unordered_map<std::string, std::string> string_data = {{"",                                                                                 "d41d8cd98f00b204e9800998ecf8427e"},
                                                                          {"a",                                                                                "0cc175b9c0f1b6a831c399e269772661"},
@@ -51,7 +51,7 @@ static const std::unordered_map<std::string, std::string> string_data = {{"",   
 
 class fixture {
 public:
-    md5::block_hash_type a;
+    md5::construction_type a;
 };
 
 BOOST_AUTO_TEST_SUITE(md5_test_suite)
@@ -63,7 +63,7 @@ BOOST_AUTO_TEST_SUITE(md5_test_suite)
     }
 
     BOOST_FIXTURE_TEST_CASE(md5_accumulator1, fixture) {
-        md5::block_hash_type::digest_type s = a.end_message();
+        md5::construction_type::digest_type s = a.end_message();
 
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
         std::printf("%s\n", std::to_string(s));
@@ -80,9 +80,9 @@ BOOST_AUTO_TEST_SUITE(md5_test_suite)
         // then pad with 0s,
         // then add the length, which is also 0.
         // Remember that MD5 is little-octet, big-bit endian
-        md5::block_hash_type::block_type m = {{0x00000080u}};
+        md5::construction_type::block_type m = {{0x00000080u}};
         a.update(m);
-        md5::block_hash_type::digest_type s = a.end_message();
+        md5::construction_type::digest_type s = a.end_message();
 
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
         std::printf("%s\n", std::to_string(s));
@@ -95,12 +95,12 @@ BOOST_AUTO_TEST_SUITE(md5_test_suite)
 
     BOOST_FIXTURE_TEST_CASE(md5_accumulator3, fixture) {
         // echo -n "abc" | md4sum
-        md5::block_hash_type::block_type m = {{}};
+        md5::construction_type::block_type m = {{}};
         m[0] = 0x80636261;
         // little-octet, big-bit endian also means the size isn't in the last word
         m[14] = 0x00000018;
         a.update(m);
-        md5::block_hash_type::digest_type s = a.end_message();
+        md5::construction_type::digest_type s = a.end_message();
 
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
         std::printf("%s\n", std::to_string(s));
@@ -113,7 +113,7 @@ BOOST_AUTO_TEST_SUITE(md5_test_suite)
 
     BOOST_AUTO_TEST_CASE(md5_preprocessor1) {
         md5::stream_processor<8>::type h;
-        md5::block_hash_type::digest_type s = h.end_message();
+        md5::construction_type::digest_type s = h.end_message();
 
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
         std::printf("%s\n", std::to_string(s));
@@ -126,7 +126,7 @@ BOOST_AUTO_TEST_SUITE(md5_test_suite)
         md5::stream_processor<8>::type h;
         h.update_one('a').update_one('b').update_one('c');
 
-        md5::block_hash_type::digest_type s = h.end_message();
+        md5::construction_type::digest_type s = h.end_message();
 
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
         std::printf("%s\n", std::to_string(s));
@@ -141,7 +141,7 @@ BOOST_AUTO_TEST_SUITE(md5_test_suite)
         for (unsigned i = 0; i < 1000000; ++i) {
             h.update_one('a');
         }
-        md5::block_hash_type::digest_type s = h.end_message();
+        md5::construction_type::digest_type s = h.end_message();
 
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
         std::printf("%s\n", std::to_string(s));

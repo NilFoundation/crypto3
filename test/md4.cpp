@@ -33,7 +33,7 @@ using namespace nil::crypto3::hash;
 typedef std::unordered_map<std::string, std::string>::value_type string_data_value;
 BOOST_TEST_DONT_PRINT_LOG_VALUE(string_data_value)
 
-BOOST_TEST_DONT_PRINT_LOG_VALUE(md4::block_hash_type::digest_type)
+BOOST_TEST_DONT_PRINT_LOG_VALUE(md4::construction_type::digest_type)
 
 static const std::unordered_map<std::string, std::string> string_data = {{"",                                                                                 "31d6cfe0d16ae931b73c59d7e0c089c0"},
                                                                          {"a",                                                                                "bde52cb31de33e46245e05fbdbd6fb24"},
@@ -49,7 +49,7 @@ public:
         a.reset();
     }
 
-    md4::block_hash_type a;
+    md4::construction_type a;
 };
 
 BOOST_AUTO_TEST_SUITE(md4_test_suite)
@@ -61,7 +61,7 @@ BOOST_AUTO_TEST_SUITE(md4_test_suite)
     }
 
     BOOST_FIXTURE_TEST_CASE(md4_accumulator1, fixture) {
-        md4::block_hash_type::digest_type s = a.end_message();
+        md4::construction_type::digest_type s = a.end_message();
 
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
         std::printf("%s\n", std::to_string(s));
@@ -78,9 +78,9 @@ BOOST_AUTO_TEST_SUITE(md4_test_suite)
         // then pad with 0s,
         // then add the length, which is also 0.
         // Remember that MD5 is little-octet, big-bit endian
-        md4::block_hash_type::block_type m = {{0x00000080u}};
+        md4::construction_type::block_type m = {{0x00000080u}};
         a.update(m);
-        md4::block_hash_type::digest_type s = a.end_message();
+        md4::construction_type::digest_type s = a.end_message();
 
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
         std::printf("%s\n", std::to_string(s));
@@ -93,12 +93,12 @@ BOOST_AUTO_TEST_SUITE(md4_test_suite)
 
     BOOST_FIXTURE_TEST_CASE(md4_accumulator3, fixture) {
         // echo -n "abc" | md4sum
-        md4::block_hash_type::block_type m = {{}};
+        md4::construction_type::block_type m = {{}};
         m[0] = 0x80636261;
         // little-octet, big-bit endian also means the size isn't in the last word
         m[14] = 0x00000018;
         a.update(m);
-        md4::block_hash_type::digest_type s = a.end_message();
+        md4::construction_type::digest_type s = a.end_message();
 
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
         std::printf("%s\n", std::to_string(s));
@@ -111,7 +111,7 @@ BOOST_AUTO_TEST_SUITE(md4_test_suite)
 
     BOOST_AUTO_TEST_CASE(md4_preprocessor1) {
         md4::stream_processor<8>::type h;
-        md4::block_hash_type::digest_type s = h.end_message();
+        md4::construction_type::digest_type s = h.end_message();
 
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
         std::printf("%s\n", std::to_string(s));
@@ -125,7 +125,7 @@ BOOST_AUTO_TEST_SUITE(md4_test_suite)
         h.update_one('a').update_one('b').update_one('c');
         BOOST_CHECK(h.digest() == h.digest());
 
-        md4::block_hash_type::digest_type s = h.end_message();
+        md4::construction_type::digest_type s = h.end_message();
 
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
         std::printf("%s\n", std::to_string(s));
@@ -139,7 +139,7 @@ BOOST_AUTO_TEST_SUITE(md4_test_suite)
         for (unsigned i = 0; i < 1000000; ++i) {
             h.update_one('a');
         }
-        md4::block_hash_type::digest_type s = h.end_message();
+        md4::construction_type::digest_type s = h.end_message();
 
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
         std::printf("%s\n", std::to_string(s));

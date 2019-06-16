@@ -34,11 +34,11 @@ namespace nil {
             public:
                 typedef sponge_construction<stream_endian::little_octet_big_bit, policy_type::digest_bits,
                                             typename policy_type::iv_generator,
-                                            keccak_1600_compressor<DigestBits>> block_hash_type_;
+                                            keccak_1600_compressor<DigestBits>> construction_type_;
 #ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES
-                typedef block_hash_type_ block_hash_type;
+                typedef construction_type_ construction_type;
 #else
-                struct block_hash_type : block_hash_type_ {
+                struct construction_type : construction_type_ {
                 };
 #endif
                 template<typename StateAccumulator, std::size_t ValueBits>
@@ -50,7 +50,7 @@ namespace nil {
                         constexpr static const std::size_t length_bits = 0; // No length padding
                     };
 
-                    typedef sponge_state_preprocessor<block_hash_type, StateAccumulator, params_type> type_;
+                    typedef sponge_state_preprocessor<construction_type, StateAccumulator, params_type> type_;
 
 #ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES
                     typedef type_ type;
@@ -61,7 +61,7 @@ namespace nil {
                 };
 
                 constexpr static const std::size_t digest_bits = DigestBits;
-                typedef typename block_hash_type::digest_type digest_type;
+                typedef typename construction_type::digest_type digest_type;
             };
         }
 

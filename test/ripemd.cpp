@@ -33,10 +33,10 @@ using namespace nil::crypto3::hash;
 typedef std::unordered_map<std::string, std::string>::value_type string_data_value;
 BOOST_TEST_DONT_PRINT_LOG_VALUE(string_data_value)
 
-BOOST_TEST_DONT_PRINT_LOG_VALUE(ripemd<128>::block_hash_type::digest_type)
-BOOST_TEST_DONT_PRINT_LOG_VALUE(ripemd<160>::block_hash_type::digest_type)
-BOOST_TEST_DONT_PRINT_LOG_VALUE(ripemd<256>::block_hash_type::digest_type)
-BOOST_TEST_DONT_PRINT_LOG_VALUE(ripemd<320>::block_hash_type::digest_type)
+BOOST_TEST_DONT_PRINT_LOG_VALUE(ripemd<128>::construction_type::digest_type)
+BOOST_TEST_DONT_PRINT_LOG_VALUE(ripemd<160>::construction_type::digest_type)
+BOOST_TEST_DONT_PRINT_LOG_VALUE(ripemd<256>::construction_type::digest_type)
+BOOST_TEST_DONT_PRINT_LOG_VALUE(ripemd<320>::construction_type::digest_type)
 
 static const std::unordered_map<std::string, std::string> string_128_data = {{"",                                                               "cdf26213a150dc3ecb610f18f6b38b46"},
                                                                              {"a",                                                              "86be7afa339d0fc7cfc785e72f578d33"},

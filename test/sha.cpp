@@ -51,7 +51,7 @@ using namespace nil::crypto3::hash;
 
 class fixture {
 public:
-    sha1::block_hash_type a;
+    sha1::construction_type a;
 };
 
 namespace std {
@@ -114,7 +114,7 @@ BOOST_AUTO_TEST_SUITE(sha_test_suite)
 
     BOOST_AUTO_TEST_CASE(sha_collision) {
         // Reported 2004-08-12 by Joux, Carribault, Lemuet, and Jalby
-        typedef sha::block_hash_type::word_type word_type;
+        typedef sha::construction_type::word_type word_type;
         constexpr const std::array<word_type, 64> fic1 = {
                 0xa766a602, 0xb65cffe7, 0x73bcf258, 0x26b322b3, 0xd01b1a97, 0x2684ef53, 0x3e3b4b7f, 0x53fe3762,
                 0x24c08e47, 0xe959b2bc, 0x3b519880, 0xb9286568, 0x247d110f, 0x70f5c5e2, 0xb4590ca3, 0xf55f52fe,
@@ -237,7 +237,7 @@ BOOST_AUTO_TEST_SUITE(sha_test_suite)
         // A single 1 bit after the (empty) message,
         // then pad with 0s,
         // then add the length, which is also 0
-        sha1::block_hash_type::block_type m = {{0x80000000u}};
+        sha1::construction_type::block_type m = {{0x80000000u}};
         a.update(m);
 
         sha1::digest_type s = a.end_message();
@@ -253,7 +253,7 @@ BOOST_AUTO_TEST_SUITE(sha_test_suite)
 
     BOOST_FIXTURE_TEST_CASE(sha1_accumulator_hash3, fixture) {
         // Example from appendix A.1: echo -n "abc" | sha1sum
-        sha1::block_hash_type::block_type m = {{}};
+        sha1::construction_type::block_type m = {{}};
         m[0] = 0x61626380;
         m[15] = 0x00000018;
         a.update(m);
@@ -272,12 +272,12 @@ BOOST_AUTO_TEST_SUITE(sha_test_suite)
     BOOST_FIXTURE_TEST_CASE(sha1_accumulator_hash4, fixture) {
         // Example from appendix A.2:
         // echo -n "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq" | sha1sum
-        sha1::block_hash_type::block_type m1 = {{0x61626364, 0x62636465, 0x63646566, 0x64656667, 0x65666768, 0x66676869, 0x6768696a, 0x68696a6b, 0x696a6b6c, 0x6a6b6c6d, 0x6b6c6d6e, 0x6c6d6e6f, 0x6d6e6f70, 0x6e6f7071, 0x80000000, 0x00000000,}};
+        sha1::construction_type::block_type m1 = {{0x61626364, 0x62636465, 0x63646566, 0x64656667, 0x65666768, 0x66676869, 0x6768696a, 0x68696a6b, 0x696a6b6c, 0x6a6b6c6d, 0x6b6c6d6e, 0x6c6d6e6f, 0x6d6e6f70, 0x6e6f7071, 0x80000000, 0x00000000,}};
         a.update(m1);
 
         BOOST_CHECK_EQUAL("f4286818c37b27ae0408f581846771484a566572", std::to_string(a.digest()).data());
 
-        sha1::block_hash_type::block_type m2 = {{}};
+        sha1::construction_type::block_type m2 = {{}};
         m2[15] = 0x000001c0;
         a.update(m2);
 

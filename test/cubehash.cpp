@@ -113,7 +113,7 @@ BOOST_AUTO_TEST_SUITE(cubehash_test_suite)
 
     BOOST_AUTO_TEST_CASE(cubehash_various) {
         typedef cubehash<16, 32, 512> hash_t;
-        typedef hash_t::block_hash_type bht;
+        typedef hash_t::construction_type bht;
         bht bh;
 
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS

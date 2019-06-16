@@ -53,11 +53,11 @@ namespace nil {
                 typedef merkle_damgard_construction<stream_endian::big_octet_big_bit, policy_type::digest_bits,
                                                     typename policy_type::iv_generator,
                                                     miyaguchi_preneel_compressor<block_cipher_type, detail::state_adder,
-                                                                                 whirlpool_key_converter>> block_hash_type_;
+                                                                                 whirlpool_key_converter>> construction_type_;
 #ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES
-                typedef block_hash_type_ block_hash_type;
+                typedef construction_type_ construction_type;
 #else
-                struct block_hash_type : block_hash_type_ {
+                struct construction_type : construction_type_ {
                 };
 #endif
                 template<typename StateAccumulator, std::size_t ValueBits>
@@ -66,10 +66,10 @@ namespace nil {
                         typedef typename stream_endian::big_octet_big_bit endian;
 
                         constexpr static const std::size_t value_bits = ValueBits;
-                        constexpr static const std::size_t length_bits = block_hash_type::word_bits * 2;
+                        constexpr static const std::size_t length_bits = construction_type::word_bits * 2;
                     };
 
-                    typedef merkle_damgard_state_preprocessor<block_hash_type, StateAccumulator, params_type> type_;
+                    typedef merkle_damgard_state_preprocessor<construction_type, StateAccumulator, params_type> type_;
 #ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES
                     typedef type_ type;
 #else
@@ -79,7 +79,7 @@ namespace nil {
                 };
 
                 constexpr static const std::size_t digest_bits = policy_type::digest_bits;
-                typedef typename block_hash_type::digest_type digest_type;
+                typedef typename construction_type::digest_type digest_type;
             };
         }
     }

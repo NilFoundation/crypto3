@@ -25,24 +25,30 @@
 namespace nil {
     namespace crypto3 {
         namespace hash {
-            template<std::size_t Bits>
+            template<std::size_t DigestBits>
             class basic_adler {
             public:
                 constexpr static const std::size_t value_bits = 8;
                 typedef typename boost::uint_t<value_bits>::least value_type;
 
-                BOOST_STATIC_ASSERT(Bits % 2 == 0);
-                BOOST_STATIC_ASSERT(Bits >= value_bits);
+                BOOST_STATIC_ASSERT(DigestBits % 2 == 0);
+                BOOST_STATIC_ASSERT(DigestBits >= value_bits);
 
-                constexpr static const std::size_t digest_bits = Bits;
+                constexpr static const std::size_t digest_bits = DigestBits;
                 typedef hash::static_digest<digest_bits> digest_type;
 
-                constexpr static const std::size_t word_bits = Bits;
+                constexpr static const std::size_t word_bits = DigestBits;
                 typedef typename boost::uint_t<word_bits>::least word_type;
 
-                typedef std::array<word_type, 2> state_type;
+                constexpr static const std::size_t state_words = 2;
+                constexpr static const std::size_t state_bits = word_bits * state_words;
+                typedef std::array<word_type, state_words> state_type;
 
-                static word_type const modulo = detail::largest_prime<Bits / 2>::value;
+                constexpr static const std::size_t block_bits = state_bits;
+                constexpr static const std::size_t block_words = state_words;
+                typedef state_type block_type;
+
+                constexpr static const word_type modulo = detail::largest_prime<DigestBits / 2>::value;
 
             public:
                 basic_adler() {
@@ -55,7 +61,7 @@ namespace nil {
                 }
 
                 digest_type digest() const {
-                    word_type x = (state_[0] << (Bits / 2)) | state_[1];
+                    word_type x = (state_[0] << (DigestBits / 2)) | state_[1];
                     digest_type d;
                     // RFC 1950, Section 2.2 stores the ADLER-32 in big-endian
                     pack_n<stream_endian::big_bit, digest_bits, octet_bits>(&x, 1, d.data(), digest_bits / octet_bits);
@@ -68,10 +74,10 @@ namespace nil {
                     return d;
                 }
 
-            public:
+            protected:
 
                 basic_adler &update_one(value_type x) {
-                    if (Bits < 16) {
+                    if (DigestBits < 16) {
                         x %= modulo;
                     } // avoid overflow
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
@@ -178,13 +184,15 @@ Bits    Limit
                     return *this;
                 }
 
+            public:
+
                 template<typename InputIterator>
-                basic_adler &update(InputIterator b, InputIterator e, std::random_access_iterator_tag) {
+                basic_adler &operator()(InputIterator b, InputIterator e, std::random_access_iterator_tag) {
                     return update_n(b, e - b);
                 }
 
                 template<typename InputIterator, typename Category>
-                basic_adler &update(InputIterator b, InputIterator e, Category) {
+                basic_adler &operator()(InputIterator b, InputIterator e, Category) {
                     while (b != e) {
                         update_one(*b++);
                     }
@@ -192,7 +200,7 @@ Bits    Limit
                 }
 
                 template<typename InputIterator>
-                basic_adler &update(InputIterator b, InputIterator e) {
+                basic_adler &operator()(InputIterator b, InputIterator e) {
                     typedef typename std::iterator_traits<InputIterator>::iterator_category cat;
                     return update(b, e, cat());
                 }
@@ -204,15 +212,16 @@ Bits    Limit
             /*!
              * @brief Adler. Non-cryptographically secure checksum. Adler32
              * checksum is used in the zlib format. 32 bit output.
+             *
              * @ingroup hash
-             * @tparam Bit
+             * @tparam DigestBits
              * s
              */
-            template<unsigned DigestBits>
-            struct adler {
-            private:
-                typedef basic_adler<DigestBits> octet_hash_type;
+            template<std::size_t DigestBits>
+            class adler {
             public:
+                typedef basic_adler<DigestBits> construction_type;
+
                 template<typename StateAccumulator, std::size_t ValueBits>
                 struct stream_processor {
                     struct params_type {
@@ -220,7 +229,7 @@ Bits    Limit
                     };
 
                     BOOST_STATIC_ASSERT(ValueBits == 8);
-                    typedef octet_hash_type type_;
+                    typedef construction_type type_;
 #ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES
                     typedef type_ type;
 #else
@@ -230,9 +239,8 @@ Bits    Limit
                 };
 
                 constexpr static const std::size_t digest_bits = DigestBits;
-                typedef typename octet_hash_type::digest_type digest_type;
+                typedef typename construction_type::digest_type digest_type;
             };
-
         }
     }
 } // namespace nil

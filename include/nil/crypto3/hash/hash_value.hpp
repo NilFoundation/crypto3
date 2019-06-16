@@ -13,135 +13,170 @@
 #include <boost/assert.hpp>
 #include <boost/concept_check.hpp>
 
-#include <boost/range/begin.hpp>
-#include <boost/range/end.hpp>
 #include <boost/range/concepts.hpp>
 
-#include <nil/crypto3/hash/detail/type_traits.hpp>
-#include <nil/crypto3/hash/detail/static_digest.hpp>
+#include <nil/crypto3/hash/accumulators/hash.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace hash {
             namespace detail {
-                template<typename HashAccumulator>
+                template<typename HashAccumulatorSet>
                 struct ref_hash_impl {
-                    typedef HashAccumulator stream_hash_type;
+                    typedef HashAccumulatorSet accumulator_set_type;
+                    typedef typename boost::mpl::front<
+                            typename accumulator_set_type::features_type>::type accumulator_type;
 
-                    ref_hash_impl(const HashAccumulator &stream_hash) : sh(std::move(stream_hash)) {
+                    typedef typename accumulator_type::hash_type hash_type;
+
+                    ref_hash_impl(const accumulator_set_type &stream_hash) : accumulator_set(stream_hash) {
 
                     }
 
-                    template<typename Result>
-                    Result result() const {
-                        return sh.digest();
-                    }
-
-                    HashAccumulator &sh;
+                    accumulator_set_type &accumulator_set;
                 };
 
-                template<typename HashAccumulator>
+                template<typename HashAccumulatorSet>
                 struct value_hash_impl {
-                    typedef HashAccumulator stream_hash_type;
+                    typedef HashAccumulatorSet accumulator_set_type;
+                    typedef typename boost::mpl::front<
+                            typename accumulator_set_type::features_type>::type accumulator_type;
 
-                    value_hash_impl(const HashAccumulator &stream_hash) : sh(stream_hash) {
+                    typedef typename accumulator_type::hash_type hash_type;
+
+                    value_hash_impl(const accumulator_set_type &stream_hash) : accumulator_set(stream_hash) {
 
                     }
 
-                    template<typename Result>
-                    Result result() const {
-                        return sh.end_message();
-                    }
-
-                    mutable HashAccumulator sh;
+                    mutable accumulator_set_type accumulator_set;
                 };
 
-                template<typename Hasher, typename StreamHashImpl>
-                struct range_hash_impl : public StreamHashImpl {
-                public:
+                template<typename HashStateImpl>
+                struct range_hash_impl : public HashStateImpl {
+                    typedef HashStateImpl hash_state_impl_type;
+
+                    typedef typename hash_state_impl_type::accumulator_type accumulator_type;
+                    typedef typename hash_state_impl_type::accumulator_set_type accumulator_set_type;
+
+                    typedef typename hash_state_impl_type::hash_type hash_type;
+
+                    typedef typename boost::mpl::apply<accumulator_set_type,
+                                                       accumulator_type>::type::result_type result_type;
+
                     template<typename SinglePassRange>
-                    range_hash_impl(const SinglePassRange &range, const typename StreamHashImpl::stream_hash_type &ish)
-                            : StreamHashImpl(ish) {
-                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<SinglePassRange>));
+                    range_hash_impl(const SinglePassRange &range, const accumulator_set_type &ise)
+                            : HashStateImpl(ise) {
+                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange>));
 
                         typedef typename std::iterator_traits<
                                 typename SinglePassRange::iterator>::value_type value_type;
-
                         BOOST_STATIC_ASSERT(std::numeric_limits<value_type>::is_specialized);
+                        typedef typename hash_type::template stream_processor<accumulator_set_type,
+                                                                              std::numeric_limits<value_type>::digits +
+                                                                              std::numeric_limits<
+                                                                                      value_type>::is_signed>::type stream_processor;
 
-                        this->sh(boost::begin(range), boost::end(range));
+
+                        stream_processor(this->accumulator_set)(range.begin(), range.end());
                     }
 
                     template<typename InputIterator>
-                    range_hash_impl(InputIterator first, InputIterator last,
-                                    const typename StreamHashImpl::stream_hash_type &ish) : StreamHashImpl(ish) {
+                    range_hash_impl(InputIterator first, InputIterator last, const accumulator_set_type &ise)
+                            :
+                            HashStateImpl(ise) {
                         BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<InputIterator>));
 
                         typedef typename std::iterator_traits<InputIterator>::value_type value_type;
-
                         BOOST_STATIC_ASSERT(std::numeric_limits<value_type>::is_specialized);
+                        typedef typename hash_type::template stream_processor<accumulator_set_type,
+                                                                              std::numeric_limits<value_type>::digits +
+                                                                              std::numeric_limits<
+                                                                                      value_type>::is_signed>::type stream_processor;
 
-                        this->sh(first, last);
+                        stream_processor(this->accumulator_set)(first, last);
                     }
 
                     template<typename OutputRange>
-                    operator OutputRange() const {
-                        const auto &range = this->template result<typename Hasher::digest_type>();
-
-                        return OutputRange(range.begin(), range.end());
+                    inline operator OutputRange() const {
+                        result_type result = boost::accumulators::extract_result<accumulator_type>(
+                                this->accumulator_set);
+                        return OutputRange(result.cbegin(), result.cend());
                     }
 
-                    operator typename Hasher::digest_type() const {
-                        return this->template result<typename Hasher::digest_type>();
+                    inline operator result_type() const {
+                        return boost::accumulators::extract_result<accumulator_type>(this->accumulator_set);
                     }
 
-#ifndef CRYPTO3_RAW_HASH_STRING_OUTPUT
+                    inline operator accumulator_set_type() const {
+                        return this->accumulator_set;
+                    }
+
+#ifndef CRYPTO3_ASCII_STRING_HASH_OUTPUT
 
                     template<typename Char, typename CharTraits, typename Alloc>
-                    operator std::basic_string<Char, CharTraits, Alloc>() const {
-                        return std::to_string(this->template result<typename Hasher::digest_type>());
+                    inline operator std::basic_string<Char, CharTraits, Alloc>() const {
+                        return std::to_string(boost::accumulators::extract_result<accumulator_type>(
+                                this->accumulator_set));
                     }
 
 #endif
                 };
 
-                template<typename Hasher, typename StreamHashImpl, typename OutputIterator>
-                struct itr_hash_impl : public StreamHashImpl {
+                template<typename HashStateImpl, typename OutputIterator>
+                struct itr_hash_impl : public HashStateImpl {
                 private:
                     mutable OutputIterator out;
 
                 public:
+                    typedef HashStateImpl hash_state_impl_type;
+
+                    typedef typename hash_state_impl_type::accumulator_type accumulator_type;
+                    typedef typename hash_state_impl_type::accumulator_set_type accumulator_set_type;
+
+                    typedef typename hash_state_impl_type::hash_type hash_type;
+
+                    typedef typename boost::mpl::apply<accumulator_set_type,
+                                                       accumulator_type>::type::result_type result_type;
+
                     template<typename SinglePassRange>
-                    itr_hash_impl(const SinglePassRange &range, OutputIterator out,
-                                  const typename StreamHashImpl::stream_hash_type &ish) : StreamHashImpl(ish),
-                            out(std::move(out)) {
-                        BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<SinglePassRange>));
+                    itr_hash_impl(const SinglePassRange &range, OutputIterator out, const accumulator_set_type &ise)
+                            : HashStateImpl(ise), out(std::move(out)) {
+                        BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange>));
 
                         typedef typename std::iterator_traits<
                                 typename SinglePassRange::iterator>::value_type value_type;
-
                         BOOST_STATIC_ASSERT(std::numeric_limits<value_type>::is_specialized);
+                        typedef typename hash_type::template stream_processor<accumulator_set_type,
+                                                                              std::numeric_limits<value_type>::digits +
+                                                                              std::numeric_limits<
+                                                                                      value_type>::is_signed>::type stream_processor;
 
-                        this->sh(boost::begin(range), boost::end(range));
+
+                        stream_processor(this->accumulator_set)(range.begin(), range.end());
                     }
 
                     template<typename InputIterator>
                     itr_hash_impl(InputIterator first, InputIterator last, OutputIterator out,
-                                  const typename StreamHashImpl::stream_hash_type &ish)
-                            : StreamHashImpl(ish), out(std::move(out)) {
+                                  const accumulator_set_type &ise)
+                            : HashStateImpl(ise), out(std::move(out)) {
                         BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<InputIterator>));
 
                         typedef typename std::iterator_traits<InputIterator>::value_type value_type;
-
                         BOOST_STATIC_ASSERT(std::numeric_limits<value_type>::is_specialized);
+                        typedef typename hash_type::template stream_processor<accumulator_set_type,
+                                                                              std::numeric_limits<value_type>::digits +
+                                                                              std::numeric_limits<
+                                                                                      value_type>::is_signed>::type stream_processor;
 
-                        this->sh(first, last);
+
+                        stream_processor(this->accumulator_set)(first, last);
                     }
 
-                    operator OutputIterator() const {
-                        const auto &result = this->template result<typename Hasher::digest_type>();
+                    inline operator OutputIterator() const {
+                        result_type result = boost::accumulators::extract_result<accumulator_type>(
+                                this->accumulator_set);
 
-                        return std::move(result.begin(), result.end(), out);
+                        return std::move(result.cbegin(), result.cend(), out);
                     }
                 };
             }

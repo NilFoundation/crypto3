@@ -45,6 +45,9 @@ namespace nil {
                 constexpr static const std::size_t digest_bits = DigestBits;
                 typedef hash::static_digest<digest_bits> digest_type;
 
+                constexpr static const std::size_t state_bits = digest_bits;
+                typedef digest_type state_type;
+
             public:
                 basic_crc() {
                     reset();
@@ -68,7 +71,7 @@ namespace nil {
                     return d;
                 }
 
-            public:
+            protected:
                 basic_crc &update_one(value_type x) {
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
                     printf("%.8lx + %.2x ==> ", (long)crc_.checksum(), (int)x);
@@ -109,13 +112,15 @@ namespace nil {
 
 #endif
 
+            public:
+
                 template<typename InputIterator>
-                basic_crc &update(InputIterator b, InputIterator e, std::random_access_iterator_tag) {
+                basic_crc &operator()(InputIterator b, InputIterator e, std::random_access_iterator_tag) {
                     return update_n(b, e - b);
                 }
 
                 template<typename InputIterator, typename Category>
-                basic_crc &update(InputIterator b, InputIterator e, Category) {
+                basic_crc &operator()(InputIterator b, InputIterator e, Category) {
                     while (b != e) {
                         update_one(*b++);
                     }
@@ -123,7 +128,7 @@ namespace nil {
                 }
 
                 template<typename InputIterator>
-                basic_crc &update(InputIterator b, InputIterator e) {
+                basic_crc &operator()(InputIterator b, InputIterator e) {
                     typedef typename std::iterator_traits<InputIterator>::iterator_category cat;
                     return update(b, e, cat());
                 }
@@ -137,21 +142,27 @@ namespace nil {
              *
              * @ingroup hash
              *
-             * @tparam Bits
+             * @tparam DigestBits
              * @tparam TruncPoly
              * @tparam InitRem
              * @tparam FinalXor
              * @tparam ReflectIn
              * @tparam ReflectRem
              */
-            template<unsigned DigestBits, BOOST_CRC_PARM_TYPE TruncPoly = 0u, BOOST_CRC_PARM_TYPE InitRem = 0u, BOOST_CRC_PARM_TYPE FinalXor = 0u, bool ReflectIn = false, bool ReflectRem = false>
+            template<std::size_t DigestBits, BOOST_CRC_PARM_TYPE TruncPoly = 0u, BOOST_CRC_PARM_TYPE InitRem = 0u, BOOST_CRC_PARM_TYPE FinalXor = 0u, bool ReflectIn = false, bool ReflectRem = false>
             class crc {
-                typedef basic_crc<Bits, TruncPoly, InitRem, FinalXor, ReflectIn, ReflectRem> octet_hash_type;
             public:
+
+                typedef basic_crc<DigestBits, TruncPoly, InitRem, FinalXor, ReflectIn, ReflectRem> construction_type;
+
                 template<typename StateAccumulator, std::size_t ValueBits>
                 struct stream_processor {
+                    struct params_type {
+
+                    };
+
                     BOOST_STATIC_ASSERT(ValueBits == CHAR_BIT);
-                    typedef octet_hash_type type_;
+                    typedef construction_type type_;
 #ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES
                     typedef type_ type;
 #else
@@ -161,7 +172,7 @@ namespace nil {
                 };
 
                 constexpr static const std::size_t digest_bits = DigestBits;
-                typedef typename octet_hash_type::digest_type digest_type;
+                typedef typename construction_type::digest_type digest_type;
             };
 
 // http://www.libpng.org/pub/png/spec/1.2/PNG-Structure.html#CRC-algorithm
