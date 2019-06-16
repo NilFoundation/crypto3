@@ -161,9 +161,9 @@ BOOST_AUTO_TEST_SUITE(shacal_test_suite)
         typedef hash::merkle_damgard_construction<hash::stream_endian::big_octet_big_bit, 160,
                                                   hash::detail::sha1_policy::iv_generator,
                                                   hash::davies_meyer_compressor<block::shacal1,
-                                                                                state_adder> > block_hash_type;
-        typedef hash::merkle_damgard_state_preprocessor<block_hash_type, hash::stream_endian::big_octet_big_bit, 8,
-                                                        block_hash_type::word_bits * 2> sha1_octet_hash;
+                                                                                state_adder> > construction_type;
+        typedef hash::merkle_damgard_state_preprocessor<construction_type, hash::stream_endian::big_octet_big_bit, 8,
+                                                        construction_type::word_bits * 2> sha1_octet_hash;
         typedef sha1_octet_hash::digest_type digest_type;
 
         // perl -e 'for ($x = 1000000000; $x--;) {print "a";}' | sha1sum
@@ -186,9 +186,9 @@ BOOST_AUTO_TEST_SUITE(shacal_test_suite)
         typedef hash::merkle_damgard_construction<hash::stream_endian::big_octet_big_bit, SHA,
                                                   hash::detail::sha2_policy<SHA>::iv_generator,
                                                   hash::davies_meyer_compressor<block::shacal2<SHA>,
-                                                                                state_adder> > block_hash_type;
-        typedef hash::merkle_damgard_state_preprocessor<block_hash_type, hash::stream_endian::big_octet_big_bit, 8,
-                                                        block_hash_type::word_bits * 2> sha512_octet_hash;
+                                                                                state_adder> > construction_type;
+        typedef hash::merkle_damgard_state_preprocessor<construction_type, hash::stream_endian::big_octet_big_bit, 8,
+                                                        construction_type::word_bits * 2> sha512_octet_hash;
         typedef sha512_octet_hash::digest_type digest_type;
 
 
@@ -205,9 +205,9 @@ BOOST_AUTO_TEST_SUITE(shacal_test_suite)
         typedef hash::merkle_damgard_construction<hash::stream_endian::big_octet_big_bit, SHA,
                                                   hash::detail::sha2_policy<SHA>::iv_generator,
                                                   hash::davies_meyer_compressor<block::shacal2<SHA>,
-                                                                                state_adder> > block_hash_type;
-        typedef hash::merkle_damgard_state_preprocessor<block_hash_type, hash::stream_endian::big_octet_big_bit, 8,
-                                                        block_hash_type::word_bits * 2> sha512_octet_hash;
+                                                                                state_adder> > construction_type;
+        typedef hash::merkle_damgard_state_preprocessor<construction_type, hash::stream_endian::big_octet_big_bit, 8,
+                                                        construction_type::word_bits * 2> sha512_octet_hash;
         typedef sha512_octet_hash::digest_type digest_type;
 
         sha512_octet_hash h;
@@ -224,9 +224,9 @@ BOOST_AUTO_TEST_SUITE(shacal_test_suite)
         typedef hash::merkle_damgard_construction<hash::stream_endian::big_octet_big_bit, SHA,
                                                   hash::detail::sha2_policy<SHA>::iv_generator,
                                                   hash::davies_meyer_compressor<block::shacal2<SHA>,
-                                                                                state_adder> > block_hash_type;
-        typedef hash::merkle_damgard_state_preprocessor<block_hash_type, hash::stream_endian::big_octet_big_bit, 8,
-                                                        block_hash_type::word_bits * 2> sha512_octet_hash;
+                                                                                state_adder> > construction_type;
+        typedef hash::merkle_damgard_state_preprocessor<construction_type, hash::stream_endian::big_octet_big_bit, 8,
+                                                        construction_type::word_bits * 2> sha512_octet_hash;
         typedef sha512_octet_hash::digest_type digest_type;
         sha512_octet_hash h;
         const char *m = "abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghijklmn"
@@ -246,9 +246,9 @@ BOOST_AUTO_TEST_SUITE(shacal_test_suite)
         typedef hash::merkle_damgard_construction<hash::stream_endian::big_octet_big_bit, SHA,
                                                   hash::detail::sha2_policy<SHA>::iv_generator,
                                                   hash::davies_meyer_compressor<block::shacal2<SHA>,
-                                                                                state_adder> > block_hash_type;
-        typedef hash::merkle_damgard_state_preprocessor<block_hash_type, hash::stream_endian::big_octet_big_bit, 8,
-                                                        block_hash_type::word_bits * 2> sha512_octet_hash;
+                                                                                state_adder> > construction_type;
+        typedef hash::merkle_damgard_state_preprocessor<construction_type, hash::stream_endian::big_octet_big_bit, 8,
+                                                        construction_type::word_bits * 2> sha512_octet_hash;
         typedef sha512_octet_hash::digest_type digest_type;
 
         sha512_octet_hash h;
@@ -271,9 +271,9 @@ BOOST_AUTO_TEST_SUITE(shacal_test_suite)
         typedef hash::merkle_damgard_construction<hash::stream_endian::big_octet_big_bit, SHA,
                                                   hash::detail::sha2_policy<SHA>::iv_generator,
                                                   hash::davies_meyer_compressor<block::shacal2<SHA>,
-                                                                                state_adder> > block_hash_type;
-        typedef hash::merkle_damgard_state_preprocessor<block_hash_type, hash::stream_endian::big_octet_big_bit, 8,
-                                                        block_hash_type::word_bits * 2> sha512_octet_hash;
+                                                                                state_adder> > construction_type;
+        typedef hash::merkle_damgard_state_preprocessor<construction_type, hash::stream_endian::big_octet_big_bit, 8,
+                                                        construction_type::word_bits * 2> sha512_octet_hash;
         typedef sha512_octet_hash::digest_type digest_type;
 
         // perl -e 'for ($x = 1000000000; $x--;) {print "a";}' | sha512sum
