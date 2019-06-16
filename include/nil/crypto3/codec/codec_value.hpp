@@ -99,24 +99,24 @@ namespace nil {
                     }
 
                     template<typename OutputRange>
-                    operator OutputRange() const {
+                    inline operator OutputRange() const {
                         result_type result = boost::accumulators::extract_result<accumulator_type>(
                                 this->accumulator_set);
                         return OutputRange(result.cbegin(), result.cend());
                     }
 
-                    operator result_type() const {
+                    inline operator result_type() const {
                         return boost::accumulators::extract_result<accumulator_type>(this->accumulator_set);
                     }
 
-                    operator accumulator_set_type() const {
+                    inline operator accumulator_set_type() const {
                         return this->accumulator_set;
                     }
 
 #ifdef CRYPTO3_ASCII_STRING_CODEC_OUTPUT
 
                     template<typename Char, typename CharTraits, typename Alloc>
-                    operator std::basic_string<Char, CharTraits, Alloc>() const {
+                    inline operator std::basic_string<Char, CharTraits, Alloc>() const {
                         return std::to_string(boost::accumulators::extract_result<accumulator_type>(
                                 this->accumulator_set));
                     }
@@ -175,7 +175,7 @@ namespace nil {
                         stream_processor(this->accumulator_set)(first, last);
                     }
 
-                    operator OutputIterator() const {
+                    inline operator OutputIterator() const {
                         result_type result = boost::accumulators::extract_result<accumulator_type>(
                                 this->accumulator_set);
 
