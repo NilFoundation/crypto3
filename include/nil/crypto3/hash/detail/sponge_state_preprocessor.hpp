@@ -59,7 +59,7 @@ namespace nil {
 
                 BOOST_STATIC_ASSERT(!length_bits || value_bits <= length_bits);
 
-                void process_block() {
+                inline void process_block() {
                     // Convert the input into words
                     block_type block;
                     pack<endian_type, value_bits, word_bits>(value_array, block);
@@ -138,12 +138,12 @@ namespace nil {
                 }
 
                 template<typename InputIterator>
-                void operator()(InputIterator b, InputIterator e, std::random_access_iterator_tag) {
+                inline void operator()(InputIterator b, InputIterator e, std::random_access_iterator_tag) {
                     return update_n(b, e - b);
                 }
 
                 template<typename InputIterator, typename Category>
-                void operator()(InputIterator first, InputIterator last, Category) {
+                inline void operator()(InputIterator first, InputIterator last, Category) {
                     while (first != last) {
                         update_one(*first++);
                     }
@@ -151,13 +151,13 @@ namespace nil {
                 }
 
                 template<typename InputIterator>
-                void operator()(InputIterator b, InputIterator e) {
+                inline void operator()(InputIterator b, InputIterator e) {
                     typedef typename std::iterator_traits<InputIterator>::iterator_category cat;
-                    return update(b, e, cat());
+                    return operator()(b, e, cat());
                 }
 
                 template<typename ContainerT>
-                void operator()(const ContainerT &c) {
+                inline void operator()(const ContainerT &c) {
                     return update_n(c.data(), c.size());
                 }
 
@@ -195,9 +195,7 @@ namespace nil {
                     return sponge_state_preprocessor(*this).end_message();
                 }
 
-                sponge_state_preprocessor(const accumulator_type &acc = accumulator_type()) : value_array(),
-                block_hash(),
-                        seen() {
+                sponge_state_preprocessor(accumulator_type &acc) : acc(acc), value_array(), block_hash(), seen() {
                 }
 
                 void reset() {
@@ -206,6 +204,8 @@ namespace nil {
                 }
 
             private:
+                accumulator_type &acc;
+
                 value_array_type value_array;
                 construction_type block_hash;
                 length_type seen;

@@ -220,8 +220,8 @@ namespace nil {
                 }
 
             public:
-                haifa_state_preprocessor(const accumulator_type &acc = accumulator_type())
-                        : value_array(), block_hash(), seen() {
+                haifa_state_preprocessor(accumulator_type &acc)
+                        : acc(acc), value_array(), block_hash(), seen() {
                 }
 
                 void reset() {
@@ -230,6 +230,8 @@ namespace nil {
                 }
 
             private:
+                accumulator_type &acc;
+
                 value_array_type value_array;
                 construction_type block_hash;
                 length_type seen;
