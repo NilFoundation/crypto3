@@ -18,12 +18,66 @@ namespace nil {
             namespace detail {
                 template<typename PolicyType>
                 struct des_functions : public PolicyType {
+                protected:
                     typedef PolicyType policy_type;
 
-                    inline static void des_key_schedule(typename policy_type::key_schedule_type &round_key,
-                                                        const typename policy_type::key_type &key) {
-                        typedef typename policy_type::byte_type byte_type;
-                        typedef typename policy_type::word_type word_type;
+                public:
+                    typedef typename policy_type::byte_type byte_type;
+                    typedef typename policy_type::word_type word_type;
+
+                    typedef typename policy_type::block_type block_type;
+
+                    typedef typename policy_type::key_type key_type;
+                    typedef typename policy_type::key_schedule_type key_schedule_type;
+
+                    inline static void ip(word_type &L, word_type &R, const block_type &block) {
+                        L = boost::endian::native_to_big(block[0]);
+                        R = boost::endian::native_to_big(block[1]);
+
+                        word_type T;
+                        R = policy_type::template rotl<4>(R);
+                        T = (L ^ R) & 0xF0F0F0F0;
+                        L ^= T;
+                        R = policy_type::template rotr<20>(R ^ T);
+                        T = (L ^ R) & 0xFFFF0000;
+                        L ^= T;
+                        R = policy_type::template rotr<18>(R ^ T);
+                        T = (L ^ R) & 0x33333333;
+                        L ^= T;
+                        R = policy_type::template rotr<6>(R ^ T);
+                        T = (L ^ R) & 0x00FF00FF;
+                        L ^= T;
+                        R = policy_type::template rotl<9>(R ^ T);
+                        T = (L ^ R) & 0xAAAAAAAA;
+                        L = policy_type::template rotl<1>(L ^ T);
+                        R ^= T;
+                    }
+
+                    inline static void fp(word_type L, word_type R, block_type &block) {
+                        // FP sequence by Wei Dai, taken from public domain Crypto++
+                        word_type T;
+
+                        R = policy_type::template rotr<1>(R);
+                        T = (L ^ R) & 0xAAAAAAAA;
+                        R ^= T;
+                        L = policy_type::template rotr<9>(L ^ T);
+                        T = (L ^ R) & 0x00FF00FF;
+                        R ^= T;
+                        L = policy_type::template rotl<6>(L ^ T);
+                        T = (L ^ R) & 0x33333333;
+                        R ^= T;
+                        L = policy_type::template rotl<18>(L ^ T);
+                        T = (L ^ R) & 0xFFFF0000;
+                        R ^= T;
+                        L = policy_type::template rotl<20>(L ^ T);
+                        T = (L ^ R) & 0xF0F0F0F0;
+                        R ^= T;
+                        L = policy_type::template rotr<4>(L ^ T);
+
+                        block = {boost::endian::native_to_big(R), boost::endian::native_to_big(L)};
+                    }
+
+                    inline static void des_key_schedule(key_schedule_type &round_key, const key_type &key) {
 
                         constexpr static const std::array<byte_type, 16> ROT = {
                                 1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1
@@ -73,67 +127,31 @@ namespace nil {
                         }
                     }
 
-                    inline static void des_encrypt(typename policy_type::word_type &L,
-                                                   typename policy_type::word_type &R,
-                                                   const typename policy_type::key_schedule_type &round_key) {
+                    inline static word_type spbox(word_type T0, word_type T1) {
+                        return policy_type::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(T0, 0)] ^
+                               policy_type::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(T1, 0)] ^
+                               policy_type::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(T0, 1)] ^
+                               policy_type::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(T1, 1)] ^
+                               policy_type::sbox5[policy_type::template extract_uint_t<CHAR_BIT>(T0, 2)] ^
+                               policy_type::sbox6[policy_type::template extract_uint_t<CHAR_BIT>(T1, 2)] ^
+                               policy_type::sbox7[policy_type::template extract_uint_t<CHAR_BIT>(T0, 3)] ^
+                               policy_type::sbox8[policy_type::template extract_uint_t<CHAR_BIT>(T1, 3)];
+                    }
+
+                    inline static void des_encrypt(word_type &L, word_type &R, const key_schedule_type &round_key) {
                         for (size_t i = 0; i != policy_type::rounds; i += 2) {
-                            typename policy_type::word_type T0, T1;
-
-                            T0 = policy_type::template rotr<4>(R) ^ round_key[2 * i];
-                            T1 = R ^ round_key[2 * i + 1];
-
-                            L ^= policy_type::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(T0, 0)] ^
-                                 policy_type::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(T1, 0)] ^
-                                 policy_type::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(T0, 1)] ^
-                                 policy_type::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(T1, 1)] ^
-                                 policy_type::sbox5[policy_type::template extract_uint_t<CHAR_BIT>(T0, 2)] ^
-                                 policy_type::sbox6[policy_type::template extract_uint_t<CHAR_BIT>(T1, 2)] ^
-                                 policy_type::sbox7[policy_type::template extract_uint_t<CHAR_BIT>(T0, 3)] ^
-                                 policy_type::sbox8[policy_type::template extract_uint_t<CHAR_BIT>(T1, 3)];
-
-                            T0 = policy_type::template rotr<4>(L) ^ round_key[2 * i + 2];
-                            T1 = L ^ round_key[2 * i + 3];
-
-                            R ^= policy_type::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(T0, 0)] ^
-                                 policy_type::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(T1, 0)] ^
-                                 policy_type::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(T0, 1)] ^
-                                 policy_type::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(T1, 1)] ^
-                                 policy_type::sbox5[policy_type::template extract_uint_t<CHAR_BIT>(T0, 2)] ^
-                                 policy_type::sbox6[policy_type::template extract_uint_t<CHAR_BIT>(T1, 2)] ^
-                                 policy_type::sbox7[policy_type::template extract_uint_t<CHAR_BIT>(T0, 3)] ^
-                                 policy_type::sbox8[policy_type::template extract_uint_t<CHAR_BIT>(T1, 3)];
+                            L ^= spbox(policy_type::template rotr<4>(R) ^ round_key[2 * i], R ^ round_key[2 * i + 1]);
+                            R ^= spbox(policy_type::template rotr<4>(L) ^ round_key[2 * i + 2],
+                                    L ^ round_key[2 * i + 3]);
                         }
                     }
 
-                    inline static void des_decrypt(typename policy_type::word_type &L,
-                                                   typename policy_type::word_type &R,
-                                                   const typename policy_type::key_schedule_type &round_key) {
+                    inline static void des_decrypt(word_type &L, word_type &R, const key_schedule_type &round_key) {
                         for (size_t i = policy_type::rounds; i != 0; i -= 2) {
-                            typename policy_type::word_type T0, T1;
-
-                            T0 = policy_type::template rotr<4>(R) ^ round_key[2 * i - 2];
-                            T1 = R ^ round_key[2 * i - 1];
-
-                            L ^= policy_type::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(T0, 0)] ^
-                                 policy_type::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(T1, 0)] ^
-                                 policy_type::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(T0, 1)] ^
-                                 policy_type::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(T1, 1)] ^
-                                 policy_type::sbox5[policy_type::template extract_uint_t<CHAR_BIT>(T0, 2)] ^
-                                 policy_type::sbox6[policy_type::template extract_uint_t<CHAR_BIT>(T1, 2)] ^
-                                 policy_type::sbox7[policy_type::template extract_uint_t<CHAR_BIT>(T0, 3)] ^
-                                 policy_type::sbox8[policy_type::template extract_uint_t<CHAR_BIT>(T1, 3)];
-
-                            T0 = policy_type::template rotr<4>(L) ^ round_key[2 * i - 4];
-                            T1 = L ^ round_key[2 * i - 3];
-
-                            R ^= policy_type::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(T0, 0)] ^
-                                 policy_type::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(T1, 0)] ^
-                                 policy_type::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(T0, 1)] ^
-                                 policy_type::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(T1, 1)] ^
-                                 policy_type::sbox5[policy_type::template extract_uint_t<CHAR_BIT>(T0, 2)] ^
-                                 policy_type::sbox6[policy_type::template extract_uint_t<CHAR_BIT>(T1, 2)] ^
-                                 policy_type::sbox7[policy_type::template extract_uint_t<CHAR_BIT>(T0, 3)] ^
-                                 policy_type::sbox8[policy_type::template extract_uint_t<CHAR_BIT>(T1, 3)];
+                            L ^= spbox(policy_type::template rotr<4>(R) ^ round_key[2 * i - 2],
+                                    R ^ round_key[2 * i - 1]);
+                            R ^= spbox(policy_type::template rotr<4>(L) ^ round_key[2 * i - 4],
+                                    L ^ round_key[2 * i - 3]);
                         }
                     }
                 };
