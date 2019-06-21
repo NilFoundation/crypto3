@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2019 Nil Foundation
+// Copyright (c) 2018-2019 Nil Foundation AG
 // Copyright (c) 2018-2019 Mikhail Komarov <nemo@nilfoundation.org>
 //
 // Distributed under the Boost Software License, Version 1.0
@@ -11,6 +11,7 @@
 #define CRYPTO3_CIPHER_STATE_PREPROCESSOR_HPP
 
 #include <boost/accumulators/framework/accumulator_set.hpp>
+#include <boost/accumulators/framework/features.hpp>
 
 #include <nil/crypto3/block/accumulators/block.hpp>
 
@@ -27,14 +28,9 @@ namespace nil {
              * @tparam ValueBits
              * @tparam LengthBits
              */
-            template<typename ProcessingMode>
-            struct block_accumulator {
-                typedef boost::accumulators::accumulator_set<block::digest<ProcessingMode::input_block_bits>,
-                                                             boost::accumulators::features<
-                                                                     accumulators::tag::block<ProcessingMode>>> type;
-
-                typedef ProcessingMode mode_type;
-            };
+            template<typename ProcessingMode> using block_accumulator = boost::accumulators::accumulator_set<
+                    block::digest<ProcessingMode::input_block_bits>,
+                    boost::accumulators::features<accumulators::tag::block<ProcessingMode>>>;
         }
     }
 }

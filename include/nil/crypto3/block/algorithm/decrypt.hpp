@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2019 Nil Foundation
+// Copyright (c) 2018-2019 Nil Foundation AG
 // Copyright (c) 2018-2019 Mikhail Komarov <nemo@nilfoundation.org>
 //
 // Distributed under the Boost Software License, Version 1.0
@@ -44,8 +44,8 @@ namespace nil {
             typedef typename BlockCipher::stream_decrypter_type EncryptionMode;
             typedef typename block::block_accumulator<EncryptionMode> CipherAccumulator;
 
-            typedef block::detail::value_cipher_impl <CipherAccumulator> StreamEncrypterImpl;
-            typedef block::detail::itr_cipher_impl <StreamEncrypterImpl, OutputIterator> EncrypterImpl;
+            typedef block::detail::value_cipher_impl<CipherAccumulator> StreamEncrypterImpl;
+            typedef block::detail::itr_cipher_impl<StreamEncrypterImpl, OutputIterator> EncrypterImpl;
 
             return EncrypterImpl(first, last, std::move(out), CiperState(BlockCipher(key_first, key_last)));
         }
@@ -70,13 +70,13 @@ namespace nil {
                  typename InputIterator,
                  typename OutputAccumulator = typename block::block_accumulator<
                          typename BlockCipher::stream_decrypter_type>>
-        OutputAccumulator &decrypt(InputIterator first, InputIterator last, typename OutputAccumulator::type &acc) {
+        OutputAccumulator &decrypt(InputIterator first, InputIterator last, OutputAccumulator &acc) {
 
             typedef typename BlockCipher::stream_decrypter_type EncryptionMode;
             typedef typename block::block_accumulator<EncryptionMode> CipherAccumulator;
 
-            typedef block::detail::ref_cipher_impl <CipherAccumulator> StreamEncrypterImpl;
-            typedef block::detail::range_cipher_impl <StreamEncrypterImpl> EncrypterImpl;
+            typedef block::detail::ref_cipher_impl<CipherAccumulator> StreamEncrypterImpl;
+            typedef block::detail::range_cipher_impl<StreamEncrypterImpl> EncrypterImpl;
 
             return EncrypterImpl(first, last, acc);
         }
@@ -99,13 +99,13 @@ namespace nil {
                  typename SinglePassRange,
                  typename OutputAccumulator = typename block::block_accumulator<
                          typename BlockCipher::stream_decrypter_type>>
-        OutputAccumulator &decrypt(const SinglePassRange &r, typename OutputAccumulator::type &acc) {
+        OutputAccumulator &decrypt(const SinglePassRange &r, OutputAccumulator &acc) {
 
             typedef typename BlockCipher::stream_decrypter_type EncryptionMode;
             typedef typename block::block_accumulator<EncryptionMode> CipherAccumulator;
 
-            typedef block::detail::ref_cipher_impl <CipherAccumulator> StreamEncrypterImpl;
-            typedef block::detail::range_cipher_impl <StreamEncrypterImpl> EncrypterImpl;
+            typedef block::detail::ref_cipher_impl<CipherAccumulator> StreamEncrypterImpl;
+            typedef block::detail::range_cipher_impl<StreamEncrypterImpl> EncrypterImpl;
 
             return EncrypterImpl(r, acc);
         }
@@ -129,8 +129,9 @@ namespace nil {
                          typename BlockCipher::stream_decrypter_type>>
         block::detail::range_cipher_impl <block::detail::value_cipher_impl<CipherAccumulator>> decrypt(
                 InputIterator first, InputIterator last, KeyIterator key_first, KeyIterator key_last) {
-            typedef block::detail::value_cipher_impl <CipherAccumulator> StreamEncrypterImpl;
-            typedef block::detail::range_cipher_impl <StreamEncrypterImpl> EncrypterImpl;
+
+            typedef block::detail::value_cipher_impl<CipherAccumulator> StreamEncrypterImpl;
+            typedef block::detail::range_cipher_impl<StreamEncrypterImpl> EncrypterImpl;
 
             return EncrypterImpl(first, last, CipherAccumulator(BlockCipher(key_first, key_last)));
         }
@@ -154,8 +155,8 @@ namespace nil {
             typedef typename BlockCipher::stream_decrypter_type EncryptionMode;
             typedef typename block::block_accumulator<EncryptionMode> CipherAccumulator;
 
-            typedef block::detail::value_cipher_impl <CipherAccumulator> StreamEncrypterImpl;
-            typedef block::detail::itr_cipher_impl <StreamEncrypterImpl, OutputIterator> EncrypterImpl;
+            typedef block::detail::value_cipher_impl<CipherAccumulator> StreamEncrypterImpl;
+            typedef block::detail::itr_cipher_impl<StreamEncrypterImpl, OutputIterator> EncrypterImpl;
 
             return EncrypterImpl(rng, std::move(out), CipherState(BlockCipher(key)));
         }
@@ -179,8 +180,8 @@ namespace nil {
         block::detail::range_cipher_impl <block::detail::value_cipher_impl<CipherAccumulator>> decrypt(
                 const SinglePassRange &r, const KeyRange &key) {
 
-            typedef block::detail::value_cipher_impl <CipherAccumulator> StreamEncrypterImpl;
-            typedef block::detail::range_cipher_impl <StreamEncrypterImpl> EncrypterImpl;
+            typedef block::detail::value_cipher_impl<CipherAccumulator> StreamEncrypterImpl;
+            typedef block::detail::range_cipher_impl<StreamEncrypterImpl> EncrypterImpl;
 
             return EncrypterImpl(r, CipherState(BlockCipher(key)));
         }

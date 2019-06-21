@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2019 Nil Foundation
+// Copyright (c) 2018-2019 Nil Foundation AG
 // Copyright (c) 2018-2019 Mikhail Komarov <nemo@nilfoundation.org>
 //
 // Distributed under the Boost Software License, Version 1.0
@@ -27,15 +27,6 @@
 using namespace nil::crypto3;
 using namespace nil::crypto3::block;
 
-template<typename cipher_type, typename state_type>
-typename cipher_type::template stream_cipher<8>::type::digest_type to_digest(state_type state) {
-    typename cipher_type::template stream_cipher<8>::type::digest_type d;
-    pack_n<stream_endian::little_octet_big_bit, cipher_type::word_bits, octet_bits>(state.begin(),
-            cipher_type::block_bits / cipher_type::word_bits, std::back_inserter(d),
-            cipher_type::block_bits * octet_bits / cipher_type::word_bits);
-    return d;
-}
-
 template<std::size_t Size>
 class fixture {
 public:
@@ -59,13 +50,16 @@ BOOST_AUTO_TEST_SUITE(threefish_test_suite)
         // All-zero key, tweak, and plaintext
         cipher_type cipher((key_type()));
         block_type ciphertext = cipher.encrypt(block_type());
-        digest_type d = to_digest<cipher_type>(ciphertext);
+        digest_type d;
+        pack_n<stream_endian::little_octet_big_bit, cipher_type::word_bits, octet_bits>(ciphertext.begin(),
+                cipher_type::block_bits / cipher_type::word_bits, std::back_inserter(d),
+                cipher_type::block_bits * octet_bits / cipher_type::word_bits);
 
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
         std::cout << d << std::endl;
 #endif
 
-        std::string string_digest = decode<codec::hex>(d);
+        std::string string_digest = decode<codec::hex<codec::mode::lower>>(d);
 #ifdef CRYPTO3_BLOCK_THREEFISH_OLD_ROTATION_CONSTANTS
         BOOST_CHECK_EQUAL(string_digest, "e39756f9f3b6cf3ff91d2bc3d324ce618574ea1623b2367f88382e2a93afa858");
 #else
@@ -110,13 +104,16 @@ BOOST_AUTO_TEST_SUITE(threefish_test_suite)
         // All-zero key, tweak, and plaintext
         cipher_type cipher((key_type()));
         block_type ciphertext = cipher.encrypt(block_type());
-        digest_type d = to_digest<cipher_type>(ciphertext);
+        digest_type d;
+        pack_n<stream_endian::little_octet_big_bit, cipher_type::word_bits, octet_bits>(ciphertext.begin(),
+                cipher_type::block_bits / cipher_type::word_bits, std::back_inserter(d),
+                cipher_type::block_bits * octet_bits / cipher_type::word_bits);
 
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
         std::cout << d std::endl;
 #endif
 
-        std::string string_digest = decode<codec::hex>(d);
+        std::string string_digest = decode<codec::hex<codec::mode::lower>>(d);
 #ifdef CRYPTO3_HASH_THREEFISH_OLD_ROTATION_CONSTANTS
         BOOST_CHECK_EQUAL(string_digest, "408be942494492eab19daa3e96ad19aedfc41f4e55f8a2626c1e46d54547a713"
                        "d43b21f0de1a10881ed5c4adefdad1c4172cd768c8fc28d0dde9df018042fe3e");
@@ -176,13 +173,16 @@ BOOST_AUTO_TEST_SUITE(threefish_test_suite)
         // All-zero key, tweak, and plaintext
         cipher_type cipher((key_type()));
         block_type ciphertext = cipher.encrypt(block_type());
-        digest_type d = to_digest<cipher_type>(ciphertext);
+        digest_type d;
+        pack_n<stream_endian::little_octet_big_bit, cipher_type::word_bits, octet_bits>(ciphertext.begin(),
+                cipher_type::block_bits / cipher_type::word_bits, std::back_inserter(d),
+                cipher_type::block_bits * octet_bits / cipher_type::word_bits);
 
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
         std::cout << d std::endl;
 #endif
 
-        std::string string_digest = decode<codec::hex>(d);
+        std::string string_digest = decode<codec::hex<codec::mode::lower>>(d);
 #ifdef CRYPTO3_HASH_THREEFISH_OLD_ROTATION_CONSTANTS
         BOOST_CHECK_EQUAL(string_digest, "43cf2a34cb1668e38c2e19ea1757d6b31ac6dead02fea99459d8a0331bdc7273"
                        "a1f7e9495d60402d1f8b43e48a5ac4f9d9d30965835e07f5455b87f963fdbca6"

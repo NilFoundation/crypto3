@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2019 Nil Foundation
+// Copyright (c) 2018-2019 Nil Foundation AG
 // Copyright (c) 2018-2019 Mikhail Komarov <nemo@nilfoundation.org>
 //
 // Distributed under the Boost Software License, Version 1.0
@@ -91,52 +91,25 @@ namespace nil {
                 }
 
                 inline block_type encrypt_block(const block_type &plaintext) {
-                    uint64_t T = (policy_type::iptab1[plaintext[0]]) | (policy_type::iptab1[plaintext[1]] << 1) |
-                                 (policy_type::iptab1[plaintext[2]] << 2) | (policy_type::iptab1[plaintext[3]] << 3) |
-                                 (policy_type::iptab1[plaintext[4]] << 4) | (policy_type::iptab1[plaintext[5]] << 5) |
-                                 (policy_type::iptab1[plaintext[6]] << 6) | (policy_type::iptab2[plaintext[7]]);
+                    block_type out;
 
-                    word_type L = static_cast<uint32_t>(T >> 32);
-                    word_type R = static_cast<uint32_t>(T);
-
+                    word_type L, R;
+                    policy_type::ip(L, R, plaintext);
                     policy_type::des_encrypt(L, R, round_key);
+                    policy_type::fp(L, R, out);
 
-                    T = (policy_type::fptab1[policy_type::template extract_uint_t<CHAR_BIT>(L, 0)] << 5) |
-                        (policy_type::fptab1[policy_type::template extract_uint_t<CHAR_BIT>(L, 1)] << 3) |
-                        (policy_type::fptab1[policy_type::template extract_uint_t<CHAR_BIT>(L, 2)] << 1) |
-                        (policy_type::fptab2[policy_type::template extract_uint_t<CHAR_BIT>(L, 3)] << 1) |
-                        (policy_type::fptab1[policy_type::template extract_uint_t<CHAR_BIT>(R, 0)] << 4) |
-                        (policy_type::fptab1[policy_type::template extract_uint_t<CHAR_BIT>(R, 1)] << 2) |
-                        (policy_type::fptab1[policy_type::template extract_uint_t<CHAR_BIT>(R, 2)]) |
-                        (policy_type::fptab2[policy_type::template extract_uint_t<CHAR_BIT>(R, 3)]);
-                    T = policy_type::template rotl<32>(T);
-
-                    return {boost::endian::big_to_native<typename block_type::value_type>(T)};
+                    return out;
                 }
 
                 inline block_type decrypt_block(const block_type &ciphertext) {
-                    uint64_t T = (policy_type::iptab1[ciphertext[0]]) | (policy_type::iptab1[ciphertext[1]] << 1) |
-                                 (policy_type::iptab1[ciphertext[2]] << 2) | (policy_type::iptab1[ciphertext[3]] << 3) |
-                                 (policy_type::iptab1[ciphertext[4]] << 4) | (policy_type::iptab1[ciphertext[5]] << 5) |
-                                 (policy_type::iptab1[ciphertext[6]] << 6) | (policy_type::iptab2[ciphertext[7]]);
+                    block_type out;
 
-                    word_type L = static_cast<word_type>(T >> word_bits);
-                    word_type R = static_cast<word_type>(T);
-
+                    word_type L, R;
+                    policy_type::ip(L, R, ciphertext);
                     policy_type::des_decrypt(L, R, round_key);
+                    policy_type::fp(L, R, out);
 
-                    T = (policy_type::fptab1[policy_type::template extract_uint_t<CHAR_BIT>(L, 0)] << 5) |
-                        (policy_type::fptab1[policy_type::template extract_uint_t<CHAR_BIT>(L, 1)] << 3) |
-                        (policy_type::fptab1[policy_type::template extract_uint_t<CHAR_BIT>(L, 2)] << 1) |
-                        (policy_type::fptab2[policy_type::template extract_uint_t<CHAR_BIT>(L, 3)] << 1) |
-                        (policy_type::fptab1[policy_type::template extract_uint_t<CHAR_BIT>(R, 0)] << 4) |
-                        (policy_type::fptab1[policy_type::template extract_uint_t<CHAR_BIT>(R, 1)] << 2) |
-                        (policy_type::fptab1[policy_type::template extract_uint_t<CHAR_BIT>(R, 2)]) |
-                        (policy_type::fptab2[policy_type::template extract_uint_t<CHAR_BIT>(R, 3)]);
-
-                    T = policy_type::template rotl<32>(T);
-
-                    return {boost::endian::big_to_native<typename block_type::value_type>(T)};
+                    return out;
                 }
             };
 
@@ -192,57 +165,33 @@ namespace nil {
                 }
 
                 inline block_type encrypt_block(const block_type &plaintext) {
-                    uint64_t T = (policy_type::iptab1[plaintext[0]]) | (policy_type::iptab1[plaintext[1]] << 1) |
-                                 (policy_type::iptab1[plaintext[2]] << 2) | (policy_type::iptab1[plaintext[3]] << 3) |
-                                 (policy_type::iptab1[plaintext[4]] << 4) | (policy_type::iptab1[plaintext[5]] << 5) |
-                                 (policy_type::iptab1[plaintext[6]] << 6) | (policy_type::iptab2[plaintext[7]]);
+                    block_type out;
+                    word_type L, R;
 
-                    word_type L = static_cast<uint32_t>(T >> word_bits);
-                    word_type R = static_cast<uint32_t>(T);
+                    policy_type::ip(L, R, plaintext);
 
                     policy_type::des_encrypt(L, R, &round_key[0]);
                     policy_type::des_decrypt(R, L, &round_key[32]);
                     policy_type::des_encrypt(L, R, &round_key[64]);
 
-                    T = (policy_type::fptab1[policy_type::template extract_uint_t<CHAR_BIT>(L, 0)] << 5) |
-                        (policy_type::fptab1[policy_type::template extract_uint_t<CHAR_BIT>(L, 1)] << 3) |
-                        (policy_type::fptab1[policy_type::template extract_uint_t<CHAR_BIT>(L, 2)] << 1) |
-                        (policy_type::fptab2[policy_type::template extract_uint_t<CHAR_BIT>(L, 3)] << 1) |
-                        (policy_type::fptab1[policy_type::template extract_uint_t<CHAR_BIT>(R, 0)] << 4) |
-                        (policy_type::fptab1[policy_type::template extract_uint_t<CHAR_BIT>(R, 1)] << 2) |
-                        (policy_type::fptab1[policy_type::template extract_uint_t<CHAR_BIT>(R, 2)]) |
-                        (policy_type::fptab2[policy_type::template extract_uint_t<CHAR_BIT>(R, 3)]);
+                    policy_type::fp(L, R, out);
 
-                    T = policy_type::template rotl<32>(T);
-
-                    return {boost::endian::big_to_native<typename block_type::value_type>(T)};
+                    return out;
                 }
 
                 inline block_type decrypt_block(const block_type &ciphertext) {
-                    uint64_t T = (policy_type::iptab1[ciphertext[0]]) | (policy_type::iptab1[ciphertext[1]] << 1) |
-                                 (policy_type::iptab1[ciphertext[2]] << 2) | (policy_type::iptab1[ciphertext[3]] << 3) |
-                                 (policy_type::iptab1[ciphertext[4]] << 4) | (policy_type::iptab1[ciphertext[5]] << 5) |
-                                 (policy_type::iptab1[ciphertext[6]] << 6) | (policy_type::iptab2[ciphertext[7]]);
+                    block_type out;
+                    word_type L, R;
 
-                    word_type L = static_cast<word_type>(T >> word_bits);
-                    word_type R = static_cast<word_type>(T);
+                    policy_type::ip(L, R, ciphertext);
 
                     policy_type::des_decrypt(L, R, &round_key[64]);
                     policy_type::des_encrypt(R, L, &round_key[32]);
                     policy_type::des_decrypt(L, R, &round_key[0]);
 
-                    T = (policy_type::fptab1[policy_type::template extract_uint_t<CHAR_BIT>(L, 0)] << 5) |
-                        (policy_type::fptab1[policy_type::template extract_uint_t<CHAR_BIT>(L, 1)] << 3) |
-                        (policy_type::fptab1[policy_type::template extract_uint_t<CHAR_BIT>(L, 2)] << 1) |
-                        (policy_type::fptab2[policy_type::template extract_uint_t<CHAR_BIT>(L, 3)] << 1) |
-                        (policy_type::fptab1[policy_type::template extract_uint_t<CHAR_BIT>(R, 0)] << 4) |
-                        (policy_type::fptab1[policy_type::template extract_uint_t<CHAR_BIT>(R, 1)] << 2) |
-                        (policy_type::fptab1[policy_type::template extract_uint_t<CHAR_BIT>(R, 2)]) |
-                        (policy_type::fptab2[policy_type::template extract_uint_t<CHAR_BIT>(R, 3)]);
+                    policy_type::fp(L, R, out);
 
-                    T = policy_type::template rotl<32>(T);
-
-                    return {boost::endian::big_to_native<typename block_type::value_type>(T)};
+                    return out;
                 }
             };
         }

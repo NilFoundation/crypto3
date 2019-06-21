@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2019 Nil Foundation
+// Copyright (c) 2018-2019 Nil Foundation AG
 // Copyright (c) 2018-2019 Mikhail Komarov <nemo@nilfoundation.org>
 //
 // Distributed under the Boost Software License, Version 1.0
@@ -105,7 +105,7 @@ namespace nil {
                 permutations_type permutations;
                 plain_constants_type constants;
 
-                void key_expansion(const key_type &key, const salt_type &salt) {
+                inline void key_expansion(const key_type &key, const salt_type &salt) {
                     for (size_t i = 0, j = 0; i != policy_type::permutations_size; ++i, j += word_bits / 8) {
                         permutations[i] ^= key[(j) % key.size()];
                     }
