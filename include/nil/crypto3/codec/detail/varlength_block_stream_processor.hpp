@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2019 Nil Foundation
+// Copyright (c) 2018-2019 Nil Foundation AG
 // Copyright (c) 2018-2019 Mikhail Komarov <nemo@nilfoundation.org>
 //
 // Distributed under the Boost Software License, Version 1.0
@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ARITHMETIC_STATE_PREPROCESSOR_HPP
-#define CRYPTO3_ARITHMETIC_STATE_PREPROCESSOR_HPP
+#ifndef CRYPTO3_VARLENGTH_BLOCK_STREAM_PROCESSOR_HPP
+#define CRYPTO3_VARLENGTH_BLOCK_STREAM_PROCESSOR_HPP
 
 #include <array>
 #include <iterator>
@@ -26,7 +26,7 @@ namespace nil {
     namespace crypto3 {
         namespace codec {
             template<typename Mode, typename StateAccumulator, typename Params>
-            struct arithmetic_state_preprocessor {
+            struct varlength_block_stream_processor {
             private:
                 typedef Mode mode_type;
                 typedef StateAccumulator accumulator_type;
@@ -67,7 +67,7 @@ namespace nil {
                 BOOST_STATIC_ASSERT(!length_bits || value_bits <= length_bits);
 
             public:
-                arithmetic_state_preprocessor(StateAccumulator &s) : state(s) {
+                varlength_block_stream_processor(StateAccumulator &s) : state(s) {
 
                 }
 
@@ -113,4 +113,4 @@ namespace nil {
     }
 }
 
-#endif //CRYPTO3_BLOCK_STATE_PREPROCESSOR_HPP
+#endif //CRYPTO3_FIXED_BLOCK_STREAM_PROCESSOR_HPP

@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2019 Nil Foundation
+// Copyright (c) 2018-2019 Nil Foundation AG
 // Copyright (c) 2018-2019 Mikhail Komarov <nemo@nilfoundation.org>
 //
 // Distributed under the Boost Software License, Version 1.0
@@ -57,20 +57,20 @@ namespace nil {
          *
          * @tparam Decoder
          * @tparam InputIterator
-         * @tparam DecoderAccumuator
+         * @tparam CodecAccumulator
          * @param first
          * @param last
          * @return
          */
         template<typename Decoder,
                  typename InputIterator,
-                 typename DecoderAccumuator = typename codec::codec_accumulator<typename Decoder::stream_decoder_type>>
-        codec::detail::range_codec_impl<codec::detail::value_codec_impl<DecoderAccumuator>> decode(InputIterator first,
-                                                                                                   InputIterator last) {
-            typedef codec::detail::value_codec_impl<DecoderAccumuator> DecoderStateImpl;
+                 typename CodecAccumulator = typename codec::codec_accumulator<typename Decoder::stream_decoder_type>>
+        codec::detail::range_codec_impl<codec::detail::value_codec_impl<CodecAccumulator>> decode(InputIterator first,
+                                                                                                  InputIterator last) {
+            typedef codec::detail::value_codec_impl<CodecAccumulator> DecoderStateImpl;
             typedef codec::detail::range_codec_impl<DecoderStateImpl> DecoderImpl;
 
-            return DecoderImpl(first, last, DecoderAccumuator());
+            return DecoderImpl(first, last, CodecAccumulator());
         }
 
         /*!
@@ -91,8 +91,10 @@ namespace nil {
          */
         template<typename Decoder,
                  typename InputIterator,
-                 typename OutputAccumulator = typename codec::codec_accumulator<typename Decoder::stream_decoder_type>>
-        OutputAccumulator &decode(InputIterator first, InputIterator last, OutputAccumulator &acc) {
+                 typename CodecAccumulator = typename codec::codec_accumulator<typename Decoder::stream_decoder_type>>
+        typename std::enable_if<boost::accumulators::detail::is_accumulator_set<CodecAccumulator>::value,
+                                CodecAccumulator>::type &decode(InputIterator first, InputIterator last,
+                                                                CodecAccumulator &acc) {
             typedef typename Decoder::stream_decoder_type DecodingMode;
             typedef typename codec::codec_accumulator<DecodingMode> DecoderAccumulator;
 
@@ -140,8 +142,9 @@ namespace nil {
          */
         template<typename Decoder,
                  typename SinglePassRange,
-                 typename OutputAccumulator = typename codec::codec_accumulator<typename Decoder::stream_decoder_type>>
-        OutputAccumulator &decode(const SinglePassRange &rng, OutputAccumulator &out) {
+                 typename CodecAccumulator = typename codec::codec_accumulator<typename Decoder::stream_decoder_type>>
+        typename std::enable_if<boost::accumulators::detail::is_accumulator_set<CodecAccumulator>::value,
+                                CodecAccumulator>::type &decode(const SinglePassRange &rng, CodecAccumulator &out) {
             typedef typename Decoder::stream_decoder_type DecodingMode;
             typedef typename codec::codec_accumulator<DecodingMode> DecoderAccumulator;
 

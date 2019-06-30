@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2019 Nil Foundation
+// Copyright (c) 2018-2019 Nil Foundation AG
 // Copyright (c) 2018-2019 Mikhail Komarov <nemo@nilfoundation.org>
 //
 // Distributed under the Boost Software License, Version 1.0
@@ -11,6 +11,7 @@
 #define CRYPTO3_CODEC_STATE_HPP
 
 #include <boost/accumulators/framework/accumulator_set.hpp>
+#include <boost/accumulators/framework/features.hpp>
 
 #include <nil/crypto3/codec/accumulators/codec.hpp>
 

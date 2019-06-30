@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2019 Nil Foundation
+// Copyright (c) 2018-2019 Nil Foundation AG
 // Copyright (c) 2018-2019 Mikhail Komarov <nemo@nilfoundation.org>
 //
 // Distributed under the Boost Software License, Version 1.0
@@ -25,6 +25,9 @@
 namespace nil {
     namespace crypto3 {
         namespace accumulators {
+            BOOST_PARAMETER_KEYWORD(tag, bits)
+            BOOST_ACCUMULATORS_IGNORE_GLOBAL(bits)
+
             namespace impl {
                 template<typename Mode>
                 struct codec_impl : boost::accumulators::accumulator_base {
@@ -33,12 +36,14 @@ namespace nil {
                     typedef typename mode_type::finalizer_type finalizer_type;
 
                     constexpr static const std::size_t input_block_bits = mode_type::input_block_bits;
+                    constexpr static const std::size_t input_block_values = mode_type::input_block_values;
                     typedef typename mode_type::input_block_type input_block_type;
 
                     constexpr static const std::size_t input_value_bits = mode_type::input_value_bits;
                     typedef typename input_block_type::value_type input_value_type;
 
                     constexpr static const std::size_t output_block_bits = mode_type::output_block_bits;
+                    constexpr static const std::size_t output_block_values = mode_type::output_block_values;
                     typedef typename mode_type::output_block_type output_block_type;
 
                     constexpr static const std::size_t output_value_bits = mode_type::output_value_bits;
@@ -57,7 +62,7 @@ namespace nil {
 
                     template<typename ArgumentPack>
                     inline void operator()(const ArgumentPack &args) {
-                        return process(args[boost::accumulators::sample]);
+                        resolve_type(args[boost::accumulators::sample], args[bits | std::size_t()]);
                     }
 
                     template<typename ArgumentPack>
@@ -82,7 +87,23 @@ namespace nil {
 
                 protected:
 
-                    inline void process(const input_value_type &value) {
+                    inline void resolve_type(const input_value_type &value, std::size_t bits) {
+                        if (bits == std::size_t()) {
+                            process(value, input_value_bits);
+                        } else {
+                            process(value, bits);
+                        }
+                    }
+
+                    inline void resolve_type(const input_block_type &value, std::size_t bits) {
+                        if (bits == std::size_t()) {
+                            process(value, input_block_bits);
+                        } else {
+                            process(value, bits);
+                        }
+                    }
+
+                    inline void process(const input_value_type &value, std::size_t bits) {
                         if (cache.size() == cache.max_size()) {
                             input_block_type ib = {0};
                             std::move(cache.begin(), cache.end(), ib.begin());
@@ -96,13 +117,12 @@ namespace nil {
                         seen += input_value_bits;
                     }
 
-                    inline void process(const input_block_type &block) {
+                    inline void process(const input_block_type &block, std::size_t bits) {
                         output_block_type ob;
                         if (cache.empty()) {
                             ob = mode_type::process_block(block);
                         } else {
-                            input_block_type b = codec::make_array<input_block_bits / input_value_bits>(cache.begin(),
-                                    cache.end());
+                            input_block_type b = codec::make_array<input_block_values>(cache.begin(), cache.end());
                             typename input_block_type::const_iterator itr =
                                     block.begin() + (cache.max_size() - cache.size());
 

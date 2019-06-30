@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2019 Nil Foundation
+// Copyright (c) 2018-2019 Nil Foundation AG
 // Copyright (c) 2018-2019 Mikhail Komarov <nemo@nilfoundation.org>
 //
 // Distributed under the Boost Software License, Version 1.0
@@ -92,8 +92,10 @@ namespace nil {
          */
         template<typename Encoder,
                  typename InputIterator,
-                 typename OutputAccumulator = typename codec::codec_accumulator<typename Encoder::stream_encoder_type>>
-        OutputAccumulator &encode(InputIterator first, InputIterator last, OutputAccumulator &acc) {
+                 typename CodecAccumulator = typename codec::codec_accumulator<typename Encoder::stream_encoder_type>>
+        typename std::enable_if<boost::accumulators::detail::is_accumulator_set<CodecAccumulator>::value,
+                                CodecAccumulator>::type &encode(InputIterator first, InputIterator last,
+                                                                CodecAccumulator &acc) {
             typedef typename Encoder::stream_encoder_type EncodingMode;
             typedef typename codec::codec_accumulator<EncodingMode> EncoderAccumulator;
 
@@ -141,8 +143,9 @@ namespace nil {
          */
         template<typename Encoder,
                  typename SinglePassRange,
-                 typename OutputAccumulator = typename codec::codec_accumulator<typename Encoder::stream_encoder_type>>
-        OutputAccumulator &encode(const SinglePassRange &rng, OutputAccumulator &out) {
+                 typename CodecAccumulator = typename codec::codec_accumulator<typename Encoder::stream_encoder_type>>
+        typename std::enable_if<boost::accumulators::detail::is_accumulator_set<CodecAccumulator>::value,
+                                CodecAccumulator>::type &encode(const SinglePassRange &rng, CodecAccumulator &out) {
             typedef typename Encoder::stream_encoder_type EncodingMode;
             typedef typename codec::codec_accumulator<EncodingMode> EncoderAccumulator;
 
@@ -165,14 +168,14 @@ namespace nil {
          */
         template<typename Encoder,
                  typename SinglePassRange,
-                 typename EncoderAccumuator = typename codec::codec_accumulator<typename Encoder::stream_encoder_type>>
-        codec::detail::range_codec_impl<codec::detail::value_codec_impl<EncoderAccumuator>> encode(
+                 typename CodecAccumuator = typename codec::codec_accumulator<typename Encoder::stream_encoder_type>>
+        codec::detail::range_codec_impl<codec::detail::value_codec_impl<CodecAccumuator>> encode(
                 const SinglePassRange &r) {
 
-            typedef codec::detail::value_codec_impl<EncoderAccumuator> EncoderStateImpl;
+            typedef codec::detail::value_codec_impl<CodecAccumuator> EncoderStateImpl;
             typedef codec::detail::range_codec_impl<EncoderStateImpl> EncoderImpl;
 
-            return EncoderImpl(r, EncoderAccumuator());
+            return EncoderImpl(r, CodecAccumuator());
         }
     } // namespace crypto3
 } // namespace nil
