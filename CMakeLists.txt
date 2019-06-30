@@ -13,6 +13,22 @@ endif()
 
 cm_project(block WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME} LANGUAGES C CXX)
 
+include(TargetArchitecture)
+include(TargetConfiguration)
+include(PlatformConfiguration)
+
+include(CheckSSE)
+include(CheckAVX)
+
+define_target_architecture(${CMAKE_PROJECT_NAME} ${CMAKE_TARGET_ARCHITECTURE})
+define_target_endianness(${CMAKE_PROJECT_NAME} ${CMAKE_TARGET_ARCHITECTURE})
+define_target_platform_features(${CMAKE_PROJECT_NAME})
+
+define_target_platform_size(${CMAKE_PROJECT_NAME} ${CMAKE_TARGET_ARCHITECTURE})
+
+check_sse()
+check_avx()
+
 if(NOT Boost_CONTAINER_FOUND OR NOT Boost_FOUND)
     cm_find_package(Boost COMPONENTS container)
 endif()
@@ -445,41 +461,32 @@ list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
 
 cm_setup_version(VERSION 0.1.0 PREFIX ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME})
 
-add_library(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
-            ${${CURRENT_PROJECT_NAME}_HEADERS} ${${CURRENT_PROJECT_NAME}_SOURCES})
+add_library(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE)
 
-set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES
-                      LINKER_LANGUAGE CXX
-                      EXPORT_NAME ${CURRENT_PROJECT_NAME}
-                      CXX_STANDARD 14)
+set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES EXPORT_NAME ${CURRENT_PROJECT_NAME})
 
 if(${CMAKE_TARGET_ARCHITECTURE} STREQUAL "x86_64" OR ${CMAKE_TARGET_ARCHITECTURE} STREQUAL "x86")
     if(SSE2_FOUND)
-        set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES
-                              COMPILE_FLAGS "-maes -mpclmul -mssse3"
-                              COMPILE_DEFINITIONS "${CMAKE_UPPER_WORKSPACE_NAME}_HAS_RIJNDAEL_NI")
+        target_compile_definitions(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE "${CMAKE_UPPER_WORKSPACE_NAME}_HAS_RIJNDAEL_NI")
+        target_compile_options(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE "-maes;-mpclmul;-mssse3")
     elseif(SSSE3_FOUND)
-        set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES
-                              COMPILE_FLAGS "-maes -mpclmul -mssse3"
-                              COMPILE_DEFINITIONS "${CMAKE_UPPER_WORKSPACE_NAME}_HAS_RIJNDAEL_SSSE3")
+        target_compile_definitions(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
+                                   "${CMAKE_UPPER_WORKSPACE_NAME}_HAS_RIJNDAEL_SSSE3")
+        target_compile_options(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE "-maes;-mpclmul;-mssse3")
     endif()
 elseif(${CMAKE_TARGET_ARCHITECTURE} STREQUAL "armv8")
-    set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES
-                          COMPILE_DEFINITIONS "${CMAKE_UPPER_WORKSPACE_NAME}_HAS_RIJNDAEL_ARMV8")
+    target_compile_definitions(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE "${CMAKE_UPPER_WORKSPACE_NAME}_HAS_RIJNDAEL_ARMV8")
 elseif(${CMAKE_TARGET_ARCHITECTURE} STREQUAL "ppc64")
-    set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES
-                          COMPILE_DEFINITIONS "${CMAKE_UPPER_WORKSPACE_NAME}_HAS_RIJNDAEL_POWER8")
+    target_compile_definitions(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
+                               "${CMAKE_UPPER_WORKSPACE_NAME}_HAS_RIJNDAEL_POWER8")
 endif()
 
-set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES
-                      COMPILE_FLAGS "-fvisibility=hidden")
-
-target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PUBLIC
+target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
                       ${CMAKE_WORKSPACE_NAME}::utilities
 
                       ${Boost_LIBRARIES})
 
-target_include_directories(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PRIVATE
+target_include_directories(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
                            "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
                            "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>"
 
@@ -488,12 +495,6 @@ target_include_directories(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PRIVA
 cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
           INCLUDE include
           NAMESPACE ${CMAKE_WORKSPACE_NAME}::)
-
-if(APPLE OR NOT ${CMAKE_TARGET_ARCHITECTURE} STREQUAL ${CMAKE_HOST_SYSTEM_PROCESSOR})
-    set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES
-                          XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "${APPLE_CODE_SIGN_IDENTITY}"
-                          XCODE_ATTRIBUTE_DEVELOPMENT_TEAM "${CMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM}")
-endif()
 
 if(BUILD_UNIT_TESTS)
     add_subdirectory(test)

@@ -32,23 +32,21 @@ namespace nil {
                     typedef Mode mode_type;
                     typedef typename mode_type::finalizer_type finalizer_type;
 
-                    typedef typename mode_type::input_block_type input_block_type;
-                    typedef typename input_block_type::value_type input_value_type;
-                    constexpr static const std::size_t input_block_bits = mode_type::input_block_bits;
-                    constexpr static const std::size_t input_value_bits =
-                            input_block_bits / std::tuple_size<input_block_type>::value;
+                    constexpr static const std::size_t word_bits = mode_type::word_bits;
+                    typedef typename mode_type::word_type word_type;
 
-                    typedef typename mode_type::output_block_type output_block_type;
-                    typedef typename output_block_type::value_type output_value_type;
-                    constexpr static const std::size_t output_block_bits = mode_type::output_block_bits;
-                    constexpr static const std::size_t output_value_bits =
-                            output_block_bits / std::tuple_size<output_block_type>::value;
+                    constexpr static const std::size_t state_bits = mode_type::state_bits;
+                    constexpr static const std::size_t state_words = mode_type::state_words;
+                    typedef typename mode_type::state_type state_type;
 
-                    typedef boost::container::static_vector<input_value_type,
-                                                            std::tuple_size<input_block_type>::value> cache_type;
+                    constexpr static const std::size_t block_bits = mode_type::block_bits;
+                    constexpr static const std::size_t block_words = mode_type::block_words;
+                    typedef typename mode_type::block_type block_type;
+
+                    typedef boost::container::static_vector<word_type, block_words> cache_type;
 
                 public:
-                    typedef block::digest<output_block_bits> result_type;
+                    typedef block::digest<block_bits> result_type;
 
                     template<typename Args>
                     // The constructor takes an argument pack.
@@ -65,14 +63,14 @@ namespace nil {
                         result_type res = digest;
 
                         if (!cache.empty()) {
-                            input_block_type ib = {0};
+                            block_type ib = {0};
                             std::move(cache.begin(), cache.end(), ib.begin());
-                            output_block_type ob = mode_type::process_block(ib);
+                            block_type ob = mode_type::process_block(ib);
                             std::move(ob.begin(), ob.end(), std::inserter(res, res.end()));
                         }
 
-                        if (seen % input_block_bits) {
-                            finalizer_type(input_block_bits - seen % input_block_bits)(res);
+                        if (seen % block_bits) {
+                            finalizer_type(block_bits - seen % block_bits)(res);
                         } else {
                             finalizer_type(0)(res);
                         }
@@ -82,29 +80,44 @@ namespace nil {
 
                 protected:
 
-                    inline void process(const input_value_type &value) {
+                    inline void resolve_type(const word_type &value, std::size_t bits) {
+                        if (bits == std::size_t()) {
+                            process(value, word_bits);
+                        } else {
+                            process(value, bits);
+                        }
+                    }
+
+                    inline void resolve_type(const block_type &value, std::size_t bits) {
+                        if (bits == std::size_t()) {
+                            process(value, block_bits);
+                        } else {
+                            process(value, bits);
+                        }
+                    }
+
+
+                    inline void process(const word_type &value, std::size_t bits) {
                         if (cache.size() == cache.max_size()) {
-                            input_block_type ib = {0};
+                            block_type ib = {0};
                             std::move(cache.begin(), cache.end(), ib.begin());
-                            output_block_type ob = mode_type::process_block(ib);
+                            block_type ob = mode_type::process_block(ib);
                             std::move(ob.begin(), ob.end(), std::inserter(digest, digest.end()));
 
                             cache.clear();
                         }
 
                         cache.push_back(value);
-                        seen += input_value_bits;
+                        seen += bits;
                     }
 
-                    inline void process(const input_block_type &block) {
-                        output_block_type ob;
+                    inline void process(const block_type &block, std::size_t bits) {
+                        block_type ob;
                         if (cache.empty()) {
                             ob = mode_type::process_block(block);
                         } else {
-                            input_block_type b = block::make_array<std::tuple_size<input_block_type>::value>(
-                                    cache.begin(), cache.end());
-                            typename input_block_type::const_iterator itr =
-                                    block.begin() + (cache.max_size() - cache.size());
+                            block_type b = block::make_array<block_words>(cache.begin(), cache.end());
+                            typename block_type::const_iterator itr = block.begin() + (cache.max_size() - cache.size());
 
                             std::copy(block.begin(), itr, b.end());
 
@@ -115,7 +128,7 @@ namespace nil {
                         }
 
                         std::move(ob.begin(), ob.end(), std::inserter(digest, digest.end()));
-                        seen += input_block_bits;
+                        seen += bits;
                     }
 
                     std::size_t seen;

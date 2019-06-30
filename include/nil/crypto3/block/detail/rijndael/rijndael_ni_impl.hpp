@@ -14,6 +14,9 @@
 
 #include <wmmintrin.h>
 
+#include <nil/crypto3/utilities/compiler.hpp>
+#include <nil/crypto3/utilities/loadstore.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace block {
@@ -113,24 +116,24 @@ namespace nil {
 
                 template<std::size_t KeyBitsImpl, std::size_t BlockBitsImpl, typename PolicyType>
                 class ni_rijndael_impl {
-                    BOOST_STATIC_ASSERT(PolicyType::block_bits
-                    == 128 && BlockBitsImpl == 128);
+                    BOOST_STATIC_ASSERT(PolicyType::block_bits == 128 && BlockBitsImpl == 128);
                 };
 
                 template<typename PolicyType>
                 class ni_rijndael_impl<128, 128, PolicyType> {
                     typedef PolicyType policy_type;
+                    typedef typename policy_type::block_type block_type;
+                    typedef typename policy_type::key_type key_type;
+                    typedef typename policy_type::key_schedule_type key_schedule_type;
 
-                    BOOST_STATIC_ASSERT(PolicyType::key_bits
-                    == 128);
+                    BOOST_STATIC_ASSERT(PolicyType::key_bits == 128);
 
                 public:
                     CRYPTO3_FUNC_ISA("ssse3,aes")
 
-                    static typename policy_type::block_type encrypt_block(
-                            const typename policy_type::block_type &plaintext,
-                            const typename policy_type::key_schedule_type &encryption_key) {
-                        typename policy_type::block_type out = {0};
+                    static block_type encrypt_block(const block_type &plaintext,
+                                                    const key_schedule_type &encryption_key) {
+                        block_type out = {0};
                         const __m128i *in_mm = reinterpret_cast<const __m128i *>(plaintext.data());
                         __m128i *out_mm = reinterpret_cast<__m128i *>(out.data());
 
@@ -170,10 +173,9 @@ namespace nil {
 
                     CRYPTO3_FUNC_ISA("ssse3,aes")
 
-                    static typename policy_type::block_type decrypt_block(
-                            const typename policy_type::block_type &plaintext,
-                            const typename policy_type::key_schedule_type &decryption_key) {
-                        typename policy_type::block_type out = {0};
+                    static block_type decrypt_block(const block_type &plaintext,
+                                                    const key_schedule_type &decryption_key) {
+                        block_type out = {0};
                         const __m128i *in_mm = reinterpret_cast<const __m128i *>(plaintext.data());
                         __m128i *out_mm = reinterpret_cast<__m128i *>(out.data());
 
@@ -213,9 +215,8 @@ namespace nil {
 
                     CRYPTO3_FUNC_ISA("ssse3,aes")
 
-                    static void schedule_key(const typename policy_type::key_type &input_key,
-                                             typename policy_type::key_schedule_type &encryption_key,
-                                             typename policy_type::key_schedule_type &decryption_key) {
+                    static void schedule_key(const key_type &input_key, key_schedule_type &encryption_key,
+                                             key_schedule_type &decryption_key) {
 #define AES_128_KEY_EXPANSION(K, RCON) \
       detail::aes_128_key_expansion(K, _mm_aeskeygenassist_si128(K, RCON))
 
@@ -267,18 +268,19 @@ namespace nil {
                 class ni_rijndael_impl<192, 128, PolicyType> {
                 protected:
                     typedef PolicyType policy_type;
+                    typedef typename policy_type::block_type block_type;
+                    typedef typename policy_type::key_type key_type;
+                    typedef typename policy_type::key_schedule_type key_schedule_type;
 
-                    BOOST_STATIC_ASSERT(PolicyType::key_bits
-                    == 192);
+                    BOOST_STATIC_ASSERT(PolicyType::key_bits == 192);
 
                 public:
 
                     CRYPTO3_FUNC_ISA("ssse3,aes")
 
-                    static typename policy_type::block_type encrypt_block(
-                            const typename policy_type::block_type &plaintext,
-                            const typename policy_type::key_schedule_type &encryption_key) {
-                        typename policy_type::block_type out = {0};
+                    static block_type encrypt_block(const block_type &plaintext,
+                                                    const key_schedule_type &encryption_key) {
+                        block_type out = {0};
                         const __m128i *in_mm = reinterpret_cast<const __m128i *>(plaintext.data());
                         __m128i *out_mm = reinterpret_cast<__m128i *>(out.data());
 
@@ -322,10 +324,9 @@ namespace nil {
 
                     CRYPTO3_FUNC_ISA("ssse3,aes")
 
-                    static typename policy_type::block_type decrypt_block(
-                            const typename policy_type::block_type &plaintext,
-                            const typename policy_type::key_schedule_type &decryption_key) {
-                        typename policy_type::block_type out = {0};
+                    static block_type decrypt_block(const block_type &plaintext,
+                                                    const key_schedule_type &decryption_key) {
+                        block_type out = {0};
                         const __m128i *in_mm = reinterpret_cast<const __m128i *>(plaintext.data());
                         __m128i *out_mm = reinterpret_cast<__m128i *>(out.data());
 
@@ -369,9 +370,8 @@ namespace nil {
 
                     CRYPTO3_FUNC_ISA("ssse3,aes")
 
-                    static void schedule_key(const typename policy_type::key_type &input_key,
-                                             typename policy_type::key_schedule_type &encryption_key,
-                                             typename policy_type::key_schedule_type &decryption_key) {
+                    static void schedule_key(const key_type &input_key, key_schedule_type &encryption_key,
+                                             key_schedule_type &decryption_key) {
                         __m128i K0 = _mm_loadu_si128(reinterpret_cast<const __m128i *>(input_key.data()));
                         __m128i K1 = _mm_loadu_si128(reinterpret_cast<const __m128i *>(input_key.data() + 8));
                         K1 = _mm_srli_si128(K1, 8);
@@ -418,17 +418,18 @@ namespace nil {
                 class ni_rijndael_impl<256, 128, PolicyType> {
                 protected:
                     typedef PolicyType policy_type;
+                    typedef typename policy_type::block_type block_type;
+                    typedef typename policy_type::key_type key_type;
+                    typedef typename policy_type::key_schedule_type key_schedule_type;
 
-                    BOOST_STATIC_ASSERT(PolicyType::key_bits
-                    == 256);
+                    BOOST_STATIC_ASSERT(PolicyType::key_bits == 256);
 
                 public:
                     CRYPTO3_FUNC_ISA("ssse3,aes")
 
-                    static typename policy_type::block_type encrypt_block(
-                            const typename policy_type::block_type &plaintext,
-                            const typename policy_type::key_schedule_type &encryption_key) {
-                        typename policy_type::block_type out = {0};
+                    static block_type encrypt_block(const block_type &plaintext,
+                                                    const key_schedule_type &encryption_key) {
+                        block_type out = {0};
                         const __m128i *in_mm = reinterpret_cast<const __m128i *>(plaintext.data());
                         __m128i *out_mm = reinterpret_cast<__m128i *>(out.data());
 
@@ -476,10 +477,9 @@ namespace nil {
 
                     CRYPTO3_FUNC_ISA("ssse3,aes")
 
-                    static typename policy_type::block_type decrypt_block(
-                            const typename policy_type::block_type &plaintext,
-                            const typename policy_type::key_schedule_type &decryption_key) {
-                        typename policy_type::block_type out = {0};
+                    static block_type decrypt_block(const block_type &plaintext,
+                                                    const key_schedule_type &decryption_key) {
+                        block_type out = {0};
                         const __m128i *in_mm = reinterpret_cast<const __m128i *>(plaintext.data());
                         __m128i *out_mm = reinterpret_cast<__m128i *>(out.data());
 
@@ -527,9 +527,8 @@ namespace nil {
 
                     CRYPTO3_FUNC_ISA("ssse3,aes")
 
-                    static void schedule_key(const typename policy_type::key_type &input_key,
-                                             typename policy_type::key_schedule_type &encryption_key,
-                                             typename policy_type::key_schedule_type &decryption_key) {
+                    static void schedule_key(const key_type &input_key, key_schedule_type &encryption_key,
+                                             key_schedule_type &decryption_key) {
                         const __m128i K0 = _mm_loadu_si128(reinterpret_cast<const __m128i *>(input_key.data()));
                         const __m128i K1 = _mm_loadu_si128(reinterpret_cast<const __m128i *>(input_key.data() + 16));
 

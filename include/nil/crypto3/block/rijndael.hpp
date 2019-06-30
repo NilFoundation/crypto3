@@ -14,7 +14,7 @@
 
 #include <nil/crypto3/block/block_cipher.hpp>
 
-#include <nil/crypto3/block/detail/block_state_preprocessor.hpp>
+#include <nil/crypto3/block/detail/block_stream_processor.hpp>
 #include <nil/crypto3/block/detail/cipher_modes.hpp>
 
 #include <nil/crypto3/block/detail/rijndael/rijndael_policy.hpp>
@@ -105,7 +105,7 @@ namespace nil {
 
                 typedef typename std::conditional<
                         BlockBits == 128 && (KeyBits == 128 || KeyBits == 192 || KeyBits == 256),
-                        #if defined(CRYPTO3_HAS_RIJNDAEL_NI)
+#if defined(CRYPTO3_HAS_RIJNDAEL_NI)
                         detail::ni_rijndael_impl<KeyBits, BlockBits, policy_type>,
 #elif defined(CRYPTO3_HAS_RIJNDAEL_SSSE3)
                         detail::rijndael_ssse3_impl<KeyBits, BlockBits, policy_type>,
@@ -115,7 +115,7 @@ namespace nil {
                         detail::rijndael_power8_impl<KeyBits, BlockBits, policy_type>,
 #else
                         detail::rijndael_impl<KeyBits, BlockBits, policy_type>,
-                        #endif
+#endif
                         detail::rijndael_impl<KeyBits, BlockBits, policy_type>>::type impl_type;
 
             public:
@@ -147,7 +147,7 @@ namespace nil {
                                                       typename StateAccumulator, std::size_t ValueBits,
                                                       typename Padding>
                 struct stream_cipher {
-                    typedef block_state_preprocessor<Mode<rijndael<KeyBits, BlockBits>, Padding>, StateAccumulator,
+                    typedef block_stream_processor<Mode<rijndael<KeyBits, BlockBits>, Padding>, StateAccumulator,
                                                      stream_endian::little_octet_big_bit, ValueBits,
                                                      policy_type::word_bits * 2> type_;
 #ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES

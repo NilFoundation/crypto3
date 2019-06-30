@@ -28,7 +28,7 @@ namespace nil {
             template<typename Mode,
                      typename StateAccumulator,
                      typename Endian, std::size_t ValueBits, std::size_t LengthBits>
-            struct block_state_preprocessor {
+            struct block_stream_processor {
             private:
                 typedef Mode mode_type;
 
@@ -107,11 +107,11 @@ namespace nil {
                 }
 
             public:
-                block_state_preprocessor(StateAccumulator &s) : state(s), cache(cache_type()), seen(0) {
+                block_stream_processor(StateAccumulator &s) : state(s), cache(cache_type()), seen(0) {
 
                 }
 
-                virtual ~block_state_preprocessor() {
+                virtual ~block_stream_processor() {
                     if (!cache.empty()) {
                         input_block_type block = {0};
                         pack<Endian, value_bits, input_block_bits / block_values>(cache.begin(),
