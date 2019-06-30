@@ -16,7 +16,7 @@
 
 #include <nil/crypto3/codec/detail/hex_policy.hpp>
 #include <nil/crypto3/codec/detail/codec_modes.hpp>
-#include <nil/crypto3/codec/detail/block_state_preprocessor.hpp>
+#include <nil/crypto3/codec/detail/fixed_block_stream_processor.hpp>
 
 #include <nil/crypto3/codec/codec_state.hpp>
 
@@ -131,11 +131,13 @@ namespace nil {
                 constexpr static const std::size_t decoded_value_bits = policy_type::decoded_value_bits;
                 typedef typename policy_type::decoded_value_type decoded_value_type;
 
+                constexpr static const std::size_t encoded_block_values = policy_type::encoded_block_values;
+                constexpr static const std::size_t encoded_block_bits = policy_type::encoded_block_bits;
                 typedef typename policy_type::encoded_block_type encoded_block_type;
-                constexpr static const std::uint8_t encoded_block_bits = policy_type::encoded_block_bits;
 
+                constexpr static const std::size_t decoded_block_values = policy_type::decoded_block_values;
+                constexpr static const std::size_t decoded_block_bits = policy_type::decoded_block_bits;
                 typedef typename policy_type::decoded_block_type decoded_block_type;
-                constexpr static const std::uint8_t decoded_block_bits = policy_type::decoded_block_bits;
 
                 static encoded_block_type encode(const decoded_block_type &plaintext) {
                     BOOST_STATIC_ASSERT(std::tuple_size<decoded_block_type>::value == 1);
@@ -174,7 +176,7 @@ namespace nil {
                         constexpr static const std::size_t length_bits = CHAR_BIT * CHAR_BIT;
                     };
 
-                    typedef block_state_preprocessor<ProcessingMode, StateAccumulator, params_type> type;
+                    typedef fixed_block_stream_processor<ProcessingMode, StateAccumulator, params_type> type;
                 };
 
             protected:

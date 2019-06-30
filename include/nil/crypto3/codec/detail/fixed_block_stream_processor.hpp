@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_BLOCK_STATE_PREPROCESSOR_HPP
-#define CRYPTO3_BLOCK_STATE_PREPROCESSOR_HPP
+#ifndef CRYPTO3_FIXED_BLOCK_STREAM_PROCESSOR_HPP
+#define CRYPTO3_FIXED_BLOCK_STREAM_PROCESSOR_HPP
 
 #include <array>
 #include <iterator>
@@ -26,7 +26,7 @@ namespace nil {
     namespace crypto3 {
         namespace codec {
             template<typename Mode, typename StateAccumulator, typename Params>
-            struct block_state_preprocessor {
+            struct fixed_block_stream_processor {
             private:
                 typedef Mode mode_type;
                 typedef StateAccumulator accumulator_type;
@@ -111,11 +111,11 @@ namespace nil {
                 }
 
             public:
-                block_state_preprocessor(accumulator_type &s) : state(s), cache(cache_type()), seen(0) {
+                fixed_block_stream_processor(accumulator_type &s) : state(s), cache(cache_type()), seen(0) {
 
                 }
 
-                virtual ~block_state_preprocessor() {
+                virtual ~fixed_block_stream_processor() {
                     if (!cache.empty()) {
                         input_block_type block = {0};
                         typename input_block_type::const_iterator v = block.cbegin();
@@ -170,4 +170,4 @@ namespace nil {
     }
 }
 
-#endif //CRYPTO3_BLOCK_STATE_PREPROCESSOR_HPP
+#endif //CRYPTO3_FIXED_BLOCK_STREAM_PROCESSOR_HPP
