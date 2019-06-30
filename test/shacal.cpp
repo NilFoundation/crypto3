@@ -21,7 +21,7 @@
 
 #include <nil/crypto3/hash/hash_state.hpp>
 
-#include <nil/crypto3/hash/detail/merkle_damgard_state_preprocessor.hpp>
+#include <nil/crypto3/hash/detail/merkle_damgard_stream_processor.hpp>
 #include <nil/crypto3/hash/detail/davies_meyer_compressor.hpp>
 #include <nil/crypto3/hash/detail/merkle_damgard_construction.hpp>
 

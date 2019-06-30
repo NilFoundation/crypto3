@@ -14,7 +14,7 @@
 
 #include <nil/crypto3/block/detail/twofish/twofish_policy.hpp>
 
-#include <nil/crypto3/block/detail/block_state_preprocessor.hpp>
+#include <nil/crypto3/block/detail/block_stream_processor.hpp>
 #include <nil/crypto3/block/detail/stream_endian.hpp>
 
 namespace nil {
@@ -56,7 +56,7 @@ namespace nil {
                                                       typename StateAccumulator, std::size_t ValueBits,
                                                       typename Padding>
                 struct stream_cipher {
-                    typedef block_state_preprocessor<Mode<twofish<KeyBits>, Padding>, StateAccumulator,
+                    typedef block_stream_processor<Mode<twofish<KeyBits>, Padding>, StateAccumulator,
                                                      stream_endian::little_octet_big_bit, ValueBits,
                                                      policy_type::word_bits * 2> type;
                 };

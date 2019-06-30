@@ -14,7 +14,7 @@
 
 #include <nil/crypto3/block/detail/aria/aria_policy.hpp>
 
-#include <nil/crypto3/block/detail/block_state_preprocessor.hpp>
+#include <nil/crypto3/block/detail/block_stream_processor.hpp>
 #include <nil/crypto3/block/detail/stream_endian.hpp>
 
 #include <nil/crypto3/utilities/cpuid/cpuid.hpp>
@@ -64,7 +64,7 @@ namespace nil {
                                                       typename StateAccumulator, std::size_t ValueBits,
                                                       typename Padding>
                 struct stream_cipher {
-                    typedef block_state_preprocessor<Mode<aria<Size>, Padding>, StateAccumulator,
+                    typedef block_stream_processor<Mode<aria<Size>, Padding>, StateAccumulator,
                                                      stream_endian::little_octet_big_bit, ValueBits,
                                                      policy_type::word_bits * 2> type;
                 };
