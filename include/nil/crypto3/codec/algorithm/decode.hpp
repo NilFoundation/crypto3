@@ -13,6 +13,8 @@
 #include <nil/crypto3/codec/codec_value.hpp>
 #include <nil/crypto3/codec/codec_state.hpp>
 
+#include <nil/crypto3/codec/detail/type_traits.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace codec {
@@ -40,7 +42,8 @@ namespace nil {
          * @return
          */
         template<typename Decoder, typename InputIterator, typename OutputIterator>
-        OutputIterator decode(InputIterator first, InputIterator last, OutputIterator out) {
+        typename std::enable_if<codec::detail::is_iterator<OutputIterator>::value, OutputIterator>::type decode(
+                InputIterator first, InputIterator last, OutputIterator out) {
             typedef typename Decoder::stream_decoder_type DecodingMode;
             typedef typename codec::codec_accumulator<DecodingMode> DecoderAccumulator;
 
@@ -101,7 +104,7 @@ namespace nil {
             typedef codec::detail::ref_codec_impl<DecoderAccumulator> DecoderStateImpl;
             typedef codec::detail::range_codec_impl<DecoderStateImpl> DecoderImpl;
 
-            return DecoderImpl(first, last, acc);
+            return DecoderImpl(first, last, std::forward<CodecAccumulator>(acc));
         }
 
 
@@ -118,7 +121,8 @@ namespace nil {
          * @return
          */
         template<typename Decoder, typename SinglePassRange, typename OutputIterator>
-        OutputIterator decode(const SinglePassRange &rng, OutputIterator out) {
+        typename std::enable_if<codec::detail::is_iterator<OutputIterator>::value, OutputIterator>::type decode(
+                const SinglePassRange &rng, OutputIterator out) {
             typedef typename Decoder::stream_decoder_type DecodingMode;
             typedef typename codec::codec_accumulator<DecodingMode> DecoderAccumulator;
 
@@ -151,7 +155,7 @@ namespace nil {
             typedef codec::detail::value_codec_impl<DecoderAccumulator> DecoderStateImpl;
             typedef codec::detail::range_codec_impl<DecoderStateImpl> DecoderImpl;
 
-            return DecoderImpl(rng, out);
+            return DecoderImpl(rng, std::forward<CodecAccumulator>(out));
         }
 
         /*!

@@ -13,6 +13,8 @@
 #include <nil/crypto3/codec/codec_value.hpp>
 #include <nil/crypto3/codec/codec_state.hpp>
 
+#include <nil/crypto3/codec/detail/type_traits.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace codec {
@@ -41,7 +43,8 @@ namespace nil {
          * @return
          */
         template<typename Encoder, typename InputIterator, typename OutputIterator>
-        OutputIterator encode(InputIterator first, InputIterator last, OutputIterator out) {
+        typename std::enable_if<codec::detail::is_iterator<OutputIterator>::value, OutputIterator>::type encode(
+                InputIterator first, InputIterator last, OutputIterator out) {
             typedef typename Encoder::stream_encoder_type EncodingMode;
             typedef typename codec::codec_accumulator<EncodingMode> EncoderAccumulator;
 
@@ -102,7 +105,7 @@ namespace nil {
             typedef codec::detail::ref_codec_impl<EncoderAccumulator> EncoderStateImpl;
             typedef codec::detail::range_codec_impl<EncoderStateImpl> EncoderImpl;
 
-            return EncoderImpl(first, last, acc);
+            return EncoderImpl(first, last, std::forward<CodecAccumulator>(acc));
         }
 
 
@@ -119,7 +122,8 @@ namespace nil {
          * @return
          */
         template<typename Encoder, typename SinglePassRange, typename OutputIterator>
-        OutputIterator encode(const SinglePassRange &rng, OutputIterator out) {
+        typename std::enable_if<codec::detail::is_iterator<OutputIterator>::value, OutputIterator>::type encode(
+                const SinglePassRange &rng, OutputIterator out) {
             typedef typename Encoder::stream_encoder_type EncodingMode;
             typedef typename codec::codec_accumulator<EncodingMode> EncoderAccumulator;
 
@@ -149,10 +153,10 @@ namespace nil {
             typedef typename Encoder::stream_encoder_type EncodingMode;
             typedef typename codec::codec_accumulator<EncodingMode> EncoderAccumulator;
 
-            typedef codec::detail::value_codec_impl<EncoderAccumulator> EncoderStateImpl;
+            typedef codec::detail::ref_codec_impl<EncoderAccumulator> EncoderStateImpl;
             typedef codec::detail::range_codec_impl<EncoderStateImpl> EncoderImpl;
 
-            return EncoderImpl(rng, out);
+            return EncoderImpl(rng, std::forward<CodecAccumulator>(out));
         }
 
         /*!

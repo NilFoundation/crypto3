@@ -10,6 +10,7 @@
 #ifndef CRYPTO3_CODEC_PACK_HPP
 #define CRYPTO3_CODEC_PACK_HPP
 
+#include <nil/crypto3/codec/detail/type_traits.hpp>
 #include <nil/crypto3/codec/detail/stream_endian.hpp>
 #include <nil/crypto3/codec/detail/exploder.hpp>
 #include <nil/crypto3/codec/detail/imploder.hpp>
@@ -29,24 +30,6 @@
 namespace nil {
     namespace crypto3 {
         namespace codec {
-            namespace detail {
-                template<typename T>
-                struct sfinae_true : std::true_type {
-                };
-
-                struct is_iterator_tester {
-                    template<typename T>
-                    static sfinae_true<typename std::iterator_traits<T>::iterator_category> test(int);
-
-                    template<typename>
-                    static std::false_type test(...);
-                };
-
-                template<typename T>
-                struct is_iterator : decltype(is_iterator_tester::test<T>(0)) {
-                };
-            }
-
             using namespace boost::multiprecision;
 
 #ifndef CRYPTO3_CODEC_NO_OPTIMIZATION

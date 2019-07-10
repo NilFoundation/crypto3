@@ -30,7 +30,7 @@ namespace nil {
                     typedef typename accumulator_type::mode_type mode_type;
                     typedef typename mode_type::codec_type codec_type;
 
-                    ref_codec_impl(const accumulator_set_type &acc) : accumulator_set(acc) {
+                    ref_codec_impl(accumulator_set_type &&acc) : accumulator_set(acc) {
 
                     }
 
@@ -46,7 +46,8 @@ namespace nil {
                     typedef typename accumulator_type::mode_type mode_type;
                     typedef typename mode_type::codec_type codec_type;
 
-                    value_codec_impl(const accumulator_set_type &acc) : accumulator_set(acc) {
+                    value_codec_impl(accumulator_set_type &&acc) : accumulator_set(
+                            std::forward<accumulator_set_type>(acc)) {
 
                     }
 
@@ -67,8 +68,8 @@ namespace nil {
                                                        accumulator_type>::type::result_type result_type;
 
                     template<typename SinglePassRange>
-                    range_codec_impl(const SinglePassRange &range, const accumulator_set_type &ise)
-                            : CodecStateImpl(ise) {
+                    range_codec_impl(const SinglePassRange &range, accumulator_set_type &&ise)
+                            : CodecStateImpl(std::forward<accumulator_set_type>(ise)) {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange>));
 
                         typedef typename std::iterator_traits<
@@ -84,8 +85,8 @@ namespace nil {
                     }
 
                     template<typename InputIterator>
-                    range_codec_impl(InputIterator first, InputIterator last, const accumulator_set_type &ise)
-                            : CodecStateImpl(ise) {
+                    range_codec_impl(InputIterator first, InputIterator last, accumulator_set_type &&ise)
+                            : CodecStateImpl(std::forward<accumulator_set_type>(ise)) {
                         BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<InputIterator>));
 
                         typedef typename std::iterator_traits<InputIterator>::value_type value_type;
@@ -109,7 +110,7 @@ namespace nil {
                         return boost::accumulators::extract_result<accumulator_type>(this->accumulator_set);
                     }
 
-                    inline operator accumulator_set_type() const {
+                    inline operator accumulator_set_type &() const {
                         return this->accumulator_set;
                     }
 
@@ -142,8 +143,8 @@ namespace nil {
                                                        accumulator_type>::type::result_type result_type;
 
                     template<typename SinglePassRange>
-                    itr_codec_impl(const SinglePassRange &range, OutputIterator out, const accumulator_set_type &ise)
-                            : CodecStateImpl(ise), out(std::move(out)) {
+                    itr_codec_impl(const SinglePassRange &range, OutputIterator out, accumulator_set_type &&ise)
+                            : CodecStateImpl(std::forward<accumulator_set_type>(ise)), out(std::move(out)) {
                         BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange>));
 
                         typedef typename std::iterator_traits<
@@ -160,8 +161,8 @@ namespace nil {
 
                     template<typename InputIterator>
                     itr_codec_impl(InputIterator first, InputIterator last, OutputIterator out,
-                                   const accumulator_set_type &ise)
-                            : CodecStateImpl(ise), out(std::move(out)) {
+                                   accumulator_set_type &&ise)
+                            : CodecStateImpl(std::forward<accumulator_set_type>(ise)), out(std::move(out)) {
                         BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<InputIterator>));
 
                         typedef typename std::iterator_traits<InputIterator>::value_type value_type;
@@ -180,6 +181,10 @@ namespace nil {
                                 this->accumulator_set);
 
                         return std::move(result.cbegin(), result.cend(), out);
+                    }
+
+                    inline operator accumulator_set_type &() const {
+                        return this->accumulator_set;
                     }
                 };
             }
