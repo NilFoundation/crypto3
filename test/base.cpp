@@ -218,7 +218,7 @@ BOOST_AUTO_TEST_SUITE(base32_codec_test_suite)
         BOOST_CHECK_EQUAL(array_element.first, std::string(res.begin(), res.end()));
     }
 
-    
+
 BOOST_AUTO_TEST_SUITE_END()
 
 //BOOST_AUTO_TEST_SUITE(base58_codec_test_suite)

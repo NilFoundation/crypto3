@@ -253,10 +253,18 @@ namespace nil {
                 public:
                     typedef typename boost::uint_t<CHAR_BIT>::exact byte_type;
 
-                    constexpr static const std::size_t decoded_block_bits = 0;
+                    constexpr static const std::size_t decoded_value_bits = CHAR_BIT;
+                    typedef byte_type decoded_value_type;
+
+                    constexpr static const std::size_t encoded_value_bits = CHAR_BIT;
+                    typedef byte_type encoded_value_type;
+
+                    constexpr static const std::size_t decoded_block_values = 1;
+                    constexpr static const std::size_t decoded_block_bits = decoded_block_values * decoded_value_bits;
                     typedef std::vector<byte_type> decoded_block_type;
 
-                    constexpr static const std::size_t encoded_block_bits = 0;
+                    constexpr static const std::size_t encoded_block_values = 1;
+                    constexpr static const std::size_t encoded_block_bits = encoded_block_values * encoded_value_bits;
                     typedef std::vector<byte_type> encoded_block_type;
 
                     constexpr static const std::size_t constants_size = 64;

@@ -49,8 +49,7 @@ namespace nil {
                     constexpr static const std::size_t output_value_bits = mode_type::output_value_bits;
                     typedef typename output_block_type::value_type output_value_type;
 
-                    typedef boost::container::static_vector<input_value_type,
-                                                            std::tuple_size<input_block_type>::value> cache_type;
+                    typedef boost::container::static_vector<input_value_type, input_block_values> cache_type;
 
                 public:
                     typedef codec::digest<output_block_bits> result_type;
