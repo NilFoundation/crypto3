@@ -204,20 +204,21 @@ BOOST_AUTO_TEST_SUITE(base32_codec_test_suite)
         BOOST_REQUIRE_THROW(decode<base32>(array_element), base_decode_error<32>);
     }
 
-    BOOST_DATA_TEST_CASE(base32_iterator_accumulator_encode, boost::unit_test::data::make(base32_valid_data),
-            array_element) {
+    BOOST_DATA_TEST_CASE(base32_accumulator_encode, boost::unit_test::data::make(base32_valid_data), array_element) {
         typedef typename base<32>::stream_encoder_type codec_mode;
         typedef codec_accumulator<codec_mode> accumulator_type;
 
         accumulator_type acc;
-        encode<base<32>>(array_element.second.begin(), array_element.second.begin() + array_element.second.size() / 2,
-                acc);
-        encode<base<32>>(array_element.second.begin() + array_element.second.size() / 2, array_element.second.end(),
-                acc);
+
+        for (const auto &c : array_element.second) {
+            acc(c);
+        }
+
         auto res = accumulators::extract::codec<codec_mode>(acc);
         BOOST_CHECK_EQUAL(array_element.first, std::string(res.begin(), res.end()));
     }
 
+    
 BOOST_AUTO_TEST_SUITE_END()
 
 //BOOST_AUTO_TEST_SUITE(base58_codec_test_suite)
