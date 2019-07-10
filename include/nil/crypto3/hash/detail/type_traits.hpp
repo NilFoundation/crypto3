@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2019 Nil Foundation
+// Copyright (c) 2018-2019 Nil Foundation AG
 // Copyright (c) 2018-2019 Mikhail Komarov <nemo@nilfoundation.org>
 //
 // Distributed under the Boost Software License, Version 1.0
@@ -7,31 +7,90 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_TYPE_TRAITS_HPP
-#define CRYPTO3_TYPE_TRAITS_HPP
+#ifndef CRYPTO3_HASH_TYPE_TRAITS_HPP
+#define CRYPTO3_HASH_TYPE_TRAITS_HPP
 
-#include <type_traits>
 #include <iterator>
+#include <type_traits>
 
 namespace nil {
     namespace crypto3 {
         namespace hash {
             namespace detail {
                 template<typename T>
-                class is_stream_hash {
-                    typedef char yes;
-                    typedef long no;
+                struct is_iterator {
+                    static char test(...);
+
+                    template<typename U,
+                             typename=typename std::iterator_traits<U>::difference_type,
+                             typename=typename std::iterator_traits<U>::pointer,
+                             typename=typename std::iterator_traits<U>::reference,
+                             typename=typename std::iterator_traits<U>::value_type,
+                             typename=typename std::iterator_traits<U>::iterator_category>
+                    static long test(U &&);
+
+                    constexpr static bool value = std::is_same<decltype(test(std::declval<T>())), long>::value;
+                };
+
+                template<typename T>
+                struct has_const_iterator {
+                private:
+                    typedef char one;
+                    typedef struct {
+                        char array[2];
+                    } two;
 
                     template<typename C>
-                    static yes check(typename C::digest_type *);
+                    static one test(typename C::const_iterator *);
 
                     template<typename C>
-                    static no check(...);
+                    static two test(...);
 
                 public:
-                    enum {
-                        value = sizeof(check<T>(0)) == sizeof(yes)
+                    static const bool value = sizeof(test<T>(0)) == sizeof(one);
+                    typedef T type;
+                };
+
+                template<typename T>
+                struct has_begin_end {
+                    struct Dummy {
+                        typedef void const_iterator;
                     };
+                    typedef typename std::conditional<has_const_iterator<T>::value, T, Dummy>::type TType;
+                    typedef typename TType::const_iterator iter;
+
+                    struct Fallback {
+                        iter begin() const;
+
+                        iter end() const;
+                    };
+
+                    struct Derived : TType, Fallback {
+                    };
+
+                    template<typename C, C>
+                    struct ChT;
+
+                    template<typename C>
+                    static char (&f(ChT<iter (Fallback::*)() const, &C::begin> *))[1];
+
+                    template<typename C>
+                    static char (&f(...))[2];
+
+                    template<typename C>
+                    static char (&g(ChT<iter (Fallback::*)() const, &C::end> *))[1];
+
+                    template<typename C>
+                    static char (&g(...))[2];
+
+                    static bool const beg_value = sizeof(f<Derived>(0)) == 2;
+                    static bool const end_value = sizeof(g<Derived>(0)) == 2;
+                };
+
+                template<typename T>
+                struct is_container {
+                    static const bool value =
+                            has_const_iterator<T>::value && has_begin_end<T>::beg_value && has_begin_end<T>::end_value;
                 };
             }
         }

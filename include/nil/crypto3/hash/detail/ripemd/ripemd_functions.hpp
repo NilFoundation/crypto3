@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2019 Nil Foundation
+// Copyright (c) 2018-2019 Nil Foundation AG
 // Copyright (c) 2018-2019 Mikhail Komarov <nemo@nilfoundation.org>
 //
 // Distributed under the Boost Software License, Version 1.0
@@ -22,38 +22,38 @@ namespace nil {
                     typedef typename basic_functions<WordBits>::word_type word_type;
 
                     struct f1 {
-                        word_type operator()(word_type x, word_type y, word_type z) const {
+                        inline word_type operator()(word_type x, word_type y, word_type z) const {
                             return x ^ y ^ z;
                         }
                     };
 
                     struct f2 {
-                        word_type operator()(word_type x, word_type y, word_type z) const {
+                        inline word_type operator()(word_type x, word_type y, word_type z) const {
                             return (x & y) | (~x & z);
                         }
                     };
 
                     struct f3 {
-                        word_type operator()(word_type x, word_type y, word_type z) const {
+                        inline word_type operator()(word_type x, word_type y, word_type z) const {
                             return (x | ~y) ^ z;
                         }
                     };
 
                     struct f4 {
-                        word_type operator()(word_type x, word_type y, word_type z) const {
+                        inline word_type operator()(word_type x, word_type y, word_type z) const {
                             return (x & z) | (y & ~z);
                         }
                     };
 
                     struct f5 {
-                        word_type operator()(word_type x, word_type y, word_type z) const {
+                        inline word_type operator()(word_type x, word_type y, word_type z) const {
                             return x ^ (y | ~z);
                         }
                     };
 
                     template<class F>
-                    static void transform(word_type &a, word_type &b, word_type &c, word_type &d, word_type x,
-                                          word_type k, word_type s) {
+                    inline static void transform(word_type &a, word_type &b, word_type &c, word_type &d, word_type x,
+                                                 word_type k, word_type s) {
                         word_type T = basic_functions<WordBits>::rotl(a + F()(b, c, d) + x + k, s);
                         a = d;
                         d = c;
@@ -62,8 +62,8 @@ namespace nil {
                     }
 
                     template<typename Functor>
-                    static void transform(word_type &a, word_type &b, word_type &c, word_type &d, word_type &e,
-                                          word_type x, word_type k, word_type s) {
+                    inline static void transform(word_type &a, word_type &b, word_type &c, word_type &d, word_type &e,
+                                                 word_type x, word_type k, word_type s) {
                         word_type T = basic_functions<WordBits>::rotl(a + Functor()(b, c, d) + x + k, s) + e;
                         a = e;
                         e = d;

@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2019 Nil Foundation
+// Copyright (c) 2018-2019 Nil Foundation AG
 // Copyright (c) 2018-2019 Mikhail Komarov <nemo@nilfoundation.org>
 //
 // Distributed under the Boost Software License, Version 1.0
@@ -9,8 +9,6 @@
 
 #ifndef CRYPTO3_GOST_3411_H_
 #define CRYPTO3_GOST_3411_H_
-
-#include <nil/crypto3/hash/hash.hpp>
 
 #include <nil/crypto3/hash/detail/gost_3411_policy.hpp>
 

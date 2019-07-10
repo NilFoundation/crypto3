@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2019 Nil Foundation
+// Copyright (c) 2018-2019 Nil Foundation AG
 // Copyright (c) 2018-2019 Mikhail Komarov <nemo@nilfoundation.org>
 //
 // Distributed under the Boost Software License, Version 1.0
@@ -11,6 +11,8 @@
 #define CRYPTO3_HASH_ADLER_HPP
 
 #include <array>
+
+#include <nil/crypto3/hash/detail/adler/accumulator.hpp>
 
 #include <nil/crypto3/hash/detail/primes.hpp>
 #include <nil/crypto3/hash/detail/static_digest.hpp>
@@ -25,53 +27,126 @@
 namespace nil {
     namespace crypto3 {
         namespace hash {
-            template<std::size_t Bits>
-            class basic_adler {
+            template<typename Hash, typename StateAccumulator, typename Params>
+            class adler_stream_processor {
+            protected:
+                typedef Hash construction_type;
+                typedef StateAccumulator accumulator_type;
+                typedef Params params_type;
+
+                typedef typename boost::uint_t<CHAR_BIT> byte_type;
+
+                constexpr static const std::size_t word_bits = construction_type::word_bits;
+                typedef typename construction_type::word_type word_type;
+
+                constexpr static const std::size_t block_bits = construction_type::block_bits;
+                constexpr static const std::size_t block_words = construction_type::block_words;
+                typedef typename construction_type::block_type block_type;
+
+                typedef typename params_type::endian endian_type;
             public:
+                constexpr static const std::size_t value_bits = params_type::value_bits;
+                typedef typename boost::uint_t<value_bits>::least value_type;
+
+                typedef typename construction_type::digest_type digest_type;
+
+                adler_stream_processor(accumulator_type &a) : acc(a) {
+                }
+
+            protected:
+
+                inline adler_stream_processor &update_one(value_type value) {
+                    acc(value);
+                    return *this;
+                }
+
+                template<typename InputIterator>
+                inline adler_stream_processor &update_n(InputIterator p, size_t n) {
+                    acc(p, n);
+                    return *this;
+                }
+
+            public:
+                template<typename InputIterator>
+                inline adler_stream_processor &operator()(InputIterator b, InputIterator e,
+                                                          std::random_access_iterator_tag) {
+                    return update_n(b, e - b);
+                }
+
+                template<typename InputIterator, typename Category>
+                inline adler_stream_processor &operator()(InputIterator first, InputIterator last, Category) {
+                    while (first != last) {
+                        update_one(*first++);
+                    }
+                    return *this;
+                }
+
+                template<typename InputIterator>
+                inline adler_stream_processor &operator()(InputIterator b, InputIterator e) {
+                    typedef typename std::iterator_traits<InputIterator>::iterator_category cat;
+                    return operator()(b, e, cat());
+                }
+
+                template<typename ContainerT>
+                inline adler_stream_processor &operator()(const ContainerT &c) {
+                    return update_n(c.data(), c.size());
+                }
+
+            protected:
+                accumulator_type &acc;
+            };
+
+            template<std::size_t DigestBits>
+            struct basic_adler {
                 constexpr static const std::size_t value_bits = 8;
                 typedef typename boost::uint_t<value_bits>::least value_type;
 
-                BOOST_STATIC_ASSERT(Bits % 2 == 0);
-                BOOST_STATIC_ASSERT(Bits >= value_bits);
+                BOOST_STATIC_ASSERT(DigestBits % 2 == 0);
+                BOOST_STATIC_ASSERT(DigestBits >= value_bits);
 
-                constexpr static const std::size_t digest_bits = Bits;
+                constexpr static const std::size_t digest_bits = DigestBits;
                 typedef hash::static_digest<digest_bits> digest_type;
 
-                constexpr static const std::size_t word_bits = Bits;
+                constexpr static const std::size_t word_bits = DigestBits;
                 typedef typename boost::uint_t<word_bits>::least word_type;
 
-                typedef std::array<word_type, 2> state_type;
+                constexpr static const std::size_t state_words = 2;
+                constexpr static const std::size_t state_bits = word_bits * state_words;
+                typedef std::array<word_type, state_words> state_type;
 
-                static word_type const modulo = detail::largest_prime<Bits / 2>::value;
+                constexpr static const std::size_t block_bits = state_bits;
+                constexpr static const std::size_t block_words = state_words;
+                typedef state_type block_type;
 
-            public:
+                constexpr static const word_type modulo = detail::largest_prime<DigestBits / 2>::value;
+
                 basic_adler() {
                     reset();
                 }
 
-                void reset() {
+                inline void reset() {
                     state_[0] = 0;
                     state_[1] = 1;
                 }
 
-                digest_type digest() const {
-                    word_type x = (state_[0] << (Bits / 2)) | state_[1];
+                inline digest_type digest() const {
+                    word_type x = (state_[0] << (DigestBits / 2)) | state_[1];
                     digest_type d;
                     // RFC 1950, Section 2.2 stores the ADLER-32 in big-endian
                     pack_n<stream_endian::big_bit, digest_bits, octet_bits>(&x, 1, d.data(), digest_bits / octet_bits);
                     return d;
                 }
 
-                digest_type end_message() {
+                inline digest_type end_message() {
                     digest_type d(std::move(digest()));
                     reset();
                     return d;
                 }
 
-            public:
+            protected:
 
-                basic_adler &update_one(value_type x) {
-                    if (Bits < 16) {
+                inline basic_adler &update_one(value_type x) {
+                    if (DigestBits < 16) {
                         x %= modulo;
                     } // avoid overflow
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
@@ -86,7 +161,7 @@ namespace nil {
                 }
 
                 template<typename InputIterator>
-                basic_adler &update_n(InputIterator p, size_t n) {
+                inline basic_adler &update_n(InputIterator p, size_t n) {
 #ifndef CRYPTO3_HASH_NO_OPTIMIZATION
 
                     unsigned const fast_word_bits = (word_bits < 16 ? 16 : word_bits);
@@ -178,13 +253,19 @@ Bits    Limit
                     return *this;
                 }
 
+            public:
+
+                inline basic_adler &operator()(value_type v) {
+                    return update_one(v);
+                }
+
                 template<typename InputIterator>
-                basic_adler &update(InputIterator b, InputIterator e, std::random_access_iterator_tag) {
+                inline basic_adler &operator()(InputIterator b, InputIterator e, std::random_access_iterator_tag) {
                     return update_n(b, e - b);
                 }
 
                 template<typename InputIterator, typename Category>
-                basic_adler &update(InputIterator b, InputIterator e, Category) {
+                inline basic_adler &operator()(InputIterator b, InputIterator e, Category) {
                     while (b != e) {
                         update_one(*b++);
                     }
@@ -192,41 +273,43 @@ Bits    Limit
                 }
 
                 template<typename InputIterator>
-                basic_adler &update(InputIterator b, InputIterator e) {
+                inline basic_adler &operator()(InputIterator b, InputIterator e) {
                     typedef typename std::iterator_traits<InputIterator>::iterator_category cat;
-                    return update(b, e, cat());
+                    return operator()(b, e, cat());
                 }
 
-            private:
+            protected:
                 state_type state_;
             };
 
             /*!
              * @brief Adler. Non-cryptographically secure checksum. Adler32
              * checksum is used in the zlib format. 32 bit output.
+             *
              * @ingroup hash
-             * @tparam Bit
+             * @tparam DigestBits
              * s
              */
-            template<unsigned Bits>
+            template<std::size_t DigestBits>
             struct adler {
-            private:
-                typedef basic_adler<Bits> octet_hash_type;
-            public:
-                template<std::size_t ValueBits>
-                struct stream_processor {
-                    BOOST_STATIC_ASSERT(ValueBits == 8);
-                    typedef octet_hash_type type_;
-#ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES
-                    typedef type_ type;
-#else
-                    struct type : type_ {
-                    };
-#endif
-                };
-                typedef typename octet_hash_type::digest_type digest_type;
-            };
+                typedef basic_adler<DigestBits> construction_type;
 
+                template<typename StateAccumulator, std::size_t ValueBits>
+                struct stream_processor {
+                    struct params_type {
+                        typedef typename stream_endian::big_bit endian;
+
+                        constexpr static const std::size_t digest_bits = DigestBits;
+                        constexpr static const std::size_t value_bits = ValueBits;
+                    };
+
+                    BOOST_STATIC_ASSERT(ValueBits == CHAR_BIT);
+                    typedef adler_stream_processor<construction_type, StateAccumulator, params_type> type;
+                };
+
+                constexpr static const std::size_t digest_bits = DigestBits;
+                typedef typename construction_type::digest_type digest_type;
+            };
         }
     }
 } // namespace nil

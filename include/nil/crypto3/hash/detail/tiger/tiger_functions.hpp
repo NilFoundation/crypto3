@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2019 Nil Foundation
+// Copyright (c) 2018-2019 Nil Foundation AG
 // Copyright (c) 2018-2019 Mikhail Komarov <nemo@nilfoundation.org>
 //
 // Distributed under the Boost Software License, Version 1.0
@@ -51,59 +51,91 @@ namespace nil {
 
                     inline static void pass(word_type &A, word_type &B, word_type &C, block_type &X, byte_type mul) {
                         C ^= X[0];
-                        A -= policy_type::sbox1[get_byte(7, C)] ^ policy_type::sbox2[get_byte(5, C)] ^
-                             policy_type::sbox3[get_byte(3, C)] ^ policy_type::sbox4[get_byte(1, C)];
-                        B += policy_type::sbox1[get_byte(0, C)] ^ policy_type::sbox2[get_byte(2, C)] ^
-                             policy_type::sbox3[get_byte(4, C)] ^ policy_type::sbox4[get_byte(6, C)];
+                        A -= policy_type::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(C, 7)] ^
+                             policy_type::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(C, 5)] ^
+                             policy_type::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(C, 3)] ^
+                             policy_type::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(C, 1)];
+                        B += policy_type::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(C, 0)] ^
+                             policy_type::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(C, 2)] ^
+                             policy_type::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(C, 4)] ^
+                             policy_type::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(C, 6)];
                         B *= mul;
 
                         A ^= X[1];
-                        B -= policy_type::sbox1[get_byte(7, A)] ^ policy_type::sbox2[get_byte(5, A)] ^
-                             policy_type::sbox3[get_byte(3, A)] ^ policy_type::sbox4[get_byte(1, A)];
-                        C += policy_type::sbox1[get_byte(0, A)] ^ policy_type::sbox2[get_byte(2, A)] ^
-                             policy_type::sbox3[get_byte(4, A)] ^ policy_type::sbox4[get_byte(6, A)];
+                        B -= policy_type::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(A, 7)] ^
+                             policy_type::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(A, 5)] ^
+                             policy_type::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(A, 3)] ^
+                             policy_type::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(A, 1)];
+                        C += policy_type::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(A, 0)] ^
+                             policy_type::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(A, 2)] ^
+                             policy_type::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(A, 4)] ^
+                             policy_type::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(A, 6)];
                         C *= mul;
 
                         B ^= X[2];
-                        C -= policy_type::sbox1[get_byte(7, B)] ^ policy_type::sbox2[get_byte(5, B)] ^
-                             policy_type::sbox3[get_byte(3, B)] ^ policy_type::sbox4[get_byte(1, B)];
-                        A += policy_type::sbox1[get_byte(0, B)] ^ policy_type::sbox2[get_byte(2, B)] ^
-                             policy_type::sbox3[get_byte(4, B)] ^ policy_type::sbox4[get_byte(6, B)];
+                        C -= policy_type::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(B, 7)] ^
+                             policy_type::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(B, 5)] ^
+                             policy_type::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(B, 3)] ^
+                             policy_type::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(B, 1)];
+                        A += policy_type::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(B, 0)] ^
+                             policy_type::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(B, 2)] ^
+                             policy_type::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(B, 4)] ^
+                             policy_type::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(B, 6)];
                         A *= mul;
 
                         C ^= X[3];
-                        A -= policy_type::sbox1[get_byte(7, C)] ^ policy_type::sbox2[get_byte(5, C)] ^
-                             policy_type::sbox3[get_byte(3, C)] ^ policy_type::sbox4[get_byte(1, C)];
-                        B += policy_type::sbox1[get_byte(0, C)] ^ policy_type::sbox2[get_byte(2, C)] ^
-                             policy_type::sbox3[get_byte(4, C)] ^ policy_type::sbox4[get_byte(6, C)];
+                        A -= policy_type::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(C, 7)] ^
+                             policy_type::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(C, 5)] ^
+                             policy_type::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(C, 3)] ^
+                             policy_type::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(C, 1)];
+                        B += policy_type::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(C, 0)] ^
+                             policy_type::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(C, 2)] ^
+                             policy_type::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(C, 4)] ^
+                             policy_type::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(C, 6)];
                         B *= mul;
 
                         A ^= X[4];
-                        B -= policy_type::sbox1[get_byte(7, A)] ^ policy_type::sbox2[get_byte(5, A)] ^
-                             policy_type::sbox3[get_byte(3, A)] ^ policy_type::sbox4[get_byte(1, A)];
-                        C += policy_type::sbox1[get_byte(0, A)] ^ policy_type::sbox2[get_byte(2, A)] ^
-                             policy_type::sbox3[get_byte(4, A)] ^ policy_type::sbox4[get_byte(6, A)];
+                        B -= policy_type::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(A, 7)] ^
+                             policy_type::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(A, 5)] ^
+                             policy_type::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(A, 3)] ^
+                             policy_type::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(A, 1)];
+                        C += policy_type::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(A, 0)] ^
+                             policy_type::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(A, 2)] ^
+                             policy_type::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(A, 4)] ^
+                             policy_type::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(A, 6)];
                         C *= mul;
 
                         B ^= X[5];
-                        C -= policy_type::sbox1[get_byte(7, B)] ^ policy_type::sbox2[get_byte(5, B)] ^
-                             policy_type::sbox3[get_byte(3, B)] ^ policy_type::sbox4[get_byte(1, B)];
-                        A += policy_type::sbox1[get_byte(0, B)] ^ policy_type::sbox2[get_byte(2, B)] ^
-                             policy_type::sbox3[get_byte(4, B)] ^ policy_type::sbox4[get_byte(6, B)];
+                        C -= policy_type::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(B, 7)] ^
+                             policy_type::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(B, 5)] ^
+                             policy_type::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(B, 3)] ^
+                             policy_type::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(B, 1)];
+                        A += policy_type::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(B, 0)] ^
+                             policy_type::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(B, 2)] ^
+                             policy_type::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(B, 4)] ^
+                             policy_type::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(B, 6)];
                         A *= mul;
 
                         C ^= X[6];
-                        A -= policy_type::sbox1[get_byte(7, C)] ^ policy_type::sbox2[get_byte(5, C)] ^
-                             policy_type::sbox3[get_byte(3, C)] ^ policy_type::sbox4[get_byte(1, C)];
-                        B += policy_type::sbox1[get_byte(0, C)] ^ policy_type::sbox2[get_byte(2, C)] ^
-                             policy_type::sbox3[get_byte(4, C)] ^ policy_type::sbox4[get_byte(6, C)];
+                        A -= policy_type::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(C, 7)] ^
+                             policy_type::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(C, 5)] ^
+                             policy_type::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(C, 3)] ^
+                             policy_type::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(C, 1)];
+                        B += policy_type::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(C, 0)] ^
+                             policy_type::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(C, 2)] ^
+                             policy_type::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(C, 4)] ^
+                             policy_type::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(C, 6)];
                         B *= mul;
 
                         A ^= X[7];
-                        B -= policy_type::sbox1[get_byte(7, A)] ^ policy_type::sbox2[get_byte(5, A)] ^
-                             policy_type::sbox3[get_byte(3, A)] ^ policy_type::sbox4[get_byte(1, A)];
-                        C += policy_type::sbox1[get_byte(0, A)] ^ policy_type::sbox2[get_byte(2, A)] ^
-                             policy_type::sbox3[get_byte(4, A)] ^ policy_type::sbox4[get_byte(6, A)];
+                        B -= policy_type::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(A, 7)] ^
+                             policy_type::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(A, 5)] ^
+                             policy_type::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(A, 3)] ^
+                             policy_type::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(A, 1)];
+                        C += policy_type::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(A, 0)] ^
+                             policy_type::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(A, 2)] ^
+                             policy_type::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(A, 4)] ^
+                             policy_type::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(A, 6)];
                         C *= mul;
                     }
                 };

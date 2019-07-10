@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2019 Nil Foundation
+// Copyright (c) 2018-2019 Nil Foundation AG
 // Copyright (c) 2018-2019 Mikhail Komarov <nemo@nilfoundation.org>
 //
 // Distributed under the Boost Software License, Version 1.0
@@ -61,9 +61,8 @@ namespace nil {
                 constexpr static const std::size_t block_words = compressor_functor::block_words;
                 typedef typename compressor_functor::block_type block_type;
 
-            public:
                 template<typename Integer>
-                haifa_construction &update(const block_type &block, Integer seen, Integer finalization = 0) {
+                haifa_construction &operator()(const block_type &block, Integer seen, Integer finalization = 0) {
                     compressor_functor()(state_, block, seen, finalization);
                     return *this;
                 }
@@ -85,7 +84,6 @@ namespace nil {
                     return d;
                 }
 
-            public:
                 haifa_construction() {
                     reset();
                 }

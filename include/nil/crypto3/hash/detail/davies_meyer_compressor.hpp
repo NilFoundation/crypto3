@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2019 Nil Foundation
+// Copyright (c) 2018-2019 Nil Foundation AG
 // Copyright (c) 2018-2019 Mikhail Komarov <nemo@nilfoundation.org>
 //
 // Distributed under the Boost Software License, Version 1.0
@@ -27,7 +27,6 @@ namespace nil {
              */
             template<typename BlockCipher, typename CombineFunction>
             struct davies_meyer_compressor {
-            public:
                 typedef BlockCipher block_cipher_type;
 
                 constexpr static const std::size_t word_bits = block_cipher_type::word_bits;
@@ -41,13 +40,12 @@ namespace nil {
                 constexpr static const std::size_t block_words = block_cipher_type::key_words;
                 typedef typename block_cipher_type::key_type block_type;
 
-            public:
-                void operator()(state_type &state, const block_type &block) {
+                inline void operator()(state_type &state, const block_type &block) {
                     process_block(state, block);
                 }
 
-            private:
-                static void process_block(state_type &state, const block_type &block) {
+            protected:
+                inline static void process_block(state_type &state, const block_type &block) {
                     block_cipher_type cipher(block);
                     state_type new_state = cipher.encrypt((const state_type &) state);
                     CombineFunction f;

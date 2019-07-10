@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2019 Nil Foundation
+// Copyright (c) 2018-2019 Nil Foundation AG
 // Copyright (c) 2018-2019 Mikhail Komarov <nemo@nilfoundation.org>
 //
 // Distributed under the Boost Software License, Version 1.0
@@ -12,7 +12,7 @@
 
 #include <nil/crypto3/hash/detail/cubehash_policy.hpp>
 #include <nil/crypto3/hash/detail/merkle_damgard_construction.hpp>
-#include <nil/crypto3/hash/detail/merkle_damgard_state_preprocessor.hpp>
+#include <nil/crypto3/hash/detail/merkle_damgard_stream_processor.hpp>
 
 // Submission to NIST for SHA-3 is CubeHash16/32
 // http://cubehash.cr.yp.to/submission/tweak.pdf
@@ -29,7 +29,6 @@ namespace nil {
 
             template<unsigned r, unsigned b, unsigned h>
             struct cubehash_compressor {
-            public:
                 typedef detail::cubehash_policy<r, b, h> policy_type;
 
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
@@ -43,12 +42,12 @@ namespace nil {
                 constexpr static const std::size_t block_words = policy_type::block_words;
                 typedef typename policy_type::block_type block_type;
 
-                void operator()(state_type &state, block_type const &block) {
+                inline void operator()(state_type &state, block_type const &block) {
                     process_block(state, block);
                 }
 
             protected:
-                static void process_block(state_type &state, const block_type &block) {
+                inline static void process_block(state_type &state, const block_type &block) {
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
                     printf("Xoring the following block to the state:\n");
                     for (unsigned i = 0; i < block.size(); ++i) {
@@ -68,7 +67,7 @@ namespace nil {
                 typedef detail::cubehash_policy<r, b, h> policy_type;
                 typedef typename policy_type::state_type state_type;
 
-                void operator()(state_type &state) const {
+                inline void operator()(state_type &state) const {
                     state[31] ^= 1;
                     policy_type::transform_10r(state);
                 }
@@ -99,29 +98,30 @@ namespace nil {
             public:
                 typedef merkle_damgard_construction<stream_endian::little_octet_big_bit, policy_type::digest_bits,
                                                     typename policy_type::iv_generator, cubehash_compressor<r, b, h>,
-                                                    cubehash_finalizer<r, b, h> > block_hash_type_;
+                                                    cubehash_finalizer<r, b, h> > construction_type_;
 #ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES
-                typedef block_hash_type_ block_hash_type;
+                typedef construction_type_ construction_type;
 #else
-                struct block_hash_type : block_hash_type_ {
+                struct construction_type : construction_type_ {
                 };
 #endif
-                template<std::size_t ValueBits>
+                template<typename StateAccumulator, std::size_t ValueBits>
                 struct stream_processor {
-                    typedef merkle_damgard_state_preprocessor<stream_endian::little_octet_big_bit, ValueBits,
-                                                              0, // No length padding!
-                                                              block_hash_type> type_;
-#ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES
-                    typedef type_ type;
-#else
-                    struct type : type_ {
+                    struct params_type {
+                        typedef typename stream_endian::little_octet_big_bit endian;
+
+                        constexpr static const std::size_t value_bits = ValueBits;
+                        constexpr static const std::size_t length_bits = 0; // No length padding
                     };
-#endif
+
+                    typedef merkle_damgard_stream_processor<construction_type, StateAccumulator, params_type> type;
                 };
-                typedef typename block_hash_type::digest_type digest_type;
+
+                constexpr static const std::size_t digest_bits = policy_type::digest_bits;
+                typedef typename construction_type::digest_type digest_type;
             };
 
-            template<unsigned h>
+            template<std::size_t h>
             struct cubehash<h, 0, 0> : cubehash<CRYPTO3_HASH_CUBEHASH_DEFAULT_R, CRYPTO3_HASH_CUBEHASH_DEFAULT_B, h> {
             };
 

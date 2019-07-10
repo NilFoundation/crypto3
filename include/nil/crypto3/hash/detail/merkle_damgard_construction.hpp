@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2019 Nil Foundation
+// Copyright (c) 2018-2019 Nil Foundation AG
 // Copyright (c) 2018-2019 Mikhail Komarov <nemo@nilfoundation.org>
 //
 // Distributed under the Boost Software License, Version 1.0
@@ -17,6 +17,11 @@
 namespace nil {
     namespace crypto3 {
         namespace hash {
+            template<typename Params>
+            struct merkle_damgard_finalizer {
+
+            };
+
             /*!
              * @brief
              * @tparam DigestEndian
@@ -33,8 +38,10 @@ namespace nil {
              *
              * @note http://www.merkle.com/papers/Thesis1979.pdf
              */
-            template<typename DigestEndian, int DigestBits, typename IV, typename Compressor,
-                    typename Finalizer = nop_finalizer>
+            template<typename DigestEndian, int DigestBits,
+                     typename IV,
+                     typename Compressor,
+                     typename Finalizer = nop_finalizer>
             class merkle_damgard_construction {
             public:
                 typedef hash::static_digest<DigestBits> digest_type;
@@ -54,30 +61,26 @@ namespace nil {
                 constexpr static const std::size_t block_words = compressor_functor::block_words;
                 typedef typename compressor_functor::block_type block_type;
 
-            public:
-                merkle_damgard_construction &update(const block_type &block) {
+                merkle_damgard_construction &operator()(const block_type &block) {
                     compressor_functor()(state_, block);
                     return *this;
                 }
 
-                template<typename DigestType = digest_type>
-                DigestType end_message() {
-                    DigestType d = digest();
+                digest_type end_message() {
+                    digest_type d = digest();
                     reset();
                     return d;
                 }
 
-                template<typename DigestType = digest_type>
-                DigestType digest() {
+                digest_type digest() {
                     finalizer_functor finalizer;
                     finalizer(state_);
-                    DigestType d;
+                    digest_type d;
                     pack_n<DigestEndian, word_bits, octet_bits>(state_.data(), DigestBits / word_bits, d.data(),
                             DigestBits / octet_bits);
                     return d;
                 }
 
-            public:
                 merkle_damgard_construction() {
                     reset();
                 }

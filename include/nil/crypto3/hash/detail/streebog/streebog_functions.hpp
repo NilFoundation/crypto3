@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2019 Nil Foundation
+// Copyright (c) 2018-2019 Nil Foundation AG
 // Copyright (c) 2018-2019 Mikhail Komarov <nemo@nilfoundation.org>
 //
 // Distributed under the Boost Software License, Version 1.0
@@ -10,6 +10,8 @@
 #ifndef CRYPTO3_STREEBOG_FUNCTIONS_HPP
 #define CRYPTO3_STREEBOG_FUNCTIONS_HPP
 
+#include <boost/endian/arithmetic.hpp>
+
 #include <nil/crypto3/hash/detail/streebog/basic_streebog_policy.hpp>
 
 namespace nil {
@@ -19,6 +21,8 @@ namespace nil {
                 template<std::size_t DigestBits>
                 struct streebog_functions : public basic_streebog_policy<DigestBits> {
                     typedef basic_streebog_policy<DigestBits> policy_type;
+
+                    typedef typename policy_type::byte_type byte_type;
 
                     constexpr static const std::size_t word_bits = policy_type::word_bits;
                     typedef typename policy_type::word_type word_type;
@@ -33,9 +37,9 @@ namespace nil {
 
                     inline static void addm(const uint8_t *m, word_type *h) {
                         word_type carry = 0;
-                        for (int i = 0; i < 8; i++) {
-                            const word_type m64 = load_le<word_type>(m, i);
-                            const word_type hi = load_le<word_type>(reinterpret_cast<uint8_t *>(h), i);
+                        for (int i = 0; i < block_words; i++) {
+                            const word_type m64 = boost::endian::native_to_little(m[i]);
+                            const word_type hi = boost::endian::native_to_little(reinterpret_cast<uint8_t *>(h)[i]);
                             const word_type t = hi + m64;
 
                             const word_type overflow = (t < hi ? 1 : 0) | (t < m64 ? 1 : 0);
@@ -45,27 +49,36 @@ namespace nil {
                     }
 
                     inline static void lps(const block_type &block) {
-                        std::array<typename policy_type::byte_type, block_bits / 512> r;
+                        std::array<byte_type, block_bits / CHAR_BIT> r;
                         pack(block, r);
 
-                        for (int i = 0; i < 8; ++i) {
-                            block[i] = load_le<word_type>(reinterpret_cast<const uint8_t *>
-                            (&policy_type::substitution[0 * policy_type::substitution_words + r[i]]), 0) ^
-                                       load_le<word_type>(reinterpret_cast<const uint8_t *>(&policy_type::substitution[
-                                               1 * policy_type::substitution_words + r[i + 8]]), 0) ^
-                                       load_le<word_type>(reinterpret_cast<const uint8_t *>(&policy_type::substitution[
-                                               2 * policy_type::substitution_words + r[i + 16]]), 0) ^
-                                       load_le<word_type>(reinterpret_cast<const uint8_t *>(&policy_type::substitution[
-                                               3 * policy_type::substitution_words + r[i + 24]]), 0) ^
-                                       load_le<word_type>(reinterpret_cast<const uint8_t *>(&policy_type::substitution[
-                                               4 * policy_type::substitution_words + r[i + 32]]), 0) ^
-                                       load_le<word_type>(reinterpret_cast<const uint8_t *>(&policy_type::substitution[
-                                               5 * policy_type::substitution_words + r[i + 40]]), 0) ^
-                                       load_le<word_type>(reinterpret_cast<const uint8_t *>(&policy_type::substitution[
-                                               6 * policy_type::substitution_words + r[i + 48]]), 0) ^
-                                       load_le<word_type>(reinterpret_cast<const uint8_t *>(&policy_type::substitution[
-                                               7 * policy_type::substitution_words + r[i + 56]]), 0);
+                        for (int i = 0; i < block_words; ++i) {
+                            block[i] = boost::endian::native_to_little(
+                                    &policy_type::substitution[0 * policy_type::substitution_words + r[i + 0 * 8]]) ^
+                                       boost::endian::native_to_little(
+                                               policy_type::substitution[1 * policy_type::substitution_words +
+                                                                         r[i + 1 * 8]]) ^
+                                       boost::endian::native_to_little(
+                                               policy_type::substitution[2 * policy_type::substitution_words +
+                                                                         r[i + 2 * 8]]) ^
+                                       boost::endian::native_to_little(
+                                               policy_type::substitution[3 * policy_type::substitution_words +
+                                                                         r[i + 3 * 8]]) ^
+                                       boost::endian::native_to_little(
+                                               policy_type::substitution[4 * policy_type::substitution_words +
+                                                                         r[i + 4 * 8]]) ^
+                                       boost::endian::native_to_little(
+                                               policy_type::substitution[5 * policy_type::substitution_words +
+                                                                         r[i + 5 * 8]]) ^
+                                       boost::endian::native_to_little(
+                                               policy_type::substitution[6 * policy_type::substitution_words +
+                                                                         r[i + 6 * 8]]) ^
+                                       boost::endian::native_to_little(
+                                               policy_type::substitution[7 * policy_type::substitution_words +
+                                                                         r[i + 7 * 8]]);
                         }
+
+                        r.fill(0);
                     }
 
                     inline static void e(word_type *K, const word_type *m) {
@@ -98,7 +111,7 @@ namespace nil {
                         word_type hN[8];
 
                         // force N to little-endian
-                        store_le(N, reinterpret_cast<uint8_t *>(&N));
+                        boost::endian::native_to_little_inplace(N);
 
                         copy_mem(hN, state, 8);
                         hN[0] ^= N;
@@ -107,7 +120,7 @@ namespace nil {
 
                         e(hN, m64);
 
-                        for (size_t i = 0; i != 8; ++i) {
+                        for (size_t i = 0; i != block_words; ++i) {
                             state[i] ^= hN[i] ^ m64[i];
                         }
                     }

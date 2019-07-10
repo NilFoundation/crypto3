@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2019 Nil Foundation
+// Copyright (c) 2018-2019 Nil Foundation AG
 // Copyright (c) 2018-2019 Mikhail Komarov <nemo@nilfoundation.org>
 //
 // Distributed under the Boost Software License, Version 1.0
@@ -74,39 +74,71 @@ namespace nil {
                         for (size_t j = 0; j != rounds; ++j) {
                             word_type T0, T1, T2, T3, T4, T5, T6, T7;
 
-                            T0 = policy_type::sbox0[get_byte(0, K0)] ^ policy_type::sbox1[get_byte(1, K7)] ^
-                                 policy_type::sbox2[get_byte(2, K6)] ^ policy_type::sbox3[get_byte(3, K5)] ^
-                                 policy_type::sbox4[get_byte(4, K4)] ^ policy_type::sbox5[get_byte(5, K3)] ^
-                                 policy_type::sbox6[get_byte(6, K2)] ^ policy_type::sbox7[get_byte(7, K1)] ^
+                            T0 = policy_type::sbox0[policy_type::template extract_uint_t<CHAR_BIT>(K0, 0)] ^
+                                 policy_type::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(K7, 1)] ^
+                                 policy_type::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(K6, 2)] ^
+                                 policy_type::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(K5, 3)] ^
+                                 policy_type::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(K4, 4)] ^
+                                 policy_type::sbox5[policy_type::template extract_uint_t<CHAR_BIT>(K3, 5)] ^
+                                 policy_type::sbox6[policy_type::template extract_uint_t<CHAR_BIT>(K2, 6)] ^
+                                 policy_type::sbox7[policy_type::template extract_uint_t<CHAR_BIT>(K1, 7)] ^
                                  policy_type::round_constants[j];
-                            T1 = policy_type::sbox0[get_byte(0, K1)] ^ policy_type::sbox1[get_byte(1, K0)] ^
-                                 policy_type::sbox2[get_byte(2, K7)] ^ policy_type::sbox3[get_byte(3, K6)] ^
-                                 policy_type::sbox4[get_byte(4, K5)] ^ policy_type::sbox5[get_byte(5, K4)] ^
-                                 policy_type::sbox6[get_byte(6, K3)] ^ policy_type::sbox7[get_byte(7, K2)];
-                            T2 = policy_type::sbox0[get_byte(0, K2)] ^ policy_type::sbox1[get_byte(1, K1)] ^
-                                 policy_type::sbox2[get_byte(2, K0)] ^ policy_type::sbox3[get_byte(3, K7)] ^
-                                 policy_type::sbox4[get_byte(4, K6)] ^ policy_type::sbox5[get_byte(5, K5)] ^
-                                 policy_type::sbox6[get_byte(6, K4)] ^ policy_type::sbox7[get_byte(7, K3)];
-                            T3 = policy_type::sbox0[get_byte(0, K3)] ^ policy_type::sbox1[get_byte(1, K2)] ^
-                                 policy_type::sbox2[get_byte(2, K1)] ^ policy_type::sbox3[get_byte(3, K0)] ^
-                                 policy_type::sbox4[get_byte(4, K7)] ^ policy_type::sbox5[get_byte(5, K6)] ^
-                                 policy_type::sbox6[get_byte(6, K5)] ^ policy_type::sbox7[get_byte(7, K4)];
-                            T4 = policy_type::sbox0[get_byte(0, K4)] ^ policy_type::sbox1[get_byte(1, K3)] ^
-                                 policy_type::sbox2[get_byte(2, K2)] ^ policy_type::sbox3[get_byte(3, K1)] ^
-                                 policy_type::sbox4[get_byte(4, K0)] ^ policy_type::sbox5[get_byte(5, K7)] ^
-                                 policy_type::sbox6[get_byte(6, K6)] ^ policy_type::sbox7[get_byte(7, K5)];
-                            T5 = policy_type::sbox0[get_byte(0, K5)] ^ policy_type::sbox1[get_byte(1, K4)] ^
-                                 policy_type::sbox2[get_byte(2, K3)] ^ policy_type::sbox3[get_byte(3, K2)] ^
-                                 policy_type::sbox4[get_byte(4, K1)] ^ policy_type::sbox5[get_byte(5, K0)] ^
-                                 policy_type::sbox6[get_byte(6, K7)] ^ policy_type::sbox7[get_byte(7, K6)];
-                            T6 = policy_type::sbox0[get_byte(0, K6)] ^ policy_type::sbox1[get_byte(1, K5)] ^
-                                 policy_type::sbox2[get_byte(2, K4)] ^ policy_type::sbox3[get_byte(3, K3)] ^
-                                 policy_type::sbox4[get_byte(4, K2)] ^ policy_type::sbox5[get_byte(5, K1)] ^
-                                 policy_type::sbox6[get_byte(6, K0)] ^ policy_type::sbox7[get_byte(7, K7)];
-                            T7 = policy_type::sbox0[get_byte(0, K7)] ^ policy_type::sbox1[get_byte(1, K6)] ^
-                                 policy_type::sbox2[get_byte(2, K5)] ^ policy_type::sbox3[get_byte(3, K4)] ^
-                                 policy_type::sbox4[get_byte(4, K3)] ^ policy_type::sbox5[get_byte(5, K2)] ^
-                                 policy_type::sbox6[get_byte(6, K1)] ^ policy_type::sbox7[get_byte(7, K0)];
+                            T1 = policy_type::sbox0[policy_type::template extract_uint_t<CHAR_BIT>(K1, 0)] ^
+                                 policy_type::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(K0, 1)] ^
+                                 policy_type::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(K7, 2)] ^
+                                 policy_type::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(K6, 3)] ^
+                                 policy_type::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(K5, 4)] ^
+                                 policy_type::sbox5[policy_type::template extract_uint_t<CHAR_BIT>(K4, 5)] ^
+                                 policy_type::sbox6[policy_type::template extract_uint_t<CHAR_BIT>(K3, 6)] ^
+                                 policy_type::sbox7[policy_type::template extract_uint_t<CHAR_BIT>(K2, 7)];
+                            T2 = policy_type::sbox0[policy_type::template extract_uint_t<CHAR_BIT>(K2, 0)] ^
+                                 policy_type::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(K1, 1)] ^
+                                 policy_type::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(K0, 2)] ^
+                                 policy_type::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(K7, 3)] ^
+                                 policy_type::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(K6, 4)] ^
+                                 policy_type::sbox5[policy_type::template extract_uint_t<CHAR_BIT>(K5, 5)] ^
+                                 policy_type::sbox6[policy_type::template extract_uint_t<CHAR_BIT>(K4, 6)] ^
+                                 policy_type::sbox7[policy_type::template extract_uint_t<CHAR_BIT>(K3, 7)];
+                            T3 = policy_type::sbox0[policy_type::template extract_uint_t<CHAR_BIT>(K3, 0)] ^
+                                 policy_type::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(K2, 1)] ^
+                                 policy_type::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(K1, 2)] ^
+                                 policy_type::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(K0, 3)] ^
+                                 policy_type::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(K7, 4)] ^
+                                 policy_type::sbox5[policy_type::template extract_uint_t<CHAR_BIT>(K6, 5)] ^
+                                 policy_type::sbox6[policy_type::template extract_uint_t<CHAR_BIT>(K5, 6)] ^
+                                 policy_type::sbox7[policy_type::template extract_uint_t<CHAR_BIT>(K4, 7)];
+                            T4 = policy_type::sbox0[policy_type::template extract_uint_t<CHAR_BIT>(K4, 0)] ^
+                                 policy_type::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(K3, 1)] ^
+                                 policy_type::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(K2, 2)] ^
+                                 policy_type::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(K1, 3)] ^
+                                 policy_type::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(K0, 4)] ^
+                                 policy_type::sbox5[policy_type::template extract_uint_t<CHAR_BIT>(K7, 5)] ^
+                                 policy_type::sbox6[policy_type::template extract_uint_t<CHAR_BIT>(K6, 6)] ^
+                                 policy_type::sbox7[policy_type::template extract_uint_t<CHAR_BIT>(K5, 7)];
+                            T5 = policy_type::sbox0[policy_type::template extract_uint_t<CHAR_BIT>(K5, 0)] ^
+                                 policy_type::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(K4, 1)] ^
+                                 policy_type::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(K3, 2)] ^
+                                 policy_type::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(K2, 3)] ^
+                                 policy_type::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(K1, 4)] ^
+                                 policy_type::sbox5[policy_type::template extract_uint_t<CHAR_BIT>(K0, 5)] ^
+                                 policy_type::sbox6[policy_type::template extract_uint_t<CHAR_BIT>(K7, 6)] ^
+                                 policy_type::sbox7[policy_type::template extract_uint_t<CHAR_BIT>(K6, 7)];
+                            T6 = policy_type::sbox0[policy_type::template extract_uint_t<CHAR_BIT>(K6, 0)] ^
+                                 policy_type::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(K5, 1)] ^
+                                 policy_type::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(K4, 2)] ^
+                                 policy_type::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(K3, 3)] ^
+                                 policy_type::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(K2, 4)] ^
+                                 policy_type::sbox5[policy_type::template extract_uint_t<CHAR_BIT>(K1, 5)] ^
+                                 policy_type::sbox6[policy_type::template extract_uint_t<CHAR_BIT>(K0, 6)] ^
+                                 policy_type::sbox7[policy_type::template extract_uint_t<CHAR_BIT>(K7, 7)];
+                            T7 = policy_type::sbox0[policy_type::template extract_uint_t<CHAR_BIT>(K7, 0)] ^
+                                 policy_type::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(K6, 1)] ^
+                                 policy_type::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(K5, 2)] ^
+                                 policy_type::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(K4, 3)] ^
+                                 policy_type::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(K3, 4)] ^
+                                 policy_type::sbox5[policy_type::template extract_uint_t<CHAR_BIT>(K2, 5)] ^
+                                 policy_type::sbox6[policy_type::template extract_uint_t<CHAR_BIT>(K1, 6)] ^
+                                 policy_type::sbox7[policy_type::template extract_uint_t<CHAR_BIT>(K0, 7)];
 
                             K0 = T0;
                             K1 = T1;
@@ -117,38 +149,70 @@ namespace nil {
                             K6 = T6;
                             K7 = T7;
 
-                            T0 = policy_type::sbox0[get_byte(0, B0)] ^ policy_type::sbox1[get_byte(1, B7)] ^
-                                 policy_type::sbox2[get_byte(2, B6)] ^ policy_type::sbox3[get_byte(3, B5)] ^
-                                 policy_type::sbox4[get_byte(4, B4)] ^ policy_type::sbox5[get_byte(5, B3)] ^
-                                 policy_type::sbox6[get_byte(6, B2)] ^ policy_type::sbox7[get_byte(7, B1)] ^ K0;
-                            T1 = policy_type::sbox0[get_byte(0, B1)] ^ policy_type::sbox1[get_byte(1, B0)] ^
-                                 policy_type::sbox2[get_byte(2, B7)] ^ policy_type::sbox3[get_byte(3, B6)] ^
-                                 policy_type::sbox4[get_byte(4, B5)] ^ policy_type::sbox5[get_byte(5, B4)] ^
-                                 policy_type::sbox6[get_byte(6, B3)] ^ policy_type::sbox7[get_byte(7, B2)] ^ K1;
-                            T2 = policy_type::sbox0[get_byte(0, B2)] ^ policy_type::sbox1[get_byte(1, B1)] ^
-                                 policy_type::sbox2[get_byte(2, B0)] ^ policy_type::sbox3[get_byte(3, B7)] ^
-                                 policy_type::sbox4[get_byte(4, B6)] ^ policy_type::sbox5[get_byte(5, B5)] ^
-                                 policy_type::sbox6[get_byte(6, B4)] ^ policy_type::sbox7[get_byte(7, B3)] ^ K2;
-                            T3 = policy_type::sbox0[get_byte(0, B3)] ^ policy_type::sbox1[get_byte(1, B2)] ^
-                                 policy_type::sbox2[get_byte(2, B1)] ^ policy_type::sbox3[get_byte(3, B0)] ^
-                                 policy_type::sbox4[get_byte(4, B7)] ^ policy_type::sbox5[get_byte(5, B6)] ^
-                                 policy_type::sbox6[get_byte(6, B5)] ^ policy_type::sbox7[get_byte(7, B4)] ^ K3;
-                            T4 = policy_type::sbox0[get_byte(0, B4)] ^ policy_type::sbox1[get_byte(1, B3)] ^
-                                 policy_type::sbox2[get_byte(2, B2)] ^ policy_type::sbox3[get_byte(3, B1)] ^
-                                 policy_type::sbox4[get_byte(4, B0)] ^ policy_type::sbox5[get_byte(5, B7)] ^
-                                 policy_type::sbox6[get_byte(6, B6)] ^ policy_type::sbox7[get_byte(7, B5)] ^ K4;
-                            T5 = policy_type::sbox0[get_byte(0, B5)] ^ policy_type::sbox1[get_byte(1, B4)] ^
-                                 policy_type::sbox2[get_byte(2, B3)] ^ policy_type::sbox3[get_byte(3, B2)] ^
-                                 policy_type::sbox4[get_byte(4, B1)] ^ policy_type::sbox5[get_byte(5, B0)] ^
-                                 policy_type::sbox6[get_byte(6, B7)] ^ policy_type::sbox7[get_byte(7, B6)] ^ K5;
-                            T6 = policy_type::sbox0[get_byte(0, B6)] ^ policy_type::sbox1[get_byte(1, B5)] ^
-                                 policy_type::sbox2[get_byte(2, B4)] ^ policy_type::sbox3[get_byte(3, B3)] ^
-                                 policy_type::sbox4[get_byte(4, B2)] ^ policy_type::sbox5[get_byte(5, B1)] ^
-                                 policy_type::sbox6[get_byte(6, B0)] ^ policy_type::sbox7[get_byte(7, B7)] ^ K6;
-                            T7 = policy_type::sbox0[get_byte(0, B7)] ^ policy_type::sbox1[get_byte(1, B6)] ^
-                                 policy_type::sbox2[get_byte(2, B5)] ^ policy_type::sbox3[get_byte(3, B4)] ^
-                                 policy_type::sbox4[get_byte(4, B3)] ^ policy_type::sbox5[get_byte(5, B2)] ^
-                                 policy_type::sbox6[get_byte(6, B1)] ^ policy_type::sbox7[get_byte(7, B0)] ^ K7;
+                            T0 = policy_type::sbox0[policy_type::template extract_uint_t<CHAR_BIT>(B0, 0)] ^
+                                 policy_type::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(B7, 1)] ^
+                                 policy_type::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(B6, 2)] ^
+                                 policy_type::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(B5, 3)] ^
+                                 policy_type::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(B4, 4)] ^
+                                 policy_type::sbox5[policy_type::template extract_uint_t<CHAR_BIT>(B3, 5)] ^
+                                 policy_type::sbox6[policy_type::template extract_uint_t<CHAR_BIT>(B2, 6)] ^
+                                 policy_type::sbox7[policy_type::template extract_uint_t<CHAR_BIT>(B1, 7)] ^ K0;
+                            T1 = policy_type::sbox0[policy_type::template extract_uint_t<CHAR_BIT>(B1, 0)] ^
+                                 policy_type::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(B0, 1)] ^
+                                 policy_type::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(B7, 2)] ^
+                                 policy_type::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(B6, 3)] ^
+                                 policy_type::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(B5, 4)] ^
+                                 policy_type::sbox5[policy_type::template extract_uint_t<CHAR_BIT>(B4, 5)] ^
+                                 policy_type::sbox6[policy_type::template extract_uint_t<CHAR_BIT>(B3, 6)] ^
+                                 policy_type::sbox7[policy_type::template extract_uint_t<CHAR_BIT>(B2, 7)] ^ K1;
+                            T2 = policy_type::sbox0[policy_type::template extract_uint_t<CHAR_BIT>(B2, 0)] ^
+                                 policy_type::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(B1, 1)] ^
+                                 policy_type::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(B0, 2)] ^
+                                 policy_type::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(B7, 3)] ^
+                                 policy_type::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(B6, 4)] ^
+                                 policy_type::sbox5[policy_type::template extract_uint_t<CHAR_BIT>(B5, 5)] ^
+                                 policy_type::sbox6[policy_type::template extract_uint_t<CHAR_BIT>(B4, 6)] ^
+                                 policy_type::sbox7[policy_type::template extract_uint_t<CHAR_BIT>(B3, 7)] ^ K2;
+                            T3 = policy_type::sbox0[policy_type::template extract_uint_t<CHAR_BIT>(B3, 0)] ^
+                                 policy_type::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(B2, 1)] ^
+                                 policy_type::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(B1, 2)] ^
+                                 policy_type::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(B0, 3)] ^
+                                 policy_type::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(B7, 4)] ^
+                                 policy_type::sbox5[policy_type::template extract_uint_t<CHAR_BIT>(B6, 5)] ^
+                                 policy_type::sbox6[policy_type::template extract_uint_t<CHAR_BIT>(B5, 6)] ^
+                                 policy_type::sbox7[policy_type::template extract_uint_t<CHAR_BIT>(B4, 7)] ^ K3;
+                            T4 = policy_type::sbox0[policy_type::template extract_uint_t<CHAR_BIT>(B4, 0)] ^
+                                 policy_type::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(B3, 1)] ^
+                                 policy_type::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(B2, 2)] ^
+                                 policy_type::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(B1, 3)] ^
+                                 policy_type::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(B0, 4)] ^
+                                 policy_type::sbox5[policy_type::template extract_uint_t<CHAR_BIT>(B7, 5)] ^
+                                 policy_type::sbox6[policy_type::template extract_uint_t<CHAR_BIT>(B6, 6)] ^
+                                 policy_type::sbox7[policy_type::template extract_uint_t<CHAR_BIT>(B5, 7)] ^ K4;
+                            T5 = policy_type::sbox0[policy_type::template extract_uint_t<CHAR_BIT>(B5, 0)] ^
+                                 policy_type::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(B4, 1)] ^
+                                 policy_type::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(B3, 2)] ^
+                                 policy_type::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(B2, 3)] ^
+                                 policy_type::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(B1, 4)] ^
+                                 policy_type::sbox5[policy_type::template extract_uint_t<CHAR_BIT>(B0, 5)] ^
+                                 policy_type::sbox6[policy_type::template extract_uint_t<CHAR_BIT>(B7, 6)] ^
+                                 policy_type::sbox7[policy_type::template extract_uint_t<CHAR_BIT>(B6, 7)] ^ K5;
+                            T6 = policy_type::sbox0[policy_type::template extract_uint_t<CHAR_BIT>(B6, 0)] ^
+                                 policy_type::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(B5, 1)] ^
+                                 policy_type::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(B4, 2)] ^
+                                 policy_type::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(B3, 3)] ^
+                                 policy_type::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(B2, 4)] ^
+                                 policy_type::sbox5[policy_type::template extract_uint_t<CHAR_BIT>(B1, 5)] ^
+                                 policy_type::sbox6[policy_type::template extract_uint_t<CHAR_BIT>(B0, 6)] ^
+                                 policy_type::sbox7[policy_type::template extract_uint_t<CHAR_BIT>(B7, 7)] ^ K6;
+                            T7 = policy_type::sbox0[policy_type::template extract_uint_t<CHAR_BIT>(B7, 0)] ^
+                                 policy_type::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(B6, 1)] ^
+                                 policy_type::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(B5, 2)] ^
+                                 policy_type::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(B4, 3)] ^
+                                 policy_type::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(B3, 4)] ^
+                                 policy_type::sbox5[policy_type::template extract_uint_t<CHAR_BIT>(B2, 5)] ^
+                                 policy_type::sbox6[policy_type::template extract_uint_t<CHAR_BIT>(B1, 6)] ^
+                                 policy_type::sbox7[policy_type::template extract_uint_t<CHAR_BIT>(B0, 7)] ^ K7;
 
                             B0 = T0;
                             B1 = T1;

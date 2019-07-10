@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2019 Nil Foundation
+// Copyright (c) 2018-2019 Nil Foundation AG
 // Copyright (c) 2018-2019 Mikhail Komarov <nemo@nilfoundation.org>
 //
 // Distributed under the Boost Software License, Version 1.0
@@ -48,10 +48,11 @@
 #define BF 1, 1, 1, 1
 
 using namespace nil::crypto3::hash;
+using namespace nil::crypto3::accumulators;
 
 class fixture {
 public:
-    sha1::block_hash_type a;
+    sha1::construction_type a;
 };
 
 namespace std {
@@ -82,19 +83,20 @@ BOOST_TEST_DONT_PRINT_LOG_VALUE(sha::digest_type)
 namespace boost {
     namespace test_tools {
         namespace tt_detail {
-            template <typename T, typename U>
+            template<typename T, typename U>
             struct print_log_value<std::pair<T, U>> {
-                void operator()(::std::ostream & os, std::pair<T, U> const & p ) {
+                void operator()(::std::ostream &os, std::pair<T, U> const &p) {
                 }
             };
         } // namespace tt_detail
     } // namespace test_tools
 }
 
-static const std::unordered_map<std::vector<bool>, std::pair<std::size_t, std::string>> bool_string_data = {{{1, 0, 0, 1, 1}, {5, "29826b003b906e660eff4027ce98af3531ac75ba"}},
-                                                                                                         {{1,0,0,1,1,0,1,0, 0,1,1,1,1,1,0,1, 1,1,1,1,1,1,0,1, 1,1,1,1,0,0,0,1, 1,1,1,0,1,1,0,0, 1,1,1,0,1,0,1,0, 1,1,0,1,0,0,0,0, 0,1,1,0,1,1,1,0, 1,1,0,1,0,1,1,0, 0,1,0,0,0,1,1,0, 1,0,1,0,1,0,1,0, 0,1,0,1,0,1,0,1, 1,1,1,1,1,1,1,0, 0,1,1,1,0,1,0,1, 0,1,1,1,0,0,0,1,0,1,0,0,0,1,1,0}, {128, "82abff6605dbe1c17def12a394fa22a82b544a35"}},
-                                                                                                         {{B4, B9, BB, B2, BA, BE, BC, B2, B5, B9, B4, BB, BB, BE, B3, BA, B3, BB, B1, B1, B7, B5, B4, B2, BD, B9, B4, BA, BC, B8, B8}, {123,                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         "6239781e03729919c01955b3ffa8acb60b988340"}},
-                                                                                                {{B6, B5, BF, B9, B3, B2, B9, B9, B5, BB, BA, B4, BC, BE, B2, BC, BB, B1, BB, B4, BA, B2, BE, B7, B1, BA, BE, B7, B0, B2, B2, B0, BA, BA, BC, BE, BC, B8, B9, B6, B2, BD, BD, B4, B4, B9, B9, BC, BB, BD, B7, BC, B8, B8, B7, BA, B9, B4, BE, BA, BA, BA, B1, B0, B1, BE, BA, B5, BA, BA, BB, BC, B5, B2, B9, BB, B4, BE, B7, BE, B4, B3, B6, B6, B5, BA, B5, BA, BF, B2, BC, BD, B0, B3, BF, BE, B6, B7, B8, BE, BA, B6, BA, B5, B0, B0, B5, BB, BB, BA, B3, BB, B0, B8, B2, B2, B0, B4, BC, B2, B8, BB, B9, B1, B0, B9, BF, B4, B6, B9, BD, BA, BC, B9, B2, BA, BA, BA, BB, B3, BA, BA, B7, BC, B1, B1, BA, B1, BB, B3, B2, BA, BE}, {611, "8c5b2a5ddae5a97fc7f9d85661c672adbf7933d4"}}};
+static const std::unordered_map<std::vector<bool>, std::pair<std::size_t,
+                                                             std::string>> bool_string_data = {{{1, 0, 0, 1, 1},                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      {5,   "29826b003b906e660eff4027ce98af3531ac75ba"}},
+                                                                                               {{1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 1, 0},                                                                                                                                                                                                                                     {128, "82abff6605dbe1c17def12a394fa22a82b544a35"}},
+                                                                                               {{B4, B9, BB, B2, BA, BE, BC, B2, B5, B9, B4, BB, BB, BE, B3, BA, B3, BB, B1, B1, B7, B5, B4, B2, BD, B9, B4, BA, BC, B8, B8},                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         {123, "6239781e03729919c01955b3ffa8acb60b988340"}},
+                                                                                               {{B6, B5, BF, B9, B3, B2, B9, B9, B5, BB, BA, B4, BC, BE, B2, BC, BB, B1, BB, B4, BA, B2, BE, B7, B1, BA, BE, B7, B0, B2, B2, B0, BA, BA, BC, BE, BC, B8, B9, B6, B2, BD, BD, B4, B4, B9, B9, BC, BB, BD, B7, BC, B8, B8, B7, BA, B9, B4, BE, BA, BA, BA, B1, B0, B1, BE, BA, B5, BA, BA, BB, BC, B5, B2, B9, BB, B4, BE, B7, BE, B4, B3, B6, B6, B5, BA, B5, BA, BF, B2, BC, BD, B0, B3, BF, BE, B6, B7, B8, BE, BA, B6, BA, B5, B0, B0, B5, BB, BB, BA, B3, BB, B0, B8, B2, B2, B0, B4, BC, B2, B8, BB, B9, B1, B0, B9, BF, B4, B6, B9, BD, BA, BC, B9, B2, BA, BA, BA, BB, B3, BA, BA, B7, BC, B1, B1, BA, B1, BB, B3, B2, BA, BE}, {611, "8c5b2a5ddae5a97fc7f9d85661c672adbf7933d4"}}};
 
 static const std::unordered_map<std::pair<std::vector<std::uint32_t>, std::size_t>,
                                 std::string> integer_string_data = {{{{0x9a7dfdf1, 0xecead06e, 0xd646aa55, 0xfe757146},                                                                                                                                                                                                                                                                                                                                                                                                                                                             128},  "82abff6605dbe1c17def12a394fa22a82b544a35"},
@@ -114,7 +116,7 @@ BOOST_AUTO_TEST_SUITE(sha_test_suite)
 
     BOOST_AUTO_TEST_CASE(sha_collision) {
         // Reported 2004-08-12 by Joux, Carribault, Lemuet, and Jalby
-        typedef sha::block_hash_type::word_type word_type;
+        typedef sha::construction_type::word_type word_type;
         constexpr const std::array<word_type, 64> fic1 = {
                 0xa766a602, 0xb65cffe7, 0x73bcf258, 0x26b322b3, 0xd01b1a97, 0x2684ef53, 0x3e3b4b7f, 0x53fe3762,
                 0x24c08e47, 0xe959b2bc, 0x3b519880, 0xb9286568, 0x247d110f, 0x70f5c5e2, 0xb4590ca3, 0xf55f52fe,
@@ -158,14 +160,16 @@ BOOST_AUTO_TEST_SUITE(sha_test_suite)
     }
 
     BOOST_AUTO_TEST_CASE(sha1_subbbyte1) {
-        sha1::stream_processor<1>::type h;
+        hash_accumulator<sha1> acc;
+        sha1::stream_processor<hash_accumulator<sha1>, 1>::type h(acc);
         sha1::digest_type d = h.end_message();
         BOOST_CHECK_EQUAL("da39a3ee5e6b4b0d3255bfef95601890afd80709", std::to_string(d).data());
     }
 
     BOOST_AUTO_TEST_CASE(sha1_subbyte2) {
         // echo -n "abc" | sha1sum
-        sha1::stream_processor<4>::type h;
+        hash_accumulator<sha1> acc;
+        sha1::stream_processor<hash_accumulator<sha1>, 4>::type h(acc);
         h.update_one(0x6).update_one(0x1).update_one(0x6).update_one(0x2).update_one(0x6).update_one(0x3);
         sha1::digest_type d = h.end_message();
         BOOST_CHECK_EQUAL("a9993e364706816aba3e25717850c26c9cd0d89d", std::to_string(d).data());
@@ -205,7 +209,8 @@ BOOST_AUTO_TEST_SUITE(sha_test_suite)
     }
 
     BOOST_DATA_TEST_CASE(sha1_accumulator_hash, boost::unit_test::data::make(integer_string_data), array_element) {
-        sha1::stream_processor<4>::type h;
+        hash_accumulator<sha1> acc;
+        sha1::stream_processor<hash_accumulator<sha1>, 4>::type h(acc);
 
         for (unsigned i = 0; i < array_element.first.second; i += 4) {
             h.update_one((array_element.first.first[i / 32] >> (32 - 4 - i % 32)) % 0x10);
@@ -237,8 +242,8 @@ BOOST_AUTO_TEST_SUITE(sha_test_suite)
         // A single 1 bit after the (empty) message,
         // then pad with 0s,
         // then add the length, which is also 0
-        sha1::block_hash_type::block_type m = {{0x80000000u}};
-        a.update(m);
+        sha1::construction_type::block_type m = {{0x80000000u}};
+        a(m);
 
         sha1::digest_type s = a.end_message();
 
@@ -253,10 +258,10 @@ BOOST_AUTO_TEST_SUITE(sha_test_suite)
 
     BOOST_FIXTURE_TEST_CASE(sha1_accumulator_hash3, fixture) {
         // Example from appendix A.1: echo -n "abc" | sha1sum
-        sha1::block_hash_type::block_type m = {{}};
+        sha1::construction_type::block_type m = {{}};
         m[0] = 0x61626380;
         m[15] = 0x00000018;
-        a.update(m);
+        a(m);
 
         sha1::digest_type s = a.end_message();
 
@@ -272,14 +277,14 @@ BOOST_AUTO_TEST_SUITE(sha_test_suite)
     BOOST_FIXTURE_TEST_CASE(sha1_accumulator_hash4, fixture) {
         // Example from appendix A.2:
         // echo -n "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq" | sha1sum
-        sha1::block_hash_type::block_type m1 = {{0x61626364, 0x62636465, 0x63646566, 0x64656667, 0x65666768, 0x66676869, 0x6768696a, 0x68696a6b, 0x696a6b6c, 0x6a6b6c6d, 0x6b6c6d6e, 0x6c6d6e6f, 0x6d6e6f70, 0x6e6f7071, 0x80000000, 0x00000000,}};
-        a.update(m1);
+        sha1::construction_type::block_type m1 = {{0x61626364, 0x62636465, 0x63646566, 0x64656667, 0x65666768, 0x66676869, 0x6768696a, 0x68696a6b, 0x696a6b6c, 0x6a6b6c6d, 0x6b6c6d6e, 0x6c6d6e6f, 0x6d6e6f70, 0x6e6f7071, 0x80000000, 0x00000000,}};
+        a(m1);
 
         BOOST_CHECK_EQUAL("f4286818c37b27ae0408f581846771484a566572", std::to_string(a.digest()).data());
 
-        sha1::block_hash_type::block_type m2 = {{}};
+        sha1::construction_type::block_type m2 = {{}};
         m2[15] = 0x000001c0;
-        a.update(m2);
+        a(m2);
 
         sha1::digest_type s = a.end_message();
 
@@ -293,7 +298,8 @@ BOOST_AUTO_TEST_SUITE(sha_test_suite)
     }
 
     BOOST_AUTO_TEST_CASE(sha1_preprocessor1) {
-        sha1::stream_processor<8>::type h;
+        hash_accumulator<sha1> acc;
+        sha1::stream_processor<hash_accumulator<sha1>, 8>::type h(acc);
         sha1::digest_type s = h.end_message();
 
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
@@ -305,7 +311,8 @@ BOOST_AUTO_TEST_SUITE(sha_test_suite)
 
     BOOST_AUTO_TEST_CASE(sha1_preprocessor2) {
         // Example from Appendix A.1
-        sha1::stream_processor<8>::type h;
+        hash_accumulator<sha1> acc;
+        sha1::stream_processor<hash_accumulator<sha1>, 8>::type h(acc);
         h.update_one('a').update_one('b').update_one('c');
         sha1::digest_type s = h.end_message();
 
@@ -318,11 +325,11 @@ BOOST_AUTO_TEST_SUITE(sha_test_suite)
 
     BOOST_AUTO_TEST_CASE(sha1_preprocessor3) {
         // Example from Appendix A.3
-        sha1::stream_processor<8>::type h;
+        hash_accumulator<sha1> acc;
         for (unsigned i = 0; i < 1000000; ++i) {
-            h.update_one('a');
+            acc('a');
         }
-        sha1::digest_type s = h.end_message();
+        sha1::digest_type s = extract::hash<sha1>(acc);
 
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
         std::printf("%s\n", s.cstring().data());

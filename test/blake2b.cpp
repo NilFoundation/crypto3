@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2019 Nil Foundation
+// Copyright (c) 2018-2019 Nil Foundation AG
 // Copyright (c) 2018-2019 Mikhail Komarov <nemo@nilfoundation.org>
 //
 // Distributed under the Boost Software License, Version 1.0
@@ -32,10 +32,10 @@ using namespace nil::crypto3::hash;
 typedef std::unordered_map<std::string, std::string>::value_type string_data_value;
 BOOST_TEST_DONT_PRINT_LOG_VALUE(string_data_value)
 
-BOOST_TEST_DONT_PRINT_LOG_VALUE(blake2b<128>::block_hash_type::digest_type)
-BOOST_TEST_DONT_PRINT_LOG_VALUE(blake2b<160>::block_hash_type::digest_type)
-BOOST_TEST_DONT_PRINT_LOG_VALUE(blake2b<256>::block_hash_type::digest_type)
-BOOST_TEST_DONT_PRINT_LOG_VALUE(blake2b<320>::block_hash_type::digest_type)
+BOOST_TEST_DONT_PRINT_LOG_VALUE(blake2b<128>::construction_type::digest_type)
+BOOST_TEST_DONT_PRINT_LOG_VALUE(blake2b<160>::construction_type::digest_type)
+BOOST_TEST_DONT_PRINT_LOG_VALUE(blake2b<256>::construction_type::digest_type)
+BOOST_TEST_DONT_PRINT_LOG_VALUE(blake2b<320>::construction_type::digest_type)
 
 BOOST_AUTO_TEST_SUITE(blake2b_test_suite)
 

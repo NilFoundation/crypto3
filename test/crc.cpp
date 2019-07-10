@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2019 Nil Foundation
+// Copyright (c) 2018-2019 Nil Foundation AG
 // Copyright (c) 2018-2019 Mikhail Komarov <nemo@nilfoundation.org>
 //
 // Distributed under the Boost Software License, Version 1.0
@@ -26,6 +26,7 @@
 #include <unordered_map>
 
 using namespace nil::crypto3::hash;
+using namespace nil::crypto3::accumulators;
 using nil::crypto3::hash::detail::largest_prime;
 
 typedef std::vector<uint8_t> byte_vector_t;
@@ -75,33 +76,32 @@ BOOST_AUTO_TEST_SUITE(crc_hash_test_suite)
     }
 
     BOOST_AUTO_TEST_CASE(crc_stateful_hash1) {
-
-        crc32_png::stream_processor<8>::type sh;
+        hash_accumulator<crc32_png> acc;
         for (unsigned i = 0; i < 1000000; ++i) {
-            sh.update_one('a');
+            acc('a');
         }
-        crc32_png::digest_type d = sh.end_message();
+        crc32_png::digest_type d = extract::hash<crc32_png>(acc);
         std::cout << d << "\n";
         BOOST_CHECK_EQUAL(d, "dc25bfbc");
     }
 
     BOOST_AUTO_TEST_CASE(crc_stateful_hash2) {
-        crc32_png::stream_processor<8>::type sh;
+        hash_accumulator<crc32_png> acc;
         std::string s(1000, 'a');
         for (unsigned i = 0; i < 1000000; ++i) {
-            sh.update_n(s.data(), s.size());
+            hash<crc32_png>(s, acc);
         }
-        crc32_png::digest_type d = sh.end_message();
+        crc32_png::digest_type d = extract::hash<crc32_png>(acc);
         std::cout << d << "\n";
         BOOST_CHECK_EQUAL(d, "a7943e77");
     }
 
     BOOST_AUTO_TEST_CASE(crc_stateful_hash3) {
-        crc32_png::stream_processor<8>::type sh;
+        hash_accumulator<crc32_png> acc;
         for (unsigned i = 0; i < 1000000000; ++i) {
-            sh.update_one('a');
+            acc('a');
         }
-        crc32_png::digest_type d = sh.end_message();
+        crc32_png::digest_type d = extract::hash<crc32_png>(acc);
         std::cout << d << "\n";
         BOOST_CHECK_EQUAL(d, "a7943e77");
     }

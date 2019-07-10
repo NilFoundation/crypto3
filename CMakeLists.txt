@@ -7,7 +7,7 @@ if(NOT ${CMAKE_WORKSPACE_NAME} STREQUAL crypto3)
     cm_workspace(crypto3)
 endif()
 
-cm_project(hash WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME})
+cm_project(hash WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME} LANGUAGES C CXX)
 
 cm_find_package(CM)
 include(CMDeploy)
@@ -18,19 +18,16 @@ if(NOT Boost_FOUND)
 endif()
 
 cm_find_package(${CMAKE_WORKSPACE_NAME}_block)
-cm_find_package(${CMAKE_WORKSPACE_NAME}_utilities)
 
 list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
      include/nil/crypto3/hash/algorithm/hash.hpp
-
-     include/nil/crypto3/hash/detail/type_traits.hpp
 
      include/nil/crypto3/hash/adaptor/hashed.hpp
      )
 
 option(CRYPTO3_HASH_BLAKE2B "Build with Blake2 hash support" TRUE)
-option(CRYPTO3_HASH_CHECKSUM_ADLER32 "Build with Adler32 hash checksum support" TRUE)
-option(CRYPTO3_HASH_CHECKSUM_CRC "Build with CRC hash checksum support" TRUE)
+option(CRYPTO3_HASH_CHECKSUM_ADLER "Build with Adler checksum support" TRUE)
+option(CRYPTO3_HASH_CHECKSUM_CRC "Build with CRC checksum support" TRUE)
 option(CRYPTO3_HASH_CUBEHSAH "Build with Cubehash hash support" TRUE)
 option(CRYPTO3_HASH_COMB4P "Build with Comb4p hash support" TRUE)
 option(CRYPTO3_HASH_GOST_34_11 "Build with GOST.34.11 hash support" TRUE)
@@ -64,12 +61,12 @@ if(CRYPTO3_HASH_BLAKE2B)
          )
 endif()
 
-if(CRYPTO3_HASH_CHECKSUM_ADLER32)
+if(CRYPTO3_HASH_CHECKSUM_ADLER)
     list(APPEND ${CURRENT_PROJECT_NAME}_ADLER32_HEADERS
          include/nil/crypto3/hash/adler.hpp
          )
 
-    add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_ADLER32)
+    add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_ADLER)
     list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
          ${${CURRENT_PROJECT_NAME}_ADLER32_HEADERS}
          )
@@ -299,34 +296,27 @@ list(APPEND ${CURRENT_PROJECT_NAME}_HEADERS
      ${${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS}
      )
 
-cm_setup_version(VERSION 0.3.0 PREFIX ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME})
+cm_setup_version(VERSION 0.1.0 PREFIX ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME})
 
-add_library(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
-            ${${CURRENT_PROJECT_NAME}_HEADERS}
-            ${${CURRENT_PROJECT_NAME}_SOURCES})
-set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES LINKER_LANGUAGE CXX EXPORT_NAME
-                      ${CURRENT_PROJECT_NAME} CXX_STANDARD 14)
+add_library(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE)
+set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES
+                      EXPORT_NAME ${CURRENT_PROJECT_NAME})
 
-target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PUBLIC
+target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
                       ${CMAKE_WORKSPACE_NAME}::block
-                      ${CMAKE_WORKSPACE_NAME}::utilities
-
-                      concept_container
 
                       ${Boost_LIBRARIES})
 
-target_include_directories(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PRIVATE
+target_include_directories(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
                            "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
                            "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>"
 
                            ${Boost_INCLUDE_DIR})
 
-cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INCLUDE include NAMESPACE ${CMAKE_WORKSPACE_NAME}::)
+cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
+          INCLUDE include
+          NAMESPACE ${CMAKE_WORKSPACE_NAME}::)
 
-if(APPLE OR NOT ${CMAKE_TARGET_ARCHITECTURE} STREQUAL ${CMAKE_HOST_SYSTEM_PROCESSOR})
-    set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES
-                          XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "${APPLE_CODE_SIGN_IDENTITY}"
-                          XCODE_ATTRIBUTE_DEVELOPMENT_TEAM "${CMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM}")
+if(BUILD_UNIT_TESTS)
+    add_subdirectory(test)
 endif()
-
-add_subdirectory(test)
