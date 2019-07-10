@@ -110,10 +110,6 @@ namespace nil {
                         return boost::accumulators::extract_result<accumulator_type>(this->accumulator_set);
                     }
 
-                    inline operator accumulator_set_type() const {
-                        return this->accumulator_set;
-                    }
-
                     inline operator accumulator_set_type &() const {
                         return this->accumulator_set;
                     }
@@ -177,10 +173,6 @@ namespace nil {
 
 
                         stream_processor(this->accumulator_set)(first, last);
-                    }
-
-                    inline operator accumulator_set_type() const {
-                        return this->accumulator_set;
                     }
 
                     inline operator accumulator_set_type &() const {
