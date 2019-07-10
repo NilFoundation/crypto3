@@ -162,6 +162,20 @@ namespace nil {
                         const AccumulatorSet &acc) {
                     return boost::accumulators::extract_result<tag::codec<Mode> >(acc);
                 }
+
+                template<typename Codec, typename AccumulatorSet>
+                typename boost::mpl::apply<AccumulatorSet,
+                                           tag::codec<typename Codec::stream_encoder_type> >::type::result_type encode(
+                        const AccumulatorSet &acc) {
+                    return boost::accumulators::extract_result<tag::codec<typename Codec::stream_encoder_type> >(acc);
+                }
+
+                template<typename Codec, typename AccumulatorSet>
+                typename boost::mpl::apply<AccumulatorSet,
+                                           tag::codec<typename Codec::stream_decoder_type> >::type::result_type decode(
+                        const AccumulatorSet &acc) {
+                    return boost::accumulators::extract_result<tag::codec<typename Codec::stream_decoder_type> >(acc);
+                }
             }
         }
     }
