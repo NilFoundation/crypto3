@@ -29,6 +29,7 @@
 #include <cstring>
 
 using namespace nil::crypto3::hash;
+using namespace nil::crypto3::accumulators;
 
 typedef std::vector<uint8_t> byte_vector_t;
 BOOST_TEST_DONT_PRINT_LOG_VALUE(byte_vector_t)
@@ -81,7 +82,7 @@ BOOST_AUTO_TEST_SUITE(md5_test_suite)
         // then add the length, which is also 0.
         // Remember that MD5 is little-octet, big-bit endian
         md5::construction_type::block_type m = {{0x00000080u}};
-        a.update(m);
+        a(m);
         md5::construction_type::digest_type s = a.end_message();
 
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
@@ -99,7 +100,7 @@ BOOST_AUTO_TEST_SUITE(md5_test_suite)
         m[0] = 0x80636261;
         // little-octet, big-bit endian also means the size isn't in the last word
         m[14] = 0x00000018;
-        a.update(m);
+        a(m);
         md5::construction_type::digest_type s = a.end_message();
 
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
@@ -112,8 +113,8 @@ BOOST_AUTO_TEST_SUITE(md5_test_suite)
     }
 
     BOOST_AUTO_TEST_CASE(md5_preprocessor1) {
-        md5::stream_processor<8>::type h;
-        md5::construction_type::digest_type s = h.end_message();
+        hash_accumulator<md5> acc;
+        md5::construction_type::digest_type s = extract::hash<md5>(acc);
 
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
         std::printf("%s\n", std::to_string(s));
@@ -123,10 +124,12 @@ BOOST_AUTO_TEST_SUITE(md5_test_suite)
     }
 
     BOOST_AUTO_TEST_CASE(md5_preprocessor2) {
-        md5::stream_processor<8>::type h;
-        h.update_one('a').update_one('b').update_one('c');
+        hash_accumulator<md5> acc;
+        acc('a');
+        acc('b');
+        acc('c');
 
-        md5::construction_type::digest_type s = h.end_message();
+        md5::construction_type::digest_type s = extract::hash<md5>(acc);
 
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
         std::printf("%s\n", std::to_string(s));
@@ -137,11 +140,11 @@ BOOST_AUTO_TEST_SUITE(md5_test_suite)
 
     BOOST_AUTO_TEST_CASE(md5_preprocessor3) {
         // perl -e 'for (1..1000000) { print "a"; }' | md5sum
-        md5::stream_processor<8>::type h;
+        hash_accumulator<md5> acc;
         for (unsigned i = 0; i < 1000000; ++i) {
-            h.update_one('a');
+            acc('a');
         }
-        md5::construction_type::digest_type s = h.end_message();
+        md5::construction_type::digest_type s = extract::hash<md5>(acc);
 
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
         std::printf("%s\n", std::to_string(s));

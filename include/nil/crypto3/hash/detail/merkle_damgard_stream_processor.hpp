@@ -33,7 +33,7 @@ namespace nil {
              * @tparam Params
              */
             template<typename Hash, typename StateAccumulator, typename Params>
-            class merkle_damgard_state_preprocessor {
+            class merkle_damgard_stream_processor {
             protected:
                 typedef Hash construction_type;
                 typedef StateAccumulator accumulator_type;
@@ -109,7 +109,7 @@ namespace nil {
 
             public:
 
-                merkle_damgard_state_preprocessor &update_one(value_type value) {
+                merkle_damgard_stream_processor &update_one(value_type value) {
                     std::size_t i = seen % block_bits;
                     std::size_t j = i / value_bits;
                     value_array[j] = value;
@@ -122,7 +122,7 @@ namespace nil {
                 }
 
                 template<typename InputIterator>
-                merkle_damgard_state_preprocessor &update_n(InputIterator p, size_t n) {
+                merkle_damgard_stream_processor &update_n(InputIterator p, size_t n) {
 #ifndef CRYPTO3_HASH_NO_OPTIMIZATION
                     for (; n && (seen % block_bits); --n, ++p) {
                         update_one(*p);
@@ -149,12 +149,13 @@ namespace nil {
                 }
 
                 template<typename InputIterator>
-                inline void operator()(InputIterator b, InputIterator e, std::random_access_iterator_tag) {
+                inline merkle_damgard_stream_processor &operator()(InputIterator b, InputIterator e,
+                                                                   std::random_access_iterator_tag) {
                     return update_n(b, e - b);
                 }
 
                 template<typename InputIterator, typename Category>
-                inline void operator()(InputIterator first, InputIterator last, Category) {
+                inline merkle_damgard_stream_processor &operator()(InputIterator first, InputIterator last, Category) {
                     while (first != last) {
                         update_one(*first++);
                     }
@@ -162,13 +163,13 @@ namespace nil {
                 }
 
                 template<typename InputIterator>
-                inline void operator()(InputIterator b, InputIterator e) {
+                inline merkle_damgard_stream_processor &operator()(InputIterator b, InputIterator e) {
                     typedef typename std::iterator_traits<InputIterator>::iterator_category cat;
                     return operator()(b, e, cat());
                 }
 
                 template<typename ContainerT>
-                inline void operator()(const ContainerT &c) {
+                inline merkle_damgard_stream_processor &operator()(const ContainerT &c) {
                     return update_n(c.data(), c.size());
                 }
 
@@ -205,16 +206,11 @@ namespace nil {
 
                 template<typename DigestType = digest_type>
                 DigestType digest() const {
-                    return merkle_damgard_state_preprocessor(*this).end_message();
+                    return merkle_damgard_stream_processor(*this).end_message();
                 }
 
             public:
-                merkle_damgard_state_preprocessor(accumulator_type &acc) : acc(acc), value_array(), block_hash(),
-                        seen() {
-
-                }
-
-                virtual ~merkle_damgard_state_preprocessor() {
+                merkle_damgard_stream_processor(accumulator_type &acc) : acc(acc), value_array(), block_hash(), seen() {
 
                 }
 

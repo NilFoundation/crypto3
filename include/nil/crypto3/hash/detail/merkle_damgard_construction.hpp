@@ -17,6 +17,11 @@
 namespace nil {
     namespace crypto3 {
         namespace hash {
+            template<typename Params>
+            struct merkle_damgard_finalizer {
+
+            };
+
             /*!
              * @brief
              * @tparam DigestEndian

@@ -7,8 +7,11 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ACCUMULATORS_HASH_HPP
-#define CRYPTO3_ACCUMULATORS_HASH_HPP
+#ifndef CRYPTO3_CRC_ACCUMULATOR_HPP
+#define CRYPTO3_CRC_ACCUMULATOR_HPP
+
+#include <boost/crc.hpp>
+#include <boost/static_assert.hpp>
 
 #include <boost/parameter/value_type.hpp>
 
@@ -24,14 +27,41 @@
 #include <nil/crypto3/hash/detail/make_array.hpp>
 #include <nil/crypto3/hash/detail/static_digest.hpp>
 
+// Boost.CRC undefs this, so re-define it
+#if !(defined(BOOST_NO_DEPENDENT_TYPES_IN_TEMPLATE_VALUE_PARAMETERS) || (defined(BOOST_MSVC) && (BOOST_MSVC <= 1300)))
+#define BOOST_CRC_PARM_TYPE  typename ::boost::uint_t<DigestBits>::fast
+#else
+#define BOOST_CRC_PARM_TYPE  unsigned long
+#endif
+
 namespace nil {
     namespace crypto3 {
+        namespace hash {
+            template<std::size_t DigestBits, BOOST_CRC_PARM_TYPE TruncPoly, BOOST_CRC_PARM_TYPE InitRem, BOOST_CRC_PARM_TYPE FinalXor, bool ReflectIn, bool ReflectRem>
+            class crc;
+
+        }
         namespace accumulators {
             namespace impl {
                 template<typename Hash>
-                struct hash_impl : boost::accumulators::accumulator_base {
+                struct hash_impl;
+
+                /*!
+                 * @brief
+                 * @tparam DigestBits
+                 * @tparam TruncPoly
+                 * @tparam InitRem
+                 * @tparam FinalXor
+                 * @tparam ReflectIn
+                 * @tparam ReflectRem
+                 *
+                 * @note CRC hash-specific accumulator. Be careful.
+                 */
+                template<std::size_t DigestBits, BOOST_CRC_PARM_TYPE TruncPoly, BOOST_CRC_PARM_TYPE InitRem, BOOST_CRC_PARM_TYPE FinalXor, bool ReflectIn, bool ReflectRem>
+                struct hash_impl<hash::crc<DigestBits, TruncPoly, InitRem, FinalXor, ReflectIn, ReflectRem>>
+                        : boost::accumulators::accumulator_base {
                 protected:
-                    typedef Hash hash_type;
+                    typedef hash::crc<DigestBits, TruncPoly, InitRem, FinalXor, ReflectIn, ReflectRem> hash_type;
                     typedef typename hash_type::construction_type construction_type;
 
                     constexpr static const std::size_t word_bits = construction_type::word_bits;
@@ -45,14 +75,12 @@ namespace nil {
                     constexpr static const std::size_t block_words = construction_type::block_words;
                     typedef typename construction_type::block_type block_type;
 
-                    typedef boost::container::static_vector<word_type, block_words> cache_type;
-
                 public:
                     typedef typename hash_type::digest_type result_type;
 
-                    template<typename Args>
                     // The constructor takes an argument pack.
-                    hash_impl(const Args &args) : seen(0) {
+                    template<typename ArgumentPack>
+                    hash_impl(const ArgumentPack &args) {
                     }
 
                     template<typename ArgumentPack>
@@ -62,15 +90,7 @@ namespace nil {
 
                     template<typename ArgumentPack>
                     inline result_type result(const ArgumentPack &args) const {
-                        construction_type res = construction;
-
-                        if (!cache.empty()) {
-                            block_type ib = {0};
-                            std::move(cache.begin(), cache.end(), ib.begin());
-                            return res(ib).digest();
-                        } else {
-                            return res.digest();
-                        }
+                        return construction.digest();
                     }
 
                 protected:
@@ -91,64 +111,25 @@ namespace nil {
                         }
                     }
 
+                    template<typename InputIterator,
+                             typename = typename std::enable_if<hash::detail::is_iterator<InputIterator>::value>::type>
+                    inline void resolve_type(InputIterator p, std::size_t bits) {
+                        construction(p, p + bits / word_bits);
+                    }
+
                     inline void process(const word_type &value, std::size_t bits) {
-                        if (cache.size() == cache.max_size()) {
-                            block_type ib = {0};
-                            std::move(cache.begin(), cache.end(), ib.begin());
-                            construction(ib);
-
-                            cache.clear();
-                        }
-
-                        cache.push_back(value);
-                        seen += bits;
+                        construction(value);
                     }
 
                     inline void process(const block_type &block, std::size_t bits) {
-                        if (cache.empty()) {
-                            construction(block);
-                        } else {
-                            block_type b = hash::make_array<block_words>(cache.begin(), cache.end());
-                            typename block_type::const_iterator itr = block.begin() + (cache.max_size() - cache.size());
-
-                            std::move(block.begin(), itr, b.end());
-
-                            construction(b);
-
-                            cache.clear();
-                            cache.insert(cache.end(), itr, block.end());
-                        }
-
-                        seen += bits;
+                        construction(std::begin(block), std::end(block));
                     }
 
-                    std::size_t seen;
-                    cache_type cache;
                     construction_type construction;
                 };
-            }
-
-            namespace tag {
-                template<typename Hash>
-                struct hash : boost::accumulators::depends_on<> {
-                    typedef Hash hash_type;
-
-                    /// INTERNAL ONLY
-                    ///
-
-                    typedef boost::mpl::always<accumulators::impl::hash_impl<Hash>> impl;
-                };
-            }
-
-            namespace extract {
-                template<typename Hash, typename AccumulatorSet>
-                typename boost::mpl::apply<AccumulatorSet, tag::hash<Hash> >::type::result_type hash(
-                        const AccumulatorSet &acc) {
-                    return boost::accumulators::extract_result<tag::hash<Hash> >(acc);
-                }
             }
         }
     }
 }
 
-#endif //CRYPTO3_ACCUMULATORS_BLOCK_HPP
+#endif //CRYPTO3_CRC_ACCUMULATOR_HPP

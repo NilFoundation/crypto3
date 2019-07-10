@@ -10,7 +10,7 @@
 #ifndef CRYPTO3_SM3_H_
 #define CRYPTO3_SM3_H_
 
-#include <nil/crypto3/hash/detail/merkle_damgard_state_preprocessor.hpp>
+#include <nil/crypto3/hash/detail/merkle_damgard_stream_processor.hpp>
 #include <nil/crypto3/hash/detail/merkle_damgard_construction.hpp>
 #include <nil/crypto3/hash/detail/state_adder.hpp>
 
@@ -210,7 +210,7 @@ namespace nil {
                         constexpr static const std::size_t length_bits = 0;
                     };
 
-                    typedef merkle_damgard_state_preprocessor<construction_type, StateAccumulator, params_type> type;
+                    typedef merkle_damgard_stream_processor<construction_type, StateAccumulator, params_type> type;
                 };
 
                 constexpr static const std::size_t digest_bits = policy_type::digest_bits;

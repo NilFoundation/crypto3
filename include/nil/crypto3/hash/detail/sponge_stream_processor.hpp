@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_HASH_HAIFA_STATE_PREPROCESSOR_HPP
-#define CRYPTO3_HASH_HAIFA_STATE_PREPROCESSOR_HPP
+#ifndef CRYPTO3_HASH_SPONGE_STREAM_PROCESSOR_HPP
+#define CRYPTO3_HASH_SPONGE_STREAM_PROCESSOR_HPP
 
 #include <array>
 #include <iterator>
@@ -19,29 +19,14 @@
 #include <boost/static_assert.hpp>
 #include <boost/utility/enable_if.hpp>
 
-#include <boost/multiprecision/cpp_int.hpp>
-
 namespace nil {
     namespace crypto3 {
         namespace hash {
-
-            /*!
-             * @brief This will do the usual HAIFA-style strengthening, padding with
-             * a 1 bit, then 0 bits as needed, then, if requested, the length and
-             * the digest bits.
-             *
-             * @tparam Hash
-             * @tparam StateAccumulator
-             * @tparam Params
-             */
             template<typename Hash, typename StateAccumulator, typename Params>
-            class haifa_state_preprocessor {
-            protected:
+            class sponge_stream_processor {
                 typedef Hash construction_type;
                 typedef StateAccumulator accumulator_type;
                 typedef Params params_type;
-
-                typedef typename boost::uint_t<CHAR_BIT> byte_type;
 
                 constexpr static const std::size_t word_bits = construction_type::word_bits;
                 typedef typename construction_type::word_type word_type;
@@ -53,24 +38,17 @@ namespace nil {
             public:
                 typedef typename params_type::endian endian_type;
 
+                typedef typename construction_type::digest_type digest_type;
+
                 constexpr static const std::size_t value_bits = params_type::value_bits;
                 typedef typename boost::uint_t<value_bits>::least value_type;
                 BOOST_STATIC_ASSERT(word_bits % value_bits == 0);
                 constexpr static const std::size_t block_values = block_bits / value_bits;
                 typedef std::array<value_type, block_values> value_array_type;
 
-                typedef typename construction_type::digest_type digest_type;
+            private:
 
-            protected:
-
-                constexpr static const std::size_t digest_length_bits = params_type::digest_length_bits;
-                // FIXME: do something more intelligent than capping at 64
-                constexpr static const std::size_t digest_length_type_bits =
-                        digest_length_bits < word_bits ? word_bits : digest_length_bits > 64 ? 64 : digest_length_bits;
-                typedef typename boost::uint_t<digest_length_type_bits>::least digest_length_type;
-                constexpr static const std::size_t digest_length_words = digest_length_bits / word_bits;
-
-                constexpr static const std::size_t length_bits = params_type::length_bits;
+                constexpr static const std::size_t length_bits = params_type::digest_length_bits;
                 // FIXME: do something more intelligent than capping at 64
                 constexpr static const std::size_t length_type_bits =
                         length_bits < word_bits ? word_bits : length_bits > 64 ? 64 : length_bits;
@@ -81,13 +59,13 @@ namespace nil {
 
                 BOOST_STATIC_ASSERT(!length_bits || value_bits <= length_bits);
 
-                void process_block() {
+                inline void process_block() {
                     // Convert the input into words
                     block_type block;
                     pack<endian_type, value_bits, word_bits>(value_array, block);
 
                     // Process the block
-                    block_hash.update(block, seen);
+                    block_hash.update(block);
 
                     // Reset seen if we don't need to track the length
                     if (!length_bits) {
@@ -110,7 +88,7 @@ namespace nil {
                     }
 
                     // Process the last block
-                    block_hash.update(block, seen, construction_type::salt_value);
+                    block_hash.update(block);
                 }
 
                 template<typename Dummy>
@@ -120,7 +98,7 @@ namespace nil {
 
             public:
 
-                haifa_state_preprocessor &update_one(value_type value) {
+                sponge_stream_processor &update_one(value_type value) {
                     std::size_t i = seen % block_bits;
                     std::size_t j = i / value_bits;
                     value_array[j] = value;
@@ -133,7 +111,7 @@ namespace nil {
                 }
 
                 template<typename InputIterator>
-                haifa_state_preprocessor &update_n(InputIterator p, size_t n) {
+                sponge_stream_processor &update_n(InputIterator p, size_t n) {
 #ifndef CRYPTO3_HASH_NO_OPTIMIZATION
                     for (; n && (seen % block_bits); --n, ++p) {
                         update_one(*p);
@@ -144,7 +122,7 @@ namespace nil {
                         pack_n<endian_type, value_bits, word_bits>(p, block_values, std::begin(block), block_words);
 
                         // Process the block
-                        block_hash.update(block, seen);
+                        block_hash.update(block);
                         seen += block_bits;
 
                         // Reset seen if we don't need to track the length
@@ -160,12 +138,13 @@ namespace nil {
                 }
 
                 template<typename InputIterator>
-                void operator()(InputIterator b, InputIterator e, std::random_access_iterator_tag) {
+                inline sponge_stream_processor &operator()(InputIterator b, InputIterator e,
+                                                           std::random_access_iterator_tag) {
                     return update_n(b, e - b);
                 }
 
                 template<typename InputIterator, typename Category>
-                void operator()(InputIterator first, InputIterator last, Category) {
+                inline sponge_stream_processor &operator()(InputIterator first, InputIterator last, Category) {
                     while (first != last) {
                         update_one(*first++);
                     }
@@ -173,18 +152,17 @@ namespace nil {
                 }
 
                 template<typename InputIterator>
-                void operator()(InputIterator b, InputIterator e) {
+                inline sponge_stream_processor &operator()(InputIterator b, InputIterator e) {
                     typedef typename std::iterator_traits<InputIterator>::iterator_category cat;
-                    return update(b, e, cat());
+                    return operator()(b, e, cat());
                 }
 
                 template<typename ContainerT>
-                void operator()(const ContainerT &c) {
+                inline sponge_stream_processor &operator()(const ContainerT &c) {
                     return update_n(c.data(), c.size());
                 }
 
-                template<typename DigestType = digest_type>
-                DigestType end_message() {
+                digest_type end_message() {
                     length_type length = seen;
 
                     // Add a 1 bit
@@ -214,14 +192,11 @@ namespace nil {
                     return block_hash.end_message();
                 }
 
-                template<typename DigestType = digest_type>
-                DigestType digest() const {
-                    return haifa_state_preprocessor(*this).end_message();
+                digest_type digest() const {
+                    return sponge_stream_processor(*this).end_message();
                 }
 
-            public:
-                haifa_state_preprocessor(accumulator_type &acc)
-                        : acc(acc), value_array(), block_hash(), seen() {
+                sponge_stream_processor(accumulator_type &acc) : acc(acc), value_array(), block_hash(), seen() {
                 }
 
                 void reset() {
@@ -240,4 +215,4 @@ namespace nil {
     }
 } // namespace nil
 
-#endif // CRYPTO3_HASH_STREAM_PROCESSOR_HPP
+#endif

@@ -29,7 +29,7 @@ namespace nil {
 
                     typedef typename accumulator_type::hash_type hash_type;
 
-                    ref_hash_impl(const accumulator_set_type &stream_hash) : accumulator_set(stream_hash) {
+                    ref_hash_impl(accumulator_set_type &&stream_hash) : accumulator_set(stream_hash) {
 
                     }
 
@@ -44,7 +44,8 @@ namespace nil {
 
                     typedef typename accumulator_type::hash_type hash_type;
 
-                    value_hash_impl(const accumulator_set_type &stream_hash) : accumulator_set(stream_hash) {
+                    value_hash_impl(accumulator_set_type &&stream_hash) : accumulator_set(
+                            std::forward<accumulator_set_type>(stream_hash)) {
 
                     }
 
@@ -64,8 +65,8 @@ namespace nil {
                                                        accumulator_type>::type::result_type result_type;
 
                     template<typename SinglePassRange>
-                    range_hash_impl(const SinglePassRange &range, const accumulator_set_type &ise)
-                            : HashStateImpl(ise) {
+                    range_hash_impl(const SinglePassRange &range, accumulator_set_type &&ise)
+                            : HashStateImpl(std::forward<accumulator_set_type>(ise)) {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange>));
 
                         typedef typename std::iterator_traits<
@@ -81,9 +82,9 @@ namespace nil {
                     }
 
                     template<typename InputIterator>
-                    range_hash_impl(InputIterator first, InputIterator last, const accumulator_set_type &ise)
+                    range_hash_impl(InputIterator first, InputIterator last, accumulator_set_type &&ise)
                             :
-                            HashStateImpl(ise) {
+                            HashStateImpl(std::forward<accumulator_set_type>(ise)) {
                         BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<InputIterator>));
 
                         typedef typename std::iterator_traits<InputIterator>::value_type value_type;
@@ -100,7 +101,9 @@ namespace nil {
                     inline operator OutputRange() const {
                         result_type result = boost::accumulators::extract_result<accumulator_type>(
                                 this->accumulator_set);
-                        return OutputRange(result.cbegin(), result.cend());
+                        OutputRange out;
+                        std::move(result.begin(), result.end(), out.end());
+                        return out;
                     }
 
                     inline operator result_type() const {
@@ -111,12 +114,12 @@ namespace nil {
                         return this->accumulator_set;
                     }
 
-#ifndef CRYPTO3_ASCII_STRING_HASH_OUTPUT
+#ifndef CRYPTO3_RAW_HASH_STRING_OUTPUT
 
                     template<typename Char, typename CharTraits, typename Alloc>
                     inline operator std::basic_string<Char, CharTraits, Alloc>() const {
-                        return std::to_string(boost::accumulators::extract_result<accumulator_type>(
-                                this->accumulator_set));
+                        return std::to_string(
+                                boost::accumulators::extract_result<accumulator_type>(this->accumulator_set));
                     }
 
 #endif
@@ -139,8 +142,8 @@ namespace nil {
                                                        accumulator_type>::type::result_type result_type;
 
                     template<typename SinglePassRange>
-                    itr_hash_impl(const SinglePassRange &range, OutputIterator out, const accumulator_set_type &ise)
-                            : HashStateImpl(ise), out(std::move(out)) {
+                    itr_hash_impl(const SinglePassRange &range, OutputIterator out, accumulator_set_type &&ise)
+                            : HashStateImpl(std::forward<accumulator_set_type>(ise)), out(std::move(out)) {
                         BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange>));
 
                         typedef typename std::iterator_traits<
@@ -157,8 +160,8 @@ namespace nil {
 
                     template<typename InputIterator>
                     itr_hash_impl(InputIterator first, InputIterator last, OutputIterator out,
-                                  const accumulator_set_type &ise)
-                            : HashStateImpl(ise), out(std::move(out)) {
+                                  accumulator_set_type &&ise)
+                            : HashStateImpl(std::forward<accumulator_set_type>(ise)), out(std::move(out)) {
                         BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<InputIterator>));
 
                         typedef typename std::iterator_traits<InputIterator>::value_type value_type;

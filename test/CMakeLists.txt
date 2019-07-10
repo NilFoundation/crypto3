@@ -1,7 +1,6 @@
 include(CMTest)
 
 cm_find_package(${CMAKE_WORKSPACE_NAME}_block)
-cm_find_package(${CMAKE_WORKSPACE_NAME}_utilities)
 
 if(NOT Boost_UNIT_TEST_FRAMEWORK_FOUND)
     cm_find_package(Boost REQUIRED COMPONENTS unit_test_framework)
@@ -10,7 +9,6 @@ endif()
 cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
 
                        ${CMAKE_WORKSPACE_NAME}::block
-                       ${CMAKE_WORKSPACE_NAME}::utilities
 
                        ${Boost_LIBRARIES})
 
@@ -34,7 +32,8 @@ macro(define_hash_test name)
     endif()
 endmacro()
 
-set(TESTS_NAMES "adler"
+set(TESTS_NAMES
+    "adler"
     "blake2b"
     "crc"
     "cubehash"

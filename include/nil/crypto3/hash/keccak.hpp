@@ -13,7 +13,7 @@
 #include <string>
 
 #include <nil/crypto3/hash/detail/keccak/keccak_functions.hpp>
-#include <nil/crypto3/hash/detail/sponge_state_preprocessor.hpp>
+#include <nil/crypto3/hash/detail/sponge_stream_processor.hpp>
 #include <nil/crypto3/hash/detail/sponge_construction.hpp>
 
 #include <nil/crypto3/utilities/secmem.hpp>
@@ -50,7 +50,7 @@ namespace nil {
                         constexpr static const std::size_t length_bits = 0; // No length padding
                     };
 
-                    typedef sponge_state_preprocessor<construction_type, StateAccumulator, params_type> type;
+                    typedef sponge_stream_processor<construction_type, StateAccumulator, params_type> type;
                 };
 
                 constexpr static const std::size_t digest_bits = DigestBits;

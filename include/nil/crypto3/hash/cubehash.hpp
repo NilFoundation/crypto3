@@ -12,7 +12,7 @@
 
 #include <nil/crypto3/hash/detail/cubehash_policy.hpp>
 #include <nil/crypto3/hash/detail/merkle_damgard_construction.hpp>
-#include <nil/crypto3/hash/detail/merkle_damgard_state_preprocessor.hpp>
+#include <nil/crypto3/hash/detail/merkle_damgard_stream_processor.hpp>
 
 // Submission to NIST for SHA-3 is CubeHash16/32
 // http://cubehash.cr.yp.to/submission/tweak.pdf
@@ -114,7 +114,7 @@ namespace nil {
                         constexpr static const std::size_t length_bits = 0; // No length padding
                     };
 
-                    typedef merkle_damgard_state_preprocessor<construction_type, StateAccumulator, params_type> type;
+                    typedef merkle_damgard_stream_processor<construction_type, StateAccumulator, params_type> type;
                 };
 
                 constexpr static const std::size_t digest_bits = policy_type::digest_bits;

@@ -135,11 +135,11 @@ BOOST_AUTO_TEST_SUITE(adler_test_suite)
     }
 
     BOOST_AUTO_TEST_CASE(adler_stateful_hash1) {
-        adler<32>::stream_processor<hash_accumulator<adler<32>>, 8>::type sh;
+        hash_accumulator<adler<32>> acc;
         for (unsigned i = 0; i < 1000000; ++i) {
-            sh.update_one('a');
+            acc('a');
         }
-        adler<32>::digest_type d = sh.end_message();
+        adler<32>::digest_type d = extract::hash<adler<32>>(acc);
 
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
         std::cout << d << "\n";
@@ -149,12 +149,12 @@ BOOST_AUTO_TEST_SUITE(adler_test_suite)
     }
 
     BOOST_AUTO_TEST_CASE(adler_stateful_hash2) {
-        adler<32>::stream_processor<hash_accumulator<adler<32>>, 8>::type sh;
+        hash_accumulator<adler<32>> acc;
         std::string s(1000, 'a');
         for (unsigned i = 0; i < 1000000; ++i) {
-            sh.update_n(s.data(), s.size());
+            hash<adler<32>>(s, acc);
         }
-        adler<32>::digest_type d = sh.end_message();
+        adler<32>::digest_type d = extract::hash<adler<32>>(acc);
 
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
         std::cout << d << "\n";
@@ -164,11 +164,11 @@ BOOST_AUTO_TEST_SUITE(adler_test_suite)
     }
 
     BOOST_AUTO_TEST_CASE(adler_stateful_hash3) {
-        adler<32>::stream_processor<hash_accumulator<adler<32>>, 8>::type sh;
+        hash_accumulator<adler<32>> acc;
         for (unsigned i = 0; i < 1000000000; ++i) {
-            sh.update_one('a');
+            acc('a');
         }
-        adler<32>::digest_type d = sh.end_message();
+        adler<32>::digest_type d = extract::hash<adler<32>>(acc);
 
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
         std::cout << d << "\n";

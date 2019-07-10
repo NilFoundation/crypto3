@@ -28,6 +28,7 @@
 #include <unordered_map>
 
 using namespace nil::crypto3::hash;
+using namespace nil::crypto3::accumulators;
 
 typedef std::vector<uint8_t> byte_vector_t;
 BOOST_TEST_DONT_PRINT_LOG_VALUE(byte_vector_t)

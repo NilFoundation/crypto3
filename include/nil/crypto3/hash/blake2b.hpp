@@ -13,7 +13,7 @@
 #include <nil/crypto3/hash/detail/blake2b/blake2b_functions.hpp>
 
 #include <nil/crypto3/hash/detail/haifa_construction.hpp>
-#include <nil/crypto3/hash/detail/haifa_state_preprocessor.hpp>
+#include <nil/crypto3/hash/detail/haifa_stream_processor.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -121,7 +121,7 @@ namespace nil {
                                 typename boost::uint_t<DigestBits>::exact>::digits;
                     };
 
-                    typedef haifa_state_preprocessor<construction_type, StateAccumulator, params_type> type;
+                    typedef haifa_stream_processor<construction_type, StateAccumulator, params_type> type;
                 };
 
                 constexpr static const std::size_t digets_bits = DigestBits;

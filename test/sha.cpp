@@ -48,6 +48,7 @@
 #define BF 1, 1, 1, 1
 
 using namespace nil::crypto3::hash;
+using namespace nil::crypto3::accumulators;
 
 class fixture {
 public:
@@ -159,14 +160,16 @@ BOOST_AUTO_TEST_SUITE(sha_test_suite)
     }
 
     BOOST_AUTO_TEST_CASE(sha1_subbbyte1) {
-        sha1::stream_processor<hash_accumulator<sha1>, 1>::type h;
+        hash_accumulator<sha1> acc;
+        sha1::stream_processor<hash_accumulator<sha1>, 1>::type h(acc);
         sha1::digest_type d = h.end_message();
         BOOST_CHECK_EQUAL("da39a3ee5e6b4b0d3255bfef95601890afd80709", std::to_string(d).data());
     }
 
     BOOST_AUTO_TEST_CASE(sha1_subbyte2) {
         // echo -n "abc" | sha1sum
-        sha1::stream_processor<hash_accumulator<sha1>, 4>::type h;
+        hash_accumulator<sha1> acc;
+        sha1::stream_processor<hash_accumulator<sha1>, 4>::type h(acc);
         h.update_one(0x6).update_one(0x1).update_one(0x6).update_one(0x2).update_one(0x6).update_one(0x3);
         sha1::digest_type d = h.end_message();
         BOOST_CHECK_EQUAL("a9993e364706816aba3e25717850c26c9cd0d89d", std::to_string(d).data());
@@ -206,7 +209,8 @@ BOOST_AUTO_TEST_SUITE(sha_test_suite)
     }
 
     BOOST_DATA_TEST_CASE(sha1_accumulator_hash, boost::unit_test::data::make(integer_string_data), array_element) {
-        sha1::stream_processor<hash_accumulator<sha1>, 4>::type h;
+        hash_accumulator<sha1> acc;
+        sha1::stream_processor<hash_accumulator<sha1>, 4>::type h(acc);
 
         for (unsigned i = 0; i < array_element.first.second; i += 4) {
             h.update_one((array_element.first.first[i / 32] >> (32 - 4 - i % 32)) % 0x10);
@@ -294,7 +298,8 @@ BOOST_AUTO_TEST_SUITE(sha_test_suite)
     }
 
     BOOST_AUTO_TEST_CASE(sha1_preprocessor1) {
-        sha1::stream_processor<hash_accumulator<sha1>, 8>::type h;
+        hash_accumulator<sha1> acc;
+        sha1::stream_processor<hash_accumulator<sha1>, 8>::type h(acc);
         sha1::digest_type s = h.end_message();
 
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
@@ -306,7 +311,8 @@ BOOST_AUTO_TEST_SUITE(sha_test_suite)
 
     BOOST_AUTO_TEST_CASE(sha1_preprocessor2) {
         // Example from Appendix A.1
-        sha1::stream_processor<hash_accumulator<sha1>, 8>::type h;
+        hash_accumulator<sha1> acc;
+        sha1::stream_processor<hash_accumulator<sha1>, 8>::type h(acc);
         h.update_one('a').update_one('b').update_one('c');
         sha1::digest_type s = h.end_message();
 
@@ -319,11 +325,11 @@ BOOST_AUTO_TEST_SUITE(sha_test_suite)
 
     BOOST_AUTO_TEST_CASE(sha1_preprocessor3) {
         // Example from Appendix A.3
-        sha1::stream_processor<hash_accumulator<sha1>, 8>::type h;
+        hash_accumulator<sha1> acc;
         for (unsigned i = 0; i < 1000000; ++i) {
-            h.update_one('a');
+            acc('a');
         }
-        sha1::digest_type s = h.end_message();
+        sha1::digest_type s = extract::hash<sha1>(acc);
 
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
         std::printf("%s\n", s.cstring().data());

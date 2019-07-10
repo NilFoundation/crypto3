@@ -12,6 +12,8 @@
 
 #include <array>
 
+#include <nil/crypto3/hash/detail/adler/accumulator.hpp>
+
 #include <nil/crypto3/hash/detail/primes.hpp>
 #include <nil/crypto3/hash/detail/static_digest.hpp>
 #include <nil/crypto3/hash/detail/pack.hpp>
@@ -25,9 +27,77 @@
 namespace nil {
     namespace crypto3 {
         namespace hash {
-            template<std::size_t DigestBits>
-            class basic_adler {
+            template<typename Hash, typename StateAccumulator, typename Params>
+            class adler_stream_processor {
+            protected:
+                typedef Hash construction_type;
+                typedef StateAccumulator accumulator_type;
+                typedef Params params_type;
+
+                typedef typename boost::uint_t<CHAR_BIT> byte_type;
+
+                constexpr static const std::size_t word_bits = construction_type::word_bits;
+                typedef typename construction_type::word_type word_type;
+
+                constexpr static const std::size_t block_bits = construction_type::block_bits;
+                constexpr static const std::size_t block_words = construction_type::block_words;
+                typedef typename construction_type::block_type block_type;
+
+                typedef typename params_type::endian endian_type;
             public:
+                constexpr static const std::size_t value_bits = params_type::value_bits;
+                typedef typename boost::uint_t<value_bits>::least value_type;
+
+                typedef typename construction_type::digest_type digest_type;
+
+                adler_stream_processor(accumulator_type &a) : acc(a) {
+                }
+
+            protected:
+
+                inline adler_stream_processor &update_one(value_type value) {
+                    acc(value);
+                    return *this;
+                }
+
+                template<typename InputIterator>
+                inline adler_stream_processor &update_n(InputIterator p, size_t n) {
+                    acc(p, n);
+                    return *this;
+                }
+
+            public:
+                template<typename InputIterator>
+                inline adler_stream_processor &operator()(InputIterator b, InputIterator e,
+                                                          std::random_access_iterator_tag) {
+                    return update_n(b, e - b);
+                }
+
+                template<typename InputIterator, typename Category>
+                inline adler_stream_processor &operator()(InputIterator first, InputIterator last, Category) {
+                    while (first != last) {
+                        update_one(*first++);
+                    }
+                    return *this;
+                }
+
+                template<typename InputIterator>
+                inline adler_stream_processor &operator()(InputIterator b, InputIterator e) {
+                    typedef typename std::iterator_traits<InputIterator>::iterator_category cat;
+                    return operator()(b, e, cat());
+                }
+
+                template<typename ContainerT>
+                inline adler_stream_processor &operator()(const ContainerT &c) {
+                    return update_n(c.data(), c.size());
+                }
+
+            protected:
+                accumulator_type &acc;
+            };
+
+            template<std::size_t DigestBits>
+            struct basic_adler {
                 constexpr static const std::size_t value_bits = 8;
                 typedef typename boost::uint_t<value_bits>::least value_type;
 
@@ -50,17 +120,16 @@ namespace nil {
 
                 constexpr static const word_type modulo = detail::largest_prime<DigestBits / 2>::value;
 
-            public:
                 basic_adler() {
                     reset();
                 }
 
-                void reset() {
+                inline void reset() {
                     state_[0] = 0;
                     state_[1] = 1;
                 }
 
-                digest_type digest() const {
+                inline digest_type digest() const {
                     word_type x = (state_[0] << (DigestBits / 2)) | state_[1];
                     digest_type d;
                     // RFC 1950, Section 2.2 stores the ADLER-32 in big-endian
@@ -68,13 +137,15 @@ namespace nil {
                     return d;
                 }
 
-                digest_type end_message() {
+                inline digest_type end_message() {
                     digest_type d(std::move(digest()));
                     reset();
                     return d;
                 }
 
-                basic_adler &update_one(value_type x) {
+            protected:
+
+                inline basic_adler &update_one(value_type x) {
                     if (DigestBits < 16) {
                         x %= modulo;
                     } // avoid overflow
@@ -90,7 +161,7 @@ namespace nil {
                 }
 
                 template<typename InputIterator>
-                basic_adler &update_n(InputIterator p, size_t n) {
+                inline basic_adler &update_n(InputIterator p, size_t n) {
 #ifndef CRYPTO3_HASH_NO_OPTIMIZATION
 
                     unsigned const fast_word_bits = (word_bits < 16 ? 16 : word_bits);
@@ -182,13 +253,19 @@ Bits    Limit
                     return *this;
                 }
 
+            public:
+
+                inline basic_adler &operator()(value_type v) {
+                    return update_one(v);
+                }
+
                 template<typename InputIterator>
-                basic_adler &operator()(InputIterator b, InputIterator e, std::random_access_iterator_tag) {
+                inline basic_adler &operator()(InputIterator b, InputIterator e, std::random_access_iterator_tag) {
                     return update_n(b, e - b);
                 }
 
                 template<typename InputIterator, typename Category>
-                basic_adler &operator()(InputIterator b, InputIterator e, Category) {
+                inline basic_adler &operator()(InputIterator b, InputIterator e, Category) {
                     while (b != e) {
                         update_one(*b++);
                     }
@@ -196,12 +273,12 @@ Bits    Limit
                 }
 
                 template<typename InputIterator>
-                basic_adler &operator()(InputIterator b, InputIterator e) {
+                inline basic_adler &operator()(InputIterator b, InputIterator e) {
                     typedef typename std::iterator_traits<InputIterator>::iterator_category cat;
                     return operator()(b, e, cat());
                 }
 
-            private:
+            protected:
                 state_type state_;
             };
 
@@ -214,18 +291,20 @@ Bits    Limit
              * s
              */
             template<std::size_t DigestBits>
-            class adler {
-            public:
+            struct adler {
                 typedef basic_adler<DigestBits> construction_type;
 
                 template<typename StateAccumulator, std::size_t ValueBits>
                 struct stream_processor {
                     struct params_type {
+                        typedef typename stream_endian::big_bit endian;
 
+                        constexpr static const std::size_t digest_bits = DigestBits;
+                        constexpr static const std::size_t value_bits = ValueBits;
                     };
 
-                    BOOST_STATIC_ASSERT(ValueBits == 8);
-                    typedef construction_type type;
+                    BOOST_STATIC_ASSERT(ValueBits == CHAR_BIT);
+                    typedef adler_stream_processor<construction_type, StateAccumulator, params_type> type;
                 };
 
                 constexpr static const std::size_t digest_bits = DigestBits;
