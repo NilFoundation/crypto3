@@ -92,10 +92,10 @@ namespace nil {
             typename std::enable_if<boost::accumulators::detail::is_accumulator_set<HashAccumulator>::value,
                                     HashAccumulator>::type &hash(InputIterator first, InputIterator last,
                                                                  HashAccumulator &sh) {
-                detail::range_hash_impl<detail::ref_hash_impl<HashAccumulator>> hash_impl(first, last,
-                        std::forward<HashAccumulator>(sh));
+                typedef detail::ref_hash_impl<HashAccumulator> StreamHashImpl;
+                typedef detail::range_hash_impl<StreamHashImpl> HashImpl;
 
-                return sh;
+                return HashImpl(first, last, std::forward<HashAccumulator>(sh));
             }
 
             /*!
@@ -163,10 +163,10 @@ namespace nil {
                      typename HashAccumulator = typename hash::hash_accumulator<Hash>>
             typename std::enable_if<boost::accumulators::detail::is_accumulator_set<HashAccumulator>::value,
                                     HashAccumulator>::type &hash(const SinglePassRange &rng, HashAccumulator &sh) {
-                detail::range_hash_impl<detail::ref_hash_impl<HashAccumulator>> hash_impl(rng,
-                        std::forward<HashAccumulator>(sh));
+                typedef detail::ref_hash_impl<HashAccumulator> StreamHashImpl;
+                typedef detail::range_hash_impl<StreamHashImpl> HashImpl;
 
-                return sh;
+                return HashImpl(rng, std::forward<HashAccumulator>(sh));
             }
 
             /*!

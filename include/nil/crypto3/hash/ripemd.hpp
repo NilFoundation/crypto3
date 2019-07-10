@@ -203,7 +203,7 @@ namespace nil {
                     std::swap(Y[3], Y[7]);
 
 #pragma clang loop unroll(full)
-                    for (int i = 0; i < policy_type::state_words; ++i) {
+                    for (std::size_t i = 0; i < policy_type::state_words; ++i) {
                         state[i] += Y[i];
                     }
                 }
@@ -268,7 +268,7 @@ namespace nil {
                     std::swap(Y[4], Y[9]);
 
 #pragma clang loop unroll(full)
-                    for (int i = 0; i < policy_type::state_words; ++i) {
+                    for (std::size_t i = 0; i < policy_type::state_words; ++i) {
                         state[i] += Y[i];
                     }
                 }

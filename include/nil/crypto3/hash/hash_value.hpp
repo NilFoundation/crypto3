@@ -114,6 +114,10 @@ namespace nil {
                         return this->accumulator_set;
                     }
 
+                    inline operator accumulator_set_type &() const {
+                        return this->accumulator_set;
+                    }
+
 #ifndef CRYPTO3_RAW_HASH_STRING_OUTPUT
 
                     template<typename Char, typename CharTraits, typename Alloc>
@@ -173,6 +177,14 @@ namespace nil {
 
 
                         stream_processor(this->accumulator_set)(first, last);
+                    }
+
+                    inline operator accumulator_set_type() const {
+                        return this->accumulator_set;
+                    }
+
+                    inline operator accumulator_set_type &() const {
+                        return this->accumulator_set;
                     }
 
                     inline operator OutputIterator() const {
