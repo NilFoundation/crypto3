@@ -65,7 +65,7 @@ namespace nil {
                     pack<endian_type, value_bits, word_bits>(value_array, block);
 
                     // Process the block
-                    block_hash.update(block);
+                    acc(block, block_bits);
 
                     // Reset seen if we don't need to track the length
                     if (!length_bits) {
@@ -88,7 +88,7 @@ namespace nil {
                     }
 
                     // Process the last block
-                    block_hash.update(block);
+                    acc(block, seen % block_bits);
                 }
 
                 template<typename Dummy>
@@ -122,7 +122,7 @@ namespace nil {
                         pack_n<endian_type, value_bits, word_bits>(p, block_values, std::begin(block), block_words);
 
                         // Process the block
-                        block_hash.update(block);
+                        acc(block, block_bits);
                         seen += block_bits;
 
                         // Reset seen if we don't need to track the length
