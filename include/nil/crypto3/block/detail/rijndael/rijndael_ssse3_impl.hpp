@@ -62,18 +62,15 @@ namespace nil {
 
 #define mm_xor3(x, y, z) _mm_xor_si128(x, _mm_xor_si128(y, z))
 
-                CRYPTO3_FUNC_ISA("ssse3")
-
-                __m128i aes_schedule_transform(__m128i input, __m128i table_1, __m128i table_2) {
+                CRYPTO3_FUNC_ISA("ssse3") __m128i aes_schedule_transform(__m128i input, __m128i table_1,
+                                                                         __m128i table_2) {
                     __m128i i_1 = _mm_and_si128(low_nibs, input);
                     __m128i i_2 = _mm_srli_epi32(_mm_andnot_si128(low_nibs, input), 4);
 
                     return _mm_xor_si128(_mm_shuffle_epi8(table_1, i_1), _mm_shuffle_epi8(table_2, i_2));
                 }
 
-                CRYPTO3_FUNC_ISA("ssse3")
-
-                __m128i aes_schedule_mangle(__m128i k, uint8_t round_no) {
+                CRYPTO3_FUNC_ISA("ssse3") __m128i aes_schedule_mangle(__m128i k, uint8_t round_no) {
                     __m128i t = _mm_shuffle_epi8(_mm_xor_si128(k, _mm_set1_epi8(0x5B)), mc_forward[0]);
 
                     __m128i t2 = t;
@@ -85,15 +82,11 @@ namespace nil {
                     return _mm_shuffle_epi8(t2, sr[round_no % 4]);
                 }
 
-                CRYPTO3_FUNC_ISA("ssse3")
-
-                __m128i aes_schedule_192_smear(__m128i x, __m128i y) {
+                CRYPTO3_FUNC_ISA("ssse3") __m128i aes_schedule_192_smear(__m128i x, __m128i y) {
                     return mm_xor3(y, _mm_shuffle_epi32(x, 0xFE), _mm_shuffle_epi32(y, 0x80));
                 }
 
-                CRYPTO3_FUNC_ISA("ssse3")
-
-                __m128i aes_schedule_mangle_dec(__m128i k, uint8_t round_no) {
+                CRYPTO3_FUNC_ISA("ssse3") __m128i aes_schedule_mangle_dec(__m128i k, uint8_t round_no) {
                     const __m128i dsk[8] = {
                             _mm_set_epi32(0x4AED9334, 0x82255BFC, 0xB6116FC8, 0x7ED9A700),
                             _mm_set_epi32(0x8BB89FAC, 0xE9DAFDCE, 0x45765162, 0x27143300),
@@ -120,9 +113,7 @@ namespace nil {
                     return _mm_shuffle_epi8(output, sr[round_no % 4]);
                 }
 
-                CRYPTO3_FUNC_ISA("ssse3")
-
-                __m128i aes_schedule_mangle_last(__m128i k, uint8_t round_no) {
+                CRYPTO3_FUNC_ISA("ssse3") __m128i aes_schedule_mangle_last(__m128i k, uint8_t round_no) {
                     const __m128i out_tr1 = _mm_set_epi32(0xF7974121, 0xDEBE6808, 0xFF9F4929, 0xD6B66000);
                     const __m128i out_tr2 = _mm_set_epi32(0xE10D5DB1, 0xB05C0CE0, 0x01EDBD51, 0x50BCEC00);
 
@@ -131,9 +122,7 @@ namespace nil {
                     return aes_schedule_transform(k, out_tr1, out_tr2);
                 }
 
-                CRYPTO3_FUNC_ISA("ssse3")
-
-                __m128i aes_schedule_mangle_last_dec(__m128i k) {
+                CRYPTO3_FUNC_ISA("ssse3") __m128i aes_schedule_mangle_last_dec(__m128i k) {
                     const __m128i deskew1 = _mm_set_epi32(0x1DFEB95A, 0x5DBEF91A, 0x07E4A340, 0x47A4E300);
                     const __m128i deskew2 = _mm_set_epi32(0x2841C2AB, 0xF49D1E77, 0x5F36B5DC, 0x83EA6900);
 
@@ -141,9 +130,7 @@ namespace nil {
                     return aes_schedule_transform(k, deskew1, deskew2);
                 }
 
-                CRYPTO3_FUNC_ISA("ssse3")
-
-                __m128i aes_schedule_round(__m128i *rcon, __m128i input1, __m128i input2) {
+                CRYPTO3_FUNC_ISA("ssse3") __m128i aes_schedule_round(__m128i *rcon, __m128i input1, __m128i input2) {
                     if (rcon) {
                         input2 = _mm_xor_si128(_mm_alignr_epi8(_mm_setzero_si128(), *rcon, 15), input2);
 
@@ -173,9 +160,7 @@ namespace nil {
                     return mm_xor3(_mm_shuffle_epi8(sb1u, t5), _mm_shuffle_epi8(sb1t, t6), smeared);
                 }
 
-                CRYPTO3_FUNC_ISA("ssse3")
-
-                __m128i aes_ssse3_encrypt(__m128i B, const __m128i *keys, size_t rounds) {
+                CRYPTO3_FUNC_ISA("ssse3") __m128i aes_ssse3_encrypt(__m128i B, const __m128i *keys, size_t rounds) {
                     const __m128i sb2u = _mm_set_epi32(0x5EB7E955, 0xBC982FCD, 0xE27A93C6, 0x0B712400);
                     const __m128i sb2t = _mm_set_epi32(0xC2A163C8, 0xAB82234A, 0x69EB8840, 0x0AE12900);
 
@@ -227,9 +212,7 @@ namespace nil {
                     }
                 }
 
-                CRYPTO3_FUNC_ISA("ssse3")
-
-                __m128i aes_ssse3_decrypt(__m128i B, const __m128i *keys, size_t rounds) {
+                CRYPTO3_FUNC_ISA("ssse3") __m128i aes_ssse3_decrypt(__m128i B, const __m128i *keys, size_t rounds) {
                     const __m128i k_dipt1 = _mm_set_epi32(0x154A411E, 0x114E451A, 0x0F505B04, 0x0B545F00);
                     const __m128i k_dipt2 = _mm_set_epi32(0x12771772, 0xF491F194, 0x86E383E6, 0x60056500);
 
@@ -310,15 +293,16 @@ namespace nil {
                 class basic_rijndael_ssse3_impl<KeyBitsImpl, 128, PolicyType> {
                 protected:
                     typedef PolicyType policy_type;
+                    typedef typename policy_type::block_type block_type;
+                    typedef typename policy_type::key_schedule_type key_schedule_type;
 
                     BOOST_STATIC_ASSERT(PolicyType::key_bits == KeyBitsImpl);
                     BOOST_STATIC_ASSERT(PolicyType::block_bits == 128);
 
                 public:
-                    static typename policy_type::block_type encrypt_block(
-                            const typename policy_type::block_type &plaintext,
-                            const typename policy_type::key_schedule_type &encryption_key) {
-                        typename policy_type::block_type out = {0};
+                    static block_type encrypt_block(const block_type &plaintext,
+                                                    const key_schedule_type &encryption_key) {
+                        block_type out = {0};
 
                         const __m128i *in_mm = reinterpret_cast<const __m128i *>(plaintext.data());
                         __m128i *out_mm = reinterpret_cast<__m128i *>(out.data());
@@ -336,10 +320,9 @@ namespace nil {
                         return out;
                     }
 
-                    static typename policy_type::block_type decrypt_block(
-                            const typename policy_type::block_type &plaintext,
-                            const typename policy_type::key_schedule_type &decryption_key) {
-                        typename policy_type::block_type out = {0};
+                    static block_type decrypt_block(const block_type &plaintext,
+                                                    const key_schedule_type &decryption_key) {
+                        block_type out = {0};
 
                         const __m128i *in_mm = reinterpret_cast<const __m128i *>(plaintext.data());
                         __m128i *out_mm = reinterpret_cast<__m128i *>(out.data());
@@ -363,36 +346,40 @@ namespace nil {
                                                                                                    PolicyType> {
                 protected:
                     typedef typename basic_rijndael_ssse3_impl<128, 128, PolicyType>::policy_type policy_type;
+
+                    typedef typename policy_type::block_type block_type;
+                    typedef typename policy_type::key_type key_type;
+                    typedef typename policy_type::key_schedule_type key_schedule_type;
                 public:
-                    static void schedule_key(const typename policy_type::key_type &input_key,
-                                             typename policy_type::key_schedule_type &encryption_key,
-                                             typename policy_type::key_schedule_type &decryption_key) {
+                    static void schedule_key(const key_type &input_key, key_schedule_type &encryption_key,
+                                             key_schedule_type &decryption_key) {
                         __m128i rcon = _mm_set_epi32(0x702A9808, 0x4D7C7D81, 0x1F8391B9, 0xAF9DEEB6);
 
                         __m128i key = _mm_loadu_si128(reinterpret_cast<const __m128i *>(input_key.data()));
 
-                        __m128i *EK_mm = reinterpret_cast<__m128i *>(encryption_key.data());
-                        __m128i *DK_mm = reinterpret_cast<__m128i *>(encryption_key.data());
+                        __m128i *encryption_key_mm = reinterpret_cast<__m128i *>(encryption_key.data());
+                        __m128i *decryption_key_mm = reinterpret_cast<__m128i *>(encryption_key.data());
 
-                        _mm_storeu_si128(DK_mm + policy_type::rounds, _mm_shuffle_epi8(key, detail::sr[2]));
+                        _mm_storeu_si128(decryption_key_mm + policy_type::rounds, _mm_shuffle_epi8(key, detail::sr[2]));
 
                         key = detail::aes_schedule_transform(key, detail::k_ipt1, detail::k_ipt2);
 
-                        _mm_storeu_si128(EK_mm, key);
+                        _mm_storeu_si128(encryption_key_mm, key);
 
 #pragma clang loop unroll(full)
                         for (size_t i = 1; i != policy_type::rounds; ++i) {
                             key = detail::aes_schedule_round(&rcon, key, key);
 
-                            _mm_storeu_si128(EK_mm + i, detail::aes_schedule_mangle(key, (12 - i) % 4));
+                            _mm_storeu_si128(encryption_key_mm + i, detail::aes_schedule_mangle(key, (12 - i) % 4));
 
-                            _mm_storeu_si128(DK_mm + (policy_type::rounds - i),
+                            _mm_storeu_si128(decryption_key_mm + (policy_type::rounds - i),
                                     detail::aes_schedule_mangle_dec(key, (10 - i) % 4));
                         }
 
                         key = detail::aes_schedule_round(&rcon, key, key);
-                        _mm_storeu_si128(EK_mm + policy_type::rounds, detail::aes_schedule_mangle_last(key, 2));
-                        _mm_storeu_si128(DK_mm, detail::aes_schedule_mangle_last_dec(key));
+                        _mm_storeu_si128(encryption_key_mm + policy_type::rounds,
+                                detail::aes_schedule_mangle_last(key, 2));
+                        _mm_storeu_si128(decryption_key_mm, detail::aes_schedule_mangle_last_dec(key));
                     }
                 };
 
@@ -401,24 +388,28 @@ namespace nil {
                                                                                                    PolicyType> {
                 protected:
                     typedef typename basic_rijndael_ssse3_impl<192, 128, PolicyType>::policy_type policy_type;
+
+                    typedef typename policy_type::block_type block_type;
+                    typedef typename policy_type::key_type key_type;
+                    typedef typename policy_type::key_schedule_type key_schedule_type;
                 public:
-                    static void schedule_key(const typename policy_type::key_type &input_key,
-                                             typename policy_type::key_schedule_type &encryption_key,
-                                             typename policy_type::key_schedule_type &decryption_key) {
+                    static void schedule_key(const key_type &input_key, key_schedule_type &encryption_key,
+                                             key_schedule_type &decryption_key) {
                         __m128i rcon = _mm_set_epi32(0x702A9808, 0x4D7C7D81, 0x1F8391B9, 0xAF9DEEB6);
 
-                        __m128i *EK_mm = reinterpret_cast<__m128i *>(encryption_key.data());
-                        __m128i *DK_mm = reinterpret_cast<__m128i *>(decryption_key.data());
+                        __m128i *encryption_key_mm = reinterpret_cast<__m128i *>(encryption_key.data());
+                        __m128i *decryption_key_mm = reinterpret_cast<__m128i *>(decryption_key.data());
 
                         __m128i key1 = _mm_loadu_si128(reinterpret_cast<const __m128i *>(input_key.data()));
                         __m128i key2 = _mm_loadu_si128(reinterpret_cast<const __m128i *>((input_key.data() + 8)));
 
-                        _mm_storeu_si128(DK_mm + policy_type::rounds, _mm_shuffle_epi8(key1, detail::sr[0]));
+                        _mm_storeu_si128(decryption_key_mm + policy_type::rounds,
+                                _mm_shuffle_epi8(key1, detail::sr[0]));
 
                         key1 = detail::aes_schedule_transform(key1, detail::k_ipt1, detail::k_ipt2);
                         key2 = detail::aes_schedule_transform(key2, detail::k_ipt1, detail::k_ipt2);
 
-                        _mm_storeu_si128(EK_mm + 0, key1);
+                        _mm_storeu_si128(encryption_key_mm + 0, key1);
 
                         // key2 with 8 high bytes masked off
                         __m128i t = _mm_slli_si128(_mm_srli_si128(key2, 8), 8);
@@ -427,25 +418,30 @@ namespace nil {
                         for (size_t i = 0; i != 4; ++i) {
                             key2 = detail::aes_schedule_round(&rcon, key2, key1);
 
-                            _mm_storeu_si128(EK_mm + 3 * i + 1,
+                            _mm_storeu_si128(encryption_key_mm + 3 * i + 1,
                                     detail::aes_schedule_mangle(_mm_alignr_epi8(key2, t, 8), (i + 3) % 4));
-                            _mm_storeu_si128(DK_mm + 11 - 3 * i,
+                            _mm_storeu_si128(decryption_key_mm + 11 - 3 * i,
                                     detail::aes_schedule_mangle_dec(_mm_alignr_epi8(key2, t, 8), (i + 3) % 4));
 
                             t = detail::aes_schedule_192_smear(key2, t);
 
-                            _mm_storeu_si128(EK_mm + 3 * i + 2, detail::aes_schedule_mangle(t, (i + 2) % 4));
-                            _mm_storeu_si128(DK_mm + 10 - 3 * i, detail::aes_schedule_mangle_dec(t, (i + 2) % 4));
+                            _mm_storeu_si128(encryption_key_mm + 3 * i + 2,
+                                    detail::aes_schedule_mangle(t, (i + 2) % 4));
+                            _mm_storeu_si128(decryption_key_mm + 10 - 3 * i,
+                                    detail::aes_schedule_mangle_dec(t, (i + 2) % 4));
 
                             key2 = detail::aes_schedule_round(&rcon, t, key2);
 
                             if (i == 3) {
-                                _mm_storeu_si128(EK_mm + 3 * i + 3,
+                                _mm_storeu_si128(encryption_key_mm + 3 * i + 3,
                                         detail::aes_schedule_mangle_last(key2, (i + 1) % 4));
-                                _mm_storeu_si128(DK_mm + 9 - 3 * i, detail::aes_schedule_mangle_last_dec(key2));
+                                _mm_storeu_si128(decryption_key_mm + 9 - 3 * i,
+                                        detail::aes_schedule_mangle_last_dec(key2));
                             } else {
-                                _mm_storeu_si128(EK_mm + 3 * i + 3, detail::aes_schedule_mangle(key2, (i + 1) % 4));
-                                _mm_storeu_si128(DK_mm + 9 - 3 * i, detail::aes_schedule_mangle_dec(key2, (i + 1) % 4));
+                                _mm_storeu_si128(encryption_key_mm + 3 * i + 3,
+                                        detail::aes_schedule_mangle(key2, (i + 1) % 4));
+                                _mm_storeu_si128(decryption_key_mm + 9 - 3 * i,
+                                        detail::aes_schedule_mangle_dec(key2, (i + 1) % 4));
                             }
 
                             key1 = key2;
@@ -460,45 +456,48 @@ namespace nil {
                                                                                                    PolicyType> {
                 protected:
                     typedef typename basic_rijndael_ssse3_impl<256, 128, PolicyType>::policy_type policy_type;
+
+                    typedef typename policy_type::block_type block_type;
+                    typedef typename policy_type::key_type key_type;
+                    typedef typename policy_type::key_schedule_type key_schedule_type;
                 public:
-                    static void schedule_key(const typename policy_type::key_type &input_key,
-                                             typename policy_type::key_schedule_type &encryption_key,
-                                             typename policy_type::key_schedule_type &decryption_key) {
+                    static void schedule_key(const key_type &input_key, key_schedule_type &encryption_key,
+                                             key_schedule_type &decryption_key) {
                         __m128i rcon = _mm_set_epi32(0x702A9808, 0x4D7C7D81, 0x1F8391B9, 0xAF9DEEB6);
 
-                        __m128i *EK_mm = reinterpret_cast<__m128i *>(encryption_key.data());
-                        __m128i *DK_mm = reinterpret_cast<__m128i *>(decryption_key.data());
+                        __m128i *encryption_key_mm = reinterpret_cast<__m128i *>(encryption_key.data());
+                        __m128i *decryption_key_mm = reinterpret_cast<__m128i *>(decryption_key.data());
 
                         __m128i key1 = _mm_loadu_si128(reinterpret_cast<const __m128i *>(input_key.data()));
                         __m128i key2 = _mm_loadu_si128(reinterpret_cast<const __m128i *>((input_key.data() + 16)));
 
-                        _mm_storeu_si128(DK_mm + policy_type::rounds, _mm_shuffle_epi8(key1, detail::sr[2]));
+                        _mm_storeu_si128(decryption_key_mm + policy_type::rounds, _mm_shuffle_epi8(key1, detail::sr[2]));
 
                         key1 = detail::aes_schedule_transform(key1, detail::k_ipt1, detail::k_ipt2);
                         key2 = detail::aes_schedule_transform(key2, detail::k_ipt1, detail::k_ipt2);
 
-                        _mm_storeu_si128(EK_mm + 0, key1);
-                        _mm_storeu_si128(EK_mm + 1, detail::aes_schedule_mangle(key2, 3));
+                        _mm_storeu_si128(encryption_key_mm + 0, key1);
+                        _mm_storeu_si128(encryption_key_mm + 1, detail::aes_schedule_mangle(key2, 3));
 
-                        _mm_storeu_si128(DK_mm + 13, detail::aes_schedule_mangle_dec(key2, 1));
+                        _mm_storeu_si128(decryption_key_mm + 13, detail::aes_schedule_mangle_dec(key2, 1));
 
 #pragma clang loop unroll(full)
                         for (size_t i = 2; i != 14; i += 2) {
                             __m128i k_t = key2;
                             key1 = key2 = detail::aes_schedule_round(&rcon, key2, key1);
 
-                            _mm_storeu_si128(EK_mm + i, detail::aes_schedule_mangle(key2, i % 4));
-                            _mm_storeu_si128(DK_mm + (14 - i), detail::aes_schedule_mangle_dec(key2, (i + 2) % 4));
+                            _mm_storeu_si128(encryption_key_mm + i, detail::aes_schedule_mangle(key2, i % 4));
+                            _mm_storeu_si128(decryption_key_mm + (14 - i), detail::aes_schedule_mangle_dec(key2, (i + 2) % 4));
 
                             key2 = detail::aes_schedule_round(nullptr, _mm_shuffle_epi32(key2, 0xFF), k_t);
-                            _mm_storeu_si128(EK_mm + i + 1, detail::aes_schedule_mangle(key2, (i - 1) % 4));
-                            _mm_storeu_si128(DK_mm + (13 - i), detail::aes_schedule_mangle_dec(key2, (i + 1) % 4));
+                            _mm_storeu_si128(encryption_key_mm + i + 1, detail::aes_schedule_mangle(key2, (i - 1) % 4));
+                            _mm_storeu_si128(decryption_key_mm + (13 - i), detail::aes_schedule_mangle_dec(key2, (i + 1) % 4));
                         }
 
                         key2 = detail::aes_schedule_round(&rcon, key2, key1);
 
-                        _mm_storeu_si128(EK_mm + 14, detail::aes_schedule_mangle_last(key2, 2));
-                        _mm_storeu_si128(DK_mm + 0, detail::aes_schedule_mangle_last_dec(key2));
+                        _mm_storeu_si128(encryption_key_mm + 14, detail::aes_schedule_mangle_last(key2, 2));
+                        _mm_storeu_si128(decryption_key_mm + 0, detail::aes_schedule_mangle_last_dec(key2));
                     }
                 };
 

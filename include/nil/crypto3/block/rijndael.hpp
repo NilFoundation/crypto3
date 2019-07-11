@@ -105,10 +105,10 @@ namespace nil {
 
                 typedef typename std::conditional<
                         BlockBits == 128 && (KeyBits == 128 || KeyBits == 192 || KeyBits == 256),
-#if defined(CRYPTO3_HAS_RIJNDAEL_NI)
-                        detail::ni_rijndael_impl<KeyBits, BlockBits, policy_type>,
-#elif defined(CRYPTO3_HAS_RIJNDAEL_SSSE3)
+#if defined(CRYPTO3_HAS_RIJNDAEL_SSSE3)
                         detail::rijndael_ssse3_impl<KeyBits, BlockBits, policy_type>,
+#elif defined(CRYPTO3_HAS_RIJNDAEL_NI)
+                        detail::ni_rijndael_impl<KeyBits, BlockBits, policy_type>,
 #elif defined(CRYPTO3_HAS_RIJNDAEL_ARMV8)
                         detail::armv8_rijndael_impl<KeyBits, BlockBits, policy_type>,
 #elif defined(CRYPTO3_HAS_RIJNDAEL_POWER8)
@@ -148,8 +148,8 @@ namespace nil {
                                                       typename Padding>
                 struct stream_cipher {
                     typedef block_stream_processor<Mode<rijndael<KeyBits, BlockBits>, Padding>, StateAccumulator,
-                                                     stream_endian::little_octet_big_bit, ValueBits,
-                                                     policy_type::word_bits * 2> type_;
+                                                   stream_endian::little_octet_big_bit, ValueBits,
+                                                   policy_type::word_bits * 2> type_;
 #ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES
                     typedef type_ type;
 #else
