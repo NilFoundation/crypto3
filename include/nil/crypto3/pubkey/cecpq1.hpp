@@ -1,5 +1,5 @@
-#ifndef CRYPTO3_CECPQ1_H_
-#define CRYPTO3_CECPQ1_H_
+#ifndef CRYPTO3_CECPQ1_HPP_
+#define CRYPTO3_CECPQ1_HPP_
 
 #include <nil/crypto3/utilities/secmem.hpp>
 #include <nil/crypto3/pubkey/newhope/newhope.hpp>

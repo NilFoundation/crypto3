@@ -1,5 +1,5 @@
-#ifndef CRYPTO3_KEYPAIR_CHECKS_H_
-#define CRYPTO3_KEYPAIR_CHECKS_H_
+#ifndef CRYPTO3_KEYPAIR_CHECKS_HPP_
+#define CRYPTO3_KEYPAIR_CHECKS_HPP_
 
 #include <nil/crypto3/pubkey/pk_keys.hpp>
 

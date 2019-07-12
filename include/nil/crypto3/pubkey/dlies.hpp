@@ -1,5 +1,5 @@
-#ifndef CRYPTO3_DLIES_H_
-#define CRYPTO3_DLIES_H_
+#ifndef CRYPTO3_DLIES_HPP_
+#define CRYPTO3_DLIES_HPP_
 
 #include <nil/crypto3/pubkey/pubkey.hpp>
 #include <nil/crypto3/mac/mac.hpp>

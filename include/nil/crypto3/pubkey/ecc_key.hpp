@@ -1,5 +1,5 @@
-#ifndef CRYPTO3_ECC_PUBLIC_KEY_BASE_H_
-#define CRYPTO3_ECC_PUBLIC_KEY_BASE_H_
+#ifndef CRYPTO3_ECC_PUBLIC_KEY_BASE_HPP_
+#define CRYPTO3_ECC_PUBLIC_KEY_BASE_HPP_
 
 #include <nil/crypto3/pubkey/ec_group/ec_group.hpp>
 #include <nil/crypto3/pubkey/pk_keys.hpp>

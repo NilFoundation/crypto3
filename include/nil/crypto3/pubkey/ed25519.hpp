@@ -1,5 +1,5 @@
-#ifndef CRYPTO3_ED25519_H_
-#define CRYPTO3_ED25519_H_
+#ifndef CRYPTO3_ED25519_HPP_
+#define CRYPTO3_ED25519_HPP_
 
 #include <nil/crypto3/pubkey/pk_keys.hpp>
 

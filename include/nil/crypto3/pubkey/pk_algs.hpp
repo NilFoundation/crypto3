@@ -1,5 +1,5 @@
-#ifndef CRYPTO3_PK_KEY_FACTORY_H_
-#define CRYPTO3_PK_KEY_FACTORY_H_
+#ifndef CRYPTO3_PK_KEY_FACTORY_HPP_
+#define CRYPTO3_PK_KEY_FACTORY_HPP_
 
 #include <nil/crypto3/pubkey/pk_keys.hpp>
 #include <nil/crypto3/asn1/alg_id.hpp>

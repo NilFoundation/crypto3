@@ -1,5 +1,5 @@
-#ifndef CRYPTO3_PK_KEYS_H_
-#define CRYPTO3_PK_KEYS_H_
+#ifndef CRYPTO3_PK_KEYS_HPP_
+#define CRYPTO3_PK_KEYS_HPP_
 
 #include <nil/crypto3/utilities/secmem.hpp>
 

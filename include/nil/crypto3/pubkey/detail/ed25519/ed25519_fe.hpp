@@ -1,5 +1,5 @@
-#ifndef CRYPTO3_ED25519_FE_H_
-#define CRYPTO3_ED25519_FE_H_
+#ifndef CRYPTO3_ED25519_FE_HPP_
+#define CRYPTO3_ED25519_FE_HPP_
 
 #include <nil/crypto3/utilities/memory_operations.hpp>
 

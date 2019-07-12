@@ -1,5 +1,5 @@
-#ifndef CRYPTO3_XMSS_WOTS_PRIVATEKEY_H_
-#define CRYPTO3_XMSS_WOTS_PRIVATEKEY_H_
+#ifndef CRYPTO3_XMSS_WOTS_PRIVATEKEY_HPP_
+#define CRYPTO3_XMSS_WOTS_PRIVATEKEY_HPP_
 
 #include <cstddef>
 #include <memory>

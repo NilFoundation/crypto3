@@ -1,5 +1,5 @@
-#ifndef CRYPTO3_XMSS_ADDRESS_H_
-#define CRYPTO3_XMSS_ADDRESS_H_
+#ifndef CRYPTO3_XMSS_ADDRESS_HPP_
+#define CRYPTO3_XMSS_ADDRESS_HPP_
 
 #include <nil/crypto3/pubkey/xmss/xmss_tools.hpp>
 

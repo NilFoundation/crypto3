@@ -1,5 +1,5 @@
-#ifndef CRYPTO3_ATOMIC_H_
-#define CRYPTO3_ATOMIC_H_
+#ifndef CRYPTO3_ATOMIC_HPP_
+#define CRYPTO3_ATOMIC_HPP_
 
 #include <atomic>
 #include <memory>

@@ -1,5 +1,5 @@
-#ifndef CRYPTO3_XMSS_SIGNATURE_H_
-#define CRYPTO3_XMSS_SIGNATURE_H_
+#ifndef CRYPTO3_XMSS_SIGNATURE_HPP_
+#define CRYPTO3_XMSS_SIGNATURE_HPP_
 
 #include <cstddef>
 #include <nil/crypto3/utilities/exceptions.hpp>

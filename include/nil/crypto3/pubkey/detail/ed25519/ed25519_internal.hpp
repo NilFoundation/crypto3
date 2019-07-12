@@ -1,5 +1,5 @@
-#ifndef CRYPTO3_ED25519_INT_H_
-#define CRYPTO3_ED25519_INT_H_
+#ifndef CRYPTO3_ED25519_INT_HPP_
+#define CRYPTO3_ED25519_INT_HPP_
 
 #include <nil/crypto3/pubkey/ed25519/ed25519_fe.hpp>
 #include <nil/crypto3/utilities/loadstore.hpp>

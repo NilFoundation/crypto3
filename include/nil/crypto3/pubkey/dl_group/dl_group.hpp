@@ -1,5 +1,5 @@
-#ifndef CRYPTO3_DL_PARAM_H_
-#define CRYPTO3_DL_PARAM_H_
+#ifndef CRYPTO3_DL_PARAM_HPP_
+#define CRYPTO3_DL_PARAM_HPP_
 
 #include <boost/multiprecision/cpp_int.hpp>
 

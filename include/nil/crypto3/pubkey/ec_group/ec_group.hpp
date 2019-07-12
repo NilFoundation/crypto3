@@ -1,5 +1,5 @@
-#ifndef CRYPTO3_ECC_DOMAIN_PARAMETERS_H_
-#define CRYPTO3_ECC_DOMAIN_PARAMETERS_H_
+#ifndef CRYPTO3_ECC_DOMAIN_PARAMETERS_HPP_
+#define CRYPTO3_ECC_DOMAIN_PARAMETERS_HPP_
 
 #include <nil/crypto3/pubkey/ec_group/point_gfp.hpp>
 

@@ -7,8 +7,8 @@
  *
  */
 
-#ifndef CRYPTO3_CODE_BASED_UTIL_H_
-#define CRYPTO3_CODE_BASED_UTIL_H_
+#ifndef CRYPTO3_CODE_BASED_UTIL_HPP_
+#define CRYPTO3_CODE_BASED_UTIL_HPP_
 
 #include <nil/crypto3/pubkey/mce/gf2m_small_m.hpp>
 

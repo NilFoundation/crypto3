@@ -1,5 +1,5 @@
-#ifndef CRYPTO3_RSA_H_
-#define CRYPTO3_RSA_H_
+#ifndef CRYPTO3_RSA_HPP_
+#define CRYPTO3_RSA_HPP_
 
 #include <nil/crypto3/pubkey/pk_keys.hpp>
 

@@ -1,5 +1,5 @@
-#ifndef CRYPTO3_SM2_KEY_H_
-#define CRYPTO3_SM2_KEY_H_
+#ifndef CRYPTO3_SM2_KEY_HPP_
+#define CRYPTO3_SM2_KEY_HPP_
 
 #include <nil/crypto3/pubkey/ecc_key.hpp>
 

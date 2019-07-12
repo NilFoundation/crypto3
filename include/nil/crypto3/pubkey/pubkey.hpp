@@ -1,5 +1,5 @@
-#ifndef CRYPTO3_PUBKEY_H_
-#define CRYPTO3_PUBKEY_H_
+#ifndef CRYPTO3_PUBKEY_HPP_
+#define CRYPTO3_PUBKEY_HPP_
 
 #include <nil/crypto3/pubkey/pk_keys.hpp>
 #include <nil/crypto3/pubkey/pk_ops_fwd.hpp>

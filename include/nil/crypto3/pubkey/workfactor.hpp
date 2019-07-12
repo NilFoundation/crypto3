@@ -1,5 +1,5 @@
-#ifndef CRYPTO3_WORKFACTOR_H_
-#define CRYPTO3_WORKFACTOR_H_
+#ifndef CRYPTO3_WORKFACTOR_HPP_
+#define CRYPTO3_WORKFACTOR_HPP_
 
 #include <nil/crypto3/utilities/types.hpp>
 

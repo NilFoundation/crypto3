@@ -4,8 +4,8 @@
 * designers (https://github.com/tpoeppelmann/newhope)
 */
 
-#ifndef CRYPTO3_NEWHOPE_H_
-#define CRYPTO3_NEWHOPE_H_
+#ifndef CRYPTO3_NEWHOPE_HPP_
+#define CRYPTO3_NEWHOPE_HPP_
 
 #include <nil/crypto3/utilities/memory_operations.hpp>
 

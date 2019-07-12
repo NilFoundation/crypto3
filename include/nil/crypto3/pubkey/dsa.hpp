@@ -1,5 +1,5 @@
-#ifndef CRYPTO3_DSA_H_
-#define CRYPTO3_DSA_H_
+#ifndef CRYPTO3_DSA_HPP_
+#define CRYPTO3_DSA_HPP_
 
 #include <nil/crypto3/pubkey/detail/stream_preprocessor.hpp>
 

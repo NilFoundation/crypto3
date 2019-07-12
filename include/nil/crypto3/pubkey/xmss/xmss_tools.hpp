@@ -1,5 +1,5 @@
-#ifndef CRYPTO3_XMSS_TOOLS_H_
-#define CRYPTO3_XMSS_TOOLS_H_
+#ifndef CRYPTO3_XMSS_TOOLS_HPP_
+#define CRYPTO3_XMSS_TOOLS_HPP_
 
 #include <iterator>
 #include <type_traits>

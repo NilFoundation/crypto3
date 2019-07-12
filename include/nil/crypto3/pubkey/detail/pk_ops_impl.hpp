@@ -1,5 +1,5 @@
-#ifndef CRYPTO3_PK_OPERATION_IMPL_H_
-#define CRYPTO3_PK_OPERATION_IMPL_H_
+#ifndef CRYPTO3_PK_OPERATION_IMPL_HPP_
+#define CRYPTO3_PK_OPERATION_IMPL_HPP_
 
 #include <nil/crypto3/pubkey/pk_operations.hpp>
 #include <nil/crypto3/pk_pad/eme.hpp>

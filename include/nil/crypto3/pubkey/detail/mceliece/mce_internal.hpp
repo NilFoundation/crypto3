@@ -7,8 +7,8 @@
  *
  */
 
-#ifndef CRYPTO3_MCELIECE_INTERNAL_H_
-#define CRYPTO3_MCELIECE_INTERNAL_H_
+#ifndef CRYPTO3_MCELIECE_INTERNAL_HPP_
+#define CRYPTO3_MCELIECE_INTERNAL_HPP_
 
 #include <nil/crypto3/utilities/secmem.hpp>
 #include <nil/crypto3/utilities/types.hpp>

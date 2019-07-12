@@ -1,5 +1,5 @@
-#ifndef CRYPTO3_RFC6979_GENERATOR_H_
-#define CRYPTO3_RFC6979_GENERATOR_H_
+#ifndef CRYPTO3_RFC6979_GENERATOR_HPP_
+#define CRYPTO3_RFC6979_GENERATOR_HPP_
 
 #include <nil/crypto3/multiprecision/bigint/bigint.hpp>
 

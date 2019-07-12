@@ -7,8 +7,8 @@
  *
  */
 
-#ifndef CRYPTO3_MCELIECE_KEY_H_
-#define CRYPTO3_MCELIECE_KEY_H_
+#ifndef CRYPTO3_MCELIECE_KEY_HPP_
+#define CRYPTO3_MCELIECE_KEY_HPP_
 
 #include <nil/crypto3/pubkey/pk_keys.hpp>
 #include <nil/crypto3/pubkey/mce/polyn_gf2m.hpp>
@@ -125,7 +125,7 @@ namespace nil {
                 return m_g;
             }
 
-            std::vector<uint32_t> const &get_H_coeffs() const {
+            std::vector<uint32_t> const &get_HPP_coeffs() const {
                 return m_coeffs;
             }
 

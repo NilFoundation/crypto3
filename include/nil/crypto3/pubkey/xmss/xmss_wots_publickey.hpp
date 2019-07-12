@@ -1,5 +1,5 @@
-#ifndef CRYPTO3_XMSS_WOTS_PUBLICKEY_H_
-#define CRYPTO3_XMSS_WOTS_PUBLICKEY_H_
+#ifndef CRYPTO3_XMSS_WOTS_PUBLICKEY_HPP_
+#define CRYPTO3_XMSS_WOTS_PUBLICKEY_HPP_
 
 #include <cstddef>
 #include <string>

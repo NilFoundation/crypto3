@@ -1,5 +1,5 @@
-#ifndef CRYPTO3_PK_OPERATIONS_FWD_H_
-#define CRYPTO3_PK_OPERATIONS_FWD_H_
+#ifndef CRYPTO3_PK_OPERATIONS_FWD_HPP_
+#define CRYPTO3_PK_OPERATIONS_FWD_HPP_
 
 namespace nil {
     namespace crypto3 {

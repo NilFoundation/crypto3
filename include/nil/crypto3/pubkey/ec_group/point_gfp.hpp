@@ -1,5 +1,5 @@
-#ifndef CRYPTO3_POINT_GFP_H_
-#define CRYPTO3_POINT_GFP_H_
+#ifndef CRYPTO3_POINT_GFP_HPP_
+#define CRYPTO3_POINT_GFP_HPP_
 
 #include <boost/random.hpp>
 

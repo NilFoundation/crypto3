@@ -1,5 +1,5 @@
-#ifndef CRYPTO3_GFP_CURVE_H_
-#define CRYPTO3_GFP_CURVE_H_
+#ifndef CRYPTO3_GFP_CURVE_HPP_
+#define CRYPTO3_GFP_CURVE_HPP_
 
 #include <memory>
 

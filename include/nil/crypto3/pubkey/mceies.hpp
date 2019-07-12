@@ -1,5 +1,5 @@
-#ifndef CRYPTO3_MCEIES_H_
-#define CRYPTO3_MCEIES_H_
+#ifndef CRYPTO3_MCEIES_HPP_
+#define CRYPTO3_MCEIES_HPP_
 
 #include <nil/crypto3/utilities/secmem.hpp>
 

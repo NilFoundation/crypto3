@@ -7,8 +7,8 @@
  *
  */
 
-#ifndef CRYPTO3_GF2M_SMALL_M_H_
-#define CRYPTO3_GF2M_SMALL_M_H_
+#ifndef CRYPTO3_GF2M_SMALL_M_HPP_
+#define CRYPTO3_GF2M_SMALL_M_HPP_
 
 #include <vector>
 #include <nil/crypto3/utilities/types.hpp>

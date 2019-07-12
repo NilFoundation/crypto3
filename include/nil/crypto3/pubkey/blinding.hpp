@@ -1,5 +1,5 @@
-#ifndef CRYPTO3_BLINDER_H_
-#define CRYPTO3_BLINDER_H_
+#ifndef CRYPTO3_BLINDER_HPP_
+#define CRYPTO3_BLINDER_HPP_
 
 #include <boost/multiprecision/cpp_int.hpp>
 

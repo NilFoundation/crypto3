@@ -1,5 +1,5 @@
-#ifndef CRYPTO3_PBE_PKCS_v20_H_
-#define CRYPTO3_PBE_PKCS_v20_H_
+#ifndef CRYPTO3_PBE_PKCS_v20_HPP_
+#define CRYPTO3_PBE_PKCS_v20_HPP_
 
 #include <nil/crypto3/asn1/alg_id.hpp>
 

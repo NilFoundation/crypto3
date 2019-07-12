@@ -1,5 +1,5 @@
-#ifndef CRYPTO3_ECKCDSA_KEY_H_
-#define CRYPTO3_ECKCDSA_KEY_H_
+#ifndef CRYPTO3_ECKCDSA_KEY_HPP_
+#define CRYPTO3_ECKCDSA_KEY_HPP_
 
 #include <nil/crypto3/pubkey/ecc_key.hpp>
 

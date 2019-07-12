@@ -1,5 +1,5 @@
-#ifndef CRYPTO3_XMSS_HASH_H_
-#define CRYPTO3_XMSS_HASH_H_
+#ifndef CRYPTO3_XMSS_HASH_HPP_
+#define CRYPTO3_XMSS_HASH_HPP_
 
 namespace nil {
     namespace crypto3 {

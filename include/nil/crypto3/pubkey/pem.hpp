@@ -1,5 +1,5 @@
-#ifndef CRYPTO3_PEM_H_
-#define CRYPTO3_PEM_H_
+#ifndef CRYPTO3_PEM_HPP_
+#define CRYPTO3_PEM_HPP_
 
 #include <nil/crypto3/utilities/secmem.hpp>
 

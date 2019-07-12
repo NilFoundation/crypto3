@@ -1,5 +1,5 @@
-#ifndef CRYPTO3_CURVE_25519_H_
-#define CRYPTO3_CURVE_25519_H_
+#ifndef CRYPTO3_CURVE_25519_HPP_
+#define CRYPTO3_CURVE_25519_HPP_
 
 #include <nil/crypto3/pubkey/pk_keys.hpp>
 

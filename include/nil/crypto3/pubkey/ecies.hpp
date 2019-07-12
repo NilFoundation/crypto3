@@ -1,5 +1,5 @@
-#ifndef CRYPTO3_ECIES_H_
-#define CRYPTO3_ECIES_H_
+#ifndef CRYPTO3_ECIES_HPP_
+#define CRYPTO3_ECIES_HPP_
 
 #include <memory>
 #include <string>

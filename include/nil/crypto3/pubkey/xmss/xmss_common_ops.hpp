@@ -1,5 +1,5 @@
-#ifndef CRYPTO3_XMSS_COMMON_OPS_H_
-#define CRYPTO3_XMSS_COMMON_OPS_H_
+#ifndef CRYPTO3_XMSS_COMMON_OPS_HPP_
+#define CRYPTO3_XMSS_COMMON_OPS_HPP_
 
 #include <vector>
 #include <nil/crypto3/utilities/secmem.hpp>

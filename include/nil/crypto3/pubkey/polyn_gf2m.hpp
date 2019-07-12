@@ -1,5 +1,5 @@
-#ifndef CRYPTO3_POLYN_GF2M_H_
-#define CRYPTO3_POLYN_GF2M_H_
+#ifndef CRYPTO3_POLYN_GF2M_HPP_
+#define CRYPTO3_POLYN_GF2M_HPP_
 
 #include <nil/crypto3/utilities/secmem.hpp>
 #include <nil/crypto3/pubkey/mce/gf2m_small_m.hpp>

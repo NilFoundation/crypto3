@@ -1,5 +1,5 @@
-#ifndef CRYPTO3_ELGAMAL_H_
-#define CRYPTO3_ELGAMAL_H_
+#ifndef CRYPTO3_ELGAMAL_HPP_
+#define CRYPTO3_ELGAMAL_HPP_
 
 #include <nil/crypto3/pubkey/dl_algorithm.hpp>
 
