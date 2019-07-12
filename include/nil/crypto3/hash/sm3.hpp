@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_SM3_H_
-#define CRYPTO3_SM3_H_
+#ifndef CRYPTO3_SM3_HPP_
+#define CRYPTO3_SM3_HPP_
 
 #include <nil/crypto3/hash/detail/merkle_damgard_stream_processor.hpp>
 #include <nil/crypto3/hash/detail/merkle_damgard_construction.hpp>

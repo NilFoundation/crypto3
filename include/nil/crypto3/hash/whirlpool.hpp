@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_WHIRLPOOL_H_
-#define CRYPTO3_WHIRLPOOL_H_
+#ifndef CRYPTO3_WHIRLPOOL_HPP_
+#define CRYPTO3_WHIRLPOOL_HPP_
 
 #include <nil/crypto3/hash/detail/state_adder.hpp>
 #include <nil/crypto3/hash/detail/miyaguchi_preneel_compressor.hpp>

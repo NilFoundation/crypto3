@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_BLAKE2B_H_
-#define CRYPTO3_BLAKE2B_H_
+#ifndef CRYPTO3_BLAKE2B_HPP_
+#define CRYPTO3_BLAKE2B_HPP_
 
 #include <nil/crypto3/hash/detail/blake2b/blake2b_functions.hpp>
 

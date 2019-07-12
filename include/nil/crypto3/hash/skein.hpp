@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_SKEIN_512_H_
-#define CRYPTO3_SKEIN_512_H_
+#ifndef CRYPTO3_SKEIN_512_HPP_
+#define CRYPTO3_SKEIN_512_HPP_
 
 #include <nil/crypto3/block/threefish.hpp>
 

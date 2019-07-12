@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_RIPEMD_160_H_
-#define CRYPTO3_RIPEMD_160_H_
+#ifndef CRYPTO3_RIPEMD_160_HPP_
+#define CRYPTO3_RIPEMD_160_HPP_
 
 #include <nil/crypto3/hash/detail/ripemd/ripemd_policy.hpp>
 #include <nil/crypto3/hash/detail/merkle_damgard_construction.hpp>

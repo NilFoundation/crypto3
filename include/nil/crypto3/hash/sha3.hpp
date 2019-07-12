@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_SHA3_H_
-#define CRYPTO3_SHA3_H_
+#ifndef CRYPTO3_SHA3_HPP_
+#define CRYPTO3_SHA3_HPP_
 
 #include <nil/crypto3/utilities/secmem.hpp>
 
