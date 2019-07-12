@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_BLOWFISH_H_
-#define CRYPTO3_BLOWFISH_H_
+#ifndef CRYPTO3_BLOWFISH_HPP_
+#define CRYPTO3_BLOWFISH_HPP_
 
 #include <nil/crypto3/block/detail/blowfish/blowfish_policy.hpp>
 

@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_RIJNDAEL_H_
-#define CRYPTO3_RIJNDAEL_H_
+#ifndef CRYPTO3_RIJNDAEL_HPP_
+#define CRYPTO3_RIJNDAEL_HPP_
 
 #include <boost/range/adaptor/sliced.hpp>
 

@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_CAST_H_
-#define CRYPTO3_CAST_H_
+#ifndef CRYPTO3_CAST_HPP_
+#define CRYPTO3_CAST_HPP_
 
 #include <nil/crypto3/block/detail/cast/cast_policy.hpp>
 

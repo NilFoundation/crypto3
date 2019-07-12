@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_IDEA_H_
-#define CRYPTO3_IDEA_H_
+#ifndef CRYPTO3_IDEA_HPP_
+#define CRYPTO3_IDEA_HPP_
 
 #include <boost/endian/arithmetic.hpp>
 

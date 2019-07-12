@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_BLOCK_CIPHER_H_
-#define CRYPTO3_BLOCK_CIPHER_H_
+#ifndef CRYPTO3_BLOCK_CIPHER_HPP_
+#define CRYPTO3_BLOCK_CIPHER_HPP_
 
 #include <string>
 #include <memory>
