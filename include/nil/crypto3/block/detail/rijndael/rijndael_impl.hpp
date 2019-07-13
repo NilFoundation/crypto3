@@ -26,13 +26,22 @@ namespace nil {
                 class rijndael_impl {
                     typedef PolicyType policy_type;
 
+                    typedef typename policy_type::key_type key_type;
+                    typedef typename policy_type::key_schedule_type key_schedule_type;
+                    typedef typename policy_type::key_schedule_word_type key_schedule_word_type;
+
+                    typedef typename policy_type::block_type block_type;
+
+                    typedef typename policy_type::constants_type constants_type;
+                    typedef typename policy_type::shift_offsets_type shift_offsets_type;
+                    typedef typename policy_type::mm_type mm_type;
+
                     BOOST_STATIC_ASSERT(KeyBitsImpl == PolicyType::key_bits);
                     BOOST_STATIC_ASSERT(BlockBitsImpl == PolicyType::block_bits);
 
-                    static inline typename policy_type::key_schedule_word_type sub_word(
-                            const typename policy_type::key_schedule_word_type &x,
-                            const typename policy_type::constants_type &constants) {
-                        typename policy_type::key_schedule_word_type result = {0};
+                    static inline key_schedule_word_type sub_word(const key_schedule_word_type &x,
+                                                                  const constants_type &constants) {
+                        key_schedule_word_type result = {0};
 #pragma clang loop unroll(full)
                         for (uint8_t i = 0; i < policy_type::word_bytes; ++i) {
                             result = result << CHAR_BIT |
@@ -42,16 +51,14 @@ namespace nil {
                         return result;
                     }
 
-                    static inline void sub_bytes(typename policy_type::block_type &state,
-                                                 const typename policy_type::constants_type &sbox) {
+                    static inline void sub_bytes(block_type &state, const constants_type &sbox) {
 #pragma clang loop unroll(full)
                         for (int i = 0; i < policy_type::word_bytes * policy_type::block_words; ++i) {
                             state[i] = sbox[state[i]];
                         }
                     }
 
-                    static inline void shift_rows(typename policy_type::block_type &state,
-                                                  const typename policy_type::shift_offsets_type &offset) {
+                    static inline void shift_rows(block_type &state, const shift_offsets_type &offset) {
                         std::array<typename policy_type::byte_type, policy_type::block_words> tmp = {0};
 
                         // row 0 never gets shifted
@@ -76,9 +83,8 @@ namespace nil {
                     }
 
                     template<typename StateType>
-                    static inline typename policy_type::block_type mix_columns(const StateType &state,
-                                                                               const typename policy_type::mm_type &mm) {
-                        typename policy_type::block_type tmp = {0};
+                    static inline block_type mix_columns(const StateType &state, const mm_type &mm) {
+                        block_type tmp = {0};
 
 #pragma clang loop unroll(full)
                         for (int col = 0; col < policy_type::block_words; ++col) {
@@ -97,8 +103,7 @@ namespace nil {
                     }
 
                     template<typename InputIterator>
-                    static inline void add_round_key(typename policy_type::block_type &state, InputIterator first,
-                                                     InputIterator last) {
+                    static inline void add_round_key(block_type &state, InputIterator first, InputIterator last) {
                         BOOST_ASSERT(std::distance(first, last) == policy_type::block_words &&
                                      state.size() == policy_type::block_bytes);
 
@@ -112,11 +117,9 @@ namespace nil {
                         }
                     }
 
-                    static void apply_round(std::uint8_t round, typename policy_type::block_type &state,
-                                            const typename policy_type::key_schedule_type &w,
-                                            const typename policy_type::constants_type &sbox,
-                                            const typename policy_type::shift_offsets_type &offsets,
-                                            const typename policy_type::mm_type &mm) {
+                    static void apply_round(std::uint8_t round, block_type &state, const key_schedule_type &w,
+                                            const constants_type &sbox, const shift_offsets_type &offsets,
+                                            const mm_type &mm) {
                         sub_bytes(state, sbox);
                         shift_rows(state, offsets);
                         state = mix_columns(state, mm);
@@ -126,10 +129,9 @@ namespace nil {
 
                 public:
 
-                    static typename policy_type::block_type encrypt_block(
-                            const typename policy_type::block_type &plaintext,
-                            const typename policy_type::key_schedule_type &encryption_key) {
-                        typename policy_type::block_type state = plaintext;
+                    static typename policy_type::block_type encrypt_block(const block_type &plaintext,
+                                                                          const key_schedule_type &encryption_key) {
+                        block_type state = plaintext;
 
                         add_round_key(state, encryption_key.begin(), encryption_key.begin() + policy_type::block_words);
 
@@ -147,10 +149,9 @@ namespace nil {
                         return state;
                     }
 
-                    static typename policy_type::block_type decrypt_block(
-                            const typename policy_type::block_type &plaintext,
-                            const typename policy_type::key_schedule_type &decryption_key) {
-                        typename policy_type::block_type state = plaintext;
+                    static typename policy_type::block_type decrypt_block(const block_type &plaintext,
+                                                                          const key_schedule_type &decryption_key) {
+                        block_type state = plaintext;
 
                         add_round_key(state, decryption_key.begin() + policy_type::rounds * policy_type::block_words,
                                 decryption_key.begin() + (policy_type::rounds + 1) * policy_type::block_words);
@@ -168,9 +169,8 @@ namespace nil {
                         return state;
                     }
 
-                    static void schedule_key(const typename policy_type::key_type &key,
-                                             typename policy_type::key_schedule_type &encryption_key,
-                                             typename policy_type::key_schedule_type &decryption_key) {
+                    static void schedule_key(const key_type &key, key_schedule_type &encryption_key,
+                                             key_schedule_type &decryption_key) {
                         // the first key_words words are the original key
                         pack<stream_endian::little_octet_big_bit, CHAR_BIT, policy_type::word_bits>(key.begin(),
                                 key.begin() + policy_type::key_words * policy_type::word_bytes, encryption_key.begin(),

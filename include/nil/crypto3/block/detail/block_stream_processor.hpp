@@ -85,6 +85,7 @@ namespace nil {
                     for (; n && (seen % input_block_bits); --n, ++first) {
                         update_one(*first);
                     }
+#pragma clang loop unroll(full)
                     for (; n >= block_values; n -= block_values, first += block_values) {
                         // Convert the input into words
                         input_block_type block = {0};
