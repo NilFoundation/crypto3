@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_GOST_3411_HPP_
-#define CRYPTO3_GOST_3411_HPP_
+#ifndef CRYPTO3_GOST_3411_HPP
+#define CRYPTO3_GOST_3411_HPP
 
 #include <nil/crypto3/hash/detail/gost_3411_policy.hpp>
 

@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_TIGER_HPP_
-#define CRYPTO3_TIGER_HPP_
+#ifndef CRYPTO3_TIGER_HPP
+#define CRYPTO3_TIGER_HPP
 
 #include <nil/crypto3/hash/detail/tiger/tiger_policy.hpp>
 #include <nil/crypto3/hash/detail/merkle_damgard_construction.hpp>
