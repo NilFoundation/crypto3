@@ -59,8 +59,8 @@ namespace nil {
                     state = new_state;
                 }
             };
-        }
-    }
-}
+        }    // namespace hash
+    }        // namespace crypto3
+}    // namespace nil
 
-#endif //CRYPTO3_MATYAS_MEYER_OSEAS_COMPRESSOR_HPP
+#endif    // CRYPTO3_MATYAS_MEYER_OSEAS_COMPRESSOR_HPP

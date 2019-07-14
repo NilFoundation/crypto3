@@ -24,7 +24,7 @@ namespace nil {
                     typedef cipher_policy::block_type state_type;
 
                     constexpr static const std::size_t digest_bits = cipher_policy::block_bits;
-                    typedef hash::static_digest <digest_bits> digest_type;
+                    typedef hash::static_digest<digest_bits> digest_type;
 
                     struct iv_generator {
                         state_type const &operator()() const {
@@ -33,12 +33,11 @@ namespace nil {
                             return H0;
                         }
                     };
-
                 };
 
-            } // namespace detail
-        }
-    }
-} // namespace nil
+            }    // namespace detail
+        }        // namespace hash
+    }            // namespace crypto3
+}    // namespace nil
 
-#endif // CRYPTO3_HASH_DETAIL_MD5_POLICY_HPP
+#endif    // CRYPTO3_HASH_DETAIL_MD5_POLICY_HPP

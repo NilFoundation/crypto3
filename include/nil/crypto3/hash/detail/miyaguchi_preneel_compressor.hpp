@@ -59,8 +59,8 @@ namespace nil {
                     f(state, block);
                 }
             };
-        }
-    }
-}
+        }    // namespace hash
+    }        // namespace crypto3
+}    // namespace nil
 
-#endif //CRYPTO3_MIYAGUCHI_PRENEEL_COMPRESSOR_HPP
+#endif    // CRYPTO3_MIYAGUCHI_PRENEEL_COMPRESSOR_HPP

@@ -31,12 +31,11 @@ namespace nil {
                             return H0;
                         }
                     };
-
                 };
 
-            } // namespace detail
-        }
-    }
-} // namespace nil
+            }    // namespace detail
+        }        // namespace hash
+    }            // namespace crypto3
+}    // namespace nil
 
-#endif // CRYPTO3_HASH_DETAIL_MD4_POLICY_HPP
+#endif    // CRYPTO3_HASH_DETAIL_MD4_POLICY_HPP

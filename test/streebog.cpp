@@ -34,8 +34,7 @@ BOOST_TEST_DONT_PRINT_LOG_VALUE(string_data_value_t)
 
 BOOST_AUTO_TEST_SUITE(streebog_test_suite)
 
-    BOOST_AUTO_TEST_CASE(streebog_range_hash) {
-
-    }
+BOOST_AUTO_TEST_CASE(streebog_range_hash) {
+}
 
 BOOST_AUTO_TEST_SUITE_END()

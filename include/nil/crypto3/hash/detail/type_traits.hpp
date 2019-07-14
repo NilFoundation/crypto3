@@ -21,12 +21,11 @@ namespace nil {
                 struct is_iterator {
                     static char test(...);
 
-                    template<typename U,
-                             typename=typename std::iterator_traits<U>::difference_type,
-                             typename=typename std::iterator_traits<U>::pointer,
-                             typename=typename std::iterator_traits<U>::reference,
-                             typename=typename std::iterator_traits<U>::value_type,
-                             typename=typename std::iterator_traits<U>::iterator_category>
+                    template<typename U, typename = typename std::iterator_traits<U>::difference_type,
+                             typename = typename std::iterator_traits<U>::pointer,
+                             typename = typename std::iterator_traits<U>::reference,
+                             typename = typename std::iterator_traits<U>::value_type,
+                             typename = typename std::iterator_traits<U>::iterator_category>
                     static long test(U &&);
 
                     constexpr static bool value = std::is_same<decltype(test(std::declval<T>())), long>::value;
@@ -65,8 +64,7 @@ namespace nil {
                         iter end() const;
                     };
 
-                    struct Derived : TType, Fallback {
-                    };
+                    struct Derived : TType, Fallback {};
 
                     template<typename C, C>
                     struct ChT;
@@ -89,12 +87,12 @@ namespace nil {
 
                 template<typename T>
                 struct is_container {
-                    static const bool value =
-                            has_const_iterator<T>::value && has_begin_end<T>::beg_value && has_begin_end<T>::end_value;
+                    static const bool value
+                        = has_const_iterator<T>::value && has_begin_end<T>::beg_value && has_begin_end<T>::end_value;
                 };
-            }
-        }
-    }
-}
+            }    // namespace detail
+        }        // namespace hash
+    }            // namespace crypto3
+}    // namespace nil
 
-#endif //CRYPTO3_TYPE_TRAITS_HPP
+#endif    // CRYPTO3_TYPE_TRAITS_HPP

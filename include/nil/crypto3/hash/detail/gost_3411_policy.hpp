@@ -34,9 +34,9 @@ namespace nil {
                     constexpr static const std::size_t state_words = state_bits / word_bits;
                     typedef std::array<word_type, state_words> state_type;
                 };
-            }
-        }
-    }
-}
+            }    // namespace detail
+        }        // namespace hash
+    }            // namespace crypto3
+}    // namespace nil
 
-#endif //CRYPTO3_GOST_3411_POLICY_HPP
+#endif    // CRYPTO3_GOST_3411_POLICY_HPP

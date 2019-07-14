@@ -39,8 +39,7 @@ BOOST_TEST_DONT_PRINT_LOG_VALUE(blake2b<320>::construction_type::digest_type)
 
 BOOST_AUTO_TEST_SUITE(blake2b_test_suite)
 
-    BOOST_AUTO_TEST_CASE(blake2b_128_range_hash) {
-
-    }
+BOOST_AUTO_TEST_CASE(blake2b_128_range_hash) {
+}
 
 BOOST_AUTO_TEST_SUITE_END()

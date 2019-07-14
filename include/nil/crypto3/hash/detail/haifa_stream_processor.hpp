@@ -60,18 +60,17 @@ namespace nil {
                 typedef typename construction_type::digest_type digest_type;
 
             protected:
-
                 constexpr static const std::size_t digest_length_bits = params_type::digest_length_bits;
                 // FIXME: do something more intelligent than capping at 64
                 constexpr static const std::size_t digest_length_type_bits =
-                        digest_length_bits < word_bits ? word_bits : digest_length_bits > 64 ? 64 : digest_length_bits;
+                    digest_length_bits < word_bits ? word_bits : digest_length_bits > 64 ? 64 : digest_length_bits;
                 typedef typename boost::uint_t<digest_length_type_bits>::least digest_length_type;
                 constexpr static const std::size_t digest_length_words = digest_length_bits / word_bits;
 
                 constexpr static const std::size_t length_bits = params_type::length_bits;
                 // FIXME: do something more intelligent than capping at 64
                 constexpr static const std::size_t length_type_bits =
-                        length_bits < word_bits ? word_bits : length_bits > 64 ? 64 : length_bits;
+                    length_bits < word_bits ? word_bits : length_bits > 64 ? 64 : length_bits;
                 typedef typename boost::uint_t<length_type_bits>::least length_type;
                 constexpr static const std::size_t length_words = length_bits / word_bits;
                 BOOST_STATIC_ASSERT(!length_bits || length_bits % word_bits == 0);
@@ -117,7 +116,6 @@ namespace nil {
                 }
 
             public:
-
                 haifa_stream_processor &update_one(value_type value) {
                     std::size_t i = seen % block_bits;
                     std::size_t j = i / value_bits;
@@ -234,8 +232,8 @@ namespace nil {
                 construction_type block_hash;
                 length_type seen;
             };
-        }
-    }
-} // namespace nil
+        }    // namespace hash
+    }        // namespace crypto3
+}    // namespace nil
 
-#endif // CRYPTO3_HASH_STREAM_PROCESSOR_HPP
+#endif    // CRYPTO3_HASH_STREAM_PROCESSOR_HPP

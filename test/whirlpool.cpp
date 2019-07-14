@@ -34,8 +34,7 @@ BOOST_TEST_DONT_PRINT_LOG_VALUE(string_data_value)
 
 BOOST_AUTO_TEST_SUITE(whirlpool_test_suite)
 
-    BOOST_AUTO_TEST_CASE(whirlpool_range_hash) {
-
-    }
+BOOST_AUTO_TEST_CASE(whirlpool_range_hash) {
+}
 
 BOOST_AUTO_TEST_SUITE_END()

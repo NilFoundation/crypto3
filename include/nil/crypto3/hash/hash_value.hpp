@@ -24,13 +24,12 @@ namespace nil {
                 template<typename HashAccumulatorSet>
                 struct ref_hash_impl {
                     typedef HashAccumulatorSet accumulator_set_type;
-                    typedef typename boost::mpl::front<
-                            typename accumulator_set_type::features_type>::type accumulator_type;
+                    typedef
+                        typename boost::mpl::front<typename accumulator_set_type::features_type>::type accumulator_type;
 
                     typedef typename accumulator_type::hash_type hash_type;
 
                     ref_hash_impl(accumulator_set_type &&stream_hash) : accumulator_set(stream_hash) {
-
                     }
 
                     accumulator_set_type &accumulator_set;
@@ -39,14 +38,13 @@ namespace nil {
                 template<typename HashAccumulatorSet>
                 struct value_hash_impl {
                     typedef HashAccumulatorSet accumulator_set_type;
-                    typedef typename boost::mpl::front<
-                            typename accumulator_set_type::features_type>::type accumulator_type;
+                    typedef
+                        typename boost::mpl::front<typename accumulator_set_type::features_type>::type accumulator_type;
 
                     typedef typename accumulator_type::hash_type hash_type;
 
-                    value_hash_impl(accumulator_set_type &&stream_hash) : accumulator_set(
-                            std::forward<accumulator_set_type>(stream_hash)) {
-
+                    value_hash_impl(accumulator_set_type &&stream_hash) :
+                        accumulator_set(std::forward<accumulator_set_type>(stream_hash)) {
                     }
 
                     mutable accumulator_set_type accumulator_set;
@@ -61,46 +59,44 @@ namespace nil {
 
                     typedef typename hash_state_impl_type::hash_type hash_type;
 
-                    typedef typename boost::mpl::apply<accumulator_set_type,
-                                                       accumulator_type>::type::result_type result_type;
+                    typedef typename boost::mpl::apply<accumulator_set_type, accumulator_type>::type::result_type
+                        result_type;
 
                     template<typename SinglePassRange>
-                    range_hash_impl(const SinglePassRange &range, accumulator_set_type &&ise)
-                            : HashStateImpl(std::forward<accumulator_set_type>(ise)) {
+                    range_hash_impl(const SinglePassRange &range, accumulator_set_type &&ise) :
+                        HashStateImpl(std::forward<accumulator_set_type>(ise)) {
                         BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange>));
 
-                        typedef typename std::iterator_traits<
-                                typename SinglePassRange::iterator>::value_type value_type;
+                        typedef
+                            typename std::iterator_traits<typename SinglePassRange::iterator>::value_type value_type;
                         BOOST_STATIC_ASSERT(std::numeric_limits<value_type>::is_specialized);
-                        typedef typename hash_type::template stream_processor<accumulator_set_type,
-                                                                              std::numeric_limits<value_type>::digits +
-                                                                              std::numeric_limits<
-                                                                                      value_type>::is_signed>::type stream_processor;
-
+                        typedef typename hash_type::template stream_processor<
+                            accumulator_set_type,
+                            std::numeric_limits<value_type>::digits + std::numeric_limits<value_type>::is_signed>::type
+                            stream_processor;
 
                         stream_processor(this->accumulator_set)(range.begin(), range.end());
                     }
 
                     template<typename InputIterator>
-                    range_hash_impl(InputIterator first, InputIterator last, accumulator_set_type &&ise)
-                            :
-                            HashStateImpl(std::forward<accumulator_set_type>(ise)) {
+                    range_hash_impl(InputIterator first, InputIterator last, accumulator_set_type &&ise) :
+                        HashStateImpl(std::forward<accumulator_set_type>(ise)) {
                         BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<InputIterator>));
 
                         typedef typename std::iterator_traits<InputIterator>::value_type value_type;
                         BOOST_STATIC_ASSERT(std::numeric_limits<value_type>::is_specialized);
-                        typedef typename hash_type::template stream_processor<accumulator_set_type,
-                                                                              std::numeric_limits<value_type>::digits +
-                                                                              std::numeric_limits<
-                                                                                      value_type>::is_signed>::type stream_processor;
+                        typedef typename hash_type::template stream_processor<
+                            accumulator_set_type,
+                            std::numeric_limits<value_type>::digits + std::numeric_limits<value_type>::is_signed>::type
+                            stream_processor;
 
                         stream_processor(this->accumulator_set)(first, last);
                     }
 
                     template<typename OutputRange>
                     inline operator OutputRange() const {
-                        result_type result = boost::accumulators::extract_result<accumulator_type>(
-                                this->accumulator_set);
+                        result_type result
+                            = boost::accumulators::extract_result<accumulator_type>(this->accumulator_set);
                         OutputRange out;
                         std::move(result.begin(), result.end(), out.end());
                         return out;
@@ -119,7 +115,7 @@ namespace nil {
                     template<typename Char, typename CharTraits, typename Alloc>
                     inline operator std::basic_string<Char, CharTraits, Alloc>() const {
                         return std::to_string(
-                                boost::accumulators::extract_result<accumulator_type>(this->accumulator_set));
+                            boost::accumulators::extract_result<accumulator_type>(this->accumulator_set));
                     }
 
 #endif
@@ -138,39 +134,38 @@ namespace nil {
 
                     typedef typename hash_state_impl_type::hash_type hash_type;
 
-                    typedef typename boost::mpl::apply<accumulator_set_type,
-                                                       accumulator_type>::type::result_type result_type;
+                    typedef typename boost::mpl::apply<accumulator_set_type, accumulator_type>::type::result_type
+                        result_type;
 
                     template<typename SinglePassRange>
-                    itr_hash_impl(const SinglePassRange &range, OutputIterator out, accumulator_set_type &&ise)
-                            : HashStateImpl(std::forward<accumulator_set_type>(ise)), out(std::move(out)) {
+                    itr_hash_impl(const SinglePassRange &range, OutputIterator out, accumulator_set_type &&ise) :
+                        HashStateImpl(std::forward<accumulator_set_type>(ise)), out(std::move(out)) {
                         BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange>));
 
-                        typedef typename std::iterator_traits<
-                                typename SinglePassRange::iterator>::value_type value_type;
+                        typedef
+                            typename std::iterator_traits<typename SinglePassRange::iterator>::value_type value_type;
                         BOOST_STATIC_ASSERT(std::numeric_limits<value_type>::is_specialized);
-                        typedef typename hash_type::template stream_processor<accumulator_set_type,
-                                                                              std::numeric_limits<value_type>::digits +
-                                                                              std::numeric_limits<
-                                                                                      value_type>::is_signed>::type stream_processor;
-
+                        typedef typename hash_type::template stream_processor<
+                            accumulator_set_type,
+                            std::numeric_limits<value_type>::digits + std::numeric_limits<value_type>::is_signed>::type
+                            stream_processor;
 
                         stream_processor(this->accumulator_set)(range.begin(), range.end());
                     }
 
                     template<typename InputIterator>
                     itr_hash_impl(InputIterator first, InputIterator last, OutputIterator out,
-                                  accumulator_set_type &&ise)
-                            : HashStateImpl(std::forward<accumulator_set_type>(ise)), out(std::move(out)) {
+                                  accumulator_set_type &&ise) :
+                        HashStateImpl(std::forward<accumulator_set_type>(ise)),
+                        out(std::move(out)) {
                         BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<InputIterator>));
 
                         typedef typename std::iterator_traits<InputIterator>::value_type value_type;
                         BOOST_STATIC_ASSERT(std::numeric_limits<value_type>::is_specialized);
-                        typedef typename hash_type::template stream_processor<accumulator_set_type,
-                                                                              std::numeric_limits<value_type>::digits +
-                                                                              std::numeric_limits<
-                                                                                      value_type>::is_signed>::type stream_processor;
-
+                        typedef typename hash_type::template stream_processor<
+                            accumulator_set_type,
+                            std::numeric_limits<value_type>::digits + std::numeric_limits<value_type>::is_signed>::type
+                            stream_processor;
 
                         stream_processor(this->accumulator_set)(first, last);
                     }
@@ -180,15 +175,15 @@ namespace nil {
                     }
 
                     inline operator OutputIterator() const {
-                        result_type result = boost::accumulators::extract_result<accumulator_type>(
-                                this->accumulator_set);
+                        result_type result
+                            = boost::accumulators::extract_result<accumulator_type>(this->accumulator_set);
 
                         return std::move(result.cbegin(), result.cend(), out);
                     }
                 };
-            }
-        }
-    }
-}
+            }    // namespace detail
+        }        // namespace hash
+    }            // namespace crypto3
+}    // namespace nil
 
 #endif

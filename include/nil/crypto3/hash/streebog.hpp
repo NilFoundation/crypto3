@@ -30,7 +30,8 @@ namespace nil {
              */
             template<std::size_t DigestBits>
             class streebog_compressor {
-                typedef detail::streebog_policy <DigestBits> policy_type;
+                typedef detail::streebog_policy<DigestBits> policy_type;
+
             public:
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
                 typedef typename policy_type::word_type word_type;
@@ -87,15 +88,13 @@ namespace nil {
                         }
                     }
 
-//                    policy_type::g(state, block);
-//                    policy_type::addm(block, state);
+                    //                    policy_type::g(state, block);
+                    //                    policy_type::addm(block, state);
                 }
             };
 
             template<std::size_t DigestBits>
-            class streebog_finalizer {
-
-            };
+            class streebog_finalizer {};
 
             /*!
              * @brief Streebog (GOST R 34.11-2012). RFC 6986. Newly designed Russian
@@ -107,16 +106,16 @@ namespace nil {
              */
             template<std::size_t DigestBits>
             class streebog {
-                typedef detail::streebog_policy <DigestBits> policy_type;
+                typedef detail::streebog_policy<DigestBits> policy_type;
 
             public:
                 typedef merkle_damgard_construction<stream_endian::little_octet_big_bit, policy_type::digest_bits,
-                        typename policy_type::iv_generator, streebog_compressor<DigestBits>> construction_type_;
+                                                    typename policy_type::iv_generator, streebog_compressor<DigestBits>>
+                    construction_type_;
 #ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES
                 typedef construction_type_ construction_type;
 #else
-                struct construction_type : construction_type_ {
-                };
+                struct construction_type : construction_type_ {};
 #endif
                 template<typename StateAccumulator, std::size_t ValueBits>
                 struct stream_processor {
@@ -127,14 +126,14 @@ namespace nil {
                         constexpr static const std::size_t length_bits = 0;
                     };
 
-                    typedef merkle_damgard_state_preprocessor <construction_type, StateAccumulator, params_type> type;
+                    typedef merkle_damgard_state_preprocessor<construction_type, StateAccumulator, params_type> type;
                 };
 
                 constexpr static const std::size_t digest_bits = policy_type::digest_bits;
                 typedef typename construction_type::digest_type digest_type;
             };
-        }
-    }
-}
+        }    // namespace hash
+    }        // namespace crypto3
+}    // namespace nil
 
 #endif

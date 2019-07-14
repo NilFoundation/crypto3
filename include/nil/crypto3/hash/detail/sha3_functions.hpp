@@ -24,21 +24,20 @@ namespace nil {
                     typedef typename policy_type::word_type word_type;
 
                     static inline void permute(word_type A[25]) {
-                        for (typename policy_type::round_constants_type::value_type c :
-                                policy_type::round_constants) {
-                            const word_type C0 = A[0] ^A[5] ^A[10] ^A[15] ^A[20];
-                            const word_type C1 = A[1] ^A[6] ^A[11] ^A[16] ^A[21];
-                            const word_type C2 = A[2] ^A[7] ^A[12] ^A[17] ^A[22];
-                            const word_type C3 = A[3] ^A[8] ^A[13] ^A[18] ^A[23];
-                            const word_type C4 = A[4] ^A[9] ^A[14] ^A[19] ^A[24];
+                        for (typename policy_type::round_constants_type::value_type c : policy_type::round_constants) {
+                            const word_type C0 = A[0] ^ A[5] ^ A[10] ^ A[15] ^ A[20];
+                            const word_type C1 = A[1] ^ A[6] ^ A[11] ^ A[16] ^ A[21];
+                            const word_type C2 = A[2] ^ A[7] ^ A[12] ^ A[17] ^ A[22];
+                            const word_type C3 = A[3] ^ A[8] ^ A[13] ^ A[18] ^ A[23];
+                            const word_type C4 = A[4] ^ A[9] ^ A[14] ^ A[19] ^ A[24];
 
-                            const word_type D0 = policy_type::template rotl<1>(C0) ^C3;
-                            const word_type D1 = policy_type::template rotl<1>(C1) ^C4;
-                            const word_type D2 = policy_type::template rotl<1>(C2) ^C0;
-                            const word_type D3 = policy_type::template rotl<1>(C3) ^C1;
-                            const word_type D4 = policy_type::template rotl<1>(C4) ^C2;
+                            const word_type D0 = policy_type::template rotl<1>(C0) ^ C3;
+                            const word_type D1 = policy_type::template rotl<1>(C1) ^ C4;
+                            const word_type D2 = policy_type::template rotl<1>(C2) ^ C0;
+                            const word_type D3 = policy_type::template rotl<1>(C3) ^ C1;
+                            const word_type D4 = policy_type::template rotl<1>(C4) ^ C2;
 
-                            const word_type B00 = A[0] ^D1;
+                            const word_type B00 = A[0] ^ D1;
                             const word_type B10 = policy_type::template rotl<1>(A[1] ^ D2);
                             const word_type B20 = policy_type::template rotl<62>(A[2] ^ D3);
                             const word_type B05 = policy_type::template rotl<28>(A[3] ^ D4);
@@ -94,9 +93,9 @@ namespace nil {
                         }
                     }
                 };
-            }
-        }
-    }
-}
+            }    // namespace detail
+        }        // namespace hash
+    }            // namespace crypto3
+}    // namespace nil
 
-#endif //CRYPTO3_SHA3_FUNCTIONS_HPP
+#endif    // CRYPTO3_SHA3_FUNCTIONS_HPP

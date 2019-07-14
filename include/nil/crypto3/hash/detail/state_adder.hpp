@@ -25,9 +25,9 @@ namespace nil {
                     }
                 };
 
-            } // namespace detail
-        }
-    }
-} // namespace nil
+            }    // namespace detail
+        }        // namespace hash
+    }            // namespace crypto3
+}    // namespace nil
 
-#endif // CRYPTO3_HASH_DETAIL_STATE_ADDER_HPP
+#endif    // CRYPTO3_HASH_DETAIL_STATE_ADDER_HPP
