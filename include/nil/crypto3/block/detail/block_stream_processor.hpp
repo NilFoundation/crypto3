@@ -25,9 +25,8 @@
 namespace nil {
     namespace crypto3 {
         namespace block {
-            template<typename Mode,
-                     typename StateAccumulator,
-                     typename Endian, std::size_t ValueBits, std::size_t LengthBits>
+            template<typename Mode, typename StateAccumulator, typename Endian, std::size_t ValueBits,
+                     std::size_t LengthBits>
             struct block_stream_processor {
             private:
                 typedef Mode mode_type;
@@ -37,8 +36,8 @@ namespace nil {
 
                 typedef typename mode_type::output_block_type output_block_type;
                 constexpr static const std::size_t output_block_bits = mode_type::output_block_bits;
-            public:
 
+            public:
                 constexpr static const std::size_t value_bits = ValueBits;
                 typedef typename boost::uint_t<value_bits>::least value_type;
                 BOOST_STATIC_ASSERT(input_block_bits % value_bits == 0);
@@ -46,11 +45,10 @@ namespace nil {
                 typedef std::array<value_type, block_values> cache_type;
 
             private:
-
                 constexpr static const std::size_t length_bits = LengthBits;
                 // FIXME: do something more intelligent than capping at 64
                 constexpr static const std::size_t length_type_bits =
-                        length_bits < input_block_bits ? input_block_bits : length_bits > 64 ? 64 : length_bits;
+                    length_bits < input_block_bits ? input_block_bits : length_bits > 64 ? 64 : length_bits;
                 typedef typename boost::uint_t<length_type_bits>::least length_type;
 
                 BOOST_STATIC_ASSERT(!length_bits || length_bits % input_block_bits == 0);
@@ -109,14 +107,13 @@ namespace nil {
 
             public:
                 block_stream_processor(StateAccumulator &s) : state(s), cache(cache_type()), seen(0) {
-
                 }
 
                 virtual ~block_stream_processor() {
                     if (!cache.empty()) {
                         input_block_type block = {0};
                         pack<Endian, value_bits, input_block_bits / block_values>(cache.begin(),
-                                cache.begin() + cache.size(), block);
+                                                                                  cache.begin() + cache.size(), block);
                         typename input_block_type::const_iterator v = block.cbegin();
                         for (length_type itr = seen - (seen % input_block_bits); itr < seen; itr += value_bits) {
                             state(*v++);
@@ -162,8 +159,8 @@ namespace nil {
                 length_type seen;
                 cache_type cache;
             };
-        }
-    }
-}
+        }    // namespace block
+    }        // namespace crypto3
+}    // namespace nil
 
-#endif //CRYPTO3_BLOCK_BLOCK_STATE_PREPROCESSOR_HPP
+#endif    // CRYPTO3_BLOCK_BLOCK_STATE_PREPROCESSOR_HPP

@@ -28,30 +28,29 @@ namespace nil {
 
                     template<std::size_t Size, typename Integer>
                     static inline typename boost::uint_t<Size>::exact extract_uint_t(Integer v, std::size_t position) {
-                        return static_cast<typename boost::uint_t<Size>::exact>(v
-                                >> (((~position) & (sizeof(Integer) - 1)) << 3));
+                        return static_cast<typename boost::uint_t<Size>::exact>(
+                            v >> (((~position) & (sizeof(Integer) - 1)) << 3));
                     }
 
                     template<std::size_t Size, typename T>
-                    static inline typename boost::uint_t<Size>::exact make_uint_t(
-                            const std::initializer_list<T> &args) {
+                    static inline typename boost::uint_t<Size>::exact
+                        make_uint_t(const std::initializer_list<T> &args) {
                         typedef typename std::initializer_list<T>::value_type value_type;
                         typename boost::uint_t<Size>::exact result = 0;
 
 #pragma clang loop unroll(full)
                         for (const value_type &itr : args) {
                             result = static_cast<typename boost::uint_t<Size>::exact>(
-                                    (result << std::numeric_limits<value_type>::digits) | itr);
+                                (result << std::numeric_limits<value_type>::digits) | itr);
                         }
 
                         return result;
                     }
 
-                    template<std::size_t Size, typename ...Args>
+                    template<std::size_t Size, typename... Args>
                     static inline typename boost::uint_t<Size>::exact make_uint_t(Args... args) {
-                        return basic_functions<WordBits>::template make_uint_t<Size, typename std::tuple_element<0,
-                                                                                                                 std::tuple<
-                                                                                                                         Args...>>::type>(
+                        return basic_functions<WordBits>::
+                            template make_uint_t<Size, typename std::tuple_element<0, std::tuple<Args...>>::type>(
                                 {args...});
                     }
 
@@ -93,9 +92,9 @@ namespace nil {
                         return shl<n>(x) | shr<word_bits - n>(x);
                     }
                 };
-            } // namespace detail
-        }
-    }
-} // namespace nil
+            }    // namespace detail
+        }        // namespace block
+    }            // namespace crypto3
+}    // namespace nil
 
-#endif // CRYPTO3_BASIC_FUNCTIONS_HPP
+#endif    // CRYPTO3_BASIC_FUNCTIONS_HPP

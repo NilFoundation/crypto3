@@ -68,16 +68,16 @@ namespace nil {
                 typedef typename policy_type::key_schedule_type key_schedule_type;
 
                 template<template<typename, typename> class Mode, typename StateAccumulator, std::size_t ValueBits,
-                        typename Padding>
+                         typename Padding>
                 struct stream_cipher {
                     typedef block_stream_processor<Mode<shacal2<Version>, Padding>, StateAccumulator,
-                            stream_endian::little_octet_big_bit,
-                            ValueBits, policy_type::word_bits * 2> type_;
+                                                   stream_endian::little_octet_big_bit, ValueBits,
+                                                   policy_type::word_bits * 2>
+                        type_;
 #ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES
                     typedef type_ type;
 #else
-                    struct type : type_ {
-                    };
+                    struct type : type_ {};
 #endif
                 };
 
@@ -111,10 +111,8 @@ namespace nil {
                 static void prepare_schedule(key_schedule_type &schedule) {
 #ifdef CRYPTO3_BLOCK_SHOW_PROGRESS
                     for (unsigned t = 0; t < key_words; ++t) {
-                        std::printf(word_bits == 32 ?
-                                    "WordBits[%2d] = %.8x\n" :
-                                    "WordBits[%2d] = %.16lx\n",
-                                    t, round_constants_words[t]);
+                        std::printf(word_bits == 32 ? "WordBits[%2d] = %.8x\n" : "WordBits[%2d] = %.16lx\n", t,
+                                    round_constants_words[t]);
                     }
 #endif
 
@@ -132,27 +130,21 @@ namespace nil {
 
 #ifdef CRYPTO3_BLOCK_SHOW_PROGRESS
                     for (unsigned t = 0; t < block_words; ++t) {
-                        std::printf(word_bits == 32 ?
-                                    "H[%d] = %.8x\n" :
-                                    "H[%d] = %.16lx\n",
-                                    t, plaintext[t]);
+                        std::printf(word_bits == 32 ? "H[%d] = %.8x\n" : "H[%d] = %.16lx\n", t, plaintext[t]);
                     }
 #endif
 
                     // Initialize working variables with block
-                    word_type a = plaintext[0], b = plaintext[1], c = plaintext[2], d = plaintext[3], e = plaintext[4], f = plaintext[5], g = plaintext[6], h = plaintext[7];
+                    word_type a = plaintext[0], b = plaintext[1], c = plaintext[2], d = plaintext[3], e = plaintext[4],
+                              f = plaintext[5], g = plaintext[6], h = plaintext[7];
 
                     // Encipher block
 #ifdef CRYPTO3_BLOCK_NO_OPTIMIZATION
 
                     for (unsigned t = 0; t < rounds; ++t) {
-                        word_type T1 = h
-                                     + policy_type::Sigma_1(e)
-                                     + policy_type::Ch(e, f, g)
-                                     + policy_type::constants[t]
-                                     + round_constants_words[t];
-                        word_type T2 = policy_type::Sigma_0(a)
-                                     + policy_type::Maj(a, b, c);
+                        word_type T1 = h + policy_type::Sigma_1(e) + policy_type::Ch(e, f, g) +
+                                       policy_type::constants[t] + round_constants_words[t];
+                        word_type T2 = policy_type::Sigma_0(a) + policy_type::Maj(a, b, c);
 
                         h = g;
                         g = f;
@@ -164,24 +156,21 @@ namespace nil {
                         a = T1 + T2;
 
 #ifdef CRYPTO3_BLOCK_SHOW_PROGRESS
-                        std::printf(word_bits == 32 ?
-                                    "t = %2d: %.8x %.8x %.8x %.8x"
-                                            " %.8x %.8x %.8x %.8x\n" :
-                                    "t = %2d: %.16lx %.16lx %.16lx %.16lx"
-                                            " %.16lx %.16lx %.16lx %.16lx\n",
-                                    t, a, b, c, d,
-                                       e, f, g, h);
+                        std::printf(word_bits == 32 ? "t = %2d: %.8x %.8x %.8x %.8x"
+                                                      " %.8x %.8x %.8x %.8x\n" :
+                                                      "t = %2d: %.16lx %.16lx %.16lx %.16lx"
+                                                      " %.16lx %.16lx %.16lx %.16lx\n",
+                                    t, a, b, c, d, e, f, g, h);
 #endif
                     }
 
-#else // CRYPTO3_BLOCK_NO_OPTIMIZATION
+#else    // CRYPTO3_BLOCK_NO_OPTIMIZATION
 
                     BOOST_STATIC_ASSERT(rounds % block_words == 0);
                     for (unsigned t = 0; t < rounds;) {
                         for (int n = block_words; n--; ++t) {
-                            word_type T1 =
-                                    h + policy_type::Sigma_1(e) + policy_type::Ch(e, f, g) + policy_type::constants[t] +
-                                    schedule[t];
+                            word_type T1 = h + policy_type::Sigma_1(e) + policy_type::Ch(e, f, g) +
+                                           policy_type::constants[t] + schedule[t];
                             word_type T2 = policy_type::Sigma_0(a) + policy_type::Maj(a, b, c);
 
                             h = g;
@@ -194,69 +183,65 @@ namespace nil {
                             a = T1 + T2;
 
 #ifdef CRYPTO3_BLOCK_SHOW_PROGRESS
-                            std::printf(word_bits == 32 ?
-                                        "t = %2d: %.8x %.8x %.8x %.8x"
-                                                " %.8x %.8x %.8x %.8x\n" :
-                                        "t = %2d: %.16lx %.16lx %.16lx %.16lx"
-                                                " %.16lx %.16lx %.16lx %.16lx\n",
-                                        t, a, b, c, d,
-                                           e, f, g, h);
+                            std::printf(word_bits == 32 ? "t = %2d: %.8x %.8x %.8x %.8x"
+                                                          " %.8x %.8x %.8x %.8x\n" :
+                                                          "t = %2d: %.16lx %.16lx %.16lx %.16lx"
+                                                          " %.16lx %.16lx %.16lx %.16lx\n",
+                                        t, a, b, c, d, e, f, g, h);
 #endif
                         }
-            }
+                    }
 
 #endif
 
-            return {{a, b, c, d, e, f, g, h}};
-        }
+                    return {{a, b, c, d, e, f, g, h}};
+                }
 
-        block_type decrypt_block(const block_type &ciphertext) {
-            return decrypt_block(schedule, ciphertext);
-        }
+                block_type decrypt_block(const block_type &ciphertext) {
+                    return decrypt_block(schedule, ciphertext);
+                }
 
-        inline static block_type decrypt_block(const key_schedule_type &schedule, const block_type &ciphertext) {
+                inline static block_type decrypt_block(const key_schedule_type &schedule,
+                                                       const block_type &ciphertext) {
 
 #ifdef CRYPTO3_BLOCK_SHOW_PROGRESS
-            for (unsigned t = 0; t < block_words; ++t) {
-                std::printf(word_bits == 32 ?
-                            "H[%d] = %.8x\n" :
-                            "H[%d] = %.16lx\n",
-                            t, ciphertext[t]);
-            }
+                    for (unsigned t = 0; t < block_words; ++t) {
+                        std::printf(word_bits == 32 ? "H[%d] = %.8x\n" : "H[%d] = %.16lx\n", t, ciphertext[t]);
+                    }
 #endif
 
-            // Initialize working variables with block
-            word_type a = ciphertext[0], b = ciphertext[1], c = ciphertext[2], d = ciphertext[3], e = ciphertext[4], f = ciphertext[5], g = ciphertext[6], h = ciphertext[7];
+                    // Initialize working variables with block
+                    word_type a = ciphertext[0], b = ciphertext[1], c = ciphertext[2], d = ciphertext[3],
+                              e = ciphertext[4], f = ciphertext[5], g = ciphertext[6], h = ciphertext[7];
 
-            // Decipher block
-            for (unsigned t = rounds; t--;) {
-                word_type T2 = policy_type::Sigma_0(b) + policy_type::Maj(b, c, d);
-                word_type T1 = a - T2;
+                    // Decipher block
+                    for (unsigned t = rounds; t--;) {
+                        word_type T2 = policy_type::Sigma_0(b) + policy_type::Maj(b, c, d);
+                        word_type T1 = a - T2;
 
-                a = b;
-                b = c;
-                c = d;
-                d = e - T1;
-                e = f;
-                f = g;
-                g = h;
-                h = T1 - policy_type::Sigma_1(e) - policy_type::Ch(e, f, g) - policy_type::constants[t] - schedule[t];
+                        a = b;
+                        b = c;
+                        c = d;
+                        d = e - T1;
+                        e = f;
+                        f = g;
+                        g = h;
+                        h = T1 - policy_type::Sigma_1(e) - policy_type::Ch(e, f, g) - policy_type::constants[t] -
+                            schedule[t];
 
 #ifdef CRYPTO3_BLOCK_SHOW_PROGRESS
-                std::printf(word_bits == 32 ?
-                            "t = %2d: %.8x %.8x %.8x %.8x"
-                                    " %.8x %.8x %.8x %.8x\n" :
-                            "t = %2d: %.16lx %.16lx %.16lx %.16lx"
-                                    " %.16lx %.16lx %.16lx %.16lx\n",
-                            t, a, b, c, d,
-                               e, f, g, h);
+                        std::printf(word_bits == 32 ? "t = %2d: %.8x %.8x %.8x %.8x"
+                                                      " %.8x %.8x %.8x %.8x\n" :
+                                                      "t = %2d: %.16lx %.16lx %.16lx %.16lx"
+                                                      " %.16lx %.16lx %.16lx %.16lx\n",
+                                    t, a, b, c, d, e, f, g, h);
 #endif
-            }
-            return {{a, b, c, d, e, f, g, h}};
-        }
-    };
-}
-}
-} // namespace nil
+                    }
+                    return {{a, b, c, d, e, f, g, h}};
+                }
+            };
+        }    // namespace block
+    }        // namespace crypto3
+}    // namespace nil
 
-#endif // CRYPTO3_BLOCK_CIPHERS_SHACAL2_HPP
+#endif    // CRYPTO3_BLOCK_CIPHERS_SHACAL2_HPP

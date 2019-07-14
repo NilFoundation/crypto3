@@ -79,7 +79,6 @@ namespace nil {
                     }
 
                 protected:
-
                     inline void resolve_type(const word_type &value, std::size_t bits) {
                         if (bits == std::size_t()) {
                             process(value, word_bits);
@@ -95,7 +94,6 @@ namespace nil {
                             process(value, bits);
                         }
                     }
-
 
                     inline void process(const word_type &value, std::size_t bits) {
                         if (cache.size() == cache.max_size()) {
@@ -135,7 +133,7 @@ namespace nil {
                     cache_type cache;
                     result_type digest;
                 };
-            }
+            }    // namespace impl
 
             namespace tag {
                 template<typename Mode>
@@ -147,17 +145,17 @@ namespace nil {
 
                     typedef boost::mpl::always<accumulators::impl::block_impl<Mode>> impl;
                 };
-            }
+            }    // namespace tag
 
             namespace extract {
                 template<typename Mode, typename AccumulatorSet>
-                typename boost::mpl::apply<AccumulatorSet, tag::block<Mode> >::type::result_type block(
-                        const AccumulatorSet &acc) {
-                    return boost::accumulators::extract_result<tag::block<Mode> >(acc);
+                typename boost::mpl::apply<AccumulatorSet, tag::block<Mode>>::type::result_type
+                    block(const AccumulatorSet &acc) {
+                    return boost::accumulators::extract_result<tag::block<Mode>>(acc);
                 }
-            }
-        }
-    }
-}
+            }    // namespace extract
+        }        // namespace accumulators
+    }            // namespace crypto3
+}    // namespace nil
 
-#endif //CRYPTO3_ACCUMULATORS_BLOCK_HPP
+#endif    // CRYPTO3_ACCUMULATORS_BLOCK_HPP

@@ -34,9 +34,9 @@ namespace nil {
                                constants[768 + policy_type::template extract_uint_t<CHAR_BIT>(X, 3)];
                     }
                 };
-            }
-        }
-    }
-}
+            }    // namespace detail
+        }        // namespace block
+    }            // namespace crypto3
+}    // namespace nil
 
-#endif //CRYPTO3_BLOWFISH_FUNCTIONS_CPP_HPP
+#endif    // CRYPTO3_BLOWFISH_FUNCTIONS_CPP_HPP

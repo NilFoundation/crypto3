@@ -28,9 +28,9 @@ namespace nil {
                     if (cpuid::is_little_endian()) {
                         const __vector unsigned char mask = {12, 13, 14, 15, 8, 9, 10, 11, 4, 5, 6, 7, 0, 1, 2, 3};
                         const __vector unsigned char zero = {0};
-                        return (__vector unsigned long long) vec_perm((__vector unsigned char) vec, zero, mask);
+                        return (__vector unsigned long long)vec_perm((__vector unsigned char)vec, zero, mask);
                     } else {
-                        return (__vector unsigned long long) vec;
+                        return (__vector unsigned long long)vec;
                     }
                 }
 
@@ -45,17 +45,16 @@ namespace nil {
                 }
 
                 __vector unsigned long long LoadBlock(const uint8_t *src) {
-                    return (__vector unsigned long long) Reverse8x16(vec_vsx_ld(0, src));
+                    return (__vector unsigned long long)Reverse8x16(vec_vsx_ld(0, src));
                 }
 
                 void StoreBlock(const __vector unsigned long long src, uint8_t *dest) {
-                    vec_vsx_st(Reverse8x16((__vector unsigned char) src), 0, dest);
+                    vec_vsx_st(Reverse8x16((__vector unsigned char)src), 0, dest);
                 }
 
                 template<std::size_t KeyBitsImpl, std::size_t BlockBitsImpl, typename PolicyType>
                 class rijndael_power8_impl {
-                    BOOST_STATIC_ASSERT(BlockBitsImpl
-                    == 128);
+                    BOOST_STATIC_ASSERT(BlockBitsImpl == 128);
                 };
 
                 template<typename PolicyType>
@@ -63,15 +62,13 @@ namespace nil {
                 protected:
                     typedef PolicyType policy_type;
 
-                    BOOST_STATIC_ASSERT(PolicyType::key_bits
-                    == 128);
-                    BOOST_STATIC_ASSERT(PolicyType::block_bits
-                    == 128);
+                    BOOST_STATIC_ASSERT(PolicyType::key_bits == 128);
+                    BOOST_STATIC_ASSERT(PolicyType::block_bits == 128);
 
                 public:
-                    static typename policy_type::block_type encrypt_block(
-                            const typename policy_type::block_type &plaintext,
-                            const typename policy_type::key_schedule_type &encryption_key) {
+                    static typename policy_type::block_type
+                        encrypt_block(const typename policy_type::block_type &plaintext,
+                                      const typename policy_type::key_schedule_type &encryption_key) {
                         typename policy_type::block_type out = {0};
 
                         const __vector unsigned long long K0 = LoadKey(&encryption_key[0]);
@@ -105,9 +102,9 @@ namespace nil {
                         return out;
                     }
 
-                    static typename policy_type::block_type decrypt_block(
-                            const typename policy_type::block_type &plaintext,
-                            const typename policy_type::key_schedule_type &encryption_key) {
+                    static typename policy_type::block_type
+                        decrypt_block(const typename policy_type::block_type &plaintext,
+                                      const typename policy_type::key_schedule_type &encryption_key) {
                         typename policy_type::block_type out = {0};
 
                         const __vector unsigned long long K0 = LoadBlock(&m_ME.data());
@@ -147,15 +144,13 @@ namespace nil {
                 protected:
                     typedef PolicyType policy_type;
 
-                    BOOST_STATIC_ASSERT(PolicyType::key_bits
-                    == 192);
-                    BOOST_STATIC_ASSERT(PolicyType::block_bits
-                    == 128);
+                    BOOST_STATIC_ASSERT(PolicyType::key_bits == 192);
+                    BOOST_STATIC_ASSERT(PolicyType::block_bits == 128);
 
                 public:
-                    static typename policy_type::block_type encrypt_block(
-                            const typename policy_type::block_type &plaintext,
-                            const typename policy_type::key_schedule_type &encryption_key) {
+                    static typename policy_type::block_type
+                        encrypt_block(const typename policy_type::block_type &plaintext,
+                                      const typename policy_type::key_schedule_type &encryption_key) {
                         typename policy_type::block_type out = {0};
 
                         const __vector unsigned long long K0 = LoadKey(&encryption_key[0]);
@@ -191,12 +186,11 @@ namespace nil {
                         StoreBlock(B, out.data());
 
                         return out;
-
                     }
 
-                    static typename policy_type::block_type decrypt_block(
-                            const typename policy_type::block_type &plaintext,
-                            const typename policy_type::key_schedule_type &encryption_key) {
+                    static typename policy_type::block_type
+                        decrypt_block(const typename policy_type::block_type &plaintext,
+                                      const typename policy_type::key_schedule_type &encryption_key) {
                         typename policy_type::block_type out = {0};
 
                         const __vector unsigned long long K0 = LoadBlock(m_ME.data());
@@ -238,15 +232,13 @@ namespace nil {
                 protected:
                     typedef PolicyType policy_type;
 
-                    BOOST_STATIC_ASSERT(PolicyType::key_bits
-                    == 256);
-                    BOOST_STATIC_ASSERT(PolicyType::block_bits
-                    == 128);
+                    BOOST_STATIC_ASSERT(PolicyType::key_bits == 256);
+                    BOOST_STATIC_ASSERT(PolicyType::block_bits == 128);
 
                 public:
-                    static typename policy_type::block_type encrypt_block(
-                            const typename policy_type::block_type &plaintext,
-                            const typename policy_type::key_schedule_type &encryption_key) {
+                    static typename policy_type::block_type
+                        encrypt_block(const typename policy_type::block_type &plaintext,
+                                      const typename policy_type::key_schedule_type &encryption_key) {
                         typename policy_type::block_type out = {0};
 
                         const __vector unsigned long long K0 = LoadKey(&encryption_key[0]);
@@ -288,9 +280,9 @@ namespace nil {
                         return out;
                     }
 
-                    static typename policy_type::block_type decrypt_block(
-                            const typename policy_type::block_type &plaintext,
-                            const typename policy_type::key_schedule_type &encryption_key) {
+                    static typename policy_type::block_type
+                        decrypt_block(const typename policy_type::block_type &plaintext,
+                                      const typename policy_type::key_schedule_type &encryption_key) {
 
                         typename policy_type::block_type out = {0};
 
@@ -333,9 +325,9 @@ namespace nil {
                         return out;
                     }
                 };
-            }
-        }
-    }
-}
+            }    // namespace detail
+        }        // namespace block
+    }            // namespace crypto3
+}    // namespace nil
 
-#endif //CRYPTO3_RIJNDAEL_POWER8_IMPL_HPP
+#endif    // CRYPTO3_RIJNDAEL_POWER8_IMPL_HPP

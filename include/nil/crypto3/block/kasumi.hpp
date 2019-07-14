@@ -32,8 +32,8 @@ namespace nil {
 
                 constexpr static const std::size_t key_schedule_size = policy_type::key_schedule_size;
                 typedef typename policy_type::key_schedule_type key_schedule_type;
-            public:
 
+            public:
                 constexpr static const std::size_t rounds = policy_type::rounds;
 
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
@@ -47,18 +47,17 @@ namespace nil {
                 constexpr static const std::size_t key_words = policy_type::key_words;
                 typedef typename policy_type::key_type key_type;
 
-                template<template<typename, typename> class Mode,
-                                                      typename StateAccumulator, std::size_t ValueBits,
-                                                      typename Padding>
+                template<template<typename, typename> class Mode, typename StateAccumulator, std::size_t ValueBits,
+                         typename Padding>
                 struct stream_cipher {
                     typedef block_stream_processor<Mode<kasumi, Padding>, StateAccumulator,
-                                                     stream_endian::little_octet_big_bit, ValueBits,
-                                                     policy_type::word_bits * 2> type_;
+                                                   stream_endian::little_octet_big_bit, ValueBits,
+                                                   policy_type::word_bits * 2>
+                        type_;
 #ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES
                     typedef type_ type;
 #else
-                    struct type : type_ {
-                    };
+                    struct type : type_ {};
 #endif
                 };
 
@@ -88,8 +87,8 @@ namespace nil {
                     for (size_t j = 0; j != rounds; j += 2) {
                         const uint16_t *K = &key_schedule[8 * j];
 
-                        uint16_t R = B1 ^(policy_type::template rotl<1>(B0) & K[0]);
-                        uint16_t L = B0 ^(policy_type::template rotl<1>(R) | K[1]);
+                        uint16_t R = B1 ^ (policy_type::template rotl<1>(B0) & K[0]);
+                        uint16_t L = B0 ^ (policy_type::template rotl<1>(R) | K[1]);
 
                         L = policy_type::FI(L ^ K[2], K[3]) ^ R;
                         R = policy_type::FI(R ^ K[4], K[5]) ^ L;
@@ -109,10 +108,8 @@ namespace nil {
                         B1 ^= R;
                     }
 
-                    return {
-                            boost::endian::big_to_native(B0), boost::endian::big_to_native(B1),
-                            boost::endian::big_to_native(B2), boost::endian::big_to_native(B3)
-                    };
+                    return {boost::endian::big_to_native(B0), boost::endian::big_to_native(B1),
+                            boost::endian::big_to_native(B2), boost::endian::big_to_native(B3)};
                 }
 
                 inline block_type decrypt_block(const block_type &ciphertext) {
@@ -147,10 +144,8 @@ namespace nil {
                         B3 ^= R;
                     }
 
-                    return {
-                            boost::endian::big_to_native(B0), boost::endian::big_to_native(B1),
-                            boost::endian::big_to_native(B2), boost::endian::big_to_native(B3)
-                    };
+                    return {boost::endian::big_to_native(B0), boost::endian::big_to_native(B1),
+                            boost::endian::big_to_native(B2), boost::endian::big_to_native(B3)};
                 }
 
                 key_schedule_type key_schedule;
@@ -176,7 +171,7 @@ namespace nil {
                     K.fill(0);
                 }
             };
-        }
-    }
-}
+        }    // namespace block
+    }        // namespace crypto3
+}    // namespace nil
 #endif

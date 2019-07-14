@@ -35,8 +35,8 @@ namespace nil {
                 typedef Mode mode_type;
                 typedef Padding padding_strategy;
             };
-        }
-    }
-}
+        }    // namespace block
+    }        // namespace crypto3
+}    // namespace nil
 
 #endif

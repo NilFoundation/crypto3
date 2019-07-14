@@ -24,9 +24,9 @@ namespace nil {
                     constexpr static const std::size_t parameters_size = 64;
                     typedef std::array<byte_type, parameters_size> parameters_type;
                 };
-            }
-        }
-    }
-}
+            }    // namespace detail
+        }        // namespace block
+    }            // namespace crypto3
+}    // namespace nil
 
-#endif //CRYPTO3_GOST_28147_89_POLICY_HPP
+#endif    // CRYPTO3_GOST_28147_89_POLICY_HPP

@@ -25,7 +25,6 @@ namespace nil {
             private:
                 struct col_selector {
                     col_selector(std::size_t row) : row(row) {
-
                     }
 
                     byte_type operator[](std::size_t col) const {
@@ -45,11 +44,10 @@ namespace nil {
 
                 // GostR3411-94-CryptoProParamSet (OID 1.2.643.2.2.31.1)
                 constexpr static const parameters_type parameters = {
-                        0xA5, 0x74, 0x77, 0xD1, 0x4F, 0xFA, 0x66, 0xE3, 0x54, 0xC7, 0x42, 0x4A, 0x60, 0xEC, 0xB4, 0x19,
-                        0x82, 0x90, 0x9D, 0x75, 0x1D, 0x4F, 0xC9, 0x0B, 0x3B, 0x12, 0x2F, 0x54, 0x79, 0x08, 0xA0, 0xAF,
-                        0xD1, 0x3E, 0x1A, 0x38, 0xC7, 0xB1, 0x81, 0xC6, 0xE6, 0x56, 0x05, 0x87, 0x03, 0x25, 0xEB, 0xFE,
-                        0x9C, 0x6D, 0xF8, 0x6D, 0x2E, 0xAB, 0xDE, 0x20, 0xBA, 0x89, 0x3C, 0x92, 0xF8, 0xD3, 0x53, 0xBC
-                };
+                    0xA5, 0x74, 0x77, 0xD1, 0x4F, 0xFA, 0x66, 0xE3, 0x54, 0xC7, 0x42, 0x4A, 0x60, 0xEC, 0xB4, 0x19,
+                    0x82, 0x90, 0x9D, 0x75, 0x1D, 0x4F, 0xC9, 0x0B, 0x3B, 0x12, 0x2F, 0x54, 0x79, 0x08, 0xA0, 0xAF,
+                    0xD1, 0x3E, 0x1A, 0x38, 0xC7, 0xB1, 0x81, 0xC6, 0xE6, 0x56, 0x05, 0x87, 0x03, 0x25, 0xEB, 0xFE,
+                    0x9C, 0x6D, 0xF8, 0x6D, 0x2E, 0xAB, 0xDE, 0x20, 0xBA, 0x89, 0x3C, 0x92, 0xF8, 0xD3, 0x53, 0xBC};
             };
 
             /**
@@ -62,7 +60,6 @@ namespace nil {
             private:
                 struct col_selector {
                     col_selector(std::size_t row) : row(row) {
-
                     }
 
                     byte_type operator[](std::size_t col) const {
@@ -82,11 +79,10 @@ namespace nil {
 
                 // GostR3411_94_TestParamSet (OID 1.2.643.2.2.31.0)
                 constexpr static const parameters_type parameters = {
-                        0x4E, 0x57, 0x64, 0xD1, 0xAB, 0x8D, 0xCB, 0xBF, 0x94, 0x1A, 0x7A, 0x4D, 0x2C, 0xD1, 0x10, 0x10,
-                        0xD6, 0xA0, 0x57, 0x35, 0x8D, 0x38, 0xF2, 0xF7, 0x0F, 0x49, 0xD1, 0x5A, 0xEA, 0x2F, 0x8D, 0x94,
-                        0x62, 0xEE, 0x43, 0x09, 0xB3, 0xF4, 0xA6, 0xA2, 0x18, 0xC6, 0x98, 0xE3, 0xC1, 0x7C, 0xE5, 0x7E,
-                        0x70, 0x6B, 0x09, 0x66, 0xF7, 0x02, 0x3C, 0x8B, 0x55, 0x95, 0xBF, 0x28, 0x39, 0xB3, 0x2E, 0xCC
-                };
+                    0x4E, 0x57, 0x64, 0xD1, 0xAB, 0x8D, 0xCB, 0xBF, 0x94, 0x1A, 0x7A, 0x4D, 0x2C, 0xD1, 0x10, 0x10,
+                    0xD6, 0xA0, 0x57, 0x35, 0x8D, 0x38, 0xF2, 0xF7, 0x0F, 0x49, 0xD1, 0x5A, 0xEA, 0x2F, 0x8D, 0x94,
+                    0x62, 0xEE, 0x43, 0x09, 0xB3, 0xF4, 0xA6, 0xA2, 0x18, 0xC6, 0x98, 0xE3, 0xC1, 0x7C, 0xE5, 0x7E,
+                    0x70, 0x6B, 0x09, 0x66, 0xF7, 0x02, 0x3C, 0x8B, 0x55, 0x95, 0xBF, 0x28, 0x39, 0xB3, 0x2E, 0xCC};
             };
 
             /*!
@@ -113,7 +109,6 @@ namespace nil {
                 typedef typename policy_type::expanded_substitution_type expanded_substitution_type;
 
             public:
-
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
                 typedef typename policy_type::word_type word_type;
 
@@ -125,23 +120,23 @@ namespace nil {
                 constexpr static const std::size_t key_words = policy_type::key_words;
                 typedef typename policy_type::key_type key_type;
 
-                template<template<typename, typename> class Mode,
-                                                      typename StateAccumulator, std::size_t ValueBits,
-                                                      typename Padding>
+                template<template<typename, typename> class Mode, typename StateAccumulator, std::size_t ValueBits,
+                         typename Padding>
                 struct stream_cipher {
                     typedef block_stream_processor<Mode<gost_28147_89<ParamsType>, Padding>, StateAccumulator,
-                                                     stream_endian::little_octet_big_bit, ValueBits,
-                                                     policy_type::word_bits * 2> type_;
+                                                   stream_endian::little_octet_big_bit, ValueBits,
+                                                   policy_type::word_bits * 2>
+                        type_;
 #ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES
                     typedef type_ type;
 #else
-                    struct type : type_ {
-                    };
+                    struct type : type_ {};
 #endif
                 };
 
-                gost_28147_89(const key_type &key, const expanded_substitution_type &exp = expanded_substitution_type())
-                        : expanded_substitution(exp) {
+                gost_28147_89(const key_type &key,
+                              const expanded_substitution_type &exp = expanded_substitution_type()) :
+                    expanded_substitution(exp) {
                     for (size_t i = 0; i != 256; ++i) {
                         expanded_substitution[i] = policy_type::template rotl<11, word_type>(params[0][i]);
                         expanded_substitution[i + 256] = policy_type::template rotl<19, word_type>(params[1][i]);
@@ -213,7 +208,7 @@ namespace nil {
                     return {boost::endian::little_to_native(N2), boost::endian::little_to_native(N1)};
                 }
             };
-        }
-    }
-}
+        }    // namespace block
+    }        // namespace crypto3
+}    // namespace nil
 #endif

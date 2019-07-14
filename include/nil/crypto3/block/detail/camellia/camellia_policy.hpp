@@ -51,9 +51,9 @@ namespace nil {
 
                     typedef typename std::array<word_type, key_schedule_words> key_schedule_type;
                 };
-            }
-        }
-    }
-}
+            }    // namespace detail
+        }        // namespace block
+    }            // namespace crypto3
+}    // namespace nil
 
-#endif //CRYPTO3_CAMELLIA_POLICY_HPP
+#endif    // CRYPTO3_CAMELLIA_POLICY_HPP

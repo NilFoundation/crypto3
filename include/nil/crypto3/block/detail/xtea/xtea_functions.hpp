@@ -20,9 +20,9 @@ namespace nil {
                 struct xtea_functions : public basic_functions<WordBits> {
                     typedef typename basic_functions<WordBits>::word_type word_type;
                 };
-            }
-        }
-    }
-}
+            }    // namespace detail
+        }        // namespace block
+    }            // namespace crypto3
+}    // namespace nil
 
-#endif //CRYPTO3_MISTY1_FUNCTIONS_CPP_HPP
+#endif    // CRYPTO3_MISTY1_FUNCTIONS_CPP_HPP

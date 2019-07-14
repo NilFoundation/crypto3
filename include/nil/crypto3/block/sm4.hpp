@@ -35,7 +35,6 @@ namespace nil {
                 typedef typename policy_type::key_schedule_type key_schedule_type;
 
             public:
-
                 constexpr static const std::size_t rounds = policy_type::rounds;
 
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
@@ -50,12 +49,16 @@ namespace nil {
                 typedef typename policy_type::key_type key_type;
 
                 template<template<typename, typename> class Mode,
-                                                      typename StateAccumulator, std::size_t ValueBits,
-                                                      typename Padding>
+                         typename StateAccumulator,
+                         std::size_t ValueBits,
+                         typename Padding>
                 struct stream_cipher {
-                    typedef block_stream_processor<Mode<sm4, Padding>, StateAccumulator,
-                                                     stream_endian::little_octet_big_bit, ValueBits,
-                                                     policy_type::word_bits * 2> type;
+                    typedef block_stream_processor<Mode<sm4, Padding>,
+                                                   StateAccumulator,
+                                                   stream_endian::little_octet_big_bit,
+                                                   ValueBits,
+                                                   policy_type::word_bits * 2>
+                        type;
                 };
 
                 sm4(const key_type &key) {
@@ -75,13 +78,13 @@ namespace nil {
                 }
 
             protected:
-
-#define SM4_RNDS(k0, k1, k2, k3, F, C) do {        \
-         B0 ^= F(B1 ^ B2 ^ B3 ^ key_schedule[k0], C); \
-         B1 ^= F(B0 ^ B2 ^ B3 ^ key_schedule[k1], C); \
-         B2 ^= F(B0 ^ B1 ^ B3 ^ key_schedule[k2], C); \
-         B3 ^= F(B0 ^ B1 ^ B2 ^ key_schedule[k3], C); \
-      } while(0)
+#define SM4_RNDS(k0, k1, k2, k3, F, C)               \
+    do {                                             \
+        B0 ^= F(B1 ^ B2 ^ B3 ^ key_schedule[k0], C); \
+        B1 ^= F(B0 ^ B2 ^ B3 ^ key_schedule[k1], C); \
+        B2 ^= F(B0 ^ B1 ^ B3 ^ key_schedule[k2], C); \
+        B3 ^= F(B0 ^ B1 ^ B2 ^ key_schedule[k3], C); \
+    } while (0)
 
                 key_schedule_type key_schedule;
 
@@ -100,10 +103,8 @@ namespace nil {
                     SM4_RNDS(24, 25, 26, 27, policy_type::t, policy_type::transposed_constants);
                     SM4_RNDS(28, 29, 30, 31, policy_type::t_slow, policy_type::constants);
 
-                    return {
-                            boost::endian::big_to_native(B3), boost::endian::big_to_native(B2),
-                            boost::endian::big_to_native(B1), boost::endian::big_to_native(B0)
-                    };
+                    return {boost::endian::big_to_native(B3), boost::endian::big_to_native(B2),
+                            boost::endian::big_to_native(B1), boost::endian::big_to_native(B0)};
                 }
 
                 inline block_type decrypt_block(const block_type &plaintext) {
@@ -121,10 +122,8 @@ namespace nil {
                     SM4_RNDS(7, 6, 5, 4, policy_type::t, policy_type::transposed_constants);
                     SM4_RNDS(3, 2, 1, 0, policy_type::t_slow, policy_type::constants);
 
-                    return {
-                            boost::endian::big_to_native(B3), boost::endian::big_to_native(B2),
-                            boost::endian::big_to_native(B1), boost::endian::big_to_native(B0)
-                    };
+                    return {boost::endian::big_to_native(B3), boost::endian::big_to_native(B2),
+                            boost::endian::big_to_native(B1), boost::endian::big_to_native(B0)};
                 }
 
                 void schedule_key(const key_type &key) {
@@ -135,16 +134,16 @@ namespace nil {
                     K[3] = boost::endian::native_to_big(key[3]) ^ policy_type::fk[3];
 
                     for (size_t i = 0; i != 32; ++i) {
-                        K[i % 4] ^= policy_type::tp(
-                                K[(i + 1) % 4] ^ K[(i + 2) % 4] ^ K[(i + 3) % 4] ^ policy_type::ck[i],
-                                policy_type::constants);
+                        K[i % 4] ^=
+                            policy_type::tp(K[(i + 1) % 4] ^ K[(i + 2) % 4] ^ K[(i + 3) % 4] ^ policy_type::ck[i],
+                                            policy_type::constants);
                         key_schedule[i] = K[i % 4];
                     }
 
                     K.fill(0);
                 }
             };
-        }
-    }
-}
+        }    // namespace block
+    }        // namespace crypto3
+}    // namespace nil
 #endif

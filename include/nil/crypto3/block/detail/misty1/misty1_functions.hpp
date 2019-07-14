@@ -27,9 +27,9 @@ namespace nil {
                         return static_cast<word_type>(D7 << 9) | D9;
                     }
                 };
-            }
-        }
-    }
-}
+            }    // namespace detail
+        }        // namespace block
+    }            // namespace crypto3
+}    // namespace nil
 
-#endif //CRYPTO3_MISTY1_FUNCTIONS_CPP_HPP
+#endif    // CRYPTO3_MISTY1_FUNCTIONS_CPP_HPP

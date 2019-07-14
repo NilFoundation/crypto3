@@ -34,7 +34,8 @@ namespace nil {
              * the 8-bit implementation by Jin Hong. The source files are available in ARIA.zip from
              * the Korea Internet & Security Agency website.
              * [RFC 5794, A Description of the ARIA Encryption Algorithm](https://tools.ietf.org/html/rfc5794),
-             * [Korea Internet & Security Agency homepage](http://seed.kisa.or.kr/iwt/ko/bbs/EgovReferenceList.do?bbsId=BBSMSTR_000000000002)
+             * [Korea Internet & Security Agency
+             * homepage](http://seed.kisa.or.kr/iwt/ko/bbs/EgovReferenceList.do?bbsId=BBSMSTR_000000000002)
              */
             template<std::size_t Size>
             class aria {
@@ -60,17 +61,16 @@ namespace nil {
                 constexpr static const std::size_t rounds = policy_type::rounds;
                 typedef typename policy_type::round_constants_type round_constants_type;
 
-                template<template<typename, typename> class Mode,
-                                                      typename StateAccumulator, std::size_t ValueBits,
-                                                      typename Padding>
+                template<template<typename, typename> class Mode, typename StateAccumulator, std::size_t ValueBits,
+                         typename Padding>
                 struct stream_cipher {
                     typedef block_stream_processor<Mode<aria<Size>, Padding>, StateAccumulator,
-                                                     stream_endian::little_octet_big_bit, ValueBits,
-                                                     policy_type::word_bits * 2> type;
+                                                   stream_endian::little_octet_big_bit, ValueBits,
+                                                   policy_type::word_bits * 2>
+                        type;
                 };
 
             public:
-
                 aria(const key_type &key) {
                     schedule_key(key);
                 }
@@ -228,9 +228,9 @@ namespace nil {
                     const size_t cache_line_size = cpuid::cache_line_size();
 
                     /*
-                    * This initializer ensures Z == 0xFFFFFFFF for any state line size
-                    * in {32,64,128,256,512}
-                    */
+                     * This initializer ensures Z == 0xFFFFFFFF for any state line size
+                     * in {32,64,128,256,512}
+                     */
                     volatile uint32_t Z = 0x11101010;
                     for (size_t i = 0; i < policy_type::constants_size; i += cache_line_size / sizeof(uint32_t)) {
                         Z |= policy_type::s1[i] | policy_type::s2[i];
@@ -260,43 +260,41 @@ namespace nil {
                         }
                     }
 
-                    return {
-                            policy_type::x1[policy_type::extract_uint_t<CHAR_BIT>(t0, 0)] ^
-                            policy_type::extract_uint_t<CHAR_BIT>(schedule[4 * rounds], 0),
+                    return {policy_type::x1[policy_type::extract_uint_t<CHAR_BIT>(t0, 0)] ^
+                                policy_type::extract_uint_t<CHAR_BIT>(schedule[4 * rounds], 0),
                             policy_type::x2[policy_type::extract_uint_t<CHAR_BIT>(t0, 1)] >> 8 ^
-                            policy_type::extract_uint_t<CHAR_BIT>(schedule[4 * rounds], 1),
+                                policy_type::extract_uint_t<CHAR_BIT>(schedule[4 * rounds], 1),
                             policy_type::s1[policy_type::extract_uint_t<CHAR_BIT>(t0, 2)] ^
-                            policy_type::extract_uint_t<CHAR_BIT>(schedule[4 * rounds], 2),
+                                policy_type::extract_uint_t<CHAR_BIT>(schedule[4 * rounds], 2),
                             policy_type::s2[policy_type::extract_uint_t<CHAR_BIT>(t0, 3)] ^
-                            policy_type::extract_uint_t<CHAR_BIT>(schedule[4 * rounds], 3),
+                                policy_type::extract_uint_t<CHAR_BIT>(schedule[4 * rounds], 3),
                             policy_type::x1[policy_type::extract_uint_t<CHAR_BIT>(t1, 0)] ^
-                            policy_type::extract_uint_t<CHAR_BIT>(schedule[4 * rounds + 1], 0),
+                                policy_type::extract_uint_t<CHAR_BIT>(schedule[4 * rounds + 1], 0),
                             policy_type::x2[policy_type::extract_uint_t<CHAR_BIT>(t1, 1)] >> 8 ^
-                            policy_type::extract_uint_t<CHAR_BIT>(schedule[4 * rounds + 1], 1),
+                                policy_type::extract_uint_t<CHAR_BIT>(schedule[4 * rounds + 1], 1),
                             policy_type::s1[policy_type::extract_uint_t<CHAR_BIT>(t1, 2)] ^
-                            policy_type::extract_uint_t<CHAR_BIT>(schedule[4 * rounds + 1], 2),
+                                policy_type::extract_uint_t<CHAR_BIT>(schedule[4 * rounds + 1], 2),
                             policy_type::s2[policy_type::extract_uint_t<CHAR_BIT>(t1, 3)] ^
-                            policy_type::extract_uint_t<CHAR_BIT>(schedule[4 * rounds + 1], 3),
+                                policy_type::extract_uint_t<CHAR_BIT>(schedule[4 * rounds + 1], 3),
                             policy_type::x1[policy_type::extract_uint_t<CHAR_BIT>(t2, 0)] ^
-                            policy_type::extract_uint_t<CHAR_BIT>(schedule[4 * rounds + 2], 0),
+                                policy_type::extract_uint_t<CHAR_BIT>(schedule[4 * rounds + 2], 0),
                             policy_type::x2[policy_type::extract_uint_t<CHAR_BIT>(t2, 1)] >> 8 ^
-                            policy_type::extract_uint_t<CHAR_BIT>(schedule[4 * rounds + 2], 1),
+                                policy_type::extract_uint_t<CHAR_BIT>(schedule[4 * rounds + 2], 1),
                             policy_type::s1[policy_type::extract_uint_t<CHAR_BIT>(t2, 2)] ^
-                            policy_type::extract_uint_t<CHAR_BIT>(schedule[4 * rounds + 2], 2),
+                                policy_type::extract_uint_t<CHAR_BIT>(schedule[4 * rounds + 2], 2),
                             policy_type::s2[policy_type::extract_uint_t<CHAR_BIT>(t2, 3)] ^
-                            policy_type::extract_uint_t<CHAR_BIT>(schedule[4 * rounds + 2], 3),
+                                policy_type::extract_uint_t<CHAR_BIT>(schedule[4 * rounds + 2], 3),
                             policy_type::x1[policy_type::extract_uint_t<CHAR_BIT>(t3, 0)] ^
-                            policy_type::extract_uint_t<CHAR_BIT>(schedule[4 * rounds + 3], 0),
+                                policy_type::extract_uint_t<CHAR_BIT>(schedule[4 * rounds + 3], 0),
                             policy_type::x2[policy_type::extract_uint_t<CHAR_BIT>(t3, 1)] >> 8 ^
-                            policy_type::extract_uint_t<CHAR_BIT>(schedule[4 * rounds + 3], 1),
+                                policy_type::extract_uint_t<CHAR_BIT>(schedule[4 * rounds + 3], 1),
                             policy_type::s1[policy_type::extract_uint_t<CHAR_BIT>(t3, 2)] ^
-                            policy_type::extract_uint_t<CHAR_BIT>(schedule[4 * rounds + 3], 2),
+                                policy_type::extract_uint_t<CHAR_BIT>(schedule[4 * rounds + 3], 2),
                             policy_type::s2[policy_type::extract_uint_t<CHAR_BIT>(t3, 3)] ^
-                            policy_type::extract_uint_t<CHAR_BIT>(schedule[4 * rounds + 3], 3)
-                    };
+                                policy_type::extract_uint_t<CHAR_BIT>(schedule[4 * rounds + 3], 3)};
                 }
             };
-        }
-    }
-}
+        }    // namespace block
+    }        // namespace crypto3
+}    // namespace nil
 #endif

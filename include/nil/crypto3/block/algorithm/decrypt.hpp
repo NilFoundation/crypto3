@@ -66,10 +66,9 @@ namespace nil {
          *
          * @return
          */
-        template<typename BlockCipher,
-                 typename InputIterator,
-                 typename OutputAccumulator = typename block::block_accumulator<
-                         typename BlockCipher::stream_decrypter_type>>
+        template<
+            typename BlockCipher, typename InputIterator,
+            typename OutputAccumulator = typename block::block_accumulator<typename BlockCipher::stream_decrypter_type>>
         OutputAccumulator &decrypt(InputIterator first, InputIterator last, OutputAccumulator &acc) {
 
             typedef typename BlockCipher::stream_decrypter_type EncryptionMode;
@@ -95,10 +94,9 @@ namespace nil {
          *
          * @return
          */
-        template<typename BlockCipher,
-                 typename SinglePassRange,
-                 typename OutputAccumulator = typename block::block_accumulator<
-                         typename BlockCipher::stream_decrypter_type>>
+        template<
+            typename BlockCipher, typename SinglePassRange,
+            typename OutputAccumulator = typename block::block_accumulator<typename BlockCipher::stream_decrypter_type>>
         OutputAccumulator &decrypt(const SinglePassRange &r, OutputAccumulator &acc) {
 
             typedef typename BlockCipher::stream_decrypter_type EncryptionMode;
@@ -122,13 +120,11 @@ namespace nil {
          * @param last
          * @return
          */
-        template<typename BlockCipher,
-                 typename InputIterator,
-                 typename KeyIterator,
-                 typename CipherAccumulator = typename block::block_accumulator<
-                         typename BlockCipher::stream_decrypter_type>>
-        block::detail::range_cipher_impl <block::detail::value_cipher_impl<CipherAccumulator>> decrypt(
-                InputIterator first, InputIterator last, KeyIterator key_first, KeyIterator key_last) {
+        template<
+            typename BlockCipher, typename InputIterator, typename KeyIterator,
+            typename CipherAccumulator = typename block::block_accumulator<typename BlockCipher::stream_decrypter_type>>
+        block::detail::range_cipher_impl<block::detail::value_cipher_impl<CipherAccumulator>>
+            decrypt(InputIterator first, InputIterator last, KeyIterator key_first, KeyIterator key_last) {
 
             typedef block::detail::value_cipher_impl<CipherAccumulator> StreamEncrypterImpl;
             typedef block::detail::range_cipher_impl<StreamEncrypterImpl> EncrypterImpl;
@@ -172,20 +168,18 @@ namespace nil {
          * @param r
          * @return
          */
-        template<typename BlockCipher,
-                 typename SinglePassRange,
-                 typename KeyRange,
-                 typename CipherAccumulator = typename block::block_accumulator<
-                         typename BlockCipher::stream_decrypter_type>>
-        block::detail::range_cipher_impl <block::detail::value_cipher_impl<CipherAccumulator>> decrypt(
-                const SinglePassRange &r, const KeyRange &key) {
+        template<
+            typename BlockCipher, typename SinglePassRange, typename KeyRange,
+            typename CipherAccumulator = typename block::block_accumulator<typename BlockCipher::stream_decrypter_type>>
+        block::detail::range_cipher_impl<block::detail::value_cipher_impl<CipherAccumulator>>
+            decrypt(const SinglePassRange &r, const KeyRange &key) {
 
             typedef block::detail::value_cipher_impl<CipherAccumulator> StreamEncrypterImpl;
             typedef block::detail::range_cipher_impl<StreamEncrypterImpl> EncrypterImpl;
 
             return EncrypterImpl(r, CipherState(BlockCipher(key)));
         }
-    } // namespace crypto3
-} // namespace nil
+    }    // namespace crypto3
+}    // namespace nil
 
-#endif // include guard
+#endif    // include guard

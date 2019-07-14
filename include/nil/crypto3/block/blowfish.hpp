@@ -28,7 +28,6 @@ namespace nil {
              */
             class blowfish {
             protected:
-
                 typedef detail::blowfish_policy policy_type;
 
                 typedef typename policy_type::permutations_type permutations_type;
@@ -36,7 +35,6 @@ namespace nil {
                 typedef typename policy_type::constants_type constants_type;
 
             public:
-
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
                 typedef typename policy_type::word_type word_type;
 
@@ -49,23 +47,22 @@ namespace nil {
 
                 constexpr static const std::size_t rounds = policy_type::rounds;
 
-                template<template<typename, typename> class Mode,
-                                                      typename StateAccumulator, std::size_t ValueBits,
-                                                      typename Padding>
+                template<template<typename, typename> class Mode, typename StateAccumulator, std::size_t ValueBits,
+                         typename Padding>
                 struct stream_cipher {
                     typedef block_stream_processor<Mode<blowfish, Padding>, StateAccumulator,
-                                                     stream_endian::little_octet_big_bit, ValueBits,
-                                                     policy_type::word_bits * 2> type_;
+                                                   stream_endian::little_octet_big_bit, ValueBits,
+                                                   policy_type::word_bits * 2>
+                        type_;
 #ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES
                     typedef type_ type;
 #else
-                    struct type : type_ {
-                    };
+                    struct type : type_ {};
 #endif
                 };
 
-                blowfish(const key_type &key, const salt_type &salt = salt_type()) : permutations(
-                        policy_type::permutations), constants(policy_type::constants) {
+                blowfish(const key_type &key, const salt_type &salt = salt_type()) :
+                    permutations(policy_type::permutations), constants(policy_type::constants) {
                     key_expansion(key, salt);
                 }
 
@@ -176,8 +173,8 @@ namespace nil {
                     return {R0, L0};
                 }
             };
-        }
-    }
-}
+        }    // namespace block
+    }        // namespace crypto3
+}    // namespace nil
 
 #endif

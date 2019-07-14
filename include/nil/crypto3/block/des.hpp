@@ -33,14 +33,12 @@ namespace nil {
              */
             class des {
             protected:
-
                 typedef detail::des_functions<detail::des_policy> policy_type;
 
                 constexpr static const std::size_t key_schedule_size = policy_type::key_schedule_size;
                 typedef typename policy_type::key_schedule_type key_schedule_type;
 
             public:
-
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
                 typedef typename policy_type::word_type word_type;
 
@@ -52,18 +50,17 @@ namespace nil {
                 constexpr static const std::size_t key_words = policy_type::key_words;
                 typedef typename policy_type::key_type key_type;
 
-                template<template<typename, typename> class Mode,
-                                                      typename StateAccumulator, std::size_t ValueBits,
-                                                      typename Padding>
+                template<template<typename, typename> class Mode, typename StateAccumulator, std::size_t ValueBits,
+                         typename Padding>
                 struct stream_cipher {
                     typedef block_stream_processor<Mode<des, Padding>, StateAccumulator,
-                                                     stream_endian::little_octet_big_bit, ValueBits,
-                                                     policy_type::word_bits * 2> type_;
+                                                   stream_endian::little_octet_big_bit, ValueBits,
+                                                   policy_type::word_bits * 2>
+                        type_;
 #ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES
                     typedef type_ type;
 #else
-                    struct type : type_ {
-                    };
+                    struct type : type_ {};
 #endif
                 };
 
@@ -117,8 +114,8 @@ namespace nil {
             class triple_des {
             protected:
                 typedef detail::des_functions<detail::triple_des_policy<KeyBits>> policy_type;
-            public:
 
+            public:
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
                 typedef typename policy_type::word_type word_type;
 
@@ -150,7 +147,6 @@ namespace nil {
                 }
 
             protected:
-
                 key_schedule_type round_key;
 
                 inline void schedule_key(const key_type &key) {
@@ -194,8 +190,8 @@ namespace nil {
                     return out;
                 }
             };
-        }
-    }
-}
+        }    // namespace block
+    }        // namespace crypto3
+}    // namespace nil
 
 #endif

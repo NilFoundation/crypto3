@@ -44,8 +44,8 @@ namespace nil {
                         key_schedule_word_type result = {0};
 #pragma clang loop unroll(full)
                         for (uint8_t i = 0; i < policy_type::word_bytes; ++i) {
-                            result = result << CHAR_BIT |
-                                     constants[policy_type::template extract_uint_t<CHAR_BIT>(x, i)];
+                            result =
+                                result << CHAR_BIT | constants[policy_type::template extract_uint_t<CHAR_BIT>(x, i)];
                         }
 
                         return result;
@@ -71,13 +71,13 @@ namespace nil {
                             }
 #pragma clang loop unroll(full)
                             for (int i = 0; i < policy_type::block_words - 1; ++i) {
-                                state[i * policy_type::word_bytes + row] = state[(i + off) * policy_type::word_bytes +
-                                                                                 row];
+                                state[i * policy_type::word_bytes + row] =
+                                    state[(i + off) * policy_type::word_bytes + row];
                             }
 #pragma clang loop unroll(full)
                             for (int i = 0; i < off; ++i) {
-                                state[(policy_type::block_words - 1 - i) * policy_type::word_bytes + row] = tmp[off -
-                                                                                                                1 - i];
+                                state[(policy_type::block_words - 1 - i) * policy_type::word_bytes + row] =
+                                    tmp[off - 1 - i];
                             }
                         }
                     }
@@ -92,9 +92,9 @@ namespace nil {
                             for (int row = 0; row < policy_type::word_bytes; ++row) {
 #pragma clang loop unroll(full)
                                 for (int k = 0; k < policy_type::word_bytes; ++k) {
-                                    tmp[col * policy_type::word_bytes + row] ^= policy_type::mul(
-                                            mm[row * policy_type::word_bytes + k],
-                                            state[col * policy_type::word_bytes + k]);
+                                    tmp[col * policy_type::word_bytes + row] ^=
+                                        policy_type::mul(mm[row * policy_type::word_bytes + k],
+                                                         state[col * policy_type::word_bytes + k]);
                                 }
                             }
                         }
@@ -111,8 +111,9 @@ namespace nil {
                         for (std::uint8_t i = 0; i < policy_type::block_words && first != last; ++i && ++first) {
 #pragma clang loop unroll(full)
                             for (std::uint8_t j = 0; j < policy_type::word_bytes; ++j) {
-                                state[i * policy_type::word_bytes + j] ^= policy_type::template extract_uint_t<
-                                        CHAR_BIT>(*first, policy_type::word_bytes - (j + 1));
+                                state[i * policy_type::word_bytes + j] ^=
+                                    policy_type::template extract_uint_t<CHAR_BIT>(*first,
+                                                                                   policy_type::word_bytes - (j + 1));
                             }
                         }
                     }
@@ -124,11 +125,10 @@ namespace nil {
                         shift_rows(state, offsets);
                         state = mix_columns(state, mm);
                         add_round_key(state, w.begin() + round * policy_type::block_words,
-                                w.begin() + (round + 1) * policy_type::block_words);
+                                      w.begin() + (round + 1) * policy_type::block_words);
                     }
 
                 public:
-
                     static typename policy_type::block_type encrypt_block(const block_type &plaintext,
                                                                           const key_schedule_type &encryption_key) {
                         block_type state = plaintext;
@@ -138,13 +138,13 @@ namespace nil {
 #pragma clang loop unroll(full)
                         for (std::uint8_t round = 1; round < policy_type::rounds; ++round) {
                             apply_round(round, state, encryption_key, policy_type::constants,
-                                    policy_type::shift_offsets, policy_type::mm);
+                                        policy_type::shift_offsets, policy_type::mm);
                         }
 
                         sub_bytes(state, policy_type::constants);
                         shift_rows(state, policy_type::shift_offsets);
                         add_round_key(state, encryption_key.begin() + policy_type::rounds * policy_type::block_words,
-                                encryption_key.begin() + (policy_type::rounds + 1) * policy_type::block_words);
+                                      encryption_key.begin() + (policy_type::rounds + 1) * policy_type::block_words);
 
                         return state;
                     }
@@ -154,12 +154,12 @@ namespace nil {
                         block_type state = plaintext;
 
                         add_round_key(state, decryption_key.begin() + policy_type::rounds * policy_type::block_words,
-                                decryption_key.begin() + (policy_type::rounds + 1) * policy_type::block_words);
+                                      decryption_key.begin() + (policy_type::rounds + 1) * policy_type::block_words);
 
 #pragma clang loop unroll(full)
                         for (std::uint8_t round = policy_type::rounds - 1; round > 0; --round) {
                             apply_round(round, state, decryption_key, policy_type::inverted_constants,
-                                    policy_type::inverted_shift_offsets, policy_type::inverted_mm);
+                                        policy_type::inverted_shift_offsets, policy_type::inverted_mm);
                         }
 
                         sub_bytes(state, policy_type::inverted_constants);
@@ -172,9 +172,9 @@ namespace nil {
                     static void schedule_key(const key_type &key, key_schedule_type &encryption_key,
                                              key_schedule_type &decryption_key) {
                         // the first key_words words are the original key
-                        pack<stream_endian::little_octet_big_bit, CHAR_BIT, policy_type::word_bits>(key.begin(),
-                                key.begin() + policy_type::key_words * policy_type::word_bytes, encryption_key.begin(),
-                                encryption_key.begin() + policy_type::key_words);
+                        pack<stream_endian::little_octet_big_bit, CHAR_BIT, policy_type::word_bits>(
+                            key.begin(), key.begin() + policy_type::key_words * policy_type::word_bytes,
+                            encryption_key.begin(), encryption_key.begin() + policy_type::key_words);
 
 #pragma clang loop unroll(full)
                         for (std::size_t i = policy_type::key_words; i < policy_type::key_schedule_words; ++i) {
@@ -190,25 +190,26 @@ namespace nil {
 
                         std::array<typename policy_type::byte_type, policy_type::key_schedule_bytes> bekey = {0};
                         pack<stream_endian::little_octet_big_bit, policy_type::word_bits, CHAR_BIT>(encryption_key,
-                                bekey);
+                                                                                                    bekey);
 
 #pragma clang loop unroll(full)
                         for (std::uint8_t round = 1; round < policy_type::rounds; ++round) {
                             move(mix_columns(boost::adaptors::slice(bekey, round * policy_type::block_bytes,
-                                    (round + 1) * policy_type::block_bytes), policy_type::inverted_mm),
-                                    bekey.begin() + round * policy_type::block_bytes);
+                                                                    (round + 1) * policy_type::block_bytes),
+                                             policy_type::inverted_mm),
+                                 bekey.begin() + round * policy_type::block_bytes);
                         }
 
                         pack<stream_endian::little_octet_big_bit, CHAR_BIT, policy_type::word_bits>(bekey,
-                                decryption_key);
+                                                                                                    decryption_key);
                     }
                 };
-            }
+            }    // namespace detail
             /*!
              * @endcond
              */
-        }
-    }
-}
+        }    // namespace block
+    }        // namespace crypto3
+}    // namespace nil
 
-#endif //CRYPTO3_RIJNDAEL_IMPL_HPP
+#endif    // CRYPTO3_RIJNDAEL_IMPL_HPP

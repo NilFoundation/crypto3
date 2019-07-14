@@ -33,9 +33,9 @@ namespace nil {
                                 s3[basic_functions<WordBits>::template extract_uint_t<CHAR_BIT>(X, 0)]);
                     }
                 };
-            }
-        }
-    }
-}
+            }    // namespace detail
+        }        // namespace block
+    }            // namespace crypto3
+}    // namespace nil
 
-#endif //CRYPTO3_SEED_FUNCTIONS_CPP_HPP
+#endif    // CRYPTO3_SEED_FUNCTIONS_CPP_HPP

@@ -48,9 +48,9 @@ namespace nil {
                     constexpr static const std::size_t key_schedule_size = 96;
                     typedef std::array<word_type, key_schedule_size> key_schedule_type;
                 };
-            }
-        }
-    }
-}
+            }    // namespace detail
+        }        // namespace block
+    }            // namespace crypto3
+}    // namespace nil
 
-#endif //CRYPTO3_DES_POLICY_HPP
+#endif    // CRYPTO3_DES_POLICY_HPP

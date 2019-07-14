@@ -34,9 +34,9 @@ namespace nil {
                         return y ^ (x | ~z);
                     }
                 };
-            }
-        }
-    }
-}
+            }    // namespace detail
+        }        // namespace block
+    }            // namespace crypto3
+}    // namespace nil
 
-#endif //CRYPTO3_MD5_FUNCTIONS_HPP
+#endif    // CRYPTO3_MD5_FUNCTIONS_HPP

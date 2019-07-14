@@ -20,9 +20,9 @@ namespace nil {
                 struct gost_28147_89_functions : public basic_functions<WordBits> {
                     typedef typename basic_functions<WordBits>::word_type word_type;
                 };
-            }
-        }
-    }
-}
+            }    // namespace detail
+        }        // namespace block
+    }            // namespace crypto3
+}    // namespace nil
 
-#endif //CRYPTO3_GOST_28147_89_FUNCTIONS_CPP_HPP
+#endif    // CRYPTO3_GOST_28147_89_FUNCTIONS_CPP_HPP

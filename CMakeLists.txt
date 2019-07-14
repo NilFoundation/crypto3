@@ -52,7 +52,6 @@ list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
      include/nil/crypto3/block/detail/exploder.hpp
      include/nil/crypto3/block/detail/imploder.hpp
      include/nil/crypto3/block/detail/state_adder.hpp
-     include/nil/crypto3/block/detail/type_traits.hpp
      include/nil/crypto3/block/detail/unbounded_shift.hpp
      )
 

@@ -52,10 +52,8 @@ namespace nil {
                 static void prepare_schedule(schedule_type &schedule) {
 #ifdef CRYPTO3_BLOCK_SHOW_PROGRESS
                     for (unsigned t = 0; t < key_words; ++t) {
-                        std::printf(word_bits == 32 ?
-                                    "WordBits[%2d] = %.8x\n" :
-                                    "WordBits[%2d] = %.16lx\n",
-                                    t, round_constants_words[t]);
+                        std::printf(word_bits == 32 ? "WordBits[%2d] = %.8x\n" : "WordBits[%2d] = %.16lx\n", t,
+                                    round_constants_words[t]);
                     }
 #endif
 
@@ -65,8 +63,8 @@ namespace nil {
                     }
                 }
             };
-        }
-    }
-} // namespace nil
+        }    // namespace block
+    }        // namespace crypto3
+}    // namespace nil
 
-#endif // CRYPTO3_BLOCK_CIPHERS_SHACAL1_HPP
+#endif    // CRYPTO3_BLOCK_CIPHERS_SHACAL1_HPP

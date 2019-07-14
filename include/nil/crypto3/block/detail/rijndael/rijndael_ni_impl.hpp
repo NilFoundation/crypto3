@@ -62,9 +62,9 @@ namespace nil {
                     out[5] = _mm_cvtsi128_si32(_mm_srli_si128(key2, 4));
                 }
 
-/*
-* The second half of the AES-256 key expansion (other half same as AES-128)
-*/
+                /*
+                 * The second half of the AES-256 key expansion (other half same as AES-128)
+                 */
                 CRYPTO3_FUNC_ISA("ssse3,aes")
 
                 __m128i aes_256_key_expansion(__m128i key, __m128i key2) {
@@ -77,42 +77,37 @@ namespace nil {
                     return _mm_xor_si128(key, key_with_rcon);
                 }
 
+#define AES_ENC_4_ROUNDS(K)           \
+    do {                              \
+        B0 = _mm_aesenc_si128(B0, K); \
+        B1 = _mm_aesenc_si128(B1, K); \
+        B2 = _mm_aesenc_si128(B2, K); \
+        B3 = _mm_aesenc_si128(B3, K); \
+    } while (0)
 
-#define AES_ENC_4_ROUNDS(K)                     \
-   do                                           \
-      {                                         \
-      B0 = _mm_aesenc_si128(B0, K);             \
-      B1 = _mm_aesenc_si128(B1, K);             \
-      B2 = _mm_aesenc_si128(B2, K);             \
-      B3 = _mm_aesenc_si128(B3, K);             \
-      } while(0)
+#define AES_ENC_4_LAST_ROUNDS(K)          \
+    do {                                  \
+        B0 = _mm_aesenclast_si128(B0, K); \
+        B1 = _mm_aesenclast_si128(B1, K); \
+        B2 = _mm_aesenclast_si128(B2, K); \
+        B3 = _mm_aesenclast_si128(B3, K); \
+    } while (0)
 
-#define AES_ENC_4_LAST_ROUNDS(K)                \
-   do                                           \
-      {                                         \
-      B0 = _mm_aesenclast_si128(B0, K);         \
-      B1 = _mm_aesenclast_si128(B1, K);         \
-      B2 = _mm_aesenclast_si128(B2, K);         \
-      B3 = _mm_aesenclast_si128(B3, K);         \
-      } while(0)
+#define AES_DEC_4_ROUNDS(K)           \
+    do {                              \
+        B0 = _mm_aesdec_si128(B0, K); \
+        B1 = _mm_aesdec_si128(B1, K); \
+        B2 = _mm_aesdec_si128(B2, K); \
+        B3 = _mm_aesdec_si128(B3, K); \
+    } while (0)
 
-#define AES_DEC_4_ROUNDS(K)                     \
-   do                                           \
-      {                                         \
-      B0 = _mm_aesdec_si128(B0, K);             \
-      B1 = _mm_aesdec_si128(B1, K);             \
-      B2 = _mm_aesdec_si128(B2, K);             \
-      B3 = _mm_aesdec_si128(B3, K);             \
-      } while(0)
-
-#define AES_DEC_4_LAST_ROUNDS(K)                \
-   do                                           \
-      {                                         \
-      B0 = _mm_aesdeclast_si128(B0, K);         \
-      B1 = _mm_aesdeclast_si128(B1, K);         \
-      B2 = _mm_aesdeclast_si128(B2, K);         \
-      B3 = _mm_aesdeclast_si128(B3, K);         \
-      } while(0)
+#define AES_DEC_4_LAST_ROUNDS(K)          \
+    do {                                  \
+        B0 = _mm_aesdeclast_si128(B0, K); \
+        B1 = _mm_aesdeclast_si128(B1, K); \
+        B2 = _mm_aesdeclast_si128(B2, K); \
+        B3 = _mm_aesdeclast_si128(B3, K); \
+    } while (0)
 
                 template<std::size_t KeyBitsImpl, std::size_t BlockBitsImpl, typename PolicyType>
                 class ni_rijndael_impl {
@@ -215,10 +210,10 @@ namespace nil {
 
                     CRYPTO3_FUNC_ISA("ssse3,aes")
 
-                    static void schedule_key(const key_type &input_key, key_schedule_type &encryption_key,
+                    static void schedule_key(const key_type &input_key,
+                                             key_schedule_type &encryption_key,
                                              key_schedule_type &decryption_key) {
-#define AES_128_KEY_EXPANSION(K, RCON) \
-      detail::aes_128_key_expansion(K, _mm_aeskeygenassist_si128(K, RCON))
+#define AES_128_KEY_EXPANSION(K, RCON) detail::aes_128_key_expansion(K, _mm_aeskeygenassist_si128(K, RCON))
 
                         const __m128i K0 = _mm_loadu_si128(reinterpret_cast<const __m128i *>(input_key.data()));
                         const __m128i K1 = AES_128_KEY_EXPANSION(K0, 0x01);
@@ -275,7 +270,6 @@ namespace nil {
                     BOOST_STATIC_ASSERT(PolicyType::key_bits == 192);
 
                 public:
-
                     CRYPTO3_FUNC_ISA("ssse3,aes")
 
                     static block_type encrypt_block(const block_type &plaintext,
@@ -370,7 +364,8 @@ namespace nil {
 
                     CRYPTO3_FUNC_ISA("ssse3,aes")
 
-                    static void schedule_key(const key_type &input_key, key_schedule_type &encryption_key,
+                    static void schedule_key(const key_type &input_key,
+                                             key_schedule_type &encryption_key,
                                              key_schedule_type &decryption_key) {
                         __m128i K0 = _mm_loadu_si128(reinterpret_cast<const __m128i *>(input_key.data()));
                         __m128i K1 = _mm_loadu_si128(reinterpret_cast<const __m128i *>(input_key.data() + 8));
@@ -378,10 +373,8 @@ namespace nil {
 
                         load_le(encryption_key.data(), input_key.data(), 6);
 
-#define AES_192_KEY_EXPANSION(RCON, EK_OFF)                         \
-     detail::aes_192_key_expansion(&K0, &K1,                             \
-                           _mm_aeskeygenassist_si128(K1, RCON),  \
-                           &encryption_key[EK_OFF], EK_OFF == 48)
+#define AES_192_KEY_EXPANSION(RCON, EK_OFF) \
+    detail::aes_192_key_expansion(&K0, &K1, _mm_aeskeygenassist_si128(K1, RCON), &encryption_key[EK_OFF], EK_OFF == 48)
 
                         AES_192_KEY_EXPANSION(0x01, 6);
                         AES_192_KEY_EXPANSION(0x02, 12);
@@ -527,7 +520,8 @@ namespace nil {
 
                     CRYPTO3_FUNC_ISA("ssse3,aes")
 
-                    static void schedule_key(const key_type &input_key, key_schedule_type &encryption_key,
+                    static void schedule_key(const key_type &input_key,
+                                             key_schedule_type &encryption_key,
                                              key_schedule_type &decryption_key) {
                         const __m128i K0 = _mm_loadu_si128(reinterpret_cast<const __m128i *>(input_key.data()));
                         const __m128i K1 = _mm_loadu_si128(reinterpret_cast<const __m128i *>(input_key.data() + 16));
@@ -588,12 +582,12 @@ namespace nil {
                         _mm_storeu_si128(DK_mm + 14, K0);
                     }
                 };
-            }
+            }    // namespace detail
             /*!
              * @endcond
              */
-        }
-    }
-}
+        }    // namespace block
+    }        // namespace crypto3
+}    // namespace nil
 
-#endif //CRYPTO3_RIJNDAEL_NI_IMPL_HPP
+#endif    // CRYPTO3_RIJNDAEL_NI_IMPL_HPP

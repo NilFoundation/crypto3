@@ -108,9 +108,9 @@ namespace nil {
                         KS[3] = (X[3]) ^ ((Y[(Q + 3) % 4]) >> R) ^ ((Y[(Q + 2) % 4]) << (32 - R));
                     }
                 };
-            }
-        }
-    }
-}
+            }    // namespace detail
+        }        // namespace block
+    }            // namespace crypto3
+}    // namespace nil
 
-#endif //CRYPTO3_ARIA_FUNCTIONS_CPP_HPP
+#endif    // CRYPTO3_ARIA_FUNCTIONS_CPP_HPP

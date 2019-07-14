@@ -30,9 +30,9 @@ namespace nil {
                 struct cast_policy<256, KeyBits> : public cast_functions<256, KeyBits> {
                     constexpr static const std::size_t rounds = cast_functions<256, KeyBits>::rounds;
                 };
-            }
-        }
-    }
-}
+            }    // namespace detail
+        }        // namespace block
+    }            // namespace crypto3
+}    // namespace nil
 
-#endif //CRYPTO3_CAST_POLICY_HPP
+#endif    // CRYPTO3_CAST_POLICY_HPP

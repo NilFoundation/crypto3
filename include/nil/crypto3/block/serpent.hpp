@@ -37,7 +37,6 @@ namespace nil {
                 typedef typename policy_type::key_schedule_type key_schedule_type;
 
             public:
-
                 constexpr static const std::size_t rounds = policy_type::rounds;
 
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
@@ -67,23 +66,21 @@ namespace nil {
                     return decrypt_block(ciphertext);
                 }
 
-                template<template<typename, typename> class Mode,
-                                                      typename StateAccumulator, std::size_t ValueBits,
-                                                      typename Padding>
+                template<template<typename, typename> class Mode, typename StateAccumulator, std::size_t ValueBits,
+                         typename Padding>
                 struct stream_cipher {
                     typedef block_stream_processor<Mode<serpent, Padding>, StateAccumulator,
-                                                     stream_endian::little_octet_big_bit, ValueBits,
-                                                     policy_type::word_bits * 2> type_;
+                                                   stream_endian::little_octet_big_bit, ValueBits,
+                                                   policy_type::word_bits * 2>
+                        type_;
 #ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES
                     typedef type_ type;
 #else
-                    struct type : type_ {
-                    };
+                    struct type : type_ {};
 #endif
                 };
 
             protected:
-
                 key_schedule_type key_schedule;
 
                 inline block_type encrypt_block(const block_type &plaintext) {
@@ -189,10 +186,8 @@ namespace nil {
                     SBoxE8(B0, B1, B2, B3);
                     key_xor(32, B0, B1, B2, B3);
 
-                    return {
-                            boost::endian::little_to_native(B0), boost::endian::little_to_native(B1),
-                            boost::endian::little_to_native(B2), boost::endian::little_to_native(B3)
-                    };
+                    return {boost::endian::little_to_native(B0), boost::endian::little_to_native(B1),
+                            boost::endian::little_to_native(B2), boost::endian::little_to_native(B3)};
                 }
 
                 inline block_type decrypt_block(const block_type &ciphertext) {
@@ -298,10 +293,8 @@ namespace nil {
                     SBoxD1(B0, B1, B2, B3);
                     key_xor(0, B0, B1, B2, B3);
 
-                    return {
-                            boost::endian::little_to_native(B0), boost::endian::little_to_native(B1),
-                            boost::endian::little_to_native(B2), boost::endian::little_to_native(B3)
-                    };
+                    return {boost::endian::little_to_native(B0), boost::endian::little_to_native(B1),
+                            boost::endian::little_to_native(B2), boost::endian::little_to_native(B3)};
                 }
 
                 void schedule_key(const key_type &key) {
@@ -313,7 +306,7 @@ namespace nil {
                     W[key.size() / 4] |= word_type(1) << ((key.size() % 4) * 8);
 
                     for (size_t i = 8; i != 140; ++i) {
-                        word_type wi = W[i - 8] ^W[i - 5] ^W[i - 3] ^W[i - 1] ^policy_type::phi ^word_type(i - 8);
+                        word_type wi = W[i - 8] ^ W[i - 5] ^ W[i - 3] ^ W[i - 1] ^ policy_type::phi ^ word_type(i - 8);
                         W[i] = policy_type::template rotl<11>(wi);
                     }
 
@@ -363,7 +356,7 @@ namespace nil {
                     W.fill(0);
                 }
             };
-        }
-    }
-}
+        }    // namespace block
+    }        // namespace crypto3
+}    // namespace nil
 #endif
