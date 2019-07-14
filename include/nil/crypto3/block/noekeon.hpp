@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_NOEKEON_HPP_
-#define CRYPTO3_NOEKEON_HPP_
+#ifndef CRYPTO3_NOEKEON_HPP
+#define CRYPTO3_NOEKEON_HPP
 
 #include <boost/endian/arithmetic.hpp>
 

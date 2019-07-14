@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_SEED_HPP_
-#define CRYPTO3_SEED_HPP_
+#ifndef CRYPTO3_SEED_HPP
+#define CRYPTO3_SEED_HPP
 
 #include <nil/crypto3/block/detail/seed/seed_policy.hpp>
 
