@@ -52,7 +52,6 @@ namespace nil {
                  * @param input_remaining_bits Bits remaining unprocessed in block
                  */
                 base_encode_finalizer(std::size_t) {
-
                 }
 
                 /*!
@@ -63,10 +62,8 @@ namespace nil {
                  */
                 template<typename T>
                 void operator()(T &t) {
-
                 }
             };
-
 
             template<std::size_t Version>
             struct base_encode_finalizer<Version, detail::static_range<!(Version % 32)>> {
@@ -76,7 +73,6 @@ namespace nil {
                  * @param input_remaining_bits Bits remaining unprocessed in block
                  */
                 base_encode_finalizer(std::size_t input_remaining_bits = 0) : remaining_bits(input_remaining_bits) {
-
                 }
 
                 /*!
@@ -87,13 +83,13 @@ namespace nil {
                  */
                 template<typename T>
                 void operator()(T &t) {
-                    for (typename T::iterator out = t.end() - 1; remaining_bits >=
-                                                                 policy_type::padding_bits; remaining_bits -= policy_type::padding_block_bits) {
+                    for (typename T::iterator out = t.end() - 1; remaining_bits >= policy_type::padding_bits;
+                         remaining_bits -= policy_type::padding_block_bits) {
                         *out-- = '=';
                     }
                 }
 
-                std::size_t remaining_bits; ///< Bits remaining unprocessed in block
+                std::size_t remaining_bits;    ///< Bits remaining unprocessed in block
             };
 
             /*!
@@ -109,7 +105,6 @@ namespace nil {
                 typedef detail::base_policy<Version> policy_type;
 
                 base_decode_finalizer(std::size_t) {
-
                 }
 
                 /*!
@@ -120,7 +115,6 @@ namespace nil {
                  */
                 template<typename T>
                 void operator()(T &t) {
-
                 }
             };
 
@@ -132,7 +126,6 @@ namespace nil {
                  * @param input_remaining_bits
                  */
                 base_decode_finalizer(std::size_t input_remaining_bits = 0) : remaining_bits(input_remaining_bits) {
-
                 }
 
                 /*!
@@ -262,8 +255,8 @@ namespace nil {
              * @brief Type alias for base<64>
              */
             typedef base<64> base64;
-        }
-    }
-}
+        }    // namespace codec
+    }        // namespace crypto3
+}    // namespace nil
 
 #endif

@@ -43,8 +43,8 @@ namespace nil {
 
                 constexpr static const std::size_t output_value_bits = mode_type::output_value_bits;
                 typedef typename output_block_type::value_type output_value_type;
-            public:
 
+            public:
                 typedef typename params_type::endian_type endian_type;
 
                 constexpr static const std::size_t value_bits = params_type::value_bits;
@@ -54,11 +54,10 @@ namespace nil {
                 typedef std::array<value_type, block_values> value_array_type;
 
             private:
-
                 constexpr static const std::size_t length_bits = params_type::length_bits;
                 // FIXME: do something more intelligent than capping at 64
                 constexpr static const std::size_t length_type_bits =
-                        length_bits < input_block_bits ? input_block_bits : length_bits > 64 ? 64 : length_bits;
+                    length_bits < input_block_bits ? input_block_bits : length_bits > 64 ? 64 : length_bits;
                 typedef typename boost::uint_t<length_type_bits>::least length_type;
 
                 BOOST_STATIC_ASSERT(!length_bits || length_bits % input_block_bits == 0);
@@ -68,7 +67,6 @@ namespace nil {
 
             public:
                 varlength_block_stream_processor(StateAccumulator &s) : state(s) {
-
                 }
 
                 template<typename InputIterator>
@@ -85,9 +83,8 @@ namespace nil {
                     state(block);
                 }
 
-                template<typename ValueType,
-                         typename = typename std::enable_if<
-                                 std::is_same<ValueType, typename input_block_type::value_type>::value>::type>
+                template<typename ValueType, typename = typename std::enable_if<std::is_same<
+                                                 ValueType, typename input_block_type::value_type>::value>::type>
                 inline void operator()(const ValueType &value) {
                     state(value);
                 }
@@ -104,13 +101,12 @@ namespace nil {
                 }
 
                 void reset() {
-
                 }
 
                 StateAccumulator &state;
             };
-        }
-    }
-}
+        }    // namespace codec
+    }        // namespace crypto3
+}    // namespace nil
 
-#endif //CRYPTO3_FIXED_BLOCK_STREAM_PROCESSOR_HPP
+#endif    // CRYPTO3_FIXED_BLOCK_STREAM_PROCESSOR_HPP

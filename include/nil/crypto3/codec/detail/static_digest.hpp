@@ -56,9 +56,7 @@ namespace nil {
              */
 
             template<std::size_t DigestBits>
-            class static_digest : public std::array<octet_type, DigestBits / octet_bits> {
-
-            };
+            class static_digest : public std::array<octet_type, DigestBits / octet_bits> {};
 
             namespace detail {
                 template<std::size_t DigestBits, typename OutputIterator>
@@ -78,10 +76,10 @@ namespace nil {
                     *p++ = '\0';
                     return s;
                 }
-            }
-        }
-    }
-}
+            }    // namespace detail
+        }        // namespace codec
+    }            // namespace crypto3
+}    // namespace nil
 
 namespace std {
     template<std::size_t DigestBits>
@@ -89,7 +87,7 @@ namespace std {
         std::array<char, DigestBits / 4 + 1> cstr = nil::crypto3::codec::detail::c_str(d);
         return std::string(cstr.data(), cstr.size() - 1);
     }
-}
+}    // namespace std
 
 namespace nil {
     namespace crypto3 {
@@ -132,8 +130,8 @@ namespace nil {
             bool operator==(const static_digest<DB1> &a, const static_digest<DB2> &b) {
                 // TODO: Think about size of static_digest. We can't use resize here because
                 //  it's change element which we compare
-                return static_cast<bool>(DB1 == DB2 ? std::equal(std::begin(a), std::end(a), std::begin(b), std::end(b))
-                                                    : 0);
+                return static_cast<bool>(
+                    DB1 == DB2 ? std::equal(std::begin(a), std::end(a), std::begin(b), std::end(b)) : 0);
             }
 
             template<std::size_t DB1, std::size_t DB2>
@@ -213,8 +211,8 @@ namespace nil {
                 pack<stream_endian::big_bit, 4, 8>(a, d);
                 return source;
             }
-        }
-    }
-} // namespace nil
+        }    // namespace codec
+    }        // namespace crypto3
+}    // namespace nil
 
-#endif // CRYPTO3_CODEC_STATIC_DIGEST_HPP
+#endif    // CRYPTO3_CODEC_STATIC_DIGEST_HPP

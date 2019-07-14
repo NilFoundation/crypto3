@@ -74,9 +74,9 @@ namespace nil {
                         return codec_type::decode(plaintext);
                     }
                 };
-            }
-        }
-    }
-}
+            }    // namespace detail
+        }        // namespace codec
+    }            // namespace crypto3
+}    // namespace nil
 
-#endif //CRYPTO3_PREPROCESSING_MODES_HPP
+#endif    // CRYPTO3_PREPROCESSING_MODES_HPP

@@ -17,8 +17,8 @@ namespace nil {
         namespace codec {
             constexpr static const std::size_t octet_bits = 8;
             typedef boost::uint_t<octet_bits>::least octet_type;
-        }
-    }
-}
+        }    // namespace codec
+    }        // namespace crypto3
+}    // namespace nil
 
-#endif //CRYPTO3_OCTET_HPP
+#endif    // CRYPTO3_OCTET_HPP

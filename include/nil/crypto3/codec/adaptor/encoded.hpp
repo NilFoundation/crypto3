@@ -31,7 +31,6 @@ namespace nil {
                 struct encoded {
                 public:
                     encoded(const StreamCodec &ise = StreamCodec()) : val(ise) {
-
                     }
 
                     StreamCodec val;
@@ -39,11 +38,10 @@ namespace nil {
 
                 template<typename Encoder,
                          typename SinglePassRange,
-                         typename StreamCodec = typename detail::range_codec_state_traits<
-                                 typename Encoder::stream_encoder_type, SinglePassRange>::type>
-                inline detail::range_codec_impl<detail::ref_codec_impl<StreamCodec>> operator|(SinglePassRange &r,
-                                                                                               const encoded<Encoder,
-                                                                                                             StreamCodec> &f) {
+                         typename StreamCodec = typename detail::
+                             range_codec_state_traits<typename Encoder::stream_encoder_type, SinglePassRange>::type>
+                inline detail::range_codec_impl<detail::ref_codec_impl<StreamCodec>>
+                    operator|(SinglePassRange &r, const encoded<Encoder, StreamCodec> &f) {
                     BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<SinglePassRange>));
 
                     return detail::range_codec_impl<detail::ref_codec_impl<StreamCodec>>(r, f.val);
@@ -51,17 +49,16 @@ namespace nil {
 
                 template<typename Encoder,
                          typename SinglePassRange,
-                         typename StreamCodec = typename detail::range_codec_state_traits<
-                                 typename Encoder::stream_encoder_type, SinglePassRange>::type>
-                inline detail::range_codec_impl<detail::ref_codec_impl<StreamCodec>> operator|(const SinglePassRange &r,
-                                                                                               const encoded<Encoder,
-                                                                                                             StreamCodec> &f) {
+                         typename StreamCodec = typename detail::
+                             range_codec_state_traits<typename Encoder::stream_encoder_type, SinglePassRange>::type>
+                inline detail::range_codec_impl<detail::ref_codec_impl<StreamCodec>>
+                    operator|(const SinglePassRange &r, const encoded<Encoder, StreamCodec> &f) {
                     BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange>));
 
                     return detail::range_codec_impl<detail::ref_codec_impl<StreamCodec>>(r, f.val);
                 }
-            };
-        }
-    }
-}
-#endif //CRYPTO3_ENCODED_HPP
+            };    // namespace adaptors
+        }         // namespace codec
+    }             // namespace crypto3
+}    // namespace nil
+#endif    // CRYPTO3_ENCODED_HPP

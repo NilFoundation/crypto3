@@ -85,7 +85,6 @@ namespace nil {
                     }
 
                 protected:
-
                     inline void resolve_type(const input_value_type &value, std::size_t bits) {
                         if (bits == std::size_t()) {
                             process(value, input_value_bits);
@@ -123,7 +122,7 @@ namespace nil {
                         } else {
                             input_block_type b = codec::make_array<input_block_values>(cache.begin(), cache.end());
                             typename input_block_type::const_iterator itr =
-                                    block.begin() + (cache.max_size() - cache.size());
+                                block.begin() + (cache.max_size() - cache.size());
 
                             std::move(block.begin(), itr, b.end());
 
@@ -141,7 +140,7 @@ namespace nil {
                     cache_type cache;
                     result_type digest;
                 };
-            }
+            }    // namespace impl
 
             namespace tag {
                 template<typename Mode>
@@ -153,31 +152,31 @@ namespace nil {
 
                     typedef boost::mpl::always<accumulators::impl::codec_impl<Mode>> impl;
                 };
-            }
+            }    // namespace tag
 
             namespace extract {
                 template<typename Mode, typename AccumulatorSet>
-                typename boost::mpl::apply<AccumulatorSet, tag::codec<Mode> >::type::result_type codec(
-                        const AccumulatorSet &acc) {
-                    return boost::accumulators::extract_result<tag::codec<Mode> >(acc);
+                typename boost::mpl::apply<AccumulatorSet, tag::codec<Mode>>::type::result_type
+                    codec(const AccumulatorSet &acc) {
+                    return boost::accumulators::extract_result<tag::codec<Mode>>(acc);
                 }
 
                 template<typename Codec, typename AccumulatorSet>
                 typename boost::mpl::apply<AccumulatorSet,
-                                           tag::codec<typename Codec::stream_encoder_type> >::type::result_type encode(
-                        const AccumulatorSet &acc) {
-                    return boost::accumulators::extract_result<tag::codec<typename Codec::stream_encoder_type> >(acc);
+                                           tag::codec<typename Codec::stream_encoder_type>>::type::result_type
+                    encode(const AccumulatorSet &acc) {
+                    return boost::accumulators::extract_result<tag::codec<typename Codec::stream_encoder_type>>(acc);
                 }
 
                 template<typename Codec, typename AccumulatorSet>
                 typename boost::mpl::apply<AccumulatorSet,
-                                           tag::codec<typename Codec::stream_decoder_type> >::type::result_type decode(
-                        const AccumulatorSet &acc) {
-                    return boost::accumulators::extract_result<tag::codec<typename Codec::stream_decoder_type> >(acc);
+                                           tag::codec<typename Codec::stream_decoder_type>>::type::result_type
+                    decode(const AccumulatorSet &acc) {
+                    return boost::accumulators::extract_result<tag::codec<typename Codec::stream_decoder_type>>(acc);
                 }
-            }
-        }
-    }
-}
+            }    // namespace extract
+        }        // namespace accumulators
+    }            // namespace crypto3
+}    // namespace nil
 
-#endif //CRYPTO3_ACCUMULATORS_CODEC_HPP
+#endif    // CRYPTO3_ACCUMULATORS_CODEC_HPP

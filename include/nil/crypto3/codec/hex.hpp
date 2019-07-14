@@ -35,30 +35,26 @@ namespace nil {
              * @struct hex_decode_error
              * @brief  Base exception class for all hex decoding errors
              */
-            struct hex_decode_error : virtual boost::exception, virtual std::exception {
-            };
+            struct hex_decode_error : virtual boost::exception, virtual std::exception {};
 
             /*!
              * @struct not_enough_input
              * @brief  Thrown when the input sequence unexpectedly ends
              * */
-            struct not_enough_input : virtual hex_decode_error {
-            };
+            struct not_enough_input : virtual hex_decode_error {};
 
             /*!
              * @struct non_hex_input
              * @brief  Thrown when a non-hex value (0-9, A-F) encountered when decoding.
              * Contains the offending character
              */
-            struct non_hex_input : virtual hex_decode_error {
-
-            };
+            struct non_hex_input : virtual hex_decode_error {};
             typedef boost::error_info<struct bad_char_, char> bad_char;
 
             namespace detail {
                 /*!
-                 * @brief Own detail::hex_iterator_traits class allows to get inside of some kinds of output iterator and get the
-                 * type to write in a hacky way.
+                 * @brief Own detail::hex_iterator_traits class allows to get inside of some kinds of output iterator
+                 * and get the type to write in a hacky way.
                  * @tparam Iterator
                  */
                 template<typename Iterator>
@@ -67,17 +63,17 @@ namespace nil {
                 };
 
                 template<typename Container>
-                struct hex_iterator_traits<std::back_insert_iterator<Container> > {
+                struct hex_iterator_traits<std::back_insert_iterator<Container>> {
                     typedef typename Container::value_type value_type;
                 };
 
                 template<typename Container>
-                struct hex_iterator_traits<std::front_insert_iterator<Container> > {
+                struct hex_iterator_traits<std::front_insert_iterator<Container>> {
                     typedef typename Container::value_type value_type;
                 };
 
                 template<typename Container>
-                struct hex_iterator_traits<std::insert_iterator<Container> > {
+                struct hex_iterator_traits<std::insert_iterator<Container>> {
                     typedef typename Container::value_type value_type;
                 };
 
@@ -93,7 +89,7 @@ namespace nil {
                  * We only care about the first one.
                  */
                 template<typename T, typename charType, typename traits>
-                struct hex_iterator_traits<std::ostream_iterator<T, charType, traits> > {
+                struct hex_iterator_traits<std::ostream_iterator<T, charType, traits>> {
                     typedef T value_type;
                 };
 
@@ -103,10 +99,10 @@ namespace nil {
                 }
 
                 template<typename T>
-                inline static bool ptr_end(const T *ptr, const T * /*end*/ ) {
+                inline static bool ptr_end(const T *ptr, const T * /*end*/) {
                     return *ptr == '\0';
                 }
-            }
+            }    // namespace detail
 
             /*!
              * @brief Hex encoder
@@ -115,8 +111,8 @@ namespace nil {
             template<typename Mode = mode::upper>
             class hex {
                 typedef typename detail::hex_policy<Mode> policy_type;
-            public:
 
+            public:
                 typedef typename policy_type::mode_type mode_type;
 
                 typedef nop_finalizer encoding_finalizer_type;
@@ -147,8 +143,8 @@ namespace nil {
                     typename encoded_block_type::iterator p = res.end();
                     typename decoded_block_type::value_type integral_plaintext = plaintext.back();
 
-                    for (std::size_t i = 0;
-                         i < encoded_block_bits / CHAR_BIT && p != res.begin(); ++i, integral_plaintext >>= 4) {
+                    for (std::size_t i = 0; i < encoded_block_bits / CHAR_BIT && p != res.begin();
+                         ++i, integral_plaintext >>= 4) {
                         *--p = policy_type::constants[integral_plaintext & 0x0F];
                     }
 
@@ -196,8 +192,8 @@ namespace nil {
                     return static_cast<char>(retval);
                 }
             };
-        }
-    }
-}
+        }    // namespace codec
+    }        // namespace crypto3
+}    // namespace nil
 
 #endif
