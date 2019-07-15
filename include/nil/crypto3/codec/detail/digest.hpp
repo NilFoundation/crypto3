@@ -55,8 +55,8 @@ namespace nil {
              * @tparam DigestBits
              */
 
-            template<std::size_t DigestBits> using digest =
-            boost::container::small_vector<octet_type, DigestBits / octet_bits>;
+            template<std::size_t DigestBits>
+            using digest = boost::container::small_vector<octet_type, DigestBits / octet_bits>;
 
             namespace detail {
                 template<std::size_t DigestBits, typename OutputIterator>
@@ -71,14 +71,14 @@ namespace nil {
                 }
 
                 template<std::size_t DigestBits>
-                digest<DigestBits / 4 + 1> c_str(
-                        const boost::container::small_vector<octet_type, DigestBits / octet_bits> &d) {
+                digest<DigestBits / 4 + 1>
+                    c_str(const boost::container::small_vector<octet_type, DigestBits / octet_bits> &d) {
                     digest<DigestBits / 4 + 1> s;
                     to_ascii<DigestBits>(d, std::back_inserter(s));
                     s.push_back('\0');
                     return s;
                 }
-            }
+            }    // namespace detail
 
             /*!
              *
@@ -195,9 +195,9 @@ namespace nil {
                 pack<stream_endian::big_bit, 4, 8>(a, d);
                 return source;
             }
-        }
-    }
-} // namespace nil
+        }    // namespace codec
+    }        // namespace crypto3
+}    // namespace nil
 
 namespace std {
     template<std::size_t DigestBits>
@@ -205,6 +205,6 @@ namespace std {
         nil::crypto3::codec::digest<DigestBits / 4 + 1> cstr = nil::crypto3::codec::detail::c_str(d);
         return std::string(cstr.begin(), cstr.begin() + cstr.size() - 1);
     }
-}
+}    // namespace std
 
-#endif // CRYPTO3_CODEC_DIGEST_HPP
+#endif    // CRYPTO3_CODEC_DIGEST_HPP

@@ -42,8 +42,8 @@ namespace nil {
          * @return
          */
         template<typename Decoder, typename InputIterator, typename OutputIterator>
-        typename std::enable_if<codec::detail::is_iterator<OutputIterator>::value, OutputIterator>::type decode(
-                InputIterator first, InputIterator last, OutputIterator out) {
+        typename std::enable_if<codec::detail::is_iterator<OutputIterator>::value, OutputIterator>::type
+            decode(InputIterator first, InputIterator last, OutputIterator out) {
             typedef typename Decoder::stream_decoder_type DecodingMode;
             typedef typename codec::codec_accumulator<DecodingMode> DecoderAccumulator;
 
@@ -65,8 +65,7 @@ namespace nil {
          * @param last
          * @return
          */
-        template<typename Decoder,
-                 typename InputIterator,
+        template<typename Decoder, typename InputIterator,
                  typename CodecAccumulator = typename codec::codec_accumulator<typename Decoder::stream_decoder_type>>
         codec::detail::range_codec_impl<codec::detail::value_codec_impl<CodecAccumulator>> decode(InputIterator first,
                                                                                                   InputIterator last) {
@@ -92,12 +91,11 @@ namespace nil {
          *
          * @return
          */
-        template<typename Decoder,
-                 typename InputIterator,
+        template<typename Decoder, typename InputIterator,
                  typename CodecAccumulator = typename codec::codec_accumulator<typename Decoder::stream_decoder_type>>
         typename std::enable_if<boost::accumulators::detail::is_accumulator_set<CodecAccumulator>::value,
-                                CodecAccumulator>::type &decode(InputIterator first, InputIterator last,
-                                                                CodecAccumulator &acc) {
+                                CodecAccumulator>::type &
+            decode(InputIterator first, InputIterator last, CodecAccumulator &acc) {
             typedef typename Decoder::stream_decoder_type DecodingMode;
             typedef typename codec::codec_accumulator<DecodingMode> DecoderAccumulator;
 
@@ -106,7 +104,6 @@ namespace nil {
 
             return DecoderImpl(first, last, std::forward<CodecAccumulator>(acc));
         }
-
 
         /*!
          * @brief
@@ -121,8 +118,8 @@ namespace nil {
          * @return
          */
         template<typename Decoder, typename SinglePassRange, typename OutputIterator>
-        typename std::enable_if<codec::detail::is_iterator<OutputIterator>::value, OutputIterator>::type decode(
-                const SinglePassRange &rng, OutputIterator out) {
+        typename std::enable_if<codec::detail::is_iterator<OutputIterator>::value, OutputIterator>::type
+            decode(const SinglePassRange &rng, OutputIterator out) {
             typedef typename Decoder::stream_decoder_type DecodingMode;
             typedef typename codec::codec_accumulator<DecodingMode> DecoderAccumulator;
 
@@ -144,11 +141,11 @@ namespace nil {
          * @param out
          * @return
          */
-        template<typename Decoder,
-                 typename SinglePassRange,
+        template<typename Decoder, typename SinglePassRange,
                  typename CodecAccumulator = typename codec::codec_accumulator<typename Decoder::stream_decoder_type>>
         typename std::enable_if<boost::accumulators::detail::is_accumulator_set<CodecAccumulator>::value,
-                                CodecAccumulator>::type &decode(const SinglePassRange &rng, CodecAccumulator &out) {
+                                CodecAccumulator>::type &
+            decode(const SinglePassRange &rng, CodecAccumulator &out) {
             typedef typename Decoder::stream_decoder_type DecodingMode;
             typedef typename codec::codec_accumulator<DecodingMode> DecoderAccumulator;
 
@@ -169,18 +166,17 @@ namespace nil {
          * @param r
          * @return
          */
-        template<typename Decoder,
-                 typename SinglePassRange,
+        template<typename Decoder, typename SinglePassRange,
                  typename DecoderAccumuator = typename codec::codec_accumulator<typename Decoder::stream_decoder_type>>
-        codec::detail::range_codec_impl<codec::detail::value_codec_impl<DecoderAccumuator>> decode(
-                const SinglePassRange &r) {
+        codec::detail::range_codec_impl<codec::detail::value_codec_impl<DecoderAccumuator>>
+            decode(const SinglePassRange &r) {
 
             typedef codec::detail::value_codec_impl<DecoderAccumuator> DecoderStateImpl;
             typedef codec::detail::range_codec_impl<DecoderStateImpl> DecoderImpl;
 
             return DecoderImpl(r, DecoderAccumuator());
         }
-    } // namespace crypto3
-} // namespace nil
+    }    // namespace crypto3
+}    // namespace nil
 
-#endif // include guard
+#endif    // include guard

@@ -32,7 +32,7 @@ namespace nil {
                 };
 
                 constexpr lower::constants_type lower::constants;
-            }
+            }    // namespace mode
 
             namespace detail {
                 template<typename Mode>
@@ -58,9 +58,9 @@ namespace nil {
                     constexpr static const std::uint8_t encoded_block_bits = encoded_block_values * encoded_value_bits;
                     typedef std::array<encoded_value_type, encoded_block_values> encoded_block_type;
                 };
-            }
-        }
-    }
-}
+            }    // namespace detail
+        }        // namespace codec
+    }            // namespace crypto3
+}    // namespace nil
 
-#endif //CRYPTO3_HEX_POLICY_HPP
+#endif    // CRYPTO3_HEX_POLICY_HPP

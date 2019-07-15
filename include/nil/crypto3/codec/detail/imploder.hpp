@@ -23,9 +23,9 @@ namespace nil {
         namespace codec {
             namespace detail {
 
-// By definition, for all imploders, InputBits < OutputBits,
-// so we're taking many smaller values and combining them into one value
-// @formatter:off
+                // By definition, for all imploders, InputBits < OutputBits,
+                // so we're taking many smaller values and combining them into one value
+                // @formatter:off
 
                 template<typename Endianness, int InputBits, int OutputBits, int k>
                 struct imploder_step;

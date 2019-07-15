@@ -35,8 +35,7 @@ static const std::vector<std::string> invalid_data;
 
 BOOST_AUTO_TEST_SUITE(logic_encode_test_suite)
 
-    BOOST_DATA_TEST_CASE(logic_single_range_encode, boost::unit_test::data::make(valid_data), array_element) {
-
-    }
+BOOST_DATA_TEST_CASE(logic_single_range_encode, boost::unit_test::data::make(valid_data), array_element) {
+}
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -39,7 +39,6 @@ namespace nil {
                 typedef typename input_block_type::value_type input_value_type;
 
             public:
-
                 typedef typename params_type::endian_type endian_type;
 
                 constexpr static const std::size_t value_bits = params_type::value_bits;
@@ -49,11 +48,10 @@ namespace nil {
                 typedef std::array<value_type, block_values> cache_type;
 
             private:
-
                 constexpr static const std::size_t length_bits = params_type::length_bits;
                 // FIXME: do something more intelligent than capping at 64
                 constexpr static const std::size_t length_type_bits =
-                        length_bits < input_block_bits ? input_block_bits : length_bits > 64 ? 64 : length_bits;
+                    length_bits < input_block_bits ? input_block_bits : length_bits > 64 ? 64 : length_bits;
                 typedef typename boost::uint_t<length_type_bits>::least length_type;
 
                 BOOST_STATIC_ASSERT(!length_bits || length_bits % input_block_bits == 0);
@@ -112,7 +110,6 @@ namespace nil {
 
             public:
                 fixed_block_stream_processor(accumulator_type &s) : state(s), cache(cache_type()), seen(0) {
-
                 }
 
                 virtual ~fixed_block_stream_processor() {
@@ -121,7 +118,7 @@ namespace nil {
                         typename input_block_type::const_iterator v = block.cbegin();
 
                         pack<endian_type, value_bits, input_value_bits>(cache.begin(), cache.begin() + cache.size(),
-                                block);
+                                                                        block);
                         for (length_type itr = seen - (seen % input_block_bits); itr < seen; itr += value_bits) {
                             state(*v++);
                         }
@@ -166,8 +163,8 @@ namespace nil {
                 length_type seen;
                 cache_type cache;
             };
-        }
-    }
-}
+        }    // namespace codec
+    }        // namespace crypto3
+}    // namespace nil
 
-#endif //CRYPTO3_FIXED_BLOCK_STREAM_PROCESSOR_HPP
+#endif    // CRYPTO3_FIXED_BLOCK_STREAM_PROCESSOR_HPP
