@@ -28,11 +28,12 @@ namespace nil {
              * @tparam ValueBits
              * @tparam LengthBits
              */
-            template<typename Hash> using hash_accumulator = boost::accumulators::accumulator_set<
-                    hash::static_digest<Hash::digest_bits>,
-                    boost::accumulators::features<accumulators::tag::hash<Hash>>>;
-        }
-    }
-} // namespace nil
+            template<typename Hash>
+            using hash_accumulator
+                = boost::accumulators::accumulator_set<hash::static_digest<Hash::digest_bits>,
+                                                       boost::accumulators::features<accumulators::tag::hash<Hash>>>;
+        }    // namespace hash
+    }        // namespace crypto3
+}    // namespace nil
 
-#endif // CRYPTO3_BLOCK_STREAM_PREPROCESSOR_HPP
+#endif    // CRYPTO3_BLOCK_STREAM_PREPROCESSOR_HPP

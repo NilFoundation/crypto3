@@ -55,9 +55,9 @@ namespace nil {
                     return T(x & ~highmask);
                 }
 
-            } // namespace detail
-        }
-    }
-} // namespace nil
+            }    // namespace detail
+        }        // namespace hash
+    }            // namespace crypto3
+}    // namespace nil
 
-#endif // CRYPTO3_HASH_DETAIL_UNBOUNDED_SHIFT_HPP
+#endif    // CRYPTO3_HASH_DETAIL_UNBOUNDED_SHIFT_HPP

@@ -30,16 +30,16 @@ namespace nil {
             class sha2 {
                 typedef detail::sha2_policy<Version> policy_type;
                 typedef block::shacal2<policy_type::cipher_version> block_cipher_type;
+
             public:
                 typedef merkle_damgard_construction<stream_endian::big_octet_big_bit, policy_type::digest_bits,
                                                     typename policy_type::iv_generator,
-                                                    davies_meyer_compressor<block_cipher_type,
-                                                                            detail::state_adder>> construction_type_;
+                                                    davies_meyer_compressor<block_cipher_type, detail::state_adder>>
+                    construction_type_;
 #ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES
                 typedef construction_type_ construction_type;
 #else
-                struct construction_type : construction_type_ {
-                };
+                struct construction_type : construction_type_ {};
 #endif
                 template<typename StateAccumulator, std::size_t ValueBits>
                 struct stream_processor {
@@ -57,8 +57,8 @@ namespace nil {
                 typedef typename construction_type::digest_type digest_type;
             };
 
-        }
-    }
-} // namespace nil
+        }    // namespace hash
+    }        // namespace crypto3
+}    // namespace nil
 
-#endif // CRYPTO3_HASH_SHA2_HPP
+#endif    // CRYPTO3_HASH_SHA2_HPP

@@ -34,8 +34,7 @@ BOOST_TEST_DONT_PRINT_LOG_VALUE(string_data_value)
 
 BOOST_AUTO_TEST_SUITE(skein_test_suite)
 
-    BOOST_AUTO_TEST_CASE(skein_256_range_hash) {
-
-    }
+BOOST_AUTO_TEST_CASE(skein_256_range_hash) {
+}
 
 BOOST_AUTO_TEST_SUITE_END()

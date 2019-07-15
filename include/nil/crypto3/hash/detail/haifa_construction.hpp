@@ -33,9 +33,7 @@ namespace nil {
              *
              * @note https://eprint.iacr.org/2007/278.pdf
              */
-            template<typename DigestEndian, int DigestBits,
-                     typename IV,
-                     typename Compressor,
+            template<typename DigestEndian, int DigestBits, typename IV, typename Compressor,
                      typename Finalizer = nop_finalizer>
             class haifa_construction {
             public:
@@ -80,7 +78,7 @@ namespace nil {
                     finalizer(state_);
                     DigestType d;
                     pack_n<DigestEndian, word_bits, octet_bits>(state_.data(), DigestBits / word_bits, d.data(),
-                            DigestBits / octet_bits);
+                                                                DigestBits / octet_bits);
                     return d;
                 }
 
@@ -106,8 +104,8 @@ namespace nil {
                 state_type state_;
             };
 
-        }
-    }
-} // namespace nil
+        }    // namespace hash
+    }        // namespace crypto3
+}    // namespace nil
 
-#endif // CRYPTO3_HASH_MERKLE_DAMGARD_BLOCK_HASH_HPP
+#endif    // CRYPTO3_HASH_MERKLE_DAMGARD_BLOCK_HASH_HPP

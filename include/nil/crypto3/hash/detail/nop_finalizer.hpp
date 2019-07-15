@@ -18,8 +18,8 @@ namespace nil {
                 void operator()(T &) {
                 }
             };
-        }
-    }
-}
+        }    // namespace hash
+    }        // namespace crypto3
+}    // namespace nil
 
-#endif //CRYPTO3_NOP_FINALIZER_HPP
+#endif    // CRYPTO3_NOP_FINALIZER_HPP

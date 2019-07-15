@@ -27,9 +27,9 @@ namespace nil {
         namespace hash {
             // Boost.CRC undefs this, so re-define it
 #if !(defined(BOOST_NO_DEPENDENT_TYPES_IN_TEMPLATE_VALUE_PARAMETERS) || (defined(BOOST_MSVC) && (BOOST_MSVC <= 1300)))
-#define BOOST_CRC_PARM_TYPE  typename ::boost::uint_t<DigestBits>::fast
+#define BOOST_CRC_PARM_TYPE typename ::boost::uint_t<DigestBits>::fast
 #else
-#define BOOST_CRC_PARM_TYPE  unsigned long
+#define BOOST_CRC_PARM_TYPE unsigned long
 #endif
 
             template<typename Hash, typename StateAccumulator, typename Params>
@@ -47,6 +47,7 @@ namespace nil {
                 constexpr static const std::size_t block_bits = construction_type::block_bits;
                 constexpr static const std::size_t block_words = construction_type::block_words;
                 typedef typename construction_type::block_type block_type;
+
             public:
                 constexpr static const std::size_t value_bits = params_type::value_bits;
                 typedef typename boost::uint_t<value_bits>::least value_type;
@@ -57,7 +58,6 @@ namespace nil {
                 }
 
             protected:
-
                 crc_stream_processor &update_one(value_type value) {
                     acc(value);
                     return *this;
@@ -99,11 +99,12 @@ namespace nil {
                 accumulator_type &acc;
             };
 
-            template<unsigned DigestBits, BOOST_CRC_PARM_TYPE TruncPoly = 0u, BOOST_CRC_PARM_TYPE InitRem = 0u, BOOST_CRC_PARM_TYPE FinalXor = 0u, bool ReflectIn = false, bool ReflectRem = false>
+            template<unsigned DigestBits, BOOST_CRC_PARM_TYPE TruncPoly = 0u, BOOST_CRC_PARM_TYPE InitRem = 0u,
+                     BOOST_CRC_PARM_TYPE FinalXor = 0u, bool ReflectIn = false, bool ReflectRem = false>
             class basic_crc {
             public:
-                typedef boost::crc_optimal<DigestBits, TruncPoly, InitRem, FinalXor, ReflectIn,
-                                           ReflectRem> crc_computer;
+                typedef boost::crc_optimal<DigestBits, TruncPoly, InitRem, FinalXor, ReflectIn, ReflectRem>
+                    crc_computer;
 
                 constexpr static const std::size_t word_bits = DigestBits;
                 typedef typename crc_computer::value_type word_type;
@@ -183,12 +184,11 @@ namespace nil {
 
                 template<typename ValT>
                 inline basic_crc &update_n(ValT *p, size_t n) {
-                    return update_n((ValT const *) p, n);
+                    return update_n((ValT const *)p, n);
                 }
 
 #endif
             public:
-
                 inline basic_crc &operator()(value_type v) {
                     return update_one(v);
                 }
@@ -228,10 +228,10 @@ namespace nil {
              * @tparam ReflectIn
              * @tparam ReflectRem
              */
-            template<std::size_t DigestBits, BOOST_CRC_PARM_TYPE TruncPoly = 0u, BOOST_CRC_PARM_TYPE InitRem = 0u, BOOST_CRC_PARM_TYPE FinalXor = 0u, bool ReflectIn = false, bool ReflectRem = false>
+            template<std::size_t DigestBits, BOOST_CRC_PARM_TYPE TruncPoly = 0u, BOOST_CRC_PARM_TYPE InitRem = 0u,
+                     BOOST_CRC_PARM_TYPE FinalXor = 0u, bool ReflectIn = false, bool ReflectRem = false>
             class crc {
             public:
-
                 typedef basic_crc<DigestBits, TruncPoly, InitRem, FinalXor, ReflectIn, ReflectRem> construction_type;
 
                 template<typename StateAccumulator, std::size_t ValueBits>
@@ -249,11 +249,11 @@ namespace nil {
                 typedef typename construction_type::digest_type digest_type;
             };
 
-// http://www.libpng.org/pub/png/spec/1.2/PNG-Structure.html#CRC-algorithm
+            // http://www.libpng.org/pub/png/spec/1.2/PNG-Structure.html#CRC-algorithm
             typedef crc<32, 0x04C11DB7, 0xFFFFFFFF, 0xFFFFFFFF, true, true> crc32_png;
 
-        }
-    }
-} // namespace nil
+        }    // namespace hash
+    }        // namespace crypto3
+}    // namespace nil
 
-#endif // CRYPTO3_HASH_CRC_HPP
+#endif    // CRYPTO3_HASH_CRC_HPP

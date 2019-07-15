@@ -27,8 +27,8 @@ namespace nil {
                     typedef hash::static_digest<digest_bits> digest_type;
                     typedef std::array<std::uint8_t, 15> pkcs_id_type;
 
-                    constexpr static const pkcs_id_type pkcs_id = {0x30, 0x21, 0x30, 0x09, 0x06, 0x05, 0x2B, 0x0E, 0x03, 0x02,
-                                                             0x1A, 0x05, 0x00, 0x04, 0x14};
+                    constexpr static const pkcs_id_type pkcs_id
+                        = {0x30, 0x21, 0x30, 0x09, 0x06, 0x05, 0x2B, 0x0E, 0x03, 0x02, 0x1A, 0x05, 0x00, 0x04, 0x14};
 
                     struct iv_generator {
                         state_type const &operator()() const {
@@ -37,14 +37,13 @@ namespace nil {
                             return H0;
                         }
                     };
-
                 };
 
                 typedef sha_policy sha0_policy;
 
-            } // namespace detail
-        }
-    }
-} // namespace nil
+            }    // namespace detail
+        }        // namespace hash
+    }            // namespace crypto3
+}    // namespace nil
 
-#endif // CRYPTO3_HASH_DETAIL_SHA_POLICY_HPP
+#endif    // CRYPTO3_HASH_DETAIL_SHA_POLICY_HPP

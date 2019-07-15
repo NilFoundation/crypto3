@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_GOST_3411_H_
-#define CRYPTO3_GOST_3411_H_
+#ifndef CRYPTO3_GOST_3411_HPP
+#define CRYPTO3_GOST_3411_HPP
 
 #include <nil/crypto3/hash/detail/gost_3411_policy.hpp>
 
@@ -19,8 +19,8 @@ namespace nil {
         namespace hash {
             class gost_3411_compressor {
                 typedef detail::gost_3411_policy policy_type;
-            public:
 
+            public:
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
                 typedef typename policy_type::word_type word_type;
 
@@ -33,7 +33,6 @@ namespace nil {
                 typedef typename policy_type::block_type block_type;
 
                 void operator()(state_type &state, const block_type &block) {
-
                 }
             };
 
@@ -43,10 +42,9 @@ namespace nil {
                 typedef block::gost_28147_89<ParamsType> block_cipher_type;
 
             public:
-
             };
-        }
-    }
-}
+        }    // namespace hash
+    }        // namespace crypto3
+}    // namespace nil
 
 #endif

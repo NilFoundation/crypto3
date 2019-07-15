@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_WHIRLPOOL_H_
-#define CRYPTO3_WHIRLPOOL_H_
+#ifndef CRYPTO3_WHIRLPOOL_HPP
+#define CRYPTO3_WHIRLPOOL_HPP
 
 #include <nil/crypto3/hash/detail/state_adder.hpp>
 #include <nil/crypto3/hash/detail/miyaguchi_preneel_compressor.hpp>
@@ -49,16 +49,16 @@ namespace nil {
             class whirlpool {
                 typedef detail::whirlpool_policy policy_type;
                 typedef detail::whirlpool_cipher block_cipher_type;
+
             public:
-                typedef merkle_damgard_construction<stream_endian::big_octet_big_bit, policy_type::digest_bits,
-                                                    typename policy_type::iv_generator,
-                                                    miyaguchi_preneel_compressor<block_cipher_type, detail::state_adder,
-                                                                                 whirlpool_key_converter>> construction_type_;
+                typedef merkle_damgard_construction<
+                    stream_endian::big_octet_big_bit, policy_type::digest_bits, typename policy_type::iv_generator,
+                    miyaguchi_preneel_compressor<block_cipher_type, detail::state_adder, whirlpool_key_converter>>
+                    construction_type_;
 #ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES
                 typedef construction_type_ construction_type;
 #else
-                struct construction_type : construction_type_ {
-                };
+                struct construction_type : construction_type_ {};
 #endif
                 template<typename StateAccumulator, std::size_t ValueBits>
                 struct stream_processor {
@@ -75,8 +75,8 @@ namespace nil {
                 constexpr static const std::size_t digest_bits = policy_type::digest_bits;
                 typedef typename construction_type::digest_type digest_type;
             };
-        }
-    }
-}
+        }    // namespace hash
+    }        // namespace crypto3
+}    // namespace nil
 
 #endif

@@ -44,6 +44,7 @@ namespace nil {
                 typedef typename construction_type::block_type block_type;
 
                 typedef typename params_type::endian endian_type;
+
             public:
                 constexpr static const std::size_t value_bits = params_type::value_bits;
                 typedef typename boost::uint_t<value_bits>::least value_type;
@@ -54,7 +55,6 @@ namespace nil {
                 }
 
             protected:
-
                 inline adler_stream_processor &update_one(value_type value) {
                     acc(value);
                     return *this;
@@ -144,11 +144,10 @@ namespace nil {
                 }
 
             protected:
-
                 inline basic_adler &update_one(value_type x) {
                     if (DigestBits < 16) {
                         x %= modulo;
-                    } // avoid overflow
+                    }    // avoid overflow
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
                     printf("(%.4x, %.4x) + %.2x ==> ", (int)state_[0], (int)state_[1], (int)x);
 #endif
@@ -165,61 +164,61 @@ namespace nil {
 #ifndef CRYPTO3_HASH_NO_OPTIMIZATION
 
                     unsigned const fast_word_bits = (word_bits < 16 ? 16 : word_bits);
-                    typedef typename boost::uint_t<fast_word_bits>::least/*fast*/ fast_word_type;
-/*
+                    typedef typename boost::uint_t<fast_word_bits>::least /*fast*/ fast_word_type;
+                    /*
 
-Worst-case behaviour for delaying the modulo:
-- every input is 255
-- s1 and s0 start out at modulo-1
+                    Worst-case behaviour for delaying the modulo:
+                    - every input is 255
+                    - s1 and s0 start out at modulo-1
 
-So after k inputs, we have:
-- s1 = (modulo-1) + k*255
-- s0 = (modulo-1) + Sigma(i = 1 to k)[ (modulo-1) + i*255 ]
-     = (modulo-1) + k*(modulo-1) + Sigma(i = 1 to k)[ i*255 ]
-     = (k+1)*(modulo-1) + 255 * Sigma(i = 1 to k)[i]
-     = (k+1)*(modulo-1) + 255 * k*(k+1)/2
+                    So after k inputs, we have:
+                    - s1 = (modulo-1) + k*255
+                    - s0 = (modulo-1) + Sigma(i = 1 to k)[ (modulo-1) + i*255 ]
+                         = (modulo-1) + k*(modulo-1) + Sigma(i = 1 to k)[ i*255 ]
+                         = (k+1)*(modulo-1) + 255 * Sigma(i = 1 to k)[i]
+                         = (k+1)*(modulo-1) + 255 * k*(k+1)/2
 
-And to avoid overflow we need s1, s0 <= 2**fast_word_bits - 1
+                    And to avoid overflow we need s1, s0 <= 2**fast_word_bits - 1
 
-s1 = (modulo-1) + k*255 <= 2**fast_word_bits - 1
-     k*255 <= 2**fast_word_bits - 1 - (modulo-1)
-     k <= (2**fast_word_bits - modulo)/255
+                    s1 = (modulo-1) + k*255 <= 2**fast_word_bits - 1
+                         k*255 <= 2**fast_word_bits - 1 - (modulo-1)
+                         k <= (2**fast_word_bits - modulo)/255
 
-Then use an overestimate for s0 to make the numbers nicer
-s0 < (k+1)*modulo + 256/2(k+1)**2 < 2**fast_word_bits
+                    Then use an overestimate for s0 to make the numbers nicer
+                    s0 < (k+1)*modulo + 256/2(k+1)**2 < 2**fast_word_bits
 
-Which solves as
-k < ( sqrt(512*2**fast_word_bits + modulo**2) - m - 256 )/256
+                    Which solves as
+                    k < ( sqrt(512*2**fast_word_bits + modulo**2) - m - 256 )/256
 
-So then overestimating m as 2**(word_bits/2) and other safe approximations gives
-k < 2**((fast_word_bits-7)/2) - 2**((word_bits-16)/2) - 1
+                    So then overestimating m as 2**(word_bits/2) and other safe approximations gives
+                    k < 2**((fast_word_bits-7)/2) - 2**((word_bits-16)/2) - 1
 
-Bits    Limit
-----    -----
-8       16
-16      16
-24      240
-32      3840
-40      61440
-48      983040
-56      15728640
-64      251658240
+                    Bits    Limit
+                    ----    -----
+                    8       16
+                    16      16
+                    24      240
+                    32      3840
+                    40      61440
+                    48      983040
+                    56      15728640
+                    64      251658240
 
-*/
+                    */
 
                     unsigned const less = (1 << (fast_word_bits / 2 - 8));
                     unsigned const limit = (1 << (fast_word_bits / 2 - 4)) - (word_bits < 16 ? 0 : less);
 
 #define CRYPTO3_HASH_ADLER_STEP \
-        { value_type x = *p++; s1 += x; s0 += s1; }
+    {                           \
+        value_type x = *p++;    \
+        s1 += x;                \
+        s0 += s1;               \
+    }
 
-#define CRYPTO3_HASH_ADLER_8_STEPS \
-        { \
-            CRYPTO3_HASH_ADLER_STEP CRYPTO3_HASH_ADLER_STEP \
-            CRYPTO3_HASH_ADLER_STEP CRYPTO3_HASH_ADLER_STEP \
-            CRYPTO3_HASH_ADLER_STEP CRYPTO3_HASH_ADLER_STEP \
-            CRYPTO3_HASH_ADLER_STEP CRYPTO3_HASH_ADLER_STEP \
-        }
+#define CRYPTO3_HASH_ADLER_8_STEPS                                                                   \
+    {CRYPTO3_HASH_ADLER_STEP CRYPTO3_HASH_ADLER_STEP CRYPTO3_HASH_ADLER_STEP CRYPTO3_HASH_ADLER_STEP \
+         CRYPTO3_HASH_ADLER_STEP CRYPTO3_HASH_ADLER_STEP CRYPTO3_HASH_ADLER_STEP CRYPTO3_HASH_ADLER_STEP}
 
                     fast_word_type s0 = state_[0];
                     fast_word_type s1 = state_[1];
@@ -248,13 +247,13 @@ Bits    Limit
                     state_[1] = s1;
 
 #else
-                    while (n--) update_one(*p++);
+                    while (n--)
+                        update_one(*p++);
 #endif
                     return *this;
                 }
 
             public:
-
                 inline basic_adler &operator()(value_type v) {
                     return update_one(v);
                 }
@@ -310,8 +309,8 @@ Bits    Limit
                 constexpr static const std::size_t digest_bits = DigestBits;
                 typedef typename construction_type::digest_type digest_type;
             };
-        }
-    }
-} // namespace nil
+        }    // namespace hash
+    }        // namespace crypto3
+}    // namespace nil
 
-#endif // CRYPTO3_HASH_ADLER_HPP
+#endif    // CRYPTO3_HASH_ADLER_HPP

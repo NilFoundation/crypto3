@@ -38,9 +38,9 @@ namespace nil {
         namespace hash {
             namespace detail {
 
-//
-// For details, see http://cubehash.cr.yp.to/
-//
+                //
+                // For details, see http://cubehash.cr.yp.to/
+                //
 
                 struct basic_cubehash_policy : public basic_functions<32> {
 
@@ -72,7 +72,7 @@ namespace nil {
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
                         printf("About to run %d CubeHash transform(s) on the following:\n", n);
                         for (unsigned i = 0; i < state.size(); ++i) {
-                            printf("%.8x%c", state[i], (i+1)%8 ? ' ' : '\n');
+                            printf("%.8x%c", state[i], (i + 1) % 8 ? ' ' : '\n');
                         }
 #endif
 
@@ -83,31 +83,43 @@ namespace nil {
                         state_type y;
                         while (n--) {
                             unsigned i;
-                            for (i = 0;i < 16;++i) x[i + 16] += x[i];
-                            for (i = 0;i < 16;++i) y[i ^ 8] = x[i];
-                            for (i = 0;i < 16;++i) x[i] = rotl<7>(y[i]);
-                            for (i = 0;i < 16;++i) x[i] ^= x[i + 16];
-                            for (i = 0;i < 16;++i) y[i ^ 2] = x[i + 16];
-                            for (i = 0;i < 16;++i) x[i + 16] = y[i];
-                            for (i = 0;i < 16;++i) x[i + 16] += x[i];
-                            for (i = 0;i < 16;++i) y[i ^ 4] = x[i];
-                            for (i = 0;i < 16;++i) x[i] = rotl<11>(y[i]);
-                            for (i = 0;i < 16;++i) x[i] ^= x[i + 16];
-                            for (i = 0;i < 16;++i) y[i ^ 1] = x[i + 16];
-                            for (i = 0;i < 16;++i) x[i + 16] = y[i];
+                            for (i = 0; i < 16; ++i)
+                                x[i + 16] += x[i];
+                            for (i = 0; i < 16; ++i)
+                                y[i ^ 8] = x[i];
+                            for (i = 0; i < 16; ++i)
+                                x[i] = rotl<7>(y[i]);
+                            for (i = 0; i < 16; ++i)
+                                x[i] ^= x[i + 16];
+                            for (i = 0; i < 16; ++i)
+                                y[i ^ 2] = x[i + 16];
+                            for (i = 0; i < 16; ++i)
+                                x[i + 16] = y[i];
+                            for (i = 0; i < 16; ++i)
+                                x[i + 16] += x[i];
+                            for (i = 0; i < 16; ++i)
+                                y[i ^ 4] = x[i];
+                            for (i = 0; i < 16; ++i)
+                                x[i] = rotl<11>(y[i]);
+                            for (i = 0; i < 16; ++i)
+                                x[i] ^= x[i + 16];
+                            for (i = 0; i < 16; ++i)
+                                y[i ^ 1] = x[i + 16];
+                            for (i = 0; i < 16; ++i)
+                                x[i + 16] = y[i];
                         }
 #else
 
 #ifdef CRYPTO3_HASH_CUBEHASH_USE_INTRINSICS
 
-                        __m128i x0 = _mm_loadu_si128((__m128i *) &state[0]);
-                        __m128i x1 = _mm_loadu_si128((__m128i *) &state[4]);
-                        __m128i x2 = _mm_loadu_si128((__m128i *) &state[8]);
-                        __m128i x3 = _mm_loadu_si128((__m128i *) &state[12]);
-                        __m128i x4 = _mm_loadu_si128((__m128i *) &state[16]);
-                        __m128i x5 = _mm_loadu_si128((__m128i *) &state[20]);
-                        __m128i x6 = _mm_loadu_si128((__m128i *) &state[24]);
-                        __m128i x7 = _mm_loadu_si128((__m128i *) &state[28]);
+                        __m128i x0 = _mm_loadu_si128((__m128i *)&state[0]);
+                        __m128i x1 = _mm_loadu_si128((__m128i *)&state[4]);
+                        __m128i x2 = _mm_loadu_si128((__m128i *)&state[8]);
+                        __m128i x3 = _mm_loadu_si128((__m128i *)&state[12]);
+                        __m128i x4 = _mm_loadu_si128((__m128i *)&state[16]);
+                        __m128i x5 = _mm_loadu_si128((__m128i *)&state[20]);
+                        __m128i x6 = _mm_loadu_si128((__m128i *)&state[24]);
+                        __m128i x7 = _mm_loadu_si128((__m128i *)&state[28]);
 
                         while (n--) {
 
@@ -123,7 +135,6 @@ namespace nil {
                             x1 = _mm_xor_si128(_mm_slli_epi32(x1, 7), _mm_srli_epi32(x1, 25));
                             x2 = _mm_xor_si128(_mm_slli_epi32(x2, 7), _mm_srli_epi32(x2, 25));
                             x3 = _mm_xor_si128(_mm_slli_epi32(x3, 7), _mm_srli_epi32(x3, 25));
-
 
                             x0 = _mm_xor_si128(x0, x4);
                             x1 = _mm_xor_si128(x1, x5);
@@ -157,17 +168,16 @@ namespace nil {
                             x5 = _mm_shuffle_epi32(x5, 0xb1);
                             x6 = _mm_shuffle_epi32(x6, 0xb1);
                             x7 = _mm_shuffle_epi32(x7, 0xb1);
-
                         }
 
-                        _mm_storeu_si128((__m128i *) &state[0], x0);
-                        _mm_storeu_si128((__m128i *) &state[4], x1);
-                        _mm_storeu_si128((__m128i *) &state[8], x2);
-                        _mm_storeu_si128((__m128i *) &state[12], x3);
-                        _mm_storeu_si128((__m128i *) &state[16], x4);
-                        _mm_storeu_si128((__m128i *) &state[20], x5);
-                        _mm_storeu_si128((__m128i *) &state[24], x6);
-                        _mm_storeu_si128((__m128i *) &state[28], x7);
+                        _mm_storeu_si128((__m128i *)&state[0], x0);
+                        _mm_storeu_si128((__m128i *)&state[4], x1);
+                        _mm_storeu_si128((__m128i *)&state[8], x2);
+                        _mm_storeu_si128((__m128i *)&state[12], x3);
+                        _mm_storeu_si128((__m128i *)&state[16], x4);
+                        _mm_storeu_si128((__m128i *)&state[20], x5);
+                        _mm_storeu_si128((__m128i *)&state[24], x6);
+                        _mm_storeu_si128((__m128i *)&state[28], x7);
 
 #else
 
@@ -178,16 +188,16 @@ namespace nil {
                         //
 
                         //         ijklm
-                        word_type x00000 = state[ 0];
-                        word_type x00001 = state[ 1];
-                        word_type x00010 = state[ 2];
-                        word_type x00011 = state[ 3];
-                        word_type x00100 = state[ 4];
-                        word_type x00101 = state[ 5];
-                        word_type x00110 = state[ 6];
-                        word_type x00111 = state[ 7];
-                        word_type x01000 = state[ 8];
-                        word_type x01001 = state[ 9];
+                        word_type x00000 = state[0];
+                        word_type x00001 = state[1];
+                        word_type x00010 = state[2];
+                        word_type x00011 = state[3];
+                        word_type x00100 = state[4];
+                        word_type x00101 = state[5];
+                        word_type x00110 = state[6];
+                        word_type x00111 = state[7];
+                        word_type x01000 = state[8];
+                        word_type x01001 = state[9];
                         word_type x01010 = state[10];
                         word_type x01011 = state[11];
                         word_type x01100 = state[12];
@@ -361,16 +371,16 @@ namespace nil {
                             word_swap(x11110, x11111);
                         }
 
-                        state[ 0] = x00000;
-                        state[ 1] = x00001;
-                        state[ 2] = x00010;
-                        state[ 3] = x00011;
-                        state[ 4] = x00100;
-                        state[ 5] = x00101;
-                        state[ 6] = x00110;
-                        state[ 7] = x00111;
-                        state[ 8] = x01000;
-                        state[ 9] = x01001;
+                        state[0] = x00000;
+                        state[1] = x00001;
+                        state[2] = x00010;
+                        state[3] = x00011;
+                        state[4] = x00100;
+                        state[5] = x00101;
+                        state[6] = x00110;
+                        state[7] = x00111;
+                        state[8] = x01000;
+                        state[9] = x01001;
                         state[10] = x01010;
                         state[11] = x01011;
                         state[12] = x01100;
@@ -401,11 +411,10 @@ namespace nil {
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
                         printf("Resulting state:\n");
                         for (unsigned i = 0; i < state.size(); ++i) {
-                            printf("%.8x%c", state[i], (i+1)%8 ? ' ' : '\n');
+                            printf("%.8x%c", state[i], (i + 1) % 8 ? ' ' : '\n');
                         }
 #endif
                     }
-
                 };
 
                 template<unsigned r, unsigned b, unsigned h>
@@ -445,10 +454,9 @@ namespace nil {
 
                     struct iv_generator {
 #ifdef CRYPTO3_HASH_NO_OPTIMIZATION
-                        state_type
-                        operator()() const {
+                        state_type operator()() const {
                             state_type state = {{}};
-                            state[0] = h/8;
+                            state[0] = h / 8;
                             state[1] = b;
                             state[2] = r;
                             transform_10r(state);
@@ -473,12 +481,11 @@ namespace nil {
 
 #endif
                     };
-
                 };
 
-            } // namespace detail
-        }
-    }
-} // namespace nil
+            }    // namespace detail
+        }        // namespace hash
+    }            // namespace crypto3
+}    // namespace nil
 
-#endif // CRYPTO3_HASH_DETAIL_CUBEHASH_POLICY_HPP
+#endif    // CRYPTO3_HASH_DETAIL_CUBEHASH_POLICY_HPP

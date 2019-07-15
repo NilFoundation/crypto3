@@ -31,16 +31,16 @@ namespace nil {
                 template<int Bits>
                 struct largest_prime;
 
-#define CRYPTO3_HASH_DEFINE_LARGEST_PRIME_BY_OFFSET(B, D) \
-    template <> \
-    struct largest_prime<B> { \
+#define CRYPTO3_HASH_DEFINE_LARGEST_PRIME_BY_OFFSET(B, D)                              \
+    template<>                                                                         \
+    struct largest_prime<B> {                                                          \
         constexpr static boost::uint_t<B>::least const value = all_ones<B>::value - D; \
-    }; \
+    };                                                                                 \
     constexpr boost::uint_t<B>::least const largest_prime<B>::value;
 
-// http://primes.utm.edu/lists/2small/0bit.html or
-// http://www.research.att.com/~njas/sequences/A013603
-// Though those offets are from 2**b; This code is offsets from 2**b-1
+                // http://primes.utm.edu/lists/2small/0bit.html or
+                // http://www.research.att.com/~njas/sequences/A013603
+                // Though those offets are from 2**b; This code is offsets from 2**b-1
                 CRYPTO3_HASH_DEFINE_LARGEST_PRIME_BY_OFFSET(2, 0);
                 CRYPTO3_HASH_DEFINE_LARGEST_PRIME_BY_OFFSET(3, 0);
                 CRYPTO3_HASH_DEFINE_LARGEST_PRIME_BY_OFFSET(4, 2);
@@ -73,9 +73,9 @@ namespace nil {
                 CRYPTO3_HASH_DEFINE_LARGEST_PRIME_BY_OFFSET(31, 0);
                 CRYPTO3_HASH_DEFINE_LARGEST_PRIME_BY_OFFSET(32, 4);
 
-            } // namespace detail
-        }
-    }
-} // namespace nil
+            }    // namespace detail
+        }        // namespace hash
+    }            // namespace crypto3
+}    // namespace nil
 
-#endif // CRYPTO3_HASH_DETAIL_PRIMES_HPP
+#endif    // CRYPTO3_HASH_DETAIL_PRIMES_HPP

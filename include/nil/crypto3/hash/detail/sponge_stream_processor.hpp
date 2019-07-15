@@ -47,11 +47,10 @@ namespace nil {
                 typedef std::array<value_type, block_values> value_array_type;
 
             private:
-
                 constexpr static const std::size_t length_bits = params_type::digest_length_bits;
                 // FIXME: do something more intelligent than capping at 64
-                constexpr static const std::size_t length_type_bits =
-                        length_bits < word_bits ? word_bits : length_bits > 64 ? 64 : length_bits;
+                constexpr static const std::size_t length_type_bits
+                    = length_bits < word_bits ? word_bits : length_bits > 64 ? 64 : length_bits;
                 typedef typename boost::uint_t<length_type_bits>::least length_type;
                 constexpr static const std::size_t length_words = length_bits / word_bits;
                 BOOST_STATIC_ASSERT(!length_bits || length_bits % word_bits == 0);
@@ -65,7 +64,7 @@ namespace nil {
                     pack<endian_type, value_bits, word_bits>(value_array, block);
 
                     // Process the block
-                    block_hash.update(block);
+                    acc(block, block_bits);
 
                     // Reset seen if we don't need to track the length
                     if (!length_bits) {
@@ -88,7 +87,7 @@ namespace nil {
                     }
 
                     // Process the last block
-                    block_hash.update(block);
+                    acc(block, seen % block_bits);
                 }
 
                 template<typename Dummy>
@@ -97,7 +96,6 @@ namespace nil {
                 }
 
             public:
-
                 sponge_stream_processor &update_one(value_type value) {
                     std::size_t i = seen % block_bits;
                     std::size_t j = i / value_bits;
@@ -122,7 +120,7 @@ namespace nil {
                         pack_n<endian_type, value_bits, word_bits>(p, block_values, std::begin(block), block_words);
 
                         // Process the block
-                        block_hash.update(block);
+                        acc(block, block_bits);
                         seen += block_bits;
 
                         // Reset seen if we don't need to track the length
@@ -211,8 +209,8 @@ namespace nil {
                 construction_type block_hash;
                 length_type seen;
             };
-        }
-    }
-} // namespace nil
+        }    // namespace hash
+    }        // namespace crypto3
+}    // namespace nil
 
 #endif

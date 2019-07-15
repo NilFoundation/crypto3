@@ -28,16 +28,16 @@ namespace nil {
             class md4 {
                 typedef detail::md4_policy policy_type;
                 typedef block::md4 block_cipher_type;
+
             public:
                 typedef merkle_damgard_construction<stream_endian::little_octet_big_bit, policy_type::digest_bits,
                                                     policy_type::iv_generator,
-                                                    davies_meyer_compressor<block_cipher_type,
-                                                                            detail::state_adder>> construction_type_;
+                                                    davies_meyer_compressor<block_cipher_type, detail::state_adder>>
+                    construction_type_;
 #ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES
                 typedef construction_type_ construction_type;
 #else
-                struct construction_type : construction_type_ {
-                };
+                struct construction_type : construction_type_ {};
 #endif
                 template<typename StateAccumulator, std::size_t ValueBits>
                 struct stream_processor {
@@ -55,8 +55,8 @@ namespace nil {
                 typedef construction_type::digest_type digest_type;
             };
 
-        }
-    }
-} // namespace nil
+        }    // namespace hash
+    }        // namespace crypto3
+}    // namespace nil
 
-#endif // CRYPTO3_HASH_MD4_HPP
+#endif    // CRYPTO3_HASH_MD4_HPP

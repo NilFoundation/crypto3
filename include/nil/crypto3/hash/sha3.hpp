@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_SHA3_H_
-#define CRYPTO3_SHA3_H_
+#ifndef CRYPTO3_SHA3_HPP
+#define CRYPTO3_SHA3_HPP
 
 #include <nil/crypto3/utilities/secmem.hpp>
 
@@ -21,20 +21,21 @@
 namespace nil {
     namespace crypto3 {
         namespace hash {
-            template<std::size_t DigestBits> using sha3_compressor = keccak_1600_compressor<DigestBits>;
+            template<std::size_t DigestBits>
+            using sha3_compressor = keccak_1600_compressor<DigestBits>;
 
             template<std::size_t DigestBits = 512>
             class sha3 {
                 typedef detail::sha3_functions<DigestBits> policy_type;
+
             public:
                 typedef sponge_construction<stream_endian::little_octet_big_bit, policy_type::digest_bits,
-                                            typename policy_type::iv_generator,
-                                            sha3_compressor<DigestBits>> construction_type_;
+                                            typename policy_type::iv_generator, sha3_compressor<DigestBits>>
+                    construction_type_;
 #ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES
                 typedef construction_type_ construction_type;
 #else
-                struct construction_type : construction_type_ {
-                };
+                struct construction_type : construction_type_ {};
 #endif
                 template<typename StateAccumulator, std::size_t ValueBits>
                 struct stream_processor {
@@ -50,8 +51,8 @@ namespace nil {
                 constexpr static const std::size_t digest_bits = policy_type::digest_bits;
                 typedef typename construction_type::digest_type digest_type;
             };
-        }
-    }
-}
+        }    // namespace hash
+    }        // namespace crypto3
+}    // namespace nil
 
 #endif

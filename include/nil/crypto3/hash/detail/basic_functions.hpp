@@ -19,9 +19,9 @@ namespace nil {
 
                 using block::detail::basic_functions;
 
-            } // namespace detail
-        }
-    }
-} // namespace nil
+            }    // namespace detail
+        }        // namespace hash
+    }            // namespace crypto3
+}    // namespace nil
 
-#endif // CRYPTO3_HASH_DETAIL_BASIC_FUNCTIONS_HPP
+#endif    // CRYPTO3_HASH_DETAIL_BASIC_FUNCTIONS_HPP
