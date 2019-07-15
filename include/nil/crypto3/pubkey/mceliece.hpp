@@ -1,14 +1,5 @@
-/*
- * (C) Copyright Projet SECRET, INRIA, Rocquencourt
- * (C) Bhaskar Biswas and  Nicolas Sendrier
- *
- * (C) 2014 cryptosource GmbH
- * (C) 2014 Falko Strenzke fstrenzke@cryptosource.de
- *
- */
-
-#ifndef CRYPTO3_MCELIECE_KEY_HPP_
-#define CRYPTO3_MCELIECE_KEY_HPP_
+#ifndef CRYPTO3_MCELIECE_KEY_HPP
+#define CRYPTO3_MCELIECE_KEY_HPP
 
 #include <nil/crypto3/pubkey/pk_keys.hpp>
 #include <nil/crypto3/pubkey/mce/polyn_gf2m.hpp>
@@ -19,11 +10,10 @@ namespace nil {
 
         class mc_eliece_public_key : public virtual public_key_policy {
         public:
-
             explicit mc_eliece_public_key(const std::vector<uint8_t> &key_bits);
 
-            mc_eliece_public_key(const std::vector<uint8_t> &pub_matrix, uint32_t the_t, uint32_t the_code_length)
-                    : m_public_matrix(pub_matrix), m_t(the_t), m_code_length(the_code_length) {
+            mc_eliece_public_key(const std::vector<uint8_t> &pub_matrix, uint32_t the_t, uint32_t the_code_length) :
+                m_public_matrix(pub_matrix), m_t(the_t), m_code_length(the_code_length) {
             }
 
             mc_eliece_public_key(const mc_eliece_public_key &other) = default;
@@ -82,10 +72,9 @@ namespace nil {
                                                                                     const std::string &params,
                                                                                     const std::string &provider) const
 
-            override;
+                override;
 
         protected:
-
             mc_eliece_public_key() : m_t(0), m_code_length(0) {
             }
 
@@ -94,22 +83,20 @@ namespace nil {
             uint32_t m_code_length;
         };
 
-        class mc_eliece_private_key final
-                : public virtual mc_eliece_public_key, public virtual private_key_policy {
+        class mc_eliece_private_key final : public virtual mc_eliece_public_key, public virtual private_key_policy {
         public:
-
-/**
- * @brief Generate a McEliece key pair
- *
- * Suggested parameters for a given security level (SL)
- *
- * SL=80 n=1632 t=33 - 59 KB pubkey 140 KB privkey
- * SL=107 n=2480 t=45 - 128 KB pubkey 300 KB privkey
- * SL=128 n=2960 t=57 - 195 KB pubkey 459 KB privkey
- * SL=147 n=3408 t=67 - 265 KB pubkey 622 KB privkey
- * SL=191 n=4624 t=95 - 516 KB pubkey 1234 KB privkey
- * SL=256 n=6624 t=115 - 942 KB pubkey 2184 KB privkey
- */
+            /**
+             * @brief Generate a McEliece key pair
+             *
+             * Suggested parameters for a given security level (SL)
+             *
+             * SL=80 n=1632 t=33 - 59 KB pubkey 140 KB privkey
+             * SL=107 n=2480 t=45 - 128 KB pubkey 300 KB privkey
+             * SL=128 n=2960 t=57 - 195 KB pubkey 459 KB privkey
+             * SL=147 n=3408 t=67 - 265 KB pubkey 622 KB privkey
+             * SL=191 n=4624 t=95 - 516 KB pubkey 1234 KB privkey
+             * SL=256 n=6624 t=115 - 942 KB pubkey 2184 KB privkey
+             */
             mc_eliece_private_key(random_number_generator &rng, size_t code_length, size_t t);
 
             explicit mc_eliece_private_key(const secure_vector<uint8_t> &key_bits);
@@ -125,7 +112,7 @@ namespace nil {
                 return m_g;
             }
 
-            std::vector<uint32_t> const &get_HPP_coeffs() const {
+            std::vector<uint32_t> const &get_HPPcoeffs() const {
                 return m_coeffs;
             }
 
@@ -153,9 +140,10 @@ namespace nil {
                 return !(*this == other);
             }
 
-            std::unique_ptr<pk_operations::kem_decryption> create_kem_decryption_op(random_number_generator &rng,
-                                                                                    const std::string &params,
-                                                                                    const std::string &provider) const override;
+            std::unique_ptr<pk_operations::kem_decryption>
+                create_kem_decryption_op(random_number_generator &rng,
+                                         const std::string &params,
+                                         const std::string &provider) const override;
 
         private:
             polyn_gf2m m_g;
@@ -167,10 +155,10 @@ namespace nil {
             uint32_t m_dimension;
         };
 
-/**
-* Estimate work factor for McEliece
-* @return estimated security level for these key parameters
-*/
+        /**
+         * Estimate work factor for McEliece
+         * @return estimated security level for these key parameters
+         */
 
         size_t mceliece_work_factor(size_t code_size, size_t t);
 
@@ -179,7 +167,7 @@ namespace nil {
             typedef mceliece_public_key public_key_policy;
             typedef mceliece_private_key private_key_policy;
         };
-    }
-}
+    }    // namespace crypto3
+}    // namespace nil
 
 #endif

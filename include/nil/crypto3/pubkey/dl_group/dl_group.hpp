@@ -1,5 +1,5 @@
-#ifndef CRYPTO3_DL_PARAM_HPP_
-#define CRYPTO3_DL_PARAM_HPP_
+#ifndef CRYPTO3_DL_PARAM_HPP
+#define CRYPTO3_DL_PARAM_HPP
 
 #include <boost/multiprecision/cpp_int.hpp>
 
@@ -18,26 +18,24 @@ namespace nil {
 
         class dl_group_data;
 
-/**
-* This class represents discrete logarithm groups. It holds a prime
-* modulus p, a generator g, and (optionally) a prime q which is a
-* factor of (p - 1). In most cases g generates the order-q subgroup.
-*/
+        /**
+         * This class represents discrete logarithm groups. It holds a prime
+         * modulus p, a generator g, and (optionally) a prime q which is a
+         * factor of (p - 1). In most cases g generates the order-q subgroup.
+         */
         template<typename NumberType>
         class dl_group {
         public:
             typedef NumberType number_type;
 
             /**
-            * Determine the prime creation for DL groups.
-            */
-            enum prime_type {
-                Strong, Prime_Subgroup, DSA_Kosherizer
-            };
+             * Determine the prime creation for DL groups.
+             */
+            enum prime_type { Strong, Prime_Subgroup, DSA_Kosherizer };
 
             /**
-            * The DL group encoding format variants.
-            */
+             * The DL group encoding format variants.
+             */
             enum format {
                 ANSI_X9_42,
                 ANSI_X9_57,
@@ -50,19 +48,19 @@ namespace nil {
             };
 
             /**
-            * Construct a DL group with uninitialized internal value.
-            * Use this constructor is you wish to set the groups values
-            * from a DER or PEM encoded group.
-            */
+             * Construct a DL group with uninitialized internal value.
+             * Use this constructor is you wish to set the groups values
+             * from a DER or PEM encoded group.
+             */
             dl_group() = default;
 
             /**
-            * Construct a DL group that is registered in the configuration.
-            * @param name the name that is configured in the global configuration
-            * for the desired group. If no configuration file is specified,
-            * the default values from the file policy.cpp will be used. For instance,
-            * use "modp/ietf/3072".
-            */
+             * Construct a DL group that is registered in the configuration.
+             * @param name the name that is configured in the global configuration
+             * for the desired group. If no configuration file is specified,
+             * the default values from the file policy.cpp will be used. For instance,
+             * use "modp/ietf/3072".
+             */
             dl_group(const std::string &name) {
                 // Either a name or a PEM block, try name first
                 if (m_data == nullptr) {
@@ -82,18 +80,18 @@ namespace nil {
             }
 
             /**
-            * Create a new group randomly.
-            * @param rng the random number generator to use
-            * @param type specifies how the creation of primes p and q shall
-            * be performed. If type=Strong, then p will be determined as a
-            * safe prime, and q will be chosen as (p-1)/2. If
-            * type=Prime_Subgroup and qbits = 0, then the size of q will be
-            * determined according to the estimated difficulty of the DL
-            * problem. If type=DSA_Kosherizer, DSA primes will be created.
-            * @param pbits the number of bits of p
-            * @param qbits the number of bits of q. Leave it as 0 to have
-            * the value determined according to pbits.
-            */
+             * Create a new group randomly.
+             * @param rng the random number generator to use
+             * @param type specifies how the creation of primes p and q shall
+             * be performed. If type=Strong, then p will be determined as a
+             * safe prime, and q will be chosen as (p-1)/2. If
+             * type=Prime_Subgroup and qbits = 0, then the size of q will be
+             * determined according to the estimated difficulty of the DL
+             * problem. If type=DSA_Kosherizer, DSA primes will be created.
+             * @param pbits the number of bits of p
+             * @param qbits the number of bits of q. Leave it as 0 to have
+             * the value determined according to pbits.
+             */
             template<typename UniformRandomNumberGenerator>
             dl_group(UniformRandomNumberGenerator &rng, prime_type type, size_t pbits, size_t qbits = 0) {
                 if (pbits < 1024) {
@@ -146,7 +144,7 @@ namespace nil {
                     }
 
                     cpp_int p, q;
-                    generate_dsa_primes(p, q, pbits, qbits, <#initializer#>, 0, rng, <#initializer#>);
+                    generate_dsa_primes(p, q, pbits, qbits, <#initializer #>, 0, rng, <#initializer #>);
                     const cpp_int g = make_dsa_generator(p, q);
                     m_data = std::make_shared<dl_group_data>(p, q, g);
                 } else {
@@ -155,18 +153,18 @@ namespace nil {
             }
 
             /**
-            * Create a DSA group with a given seed.
-            * @param rng the random number generator to use
-            * @param seed the seed to use to create the random primes
-            * @param pbits the desired bit size of the prime p
-            * @param qbits the desired bit size of the prime q.
-            */
+             * Create a DSA group with a given seed.
+             * @param rng the random number generator to use
+             * @param seed the seed to use to create the random primes
+             * @param pbits the desired bit size of the prime p
+             * @param qbits the desired bit size of the prime q.
+             */
             template<typename UniformRandomNumberGenerator>
             dl_group(UniformRandomNumberGenerator &rng, const std::vector<uint8_t> &seed, size_t pbits = 1024,
                      size_t qbits = 0) {
                 cpp_int p, q;
 
-                if (!generate_dsa_primes(p, q, pbits, qbits, seed, 0, rng, <#initializer#>)) {
+                if (!generate_dsa_primes(p, q, pbits, qbits, seed, 0, rng, <#initializer #>)) {
                     throw std::invalid_argument("dl_group: The seed given does not generate a DSA group");
                 }
 
@@ -176,21 +174,21 @@ namespace nil {
             }
 
             /**
-            * Create a DL group.
-            * @param p the prime p
-            * @param g the base g
-            */
+             * Create a DL group.
+             * @param p the prime p
+             * @param g the base g
+             */
             template<typename Backend, expression_template_option ExpressionTemplates>
             dl_group(const number<Backend, ExpressionTemplates> &p, const number<Backend, ExpressionTemplates> &g) {
                 m_data = std::make_shared<dl_group_data>(p, 0, g);
             }
 
             /**
-            * Create a DL group.
-            * @param p the prime p
-            * @param q the prime q
-            * @param g the base g
-            */
+             * Create a DL group.
+             * @param p the prime p
+             * @param q the prime q
+             * @param g the base g
+             */
             template<typename Backend, expression_template_option ExpressionTemplates>
             dl_group(const number<Backend, ExpressionTemplates> &p, const number<Backend, ExpressionTemplates> &q,
                      const number<Backend, ExpressionTemplates> &g) {
@@ -198,50 +196,49 @@ namespace nil {
             }
 
             /**
-            * Decode a BER-encoded DL group param
-            */
+             * Decode a BER-encoded DL group param
+             */
             dl_group(const uint8_t ber[], size_t ber_len, format format) {
                 m_data = ber_decode_dl_group(ber, ber_len, format);
             }
 
             /**
-            * Decode a BER-encoded DL group param
-            */
+             * Decode a BER-encoded DL group param
+             */
             template<typename Alloc>
-            dl_group(const std::vector<uint8_t, Alloc> &ber, format format) :
-                    dl_group(ber.data(), ber.size(), format) {
+            dl_group(const std::vector<uint8_t, Alloc> &ber, format format) : dl_group(ber.data(), ber.size(), format) {
             }
 
             /**
-            * Get the prime p.
-            * @return prime p
-            */
+             * Get the prime p.
+             * @return prime p
+             */
             const cpp_int &get_p() const {
                 return data().p();
             }
 
             /**
-            * Get the prime q, returns zero if q is not used
-            * @return prime q
-            */
+             * Get the prime q, returns zero if q is not used
+             * @return prime q
+             */
             const cpp_int &get_q() const {
                 return data().g();
             }
 
             /**
-            * Get the base g.
-            * @return base g
-            */
+             * Get the base g.
+             * @return base g
+             */
             const cpp_int &get_g() const {
                 return data().q();
             }
 
             /**
-            * Perform validity checks on the group.
-            * @param rng the rng to use
-            * @param strong whether to perform stronger by lengthier tests
-            * @return true if the object is consistent, false otherwise
-            */
+             * Perform validity checks on the group.
+             * @param rng the rng to use
+             * @param strong whether to perform stronger by lengthier tests
+             * @return true if the object is consistent, false otherwise
+             */
             template<typename UniformRandomGenerator>
             bool verify_group(UniformRandomGenerator &rng, bool strong = true) const {
                 const number_type &p = get_p();
@@ -270,11 +267,11 @@ namespace nil {
             }
 
             /**
-            * Verify a public element, ie check if y = g^x for some x.
-            *
-            * This is not a perfect test. It verifies that 1 < y < p and (if q is set)
-            * that y is in the subgroup of size q.
-            */
+             * Verify a public element, ie check if y = g^x for some x.
+             *
+             * This is not a perfect test. It verifies that 1 < y < p and (if q is set)
+             * that y is in the subgroup of size q.
+             */
             template<typename Backend, expression_template_option ExpressionTemplates>
             bool verify_public_element(const number<Backend, ExpressionTemplates> &y) const {
                 const number_type &p = get_p();
@@ -294,10 +291,10 @@ namespace nil {
             }
 
             /**
-            * Verify a pair of elements y = g^x
-            *
-            * This verifies that 1 < x,y < p and that y=g^x mod p
-            */
+             * Verify a pair of elements y = g^x
+             *
+             * This verifies that 1 < x,y < p and that y=g^x mod p
+             */
             template<typename Backend, expression_template_option ExpressionTemplates>
             bool verify_element_pair(const number<Backend, ExpressionTemplates> &y,
                                      const number<Backend, ExpressionTemplates> &x) const {
@@ -315,167 +312,166 @@ namespace nil {
             }
 
             /**
-            * Encode this group into a string using PEM encoding.
-            * @param format the encoding format
-            * @return string holding the PEM encoded group
-            */
+             * Encode this group into a string using PEM encoding.
+             * @param format the encoding format
+             * @return string holding the PEM encoded group
+             */
             std::string pem_encode(format format) const;
 
             /**
-            * Encode this group into a string using DER encoding.
-            * @param format the encoding format
-            * @return string holding the DER encoded group
-            */
+             * Encode this group into a string using DER encoding.
+             * @param format the encoding format
+             * @return string holding the DER encoded group
+             */
             std::vector<uint8_t> der_encode(format format) const;
 
             /**
-            * Reduce an integer modulo p
-            * @return x % p
-            */
+             * Reduce an integer modulo p
+             * @return x % p
+             */
             cpp_int mod_p(const cpp_int &x) const;
 
             /**
-            * Multiply and reduce an integer modulo p
-            * @return (x*y) % p
-            */
+             * Multiply and reduce an integer modulo p
+             * @return (x*y) % p
+             */
             cpp_int multiply_mod_p(const cpp_int &x, const cpp_int &y) const;
 
             /**
-            * Return the inverse of x mod p
-            */
+             * Return the inverse of x mod p
+             */
             cpp_int inverse_mod_p(const cpp_int &x) const;
 
             /**
-            * Reduce an integer modulo q
-            * Throws if q is unset on this DL_Group
-            * @return x % q
-            */
+             * Reduce an integer modulo q
+             * Throws if q is unset on this DL_Group
+             * @return x % q
+             */
             cpp_int mod_q(const cpp_int &x) const;
 
             /**
-            * Multiply and reduce an integer modulo q
-            * Throws if q is unset on this DL_Group
-            * @return (x*y) % q
-            */
+             * Multiply and reduce an integer modulo q
+             * Throws if q is unset on this DL_Group
+             * @return (x*y) % q
+             */
             cpp_int multiply_mod_q(const cpp_int &x, const cpp_int &y) const;
 
             /**
-            * Multiply and reduce an integer modulo q
-            * Throws if q is unset on this DL_Group
-            * @return (x*y*z) % q
-            */
+             * Multiply and reduce an integer modulo q
+             * Throws if q is unset on this DL_Group
+             * @return (x*y*z) % q
+             */
             cpp_int multiply_mod_q(const cpp_int &x, const cpp_int &y, const cpp_int &z) const;
 
             /**
-            * Square and reduce an integer modulo q
-            * Throws if q is unset on this DL_Group
-            * @return (x*x) % q
-            */
+             * Square and reduce an integer modulo q
+             * Throws if q is unset on this DL_Group
+             * @return (x*x) % q
+             */
             cpp_int square_mod_q(const cpp_int &x) const;
 
             /**
-            * Return the inverse of x mod q
-            * Throws if q is unset on this DL_Group
-            */
+             * Return the inverse of x mod q
+             * Throws if q is unset on this DL_Group
+             */
             cpp_int inverse_mod_q(const cpp_int &x) const;
 
             /**
-            * Modular exponentiation
-            *
-            * @warning this function leaks the size of x via the number of
-            * loop iterations. Use the version taking the maximum size to
-            * avoid this.
-            *
-            * @return (g^x) % p
-            */
+             * Modular exponentiation
+             *
+             * @warning this function leaks the size of x via the number of
+             * loop iterations. Use the version taking the maximum size to
+             * avoid this.
+             *
+             * @return (g^x) % p
+             */
             cpp_int power_g_p(const cpp_int &x) const;
 
             /**
-            * Modular exponentiation
-            * @param x the exponent
-            * @param max_x_bits x is assumed to be at most this many bits long.
-            *
-            * @return (g^x) % p
-            */
+             * Modular exponentiation
+             * @param x the exponent
+             * @param max_x_bits x is assumed to be at most this many bits long.
+             *
+             * @return (g^x) % p
+             */
             cpp_int power_g_p(const cpp_int &x, size_t max_x_bits) const;
 
             /**
-            * Multi-exponentiate
-            * Return (g^x * y^z) % p
-            */
+             * Multi-exponentiate
+             * Return (g^x * y^z) % p
+             */
             cpp_int multi_exponentiate(const cpp_int &x, const cpp_int &y, const cpp_int &z) const;
 
             /**
-            * Return parameters for Montgomery reduction/exponentiation mod p
-            */
+             * Return parameters for Montgomery reduction/exponentiation mod p
+             */
             std::shared_ptr<const montgomery_params> monty_params_p() const;
 
             /**
-            * Return the size of p in bits
-            * Same as get_p().bits()
-            */
+             * Return the size of p in bits
+             * Same as get_p().bits()
+             */
             size_t p_bits() const;
 
             /**
-            * Return the size of p in bytes
-            * Same as get_p().bytes()
-            */
+             * Return the size of p in bytes
+             * Same as get_p().bytes()
+             */
             size_t p_bytes() const;
 
             /**
-            * Return the size of q in bits
-            * Same as get_q().bits()
-            * Throws if q is unset
-            */
+             * Return the size of q in bits
+             * Same as get_q().bits()
+             * Throws if q is unset
+             */
             size_t q_bits() const;
 
             /**
-            * Return the size of q in bytes
-            * Same as get_q().bytes()
-            * Throws if q is unset
-            */
+             * Return the size of q in bytes
+             * Same as get_q().bytes()
+             * Throws if q is unset
+             */
             size_t q_bytes() const;
 
             /**
-            * Return size in bits of a secret exponent
-            *
-            * This attempts to balance between the attack costs of NFS
-            * (which depends on the size of the modulus) and Pollard's rho
-            * (which depends on the size of the exponent).
-            *
-            * It may vary over time for a particular group, if the attack
-            * costs change.
-            */
+             * Return size in bits of a secret exponent
+             *
+             * This attempts to balance between the attack costs of NFS
+             * (which depends on the size of the modulus) and Pollard's rho
+             * (which depends on the size of the exponent).
+             *
+             * It may vary over time for a particular group, if the attack
+             * costs change.
+             */
             size_t exponent_bits() const;
 
             /**
-            * Return an estimate of the strength of this group against
-            * discrete logarithm attacks (eg NFS). Warning: since this only
-            * takes into account known attacks it is by necessity an
-            * overestimate of the actual strength.
-            */
+             * Return an estimate of the strength of this group against
+             * discrete logarithm attacks (eg NFS). Warning: since this only
+             * takes into account known attacks it is by necessity an
+             * overestimate of the actual strength.
+             */
             size_t estimated_strength() const;
 
             /**
-            * Decode a DER/BER encoded group into this instance.
-            * @param ber a vector containing the DER/BER encoded group
-            * @param format the format of the encoded group
-            */
+             * Decode a DER/BER encoded group into this instance.
+             * @param ber a vector containing the DER/BER encoded group
+             * @param format the format of the encoded group
+             */
             void ber_decode(const std::vector<uint8_t> &ber, format format);
 
             /**
-            * Decode a PEM encoded group into this instance.
-            * @param pem the PEM encoding of the group
-            */
+             * Decode a PEM encoded group into this instance.
+             * @param pem the PEM encoding of the group
+             */
             void pem_decode(const std::string &pem);
 
             /*
-            * For internal use only
-            */
+             * For internal use only
+             */
             static std::shared_ptr<dl_group_data> dl_group_info(const std::string &name);
 
         private:
-
             static std::shared_ptr<dl_group_data> ber_decode_dl_group(const uint8_t *data, size_t data_len,
                                                                       dl_group::format format);
 
@@ -493,7 +489,7 @@ namespace nil {
             size_t m_estimated_strength;
             size_t m_exponent_bits;
         };
-    }
-}
+    }    // namespace crypto3
+}    // namespace nil
 
 #endif

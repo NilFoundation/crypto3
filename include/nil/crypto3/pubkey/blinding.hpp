@@ -1,9 +1,8 @@
-#ifndef CRYPTO3_BLINDER_HPP_
-#define CRYPTO3_BLINDER_HPP_
+#ifndef CRYPTO3_BLINDER_HPP
+#define CRYPTO3_BLINDER_HPP
 
-#include <boost/multiprecision/cpp_int.hpp>
-
-#include <nil/crypto3/multiprecision/modular_reduce.hpp>
+#include <boost/multiprecision/number.hpp>
+#include <boost/multiprecision/modular_reduce.hpp>
 
 #include <functional>
 
@@ -38,38 +37,38 @@ namespace nil {
                                                      const ModularInverter &exp) {
         }
 
-/**
-* Blinding Function Object.
-*/
+        /**
+         * Blinding Function Object.
+         */
         class blinder final {
         public:
             /**
-            * Blind a value.
-            * The blinding nonce k is freshly generated after
-            * CRYPTO3_BLINDING_REINIT_INTERVAL calls to blind().
-            * CRYPTO3_BLINDING_REINIT_INTERVAL = 0 means a fresh
-            * nonce is only generated once. On every other call,
-            * an updated nonce is used for blinding: k' = k*k mod n.
-            * @param x value to blind
-            * @return blinded value
-            */
+             * Blind a value.
+             * The blinding nonce k is freshly generated after
+             * CRYPTO3_BLINDING_REINIT_INTERVAL calls to blind().
+             * CRYPTO3_BLINDING_REINIT_INTERVAL = 0 means a fresh
+             * nonce is only generated once. On every other call,
+             * an updated nonce is used for blinding: k' = k*k mod n.
+             * @param x value to blind
+             * @return blinded value
+             */
             cpp_int blind(const cpp_int &x) const;
 
             /**
-            * Unblind a value.
-            * @param x value to unblind
-            * @return unblinded value
-            */
+             * Unblind a value.
+             * @param x value to unblind
+             * @return unblinded value
+             */
             cpp_int unblind(const cpp_int &x) const;
 
             /**
-            * @param modulus the modulus
-            * @param rng the RNG to use for generating the nonce
-            * @param fwd_func a function that calculates the modular
-            * exponentiation of the public exponent and the given value (the nonce)
-            * @param inv_func a function that calculates the modular inverse
-            * of the given value (the nonce)
-            */
+             * @param modulus the modulus
+             * @param rng the RNG to use for generating the nonce
+             * @param fwd_func a function that calculates the modular
+             * exponentiation of the public exponent and the given value (the nonce)
+             * @param inv_func a function that calculates the modular inverse
+             * of the given value (the nonce)
+             */
             blinder(const cpp_int &modulus, random_number_generator &rng,
                     std::function<cpp_int(const cpp_int &)> fwd_func, std::function<cpp_int(const cpp_int &)> inv_func);
 
@@ -93,7 +92,7 @@ namespace nil {
             mutable cpp_int m_e, m_d;
             mutable size_t m_counter = 0;
         };
-    }
-}
+    }    // namespace crypto3
+}    // namespace nil
 
 #endif

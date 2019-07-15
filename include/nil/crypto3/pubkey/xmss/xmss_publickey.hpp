@@ -1,5 +1,5 @@
-#ifndef CRYPTO3_XMSS_PUBLICKEY_HPP_
-#define CRYPTO3_XMSS_PUBLICKEY_HPP_
+#ifndef CRYPTO3_XMSS_PUBLICKEY_HPP
+#define CRYPTO3_XMSS_PUBLICKEY_HPP
 
 #include <cstddef>
 #include <iterator>

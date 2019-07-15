@@ -15,9 +15,9 @@ namespace nil {
 
         BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(224)
 
-/**
-* The NIST P-224 curve
-*/
+        /**
+         * The NIST P-224 curve
+         */
         template<std::size_t WordBits = CRYPTO3_MP_WORD_BITS>
         class p224 : public curve_nist_policy<224, WordBits> {
         public:
@@ -25,7 +25,7 @@ namespace nil {
             constexpr static const std::size_t p_bits = curve_nist_policy<224, WordBits>::p_bits;
             constexpr static const std::size_t p_words = curve_nist_policy<224, WordBits>::p_words;
 
-            typedef number<backends::cpp_int_backend<p_bits, p_bits, unsigned_magnitude, unchecked, void> > p_type;
+            typedef number<backends::cpp_int_backend<p_bits, p_bits, unsigned_magnitude, unchecked, void>> p_type;
 
             constexpr static const p_type p = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF000000000000000000000001_cppui224;
 
@@ -101,7 +101,7 @@ namespace nil {
                 reduce_below(x, p);
             }
         };
-    }
-}
+    }    // namespace crypto3
+}    // namespace nil
 
-#endif //CRYPTO3_CURVE_NIST_P224_HPP
+#endif    // CRYPTO3_CURVE_NIST_P224_HPP

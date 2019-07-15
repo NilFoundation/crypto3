@@ -17,9 +17,9 @@ namespace nil {
 
         BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(521)
 
-/**
- * The NIST P-521 curve
- */
+        /**
+         * The NIST P-521 curve
+         */
         template<std::size_t WordBits = CRYPTO3_MP_WORD_BITS>
         class p521 : public curve_nist_policy<521, WordBits> {
         public:
@@ -27,9 +27,10 @@ namespace nil {
             constexpr static const std::size_t p_bits = curve_nist_policy<521, WordBits>::p_bits;
             constexpr static const std::size_t p_words = curve_nist_policy<521, WordBits>::p_words;
 
-            typedef number<backends::cpp_int_backend<p_bits, p_bits, unsigned_magnitude, unchecked, void> > p_type;
+            typedef number<backends::cpp_int_backend<p_bits, p_bits, unsigned_magnitude, unchecked, void>> p_type;
 
-            constexpr static const p_type p = 0x1FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF_cppui521;
+            constexpr static const p_type p
+                = 0x1FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF_cppui521;
 
             template<typename Backend, expression_template_option ExpressionTemplates>
             static void redc_mod_p(number<Backend, ExpressionTemplates> &x, secure_vector<uint32_t> &ws) {
@@ -41,7 +42,7 @@ namespace nil {
 
                 if (x_sw < p_words) {
                     return;
-                } // already smaller
+                }    // already smaller
 
                 if (ws.size() < p_words + 1) {
                     ws.resize(p_words + 1);
@@ -60,16 +61,15 @@ namespace nil {
                 const uint8_t bit_522_set = x.word_at(p_full_words) >> (p_top_bits);
 
 #if (CRYPTO3_MP_WORD_BITS == 64)
-                static const word p521_words[9] = {
-                        0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF,
-                        0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0x1FF
-                };
+                static const word p521_words[9] = {0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF,
+                                                   0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF,
+                                                   0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0x1FF};
 #endif
 
                 /*
-                * If bit 522 is set then we overflowed and must reduce. Otherwise, if the
-                * top bit is set, it is possible we have x == 2**521 - 1 so check for that.
-                */
+                 * If bit 522 is set then we overflowed and must reduce. Otherwise, if the
+                 * top bit is set, it is possible we have x == 2**521 - 1 so check for that.
+                 */
                 if (bit_522_set) {
 #if (CRYPTO3_MP_WORD_BITS == 64)
                     bigint_sub2(x.mutable_data(), x.size(), p521_words, 9);
@@ -78,8 +78,8 @@ namespace nil {
 #endif
                 } else if (x.word_at(p_full_words) >> (p_top_bits - 1)) {
                     /*
-                    * Otherwise we must reduce if p is exactly 2^512-1
-                    */
+                     * Otherwise we must reduce if p is exactly 2^512-1
+                     */
 
                     word possibly_521 = MP_WORD_MAX;
                     for (size_t i = 0; i != p_full_words; ++i) {
@@ -115,7 +115,7 @@ namespace nil {
 
                 curve_sqr_tmp(r, tmp, ws);
                 curve_mul_tmp(r, x, tmp, ws);
-                a7 = r; // need this value later
+                a7 = r;    // need this value later
 
                 curve_sqr_tmp(r, tmp, ws);
                 curve_mul_tmp(r, x, tmp, ws);
@@ -169,7 +169,7 @@ namespace nil {
                 return r;
             }
         };
-    }
-}
+    }    // namespace crypto3
+}    // namespace nil
 
-#endif //CRYPTO3_CURVE_NIST_P521_HPP
+#endif    // CRYPTO3_CURVE_NIST_P521_HPP

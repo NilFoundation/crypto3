@@ -1,7 +1,7 @@
-#ifndef CRYPTO3_RFC6979_GENERATOR_HPP_
-#define CRYPTO3_RFC6979_GENERATOR_HPP_
+#ifndef CRYPTO3_RFC6979_GENERATOR_HPP
+#define CRYPTO3_RFC6979_GENERATOR_HPP
 
-#include <nil/crypto3/multiprecision/bigint/bigint.hpp>
+#include <boost/multiprecision/number.hpp>
 
 #include <string>
 #include <memory>
@@ -14,9 +14,10 @@ namespace nil {
         class rfc6979_nonce_generator final {
         public:
             /**
-            * Note: keeps persistent reference to order
-            */
-            rfc6979_nonce_generator(const std::string &hash, const boost::multiprecision::cpp_int &order, const boost::multiprecision::cpp_int &x);
+             * Note: keeps persistent reference to order
+             */
+            rfc6979_nonce_generator(const std::string &hash, const boost::multiprecision::cpp_int &order,
+                                    const boost::multiprecision::cpp_int &x);
 
             ~rfc6979_nonce_generator();
 
@@ -30,14 +31,17 @@ namespace nil {
             secure_vector<uint8_t> m_rng_in, m_rng_out;
         };
 
-/**
-* @param x the secret (EC)DSA key
-* @param q the group order
-* @param h the message hash already reduced mod q
-* @param hash the hash function used to generate h
-*/
-        boost::multiprecision::cpp_int generate_rfc6979_nonce(const boost::multiprecision::cpp_int &x, const boost::multiprecision::cpp_int &q, const boost::multiprecision::cpp_int &h, const std::string &hash);
-    }
-}
+        /**
+         * @param x the secret (EC)DSA key
+         * @param q the group order
+         * @param h the message hash already reduced mod q
+         * @param hash the hash function used to generate h
+         */
+        boost::multiprecision::cpp_int generate_rfc6979_nonce(const boost::multiprecision::cpp_int &x,
+                                                              const boost::multiprecision::cpp_int &q,
+                                                              const boost::multiprecision::cpp_int &h,
+                                                              const std::string &hash);
+    }    // namespace crypto3
+}    // namespace nil
 
 #endif

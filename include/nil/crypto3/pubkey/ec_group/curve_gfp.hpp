@@ -1,18 +1,16 @@
-#ifndef CRYPTO3_GFP_CURVE_HPP_
-#define CRYPTO3_GFP_CURVE_HPP_
+#ifndef CRYPTO3_GFP_CURVE_HPP
+#define CRYPTO3_GFP_CURVE_HPP
 
 #include <memory>
 
-#include <boost/multiprecision/cpp_int.hpp>
-
-#include <nil/crypto3/multiprecision/prime.hpp>
-#include <nil/crypto3/multiprecision/mp_core.hpp>
+#include <boost/multiprecision/number.hpp>
+#include <boost/multiprecision/prime.hpp>
 
 namespace nil {
     namespace crypto3 {
 
-        // Any use of user defined literals requires that we import the literal-operators
-        // into current scope first:
+        // Any use of user defined literals requires that we import the
+        // literal-operators into current scope first:
         using namespace boost::multiprecision::literals;
         using namespace boost::multiprecision;
 
@@ -23,8 +21,9 @@ namespace nil {
          *
          * @tparam Number Represents the Boost.Multiprecision number type.
          *
-         * @note There should not be any reason for applications to use this type.
-         * If you need EC primitives use the interfaces ec_group and point_gfp
+         * @note There should not be any reason for applications to use this
+         * type. If you need EC primitives use the interfaces ec_group and
+         * point_gfp
          */
         template<typename NumberType>
         class curve_gfp {
@@ -50,18 +49,18 @@ namespace nil {
             virtual bool a_is_minus_3() const = 0;
 
             /*
-            * Returns to_curve_rep(get_a())
-            */
+             * Returns to_curve_rep(get_a())
+             */
             virtual const number_type &get_a_rep() const = 0;
 
             /*
-            * Returns to_curve_rep(get_b())
-            */
+             * Returns to_curve_rep(get_b())
+             */
             virtual const number_type &get_b_rep() const = 0;
 
             /*
-            * Returns to_curve_rep(1)
-            */
+             * Returns to_curve_rep(1)
+             */
             virtual const number_type &get_1_rep() const = 0;
 
             virtual void redc_mod_p(number_type &z, secure_vector<word> &ws) const = 0;
@@ -98,7 +97,7 @@ namespace nil {
         inline bool operator!=(const curve_gfp<NumberType1> &lhs, const curve_gfp<NumberType2> &rhs) {
             return !(lhs == rhs);
         }
-    }
-}
+    }    // namespace crypto3
+}    // namespace nil
 
 #endif

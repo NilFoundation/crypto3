@@ -15,13 +15,13 @@ namespace nil {
         namespace pubkey {
 
             template<unsigned DB>
-            std::ostream &operator<<(std::ostream &sink, digest <DB> const &d) {
+            std::ostream &operator<<(std::ostream &sink, digest<DB> const &d) {
                 d.to_ascii(std::ostream_iterator<char>(sink));
                 return sink;
             };
 
             template<unsigned DB>
-            std::istream &operator>>(std::istream &source, digest <DB> &d) {
+            std::istream &operator>>(std::istream &source, digest<DB> &d) {
                 std::array<char, DB / 4> a = {{}};
                 for (unsigned i = 0; i < a.size(); ++i) {
                     char c;
@@ -45,8 +45,8 @@ namespace nil {
                 return source;
             };
 
-        }
-    }
-} // namespace nil
+        }    // namespace pubkey
+    }        // namespace crypto3
+}    // namespace nil
 
-#endif // CRYPTO3_PUBKEY_DIGEST_IO_HPP
+#endif    // CRYPTO3_PUBKEY_DIGEST_IO_HPP

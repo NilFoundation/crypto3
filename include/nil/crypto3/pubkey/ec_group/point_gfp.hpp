@@ -1,5 +1,5 @@
-#ifndef CRYPTO3_POINT_GFP_HPP_
-#define CRYPTO3_POINT_GFP_HPP_
+#ifndef CRYPTO3_POINT_GFP_HPP
+#define CRYPTO3_POINT_GFP_HPP
 
 #include <boost/random.hpp>
 
@@ -12,19 +12,19 @@
 namespace nil {
     namespace crypto3 {
 
-/**
-* Exception thrown if you try to convert a zero point to an affine
-* coordinate
-*/
+        /**
+         * Exception thrown if you try to convert a zero point to an affine
+         * coordinate
+         */
         class illegal_transformation final : public std::exception {
         public:
             explicit illegal_transformation(const std::string &err = "Requested transformation is not possible") {
             }
         };
 
-/**
-* Exception thrown if some form of illegal point is decoded
-*/
+        /**
+         * Exception thrown if some form of illegal point is decoded
+         */
         class illegal_point final : public std::exception {
         public:
             explicit illegal_point(const std::string &err = "Malformed ECP point detected") {
@@ -41,17 +41,13 @@ namespace nil {
             typedef CurveType curve_type;
             typedef typename curve_type::number_type number_type;
 
-            enum compression_type {
-                UNCOMPRESSED = 0, COMPRESSED = 1, HYBRID = 2
-            };
+            enum compression_type { UNCOMPRESSED = 0, COMPRESSED = 1, HYBRID = 2 };
 
-            enum {
-                WORKSPACE_SIZE = 8
-            };
+            enum { WORKSPACE_SIZE = 8 };
 
             /**
-            * Construct an uninitialized point_gfp
-            */
+             * Construct an uninitialized point_gfp
+             */
             point_gfp() = default;
 
             /**
@@ -60,31 +56,30 @@ namespace nil {
              *
              * @note Assumes Montgomery rep of zero is zero
              */
-            explicit point_gfp(const curve_type &curve) : m_curve(curve), m_coord_x(0), m_coord_y(curve.get_1_rep()),
-                    m_coord_z(0) {
-
+            explicit point_gfp(const curve_type &curve) :
+                m_curve(curve), m_coord_x(0), m_coord_y(curve.get_1_rep()), m_coord_z(0) {
             }
 
             /**
-            * Copy constructor
-            */
+             * Copy constructor
+             */
             point_gfp(const point_gfp<CurveType> &) = default;
 
             /**
-            * Move Constructor
-            */
+             * Move Constructor
+             */
             point_gfp(point_gfp<CurveType> &&other) {
                 this->swap(other);
             }
 
             /**
-            * Standard Assignment
-            */
+             * Standard Assignment
+             */
             point_gfp<CurveType> &operator=(const point_gfp<CurveType> &) = default;
 
             /**
-            * Move Assignment
-            */
+             * Move Assignment
+             */
             point_gfp<CurveType> &operator=(point_gfp<CurveType> &&other) {
                 if (this != &other) {
                     this->swap(other);
@@ -93,15 +88,16 @@ namespace nil {
             }
 
             /**
-            * Construct a point from its affine coordinates
-            * @param curve the base curve
-            * @param x affine x coordinate
-            * @param y affine y coordinate
-            */
+             * Construct a point from its affine coordinates
+             * @param curve the base curve
+             * @param x affine x coordinate
+             * @param y affine y coordinate
+             */
             template<typename Backend, expression_template_option ExpressionTemplates>
             point_gfp(const curve_type &curve, const number<Backend, ExpressionTemplates> &x,
                       const number<Backend, ExpressionTemplates> &y) :
-                    m_curve(curve), m_coord_x(x), m_coord_y(y), m_coord_z(m_curve.get_1_rep()) {
+                m_curve(curve),
+                m_coord_x(x), m_coord_y(y), m_coord_z(m_curve.get_1_rep()) {
                 if (x <= 0 || x >= curve.get_p()) {
                     throw std::invalid_argument("Invalid point_gfp affine x");
                 }
@@ -109,22 +105,22 @@ namespace nil {
                     throw std::invalid_argument("Invalid point_gfp affine y");
                 }
 
-                secure_vector <word> monty_ws(m_curve.get_ws_size());
+                secure_vector<word> monty_ws(m_curve.get_ws_size());
                 m_curve.to_rep(m_coord_x, monty_ws);
                 m_curve.to_rep(m_coord_y, monty_ws);
             }
 
             /**
-            * EC2OSP - elliptic curve to octet string primitive
-            * @param format which format to encode using
-            */
+             * EC2OSP - elliptic curve to octet string primitive
+             * @param format which format to encode using
+             */
             std::vector<uint8_t> encode(point_gfp<CurveType>::compression_type format) const;
 
             /**
-            * += Operator
-            * @param rhs the point_gfp to add to the local value
-            * @result resulting point_gfp
-            */
+             * += Operator
+             * @param rhs the point_gfp to add to the local value
+             * @result resulting point_gfp
+             */
             point_gfp<CurveType> &operator+=(const point_gfp<CurveType> &rhs) {
                 std::vector<number_type> ws(point_gfp<CurveType>::WORKSPACE_SIZE);
                 add(rhs, ws);
@@ -132,10 +128,10 @@ namespace nil {
             }
 
             /**
-            * -= Operator
-            * @param rhs the point_gfp to subtract from the local value
-            * @result resulting point_gfp
-            */
+             * -= Operator
+             * @param rhs the point_gfp to subtract from the local value
+             * @result resulting point_gfp
+             */
             point_gfp<CurveType> &operator-=(const point_gfp<CurveType> &rhs) {
                 point_gfp<CurveType> minus_rhs = point_gfp<CurveType>(rhs).negate();
 
@@ -149,10 +145,10 @@ namespace nil {
             }
 
             /**
-            * *= Operator
-            * @param scalar the point_gfp to multiply with *this
-            * @result resulting point_gfp
-            */
+             * *= Operator
+             * @param scalar the point_gfp to multiply with *this
+             * @result resulting point_gfp
+             */
             template<typename Backend, expression_template_option ExpressionTemplates>
             point_gfp<CurveType> &operator*=(const number<Backend, ExpressionTemplates> &scalar) {
                 *this = scalar * *this;
@@ -160,9 +156,9 @@ namespace nil {
             }
 
             /**
-            * Negate this point
-            * @return *this
-            */
+             * Negate this point
+             * @return *this
+             */
             point_gfp<CurveType> &negate() {
                 if (!is_zero()) {
                     m_coord_y = m_curve.get_p() - m_coord_y;
@@ -171,15 +167,15 @@ namespace nil {
             }
 
             /**
-            * get affine x coordinate
-            * @result affine x coordinate
-            */
+             * get affine x coordinate
+             * @result affine x coordinate
+             */
             number_type get_affine_x() const {
                 if (is_zero()) {
                     throw illegal_transformation("Cannot convert zero point to affine");
                 }
 
-                secure_vector <word> monty_ws;
+                secure_vector<word> monty_ws;
 
                 if (is_affine()) {
                     return m_curve.from_rep(m_coord_x, monty_ws);
@@ -195,15 +191,15 @@ namespace nil {
             }
 
             /**
-            * get affine y coordinate
-            * @result affine y coordinate
-            */
+             * get affine y coordinate
+             * @result affine y coordinate
+             */
             number_type get_affine_y() const {
                 if (is_zero()) {
                     throw illegal_transformation("Cannot convert zero point to affine");
                 }
 
-                secure_vector <word> monty_ws;
+                secure_vector<word> monty_ws;
 
                 if (is_affine()) {
                     return m_curve.from_rep(m_coord_y, monty_ws);
@@ -247,7 +243,7 @@ namespace nil {
                     throw Invalid_State("Cannot convert zero ECC point to affine");
                 }
 
-                secure_vector <word> ws;
+                secure_vector<word> ws;
 
                 const number_type z_inv = m_curve.invert_element(m_coord_z, ws);
                 const number_type z2_inv = m_curve.sqr_to_tmp(z_inv, ws);
@@ -268,7 +264,7 @@ namespace nil {
              * TODO is it really necessary to save all k points in c?
              */
             template<typename Backend, expression_template_option ExpressionTemplates>
-            static void force_all_affine(std::vector<point_gfp> &points, secure_vector <word> &ws) {
+            static void force_all_affine(std::vector<point_gfp> &points, secure_vector<word> &ws) {
                 if (points.size() <= 1) {
                     for (size_t i = 0; i != points.size(); ++i) {
                         points[i].force_affine();
@@ -320,18 +316,18 @@ namespace nil {
             }
 
             /**
-            * Is this the point at infinity?
-            * @result true, if this point is at infinity, false otherwise.
-            */
+             * Is this the point at infinity?
+             * @result true, if this point is at infinity, false otherwise.
+             */
             bool is_zero() const {
                 return (m_coord_x == 0 && m_coord_z == 0);
             }
 
             /**
-            * Checks whether the point is to be found on the underlying
-            * curve; used to prevent fault attacks.
-            * @return if the point is on the curve
-            */
+             * Checks whether the point is to be found on the underlying
+             * curve; used to prevent fault attacks.
+             * @return if the point is on the curve
+             */
             bool on_the_curve() const {
                 /*
                 Is the point still on the curve?? (If everything is correct, the
@@ -343,14 +339,14 @@ namespace nil {
                     return true;
                 }
 
-                secure_vector <word> monty_ws;
+                secure_vector<word> monty_ws;
 
                 const number_type y2 = m_curve.from_rep(m_curve.sqr_to_tmp(m_coord_y, monty_ws), monty_ws);
                 const number_type x3 = m_curve.mul_to_tmp(m_coord_x, m_curve.sqr_to_tmp(m_coord_x, monty_ws), monty_ws);
                 const number_type ax = m_curve.mul_to_tmp(m_coord_x, m_curve.get_a_rep(), monty_ws);
                 const number_type z2 = m_curve.sqr_to_tmp(m_coord_z, monty_ws);
 
-                if (m_coord_z == z2) // Is z equal to 1 (in Montgomery form)?
+                if (m_coord_z == z2)    // Is z equal to 1 (in Montgomery form)?
                 {
                     if (y2 != m_curve.from_rep(x3 + ax + m_curve.get_b_rep(), monty_ws)) {
                         return false;
@@ -359,20 +355,16 @@ namespace nil {
 
                 const number_type z3 = m_curve.mul_to_tmp(m_coord_z, z2, monty_ws);
                 const number_type ax_z4 = m_curve.mul_to_tmp(ax, m_curve.sqr_to_tmp(z2, monty_ws), monty_ws);
-                const number_type b_z6 = m_curve.mul_to_tmp(m_curve.get_b_rep(), m_curve.sqr_to_tmp(z3, monty_ws),
-                        monty_ws);
+                const number_type b_z6
+                    = m_curve.mul_to_tmp(m_curve.get_b_rep(), m_curve.sqr_to_tmp(z3, monty_ws), monty_ws);
 
-                if (y2 != m_curve.from_rep(x3 + ax_z4 + b_z6, monty_ws)) {
-                    return false;
-                }
-
-                return true;
+                return !(y2 != m_curve.from_rep(x3 + ax_z4 + b_z6, monty_ws)) && true;
             }
 
             /**
-            * swaps the states of *this and other, does not throw!
-            * @param other the object to swap values with
-            */
+             * swaps the states of *this and other, does not throw!
+             * @param other the object to swap values with
+             */
             void swap(point_gfp<CurveType> &other) {
                 m_curve.swap(other.m_curve);
                 m_coord_x.swap(other.m_coord_x);
@@ -381,30 +373,30 @@ namespace nil {
             }
 
             /**
-            * Randomize the point representation
-            * The actual value (get_affine_x, get_affine_y) does not change
-            */
+             * Randomize the point representation
+             * The actual value (get_affine_x, get_affine_y) does not change
+             */
             template<typename UniformRandomGenerator>
             void randomize_repr(UniformRandomGenerator &rng) {
-                secure_vector <word> ws(m_curve.get_ws_size());
+                secure_vector<word> ws(m_curve.get_ws_size());
                 randomize_repr(rng, ws);
             }
 
             /**
-            * Randomize the point representation
-            * The actual value (get_affine_x, get_affine_y) does not change
-            */
+             * Randomize the point representation
+             * The actual value (get_affine_x, get_affine_y) does not change
+             */
             template<typename UniformRandomGenerator>
-            void randomize_repr(UniformRandomGenerator &rng, secure_vector <word> &ws) {
+            void randomize_repr(UniformRandomGenerator &rng, secure_vector<word> &ws) {
                 const number_type mask = random_integer(rng, 2, m_curve.get_p());
 
                 /*
-                * No reason to convert this to Montgomery representation first,
-                * just pretend the random mask was chosen as Redc(mask) and the
-                * random mask we generated above is in the Montgomery
-                * representation.
-                * //m_curve.to_rep(mask, ws);
-                */
+                 * No reason to convert this to Montgomery representation first,
+                 * just pretend the random mask was chosen as Redc(mask) and the
+                 * random mask we generated above is in the Montgomery
+                 * representation.
+                 * //m_curve.to_rep(mask, ws);
+                 */
                 const number_type mask2 = m_curve.sqr_to_tmp(mask, ws);
                 const number_type mask3 = m_curve.mul_to_tmp(mask2, mask, ws);
 
@@ -414,8 +406,8 @@ namespace nil {
             }
 
             /**
-            * Equality operator
-            */
+             * Equality operator
+             */
             bool operator==(const point_gfp<CurveType> &other) const {
                 if (m_curve != other.m_curve) {
                     return false;
@@ -430,10 +422,10 @@ namespace nil {
             }
 
             /**
-            * Point addition
-            * @param other the point to add to *this
-            * @param workspace temp space, at least WORKSPACE_SIZE elements
-            */
+             * Point addition
+             * @param other the point to add to *this
+             * @param workspace temp space, at least WORKSPACE_SIZE elements
+             */
             template<typename Backend, expression_template_option ExpressionTemplates>
             void add(const point_gfp &other, std::vector<number<Backend, ExpressionTemplates>> &workspace) {
                 BOOST_ASSERT(m_curve == other.m_curve);
@@ -441,21 +433,21 @@ namespace nil {
                 const size_t p_words = m_curve.get_p_words();
 
                 add(other.m_coord_x.data(), std::min(p_words, other.m_coord_x.size()), other.m_coord_y.data(),
-                        std::min(p_words, other.m_coord_y.size()), other.m_coord_z.data(),
-                        std::min(p_words, other.m_coord_z.size()), workspace);
+                    std::min(p_words, other.m_coord_y.size()), other.m_coord_z.data(),
+                    std::min(p_words, other.m_coord_z.size()), workspace);
             }
 
             /**
-            * Point addition. Array version.
-            *
-            * @param x_words the words of the x coordinate of the other point
-            * @param x_size size of x_words
-            * @param y_words the words of the y coordinate of the other point
-            * @param y_size size of y_words
-            * @param z_words the words of the z coordinate of the other point
-            * @param z_size size of z_words
-            * @param workspace temp space, at least WORKSPACE_SIZE elements
-            */
+             * Point addition. Array version.
+             *
+             * @param x_words the words of the x coordinate of the other point
+             * @param x_size size of x_words
+             * @param y_words the words of the y coordinate of the other point
+             * @param y_size size of y_words
+             * @param z_words the words of the z coordinate of the other point
+             * @param z_size size of z_words
+             * @param workspace temp space, at least WORKSPACE_SIZE elements
+             */
             void add(const word x_words[], size_t x_size, const word y_words[], size_t y_size, const word z_words[],
                      size_t z_size, std::vector<cpp_int> &workspace) {
                 if (all_zeros(x_words, x_size) && all_zeros(z_words, z_size)) {
@@ -471,8 +463,8 @@ namespace nil {
 
                 resize_ws(ws_bn, m_curve.get_ws_size());
 
-                secure_vector <word> &ws = ws_bn[0].get_word_vector();
-                secure_vector <word> &sub_ws = ws_bn[1].get_word_vector();
+                secure_vector<word> &ws = ws_bn[0].get_word_vector();
+                secure_vector<word> &sub_ws = ws_bn[1].get_word_vector();
 
                 number<Backend, ExpressionTemplates> &T0 = ws_bn[2];
                 number<Backend, ExpressionTemplates> &T1 = ws_bn[3];
@@ -487,18 +479,18 @@ namespace nil {
 
                 const number<Backend, ExpressionTemplates> &p = m_curve.get_p();
 
-                m_curve.sqr(T0, z_words, z_size, ws); // z2^2
-                m_curve.mul(T1, m_coord_x, T0, ws); // x1*z2^2
-                m_curve.mul(T3, z_words, z_size, T0, ws); // z2^3
-                m_curve.mul(T2, m_coord_y, T3, ws); // y1*z2^3
+                m_curve.sqr(T0, z_words, z_size, ws);        // z2^2
+                m_curve.mul(T1, m_coord_x, T0, ws);          // x1*z2^2
+                m_curve.mul(T3, z_words, z_size, T0, ws);    // z2^3
+                m_curve.mul(T2, m_coord_y, T3, ws);          // y1*z2^3
 
-                m_curve.sqr(T3, m_coord_z, ws); // z1^2
-                m_curve.mul(T4, x_words, x_size, T3, ws); // x2*z1^2
+                m_curve.sqr(T3, m_coord_z, ws);              // z1^2
+                m_curve.mul(T4, x_words, x_size, T3, ws);    // x2*z1^2
 
-                m_curve.mul(T5, m_coord_z, T3, ws); // z1^3
-                m_curve.mul(T0, y_words, y_size, T5, ws); // y2*z1^3
+                m_curve.mul(T5, m_coord_z, T3, ws);          // z1^3
+                m_curve.mul(T0, y_words, y_size, T5, ws);    // y2*z1^3
 
-                T4.mod_sub(T1, p, sub_ws); // x2*z1^2 - x1*z2^2
+                T4.mod_sub(T1, p, sub_ws);    // x2*z1^2 - x1*z2^2
 
                 T0.mod_sub(T2, p, sub_ws);
 
@@ -538,28 +530,28 @@ namespace nil {
             }
 
             /**
-            * Point addition - mixed J+A
-            * @param other affine point to add - assumed to be affine!
-            * @param workspace temp space, at least WORKSPACE_SIZE elements
-            */
+             * Point addition - mixed J+A
+             * @param other affine point to add - assumed to be affine!
+             * @param workspace temp space, at least WORKSPACE_SIZE elements
+             */
             void add_affine(const point_gfp &other, std::vector<number<Backend, ExpressionTemplates>> &workspace) {
                 BOOST_ASSERT(m_curve == other.m_curve);
                 CRYPTO3_DEBUG_ASSERT(other.is_affine());
 
                 const size_t p_words = m_curve.get_p_words();
                 add_affine(other.m_coord_x.data(), std::min(p_words, other.m_coord_x.size()), other.m_coord_y.data(),
-                        std::min(p_words, other.m_coord_y.size()), workspace);
+                           std::min(p_words, other.m_coord_y.size()), workspace);
             }
 
             /**
-            * Point addition - mixed J+A. Array version.
-            *
-            * @param x_words the words of the x coordinate of the other point
-            * @param x_size size of x_words
-            * @param y_words the words of the y coordinate of the other point
-            * @param y_size size of y_words
-            * @param workspace temp space, at least WORKSPACE_SIZE elements
-            */
+             * Point addition - mixed J+A. Array version.
+             *
+             * @param x_words the words of the x coordinate of the other point
+             * @param x_size size of x_words
+             * @param y_words the words of the y coordinate of the other point
+             * @param y_size size of y_words
+             * @param workspace temp space, at least WORKSPACE_SIZE elements
+             */
             void add_affine(const word x_words[], size_t x_size, const word y_words[], size_t y_size,
                             std::vector<number<Backend, ExpressionTemplates>> &workspace) {
                 if (all_zeros(x_words, x_size) && all_zeros(y_words, y_size)) {
@@ -575,8 +567,8 @@ namespace nil {
 
                 resize_ws(ws_bn, m_curve.get_ws_size());
 
-                secure_vector <word> &ws = ws_bn[0].get_word_vector();
-                secure_vector <word> &sub_ws = ws_bn[1].get_word_vector();
+                secure_vector<word> &ws = ws_bn[0].get_word_vector();
+                secure_vector<word> &sub_ws = ws_bn[1].get_word_vector();
 
                 number<Backend, ExpressionTemplates> &T0 = ws_bn[2];
                 number<Backend, ExpressionTemplates> &T1 = ws_bn[3];
@@ -591,13 +583,13 @@ namespace nil {
 
                 const number<Backend, ExpressionTemplates> &p = m_curve.get_p();
 
-                m_curve.sqr(T3, m_coord_z, ws); // z1^2
-                m_curve.mul(T4, x_words, x_size, T3, ws); // x2*z1^2
+                m_curve.sqr(T3, m_coord_z, ws);              // z1^2
+                m_curve.mul(T4, x_words, x_size, T3, ws);    // x2*z1^2
 
-                m_curve.mul(T2, m_coord_z, T3, ws); // z1^3
-                m_curve.mul(T0, y_words, y_size, T2, ws); // y2*z1^3
+                m_curve.mul(T2, m_coord_z, T3, ws);          // z1^3
+                m_curve.mul(T0, y_words, y_size, T2, ws);    // y2*z1^3
 
-                T4.mod_sub(m_coord_x, p, sub_ws); // x2*z1^2 - x1*z2^2
+                T4.mod_sub(m_coord_x, p, sub_ws);    // x2*z1^2 - x1*z2^2
 
                 T0.mod_sub(m_coord_y, p, sub_ws);
 
@@ -647,14 +639,14 @@ namespace nil {
                 }
 
                 if (m_coord_y == 0) {
-                    *this = point_gfp(m_curve); // setting myself to zero
+                    *this = point_gfp(m_curve);    // setting myself to zero
                     return;
                 }
 
                 resize_ws(ws_bn, m_curve.get_ws_size());
 
-                secure_vector <word> &ws = ws_bn[0].get_word_vector();
-                secure_vector <word> &sub_ws = ws_bn[1].get_word_vector();
+                secure_vector<word> &ws = ws_bn[0].get_word_vector();
+                secure_vector<word> &sub_ws = ws_bn[1].get_word_vector();
 
                 number<Backend, ExpressionTemplates> &T0 = ws_bn[2];
                 number<Backend, ExpressionTemplates> &T1 = ws_bn[3];
@@ -670,20 +662,20 @@ namespace nil {
                 m_curve.sqr(T0, m_coord_y, ws);
 
                 m_curve.mul(T1, m_coord_x, T0, ws);
-                T1 <<= 2; // * 4
+                T1 <<= 2;    // * 4
                 m_curve.redc_mod_p(T1, sub_ws);
 
                 if (m_curve.a_is_zero()) {
                     // if a == 0 then 3*x^2 + a*z^4 is just 3*x^2
-                    m_curve.sqr(T4, m_coord_x, ws); // x^2
-                    T4 *= 3; // 3*x^2
+                    m_curve.sqr(T4, m_coord_x, ws);    // x^2
+                    T4 *= 3;                           // 3*x^2
                     m_curve.redc_mod_p(T4, sub_ws);
                 } else if (m_curve.a_is_minus_3()) {
                     /*
                     if a == -3 then
                       3*x^2 + a*z^4 == 3*x^2 - 3*z^4 == 3*(x^2-z^4) == 3*(x-z^2)*(x+z^2)
                     */
-                    m_curve.sqr(T3, m_coord_z, ws); // z^2
+                    m_curve.sqr(T3, m_coord_z, ws);    // z^2
 
                     // (x-z^2)
                     T2 = m_coord_x;
@@ -692,18 +684,18 @@ namespace nil {
                     // (x+z^2)
                     T3.mod_add(m_coord_x, p, sub_ws);
 
-                    m_curve.mul(T4, T2, T3, ws); // (x-z^2)*(x+z^2)
+                    m_curve.mul(T4, T2, T3, ws);    // (x-z^2)*(x+z^2)
 
-                    T4 *= 3; // 3*(x-z^2)*(x+z^2)
+                    T4 *= 3;    // 3*(x-z^2)*(x+z^2)
                     m_curve.redc_mod_p(T4, sub_ws);
                 } else {
-                    m_curve.sqr(T3, m_coord_z, ws); // z^2
-                    m_curve.sqr(T4, T3, ws); // z^4
-                    m_curve.mul(T3, m_curve.get_a_rep(), T4, ws); // a*z^4
+                    m_curve.sqr(T3, m_coord_z, ws);                  // z^2
+                    m_curve.sqr(T4, T3, ws);                         // z^4
+                    m_curve.mul(T3, m_curve.get_a_rep(), T4, ws);    // a*z^4
 
-                    m_curve.sqr(T4, m_coord_x, ws); // x^2
-                    T4 *= 3; // 3*x^2
-                    T4.mod_add(T3, p, sub_ws); // 3*x^2 + a*z^4
+                    m_curve.sqr(T4, m_coord_x, ws);    // x^2
+                    T4 *= 3;                           // 3*x^2
+                    T4.mod_add(T3, p, sub_ws);         // 3*x^2 + a*z^4
                 }
 
                 m_curve.sqr(T2, T4, ws);
@@ -730,17 +722,17 @@ namespace nil {
             }
 
             /**
-            * Repeated point doubling
-            * @param i number of doublings to perform
-            * @param workspace temp space, at least WORKSPACE_SIZE elements
-            */
+             * Repeated point doubling
+             * @param i number of doublings to perform
+             * @param workspace temp space, at least WORKSPACE_SIZE elements
+             */
             void mult2i(size_t iterations, std::vector<cpp_int> &ws_bn) {
                 if (iterations == 0) {
                     return;
                 }
 
                 if (m_coord_y == 0) {
-                    *this = point_gfp(m_curve); // setting myself to zero
+                    *this = point_gfp(m_curve);    // setting myself to zero
                     return;
                 }
 
@@ -754,11 +746,11 @@ namespace nil {
             }
 
             /**
-            * Point addition
-            * @param other the point to add to *this
-            * @param workspace temp space, at least WORKSPACE_SIZE elements
-            * @return other plus *this
-            */
+             * Point addition
+             * @param other the point to add to *this
+             * @param workspace temp space, at least WORKSPACE_SIZE elements
+             * @return other plus *this
+             */
             point_gfp plus(const point_gfp &other, std::vector<cpp_int> &workspace) const {
                 point_gfp x = (*this);
                 x.add(other, workspace);
@@ -766,10 +758,10 @@ namespace nil {
             }
 
             /**
-            * Point doubling
-            * @param workspace temp space, at least WORKSPACE_SIZE elements
-            * @return *this doubled
-            */
+             * Point doubling
+             * @param workspace temp space, at least WORKSPACE_SIZE elements
+             * @return *this doubled
+             */
             point_gfp double_of(std::vector<cpp_int> &workspace) const {
                 point_gfp x = (*this);
                 x.mult2(workspace);
@@ -777,18 +769,18 @@ namespace nil {
             }
 
             /**
-            * Return the zero (aka infinite) point associated with this curve
-            */
+             * Return the zero (aka infinite) point associated with this curve
+             */
             point_gfp zero() const {
                 return point_gfp(m_curve);
             }
 
             /**
-            * Return base curve of this point
-            * @result the curve over GF(p) of this point
-            *
-            * You should not need to use this
-            */
+             * Return base curve of this point
+             * @result the curve over GF(p) of this point
+             *
+             * You should not need to use this
+             */
             const curve_gfp<Backend, ExpressionTemplates> &get_curve() const {
                 return m_curve;
             }
@@ -817,12 +809,12 @@ namespace nil {
             number_type m_coord_x, m_coord_y, m_coord_z;
         };
 
-/**
-* Point multiplication operator
-* @param scalar the scalar value
-* @param point the point value
-* @return scalar*point on the curve
-*/
+        /**
+         * Point multiplication operator
+         * @param scalar the scalar value
+         * @param point the point value
+         * @return scalar*point on the curve
+         */
         template<typename CurveType>
         point_gfp<CurveType> operator*(const number<Backend, ExpressionTemplates> &scalar,
                                        const point_gfp<CurveType> &point) {
@@ -849,12 +841,12 @@ namespace nil {
             return R[0];
         }
 
-// relational operators
+        // relational operators
         inline bool operator!=(const point_gfp &lhs, const point_gfp &rhs) {
             return !(rhs == lhs);
         }
 
-// arithmetic operators
+        // arithmetic operators
         inline point_gfp operator-(const point_gfp &lhs) {
             return point_gfp(lhs).negate();
         }
@@ -873,22 +865,22 @@ namespace nil {
             return scalar * point;
         }
 
-/**
-* Perform point decoding
-* Use ec_group::os2ecp instead
-*/
+        /**
+         * Perform point decoding
+         * Use ec_group::os2ecp instead
+         */
         point_gfp os2ecp(const uint8_t data[], size_t data_len, const curve_gfp &curve);
 
-/**
-* Perform point decoding
-* Use ec_group::os2ecp instead
-*
-* @param data the encoded point
-* @param data_len length of data in bytes
-* @param curve_p the curve equation prime
-* @param curve_a the curve equation a parameter
-* @param curve_b the curve equation b parameter
-*/
+        /**
+         * Perform point decoding
+         * Use ec_group::os2ecp instead
+         *
+         * @param data the encoded point
+         * @param data_len length of data in bytes
+         * @param curve_p the curve equation prime
+         * @param curve_a the curve equation a parameter
+         * @param curve_b the curve equation b parameter
+         */
         std::pair<cpp_int, cpp_int> os2ecp(const uint8_t data[], size_t data_len, const cpp_int &curve_p,
                                            const cpp_int &curve_a, const cpp_int &curve_b);
 
@@ -897,8 +889,8 @@ namespace nil {
             return os2ecp(data.data(), data.size(), curve);
         }
 
-    }
-}
+    }    // namespace crypto3
+}    // namespace nil
 
 namespace std {
 
@@ -907,6 +899,6 @@ namespace std {
         x.swap(y);
     }
 
-}
+}    // namespace std
 
 #endif

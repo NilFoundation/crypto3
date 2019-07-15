@@ -15,24 +15,23 @@
 namespace nil {
     namespace crypto3 {
         namespace detail {
-            template<typename Encrypter,
-                     typename SinglePassRange> using range_stream_encrypt_traits = typename Encrypter::template stream_encrypt<
-                    std::numeric_limits<
-                            typename std::iterator_traits<typename SinglePassRange::iterator>::value_type>::digits +
-                    std::numeric_limits<typename std::iterator_traits<
-                            typename SinglePassRange::iterator>::value_type>::is_encrypted>;
+            template<typename Encrypter, typename SinglePassRange>
+            using range_stream_encrypt_traits = typename Encrypter::template stream_encrypt<
+                std::numeric_limits<
+                    typename std::iterator_traits<typename SinglePassRange::iterator>::value_type>::digits
+                + std::numeric_limits<
+                    typename std::iterator_traits<typename SinglePassRange::iterator>::value_type>::is_encrypted>;
 
-            template<typename Encrypter,
-                     typename InputIterator> using itr_stream_encrypt_traits = typename Encrypter::template stream_encrypt<
-                    std::numeric_limits<typename std::iterator_traits<InputIterator>::value_type>::digits +
-                    std::numeric_limits<typename std::iterator_traits<InputIterator>::value_type>::is_encrypted>;
+            template<typename Encrypter, typename InputIterator>
+            using itr_stream_encrypt_traits = typename Encrypter::template stream_encrypt<
+                std::numeric_limits<typename std::iterator_traits<InputIterator>::value_type>::digits
+                + std::numeric_limits<typename std::iterator_traits<InputIterator>::value_type>::is_encrypted>;
 
             template<typename StreamHash>
             struct ref_encrypt_impl {
                 typedef StreamHash stream_encrypt_type;
 
                 ref_encrypt_impl(const StreamHash &stream_encrypt) : sh(std::move(stream_encrypt)) {
-
                 }
 
                 template<typename Result>
@@ -48,7 +47,6 @@ namespace nil {
                 typedef StreamHash stream_encrypt_type;
 
                 value_encrypt_impl(const StreamHash &stream_encrypt) : sh(stream_encrypt) {
-
                 }
 
                 template<typename Result>
@@ -64,8 +62,8 @@ namespace nil {
             public:
                 template<typename SinglePassRange>
                 range_encrypt_impl(const SinglePassRange &range,
-                                   const typename StreamEncrypterImpl::stream_encrypt_type &ish)
-                        : StreamEncrypterImpl(ish) {
+                                   const typename StreamEncrypterImpl::stream_encrypt_type &ish) :
+                    StreamEncrypterImpl(ish) {
                     BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<SinglePassRange>));
 
                     typedef typename std::iterator_traits<typename SinglePassRange::iterator>::value_type value_type;
@@ -77,8 +75,8 @@ namespace nil {
 
                 template<typename InputIterator>
                 range_encrypt_impl(InputIterator first, InputIterator last,
-                                   const typename StreamEncrypterImpl::stream_encrypt_type &ish) : StreamEncrypterImpl(
-                        ish) {
+                                   const typename StreamEncrypterImpl::stream_encrypt_type &ish) :
+                    StreamEncrypterImpl(ish) {
                     BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<InputIterator>));
 
                     typedef typename std::iterator_traits<InputIterator>::value_type value_type;
@@ -117,8 +115,9 @@ namespace nil {
             public:
                 template<typename SinglePassRange>
                 itr_encrypt_impl(const SinglePassRange &range, OutputIterator out,
-                                 const typename StreamEncrypterImpl::stream_encrypt_type &ish) : StreamEncrypterImpl(
-                        ish), out(std::move(out)) {
+                                 const typename StreamEncrypterImpl::stream_encrypt_type &ish) :
+                    StreamEncrypterImpl(ish),
+                    out(std::move(out)) {
                     BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<SinglePassRange>));
 
                     typedef typename std::iterator_traits<typename SinglePassRange::iterator>::value_type value_type;
@@ -130,8 +129,9 @@ namespace nil {
 
                 template<typename InputIterator>
                 itr_encrypt_impl(InputIterator first, InputIterator last, OutputIterator out,
-                                 const typename StreamEncrypterImpl::stream_encrypt_type &ish)
-                        : StreamEncrypterImpl(ish), out(std::move(out)) {
+                                 const typename StreamEncrypterImpl::stream_encrypt_type &ish) :
+                    StreamEncrypterImpl(ish),
+                    out(std::move(out)) {
                     BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<InputIterator>));
 
                     typedef typename std::iterator_traits<InputIterator>::value_type value_type;
@@ -147,8 +147,8 @@ namespace nil {
                     return std::move(result.begin(), result.end(), out);
                 }
             };
-        }
-    }
-}
+        }    // namespace detail
+    }        // namespace crypto3
+}    // namespace nil
 
-#endif //CRYPTO3_PUBKEY_STREAM_POSTPROCESSOR_HPP
+#endif    // CRYPTO3_PUBKEY_STREAM_POSTPROCESSOR_HPP

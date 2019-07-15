@@ -1,5 +1,5 @@
-#ifndef ECC_HELPERS_HPP_
-#define ECC_HELPERS_HPP_
+#ifndef ECC_HELPERS_HPP
+#define ECC_HELPERS_HPP
 
 #include "fuzzers.hpp"
 #include <nil/crypto3/pubkey/ec_group/ec_group.hpp>

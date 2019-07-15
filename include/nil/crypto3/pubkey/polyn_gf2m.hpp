@@ -1,5 +1,5 @@
-#ifndef CRYPTO3_POLYN_GF2M_HPP_
-#define CRYPTO3_POLYN_GF2M_HPP_
+#ifndef CRYPTO3_POLYN_GF2M_HPP
+#define CRYPTO3_POLYN_GF2M_HPP
 
 #include <nil/crypto3/utilities/secmem.hpp>
 #include <nil/crypto3/pubkey/mce/gf2m_small_m.hpp>
@@ -13,8 +13,8 @@ namespace nil {
         class polyn_gf2m {
         public:
             /**
-            * create a zero polynomial:
-            */
+             * create a zero polynomial:
+             */
             explicit polyn_gf2m(std::shared_ptr<GF2m_Field> sp_field);
 
             polyn_gf2m() : m_deg(-1) {
@@ -46,18 +46,18 @@ namespace nil {
             secure_vector<uint8_t> encode() const;
 
             /**
-            * create zero polynomial with reservation of space for a degree d polynomial
-            */
+             * create zero polynomial with reservation of space for a degree d polynomial
+             */
             polyn_gf2m(int d, std::shared_ptr<GF2m_Field> sp_field);
 
             polyn_gf2m(polyn_gf2m const &other);
             /**
-            * create zero polynomial with allocated size determined by specified degree d:
-            */
+             * create zero polynomial with allocated size determined by specified degree d:
+             */
 
             /**
-            * random irreducible polynomial of degree t
-            */
+             * random irreducible polynomial of degree t
+             */
             polyn_gf2m(int t, random_number_generator &rng, std::shared_ptr<GF2m_Field> sp_field);
 
             std::shared_ptr<GF2m_Field> get_sp_field() const {
@@ -94,8 +94,8 @@ namespace nil {
             polyn_gf2m(const uint8_t *mem, uint32_t mem_len, std::shared_ptr<GF2m_Field> sp_field);
             // remove one! ^v!
             /**
-            *  create a polynomial from memory area (encoded)
-            */
+             *  create a polynomial from memory area (encoded)
+             */
             polyn_gf2m(int degree, const unsigned char *mem, uint32_t mem_byte_len,
                        std::shared_ptr<GF2m_Field> sp_field);
 
@@ -104,10 +104,10 @@ namespace nil {
             int get_degree() const;
 
             /**
-            * determine the degree in a timing secure manner. the timing of this function
-            * only depends on the number of allocated coefficients, not on the actual
-            * degree
-            */
+             * determine the degree in a timing secure manner. the timing of this function
+             * only depends on the number of allocated coefficients, not on the actual
+             * degree
+             */
             int calc_degree_secure() const;
 
             void degppf(const polyn_gf2m &g, int *p_result);
@@ -115,7 +115,6 @@ namespace nil {
             static std::vector<polyn_gf2m> sqmod_init(const polyn_gf2m &g);
 
             static std::vector<polyn_gf2m> sqrt_mod_init(const polyn_gf2m &g);
-
 
             polyn_gf2m sqmod(const std::vector<polyn_gf2m> &sq, int d);
 
@@ -129,7 +128,6 @@ namespace nil {
             void patchup_deg_secure(uint32_t trgt_deg, volatile gf2m patch_elem);
 
         private:
-
             void set_degree(int d) {
                 m_deg = d;
             }
@@ -141,8 +139,8 @@ namespace nil {
             static polyn_gf2m gcd(polyn_gf2m const &p1, polyn_gf2m const &p2);
 
             /**
-            * destructive:
-            */
+             * destructive:
+             */
             static void remainder(polyn_gf2m &p, const polyn_gf2m &g);
 
             static polyn_gf2m gcd_aux(polyn_gf2m &p1, polyn_gf2m &p2);
@@ -164,12 +162,12 @@ namespace nil {
 
         std::vector<polyn_gf2m> syndrome_init(polyn_gf2m const &generator, std::vector<gf2m> const &support, int n);
 
-/**
-* Find the roots of a polynomial over GF(2^m) using the method by Federenko
-* et al.
-*/
+        /**
+         * Find the roots of a polynomial over GF(2^m) using the method by Federenko
+         * et al.
+         */
         secure_vector<gf2m> find_roots_gf2m_decomp(const polyn_gf2m &polyn, uint32_t code_length);
-    }
-}
+    }    // namespace crypto3
+}    // namespace nil
 
 #endif

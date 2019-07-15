@@ -1,14 +1,5 @@
-/*
- * (C) Copyright Projet SECRET, INRIA, Rocquencourt
- * (C) Bhaskar Biswas and  Nicolas Sendrier
- *
- * (C) 2014 cryptosource GmbH
- * (C) 2014 Falko Strenzke fstrenzke@cryptosource.de
- *
- */
-
-#ifndef CRYPTO3_GF2M_SMALL_M_HPP_
-#define CRYPTO3_GF2M_SMALL_M_HPP_
+#ifndef CRYPTO3_GF2M_SMALL_M_HPP
+#define CRYPTO3_GF2M_SMALL_M_HPP
 
 #include <vector>
 #include <nil/crypto3/utilities/types.hpp>
@@ -18,9 +9,9 @@ namespace nil {
 
         typedef uint16_t gf2m;
 
-/**
-* GF(2^m) field for m = [2...16]
-*/
+        /**
+         * GF(2^m) field for m = [2...16]
+         */
         class gf2m_field {
         public:
             explicit gf2m_field(size_t extdeg);
@@ -82,8 +73,8 @@ namespace nil {
             }
 
             /**
-            * zero operand allowed
-            */
+             * zero operand allowed
+             */
             gf2m gf_mul_zrz(gf2m a, gf2m y) const {
                 return ((y == 0) ? 0 : gf_mul_nrn(a, y));
             }
@@ -93,8 +84,8 @@ namespace nil {
             }
 
             /**
-            * non-zero operand
-            */
+             * non-zero operand
+             */
             gf2m gf_mul_nnr(gf2m y, gf2m a) const {
                 return gf_mul_nrn(a, y);
             }
@@ -164,14 +155,13 @@ namespace nil {
             }
 
         private:
-
             gf2m _gf_modq_1(int32_t d) const {
                 /* residual modulo q-1
                 when -q < d < 0, we get (q-1+d)
                 when 0 <= d < q, we get (d)
                 when q <= d < 2q-1, we get (d-q+1)
                 */
-                return static_cast<gf2m>(((d) & gf_ord()) + ((d) >> get_extension_degree()));
+                return static_cast<gf2m>(((d)&gf_ord()) + ((d) >> get_extension_degree()));
             }
 
             gf2m m_gf_extension_degree, m_gf_multiplicative_order;
@@ -182,7 +172,7 @@ namespace nil {
         uint32_t encode_gf2m(gf2m to_enc, uint8_t *mem);
 
         gf2m decode_gf2m(const uint8_t *mem);
-    }
-}
+    }    // namespace crypto3
+}    // namespace nil
 
 #endif

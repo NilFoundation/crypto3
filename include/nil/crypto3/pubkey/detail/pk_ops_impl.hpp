@@ -1,5 +1,5 @@
-#ifndef CRYPTO3_PK_OPERATION_IMPL_HPP_
-#define CRYPTO3_PK_OPERATION_IMPL_HPP_
+#ifndef CRYPTO3_PK_OPERATION_IMPL_HPP
+#define CRYPTO3_PK_OPERATION_IMPL_HPP
 
 #include <nil/crypto3/pubkey/pk_operations.hpp>
 #include <nil/crypto3/pk_pad/eme.hpp>
@@ -27,7 +27,8 @@ namespace nil {
                 virtual size_t max_raw_input_bits() const = 0;
 
                 virtual secure_vector<uint8_t> raw_encrypt(const uint8_t msg[], size_t len,
-                                                           random_number_generator &rng) = 0;
+                                                           random_number_generator &rng)
+                    = 0;
 
                 std::unique_ptr<eme> m_eme;
             };
@@ -65,52 +66,52 @@ namespace nil {
                 explicit verification_with_emsa(const std::string &emsa);
 
                 /**
-                * Get the maximum message size in bits supported by this public key.
-                * @return maximum message in bits
-                */
+                 * Get the maximum message size in bits supported by this public key.
+                 * @return maximum message in bits
+                 */
                 virtual size_t max_input_bits() const = 0;
 
                 /**
-                * @return boolean specifying if this signature scheme uses
-                * a message prefix returned by message_prefix()
-                */
+                 * @return boolean specifying if this signature scheme uses
+                 * a message prefix returned by message_prefix()
+                 */
                 virtual bool has_prefix() {
                     return false;
                 }
 
                 /**
-                * @return the message prefix if this signature scheme uses
-                * a message prefix, signaled via has_prefix()
-                */
+                 * @return the message prefix if this signature scheme uses
+                 * a message prefix, signaled via has_prefix()
+                 */
                 virtual secure_vector<uint8_t> message_prefix() const {
                     throw Exception("No prefix");
                 }
 
                 /**
-                * @return boolean specifying if this key type supports message
-                * recovery and thus if you need to call verify() or verify_mr()
-                */
+                 * @return boolean specifying if this key type supports message
+                 * recovery and thus if you need to call verify() or verify_mr()
+                 */
                 virtual bool with_recovery() const = 0;
 
                 /*
-                * Perform a signature check operation
-                * @param msg the message
-                * @param msg_len the length of msg in bytes
-                * @param sig the signature
-                * @param sig_len the length of sig in bytes
-                * @returns if signature is a valid one for message
-                */
+                 * Perform a signature check operation
+                 * @param msg the message
+                 * @param msg_len the length of msg in bytes
+                 * @param sig the signature
+                 * @param sig_len the length of sig in bytes
+                 * @returns if signature is a valid one for message
+                 */
                 virtual bool verify(const uint8_t[], size_t, const uint8_t[], size_t) {
                     throw Invalid_State("Message recovery required");
                 }
 
                 /*
-                * Perform a signature operation (with message recovery)
-                * Only call this if with_recovery() returns true
-                * @param msg the message
-                * @param msg_len the length of msg in bytes
-                * @returns recovered message
-                */
+                 * Perform a signature operation (with message recovery)
+                 * Only call this if with_recovery() returns true
+                 * @param msg the message
+                 * @param msg_len the length of msg in bytes
+                 * @returns recovered message
+                 */
                 virtual secure_vector<uint8_t> verify_mr(const uint8_t[], size_t) {
                     throw Invalid_State("Message recovery not supported");
                 }
@@ -141,17 +142,17 @@ namespace nil {
                 }
 
                 /**
-                * @return boolean specifying if this signature scheme uses
-                * a message prefix returned by message_prefix()
-                */
+                 * @return boolean specifying if this signature scheme uses
+                 * a message prefix returned by message_prefix()
+                 */
                 virtual bool has_prefix() {
                     return false;
                 }
 
                 /**
-                * @return the message prefix if this signature scheme uses
-                * a message prefix, signaled via has_prefix()
-                */
+                 * @return the message prefix if this signature scheme uses
+                 * a message prefix, signaled via has_prefix()
+                 */
                 virtual secure_vector<uint8_t> message_prefix() const {
                     throw Exception("No prefix");
                 }
@@ -161,17 +162,17 @@ namespace nil {
                 }
 
             private:
-
                 /**
-                * Get the maximum message size in bits supported by this public key.
-                * @return maximum message in bits
-                */
+                 * Get the maximum message size in bits supported by this public key.
+                 * @return maximum message in bits
+                 */
                 virtual size_t max_input_bits() const = 0;
 
                 bool self_test_signature(const std::vector<uint8_t> &msg, const std::vector<uint8_t> &sig) const;
 
                 virtual secure_vector<uint8_t> raw_sign(const uint8_t msg[], size_t msg_len,
-                                                        random_number_generator &rng) = 0;
+                                                        random_number_generator &rng)
+                    = 0;
 
                 std::unique_ptr<emsa> m_emsa;
                 const std::string m_hash;
@@ -203,7 +204,8 @@ namespace nil {
             protected:
                 virtual void raw_kem_encrypt(secure_vector<uint8_t> &out_encapsulated_key,
                                              secure_vector<uint8_t> &raw_shared_key,
-                                             nil::crypto3::random_number_generator &rng) = 0;
+                                             nil::crypto3::random_number_generator &rng)
+                    = 0;
 
                 explicit kem_encryption_with_kdf(const std::string &kdf);
 
@@ -228,8 +230,8 @@ namespace nil {
             private:
                 std::unique_ptr<kdf> m_kdf;
             };
-        }
-    }
-}
+        }    // namespace pk_operations
+    }        // namespace crypto3
+}    // namespace nil
 
 #endif

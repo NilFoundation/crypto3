@@ -48,9 +48,7 @@ namespace nil {
              */
 
             template<std::size_t DigestBits>
-            class digest : public boost::container::small_vector<octet_type, DigestBits / octet_bits> {
-
-            };
+            class digest : public boost::container::small_vector<octet_type, DigestBits / octet_bits> {};
 
             namespace detail {
                 template<std::size_t DigestBits, typename OutputIterator>
@@ -70,7 +68,7 @@ namespace nil {
                     s.push_back('\0');
                     return s;
                 }
-            }
+            }    // namespace detail
 
             /*!
              *
@@ -157,9 +155,9 @@ namespace nil {
                 return a == b;
             }
 
-        }
-    }
-} // namespace nil
+        }    // namespace pubkey
+    }        // namespace crypto3
+}    // namespace nil
 
 namespace std {
     template<std::size_t DigestBits>
@@ -167,6 +165,6 @@ namespace std {
         nil::crypto3::pubkey::digest<DigestBits / 4 + 1> cstr = nil::crypto3::pubkey::detail::c_str(d);
         return std::string(cstr.begin(), cstr.begin() + cstr.size() - 1);
     }
-}
+}    // namespace std
 
-#endif // CRYPTO3_CODEC_DIGEST_HPP
+#endif    // CRYPTO3_CODEC_DIGEST_HPP

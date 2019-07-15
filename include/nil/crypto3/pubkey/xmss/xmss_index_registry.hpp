@@ -1,5 +1,5 @@
-#ifndef CRYPTO3_XMSS_INDEX_REGISTRY_HPP_
-#define CRYPTO3_XMSS_INDEX_REGISTRY_HPP_
+#ifndef CRYPTO3_XMSS_INDEX_REGISTRY_HPP
+#define CRYPTO3_XMSS_INDEX_REGISTRY_HPP
 
 #include <nil/crypto3/utilities/secmem.hpp>
 #include <nil/crypto3/utilities/mutex.hpp>

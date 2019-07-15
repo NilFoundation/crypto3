@@ -1,5 +1,5 @@
-#ifndef CRYPTO3_FUZZER_DRIVER_HPP_
-#define CRYPTO3_FUZZER_DRIVER_HPP_
+#ifndef CRYPTO3_FUZZER_DRIVER_HPP
+#define CRYPTO3_FUZZER_DRIVER_HPP
 
 #include <stdint.h>
 #include <stdlib.h> // for setenv

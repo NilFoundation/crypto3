@@ -26,15 +26,12 @@ namespace nil {
                 typedef typename Cipher::pubkey_type pubkey_type;
 
                 pubkey_type begin_message(const pubkey_type &plaintext) {
-
                 }
 
                 pubkey_type process_pubkey(const pubkey_type &plaintext) {
-
                 }
 
                 pubkey_type end_message(const pubkey_type &plaintext) {
-
                 }
             };
 
@@ -44,16 +41,20 @@ namespace nil {
                 }
             };
 
-            template<typename Mode, typename Endian, std::size_t ValueBits, std::size_t LengthBits, template<typename>
-                    class StateAppendFunctor = std::back_insert_iterator, typename FinalizerFunctor =
-                    nop_finalizer>
+            template<typename Mode,
+                     typename Endian,
+                     std::size_t ValueBits,
+                     std::size_t LengthBits,
+                     template<typename> class StateAppendFunctor = std::back_insert_iterator,
+                     typename FinalizerFunctor = nop_finalizer>
             class stream_preprocessor {
             public:
                 typedef Mode cipher_mode_type;
                 typedef typename cipher_mode_type::cipher_type cipher_type;
                 typedef typename cipher_mode_type::padding_type cipher_padding_type;
 
-                template<typename T> using state_append_functor = StateAppendFunctor<T>;
+                template<typename T>
+                using state_append_functor = StateAppendFunctor<T>;
 
                 typedef FinalizerFunctor finalizer_functor;
 
@@ -73,11 +74,10 @@ namespace nil {
                 typedef std::array<value_type, pubkey_values> value_array_type;
 
             private:
-
                 constexpr static const std::size_t length_bits = LengthBits;
                 // FIXME: do something more intelligent than capping at 64
-                constexpr static const std::size_t length_type_bits =
-                        length_bits < word_bits ? word_bits : length_bits > 64 ? 64 : length_bits;
+                constexpr static const std::size_t length_type_bits
+                    = length_bits < word_bits ? word_bits : length_bits > 64 ? 64 : length_bits;
                 typedef typename boost::uint_t<length_type_bits>::least length_type;
                 constexpr static const std::size_t length_words = length_bits / word_bits;
                 BOOST_STATIC_ASSERT(!length_bits || length_bits % word_bits == 0);
@@ -203,17 +203,18 @@ namespace nil {
                 }
 
             public:
-                stream_preprocessor(const cipher_type &cipher = cipher_type())
-                        : result(), value_array(), c(cipher, cipher_padding_type()), seen() {
+                stream_preprocessor(const cipher_type &cipher = cipher_type()) :
+                    result(), value_array(), c(cipher, cipher_padding_type()), seen() {
                 }
 
-                stream_preprocessor(const cipher_mode_type &mode = cipher_mode_type())
-                        : result(), value_array(), c(mode), seen() {
+                stream_preprocessor(const cipher_mode_type &mode = cipher_mode_type()) :
+                    result(), value_array(), c(mode), seen() {
                 }
 
                 stream_preprocessor(const cipher_type &cipher = cipher_type(),
-                                    const cipher_padding_type &padding = cipher_padding_type())
-                        : result(), value_array(), c(cipher, padding), seen() {
+                                    const cipher_padding_type &padding = cipher_padding_type()) :
+                    result(),
+                    value_array(), c(cipher, padding), seen() {
                 }
 
                 void reset() {
@@ -228,8 +229,8 @@ namespace nil {
                 cipher<cipher_type, cipher_mode_type, cipher_padding_type> c;
                 length_type seen;
             };
-        }
-    }
-} // namespace nil
+        }    // namespace pubkey
+    }        // namespace crypto3
+}    // namespace nil
 
-#endif // CRYPTO3_PUBKEY_STREAM_PREPROCESSOR_HPP
+#endif    // CRYPTO3_PUBKEY_STREAM_PREPROCESSOR_HPP

@@ -1,5 +1,5 @@
-#ifndef CRYPTO3_XMSS_SIGNATURE_HPP_
-#define CRYPTO3_XMSS_SIGNATURE_HPP_
+#ifndef CRYPTO3_XMSS_SIGNATURE_HPP
+#define CRYPTO3_XMSS_SIGNATURE_HPP
 
 #include <cstddef>
 #include <nil/crypto3/utilities/exceptions.hpp>
@@ -22,7 +22,7 @@ namespace nil {
              * @param raw_sig An XMSS signature serialized using
              *                XMSS_Signature::bytes().
              **/
-            XMSS_Signature(XMSS_Parameters::xmss_algorithm_t oid, const secure_vector <uint8_t> &raw_sig);
+            XMSS_Signature(XMSS_Parameters::xmss_algorithm_t oid, const secure_vector<uint8_t> &raw_sig);
 
             /**
              * Creates an XMSS Signature from a leaf index used for signature
@@ -32,9 +32,10 @@ namespace nil {
              * @param randomness A random value.
              * @param tree_sig A tree signature.
              **/
-            XMSS_Signature(size_t leaf_idx, const secure_vector <uint8_t> &randomness,
-                           const XMSS_WOTS_PublicKey::TreeSignature &tree_sig) : m_leaf_idx(leaf_idx),
-                    m_randomness(randomness), m_tree_sig(tree_sig) {
+            XMSS_Signature(size_t leaf_idx, const secure_vector<uint8_t> &randomness,
+                           const XMSS_WOTS_PublicKey::TreeSignature &tree_sig) :
+                m_leaf_idx(leaf_idx),
+                m_randomness(randomness), m_tree_sig(tree_sig) {
             }
 
             /**
@@ -45,9 +46,10 @@ namespace nil {
              * @param randomness A random value.
              * @param tree_sig A tree signature.
              **/
-            XMSS_Signature(size_t leaf_idx, secure_vector <uint8_t> &&randomness,
-                           XMSS_WOTS_PublicKey::TreeSignature &&tree_sig) : m_leaf_idx(leaf_idx),
-                    m_randomness(std::move(randomness)), m_tree_sig(std::move(tree_sig)) {
+            XMSS_Signature(size_t leaf_idx, secure_vector<uint8_t> &&randomness,
+                           XMSS_WOTS_PublicKey::TreeSignature &&tree_sig) :
+                m_leaf_idx(leaf_idx),
+                m_randomness(std::move(randomness)), m_tree_sig(std::move(tree_sig)) {
             }
 
             size_t unused_leaf_index() const {
@@ -58,19 +60,19 @@ namespace nil {
                 m_leaf_idx = idx;
             }
 
-            const secure_vector <uint8_t> randomness() const {
+            const secure_vector<uint8_t> randomness() const {
                 return m_randomness;
             }
 
-            secure_vector <uint8_t> &randomness() {
+            secure_vector<uint8_t> &randomness() {
                 return m_randomness;
             }
 
-            void set_randomness(const secure_vector <uint8_t> &randomness) {
+            void set_randomness(const secure_vector<uint8_t> &randomness) {
                 m_randomness = randomness;
             }
 
-            void set_randomness(secure_vector <uint8_t> &&randomness) {
+            void set_randomness(secure_vector<uint8_t> &&randomness) {
                 m_randomness = std::move(randomness);
             }
 
@@ -102,14 +104,14 @@ namespace nil {
              * @return serialized signature, a sequence of
              *         (len + h + 1)n bytes.
              **/
-            secure_vector <uint8_t> bytes() const;
+            secure_vector<uint8_t> bytes() const;
 
         private:
             size_t m_leaf_idx;
-            secure_vector <uint8_t> m_randomness;
+            secure_vector<uint8_t> m_randomness;
             XMSS_WOTS_PublicKey::TreeSignature m_tree_sig;
         };
-    }
-}
+    }    // namespace crypto3
+}    // namespace nil
 
 #endif

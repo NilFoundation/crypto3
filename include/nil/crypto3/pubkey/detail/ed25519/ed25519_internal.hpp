@@ -1,5 +1,5 @@
-#ifndef CRYPTO3_ED25519_INT_HPP_
-#define CRYPTO3_ED25519_INT_HPP_
+#ifndef CRYPTO3_ED25519_INT_HPP
+#define CRYPTO3_ED25519_INT_HPP
 
 #include <nil/crypto3/pubkey/ed25519/ed25519_fe.hpp>
 #include <nil/crypto3/utilities/loadstore.hpp>
@@ -8,8 +8,8 @@ namespace nil {
     namespace crypto3 {
 
         inline uint64_t load_3(const uint8_t in[3]) {
-            return static_cast<uint64_t>(in[0]) | (static_cast<uint64_t>(in[1]) << 8) |
-                   (static_cast<uint64_t>(in[2]) << 16);
+            return static_cast<uint64_t>(in[0]) | (static_cast<uint64_t>(in[1]) << 8)
+                   | (static_cast<uint64_t>(in[2]) << 16);
         }
 
         inline uint64_t load_4(const uint8_t *in) {
@@ -57,16 +57,16 @@ namespace nil {
             X = 0;
         }
 
-/*
-ge means group element.
+        /*
+        ge means group element.
 
-Here the group is the set of pairs (x,y) of field elements (see fe.h)
-satisfying -x^2 + y^2 = 1 + d x^2y^2
-where d = -121665/121666.
+        Here the group is the set of pairs (x,y) of field elements (see fe.h)
+        satisfying -x^2 + y^2 = 1 + d x^2y^2
+        where d = -121665/121666.
 
-Representations:
-  ge_p3 (extended): (X:Y:Z:T) satisfying x=X/Z, y=Y/Z, XY=ZT
-*/
+        Representations:
+          ge_p3 (extended): (X:Y:Z:T) satisfying x=X/Z, y=Y/Z, XY=ZT
+        */
 
         typedef struct {
             fe X;
@@ -81,15 +81,15 @@ Representations:
 
         void ge_double_scalarmult_vartime(uint8_t out[32], const uint8_t a[], const ge_p3 *A, const uint8_t b[]);
 
-/*
-The set of scalars is \Z/l
-where l = 2^252 + 27742317777372353535851937790883648493.
-*/
+        /*
+        The set of scalars is \Z/l
+        where l = 2^252 + 27742317777372353535851937790883648493.
+        */
 
         void sc_reduce(uint8_t *);
 
         void sc_muladd(uint8_t *, const uint8_t *, const uint8_t *, const uint8_t *);
-    }
-}
+    }    // namespace crypto3
+}    // namespace nil
 
 #endif

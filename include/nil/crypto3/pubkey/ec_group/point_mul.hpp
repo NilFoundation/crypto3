@@ -27,7 +27,7 @@ namespace nil {
                 }
                 return n;
             }
-        }
+        }    // namespace
         class modular_reducer;
 
         constexpr static const std::size_t point_gfp_scalar_blinding_bits = 80;
@@ -42,19 +42,18 @@ namespace nil {
             typedef typename curve_type::number_type number_type;
 
             template<typename Backend, expression_template_option ExpressionTemplates>
-            point_gfp_base_point_precompute(const point_gfp<curve_type> &base_point, const modular_reducer &mod_order)
-                    : m_base_point(base_point), m_mod_order(mod_order),
-                    m_p_words(base_point.get_curve().get_p().sig_words()),
-                    m_T_size(base_point.get_curve().get_p().bits() + point_gfp_scalar_blinding_bits + 1) {
+            point_gfp_base_point_precompute(const point_gfp<curve_type> &base_point, const modular_reducer &mod_order) :
+                m_base_point(base_point), m_mod_order(mod_order), m_p_words(base_point.get_curve().get_p().sig_words()),
+                m_T_size(base_point.get_curve().get_p().bits() + point_gfp_scalar_blinding_bits + 1) {
                 std::vector<number_type> ws(point_gfp<curve_type>::WORKSPACE_SIZE);
 
                 const size_t p_bits = base_point.get_curve().get_p().bits();
 
                 /*
-                * Some of the curves (eg secp160k1) have an order slightly larger than
-                * the size of the prime modulus. In all cases they are at most 1 bit
-                * longer. The +1 compensates for this.
-                */
+                 * Some of the curves (eg secp160k1) have an order slightly larger than
+                 * the size of the prime modulus. In all cases they are at most 1 bit
+                 * longer. The +1 compensates for this.
+                 */
                 const size_t T_bits = round_up(p_bits + point_gfp_scalar_blinding_bits + 1, 2) / 2;
 
                 std::vector<point_gfp> T(3 * T_bits);
@@ -107,7 +106,7 @@ namespace nil {
                 const size_t elem_size = 2 * m_p_words;
 
                 BOOST_ASSERT_MSG(windows <= m_W.size() / (3 * elem_size),
-                        "Precomputed sufficient values for scalar mult");
+                                 "Precomputed sufficient values for scalar mult");
 
                 point_gfp R = m_base_point.zero();
 
@@ -140,10 +139,10 @@ namespace nil {
 
                     if (i == 0) {
                         /*
-                        * Since we start with the top bit of the exponent we know the
-                        * first window must have a non-zero element, and thus R is
-                        * now a point other than the point at infinity.
-                        */
+                         * Since we start with the top bit of the exponent we know the
+                         * first window must have a non-zero element, and thus R is
+                         * now a point other than the point at infinity.
+                         */
                         CRYPTO3_DEBUG_ASSERT(w != 0);
                         R.randomize_repr(rng, ws[0].get_word_vector());
                     }
@@ -162,8 +161,8 @@ namespace nil {
             const size_t m_T_size;
 
             /*
-            * This is a table of T_size * 3*p_word words
-            */
+             * This is a table of T_size * 3*p_word words
+             */
             std::vector<word> m_W;
         };
 
@@ -175,8 +174,9 @@ namespace nil {
 
             template<typename Backend, expression_templates ExpressionTemplates>
             point_gfp_var_point_precompute(const point_gfp<CurveType> &point, random_number_generator &rng,
-                                           std::vector<number<Backend, ExpressionTemplates>> &ws) : m_curve(
-                    point.get_curve()), m_p_words(m_curve.get_p().sig_words()), m_window_bits(4) {
+                                           std::vector<number<Backend, ExpressionTemplates>> &ws) :
+                m_curve(point.get_curve()),
+                m_p_words(m_curve.get_p().sig_words()), m_window_bits(4) {
                 if (ws.size() < point_gfp::WORKSPACE_SIZE) {
                     ws.resize(point_gfp::WORKSPACE_SIZE);
                 }
@@ -308,11 +308,11 @@ namespace nil {
             const size_t m_window_bits;
 
             /*
-            * Table of 2^window_bits * 3*2*p_word words
-            * Kept in locked vector since the base point might be sensitive
-            * (normally isn't in most protocols but hard to say anything
-            * categorically.)
-            */
+             * Table of 2^window_bits * 3*2*p_word words
+             * Kept in locked vector since the base point might be sensitive
+             * (normally isn't in most protocols but hard to say anything
+             * categorically.)
+             */
             secure_vector<word> m_T;
         };
 
@@ -358,9 +358,9 @@ namespace nil {
             }
 
             /*
-            * Return (g1*k1 + g2*k2)
-            * Not constant time, intended to use with public inputs
-            */
+             * Return (g1*k1 + g2*k2)
+             * Not constant time, intended to use with public inputs
+             */
             point_gfp<Backend, ExpressionTemplates> multi_exp(const number<Backend, ExpressionTemplates> &k1,
                                                               const number<Backend, ExpressionTemplates> &k2) const {
                 std::vector<cpp_int> ws(point_gfp::WORKSPACE_SIZE);
@@ -396,14 +396,14 @@ namespace nil {
             std::vector<point_gfp<Backend, ExpressionTemplates>> m_M;
         };
 
-/**
-* @brief ECC point multiexponentiation (Non const-time).
-* @param p1 a point
-* @param z1 a scalar
-* @param p2 a point
-* @param z2 a scalar
-* @result (p1 * z1 + p2 * z2)
-*/
+        /**
+         * @brief ECC point multiexponentiation (Non const-time).
+         * @param p1 a point
+         * @param z1 a scalar
+         * @param p2 a point
+         * @param z2 a scalar
+         * @result (p1 * z1 + p2 * z2)
+         */
         template<typename Backend, expression_templates ExpressionTemplates>
         point_gfp<Backend, ExpressionTemplates> multi_exponentiate(const point_gfp<Backend, ExpressionTemplates> &p1,
                                                                    const number<Backend, ExpressionTemplates> &z1,
@@ -412,7 +412,7 @@ namespace nil {
             point_gfp_multi_point_precompute xy_mul(x, y);
             return xy_mul.multi_exp(z1, z2);
         }
-    }
-}
+    }    // namespace crypto3
+}    // namespace nil
 
-#endif //CRYPTO3_POINT_MUL_HPP
+#endif    // CRYPTO3_POINT_MUL_HPP

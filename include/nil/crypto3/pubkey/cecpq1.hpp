@@ -1,5 +1,5 @@
-#ifndef CRYPTO3_CECPQ1_HPP_
-#define CRYPTO3_CECPQ1_HPP_
+#ifndef CRYPTO3_CECPQ1_HPP
+#define CRYPTO3_CECPQ1_HPP
 
 #include <nil/crypto3/utilities/secmem.hpp>
 #include <nil/crypto3/pubkey/newhope/newhope.hpp>
@@ -13,15 +13,13 @@ namespace nil {
             newhope_poly m_newhope;
         };
 
-        void  CECPQ1_offer(uint8_t *offer_message, CECPQ1_key *offer_key_output,
-                                                  RandomNumberGenerator &rng);
+        void CECPQ1_offer(uint8_t *offer_message, CECPQ1_key *offer_key_output, RandomNumberGenerator &rng);
 
-        void  CECPQ1_accept(uint8_t *shared_key, uint8_t *accept_message,
-                                                   const uint8_t *offer_message, RandomNumberGenerator &rng);
+        void CECPQ1_accept(uint8_t *shared_key, uint8_t *accept_message, const uint8_t *offer_message,
+                           RandomNumberGenerator &rng);
 
-        void  CECPQ1_finish(uint8_t *shared_key, const CECPQ1_key &offer_key,
-                                                   const uint8_t *accept_message);
-    }
-}
+        void CECPQ1_finish(uint8_t *shared_key, const CECPQ1_key &offer_key, const uint8_t *accept_message);
+    }    // namespace crypto3
+}    // namespace nil
 
 #endif

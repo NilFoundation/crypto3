@@ -1,11 +1,5 @@
-/*
-* NEWHOPE Ring-LWE scheme
-* Based on the public domain reference implementation by the
-* designers (https://github.com/tpoeppelmann/newhope)
-*/
-
-#ifndef CRYPTO3_NEWHOPE_HPP_
-#define CRYPTO3_NEWHOPE_HPP_
+#ifndef CRYPTO3_NEWHOPE_HPP
+#define CRYPTO3_NEWHOPE_HPP
 
 #include <nil/crypto3/utilities/memory_operations.hpp>
 
@@ -14,13 +8,13 @@ namespace nil {
 
         class random_number_generator;
 
-/*
-* WARNING: This API is preliminary and will change
-* Currently pubkey.h does not support a 2-phase KEM scheme of
-* the sort NEWHOPE exports.
-*/
+        /*
+         * WARNING: This API is preliminary and will change
+         * Currently pubkey.h does not support a 2-phase KEM scheme of
+         * the sort NEWHOPE exports.
+         */
 
-// TODO: change to just a secure_vector
+        // TODO: change to just a secure_vector
         class newhope_poly final {
         public:
             uint16_t coeffs[1024];
@@ -46,28 +40,26 @@ namespace nil {
             CECPQ1_SHARED_KEY_BYTES = NEWHOPE_SHARED_KEY_BYTES + 32
         };
 
-/**
-* This chooses the XOF + hash for NewHope
-* The official NewHope specification and reference implementation use
-* SHA-3 and SHAKE-128. BoringSSL instead uses SHA-256 and AES-128 in
-* CTR mode. CECPQ1 (x25519+NewHope) always uses BoringSSL's mode
-*/
-        enum class newhope_mode {
-            SHA3, BoringSSL
-        };
+        /**
+         * This chooses the XOF + hash for NewHope
+         * The official NewHope specification and reference implementation use
+         * SHA-3 and SHAKE-128. BoringSSL instead uses SHA-256 and AES-128 in
+         * CTR mode. CECPQ1 (x25519+NewHope) always uses BoringSSL's mode
+         */
+        enum class newhope_mode { SHA3, BoringSSL };
 
-// offer
+        // offer
         void newhope_keygen(uint8_t send[NEWHOPE_SENDABYTES], newhope_poly *sk, random_number_generator &rng,
                             newhope_mode = newhope_mode::SHA3);
 
-// accept
+        // accept
         void newhope_sharedb(uint8_t sharedkey[NEWHOPE_SHARED_KEY_BYTES], uint8_t send[], const uint8_t *received,
                              random_number_generator &rng, newhope_mode mode = newhope_mode::SHA3);
 
-// finish
+        // finish
         void newhope_shareda(uint8_t sharedkey[NEWHOPE_SHARED_KEY_BYTES], const newhope_poly *ska,
                              const uint8_t *received, newhope_mode mode = newhope_mode::SHA3);
-    }
-}
+    }    // namespace crypto3
+}    // namespace nil
 
 #endif

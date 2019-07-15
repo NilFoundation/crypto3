@@ -1,14 +1,14 @@
-#ifndef CRYPTO3_ED25519_FE_HPP_
-#define CRYPTO3_ED25519_FE_HPP_
+#ifndef CRYPTO3_ED25519_FE_HPP
+#define CRYPTO3_ED25519_FE_HPP
 
 #include <nil/crypto3/utilities/memory_operations.hpp>
 
 namespace nil {
     namespace crypto3 {
 
-/**
-* An element of the field \\Z/(2^255-19)
-*/
+        /**
+         * An element of the field \\Z/(2^255-19)
+         */
         class fe25519 {
         public:
             ~fe25519() {
@@ -16,8 +16,8 @@ namespace nil {
             }
 
             /**
-            * Zero element
-            */
+             * Zero element
+             */
             fe25519(int init = 0) {
                 if (init != 0 && init != 1) {
                     throw std::invalid_argument("Invalid fe25519 initial value");
@@ -135,19 +135,18 @@ namespace nil {
             }
 
         private:
-
             int32_t m_fe[10];
         };
 
         typedef fe25519 fe;
 
-/*
-fe means field element.
-Here the field is
-An element t, entries t[0]...t[9], represents the integer
-t[0]+2^26 t[1]+2^51 t[2]+2^77 t[3]+2^102 t[4]+...+2^230 t[9].
-Bounds on each t[i] vary depending on context.
-*/
+        /*
+        fe means field element.
+        Here the field is
+        An element t, entries t[0]...t[9], represents the integer
+        t[0]+2^26 t[1]+2^51 t[2]+2^77 t[3]+2^102 t[4]+...+2^230 t[9].
+        Bounds on each t[i] vary depending on context.
+        */
 
         inline void fe_frombytes(fe &x, const uint8_t *b) {
             x.from_bytes(b);
@@ -168,7 +167,6 @@ Bounds on each t[i] vary depending on context.
         inline int fe_isnegative(const fe &x) {
             return x < 0;
         }
-
 
         inline void fe_0(fe &x) {
             x = fe25519();
@@ -213,7 +211,7 @@ Bounds on each t[i] vary depending on context.
         inline void fe_pow22523(fe &x, const fe &y) {
             x = fe25519::fe25519(y);
         }
-    }
-}
+    }    // namespace crypto3
+}    // namespace nil
 
 #endif

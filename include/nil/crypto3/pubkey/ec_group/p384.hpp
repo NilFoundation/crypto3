@@ -17,9 +17,9 @@ namespace nil {
 
         BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(384)
 
-/**
-* The NIST P-384 curve
-*/
+        /**
+         * The NIST P-384 curve
+         */
         template<std::size_t WordBits = CRYPTO3_MP_WORD_BITS>
         class p384 : public curve_nist_policy<384, WordBits> {
         public:
@@ -27,9 +27,10 @@ namespace nil {
             constexpr static const std::size_t p_bits = curve_nist_policy<384, WordBits>::p_bits;
             constexpr static const std::size_t p_words = curve_nist_policy<384, WordBits>::p_words;
 
-            typedef number<backends::cpp_int_backend<p_bits, p_bits, unsigned_magnitude, unchecked, void> > p_type;
+            typedef number<backends::cpp_int_backend<p_bits, p_bits, unsigned_magnitude, unchecked, void>> p_type;
 
-            constexpr static const p_type p = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFF0000000000000000FFFFFFFF_cppui384;
+            constexpr static const p_type p
+                = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFF0000000000000000FFFFFFFF_cppui384;
 
             template<typename Backend, expression_template_option ExpressionTemplates>
             static void redc_mod_p(number<Backend, ExpressionTemplates> &x) {
@@ -185,34 +186,28 @@ namespace nil {
                 */
                 static const uint32_t p384_mults[5][p384_limbs] = {
 #if (CRYPTO3_MP_WORD_BITS == 64)
-                        {
-                                0x00000000FFFFFFFF, 0xFFFFFFFF00000000, 0xFFFFFFFFFFFFFFFE, 0xFFFFFFFFFFFFFFFF,
-                                0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF
-                        }, {
-                                0x00000001FFFFFFFE, 0xFFFFFFFE00000000, 0xFFFFFFFFFFFFFFFD, 0xFFFFFFFFFFFFFFFF,
-                                0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF
-                        }, {
-                                0x00000002FFFFFFFD, 0xFFFFFFFD00000000, 0xFFFFFFFFFFFFFFFC, 0xFFFFFFFFFFFFFFFF,
-                                0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF
-                        }, {
-                                0x00000003FFFFFFFC, 0xFFFFFFFC00000000, 0xFFFFFFFFFFFFFFFB, 0xFFFFFFFFFFFFFFFF,
-                                0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF
-                        }, {
-                                0x00000004FFFFFFFB, 0xFFFFFFFB00000000, 0xFFFFFFFFFFFFFFFA, 0xFFFFFFFFFFFFFFFF,
-                                0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF
-                        },
+                    {0x00000000FFFFFFFF, 0xFFFFFFFF00000000, 0xFFFFFFFFFFFFFFFE, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF,
+                     0xFFFFFFFFFFFFFFFF},
+                    {0x00000001FFFFFFFE, 0xFFFFFFFE00000000, 0xFFFFFFFFFFFFFFFD, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF,
+                     0xFFFFFFFFFFFFFFFF},
+                    {0x00000002FFFFFFFD, 0xFFFFFFFD00000000, 0xFFFFFFFFFFFFFFFC, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF,
+                     0xFFFFFFFFFFFFFFFF},
+                    {0x00000003FFFFFFFC, 0xFFFFFFFC00000000, 0xFFFFFFFFFFFFFFFB, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF,
+                     0xFFFFFFFFFFFFFFFF},
+                    {0x00000004FFFFFFFB, 0xFFFFFFFB00000000, 0xFFFFFFFFFFFFFFFA, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF,
+                     0xFFFFFFFFFFFFFFFF},
 
 #else
-                {0xFFFFFFFF, 0x00000000, 0x00000000, 0xFFFFFFFF, 0xFFFFFFFE, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-                 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF},
-                {0xFFFFFFFE, 0x00000001, 0x00000000, 0xFFFFFFFE, 0xFFFFFFFD, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-                 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF},
-                {0xFFFFFFFD, 0x00000002, 0x00000000, 0xFFFFFFFD, 0xFFFFFFFC, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-                 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF},
-                {0xFFFFFFFC, 0x00000003, 0x00000000, 0xFFFFFFFC, 0xFFFFFFFB, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-                 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF},
-                {0xFFFFFFFB, 0x00000004, 0x00000000, 0xFFFFFFFB, 0xFFFFFFFA, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
-                 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF},
+                    {0xFFFFFFFF, 0x00000000, 0x00000000, 0xFFFFFFFF, 0xFFFFFFFE, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
+                     0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF},
+                    {0xFFFFFFFE, 0x00000001, 0x00000000, 0xFFFFFFFE, 0xFFFFFFFD, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
+                     0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF},
+                    {0xFFFFFFFD, 0x00000002, 0x00000000, 0xFFFFFFFD, 0xFFFFFFFC, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
+                     0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF},
+                    {0xFFFFFFFC, 0x00000003, 0x00000000, 0xFFFFFFFC, 0xFFFFFFFB, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
+                     0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF},
+                    {0xFFFFFFFB, 0x00000004, 0x00000000, 0xFFFFFFFB, 0xFFFFFFFA, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
+                     0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF},
 #endif
                 };
 
@@ -309,7 +304,7 @@ namespace nil {
                 return r;
             }
         };
-    }
-}
+    }    // namespace crypto3
+}    // namespace nil
 
-#endif //CRYPTO3_CURVE_NIST_P384_HPP
+#endif    // CRYPTO3_CURVE_NIST_P384_HPP

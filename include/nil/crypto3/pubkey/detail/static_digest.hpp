@@ -21,8 +21,8 @@ namespace nil {
              * octet_type. DigestBits must be a multiple of 8.
              *
              * It is independent of any particular algorithm; For example sha2<224> and cubehash<224> both produce a
-             * static_digest<224>. Each algorithm generates its digest such that it will be displayed in the canonical order
-             * for that algorithm. The truncate and resize function templates are provided to handle digests with
+             * static_digest<224>. Each algorithm generates its digest such that it will be displayed in the canonical
+             * order for that algorithm. The truncate and resize function templates are provided to handle digests with
              * lengths other than you're expecting. For instance, generating name-based UUIDs uses only 128 bits but
              * SHA-1 provides a 160-bit digest, so it would be truncated. (Using truncate instead of resize means
              * that a compilation error will result from trying to use a hash algorithm with too small an output.) On
@@ -46,9 +46,7 @@ namespace nil {
              */
 
             template<std::size_t DigestBits>
-            class static_digest : public std::array<octet_type, DigestBits / octet_bits> {
-
-            };
+            class static_digest : public std::array<octet_type, DigestBits / octet_bits> {};
 
             namespace detail {
                 template<std::size_t DigestBits, typename OutputIterator>
@@ -68,10 +66,10 @@ namespace nil {
                     *p++ = '\0';
                     return s;
                 }
-            }
-        }
-    }
-}
+            }    // namespace detail
+        }        // namespace pubkey
+    }            // namespace crypto3
+}    // namespace nil
 
 namespace std {
     template<std::size_t DigestBits>
@@ -79,7 +77,7 @@ namespace std {
         std::array<char, DigestBits / 4 + 1> cstr = nil::crypto3::pubkey::detail::c_str(d);
         return std::string(cstr.data(), cstr.size() - 1);
     }
-}
+}    // namespace std
 
 namespace nil {
     namespace crypto3 {
@@ -169,8 +167,8 @@ namespace nil {
             bool operator==(char const *b, static_digest<DB> const &a) {
                 return a == b;
             }
-        }
-    }
-} // namespace nil
+        }    // namespace pubkey
+    }        // namespace crypto3
+}    // namespace nil
 
-#endif // CRYPTO3_HASH_DIGEST_HPP
+#endif    // CRYPTO3_HASH_DIGEST_HPP

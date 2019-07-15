@@ -20,23 +20,18 @@ namespace nil {
 
         class ec_group_data final {
         public:
-
-            ec_group_data(const cpp_int &p, const cpp_int &a,
-                          const cpp_int &b, const cpp_int &g_x,
-                          const cpp_int &g_y, const cpp_int &order,
-                          const cpp_int &cofactor, const oid_t &oid) : m_curve(p, a, b),
-                    m_base_point(m_curve, g_x, g_y), m_g_x(g_x), m_g_y(g_y), m_order(order), m_cofactor(cofactor),
-                    m_mod_order(order), m_base_mult(m_base_point, m_mod_order), m_oid(oid),
-                    m_p_bits(msb(p)), m_order_bits(msb(order)),
-                    m_a_is_minus_3(a == p - 3), m_a_is_zero(a == 0) {
+            ec_group_data(const cpp_int &p, const cpp_int &a, const cpp_int &b, const cpp_int &g_x, const cpp_int &g_y,
+                          const cpp_int &order, const cpp_int &cofactor, const oid_t &oid) :
+                m_curve(p, a, b),
+                m_base_point(m_curve, g_x, g_y), m_g_x(g_x), m_g_y(g_y), m_order(order), m_cofactor(cofactor),
+                m_mod_order(order), m_base_mult(m_base_point, m_mod_order), m_oid(oid), m_p_bits(msb(p)),
+                m_order_bits(msb(order)), m_a_is_minus_3(a == p - 3), m_a_is_zero(a == 0) {
             }
 
-            bool match(const cpp_int &p, const cpp_int &a,
-                       const cpp_int &b, const cpp_int &g_x,
-                       const cpp_int &g_y, const cpp_int &order,
-                       const cpp_int &cofactor) const {
-                return (this->p() == p && this->a() == a && this->b() == b && this->order() == order &&
-                        this->cofactor() == cofactor && this->g_x() == g_x && this->g_y() == g_y);
+            bool match(const cpp_int &p, const cpp_int &a, const cpp_int &b, const cpp_int &g_x, const cpp_int &g_y,
+                       const cpp_int &order, const cpp_int &cofactor) const {
+                return (this->p() == p && this->a() == a && this->b() == b && this->order() == order
+                        && this->cofactor() == cofactor && this->g_x() == g_x && this->g_y() == g_y);
             }
 
             const oid_t &oid() const {
@@ -111,14 +106,11 @@ namespace nil {
                 return m_mod_order.square(x);
             }
 
-            cpp_int multiply_mod_order(const cpp_int &x,
-                                                              const cpp_int &y) const {
+            cpp_int multiply_mod_order(const cpp_int &x, const cpp_int &y) const {
                 return m_mod_order.multiply(x, y);
             }
 
-            cpp_int multiply_mod_order(const cpp_int &x,
-                                                              const cpp_int &y,
-                                                              const cpp_int &z) const {
+            cpp_int multiply_mod_order(const cpp_int &x, const cpp_int &y, const cpp_int &z) const {
                 return m_mod_order.multiply(m_mod_order.multiply(x, y), z);
             }
 
@@ -222,16 +214,11 @@ namespace nil {
             }
 
         private:
-
-            std::shared_ptr<ec_group_data> add_curve(const cpp_int &p,
-                                                     const cpp_int &a,
-                                                     const cpp_int &b,
-                                                     const cpp_int &g_x,
-                                                     const cpp_int &g_y,
-                                                     const cpp_int &order,
+            std::shared_ptr<ec_group_data> add_curve(const cpp_int &p, const cpp_int &a, const cpp_int &b,
+                                                     const cpp_int &g_x, const cpp_int &g_y, const cpp_int &order,
                                                      const cpp_int &cofactor, const oid_t &oid) {
-                std::shared_ptr<ec_group_data> d = std::make_shared<ec_group_data>(p, a, b, g_x, g_y, order, cofactor,
-                                                                                   oid);
+                std::shared_ptr<ec_group_data> d
+                    = std::make_shared<ec_group_data>(p, a, b, g_x, g_y, order, cofactor, oid);
 
                 // This function is always called with the lock held
                 m_registered_curves.push_back(d);
@@ -242,24 +229,24 @@ namespace nil {
             std::vector<std::shared_ptr<ec_group_data>> m_registered_curves;
         };
 
-//static
+        // static
         ec_group_data_map &ec_group::ec_group_data() {
             /*
-            * This exists purely to ensure the allocator is constructed before g_ec_data,
-            * which ensures that its destructor runs after ~g_ec_data is complete.
-            */
+             * This exists purely to ensure the allocator is constructed before g_ec_data,
+             * which ensures that its destructor runs after ~g_ec_data is complete.
+             */
 
             static allocator_initializer g_init_allocator;
             static ec_group_data_map g_ec_data;
             return g_ec_data;
         }
 
-//static
+        // static
         size_t ec_group::clear_registered_curve_data() {
             return ec_group_data().clear();
         }
 
-//static
+        // static
         std::shared_ptr<ec_group_data> ec_group::load_ec_group_info(const char *p_str, const char *a_str,
                                                                     const char *b_str, const char *g_x_str,
                                                                     const char *g_y_str, const char *order_str,
@@ -270,12 +257,12 @@ namespace nil {
             const cpp_int g_x(g_x_str);
             const cpp_int g_y(g_y_str);
             const cpp_int order(order_str);
-            const cpp_int cofactor(1); // implicit
+            const cpp_int cofactor(1);    // implicit
 
             return std::make_shared<ec_group_data>(p, a, b, g_x, g_y, order, cofactor, oid);
         }
 
-//static
+        // static
         std::shared_ptr<ec_group_data> ec_group::ber_decode_ec_group(const uint8_t bits[], size_t len) {
             ber_decoder ber(bits, len);
             ber_object obj = ber.get_next_object();
@@ -291,13 +278,25 @@ namespace nil {
                 std::vector<uint8_t> base_pt;
                 std::vector<uint8_t> seed;
 
-                ber_decoder(bits, len).start_cons(SEQUENCE).decode_and_check<size_t>(1, "Unknown ECC param version "
-                                                                                        "code").start_cons(
-                        SEQUENCE).decode_and_check(oid_t("1.2.840.10045.1.1"),
-                                                   "Only prime ECC fields supported").decode(p).end_cons().start_cons(
-                        SEQUENCE).decode_octet_string_bigint(a).decode_octet_string_bigint(b).decode_optional_string(
-                        seed, BIT_STRING, BIT_STRING).end_cons().decode(base_pt, OCTET_STRING).decode(order).decode(
-                        cofactor).end_cons().verify_end();
+                ber_decoder(bits, len)
+                    .start_cons(SEQUENCE)
+                    .decode_and_check<size_t>(1,
+                                              "Unknown ECC param version "
+                                              "code")
+                    .start_cons(SEQUENCE)
+                    .decode_and_check(oid_t("1.2.840.10045.1.1"), "Only prime ECC fields supported")
+                    .decode(p)
+                    .end_cons()
+                    .start_cons(SEQUENCE)
+                    .decode_octet_string_bigint(a)
+                    .decode_octet_string_bigint(b)
+                    .decode_optional_string(seed, BIT_STRING, BIT_STRING)
+                    .end_cons()
+                    .decode(base_pt, OCTET_STRING)
+                    .decode(order)
+                    .decode(cofactor)
+                    .end_cons()
+                    .verify_end();
 
                 if (p.bits() < 64 || p < 0 || !is_bailie_psw_probable_prime(p)) {
                     throw decoding_error("Invalid ECC p parameter");
@@ -319,9 +318,7 @@ namespace nil {
                     throw decoding_error("Invalid ECC cofactor parameter");
                 }
 
-                std::pair<cpp_int,
-                        cpp_int> base_xy = nil::crypto3::os2ecp(base_pt.data(), base_pt.size(),
-                                                                                       p, a, b);
+                std::pair<cpp_int, cpp_int> base_xy = nil::crypto3::os2ecp(base_pt.data(), base_pt.size(), p, a, b);
 
                 return ec_group_data().lookup_or_create(p, a, b, base_xy.first, base_xy.second, order, cofactor,
                                                         oid_t());
@@ -347,7 +344,7 @@ namespace nil {
         ec_group::ec_group(const std::string &str) {
             if (str.empty()) {
                 return;
-            } // no initialization / uninitialized
+            }    // no initialization / uninitialized
 
             try {
                 oid_t oid = oid_tS::lookup(str);
@@ -445,14 +442,11 @@ namespace nil {
             return data().square_mod_order(x);
         }
 
-        cpp_int ec_group::multiply_mod_order(const cpp_int &x,
-                                                                    const cpp_int &y) const {
+        cpp_int ec_group::multiply_mod_order(const cpp_int &x, const cpp_int &y) const {
             return data().multiply_mod_order(x, y);
         }
 
-        cpp_int ec_group::multiply_mod_order(const cpp_int &x,
-                                                                    const cpp_int &y,
-                                                                    const cpp_int &z) const {
+        cpp_int ec_group::multiply_mod_order(const cpp_int &x, const cpp_int &y, const cpp_int &z) const {
             return data().multiply_mod_order(x, y, z);
         }
 
@@ -477,14 +471,12 @@ namespace nil {
             return nil::crypto3::os2ecp(bits, len, data().curve());
         }
 
-        point_gfp ec_group::point(const cpp_int &x,
-                                  const cpp_int &y) const {
+        point_gfp ec_group::point(const cpp_int &x, const cpp_int &y) const {
             // TODO: randomize the representation?
             return point_gfp(data().curve(), x, y);
         }
 
-        point_gfp ec_group::point_multiply(const cpp_int &x, const point_gfp &pt,
-                                           const cpp_int &y) const {
+        point_gfp ec_group::point_multiply(const cpp_int &x, const point_gfp &pt, const cpp_int &y) const {
             point_gfp_multi_point_precompute xy_mul(get_base_point(), pt);
             return xy_mul.multi_exp(x, y);
         }
@@ -496,8 +488,8 @@ namespace nil {
         }
 
         cpp_int ec_group::blinded_base_point_multiply_x(const cpp_int &k,
-                                                                               random_number_generator &rng, std::vector<
-                cpp_int> &ws) const {
+                                                        random_number_generator &rng,
+                                                        std::vector<cpp_int> &ws) const {
             const point_gfp pt = data().blinded_base_point_multiply(k, rng, ws);
 
             if (pt == 0) {
@@ -511,8 +503,7 @@ namespace nil {
         }
 
         point_gfp ec_group::blinded_var_point_multiply(const point_gfp &point, const cpp_int &k,
-                                                       random_number_generator &rng,
-                                                       std::vector<cpp_int> &ws) const {
+                                                       random_number_generator &rng, std::vector<cpp_int> &ws) const {
             point_gfp_var_point_precompute mul(point, rng, ws);
             return mul.mul(k, rng, get_order(), ws);
         }
@@ -528,16 +519,24 @@ namespace nil {
 
             if (form == EC_DOMPAR_ENC_EXPLICIT) {
                 const size_t ecpVers1 = 1;
-                const oid_t curve_type("1.2.840.10045.1.1"); // prime field
+                const oid_t curve_type("1.2.840.10045.1.1");    // prime field
 
                 const size_t p_bytes = get_p_bytes();
 
-                der.start_cons(SEQUENCE).encode(ecpVers1).start_cons(SEQUENCE).encode(curve_type).encode(
-                        get_p()).end_cons().start_cons(SEQUENCE).encode(
-                        cpp_int::encode_1363(get_a(), p_bytes), OCTET_STRING).encode(
-                        cpp_int::encode_1363(get_b(), p_bytes), OCTET_STRING).end_cons().encode(
-                        get_base_point().encode(point_gfp::UNCOMPRESSED), OCTET_STRING).encode(get_order()).encode(
-                        get_cofactor()).end_cons();
+                der.start_cons(SEQUENCE)
+                    .encode(ecpVers1)
+                    .start_cons(SEQUENCE)
+                    .encode(curve_type)
+                    .encode(get_p())
+                    .end_cons()
+                    .start_cons(SEQUENCE)
+                    .encode(cpp_int::encode_1363(get_a(), p_bytes), OCTET_STRING)
+                    .encode(cpp_int::encode_1363(get_b(), p_bytes), OCTET_STRING)
+                    .end_cons()
+                    .encode(get_base_point().encode(point_gfp::UNCOMPRESSED), OCTET_STRING)
+                    .encode(get_order())
+                    .encode(get_cofactor())
+                    .end_cons();
             } else if (form == EC_DOMPAR_ENC_oid_t) {
                 const oid_t oid = get_curve_oid();
                 if (oid.empty()) {
@@ -561,28 +560,28 @@ namespace nil {
         bool ec_group::operator==(const ec_group &other) const {
             if (m_data == other.m_data) {
                 return true;
-            } // same shared rep
+            }    // same shared rep
 
             /*
-            * No point comparing order/cofactor as they are uniquely determined
-            * by the curve equation (p,a,b) and the base point.
-            */
-            return (get_p() == other.get_p() && get_a() == other.get_a() && get_b() == other.get_b() &&
-                    get_g_x() == other.get_g_x() && get_g_y() == other.get_g_y());
+             * No point comparing order/cofactor as they are uniquely determined
+             * by the curve equation (p,a,b) and the base point.
+             */
+            return (get_p() == other.get_p() && get_a() == other.get_a() && get_b() == other.get_b()
+                    && get_g_x() == other.get_g_x() && get_g_y() == other.get_g_y());
         }
 
         bool ec_group::verify_public_element(const point_gfp &point) const {
-            //check that public point is not at infinity
+            // check that public point is not at infinity
             if (point == 0) {
                 return false;
             }
 
-            //check that public point is on the curve
+            // check that public point is on the curve
             if (!point.on_the_curve()) {
                 return false;
             }
 
-            //check that public point has order q
+            // check that public point has order q
             if (!(point * get_order()) == 0) {
                 return false;
             }
@@ -613,40 +612,40 @@ namespace nil {
                 return false;
             }
 
-            //check if field modulus is prime
+            // check if field modulus is prime
             if (!miller_rabin_test(p, 128, rng)) {
                 return false;
             }
 
-            //check if order is prime
+            // check if order is prime
             if (!miller_rabin_test(order, 128, rng)) {
                 return false;
             }
 
-            //compute the discriminant: 4*a^3 + 27*b^2 which must be nonzero
+            // compute the discriminant: 4*a^3 + 27*b^2 which must be nonzero
             const modular_reducer mod_p(p);
 
-            const cpp_int discriminant = mod_p.reduce(
-                    mod_p.multiply(4, mod_p.cube(a)) + mod_p.multiply(27, mod_p.square(b)));
+            const cpp_int discriminant
+                = mod_p.reduce(mod_p.multiply(4, mod_p.cube(a)) + mod_p.multiply(27, mod_p.square(b)));
 
             if (discriminant == 0) {
                 return false;
             }
 
-            //check for valid cofactor
+            // check for valid cofactor
             if (get_cofactor() < 1) {
                 return false;
             }
 
-            //check if the base point is on the curve
+            // check if the base point is on the curve
             if (!base_point.on_the_curve()) {
                 return false;
             }
             if ((base_point * get_cofactor()) == 0) {
                 return false;
             }
-            //check if order of the base point is correct
+            // check if order of the base point is correct
             return (base_point * order) == 0;
         }
-    }
+    }    // namespace crypto3
 }

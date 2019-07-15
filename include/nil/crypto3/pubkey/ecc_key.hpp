@@ -1,5 +1,5 @@
-#ifndef CRYPTO3_ECC_PUBLIC_KEY_BASE_HPP_
-#define CRYPTO3_ECC_PUBLIC_KEY_BASE_HPP_
+#ifndef CRYPTO3_ECC_PUBLIC_KEY_BASE_HPP
+#define CRYPTO3_ECC_PUBLIC_KEY_BASE_HPP
 
 #include <nil/crypto3/pubkey/ec_group/ec_group.hpp>
 #include <nil/crypto3/pubkey/pk_keys.hpp>
@@ -7,19 +7,18 @@
 namespace nil {
     namespace crypto3 {
 
-/**
- * This class represents abstract ECC public keys. When encoding a key
- * via an encoder that can be accessed via the corresponding member
- * functions, the key will decide upon its internally stored encoding
- * information whether to encode itself with or without domain
- * parameters, or using the domain parameter oid. Furthermore, a public
- * key without domain parameters can be decoded. In that case, it
- * cannot be used for verification until its domain parameters are set
- * by calling the corresponding member function.
- */
+        /**
+         * This class represents abstract ECC public keys. When encoding a key
+         * via an encoder that can be accessed via the corresponding member
+         * functions, the key will decide upon its internally stored encoding
+         * information whether to encode itself with or without domain
+         * parameters, or using the domain parameter oid. Furthermore, a public
+         * key without domain parameters can be decoded. In that case, it
+         * cannot be used for verification until its domain parameters are set
+         * by calling the corresponding member function.
+         */
         class ec_public_key : public virtual public_key_policy {
         public:
-
             /**
              * Create a public key.
              * @param dom_par EC domain parameters
@@ -107,8 +106,7 @@ namespace nil {
             size_t estimated_strength() const override;
 
         protected:
-
-            ec_public_key() : m_domain_params{}, m_public_key{}, m_domain_encoding(EC_DOMPAR_ENC_EXPLICIT) {
+            ec_public_key() : m_domain_params {}, m_public_key {}, m_domain_encoding(EC_DOMPAR_ENC_EXPLICIT) {
             }
 
             ec_group m_domain_params;
@@ -117,19 +115,19 @@ namespace nil {
             point_gfp::compression_type m_point_encoding = point_gfp::UNCOMPRESSED;
         };
 
-/**
- * This abstract class represents ECC private keys
- */
+        /**
+         * This abstract class represents ECC private keys
+         */
         class ec_private_key : public virtual ec_public_key, public virtual private_key_policy {
         public:
-/*
- * If x=0, creates a new private key in the domain
- * using the given random. If with_modular_inverse is set,
- * the public key will be calculated by multiplying
- * the core point with the modular inverse of
- * x (as in ECGDSA and ECKCDSA), otherwise by
- * multiplying directly with x (as in ECDSA).
- */
+            /*
+             * If x=0, creates a new private key in the domain
+             * using the given random. If with_modular_inverse is set,
+             * the public key will be calculated by multiplying
+             * the core point with the modular inverse of
+             * x (as in ECGDSA and ECKCDSA), otherwise by
+             * multiplying directly with x (as in ECDSA).
+             */
             ec_private_key(random_number_generator &rng, const ec_group &domain,
                            const boost::multiprecision::cpp_int &x, bool with_modular_inverse = false) {
                 m_domain_params = ec_group;
@@ -141,7 +139,7 @@ namespace nil {
 
                 const boost::multiprecision::cpp_int &order = m_domain_params.get_order();
 
-                    m_private_key = x;
+                m_private_key = x;
 
                 // Can't use random here because ffi load functions use null_rng
                 if (with_modular_inverse) {
@@ -154,15 +152,15 @@ namespace nil {
                 BOOST_ASSERT_MSG(m_public_key.on_the_curve(), "Generated public key point was on the curve");
             }
 
-/*
- * Creates a new private key object from the
- * ECPrivateKey structure given in key_bits.
- * If with_modular_inverse is set,
- * the public key will be calculated by multiplying
- * the core point with the modular inverse of
- * x (as in ECGDSA and ECKCDSA), otherwise by
- * multiplying directly with x (as in ECDSA).
- */
+            /*
+             * Creates a new private key object from the
+             * ECPrivateKey structure given in key_bits.
+             * If with_modular_inverse is set,
+             * the public key will be calculated by multiplying
+             * the core point with the modular inverse of
+             * x (as in ECGDSA and ECKCDSA), otherwise by
+             * multiplying directly with x (as in ECDSA).
+             */
             ec_private_key(const algorithm_identifier &alg_id, const secure_vector<uint8_t> &key_bits,
                            bool with_modular_inverse = false) {
                 m_domain_params = ec_group(alg_id.get_parameters());
@@ -177,10 +175,13 @@ namespace nil {
                 oid_t key_parameters;
                 secure_vector<uint8_t> public_key_bits;
 
-                ber_decoder(key_bits).start_cons(SEQUENCE).decode_and_check<size_t>(1,
-                        "Unknown version code for ECC key").decode_octet_string_bigint(
-                        m_private_key).decode_optional(key_parameters, asn1_tag(0), PRIVATE).decode_optional_string(
-                        public_key_bits, BIT_STRING, 1, PRIVATE).end_cons();
+                ber_decoder(key_bits)
+                    .start_cons(SEQUENCE)
+                    .decode_and_check<size_t>(1, "Unknown version code for ECC key")
+                    .decode_octet_string_bigint(m_private_key)
+                    .decode_optional(key_parameters, asn1_tag(0), PRIVATE)
+                    .decode_optional_string(public_key_bits, BIT_STRING, 1, PRIVATE)
+                    .end_cons();
 
                 if (public_key_bits.empty()) {
                     if (with_modular_inverse) {
@@ -191,7 +192,8 @@ namespace nil {
                         m_public_key = domain().get_base_point() * m_private_key;
                     }
 
-                    BOOST_ASSERT_MSG(m_public_key.on_the_curve(), "Public point derived from loaded key was on the curve");
+                    BOOST_ASSERT_MSG(m_public_key.on_the_curve(),
+                                     "Public point derived from loaded key was on the curve");
                 } else {
                     m_public_key = domain().OS2ECP(public_key_bits);
                     // os2ecp verifies that the point is on the curve
@@ -199,14 +201,19 @@ namespace nil {
             }
 
             secure_vector<uint8_t> private_key_bits() const override {
-                return der_encoder().start_cons(SEQUENCE).encode(static_cast<size_t>(1)).encode(
-                        boost::multiprecision::cpp_int::encode_1363(m_private_key, m_private_key.bytes()), OCTET_STRING).end_cons().get_contents();
+                return der_encoder()
+                    .start_cons(SEQUENCE)
+                    .encode(static_cast<size_t>(1))
+                    .encode(boost::multiprecision::cpp_int::encode_1363(m_private_key, m_private_key.bytes()),
+                            OCTET_STRING)
+                    .end_cons()
+                    .get_contents();
             }
 
-/**
- * Get the private key value of this key object.
- * @result the private key value of this key object
- */
+            /**
+             * Get the private key value of this key object.
+             * @result the private key value of this key object
+             */
             const boost::multiprecision::cpp_int &private_value() const;
 
             ec_private_key(const ec_private_key &other) = default;
@@ -216,12 +223,11 @@ namespace nil {
             ~ec_private_key() = default;
 
         protected:
-
             ec_private_key() = default;
 
             boost::multiprecision::cpp_int m_private_key;
         };
-    }
-}
+    }    // namespace crypto3
+}    // namespace nil
 
 #endif

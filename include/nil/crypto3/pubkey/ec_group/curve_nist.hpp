@@ -15,9 +15,9 @@ namespace nil {
         namespace detail {
 
             /**
-            * Treating this MPI as a sequence of 32-bit words in big-endian
-            * order, return word i (or 0 if out of range)
-            */
+             * Treating this MPI as a sequence of 32-bit words in big-endian
+             * order, return word i (or 0 if out of range)
+             */
             inline uint32_t get_uint32_t(const cpp_int &x, size_t i) {
 #if (CRYPTO3_MP_WORD_BITS == 32)
                 return x.word_at(i);
@@ -29,9 +29,9 @@ namespace nil {
             }
 
             /**
-            * Treating this MPI as a sequence of 32-bit words in big-endian
-            * order, set word i to the value x
-            */
+             * Treating this MPI as a sequence of 32-bit words in big-endian
+             * order, set word i to the value x
+             */
             template<typename T>
             inline void set_uint32_t(cpp_int &x, size_t i, T v_in) {
                 const uint32_t v = static_cast<uint32_t>(v_in);
@@ -39,15 +39,15 @@ namespace nil {
                 x.set_word_at(i, v);
 #elif (CRYPTO3_MP_WORD_BITS == 64)
                 const word shift_32 = (i % 2) * 32;
-                const word w = (x.word_at(i / 2) & (static_cast<word>(0xFFFFFFFF) << (32 - shift_32))) |
-                               (static_cast<word>(v) << shift_32);
+                const word w = (x.word_at(i / 2) & (static_cast<word>(0xFFFFFFFF) << (32 - shift_32)))
+                               | (static_cast<word>(v) << shift_32);
                 x.set_word_at(i / 2, w);
 #else
 #error "Not implemented"
 #endif
             }
 
-        }
+        }    // namespace detail
 
         template<std::size_t PSize, std::size_t WordBits>
         class curve_nist_policy {
@@ -72,8 +72,8 @@ namespace nil {
             constexpr static const p_type p = policy_type::p;
 
             template<typename Backend, expression_template_option ExpressionTemplates>
-            curve_nist(const number<Backend, ExpressionTemplates> &a, const number<Backend, ExpressionTemplates> &b)
-                    : m_1(1), m_a(a), m_b(b) {
+            curve_nist(const number<Backend, ExpressionTemplates> &a, const number<Backend, ExpressionTemplates> &b) :
+                m_1(1), m_a(a), m_b(b) {
                 // All Solinas prime curves are assumed a == -3
             }
 
@@ -144,7 +144,7 @@ namespace nil {
                 }
 
                 bigint_mul(z.mutable_data(), z.size(), x_words, x_size, std::min(p_words, x_size), y.data(), y.size(),
-                        std::min(p_words, y.size()), ws.data(), ws.size());
+                           std::min(p_words, y.size()), ws.data(), ws.size());
 
                 this->redc_mod_p(z, ws);
             }
@@ -172,7 +172,7 @@ namespace nil {
                 }
 
                 bigint_sqr(z.mutable_data(), output_size, x_words, x_size, std::min(p_words, x_size), ws.data(),
-                        ws.size());
+                           ws.size());
 
                 this->redc_mod_p(z, ws);
             }
@@ -191,7 +191,7 @@ namespace nil {
             number_type m_a, m_b;
             // c of m_p.sig_words()
         };
-    }
-}
+    }    // namespace crypto3
+}    // namespace nil
 
-#endif //CRYPTO3_CURVE_NIST_HPP
+#endif    // CRYPTO3_CURVE_NIST_HPP

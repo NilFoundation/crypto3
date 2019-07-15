@@ -1,5 +1,5 @@
-#ifndef CRYPTO3_PK_OPERATIONS_FWD_HPP_
-#define CRYPTO3_PK_OPERATIONS_FWD_HPP_
+#ifndef CRYPTO3_PK_OPERATIONS_FWD_HPP
+#define CRYPTO3_PK_OPERATIONS_FWD_HPP
 
 namespace nil {
     namespace crypto3 {
@@ -20,8 +20,8 @@ namespace nil {
 
             class kem_decryption;
 
-        }
-    }
-}
+        }    // namespace pk_operations
+    }        // namespace crypto3
+}    // namespace nil
 
 #endif
