@@ -28,11 +28,12 @@ namespace nil {
              * @tparam ValueBits
              * @tparam LengthBits
              */
-            template<typename ProcessingMode> using block_accumulator = boost::accumulators::accumulator_set<
-                    block::digest<ProcessingMode::input_block_bits>,
-                    boost::accumulators::features<accumulators::tag::block<ProcessingMode>>>;
-        }
-    }
-}
+            template<typename ProcessingMode>
+            using block_accumulator = boost::accumulators::accumulator_set<
+                block::digest<ProcessingMode::input_block_bits>,
+                boost::accumulators::features<accumulators::tag::block<ProcessingMode>>>;
+        }    // namespace block
+    }        // namespace crypto3
+}    // namespace nil
 
-#endif //CRYPTO3_CIPHER_STATE_PREPROCESSOR_HPP
+#endif    // CRYPTO3_CIPHER_STATE_PREPROCESSOR_HPP

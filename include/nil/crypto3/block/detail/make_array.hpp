@@ -29,19 +29,22 @@ namespace nil {
                 struct build_indices<0> {
                     using type = indices<>;
                 };
-                template<std::size_t N> using BuildIndices = typename build_indices<N>::type;
+                template<std::size_t N>
+                using BuildIndices = typename build_indices<N>::type;
 
-                template<typename Iterator> using ValueType = typename std::iterator_traits<Iterator>::value_type;
+                template<typename Iterator>
+                using ValueType = typename std::iterator_traits<Iterator>::value_type;
 
-// internal overload with indices tag
+                // internal overload with indices tag
 
-                template<std::size_t... I, typename InputIterator,
-                                           typename Array = std::array<ValueType<InputIterator>, sizeof...(I)>>
+                template<std::size_t... I,
+                         typename InputIterator,
+                         typename Array = std::array<ValueType<InputIterator>, sizeof...(I)>>
 
                 Array make_array(InputIterator first, indices<I...>) {
-                    return Array{{(void(I), *first++)...}};
+                    return Array {{(void(I), *first++)...}};
                 }
-            }
+            }    // namespace detail
 
             // externally visible interface
             template<std::size_t N, typename RandomAccessIterator>
@@ -50,10 +53,10 @@ namespace nil {
                 // last is not relevant if we're assuming the size is N
                 // I'll assert it is correct anyway
                 assert(last - first == N);
-                return make_array(first, detail::BuildIndices<N>{});
+                return make_array(first, detail::BuildIndices<N> {});
             }
-        }
-    }
-}
+        }    // namespace block
+    }        // namespace crypto3
+}    // namespace nil
 
-#endif //CRYPTO3_MAKE_ARRAY_HPP
+#endif    // CRYPTO3_MAKE_ARRAY_HPP

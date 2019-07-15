@@ -41,11 +41,9 @@ namespace nil {
              */
             class basic_shacal {
             protected:
-
                 typedef detail::shacal_policy policy_type;
 
             public:
-
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
                 typedef policy_type::word_type word_type;
 
@@ -62,7 +60,6 @@ namespace nil {
 
             protected:
                 basic_shacal(const schedule_type &s) : schedule(s) {
-
                 }
 
                 virtual ~basic_shacal() {
@@ -85,10 +82,7 @@ namespace nil {
 
 #ifdef CRYPTO3_BLOCK_SHOW_PROGRESS
                     for (unsigned t = 0; t < block_words; ++t) {
-                        std::printf(word_bits == 32 ?
-                                    "H[%d] = %.8x\n" :
-                                    "H[%d] = %.16lx\n",
-                                    t, plaintext[t]);
+                        std::printf(word_bits == 32 ? "H[%d] = %.8x\n" : "H[%d] = %.16lx\n", t, plaintext[t]);
                     }
 #endif
 
@@ -99,11 +93,8 @@ namespace nil {
 #ifdef CRYPTO3_BLOCK_NO_OPTIMIZATION
 
                     for (unsigned t = 0; t < rounds; ++t) {
-                        word_type T = policy_type::ROTL<5>(a)
-                                    + policy_type::f(t,b,c,d)
-                                    + e
-                                    + policy_type::constants[t]
-                                    + round_constants_words[t];
+                        word_type T = policy_type::ROTL<5>(a) + policy_type::f(t, b, c, d) + e +
+                                      policy_type::constants[t] + round_constants_words[t];
 
                         e = d;
                         d = c;
@@ -112,37 +103,30 @@ namespace nil {
                         a = T;
 
 #ifdef CRYPTO3_BLOCK_SHOW_PROGRESS
-                        printf(word_bits == 32 ?
-                               "t = %2d: %.8x %.8x %.8x %.8x %.8x\n" :
-                               "t = %2d: %.16lx %.16lx %.16lx %.16lx %.16lx\n",
+                        printf(word_bits == 32 ? "t = %2d: %.8x %.8x %.8x %.8x %.8x\n" :
+                                                 "t = %2d: %.16lx %.16lx %.16lx %.16lx %.16lx\n",
                                t, a, b, c, d, e);
 #endif
                     }
 
-#else // CRYPTO3_BLOCK_NO_OPTIMIZATION
+#else    // CRYPTO3_BLOCK_NO_OPTIMIZATION
 
-#   ifdef CRYPTO3_BLOCK_SHOW_PROGRESS
-#       define CRYPTO3_BLOCK_SHACAL1_TRANSFORM_PROGRESS \
-            printf(word_bits == 32 ? \
-                   "t = %2d: %.8x %.8x %.8x %.8x %.8x\n" : \
-                   "t = %2d: %.16lx %.16lx %.16lx %.16lx %.16lx\n", \
-                   t, a, b, c, d, e);
-#   else
-#       define CRYPTO3_BLOCK_SHACAL1_TRANSFORM_PROGRESS
-#   endif
+#ifdef CRYPTO3_BLOCK_SHOW_PROGRESS
+#define CRYPTO3_BLOCK_SHACAL1_TRANSFORM_PROGRESS                                                                      \
+    printf(word_bits == 32 ? "t = %2d: %.8x %.8x %.8x %.8x %.8x\n" : "t = %2d: %.16lx %.16lx %.16lx %.16lx %.16lx\n", \
+           t, a, b, c, d, e);
+#else
+#define CRYPTO3_BLOCK_SHACAL1_TRANSFORM_PROGRESS
+#endif
 
-#   define CRYPTO3_BLOCK_SHACAL1_TRANSFORM \
-            word_type T = policy_type::rotl<5>(a) \
-                        + policy_type::f(t,b,c,d) \
-                        + e \
-                        + policy_type::constants[t] \
-                        + schedule[t]; \
-            e = d; \
-            d = c; \
-            c = policy_type::rotl<30>(b); \
-            b = a; \
-            a = T; \
-            CRYPTO3_BLOCK_SHACAL1_TRANSFORM_PROGRESS
+#define CRYPTO3_BLOCK_SHACAL1_TRANSFORM                                                                               \
+    word_type T = policy_type::rotl<5>(a) + policy_type::f(t, b, c, d) + e + policy_type::constants[t] + schedule[t]; \
+    e = d;                                                                                                            \
+    d = c;                                                                                                            \
+    c = policy_type::rotl<30>(b);                                                                                     \
+    b = a;                                                                                                            \
+    a = T;                                                                                                            \
+    CRYPTO3_BLOCK_SHACAL1_TRANSFORM_PROGRESS
 
                     BOOST_STATIC_ASSERT(rounds == 80);
                     BOOST_STATIC_ASSERT(rounds % block_words == 0);
@@ -176,15 +160,13 @@ namespace nil {
 
 #ifdef CRYPTO3_BLOCK_SHOW_PROGRESS
                     for (unsigned t = 0; t < block_words; ++t) {
-                        std::printf(word_bits == 32 ?
-                                    "H[%d] = %.8x\n" :
-                                    "H[%d] = %.16lx\n",
-                                    t, ciphertext[t]);
+                        std::printf(word_bits == 32 ? "H[%d] = %.8x\n" : "H[%d] = %.16lx\n", t, ciphertext[t]);
                     }
 #endif
 
                     // Initialize working variables with block
-                    word_type a = ciphertext[0], b = ciphertext[1], c = ciphertext[2], d = ciphertext[3], e = ciphertext[4];
+                    word_type a = ciphertext[0], b = ciphertext[1], c = ciphertext[2], d = ciphertext[3],
+                              e = ciphertext[4];
 
                     // Decipher block
                     for (unsigned t = rounds; t--;) {
@@ -198,9 +180,8 @@ namespace nil {
                             schedule[t];
 
 #ifdef CRYPTO3_BLOCK_SHOW_PROGRESS
-                        std::printf(word_bits == 32 ?
-                                    "t = %2d: %.8x %.8x %.8x %.8x %.8x\n" :
-                                    "t = %2d: %.16lx %.16lx %.16lx %.16lx %.16lx\n",
+                        std::printf(word_bits == 32 ? "t = %2d: %.8x %.8x %.8x %.8x %.8x\n" :
+                                                      "t = %2d: %.16lx %.16lx %.16lx %.16lx %.16lx\n",
                                     t, a, b, c, d, e);
 #endif
                     }
@@ -208,8 +189,8 @@ namespace nil {
                     return {{a, b, c, d, e}};
                 }
             };
-        }
-    }
-} // namespace nil
+        }    // namespace block
+    }        // namespace crypto3
+}    // namespace nil
 
-#endif // CRYPTO3_BLOCK_CIPHERS_BASIC_SHACAL_HPP
+#endif    // CRYPTO3_BLOCK_CIPHERS_BASIC_SHACAL_HPP

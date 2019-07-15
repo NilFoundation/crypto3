@@ -17,9 +17,7 @@ namespace nil {
         namespace block {
             namespace detail {
                 template<std::size_t KeyBits>
-                struct twofish_policy : public twofish_functions<KeyBits> {
-
-                };
+                struct twofish_policy : public twofish_functions<KeyBits> {};
 
                 template<>
                 struct twofish_policy<128> : public twofish_functions<128> {
@@ -30,8 +28,8 @@ namespace nil {
 
                         for (size_t i = 0; i != key.size(); ++i) {
                             /*
-                            * Do one column of the RS matrix multiplication
-                            */
+                             * Do one column of the RS matrix multiplication
+                             */
                             if (key[i]) {
                                 byte_type X = poly_to_exp[key[i] - 1];
 
@@ -55,11 +53,11 @@ namespace nil {
                         }
 
                         for (size_t i = 0; i < expanded_substitution_size; i += 2) {
-                            word_type X = mds0[q0[q0[i] ^ key[8]] ^ key[0]] ^mds1[q0[q1[i] ^ key[9]] ^ key[1]] ^
-                                          mds2[q1[q0[i] ^ key[10]] ^ key[2]] ^mds3[q1[q1[i] ^ key[11]] ^ key[3]];
+                            word_type X = mds0[q0[q0[i] ^ key[8]] ^ key[0]] ^ mds1[q0[q1[i] ^ key[9]] ^ key[1]] ^
+                                          mds2[q1[q0[i] ^ key[10]] ^ key[2]] ^ mds3[q1[q1[i] ^ key[11]] ^ key[3]];
                             word_type Y =
-                                    mds0[q0[q0[i + 1] ^ key[12]] ^ key[4]] ^mds1[q0[q1[i + 1] ^ key[13]] ^ key[5]] ^
-                                    mds2[q1[q0[i + 1] ^ key[14]] ^ key[6]] ^mds3[q1[q1[i + 1] ^ key[15]] ^ key[7]];
+                                mds0[q0[q0[i + 1] ^ key[12]] ^ key[4]] ^ mds1[q0[q1[i + 1] ^ key[13]] ^ key[5]] ^
+                                mds2[q1[q0[i + 1] ^ key[14]] ^ key[6]] ^ mds3[q1[q1[i + 1] ^ key[15]] ^ key[7]];
                             Y = policy_type::template rotl<8>(Y);
                             X += Y;
                             Y += X;
@@ -81,8 +79,8 @@ namespace nil {
 
                         for (size_t i = 0; i != key.size(); ++i) {
                             /*
-                            * Do one column of the RS matrix multiplication
-                            */
+                             * Do one column of the RS matrix multiplication
+                             */
                             if (key[i]) {
                                 byte_type X = poly_to_exp[key[i] - 1];
 
@@ -97,7 +95,6 @@ namespace nil {
                                 S[4 * (i / 8) + 3] ^= exp_to_poly[(X + poly_to_exp[RS4 - 1]) % 255];
                             }
                         }
-
 
                         for (size_t i = 0; i != key_schedule_size / 4; ++i) {
                             expanded_substitution[i] = mds0[q0[q0[q1[i] ^ S[0]] ^ S[4]] ^ S[8]];
@@ -136,8 +133,8 @@ namespace nil {
 
                         for (size_t i = 0; i != key.size(); ++i) {
                             /*
-                            * Do one column of the RS matrix multiplication
-                            */
+                             * Do one column of the RS matrix multiplication
+                             */
                             if (key[i]) {
                                 byte_type X = poly_to_exp[key[i] - 1];
 
@@ -152,7 +149,6 @@ namespace nil {
                                 S[4 * (i / 8) + 3] ^= exp_to_poly[(X + poly_to_exp[RS4 - 1]) % 255];
                             }
                         }
-
 
                         for (size_t i = 0; i != key_schedule_size / 4; ++i) {
                             expanded_substitution[i] = mds0[q0[q0[q1[q1[i] ^ S[0]] ^ S[4]] ^ S[8]] ^ S[12]];
@@ -181,9 +177,9 @@ namespace nil {
                         S.fill(0);
                     }
                 };
-            }
-        }
-    }
-}
+            }    // namespace detail
+        }        // namespace block
+    }            // namespace crypto3
+}    // namespace nil
 
-#endif //CRYPTO3_TWOFISH_POLICY_HPP
+#endif    // CRYPTO3_TWOFISH_POLICY_HPP

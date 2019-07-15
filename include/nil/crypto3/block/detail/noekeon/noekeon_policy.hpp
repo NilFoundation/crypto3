@@ -33,14 +33,13 @@ namespace nil {
                     typedef std::array<word_type, key_schedule_size> key_schedule_type;
 
                     typedef std::array<byte_type, rounds + 1> constants_type;
-                    constexpr static const constants_type round_constants = {
-                            0x80, 0x1B, 0x36, 0x6C, 0xD8, 0xAB, 0x4D, 0x9A, 0x2F, 0x5E, 0xBC, 0x63, 0xC6, 0x97, 0x35,
-                            0x6A, 0xD4
-                    };
+                    constexpr static const constants_type round_constants = {0x80, 0x1B, 0x36, 0x6C, 0xD8, 0xAB,
+                                                                             0x4D, 0x9A, 0x2F, 0x5E, 0xBC, 0x63,
+                                                                             0xC6, 0x97, 0x35, 0x6A, 0xD4};
                 };
-            }
-        }
-    }
-}
+            }    // namespace detail
+        }        // namespace block
+    }            // namespace crypto3
+}    // namespace nil
 
-#endif //CRYPTO3_NOEKEON_POLICY_HPP
+#endif    // CRYPTO3_NOEKEON_POLICY_HPP

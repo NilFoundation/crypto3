@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_CAMELLIA_H_
-#define CRYPTO3_CAMELLIA_H_
+#ifndef CRYPTO3_CAMELLIA_HPP
+#define CRYPTO3_CAMELLIA_HPP
 
 #include <boost/endian/arithmetic.hpp>
 
@@ -29,7 +29,6 @@ namespace nil {
             template<std::size_t Size>
             class camellia {
             protected:
-
                 constexpr static const std::size_t version = Size;
                 typedef detail::camellia_policy<Size> policy_type;
 
@@ -37,7 +36,6 @@ namespace nil {
                 typedef typename policy_type::key_schedule_type key_schedule_type;
 
             public:
-
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
                 typedef typename policy_type::word_type word_type;
 
@@ -52,17 +50,20 @@ namespace nil {
                 constexpr static const std::size_t rounds = policy_type::rounds;
 
                 template<template<typename, typename> class Mode,
-                                                      typename StateAccumulator, std::size_t ValueBits,
-                                                      typename Padding>
+                         typename StateAccumulator,
+                         std::size_t ValueBits,
+                         typename Padding>
                 struct stream_cipher {
-                    typedef block_stream_processor<Mode<camellia<Size>, Padding>, StateAccumulator,
-                                                     stream_endian::little_octet_big_bit, ValueBits,
-                                                     policy_type::word_bits * 2> type_;
+                    typedef block_stream_processor<Mode<camellia<Size>, Padding>,
+                                                   StateAccumulator,
+                                                   stream_endian::little_octet_big_bit,
+                                                   ValueBits,
+                                                   policy_type::word_bits * 2>
+                        type_;
 #ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES
                     typedef type_ type;
 #else
-                    struct type : type_ {
-                    };
+                    struct type : type_ {};
 #endif
                 };
 
@@ -83,7 +84,6 @@ namespace nil {
                 }
 
             protected:
-
                 key_schedule_type key_schedule;
 
                 inline block_type encrypt_block(const block_type &plaintext) {
@@ -161,12 +161,11 @@ namespace nil {
                     const word_type KL_L = boost::endian::native_to_big(key[1]);
 
                     const word_type KR_H = (key.size() >= 24) ? boost::endian::native_to_big(key[2]) : 0;
-                    const word_type KR_L = (key.size() == 32) ? boost::endian::native_to_big(key[3]) : ((key.size() ==
-                                                                                                         24) ? ~KR_H
-                                                                                                             : 0);
+                    const word_type KR_L =
+                        (key.size() == 32) ? boost::endian::native_to_big(key[3]) : ((key.size() == 24) ? ~KR_H : 0);
 
-                    word_type D1 = KL_H ^KR_H;
-                    word_type D2 = KL_L ^KR_L;
+                    word_type D1 = KL_H ^ KR_H;
+                    word_type D2 = KL_L ^ KR_L;
                     D2 ^= policy_type::f(D1, policy_type::sigma[1]);
                     D1 ^= policy_type::f(D2, policy_type::sigma[2]);
                     D1 ^= KL_H;
@@ -256,8 +255,8 @@ namespace nil {
                     }
                 }
             };
-        }
-    }
-}
+        }    // namespace block
+    }        // namespace crypto3
+}    // namespace nil
 
 #endif

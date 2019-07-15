@@ -22,8 +22,8 @@ namespace nil {
             inline OutputIterator move(const SinglePassRange &rng, OutputIterator result) {
                 return std::move(boost::begin(rng), boost::end(rng), result);
             }
-        }
-    }
-}
+        }    // namespace block
+    }        // namespace crypto3
+}    // namespace nil
 
-#endif //CRYPTO3_BLOCK_MOVE_HPP
+#endif    // CRYPTO3_BLOCK_MOVE_HPP

@@ -21,8 +21,8 @@ namespace nil {
                     typedef basic_twofish_policy<KeyBits> policy_type;
                     typedef typename policy_type::word_type word_type;
 
-                    typedef typename basic_twofish_policy<
-                            KeyBits>::expanded_substitution_type expanded_substitution_type;
+                    typedef
+                        typename basic_twofish_policy<KeyBits>::expanded_substitution_type expanded_substitution_type;
 
                     inline static void tf_e(word_type A, word_type B, word_type &C, word_type &D, word_type RK1,
                                             word_type RK2, const expanded_substitution_type &SB) {
@@ -66,9 +66,9 @@ namespace nil {
                         D = policy_type::template rotr<1>(D ^ Y);
                     }
                 };
-            }
-        }
-    }
-}
+            }    // namespace detail
+        }        // namespace block
+    }            // namespace crypto3
+}    // namespace nil
 
-#endif //CRYPTO3_MISTY1_FUNCTIONS_CPP_HPP
+#endif    // CRYPTO3_MISTY1_FUNCTIONS_CPP_HPP

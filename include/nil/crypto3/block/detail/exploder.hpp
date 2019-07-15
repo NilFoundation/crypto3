@@ -26,8 +26,8 @@ namespace nil {
         namespace block {
             namespace detail {
 
-// By definition, for all exploders, InputBits > OutputBits,
-// so we're taking one value and splitting it into many smaller values
+                // By definition, for all exploders, InputBits > OutputBits,
+                // so we're taking one value and splitting it into many smaller values
 
                 template<typename OutIter, int OutBits, typename T = typename std::iterator_traits<OutIter>::value_type>
                 struct outvalue_helper {
@@ -58,9 +58,10 @@ namespace nil {
                     static void step(InputValue const &x, OutIter &out) {
                         int const kb = (k % UnitBits);
                         int const ku = k - kb;
-                        int const shift =
-                                OutputBits >= UnitBits ? k : InputBits >= UnitBits ? ku + (UnitBits - (OutputBits + kb))
-                                                                                   : InputBits - (OutputBits + kb);
+                        int const shift = OutputBits >= UnitBits ?
+                                              k :
+                                              InputBits >= UnitBits ? ku + (UnitBits - (OutputBits + kb)) :
+                                                                      InputBits - (OutputBits + kb);
                         typedef typename outvalue_helper<OutIter, OutputBits>::type OutValue;
                         InputValue y = unbounded_shr<shift>(x);
                         *out++ = OutValue(low_bits<OutputBits>(y));
@@ -73,10 +74,9 @@ namespace nil {
                     static void step(InputValue const &x, OutIter &out) {
                         int const kb = (k % UnitBits);
                         int const ku = k - kb;
-                        int const shift =
-                                OutputBits >= UnitBits ? InputBits - (OutputBits + k) : InputBits >= UnitBits ?
-                                                                                        InputBits - (UnitBits + ku) + kb
-                                                                                                              : kb;
+                        int const shift = OutputBits >= UnitBits ?
+                                              InputBits - (OutputBits + k) :
+                                              InputBits >= UnitBits ? InputBits - (UnitBits + ku) + kb : kb;
                         typedef typename outvalue_helper<OutIter, OutputBits>::type OutValue;
                         InputValue y = unbounded_shr<shift>(x);
                         *out++ = OutValue(low_bits<OutputBits>(y));
@@ -102,7 +102,7 @@ namespace nil {
                         BOOST_STATIC_ASSERT(sizeof(InputValue) * CHAR_BIT == InputBits);
                         BOOST_STATIC_ASSERT(sizeof(OutValue) * CHAR_BIT == OutputBits);
                         OutValue value;
-                        std::memcpy(&value, (char *) &x + k / CHAR_BIT, OutputBits / CHAR_BIT);
+                        std::memcpy(&value, (char *)&x + k / CHAR_BIT, OutputBits / CHAR_BIT);
                         *out++ = value;
                     }
                 };
@@ -129,7 +129,6 @@ namespace nil {
                         step_type::step(x, out);
                         next_type::explode(x, out);
                     }
-
                 };
 
                 template<template<int> class Endian, int UnitBits, int InputBits, int OutputBits>
@@ -139,9 +138,9 @@ namespace nil {
                     }
                 };
 
-            } // namespace detail
-        }
-    }
-} // namespace nil
+            }    // namespace detail
+        }        // namespace block
+    }            // namespace crypto3
+}    // namespace nil
 
-#endif // CRYPTO3_BLOCK_DETAIL_EXPLODER_HPP
+#endif    // CRYPTO3_BLOCK_DETAIL_EXPLODER_HPP

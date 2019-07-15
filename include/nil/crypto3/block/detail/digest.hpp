@@ -63,8 +63,8 @@ namespace nil {
              * @tparam DigestBits
              */
 
-            template<std::size_t DigestBits> using digest = boost::container::small_vector<octet_type,
-                                                                                           DigestBits / octet_bits>;
+            template<std::size_t DigestBits>
+            using digest = boost::container::small_vector<octet_type, DigestBits / octet_bits>;
 
             namespace detail {
                 template<typename oit_T>
@@ -84,7 +84,7 @@ namespace nil {
                     *p++ = '\0';
                     return s;
                 }
-            }
+            }    // namespace detail
 
             /*!
              *
@@ -201,9 +201,9 @@ namespace nil {
                 pack<stream_endian::big_bit, 4, 8>(a, d);
                 return source;
             };
-        }
-    }
-} // namespace nil
+        }    // namespace block
+    }        // namespace crypto3
+}    // namespace nil
 
 namespace std {
     template<std::size_t DigestBits>
@@ -211,6 +211,6 @@ namespace std {
         std::array<char, DigestBits / 4 + 1> cstr = nil::crypto3::block::detail::c_str(d);
         return std::string(cstr.data(), cstr.size() - 1);
     }
-}
+}    // namespace std
 
-#endif // CRYPTO3_BLOCK_DIGEST_HPP
+#endif    // CRYPTO3_BLOCK_DIGEST_HPP

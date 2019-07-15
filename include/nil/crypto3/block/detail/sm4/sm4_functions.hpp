@@ -27,10 +27,10 @@ namespace nil {
 
                     inline static word_type t_slow(word_type b, const constants_type &constants) {
                         const word_type t = basic_functions<WordBits>::template make_uint_t<WordBits>(
-                                constants[basic_functions<WordBits>::template extract_uint_t<CHAR_BIT>(b, 0)],
-                                constants[basic_functions<WordBits>::template extract_uint_t<CHAR_BIT>(b, 1)],
-                                constants[basic_functions<WordBits>::template extract_uint_t<CHAR_BIT>(b, 2)],
-                                constants[basic_functions<WordBits>::template extract_uint_t<CHAR_BIT>(b, 3)]);
+                            constants[basic_functions<WordBits>::template extract_uint_t<CHAR_BIT>(b, 0)],
+                            constants[basic_functions<WordBits>::template extract_uint_t<CHAR_BIT>(b, 1)],
+                            constants[basic_functions<WordBits>::template extract_uint_t<CHAR_BIT>(b, 2)],
+                            constants[basic_functions<WordBits>::template extract_uint_t<CHAR_BIT>(b, 3)]);
 
                         // L linear transform
                         return t ^ (basic_functions<WordBits>::template rotl<2>(t)) ^
@@ -42,29 +42,29 @@ namespace nil {
                     inline static word_type t(word_type b, const transposed_constants_type &constants) {
                         return constants[basic_functions<WordBits>::template extract_uint_t<CHAR_BIT>(b, 0)] ^
                                (basic_functions<WordBits>::template rotr<8>(
-                                       constants[basic_functions<WordBits>::template extract_uint_t<CHAR_BIT>(b, 1)])) ^
+                                   constants[basic_functions<WordBits>::template extract_uint_t<CHAR_BIT>(b, 1)])) ^
                                basic_functions<WordBits>::template rotr<16>(
-                                       constants[basic_functions<WordBits>::template extract_uint_t<CHAR_BIT>(b, 2)]) ^
+                                   constants[basic_functions<WordBits>::template extract_uint_t<CHAR_BIT>(b, 2)]) ^
                                basic_functions<WordBits>::template rotr<24>(
-                                       constants[basic_functions<WordBits>::template extract_uint_t<CHAR_BIT>(b, 3)]);
+                                   constants[basic_functions<WordBits>::template extract_uint_t<CHAR_BIT>(b, 3)]);
                     }
 
-// Variant of T for key round_constants_words
+                    // Variant of T for key round_constants_words
                     inline static word_type tp(word_type b, const constants_type &constants) {
                         const word_type t = basic_functions<WordBits>::template make_uint_t<WordBits>(
-                                constants[basic_functions<WordBits>::template extract_uint_t<CHAR_BIT>(b, 0)],
-                                constants[basic_functions<WordBits>::template extract_uint_t<CHAR_BIT>(b, 1)],
-                                constants[basic_functions<WordBits>::template extract_uint_t<CHAR_BIT>(b, 2)],
-                                constants[basic_functions<WordBits>::template extract_uint_t<CHAR_BIT>(b, 3)]);
+                            constants[basic_functions<WordBits>::template extract_uint_t<CHAR_BIT>(b, 0)],
+                            constants[basic_functions<WordBits>::template extract_uint_t<CHAR_BIT>(b, 1)],
+                            constants[basic_functions<WordBits>::template extract_uint_t<CHAR_BIT>(b, 2)],
+                            constants[basic_functions<WordBits>::template extract_uint_t<CHAR_BIT>(b, 3)]);
 
                         // L' linear transform
                         return t ^ (basic_functions<WordBits>::template rotl<13>(t)) ^
                                basic_functions<WordBits>::template rotl<23>(t);
                     }
                 };
-            }
-        }
-    }
-}
+            }    // namespace detail
+        }        // namespace block
+    }            // namespace crypto3
+}    // namespace nil
 
-#endif //CRYPTO3_SM4_FUNCTIONS_CPP_HPP
+#endif    // CRYPTO3_SM4_FUNCTIONS_CPP_HPP

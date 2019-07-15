@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_XTEA_H_
-#define CRYPTO3_XTEA_H_
+#ifndef CRYPTO3_XTEA_HPP
+#define CRYPTO3_XTEA_HPP
 
 #include <boost/endian/arithmetic.hpp>
 
@@ -34,7 +34,6 @@ namespace nil {
                 typedef typename policy_type::key_schedule_type key_schedule_type;
 
             public:
-
                 constexpr static const std::size_t rounds = policy_type::rounds;
 
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
@@ -48,13 +47,13 @@ namespace nil {
                 constexpr static const std::size_t key_words = policy_type::key_words;
                 typedef typename policy_type::key_type key_type;
 
-                template<template<typename, typename> class Mode,
-                                                      typename StateAccumulator, std::size_t ValueBits,
-                                                      typename Padding>
+                template<template<typename, typename> class Mode, typename StateAccumulator, std::size_t ValueBits,
+                         typename Padding>
                 struct stream_cipher {
                     typedef block_stream_processor<Mode<xtea, Padding>, StateAccumulator,
-                                                     stream_endian::little_octet_big_bit, ValueBits,
-                                                     policy_type::word_bits * 2> type;
+                                                   stream_endian::little_octet_big_bit, ValueBits,
+                                                   policy_type::word_bits * 2>
+                        type;
                 };
 
                 xtea(const key_type &key) {
@@ -113,10 +112,9 @@ namespace nil {
                         key_schedule[i + 1] = D + UK[(D >> 11) % 4];
                     }
                 }
-
             };
-        }
-    }
-}
+        }    // namespace block
+    }        // namespace crypto3
+}    // namespace nil
 
 #endif

@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_BLOCK_CIPHER_H_
-#define CRYPTO3_BLOCK_CIPHER_H_
+#ifndef CRYPTO3_BLOCK_CIPHER_HPP
+#define CRYPTO3_BLOCK_CIPHER_HPP
 
 #include <string>
 #include <memory>
@@ -35,8 +35,8 @@ namespace nil {
                 typedef Mode mode_type;
                 typedef Padding padding_strategy;
             };
-        }
-    }
-}
+        }    // namespace block
+    }        // namespace crypto3
+}    // namespace nil
 
 #endif

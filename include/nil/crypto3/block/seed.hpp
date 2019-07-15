@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_SEED_H_
-#define CRYPTO3_SEED_H_
+#ifndef CRYPTO3_SEED_HPP
+#define CRYPTO3_SEED_HPP
 
 #include <nil/crypto3/block/detail/seed/seed_policy.hpp>
 
@@ -32,7 +32,6 @@ namespace nil {
                 typedef typename policy_type::key_schedule_type key_schedule_type;
 
             public:
-
                 constexpr static const std::size_t rounds = policy_type::rounds;
 
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
@@ -46,18 +45,17 @@ namespace nil {
                 constexpr static const std::size_t key_words = policy_type::key_words;
                 typedef typename policy_type::key_type key_type;
 
-                template<template<typename, typename> class Mode,
-                                                      typename StateAccumulator, std::size_t ValueBits,
-                                                      typename Padding>
+                template<template<typename, typename> class Mode, typename StateAccumulator, std::size_t ValueBits,
+                         typename Padding>
                 struct stream_cipher {
                     typedef block_stream_processor<Mode<seed, Padding>, StateAccumulator,
-                                                     stream_endian::little_octet_big_bit, ValueBits,
-                                                     policy_type::word_bits * 2> type_;
+                                                   stream_endian::little_octet_big_bit, ValueBits,
+                                                   policy_type::word_bits * 2>
+                        type_;
 #ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES
                     typedef type_ type;
 #else
-                    struct type : type_ {
-                    };
+                    struct type : type_ {};
 #endif
                 };
 
@@ -91,29 +89,29 @@ namespace nil {
 
                         T0 = B2 ^ key_schedule[2 * j];
                         T1 = policy_type::g(B2 ^ B3 ^ key_schedule[2 * j + 1], policy_type::s0_constants,
-                                policy_type::s1_constants, policy_type::s2_constants, policy_type::s3_constants);
+                                            policy_type::s1_constants, policy_type::s2_constants,
+                                            policy_type::s3_constants);
                         T0 = policy_type::g(T1 + T0, policy_type::s0_constants, policy_type::s1_constants,
-                                policy_type::s2_constants, policy_type::s3_constants);
+                                            policy_type::s2_constants, policy_type::s3_constants);
                         T1 = policy_type::g(T1 + T0, policy_type::s0_constants, policy_type::s1_constants,
-                                policy_type::s2_constants, policy_type::s3_constants);
+                                            policy_type::s2_constants, policy_type::s3_constants);
                         B1 ^= T1;
                         B0 ^= T0 + T1;
 
                         T0 = B0 ^ key_schedule[2 * j + 2];
                         T1 = policy_type::g(B0 ^ B1 ^ key_schedule[2 * j + 3], policy_type::s0_constants,
-                                policy_type::s1_constants, policy_type::s2_constants, policy_type::s3_constants);
+                                            policy_type::s1_constants, policy_type::s2_constants,
+                                            policy_type::s3_constants);
                         T0 = policy_type::g(T1 + T0, policy_type::s0_constants, policy_type::s1_constants,
-                                policy_type::s2_constants, policy_type::s3_constants);
+                                            policy_type::s2_constants, policy_type::s3_constants);
                         T1 = policy_type::g(T1 + T0, policy_type::s0_constants, policy_type::s1_constants,
-                                policy_type::s2_constants, policy_type::s3_constants);
+                                            policy_type::s2_constants, policy_type::s3_constants);
                         B3 ^= T1;
                         B2 ^= T0 + T1;
                     }
 
-                    return {
-                            boost::endian::big_to_native(B2), boost::endian::big_to_native(B3),
-                            boost::endian::big_to_native(B0), boost::endian::big_to_native(B1)
-                    };
+                    return {boost::endian::big_to_native(B2), boost::endian::big_to_native(B3),
+                            boost::endian::big_to_native(B0), boost::endian::big_to_native(B1)};
                 }
 
                 inline block_type decrypt_block(const block_type &ciphertext) {
@@ -127,29 +125,29 @@ namespace nil {
 
                         T0 = B2 ^ key_schedule[30 - 2 * j];
                         T1 = policy_type::g(B2 ^ B3 ^ key_schedule[31 - 2 * j], policy_type::s0_constants,
-                                policy_type::s1_constants, policy_type::s2_constants, policy_type::s3_constants);
+                                            policy_type::s1_constants, policy_type::s2_constants,
+                                            policy_type::s3_constants);
                         T0 = policy_type::g(T1 + T0, policy_type::s0_constants, policy_type::s1_constants,
-                                policy_type::s2_constants, policy_type::s3_constants);
+                                            policy_type::s2_constants, policy_type::s3_constants);
                         T1 = policy_type::g(T1 + T0, policy_type::s0_constants, policy_type::s1_constants,
-                                policy_type::s2_constants, policy_type::s3_constants);
+                                            policy_type::s2_constants, policy_type::s3_constants);
                         B1 ^= T1;
                         B0 ^= T0 + T1;
 
                         T0 = B0 ^ key_schedule[28 - 2 * j];
                         T1 = policy_type::g(B0 ^ B1 ^ key_schedule[29 - 2 * j], policy_type::s0_constants,
-                                policy_type::s1_constants, policy_type::s2_constants, policy_type::s3_constants);
+                                            policy_type::s1_constants, policy_type::s2_constants,
+                                            policy_type::s3_constants);
                         T0 = policy_type::g(T1 + T0, policy_type::s0_constants, policy_type::s1_constants,
-                                policy_type::s2_constants, policy_type::s3_constants);
+                                            policy_type::s2_constants, policy_type::s3_constants);
                         T1 = policy_type::g(T1 + T0, policy_type::s0_constants, policy_type::s1_constants,
-                                policy_type::s2_constants, policy_type::s3_constants);
+                                            policy_type::s2_constants, policy_type::s3_constants);
                         B3 ^= T1;
                         B2 ^= T0 + T1;
                     }
 
-                    return {
-                            boost::endian::big_to_native(B2), boost::endian::big_to_native(B3),
-                            boost::endian::big_to_native(B0), boost::endian::big_to_native(B1)
-                    };
+                    return {boost::endian::big_to_native(B2), boost::endian::big_to_native(B3),
+                            boost::endian::big_to_native(B0), boost::endian::big_to_native(B1)};
                 }
 
                 inline void schedule_key(const key_type &key) {
@@ -161,22 +159,24 @@ namespace nil {
 
                     for (size_t i = 0; i != 16; i += 2) {
                         key_schedule[2 * i] = policy_type::g(WK[0] + WK[2] - policy_type::round_constants[i],
-                                policy_type::s0_constants, policy_type::s1_constants, policy_type::s2_constants,
-                                policy_type::s3_constants);
+                                                             policy_type::s0_constants, policy_type::s1_constants,
+                                                             policy_type::s2_constants, policy_type::s3_constants);
                         key_schedule[2 * i + 1] = policy_type::g(WK[1] - WK[3] + policy_type::round_constants[i],
-                                policy_type::s0_constants, policy_type::s1_constants, policy_type::s2_constants,
-                                policy_type::s3_constants) ^ key_schedule[2 * i];
+                                                                 policy_type::s0_constants, policy_type::s1_constants,
+                                                                 policy_type::s2_constants, policy_type::s3_constants) ^
+                                                  key_schedule[2 * i];
 
                         uint32_t T = (WK[0] & 0xFF) << 24;
                         WK[0] = (WK[0] >> 8) | (policy_type::template extract_uint_t<CHAR_BIT>(WK[1], 3) << 24);
                         WK[1] = (WK[1] >> 8) | T;
 
                         key_schedule[2 * i + 2] = policy_type::g(WK[0] + WK[2] - policy_type::round_constants[i + 1],
-                                policy_type::s0_constants, policy_type::s1_constants, policy_type::s2_constants,
-                                policy_type::s3_constants);
+                                                                 policy_type::s0_constants, policy_type::s1_constants,
+                                                                 policy_type::s2_constants, policy_type::s3_constants);
                         key_schedule[2 * i + 3] = policy_type::g(WK[1] - WK[3] + policy_type::round_constants[i + 1],
-                                policy_type::s0_constants, policy_type::s1_constants, policy_type::s2_constants,
-                                policy_type::s3_constants) ^ key_schedule[2 * i + 2];
+                                                                 policy_type::s0_constants, policy_type::s1_constants,
+                                                                 policy_type::s2_constants, policy_type::s3_constants) ^
+                                                  key_schedule[2 * i + 2];
 
                         T = policy_type::template extract_uint_t<CHAR_BIT>(WK[3], 0);
                         WK[3] = (WK[3] << 8) | policy_type::template extract_uint_t<CHAR_BIT>(WK[2], 0);
@@ -184,8 +184,8 @@ namespace nil {
                     }
                 }
             };
-        }
-    }
-}
+        }    // namespace block
+    }        // namespace crypto3
+}    // namespace nil
 
 #endif

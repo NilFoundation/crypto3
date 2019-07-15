@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_TWOFISH_H_
-#define CRYPTO3_TWOFISH_H_
+#ifndef CRYPTO3_TWOFISH_HPP
+#define CRYPTO3_TWOFISH_HPP
 
 #include <boost/endian/arithmetic.hpp>
 
@@ -38,7 +38,6 @@ namespace nil {
                 typedef typename policy_type::expanded_substitution_type expanded_substitution_type;
 
             public:
-
                 constexpr static const std::size_t rounds = policy_type::rounds;
 
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
@@ -52,13 +51,13 @@ namespace nil {
                 constexpr static const std::size_t key_words = policy_type::key_words;
                 typedef typename policy_type::key_type key_type;
 
-                template<template<typename, typename> class Mode,
-                                                      typename StateAccumulator, std::size_t ValueBits,
-                                                      typename Padding>
+                template<template<typename, typename> class Mode, typename StateAccumulator, std::size_t ValueBits,
+                         typename Padding>
                 struct stream_cipher {
                     typedef block_stream_processor<Mode<twofish<KeyBits>, Padding>, StateAccumulator,
-                                                     stream_endian::little_octet_big_bit, ValueBits,
-                                                     policy_type::word_bits * 2> type;
+                                                   stream_endian::little_octet_big_bit, ValueBits,
+                                                   policy_type::word_bits * 2>
+                        type;
                 };
 
                 twofish(const key_type &key) {
@@ -78,7 +77,6 @@ namespace nil {
                 }
 
             protected:
-
                 key_schedule_type round_key;
                 expanded_substitution_type expanded_substitution;
 
@@ -103,10 +101,8 @@ namespace nil {
                     A ^= round_key[6];
                     B ^= round_key[7];
 
-                    return {
-                            boost::endian::little_to_native(C), boost::endian::little_to_native(D),
-                            boost::endian::little_to_native(A), boost::endian::little_to_native(B)
-                    };
+                    return {boost::endian::little_to_native(C), boost::endian::little_to_native(D),
+                            boost::endian::little_to_native(A), boost::endian::little_to_native(B)};
                 }
 
                 inline block_type decrypt_block(const block_type &ciphertext) {
@@ -130,18 +126,16 @@ namespace nil {
                     A ^= round_key[2];
                     B ^= round_key[3];
 
-                    return {
-                            boost::endian::little_to_native(C), boost::endian::little_to_native(D),
-                            boost::endian::little_to_native(A), boost::endian::little_to_native(B)
-                    };
+                    return {boost::endian::little_to_native(C), boost::endian::little_to_native(D),
+                            boost::endian::little_to_native(A), boost::endian::little_to_native(B)};
                 }
 
                 inline void schedule_key(const key_type &key) {
                     return policy_type::schedule_key(key, expanded_substitution, round_key);
                 }
             };
-        }
-    }
-}
+        }    // namespace block
+    }        // namespace crypto3
+}    // namespace nil
 
 #endif

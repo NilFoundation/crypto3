@@ -55,16 +55,16 @@ namespace nil {
                         word_type y = x;
 
                         for (size_t i = 0; i != 15; ++i) {
-                            y = mul(y, y); // square
+                            y = mul(y, y);    // square
                             y = mul(y, x);
                         }
 
                         return y;
                     }
                 };
-            }
-        }
-    }
-}
+            }    // namespace detail
+        }        // namespace block
+    }            // namespace crypto3
+}    // namespace nil
 
-#endif //CRYPTO3_IDEA_FUNCTIONS_CPP_HPP
+#endif    // CRYPTO3_IDEA_FUNCTIONS_CPP_HPP

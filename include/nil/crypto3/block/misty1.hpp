@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_MISTY1_H_
-#define CRYPTO3_MISTY1_H_
+#ifndef CRYPTO3_MISTY1_HPP
+#define CRYPTO3_MISTY1_HPP
 
 #include <boost/endian/arithmetic.hpp>
 
@@ -33,8 +33,8 @@ namespace nil {
 
                 constexpr static const std::size_t key_schedule_size = policy_type::key_schedule_size;
                 typedef typename policy_type::key_schedule_type key_schedule_type;
-            public:
 
+            public:
                 constexpr static const std::size_t rounds = policy_type::rounds;
 
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
@@ -48,18 +48,17 @@ namespace nil {
                 constexpr static const std::size_t key_words = policy_type::key_words;
                 typedef typename policy_type::key_type key_type;
 
-                template<template<typename, typename> class Mode,
-                                                      typename StateAccumulator, std::size_t ValueBits,
-                                                      typename Padding>
+                template<template<typename, typename> class Mode, typename StateAccumulator, std::size_t ValueBits,
+                         typename Padding>
                 struct stream_cipher {
                     typedef block_stream_processor<Mode<misty1, Padding>, StateAccumulator,
-                                                     stream_endian::little_octet_big_bit, ValueBits,
-                                                     policy_type::word_bits * 2> type_;
+                                                   stream_endian::little_octet_big_bit, ValueBits,
+                                                   policy_type::word_bits * 2>
+                        type_;
 #ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES
                     typedef type_ type;
 #else
-                    struct type : type_ {
-                    };
+                    struct type : type_ {};
 #endif
                 };
 
@@ -119,10 +118,8 @@ namespace nil {
                     B3 ^= B2 & encryption_key[98];
                     B2 ^= B3 | encryption_key[99];
 
-                    return {
-                            boost::endian::big_to_native(B2), boost::endian::big_to_native(B3),
-                            boost::endian::big_to_native(B0), boost::endian::big_to_native(B1)
-                    };
+                    return {boost::endian::big_to_native(B2), boost::endian::big_to_native(B3),
+                            boost::endian::big_to_native(B0), boost::endian::big_to_native(B1)};
                 }
 
                 inline block_type decrypt_block(const block_type &ciphertext) {
@@ -161,10 +158,8 @@ namespace nil {
                     B0 ^= B1 | decryption_key[98];
                     B1 ^= B0 & decryption_key[99];
 
-                    return {
-                            boost::endian::big_to_native(B0), boost::endian::big_to_native(B1),
-                            boost::endian::big_to_native(B2), boost::endian::big_to_native(B3)
-                    };
+                    return {boost::endian::big_to_native(B0), boost::endian::big_to_native(B1),
+                            boost::endian::big_to_native(B2), boost::endian::big_to_native(B3)};
                 }
 
                 inline void schedule_key(const key_type &key) {
@@ -174,8 +169,8 @@ namespace nil {
                     }
 
                     for (size_t i = 0; i != rounds; ++i) {
-                        schedule[i + 8] = policy_type::FI(schedule[i], schedule[(i + 1) % 8] >> 9,
-                                schedule[(i + 1) % 8] & 0x1FF);
+                        schedule[i + 8] =
+                            policy_type::FI(schedule[i], schedule[(i + 1) % 8] >> 9, schedule[(i + 1) % 8] & 0x1FF);
                         schedule[i + 16] = schedule[i + 8] >> 9;
                         schedule[i + 24] = schedule[i + 8] & 0x1FF;
                     }
@@ -188,7 +183,7 @@ namespace nil {
                     schedule.fill(0);
                 }
             };
-        }
-    }
-}
+        }    // namespace block
+    }        // namespace crypto3
+}    // namespace nil
 #endif

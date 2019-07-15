@@ -36,9 +36,9 @@ namespace nil {
                 struct aria_policy<256> : public aria_functions<256> {
                     constexpr static const std::size_t rounds = 16;
                 };
-            }
-        }
-    }
-}
+            }    // namespace detail
+        }        // namespace block
+    }            // namespace crypto3
+}    // namespace nil
 
-#endif //CRYPTO3_ARIA_POLICY_HPP
+#endif    // CRYPTO3_ARIA_POLICY_HPP

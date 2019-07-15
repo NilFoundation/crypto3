@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_CAST_H_
-#define CRYPTO3_CAST_H_
+#ifndef CRYPTO3_CAST_HPP
+#define CRYPTO3_CAST_HPP
 
 #include <nil/crypto3/block/detail/cast/cast_policy.hpp>
 
@@ -24,7 +24,8 @@ namespace nil {
              * Cast128. A 64-bit cipher, commonly used in OpenPGP.
              *
              * Cast256. A 128-bit cipher that was a contestent in the NIST AES competition.
-             * Rarely used, and now probably would be deprecated in crypto3. Use AES or Serpent instead.
+             * Rarely used, and now probably would be deprecated in crypto3. Use AES or Serpent
+             * instead.
              *
              * @ingroup block
              *
@@ -34,7 +35,6 @@ namespace nil {
             template<std::size_t Version, std::size_t KeyBits>
             class cast {
             protected:
-
                 typedef typename detail::cast_policy<Version, KeyBits> policy_type;
 
                 typedef typename policy_type::rotation_key_schedule_type rotation_key_schedule_type;
@@ -52,18 +52,17 @@ namespace nil {
                 constexpr static const std::size_t key_words = policy_type::key_words;
                 typedef typename policy_type::key_type key_type;
 
-                template<template<typename, typename> class Mode,
-                                                      typename StateAccumulator, std::size_t ValueBits,
-                                                      typename Padding>
+                template<template<typename, typename> class Mode, typename StateAccumulator, std::size_t ValueBits,
+                         typename Padding>
                 struct stream_cipher {
                     typedef block_stream_processor<Mode<cast<Version, KeyBits>, Padding>, StateAccumulator,
-                                                     stream_endian::little_octet_big_bit, ValueBits,
-                                                     policy_type::word_bits * 2> type_;
+                                                   stream_endian::little_octet_big_bit, ValueBits,
+                                                   policy_type::word_bits * 2>
+                        type_;
 #ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES
                     typedef type_ type;
 #else
-                    struct type : type_ {
-                    };
+                    struct type : type_ {};
 #endif
                 };
 
@@ -100,7 +99,7 @@ namespace nil {
                     policy_type::schedule_key(key, key_schedule, rkey_schedule);
                 }
             };
-        }
-    }
-}
+        }    // namespace block
+    }        // namespace crypto3
+}    // namespace nil
 #endif

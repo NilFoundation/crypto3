@@ -21,40 +21,36 @@ namespace nil {
         namespace block {
             namespace detail {
 #define AES_ENC_4_ROUNDS(K)                \
-   do                                      \
-      {                                    \
-      B0 = vaesmcq_u8(vaeseq_u8(B0, K));   \
-      B1 = vaesmcq_u8(vaeseq_u8(B1, K));   \
-      B2 = vaesmcq_u8(vaeseq_u8(B2, K));   \
-      B3 = vaesmcq_u8(vaeseq_u8(B3, K));   \
-      } while(0)
+    do {                                   \
+        B0 = vaesmcq_u8(vaeseq_u8(B0, K)); \
+        B1 = vaesmcq_u8(vaeseq_u8(B1, K)); \
+        B2 = vaesmcq_u8(vaeseq_u8(B2, K)); \
+        B3 = vaesmcq_u8(vaeseq_u8(B3, K)); \
+    } while (0)
 
-#define AES_ENC_4_LAST_ROUNDS(K, K2)       \
-   do                                      \
-      {                                    \
-      B0 = veorq_u8(vaeseq_u8(B0, K), K2); \
-      B1 = veorq_u8(vaeseq_u8(B1, K), K2); \
-      B2 = veorq_u8(vaeseq_u8(B2, K), K2); \
-      B3 = veorq_u8(vaeseq_u8(B3, K), K2); \
-      } while(0)
+#define AES_ENC_4_LAST_ROUNDS(K, K2)         \
+    do {                                     \
+        B0 = veorq_u8(vaeseq_u8(B0, K), K2); \
+        B1 = veorq_u8(vaeseq_u8(B1, K), K2); \
+        B2 = veorq_u8(vaeseq_u8(B2, K), K2); \
+        B3 = veorq_u8(vaeseq_u8(B3, K), K2); \
+    } while (0)
 
-#define AES_DEC_4_ROUNDS(K)                \
-   do                                      \
-      {                                    \
-      B0 = vaesimcq_u8(vaesdq_u8(B0, K));  \
-      B1 = vaesimcq_u8(vaesdq_u8(B1, K));  \
-      B2 = vaesimcq_u8(vaesdq_u8(B2, K));  \
-      B3 = vaesimcq_u8(vaesdq_u8(B3, K));  \
-      } while(0)
+#define AES_DEC_4_ROUNDS(K)                 \
+    do {                                    \
+        B0 = vaesimcq_u8(vaesdq_u8(B0, K)); \
+        B1 = vaesimcq_u8(vaesdq_u8(B1, K)); \
+        B2 = vaesimcq_u8(vaesdq_u8(B2, K)); \
+        B3 = vaesimcq_u8(vaesdq_u8(B3, K)); \
+    } while (0)
 
-#define AES_DEC_4_LAST_ROUNDS(K, K2)       \
-   do                                      \
-      {                                    \
-      B0 = veorq_u8(vaesdq_u8(B0, K), K2); \
-      B1 = veorq_u8(vaesdq_u8(B1, K), K2); \
-      B2 = veorq_u8(vaesdq_u8(B2, K), K2); \
-      B3 = veorq_u8(vaesdq_u8(B3, K), K2); \
-      } while(0)
+#define AES_DEC_4_LAST_ROUNDS(K, K2)         \
+    do {                                     \
+        B0 = veorq_u8(vaesdq_u8(B0, K), K2); \
+        B1 = veorq_u8(vaesdq_u8(B1, K), K2); \
+        B2 = veorq_u8(vaesdq_u8(B2, K), K2); \
+        B3 = veorq_u8(vaesdq_u8(B3, K), K2); \
+    } while (0)
 
                 template<std::size_t KeyBitsImpl, std::size_t BlockBitsImpl>
                 class basic_armv8_rijndael_impl {
@@ -76,6 +72,7 @@ namespace nil {
                 class basic_armv8_rijndael_impl<KeyBitsImpl, 128> {
                 protected:
                     typedef rijndael<KeyBitsImpl, 128> basic_type;
+
                 public:
                     static inline void schedule_key(const typename basic_type::key_type &key,
                                                     typename basic_type::key_schedule_type encryption_key,
@@ -90,13 +87,14 @@ namespace nil {
                         }
                     }
                 }
-            };
+            };    // namespace detail
 
             template<>
             class armv8_rijndael_impl<128, 128> : public basic_armv8_rijndael_impl<128, 128> {
             public:
-                static typename basic_type::block_type encrypt_block(const typename basic_type::block_type &plaintext,
-                                                                     const typename basic_type::key_schedule_type &encryption_key) {
+                static typename basic_type::block_type
+                    encrypt_block(const typename basic_type::block_type &plaintext,
+                                  const typename basic_type::key_schedule_type &encryption_key) {
                     typename basic_type::block_type out = {0};
 
                     const uint8_t *skey = reinterpret_cast<const uint8_t *>(encryption_key.data());
@@ -130,8 +128,9 @@ namespace nil {
                     return out;
                 }
 
-                static typename basic_type::block_type decrypt_block(const typename basic_type::block_type &plaintext,
-                                                                     const typename basic_type::key_schedule_type &decryption_key) {
+                static typename basic_type::block_type
+                    decrypt_block(const typename basic_type::block_type &plaintext,
+                                  const typename basic_type::key_schedule_type &decryption_key) {
                     typename basic_type::block_type out = {0};
 
                     const uint8_t *skey = reinterpret_cast<const uint8_t *>(decryption_key.data());
@@ -170,8 +169,9 @@ namespace nil {
             template<>
             class armv8_rijndael_impl<192, 128> : public basic_armv8_rijndael_impl<192, 128> {
             public:
-                static typename basic_type::block_type encrypt_block(const typename basic_type::block_type &plaintext,
-                                                                     const typename basic_type::key_schedule_type &encryption_key) {
+                static typename basic_type::block_type
+                    encrypt_block(const typename basic_type::block_type &plaintext,
+                                  const typename basic_type::key_schedule_type &encryption_key) {
                     typename basic_type::block_type out = {0};
 
                     const uint8_t *skey = reinterpret_cast<const uint8_t *>(encryption_key.data());
@@ -209,8 +209,9 @@ namespace nil {
                     return out;
                 }
 
-                static typename basic_type::block_type decrypt_block(const typename basic_type::block_type &plaintext,
-                                                                     const typename basic_type::key_schedule_type &decryption_key) {
+                static typename basic_type::block_type
+                    decrypt_block(const typename basic_type::block_type &plaintext,
+                                  const typename basic_type::key_schedule_type &decryption_key) {
                     typename basic_type::block_type out = {0};
                     const uint8_t *skey = reinterpret_cast<const uint8_t *>(decryption_key.data());
                     const uint8_t *mkey = reinterpret_cast<const uint8_t *>(m_MD.data());
@@ -245,15 +246,15 @@ namespace nil {
                     vst1q_u8(out.data(), B);
 
                     return out;
-
                 }
             };
 
             template<>
             class armv8_rijndael_impl<256, 128> : public basic_armv8_rijndael_impl<256, 128> {
             public:
-                static typename basic_type::block_type encrypt_block(const typename basic_type::block_type &plaintext,
-                                                                     const typename basic_type::key_schedule_type &encryption_key) {
+                static typename basic_type::block_type
+                    encrypt_block(const typename basic_type::block_type &plaintext,
+                                  const typename basic_type::key_schedule_type &encryption_key) {
                     typename basic_type::block_type out = {0};
                     const uint8_t *skey = reinterpret_cast<const uint8_t *>(encryption_key.data());
                     const uint8_t *mkey = reinterpret_cast<const uint8_t *>(m_ME.data());
@@ -294,8 +295,9 @@ namespace nil {
                     return out;
                 }
 
-                static typename basic_type::block_type decrypt_block(const typename basic_type::block_type &plaintext,
-                                                                     const typename basic_type::key_schedule_type &decryption_key) {
+                static typename basic_type::block_type
+                    decrypt_block(const typename basic_type::block_type &plaintext,
+                                  const typename basic_type::key_schedule_type &decryption_key) {
                     const uint8_t *skey = reinterpret_cast<const uint8_t *>(decryption_key.data());
                     const uint8_t *mkey = reinterpret_cast<const uint8_t *>(m_MD.data());
 
@@ -335,9 +337,9 @@ namespace nil {
                     return out;
                 }
             };
-        }
-    }
-}
+        }    // namespace block
+    }        // namespace crypto3
+}    // namespace nil
 }
 
-#endif //CRYPTO3_RIJNDAEL_ARMV8_IMPL_HPP
+#endif    // CRYPTO3_RIJNDAEL_ARMV8_IMPL_HPP

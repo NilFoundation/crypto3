@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_NOEKEON_H_
-#define CRYPTO3_NOEKEON_H_
+#ifndef CRYPTO3_NOEKEON_HPP
+#define CRYPTO3_NOEKEON_HPP
 
 #include <boost/endian/arithmetic.hpp>
 
@@ -34,7 +34,6 @@ namespace nil {
                 typedef typename policy_type::key_schedule_type key_schedule_type;
 
             public:
-
                 constexpr static const std::size_t rounds = policy_type::rounds;
 
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
@@ -48,18 +47,17 @@ namespace nil {
                 constexpr static const std::size_t key_words = policy_type::key_words;
                 typedef typename policy_type::key_type key_type;
 
-                template<template<typename, typename> class Mode,
-                                                      typename StateAccumulator, std::size_t ValueBits,
-                                                      typename Padding>
+                template<template<typename, typename> class Mode, typename StateAccumulator, std::size_t ValueBits,
+                         typename Padding>
                 struct stream_cipher {
                     typedef block_stream_processor<Mode<noekeon, Padding>, StateAccumulator,
-                                                     stream_endian::little_octet_big_bit, ValueBits,
-                                                     policy_type::word_bits * 2> type_;
+                                                   stream_endian::little_octet_big_bit, ValueBits,
+                                                   policy_type::word_bits * 2>
+                        type_;
 #ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES
                     typedef type_ type;
 #else
-                    struct type : type_ {
-                    };
+                    struct type : type_ {};
 #endif
                 };
 
@@ -107,10 +105,8 @@ namespace nil {
                     A0 ^= policy_type::round_constants[16];
                     policy_type::theta(A0, A1, A2, A3, encryption_key.data());
 
-                    return {
-                            boost::endian::big_to_native(A0), boost::endian::big_to_native(A1),
-                            boost::endian::big_to_native(A2), boost::endian::big_to_native(A3)
-                    };
+                    return {boost::endian::big_to_native(A0), boost::endian::big_to_native(A1),
+                            boost::endian::big_to_native(A2), boost::endian::big_to_native(A3)};
                 }
 
                 inline block_type decrypt_block(const block_type &ciphertext) {
@@ -137,10 +133,8 @@ namespace nil {
                     policy_type::theta(A0, A1, A2, A3, decryption_key.data());
                     A0 ^= policy_type::round_constants[0];
 
-                    return {
-                            boost::endian::big_to_native(A0), boost::endian::big_to_native(A1),
-                            boost::endian::big_to_native(A2), boost::endian::big_to_native(A3)
-                    };
+                    return {boost::endian::big_to_native(A0), boost::endian::big_to_native(A1),
+                            boost::endian::big_to_native(A2), boost::endian::big_to_native(A3)};
                 }
 
                 inline void schedule_key(const key_type &key) {
@@ -179,7 +173,7 @@ namespace nil {
                     encryption_key[3] = A3;
                 }
             };
-        }
-    }
-}
+        }    // namespace block
+    }        // namespace crypto3
+}    // namespace nil
 #endif

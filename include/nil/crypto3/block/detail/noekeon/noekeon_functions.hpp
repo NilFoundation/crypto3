@@ -25,7 +25,7 @@ namespace nil {
                      */
                     inline static void theta(word_type &A0, word_type &A1, word_type &A2, word_type &A3,
                                              const word_type *EK) {
-                        word_type T = A0 ^A2;
+                        word_type T = A0 ^ A2;
                         T ^= basic_functions<WordBits>::template rotl<8>(T) ^
                              basic_functions<WordBits>::template rotr<8>(T);
                         A1 ^= T;
@@ -47,7 +47,7 @@ namespace nil {
                      * Theta With Null Key
                      */
                     inline static void theta(word_type &A0, word_type &A1, word_type &A2, word_type &A3) {
-                        word_type T = A0 ^A2;
+                        word_type T = A0 ^ A2;
                         T ^= basic_functions<WordBits>::template rotl<8>(T) ^
                              basic_functions<WordBits>::template rotr<8>(T);
                         A1 ^= T;
@@ -77,9 +77,9 @@ namespace nil {
                         A0 ^= A2 & A1;
                     }
                 };
-            }
-        }
-    }
-}
+            }    // namespace detail
+        }        // namespace block
+    }            // namespace crypto3
+}    // namespace nil
 
-#endif //CRYPTO3_NOEKEON_FUNCTIONS_CPP_HPP
+#endif    // CRYPTO3_NOEKEON_FUNCTIONS_CPP_HPP

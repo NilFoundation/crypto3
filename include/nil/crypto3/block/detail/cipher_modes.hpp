@@ -44,9 +44,9 @@ namespace nil {
                         return cipher_type::decrypt(ciphertext);
                     }
                 };
-            }
-        }
-    }
-}
+            }    // namespace detail
+        }        // namespace block
+    }            // namespace crypto3
+}    // namespace nil
 
-#endif //CRYPTO3_CIPHER_MODES_HPP
+#endif    // CRYPTO3_CIPHER_MODES_HPP

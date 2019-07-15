@@ -63,13 +63,13 @@ namespace nil {
                 typedef typename policy_type::key_schedule_type key_schedule_type;
                 typedef typename policy_type::tweak_schedule_type tweak_schedule_type;
 
-                template<template<typename, typename> class Mode,
-                                                      typename StateAccumulator, std::size_t ValueBits,
-                                                      typename Padding>
+                template<template<typename, typename> class Mode, typename StateAccumulator, std::size_t ValueBits,
+                         typename Padding>
                 struct stream_cipher {
                     typedef block_stream_processor<Mode<threefish<KeyBits>, Padding>, StateAccumulator,
-                                                     stream_endian::little_octet_big_bit, ValueBits,
-                                                     policy_type::word_bits * 2> type;
+                                                   stream_endian::little_octet_big_bit, ValueBits,
+                                                   policy_type::word_bits * 2>
+                        type;
                 };
 
                 threefish(const key_type &key = key_type(), const tweak_type &tweak = tweak_type()) {
@@ -97,8 +97,7 @@ namespace nil {
                     tweak_schedule[2] = t[0] ^ t[1];
 #ifdef CRYPTO3_BLOCK_SHOW_PROGRESS
                     for (unsigned t = 0; t <= tweak_words; ++t) {
-                        std::printf("t_%d = %.16lx\n",
-                                    t, tweak_schedule[t]);
+                        std::printf("t_%d = %.16lx\n", t, tweak_schedule[t]);
                     }
 #endif
                 }
@@ -108,15 +107,13 @@ namespace nil {
                     for (unsigned t = 0; t < key_words; ++t) {
                         key_schedule[t] = key[t];
 #ifdef CRYPTO3_BLOCK_SHOW_PROGRESS
-                        std::printf("k_%-2d = %.16lx\n",
-                                    t, encryption_key[t]);
+                        std::printf("k_%-2d = %.16lx\n", t, encryption_key[t]);
 #endif
                         k_N_w ^= key[t];
                     }
                     key_schedule[key_words] = k_N_w;
 #ifdef CRYPTO3_BLOCK_SHOW_PROGRESS
-                    std::printf("k_%-2d = %.16lx\n",
-                                key_words, encryption_key[key_words]);
+                    std::printf("k_%-2d = %.16lx\n", key_words, encryption_key[key_words]);
 #endif
                 }
 
@@ -144,8 +141,7 @@ namespace nil {
 
 #ifdef CRYPTO3_BLOCK_SHOW_PROGRESS
                     for (unsigned t = 0; t < block_words; ++t) {
-                        std::printf("v_0,%-2d = %.16lx\n",
-                                    t, v[t]);
+                        std::printf("v_0,%-2d = %.16lx\n", t, v[t]);
                     }
 #endif
 
@@ -155,8 +151,7 @@ namespace nil {
                         for (unsigned i = 0; i < block_words; ++i) {
                             v[i] += k(d / 4, i);
 #ifdef CRYPTO3_BLOCK_SHOW_PROGRESS
-                            std::printf("e_%d,%-2d = %.16lx\n",
-                                        d, i, v[i]);
+                            std::printf("e_%d,%-2d = %.16lx\n", d, i, v[i]);
 #endif
                         }
 
@@ -170,14 +165,12 @@ namespace nil {
                                 word_type x1 = v[2 * j + 1];
                                 word_type y0 = x0 + x1;
                                 std::size_t r = policy_type::rotations[d % 8][j];
-                                word_type y1 = policy_type::rotl(x1, r) ^y0;
+                                word_type y1 = policy_type::rotl(x1, r) ^ y0;
                                 f[2 * j + 0] = y0;
                                 f[2 * j + 1] = y1;
 #ifdef CRYPTO3_BLOCK_SHOW_PROGRESS
-                                std::printf("f_%d,%-2d = %.16lx\n",
-                                            d, 2*j+0, f[2*j+0]);
-                                std::printf("f_%d,%-2d = %.16lx\n",
-                                            d, 2*j+1, f[2*j+1]);
+                                std::printf("f_%d,%-2d = %.16lx\n", d, 2 * j + 0, f[2 * j + 0]);
+                                std::printf("f_%d,%-2d = %.16lx\n", d, 2 * j + 1, f[2 * j + 1]);
 #endif
                             }
                             // PERMUTE back into v
@@ -185,8 +178,7 @@ namespace nil {
                                 unsigned pi = policy_type::permutation[i];
                                 v[i] = f[pi];
 #ifdef CRYPTO3_BLOCK_SHOW_PROGRESS
-                                std::printf("v_%d,%-2d = %.16lx\n",
-                                            d+1, i, v[i]);
+                                std::printf("v_%d,%-2d = %.16lx\n", d + 1, i, v[i]);
 #endif
                             }
                         }
@@ -197,8 +189,7 @@ namespace nil {
                     for (unsigned i = 0; i < block_words; ++i) {
                         ciphertext[i] = v[i] + k(rounds / 4, i);
 #ifdef CRYPTO3_BLOCK_SHOW_PROGRESS
-                        std::printf("c_%-2d = %.16lx\n",
-                                    i, ciphertext[i]);
+                        std::printf("c_%-2d = %.16lx\n", i, ciphertext[i]);
 #endif
                     }
                     return ciphertext;
@@ -207,8 +198,7 @@ namespace nil {
                 inline block_type decrypt_block(const block_type &ciphertext) {
                     for (unsigned i = 0; i < block_words; ++i) {
 #ifdef CRYPTO3_BLOCK_SHOW_PROGRESS
-                        std::printf("c_%-2d = %.16lx\n",
-                                    i, ciphertext[i]);
+                        std::printf("c_%-2d = %.16lx\n", i, ciphertext[i]);
 #endif
                     }
 
@@ -218,8 +208,7 @@ namespace nil {
                     for (unsigned i = 0; i < block_words; ++i) {
                         v[i] = ciphertext[i] - k(rounds / 4, i);
 #ifdef CRYPTO3_BLOCK_SHOW_PROGRESS
-                        std::printf("v_%d,%-2d = %.16lx\n",
-                                    rounds, i, v[i]);
+                        std::printf("v_%d,%-2d = %.16lx\n", rounds, i, v[i]);
 #endif
                     }
 
@@ -236,8 +225,7 @@ namespace nil {
                                 unsigned pi = policy_type::permutation[i];
                                 f[pi] = v[i];
 #ifdef CRYPTO3_BLOCK_SHOW_PROGRESS
-                                std::printf("f_%d,%-2d = %.16lx\n",
-                                            d, pi, f[pi]);
+                                std::printf("f_%d,%-2d = %.16lx\n", d, pi, f[pi]);
 #endif
                             }
 
@@ -254,10 +242,8 @@ namespace nil {
                                 v[2 * j + 1] = x1;
 
 #ifdef CRYPTO3_BLOCK_SHOW_PROGRESS
-                                std::printf("e_%d,%-2d = %.16lx\n",
-                                            d, 2*j+0, v[2*j+0]);
-                                std::printf("e_%d,%-2d = %.16lx\n",
-                                            d, 2*j+1, v[2*j+1]);
+                                std::printf("e_%d,%-2d = %.16lx\n", d, 2 * j + 0, v[2 * j + 0]);
+                                std::printf("e_%d,%-2d = %.16lx\n", d, 2 * j + 1, v[2 * j + 1]);
 #endif
                             }
                         }
@@ -266,8 +252,7 @@ namespace nil {
                         for (unsigned i = 0; i < block_words; ++i) {
                             v[i] -= k(d / 4, i);
 #ifdef CRYPTO3_BLOCK_SHOW_PROGRESS
-                            std::printf("d_%d,%-2d = %.16lx\n",
-                                        d, i, v[i]);
+                            std::printf("d_%d,%-2d = %.16lx\n", d, i, v[i]);
 #endif
                         }
                     }
@@ -275,8 +260,8 @@ namespace nil {
                     return v;
                 }
             };
-        }
-    }
-} // namespace nil
+        }    // namespace block
+    }        // namespace crypto3
+}    // namespace nil
 
-#endif // CRYPTO3_THREEFISH_HPP
+#endif    // CRYPTO3_THREEFISH_HPP

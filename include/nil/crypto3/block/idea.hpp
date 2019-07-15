@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_IDEA_H_
-#define CRYPTO3_IDEA_H_
+#ifndef CRYPTO3_IDEA_HPP
+#define CRYPTO3_IDEA_HPP
 
 #include <boost/endian/arithmetic.hpp>
 
@@ -33,8 +33,8 @@ namespace nil {
 
                 constexpr static const std::size_t key_schedule_size = policy_type::key_schedule_size;
                 typedef typename policy_type::key_schedule_type key_schedule_type;
-            public:
 
+            public:
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
                 typedef typename policy_type::word_type word_type;
 
@@ -46,18 +46,17 @@ namespace nil {
                 constexpr static const std::size_t key_words = policy_type::key_words;
                 typedef typename policy_type::key_type key_type;
 
-                template<template<typename, typename> class Mode,
-                                                      typename StateAccumulator, std::size_t ValueBits,
-                                                      typename Padding>
+                template<template<typename, typename> class Mode, typename StateAccumulator, std::size_t ValueBits,
+                         typename Padding>
                 struct stream_cipher {
                     typedef block_stream_processor<Mode<idea, Padding>, StateAccumulator,
-                                                     stream_endian::little_octet_big_bit, ValueBits,
-                                                     policy_type::word_bits * 2> type_;
+                                                   stream_endian::little_octet_big_bit, ValueBits,
+                                                   policy_type::word_bits * 2>
+                        type_;
 #ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES
                     typedef type_ type;
 #else
-                    struct type : type_ {
-                    };
+                    struct type : type_ {};
 #endif
                 };
 
@@ -112,10 +111,8 @@ namespace nil {
                     X3 += key[49];
                     X4 = policy_type::mul(X4, key[51]);
 
-                    return {
-                            boost::endian::big_to_native(X1), boost::endian::big_to_native(X2),
-                            boost::endian::big_to_native(X3), boost::endian::big_to_native(X4)
-                    };
+                    return {boost::endian::big_to_native(X1), boost::endian::big_to_native(X2),
+                            boost::endian::big_to_native(X3), boost::endian::big_to_native(X4)};
                 }
 
                 inline void schedule_key(const key_type &key) {
@@ -167,7 +164,7 @@ namespace nil {
                     ct::unpoison(decryption_key.data(), 52);
                 }
             };
-        }
-    }
-}
+        }    // namespace block
+    }        // namespace crypto3
+}    // namespace nil
 #endif

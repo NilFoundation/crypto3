@@ -31,9 +31,9 @@ namespace nil {
                         return x ^ y ^ z;
                     }
                 };
-            }
-        }
-    }
-}
+            }    // namespace detail
+        }        // namespace block
+    }            // namespace crypto3
+}    // namespace nil
 
-#endif //CRYPTO3_MD4_FUNCTIONS_HPP
+#endif    // CRYPTO3_MD4_FUNCTIONS_HPP

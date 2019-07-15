@@ -49,24 +49,21 @@ namespace nil {
                 template<>
                 struct serpent_policy<128> : basic_serpent_policy<128> {
                     typedef std::array<word_type, rounds> constants_type;
-
                 };
 
                 template<>
                 struct serpent_policy<192> : basic_serpent_policy<192> {
                     typedef std::array<word_type, rounds> constants_type;
-
                 };
 
                 template<>
                 struct serpent_policy<256> : basic_serpent_policy<256> {
                     typedef std::array<word_type, rounds> constants_type;
-
                 };
 
-            } // namespace detail
-        }
-    }
-} // namespace nil
+            }    // namespace detail
+        }        // namespace block
+    }            // namespace crypto3
+}    // namespace nil
 
-#endif // CRYPTO3_BLOCK_DETAIL_SERPENT_POLICY_HPP
+#endif    // CRYPTO3_BLOCK_DETAIL_SERPENT_POLICY_HPP

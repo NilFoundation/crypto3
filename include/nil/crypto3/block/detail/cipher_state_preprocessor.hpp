@@ -79,11 +79,10 @@ namespace nil {
                 typedef std::array<value_type, block_values> value_array_type;
 
             private:
-
                 constexpr static const std::size_t length_bits = LengthBits;
                 // FIXME: do something more intelligent than capping at 64
                 constexpr static const std::size_t length_type_bits =
-                        length_bits < word_bits ? word_bits : length_bits > 64 ? 64 : length_bits;
+                    length_bits < word_bits ? word_bits : length_bits > 64 ? 64 : length_bits;
                 typedef typename boost::uint_t<length_type_bits>::least length_type;
 
                 BOOST_STATIC_ASSERT(!length_bits || length_bits % word_bits == 0);
@@ -168,17 +167,18 @@ namespace nil {
                 }
 
             public:
-                cipher_state_preprocessor(const cipher_type &cipher = cipher_type())
-                        : value_array(), c(cipher, cipher_padding_type()), seen() {
+                cipher_state_preprocessor(const cipher_type &cipher = cipher_type()) :
+                    value_array(), c(cipher, cipher_padding_type()), seen() {
                 }
 
-                cipher_state_preprocessor(const cipher_mode_type &mode = cipher_mode_type())
-                        : value_array(), c(mode), seen() {
+                cipher_state_preprocessor(const cipher_mode_type &mode = cipher_mode_type()) :
+                    value_array(), c(mode), seen() {
                 }
 
                 cipher_state_preprocessor(const cipher_type &cipher = cipher_type(),
-                                          const cipher_padding_type &padding = cipher_padding_type())
-                        : value_array(), c(cipher, padding), seen() {
+                                          const cipher_padding_type &padding = cipher_padding_type()) :
+                    value_array(),
+                    c(cipher, padding), seen() {
                 }
 
                 void reset() {
@@ -191,8 +191,8 @@ namespace nil {
                 cipher<cipher_type, cipher_mode_type, cipher_padding_type> c;
                 length_type seen;
             };
-        }
-    }
-} // namespace nil
+        }    // namespace block
+    }        // namespace crypto3
+}    // namespace nil
 
-#endif // CRYPTO3_BLOCK_STREAM_PREPROCESSOR_HPP
+#endif    // CRYPTO3_BLOCK_STREAM_PREPROCESSOR_HPP
