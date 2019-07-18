@@ -50,8 +50,8 @@ namespace nil {
                 public:
                     typedef typename hash_type::digest_type result_type;
 
-                    template<typename Args>
                     // The constructor takes an argument pack.
+                    template<typename Args>
                     hash_impl(const Args &args) : seen(0) {
                     }
 

@@ -2,6 +2,7 @@
 #define CRYPTO3_HASH_ACCUMULATOR_PARAMETERS_HPP
 
 #include <boost/parameter/keyword.hpp>
+
 #include <boost/accumulators/accumulators_fwd.hpp>
 
 namespace nil {
