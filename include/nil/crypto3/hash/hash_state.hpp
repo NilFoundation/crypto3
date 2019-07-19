@@ -29,9 +29,10 @@ namespace nil {
              * @tparam LengthBits
              */
             template<typename Hash>
-            using hash_accumulator
-                = boost::accumulators::accumulator_set<hash::static_digest<Hash::digest_bits>,
-                                                       boost::accumulators::features<accumulators::tag::hash<Hash>>>;
+            using hash_accumulator =
+                boost::accumulators::accumulator_set<hash::static_digest<Hash::digest_bits>,
+                                                     boost::accumulators::features<accumulators::tag::hash<Hash>>,
+                                                     std::size_t>;
         }    // namespace hash
     }        // namespace crypto3
 }    // namespace nil

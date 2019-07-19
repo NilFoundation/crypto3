@@ -50,8 +50,8 @@ namespace nil {
                 public:
                     typedef typename hash_type::digest_type result_type;
 
-                    template<typename Args>
                     // The constructor takes an argument pack.
+                    template<typename Args>
                     hash_impl(const Args &args) : seen(0) {
                     }
 
@@ -74,7 +74,6 @@ namespace nil {
                     }
 
                 protected:
-
                     inline void resolve_type(const word_type &value, std::size_t bits) {
                         if (bits == std::size_t()) {
                             process(value, word_bits);
