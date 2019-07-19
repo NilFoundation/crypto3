@@ -74,7 +74,6 @@ namespace nil {
                     }
 
                 protected:
-
                     inline void resolve_type(const word_type &value, std::size_t bits) {
                         if (bits == std::size_t()) {
                             process(value, word_bits);

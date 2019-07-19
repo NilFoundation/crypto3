@@ -84,7 +84,7 @@ namespace nil {
                     pack<endian_type, value_bits, word_bits>(value_array, block);
 
                     // Process the block
-                    acc(block, block_bits);
+                    acc(block, this->block_bits);
 
                     // Reset seen if we don't need to track the length
                     if (!length_bits) {
@@ -107,7 +107,7 @@ namespace nil {
                     }
 
                     // Process the last block
-                    acc(block, block_bits, construction_type::salt_value);
+                    acc(block, this->block_bits, construction_type::salt_value);
                 }
 
                 template<typename Dummy>
