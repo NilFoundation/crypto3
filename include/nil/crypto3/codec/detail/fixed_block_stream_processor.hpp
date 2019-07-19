@@ -16,6 +16,8 @@
 #include <nil/crypto3/codec/detail/pack.hpp>
 #include <nil/crypto3/codec/detail/digest.hpp>
 
+#include <nil/crypto3/codec/accumulators/codec.hpp>
+
 #include <boost/integer.hpp>
 #include <boost/static_assert.hpp>
 #include <boost/utility/enable_if.hpp>
@@ -27,7 +29,7 @@ namespace nil {
         namespace codec {
             template<typename Mode, typename StateAccumulator, typename Params>
             struct fixed_block_stream_processor {
-            private:
+            public:
                 typedef Mode mode_type;
                 typedef StateAccumulator accumulator_type;
                 typedef Params params_type;
@@ -69,7 +71,9 @@ namespace nil {
                         pack<endian_type, value_bits, input_value_bits>(cache.begin(), cache.end(), block);
 
                         // Process the block
-                        state(block);
+                        // Boost.Parameter is awful with constexpr static const params in argument packs
+                        std::size_t ibb = input_block_bits;
+                        state(block, ibb);
 
                         // Reset seen if we don't need to track the length
                         if (!length_bits) {
@@ -93,7 +97,9 @@ namespace nil {
                         pack<endian_type, value_bits, input_value_bits>(first, first + block_values, block);
                         seen += value_bits * block_values;
 
-                        state(block);
+                        // Boost.Parameter is awful with constexpr static const params in argument packs
+                        std::size_t ibb = input_block_bits;
+                        state(block, ibb);
 
                         // Reset seen if we don't need to track the length
                         if (!length_bits) {

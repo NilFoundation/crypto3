@@ -19,15 +19,14 @@
 
 #include <boost/container/static_vector.hpp>
 
+#include <nil/crypto3/codec/accumulators/parameters/bits.hpp>
+
 #include <nil/crypto3/codec/detail/make_array.hpp>
 #include <nil/crypto3/codec/detail/digest.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace accumulators {
-            BOOST_PARAMETER_KEYWORD(tag, bits)
-            BOOST_ACCUMULATORS_IGNORE_GLOBAL(bits)
-
             namespace impl {
                 template<typename Mode>
                 struct codec_impl : boost::accumulators::accumulator_base {

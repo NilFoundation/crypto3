@@ -38,7 +38,7 @@ namespace nil {
             template<typename ProcessingMode>
             using codec_accumulator = boost::accumulators::accumulator_set<
                 codec::digest<ProcessingMode::output_block_bits>,
-                boost::accumulators::features<accumulators::tag::codec<ProcessingMode>>>;
+                boost::accumulators::features<accumulators::tag::codec<ProcessingMode>>, std::size_t>;
         }    // namespace codec
     }        // namespace crypto3
 }    // namespace nil
