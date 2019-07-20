@@ -76,7 +76,7 @@ namespace nil {
 
                     // Process the block
                     std::size_t bb = block_bits;
-                    acc(block, bb);
+                    acc(block, accumulators::bits = bb);
 
                     // Reset seen if we don't need to track the length
                     if (!length_bits) {
@@ -99,8 +99,7 @@ namespace nil {
                     }
 
                     // Process the last block
-                    std::size_t bb = seen % block_bits;
-                    acc(block, bb);
+                    acc(block, accumulators::bits = seen % block_bits);
                 }
 
                 template<typename Dummy>
@@ -134,7 +133,7 @@ namespace nil {
 
                         // Process the block
                         std::size_t bb = block_bits;
-                        acc(block, bb);
+                        acc(block, accumulators::bits = bb);
                         seen += block_bits;
 
                         // Reset seen if we don't need to track the length

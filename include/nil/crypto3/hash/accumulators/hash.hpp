@@ -20,6 +20,7 @@
 #include <boost/container/static_vector.hpp>
 
 #include <nil/crypto3/hash/accumulators/parameters/bits.hpp>
+#include <nil/crypto3/hash/accumulators/parameters/salt.hpp>
 
 #include <nil/crypto3/hash/detail/make_array.hpp>
 #include <nil/crypto3/hash/detail/static_digest.hpp>

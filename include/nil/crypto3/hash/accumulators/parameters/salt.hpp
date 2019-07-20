@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_HASH_ACCUMULATORS_PARAMETERS_BITS_HPP
-#define CRYPTO3_HASH_ACCUMULATORS_PARAMETERS_BITS_HPP
+#ifndef CRYPTO3_HASH_ACCUMULATORS_PARAMETERS_SALT_HPP
+#define CRYPTO3_HASH_ACCUMULATORS_PARAMETERS_SALT_HPP
 
 #include <boost/parameter/keyword.hpp>
 
@@ -17,8 +17,8 @@
 namespace nil {
     namespace crypto3 {
         namespace accumulators {
-            BOOST_PARAMETER_KEYWORD(tag, bits)
-            BOOST_ACCUMULATORS_IGNORE_GLOBAL(bits)
+            BOOST_PARAMETER_KEYWORD(tag, salt)
+            BOOST_ACCUMULATORS_IGNORE_GLOBAL(salt)
         }    // namespace accumulators
     }        // namespace crypto3
 }    // namespace nil
