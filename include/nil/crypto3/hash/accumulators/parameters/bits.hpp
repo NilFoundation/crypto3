@@ -1,5 +1,14 @@
-#ifndef CRYPTO3_HASH_ACCUMULATOR_PARAMETERS_BITS_HPP
-#define CRYPTO3_HASH_ACCUMULATOR_PARAMETERS_BITS_HPP
+//---------------------------------------------------------------------------//
+// Copyright (c) 2018-2019 Nil Foundation AG
+// Copyright (c) 2018-2019 Mikhail Komarov <nemo@nilfoundation.org>
+//
+// Distributed under the Boost Software License, Version 1.0
+// See accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt
+//---------------------------------------------------------------------------//
+
+#ifndef CRYPTO3_HASH_ACCUMULATORS_PARAMETERS_BITS_HPP
+#define CRYPTO3_HASH_ACCUMULATORS_PARAMETERS_BITS_HPP
 
 #include <boost/parameter/keyword.hpp>
 

@@ -1,5 +1,14 @@
-#ifndef CRYPTO3_HASH_ACCUMULATOR_PARAMETERS_SALT_HPP
-#define CRYPTO3_HASH_ACCUMULATOR_PARAMETERS_SALT_HPP
+//---------------------------------------------------------------------------//
+// Copyright (c) 2018-2019 Nil Foundation AG
+// Copyright (c) 2018-2019 Mikhail Komarov <nemo@nilfoundation.org>
+//
+// Distributed under the Boost Software License, Version 1.0
+// See accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt
+//---------------------------------------------------------------------------//
+
+#ifndef CRYPTO3_HASH_ACCUMULATORS_PARAMETERS_SALT_HPP
+#define CRYPTO3_HASH_ACCUMULATORS_PARAMETERS_SALT_HPP
 
 #include <boost/parameter/keyword.hpp>
 
@@ -10,8 +19,8 @@ namespace nil {
         namespace accumulators {
             BOOST_PARAMETER_KEYWORD(tag, salt)
             BOOST_ACCUMULATORS_IGNORE_GLOBAL(salt)
-        }
-    }
-}
+        }    // namespace accumulators
+    }        // namespace crypto3
+}    // namespace nil
 
-#endif //CRYPTO3_PARAMETERS_HPP
+#endif    // CRYPTO3_PARAMETERS_HPP
