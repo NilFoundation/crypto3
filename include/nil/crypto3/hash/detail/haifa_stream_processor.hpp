@@ -107,7 +107,8 @@ namespace nil {
                     }
 
                     // Process the last block
-                    acc(block, this->block_bits, construction_type::salt_value);
+                    std::size_t bb = block_bits;
+                    acc(block, accumulators::bits = bb, construction_type::salt_value);
                 }
 
                 template<typename Dummy>
