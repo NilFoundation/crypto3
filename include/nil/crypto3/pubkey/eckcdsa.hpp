@@ -9,15 +9,17 @@ namespace nil {
         /**
          * This class represents ECKCDSA public keys.
          */
-        class eckcdsa_public_key : public virtual ec_public_key {
+        template<typename CurveType, typename NumberType = typename CurveType::number_type>
+        class eckcdsa_public_key : public virtual ec_public_key<CurveType, NumberType> {
         public:
             /**
              * Construct a public key from a given public point.
              * @param dom_par the domain parameters associated with this key
              * @param public_point the public point defining this key
              */
-            eckcdsa_public_key(const ec_group &dom_par, const point_gfp &public_point) :
-                ec_public_key(dom_par, public_point) {
+            eckcdsa_public_key(const ec_group<CurveType, NumberType> &dom_par,
+                               const point_gfp<CurveType> &public_point) :
+                ec_public_key<CurveType, NumberType>(dom_par, public_point) {
             }
 
             /**
@@ -26,7 +28,7 @@ namespace nil {
              * @param key_bits DER encoded public key bits
              */
             eckcdsa_public_key(const algorithm_identifier &alg_id, const std::vector<uint8_t> &key_bits) :
-                ec_public_key(alg_id, key_bits) {
+                ec_public_key<CurveType, NumberType>(alg_id, key_bits) {
             }
 
             /**
@@ -63,7 +65,9 @@ namespace nil {
         /**
          * This class represents ECKCDSA private keys.
          */
-        class eckcdsa_private_key final : public eckcdsa_public_key, public ec_private_key {
+        template<typename CurveType, typename NumberType = typename CurveType::number_type>
+        class eckcdsa_private_key : public eckcdsa_public_key<CurveType, NumberType>,
+                                    public ec_private_key<CurveType, NumberType> {
         public:
             /**
              * Load a private key.
@@ -71,7 +75,7 @@ namespace nil {
              * @param key_bits ECPrivateKey bits
              */
             eckcdsa_private_key(const algorithm_identifier &alg_id, const secure_vector<uint8_t> &key_bits) :
-                ec_private_key(alg_id, key_bits, true) {
+                ec_private_key<CurveType, NumberType>(alg_id, key_bits, true) {
             }
 
             /**
@@ -80,9 +84,9 @@ namespace nil {
              * @param domain parameters to used for this key
              * @param x the private key (if zero, generate a new random key)
              */
-            eckcdsa_private_key(random_number_generator &rng, const ec_group &domain,
+            eckcdsa_private_key(random_number_generator &rng, const ec_group<CurveType, NumberType> &domain,
                                 const boost::multiprecision::cpp_int &x = 0) :
-                ec_private_key(rng, domain, x, true) {
+                ec_private_key<CurveType, NumberType>(rng, domain, x, true) {
             }
 
             bool check_key(random_number_generator &rng, bool) const override;
@@ -92,10 +96,11 @@ namespace nil {
                                                                           const std::string &provider) const override;
         };
 
+        template<typename CurveType, typename NumberType = typename CurveType::number_type>
         class eckcdsa {
         public:
-            typedef eckcdsa_public_key public_key_policy;
-            typedef eckcdsa_private_key private_key_policy;
+            typedef eckcdsa_public_key<CurveType, NumberType> public_key_policy;
+            typedef eckcdsa_private_key<CurveType, NumberType> private_key_policy;
         };
     }    // namespace crypto3
 }    // namespace nil

@@ -272,7 +272,7 @@ namespace nil {
                     return;
                 }
 
-                const curve_gfp<Backend, ExpressionTemplates> &curve = points[0].m_curve;
+                const curve_gfp<number<Backend, ExpressionTemplates>> &curve = points[0].m_curve;
                 const number<Backend, ExpressionTemplates> &rep_1 = curve.get_1_rep();
 
                 if (ws.size() < curve.get_ws_size()) {
@@ -804,7 +804,6 @@ namespace nil {
                 }
             }
 
-        private:
             curve_type m_curve;
             number_type m_coord_x, m_coord_y, m_coord_z;
         };

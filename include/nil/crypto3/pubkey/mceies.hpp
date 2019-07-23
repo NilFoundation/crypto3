@@ -32,6 +32,10 @@ namespace nil {
                                               const uint8_t ad[], size_t ad_len,
                                               const std::string &aead = "AES-256/OCB");
 
+        template<typename AEADMode>
+        class mceies {
+
+        };
     }    // namespace crypto3
 }    // namespace nil
 

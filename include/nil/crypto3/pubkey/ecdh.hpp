@@ -9,7 +9,8 @@ namespace nil {
         /**
          * This class represents ECDH Public Keys.
          */
-        class ecdh_public_key : public virtual ec_public_key {
+        template<typename CurveType, typename NumberType = typename CurveType::number_type>
+        class ecdh_public_key : public virtual ec_public_key<CurveType, NumberType> {
         public:
             /**
              * Create an ECDH public key.
@@ -66,7 +67,10 @@ namespace nil {
         /**
          * This class represents ECDH Private Keys.
          */
-        class ecdh_private_key final : public ecdh_public_key, public ec_private_key, public pk_key_agreement_key {
+        template<typename CurveType, typename NumberType = typename CurveType::number_type>
+        class ecdh_private_key : public ecdh_public_key<CurveType, NumberType>,
+                                 public ec_private_key<CurveType, NumberType>,
+                                 public pk_key_agreement_key {
         public:
             /**
              * Load a private key.
@@ -104,10 +108,11 @@ namespace nil {
                                         const std::string &provider) const override;
         };
 
+        template<typename CurveType, typename NumberType = typename CurveType::number_type>
         class ecdh {
         public:
-            typedef ecdh_public_key public_key_policy;
-            typedef ecdh_private_key private_key_policy;
+            typedef ecdh_public_key<CurveType, NumberType> public_key_policy;
+            typedef ecdh_private_key<CurveType, NumberType> private_key_policy;
         };
     }    // namespace crypto3
 }    // namespace nil

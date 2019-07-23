@@ -330,50 +330,6 @@ namespace nil {
             }
         }
 
-        ec_group::ec_group() {
-        }
-
-        ec_group::~ec_group() {
-            // shared_ptr possibly freed here
-        }
-
-        ec_group::ec_group(const oid_t &domain_oid) {
-            this->m_data = ec_group_data().lookup(domain_oid);
-            if (!this->m_data) {
-                throw std::invalid_argument("Unknown ec_group " + domain_oid.as_string());
-            }
-        }
-
-        ec_group::ec_group(const std::string &str) {
-            if (str.empty()) {
-                return;
-            }    // no initialization / uninitialized
-
-            try {
-                oid_t oid = oid_tS::lookup(str);
-                if (!oid.empty()) {
-                    m_data = ec_group_data().lookup(oid);
-                }
-            } catch (Invalid_oid_t &) {
-            }
-
-            if (m_data == nullptr) {
-                if (str.size() > 30 && str.substr(0, 29) == "-----BEGIN EC PARAMETERS-----") {
-                    // OK try it as PEM ...
-                    secure_vector<uint8_t> ber = pem_code::decode_check_label(str, "EC PARAMETERS");
-                    this->m_data = ber_decode_ec_group(ber.data(), ber.size());
-                }
-            }
-
-            if (m_data == nullptr) {
-                throw std::invalid_argument("Unknown ECC group '" + str + "'");
-            }
-        }
-
-        ec_group::ec_group(const std::vector<uint8_t> &ber) {
-            m_data = ber_decode_ec_group(ber.data(), ber.size());
-        }
-
         const ec_group_data &ec_group::data() const {
             if (m_data == nullptr) {
                 throw Invalid_State("ec_group uninitialized");

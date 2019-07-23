@@ -1,7 +1,7 @@
 #ifndef CRYPTO3_DL_ALGO_HPP
 #define CRYPTO3_DL_ALGO_HPP
 
-#include <nil/crypto3/pubkey/dl_group.hpp>
+#include <nil/crypto3/pubkey/dl_group/dl_group.hpp>
 #include <nil/crypto3/pubkey/pk_keys.hpp>
 
 namespace nil {

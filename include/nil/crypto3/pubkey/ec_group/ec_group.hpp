@@ -57,27 +57,58 @@ namespace nil {
              * Decode a BER encoded ECC domain parameter set
              * @param ber_encoding the bytes of the BER encoding
              */
-            explicit ec_group(const std::vector<uint8_t> &ber_encoding);
+            explicit ec_group(const std::vector<uint8_t> &ber_encoding) {
+                m_data = ber_decode_ec_group(ber.data(), ber.size());
+            }
 
             /**
              * Create an EC domain by oid_t (or throw if unknown)
              * @param oid the oid_t of the EC domain to create
              */
-            explicit ec_group(const oid_t &oid);
+            explicit ec_group(const oid_t &oid) {
+                this->m_data = ec_group_data().lookup(oid);
+                if (!this->m_data) {
+                    throw std::invalid_argument("Unknown ec_group " + oid.as_string());
+                }
+            }
 
             /**
              * Create an EC domain from PEM encoding (as from pem_encode), or
              * from an oid_t name (eg "secp256r1", or "1.2.840.10045.3.1.7")
-             * @param pem_or_oid PEM-encoded data, or an oid_t
+             * @param str PEM-encoded data, or an oid_t
              */
-            explicit ec_group(const std::string &pem_or_oid);
+            explicit ec_group(const std::string &str) {
+                if (str.empty()) {
+                    return;
+                }    // no initialization / uninitialized
+
+                try {
+                    oid_t oid = oid_tS::lookup(str);
+                    if (!oid.empty()) {
+                        m_data = ec_group_data().lookup(oid);
+                    }
+                } catch (Invalid_oid_t &) {
+                }
+
+                if (m_data == nullptr) {
+                    if (str.size() > 30 && str.substr(0, 29) == "-----BEGIN EC PARAMETERS-----") {
+                        // OK try it as PEM ...
+                        secure_vector<uint8_t> ber = pem_code::decode_check_label(str, "EC PARAMETERS");
+                        this->m_data = ber_decode_ec_group(ber.data(), ber.size());
+                    }
+                }
+
+                if (m_data == nullptr) {
+                    throw std::invalid_argument("Unknown ECC group '" + str + "'");
+                }
+            }
 
             /**
              * Create an uninitialized ec_group
              */
-            ec_group();
+            ec_group() = default;
 
-            ~ec_group();
+            ~ec_group() = default;
 
             /**
              * Create the DER encoding of this domain
@@ -95,7 +126,9 @@ namespace nil {
             /**
              * Return if a == -3 mod p
              */
-            bool a_is_minus_3() const;
+            bool a_is_minus_3() const {
+                return m_a_is_minus_3;
+            }
 
             /**
              * Return if a == 0 mod p
@@ -244,8 +277,8 @@ namespace nil {
              * @return x coordinate of base_point*k
              */
             template<typename UniformRandomGenerator>
-            number_type<curve_type> blinded_base_point_multiply_x(const number_type &k, UniformRandomGenerator &rng,
-                                                                  std::vector<number_type> &ws) const;
+            number_type blinded_base_point_multiply_x(const number_type &k, UniformRandomGenerator &rng,
+                                                      std::vector<number_type> &ws) const;
 
             /**
              * Blinded point multiplication, attempts resistance to side channels

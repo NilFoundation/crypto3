@@ -6,19 +6,6 @@
 
 namespace nil {
     namespace crypto3 {
-
-        bool ecgdsa_private_key::check_key(random_number_generator &rng, bool strong) const {
-            if (!public_point().on_the_curve()) {
-                return false;
-            }
-
-            if (!strong) {
-                return true;
-            }
-
-            return key_pair::signature_consistency_check(rng, *this, "EMSA1(SHA-256)");
-        }
-
         namespace {
 
 /**
