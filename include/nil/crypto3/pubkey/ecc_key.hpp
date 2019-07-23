@@ -17,21 +17,43 @@ namespace nil {
          * cannot be used for verification until its domain parameters are set
          * by calling the corresponding member function.
          */
+        template<typename CurveType, typename NumberType = typename CurveType::number_type>
         class ec_public_key : public virtual public_key_policy {
         public:
+            typedef NumberType number_type;
+            typedef CurveType curve_type;
             /**
              * Create a public key.
              * @param dom_par EC domain parameters
              * @param pub_point public point on the curve
              */
-            ec_public_key(const ec_group &dom_par, const point_gfp &pub_point);
+            ec_public_key(const ec_group<CurveType> &dom_par, const point_gfp<NumberType> &pub_point) :
+                m_domain_params(dom_par), m_public_key(pub_point) {
+                if (!dom_par.get_curve_oid().empty()) {
+                    m_domain_encoding = EC_DOMPAR_ENC_OID;
+                } else {
+                    m_domain_encoding = EC_DOMPAR_ENC_EXPLICIT;
+                }
+
+#if 0
+                    if(domain().get_curve() != public_point().get_curve())
+               throw std::invalid_argument("ec_public_key: curve mismatch in constructor");
+#endif
+            }
 
             /**
              * Load a public key.
              * @param alg_id the X.509 algorithm identifier
              * @param key_bits DER encoded public key bits
              */
-            ec_public_key(const algorithm_identifier &alg_id, const std::vector<uint8_t> &key_bits);
+            ec_public_key(const algorithm_identifier &alg_id, const std::vector<uint8_t> &key_bits) :
+                m_domain_params {ec_group(alg_id.get_parameters())}, m_public_key {domain().OS2ECP(key_bits)} {
+                if (!domain().get_curve_oid().empty()) {
+                    m_domain_encoding = EC_DOMPAR_ENC_OID;
+                } else {
+                    m_domain_encoding = EC_DOMPAR_ENC_EXPLICIT;
+                }
+            }
 
             ec_public_key(const ec_public_key &other) = default;
 
@@ -45,15 +67,22 @@ namespace nil {
              * domain parameters of this point are not set
              * @result the public point of this key
              */
-            const point_gfp &public_point() const {
+            const point_gfp<NumberType> &public_point() const {
                 return m_public_key;
             }
 
-            algorithm_identifier get_algorithm_identifier() const override;
+            algorithm_identifier get_algorithm_identifier() const override {
+                return algorithm_identifier(oid_t(), der_domain());
+            }
 
-            std::vector<uint8_t> public_key_bits() const override;
+            std::vector<uint8_t> public_key_bits() const override {
+                return public_point().encode(point_encoding());
+            }
 
-            bool check_key(random_number_generator &rng, bool strong) const override;
+            template<typename UniformRandomGenerator>
+            bool check_key(UniformRandomGenerator &rng, bool strong) const override {
+                return m_domain_params.verify_group(rng) && m_domain_params.verify_public_element(public_point());
+            }
 
             /**
              * Get the domain parameters of this key.
@@ -61,7 +90,7 @@ namespace nil {
              * domain parameters of this point are not set
              * @result the domain parameters of this key
              */
-            const ec_group &domain() const {
+            const ec_group<CurveType> &domain() const {
                 return m_domain_params;
             }
 
@@ -69,13 +98,32 @@ namespace nil {
              * Set the domain parameter encoding to be used when encoding this key.
              * @param enc the encoding to use
              */
-            void set_parameter_encoding(ec_group_encoding enc);
+            void set_parameter_encoding(ec_group_encoding enc) {
+                if (form != EC_DOMPAR_ENC_EXPLICIT && form != EC_DOMPAR_ENC_IMPLICITCA && form != EC_DOMPAR_ENC_OID) {
+                    throw std::invalid_argument("Invalid encoding form for EC-key object specified");
+                }
+
+                if ((form == EC_DOMPAR_ENC_OID) && (m_domain_params.get_curve_oid().empty())) {
+                    throw std::invalid_argument(
+                        "Invalid encoding form oid_t specified for "
+                        "EC-key object whose corresponding domain "
+                        "parameters are without oid_t");
+                }
+
+                m_domain_encoding = form;
+            }
 
             /**
              * Set the point encoding method to be used when encoding this key.
              * @param enc the encoding to use
              */
-            void set_point_encoding(point_gfp::compression_type enc);
+            void set_point_encoding(typename point_gfp<NumberType>::compression_type enc) {
+                if (enc != point_gfp::COMPRESSED && enc != point_gfp::UNCOMPRESSED && enc != point_gfp::HYBRID) {
+                    throw std::invalid_argument("Invalid point encoding for ec_public_key");
+                }
+
+                m_point_encoding = enc;
+            }
 
             /**
              * Return the DER encoding of this keys domain in whatever format
@@ -97,29 +145,37 @@ namespace nil {
              * Get the point encoding method to be used when encoding this key.
              * @result the encoding to use
              */
-            point_gfp::compression_type point_encoding() const {
+            typename point_gfp<NumberType>::compression_type point_encoding() const {
                 return m_point_encoding;
             }
 
-            size_t key_length() const override;
+            size_t key_length() const override {
+                return domain().get_p_bits();
+            }
 
-            size_t estimated_strength() const override;
+            size_t estimated_strength() const override {
+                return ecp_work_factor(key_length());
+            }
 
         protected:
             ec_public_key() : m_domain_params {}, m_public_key {}, m_domain_encoding(EC_DOMPAR_ENC_EXPLICIT) {
             }
 
-            ec_group m_domain_params;
-            point_gfp m_public_key;
+            ec_group<CurveType> m_domain_params;
+            point_gfp<NumberType> m_public_key;
             ec_group_encoding m_domain_encoding;
-            point_gfp::compression_type m_point_encoding = point_gfp::UNCOMPRESSED;
+            typename point_gfp<NumberType>::compression_type m_point_encoding =
+                typename point_gfp<NumberType>::UNCOMPRESSED;
         };
 
         /**
          * This abstract class represents ECC private keys
          */
-        class ec_private_key : public virtual ec_public_key, public virtual private_key_policy {
+        template<typename CurveType, typename NumberType = typename CurveType::number_type>
+        class ec_private_key : public ec_public_key<CurveType, NumberType>, public private_key_policy {
         public:
+            typedef typename ec_public_key<CurveType, NumberType>::curve_type curve_type;
+            typedef typename ec_public_key<CurveType, NumberType>::number_type number_type;
             /*
              * If x=0, creates a new private key in the domain
              * using the given random. If with_modular_inverse is set,
@@ -128,8 +184,9 @@ namespace nil {
              * x (as in ECGDSA and ECKCDSA), otherwise by
              * multiplying directly with x (as in ECDSA).
              */
-            ec_private_key(random_number_generator &rng, const ec_group &domain,
-                           const boost::multiprecision::cpp_int &x, bool with_modular_inverse = false) {
+            template<typename UniformRandomGenerator, typename Backend, expression_template_option ExpressionTemplates>
+            ec_private_key(UniformRandomGenerator &rng, const ec_group<CurveType, NumberType> &domain,
+                           const number<Backend, ExpressionTemplates> &x, bool with_modular_inverse = false) {
                 m_domain_params = ec_group;
                 if (!ec_group.get_curve_oid().empty()) {
                     m_domain_encoding = EC_DOMPAR_ENC_OID;
@@ -137,7 +194,7 @@ namespace nil {
                     m_domain_encoding = EC_DOMPAR_ENC_EXPLICIT;
                 }
 
-                const boost::multiprecision::cpp_int &order = m_domain_params.get_order();
+                const typename ec_group<CurveType>::number_type &order = m_domain_params.get_order();
 
                 m_private_key = x;
 
@@ -186,7 +243,7 @@ namespace nil {
                 if (public_key_bits.empty()) {
                     if (with_modular_inverse) {
                         // ECKCDSA
-                        const boost::multiprecision::cpp_int &order = m_domain_params.get_order();
+                        const typename ec_group<CurveType>::number_type &order = m_domain_params.get_order();
                         m_public_key = domain().get_base_point() * inverse_mod(m_private_key, order);
                     } else {
                         m_public_key = domain().get_base_point() * m_private_key;
@@ -214,7 +271,13 @@ namespace nil {
              * Get the private key value of this key object.
              * @result the private key value of this key object
              */
-            const boost::multiprecision::cpp_int &private_value() const;
+            const number_type &private_value() const {
+                if (m_private_key == 0) {
+                    throw Invalid_State("ec_private_key::private_value - uninitialized");
+                }
+
+                return m_private_key;
+            }
 
             ec_private_key(const ec_private_key &other) = default;
 
@@ -225,7 +288,7 @@ namespace nil {
         protected:
             ec_private_key() = default;
 
-            boost::multiprecision::cpp_int m_private_key;
+            number_type m_private_key;
         };
     }    // namespace crypto3
 }    // namespace nil

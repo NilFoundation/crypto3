@@ -22,8 +22,6 @@ namespace nil {
             typedef typename policy_type::key_type key_type;
             typedef typename policy_type::key_schedule_type key_schedule_type;
 
-            typedef typename policy_type::block_type block_type;
-
             public_key(const key_type &key) {
             }
 
@@ -39,8 +37,6 @@ namespace nil {
 
             typedef typename public_key<Policy>::key_type key_type;
             typedef typename public_key<Policy>::key_schedule_type key_schedule_type;
-
-            typedef typename public_key<Policy>::block_type block_type;
 
             private_key(const key_type &key) : public_key<Policy>(key) {
             }

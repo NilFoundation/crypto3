@@ -2,6 +2,7 @@
 #define CRYPTO3_ECC_DOMAIN_PARAMETERS_HPP
 
 #include <nil/crypto3/pubkey/ec_group/point_gfp.hpp>
+#include <nil/crypto3/pubkey/ec_group/point_mul.hpp>
 
 #include <nil/crypto3/asn1/asn1_oid.hpp>
 
@@ -16,8 +17,6 @@ namespace nil {
          */
         enum ec_group_encoding { EC_DOMPAR_ENC_EXPLICIT = 0, EC_DOMPAR_ENC_IMPLICITCA = 1, EC_DOMPAR_ENC_oid_t = 2 };
 
-        class curve_gfp;
-
         class ec_group_data;
 
         class ec_group_data_map;
@@ -25,8 +24,12 @@ namespace nil {
         /**
          * @brief Class representing an elliptic curve
          */
-        class ec_group final {
+        template<typename CurveType, typename NumberType = typename CurveType::number_type>
+        class ec_group {
         public:
+            typedef NumberType number_type;
+            typedef CurveType curve_type;
+
             /**
              * Construct Domain parameters from specified parameters
              * @param p the elliptic curve p
@@ -38,9 +41,16 @@ namespace nil {
              * @param cofactor the cofactor
              * @param oid an optional oid_t used to identify this curve
              */
-            ec_group(const cpp_int &p, const cpp_int &a, const cpp_int &b, const cpp_int &base_x, const cpp_int &base_y,
-                     const cpp_int &order, const cpp_int &cofactor, const oid_t &oid = oid_t()) {
-                m_data = ec_group_data().lookup_or_create(p, a, b, base_x, base_y, order, cofactor, oid);
+            template<typename Backend, expression_template_option ExpressionTemplates>
+            ec_group(const number<Backend, ExpressionTemplates> &p, const number<Backend, ExpressionTemplates> &a,
+                     const number<Backend, ExpressionTemplates> &b, const number<Backend, ExpressionTemplates> &base_x,
+                     const number<Backend, ExpressionTemplates> &base_y,
+                     const number<Backend, ExpressionTemplates> &order,
+                     const number<Backend, ExpressionTemplates> &cofactor, const oid_t &oid = oid_t()) :
+                m_curve(p, a, b),
+                m_base_point(m_curve, base_x, base_y), m_g_x(base_x), m_g_y(base_y), m_order(order),
+                m_cofactor(cofactor), m_mod_order(order), m_base_mult(m_base_point, m_mod_order), m_oid(oid),
+                m_p_bits(msb(p)), m_order_bits(msb(order)), m_a_is_minus_3(a == p - 3), m_a_is_zero(a == 0) {
             }
 
             /**
@@ -115,70 +125,70 @@ namespace nil {
             /**
              * Return the prime modulus of the field
              */
-            const cpp_int &get_p() const;
+            const number_type &get_p() const;
 
             /**
              * Return the a parameter of the elliptic curve equation
              */
-            const cpp_int &get_a() const;
+            const number_type &get_a() const;
 
             /**
              * Return the b parameter of the elliptic curve equation
              */
-            const cpp_int &get_b() const;
+            const number_type &get_b() const;
 
             /**
              * Return group base point
              * @result base point
              */
-            const point_gfp &get_base_point() const;
+            const point_gfp<curve_type> &get_base_point() const;
 
             /**
              * Return the x coordinate of the base point
              */
-            const cpp_int &get_g_x() const;
+            const number_type &get_g_x() const;
 
             /**
              * Return the y coordinate of the base point
              */
-            const cpp_int &get_g_y() const;
+            const number_type &get_g_y() const;
 
             /**
              * Return the order of the base point
              * @result order of the base point
              */
-            const cpp_int &get_order() const;
+            const number_type &get_order() const;
 
             /*
              * Reduce x modulo the order
              */
-            cpp_int mod_order(const cpp_int &x) const;
+            number_type mod_order(const number_type &x) const;
 
             /*
              * Return inverse of x modulo the order
              */
-            cpp_int inverse_mod_order(const cpp_int &x) const;
+            number_type inverse_mod_order(const number_type &x) const;
 
             /*
              * Reduce (x*x) modulo the order
              */
-            cpp_int square_mod_order(const cpp_int &x) const;
+            number_type square_mod_order(const number_type &x) const;
 
             /*
              * Reduce (x*y) modulo the order
              */
-            cpp_int multiply_mod_order(const cpp_int &x, const cpp_int &y) const;
+            number_type multiply_mod_order(const number_type &x, const number_type &y) const;
 
             /*
              * Reduce (x*y*z) modulo the order
              */
-            cpp_int multiply_mod_order(const cpp_int &x, const cpp_int &y, const cpp_int &z) const;
+            number_type multiply_mod_order(const number_type &x, const number_type &y, const number_type &z) const;
 
             /**
              * Return the cofactor
              * @result the cofactor
              */
-            const cpp_int &get_cofactor() const;
+            const number_type &get_cofactor() const;
 
             /**
              * Check if y is a plausible point on the curve
@@ -186,7 +196,7 @@ namespace nil {
              * In particular, checks that it is a point on the curve, not infinity,
              * and that it has order matching the group.
              */
-            bool verify_public_element(const point_gfp &y) const;
+            bool verify_public_element(const point_gfp<curve_type> &y) const;
 
             /**
              * Return the oid_t of these domain parameters
@@ -205,13 +215,13 @@ namespace nil {
             /**
              * Return a point on this curve with the affine values x, y
              */
-            point_gfp point(const cpp_int &x, const cpp_int &y) const;
+            point_gfp<curve_type> point(const number_type &x, const number_type &y) const;
 
             /**
              * Multi exponentiate. Not constant time.
              * @return base_point*x + pt*y
              */
-            point_gfp point_multiply(const cpp_int &x, const point_gfp &pt, const cpp_int &y) const;
+            point_gfp<curve_type> point_multiply(const number_type &x, const point_gfp &pt, const number_type &y) const;
 
             /**
              * Blinded point multiplication, attempts resistance to side channels
@@ -220,8 +230,9 @@ namespace nil {
              * @param ws a temp workspace
              * @return base_point*k
              */
-            point_gfp blinded_base_point_multiply(const cpp_int &k, random_number_generator &rng,
-                                                  std::vector<cpp_int> &ws) const;
+            template<typename UniformRandomGenerator>
+            point_gfp<curve_type> blinded_base_point_multiply(const number_type &k, UniformRandomGenerator &rng,
+                                                              std::vector<number_type> &ws) const;
 
             /**
              * Blinded point multiplication, attempts resistance to side channels
@@ -232,8 +243,9 @@ namespace nil {
              * @param ws a temp workspace
              * @return x coordinate of base_point*k
              */
-            cpp_int blinded_base_point_multiply_x(const cpp_int &k, random_number_generator &rng,
-                                                  std::vector<cpp_int> &ws) const;
+            template<typename UniformRandomGenerator>
+            number_type<curve_type> blinded_base_point_multiply_x(const number_type &k, UniformRandomGenerator &rng,
+                                                                  std::vector<number_type> &ws) const;
 
             /**
              * Blinded point multiplication, attempts resistance to side channels
@@ -243,25 +255,28 @@ namespace nil {
              * @param ws a temp workspace
              * @return point*k
              */
-            point_gfp blinded_var_point_multiply(const point_gfp &point, const cpp_int &k, random_number_generator &rng,
-                                                 std::vector<cpp_int> &ws) const;
+            template<typename UniformRandomGenerator>
+            point_gfp<curve_type> blinded_var_point_multiply(const point_gfp<curve_type> &point, const number_type &k,
+                                                             UniformRandomGenerator &rng,
+                                                             std::vector<number_type> &ws) const;
 
             /**
              * Return a random scalar ie an integer in [1,order)
              */
-            cpp_int random_scalar(random_number_generator &rng) const;
+            template<typename UniformRandomGenerator>
+            number_type random_scalar(UniformRandomGenerator &rng) const;
 
             /**
              * Return the zero (or infinite) point on this curve
              */
-            point_gfp zero_point() const;
+            point_gfp<curve_type> zero_point() const;
 
-            size_t point_size(point_gfp::compression_type format) const;
+            size_t point_size(typename point_gfp<curve_type>::compression_type format) const;
 
-            point_gfp os2ecp(const uint8_t bits[], size_t len) const;
+            point_gfp<curve_type> os2ecp(const uint8_t bits[], size_t len) const;
 
             template<typename Alloc>
-            point_gfp os2ecp(const std::vector<uint8_t, Alloc> &vec) const {
+            point_gfp<curve_type> os2ecp(const std::vector<uint8_t, Alloc> &vec) const {
                 return this->os2ecp(vec.data(), vec.size());
             }
 
@@ -273,7 +288,8 @@ namespace nil {
              * Verify ec_group domain
              * @returns true if group is valid. false otherwise
              */
-            bool verify_group(random_number_generator &rng, bool strong = false) const;
+            template<typename UniformRandomGenerator>
+            bool verify_group(UniformRandomGenerator &rng, bool strong = false) const;
 
             bool operator==(const ec_group &other) const;
 
@@ -290,6 +306,21 @@ namespace nil {
             static size_t clear_registered_curve_data();
 
         private:
+            curve_gfp<NumberType> m_curve;
+            point_gfp<CurveType> m_base_point;
+
+            NumberType m_g_x;
+            NumberType m_g_y;
+            NumberType m_order;
+            NumberType m_cofactor;
+            modular_reducer m_mod_order;
+            point_gfp_base_point_precompute m_base_mult;
+            oid_t m_oid;
+            size_t m_p_bits;
+            size_t m_order_bits;
+            bool m_a_is_minus_3;
+            bool m_a_is_zero;
+
             static ec_group_data_map &ec_group_data();
 
             static std::shared_ptr<ec_group_data> ber_decode_ec_group(const uint8_t bits[], size_t len);
@@ -304,7 +335,8 @@ namespace nil {
             std::shared_ptr<ec_group_data> m_data;
         };
 
-        inline bool operator!=(const ec_group &lhs, const ec_group &rhs) {
+        template<typename CurveType, typename NumberType = typename CurveType::number_type>
+        inline bool operator!=(const ec_group<CurveType, NumberType> &lhs, const ec_group<CurveType, NumberType> &rhs) {
             return !(lhs == rhs);
         }
     }    // namespace crypto3

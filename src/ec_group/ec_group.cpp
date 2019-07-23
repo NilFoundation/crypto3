@@ -20,16 +20,17 @@ namespace nil {
 
         class ec_group_data final {
         public:
-            ec_group_data(const cpp_int &p, const cpp_int &a, const cpp_int &b, const cpp_int &g_x, const cpp_int &g_y,
-                          const cpp_int &order, const cpp_int &cofactor, const oid_t &oid) :
+            ec_group_data(const number_type &p, const number_type &a, const number_type &b, const number_type &g_x,
+                          const number_type &g_y, const number_type &order, const number_type &cofactor,
+                          const oid_t &oid) :
                 m_curve(p, a, b),
                 m_base_point(m_curve, g_x, g_y), m_g_x(g_x), m_g_y(g_y), m_order(order), m_cofactor(cofactor),
                 m_mod_order(order), m_base_mult(m_base_point, m_mod_order), m_oid(oid), m_p_bits(msb(p)),
                 m_order_bits(msb(order)), m_a_is_minus_3(a == p - 3), m_a_is_zero(a == 0) {
             }
 
-            bool match(const cpp_int &p, const cpp_int &a, const cpp_int &b, const cpp_int &g_x, const cpp_int &g_y,
-                       const cpp_int &order, const cpp_int &cofactor) const {
+            bool match(const number_type &p, const number_type &a, const number_type &b, const number_type &g_x,
+                       const number_type &g_y, const number_type &order, const number_type &cofactor) const {
                 return (this->p() == p && this->a() == a && this->b() == b && this->order() == order
                         && this->cofactor() == cofactor && this->g_x() == g_x && this->g_y() == g_y);
             }
@@ -38,31 +39,31 @@ namespace nil {
                 return m_oid;
             }
 
-            const cpp_int &p() const {
+            const number_type &p() const {
                 return m_curve.get_p();
             }
 
-            const cpp_int &a() const {
+            const number_type &a() const {
                 return m_curve.get_a();
             }
 
-            const cpp_int &b() const {
+            const number_type &b() const {
                 return m_curve.get_b();
             }
 
-            const cpp_int &order() const {
+            const number_type &order() const {
                 return m_order;
             }
 
-            const cpp_int &cofactor() const {
+            const number_type &cofactor() const {
                 return m_cofactor;
             }
 
-            const cpp_int &g_x() const {
+            const number_type &g_x() const {
                 return m_g_x;
             }
 
-            const cpp_int &g_y() const {
+            const number_type &g_y() const {
                 return m_g_y;
             }
 
@@ -98,28 +99,28 @@ namespace nil {
                 return m_a_is_zero;
             }
 
-            cpp_int mod_order(const cpp_int &x) const {
+            number_type mod_order(const number_type &x) const {
                 return m_mod_order.reduce(x);
             }
 
-            cpp_int square_mod_order(const cpp_int &x) const {
+            number_type square_mod_order(const number_type &x) const {
                 return m_mod_order.square(x);
             }
 
-            cpp_int multiply_mod_order(const cpp_int &x, const cpp_int &y) const {
+            number_type multiply_mod_order(const number_type &x, const number_type &y) const {
                 return m_mod_order.multiply(x, y);
             }
 
-            cpp_int multiply_mod_order(const cpp_int &x, const cpp_int &y, const cpp_int &z) const {
+            number_type multiply_mod_order(const number_type &x, const number_type &y, const number_type &z) const {
                 return m_mod_order.multiply(m_mod_order.multiply(x, y), z);
             }
 
-            cpp_int inverse_mod_order(const cpp_int &x) const {
+            number_type inverse_mod_order(const number_type &x) const {
                 return inverse_mod(x, m_order);
             }
 
-            point_gfp blinded_base_point_multiply(const cpp_int &k, random_number_generator &rng,
-                                                  std::vector<cpp_int> &ws) const {
+            point_gfp blinded_base_point_multiply(const number_type &k, random_number_generator &rng,
+                                                  std::vector<number_type> &ws) const {
                 return m_base_mult.mul(k, rng, m_order, ws);
             }
 
@@ -127,10 +128,10 @@ namespace nil {
             curve_gfp m_curve;
             point_gfp m_base_point;
 
-            cpp_int m_g_x;
-            cpp_int m_g_y;
-            cpp_int m_order;
-            cpp_int m_cofactor;
+            number_type m_g_x;
+            number_type m_g_y;
+            number_type m_order;
+            number_type m_cofactor;
             modular_reducer m_mod_order;
             point_gfp_base_point_precompute m_base_mult;
             oid_t m_oid;
@@ -173,13 +174,13 @@ namespace nil {
                 return std::shared_ptr<ec_group_data>();
             }
 
-            std::shared_ptr<ec_group_data> lookup_or_create(const cpp_int &p,
-                                                            const cpp_int &a,
-                                                            const cpp_int &b,
-                                                            const cpp_int &g_x,
-                                                            const cpp_int &g_y,
-                                                            const cpp_int &order,
-                                                            const cpp_int &cofactor,
+            std::shared_ptr<ec_group_data> lookup_or_create(const number_type &p,
+                                                            const number_type &a,
+                                                            const number_type &b,
+                                                            const number_type &g_x,
+                                                            const number_type &g_y,
+                                                            const number_type &order,
+                                                            const number_type &cofactor,
                                                             const oid_t &oid) {
                 lock_guard_type<mutex_type> lock(m_mutex);
 
@@ -214,9 +215,10 @@ namespace nil {
             }
 
         private:
-            std::shared_ptr<ec_group_data> add_curve(const cpp_int &p, const cpp_int &a, const cpp_int &b,
-                                                     const cpp_int &g_x, const cpp_int &g_y, const cpp_int &order,
-                                                     const cpp_int &cofactor, const oid_t &oid) {
+            std::shared_ptr<ec_group_data> add_curve(const number_type &p, const number_type &a, const number_type &b,
+                                                     const number_type &g_x, const number_type &g_y,
+                                                     const number_type &order, const number_type &cofactor,
+                                                     const oid_t &oid) {
                 std::shared_ptr<ec_group_data> d
                     = std::make_shared<ec_group_data>(p, a, b, g_x, g_y, order, cofactor, oid);
 
@@ -251,13 +253,13 @@ namespace nil {
                                                                     const char *b_str, const char *g_x_str,
                                                                     const char *g_y_str, const char *order_str,
                                                                     const oid_t &oid) {
-            const cpp_int p(p_str);
-            const cpp_int a(a_str);
-            const cpp_int b(b_str);
-            const cpp_int g_x(g_x_str);
-            const cpp_int g_y(g_y_str);
-            const cpp_int order(order_str);
-            const cpp_int cofactor(1);    // implicit
+            const number_type p(p_str);
+            const number_type a(a_str);
+            const number_type b(b_str);
+            const number_type g_x(g_x_str);
+            const number_type g_y(g_y_str);
+            const number_type order(order_str);
+            const number_type cofactor(1);    // implicit
 
             return std::make_shared<ec_group_data>(p, a, b, g_x, g_y, order, cofactor, oid);
         }
@@ -274,7 +276,7 @@ namespace nil {
                 ber_decoder(bits, len).decode(dom_par_oid);
                 return ec_group_data().lookup(dom_par_oid);
             } else if (obj.type() == SEQUENCE) {
-                cpp_int p, a, b, order, cofactor;
+                number_type p, a, b, order, cofactor;
                 std::vector<uint8_t> base_pt;
                 std::vector<uint8_t> seed;
 
@@ -318,7 +320,8 @@ namespace nil {
                     throw decoding_error("Invalid ECC cofactor parameter");
                 }
 
-                std::pair<cpp_int, cpp_int> base_xy = nil::crypto3::os2ecp(base_pt.data(), base_pt.size(), p, a, b);
+                std::pair<number_type, number_type> base_xy
+                    = nil::crypto3::os2ecp(base_pt.data(), base_pt.size(), p, a, b);
 
                 return ec_group_data().lookup_or_create(p, a, b, base_xy.first, base_xy.second, order, cofactor,
                                                         oid_t());
@@ -391,7 +394,7 @@ namespace nil {
         }
 
         size_t ec_group::get_p_bytes() const {
-            return data().p_bytes();
+            return (m_p_bits + 7) / 8;
         }
 
         size_t ec_group::get_order_bits() const {
@@ -402,55 +405,56 @@ namespace nil {
             return data().order_bytes();
         }
 
-        const cpp_int &ec_group::get_p() const {
-            return data().p();
+        const number_type &ec_group::get_p() const {
+            return m_curve.get_p();
         }
 
-        const cpp_int &ec_group::get_a() const {
-            return data().a();
+        const number_type &ec_group::get_a() const {
+            return m_curve.get_a();
         }
 
-        const cpp_int &ec_group::get_b() const {
-            return data().b();
+        const number_type &ec_group::get_b() const {
+            return m_curve.get_b();
         }
 
         const point_gfp &ec_group::get_base_point() const {
-            return data().base_point();
+            return m_base_point;
         }
 
-        const cpp_int &ec_group::get_order() const {
-            return data().order();
+        const number_type &ec_group::get_order() const {
+            return m_order;
         }
 
-        const cpp_int &ec_group::get_g_x() const {
+        const number_type &ec_group::get_g_x() const {
             return data().g_x();
         }
 
-        const cpp_int &ec_group::get_g_y() const {
+        const number_type &ec_group::get_g_y() const {
             return data().g_y();
         }
 
-        const cpp_int &ec_group::get_cofactor() const {
+        const number_type &ec_group::get_cofactor() const {
             return data().cofactor();
         }
 
-        cpp_int ec_group::mod_order(const cpp_int &k) const {
+        number_type ec_group::mod_order(const number_type &k) const {
             return data().mod_order(k);
         }
 
-        cpp_int ec_group::square_mod_order(const cpp_int &x) const {
+        number_type ec_group::square_mod_order(const number_type &x) const {
             return data().square_mod_order(x);
         }
 
-        cpp_int ec_group::multiply_mod_order(const cpp_int &x, const cpp_int &y) const {
+        number_type ec_group::multiply_mod_order(const number_type &x, const number_type &y) const {
             return data().multiply_mod_order(x, y);
         }
 
-        cpp_int ec_group::multiply_mod_order(const cpp_int &x, const cpp_int &y, const cpp_int &z) const {
+        number_type ec_group::multiply_mod_order(const number_type &x, const number_type &y,
+                                                 const number_type &z) const {
             return data().multiply_mod_order(x, y, z);
         }
 
-        cpp_int ec_group::inverse_mod_order(const cpp_int &x) const {
+        number_type ec_group::inverse_mod_order(const number_type &x) const {
             return data().inverse_mod_order(x);
         }
 
@@ -471,25 +475,25 @@ namespace nil {
             return nil::crypto3::os2ecp(bits, len, data().curve());
         }
 
-        point_gfp ec_group::point(const cpp_int &x, const cpp_int &y) const {
+        point_gfp ec_group::point(const number_type &x, const number_type &y) const {
             // TODO: randomize the representation?
             return point_gfp(data().curve(), x, y);
         }
 
-        point_gfp ec_group::point_multiply(const cpp_int &x, const point_gfp &pt, const cpp_int &y) const {
+        point_gfp ec_group::point_multiply(const number_type &x, const point_gfp &pt, const number_type &y) const {
             point_gfp_multi_point_precompute xy_mul(get_base_point(), pt);
             return xy_mul.multi_exp(x, y);
         }
 
-        point_gfp ec_group::blinded_base_point_multiply(const cpp_int &k,
+        point_gfp ec_group::blinded_base_point_multiply(const number_type &k,
                                                         random_number_generator &rng,
-                                                        std::vector<cpp_int> &ws) const {
+                                                        std::vector<number_type> &ws) const {
             return data().blinded_base_point_multiply(k, rng, ws);
         }
 
-        cpp_int ec_group::blinded_base_point_multiply_x(const cpp_int &k,
-                                                        random_number_generator &rng,
-                                                        std::vector<cpp_int> &ws) const {
+        number_type ec_group::blinded_base_point_multiply_x(const number_type &k,
+                                                            random_number_generator &rng,
+                                                            std::vector<number_type> &ws) const {
             const point_gfp pt = data().blinded_base_point_multiply(k, rng, ws);
 
             if (pt == 0) {
@@ -498,12 +502,13 @@ namespace nil {
             return pt.get_affine_x();
         }
 
-        cpp_int ec_group::random_scalar(random_number_generator &rng) const {
-            return cpp_int::random_integer(rng, 1, get_order());
+        number_type ec_group::random_scalar(random_number_generator &rng) const {
+            return number_type::random_integer(rng, 1, get_order());
         }
 
-        point_gfp ec_group::blinded_var_point_multiply(const point_gfp &point, const cpp_int &k,
-                                                       random_number_generator &rng, std::vector<cpp_int> &ws) const {
+        point_gfp ec_group::blinded_var_point_multiply(const point_gfp &point, const number_type &k,
+                                                       random_number_generator &rng,
+                                                       std::vector<number_type> &ws) const {
             point_gfp_var_point_precompute mul(point, rng, ws);
             return mul.mul(k, rng, get_order(), ws);
         }
@@ -530,8 +535,8 @@ namespace nil {
                     .encode(get_p())
                     .end_cons()
                     .start_cons(SEQUENCE)
-                    .encode(cpp_int::encode_1363(get_a(), p_bytes), OCTET_STRING)
-                    .encode(cpp_int::encode_1363(get_b(), p_bytes), OCTET_STRING)
+                    .encode(number_type::encode_1363(get_a(), p_bytes), OCTET_STRING)
+                    .encode(number_type::encode_1363(get_b(), p_bytes), OCTET_STRING)
                     .end_cons()
                     .encode(get_base_point().encode(point_gfp::UNCOMPRESSED), OCTET_STRING)
                     .encode(get_order())
@@ -596,10 +601,10 @@ namespace nil {
         }
 
         bool ec_group::verify_group(random_number_generator &rng, bool) const {
-            const cpp_int &p = get_p();
-            const cpp_int &a = get_a();
-            const cpp_int &b = get_b();
-            const cpp_int &order = get_order();
+            const number_type &p = get_p();
+            const number_type &a = get_a();
+            const number_type &b = get_b();
+            const number_type &order = get_order();
             const point_gfp &base_point = get_base_point();
 
             if (a < 0 || a >= p) {
@@ -625,7 +630,7 @@ namespace nil {
             // compute the discriminant: 4*a^3 + 27*b^2 which must be nonzero
             const modular_reducer mod_p(p);
 
-            const cpp_int discriminant
+            const number_type discriminant
                 = mod_p.reduce(mod_p.multiply(4, mod_p.cube(a)) + mod_p.multiply(27, mod_p.square(b)));
 
             if (discriminant == 0) {

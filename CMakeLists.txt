@@ -77,7 +77,6 @@ list(APPEND ${CURRENT_PROJECT_NAME}_UNGROUPED_SOURCES
      src/dl_group/dl_group.cpp
      src/dl_algo/dl_algorithm.cpp
      src/ecies/ecies.cpp
-     src/ecc_key/ecc_key.cpp
 
      src/ec_group/point_gfp.cpp
      src/ec_group/ec_group.cpp
