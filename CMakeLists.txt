@@ -65,7 +65,6 @@ list(APPEND ${CURRENT_PROJECT_NAME}_PRIVATE_HEADERS
      )
 
 list(APPEND ${CURRENT_PROJECT_NAME}_UNGROUPED_SOURCES
-     src/blinding.cpp
      src/pk_algs.cpp
      src/pk_keys.cpp
      src/pk_operations.cpp
@@ -604,3 +603,5 @@ if(APPLE OR NOT ${CMAKE_TARGET_ARCHITECTURE} STREQUAL ${CMAKE_HOST_SYSTEM_PROCES
                           XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "${APPLE_CODE_SIGN_IDENTITY}"
                           XCODE_ATTRIBUTE_DEVELOPMENT_TEAM "${CMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM}")
 endif()
+
+add_subdirectory(test)

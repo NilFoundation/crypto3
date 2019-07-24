@@ -1,6 +1,7 @@
 include(CMTest)
 
 cm_find_package(${CMAKE_WORKSPACE_NAME}_block)
+cm_find_package(${CMAKE_WORKSPACE_NAME}_hash)
 
 if(NOT Boost_UNIT_TEST_FRAMEWORK_FOUND)
     cm_find_package(Boost REQUIRED COMPONENTS unit_test_framework)
@@ -9,6 +10,9 @@ endif()
 cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
 
                        ${CMAKE_WORKSPACE_NAME}::block
+                       ${CMAKE_WORKSPACE_NAME}::hash
+
+                       boost::multiprecision
 
                        ${Boost_LIBRARIES})
 
@@ -32,24 +36,7 @@ macro(define_pubkey_test name)
 endmacro()
 
 set(TESTS_NAMES
-    "adler"
-    "blake2b"
-    "crc"
-    "cubehash"
-    "md4"
-    "md5"
-    "keccak"
-    "ripemd"
-    "pack"
-    "tiger"
-    "sha"
-    "sha2"
-    "sha3"
-    "skein"
-    "sm3"
-    "static_digest"
-#    "streebog"
-    "whirlpool")
+    "ecdsa")
 
 foreach(TEST_NAME ${TESTS_NAMES})
     define_pubkey_test(${TEST_NAME})

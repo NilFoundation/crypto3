@@ -2,6 +2,7 @@
 #define CRYPTO3_ECDSA_KEY_HPP
 
 #include <nil/crypto3/pubkey/ecc_key.hpp>
+#include <nil/crypto3/pubkey/keypair.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -88,7 +89,18 @@ namespace nil {
                 ec_private_key<CurveType, NumberType>(rng, domain, x) {
             }
 
-            bool check_key(random_number_generator &rng, bool) const override;
+            template<typename UniformRandonGenerator>
+            bool check_key(UniformRandonGenerator &rng, bool) const {
+                if (!public_point().on_the_curve()) {
+                    return false;
+                }
+
+                if (!strong) {
+                    return true;
+                }
+
+                return key_pair::signature_consistency_check(rng, *this, "EMSA1(SHA-256)");
+            }
 
             std::unique_ptr<pk_operations::signature> create_signature_op(random_number_generator &rng,
                                                                           const std::string &params,

@@ -1,7 +1,7 @@
 #ifndef CRYPTO3_DIFFIE_HELLMAN_HPP
 #define CRYPTO3_DIFFIE_HELLMAN_HPP
 
-#include <nil/crypto3/pubkey/dl_algorithm.hpp>
+#include <nil/crypto3/pubkey/dl_group/dl_algorithm.hpp>
 
 namespace nil {
     namespace crypto3 {

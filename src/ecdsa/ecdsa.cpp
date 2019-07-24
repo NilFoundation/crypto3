@@ -1,13 +1,13 @@
 #include <nil/crypto3/pubkey/ecdsa.hpp>
 #include <nil/crypto3/pubkey/pk_ops_impl.hpp>
-#include <nil/crypto3/multiprecision/modular_reduce.hpp>
 #include <nil/crypto3/pubkey/ec_group/point_mul.hpp>
-#include <nil/crypto3/pubkey/keypair.hpp>
+
+#include <boost/multiprecision/modular_reduce.hpp>
 
 #if defined(CRYPTO3_HAS_RFC6979)
 
 #include <nil/crypto3/pubkey/rfc6979.hpp>
-#include <nil/crypto3/multiprecision/modular_inverse.hpp>
+#include <boost/multiprecision/modular_inverse.hpp>
 
 #endif
 
@@ -22,29 +22,15 @@
 namespace nil {
     namespace crypto3 {
 
-        bool ecdsa_private_key::check_key(random_number_generator &rng, bool strong) const {
-            if (!public_point().on_the_curve()) {
-                return false;
-            }
-
-            if (!strong) {
-                return true;
-            }
-
-            return key_pair::signature_consistency_check(rng, *this, "EMSA1(SHA-256)");
-        }
-
         namespace {
 
-/**
-* ECDSA signature operation
-*/
+            /**
+             * ECDSA signature operation
+             */
             class ecdsa_signature_operation final : public pk_operations::signature_with_emsa {
             public:
-
-                ecdsa_signature_operation(const ecdsa_private_key &ecdsa, const std::string &emsa)
-                        : pk_operations::signature_with_emsa(emsa), m_group(ecdsa.domain()),
-                        m_x(ecdsa.private_value()) {
+                ecdsa_signature_operation(const ecdsa_private_key &ecdsa, const std::string &emsa) :
+                    pk_operations::signature_with_emsa(emsa), m_group(ecdsa.domain()), m_x(ecdsa.private_value()) {
 #if defined(CRYPTO3_HAS_RFC6979)
                     m_rfc6979_hash = hash_for_emsa(emsa);
 #endif
@@ -73,13 +59,15 @@ namespace nil {
                 boost::multiprecision::cpp_int m(msg, msg_len, m_group.get_order_bits());
 
 #if defined(CRYPTO3_HAS_RFC6979)
-                const boost::multiprecision::cpp_int k = generate_rfc6979_nonce(m_x, m_group.get_order(), m, m_rfc6979_hash);
+                const boost::multiprecision::cpp_int k
+                    = generate_rfc6979_nonce(m_x, m_group.get_order(), m, m_rfc6979_hash);
 #else
                 const boost::multiprecision::cpp_int k = m_group.random_scalar(rng);
 #endif
 
                 const boost::multiprecision::cpp_int k_inv = inverse_mod(k, m_group.get_order());
-                const boost::multiprecision::cpp_int r = m_group.mod_order(m_group.blinded_base_point_multiply_x(k, rng, m_ws));
+                const boost::multiprecision::cpp_int r
+                    = m_group.mod_order(m_group.blinded_base_point_multiply_x(k, rng, m_ws));
 
                 const boost::multiprecision::cpp_int xrm = m_group.mod_order(m_group.multiply_mod_order(m_x, r) + m);
                 const boost::multiprecision::cpp_int s = m_group.multiply_mod_order(k_inv, xrm);
@@ -92,14 +80,14 @@ namespace nil {
                 return boost::multiprecision::cpp_int::encode_fixed_length_int_pair(r, s, m_group.get_order_bytes());
             }
 
-/**
-* ECDSA verification operation
-*/
+            /**
+             * ECDSA verification operation
+             */
             class ecdsa_verification_operation final : public pk_operations::verification_with_emsa {
             public:
-                ecdsa_verification_operation(const ecdsa_public_key &ecdsa, const std::string &emsa)
-                        : pk_operations::verification_with_emsa(emsa), m_group(ecdsa.domain()),
-                        m_gy_mul(m_group.get_base_point(), ecdsa.public_point()) {
+                ecdsa_verification_operation(const ecdsa_public_key &ecdsa, const std::string &emsa) :
+                    pk_operations::verification_with_emsa(emsa), m_group(ecdsa.domain()),
+                    m_gy_mul(m_group.get_base_point(), ecdsa.public_point()) {
                 }
 
                 size_t max_input_bits() const override {
@@ -146,38 +134,30 @@ namespace nil {
                 return (v == r);
             }
 
-        }
+        }    // namespace
 
-        std::unique_ptr<pk_operations::verification> ecdsa_public_key::create_verification_op(const std::string &params,
-                                                                                              const std::string &provider) const {
+        std::unique_ptr<pk_operations::verification>
+            ecdsa_public_key::create_verification_op(const std::string &params, const std::string &provider) const {
 #if defined(CRYPTO3_HAS_BEARSSL)
-            if(provider == "bearssl" || provider.empty())
-               {
-               try
-                  {
-                  return make_bearssl_ecdsa_ver_op(*this, params);
-                  }
-               catch(lookup_error& e)
-                  {
-                  if(provider == "bearssl")
-                     throw;
-                  }
-               }
+            if (provider == "bearssl" || provider.empty()) {
+                try {
+                    return make_bearssl_ecdsa_ver_op(*this, params);
+                } catch (lookup_error &e) {
+                    if (provider == "bearssl")
+                        throw;
+                }
+            }
 #endif
 
 #if defined(CRYPTO3_HAS_OPENSSL)
-            if(provider == "openssl" || provider.empty())
-               {
-               try
-                  {
-                  return make_openssl_ecdsa_ver_op(*this, params);
-                  }
-               catch(lookup_error& e)
-                  {
-                  if(provider == "openssl")
-                     throw;
-                  }
-               }
+            if (provider == "openssl" || provider.empty()) {
+                try {
+                    return make_openssl_ecdsa_ver_op(*this, params);
+                } catch (lookup_error &e) {
+                    if (provider == "openssl")
+                        throw;
+                }
+            }
 #endif
 
             if (provider == "core" || provider.empty()) {
@@ -187,36 +167,29 @@ namespace nil {
             throw Provider_Not_Found(algo_name(), provider);
         }
 
-        std::unique_ptr<pk_operations::signature> ecdsa_private_key::create_signature_op(
-                random_number_generator & /*random*/, const std::string &params, const std::string &provider) const {
+        std::unique_ptr<pk_operations::signature>
+            ecdsa_private_key::create_signature_op(random_number_generator & /*random*/, const std::string &params,
+                                                   const std::string &provider) const {
 #if defined(CRYPTO3_HAS_BEARSSL)
-            if(provider == "bearssl" || provider.empty())
-               {
-               try
-                  {
-                  return make_bearssl_ecdsa_sig_op(*this, params);
-                  }
-               catch(lookup_error& e)
-                  {
-                  if(provider == "bearssl")
-                     throw;
-                  }
-               }
+            if (provider == "bearssl" || provider.empty()) {
+                try {
+                    return make_bearssl_ecdsa_sig_op(*this, params);
+                } catch (lookup_error &e) {
+                    if (provider == "bearssl")
+                        throw;
+                }
+            }
 #endif
 
 #if defined(CRYPTO3_HAS_OPENSSL)
-            if(provider == "openssl" || provider.empty())
-               {
-               try
-                  {
-                  return make_openssl_ecdsa_sig_op(*this, params);
-                  }
-               catch(lookup_error& e)
-                  {
-                  if(provider == "openssl")
-                     throw;
-                  }
-               }
+            if (provider == "openssl" || provider.empty()) {
+                try {
+                    return make_openssl_ecdsa_sig_op(*this, params);
+                } catch (lookup_error &e) {
+                    if (provider == "openssl")
+                        throw;
+                }
+            }
 #endif
 
             if (provider == "core" || provider.empty()) {
@@ -225,5 +198,5 @@ namespace nil {
 
             throw Provider_Not_Found(algo_name(), provider);
         }
-    }
+    }    // namespace crypto3
 }
