@@ -11,8 +11,6 @@
 
 #include <nil/crypto3/pubkey/detail/static_digest.hpp>
 
-#include <nil/crypto3/utilities/type_traits/is_iterator.hpp>
-
 namespace nil {
     namespace crypto3 {
         /*!

@@ -139,19 +139,27 @@ namespace nil {
                 return curve25519_public_key::public_value();
             }
 
-            secure_vector<uint8_t> agree(const uint8_t w[], size_t w_len) const;
+            secure_vector<uint8_t> agree(const uint8_t w[], size_t w_len) const {
+                size_check(w_len, "public value");
+                return curve25519(m_private, w);
+            }
 
             const secure_vector<uint8_t> &get_x() const {
                 return m_private;
             }
 
-            secure_vector<uint8_t> private_key_bits() const override;
+            secure_vector<uint8_t> private_key_bits() const override {
+                return der_encoder().encode(m_private, OCTET_STRING).get_contents();
+            }
 
-            bool check_key(random_number_generator &rng, bool strong) const override;
+            bool check_key(random_number_generator &rng, bool strong) const override {
+                std::vector<uint8_t> public_point(32);
+                curve25519_basepoint(public_point.data(), m_private.data());
+                return public_point == m_public;
+            }
 
             std::unique_ptr<pk_operations::key_agreement>
-                create_key_agreement_op(random_number_generator &rng,
-                                        const std::string &params,
+                create_key_agreement_op(random_number_generator &rng, const std::string &params,
                                         const std::string &provider) const override;
 
         private:

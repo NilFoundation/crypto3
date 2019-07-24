@@ -18,6 +18,44 @@ namespace nil {
 
         class dl_group_data;
 
+        namespace pubkey {
+            namespace detail {
+                dl_group::format pem_label_to_dl_format(const std::string &label) {
+                    if (label == "DH PARAMETERS") {
+                        return dl_group::PKCS_3;
+                    } else if (label == "DSA PARAMETERS") {
+                        return dl_group::ANSI_X9_57;
+                    } else if (label == "X942 DH PARAMETERS" || label == "X9.42 DH PARAMETERS") {
+                        return dl_group::ANSI_X9_42;
+                    } else {
+                        throw decoding_error("dl_group: Invalid PEM label " + label);
+                    }
+                }
+
+                /*
+                 * Create generator of the q-sized subgroup (DSA style generator)
+                 */
+                cpp_int make_dsa_generator(const cpp_int &p, const cpp_int &q) {
+                    const cpp_int e = (p - 1) / q;
+
+                    if (e == 0 || (p - 1) % q > 0) {
+                        throw std::invalid_argument("make_dsa_generator q does not divide p-1");
+                    }
+
+                    for (size_t i = 0; i != PRIME_TABLE_SIZE; ++i) {
+                        // TODO precompute!
+                        cpp_int g = power_mod(PRIMES[i], e, p);
+                        if (g > 1) {
+                            return g;
+                        }
+                    }
+
+                    throw Internal_Error("dl_group: Couldn't create a suitable generator");
+                }
+
+            }    // namespace detail
+        }        // namespace pubkey
+
         /**
          * This class represents discrete logarithm groups. It holds a prime
          * modulus p, a generator g, and (optionally) a prime q which is a
@@ -316,31 +354,80 @@ namespace nil {
              * @param format the encoding format
              * @return string holding the PEM encoded group
              */
-            std::string pem_encode(format format) const;
+            std::string pem_encode(format format) const {
+                const std::vector<uint8_t> encoding = der_encode(format);
+
+                if (format == PKCS_3) {
+                    return pem_code::encode(encoding, "DH PARAMETERS");
+                } else if (format == ANSI_X9_57) {
+                    return pem_code::encode(encoding, "DSA PARAMETERS");
+                } else if (format == ANSI_X9_42) {
+                    return pem_code::encode(encoding, "X9.42 DH PARAMETERS");
+                } else {
+                    throw std::invalid_argument("Unknown dl_group encoding " + std::to_string(format));
+                }
+            }
 
             /**
              * Encode this group into a string using DER encoding.
              * @param format the encoding format
              * @return string holding the DER encoded group
              */
-            std::vector<uint8_t> der_encode(format format) const;
+            std::vector<uint8_t> der_encode(format format) const {
+                if (get_q() == 0 && (format == ANSI_X9_57 || format == ANSI_X9_42)) {
+                    throw Encoding_Error("Cannot encode dl_group in ANSI formats when q param is missing");
+                }
+
+                if (format == ANSI_X9_57) {
+                    return der_encoder()
+                        .start_cons(SEQUENCE)
+                        .encode(get_p())
+                        .encode(get_q())
+                        .encode(get_g())
+                        .end_cons()
+                        .get_contents_unlocked();
+                } else if (format == ANSI_X9_42) {
+                    return der_encoder()
+                        .start_cons(SEQUENCE)
+                        .encode(get_p())
+                        .encode(get_g())
+                        .encode(get_q())
+                        .end_cons()
+                        .get_contents_unlocked();
+                } else if (format == PKCS_3) {
+                    return der_encoder()
+                        .start_cons(SEQUENCE)
+                        .encode(get_p())
+                        .encode(get_g())
+                        .end_cons()
+                        .get_contents_unlocked();
+                }
+
+                throw std::invalid_argument("Unknown dl_group encoding " + std::to_string(format));
+            }
 
             /**
              * Reduce an integer modulo p
              * @return x % p
              */
-            cpp_int mod_p(const cpp_int &x) const;
+            cpp_int mod_p(const cpp_int &x) const {
+                return m_mod_p.reduce(x);
+            }
 
             /**
              * Multiply and reduce an integer modulo p
              * @return (x*y) % p
              */
-            cpp_int multiply_mod_p(const cpp_int &x, const cpp_int &y) const;
+            cpp_int multiply_mod_p(const cpp_int &x, const cpp_int &y) const {
+                return m_mod_p.multiply(x, y);
+            }
 
             /**
              * Return the inverse of x mod p
              */
-            cpp_int inverse_mod_p(const cpp_int &x) const;
+            cpp_int inverse_mod_p(const cpp_int &x) const {
+                return inverse_mod(x, get_p());
+            }
 
             /**
              * Reduce an integer modulo q
@@ -443,7 +530,9 @@ namespace nil {
              * It may vary over time for a particular group, if the attack
              * costs change.
              */
-            size_t exponent_bits() const;
+            size_t exponent_bits() const {
+                return m_exponent_bits;
+            }
 
             /**
              * Return an estimate of the strength of this group against
@@ -451,20 +540,30 @@ namespace nil {
              * takes into account known attacks it is by necessity an
              * overestimate of the actual strength.
              */
-            size_t estimated_strength() const;
+            size_t estimated_strength() const {
+                return m_estimated_strength;
+            }
 
             /**
              * Decode a DER/BER encoded group into this instance.
              * @param ber a vector containing the DER/BER encoded group
              * @param format the format of the encoded group
              */
-            void ber_decode(const std::vector<uint8_t> &ber, format format);
+            void ber_decode(const std::vector<uint8_t> &ber, format format) {
+                m_data = ber_decode_dl_group(ber.data(), ber.size(), format);
+            }
 
             /**
              * Decode a PEM encoded group into this instance.
              * @param pem the PEM encoding of the group
              */
-            void pem_decode(const std::string &pem);
+            void pem_decode(const std::string &pem) {
+                std::string label;
+                const std::vector<uint8_t> ber = unlock(pem_code::decode(pem, label));
+                format format = pem_label_to_dl_format(label);
+
+                m_data = ber_decode_dl_group(ber.data(), ber.size(), format);
+            }
 
             /*
              * For internal use only

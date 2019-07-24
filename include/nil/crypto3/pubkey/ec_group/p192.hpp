@@ -3,10 +3,9 @@
 
 #include <memory>
 
-#include <boost/multiprecision/cpp_int.hpp>
-
-#include <nil/crypto3/multiprecision/mask_bits.hpp>
-#include <nil/crypto3/multiprecision/reduce_below.hpp>
+#include <boost/multiprecision/cpp_bin_float.hpp>
+#include <boost/multiprecision/mask_bits.hpp>
+#include <boost/multiprecision/reduce_below.hpp>
 
 #include <nil/crypto3/pubkey/ec_group/curve_nist.hpp>
 
@@ -18,7 +17,7 @@ namespace nil {
         /**
          * The NIST P-192 curve
          */
-        template<std::size_t WordBits = CRYPTO3_MP_WORD_BITS>
+        template<std::size_t WordBits = limb_bits>
         class p192 : public curve_nist_policy<192, WordBits> {
         public:
             constexpr static const std::size_t word_bits = curve_nist_policy<192, WordBits>::word_bits;

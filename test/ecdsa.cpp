@@ -14,7 +14,6 @@
 #include <nil/crypto3/pubkey/algorithm/verify.hpp>
 
 #include <nil/crypto3/pubkey/ecdsa.hpp>
-#include <nil/crypto3/pubkey/hash_state.hpp>
 
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
@@ -30,14 +29,13 @@
 #include <cstring>
 
 using namespace nil::crypto3::pubkey;
-using namespace nil::crypto3::accumulators;
 
 typedef std::unordered_map<std::string, std::string>::value_type string_data_value;
 BOOST_TEST_DONT_PRINT_LOG_VALUE(string_data_value)
 
 //BOOST_TEST_DONT_PRINT_LOG_VALUE(ecdsa::construction_type::digest_type)
 
-static const std::unordered_map<std::string, std::string> string_128_data
+static const std::unordered_map<std::string, std::string> string_data
     = {{"", "cdf26213a150dc3ecb610f18f6b38b46"},
        {"a", "86be7afa339d0fc7cfc785e72f578d33"},
        {"abc", "c14a12199c66e4ba84636b0f69144c77"},
@@ -48,7 +46,7 @@ static const std::unordered_map<std::string, std::string> string_128_data
 
 BOOST_AUTO_TEST_SUITE(ecdsa_test_suite)
 
-BOOST_DATA_TEST_CASE(ecdsa_range_hash, boost::unit_test::data::make(string_128_data), array_element) {
+BOOST_DATA_TEST_CASE(ecdsa_range_hash, boost::unit_test::data::make(string_data), array_element) {
     std::string out = sign<ecdsa>(array_element.first);
 
     BOOST_CHECK_EQUAL(out, array_element.second);

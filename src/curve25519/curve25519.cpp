@@ -8,21 +8,6 @@
 
 namespace nil {
     namespace crypto3 {
-        secure_vector<uint8_t> curve25519_private_key::private_key_bits() const {
-            return der_encoder().encode(m_private, OCTET_STRING).get_contents();
-        }
-
-        bool curve25519_private_key::check_key(random_number_generator &, bool) const {
-            std::vector<uint8_t> public_point(32);
-            curve25519_basepoint(public_point.data(), m_private.data());
-            return public_point == m_public;
-        }
-
-        secure_vector<uint8_t> curve25519_private_key::agree(const uint8_t w[], size_t w_len) const {
-            size_check(w_len, "public value");
-            return curve25519(m_private, w);
-        }
-
         namespace {
 
 /**

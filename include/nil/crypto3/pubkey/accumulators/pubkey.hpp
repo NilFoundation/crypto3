@@ -59,81 +59,9 @@ namespace nil {
 
                     template<typename ArgumentPack>
                     inline void operator()(const ArgumentPack &args) {
-                        resolve_type(args[boost::accumulators::sample], args[bits | std::size_t()]);
-                    }
-
-                    template<typename ArgumentPack>
-                    inline result_type result(const ArgumentPack &args) const {
-                        result_type res = digest;
-
-                        if (!cache.empty()) {
-                            input_block_type ib = {0};
-                            std::move(cache.begin(), cache.end(), ib.begin());
-                            output_block_type ob = mode_type::process_block(ib);
-                            std::move(ob.begin(), ob.end(), std::inserter(res, res.end()));
-                        }
-
-                        if (seen % input_block_bits) {
-                            finalizer_type(input_block_bits - seen % input_block_bits)(res);
-                        } else {
-                            finalizer_type(0)(res);
-                        }
-
-                        return res;
                     }
 
                 protected:
-                    inline void resolve_type(const input_value_type &value, std::size_t bits) {
-                        if (bits == std::size_t()) {
-                            process(value, input_value_bits);
-                        } else {
-                            process(value, bits);
-                        }
-                    }
-
-                    inline void resolve_type(const input_block_type &value, std::size_t bits) {
-                        if (bits == std::size_t()) {
-                            process(value, input_block_bits);
-                        } else {
-                            process(value, bits);
-                        }
-                    }
-
-                    inline void process(const input_value_type &value, std::size_t bits) {
-                        if (cache.size() == cache.max_size()) {
-                            input_block_type ib = {0};
-                            std::move(cache.begin(), cache.end(), ib.begin());
-                            output_block_type ob = mode_type::process_block(ib);
-                            std::move(ob.begin(), ob.end(), std::inserter(digest, digest.end()));
-
-                            cache.clear();
-                        }
-
-                        cache.push_back(value);
-                        seen += input_value_bits;
-                    }
-
-                    inline void process(const input_block_type &block, std::size_t bits) {
-                        output_block_type ob;
-                        if (cache.empty()) {
-                            ob = mode_type::process_block(block);
-                        } else {
-                            input_block_type b = pubkey::make_array<input_block_values>(cache.begin(), cache.end());
-                            typename input_block_type::const_iterator itr
-                                = block.begin() + (cache.max_size() - cache.size());
-
-                            std::move(block.begin(), itr, b.end());
-
-                            ob = mode_type::process_block(b);
-
-                            cache.clear();
-                            cache.insert(cache.end(), itr, block.end());
-                        }
-
-                        std::move(ob.begin(), ob.end(), std::inserter(digest, digest.end()));
-                        seen += input_block_bits;
-                    }
-
                     std::size_t seen;
                     cache_type cache;
                     result_type digest;

@@ -5,15 +5,14 @@
 
 #include <boost/multiprecision/cpp_int.hpp>
 
-#include <nil/crypto3/multiprecision/modular_inverse.hpp>
-#include <nil/crypto3/multiprecision/prime.hpp>
+#include <boost/multiprecision/modular_inverse.hpp>
+#include <boost/multiprecision/prime.hpp>
 
 #include <nil/crypto3/pubkey/ec_group/curve_gfp.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace detail {
-
             /**
              * Treating this MPI as a sequence of 32-bit words in big-endian
              * order, return word i (or 0 if out of range)
