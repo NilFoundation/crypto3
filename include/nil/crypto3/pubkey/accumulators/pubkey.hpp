@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ACCUMULATORS_PUBKEY_HPP
-#define CRYPTO3_ACCUMULATORS_PUBKEY_HPP
+#ifndef CRYPTO3_PUBKEY_ACCUMULATORS_PUBKEY_HPP
+#define CRYPTO3_PUBKEY_ACCUMULATORS_PUBKEY_HPP
 
 #include <boost/parameter/value_type.hpp>
 

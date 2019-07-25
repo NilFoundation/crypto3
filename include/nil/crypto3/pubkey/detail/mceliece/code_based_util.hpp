@@ -1,5 +1,5 @@
-#ifndef CRYPTO3_CODE_BASED_UTIL_HPP
-#define CRYPTO3_CODE_BASED_UTIL_HPP
+#ifndef CRYPTO3_PUBKEY_CODE_BASED_UTIL_HPP
+#define CRYPTO3_PUBKEY_CODE_BASED_UTIL_HPP
 
 #include <nil/crypto3/pubkey/mce/gf2m_small_m.hpp>
 

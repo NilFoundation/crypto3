@@ -59,7 +59,7 @@ namespace nil {
                 return true;
             }
 
-            return key_pair::signature_consistency_check(rng, *this, "EMSA1(SHA-256)");
+            return keypair::signature_consistency_check(rng, *this, "EMSA1(SHA-256)");
         }
 
         namespace {

@@ -1,5 +1,5 @@
-#ifndef CRYPTO3_XMSS_WOTS_ADDRESSED_PRIVATEKEY_HPP
-#define CRYPTO3_XMSS_WOTS_ADDRESSED_PRIVATEKEY_HPP
+#ifndef CRYPTO3_PUBKEY_XMSS_WOTS_ADDRESSED_PRIVATEKEY_HPP
+#define CRYPTO3_PUBKEY_XMSS_WOTS_ADDRESSED_PRIVATEKEY_HPP
 
 #include <nil/crypto3/pubkey/xmss/xmss_address.hpp>
 #include <nil/crypto3/pubkey/xmss/xmss_wots_addressed_publickey.hpp>

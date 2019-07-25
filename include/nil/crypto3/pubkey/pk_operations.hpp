@@ -1,5 +1,5 @@
-#ifndef CRYPTO3_PK_OPERATIONS_HPP
-#define CRYPTO3_PK_OPERATIONS_HPP
+#ifndef CRYPTO3_PUBKEY_PK_OPERATIONS_HPP
+#define CRYPTO3_PUBKEY_PK_OPERATIONS_HPP
 
 /**
  * Ordinary applications should never need to include or use this

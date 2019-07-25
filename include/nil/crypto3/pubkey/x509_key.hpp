@@ -1,5 +1,5 @@
-#ifndef CRYPTO3_X509_PUBLIC_KEY_HPP
-#define CRYPTO3_X509_PUBLIC_KEY_HPP
+#ifndef CRYPTO3_PUBKEY_X509_PUBLIC_KEY_HPP
+#define CRYPTO3_PUBKEY_X509_PUBLIC_KEY_HPP
 
 #include <nil/crypto3/pubkey/pk_keys.hpp>
 #include <nil/crypto3/utilities/types.hpp>

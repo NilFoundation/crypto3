@@ -3,7 +3,7 @@
 #include <nil/crypto3/random/random.hpp>
 
 #include <nil/crypto3/pubkey/ed25519.hpp>
-#include <nil/crypto3/pubkey/ed25519/ed25519_internal.hpp>
+#include <nil/crypto3/pubkey/detail/ed25519/ed25519_internal.hpp>
 
 namespace nil {
     namespace crypto3 {

@@ -1,9 +1,8 @@
-#ifndef CRYPTO3_POINT_MUL_HPP
-#define CRYPTO3_POINT_MUL_HPP
+#ifndef CRYPTO3_PUBKEY_POINT_MUL_HPP
+#define CRYPTO3_PUBKEY_POINT_MUL_HPP
 
-#include <boost/multiprecision/cpp_int.hpp>
-
-#include <nil/crypto3/multiprecision/modular_reduce.hpp>
+#include <boost/multiprecision/number.hpp>
+#include <boost/multiprecision/montgomery/modular_reduce.hpp>
 
 #include <nil/crypto3/pubkey/ec_group/curve_gfp.hpp>
 #include <nil/crypto3/pubkey/ec_group/point_gfp.hpp>
@@ -28,8 +27,6 @@ namespace nil {
                 return n;
             }
         }    // namespace
-        class modular_reducer;
-
         constexpr static const std::size_t point_gfp_scalar_blinding_bits = 80;
 
         /*!
@@ -319,8 +316,8 @@ namespace nil {
         template<typename CurveType>
         class point_gfp_multi_point_precompute {
         public:
-            point_gfp_multi_point_precompute(const point_gfp<Backend, ExpressionTemplates> &g1,
-                                             const point_gfp<Backend, ExpressionTemplates> &g2) {
+            point_gfp_multi_point_precompute(const point_gfp<number<Backend, ExpressionTemplates>> &g1,
+                                             const point_gfp<number<Backend, ExpressionTemplates>> &g2) {
                 std::vector<cpp_int> ws(point_gfp::WORKSPACE_SIZE);
 
                 point_gfp x2 = x;
@@ -361,8 +358,9 @@ namespace nil {
              * Return (g1*k1 + g2*k2)
              * Not constant time, intended to use with public inputs
              */
-            point_gfp<Backend, ExpressionTemplates> multi_exp(const number<Backend, ExpressionTemplates> &k1,
-                                                              const number<Backend, ExpressionTemplates> &k2) const {
+            point_gfp<number<Backend, ExpressionTemplates>>
+                multi_exp(const number<Backend, ExpressionTemplates> &k1,
+                          const number<Backend, ExpressionTemplates> &k2) const {
                 std::vector<cpp_int> ws(point_gfp::WORKSPACE_SIZE);
 
                 const size_t z_bits = round_up(std::max(z1.bits(), z2.bits()), 2);
@@ -393,7 +391,7 @@ namespace nil {
             }
 
         private:
-            std::vector<point_gfp<Backend, ExpressionTemplates>> m_M;
+            std::vector<point_gfp<number<Backend, ExpressionTemplates>>> m_M;
         };
 
         /**
@@ -405,10 +403,11 @@ namespace nil {
          * @result (p1 * z1 + p2 * z2)
          */
         template<typename Backend, expression_templates ExpressionTemplates>
-        point_gfp<Backend, ExpressionTemplates> multi_exponentiate(const point_gfp<Backend, ExpressionTemplates> &p1,
-                                                                   const number<Backend, ExpressionTemplates> &z1,
-                                                                   const point_gfp<Backend, ExpressionTemplates> &p2,
-                                                                   const number<Backend, ExpressionTemplates> &z2) {
+        point_gfp<number<Backend, ExpressionTemplates>>
+            multi_exponentiate(const point_gfp<number<Backend, ExpressionTemplates>> &p1,
+                               const number<Backend, ExpressionTemplates> &z1,
+                               const point_gfp<number<Backend, ExpressionTemplates>> &p2,
+                               const number<Backend, ExpressionTemplates> &z2) {
             point_gfp_multi_point_precompute xy_mul(x, y);
             return xy_mul.multi_exp(z1, z2);
         }

@@ -1,5 +1,5 @@
-#ifndef CRYPTO3_XMSS_KEY_PAIR_HPP
-#define CRYPTO3_XMSS_KEY_PAIR_HPP
+#ifndef CRYPTO3_PUBKEY_XMSS_KEY_PAIR_HPP
+#define CRYPTO3_PUBKEY_XMSS_KEY_PAIR_HPP
 
 #include <nil/crypto3/pubkey/xmss/xmss_parameters.hpp>
 #include <nil/crypto3/pubkey/xmss/xmss_wots_parameters.hpp>

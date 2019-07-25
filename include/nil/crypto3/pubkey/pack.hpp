@@ -1,5 +1,5 @@
-#ifndef CRYPTO3_PUBKEY_PACK_HPP
-#define CRYPTO3_PUBKEY_PACK_HPP
+#ifndef CRYPTO3_PUBKEY_PUBKEY_PACK_HPP
+#define CRYPTO3_PUBKEY_PUBKEY_PACK_HPP
 
 #include <nil/crypto3/pubkey/stream_endian.hpp>
 #include <nil/crypto3/pubkey/detail/exploder.hpp>

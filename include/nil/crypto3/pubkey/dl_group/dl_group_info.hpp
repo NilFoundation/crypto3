@@ -1,5 +1,5 @@
-#ifndef CRYPTO3_DL_GROUP_INFO_HPP
-#define CRYPTO3_DL_GROUP_INFO_HPP
+#ifndef CRYPTO3_PUBKEY_DL_GROUP_INFO_HPP
+#define CRYPTO3_PUBKEY_DL_GROUP_INFO_HPP
 
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/multiprecision/number.hpp>

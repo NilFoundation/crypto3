@@ -14,8 +14,8 @@
  *
  **/
 
-#ifndef CRYPTO3_XMSS_HPP
-#define CRYPTO3_XMSS_HPP
+#ifndef CRYPTO3_PUBKEY_XMSS_HPP
+#define CRYPTO3_PUBKEY_XMSS_HPP
 
 #include <nil/crypto3/pubkey/xmss/xmss_publickey.hpp>
 #include <nil/crypto3/pubkey/xmss/xmss_privatekey.hpp>

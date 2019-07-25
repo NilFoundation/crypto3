@@ -2,7 +2,7 @@
 #include <nil/crypto3/pubkey/pk_ops_impl.hpp>
 #include <nil/crypto3/pubkey/ec_group/point_mul.hpp>
 
-#include <boost/multiprecision/modular_reduce.hpp>
+#include <boost/multiprecision/montgomery/modular_reduce.hpp>
 
 #if defined(CRYPTO3_HAS_RFC6979)
 

@@ -38,22 +38,6 @@ namespace nil {
                 return m_g;
             }
 
-            std::shared_ptr<const montgomery_params> monty_params_p() const {
-                return m_monty_params;
-            }
-
-            size_t p_bits() const {
-                return m_p_bits;
-            }
-
-            size_t p_bytes() const {
-                return (m_p_bits + 7) / 8;
-            }
-
-            cpp_int power_g_p(const cpp_int &k) const {
-                return monty_execute(*m_monty, k);
-            }
-
         private:
             cpp_int m_p;
             cpp_int m_q;
@@ -98,22 +82,6 @@ namespace nil {
 
         std::shared_ptr<const montgomery_params> dl_group::monty_params_p() const {
             return data().monty_params_p();
-        }
-
-        size_t dl_group::p_bits() const {
-            return data().p_bits();
-        }
-
-        size_t dl_group::p_bytes() const {
-            return data().p_bytes();
-        }
-
-        cpp_int dl_group::multi_exponentiate(const cpp_int &x, const cpp_int &y, const cpp_int &z) const {
-            return monty_multi_exp(data().monty_params_p(), get_g(), x, y, z);
-        }
-
-        cpp_int dl_group::power_g_p(const cpp_int &x) const {
-            return data().power_g_p(x);
         }
     }
 }

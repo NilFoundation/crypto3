@@ -70,9 +70,7 @@ list(APPEND ${CURRENT_PROJECT_NAME}_UNGROUPED_SOURCES
      src/pk_operations.cpp
      src/pkcs8.cpp
      src/pubkey.cpp
-     src/workfactor.cpp
      src/x509_key.cpp
-     src/keypair/keypair.cpp
      src/dl_group/dl_group.cpp
      src/dl_algo/dl_algorithm.cpp
      src/ecies/ecies.cpp
@@ -125,10 +123,6 @@ if(CRYPTO3_PUBKEY_RFC6979)
          include//nil/crypto3/pubkey/rfc6979.hpp
          )
 
-    list(APPEND ${CURRENT_PROJECT_NAME}_RFC6979_SOURCES
-         src/rfc6979/rfc6979.cpp
-         )
-
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_RFC6979)
     list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
          ${${CURRENT_PROJECT_NAME}_RFC6979_HEADERS}
@@ -143,10 +137,6 @@ if(CRYPTO3_PUBKEY_PBES2)
          include//nil/crypto3/pubkey/pbes2.hpp
          )
 
-    list(APPEND ${CURRENT_PROJECT_NAME}_PBES2_SOURCES
-         src/pbes2/pbes2.cpp
-         )
-
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_PBES2)
     list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
          ${${CURRENT_PROJECT_NAME}_PBES2_HEADERS}
@@ -159,10 +149,6 @@ endif()
 if(CRYPTO3_PUBKEY_PEM)
     list(APPEND ${CURRENT_PROJECT_NAME}_PEM_HEADERS
          include//nil/crypto3/pubkey/pem.hpp
-         )
-
-    list(APPEND ${CURRENT_PROJECT_NAME}_PEM_SOURCES
-         src/pem/pem.cpp
          )
 
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_PEM)
@@ -431,7 +417,6 @@ if(CRYPTO3_PUBKEY_MCELIECE)
          src/mceliece/gf2m_small_m.cpp
          src/mceliece/goppa_code.cpp
          src/mceliece/mce_workfactor.cpp
-         src/mceliece/mceliece.cpp
          src/mceliece/mceliece_key.cpp
          src/mceliece/polyn_gf2m.cpp
          )
@@ -472,10 +457,6 @@ endif()
 if(CRYPTO3_PUBKEY_MCEIES)
     list(APPEND ${CURRENT_PROJECT_NAME}_MCEIES_PUBLIC_HEADERS
          include//nil/crypto3/pubkey/mceies.hpp
-         )
-
-    list(APPEND ${CURRENT_PROJECT_NAME}_MCEIES_SOURCES
-         src/mceies/mceies.cpp
          )
 
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_MCEIES)

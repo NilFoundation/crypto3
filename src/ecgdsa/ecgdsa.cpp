@@ -1,8 +1,9 @@
 #include <nil/crypto3/pubkey/ecgdsa.hpp>
-#include <nil/crypto3/multiprecision/modular_reduce.hpp>
 #include <nil/crypto3/pubkey/pk_ops_impl.hpp>
 #include <nil/crypto3/pubkey/keypair.hpp>
-#include <nil/crypto3/multiprecision/modular_inverse.hpp>
+
+#include <boost/multiprecision/modular_inverse.hpp>
+#include <boost/multiprecision/montgomery_int/modular_reduce.hpp>
 
 namespace nil {
     namespace crypto3 {

@@ -1,10 +1,9 @@
-#ifndef CRYPTO3_DL_PARAM_HPP
-#define CRYPTO3_DL_PARAM_HPP
+#ifndef CRYPTO3_PUBKEY_DL_PARAM_HPP
+#define CRYPTO3_PUBKEY_DL_PARAM_HPP
 
 #include <boost/multiprecision/cpp_int.hpp>
-
-#include <nil/crypto3/multiprecision/jacobi.hpp>
-#include <nil/crypto3/multiprecision/prime.hpp>
+#include <boost/multiprecision/jacobi.hpp>
+#include <boost/multiprecision/prime.hpp>
 
 #include <nil/crypto3/pubkey/dl_group/dl_group_info.hpp>
 #include <nil/crypto3/pubkey/pem.hpp>
@@ -472,7 +471,9 @@ namespace nil {
              *
              * @return (g^x) % p
              */
-            cpp_int power_g_p(const cpp_int &x) const;
+            cpp_int power_g_p(const cpp_int &x) const {
+                return monty_execute(*m_monty, k);
+            }
 
             /**
              * Modular exponentiation
@@ -487,24 +488,32 @@ namespace nil {
              * Multi-exponentiate
              * Return (g^x * y^z) % p
              */
-            cpp_int multi_exponentiate(const cpp_int &x, const cpp_int &y, const cpp_int &z) const;
+            cpp_int multi_exponentiate(const cpp_int &x, const cpp_int &y, const cpp_int &z) const {
+                return monty_multi_exp(m_monty_params, get_g(), x, y, z);
+            }
 
             /**
              * Return parameters for Montgomery reduction/exponentiation mod p
              */
-            std::shared_ptr<const montgomery_params> monty_params_p() const;
+            std::shared_ptr<const montgomery_params> monty_params_p() const {
+                return m_monty_params;
+            }
 
             /**
              * Return the size of p in bits
              * Same as get_p().bits()
              */
-            size_t p_bits() const;
+            size_t p_bits() const {
+                return m_p_bits;
+            }
 
             /**
              * Return the size of p in bytes
              * Same as get_p().bytes()
              */
-            size_t p_bytes() const;
+            size_t p_bytes() const {
+                return (m_p_bits + 7) / 8;
+            }
 
             /**
              * Return the size of q in bits
