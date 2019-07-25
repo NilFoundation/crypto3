@@ -10,15 +10,15 @@
 namespace nil {
     namespace crypto3 {
 
-/**
- * Descibes a signature method for XMSS Winternitz One Time Signatures,
- * as defined in:
- * [1] XMSS: Extended Hash-Based Signatures,
- *     draft-itrf-cfrg-xmss-hash-based-signatures-06
- *     Release: July 2016.
- *     https://datatracker.ietf.org/doc/
- *     draft-irtf-cfrg-xmss-hash-based-signatures/?include_text=1
- **/
+        /**
+         * Descibes a signature method for XMSS Winternitz One Time Signatures,
+         * as defined in:
+         * [1] XMSS: Extended Hash-Based Signatures,
+         *     draft-itrf-cfrg-xmss-hash-based-signatures-06
+         *     Release: July 2016.
+         *     https://datatracker.ietf.org/doc/
+         *     draft-irtf-cfrg-xmss-hash-based-signatures/?include_text=1
+         **/
         class XMSS_WOTS_Parameters final {
         public:
             enum ots_algorithm_t {
@@ -42,11 +42,11 @@ namespace nil {
              *
              * @return Input string converted to the given base.
              **/
-            secure_vector <uint8_t> base_w(const secure_vector <uint8_t> &msg, size_t out_size) const;
+            secure_vector<uint8_t> base_w(const secure_vector<uint8_t> &msg, size_t out_size) const;
 
-            secure_vector <uint8_t> base_w(size_t value) const;
+            secure_vector<uint8_t> base_w(size_t value) const;
 
-            void append_checksum(secure_vector <uint8_t> &data);
+            void append_checksum(secure_vector<uint8_t> &data);
 
             /**
              * @return XMSS WOTS registry name for the chosen parameter set.
@@ -124,7 +124,7 @@ namespace nil {
             size_t m_strength;
             uint8_t m_lg_w;
         };
-    }
-}
+    }    // namespace crypto3
+}    // namespace nil
 
 #endif

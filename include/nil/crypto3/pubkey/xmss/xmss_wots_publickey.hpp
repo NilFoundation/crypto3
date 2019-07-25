@@ -20,25 +20,24 @@
 namespace nil {
     namespace crypto3 {
 
-        typedef std::vector<secure_vector < uint8_t>>
-        wots_keysig_t;
+        typedef std::vector<secure_vector<uint8_t>> wots_keysig_t;
 
-/**
- * A Winternitz One Time Signature public key for use with Extended Hash-Based
- * Signatures.
- **/
+        /**
+         * A Winternitz One Time Signature public key for use with Extended Hash-Based
+         * Signatures.
+         **/
         class XMSS_WOTS_PublicKey : virtual public Public_Key {
         public:
             class TreeSignature final {
             public:
                 TreeSignature() = default;
 
-                TreeSignature(const wots_keysig_t &ots_sig, const wots_keysig_t &auth_path) : m_ots_sig(ots_sig),
-                        m_auth_path(auth_path) {
+                TreeSignature(const wots_keysig_t &ots_sig, const wots_keysig_t &auth_path) :
+                    m_ots_sig(ots_sig), m_auth_path(auth_path) {
                 }
 
-                TreeSignature(wots_keysig_t &&ots_sig, wots_keysig_t &&auth_path) : m_ots_sig(std::move(ots_sig)),
-                        m_auth_path(std::move(auth_path)) {
+                TreeSignature(wots_keysig_t &&ots_sig, wots_keysig_t &&auth_path) :
+                    m_ots_sig(std::move(ots_sig)), m_auth_path(std::move(auth_path)) {
                 }
 
                 const wots_keysig_t &ots_signature() const {
@@ -70,8 +69,8 @@ namespace nil {
              *
              * @param oid Identifier for the selected signature method.
              **/
-            XMSS_WOTS_PublicKey(XMSS_WOTS_Parameters::ots_algorithm_t oid) : m_wots_params(oid),
-                    m_hash(m_wots_params.hash_function_name()) {
+            XMSS_WOTS_PublicKey(XMSS_WOTS_Parameters::ots_algorithm_t oid) :
+                m_wots_params(oid), m_hash(m_wots_params.hash_function_name()) {
             }
 
             /**
@@ -83,9 +82,9 @@ namespace nil {
              * @param oid Identifier for the selected signature method.
              * @param rng A random number generate used to generate the public seed.
              **/
-            XMSS_WOTS_PublicKey(XMSS_WOTS_Parameters::ots_algorithm_t oid, RandomNumberGenerator &rng) : m_wots_params(
-                    oid), m_hash(m_wots_params.hash_function_name()),
-                    m_public_seed(rng.random_vec(m_wots_params.element_size())) {
+            XMSS_WOTS_PublicKey(XMSS_WOTS_Parameters::ots_algorithm_t oid, RandomNumberGenerator &rng) :
+                m_wots_params(oid), m_hash(m_wots_params.hash_function_name()),
+                m_public_seed(rng.random_vec(m_wots_params.element_size())) {
             }
 
             /**
@@ -95,8 +94,8 @@ namespace nil {
              * @param oid Identifier for the selected signature method.
              * @param public_seed A precomputed public seed of n-bytes length.
              **/
-            XMSS_WOTS_PublicKey(XMSS_WOTS_Parameters::ots_algorithm_t oid, secure_vector <uint8_t> public_seed)
-                    : m_wots_params(oid), m_hash(m_wots_params.hash_function_name()), m_public_seed(public_seed) {
+            XMSS_WOTS_PublicKey(XMSS_WOTS_Parameters::ots_algorithm_t oid, secure_vector<uint8_t> public_seed) :
+                m_wots_params(oid), m_hash(m_wots_params.hash_function_name()), m_public_seed(public_seed) {
             }
 
             /**
@@ -109,9 +108,11 @@ namespace nil {
              * @param public_seed A precomputed public seed of n-bytes length.
              * @param key Precomputed raw key data of the XMSS_WOTS_PublicKey.
              **/
-            XMSS_WOTS_PublicKey(XMSS_WOTS_Parameters::ots_algorithm_t oid, secure_vector <uint8_t> &&public_seed,
-                                wots_keysig_t &&key) : m_wots_params(oid), m_hash(m_wots_params.hash_function_name()),
-                    m_key(std::move(key)), m_public_seed(std::move(public_seed)) {
+            XMSS_WOTS_PublicKey(XMSS_WOTS_Parameters::ots_algorithm_t oid, secure_vector<uint8_t> &&public_seed,
+                                wots_keysig_t &&key) :
+                m_wots_params(oid),
+                m_hash(m_wots_params.hash_function_name()), m_key(std::move(key)),
+                m_public_seed(std::move(public_seed)) {
             }
 
             /**
@@ -124,9 +125,10 @@ namespace nil {
              * @param public_seed A precomputed public seed of n-bytes length.
              * @param key Precomputed raw key data of the XMSS_WOTS_PublicKey.
              **/
-            XMSS_WOTS_PublicKey(XMSS_WOTS_Parameters::ots_algorithm_t oid, const secure_vector <uint8_t> &public_seed,
-                                const wots_keysig_t &key) : m_wots_params(oid),
-                    m_hash(m_wots_params.hash_function_name()), m_key(key), m_public_seed(public_seed) {
+            XMSS_WOTS_PublicKey(XMSS_WOTS_Parameters::ots_algorithm_t oid, const secure_vector<uint8_t> &public_seed,
+                                const wots_keysig_t &key) :
+                m_wots_params(oid),
+                m_hash(m_wots_params.hash_function_name()), m_key(key), m_public_seed(public_seed) {
             }
 
             /**
@@ -140,11 +142,12 @@ namespace nil {
              * @param adrs An XMSS_Address.
              * @param public_seed The public public_seed.
              **/
-            XMSS_WOTS_PublicKey(XMSS_WOTS_Parameters::ots_algorithm_t oid, const secure_vector <uint8_t> &msg,
+            XMSS_WOTS_PublicKey(XMSS_WOTS_Parameters::ots_algorithm_t oid, const secure_vector<uint8_t> &msg,
                                 const wots_keysig_t &sig, XMSS_Address &adrs,
-                                const secure_vector <uint8_t> &public_seed) : m_wots_params(oid),
-                    m_hash(m_wots_params.hash_function_name()),
-                    m_key(pub_key_from_signature(msg, sig, adrs, public_seed)), m_public_seed(public_seed) {
+                                const secure_vector<uint8_t> &public_seed) :
+                m_wots_params(oid),
+                m_hash(m_wots_params.hash_function_name()), m_key(pub_key_from_signature(msg, sig, adrs, public_seed)),
+                m_public_seed(public_seed) {
             }
 
             /**
@@ -154,11 +157,11 @@ namespace nil {
              * @param i index of the element.
              * @returns n-byte element addressed by i.
              **/
-            const secure_vector <uint8_t> &operator[](size_t i) const {
+            const secure_vector<uint8_t> &operator[](size_t i) const {
                 return m_key[i];
             }
 
-            secure_vector <uint8_t> &operator[](size_t i) {
+            secure_vector<uint8_t> &operator[](size_t i) {
                 return m_key[i];
             }
 
@@ -178,19 +181,19 @@ namespace nil {
                 return m_key;
             }
 
-            const secure_vector <uint8_t> &public_seed() const {
+            const secure_vector<uint8_t> &public_seed() const {
                 return m_public_seed;
             }
 
-            secure_vector <uint8_t> &public_seed() {
+            secure_vector<uint8_t> &public_seed() {
                 return m_public_seed;
             }
 
-            void set_public_seed(const secure_vector <uint8_t> &public_seed) {
+            void set_public_seed(const secure_vector<uint8_t> &public_seed) {
                 m_public_seed = public_seed;
             }
 
-            void set_public_seed(secure_vector <uint8_t> &&public_seed) {
+            void set_public_seed(secure_vector<uint8_t> &&public_seed) {
                 m_public_seed = std::move(public_seed);
             }
 
@@ -267,8 +270,8 @@ namespace nil {
              * @param hash Instance of XMSS_Hash, that may only by the thead
              *        executing chain.
              **/
-            void chain(secure_vector <uint8_t> &x, size_t start_idx, size_t steps, XMSS_Address &adrs,
-                       const secure_vector <uint8_t> &public_seed, XMSS_Hash &hash);
+            void chain(secure_vector<uint8_t> &x, size_t start_idx, size_t steps, XMSS_Address &adrs,
+                       const secure_vector<uint8_t> &public_seed, XMSS_Hash &hash);
 
             /**
              * Algorithm 2: Chaining Function.
@@ -284,15 +287,15 @@ namespace nil {
              * @param adrs An OTS Hash Address.
              * @param public_seed A public seed.
              **/
-            inline void chain(secure_vector <uint8_t> &x, size_t start_idx, size_t steps, XMSS_Address &adrs,
-                              const secure_vector <uint8_t> &public_seed) {
+            inline void chain(secure_vector<uint8_t> &x, size_t start_idx, size_t steps, XMSS_Address &adrs,
+                              const secure_vector<uint8_t> &public_seed) {
                 chain(x, start_idx, steps, adrs, public_seed, m_hash);
             }
 
             XMSS_WOTS_Parameters m_wots_params;
             XMSS_Hash m_hash;
             wots_keysig_t m_key;
-            secure_vector <uint8_t> m_public_seed;
+            secure_vector<uint8_t> m_public_seed;
 
         private:
             /**
@@ -307,10 +310,10 @@ namespace nil {
              *
              * @return Temporary WOTS+ public key.
              **/
-            wots_keysig_t pub_key_from_signature(const secure_vector <uint8_t> &msg, const wots_keysig_t &sig,
-                                                 XMSS_Address &adrs, const secure_vector <uint8_t> &public_seed);
+            wots_keysig_t pub_key_from_signature(const secure_vector<uint8_t> &msg, const wots_keysig_t &sig,
+                                                 XMSS_Address &adrs, const secure_vector<uint8_t> &public_seed);
         };
-    }
-}
+    }    // namespace crypto3
+}    // namespace nil
 
 #endif

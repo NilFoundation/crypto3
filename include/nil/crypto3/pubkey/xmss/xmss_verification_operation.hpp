@@ -17,10 +17,10 @@
 namespace nil {
     namespace crypto3 {
 
-/**
- * Provides signature verification capabilities for Extended Hash-Based
- * Signatures (XMSS).
- **/
+        /**
+         * Provides signature verification capabilities for Extended Hash-Based
+         * Signatures (XMSS).
+         **/
         class XMSS_Verification_Operation final : public virtual pk_operations::verification, public XMSS_Common_Ops {
         public:
             XMSS_Verification_Operation(const XMSS_PublicKey &public_key);
@@ -42,8 +42,8 @@ namespace nil {
              * @return An n-byte string holding the value of the root of a tree
              *         defined by the input parameters.
              **/
-            secure_vector <uint8_t> root_from_signature(const XMSS_Signature &sig, const secure_vector <uint8_t> &msg,
-                                                        XMSS_Address &ards, const secure_vector <uint8_t> &seed);
+            secure_vector<uint8_t> root_from_signature(const XMSS_Signature &sig, const secure_vector<uint8_t> &msg,
+                                                       XMSS_Address &ards, const secure_vector<uint8_t> &seed);
 
             /**
              * Algorithm 14: "XMSS_verify"
@@ -55,12 +55,12 @@ namespace nil {
              *
              * @return true if signature sig is valid for msg, false otherwise.
              **/
-            bool verify(const XMSS_Signature &sig, const secure_vector <uint8_t> &msg, const XMSS_PublicKey &pub_key);
+            bool verify(const XMSS_Signature &sig, const secure_vector<uint8_t> &msg, const XMSS_PublicKey &pub_key);
 
             XMSS_PublicKey m_pub_key;
-            secure_vector <uint8_t> m_msg_buf;
+            secure_vector<uint8_t> m_msg_buf;
         };
-    }
-}
+    }    // namespace crypto3
+}    // namespace nil
 
 #endif

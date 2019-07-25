@@ -19,16 +19,16 @@
 namespace nil {
     namespace crypto3 {
 
-/**
- * Signature generation operation for Extended Hash-Based Signatures (XMSS) as
- * defined in:
- *
- * [1] XMSS: Extended Hash-Based Signatures,
- *     draft-itrf-cfrg-xmss-hash-based-signatures-06
- *     Release: July 2016.
- *     https://datatracker.ietf.org/doc/
- *     draft-irtf-cfrg-xmss-hash-based-signatures/?include_text=1
- **/
+        /**
+         * Signature generation operation for Extended Hash-Based Signatures (XMSS) as
+         * defined in:
+         *
+         * [1] XMSS: Extended Hash-Based Signatures,
+         *     draft-itrf-cfrg-xmss-hash-based-signatures-06
+         *     Release: July 2016.
+         *     https://datatracker.ietf.org/doc/
+         *     draft-irtf-cfrg-xmss-hash-based-signatures/?include_text=1
+         **/
         class XMSS_Signature_Operation final : public virtual pk_operations::signature, public XMSS_Common_Ops {
         public:
             XMSS_Signature_Operation(const XMSS_PrivateKey &private_key);
@@ -39,7 +39,7 @@ namespace nil {
              *
              * @return serialized XMSS signature.
              **/
-            secure_vector <uint8_t> sign(RandomNumberGenerator &) override;
+            secure_vector<uint8_t> sign(RandomNumberGenerator &) override;
 
             void update(const uint8_t msg[], size_t msg_len) override;
 
@@ -52,7 +52,7 @@ namespace nil {
              * @param xmss_priv_key A XMSS private key.
              * @param adrs A XMSS Address.
              **/
-            XMSS_WOTS_PublicKey::TreeSignature generate_tree_signature(const secure_vector <uint8_t> &msg,
+            XMSS_WOTS_PublicKey::TreeSignature generate_tree_signature(const secure_vector<uint8_t> &msg,
                                                                        XMSS_PrivateKey &xmss_priv_key,
                                                                        XMSS_Address &adrs);
 
@@ -66,19 +66,18 @@ namespace nil {
              *
              * @return The signature of msg signed using xmss_priv_key.
              **/
-            XMSS_Signature sign(const secure_vector <uint8_t> &msg, XMSS_PrivateKey &xmss_priv_key);
+            XMSS_Signature sign(const secure_vector<uint8_t> &msg, XMSS_PrivateKey &xmss_priv_key);
 
             wots_keysig_t build_auth_path(XMSS_PrivateKey &priv_key, XMSS_Address &adrs);
 
             void initialize();
 
             XMSS_PrivateKey m_priv_key;
-            secure_vector <uint8_t> m_randomness;
+            secure_vector<uint8_t> m_randomness;
             size_t m_leaf_idx;
             bool m_is_initialized;
         };
-    }
-}
+    }    // namespace crypto3
+}    // namespace nil
 
 #endif
-

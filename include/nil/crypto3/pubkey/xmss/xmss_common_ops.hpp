@@ -11,54 +11,53 @@
 namespace nil {
     namespace crypto3 {
 
-        typedef std::vector<secure_vector < uint8_t>>
-        wots_keysig_t;
+        typedef std::vector<secure_vector<uint8_t>> wots_keysig_t;
 
-/**
- * Operations shared by XMSS signature generation and verification operations.
- **/
+        /**
+         * Operations shared by XMSS signature generation and verification operations.
+         **/
         class XMSS_Common_Ops {
         public:
-            XMSS_Common_Ops(XMSS_Parameters::xmss_algorithm_t oid) : m_xmss_params(oid),
-                    m_hash(m_xmss_params.hash_function_name()) {
+            XMSS_Common_Ops(XMSS_Parameters::xmss_algorithm_t oid) :
+                m_xmss_params(oid), m_hash(m_xmss_params.hash_function_name()) {
             }
 
         protected:
             /**
-              * Algorithm 7: "RAND_HASH"
-              *
-              * Generates a randomized hash.
-              *
-              * This overload is used in multithreaded scenarios, where it is
-              * required to provide seperate instances of XMSS_Hash to each
-              * thread.
-              *
-              * @param[out] result The resulting randomized hash.
-              * @param[in] left Left half of the hash function input.
-              * @param[in] right Right half of the hash function input.
-              * @param[in] adrs Adress of the hash function call.
-              * @param[in] seed The seed for G.
-              * @param[in] hash Instance of XMSS_Hash, that may only by the thead
-              *            executing generate_public_key.
-              **/
-            void randomize_tree_hash(secure_vector <uint8_t> &result, const secure_vector <uint8_t> &left,
-                                     const secure_vector <uint8_t> &right, XMSS_Address &adrs,
-                                     const secure_vector <uint8_t> &seed, XMSS_Hash &hash);
+             * Algorithm 7: "RAND_HASH"
+             *
+             * Generates a randomized hash.
+             *
+             * This overload is used in multithreaded scenarios, where it is
+             * required to provide seperate instances of XMSS_Hash to each
+             * thread.
+             *
+             * @param[out] result The resulting randomized hash.
+             * @param[in] left Left half of the hash function input.
+             * @param[in] right Right half of the hash function input.
+             * @param[in] adrs Adress of the hash function call.
+             * @param[in] seed The seed for G.
+             * @param[in] hash Instance of XMSS_Hash, that may only by the thead
+             *            executing generate_public_key.
+             **/
+            void randomize_tree_hash(secure_vector<uint8_t> &result, const secure_vector<uint8_t> &left,
+                                     const secure_vector<uint8_t> &right, XMSS_Address &adrs,
+                                     const secure_vector<uint8_t> &seed, XMSS_Hash &hash);
 
             /**
-              * Algorithm 7: "RAND_HASH"
-              *
-              * Generates a randomized hash.
-              *
-              * @param[out] result The resulting randomized hash.
-              * @param[in] left Left half of the hash function input.
-              * @param[in] right Right half of the hash function input.
-              * @param[in] adrs Adress of the hash function call.
-              * @param[in] seed The seed for G.
-              **/
-            inline void randomize_tree_hash(secure_vector <uint8_t> &result, const secure_vector <uint8_t> &left,
-                                            const secure_vector <uint8_t> &right, XMSS_Address &adrs,
-                                            const secure_vector <uint8_t> &seed) {
+             * Algorithm 7: "RAND_HASH"
+             *
+             * Generates a randomized hash.
+             *
+             * @param[out] result The resulting randomized hash.
+             * @param[in] left Left half of the hash function input.
+             * @param[in] right Right half of the hash function input.
+             * @param[in] adrs Adress of the hash function call.
+             * @param[in] seed The seed for G.
+             **/
+            inline void randomize_tree_hash(secure_vector<uint8_t> &result, const secure_vector<uint8_t> &left,
+                                            const secure_vector<uint8_t> &right, XMSS_Address &adrs,
+                                            const secure_vector<uint8_t> &seed) {
                 randomize_tree_hash(result, left, right, adrs, seed, m_hash);
             }
 
@@ -77,9 +76,9 @@ namespace nil {
              * @param[in] seed The seed generated during the public key generation.
              * @param[in] hash Instance of XMSS_Hash, that may only be used by the
              *            thead executing create_l_tree.
-            **/
-            void create_l_tree(secure_vector <uint8_t> &result, wots_keysig_t pk, XMSS_Address &adrs,
-                               const secure_vector <uint8_t> &seed, XMSS_Hash &hash);
+             **/
+            void create_l_tree(secure_vector<uint8_t> &result, wots_keysig_t pk, XMSS_Address &adrs,
+                               const secure_vector<uint8_t> &seed, XMSS_Hash &hash);
 
             /**
              * Algorithm 8: "ltree"
@@ -92,17 +91,16 @@ namespace nil {
              * @param[in] adrs Address encoding the address of the L-Tree
              * @param[in] seed The seed generated during the public key generation.
              **/
-            inline void create_l_tree(secure_vector <uint8_t> &result, wots_keysig_t pk, XMSS_Address &adrs,
-                                      const secure_vector <uint8_t> &seed) {
+            inline void create_l_tree(secure_vector<uint8_t> &result, wots_keysig_t pk, XMSS_Address &adrs,
+                                      const secure_vector<uint8_t> &seed) {
                 create_l_tree(result, pk, adrs, seed, m_hash);
             }
 
         protected:
             XMSS_Parameters m_xmss_params;
             XMSS_Hash m_hash;
-
         };
-    }
-}
+    }    // namespace crypto3
+}    // namespace nil
 
 #endif

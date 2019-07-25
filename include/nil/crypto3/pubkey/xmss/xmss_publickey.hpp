@@ -26,17 +26,17 @@ namespace nil {
 
         class XMSS_Verification_Operation;
 
-/**
- * An XMSS: Extended Hash-Based Signature public key.
- * The XMSS public key does not support the X509 standard. Instead the
- * raw format described in [1] is used.
- *
- *   [1] XMSS: Extended Hash-Based Signatures,
- *       draft-itrf-cfrg-xmss-hash-based-signatures-06
- *       Release: July 2016.
- *       https://datatracker.ietf.org/doc/
- *       draft-irtf-cfrg-xmss-hash-based-signatures/?include_text=1
- **/
+        /**
+         * An XMSS: Extended Hash-Based Signature public key.
+         * The XMSS public key does not support the X509 standard. Instead the
+         * raw format described in [1] is used.
+         *
+         *   [1] XMSS: Extended Hash-Based Signatures,
+         *       draft-itrf-cfrg-xmss-hash-based-signatures-06
+         *       Release: July 2016.
+         *       https://datatracker.ietf.org/doc/
+         *       draft-irtf-cfrg-xmss-hash-based-signatures/?include_text=1
+         **/
         class XMSS_PublicKey : public virtual public_key_policy {
         public:
             /**
@@ -50,8 +50,8 @@ namespace nil {
              **/
             XMSS_PublicKey(XMSS_Parameters::xmss_algorithm_t xmss_oid, RandomNumberGenerator &rng) :
 
-                    m_xmss_params(xmss_oid), m_wots_params(m_xmss_params.ots_oid()),
-                    m_root(m_xmss_params.element_size()), m_public_seed(rng.random_vec(m_xmss_params.element_size())) {
+                m_xmss_params(xmss_oid), m_wots_params(m_xmss_params.ots_oid()), m_root(m_xmss_params.element_size()),
+                m_public_seed(rng.random_vec(m_xmss_params.element_size())) {
             }
 
             /**
@@ -71,8 +71,8 @@ namespace nil {
             XMSS_PublicKey(XMSS_Parameters::xmss_algorithm_t xmss_oid, const secure_vector<uint8_t> &root,
                            const secure_vector<uint8_t> &public_seed) :
 
-                    m_xmss_params(xmss_oid), m_wots_params(m_xmss_params.ots_oid()), m_root(root),
-                    m_public_seed(public_seed) {
+                m_xmss_params(xmss_oid),
+                m_wots_params(m_xmss_params.ots_oid()), m_root(root), m_public_seed(public_seed) {
             }
 
             /**
@@ -86,8 +86,8 @@ namespace nil {
             XMSS_PublicKey(XMSS_Parameters::xmss_algorithm_t xmss_oid, secure_vector<uint8_t> &&root,
                            secure_vector<uint8_t> &&public_seed) :
 
-                    m_xmss_params(xmss_oid), m_wots_params(m_xmss_params.ots_oid()), m_root(std::move(root)),
-                    m_public_seed(std::move(public_seed)) {
+                m_xmss_params(xmss_oid),
+                m_wots_params(m_xmss_params.ots_oid()), m_root(std::move(root)), m_public_seed(std::move(public_seed)) {
             }
 
             /**
@@ -171,78 +171,78 @@ namespace nil {
 
             std::string algo_name() const
 
-            override {
+                override {
                 return "XMSS";
             }
 
             algorithm_identifier algorithm_identifier() const
 
-            override {
+                override {
                 return
 
-                        algorithm_identifier(get_oid(), algorithm_identifier::USE_NULL_PARAM
+                    algorithm_identifier(get_oid(), algorithm_identifier::USE_NULL_PARAM
 
-                        );
+                    );
             }
 
             bool check_key(RandomNumberGenerator &, bool) const
 
-            override {
+                override {
                 return true;
             }
 
             std::unique_ptr<pk_operations::verification> create_verification_op(const std::string &,
-                                                                         const std::string &provider) const
+                                                                                const std::string &provider) const
 
-            override;
+                override;
 
             size_t estimated_strength() const
 
-            override {
+                override {
                 return m_xmss_params.
 
-                        estimated_strength();
+                    estimated_strength();
             }
 
             size_t key_length() const
 
-            override {
+                override {
                 return m_xmss_params.
 
-                        estimated_strength();
+                    estimated_strength();
             }
 
-/**
- * Returns a raw byte sequence as defined in [1].
- * This method acts as an alias for raw_public_key().
- *
- * @return raw public key bits.
- **/
+            /**
+             * Returns a raw byte sequence as defined in [1].
+             * This method acts as an alias for raw_public_key().
+             *
+             * @return raw public key bits.
+             **/
             std::vector<uint8_t> public_key_bits() const
 
-            override {
+                override {
                 return
 
-                        raw_public_key();
+                    raw_public_key();
             }
 
-/**
- * Size in bytes of the serialized XMSS public key produced by
- * raw_public_key().
- *
- * @return size in bytes of serialized Public Key.
- **/
+            /**
+             * Size in bytes of the serialized XMSS public key produced by
+             * raw_public_key().
+             *
+             * @return size in bytes of serialized Public Key.
+             **/
             virtual size_t size() const {
                 return sizeof(uint32_t) + 2 * m_xmss_params.element_size();
             }
 
-/**
- * Generates a non standardized byte sequence representing the XMSS
- * public key, as defined in [1] (p. 23, "XMSS Public Key")
- *
- * @return 4-byte OID, followed by n-byte root node, followed by
- *         public seed.
- **/
+            /**
+             * Generates a non standardized byte sequence representing the XMSS
+             * public key, as defined in [1] (p. 23, "XMSS Public Key")
+             *
+             * @return 4-byte OID, followed by n-byte root node, followed by
+             *         public seed.
+             **/
             virtual std::vector<uint8_t> raw_public_key() const;
 
         protected:
@@ -254,7 +254,7 @@ namespace nil {
         private:
             XMSS_Parameters::xmss_algorithm_t deserialize_xmss_oid(const std::vector<uint8_t> &raw_key);
         };
-    }
-}
+    }    // namespace crypto3
+}    // namespace nil
 
 #endif

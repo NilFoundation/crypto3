@@ -1,6 +1,8 @@
 #ifndef CRYPTO3_PUBKEY_ECC_DOMAIN_PARAMETERS_HPP
 #define CRYPTO3_PUBKEY_ECC_DOMAIN_PARAMETERS_HPP
 
+#include <nil/crypto3/pubkey/pem.hpp>
+
 #include <nil/crypto3/pubkey/ec_group/ec_group_info.hpp>
 #include <nil/crypto3/pubkey/ec_group/point_gfp.hpp>
 #include <nil/crypto3/pubkey/ec_group/point_mul.hpp>

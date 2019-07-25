@@ -8,12 +8,12 @@ namespace nil {
     namespace crypto3 {
 
         template<typename T>
-/**
- * Simple helper class to expand std::atomic with copy constructor and copy
- * assignment operator, i.e. for use as element in a container like
- * std::vector. The construction of instances of this wrapper is NOT atomic
- * and needs to be properly guarded.
- **/
+        /**
+         * Simple helper class to expand std::atomic with copy constructor and copy
+         * assignment operator, i.e. for use as element in a container like
+         * std::vector. The construction of instances of this wrapper is NOT atomic
+         * and needs to be properly guarded.
+         **/
         class Atomic final {
         public:
             Atomic() = default;
@@ -47,7 +47,7 @@ namespace nil {
         private:
             std::atomic<T> m_data;
         };
-    }
-}
+    }    // namespace crypto3
+}    // namespace nil
 
 #endif

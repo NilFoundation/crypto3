@@ -17,10 +17,10 @@
 namespace nil {
     namespace crypto3 {
 
-/**
- * Helper tools for low level byte operations required
- * for the XMSS implementation.
- **/
+        /**
+         * Helper tools for low level byte operations required
+         * for the XMSS implementation.
+         **/
         class XMSS_Tools final {
         public:
             XMSS_Tools(const XMSS_Tools &) = delete;
@@ -36,7 +36,7 @@ namespace nil {
              * @param src integral value to concatenate.
              **/
             template<typename T, typename U = typename std::enable_if<std::is_integral<T>::value, void>::type>
-            static void concat(secure_vector <uint8_t> &target, const T &src);
+            static void concat(secure_vector<uint8_t> &target, const T &src);
 
             /**
              * Concatenates the last n bytes of the byte representation in big-endian
@@ -49,7 +49,7 @@ namespace nil {
              *            or equal to the size of type T.
              **/
             template<typename T, typename U = typename std::enable_if<std::is_integral<T>::value, void>::type>
-            static void concat(secure_vector <uint8_t> &target, const T &src, size_t len);
+            static void concat(secure_vector<uint8_t> &target, const T &src, size_t len);
 
             /**
              * Not a public API function - will be removed in a future release.
@@ -69,7 +69,7 @@ namespace nil {
              *
              * @return Presumed number of physical cores based on timing measurements.
              **/
-            static size_t max_threads(); // TODO: Remove max_threads() and use
+            static size_t max_threads();    // TODO: Remove max_threads() and use
             // nil::crypto3::CPUID once proper plattform
             // independent detection of physical cores is
             // available.
@@ -86,14 +86,14 @@ namespace nil {
              * @return std::thread::hardware_concurrency() if t1 < t2
              *         std::thread::hardware_concurrency() / 2 otherwise.
              **/
-            static size_t bench_threads(); // TODO: Remove bench_threads() and use
+            static size_t bench_threads();    // TODO: Remove bench_threads() and use
             // nil::crypto3::CPUID once proper plattform
             // independent detection of physical cores
             // is //available.
         };
 
         template<typename T, typename U>
-        void XMSS_Tools::concat(secure_vector <uint8_t> &target, const T &src) {
+        void XMSS_Tools::concat(secure_vector<uint8_t> &target, const T &src) {
             const uint8_t *src_bytes = reinterpret_cast<const uint8_t *>(&src);
             if (cpuid::is_little_endian()) {
                 std::reverse_copy(src_bytes, src_bytes + sizeof(src), std::back_inserter(target));
@@ -102,9 +102,8 @@ namespace nil {
             }
         }
 
-
         template<typename T, typename U>
-        void XMSS_Tools::concat(secure_vector <uint8_t> &target, const T &src, size_t len) {
+        void XMSS_Tools::concat(secure_vector<uint8_t> &target, const T &src, size_t len) {
             size_t c = static_cast<size_t>(std::min(len, sizeof(src)));
             if (len > sizeof(src)) {
                 target.resize(target.size() + len - sizeof(src), 0);
@@ -117,7 +116,7 @@ namespace nil {
                 std::copy(src_bytes + sizeof(src) - c, src_bytes + sizeof(src), std::back_inserter(target));
             }
         }
-    }
-}
+    }    // namespace crypto3
+}    // namespace nil
 
 #endif

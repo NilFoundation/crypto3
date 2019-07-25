@@ -17,9 +17,9 @@
 namespace nil {
     namespace crypto3 {
 
-/** A Winternitz One Time Signature private key for use with Extended Hash-Based
- * Signatures.
- **/
+        /** A Winternitz One Time Signature private key for use with Extended Hash-Based
+         * Signatures.
+         **/
         class XMSS_WOTS_PrivateKey final : public virtual XMSS_WOTS_PublicKey, public virtual private_key_policy {
         public:
             /**
@@ -37,8 +37,8 @@ namespace nil {
              * @param oid Identifier for the selected signature method.
              * @param rng A random number generator to use for key generation.
              **/
-            XMSS_WOTS_PrivateKey(XMSS_WOTS_Parameters::ots_algorithm_t oid, RandomNumberGenerator &rng)
-                    : XMSS_WOTS_PublicKey(oid, rng), m_private_seed(rng.random_vec(m_wots_params.element_size())) {
+            XMSS_WOTS_PrivateKey(XMSS_WOTS_Parameters::ots_algorithm_t oid, RandomNumberGenerator &rng) :
+                XMSS_WOTS_PublicKey(oid, rng), m_private_seed(rng.random_vec(m_wots_params.element_size())) {
                 set_key_data(generate(m_private_seed));
             }
 
@@ -54,9 +54,10 @@ namespace nil {
              *        of public keys derived from this private key.
              * @param rng A random number generator to use for key generation.
              **/
-            XMSS_WOTS_PrivateKey(XMSS_WOTS_Parameters::ots_algorithm_t oid, const secure_vector <uint8_t> &public_seed,
-                                 RandomNumberGenerator &rng) : XMSS_WOTS_PublicKey(oid, public_seed),
-                    m_private_seed(rng.random_vec(m_wots_params.element_size())) {
+            XMSS_WOTS_PrivateKey(XMSS_WOTS_Parameters::ots_algorithm_t oid, const secure_vector<uint8_t> &public_seed,
+                                 RandomNumberGenerator &rng) :
+                XMSS_WOTS_PublicKey(oid, public_seed),
+                m_private_seed(rng.random_vec(m_wots_params.element_size())) {
                 set_key_data(generate(m_private_seed));
             }
 
@@ -71,8 +72,8 @@ namespace nil {
              * @param public_seed A public seed used for the pseudo random generation
              *        of public keys derived from this private key.
              **/
-            XMSS_WOTS_PrivateKey(XMSS_WOTS_Parameters::ots_algorithm_t oid, const secure_vector <uint8_t> &public_seed)
-                    : XMSS_WOTS_PublicKey(oid, public_seed) {
+            XMSS_WOTS_PrivateKey(XMSS_WOTS_Parameters::ots_algorithm_t oid, const secure_vector<uint8_t> &public_seed) :
+                XMSS_WOTS_PublicKey(oid, public_seed) {
             }
 
             /**
@@ -85,9 +86,10 @@ namespace nil {
              *        of public keys derived from this private key.
              * @param private_seed A secret uniformly random n-byte value.
              **/
-            XMSS_WOTS_PrivateKey(XMSS_WOTS_Parameters::ots_algorithm_t oid, const secure_vector <uint8_t> &public_seed,
-                                 const secure_vector <uint8_t> &private_seed) : XMSS_WOTS_PublicKey(oid, public_seed),
-                    m_private_seed(private_seed) {
+            XMSS_WOTS_PrivateKey(XMSS_WOTS_Parameters::ots_algorithm_t oid, const secure_vector<uint8_t> &public_seed,
+                                 const secure_vector<uint8_t> &private_seed) :
+                XMSS_WOTS_PublicKey(oid, public_seed),
+                m_private_seed(private_seed) {
                 set_key_data(generate(private_seed));
             }
 
@@ -106,7 +108,7 @@ namespace nil {
              * @return WOTS secret key.
              **/
             wots_keysig_t at(size_t i, XMSS_Hash &hash) {
-                secure_vector <uint8_t> idx_bytes;
+                secure_vector<uint8_t> idx_bytes;
                 XMSS_Tools::concat(idx_bytes, i, m_wots_params.element_size());
                 hash.h(idx_bytes, m_private_seed, idx_bytes);
                 return generate(idx_bytes, hash);
@@ -139,7 +141,7 @@ namespace nil {
              * @return WOTS secret key.
              **/
             wots_keysig_t at(const XMSS_Address &adrs, XMSS_Hash &hash) {
-                secure_vector <uint8_t> result;
+                secure_vector<uint8_t> result;
                 hash.prf(result, m_private_seed, adrs.bytes());
                 return generate(result, hash);
             }
@@ -148,7 +150,7 @@ namespace nil {
                 return this->at(adrs, m_hash);
             }
 
-            wots_keysig_t generate_private_key(const secure_vector <uint8_t> &priv_seed);
+            wots_keysig_t generate_private_key(const secure_vector<uint8_t> &priv_seed);
 
             /**
              * Algorithm 4: "WOTS_genPK"
@@ -210,7 +212,7 @@ namespace nil {
              *
              * @return signature for msg.
              **/
-            inline wots_keysig_t sign(const secure_vector <uint8_t> &msg, XMSS_Address &adrs) {
+            inline wots_keysig_t sign(const secure_vector<uint8_t> &msg, XMSS_Address &adrs) {
                 return sign(msg, adrs, m_hash);
             }
 
@@ -230,7 +232,7 @@ namespace nil {
              *
              * @return signature for msg.
              **/
-            wots_keysig_t sign(const secure_vector <uint8_t> &msg, XMSS_Address &adrs, XMSS_Hash &hash);
+            wots_keysig_t sign(const secure_vector<uint8_t> &msg, XMSS_Address &adrs, XMSS_Hash &hash);
 
             /**
              * Retrieves the secret seed used to generate WOTS+ chains. The seed
@@ -238,7 +240,7 @@ namespace nil {
              *
              * @return secret seed.
              **/
-            const secure_vector <uint8_t> &private_seed() const {
+            const secure_vector<uint8_t> &private_seed() const {
                 return m_private_seed;
             }
 
@@ -248,7 +250,7 @@ namespace nil {
              *
              * @param private_seed Uniformly random n-byte value.
              **/
-            void set_private_seed(const secure_vector <uint8_t> &private_seed) {
+            void set_private_seed(const secure_vector<uint8_t> &private_seed) {
                 m_private_seed = private_seed;
             }
 
@@ -258,7 +260,7 @@ namespace nil {
              *
              * @param private_seed Uniformly random n-byte value.
              **/
-            void set_private_seed(secure_vector <uint8_t> &&private_seed) {
+            void set_private_seed(secure_vector<uint8_t> &&private_seed) {
                 m_private_seed = std::move(private_seed);
             }
 
@@ -266,7 +268,7 @@ namespace nil {
                 throw Not_Implemented("No algorithm_identifier available for XMSS-WOTS.");
             }
 
-            secure_vector <uint8_t> private_key_bits() const override {
+            secure_vector<uint8_t> private_key_bits() const override {
                 throw Not_Implemented("No PKCS8 key format defined for XMSS-WOTS.");
             }
 
@@ -285,16 +287,15 @@ namespace nil {
              * @returns a vector of length key_size() of vectors of n bytes length
              *          containing uniformly random data.
              **/
-            wots_keysig_t generate(const secure_vector <uint8_t> &private_seed, XMSS_Hash &hash);
+            wots_keysig_t generate(const secure_vector<uint8_t> &private_seed, XMSS_Hash &hash);
 
-            inline wots_keysig_t generate(const secure_vector <uint8_t> &private_seed) {
+            inline wots_keysig_t generate(const secure_vector<uint8_t> &private_seed) {
                 return generate(private_seed, m_hash);
             }
 
-            secure_vector <uint8_t> m_private_seed;
+            secure_vector<uint8_t> m_private_seed;
         };
-    }
-}
+    }    // namespace crypto3
+}    // namespace nil
 
 #endif
-

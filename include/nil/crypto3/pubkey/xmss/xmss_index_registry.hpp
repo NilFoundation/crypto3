@@ -9,10 +9,10 @@
 namespace nil {
     namespace crypto3 {
 
-/**
- * A registry for XMSS private keys, keeps track of the leaf index for
- * independend copies of the same key.
- **/
+        /**
+         * A registry for XMSS private keys, keeps track of the leaf index for
+         * independend copies of the same key.
+         **/
         class XMSS_Index_Registry final {
         public:
             XMSS_Index_Registry(const XMSS_Index_Registry &) = delete;
@@ -40,10 +40,8 @@ namespace nil {
              *
              * @return last unused leaf index for private_key.
              **/
-            std::shared_ptr<Atomic < size_t>> get(
-            const secure_vector <uint8_t> &private_seed,
-            const secure_vector <uint8_t> &prf
-            );
+            std::shared_ptr<Atomic<size_t>> get(const secure_vector<uint8_t> &private_seed,
+                                                const secure_vector<uint8_t> &prf);
 
         private:
             XMSS_Index_Registry() = default;
@@ -57,7 +55,7 @@ namespace nil {
              *
              * @return unique integral identifier for an XMSS private key.
              **/
-            uint64_t make_key_id(const secure_vector <uint8_t> &private_seed, const secure_vector <uint8_t> &prf) const;
+            uint64_t make_key_id(const secure_vector<uint8_t> &private_seed, const secure_vector<uint8_t> &prf) const;
 
             /**
              * Retrieves the index position of a key within the registry or
@@ -86,11 +84,10 @@ namespace nil {
             size_t add(uint64_t id, size_t last_unused = 0);
 
             std::vector<uint64_t> m_key_ids;
-            std::vector<std::shared_ptr<Atomic < size_t>>>
-            m_leaf_indices;
+            std::vector<std::shared_ptr<Atomic<size_t>>> m_leaf_indices;
             mutex_type m_mutex;
         };
-    }
-}
+    }    // namespace crypto3
+}    // namespace nil
 
 #endif

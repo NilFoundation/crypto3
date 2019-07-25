@@ -6,21 +6,19 @@
 namespace nil {
     namespace crypto3 {
 
-/**
- * Generic XMSS Address type holding 256 Bits of data. Properties
- * of all three address formats L-Tree-Address, Hash-Tree-Address,
- * OTS-Hash-Address can be called depending on the type currently
- * assigned to the XMSS address using set_type().
- **/
+        /**
+         * Generic XMSS Address type holding 256 Bits of data. Properties
+         * of all three address formats L-Tree-Address, Hash-Tree-Address,
+         * OTS-Hash-Address can be called depending on the type currently
+         * assigned to the XMSS address using set_type().
+         **/
         class XMSS_Address final {
         public:
             /**
              * Distinct types an XMSS_Address can represent. The available types
              * are specified in [1] - 2.5 Hash Function Address Scheme.
              **/
-            enum class Type : uint8_t {
-                None = 255, OTS_Hash_Address = 0, LTree_Address = 1, Hash_Tree_Address = 2
-            };
+            enum class Type : uint8_t { None = 255, OTS_Hash_Address = 0, LTree_Address = 1, Hash_Tree_Address = 2 };
 
             /**
              * The available modes for an XMSS Address:
@@ -31,9 +29,7 @@ namespace nil {
              *   - Mask_LSB_Mode: Used to generated the b least significant bytes
              *     of the 2n-byte bitmask. (LTree Address and Hash Tree Address).
              **/
-            enum class Key_Mask : uint8_t {
-                Key_Mode = 0, Mask_Mode = 1, Mask_MSB_Mode = 1, Mask_LSB_Mode = 2
-            };
+            enum class Key_Mask : uint8_t { Key_Mode = 0, Mask_Mode = 1, Mask_MSB_Mode = 1, Mask_LSB_Mode = 2 };
 
             /**
              * Layer Address for XMSS is constantly zero and can not be changed this
@@ -117,7 +113,7 @@ namespace nil {
              **/
             void set_key_mask_mode(Key_Mask value) {
                 BOOST_ASSERT_MSG(value != Key_Mask::Mask_LSB_Mode || get_type() != Type::OTS_Hash_Address,
-                              "Invalid Key_Mask for current XMSS_Address::Type.");
+                                 "Invalid Key_Mask for current XMSS_Address::Type.");
                 m_data[31] = static_cast<uint8_t>(value);
             }
 
@@ -129,8 +125,9 @@ namespace nil {
              * @return index of OTS key pair.
              **/
             uint32_t get_ots_address() const {
-                BOOST_ASSERT_MSG(get_type() == Type::OTS_Hash_Address, "get_ots_address() requires XMSS_Address::Type::"
-                                                                    "OTS_Hash_Address.");
+                BOOST_ASSERT_MSG(get_type() == Type::OTS_Hash_Address,
+                                 "get_ots_address() requires XMSS_Address::Type::"
+                                 "OTS_Hash_Address.");
                 return get_hi32(2);
             }
 
@@ -142,8 +139,9 @@ namespace nil {
              * @param value index of OTS key pair.
              **/
             void set_ots_address(uint32_t value) {
-                BOOST_ASSERT_MSG(get_type() == Type::OTS_Hash_Address, "set_ots_address() requires XMSS_Address::Type::"
-                                                                    "OTS_Hash_Address.");
+                BOOST_ASSERT_MSG(get_type() == Type::OTS_Hash_Address,
+                                 "set_ots_address() requires XMSS_Address::Type::"
+                                 "OTS_Hash_Address.");
                 set_hi32(2, value);
             }
 
@@ -155,8 +153,9 @@ namespace nil {
              * @return index of the leaf.
              **/
             uint32_t get_ltree_address() const {
-                BOOST_ASSERT_MSG(get_type() == Type::LTree_Address, "set_ltree_address() requires XMSS_Address::Type::"
-                                                                 "LTree_Address.");
+                BOOST_ASSERT_MSG(get_type() == Type::LTree_Address,
+                                 "set_ltree_address() requires XMSS_Address::Type::"
+                                 "LTree_Address.");
                 return get_hi32(2);
             }
 
@@ -168,8 +167,9 @@ namespace nil {
              * @param value index of the leaf.
              **/
             void set_ltree_address(uint32_t value) {
-                BOOST_ASSERT_MSG(get_type() == Type::LTree_Address, "set_ltree_address() requires XMSS_Address::Type::"
-                                                                 "LTree_Address.");
+                BOOST_ASSERT_MSG(get_type() == Type::LTree_Address,
+                                 "set_ltree_address() requires XMSS_Address::Type::"
+                                 "LTree_Address.");
                 set_hi32(2, value);
             }
 
@@ -180,8 +180,9 @@ namespace nil {
              * @return chain address.
              **/
             uint32_t get_chain_address() const {
-                BOOST_ASSERT_MSG(get_type() == Type::OTS_Hash_Address, "get_chain_address() requires XMSS_Address::Type::"
-                                                                    "OTS_Hash_Address.");
+                BOOST_ASSERT_MSG(get_type() == Type::OTS_Hash_Address,
+                                 "get_chain_address() requires XMSS_Address::Type::"
+                                 "OTS_Hash_Address.");
                 return get_lo32(2);
             }
 
@@ -190,8 +191,9 @@ namespace nil {
              * the address type is set to Type::OTS_Hash_Address.
              **/
             void set_chain_address(uint32_t value) {
-                BOOST_ASSERT_MSG(get_type() == Type::OTS_Hash_Address, "set_chain_address() requires XMSS_Address::Type::"
-                                                                    "OTS_Hash_Address.");
+                BOOST_ASSERT_MSG(get_type() == Type::OTS_Hash_Address,
+                                 "set_chain_address() requires XMSS_Address::Type::"
+                                 "OTS_Hash_Address.");
                 set_lo32(2, value);
             }
 
@@ -204,8 +206,8 @@ namespace nil {
              **/
             uint32_t get_tree_height() const {
                 BOOST_ASSERT_MSG(get_type() == Type::LTree_Address || get_type() == Type::Hash_Tree_Address,
-                              "get_tree_height() requires XMSS_Address::Type::"
-                              "LTree_Address or XMSS_Address::Type::Hash_Tree_Address.");
+                                 "get_tree_height() requires XMSS_Address::Type::"
+                                 "LTree_Address or XMSS_Address::Type::Hash_Tree_Address.");
                 return get_lo32(2);
             }
 
@@ -218,8 +220,8 @@ namespace nil {
              **/
             void set_tree_height(uint32_t value) {
                 BOOST_ASSERT_MSG(get_type() == Type::LTree_Address || get_type() == Type::Hash_Tree_Address,
-                              "set_tree_height() requires XMSS_Address::Type::"
-                              "LTree_Address or XMSS_Address::Type::Hash_Tree_Address.");
+                                 "set_tree_height() requires XMSS_Address::Type::"
+                                 "LTree_Address or XMSS_Address::Type::Hash_Tree_Address.");
                 set_lo32(2, value);
             }
 
@@ -231,8 +233,9 @@ namespace nil {
              * @return address of the hash function call within chain.
              **/
             uint32_t get_hash_address() const {
-                BOOST_ASSERT_MSG(get_type() == Type::OTS_Hash_Address, "get_hash_address() requires XMSS_Address::Type::"
-                                                                    "OTS_Hash_Address.");
+                BOOST_ASSERT_MSG(get_type() == Type::OTS_Hash_Address,
+                                 "get_hash_address() requires XMSS_Address::Type::"
+                                 "OTS_Hash_Address.");
                 return get_hi32(3);
             }
 
@@ -244,8 +247,9 @@ namespace nil {
              * @param value address of the hash function call within chain.
              **/
             void set_hash_address(uint32_t value) {
-                BOOST_ASSERT_MSG(get_type() == Type::OTS_Hash_Address, "set_hash_address() requires XMSS_Address::Type::"
-                                                                    "OTS_Hash_Address.");
+                BOOST_ASSERT_MSG(get_type() == Type::OTS_Hash_Address,
+                                 "set_hash_address() requires XMSS_Address::Type::"
+                                 "OTS_Hash_Address.");
                 set_hi32(3, value);
             }
 
@@ -258,8 +262,8 @@ namespace nil {
              **/
             uint32_t get_tree_index() const {
                 BOOST_ASSERT_MSG(get_type() == Type::LTree_Address || get_type() == Type::Hash_Tree_Address,
-                              "get_tree_index() requires XMSS_Address::Type::"
-                              "LTree_Address or XMSS_Address::Type::Hash_Tree_Address.");
+                                 "get_tree_index() requires XMSS_Address::Type::"
+                                 "LTree_Address or XMSS_Address::Type::Hash_Tree_Address.");
                 return get_hi32(3);
             }
 
@@ -272,16 +276,16 @@ namespace nil {
              **/
             void set_tree_index(uint32_t value) {
                 BOOST_ASSERT_MSG(get_type() == Type::LTree_Address || get_type() == Type::Hash_Tree_Address,
-                              "set_tree_index() requires XMSS_Address::Type::"
-                              "LTree_Address or XMSS_Address::Type::Hash_Tree_Address.");
+                                 "set_tree_index() requires XMSS_Address::Type::"
+                                 "LTree_Address or XMSS_Address::Type::Hash_Tree_Address.");
                 set_hi32(3, value);
             }
 
-            const secure_vector <uint8_t> &bytes() const {
+            const secure_vector<uint8_t> &bytes() const {
                 return m_data;
             }
 
-            secure_vector <uint8_t> &bytes() {
+            secure_vector<uint8_t> &bytes() {
                 return m_data;
             }
 
@@ -300,45 +304,45 @@ namespace nil {
                 set_type(type);
             }
 
-            XMSS_Address(const secure_vector <uint8_t> &data) : m_data(data) {
+            XMSS_Address(const secure_vector<uint8_t> &data) : m_data(data) {
                 BOOST_ASSERT_MSG(m_data.size() == m_address_size, "XMSS_Address must be of 256 bits size.");
             }
 
-            XMSS_Address(secure_vector <uint8_t> &&data) : m_data(std::move(data)) {
+            XMSS_Address(secure_vector<uint8_t> &&data) : m_data(std::move(data)) {
                 BOOST_ASSERT_MSG(m_data.size() == m_address_size, "XMSS_Address must be of 256 bits size.");
             }
 
         protected:
-            secure_vector <uint8_t> m_data;
+            secure_vector<uint8_t> m_data;
 
         private:
             static const size_t m_address_size = 32;
 
             inline uint32_t get_hi32(size_t offset) const {
-                return ((0x000000FF & m_data[8 * offset + 3]) | (0x000000FF & m_data[8 * offset + 2]) << 8 |
-                        (0x000000FF & m_data[8 * offset + 1]) << 16 | (0x000000FF & m_data[8 * offset]) << 24);
+                return ((0x000000FF & m_data[8 * offset + 3]) | (0x000000FF & m_data[8 * offset + 2]) << 8
+                        | (0x000000FF & m_data[8 * offset + 1]) << 16 | (0x000000FF & m_data[8 * offset]) << 24);
             }
 
             inline void set_hi32(size_t offset, uint32_t value) {
                 m_data[offset * 8] = ((value >> 24) & 0xFF);
                 m_data[offset * 8 + 1] = ((value >> 16) & 0xFF);
                 m_data[offset * 8 + 2] = ((value >> 8) & 0xFF);
-                m_data[offset * 8 + 3] = ((value) & 0xFF);
+                m_data[offset * 8 + 3] = ((value)&0xFF);
             }
 
             inline uint32_t get_lo32(size_t offset) const {
-                return ((0x000000FF & m_data[8 * offset + 7]) | (0x000000FF & m_data[8 * offset + 6]) << 8 |
-                        (0x000000FF & m_data[8 * offset + 5]) << 16 | (0x000000FF & m_data[8 * offset + 4]) << 24);
+                return ((0x000000FF & m_data[8 * offset + 7]) | (0x000000FF & m_data[8 * offset + 6]) << 8
+                        | (0x000000FF & m_data[8 * offset + 5]) << 16 | (0x000000FF & m_data[8 * offset + 4]) << 24);
             }
 
             inline void set_lo32(size_t offset, uint32_t value) {
                 m_data[offset * 8 + 4] = ((value >> 24) & 0xFF);
                 m_data[offset * 8 + 5] = ((value >> 16) & 0xFF);
                 m_data[offset * 8 + 6] = ((value >> 8) & 0xFF);
-                m_data[offset * 8 + 7] = ((value) & 0xFF);
+                m_data[offset * 8 + 7] = ((value)&0xFF);
             }
         };
-    }
-}
+    }    // namespace crypto3
+}    // namespace nil
 
 #endif
