@@ -146,7 +146,7 @@ namespace nil {
                             .encode(number_type::encode_1363(get_a(), p_bytes), OCTET_STRING)
                             .encode(number_type::encode_1363(get_b(), p_bytes), OCTET_STRING)
                             .end_cons()
-                            .encode(get_base_point().encode(point_gfp::UNCOMPRESSED), OCTET_STRING)
+                            .encode(get_base_point().encode(point_gfp<CurveType>::UNCOMPRESSED), OCTET_STRING)
                             .encode(get_order())
                             .encode(get_cofactor())
                             .end_cons();
@@ -328,8 +328,11 @@ namespace nil {
                  * Multi exponentiate. Not constant time.
                  * @return base_point*x + pt*y
                  */
-                point_gfp<curve_type> point_multiply(const number_type &x, const point_gfp &pt,
-                                                     const number_type &y) const;
+                point_gfp<curve_type> point_multiply(const number_type &x, const point_gfp<CurveType> &pt,
+                                                     const number_type &y) const {
+                    point_gfp_multi_point_precompute xy_mul(get_base_point(), pt);
+                    return xy_mul.multi_exp(x, y);
+                }
 
                 /**
                  * Blinded point multiplication, attempts resistance to side channels
@@ -366,22 +369,38 @@ namespace nil {
                 template<typename UniformRandomGenerator>
                 point_gfp<curve_type> blinded_var_point_multiply(const point_gfp<curve_type> &point,
                                                                  const number_type &k, UniformRandomGenerator &rng,
-                                                                 std::vector<number_type> &ws) const;
+                                                                 std::vector<number_type> &ws) const {
+                    point_gfp_var_point_precompute mul(point, rng, ws);
+                    return mul.mul(k, rng, get_order(), ws);
+                }
 
                 /**
                  * Return a random scalar ie an integer in [1,order)
                  */
                 template<typename UniformRandomGenerator>
-                number_type random_scalar(UniformRandomGenerator &rng) const;
+                number_type random_scalar(UniformRandomGenerator &rng) const {
+                    return number_type::random_integer(rng, 1, get_order());
+                }
 
                 /**
                  * Return the zero (or infinite) point on this curve
                  */
-                point_gfp<curve_type> zero_point() const;
+                point_gfp<curve_type> zero_point() const {
+                    return point_gfp(data().curve());
+                }
 
-                size_t point_size(typename point_gfp<curve_type>::compression_type format) const;
+                size_t point_size(typename point_gfp<curve_type>::compression_type format) const {
+                    // Hybrid and standard format are (x,y), compressed is y, +1 format byte
+                    if (format == point_gfp::COMPRESSED) {
+                        return (1 + get_p_bytes());
+                    } else {
+                        return (1 + 2 * get_p_bytes());
+                    }
+                }
 
-                point_gfp<curve_type> os2ecp(const uint8_t bits[], size_t len) const;
+                point_gfp<curve_type> os2ecp(const uint8_t bits[], size_t len) const {
+                    return nil::crypto3::os2ecp(bits, len, data().curve());
+                }
 
                 template<typename Alloc>
                 point_gfp<curve_type> os2ecp(const std::vector<uint8_t, Alloc> &vec) const {
@@ -483,13 +502,13 @@ namespace nil {
                 NumberType m_g_y;
                 NumberType m_order;
                 NumberType m_cofactor;
-                modular_reducer m_mod_order{};
-                point_gfp_base_point_precompute m_base_mult{};
+                modular_reducer m_mod_order {};
+                point_gfp_base_point_precompute m_base_mult {};
                 oid_t m_oid;
-                size_t m_p_bits{};
-                size_t m_order_bits{};
-                bool m_a_is_minus_3{};
-                bool m_a_is_zero{};
+                size_t m_p_bits {};
+                size_t m_order_bits {};
+                bool m_a_is_minus_3 {};
+                bool m_a_is_zero {};
 
                 static ec_group_data_map &ec_group_data();
 
@@ -502,7 +521,7 @@ namespace nil {
                 // Member data
                 const ec_group_data &data() const;
 
-                std::shared_ptr<ec_group_data> m_data{};
+                std::shared_ptr<ec_group_data> m_data {};
             };
 
             template<typename CurveType, typename NumberType = typename CurveType::number_type>
