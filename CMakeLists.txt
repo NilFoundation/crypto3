@@ -77,7 +77,6 @@ list(APPEND ${CURRENT_PROJECT_NAME}_UNGROUPED_SOURCES
 
      src/ec_group/point_gfp.cpp
      src/ec_group/ec_group.cpp
-     src/ec_group/ec_named.cpp
      )
 
 option(CRYPTO3_PUBKEY_RSA "Build with RSA public key scheme support" TRUE)

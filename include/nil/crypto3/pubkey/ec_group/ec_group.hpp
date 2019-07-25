@@ -1,13 +1,15 @@
 #ifndef CRYPTO3_PUBKEY_ECC_DOMAIN_PARAMETERS_HPP
 #define CRYPTO3_PUBKEY_ECC_DOMAIN_PARAMETERS_HPP
 
+#include <nil/crypto3/pubkey/ec_group/ec_group_info.hpp>
 #include <nil/crypto3/pubkey/ec_group/point_gfp.hpp>
 #include <nil/crypto3/pubkey/ec_group/point_mul.hpp>
 
-#include <nil/crypto3/asn1/asn1_oid.hpp>
-
 #include <memory>
 #include <set>
+
+#include <nil/crypto3/asn1/asn1_oid.hpp>
+#include <nil/crypto3/asn1/der_enc.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -479,13 +481,13 @@ namespace nil {
                 NumberType m_g_y;
                 NumberType m_order;
                 NumberType m_cofactor;
-                modular_reducer m_mod_order;
-                point_gfp_base_point_precompute m_base_mult;
+                modular_reducer m_mod_order{};
+                point_gfp_base_point_precompute m_base_mult{};
                 oid_t m_oid;
-                size_t m_p_bits;
-                size_t m_order_bits;
-                bool m_a_is_minus_3;
-                bool m_a_is_zero;
+                size_t m_p_bits{};
+                size_t m_order_bits{};
+                bool m_a_is_minus_3{};
+                bool m_a_is_zero{};
 
                 static ec_group_data_map &ec_group_data();
 
@@ -498,7 +500,7 @@ namespace nil {
                 // Member data
                 const ec_group_data &data() const;
 
-                std::shared_ptr<ec_group_data> m_data;
+                std::shared_ptr<ec_group_data> m_data{};
             };
 
             template<typename CurveType, typename NumberType = typename CurveType::number_type>
