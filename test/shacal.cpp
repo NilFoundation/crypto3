@@ -48,6 +48,7 @@ struct state_adder {
 namespace boost {
     namespace test_tools {
         namespace tt_detail {
+            template<>
             struct print_log_value<block::shacal1::block_type> {
                 void operator()(std::ostream&, typename block::shacal1::block_type const&) {
                 }
