@@ -45,9 +45,22 @@ struct state_adder {
     }
 };
 
-BOOST_TEST_DONT_PRINT_LOG_VALUE(block::shacal1::block_type)
-BOOST_TEST_DONT_PRINT_LOG_VALUE(block::shacal2<256>::block_type)
-BOOST_TEST_DONT_PRINT_LOG_VALUE(block::shacal2<512>::block_type)
+namespace boost {
+    namespace test_tools {
+        namespace tt_detail {
+            struct print_log_value<block::shacal1::block_type> {
+                void operator()(std::ostream&, typename block::shacal1::block_type const&) {
+                }
+            };
+
+            template<std::size_t Size>
+            struct print_log_value<block::shacal2<Size>::block_type> {
+                void operator()(std::ostream&, typename block::shacal2<Size>::block_type const&) {
+                }
+            };
+        }    // namespace tt_detail
+    }        // namespace test_tools
+}    // namespace boost
 
 BOOST_AUTO_TEST_SUITE(shacal_test_suite)
 

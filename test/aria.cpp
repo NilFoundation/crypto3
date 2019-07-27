@@ -23,21 +23,19 @@
 
 using namespace nil::crypto3::block;
 
-typedef std::unordered_map<std::string, std::string>::value_type string_data_value;
-typedef std::unordered_map<std::string, std::string> string_data;
-BOOST_TEST_DONT_PRINT_LOG_VALUE(string_data_value)
+namespace boost {
+    namespace test_tools {
+        namespace tt_detail {
+            template<template<typename, typename> class P, typename K, typename V>
+            struct print_log_value<P<K, V>> {
+                void operator()(std::ostream&, P<K, V> const&) {
+                }
+            };
+        }    // namespace tt_detail
+    }        // namespace test_tools
+}    // namespace boost
 
-typedef std::unordered_map<std::string, std::vector<uint8_t>>::value_type byte_vector_data_value;
-typedef std::unordered_map<std::string, std::vector<uint8_t>> byte_vector_data;
-BOOST_TEST_DONT_PRINT_LOG_VALUE(byte_vector_data_value)
-
-typedef std::vector<uint8_t> byte_vector_t;
-BOOST_TEST_DONT_PRINT_LOG_VALUE(byte_vector_t)
-
-typedef std::vector<std::string> string_vector_t;
-BOOST_TEST_DONT_PRINT_LOG_VALUE(string_vector_t)
-
-static const byte_vector_data valid_data = {
+static const std::unordered_map<std::string, std::vector<std::uint8_t>> valid_data = {
     {"Zg==", {0x66}},
     {"Zm8=", {0x66, 0x6F}},
     {"Zm9v", {0x66, 0x6F, 0x6F}},
@@ -64,7 +62,7 @@ static const byte_vector_data valid_data = {
     {"Dw/O2Ul6r5I=", {0x0f, 0x0f, 0xce, 0xd9, 0x49, 0x7a, 0xaf, 0x92}},
     {"Jw+xiYKADaZA", {0x27, 0x0f, 0xb1, 0x89, 0x82, 0x80, 0x0d, 0xa6, 0x40}}};
 
-static const string_vector_t invalid_data = {"ZOOL!isnotvalidbase64", "Neitheris:this?"};
+static const std::vector<std::string> invalid_data = {"ZOOL!isnotvalidbase64", "Neitheris:this?"};
 
 BOOST_AUTO_TEST_SUITE(aria_test_suite)
 
