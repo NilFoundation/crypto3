@@ -29,8 +29,17 @@
 
 using namespace nil::crypto3::hash;
 
-typedef std::unordered_map<std::string, std::string>::value_type string_data_value;
-BOOST_TEST_DONT_PRINT_LOG_VALUE(string_data_value)
+namespace boost {
+    namespace test_tools {
+        namespace tt_detail {
+            template<template<typename, typename> class P, typename K, typename V>
+            struct print_log_value<P<K, V>> {
+                void operator()(std::ostream&, P<K, V> const&) {
+                }
+            };
+        }    // namespace tt_detail
+    }        // namespace test_tools
+}    // namespace boost
 
 BOOST_TEST_DONT_PRINT_LOG_VALUE(blake2b<128>::construction_type::digest_type)
 BOOST_TEST_DONT_PRINT_LOG_VALUE(blake2b<160>::construction_type::digest_type)

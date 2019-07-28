@@ -15,6 +15,9 @@
 
 #include <nil/crypto3/hash/detail/pack.hpp>
 
+#include <nil/crypto3/hash/accumulators/parameters/bits.hpp>
+#include <nil/crypto3/hash/accumulators/parameters/salt.hpp>
+
 #include <boost/integer.hpp>
 #include <boost/static_assert.hpp>
 #include <boost/utility/enable_if.hpp>

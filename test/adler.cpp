@@ -31,14 +31,17 @@ using namespace nil::crypto3::hash;
 using namespace nil::crypto3::accumulators;
 using nil::crypto3::hash::detail::largest_prime;
 
-typedef std::vector<uint8_t> byte_vector_t;
-BOOST_TEST_DONT_PRINT_LOG_VALUE(byte_vector_t)
-
-typedef std::unordered_map<std::string, std::string>::value_type string_data_value;
-BOOST_TEST_DONT_PRINT_LOG_VALUE(string_data_value)
-
-typedef std::unordered_map<std::string, std::vector<uint8_t>>::value_type byte_data_value_t;
-BOOST_TEST_DONT_PRINT_LOG_VALUE(byte_data_value_t)
+namespace boost {
+    namespace test_tools {
+        namespace tt_detail {
+            template<template<typename, typename> class P, typename K, typename V>
+            struct print_log_value<P<K, V>> {
+                void operator()(std::ostream&, P<K, V> const&) {
+                }
+            };
+        }    // namespace tt_detail
+    }        // namespace test_tools
+}    // namespace boost
 
 static const std::unordered_map<std::string, std::string> string_data
     = {{"\x2", "00030003"},
