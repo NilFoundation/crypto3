@@ -38,24 +38,6 @@ public:
     typedef block::digest<Size> digest_type;
 };
 
-namespace boost {
-    namespace test_tools {
-        namespace tt_detail {
-            template<std::size_t Size>
-            struct print_log_value<typename fixture<Size>::block_type> {
-                void operator()(std::ostream&, typename fixture<Size>::block_type const&) {
-                }
-            };
-
-            template<std::size_t Size>
-            struct print_log_value<typename fixture<Size>::digest_type> {
-                void operator()(std::ostream&, typename fixture<Size>::digest_type const&) {
-                }
-            };
-        }    // namespace tt_detail
-    }        // namespace test_tools
-}    // namespace boost
-
 BOOST_TEST_DONT_PRINT_LOG_VALUE(fixture<256>::digest_type)
 
 BOOST_TEST_DONT_PRINT_LOG_VALUE(fixture<256>::block_type)

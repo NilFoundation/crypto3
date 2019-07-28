@@ -33,8 +33,6 @@ if(NOT Boost_CONTAINER_FOUND OR NOT Boost_FOUND)
     cm_find_package(Boost COMPONENTS container)
 endif()
 
-cm_find_package(${CMAKE_WORKSPACE_NAME}_utilities)
-
 list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
      include/nil/crypto3/block/algorithm/encrypt.hpp
      include/nil/crypto3/block/algorithm/decrypt.hpp
@@ -481,7 +479,6 @@ elseif(${CMAKE_TARGET_ARCHITECTURE} STREQUAL "ppc64")
 endif()
 
 target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
-                      ${CMAKE_WORKSPACE_NAME}::utilities
 
                       ${Boost_LIBRARIES})
 
