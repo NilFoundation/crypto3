@@ -148,7 +148,7 @@ namespace nil {
                 if (provider == "core" || provider.empty()) {
                     return std::unique_ptr<pk_operations::encryption>(new el_gamal_encryption_operation(*this, params));
                 }
-                throw Provider_Not_Found(algo_name(), provider);
+                throw provider_not_found(algo_name(), provider);
             }
 
             std::unique_ptr<pk_operations::decryption>
@@ -158,7 +158,7 @@ namespace nil {
                     return std::unique_ptr<pk_operations::decryption>(
                         new el_gamal_decryption_operation(*this, params, rng));
                 }
-                throw Provider_Not_Found(algo_name(), provider);
+                throw provider_not_found(algo_name(), provider);
             }
         }    // namespace pubkey
     }        // namespace crypto3

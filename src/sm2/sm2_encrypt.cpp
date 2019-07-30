@@ -201,7 +201,7 @@ namespace nil {
                     return std::unique_ptr<pk_operations::encryption>(new SM2_Encryption_Operation(*this, kdf_hash));
                 }
 
-                throw Provider_Not_Found(algo_name(), provider);
+                throw provider_not_found(algo_name(), provider);
             }
 
             std::unique_ptr<pk_operations::decryption>
@@ -214,7 +214,7 @@ namespace nil {
                         new SM2_Decryption_Operation(*this, rng, kdf_hash));
                 }
 
-                throw Provider_Not_Found(algo_name(), provider);
+                throw provider_not_found(algo_name(), provider);
             }
         }    // namespace pubkey
     }        // namespace crypto3

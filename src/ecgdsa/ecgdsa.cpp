@@ -47,7 +47,7 @@ namespace nil {
 
                 // With overwhelming probability, a bug rather than actual zero r/s
                 if (r.is_zero() || s.is_zero()) {
-                    throw Internal_Error("During ECGDSA signature generated zero r/s");
+                    throw internal_error("During ECGDSA signature generated zero r/s");
                 }
 
                 return boost::multiprecision::cpp_int::encode_fixed_length_int_pair(r, s, m_group.get_order_bytes());

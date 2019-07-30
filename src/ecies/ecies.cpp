@@ -59,7 +59,7 @@ namespace nil {
                             = group.blinded_var_point_multiply(input_point, m_key.private_value(), m_rng, m_ws);
 
                         if (S.on_the_curve() == false) {
-                            throw Internal_Error("ECDH agreed value was not on the curve");
+                            throw internal_error("ECDH agreed value was not on the curve");
                         }
                         return cpp_int::encode_1363(S.get_affine_x(), group.get_p_bytes());
                     }
@@ -222,7 +222,7 @@ namespace nil {
             std::vector<uint8_t> ecies_encryptor::enc(const uint8_t data[], size_t length,
                                                       random_number_generator &) const {
                 if (m_other_point.is_zero()) {
-                    throw Invalid_State("ECIES: the other key is zero");
+                    throw invalid_state("ECIES: the other key is zero");
                 }
 
                 const symmetric_key secret_key = m_ka.derive_secret(m_eph_public_key_bin, m_other_point);
@@ -329,7 +329,7 @@ namespace nil {
 
                     try {
                         // the decryption can fail:
-                        // e.g. Integrity_Failure is thrown if GCM is used and the message does not have a valid tag
+                        // e.g. integrity_failure is thrown if GCM is used and the message does not have a valid tag
                         secure_vector<uint8_t> decrypted_data(encrypted_data.begin(), encrypted_data.end());
                         cipher->finish(decrypted_data);
                         return decrypted_data;

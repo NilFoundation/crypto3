@@ -196,7 +196,7 @@ namespace nil {
                         new sm2_verification_operation(*this, userid, hash));
                 }
 
-                throw Provider_Not_Found(algo_name(), provider);
+                throw provider_not_found(algo_name(), provider);
             }
 
             std::unique_ptr<pk_operations::signature> sm2_signature_private_key::create_signature_op(
@@ -221,7 +221,7 @@ namespace nil {
                     return std::unique_ptr<pk_operations::signature>(new sm2_signature_operation(*this, userid, hash));
                 }
 
-                throw Provider_Not_Found(algo_name(), provider);
+                throw provider_not_found(algo_name(), provider);
             }
         }    // namespace pubkey
     }        // namespace crypto3

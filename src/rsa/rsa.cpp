@@ -432,7 +432,7 @@ namespace nil {
                 if (provider == "core" || provider.empty()) {
                     return std::unique_ptr<pk_operations::encryption>(new RSA_Encryption_Operation(*this, params));
                 }
-                throw Provider_Not_Found(algo_name(), provider);
+                throw provider_not_found(algo_name(), provider);
             }
 
             std::unique_ptr<pk_operations::kem_encryption>
@@ -442,7 +442,7 @@ namespace nil {
                     return std::unique_ptr<pk_operations::kem_encryption>(
                         new RSA_KEM_Encryption_Operation(*this, params));
                 }
-                throw Provider_Not_Found(algo_name(), provider);
+                throw provider_not_found(algo_name(), provider);
             }
 
             std::unique_ptr<pk_operations::verification>
@@ -459,7 +459,7 @@ namespace nil {
                     return std::unique_ptr<pk_operations::verification>(new RSA_Verify_Operation(*this, params));
                 }
 
-                throw Provider_Not_Found(algo_name(), provider);
+                throw provider_not_found(algo_name(), provider);
             }
 
             std::unique_ptr<pk_operations::decryption>
@@ -481,7 +481,7 @@ namespace nil {
                     return std::unique_ptr<pk_operations::decryption>(new RSA_Decryption_Operation(*this, params, rng));
                 }
 
-                throw Provider_Not_Found(algo_name(), provider);
+                throw provider_not_found(algo_name(), provider);
             }
 
             std::unique_ptr<pk_operations::kem_decryption>
@@ -492,7 +492,7 @@ namespace nil {
                         new RSA_KEM_Decryption_Operation(*this, params, rng));
                 }
 
-                throw Provider_Not_Found(algo_name(), provider);
+                throw provider_not_found(algo_name(), provider);
             }
 
             std::unique_ptr<pk_operations::signature>
@@ -511,7 +511,7 @@ namespace nil {
                     return std::unique_ptr<pk_operations::signature>(new rsa_signature_operation(*this, params, rng));
                 }
 
-                throw Provider_Not_Found(algo_name(), provider);
+                throw provider_not_found(algo_name(), provider);
             }
         }    // namespace pubkey
     }        // namespace crypto3

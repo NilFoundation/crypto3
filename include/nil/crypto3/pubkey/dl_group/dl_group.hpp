@@ -49,7 +49,7 @@ namespace nil {
                         }
                     }
 
-                    throw Internal_Error("dl_group: Couldn't create a suitable generator");
+                    throw internal_error("dl_group: Couldn't create a suitable generator");
                 }
 
             }    // namespace detail
@@ -374,7 +374,7 @@ namespace nil {
              */
             std::vector<uint8_t> der_encode(format format) const {
                 if (get_q() == 0 && (format == ANSI_X9_57 || format == ANSI_X9_42)) {
-                    throw Encoding_Error("Cannot encode dl_group in ANSI formats when q param is missing");
+                    throw encoding_error("Cannot encode dl_group in ANSI formats when q param is missing");
                 }
 
                 if (format == ANSI_X9_57) {

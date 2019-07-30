@@ -117,7 +117,7 @@ namespace nil {
 
                 // With overwhelming probability, a bug rather than actual zero r/s
                 if (r == 0 || s == 0) {
-                    throw Internal_Error("Computed zero r/s during DSA signature");
+                    throw internal_error("Computed zero r/s during DSA signature");
                 }
 
                 return cpp_int::encode_fixed_length_int_pair(r, s, q.bytes());

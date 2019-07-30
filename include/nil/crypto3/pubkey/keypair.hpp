@@ -78,7 +78,7 @@ namespace nil {
 
                     try {
                         signature = signer.sign_message(message, rng);
-                    } catch (Encoding_Error &) {
+                    } catch (encoding_error &) {
                         return false;
                     }
 

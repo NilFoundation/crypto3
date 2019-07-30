@@ -29,7 +29,7 @@ namespace nil {
                             = m_group.blinded_var_point_multiply(input_point, m_l_times_priv, m_rng, m_ws);
 
                         if (!S.on_the_curve()) {
-                            throw Internal_Error("ECDH agreed value was not on the curve");
+                            throw internal_error("ECDH agreed value was not on the curve");
                         }
                         return boost::multiprecision::cpp_int::encode_1363(S.get_affine_x(), m_group.get_p_bytes());
                     }
@@ -48,7 +48,7 @@ namespace nil {
                                                           const std::string &provider) const {
                 return std::unique_ptr<pk_operations::key_agreement>(new ecdh_ka_operation(*this, params, rng));
 
-                throw Provider_Not_Found(algo_name(), provider);
+                throw provider_not_found(algo_name(), provider);
             }
         }    // namespace pubkey
     }        // namespace crypto3

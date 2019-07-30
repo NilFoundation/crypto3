@@ -78,7 +78,7 @@ namespace nil {
                 return *m_data;
             }
 
-            throw Invalid_State("dl_group uninitialized");
+            throw invalid_state("dl_group uninitialized");
         }
 
         std::shared_ptr<const montgomery_params> dl_group::monty_params_p() const {

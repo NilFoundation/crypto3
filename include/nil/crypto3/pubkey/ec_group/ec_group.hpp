@@ -153,13 +153,13 @@ namespace nil {
                     } else if (form == EC_DOMPAR_ENC_oid_t) {
                         const oid_t oid = get_curve_oid();
                         if (oid.empty()) {
-                            throw Encoding_Error("Cannot encode ec_group as oid_t because oid_t not set");
+                            throw encoding_error("Cannot encode ec_group as oid_t because oid_t not set");
                         }
                         der.encode(oid);
                     } else if (form == EC_DOMPAR_ENC_IMPLICITCA) {
                         der.encode_null();
                     } else {
-                        throw Internal_Error("ec_group::der_encode: Unknown encoding");
+                        throw internal_error("ec_group::der_encode: Unknown encoding");
                     }
 
                     return output;
@@ -386,12 +386,12 @@ namespace nil {
                  * Return the zero (or infinite) point on this curve
                  */
                 point_gfp<curve_type> zero_point() const {
-                    return point_gfp(data().curve());
+                    return point_gfp<curve_type>(m_curve);
                 }
 
                 size_t point_size(typename point_gfp<curve_type>::compression_type format) const {
                     // Hybrid and standard format are (x,y), compressed is y, +1 format byte
-                    if (format == point_gfp::COMPRESSED) {
+                    if (format == point_gfp<curve_type>::COMPRESSED) {
                         return (1 + get_p_bytes());
                     } else {
                         return (1 + 2 * get_p_bytes());

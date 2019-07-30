@@ -333,7 +333,7 @@ namespace nil {
 
             const ec_group_data &ec_group::data() const {
                 if (m_data == nullptr) {
-                    throw Invalid_State("ec_group uninitialized");
+                    throw invalid_state("ec_group uninitialized");
                 }
                 return *m_data;
             }
@@ -439,10 +439,6 @@ namespace nil {
                     return 0;
                 }
                 return pt.get_affine_x();
-            }
-
-            point_gfp ec_group::zero_point() const {
-                return point_gfp(data().curve());
             }
         }    // namespace pubkey
     }        // namespace crypto3

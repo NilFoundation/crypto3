@@ -5,7 +5,6 @@
 #include <nil/crypto3/codec/algorithm/decode.hpp>
 #include <nil/crypto3/codec/base.hpp>
 
-#include <nil/crypto3/utilities/data_src.hpp>
 #include <nil/crypto3/utilities/secmem.hpp>
 
 #include <string>

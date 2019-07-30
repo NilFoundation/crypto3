@@ -159,7 +159,7 @@ namespace nil {
                    .get_contents_unlocked();
 #else
                 CRYPTO3_UNUSED(key, rng, pass, msec, pbe_algo);
-                throw Encoding_Error("pkcs8::ber_encode cannot encipher because PBES2 was disabled in build");
+                throw encoding_error("pkcs8::ber_encode cannot encipher because PBES2 was disabled in build");
 #endif
             }
 
@@ -198,7 +198,7 @@ namespace nil {
                    .get_contents_unlocked();
 #else
                 CRYPTO3_UNUSED(key, rng, pass, pbkdf_iterations, cipher, pbkdf_hash);
-                throw Encoding_Error(
+                throw encoding_error(
                         "pkcs8::ber_encode_encrypted_pbkdf_iter cannot encipher because PBES2 disabled in build");
 #endif
             }
@@ -238,7 +238,7 @@ namespace nil {
                    .get_contents_unlocked();
 #else
                 CRYPTO3_UNUSED(key, rng, pass, pbkdf_msec, pbkdf_iterations, cipher, pbkdf_hash);
-                throw Encoding_Error("ber_encode_encrypted_pbkdf_msec cannot encipher because PBES2 disabled in build");
+                throw encoding_error("ber_encode_encrypted_pbkdf_msec cannot encipher because PBES2 disabled in build");
 #endif
             }
 

@@ -240,7 +240,7 @@ namespace nil {
              */
             void force_affine() {
                 if (is_zero()) {
-                    throw Invalid_State("Cannot convert zero ECC point to affine");
+                    throw invalid_state("Cannot convert zero ECC point to affine");
                 }
 
                 secure_vector<word> ws;

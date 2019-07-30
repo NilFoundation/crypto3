@@ -133,7 +133,7 @@ namespace nil {
 
                     try {
                         // the decryption can fail:
-                        // e.g. Integrity_Failure is thrown if GCM is used and the message does not have a valid tag
+                        // e.g. integrity_failure is thrown if GCM is used and the message does not have a valid tag
 
                         if (m_iv.size()) {
                             m_cipher->start(m_iv.bits_of());

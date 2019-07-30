@@ -95,7 +95,7 @@ namespace nil {
                 std::shared_ptr<GF2m_Field> sp_field = polyn.get_sp_field();
                 int deg_sigma = polyn.get_degree();
                 if (deg_sigma <= 3) {
-                    throw Internal_Error("Unexpected degree in gf2m_decomp_rootfind_state");
+                    throw internal_error("Unexpected degree in gf2m_decomp_rootfind_state");
                 }
 
                 coeff_3 = polyn.get_coef(3);

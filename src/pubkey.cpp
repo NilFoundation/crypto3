@@ -193,7 +193,7 @@ namespace nil {
 
             std::vector<uint8_t> der_encode_signature(const std::vector<uint8_t> &sig, size_t parts, size_t part_size) {
                 if (sig.size() % parts != 0 || sig.size() != parts * part_size) {
-                    throw Encoding_Error("Unexpected size for DER signature");
+                    throw encoding_error("Unexpected size for DER signature");
                 }
 
                 std::vector<boost::multiprecision::cpp_int> sig_parts(parts);
@@ -216,7 +216,7 @@ namespace nil {
                 // the exact value
                 return m_op->signature_length() + (8 + 4 * m_parts);
             } else {
-                throw Internal_Error("pk_signer: Invalid signature format enum");
+                throw internal_error("pk_signer: Invalid signature format enum");
             }
         }
 
@@ -228,7 +228,7 @@ namespace nil {
             } else if (m_sig_format == DER_SEQUENCE) {
                 return der_encode_signature(sig, m_parts, m_part_size);
             } else {
-                throw Internal_Error("pk_signer: Invalid signature format enum");
+                throw internal_error("pk_signer: Invalid signature format enum");
             }
         }
 
@@ -294,7 +294,7 @@ namespace nil {
 
                     return m_op->is_valid_signature(real_sig.data(), real_sig.size());
                 } else {
-                    throw Internal_Error("pk_verifier: Invalid signature format enum");
+                    throw internal_error("pk_verifier: Invalid signature format enum");
                 }
             } catch (std::invalid_argument &) {
                 return false;

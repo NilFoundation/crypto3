@@ -86,7 +86,7 @@ namespace nil {
 
                     const boost::multiprecision::cpp_int s = m_group.multiply_mod_order(m_x, k - w);
                     if (s.is_zero()) {
-                        throw Internal_Error("During ECKCDSA signature generation created zero s");
+                        throw internal_error("During ECKCDSA signature generation created zero s");
                     }
 
                     secure_vector<uint8_t> output = boost::multiprecision::cpp_int::encode_1363(r, c.size());
@@ -195,7 +195,7 @@ namespace nil {
                 if (provider == "core" || provider.empty()) {
                     return std::unique_ptr<pk_operations::signature>(new ECKCDSA_Signature_Operation(*this, params));
                 }
-                throw Provider_Not_Found(algo_name(), provider);
+                throw provider_not_found(algo_name(), provider);
             }
         }
     }

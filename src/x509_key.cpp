@@ -1,8 +1,6 @@
 #include <nil/crypto3/pubkey/x509_key.hpp>
 #include <nil/crypto3/pubkey/pem.hpp>
 
-#include <nil/crypto3/utilities/data_src.hpp>
-
 namespace nil {
     namespace crypto3 {
 

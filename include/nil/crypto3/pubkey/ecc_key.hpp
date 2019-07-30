@@ -276,7 +276,7 @@ namespace nil {
                  */
                 const number_type &private_value() const {
                     if (m_private_key == 0) {
-                        throw Invalid_State("ec_private_key::private_value - uninitialized");
+                        throw invalid_state("ec_private_key::private_value - uninitialized");
                     }
 
                     return m_private_key;

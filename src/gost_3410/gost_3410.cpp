@@ -121,7 +121,7 @@ namespace nil {
                         = m_group.mod_order(m_group.multiply_mod_order(r, m_x) + m_group.multiply_mod_order(k, e));
 
                     if (r == 0 || s == 0) {
-                        throw Internal_Error("GOST 34.10 signature generation failed, r/s equal to zero");
+                        throw internal_error("GOST 34.10 signature generation failed, r/s equal to zero");
                     }
 
                     return boost::multiprecision::cpp_int::encode_fixed_length_int_pair(s, r,
@@ -197,7 +197,7 @@ namespace nil {
                     return std::unique_ptr<pk_operations::verification>(
                         new GOST_3410_Verification_Operation(*this, params));
                 }
-                throw Provider_Not_Found(algo_name(), provider);
+                throw provider_not_found(algo_name(), provider);
             }
 
             std::unique_ptr<pk_operations::signature>
@@ -207,7 +207,7 @@ namespace nil {
                 if (provider == "core" || provider.empty()) {
                     return std::unique_ptr<pk_operations::signature>(new GOST_3410_Signature_Operation(*this, params));
                 }
-                throw Provider_Not_Found(algo_name(), provider);
+                throw provider_not_found(algo_name(), provider);
             }
         }
     }
