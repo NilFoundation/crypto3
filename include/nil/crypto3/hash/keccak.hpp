@@ -16,8 +16,6 @@
 #include <nil/crypto3/hash/detail/sponge_stream_processor.hpp>
 #include <nil/crypto3/hash/detail/sponge_construction.hpp>
 
-#include <nil/crypto3/utilities/secmem.hpp>
-
 namespace nil {
     namespace crypto3 {
         namespace hash {

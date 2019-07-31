@@ -10,8 +10,6 @@
 #ifndef CRYPTO3_SHA3_HPP
 #define CRYPTO3_SHA3_HPP
 
-#include <nil/crypto3/utilities/secmem.hpp>
-
 #include <nil/crypto3/hash/keccak.hpp>
 
 #include <nil/crypto3/hash/detail/sponge_construction.hpp>
