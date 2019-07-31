@@ -21,9 +21,9 @@ namespace nil {
     namespace crypto3 {
         namespace block {
             /*!
-             * @brief Misty1. A 64-bit Japanese cipher standardized by NESSIE and ISO.
-             * Seemingly secure, but quite slow and saw little adoption. No reason
-             * to use it in new code.
+             * @brief Misty1. A 64-bit Japanese cipher standardized by NESSIE
+             * and ISO. Seemingly secure, but quite slow and saw little
+             * adoption. No reason to use it in new code.
              *
              * @ingroup block
              */
@@ -98,16 +98,16 @@ namespace nil {
 
                         uint16_t T0, T1;
 
-                        T0 = policy_type::FI(B0 ^ RK[4], RK[5], RK[6]) ^ B1;
-                        T1 = policy_type::FI(B1 ^ RK[7], RK[8], RK[9]) ^ T0;
-                        T0 = policy_type::FI(T0 ^ RK[10], RK[11], RK[12]) ^ T1;
+                        T0 = policy_type::fi(B0 ^ RK[4], RK[5], RK[6]) ^ B1;
+                        T1 = policy_type::fi(B1 ^ RK[7], RK[8], RK[9]) ^ T0;
+                        T0 = policy_type::fi(T0 ^ RK[10], RK[11], RK[12]) ^ T1;
 
                         B2 ^= T1 ^ RK[13];
                         B3 ^= T0;
 
-                        T0 = policy_type::FI(B2 ^ RK[14], RK[15], RK[16]) ^ B3;
-                        T1 = policy_type::FI(B3 ^ RK[17], RK[18], RK[19]) ^ T0;
-                        T0 = policy_type::FI(T0 ^ RK[20], RK[21], RK[22]) ^ T1;
+                        T0 = policy_type::fi(B2 ^ RK[14], RK[15], RK[16]) ^ B3;
+                        T1 = policy_type::fi(B3 ^ RK[17], RK[18], RK[19]) ^ T0;
+                        T0 = policy_type::fi(T0 ^ RK[20], RK[21], RK[22]) ^ T1;
 
                         B0 ^= T1 ^ RK[23];
                         B1 ^= T0;
@@ -138,16 +138,16 @@ namespace nil {
 
                         uint16_t T0, T1;
 
-                        T0 = policy_type::FI(B2 ^ RK[4], RK[5], RK[6]) ^ B3;
-                        T1 = policy_type::FI(B3 ^ RK[7], RK[8], RK[9]) ^ T0;
-                        T0 = policy_type::FI(T0 ^ RK[10], RK[11], RK[12]) ^ T1;
+                        T0 = policy_type::fi(B2 ^ RK[4], RK[5], RK[6]) ^ B3;
+                        T1 = policy_type::fi(B3 ^ RK[7], RK[8], RK[9]) ^ T0;
+                        T0 = policy_type::fi(T0 ^ RK[10], RK[11], RK[12]) ^ T1;
 
                         B0 ^= T1 ^ RK[13];
                         B1 ^= T0;
 
-                        T0 = policy_type::FI(B0 ^ RK[14], RK[15], RK[16]) ^ B1;
-                        T1 = policy_type::FI(B1 ^ RK[17], RK[18], RK[19]) ^ T0;
-                        T0 = policy_type::FI(T0 ^ RK[20], RK[21], RK[22]) ^ T1;
+                        T0 = policy_type::fi(B0 ^ RK[14], RK[15], RK[16]) ^ B1;
+                        T1 = policy_type::fi(B1 ^ RK[17], RK[18], RK[19]) ^ T0;
+                        T0 = policy_type::fi(T0 ^ RK[20], RK[21], RK[22]) ^ T1;
 
                         B2 ^= T1 ^ RK[23];
                         B3 ^= T0;
@@ -170,7 +170,7 @@ namespace nil {
 
                     for (size_t i = 0; i != rounds; ++i) {
                         schedule[i + 8] =
-                            policy_type::FI(schedule[i], schedule[(i + 1) % 8] >> 9, schedule[(i + 1) % 8] & 0x1FF);
+                            policy_type::fi(schedule[i], schedule[(i + 1) % 8] >> 9, schedule[(i + 1) % 8] & 0x1FF);
                         schedule[i + 16] = schedule[i + 8] >> 9;
                         schedule[i + 24] = schedule[i + 8] & 0x1FF;
                     }

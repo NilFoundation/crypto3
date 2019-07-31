@@ -16,7 +16,7 @@
 
 #include <boost/static_assert.hpp>
 
-#include <nil/crypto3/utilities/ct_utils.hpp>
+#include <nil/crypto3/block/detail/utilities/constant_time_utilities.hpp>
 
 /*
  * AES using SSSE3

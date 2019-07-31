@@ -117,11 +117,12 @@ namespace nil {
                     static const prefetched_constants_type prefetch_constants(const constants_type &constants) {
                         alignas(64) prefetched_constants_type result;
 
-                        copy_n_if(constants.begin(), result.size(), result.begin(),
-                                  [](const typename constants_type::value_type &c) ->
-                                  typename prefetched_constants_type::value_type {
-                                      return {xtime(c), c, c, xtime3(c)};
-                                  });
+                        copy_n_if(
+                            constants.begin(), result.size(), result.begin(),
+                            [](const typename constants_type::value_type &c) ->
+                            typename prefetched_constants_type::value_type {
+                                return {xtime(c), c, c, xtime3(c)};
+                            });
 
                         return result;
                     }
@@ -130,11 +131,12 @@ namespace nil {
                         prefetch_inverted_constants(const constants_type &constants) {
                         alignas(64) prefetched_constants_type result;
 
-                        copy_n_if(constants.begin(), result.size(), result.begin(),
-                                  [](const typename constants_type::value_type &c) ->
-                                  typename prefetched_constants_type::value_type {
-                                      return {xtime14(c), xtime9(c), xtime13(c), xtime11(c)};
-                                  });
+                        copy_n_if(
+                            constants.begin(), result.size(), result.begin(),
+                            [](const typename constants_type::value_type &c) ->
+                            typename prefetched_constants_type::value_type {
+                                return {xtime14(c), xtime9(c), xtime13(c), xtime11(c)};
+                            });
 
                         return result;
                     }

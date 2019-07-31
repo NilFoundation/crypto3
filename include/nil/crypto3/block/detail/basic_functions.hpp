@@ -49,9 +49,8 @@ namespace nil {
 
                     template<std::size_t Size, typename... Args>
                     static inline typename boost::uint_t<Size>::exact make_uint_t(Args... args) {
-                        return basic_functions<WordBits>::
-                            template make_uint_t<Size, typename std::tuple_element<0, std::tuple<Args...>>::type>(
-                                {args...});
+                        return basic_functions<WordBits>::template make_uint_t<
+                            Size, typename std::tuple_element<0, std::tuple<Args...>>::type>({args...});
                     }
 
                     static inline word_type shr(word_type x, std::size_t n) {

@@ -19,7 +19,7 @@ namespace nil {
                 struct misty1_functions : public misty1_policy {
                     typedef typename misty1_policy::word_type word_type;
 
-                    static inline word_type FI(word_type input, word_type key7, word_type key9) {
+                    static inline word_type fi(word_type input, word_type key7, word_type key9) {
                         word_type D9 = input >> 7, D7 = input & 0x7F;
                         D9 = s9_substitution[D9] ^ D7;
                         D7 = (s7_substitution[D7] ^ key7 ^ D9) & 0x7F;
