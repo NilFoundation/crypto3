@@ -67,8 +67,9 @@ namespace nil {
          *
          * @return
          */
-        template<typename BlockCipher, typename InputIterator, typename OutputAccumulator = typename
-            block::block_accumulator<typename BlockCipher::stream_encrypter_type>>
+        template<
+            typename BlockCipher, typename InputIterator,
+            typename OutputAccumulator = typename block::block_accumulator<typename BlockCipher::stream_encrypter_type>>
         OutputAccumulator &encrypt(InputIterator first, InputIterator last, OutputAccumulator &acc) {
 
             typedef typename BlockCipher::stream_encrypter_type EncryptionMode;
@@ -94,8 +95,9 @@ namespace nil {
          *
          * @return
          */
-        template<typename BlockCipher, typename SinglePassRange, typename OutputAccumulator = typename
-            block::block_accumulator<typename BlockCipher::stream_encrypter_type>>
+        template<
+            typename BlockCipher, typename SinglePassRange,
+            typename OutputAccumulator = typename block::block_accumulator<typename BlockCipher::stream_encrypter_type>>
         OutputAccumulator &encrypt(const SinglePassRange &r, OutputAccumulator &acc) {
 
             typedef typename BlockCipher::stream_encrypter_type EncryptionMode;
@@ -119,7 +121,8 @@ namespace nil {
          * @param last
          * @return
          */
-        template<typename BlockCipher, typename InputIterator, typename KeyIterator,
+        template<
+            typename BlockCipher, typename InputIterator, typename KeyIterator,
             typename CipherAccumulator = typename block::block_accumulator<typename BlockCipher::stream_encrypter_type>>
         block::detail::range_cipher_impl<block::detail::value_cipher_impl<CipherAccumulator>>
             encrypt(InputIterator first, InputIterator last, KeyIterator key_first, KeyIterator key_last) {
@@ -165,7 +168,8 @@ namespace nil {
          * @param r
          * @return
          */
-        template<typename BlockCipher, typename SinglePassRange, typename KeyRange,
+        template<
+            typename BlockCipher, typename SinglePassRange, typename KeyRange,
             typename CipherAccumulator = typename block::block_accumulator<typename BlockCipher::stream_encrypter_type>>
         block::detail::range_cipher_impl<block::detail::value_cipher_impl<CipherAccumulator>>
             encrypt(const SinglePassRange &r, const KeyRange &key) {

@@ -1,7 +1,3 @@
-
-# Created by https://www.gitignore.io/api/c,tex,c++,cmake,jetbrains+all
-# Edit at https://www.gitignore.io/?templates=c,tex,c++,cmake,jetbrains+all
-
 ### C ###
 # Prerequisites
 *.d
@@ -445,5 +441,3 @@ TSWLatexianTemp*
 ### TeX Patch ###
 # glossaries
 *.glstex
-
-# End of https://www.gitignore.io/api/c,tex,c++,cmake,jetbrains+all

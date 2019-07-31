@@ -116,9 +116,9 @@ namespace nil {
                 }
 
                 inline void schedule_key(const key_type &key) {
-                    ct::poison(key.data(), 16);
-                    ct::poison(encryption_key.data(), 52);
-                    ct::poison(decryption_key.data(), 52);
+                    crypto3::detail::poison(key.data(), 16);
+                    crypto3::detail::poison(encryption_key.data(), key_schedule_size);
+                    crypto3::detail::poison(decryption_key.data(), key_schedule_size);
 
                     std::array<uint64_t, 2> K = {0};
 
@@ -159,9 +159,9 @@ namespace nil {
 
                     std::swap(decryption_key[49], decryption_key[50]);
 
-                    ct::unpoison(key.data(), 16);
-                    ct::unpoison(encryption_key.data(), 52);
-                    ct::unpoison(decryption_key.data(), 52);
+                    crypto3::detail::unpoison(key.data(), 16);
+                    crypto3::detail::unpoison(encryption_key.data(), 52);
+                    crypto3::detail::unpoison(decryption_key.data(), 52);
                 }
             };
         }    // namespace block

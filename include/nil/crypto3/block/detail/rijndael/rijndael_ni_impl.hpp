@@ -14,8 +14,9 @@
 
 #include <wmmintrin.h>
 
-#include <nil/crypto3/utilities/compiler.hpp>
-#include <nil/crypto3/utilities/loadstore.hpp>
+#include <nil/crypto3/build.hpp>
+
+#include <nil/crypto3/block/detail/utilities/loadstore.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -25,7 +26,6 @@ namespace nil {
              */
             namespace detail {
                 CRYPTO3_FUNC_ISA("ssse3,aes")
-
                 __m128i aes_128_key_expansion(__m128i key, __m128i key_with_rcon) {
                     key_with_rcon = _mm_shuffle_epi32(key_with_rcon, _MM_SHUFFLE(3, 3, 3, 3));
                     key = _mm_xor_si128(key, _mm_slli_si128(key, 4));

@@ -120,11 +120,15 @@ namespace nil {
                 constexpr static const std::size_t key_words = policy_type::key_words;
                 typedef typename policy_type::key_type key_type;
 
-                template<template<typename, typename> class Mode, typename StateAccumulator, std::size_t ValueBits,
+                template<template<typename, typename> class Mode,
+                         typename StateAccumulator,
+                         std::size_t ValueBits,
                          typename Padding>
                 struct stream_cipher {
-                    typedef block_stream_processor<Mode<gost_28147_89<ParamsType>, Padding>, StateAccumulator,
-                                                   stream_endian::little_octet_big_bit, ValueBits,
+                    typedef block_stream_processor<Mode<gost_28147_89<ParamsType>, Padding>,
+                                                   StateAccumulator,
+                                                   stream_endian::little_octet_big_bit,
+                                                   ValueBits,
                                                    policy_type::word_bits * 2>
                         type_;
 #ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES

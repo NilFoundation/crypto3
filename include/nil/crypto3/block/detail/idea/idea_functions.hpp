@@ -7,12 +7,11 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_IDEA_FUNCTIONS_CPP_HPP
-#define CRYPTO3_IDEA_FUNCTIONS_CPP_HPP
+#ifndef CRYPTO3_IDEA_FUNCTIONS_HPP
+#define CRYPTO3_IDEA_FUNCTIONS_HPP
 
 #include <nil/crypto3/block/detail/basic_functions.hpp>
-
-#include <nil/crypto3/utilities/ct_utils.hpp>
+#include <nil/crypto3/block/detail/utilities/constant_time_utilities.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -28,7 +27,7 @@ namespace nil {
                     static inline word_type mul(word_type x, word_type y) {
                         const uint32_t P = static_cast<uint32_t>(x) * y;
 
-                        const word_type Z_mask = static_cast<uint16_t>(ct::expand_mask(P) & 0xFFFF);
+                        const word_type Z_mask = static_cast<uint16_t>(crypto3::detail::expand_mask(P) & 0xFFFF);
 
                         const uint32_t P_hi = P >> 16;
                         const uint32_t P_lo = P & 0xFFFF;
@@ -37,7 +36,7 @@ namespace nil {
                         const word_type r_1 = static_cast<uint16_t>((P_lo - P_hi) + carry);
                         const word_type r_2 = 1 - x - y;
 
-                        return ct::select(Z_mask, r_1, r_2);
+                        return crypto3::detail::select(Z_mask, r_1, r_2);
                     }
 
                     /*

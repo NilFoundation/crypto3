@@ -20,13 +20,13 @@
 #include <nil/crypto3/block/detail/rijndael/rijndael_policy.hpp>
 #include <nil/crypto3/block/detail/rijndael/rijndael_impl.hpp>
 
-#if defined(CRYPTO3_HAS_RIJNDAEL_SSSE3)
-
-#include <nil/crypto3/block/detail/rijndael/rijndael_ssse3_impl.hpp>
-
-#elif defined(CRYPTO3_HAS_RIJNDAEL_NI)
+#if defined(CRYPTO3_HAS_RIJNDAEL_NI)
 
 #include <nil/crypto3/block/detail/rijndael/rijndael_ni_impl.hpp>
+
+#elif defined(CRYPTO3_HAS_RIJNDAEL_SSSE3)
+
+#include <nil/crypto3/block/detail/rijndael/rijndael_ssse3_impl.hpp>
 
 #elif defined(CRYPTO3_HAS_RIJNDAEL_ARMV8)
 
@@ -38,7 +38,7 @@
 
 #endif
 
-#include <nil/crypto3/utilities/cpuid/cpuid.hpp>
+#include <nil/crypto3/block/detail/utilities/cpuid/cpuid.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -108,10 +108,10 @@ namespace nil {
 
                 typedef
                     typename std::conditional<BlockBits == 128 && (KeyBits == 128 || KeyBits == 192 || KeyBits == 256),
-#if defined(CRYPTO3_HAS_RIJNDAEL_SSSE3)
-                                              detail::rijndael_ssse3_impl<KeyBits, BlockBits, policy_type>,
-#elif defined(CRYPTO3_HAS_RIJNDAEL_NI)
+#if defined(CRYPTO3_HAS_RIJNDAEL_NI)
                                               detail::ni_rijndael_impl<KeyBits, BlockBits, policy_type>,
+#elif defined(CRYPTO3_HAS_RIJNDAEL_SSSE3)
+                                              detail::rijndael_ssse3_impl<KeyBits, BlockBits, policy_type>,
 #elif defined(CRYPTO3_HAS_RIJNDAEL_ARMV8)
                                               detail::armv8_rijndael_impl<KeyBits, BlockBits, policy_type>,
 #elif defined(CRYPTO3_HAS_RIJNDAEL_POWER8)
