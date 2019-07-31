@@ -27,6 +27,8 @@ include(PlatformConfiguration)
 include(CheckSSE)
 include(CheckAVX)
 
+set(BUILD_WITH_TARGET_ARCHITECTURE "" CACHE STRING "Target build architecture")
+
 define_target_architecture(${CMAKE_PROJECT_NAME} ${CMAKE_TARGET_ARCHITECTURE})
 define_target_endianness(${CMAKE_PROJECT_NAME} ${CMAKE_TARGET_ARCHITECTURE})
 define_target_platform_features(${CMAKE_PROJECT_NAME})
