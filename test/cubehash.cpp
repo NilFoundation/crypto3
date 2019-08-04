@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2019 Nil Foundation AG
-// Copyright (c) 2018-2019 Mikhail Komarov <nemo@nilfoundation.org>
+// Copyright (c) 2018-2019 Mikhail Komarov <nemo@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -26,8 +26,17 @@
 
 using namespace nil::crypto3;
 
-typedef std::unordered_map<std::string, std::string>::value_type string_data_value;
-BOOST_TEST_DONT_PRINT_LOG_VALUE(string_data_value)
+namespace boost {
+    namespace test_tools {
+        namespace tt_detail {
+            template<template<typename, typename> class P, typename K, typename V>
+            struct print_log_value<P<K, V>> {
+                void operator()(std::ostream&, P<K, V> const&) {
+                }
+            };
+        }    // namespace tt_detail
+    }        // namespace test_tools
+}    // namespace boost
 
 typedef hash::cubehash<16, 32, 512>::digest_type cubehash_hash_512_digest_t;
 BOOST_TEST_DONT_PRINT_LOG_VALUE(cubehash_hash_512_digest_t)

@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2019 Nil Foundation AG
-// Copyright (c) 2018-2019 Mikhail Komarov <nemo@nilfoundation.org>
+// Copyright (c) 2018-2019 Mikhail Komarov <nemo@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -31,26 +31,29 @@
 using namespace nil::crypto3::hash;
 using namespace nil::crypto3::accumulators;
 
-typedef std::vector<uint8_t> byte_vector_t;
-BOOST_TEST_DONT_PRINT_LOG_VALUE(byte_vector_t)
-
-typedef std::unordered_map<std::string, std::string>::value_type string_data_value;
-BOOST_TEST_DONT_PRINT_LOG_VALUE(string_data_value)
-
-typedef std::unordered_map<std::string, std::vector<uint8_t>>::value_type byte_data_value_t;
-BOOST_TEST_DONT_PRINT_LOG_VALUE(byte_data_value_t)
+namespace boost {
+    namespace test_tools {
+        namespace tt_detail {
+            template<template<typename, typename> class P, typename K, typename V>
+            struct print_log_value<P<K, V>> {
+                void operator()(std::ostream&, P<K, V> const&) {
+                }
+            };
+        }    // namespace tt_detail
+    }        // namespace test_tools
+}    // namespace boost
 
 BOOST_TEST_DONT_PRINT_LOG_VALUE(md5::construction_type::digest_type)
 
-static const std::unordered_map<std::string, std::string> string_data
-    = {{"", "d41d8cd98f00b204e9800998ecf8427e"},
-       {"a", "0cc175b9c0f1b6a831c399e269772661"},
-       {"abc", "900150983cd24fb0d6963f7d28e17f72"},
-       {"message digest", "f96b697d7cb7938d525a2f31aaf161d0"},
-       {"abcdefghijklmnopqrstuvwxyz", "c3fcd3d76192e4007dfb496cca67e13b"},
-       {"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789", "d174ab98d277d9f5a5611c2c9f419d9f"},
-       {"12345678901234567890123456789012345678901234567890123456789012345678901234567890",
-        "57edf4a22be3c955ac49da2e2107b67a"}};
+static const std::unordered_map<std::string, std::string> string_data = {
+    {"", "d41d8cd98f00b204e9800998ecf8427e"},
+    {"a", "0cc175b9c0f1b6a831c399e269772661"},
+    {"abc", "900150983cd24fb0d6963f7d28e17f72"},
+    {"message digest", "f96b697d7cb7938d525a2f31aaf161d0"},
+    {"abcdefghijklmnopqrstuvwxyz", "c3fcd3d76192e4007dfb496cca67e13b"},
+    {"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789", "d174ab98d277d9f5a5611c2c9f419d9f"},
+    {"12345678901234567890123456789012345678901234567890123456789012345678901234567890",
+     "57edf4a22be3c955ac49da2e2107b67a"}};
 
 class fixture {
 public:

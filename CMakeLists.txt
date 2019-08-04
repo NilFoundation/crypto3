@@ -19,11 +19,7 @@ endif()
 
 cm_find_package(${CMAKE_WORKSPACE_NAME}_block)
 
-list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-     include/nil/crypto3/hash/algorithm/hash.hpp
-
-     include/nil/crypto3/hash/adaptor/hashed.hpp
-     )
+option(BUILD_UNIT_TESTS "Build unit tests" FALSE)
 
 option(CRYPTO3_HASH_BLAKE2B "Build with Blake2 hash support" TRUE)
 option(CRYPTO3_HASH_CHECKSUM_ADLER "Build with Adler checksum support" TRUE)
@@ -43,6 +39,12 @@ option(CRYPTO3_HASH_SHAKE "Build with Snake hash support" TRUE)
 option(CRYPTO3_HASH_STREEBOG "Build with Streebog hash support" TRUE)
 option(CRYPTO3_HASH_TIGER "Build with Tiger hash support" TRUE)
 option(CRYPTO3_HASH_WHIRLPOOL "Build with Whirlpool hash support" TRUE)
+
+list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
+     include/nil/crypto3/hash/algorithm/hash.hpp
+
+     include/nil/crypto3/hash/adaptor/hashed.hpp
+     )
 
 if(CRYPTO3_HASH_BLAKE2B)
     list(APPEND ${CURRENT_PROJECT_NAME}_BLAKE2B_HEADERS

@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2019 Nil Foundation AG
-// Copyright (c) 2018-2019 Mikhail Komarov <nemo@nilfoundation.org>
+// Copyright (c) 2018-2019 Mikhail Komarov <nemo@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -15,8 +15,6 @@
 #include <nil/crypto3/hash/detail/keccak/keccak_functions.hpp>
 #include <nil/crypto3/hash/detail/sponge_stream_processor.hpp>
 #include <nil/crypto3/hash/detail/sponge_construction.hpp>
-
-#include <nil/crypto3/utilities/secmem.hpp>
 
 namespace nil {
     namespace crypto3 {

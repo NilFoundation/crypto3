@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2019 Nil Foundation AG
-// Copyright (c) 2018-2019 Mikhail Komarov <nemo@nilfoundation.org>
+// Copyright (c) 2018-2019 Mikhail Komarov <nemo@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -14,6 +14,9 @@
 #include <iterator>
 
 #include <nil/crypto3/hash/detail/pack.hpp>
+
+#include <nil/crypto3/hash/accumulators/parameters/bits.hpp>
+#include <nil/crypto3/hash/accumulators/parameters/salt.hpp>
 
 #include <boost/integer.hpp>
 #include <boost/static_assert.hpp>

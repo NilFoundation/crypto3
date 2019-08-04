@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2019 Nil Foundation AG
-// Copyright (c) 2018-2019 Mikhail Komarov <nemo@nilfoundation.org>
+// Copyright (c) 2018-2019 Mikhail Komarov <nemo@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -17,18 +17,14 @@
 #include <nil/crypto3/hash/hash_state.hpp>
 
 #include <cassert>
-#include <cstdio>
 #include <cstring>
+#include <unordered_map>
 
 #include <boost/cstdint.hpp>
 
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
-
-#include <iostream>
-#include <string>
-#include <unordered_map>
 
 #define B0 0, 0, 0, 0
 #define B1 0, 0, 0, 1
@@ -72,55 +68,64 @@ namespace std {
 
 }    // namespace std
 
-namespace bdata = boost::unit_test::data;
-typedef std::unordered_map<std::vector<bool>, std::string>::value_type bool_string_data_value_t;
-BOOST_TEST_DONT_PRINT_LOG_VALUE(bool_string_data_value_t)
-
-typedef std::unordered_map<std::pair<std::vector<std::uint32_t>, std::size_t>, std::string>::value_type
-    integer_string_data_value_t;
-BOOST_TEST_DONT_PRINT_LOG_VALUE(integer_string_data_value_t)
-
-BOOST_TEST_DONT_PRINT_LOG_VALUE(sha::digest_type)
-
 namespace boost {
     namespace test_tools {
         namespace tt_detail {
-            template<typename T, typename U>
-            struct print_log_value<std::pair<T, U>> {
-                void operator()(::std::ostream &os, std::pair<T, U> const &p) {
+            template<>
+            struct print_log_value<sha::digest_type> {
+                void operator()(::std::ostream &os, sha::digest_type const &p) {
+                }
+            };
+
+            template<template<typename, typename> class P, typename T, typename U>
+            struct print_log_value<P<T, U>> {
+                void operator()(::std::ostream &os, P<T, U> const &p) {
+                }
+            };
+
+            template<template<typename, typename> class P, template<typename> class V, typename T, typename U>
+            struct print_log_value<P<V<T>, U>> {
+                void operator()(::std::ostream &os, P<V<T>, U> const &p) {
+                }
+            };
+
+            template<template<typename, typename> class M, template<typename, typename> class P,
+                     template<typename> class V, typename T, typename U, typename I>
+            struct print_log_value<M<P<V<T>, I>, U>> {
+                void operator()(::std::ostream &os, M<P<V<T>, I>, U> const &p) {
                 }
             };
         }    // namespace tt_detail
     }        // namespace test_tools
 }    // namespace boost
 
-static const std::unordered_map<std::vector<bool>, std::pair<std::size_t, std::string>> bool_string_data
-    = {{{1, 0, 0, 1, 1}, {5, "29826b003b906e660eff4027ce98af3531ac75ba"}},
-       {{1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1,
-         1, 1, 1, 0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0,
-         1, 1, 0, 1, 0, 1, 1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 1,
-         1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 1, 0},
-        {128, "82abff6605dbe1c17def12a394fa22a82b544a35"}},
-       {{B4, B9, BB, B2, BA, BE, BC, B2, B5, B9, B4, BB, BB, BE, B3, BA,
-         B3, BB, B1, B1, B7, B5, B4, B2, BD, B9, B4, BA, BC, B8, B8},
-        {123, "6239781e03729919c01955b3ffa8acb60b988340"}},
-       {{B6, B5, BF, B9, B3, B2, B9, B9, B5, BB, BA, B4, BC, BE, B2, BC, BB, B1, BB, B4, BA, B2, BE, B7, B1, BA,
-         BE, B7, B0, B2, B2, B0, BA, BA, BC, BE, BC, B8, B9, B6, B2, BD, BD, B4, B4, B9, B9, BC, BB, BD, B7, BC,
-         B8, B8, B7, BA, B9, B4, BE, BA, BA, BA, B1, B0, B1, BE, BA, B5, BA, BA, BB, BC, B5, B2, B9, BB, B4, BE,
-         B7, BE, B4, B3, B6, B6, B5, BA, B5, BA, BF, B2, BC, BD, B0, B3, BF, BE, B6, B7, B8, BE, BA, B6, BA, B5,
-         B0, B0, B5, BB, BB, BA, B3, BB, B0, B8, B2, B2, B0, B4, BC, B2, B8, BB, B9, B1, B0, B9, BF, B4, B6, B9,
-         BD, BA, BC, B9, B2, BA, BA, BA, BB, B3, BA, BA, B7, BC, B1, B1, BA, B1, BB, B3, B2, BA, BE},
-        {611, "8c5b2a5ddae5a97fc7f9d85661c672adbf7933d4"}}};
+static const std::unordered_map<std::vector<bool>, std::pair<std::size_t, std::string>> bool_string_data = {
+    {{1, 0, 0, 1, 1}, {5, "29826b003b906e660eff4027ce98af3531ac75ba"}},
+    {{1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1,
+      1, 1, 1, 0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0,
+      1, 1, 0, 1, 0, 1, 1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 1,
+      1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 1, 0},
+     {128, "82abff6605dbe1c17def12a394fa22a82b544a35"}},
+    {{B4, B9, BB, B2, BA, BE, BC, B2, B5, B9, B4, BB, BB, BE, B3, BA,
+      B3, BB, B1, B1, B7, B5, B4, B2, BD, B9, B4, BA, BC, B8, B8},
+     {123, "6239781e03729919c01955b3ffa8acb60b988340"}},
+    {{B6, B5, BF, B9, B3, B2, B9, B9, B5, BB, BA, B4, BC, BE, B2, BC, BB, B1, BB, B4, BA, B2, BE, B7, B1, BA,
+      BE, B7, B0, B2, B2, B0, BA, BA, BC, BE, BC, B8, B9, B6, B2, BD, BD, B4, B4, B9, B9, BC, BB, BD, B7, BC,
+      B8, B8, B7, BA, B9, B4, BE, BA, BA, BA, B1, B0, B1, BE, BA, B5, BA, BA, BB, BC, B5, B2, B9, BB, B4, BE,
+      B7, BE, B4, B3, B6, B6, B5, BA, B5, BA, BF, B2, BC, BD, B0, B3, BF, BE, B6, B7, B8, BE, BA, B6, BA, B5,
+      B0, B0, B5, BB, BB, BA, B3, BB, B0, B8, B2, B2, B0, B4, BC, B2, B8, BB, B9, B1, B0, B9, BF, B4, B6, B9,
+      BD, BA, BC, B9, B2, BA, BA, BA, BB, B3, BA, BA, B7, BC, B1, B1, BA, B1, BB, B3, B2, BA, BE},
+     {611, "8c5b2a5ddae5a97fc7f9d85661c672adbf7933d4"}}};
 
-static const std::unordered_map<std::pair<std::vector<std::uint32_t>, std::size_t>, std::string> integer_string_data
-    = {{{{0x9a7dfdf1, 0xecead06e, 0xd646aa55, 0xfe757146}, 128}, "82abff6605dbe1c17def12a394fa22a82b544a35"},
-       {{{0xf78f9214, 0x1bcd170a, 0xe89b4fba, 0x15a1d59f, 0x3fd84d22, 0x3c9251bd, 0xacbbae61, 0xd05ed115, 0xa06a7ce1,
-          0x17b7beea, 0xd24421de, 0xd9c32592, 0xbd57edea, 0xe39c39fa, 0x1fe8946a, 0x84d0cf1f, 0x7beead17, 0x13e2e095,
-          0x9897347f, 0x67c80b04, 0x00c20981, 0x5d6b10a6, 0x83836fd5, 0x562a56ca, 0xb1a28e81, 0xb6576654, 0x631cf165,
-          0x66b86e3b, 0x33a108b0, 0x5307c00a, 0xff14a768, 0xed735060, 0x6a0f85e6, 0xa91d396f, 0x5b5cbe57, 0x7f9b3880,
-          0x7c7d523d, 0x6d792f6e, 0xbc24a4ec, 0xf2b3a427, 0xcdbbfb00},
-         1304},
-        "cb0082c8f197d260991ba6a460e76e202bad27b3"}};
+static const std::unordered_map<std::pair<std::vector<std::uint32_t>, std::size_t>, std::string> integer_string_data = {
+    {{{0x9a7dfdf1, 0xecead06e, 0xd646aa55, 0xfe757146}, 128}, "82abff6605dbe1c17def12a394fa22a82b544a35"},
+    {{{0xf78f9214, 0x1bcd170a, 0xe89b4fba, 0x15a1d59f, 0x3fd84d22, 0x3c9251bd, 0xacbbae61, 0xd05ed115, 0xa06a7ce1,
+       0x17b7beea, 0xd24421de, 0xd9c32592, 0xbd57edea, 0xe39c39fa, 0x1fe8946a, 0x84d0cf1f, 0x7beead17, 0x13e2e095,
+       0x9897347f, 0x67c80b04, 0x00c20981, 0x5d6b10a6, 0x83836fd5, 0x562a56ca, 0xb1a28e81, 0xb6576654, 0x631cf165,
+       0x66b86e3b, 0x33a108b0, 0x5307c00a, 0xff14a768, 0xed735060, 0x6a0f85e6, 0xa91d396f, 0x5b5cbe57, 0x7f9b3880,
+       0x7c7d523d, 0x6d792f6e, 0xbc24a4ec, 0xf2b3a427, 0xcdbbfb00},
+      1304},
+     "cb0082c8f197d260991ba6a460e76e202bad27b3"}};
 
 //
 // Appendix references are from
@@ -137,27 +142,27 @@ BOOST_AUTO_TEST_SUITE(sha_test_suite)
 BOOST_AUTO_TEST_CASE(sha_collision) {
     // Reported 2004-08-12 by Joux, Carribault, Lemuet, and Jalby
     typedef sha::construction_type::word_type word_type;
-    constexpr const std::array<word_type, 64> fic1
-        = {0xa766a602, 0xb65cffe7, 0x73bcf258, 0x26b322b3, 0xd01b1a97, 0x2684ef53, 0x3e3b4b7f, 0x53fe3762, 0x24c08e47,
-           0xe959b2bc, 0x3b519880, 0xb9286568, 0x247d110f, 0x70f5c5e2, 0xb4590ca3, 0xf55f52fe, 0xeffd4c8f, 0xe68de835,
-           0x329e603c, 0xc51e7f02, 0x545410d1, 0x671d108d, 0xf5a4000d, 0xcf20a439, 0x4949d72c, 0xd14fbb03, 0x45cf3a29,
-           0x5dcda89f, 0x998f8755, 0x2c9a58b1, 0xbdc38483, 0x5e477185, 0xf96e68be, 0xbb0025d2, 0xd2b69edf, 0x21724198,
-           0xf688b41d, 0xeb9b4913, 0xfbe696b5, 0x457ab399, 0x21e1d759, 0x1f89de84, 0x57e8613c, 0x6c9e3b24, 0x2879d4d8,
-           0x783b2d9c, 0xa9935ea5, 0x26a729c0, 0x6edfc501, 0x37e69330, 0xbe976012, 0xcc5dfe1c, 0x14c4c68b, 0xd1db3ecb,
-           0x24438a59, 0xa09b5db4, 0x35563e0d, 0x8bdf572f, 0x77b53065, 0xcef31f32, 0xdc9dbaa0, 0x4146261e, 0x9994bd5c,
-           0xd0758e3d
+    constexpr const std::array<word_type, 64> fic1 = {
+        0xa766a602, 0xb65cffe7, 0x73bcf258, 0x26b322b3, 0xd01b1a97, 0x2684ef53, 0x3e3b4b7f, 0x53fe3762, 0x24c08e47,
+        0xe959b2bc, 0x3b519880, 0xb9286568, 0x247d110f, 0x70f5c5e2, 0xb4590ca3, 0xf55f52fe, 0xeffd4c8f, 0xe68de835,
+        0x329e603c, 0xc51e7f02, 0x545410d1, 0x671d108d, 0xf5a4000d, 0xcf20a439, 0x4949d72c, 0xd14fbb03, 0x45cf3a29,
+        0x5dcda89f, 0x998f8755, 0x2c9a58b1, 0xbdc38483, 0x5e477185, 0xf96e68be, 0xbb0025d2, 0xd2b69edf, 0x21724198,
+        0xf688b41d, 0xeb9b4913, 0xfbe696b5, 0x457ab399, 0x21e1d759, 0x1f89de84, 0x57e8613c, 0x6c9e3b24, 0x2879d4d8,
+        0x783b2d9c, 0xa9935ea5, 0x26a729c0, 0x6edfc501, 0x37e69330, 0xbe976012, 0xcc5dfe1c, 0x14c4c68b, 0xd1db3ecb,
+        0x24438a59, 0xa09b5db4, 0x35563e0d, 0x8bdf572f, 0x77b53065, 0xcef31f32, 0xdc9dbaa0, 0x4146261e, 0x9994bd5c,
+        0xd0758e3d
 
-        };
+    };
 
-    constexpr const std::array<word_type, 64> fic2
-        = {0xa766a602, 0xb65cffe7, 0x73bcf258, 0x26b322b1, 0xd01b1ad7, 0x2684ef51, 0xbe3b4b7f, 0xd3fe3762,
-           0xa4c08e45, 0xe959b2fc, 0x3b519880, 0x39286528, 0xa47d110d, 0x70f5c5e0, 0x34590ce3, 0x755f52fc,
-           0x6ffd4c8d, 0x668de875, 0x329e603e, 0x451e7f02, 0xd45410d1, 0xe71d108d, 0xf5a4000d, 0xcf20a439,
-           0x4949d72c, 0xd14fbb01, 0x45cf3a69, 0x5dcda89d, 0x198f8755, 0xac9a58b1, 0x3dc38481, 0x5e4771c5,
-           0x796e68fe, 0xbb0025d0, 0x52b69edd, 0xa17241d8, 0x7688b41f, 0x6b9b4911, 0x7be696f5, 0xc57ab399,
-           0xa1e1d719, 0x9f89de86, 0x57e8613c, 0xec9e3b26, 0xa879d498, 0x783b2d9e, 0x29935ea7, 0xa6a72980,
-           0x6edfc503, 0x37e69330, 0x3e976010, 0x4c5dfe5c, 0x14c4c689, 0x51db3ecb, 0xa4438a59, 0x209b5db4,
-           0x35563e0d, 0x8bdf572f, 0x77b53065, 0xcef31f30, 0xdc9dbae0, 0x4146261c, 0x1994bd5c, 0x50758e3d};
+    constexpr const std::array<word_type, 64> fic2 = {
+        0xa766a602, 0xb65cffe7, 0x73bcf258, 0x26b322b1, 0xd01b1ad7, 0x2684ef51, 0xbe3b4b7f, 0xd3fe3762,
+        0xa4c08e45, 0xe959b2fc, 0x3b519880, 0x39286528, 0xa47d110d, 0x70f5c5e0, 0x34590ce3, 0x755f52fc,
+        0x6ffd4c8d, 0x668de875, 0x329e603e, 0x451e7f02, 0xd45410d1, 0xe71d108d, 0xf5a4000d, 0xcf20a439,
+        0x4949d72c, 0xd14fbb01, 0x45cf3a69, 0x5dcda89d, 0x198f8755, 0xac9a58b1, 0x3dc38481, 0x5e4771c5,
+        0x796e68fe, 0xbb0025d0, 0x52b69edd, 0xa17241d8, 0x7688b41f, 0x6b9b4911, 0x7be696f5, 0xc57ab399,
+        0xa1e1d719, 0x9f89de86, 0x57e8613c, 0xec9e3b26, 0xa879d498, 0x783b2d9e, 0x29935ea7, 0xa6a72980,
+        0x6edfc503, 0x37e69330, 0x3e976010, 0x4c5dfe5c, 0x14c4c689, 0x51db3ecb, 0xa4438a59, 0x209b5db4,
+        0x35563e0d, 0x8bdf572f, 0x77b53065, 0xcef31f30, 0xdc9dbae0, 0x4146261c, 0x1994bd5c, 0x50758e3d};
 
     sha::digest_type h1 = hash<sha>(fic1);
 
@@ -196,7 +201,7 @@ BOOST_AUTO_TEST_CASE(sha1_subbyte2) {
 
 // More from http://csrc.nist.gov/groups/STM/cavp/documents/shs/SHAVS.pdf
 
-BOOST_DATA_TEST_CASE(sha1_range_hash1, bdata::make(bool_string_data), element) {
+BOOST_DATA_TEST_CASE(sha1_range_hash1, boost::unit_test::data::make(bool_string_data), element) {
     sha1::digest_type out;
 
     std::vector<bool> input = element.first;
