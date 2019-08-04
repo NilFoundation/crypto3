@@ -13,6 +13,8 @@ if(NOT Boost_FOUND)
     cm_find_package(Boost REQUIRED)
 endif()
 
+option(BUILD_UNIT_TESTS "Build unit tests" FALSE)
+
 list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
      include/nil/crypto3/codec/detail/base_policy.hpp
      include/nil/crypto3/codec/detail/hex_policy.hpp
