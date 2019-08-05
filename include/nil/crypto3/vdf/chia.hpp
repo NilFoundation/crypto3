@@ -71,6 +71,7 @@ namespace nil {
                 template<typename Backend, expression_template_option ExpressionTemplates, typename Integer>
                 inline static void compute(state_type<number<Backend, ExpressionTemplates>> &state,
                                            Integer difficulty) {
+                    state.L = std::abs()
                     fmpz_abs(state.L, difficulty);
                     fmpz_root(state.L, state.L, 4);
 

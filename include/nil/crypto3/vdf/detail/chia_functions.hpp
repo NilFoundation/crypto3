@@ -1136,67 +1136,63 @@ namespace nil {
 
                         mpz_gcdext(state.G, state.y, NULL, state.form.b, state.form.a);
 
-#if defined(CRYPTO3_VDF_GMP)
+                        state.By = state.form.a / state.G;
+                        state.Dy = state.form.b / state.G;
 
-                        mpz_divexact(state.By, state.form.a, state.G);
-                        mpz_divexact(state.Dy, state.form.b, state.G);
+                        state.bx = (state.y * state.form.c) % state.By;
+                        state.by = state.By;
 
-#elif defined(CRYPTO3_VDF_MPIR)
+                        if (state.by <= state.L) {
+                            state.dx = state.bx * state.Dy;
+                            state.dx = state.dx - state.form.c;
 
-                        mpz_divexact_gcd(state.By, state.form.a, state.G);
-                        mpz_divexact_gcd(state.Dy, state.form.b, state.G);
+                            state.dx = statte.dx / state.By;
 
-#endif
+                            state.form.a = state.by * state.by;
+                            state.form.c = state.bx * state.bx;
 
-                        mpz_mul(state.bx, state.y, state.form.c);
-                        mpz_mod(state.bx, state.bx, state.By);
+                            state.t = state.bx + state.by;
+                            state.t *= state.t;
 
-                        mpz_set(state.by, state.By);
+                            state.form.b = state.form.b - state.t;
+                            state.form.b = state.form.b + state.form.a;
+                            state.form.b = state.form.b + state.form.c;
 
-                        if (mpz_cmpabs(state.by, state.L) <= 0) {
-                            mpz_mul(state.dx, state.bx, state.Dy);
-                            mpz_sub(state.dx, state.dx, state.form.c);
-                            mpz_divexact(state.dx, state.dx, state.By);
-                            mpz_mul(state.form.a, state.by, state.by);
-                            mpz_mul(state.form.c, state.bx, state.bx);
-                            mpz_add(state.t, state.bx, state.by);
-                            mpz_mul(state.t, state.t, state.t);
-                            mpz_sub(state.form.b, state.form.b, state.t);
-                            mpz_add(state.form.b, state.form.b, state.form.a);
-                            mpz_add(state.form.b, state.form.b, state.form.c);
-                            mpz_mul(state.t, state.G, state.dx);
-                            mpz_sub(state.form.c, state.form.c, state.t);
+                            state.t = state.G * state.dx;
+                            state.form.c = state.form.c - state.t;
                             return;
                         }
 
                         mpz_xgcd_partial(state);
 
-                        mpz_neg(state.x, state.x);
-                        if (mpz_sgn((state.x)) > 0) {
-                            mpz_neg(state.y, state.y);
+                        state.x = -state.x;
+                        if (state.x > 0) {
+                            state.y = -state.y;
                         } else {
-                            mpz_neg(state.by, state.by);
+                            state.by = -state.by;
                         }
 
-                        mpz_mul(state.ax, state.G, state.x);
-                        mpz_mul(state.ay, state.G, state.y);
+                        state.ax = state.G * state.x;
+                        state.ay = state.G * state.y;
 
-                        mpz_mul(state.t, state.Dy, state.bx);
-                        mpz_submul(state.t, state.form.c, state.x);
-                        mpz_divexact(state.dx, state.t, state.By);
-                        mpz_mul(state.Q1, state.y, state.dx);
-                        mpz_add(state.dy, state.Q1, state.Dy);
-                        mpz_add(state.form.b, state.dy, state.Q1);
-                        mpz_mul(state.form.b, state.form.b, state.G);
-                        mpz_divexact(state.dy, state.dy, state.x);
-                        mpz_mul(state.form.a, state.by, state.by);
-                        mpz_mul(state.form.c, state.bx, state.bx);
-                        mpz_add(state.t, state.bx, state.by);
-                        mpz_submul(state.form.b, state.t, state.t);
-                        mpz_add(state.form.b, state.form.b, state.form.a);
-                        mpz_add(state.form.b, state.form.b, state.form.c);
-                        mpz_submul(state.form.a, state.ay, state.dy);
-                        mpz_submul(state.form.c, state.ax, state.dx);
+                        state.t = state.Dy * state.bx;
+                        state.t -= state.form.c * state.x;
+
+                        state.dx = state.t / state.By;
+
+                        state.Q1 = state.y * state.dx;
+                        state.dy = state.dy + state.Q1;
+                        state.form.b = state.dy + state.Q1;
+                        state.form.b = state.form.b * state.G;
+                        state.dy = state.dy / state.x;
+                        state.form.a = state.by * state.by;
+                        state.form.c = state.bx * state.bx;
+                        state.t = state.bx + state.by;
+                        state.form.b -= state.t * state.t;
+                        state.form.b = state.form.b + state.form.a;
+                        state.form.b = state.form.b + state.form.c;
+                        state.form.a -= state.ay * state.dy;
+                        state.form.c -= state.ax * state.dx;
                     }
 #endif
                 };

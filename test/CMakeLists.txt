@@ -21,9 +21,7 @@ macro(define_vdf_test name)
 
                                ${Boost_INCLUDE_DIRS})
 
-    if(NOT CMAKE_CXX_STANDARD OR ${CMAKE_CXX_STANDARD} LESS 14)
-        set_target_properties(vdf_${name}_test PROPERTIES CXX_STANDARD 14)
-    endif()
+    set_target_properties(vdf_${name}_test PROPERTIES CXX_STANDARD 14)
 
     get_target_property(target_type Boost::unit_test_framework TYPE)
     if(target_type STREQUAL "SHARED_LIB")
