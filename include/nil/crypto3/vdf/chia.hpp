@@ -60,6 +60,14 @@ namespace nil {
                 template<typename T>
                 using state_type = typename policy_type::state_type<T>;
 
+                /*!
+                 * @brief
+                 * @tparam Backend
+                 * @tparam ExpressionTemplates
+                 * @tparam Integer
+                 * @param state
+                 * @param difficulty
+                 */
                 template<typename Backend, expression_template_option ExpressionTemplates, typename Integer>
                 inline static void compute(state_type<number<Backend, ExpressionTemplates>> &state,
                                            Integer difficulty) {
@@ -72,21 +80,35 @@ namespace nil {
                     }
                 }
 
+                /*!
+                 * @brief
+                 * @tparam Backend
+                 * @tparam ExpressionTemplates
+                 * @param state
+                 * @param discriminant
+                 * @param a
+                 * @param b
+                 */
                 template<typename Backend, expression_template_option ExpressionTemplates>
-                static inline void state_from_discriminant(state_type<number<Backend, ExpressionTemplates>> &state,
-                                                           const number<Backend, ExpressionTemplates> &d) {
-                    number<Backend, ExpressionTemplates> denom;
-                    mpz_set_ui(state.form.a, 2);
-                    mpz_set_ui(state.form.b, 1);
-                    mpz_set_ui(state.form.b, 1);
-                    mpz_mul(state.form.c, state.form.b, state.form.b);
-                    mpz_sub(state.form.c, state.form.c, d);
-                    mpz_mul_ui(denom, state.form.a, 4);
-                    mpz_fdiv_q(state.form.c, state.form.c, denom);
+                static inline void make_state(state_type<number<Backend, ExpressionTemplates>> &state,
+                                              const number<Backend, ExpressionTemplates> &discriminant,
+                                              const number<Backend, ExpressionTemplates> &a = 2,
+                                              const number<Backend, ExpressionTemplates> &b = 1) {
+                    state.form.a = a;
+                    state.form.b = b;
+                    state.form.c = (b * b - discriminant) / (a * 4);
                     fast_reduce(state);
-                    mpz_clear(denom);
                 }
 
+                template<typename Backend, expression_template_option ExpressionTemplates>
+                static inline state_type<number<Backend, ExpressionTemplates>>
+                    make_state(const number<Backend, ExpressionTemplates> &a,
+                               const number<Backend, ExpressionTemplates> &b,
+                               const number<Backend, ExpressionTemplates> &discriminant) {
+                    state_type<number<Backend, ExpressionTemplates>> state;
+                    make_state(state, discriminant, a, b);
+                    return state;
+                }
 #endif
             };
         }    // namespace vdf

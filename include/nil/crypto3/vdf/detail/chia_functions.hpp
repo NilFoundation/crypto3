@@ -801,34 +801,33 @@ namespace nil {
 
                     template<typename T>
                     inline static void normalize(state_type<T> &state) {
-                        bool bleqa = (mpz_cmp(state.form.b, state.form.a) <= 0);
-                        mpz_neg(state.form.a, state.form.a);
-                        if (mpz_cmp(state.form.b, state.form.a) > 0 && bleqa) {
+                        bool bleqa = (state.form.b <= state.forma.a);
+                        state.form.a = -state.form.a;
+                        if (state.form.b > state.form.a && bleqa) {
                             // Already normalized
                             return;
                         }
-                        mpz_neg(state.form.a, state.form.a);
-                        mpz_sub(state.r, state.form.a, state.form.b);
+                        state.form.a = -state.form.a;
+                        state.r = state.form.a - state.form.b;
 
-                        mpz_mul_si(state.ra, state.form.a, -3);
-                        bool falb = (mpz_cmp(state.ra, state.form.b) < 0);
+                        state.ra = state.form.a * -3;
+                        bool falb = (state.ra < state.form.b < 0);
 
-                        mpz_mul_2exp(state.ra, state.form.a, 1);
+                        state.ra = state.form.a << 1;
 
-                        if (mpz_cmp(state.r, state.ra) >= 0 && falb) {
-                            mpz_add(state.form.c, state.form.c, state.form.a);
-                            mpz_add(state.form.c, state.form.c, state.form.b);
-                            mpz_add(state.form.b, state.form.b, state.ra);
+                        if (state.r >= state.ra && falb) {
+                            state.form.c += state.form.a + state.form.b;
+                            state.form.b += state.ra;
 
                             return;
                         }
 
-                        mpz_fdiv_q(state.r, state.r, state.ra);
-                        mpz_mul(state.ra, state.r, state.form.a);
-                        mpz_addmul(state.form.c, state.ra, state.r);
-                        mpz_addmul(state.form.c, state.r, state.form.b);
-                        mpz_mul_2exp(state.ra, state.ra, 1);
-                        mpz_add(state.form.b, state.form.b, state.ra);
+                        state.r = state.r / state.ra;
+                        state.ra = state.r * state.form.a;
+                        state.form.c += state.ra * state.r;
+                        state.form.c += state.r * state.form.b;
+                        state.ra <<= 1;
+                        state.form.b += state.ra;
                     }
 
                     /*!
@@ -872,9 +871,9 @@ namespace nil {
 
                         while (!test_reduction(state.form)) {
 
-                            a = mpz_get_si_2exp(&a_exp, state.form.a);
-                            b = mpz_get_si_2exp(&b_exp, state.form.b);
-                            c = mpz_get_si_2exp(&c_exp, state.form.c);
+                            a = si_2exp(&a_exp, state.form.a);
+                            b = si_2exp(&b_exp, state.form.b);
+                            c = si_2exp(&c_exp, state.form.c);
 
                             max_exp = a_exp;
                             min_exp = a_exp;
@@ -955,26 +954,21 @@ namespace nil {
 
                             // The following operations take 40% of the overall runtime.
 
-                            mpz_mul_si(state.faa, state.form.a, aa);
-                            mpz_mul_si(state.fab, state.form.b, ab);
-                            mpz_mul_si(state.fac, state.form.c, ac);
+                            state.faa = state.form.a * aa;
+                            state.fab = state.form.b * ab;
+                            state.fac = state.form.c * ac;
 
-                            mpz_mul_si(state.fba, state.form.a, ba);
-                            mpz_mul_si(state.fbb, state.form.b, bb);
-                            mpz_mul_si(state.fbc, state.form.c, bc);
+                            state.fba = state.form.a * ba;
+                            state.fbb = state.form.b * bb;
+                            state.fbc = state.form.c * bc;
 
-                            mpz_mul_si(state.fca, state.form.a, ca);
-                            mpz_mul_si(state.fcb, state.form.b, cb);
-                            mpz_mul_si(state.fcc, state.form.c, cc);
+                            state.fca = state.form.a * ca;
+                            state.fcb = state.form.b * cb;
+                            state.fcc = state.form.c * cc;
 
-                            mpz_add(state.form.a, state.faa, state.fab);
-                            mpz_add(state.form.a, state.form.a, state.fac);
-
-                            mpz_add(state.form.b, state.fba, state.fbb);
-                            mpz_add(state.form.b, state.form.b, state.fbc);
-
-                            mpz_add(state.form.c, state.fca, state.fcb);
-                            mpz_add(state.form.c, state.form.c, state.fcc);
+                            state.form.a = state.faa + state.fab + state.fac;
+                            state.form.b = state.fba + state.fbb + state.fbc;
+                            state.form.c = state.fca + state.fcb + state.fcc;
                         }
                     }
 
@@ -1010,8 +1004,8 @@ namespace nil {
                     // Return an approximation x of the large mpz_t op by an int64_t and the exponent e adjustment.
                     // We must have (x * 2^e) / op = constant approximately.
                     template<typename Backend, expression_template_option ExpressionTemplates>
-                    inline static int64_t mpz_get_si_2exp(signed long int *exp,
-                                                          const number<Backend, ExpressionTemplates> &op) {
+                    inline static int64_t si_2exp(signed long int *exp,
+                                                  const number<Backend, ExpressionTemplates> &op) {
                         uint64_t size = mpz_size(op);
                         uint64_t last = mpz_getlimbn(op, size - 1);
                         uint64_t ret;
