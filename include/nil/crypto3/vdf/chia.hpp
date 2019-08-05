@@ -24,11 +24,44 @@ namespace nil {
                 template<typename T = mpz_t>
                 using state_type = typename policy_type::state_type<T>;
 
+                /*!
+                 * @brief
+                 * @tparam NumberType
+                 * @tparam ExpressionTemplates
+                 * @param state
+                 * @param discriminant
+                 * @param a
+                 * @param b
+                 */
+                template<typename Integer, typename NumberType = mpz_t>
+                static inline void make_state(state_type<NumberType> &state,
+                                              NumberType discriminant) {
+                    NumberType denom;
+                    mpz_init(denom);
+                    mpz_set_ui(state.form.a, 2);
+                    mpz_set_ui(state.form.b, 1);
+                    mpz_mul(state.form.c, state.form.b, state.form.b);
+                    mpz_sub(state.form.c, state.form.c, d);
+                    mpz_mul_ui(denom, state.form.a, 4);
+                    mpz_fdiv_q(state.form.c, state.form.c, denom);
+                    mpz_set(state.form.d, discriminant);
+                    fast_reduce(state);
+                    mpz_clear(denom);
+                }
+
+                template<typename NumberType = mpz_t>
+                static inline state_type<NumberType>
+                    make_state(const NumberType &a, const NumberType &b, const NumberType &discriminant) {
+                    state_type<NumberType> state;
+                    make_state(state, discriminant, a, b);
+                    return state;
+                }
+
                 template<typename T, typename I>
-                inline static void compute(state_type<T> &state, const T &d, I itr) {
+                inline static void compute(state_type<T> &state, I itr) {
                     policy_type::discriminant_generator(state, d);
 
-                    mpz_abs(state.L, d);
+                    mpz_abs(state.L, state.form.d);
                     mpz_root(state.L, state.L, 4);
 
                     for (int i = 0; i < itr; i++) {
@@ -42,11 +75,40 @@ namespace nil {
                 template<typename T = fmpz_t>
                 using state_type = typename policy_type::state_type<T>;
 
-                template<typename T, typename I>
-                inline static void compute(state_type<T> &state, const T &d, I itr) {
-                    policy_type::discriminant_generator(state, d);
+                /*!
+                 * @brief
+                 * @tparam NumberType
+                 * @tparam ExpressionTemplates
+                 * @param state
+                 * @param discriminant
+                 * @param a
+                 * @param b
+                 */
+                template<typename Integer, typename NumberType = fmpz_t>
+                static inline void make_state(state_type<NumberType> &state, NumberType discriminant) {
+                    NumberType denom;
+                    fmpz_init(denom);
+                    fmpz_set_ui(state.form.a, 2);
+                    fmpz_set_ui(state.form.b, 1);
+                    fmpz_mul(state.form.c, state.form.b, state.form.b);
+                    fmpz_sub(state.form.c, state.form.c, d);
+                    fmpz_mul_ui(denom, state.form.a, 4);
+                    fmpz_fdiv_q(state.form.c, state.form.c, denom);
+                    fmpz_set(state.form.d, discriminant);
+                    fast_reduce(state);
+                    fmpz_clear(denom);
+                }
 
-                    fmpz_abs(state.L, d);
+                template<typename NumberType = fmpz_t>
+                static inline state_type<NumberType> make_state(NumberType a, NumberType b, NumberType discriminant) {
+                    state_type<NumberType> state;
+                    make_state(state, discriminant, a, b);
+                    return state;
+                }
+
+                template<typename T, typename I>
+                inline static void compute(state_type<T> &state, I itr) {
+                    fmpz_abs(state.L, state.form.d);
                     fmpz_root(state.L, state.L, 4);
 
                     for (int i = 0; i < itr; i++) {
@@ -71,9 +133,10 @@ namespace nil {
                 template<typename Backend, expression_template_option ExpressionTemplates, typename Integer>
                 inline static void compute(state_type<number<Backend, ExpressionTemplates>> &state,
                                            Integer difficulty) {
-                    state.L = std::abs()
-                    fmpz_abs(state.L, difficulty);
-                    fmpz_root(state.L, state.L, 4);
+                    state.L = abs(state.form.d);
+                    //#FIXME: requires root(state.L, 4) functions
+                    state.L = sqrt(state.L);
+                    state.L = sqrt(state.L);
 
                     for (int i = 0; i < difficulty; i++) {
                         policy_type::nudupl(state);
@@ -98,6 +161,7 @@ namespace nil {
                     state.form.a = a;
                     state.form.b = b;
                     state.form.c = (b * b - discriminant) / (a * 4);
+                    state.form.d = discriminant;
                     fast_reduce(state);
                 }
 
