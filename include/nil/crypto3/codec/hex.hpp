@@ -105,8 +105,8 @@ namespace nil {
             }    // namespace detail
 
             /*!
-             * @brief Hex encoder
-             * @tparam Mode Hex encoder mode selector. Defines which alphabet to use - upper or lower
+             * @brief Hex codec. Meets the requirements of Codec.
+             * @tparam Mode Hex encoder mode selector. Defines which case to use - upper or lower
              */
             template<typename Mode = mode::upper>
             class hex {
@@ -135,6 +135,11 @@ namespace nil {
                 constexpr static const std::size_t decoded_block_bits = policy_type::decoded_block_bits;
                 typedef typename policy_type::decoded_block_type decoded_block_type;
 
+                /*!
+                 * @brief Encodes single atomic data block.
+                 * @param plaintext Input plaintext.
+                 * @return encoded atomic data block.
+                 */
                 static encoded_block_type encode(const decoded_block_type &plaintext) {
                     BOOST_STATIC_ASSERT(std::tuple_size<decoded_block_type>::value == 1);
 
@@ -151,6 +156,11 @@ namespace nil {
                     return res;
                 }
 
+                /*!
+                 * @brief Decodes single atomic data block.
+                 * @param plaintext Input plaintext.
+                 * @return decoded atomic data block.
+                 */
                 static decoded_block_type decode(const encoded_block_type &plaintext) {
                     BOOST_STATIC_ASSERT(std::tuple_size<decoded_block_type>::value == 1);
 

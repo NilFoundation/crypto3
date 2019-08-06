@@ -65,13 +65,13 @@ namespace nil {
                     typedef typename boost::mpl::apply<accumulator_set_type, accumulator_type>::type::result_type
                         result_type;
 
-                    template<typename SinglePassRange>
-                    range_codec_impl(const SinglePassRange &range, accumulator_set_type &&ise) :
+                    template<typename InputRange>
+                    range_codec_impl(const InputRange &range, accumulator_set_type &&ise) :
                         CodecStateImpl(std::forward<accumulator_set_type>(ise)) {
-                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange>));
+                        BOOST_RANGE_CONCEPT_ASSERT((boost::InputRangeConcept<const InputRange>));
 
                         typedef
-                            typename std::iterator_traits<typename SinglePassRange::iterator>::value_type value_type;
+                            typename std::iterator_traits<typename InputRange::iterator>::value_type value_type;
                         BOOST_STATIC_ASSERT(std::numeric_limits<value_type>::is_specialized);
                         typedef typename codec_type::template stream_processor<
                             mode_type, accumulator_set_type,
@@ -139,13 +139,13 @@ namespace nil {
                     typedef typename boost::mpl::apply<accumulator_set_type, accumulator_type>::type::result_type
                         result_type;
 
-                    template<typename SinglePassRange>
-                    itr_codec_impl(const SinglePassRange &range, OutputIterator out, accumulator_set_type &&ise) :
+                    template<typename InputRange>
+                    itr_codec_impl(const InputRange &range, OutputIterator out, accumulator_set_type &&ise) :
                         CodecStateImpl(std::forward<accumulator_set_type>(ise)), out(std::move(out)) {
-                        BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange>));
+                        BOOST_CONCEPT_ASSERT((boost::InputRangeConcept<const InputRange>));
 
                         typedef
-                            typename std::iterator_traits<typename SinglePassRange::iterator>::value_type value_type;
+                            typename std::iterator_traits<typename InputRange::iterator>::value_type value_type;
                         BOOST_STATIC_ASSERT(std::numeric_limits<value_type>::is_specialized);
                         typedef typename codec_type::template stream_processor<
                             mode_type, accumulator_set_type,

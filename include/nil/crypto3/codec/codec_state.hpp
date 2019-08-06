@@ -30,10 +30,9 @@ namespace nil {
             /*!
              * @brief Codec state managing container
              *
-             * Meets the requirements of CodecStateContainer, CachedConceptContainer, ConceptContainer,
-             * SequenceContainer, Container
+             * Meets the requirements of AccumulatorSet
              *
-             * @tparam Mode Codec state preprocessing mode type (e.g. isomorphic_encoding_mode<base64>)
+             * @tparam ProcessingMode Codec state preprocessing mode type (e.g. isomorphic_encoding_mode<base64>)
              */
             template<typename ProcessingMode>
             using codec_accumulator = boost::accumulators::accumulator_set<

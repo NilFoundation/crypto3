@@ -37,23 +37,23 @@ namespace nil {
                 };
 
                 template<typename Decoder,
-                         typename SinglePassRange,
+                         typename InputRange,
                          typename StreamCodec = typename detail::
-                             range_codec_state_traits<typename Decoder::stream_decoder_type, SinglePassRange>::type>
+                             range_codec_state_traits<typename Decoder::stream_decoder_type, InputRange>::type>
                 inline detail::range_codec_impl<detail::ref_codec_impl<StreamCodec>>
-                    operator|(SinglePassRange &r, const decoded<Decoder, StreamCodec> &f) {
-                    BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<SinglePassRange>));
+                    operator|(InputRange &r, const decoded<Decoder, StreamCodec> &f) {
+                    BOOST_CONCEPT_ASSERT((boost::InputRangeConcept<InputRange>));
 
                     return detail::range_codec_impl<detail::ref_codec_impl<StreamCodec>>(r, f.val);
                 }
 
                 template<typename Decoder,
-                         typename SinglePassRange,
+                         typename InputRange,
                          typename StreamCodec = typename detail::
-                             range_codec_state_traits<typename Decoder::stream_decoder_type, SinglePassRange>::type>
+                             range_codec_state_traits<typename Decoder::stream_decoder_type, InputRange>::type>
                 inline detail::range_codec_impl<detail::ref_codec_impl<StreamCodec>>
-                    operator|(const SinglePassRange &r, const decoded<Decoder, StreamCodec> &f) {
-                    BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange>));
+                    operator|(const InputRange &r, const decoded<Decoder, StreamCodec> &f) {
+                    BOOST_CONCEPT_ASSERT((boost::InputRangeConcept<const InputRange>));
 
                     return detail::range_codec_impl<detail::ref_codec_impl<StreamCodec>>(r, f.val);
                 }
