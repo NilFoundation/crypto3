@@ -871,9 +871,9 @@ namespace nil {
 
                         while (!test_reduction(state.form)) {
 
-                            a = si_2exp(&a_exp, state.form.a);
-                            b = si_2exp(&b_exp, state.form.b);
-                            c = si_2exp(&c_exp, state.form.c);
+                            a = mpz_get_si_2exp(&a_exp, state.form.a);
+                            b = mpz_get_si_2exp(&b_exp, state.form.b);
+                            c = mpz_get_si_2exp(&c_exp, state.form.c);
 
                             max_exp = a_exp;
                             min_exp = a_exp;
@@ -980,17 +980,6 @@ namespace nil {
                         return mpz_sizeinbase(x, 2);
                     }
 
-                    template<typename Backend, expression_template_option ExpressionTemplates>
-                    inline static void mpz_addmul_si(number<Backend, ExpressionTemplates> &r,
-                                                     number<Backend, ExpressionTemplates> &x,
-                                                     long u) {
-                        if (u >= 0) {
-                            mpz_addmul_ui(r, x, u);
-                        } else {
-                            mpz_submul_ui(r, x, -u);
-                        }
-                    }
-
                     inline static uint64_t signed_shift(uint64_t op, int shift) {
                         if (shift > 0) {
                             return op << shift;
@@ -1004,7 +993,7 @@ namespace nil {
                     // Return an approximation x of the large mpz_t op by an int64_t and the exponent e adjustment.
                     // We must have (x * 2^e) / op = constant approximately.
                     template<typename Backend, expression_template_option ExpressionTemplates>
-                    inline static int64_t si_2exp(signed long int *exp,
+                    inline static int64_t mpz_get_si_2exp(signed long int *exp,
                                                   const number<Backend, ExpressionTemplates> &op) {
                         uint64_t size = mpz_size(op);
                         uint64_t last = mpz_getlimbn(op, size - 1);
