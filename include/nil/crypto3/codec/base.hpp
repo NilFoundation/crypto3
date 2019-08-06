@@ -94,7 +94,7 @@ namespace nil {
 
             /*!
              * @brief Base decoder finalizer functor
-             * @tparam Version
+             * @tparam Version Base encoder version selector. Available values are: 32, 58, 64
              *
              * Base decoder finalizer
              *
@@ -146,8 +146,9 @@ namespace nil {
             };
 
             /*!
-             * @brief Base encoder
+             * @brief Base codec implements Base-family encoding. Meets the requirements of Codec.
              * @tparam Version Base encoder version selector. Available values are: 32, 58, 64
+             * @note This particular implementation gets resolved for base58
              */
             template<std::size_t Version, typename = detail::static_range<true>>
             class base {
@@ -174,10 +175,20 @@ namespace nil {
                 constexpr static const std::size_t decoded_block_bits = policy_type::decoded_block_bits;
                 typedef typename policy_type::decoded_block_type decoded_block_type;
 
+                /*!
+                 * @brief Encodes single atomic data block.
+                 * @param plaintext Input plaintext.
+                 * @return encoded atomic data block.
+                 */
                 inline static encoded_block_type encode(const decoded_block_type &plaintext) {
                     return policy_type::encode_block(plaintext);
                 }
 
+                /*!
+                 * @brief Decodes single atomic data block.
+                 * @param plaintext Input plaintext.
+                 * @return decoded atomic data block.
+                 */
                 inline static decoded_block_type decode(const encoded_block_type &encoded) {
                     return policy_type::decode_block(encoded);
                 }
@@ -195,6 +206,11 @@ namespace nil {
                 };
             };
 
+            /*!
+             * @brief Base codec implements Base-family encoding. Meets the requirements of Codec.
+             * @tparam Version Base encoder version selector. Available values are: 32, 58, 64.
+             * @note This particular implementation is defined for base32 and base64
+             */
             template<std::size_t Version>
             class base<Version, detail::static_range<!(Version % 32)>> {
                 typedef typename detail::base_policy<Version> policy_type;
@@ -220,10 +236,20 @@ namespace nil {
                 constexpr static const std::size_t decoded_block_bits = policy_type::decoded_block_bits;
                 typedef typename policy_type::decoded_block_type decoded_block_type;
 
+                /*!
+                 * @brief Encodes single atomic data block.
+                 * @param plaintext Input plaintext.
+                 * @return encoded atomic data block.
+                 */
                 inline static encoded_block_type encode(const decoded_block_type &plaintext) {
                     return policy_type::encode_block(plaintext);
                 }
 
+                /*!
+                 * @brief Decodes single atomic data block.
+                 * @param plaintext Input plaintext.
+                 * @return decoded atomic data block.
+                 */
                 inline static decoded_block_type decode(const encoded_block_type &encoded) {
                     return policy_type::decode_block(encoded);
                 }
