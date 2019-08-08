@@ -23,19 +23,19 @@
 using namespace nil::crypto3::codec;
 using namespace nil::crypto3;
 
-typedef std::unordered_map<std::string, std::string>::value_type string_data_value;
-BOOST_TEST_DONT_PRINT_LOG_VALUE(string_data_value)
+namespace boost {
+    namespace test_tools {
+        namespace tt_detail {
+            template<template<typename, typename> class P, typename K, typename V>
+            struct print_log_value<P<K, V>> {
+                void operator()(std::ostream &, P<K, V> const &) {
+                }
+            };
+        }    // namespace tt_detail
+    }        // namespace test_tools
+}    // namespace boost
 
-typedef std::unordered_map<std::string, std::vector<uint8_t>> byte_vector_data_t;
-typedef std::unordered_map<std::string, std::string> string_data_t;
-
-typedef std::unordered_map<std::string, std::vector<uint8_t>>::value_type byte_vector_data_value;
-BOOST_TEST_DONT_PRINT_LOG_VALUE(byte_vector_data_value)
-
-typedef std::vector<uint8_t> byte_vector_t;
-BOOST_TEST_DONT_PRINT_LOG_VALUE(byte_vector_t)
-
-static const byte_vector_data_t base64_valid_data = {
+static const std::unordered_map<std::string, std::vector<std::uint8_t>> base64_valid_data = {
     {"Zg==", {0x66}},
     {"Zm8=", {0x66, 0x6F}},
     {"Zm9v", {0x66, 0x6F, 0x6F}},
@@ -64,7 +64,7 @@ static const byte_vector_data_t base64_valid_data = {
 
 static const std::vector<std::string> base_invalid_data = {"ZOOL!isnotvalidbase64", "Neitheris:this?"};
 
-static const byte_vector_data_t base58_valid_data = {
+static const std::unordered_map<std::string, std::vector<std::uint8_t>> base58_valid_data = {
     {"Z", {0x20}},
     {"n", {0x2d}},
     {"q", {0x30}},
@@ -87,7 +87,7 @@ static const byte_vector_data_t base58_valid_data = {
 static const std::vector<std::string> base_58_invalid_data = {
     "0", "O", "I", "l", "3mJr0", "O3yxU", "3sNI", "4kl8", "s!5<", "t$@mX<*", "AreYouEvenLookingAtThese?"};
 
-static const byte_vector_data_t base32_valid_data = {
+static const std::unordered_map<std::string, std::vector<std::uint8_t>> base32_valid_data = {
     {"MY======", {0x66}},
     {"MZXQ====", {0x66, 0x6F}},
     {"MZXW6===", {0x66, 0x6F, 0x6F}},
@@ -115,7 +115,37 @@ static const byte_vector_data_t base32_valid_data = {
     {"B4H45WKJPKXZE===", {0x0f, 0x0f, 0xce, 0xd9, 0x49, 0x7a, 0xaf, 0x92}},
     {"E4H3DCMCQAG2MQA=", {0x27, 0x0f, 0xb1, 0x89, 0x82, 0x80, 0x0d, 0xa6, 0x40}}};
 
-BOOST_AUTO_TEST_SUITE(base32_codec_test_suite)
+template<std::size_t Size, typename Integer>
+static inline typename boost::uint_t<Size>::exact extract_uint_t(Integer v, std::size_t position) {
+    return static_cast<typename boost::uint_t<Size>::exact>(v >> (((~position) & (sizeof(Integer) - 1)) << 3));
+}
+
+template<typename Integer>
+std::array<std::uint8_t, sizeof(Integer)> to_byte_array(Integer i) {
+    std::array<std::uint8_t, sizeof(Integer)> res;
+    for (int itr = 0; itr < sizeof(Integer); itr++) {
+        res[itr] = extract_uint_t<CHAR_BIT>(i, itr);
+    }
+    return res;
+}
+
+//BOOST_AUTO_TEST_SUITE(base32_codec_random_data_test_suite)
+//
+//BOOST_DATA_TEST_CASE(base32_single_range_random_encode_decode,
+//                     boost::unit_test::data::random(std::numeric_limits<std::uintmax_t>::min(),
+//                                                    std::numeric_limits<std::uintmax_t>::max()) ^
+//                         boost::unit_test::data::xrange(std::numeric_limits<std::uint8_t>::max()),
+//                     random_sample, index) {
+//    std::array<std::uint8_t, sizeof(decltype(random_sample))> arr = to_byte_array(random_sample);
+//    std::array<std::uint8_t, sizeof(decltype(random_sample))> enc = encode<base<32>>(arr);
+//    std::array<std::uint8_t, sizeof(decltype(random_sample))> out = decode<base<32>>(enc);
+//
+//    BOOST_CHECK_EQUAL_COLLECTIONS(out.begin(), out.end(), arr.begin(), arr.end());
+//}
+//
+//BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(base32_codec_predefined_data_test_suite)
 
 BOOST_DATA_TEST_CASE(base32_single_range_encode, boost::unit_test::data::make(base32_valid_data), array_element) {
     std::string out = encode<base<32>>(array_element.second);

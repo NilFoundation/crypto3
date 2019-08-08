@@ -65,13 +65,13 @@ namespace nil {
                     typedef typename boost::mpl::apply<accumulator_set_type, accumulator_type>::type::result_type
                         result_type;
 
-                    template<typename InputRange>
-                    range_codec_impl(const InputRange &range, accumulator_set_type &&ise) :
+                    template<typename SinglePassRange>
+                    range_codec_impl(const SinglePassRange &range, accumulator_set_type &&ise) :
                         CodecStateImpl(std::forward<accumulator_set_type>(ise)) {
-                        BOOST_RANGE_CONCEPT_ASSERT((boost::InputRangeConcept<const InputRange>));
+                        BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange>));
 
                         typedef
-                            typename std::iterator_traits<typename InputRange::iterator>::value_type value_type;
+                            typename std::iterator_traits<typename SinglePassRange::iterator>::value_type value_type;
                         BOOST_STATIC_ASSERT(std::numeric_limits<value_type>::is_specialized);
                         typedef typename codec_type::template stream_processor<
                             mode_type, accumulator_set_type,
@@ -96,11 +96,29 @@ namespace nil {
                         stream_processor(this->accumulator_set)(first, last);
                     }
 
+                    template<typename T, std::size_t Size>
+                    inline operator std::array<T, Size>() const {
+                        result_type result =
+                            boost::accumulators::extract_result<accumulator_type>(this->accumulator_set);
+                        std::array<T, Size> out;
+                        std::copy(result.begin(), result.end(), out.end());
+                        return out;
+                    }
+
+                    template<typename T, std::size_t Size>
+                    inline operator boost::array<T, Size>() const {
+                        result_type result =
+                            boost::accumulators::extract_result<accumulator_type>(this->accumulator_set);
+                        boost::array<T, Size> out;
+                        std::copy(result.begin(), result.end(), out.end());
+                        return out;
+                    }
+
                     template<typename OutputRange>
                     inline operator OutputRange() const {
                         result_type result =
                             boost::accumulators::extract_result<accumulator_type>(this->accumulator_set);
-                        return OutputRange(result.cbegin(), result.cend());
+                        return OutputRange(result.begin(), result.end());
                     }
 
                     inline operator result_type() const {
@@ -139,13 +157,13 @@ namespace nil {
                     typedef typename boost::mpl::apply<accumulator_set_type, accumulator_type>::type::result_type
                         result_type;
 
-                    template<typename InputRange>
-                    itr_codec_impl(const InputRange &range, OutputIterator out, accumulator_set_type &&ise) :
+                    template<typename SinglePassRange>
+                    itr_codec_impl(const SinglePassRange &range, OutputIterator out, accumulator_set_type &&ise) :
                         CodecStateImpl(std::forward<accumulator_set_type>(ise)), out(std::move(out)) {
-                        BOOST_CONCEPT_ASSERT((boost::InputRangeConcept<const InputRange>));
+                        BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange>));
 
                         typedef
-                            typename std::iterator_traits<typename InputRange::iterator>::value_type value_type;
+                            typename std::iterator_traits<typename SinglePassRange::iterator>::value_type value_type;
                         BOOST_STATIC_ASSERT(std::numeric_limits<value_type>::is_specialized);
                         typedef typename codec_type::template stream_processor<
                             mode_type, accumulator_set_type,
