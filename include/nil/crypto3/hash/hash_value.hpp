@@ -93,10 +93,28 @@ namespace nil {
                         stream_processor(this->accumulator_set)(first, last);
                     }
 
+                    template<typename T, std::size_t Size>
+                    inline operator std::array<T, Size>() const {
+                        result_type result =
+                            boost::accumulators::extract_result<accumulator_type>(this->accumulator_set);
+                        std::array<T, Size> out;
+                        std::copy(result.begin(), result.end(), out.end());
+                        return out;
+                    }
+
+                    template<typename T, std::size_t Size>
+                    inline operator boost::array<T, Size>() const {
+                        result_type result =
+                            boost::accumulators::extract_result<accumulator_type>(this->accumulator_set);
+                        boost::array<T, Size> out;
+                        std::copy(result.begin(), result.end(), out.end());
+                        return out;
+                    }
+
                     template<typename OutputRange>
                     inline operator OutputRange() const {
-                        result_type result
-                            = boost::accumulators::extract_result<accumulator_type>(this->accumulator_set);
+                        result_type result =
+                            boost::accumulators::extract_result<accumulator_type>(this->accumulator_set);
                         OutputRange out;
                         std::move(result.begin(), result.end(), out.end());
                         return out;
@@ -175,8 +193,8 @@ namespace nil {
                     }
 
                     inline operator OutputIterator() const {
-                        result_type result
-                            = boost::accumulators::extract_result<accumulator_type>(this->accumulator_set);
+                        result_type result =
+                            boost::accumulators::extract_result<accumulator_type>(this->accumulator_set);
 
                         return std::move(result.cbegin(), result.cend(), out);
                     }
