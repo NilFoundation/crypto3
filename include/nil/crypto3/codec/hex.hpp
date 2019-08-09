@@ -173,6 +173,9 @@ namespace nil {
                     return res;
                 }
 
+                template<typename ProcessingMode>
+                using accumulator_mode_type = accumulators::preprocessing_accumulator_mode<ProcessingMode>;
+
                 template<typename ProcessingMode, typename StateAccumulator, std::size_t ValueBits>
                 struct stream_processor {
                     struct params_type {

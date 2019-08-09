@@ -242,11 +242,11 @@ namespace nil {
 
                     constexpr static const std::size_t decoded_block_values = 1;
                     constexpr static const std::size_t decoded_block_bits = decoded_block_values * decoded_value_bits;
-                    typedef std::vector<byte_type> decoded_block_type;
+                    typedef boost::container::small_vector<byte_type, decoded_block_values> decoded_block_type;
 
                     constexpr static const std::size_t encoded_block_values = 1;
                     constexpr static const std::size_t encoded_block_bits = encoded_block_values * encoded_value_bits;
-                    typedef std::vector<byte_type> encoded_block_type;
+                    typedef boost::container::small_vector<byte_type, encoded_block_values> encoded_block_type;
 
                     constexpr static const std::size_t constants_size = 64;
                     typedef std::array<byte_type, constants_size> constants_type;
@@ -258,6 +258,7 @@ namespace nil {
                         'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
                 };
 
+                constexpr const std::size_t basic_base_policy<58>::constants_size;
                 constexpr typename basic_base_policy<58>::constants_type const basic_base_policy<58>::constants;
 
                 template<>
@@ -266,7 +267,7 @@ namespace nil {
                     static inline encoded_block_type encode_block(const decoded_block_type &plaintext) {
                         encoded_block_type out;
 
-                        cpp_int v = 0, q = 0, r = 0, cs(constants_size);
+                        cpp_int v = 0, q = 0, r = 0, cs(basic_base_policy<58>::constants_size);
 
                         import_bits(v, plaintext.begin(), plaintext.end());
 
