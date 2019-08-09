@@ -264,62 +264,45 @@ namespace nil {
                 template<>
                 class base_functions<58> : public basic_base_policy<58> {
                 public:
+                    template<typename NumberType = cpp_int>
                     static inline encoded_block_type encode_block(const decoded_block_type &plaintext) {
                         encoded_block_type out;
 
-                        cpp_int v = 0, q = 0, r = 0, cs(basic_base_policy<58>::constants_size);
+                        NumberType v = 0, q = 0, r = 0, cs(basic_base_policy<58>::constants_size);
 
-                        import_bits(v, plaintext.begin(), plaintext.end());
+                        import_bits(v, plaintext.begin(), plaintext.end(), encoded_value_bits);
 
                         while (v != 0) {
                             divide_qr(v, cs, q, r);
-                            out.emplace_back(constants[static_cast<std::size_t>(r)]);
+                            out.emplace_back(constants[r.template convert_to<std::uint8_t>()]);
                             v = q;
                         }
 
                         return out;
                     }
 
+                    template<typename NumberType = cpp_int>
                     static inline decoded_block_type decode_block(const encoded_block_type &plaintext) {
-                        //                        const auto base58 = BASE58_ALPHA();
-                        //
-                        //                        const size_t leading_zeros = count_leading_zeros(input, input_length,
-                        //                        base58[0]);
-                        //
-                        //                        cpp_int v;
-                        //
-                        //                        for (size_t i = leading_zeros; i != input_length; ++i) {
-                        //                            const char c = input[i];
-                        //
-                        //                            if (c == ' ' || c == '\n') {
-                        //                                continue;
-                        //                            }
-                        //
-                        //                            const size_t idx = base58.code_for(c);
-                        //
-                        //                            if (idx == 0x80) {
-                        //                                throw Decoding_Error("Invalid base58");
-                        //                            }
-                        //
-                        //                            v *= base58.radix();
-                        //                            v += idx;
-                        //                        }
-                        //
-                        //                        std::vector<uint8_t> output(v.bytes() + leading_zeros);
-                        //                        v.binary_encode(output.data() + leading_zeros);
-                        //                        return output;
-                    }
+                        decoded_block_type out;
+                        NumberType v = 0;
 
-                protected:
-                    template<typename T, typename Z>
-                    static inline std::size_t count_leading_zeros(const T input[], size_t input_length, Z zero) {
-                        size_t leading_zeros = 0;
+                        for (const typename encoded_block_type::value_type &c : plaintext) {
+                            if (c == ' ' || c == '\n') {
+                                continue;
+                            }
 
-                        while (leading_zeros < input_length && input[leading_zeros] == zero) {
-                            leading_zeros += 1;
+                            const size_t idx = constants[c];
+
+                            if (idx == 0x80) {
+                                throw std::invalid_argument("Invalid base58");
+                            }
+
+                            v *= basic_base_policy<58>::constants_size;
+                            v += idx;
                         }
 
-                        return leading_zeros;
+                        export_bits(v, std::back_inserter(out), decoded_value_bits);
+                        return out;
                     }
                 };
 
