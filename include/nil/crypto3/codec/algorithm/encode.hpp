@@ -49,12 +49,12 @@ namespace nil {
         typename std::enable_if<codec::detail::is_iterator<OutputIterator>::value, OutputIterator>::type
             encode(InputIterator first, InputIterator last, OutputIterator out) {
             typedef typename Encoder::stream_encoder_type EncodingMode;
-            typedef typename codec::codec_accumulator<EncodingMode> EncoderAccumulator;
+            typedef typename codec::codec_accumulator<EncodingMode> CodecAccumulator;
 
-            typedef codec::detail::value_codec_impl<EncoderAccumulator> EncoderStateImpl;
+            typedef codec::detail::value_codec_impl<CodecAccumulator> EncoderStateImpl;
             typedef codec::detail::itr_codec_impl<EncoderStateImpl, OutputIterator> EncoderImpl;
 
-            return EncoderImpl(first, last, std::move(out), EncoderAccumulator());
+            return EncoderImpl(first, last, std::move(out), CodecAccumulator());
         }
 
         /*!
@@ -68,7 +68,7 @@ namespace nil {
          * @tparam Encoder Must meet the requirements of Codec which determines the
          * particular algorithm to be used with range given.
          * @tparam InputIterator Must meet the requirements of InputIterator.
-         * @tparam EncoderAccumulator Must meet the requirements of AccumulatorSet.
+         * @tparam CodecAccumulator Must meet the requirements of AccumulatorSet.
          *
          * @param first Iterator defines the beginning of the range to be encoded.
          * @param last Iterator defines the end of the range to be encoded.
@@ -78,13 +78,13 @@ namespace nil {
          * concept requirements.
          */
         template<typename Encoder, typename InputIterator,
-                 typename EncoderAccumulator = typename codec::codec_accumulator<typename Encoder::stream_encoder_type>>
-        codec::detail::range_codec_impl<codec::detail::value_codec_impl<EncoderAccumulator>>
+                 typename CodecAccumulator = typename codec::codec_accumulator<typename Encoder::stream_encoder_type>>
+        codec::detail::range_codec_impl<codec::detail::value_codec_impl<CodecAccumulator>>
             encode(InputIterator first, InputIterator last) {
-            typedef codec::detail::value_codec_impl<EncoderAccumulator> EncoderStateImpl;
+            typedef codec::detail::value_codec_impl<CodecAccumulator> EncoderStateImpl;
             typedef codec::detail::range_codec_impl<EncoderStateImpl> EncoderImpl;
 
-            return EncoderImpl(first, last, EncoderAccumulator());
+            return EncoderImpl(first, last, CodecAccumulator());
         }
 
         /*!
@@ -110,10 +110,7 @@ namespace nil {
         typename std::enable_if<boost::accumulators::detail::is_accumulator_set<CodecAccumulator>::value,
                                 CodecAccumulator>::type &
             encode(InputIterator first, InputIterator last, CodecAccumulator &acc) {
-            typedef typename Encoder::stream_encoder_type EncodingMode;
-            typedef typename codec::codec_accumulator<EncodingMode> EncoderAccumulator;
-
-            typedef codec::detail::ref_codec_impl<EncoderAccumulator> EncoderStateImpl;
+            typedef codec::detail::ref_codec_impl<CodecAccumulator> EncoderStateImpl;
             typedef codec::detail::range_codec_impl<EncoderStateImpl> EncoderImpl;
 
             return EncoderImpl(first, last, std::forward<CodecAccumulator>(acc));
@@ -128,7 +125,7 @@ namespace nil {
          *
          * @tparam Encoder Must meet the requirements of Codec which determines the
          * particular algorithm to be used with range given.
-         * @tparam InputRange Must meet the requirements of InputRange
+         * @tparam SinglePassRange Must meet the requirements of SinglePassRange
          * @tparam OutputIterator Must meet the requirements of OutputIterator.
          *
          * @param rng Defines the range to be processed by encoder.
@@ -136,16 +133,16 @@ namespace nil {
          *
          * @return Output iterator to the element in the destination range, one past the last element inserted.
          */
-        template<typename Encoder, typename InputRange, typename OutputIterator>
+        template<typename Encoder, typename SinglePassRange, typename OutputIterator>
         typename std::enable_if<codec::detail::is_iterator<OutputIterator>::value, OutputIterator>::type
-            encode(const InputRange &rng, OutputIterator out) {
+            encode(const SinglePassRange &rng, OutputIterator out) {
             typedef typename Encoder::stream_encoder_type EncodingMode;
-            typedef typename codec::codec_accumulator<EncodingMode> EncoderAccumulator;
+            typedef typename codec::codec_accumulator<EncodingMode> CodecAccumulator;
 
-            typedef codec::detail::value_codec_impl<EncoderAccumulator> EncoderStateImpl;
+            typedef codec::detail::value_codec_impl<CodecAccumulator> EncoderStateImpl;
             typedef codec::detail::itr_codec_impl<EncoderStateImpl, OutputIterator> EncoderImpl;
 
-            return EncoderImpl(rng, std::move(out), EncoderAccumulator());
+            return EncoderImpl(rng, std::move(out), CodecAccumulator());
         }
 
         /*!
@@ -157,22 +154,19 @@ namespace nil {
          *
          * @tparam Encoder Must meet the requirements of Codec which determines the
          * particular algorithm to be used with range given.
-         * @tparam InputRange Must meet the requirements of InputRange
+         * @tparam SinglePassRange Must meet the requirements of SinglePassRange
          * @tparam CodecAccumulator Must meet the requirements of AccumulatorSet.
          *
          * @param rng Defines the range to be processed by encoder.
          * @param acc AccumulatorSet defines the destination encoded data would be stored.
          * @return CodecAccumulator AccumulatorSet non-const reference equal to acc.
          */
-        template<typename Encoder, typename InputRange,
+        template<typename Encoder, typename SinglePassRange,
                  typename CodecAccumulator = typename codec::codec_accumulator<typename Encoder::stream_encoder_type>>
         typename std::enable_if<boost::accumulators::detail::is_accumulator_set<CodecAccumulator>::value,
                                 CodecAccumulator>::type &
-            encode(const InputRange &rng, CodecAccumulator &acc) {
-            typedef typename Encoder::stream_encoder_type EncodingMode;
-            typedef typename codec::codec_accumulator<EncodingMode> EncoderAccumulator;
-
-            typedef codec::detail::ref_codec_impl<EncoderAccumulator> EncoderStateImpl;
+            encode(const SinglePassRange &rng, CodecAccumulator &acc) {
+            typedef codec::detail::ref_codec_impl<CodecAccumulator> EncoderStateImpl;
             typedef codec::detail::range_codec_impl<EncoderStateImpl> EncoderImpl;
 
             return EncoderImpl(rng, std::forward<CodecAccumulator>(acc));
@@ -188,7 +182,7 @@ namespace nil {
          *
          * @tparam Encoder Must meet the requirements of Codec which determines the
          * particular algorithm to be used with range given.
-         * @tparam InputRange Must meet the requirements of InputRange
+         * @tparam SinglePassRange Must meet the requirements of SinglePassRange
          *
          * @param r Defines the range to be processed by encoder.
          *
@@ -196,9 +190,9 @@ namespace nil {
          * satisfying SequenceContainer with the value type satisfying Integral
          * concept requirements.
          */
-        template<typename Encoder, typename InputRange,
+        template<typename Encoder, typename SinglePassRange,
                  typename CodecAccumulator = typename codec::codec_accumulator<typename Encoder::stream_encoder_type>>
-        codec::detail::range_codec_impl<codec::detail::value_codec_impl<CodecAccumulator>> encode(const InputRange &r) {
+        codec::detail::range_codec_impl<codec::detail::value_codec_impl<CodecAccumulator>> encode(const SinglePassRange &r) {
 
             typedef codec::detail::value_codec_impl<CodecAccumulator> EncoderStateImpl;
             typedef codec::detail::range_codec_impl<EncoderStateImpl> EncoderImpl;

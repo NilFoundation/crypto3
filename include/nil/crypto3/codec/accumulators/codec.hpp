@@ -27,25 +27,49 @@
 namespace nil {
     namespace crypto3 {
         namespace accumulators {
+            template<typename CodecMode>
+            struct accumulator_mode {
+                typedef CodecMode codec_mode_type;
+            };
+
+            template<typename CodecMode>
+            struct preprocessing_accumulator_mode : public accumulator_mode<CodecMode> {
+                typedef typename accumulator_mode<CodecMode>::codec_mode_type codec_mode_type;
+            };
+
+            template<typename CodecMode>
+            struct postprocessing_accumulator_mode : public accumulator_mode<CodecMode> {
+                typedef typename accumulator_mode<CodecMode>::codec_mode_type codec_mode_type;
+            };
+
             namespace impl {
-                template<typename Mode>
+                template<typename CodecMode, typename AccumulatorMode>
                 struct codec_impl : boost::accumulators::accumulator_base {
+                    typedef CodecMode codec_mode_type;
+                    typedef AccumulatorMode accumulator_mode_type;
+                };
+
+                template<typename CodecMode>
+                struct codec_impl<CodecMode, preprocessing_accumulator_mode<CodecMode>>
+                    : boost::accumulators::accumulator_base {
                 protected:
-                    typedef Mode mode_type;
-                    typedef typename mode_type::finalizer_type finalizer_type;
+                    typedef CodecMode codec_mode_type;
+                    typedef preprocessing_accumulator_mode<CodecMode> accumulator_mode_type;
 
-                    constexpr static const std::size_t input_block_bits = mode_type::input_block_bits;
-                    constexpr static const std::size_t input_block_values = mode_type::input_block_values;
-                    typedef typename mode_type::input_block_type input_block_type;
+                    typedef typename codec_mode_type::finalizer_type finalizer_type;
 
-                    constexpr static const std::size_t input_value_bits = mode_type::input_value_bits;
+                    constexpr static const std::size_t input_block_bits = codec_mode_type::input_block_bits;
+                    constexpr static const std::size_t input_block_values = codec_mode_type::input_block_values;
+                    typedef typename codec_mode_type::input_block_type input_block_type;
+
+                    constexpr static const std::size_t input_value_bits = codec_mode_type::input_value_bits;
                     typedef typename input_block_type::value_type input_value_type;
 
-                    constexpr static const std::size_t output_block_bits = mode_type::output_block_bits;
-                    constexpr static const std::size_t output_block_values = mode_type::output_block_values;
-                    typedef typename mode_type::output_block_type output_block_type;
+                    constexpr static const std::size_t output_block_bits = codec_mode_type::output_block_bits;
+                    constexpr static const std::size_t output_block_values = codec_mode_type::output_block_values;
+                    typedef typename codec_mode_type::output_block_type output_block_type;
 
-                    constexpr static const std::size_t output_value_bits = mode_type::output_value_bits;
+                    constexpr static const std::size_t output_value_bits = codec_mode_type::output_value_bits;
                     typedef typename output_block_type::value_type output_value_type;
 
                     typedef boost::container::static_vector<input_value_type, input_block_values> cache_type;
@@ -70,7 +94,7 @@ namespace nil {
                         if (!cache.empty()) {
                             input_block_type ib = {0};
                             std::move(cache.begin(), cache.end(), ib.begin());
-                            output_block_type ob = mode_type::process_block(ib);
+                            output_block_type ob = codec_mode_type::process_block(ib);
                             std::move(ob.begin(), ob.end(), std::inserter(res, res.end()));
                         }
 
@@ -104,7 +128,7 @@ namespace nil {
                         if (cache.size() == cache.max_size()) {
                             input_block_type ib = {0};
                             std::move(cache.begin(), cache.end(), ib.begin());
-                            output_block_type ob = mode_type::process_block(ib);
+                            output_block_type ob = codec_mode_type::process_block(ib);
                             std::move(ob.begin(), ob.end(), std::inserter(digest, digest.end()));
 
                             cache.clear();
@@ -117,7 +141,7 @@ namespace nil {
                     inline void process(const input_block_type &block, std::size_t bits) {
                         output_block_type ob;
                         if (cache.empty()) {
-                            ob = mode_type::process_block(block);
+                            ob = codec_mode_type::process_block(block);
                         } else {
                             input_block_type b = codec::make_array<input_block_values>(cache.begin(), cache.end());
                             typename input_block_type::const_iterator itr =
@@ -125,7 +149,7 @@ namespace nil {
 
                             std::move(block.begin(), itr, b.end());
 
-                            ob = mode_type::process_block(b);
+                            ob = codec_mode_type::process_block(b);
 
                             cache.clear();
                             cache.insert(cache.end(), itr, block.end());
@@ -139,17 +163,87 @@ namespace nil {
                     cache_type cache;
                     result_type digest;
                 };
-            }    // namespace impl
+
+                template<typename CodecMode>
+                struct codec_impl<CodecMode, postprocessing_accumulator_mode<CodecMode>>
+                    : boost::accumulators::accumulator_base {
+                protected:
+                    typedef CodecMode codec_mode_type;
+                    typedef postprocessing_accumulator_mode<CodecMode> accumulator_mode_type;
+
+                    typedef typename codec_mode_type::finalizer_type finalizer_type;
+
+                    constexpr static const std::size_t input_block_bits = codec_mode_type::input_block_bits;
+                    constexpr static const std::size_t input_block_values = codec_mode_type::input_block_values;
+                    typedef typename codec_mode_type::input_block_type input_block_type;
+
+                    constexpr static const std::size_t input_value_bits = codec_mode_type::input_value_bits;
+                    typedef typename input_block_type::value_type input_value_type;
+
+                    constexpr static const std::size_t output_block_bits = codec_mode_type::output_block_bits;
+                    constexpr static const std::size_t output_block_values = codec_mode_type::output_block_values;
+                    typedef typename codec_mode_type::output_block_type output_block_type;
+
+                    constexpr static const std::size_t output_value_bits = codec_mode_type::output_value_bits;
+                    typedef typename output_block_type::value_type output_value_type;
+
+                public:
+                    typedef codec::digest<output_block_bits> result_type;
+
+                    template<typename Args>
+                    // The constructor takes an argument pack.
+                    codec_impl(const Args &args) : leading_zeros(0) {
+                    }
+
+                    template<typename ArgumentPack>
+                    inline void operator()(const ArgumentPack &args) {
+                        resolve_type(args[boost::accumulators::sample]);
+                    }
+
+                    template<typename ArgumentPack>
+                    inline result_type result(const ArgumentPack &args) const {
+                        result_type res;
+
+                        output_block_type ob = codec_mode_type::process_block(digest);
+                        std::move(ob.begin(), ob.end(), std::inserter(res, res.end()));
+
+                        if (leading_zeros) {
+                            finalizer_type fin(leading_zeros);
+                            fin(res);
+                        }
+
+                        return ob;
+                    }
+
+                protected:
+                    inline void resolve_type(const input_block_type &block) {
+                        if (digest.empty()) {
+                            typename input_block_type::const_iterator itr = block.cbegin();
+                            while (*itr == 0) {
+                                ++itr;
+                            }
+
+                            leading_zeros = std::distance(block.begin(), itr);
+                        }
+                        std::move(block.begin(), block.end(), std::back_inserter(digest));
+                    }
+
+                    std::size_t leading_zeros;
+                    result_type digest;
+                };    // namespace impl
+            }         // namespace impl
 
             namespace tag {
-                template<typename Mode>
+                template<typename ProcessingMode>
                 struct codec : boost::accumulators::depends_on<> {
-                    typedef Mode mode_type;
+                    typedef ProcessingMode mode_type;
 
                     /// INTERNAL ONLY
                     ///
 
-                    typedef boost::mpl::always<accumulators::impl::codec_impl<Mode>> impl;
+                    typedef boost::mpl::always<accumulators::impl::codec_impl<
+                        mode_type, typename mode_type::codec_type::template accumulator_mode_type<ProcessingMode>>>
+                        impl;
                 };
             }    // namespace tag
 

@@ -22,8 +22,17 @@
 using namespace nil::crypto3;
 using namespace nil::crypto3::codec;
 
-typedef std::unordered_map<std::string, std::string>::value_type data_value_t;
-BOOST_TEST_DONT_PRINT_LOG_VALUE(data_value_t)
+namespace boost {
+    namespace test_tools {
+        namespace tt_detail {
+            template<template<typename, typename> class P, typename K, typename V>
+            struct print_log_value<P<K, V>> {
+                void operator()(std::ostream&, P<K, V> const&) {
+                }
+            };
+        }    // namespace tt_detail
+    }        // namespace test_tools
+}
 
 static const std::unordered_map<std::string, std::string> upper_valid_data_map = {{"ABCD", "41424344"},
                                                                                   {"AAAA", "41414141"},

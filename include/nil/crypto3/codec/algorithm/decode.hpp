@@ -49,12 +49,12 @@ namespace nil {
         typename std::enable_if<codec::detail::is_iterator<OutputIterator>::value, OutputIterator>::type
             decode(InputIterator first, InputIterator last, OutputIterator out) {
             typedef typename Decoder::stream_decoder_type DecodingMode;
-            typedef typename codec::codec_accumulator<DecodingMode> DecoderAccumulator;
+            typedef typename codec::codec_accumulator<DecodingMode> CodecAccumulator;
 
-            typedef codec::detail::value_codec_impl<DecoderAccumulator> DecoderStateImpl;
+            typedef codec::detail::value_codec_impl<CodecAccumulator> DecoderStateImpl;
             typedef codec::detail::itr_codec_impl<DecoderStateImpl, OutputIterator> DecoderImpl;
 
-            return DecoderImpl(first, last, std::move(out), DecoderAccumulator());
+            return DecoderImpl(first, last, std::move(out), CodecAccumulator());
         }
 
         /*!
@@ -68,7 +68,7 @@ namespace nil {
          * @tparam Decoder Must meet the requirements of Codec which determines the
          * particular algorithm to be used with range given.
          * @tparam InputIterator Must meet the requirements of InputIterator.
-         * @tparam DecoderAccumulator Must meet the requirements of AccumulatorSet.
+         * @tparam CodecAccumulator Must meet the requirements of AccumulatorSet.
          *
          * @param first Iterator defines the beginning of the range to be decoded.
          * @param last Iterator defines the end of the range to be decoded.
@@ -97,7 +97,7 @@ namespace nil {
          *
          * @tparam Decoder Must meet the requirements of Codec which determines the
          * particular algorithm to be used with range given.
-         * @tparam InputRange Must meet the requirements of InputRange
+         * @tparam SinglePassRange Must meet the requirements of SinglePassRange
          * @tparam OutputIterator Must meet the requirements of OutputIterator.
          *
          * @param rng Defines the range to be processed by decoder.
@@ -111,10 +111,7 @@ namespace nil {
         typename std::enable_if<boost::accumulators::detail::is_accumulator_set<CodecAccumulator>::value,
                                 CodecAccumulator>::type &
             decode(InputIterator first, InputIterator last, CodecAccumulator &acc) {
-            typedef typename Decoder::stream_decoder_type DecodingMode;
-            typedef typename codec::codec_accumulator<DecodingMode> DecoderAccumulator;
-
-            typedef codec::detail::ref_codec_impl<DecoderAccumulator> DecoderStateImpl;
+            typedef codec::detail::ref_codec_impl<CodecAccumulator> DecoderStateImpl;
             typedef codec::detail::range_codec_impl<DecoderStateImpl> DecoderImpl;
 
             return DecoderImpl(first, last, std::forward<CodecAccumulator>(acc));
@@ -129,23 +126,23 @@ namespace nil {
          *
          * @tparam Decoder Must meet the requirements of Codec which determines the
          * particular algorithm to be used with range given.
-         * @tparam InputRange Must meet the requirements of InputRange
+         * @tparam SinglePassRange Must meet the requirements of SinglePassRange
          * @tparam CodecAccumulator Must meet the requirements of AccumulatorSet.
          *
          * @param rng Defines the range to be processed by decoder.
          * @param acc AccumulatorSet defines the destination decoded data would be stored.
          * @return CodecAccumulator AccumulatorSet non-const reference equal to acc.
          */
-        template<typename Decoder, typename InputRange, typename OutputIterator>
+        template<typename Decoder, typename SinglePassRange, typename OutputIterator>
         typename std::enable_if<codec::detail::is_iterator<OutputIterator>::value, OutputIterator>::type
-            decode(const InputRange &rng, OutputIterator out) {
+            decode(const SinglePassRange &rng, OutputIterator out) {
             typedef typename Decoder::stream_decoder_type DecodingMode;
-            typedef typename codec::codec_accumulator<DecodingMode> DecoderAccumulator;
+            typedef typename codec::codec_accumulator<DecodingMode> CodecAccumulator;
 
-            typedef codec::detail::value_codec_impl<DecoderAccumulator> DecoderStateImpl;
+            typedef codec::detail::value_codec_impl<CodecAccumulator> DecoderStateImpl;
             typedef codec::detail::itr_codec_impl<DecoderStateImpl, OutputIterator> DecoderImpl;
 
-            return DecoderImpl(rng, std::move(out), DecoderAccumulator());
+            return DecoderImpl(rng, std::move(out), CodecAccumulator());
         }
 
         /*!
@@ -157,7 +154,7 @@ namespace nil {
          *
          * @tparam Decoder Must meet the requirements of Codec which determines the
          * particular algorithm to be used with range given.
-         * @tparam InputRange Must meet the requirements of InputRange
+         * @tparam SinglePassRange Must meet the requirements of SinglePassRange
          * @tparam CodecAccumulator Must meet the requirements of AccumulatorSet.
          *
          * @param rng Defines the range to be processed by decoder.
@@ -165,15 +162,12 @@ namespace nil {
          * @return CodecAccumulator AccumulatorSet non-const reference equal to acc.
          */
         template<typename Decoder,
-                 typename InputRange,
+                 typename SinglePassRange,
                  typename CodecAccumulator = typename codec::codec_accumulator<typename Decoder::stream_decoder_type>>
         typename std::enable_if<boost::accumulators::detail::is_accumulator_set<CodecAccumulator>::value,
                                 CodecAccumulator>::type &
-            decode(const InputRange &rng, CodecAccumulator &out) {
-            typedef typename Decoder::stream_decoder_type DecodingMode;
-            typedef typename codec::codec_accumulator<DecodingMode> DecoderAccumulator;
-
-            typedef codec::detail::value_codec_impl<DecoderAccumulator> DecoderStateImpl;
+            decode(const SinglePassRange &rng, CodecAccumulator &out) {
+            typedef codec::detail::value_codec_impl<CodecAccumulator> DecoderStateImpl;
             typedef codec::detail::range_codec_impl<DecoderStateImpl> DecoderImpl;
 
             return DecoderImpl(rng, std::forward<CodecAccumulator>(out));
@@ -189,7 +183,7 @@ namespace nil {
          *
          * @tparam Decoder Must meet the requirements of Codec which determines the
          * particular algorithm to be used with range given.
-         * @tparam InputRange Must meet the requirements of InputRange
+         * @tparam SinglePassRange Must meet the requirements of SinglePassRange
          *
          * @param r Defines the range to be processed by decoder.
          *
@@ -198,15 +192,15 @@ namespace nil {
          * concept requirements.
          */
         template<typename Decoder,
-                 typename InputRange,
-                 typename DecoderAccumulator = typename codec::codec_accumulator<typename Decoder::stream_decoder_type>>
-        codec::detail::range_codec_impl<codec::detail::value_codec_impl<DecoderAccumulator>>
-            decode(const InputRange &r) {
+                 typename SinglePassRange,
+                 typename CodecAccumulator = typename codec::codec_accumulator<typename Decoder::stream_decoder_type>>
+        codec::detail::range_codec_impl<codec::detail::value_codec_impl<CodecAccumulator>>
+            decode(const SinglePassRange &r) {
 
-            typedef codec::detail::value_codec_impl<DecoderAccumulator> DecoderStateImpl;
+            typedef codec::detail::value_codec_impl<CodecAccumulator> DecoderStateImpl;
             typedef codec::detail::range_codec_impl<DecoderStateImpl> DecoderImpl;
 
-            return DecoderImpl(r, DecoderAccumulator());
+            return DecoderImpl(r, CodecAccumulator());
         }
     }    // namespace crypto3
 }    // namespace nil

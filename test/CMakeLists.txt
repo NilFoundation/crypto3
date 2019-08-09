@@ -4,9 +4,17 @@ if(NOT Boost_UNIT_TEST_FRAMEWORK_FOUND)
     cm_find_package(Boost REQUIRED COMPONENTS unit_test_framework)
 endif()
 
-cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
+if(TARGET boost::multiprecision)
+    cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
 
-                       ${Boost_LIBRARIES})
+                           boost::multiprecision
+
+                           ${Boost_LIBRARIES})
+else()
+    cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
+
+                           ${Boost_LIBRARIES})
+endif()
 
 macro(define_codec_test name)
     cm_test(NAME codec_${name}_test SOURCES ${name}.cpp)

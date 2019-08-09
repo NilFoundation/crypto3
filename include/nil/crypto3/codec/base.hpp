@@ -19,7 +19,6 @@
 #include <nil/crypto3/codec/detail/varlength_block_stream_processor.hpp>
 
 #include <nil/crypto3/codec/codec_state.hpp>
-#include <nil/crypto3/codec/accumulators/codec.hpp>
 
 #include <boost/range/begin.hpp>
 #include <boost/range/end.hpp>
@@ -38,11 +37,9 @@ namespace nil {
 
             /*!
              * @brief Base encoder finalizer functor
-             * @tparam Version
+             * @tparam Version Base encoder version selector. Available values are: 32, 58, 64
              *
-             * Base encoder finalizer
-             *
-             * @note Finalizer is implemented under assumption it gets applied to the byte storage
+             * @note This particular implementation gets selected with Version == 58.
              */
             template<std::size_t Version, typename = detail::static_range<true>>
             struct base_encode_finalizer {
@@ -51,19 +48,32 @@ namespace nil {
                 /*!
                  * @param input_remaining_bits Bits remaining unprocessed in block
                  */
-                base_encode_finalizer(std::size_t) {
+                base_encode_finalizer(std::size_t leading_zeros = 0) : leading_zeros(leading_zeros) {
                 }
 
                 /*!
-                 * @brief Base encoding padding function. Fills remaining empty bits with '='.
+                 * @brief Base encoding padding function. Fills remaining empty bits with '0'.
                  * @tparam T Input container type. Assumed to meet the requirements of Container,
                  * AllocatorAwareContainer and SequenceContainer concepts.
                  * @param t
                  */
                 template<typename T>
                 void operator()(T &t) {
+                    while (leading_zeros) {
+                        t.push_back(typename T::value_type());
+                        leading_zeros--;
+                    }
                 }
+
+                std::size_t leading_zeros;
             };
+
+            /*!
+             * @brief Base encoder finalizer functor
+             * @tparam Version Base encoder version selector. Available values are: 32, 58, 64.
+             *
+             * @note This particular implementation gets selected with Version == 32 || Version == 64.
+             */
 
             template<std::size_t Version>
             struct base_encode_finalizer<Version, detail::static_range<!(Version % 32)>> {
@@ -193,6 +203,9 @@ namespace nil {
                     return policy_type::decode_block(encoded);
                 }
 
+                template<typename ProcessingMode>
+                using accumulator_mode_type = accumulators::postprocessing_accumulator_mode<ProcessingMode>;
+
                 template<typename ProcessingMode, typename StateAccumulator, std::size_t ValueBits>
                 struct stream_processor {
                     struct params_type {
@@ -253,6 +266,9 @@ namespace nil {
                 inline static decoded_block_type decode(const encoded_block_type &encoded) {
                     return policy_type::decode_block(encoded);
                 }
+
+                template<typename ProcessingMode>
+                using accumulator_mode_type = accumulators::preprocessing_accumulator_mode<ProcessingMode>;
 
                 template<typename ProcessingMode, typename StateAccumulator, std::size_t ValueBits>
                 struct stream_processor {

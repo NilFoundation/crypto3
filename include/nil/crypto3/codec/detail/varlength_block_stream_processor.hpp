@@ -70,29 +70,29 @@ namespace nil {
                 }
 
                 template<typename InputIterator>
-                inline void operator()(InputIterator b, InputIterator e, std::random_access_iterator_tag) {
-                    input_block_type block;
-                    pack<endian_type>(b, e, block);
+                inline void operator()(InputIterator first, InputIterator last, std::random_access_iterator_tag) {
+                    input_block_type block = {0};
+                    pack<endian_type, value_bits, input_value_bits>(first, last, std::back_inserter(block));
                     state(block);
                 }
 
                 template<typename InputIterator, typename Category>
                 inline void operator()(InputIterator first, InputIterator last, Category) {
-                    input_block_type block;
-                    pack<endian_type>(first, last, block);
+                    input_block_type block = {0};
+                    pack<endian_type, value_bits, input_value_bits>(first, last, std::back_inserter(block));
                     state(block);
                 }
 
-                template<typename ValueType, typename = typename std::enable_if<std::is_same<
-                                                 ValueType, typename input_block_type::value_type>::value>::type>
+                template<typename ValueType,
+                         typename = typename std::enable_if<std::is_same<ValueType, input_value_type>::value>::type>
                 inline void operator()(const ValueType &value) {
                     state(value);
                 }
 
                 template<typename InputIterator>
-                inline void operator()(InputIterator b, InputIterator e) {
+                inline void operator()(InputIterator first, InputIterator last) {
                     typedef typename std::iterator_traits<InputIterator>::iterator_category cat;
-                    return operator()(b, e, cat());
+                    return operator()(first, last, cat());
                 }
 
                 template<typename ValueType>
