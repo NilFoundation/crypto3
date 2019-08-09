@@ -114,7 +114,7 @@ namespace nil {
             struct base_decode_finalizer {
                 typedef detail::base_policy<Version> policy_type;
 
-                base_decode_finalizer(std::size_t) {
+                base_decode_finalizer(std::size_t leading_zeros) : leading_zeros(leading_zeros) {
                 }
 
                 /*!
@@ -125,7 +125,10 @@ namespace nil {
                  */
                 template<typename T>
                 void operator()(T &t) {
+                    t.swap(T(t.begin() + leading_zeros, t.end()));
                 }
+
+                std::size_t leading_zeros;
             };
 
             template<std::size_t Version>
