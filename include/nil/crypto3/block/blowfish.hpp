@@ -35,6 +35,9 @@ namespace nil {
                 typedef typename policy_type::constants_type constants_type;
 
             public:
+                typedef typename detail::isomorphic_encrypter_mode<blowfish> stream_encrypter_type;
+                typedef typename detail::isomorphic_decrypter_mode<blowfish> stream_decrypter_type;
+
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
                 typedef typename policy_type::word_type word_type;
 
@@ -50,11 +53,15 @@ namespace nil {
                 template<template<typename, typename> class Mode, typename StateAccumulator, std::size_t ValueBits,
                          typename Padding>
                 struct stream_cipher {
-                    typedef block_stream_processor<Mode<blowfish, Padding>, StateAccumulator,
-                                                   stream_endian::little_octet_big_bit, ValueBits,
-                                                   policy_type::word_bits * 2>
-                        type_;
-#ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES
+                    struct params_type {
+                        typedef typename stream_endian::little_octet_big_bit endian_type;
+
+                        constexpr static const std::size_t value_bits = ValueBits;
+                        constexpr static const std::size_t length_bits = policy_type::word_bits * 2;
+                    };
+
+                    typedef block_stream_processor<Mode<blowfish, Padding>, StateAccumulator, params_type> type_;
+#ifdef CRYPTO3_BLOCK_NO_HIDE_INTERNAL_TYPES
                     typedef type_ type;
 #else
                     struct type : type_ {};

@@ -109,6 +109,9 @@ namespace nil {
                 typedef typename policy_type::expanded_substitution_type expanded_substitution_type;
 
             public:
+                typedef typename detail::isomorphic_encrypter_mode<gost_28147_89<ParamsType>> stream_encrypter_type;
+                typedef typename detail::isomorphic_decrypter_mode<gost_28147_89<ParamsType>> stream_decrypter_type;
+
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
                 typedef typename policy_type::word_type word_type;
 
@@ -120,18 +123,22 @@ namespace nil {
                 constexpr static const std::size_t key_words = policy_type::key_words;
                 typedef typename policy_type::key_type key_type;
 
-                template<template<typename, typename> class Mode,
-                         typename StateAccumulator,
+                template<template<typename, typename> class Mode, typename StateAccumulator,
                          std::size_t ValueBits,
                          typename Padding>
                 struct stream_cipher {
+                    struct params_type {
+                        typedef typename stream_endian::little_octet_big_bit endian_type;
+
+                        constexpr static const std::size_t value_bits = ValueBits;
+                        constexpr static const std::size_t length_bits = policy_type::word_bits * 2;
+                    };
+
                     typedef block_stream_processor<Mode<gost_28147_89<ParamsType>, Padding>,
                                                    StateAccumulator,
-                                                   stream_endian::little_octet_big_bit,
-                                                   ValueBits,
-                                                   policy_type::word_bits * 2>
+                                                   params_type>
                         type_;
-#ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES
+#ifdef CRYPTO3_BLOCK_NO_HIDE_INTERNAL_TYPES
                     typedef type_ type;
 #else
                     struct type : type_ {};

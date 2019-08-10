@@ -18,8 +18,6 @@ endif()
 
 cm_project(block WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME} LANGUAGES C CXX)
 
-cm_setup_version(VERSION 1.70.0)
-
 include(TargetArchitecture)
 include(TargetConfiguration)
 include(PlatformConfiguration)

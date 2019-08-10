@@ -153,6 +153,13 @@ namespace nil {
                     block(const AccumulatorSet &acc) {
                     return boost::accumulators::extract_result<tag::block<Mode>>(acc);
                 }
+
+                template<typename Cipher, typename AccumulatorSet>
+                typename boost::mpl::apply<AccumulatorSet,
+                                           tag::block<typename Cipher::stream_encrypter_mode>>::type::result_type
+                    encrypt(const AccumulatorSet &acc) {
+                    return boost::accumulators::extract_result<tag::block<Mode>>(acc);
+                }
             }    // namespace extract
         }        // namespace accumulators
     }            // namespace crypto3
