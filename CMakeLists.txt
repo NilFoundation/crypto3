@@ -18,6 +18,14 @@ endif()
 
 cm_project(codec WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME} LANGUAGES C CXX)
 
+macro(cm_find_package NAME)
+    if(NOT "${NAME}" MATCHES "^${CMAKE_WORKSPACE_NAME}_.*$" AND NOT "${NAME}" STREQUAL CM)
+        find_package(${ARGV})
+    else()
+        set(${ARGV0}_FOUND ON CACHE BOOL "")
+    endif()
+endmacro()
+
 if(NOT Boost_FOUND)
     cm_find_package(Boost REQUIRED)
 endif()
