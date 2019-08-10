@@ -125,7 +125,7 @@ namespace nil {
                  */
                 template<typename T>
                 void operator()(T &t) {
-                    t.swap(T(t.begin() + leading_zeros, t.end()));
+                    t = T(t.begin() + leading_zeros, t.end());
                 }
 
                 std::size_t leading_zeros;
