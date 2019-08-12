@@ -19,6 +19,7 @@ endif()
 
 cm_find_package(${CMAKE_WORKSPACE_NAME}_block)
 
+option(BUILD_WITH_CCACHE "Build with ccache usage" TRUE)
 option(BUILD_UNIT_TESTS "Build unit tests" FALSE)
 
 option(CRYPTO3_HASH_BLAKE2B "Build with Blake2 hash support" TRUE)
