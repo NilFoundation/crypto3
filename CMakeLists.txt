@@ -96,7 +96,9 @@ if(${CMAKE_CXX_STANDARD} LESS 17)
 
     set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES
                           EXPORT_NAME ${CURRENT_PROJECT_NAME}
-                          CXX_STANDARD_REQUIRED 11)
+                          CXX_STANDARD 11
+                          CXX_STANDARD_REQUIRED TRUE
+                          CXX_EXTENSIONS FALSE)
 else()
     add_library(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE)
 
