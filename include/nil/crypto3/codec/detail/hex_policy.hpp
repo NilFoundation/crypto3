@@ -12,6 +12,8 @@
 
 #include <array>
 
+#include <boost/integer.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace codec {
@@ -21,17 +23,10 @@ namespace nil {
                     constexpr static const constants_type constants = "0123456789ABCDEF";
                 };
 
-                constexpr upper::constants_type upper::constants;
-
-                /*!
-                 *
-                 */
                 struct lower {
                     typedef const char *constants_type;
                     constexpr static const constants_type constants = "0123456789abcdef";
                 };
-
-                constexpr lower::constants_type lower::constants;
             }    // namespace mode
 
             namespace detail {

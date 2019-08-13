@@ -1,9 +1,5 @@
 include(CMTest)
 
-if(NOT Boost_UNIT_TEST_FRAMEWORK_FOUND)
-    cm_find_package(Boost REQUIRED COMPONENTS unit_test_framework)
-endif()
-
 if(TARGET boost::multiprecision)
     cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
 
@@ -25,7 +21,9 @@ macro(define_codec_test name)
 
                                ${Boost_INCLUDE_DIRS})
 
-    set_target_properties(codec_${name}_test PROPERTIES CXX_STANDARD 14)
+    if(NOT CMAKE_CXX_STANDARD)
+        set_target_properties(codec_${name}_test PROPERTIES CXX_STANDARD 14)
+    endif()
 
     get_target_property(target_type Boost::unit_test_framework TYPE)
     if(target_type STREQUAL "SHARED_LIB")

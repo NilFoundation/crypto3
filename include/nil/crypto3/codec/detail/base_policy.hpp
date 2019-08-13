@@ -14,6 +14,8 @@
 
 #include <boost/integer.hpp>
 
+#include <boost/container/small_vector.hpp>
+
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/multiprecision/integer.hpp>
 
@@ -155,16 +157,6 @@ namespace nil {
                         0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
                 };
 
-                constexpr typename basic_base_policy<32>::constants_type const basic_base_policy<32>::constants;
-
-                constexpr typename basic_base_policy<64>::constants_type const basic_base_policy<64>::constants;
-
-                constexpr typename basic_base_policy<32>::inverted_constants_type const
-                    basic_base_policy<32>::inverted_constants;
-
-                constexpr typename basic_base_policy<64>::inverted_constants_type const
-                    basic_base_policy<64>::inverted_constants;
-
                 template<std::size_t Version>
                 class base_functions : public basic_base_policy<Version> {};
 
@@ -257,9 +249,6 @@ namespace nil {
                         'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
                         'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
                 };
-
-                constexpr const std::size_t basic_base_policy<58>::constants_size;
-                constexpr typename basic_base_policy<58>::constants_type const basic_base_policy<58>::constants;
 
                 template<>
                 class base_functions<58> : public basic_base_policy<58> {

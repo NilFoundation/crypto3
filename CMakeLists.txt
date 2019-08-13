@@ -27,11 +27,17 @@ macro(cm_find_package NAME)
     endif()
 endmacro()
 
-if(NOT Boost_FOUND)
-    cm_find_package(Boost REQUIRED)
+if(NOT Boost_FOUND AND NOT BUILD_TESTS)
+    cm_find_package(Boost REQUIRED COMPONENTS container)
+    else()
+    cm_find_package(Boost REQUIRED COMPONENTS container unit_test_framework)
 endif()
 
+option(BUILD_WITH_CCACHE "Build with ccache usage" TRUE)
 option(BUILD_UNIT_TESTS "Build unit tests" FALSE)
+
+configure_file(${CMAKE_CURRENT_LIST_DIR}/cmake/build.hpp.in
+               ${CMAKE_BINARY_DIR}/include/nil/${CMAKE_WORKSPACE_NAME}/build.hpp @ONLY)
 
 list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
      include/nil/crypto3/codec/detail/base_policy.hpp
@@ -40,13 +46,13 @@ list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
      include/nil/crypto3/codec/detail/exploder.hpp
      include/nil/crypto3/codec/detail/unbounded_shift.hpp
      include/nil/crypto3/codec/detail/imploder.hpp
-     include/nil/crypto3/codec/detail/codec_value.hpp
+     include/nil/crypto3/codec/detail/stream_endian.hpp
+
+     include/nil/crypto3/codec/codec_value.hpp
+     include/nil/crypto3/codec/codec_state.hpp
 
      include/nil/crypto3/codec/hex.hpp
-     include/nil/crypto3/codec/zlib.hpp
-
-     include/nil/crypto3/codec/detail/codec_state.hpp
-     include/nil/crypto3/codec/stream_endian.hpp
+     include/nil/crypto3/codec/base.hpp
 
      include/nil/crypto3/codec/algorithm/encode.hpp
      include/nil/crypto3/codec/algorithm/decode.hpp
@@ -61,28 +67,64 @@ list(APPEND ${CURRENT_PROJECT_NAME}_HEADERS
 
 cm_setup_version(VERSION 0.1.0 PREFIX ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME})
 
-add_library(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE)
-set_property(TARGET ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTY EXPORT_NAME ${CURRENT_PROJECT_NAME})
+if(${CMAKE_CXX_STANDARD} LESS 17)
+    list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
+         src/base_policy.cpp
+         src/hex_policy.cpp)
 
-if(TARGET boost::multiprecision)
-    target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
+    add_library(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
+                ${${CURRENT_PROJECT_NAME}_HEADERS}
+                ${${CURRENT_PROJECT_NAME}_SOURCES})
 
-                          ${Boost_LIBRARIES}
+    if(TARGET boost::multiprecision)
+        target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PRIVATE
 
-                          boost::multiprecision)
+                              ${Boost_LIBRARIES}
+
+                              boost::multiprecision)
+    else()
+        target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PRIVATE
+
+                              ${Boost_LIBRARIES})
+    endif()
+
+    target_include_directories(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PRIVATE
+                               "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+                               "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>"
+
+                               ${Boost_INCLUDE_DIR})
+
+    set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES
+                          EXPORT_NAME ${CURRENT_PROJECT_NAME}
+                          CXX_STANDARD_REQUIRED 11)
 else()
-    target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
+    add_library(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE)
 
-                          ${Boost_LIBRARIES})
+    if(TARGET boost::multiprecision)
+        target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
+
+                              ${Boost_LIBRARIES}
+
+                              boost::multiprecision)
+    else()
+        target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
+
+                              ${Boost_LIBRARIES})
+    endif()
+
+    target_include_directories(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
+                               "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+                               "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>"
+
+                               ${Boost_INCLUDE_DIR})
+
+    set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES
+                          EXPORT_NAME ${CURRENT_PROJECT_NAME})
 endif()
 
-target_include_directories(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
-                           "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
-                           "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>"
-
-                           ${Boost_INCLUDE_DIR})
-
-cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INCLUDE include NAMESPACE ${CMAKE_WORKSPACE_NAME}::)
+cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
+          INCLUDE include
+          NAMESPACE ${CMAKE_WORKSPACE_NAME}::)
 
 if(BUILD_UNIT_TESTS)
     add_subdirectory(test)
