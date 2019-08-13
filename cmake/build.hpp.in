@@ -81,25 +81,8 @@
 #define CRYPTO3_RNG_AUTO_RESEED_TIMEOUT std::chrono::milliseconds(10)
 #define CRYPTO3_RNG_RESEED_DEFAULT_TIMEOUT std::chrono::milliseconds(50)
 
-/*
-* Specifies (in order) the list of entropy sources that will be used
-* to seed an in-memory RNG. The first in the default list: "rdseed"
-* and "rdrand" do not count as contributing any entropy but are
-* included as they are fast and help protect against a seriously
-* broken system RNG.
-*/
-#define CRYPTO3_ENTROPY_DEFAULT_SOURCES \
-   { "rdseed", "rdrand", "darwin_secrandom", "getentropy", \
-     "dev_random", "system_rng", "proc_walk", "system_stats" }
-
 /* Multiplier on a block cipher's native parallelism */
 #define CRYPTO3_BLOCK_CIPHER_PAR_MULT 4
-
-/*
-* These control the RNG used by the system RNG interface
-*/
-#define CRYPTO3_SYSTEM_RNG_DEVICE "/dev/urandom"
-#define CRYPTO3_SYSTEM_RNG_POLL_DEVICES { "/dev/urandom", "/dev/random", "/dev/srandom" }
 
 /*
 * This directory will be monitored by proc_walking_entropy_source and
