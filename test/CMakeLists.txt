@@ -1,16 +1,10 @@
 include(CMTest)
 
-if(TARGET boost::multiprecision)
-    cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
+cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
 
-                           boost::multiprecision
+                       $<TARGET_NAME_IF_EXISTS:boost::multiprecision>
 
-                           ${Boost_LIBRARIES})
-else()
-    cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
-
-                           ${Boost_LIBRARIES})
-endif()
+                       ${Boost_LIBRARIES})
 
 macro(define_codec_test name)
     cm_test(NAME codec_${name}_test SOURCES ${name}.cpp)
