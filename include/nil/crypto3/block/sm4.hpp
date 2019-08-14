@@ -35,6 +35,9 @@ namespace nil {
                 typedef typename policy_type::key_schedule_type key_schedule_type;
 
             public:
+                typedef typename detail::isomorphic_encrypter_mode<sm4> stream_encrypter_type;
+                typedef typename detail::isomorphic_decrypter_mode<sm4> stream_decrypter_type;
+
                 constexpr static const std::size_t rounds = policy_type::rounds;
 
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
@@ -53,12 +56,14 @@ namespace nil {
                          std::size_t ValueBits,
                          typename Padding>
                 struct stream_cipher {
-                    typedef block_stream_processor<Mode<sm4, Padding>,
-                                                   StateAccumulator,
-                                                   stream_endian::little_octet_big_bit,
-                                                   ValueBits,
-                                                   policy_type::word_bits * 2>
-                        type;
+                    struct params_type {
+                        typedef typename stream_endian::little_octet_big_bit endian_type;
+
+                        constexpr static const std::size_t value_bits = ValueBits;
+                        constexpr static const std::size_t length_bits = policy_type::word_bits * 2;
+                    };
+
+                    typedef block_stream_processor<Mode<sm4, Padding>, StateAccumulator, params_type> type;
                 };
 
                 sm4(const key_type &key) {

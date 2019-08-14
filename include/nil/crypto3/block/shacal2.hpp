@@ -51,6 +51,9 @@ namespace nil {
                 typedef detail::shacal2_policy<Version> policy_type;
 
             public:
+                typedef typename detail::isomorphic_encrypter_mode<shacal2<Version>> stream_encrypter_type;
+                typedef typename detail::isomorphic_decrypter_mode<shacal2<Version>> stream_decrypter_type;
+
                 constexpr static const std::size_t version = Version;
 
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
@@ -70,11 +73,16 @@ namespace nil {
                 template<template<typename, typename> class Mode, typename StateAccumulator, std::size_t ValueBits,
                          typename Padding>
                 struct stream_cipher {
-                    typedef block_stream_processor<Mode<shacal2<Version>, Padding>, StateAccumulator,
-                                                   stream_endian::little_octet_big_bit, ValueBits,
-                                                   policy_type::word_bits * 2>
+                    struct params_type {
+                        typedef typename stream_endian::little_octet_big_bit endian_type;
+
+                        constexpr static const std::size_t value_bits = ValueBits;
+                        constexpr static const std::size_t length_bits = policy_type::word_bits * 2;
+                    };
+
+                    typedef block_stream_processor<Mode<shacal2<Version>, Padding>, StateAccumulator, params_type>
                         type_;
-#ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES
+#ifdef CRYPTO3_BLOCK_NO_HIDE_INTERNAL_TYPES
                     typedef type_ type;
 #else
                     struct type : type_ {};

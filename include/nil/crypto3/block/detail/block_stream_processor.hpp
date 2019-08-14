@@ -25,11 +25,12 @@
 namespace nil {
     namespace crypto3 {
         namespace block {
-            template<typename Mode, typename StateAccumulator, typename Endian, std::size_t ValueBits,
-                     std::size_t LengthBits>
+            template<typename Mode, typename StateAccumulator, typename Params>
             struct block_stream_processor {
             private:
                 typedef Mode mode_type;
+                typedef StateAccumulator accumulator_type;
+                typedef Params params_type;
 
                 typedef typename mode_type::input_block_type input_block_type;
                 constexpr static const std::size_t input_block_bits = mode_type::input_block_bits;
@@ -38,25 +39,27 @@ namespace nil {
                 constexpr static const std::size_t output_block_bits = mode_type::output_block_bits;
 
             public:
-                constexpr static const std::size_t value_bits = ValueBits;
+                typedef typename params_type::endian_type endian_type;
+
+                constexpr static const std::size_t value_bits = params_type::value_bits;
                 typedef typename boost::uint_t<value_bits>::least value_type;
                 BOOST_STATIC_ASSERT(input_block_bits % value_bits == 0);
                 constexpr static const std::size_t block_values = input_block_bits / value_bits;
                 typedef std::array<value_type, block_values> cache_type;
 
             private:
-                constexpr static const std::size_t length_bits = LengthBits;
+                constexpr static const std::size_t length_bits = params_type::length_bits;
                 // FIXME: do something more intelligent than capping at 64
                 constexpr static const std::size_t length_type_bits =
                     length_bits < input_block_bits ? input_block_bits : length_bits > 64 ? 64 : length_bits;
                 typedef typename boost::uint_t<length_type_bits>::least length_type;
 
                 BOOST_STATIC_ASSERT(!length_bits || length_bits % input_block_bits == 0);
-                BOOST_STATIC_ASSERT(output_block_bits % value_bits == 0);
+                BOOST_STATIC_ASSERT(input_block_bits % value_bits == 0);
 
                 BOOST_STATIC_ASSERT(!length_bits || value_bits <= length_bits);
 
-                inline void update_one(value_type value) {
+                void update_one(value_type value) {
                     std::size_t i = seen % input_block_bits;
                     cache[i / value_bits] = value;
                     seen += value_bits;

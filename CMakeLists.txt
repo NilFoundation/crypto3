@@ -18,8 +18,6 @@ endif()
 
 cm_project(block WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME} LANGUAGES C CXX)
 
-cm_setup_version(VERSION 1.70.0)
-
 include(TargetArchitecture)
 include(TargetConfiguration)
 include(PlatformConfiguration)
@@ -28,6 +26,7 @@ include(CheckSSE)
 include(CheckAVX)
 
 option(BUILD_WITH_CCACHE "Build with ccache usage" TRUE)
+option(BUILD_UNIT_TESTS "Build unit tests" FALSE)
 
 if(UNIX AND BUILD_WITH_CCACHE)
     find_program(CCACHE_FOUND ccache)
