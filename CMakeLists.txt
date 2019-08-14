@@ -26,7 +26,7 @@ include(CheckSSE)
 include(CheckAVX)
 
 option(BUILD_WITH_CCACHE "Build with ccache usage" TRUE)
-option(BUILD_UNIT_TESTS "Build unit tests" FALSE)
+option(BUILD_TESTS "Build unit tests" FALSE)
 
 if(UNIX AND BUILD_WITH_CCACHE)
     find_program(CCACHE_FOUND ccache)
@@ -516,6 +516,6 @@ cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
           INCLUDE include
           NAMESPACE ${CMAKE_WORKSPACE_NAME}::)
 
-if(BUILD_UNIT_TESTS)
+if(BUILD_TESTS)
     add_subdirectory(test)
 endif()
