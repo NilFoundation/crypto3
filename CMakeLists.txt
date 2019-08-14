@@ -80,7 +80,7 @@ if(NOT CMAKE_CXX_STANDARD OR CMAKE_CXX_STANDARD LESS 17)
                 ${${CURRENT_PROJECT_NAME}_SOURCES})
     target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PRIVATE
                           ${Boost_LIBRARIES}
-                          $<TARGET_NAME_IF_EXISTS:boost::multiprecision>)
+                          $<TARGET_NAME_IF_EXISTS:boost_multiprecision>)
     set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES
                           EXPORT_NAME ${CURRENT_PROJECT_NAME}
                           CXX_STANDARD 11
