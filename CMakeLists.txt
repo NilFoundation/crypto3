@@ -93,7 +93,7 @@ if(NOT CMAKE_CXX_STANDARD OR CMAKE_CXX_STANDARD LESS 17)
 else()
     add_library(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE)
     target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
-                          ${Boost_LIBRARIES} INTERFACE
+                          ${Boost_LIBRARIES}
                           $<TARGET_NAME_IF_EXISTS:boost::multiprecision>)
     set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES
                           EXPORT_NAME ${CURRENT_PROJECT_NAME})
