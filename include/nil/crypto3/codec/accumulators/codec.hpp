@@ -19,6 +19,8 @@
 
 #include <boost/container/static_vector.hpp>
 
+#include <boost/range/algorithm.hpp>
+
 #include <nil/crypto3/codec/accumulators/parameters/bits.hpp>
 
 #include <nil/crypto3/codec/detail/make_array.hpp>
@@ -205,14 +207,14 @@ namespace nil {
                         result_type res;
 
                         output_block_type ob = codec_mode_type::process_block(digest);
+                        //std::move_backward(ob.begin(), ob.end(), std::inserter(res, res.end()));
                         std::move(ob.begin(), ob.end(), std::inserter(res, res.end()));
-
-                        if (leading_zeros) {
-                            finalizer_type fin(leading_zeros);
+                        if (leading_zeros - 1) {
+                            finalizer_type fin(leading_zeros - 1);
                             fin(res);
                         }
-
-                        return ob;
+                        boost::range::reverse(res);
+                        return res;
                     }
 
                 protected:

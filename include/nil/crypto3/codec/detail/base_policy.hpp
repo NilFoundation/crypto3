@@ -240,13 +240,13 @@ namespace nil {
                     constexpr static const std::size_t encoded_block_bits = encoded_block_values * encoded_value_bits;
                     typedef boost::container::small_vector<byte_type, encoded_block_values> encoded_block_type;
 
-                    constexpr static const std::size_t constants_size = 64;
+                    constexpr static const std::size_t constants_size = 58;
                     typedef std::array<byte_type, constants_size> constants_type;
 
                     constexpr static const constants_type constants = {
-                        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F',
-                        'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V',
-                        'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
+                        '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F',
+                        'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'U', 'V',
+                        'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k',
                         'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
                 };
 
@@ -266,7 +266,6 @@ namespace nil {
                             out.emplace_back(constants[r.template convert_to<std::uint8_t>()]);
                             v = q;
                         }
-
                         return out;
                     }
 
