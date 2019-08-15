@@ -13,7 +13,7 @@ include(CMConfig)
 include(CMDeploy)
 include(CMSetupVersion)
 
-if(NOT ${CMAKE_WORKSPACE_NAME} STREQUAL crypto3)
+if(NOT CMAKE_WORKSPACE_NAME OR NOT ("${CMAKE_WORKSPACE_NAME}" STREQUAL "crypto3"))
     cm_workspace(crypto3)
 endif()
 
