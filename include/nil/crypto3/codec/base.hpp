@@ -60,8 +60,7 @@ namespace nil {
                 template<typename T>
                 void operator()(T &t) {
                     while (leading_zeros) {
-                        //t.push_back(typename T::value_type());
-                        t.push_back('1');
+                        t.push_back(policy_type::constants[0]);
                         leading_zeros--;
                     }
                 }
