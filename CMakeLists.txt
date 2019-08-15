@@ -79,8 +79,8 @@ if(NOT CMAKE_CXX_STANDARD OR CMAKE_CXX_STANDARD LESS 17)
                 ${${CURRENT_PROJECT_NAME}_HEADERS}
                 ${${CURRENT_PROJECT_NAME}_SOURCES})
     target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PRIVATE
-                          ${Boost_LIBRARIES}
-                          $<TARGET_NAME_IF_EXISTS:boost_multiprecision>)
+                          ${Boost_LIBRARIES} INTERFACE
+                          $<TARGET_NAME_IF_EXISTS:boost::multiprecision>)
     set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES
                           EXPORT_NAME ${CURRENT_PROJECT_NAME}
                           CXX_STANDARD 11
@@ -93,8 +93,8 @@ if(NOT CMAKE_CXX_STANDARD OR CMAKE_CXX_STANDARD LESS 17)
 else()
     add_library(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE)
     target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
-                          ${Boost_LIBRARIES}
-                          $<TARGET_NAME_IF_EXISTS:boost_multiprecision>)
+                          ${Boost_LIBRARIES} INTERFACE
+                          $<TARGET_NAME_IF_EXISTS:boost::multiprecision>)
     set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES
                           EXPORT_NAME ${CURRENT_PROJECT_NAME})
     target_include_directories(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
