@@ -33,7 +33,7 @@ if(NOT SSE2_FOUND OR NOT SSE3_FOUND OR NOT SSSE3_FOUND OR NOT SSE4_1_FOUND OR NO
     option(CRYPTO3_VDF_USE_SIMD "Build Crypto3.VDF with SIMD instructions usage." TRUE)
 endif()
 
-option(BUILD_UNIT_TESTS "Build unit tests" FALSE)
+option(BUILD_TESTS "Build unit tests" FALSE)
 
 option(CRYPTO3_VDF_BOOST "Build Crypto3.VDF with Boost.Multiprecision backend usage" TRUE)
 option(CRYPTO3_VDF_GMP "Build Crypto3.VDF with GMP backend usage" FALSE)
@@ -229,6 +229,6 @@ cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
           INCLUDE include
           NAMESPACE ${CMAKE_WORKSPACE_NAME}::)
 
-if(BUILD_UNIT_TESTS)
+if(BUILD_TESTS)
     add_subdirectory(test)
 endif()
