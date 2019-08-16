@@ -15,7 +15,7 @@
 #include <nil/crypto3/block/detail/gost_28147_89/gost_28147_89_policy.hpp>
 #include <nil/crypto3/block/detail/gost_28147_89/gost_28147_89_parameters.hpp>
 
-#include <nil/crypto3/block/detail/stream_endian.hpp>
+#include <nil/crypto3/block/detail/cipher_modes.hpp>
 #include <nil/crypto3/block/detail/block_stream_processor.hpp>
 
 namespace nil {
@@ -109,8 +109,8 @@ namespace nil {
                 typedef typename policy_type::expanded_substitution_type expanded_substitution_type;
 
             public:
-                typedef typename detail::isomorphic_encrypter_mode<gost_28147_89<ParamsType>> stream_encrypter_type;
-                typedef typename detail::isomorphic_decrypter_mode<gost_28147_89<ParamsType>> stream_decrypter_type;
+                typedef typename detail::isomorphic_encryption_mode<gost_28147_89<ParamsType>> stream_encrypter_type;
+                typedef typename detail::isomorphic_decryption_mode<gost_28147_89<ParamsType>> stream_decrypter_type;
 
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
                 typedef typename policy_type::word_type word_type;

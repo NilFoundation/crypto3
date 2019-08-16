@@ -26,7 +26,7 @@ include(CheckSSE)
 include(CheckAVX)
 
 option(BUILD_WITH_CCACHE "Build with ccache usage" TRUE)
-option(BUILD_UNIT_TESTS "Build unit tests" FALSE)
+option(BUILD_TESTS "Build unit tests" FALSE)
 
 if(UNIX AND BUILD_WITH_CCACHE)
     find_program(CCACHE_FOUND ccache)
@@ -503,8 +503,8 @@ elseif(${CMAKE_TARGET_ARCHITECTURE} STREQUAL "ppc64")
 endif()
 
 target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
-
-                      ${Boost_LIBRARIES})
+                      "$<TARGET_NAME_IF_EXISTS:boost_multiprecision>"
+                      "${Boost_LIBRARIES}")
 
 target_include_directories(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
                            "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
@@ -516,6 +516,6 @@ cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
           INCLUDE include
           NAMESPACE ${CMAKE_WORKSPACE_NAME}::)
 
-if(BUILD_UNIT_TESTS)
+if(BUILD_TESTS)
     add_subdirectory(test)
 endif()

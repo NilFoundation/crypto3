@@ -15,7 +15,7 @@
 #include <nil/crypto3/block/detail/twofish/twofish_policy.hpp>
 
 #include <nil/crypto3/block/detail/block_stream_processor.hpp>
-#include <nil/crypto3/block/detail/stream_endian.hpp>
+#include <nil/crypto3/block/detail/cipher_modes.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -38,8 +38,8 @@ namespace nil {
                 typedef typename policy_type::expanded_substitution_type expanded_substitution_type;
 
             public:
-                typedef typename detail::isomorphic_encrypter_mode<twofish<KeyBits>> stream_encrypter_type;
-                typedef typename detail::isomorphic_decrypter_mode<twofish<KeyBits>> stream_decrypter_type;
+                typedef typename detail::isomorphic_encryption_mode<twofish<KeyBits>> stream_encrypter_type;
+                typedef typename detail::isomorphic_decryption_mode<twofish<KeyBits>> stream_decrypter_type;
 
                 constexpr static const std::size_t rounds = policy_type::rounds;
 

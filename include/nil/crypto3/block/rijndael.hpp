@@ -12,8 +12,6 @@
 
 #include <boost/range/adaptor/sliced.hpp>
 
-#include <nil/crypto3/block/block_cipher.hpp>
-
 #include <nil/crypto3/block/detail/block_stream_processor.hpp>
 #include <nil/crypto3/block/detail/cipher_modes.hpp>
 

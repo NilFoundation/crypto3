@@ -66,7 +66,7 @@ namespace nil {
                     if (i == input_block_bits - value_bits) {
                         // Convert the input into words
                         input_block_type block = {0};
-                        pack<Endian, value_bits, input_block_bits / block_values>(cache.begin(), cache.end(), block);
+                        pack<endian_type, value_bits, input_block_bits / block_values>(cache.begin(), cache.end(), block);
 
                         // Process the block
                         state(block);
@@ -90,7 +90,7 @@ namespace nil {
                     for (; n >= block_values; n -= block_values, first += block_values) {
                         // Convert the input into words
                         input_block_type block = {0};
-                        pack<Endian, value_bits, input_block_bits / block_values>(first, first + block_values, block);
+                        pack<endian_type, value_bits, input_block_bits / block_values>(first, first + block_values, block);
                         seen += value_bits * block_values;
 
                         state(block);
@@ -115,7 +115,7 @@ namespace nil {
                 virtual ~block_stream_processor() {
                     if (!cache.empty()) {
                         input_block_type block = {0};
-                        pack<Endian, value_bits, input_block_bits / block_values>(cache.begin(),
+                        pack<endian_type, value_bits, input_block_bits / block_values>(cache.begin(),
                                                                                   cache.begin() + cache.size(), block);
                         typename input_block_type::const_iterator v = block.cbegin();
                         for (length_type itr = seen - (seen % input_block_bits); itr < seen; itr += value_bits) {

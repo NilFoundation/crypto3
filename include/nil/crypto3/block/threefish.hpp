@@ -13,7 +13,7 @@
 #include <nil/crypto3/block/detail/threefish/threefish_policy.hpp>
 
 #include <nil/crypto3/block/detail/block_stream_processor.hpp>
-#include <nil/crypto3/block/detail/stream_endian.hpp>
+#include <nil/crypto3/block/detail/cipher_modes.hpp>
 
 #include <boost/cstdint.hpp>
 
@@ -42,8 +42,8 @@ namespace nil {
                 typedef detail::threefish_policy<KeyBits> policy_type;
 
             public:
-                typedef typename detail::isomorphic_encrypter_mode<threefish<KeyBits>> stream_encrypter_type;
-                typedef typename detail::isomorphic_decrypter_mode<threefish<KeyBits>> stream_decrypter_type;
+                typedef typename detail::isomorphic_encryption_mode<threefish<KeyBits>> stream_encrypter_type;
+                typedef typename detail::isomorphic_decryption_mode<threefish<KeyBits>> stream_decrypter_type;
 
                 constexpr static const std::size_t version = KeyBits;
 

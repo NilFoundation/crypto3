@@ -19,6 +19,9 @@
 #include <boost/accumulators/framework/depends_on.hpp>
 #include <boost/accumulators/framework/parameters/sample.hpp>
 
+#include <nil/crypto3/block/accumulators/parameters/cipher.hpp>
+#include <nil/crypto3/block/accumulators/parameters/bits.hpp>
+
 #include <nil/crypto3/block/detail/make_array.hpp>
 #include <nil/crypto3/block/detail/digest.hpp>
 
@@ -50,7 +53,7 @@ namespace nil {
 
                     template<typename Args>
                     // The constructor takes an argument pack.
-                    block_impl(const Args &args) : seen(0) {
+                    block_impl(const Args &args) : cipher(args[accumulators::cipher]), seen(0) {
                     }
 
                     template<typename ArgumentPack>
@@ -129,6 +132,8 @@ namespace nil {
                         seen += bits;
                     }
 
+                    mode_type cipher;
+
                     std::size_t seen;
                     cache_type cache;
                     result_type digest;
@@ -158,7 +163,14 @@ namespace nil {
                 typename boost::mpl::apply<AccumulatorSet,
                                            tag::block<typename Cipher::stream_encrypter_mode>>::type::result_type
                     encrypt(const AccumulatorSet &acc) {
-                    return boost::accumulators::extract_result<tag::block<Mode>>(acc);
+                    return boost::accumulators::extract_result<tag::block<typename Cipher::stream_encrypter_mode>>(acc);
+                }
+
+                template<typename Cipher, typename AccumulatorSet>
+                typename boost::mpl::apply<AccumulatorSet,
+                                           tag::block<typename Cipher::stream_encrypter_mode>>::type::result_type
+                    decrypt(const AccumulatorSet &acc) {
+                    return boost::accumulators::extract_result<tag::block<typename Cipher::stream_decrypter_mode>>(acc);
                 }
             }    // namespace extract
         }        // namespace accumulators
