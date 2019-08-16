@@ -68,7 +68,7 @@ namespace nil {
                         if (!cache.empty()) {
                             block_type ib = {0};
                             std::move(cache.begin(), cache.end(), ib.begin());
-                            block_type ob = mode_type::process_block(ib);
+                            block_type ob = cipher.process_block(ib);
                             std::move(ob.begin(), ob.end(), std::inserter(res, res.end()));
                         }
 
@@ -102,7 +102,7 @@ namespace nil {
                         if (cache.size() == cache.max_size()) {
                             block_type ib = {0};
                             std::move(cache.begin(), cache.end(), ib.begin());
-                            block_type ob = mode_type::process_block(ib);
+                            block_type ob = cipher.process_block(ib);
                             std::move(ob.begin(), ob.end(), std::inserter(digest, digest.end()));
 
                             cache.clear();
@@ -115,14 +115,14 @@ namespace nil {
                     inline void process(const block_type &block, std::size_t bits) {
                         block_type ob;
                         if (cache.empty()) {
-                            ob = mode_type::process_block(block);
+                            ob = cipher.process_block(block);
                         } else {
                             block_type b = block::make_array<block_words>(cache.begin(), cache.end());
                             typename block_type::const_iterator itr = block.begin() + (cache.max_size() - cache.size());
 
                             std::copy(block.begin(), itr, b.end());
 
-                            ob = mode_type::process_block(block);
+                            ob = cipher.process_block(block);
 
                             cache.clear();
                             cache.insert(cache.end(), itr, block.end());
