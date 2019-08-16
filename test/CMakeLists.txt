@@ -21,7 +21,9 @@ macro(define_hash_test name)
 
                                ${Boost_INCLUDE_DIRS})
 
-    set_target_properties(hash_${name}_test PROPERTIES CXX_STANDARD 14)
+    set_target_properties(hash_${name}_test PROPERTIES
+                          CXX_STANDARD 14
+                          CXX_STANDARD_REQUIRED TRUE)
 
     get_target_property(target_type Boost::unit_test_framework TYPE)
     if(target_type STREQUAL "SHARED_LIB")
@@ -48,7 +50,7 @@ set(TESTS_NAMES
     "skein"
     "sm3"
     "static_digest"
-#    "streebog"
+    #    "streebog"
     "whirlpool")
 
 foreach(TEST_NAME ${TESTS_NAMES})
