@@ -19,6 +19,9 @@
 #include <boost/accumulators/framework/depends_on.hpp>
 #include <boost/accumulators/framework/parameters/sample.hpp>
 
+#include <nil/crypto3/block/accumulators/parameters/cipher.hpp>
+#include <nil/crypto3/block/accumulators/parameters/bits.hpp>
+
 #include <nil/crypto3/block/detail/make_array.hpp>
 #include <nil/crypto3/block/detail/digest.hpp>
 
@@ -50,7 +53,7 @@ namespace nil {
 
                     template<typename Args>
                     // The constructor takes an argument pack.
-                    block_impl(const Args &args) : cipher(args[boost::accumulators::cipher]), seen(0) {
+                    block_impl(const Args &args) : cipher(args[accumulators::cipher]), seen(0) {
                     }
 
                     template<typename ArgumentPack>
