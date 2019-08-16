@@ -138,14 +138,14 @@ namespace nil {
             }    // namespace impl
 
             namespace tag {
-                template<typename ProcessingMode>
+                template<typename Mode>
                 struct block : boost::accumulators::depends_on<> {
-                    typedef ProcessingMode mode_type;
+                    typedef Mode mode_type;
 
                     /// INTERNAL ONLY
                     ///
 
-                    typedef boost::mpl::always<accumulators::impl::block_impl<ProcessingMode>> impl;
+                    typedef boost::mpl::always<accumulators::impl::block_impl<Mode>> impl;
                 };
             }    // namespace tag
 
