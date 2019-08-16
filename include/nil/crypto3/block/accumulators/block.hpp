@@ -50,7 +50,7 @@ namespace nil {
 
                     template<typename Args>
                     // The constructor takes an argument pack.
-                    block_impl(const Args &args) : seen(0) {
+                    block_impl(const Args &args) : cipher(args[boost::accumulators::cipher]), seen(0) {
                     }
 
                     template<typename ArgumentPack>
@@ -129,6 +129,8 @@ namespace nil {
                         seen += bits;
                     }
 
+                    mode_type cipher;
+
                     std::size_t seen;
                     cache_type cache;
                     result_type digest;
@@ -136,14 +138,14 @@ namespace nil {
             }    // namespace impl
 
             namespace tag {
-                template<typename Mode>
+                template<typename ProcessingMode>
                 struct block : boost::accumulators::depends_on<> {
-                    typedef Mode mode_type;
+                    typedef ProcessingMode mode_type;
 
                     /// INTERNAL ONLY
                     ///
 
-                    typedef boost::mpl::always<accumulators::impl::block_impl<Mode>> impl;
+                    typedef boost::mpl::always<accumulators::impl::block_impl<ProcessingMode>> impl;
                 };
             }    // namespace tag
 
@@ -158,7 +160,14 @@ namespace nil {
                 typename boost::mpl::apply<AccumulatorSet,
                                            tag::block<typename Cipher::stream_encrypter_mode>>::type::result_type
                     encrypt(const AccumulatorSet &acc) {
-                    return boost::accumulators::extract_result<tag::block<Mode>>(acc);
+                    return boost::accumulators::extract_result<tag::block<typename Cipher::stream_encrypter_mode>>(acc);
+                }
+
+                template<typename Cipher, typename AccumulatorSet>
+                typename boost::mpl::apply<AccumulatorSet,
+                                           tag::block<typename Cipher::stream_encrypter_mode>>::type::result_type
+                    decrypt(const AccumulatorSet &acc) {
+                    return boost::accumulators::extract_result<tag::block<typename Cipher::stream_decrypter_mode>>(acc);
                 }
             }    // namespace extract
         }        // namespace accumulators

@@ -13,6 +13,7 @@
 #include <nil/crypto3/block/detail/shacal/shacal2_policy.hpp>
 
 #include <nil/crypto3/block/detail/block_stream_processor.hpp>
+#include <nil/crypto3/block/detail/cipher_modes.hpp>
 
 #include <boost/static_assert.hpp>
 
@@ -51,8 +52,8 @@ namespace nil {
                 typedef detail::shacal2_policy<Version> policy_type;
 
             public:
-                typedef typename detail::isomorphic_encrypter_mode<shacal2<Version>> stream_encrypter_type;
-                typedef typename detail::isomorphic_decrypter_mode<shacal2<Version>> stream_decrypter_type;
+                typedef typename detail::isomorphic_encryption_mode<shacal2<Version>> stream_encrypter_type;
+                typedef typename detail::isomorphic_decryption_mode<shacal2<Version>> stream_decrypter_type;
 
                 constexpr static const std::size_t version = Version;
 

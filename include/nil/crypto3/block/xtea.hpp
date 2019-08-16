@@ -15,7 +15,7 @@
 #include <nil/crypto3/block/detail/xtea/xtea_policy.hpp>
 
 #include <nil/crypto3/block/detail/block_stream_processor.hpp>
-#include <nil/crypto3/block/detail/stream_endian.hpp>
+#include <nil/crypto3/block/detail/cipher_modes.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -34,8 +34,8 @@ namespace nil {
                 typedef typename policy_type::key_schedule_type key_schedule_type;
 
             public:
-                typedef typename detail::isomorphic_encrypter_mode<xtea> stream_encrypter_type;
-                typedef typename detail::isomorphic_decrypter_mode<xtea> stream_decrypter_type;
+                typedef typename detail::isomorphic_encryption_mode<xtea> stream_encrypter_type;
+                typedef typename detail::isomorphic_decryption_mode<xtea> stream_decrypter_type;
 
                 constexpr static const std::size_t rounds = policy_type::rounds;
 

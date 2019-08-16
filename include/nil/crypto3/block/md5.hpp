@@ -13,7 +13,7 @@
 #include <nil/crypto3/block/detail/md5/md5_policy.hpp>
 
 #include <nil/crypto3/block/detail/block_stream_processor.hpp>
-#include <nil/crypto3/block/detail/stream_endian.hpp>
+#include <nil/crypto3/block/detail/cipher_modes.hpp>
 
 #ifdef CRYPTO3_BLOCK_SHOW_PROGRESS
 #include <cstdio>
@@ -42,8 +42,8 @@ namespace nil {
                 typedef detail::md5_policy policy_type;
 
             public:
-                typedef typename detail::isomorphic_encrypter_mode<md5> stream_encrypter_type;
-                typedef typename detail::isomorphic_decrypter_mode<md5> stream_decrypter_type;
+                typedef typename detail::isomorphic_encryption_mode<md5> stream_encrypter_type;
+                typedef typename detail::isomorphic_decryption_mode<md5> stream_decrypter_type;
 
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
                 typedef policy_type::word_type word_type;
