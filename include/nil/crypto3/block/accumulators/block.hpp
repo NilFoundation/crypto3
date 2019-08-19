@@ -52,7 +52,6 @@ namespace nil {
                     typedef block::digest<block_bits> result_type;
 
                     template<typename Args>
-                    // The constructor takes an argument pack.
                     block_impl(const Args &args) : cipher(args[accumulators::cipher]), seen(0) {
                     }
 
@@ -102,7 +101,7 @@ namespace nil {
                         if (cache.size() == cache.max_size()) {
                             block_type ib = {0};
                             std::move(cache.begin(), cache.end(), ib.begin());
-                            block_type ob = cipher.process_block(ib);
+                            block_type ob = digest.empty() ? cipher.begin_message(ib) : cipher.process_block(ib);
                             std::move(ob.begin(), ob.end(), std::inserter(digest, digest.end()));
 
                             cache.clear();
@@ -122,7 +121,7 @@ namespace nil {
 
                             std::copy(block.begin(), itr, b.end());
 
-                            ob = cipher.process_block(block);
+                            ob = digest.empty() ? cipher.begin_message(ib) : cipher.process_block(ib);
 
                             cache.clear();
                             cache.insert(cache.end(), itr, block.end());

@@ -20,7 +20,9 @@ namespace nil {
 
                     typedef typename Cipher::block_type block_type;
 
+                    inline virtual block_type begin_message(const block_type &) const = 0;
                     inline virtual block_type process_block(const block_type &) const = 0;
+                    inline virtual block_type end_message(const block_type &) const = 0;
                 };
 
                 template<typename Cipher>
@@ -29,8 +31,14 @@ namespace nil {
 
                     typedef typename stream_processor_mode<Cipher>::block_type block_type;
 
+                    inline virtual block_type begin_message(const block_type &plaintext) const override {
+                    }
+
                     inline virtual block_type process_block(const block_type &plaintext) const override {
                         return cipher_type::encrypt(plaintext);
+                    }
+
+                    inline virtual block_type end_message(const block_type &plaintext) const override {
                     }
                 };
 
@@ -40,8 +48,14 @@ namespace nil {
 
                     typedef typename stream_processor_mode<Cipher>::block_type block_type;
 
+                    inline virtual block_type begin_message(const block_type &ciphertext) const override {
+                    }
+
                     inline virtual block_type process_block(const block_type &ciphertext) const override {
                         return cipher_type::decrypt(ciphertext);
+                    }
+
+                    inline virtual block_type end_message(const block_type &ciphertext) const override {
                     }
                 };
             }    // namespace detail
