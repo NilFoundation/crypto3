@@ -121,7 +121,7 @@ namespace nil {
 
                             std::copy(block.begin(), itr, b.end());
 
-                            ob = digest.empty() ? cipher.begin_message(ib) : cipher.process_block(ib);
+                            ob = digest.empty() ? cipher.begin_message(b) : cipher.process_block(b);
 
                             cache.clear();
                             cache.insert(cache.end(), itr, block.end());
