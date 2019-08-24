@@ -42,9 +42,6 @@ namespace nil {
                 typedef detail::md5_policy policy_type;
 
             public:
-                typedef typename detail::isomorphic_encryption_mode<md5> stream_encrypter_type;
-                typedef typename detail::isomorphic_decryption_mode<md5> stream_decrypter_type;
-
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
                 typedef policy_type::word_type word_type;
 
@@ -86,11 +83,11 @@ namespace nil {
                     key.fill(0);
                 }
 
-                block_type encrypt(const block_type &plaintext) {
+                inline block_type encrypt(const block_type &plaintext) const {
                     return encrypt_block(key, plaintext);
                 }
 
-                block_type decrypt(const block_type &ciphertext) {
+                inline block_type decrypt(const block_type &ciphertext) const {
                     return decrypt_block(key, ciphertext);
                 }
 

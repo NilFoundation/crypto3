@@ -35,9 +35,6 @@ namespace nil {
                 typedef typename policy_type::key_schedule_type key_schedule_type;
 
             public:
-                typedef typename detail::isomorphic_encryption_mode<sm4> stream_encrypter_type;
-                typedef typename detail::isomorphic_decryption_mode<sm4> stream_decrypter_type;
-
                 constexpr static const std::size_t rounds = policy_type::rounds;
 
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
@@ -74,11 +71,11 @@ namespace nil {
                     key_schedule.fill(0);
                 }
 
-                block_type encrypt(const block_type &plaintext) {
+                inline block_type encrypt(const block_type &plaintext) const {
                     return encrypt_block(plaintext);
                 }
 
-                block_type decrypt(const block_type &ciphertext) {
+                inline block_type decrypt(const block_type &ciphertext) const {
                     return decrypt_block(ciphertext);
                 }
 
@@ -93,7 +90,7 @@ namespace nil {
 
                 key_schedule_type key_schedule;
 
-                inline block_type encrypt_block(const block_type &plaintext) {
+                inline block_type encrypt_block(const block_type &plaintext) const {
                     word_type B0 = boost::endian::native_to_big(plaintext[0]);
                     word_type B1 = boost::endian::native_to_big(plaintext[1]);
                     word_type B2 = boost::endian::native_to_big(plaintext[2]);
@@ -112,7 +109,7 @@ namespace nil {
                             boost::endian::big_to_native(B1), boost::endian::big_to_native(B0)};
                 }
 
-                inline block_type decrypt_block(const block_type &plaintext) {
+                inline block_type decrypt_block(const block_type &plaintext) const {
                     word_type B0 = boost::endian::native_to_big(plaintext[0]);
                     word_type B1 = boost::endian::native_to_big(plaintext[1]);
                     word_type B2 = boost::endian::native_to_big(plaintext[2]);

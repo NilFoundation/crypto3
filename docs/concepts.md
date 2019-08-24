@@ -1,6 +1,6 @@
 ## Block Cipher Concepts
 
-### HashAlgorithm Concept
+### BlockCipher Concept
  
 Models of the ```HashAlgorithm``` concept are policies to be provided as template arguments to other
 templates. They provide access to the set of types needed to generically compute and store digests with

@@ -42,9 +42,6 @@ namespace nil {
                 typedef detail::md4_policy policy_type;
 
             public:
-                typedef typename detail::isomorphic_encryption_mode<md4> stream_encrypter_type;
-                typedef typename detail::isomorphic_decryption_mode<md4> stream_decrypter_type;
-
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
                 typedef policy_type::word_type word_type;
 
@@ -86,18 +83,18 @@ namespace nil {
                     key.fill(0);
                 }
 
-                block_type encrypt(const block_type &plaintext) {
+                inline block_type encrypt(const block_type &plaintext) const {
                     return encrypt_block(key, plaintext);
                 }
 
-                block_type decrypt(const block_type &ciphertext) {
+                inline block_type decrypt(const block_type &ciphertext) const {
                     return decrypt_block(key, ciphertext);
                 }
 
             private:
                 key_type key;
 
-                inline static block_type encrypt_block(key_type const &key, block_type const &plaintext) {
+                inline static block_type encrypt_block(const key_type &key, const block_type &plaintext) {
 
 #ifdef CRYPTO3_BLOCK_SHOW_PROGRESS
                     for (unsigned t = 0; t < block_words; ++t) {
@@ -149,7 +146,7 @@ namespace nil {
                     return {{a, b, c, d}};
                 }
 
-                inline static block_type decrypt_block(key_type const &key, const block_type &ciphertext) {
+                inline static block_type decrypt_block(const key_type &key, const block_type &ciphertext) {
 
 #ifdef CRYPTO3_BLOCK_SHOW_PROGRESS
                     for (unsigned t = 0; t < block_words; ++t) {

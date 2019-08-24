@@ -42,9 +42,6 @@ namespace nil {
                 typedef detail::threefish_policy<KeyBits> policy_type;
 
             public:
-                typedef typename detail::isomorphic_encryption_mode<threefish<KeyBits>> stream_encrypter_type;
-                typedef typename detail::isomorphic_decryption_mode<threefish<KeyBits>> stream_decrypter_type;
-
                 constexpr static const std::size_t version = KeyBits;
 
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
@@ -90,11 +87,11 @@ namespace nil {
                     key_schedule.fill(0);
                 }
 
-                block_type encrypt(const block_type &plaintext) {
+                inline block_type encrypt(const block_type &plaintext) const {
                     return encrypt_block(plaintext);
                 }
 
-                block_type decrypt(const block_type &plaintext) {
+                block_type decrypt(const block_type &plaintext) const {
                     return decrypt_block(plaintext);
                 }
 
@@ -128,7 +125,7 @@ namespace nil {
                 key_schedule_type key_schedule;
                 tweak_schedule_type tweak_schedule;
 
-                inline word_type k(unsigned s, unsigned i) {
+                inline word_type k(unsigned s, unsigned i) const {
                     word_type x = key_schedule[(s + i) % (key_words + 1)];
                     switch (i) {
                         default:
@@ -142,7 +139,7 @@ namespace nil {
                     }
                 }
 
-                inline block_type encrypt_block(const block_type &plaintext) {
+                inline block_type encrypt_block(const block_type &plaintext) const {
 
                     // Initialize working variables with block
                     block_type v = plaintext;
@@ -203,7 +200,7 @@ namespace nil {
                     return ciphertext;
                 }
 
-                inline block_type decrypt_block(const block_type &ciphertext) {
+                inline block_type decrypt_block(const block_type &ciphertext) const {
                     for (unsigned i = 0; i < block_words; ++i) {
 #ifdef CRYPTO3_BLOCK_SHOW_PROGRESS
                         std::printf("c_%-2d = %.16lx\n", i, ciphertext[i]);

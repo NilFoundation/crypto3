@@ -41,9 +41,6 @@ namespace nil {
                 typedef typename policy_type::key_schedule_type key_schedule_type;
 
             public:
-                typedef typename detail::isomorphic_encryption_mode<cast<Version, KeyBits>> stream_encrypter_type;
-                typedef typename detail::isomorphic_decryption_mode<cast<Version, KeyBits>> stream_decrypter_type;
-
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
                 typedef typename policy_type::word_type word_type;
 
@@ -83,11 +80,11 @@ namespace nil {
                     rkey_schedule.fill(0);
                 }
 
-                block_type encrypt(const block_type &plaintext) {
+                inline block_type encrypt(const block_type &plaintext) const {
                     return encrypt_block(plaintext);
                 }
 
-                block_type decrypt(const block_type &ciphertext) {
+                inline block_type decrypt(const block_type &ciphertext) const {
                     return decrypt_block(ciphertext);
                 }
 
@@ -95,11 +92,11 @@ namespace nil {
                 key_schedule_type key_schedule;
                 rotation_key_schedule_type rkey_schedule;
 
-                inline block_type encrypt_block(const block_type &plaintext) {
+                inline block_type encrypt_block(const block_type &plaintext) const {
                     return policy_type::encrypt_block(plaintext, key_schedule, rkey_schedule);
                 }
 
-                inline block_type decrypt_block(const block_type &ciphertext) {
+                inline block_type decrypt_block(const block_type &ciphertext) const {
                     return policy_type::decrypt_block(ciphertext, key_schedule, rkey_schedule);
                 }
 
