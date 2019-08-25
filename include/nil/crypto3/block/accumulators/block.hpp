@@ -25,6 +25,8 @@
 #include <nil/crypto3/block/detail/make_array.hpp>
 #include <nil/crypto3/block/detail/digest.hpp>
 
+#include <nil/crypto3/block/cipher.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace accumulators {
@@ -33,6 +35,9 @@ namespace nil {
                 struct block_impl : boost::accumulators::accumulator_base {
                 protected:
                     typedef Mode mode_type;
+                    typedef typename Mode::cipher_type cipher_type;
+                    typedef typename Mode::padding_type padding_type;
+
                     typedef typename mode_type::finalizer_type finalizer_type;
 
                     constexpr static const std::size_t word_bits = mode_type::word_bits;
@@ -67,7 +72,7 @@ namespace nil {
                         if (!cache.empty()) {
                             block_type ib = {0};
                             std::move(cache.begin(), cache.end(), ib.begin());
-                            block_type ob = cipher.process_block(ib);
+                            block_type ob = cipher.end_message(ib);
                             std::move(ob.begin(), ob.end(), std::inserter(res, res.end()));
                         }
 
@@ -114,7 +119,7 @@ namespace nil {
                     inline void process(const block_type &block, std::size_t bits) {
                         block_type ob;
                         if (cache.empty()) {
-                            ob = cipher.process_block(block);
+                            ob = digest.empty() ? cipher.begin_message(block) : cipher.process_block(block);
                         } else {
                             block_type b = block::make_array<block_words>(cache.begin(), cache.end());
                             typename block_type::const_iterator itr = block.begin() + (cache.max_size() - cache.size());
@@ -131,7 +136,7 @@ namespace nil {
                         seen += bits;
                     }
 
-                    mode_type cipher;
+                    block::cipher<cipher_type, mode_type, padding_type> cipher;
 
                     std::size_t seen;
                     cache_type cache;

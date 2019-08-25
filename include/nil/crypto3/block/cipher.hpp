@@ -10,13 +10,6 @@
 #ifndef CRYPTO3_BLOCK_CIPHER_HPP
 #define CRYPTO3_BLOCK_CIPHER_HPP
 
-#include <string>
-#include <memory>
-
-#include <boost/exception/exception.hpp>
-#include <boost/exception/info.hpp>
-#include <boost/throw_exception.hpp>
-
 namespace nil {
     namespace crypto3 {
         namespace block {
