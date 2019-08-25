@@ -29,8 +29,8 @@ namespace nil {
          *
          * @tparam BlockCipher
          * @tparam InputIterator
+         * @tparam KeyIterator
          * @tparam OutputIterator
-         * @tparam StreamEncrypter
          *
          * @param first
          * @param last
