@@ -7,10 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_BASIC_FUNCTIONS_HPP
-#define CRYPTO3_BASIC_FUNCTIONS_HPP
-
-#include <vector>
+#ifndef CRYPTO3_BLOCK_BASIC_FUNCTIONS_HPP
+#define CRYPTO3_BLOCK_BASIC_FUNCTIONS_HPP
 
 #include <boost/integer.hpp>
 #include <boost/static_assert.hpp>
