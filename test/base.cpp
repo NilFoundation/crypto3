@@ -248,8 +248,7 @@ BOOST_DATA_TEST_CASE(base58_single_range_random_encode_decode,
                      random_sample, index) {
     std::array<std::uint8_t, sizeof(decltype(random_sample))> arr = to_byte_array(random_sample);
     std::array<std::uint8_t, sizeof(decltype(random_sample))> enc = encode<base<58>>(arr);
-    std::array<std::uint8_t, sizeof(decltype
-    (random_sample))> out = decode<base<58>>(enc);
+    std::array<std::uint8_t, sizeof(decltype(random_sample))> out = decode<base<58>>(enc);
 
     BOOST_CHECK_EQUAL_COLLECTIONS(out.begin(), out.end(), arr.begin(), arr.end());
 }
