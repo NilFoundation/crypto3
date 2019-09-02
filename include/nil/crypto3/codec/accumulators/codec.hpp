@@ -202,8 +202,10 @@ namespace nil {
 
                     template<typename ArgumentPack>
                     inline void operator()(const ArgumentPack &args) {
-                        preprocessor_type preprocessor(0);
-                        const input_block_type block = args[boost::accumulators::sample]; // TODO: I think it must be user type block like digest
+                        preprocessor_type preprocessor;
+                        const input_block_type block =
+                            args[boost::accumulators::sample];    // TODO: I think it must be user type block like
+                                                                  // digest
                         if (input.empty()) {
                             preprocessor(block);
                             leading_zeros = preprocessor.leading_zeros;
