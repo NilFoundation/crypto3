@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2019 Nil Foundation AG
 // Copyright (c) 2018-2019 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2019 Moskvin Aleksey <zerg1996@yandex.ru>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -59,6 +60,7 @@ namespace nil {
                     typedef preprocessing_accumulator_mode<CodecMode> accumulator_mode_type;
 
                     typedef typename codec_mode_type::finalizer_type finalizer_type;
+                    typedef typename codec_mode_type::preprocessor_type preprocessor_type;
 
                     constexpr static const std::size_t input_block_bits = codec_mode_type::input_block_bits;
                     constexpr static const std::size_t input_block_values = codec_mode_type::input_block_values;
@@ -174,6 +176,7 @@ namespace nil {
                     typedef postprocessing_accumulator_mode<CodecMode> accumulator_mode_type;
 
                     typedef typename codec_mode_type::finalizer_type finalizer_type;
+                    typedef typename codec_mode_type::preprocessor_type preprocessor_type;
 
                     constexpr static const std::size_t input_block_bits = codec_mode_type::input_block_bits;
                     constexpr static const std::size_t input_block_values = codec_mode_type::input_block_values;
@@ -192,46 +195,38 @@ namespace nil {
                 public:
                     typedef codec::digest<output_block_bits> result_type;
 
-                    template<typename Args>
                     // The constructor takes an argument pack.
+                    template<typename Args>
                     codec_impl(const Args &args) : leading_zeros(0) {
                     }
 
                     template<typename ArgumentPack>
                     inline void operator()(const ArgumentPack &args) {
-                        resolve_type(args[boost::accumulators::sample]);
+                        preprocessor_type preprocessor(0);
+                        const input_block_type block = args[boost::accumulators::sample]; // TODO: I think it must be user type block like digest
+                        if (input.empty()) {
+                            preprocessor(block);
+                            leading_zeros = preprocessor.leading_zeros;
+                        }
+                        std::move(block.begin(), block.end(), std::back_inserter(input));
                     }
 
                     template<typename ArgumentPack>
                     inline result_type result(const ArgumentPack &args) const {
                         result_type res;
-
-                        output_block_type ob = codec_mode_type::process_block(digest);
-                        //std::move_backward(ob.begin(), ob.end(), std::inserter(res, res.end()));
+                        output_block_type ob = codec_mode_type::process_block(input);
                         std::move(ob.begin(), ob.end(), std::inserter(res, res.end()));
-                        if (leading_zeros - 1) {
-                            finalizer_type fin(leading_zeros - 1);
+                        if (leading_zeros) {
+                            finalizer_type fin(leading_zeros);
                             fin(res);
                         }
-                        boost::range::reverse(res);
+                        std::reverse(res.begin(), res.end());
                         return res;
                     }
 
                 protected:
-                    inline void resolve_type(const input_block_type &block) {
-                        if (digest.empty()) {
-                            typename input_block_type::const_iterator itr = block.cbegin();
-                            while (*itr == 0) {
-                                ++itr;
-                            }
-
-                            leading_zeros = std::distance(block.begin(), itr);
-                        }
-                        std::move(block.begin(), block.end(), std::back_inserter(digest));
-                    }
-
                     std::size_t leading_zeros;
-                    result_type digest;
+                    input_block_type input;
                 };    // namespace impl
             }         // namespace impl
 

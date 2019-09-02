@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2019 Nil Foundation AG
 // Copyright (c) 2018-2019 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2019 Moskvin Aleksey <zerg1996@yandex.ru>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -44,6 +45,7 @@ namespace nil {
                     typedef typename stream_processor_mode<Codec>::encoded_block_type output_block_type;
 
                     typedef typename codec_type::encoding_finalizer_type finalizer_type;
+                    typedef typename codec_type::encoding_preprocessor_type preprocessor_type;
 
                     static inline output_block_type process_block(const input_block_type &plaintext) {
                         return codec_type::encode(plaintext);
@@ -69,6 +71,7 @@ namespace nil {
                     constexpr static const std::size_t output_block_values = codec_type::decoded_block_values;
 
                     typedef typename codec_type::decoding_finalizer_type finalizer_type;
+                    typedef typename codec_type::decoding_preprocessor_type preprocessor_type;
 
                     static inline output_block_type process_block(const input_block_type &plaintext) {
                         return codec_type::decode(plaintext);

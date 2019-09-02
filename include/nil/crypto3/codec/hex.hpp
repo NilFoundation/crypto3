@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2019 Nil Foundation AG
 // Copyright (c) 2018-2019 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2019 Moskvin Aleksey <zerg1996@yandex.ru>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -117,6 +118,8 @@ namespace nil {
 
                 typedef nop_finalizer encoding_finalizer_type;
                 typedef nop_finalizer decoding_finalizer_type;
+                typedef nop_preprocessor encoding_preprocessor_type;
+                typedef nop_preprocessor decoding_preprocessor_type;
 
                 typedef typename detail::isomorphic_encoding_mode<hex<Mode>> stream_encoder_type;
                 typedef typename detail::isomorphic_decoding_mode<hex<Mode>> stream_decoder_type;

@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2019 Nil Foundation AG
 // Copyright (c) 2018-2019 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2019 Moskvin Aleksey <zerg1996@yandex.ru>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -20,6 +21,15 @@ namespace nil {
         namespace codec {
             struct nop_finalizer {
                 nop_finalizer(std::size_t v = 0) {
+                }
+
+                template<typename T>
+                void operator()(T &) {
+                }
+            };
+
+            struct nop_preprocessor {
+                nop_preprocessor(std::size_t v = 0) {
                 }
 
                 template<typename T>

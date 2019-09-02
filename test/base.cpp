@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2019 Nil Foundation AG
 // Copyright (c) 2018-2019 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2019 Moskvin Aleksey <zerg1996@yandex.ru>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -129,21 +130,21 @@ std::array<std::uint8_t, sizeof(Integer)> to_byte_array(Integer i) {
     return res;
 }
 
-// BOOST_AUTO_TEST_SUITE(base32_codec_random_data_test_suite)
-//
-// BOOST_DATA_TEST_CASE(base32_single_range_random_encode_decode,
-//                     boost::unit_test::data::random(std::numeric_limits<std::uintmax_t>::min(),
-//                                                    std::numeric_limits<std::uintmax_t>::max()) ^
-//                         boost::unit_test::data::xrange(std::numeric_limits<std::uint8_t>::max()),
-//                     random_sample, index) {
-//    std::array<std::uint8_t, sizeof(decltype(random_sample))> arr = to_byte_array(random_sample);
-//    std::array<std::uint8_t, sizeof(decltype(random_sample))> enc = encode<base<32>>(arr);
-//    std::array<std::uint8_t, sizeof(decltype(random_sample))> out = decode<base<32>>(enc);
-//
-//    BOOST_CHECK_EQUAL_COLLECTIONS(out.begin(), out.end(), arr.begin(), arr.end());
-//}
-//
-// BOOST_AUTO_TEST_SUITE_END()
+BOOST_AUTO_TEST_SUITE(base32_codec_random_data_test_suite)
+
+BOOST_DATA_TEST_CASE(base32_single_range_random_encode_decode,
+                     boost::unit_test::data::random(std::numeric_limits<std::uintmax_t>::min(),
+                                                    std::numeric_limits<std::uintmax_t>::max()) ^
+                         boost::unit_test::data::xrange(std::numeric_limits<std::uint8_t>::max()),
+                     random_sample, index) {
+    std::array<std::uint8_t, sizeof(decltype(random_sample))> arr = to_byte_array(random_sample);
+    std::array<std::uint8_t, sizeof(decltype(random_sample))> enc = encode<base<32>>(arr);
+    std::array<std::uint8_t, sizeof(decltype(random_sample))> out = decode<base<32>>(enc);
+
+    BOOST_CHECK_EQUAL_COLLECTIONS(out.begin(), out.end(), arr.begin(), arr.end());
+}
+
+BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(base32_codec_predefined_data_test_suite)
 
@@ -238,18 +239,32 @@ BOOST_DATA_TEST_CASE(base32_accumulator_encode, boost::unit_test::data::make(bas
 
 BOOST_AUTO_TEST_SUITE_END()
 
+BOOST_AUTO_TEST_SUITE(base58_codec_random_data_test_suite)
+
+    BOOST_DATA_TEST_CASE(base58_single_range_random_encode_decode,
+                         boost::unit_test::data::random(std::numeric_limits<std::uintmax_t>::min(),
+                                                        std::numeric_limits<std::uintmax_t>::max()) ^
+                         boost::unit_test::data::xrange(std::numeric_limits<std::uint8_t>::max()),
+                         random_sample, index) {
+        std::array<std::uint8_t, sizeof(decltype(random_sample))> arr = to_byte_array(random_sample);
+        std::array<std::uint8_t, sizeof(decltype(random_sample))> enc = encode<base<58>>(arr);
+        std::array<std::uint8_t, sizeof(decltype(random_sample))> out = decode<base<58>>(enc);
+
+        BOOST_CHECK_EQUAL_COLLECTIONS(out.begin(), out.end(), arr.begin(), arr.end());
+    }
+
+BOOST_AUTO_TEST_SUITE_END()
+
 BOOST_AUTO_TEST_SUITE(base58_codec_test_suite)
 
 BOOST_DATA_TEST_CASE(base58_single_range_encode, boost::unit_test::data::make(base58_valid_data), array_element) {
     std::string out = encode<base<58>>(array_element.second);
-
     BOOST_CHECK_EQUAL(out, array_element.first);
 }
 
 BOOST_DATA_TEST_CASE(base58_range_encode, boost::unit_test::data::make(base58_valid_data), array_element) {
     std::vector<uint8_t> out;
     encode<base<58>>(array_element.second, std::back_inserter(out));
-
     BOOST_CHECK_EQUAL(std::string(out.begin(), out.end()), array_element.first);
 }
 
@@ -307,6 +322,22 @@ BOOST_DATA_TEST_CASE(base58_alias_iterator_range_decode, boost::unit_test::data:
 
 BOOST_DATA_TEST_CASE(base58_alias_decode_failure, boost::unit_test::data::make(base_58_invalid_data), array_element) {
     BOOST_REQUIRE_THROW(decode<base58>(array_element), base_decode_error<58>);
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(base64_codec_random_data_test_suite)
+
+BOOST_DATA_TEST_CASE(base64_single_range_random_encode_decode,
+                     boost::unit_test::data::random(std::numeric_limits<std::uintmax_t>::min(),
+                                                    std::numeric_limits<std::uintmax_t>::max()) ^
+                     boost::unit_test::data::xrange(std::numeric_limits<std::uint8_t>::max()),
+                     random_sample, index) {
+    std::array<std::uint8_t, sizeof(decltype(random_sample))> arr = to_byte_array(random_sample);
+    std::array<std::uint8_t, sizeof(decltype(random_sample))> enc = encode<base<64>>(arr);
+    std::array<std::uint8_t, sizeof(decltype(random_sample))> out = decode<base<64>>(enc);
+
+    BOOST_CHECK_EQUAL_COLLECTIONS(out.begin(), out.end(), arr.begin(), arr.end());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

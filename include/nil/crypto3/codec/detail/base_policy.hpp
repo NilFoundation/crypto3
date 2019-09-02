@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2019 Nil Foundation AG
 // Copyright (c) 2018-2019 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2019 Moskvin Aleksey <zerg1996@yandex.ru>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -225,29 +226,52 @@ namespace nil {
                 class basic_base_policy<58> {
                 public:
                     typedef typename boost::uint_t<CHAR_BIT>::exact byte_type;
-
-                    constexpr static const std::size_t decoded_value_bits = CHAR_BIT;
+                    typedef byte_type encoded_value_type;
                     typedef byte_type decoded_value_type;
 
-                    constexpr static const std::size_t encoded_value_bits = CHAR_BIT;
-                    typedef byte_type encoded_value_type;
-
-                    constexpr static const std::size_t decoded_block_values = 1;
-                    constexpr static const std::size_t decoded_block_bits = decoded_block_values * decoded_value_bits;
-                    typedef boost::container::small_vector<byte_type, decoded_block_values> decoded_block_type;
-
-                    constexpr static const std::size_t encoded_block_values = 1;
-                    constexpr static const std::size_t encoded_block_bits = encoded_block_values * encoded_value_bits;
-                    typedef boost::container::small_vector<byte_type, encoded_block_values> encoded_block_type;
-
                     constexpr static const std::size_t constants_size = 58;
-                    typedef std::array<byte_type, constants_size> constants_type;
+                    constexpr static const std::size_t inverted_constants_size = 256;
+
+                    typedef std::array<encoded_value_type, constants_size> constants_type;
+                    typedef std::array<decoded_value_type, inverted_constants_size> inverted_constants_type;
 
                     constexpr static const constants_type constants = {
                         '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F',
                         'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'U', 'V',
                         'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k',
                         'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
+
+                    constexpr static const inverted_constants_type inverted_constants = {
+                        0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+                        0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+                        0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+                        0x80, 0x80, 0x80, 0x80, 0x80, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x80,
+                        0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10, 0x80,
+                        0x11, 0x12, 0x13, 0x14, 0x15, 0x80, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E,
+                        0x1F, 0x20, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27,
+                        0x28, 0x29, 0x2A, 0x2B, 0x80, 0x2C, 0x2D, 0x2E, 0x2F, 0x30, 0x31, 0x32, 0x33, 0x34, 0x35,
+                        0x36, 0x37, 0x38, 0x39, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+                        0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+                        0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+                        0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+                        0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+                        0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+                        0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+                        0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+                        0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
+                        0x80, 0x80};
+
+                    constexpr static const std::size_t decoded_value_bits = CHAR_BIT;
+
+                    constexpr static const std::size_t encoded_value_bits = CHAR_BIT;
+
+                    constexpr static const std::size_t decoded_block_values = 1;
+                    constexpr static const std::size_t decoded_block_bits = decoded_block_values * decoded_value_bits;
+                    typedef boost::container::small_vector<decoded_value_type, decoded_block_values> decoded_block_type;
+
+                    constexpr static const std::size_t encoded_block_values = 1;
+                    constexpr static const std::size_t encoded_block_bits = encoded_block_values * encoded_value_bits;
+                    typedef boost::container::small_vector<encoded_value_type, encoded_block_values> encoded_block_type;
                 };
 
                 template<>
@@ -256,11 +280,9 @@ namespace nil {
                     template<typename NumberType = cpp_int>
                     static inline encoded_block_type encode_block(const decoded_block_type &plaintext) {
                         encoded_block_type out;
-
                         NumberType v = 0, q = 0, r = 0, cs(basic_base_policy<58>::constants_size);
 
                         import_bits(v, plaintext.begin(), plaintext.end(), encoded_value_bits);
-
                         while (v != 0) {
                             divide_qr(v, cs, q, r);
                             out.emplace_back(constants[r.template convert_to<std::uint8_t>()]);
@@ -278,18 +300,16 @@ namespace nil {
                             if (c == ' ' || c == '\n') {
                                 continue;
                             }
-
-                            const size_t idx = constants[c];
+                            const size_t idx = inverted_constants[c];
 
                             if (idx == 0x80) {
                                 throw std::invalid_argument("Invalid base58");
                             }
-
                             v *= basic_base_policy<58>::constants_size;
                             v += idx;
                         }
-
-                        export_bits(v, std::back_inserter(out), decoded_value_bits);
+                        export_bits(v, std::inserter(out, out.end()), decoded_value_bits);
+                        std::reverse(out.begin(), out.end());
                         return out;
                     }
                 };
