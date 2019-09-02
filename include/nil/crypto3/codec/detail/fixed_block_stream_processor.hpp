@@ -115,7 +115,7 @@ namespace nil {
                 }
 
             public:
-                fixed_block_stream_processor(accumulator_type &s) : state(s), cache(cache_type()), seen(0) {
+                fixed_block_stream_processor(accumulator_type &s) : state(s), seen(0), cache(cache_type()) {
                 }
 
                 virtual ~fixed_block_stream_processor() {
