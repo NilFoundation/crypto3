@@ -282,7 +282,8 @@ BOOST_DATA_TEST_CASE(base58_iterator_range_decode, boost::unit_test::data::make(
 }
 
 BOOST_DATA_TEST_CASE(base58_decode_failure, boost::unit_test::data::make(base_invalid_data), array_element) {
-    BOOST_REQUIRE_THROW(decode<base<58>>(array_element), base_decode_error<58>);
+        std::vector<uint8_t> out;
+        BOOST_REQUIRE_THROW(decode<base<58>>(array_element.begin(), array_element.end(), std::back_inserter(out)), base_decode_error<58>);
 }
 
 BOOST_DATA_TEST_CASE(base58_alias_single_range_encode, boost::unit_test::data::make(base58_valid_data), array_element) {
@@ -321,7 +322,8 @@ BOOST_DATA_TEST_CASE(base58_alias_iterator_range_decode, boost::unit_test::data:
 }
 
 BOOST_DATA_TEST_CASE(base58_alias_decode_failure, boost::unit_test::data::make(base_58_invalid_data), array_element) {
-    BOOST_REQUIRE_THROW(decode<base58>(array_element), base_decode_error<58>);
+    std::vector<uint8_t> out;
+    BOOST_REQUIRE_THROW(decode<base<58>>(array_element.begin(), array_element.end(), std::back_inserter(out)), base_decode_error<58>);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

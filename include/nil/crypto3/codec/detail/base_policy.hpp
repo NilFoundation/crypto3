@@ -34,10 +34,17 @@ namespace nil {
 
             /*!
              * @struct wrong_input_range
-             * @brief Thrown in case of the range passed to base64 encoding is larger than 4 or smaller than 1.
+             * @brief Thrown in case of the range passed to base64 encoding is larger than 4 or smaller than 1
              */
             template<std::uint8_t Version>
             struct wrong_input_range : virtual base_decode_error<Version> {};
+
+            /*!
+             * @struct wrong_input_symbol
+             * @brief Thrown in case of the symbol passed to base58 encoding isn't in correct set for base58
+             */
+            template<std::uint8_t Version>
+            struct wrong_input_symbol : virtual base_decode_error<Version> {};
 
             /*!
              * @struct non_base_input
@@ -303,7 +310,8 @@ namespace nil {
                             const size_t idx = inverted_constants[c];
 
                             if (idx == 0x80) {
-                                throw std::invalid_argument("Invalid base58");
+                                throw wrong_input_symbol<58>();
+                                //throw std::invalid_argument("Invalid base58");
                             }
                             v *= csint;
                             v += idx;
