@@ -241,17 +241,18 @@ BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(base58_codec_random_data_test_suite)
 
-    BOOST_DATA_TEST_CASE(base58_single_range_random_encode_decode,
-                         boost::unit_test::data::random(std::numeric_limits<std::uintmax_t>::min(),
-                                                        std::numeric_limits<std::uintmax_t>::max()) ^
+BOOST_DATA_TEST_CASE(base58_single_range_random_encode_decode,
+                     boost::unit_test::data::random(std::numeric_limits<std::uintmax_t>::min(),
+                                                    std::numeric_limits<std::uintmax_t>::max()) ^
                          boost::unit_test::data::xrange(std::numeric_limits<std::uint8_t>::max()),
-                         random_sample, index) {
-        std::array<std::uint8_t, sizeof(decltype(random_sample))> arr = to_byte_array(random_sample);
-        std::array<std::uint8_t, sizeof(decltype(random_sample))> enc = encode<base<58>>(arr);
-        std::array<std::uint8_t, sizeof(decltype(random_sample))> out = decode<base<58>>(enc);
+                     random_sample, index) {
+    std::array<std::uint8_t, sizeof(decltype(random_sample))> arr = to_byte_array(random_sample);
+    std::array<std::uint8_t, sizeof(decltype(random_sample))> enc = encode<base<58>>(arr);
+    std::array<std::uint8_t, sizeof(decltype
+    (random_sample))> out = decode<base<58>>(enc);
 
-        BOOST_CHECK_EQUAL_COLLECTIONS(out.begin(), out.end(), arr.begin(), arr.end());
-    }
+    BOOST_CHECK_EQUAL_COLLECTIONS(out.begin(), out.end(), arr.begin(), arr.end());
+}
 
 BOOST_AUTO_TEST_SUITE_END()
 
@@ -333,7 +334,7 @@ BOOST_AUTO_TEST_SUITE(base64_codec_random_data_test_suite)
 BOOST_DATA_TEST_CASE(base64_single_range_random_encode_decode,
                      boost::unit_test::data::random(std::numeric_limits<std::uintmax_t>::min(),
                                                     std::numeric_limits<std::uintmax_t>::max()) ^
-                     boost::unit_test::data::xrange(std::numeric_limits<std::uint8_t>::max()),
+                         boost::unit_test::data::xrange(std::numeric_limits<std::uint8_t>::max()),
                      random_sample, index) {
     std::array<std::uint8_t, sizeof(decltype(random_sample))> arr = to_byte_array(random_sample);
     std::array<std::uint8_t, sizeof(decltype(random_sample))> enc = encode<base<64>>(arr);
