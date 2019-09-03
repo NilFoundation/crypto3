@@ -8,7 +8,6 @@
 
 #include <nil/crypto3/pubkey/ecdh.hpp>
 #include <nil/crypto3/pubkey/ec_group/ec_group.hpp>
-#include <nil/crypto3/modes/cipher_mode.hpp>
 #include <nil/crypto3/pubkey/ec_group/point_gfp.hpp>
 #include <nil/crypto3/pubkey/pubkey.hpp>
 

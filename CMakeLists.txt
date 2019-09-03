@@ -24,7 +24,7 @@ cm_find_package(${CMAKE_WORKSPACE_NAME}_modes)
 cm_find_package(${CMAKE_WORKSPACE_NAME}_pk_pad)
 cm_find_package(${CMAKE_WORKSPACE_NAME}_utilities)
 
-option(BUILD_UNIT_TESTS "Build unit tests" FALSE)
+option(BUILD_TESTS "Build unit tests" FALSE)
 
 list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
      include//nil/crypto3/pubkey/algorithm/sign.hpp
