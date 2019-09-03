@@ -138,9 +138,8 @@ BOOST_DATA_TEST_CASE(base32_single_range_random_encode_decode,
                          boost::unit_test::data::xrange(std::numeric_limits<std::uint8_t>::max()),
                      random_sample, index) {
     std::array<std::uint8_t, sizeof(decltype(random_sample))> arr = to_byte_array(random_sample);
-    std::array<std::uint8_t, sizeof(decltype(random_sample))> enc = encode<base<32>>(arr);
-    std::array<std::uint8_t, sizeof(decltype(random_sample))> out = decode<base<32>>(enc);
-
+    std::vector<std::uint8_t> enc = encode<base<32>>(arr);
+    std::vector<std::uint8_t> out = decode<base<32>>(enc);
     BOOST_CHECK_EQUAL_COLLECTIONS(out.begin(), out.end(), arr.begin(), arr.end());
 }
 
@@ -247,9 +246,8 @@ BOOST_DATA_TEST_CASE(base58_single_range_random_encode_decode,
                          boost::unit_test::data::xrange(std::numeric_limits<std::uint8_t>::max()),
                      random_sample, index) {
     std::array<std::uint8_t, sizeof(decltype(random_sample))> arr = to_byte_array(random_sample);
-    std::array<std::uint8_t, sizeof(decltype(random_sample))> enc = encode<base<58>>(arr);
-    std::array<std::uint8_t, sizeof(decltype
-    (random_sample))> out = decode<base<58>>(enc);
+    std::vector<std::uint8_t> enc = encode<base<58>>(arr);
+    std::vector<std::uint8_t> out = decode<base<58>>(enc);
 
     BOOST_CHECK_EQUAL_COLLECTIONS(out.begin(), out.end(), arr.begin(), arr.end());
 }
@@ -337,8 +335,8 @@ BOOST_DATA_TEST_CASE(base64_single_range_random_encode_decode,
                          boost::unit_test::data::xrange(std::numeric_limits<std::uint8_t>::max()),
                      random_sample, index) {
     std::array<std::uint8_t, sizeof(decltype(random_sample))> arr = to_byte_array(random_sample);
-    std::array<std::uint8_t, sizeof(decltype(random_sample))> enc = encode<base<64>>(arr);
-    std::array<std::uint8_t, sizeof(decltype(random_sample))> out = decode<base<64>>(enc);
+    std::vector<std::uint8_t> enc = encode<base<64>>(arr);
+    std::vector<std::uint8_t> out = decode<base<64>>(enc);
 
     BOOST_CHECK_EQUAL_COLLECTIONS(out.begin(), out.end(), arr.begin(), arr.end());
 }
