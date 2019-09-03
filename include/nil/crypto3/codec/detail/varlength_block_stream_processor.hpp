@@ -72,7 +72,7 @@ namespace nil {
 
                 template<typename InputIterator>
                 inline void operator()(InputIterator first, InputIterator last, std::random_access_iterator_tag) {
-                    input_block_type block = {};
+                    input_block_type block = {0};
                     pack<endian_type, value_bits, input_value_bits>(first, last, std::inserter(block, block.begin()));
                     state(block);
                 }
