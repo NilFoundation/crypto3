@@ -196,7 +196,7 @@ script:
       CXXSTD=c++17;
     fi;
   - cmake -DBUILD_SHARED_LIBS=TRUE -DBUILD_TESTS=TRUE -DCMAKE_CXX_STANDARD=$(echo $CXXSTD | sed 's/[^0-9]*//g') -DBUILD_WITH_CI_KNOWN_ISSUES_SUPPRESS=TRUE ..;
-  - make tests-codec;
+  - make -j$proc tests-codec;
   - ctest .
 
 notifications:
