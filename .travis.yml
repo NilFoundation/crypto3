@@ -175,7 +175,8 @@ install:
   - git submodule update --init tools/boostdep
   - git submodule update --init libs/multiprecision
   - git submodule update --init libs/container
-  - python tools/boostdep/depinst/depinst.py multiprecision container
+  - python tools/boostdep/depinst/depinst.py multiprecision
+  - python tools/boostdep/depinst/depinst.py container
   - ./bootstrap.sh
 
 script:
