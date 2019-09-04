@@ -1,0 +1,201 @@
+#//---------------------------------------------------------------------------//
+#// Copyright (c) 2018-2019 Nil Foundation AG
+#// Copyright (c) 2018-2019 Mikhail Komarov <nemo@nil.foundation>
+#// Copyright (c) 2019 Moskvin Aleksey <zerg1996@yandex.ru>
+#//
+
+language: cpp
+
+sudo: true
+
+python: "2.7"
+
+os:
+  - linux
+  - osx
+
+env:
+  matrix:
+    - BOGUS_JOB=true
+
+matrix:
+
+  exclude:
+    - env: BOGUS_JOB=true
+
+  include:
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++03 TEST_SUITE=check-codec
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++11 TEST_SUITE=check-codec
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++14 TEST_SUITE=check-codec
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-6 CXXSTD=c++1z TEST_SUITE=check-codec
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-5 CXXSTD=c++14 TEST_SUITE=check-codec
+      addons:
+        apt:
+          packages:
+            - g++-5
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++03 TEST_SUITE=check-codec
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++11 TEST_SUITE=check-codec
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++14 TEST_SUITE=check-codec
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: linux
+      env: TOOLSET=gcc COMPILER=g++-8 CXXSTD=c++17 TEST_SUITE=check-codec
+      addons:
+        apt:
+          packages:
+            - g++-8
+            - cmake
+            - libgmp-dev
+            - libmpfr-dev
+            - libmpc-dev
+            - libmpfi-dev
+          sources:
+            - ubuntu-toolchain-r-test
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=check-codec
+      osx_image: xcode9.3
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=check-codec
+      osx_image: xcode8.3
+
+    - os: osx
+      env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=check-codec
+      osx_image: xcode7.3
+
+
+install:
+  - cd ..
+  - git clone -b develop --depth 1 https://github.com/boostorg/boost.git boost-root;
+  - cd boost-root
+  - git submodule update --init tools/build
+  - git submodule update --init libs/config
+  - git submodule update --init tools/boost_install
+  - git submodule update --init libs/headers
+  - git submodule update --init tools/boostdep
+  - git submodule update --init libs/multiprecision
+  - git submodule update --init libs/container
+  - python tools/boostdep/depinst/depinst.py multiprecision container
+  - ./bootstrap.sh
+
+script:
+  - |-
+    echo "using $TOOLSET : : $COMPILER : <cxxflags>-std=$CXXSTD ;" > ~/user-config.jam
+  - if [[ $TRAVIS_OS_NAME == linux ]]; then
+      proc=$(($(nproc) + 1));
+    elif [[ $TRAVIS_OS_NAME == osx ]]; then
+      proc=$(($(sysctl -n hw.ncpu) + 1));
+    fi;
+  - sudo ./b2 -j$proc install;
+  - cd $TRAVIS_BUILD_DIR && mkdir cmake-build && cd cmake-build;
+  - if [[ $(echo $CXXSTD | sed 's/[^0-9]*//g') == 03 ]]; then
+      CXXSTD=c++98;
+    fi;
+  - if [[ $CXXSTD == c++1z ]]; then
+      CXXSTD=c++17;
+    fi;
+  - cmake  -DBUILD_SHARED_LIBS=TRUE-DBUILD_TESTS=TRUE -DCMAKE_CXX_STANDARD=$(echo $CXXSTD | sed 's/[^0-9]*//g') -DBUILD_WITH_CI_KNOWN_ISSUES_SUPPRESS=TRUE ..;
+
+notifications:
+  email:
+    on_success: always
