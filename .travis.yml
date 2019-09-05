@@ -513,7 +513,7 @@ install:
 
     - if [[ $TRAVIS_OS_NAME == osx ]]; then
         ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)" < /dev/null 2> /dev/null;
-        brew install wget;
+        brew install cmake;
       fi
 
 script:
