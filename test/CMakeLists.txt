@@ -16,7 +16,9 @@ macro(define_codec_test name)
             ${Boost_INCLUDE_DIRS})
 
     if(NOT CMAKE_CXX_STANDARD)
-        set_target_properties(codec_${name}_test PROPERTIES CXX_STANDARD 14)
+        set_target_properties(codec_${name}_test PROPERTIES
+                              CXX_STANDARD 14
+                              CXX_STANDARD_REQUIRED TRUE)
     endif()
 
     get_target_property(target_type Boost::unit_test_framework TYPE)
