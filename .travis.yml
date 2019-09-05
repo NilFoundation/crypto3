@@ -511,13 +511,9 @@ install:
     - python tools/boostdep/depinst/depinst.py accumulators
     - ./bootstrap.sh
 
-    - if [[ $TRAVIS_OS_NAME == linux ]]; then
+    - if [[ $TRAVIS_OS_NAME == osx ]]; then
         ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)" < /dev/null 2> /dev/null;
         brew install wget;
-        wget https://cmake.org/files/v3.12/cmake-3.12.4-Darwin-x86_64.tar.gz;
-        tar xf cmake-3.12.4-Darwin-x86_64.tar.gz;
-        export PATH="`pwd`/cmake-3.12.4-Darwin-x86_64/CMake.app/Contents/bin:$PATH";
-        cmake --version;
       fi
 
 script:
