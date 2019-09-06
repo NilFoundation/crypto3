@@ -35,9 +35,6 @@ namespace nil {
                 typedef typename policy_type::key_schedule_type key_schedule_type;
 
             public:
-                typedef typename detail::isomorphic_encryption_mode<misty1> stream_encrypter_type;
-                typedef typename detail::isomorphic_decryption_mode<misty1> stream_decrypter_type;
-
                 constexpr static const std::size_t rounds = policy_type::rounds;
 
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
@@ -78,18 +75,18 @@ namespace nil {
                     decryption_key.fill(0);
                 }
 
-                block_type encrypt(const block_type &plaintext) {
+                inline block_type encrypt(const block_type &plaintext) const {
                     return encrypt_block(plaintext);
                 }
 
-                block_type decrypt(const block_type &ciphertext) {
+                inline block_type decrypt(const block_type &ciphertext) const {
                     return decrypt_block(ciphertext);
                 }
 
             protected:
                 key_schedule_type encryption_key, decryption_key;
 
-                inline block_type encrypt_block(const block_type &plaintext) {
+                inline block_type encrypt_block(const block_type &plaintext) const {
                     uint16_t B0 = boost::endian::native_to_big(plaintext[0]);
                     uint16_t B1 = boost::endian::native_to_big(plaintext[1]);
                     uint16_t B2 = boost::endian::native_to_big(plaintext[2]);
@@ -129,7 +126,7 @@ namespace nil {
                             boost::endian::big_to_native(B0), boost::endian::big_to_native(B1)};
                 }
 
-                inline block_type decrypt_block(const block_type &ciphertext) {
+                inline block_type decrypt_block(const block_type &ciphertext) const {
                     uint16_t B0 = boost::endian::native_to_big(ciphertext[2]);
                     uint16_t B1 = boost::endian::native_to_big(ciphertext[3]);
                     uint16_t B2 = boost::endian::native_to_big(ciphertext[0]);

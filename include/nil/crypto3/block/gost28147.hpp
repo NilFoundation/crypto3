@@ -109,9 +109,6 @@ namespace nil {
                 typedef typename policy_type::expanded_substitution_type expanded_substitution_type;
 
             public:
-                typedef typename detail::isomorphic_encryption_mode<gost_28147_89<ParamsType>> stream_encrypter_type;
-                typedef typename detail::isomorphic_decryption_mode<gost_28147_89<ParamsType>> stream_decrypter_type;
-
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
                 typedef typename policy_type::word_type word_type;
 
@@ -123,8 +120,7 @@ namespace nil {
                 constexpr static const std::size_t key_words = policy_type::key_words;
                 typedef typename policy_type::key_type key_type;
 
-                template<template<typename, typename> class Mode, typename StateAccumulator,
-                         std::size_t ValueBits,
+                template<template<typename, typename> class Mode, typename StateAccumulator, std::size_t ValueBits,
                          typename Padding>
                 struct stream_cipher {
                     struct params_type {
@@ -162,11 +158,11 @@ namespace nil {
                     key_schedule.fill(0);
                 }
 
-                block_type encrypt(const block_type &plaintext) {
+                inline block_type encrypt(const block_type &plaintext) const {
                     return encrypt_block(plaintext);
                 }
 
-                block_type decrypt(const block_type &ciphertext) {
+                inline block_type decrypt(const block_type &ciphertext) const {
                     return decrypt_block(ciphertext);
                 }
 
@@ -181,7 +177,7 @@ namespace nil {
                     }
                 }
 
-                inline block_type encrypt_block(const block_type &plaintext) {
+                inline block_type encrypt_block(const block_type &plaintext) const {
                     word_type N1 = boost::endian::native_to_little(plaintext[0]);
                     word_type N2 = boost::endian::native_to_little(plaintext[1]);
 
@@ -200,7 +196,7 @@ namespace nil {
                     return {boost::endian::little_to_native(N2), boost::endian::little_to_native(N1)};
                 }
 
-                inline block_type decrypt_block(const block_type &ciphertext) {
+                inline block_type decrypt_block(const block_type &ciphertext) const {
                     word_type N1 = boost::endian::native_to_little(ciphertext[0]);
                     word_type N2 = boost::endian::native_to_little(ciphertext[1]);
 

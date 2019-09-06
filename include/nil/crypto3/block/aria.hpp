@@ -47,9 +47,6 @@ namespace nil {
                 typedef typename policy_type::key_schedule_type key_schedule_type;
 
             public:
-                typedef typename detail::isomorphic_encryption_mode<aria<Size>> stream_encrypter_type;
-                typedef typename detail::isomorphic_decryption_mode<aria<Size>> stream_decrypter_type;
-
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
                 typedef typename policy_type::word_type word_type;
 
@@ -87,22 +84,22 @@ namespace nil {
                     decryption_round_key.fill(0);
                 }
 
-                block_type encrypt(const block_type &plaintext) {
+                inline block_type encrypt(const block_type &plaintext) const {
                     return encrypt_block(plaintext);
                 }
 
-                block_type decrypt(const block_type &ciphertext) {
+                inline block_type decrypt(const block_type &ciphertext) const {
                     return decrypt_block(ciphertext);
                 }
 
             protected:
                 key_schedule_type encryption_round_key, decryption_round_key;
 
-                inline block_type encrypt_block(const block_type &plaintext) {
+                inline block_type encrypt_block(const block_type &plaintext) const {
                     return transform(plaintext, encryption_round_key);
                 }
 
-                inline block_type decrypt_block(const block_type &ciphertext) {
+                inline block_type decrypt_block(const block_type &ciphertext) const {
                     return transform(ciphertext, decryption_round_key);
                 }
 

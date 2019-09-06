@@ -52,9 +52,6 @@ namespace nil {
                 typedef detail::shacal2_policy<Version> policy_type;
 
             public:
-                typedef typename detail::isomorphic_encryption_mode<shacal2<Version>> stream_encrypter_type;
-                typedef typename detail::isomorphic_decryption_mode<shacal2<Version>> stream_decrypter_type;
-
                 constexpr static const std::size_t version = Version;
 
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
@@ -96,18 +93,18 @@ namespace nil {
                 shacal2(key_schedule_type s) : schedule((prepare_schedule(s), s)) {
                 }
 
-                block_type encrypt(block_type const &plaintext) {
+                block_type encrypt(block_type const &plaintext) const {
                     return encrypt_block(plaintext);
                 }
 
-                block_type decrypt(const block_type &ciphertext) {
+                inline block_type decrypt(const block_type &ciphertext) const {
                     return decrypt_block(ciphertext);
                 }
 
             protected:
                 const key_schedule_type schedule;
 
-                static key_schedule_type build_schedule(key_type const &key) {
+                static key_schedule_type build_schedule(const key_type &key) {
                     // Copy key into beginning of round_constants_words
                     key_schedule_type schedule;
                     for (unsigned t = 0; t < key_words; ++t) {
@@ -131,7 +128,7 @@ namespace nil {
                     }
                 }
 
-                block_type encrypt_block(const block_type &plaintext) {
+                block_type encrypt_block(const block_type &plaintext) const {
                     return encrypt_block(schedule, plaintext);
                 }
 
@@ -206,7 +203,7 @@ namespace nil {
                     return {{a, b, c, d, e, f, g, h}};
                 }
 
-                block_type decrypt_block(const block_type &ciphertext) {
+                block_type decrypt_block(const block_type &ciphertext) const {
                     return decrypt_block(schedule, ciphertext);
                 }
 

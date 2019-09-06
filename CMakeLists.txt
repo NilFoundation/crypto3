@@ -88,7 +88,7 @@ list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
      include/nil/crypto3/block/algorithm/move.hpp
      include/nil/crypto3/block/algorithm/copy_n_if.hpp
 
-     include/nil/crypto3/block/block_cipher.hpp
+     include/nil/crypto3/block/cipher.hpp
      include/nil/crypto3/block/cipher_state.hpp
      include/nil/crypto3/block/cipher_value.hpp
 

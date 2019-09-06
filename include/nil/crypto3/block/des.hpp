@@ -39,9 +39,6 @@ namespace nil {
                 typedef typename policy_type::key_schedule_type key_schedule_type;
 
             public:
-                typedef typename detail::isomorphic_encryption_mode<des> stream_encrypter_type;
-                typedef typename detail::isomorphic_decryption_mode<des> stream_decrypter_type;
-
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
                 typedef typename policy_type::word_type word_type;
 
@@ -79,11 +76,11 @@ namespace nil {
                     round_key.fill(0);
                 }
 
-                block_type encrypt(const block_type &plaintext) {
+                inline block_type encrypt(const block_type &plaintext) const {
                     return encrypt_block(plaintext);
                 }
 
-                block_type decrypt(const block_type &ciphertext) {
+                inline block_type decrypt(const block_type &ciphertext) const {
                     return decrypt_block(ciphertext);
                 }
 
@@ -94,7 +91,7 @@ namespace nil {
                     policy_type::des_key_schedule(round_key, key);
                 }
 
-                inline block_type encrypt_block(const block_type &plaintext) {
+                inline block_type encrypt_block(const block_type &plaintext) const {
                     block_type out;
 
                     word_type L, R;
@@ -105,7 +102,7 @@ namespace nil {
                     return out;
                 }
 
-                inline block_type decrypt_block(const block_type &ciphertext) {
+                inline block_type decrypt_block(const block_type &ciphertext) const {
                     block_type out;
 
                     word_type L, R;
@@ -137,6 +134,25 @@ namespace nil {
                 constexpr static const std::size_t key_schedule_size = policy_type::key_schedule_size;
                 typedef typename policy_type::key_schedule_type key_schedule_type;
 
+                template<template<typename, typename> class Mode, typename StateAccumulator, std::size_t ValueBits,
+                         typename Padding>
+                struct stream_cipher {
+                    struct params_type {
+                        typedef typename stream_endian::little_octet_big_bit endian_type;
+
+                        constexpr static const std::size_t value_bits = ValueBits;
+                        constexpr static const std::size_t length_bits = policy_type::word_bits * 2;
+                    };
+
+                    typedef block_stream_processor<Mode<triple_des<KeyBits>, Padding>, StateAccumulator, params_type>
+                        type_;
+#ifdef CRYPTO3_BLOCK_NO_HIDE_INTERNAL_TYPES
+                    typedef type_ type;
+#else
+                    struct type : type_ {};
+#endif
+                };
+
                 triple_des(const key_type &key) {
                     schedule_key(key);
                 }
@@ -145,11 +161,11 @@ namespace nil {
                     round_key.fill(0);
                 }
 
-                block_type encrypt(const block_type &plaintext) {
+                inline block_type encrypt(const block_type &plaintext) const {
                     return encrypt_block(plaintext);
                 }
 
-                block_type decrypt(const block_type &ciphertext) {
+                inline block_type decrypt(const block_type &ciphertext) const {
                     return decrypt_block(ciphertext);
                 }
 
@@ -167,7 +183,7 @@ namespace nil {
                     }
                 }
 
-                inline block_type encrypt_block(const block_type &plaintext) {
+                inline block_type encrypt_block(const block_type &plaintext) const {
                     block_type out;
                     word_type L, R;
 
@@ -182,7 +198,7 @@ namespace nil {
                     return out;
                 }
 
-                inline block_type decrypt_block(const block_type &ciphertext) {
+                inline block_type decrypt_block(const block_type &ciphertext) const {
                     block_type out;
                     word_type L, R;
 

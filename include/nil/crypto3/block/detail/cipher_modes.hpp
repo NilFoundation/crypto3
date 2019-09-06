@@ -14,37 +14,107 @@ namespace nil {
     namespace crypto3 {
         namespace block {
             namespace detail {
-                template<typename Cipher>
-                struct stream_processor_mode {
+                template<typename Cipher, typename Padding>
+                struct isomorphic_policy {
+                    typedef std::size_t size_type;
+
                     typedef Cipher cipher_type;
+                    typedef Padding padding_type;
 
-                    typedef typename Cipher::block_type block_type;
-
-                    inline virtual block_type process_block(const block_type &) const = 0;
+                    constexpr static const size_type block_bits = cipher_type::block_bits;
+                    constexpr static const size_type block_words = cipher_type::block_words;
+                    typedef typename cipher_type::block_type block_type;
                 };
 
-                template<typename Cipher>
-                struct isomorphic_encryption_mode : public stream_processor_mode<Cipher> {
-                    typedef typename stream_processor_mode<Cipher>::cipher_type cipher_type;
+                template<typename Cipher, typename Padding>
+                struct isomorphic_encryption_policy : public isomorphic_policy<Cipher, Padding> {
+                    typedef typename isomorphic_policy<Cipher, Padding>::cipher_type cipher_type;
+                    typedef typename isomorphic_policy<Cipher, Padding>::block_type block_type;
 
-                    typedef typename stream_processor_mode<Cipher>::block_type block_type;
+                    inline static block_type begin_message(const cipher_type &cipher, const block_type &plaintext) {
+                        return cipher.encrypt(plaintext);
+                    }
 
-                    inline virtual block_type process_block(const block_type &plaintext) const override {
-                        return cipher_type::encrypt(plaintext);
+                    inline static block_type process_block(const cipher_type &cipher, const block_type &plaintext) {
+                        return cipher.encrypt(plaintext);
+                    }
+
+                    inline static block_type end_message(const cipher_type &cipher, const block_type &plaintext) {
+                        return cipher.encrypt(plaintext);
                     }
                 };
 
-                template<typename Cipher>
-                struct isomorphic_decryption_mode : public stream_processor_mode<Cipher> {
-                    typedef typename stream_processor_mode<Cipher>::cipher_type cipher_type;
+                template<typename Cipher, typename Padding>
+                struct isomorphic_decryption_policy : public isomorphic_policy<Cipher, Padding> {
+                    typedef typename isomorphic_policy<Cipher, Padding>::cipher_type cipher_type;
+                    typedef typename isomorphic_policy<Cipher, Padding>::block_type block_type;
 
-                    typedef typename stream_processor_mode<Cipher>::block_type block_type;
-
-                    inline virtual block_type process_block(const block_type &ciphertext) const override {
-                        return cipher_type::decrypt(ciphertext);
+                    inline static block_type begin_message(const cipher_type &cipher, const block_type &ciphertext) {
+                        return cipher.decrypt(ciphertext);
                     }
+
+                    inline static block_type process_block(const cipher_type &cipher, const block_type &ciphertext) {
+                        return cipher.decrypt(ciphertext);
+                    }
+
+                    inline static block_type end_message(const cipher_type &cipher, const block_type &ciphertext) {
+                        return cipher.decrypt(ciphertext);
+                    }
+                };
+
+                template<typename Policy>
+                class isomorphic {
+                    typedef Policy policy_type;
+
+                public:
+                    typedef typename policy_type::cipher_type cipher_type;
+                    typedef typename policy_type::padding_type padding_type;
+
+                    typedef typename policy_type::size_type size_type;
+
+                    typedef typename cipher_type::key_type key_type;
+                    typedef typename policy_type::iv_type iv_type;
+
+                    constexpr static const size_type block_bits = policy_type::block_bits;
+                    constexpr static const size_type block_words = policy_type::block_words;
+                    typedef typename cipher_type::block_type block_type;
+
+                    isomorphic(const cipher_type &cipher) : cipher(cipher) {
+                    }
+
+                    block_type begin_message(const block_type &plaintext, const iv_type &iv = iv_type()) {
+                        return policy_type::begin_message(cipher, plaintext, iv);
+                    }
+
+                    block_type process_block(const block_type &plaintext) {
+                        return policy_type::process_block(cipher, plaintext);
+                    }
+
+                    block_type end_message(const block_type &plaintext, const iv_type &iv = iv_type()) {
+                        return policy_type::end_message(cipher, plaintext, iv);
+                    }
+
+                protected:
+                    cipher_type cipher;
                 };
             }    // namespace detail
+
+            namespace modes {
+
+                template<typename Cipher, template<typename> class Padding>
+                struct isomorphic {
+                    typedef Cipher cipher_type;
+                    typedef Padding<Cipher> padding_type;
+
+                    typedef detail::isomorphic_encryption_policy<cipher_type, padding_type> encryption_policy;
+                    typedef detail::isomorphic_decryption_policy<cipher_type, padding_type> decryption_policy;
+
+                    template<template<typename, typename> class Policy>
+                    struct bind {
+                        typedef detail::isomorphic<Policy<cipher_type, padding_type>> type;
+                    };
+                };
+            }    // namespace modes
         }        // namespace block
     }            // namespace crypto3
 }    // namespace nil

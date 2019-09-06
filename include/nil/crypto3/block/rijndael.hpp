@@ -120,9 +120,6 @@ namespace nil {
                                               detail::rijndael_impl<KeyBits, BlockBits, policy_type>>::type impl_type;
 
             public:
-                typedef typename detail::isomorphic_encryption_mode<rijndael<KeyBits, BlockBits>> stream_encrypter_type;
-                typedef typename detail::isomorphic_decryption_mode<rijndael<KeyBits, BlockBits>> stream_decrypter_type;
-
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
                 constexpr static const std::size_t word_bytes = policy_type::word_bytes;
                 typedef typename policy_type::word_type word_type;
@@ -172,11 +169,11 @@ namespace nil {
                     decryption_key.fill(0);
                 }
 
-                block_type encrypt(const block_type &plaintext) {
+                inline block_type encrypt(const block_type &plaintext) const {
                     return impl_type::encrypt_block(plaintext, encryption_key);
                 }
 
-                block_type decrypt(const block_type &plaintext) {
+                block_type decrypt(const block_type &plaintext) const {
                     return impl_type::decrypt_block(plaintext, decryption_key);
                 }
 

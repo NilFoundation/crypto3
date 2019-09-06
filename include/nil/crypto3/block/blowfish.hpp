@@ -33,9 +33,6 @@ namespace nil {
                 typedef typename policy_type::constants_type constants_type;
 
             public:
-                typedef typename detail::isomorphic_encryption_mode<blowfish> stream_encrypter_type;
-                typedef typename detail::isomorphic_decryption_mode<blowfish> stream_decrypter_type;
-
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
                 typedef typename policy_type::word_type word_type;
 
@@ -76,11 +73,11 @@ namespace nil {
                     constants.fill(0);
                 }
 
-                block_type encrypt(const block_type &plaintext) {
+                inline block_type encrypt(const block_type &plaintext) const {
                     return encrypt_block(plaintext);
                 }
 
-                block_type decrypt(const block_type &ciphertext) {
+                inline block_type decrypt(const block_type &ciphertext) const {
                     return decrypt_block(ciphertext);
                 }
 
@@ -144,7 +141,7 @@ namespace nil {
                     }
                 }
 
-                inline block_type encrypt_block(const block_type &plaintext) {
+                inline block_type encrypt_block(const block_type &plaintext) const {
                     word_type L0 = plaintext[0], R0 = plaintext[1];
 
                     for (size_t r = 0; r != policy_type::rounds; r += 2) {
@@ -161,7 +158,7 @@ namespace nil {
                     return {R0, L0};
                 }
 
-                inline block_type decrypt_block(const block_type &ciphertext) {
+                inline block_type decrypt_block(const block_type &ciphertext) const {
                     word_type L0 = ciphertext[0], R0 = ciphertext[1];
 
                     for (size_t r = policy_type::rounds + 1; r != 1; r -= 2) {
