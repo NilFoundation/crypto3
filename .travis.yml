@@ -14,18 +14,243 @@ jobs:
   include:
       - os: linux
         dist: xenial
-        env: COMPILER_VERSION=6 CXXSTD=11
+        env: COMPILER_VERSION=5 CXXSTD=c++11
         compiler: gcc
+
 
       - os: linux
         dist: xenial
-        env: COMPILER_VERSION=7 CXXSTD=11
+        env: COMPILER_VERSION=6 CXXSTD=c++11
         compiler: gcc
+
 
       - os: linux
         dist: xenial
-        env: COMPILER_VERSION=8 CXXSTD=11
+        env: COMPILER_VERSION=7 CXXSTD=c++11
         compiler: gcc
+
+
+      - os: linux
+        dist: xenial
+        env: COMPILER_VERSION=8 CXXSTD=c++11
+        compiler: gcc
+
+
+      - os: linux
+        dist: xenial
+        env: COMPILER_VERSION=9 CXXSTD=c++11
+        compiler: gcc
+
+
+      - os: linux
+        dist: xenial
+        env: COMPILER_VERSION=5 CXXSTD=c++14
+        compiler: gcc
+
+
+      - os: linux
+        dist: xenial
+        env: COMPILER_VERSION=6 CXXSTD=c++14
+        compiler: gcc
+
+
+      - os: linux
+        dist: xenial
+        env: COMPILER_VERSION=7 CXXSTD=c++14
+        compiler: gcc
+
+
+      - os: linux
+        dist: xenial
+        env: COMPILER_VERSION=8 CXXSTD=c++14
+        compiler: gcc
+
+
+      - os: linux
+        dist: xenial
+        env: COMPILER_VERSION=9 CXXSTD=c++14
+        compiler: gcc
+
+
+      - os: linux
+        dist: xenial
+        env: COMPILER_VERSION=5 CXXSTD=c++1z
+        compiler: gcc
+
+
+      - os: linux
+        dist: xenial
+        env: COMPILER_VERSION=6 CXXSTD=c++1z
+        compiler: gcc
+
+
+      - os: linux
+        dist: xenial
+        env: COMPILER_VERSION=7 CXXSTD=c++1z
+        compiler: gcc
+
+
+      - os: linux
+        dist: xenial
+        env: COMPILER_VERSION=8 CXXSTD=c++1z
+        compiler: gcc
+
+
+      - os: linux
+        dist: xenial
+        env: COMPILER_VERSION=9 CXXSTD=c++1z
+        compiler: gcc
+
+
+      - os: linux
+        dist: xenial
+        env: COMPILER_VERSION=5 CXXSTD=c++17
+        compiler: gcc
+
+
+      - os: linux
+        dist: xenial
+        env: COMPILER_VERSION=6 CXXSTD=c++17
+        compiler: gcc
+
+
+      - os: linux
+        dist: xenial
+        env: COMPILER_VERSION=7 CXXSTD=c++17
+        compiler: gcc
+
+
+      - os: linux
+        dist: xenial
+        env: COMPILER_VERSION=8 CXXSTD=c++17
+        compiler: gcc
+
+
+      - os: linux
+        dist: xenial
+        env: COMPILER_VERSION=9 CXXSTD=c++17
+        compiler: gcc
+
+
+      - os: linux
+        dist: xenial
+        env: COMPILER_VERSION=5.0 CXXSTD=c++11
+        compiler: clang
+
+
+      - os: linux
+        dist: xenial
+        env: COMPILER_VERSION=6.0 CXXSTD=c++11
+        compiler: clang
+
+
+      - os: linux
+        dist: xenial
+        env: COMPILER_VERSION=7 CXXSTD=c++11
+        compiler: clang
+
+
+      - os: linux
+        dist: xenial
+        env: COMPILER_VERSION=8 CXXSTD=c++11
+        compiler: clang
+
+
+      - os: linux
+        dist: xenial
+        env: COMPILER_VERSION=9 CXXSTD=c++11
+        compiler: clang
+
+
+      - os: linux
+        dist: xenial
+        env: COMPILER_VERSION=5.0 CXXSTD=c++14
+        compiler: clang
+
+
+      - os: linux
+        dist: xenial
+        env: COMPILER_VERSION=6.0 CXXSTD=c++14
+        compiler: clang
+
+
+      - os: linux
+        dist: xenial
+        env: COMPILER_VERSION=7 CXXSTD=c++14
+        compiler: clang
+
+
+      - os: linux
+        dist: xenial
+        env: COMPILER_VERSION=8 CXXSTD=c++14
+        compiler: clang
+
+
+      - os: linux
+        dist: xenial
+        env: COMPILER_VERSION=9 CXXSTD=c++14
+        compiler: clang
+
+
+      - os: linux
+        dist: xenial
+        env: COMPILER_VERSION=5.0 CXXSTD=c++1z
+        compiler: clang
+
+
+      - os: linux
+        dist: xenial
+        env: COMPILER_VERSION=6.0 CXXSTD=c++1z
+        compiler: clang
+
+
+      - os: linux
+        dist: xenial
+        env: COMPILER_VERSION=7 CXXSTD=c++1z
+        compiler: clang
+
+
+      - os: linux
+        dist: xenial
+        env: COMPILER_VERSION=8 CXXSTD=c++1z
+        compiler: clang
+
+
+      - os: linux
+        dist: xenial
+        env: COMPILER_VERSION=9 CXXSTD=c++1z
+        compiler: clang
+
+
+      - os: linux
+        dist: xenial
+        env: COMPILER_VERSION=5.0 CXXSTD=c++17
+        compiler: clang
+
+
+      - os: linux
+        dist: xenial
+        env: COMPILER_VERSION=6.0 CXXSTD=c++17
+        compiler: clang
+
+
+      - os: linux
+        dist: xenial
+        env: COMPILER_VERSION=7 CXXSTD=c++17
+        compiler: clang
+
+
+      - os: linux
+        dist: xenial
+        env: COMPILER_VERSION=8 CXXSTD=c++17
+        compiler: clang
+
+
+      - os: linux
+        dist: xenial
+        env: COMPILER_VERSION=9 CXXSTD=c++17
+        compiler: clang
+
 
 before_install:
     - if [[ $TRAVIS_OS_NAME == linux && $TRAVIS_COMPILER == clang ]]; then
