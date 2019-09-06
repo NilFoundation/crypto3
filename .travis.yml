@@ -14,806 +14,800 @@ os:
     - linux
     - osx
 
-env:
-    matrix:
-        - BOGUS_JOB=true
-
 matrix:
-    exclude:
-        -   env: BOGUS_JOB=true
     include:
 
 
-      - os: osx
-        env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++11 TEST_SUITE=tests-codec
-        osx_image: xcode9.3
+        -   os: osx
+            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++11 TEST_SUITE=tests-codec
+            osx_image: xcode9.3
 
 
-      - os: osx
-        env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++11 TEST_SUITE=tests-codec
-        osx_image: xcode9.3
+        -   os: osx
+            env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++11 TEST_SUITE=tests-codec
+            osx_image: xcode9.3
 
 
-      - os: osx
-        env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++11 TEST_SUITE=tests-codec
-        osx_image: xcode8.3
+        -   os: osx
+            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++11 TEST_SUITE=tests-codec
+            osx_image: xcode8.3
 
 
-      - os: osx
-        env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++11 TEST_SUITE=tests-codec
-        osx_image: xcode8.3
+        -   os: osx
+            env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++11 TEST_SUITE=tests-codec
+            osx_image: xcode8.3
 
 
-      - os: osx
-        env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++11 TEST_SUITE=tests-codec
-        osx_image: xcode7.3
+        -   os: osx
+            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++11 TEST_SUITE=tests-codec
+            osx_image: xcode7.3
 
 
-      - os: osx
-        env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++11 TEST_SUITE=tests-codec
-        osx_image: xcode7.3
+        -   os: osx
+            env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++11 TEST_SUITE=tests-codec
+            osx_image: xcode7.3
 
 
-      - os: osx
-        env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++11 TEST_SUITE=tests-codec
-        osx_image: xcode9.1
+        -   os: osx
+            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++11 TEST_SUITE=tests-codec
+            osx_image: xcode9.1
 
 
-      - os: osx
-        env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++11 TEST_SUITE=tests-codec
-        osx_image: xcode9.1
+        -   os: osx
+            env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++11 TEST_SUITE=tests-codec
+            osx_image: xcode9.1
 
 
-      - os: osx
-        env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++11 TEST_SUITE=tests-codec
-        osx_image: xcode9.2
+        -   os: osx
+            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++11 TEST_SUITE=tests-codec
+            osx_image: xcode9.2
 
 
-      - os: osx
-        env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++11 TEST_SUITE=tests-codec
-        osx_image: xcode9.2
+        -   os: osx
+            env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++11 TEST_SUITE=tests-codec
+            osx_image: xcode9.2
 
 
-      - os: osx
-        env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++11 TEST_SUITE=tests-codec
-        osx_image: xcode9.3
+        -   os: osx
+            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++11 TEST_SUITE=tests-codec
+            osx_image: xcode9.3
 
 
-      - os: osx
-        env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++11 TEST_SUITE=tests-codec
-        osx_image: xcode9.3
+        -   os: osx
+            env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++11 TEST_SUITE=tests-codec
+            osx_image: xcode9.3
 
 
-      - os: osx
-        env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++11 TEST_SUITE=tests-codec
-        osx_image: xcode9.4
+        -   os: osx
+            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++11 TEST_SUITE=tests-codec
+            osx_image: xcode9.4
 
 
-      - os: osx
-        env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++11 TEST_SUITE=tests-codec
-        osx_image: xcode9.4
+        -   os: osx
+            env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++11 TEST_SUITE=tests-codec
+            osx_image: xcode9.4
 
 
-      - os: osx
-        env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++11 TEST_SUITE=tests-codec
-        osx_image: xcode10
+        -   os: osx
+            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++11 TEST_SUITE=tests-codec
+            osx_image: xcode10
 
 
-      - os: osx
-        env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++11 TEST_SUITE=tests-codec
-        osx_image: xcode10
+        -   os: osx
+            env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++11 TEST_SUITE=tests-codec
+            osx_image: xcode10
 
 
-      - os: osx
-        env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++11 TEST_SUITE=tests-codec
-        osx_image: xcode10.1
+        -   os: osx
+            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++11 TEST_SUITE=tests-codec
+            osx_image: xcode10.1
 
 
-      - os: osx
-        env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++11 TEST_SUITE=tests-codec
-        osx_image: xcode10.1
+        -   os: osx
+            env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++11 TEST_SUITE=tests-codec
+            osx_image: xcode10.1
 
 
-      - os: osx
-        env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++11 TEST_SUITE=tests-codec
-        osx_image: xcode10.2
+        -   os: osx
+            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++11 TEST_SUITE=tests-codec
+            osx_image: xcode10.2
 
 
-      - os: osx
-        env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++11 TEST_SUITE=tests-codec
-        osx_image: xcode10.2
+        -   os: osx
+            env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++11 TEST_SUITE=tests-codec
+            osx_image: xcode10.2
 
 
-      - os: osx
-        env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++11 TEST_SUITE=tests-codec
-        osx_image: xcode11
+        -   os: osx
+            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++11 TEST_SUITE=tests-codec
+            osx_image: xcode11
 
 
-      - os: osx
-        env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++11 TEST_SUITE=tests-codec
-        osx_image: xcode11
+        -   os: osx
+            env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++11 TEST_SUITE=tests-codec
+            osx_image: xcode11
 
 
-      - os: osx
-        env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=tests-codec
-        osx_image: xcode9.3
+        -   os: osx
+            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=tests-codec
+            osx_image: xcode9.3
 
 
-      - os: osx
-        env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++14 TEST_SUITE=tests-codec
-        osx_image: xcode9.3
+        -   os: osx
+            env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++14 TEST_SUITE=tests-codec
+            osx_image: xcode9.3
 
 
-      - os: osx
-        env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=tests-codec
-        osx_image: xcode8.3
+        -   os: osx
+            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=tests-codec
+            osx_image: xcode8.3
 
 
-      - os: osx
-        env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++14 TEST_SUITE=tests-codec
-        osx_image: xcode8.3
+        -   os: osx
+            env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++14 TEST_SUITE=tests-codec
+            osx_image: xcode8.3
 
 
-      - os: osx
-        env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=tests-codec
-        osx_image: xcode7.3
+        -   os: osx
+            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=tests-codec
+            osx_image: xcode7.3
 
 
-      - os: osx
-        env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++14 TEST_SUITE=tests-codec
-        osx_image: xcode7.3
+        -   os: osx
+            env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++14 TEST_SUITE=tests-codec
+            osx_image: xcode7.3
 
 
-      - os: osx
-        env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=tests-codec
-        osx_image: xcode9.1
+        -   os: osx
+            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=tests-codec
+            osx_image: xcode9.1
 
 
-      - os: osx
-        env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++14 TEST_SUITE=tests-codec
-        osx_image: xcode9.1
+        -   os: osx
+            env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++14 TEST_SUITE=tests-codec
+            osx_image: xcode9.1
 
 
-      - os: osx
-        env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=tests-codec
-        osx_image: xcode9.2
+        -   os: osx
+            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=tests-codec
+            osx_image: xcode9.2
 
 
-      - os: osx
-        env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++14 TEST_SUITE=tests-codec
-        osx_image: xcode9.2
+        -   os: osx
+            env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++14 TEST_SUITE=tests-codec
+            osx_image: xcode9.2
 
 
-      - os: osx
-        env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=tests-codec
-        osx_image: xcode9.3
+        -   os: osx
+            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=tests-codec
+            osx_image: xcode9.3
 
 
-      - os: osx
-        env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++14 TEST_SUITE=tests-codec
-        osx_image: xcode9.3
+        -   os: osx
+            env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++14 TEST_SUITE=tests-codec
+            osx_image: xcode9.3
 
 
-      - os: osx
-        env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=tests-codec
-        osx_image: xcode9.4
+        -   os: osx
+            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=tests-codec
+            osx_image: xcode9.4
 
 
-      - os: osx
-        env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++14 TEST_SUITE=tests-codec
-        osx_image: xcode9.4
+        -   os: osx
+            env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++14 TEST_SUITE=tests-codec
+            osx_image: xcode9.4
 
 
-      - os: osx
-        env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=tests-codec
-        osx_image: xcode10
+        -   os: osx
+            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=tests-codec
+            osx_image: xcode10
 
 
-      - os: osx
-        env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++14 TEST_SUITE=tests-codec
-        osx_image: xcode10
+        -   os: osx
+            env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++14 TEST_SUITE=tests-codec
+            osx_image: xcode10
 
 
-      - os: osx
-        env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=tests-codec
-        osx_image: xcode10.1
+        -   os: osx
+            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=tests-codec
+            osx_image: xcode10.1
 
 
-      - os: osx
-        env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++14 TEST_SUITE=tests-codec
-        osx_image: xcode10.1
+        -   os: osx
+            env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++14 TEST_SUITE=tests-codec
+            osx_image: xcode10.1
 
 
-      - os: osx
-        env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=tests-codec
-        osx_image: xcode10.2
+        -   os: osx
+            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=tests-codec
+            osx_image: xcode10.2
 
 
-      - os: osx
-        env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++14 TEST_SUITE=tests-codec
-        osx_image: xcode10.2
+        -   os: osx
+            env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++14 TEST_SUITE=tests-codec
+            osx_image: xcode10.2
 
 
-      - os: osx
-        env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=tests-codec
-        osx_image: xcode11
+        -   os: osx
+            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=tests-codec
+            osx_image: xcode11
 
 
-      - os: osx
-        env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++14 TEST_SUITE=tests-codec
-        osx_image: xcode11
+        -   os: osx
+            env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++14 TEST_SUITE=tests-codec
+            osx_image: xcode11
 
 
-      - os: osx
-        env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++1z TEST_SUITE=tests-codec
-        osx_image: xcode9.3
+        -   os: osx
+            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++1z TEST_SUITE=tests-codec
+            osx_image: xcode9.3
 
 
-      - os: osx
-        env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++1z TEST_SUITE=tests-codec
-        osx_image: xcode9.3
+        -   os: osx
+            env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++1z TEST_SUITE=tests-codec
+            osx_image: xcode9.3
 
 
-      - os: osx
-        env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++1z TEST_SUITE=tests-codec
-        osx_image: xcode8.3
+        -   os: osx
+            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++1z TEST_SUITE=tests-codec
+            osx_image: xcode8.3
 
 
-      - os: osx
-        env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++1z TEST_SUITE=tests-codec
-        osx_image: xcode8.3
+        -   os: osx
+            env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++1z TEST_SUITE=tests-codec
+            osx_image: xcode8.3
 
 
-      - os: osx
-        env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++1z TEST_SUITE=tests-codec
-        osx_image: xcode7.3
+        -   os: osx
+            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++1z TEST_SUITE=tests-codec
+            osx_image: xcode7.3
 
 
-      - os: osx
-        env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++1z TEST_SUITE=tests-codec
-        osx_image: xcode7.3
+        -   os: osx
+            env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++1z TEST_SUITE=tests-codec
+            osx_image: xcode7.3
 
 
-      - os: osx
-        env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++1z TEST_SUITE=tests-codec
-        osx_image: xcode9.1
+        -   os: osx
+            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++1z TEST_SUITE=tests-codec
+            osx_image: xcode9.1
 
 
-      - os: osx
-        env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++1z TEST_SUITE=tests-codec
-        osx_image: xcode9.1
+        -   os: osx
+            env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++1z TEST_SUITE=tests-codec
+            osx_image: xcode9.1
 
 
-      - os: osx
-        env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++1z TEST_SUITE=tests-codec
-        osx_image: xcode9.2
+        -   os: osx
+            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++1z TEST_SUITE=tests-codec
+            osx_image: xcode9.2
 
 
-      - os: osx
-        env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++1z TEST_SUITE=tests-codec
-        osx_image: xcode9.2
+        -   os: osx
+            env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++1z TEST_SUITE=tests-codec
+            osx_image: xcode9.2
 
 
-      - os: osx
-        env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++1z TEST_SUITE=tests-codec
-        osx_image: xcode9.3
+        -   os: osx
+            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++1z TEST_SUITE=tests-codec
+            osx_image: xcode9.3
 
 
-      - os: osx
-        env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++1z TEST_SUITE=tests-codec
-        osx_image: xcode9.3
+        -   os: osx
+            env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++1z TEST_SUITE=tests-codec
+            osx_image: xcode9.3
 
 
-      - os: osx
-        env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++1z TEST_SUITE=tests-codec
-        osx_image: xcode9.4
+        -   os: osx
+            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++1z TEST_SUITE=tests-codec
+            osx_image: xcode9.4
 
 
-      - os: osx
-        env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++1z TEST_SUITE=tests-codec
-        osx_image: xcode9.4
+        -   os: osx
+            env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++1z TEST_SUITE=tests-codec
+            osx_image: xcode9.4
 
 
-      - os: osx
-        env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++1z TEST_SUITE=tests-codec
-        osx_image: xcode10
+        -   os: osx
+            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++1z TEST_SUITE=tests-codec
+            osx_image: xcode10
 
 
-      - os: osx
-        env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++1z TEST_SUITE=tests-codec
-        osx_image: xcode10
+        -   os: osx
+            env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++1z TEST_SUITE=tests-codec
+            osx_image: xcode10
 
 
-      - os: osx
-        env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++1z TEST_SUITE=tests-codec
-        osx_image: xcode10.1
+        -   os: osx
+            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++1z TEST_SUITE=tests-codec
+            osx_image: xcode10.1
 
 
-      - os: osx
-        env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++1z TEST_SUITE=tests-codec
-        osx_image: xcode10.1
+        -   os: osx
+            env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++1z TEST_SUITE=tests-codec
+            osx_image: xcode10.1
 
 
-      - os: osx
-        env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++1z TEST_SUITE=tests-codec
-        osx_image: xcode10.2
+        -   os: osx
+            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++1z TEST_SUITE=tests-codec
+            osx_image: xcode10.2
 
 
-      - os: osx
-        env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++1z TEST_SUITE=tests-codec
-        osx_image: xcode10.2
+        -   os: osx
+            env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++1z TEST_SUITE=tests-codec
+            osx_image: xcode10.2
 
 
-      - os: osx
-        env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++1z TEST_SUITE=tests-codec
-        osx_image: xcode11
+        -   os: osx
+            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++1z TEST_SUITE=tests-codec
+            osx_image: xcode11
 
 
-      - os: osx
-        env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++1z TEST_SUITE=tests-codec
-        osx_image: xcode11
+        -   os: osx
+            env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++1z TEST_SUITE=tests-codec
+            osx_image: xcode11
 
 
-      - os: osx
-        env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++17 TEST_SUITE=tests-codec
-        osx_image: xcode9.3
+        -   os: osx
+            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++17 TEST_SUITE=tests-codec
+            osx_image: xcode9.3
 
 
-      - os: osx
-        env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++17 TEST_SUITE=tests-codec
-        osx_image: xcode9.3
+        -   os: osx
+            env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++17 TEST_SUITE=tests-codec
+            osx_image: xcode9.3
 
 
-      - os: osx
-        env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++17 TEST_SUITE=tests-codec
-        osx_image: xcode8.3
+        -   os: osx
+            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++17 TEST_SUITE=tests-codec
+            osx_image: xcode8.3
 
 
-      - os: osx
-        env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++17 TEST_SUITE=tests-codec
-        osx_image: xcode8.3
+        -   os: osx
+            env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++17 TEST_SUITE=tests-codec
+            osx_image: xcode8.3
 
 
-      - os: osx
-        env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++17 TEST_SUITE=tests-codec
-        osx_image: xcode7.3
+        -   os: osx
+            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++17 TEST_SUITE=tests-codec
+            osx_image: xcode7.3
 
 
-      - os: osx
-        env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++17 TEST_SUITE=tests-codec
-        osx_image: xcode7.3
+        -   os: osx
+            env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++17 TEST_SUITE=tests-codec
+            osx_image: xcode7.3
 
 
-      - os: osx
-        env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++17 TEST_SUITE=tests-codec
-        osx_image: xcode9.1
+        -   os: osx
+            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++17 TEST_SUITE=tests-codec
+            osx_image: xcode9.1
 
 
-      - os: osx
-        env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++17 TEST_SUITE=tests-codec
-        osx_image: xcode9.1
+        -   os: osx
+            env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++17 TEST_SUITE=tests-codec
+            osx_image: xcode9.1
 
 
-      - os: osx
-        env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++17 TEST_SUITE=tests-codec
-        osx_image: xcode9.2
+        -   os: osx
+            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++17 TEST_SUITE=tests-codec
+            osx_image: xcode9.2
 
 
-      - os: osx
-        env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++17 TEST_SUITE=tests-codec
-        osx_image: xcode9.2
+        -   os: osx
+            env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++17 TEST_SUITE=tests-codec
+            osx_image: xcode9.2
 
 
-      - os: osx
-        env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++17 TEST_SUITE=tests-codec
-        osx_image: xcode9.3
+        -   os: osx
+            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++17 TEST_SUITE=tests-codec
+            osx_image: xcode9.3
 
 
-      - os: osx
-        env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++17 TEST_SUITE=tests-codec
-        osx_image: xcode9.3
+        -   os: osx
+            env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++17 TEST_SUITE=tests-codec
+            osx_image: xcode9.3
 
 
-      - os: osx
-        env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++17 TEST_SUITE=tests-codec
-        osx_image: xcode9.4
+        -   os: osx
+            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++17 TEST_SUITE=tests-codec
+            osx_image: xcode9.4
 
 
-      - os: osx
-        env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++17 TEST_SUITE=tests-codec
-        osx_image: xcode9.4
+        -   os: osx
+            env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++17 TEST_SUITE=tests-codec
+            osx_image: xcode9.4
 
 
-      - os: osx
-        env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++17 TEST_SUITE=tests-codec
-        osx_image: xcode10
+        -   os: osx
+            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++17 TEST_SUITE=tests-codec
+            osx_image: xcode10
 
 
-      - os: osx
-        env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++17 TEST_SUITE=tests-codec
-        osx_image: xcode10
+        -   os: osx
+            env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++17 TEST_SUITE=tests-codec
+            osx_image: xcode10
 
 
-      - os: osx
-        env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++17 TEST_SUITE=tests-codec
-        osx_image: xcode10.1
+        -   os: osx
+            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++17 TEST_SUITE=tests-codec
+            osx_image: xcode10.1
 
 
-      - os: osx
-        env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++17 TEST_SUITE=tests-codec
-        osx_image: xcode10.1
+        -   os: osx
+            env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++17 TEST_SUITE=tests-codec
+            osx_image: xcode10.1
 
 
-      - os: osx
-        env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++17 TEST_SUITE=tests-codec
-        osx_image: xcode10.2
+        -   os: osx
+            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++17 TEST_SUITE=tests-codec
+            osx_image: xcode10.2
 
 
-      - os: osx
-        env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++17 TEST_SUITE=tests-codec
-        osx_image: xcode10.2
+        -   os: osx
+            env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++17 TEST_SUITE=tests-codec
+            osx_image: xcode10.2
 
 
-      - os: osx
-        env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++17 TEST_SUITE=tests-codec
-        osx_image: xcode11
+        -   os: osx
+            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++17 TEST_SUITE=tests-codec
+            osx_image: xcode11
 
 
-      - os: osx
-        env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++17 TEST_SUITE=tests-codec
-        osx_image: xcode11
+        -   os: osx
+            env: TOOLSET=gcc COMPILER=g++ CXXSTD=c++17 TEST_SUITE=tests-codec
+            osx_image: xcode11
 
 
-      - os: linux
-        env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++11 TEST_SUITE=tests-codec
-        addons:
-          apt:
-            packages:
-              - clang++5
-              - cmake
-            sources:
-              - ubuntu-toolchain-r-test
+        -   os: linux
+            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++11 TEST_SUITE=tests-codec
+            addons:
+                apt:
+                    packages:
+                        - clang++5
+                        - cmake
+                    sources:
+                        - ubuntu-toolchain-r-test
 
 
-      - os: linux
-        env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++11 TEST_SUITE=tests-codec
-        addons:
-          apt:
-            packages:
-              - clang++6
-              - cmake
-            sources:
-              - ubuntu-toolchain-r-test
+        -   os: linux
+            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++11 TEST_SUITE=tests-codec
+            addons:
+                apt:
+                    packages:
+                        - clang++6
+                        - cmake
+                    sources:
+                        - ubuntu-toolchain-r-test
 
 
-      - os: linux
-        env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++11 TEST_SUITE=tests-codec
-        addons:
-          apt:
-            packages:
-              - clang++7
-              - cmake
-            sources:
-              - ubuntu-toolchain-r-test
+        -   os: linux
+            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++11 TEST_SUITE=tests-codec
+            addons:
+                apt:
+                    packages:
+                        - clang++7
+                        - cmake
+                    sources:
+                        - ubuntu-toolchain-r-test
 
 
-      - os: linux
-        env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++11 TEST_SUITE=tests-codec
-        addons:
-          apt:
-            packages:
-              - clang++8
-              - cmake
-            sources:
-              - ubuntu-toolchain-r-test
+        -   os: linux
+            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++11 TEST_SUITE=tests-codec
+            addons:
+                apt:
+                    packages:
+                        - clang++8
+                        - cmake
+                    sources:
+                        - ubuntu-toolchain-r-test
 
 
-      - os: linux
-        env: TOOLSET=gcc COMPILER=gcc++ CXXSTD=c++11 TEST_SUITE=tests-codec
-        addons:
-          apt:
-            packages:
-              - g++5
-              - cmake
-            sources:
-              - ubuntu-toolchain-r-test
+        -   os: linux
+            env: TOOLSET=gcc COMPILER=gcc++ CXXSTD=c++11 TEST_SUITE=tests-codec
+            addons:
+                apt:
+                    packages:
+                        - g++5
+                        - cmake
+                    sources:
+                        - ubuntu-toolchain-r-test
 
 
-      - os: linux
-        env: TOOLSET=gcc COMPILER=gcc++ CXXSTD=c++11 TEST_SUITE=tests-codec
-        addons:
-          apt:
-            packages:
-              - g++6
-              - cmake
-            sources:
-              - ubuntu-toolchain-r-test
+        -   os: linux
+            env: TOOLSET=gcc COMPILER=gcc++ CXXSTD=c++11 TEST_SUITE=tests-codec
+            addons:
+                apt:
+                    packages:
+                        - g++6
+                        - cmake
+                    sources:
+                        - ubuntu-toolchain-r-test
 
 
-      - os: linux
-        env: TOOLSET=gcc COMPILER=gcc++ CXXSTD=c++11 TEST_SUITE=tests-codec
-        addons:
-          apt:
-            packages:
-              - g++7
-              - cmake
-            sources:
-              - ubuntu-toolchain-r-test
+        -   os: linux
+            env: TOOLSET=gcc COMPILER=gcc++ CXXSTD=c++11 TEST_SUITE=tests-codec
+            addons:
+                apt:
+                    packages:
+                        - g++7
+                        - cmake
+                    sources:
+                        - ubuntu-toolchain-r-test
 
 
-      - os: linux
-        env: TOOLSET=gcc COMPILER=gcc++ CXXSTD=c++11 TEST_SUITE=tests-codec
-        addons:
-          apt:
-            packages:
-              - g++8
-              - cmake
-            sources:
-              - ubuntu-toolchain-r-test
+        -   os: linux
+            env: TOOLSET=gcc COMPILER=gcc++ CXXSTD=c++11 TEST_SUITE=tests-codec
+            addons:
+                apt:
+                    packages:
+                        - g++8
+                        - cmake
+                    sources:
+                        - ubuntu-toolchain-r-test
 
 
-      - os: linux
-        env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=tests-codec
-        addons:
-          apt:
-            packages:
-              - clang++5
-              - cmake
-            sources:
-              - ubuntu-toolchain-r-test
+        -   os: linux
+            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=tests-codec
+            addons:
+                apt:
+                    packages:
+                        - clang++5
+                        - cmake
+                    sources:
+                        - ubuntu-toolchain-r-test
 
 
-      - os: linux
-        env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=tests-codec
-        addons:
-          apt:
-            packages:
-              - clang++6
-              - cmake
-            sources:
-              - ubuntu-toolchain-r-test
+        -   os: linux
+            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=tests-codec
+            addons:
+                apt:
+                    packages:
+                        - clang++6
+                        - cmake
+                    sources:
+                        - ubuntu-toolchain-r-test
 
 
-      - os: linux
-        env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=tests-codec
-        addons:
-          apt:
-            packages:
-              - clang++7
-              - cmake
-            sources:
-              - ubuntu-toolchain-r-test
+        -   os: linux
+            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=tests-codec
+            addons:
+                apt:
+                    packages:
+                        - clang++7
+                        - cmake
+                    sources:
+                        - ubuntu-toolchain-r-test
 
 
-      - os: linux
-        env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=tests-codec
-        addons:
-          apt:
-            packages:
-              - clang++8
-              - cmake
-            sources:
-              - ubuntu-toolchain-r-test
+        -   os: linux
+            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=tests-codec
+            addons:
+                apt:
+                    packages:
+                        - clang++8
+                        - cmake
+                    sources:
+                        - ubuntu-toolchain-r-test
 
 
-      - os: linux
-        env: TOOLSET=gcc COMPILER=gcc++ CXXSTD=c++14 TEST_SUITE=tests-codec
-        addons:
-          apt:
-            packages:
-              - g++5
-              - cmake
-            sources:
-              - ubuntu-toolchain-r-test
+        -   os: linux
+            env: TOOLSET=gcc COMPILER=gcc++ CXXSTD=c++14 TEST_SUITE=tests-codec
+            addons:
+                apt:
+                    packages:
+                        - g++5
+                        - cmake
+                    sources:
+                        - ubuntu-toolchain-r-test
 
 
-      - os: linux
-        env: TOOLSET=gcc COMPILER=gcc++ CXXSTD=c++14 TEST_SUITE=tests-codec
-        addons:
-          apt:
-            packages:
-              - g++6
-              - cmake
-            sources:
-              - ubuntu-toolchain-r-test
+        -   os: linux
+            env: TOOLSET=gcc COMPILER=gcc++ CXXSTD=c++14 TEST_SUITE=tests-codec
+            addons:
+                apt:
+                    packages:
+                        - g++6
+                        - cmake
+                    sources:
+                        - ubuntu-toolchain-r-test
 
 
-      - os: linux
-        env: TOOLSET=gcc COMPILER=gcc++ CXXSTD=c++14 TEST_SUITE=tests-codec
-        addons:
-          apt:
-            packages:
-              - g++7
-              - cmake
-            sources:
-              - ubuntu-toolchain-r-test
+        -   os: linux
+            env: TOOLSET=gcc COMPILER=gcc++ CXXSTD=c++14 TEST_SUITE=tests-codec
+            addons:
+                apt:
+                    packages:
+                        - g++7
+                        - cmake
+                    sources:
+                        - ubuntu-toolchain-r-test
 
 
-      - os: linux
-        env: TOOLSET=gcc COMPILER=gcc++ CXXSTD=c++14 TEST_SUITE=tests-codec
-        addons:
-          apt:
-            packages:
-              - g++8
-              - cmake
-            sources:
-              - ubuntu-toolchain-r-test
+        -   os: linux
+            env: TOOLSET=gcc COMPILER=gcc++ CXXSTD=c++14 TEST_SUITE=tests-codec
+            addons:
+                apt:
+                    packages:
+                        - g++8
+                        - cmake
+                    sources:
+                        - ubuntu-toolchain-r-test
 
 
-      - os: linux
-        env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++1z TEST_SUITE=tests-codec
-        addons:
-          apt:
-            packages:
-              - clang++5
-              - cmake
-            sources:
-              - ubuntu-toolchain-r-test
+        -   os: linux
+            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++1z TEST_SUITE=tests-codec
+            addons:
+                apt:
+                    packages:
+                        - clang++5
+                        - cmake
+                    sources:
+                        - ubuntu-toolchain-r-test
 
 
-      - os: linux
-        env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++1z TEST_SUITE=tests-codec
-        addons:
-          apt:
-            packages:
-              - clang++6
-              - cmake
-            sources:
-              - ubuntu-toolchain-r-test
+        -   os: linux
+            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++1z TEST_SUITE=tests-codec
+            addons:
+                apt:
+                    packages:
+                        - clang++6
+                        - cmake
+                    sources:
+                        - ubuntu-toolchain-r-test
 
 
-      - os: linux
-        env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++1z TEST_SUITE=tests-codec
-        addons:
-          apt:
-            packages:
-              - clang++7
-              - cmake
-            sources:
-              - ubuntu-toolchain-r-test
+        -   os: linux
+            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++1z TEST_SUITE=tests-codec
+            addons:
+                apt:
+                    packages:
+                        - clang++7
+                        - cmake
+                    sources:
+                        - ubuntu-toolchain-r-test
 
 
-      - os: linux
-        env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++1z TEST_SUITE=tests-codec
-        addons:
-          apt:
-            packages:
-              - clang++8
-              - cmake
-            sources:
-              - ubuntu-toolchain-r-test
+        -   os: linux
+            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++1z TEST_SUITE=tests-codec
+            addons:
+                apt:
+                    packages:
+                        - clang++8
+                        - cmake
+                    sources:
+                        - ubuntu-toolchain-r-test
 
 
-      - os: linux
-        env: TOOLSET=gcc COMPILER=gcc++ CXXSTD=c++1z TEST_SUITE=tests-codec
-        addons:
-          apt:
-            packages:
-              - g++5
-              - cmake
-            sources:
-              - ubuntu-toolchain-r-test
+        -   os: linux
+            env: TOOLSET=gcc COMPILER=gcc++ CXXSTD=c++1z TEST_SUITE=tests-codec
+            addons:
+                apt:
+                    packages:
+                        - g++5
+                        - cmake
+                    sources:
+                        - ubuntu-toolchain-r-test
 
 
-      - os: linux
-        env: TOOLSET=gcc COMPILER=gcc++ CXXSTD=c++1z TEST_SUITE=tests-codec
-        addons:
-          apt:
-            packages:
-              - g++6
-              - cmake
-            sources:
-              - ubuntu-toolchain-r-test
+        -   os: linux
+            env: TOOLSET=gcc COMPILER=gcc++ CXXSTD=c++1z TEST_SUITE=tests-codec
+            addons:
+                apt:
+                    packages:
+                        - g++6
+                        - cmake
+                    sources:
+                        - ubuntu-toolchain-r-test
 
 
-      - os: linux
-        env: TOOLSET=gcc COMPILER=gcc++ CXXSTD=c++1z TEST_SUITE=tests-codec
-        addons:
-          apt:
-            packages:
-              - g++7
-              - cmake
-            sources:
-              - ubuntu-toolchain-r-test
+        -   os: linux
+            env: TOOLSET=gcc COMPILER=gcc++ CXXSTD=c++1z TEST_SUITE=tests-codec
+            addons:
+                apt:
+                    packages:
+                        - g++7
+                        - cmake
+                    sources:
+                        - ubuntu-toolchain-r-test
 
 
-      - os: linux
-        env: TOOLSET=gcc COMPILER=gcc++ CXXSTD=c++1z TEST_SUITE=tests-codec
-        addons:
-          apt:
-            packages:
-              - g++8
-              - cmake
-            sources:
-              - ubuntu-toolchain-r-test
+        -   os: linux
+            env: TOOLSET=gcc COMPILER=gcc++ CXXSTD=c++1z TEST_SUITE=tests-codec
+            addons:
+                apt:
+                    packages:
+                        - g++8
+                        - cmake
+                    sources:
+                        - ubuntu-toolchain-r-test
 
 
-      - os: linux
-        env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++17 TEST_SUITE=tests-codec
-        addons:
-          apt:
-            packages:
-              - clang++5
-              - cmake
-            sources:
-              - ubuntu-toolchain-r-test
+        -   os: linux
+            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++17 TEST_SUITE=tests-codec
+            addons:
+                apt:
+                    packages:
+                        - clang++5
+                        - cmake
+                    sources:
+                        - ubuntu-toolchain-r-test
 
 
-      - os: linux
-        env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++17 TEST_SUITE=tests-codec
-        addons:
-          apt:
-            packages:
-              - clang++6
-              - cmake
-            sources:
-              - ubuntu-toolchain-r-test
+        -   os: linux
+            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++17 TEST_SUITE=tests-codec
+            addons:
+                apt:
+                    packages:
+                        - clang++6
+                        - cmake
+                    sources:
+                        - ubuntu-toolchain-r-test
 
 
-      - os: linux
-        env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++17 TEST_SUITE=tests-codec
-        addons:
-          apt:
-            packages:
-              - clang++7
-              - cmake
-            sources:
-              - ubuntu-toolchain-r-test
+        -   os: linux
+            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++17 TEST_SUITE=tests-codec
+            addons:
+                apt:
+                    packages:
+                        - clang++7
+                        - cmake
+                    sources:
+                        - ubuntu-toolchain-r-test
 
 
-      - os: linux
-        env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++17 TEST_SUITE=tests-codec
-        addons:
-          apt:
-            packages:
-              - clang++8
-              - cmake
-            sources:
-              - ubuntu-toolchain-r-test
+        -   os: linux
+            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++17 TEST_SUITE=tests-codec
+            addons:
+                apt:
+                    packages:
+                        - clang++8
+                        - cmake
+                    sources:
+                        - ubuntu-toolchain-r-test
 
 
-      - os: linux
-        env: TOOLSET=gcc COMPILER=gcc++ CXXSTD=c++17 TEST_SUITE=tests-codec
-        addons:
-          apt:
-            packages:
-              - g++5
-              - cmake
-            sources:
-              - ubuntu-toolchain-r-test
+        -   os: linux
+            env: TOOLSET=gcc COMPILER=gcc++ CXXSTD=c++17 TEST_SUITE=tests-codec
+            addons:
+                apt:
+                    packages:
+                        - g++5
+                        - cmake
+                    sources:
+                        - ubuntu-toolchain-r-test
 
 
-      - os: linux
-        env: TOOLSET=gcc COMPILER=gcc++ CXXSTD=c++17 TEST_SUITE=tests-codec
-        addons:
-          apt:
-            packages:
-              - g++6
-              - cmake
-            sources:
-              - ubuntu-toolchain-r-test
+        -   os: linux
+            env: TOOLSET=gcc COMPILER=gcc++ CXXSTD=c++17 TEST_SUITE=tests-codec
+            addons:
+                apt:
+                    packages:
+                        - g++6
+                        - cmake
+                    sources:
+                        - ubuntu-toolchain-r-test
 
 
-      - os: linux
-        env: TOOLSET=gcc COMPILER=gcc++ CXXSTD=c++17 TEST_SUITE=tests-codec
-        addons:
-          apt:
-            packages:
-              - g++7
-              - cmake
-            sources:
-              - ubuntu-toolchain-r-test
+        -   os: linux
+            env: TOOLSET=gcc COMPILER=gcc++ CXXSTD=c++17 TEST_SUITE=tests-codec
+            addons:
+                apt:
+                    packages:
+                        - g++7
+                        - cmake
+                    sources:
+                        - ubuntu-toolchain-r-test
 
 
-      - os: linux
-        env: TOOLSET=gcc COMPILER=gcc++ CXXSTD=c++17 TEST_SUITE=tests-codec
-        addons:
-          apt:
-            packages:
-              - g++8
-              - cmake
-            sources:
-              - ubuntu-toolchain-r-test
+        -   os: linux
+            env: TOOLSET=gcc COMPILER=gcc++ CXXSTD=c++17 TEST_SUITE=tests-codec
+            addons:
+                apt:
+                    packages:
+                        - g++8
+                        - cmake
+                    sources:
+                        - ubuntu-toolchain-r-test
 
 
 install:
@@ -833,6 +827,10 @@ install:
     - python tools/boostdep/depinst/depinst.py accumulators
     - ./bootstrap.sh
 
+    - if [[ $TRAVIS_OS_NAME == osx ]]; then
+        brew upgrade cmake;
+      fi
+
 script:
     - |-
         echo "using $TOOLSET : : $COMPILER : <cxxflags>-std=$CXXSTD ;" > ~/user-config.jam
@@ -840,7 +838,7 @@ script:
         proc=$(($(nproc) + 1));
         elif [[ $TRAVIS_OS_NAME == osx ]]; then
         proc=$(($(sysctl -n hw.ncpu) + 1));
-        fi;
+      fi;
     - sudo ./b2 -j$proc install;
     - cd $TRAVIS_BUILD_DIR && mkdir cmake-build && cd cmake-build;
     - echo $CXXSTD
