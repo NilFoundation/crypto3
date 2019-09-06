@@ -1,79 +1,63 @@
-# Check for the presence of AVX and figure out the flags to use for it.
+include(CheckCSourceCompiles)
+include(CheckCXXSourceCompiles)
+
+set(AVX_CODE "
+  #include <immintrin.h>
+
+  int main()
+  {
+    __m256 a;
+    a = _mm256_set1_ps(0);
+    return 0;
+  }
+")
+
+set(AVX2_CODE "
+  #include <immintrin.h>
+
+  int main()
+  {
+    __m256i a = {0};
+    a = _mm256_abs_epi16(a);
+    __m256i x;
+    _mm256_extract_epi64(x, 0); // we rely on this in our AVX2 code
+    return 0;
+  }
+")
+
+macro(check_avx_lang lang type flags)
+    set(__FLAG_I 1)
+    set(CMAKE_REQUIRED_FLAGS_SAVE ${CMAKE_REQUIRED_FLAGS})
+    foreach(__FLAG ${flags})
+        if(NOT ${lang}_${type}_FOUND)
+            set(CMAKE_REQUIRED_FLAGS ${__FLAG})
+            if(lang STREQUAL "CXX")
+                check_cxx_source_compiles("${${type}_CODE}" ${lang}_HAS_${type}_${__FLAG_I})
+            else()
+                check_c_source_compiles("${${type}_CODE}" ${lang}_HAS_${type}_${__FLAG_I})
+            endif()
+            if(${lang}_HAS_${type}_${__FLAG_I})
+                set(${lang}_${type}_FOUND TRUE CACHE BOOL "${lang} ${type} support")
+                set(${lang}_${type}_FLAGS "${__FLAG}" CACHE STRING "${lang} ${type} flags")
+            endif()
+            math(EXPR __FLAG_I "${__FLAG_I}+1")
+        endif()
+    endforeach()
+    set(CMAKE_REQUIRED_FLAGS ${CMAKE_REQUIRED_FLAGS_SAVE})
+
+    if(NOT ${lang}_${type}_FOUND)
+        set(${lang}_${type}_FOUND FALSE CACHE BOOL "${lang} ${type} support")
+        set(${lang}_${type}_FLAGS "" CACHE STRING "${lang} ${type} flags")
+    endif()
+
+    mark_as_advanced(${lang}_${type}_FOUND ${lang}_${type}_FLAGS)
+
+endmacro()
+
 macro(check_avx)
-    set(AVX_FLAGS)
+    check_avx_lang(C "AVX" " ;-mavx;/arch:AVX")
+    check_avx_lang(C "AVX2" " ;-mavx2 -mfma;/arch:AVX2")
 
-    include(CheckCXXSourceRuns)
-    set(CMAKE_REQUIRED_FLAGS)
-
-    # Check AVX
-    if(MSVC AND NOT MSVC_VERSION LESS 1600)
-        set(CMAKE_REQUIRED_FLAGS "/arch:AVX")
-    elseif(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_CLANG)
-        set(CMAKE_REQUIRED_FLAGS "-mavx")
-    endif()
-
-    check_cxx_source_runs("
-        #include <immintrin.h>
-        int main()
-        {
-          __m256 a, b, c;
-          const float src[8] = { 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f };
-          float dst[8];
-          a = _mm256_loadu_ps( src );
-          b = _mm256_loadu_ps( src );
-          c = _mm256_add_ps( a, b );
-          _mm256_storeu_ps( dst, c );
-
-          for( int i = 0; i < 8; i++ ){
-            if( ( src[i] + src[i] ) != dst[i] ){
-              return -1;
-            }
-          }
-
-          return 0;
-        }"
-                          HAVE_AVX_EXTENSIONS)
-
-    # Check AVX2
-    if(MSVC AND NOT MSVC_VERSION LESS 1800)
-        set(CMAKE_REQUIRED_FLAGS "/arch:AVX2")
-    elseif(CMAKE_COMPILER_IS_GNUCC)
-        set(CMAKE_REQUIRED_FLAGS "-mavx2")
-    endif()
-
-    check_cxx_source_runs("
-        #include <immintrin.h>
-        int main()
-        {
-          __m256i a, b, c;
-          const int src[8] = { 1, 2, 3, 4, 5, 6, 7, 8 };
-          int dst[8];
-          a =  _mm256_loadu_si256( (__m256i*)src );
-          b =  _mm256_loadu_si256( (__m256i*)src );
-          c = _mm256_add_epi32( a, b );
-          _mm256_storeu_si256( (__m256i*)dst, c );
-
-          for( int i = 0; i < 8; i++ ){
-            if( ( src[i] + src[i] ) != dst[i] ){
-              return -1;
-            }
-          }
-
-          return 0;
-        }" HAVE_AVX2_EXTENSIONS)
-
-    # Set Flags
-    if(MSVC)
-        if(HAVE_AVX2_EXTENSIONS AND NOT MSVC_VERSION LESS 1800)
-            set(AVX_FLAGS "${AVX_FLAGS} /arch:AVX2")
-        elseif(HAVE_AVX_EXTENSIONS AND NOT MSVC_VERSION LESS 1600)
-            set(AVX_FLAGS "${AVX_FLAGS} /arch:AVX")
-        endif()
-    elseif(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_CLANG)
-        if(HAVE_AVX2_EXTENSIONS)
-            set(AVX_FLAGS "${AVX_FLAGS} -mavx2")
-        elseif(HAVE_AVX_EXTENSIONS)
-            set(AVX_FLAGS "${AVX_FLAGS} -mavx")
-        endif()
-    endif()
-endmacro(check_avx)
+    check_avx_lang(CXX "AVX" " ;-mavx;/arch:AVX")
+    check_avx_lang(CXX "AVX2" " ;-mavx2 -mfma;/arch:AVX2")
+endmacro()
