@@ -14,6 +14,8 @@ jobs:
   include:
 
       - compiler: gcc
+        os: linux
+        dist: xenial
         addons:
             apt:
                 sources: ['ubuntu-toolchain-r-test']
@@ -23,6 +25,8 @@ jobs:
 
 
       - compiler: gcc
+        os: linux
+        dist: xenial
         addons:
             apt:
                 sources: ['ubuntu-toolchain-r-test']
@@ -32,6 +36,8 @@ jobs:
 
 
       - compiler: gcc
+        os: linux
+        dist: xenial
         addons:
             apt:
                 sources: ['ubuntu-toolchain-r-test']
@@ -41,6 +47,8 @@ jobs:
 
 
       - compiler: gcc
+        os: linux
+        dist: xenial
         addons:
             apt:
                 sources: ['ubuntu-toolchain-r-test']
@@ -50,6 +58,8 @@ jobs:
 
 
       - compiler: gcc
+        os: linux
+        dist: xenial
         addons:
             apt:
                 sources: ['ubuntu-toolchain-r-test']
@@ -59,6 +69,8 @@ jobs:
 
 
       - compiler: gcc
+        os: linux
+        dist: xenial
         addons:
             apt:
                 sources: ['ubuntu-toolchain-r-test']
@@ -68,6 +80,8 @@ jobs:
 
 
       - compiler: gcc
+        os: linux
+        dist: xenial
         addons:
             apt:
                 sources: ['ubuntu-toolchain-r-test']
@@ -77,6 +91,8 @@ jobs:
 
 
       - compiler: gcc
+        os: linux
+        dist: xenial
         addons:
             apt:
                 sources: ['ubuntu-toolchain-r-test']
@@ -86,6 +102,8 @@ jobs:
 
 
       - compiler: gcc
+        os: linux
+        dist: xenial
         addons:
             apt:
                 sources: ['ubuntu-toolchain-r-test']
@@ -95,6 +113,8 @@ jobs:
 
 
       - compiler: gcc
+        os: linux
+        dist: xenial
         addons:
             apt:
                 sources: ['ubuntu-toolchain-r-test']
@@ -104,6 +124,8 @@ jobs:
 
 
       - compiler: gcc
+        os: linux
+        dist: xenial
         addons:
             apt:
                 sources: ['ubuntu-toolchain-r-test']
@@ -113,6 +135,8 @@ jobs:
 
 
       - compiler: gcc
+        os: linux
+        dist: xenial
         addons:
             apt:
                 sources: ['ubuntu-toolchain-r-test']
@@ -122,6 +146,8 @@ jobs:
 
 
       - compiler: clang
+        os: linux
+        dist: xenial
         addons:
             apt:
                 sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-xenial-5.0']
@@ -131,6 +157,8 @@ jobs:
 
 
       - compiler: clang
+        os: linux
+        dist: xenial
         addons:
             apt:
                 sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-xenial-6.0']
@@ -140,6 +168,8 @@ jobs:
 
 
       - compiler: clang
+        os: linux
+        dist: xenial
         addons:
             apt:
                 sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-xenial-7']
@@ -149,6 +179,8 @@ jobs:
 
 
       - compiler: clang
+        os: linux
+        dist: xenial
         addons:
             apt:
                 sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-xenial-8']
@@ -158,6 +190,8 @@ jobs:
 
 
       - compiler: clang
+        os: linux
+        dist: xenial
         addons:
             apt:
                 sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-xenial-5.0']
@@ -167,6 +201,8 @@ jobs:
 
 
       - compiler: clang
+        os: linux
+        dist: xenial
         addons:
             apt:
                 sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-xenial-6.0']
@@ -176,6 +212,8 @@ jobs:
 
 
       - compiler: clang
+        os: linux
+        dist: xenial
         addons:
             apt:
                 sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-xenial-7']
@@ -185,6 +223,8 @@ jobs:
 
 
       - compiler: clang
+        os: linux
+        dist: xenial
         addons:
             apt:
                 sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-xenial-8']
@@ -194,6 +234,8 @@ jobs:
 
 
       - compiler: clang
+        os: linux
+        dist: xenial
         addons:
             apt:
                 sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-xenial-5.0']
@@ -203,6 +245,8 @@ jobs:
 
 
       - compiler: clang
+        os: linux
+        dist: xenial
         addons:
             apt:
                 sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-xenial-6.0']
@@ -212,6 +256,8 @@ jobs:
 
 
       - compiler: clang
+        os: linux
+        dist: xenial
         addons:
             apt:
                 sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-xenial-7']
@@ -221,6 +267,8 @@ jobs:
 
 
       - compiler: clang
+        os: linux
+        dist: xenial
         addons:
             apt:
                 sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-xenial-8']
@@ -230,6 +278,8 @@ jobs:
 
 
       - compiler: clang
+        os: linux
+        dist: xenial
         addons:
             apt:
                 sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-xenial-5.0']
@@ -239,6 +289,8 @@ jobs:
 
 
       - compiler: clang
+        os: linux
+        dist: xenial
         addons:
             apt:
                 sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-xenial-6.0']
@@ -248,6 +300,8 @@ jobs:
 
 
       - compiler: clang
+        os: linux
+        dist: xenial
         addons:
             apt:
                 sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-xenial-7']
@@ -257,12 +311,15 @@ jobs:
 
 
       - compiler: clang
+        os: linux
+        dist: xenial
         addons:
             apt:
                 sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-xenial-8']
                 packages: ['clang-8', 'g++-7']
         env:
             - CXX=clang++-8 CXXSTD=c++17
+
 
 
 before_install:
@@ -299,7 +356,7 @@ install:
     - python tools/boostdep/depinst/depinst.py container
     - python tools/boostdep/depinst/depinst.py accumulators
     - ./bootstrap.sh
-
+    - cat bootstrap.log
     - if [[ $TRAVIS_OS_NAME == osx ]]; then
         brew upgrade;
       fi
