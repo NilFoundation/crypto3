@@ -18,7 +18,7 @@ jobs:
             addons:
                 apt:
                     packages:
-                        - clang++5
+                        - clang++-5
                         - cmake
                     sources:
                         - ubuntu-toolchain-r-test
@@ -29,7 +29,7 @@ jobs:
             addons:
                 apt:
                     packages:
-                        - clang++6
+                        - clang++-6
                         - cmake
                     sources:
                         - ubuntu-toolchain-r-test
@@ -40,7 +40,7 @@ jobs:
             addons:
                 apt:
                     packages:
-                        - clang++7
+                        - clang++-7
                         - cmake
                     sources:
                         - ubuntu-toolchain-r-test
@@ -51,7 +51,7 @@ jobs:
             addons:
                 apt:
                     packages:
-                        - clang++8
+                        - clang++-8
                         - cmake
                     sources:
                         - ubuntu-toolchain-r-test
@@ -62,7 +62,7 @@ jobs:
             addons:
                 apt:
                     packages:
-                        - g++5
+                        - g++-5
                         - cmake
                     sources:
                         - ubuntu-toolchain-r-test
@@ -73,7 +73,7 @@ jobs:
             addons:
                 apt:
                     packages:
-                        - g++6
+                        - g++-6
                         - cmake
                     sources:
                         - ubuntu-toolchain-r-test
@@ -84,7 +84,7 @@ jobs:
             addons:
                 apt:
                     packages:
-                        - g++7
+                        - g++-7
                         - cmake
                     sources:
                         - ubuntu-toolchain-r-test
@@ -95,7 +95,7 @@ jobs:
             addons:
                 apt:
                     packages:
-                        - g++8
+                        - g++-8
                         - cmake
                     sources:
                         - ubuntu-toolchain-r-test
@@ -106,7 +106,7 @@ jobs:
             addons:
                 apt:
                     packages:
-                        - clang++5
+                        - clang++-5
                         - cmake
                     sources:
                         - ubuntu-toolchain-r-test
@@ -117,7 +117,7 @@ jobs:
             addons:
                 apt:
                     packages:
-                        - clang++6
+                        - clang++-6
                         - cmake
                     sources:
                         - ubuntu-toolchain-r-test
@@ -128,7 +128,7 @@ jobs:
             addons:
                 apt:
                     packages:
-                        - clang++7
+                        - clang++-7
                         - cmake
                     sources:
                         - ubuntu-toolchain-r-test
@@ -139,7 +139,7 @@ jobs:
             addons:
                 apt:
                     packages:
-                        - clang++8
+                        - clang++-8
                         - cmake
                     sources:
                         - ubuntu-toolchain-r-test
@@ -150,7 +150,7 @@ jobs:
             addons:
                 apt:
                     packages:
-                        - g++5
+                        - g++-5
                         - cmake
                     sources:
                         - ubuntu-toolchain-r-test
@@ -161,7 +161,7 @@ jobs:
             addons:
                 apt:
                     packages:
-                        - g++6
+                        - g++-6
                         - cmake
                     sources:
                         - ubuntu-toolchain-r-test
@@ -172,7 +172,7 @@ jobs:
             addons:
                 apt:
                     packages:
-                        - g++7
+                        - g++-7
                         - cmake
                     sources:
                         - ubuntu-toolchain-r-test
@@ -183,7 +183,7 @@ jobs:
             addons:
                 apt:
                     packages:
-                        - g++8
+                        - g++-8
                         - cmake
                     sources:
                         - ubuntu-toolchain-r-test
@@ -194,7 +194,7 @@ jobs:
             addons:
                 apt:
                     packages:
-                        - clang++5
+                        - clang++-5
                         - cmake
                     sources:
                         - ubuntu-toolchain-r-test
@@ -205,7 +205,7 @@ jobs:
             addons:
                 apt:
                     packages:
-                        - clang++6
+                        - clang++-6
                         - cmake
                     sources:
                         - ubuntu-toolchain-r-test
@@ -216,7 +216,7 @@ jobs:
             addons:
                 apt:
                     packages:
-                        - clang++7
+                        - clang++-7
                         - cmake
                     sources:
                         - ubuntu-toolchain-r-test
@@ -227,7 +227,7 @@ jobs:
             addons:
                 apt:
                     packages:
-                        - clang++8
+                        - clang++-8
                         - cmake
                     sources:
                         - ubuntu-toolchain-r-test
@@ -238,7 +238,7 @@ jobs:
             addons:
                 apt:
                     packages:
-                        - g++5
+                        - g++-5
                         - cmake
                     sources:
                         - ubuntu-toolchain-r-test
@@ -249,7 +249,7 @@ jobs:
             addons:
                 apt:
                     packages:
-                        - g++6
+                        - g++-6
                         - cmake
                     sources:
                         - ubuntu-toolchain-r-test
@@ -260,7 +260,7 @@ jobs:
             addons:
                 apt:
                     packages:
-                        - g++7
+                        - g++-7
                         - cmake
                     sources:
                         - ubuntu-toolchain-r-test
@@ -271,7 +271,7 @@ jobs:
             addons:
                 apt:
                     packages:
-                        - g++8
+                        - g++-8
                         - cmake
                     sources:
                         - ubuntu-toolchain-r-test
@@ -282,7 +282,7 @@ jobs:
             addons:
                 apt:
                     packages:
-                        - clang++5
+                        - clang++-5
                         - cmake
                     sources:
                         - ubuntu-toolchain-r-test
@@ -293,7 +293,7 @@ jobs:
             addons:
                 apt:
                     packages:
-                        - clang++6
+                        - clang++-6
                         - cmake
                     sources:
                         - ubuntu-toolchain-r-test
@@ -304,7 +304,7 @@ jobs:
             addons:
                 apt:
                     packages:
-                        - clang++7
+                        - clang++-7
                         - cmake
                     sources:
                         - ubuntu-toolchain-r-test
@@ -315,7 +315,7 @@ jobs:
             addons:
                 apt:
                     packages:
-                        - clang++8
+                        - clang++-8
                         - cmake
                     sources:
                         - ubuntu-toolchain-r-test
@@ -326,7 +326,7 @@ jobs:
             addons:
                 apt:
                     packages:
-                        - g++5
+                        - g++-5
                         - cmake
                     sources:
                         - ubuntu-toolchain-r-test
@@ -337,7 +337,7 @@ jobs:
             addons:
                 apt:
                     packages:
-                        - g++6
+                        - g++-6
                         - cmake
                     sources:
                         - ubuntu-toolchain-r-test
@@ -348,7 +348,7 @@ jobs:
             addons:
                 apt:
                     packages:
-                        - g++7
+                        - g++-7
                         - cmake
                     sources:
                         - ubuntu-toolchain-r-test
@@ -359,7 +359,7 @@ jobs:
             addons:
                 apt:
                     packages:
-                        - g++8
+                        - g++-8
                         - cmake
                     sources:
                         - ubuntu-toolchain-r-test
