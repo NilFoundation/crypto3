@@ -320,26 +320,6 @@ jobs:
         env:
             - CXX=clang++-8 CXXSTD=c++17
 
-
-
-before_install:
-    - if [[ $TRAVIS_OS_NAME == linux && $TRAVIS_COMPILER == clang ]]; then
-        sudo apt-get update;
-        wget -O - http://apt.llvm.org/llvm-snapshot.gpg.key|sudo apt-key add -;
-        sudo apt-add-repository "deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial-${COMPILER_VERSION} main";
-        sudo apt-get update && sudo apt-get install clang-${COMPILER_VERSION};
-        export CC=/usr/bin/clang-${COMPILER_VERSION};
-        export CXX=/usr/bin/clang++-${COMPILER_VERSION};
-      fi
-    - if [[ $TRAVIS_OS_NAME == linux && $TRAVIS_COMPILER == gcc ]]; then
-        sudo apt-add-repository -y ppa:ubuntu-toolchain-r/test;
-        sudo apt-get update;
-        sudo apt-get install gcc-${COMPILER_VERSION} g++-${COMPILER_VERSION};
-        export CC=/usr/bin/gcc-${COMPILER_VERSION};
-        export CXX=/usr/bin/g++-${COMPILER_VERSION};
-      fi
-
-
 install:
     - cd ..
     - git clone --depth 1 https://github.com/boostorg/boost.git boost-root;
