@@ -103,12 +103,8 @@ namespace nil {
             public:
                 typedef haifa_construction<stream_endian::little_octet_big_bit, policy_type::digest_bits,
                                            typename policy_type::iv_generator, blake2b_compressor<DigestBits>>
-                    construction_type_;
-#ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES
-                typedef construction_type_ construction_type;
-#else
-                struct construction_type : construction_type_ {};
-#endif
+                    construction_type;
+
                 template<typename StateAccumulator, std::size_t ValueBits>
                 struct stream_processor {
                     struct params_type {
