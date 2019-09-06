@@ -19,7 +19,8 @@ endif()
 
 cm_find_package(${CMAKE_WORKSPACE_NAME}_block)
 
-option(BUILD_UNIT_TESTS "Build unit tests" FALSE)
+option(BUILD_WITH_CCACHE "Build with ccache usage" TRUE)
+option(BUILD_TESTS "Build unit tests" FALSE)
 
 option(CRYPTO3_HASH_BLAKE2B "Build with Blake2 hash support" TRUE)
 option(CRYPTO3_HASH_CHECKSUM_ADLER "Build with Adler checksum support" TRUE)
@@ -319,6 +320,6 @@ cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
           INCLUDE include
           NAMESPACE ${CMAKE_WORKSPACE_NAME}::)
 
-if(BUILD_UNIT_TESTS)
+if(BUILD_TESTS)
     add_subdirectory(test)
 endif()

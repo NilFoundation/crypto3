@@ -64,12 +64,8 @@ namespace nil {
                     stream_endian::little_octet_big_bit, policy_type::digest_bits, typename policy_type::iv_generator,
                     matyas_meyer_oseas_compressor<block_cipher_type, detail::state_adder,
                                                   skein_key_converter<DigestBits>>>
-                    construction_type_;
-#ifdef CRYPTO3_HASH_NO_HIDE_INTERNAL_TYPES
-                typedef construction_type_ construction_type;
-#else
-                struct construction_type : construction_type_ {};
-#endif
+                    construction_type;
+
                 template<typename StateAccumulator, std::size_t ValueBits>
                 struct stream_processor {
                     struct params_type {
