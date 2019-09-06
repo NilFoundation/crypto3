@@ -10,6 +10,8 @@
 #ifndef CRYPTO3_STREAM_CHACHA_AVX2_IMPL_HPP
 #define CRYPTO3_STREAM_CHACHA_AVX2_IMPL_HPP
 
+#include <nil/crypto3/build.hpp>
+
 #include <nil/crypto3/stream/detail/chacha/chacha_policy.hpp>
 
 #include <immintrin.h>
@@ -40,22 +42,22 @@ namespace nil {
                         const word_type C = 0xFFFFFFFF - schedule[12];
                         const __m256i CTR1 = _mm256_set_epi32(C < 7, C < 6, C < 5, C < 4, C < 3, C < 2, C < 1, 0);
 
-                        __m256i R00 = _mm256_set1_epi32(state[0]);
-                        __m256i R01 = _mm256_set1_epi32(state[1]);
-                        __m256i R02 = _mm256_set1_epi32(state[2]);
-                        __m256i R03 = _mm256_set1_epi32(state[3]);
-                        __m256i R04 = _mm256_set1_epi32(state[4]);
-                        __m256i R05 = _mm256_set1_epi32(state[5]);
-                        __m256i R06 = _mm256_set1_epi32(state[6]);
-                        __m256i R07 = _mm256_set1_epi32(state[7]);
-                        __m256i R08 = _mm256_set1_epi32(state[8]);
-                        __m256i R09 = _mm256_set1_epi32(state[9]);
-                        __m256i R10 = _mm256_set1_epi32(state[10]);
-                        __m256i R11 = _mm256_set1_epi32(state[11]);
-                        __m256i R12 = _mm256_set1_epi32(state[12]) + CTR0;
-                        __m256i R13 = _mm256_set1_epi32(state[13]) + CTR1;
-                        __m256i R14 = _mm256_set1_epi32(state[14]);
-                        __m256i R15 = _mm256_set1_epi32(state[15]);
+                        __m256i R00 = _mm256_set1_epi32(schedule[0]);
+                        __m256i R01 = _mm256_set1_epi32(schedule[1]);
+                        __m256i R02 = _mm256_set1_epi32(schedule[2]);
+                        __m256i R03 = _mm256_set1_epi32(schedule[3]);
+                        __m256i R04 = _mm256_set1_epi32(schedule[4]);
+                        __m256i R05 = _mm256_set1_epi32(schedule[5]);
+                        __m256i R06 = _mm256_set1_epi32(schedule[6]);
+                        __m256i R07 = _mm256_set1_epi32(schedule[7]);
+                        __m256i R08 = _mm256_set1_epi32(schedule[8]);
+                        __m256i R09 = _mm256_set1_epi32(schedule[9]);
+                        __m256i R10 = _mm256_set1_epi32(schedule[10]);
+                        __m256i R11 = _mm256_set1_epi32(schedule[11]);
+                        __m256i R12 = _mm256_set1_epi32(schedule[12]) + CTR0;
+                        __m256i R13 = _mm256_set1_epi32(schedule[13]) + CTR1;
+                        __m256i R14 = _mm256_set1_epi32(schedule[14]);
+                        __m256i R15 = _mm256_set1_epi32(schedule[15]);
 
                         for (size_t r = 0; r != rounds / 2; ++r) {
                             R00 += R04;
@@ -187,22 +189,22 @@ namespace nil {
                             R04 = _mm256_or_si256(_mm256_slli_epi32(R04, 7), _mm256_srli_epi32(R04, 32 - 7));
                         }
 
-                        R00 += _mm256_set1_epi32(state[0]);
-                        R01 += _mm256_set1_epi32(state[1]);
-                        R02 += _mm256_set1_epi32(state[2]);
-                        R03 += _mm256_set1_epi32(state[3]);
-                        R04 += _mm256_set1_epi32(state[4]);
-                        R05 += _mm256_set1_epi32(state[5]);
-                        R06 += _mm256_set1_epi32(state[6]);
-                        R07 += _mm256_set1_epi32(state[7]);
-                        R08 += _mm256_set1_epi32(state[8]);
-                        R09 += _mm256_set1_epi32(state[9]);
-                        R10 += _mm256_set1_epi32(state[10]);
-                        R11 += _mm256_set1_epi32(state[11]);
-                        R12 += _mm256_set1_epi32(state[12]) + CTR0;
-                        R13 += _mm256_set1_epi32(state[13]) + CTR1;
-                        R14 += _mm256_set1_epi32(state[14]);
-                        R15 += _mm256_set1_epi32(state[15]);
+                        R00 += _mm256_set1_epi32(schedule[0]);
+                        R01 += _mm256_set1_epi32(schedule[1]);
+                        R02 += _mm256_set1_epi32(schedule[2]);
+                        R03 += _mm256_set1_epi32(schedule[3]);
+                        R04 += _mm256_set1_epi32(schedule[4]);
+                        R05 += _mm256_set1_epi32(schedule[5]);
+                        R06 += _mm256_set1_epi32(schedule[6]);
+                        R07 += _mm256_set1_epi32(schedule[7]);
+                        R08 += _mm256_set1_epi32(schedule[8]);
+                        R09 += _mm256_set1_epi32(schedule[9]);
+                        R10 += _mm256_set1_epi32(schedule[10]);
+                        R11 += _mm256_set1_epi32(schedule[11]);
+                        R12 += _mm256_set1_epi32(schedule[12]) + CTR0;
+                        R13 += _mm256_set1_epi32(schedule[13]) + CTR1;
+                        R14 += _mm256_set1_epi32(schedule[14]);
+                        R15 += _mm256_set1_epi32(schedule[15]);
 
                         __m256i T0 = _mm256_unpacklo_epi32(R00, R01);
                         __m256i T1 = _mm256_unpacklo_epi32(R02, R03);
@@ -266,14 +268,14 @@ namespace nil {
 
                         _mm256_zeroall();
 
-                        state[12] += 8;
-                        if (state[12] < 8)
-                            state[13]++;
+                        schedule[12] += 8;
+                        if (schedule[12] < 8)
+                            schedule[13]++;
                     }
-                }
-            };    // namespace detail
-        }         // namespace stream
-    }             // namespace crypto3
+                };
+            }    // namespace detail
+        }        // namespace stream
+    }            // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_CHACHA_AVX2_IMPL_HPP

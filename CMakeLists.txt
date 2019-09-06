@@ -9,9 +9,13 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake"
      "${CMAKE_CURRENT_LIST_DIR}/cmake/packages"
      "${CMAKE_CURRENT_LIST_DIR}/cmake/modules/share/modules/cmake")
 
+cm_find_package(CM)
 include(CMConfig)
 include(CMDeploy)
 include(CMSetupVersion)
+
+include(CheckSSE)
+include(CheckAVX)
 
 if(NOT CMAKE_WORKSPACE_NAME OR NOT ("${CMAKE_WORKSPACE_NAME}" STREQUAL "crypto3"))
     cm_workspace(crypto3)
@@ -19,12 +23,29 @@ endif()
 
 cm_project(stream WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME} LANGUAGES C CXX)
 
-cm_find_package(CM)
-include(CMDeploy)
-include(CMSetupVersion)
+check_sse()
+check_avx()
 
 option(BUILD_WITH_CCACHE "Build with ccache usage" TRUE)
 option(BUILD_TESTS "Build unit tests" FALSE)
+option(CRYPTO3_STREAM_CHACHA "Build with CHACHA stream encryption support" TRUE)
+option(CRYPTO3_STREAM_SALSA20 "Build with SALSA20 stream encryption support" TRUE)
+option(CRYPTO3_STREAM_RC4 "Build with RC4 stream encryption support" TRUE)
+
+if(UNIX AND BUILD_WITH_CCACHE)
+    find_program(CCACHE_FOUND ccache)
+    if(CCACHE_FOUND)
+        set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ccache)
+        set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK ccache)
+    endif(CCACHE_FOUND)
+endif()
+
+if(NOT Boost_CONTAINER_FOUND OR NOT Boost_FOUND)
+    cm_find_package(Boost COMPONENTS container)
+endif()
+
+configure_file(${CMAKE_CURRENT_LIST_DIR}/cmake/build.hpp.in
+               ${CMAKE_BINARY_DIR}/include/nil/${CMAKE_WORKSPACE_NAME}/build.hpp @ONLY)
 
 list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
      )
@@ -32,25 +53,14 @@ list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
 list(APPEND ${CURRENT_PROJECT_NAME}_UNGROUPED_SOURCES
      )
 
-option(CRYPTO3_STREAM_CHACHA "Build with CHACHA stream encryption support" TRUE)
-option(CRYPTO3_STREAM_SALSA20 "Build with SALSA20 stream encryption support" TRUE)
-option(CRYPTO3_STREAM_RC4 "Build with RC4 stream encryption support" TRUE)
-
 if(CRYPTO3_STREAM_CHACHA)
     list(APPEND ${CURRENT_PROJECT_NAME}_CHACHA_HEADERS
          include/nil/crypto3/stream/chacha.hpp
          )
 
-    if(${CMAKE_TARGET_ARCHITECTURE} STREQUAL "x86_64" OR
-       ${CMAKE_TARGET_ARCHITECTURE} STREQUAL "x86")
-        add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_CHACHA_SSE2)
-    endif()
-
     list(APPEND ${CURRENT_PROJECT_NAME}_CHACHA_SOURCES
          src/chacha_policy.cpp
          )
-
-    add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_CHACHA)
     list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
          ${${CURRENT_PROJECT_NAME}_CHACHA_HEADERS}
          )
@@ -68,7 +78,6 @@ if(CRYPTO3_STREAM_SALSA20)
          src/salsa20_policy.cpp
          )
 
-    add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_SALSA20)
     list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
          ${${CURRENT_PROJECT_NAME}_SALSA20_HEADERS}
          )
@@ -85,7 +94,6 @@ if(CRYPTO3_STREAM_RC4)
     list(APPEND ${CURRENT_PROJECT_NAME}_RC4_SOURCES
          )
 
-    add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_RC4)
     list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
          ${${CURRENT_PROJECT_NAME}_RC4_HEADERS}
          )
@@ -128,6 +136,19 @@ if((NOT CMAKE_CXX_STANDARD) OR (CMAKE_CXX_STANDARD LESS 17))
                                "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>"
 
                                ${Boost_INCLUDE_DIRS})
+
+    if(${CMAKE_TARGET_ARCHITECTURE} STREQUAL "x86_64" OR
+       ${CMAKE_TARGET_ARCHITECTURE} STREQUAL "x86")
+        if(CXX_HAS_AVX_2)
+            target_compile_definitions(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PUBLIC
+                                       ${CMAKE_UPPER_WORKSPACE_NAME}_HAS_CHACHA_AVX2)
+            target_compile_options(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PUBLIC "-mavx2")
+        elseif(SSE2_FOUND)
+            target_compile_definitions(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PUBLIC
+                                       ${CMAKE_UPPER_WORKSPACE_NAME}_HAS_CHACHA_SSE2)
+            target_compile_options(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PUBLIC "-msse2")
+        endif()
+    endif()
 else()
     add_library(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE)
     target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
@@ -139,6 +160,18 @@ else()
                                "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>"
 
                                ${Boost_INCLUDE_DIRS})
+    if(${CMAKE_TARGET_ARCHITECTURE} STREQUAL "x86_64" OR
+       ${CMAKE_TARGET_ARCHITECTURE} STREQUAL "x86")
+        if(CXX_HAS_AVX_2)
+            target_compile_definitions(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
+                                       ${CMAKE_UPPER_WORKSPACE_NAME}_HAS_CHACHA_AVX2)
+            target_compile_options(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE "-mavx2")
+        elseif(SSE2_FOUND)
+            target_compile_definitions(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
+                                       ${CMAKE_UPPER_WORKSPACE_NAME}_HAS_CHACHA_SSE2)
+            target_compile_options(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE "-msse2")
+        endif()
+    endif()
 endif()
 
 cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
