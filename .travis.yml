@@ -12,221 +12,221 @@ python: "2.7"
 
 jobs:
   include:
+
       - os: linux
         dist: xenial
-        env: TOOLSET=clang COMPILER_VERSION=clang++ CXXSTD=c++11
+        env: TOOLSET=clang COMPILER_VERSION=5.0 CXXSTD=c++11
         compiler: clang
 
 
       - os: linux
         dist: xenial
-        env: TOOLSET=clang COMPILER_VERSION=clang++ CXXSTD=c++11
+        env: TOOLSET=clang COMPILER_VERSION=6.0 CXXSTD=c++11
         compiler: clang
 
 
       - os: linux
         dist: xenial
-        env: TOOLSET=clang COMPILER_VERSION=clang++ CXXSTD=c++11
+        env: TOOLSET=clang COMPILER_VERSION=7 CXXSTD=c++11
         compiler: clang
 
 
       - os: linux
         dist: xenial
-        env: TOOLSET=clang COMPILER_VERSION=clang++ CXXSTD=c++11
+        env: TOOLSET=clang COMPILER_VERSION=8 CXXSTD=c++11
         compiler: clang
 
 
       - os: linux
         dist: xenial
-        env: TOOLSET=clang COMPILER_VERSION=clang++ CXXSTD=c++11
+        env: TOOLSET=clang COMPILER_VERSION=9 CXXSTD=c++11
         compiler: clang
 
 
       - os: linux
         dist: xenial
-        env: TOOLSET=gcc COMPILER_VERSION=gcc++ CXXSTD=c++11
+        env: TOOLSET=gcc COMPILER_VERSION=5 CXXSTD=c++11
         compiler: gcc
 
 
       - os: linux
         dist: xenial
-        env: TOOLSET=gcc COMPILER_VERSION=gcc++ CXXSTD=c++11
+        env: TOOLSET=gcc COMPILER_VERSION=6 CXXSTD=c++11
         compiler: gcc
 
 
       - os: linux
         dist: xenial
-        env: TOOLSET=gcc COMPILER_VERSION=gcc++ CXXSTD=c++11
+        env: TOOLSET=gcc COMPILER_VERSION=7 CXXSTD=c++11
         compiler: gcc
 
 
       - os: linux
         dist: xenial
-        env: TOOLSET=gcc COMPILER_VERSION=gcc++ CXXSTD=c++11
+        env: TOOLSET=gcc COMPILER_VERSION=8 CXXSTD=c++11
         compiler: gcc
 
 
       - os: linux
         dist: xenial
-        env: TOOLSET=clang COMPILER_VERSION=clang++ CXXSTD=c++14
+        env: TOOLSET=clang COMPILER_VERSION=5.0 CXXSTD=c++14
         compiler: clang
 
 
       - os: linux
         dist: xenial
-        env: TOOLSET=clang COMPILER_VERSION=clang++ CXXSTD=c++14
+        env: TOOLSET=clang COMPILER_VERSION=6.0 CXXSTD=c++14
         compiler: clang
 
 
       - os: linux
         dist: xenial
-        env: TOOLSET=clang COMPILER_VERSION=clang++ CXXSTD=c++14
+        env: TOOLSET=clang COMPILER_VERSION=7 CXXSTD=c++14
         compiler: clang
 
 
       - os: linux
         dist: xenial
-        env: TOOLSET=clang COMPILER_VERSION=clang++ CXXSTD=c++14
+        env: TOOLSET=clang COMPILER_VERSION=8 CXXSTD=c++14
         compiler: clang
 
 
       - os: linux
         dist: xenial
-        env: TOOLSET=clang COMPILER_VERSION=clang++ CXXSTD=c++14
+        env: TOOLSET=clang COMPILER_VERSION=9 CXXSTD=c++14
         compiler: clang
 
 
       - os: linux
         dist: xenial
-        env: TOOLSET=gcc COMPILER_VERSION=gcc++ CXXSTD=c++14
+        env: TOOLSET=gcc COMPILER_VERSION=5 CXXSTD=c++14
         compiler: gcc
 
 
       - os: linux
         dist: xenial
-        env: TOOLSET=gcc COMPILER_VERSION=gcc++ CXXSTD=c++14
+        env: TOOLSET=gcc COMPILER_VERSION=6 CXXSTD=c++14
         compiler: gcc
 
 
       - os: linux
         dist: xenial
-        env: TOOLSET=gcc COMPILER_VERSION=gcc++ CXXSTD=c++14
+        env: TOOLSET=gcc COMPILER_VERSION=7 CXXSTD=c++14
         compiler: gcc
 
 
       - os: linux
         dist: xenial
-        env: TOOLSET=gcc COMPILER_VERSION=gcc++ CXXSTD=c++14
+        env: TOOLSET=gcc COMPILER_VERSION=8 CXXSTD=c++14
         compiler: gcc
 
 
       - os: linux
         dist: xenial
-        env: TOOLSET=clang COMPILER_VERSION=clang++ CXXSTD=c++1z
+        env: TOOLSET=clang COMPILER_VERSION=5.0 CXXSTD=c++1z
         compiler: clang
 
 
       - os: linux
         dist: xenial
-        env: TOOLSET=clang COMPILER_VERSION=clang++ CXXSTD=c++1z
+        env: TOOLSET=clang COMPILER_VERSION=6.0 CXXSTD=c++1z
         compiler: clang
 
 
       - os: linux
         dist: xenial
-        env: TOOLSET=clang COMPILER_VERSION=clang++ CXXSTD=c++1z
+        env: TOOLSET=clang COMPILER_VERSION=7 CXXSTD=c++1z
         compiler: clang
 
 
       - os: linux
         dist: xenial
-        env: TOOLSET=clang COMPILER_VERSION=clang++ CXXSTD=c++1z
+        env: TOOLSET=clang COMPILER_VERSION=8 CXXSTD=c++1z
         compiler: clang
 
 
       - os: linux
         dist: xenial
-        env: TOOLSET=clang COMPILER_VERSION=clang++ CXXSTD=c++1z
+        env: TOOLSET=clang COMPILER_VERSION=9 CXXSTD=c++1z
         compiler: clang
 
 
       - os: linux
         dist: xenial
-        env: TOOLSET=gcc COMPILER_VERSION=gcc++ CXXSTD=c++1z
+        env: TOOLSET=gcc COMPILER_VERSION=5 CXXSTD=c++1z
         compiler: gcc
 
 
       - os: linux
         dist: xenial
-        env: TOOLSET=gcc COMPILER_VERSION=gcc++ CXXSTD=c++1z
+        env: TOOLSET=gcc COMPILER_VERSION=6 CXXSTD=c++1z
         compiler: gcc
 
 
       - os: linux
         dist: xenial
-        env: TOOLSET=gcc COMPILER_VERSION=gcc++ CXXSTD=c++1z
+        env: TOOLSET=gcc COMPILER_VERSION=7 CXXSTD=c++1z
         compiler: gcc
 
 
       - os: linux
         dist: xenial
-        env: TOOLSET=gcc COMPILER_VERSION=gcc++ CXXSTD=c++1z
+        env: TOOLSET=gcc COMPILER_VERSION=8 CXXSTD=c++1z
         compiler: gcc
 
 
       - os: linux
         dist: xenial
-        env: TOOLSET=clang COMPILER_VERSION=clang++ CXXSTD=c++17
+        env: TOOLSET=clang COMPILER_VERSION=5.0 CXXSTD=c++17
         compiler: clang
 
 
       - os: linux
         dist: xenial
-        env: TOOLSET=clang COMPILER_VERSION=clang++ CXXSTD=c++17
+        env: TOOLSET=clang COMPILER_VERSION=6.0 CXXSTD=c++17
         compiler: clang
 
 
       - os: linux
         dist: xenial
-        env: TOOLSET=clang COMPILER_VERSION=clang++ CXXSTD=c++17
+        env: TOOLSET=clang COMPILER_VERSION=7 CXXSTD=c++17
         compiler: clang
 
 
       - os: linux
         dist: xenial
-        env: TOOLSET=clang COMPILER_VERSION=clang++ CXXSTD=c++17
+        env: TOOLSET=clang COMPILER_VERSION=8 CXXSTD=c++17
         compiler: clang
 
 
       - os: linux
         dist: xenial
-        env: TOOLSET=clang COMPILER_VERSION=clang++ CXXSTD=c++17
+        env: TOOLSET=clang COMPILER_VERSION=9 CXXSTD=c++17
         compiler: clang
 
 
       - os: linux
         dist: xenial
-        env: TOOLSET=gcc COMPILER_VERSION=gcc++ CXXSTD=c++17
+        env: TOOLSET=gcc COMPILER_VERSION=5 CXXSTD=c++17
         compiler: gcc
 
 
       - os: linux
         dist: xenial
-        env: TOOLSET=gcc COMPILER_VERSION=gcc++ CXXSTD=c++17
+        env: TOOLSET=gcc COMPILER_VERSION=6 CXXSTD=c++17
         compiler: gcc
 
 
       - os: linux
         dist: xenial
-        env: TOOLSET=gcc COMPILER_VERSION=gcc++ CXXSTD=c++17
+        env: TOOLSET=gcc COMPILER_VERSION=7 CXXSTD=c++17
         compiler: gcc
 
 
       - os: linux
         dist: xenial
-        env: TOOLSET=gcc COMPILER_VERSION=gcc++ CXXSTD=c++17
+        env: TOOLSET=gcc COMPILER_VERSION=8 CXXSTD=c++17
         compiler: gcc
-
 
 before_install:
     - if [[ $TRAVIS_OS_NAME == linux && $TRAVIS_COMPILER == clang ]]; then
