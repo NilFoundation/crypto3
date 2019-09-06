@@ -13,220 +13,257 @@ python: "2.7"
 jobs:
   include:
 
-      - os: linux
-        dist: xenial
-        env: TOOLSET=clang COMPILER_VERSION=5.0 CXXSTD=c++11
-        compiler: clang
+      - compiler: gcc
+        addons:
+            apt:
+                sources: ['ubuntu-toolchain-r-test']
+                packages: ['g++-7']
+        env:
+            - CXX=g++-7 CXXSTD=c++11
+
+
+      - compiler: gcc
+        addons:
+            apt:
+                sources: ['ubuntu-toolchain-r-test']
+                packages: ['g++-8']
+        env:
+            - CXX=g++-8 CXXSTD=c++11
+
+
+      - compiler: gcc
+        addons:
+            apt:
+                sources: ['ubuntu-toolchain-r-test']
+                packages: ['g++-9']
+        env:
+            - CXX=g++-9 CXXSTD=c++11
+
+
+      - compiler: gcc
+        addons:
+            apt:
+                sources: ['ubuntu-toolchain-r-test']
+                packages: ['g++-7']
+        env:
+            - CXX=g++-7 CXXSTD=c++14
+
+
+      - compiler: gcc
+        addons:
+            apt:
+                sources: ['ubuntu-toolchain-r-test']
+                packages: ['g++-8']
+        env:
+            - CXX=g++-8 CXXSTD=c++14
+
+
+      - compiler: gcc
+        addons:
+            apt:
+                sources: ['ubuntu-toolchain-r-test']
+                packages: ['g++-9']
+        env:
+            - CXX=g++-9 CXXSTD=c++14
+
+
+      - compiler: gcc
+        addons:
+            apt:
+                sources: ['ubuntu-toolchain-r-test']
+                packages: ['g++-7']
+        env:
+            - CXX=g++-7 CXXSTD=c++1z
+
+
+      - compiler: gcc
+        addons:
+            apt:
+                sources: ['ubuntu-toolchain-r-test']
+                packages: ['g++-8']
+        env:
+            - CXX=g++-8 CXXSTD=c++1z
+
+
+      - compiler: gcc
+        addons:
+            apt:
+                sources: ['ubuntu-toolchain-r-test']
+                packages: ['g++-9']
+        env:
+            - CXX=g++-9 CXXSTD=c++1z
+
+
+      - compiler: gcc
+        addons:
+            apt:
+                sources: ['ubuntu-toolchain-r-test']
+                packages: ['g++-7']
+        env:
+            - CXX=g++-7 CXXSTD=c++17
+
+
+      - compiler: gcc
+        addons:
+            apt:
+                sources: ['ubuntu-toolchain-r-test']
+                packages: ['g++-8']
+        env:
+            - CXX=g++-8 CXXSTD=c++17
+
+
+      - compiler: gcc
+        addons:
+            apt:
+                sources: ['ubuntu-toolchain-r-test']
+                packages: ['g++-9']
+        env:
+            - CXX=g++-9 CXXSTD=c++17
+
+
+      - compiler: clang
+        addons:
+            apt:
+                sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-xenial-5.0']
+                packages: ['clang-5.0', 'g++-7']
+        env:
+            - CXX=clang++-5.0 CXXSTD=c++11
+
+
+      - compiler: clang
+        addons:
+            apt:
+                sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-xenial-6.0']
+                packages: ['clang-6.0', 'g++-7']
+        env:
+            - CXX=clang++-6.0 CXXSTD=c++11
+
+
+      - compiler: clang
+        addons:
+            apt:
+                sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-xenial-7']
+                packages: ['clang-7', 'g++-7']
+        env:
+            - CXX=clang++-7 CXXSTD=c++11
+
+
+      - compiler: clang
+        addons:
+            apt:
+                sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-xenial-8']
+                packages: ['clang-8', 'g++-7']
+        env:
+            - CXX=clang++-8 CXXSTD=c++11
+
+
+      - compiler: clang
+        addons:
+            apt:
+                sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-xenial-5.0']
+                packages: ['clang-5.0', 'g++-7']
+        env:
+            - CXX=clang++-5.0 CXXSTD=c++14
+
+
+      - compiler: clang
+        addons:
+            apt:
+                sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-xenial-6.0']
+                packages: ['clang-6.0', 'g++-7']
+        env:
+            - CXX=clang++-6.0 CXXSTD=c++14
+
+
+      - compiler: clang
+        addons:
+            apt:
+                sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-xenial-7']
+                packages: ['clang-7', 'g++-7']
+        env:
+            - CXX=clang++-7 CXXSTD=c++14
+
+
+      - compiler: clang
+        addons:
+            apt:
+                sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-xenial-8']
+                packages: ['clang-8', 'g++-7']
+        env:
+            - CXX=clang++-8 CXXSTD=c++14
+
+
+      - compiler: clang
+        addons:
+            apt:
+                sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-xenial-5.0']
+                packages: ['clang-5.0', 'g++-7']
+        env:
+            - CXX=clang++-5.0 CXXSTD=c++1z
+
+
+      - compiler: clang
+        addons:
+            apt:
+                sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-xenial-6.0']
+                packages: ['clang-6.0', 'g++-7']
+        env:
+            - CXX=clang++-6.0 CXXSTD=c++1z
+
+
+      - compiler: clang
+        addons:
+            apt:
+                sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-xenial-7']
+                packages: ['clang-7', 'g++-7']
+        env:
+            - CXX=clang++-7 CXXSTD=c++1z
+
+
+      - compiler: clang
+        addons:
+            apt:
+                sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-xenial-8']
+                packages: ['clang-8', 'g++-7']
+        env:
+            - CXX=clang++-8 CXXSTD=c++1z
+
+
+      - compiler: clang
+        addons:
+            apt:
+                sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-xenial-5.0']
+                packages: ['clang-5.0', 'g++-7']
+        env:
+            - CXX=clang++-5.0 CXXSTD=c++17
+
+
+      - compiler: clang
+        addons:
+            apt:
+                sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-xenial-6.0']
+                packages: ['clang-6.0', 'g++-7']
+        env:
+            - CXX=clang++-6.0 CXXSTD=c++17
+
+
+      - compiler: clang
+        addons:
+            apt:
+                sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-xenial-7']
+                packages: ['clang-7', 'g++-7']
+        env:
+            - CXX=clang++-7 CXXSTD=c++17
+
+
+      - compiler: clang
+        addons:
+            apt:
+                sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-xenial-8']
+                packages: ['clang-8', 'g++-7']
+        env:
+            - CXX=clang++-8 CXXSTD=c++17
 
-
-      - os: linux
-        dist: xenial
-        env: TOOLSET=clang COMPILER_VERSION=6.0 CXXSTD=c++11
-        compiler: clang
-
-
-      - os: linux
-        dist: xenial
-        env: TOOLSET=clang COMPILER_VERSION=7 CXXSTD=c++11
-        compiler: clang
-
-
-      - os: linux
-        dist: xenial
-        env: TOOLSET=clang COMPILER_VERSION=8 CXXSTD=c++11
-        compiler: clang
-
-
-      - os: linux
-        dist: xenial
-        env: TOOLSET=clang COMPILER_VERSION=9 CXXSTD=c++11
-        compiler: clang
-
-
-      - os: linux
-        dist: xenial
-        env: TOOLSET=gcc COMPILER_VERSION=5 CXXSTD=c++11
-        compiler: gcc
-
-
-      - os: linux
-        dist: xenial
-        env: TOOLSET=gcc COMPILER_VERSION=6 CXXSTD=c++11
-        compiler: gcc
-
-
-      - os: linux
-        dist: xenial
-        env: TOOLSET=gcc COMPILER_VERSION=7 CXXSTD=c++11
-        compiler: gcc
-
-
-      - os: linux
-        dist: xenial
-        env: TOOLSET=gcc COMPILER_VERSION=8 CXXSTD=c++11
-        compiler: gcc
-
-
-      - os: linux
-        dist: xenial
-        env: TOOLSET=clang COMPILER_VERSION=5.0 CXXSTD=c++14
-        compiler: clang
-
-
-      - os: linux
-        dist: xenial
-        env: TOOLSET=clang COMPILER_VERSION=6.0 CXXSTD=c++14
-        compiler: clang
-
-
-      - os: linux
-        dist: xenial
-        env: TOOLSET=clang COMPILER_VERSION=7 CXXSTD=c++14
-        compiler: clang
-
-
-      - os: linux
-        dist: xenial
-        env: TOOLSET=clang COMPILER_VERSION=8 CXXSTD=c++14
-        compiler: clang
-
-
-      - os: linux
-        dist: xenial
-        env: TOOLSET=clang COMPILER_VERSION=9 CXXSTD=c++14
-        compiler: clang
-
-
-      - os: linux
-        dist: xenial
-        env: TOOLSET=gcc COMPILER_VERSION=5 CXXSTD=c++14
-        compiler: gcc
-
-
-      - os: linux
-        dist: xenial
-        env: TOOLSET=gcc COMPILER_VERSION=6 CXXSTD=c++14
-        compiler: gcc
-
-
-      - os: linux
-        dist: xenial
-        env: TOOLSET=gcc COMPILER_VERSION=7 CXXSTD=c++14
-        compiler: gcc
-
-
-      - os: linux
-        dist: xenial
-        env: TOOLSET=gcc COMPILER_VERSION=8 CXXSTD=c++14
-        compiler: gcc
-
-
-      - os: linux
-        dist: xenial
-        env: TOOLSET=clang COMPILER_VERSION=5.0 CXXSTD=c++1z
-        compiler: clang
-
-
-      - os: linux
-        dist: xenial
-        env: TOOLSET=clang COMPILER_VERSION=6.0 CXXSTD=c++1z
-        compiler: clang
-
-
-      - os: linux
-        dist: xenial
-        env: TOOLSET=clang COMPILER_VERSION=7 CXXSTD=c++1z
-        compiler: clang
-
-
-      - os: linux
-        dist: xenial
-        env: TOOLSET=clang COMPILER_VERSION=8 CXXSTD=c++1z
-        compiler: clang
-
-
-      - os: linux
-        dist: xenial
-        env: TOOLSET=clang COMPILER_VERSION=9 CXXSTD=c++1z
-        compiler: clang
-
-
-      - os: linux
-        dist: xenial
-        env: TOOLSET=gcc COMPILER_VERSION=5 CXXSTD=c++1z
-        compiler: gcc
-
-
-      - os: linux
-        dist: xenial
-        env: TOOLSET=gcc COMPILER_VERSION=6 CXXSTD=c++1z
-        compiler: gcc
-
-
-      - os: linux
-        dist: xenial
-        env: TOOLSET=gcc COMPILER_VERSION=7 CXXSTD=c++1z
-        compiler: gcc
-
-
-      - os: linux
-        dist: xenial
-        env: TOOLSET=gcc COMPILER_VERSION=8 CXXSTD=c++1z
-        compiler: gcc
-
-
-      - os: linux
-        dist: xenial
-        env: TOOLSET=clang COMPILER_VERSION=5.0 CXXSTD=c++17
-        compiler: clang
-
-
-      - os: linux
-        dist: xenial
-        env: TOOLSET=clang COMPILER_VERSION=6.0 CXXSTD=c++17
-        compiler: clang
-
-
-      - os: linux
-        dist: xenial
-        env: TOOLSET=clang COMPILER_VERSION=7 CXXSTD=c++17
-        compiler: clang
-
-
-      - os: linux
-        dist: xenial
-        env: TOOLSET=clang COMPILER_VERSION=8 CXXSTD=c++17
-        compiler: clang
-
-
-      - os: linux
-        dist: xenial
-        env: TOOLSET=clang COMPILER_VERSION=9 CXXSTD=c++17
-        compiler: clang
-
-
-      - os: linux
-        dist: xenial
-        env: TOOLSET=gcc COMPILER_VERSION=5 CXXSTD=c++17
-        compiler: gcc
-
-
-      - os: linux
-        dist: xenial
-        env: TOOLSET=gcc COMPILER_VERSION=6 CXXSTD=c++17
-        compiler: gcc
-
-
-      - os: linux
-        dist: xenial
-        env: TOOLSET=gcc COMPILER_VERSION=7 CXXSTD=c++17
-        compiler: gcc
-
-
-      - os: linux
-        dist: xenial
-        env: TOOLSET=gcc COMPILER_VERSION=8 CXXSTD=c++17
-        compiler: gcc
 
 before_install:
     - if [[ $TRAVIS_OS_NAME == linux && $TRAVIS_COMPILER == clang ]]; then
@@ -268,6 +305,7 @@ install:
       fi
 
 script:
+    - clang++
     - |-
         echo "using $TOOLSET : : $COMPILER : <cxxflags>-std=$CXXSTD ;" > ~/user-config.jam
     - if [[ $TRAVIS_OS_NAME == linux ]]; then
