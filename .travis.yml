@@ -12,357 +12,238 @@ python: "2.7"
 
 jobs:
   include:
-
-        -   os: linux
-            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++11 TEST_SUITE=tests-codec
-            addons:
-                apt:
-                    packages:
-                        - clang++-5
-                        - cmake
-                    sources:
-                        - ubuntu-toolchain-r-test
+      - os: linux
+        dist: xenial
+        env: TOOLSET=clang COMPILER_VERSION=clang++ CXXSTD=c++11
+        compiler: clang
 
 
-        -   os: linux
-            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++11 TEST_SUITE=tests-codec
-            addons:
-                apt:
-                    packages:
-                        - clang++-6
-                        - cmake
-                    sources:
-                        - ubuntu-toolchain-r-test
+      - os: linux
+        dist: xenial
+        env: TOOLSET=clang COMPILER_VERSION=clang++ CXXSTD=c++11
+        compiler: clang
 
 
-        -   os: linux
-            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++11 TEST_SUITE=tests-codec
-            addons:
-                apt:
-                    packages:
-                        - clang++-7
-                        - cmake
-                    sources:
-                        - ubuntu-toolchain-r-test
+      - os: linux
+        dist: xenial
+        env: TOOLSET=clang COMPILER_VERSION=clang++ CXXSTD=c++11
+        compiler: clang
 
 
-        -   os: linux
-            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++11 TEST_SUITE=tests-codec
-            addons:
-                apt:
-                    packages:
-                        - clang++-8
-                        - cmake
-                    sources:
-                        - ubuntu-toolchain-r-test
+      - os: linux
+        dist: xenial
+        env: TOOLSET=clang COMPILER_VERSION=clang++ CXXSTD=c++11
+        compiler: clang
 
 
-        -   os: linux
-            env: TOOLSET=gcc COMPILER=gcc++ CXXSTD=c++11 TEST_SUITE=tests-codec
-            addons:
-                apt:
-                    packages:
-                        - g++-5
-                        - cmake
-                    sources:
-                        - ubuntu-toolchain-r-test
+      - os: linux
+        dist: xenial
+        env: TOOLSET=clang COMPILER_VERSION=clang++ CXXSTD=c++11
+        compiler: clang
 
 
-        -   os: linux
-            env: TOOLSET=gcc COMPILER=gcc++ CXXSTD=c++11 TEST_SUITE=tests-codec
-            addons:
-                apt:
-                    packages:
-                        - g++-6
-                        - cmake
-                    sources:
-                        - ubuntu-toolchain-r-test
+      - os: linux
+        dist: xenial
+        env: TOOLSET=gcc COMPILER_VERSION=gcc++ CXXSTD=c++11
+        compiler: gcc
 
 
-        -   os: linux
-            env: TOOLSET=gcc COMPILER=gcc++ CXXSTD=c++11 TEST_SUITE=tests-codec
-            addons:
-                apt:
-                    packages:
-                        - g++-7
-                        - cmake
-                    sources:
-                        - ubuntu-toolchain-r-test
+      - os: linux
+        dist: xenial
+        env: TOOLSET=gcc COMPILER_VERSION=gcc++ CXXSTD=c++11
+        compiler: gcc
 
 
-        -   os: linux
-            env: TOOLSET=gcc COMPILER=gcc++ CXXSTD=c++11 TEST_SUITE=tests-codec
-            addons:
-                apt:
-                    packages:
-                        - g++-8
-                        - cmake
-                    sources:
-                        - ubuntu-toolchain-r-test
+      - os: linux
+        dist: xenial
+        env: TOOLSET=gcc COMPILER_VERSION=gcc++ CXXSTD=c++11
+        compiler: gcc
 
 
-        -   os: linux
-            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=tests-codec
-            addons:
-                apt:
-                    packages:
-                        - clang++-5
-                        - cmake
-                    sources:
-                        - ubuntu-toolchain-r-test
+      - os: linux
+        dist: xenial
+        env: TOOLSET=gcc COMPILER_VERSION=gcc++ CXXSTD=c++11
+        compiler: gcc
 
 
-        -   os: linux
-            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=tests-codec
-            addons:
-                apt:
-                    packages:
-                        - clang++-6
-                        - cmake
-                    sources:
-                        - ubuntu-toolchain-r-test
+      - os: linux
+        dist: xenial
+        env: TOOLSET=clang COMPILER_VERSION=clang++ CXXSTD=c++14
+        compiler: clang
 
 
-        -   os: linux
-            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=tests-codec
-            addons:
-                apt:
-                    packages:
-                        - clang++-7
-                        - cmake
-                    sources:
-                        - ubuntu-toolchain-r-test
+      - os: linux
+        dist: xenial
+        env: TOOLSET=clang COMPILER_VERSION=clang++ CXXSTD=c++14
+        compiler: clang
 
 
-        -   os: linux
-            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++14 TEST_SUITE=tests-codec
-            addons:
-                apt:
-                    packages:
-                        - clang++-8
-                        - cmake
-                    sources:
-                        - ubuntu-toolchain-r-test
+      - os: linux
+        dist: xenial
+        env: TOOLSET=clang COMPILER_VERSION=clang++ CXXSTD=c++14
+        compiler: clang
 
 
-        -   os: linux
-            env: TOOLSET=gcc COMPILER=gcc++ CXXSTD=c++14 TEST_SUITE=tests-codec
-            addons:
-                apt:
-                    packages:
-                        - g++-5
-                        - cmake
-                    sources:
-                        - ubuntu-toolchain-r-test
+      - os: linux
+        dist: xenial
+        env: TOOLSET=clang COMPILER_VERSION=clang++ CXXSTD=c++14
+        compiler: clang
 
 
-        -   os: linux
-            env: TOOLSET=gcc COMPILER=gcc++ CXXSTD=c++14 TEST_SUITE=tests-codec
-            addons:
-                apt:
-                    packages:
-                        - g++-6
-                        - cmake
-                    sources:
-                        - ubuntu-toolchain-r-test
+      - os: linux
+        dist: xenial
+        env: TOOLSET=clang COMPILER_VERSION=clang++ CXXSTD=c++14
+        compiler: clang
 
 
-        -   os: linux
-            env: TOOLSET=gcc COMPILER=gcc++ CXXSTD=c++14 TEST_SUITE=tests-codec
-            addons:
-                apt:
-                    packages:
-                        - g++-7
-                        - cmake
-                    sources:
-                        - ubuntu-toolchain-r-test
+      - os: linux
+        dist: xenial
+        env: TOOLSET=gcc COMPILER_VERSION=gcc++ CXXSTD=c++14
+        compiler: gcc
 
 
-        -   os: linux
-            env: TOOLSET=gcc COMPILER=gcc++ CXXSTD=c++14 TEST_SUITE=tests-codec
-            addons:
-                apt:
-                    packages:
-                        - g++-8
-                        - cmake
-                    sources:
-                        - ubuntu-toolchain-r-test
+      - os: linux
+        dist: xenial
+        env: TOOLSET=gcc COMPILER_VERSION=gcc++ CXXSTD=c++14
+        compiler: gcc
 
 
-        -   os: linux
-            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++1z TEST_SUITE=tests-codec
-            addons:
-                apt:
-                    packages:
-                        - clang++-5
-                        - cmake
-                    sources:
-                        - ubuntu-toolchain-r-test
+      - os: linux
+        dist: xenial
+        env: TOOLSET=gcc COMPILER_VERSION=gcc++ CXXSTD=c++14
+        compiler: gcc
 
 
-        -   os: linux
-            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++1z TEST_SUITE=tests-codec
-            addons:
-                apt:
-                    packages:
-                        - clang++-6
-                        - cmake
-                    sources:
-                        - ubuntu-toolchain-r-test
+      - os: linux
+        dist: xenial
+        env: TOOLSET=gcc COMPILER_VERSION=gcc++ CXXSTD=c++14
+        compiler: gcc
 
 
-        -   os: linux
-            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++1z TEST_SUITE=tests-codec
-            addons:
-                apt:
-                    packages:
-                        - clang++-7
-                        - cmake
-                    sources:
-                        - ubuntu-toolchain-r-test
+      - os: linux
+        dist: xenial
+        env: TOOLSET=clang COMPILER_VERSION=clang++ CXXSTD=c++1z
+        compiler: clang
 
 
-        -   os: linux
-            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++1z TEST_SUITE=tests-codec
-            addons:
-                apt:
-                    packages:
-                        - clang++-8
-                        - cmake
-                    sources:
-                        - ubuntu-toolchain-r-test
+      - os: linux
+        dist: xenial
+        env: TOOLSET=clang COMPILER_VERSION=clang++ CXXSTD=c++1z
+        compiler: clang
 
 
-        -   os: linux
-            env: TOOLSET=gcc COMPILER=gcc++ CXXSTD=c++1z TEST_SUITE=tests-codec
-            addons:
-                apt:
-                    packages:
-                        - g++-5
-                        - cmake
-                    sources:
-                        - ubuntu-toolchain-r-test
+      - os: linux
+        dist: xenial
+        env: TOOLSET=clang COMPILER_VERSION=clang++ CXXSTD=c++1z
+        compiler: clang
 
 
-        -   os: linux
-            env: TOOLSET=gcc COMPILER=gcc++ CXXSTD=c++1z TEST_SUITE=tests-codec
-            addons:
-                apt:
-                    packages:
-                        - g++-6
-                        - cmake
-                    sources:
-                        - ubuntu-toolchain-r-test
+      - os: linux
+        dist: xenial
+        env: TOOLSET=clang COMPILER_VERSION=clang++ CXXSTD=c++1z
+        compiler: clang
 
 
-        -   os: linux
-            env: TOOLSET=gcc COMPILER=gcc++ CXXSTD=c++1z TEST_SUITE=tests-codec
-            addons:
-                apt:
-                    packages:
-                        - g++-7
-                        - cmake
-                    sources:
-                        - ubuntu-toolchain-r-test
+      - os: linux
+        dist: xenial
+        env: TOOLSET=clang COMPILER_VERSION=clang++ CXXSTD=c++1z
+        compiler: clang
 
 
-        -   os: linux
-            env: TOOLSET=gcc COMPILER=gcc++ CXXSTD=c++1z TEST_SUITE=tests-codec
-            addons:
-                apt:
-                    packages:
-                        - g++-8
-                        - cmake
-                    sources:
-                        - ubuntu-toolchain-r-test
+      - os: linux
+        dist: xenial
+        env: TOOLSET=gcc COMPILER_VERSION=gcc++ CXXSTD=c++1z
+        compiler: gcc
 
 
-        -   os: linux
-            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++17 TEST_SUITE=tests-codec
-            addons:
-                apt:
-                    packages:
-                        - clang++-5
-                        - cmake
-                    sources:
-                        - ubuntu-toolchain-r-test
+      - os: linux
+        dist: xenial
+        env: TOOLSET=gcc COMPILER_VERSION=gcc++ CXXSTD=c++1z
+        compiler: gcc
 
 
-        -   os: linux
-            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++17 TEST_SUITE=tests-codec
-            addons:
-                apt:
-                    packages:
-                        - clang++-6
-                        - cmake
-                    sources:
-                        - ubuntu-toolchain-r-test
+      - os: linux
+        dist: xenial
+        env: TOOLSET=gcc COMPILER_VERSION=gcc++ CXXSTD=c++1z
+        compiler: gcc
 
 
-        -   os: linux
-            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++17 TEST_SUITE=tests-codec
-            addons:
-                apt:
-                    packages:
-                        - clang++-7
-                        - cmake
-                    sources:
-                        - ubuntu-toolchain-r-test
+      - os: linux
+        dist: xenial
+        env: TOOLSET=gcc COMPILER_VERSION=gcc++ CXXSTD=c++1z
+        compiler: gcc
 
 
-        -   os: linux
-            env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++17 TEST_SUITE=tests-codec
-            addons:
-                apt:
-                    packages:
-                        - clang++-8
-                        - cmake
-                    sources:
-                        - ubuntu-toolchain-r-test
+      - os: linux
+        dist: xenial
+        env: TOOLSET=clang COMPILER_VERSION=clang++ CXXSTD=c++17
+        compiler: clang
 
 
-        -   os: linux
-            env: TOOLSET=gcc COMPILER=gcc++ CXXSTD=c++17 TEST_SUITE=tests-codec
-            addons:
-                apt:
-                    packages:
-                        - g++-5
-                        - cmake
-                    sources:
-                        - ubuntu-toolchain-r-test
+      - os: linux
+        dist: xenial
+        env: TOOLSET=clang COMPILER_VERSION=clang++ CXXSTD=c++17
+        compiler: clang
 
 
-        -   os: linux
-            env: TOOLSET=gcc COMPILER=gcc++ CXXSTD=c++17 TEST_SUITE=tests-codec
-            addons:
-                apt:
-                    packages:
-                        - g++-6
-                        - cmake
-                    sources:
-                        - ubuntu-toolchain-r-test
+      - os: linux
+        dist: xenial
+        env: TOOLSET=clang COMPILER_VERSION=clang++ CXXSTD=c++17
+        compiler: clang
 
 
-        -   os: linux
-            env: TOOLSET=gcc COMPILER=gcc++ CXXSTD=c++17 TEST_SUITE=tests-codec
-            addons:
-                apt:
-                    packages:
-                        - g++-7
-                        - cmake
-                    sources:
-                        - ubuntu-toolchain-r-test
+      - os: linux
+        dist: xenial
+        env: TOOLSET=clang COMPILER_VERSION=clang++ CXXSTD=c++17
+        compiler: clang
 
 
-        -   os: linux
-            env: TOOLSET=gcc COMPILER=gcc++ CXXSTD=c++17 TEST_SUITE=tests-codec
-            addons:
-                apt:
-                    packages:
-                        - g++-8
-                        - cmake
-                    sources:
-                        - ubuntu-toolchain-r-test
+      - os: linux
+        dist: xenial
+        env: TOOLSET=clang COMPILER_VERSION=clang++ CXXSTD=c++17
+        compiler: clang
+
+
+      - os: linux
+        dist: xenial
+        env: TOOLSET=gcc COMPILER_VERSION=gcc++ CXXSTD=c++17
+        compiler: gcc
+
+
+      - os: linux
+        dist: xenial
+        env: TOOLSET=gcc COMPILER_VERSION=gcc++ CXXSTD=c++17
+        compiler: gcc
+
+
+      - os: linux
+        dist: xenial
+        env: TOOLSET=gcc COMPILER_VERSION=gcc++ CXXSTD=c++17
+        compiler: gcc
+
+
+      - os: linux
+        dist: xenial
+        env: TOOLSET=gcc COMPILER_VERSION=gcc++ CXXSTD=c++17
+        compiler: gcc
+
+
+before_install:
+    - if [[ $TRAVIS_OS_NAME == linux && $TRAVIS_COMPILER == clang ]]; then
+        sudo apt-get update;
+        wget -O - http://apt.llvm.org/llvm-snapshot.gpg.key|sudo apt-key add -;
+        sudo apt-add-repository "deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial-${COMPILER_VERSION} main";
+        sudo apt-get update && sudo apt-get install clang-${COMPILER_VERSION};
+        export CC=/usr/bin/clang-${COMPILER_VERSION};
+        export CXX=/usr/bin/clang++-${COMPILER_VERSION};
+      fi
+    - if [[ $TRAVIS_OS_NAME == linux && $TRAVIS_COMPILER == gcc ]]; then
+        sudo apt-add-repository -y ppa:ubuntu-toolchain-r/test;
+        sudo apt-get update;
+        sudo apt-get install gcc-${COMPILER_VERSION} g++-${COMPILER_VERSION};
+        export CC=/usr/bin/gcc-${COMPILER_VERSION};
+        export CXX=/usr/bin/g++-${COMPILER_VERSION};
+      fi
 
 
 install:
