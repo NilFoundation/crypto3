@@ -818,7 +818,7 @@ matrix:
 
 install:
     - cd ..
-    - git clone -b develop --depth 1 https://github.com/boostorg/boost.git boost-root;
+    - git clone --depth 1 https://github.com/boostorg/boost.git boost-root;
     - cd boost-root
     - git submodule update --init tools/build
     - git submodule update --init libs/config
@@ -848,14 +848,8 @@ script:
         fi;
     - sudo ./b2 -j$proc install;
     - cd $TRAVIS_BUILD_DIR && mkdir cmake-build && cd cmake-build;
-    - if [[ $(echo $CXXSTD | sed 's/[^0-9]*//g') == 03 ]]; then
-        CXXSTD=c++98;
-        fi;
-    - if [[ $CXXSTD == c++1z ]]; then
-        CXXSTD=c++17;
-        fi;
     - echo $CXXSTD
-    - cmake -DBUILD_SHARED_LIBS=TRUE -DBUILD_TESTS=TRUE -DCMAKE_CXX_STANDARD=$(echo $CXXSTD | sed 's/[^0-9]*//g') ..;
+    - cmake -DBUILD_SHARED_LIBS=TRUE -DBUILD_TESTS=TRUE -DCMAKE_CXX_STANDARD=$(echo $CXXSTD | sed 's/[^0-9z]*//g') ..;
     - make -j$proc tests-codec;
     - ctest .
 
