@@ -1,5 +1,5 @@
 # Check for the presence of AVX and figure out the flags to use for it.
-macro(check_for_avx)
+macro(check_avx)
     set(AVX_FLAGS)
 
     include(CheckCXXSourceRuns)
@@ -76,4 +76,4 @@ macro(check_for_avx)
             set(AVX_FLAGS "${AVX_FLAGS} -mavx")
         endif()
     endif()
-endmacro(check_for_avx)
+endmacro(check_avx)
