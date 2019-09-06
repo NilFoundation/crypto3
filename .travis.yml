@@ -14,10 +14,14 @@ os:
     - linux
     - osx
 
+env:
+  matrix:
+    - BOGUS_JOB=true
+
 matrix:
-    include:
-
-
+  exclude:
+    -   env: BOGUS_JOB=true
+  include:
         -   os: osx
             env: TOOLSET=clang COMPILER=clang++ CXXSTD=c++11 TEST_SUITE=tests-codec
             osx_image: xcode9.3
@@ -828,6 +832,7 @@ install:
     - ./bootstrap.sh
 
     - if [[ $TRAVIS_OS_NAME == osx ]]; then
+        brew upgrade;
         brew upgrade cmake;
       fi
 
