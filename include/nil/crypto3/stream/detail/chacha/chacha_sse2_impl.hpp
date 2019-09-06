@@ -31,7 +31,6 @@ namespace nil {
                     constexpr static const std::size_t min_key_schedule_size = policy_type::key_schedule_size;
                     typedef typename policy_type::key_schedule_type key_schedule_type;
 
-                    CRYPTO3_FUNC_ISA("sse2")
                     inline static void chacha_x8(uint8_t output[64 * 8], key_schedule_type &schedule) {
                         chacha_x4(output, schedule);
                         chacha_x4(&output[64 * 4], schedule);
