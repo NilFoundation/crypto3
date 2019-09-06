@@ -1,5 +1,5 @@
 # Check for the presence of AVX and figure out the flags to use for it.
-macro(check_avx)
+macro(check_for_avx)
     set(AVX_FLAGS)
 
     include(CheckCXXSourceRuns)
@@ -8,6 +8,8 @@ macro(check_avx)
     # Check AVX
     if(MSVC AND NOT MSVC_VERSION LESS 1600)
         set(CMAKE_REQUIRED_FLAGS "/arch:AVX")
+    elseif(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_CLANG)
+        set(CMAKE_REQUIRED_FLAGS "-mavx")
     endif()
 
     check_cxx_source_runs("
@@ -29,11 +31,14 @@ macro(check_avx)
           }
 
           return 0;
-        }" HAVE_AVX_EXTENSIONS)
+        }"
+                          HAVE_AVX_EXTENSIONS)
 
     # Check AVX2
     if(MSVC AND NOT MSVC_VERSION LESS 1800)
         set(CMAKE_REQUIRED_FLAGS "/arch:AVX2")
+    elseif(CMAKE_COMPILER_IS_GNUCC)
+        set(CMAKE_REQUIRED_FLAGS "-mavx2")
     endif()
 
     check_cxx_source_runs("
@@ -64,5 +69,11 @@ macro(check_avx)
         elseif(HAVE_AVX_EXTENSIONS AND NOT MSVC_VERSION LESS 1600)
             set(AVX_FLAGS "${AVX_FLAGS} /arch:AVX")
         endif()
+    elseif(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_CLANG)
+        if(HAVE_AVX2_EXTENSIONS)
+            set(AVX_FLAGS "${AVX_FLAGS} -mavx2")
+        elseif(HAVE_AVX_EXTENSIONS)
+            set(AVX_FLAGS "${AVX_FLAGS} -mavx")
+        endif()
     endif()
-endmacro(check_avx)
+endmacro(check_for_avx)
