@@ -14,18 +14,20 @@
 
 #include <boost/integer.hpp>
 
+#include <nil/crypto3/codec/detail/inline_variable.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace codec {
             namespace mode {
                 struct upper {
                     typedef const char *constants_type;
-                    constexpr static const constants_type constants = "0123456789ABCDEF";
+                    CRYPTO3_INLINE_VARIABLE(constants_type, constants, ("0123456789ABCDEF"));
                 };
 
                 struct lower {
                     typedef const char *constants_type;
-                    constexpr static const constants_type constants = "0123456789abcdef";
+                    CRYPTO3_INLINE_VARIABLE(constants_type, constants, ("0123456789abcdef"));
                 };
             }    // namespace mode
 
@@ -37,7 +39,7 @@ namespace nil {
                     typedef typename boost::uint_t<CHAR_BIT>::exact byte_type;
 
                     typedef typename mode_type::constants_type constants_type;
-                    constexpr static const constants_type constants = mode_type::constants;
+                    CRYPTO3_INLINE_VARIABLE(constants_type, constants, (mode_type::constants));
 
                     constexpr static const std::size_t decoded_value_bits = CHAR_BIT;
                     typedef byte_type decoded_value_type;

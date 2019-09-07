@@ -153,7 +153,7 @@ namespace nil {
 
                     for (std::size_t i = 0; i < encoded_block_bits / CHAR_BIT && p != res.begin();
                          ++i, integral_plaintext >>= 4) {
-                        *--p = policy_type::constants[integral_plaintext & 0x0F];
+                        *--p = policy_type::constants()[integral_plaintext & 0x0F];
                     }
 
                     return res;

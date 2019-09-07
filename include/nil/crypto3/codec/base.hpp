@@ -79,7 +79,7 @@ namespace nil {
                 template<typename T>
                 void operator()(T &t) {
                     while (leading_zeros) {
-                        t.push_back(policy_type::constants[0]);
+                        t.push_back(policy_type::constants()[0]);
                         leading_zeros--;
                     }
                 }
@@ -175,7 +175,7 @@ namespace nil {
                 template<typename T>
                 void operator()(T &t) {
                     while (leading_zeros) {
-                        t.push_back(policy_type::inverted_constants['1']);
+                        t.push_back(policy_type::inverted_constants()['1']);
                         leading_zeros--;
                     }
                 }
