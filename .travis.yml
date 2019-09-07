@@ -617,7 +617,7 @@ install:
     - python tools/boostdep/depinst/depinst.py accumulators
     - ./bootstrap.sh
     - if [[ $TRAVIS_OS_NAME == osx ]]; then
-        brew upgrade;
+        brew upgrade cmake;
       fi
 
 script:
