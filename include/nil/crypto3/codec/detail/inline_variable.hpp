@@ -29,7 +29,7 @@
 
 #ifdef CRYPTO3_CXX17_INLINE_VARIABLES
 #define CRYPTO3_INLINE_VARIABLE(TYPE, NAME, VALUE) \
-    constexpr static inline const TYPE NAME() {    \
+    constexpr static inline TYPE NAME() {    \
         return TYPE VALUE;                         \
     }
 #else
