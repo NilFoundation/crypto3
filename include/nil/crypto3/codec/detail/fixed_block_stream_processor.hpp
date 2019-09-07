@@ -71,9 +71,8 @@ namespace nil {
                         pack<endian_type, value_bits, input_value_bits>(cache.begin(), cache.end(), block);
 
                         // Process the block
-                        // Boost.Parameter is awful with constexpr static const params in argument packs
                         std::size_t ibb = input_block_bits;
-                        state(block, ibb);
+                        state(block, accumulators::bits = ibb);
 
                         // Reset seen if we don't need to track the length
                         if (!length_bits) {
@@ -97,9 +96,8 @@ namespace nil {
                         pack<endian_type, value_bits, input_value_bits>(first, first + block_values, block);
                         seen += value_bits * block_values;
 
-                        // Boost.Parameter is awful with constexpr static const params in argument packs
                         std::size_t ibb = input_block_bits;
-                        state(block, ibb);
+                        state(block, accumulators::bits = ibb);
 
                         // Reset seen if we don't need to track the length
                         if (!length_bits) {

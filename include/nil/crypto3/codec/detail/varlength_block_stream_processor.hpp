@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2019 Nil Foundation AG
 // Copyright (c) 2018-2019 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2019 Aleksey Moskvin <zerg1996@yandex.ru>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -71,8 +72,8 @@ namespace nil {
 
                 template<typename InputIterator>
                 inline void operator()(InputIterator first, InputIterator last, std::random_access_iterator_tag) {
-                    input_block_type block = {0};
-                    pack<endian_type, value_bits, input_value_bits>(first, last, std::back_inserter(block));
+                    input_block_type block = {}; // TODO: fill it with zero value for base32/64, and find true size for base58
+                    pack<endian_type, value_bits, input_value_bits>(first, last, std::inserter(block, block.begin()));
                     state(block);
                 }
 

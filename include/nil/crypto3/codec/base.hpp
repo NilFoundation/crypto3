@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2019 Nil Foundation AG
 // Copyright (c) 2018-2019 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2019 Aleksey Moskvin <zerg1996@yandex.ru>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -35,6 +36,24 @@ namespace nil {
                 struct static_range;
             }
 
+            template<std::size_t Version, typename = detail::static_range<true>>
+            struct base_encode_preprocessor {
+                typedef detail::base_policy<Version> policy_type;
+
+                base_encode_preprocessor(std::size_t leading_zeros = 0) : leading_zeros(leading_zeros) {}
+
+                template<typename T>
+                void operator()(const T &block) {
+                    typename T::const_iterator itr = block.cbegin();
+                    while (*itr == '\0' and itr != block.cend()) {
+                        ++itr;
+                    }
+                    leading_zeros = std::distance(block.begin(), itr);
+                }
+
+                std::size_t leading_zeros;
+            };
+
             /*!
              * @brief Base encoder finalizer functor
              * @tparam Version Base encoder version selector. Available values are: 32, 58, 64
@@ -60,20 +79,22 @@ namespace nil {
                 template<typename T>
                 void operator()(T &t) {
                     while (leading_zeros) {
-                        t.push_back(typename T::value_type());
+                        t.push_back(policy_type::constants()[0]);
                         leading_zeros--;
                     }
                 }
 
                 std::size_t leading_zeros;
             };
+            template<std::size_t Version>
+            struct base_encode_preprocessor<Version, detail::static_range<!(Version % 32)>> {
+                typedef detail::base_policy<Version> policy_type;
 
-            /*!
-             * @brief Base encoder finalizer functor
-             * @tparam Version Base encoder version selector. Available values are: 32, 58, 64.
-             *
-             * @note This particular implementation gets selected with Version == 32 || Version == 64.
-             */
+                base_encode_preprocessor()  {}
+
+                template<typename T>
+                void operator()(T &t) {}
+            };
 
             template<std::size_t Version>
             struct base_encode_finalizer<Version, detail::static_range<!(Version % 32)>> {
@@ -102,6 +123,34 @@ namespace nil {
                 std::size_t remaining_bits;    ///< Bits remaining unprocessed in block
             };
 
+            template<std::size_t Version, typename = detail::static_range<true>>
+            struct base_decode_preprocessor {
+                typedef detail::base_policy<Version> policy_type;
+
+                base_decode_preprocessor(std::size_t leading_zeros = 0) : leading_zeros(leading_zeros) {}
+
+                template<typename T>
+                void operator()(const T &block) {
+                    typename T::const_iterator itr = block.cbegin();
+                    while (*itr == '1') {
+                        ++itr;
+                    }
+                    leading_zeros = std::distance(block.begin(), itr);
+                }
+
+                std::size_t leading_zeros;
+            };
+
+            template<std::size_t Version>
+            struct base_decode_preprocessor<Version, detail::static_range<!(Version % 32)>> {
+                typedef detail::base_policy<Version> policy_type;
+
+                base_decode_preprocessor() { }
+
+                template<typename T>
+                void operator()(T &t) { }
+            };
+
             /*!
              * @brief Base decoder finalizer functor
              * @tparam Version Base encoder version selector. Available values are: 32, 58, 64
@@ -125,7 +174,10 @@ namespace nil {
                  */
                 template<typename T>
                 void operator()(T &t) {
-                    t = T(t.begin() + leading_zeros, t.end());
+                    while (leading_zeros) {
+                        t.push_back(policy_type::inverted_constants()['1']);
+                        leading_zeros--;
+                    }
                 }
 
                 std::size_t leading_zeros;
@@ -150,8 +202,7 @@ namespace nil {
                 template<typename T>
                 void operator()(T &t) {
                     int new_size = t.size();
-                    for (typename T::iterator out = t.end() - 1; *out == '\0'; --out, --new_size) {
-                    }
+                    for (typename T::iterator out = t.end() - 1; *out == '\0'; --out, --new_size) {}
                     t.resize(new_size);
                 }
 
@@ -170,6 +221,8 @@ namespace nil {
             public:
                 typedef base_encode_finalizer<Version> encoding_finalizer_type;
                 typedef base_decode_finalizer<Version> decoding_finalizer_type;
+                typedef base_encode_preprocessor<Version> encoding_preprocessor_type;
+                typedef base_decode_preprocessor<Version> decoding_preprocessor_type;
 
                 typedef typename detail::isomorphic_encoding_mode<base<Version>> stream_encoder_type;
                 typedef typename detail::isomorphic_decoding_mode<base<Version>> stream_decoder_type;
@@ -234,6 +287,8 @@ namespace nil {
             public:
                 typedef base_encode_finalizer<Version> encoding_finalizer_type;
                 typedef base_decode_finalizer<Version> decoding_finalizer_type;
+                typedef base_encode_preprocessor<Version> encoding_preprocessor_type;
+                typedef base_decode_preprocessor<Version> decoding_preprocessor_type;
 
                 typedef typename detail::isomorphic_encoding_mode<base<Version>> stream_encoder_type;
                 typedef typename detail::isomorphic_decoding_mode<base<Version>> stream_decoder_type;

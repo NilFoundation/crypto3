@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2019 Nil Foundation AG
 // Copyright (c) 2018-2019 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2019 Moskvin Aleksey <zerg1996@yandex.ru>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -94,24 +95,6 @@ namespace nil {
                             stream_processor;
 
                         stream_processor(this->accumulator_set)(first, last);
-                    }
-
-                    template<typename T, std::size_t Size>
-                    inline operator std::array<T, Size>() const {
-                        result_type result =
-                            boost::accumulators::extract_result<accumulator_type>(this->accumulator_set);
-                        std::array<T, Size> out;
-                        std::copy(result.begin(), result.end(), out.end());
-                        return out;
-                    }
-
-                    template<typename T, std::size_t Size>
-                    inline operator boost::array<T, Size>() const {
-                        result_type result =
-                            boost::accumulators::extract_result<accumulator_type>(this->accumulator_set);
-                        boost::array<T, Size> out;
-                        std::copy(result.begin(), result.end(), out.end());
-                        return out;
                     }
 
                     template<typename OutputRange>
