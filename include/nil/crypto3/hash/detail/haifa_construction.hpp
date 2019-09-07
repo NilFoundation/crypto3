@@ -37,9 +37,11 @@ namespace nil {
                      typename Finalizer = nop_finalizer>
             class haifa_construction {
             public:
+                constexpr static const std::size_t digest_bits = DigestBits;
                 typedef hash::static_digest<DigestBits> digest_type;
 
                 typedef Compressor compressor_functor;
+                typedef DigestEndian endian_type;
                 typedef Finalizer finalizer_functor;
 
                 constexpr static const std::size_t salt_bits = compressor_functor::salt_bits;
