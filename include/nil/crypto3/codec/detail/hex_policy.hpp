@@ -39,8 +39,7 @@ namespace nil {
                     typedef typename boost::uint_t<CHAR_BIT>::exact byte_type;
 
                     typedef typename mode_type::constants_type constants_type;
-                    CRYPTO3_INLINE_VARIABLE(constants_type, constants, (mode_type::constants));
-
+                    CRYPTO3_INLINE_VARIABLE(constants_type, constants, (mode_type::constants()));
                     constexpr static const std::size_t decoded_value_bits = CHAR_BIT;
                     typedef byte_type decoded_value_type;
 
