@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_CIPHER_STATE_PREPROCESSOR_HPP
-#define CRYPTO3_CIPHER_STATE_PREPROCESSOR_HPP
+#ifndef CRYPTO3_BLOCK_CIPHER_STATE_HPP
+#define CRYPTO3_BLOCK_CIPHER_STATE_HPP
 
 #include <boost/accumulators/framework/accumulator_set.hpp>
 #include <boost/accumulators/framework/features.hpp>
@@ -36,4 +36,4 @@ namespace nil {
     }        // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_CIPHER_STATE_PREPROCESSOR_HPP
+#endif    // CRYPTO3_BLOCK_CIPHER_STATE_HPP
