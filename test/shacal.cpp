@@ -163,7 +163,7 @@ BOOST_AUTO_TEST_CASE(shacal2_single_block_encrypt3) {
 }
 
 BOOST_AUTO_TEST_CASE(shacal_accumulator) {
-    hash::hash_accumulator<hash::sha1> acc;
+    hash::hash_accumulator_set<hash::sha1> acc;
     // perl -e 'for ($x = 1000000000; $x--;) {print "a";}' | sha1sum
     for (unsigned n = 1000000000; n--;) {
         acc('a');
@@ -181,7 +181,7 @@ BOOST_AUTO_TEST_CASE(shacal_accumulator) {
 BOOST_AUTO_TEST_CASE(shacal2_512_encrypt1) {
     constexpr static const std::size_t SHA = 512;
 
-    hash::hash_accumulator<hash::sha2<SHA>> acc;
+    hash::hash_accumulator_set<hash::sha2<SHA>> acc;
 
     typename hash::sha2<SHA>::digest_type d = accumulators::extract::hash<hash::sha2<SHA>>(acc);
     printf("%s\n", std::to_string(d).data());
@@ -193,7 +193,7 @@ BOOST_AUTO_TEST_CASE(shacal2_512_encrypt1) {
 
 BOOST_AUTO_TEST_CASE(shacal2_512_encrypt2) {
     constexpr static const std::size_t SHA = 512;
-    hash::hash_accumulator<hash::sha2<SHA>> acc;
+    hash::hash_accumulator_set<hash::sha2<SHA>> acc;
 
     acc('a');
     acc('b');
@@ -210,7 +210,7 @@ BOOST_AUTO_TEST_CASE(shacal2_512_encrypt2) {
 
 BOOST_AUTO_TEST_CASE(shacal2_512_encrypt3) {
     constexpr static const std::size_t SHA = 512;
-    hash::hash_accumulator<hash::sha2<SHA>> acc;
+    hash::hash_accumulator_set<hash::sha2<SHA>> acc;
     const char *m =
         "abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghijklmn"
         "hijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstnopqrstu";
@@ -227,7 +227,7 @@ BOOST_AUTO_TEST_CASE(shacal2_512_encrypt3) {
 
 BOOST_AUTO_TEST_CASE(shacal2_512_accumulator1) {
     constexpr static const std::size_t SHA = 512;
-    hash::hash_accumulator<hash::sha2<SHA>> acc;
+    hash::hash_accumulator_set<hash::sha2<SHA>> acc;
 
     for (unsigned n = 1000000; n--;) {
         acc('a');
@@ -246,7 +246,7 @@ BOOST_AUTO_TEST_CASE(shacal2_512_accumulator1) {
 
 BOOST_AUTO_TEST_CASE(shacal2_512_accumulator2) {
     constexpr static const std::size_t SHA = 512;
-    hash::hash_accumulator<hash::sha2<SHA>> acc;
+    hash::hash_accumulator_set<hash::sha2<SHA>> acc;
 
     // perl -e 'for ($x = 1000000000; $x--;) {print "a";}' | sha512sum
     for (unsigned n = 1000000000; n--;) {
