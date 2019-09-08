@@ -138,7 +138,7 @@ BOOST_AUTO_TEST_CASE(cubehash_policy_test) {
 
 BOOST_AUTO_TEST_CASE(cubehash_various) {
     typedef hash::cubehash<16, 32, 512> hash_t;
-    hash::hash_accumulator<hash_t> acc;
+    hash::hash_accumulator_set<hash_t> acc;
     typedef hash_t::construction_type bht;
 
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
@@ -197,7 +197,7 @@ BOOST_DATA_TEST_CASE(cubehash512_return_range_hash, boost::unit_test::data::make
 
 BOOST_AUTO_TEST_CASE(cubehash512_accumulator) {
     typedef hash::cubehash<16, 32, 512> hash_t;
-    hash::hash_accumulator<hash_t> acc;
+    hash::hash_accumulator_set<hash_t> acc;
 
     for (unsigned i = 0; i < 1000000; ++i) {
         acc('a');
@@ -240,7 +240,7 @@ BOOST_DATA_TEST_CASE(cubehash256_return_range_hash, boost::unit_test::data::make
 
 BOOST_AUTO_TEST_CASE(cubehash256_accumulator) {
     typedef hash::cubehash<16, 32, 256> hash_t;
-    hash::hash_accumulator<hash_t> acc;
+    hash::hash_accumulator_set<hash_t> acc;
 
     for (unsigned i = 0; i < 1000000; ++i) {
         acc('a');

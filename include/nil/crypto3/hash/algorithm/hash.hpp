@@ -63,7 +63,7 @@ namespace nil {
             typename std::enable_if<!boost::accumulators::detail::is_accumulator_set<OutputIterator>::value,
                                     OutputIterator>::type
                 hash(InputIterator first, InputIterator last, OutputIterator out) {
-                typedef typename hash::hash_accumulator<Hash> HashAccumulator;
+                typedef typename hash::hash_accumulator_set<Hash> HashAccumulator;
 
                 typedef detail::value_hash_impl<HashAccumulator> StreamHashImpl;
                 typedef detail::itr_hash_impl<StreamHashImpl, OutputIterator> HashImpl;
@@ -87,7 +87,7 @@ namespace nil {
              * @return
              */
             template<typename Hash, typename InputIterator,
-                     typename HashAccumulator = typename hash::hash_accumulator<Hash>>
+                     typename HashAccumulator = typename hash::hash_accumulator_set<Hash>>
             typename std::enable_if<boost::accumulators::detail::is_accumulator_set<HashAccumulator>::value,
                                     HashAccumulator>::type &
                 hash(InputIterator first, InputIterator last, HashAccumulator &sh) {
@@ -109,7 +109,7 @@ namespace nil {
              * @param last
              * @return
              */
-            template<typename Hash, typename InputIterator, typename HashAccumulator = hash::hash_accumulator<Hash>>
+            template<typename Hash, typename InputIterator, typename HashAccumulator = hash::hash_accumulator_set<Hash>>
             detail::range_hash_impl<detail::value_hash_impl<typename std::enable_if<
                 boost::accumulators::detail::is_accumulator_set<HashAccumulator>::value, HashAccumulator>::type>>
                 hash(InputIterator first, InputIterator last) {
@@ -135,7 +135,7 @@ namespace nil {
             template<typename Hash, typename SinglePassRange, typename OutputIterator>
             typename std::enable_if<detail::is_iterator<OutputIterator>::value, OutputIterator>::type
                 hash(const SinglePassRange &rng, OutputIterator out) {
-                typedef typename hash::hash_accumulator<Hash> HashAccumulator;
+                typedef typename hash::hash_accumulator_set<Hash> HashAccumulator;
 
                 typedef detail::value_hash_impl<HashAccumulator> StreamHashImpl;
                 typedef detail::itr_hash_impl<StreamHashImpl, OutputIterator> HashImpl;
@@ -158,7 +158,7 @@ namespace nil {
              * @return
              */
             template<typename Hash, typename SinglePassRange,
-                     typename HashAccumulator = typename hash::hash_accumulator<Hash>>
+                     typename HashAccumulator = typename hash::hash_accumulator_set<Hash>>
             typename std::enable_if<boost::accumulators::detail::is_accumulator_set<HashAccumulator>::value,
                                     HashAccumulator>::type &
                 hash(const SinglePassRange &rng, HashAccumulator &sh) {
@@ -179,7 +179,7 @@ namespace nil {
              * @param r
              * @return
              */
-            template<typename Hash, typename SinglePassRange, typename HashAccumulator = hash::hash_accumulator<Hash>>
+            template<typename Hash, typename SinglePassRange, typename HashAccumulator = hash::hash_accumulator_set<Hash>>
             detail::range_hash_impl<detail::value_hash_impl<HashAccumulator>> hash(const SinglePassRange &r) {
 
                 typedef detail::value_hash_impl<HashAccumulator> StreamHashImpl;

@@ -64,7 +64,7 @@ BOOST_DATA_TEST_CASE(md4_return_range_hash, boost::unit_test::data::make(string_
 }
 
 BOOST_AUTO_TEST_CASE(md4_accumulator1) {
-    hash_accumulator<md4> acc;
+    hash_accumulator_set<md4> acc;
     md4::construction_type::digest_type s = extract::hash<md4>(acc);
 
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
@@ -81,7 +81,7 @@ BOOST_AUTO_TEST_CASE(md4_accumulator2) {
     // then pad with 0s,
     // then add the length, which is also 0.
     // Remember that MD5 is little-octet, big-bit endian
-    hash_accumulator<md4> acc;
+    hash_accumulator_set<md4> acc;
     md4::construction_type::block_type m = {{0x00000080u}};
     acc(m);
     md4::construction_type::digest_type s = extract::hash<md4>(acc);
@@ -95,7 +95,7 @@ BOOST_AUTO_TEST_CASE(md4_accumulator2) {
 
 BOOST_AUTO_TEST_CASE(md4_accumulator3) {
     // echo -n "abc" | md4sum
-    hash_accumulator<md4> acc;
+    hash_accumulator_set<md4> acc;
     md4::construction_type::block_type m = {{}};
     m[0] = 0x80636261;
     // little-octet, big-bit endian also means the size isn't in the last word
@@ -111,7 +111,7 @@ BOOST_AUTO_TEST_CASE(md4_accumulator3) {
 }
 
 BOOST_AUTO_TEST_CASE(md4_preprocessor1) {
-    hash_accumulator<md4> acc;
+    hash_accumulator_set<md4> acc;
     md4::construction_type::digest_type s = extract::hash<md4>(acc);
 
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
@@ -122,7 +122,7 @@ BOOST_AUTO_TEST_CASE(md4_preprocessor1) {
 }
 
 BOOST_AUTO_TEST_CASE(md4_preprocessor2) {
-    hash_accumulator<md4> acc;
+    hash_accumulator_set<md4> acc;
     acc('a');
     acc('b');
     acc('c');
@@ -137,7 +137,7 @@ BOOST_AUTO_TEST_CASE(md4_preprocessor2) {
 }
 
 BOOST_AUTO_TEST_CASE(md4_preprocessor3) {
-    hash_accumulator<md4> acc;
+    hash_accumulator_set<md4> acc;
     for (unsigned i = 0; i < 1000000; ++i) {
         acc('a');
     }
