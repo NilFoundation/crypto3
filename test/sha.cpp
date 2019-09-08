@@ -184,16 +184,16 @@ BOOST_AUTO_TEST_CASE(sha_collision) {
 }
 
 BOOST_AUTO_TEST_CASE(sha1_subbbyte1) {
-    hash_accumulator<sha1> acc;
-    sha1::stream_processor<hash_accumulator<sha1>, 1>::type h(acc);
+    hash_accumulator_set<sha1> acc;
+    sha1::stream_processor<hash_accumulator_set<sha1>, 1>::type h(acc);
     sha1::digest_type d = h.end_message();
     BOOST_CHECK_EQUAL("da39a3ee5e6b4b0d3255bfef95601890afd80709", std::to_string(d).data());
 }
 
 BOOST_AUTO_TEST_CASE(sha1_subbyte2) {
     // echo -n "abc" | sha1sum
-    hash_accumulator<sha1> acc;
-    sha1::stream_processor<hash_accumulator<sha1>, 4>::type h(acc);
+    hash_accumulator_set<sha1> acc;
+    sha1::stream_processor<hash_accumulator_set<sha1>, 4>::type h(acc);
     h.update_one(0x6).update_one(0x1).update_one(0x6).update_one(0x2).update_one(0x6).update_one(0x3);
     sha1::digest_type d = h.end_message();
     BOOST_CHECK_EQUAL("a9993e364706816aba3e25717850c26c9cd0d89d", std::to_string(d).data());
@@ -232,8 +232,8 @@ BOOST_DATA_TEST_CASE(sha1_return_range_hash1, boost::unit_test::data::make(bool_
 }
 
 BOOST_DATA_TEST_CASE(sha1_accumulator_hash, boost::unit_test::data::make(integer_string_data), array_element) {
-    hash_accumulator<sha1> acc;
-    sha1::stream_processor<hash_accumulator<sha1>, 4>::type h(acc);
+    hash_accumulator_set<sha1> acc;
+    sha1::stream_processor<hash_accumulator_set<sha1>, 4>::type h(acc);
 
     for (unsigned i = 0; i < array_element.first.second; i += 4) {
         h.update_one((array_element.first.first[i / 32] >> (32 - 4 - i % 32)) % 0x10);
@@ -337,8 +337,8 @@ BOOST_FIXTURE_TEST_CASE(sha1_accumulator_hash4, fixture) {
 }
 
 BOOST_AUTO_TEST_CASE(sha1_preprocessor1) {
-    hash_accumulator<sha1> acc;
-    sha1::stream_processor<hash_accumulator<sha1>, 8>::type h(acc);
+    hash_accumulator_set<sha1> acc;
+    sha1::stream_processor<hash_accumulator_set<sha1>, 8>::type h(acc);
     sha1::digest_type s = h.end_message();
 
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
@@ -350,8 +350,8 @@ BOOST_AUTO_TEST_CASE(sha1_preprocessor1) {
 
 BOOST_AUTO_TEST_CASE(sha1_preprocessor2) {
     // Example from Appendix A.1
-    hash_accumulator<sha1> acc;
-    sha1::stream_processor<hash_accumulator<sha1>, 8>::type h(acc);
+    hash_accumulator_set<sha1> acc;
+    sha1::stream_processor<hash_accumulator_set<sha1>, 8>::type h(acc);
     h.update_one('a').update_one('b').update_one('c');
     sha1::digest_type s = h.end_message();
 
@@ -364,7 +364,7 @@ BOOST_AUTO_TEST_CASE(sha1_preprocessor2) {
 
 BOOST_AUTO_TEST_CASE(sha1_preprocessor3) {
     // Example from Appendix A.3
-    hash_accumulator<sha1> acc;
+    hash_accumulator_set<sha1> acc;
     for (unsigned i = 0; i < 1000000; ++i) {
         acc('a');
     }
