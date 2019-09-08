@@ -29,7 +29,7 @@ namespace nil {
              * @tparam LengthBits
              */
             template<typename ProcessingMode>
-            using block_accumulator = boost::accumulators::accumulator_set<
+            using block_accumulator_set = boost::accumulators::accumulator_set<
                 block::digest<ProcessingMode::input_block_bits>,
                 boost::accumulators::features<accumulators::tag::block<ProcessingMode>>>;
         }    // namespace block
