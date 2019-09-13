@@ -11,6 +11,7 @@
 #define CRYPTO3_NOEKEON_HPP
 
 #include <boost/endian/arithmetic.hpp>
+#include <boost/endian/conversion.hpp>
 
 #include <nil/crypto3/block/detail/noekeon/noekeon_policy.hpp>
 

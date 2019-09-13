@@ -11,6 +11,7 @@
 #define CRYPTO3_KASUMI_HPP
 
 #include <boost/endian/arithmetic.hpp>
+#include <boost/endian/conversion.hpp>
 
 #include <nil/crypto3/block/detail/kasumi/kasumi_functions.hpp>
 
@@ -83,16 +84,16 @@ namespace nil {
 
             protected:
                 inline block_type encrypt_block(const block_type &plaintext) const {
-                    uint16_t B0 = boost::endian::native_to_big(plaintext[0]);
-                    uint16_t B1 = boost::endian::native_to_big(plaintext[1]);
-                    uint16_t B2 = boost::endian::native_to_big(plaintext[2]);
-                    uint16_t B3 = boost::endian::native_to_big(plaintext[3]);
+                    word_type B0 = boost::endian::native_to_big(plaintext[0]);
+                    word_type B1 = boost::endian::native_to_big(plaintext[1]);
+                    word_type B2 = boost::endian::native_to_big(plaintext[2]);
+                    word_type B3 = boost::endian::native_to_big(plaintext[3]);
 
                     for (size_t j = 0; j != rounds; j += 2) {
-                        const uint16_t *K = &key_schedule[8 * j];
+                        const word_type *K = &key_schedule[8 * j];
 
-                        uint16_t R = B1 ^ (policy_type::template rotl<1>(B0) & K[0]);
-                        uint16_t L = B0 ^ (policy_type::template rotl<1>(R) | K[1]);
+                        word_type R = B1 ^ (policy_type::template rotl<1>(B0) & K[0]);
+                        word_type L = B0 ^ (policy_type::template rotl<1>(R) | K[1]);
 
                         L = policy_type::FI(L ^ K[2], K[3]) ^ R;
                         R = policy_type::FI(R ^ K[4], K[5]) ^ L;
@@ -125,7 +126,7 @@ namespace nil {
                     for (size_t j = 0; j != rounds; j += 2) {
                         const word_type *K = &key_schedule[8 * (6 - j)];
 
-                        uint16_t L = B2, R = B3;
+                        word_type L = B2, R = B3;
 
                         L = policy_type::FI(L ^ K[10], K[11]) ^ R;
                         R = policy_type::FI(R ^ K[12], K[13]) ^ L;
@@ -155,7 +156,7 @@ namespace nil {
                 key_schedule_type key_schedule;
 
                 void schedule_key(const key_type &key) {
-                    std::array<uint16_t, 16> K = {0};
+                    std::array<word_type, 16> K = {0};
                     for (size_t i = 0; i != rounds; ++i) {
                         K[i] = boost::endian::native_to_big(key[i]);
                         K[i + 8] = K[i] ^ policy_type::round_constants[i];

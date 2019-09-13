@@ -19,6 +19,9 @@ namespace nil {
         namespace block {
             namespace detail {
                 struct kasumi_policy : basic_functions<16> {
+                    constexpr static const std::size_t word_bits = basic_functions<16>::word_bits;
+                    typedef typename basic_functions<16>::word_type word_type;
+
                     constexpr static const std::size_t block_bits = 64;
                     constexpr static const std::size_t block_words = block_bits / word_bits;
                     typedef std::array<word_type, block_words> block_type;
