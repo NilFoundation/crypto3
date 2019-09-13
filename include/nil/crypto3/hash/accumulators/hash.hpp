@@ -52,8 +52,7 @@ namespace nil {
                     typedef typename hash_type::digest_type result_type;
 
                     // The constructor takes an argument pack.
-                    template<typename Args>
-                    hash_impl(const Args &args) : seen(0) {
+                    hash_impl(boost::accumulators::dont_care) : seen(0) {
                     }
 
                     template<typename ArgumentPack>
@@ -61,8 +60,7 @@ namespace nil {
                         resolve_type(args[boost::accumulators::sample], args[bits | std::size_t()]);
                     }
 
-                    template<typename ArgumentPack>
-                    inline result_type result(const ArgumentPack &args) const {
+                    inline result_type result(boost::accumulators::dont_care) const {
                         construction_type res = construction;
 
                         if (!cache.empty()) {
