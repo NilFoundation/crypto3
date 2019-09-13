@@ -11,6 +11,7 @@
 #define CRYPTO3_GOST_28147_89_HPP
 
 #include <boost/endian/arithmetic.hpp>
+#include <boost/endian/conversion.hpp>
 
 #include <nil/crypto3/block/detail/gost_28147_89/gost_28147_89_policy.hpp>
 #include <nil/crypto3/block/detail/gost_28147_89/gost_28147_89_parameters.hpp>

@@ -7,10 +7,11 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_SERPENT_HPP
-#define CRYPTO3_SERPENT_HPP
+#ifndef CRYPTO3_BLOCK_SERPENT_HPP
+#define CRYPTO3_BLOCK_SERPENT_HPP
 
 #include <boost/endian/arithmetic.hpp>
+#include <boost/endian/conversion.hpp>
 
 #include <nil/crypto3/block/detail/serpent/serpent_policy.hpp>
 

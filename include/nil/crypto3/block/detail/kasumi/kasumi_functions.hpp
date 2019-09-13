@@ -17,6 +17,7 @@ namespace nil {
         namespace block {
             namespace detail {
                 struct kasumi_functions : public kasumi_policy {
+                    constexpr static const std::size_t word_bits = kasumi_policy::word_bits;
                     typedef typename kasumi_policy::word_type word_type;
 
                     static inline word_type FI(word_type I, word_type K) {

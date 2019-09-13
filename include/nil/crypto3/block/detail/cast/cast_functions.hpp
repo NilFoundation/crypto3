@@ -11,6 +11,7 @@
 #define CRYPTO3_CAST_FUNCTIONS_CPP_HPP
 
 #include <boost/endian/arithmetic.hpp>
+#include <boost/endian/conversion.hpp>
 
 #include <nil/crypto3/block/detail/cast/basic_cast_policy.hpp>
 

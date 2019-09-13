@@ -10,6 +10,8 @@
 #ifndef CRYPTO3_DES_FUNCTIONS_HPP
 #define CRYPTO3_DES_FUNCTIONS_HPP
 
+#include <boost/endian/conversion.hpp>
+
 #include <nil/crypto3/block/detail/des/des_policy.hpp>
 
 namespace nil {
