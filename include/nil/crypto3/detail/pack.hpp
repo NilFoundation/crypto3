@@ -28,8 +28,6 @@
 namespace nil {
     namespace crypto3 {
         namespace detail {
-            using namespace boost::multiprecision;
-
 #ifndef CRYPTO3_NO_OPTIMIZATION
 
             template<int UnitBits, int InputBits, int OutputBits, typename InT, typename OutT>
