@@ -129,14 +129,14 @@ namespace nil {
                     }
 
                     inline static word_type spbox(word_type T0, word_type T1) {
-                        return policy_type::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(T0, 0)] ^
-                               policy_type::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(T1, 0)] ^
-                               policy_type::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(T0, 1)] ^
-                               policy_type::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(T1, 1)] ^
-                               policy_type::sbox5[policy_type::template extract_uint_t<CHAR_BIT>(T0, 2)] ^
-                               policy_type::sbox6[policy_type::template extract_uint_t<CHAR_BIT>(T1, 2)] ^
-                               policy_type::sbox7[policy_type::template extract_uint_t<CHAR_BIT>(T0, 3)] ^
-                               policy_type::sbox8[policy_type::template extract_uint_t<CHAR_BIT>(T1, 3)];
+                        return policy_type::sbox1[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(T0, 0)] ^
+                               policy_type::sbox2[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(T1, 0)] ^
+                               policy_type::sbox3[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(T0, 1)] ^
+                               policy_type::sbox4[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(T1, 1)] ^
+                               policy_type::sbox5[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(T0, 2)] ^
+                               policy_type::sbox6[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(T1, 2)] ^
+                               policy_type::sbox7[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(T0, 3)] ^
+                               policy_type::sbox8[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(T1, 3)];
                     }
 
                     inline static void des_encrypt(word_type &L, word_type &R, const key_schedule_type &round_key) {

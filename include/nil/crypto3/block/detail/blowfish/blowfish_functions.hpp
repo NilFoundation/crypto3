@@ -28,10 +28,10 @@ namespace nil {
                     typedef std::array<word_type, plain_constants_size> plain_constants_type;
 
                     inline static word_type bff(word_type X, const plain_constants_type &constants) {
-                        return ((constants[policy_type::template extract_uint_t<CHAR_BIT>(X, 0)] +
-                                 constants[256 + policy_type::template extract_uint_t<CHAR_BIT>(X, 1)]) ^
-                                constants[512 + policy_type::template extract_uint_t<CHAR_BIT>(X, 2)]) +
-                               constants[768 + policy_type::template extract_uint_t<CHAR_BIT>(X, 3)];
+                        return ((constants[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(X, 0)] +
+                                 constants[256 + ::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(X, 1)]) ^
+                                constants[512 + ::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(X, 2)]) +
+                               constants[768 + ::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(X, 3)];
                     }
                 };
             }    // namespace detail

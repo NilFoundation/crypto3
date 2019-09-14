@@ -12,7 +12,7 @@
 #include <boost/array.hpp>
 #include <boost/cstdint.hpp>
 
-#include <nil/crypto3/block/detail/pack.hpp>
+#include <nil/crypto3/detail/pack.hpp>
 
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
@@ -24,13 +24,9 @@
 #include <cassert>
 #include <cstdio>
 
-using boost::array;
-using boost::int16_t;
-using boost::int32_t;
-using boost::int8_t;
-
-using namespace nil::crypto3::block;
-using namespace nil::crypto3::block::stream_endian;
+using namespace nil::crypto3;
+using namespace nil::crypto3::detail;
+using namespace nil::crypto3::stream_endian;
 
 BOOST_AUTO_TEST_SUITE(block_pack_explode_test_suite)
 
