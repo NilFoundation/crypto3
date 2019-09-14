@@ -190,7 +190,7 @@ namespace nil {
                     a[i] = std::toupper(c, source.getloc()) - 'A' + 0xA;
                 }
             }
-            pack<stream_endian::big_bit, 4, 8>(a, d);
+            detail::pack<stream_endian::big_bit, 4, 8>(a, d);
             return source;
         }
     }    // namespace crypto3
