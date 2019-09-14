@@ -19,12 +19,10 @@
 #include <iostream>
 
 #include <nil/crypto3/detail/pack.hpp>
+#include <nil/crypto3/detail/octet.hpp>
 
 namespace nil {
     namespace crypto3 {
-        constexpr static const std::size_t octet_bits = 8;
-        typedef boost::uint_t<octet_bits>::least octet_type;
-
         /*!
          * The digest class template stores a DigestBits-bit message digest as a sequence of 8-bit octets.
          * Octets are stored in the smallest std::size_t type able to hold 8 bits, hereinafter referred to as
