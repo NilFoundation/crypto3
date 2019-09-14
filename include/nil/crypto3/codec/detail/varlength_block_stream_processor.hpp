@@ -14,8 +14,8 @@
 #include <array>
 #include <iterator>
 
-#include <nil/crypto3/codec/detail/pack.hpp>
-#include <nil/crypto3/codec/detail/digest.hpp>
+#include <nil/crypto3/detail/pack.hpp>
+#include <nil/crypto3/detail/digest.hpp>
 
 #include <boost/integer.hpp>
 #include <boost/static_assert.hpp>
@@ -72,7 +72,8 @@ namespace nil {
 
                 template<typename InputIterator>
                 inline void operator()(InputIterator first, InputIterator last, std::random_access_iterator_tag) {
-                    input_block_type block = {}; // TODO: fill it with zero value for base32/64, and find true size for base58
+                    input_block_type block =
+                        {};    // TODO: fill it with zero value for base32/64, and find true size for base58
                     pack<endian_type, value_bits, input_value_bits>(first, last, std::inserter(block, block.begin()));
                     state(block);
                 }

@@ -13,7 +13,7 @@
 #include <nil/crypto3/codec/codec_value.hpp>
 #include <nil/crypto3/codec/codec_state.hpp>
 
-#include <nil/crypto3/codec/detail/type_traits.hpp>
+#include <nil/crypto3/detail/type_traits.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -46,7 +46,7 @@ namespace nil {
          * @return Output iterator to the element in the destination range, one past the last element inserted.
          */
         template<typename Decoder, typename InputIterator, typename OutputIterator>
-        typename std::enable_if<codec::detail::is_iterator<OutputIterator>::value, OutputIterator>::type
+        typename std::enable_if<detail::is_iterator<OutputIterator>::value, OutputIterator>::type
             decode(InputIterator first, InputIterator last, OutputIterator out) {
             typedef typename Decoder::stream_decoder_type DecodingMode;
             typedef typename codec::codec_accumulator<DecodingMode> CodecAccumulator;
@@ -134,7 +134,7 @@ namespace nil {
          * @return CodecAccumulator AccumulatorSet non-const reference equal to acc.
          */
         template<typename Decoder, typename SinglePassRange, typename OutputIterator>
-        typename std::enable_if<codec::detail::is_iterator<OutputIterator>::value, OutputIterator>::type
+        typename std::enable_if<detail::is_iterator<OutputIterator>::value, OutputIterator>::type
             decode(const SinglePassRange &rng, OutputIterator out) {
             typedef typename Decoder::stream_decoder_type DecodingMode;
             typedef typename codec::codec_accumulator<DecodingMode> CodecAccumulator;

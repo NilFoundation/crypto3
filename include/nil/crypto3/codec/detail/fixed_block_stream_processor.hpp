@@ -13,8 +13,8 @@
 #include <array>
 #include <iterator>
 
-#include <nil/crypto3/codec/detail/pack.hpp>
-#include <nil/crypto3/codec/detail/digest.hpp>
+#include <nil/crypto3/detail/pack.hpp>
+#include <nil/crypto3/detail/digest.hpp>
 
 #include <nil/crypto3/codec/accumulators/codec.hpp>
 

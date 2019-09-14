@@ -7,11 +7,11 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_CODEC_DETAIL_IMPLODER_HPP
-#define CRYPTO3_CODEC_DETAIL_IMPLODER_HPP
+#ifndef CRYPTO3_DETAIL_IMPLODER_HPP
+#define CRYPTO3_DETAIL_IMPLODER_HPP
 
-#include <nil/crypto3/codec/detail/stream_endian.hpp>
-#include <nil/crypto3/codec/detail/unbounded_shift.hpp>
+#include <nil/crypto3/detail/stream_endian.hpp>
+#include <nil/crypto3/detail/unbounded_shift.hpp>
 
 #include <boost/static_assert.hpp>
 
@@ -20,12 +20,11 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace codec {
-            namespace detail {
+        namespace detail {
 
-                // By definition, for all imploders, InputBits < OutputBits,
-                // so we're taking many smaller values and combining them into one value
-                // @formatter:off
+            // By definition, for all imploders, InputBits < OutputBits,
+            // so we're taking many smaller values and combining them into one value
+            // @formatter:off
 
                 template<typename Endianness, int InputBits, int OutputBits, int k>
                 struct imploder_step;
@@ -118,9 +117,8 @@ namespace nil {
                     }
                 };
             } // namespace detail
-        }
     }
 } // namespace nil
 // @formatter:on
 
-#endif // CRYPTO3_CODEC_DETAIL_IMPLODER_HPP
+#endif    // CRYPTO3_CODEC_DETAIL_IMPLODER_HPP

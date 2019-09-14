@@ -22,10 +22,10 @@
 
 #include <boost/range/algorithm.hpp>
 
-#include <nil/crypto3/codec/accumulators/parameters/bits.hpp>
+#include <nil/crypto3/detail/make_array.hpp>
+#include <nil/crypto3/detail/digest.hpp>
 
-#include <nil/crypto3/codec/detail/make_array.hpp>
-#include <nil/crypto3/codec/detail/digest.hpp>
+#include <nil/crypto3/codec/accumulators/parameters/bits.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -79,7 +79,7 @@ namespace nil {
                     typedef boost::container::static_vector<input_value_type, input_block_values> cache_type;
 
                 public:
-                    typedef codec::digest<output_block_bits> result_type;
+                    typedef digest<output_block_bits> result_type;
 
                     template<typename Args>
                     // The constructor takes an argument pack.
@@ -147,7 +147,8 @@ namespace nil {
                         if (cache.empty()) {
                             ob = codec_mode_type::process_block(block);
                         } else {
-                            input_block_type b = codec::make_array<input_block_values>(cache.begin(), cache.end());
+                            input_block_type b =
+                                ::nil::crypto3::make_array<input_block_values>(cache.begin(), cache.end());
                             typename input_block_type::const_iterator itr =
                                 block.begin() + (cache.max_size() - cache.size());
 
@@ -193,7 +194,7 @@ namespace nil {
                     typedef typename output_block_type::value_type output_value_type;
 
                 public:
-                    typedef codec::digest<output_block_bits> result_type;
+                    typedef digest<output_block_bits> result_type;
 
                     // The constructor takes an argument pack.
                     template<typename Args>

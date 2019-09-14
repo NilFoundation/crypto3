@@ -13,7 +13,7 @@
 #include <nil/crypto3/codec/codec_value.hpp>
 #include <nil/crypto3/codec/codec_state.hpp>
 
-#include <nil/crypto3/codec/detail/type_traits.hpp>
+#include <nil/crypto3/detail/type_traits.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -46,7 +46,7 @@ namespace nil {
          * @return Output iterator to the element in the destination range, one past the last element inserted.
          */
         template<typename Encoder, typename InputIterator, typename OutputIterator>
-        typename std::enable_if<codec::detail::is_iterator<OutputIterator>::value, OutputIterator>::type
+        typename std::enable_if<detail::is_iterator<OutputIterator>::value, OutputIterator>::type
             encode(InputIterator first, InputIterator last, OutputIterator out) {
             typedef typename Encoder::stream_encoder_type EncodingMode;
             typedef typename codec::codec_accumulator<EncodingMode> CodecAccumulator;
@@ -79,8 +79,8 @@ namespace nil {
          */
         template<typename Encoder, typename InputIterator,
                  typename CodecAccumulator = typename codec::codec_accumulator<typename Encoder::stream_encoder_type>>
-        codec::detail::range_codec_impl<codec::detail::value_codec_impl<CodecAccumulator>>
-            encode(InputIterator first, InputIterator last) {
+        codec::detail::range_codec_impl<codec::detail::value_codec_impl<CodecAccumulator>> encode(InputIterator first,
+                                                                                                  InputIterator last) {
             typedef codec::detail::value_codec_impl<CodecAccumulator> EncoderStateImpl;
             typedef codec::detail::range_codec_impl<EncoderStateImpl> EncoderImpl;
 
@@ -134,7 +134,7 @@ namespace nil {
          * @return Output iterator to the element in the destination range, one past the last element inserted.
          */
         template<typename Encoder, typename SinglePassRange, typename OutputIterator>
-        typename std::enable_if<codec::detail::is_iterator<OutputIterator>::value, OutputIterator>::type
+        typename std::enable_if<detail::is_iterator<OutputIterator>::value, OutputIterator>::type
             encode(const SinglePassRange &rng, OutputIterator out) {
             typedef typename Encoder::stream_encoder_type EncodingMode;
             typedef typename codec::codec_accumulator<EncodingMode> CodecAccumulator;
@@ -192,7 +192,8 @@ namespace nil {
          */
         template<typename Encoder, typename SinglePassRange,
                  typename CodecAccumulator = typename codec::codec_accumulator<typename Encoder::stream_encoder_type>>
-        codec::detail::range_codec_impl<codec::detail::value_codec_impl<CodecAccumulator>> encode(const SinglePassRange &r) {
+        codec::detail::range_codec_impl<codec::detail::value_codec_impl<CodecAccumulator>>
+            encode(const SinglePassRange &r) {
 
             typedef codec::detail::value_codec_impl<CodecAccumulator> EncoderStateImpl;
             typedef codec::detail::range_codec_impl<EncoderStateImpl> EncoderImpl;
