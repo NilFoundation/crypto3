@@ -12,9 +12,9 @@
 
 #include <nil/crypto3/hash/detail/crc/accumulator.hpp>
 
-#include <nil/crypto3/hash/detail/primes.hpp>
-#include <nil/crypto3/hash/detail/static_digest.hpp>
-#include <nil/crypto3/hash/detail/pack.hpp>
+#include <nil/crypto3/detail/primes.hpp>
+#include <nil/crypto3/detail/static_digest.hpp>
+#include <nil/crypto3/detail/pack.hpp>
 
 #include <climits>
 
@@ -65,7 +65,8 @@ namespace nil {
 
                 template<typename InputIterator>
                 crc_stream_processor &update_n(InputIterator p, size_t n) {
-                    acc(p, n);
+                    acc(p, accumulators::bits =
+                               n * sizeof(typename std::iterator_traits<InputIterator>::value_type) * CHAR_BIT);
                     return *this;
                 }
 
@@ -110,7 +111,7 @@ namespace nil {
                 typedef typename crc_computer::value_type word_type;
 
                 constexpr static const std::size_t digest_bits = DigestBits;
-                typedef hash::static_digest<digest_bits> digest_type;
+                typedef static_digest<digest_bits> digest_type;
 
                 constexpr static const std::size_t state_bits = digest_bits;
                 constexpr static const std::size_t state_words = digest_bits / word_bits;
@@ -138,7 +139,8 @@ namespace nil {
                     word_type x = crc_.checksum();
                     digest_type d;
                     // TODO: Justify bit order
-                    pack_n<stream_endian::big_bit, digest_bits, octet_bits>(&x, 1, d.data(), digest_bits / octet_bits);
+                    ::nil::crypto3::detail::pack_n<stream_endian::big_bit, digest_bits, octet_bits>(
+                        &x, 1, d.data(), digest_bits / octet_bits);
                     return d;
                 }
 

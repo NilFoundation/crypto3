@@ -13,7 +13,7 @@
 #include <nil/crypto3/hash/hash_value.hpp>
 #include <nil/crypto3/hash/hash_state.hpp>
 
-#include <nil/crypto3/hash/detail/type_traits.hpp>
+#include <nil/crypto3/detail/type_traits.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -133,7 +133,7 @@ namespace nil {
              * @return
              */
             template<typename Hash, typename SinglePassRange, typename OutputIterator>
-            typename std::enable_if<detail::is_iterator<OutputIterator>::value, OutputIterator>::type
+            typename std::enable_if<::nil::crypto3::detail::is_iterator<OutputIterator>::value, OutputIterator>::type
                 hash(const SinglePassRange &rng, OutputIterator out) {
                 typedef typename hash::hash_accumulator_set<Hash> HashAccumulator;
 
@@ -179,7 +179,8 @@ namespace nil {
              * @param r
              * @return
              */
-            template<typename Hash, typename SinglePassRange, typename HashAccumulator = hash::hash_accumulator_set<Hash>>
+            template<typename Hash, typename SinglePassRange,
+                     typename HashAccumulator = hash::hash_accumulator_set<Hash>>
             detail::range_hash_impl<detail::value_hash_impl<HashAccumulator>> hash(const SinglePassRange &r) {
 
                 typedef detail::value_hash_impl<HashAccumulator> StreamHashImpl;

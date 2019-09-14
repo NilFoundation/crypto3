@@ -19,11 +19,11 @@
 
 #include <boost/container/static_vector.hpp>
 
+#include <nil/crypto3/detail/make_array.hpp>
+#include <nil/crypto3/detail/static_digest.hpp>
+
 #include <nil/crypto3/hash/accumulators/parameters/bits.hpp>
 #include <nil/crypto3/hash/accumulators/parameters/salt.hpp>
-
-#include <nil/crypto3/hash/detail/make_array.hpp>
-#include <nil/crypto3/hash/detail/static_digest.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -106,7 +106,7 @@ namespace nil {
                         if (cache.empty()) {
                             construction(block);
                         } else {
-                            block_type b = hash::make_array<block_words>(cache.begin(), cache.end());
+                            block_type b = make_array<block_words>(cache.begin(), cache.end());
                             typename block_type::const_iterator itr = block.begin() + (cache.max_size() - cache.size());
 
                             std::move(block.begin(), itr, b.end());
@@ -124,7 +124,7 @@ namespace nil {
                     cache_type cache;
                     construction_type construction;
                 };
-            }
+            }    // namespace impl
 
             namespace tag {
                 template<typename Hash>
@@ -136,17 +136,17 @@ namespace nil {
 
                     typedef boost::mpl::always<accumulators::impl::hash_impl<Hash>> impl;
                 };
-            }
+            }    // namespace tag
 
             namespace extract {
                 template<typename Hash, typename AccumulatorSet>
-                typename boost::mpl::apply<AccumulatorSet, tag::hash<Hash> >::type::result_type hash(
-                        const AccumulatorSet &acc) {
-                    return boost::accumulators::extract_result<tag::hash<Hash> >(acc);
+                typename boost::mpl::apply<AccumulatorSet, tag::hash<Hash>>::type::result_type
+                    hash(const AccumulatorSet &acc) {
+                    return boost::accumulators::extract_result<tag::hash<Hash>>(acc);
                 }
-            }
-        }
-    }
-}
+            }    // namespace extract
+        }        // namespace accumulators
+    }            // namespace crypto3
+}    // namespace nil
 
-#endif //CRYPTO3_ACCUMULATORS_BLOCK_HPP
+#endif    // CRYPTO3_ACCUMULATORS_BLOCK_HPP

@@ -9,11 +9,10 @@
 
 #define BOOST_TEST_MODULE keccak_test
 
+#include <nil/crypto3/detail/static_digest.hpp>
+
 #include <nil/crypto3/hash/keccak.hpp>
 #include <nil/crypto3/hash/hash_state.hpp>
-
-#include <nil/crypto3/hash/detail/primes.hpp>
-#include <nil/crypto3/hash/detail/static_digest.hpp>
 
 #include <nil/crypto3/hash/algorithm/hash.hpp>
 

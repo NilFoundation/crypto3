@@ -12,7 +12,8 @@
 
 #include <array>
 
-#include <nil/crypto3/hash/detail/static_digest.hpp>
+#include <nil/crypto3/detail/static_digest.hpp>
+
 #include <nil/crypto3/hash/detail/ripemd/ripemd_functions.hpp>
 
 namespace nil {
@@ -29,7 +30,7 @@ namespace nil {
                     typedef std::array<word_type, block_words> block_type;
 
                     constexpr static const std::size_t digest_bits = DigestBits;
-                    typedef hash::static_digest<digest_bits> digest_type;
+                    typedef static_digest<digest_bits> digest_type;
 
                     constexpr static const std::uint8_t ieee1363_hash_id = 0x33;
                     typedef std::array<std::uint8_t, 15> pkcs_id_type;

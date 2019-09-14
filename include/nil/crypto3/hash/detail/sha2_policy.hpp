@@ -12,7 +12,7 @@
 
 #include <nil/crypto3/block/detail/shacal/shacal2_policy.hpp>
 
-#include <nil/crypto3/hash/detail/static_digest.hpp>
+#include <nil/crypto3/detail/static_digest.hpp>
 
 #include <boost/cstdint.hpp>
 #include <array>
@@ -40,7 +40,7 @@ namespace nil {
                     constexpr static const std::size_t digest_bits = 224;
                     constexpr static const std::uint8_t ieee1363_hash_id = 0x38;
 
-                    typedef hash::static_digest<digest_bits> digest_type;
+                    typedef static_digest<digest_bits> digest_type;
                     typedef std::array<std::uint8_t, 19> pkcs_id_type;
 
                     constexpr static const pkcs_id_type pkcs_id = {0x30, 0x2D, 0x30, 0x0D, 0x06, 0x09, 0x60,
@@ -62,7 +62,7 @@ namespace nil {
                     constexpr static const std::size_t digest_bits = 256;
                     constexpr static const std::uint8_t ieee1363_hash_id = 0x34;
 
-                    typedef hash::static_digest<digest_bits> digest_type;
+                    typedef static_digest<digest_bits> digest_type;
                     typedef std::array<std::uint8_t, 19> pkcs_id_type;
 
                     constexpr static const pkcs_id_type pkcs_id = {0x30, 0x2D, 0x30, 0x0D, 0x06, 0x09, 0x60,
@@ -84,7 +84,7 @@ namespace nil {
                     constexpr static const std::size_t digest_bits = 384;
                     constexpr static const std::uint8_t ieee1363_hash_id = 0x36;
 
-                    typedef hash::static_digest<digest_bits> digest_type;
+                    typedef static_digest<digest_bits> digest_type;
                     typedef std::array<std::uint8_t, 19> pkcs_id_type;
 
                     constexpr static const pkcs_id_type pkcs_id = {0x30, 0x2D, 0x30, 0x0D, 0x06, 0x09, 0x60,
@@ -108,7 +108,7 @@ namespace nil {
                     constexpr static const std::size_t digest_bits = 512;
                     constexpr static const std::uint8_t ieee1363_hash_id = 0x35;
 
-                    typedef hash::static_digest<digest_bits> digest_type;
+                    typedef static_digest<digest_bits> digest_type;
                     typedef std::array<std::uint8_t, 19> pkcs_id_type;
 
                     constexpr static const pkcs_id_type pkcs_id = {0x30, 0x2D, 0x30, 0x0D, 0x06, 0x09, 0x60,

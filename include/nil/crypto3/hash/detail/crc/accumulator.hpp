@@ -24,20 +24,21 @@
 
 #include <nil/crypto3/hash/accumulators/parameters/bits.hpp>
 
-#include <nil/crypto3/hash/detail/make_array.hpp>
-#include <nil/crypto3/hash/detail/static_digest.hpp>
+#include <nil/crypto3/detail/make_array.hpp>
+#include <nil/crypto3/detail/static_digest.hpp>
 
 // Boost.CRC undefs this, so re-define it
 #if !(defined(BOOST_NO_DEPENDENT_TYPES_IN_TEMPLATE_VALUE_PARAMETERS) || (defined(BOOST_MSVC) && (BOOST_MSVC <= 1300)))
-#define BOOST_CRC_PARM_TYPE  typename ::boost::uint_t<DigestBits>::fast
+#define BOOST_CRC_PARM_TYPE typename ::boost::uint_t<DigestBits>::fast
 #else
-#define BOOST_CRC_PARM_TYPE  unsigned long
+#define BOOST_CRC_PARM_TYPE unsigned long
 #endif
 
 namespace nil {
     namespace crypto3 {
         namespace hash {
-            template<std::size_t DigestBits, BOOST_CRC_PARM_TYPE TruncPoly, BOOST_CRC_PARM_TYPE InitRem, BOOST_CRC_PARM_TYPE FinalXor, bool ReflectIn, bool ReflectRem>
+            template<std::size_t DigestBits, BOOST_CRC_PARM_TYPE TruncPoly, BOOST_CRC_PARM_TYPE InitRem,
+                     BOOST_CRC_PARM_TYPE FinalXor, bool ReflectIn, bool ReflectRem>
             class crc;
 
         }
@@ -57,9 +58,10 @@ namespace nil {
                  *
                  * @note CRC hash-specific accumulator. Be careful.
                  */
-                template<std::size_t DigestBits, BOOST_CRC_PARM_TYPE TruncPoly, BOOST_CRC_PARM_TYPE InitRem, BOOST_CRC_PARM_TYPE FinalXor, bool ReflectIn, bool ReflectRem>
+                template<std::size_t DigestBits, BOOST_CRC_PARM_TYPE TruncPoly, BOOST_CRC_PARM_TYPE InitRem,
+                         BOOST_CRC_PARM_TYPE FinalXor, bool ReflectIn, bool ReflectRem>
                 struct hash_impl<hash::crc<DigestBits, TruncPoly, InitRem, FinalXor, ReflectIn, ReflectRem>>
-                        : boost::accumulators::accumulator_base {
+                    : boost::accumulators::accumulator_base {
                 protected:
                     typedef hash::crc<DigestBits, TruncPoly, InitRem, FinalXor, ReflectIn, ReflectRem> hash_type;
                     typedef typename hash_type::construction_type construction_type;
@@ -94,7 +96,6 @@ namespace nil {
                     }
 
                 protected:
-
                     inline void resolve_type(const word_type &value, std::size_t bits) {
                         if (bits == std::size_t()) {
                             process(value, word_bits);
@@ -112,7 +113,8 @@ namespace nil {
                     }
 
                     template<typename InputIterator,
-                             typename = typename std::enable_if<hash::detail::is_iterator<InputIterator>::value>::type>
+                             typename = typename std::enable_if<
+                                 ::nil::crypto3::detail::is_iterator<InputIterator>::value>::type>
                     inline void resolve_type(InputIterator p, std::size_t bits) {
                         construction(p, p + bits / word_bits);
                     }
@@ -127,9 +129,9 @@ namespace nil {
 
                     construction_type construction;
                 };
-            }
-        }
-    }
-}
+            }    // namespace impl
+        }        // namespace accumulators
+    }            // namespace crypto3
+}    // namespace nil
 
-#endif //CRYPTO3_CRC_ACCUMULATOR_HPP
+#endif    // CRYPTO3_CRC_ACCUMULATOR_HPP

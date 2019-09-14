@@ -10,9 +10,10 @@
 #ifndef CRYPTO3_HASH_SPONGE_CONSTRUCTION_HPP
 #define CRYPTO3_HASH_SPONGE_CONSTRUCTION_HPP
 
+#include <nil/crypto3/detail/static_digest.hpp>
+#include <nil/crypto3/detail/pack.hpp>
+
 #include <nil/crypto3/hash/detail/nop_finalizer.hpp>
-#include <nil/crypto3/hash/detail/static_digest.hpp>
-#include <nil/crypto3/hash/detail/pack.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -35,7 +36,7 @@ namespace nil {
                      typename Finalizer = nop_finalizer>
             class sponge_construction {
             public:
-                typedef hash::static_digest<DigestBits> digest_type;
+                typedef static_digest<DigestBits> digest_type;
 
                 typedef IV iv_generator;
                 typedef Compressor compressor_functor;
@@ -69,7 +70,7 @@ namespace nil {
                     finalizer_functor finalizer;
                     finalizer(state_);
                     DigestType d;
-                    pack_n<DigestEndian, word_bits, octet_bits>(state_.data(), DigestBits / word_bits, d.data(),
+                    ::nil::crypto3::detail::pack_n<DigestEndian, word_bits, octet_bits>(state_.data(), DigestBits / word_bits, d.data(),
                                                                 DigestBits / octet_bits);
                     return d;
                 }

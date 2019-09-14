@@ -13,7 +13,7 @@
 #include <array>
 #include <iterator>
 
-#include <nil/crypto3/hash/detail/pack.hpp>
+#include <nil/crypto3/detail/pack.hpp>
 
 #include <nil/crypto3/hash/accumulators/parameters/bits.hpp>
 #include <nil/crypto3/hash/accumulators/parameters/salt.hpp>
@@ -75,7 +75,7 @@ namespace nil {
                 inline void process_block() {
                     // Convert the input into words
                     block_type block;
-                    pack<endian_type, value_bits, word_bits>(value_array, block);
+                    ::nil::crypto3::detail::pack<endian_type, value_bits, word_bits>(value_array, block);
 
                     // Process the block
                     std::size_t bb = block_bits;
@@ -91,12 +91,12 @@ namespace nil {
                 typename boost::enable_if_c<length_bits && sizeof(Dummy)>::type append_length(length_type length) {
                     // Convert the input into words
                     block_type block;
-                    pack<endian_type, value_bits, word_bits>(value_array, block);
+                    ::nil::crypto3::detail::pack<endian_type, value_bits, word_bits>(value_array, block);
 
                     // Append length
                     std::array<length_type, 1> length_array = {{length}};
                     std::array<word_type, length_words> length_words_array;
-                    pack<endian_type, length_bits, word_bits>(length_array, length_words_array);
+                    ::nil::crypto3::detail::pack<endian_type, length_bits, word_bits>(length_array, length_words_array);
                     for (std::size_t i = length_words; i; --i) {
                         block[block_words - i] = length_words_array[length_words - i];
                     }
@@ -132,7 +132,8 @@ namespace nil {
                     for (; n >= block_values; n -= block_values, p += block_values) {
                         // Convert the input into words
                         block_type block;
-                        pack_n<endian_type, value_bits, word_bits>(p, block_values, std::begin(block), block_words);
+                        ::nil::crypto3::detail::pack_n<endian_type, value_bits, word_bits>(
+                            p, block_values, std::begin(block), block_words);
 
                         // Process the block
                         std::size_t bb = block_bits;
@@ -188,7 +189,7 @@ namespace nil {
                     update_one(padding_values[0]);
 #else
                     value_type pad = 0;
-                    detail::imploder_step<endian_type, 1, value_bits, 0>::step(1, pad);
+                    ::nil::crypto3::detail::imploder_step<endian_type, 1, value_bits, 0>::step(1, pad);
                     update_one(pad);
 #endif
 

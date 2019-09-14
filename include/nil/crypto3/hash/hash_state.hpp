@@ -30,7 +30,7 @@ namespace nil {
              */
             template<typename Hash>
             using hash_accumulator_set =
-                boost::accumulators::accumulator_set<hash::static_digest<Hash::digest_bits>,
+                boost::accumulators::accumulator_set<static_digest<Hash::digest_bits>,
                                                      boost::accumulators::features<accumulators::tag::hash<Hash>>,
                                                      std::size_t>;
         }    // namespace hash
