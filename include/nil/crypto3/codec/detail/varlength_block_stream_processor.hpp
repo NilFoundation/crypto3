@@ -15,6 +15,7 @@
 #include <iterator>
 
 #include <nil/crypto3/detail/pack.hpp>
+#include <nil/crypto3/detail/pack_numeric.hpp>
 #include <nil/crypto3/detail/digest.hpp>
 
 #include <boost/integer.hpp>
