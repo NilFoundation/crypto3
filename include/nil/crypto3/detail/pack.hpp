@@ -10,14 +10,14 @@
 #ifndef CRYPTO3_HASH_PACK_HPP
 #define CRYPTO3_HASH_PACK_HPP
 
-#include <nil/crypto3/hash/detail/stream_endian.hpp>
-#include <nil/crypto3/hash/detail/exploder.hpp>
-#include <nil/crypto3/hash/detail/imploder.hpp>
+#include <nil/crypto3/detail/stream_endian.hpp>
+#include <nil/crypto3/detail/exploder.hpp>
+#include <nil/crypto3/detail/imploder.hpp>
 
 #include <boost/assert.hpp>
 #include <boost/static_assert.hpp>
 
-#ifndef CRYPTO3_HASH_NO_OPTIMIZATION
+#ifndef CRYPTO3_NO_OPTIMIZATION
 
 #include <boost/detail/endian.hpp>
 #include <boost/utility/enable_if.hpp>
@@ -26,9 +26,9 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace hash {
+        namespace detail {
 
-#ifndef CRYPTO3_HASH_NO_OPTIMIZATION
+#ifndef CRYPTO3_NO_OPTIMIZATION
 
             template<int UnitBits, int InputBits, int OutputBits, typename InT, typename OutT>
             struct host_can_memcpy {
@@ -218,7 +218,7 @@ namespace nil {
                 pack_n<Endianness, InValueBits, OutValueBits>(in.data(), in.size(), out.data(), out.size());
             }
 
-        }    // namespace hash
+        }    // namespace detail
     }        // namespace crypto3
 }    // namespace nil
 

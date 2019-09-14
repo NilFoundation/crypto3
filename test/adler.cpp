@@ -12,8 +12,8 @@
 #include <nil/crypto3/hash/adler.hpp>
 #include <nil/crypto3/hash/hash_state.hpp>
 
-#include <nil/crypto3/hash/detail/primes.hpp>
-#include <nil/crypto3/hash/detail/static_digest.hpp>
+#include <nil/crypto3/detail/primes.hpp>
+#include <nil/crypto3/detail/static_digest.hpp>
 
 #include <nil/crypto3/hash/algorithm/hash.hpp>
 
@@ -29,7 +29,7 @@
 
 using namespace nil::crypto3::hash;
 using namespace nil::crypto3::accumulators;
-using nil::crypto3::hash::detail::largest_prime;
+using nil::crypto3::detail::largest_prime;
 
 namespace boost {
     namespace test_tools {
@@ -43,27 +43,27 @@ namespace boost {
     }        // namespace test_tools
 }    // namespace boost
 
-static const std::unordered_map<std::string, std::string> string_data
-    = {{"\x2", "00030003"},
-       {"\x2\x4", "000a0007"},
-       {"", "00000001"},
-       {"a", "00620062"},
-       {"abc", "024d0127"},
-       {"message digest", "29750586"},
-       {"abcdefghijklmnopqrstuvwxyz", "90860b20"},
-       {"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789", "8adb150c"},
-       {"12345678901234567890123456789012345678901234567890123456789012345678901234567890", "97b61069"}};
+static const std::unordered_map<std::string, std::string> string_data = {
+    {"\x2", "00030003"},
+    {"\x2\x4", "000a0007"},
+    {"", "00000001"},
+    {"a", "00620062"},
+    {"abc", "024d0127"},
+    {"message digest", "29750586"},
+    {"abcdefghijklmnopqrstuvwxyz", "90860b20"},
+    {"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789", "8adb150c"},
+    {"12345678901234567890123456789012345678901234567890123456789012345678901234567890", "97b61069"}};
 
-static const std::unordered_map<std::string, std::vector<uint8_t>> byte_data
-    = {{"\x2", {0x00, 0x03, 0x00, 0x03}},
-       {"\x2\x4", {0x00, 0x0a, 0x00, 0x07}},
-       {"", {0x00, 0x00, 0x00, 0x01}},
-       {"a", {0x00, 0x62, 0x00, 0x62}},
-       {"abc", {0x02, 0x4d, 0x01, 0x27}},
-       {"message digest", {0x29, 0x75, 0x05, 0x86}},
-       {"abcdefghijklmnopqrstuvwxyz", {0x90, 0x86, 0x0b, 0x20}},
-       {"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789", {0x8a, 0xdb, 0x15, 0x0c}},
-       {"12345678901234567890123456789012345678901234567890123456789012345678901234567890", {0x97, 0xb6, 0x10, 0x69}}};
+static const std::unordered_map<std::string, std::vector<uint8_t>> byte_data = {
+    {"\x2", {0x00, 0x03, 0x00, 0x03}},
+    {"\x2\x4", {0x00, 0x0a, 0x00, 0x07}},
+    {"", {0x00, 0x00, 0x00, 0x01}},
+    {"a", {0x00, 0x62, 0x00, 0x62}},
+    {"abc", {0x02, 0x4d, 0x01, 0x27}},
+    {"message digest", {0x29, 0x75, 0x05, 0x86}},
+    {"abcdefghijklmnopqrstuvwxyz", {0x90, 0x86, 0x0b, 0x20}},
+    {"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789", {0x8a, 0xdb, 0x15, 0x0c}},
+    {"12345678901234567890123456789012345678901234567890123456789012345678901234567890", {0x97, 0xb6, 0x10, 0x69}}};
 
 BOOST_AUTO_TEST_SUITE(adler_test_suite)
 
