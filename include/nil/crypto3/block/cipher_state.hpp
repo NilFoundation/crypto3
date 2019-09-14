@@ -30,7 +30,7 @@ namespace nil {
              */
             template<typename ProcessingMode>
             using block_accumulator_set = boost::accumulators::accumulator_set<
-                block::digest<ProcessingMode::input_block_bits>,
+                digest<ProcessingMode::input_block_bits>,
                 boost::accumulators::features<accumulators::tag::block<ProcessingMode>>>;
         }    // namespace block
     }        // namespace crypto3

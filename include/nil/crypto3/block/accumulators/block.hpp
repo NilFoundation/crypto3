@@ -19,11 +19,11 @@
 #include <boost/accumulators/framework/depends_on.hpp>
 #include <boost/accumulators/framework/parameters/sample.hpp>
 
+#include <nil/crypto3/detail/make_array.hpp>
+#include <nil/crypto3/detail/digest.hpp>
+
 #include <nil/crypto3/block/accumulators/parameters/cipher.hpp>
 #include <nil/crypto3/block/accumulators/parameters/bits.hpp>
-
-#include <nil/crypto3/block/detail/make_array.hpp>
-#include <nil/crypto3/block/detail/digest.hpp>
 
 #include <nil/crypto3/block/cipher.hpp>
 
@@ -54,7 +54,7 @@ namespace nil {
                     typedef boost::container::static_vector<word_type, block_words> cache_type;
 
                 public:
-                    typedef block::digest<block_bits> result_type;
+                    typedef digest<block_bits> result_type;
 
                     template<typename Args>
                     block_impl(const Args &args) : cipher(args[accumulators::cipher]), seen(0) {
@@ -121,7 +121,7 @@ namespace nil {
                         if (cache.empty()) {
                             ob = digest.empty() ? cipher.begin_message(block) : cipher.process_block(block);
                         } else {
-                            block_type b = block::make_array<block_words>(cache.begin(), cache.end());
+                            block_type b = make_array<block_words>(cache.begin(), cache.end());
                             typename block_type::const_iterator itr = block.begin() + (cache.max_size() - cache.size());
 
                             std::copy(block.begin(), itr, b.end());
