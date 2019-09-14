@@ -147,8 +147,7 @@ namespace nil {
                         if (cache.empty()) {
                             ob = codec_mode_type::process_block(block);
                         } else {
-                            input_block_type b =
-                                ::nil::crypto3::make_array<input_block_values>(cache.begin(), cache.end());
+                            input_block_type b = make_array<input_block_values>(cache.begin(), cache.end());
                             typename input_block_type::const_iterator itr =
                                 block.begin() + (cache.max_size() - cache.size());
 
