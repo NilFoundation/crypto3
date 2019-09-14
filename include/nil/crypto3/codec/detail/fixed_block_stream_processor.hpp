@@ -68,7 +68,8 @@ namespace nil {
                     if (i == input_block_bits - value_bits) {
                         // Convert the input into words
                         input_block_type block = {0};
-                        pack<endian_type, value_bits, input_value_bits>(cache.begin(), cache.end(), block);
+                        ::nil::crypto3::pack<endian_type, value_bits, input_value_bits>(cache.begin(),
+                                                                                                cache.end(), block);
 
                         // Process the block
                         std::size_t ibb = input_block_bits;
@@ -93,7 +94,8 @@ namespace nil {
                     for (; n >= block_values; n -= block_values, first += block_values) {
                         // Convert the input into words
                         input_block_type block = {0};
-                        pack<endian_type, value_bits, input_value_bits>(first, first + block_values, block);
+                        ::nil::crypto3::pack<endian_type, value_bits, input_value_bits>(
+                            first, first + block_values, block);
                         seen += value_bits * block_values;
 
                         std::size_t ibb = input_block_bits;
@@ -121,8 +123,8 @@ namespace nil {
                         input_block_type block = {0};
                         typename input_block_type::const_iterator v = block.cbegin();
 
-                        pack<endian_type, value_bits, input_value_bits>(cache.begin(), cache.begin() + cache.size(),
-                                                                        block);
+                        ::nil::crypto3::pack<endian_type, value_bits, input_value_bits>(
+                            cache.begin(), cache.begin() + cache.size(), block);
                         for (length_type itr = seen - (seen % input_block_bits); itr < seen; itr += value_bits) {
                             state(*v++);
                         }
