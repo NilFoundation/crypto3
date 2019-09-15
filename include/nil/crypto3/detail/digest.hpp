@@ -54,10 +54,11 @@ namespace nil {
         using digest = boost::container::small_vector<octet_type, DigestBits / octet_bits>;
 
         namespace detail {
-            template<typename oit_T>
-            oit_T to_ascii(oit_T it) {
-                for (unsigned j = 0; j < it.size(); ++j) {
-                    octet_type b = it[j];
+            template<std::size_t DigestBits, typename OutputIterator>
+            OutputIterator to_ascii(const boost::container::small_vector<octet_type, DigestBits / octet_bits> &d,
+                                    OutputIterator it) {
+                for (std::size_t j = 0; j < d.size(); ++j) {
+                    octet_type b = d[j];
                     *it++ = "0123456789abcdef"[(b >> 4) & 0xF];
                     *it++ = "0123456789abcdef"[(b >> 0) & 0xF];
                 }
@@ -65,10 +66,11 @@ namespace nil {
             }
 
             template<std::size_t DigestBits>
-            std::array<char, DigestBits / 4 + 1> c_str(const digest<DigestBits> &d) {
-                std::array<char, DigestBits / 4 + 1> s;
-                char *p = to_ascii(s.data());
-                *p++ = '\0';
+            digest<DigestBits / 4 + 1>
+                c_str(const boost::container::small_vector<octet_type, DigestBits / octet_bits> &d) {
+                digest<DigestBits / 4 + 1> s;
+                to_ascii<DigestBits>(d, std::back_inserter(s));
+                s.push_back('\0');
                 return s;
             }
         }    // namespace detail
@@ -82,7 +84,7 @@ namespace nil {
          * (0, NewBits - OldBits) bits.
          */
         template<unsigned NewBits, unsigned OldBits>
-        digest<NewBits> resize(const digest<OldBits> &od) {
+        digest<NewBits> resize(const boost::container::small_vector<octet_type, OldBits / octet_bits> &od) {
             digest<NewBits> nd;
             unsigned bytes = sizeof(octet_type) * (NewBits < OldBits ? NewBits : OldBits) / octet_bits;
             std::memcpy(nd.data(), od.data(), bytes);
@@ -100,7 +102,7 @@ namespace nil {
          * amount necessitated by the shorted output size.
          */
         template<unsigned NewBits, unsigned OldBits>
-        digest<NewBits> truncate(const digest<OldBits> &od) {
+        digest<NewBits> truncate(const boost::container::small_vector<octet_type, OldBits / octet_bits> &od) {
             BOOST_STATIC_ASSERT(NewBits <= OldBits);
             return resize<NewBits>(od);
         }
@@ -138,23 +140,23 @@ namespace nil {
         }
 
         template<unsigned DB>
-        bool operator!=(const digest<DB> &a, const char *b) {
+        bool operator!=(digest<DB> const &a, char const *b) {
             BOOST_ASSERT(std::strlen(b) == DB / 4);
             return static_cast<bool>(std::strcmp(a.cstring().data(), b));
         }
 
         template<unsigned DB>
-        bool operator==(const digest<DB> &a, const char *b) {
+        bool operator==(digest<DB> const &a, char const *b) {
             return !(a != b);
         }
 
         template<unsigned DB>
-        bool operator!=(const char *b, const digest<DB> &a) {
+        bool operator!=(char const *b, digest<DB> const &a) {
             return a != b;
         }
 
         template<unsigned DB>
-        bool operator==(const char *b, const digest<DB> &a) {
+        bool operator==(char const *b, digest<DB> const &a) {
             return a == b;
         }
 
@@ -162,7 +164,7 @@ namespace nil {
         std::ostream &operator<<(std::ostream &sink, digest<DB> const &d) {
             d.to_ascii(std::ostream_iterator<char>(sink));
             return sink;
-        };
+        }
 
         template<unsigned DB>
         std::istream &operator>>(std::istream &source, digest<DB> &d) {
@@ -187,16 +189,16 @@ namespace nil {
             }
             detail::pack<stream_endian::big_bit, 4, 8>(a, d);
             return source;
-        };
+        }
     }    // namespace crypto3
 }    // namespace nil
 
 namespace std {
     template<std::size_t DigestBits>
     std::string to_string(const nil::crypto3::digest<DigestBits> &d) {
-        std::array<char, DigestBits / 4 + 1> cstr = nil::crypto3::detail::c_str(d);
-        return std::string(cstr.data(), cstr.size() - 1);
+        nil::crypto3::digest<DigestBits / 4 + 1> cstr = nil::crypto3::detail::c_str(d);
+        return std::string(cstr.begin(), cstr.begin() + cstr.size() - 1);
     }
 }    // namespace std
 
-#endif    // CRYPTO3_BLOCK_DIGEST_HPP
+#endif    // CRYPTO3_DIGEST_HPP
