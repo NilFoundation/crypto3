@@ -18,8 +18,8 @@
 #include <cstring>
 #include <iostream>
 
-#include <nil/crypto3/detail/pack.hpp>
 #include <nil/crypto3/detail/octet.hpp>
+#include <nil/crypto3/detail/pack.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -204,10 +204,10 @@ namespace nil {
                     a[i] = std::toupper(c, source.getloc()) - 'A' + 0xA;
                 }
             }
-            pack<stream_endian::big_bit, 4, 8>(a, d);
+            detail::pack<stream_endian::big_bit, 4, 8>(a, d);
             return source;
         }
     }    // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_CODEC_STATIC_DIGEST_HPP
+#endif    // CRYPTO3_HASH_DIGEST_HPP
