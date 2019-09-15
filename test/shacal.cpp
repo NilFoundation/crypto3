@@ -86,7 +86,7 @@ BOOST_AUTO_TEST_CASE(shacal1_single_block_encrypt2) {
 BOOST_AUTO_TEST_CASE(shacal1_single_block_encrypt3) {
     typedef block::shacal1 bct;
     typedef hash::davies_meyer_compressor<bct, state_adder> owcft;
-    typedef hash::merkle_damgard_construction<hash::stream_endian::big_octet_big_bit, 160,
+    typedef hash::merkle_damgard_construction<stream_endian::big_octet_big_bit, 160,
                                               hash::detail::sha1_policy::iv_generator, owcft>
         bht;
 
@@ -144,7 +144,7 @@ BOOST_AUTO_TEST_CASE(shacal2_single_block_encrypt2) {
 BOOST_AUTO_TEST_CASE(shacal2_single_block_encrypt3) {
     typedef block::shacal2<256> bct;
     typedef hash::davies_meyer_compressor<bct, state_adder> owcft;
-    typedef hash::merkle_damgard_construction<hash::stream_endian::big_octet_big_bit, 256,
+    typedef hash::merkle_damgard_construction<stream_endian::big_octet_big_bit, 256,
                                               hash::detail::sha2_policy<256>::iv_generator, owcft>
         bht;
 

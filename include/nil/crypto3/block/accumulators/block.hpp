@@ -65,8 +65,7 @@ namespace nil {
                         return process(args[boost::accumulators::sample]);
                     }
 
-                    template<typename ArgumentPack>
-                    inline result_type result(const ArgumentPack &args) const {
+                    inline result_type result(boost::accumulators::dont_care) const {
                         result_type res = digest;
 
                         if (!cache.empty()) {
