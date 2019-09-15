@@ -29,7 +29,7 @@ namespace nil {
     namespace crypto3 {
         namespace hash {
             template<std::size_t DigestBits>
-            class adler;
+            struct adler;
         }
 
         namespace accumulators {
