@@ -64,7 +64,7 @@ namespace nil {
                         // row 0 never gets shifted
 #pragma clang loop unroll(full)
                         for (std::size_t row = 1; row < policy_type::word_bytes; ++row) {
-                            const int off = offset[row - 1];
+                            const std::size_t off = offset[row - 1];
 #pragma clang loop unroll(full)
                             for (std::size_t i = 0; i < off; ++i) {
                                 tmp[i] = state[i * policy_type::word_bytes + row];
