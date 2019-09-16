@@ -195,9 +195,7 @@ namespace nil {
                 public:
                     typedef digest<output_block_bits> result_type;
 
-                    // The constructor takes an argument pack.
-                    template<typename Args>
-                    codec_impl(const Args &args) : leading_zeros(0) {
+                    codec_impl(boost::accumulators::dont_care) : leading_zeros(0) {
                     }
 
                     template<typename ArgumentPack>
@@ -213,8 +211,7 @@ namespace nil {
                         std::move(block.begin(), block.end(), std::back_inserter(input));
                     }
 
-                    template<typename ArgumentPack>
-                    inline result_type result(const ArgumentPack &args) const {
+                    inline result_type result(boost::accumulators::dont_care) const {
                         result_type res;
                         output_block_type ob = codec_mode_type::process_block(input);
                         std::move(ob.begin(), ob.end(), std::inserter(res, res.end()));
