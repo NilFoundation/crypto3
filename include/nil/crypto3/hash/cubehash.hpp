@@ -80,7 +80,7 @@ namespace nil {
             // Otherwise the three parameters are r, b, and h respectively.
             //
             template<unsigned, unsigned = 0, unsigned = 0>
-            struct cubehash;
+            class cubehash;
 
             /*!
              * @brief Cubehash. Cubehash 16/32 modification was a SHA-3 competitor submitted to NIST.
@@ -118,7 +118,7 @@ namespace nil {
             };
 
             template<std::size_t h>
-            struct cubehash<h, 0, 0> : cubehash<CRYPTO3_HASH_CUBEHASH_DEFAULT_R, CRYPTO3_HASH_CUBEHASH_DEFAULT_B, h> {};
+            class cubehash<h, 0, 0> : cubehash<CRYPTO3_HASH_CUBEHASH_DEFAULT_R, CRYPTO3_HASH_CUBEHASH_DEFAULT_B, h> {};
 
         }    // namespace hash
     }        // namespace crypto3
