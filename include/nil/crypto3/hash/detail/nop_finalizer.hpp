@@ -14,6 +14,7 @@ namespace nil {
     namespace crypto3 {
         namespace hash {
             struct nop_finalizer {
+
                 template<typename T>
                 void operator()(T &) {
                 }
