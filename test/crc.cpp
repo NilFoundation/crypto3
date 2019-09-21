@@ -14,7 +14,7 @@
 #include <nil/crypto3/hash/crc.hpp>
 #include <nil/crypto3/hash/hash_state.hpp>
 
-#include <nil/crypto3/hash/detail/static_digest.hpp>
+#include <nil/crypto3/detail/static_digest.hpp>
 
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
@@ -27,7 +27,7 @@
 
 using namespace nil::crypto3::hash;
 using namespace nil::crypto3::accumulators;
-using nil::crypto3::hash::detail::largest_prime;
+using nil::crypto3::detail::largest_prime;
 
 namespace boost {
     namespace test_tools {
@@ -41,23 +41,23 @@ namespace boost {
     }        // namespace test_tools
 }    // namespace boost
 
-static const std::unordered_map<std::string, std::string> string_data
-    = {{"", "00000000"},
-       {"a", "e8b7be43"},
-       {"abc", "352441c2"},
-       {"message digest", "20159d7f"},
-       {"abcdefghijklmnopqrstuvwxyz", "4c2750bd"},
-       {"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789", "1fc2e6d2"},
-       {"12345678901234567890123456789012345678901234567890123456789012345678901234567890", "7ca94a72"}};
+static const std::unordered_map<std::string, std::string> string_data = {
+    {"", "00000000"},
+    {"a", "e8b7be43"},
+    {"abc", "352441c2"},
+    {"message digest", "20159d7f"},
+    {"abcdefghijklmnopqrstuvwxyz", "4c2750bd"},
+    {"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789", "1fc2e6d2"},
+    {"12345678901234567890123456789012345678901234567890123456789012345678901234567890", "7ca94a72"}};
 
-static const std::unordered_map<std::string, std::vector<uint8_t>> byte_data
-    = {{"", {0x00, 0x00, 0x00, 0x00}},
-       {"a", {0xe8, 0xb7, 0xbe, 0x43}},
-       {"abc", {0x35, 0x24, 0x41, 0xc2}},
-       {"message digest", {0x20, 0x15, 0x9d, 0x7f}},
-       {"abcdefghijklmnopqrstuvwxyz", {0x4c, 0x27, 0x50, 0xbd}},
-       {"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789", {0x1f, 0xc2, 0xe6, 0xd2}},
-       {"12345678901234567890123456789012345678901234567890123456789012345678901234567890", {0x7c, 0xa9, 0x4a, 0x72}}};
+static const std::unordered_map<std::string, std::vector<uint8_t>> byte_data = {
+    {"", {0x00, 0x00, 0x00, 0x00}},
+    {"a", {0xe8, 0xb7, 0xbe, 0x43}},
+    {"abc", {0x35, 0x24, 0x41, 0xc2}},
+    {"message digest", {0x20, 0x15, 0x9d, 0x7f}},
+    {"abcdefghijklmnopqrstuvwxyz", {0x4c, 0x27, 0x50, 0xbd}},
+    {"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789", {0x1f, 0xc2, 0xe6, 0xd2}},
+    {"12345678901234567890123456789012345678901234567890123456789012345678901234567890", {0x7c, 0xa9, 0x4a, 0x72}}};
 
 BOOST_AUTO_TEST_SUITE(crc_hash_test_suite)
 

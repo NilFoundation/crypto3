@@ -19,17 +19,17 @@
 
 #include <boost/container/static_vector.hpp>
 
-#include <nil/crypto3/hash/accumulators/parameters/bits.hpp>
+#include <nil/crypto3/detail/make_array.hpp>
+#include <nil/crypto3/detail/static_digest.hpp>
+#include <nil/crypto3/detail/type_traits.hpp>
 
-#include <nil/crypto3/hash/detail/make_array.hpp>
-#include <nil/crypto3/hash/detail/static_digest.hpp>
-#include <nil/crypto3/hash/detail/type_traits.hpp>
+#include <nil/crypto3/hash/accumulators/parameters/bits.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace hash {
             template<std::size_t DigestBits>
-            class adler;
+            struct adler;
         }
 
         namespace accumulators {
@@ -78,7 +78,6 @@ namespace nil {
                     }
 
                 protected:
-
                     inline void resolve_type(const word_type &value, std::size_t bits) {
                         if (bits == std::size_t()) {
                             process(value, word_bits);
@@ -96,7 +95,8 @@ namespace nil {
                     }
 
                     template<typename InputIterator,
-                             typename = typename std::enable_if<hash::detail::is_iterator<InputIterator>::value>::type>
+                             typename = typename std::enable_if<
+                                 ::nil::crypto3::detail::is_iterator<InputIterator>::value>::type>
                     inline void resolve_type(InputIterator p, std::size_t bits) {
                         construction(p, p + bits / word_bits);
                     }
@@ -111,9 +111,9 @@ namespace nil {
 
                     construction_type construction;
                 };
-            }
-        }
-    }
-}
+            }    // namespace impl
+        }        // namespace accumulators
+    }            // namespace crypto3
+}    // namespace nil
 
-#endif //CRYPTO3_ADLER_ACCUMULATOR_HPP
+#endif    // CRYPTO3_ADLER_ACCUMULATOR_HPP

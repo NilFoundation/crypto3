@@ -12,7 +12,7 @@
 #include <boost/array.hpp>
 #include <boost/cstdint.hpp>
 
-#include <nil/crypto3/hash/detail/pack.hpp>
+#include <nil/crypto3/detail/pack.hpp>
 
 #include <nil/crypto3/hash/hash_state.hpp>
 
@@ -26,12 +26,9 @@
 #include <cassert>
 #include <cstdio>
 
-using boost::int16_t;
-using boost::int32_t;
-using boost::int8_t;
-
+using namespace nil::crypto3::detail;
 using namespace nil::crypto3::hash;
-using namespace nil::crypto3::hash::stream_endian;
+using namespace nil::crypto3::stream_endian;
 
 BOOST_AUTO_TEST_SUITE(hash_pack_test_suite)
 
@@ -78,8 +75,8 @@ BOOST_AUTO_TEST_CASE(hash_pack_explodebb6) {
     std::array<uint16_t, 1> in = {{0xEC15}};
     std::array<bool, 16> out {};
     pack<big_octet_big_bit, 16, 1>(in, out);
-    std::array<bool, 16> eout
-        = {{true, true, true, false, true, true, false, false, false, false, false, true, false, true, false, true}};
+    std::array<bool, 16> eout = {
+        {true, true, true, false, true, true, false, false, false, false, false, true, false, true, false, true}};
     BOOST_CHECK(out == eout);
 }
 
@@ -142,8 +139,8 @@ BOOST_AUTO_TEST_CASE(hash_pack_explodelb6) {
     std::array<uint16_t, 1> in = {{0xEC15}};
     std::array<bool, 16> out {};
     pack<little_octet_big_bit, 16, 1>(in, out);
-    std::array<bool, 16> eout
-        = {{false, false, false, true, false, true, false, true, true, true, true, false, true, true, false, false}};
+    std::array<bool, 16> eout = {
+        {false, false, false, true, false, true, false, true, true, true, true, false, true, true, false, false}};
     BOOST_CHECK(out == eout);
 }
 
@@ -151,8 +148,8 @@ BOOST_AUTO_TEST_CASE(hash_pack_explodelb7) {
     std::array<uint16_t, 1> in = {{0xEC15}};
     std::array<bool, 16> out {};
     pack<little_octet_big_bit, 16, 1>(in, out);
-    std::array<bool, 16> eout
-        = {{false, false, false, true, false, true, false, true, true, true, true, false, true, true, false, false}};
+    std::array<bool, 16> eout = {
+        {false, false, false, true, false, true, false, true, true, true, true, false, true, true, false, false}};
     BOOST_CHECK(out == eout);
 }
 
@@ -207,8 +204,8 @@ BOOST_AUTO_TEST_CASE(hash_pack_explodebl6) {
     std::array<uint16_t, 1> in = {{0xEC15}};
     std::array<bool, 16> out {};
     pack<big_octet_little_bit, 16, 1>(in, out);
-    std::array<bool, 16> eout
-        = {{false, false, true, true, false, true, true, true, true, false, true, false, true, false, false, false}};
+    std::array<bool, 16> eout = {
+        {false, false, true, true, false, true, true, true, true, false, true, false, true, false, false, false}};
     BOOST_CHECK(out == eout);
 }
 
@@ -263,8 +260,8 @@ BOOST_AUTO_TEST_CASE(hash_pack_explodell6) {
     std::array<uint16_t, 1> in = {{0xEC15}};
     std::array<bool, 16> out {};
     pack<little_octet_little_bit, 16, 1>(in, out);
-    std::array<bool, 16> eout
-        = {{true, false, true, false, true, false, false, false, false, false, true, true, false, true, true, true}};
+    std::array<bool, 16> eout = {
+        {true, false, true, false, true, false, false, false, false, false, true, true, false, true, true, true}};
     BOOST_CHECK(out == eout);
 }
 
@@ -324,8 +321,8 @@ BOOST_AUTO_TEST_CASE(hash_pack_implodebb5) {
 }
 
 BOOST_AUTO_TEST_CASE(hash_pack_implodebb6) {
-    std::array<bool, 16> in
-        = {{true, true, true, false, true, true, false, false, false, false, false, true, false, true, false, true}};
+    std::array<bool, 16> in = {
+        {true, true, true, false, true, true, false, false, false, false, false, true, false, true, false, true}};
     std::array<uint16_t, 1> out {};
     pack<big_octet_big_bit, 1, 16>(in, out);
     std::array<uint16_t, 1> eout = {{0xEC15}};
@@ -388,8 +385,8 @@ BOOST_AUTO_TEST_CASE(hash_pack_implodelb5) {
 }
 
 BOOST_AUTO_TEST_CASE(hash_pack_implodelb6) {
-    std::array<bool, 16> in
-        = {{false, false, false, true, false, true, false, true, true, true, true, false, true, true, false, false}};
+    std::array<bool, 16> in = {
+        {false, false, false, true, false, true, false, true, true, true, true, false, true, true, false, false}};
     std::array<uint16_t, 1> out {};
     pack<little_octet_big_bit, 1, 16>(in, out);
     std::array<uint16_t, 1> eout = {{0xEC15}};
@@ -444,8 +441,8 @@ BOOST_AUTO_TEST_CASE(hash_pack_implodebl5) {
 }
 
 BOOST_AUTO_TEST_CASE(hash_pack_implodebl6) {
-    std::array<bool, 16> in
-        = {{false, false, true, true, false, true, true, true, true, false, true, false, true, false, false, false}};
+    std::array<bool, 16> in = {
+        {false, false, true, true, false, true, true, true, true, false, true, false, true, false, false, false}};
     std::array<uint16_t, 1> out {};
     pack<big_octet_little_bit, 1, 16>(in, out);
     std::array<uint16_t, 1> eout = {{0xEC15}};
@@ -500,8 +497,8 @@ BOOST_AUTO_TEST_CASE(hash_pack_implodell5) {
 }
 
 BOOST_AUTO_TEST_CASE(hash_pack_implodell6) {
-    std::array<bool, 16> in
-        = {{true, false, true, false, true, false, false, false, false, false, true, true, false, true, true, true}};
+    std::array<bool, 16> in = {
+        {true, false, true, false, true, false, false, false, false, false, true, true, false, true, true, true}};
     std::array<uint16_t, 1> out {};
     pack<little_octet_little_bit, 1, 16>(in, out);
     std::array<uint16_t, 1> eout = {{0xEC15}};

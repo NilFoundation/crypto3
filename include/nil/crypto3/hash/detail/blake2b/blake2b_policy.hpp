@@ -10,7 +10,7 @@
 #ifndef CRYPTO3_BLAKE2B_POLICY_HPP
 #define CRYPTO3_BLAKE2B_POLICY_HPP
 
-#include <nil/crypto3/hash/detail/static_digest.hpp>
+#include <nil/crypto3/detail/static_digest.hpp>
 #include <nil/crypto3/hash/detail/basic_functions.hpp>
 
 namespace nil {
@@ -25,7 +25,7 @@ namespace nil {
                     typedef typename basic_functions<64>::word_type word_type;
 
                     constexpr static const std::size_t digest_bits = DigestBits;
-                    typedef hash::static_digest<digest_bits> digest_type;
+                    typedef static_digest<digest_bits> digest_type;
 
                     constexpr static const std::size_t block_bits = 1024;
                     constexpr static const std::size_t block_words = block_bits / word_bits;

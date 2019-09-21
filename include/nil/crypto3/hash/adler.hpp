@@ -12,11 +12,11 @@
 
 #include <array>
 
-#include <nil/crypto3/hash/detail/adler/accumulator.hpp>
+#include <nil/crypto3/detail/static_digest.hpp>
+#include <nil/crypto3/detail/pack.hpp>
+#include <nil/crypto3/detail/primes.hpp>
 
-#include <nil/crypto3/hash/detail/primes.hpp>
-#include <nil/crypto3/hash/detail/static_digest.hpp>
-#include <nil/crypto3/hash/detail/pack.hpp>
+#include <nil/crypto3/hash/detail/adler/accumulator.hpp>
 
 #include <boost/static_assert.hpp>
 
@@ -62,7 +62,8 @@ namespace nil {
 
                 template<typename InputIterator>
                 inline adler_stream_processor &update_n(InputIterator p, size_t n) {
-                    acc(p, n);
+                    acc(p, accumulators::bits =
+                               n * sizeof(typename std::iterator_traits<InputIterator>::value_type) * CHAR_BIT);
                     return *this;
                 }
 
@@ -105,7 +106,7 @@ namespace nil {
                 BOOST_STATIC_ASSERT(DigestBits >= value_bits);
 
                 constexpr static const std::size_t digest_bits = DigestBits;
-                typedef hash::static_digest<digest_bits> digest_type;
+                typedef static_digest<digest_bits> digest_type;
 
                 constexpr static const std::size_t word_bits = DigestBits;
                 typedef typename boost::uint_t<word_bits>::least word_type;
@@ -133,7 +134,8 @@ namespace nil {
                     word_type x = (state_[0] << (DigestBits / 2)) | state_[1];
                     digest_type d;
                     // RFC 1950, Section 2.2 stores the ADLER-32 in big-endian
-                    pack_n<stream_endian::big_bit, digest_bits, octet_bits>(&x, 1, d.data(), digest_bits / octet_bits);
+                    ::nil::crypto3::detail::pack_n<stream_endian::big_bit, digest_bits, octet_bits>(
+                        &x, 1, d.data(), digest_bits / octet_bits);
                     return d;
                 }
 

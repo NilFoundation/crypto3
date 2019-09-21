@@ -11,7 +11,7 @@
 #define CRYPTO3_HASH_DETAIL_MD4_POLICY_HPP
 
 #include <nil/crypto3/block/detail/md4/md4_policy.hpp>
-#include <nil/crypto3/hash/detail/static_digest.hpp>
+#include <nil/crypto3/detail/static_digest.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -23,7 +23,7 @@ namespace nil {
                     typedef cipher_policy::block_type state_type;
 
                     constexpr static const std::size_t digest_bits = cipher_policy::block_bits;
-                    typedef hash::static_digest<digest_bits> digest_type;
+                    typedef static_digest<digest_bits> digest_type;
 
                     struct iv_generator {
                         state_type const &operator()() const {

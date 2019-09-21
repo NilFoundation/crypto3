@@ -12,8 +12,9 @@
 
 #include <array>
 
+#include <nil/crypto3/detail/static_digest.hpp>
+
 #include <nil/crypto3/hash/detail/basic_functions.hpp>
-#include <nil/crypto3/hash/detail/static_digest.hpp>
 
 #include <boost/static_assert.hpp>
 
@@ -442,7 +443,7 @@ namespace nil {
                     typedef std::array<word_type, block_words> block_type;
 
                     constexpr static const std::size_t digest_bits = h;
-                    typedef hash::static_digest<digest_bits> digest_type;
+                    typedef static_digest<digest_bits> digest_type;
 
                     inline static void transform_r(state_type &state) {
                         transform(state, r);

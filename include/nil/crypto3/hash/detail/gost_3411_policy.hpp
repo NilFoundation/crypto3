@@ -10,7 +10,7 @@
 #ifndef CRYPTO3_GOST_3411_POLICY_HPP
 #define CRYPTO3_GOST_3411_POLICY_HPP
 
-#include <nil/crypto3/hash/detail/static_digest.hpp>
+#include <nil/crypto3/detail/static_digest.hpp>
 #include <nil/crypto3/hash/detail/basic_functions.hpp>
 
 namespace nil {
