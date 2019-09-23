@@ -184,8 +184,9 @@ namespace nil {
                     return update_n(c.data(), c.size());
                 }
 
-                template<typename DigestType = digest_type>
-                DigestType end_message() {
+                digest_type end_message() {
+                    using namespace nil::crypto3::detail;
+
                     length_type length = seen;
 
                     // Add a 1 bit
@@ -215,8 +216,7 @@ namespace nil {
                     return block_hash.end_message();
                 }
 
-                template<typename DigestType = digest_type>
-                DigestType digest() const {
+                digest_type digest() const {
                     return haifa_stream_processor(*this).end_message();
                 }
 

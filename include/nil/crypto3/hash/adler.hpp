@@ -293,7 +293,13 @@ namespace nil {
              */
             template<std::size_t DigestBits>
             struct adler {
-                typedef basic_adler<DigestBits> construction_type;
+                struct construction {
+                    struct params_type {
+
+                    };
+
+                    typedef basic_adler<DigestBits> type;
+                };
 
                 template<typename StateAccumulator, std::size_t ValueBits>
                 struct stream_processor {
@@ -305,11 +311,11 @@ namespace nil {
                     };
 
                     BOOST_STATIC_ASSERT(ValueBits == CHAR_BIT);
-                    typedef adler_stream_processor<construction_type, StateAccumulator, params_type> type;
+                    typedef adler_stream_processor<typename construction::type, StateAccumulator, params_type> type;
                 };
 
                 constexpr static const std::size_t digest_bits = DigestBits;
-                typedef typename construction_type::digest_type digest_type;
+                typedef typename construction::type::digest_type digest_type;
             };
         }    // namespace hash
     }        // namespace crypto3

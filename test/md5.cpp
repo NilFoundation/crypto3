@@ -43,7 +43,7 @@ namespace boost {
     }        // namespace test_tools
 }    // namespace boost
 
-BOOST_TEST_DONT_PRINT_LOG_VALUE(md5::construction_type::digest_type)
+BOOST_TEST_DONT_PRINT_LOG_VALUE(md5::construction::type::digest_type)
 
 static const std::unordered_map<std::string, std::string> string_data = {
     {"", "d41d8cd98f00b204e9800998ecf8427e"},
@@ -57,7 +57,7 @@ static const std::unordered_map<std::string, std::string> string_data = {
 
 class fixture {
 public:
-    md5::construction_type a;
+    md5::construction::type a;
 };
 
 BOOST_AUTO_TEST_SUITE(md5_test_suite)
@@ -69,7 +69,7 @@ BOOST_DATA_TEST_CASE(md5_range_hash, boost::unit_test::data::make(string_data), 
 }
 
 BOOST_FIXTURE_TEST_CASE(md5_accumulator1, fixture) {
-    md5::construction_type::digest_type s = a.end_message();
+    md5::construction::type::digest_type s = a.end_message();
 
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
     std::printf("%s\n", std::to_string(s));
@@ -86,9 +86,9 @@ BOOST_FIXTURE_TEST_CASE(md5_accumulator2, fixture) {
     // then pad with 0s,
     // then add the length, which is also 0.
     // Remember that MD5 is little-octet, big-bit endian
-    md5::construction_type::block_type m = {{0x00000080u}};
-    a(m);
-    md5::construction_type::digest_type s = a.end_message();
+    md5::construction::type::block_type m = {{0x00000080u}};
+    a.process_block(m);
+    md5::construction::type::digest_type s = a.end_message();
 
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
     std::printf("%s\n", std::to_string(s));
@@ -101,12 +101,12 @@ BOOST_FIXTURE_TEST_CASE(md5_accumulator2, fixture) {
 
 BOOST_FIXTURE_TEST_CASE(md5_accumulator3, fixture) {
     // echo -n "abc" | md4sum
-    md5::construction_type::block_type m = {{}};
+    md5::construction::type::block_type m = {{}};
     m[0] = 0x80636261;
     // little-octet, big-bit endian also means the size isn't in the last word
     m[14] = 0x00000018;
-    a(m);
-    md5::construction_type::digest_type s = a.end_message();
+    a.process_block(m);
+    md5::construction::type::digest_type s = a.end_message();
 
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
     std::printf("%s\n", std::to_string(s));
@@ -119,7 +119,7 @@ BOOST_FIXTURE_TEST_CASE(md5_accumulator3, fixture) {
 
 BOOST_AUTO_TEST_CASE(md5_preprocessor1) {
     hash_accumulator_set<md5> acc;
-    md5::construction_type::digest_type s = extract::hash<md5>(acc);
+    md5::construction::type::digest_type s = extract::hash<md5>(acc);
 
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
     std::printf("%s\n", std::to_string(s));
@@ -134,7 +134,7 @@ BOOST_AUTO_TEST_CASE(md5_preprocessor2) {
     acc('b');
     acc('c');
 
-    md5::construction_type::digest_type s = extract::hash<md5>(acc);
+    md5::construction::type::digest_type s = extract::hash<md5>(acc);
 
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
     std::printf("%s\n", std::to_string(s));
@@ -149,7 +149,7 @@ BOOST_AUTO_TEST_CASE(md5_preprocessor3) {
     for (unsigned i = 0; i < 1000000; ++i) {
         acc('a');
     }
-    md5::construction_type::digest_type s = extract::hash<md5>(acc);
+    md5::construction::type::digest_type s = extract::hash<md5>(acc);
 
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
     std::printf("%s\n", std::to_string(s));

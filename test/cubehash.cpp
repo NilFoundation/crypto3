@@ -139,7 +139,7 @@ BOOST_AUTO_TEST_CASE(cubehash_policy_test) {
 BOOST_AUTO_TEST_CASE(cubehash_various) {
     typedef hash::cubehash<16, 32, 512> hash_t;
     hash::hash_accumulator_set<hash_t> acc;
-    typedef hash_t::construction_type bht;
+    typedef hash_t::construction::type bht;
 
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
     std::printf("initial s[0] = %.8x\n", bh.state()[0]);

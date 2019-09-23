@@ -24,6 +24,7 @@ namespace nil {
                 typedef detail::blake2b_functions<DigestBits> policy_type;
 
                 typedef typename policy_type::byte_type byte_type;
+                typedef typename policy_type::state_type::value_type value_type;
 
             public:
                 typedef typename policy_type::iv_generator iv_generator;
@@ -43,19 +44,11 @@ namespace nil {
                 typedef typename policy_type::salt_type salt_type;
                 constexpr static const salt_type salt_value = policy_type::salt_value;
 
-                inline void operator()(state_type &state, const block_type &block, typename state_type::value_type seen,
-                                       typename state_type::value_type finalizator = 0) {
-                    this->process_block(state, block, seen, finalizator);
-                }
+                static void process_block(state_type &state, const block_type &block, value_type seen = value_type(),
+                                          value_type finalizator = value_type()) {
+                    state_type v = state, M = {0};
 
-            protected:
-                static inline void process_block(state_type &state, const block_type &block,
-                                                 typename state_type::value_type seen,
-                                                 typename state_type::value_type finalizator) {
-                    state_type v, M = {0};
-
-                    std::copy(state.begin(), state.end(), v.end());
-                    std::copy(iv_generator()().begin(), iv_generator()().end(), v.end());
+                    v.insert(v.end(), iv_generator()().begin(), iv_generator()().end());
 
                     std::array<typename state_type::value_type, 2> s = {seen, 0x00};
 
@@ -101,26 +94,33 @@ namespace nil {
                 typedef detail::blake2b_policy<DigestBits> policy_type;
 
             public:
-                typedef haifa_construction<stream_endian::little_octet_big_bit, policy_type::digest_bits,
-                                           typename policy_type::iv_generator, blake2b_compressor<DigestBits>>
-                    construction_type;
+                struct construction {
+                    struct params_type {
+                        typedef typename stream_endian::little_octet_big_bit digest_endian;
+
+                        constexpr static const std::size_t length_bits = policy_type::word_bits;
+                        constexpr static const std::size_t digest_bits = policy_type::digest_bits;
+                    };
+
+                    typedef haifa_construction<params_type, typename policy_type::iv_generator,
+                                               blake2b_compressor<DigestBits>>
+                        type;
+                };
 
                 template<typename StateAccumulator, std::size_t ValueBits>
                 struct stream_processor {
                     struct params_type {
                         typedef typename stream_endian::little_octet_big_bit endian;
 
-                        constexpr static const std::size_t length_bits = construction_type::word_bits;
+                        constexpr static const std::size_t length_bits = construction::params_type::length_bits;
                         constexpr static const std::size_t value_bits = ValueBits;
-                        constexpr static const std::size_t digest_length_bits
-                            = std::numeric_limits<typename boost::uint_t<DigestBits>::exact>::digits;
                     };
 
-                    typedef haifa_stream_processor<construction_type, StateAccumulator, params_type> type;
+                    typedef haifa_stream_processor<construction, StateAccumulator, params_type> type;
                 };
 
-                constexpr static const std::size_t digets_bits = DigestBits;
-                typedef typename construction_type::digest_type digest_type;
+                constexpr static const std::size_t digest_bits = DigestBits;
+                typedef typename policy_type::digest_type digest_type;
             };
         }    // namespace hash
     }        // namespace crypto3

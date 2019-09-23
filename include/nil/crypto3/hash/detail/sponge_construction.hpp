@@ -26,21 +26,20 @@ namespace nil {
              * @tparam Compressor
              * @tparam Finalizer
              *
-             * The Merkle-Damgård construction builds a block hash from a
+             * The Sponge construction builds a block hash from a
              * one-way compressor.  As this version operated on the block
              * level, it doesn't contain any padding or other strengthening.
-             * For a Wide Pipe construction, use a digest_type that will
+             * For a Wide Pipe construction, use a digest that will
              * truncate the internal state.
              */
-            template<typename DigestEndian, int DigestBits, typename IV, typename Compressor,
-                     typename Finalizer = nop_finalizer>
+            template<typename Params, typename IV, typename Compressor, typename Finalizer = nop_finalizer>
             class sponge_construction {
             public:
-                typedef static_digest<DigestBits> digest_type;
-
                 typedef IV iv_generator;
                 typedef Compressor compressor_functor;
                 typedef Finalizer finalizer_functor;
+
+                typedef typename Params::digest_endian endian_type;
 
                 constexpr static const std::size_t word_bits = compressor_functor::word_bits;
                 typedef typename compressor_functor::word_type word_type;
@@ -53,25 +52,30 @@ namespace nil {
                 constexpr static const std::size_t block_words = compressor_functor::block_words;
                 typedef typename compressor_functor::block_type block_type;
 
-                sponge_construction &operator()(block_type const &block) {
+                constexpr static const std::size_t digest_bits = Params::digest_bits;
+                ;
+                constexpr static const std::size_t digest_bytes = digest_bits / octet_bits;
+                constexpr static const std::size_t digest_words = digest_bits / word_bits;
+                typedef static_digest<digest_bits> digest_type;
+
+                inline sponge_construction &process_block(const block_type &block) {
                     compressor_functor()(state_, block);
                     return *this;
                 }
 
-                template<typename DigestType = digest_type>
-                DigestType end_message() {
-                    DigestType d = digest();
+                digest_type end_message() {
+                    digest_type d = digest();
                     reset();
                     return d;
                 }
 
-                template<typename DigestType = digest_type>
-                DigestType digest() {
+                digest_type digest() {
+                    using namespace nil::crypto3::detail;
+
                     finalizer_functor finalizer;
                     finalizer(state_);
-                    DigestType d;
-                    ::nil::crypto3::detail::pack_n<DigestEndian, word_bits, octet_bits>(state_.data(), DigestBits / word_bits, d.data(),
-                                                                DigestBits / octet_bits);
+                    digest_type d;
+                    pack_n<endian_type, word_bits, octet_bits>(state_.data(), digest_words, d.data(), digest_bytes);
                     return d;
                 }
 

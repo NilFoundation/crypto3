@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_SHA3_HPP
-#define CRYPTO3_SHA3_HPP
+#ifndef CRYPTO3_HASH_SHA3_HPP
+#define CRYPTO3_HASH_SHA3_HPP
 
 #include <nil/crypto3/hash/keccak.hpp>
 
@@ -27,23 +27,32 @@ namespace nil {
                 typedef detail::sha3_functions<DigestBits> policy_type;
 
             public:
-                typedef sponge_construction<stream_endian::little_octet_big_bit, policy_type::digest_bits,
-                                            typename policy_type::iv_generator, sha3_compressor<DigestBits>>
-                    construction_type;
+                struct construction {
+                    struct params_type {
+                        typedef typename stream_endian::little_octet_big_bit digest_endian;
+
+                        constexpr static const std::size_t length_bits = 0;
+                        constexpr static const std::size_t digest_bits = policy_type::digest_bits;
+                    };
+
+                    typedef sponge_construction<params_type, typename policy_type::iv_generator,
+                                                sha3_compressor<DigestBits>>
+                        type;
+                };
 
                 template<typename StateAccumulator, std::size_t ValueBits>
                 struct stream_processor {
                     struct params_type {
                         typedef typename stream_endian::little_octet_big_bit endian;
 
+                        constexpr static const std::size_t length_bits = construction::params_type::length_bits;
                         constexpr static const std::size_t value_bits = ValueBits;
-                        constexpr static const std::size_t length_bits = 0;
                     };
-                    typedef sponge_stream_processor<construction_type, StateAccumulator, params_type> type;
+                    typedef sponge_stream_processor<construction, StateAccumulator, params_type> type;
                 };
 
                 constexpr static const std::size_t digest_bits = policy_type::digest_bits;
-                typedef typename construction_type::digest_type digest_type;
+                typedef typename policy_type::digest_type digest_type;
             };
         }    // namespace hash
     }        // namespace crypto3

@@ -114,7 +114,7 @@ BOOST_FIXTURE_TEST_CASE(sha2_256_accumulator1, fixture<256>) {
     // A single 1 bit after the (empty) message,
     // then pad with 0s,
     // then add the length, which is also 0
-    hash_t::construction_type::block_type m = {{0x80000000u}};
+    hash_t::construction::type::block_type m = {{0x80000000u}};
     acc(m);
 
     hash_t::digest_type s = extract::hash<hash_t>(acc);
@@ -128,7 +128,7 @@ BOOST_FIXTURE_TEST_CASE(sha2_256_accumulator1, fixture<256>) {
 
 BOOST_FIXTURE_TEST_CASE(sha2_256_accumulator2, fixture<256>) {
     // Example from appendix B.1: echo -n "abc" | sha256sum
-    hash_t::construction_type::block_type m = {{}};
+    hash_t::construction::type::block_type m = {{}};
     m[0] = 0x61626380;
     m[15] = 0x00000018;
     acc(m);
@@ -145,14 +145,15 @@ BOOST_FIXTURE_TEST_CASE(sha2_256_accumulator2, fixture<256>) {
 BOOST_FIXTURE_TEST_CASE(sha2_256_accumulator3, fixture<256>) {
     // Example from appendix B.2:
     // echo -n "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq" | sha256sum
-    hash_t::construction_type::block_type m1 = {{0x61626364, 0x62636465, 0x63646566, 0x64656667, 0x65666768, 0x66676869,
+    hash_t::construction::type::block_type m1 = {{0x61626364, 0x62636465, 0x63646566, 0x64656667, 0x65666768, 
+                                                  0x66676869,
                                                  0x6768696a, 0x68696a6b, 0x696a6b6c, 0x6a6b6c6d, 0x6b6c6d6e, 0x6c6d6e6f,
                                                  0x6d6e6f70, 0x6e6f7071, 0x80000000, 0x00000000}};
     acc(m1);
 
     BOOST_CHECK_EQUAL("85e655d6417a17953363376a624cde5c76e09589cac5f811cc4b32c1f20e533a", (extract::hash<hash_t>(acc)));
 
-    hash_t::construction_type::block_type m2 = {{}};
+    hash_t::construction::type::block_type m2 = {{}};
     m2[15] = 0x000001c0;
     acc(m2);
 
@@ -179,7 +180,7 @@ BOOST_FIXTURE_TEST_CASE(sha2_384_accumulator1, fixture<384>) {
     // A single 1 bit after the (empty) message,
     // then pad with 0s,
     // then add the length, which is also 0
-    hash_t::construction_type::block_type m = {{UINT64_C(0x8000000000000000)}};
+    hash_t::construction::type::block_type m = {{UINT64_C(0x8000000000000000)}};
     acc(m);
 
     hash_t::digest_type s = extract::hash<hash_t>(acc);
@@ -196,7 +197,7 @@ BOOST_FIXTURE_TEST_CASE(sha2_384_accumulator1, fixture<384>) {
 
 BOOST_FIXTURE_TEST_CASE(sha2_384_accumulator2, fixture<384>) {
     // Example from appendix D.1: echo -n "abc" | sha384sum
-    hash_t::construction_type::block_type m = {{}};
+    hash_t::construction::type::block_type m = {{}};
     m[0] = UINT64_C(0x6162638000000000);
     m[15] = UINT64_C(0x0000000000000018);
 
@@ -218,7 +219,7 @@ BOOST_FIXTURE_TEST_CASE(sha2_384_accumulator3, fixture<384>) {
     // Example from appendix D.2:
     // echo -n "abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghijklmn (continues)
     //          hijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstnopqrstu" | sha384sum
-    hash_t::construction_type::block_type m1 = {
+    hash_t::construction::type::block_type m1 = {
         {UINT64_C(0x6162636465666768), UINT64_C(0x6263646566676869), UINT64_C(0x636465666768696a),
          UINT64_C(0x6465666768696a6b), UINT64_C(0x65666768696a6b6c), UINT64_C(0x666768696a6b6c6d),
          UINT64_C(0x6768696a6b6c6d6e), UINT64_C(0x68696a6b6c6d6e6f), UINT64_C(0x696a6b6c6d6e6f70),
@@ -232,7 +233,7 @@ BOOST_FIXTURE_TEST_CASE(sha2_384_accumulator3, fixture<384>) {
         "f6352ca156acaff7c662113e9ebb4d6417b61a85e2ccf0a9",
         (extract::hash<hash_t>(acc)));
 
-    hash_t::construction_type::block_type m2 = {{}};
+    hash_t::construction::type::block_type m2 = {{}};
     m2[15] = 0x0000000000000380L;
     acc(m2);
     hash_t::digest_type s = extract::hash<hash_t>(acc);
@@ -261,7 +262,7 @@ BOOST_FIXTURE_TEST_CASE(sha2_512_accumulator1, fixture<512>) {
     // A single 1 bit after the (empty) message,
     // then pad with 0s,
     // then add the length, which is also 0
-    hash_t::construction_type::block_type m = {{UINT64_C(0x8000000000000000)}};
+    hash_t::construction::type::block_type m = {{UINT64_C(0x8000000000000000)}};
     acc(m);
 
     hash_t::digest_type s = extract::hash<hash_t>(acc);
@@ -278,7 +279,7 @@ BOOST_FIXTURE_TEST_CASE(sha2_512_accumulator1, fixture<512>) {
 
 BOOST_FIXTURE_TEST_CASE(sha2_512_accumulator2, fixture<512>) {
     // Example from appendix C.1: echo -n "abc" | sha512sum
-    hash_t::construction_type::block_type m = {{}};
+    hash_t::construction::type::block_type m = {{}};
     m[0] = UINT64_C(0x6162638000000000);
     m[15] = UINT64_C(0x0000000000000018);
     acc(m);
@@ -299,7 +300,7 @@ BOOST_FIXTURE_TEST_CASE(sha2_512_accumulator3, fixture<512>) {
     // Example from appendix C.2:
     // echo -n "abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghijklmn (continues)
     //          hijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstnopqrstu" | sha512sum
-    hash_t::construction_type::block_type m1 = {{
+    hash_t::construction::type::block_type m1 = {{
         UINT64_C(0x6162636465666768),
         UINT64_C(0x6263646566676869),
         UINT64_C(0x636465666768696a),
@@ -324,7 +325,7 @@ BOOST_FIXTURE_TEST_CASE(sha2_512_accumulator3, fixture<512>) {
         "d787d6764b20bda2a26014470973692000ec057f37d14b8e06add5b50e671c72",
         (extract::hash<hash_t>(acc)));
 
-    hash_t::construction_type::block_type m2 = {{}};
+    hash_t::construction::type::block_type m2 = {{}};
     m2[15] = 0x0000000000000380L;
 
     acc(m2);

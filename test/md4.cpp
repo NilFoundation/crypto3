@@ -43,7 +43,7 @@ namespace boost {
     }        // namespace test_tools
 }    // namespace boost
 
-BOOST_TEST_DONT_PRINT_LOG_VALUE(md4::construction_type::digest_type)
+BOOST_TEST_DONT_PRINT_LOG_VALUE(md4::construction::type::digest_type)
 
 static const std::unordered_map<std::string, std::string> string_data = {
     {"", "31d6cfe0d16ae931b73c59d7e0c089c0"},
@@ -65,7 +65,7 @@ BOOST_DATA_TEST_CASE(md4_return_range_hash, boost::unit_test::data::make(string_
 
 BOOST_AUTO_TEST_CASE(md4_accumulator1) {
     hash_accumulator_set<md4> acc;
-    md4::construction_type::digest_type s = extract::hash<md4>(acc);
+    md4::construction::type::digest_type s = extract::hash<md4>(acc);
 
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
     std::printf("%s\n", std::to_string(s));
@@ -82,9 +82,9 @@ BOOST_AUTO_TEST_CASE(md4_accumulator2) {
     // then add the length, which is also 0.
     // Remember that MD5 is little-octet, big-bit endian
     hash_accumulator_set<md4> acc;
-    md4::construction_type::block_type m = {{0x00000080u}};
+    md4::construction::type::block_type m = {{0x00000080u}};
     acc(m);
-    md4::construction_type::digest_type s = extract::hash<md4>(acc);
+    md4::construction::type::digest_type s = extract::hash<md4>(acc);
 
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
     std::printf("%s\n", std::to_string(s));
@@ -96,12 +96,12 @@ BOOST_AUTO_TEST_CASE(md4_accumulator2) {
 BOOST_AUTO_TEST_CASE(md4_accumulator3) {
     // echo -n "abc" | md4sum
     hash_accumulator_set<md4> acc;
-    md4::construction_type::block_type m = {{}};
+    md4::construction::type::block_type m = {{}};
     m[0] = 0x80636261;
     // little-octet, big-bit endian also means the size isn't in the last word
     m[14] = 0x00000018;
     acc(m);
-    md4::construction_type::digest_type s = extract::hash<md4>(acc);
+    md4::construction::type::digest_type s = extract::hash<md4>(acc);
 
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
     std::printf("%s\n", std::to_string(s));
@@ -112,7 +112,7 @@ BOOST_AUTO_TEST_CASE(md4_accumulator3) {
 
 BOOST_AUTO_TEST_CASE(md4_preprocessor1) {
     hash_accumulator_set<md4> acc;
-    md4::construction_type::digest_type s = extract::hash<md4>(acc);
+    md4::construction::type::digest_type s = extract::hash<md4>(acc);
 
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
     std::printf("%s\n", std::to_string(s));
@@ -127,7 +127,7 @@ BOOST_AUTO_TEST_CASE(md4_preprocessor2) {
     acc('b');
     acc('c');
 
-    md4::construction_type::digest_type s = extract::hash<md4>(acc);
+    md4::construction::type::digest_type s = extract::hash<md4>(acc);
 
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
     std::printf("%s\n", std::to_string(s));
@@ -141,7 +141,7 @@ BOOST_AUTO_TEST_CASE(md4_preprocessor3) {
     for (unsigned i = 0; i < 1000000; ++i) {
         acc('a');
     }
-    md4::construction_type::digest_type s = extract::hash<md4>(acc);
+    md4::construction::type::digest_type s = extract::hash<md4>(acc);
 
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
     std::printf("%s\n", std::to_string(s));

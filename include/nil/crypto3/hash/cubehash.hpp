@@ -26,7 +26,6 @@
 namespace nil {
     namespace crypto3 {
         namespace hash {
-
             template<unsigned r, unsigned b, unsigned h>
             struct cubehash_compressor {
                 typedef detail::cubehash_policy<r, b, h> policy_type;
@@ -42,11 +41,6 @@ namespace nil {
                 constexpr static const std::size_t block_words = policy_type::block_words;
                 typedef typename policy_type::block_type block_type;
 
-                inline void operator()(state_type &state, block_type const &block) {
-                    process_block(state, block);
-                }
-
-            protected:
                 inline static void process_block(state_type &state, const block_type &block) {
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
                     printf("Xoring the following block to the state:\n");
@@ -92,29 +86,37 @@ namespace nil {
              * @tparam h
              */
             template<unsigned r, unsigned b, unsigned h>
-            class cubehash {
+            struct cubehash {
                 typedef detail::cubehash_policy<r, b, h> policy_type;
 
             public:
-                typedef merkle_damgard_construction<stream_endian::little_octet_big_bit, policy_type::digest_bits,
-                                                    typename policy_type::iv_generator, cubehash_compressor<r, b, h>,
-                                                    cubehash_finalizer<r, b, h>>
-                    construction_type;
+                struct construction {
+                    struct params_type {
+                        typedef typename stream_endian::little_octet_big_bit digest_endian;
+
+                        constexpr static const std::size_t length_bits = 0;    // No length padding
+                        constexpr static const std::size_t digest_bits = policy_type::digest_bits;
+                    };
+
+                    typedef merkle_damgard_construction<params_type, typename policy_type::iv_generator,
+                                                        cubehash_compressor<r, b, h>, cubehash_finalizer<r, b, h>>
+                        type;
+                };
 
                 template<typename StateAccumulator, std::size_t ValueBits>
                 struct stream_processor {
                     struct params_type {
                         typedef typename stream_endian::little_octet_big_bit endian;
 
+                        constexpr static const std::size_t length_bits = construction::params_type::length_bits;
                         constexpr static const std::size_t value_bits = ValueBits;
-                        constexpr static const std::size_t length_bits = 0;    // No length padding
                     };
 
-                    typedef merkle_damgard_stream_processor<construction_type, StateAccumulator, params_type> type;
+                    typedef merkle_damgard_stream_processor<construction, StateAccumulator, params_type> type;
                 };
 
                 constexpr static const std::size_t digest_bits = policy_type::digest_bits;
-                typedef typename construction_type::digest_type digest_type;
+                typedef typename policy_type::digest_type digest_type;
             };
 
             template<std::size_t h>

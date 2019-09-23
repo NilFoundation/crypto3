@@ -43,10 +43,10 @@ namespace boost {
     }        // namespace test_tools
 }    // namespace boost
 
-BOOST_TEST_DONT_PRINT_LOG_VALUE(ripemd<128>::construction_type::digest_type)
-BOOST_TEST_DONT_PRINT_LOG_VALUE(ripemd<160>::construction_type::digest_type)
-BOOST_TEST_DONT_PRINT_LOG_VALUE(ripemd<256>::construction_type::digest_type)
-BOOST_TEST_DONT_PRINT_LOG_VALUE(ripemd<320>::construction_type::digest_type)
+BOOST_TEST_DONT_PRINT_LOG_VALUE(ripemd<128>::construction::type::digest_type)
+BOOST_TEST_DONT_PRINT_LOG_VALUE(ripemd<160>::construction::type::digest_type)
+BOOST_TEST_DONT_PRINT_LOG_VALUE(ripemd<256>::construction::type::digest_type)
+BOOST_TEST_DONT_PRINT_LOG_VALUE(ripemd<320>::construction::type::digest_type)
 
 static const std::unordered_map<std::string, std::string> string_128_data = {
     {"", "cdf26213a150dc3ecb610f18f6b38b46"},
