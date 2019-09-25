@@ -107,10 +107,10 @@ namespace nil {
                     void schedule_key(key_schedule_type &schedule, const key_type &key) {
                         m_buffer.resize(64);
 
-                        schedule[0] = policy_type::tau[0];
-                        schedule[5] = policy_type::tau[1];
-                        schedule[10] = policy_type::tau[2];
-                        schedule[15] = policy_type::tau[3];
+                        schedule[0] = policy_type::tau()[0];
+                        schedule[5] = policy_type::tau()[1];
+                        schedule[10] = policy_type::tau()[2];
+                        schedule[15] = policy_type::tau()[3];
 
 #pragma clang loop unroll(full)
                         for (std::uint8_t itr = 0; itr < 4; itr++) {
@@ -161,10 +161,10 @@ namespace nil {
                     void schedule_key(key_schedule_type &schedule, const key_type &key) {
                         m_buffer.resize(64);
 
-                        schedule[0] = policy_type::tau[0];
-                        schedule[5] = policy_type::tau[1];
-                        schedule[10] = policy_type::tau[2];
-                        schedule[15] = policy_type::tau[3];
+                        schedule[0] = policy_type::tau()[0];
+                        schedule[5] = policy_type::tau()[1];
+                        schedule[10] = policy_type::tau()[2];
+                        schedule[15] = policy_type::tau()[3];
 
 #pragma clang loop unroll(full)
                         for (std::uint8_t itr = 0; itr < 4; itr++) {
@@ -239,10 +239,10 @@ namespace nil {
                     void schedule_key(key_schedule_type &state, const key_type &key) {
                         m_buffer.resize(64);
 
-                        state[0] = policy_type::sigma[0];
-                        state[5] = policy_type::sigma[1];
-                        state[10] = policy_type::sigma[2];
-                        state[15] = policy_type::sigma[3];
+                        state[0] = policy_type::sigma()[0];
+                        state[5] = policy_type::sigma()[1];
+                        state[10] = policy_type::sigma()[2];
+                        state[15] = policy_type::sigma()[3];
 
 #pragma clang loop unroll(full)
                         for (std::uint8_t itr = 0; itr < 4; itr++) {
@@ -294,10 +294,10 @@ namespace nil {
                     void schedule_key(key_schedule_type &state, const key_type &key) {
                         m_buffer.resize(64);
 
-                        state[0] = policy_type::sigma[0];
-                        state[5] = policy_type::sigma[1];
-                        state[10] = policy_type::sigma[2];
-                        state[15] = policy_type::sigma[3];
+                        state[0] = policy_type::sigma()[0];
+                        state[5] = policy_type::sigma()[1];
+                        state[10] = policy_type::sigma()[2];
+                        state[15] = policy_type::sigma()[3];
 
 #pragma clang loop unroll(full)
                         for (std::uint8_t itr = 0; itr < 4; itr++) {

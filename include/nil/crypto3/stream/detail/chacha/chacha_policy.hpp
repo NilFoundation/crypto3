@@ -14,6 +14,8 @@
 
 #include <boost/container/small_vector.hpp>
 
+#include <nil/crypto3/detail/inline_variable.hpp>
+
 #include <nil/crypto3/stream/detail/basic_functions.hpp>
 
 namespace nil {
@@ -53,9 +55,10 @@ namespace nil {
                     constexpr static const std::size_t round_constants_size = 4;
                     typedef std::array<word_type, round_constants_size> round_constants_type;
 
-                    constexpr static const round_constants_type tau = {0x61707865, 0x3120646e, 0x79622d36, 0x6b206574};
-                    constexpr static const round_constants_type sigma = {0x61707865, 0x3320646e, 0x79622d32,
-                                                                         0x6b206574};
+                    CRYPTO3_INLINE_VARIABLE(round_constants_type, tau,
+                                            ({0x61707865, 0x3120646e, 0x79622d36, 0x6b206574}));
+                    CRYPTO3_INLINE_VARIABLE(round_constants_type, sigma,
+                                            ({0x61707865, 0x3320646e, 0x79622d32, 0x6b206574}));
 
                     constexpr static const std::size_t iv_bits = IVBits;
                     constexpr static const std::size_t iv_size = IVBits / CHAR_BIT;

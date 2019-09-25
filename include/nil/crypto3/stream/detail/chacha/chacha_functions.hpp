@@ -49,10 +49,10 @@ namespace nil {
                     typedef typename policy_type::iv_type iv_type;
 
                     static void schedule_key(key_schedule_type &schedule, const key_type &key) {
-                        schedule[0] = policy_type::sigma[0];
-                        schedule[1] = policy_type::sigma[1];
-                        schedule[2] = policy_type::sigma[2];
-                        schedule[3] = policy_type::sigma[3];
+                        schedule[0] = policy_type::sigma()[0];
+                        schedule[1] = policy_type::sigma()[1];
+                        schedule[2] = policy_type::sigma()[2];
+                        schedule[3] = policy_type::sigma()[3];
 
 #pragma clang loop unroll(full)
                         for (std::uint8_t itr = 0; itr < 4; itr++) {
@@ -91,10 +91,10 @@ namespace nil {
                     typedef typename policy_type::iv_type iv_type;
 
                     static void schedule_key(key_schedule_type &schedule, const key_type &key) {
-                        schedule[0] = policy_type::tau[0];
-                        schedule[1] = policy_type::tau[1];
-                        schedule[2] = policy_type::tau[2];
-                        schedule[3] = policy_type::tau[3];
+                        schedule[0] = policy_type::tau()[0];
+                        schedule[1] = policy_type::tau()[1];
+                        schedule[2] = policy_type::tau()[2];
+                        schedule[3] = policy_type::tau()[3];
 
 #pragma clang loop unroll(full)
                         for (std::uint8_t itr = 0; itr < 4; itr++) {
@@ -143,10 +143,10 @@ namespace nil {
                     }
 
                     static void schedule_key(key_schedule_type &schedule, const key_type &key) {
-                        schedule[0] = policy_type::tau[0];
-                        schedule[1] = policy_type::tau[1];
-                        schedule[2] = policy_type::tau[2];
-                        schedule[3] = policy_type::tau[3];
+                        schedule[0] = policy_type::tau()[0];
+                        schedule[1] = policy_type::tau()[1];
+                        schedule[2] = policy_type::tau()[2];
+                        schedule[3] = policy_type::tau()[3];
 
 #pragma clang loop unroll(full)
                         for (std::uint8_t itr = 0; itr < 4; itr++) {
@@ -195,10 +195,10 @@ namespace nil {
                     }
 
                     static void schedule_key(key_schedule_type &schedule, const key_type &key) {
-                        schedule[0] = policy_type::tau[0];
-                        schedule[1] = policy_type::tau[1];
-                        schedule[2] = policy_type::tau[2];
-                        schedule[3] = policy_type::tau[3];
+                        schedule[0] = policy_type::tau()[0];
+                        schedule[1] = policy_type::tau()[1];
+                        schedule[2] = policy_type::tau()[2];
+                        schedule[3] = policy_type::tau()[3];
 
 #pragma clang loop unroll(full)
                         for (std::uint8_t itr = 0; itr < 4; itr++) {
@@ -238,10 +238,10 @@ namespace nil {
                     typedef typename policy_type::iv_type iv_type;
 
                     static void schedule_key(key_schedule_type &schedule, const key_type &key) {
-                        schedule[0] = policy_type::sigma[0];
-                        schedule[1] = policy_type::sigma[1];
-                        schedule[2] = policy_type::sigma[2];
-                        schedule[3] = policy_type::sigma[3];
+                        schedule[0] = policy_type::sigma()[0];
+                        schedule[1] = policy_type::sigma()[1];
+                        schedule[2] = policy_type::sigma()[2];
+                        schedule[3] = policy_type::sigma()[3];
 
 #pragma clang loop unroll(full)
                         for (std::uint8_t itr = 0; itr < 8; itr++) {
@@ -289,10 +289,10 @@ namespace nil {
                     }
 
                     static void schedule_key(key_schedule_type &schedule, const key_type &key) {
-                        schedule[0] = policy_type::sigma[0];
-                        schedule[1] = policy_type::sigma[1];
-                        schedule[2] = policy_type::sigma[2];
-                        schedule[3] = policy_type::sigma[3];
+                        schedule[0] = policy_type::sigma()[0];
+                        schedule[1] = policy_type::sigma()[1];
+                        schedule[2] = policy_type::sigma()[2];
+                        schedule[3] = policy_type::sigma()[3];
 
 #pragma clang loop unroll(full)
                         for (std::uint8_t itr = 0; itr < 8; itr++) {
@@ -340,10 +340,10 @@ namespace nil {
                     }
 
                     static void schedule_key(key_schedule_type &schedule, const key_type &key) {
-                        schedule[0] = policy_type::sigma[0];
-                        schedule[1] = policy_type::sigma[1];
-                        schedule[2] = policy_type::sigma[2];
-                        schedule[3] = policy_type::sigma[3];
+                        schedule[0] = policy_type::sigma()[0];
+                        schedule[1] = policy_type::sigma()[1];
+                        schedule[2] = policy_type::sigma()[2];
+                        schedule[3] = policy_type::sigma()[3];
 
 #pragma clang loop unroll(full)
                         for (std::uint8_t itr = 0; itr < 8; itr++) {

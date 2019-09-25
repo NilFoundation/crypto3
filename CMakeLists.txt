@@ -112,65 +112,26 @@ list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
 
 cm_setup_version(VERSION 0.1.0 PREFIX ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME})
 
-if((NOT CMAKE_CXX_STANDARD) OR (CMAKE_CXX_STANDARD LESS 17))
-    add_library(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
-                ${${CURRENT_PROJECT_NAME}_HEADERS}
-                ${${CURRENT_PROJECT_NAME}_SOURCES})
-    target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PRIVATE
-                          ${Boost_LIBRARIES})
-    if(APPLE OR NOT ${CMAKE_TARGET_ARCHITECTURE} STREQUAL ${CMAKE_HOST_SYSTEM_PROCESSOR})
-        set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES
-                              EXPORT_NAME ${CURRENT_PROJECT_NAME}
-                              CXX_STANDARD 11
-                              CXX_STANDARD_REQUIRED TRUE
-                              XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "${APPLE_CODE_SIGN_IDENTITY}"
-                              XCODE_ATTRIBUTE_DEVELOPMENT_TEAM "${CMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM}")
-    else()
-        set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES
-                              EXPORT_NAME ${CURRENT_PROJECT_NAME}
-                              CXX_STANDARD 11
-                              CXX_STANDARD_REQUIRED TRUE)
-    endif()
-    target_include_directories(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PRIVATE
-                               "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
-                               "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>"
+add_library(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE)
+target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
+                      ${Boost_LIBRARIES})
+set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES
+                      EXPORT_NAME ${CURRENT_PROJECT_NAME})
+target_include_directories(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
+                           "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+                           "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>"
 
-                               ${Boost_INCLUDE_DIRS})
-
-    if(${CMAKE_TARGET_ARCHITECTURE} STREQUAL "x86_64" OR
-       ${CMAKE_TARGET_ARCHITECTURE} STREQUAL "x86")
-        if(CXX_HAS_AVX_2)
-            target_compile_definitions(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PUBLIC
-                                       ${CMAKE_UPPER_WORKSPACE_NAME}_HAS_CHACHA_AVX2)
-            target_compile_options(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PUBLIC "-mavx2")
-        elseif(SSE2_FOUND)
-            target_compile_definitions(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PUBLIC
-                                       ${CMAKE_UPPER_WORKSPACE_NAME}_HAS_CHACHA_SSE2)
-            target_compile_options(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PUBLIC "-msse2")
-        endif()
-    endif()
-else()
-    add_library(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE)
-    target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
-                          ${Boost_LIBRARIES})
-    set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES
-                          EXPORT_NAME ${CURRENT_PROJECT_NAME})
-    target_include_directories(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
-                               "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
-                               "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>"
-
-                               ${Boost_INCLUDE_DIRS})
-    if(${CMAKE_TARGET_ARCHITECTURE} STREQUAL "x86_64" OR
-       ${CMAKE_TARGET_ARCHITECTURE} STREQUAL "x86")
-        if(CXX_HAS_AVX_2)
-            target_compile_definitions(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
-                                       ${CMAKE_UPPER_WORKSPACE_NAME}_HAS_CHACHA_AVX2)
-            target_compile_options(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE "-mavx2")
-        elseif(SSE2_FOUND)
-            target_compile_definitions(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
-                                       ${CMAKE_UPPER_WORKSPACE_NAME}_HAS_CHACHA_SSE2)
-            target_compile_options(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE "-msse2")
-        endif()
+                           ${Boost_INCLUDE_DIRS})
+if(${CMAKE_TARGET_ARCHITECTURE} STREQUAL "x86_64" OR
+   ${CMAKE_TARGET_ARCHITECTURE} STREQUAL "x86")
+    if(CXX_HAS_AVX_2)
+        target_compile_definitions(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
+                                   ${CMAKE_UPPER_WORKSPACE_NAME}_HAS_CHACHA_AVX2)
+        target_compile_options(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE "-mavx2")
+    elseif(SSE2_FOUND)
+        target_compile_definitions(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
+                                   ${CMAKE_UPPER_WORKSPACE_NAME}_HAS_CHACHA_SSE2)
+        target_compile_options(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE "-msse2")
     endif()
 endif()
 
