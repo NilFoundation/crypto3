@@ -14,7 +14,7 @@
 
 #include <boost/integer.hpp>
 
-#include <nil/crypto3/codec/detail/inline_variable.hpp>
+#include <nil/crypto3/detail/inline_variable.hpp>
 
 namespace nil {
     namespace crypto3 {
