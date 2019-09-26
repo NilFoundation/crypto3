@@ -24,6 +24,8 @@ namespace nil {
                     typedef PolicyType policy_type;
 
                 public:
+                    constexpr static const std::size_t rounds = policy_type::rounds;
+
                     typedef typename policy_type::byte_type byte_type;
                     typedef typename policy_type::word_type word_type;
 
