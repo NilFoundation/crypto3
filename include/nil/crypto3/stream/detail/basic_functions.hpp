@@ -15,8 +15,6 @@
 #include <boost/integer.hpp>
 #include <boost/static_assert.hpp>
 
-#include <nil/crypto3/stream/detail/make_uint_t.hpp>
-
 namespace nil {
     namespace crypto3 {
         namespace stream {
@@ -67,7 +65,7 @@ namespace nil {
                     }
                 };
             }    // namespace detail
-        }        // namespace block
+        }        // namespace stream
     }            // namespace crypto3
 }    // namespace nil
 

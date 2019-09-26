@@ -21,8 +21,8 @@
 
 #include <nil/crypto3/stream/accumulators/parameters/bits.hpp>
 
-#include <nil/crypto3/stream/detail/make_array.hpp>
-#include <nil/crypto3/stream/detail/digest.hpp>
+#include <nil/crypto3/detail/make_array.hpp>
+#include <nil/crypto3/detail/digest.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -52,7 +52,7 @@ namespace nil {
                     typedef boost::container::static_vector<input_value_type, input_block_values> cache_type;
 
                 public:
-                    typedef stream::digest<output_block_bits> result_type;
+                    typedef digest<output_block_bits> result_type;
 
                     template<typename Args>
                     // The constructor takes an argument pack.
@@ -120,7 +120,7 @@ namespace nil {
                         if (cache.empty()) {
                             ob = stream_mode_type::process_block(block);
                         } else {
-                            input_block_type b = stream::make_array<input_block_values>(cache.begin(), cache.end());
+                            input_block_type b = make_array<input_block_values>(cache.begin(), cache.end());
                             typename input_block_type::const_iterator itr =
                                 block.begin() + (cache.max_size() - cache.size());
 
