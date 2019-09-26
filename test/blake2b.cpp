@@ -41,10 +41,10 @@ namespace boost {
     }        // namespace test_tools
 }    // namespace boost
 
-BOOST_TEST_DONT_PRINT_LOG_VALUE(blake2b<128>::construction_type::digest_type)
-BOOST_TEST_DONT_PRINT_LOG_VALUE(blake2b<160>::construction_type::digest_type)
-BOOST_TEST_DONT_PRINT_LOG_VALUE(blake2b<256>::construction_type::digest_type)
-BOOST_TEST_DONT_PRINT_LOG_VALUE(blake2b<320>::construction_type::digest_type)
+BOOST_TEST_DONT_PRINT_LOG_VALUE(blake2b<128>::construction::type::digest_type)
+BOOST_TEST_DONT_PRINT_LOG_VALUE(blake2b<160>::construction::type::digest_type)
+BOOST_TEST_DONT_PRINT_LOG_VALUE(blake2b<256>::construction::type::digest_type)
+BOOST_TEST_DONT_PRINT_LOG_VALUE(blake2b<320>::construction::type::digest_type)
 
 BOOST_AUTO_TEST_SUITE(blake2b_test_suite)
 

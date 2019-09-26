@@ -33,7 +33,8 @@ namespace nil {
                 struct hash_impl : boost::accumulators::accumulator_base {
                 protected:
                     typedef Hash hash_type;
-                    typedef typename hash_type::construction_type construction_type;
+                    typedef typename hash_type::construction::type construction_type;
+                    typedef typename hash_type::construction::params_type params_type;
 
                     constexpr static const std::size_t word_bits = construction_type::word_bits;
                     typedef typename construction_type::word_type word_type;
@@ -45,6 +46,14 @@ namespace nil {
                     constexpr static const std::size_t block_bits = construction_type::block_bits;
                     constexpr static const std::size_t block_words = construction_type::block_words;
                     typedef typename construction_type::block_type block_type;
+
+                    constexpr static const std::size_t length_bits = params_type::length_bits;
+                    // FIXME: do something more intelligent than capping at 64
+                    constexpr static const std::size_t length_type_bits =
+                        length_bits < word_bits ? word_bits : length_bits > 64 ? 64 : length_bits;
+                    typedef typename boost::uint_t<length_type_bits>::least length_type;
+                    constexpr static const std::size_t length_words = length_bits / word_bits;
+                    BOOST_STATIC_ASSERT(!length_bits || length_bits % word_bits == 0);
 
                     typedef boost::container::static_vector<word_type, block_words> cache_type;
 
@@ -66,7 +75,7 @@ namespace nil {
                         if (!cache.empty()) {
                             block_type ib = {0};
                             std::move(cache.begin(), cache.end(), ib.begin());
-                            return res(ib).digest();
+                            return res.process_block(ib).digest();
                         } else {
                             return res.digest();
                         }
@@ -90,10 +99,13 @@ namespace nil {
                     }
 
                     inline void process(const word_type &value, std::size_t bits) {
+                        if (seen % block_bits) {
+
+                        }
                         if (cache.size() == cache.max_size()) {
                             block_type ib = {0};
                             std::move(cache.begin(), cache.end(), ib.begin());
-                            construction(ib);
+                            construction.process_block(ib);
 
                             cache.clear();
                         }
@@ -104,14 +116,14 @@ namespace nil {
 
                     inline void process(const block_type &block, std::size_t bits) {
                         if (cache.empty()) {
-                            construction(block);
+                            construction.process_block(block);
                         } else {
                             block_type b = make_array<block_words>(cache.begin(), cache.end());
                             typename block_type::const_iterator itr = block.begin() + (cache.max_size() - cache.size());
 
                             std::move(block.begin(), itr, b.end());
 
-                            construction(b);
+                            construction.process_block(b);
 
                             cache.clear();
                             cache.insert(cache.end(), itr, block.end());
@@ -120,7 +132,7 @@ namespace nil {
                         seen += bits;
                     }
 
-                    std::size_t seen;
+                    length_type seen;
                     cache_type cache;
                     construction_type construction;
                 };

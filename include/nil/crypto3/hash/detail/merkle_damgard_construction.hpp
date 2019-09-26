@@ -29,22 +29,19 @@ namespace nil {
              * The Merkle-Damgård construction builds a block hash from a
              * one-way compressor.  As this version operated on the block
              * level, it doesn't contain any padding or other strengthening.
-             * For a Wide Pipe construction, use a digest_type that will
+             * For a Wide Pipe construction, use a digest that will
              * truncate the internal state.
              *
              * @note http://www.merkle.com/papers/Thesis1979.pdf
              */
-            template<typename DigestEndian, int DigestBits, typename IV, typename Compressor,
-                     typename Finalizer = nop_finalizer>
+            template<typename Params, typename IV, typename Compressor, typename Finalizer = nop_finalizer>
             class merkle_damgard_construction {
             public:
-                constexpr static const std::size_t digest_bits = DigestBits;
-                typedef static_digest<DigestBits> digest_type;
-
                 typedef IV iv_generator;
                 typedef Compressor compressor_functor;
-                typedef DigestEndian endian_type;
                 typedef Finalizer finalizer_functor;
+
+                typedef typename Params::digest_endian endian_type;
 
                 constexpr static const std::size_t word_bits = compressor_functor::word_bits;
                 typedef typename compressor_functor::word_type word_type;
@@ -57,23 +54,50 @@ namespace nil {
                 constexpr static const std::size_t block_words = compressor_functor::block_words;
                 typedef typename compressor_functor::block_type block_type;
 
-                merkle_damgard_construction &operator()(const block_type &block) {
-                    compressor_functor()(state_, block);
+                constexpr static const std::size_t digest_bits = Params::digest_bits;
+                constexpr static const std::size_t digest_bytes = digest_bits / octet_bits;
+                constexpr static const std::size_t digest_words = digest_bits / word_bits;
+                typedef static_digest<digest_bits> digest_type;
+
+            protected:
+                constexpr static const std::size_t length_bits = Params::length_bits;
+                // FIXME: do something more intelligent than capping at 64
+                constexpr static const std::size_t length_type_bits =
+                    length_bits < word_bits ? word_bits : length_bits > 64 ? 64 : length_bits;
+                typedef typename boost::uint_t<length_type_bits>::least length_type;
+                constexpr static const std::size_t length_words = length_bits / word_bits;
+                BOOST_STATIC_ASSERT(!length_bits || length_bits % word_bits == 0);
+
+            public:
+                inline merkle_damgard_construction &process_block(const block_type &block) {
+                    compressor_functor().process_block(state_, block);
                     return *this;
                 }
 
-                digest_type end_message() {
+                inline digest_type end_message(length_type seen = length_type()) {
                     digest_type d = digest();
                     reset();
                     return d;
                 }
 
-                digest_type digest() {
+                inline digest_type digest(length_type seen = length_type()) {
+                    using namespace nil::crypto3::detail;
+
+                    block_type b;
+
+                    if (!(seen % block_bits)) {
+                        std::fill(std::begin(b), std::end(b), 0);
+                    } else if (!((seen + length_bits) % block_bits)) {
+                        std::fill(b.begin() + seen % block_bits, b.end(), 0);
+                    }
+
+                    imploder_step<endian_type, 1, word_bits, 0>::step(1, b[seen % block_bits + 1]);
+                    append_length<length_bits>(b, seen);
+
                     finalizer_functor finalizer;
                     finalizer(state_);
                     digest_type d;
-                    ::nil::crypto3::detail::pack_n<DigestEndian, word_bits, octet_bits>(
-                        state_.data(), DigestBits / word_bits, d.data(), DigestBits / octet_bits);
+                    pack_n<endian_type, word_bits, octet_bits>(state_.data(), digest_words, d.data(), digest_bytes);
                     return d;
                 }
 
@@ -81,20 +105,40 @@ namespace nil {
                     reset();
                 }
 
-                void reset(const state_type &s) {
+                inline void reset(const state_type &s) {
                     state_ = s;
                 }
 
-                void reset() {
+                inline void reset() {
                     iv_generator iv;
                     reset(iv());
                 }
 
-                state_type const &state() const {
+                inline const state_type &state() const {
                     return state_;
                 }
 
-            private:
+            protected:
+                template<std::size_t LengthBits>
+                void append_length(block_type &block, length_type length) {
+                    using namespace nil::crypto3::detail;
+
+                    // Append length
+                    std::array<length_type, 1> length_array = {{length}};
+                    std::array<word_type, length_words> length_words_array;
+                    pack<endian_type, length_bits, word_bits>(length_array, length_words_array);
+                    for (std::size_t i = length_words; i; --i) {
+                        block[block_words - i] = length_words_array[length_words - i];
+                    }
+
+                    // Process the last block
+                    process_block(block);
+                }
+
+                template<>
+                void append_length<0>(block_type &block, length_type length) {
+                }
+
                 state_type state_;
             };
 

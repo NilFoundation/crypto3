@@ -38,11 +38,6 @@ namespace nil {
 
             template<>
             struct ripemd_compressor<128> : public basic_ripemd_compressor<128> {
-                inline void operator()(state_type &state, const block_type &block) {
-                    process_block(state, block);
-                }
-
-            protected:
                 static void process_block(state_type &state, const block_type &block) {
                     // ripemd works on two 'lines' in parallel
                     // all variables worked on by line 1 are suffixed with 1
@@ -94,11 +89,6 @@ namespace nil {
 
             template<>
             struct ripemd_compressor<160> : public basic_ripemd_compressor<160> {
-                inline void operator()(state_type &state, const block_type &block) {
-                    process_block(state, block);
-                }
-
-            protected:
                 static void process_block(state_type &state, const block_type &block) {
                     word_type A1 = state[0], B1 = state[1], C1 = state[2], D1 = state[3], E1 = state[4];
                     word_type A2 = state[0], B2 = state[1], C2 = state[2], D2 = state[3], E2 = state[4];
@@ -155,11 +145,6 @@ namespace nil {
 
             template<>
             struct ripemd_compressor<256> : public basic_ripemd_compressor<256> {
-                inline void operator()(state_type &state, const block_type &block) {
-                    process_block(state, block);
-                }
-
-            protected:
                 static void process_block(state_type &state, const block_type &block) {
                     state_type Y = {0};
                     std::copy(state.begin(), state.end(), Y.begin());
@@ -209,14 +194,8 @@ namespace nil {
             };
 
             template<>
-            class ripemd_compressor<320> : public basic_ripemd_compressor<320> {
-            public:
-                inline void operator()(state_type &state, block_type const &block) {
-                    process_block(state, block);
-                }
-
-            protected:
-                static void process_block(state_type &state, block_type const &block) {
+            struct ripemd_compressor<320> : public basic_ripemd_compressor<320> {
+                static void process_block(state_type &state, const block_type &block) {
                     state_type Y = {0};
                     std::copy(state.begin(), state.end(), Y.begin());
 
@@ -285,24 +264,33 @@ namespace nil {
                 typedef detail::ripemd_policy<DigestBits> policy_type;
 
             public:
-                typedef merkle_damgard_construction<stream_endian::little_octet_big_bit, policy_type::digest_bits,
-                                                    typename policy_type::iv_generator, ripemd_compressor<DigestBits>>
-                    construction_type;
+                struct construction {
+                    struct params_type {
+                        typedef typename stream_endian::little_octet_big_bit digest_endian;
+
+                        constexpr static const std::size_t length_bits = policy_type::word_bits * 2;
+                        constexpr static const std::size_t digest_bits = policy_type::digest_bits;
+                    };
+
+                    typedef merkle_damgard_construction<params_type, typename policy_type::iv_generator,
+                                                        ripemd_compressor<DigestBits>>
+                        type;
+                };
 
                 template<typename StateAccumulator, std::size_t ValueBits>
                 struct stream_processor {
                     struct params_type {
                         typedef typename stream_endian::little_octet_big_bit endian;
 
+                        constexpr static const std::size_t length_bits = construction::params_type::length_bits;
                         constexpr static const std::size_t value_bits = ValueBits;
-                        constexpr static const std::size_t length_bits = construction_type::word_bits * 2;
                     };
 
-                    typedef merkle_damgard_stream_processor<construction_type, StateAccumulator, params_type> type;
+                    typedef merkle_damgard_stream_processor<construction, StateAccumulator, params_type> type;
                 };
 
                 constexpr static const std::size_t digest_bits = DigestBits;
-                typedef typename construction_type::digest_type digest_type;
+                typedef typename policy_type::digest_type digest_type;
             };
 
             typedef ripemd<128> ripemd128;

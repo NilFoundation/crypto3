@@ -234,7 +234,12 @@ namespace nil {
                      BOOST_CRC_PARM_TYPE FinalXor = 0u, bool ReflectIn = false, bool ReflectRem = false>
             class crc {
             public:
-                typedef basic_crc<DigestBits, TruncPoly, InitRem, FinalXor, ReflectIn, ReflectRem> construction_type;
+                struct construction {
+                    struct params_type {
+
+                    };
+                    typedef basic_crc<DigestBits, TruncPoly, InitRem, FinalXor, ReflectIn, ReflectRem> type;
+                };
 
                 template<typename StateAccumulator, std::size_t ValueBits>
                 struct stream_processor {
@@ -244,11 +249,11 @@ namespace nil {
                     };
 
                     BOOST_STATIC_ASSERT(ValueBits == CHAR_BIT);
-                    typedef crc_stream_processor<construction_type, StateAccumulator, params_type> type;
+                    typedef crc_stream_processor<typename construction::type, StateAccumulator, params_type> type;
                 };
 
                 constexpr static const std::size_t digest_bits = DigestBits;
-                typedef typename construction_type::digest_type digest_type;
+                typedef typename construction::type::digest_type digest_type;
             };
 
             // http://www.libpng.org/pub/png/spec/1.2/PNG-Structure.html#CRC-algorithm

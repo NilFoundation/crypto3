@@ -40,11 +40,6 @@ namespace nil {
                 constexpr static const std::size_t block_words = block_cipher_type::key_words;
                 typedef typename block_cipher_type::key_type block_type;
 
-                inline void operator()(state_type &state, const block_type &block) {
-                    process_block(state, block);
-                }
-
-            protected:
                 inline static void process_block(state_type &state, const block_type &block) {
                     block_cipher_type cipher(block);
                     state_type new_state = cipher.encrypt((const state_type &)state);

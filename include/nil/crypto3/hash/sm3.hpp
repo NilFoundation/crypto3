@@ -39,7 +39,7 @@ namespace nil {
                 constexpr static const std::size_t state_words = policy_type::state_words;
                 typedef typename policy_type::state_type state_type;
 
-                void operator()(state_type &state, const block_type &block) {
+                void process_block(state_type &state, const block_type &block) {
                     word_type A = state[0], B = state[1], C = state[2], D = state[3], E = state[4], F = state[5],
                               G = state[6], H = state[7];
 
@@ -193,24 +193,32 @@ namespace nil {
                 typedef detail::sm3_policy policy_type;
 
             public:
-                typedef merkle_damgard_construction<stream_endian::little_octet_big_bit, policy_type::digest_bits,
-                                                    typename policy_type::iv_generator, sm3_compressor>
-                    construction_type;
+                struct construction {
+                    struct params_type {
+                        typedef typename stream_endian::little_octet_big_bit digest_endian;
+
+                        constexpr static const std::size_t length_bits = 0;
+                        constexpr static const std::size_t digest_bits = policy_type::digest_bits;
+                    };
+
+                    typedef merkle_damgard_construction<params_type, typename policy_type::iv_generator, sm3_compressor>
+                        type;
+                };
 
                 template<typename StateAccumulator, std::size_t ValueBits>
                 struct stream_processor {
                     struct params_type {
                         typedef typename stream_endian::little_octet_big_bit endian;
 
+                        constexpr static const std::size_t length_bits = construction::params_type::length_bits;
                         constexpr static const std::size_t value_bits = ValueBits;
-                        constexpr static const std::size_t length_bits = 0;
                     };
 
-                    typedef merkle_damgard_stream_processor<construction_type, StateAccumulator, params_type> type;
+                    typedef merkle_damgard_stream_processor<construction, StateAccumulator, params_type> type;
                 };
 
                 constexpr static const std::size_t digest_bits = policy_type::digest_bits;
-                typedef typename construction_type::digest_type digest_type;
+                typedef typename policy_type::digest_type digest_type;
             };
         }    // namespace hash
     }        // namespace crypto3

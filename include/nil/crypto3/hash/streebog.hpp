@@ -44,11 +44,11 @@ namespace nil {
                 constexpr static const std::size_t state_words = policy_type::state_words;
                 typedef typename policy_type::state_type state_type;
 
-                void operator()(state_type &state, const block_type &block) {
-                    uint64_t N = force_le(last_block ? 0ULL : m_count);
+                void process_block(state_type &state, const block_type &block) {
+                    word_type N = force_le(last_block ? 0ULL : m_count);
 
-                    uint64_t hN[8];
-                    uint64_t A[8];
+                    word_type hN[8];
+                    word_type A[8];
 
                     copy_mem(hN, m_h.data(), 8);
                     hN[0] ^= N;
@@ -77,11 +77,11 @@ namespace nil {
                     }
 
                     if (!last_block) {
-                        uint64_t carry = 0;
+                        word_type carry = 0;
                         for (int i = 0; i < 8; i++) {
-                            const uint64_t m = force_le(M[i]);
-                            const uint64_t hi = force_le(m_S[i]);
-                            const uint64_t t = hi + m;
+                            const word_type m = force_le(M[i]);
+                            const word_type hi = force_le(m_S[i]);
+                            const word_type t = hi + m;
 
                             m_S[i] = force_le(t + carry);
                             carry = (t < hi ? 1 : 0) | (t < m ? 1 : 0);
@@ -109,24 +109,33 @@ namespace nil {
                 typedef detail::streebog_policy<DigestBits> policy_type;
 
             public:
-                typedef merkle_damgard_construction<stream_endian::little_octet_big_bit, policy_type::digest_bits,
-                                                    typename policy_type::iv_generator, streebog_compressor<DigestBits>>
-                    construction_type;
+                struct construction {
+                    struct params_type {
+                        typedef typename stream_endian::little_octet_big_bit digest_endian;
+
+                        constexpr static const std::size_t length_bits = 0;
+                        constexpr static const std::size_t digest_bits = policy_type::digest_bits;
+                    };
+
+                    typedef merkle_damgard_construction<params_type, typename policy_type::iv_generator,
+                                                        streebog_compressor<DigestBits>>
+                        type;
+                };
 
                 template<typename StateAccumulator, std::size_t ValueBits>
                 struct stream_processor {
                     struct params_type {
                         typedef typename stream_endian::little_octet_big_bit endian;
 
+                        constexpr static const std::size_t length_bits = construction::params_type::length_bits;
                         constexpr static const std::size_t value_bits = ValueBits;
-                        constexpr static const std::size_t length_bits = 0;
                     };
 
-                    typedef merkle_damgard_state_preprocessor<construction_type, StateAccumulator, params_type> type;
+                    typedef merkle_damgard_state_preprocessor<construction, StateAccumulator, params_type> type;
                 };
 
                 constexpr static const std::size_t digest_bits = policy_type::digest_bits;
-                typedef typename construction_type::digest_type digest_type;
+                typedef typename policy_type::digest_type digest_type;
             };
         }    // namespace hash
     }        // namespace crypto3

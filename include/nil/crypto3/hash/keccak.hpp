@@ -31,24 +31,32 @@ namespace nil {
                 typedef detail::keccak_1600_functions<DigestBits> policy_type;
 
             public:
-                typedef sponge_construction<stream_endian::little_octet_big_bit, policy_type::digest_bits,
-                                            typename policy_type::iv_generator, keccak_1600_compressor<DigestBits>>
-                    construction_type;
+                struct construction {
+                    struct params_type {
+                        typedef typename stream_endian::little_octet_big_bit endian;
+
+                        constexpr static const std::size_t length_bits = 0;    // No length padding
+                        constexpr static const std::size_t digest_bits = policy_type::digest_bits;
+                    };
+                    typedef sponge_construction<params_type, typename policy_type::iv_generator,
+                                                keccak_1600_compressor<DigestBits>>
+                        type;
+                };
 
                 template<typename StateAccumulator, std::size_t ValueBits>
                 struct stream_processor {
                     struct params_type {
                         typedef typename stream_endian::little_octet_big_bit endian;
 
+                        constexpr static const std::size_t length_bits = construction::params_type::length_bits;
                         constexpr static const std::size_t value_bits = ValueBits;
-                        constexpr static const std::size_t length_bits = 0;    // No length padding
                     };
 
-                    typedef sponge_stream_processor<construction_type, StateAccumulator, params_type> type;
+                    typedef sponge_stream_processor<construction, StateAccumulator, params_type> type;
                 };
 
                 constexpr static const std::size_t digest_bits = DigestBits;
-                typedef typename construction_type::digest_type digest_type;
+                typedef typename policy_type::digest_type digest_type;
             };
         }    // namespace hash
 

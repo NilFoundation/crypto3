@@ -46,7 +46,7 @@ namespace nil {
                 struct hash_impl<hash::adler<DigestBits>> : boost::accumulators::accumulator_base {
                 protected:
                     typedef hash::adler<DigestBits> hash_type;
-                    typedef typename hash_type::construction_type construction_type;
+                    typedef typename hash_type::construction::type construction_type;
 
                     constexpr static const std::size_t word_bits = construction_type::word_bits;
                     typedef typename construction_type::word_type word_type;

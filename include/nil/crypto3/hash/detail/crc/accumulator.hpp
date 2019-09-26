@@ -64,7 +64,7 @@ namespace nil {
                     : boost::accumulators::accumulator_base {
                 protected:
                     typedef hash::crc<DigestBits, TruncPoly, InitRem, FinalXor, ReflectIn, ReflectRem> hash_type;
-                    typedef typename hash_type::construction_type construction_type;
+                    typedef typename hash_type::construction::type construction_type;
 
                     constexpr static const std::size_t word_bits = construction_type::word_bits;
                     typedef typename construction_type::word_type word_type;

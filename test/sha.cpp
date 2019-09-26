@@ -48,7 +48,7 @@ using namespace nil::crypto3::accumulators;
 
 class fixture {
 public:
-    sha1::construction_type a;
+    sha1::construction::type a;
 };
 
 namespace std {
@@ -141,7 +141,7 @@ BOOST_AUTO_TEST_SUITE(sha_test_suite)
 
 BOOST_AUTO_TEST_CASE(sha_collision) {
     // Reported 2004-08-12 by Joux, Carribault, Lemuet, and Jalby
-    typedef sha::construction_type::word_type word_type;
+    typedef sha::construction::type::word_type word_type;
     constexpr const std::array<word_type, 64> fic1 = {
         0xa766a602, 0xb65cffe7, 0x73bcf258, 0x26b322b3, 0xd01b1a97, 0x2684ef53, 0x3e3b4b7f, 0x53fe3762, 0x24c08e47,
         0xe959b2bc, 0x3b519880, 0xb9286568, 0x247d110f, 0x70f5c5e2, 0xb4590ca3, 0xf55f52fe, 0xeffd4c8f, 0xe68de835,
@@ -264,8 +264,8 @@ BOOST_FIXTURE_TEST_CASE(sha1_accumulator_hash2, fixture) {
     // A single 1 bit after the (empty) message,
     // then pad with 0s,
     // then add the length, which is also 0
-    sha1::construction_type::block_type m = {{0x80000000u}};
-    a(m);
+    sha1::construction::type::block_type m = {{0x80000000u}};
+    a.process_block(m);
 
     sha1::digest_type s = a.end_message();
 
@@ -280,10 +280,10 @@ BOOST_FIXTURE_TEST_CASE(sha1_accumulator_hash2, fixture) {
 
 BOOST_FIXTURE_TEST_CASE(sha1_accumulator_hash3, fixture) {
     // Example from appendix A.1: echo -n "abc" | sha1sum
-    sha1::construction_type::block_type m = {{}};
+    sha1::construction::type::block_type m = {{}};
     m[0] = 0x61626380;
     m[15] = 0x00000018;
-    a(m);
+    a.process_block(m);
 
     sha1::digest_type s = a.end_message();
 
@@ -299,7 +299,7 @@ BOOST_FIXTURE_TEST_CASE(sha1_accumulator_hash3, fixture) {
 BOOST_FIXTURE_TEST_CASE(sha1_accumulator_hash4, fixture) {
     // Example from appendix A.2:
     // echo -n "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq" | sha1sum
-    sha1::construction_type::block_type m1 = {{
+    sha1::construction::type::block_type m1 = {{
         0x61626364,
         0x62636465,
         0x63646566,
@@ -317,13 +317,13 @@ BOOST_FIXTURE_TEST_CASE(sha1_accumulator_hash4, fixture) {
         0x80000000,
         0x00000000,
     }};
-    a(m1);
+    a.process_block(m1);
 
     BOOST_CHECK_EQUAL("f4286818c37b27ae0408f581846771484a566572", std::to_string(a.digest()).data());
 
-    sha1::construction_type::block_type m2 = {{}};
+    sha1::construction::type::block_type m2 = {{}};
     m2[15] = 0x000001c0;
-    a(m2);
+    a.process_block(m2);
 
     sha1::digest_type s = a.end_message();
 
