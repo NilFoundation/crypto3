@@ -20,7 +20,7 @@
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/multiprecision/integer.hpp>
 
-#include <nil/crypto3/codec/detail/inline_variable.hpp>
+#include <nil/crypto3/detail/inline_variable.hpp>
 
 using namespace boost::multiprecision;
 
