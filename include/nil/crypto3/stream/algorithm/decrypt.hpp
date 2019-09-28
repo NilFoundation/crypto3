@@ -16,6 +16,9 @@
 namespace nil {
     namespace crypto3 {
         /*!
+         * @defgroup stream Stream Ciphers
+         * @brief
+         *
          * @defgroup stream_algorithms Algorithms
          * @ingroup stream
          * @brief Algorithms are meant to provide decryption interface similar to STL algorithms' one.
