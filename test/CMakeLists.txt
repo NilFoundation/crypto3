@@ -31,7 +31,7 @@ macro(define_stream_test name)
     endif()
 endmacro()
 
-set(TESTS_NAMES "chacha" "rc4" "salsa20")
+set(TESTS_NAMES "chacha" "ctr" "rc4" "salsa20")
 
 foreach(TEST_NAME ${TESTS_NAMES})
     define_stream_test(${TEST_NAME})
