@@ -23,7 +23,7 @@ namespace nil {
              */
             template<std::size_t IVBits = 64, std::size_t KeyBits = 128, std::size_t Rounds = 20>
             class chacha {
-                typedef detail::ctr_functions<Rounds, IVBits, KeyBits> policy_type;
+                typedef detail::chacha_functions<Rounds, IVBits, KeyBits> policy_type;
 
             public:
                 constexpr static const std::size_t rounds = policy_type::rounds;
