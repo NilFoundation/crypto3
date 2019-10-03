@@ -40,6 +40,7 @@ set(TESTS_NAMES
     "cubehash"
     "md4"
     "md5"
+    "ghash"
     "keccak"
     "ripemd"
     "pack"
