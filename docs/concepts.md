@@ -21,7 +21,7 @@ The following expressions must be valid and have their specified effects
 Models of the ```HashAlgorithm``` concept are policies to be provided as template arguments to other
 templates. They provide access to the set of types needed to generically compute and store digests with
 a particular algorithm. (For example, the ```hash``` algorithm templates are parametrized by a
-HashAlgorithm, as would a future HMAC-computing function template.)
+HashAlgorithm)
 
 A type ```T``` modelling the ```HashAlgorithm``` concept must support the following:
 
