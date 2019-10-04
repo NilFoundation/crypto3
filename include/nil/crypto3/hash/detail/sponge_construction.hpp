@@ -53,7 +53,7 @@ namespace nil {
                 typedef typename compressor_functor::block_type block_type;
 
                 constexpr static const std::size_t digest_bits = Params::digest_bits;
-                ;
+
                 constexpr static const std::size_t digest_bytes = digest_bits / octet_bits;
                 constexpr static const std::size_t digest_words = digest_bits / word_bits;
                 typedef static_digest<digest_bits> digest_type;
