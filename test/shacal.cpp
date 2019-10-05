@@ -78,22 +78,27 @@ BOOST_AUTO_TEST_CASE(shacal1_single_block_encrypt2) {
     owcft::state_type H = H0;
 
     owcft f;
-    f(H, block);
+    f.process_block(H, block);
     owcft::state_type const H1 = {{0xda39a3ee, 0x5e6b4b0d, 0x3255bfef, 0x95601890, 0xafd80709}};
     BOOST_CHECK_EQUAL(H, H1);
 }
 
+struct shacal_params_type {
+    constexpr static const std::size_t length_bits = 64 * 2;
+    constexpr static const std::size_t digest_bits = 160;
+
+    typedef stream_endian::big_octet_big_bit digest_endian;
+};
+
 BOOST_AUTO_TEST_CASE(shacal1_single_block_encrypt3) {
     typedef block::shacal1 bct;
     typedef hash::davies_meyer_compressor<bct, state_adder> owcft;
-    typedef hash::merkle_damgard_construction<stream_endian::big_octet_big_bit, 160,
-                                              hash::detail::sha1_policy::iv_generator, owcft>
-        bht;
+    typedef hash::merkle_damgard_construction<shacal_params_type, hash::detail::sha1_policy::iv_generator, owcft> bht;
 
     // Test with the equivalent of SHA-1("")
     bht::block_type block = {{0x80000000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
     bht bh;
-    bh(block);
+    bh.process_block(block);
     bht::digest_type h = bh.end_message();
 
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
@@ -134,24 +139,30 @@ BOOST_AUTO_TEST_CASE(shacal2_single_block_encrypt2) {
     owcft::block_type block = {{0x80000000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
     owcft::state_type H = H0;
     owcft f;
-    f(H, block);
+    f.process_block(H, block);
     owcft::state_type const H1 = {
         {0xe3b0c442, 0x98fc1c14, 0x9afbf4c8, 0x996fb924, 0x27ae41e4, 0x649b934c, 0xa495991b, 0x7852b855}};
 
     BOOST_CHECK_EQUAL(H, H1);
 }
 
+struct shacal2_params_type {
+    typedef typename stream_endian::big_octet_big_bit digest_endian;
+
+    constexpr static const std::size_t length_bits = 64;
+    constexpr static const std::size_t digest_bits = 256;
+};
+
 BOOST_AUTO_TEST_CASE(shacal2_single_block_encrypt3) {
     typedef block::shacal2<256> bct;
     typedef hash::davies_meyer_compressor<bct, state_adder> owcft;
-    typedef hash::merkle_damgard_construction<stream_endian::big_octet_big_bit, 256,
-                                              hash::detail::sha2_policy<256>::iv_generator, owcft>
+    typedef hash::merkle_damgard_construction<shacal2_params_type, hash::detail::sha2_policy<256>::iv_generator, owcft>
         bht;
 
     // Test with the equivalent of SHA-256("")
     bht::block_type block = {{0x80000000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
     bht bh;
-    bh(block);
+    bh.process_block(block);
     bht::digest_type h = bh.end_message();
 
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
