@@ -1,5 +1,4 @@
 #include <nil/crypto3/pubkey/ecies.hpp>
-#include <nil/crypto3/mac/mac.hpp>
 
 #include <nil/crypto3/utilities/ct_utils.hpp>
 #include <nil/crypto3/pubkey/pk_ops_impl.hpp>
