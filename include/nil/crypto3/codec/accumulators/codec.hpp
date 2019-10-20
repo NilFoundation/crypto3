@@ -93,7 +93,7 @@ namespace nil {
 
                     template<typename ArgumentPack>
                     inline result_type result(const ArgumentPack &args) const {
-                        result_type res = digest;
+                        result_type res = dgst;
 
                         if (!cache.empty()) {
                             input_block_type ib = {0};
@@ -133,7 +133,7 @@ namespace nil {
                             input_block_type ib = {0};
                             std::move(cache.begin(), cache.end(), ib.begin());
                             output_block_type ob = codec_mode_type::process_block(ib);
-                            std::move(ob.begin(), ob.end(), std::inserter(digest, digest.end()));
+                            std::move(ob.begin(), ob.end(), std::inserter(dgst, dgst.end()));
 
                             cache.clear();
                         }
@@ -159,13 +159,13 @@ namespace nil {
                             cache.insert(cache.end(), itr, block.end());
                         }
 
-                        std::move(ob.begin(), ob.end(), std::inserter(digest, digest.end()));
+                        std::move(ob.begin(), ob.end(), std::inserter(dgst, dgst.end()));
                         seen += input_block_bits;
                     }
 
                     std::size_t seen;
                     cache_type cache;
-                    result_type digest;
+                    result_type dgst;
                 };
 
                 template<typename CodecMode>
@@ -203,7 +203,7 @@ namespace nil {
                         preprocessor_type preprocessor;
                         const input_block_type block =
                             args[boost::accumulators::sample];    // TODO: I think it must be user type block like
-                                                                  // digest
+                                                                  // dgst
                         if (input.empty()) {
                             preprocessor(block);
                             leading_zeros = preprocessor.leading_zeros;
