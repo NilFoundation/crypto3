@@ -26,8 +26,8 @@ namespace nil {
                     typedef typename policy_type::mac_type2 mac_type2;
 
                     template<typename MessageAuthenticationCode>
-                    static void P_hash(uint8_t out[], size_t out_len, MessageAuthenticationCode &mac,
-                                       const uint8_t secret[], size_t secret_len, const uint8_t salt[],
+                    static void p_hash(uint8_t *out, size_t out_len, MessageAuthenticationCode &mac,
+                                       const uint8_t *secret, size_t secret_len, const uint8_t *salt,
                                        size_t salt_len) {
                         try {
                             mac.set_key(secret, secret_len);

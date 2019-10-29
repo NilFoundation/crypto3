@@ -57,10 +57,10 @@ namespace nil {
                     msg += std::make_pair(label, label_len);
                     msg += std::make_pair(salt, salt_len);
 
-                    policy_type::template P_hash<mac_type2>(key, key_len, *m_hmac_md5, S1, S1_len, msg.data(), msg.size
-                    ());
-                    policy_type::template P_hash<mac_type1>(key, key_len, *m_hmac_sha1, S2, S2_len, msg.data(), msg.size
-                    ());
+                    policy_type::template p_hash<mac_type2>(key, key_len, *m_hmac_md5, S1, S1_len, msg.data(),
+                                                            msg.size());
+                    policy_type::template p_hash<mac_type1>(key, key_len, *m_hmac_sha1, S2, S2_len, msg.data(),
+                                                            msg.size());
                     return key_len;
                 }
             };
@@ -87,9 +87,9 @@ namespace nil {
                     msg += std::make_pair(label, label_len);
                     msg += std::make_pair(salt, salt_len);
 
-                    policy_type::template P_hash<mac_type2>(key, key_len, *m_hmac_md5, S1, S1_len, msg.data(),
+                    policy_type::template p_hash<mac_type2>(key, key_len, *m_hmac_md5, S1, S1_len, msg.data(),
                                                             msg.size());
-                    policy_type::template P_hash<mac_type1>(key, key_len, *m_hmac_sha1, S2, S2_len, msg.data(),
+                    policy_type::template p_hash<mac_type1>(key, key_len, *m_hmac_sha1, S2, S2_len, msg.data(),
                                                             msg.size());
                     return key_len;
                 }
@@ -115,7 +115,7 @@ namespace nil {
                     msg += std::make_pair(label, label_len);
                     msg += std::make_pair(salt, salt_len);
 
-                    policy_type::template P_hash<mac_type1>(key, key_len, *m_mac, secret, secret_len, msg.data(),
+                    policy_type::template p_hash<mac_type1>(key, key_len, *m_mac, secret, secret_len, msg.data(),
                                                             msg.size());
                     return key_len;
                 }

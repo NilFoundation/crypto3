@@ -21,6 +21,10 @@ namespace nil {
                     typedef sp800_108_policy<MessageAuthenticationCode, Mode> policy_type;
                     typedef typename policy_type::mode_type mode_type;
                     typedef typename policy_type::mac_type mac_type;
+
+                    constexpr static const std::size_t digest_bits = policy_type::digest_bits;
+                    typedef typename policy_type::digest_type digest_type;
+
                 };
             }    // namespace detail
         }        // namespace kdf

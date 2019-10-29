@@ -32,7 +32,10 @@ namespace nil {
                 struct counter : sp800_108_mode<MessageAuthenticationCode> {
                     typedef typename sp800_108_mode<MessageAuthenticationCode>::mac_type mac_type;
 
-                    inline static void process() {
+                    constexpr static const std::size_t digest_bits = mac_type::digest_bits;
+                    typedef typename mac_type::digest_type digest_type;
+
+                    inline static void process(digest_type &digest) {
                         const std::size_t prf_len = m_prf->output_length();
                         const uint8_t delim = 0;
                         const uint32_t length = static_cast<uint32_t>(key_len * 8);
@@ -79,7 +82,10 @@ namespace nil {
                 struct feedback : sp800_108_mode<MessageAuthenticationCode> {
                     typedef typename sp800_108_mode<MessageAuthenticationCode>::mac_type mac_type;
 
-                    inline static void process() {
+                    constexpr static const std::size_t digest_bits = mac_type::digest_bits;
+                    typedef typename mac_type::digest_type digest_type;
+
+                    inline static void process(digest_type &digest) {
                         const uint32_t length = static_cast<uint32_t>(key_len * 8);
                         const std::size_t prf_len = m_prf->output_length();
                         const std::size_t iv_len = (salt_len >= prf_len ? prf_len : 0);
@@ -130,7 +136,10 @@ namespace nil {
                 struct pipeline : sp800_108_mode<MessageAuthenticationCode> {
                     typedef typename sp800_108_mode<MessageAuthenticationCode>::mac_type mac_type;
 
-                    inline static void process() {
+                    constexpr static const std::size_t digest_bits = mac_type::digest_bits;
+                    typedef typename mac_type::digest_type digest_type;
+
+                    inline static void process(digest_type &digest) {
                         const uint32_t length = static_cast<uint32_t>(key_len * 8);
                         const std::size_t prf_len = m_prf->output_length();
                         const uint8_t delim = 0;
@@ -196,12 +205,17 @@ namespace nil {
                 typedef typename policy_type::mode_type mode_type;
                 typedef typename policy_type::mac_type mac_type;
 
-                static void process() {
-                    mode_type::process();
+                constexpr static const std::size_t digest_bits = policy_type::digest_bits;
+                typedef typename std::enable_if<
+                    std::is_same<typename mac_type::digest_type, typename policy_type::digest_type>::value,
+                    typename policy_type::digest_type>::type digest_type;
+
+                static void process(digest_type &digest) {
+                    mode_type::process(digest);
                 }
             };
         }    // namespace kdf
-    }    // namespace crypto3
+    }        // namespace crypto3
 }    // namespace nil
 
 #endif
