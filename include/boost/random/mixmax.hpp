@@ -256,7 +256,7 @@ public: // SEEDING FUNCTIONS
          */
         
         
-        const	std::uint64_t skipMat17[128][17] =
+        const    std::uint64_t skipMat17[128][17] =
 #include "boost/random/detail/mixmax_skip_N17.ipp"
         ;
         
