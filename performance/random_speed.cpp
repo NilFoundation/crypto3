@@ -397,5 +397,7 @@ int main(int argc, char*argv[])
 
   distrib(iter, "mt19937", boost::mt19937());
   
+  distrib(iter, "mixmax", boost::random::mixmax());
+  
   distrib(iter, "lagged_fibonacci607", boost::lagged_fibonacci607());
 }
