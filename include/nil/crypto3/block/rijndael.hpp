@@ -119,6 +119,10 @@ namespace nil {
 #endif
                                               detail::rijndael_impl<KeyBits, BlockBits, policy_type>>::type impl_type;
 
+                constexpr static const std::size_t key_schedule_words = policy_type::key_schedule_words;
+                constexpr static const std::size_t key_schedule_bytes = policy_type::key_schedule_bytes;
+                typedef typename policy_type::key_schedule_type key_schedule_type;
+
             public:
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
                 constexpr static const std::size_t word_bytes = policy_type::word_bytes;
@@ -135,10 +139,6 @@ namespace nil {
 
                 constexpr static const std::uint8_t rounds = policy_type::rounds;
                 typedef typename policy_type::round_constants_type round_constants_type;
-
-                constexpr static const std::size_t key_schedule_words = policy_type::key_schedule_words;
-                constexpr static const std::size_t key_schedule_bytes = policy_type::key_schedule_bytes;
-                typedef typename policy_type::key_schedule_type key_schedule_type;
 
                 template<template<typename, typename> class Mode, typename StateAccumulator, std::size_t ValueBits,
                          typename Padding>
