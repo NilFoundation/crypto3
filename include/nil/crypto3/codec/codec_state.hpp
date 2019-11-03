@@ -20,7 +20,7 @@ namespace nil {
     namespace crypto3 {
         namespace codec {
             struct nop_finalizer {
-                nop_finalizer(std::size_t v = 0) {
+                nop_finalizer(std::size_t = 0) {
                 }
 
                 template<typename T>
@@ -29,7 +29,7 @@ namespace nil {
             };
 
             struct nop_preprocessor {
-                nop_preprocessor(std::size_t v = 0) {
+                nop_preprocessor(std::size_t = 0) {
                 }
 
                 template<typename T>

@@ -91,8 +91,7 @@ namespace nil {
                         resolve_type(args[boost::accumulators::sample], args[bits | std::size_t()]);
                     }
 
-                    template<typename ArgumentPack>
-                    inline result_type result(const ArgumentPack &args) const {
+                    inline result_type result(boost::accumulators::dont_care) const {
                         result_type res = dgst;
 
                         if (!cache.empty()) {
@@ -128,7 +127,7 @@ namespace nil {
                         }
                     }
 
-                    inline void process(const input_value_type &value, std::size_t bits) {
+                    inline void process(const input_value_type &value, std::size_t) {
                         if (cache.size() == cache.max_size()) {
                             input_block_type ib = {0};
                             std::move(cache.begin(), cache.end(), ib.begin());
@@ -142,7 +141,7 @@ namespace nil {
                         seen += input_value_bits;
                     }
 
-                    inline void process(const input_block_type &block, std::size_t bits) {
+                    inline void process(const input_block_type &block, std::size_t) {
                         output_block_type ob;
                         if (cache.empty()) {
                             ob = codec_mode_type::process_block(block);
