@@ -136,7 +136,7 @@ namespace nil {
         }
 
         template<std::size_t DB1, std::size_t DB2>
-        bool operator<(const static_digest<DB1> &a, const static_digest<DB2> &b) {
+        bool operator<(const static_digest<DB1> &, const static_digest<DB2> &) {
             // #TODO: Implement this right
             return DB1 < DB2;
         }
