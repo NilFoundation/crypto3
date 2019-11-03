@@ -10,6 +10,8 @@
 #ifndef CRYPTO3_DIGEST_HPP
 #define CRYPTO3_DIGEST_HPP
 
+#include <iostream>
+
 #include <boost/static_assert.hpp>
 #include <boost/assert.hpp>
 
