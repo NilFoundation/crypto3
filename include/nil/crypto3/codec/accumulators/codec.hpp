@@ -81,9 +81,7 @@ namespace nil {
                 public:
                     typedef digest<output_block_bits> result_type;
 
-                    template<typename Args>
-                    // The constructor takes an argument pack.
-                    codec_impl(const Args &args) : seen(0) {
+                    codec_impl(boost::accumulators::dont_care) : seen(0) {
                     }
 
                     template<typename ArgumentPack>
