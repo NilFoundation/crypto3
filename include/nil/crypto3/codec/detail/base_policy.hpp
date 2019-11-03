@@ -91,7 +91,7 @@ namespace nil {
                     CRYPTO3_INLINE_VARIABLE(constants_type, constants,
                                             ({'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
                                               'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V',
-                                              'W', 'X', 'Y', 'Z', '2', '3', '4', '5', '6', '7'}))
+                                              'W', 'X', 'Y', 'Z', '2', '3', '4', '5', '6', '7'}));
 
                     constexpr static const std::size_t inverted_constants_size = constants_size * 8;
                     typedef std::array<byte_type, inverted_constants_size> inverted_constants_type;
