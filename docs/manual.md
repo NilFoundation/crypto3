@@ -35,4 +35,16 @@ int main(int argc, char *argv[]) {
 
 ## Stateful encryption
 
-In case of accumulative encryption requirement is present, following example
+In case of accumulative encryption requirement is present, following example demonstrates 
+[accumulator](@ref block_accumulator_set) usage:
+
+```cpp
+#include <nil/crypto3/block/aria.hpp>
+#include <nil/crypto3/block/algorithm/encrypt.hpp>
+
+using namespace nil::crypto3;
+
+int main(int argc, char *argv[]) {
+   block_accumulator_set<block::aria> acc;
+}
+```
