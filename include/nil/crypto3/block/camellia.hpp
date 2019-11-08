@@ -26,12 +26,14 @@ namespace nil {
              * @brief Camellia. A Japanese design standardized by ISO, NESSIE and
              * CRYPTREC. Somewhat common. Comes in three variants, Camellia-128,
              * Camellia-192, and Camellia-256. Prefer AES or Serpent in new designs.
+             *
+             * @tparam KeyBits Block cipher key bits. Supported values are: 128, 192, 256
              */
-            template<std::size_t Size>
+            template<std::size_t KeyBits>
             class camellia {
             protected:
-                constexpr static const std::size_t version = Size;
-                typedef detail::camellia_policy<Size> policy_type;
+                constexpr static const std::size_t version = KeyBits;
+                typedef detail::camellia_policy<KeyBits> policy_type;
 
                 constexpr static const std::size_t key_schedule_words = policy_type::key_schedule_words;
                 typedef typename policy_type::key_schedule_type key_schedule_type;
@@ -60,7 +62,7 @@ namespace nil {
                         constexpr static const std::size_t length_bits = policy_type::word_bits * 2;
                     };
 
-                    typedef block_stream_processor<Mode<camellia<Size>, Padding>, StateAccumulator, params_type> type_;
+                    typedef block_stream_processor<Mode<camellia<KeyBits>, Padding>, StateAccumulator, params_type> type_;
 #ifdef CRYPTO3_BLOCK_NO_HIDE_INTERNAL_TYPES
                     typedef type_ type;
 #else

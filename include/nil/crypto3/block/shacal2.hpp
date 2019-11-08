@@ -44,15 +44,15 @@ namespace nil {
              * - key = M^(i)
              * - schedule = W
              *
-             * @tparam Version
+             * @tparam BlockBits Block cipher block bits. Available values are: 256, 512
              */
-            template<std::size_t Version>
+            template<std::size_t BlockBits>
             class shacal2 {
 
-                typedef detail::shacal2_policy<Version> policy_type;
+                typedef detail::shacal2_policy<BlockBits> policy_type;
 
             public:
-                constexpr static const std::size_t version = Version;
+                constexpr static const std::size_t version = BlockBits;
 
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
                 typedef typename policy_type::word_type word_type;
@@ -78,7 +78,7 @@ namespace nil {
                         constexpr static const std::size_t length_bits = policy_type::word_bits * 2;
                     };
 
-                    typedef block_stream_processor<Mode<shacal2<Version>, Padding>, StateAccumulator, params_type>
+                    typedef block_stream_processor<Mode<shacal2<BlockBits>, Padding>, StateAccumulator, params_type>
                         type_;
 #ifdef CRYPTO3_BLOCK_NO_HIDE_INTERNAL_TYPES
                     typedef type_ type;

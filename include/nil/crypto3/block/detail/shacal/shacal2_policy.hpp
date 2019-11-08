@@ -42,7 +42,7 @@ namespace nil {
                 template<>
                 struct shacal2_policy<256> : basic_shacal2_policy<32> {
 
-                    static const std::size_t rounds = 64;
+                    constexpr static const std::size_t rounds = 64;
                     typedef std::array<word_type, rounds> key_schedule_type;
                     typedef std::array<word_type, rounds> constants_type;
 

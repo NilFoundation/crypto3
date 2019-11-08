@@ -42,8 +42,9 @@ template<typename InputIterator, typename OutputIterator, typename UnaryOperatio
 OutputIterator transform(InputIterator first, InputIterator last, OutputIterator out, UnaryOperation unary_op);
 ```
 
-```InputIterator``` operates over any iterable range, no matter which particular type is supposed to be processed
-. While ```OutputIterator``` provides a type-independent output place for the algorithm to put results no matter
+Input values of type ```InputIterator``` operate over any iterable range, no matter which particular type is supposed
+ to be processed. 
+ While ```OutputIterator``` provides a type-independent output place for the algorithm to put results no matter
  which particular range this ```OutputIterator``` represents.
  
 Since C++20 this algorithm got it analogous inside Ranges library as follows:
@@ -84,13 +85,13 @@ initialized with ```BlockCipher``` intialized with ```KeyType``` retrieved from 
 ## Stream Data Processing {#block_cipher_stream}
 
 Block ciphers are usually defined for processing ```Integral``` value typed byte sequences of specific size packed in
- blocks (e.g. ```Rijndael``` is defined for blocks of words which are actually plain ```n```-sized arrays of 
- ```uint32_t ```). Input data in the implementation proposed is supposed to be a various-length input
-  stream, which length could be not even to block size.
+blocks (e.g. ```Rijndael``` is defined for blocks of words which are actually plain ```n```-sized arrays of 
+```uint32_t ``` ). Input data in the implementation proposed is supposed to be a various-length input
+stream, which length could be not even to block size.
   
 This requires an introduction of stream processor specified with particular parameter set unique for each
- ```BlockCipher``` type, which takes input data stream and gets it split to blocks filled with converted to
-  appropriate size integers (words in the cryptography meaning, not machine words).
+```BlockCipher``` type, which takes input data stream and gets it split to blocks filled with converted to
+appropriate size integers (words in the cryptography meaning, not machine words).
   
 Example. Lets assume input data stream consists of 16 bytes as follows.
 
