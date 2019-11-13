@@ -1,4 +1,4 @@
-# Manual
+# Manual {#block_ciphers_manual}
 
 ## Quick Start
 

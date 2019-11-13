@@ -1,5 +1,13 @@
 # Implementation {#block_ciphers_impl}
 
+Block ciphers usage is usually split to three stages:
+
+1. Initialization (key scheduling)
+2. Accumulation (data preprocessing)
+3. Encryption
+
+This separation defines the implementation architecture.
+
 Implementation of a library is considered to be highly compliant with STL. So the crucial point is to have ciphers to
 be usable in the same way as STL algorithms do.
  
