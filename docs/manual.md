@@ -1,6 +1,6 @@
-# Manual {#block_ciphers_manual}
+# Manual {#block_ciphers_manual} #
 
-## Quick Start
+## Quick Start ##
 
 The easiest way to use Crypto3.Block library is to use an algorithm with explicit key initialization and
  implicit state usage. Following example encrypts byte sequence with Aria block cipher:
@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
  
 ```
 
-## Stateful encryption
+## Stateful encryption ##
 
 In case of accumulative encryption requirement is present, following example demonstrates 
 [accumulator](@ref block_accumulator_set) usage:

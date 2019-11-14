@@ -1,4 +1,4 @@
-# Implementation {#block_ciphers_impl}
+# Implementation # {#block_ciphers_impl}
 
 Block ciphers usage is usually split to three stages:
 
@@ -11,7 +11,7 @@ This separation defines the implementation architecture.
 Some particular cases merge accumulation step with encryption step. This means 
 block gets encrypted as far as it is found filled with enough data.  
 
-## Architecture Overview {#block_ciphers_arch}
+## Architecture Overview ## {#block_ciphers_arch}
 
 Block cipher library architecture consists of several parts listed below:
 
@@ -40,7 +40,7 @@ node [shape="box"]
 }
 @enddot
 
-## Algorithms {#block_cipher_algs}
+## Algorithms ## {#block_cipher_algs}
 
 Implementation of a library is considered to be highly compliant with STL. So 
 the crucial point is to have ciphers to be usable in the same way as STL 
@@ -103,7 +103,7 @@ set with [`block`](@ref accumulators::block) accumulator inside initialized
 with [`BlockCipher`](@ref block_cipher_concept) initialized with `KeyType` 
 retrieved from input `KeyIterator` instances.
 
-## Stream Data Processing {#block_cipher_stream}
+## Stream Data Processing ## {#block_cipher_stream}
 
 Block ciphers are usually defined for processing `Integral` value typed byte 
 sequences of specific size packed in blocks (e.g. `rijndael` is defined for 
@@ -183,7 +183,7 @@ converts them and passes to `AccumulatorSet` reference as cipher input of
 format required. The rest of data not even to block size gets converted too and 
 fed value by value to the same `AccumulatorSet` reference.
 
-## Data Type Conversion {#block_cipher_data}
+## Data Type Conversion ## {#block_cipher_data}
  
 Since block cipher algorithms are usually defined for `Integral` types or byte 
 sequences of unique format for each cipher, encryption function being generic 
@@ -239,7 +239,7 @@ public:
 This part is handled internally with `stream_processor` configured for each 
 particular cipher. 
    
-## Block Cipher Algorithms {#block_cipher_pol}
+## Block Cipher Algorithms ## {#block_cipher_pol}
 
 Block cipher algorithms architecturally are stateful policies, which structural 
 contents are regulated by concepts and runtime content is a scheduled key data. 
@@ -270,7 +270,7 @@ data (usually it is represented by `block_type` typedef) per call.
 Such functions are stateful with respect to key schedule data represented by 
 `key_schedule_type` and generated while block cipher constructor call.
 
-## Accumulators {#block_cipher_acc}
+## Accumulators ## {#block_cipher_acc}
 
 Encryption contains an accumulation step, which is implemented with 
 [Boost.Accumulators](https://boost.org/libs/accumulators) library.
@@ -315,7 +315,7 @@ std::string hash = extract::hash<hash::sha2<256>>(acc);
 std::string ciphertext = extract::block<block::rijndael<128, 128>>(acc);
 ```
 
-## Value Postprocessors {#block_cipher_val}
+## Value Postprocessors ## {#block_cipher_val}
 
 Since the accumulator output type is strictly tied to [`digest_type`](@ref block::digest_type)
 of particular [`BlockCipher`](@ref block_cipher_concept) policy, the output 
