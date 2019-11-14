@@ -1,6 +1,6 @@
 # Block Cipher Concepts #{block_ciphers_concepts}
 
-## BlockCipher Concept
+## BlockCipher Concept #{block_cipher_concept}
 
 A ```BlockCipher``` is an object intended to compute non-isomorphic permutations over particular sized integers (e.g. rijndael).
 
