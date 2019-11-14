@@ -35,6 +35,6 @@ The following expressions must be valid and have their specified effects
 
 |Expression                 |Requirements      |Return Type                    |
 |---------------------------|------------------|-------------------------------|
-|```X(key_type)```|Constructs stateful ```BlockCipher``` object with input key of ```key_type```|```BlockCipher```|
-|```X.encrypt(block_type)```|Encrypts a block of data in decoded format specified for particular algorithm. A block can be of a variable size. Should be a non-mutating function depending only on a ```BlockCipher``` object inner state of ```key_type``` type.|```block_type```|
-|```X.decrypt(block_type)```|Decrypts a block of data in encoded format specified for particular algorithm. A block can be of a variable size. Should be a non-mutating function depending only on a ```BlockCipher``` object inner state of ```key_type``` type.|```block_type```|
+|```X(key_type)```|Constructs stateful ```StreamCipher``` object with input key of ```key_type```|```StreamCipher```|
+|```X.encrypt(block_type)```|Encrypts a block of data in decoded format specified for particular algorithm. A block can be of a variable size. Should be a non-mutating function depending only on a ```StreamCipher``` object inner state of ```key_type``` type.|```block_type```|
+|```X.decrypt(block_type)```|Decrypts a block of data in encoded format specified for particular algorithm. A block can be of a variable size. Should be a non-mutating function depending only on a ```StreamCipher``` object inner state of ```key_type``` type.|```block_type```|
