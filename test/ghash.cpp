@@ -37,11 +37,15 @@ namespace boost {
                 void operator()(std::ostream&, P<K, V> const&) {
                 }
             };
+
+            template<>
+            struct print_log_value<ghash<>::construction::type::digest_type> {
+                void operator()(std::ostream&, ghash<>::construction::type::digest_type const&) {
+                }
+            };
         }    // namespace tt_detail
     }        // namespace test_tools
 }    // namespace boost
-
-BOOST_TEST_DONT_PRINT_LOG_VALUE(ghash::construction::type::digest_type)
 
 BOOST_AUTO_TEST_SUITE(ghash_test_suite)
 
