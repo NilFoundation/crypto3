@@ -1,10 +1,10 @@
-# Concepts
+# Concepts # {#codec_concepts}
 
-## Codec Concept
+## Codec Concept ## {#codec_concept}
 
 A ```Codec``` is an object intended to compute isomorphic integral permutations (e.g. base64).
 
-### Requirements
+### Requirements ### {#codec_concept_requirements}
 
 The type ```X``` satisfies ```Codec``` if
 
