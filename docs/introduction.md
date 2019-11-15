@@ -11,10 +11,6 @@ Crypto3.Block consists of several parts to review:
 * [Implementation](@ref block_ciphers_impl).
 * [Concepts](@ref block_ciphers_concepts).
 
-A small part of each topic is reviewed right at 
-introduction, but the detailed information is 
-recommended to look inside of a corresponding chapter.
-
 ## Dependencies ## {#block_ciphers_dependencies}
 
 In-suite dependencies:

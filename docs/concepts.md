@@ -1,10 +1,10 @@
-# Block Cipher Concepts {#block_ciphers_concepts} #
+# Block Cipher Concepts # {#block_ciphers_concepts}
 
-## BlockCipher Concept {#block_cipher_concept} ##
+## BlockCipher Concept ## {#block_cipher_concept}
 
 A ```BlockCipher``` is an object intended to compute non-isomorphic permutations over particular sized integers (e.g. rijndael).
 
-### Requirements {#block_ciphers_concepts_requirements} ###
+### Requirements ### {#block_ciphers_concepts_requirements}
 
 The type ```X``` satisfies ```BlockCipher``` if
 
