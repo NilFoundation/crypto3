@@ -160,8 +160,8 @@ namespace nil {
                 bool m_a_is_zero;
                 bool m_a_is_minus_3;
             };
-        }
-    }    // namespace crypto3
+        }    // namespace pubkey
+    }        // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_CURVE_GFP_MONTGOMERY_HPP

@@ -42,7 +42,7 @@ namespace nil {
                  * @param group the underlying DL group
                  * @param y the public value y = g^x mod p
                  */
-                el_gamal_public_key(const dl_group &group, const boost::multiprecision::cpp_int &y);
+                el_gamal_public_key(const dl_group &group, const number<Backend, ExpressionTemplates> &y);
 
                 std::unique_ptr<pk_operations::encryption> create_encryption_op(random_number_generator &rng,
                                                                                 const std::string &params,
@@ -75,7 +75,7 @@ namespace nil {
                  * @param priv_key the key's secret value (or if zero, generate a new key)
                  */
                 el_gamal_private_key(random_number_generator &rng, const dl_group &group,
-                                     const boost::multiprecision::cpp_int &priv_key = 0);
+                                     const number<Backend, ExpressionTemplates> &priv_key = 0);
 
                 std::unique_ptr<pk_operations::decryption>
                     create_decryption_op(random_number_generator &rng,

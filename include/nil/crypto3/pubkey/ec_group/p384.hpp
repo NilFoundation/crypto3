@@ -28,8 +28,8 @@ namespace nil {
 
                 typedef number<backends::cpp_int_backend<p_bits, p_bits, unsigned_magnitude, unchecked, void>> p_type;
 
-                constexpr static const p_type p
-                    = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFF0000000000000000FFFFFFFF_cppui384;
+                constexpr static const p_type p =
+                    0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFF0000000000000000FFFFFFFF_cppui384;
 
                 template<typename Backend, expression_template_option ExpressionTemplates>
                 static void redc_mod_p(number<Backend, ExpressionTemplates> &x) {
@@ -222,7 +222,7 @@ namespace nil {
                 template<typename Backend, expression_template_option ExpressionTemplates>
                 number<Backend, ExpressionTemplates> invert_element(const number<Backend, ExpressionTemplates> &x,
                                                                     secure_vector<uint32_t> &ws) const override {
-                    boost::multiprecision::cpp_int r, x2, x3, x15, x30, tmp, rl;
+                    number<Backend, ExpressionTemplates> r, x2, x3, x15, x30, tmp, rl;
 
                     r = x;
                     curve_sqr_tmp(r, tmp, ws);

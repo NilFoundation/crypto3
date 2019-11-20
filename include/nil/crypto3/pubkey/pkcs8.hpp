@@ -237,8 +237,8 @@ namespace nil {
              * @return loaded private key object
              */
 
-            std::unique_ptr<private_key_policy> load_key(data_source &source,
-                                                         std::function<std::string()> get_passphrase);
+            std::unique_ptr<private_key_policy>
+                load_key(data_source &source, std::function<std::string()> get_passphrase);
 
             /** Load an encrypted key from a data source.
              * @param source the data source providing the encoded key

@@ -74,7 +74,7 @@ namespace nil {
                  * @param x the private key (if zero, generate a new random key)
                  */
                 sm2_encryption_private_key(random_number_generator &rng, const ec_group &domain,
-                                           const boost::multiprecision::cpp_int &x = 0);
+                                           const number<Backend, ExpressionTemplates> &x = 0);
 
                 bool check_key(random_number_generator &rng, bool) const override;
 

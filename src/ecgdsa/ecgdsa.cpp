@@ -29,28 +29,28 @@ namespace nil {
 
             private:
                 const ec_group m_group;
-                const boost::multiprecision::cpp_int &m_x;
-                std::vector<boost::multiprecision::cpp_int> m_ws;
+                const boost::multiprecision::number<Backend, ExpressionTemplates> &m_x;
+                std::vector<boost::multiprecision::number<Backend, ExpressionTemplates>> m_ws;
             };
 
             secure_vector<uint8_t> ecgdsa_signature_operation::raw_sign(const uint8_t msg[], size_t msg_len,
                                                                         random_number_generator &rng) {
-                const boost::multiprecision::cpp_int m(msg, msg_len, m_group.get_order_bits());
+                const boost::multiprecision::number<Backend, ExpressionTemplates> m(msg, msg_len, m_group.get_order_bits());
 
-                const boost::multiprecision::cpp_int k = m_group.random_scalar(rng);
+                const boost::multiprecision::number<Backend, ExpressionTemplates> k = m_group.random_scalar(rng);
 
-                const boost::multiprecision::cpp_int r = m_group.mod_order(m_group.blinded_base_point_multiply_x(k, rng, m_ws));
+                const boost::multiprecision::number<Backend, ExpressionTemplates> r = m_group.mod_order(m_group.blinded_base_point_multiply_x(k, rng, m_ws));
 
-                const boost::multiprecision::cpp_int kr = m_group.multiply_mod_order(k, r);
+                const boost::multiprecision::number<Backend, ExpressionTemplates> kr = m_group.multiply_mod_order(k, r);
 
-                const boost::multiprecision::cpp_int s = m_group.multiply_mod_order(m_x, kr - m);
+                const boost::multiprecision::number<Backend, ExpressionTemplates> s = m_group.multiply_mod_order(m_x, kr - m);
 
                 // With overwhelming probability, a bug rather than actual zero r/s
                 if (r.is_zero() || s.is_zero()) {
                     throw internal_error("During ECGDSA signature generated zero r/s");
                 }
 
-                return boost::multiprecision::cpp_int::encode_fixed_length_int_pair(r, s, m_group.get_order_bytes());
+                return boost::multiprecision::number<Backend, ExpressionTemplates>::encode_fixed_length_int_pair(r, s, m_group.get_order_bytes());
             }
 
 /**
@@ -85,26 +85,26 @@ namespace nil {
                     return false;
                 }
 
-                const boost::multiprecision::cpp_int e(msg, msg_len, m_group.get_order_bits());
+                const boost::multiprecision::number<Backend, ExpressionTemplates> e(msg, msg_len, m_group.get_order_bits());
 
-                const boost::multiprecision::cpp_int r(sig, sig_len / 2);
-                const boost::multiprecision::cpp_int s(sig + sig_len / 2, sig_len / 2);
+                const boost::multiprecision::number<Backend, ExpressionTemplates> r(sig, sig_len / 2);
+                const boost::multiprecision::number<Backend, ExpressionTemplates> s(sig + sig_len / 2, sig_len / 2);
 
                 if (r <= 0 || r >= m_group.get_order() || s <= 0 || s >= m_group.get_order()) {
                     return false;
                 }
 
-                const boost::multiprecision::cpp_int w = inverse_mod(r, m_group.get_order());
+                const boost::multiprecision::number<Backend, ExpressionTemplates> w = inverse_mod(r, m_group.get_order());
 
-                const boost::multiprecision::cpp_int u1 = m_group.multiply_mod_order(e, w);
-                const boost::multiprecision::cpp_int u2 = m_group.multiply_mod_order(s, w);
+                const boost::multiprecision::number<Backend, ExpressionTemplates> u1 = m_group.multiply_mod_order(e, w);
+                const boost::multiprecision::number<Backend, ExpressionTemplates> u2 = m_group.multiply_mod_order(s, w);
                 const point_gfp R = m_group.point_multiply(u1, m_public_point, u2);
 
                 if (R.is_zero()) {
                     return false;
                 }
 
-                const boost::multiprecision::cpp_int v = m_group.mod_order(R.get_affine_x());
+                const boost::multiprecision::number<Backend, ExpressionTemplates> v = m_group.mod_order(R.get_affine_x());
                 return (v == r);
             }
 

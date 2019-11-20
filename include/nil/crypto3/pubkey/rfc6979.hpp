@@ -28,12 +28,12 @@ namespace nil {
                     m_qlen(m_order.bits()), m_rlen(m_qlen / 8 + (m_qlen % 8 ? 1 : 0)), m_rng_in(m_rlen * 2),
                     m_rng_out(m_rlen) {
                     m_hmac_drbg.reset(new hmac_drbg(MessageAuthenticationCode::create("HMAC(" + hash + ")")));
-                    boost::multiprecision::cpp_int::encode_1363(m_rng_in.data(), m_rlen, x);
+                    number<Backend, ExpressionTemplates>::encode_1363(m_rng_in.data(), m_rlen, x);
                 }
 
                 template<typename Backend, expression_template_option ExpressionTemplates>
                 const number_type &nonce_for(const number<Backend, ExpressionTemplates> &m) {
-                    boost::multiprecision::cpp_int::encode_1363(&m_rng_in[m_rlen], m_rlen, m);
+                    number<Backend, ExpressionTemplates>::encode_1363(&m_rng_in[m_rlen], m_rlen, m);
                     m_hmac_drbg->clear();
                     m_hmac_drbg->initialize_with(m_rng_in.data(), m_rng_in.size());
 
@@ -61,10 +61,10 @@ namespace nil {
              * @param hash the hash function used to generate h
              */
             template<typename Backend, expression_template_option ExpressionTemplates>
-            boost::multiprecision::cpp_int generate_rfc6979_nonce(const number<Backend, ExpressionTemplates> &x,
-                                                                  const number<Backend, ExpressionTemplates> &q,
-                                                                  const number<Backend, ExpressionTemplates> &h,
-                                                                  const std::string &hash) {
+            number<Backend, ExpressionTemplates> generate_rfc6979_nonce(const number<Backend, ExpressionTemplates> &x,
+                                                                        const number<Backend, ExpressionTemplates> &q,
+                                                                        const number<Backend, ExpressionTemplates> &h,
+                                                                        const std::string &hash) {
                 rfc6979_nonce_generator gen(hash, q, x);
                 number<Backend, ExpressionTemplates> k = gen.nonce_for(h);
                 return k;

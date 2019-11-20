@@ -27,8 +27,7 @@ namespace nil {
                 virtual size_t max_raw_input_bits() const = 0;
 
                 virtual secure_vector<uint8_t> raw_encrypt(const uint8_t msg[], size_t len,
-                                                           random_number_generator &rng)
-                    = 0;
+                                                           random_number_generator &rng) = 0;
 
                 std::unique_ptr<eme> m_eme;
             };
@@ -171,8 +170,7 @@ namespace nil {
                 bool self_test_signature(const std::vector<uint8_t> &msg, const std::vector<uint8_t> &sig) const;
 
                 virtual secure_vector<uint8_t> raw_sign(const uint8_t msg[], size_t msg_len,
-                                                        random_number_generator &rng)
-                    = 0;
+                                                        random_number_generator &rng) = 0;
 
                 std::unique_ptr<emsa> m_emsa;
                 const std::string m_hash;
@@ -204,8 +202,7 @@ namespace nil {
             protected:
                 virtual void raw_kem_encrypt(secure_vector<uint8_t> &out_encapsulated_key,
                                              secure_vector<uint8_t> &raw_shared_key,
-                                             nil::crypto3::random_number_generator &rng)
-                    = 0;
+                                             nil::crypto3::random_number_generator &rng) = 0;
 
                 explicit kem_encryption_with_kdf(const std::string &kdf);
 

@@ -90,18 +90,18 @@ namespace nil {
                     .end_cons();
             }
 
-            rsa_private_key::rsa_private_key(const cpp_int &prime1,
-                                             const cpp_int &prime2,
-                                             const cpp_int &exp,
-                                             const cpp_int &d_exp,
-                                             const cpp_int &mod) :
+            rsa_private_key::rsa_private_key(const number<Backend, ExpressionTemplates> &prime1,
+                                             const number<Backend, ExpressionTemplates> &prime2,
+                                             const number<Backend, ExpressionTemplates> &exp,
+                                             const number<Backend, ExpressionTemplates> &d_exp,
+                                             const number<Backend, ExpressionTemplates> &mod) :
                 m_d {d_exp},
                 m_p {prime1}, m_q {prime2}, m_d1 {}, m_d2 {}, m_c {inverse_mod(m_q, m_p)} {
                 m_n = mod.is_nonzero() ? mod : m_p * m_q;
                 m_e = exp;
 
                 if (m_d == 0) {
-                    const cpp_int phi_n = boost::math::lcm(m_p - 1, m_q - 1);
+                    const number<Backend, ExpressionTemplates> phi_n = boost::math::lcm(m_p - 1, m_q - 1);
                     m_d = inverse_mod(m_e, phi_n);
                 }
 
@@ -141,7 +141,7 @@ namespace nil {
 
                          != bits);
 
-                const cpp_int phi_n = boost::math::lcm(m_p - 1, m_q - 1);
+                const number<Backend, ExpressionTemplates> phi_n = boost::math::lcm(m_p - 1, m_q - 1);
                 m_d = inverse_mod(m_e, phi_n);
                 m_d1 = m_d % (m_p - 1);
                 m_d2 = m_d % (m_q - 1);
@@ -198,12 +198,12 @@ namespace nil {
                         m_monty_q(std::make_shared<montgomery_params>(m_key.get_q(), m_mod_q)),
                         m_powermod_e_n(m_key.get_e(), m_key.get_n()),
                         m_blinder(
-                            m_key.get_n(), rng, [this](const cpp_int &k) { return m_powermod_e_n(k); },
-                            [this](const cpp_int &k) { return inverse_mod(k, m_key.get_n()); }),
+                            m_key.get_n(), rng, [this](const number<Backend, ExpressionTemplates> &k) { return m_powermod_e_n(k); },
+                            [this](const number<Backend, ExpressionTemplates> &k) { return inverse_mod(k, m_key.get_n()); }),
                         m_mod_bytes(m_key.get_n().bytes()), m_mod_bits(m_key.get_n().bits()) {
                     }
 
-                    cpp_int blinded_private_op(const cpp_int &m) const {
+                    number<Backend, ExpressionTemplates> blinded_private_op(const number<Backend, ExpressionTemplates> &m) const {
                         if (m >= m_key.get_n()) {
                             throw std::invalid_argument("RSA private op - input is too large");
                         }
@@ -211,15 +211,15 @@ namespace nil {
                         return m_blinder.unblind(private_op(m_blinder.blind(m)));
                     }
 
-                    cpp_int private_op(const cpp_int &m) const {
+                    number<Backend, ExpressionTemplates> private_op(const number<Backend, ExpressionTemplates> &m) const {
                         const size_t powm_window = 4;
                         const size_t exp_blinding_bits = 64;
 
-                        const cpp_int d1_mask(m_blinder.rng(), exp_blinding_bits);
-                        const cpp_int d2_mask(m_blinder.rng(), exp_blinding_bits);
+                        const number<Backend, ExpressionTemplates> d1_mask(m_blinder.rng(), exp_blinding_bits);
+                        const number<Backend, ExpressionTemplates> d2_mask(m_blinder.rng(), exp_blinding_bits);
 
-                        const cpp_int masked_d1 = m_key.get_d1() + (d1_mask * (m_key.get_p() - 1));
-                        const cpp_int masked_d2 = m_key.get_d2() + (d2_mask * (m_key.get_q() - 1));
+                        const number<Backend, ExpressionTemplates> masked_d1 = m_key.get_d1() + (d1_mask * (m_key.get_p() - 1));
+                        const number<Backend, ExpressionTemplates> masked_d2 = m_key.get_d2() + (d2_mask * (m_key.get_q() - 1));
 
 #if defined(CRYPTO3_TARGET_OS_HAS_THREADS)
                         auto future_j1 = std::async(std::launch::async, [this, &m, &masked_d1, powm_window]() {
@@ -228,14 +228,14 @@ namespace nil {
                         });
 
                         auto powm_d2_q = monty_precompute(m_monty_q, m, powm_window);
-                        cpp_int j2 = monty_execute(*powm_d2_q, masked_d2);
-                        cpp_int j1 = future_j1.get();
+                        number<Backend, ExpressionTemplates> j2 = monty_execute(*powm_d2_q, masked_d2);
+                        number<Backend, ExpressionTemplates> j1 = future_j1.get();
 #else
                         auto powm_d1_p = monty_precompute(m_monty_p, m, powm_window);
                         auto powm_d2_q = monty_precompute(m_monty_q, m, powm_window);
 
-                        cpp_int j1 = monty_execute(*powm_d1_p, masked_d1);
-                        cpp_int j2 = monty_execute(*powm_d2_q, masked_d2);
+                        number<Backend, ExpressionTemplates> j1 = monty_execute(*powm_d1_p, masked_d1);
+                        number<Backend, ExpressionTemplates> j2 = monty_execute(*powm_d2_q, masked_d2);
 #endif
 
                         j1 = m_mod_p.reduce((j1 - j2) * m_key.get_c());
@@ -272,11 +272,11 @@ namespace nil {
 
                     secure_vector<uint8_t> raw_sign(const uint8_t msg[], size_t msg_len,
                                                     random_number_generator &) override {
-                        const cpp_int m(msg, msg_len);
-                        const cpp_int x = blinded_private_op(m);
-                        const cpp_int c = m_powermod_e_n(x);
+                        const number<Backend, ExpressionTemplates> m(msg, msg_len);
+                        const number<Backend, ExpressionTemplates> x = blinded_private_op(m);
+                        const number<Backend, ExpressionTemplates> c = m_powermod_e_n(x);
                         BOOST_ASSERT_MSG(m == c, "RSA sign consistency check");
-                        return cpp_int::encode_1363(x, m_mod_bytes);
+                        return number<Backend, ExpressionTemplates>::encode_1363(x, m_mod_bytes);
                     }
                 };
 
@@ -290,11 +290,11 @@ namespace nil {
                     }
 
                     secure_vector<uint8_t> raw_decrypt(const uint8_t msg[], size_t msg_len) override {
-                        const cpp_int m(msg, msg_len);
-                        const cpp_int x = blinded_private_op(m);
-                        const cpp_int c = m_powermod_e_n(x);
+                        const number<Backend, ExpressionTemplates> m(msg, msg_len);
+                        const number<Backend, ExpressionTemplates> x = blinded_private_op(m);
+                        const number<Backend, ExpressionTemplates> c = m_powermod_e_n(x);
                         BOOST_ASSERT_MSG(m == c, "RSA isomorphic_decryption_mode consistency check");
-                        return cpp_int::encode_1363(x, m_mod_bytes);
+                        return number<Backend, ExpressionTemplates>::encode_1363(x, m_mod_bytes);
                     }
                 };
 
@@ -308,11 +308,11 @@ namespace nil {
                     }
 
                     secure_vector<uint8_t> raw_kem_decrypt(const uint8_t encap_key[], size_t len) override {
-                        const cpp_int m(encap_key, len);
-                        const cpp_int x = blinded_private_op(m);
-                        const cpp_int c = m_powermod_e_n(x);
+                        const number<Backend, ExpressionTemplates> m(encap_key, len);
+                        const number<Backend, ExpressionTemplates> x = blinded_private_op(m);
+                        const number<Backend, ExpressionTemplates> c = m_powermod_e_n(x);
                         BOOST_ASSERT_MSG(m == c, "RSA KEM consistency check");
-                        return cpp_int::encode_1363(x, m_mod_bytes);
+                        return number<Backend, ExpressionTemplates>::encode_1363(x, m_mod_bytes);
                     }
                 };
 
@@ -330,7 +330,7 @@ namespace nil {
                     }
 
                 protected:
-                    cpp_int public_op(const cpp_int &m) const {
+                    number<Backend, ExpressionTemplates> public_op(const number<Backend, ExpressionTemplates> &m) const {
                         if (m >= m_n) {
                             throw std::invalid_argument("RSA public op - input is too large");
                         }
@@ -341,12 +341,12 @@ namespace nil {
                         return monty_execute_vartime(*powm_m_n, m_e);
                     }
 
-                    const cpp_int &get_n() const {
+                    const number<Backend, ExpressionTemplates> &get_n() const {
                         return m_n;
                     }
 
-                    const cpp_int &m_n;
-                    const cpp_int &m_e;
+                    const number<Backend, ExpressionTemplates> &m_n;
+                    const number<Backend, ExpressionTemplates> &m_e;
                     std::shared_ptr<montgomery_params> m_monty_n;
                 };
 
@@ -363,8 +363,8 @@ namespace nil {
 
                     secure_vector<uint8_t> raw_encrypt(const uint8_t msg[], size_t msg_len,
                                                        random_number_generator &) override {
-                        cpp_int m(msg, msg_len);
-                        return cpp_int::encode_1363(public_op(m), m_n.bytes());
+                        number<Backend, ExpressionTemplates> m(msg, msg_len);
+                        return number<Backend, ExpressionTemplates>::encode_1363(public_op(m), m_n.bytes());
                     }
                 };
 
@@ -384,8 +384,8 @@ namespace nil {
                     }
 
                     secure_vector<uint8_t> verify_mr(const uint8_t msg[], size_t msg_len) override {
-                        cpp_int m(msg, msg_len);
-                        return cpp_int::encode_locked(public_op(m));
+                        number<Backend, ExpressionTemplates> m(msg, msg_len);
+                        return number<Backend, ExpressionTemplates>::encode_locked(public_op(m));
                     }
                 };
 
@@ -400,11 +400,11 @@ namespace nil {
                     void raw_kem_encrypt(secure_vector<uint8_t> &out_encapsulated_key,
                                          secure_vector<uint8_t> &raw_shared_key,
                                          nil::crypto3::random_number_generator &rng) override {
-                        const cpp_int r = cpp_int::random_integer(rng, 1, get_n());
-                        const cpp_int c = public_op(r);
+                        const number<Backend, ExpressionTemplates> r = number<Backend, ExpressionTemplates>::random_integer(rng, 1, get_n());
+                        const number<Backend, ExpressionTemplates> c = public_op(r);
 
-                        out_encapsulated_key = cpp_int::encode_locked(c);
-                        raw_shared_key = cpp_int::encode_locked(r);
+                        out_encapsulated_key = number<Backend, ExpressionTemplates>::encode_locked(c);
+                        raw_shared_key = number<Backend, ExpressionTemplates>::encode_locked(r);
                     }
                 };
 

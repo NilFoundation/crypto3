@@ -34,8 +34,7 @@ namespace nil {
             class encryption {
             public:
                 virtual secure_vector<uint8_t> encrypt(const uint8_t msg[], size_t msg_len,
-                                                       random_number_generator &rng)
-                    = 0;
+                                                       random_number_generator &rng) = 0;
 
                 virtual size_t max_input_bits() const = 0;
 
@@ -48,8 +47,7 @@ namespace nil {
             class decryption {
             public:
                 virtual secure_vector<uint8_t> decrypt(uint8_t &valid_mask, const uint8_t ciphertext[],
-                                                       size_t ciphertext_len)
-                    = 0;
+                                                       size_t ciphertext_len) = 0;
 
                 virtual ~decryption() = default;
             };
@@ -102,8 +100,7 @@ namespace nil {
             class key_agreement {
             public:
                 virtual secure_vector<uint8_t> agree(size_t key_len, const uint8_t other_key[], size_t other_key_len,
-                                                     const uint8_t salt[], size_t salt_len)
-                    = 0;
+                                                     const uint8_t salt[], size_t salt_len) = 0;
 
                 virtual ~key_agreement() = default;
             };
@@ -116,8 +113,7 @@ namespace nil {
                 virtual void kem_encrypt(secure_vector<uint8_t> &out_encapsulated_key,
                                          secure_vector<uint8_t> &out_shared_key, size_t desired_shared_key_len,
                                          nil::crypto3::random_number_generator &rng, const uint8_t salt[],
-                                         size_t salt_len)
-                    = 0;
+                                         size_t salt_len) = 0;
 
                 virtual ~kem_encryption() = default;
             };
@@ -126,8 +122,7 @@ namespace nil {
             public:
                 virtual secure_vector<uint8_t> kem_decrypt(const uint8_t encap_key[], size_t len,
                                                            size_t desired_shared_key_len, const uint8_t salt[],
-                                                           size_t salt_len)
-                    = 0;
+                                                           size_t salt_len) = 0;
 
                 virtual ~kem_decryption() = default;
             };

@@ -26,8 +26,10 @@ namespace nil {
                  * @arg n the modulus
                  * @arg e the exponent
                  */
-                rsa_public_key(const boost::multiprecision::cpp_int &n, const boost::multiprecision::cpp_int &e) :
-                    m_n(n), m_e(e) {
+                rsa_public_key(const number<Backend, ExpressionTemplates> &n,
+                               const number<Backend, ExpressionTemplates> &e) :
+                    m_n(n),
+                    m_e(e) {
                 }
 
                 /**
@@ -51,14 +53,14 @@ namespace nil {
                 /**
                  * @return public modulus
                  */
-                const boost::multiprecision::cpp_int &get_n() const {
+                const number<Backend, ExpressionTemplates> &get_n() const {
                     return m_n;
                 }
 
                 /**
                  * @return public exponent
                  */
-                const boost::multiprecision::cpp_int &get_e() const {
+                const number<Backend, ExpressionTemplates> &get_e() const {
                     return m_e;
                 }
 
@@ -82,7 +84,7 @@ namespace nil {
             protected:
                 rsa_public_key() = default;
 
-                boost::multiprecision::cpp_int m_n, m_e;
+                number<Backend, ExpressionTemplates> m_n, m_e;
             };
 
             /**
@@ -108,9 +110,11 @@ namespace nil {
                  * @param n if specified, this must be n = p * q. Leave it as 0
                  * if you wish to the constructor to calculate it.
                  */
-                rsa_private_key(const boost::multiprecision::cpp_int &p, const boost::multiprecision::cpp_int &q,
-                                const boost::multiprecision::cpp_int &e, const boost::multiprecision::cpp_int &d = 0,
-                                const boost::multiprecision::cpp_int &n = 0);
+                rsa_private_key(const number<Backend, ExpressionTemplates> &p,
+                                const number<Backend, ExpressionTemplates> &q,
+                                const number<Backend, ExpressionTemplates> &e,
+                                const number<Backend, ExpressionTemplates> &d = 0,
+                                const number<Backend, ExpressionTemplates> &n = 0);
 
                 /**
                  * Create a new private key with the specified bit length
@@ -126,7 +130,7 @@ namespace nil {
                  * Get the first prime p.
                  * @return prime p
                  */
-                const boost::multiprecision::cpp_int &get_p() const {
+                const number<Backend, ExpressionTemplates> &get_p() const {
                     return m_p;
                 }
 
@@ -134,7 +138,7 @@ namespace nil {
                  * Get the second prime q.
                  * @return prime q
                  */
-                const boost::multiprecision::cpp_int &get_q() const {
+                const number<Backend, ExpressionTemplates> &get_q() const {
                     return m_q;
                 }
 
@@ -142,19 +146,19 @@ namespace nil {
                  * Get d with exp * d = 1 mod (p - 1, q - 1).
                  * @return d
                  */
-                const boost::multiprecision::cpp_int &get_d() const {
+                const number<Backend, ExpressionTemplates> &get_d() const {
                     return m_d;
                 }
 
-                const boost::multiprecision::cpp_int &get_c() const {
+                const number<Backend, ExpressionTemplates> &get_c() const {
                     return m_c;
                 }
 
-                const boost::multiprecision::cpp_int &get_d1() const {
+                const number<Backend, ExpressionTemplates> &get_d1() const {
                     return m_d1;
                 }
 
-                const boost::multiprecision::cpp_int &get_d2() const {
+                const number<Backend, ExpressionTemplates> &get_d2() const {
                     return m_d2;
                 }
 
@@ -178,7 +182,7 @@ namespace nil {
                                         const std::string &provider) const override;
 
             private:
-                boost::multiprecision::cpp_int m_d, m_p, m_q, m_d1, m_d2, m_c;
+                number<Backend, ExpressionTemplates> m_d, m_p, m_q, m_d1, m_d2, m_c;
             };
 
             class rsa {

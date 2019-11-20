@@ -28,9 +28,9 @@ namespace nil {
          *
          * @return
          */
-        template<typename PublicKeyCipher, typename InputIterator, typename PublicKeyIterator, typename OutputIterator,
-                 typename StreamEncrypter = typename detail::itr_stream_encrypt_traits<PublicKeyCipher,
-                                                                                       InputIterator>::type>
+        template<
+            typename PublicKeyCipher, typename InputIterator, typename PublicKeyIterator, typename OutputIterator,
+            typename StreamEncrypter = typename detail::itr_stream_encrypt_traits<PublicKeyCipher, InputIterator>::type>
         OutputIterator encrypt(InputIterator first, InputIterator last, PublicKeyIterator key_first,
                                PublicKeyIterator key_last, OutputIterator out) {
 
@@ -55,9 +55,9 @@ namespace nil {
          * @param sh
          * @return
          */
-        template<typename PublicKeyCipher, typename InputIterator, typename OutputIterator,
-                 typename StreamEncrypter = typename detail::itr_stream_encrypt_traits<PublicKeyCipher,
-                                                                                       InputIterator>::type>
+        template<
+            typename PublicKeyCipher, typename InputIterator, typename OutputIterator,
+            typename StreamEncrypter = typename detail::itr_stream_encrypt_traits<PublicKeyCipher, InputIterator>::type>
         OutputIterator encrypt(InputIterator first, InputIterator last, OutputIterator out,
                                const public_key<PublicKeyCipher> &pk) {
 
@@ -79,11 +79,11 @@ namespace nil {
          * @param last
          * @return
          */
-        template<typename PublicKeyCipher, typename InputIterator, typename PublicKeyIterator,
-                 typename StreamEncrypter = typename detail::itr_stream_encrypt_traits<PublicKeyCipher,
-                                                                                       InputIterator>::type>
-        detail::range_encrypt_impl<PublicKeyCipher, detail::value_encrypt_impl<StreamEncrypter>> encrypt(
-                InputIterator first, InputIterator last, PublicKeyIterator key_first, PublicKeyIterator key_last) {
+        template<
+            typename PublicKeyCipher, typename InputIterator, typename PublicKeyIterator,
+            typename StreamEncrypter = typename detail::itr_stream_encrypt_traits<PublicKeyCipher, InputIterator>::type>
+        detail::range_encrypt_impl<PublicKeyCipher, detail::value_encrypt_impl<StreamEncrypter>>
+            encrypt(InputIterator first, InputIterator last, PublicKeyIterator key_first, PublicKeyIterator key_last) {
             typedef detail::value_encrypt_impl<StreamEncrypter> StreamEncrypterImpl;
             typedef detail::range_encrypt_impl<PublicKeyCipher, StreamEncrypterImpl> EncrypterImpl;
 
@@ -103,11 +103,11 @@ namespace nil {
          * @param sh
          * @return
          */
-        template<typename PublicKeyCipher, typename InputIterator,
-                 typename StreamEncrypter = typename detail::itr_stream_encrypt_traits<PublicKeyCipher,
-                                                                                       InputIterator>::type>
-        detail::range_encrypt_impl<PublicKeyCipher, detail::ref_encrypt_impl<StreamEncrypter>> encrypt(
-                InputIterator first, InputIterator last, const public_key<PublicKeyCipher> &pk) {
+        template<
+            typename PublicKeyCipher, typename InputIterator,
+            typename StreamEncrypter = typename detail::itr_stream_encrypt_traits<PublicKeyCipher, InputIterator>::type>
+        detail::range_encrypt_impl<PublicKeyCipher, detail::ref_encrypt_impl<StreamEncrypter>>
+            encrypt(InputIterator first, InputIterator last, const public_key<PublicKeyCipher> &pk) {
             typedef detail::ref_encrypt_impl<StreamEncrypter> StreamEncrypterImpl;
             typedef detail::range_encrypt_impl<PublicKeyCipher, StreamEncrypterImpl> EncrypterImpl;
 
@@ -128,8 +128,8 @@ namespace nil {
          * @return
          */
         template<typename PublicKeyCipher, typename SinglePassRange, typename PublicKeyRange, typename OutputIterator,
-                 typename StreamEncrypter = typename detail::range_stream_encrypt_traits<PublicKeyCipher,
-                                                                                         SinglePassRange>::type>
+                 typename StreamEncrypter =
+                     typename detail::range_stream_encrypt_traits<PublicKeyCipher, SinglePassRange>::type>
         OutputIterator encrypt(const SinglePassRange &rng, const PublicKeyRange &key, OutputIterator out) {
 
             typedef detail::value_encrypt_impl<StreamEncrypter> StreamEncrypterImpl;
@@ -173,8 +173,8 @@ namespace nil {
          * @return
          */
         template<typename PublicKeyCipher, typename SinglePassRange, typename PublicKeyRange>
-        detail::range_encrypt_impl<PublicKeyCipher, detail::value_encrypt_impl<StreamEncrypter>> encrypt(
-                const SinglePassRange &r, const PublicKeyRange &key) {
+        detail::range_encrypt_impl<PublicKeyCipher, detail::value_encrypt_impl<StreamEncrypter>>
+            encrypt(const SinglePassRange &r, const PublicKeyRange &key) {
 
             typedef detail::value_encrypt_impl<StreamEncrypter> StreamEncrypterImpl;
             typedef detail::range_encrypt_impl<PublicKeyCipher, StreamEncrypterImpl> EncrypterImpl;
@@ -195,14 +195,14 @@ namespace nil {
          * @return
          */
         template<typename PublicKeyCipher, typename SinglePassRange>
-        detail::range_encrypt_impl<PublicKeyCipher, detail::ref_encrypt_impl<StreamHash>> encrypt(
-                const SinglePassRange &rng, const public_key<PublicKeyCipher> &pk) {
+        detail::range_encrypt_impl<PublicKeyCipher, detail::ref_encrypt_impl<StreamHash>>
+            encrypt(const SinglePassRange &rng, const public_key<PublicKeyCipher> &pk) {
             typedef detail::ref_encrypt_impl<StreamHash> StreamEncrypterImpl;
             typedef detail::range_encrypt_impl<PublicKeyCipher, StreamEncrypterImpl> EncrypterImpl;
 
             return EncrypterImpl(rng, sh);
         }
-    }
-}
+    }    // namespace crypto3
+}    // namespace nil
 
-#endif // include guard
+#endif    // include guard

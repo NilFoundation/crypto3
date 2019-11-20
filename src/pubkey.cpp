@@ -196,7 +196,7 @@ namespace nil {
                     throw encoding_error("Unexpected size for DER signature");
                 }
 
-                std::vector<boost::multiprecision::cpp_int> sig_parts(parts);
+                std::vector<boost::multiprecision::number<Backend, ExpressionTemplates>> sig_parts(parts);
                 for (size_t i = 0; i != sig_parts.size(); ++i) {
                     sig_parts[i].binary_decode(&sig[part_size * i], part_size);
                 }
@@ -276,9 +276,9 @@ namespace nil {
                     size_t count = 0;
 
                     while (ber_sig.more_items()) {
-                        boost::multiprecision::cpp_int sig_part;
+                        boost::multiprecision::number<Backend, ExpressionTemplates> sig_part;
                         ber_sig.decode(sig_part);
-                        real_sig += boost::multiprecision::cpp_int::encode_1363(sig_part, m_part_size);
+                        real_sig += boost::multiprecision::number<Backend, ExpressionTemplates>::encode_1363(sig_part, m_part_size);
                         ++count;
                     }
 

@@ -18,12 +18,12 @@ namespace nil {
                 }
 
                 template<typename PaddingPolicy, typename InputIterator1, typename InputIterator2,
-                        typename OutputIterator>
+                         typename OutputIterator>
                 inline OutputIterator verify_impl(InputIterator1 first1, InputIterator1 last1, InputIterator2 first2,
                                                   InputIterator2 last2, OutputIterator result, PaddingPolicy pred) {
                     return pred.verify(first1, last1, first2, last2, result);
                 }
-            }
+            }    // namespace detail
 
             /*!
              * @brief
@@ -43,7 +43,7 @@ namespace nil {
              * @pre BinaryOperation is a model of the BinaryFunctionConcept
              */
             template<typename PaddingPolicy, typename SinglePassRange, typename OutputIterator,
-                    typename = typename std::enable_if<boost::has_range_iterator<SinglePassRange>::value>::type>
+                     typename = typename std::enable_if<boost::has_range_iterator<SinglePassRange>::value>::type>
             OutputIterator verify(const SinglePassRange &rng, OutputIterator out, PaddingPolicy fun = PaddingPolicy()) {
                 BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<SinglePassRange>));
 
@@ -64,9 +64,9 @@ namespace nil {
              * @return
              */
             template<typename PaddingPolicy, typename SinglePassRange1, typename SinglePassRange2,
-                    typename OutputIterator,
-                    typename = typename std::enable_if<boost::has_range_iterator<SinglePassRange1>::value>::type,
-                    typename = typename std::enable_if<boost::has_range_iterator<SinglePassRange2>::value>::type>
+                     typename OutputIterator,
+                     typename = typename std::enable_if<boost::has_range_iterator<SinglePassRange1>::value>::type,
+                     typename = typename std::enable_if<boost::has_range_iterator<SinglePassRange2>::value>::type>
 
             OutputIterator verify(const SinglePassRange1 &rng1, const SinglePassRange2 &rng2, OutputIterator out,
                                   PaddingPolicy fun = PaddingPolicy()) {
@@ -115,8 +115,8 @@ namespace nil {
                                   InputIterator2 last2, OutputIterator result, PaddingPolicy pred = PaddingPolicy()) {
                 return detail::verify_impl<PaddingPolicy>(first1, last1, first2, last2, result, pred);
             }
-        }
-    } // namespace crypto3
-} // namespace nil
+        }    // namespace public_key
+    }        // namespace crypto3
+}    // namespace nil
 
-#endif // include guard
+#endif    // include guard

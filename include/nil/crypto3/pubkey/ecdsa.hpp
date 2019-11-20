@@ -87,7 +87,7 @@ namespace nil {
                  */
                 template<typename UniformRandonGenerator>
                 ecdsa_private_key(UniformRandonGenerator &rng, const ec_group<CurveType, NumberType> &domain,
-                                  const boost::multiprecision::cpp_int &x = 0) :
+                                  const number<Backend, ExpressionTemplates> &x = 0) :
                     ec_private_key<CurveType, NumberType>(rng, domain, x) {
                 }
 

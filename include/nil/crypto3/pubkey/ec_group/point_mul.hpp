@@ -2,7 +2,7 @@
 #define CRYPTO3_PUBKEY_POINT_MUL_HPP
 
 #include <boost/multiprecision/number.hpp>
-#include <boost/multiprecision/montgomery/modular_reduce.hpp>
+#include <boost/multiprecision/modular/modular_adaptor.hpp>
 
 #include <nil/crypto3/pubkey/ec_group/curve_gfp.hpp>
 #include <nil/crypto3/pubkey/ec_group/point_gfp.hpp>
@@ -93,10 +93,10 @@ namespace nil {
                 }
 
                 // Choose a small mask m and use k' = k + m*order (Coron's 1st countermeasure)
-                const cpp_int mask(rng, point_gfp_scalar_blinding_bits);
+                const number<Backend, ExpressionTemplates> mask(rng, point_gfp_scalar_blinding_bits);
 
                 // Instead of reducing k mod group order should we alter the mask size??
-                const cpp_int scalar = m_mod_order.reduce(k) + group_order * mask;
+                const number<Backend, ExpressionTemplates> scalar = m_mod_order.reduce(k) + group_order * mask;
 
                 const size_t windows = round_up(scalar.bits(), 2) / 2;
 
@@ -189,12 +189,12 @@ namespace nil {
 
                 // Hack to handle blinded_point_multiply
                 if (rng.is_seeded()) {
-                    cpp_int &mask = ws[0];
-                    cpp_int &mask2 = ws[1];
-                    cpp_int &mask3 = ws[2];
-                    cpp_int &new_x = ws[3];
-                    cpp_int &new_y = ws[4];
-                    cpp_int &new_z = ws[5];
+                    number<Backend, ExpressionTemplates> &mask = ws[0];
+                    number<Backend, ExpressionTemplates> &mask2 = ws[1];
+                    number<Backend, ExpressionTemplates> &mask3 = ws[2];
+                    number<Backend, ExpressionTemplates> &new_x = ws[3];
+                    number<Backend, ExpressionTemplates> &new_y = ws[4];
+                    number<Backend, ExpressionTemplates> &new_z = ws[5];
                     secure_vector<word> &tmp = ws[6].get_word_vector();
 
                     const curve_gfp &curve = U[0].get_curve();
@@ -241,8 +241,8 @@ namespace nil {
                 }
 
                 // Choose a small mask m and use k' = k + m*order (Coron's 1st countermeasure)
-                const cpp_int mask(rng, point_gfp_scalar_blinding_bits, false);
-                const cpp_int scalar = k + group_order * mask;
+                const number<Backend, ExpressionTemplates> mask(rng, point_gfp_scalar_blinding_bits, false);
+                const number<Backend, ExpressionTemplates> scalar = k + group_order * mask;
 
                 const size_t elem_size = 3 * m_p_words;
                 const size_t window_elems = (1ULL << m_window_bits);
@@ -318,7 +318,7 @@ namespace nil {
         public:
             point_gfp_multi_point_precompute(const point_gfp<number<Backend, ExpressionTemplates>> &g1,
                                              const point_gfp<number<Backend, ExpressionTemplates>> &g2) {
-                std::vector<cpp_int> ws(point_gfp::WORKSPACE_SIZE);
+                std::vector<number<Backend, ExpressionTemplates>> ws(point_gfp::WORKSPACE_SIZE);
 
                 point_gfp x2 = x;
                 x2.mult2(ws);
@@ -361,7 +361,7 @@ namespace nil {
             point_gfp<number<Backend, ExpressionTemplates>>
                 multi_exp(const number<Backend, ExpressionTemplates> &k1,
                           const number<Backend, ExpressionTemplates> &k2) const {
-                std::vector<cpp_int> ws(point_gfp::WORKSPACE_SIZE);
+                std::vector<number<Backend, ExpressionTemplates>> ws(point_gfp::WORKSPACE_SIZE);
 
                 const size_t z_bits = round_up(std::max(z1.bits(), z2.bits()), 2);
 

@@ -60,13 +60,13 @@ namespace nil {
                         if (S.on_the_curve() == false) {
                             throw internal_error("ECDH agreed value was not on the curve");
                         }
-                        return cpp_int::encode_1363(S.get_affine_x(), group.get_p_bytes());
+                        return number<Backend, ExpressionTemplates>::encode_1363(S.get_affine_x(), group.get_p_bytes());
                     }
 
                 private:
                     ecies_private_key m_key;
                     random_number_generator &m_rng;
-                    std::vector<cpp_int> m_ws;
+                    std::vector<number<Backend, ExpressionTemplates>> m_ws;
                 };
 
                 std::unique_ptr<pk_operations::key_agreement>
@@ -262,7 +262,7 @@ namespace nil {
                 m_params(ecies_params), m_iv(), m_label() {
                 // ISO 18033: "If v > 1 and CheckMode = 0, then we must have gcd(u, v) = 1." (v = index, u= order)
                 if (!ecies_params.check_mode()) {
-                    const cpp_int &cofactor = m_params.domain().get_cofactor();
+                    const number<Backend, ExpressionTemplates> &cofactor = m_params.domain().get_cofactor();
                     if (cofactor > 1 && boost::math::gcd(cofactor, m_params.domain().get_order()) != 1) {
                         throw std::invalid_argument("ECIES: gcd of cofactor and order must be 1 if check_mode is 0");
                     }

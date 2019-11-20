@@ -319,8 +319,8 @@ namespace nil {
             static const size_t m_address_size = 32;
 
             inline uint32_t get_hi32(size_t offset) const {
-                return ((0x000000FF & m_data[8 * offset + 3]) | (0x000000FF & m_data[8 * offset + 2]) << 8
-                        | (0x000000FF & m_data[8 * offset + 1]) << 16 | (0x000000FF & m_data[8 * offset]) << 24);
+                return ((0x000000FF & m_data[8 * offset + 3]) | (0x000000FF & m_data[8 * offset + 2]) << 8 |
+                        (0x000000FF & m_data[8 * offset + 1]) << 16 | (0x000000FF & m_data[8 * offset]) << 24);
             }
 
             inline void set_hi32(size_t offset, uint32_t value) {
@@ -331,8 +331,8 @@ namespace nil {
             }
 
             inline uint32_t get_lo32(size_t offset) const {
-                return ((0x000000FF & m_data[8 * offset + 7]) | (0x000000FF & m_data[8 * offset + 6]) << 8
-                        | (0x000000FF & m_data[8 * offset + 5]) << 16 | (0x000000FF & m_data[8 * offset + 4]) << 24);
+                return ((0x000000FF & m_data[8 * offset + 7]) | (0x000000FF & m_data[8 * offset + 6]) << 8 |
+                        (0x000000FF & m_data[8 * offset + 5]) << 16 | (0x000000FF & m_data[8 * offset + 4]) << 24);
             }
 
             inline void set_lo32(size_t offset, uint32_t value) {

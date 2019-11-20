@@ -18,14 +18,14 @@ namespace nil {
             template<typename Encrypter, typename SinglePassRange>
             using range_stream_encrypt_traits = typename Encrypter::template stream_encrypt<
                 std::numeric_limits<
-                    typename std::iterator_traits<typename SinglePassRange::iterator>::value_type>::digits
-                + std::numeric_limits<
+                    typename std::iterator_traits<typename SinglePassRange::iterator>::value_type>::digits +
+                std::numeric_limits<
                     typename std::iterator_traits<typename SinglePassRange::iterator>::value_type>::is_encrypted>;
 
             template<typename Encrypter, typename InputIterator>
             using itr_stream_encrypt_traits = typename Encrypter::template stream_encrypt<
-                std::numeric_limits<typename std::iterator_traits<InputIterator>::value_type>::digits
-                + std::numeric_limits<typename std::iterator_traits<InputIterator>::value_type>::is_encrypted>;
+                std::numeric_limits<typename std::iterator_traits<InputIterator>::value_type>::digits +
+                std::numeric_limits<typename std::iterator_traits<InputIterator>::value_type>::is_encrypted>;
 
             template<typename StreamHash>
             struct ref_encrypt_impl {

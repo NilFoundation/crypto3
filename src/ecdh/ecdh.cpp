@@ -31,14 +31,14 @@ namespace nil {
                         if (!S.on_the_curve()) {
                             throw internal_error("ECDH agreed value was not on the curve");
                         }
-                        return boost::multiprecision::cpp_int::encode_1363(S.get_affine_x(), m_group.get_p_bytes());
+                        return boost::multiprecision::number<Backend, ExpressionTemplates>::encode_1363(S.get_affine_x(), m_group.get_p_bytes());
                     }
 
                 private:
                     const ec_group m_group;
-                    boost::multiprecision::cpp_int m_l_times_priv;
+                    boost::multiprecision::number<Backend, ExpressionTemplates> m_l_times_priv;
                     random_number_generator &m_rng;
-                    std::vector<boost::multiprecision::cpp_int> m_ws;
+                    std::vector<boost::multiprecision::number<Backend, ExpressionTemplates>> m_ws;
                 };
 
             }    // namespace

@@ -31,8 +31,8 @@ namespace nil {
                     ECKCDSA_Signature_Operation(const eckcdsa_private_key &eckcdsa, const std::string &emsa) :
                         pk_operations::Signature_with_EMSA(emsa), m_group(eckcdsa.domain()),
                         m_x(eckcdsa.private_value()), m_prefix() {
-                        const boost::multiprecision::cpp_int public_point_x = eckcdsa.public_point().get_affine_x();
-                        const boost::multiprecision::cpp_int public_point_y = eckcdsa.public_point().get_affine_y();
+                        const boost::multiprecision::number<Backend, ExpressionTemplates> public_point_x = eckcdsa.public_point().get_affine_x();
+                        const boost::multiprecision::number<Backend, ExpressionTemplates> public_point_y = eckcdsa.public_point().get_affine_y();
 
                         m_prefix.resize(public_point_x.bytes() + public_point_y.bytes());
                         public_point_x.binary_encode(m_prefix.data());
@@ -59,15 +59,15 @@ namespace nil {
 
                 private:
                     const ec_group m_group;
-                    const boost::multiprecision::cpp_int &m_x;
+                    const boost::multiprecision::number<Backend, ExpressionTemplates> &m_x;
                     secure_vector<uint8_t> m_prefix;
-                    std::vector<boost::multiprecision::cpp_int> m_ws;
+                    std::vector<boost::multiprecision::number<Backend, ExpressionTemplates>> m_ws;
                 };
 
                 secure_vector<uint8_t> ECKCDSA_Signature_Operation::raw_sign(const uint8_t msg[], size_t,
                                                                              random_number_generator &rng) {
-                    const boost::multiprecision::cpp_int k = m_group.random_scalar(rng);
-                    const boost::multiprecision::cpp_int k_times_P_x
+                    const boost::multiprecision::number<Backend, ExpressionTemplates> k = m_group.random_scalar(rng);
+                    const boost::multiprecision::number<Backend, ExpressionTemplates> k_times_P_x
                         = m_group.blinded_base_point_multiply_x(k, rng, m_ws);
 
                     secure_vector<uint8_t> to_be_hashed(k_times_P_x.bytes());
@@ -78,19 +78,19 @@ namespace nil {
                     secure_vector<uint8_t> c = emsa->raw_data();
                     c = emsa->encoding_of(c, max_input_bits(), rng);
 
-                    const boost::multiprecision::cpp_int r(c.data(), c.size());
+                    const boost::multiprecision::number<Backend, ExpressionTemplates> r(c.data(), c.size());
 
                     xor_buf(c, msg, c.size());
-                    boost::multiprecision::cpp_int w(c.data(), c.size());
+                    boost::multiprecision::number<Backend, ExpressionTemplates> w(c.data(), c.size());
                     w = m_group.mod_order(w);
 
-                    const boost::multiprecision::cpp_int s = m_group.multiply_mod_order(m_x, k - w);
+                    const boost::multiprecision::number<Backend, ExpressionTemplates> s = m_group.multiply_mod_order(m_x, k - w);
                     if (s.is_zero()) {
                         throw internal_error("During ECKCDSA signature generation created zero s");
                     }
 
-                    secure_vector<uint8_t> output = boost::multiprecision::cpp_int::encode_1363(r, c.size());
-                    output += boost::multiprecision::cpp_int::encode_1363(s, m_group.get_order_bytes());
+                    secure_vector<uint8_t> output = boost::multiprecision::number<Backend, ExpressionTemplates>::encode_1363(r, c.size());
+                    output += boost::multiprecision::number<Backend, ExpressionTemplates>::encode_1363(s, m_group.get_order_bytes());
                     return output;
                 }
 
@@ -102,8 +102,8 @@ namespace nil {
                     ECKCDSA_Verification_Operation(const ECKCdsa_public_key &eckcdsa, const std::string &emsa) :
                         pk_operations::Verification_with_EMSA(emsa), m_group(eckcdsa.domain()),
                         m_public_point(eckcdsa.public_point()), m_prefix() {
-                        const boost::multiprecision::cpp_int public_point_x = m_public_point.get_affine_x();
-                        const boost::multiprecision::cpp_int public_point_y = m_public_point.get_affine_y();
+                        const boost::multiprecision::number<Backend, ExpressionTemplates> public_point_x = m_public_point.get_affine_x();
+                        const boost::multiprecision::number<Backend, ExpressionTemplates> public_point_y = m_public_point.get_affine_y();
 
                         m_prefix.resize(public_point_x.bytes() + public_point_y.bytes());
                         public_point_x.binary_encode(&m_prefix[0]);
@@ -152,7 +152,7 @@ namespace nil {
                     secure_vector<uint8_t> r(sig, sig + size_r);
 
                     // check that 0 < s < q
-                    const boost::multiprecision::cpp_int s(sig + size_r, order_bytes);
+                    const boost::multiprecision::number<Backend, ExpressionTemplates> s(sig + size_r, order_bytes);
 
                     if (s <= 0 || s >= m_group.get_order()) {
                         return false;
@@ -160,11 +160,11 @@ namespace nil {
 
                     secure_vector<uint8_t> r_xor_e(r);
                     xor_buf(r_xor_e, msg, r.size());
-                    boost::multiprecision::cpp_int w(r_xor_e.data(), r_xor_e.size());
+                    boost::multiprecision::number<Backend, ExpressionTemplates> w(r_xor_e.data(), r_xor_e.size());
                     w = m_group.mod_order(w);
 
                     const point_gfp q = m_group.point_multiply(w, m_public_point, s);
-                    const boost::multiprecision::cpp_int q_x = q.get_affine_x();
+                    const boost::multiprecision::number<Backend, ExpressionTemplates> q_x = q.get_affine_x();
                     secure_vector<uint8_t> c(q_x.bytes());
                     q_x.binary_encode(c.data());
                     std::unique_ptr<emsa> emsa = this->clone_emsa();

@@ -52,8 +52,10 @@ namespace nil {
                  * @param y the public value y = g^x mod p
                  */
                 template<typename Backend, expression_template_option ExpressionTemplates>
-                dsa_public_key_policy(const dl_group &group, const number<Backend, ExpressionTemplates> &y) :
-                    m_group(group), m_y(y) {
+                dsa_public_key_policy(const dl_group<number<Backend, ExpressionTemplates>> &group,
+                                      const number<Backend, ExpressionTemplates> &y) :
+                    m_group(group),
+                    m_y(y) {
                 }
 
                 std::unique_ptr<pk_operations::verification>
@@ -82,7 +84,7 @@ namespace nil {
                  * @param private_key the private key (if zero, a new random key is generated)
                  */
                 dsa_private_key_policy(random_number_generator &rng, const dl_group &group,
-                                       const boost::multiprecision::cpp_int &private_key = 0);
+                                       const number<Backend, ExpressionTemplates> &private_key = 0);
 
                 bool check_key(random_number_generator &rng, bool strong) const override;
 

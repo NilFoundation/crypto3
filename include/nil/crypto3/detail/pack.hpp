@@ -1,14 +1,24 @@
-#ifndef CRYPTO3_PUBKEY_PUBKEY_PACK_HPP
-#define CRYPTO3_PUBKEY_PUBKEY_PACK_HPP
+//---------------------------------------------------------------------------//
+// Copyright (c) 2018-2019 Nil Foundation AG
+// Copyright (c) 2018-2019 Mikhail Komarov <nemo@nil.foundation>
+//
+// Distributed under the Boost Software License, Version 1.0
+// See accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt
+//---------------------------------------------------------------------------//
 
-#include <nil/crypto3/pubkey/stream_endian.hpp>
-#include <nil/crypto3/pubkey/detail/exploder.hpp>
-#include <nil/crypto3/pubkey/detail/imploder.hpp>
+#ifndef CRYPTO3_PACK_HPP
+#define CRYPTO3_PACK_HPP
+
+#include <nil/crypto3/detail/type_traits.hpp>
+#include <nil/crypto3/detail/stream_endian.hpp>
+#include <nil/crypto3/detail/exploder.hpp>
+#include <nil/crypto3/detail/imploder.hpp>
 
 #include <boost/assert.hpp>
 #include <boost/static_assert.hpp>
 
-#ifndef CRYPTO3_PUBKEY_NO_OPTIMIZATION
+#ifndef CRYPTO3_NO_OPTIMIZATION
 
 #include <boost/detail/endian.hpp>
 #include <boost/utility/enable_if.hpp>
@@ -17,15 +27,13 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace pubkey {
-
-#ifndef CRYPTO3_PUBKEY_NO_OPTIMIZATION
+        namespace detail {
+#ifndef CRYPTO3_NO_OPTIMIZATION
 
             template<int UnitBits, int InputBits, int OutputBits, typename InT, typename OutT>
             struct host_can_memcpy {
-                static bool const value = !(UnitBits % CHAR_BIT) && InputBits >= UnitBits && OutputBits >= UnitBits
-                                          && sizeof(InT) * CHAR_BIT == InputBits
-                                          && sizeof(OutT) * CHAR_BIT == OutputBits;
+                static bool const value = !(UnitBits % CHAR_BIT) && InputBits >= UnitBits && OutputBits >= UnitBits &&
+                                          sizeof(InT) * CHAR_BIT == InputBits && sizeof(OutT) * CHAR_BIT == OutputBits;
             };
 
             template<typename Endianness, int InputBits, int OutputBits, typename InT, typename OutT>
@@ -129,7 +137,7 @@ namespace nil {
             template<typename Endianness, int InputBits, int OutputBits>
             struct packer : real_packer<Endianness, InputBits, OutputBits> {
 
-#ifndef CRYPTO3_PUBKEY_NO_OPTIMIZATION
+#ifndef CRYPTO3_NO_OPTIMIZATION
 
                 using real_packer<Endianness, InputBits, OutputBits>::pack_n;
 
@@ -169,14 +177,17 @@ namespace nil {
             }
 
             template<typename Endianness, int InValueBits, int OutValueBits, typename InputIterator1, typename CatT1,
-                     typename InputIterator2>
+                     typename InputIterator2,
+                     typename = typename std::enable_if<detail::is_iterator<InputIterator1>::value>::type,
+                     typename = typename std::enable_if<detail::is_iterator<InputIterator2>::value>::type>
             void pack(InputIterator1 b1, InputIterator1 e1, CatT1, InputIterator2 b2) {
                 typedef packer<Endianness, InValueBits, OutValueBits> packer_type;
                 packer_type::pack(b1, e1, b2);
             }
 
             template<typename Endianness, int InValueBits, int OutValueBits, typename InputIterator1,
-                     typename InputIterator2>
+                     typename InputIterator2,
+                     typename = typename std::enable_if<detail::is_iterator<InputIterator2>::value>::type>
             void pack(InputIterator1 b1, InputIterator1 e1, InputIterator2 b2) {
                 typedef typename std::iterator_traits<InputIterator1>::iterator_category cat1;
                 pack<Endianness, InValueBits, OutValueBits>(b1, e1, cat1(), b2);
@@ -208,8 +219,15 @@ namespace nil {
                 pack_n<Endianness, InValueBits, OutValueBits>(in.data(), in.size(), out.data(), out.size());
             }
 
-        }    // namespace pubkey
+            template<typename Endianness, int InValueBits, int OutValueBits, typename InputIterator,
+                     typename OutputType,
+                     typename = typename std::enable_if<!std::is_arithmetic<OutputType>::value>::type>
+            inline void pack(InputIterator first, InputIterator last, OutputType &out) {
+                pack_n<Endianness, InValueBits, OutValueBits>(first, std::distance(first, last), out.begin(),
+                    out.size());
+            }
+        }    // namespace detail
     }        // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_PUBKEY_PACK_HPP
+#endif    // CRYPTO3_BLOCK_PACK_HPP

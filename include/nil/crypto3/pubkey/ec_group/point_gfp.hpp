@@ -355,8 +355,8 @@ namespace nil {
 
                 const number_type z3 = m_curve.mul_to_tmp(m_coord_z, z2, monty_ws);
                 const number_type ax_z4 = m_curve.mul_to_tmp(ax, m_curve.sqr_to_tmp(z2, monty_ws), monty_ws);
-                const number_type b_z6
-                    = m_curve.mul_to_tmp(m_curve.get_b_rep(), m_curve.sqr_to_tmp(z3, monty_ws), monty_ws);
+                const number_type b_z6 =
+                    m_curve.mul_to_tmp(m_curve.get_b_rep(), m_curve.sqr_to_tmp(z3, monty_ws), monty_ws);
 
                 return !(y2 != m_curve.from_rep(x3 + ax_z4 + b_z6, monty_ws)) && true;
             }
@@ -449,7 +449,7 @@ namespace nil {
              * @param workspace temp space, at least WORKSPACE_SIZE elements
              */
             void add(const word x_words[], size_t x_size, const word y_words[], size_t y_size, const word z_words[],
-                     size_t z_size, std::vector<cpp_int> &workspace) {
+                     size_t z_size, std::vector<number<Backend, ExpressionTemplates>> &workspace) {
                 if (all_zeros(x_words, x_size) && all_zeros(z_words, z_size)) {
                     return;
                 }
@@ -633,7 +633,7 @@ namespace nil {
              * Point doubling
              * @param workspace temp space, at least WORKSPACE_SIZE elements
              */
-            void mult2(std::vector<cpp_int> &ws_bn) {
+            void mult2(std::vector<number<Backend, ExpressionTemplates>> &ws_bn) {
                 if (is_zero()) {
                     return;
                 }
@@ -657,7 +657,7 @@ namespace nil {
                 /*
                 https://hyperelliptic.org/EFD/g1p/auto-shortw-jacobian-3.html#doubling-dbl-1986-cc
                 */
-                const cpp_int &p = m_curve.get_p();
+                const number<Backend, ExpressionTemplates> &p = m_curve.get_p();
 
                 m_curve.sqr(T0, m_coord_y, ws);
 
@@ -726,7 +726,7 @@ namespace nil {
              * @param i number of doublings to perform
              * @param workspace temp space, at least WORKSPACE_SIZE elements
              */
-            void mult2i(size_t iterations, std::vector<cpp_int> &ws_bn) {
+            void mult2i(size_t iterations, std::vector<number<Backend, ExpressionTemplates>> &ws_bn) {
                 if (iterations == 0) {
                     return;
                 }
@@ -751,7 +751,7 @@ namespace nil {
              * @param workspace temp space, at least WORKSPACE_SIZE elements
              * @return other plus *this
              */
-            point_gfp plus(const point_gfp &other, std::vector<cpp_int> &workspace) const {
+            point_gfp plus(const point_gfp &other, std::vector<number<Backend, ExpressionTemplates>> &workspace) const {
                 point_gfp x = (*this);
                 x.add(other, workspace);
                 return x;
@@ -762,7 +762,7 @@ namespace nil {
              * @param workspace temp space, at least WORKSPACE_SIZE elements
              * @return *this doubled
              */
-            point_gfp double_of(std::vector<cpp_int> &workspace) const {
+            point_gfp double_of(std::vector<number<Backend, ExpressionTemplates>> &workspace) const {
                 point_gfp x = (*this);
                 x.mult2(workspace);
                 return x;
@@ -860,7 +860,7 @@ namespace nil {
             return tmp -= rhs;
         }
 
-        inline point_gfp operator*(const point_gfp &point, const cpp_int &scalar) {
+        inline point_gfp operator*(const point_gfp &point, const number<Backend, ExpressionTemplates> &scalar) {
             return scalar * point;
         }
 
@@ -880,8 +880,8 @@ namespace nil {
          * @param curve_a the curve equation a parameter
          * @param curve_b the curve equation b parameter
          */
-        std::pair<cpp_int, cpp_int> os2ecp(const uint8_t data[], size_t data_len, const cpp_int &curve_p,
-                                           const cpp_int &curve_a, const cpp_int &curve_b);
+        std::pair<number<Backend, ExpressionTemplates>, number<Backend, ExpressionTemplates>> os2ecp(const uint8_t data[], size_t data_len, const number<Backend, ExpressionTemplates> &curve_p,
+                                           const number<Backend, ExpressionTemplates> &curve_a, const number<Backend, ExpressionTemplates> &curve_b);
 
         template<typename Alloc>
         point_gfp os2ecp(const std::vector<uint8_t, Alloc> &data, const curve_gfp &curve) {

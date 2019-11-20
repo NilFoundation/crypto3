@@ -9,14 +9,14 @@ namespace nil {
         namespace pubkey {
 
             /**
-         * This class represents abstract ECC public keys. When encoding a key
-         * via an encoder that can be accessed via the corresponding member
-         * functions, the key will decide upon its internally stored encoding
-         * information whether to encode itself with or without domain
-         * parameters, or using the domain parameter oid. Furthermore, a public
-         * key without domain parameters can be decoded. In that case, it
-         * cannot be used for verification until its domain parameters are set
-         * by calling the corresponding member function.
+             * This class represents abstract ECC public keys. When encoding a key
+             * via an encoder that can be accessed via the corresponding member
+             * functions, the key will decide upon its internally stored encoding
+             * information whether to encode itself with or without domain
+             * parameters, or using the domain parameter oid. Furthermore, a public
+             * key without domain parameters can be decoded. In that case, it
+             * cannot be used for verification until its domain parameters are set
+             * by calling the corresponding member function.
              */
             template<typename CurveType, typename NumberType = typename CurveType::number_type>
             class ec_public_key : public virtual public_key_policy {
@@ -24,9 +24,9 @@ namespace nil {
                 typedef NumberType number_type;
                 typedef CurveType curve_type;
                 /**
-             * Create a public key.
-             * @param dom_par EC domain parameters
-             * @param pub_point public point on the curve
+                 * Create a public key.
+                 * @param dom_par EC domain parameters
+                 * @param pub_point public point on the curve
                  */
                 ec_public_key(const ec_group<CurveType> &dom_par, const point_gfp<NumberType> &pub_point) :
                     m_domain_params(dom_par), m_public_key(pub_point) {
@@ -43,9 +43,9 @@ namespace nil {
                 }
 
                 /**
-             * Load a public key.
-             * @param alg_id the X.509 algorithm identifier
-             * @param key_bits DER encoded public key bits
+                 * Load a public key.
+                 * @param alg_id the X.509 algorithm identifier
+                 * @param key_bits DER encoded public key bits
                  */
                 ec_public_key(const algorithm_identifier &alg_id, const std::vector<uint8_t> &key_bits) :
                     m_domain_params {ec_group(alg_id.get_parameters())}, m_public_key {domain().OS2ECP(key_bits)} {
@@ -63,10 +63,10 @@ namespace nil {
                 virtual ~ec_public_key() = default;
 
                 /**
-             * Get the public point of this key.
-             * @throw Invalid_State is thrown if the
-             * domain parameters of this point are not set
-             * @result the public point of this key
+                 * Get the public point of this key.
+                 * @throw Invalid_State is thrown if the
+                 * domain parameters of this point are not set
+                 * @result the public point of this key
                  */
                 const point_gfp<NumberType> &public_point() const {
                     return m_public_key;
@@ -86,22 +86,22 @@ namespace nil {
                 }
 
                 /**
-             * Get the domain parameters of this key.
-             * @throw Invalid_State is thrown if the
-             * domain parameters of this point are not set
-             * @result the domain parameters of this key
+                 * Get the domain parameters of this key.
+                 * @throw Invalid_State is thrown if the
+                 * domain parameters of this point are not set
+                 * @result the domain parameters of this key
                  */
                 const ec_group<CurveType> &domain() const {
                     return m_domain_params;
                 }
 
                 /**
-             * Set the domain parameter encoding to be used when encoding this key.
-             * @param enc the encoding to use
+                 * Set the domain parameter encoding to be used when encoding this key.
+                 * @param enc the encoding to use
                  */
                 void set_parameter_encoding(ec_group_encoding enc) {
-                    if (form != EC_DOMPAR_ENC_EXPLICIT && form != EC_DOMPAR_ENC_IMPLICITCA
-                        && form != EC_DOMPAR_ENC_OID) {
+                    if (form != EC_DOMPAR_ENC_EXPLICIT && form != EC_DOMPAR_ENC_IMPLICITCA &&
+                        form != EC_DOMPAR_ENC_OID) {
                         throw std::invalid_argument("Invalid encoding form for EC-key object specified");
                     }
 
@@ -116,8 +116,8 @@ namespace nil {
                 }
 
                 /**
-             * Set the point encoding method to be used when encoding this key.
-             * @param enc the encoding to use
+                 * Set the point encoding method to be used when encoding this key.
+                 * @param enc the encoding to use
                  */
                 void set_point_encoding(typename point_gfp<NumberType>::compression_type enc) {
                     if (enc != point_gfp::COMPRESSED && enc != point_gfp::UNCOMPRESSED && enc != point_gfp::HYBRID) {
@@ -128,24 +128,24 @@ namespace nil {
                 }
 
                 /**
-             * Return the DER encoding of this keys domain in whatever format
-             * is preset for this particular key
+                 * Return the DER encoding of this keys domain in whatever format
+                 * is preset for this particular key
                  */
                 std::vector<uint8_t> der_domain() const {
                     return domain().der_encode(domain_format());
                 }
 
                 /**
-             * Get the domain parameter encoding to be used when encoding this key.
-             * @result the encoding to use
+                 * Get the domain parameter encoding to be used when encoding this key.
+                 * @result the encoding to use
                  */
                 ec_group_encoding domain_format() const {
                     return m_domain_encoding;
                 }
 
                 /**
-             * Get the point encoding method to be used when encoding this key.
-             * @result the encoding to use
+                 * Get the point encoding method to be used when encoding this key.
+                 * @result the encoding to use
                  */
                 typename point_gfp<NumberType>::compression_type point_encoding() const {
                     return m_point_encoding;
@@ -171,7 +171,7 @@ namespace nil {
             };
 
             /**
-         * This abstract class represents ECC private keys
+             * This abstract class represents ECC private keys
              */
             template<typename CurveType, typename NumberType = typename CurveType::number_type>
             class ec_private_key : public ec_public_key<CurveType, NumberType>, public private_key_policy {
@@ -179,12 +179,12 @@ namespace nil {
                 typedef typename ec_public_key<CurveType, NumberType>::curve_type curve_type;
                 typedef typename ec_public_key<CurveType, NumberType>::number_type number_type;
                 /*
-             * If x=0, creates a new private key in the domain
-             * using the given random. If with_modular_inverse is set,
-             * the public key will be calculated by multiplying
-             * the core point with the modular inverse of
-             * x (as in ECGDSA and ECKCDSA), otherwise by
-             * multiplying directly with x (as in ECDSA).
+                 * If x=0, creates a new private key in the domain
+                 * using the given random. If with_modular_inverse is set,
+                 * the public key will be calculated by multiplying
+                 * the core point with the modular inverse of
+                 * x (as in ECGDSA and ECKCDSA), otherwise by
+                 * multiplying directly with x (as in ECDSA).
                  */
                 template<typename UniformRandomGenerator, typename Backend,
                          expression_template_option ExpressionTemplates>
@@ -213,13 +213,13 @@ namespace nil {
                 }
 
                 /*
-             * Creates a new private key object from the
-             * ECPrivateKey structure given in key_bits.
-             * If with_modular_inverse is set,
-             * the public key will be calculated by multiplying
-             * the core point with the modular inverse of
-             * x (as in ECGDSA and ECKCDSA), otherwise by
-             * multiplying directly with x (as in ECDSA).
+                 * Creates a new private key object from the
+                 * ECPrivateKey structure given in key_bits.
+                 * If with_modular_inverse is set,
+                 * the public key will be calculated by multiplying
+                 * the core point with the modular inverse of
+                 * x (as in ECGDSA and ECKCDSA), otherwise by
+                 * multiplying directly with x (as in ECDSA).
                  */
                 ec_private_key(const algorithm_identifier &alg_id, const secure_vector<uint8_t> &key_bits,
                                bool with_modular_inverse = false) {
@@ -264,15 +264,15 @@ namespace nil {
                     return der_encoder()
                         .start_cons(SEQUENCE)
                         .encode(static_cast<size_t>(1))
-                        .encode(boost::multiprecision::cpp_int::encode_1363(m_private_key, m_private_key.bytes()),
+                        .encode(number<Backend, ExpressionTemplates>::encode_1363(m_private_key, m_private_key.bytes()),
                                 OCTET_STRING)
                         .end_cons()
                         .get_contents();
                 }
 
                 /**
-             * Get the private key value of this key object.
-             * @result the private key value of this key object
+                 * Get the private key value of this key object.
+                 * @result the private key value of this key object
                  */
                 const number_type &private_value() const {
                     if (m_private_key == 0) {
@@ -293,8 +293,8 @@ namespace nil {
 
                 number_type m_private_key;
             };
-        }
-    }    // namespace crypto3
+        }    // namespace pubkey
+    }        // namespace crypto3
 }    // namespace nil
 
 #endif

@@ -87,7 +87,7 @@ namespace nil {
                  */
                 gost_3410_private_key(random_number_generator &rng,
                                       const ec_group &domain,
-                                      const boost::multiprecision::cpp_int &x = 0) :
+                                      const number<Backend, ExpressionTemplates> &x = 0) :
                     ec_private_key(rng, domain, x) {
                 }
 

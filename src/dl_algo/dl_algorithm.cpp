@@ -23,7 +23,7 @@ namespace nil {
             return der_encoder().encode(m_y).get_contents_unlocked();
         }
 
-        dl_scheme_public_key::dl_scheme_public_key(const dl_group &group, const boost::multiprecision::cpp_int &y) : m_y(y), m_group(group) {
+        dl_scheme_public_key::dl_scheme_public_key(const dl_group &group, const boost::multiprecision::number<Backend, ExpressionTemplates> &y) : m_y(y), m_group(group) {
         }
 
         dl_scheme_public_key::dl_scheme_public_key(const algorithm_identifier &alg_id,

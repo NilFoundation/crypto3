@@ -2,7 +2,6 @@
 #define CRYPTO3_PUBKEY_DLIES_HPP
 
 #include <nil/crypto3/pubkey/pubkey.hpp>
-#include <nil/crypto3/kdf/kdf.hpp>
 #include <nil/crypto3/pubkey/dh.hpp>
 #include <nil/crypto3/modes/cipher_mode.hpp>
 
@@ -11,36 +10,36 @@ namespace nil {
         namespace pubkey {
 
             /**
-         * DLIES Encryption
+             * DLIES Encryption
              */
             class dlies_encryptor final : public pk_encryptor {
             public:
                 /**
-             * Stream mode: use KDF to provide a stream of bytes to xor with the message
-             *
-             * @param own_priv_key own (ephemeral) DH private key
-             * @param rng the RNG to use
-             * @param kdf the KDF that should be used
-             * @param mac the MAC function that should be used
-             * @param mac_key_len key length of the MAC function. Default = 20 bytes
-             *
-             * output = (ephemeral) public key + ciphertext + tag
+                 * Stream mode: use KDF to provide a stream of bytes to xor with the message
+                 *
+                 * @param own_priv_key own (ephemeral) DH private key
+                 * @param rng the RNG to use
+                 * @param kdf the KDF that should be used
+                 * @param mac the MAC function that should be used
+                 * @param mac_key_len key length of the MAC function. Default = 20 bytes
+                 *
+                 * output = (ephemeral) public key + ciphertext + tag
                  */
                 dlies_encryptor(const dh_private_key &own_priv_key, RandomNumberGenerator &rng, kdf *kdf,
                                 MessageAuthenticationCode *mac, size_t mac_key_len = 20);
 
                 /**
-             * Block cipher mode
-             *
-             * @param own_priv_key own (ephemeral) DH private key
-             * @param rng the RNG to use
-             * @param kdf the KDF that should be used
-             * @param cipher the block cipher that should be used
-             * @param cipher_key_len the key length of the block cipher
-             * @param mac the MAC function that should be used
-             * @param mac_key_len key length of the MAC function. Default = 20 bytes
-             *
-             * output = (ephemeral) public key + ciphertext + tag
+                 * Block cipher mode
+                 *
+                 * @param own_priv_key own (ephemeral) DH private key
+                 * @param rng the RNG to use
+                 * @param kdf the KDF that should be used
+                 * @param cipher the block cipher that should be used
+                 * @param cipher_key_len the key length of the block cipher
+                 * @param mac the MAC function that should be used
+                 * @param mac_key_len key length of the MAC function. Default = 20 bytes
+                 *
+                 * output = (ephemeral) public key + ciphertext + tag
                  */
                 dlies_encryptor(const dh_private_key &own_priv_key, RandomNumberGenerator &rng, kdf *kdf,
                                 cipher_mode *cipher, size_t cipher_key_len, MessageAuthenticationCode *mac,
@@ -73,36 +72,36 @@ namespace nil {
             };
 
             /**
-         * DLIES Decryption
+             * DLIES Decryption
              */
             class DLIES_Decryptor final : public pk_decryptor {
             public:
                 /**
-             * Stream mode: use KDF to provide a stream of bytes to xor with the message
-             *
-             * @param own_priv_key own (ephemeral) DH private key
-             * @param rng the RNG to use
-             * @param kdf the KDF that should be used
-             * @param mac the MAC function that should be used
-             * @param mac_key_len key length of the MAC function. Default = 20 bytes
-             *
-             * input = (ephemeral) public key + ciphertext + tag
+                 * Stream mode: use KDF to provide a stream of bytes to xor with the message
+                 *
+                 * @param own_priv_key own (ephemeral) DH private key
+                 * @param rng the RNG to use
+                 * @param kdf the KDF that should be used
+                 * @param mac the MAC function that should be used
+                 * @param mac_key_len key length of the MAC function. Default = 20 bytes
+                 *
+                 * input = (ephemeral) public key + ciphertext + tag
                  */
                 DLIES_Decryptor(const dh_private_key &own_priv_key, RandomNumberGenerator &rng, kdf *kdf,
                                 MessageAuthenticationCode *mac, size_t mac_key_len = 20);
 
                 /**
-             * Block cipher mode
-             *
-             * @param own_priv_key own (ephemeral) DH private key
-             * @param rng the RNG to use
-             * @param kdf the KDF that should be used
-             * @param cipher the block cipher that should be used
-             * @param cipher_key_len the key length of the block cipher
-             * @param mac the MAC function that should be used
-             * @param mac_key_len key length of the MAC function. Default = 20 bytes
-             *
-             * input = (ephemeral) public key + ciphertext + tag
+                 * Block cipher mode
+                 *
+                 * @param own_priv_key own (ephemeral) DH private key
+                 * @param rng the RNG to use
+                 * @param kdf the KDF that should be used
+                 * @param cipher the block cipher that should be used
+                 * @param cipher_key_len the key length of the block cipher
+                 * @param mac the MAC function that should be used
+                 * @param mac_key_len key length of the MAC function. Default = 20 bytes
+                 *
+                 * input = (ephemeral) public key + ciphertext + tag
                  */
                 DLIES_Decryptor(const dh_private_key &own_priv_key, RandomNumberGenerator &rng, kdf *kdf,
                                 cipher_mode *cipher, size_t cipher_key_len, MessageAuthenticationCode *mac,
@@ -127,8 +126,8 @@ namespace nil {
                 const size_t m_mac_keylen;
                 InitializationVector m_iv;
             };
-        }
-    }    // namespace crypto3
+        }    // namespace pubkey
+    }        // namespace crypto3
 }    // namespace nil
 
 #endif

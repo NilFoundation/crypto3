@@ -29,8 +29,8 @@ namespace nil {
 
                 typedef number<backends::cpp_int_backend<p_bits, p_bits, unsigned_magnitude, unchecked, void>> p_type;
 
-                constexpr static const p_type p
-                    = 0x1FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF_cppui521;
+                constexpr static const p_type p =
+                    0x1FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF_cppui521;
 
                 template<typename Backend, expression_template_option ExpressionTemplates>
                 static void redc_mod_p(number<Backend, ExpressionTemplates> &x, secure_vector<uint32_t> &ws) {
@@ -95,10 +95,10 @@ namespace nil {
                 template<typename Backend, expression_template_option ExpressionTemplates>
                 number<Backend, ExpressionTemplates> invert_element(const number<Backend, ExpressionTemplates> &x,
                                                                     secure_vector<uint32_t> &ws) const override {
-                    boost::multiprecision::cpp_int r;
-                    boost::multiprecision::cpp_int rl;
-                    boost::multiprecision::cpp_int a7;
-                    boost::multiprecision::cpp_int tmp;
+                    number<Backend, ExpressionTemplates> r;
+                    number<Backend, ExpressionTemplates> rl;
+                    number<Backend, ExpressionTemplates> a7;
+                    number<Backend, ExpressionTemplates> tmp;
 
                     curve_sqr(r, x, ws);
                     curve_mul_tmp(r, x, tmp, ws);

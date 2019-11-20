@@ -30,7 +30,7 @@ namespace nil {
             }
 
             sm2_encryption_private_key::sm2_encryption_private_key(random_number_generator &rng, const ec_group &domain,
-                                                                   const boost::multiprecision::cpp_int &x) :
+                                                                   const boost::multiprecision::number<Backend, ExpressionTemplates> &x) :
                 ec_private_key(rng, domain, x) {
             }
 
@@ -54,24 +54,24 @@ namespace nil {
 
                         const size_t p_bytes = m_group.get_p_bytes();
 
-                        const boost::multiprecision::cpp_int k = m_group.random_scalar(rng);
+                        const boost::multiprecision::number<Backend, ExpressionTemplates> k = m_group.random_scalar(rng);
 
                         const point_gfp C1 = m_group.blinded_base_point_multiply(k, rng, m_ws);
-                        const boost::multiprecision::cpp_int x1 = C1.get_affine_x();
-                        const boost::multiprecision::cpp_int y1 = C1.get_affine_y();
+                        const boost::multiprecision::number<Backend, ExpressionTemplates> x1 = C1.get_affine_x();
+                        const boost::multiprecision::number<Backend, ExpressionTemplates> y1 = C1.get_affine_y();
                         std::vector<uint8_t> x1_bytes(p_bytes);
                         std::vector<uint8_t> y1_bytes(p_bytes);
-                        boost::multiprecision::cpp_int::encode_1363(x1_bytes.data(), x1_bytes.size(), x1);
-                        boost::multiprecision::cpp_int::encode_1363(y1_bytes.data(), y1_bytes.size(), y1);
+                        boost::multiprecision::number<Backend, ExpressionTemplates>::encode_1363(x1_bytes.data(), x1_bytes.size(), x1);
+                        boost::multiprecision::number<Backend, ExpressionTemplates>::encode_1363(y1_bytes.data(), y1_bytes.size(), y1);
 
                         const point_gfp kPB = m_mul_public_point.mul(k, rng, m_group.get_order(), m_ws);
 
-                        const boost::multiprecision::cpp_int x2 = kPB.get_affine_x();
-                        const boost::multiprecision::cpp_int y2 = kPB.get_affine_y();
+                        const boost::multiprecision::number<Backend, ExpressionTemplates> x2 = kPB.get_affine_x();
+                        const boost::multiprecision::number<Backend, ExpressionTemplates> y2 = kPB.get_affine_y();
                         std::vector<uint8_t> x2_bytes(p_bytes);
                         std::vector<uint8_t> y2_bytes(p_bytes);
-                        boost::multiprecision::cpp_int::encode_1363(x2_bytes.data(), x2_bytes.size(), x2);
-                        boost::multiprecision::cpp_int::encode_1363(y2_bytes.data(), y2_bytes.size(), y2);
+                        boost::multiprecision::number<Backend, ExpressionTemplates>::encode_1363(x2_bytes.data(), x2_bytes.size(), x2);
+                        boost::multiprecision::number<Backend, ExpressionTemplates>::encode_1363(y2_bytes.data(), y2_bytes.size(), y2);
 
                         secure_vector<uint8_t> kdf_input;
                         kdf_input += x2_bytes;
@@ -103,7 +103,7 @@ namespace nil {
                     const ec_group m_group;
                     point_gfp_var_point_precompute m_mul_public_point;
                     const std::string m_kdf_hash;
-                    std::vector<boost::multiprecision::cpp_int> m_ws;
+                    std::vector<boost::multiprecision::number<Backend, ExpressionTemplates>> m_ws;
                 };
 
                 class SM2_Decryption_Operation final : public pk_operations::decryption {
@@ -117,7 +117,7 @@ namespace nil {
                     secure_vector<uint8_t> decrypt(uint8_t &valid_mask, const uint8_t ciphertext[],
                                                    size_t ciphertext_len) override {
                         const ec_group &group = m_key.domain();
-                        const boost::multiprecision::cpp_int &cofactor = group.get_cofactor();
+                        const boost::multiprecision::number<Backend, ExpressionTemplates> &cofactor = group.get_cofactor();
                         const size_t p_bytes = group.get_p_bytes();
 
                         valid_mask = 0x00;
@@ -130,7 +130,7 @@ namespace nil {
                             return secure_vector<uint8_t>();
                         }
 
-                        boost::multiprecision::cpp_int x1, y1;
+                        boost::multiprecision::number<Backend, ExpressionTemplates> x1, y1;
                         secure_vector<uint8_t> C3, masked_msg;
 
                         ber_decoder(ciphertext, ciphertext_len)
@@ -155,13 +155,13 @@ namespace nil {
 
                         const point_gfp dbC1 = group.blinded_var_point_multiply(C1, m_key.private_value(), m_rng, m_ws);
 
-                        const boost::multiprecision::cpp_int x2 = dbC1.get_affine_x();
-                        const boost::multiprecision::cpp_int y2 = dbC1.get_affine_y();
+                        const boost::multiprecision::number<Backend, ExpressionTemplates> x2 = dbC1.get_affine_x();
+                        const boost::multiprecision::number<Backend, ExpressionTemplates> y2 = dbC1.get_affine_y();
 
                         std::vector<uint8_t> x2_bytes(p_bytes);
                         std::vector<uint8_t> y2_bytes(p_bytes);
-                        boost::multiprecision::cpp_int::encode_1363(x2_bytes.data(), x2_bytes.size(), x2);
-                        boost::multiprecision::cpp_int::encode_1363(y2_bytes.data(), y2_bytes.size(), y2);
+                        boost::multiprecision::number<Backend, ExpressionTemplates>::encode_1363(x2_bytes.data(), x2_bytes.size(), x2);
+                        boost::multiprecision::number<Backend, ExpressionTemplates>::encode_1363(y2_bytes.data(), y2_bytes.size(), y2);
 
                         secure_vector<uint8_t> kdf_input;
                         kdf_input += x2_bytes;
@@ -189,7 +189,7 @@ namespace nil {
                     const sm2_encryption_private_key &m_key;
                     random_number_generator &m_rng;
                     const std::string m_kdf_hash;
-                    std::vector<boost::multiprecision::cpp_int> m_ws;
+                    std::vector<boost::multiprecision::number<Backend, ExpressionTemplates>> m_ws;
                 };
 
             }    // namespace

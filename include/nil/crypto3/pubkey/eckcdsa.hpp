@@ -86,7 +86,7 @@ namespace nil {
                  * @param x the private key (if zero, generate a new random key)
                  */
                 eckcdsa_private_key(random_number_generator &rng, const ec_group<CurveType, NumberType> &domain,
-                                    const boost::multiprecision::cpp_int &x = 0) :
+                                    const number<Backend, ExpressionTemplates> &x = 0) :
                     ec_private_key<CurveType, NumberType>(rng, domain, x, true) {
                 }
 

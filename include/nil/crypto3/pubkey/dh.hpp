@@ -8,13 +8,13 @@ namespace nil {
         namespace pubkey {
 
             /**
-         * This class represents Diffie-Hellman public keys.
+             * This class represents Diffie-Hellman public keys.
              */
             class dh_public_key : public virtual dl_scheme_public_key {
             public:
                 /**
-             * Get the OID of the underlying public key scheme.
-             * @return oid_t of the public key scheme
+                 * Get the OID of the underlying public key scheme.
+                 * @return oid_t of the public key scheme
                  */
                 static const oid_t oid() {
                     return oid_t({1, 2, 840, 10046, 2, 1});
@@ -24,64 +24,88 @@ namespace nil {
                     return "DH";
                 }
 
-                std::vector<uint8_t> public_value() const;
+                std::vector<uint8_t> public_value() const {
+                    return unlock(number<Backend, ExpressionTemplates>::encode_1363(m_y, group_p().bytes()));
+                }
 
                 dl_group::format group_format() const override {
                     return dl_group::ANSI_X9_42;
                 }
 
                 /**
-             * Create a public key.
-             * @param alg_id the X.509 algorithm identifier
-             * @param key_bits DER encoded public key bits
+                 * Create a public key.
+                 * @param alg_id the X.509 algorithm identifier
+                 * @param key_bits DER encoded public key bits
                  */
                 dh_public_key(const algorithm_identifier &alg_id, const std::vector<uint8_t> &key_bits) :
                     dl_scheme_public_key(alg_id, key_bits, dl_group::ANSI_X9_42) {
                 }
 
                 /**
-             * Construct a public key with the specified parameters.
-             * @param grp the DL group to use in the key
-             * @param y the public value y
+                 * Construct a public key with the specified parameters.
+                 * @param grp the DL group to use in the key
+                 * @param y the public value y
                  */
-                dh_public_key(const dl_group &grp, const boost::multiprecision::cpp_int &y);
+                dh_public_key(const dl_group &grp, const number<Backend, ExpressionTemplates> &y) {
+                    m_group = grp;
+                    m_y = y;
+                }
 
             protected:
                 dh_public_key() = default;
             };
 
             /**
-         * This class represents Diffie-Hellman private keys.
+             * This class represents Diffie-Hellman private keys.
              */
             class dh_private_key final : public dh_public_key,
                                          public pk_key_agreement_key,
                                          public virtual dl_scheme_private_key {
             public:
-                std::vector<uint8_t> public_value() const override;
+                std::vector<uint8_t> public_value() const override {
+                    return dh_public_key::public_value();
+                }
 
                 /**
-             * Load a private key.
-             * @param alg_id the X.509 algorithm identifier
-             * @param key_bits PKCS #8 structure
+                 * Load a private key.
+                 * @param alg_id the X.509 algorithm identifier
+                 * @param key_bits PKCS #8 structure
                  */
-                dh_private_key(const algorithm_identifier &alg_id, const secure_vector<uint8_t> &key_bits);
+                dh_private_key(const algorithm_identifier &alg_id, const secure_vector<uint8_t> &key_bits) :
+                    dl_scheme_private_key(alg_id, key_bits, dl_group::ANSI_X9_42) {
+                    if (m_y == 0) {
+                        m_y = m_group.power_g_p(m_x);
+                    }
+                }
 
                 /**
-             * Create a private key.
-             * @param rng random number generator to use
-             * @param grp the group to be used in the key
-             * @param x the key's secret value (or if zero, generate a new key)
+                 * Create a private key.
+                 * @param rng random number generator to use
+                 * @param grp the group to be used in the key
+                 * @param x the key's secret value (or if zero, generate a new key)
                  */
                 dh_private_key(random_number_generator &rng, const dl_group &grp,
-                               const boost::multiprecision::cpp_int &x = 0);
+                               const number<Backend, ExpressionTemplates> &x = number<Backend, ExpressionTemplates>()) {
+                    m_group = grp;
+
+                    if (x_arg == 0) {
+                        m_x.randomize(rng, grp.exponent_bits());
+                    } else {
+                        m_x = x_arg;
+                    }
+
+                    if (m_y == 0) {
+                        m_y = m_group.power_g_p(m_x);
+                    }
+                }
 
                 std::unique_ptr<pk_operations::key_agreement>
                     create_key_agreement_op(random_number_generator &rng,
                                             const std::string &params,
                                             const std::string &provider) const override;
             };
-        }
-    }    // namespace crypto3
+        }    // namespace pubkey
+    }        // namespace crypto3
 }    // namespace nil
 
 #endif

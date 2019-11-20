@@ -9,7 +9,7 @@
 #include <boost/range/concepts.hpp>
 #include <boost/range/any_range.hpp>
 
-#include <nil/crypto3/pubkey/detail/static_digest.hpp>
+#include <nil/crypto3/detail/static_digest.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -20,24 +20,23 @@ namespace nil {
          */
 
         namespace detail {
-            template<typename Signer,
-                     typename SinglePassRange> using range_stream_sign_traits = typename Signer::template stream_sign<
-                    std::numeric_limits<
-                            typename std::iterator_traits<typename SinglePassRange::iterator>::value_type>::digits +
-                    std::numeric_limits<
-                            typename std::iterator_traits<typename SinglePassRange::iterator>::value_type>::is_signed>;
+            template<typename Signer, typename SinglePassRange>
+            using range_stream_sign_traits = typename Signer::template stream_sign<
+                std::numeric_limits<
+                    typename std::iterator_traits<typename SinglePassRange::iterator>::value_type>::digits +
+                std::numeric_limits<
+                    typename std::iterator_traits<typename SinglePassRange::iterator>::value_type>::is_signed>;
 
-            template<typename Signer,
-                     typename InputIterator> using itr_stream_sign_traits = typename Signer::template stream_sign<
-                    std::numeric_limits<typename std::iterator_traits<InputIterator>::value_type>::digits +
-                    std::numeric_limits<typename std::iterator_traits<InputIterator>::value_type>::is_signed>;
+            template<typename Signer, typename InputIterator>
+            using itr_stream_sign_traits = typename Signer::template stream_sign<
+                std::numeric_limits<typename std::iterator_traits<InputIterator>::value_type>::digits +
+                std::numeric_limits<typename std::iterator_traits<InputIterator>::value_type>::is_signed>;
 
             template<typename StreamSigner>
             struct ref_sign_impl {
                 typedef StreamSigner stream_sign_type;
 
                 ref_sign_impl(const StreamSigner &stream_sign) : sh(std::move(stream_sign)) {
-
                 }
 
                 template<typename Result>
@@ -53,7 +52,6 @@ namespace nil {
                 typedef StreamSigner stream_sign_type;
 
                 value_sign_impl(const StreamSigner &stream_sign) : sh(stream_sign) {
-
                 }
 
                 template<typename Result>
@@ -68,8 +66,8 @@ namespace nil {
             struct range_sign_impl : public StreamSignerImpl {
             public:
                 template<typename SinglePassRange>
-                range_sign_impl(const SinglePassRange &range, const typename StreamSignerImpl::stream_sign_type &ish)
-                        : StreamSignerImpl(ish) {
+                range_sign_impl(const SinglePassRange &range, const typename StreamSignerImpl::stream_sign_type &ish) :
+                    StreamSignerImpl(ish) {
                     BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<SinglePassRange>));
 
                     typedef typename std::iterator_traits<typename SinglePassRange::iterator>::value_type value_type;
@@ -81,7 +79,8 @@ namespace nil {
 
                 template<typename InputIterator>
                 range_sign_impl(InputIterator first, InputIterator last,
-                                const typename StreamSignerImpl::stream_sign_type &ish) : StreamSignerImpl(ish) {
+                                const typename StreamSignerImpl::stream_sign_type &ish) :
+                    StreamSignerImpl(ish) {
                     BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<InputIterator>));
 
                     typedef typename std::iterator_traits<InputIterator>::value_type value_type;
@@ -120,8 +119,9 @@ namespace nil {
             public:
                 template<typename SinglePassRange>
                 itr_sign_impl(const SinglePassRange &range, OutputIterator out,
-                              const typename StreamSignerImpl::stream_sign_type &ish) : StreamSignerImpl(ish),
-                        out(std::move(out)) {
+                              const typename StreamSignerImpl::stream_sign_type &ish) :
+                    StreamSignerImpl(ish),
+                    out(std::move(out)) {
                     BOOST_CONCEPT_ASSERT((boost::SinglePassRangeConcept<SinglePassRange>));
 
                     typedef typename std::iterator_traits<typename SinglePassRange::iterator>::value_type value_type;
@@ -133,8 +133,9 @@ namespace nil {
 
                 template<typename InputIterator>
                 itr_sign_impl(InputIterator first, InputIterator last, OutputIterator out,
-                              const typename StreamSignerImpl::stream_sign_type &ish)
-                        : StreamSignerImpl(ish), out(std::move(out)) {
+                              const typename StreamSignerImpl::stream_sign_type &ish) :
+                    StreamSignerImpl(ish),
+                    out(std::move(out)) {
                     BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<InputIterator>));
 
                     typedef typename std::iterator_traits<InputIterator>::value_type value_type;
@@ -150,7 +151,7 @@ namespace nil {
                     return std::move(result.begin(), result.end(), out);
                 }
             };
-        }
+        }    // namespace detail
 
         /*!
          * @brief
@@ -196,7 +197,7 @@ namespace nil {
          */
         template<typename Signer, typename InputIterator, typename OutputIterator,
                  typename StreamSigner = typename detail::itr_stream_sign_traits<Signer, InputIterator>::type>
-        OutputIterator sign(InputIterator first, InputIterator last, const private_key <Signer> &pk,
+        OutputIterator sign(InputIterator first, InputIterator last, const private_key<Signer> &pk,
                             OutputIterator out) {
 
             typedef detail::ref_sign_impl<StreamSigner> StreamSignerImpl;
@@ -219,10 +220,8 @@ namespace nil {
          */
         template<typename Signer, typename InputIterator, typename KeyIterator,
                  typename StreamSigner = typename detail::itr_stream_sign_traits<Signer, InputIterator>::type>
-        detail::range_sign_impl<Signer, detail::value_sign_impl<StreamSigner>> sign(InputIterator first,
-                                                                                    InputIterator last,
-                                                                                    KeyIterator key_first,
-                                                                                    KeyIterator key_last) {
+        detail::range_sign_impl<Signer, detail::value_sign_impl<StreamSigner>>
+            sign(InputIterator first, InputIterator last, KeyIterator key_first, KeyIterator key_last) {
             typedef detail::value_sign_impl<StreamSigner> StreamSignerImpl;
             typedef detail::range_sign_impl<Signer, StreamSignerImpl> SignerImpl;
 
@@ -244,14 +243,12 @@ namespace nil {
          */
         template<typename Signer, typename InputIterator,
                  typename StreamSigner = typename detail::itr_stream_sign_traits<Signer, InputIterator>::type>
-        detail::range_sign_impl<Signer, detail::ref_sign_impl<StreamSigner>> sign(InputIterator first,
-                                                                                  InputIterator last,
-                                                                                  const private_key <Signer> &pk) {
+        detail::range_sign_impl<Signer, detail::ref_sign_impl<StreamSigner>>
+            sign(InputIterator first, InputIterator last, const private_key<Signer> &pk) {
             typedef detail::ref_sign_impl<StreamSigner> StreamSignerImpl;
             typedef detail::range_sign_impl<Signer, StreamSignerImpl> SignerImpl;
 
             return SignerImpl(first, last, sh);
-
         }
 
         /*!
@@ -293,7 +290,7 @@ namespace nil {
          */
         template<typename Signer, typename SinglePassRange, typename OutputIterator,
                  typename StreamSigner = typename detail::range_stream_sign_traits<Signer, SinglePassRange>::type>
-        OutputIterator sign(const SinglePassRange &rng, OutputIterator out, const private_key <Signer> &pk) {
+        OutputIterator sign(const SinglePassRange &rng, OutputIterator out, const private_key<Signer> &pk) {
 
             typedef detail::ref_sign_impl<StreamSigner> StreamSignerImpl;
             typedef detail::itr_sign_impl<Signer, StreamSignerImpl, OutputIterator> SignerImpl;
@@ -344,7 +341,7 @@ namespace nil {
 
             return SignerImpl(rng, sh);
         }
-    }
-}
+    }    // namespace crypto3
+}    // namespace nil
 
-#endif // include guard
+#endif    // include guard

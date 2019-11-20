@@ -16,15 +16,17 @@ namespace nil {
                 newhope_poly m_newhope;
             };
 
-            void CECPQ1_offer(uint8_t *offer_message, CECPQ1_key *offer_key_output, RandomNumberGenerator &rng) {
+            template<typename UniformRandomGenerator>
+            void CECPQ1_offer(uint8_t *offer_message, CECPQ1_key *offer_key_output, UniformRandomGenerator &rng) {
                 offer_key_output->m_x25519 = rng.random_vec(32);
                 curve25519_basepoint(send, offer_key_output->m_x25519.data());
 
                 newhope_keygen(send + 32, &offer_key_output->m_newhope, rng, Newhope_Mode::BoringSSL);
             }
 
+            template<typename UniformRandomGenerator>
             void CECPQ1_accept(uint8_t *shared_key, uint8_t *accept_message, const uint8_t *offer_message,
-                               RandomNumberGenerator &rng) {
+                               UniformRandomGenerator &rng) {
                 secure_vector<uint8_t> x25519_key = rng.random_vec(32);
 
                 curve25519_basepoint(send, x25519_key.data());

@@ -21,7 +21,7 @@ namespace nil {
 /*
 * dsa_public_key_policy Constructor
 */
-        dsa_public_key_policy::dsa_public_key_policy(const dl_group &grp, const cpp_int &y1) {
+        dsa_public_key_policy::dsa_public_key_policy(const dl_group &grp, const number<Backend, ExpressionTemplates> &y1) {
             m_group = grp;
             m_y = y1;
         }
@@ -30,11 +30,11 @@ namespace nil {
 * Create a DSA private key
 */
         dsa_private_key_policy::dsa_private_key_policy(random_number_generator &rng, const dl_group &grp,
-                                         const cpp_int &x_arg) {
+                                         const number<Backend, ExpressionTemplates> &x_arg) {
             m_group = grp;
 
             if (x_arg == 0) {
-                m_x = cpp_int::random_integer(rng, 2, group_q());
+                m_x = number<Backend, ExpressionTemplates>::random_integer(rng, 2, group_q());
             } else {
                 m_x = x_arg;
             }
@@ -86,7 +86,7 @@ namespace nil {
 
             private:
                 const dl_group m_group;
-                const cpp_int &m_x;
+                const number<Backend, ExpressionTemplates> &m_x;
                 modular_reducer m_mod_q;
 #if defined(CRYPTO3_HAS_RFC6979)
                 std::string m_rfc6979_hash;
@@ -95,9 +95,9 @@ namespace nil {
 
             secure_vector<uint8_t> dsa_signature_operation::raw_sign(const uint8_t msg[], size_t msg_len,
                                                                      random_number_generator &rng) {
-                const cpp_int &q = m_group.get_q();
+                const number<Backend, ExpressionTemplates> &q = m_group.get_q();
 
-                cpp_int i(msg, msg_len, q.bits());
+                number<Backend, ExpressionTemplates> i(msg, msg_len, q.bits());
 
                 while (i >= q) {
                     i -= q;
@@ -105,13 +105,13 @@ namespace nil {
 
 #if defined(CRYPTO3_HAS_RFC6979)
                 CRYPTO3_UNUSED(random);
-                const cpp_int k = generate_rfc6979_nonce(m_x, q, i, m_rfc6979_hash);
+                const number<Backend, ExpressionTemplates> k = generate_rfc6979_nonce(m_x, q, i, m_rfc6979_hash);
 #else
-                const cpp_int k = cpp_int::random_integer(rng, 1, q);
+                const number<Backend, ExpressionTemplates> k = number<Backend, ExpressionTemplates>::random_integer(rng, 1, q);
 #endif
 
-                cpp_int s = inverse_mod(k, q);
-                const cpp_int r = m_mod_q.reduce(m_group.power_g_p(k));
+                number<Backend, ExpressionTemplates> s = inverse_mod(k, q);
+                const number<Backend, ExpressionTemplates> r = m_mod_q.reduce(m_group.power_g_p(k));
 
                 s = m_mod_q.multiply(s, m_x * r + i);
 
@@ -120,7 +120,7 @@ namespace nil {
                     throw internal_error("Computed zero r/s during DSA signature");
                 }
 
-                return cpp_int::encode_fixed_length_int_pair(r, s, q.bytes());
+                return number<Backend, ExpressionTemplates>::encode_fixed_length_int_pair(r, s, q.bytes());
             }
 
 /**
@@ -145,23 +145,23 @@ namespace nil {
 
             private:
                 const dl_group m_group;
-                const cpp_int &m_y;
+                const number<Backend, ExpressionTemplates> &m_y;
 
                 modular_reducer m_mod_q;
             };
 
             bool dsa_verification_operation::verify(const uint8_t msg[], size_t msg_len, const uint8_t sig[],
                                                     size_t sig_len) {
-                const cpp_int &q = m_group.get_q();
+                const number<Backend, ExpressionTemplates> &q = m_group.get_q();
                 const size_t q_bytes = q.bytes();
 
                 if (sig_len != 2 * q_bytes || msg_len > q_bytes) {
                     return false;
                 }
 
-                cpp_int r(sig, q_bytes);
-                cpp_int s(sig + q_bytes, q_bytes);
-                cpp_int i(msg, msg_len, q.bits());
+                number<Backend, ExpressionTemplates> r(sig, q_bytes);
+                number<Backend, ExpressionTemplates> s(sig + q_bytes, q_bytes);
+                number<Backend, ExpressionTemplates> i(msg, msg_len, q.bits());
 
                 if (r <= 0 || r >= q || s <= 0 || s >= q) {
                     return false;
@@ -169,8 +169,8 @@ namespace nil {
 
                 s = inverse_mod(s, q);
 
-                const cpp_int sr = m_mod_q.multiply(s, r);
-                const cpp_int si = m_mod_q.multiply(s, i);
+                const number<Backend, ExpressionTemplates> sr = m_mod_q.multiply(s, r);
+                const number<Backend, ExpressionTemplates> si = m_mod_q.multiply(s, i);
 
                 s = m_group.multi_exponentiate(si, m_y, sr);
 

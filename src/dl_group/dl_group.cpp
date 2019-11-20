@@ -15,7 +15,7 @@ namespace nil {
 
         class dl_group_data final {
         public:
-            dl_group_data(const cpp_int &p, const cpp_int &q, const cpp_int &g) : m_p(p), m_q(q), m_g(g), m_mod_p(p),
+            dl_group_data(const number<Backend, ExpressionTemplates> &p, const number<Backend, ExpressionTemplates> &q, const number<Backend, ExpressionTemplates> &g) : m_p(p), m_q(q), m_g(g), m_mod_p(p),
                     m_monty_params(std::make_shared<montgomery_params>(m_p, m_mod_p)),
                     m_monty(monty_precompute(m_monty_params, m_g, /*window bits=*/4)), m_p_bits(p.bits()),
                     m_estimated_strength(dl_work_factor(m_p_bits)), m_exponent_bits(dl_exponent_size(m_p_bits)) {
@@ -27,22 +27,22 @@ namespace nil {
 
             dl_group_data &operator=(const dl_group_data &other) = delete;
 
-            const cpp_int &p() const {
+            const number<Backend, ExpressionTemplates> &p() const {
                 return m_p;
             }
 
-            const cpp_int &q() const {
+            const number<Backend, ExpressionTemplates> &q() const {
                 return m_q;
             }
 
-            const cpp_int &g() const {
+            const number<Backend, ExpressionTemplates> &g() const {
                 return m_g;
             }
 
         private:
-            cpp_int m_p;
-            cpp_int m_q;
-            cpp_int m_g;
+            number<Backend, ExpressionTemplates> m_p;
+            number<Backend, ExpressionTemplates> m_q;
+            number<Backend, ExpressionTemplates> m_g;
             modular_reducer m_mod_p;
             std::shared_ptr<const montgomery_params> m_monty_params;
             std::shared_ptr<const montgomery_exponentation_state> m_monty;
@@ -54,7 +54,7 @@ namespace nil {
 //static
         std::shared_ptr<dl_group_data> dl_group::ber_decode_dl_group(const uint8_t *data, size_t data_len,
                                                                      dl_group::format format) {
-            cpp_int p, q, g;
+            number<Backend, ExpressionTemplates> p, q, g;
 
             ber_decoder decoder(data, data_len);
             ber_decoder ber = decoder.start_cons(SEQUENCE);

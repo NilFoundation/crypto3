@@ -10,7 +10,7 @@ namespace nil {
             /*
              * el_gamal_public_key Constructor
              */
-            el_gamal_public_key::el_gamal_public_key(const dl_group &group, const cpp_int &y) :
+            el_gamal_public_key::el_gamal_public_key(const dl_group &group, const number<Backend, ExpressionTemplates> &y) :
                 dl_scheme_public_key(group, y) {
             }
 
@@ -18,7 +18,7 @@ namespace nil {
              * el_gamal_private_key Constructor
              */
             el_gamal_private_key::el_gamal_private_key(random_number_generator &rng, const dl_group &group,
-                                                       const cpp_int &x) {
+                                                       const number<Backend, ExpressionTemplates> &x) {
                 m_x = x;
                 m_group = group;
 
@@ -79,19 +79,19 @@ namespace nil {
 
                 secure_vector<uint8_t> el_gamal_encryption_operation::raw_encrypt(const uint8_t msg[], size_t msg_len,
                                                                                   random_number_generator &rng) {
-                    cpp_int m(msg, msg_len);
+                    number<Backend, ExpressionTemplates> m(msg, msg_len);
 
                     if (m >= m_group.get_p()) {
                         throw std::invalid_argument("ElGamal encryption: Input is too large");
                     }
 
                     const size_t k_bits = m_group.exponent_bits();
-                    const cpp_int k(rng, k_bits);
+                    const number<Backend, ExpressionTemplates> k(rng, k_bits);
 
-                    const cpp_int a = m_group.power_g_p(k);
-                    const cpp_int b = m_group.multiply_mod_p(m, m_powermod_y_p(k));
+                    const number<Backend, ExpressionTemplates> a = m_group.power_g_p(k);
+                    const number<Backend, ExpressionTemplates> b = m_group.multiply_mod_p(m, m_powermod_y_p(k));
 
-                    return cpp_int::encode_fixed_length_int_pair(a, b, m_group.p_bytes());
+                    return number<Backend, ExpressionTemplates>::encode_fixed_length_int_pair(a, b, m_group.p_bytes());
                 }
 
                 /**
@@ -116,8 +116,8 @@ namespace nil {
                     pk_operations::decryption_with_eme(eme),
                     m_group(key.get_group()), m_powermod_x_p(key.get_x(), m_group.get_p()),
                     m_blinder(
-                        m_group.get_p(), rng, [](const cpp_int &k) { return k; },
-                        [this](const cpp_int &k) { return m_powermod_x_p(k); }) {
+                        m_group.get_p(), rng, [](const number<Backend, ExpressionTemplates> &k) { return k; },
+                        [this](const number<Backend, ExpressionTemplates> &k) { return m_powermod_x_p(k); }) {
                 }
 
                 secure_vector<uint8_t> el_gamal_decryption_operation::raw_decrypt(const uint8_t msg[], size_t msg_len) {
@@ -127,8 +127,8 @@ namespace nil {
                         throw std::invalid_argument("ElGamal decryption: Invalid message");
                     }
 
-                    cpp_int a(msg, p_bytes);
-                    const cpp_int b(msg + p_bytes, p_bytes);
+                    number<Backend, ExpressionTemplates> a(msg, p_bytes);
+                    const number<Backend, ExpressionTemplates> b(msg + p_bytes, p_bytes);
 
                     if (a >= m_group.get_p() || b >= m_group.get_p()) {
                         throw std::invalid_argument("ElGamal decryption: Invalid message");
@@ -136,9 +136,9 @@ namespace nil {
 
                     a = m_blinder.blind(a);
 
-                    const cpp_int r = m_group.multiply_mod_p(m_group.inverse_mod_p(m_powermod_x_p(a)), b);
+                    const number<Backend, ExpressionTemplates> r = m_group.multiply_mod_p(m_group.inverse_mod_p(m_powermod_x_p(a)), b);
 
-                    return cpp_int::encode_1363(m_blinder.unblind(r), p_bytes);
+                    return number<Backend, ExpressionTemplates>::encode_1363(m_blinder.unblind(r), p_bytes);
                 }
 
             }    // namespace

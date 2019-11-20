@@ -43,8 +43,8 @@ namespace nil {
                     const std::string PEM_HEADER = "-----BEGIN " + label + "-----\n";
                     const std::string PEM_TRAILER = "-----END " + label + "-----\n";
 
-                    return (PEM_HEADER + detail::linewrap(line_width, crypto3::encode<codec::base64>(data))
-                            + PEM_TRAILER);
+                    return (PEM_HEADER + detail::linewrap(line_width, crypto3::encode<codec::base64>(data)) +
+                            PEM_TRAILER);
                 }
 
                 /**

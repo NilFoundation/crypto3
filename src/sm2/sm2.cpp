@@ -29,7 +29,7 @@ namespace nil {
             }
 
             sm2_signature_private_key::sm2_signature_private_key(random_number_generator &rng, const ec_group &domain,
-                                                                 const boost::multiprecision::cpp_int &x) :
+                                                                 const boost::multiprecision::number<Backend, ExpressionTemplates> &x) :
                 ec_private_key(rng, domain, x) {
                 m_da_inv = inverse_mod(m_private_key + 1, domain.get_order());
             }
@@ -48,12 +48,12 @@ namespace nil {
 
                 const size_t p_bytes = domain.get_p_bytes();
 
-                hash.update(boost::multiprecision::cpp_int::encode_1363(domain.get_a(), p_bytes));
-                hash.update(boost::multiprecision::cpp_int::encode_1363(domain.get_b(), p_bytes));
-                hash.update(boost::multiprecision::cpp_int::encode_1363(domain.get_g_x(), p_bytes));
-                hash.update(boost::multiprecision::cpp_int::encode_1363(domain.get_g_y(), p_bytes));
-                hash.update(boost::multiprecision::cpp_int::encode_1363(pubkey.get_affine_x(), p_bytes));
-                hash.update(boost::multiprecision::cpp_int::encode_1363(pubkey.get_affine_y(), p_bytes));
+                hash.update(boost::multiprecision::number<Backend, ExpressionTemplates>::encode_1363(domain.get_a(), p_bytes));
+                hash.update(boost::multiprecision::number<Backend, ExpressionTemplates>::encode_1363(domain.get_b(), p_bytes));
+                hash.update(boost::multiprecision::number<Backend, ExpressionTemplates>::encode_1363(domain.get_g_x(), p_bytes));
+                hash.update(boost::multiprecision::number<Backend, ExpressionTemplates>::encode_1363(domain.get_g_y(), p_bytes));
+                hash.update(boost::multiprecision::number<Backend, ExpressionTemplates>::encode_1363(pubkey.get_affine_x(), p_bytes));
+                hash.update(boost::multiprecision::number<Backend, ExpressionTemplates>::encode_1363(pubkey.get_affine_y(), p_bytes));
 
                 std::vector<uint8_t> za(hash.output_length());
                 hash.final(za.data());
@@ -86,27 +86,27 @@ namespace nil {
 
                 private:
                     const ec_group m_group;
-                    const boost::multiprecision::cpp_int &m_x;
-                    const boost::multiprecision::cpp_int &m_da_inv;
+                    const boost::multiprecision::number<Backend, ExpressionTemplates> &m_x;
+                    const boost::multiprecision::number<Backend, ExpressionTemplates> &m_da_inv;
 
                     std::vector<uint8_t> m_za;
                     std::unique_ptr<HashFunction> m_hash;
-                    std::vector<boost::multiprecision::cpp_int> m_ws;
+                    std::vector<boost::multiprecision::number<Backend, ExpressionTemplates>> m_ws;
                 };
 
                 secure_vector<uint8_t> sm2_signature_operation::sign(random_number_generator &rng) {
-                    const boost::multiprecision::cpp_int e = boost::multiprecision::cpp_int::decode(m_hash->final());
+                    const boost::multiprecision::number<Backend, ExpressionTemplates> e = boost::multiprecision::number<Backend, ExpressionTemplates>::decode(m_hash->final());
 
-                    const boost::multiprecision::cpp_int k = m_group.random_scalar(rng);
+                    const boost::multiprecision::number<Backend, ExpressionTemplates> k = m_group.random_scalar(rng);
 
-                    const boost::multiprecision::cpp_int r
+                    const boost::multiprecision::number<Backend, ExpressionTemplates> r
                         = m_group.mod_order(m_group.blinded_base_point_multiply_x(k, rng, m_ws) + e);
-                    const boost::multiprecision::cpp_int s = m_group.multiply_mod_order(m_da_inv, (k - r * m_x));
+                    const boost::multiprecision::number<Backend, ExpressionTemplates> s = m_group.multiply_mod_order(m_da_inv, (k - r * m_x));
 
                     // prepend ZA for next signature if any
                     m_hash->update(m_za);
 
-                    return boost::multiprecision::cpp_int::encode_fixed_length_int_pair(r, s,
+                    return boost::multiprecision::number<Backend, ExpressionTemplates>::encode_fixed_length_int_pair(r, s,
                                                                                         m_group.get_order().bytes());
                 }
 
@@ -138,7 +138,7 @@ namespace nil {
                 };
 
                 bool sm2_verification_operation::is_valid_signature(const uint8_t sig[], size_t sig_len) {
-                    const boost::multiprecision::cpp_int e = boost::multiprecision::cpp_int::decode(m_hash->final());
+                    const boost::multiprecision::number<Backend, ExpressionTemplates> e = boost::multiprecision::number<Backend, ExpressionTemplates>::decode(m_hash->final());
 
                     // Update for next verification
                     m_hash->update(m_za);
@@ -147,14 +147,14 @@ namespace nil {
                         return false;
                     }
 
-                    const boost::multiprecision::cpp_int r(sig, sig_len / 2);
-                    const boost::multiprecision::cpp_int s(sig + sig_len / 2, sig_len / 2);
+                    const boost::multiprecision::number<Backend, ExpressionTemplates> r(sig, sig_len / 2);
+                    const boost::multiprecision::number<Backend, ExpressionTemplates> s(sig + sig_len / 2, sig_len / 2);
 
                     if (r <= 0 || r >= m_group.get_order() || s <= 0 || s >= m_group.get_order()) {
                         return false;
                     }
 
-                    const boost::multiprecision::cpp_int t = m_group.mod_order(r + s);
+                    const boost::multiprecision::number<Backend, ExpressionTemplates> t = m_group.mod_order(r + s);
 
                     if (t == 0) {
                         return false;

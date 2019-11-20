@@ -35,8 +35,7 @@ macro(define_pubkey_test name)
     endif()
 endmacro()
 
-set(TESTS_NAMES
-    "ecdsa")
+set(TESTS_NAMES "ecdsa")
 
 foreach(TEST_NAME ${TESTS_NAMES})
     define_pubkey_test(${TEST_NAME})

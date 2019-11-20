@@ -11,8 +11,8 @@ namespace nil {
         namespace pubkey {
 
             std::vector<uint8_t> gost_3410_public_key::public_key_bits() const {
-                const boost::multiprecision::cpp_int x = public_point().get_affine_x();
-                const boost::multiprecision::cpp_int y = public_point().get_affine_y();
+                const boost::multiprecision::number<Backend, ExpressionTemplates> x = public_point().get_affine_x();
+                const boost::multiprecision::number<Backend, ExpressionTemplates> y = public_point().get_affine_y();
 
                 size_t part_size = std::max(x.bytes(), y.bytes());
 
@@ -60,8 +60,8 @@ namespace nil {
                     std::swap(bits[part_size + i], bits[2 * part_size - 1 - i]);
                 }
 
-                boost::multiprecision::cpp_int x(bits.data(), part_size);
-                boost::multiprecision::cpp_int y(&bits[part_size], part_size);
+                boost::multiprecision::number<Backend, ExpressionTemplates> x(bits.data(), part_size);
+                boost::multiprecision::number<Backend, ExpressionTemplates> y(&bits[part_size], part_size);
 
                 m_public_key = domain().point(x, y);
 
@@ -70,14 +70,14 @@ namespace nil {
 
             namespace {
 
-                boost::multiprecision::cpp_int decode_le(const uint8_t msg[], size_t msg_len) {
+                boost::multiprecision::number<Backend, ExpressionTemplates> decode_le(const uint8_t msg[], size_t msg_len) {
                     secure_vector<uint8_t> msg_le(msg, msg + msg_len);
 
                     for (size_t i = 0; i != msg_le.size() / 2; ++i) {
                         std::swap(msg_le[i], msg_le[msg_le.size() - 1 - i]);
                     }
 
-                    return boost::multiprecision::cpp_int(msg_le.data(), msg_le.size());
+                    return boost::multiprecision::number<Backend, ExpressionTemplates>(msg_le.data(), msg_le.size());
                 }
 
                 /**
@@ -99,32 +99,32 @@ namespace nil {
 
                 private:
                     const ec_group m_group;
-                    const boost::multiprecision::cpp_int &m_x;
-                    std::vector<boost::multiprecision::cpp_int> m_ws;
+                    const boost::multiprecision::number<Backend, ExpressionTemplates> &m_x;
+                    std::vector<boost::multiprecision::number<Backend, ExpressionTemplates>> m_ws;
                 };
 
                 secure_vector<uint8_t> GOST_3410_Signature_Operation::raw_sign(const uint8_t msg[], size_t msg_len,
                                                                                random_number_generator &rng) {
-                    const boost::multiprecision::cpp_int k = m_group.random_scalar(rng);
+                    const boost::multiprecision::number<Backend, ExpressionTemplates> k = m_group.random_scalar(rng);
 
-                    boost::multiprecision::cpp_int e = decode_le(msg, msg_len);
+                    boost::multiprecision::number<Backend, ExpressionTemplates> e = decode_le(msg, msg_len);
 
                     e = m_group.mod_order(e);
                     if (e == 0) {
                         e = 1;
                     }
 
-                    const boost::multiprecision::cpp_int r
+                    const boost::multiprecision::number<Backend, ExpressionTemplates> r
                         = m_group.mod_order(m_group.blinded_base_point_multiply_x(k, rng, m_ws));
 
-                    const boost::multiprecision::cpp_int s
+                    const boost::multiprecision::number<Backend, ExpressionTemplates> s
                         = m_group.mod_order(m_group.multiply_mod_order(r, m_x) + m_group.multiply_mod_order(k, e));
 
                     if (r == 0 || s == 0) {
                         throw internal_error("GOST 34.10 signature generation failed, r/s equal to zero");
                     }
 
-                    return boost::multiprecision::cpp_int::encode_fixed_length_int_pair(s, r,
+                    return boost::multiprecision::number<Backend, ExpressionTemplates>::encode_fixed_length_int_pair(s, r,
                                                                                         m_group.get_order_bytes());
                 }
 
@@ -159,25 +159,25 @@ namespace nil {
                         return false;
                     }
 
-                    const boost::multiprecision::cpp_int s(sig, sig_len / 2);
-                    const boost::multiprecision::cpp_int r(sig + sig_len / 2, sig_len / 2);
+                    const boost::multiprecision::number<Backend, ExpressionTemplates> s(sig, sig_len / 2);
+                    const boost::multiprecision::number<Backend, ExpressionTemplates> r(sig + sig_len / 2, sig_len / 2);
 
-                    const boost::multiprecision::cpp_int &order = m_group.get_order();
+                    const boost::multiprecision::number<Backend, ExpressionTemplates> &order = m_group.get_order();
 
                     if (r <= 0 || r >= order || s <= 0 || s >= order) {
                         return false;
                     }
 
-                    boost::multiprecision::cpp_int e = decode_le(msg, msg_len);
+                    boost::multiprecision::number<Backend, ExpressionTemplates> e = decode_le(msg, msg_len);
                     e = m_group.mod_order(e);
                     if (e == 0) {
                         e = 1;
                     }
 
-                    const boost::multiprecision::cpp_int v = inverse_mod(e, order);
+                    const boost::multiprecision::number<Backend, ExpressionTemplates> v = inverse_mod(e, order);
 
-                    const boost::multiprecision::cpp_int z1 = m_group.multiply_mod_order(s, v);
-                    const boost::multiprecision::cpp_int z2 = m_group.multiply_mod_order(-r, v);
+                    const boost::multiprecision::number<Backend, ExpressionTemplates> z1 = m_group.multiply_mod_order(s, v);
+                    const boost::multiprecision::number<Backend, ExpressionTemplates> z2 = m_group.multiply_mod_order(-r, v);
 
                     const point_gfp R = m_group.point_multiply(z1, m_public_point, z2);
 

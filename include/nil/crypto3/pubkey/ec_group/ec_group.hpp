@@ -446,8 +446,8 @@ namespace nil {
                     // compute the discriminant: 4*a^3 + 27*b^2 which must be nonzero
                     const modular_reducer mod_p(p);
 
-                    const number_type discriminant
-                        = mod_p.reduce(mod_p.multiply(4, mod_p.cube(a)) + mod_p.multiply(27, mod_p.square(b)));
+                    const number_type discriminant =
+                        mod_p.reduce(mod_p.multiply(4, mod_p.cube(a)) + mod_p.multiply(27, mod_p.square(b)));
 
                     if (discriminant == 0) {
                         return false;
@@ -478,8 +478,8 @@ namespace nil {
                      * No point comparing order/cofactor as they are uniquely determined
                      * by the curve equation (p,a,b) and the base point.
                      */
-                    return (get_p() == other.get_p() && get_a() == other.get_a() && get_b() == other.get_b()
-                            && get_g_x() == other.get_g_x() && get_g_y() == other.get_g_y());
+                    return (get_p() == other.get_p() && get_a() == other.get_a() && get_b() == other.get_b() &&
+                            get_g_x() == other.get_g_x() && get_g_y() == other.get_g_y());
                 }
 
                 /**

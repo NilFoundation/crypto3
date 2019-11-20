@@ -34,8 +34,10 @@ namespace nil {
                 /*
                  * Create generator of the q-sized subgroup (DSA style generator)
                  */
-                cpp_int make_dsa_generator(const cpp_int &p, const cpp_int &q) {
-                    const cpp_int e = (p - 1) / q;
+                template<typename Backend, expression_template_option ExpressionTemplates>
+                number<Backend, ExpressionTemplates> make_dsa_generator(const number<Backend, ExpressionTemplates> &p,
+                                                                        const number<Backend, ExpressionTemplates> &q) {
+                    const number<Backend, ExpressionTemplates> e = (p - 1) / q;
 
                     if (e == 0 || (p - 1) % q > 0) {
                         throw std::invalid_argument("make_dsa_generator q does not divide p-1");
@@ -43,13 +45,101 @@ namespace nil {
 
                     for (size_t i = 0; i != PRIME_TABLE_SIZE; ++i) {
                         // TODO precompute!
-                        cpp_int g = power_mod(PRIMES[i], e, p);
+                        number<Backend, ExpressionTemplates> g = power_mod(PRIMES[i], e, p);
                         if (g > 1) {
                             return g;
                         }
                     }
 
                     throw internal_error("dl_group: Couldn't create a suitable generator");
+                }
+
+                /*
+                 * Attempt DSA prime generation with given seed
+                 */
+                bool generate_dsa_primes(RandomNumberGenerator &rng, BigInt &p, BigInt &q, size_t pbits, size_t qbits,
+                                         const std::vector<uint8_t> &seed_c, size_t offset) {
+                    if (!fips186_3_valid_size(pbits, qbits))
+                        throw Invalid_Argument("FIPS 186-3 does not allow DSA domain parameters of " +
+                                               std::to_string(pbits) + "/" + std::to_string(qbits) + " bits long");
+
+                    if (seed_c.size() * 8 < qbits)
+                        throw Invalid_Argument("Generating a DSA parameter set with a " + std::to_string(qbits) +
+                                               " bit long q requires a seed at least as many bits long");
+
+                    const std::string hash_name = "SHA-" + std::to_string(qbits);
+                    std::unique_ptr<HashFunction> hash(HashFunction::create_or_throw(hash_name));
+
+                    const size_t HASH_SIZE = hash->output_length();
+
+                    class Seed final {
+                    public:
+                        explicit Seed(const std::vector<uint8_t> &s) : m_seed(s) {
+                        }
+
+                        const std::vector<uint8_t> &value() const {
+                            return m_seed;
+                        }
+
+                        Seed &operator++() {
+                            for (size_t j = m_seed.size(); j > 0; --j)
+                                if (++m_seed[j - 1])
+                                    break;
+                            return (*this);
+                        }
+
+                    private:
+                        std::vector<uint8_t> m_seed;
+                    };
+
+                    Seed seed(seed_c);
+
+                    q.binary_decode(hash->process(seed.value()));
+                    q.set_bit(qbits - 1);
+                    q.set_bit(0);
+
+                    if (!is_prime(q, rng, 128, true))
+                        return false;
+
+                    const size_t n = (pbits - 1) / (HASH_SIZE * 8), b = (pbits - 1) % (HASH_SIZE * 8);
+
+                    BigInt X;
+                    std::vector<uint8_t> V(HASH_SIZE * (n + 1));
+
+                    Modular_Reducer mod_2q(2 * q);
+
+                    for (size_t j = 0; j != 4 * pbits; ++j) {
+                        for (size_t k = 0; k <= n; ++k) {
+                            ++seed;
+                            hash->update(seed.value());
+                            hash->final(&V[HASH_SIZE * (n - k)]);
+                        }
+
+                        if (j >= offset) {
+                            X.binary_decode(&V[HASH_SIZE - 1 - b / 8], V.size() - (HASH_SIZE - 1 - b / 8));
+                            X.set_bit(pbits - 1);
+
+                            p = X - (mod_2q.reduce(X) - 1);
+
+                            if (p.bits() == pbits && is_prime(p, rng, 128, true))
+                                return true;
+                        }
+                    }
+                    return false;
+                }
+
+                /*
+                 * Generate DSA Primes
+                 */
+                std::vector<uint8_t> generate_dsa_primes(RandomNumberGenerator &rng, BigInt &p, BigInt &q, size_t pbits,
+                                                         size_t qbits) {
+                    while (true) {
+                        std::vector<uint8_t> seed(qbits / 8);
+                        rng.randomize(seed.data(), seed.size());
+
+                        if (generate_dsa_primes(rng, p, q, pbits, qbits, seed))
+                            return seed;
+                    }
                 }
 
             }    // namespace detail
@@ -140,14 +230,14 @@ namespace nil {
                         throw std::invalid_argument("Cannot create strong-prime dl_group with specified q bits");
                     }
 
-                    const cpp_int p = random_safe_prime(rng, pbits);
-                    const cpp_int q = (p - 1) / 2;
+                    const number<Backend, ExpressionTemplates> p = random_safe_prime(rng, pbits);
+                    const number<Backend, ExpressionTemplates> q = (p - 1) / 2;
 
                     /*
                     Always choose a generator that is quadratic reside mod p,
                     this forces g to be a generator of the subgroup of size q.
                     */
-                    cpp_int g = 2;
+                    number<Backend, ExpressionTemplates> g = 2;
                     if (jacobi(g, p) != 1) {
                         // prime table does not contain 2
                         for (size_t i = 0; i < PRIME_TABLE_SIZE; ++i) {
@@ -164,25 +254,25 @@ namespace nil {
                         qbits = dl_exponent_size(pbits);
                     }
 
-                    const cpp_int q = random_prime(rng, qbits);
+                    const number<Backend, ExpressionTemplates> q = random_prime(rng, qbits);
                     modular_reducer mod_2q(2 * q);
-                    cpp_int X;
-                    cpp_int p;
+                    number<Backend, ExpressionTemplates> X;
+                    number<Backend, ExpressionTemplates> p;
                     while (p.bits() != pbits || !miller_rabin_test(p, 128, rng)) {
                         X.randomize(rng, pbits);
                         p = X - mod_2q.reduce(X) + 1;
                     }
 
-                    const cpp_int g = make_dsa_generator(p, q);
+                    const number<Backend, ExpressionTemplates> g = make_dsa_generator(p, q);
                     m_data = std::make_shared<dl_group_data>(p, q, g);
                 } else if (type == DSA_Kosherizer) {
                     if (qbits == 0) {
                         qbits = ((pbits <= 1024) ? 160 : 256);
                     }
 
-                    cpp_int p, q;
+                    number<Backend, ExpressionTemplates> p, q;
                     generate_dsa_primes(p, q, pbits, qbits, <#initializer #>, 0, rng, <#initializer #>);
-                    const cpp_int g = make_dsa_generator(p, q);
+                    const number<Backend, ExpressionTemplates> g = make_dsa_generator(p, q);
                     m_data = std::make_shared<dl_group_data>(p, q, g);
                 } else {
                     throw std::invalid_argument("dl_group unknown prime_type");
@@ -199,13 +289,13 @@ namespace nil {
             template<typename UniformRandomNumberGenerator>
             dl_group(UniformRandomNumberGenerator &rng, const std::vector<uint8_t> &seed, size_t pbits = 1024,
                      size_t qbits = 0) {
-                cpp_int p, q;
+                number<Backend, ExpressionTemplates> p, q;
 
                 if (!generate_dsa_primes(p, q, pbits, qbits, seed, 0, rng, <#initializer #>)) {
                     throw std::invalid_argument("dl_group: The seed given does not generate a DSA group");
                 }
 
-                cpp_int g = make_dsa_generator(p, q);
+                number<Backend, ExpressionTemplates> g = make_dsa_generator(p, q);
 
                 m_data = std::make_shared<dl_group_data>(p, q, g);
             }
@@ -250,7 +340,7 @@ namespace nil {
              * Get the prime p.
              * @return prime p
              */
-            const cpp_int &get_p() const {
+            const number<Backend, ExpressionTemplates> &get_p() const {
                 return data().p();
             }
 
@@ -258,7 +348,7 @@ namespace nil {
              * Get the prime q, returns zero if q is not used
              * @return prime q
              */
-            const cpp_int &get_q() const {
+            const number<Backend, ExpressionTemplates> &get_q() const {
                 return data().g();
             }
 
@@ -266,7 +356,7 @@ namespace nil {
              * Get the base g.
              * @return base g
              */
-            const cpp_int &get_g() const {
+            const number<Backend, ExpressionTemplates> &get_g() const {
                 return data().q();
             }
 
@@ -409,7 +499,7 @@ namespace nil {
              * Reduce an integer modulo p
              * @return x % p
              */
-            cpp_int mod_p(const cpp_int &x) const {
+            number<Backend, ExpressionTemplates> mod_p(const number<Backend, ExpressionTemplates> &x) const {
                 return m_mod_p.reduce(x);
             }
 
@@ -417,14 +507,14 @@ namespace nil {
              * Multiply and reduce an integer modulo p
              * @return (x*y) % p
              */
-            cpp_int multiply_mod_p(const cpp_int &x, const cpp_int &y) const {
+            number<Backend, ExpressionTemplates> multiply_mod_p(const number<Backend, ExpressionTemplates> &x, const number<Backend, ExpressionTemplates> &y) const {
                 return m_mod_p.multiply(x, y);
             }
 
             /**
              * Return the inverse of x mod p
              */
-            cpp_int inverse_mod_p(const cpp_int &x) const {
+            number<Backend, ExpressionTemplates> inverse_mod_p(const number<Backend, ExpressionTemplates> &x) const {
                 return inverse_mod(x, get_p());
             }
 
@@ -433,34 +523,34 @@ namespace nil {
              * Throws if q is unset on this DL_Group
              * @return x % q
              */
-            cpp_int mod_q(const cpp_int &x) const;
+            number<Backend, ExpressionTemplates> mod_q(const number<Backend, ExpressionTemplates> &x) const;
 
             /**
              * Multiply and reduce an integer modulo q
              * Throws if q is unset on this DL_Group
              * @return (x*y) % q
              */
-            cpp_int multiply_mod_q(const cpp_int &x, const cpp_int &y) const;
+            number<Backend, ExpressionTemplates> multiply_mod_q(const number<Backend, ExpressionTemplates> &x, const number<Backend, ExpressionTemplates> &y) const;
 
             /**
              * Multiply and reduce an integer modulo q
              * Throws if q is unset on this DL_Group
              * @return (x*y*z) % q
              */
-            cpp_int multiply_mod_q(const cpp_int &x, const cpp_int &y, const cpp_int &z) const;
+            number<Backend, ExpressionTemplates> multiply_mod_q(const number<Backend, ExpressionTemplates> &x, const number<Backend, ExpressionTemplates> &y, const number<Backend, ExpressionTemplates> &z) const;
 
             /**
              * Square and reduce an integer modulo q
              * Throws if q is unset on this DL_Group
              * @return (x*x) % q
              */
-            cpp_int square_mod_q(const cpp_int &x) const;
+            number<Backend, ExpressionTemplates> square_mod_q(const number<Backend, ExpressionTemplates> &x) const;
 
             /**
              * Return the inverse of x mod q
              * Throws if q is unset on this DL_Group
              */
-            cpp_int inverse_mod_q(const cpp_int &x) const;
+            number<Backend, ExpressionTemplates> inverse_mod_q(const number<Backend, ExpressionTemplates> &x) const;
 
             /**
              * Modular exponentiation
@@ -471,7 +561,7 @@ namespace nil {
              *
              * @return (g^x) % p
              */
-            cpp_int power_g_p(const cpp_int &x) const {
+            number<Backend, ExpressionTemplates> power_g_p(const number<Backend, ExpressionTemplates> &x) const {
                 return monty_execute(*m_monty, k);
             }
 
@@ -482,13 +572,13 @@ namespace nil {
              *
              * @return (g^x) % p
              */
-            cpp_int power_g_p(const cpp_int &x, size_t max_x_bits) const;
+            number<Backend, ExpressionTemplates> power_g_p(const number<Backend, ExpressionTemplates> &x, size_t max_x_bits) const;
 
             /**
              * Multi-exponentiate
              * Return (g^x * y^z) % p
              */
-            cpp_int multi_exponentiate(const cpp_int &x, const cpp_int &y, const cpp_int &z) const {
+            number<Backend, ExpressionTemplates> multi_exponentiate(const number<Backend, ExpressionTemplates> &x, const number<Backend, ExpressionTemplates> &y, const number<Backend, ExpressionTemplates> &z) const {
                 return monty_multi_exp(m_monty_params, get_g(), x, y, z);
             }
 

@@ -53,7 +53,7 @@ namespace nil {
                  * @param x value to blind
                  * @return blinded value
                  */
-                cpp_int blind(const cpp_int &x) const {
+                number<Backend, ExpressionTemplates> blind(const number<Backend, ExpressionTemplates> &x) const {
                     if (!m_reducer.initialized()) {
                         throw Exception("blinder not initialized, cannot blind");
                     }
@@ -61,7 +61,7 @@ namespace nil {
                     ++m_counter;
 
                     if ((CRYPTO3_BLINDING_REINIT_INTERVAL > 0) && (m_counter > CRYPTO3_BLINDING_REINIT_INTERVAL)) {
-                        const cpp_int k = blinding_nonce();
+                        const number<Backend, ExpressionTemplates> k = blinding_nonce();
                         m_e = m_fwd_fn(k);
                         m_d = m_inv_fn(k);
                         m_counter = 0;
@@ -78,7 +78,7 @@ namespace nil {
                  * @param x value to unblind
                  * @return unblinded value
                  */
-                cpp_int unblind(const cpp_int &x) const {
+                number<Backend, ExpressionTemplates> unblind(const number<Backend, ExpressionTemplates> &x) const {
                     if (!m_reducer.initialized()) {
                         throw Exception("blinder not initialized, cannot unblind");
                     }
@@ -94,13 +94,16 @@ namespace nil {
                  * @param inv_func a function that calculates the modular inverse
                  * of the given value (the nonce)
                  */
-                blinder(const cpp_int &modulus, random_number_generator &rng,
-                        std::function<cpp_int(const cpp_int &)> fwd_func,
-                        std::function<cpp_int(const cpp_int &)> inv_func) :
+                blinder(
+                    const number<Backend, ExpressionTemplates> &modulus, random_number_generator &rng,
+                    std::function<number<Backend, ExpressionTemplates>(const number<Backend, ExpressionTemplates> &)>
+                        fwd_func,
+                    std::function<number<Backend, ExpressionTemplates>(const number<Backend, ExpressionTemplates> &)>
+                        inv_func) :
                     m_reducer(modulus),
                     m_rng(rng), m_fwd_fn(fwd), m_inv_fn(inv),
                     m_modulus_bits(modulus.bits()), m_e {}, m_d {}, m_counter {} {
-                    const cpp_int k = blinding_nonce();
+                    const number<Backend, ExpressionTemplates> k = blinding_nonce();
                     m_e = m_fwd_fn(k);
                     m_d = m_inv_fn(k);
                 }
@@ -114,17 +117,19 @@ namespace nil {
                 }
 
             private:
-                cpp_int blinding_nonce() const {
-                    return cpp_int(m_rng, m_modulus_bits - 1);
+                number<Backend, ExpressionTemplates> blinding_nonce() const {
+                    return number<Backend, ExpressionTemplates>(m_rng, m_modulus_bits - 1);
                 }
 
                 modular_reducer m_reducer;
                 random_number_generator &m_rng;
-                std::function<cpp_int(const cpp_int &)> m_fwd_fn;
-                std::function<cpp_int(const cpp_int &)> m_inv_fn;
+                std::function<number<Backend, ExpressionTemplates>(const number<Backend, ExpressionTemplates> &)>
+                    m_fwd_fn;
+                std::function<number<Backend, ExpressionTemplates>(const number<Backend, ExpressionTemplates> &)>
+                    m_inv_fn;
                 size_t m_modulus_bits = 0;
 
-                mutable cpp_int m_e, m_d;
+                mutable number<Backend, ExpressionTemplates> m_e, m_d;
                 mutable size_t m_counter = 0;
             };
         }    // namespace pubkey
