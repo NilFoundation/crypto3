@@ -45,15 +45,15 @@ namespace nil {
                     return m_a_is_minus_3;
                 }
 
-                const number_type &get_a() const override {
+                const number_type &a() const override {
                     return m_a;
                 }
 
-                const number_type &get_b() const override {
+                const number_type &b() const override {
                     return m_b;
                 }
 
-                const number_type &get_p() const override {
+                const number_type &p() const override {
                     return m_p;
                 }
 

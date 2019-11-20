@@ -33,11 +33,11 @@ namespace nil {
 
                 virtual ~curve_gfp() = default;
 
-                virtual const number_type &get_p() const = 0;
+                virtual const number_type &p() const = 0;
 
-                virtual const number_type &get_a() const = 0;
+                virtual const number_type &a() const = 0;
 
-                virtual const number_type &get_b() const = 0;
+                virtual const number_type &b() const = 0;
 
                 virtual size_t get_p_words() const = 0;
 
@@ -91,7 +91,7 @@ namespace nil {
 
                 template<typename NumberType1>
                 inline bool operator==(const curve_gfp<NumberType1> &other) const {
-                    return get_p() == other.get_p() && get_a() == other.get_a() && get_b() == other.get_b();
+                    return p() == other.p() && a() == other.a() && b() == other.b();
                 }
             };
 

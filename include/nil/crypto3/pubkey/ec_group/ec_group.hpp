@@ -143,8 +143,8 @@ namespace nil {
                             .encode(get_p())
                             .end_cons()
                             .start_cons(SEQUENCE)
-                            .encode(number_type::encode_1363(get_a(), p_bytes), OCTET_STRING)
-                            .encode(number_type::encode_1363(get_b(), p_bytes), OCTET_STRING)
+                            .encode(number_type::encode_1363(a(), p_bytes), OCTET_STRING)
+                            .encode(number_type::encode_1363(b(), p_bytes), OCTET_STRING)
                             .end_cons()
                             .encode(get_base_point().encode(point_gfp<CurveType>::UNCOMPRESSED), OCTET_STRING)
                             .encode(get_order())
@@ -187,12 +187,12 @@ namespace nil {
                 bool a_is_zero() const;
 
                 /**
-                 * Return the size of p in bits (same as get_p().bits())
+                 * Return the size of p in bits (same as p().bits())
                  */
                 size_t get_p_bits() const;
 
                 /**
-                 * Return the size of p in bits (same as get_p().bytes())
+                 * Return the size of p in bits (same as p().bytes())
                  */
                 size_t get_p_bytes() const;
 
@@ -209,17 +209,17 @@ namespace nil {
                 /**
                  * Return the prime modulus of the field
                  */
-                const number_type &get_p() const;
+                const number_type &p() const;
 
                 /**
                  * Return the a parameter of the elliptic curve equation
                  */
-                const number_type &get_a() const;
+                const number_type &a() const;
 
                 /**
                  * Return the b parameter of the elliptic curve equation
                  */
-                const number_type &get_b() const;
+                const number_type &b() const;
 
                 /**
                  * Return group base point
@@ -282,35 +282,27 @@ namespace nil {
                  */
                 bool verify_public_element(const point_gfp<curve_type> &y) const {
                     // check that public point is not at infinity
-                    if (point == 0) {
+                    if (y == 0) {
                         return false;
                     }
 
                     // check that public point is on the curve
-                    if (!point.on_the_curve()) {
+                    if (!y.on_the_curve()) {
                         return false;
                     }
 
                     // check that public point has order q
-                    if (!(point * get_order()) == 0) {
+                    if (!(y * get_order()) == 0) {
                         return false;
                     }
 
                     if (get_cofactor() > 1) {
-                        if ((point * get_cofactor()) == 0) {
+                        if ((y * get_cofactor()) == 0) {
                             return false;
                         }
                     }
 
                     return true;
-                }
-
-                /**
-                 * Return the oid_t of these domain parameters
-                 * @result the oid_t as a string
-                 */
-                std::string CRYPTO3_DEPRECATED("Use get_curve_oid") get_oid() const {
-                    return get_curve_oid().as_string();
                 }
 
                 /**
@@ -328,9 +320,9 @@ namespace nil {
                  * Multi exponentiate. Not constant time.
                  * @return base_point*x + pt*y
                  */
-                point_gfp<curve_type> point_multiply(const number_type &x, const point_gfp<CurveType> &pt,
+                point_gfp<curve_type> point_multiply(const number_type &x, const point_gfp<curve_type> &pt,
                                                      const number_type &y) const {
-                    point_gfp_multi_point_precompute xy_mul(get_base_point(), pt);
+                    point_gfp_multi_point_precompute<curve_type, number_type> xy_mul(get_base_point(), pt);
                     return xy_mul.multi_exp(x, y);
                 }
 
@@ -417,9 +409,9 @@ namespace nil {
                  */
                 template<typename UniformRandomGenerator>
                 bool verify_group(UniformRandomGenerator &rng, bool strong = false) const {
-                    const number_type &p = get_p();
-                    const number_type &a = get_a();
-                    const number_type &b = get_b();
+                    const number_type &p = p();
+                    const number_type &a = a();
+                    const number_type &b = b();
                     const number_type &order = get_order();
                     const point_gfp<CurveType> &base_point = get_base_point();
 
@@ -478,7 +470,7 @@ namespace nil {
                      * No point comparing order/cofactor as they are uniquely determined
                      * by the curve equation (p,a,b) and the base point.
                      */
-                    return (get_p() == other.get_p() && get_a() == other.get_a() && get_b() == other.get_b() &&
+                    return (p() == other.p() && a() == other.a() && b() == other.b() &&
                             get_g_x() == other.get_g_x() && get_g_y() == other.get_g_y());
                 }
 

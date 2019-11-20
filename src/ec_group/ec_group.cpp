@@ -41,15 +41,15 @@ namespace nil {
                 }
 
                 const number_type &p() const {
-                    return m_curve.get_p();
+                    return m_curve.p();
                 }
 
                 const number_type &a() const {
-                    return m_curve.get_a();
+                    return m_curve.a();
                 }
 
                 const number_type &b() const {
-                    return m_curve.get_b();
+                    return m_curve.b();
                 }
 
                 const number_type &order() const {
@@ -362,16 +362,16 @@ namespace nil {
                 return data().order_bytes();
             }
 
-            const number_type &ec_group::get_p() const {
-                return m_curve.get_p();
+            const number_type &ec_group::p() const {
+                return m_curve.p();
             }
 
-            const number_type &ec_group::get_a() const {
-                return m_curve.get_a();
+            const number_type &ec_group::a() const {
+                return m_curve.a();
             }
 
-            const number_type &ec_group::get_b() const {
-                return m_curve.get_b();
+            const number_type &ec_group::b() const {
+                return m_curve.b();
             }
 
             const point_gfp &ec_group::get_base_point() const {

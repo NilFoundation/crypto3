@@ -340,7 +340,7 @@ namespace nil {
              * Get the prime p.
              * @return prime p
              */
-            const number<Backend, ExpressionTemplates> &get_p() const {
+            const number<Backend, ExpressionTemplates> &p() const {
                 return data().p();
             }
 
@@ -368,7 +368,7 @@ namespace nil {
              */
             template<typename UniformRandomGenerator>
             bool verify_group(UniformRandomGenerator &rng, bool strong = true) const {
-                const number_type &p = get_p();
+                const number_type &p = p();
                 const number_type &q = get_q();
                 const number_type &g = get_g();
 
@@ -401,7 +401,7 @@ namespace nil {
              */
             template<typename Backend, expression_template_option ExpressionTemplates>
             bool verify_public_element(const number<Backend, ExpressionTemplates> &y) const {
-                const number_type &p = get_p();
+                const number_type &p = p();
                 const number_type &q = get_q();
 
                 if (y <= 1 || y >= p) {
@@ -425,7 +425,7 @@ namespace nil {
             template<typename Backend, expression_template_option ExpressionTemplates>
             bool verify_element_pair(const number<Backend, ExpressionTemplates> &y,
                                      const number<Backend, ExpressionTemplates> &x) const {
-                const number_type &p = get_p();
+                const number_type &p = p();
 
                 if (y <= 1 || y >= p || x <= 1 || x >= p) {
                     return false;
@@ -591,7 +591,7 @@ namespace nil {
 
             /**
              * Return the size of p in bits
-             * Same as get_p().bits()
+             * Same as p().bits()
              */
             size_t p_bits() const {
                 return m_p_bits;
@@ -599,7 +599,7 @@ namespace nil {
 
             /**
              * Return the size of p in bytes
-             * Same as get_p().bytes()
+             * Same as p().bytes()
              */
             size_t p_bytes() const {
                 return (m_p_bits + 7) / 8;

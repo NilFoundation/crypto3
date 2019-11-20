@@ -85,6 +85,7 @@ namespace nil {
                  * @param domain parameters to used for this key
                  * @param x the private key (if zero, generate a new random key)
                  */
+                template<typename Backend, expression_template_option ExpressionTemplates>
                 eckcdsa_private_key(random_number_generator &rng, const ec_group<CurveType, NumberType> &domain,
                                     const number<Backend, ExpressionTemplates> &x = 0) :
                     ec_private_key<CurveType, NumberType>(rng, domain, x, true) {

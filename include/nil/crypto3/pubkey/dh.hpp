@@ -46,6 +46,7 @@ namespace nil {
                  * @param grp the DL group to use in the key
                  * @param y the public value y
                  */
+                template<typename Backend, expression_template_option ExpressionTemplates>
                 dh_public_key(const dl_group &grp, const number<Backend, ExpressionTemplates> &y) {
                     m_group = grp;
                     m_y = y;
@@ -84,6 +85,8 @@ namespace nil {
                  * @param grp the group to be used in the key
                  * @param x the key's secret value (or if zero, generate a new key)
                  */
+                template<typename UniformRandomGenerator, typename Backend,
+                         expression_template_option ExpressionTemplates>
                 dh_private_key(random_number_generator &rng, const dl_group &grp,
                                const number<Backend, ExpressionTemplates> &x = number<Backend, ExpressionTemplates>()) {
                     m_group = grp;

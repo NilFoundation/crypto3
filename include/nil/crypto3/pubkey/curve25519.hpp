@@ -114,7 +114,8 @@ namespace nil {
                  * Generate a private key.
                  * @param rng the RNG to use
                  */
-                explicit curve25519_private_key(random_number_generator &rng) {
+                template<typename UniformRandomGenerator>
+                explicit curve25519_private_key(UniformRandomGenerator &rng) {
                     m_private = rng.random_vec(32);
                     m_public.resize(32);
                     curve25519_basepoint(m_public.data(), m_private.data());

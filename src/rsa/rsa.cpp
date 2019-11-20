@@ -194,7 +194,7 @@ namespace nil {
 
                     explicit rsa_private_operation(const rsa_private_key &rsa, random_number_generator &rng) :
                         m_key(rsa), m_mod_p(m_key.get_p()), m_mod_q(m_key.get_q()),
-                        m_monty_p(std::make_shared<montgomery_params>(m_key.get_p(), m_mod_p)),
+                        m_monty_p(std::make_shared<montgomery_params>(m_key.p(), m_mod_p)),
                         m_monty_q(std::make_shared<montgomery_params>(m_key.get_q(), m_mod_q)),
                         m_powermod_e_n(m_key.get_e(), m_key.get_n()),
                         m_blinder(
@@ -218,7 +218,7 @@ namespace nil {
                         const number<Backend, ExpressionTemplates> d1_mask(m_blinder.rng(), exp_blinding_bits);
                         const number<Backend, ExpressionTemplates> d2_mask(m_blinder.rng(), exp_blinding_bits);
 
-                        const number<Backend, ExpressionTemplates> masked_d1 = m_key.get_d1() + (d1_mask * (m_key.get_p() - 1));
+                        const number<Backend, ExpressionTemplates> masked_d1 = m_key.get_d1() + (d1_mask * (m_key.p() - 1));
                         const number<Backend, ExpressionTemplates> masked_d2 = m_key.get_d2() + (d2_mask * (m_key.get_q() - 1));
 
 #if defined(CRYPTO3_TARGET_OS_HAS_THREADS)

@@ -116,7 +116,7 @@ namespace nil {
                     pk_operations::decryption_with_eme(eme),
                     m_group(key.get_group()), m_powermod_x_p(key.get_x(), m_group.get_p()),
                     m_blinder(
-                        m_group.get_p(), rng, [](const number<Backend, ExpressionTemplates> &k) { return k; },
+                        m_group.p(), rng, [](const number<Backend, ExpressionTemplates> &k) { return k; },
                         [this](const number<Backend, ExpressionTemplates> &k) { return m_powermod_x_p(k); }) {
                 }
 
@@ -130,7 +130,7 @@ namespace nil {
                     number<Backend, ExpressionTemplates> a(msg, p_bytes);
                     const number<Backend, ExpressionTemplates> b(msg + p_bytes, p_bytes);
 
-                    if (a >= m_group.get_p() || b >= m_group.get_p()) {
+                    if (a >= m_group.p() || b >= m_group.get_p()) {
                         throw std::invalid_argument("ElGamal decryption: Invalid message");
                     }
 

@@ -161,7 +161,7 @@ namespace nil {
              */
             point_gfp<CurveType> &negate() {
                 if (!is_zero()) {
-                    m_coord_y = m_curve.get_p() - m_coord_y;
+                    m_coord_y = m_curve.p() - m_coord_y;
                 }
                 return *this;
             }
@@ -477,7 +477,7 @@ namespace nil {
                 https://hyperelliptic.org/EFD/g1p/auto-shortw-jacobian-3.html#addition-add-1998-cmo-2
                 */
 
-                const number<Backend, ExpressionTemplates> &p = m_curve.get_p();
+                const number<Backend, ExpressionTemplates> &p = m_curve.p();
 
                 m_curve.sqr(T0, z_words, z_size, ws);        // z2^2
                 m_curve.mul(T1, m_coord_x, T0, ws);          // x1*z2^2
@@ -581,7 +581,7 @@ namespace nil {
                     simplified with Z2 = 1
                 */
 
-                const number<Backend, ExpressionTemplates> &p = m_curve.get_p();
+                const number<Backend, ExpressionTemplates> &p = m_curve.p();
 
                 m_curve.sqr(T3, m_coord_z, ws);              // z1^2
                 m_curve.mul(T4, x_words, x_size, T3, ws);    // x2*z1^2
@@ -657,7 +657,7 @@ namespace nil {
                 /*
                 https://hyperelliptic.org/EFD/g1p/auto-shortw-jacobian-3.html#doubling-dbl-1986-cc
                 */
-                const number<Backend, ExpressionTemplates> &p = m_curve.get_p();
+                const number<Backend, ExpressionTemplates> &p = m_curve.p();
 
                 m_curve.sqr(T0, m_coord_y, ws);
 

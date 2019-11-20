@@ -3,13 +3,13 @@
 namespace nil {
     namespace crypto3 {
 
-// encoding and decoding
+        // encoding and decoding
         std::vector<uint8_t> point_gfp::encode(point_gfp::compression_type format) const {
             if (is_zero()) {
                 return std::vector<uint8_t>(1);
-            } // single 0 byte
+            }    // single 0 byte
 
-            const size_t p_bytes = m_curve.get_p().bytes();
+            const size_t p_bytes = m_curve.p().bytes();
 
             const number<Backend, ExpressionTemplates> x = get_affine_x();
             const number<Backend, ExpressionTemplates> y = get_affine_y();
@@ -39,8 +39,11 @@ namespace nil {
 
         namespace {
 
-            number<Backend, ExpressionTemplates> decompress_point(bool yMod2, const number<Backend, ExpressionTemplates> &x, const number<Backend, ExpressionTemplates> &curve_p, const number<Backend, ExpressionTemplates> &curve_a,
-                                     const number<Backend, ExpressionTemplates> &curve_b) {
+            number<Backend, ExpressionTemplates> decompress_point(bool yMod2,
+                                                                  const number<Backend, ExpressionTemplates> &x,
+                                                                  const number<Backend, ExpressionTemplates> &curve_p,
+                                                                  const number<Backend, ExpressionTemplates> &curve_a,
+                                                                  const number<Backend, ExpressionTemplates> &curve_b) {
                 number<Backend, ExpressionTemplates> xpow3 = x * x * x;
 
                 number<Backend, ExpressionTemplates> g = curve_a * x;
@@ -61,15 +64,16 @@ namespace nil {
                 return z;
             }
 
-        }
+        }    // namespace
 
         point_gfp os2ecp(const uint8_t data[], size_t data_len, const curve_gfp &curve) {
             // Should we really be doing this?
             if (data_len <= 1) {
                 return point_gfp(curve);
-            } // return zero
+            }    // return zero
 
-            std::pair<number<Backend, ExpressionTemplates>, number<Backend, ExpressionTemplates>> xy = os2ecp(data, data_len, curve.get_p(), curve.get_a(), curve.get_b());
+            std::pair<number<Backend, ExpressionTemplates>, number<Backend, ExpressionTemplates>> xy =
+                os2ecp(data, data_len, curve.p(), curve.a(), curve.get_b());
 
             point_gfp point(curve, xy.first, xy.second);
 
@@ -80,8 +84,10 @@ namespace nil {
             return point;
         }
 
-        std::pair<number<Backend, ExpressionTemplates>, number<Backend, ExpressionTemplates>> os2ecp(const uint8_t data[], size_t data_len, const number<Backend, ExpressionTemplates> &curve_p,
-                                           const number<Backend, ExpressionTemplates> &curve_a, const number<Backend, ExpressionTemplates> &curve_b) {
+        std::pair<number<Backend, ExpressionTemplates>, number<Backend, ExpressionTemplates>>
+            os2ecp(const uint8_t data[], size_t data_len, const number<Backend, ExpressionTemplates> &curve_p,
+                   const number<Backend, ExpressionTemplates> &curve_a,
+                   const number<Backend, ExpressionTemplates> &curve_b) {
             if (data_len <= 1) {
                 throw decoding_error("os2ecp invalid point");
             }
@@ -91,7 +97,7 @@ namespace nil {
             number<Backend, ExpressionTemplates> x, y;
 
             if (pc == 2 || pc == 3) {
-                //compressed form
+                // compressed form
                 x = number<Backend, ExpressionTemplates>::decode(&data[1], data_len - 1);
 
                 const bool y_mod_2 = ((pc & 0x01) == 1);
@@ -120,5 +126,5 @@ namespace nil {
 
             return std::make_pair(x, y);
         }
-    }
+    }    // namespace crypto3
 }

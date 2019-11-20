@@ -40,11 +40,11 @@ namespace nil {
 
             template<typename Backend, expression_template_option ExpressionTemplates>
             point_gfp_base_point_precompute(const point_gfp<curve_type> &base_point, const modular_reducer &mod_order) :
-                m_base_point(base_point), m_mod_order(mod_order), m_p_words(base_point.get_curve().get_p().sig_words()),
-                m_T_size(base_point.get_curve().get_p().bits() + point_gfp_scalar_blinding_bits + 1) {
+                m_base_point(base_point), m_mod_order(mod_order), m_p_words(base_point.get_curve().p().sig_words()),
+                m_T_size(base_point.get_curve().p().bits() + point_gfp_scalar_blinding_bits + 1) {
                 std::vector<number_type> ws(point_gfp<curve_type>::WORKSPACE_SIZE);
 
-                const size_t p_bits = base_point.get_curve().get_p().bits();
+                const size_t p_bits = base_point.get_curve().p().bits();
 
                 /*
                  * Some of the curves (eg secp160k1) have an order slightly larger than
@@ -173,7 +173,7 @@ namespace nil {
             point_gfp_var_point_precompute(const point_gfp<CurveType> &point, random_number_generator &rng,
                                            std::vector<number<Backend, ExpressionTemplates>> &ws) :
                 m_curve(point.get_curve()),
-                m_p_words(m_curve.get_p().sig_words()), m_window_bits(4) {
+                m_p_words(m_curve.p().sig_words()), m_window_bits(4) {
                 if (ws.size() < point_gfp::WORKSPACE_SIZE) {
                     ws.resize(point_gfp::WORKSPACE_SIZE);
                 }
@@ -199,7 +199,7 @@ namespace nil {
 
                     const curve_gfp &curve = U[0].get_curve();
 
-                    const size_t p_bits = curve.get_p().bits();
+                    const size_t p_bits = curve.p().bits();
 
                     // Skipping zero point since it can't be randomized
                     for (size_t i = 1; i != U.size(); ++i) {
@@ -313,9 +313,13 @@ namespace nil {
             secure_vector<word> m_T;
         };
 
-        template<typename CurveType>
+        template<typename CurveType, typename NumberType = typename CurveType::number_type>
         class point_gfp_multi_point_precompute {
         public:
+            typedef CurveType curve_type;
+            typedef NumberType number_type;
+
+            template<typename Backend, expression_template_option ExpressionTemplates>
             point_gfp_multi_point_precompute(const point_gfp<number<Backend, ExpressionTemplates>> &g1,
                                              const point_gfp<number<Backend, ExpressionTemplates>> &g2) {
                 std::vector<number<Backend, ExpressionTemplates>> ws(point_gfp::WORKSPACE_SIZE);
@@ -391,7 +395,7 @@ namespace nil {
             }
 
         private:
-            std::vector<point_gfp<number<Backend, ExpressionTemplates>>> m_M;
+            std::vector<point_gfp<number_type>> m_M;
         };
 
         /**

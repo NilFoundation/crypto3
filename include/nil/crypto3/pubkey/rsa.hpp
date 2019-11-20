@@ -130,7 +130,7 @@ namespace nil {
                  * Get the first prime p.
                  * @return prime p
                  */
-                const number<Backend, ExpressionTemplates> &get_p() const {
+                const number<Backend, ExpressionTemplates> &p() const {
                     return m_p;
                 }
 

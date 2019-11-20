@@ -48,7 +48,7 @@ namespace nil {
              * @return prime p
              */
             const number<Backend, ExpressionTemplates> &group_p() const {
-                return m_group.get_p();
+                return m_group.p();
             }
 
             /**
