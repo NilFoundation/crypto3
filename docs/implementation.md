@@ -14,7 +14,7 @@ input data block gets encoded as far as it is found filled with enough data.
 Others use "lazy" encoding, accumulating the unprocessed data before it gets 
 encoded/decoded.
 
-## Architecture Overview ## {#codec_arch}
+## Architecture Overview ## {#codec_architecture}
 
 Codec library architecture consists of several parts listed below:
 
@@ -30,11 +30,11 @@ color="#222222";
 rankdir="TB"
 node [shape="box"]
 
-  a [label="Algorithms" color="#F5F2F1" URL="@ref block_cipher_algs"];
-  b [label="Stream Processors" color="#F5F2F1" URL="@ref block_cipher_stream"];
-  c [label="Codec Algorithms" color="#F5F2F1" URL="@ref block_cipher_pol"];
-  d [label="Accumulators" color="#F5F2F1" URL="@ref block_cipher_acc"];
-  e [label="Value Processors" color="#F5F2F1" URL="@ref block_cipher_val"];
+  a [label="Algorithms" color="#F5F2F1" URL="@ref codec_algorithms"];
+  b [label="Stream Processors" color="#F5F2F1" URL="@ref codec_stream"];
+  c [label="Codec Algorithms" color="#F5F2F1" URL="@ref codec_policies"];
+  d [label="Accumulators" color="#F5F2F1" URL="@ref codec_accumulators"];
+  e [label="Value Processors" color="#F5F2F1" URL="@ref codec_value"];
   
   a -> b;
   b -> c;
@@ -43,7 +43,7 @@ node [shape="box"]
 }
 @enddot
 
-## Algorithms ## {#codec_algs}
+## Algorithms ## {#codec_algorithms}
 
 Implementation of a library is considered to be highly compliant with STL. So 
 the crucial point is to have encodes to be usable in the same way as STL 
@@ -186,7 +186,7 @@ converts them and passes to `AccumulatorSet` reference as cipher input of
 format required. The rest of data not even to block size gets converted too and 
 fed value by value to the same `AccumulatorSet` reference.
 
-## Data Type Conversion ## {#block_cipher_data}
+## Data Type Conversion ## {#codec_data}
  
 Since block cipher algorithms are usually defined for `Integral` types or byte 
 sequences of unique format for each cipher, encryption function being generic 
@@ -242,7 +242,7 @@ public:
 This part is handled internally with `stream_processor` configured for each 
 particular cipher. 
    
-## Block Cipher Algorithms ## {#block_cipher_pol}
+## Block Cipher Algorithms ## {#codec_policies}
 
 Block cipher algorithms architecturally are stateful policies, which structural 
 contents are regulated by concepts and runtime content is a scheduled key data. 
@@ -273,7 +273,7 @@ data (usually it is represented by `block_type` typedef) per call.
 Such functions are stateful with respect to key schedule data represented by 
 `key_schedule_type` and generated while block cipher constructor call.
 
-## Accumulators ## {#block_cipher_acc}
+## Accumulators ## {#codec_accumulators}
 
 Encryption contains an accumulation step, which is implemented with 
 [Boost.Accumulators](https://boost.org/libs/accumulators) library.
@@ -318,7 +318,7 @@ std::string hash = extract::hash<hash::sha2<256>>(acc);
 std::string ciphertext = extract::block<block::rijndael<128, 128>>(acc);
 ```
 
-## Value Postprocessors ## {#block_cipher_val}
+## Value Postprocessors ## {#codec_value}
 
 Since the accumulator output type is strictly tied to [`digest_type`](@ref block::digest_type)
 of particular [`BlockCipher`](@ref block_cipher_concept) policy, the output 
