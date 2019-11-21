@@ -36,7 +36,6 @@ namespace nil {
                      expression_template_option ExpressionTemplates>
             typename Vdf::template state_type<number<Backend, ExpressionTemplates>>
                 raw_input(const SinglePassRange &v) {
-
             }
 
             template<typename Vdf,
