@@ -37,6 +37,8 @@ namespace nil {
          *
          * @param first
          * @param last
+         * @param key_first
+         * @param key_last
          * @param out
          *
          * @return
@@ -61,12 +63,11 @@ namespace nil {
          *
          * @tparam StreamCipher
          * @tparam InputIterator
-         * @tparam OutputIterator
-         * @tparam StreamEncrypter
+         * @tparam OutputAccumulator
          *
          * @param first
          * @param last
-         * @param out
+         * @param acc
          *
          * @return
          */
@@ -119,9 +120,14 @@ namespace nil {
          *
          * @tparam StreamCipher
          * @tparam InputIterator
-         * @tparam CipherState
+         * @tparam KeyIterator
+         * @tparam CipherAccumulator
+         *
          * @param first
          * @param last
+         * @param key_first
+         * @param key_last
+         *
          * @return
          */
         template<typename StreamCipher, typename InputIterator, typename KeyIterator,
@@ -142,10 +148,13 @@ namespace nil {
          *
          * @tparam StreamCipher
          * @tparam SinglePassRange
+         * @tparam KeyRange
          * @tparam OutputIterator
-         * @tparam CipherState
+         *
          * @param rng
+         * @param key
          * @param out
+         *
          * @return
          */
         template<typename StreamCipher, typename SinglePassRange, typename KeyRange, typename OutputIterator>
@@ -167,8 +176,12 @@ namespace nil {
          *
          * @tparam StreamCipher
          * @tparam SinglePassRange
-         * @tparam CipherState
+         * @tparam KeyRange
+         * @tparam CipherAccumulator
+         *
          * @param r
+         * @param key
+         *
          * @return
          */
         template<typename StreamCipher, typename SinglePassRange, typename KeyRange,
