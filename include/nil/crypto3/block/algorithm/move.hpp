@@ -18,6 +18,14 @@
 namespace nil {
     namespace crypto3 {
         namespace block {
+            /*!
+             * @brief
+             * @tparam SinglePassRange
+             * @tparam OutputIterator
+             * @param rng
+             * @param result
+             * @return
+             */
             template<typename SinglePassRange, typename OutputIterator>
             inline OutputIterator move(const SinglePassRange &rng, OutputIterator result) {
                 return std::move(boost::begin(rng), boost::end(rng), result);
