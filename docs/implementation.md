@@ -24,11 +24,11 @@ color="#222222";
 rankdir="TB"
 node [shape="box"]
 
-  a [label="Algorithms" color="#F5F2F1" URL="@ref hash_algs"];
-  b [label="Stream Processors" color="#F5F2F1" URL="@ref hash_stream"];
-  c [label="Constructions and Compressors" color="#F5F2F1" URL="@ref hash_pol"];
-  d [label="Accumulators" color="#F5F2F1" URL="@ref hash_acc"];
-  e [label="Value Processors" color="#F5F2F1" URL="@ref hash_val"];
+  a [label="Algorithms" color="#F5F2F1" fontcolor="#F5F2F1" URL="@ref hash_algorithms"];
+  b [label="Stream Processors" color="#F5F2F1" fontcolor="#F5F2F1" URL="@ref hash_stream"];
+  c [label="Constructions and Compressors" color="#F5F2F1" fontcolor="#F5F2F1" URL="@ref hash_pol"];
+  d [label="Accumulators" color="#F5F2F1" fontcolor="#F5F2F1" URL="@ref hash_acc"];
+  e [label="Value Processors" color="#F5F2F1" fontcolor="#F5F2F1" URL="@ref hash_val"];
   
   a -> b;
   b -> c;
@@ -37,7 +37,7 @@ node [shape="box"]
 }
 @enddot
 
-## Algorithms {#hash_algs}
+## Algorithms {#hash_algorithms}
 
 Implementation of a library is considered to be highly
 compliant with STL. So the crucial point is to have
@@ -114,8 +114,8 @@ Example. Lets assume input data stream consists of 16 bytes as follows.
 
 @dot
 digraph bytes {
-color="#222222";
-node [shape=record color="#F5F2F1"];
+bgcolor="#222222";
+node [shape=record color="#F5F2F1" fontcolor="#F5F2F1"];
 
 struct1 [label="0x00 | 0x01 | 0x02 | 0x03 | 0x04 | 0x05 | 0x06 | 0x07 | 0x08 | 0x09 | 0x10 | 0x11 | 0x12 | 0x13
  | 0x14 | 0x15"];
@@ -129,8 +129,8 @@ Lets assume the selected cipher to be used is Rijndael with 32 bit word size, 12
   
 @dot
 digraph bytes_to_words {
-color="#222222";
-node [shape=record color="#F5F2F1"];
+bgcolor="#222222";
+node [shape=record color="#F5F2F1" fontcolor="#F5F2F1"];
 
 struct1 [label="<b0> 0x00 |<b1> 0x01 |<b2> 0x02 |<b3> 0x03 |<b4> 0x04 |<b5> 0x05 |<b6> 0x06 |<b7> 0x07 |<b8> 0x08 |<b9> 0x09 |<b10> 0x10 |<b11> 0x11 |<b12> 0x12 |<b13> 0x13 |<b14> 0x14 |<b15> 0x15"];
 

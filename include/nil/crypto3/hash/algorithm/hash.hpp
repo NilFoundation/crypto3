@@ -51,7 +51,6 @@ namespace nil {
              * @tparam Hash
              * @tparam InputIterator
              * @tparam OutputIterator
-             * @tparam StreamHash
              *
              * @param first
              * @param last
@@ -78,12 +77,12 @@ namespace nil {
              *
              * @tparam Hash
              * @tparam InputIterator
-             * @tparam OutputIterator
-             * @tparam StreamHash
+             * @tparam HashAccumulator
+             *
              * @param first
              * @param last
-             * @param out
              * @param sh
+             *
              * @return
              */
             template<typename Hash, typename InputIterator,
@@ -104,9 +103,11 @@ namespace nil {
              *
              * @tparam Hash
              * @tparam InputIterator
-             * @tparam StreamHash
+             * @tparam HashAccumulator
+             *
              * @param first
              * @param last
+             *
              * @return
              */
             template<typename Hash, typename InputIterator, typename HashAccumulator = hash::hash_accumulator_set<Hash>>
@@ -127,9 +128,10 @@ namespace nil {
              * @tparam Hash
              * @tparam SinglePassRange
              * @tparam OutputIterator
-             * @tparam StreamHash
+             *
              * @param rng
              * @param out
+             *
              * @return
              */
             template<typename Hash, typename SinglePassRange, typename OutputIterator>
@@ -150,11 +152,11 @@ namespace nil {
              *
              * @tparam Hash
              * @tparam SinglePassRange
-             * @tparam OutputIterator
              * @tparam HashAccumulator
+             *
              * @param rng
-             * @param out
              * @param sh
+             *
              * @return
              */
             template<typename Hash, typename SinglePassRange,
@@ -175,8 +177,10 @@ namespace nil {
              *
              * @tparam Hash
              * @tparam SinglePassRange
-             * @tparam StreamHash
+             * @tparam HashAccumulator
+             *
              * @param r
+             *
              * @return
              */
             template<typename Hash, typename SinglePassRange,
