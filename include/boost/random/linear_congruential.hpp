@@ -23,8 +23,6 @@
 #include <boost/cstdint.hpp>
 #include <boost/limits.hpp>
 #include <boost/static_assert.hpp>
-#include <boost/integer/static_log2.hpp>
-#include <boost/mpl/if.hpp>
 #include <boost/type_traits/is_arithmetic.hpp>
 #include <boost/random/detail/config.hpp>
 #include <boost/random/detail/const_mod.hpp>
