@@ -12,8 +12,6 @@ namespace nil {
 
             using namespace boost::multiprecision;
 
-            class random_number_generator;
-
             template<typename Backend, expression_template_option ExpressionTemplates>
             number<Backend, ExpressionTemplates> blind(const number<Backend, ExpressionTemplates> &x,
                                                        const number<Backend, ExpressionTemplates> &modulus) {

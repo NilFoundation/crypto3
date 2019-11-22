@@ -4,6 +4,7 @@
 #include <nil/crypto3/pubkey/pk_keys.hpp>
 
 #include <boost/multiprecision/number.hpp>
+#include <boost/multiprecision/detail/number_base.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -26,6 +27,7 @@ namespace nil {
                  * @arg n the modulus
                  * @arg e the exponent
                  */
+                template<typename Backend, expression_template_option ExpressionTemplates>
                 rsa_public_key(const number<Backend, ExpressionTemplates> &n,
                                const number<Backend, ExpressionTemplates> &e) :
                     m_n(n),
@@ -110,11 +112,25 @@ namespace nil {
                  * @param n if specified, this must be n = p * q. Leave it as 0
                  * if you wish to the constructor to calculate it.
                  */
+                template<typename Backend, expression_template_option ExpressionTemplates>
                 rsa_private_key(const number<Backend, ExpressionTemplates> &p,
                                 const number<Backend, ExpressionTemplates> &q,
                                 const number<Backend, ExpressionTemplates> &e,
                                 const number<Backend, ExpressionTemplates> &d = 0,
-                                const number<Backend, ExpressionTemplates> &n = 0);
+                                const number<Backend, ExpressionTemplates> &n = 0) :
+                    m_d {d_exp},
+                    m_p {prime1}, m_q {prime2}, m_d1 {}, m_d2 {}, m_c {inverse_mod(m_q, m_p)} {
+                    m_n = mod.is_nonzero() ? mod : m_p * m_q;
+                    m_e = exp;
+
+                    if (m_d == 0) {
+                        const number<Backend, ExpressionTemplates> phi_n = boost::math::lcm(m_p - 1, m_q - 1);
+                        m_d = inverse_mod(m_e, phi_n);
+                    }
+
+                    m_d1 = m_d % (m_p - 1);
+                    m_d2 = m_d % (m_q - 1);
+                }
 
                 /**
                  * Create a new private key with the specified bit length
@@ -122,7 +138,29 @@ namespace nil {
                  * @param bits the desired bit length of the private key
                  * @param exp the public exponent to be used
                  */
-                rsa_private_key(random_number_generator &rng, size_t bits, size_t exp = 65537);
+                rsa_private_key(random_number_generator &rng, size_t bits, size_t exp = 65537) {
+                    if (bits < 1024) {
+                        throw std::invalid_argument(algo_name() + ": Can't make a key that is only " +
+                                                    std::to_string(bits) + " bits long");
+                    }
+                    if (exp < 3 || exp % 2 == 0) {
+                        throw std::invalid_argument(algo_name() + ": Invalid encryption exponent");
+                    }
+
+                    m_e = exp;
+
+                    do {
+                        m_p = random_prime(rng, (bits + 1) / 2, m_e);
+                        m_q = random_prime(rng, bits - m_p.bits(), m_e);
+                        m_n = m_p * m_q;
+                    } while (m_n.bits() != bits);
+
+                    const number<Backend, ExpressionTemplates> phi_n = boost::math::lcm(m_p - 1, m_q - 1);
+                    m_d = inverse_mod(m_e, phi_n);
+                    m_d1 = m_d % (m_p - 1);
+                    m_d2 = m_d % (m_q - 1);
+                    m_c = inverse_mod(m_q, m_p);
+                }
 
                 bool check_key(random_number_generator &rng, bool) const override;
 

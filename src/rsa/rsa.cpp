@@ -23,7 +23,7 @@
 #endif
 
 #include <boost/math/common_factor.hpp>
-#include <boost/multiprecision/montgomery/modular_inverse.hpp>
+#include <boost/multiprecision/modular/modular_adaptor.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -90,64 +90,6 @@ namespace nil {
                     .end_cons();
             }
 
-            rsa_private_key::rsa_private_key(const number<Backend, ExpressionTemplates> &prime1,
-                                             const number<Backend, ExpressionTemplates> &prime2,
-                                             const number<Backend, ExpressionTemplates> &exp,
-                                             const number<Backend, ExpressionTemplates> &d_exp,
-                                             const number<Backend, ExpressionTemplates> &mod) :
-                m_d {d_exp},
-                m_p {prime1}, m_q {prime2}, m_d1 {}, m_d2 {}, m_c {inverse_mod(m_q, m_p)} {
-                m_n = mod.is_nonzero() ? mod : m_p * m_q;
-                m_e = exp;
-
-                if (m_d == 0) {
-                    const number<Backend, ExpressionTemplates> phi_n = boost::math::lcm(m_p - 1, m_q - 1);
-                    m_d = inverse_mod(m_e, phi_n);
-                }
-
-                m_d1 = m_d % (m_p - 1);
-                m_d2 = m_d % (m_q - 1);
-            }
-
-            /*
-             * Create a RSA private key
-             */
-            rsa_private_key::rsa_private_key(random_number_generator &rng, size_t bits, size_t exp) {
-                if (bits < 1024) {
-                    throw
-
-                        std::invalid_argument(algo_name()
-
-                                              + ": Can't make a key that is only " + std::to_string(bits)
-                                              + " bits long");
-                }
-                if (exp < 3 || exp % 2 == 0) {
-                    throw
-
-                        std::invalid_argument(algo_name()
-
-                                              + ": Invalid encryption exponent");
-                }
-
-                m_e = exp;
-
-                do {
-                    m_p = random_prime(rng, (bits + 1) / 2, m_e);
-                    m_q = random_prime(rng, bits - m_p.bits(), m_e);
-                    m_n = m_p * m_q;
-                } while (m_n.
-
-                         bits()
-
-                         != bits);
-
-                const number<Backend, ExpressionTemplates> phi_n = boost::math::lcm(m_p - 1, m_q - 1);
-                m_d = inverse_mod(m_e, phi_n);
-                m_d1 = m_d % (m_p - 1);
-                m_d2 = m_d % (m_q - 1);
-                m_c = inverse_mod(m_q, m_p);
-            }
-
             /*
              * Check Private RSA Parameters
              */
@@ -198,12 +140,16 @@ namespace nil {
                         m_monty_q(std::make_shared<montgomery_params>(m_key.get_q(), m_mod_q)),
                         m_powermod_e_n(m_key.get_e(), m_key.get_n()),
                         m_blinder(
-                            m_key.get_n(), rng, [this](const number<Backend, ExpressionTemplates> &k) { return m_powermod_e_n(k); },
-                            [this](const number<Backend, ExpressionTemplates> &k) { return inverse_mod(k, m_key.get_n()); }),
+                            m_key.get_n(), rng,
+                            [this](const number<Backend, ExpressionTemplates> &k) { return m_powermod_e_n(k); },
+                            [this](const number<Backend, ExpressionTemplates> &k) {
+                                return inverse_mod(k, m_key.get_n());
+                            }),
                         m_mod_bytes(m_key.get_n().bytes()), m_mod_bits(m_key.get_n().bits()) {
                     }
 
-                    number<Backend, ExpressionTemplates> blinded_private_op(const number<Backend, ExpressionTemplates> &m) const {
+                    number<Backend, ExpressionTemplates>
+                        blinded_private_op(const number<Backend, ExpressionTemplates> &m) const {
                         if (m >= m_key.get_n()) {
                             throw std::invalid_argument("RSA private op - input is too large");
                         }
@@ -211,15 +157,18 @@ namespace nil {
                         return m_blinder.unblind(private_op(m_blinder.blind(m)));
                     }
 
-                    number<Backend, ExpressionTemplates> private_op(const number<Backend, ExpressionTemplates> &m) const {
+                    number<Backend, ExpressionTemplates>
+                        private_op(const number<Backend, ExpressionTemplates> &m) const {
                         const size_t powm_window = 4;
                         const size_t exp_blinding_bits = 64;
 
                         const number<Backend, ExpressionTemplates> d1_mask(m_blinder.rng(), exp_blinding_bits);
                         const number<Backend, ExpressionTemplates> d2_mask(m_blinder.rng(), exp_blinding_bits);
 
-                        const number<Backend, ExpressionTemplates> masked_d1 = m_key.get_d1() + (d1_mask * (m_key.p() - 1));
-                        const number<Backend, ExpressionTemplates> masked_d2 = m_key.get_d2() + (d2_mask * (m_key.get_q() - 1));
+                        const number<Backend, ExpressionTemplates> masked_d1 =
+                            m_key.get_d1() + (d1_mask * (m_key.p() - 1));
+                        const number<Backend, ExpressionTemplates> masked_d2 =
+                            m_key.get_d2() + (d2_mask * (m_key.get_q() - 1));
 
 #if defined(CRYPTO3_TARGET_OS_HAS_THREADS)
                         auto future_j1 = std::async(std::launch::async, [this, &m, &masked_d1, powm_window]() {
@@ -330,7 +279,8 @@ namespace nil {
                     }
 
                 protected:
-                    number<Backend, ExpressionTemplates> public_op(const number<Backend, ExpressionTemplates> &m) const {
+                    number<Backend, ExpressionTemplates>
+                        public_op(const number<Backend, ExpressionTemplates> &m) const {
                         if (m >= m_n) {
                             throw std::invalid_argument("RSA public op - input is too large");
                         }
@@ -400,7 +350,8 @@ namespace nil {
                     void raw_kem_encrypt(secure_vector<uint8_t> &out_encapsulated_key,
                                          secure_vector<uint8_t> &raw_shared_key,
                                          nil::crypto3::random_number_generator &rng) override {
-                        const number<Backend, ExpressionTemplates> r = number<Backend, ExpressionTemplates>::random_integer(rng, 1, get_n());
+                        const number<Backend, ExpressionTemplates> r =
+                            number<Backend, ExpressionTemplates>::random_integer(rng, 1, get_n());
                         const number<Backend, ExpressionTemplates> c = public_op(r);
 
                         out_encapsulated_key = number<Backend, ExpressionTemplates>::encode_locked(c);

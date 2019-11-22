@@ -85,12 +85,15 @@ namespace nil {
                  * @param domain parameters to used for this key
                  * @param x the private key (if zero, generate a new random key)
                  */
-                ecgdsa_private_key(random_number_generator &rng, const ec_group<CurveType, NumberType> &domain,
+                template<typename UniformRandomGenerator, typename Backend,
+                         expression_template_option ExpressionTemplates>
+                ecgdsa_private_key(UniformRandomGenerator &rng, const ec_group<CurveType, NumberType> &domain,
                                    const number<Backend, ExpressionTemplates> &x = 0) :
                     ec_private_key<CurveType, NumberType>(rng, domain, x, true) {
                 }
 
-                bool check_key(random_number_generator &rng, bool) const override {
+                template<typename UniformRandomGenerator>
+                bool check_key(UniformRandomGenerator &rng, bool) const override {
                     if (!public_point().on_the_curve()) {
                         return false;
                     }

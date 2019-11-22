@@ -85,8 +85,9 @@ namespace nil {
                  * @param domain parameters to used for this key
                  * @param x the private key (if zero, generate a new random key)
                  */
-                template<typename UniformRandonGenerator>
-                ecdsa_private_key(UniformRandonGenerator &rng, const ec_group<CurveType, NumberType> &domain,
+                template<typename UniformRandomGenerator, typename Backend,
+                         expression_template_option ExpressionTemplates>
+                ecdsa_private_key(UniformRandomGenerator &rng, const ec_group<CurveType, NumberType> &domain,
                                   const number<Backend, ExpressionTemplates> &x = 0) :
                     ec_private_key<CurveType, NumberType>(rng, domain, x) {
                 }
