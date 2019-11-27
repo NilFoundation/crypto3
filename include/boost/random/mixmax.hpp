@@ -55,8 +55,7 @@ namespace random {
  */
 
 template <int Ndim, unsigned int SPECIALMUL, std::int64_t SPECIAL> // MIXMAX TEMPLATE PARAMETERS
-class mixmax_engine
-{
+class mixmax_engine{
 public:
     // Interfaces required by C++11 std::random and boost::random
     typedef std::uint64_t result_type ;
@@ -73,8 +72,7 @@ public:
     void seed(std::uint64_t seedval=default_seed){seed_uniquestream( &S, 0, 0, (uint32_t)(seedval>>32), (uint32_t)seedval );} ///< seed with one 64-bit seed
     
 private: // DATATYPES
-    struct rng_state_st
-    {
+    struct rng_state_st{
         std::array<std::uint64_t, Ndim> V;
         std::uint64_t sumtot;
         int counter;
@@ -89,22 +87,20 @@ public: // SEEDING FUNCTIONS
     
     /** Sets the state of the generator using values from an iterator range. */
     template<class It>
-    void seed(It& first, It last)
-    {
+    void seed(It& first, It last){
         uint32_t v[4];
         detail::fill_array_int<32>(first, last, v);
         seed_uniquestream( &S, v[0], v[1], v[2], v[3]);
     }
     /** Sets the state of the generator using values from a seed_seq. */
-    BOOST_RANDOM_DETAIL_SEED_SEQ_SEED(mixmax_engine, SeeqSeq, seq)
-    {
+    BOOST_RANDOM_DETAIL_SEED_SEQ_SEED(mixmax_engine, SeeqSeq, seq){
         uint32_t v[4];
         detail::seed_array_int<32>(seq, v);
         seed_uniquestream( &S, v[0], v[1], v[2], v[3]);
     }
     
-    std::uint64_t operator()()    ///< return one uint64 between min=0 and max=2^61-1
-    {
+    /** return one uint64 between min=0 and max=2^61-1 */
+    std::uint64_t operator()(){
         if (S.counter<=(Ndim-1) ){
             return S.V[S.counter++];
         }else{
@@ -124,8 +120,7 @@ public: // SEEDING FUNCTIONS
     /** save the state of the RNG to a stream */
     template<class CharT, class Traits>
     friend std::basic_ostream<CharT,Traits>&
-    operator<< (std::basic_ostream<CharT,Traits>& ost, const mixmax_engine& me)
-    {
+    operator<< (std::basic_ostream<CharT,Traits>& ost, const mixmax_engine& me){
         ost << Ndim << " " << me.S.counter << " " << me.S.sumtot << " ";
         for (int j=0; (j< (Ndim) ); j++) {
             ost <<  (std::uint64_t)me.S.V[j] << " ";
@@ -138,8 +133,7 @@ public: // SEEDING FUNCTIONS
         /** read the state of the RNG from a stream */
         template<class CharT, class Traits>
         friend std::basic_istream<CharT,Traits>&
-        operator>> (std::basic_istream<CharT,Traits> &in, mixmax_engine& me)
-        {
+        operator>> (std::basic_istream<CharT,Traits> &in, mixmax_engine& me){
             // will set std::ios::failbit if the input format is not right
             std::array<std::uint64_t, Ndim> vec;
             std::uint64_t sum=0, savedsum=0, counter=0;
@@ -177,7 +171,7 @@ public: // SEEDING FUNCTIONS
         inline std::uint64_t apply_bigskip(std::uint64_t* Vout, std::uint64_t* Vin, uint32_t clusterID, uint32_t machineID, uint32_t runID, uint32_t  streamID );
         inline std::uint64_t modadd(std::uint64_t foo, std::uint64_t bar);
         inline std::uint64_t fmodmulM61(std::uint64_t cum, std::uint64_t s, std::uint64_t a);
-        };
+};
         
         template <int Ndim, unsigned int SPECIALMUL, std::int64_t SPECIAL> mixmax_engine  <Ndim, SPECIALMUL, SPECIAL> ::mixmax_engine()
         ///< constructor, with no params, seeds with seed=0,  random numbers are as good as from any other seed
@@ -185,15 +179,13 @@ public: // SEEDING FUNCTIONS
         seed_uniquestream( &S, 0,  0, 0, default_seed);
         }
         
-        template <int Ndim, unsigned int SPECIALMUL, std::int64_t SPECIAL> mixmax_engine  <Ndim, SPECIALMUL, SPECIAL> ::mixmax_engine(std::uint64_t seedval)
+        template <int Ndim, unsigned int SPECIALMUL, std::int64_t SPECIAL> mixmax_engine  <Ndim, SPECIALMUL, SPECIAL> ::mixmax_engine(std::uint64_t seedval){
         ///< constructor, one uint64_t seed, random numbers are statistically independent from any two distinct seeds, e.g. consecutive seeds are ok
-        {
         seed_uniquestream( &S, 0,  0,  (uint32_t)(seedval>>32), (uint32_t)seedval );
         }
         
-        template <int Ndim, unsigned int SPECIALMUL, std::int64_t SPECIAL> mixmax_engine  <Ndim, SPECIALMUL, SPECIAL> ::mixmax_engine(uint32_t clusterID, uint32_t machineID, uint32_t runID, uint32_t  streamID)
+        template <int Ndim, unsigned int SPECIALMUL, std::int64_t SPECIAL> mixmax_engine  <Ndim, SPECIALMUL, SPECIAL> ::mixmax_engine(uint32_t clusterID, uint32_t machineID, uint32_t runID, uint32_t  streamID){
         // constructor, four 32-bit seeds for 128-bit seeding flexibility
-        {
         seed_uniquestream( &S, clusterID,  machineID,  runID,  streamID );
         }
         
@@ -205,23 +197,22 @@ public: // SEEDING FUNCTIONS
         Y[0] = tempV;
         std::uint64_t sumtot = Y[0], ovflow = 0; // will keep a running sum of all new elements
         for (int i=1; i<Ndim; i++){
-        std::uint64_t tempPO = MULWU(tempP);
-        tempV = (tempV+tempPO);
-        tempP = modadd(tempP, Y[i]);
-        tempV = modadd(tempV, tempP); // new Y[i] = old Y[i] + old partial * m
-        Y[i] = tempV;
-        sumtot += tempV; if (sumtot < tempV) {ovflow++;}
+            std::uint64_t tempPO = MULWU(tempP);
+            tempV = (tempV+tempPO);
+            tempP = modadd(tempP, Y[i]);
+            tempV = modadd(tempV, tempP); // new Y[i] = old Y[i] + old partial * m
+            Y[i] = tempV;
+            sumtot += tempV; if (sumtot < tempV) {ovflow++;}
         }
         return MOD_MERSENNE(MOD_MERSENNE(sumtot) + (ovflow <<3 ));
         }
         
-        template <int Ndim, unsigned int SPECIALMUL, std::int64_t SPECIAL> void mixmax_engine  <Ndim, SPECIALMUL, SPECIAL> ::seed_vielbein(rng_state_t* X, unsigned int index)
-        {
+        template <int Ndim, unsigned int SPECIALMUL, std::int64_t SPECIAL> void mixmax_engine  <Ndim, SPECIALMUL, SPECIAL> ::seed_vielbein(rng_state_t* X, unsigned int index){
         for (int i=0; i < Ndim; i++){
-        X->V[i] = 0;
+            X->V[i] = 0;
         }
         if (index<Ndim)
-        {X->V[index] = 1; }else{X->V[0]=1;}
+        {X->V[index] = 1; }else{ X->V[0]=1; }
         X->counter = Ndim;  // set the counter to Ndim if iteration should happen right away
         X->sumtot = 1;
         }
