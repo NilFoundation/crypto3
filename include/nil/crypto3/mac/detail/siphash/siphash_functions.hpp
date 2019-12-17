@@ -10,8 +10,8 @@
 #ifndef CRYPTO3_MAC_SIPHASH_FUNCTIONS_HPP
 #define CRYPTO3_MAC_SIPHASH_FUNCTIONS_HPP
 
-#include <boost/container/static_vector.hpp>
 #include <boost/integer.hpp>
+#include <boost/container/static_vector.hpp>
 
 #include <nil/crypto3/mac/detail/siphash/siphash_policy.hpp>
 

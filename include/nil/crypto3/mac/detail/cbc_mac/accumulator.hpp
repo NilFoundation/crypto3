@@ -21,8 +21,8 @@
 
 #include <nil/crypto3/block/accumulators/block.hpp>
 
-#include <nil/crypto3/mac/detail/make_array.hpp>
-#include <nil/crypto3/mac/detail/static_digest.hpp>
+#include <nil/crypto3/detail/make_array.hpp>
+#include <nil/crypto3/detail/static_digest.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -75,7 +75,6 @@ namespace nil {
 
                 protected:
                     inline void process(const block_type &block, std::size_t bits) {
-
                     }
 
                     mac_type mac;

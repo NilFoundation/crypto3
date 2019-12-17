@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ACCUMULATORS_BLOCK_HPP
-#define CRYPTO3_ACCUMULATORS_BLOCK_HPP
+#ifndef CRYPTO3_ACCUMULATORS_MAC_HPP
+#define CRYPTO3_ACCUMULATORS_MAC_HPP
 
 #include <boost/container/static_vector.hpp>
 
@@ -19,13 +19,11 @@
 #include <boost/accumulators/framework/depends_on.hpp>
 #include <boost/accumulators/framework/parameters/sample.hpp>
 
-#include <nil/crypto3/block/accumulators/parameters/cipher.hpp>
-#include <nil/crypto3/block/accumulators/parameters/bits.hpp>
+#include <nil/crypto3/mac/accumulators/parameters/cipher.hpp>
+#include <nil/crypto3/mac/accumulators/parameters/bits.hpp>
 
-#include <nil/crypto3/block/detail/make_array.hpp>
-#include <nil/crypto3/block/detail/digest.hpp>
-
-#include <nil/crypto3/block/cipher.hpp>
+#include <nil/crypto3/detail/make_array.hpp>
+#include <nil/crypto3/detail/digest.hpp>
 
 namespace nil {
     namespace crypto3 {

@@ -12,6 +12,7 @@
 
 #include <boost/assert.hpp>
 #include <boost/concept_check.hpp>
+
 #include <boost/range/begin.hpp>
 #include <boost/range/end.hpp>
 #include <boost/range/concepts.hpp>

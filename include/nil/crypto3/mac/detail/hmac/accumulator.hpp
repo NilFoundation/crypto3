@@ -22,8 +22,8 @@
 #include <nil/crypto3/block/accumulators/parameters/cipher.hpp>
 #include <nil/crypto3/block/accumulators/parameters/bits.hpp>
 
-#include <nil/crypto3/block/detail/make_array.hpp>
-#include <nil/crypto3/block/detail/digest.hpp>
+#include <nil/crypto3/detail/make_array.hpp>
+#include <nil/crypto3/detail/digest.hpp>
 
 #include <nil/crypto3/block/cipher.hpp>
 
