@@ -31,8 +31,8 @@ namespace nil {
                 static void process() {
                     const OID kek_algo(m_key_wrap_oid);
 
-                    secure_vector <uint8_t> h;
-                    secure_vector <uint8_t> in;
+                    secure_vector<uint8_t> h;
+                    secure_vector<uint8_t> in;
                     size_t offset = 0;
                     uint32_t counter = 1;
 
@@ -43,18 +43,24 @@ namespace nil {
                     while (offset != key_len && counter) {
                         hash->update(secret, secret_len);
 
-                        hash->update(der_encoder().start_cons(SEQUENCE)
+                        hash->update(
+                            der_encoder()
+                                .start_cons(SEQUENCE)
 
-                            .start_cons(SEQUENCE).encode(kek_algo).raw_bytes(
-                            encode_x942_int(counter)).end_cons()
+                                .start_cons(SEQUENCE)
+                                .encode(kek_algo)
+                                .raw_bytes(encode_x942_int(counter))
+                                .end_cons()
 
-                            .encode_if(salt_len != 0,
-                                der_encoder().start_explicit(0).encode(in, OCTET_STRING).end_explicit())
+                                .encode_if(salt_len != 0,
+                                           der_encoder().start_explicit(0).encode(in, OCTET_STRING).end_explicit())
 
-                            .start_explicit(2).raw_bytes(
-                            encode_x942_int(static_cast<uint32_t>(8 * key_len))).end_explicit()
+                                .start_explicit(2)
+                                .raw_bytes(encode_x942_int(static_cast<uint32_t>(8 * key_len)))
+                                .end_explicit()
 
-                            .end_cons().get_contents());
+                                .end_cons()
+                                .get_contents());
 
                         hash->final(h);
                         const size_t copied = std::min(h.size(), key_len - offset);
@@ -67,8 +73,8 @@ namespace nil {
                     return offset;
                 }
             };
-        }
-    }
-}
+        }    // namespace kdf
+    }        // namespace crypto3
+}    // namespace nil
 
 #endif

@@ -47,14 +47,13 @@ namespace nil {
 
                 static inline void process(digest_type &digest, const key_type &key) {
                     policy_type::extract(digest, secret, secret_len, salt, salt_len, nullptr, 0);
-                    return policy_type::expand(digest, key, nullptr, 0, label,
-                        label_len);
+                    return policy_type::expand(digest, key, nullptr, 0, label, label_len);
                 }
 
             protected:
                 mac_type mac;
             };
         }    // namespace kdf
-    }    // namespace crypto3
+    }        // namespace crypto3
 }    // namespace nil
 #endif

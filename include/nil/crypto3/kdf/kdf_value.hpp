@@ -198,7 +198,7 @@ namespace nil {
                     }
                 };
             }    // namespace detail
-        }        // namespace block
+        }        // namespace mac
     }            // namespace crypto3
 }    // namespace nil
 

@@ -54,6 +54,6 @@ namespace nil {
                 hash_type hash;
             };
         }    // namespace kdf
-    }    // namespace crypto3
+    }        // namespace crypto3
 }    // namespace nil
 #endif

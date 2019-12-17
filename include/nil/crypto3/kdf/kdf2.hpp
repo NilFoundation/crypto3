@@ -22,8 +22,8 @@ namespace nil {
             template<typename Hash>
             class kdf2 {
                 typedef detail::kdf2_functions<Hash> policy_type;
-            public:
 
+            public:
                 typedef typename policy_type::hash_type hash_type;
 
                 static void process() {
@@ -47,7 +47,7 @@ namespace nil {
                 }
             };
         }    // namespace kdf
-    }    // namespace crypto3
+    }        // namespace crypto3
 }    // namespace nil
 
 #endif

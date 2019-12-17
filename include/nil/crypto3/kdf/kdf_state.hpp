@@ -31,7 +31,7 @@ namespace nil {
              */
             template<typename MessageAuthenticationCode>
             using kdf_accumulator = boost::accumulators::accumulator_set<
-                kdf::digest<MessageAuthenticationCode::input_block_bits>,
+                digest<MessageAuthenticationCode::input_block_bits>,
                 boost::accumulators::features<accumulators::tag::hash<typename MessageAuthenticationCode::hash_type>,
                                               accumulators::tag::kdf<MessageAuthenticationCode>>>;
         }    // namespace kdf
