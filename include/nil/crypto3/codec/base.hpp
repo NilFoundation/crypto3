@@ -36,10 +36,20 @@ namespace nil {
                 struct static_range;
             }
 
+            /*!
+             * @brief Base encoder preprocessor functor
+             * @tparam Version Base encoder version selector. Available values are: 32, 58, 64
+             *
+             * @note This particular implementation gets selected with Version == 58.
+             */
             template<std::size_t Version, typename = detail::static_range<true>>
             struct base_encode_preprocessor {
                 typedef detail::base_policy<Version> policy_type;
 
+                /*!
+                 * @brief Constructs base encoder preprocessor
+                 * @param leading_zeros Leading zeros amount to be processed
+                 */
                 base_encode_preprocessor(std::size_t leading_zeros = 0) : leading_zeros(leading_zeros) {}
 
                 template<typename T>
@@ -65,7 +75,8 @@ namespace nil {
                 typedef detail::base_policy<Version> policy_type;
 
                 /*!
-                 * @param input_remaining_bits Bits remaining unprocessed in block
+                 * @brief Constructs the base encoder finalizer
+                 * @param leading_zeros Leading zeros amount to be processed
                  */
                 base_encode_finalizer(std::size_t leading_zeros = 0) : leading_zeros(leading_zeros) {
                 }
@@ -74,7 +85,7 @@ namespace nil {
                  * @brief Base encoding padding function. Fills remaining empty bits with '0'.
                  * @tparam T Input container type. Assumed to meet the requirements of Container,
                  * AllocatorAwareContainer and SequenceContainer concepts.
-                 * @param t
+                 * @param t Input container
                  */
                 template<typename T>
                 void operator()(T &t) {
@@ -86,6 +97,13 @@ namespace nil {
 
                 std::size_t leading_zeros;
             };
+
+            /*!
+             * @brief Base encoder preprocessor functor
+             * @tparam Version Base encoder version selector. Available values are: 32, 58, 64
+             *
+             * @note This particular implementation gets selected with Version != 58.
+             */
             template<std::size_t Version>
             struct base_encode_preprocessor<Version, detail::static_range<!(Version % 32)>> {
                 typedef detail::base_policy<Version> policy_type;
@@ -96,6 +114,10 @@ namespace nil {
                 void operator()(T &t) {}
             };
 
+            /*!
+             * @brief
+             * @tparam Version
+             */
             template<std::size_t Version>
             struct base_encode_finalizer<Version, detail::static_range<!(Version % 32)>> {
                 typedef detail::base_policy<Version> policy_type;
@@ -123,10 +145,18 @@ namespace nil {
                 std::size_t remaining_bits;    ///< Bits remaining unprocessed in block
             };
 
+            /*!
+             * @brief
+             * @tparam Version
+             */
             template<std::size_t Version, typename = detail::static_range<true>>
             struct base_decode_preprocessor {
                 typedef detail::base_policy<Version> policy_type;
 
+                /*!
+                 * @brief
+                 * @param leading_zeros
+                 */
                 base_decode_preprocessor(std::size_t leading_zeros = 0) : leading_zeros(leading_zeros) {}
 
                 template<typename T>
@@ -163,6 +193,10 @@ namespace nil {
             struct base_decode_finalizer {
                 typedef detail::base_policy<Version> policy_type;
 
+                /*!
+                 * @brief Constructs base decoder finalizer
+                 * @param leading_zeros Defines data stream leading zeros
+                 */
                 base_decode_finalizer(std::size_t leading_zeros) : leading_zeros(leading_zeros) {
                 }
 

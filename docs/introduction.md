@@ -1,23 +1,22 @@
-# Introduction
+# Introduction # {#codec_introduction}
 
-The Crypto3.Codec library extends the Nil Foundation's cryptography suite and provides a set of encoding algorithms implemented in way C++ standard library implies: concepts, algorithms, predictable behavior, latest standard features
-support and clean architecture without compromising security and performance.
- 
+The Crypto3.Codec library extends the Nil Foundation's
+cryptography suite and provides a set of encoding
+algorithms implemented in way C++ standard library
+implies: concepts, algorithms, predictable behavior,
+latest standard features support and clean architecture
+without compromising security and performance.
+  
 Crypto3.Codec consists of several parts to review:
-* Algorithms.
-* Architecture.
-* Concepts.
-* Interface.
+* [Manual](@ref codec_manual).
+* [Implementation](@ref codec_impl).
+* [Concepts](@ref codec_concepts).
 
-A small part of each topic is reviewed right at introduction, but the detailed information is recommended to look inside of a corresponding chapter.
+## Dependencies ## {#codec_dependencies}
 
-## Algorithms
+In-suite dependencies:
 
-Crypto3.Codec library contains following encoders:
+Crypto3.Codec has no dependencies on other suite libraries and can be used standalone.
 
-* Base-family (Base32, Base58, Base64)
-* Hex encoding
-
-## Architecture
-
-Crypto3.Codec library is implemented in several parts:
+Outer dependencies:
+1. Boost (>= 1.58)
