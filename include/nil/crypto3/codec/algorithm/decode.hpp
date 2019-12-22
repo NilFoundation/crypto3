@@ -48,8 +48,9 @@ namespace nil {
         template<typename Decoder, typename InputIterator, typename OutputIterator>
         typename std::enable_if<detail::is_iterator<OutputIterator>::value, OutputIterator>::type
             decode(InputIterator first, InputIterator last, OutputIterator out) {
+
             typedef typename Decoder::stream_decoder_type DecodingMode;
-            typedef typename codec::codec_accumulator<DecodingMode> CodecAccumulator;
+            typedef typename codec::accumulator_set<DecodingMode> CodecAccumulator;
 
             typedef codec::detail::value_codec_impl<CodecAccumulator> DecoderStateImpl;
             typedef codec::detail::itr_codec_impl<DecoderStateImpl, OutputIterator> DecoderImpl;
@@ -79,9 +80,10 @@ namespace nil {
          */
         template<typename Decoder,
                  typename InputIterator,
-                 typename CodecAccumulator = typename codec::codec_accumulator<typename Decoder::stream_decoder_type>>
+                 typename CodecAccumulator = typename codec::accumulator_set<typename Decoder::stream_decoder_type>>
         codec::detail::range_codec_impl<codec::detail::value_codec_impl<CodecAccumulator>> decode(InputIterator first,
                                                                                                   InputIterator last) {
+
             typedef codec::detail::value_codec_impl<CodecAccumulator> DecoderStateImpl;
             typedef codec::detail::range_codec_impl<DecoderStateImpl> DecoderImpl;
 
@@ -107,10 +109,11 @@ namespace nil {
          */
         template<typename Decoder,
                  typename InputIterator,
-                 typename CodecAccumulator = typename codec::codec_accumulator<typename Decoder::stream_decoder_type>>
+                 typename CodecAccumulator = typename codec::accumulator_set<typename Decoder::stream_decoder_type>>
         typename std::enable_if<boost::accumulators::detail::is_accumulator_set<CodecAccumulator>::value,
                                 CodecAccumulator>::type &
             decode(InputIterator first, InputIterator last, CodecAccumulator &acc) {
+
             typedef codec::detail::ref_codec_impl<CodecAccumulator> DecoderStateImpl;
             typedef codec::detail::range_codec_impl<DecoderStateImpl> DecoderImpl;
 
@@ -136,8 +139,9 @@ namespace nil {
         template<typename Decoder, typename SinglePassRange, typename OutputIterator>
         typename std::enable_if<detail::is_iterator<OutputIterator>::value, OutputIterator>::type
             decode(const SinglePassRange &rng, OutputIterator out) {
+
             typedef typename Decoder::stream_decoder_type DecodingMode;
-            typedef typename codec::codec_accumulator<DecodingMode> CodecAccumulator;
+            typedef typename codec::accumulator_set<DecodingMode> CodecAccumulator;
 
             typedef codec::detail::value_codec_impl<CodecAccumulator> DecoderStateImpl;
             typedef codec::detail::itr_codec_impl<DecoderStateImpl, OutputIterator> DecoderImpl;
@@ -163,10 +167,11 @@ namespace nil {
          */
         template<typename Decoder,
                  typename SinglePassRange,
-                 typename CodecAccumulator = typename codec::codec_accumulator<typename Decoder::stream_decoder_type>>
+                 typename CodecAccumulator = typename codec::accumulator_set<typename Decoder::stream_decoder_type>>
         typename std::enable_if<boost::accumulators::detail::is_accumulator_set<CodecAccumulator>::value,
                                 CodecAccumulator>::type &
             decode(const SinglePassRange &rng, CodecAccumulator &out) {
+
             typedef codec::detail::value_codec_impl<CodecAccumulator> DecoderStateImpl;
             typedef codec::detail::range_codec_impl<DecoderStateImpl> DecoderImpl;
 
@@ -193,7 +198,7 @@ namespace nil {
          */
         template<typename Decoder,
                  typename SinglePassRange,
-                 typename CodecAccumulator = typename codec::codec_accumulator<typename Decoder::stream_decoder_type>>
+                 typename CodecAccumulator = typename codec::accumulator_set<typename Decoder::stream_decoder_type>>
         codec::detail::range_codec_impl<codec::detail::value_codec_impl<CodecAccumulator>>
             decode(const SinglePassRange &r) {
 

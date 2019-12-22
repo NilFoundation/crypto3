@@ -280,9 +280,9 @@ Encryption contains an accumulation step, which is implemented with
 
 All the concepts are held.
 
-Block ciphers contains pre-defined [`block_accumulator_set`](@ref block_accumulator_set), 
+Encoders and decoders contains pre-defined [`accumulator_set`](@ref codec::accumulator_set), 
 which is a `boost::accumulator_set` with pre-filled 
-[`block` accumulator](@ref accumulators::block).
+[`codec` accumulator](@ref accumulators::codec).
 
 Block accumulator accepts only one either `block_type::value_type` or `block_type` 
 at insert.
