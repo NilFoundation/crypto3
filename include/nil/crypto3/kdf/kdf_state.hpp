@@ -19,18 +19,8 @@
 namespace nil {
     namespace crypto3 {
         namespace kdf {
-            /*!
-             * @brief Cipher state managing container
-             *
-             * Meets the requirements of CipherStateContainer, ConceptContainer, SequenceContainer, Container
-             *
-             * @tparam MessageAuthenticationCode
-             * @tparam Endian
-             * @tparam ValueBits
-             * @tparam LengthBits
-             */
             template<typename MessageAuthenticationCode>
-            using kdf_accumulator = boost::accumulators::accumulator_set<
+            using accumulator_set = boost::accumulators::accumulator_set<
                 digest<MessageAuthenticationCode::input_block_bits>,
                 boost::accumulators::features<accumulators::tag::hash<typename MessageAuthenticationCode::hash_type>,
                                               accumulators::tag::kdf<MessageAuthenticationCode>>>;
