@@ -34,7 +34,7 @@ namespace nil {
              * Encrypt implemented directly from the Skein standard as found at
              * http://www.skein-hash.info/sites/default/files/skein1.2.pdf
              *
-             * @tparam KeyBits
+             * @tparam KeyBits Block cipher key bits. Available values are: 256, 512.
              */
             template<std::size_t KeyBits>
             class threefish {

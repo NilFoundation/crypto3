@@ -92,8 +92,8 @@ namespace nil {
              * [Cache-Collision Timing Attacks Against AES. Bonneau,
              * Mironov](http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.88.4753)
              *
-             * @tparam KeyBits Key length used in bits.
-             * @tparam BlockBits Block length used in bits.
+             * @tparam KeyBits Key length used in bits. Available values are: 128, 192, 256
+             * @tparam BlockBits Block length used in bits. Available values are: 128, 192, 256
              */
             template<std::size_t KeyBits, std::size_t BlockBits>
             class rijndael {

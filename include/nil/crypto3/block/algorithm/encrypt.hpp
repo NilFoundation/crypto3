@@ -34,6 +34,8 @@ namespace nil {
          *
          * @param first
          * @param last
+         * @param key_first
+         * @param key_last
          * @param out
          *
          * @return
@@ -117,8 +119,12 @@ namespace nil {
          * @tparam BlockCipher
          * @tparam InputIterator
          * @tparam CipherState
+         *
          * @param first
          * @param last
+         * @param key_first
+         * @param key_last
+         *
          * @return
          */
         template<
@@ -141,8 +147,11 @@ namespace nil {
          * @tparam SinglePassRange
          * @tparam OutputIterator
          * @tparam CipherState
+         *
          * @param rng
+         * @param key
          * @param out
+         *
          * @return
          */
         template<typename BlockCipher, typename SinglePassRange, typename KeyRange, typename OutputIterator>
@@ -165,7 +174,10 @@ namespace nil {
          * @tparam BlockCipher
          * @tparam SinglePassRange
          * @tparam CipherState
+         *
          * @param r
+         * @param key
+         *
          * @return
          */
         template<

@@ -23,7 +23,7 @@ namespace nil {
     namespace crypto3 {
         namespace block {
             /*!
-             * @brief MD4 block cipher. Stands as a foundation for
+             * @brief MD5 block cipher. Stands as a foundation for
              * @ref nil::crypto3::hash::md5 "MD5" hash.
              *
              * @ingroup block

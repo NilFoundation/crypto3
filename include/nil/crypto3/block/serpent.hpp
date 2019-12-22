@@ -28,6 +28,7 @@ namespace nil {
              * especially if no SIMD instruction set is available.
              *
              * @ingroup block
+             * @tparam KeyBits Block cipher key bits. Available values are: 128, 192, 256
              */
             template<std::size_t KeyBits>
             class serpent {

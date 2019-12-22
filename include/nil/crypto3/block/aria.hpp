@@ -28,7 +28,7 @@ namespace nil {
              * to use it otherwise.
              * @ingroup block
              *
-             * @tparam Size
+             * @tparam KeyBits Block cipher key bits. Supported values are: 128, 192, 256
              *
              * This ARIA implementation is based on the 32-bit implementation by Aaram Yun from the
              * National Security Research Institute, KOREA. Aaram Yun's implementation is based on
@@ -38,11 +38,11 @@ namespace nil {
              * [Korea Internet & Security Agency
              * homepage](http://seed.kisa.or.kr/iwt/ko/bbs/EgovReferenceList.do?bbsId=BBSMSTR_000000000002)
              */
-            template<std::size_t Size>
+            template<std::size_t KeyBits>
             class aria {
             protected:
-                constexpr static const std::size_t version = Size;
-                typedef detail::aria_policy<Size> policy_type;
+                constexpr static const std::size_t version = KeyBits;
+                typedef detail::aria_policy<KeyBits> policy_type;
 
                 constexpr static const std::size_t key_schedule_words = policy_type::key_schedule_words;
                 typedef typename policy_type::key_schedule_type key_schedule_type;
@@ -72,7 +72,7 @@ namespace nil {
                         constexpr static const std::size_t length_bits = policy_type::word_bits * 2;
                     };
 
-                    typedef block_stream_processor<Mode<aria<Size>, Padding>, StateAccumulator, params_type> type;
+                    typedef block_stream_processor<Mode<aria<KeyBits>, Padding>, StateAccumulator, params_type> type;
                 };
 
             public:

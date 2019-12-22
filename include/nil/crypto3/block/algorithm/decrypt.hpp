@@ -28,11 +28,13 @@ namespace nil {
          *
          * @tparam BlockCipher
          * @tparam InputIterator
+         * @tparam KeyIterator
          * @tparam OutputIterator
-         * @tparam StreamEncrypter
          *
          * @param first
          * @param last
+         * @param key_first
+         * @param key_last
          * @param out
          *
          * @return
@@ -57,8 +59,7 @@ namespace nil {
          *
          * @tparam BlockCipher
          * @tparam InputIterator
-         * @tparam OutputIterator
-         * @tparam StreamEncrypter
+         * @tparam OutputAccumulator
          *
          * @param first
          * @param last
@@ -66,9 +67,9 @@ namespace nil {
          *
          * @return
          */
-        template<
-            typename BlockCipher, typename InputIterator,
-            typename OutputAccumulator = typename block::block_accumulator_set<typename BlockCipher::stream_decrypter_type>>
+        template<typename BlockCipher, typename InputIterator,
+                 typename OutputAccumulator =
+                     typename block::block_accumulator_set<typename BlockCipher::stream_decrypter_type>>
         OutputAccumulator &decrypt(InputIterator first, InputIterator last, OutputAccumulator &acc) {
 
             typedef typename BlockCipher::stream_decrypter_type EncryptionMode;
@@ -94,9 +95,9 @@ namespace nil {
          *
          * @return
          */
-        template<
-            typename BlockCipher, typename SinglePassRange,
-            typename OutputAccumulator = typename block::block_accumulator_set<typename BlockCipher::stream_decrypter_type>>
+        template<typename BlockCipher, typename SinglePassRange,
+                 typename OutputAccumulator =
+                     typename block::block_accumulator_set<typename BlockCipher::stream_decrypter_type>>
         OutputAccumulator &decrypt(const SinglePassRange &r, OutputAccumulator &acc) {
 
             typedef typename BlockCipher::stream_decrypter_type EncryptionMode;
@@ -115,14 +116,19 @@ namespace nil {
          *
          * @tparam BlockCipher
          * @tparam InputIterator
-         * @tparam CipherState
+         * @tparam KeyIterator
+         * @tparam CipherAccumulator
+         *
          * @param first
          * @param last
+         * @param key_first
+         * @param key_last
+         *
          * @return
          */
-        template<
-            typename BlockCipher, typename InputIterator, typename KeyIterator,
-            typename CipherAccumulator = typename block::block_accumulator_set<typename BlockCipher::stream_decrypter_type>>
+        template<typename BlockCipher, typename InputIterator, typename KeyIterator,
+                 typename CipherAccumulator =
+                     typename block::block_accumulator_set<typename BlockCipher::stream_decrypter_type>>
         block::detail::range_cipher_impl<block::detail::value_cipher_impl<CipherAccumulator>>
             decrypt(InputIterator first, InputIterator last, KeyIterator key_first, KeyIterator key_last) {
 
@@ -139,10 +145,12 @@ namespace nil {
          *
          * @tparam BlockCipher
          * @tparam SinglePassRange
+         * @tparam KeyRange
          * @tparam OutputIterator
-         * @tparam CipherState
+         *
          * @param rng
          * @param out
+         *
          * @return
          */
         template<typename BlockCipher, typename SinglePassRange, typename KeyRange, typename OutputIterator>
@@ -164,13 +172,16 @@ namespace nil {
          *
          * @tparam BlockCipher
          * @tparam SinglePassRange
-         * @tparam CipherState
+         * @tparam KeyRange
+         * @tparam CipherAccumulator
+         *
          * @param r
+         *
          * @return
          */
-        template<
-            typename BlockCipher, typename SinglePassRange, typename KeyRange,
-            typename CipherAccumulator = typename block::block_accumulator_set<typename BlockCipher::stream_decrypter_type>>
+        template<typename BlockCipher, typename SinglePassRange, typename KeyRange,
+                 typename CipherAccumulator =
+                     typename block::block_accumulator_set<typename BlockCipher::stream_decrypter_type>>
         block::detail::range_cipher_impl<block::detail::value_cipher_impl<CipherAccumulator>>
             decrypt(const SinglePassRange &r, const KeyRange &key) {
 

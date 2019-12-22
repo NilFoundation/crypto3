@@ -26,6 +26,8 @@ namespace nil {
              * and a "kitchen sink" design.
              *
              * @ingroup block
+             *
+             * @tparam KeyBits Block cipher key bits. Available values are: 128, 192, 256.
              */
             template<std::size_t KeyBits>
             class twofish {

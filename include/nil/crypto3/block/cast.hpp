@@ -29,13 +29,14 @@ namespace nil {
              *
              * @ingroup block
              *
-             * @tparam Version Version selector value. Available values are: 128, 256.
-             * @tparam KeyBits
+             * @tparam BlockBits Block cipher block bits. Does not represent the actual block bits value. Actual
+             * block bits value is BlockBits / 2. Available values are: 128, 256.
+             * @tparam KeyBits Block cipher key bits.
              */
-            template<std::size_t Version, std::size_t KeyBits>
+            template<std::size_t BlockBits, std::size_t KeyBits>
             class cast {
             protected:
-                typedef typename detail::cast_policy<Version, KeyBits> policy_type;
+                typedef typename detail::cast_policy<BlockBits, KeyBits> policy_type;
 
                 typedef typename policy_type::rotation_key_schedule_type rotation_key_schedule_type;
                 typedef typename policy_type::key_schedule_type key_schedule_type;
@@ -64,7 +65,7 @@ namespace nil {
                         constexpr static const std::size_t length_bits = policy_type::word_bits * 2;
                     };
 
-                    typedef block_stream_processor<Mode<cast<Version, KeyBits>, Padding>, StateAccumulator, params_type>
+                    typedef block_stream_processor<Mode<cast<BlockBits, KeyBits>, Padding>, StateAccumulator, params_type>
                         type_;
 #ifdef CRYPTO3_BLOCK_NO_HIDE_INTERNAL_TYPES
                     typedef type_ type;
