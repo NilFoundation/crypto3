@@ -44,7 +44,7 @@ namespace nil {
                                OutputIterator out) {
 
             typedef typename BlockCipher::stream_decrypter_type EncryptionMode;
-            typedef typename block::block_accumulator_set<EncryptionMode> CipherAccumulator;
+            typedef typename block::accumulator_set<EncryptionMode> CipherAccumulator;
 
             typedef block::detail::value_cipher_impl<CipherAccumulator> StreamEncrypterImpl;
             typedef block::detail::itr_cipher_impl<StreamEncrypterImpl, OutputIterator> EncrypterImpl;
@@ -67,15 +67,12 @@ namespace nil {
          *
          * @return
          */
-        template<typename BlockCipher, typename InputIterator,
-                 typename OutputAccumulator =
-                     typename block::block_accumulator_set<typename BlockCipher::stream_decrypter_type>>
+        template<
+            typename BlockCipher, typename InputIterator,
+            typename OutputAccumulator = typename block::accumulator_set<typename BlockCipher::stream_decrypter_type>>
         OutputAccumulator &decrypt(InputIterator first, InputIterator last, OutputAccumulator &acc) {
 
-            typedef typename BlockCipher::stream_decrypter_type EncryptionMode;
-            typedef typename block::block_accumulator_set<EncryptionMode> CipherAccumulator;
-
-            typedef block::detail::ref_cipher_impl<CipherAccumulator> StreamEncrypterImpl;
+            typedef block::detail::ref_cipher_impl<OutputAccumulator> StreamEncrypterImpl;
             typedef block::detail::range_cipher_impl<StreamEncrypterImpl> EncrypterImpl;
 
             return EncrypterImpl(first, last, acc);
@@ -95,15 +92,12 @@ namespace nil {
          *
          * @return
          */
-        template<typename BlockCipher, typename SinglePassRange,
-                 typename OutputAccumulator =
-                     typename block::block_accumulator_set<typename BlockCipher::stream_decrypter_type>>
+        template<
+            typename BlockCipher, typename SinglePassRange,
+            typename OutputAccumulator = typename block::accumulator_set<typename BlockCipher::stream_decrypter_type>>
         OutputAccumulator &decrypt(const SinglePassRange &r, OutputAccumulator &acc) {
 
-            typedef typename BlockCipher::stream_decrypter_type EncryptionMode;
-            typedef typename block::block_accumulator_set<EncryptionMode> CipherAccumulator;
-
-            typedef block::detail::ref_cipher_impl<CipherAccumulator> StreamEncrypterImpl;
+            typedef block::detail::ref_cipher_impl<OutputAccumulator> StreamEncrypterImpl;
             typedef block::detail::range_cipher_impl<StreamEncrypterImpl> EncrypterImpl;
 
             return EncrypterImpl(r, acc);
@@ -126,9 +120,9 @@ namespace nil {
          *
          * @return
          */
-        template<typename BlockCipher, typename InputIterator, typename KeyIterator,
-                 typename CipherAccumulator =
-                     typename block::block_accumulator_set<typename BlockCipher::stream_decrypter_type>>
+        template<
+            typename BlockCipher, typename InputIterator, typename KeyIterator,
+            typename CipherAccumulator = typename block::accumulator_set<typename BlockCipher::stream_decrypter_type>>
         block::detail::range_cipher_impl<block::detail::value_cipher_impl<CipherAccumulator>>
             decrypt(InputIterator first, InputIterator last, KeyIterator key_first, KeyIterator key_last) {
 
@@ -157,7 +151,7 @@ namespace nil {
         OutputIterator decrypt(const SinglePassRange &rng, const KeyRange &key, OutputIterator out) {
 
             typedef typename BlockCipher::stream_decrypter_type EncryptionMode;
-            typedef typename block::block_accumulator_set<EncryptionMode> CipherAccumulator;
+            typedef typename block::accumulator_set<EncryptionMode> CipherAccumulator;
 
             typedef block::detail::value_cipher_impl<CipherAccumulator> StreamEncrypterImpl;
             typedef block::detail::itr_cipher_impl<StreamEncrypterImpl, OutputIterator> EncrypterImpl;
@@ -179,9 +173,9 @@ namespace nil {
          *
          * @return
          */
-        template<typename BlockCipher, typename SinglePassRange, typename KeyRange,
-                 typename CipherAccumulator =
-                     typename block::block_accumulator_set<typename BlockCipher::stream_decrypter_type>>
+        template<
+            typename BlockCipher, typename SinglePassRange, typename KeyRange,
+            typename CipherAccumulator = typename block::accumulator_set<typename BlockCipher::stream_decrypter_type>>
         block::detail::range_cipher_impl<block::detail::value_cipher_impl<CipherAccumulator>>
             decrypt(const SinglePassRange &r, const KeyRange &key) {
 

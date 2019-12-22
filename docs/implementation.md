@@ -277,7 +277,7 @@ Encryption contains an accumulation step, which is implemented with
 
 All the concepts are held.
 
-Block ciphers contains pre-defined [`block_accumulator_set`](@ref block_accumulator_set), 
+Block ciphers contains pre-defined [`block::accumulator_set`](@ref block::accumulator_set), 
 which is a `boost::accumulator_set` with pre-filled 
 [`block` accumulator](@ref accumulators::block).
 
