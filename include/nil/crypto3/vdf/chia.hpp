@@ -34,8 +34,7 @@ namespace nil {
                  * @param b
                  */
                 template<typename Integer, typename NumberType = mpz_t>
-                static inline void make_state(state_type<NumberType> &state,
-                                              NumberType discriminant) {
+                static inline void make_state(state_type<NumberType> &state, NumberType discriminant) {
                     NumberType denom;
                     mpz_init(denom);
                     mpz_set_ui(state.form.a, 2);
