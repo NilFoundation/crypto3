@@ -103,7 +103,7 @@ namespace nil {
          * @tparam OutputIterator Must meet the requirements of OutputIterator.
          *
          * @param rng Defines the range to be processed by decoder.
-         * @param out Defines the beginning of destination range.
+         * @param acc AccumulatorSet defines the destination decoded data would be stored.
          *
          * @return Output iterator to the element in the destination range, one past the last element inserted.
          */
@@ -133,7 +133,7 @@ namespace nil {
          * @tparam CodecAccumulator Must meet the requirements of AccumulatorSet.
          *
          * @param rng Defines the range to be processed by decoder.
-         * @param acc AccumulatorSet defines the destination decoded data would be stored.
+         * @param out Defines the beginning of destination range.
          * @return CodecAccumulator AccumulatorSet non-const reference equal to acc.
          */
         template<typename Decoder, typename SinglePassRange, typename OutputIterator>
@@ -170,12 +170,12 @@ namespace nil {
                  typename CodecAccumulator = typename codec::accumulator_set<typename Decoder::stream_decoder_type>>
         typename std::enable_if<boost::accumulators::detail::is_accumulator_set<CodecAccumulator>::value,
                                 CodecAccumulator>::type &
-            decode(const SinglePassRange &rng, CodecAccumulator &out) {
+            decode(const SinglePassRange &rng, CodecAccumulator &acc) {
 
             typedef codec::detail::value_codec_impl<CodecAccumulator> DecoderStateImpl;
             typedef codec::detail::range_codec_impl<DecoderStateImpl> DecoderImpl;
 
-            return DecoderImpl(rng, std::forward<CodecAccumulator>(out));
+            return DecoderImpl(rng, std::forward<CodecAccumulator>(acc));
         }
 
         /*!
