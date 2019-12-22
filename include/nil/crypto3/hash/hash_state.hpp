@@ -18,18 +18,8 @@
 namespace nil {
     namespace crypto3 {
         namespace hash {
-            /*!
-             * @brief Hash state managing container
-             *
-             * Meets the requirements of HashStateContainer, ConceptContainer, SequenceContainer, Container
-             *
-             * @tparam Hasher
-             * @tparam Endian
-             * @tparam ValueBits
-             * @tparam LengthBits
-             */
             template<typename Hash>
-            using hash_accumulator_set =
+            using accumulator_set =
                 boost::accumulators::accumulator_set<static_digest<Hash::digest_bits>,
                                                      boost::accumulators::features<accumulators::tag::hash<Hash>>,
                                                      std::size_t>;
