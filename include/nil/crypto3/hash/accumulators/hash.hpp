@@ -23,7 +23,7 @@
 #include <nil/crypto3/detail/make_array.hpp>
 #include <nil/crypto3/detail/static_digest.hpp>
 
-#include <nil/crypto3/hash/accumulators/seen_count.hpp>
+#include <nil/crypto3/hash/accumulators/bits_count.hpp>
 
 #include <nil/crypto3/hash/accumulators/parameters/bits.hpp>
 #include <nil/crypto3/hash/accumulators/parameters/salt.hpp>
@@ -69,13 +69,14 @@ namespace nil {
 
                     template<typename ArgumentPack>
                     inline void operator()(const ArgumentPack &args) {
-                        seen_bits = extract::seen_count(args);
-                        resolve_type(args[boost::accumulators::sample], args[::nil::crypto3::accumulators::bits | std::size_t()]);
+                        seen_bits = extract::bits_count(args);
+                        resolve_type(args[boost::accumulators::sample],
+                                     args[::nil::crypto3::accumulators::bits | std::size_t()]);
                     }
 
                     inline result_type result(boost::accumulators::dont_care) const {
                         construction_type res = construction;
-                        return res.digest(cache, seen_bits  % block_bits);
+                        return res.digest(cache, seen_bits % block_bits);
                     }
 
                 protected:
@@ -88,9 +89,8 @@ namespace nil {
                     }
 
                     inline void cache_block(const block_type &value) {
-                        length_type i = 0;
-                        length_type cache_count = seen_bits % block_bits;
-                        length_type j = cache_count / word_bits;
+                        length_type i = 0, cache_count = seen_bits % block_bits, j = cache_count / word_bits;
+
                         while (cache_count != block_words) {
                             cache[cache_words + j] = value[i];
                             ++cache_words;
@@ -104,8 +104,10 @@ namespace nil {
 
                     inline void process(const block_type &value, std::size_t bits) {
                         length_type cached_bits = (seen_bits - bits) % block_bits;
+
                         if (cached_bits != 0) {
-                            std::move(value.begin(), value.begin() + (block_bits - cached_bits), cache.begin() + cached_bits);
+                            std::move(value.begin(), value.begin() + (block_bits - cached_bits),
+                                      cache.begin() + cached_bits);
                             cached_bits += block_bits - cached_bits;
                             if (cached_bits == block_bits) {
                                 construction.process_block(cache);
@@ -122,6 +124,7 @@ namespace nil {
 
                     inline void process(const word_type &value, std::size_t bits) {
                         length_type cached_bits = (seen_bits - bits) % block_bits;
+
                         if (cached_bits != 0) {
                             cache[cached_bits + 1] = value;
                             cached_bits += block_bits - cached_bits;
@@ -145,7 +148,7 @@ namespace nil {
 
             namespace tag {
                 template<typename Hash>
-                struct hash : boost::accumulators::depends_on<seen_count> {
+                struct hash : boost::accumulators::depends_on<bits_count> {
                     typedef Hash hash_type;
 
                     /// INTERNAL ONLY

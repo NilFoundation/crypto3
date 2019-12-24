@@ -141,7 +141,7 @@ BOOST_DATA_TEST_CASE(adler_string_various_itr_value_hash, boost::unit_test::data
 }
 
 BOOST_AUTO_TEST_CASE(adler_stateful_hash1) {
-    hash_accumulator_set<adler<32>> acc;
+    accumulator_set<adler<32>> acc;
     for (unsigned i = 0; i < 1000000; ++i) {
         acc('a');
     }
@@ -155,7 +155,7 @@ BOOST_AUTO_TEST_CASE(adler_stateful_hash1) {
 }
 
 BOOST_AUTO_TEST_CASE(adler_stateful_hash2) {
-    hash_accumulator_set<adler<32>> acc;
+    accumulator_set<adler<32>> acc;
     std::string s(1000, 'a');
     for (unsigned i = 0; i < 1000000; ++i) {
         hash<adler<32>>(s, acc);
@@ -170,7 +170,7 @@ BOOST_AUTO_TEST_CASE(adler_stateful_hash2) {
 }
 
 BOOST_AUTO_TEST_CASE(adler_stateful_hash3) {
-    hash_accumulator_set<adler<32>> acc;
+    accumulator_set<adler<32>> acc;
     for (unsigned i = 0; i < 1000000000; ++i) {
         acc('a');
     }

@@ -118,7 +118,7 @@ BOOST_FIXTURE_TEST_CASE(md5_accumulator3, fixture) {
 }
 
 BOOST_AUTO_TEST_CASE(md5_preprocessor1) {
-    hash_accumulator_set<md5> acc;
+    accumulator_set<md5> acc;
     md5::construction::type::digest_type s = extract::hash<md5>(acc);
 
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
@@ -129,7 +129,7 @@ BOOST_AUTO_TEST_CASE(md5_preprocessor1) {
 }
 
 BOOST_AUTO_TEST_CASE(md5_preprocessor2) {
-    hash_accumulator_set<md5> acc;
+    accumulator_set<md5> acc;
     acc('a');
     acc('b');
     acc('c');
@@ -145,7 +145,7 @@ BOOST_AUTO_TEST_CASE(md5_preprocessor2) {
 
 BOOST_AUTO_TEST_CASE(md5_preprocessor3) {
     // perl -e 'for (1..1000000) { print "a"; }' | md5sum
-    hash_accumulator_set<md5> acc;
+    accumulator_set<md5> acc;
     for (unsigned i = 0; i < 1000000; ++i) {
         acc('a');
     }

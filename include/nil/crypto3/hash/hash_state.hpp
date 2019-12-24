@@ -29,7 +29,7 @@ namespace nil {
              * @tparam LengthBits
              */
             template<typename Hash>
-            using hash_accumulator_set =
+            using accumulator_set =
                 boost::accumulators::accumulator_set<static_digest<Hash::digest_bits>,
                                                      boost::accumulators::features<accumulators::tag::hash<Hash>>,
                                                      std::size_t>;

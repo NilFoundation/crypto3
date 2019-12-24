@@ -112,7 +112,7 @@ namespace nil {
             public:
                 merkle_damgard_stream_processor &update_one(value_type value) {
                     using namespace boost::accumulators;
-                    length_type seen = accumulators::extract::seen_count(acc);
+                    length_type seen = accumulators::extract::bits_count(acc);
                     std::size_t i = seen % block_bits;
                     std::size_t j = i / value_bits;
                     value_array[cache_size] = value;
@@ -130,7 +130,7 @@ namespace nil {
                     using namespace nil::crypto3::detail;
                     using namespace boost::accumulators;
 #ifndef CRYPTO3_HASH_NO_OPTIMIZATION
-                    length_type seen = accumulators::extract::seen_count(acc);
+                    length_type seen = accumulators::extract::bits_count(acc);
                     if (seen % block_bits != 0) {
                         for (; n && (block_bits - seen % block_bits); --n, ++p) {
                             value_array[cache_size] = *p;
@@ -220,19 +220,20 @@ namespace nil {
                 }
 
             public:
-                merkle_damgard_stream_processor(accumulator_type &acc) : acc(acc), value_array(), block_hash(), cache_size(0) {
+                merkle_damgard_stream_processor(accumulator_type &acc) :
+                    acc(acc), value_array(), block_hash(), cache_size(0) {
                 }
 
                 virtual ~merkle_damgard_stream_processor() {
-//                    using namespace nil::crypto3::detail;
-//
-//                    // Convert the input into words
-//                    block_type block;
-//                    pack<endian_type, value_bits, word_bits>(value_array, block);
-//
-//                    // Process the block
-//                    std::size_t bb = block_bits;
-//                    acc(block, accumulators::bits = bb);
+                    //                    using namespace nil::crypto3::detail;
+                    //
+                    //                    // Convert the input into words
+                    //                    block_type block;
+                    //                    pack<endian_type, value_bits, word_bits>(value_array, block);
+                    //
+                    //                    // Process the block
+                    //                    std::size_t bb = block_bits;
+                    //                    acc(block, accumulators::bits = bb);
                 }
 
                 void reset() {
@@ -245,7 +246,7 @@ namespace nil {
 
                 value_array_type value_array;
                 construction_type block_hash;
-                length_type       cache_size;
+                length_type cache_size;
             };
         }    // namespace hash
     }        // namespace crypto3
