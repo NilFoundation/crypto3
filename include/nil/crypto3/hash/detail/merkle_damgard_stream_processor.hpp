@@ -187,8 +187,8 @@ namespace nil {
                 digest_type end_message() {
                     using namespace nil::crypto3::detail;
                     using namespace boost::accumulators;
-                    length_type seen = count(acc);
-                    length_type length = seen;
+
+                    length_type seen = count(acc), length = seen;
 
                     // Add a 1 bit
 #ifdef CRYPTO3_HASH_NO_OPTIMIZATION

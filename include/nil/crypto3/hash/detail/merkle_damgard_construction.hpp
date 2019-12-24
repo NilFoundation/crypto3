@@ -74,13 +74,14 @@ namespace nil {
                     return *this;
                 }
 
-                inline digest_type end_message(length_type seen = length_type()) {
-                    digest_type d = digest();
+                inline digest_type end_message(const block_type &block = block_type(),
+                                               length_type seen = length_type()) {
+                    digest_type d = digest(block, seen);
                     reset();
                     return d;
                 }
 
-                inline digest_type digest(const block_type &block, length_type seen = length_type()) {
+                inline digest_type digest(const block_type &block = block_type(), length_type seen = length_type()) {
                     using namespace nil::crypto3::detail;
 
                     block_type b;
@@ -88,7 +89,7 @@ namespace nil {
                     std::fill(b.begin() + seen, b.end(), 0);
                     auto t = seen / sizeof(b[0]) + 1;
                     imploder_step<endian_type, 1, word_bits, 0>::step(1, b[seen / sizeof(b[0]) + 1]);
-                    //imploder_step<endian_type, 1, word_bits, seen % block_bits>::step(1, b[seen / block_bits]);
+                    // imploder_step<endian_type, 1, word_bits, seen % block_bits>::step(1, b[seen / block_bits]);
                     append_length<length_bits>(b, seen);
 
                     finalizer_functor finalizer;
@@ -137,7 +138,6 @@ namespace nil {
                 }
 
                 state_type state_;
-
             };
 
         }    // namespace hash
