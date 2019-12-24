@@ -115,9 +115,7 @@ namespace nil {
                     inline operator OutputRange() const {
                         result_type result =
                             boost::accumulators::extract_result<accumulator_type>(this->accumulator_set);
-                        OutputRange out;
-                        std::move(result.begin(), result.end(), out.end());
-                        return out;
+                        return OutputRange(result.begin(), result.end());
                     }
 
                     inline operator result_type() const {
@@ -195,7 +193,6 @@ namespace nil {
                     inline operator OutputIterator() const {
                         result_type result =
                             boost::accumulators::extract_result<accumulator_type>(this->accumulator_set);
-
                         return std::move(result.cbegin(), result.cend(), out);
                     }
                 };
