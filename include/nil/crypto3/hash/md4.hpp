@@ -12,9 +12,9 @@
 
 #include <nil/crypto3/block/md4.hpp>
 
-#include <nil/crypto3/hash/detail/davies_meyer_compressor.hpp>
 #include <nil/crypto3/hash/detail/md4_policy.hpp>
 #include <nil/crypto3/hash/detail/state_adder.hpp>
+#include <nil/crypto3/hash/detail/davies_meyer_compressor.hpp>
 #include <nil/crypto3/hash/detail/merkle_damgard_construction.hpp>
 #include <nil/crypto3/hash/detail/merkle_damgard_stream_processor.hpp>
 

@@ -105,6 +105,9 @@ namespace nil {
                     typedef haifa_construction<params_type, typename policy_type::iv_generator,
                                                blake2b_compressor<DigestBits>>
                         type;
+
+                    constexpr static const std::size_t word_bits = policy_type::word_bits;
+                    typedef typename policy_type::word_type word_type;
                 };
 
                 template<typename StateAccumulator, std::size_t ValueBits>
@@ -112,7 +115,7 @@ namespace nil {
                     struct params_type {
                         typedef typename stream_endian::little_octet_big_bit endian;
 
-                        constexpr static const std::size_t length_bits = construction::params_type::length_bits;
+                        constexpr static const std::size_t length_bits = construction::params_type::word_bits;
                         constexpr static const std::size_t value_bits = ValueBits;
                     };
 

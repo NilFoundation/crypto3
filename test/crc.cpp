@@ -61,24 +61,43 @@ static const std::unordered_map<std::string, std::vector<uint8_t>> byte_data = {
 
 BOOST_AUTO_TEST_SUITE(crc_hash_test_suite)
 
-BOOST_DATA_TEST_CASE(crc_iterator_range_hash, boost::unit_test::data::make(byte_data), array_element) {
-    std::vector<std::uint8_t> out;
-    hash<crc32_png>(array_element.first.begin(), array_element.first.end(), std::back_inserter(out));
+    BOOST_DATA_TEST_CASE(crc_range_itr_hash, boost::unit_test::data::make(byte_data), array_element) {
+        std::vector<uint8_t> out;
+        hash<crc32_png>(array_element.first, std::back_inserter(out));
 
-    BOOST_CHECK_EQUAL(out, array_element.second);
-}
+        BOOST_CHECK_EQUAL(out, array_element.second);
+    }
 
-BOOST_DATA_TEST_CASE(crc_various_range_hash, boost::unit_test::data::make(byte_data), array_element) {
-    std::vector<std::uint8_t> out = hash<crc32_png>(array_element.first);
+    BOOST_DATA_TEST_CASE(crc_various_range_value_hash, boost::unit_test::data::make(byte_data), array_element) {
+        std::vector<uint8_t> out = hash<crc32_png>(array_element.first);
 
-    BOOST_CHECK_EQUAL(out, array_element.second);
-}
+        BOOST_CHECK_EQUAL(out, array_element.second);
+    }
 
-BOOST_DATA_TEST_CASE(crc_range_hash, boost::unit_test::data::make(string_data), array_element) {
-    std::string out = hash<crc32_png>(array_element.first);
+    BOOST_DATA_TEST_CASE(crc_various_itr_value_hash, boost::unit_test::data::make(byte_data), array_element) {
+        std::vector<uint8_t> out = hash<crc32_png>(array_element.first.begin(), array_element.first.end());
 
-    BOOST_CHECK_EQUAL(out, array_element.second);
-}
+        BOOST_CHECK_EQUAL(out, array_element.second);
+    }
+
+    BOOST_DATA_TEST_CASE(crc_iterator_itr_hash, boost::unit_test::data::make(byte_data), array_element) {
+        std::vector<uint8_t> out;
+        hash<crc32_png>(array_element.first.begin(), array_element.first.end(), std::back_inserter(out));
+
+        BOOST_CHECK_EQUAL(out, array_element.second);
+    }
+
+    BOOST_DATA_TEST_CASE(crc_string_various_range_value_hash, boost::unit_test::data::make(string_data), array_element) {
+        std::string out = hash<crc32_png>(array_element.first);
+
+        BOOST_CHECK_EQUAL(out, array_element.second);
+    }
+
+    BOOST_DATA_TEST_CASE(crc_string_various_itr_value_hash, boost::unit_test::data::make(string_data), array_element) {
+        std::string out = hash<crc32_png>(array_element.first.begin(), array_element.first.end());
+
+        BOOST_CHECK_EQUAL(out, array_element.second);
+    }
 
 BOOST_AUTO_TEST_CASE(crc_stateful_hash1) {
     accumulator_set<crc32_png> acc;

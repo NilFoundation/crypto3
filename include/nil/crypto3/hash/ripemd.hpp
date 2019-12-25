@@ -11,6 +11,7 @@
 #define CRYPTO3_RIPEMD_160_HPP
 
 #include <nil/crypto3/hash/detail/ripemd/ripemd_policy.hpp>
+
 #include <nil/crypto3/hash/detail/merkle_damgard_construction.hpp>
 #include <nil/crypto3/hash/detail/merkle_damgard_stream_processor.hpp>
 

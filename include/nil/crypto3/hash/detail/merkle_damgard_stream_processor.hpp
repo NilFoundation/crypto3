@@ -72,7 +72,7 @@ namespace nil {
 
                 BOOST_STATIC_ASSERT(!length_bits || value_bits <= length_bits);
 
-                inline void process_block() {
+                inline void process_block(std::size_t bb = block_bits) {
                     using namespace nil::crypto3::detail;
 
                     // Convert the input into words
@@ -80,19 +80,14 @@ namespace nil {
                     pack<endian_type, value_bits, word_bits>(value_array, block);
 
                     // Process the block
-                    std::size_t bb = block_bits;
                     acc(block, accumulators::bits = bb);
-
-                    // Reset seen if we don't need to track the length
-                    if (!length_bits) {
-                        seen = 0;
-                    }
                 }
 
                 template<typename Dummy>
                 typename boost::enable_if_c<length_bits && sizeof(Dummy)>::type append_length(length_type length) {
                     using namespace nil::crypto3::detail;
-
+                    using namespace boost::accumulators;
+                    length_type seen = count(acc);
                     // Convert the input into words
                     block_type block;
                     pack<endian_type, value_bits, word_bits>(value_array, block);
@@ -116,13 +111,16 @@ namespace nil {
 
             public:
                 merkle_damgard_stream_processor &update_one(value_type value) {
+                    using namespace boost::accumulators;
+                    length_type seen = accumulators::extract::bits_count(acc);
                     std::size_t i = seen % block_bits;
                     std::size_t j = i / value_bits;
-                    value_array[j] = value;
-                    seen += value_bits;
-                    if (i == block_bits - value_bits) {
+                    value_array[cache_size] = value;
+                    ++cache_size;
+                    if (cache_size == block_values) {
                         // Process the completed block
                         process_block();
+                        cache_size = 0;
                     }
                     return *this;
                 }
@@ -130,10 +128,16 @@ namespace nil {
                 template<typename InputIterator>
                 merkle_damgard_stream_processor &update_n(InputIterator p, size_t n) {
                     using namespace nil::crypto3::detail;
-
+                    using namespace boost::accumulators;
 #ifndef CRYPTO3_HASH_NO_OPTIMIZATION
-                    for (; n && (seen % block_bits); --n, ++p) {
-                        update_one(*p);
+                    length_type seen = accumulators::extract::bits_count(acc);
+                    if (seen % block_bits != 0) {
+                        for (; n && (block_bits - seen % block_bits); --n, ++p) {
+                            value_array[cache_size] = *p;
+                            ++cache_size;
+                        }
+                        process_block(cache_size * value_bits);
+                        cache_size = 0;
                     }
                     for (; n >= block_values; n -= block_values, p += block_values) {
                         // Convert the input into words
@@ -143,17 +147,15 @@ namespace nil {
                         // Process the block
                         std::size_t bb = block_bits;
                         acc(block, accumulators::bits = bb);
-                        seen += block_bits;
-
-                        // Reset seen if we don't need to track the length
-                        if (!length_bits) {
-                            seen = 0;
-                        }
                     }
 #endif
+
                     for (; n; --n, ++p) {
-                        update_one(*p);
+                        value_array[cache_size] = *p;
+                        ++cache_size;
                     }
+                    process_block(cache_size * value_bits);
+                    cache_size = 0;
                     return *this;
                 }
 
@@ -184,8 +186,9 @@ namespace nil {
 
                 digest_type end_message() {
                     using namespace nil::crypto3::detail;
+                    using namespace boost::accumulators;
 
-                    length_type length = seen;
+                    length_type seen = count(acc), length = seen;
 
                     // Add a 1 bit
 #ifdef CRYPTO3_HASH_NO_OPTIMIZATION
@@ -207,9 +210,7 @@ namespace nil {
                     // Append length
                     append_length<int>(length);
 
-                    // Reset for next message
-                    seen = 0;
-
+                    cache_size = 0;
                     // Calculate static_digest and reset block_hash
                     return block_hash.end_message();
                 }
@@ -219,11 +220,24 @@ namespace nil {
                 }
 
             public:
-                merkle_damgard_stream_processor(accumulator_type &acc) : acc(acc), value_array(), block_hash(), seen() {
+                merkle_damgard_stream_processor(accumulator_type &acc) :
+                    acc(acc), value_array(), block_hash(), cache_size(0) {
+                }
+
+                virtual ~merkle_damgard_stream_processor() {
+                    //                    using namespace nil::crypto3::detail;
+                    //
+                    //                    // Convert the input into words
+                    //                    block_type block;
+                    //                    pack<endian_type, value_bits, word_bits>(value_array, block);
+                    //
+                    //                    // Process the block
+                    //                    std::size_t bb = block_bits;
+                    //                    acc(block, accumulators::bits = bb);
                 }
 
                 void reset() {
-                    seen = 0;
+                    cache_size = 0;
                     block_hash.reset();
                 }
 
@@ -232,7 +246,7 @@ namespace nil {
 
                 value_array_type value_array;
                 construction_type block_hash;
-                length_type seen;
+                length_type cache_size;
             };
         }    // namespace hash
     }        // namespace crypto3

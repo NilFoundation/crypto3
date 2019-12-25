@@ -13,6 +13,7 @@
 #include <string>
 
 #include <nil/crypto3/hash/detail/keccak/keccak_functions.hpp>
+
 #include <nil/crypto3/hash/detail/sponge_stream_processor.hpp>
 #include <nil/crypto3/hash/detail/sponge_construction.hpp>
 
@@ -59,7 +60,6 @@ namespace nil {
                 typedef typename policy_type::digest_type digest_type;
             };
         }    // namespace hash
-
     }    // namespace crypto3
 }    // namespace nil
 
