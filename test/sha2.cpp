@@ -27,7 +27,7 @@ using namespace nil::crypto3::accumulators;
 template<std::size_t Size>
 class fixture {
 public:
-    hash_accumulator_set<sha2<Size>> acc;
+    accumulator_set<sha2<Size>> acc;
     typedef sha2<Size> hash_t;
 
     virtual ~fixture() {
@@ -343,7 +343,7 @@ BOOST_FIXTURE_TEST_CASE(sha2_512_accumulator3, fixture<512>) {
 }
 
 BOOST_AUTO_TEST_CASE(sha256_preprocessor1) {
-    hash_accumulator_set<sha2<256>> acc;
+    accumulator_set<sha2<256>> acc;
     sha2<256>::digest_type s = extract::hash<sha2<256>>(acc);
 
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
@@ -355,7 +355,7 @@ BOOST_AUTO_TEST_CASE(sha256_preprocessor1) {
 
 BOOST_AUTO_TEST_CASE(sha256_preprocessor2) {
     // Example from Appendix B.1
-    hash_accumulator_set<sha2<256>> acc;
+    accumulator_set<sha2<256>> acc;
     acc('a');
     acc('b');
     acc('c');
@@ -372,7 +372,7 @@ BOOST_AUTO_TEST_CASE(sha256_preprocessor2) {
 BOOST_AUTO_TEST_CASE(sha256_preprocessor3) {
 
     // Example from Appendix B.3
-    hash_accumulator_set<sha2<256>> acc;
+    accumulator_set<sha2<256>> acc;
     for (unsigned i = 0; i < 1000000; ++i) {
         acc('a');
     }
@@ -386,7 +386,7 @@ BOOST_AUTO_TEST_CASE(sha256_preprocessor3) {
 }
 
 BOOST_AUTO_TEST_CASE(sha384_preprocessor1) {
-    hash_accumulator_set<sha2<384>> acc;
+    accumulator_set<sha2<384>> acc;
     sha2<384>::digest_type s = extract::hash<sha2<384>>(acc);
 
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
@@ -401,7 +401,7 @@ BOOST_AUTO_TEST_CASE(sha384_preprocessor1) {
 
 BOOST_AUTO_TEST_CASE(sha384_preprocessor2) {
     // Example from Appendix D.1
-    hash_accumulator_set<sha2<384>> acc;
+    accumulator_set<sha2<384>> acc;
     acc('a');
     acc('b');
     acc('c');
@@ -420,7 +420,7 @@ BOOST_AUTO_TEST_CASE(sha384_preprocessor2) {
 BOOST_AUTO_TEST_CASE(sha384_preprocessor3) {
     // Example from Appendix D.1
     // Example from Appendix D.3
-    hash_accumulator_set<sha2<384>> acc;
+    accumulator_set<sha2<384>> acc;
     for (unsigned i = 0; i < 1000000; ++i) {
         acc('a');
     }
@@ -437,7 +437,7 @@ BOOST_AUTO_TEST_CASE(sha384_preprocessor3) {
 }
 
 BOOST_AUTO_TEST_CASE(sha512_preprocessor1) {
-    hash_accumulator_set<sha2<512>> acc;
+    accumulator_set<sha2<512>> acc;
     sha2<512>::digest_type s = extract::hash<sha2<512>>(acc);
 
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
@@ -452,7 +452,7 @@ BOOST_AUTO_TEST_CASE(sha512_preprocessor1) {
 
 BOOST_AUTO_TEST_CASE(sha512_preprocessor2) {
     // Example from Appendix C.1
-    hash_accumulator_set<sha2<512>> acc;
+    accumulator_set<sha2<512>> acc;
     acc('a');
     acc('b');
     acc('c');
@@ -471,7 +471,7 @@ BOOST_AUTO_TEST_CASE(sha512_preprocessor2) {
 
 BOOST_AUTO_TEST_CASE(sha512_preprocessor3) {
     // Example from Appendix C.3
-    hash_accumulator_set<sha2<512>> acc;
+    accumulator_set<sha2<512>> acc;
     for (unsigned i = 0; i < 1000000; ++i) {
         acc('a');
     }
@@ -499,8 +499,8 @@ BOOST_AUTO_TEST_CASE(sha224_iterator_range_hash) {
 }
 
 BOOST_AUTO_TEST_CASE(sha512_various_hash1) {
-    hash_accumulator_set<sha2<512>> acc;
-    sha2<512>::stream_processor<hash_accumulator_set<sha2<512>>, 16>::type pp(acc);
+    accumulator_set<sha2<512>> acc;
+    sha2<512>::stream_processor<accumulator_set<sha2<512>>, 16>::type pp(acc);
     for (unsigned i = 0; i < 1000000 / 2; ++i) {
         pp.update_one(('a' << 8) | 'a');
     }
@@ -517,8 +517,8 @@ BOOST_AUTO_TEST_CASE(sha512_various_hash1) {
 }
 
 BOOST_AUTO_TEST_CASE(sha512_various_hash2) {
-    hash_accumulator_set<sha2<512>> acc;
-    sha2<512>::stream_processor<hash_accumulator_set<sha2<512>>, 32>::type pp(acc);
+    accumulator_set<sha2<512>> acc;
+    sha2<512>::stream_processor<accumulator_set<sha2<512>>, 32>::type pp(acc);
     for (unsigned i = 0; i < 1000000 / 4; ++i) {
         pp.update_one(('a' << 24) | ('a' << 16) | ('a' << 8) | 'a');
     }

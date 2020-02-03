@@ -74,7 +74,7 @@ namespace nil {
             // Otherwise the three parameters are r, b, and h respectively.
             //
             template<unsigned, unsigned = 0, unsigned = 0>
-            class cubehash;
+            struct cubehash;
 
             /*!
              * @brief Cubehash. Cubehash 16/32 modification was a SHA-3 competitor submitted to NIST.
