@@ -123,7 +123,7 @@ namespace nil {
          */
         template<typename BlockCipher, typename InputIterator, typename KeyIterator,
                  typename CipherAccumulator =
-                     typename block::block::accumulator_set<typename BlockCipher::stream_encrypter_type>>
+                     typename block::accumulator_set<typename BlockCipher::stream_encrypter_type>>
         block::detail::range_cipher_impl<block::detail::value_cipher_impl<CipherAccumulator>>
             encrypt(InputIterator first, InputIterator last, KeyIterator key_first, KeyIterator key_last) {
 
