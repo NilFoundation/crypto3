@@ -4,5 +4,5 @@ Block ciphers for =nil; Foundation's crypto3 cryptography suite.
 
 ## Dependencies
 
-* Hashes (testing purposes only)
-* Boost (>= 1.58)
+* [Hashes](https://github.com/nilfoundation/hash) (testing purposes only)
+* [Boost](https://boost.org) (>= 1.58)
