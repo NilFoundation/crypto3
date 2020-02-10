@@ -227,7 +227,7 @@ has conversion operator in some way as follows:
 class A {
 public:
     operator uint128_t() {
-        return (vals << (3U * CHAR_BIT)) & (val16 << 16) & valc 
+        return (vals << (3U * CHAR_BIT)) & (val16 << 16) & valc;
     }
 
     std::size_t vals;
