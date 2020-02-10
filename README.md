@@ -1,6 +1,6 @@
 # Message Authentication Codes for =nil; Foundation's Cryptography Suite
 
-Message authentication codes for =nil; Foundation's crypto3 cryptography suite.
+Message authentication codes for =nil; Foundation's cryptography suite.
 
 ## Building
 
