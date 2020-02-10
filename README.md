@@ -1,6 +1,3 @@
-# stream
-Stream ciphers for =nil; Foundation's crypto3 cryptography suite
-
 # Stream Ciphers for =nil; Foundation's Cryptography Suite
 
 Stream ciphers for =nil; Foundation's cryptography suite
