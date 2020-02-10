@@ -21,9 +21,14 @@ namespace nil {
 
                 template<std::size_t KeyBits>
                 struct basic_camellia_policy : public basic_functions<64> {
+                    typedef basic_functions<64> policy_type;
+
+                    constexpr static const std::size_t word_bits = policy_type::word_bits;
+                    typedef typename policy_type::word_type word_type;
+
                     constexpr static const std::size_t block_bits = 128;
                     constexpr static const std::size_t block_words = block_bits / word_bits;
-                    typedef std::array<boost::uint_t<word_bits>::exact, block_words> block_type;
+                    typedef std::array<word_type, block_words> block_type;
 
                     constexpr static const std::size_t key_bits = KeyBits;
                     constexpr static const std::size_t key_words = key_bits / word_bits;
@@ -36,7 +41,7 @@ namespace nil {
                                                                0x10E527FADE682D1D, 0xB05688C2B3E6C1FD};
 
                     constexpr static const std::size_t substitution_size = 256;
-                    typedef std::array<boost::uint_t<word_bits>::exact, substitution_size> substitution_type;
+                    typedef std::array<word_type, substitution_size> substitution_type;
 
                     constexpr static const substitution_type sbox1 = {
                         UINT64_C(0x7070700070000070), UINT64_C(0x8282820082000082), UINT64_C(0x2C2C2C002C00002C),
