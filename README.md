@@ -1,4 +1,4 @@
-# =nil; Foundation's Cryptography Suite Block Ciphers (libcrypto3)
+# Block Ciphers for =nil; Foundation's Cryptography Suite
 
 Block ciphers for =nil; Foundation's crypto3 cryptography suite.
 
