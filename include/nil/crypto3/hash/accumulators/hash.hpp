@@ -133,7 +133,7 @@ namespace nil {
                             }
                         } else {
                             if (bits == block_bits) {
-                                construction.process_block(value);
+//                                construction.process_block(value);
                             } else {
                                 cache[0] = value;
                             }

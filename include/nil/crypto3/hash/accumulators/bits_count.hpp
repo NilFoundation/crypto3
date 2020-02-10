@@ -12,10 +12,11 @@
 #define CRYPTO3_BITS_COUNT_HPP
 
 #include <boost/mpl/always.hpp>
+
 #include <boost/accumulators/framework/accumulator_base.hpp>
 #include <boost/accumulators/framework/extractor.hpp>
 #include <boost/accumulators/framework/depends_on.hpp>
-#include <boost/accumulators/statistics_fwd.hpp>
+#include <boost/accumulators/framework/parameters/sample.hpp>
 
 #include <nil/crypto3/hash/accumulators/parameters/bits.hpp>
 
