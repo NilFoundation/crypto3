@@ -69,8 +69,9 @@ namespace nil {
                 BOOST_STATIC_ASSERT(!length_bits || length_bits % word_bits == 0);
 
             public:
-                inline merkle_damgard_construction &process_block(const block_type &block) {
-                    compressor_functor().process_block(state_, block);
+                template<typename Integer = std::size_t>
+                inline merkle_damgard_construction &process_block(const block_type &block, Integer seen = Integer()) {
+                    compressor_functor::process_block(state_, block);
                     return *this;
                 }
 

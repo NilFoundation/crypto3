@@ -64,10 +64,20 @@ namespace nil {
                 constexpr static const std::size_t digest_words = digest_bits / word_bits;
                 typedef static_digest<digest_bits> digest_type;
 
-                template<typename Integer>
+            protected:
+                constexpr static const std::size_t length_bits = Params::length_bits;
+                // FIXME: do something more intelligent than capping at 64
+                constexpr static const std::size_t length_type_bits =
+                    length_bits < word_bits ? word_bits : length_bits > 64 ? 64 : length_bits;
+                typedef typename boost::uint_t<length_type_bits>::least length_type;
+                constexpr static const std::size_t length_words = length_bits / word_bits;
+                BOOST_STATIC_ASSERT(!length_bits || length_bits % word_bits == 0);
+
+            public:
+                template<typename Integer = std::size_t>
                 inline haifa_construction &process_block(const block_type &block, Integer seen,
                                                          Integer finalization = 0) {
-                    compressor_functor()(state_, block, seen, finalization);
+                    compressor_functor::process_block(state_, block, seen, finalization);
                     return *this;
                 }
 
@@ -77,7 +87,7 @@ namespace nil {
                     return d;
                 }
 
-                digest_type digest() {
+                digest_type digest(const block_type &block = block_type(), length_type seen = length_type()) {
                     using namespace nil::crypto3::detail;
 
                     finalizer_functor finalizer;

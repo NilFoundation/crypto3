@@ -44,7 +44,7 @@ namespace nil {
                 constexpr static const std::size_t state_words = policy_type::state_words;
                 typedef typename policy_type::state_type state_type;
 
-                void process_block(state_type &state, const block_type &block) {
+                static void process_block(state_type &state, const block_type &block) {
                     word_type N = force_le(last_block ? 0ULL : m_count);
 
                     word_type hN[8];
