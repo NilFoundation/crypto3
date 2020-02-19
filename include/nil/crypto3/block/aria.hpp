@@ -236,8 +236,8 @@ namespace nil {
                      * This initializer ensures Z == 0xFFFFFFFF for any state line size
                      * in {32,64,128,256,512}
                      */
-                    volatile uint32_t Z = 0x11101010;
-                    for (size_t i = 0; i < policy_type::constants_size; i += cache_line_size / sizeof(uint32_t)) {
+                    volatile word_type Z = 0x11101010;
+                    for (size_t i = 0; i < policy_type::constants_size; i += cache_line_size / sizeof(word_type)) {
                         Z |= policy_type::s1[i] | policy_type::s2[i];
                     }
 
