@@ -34,7 +34,7 @@ namespace nil {
             public:
                 struct construction {
                     struct params_type {
-                        typedef typename stream_endian::little_octet_big_bit endian;
+                        typedef typename stream_endian::little_octet_big_bit digest_endian;
 
                         constexpr static const std::size_t length_bits = 0;    // No length padding
                         constexpr static const std::size_t digest_bits = policy_type::digest_bits;
@@ -56,11 +56,11 @@ namespace nil {
                     typedef sponge_stream_processor<construction, StateAccumulator, params_type> type;
                 };
 
-                constexpr static const std::size_t digest_bits = DigestBits;
+                constexpr static const std::size_t digest_bits = policy_type::digest_bits;
                 typedef typename policy_type::digest_type digest_type;
             };
         }    // namespace hash
-    }    // namespace crypto3
+    }        // namespace crypto3
 }    // namespace nil
 
 #endif

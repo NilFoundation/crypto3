@@ -41,7 +41,7 @@ set(TESTS_NAMES
     "md4"
     "md5"
     "ghash"
-    "keccak"
+#    "keccak"
     "ripemd"
     "pack"
     "tiger"

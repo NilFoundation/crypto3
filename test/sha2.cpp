@@ -145,10 +145,9 @@ BOOST_FIXTURE_TEST_CASE(sha2_256_accumulator2, fixture<256>) {
 BOOST_FIXTURE_TEST_CASE(sha2_256_accumulator3, fixture<256>) {
     // Example from appendix B.2:
     // echo -n "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq" | sha256sum
-    hash_t::construction::type::block_type m1 = {{0x61626364, 0x62636465, 0x63646566, 0x64656667, 0x65666768, 
-                                                  0x66676869,
-                                                 0x6768696a, 0x68696a6b, 0x696a6b6c, 0x6a6b6c6d, 0x6b6c6d6e, 0x6c6d6e6f,
-                                                 0x6d6e6f70, 0x6e6f7071, 0x80000000, 0x00000000}};
+    hash_t::construction::type::block_type m1 = {
+        {0x61626364, 0x62636465, 0x63646566, 0x64656667, 0x65666768, 0x66676869, 0x6768696a, 0x68696a6b, 0x696a6b6c,
+         0x6a6b6c6d, 0x6b6c6d6e, 0x6c6d6e6f, 0x6d6e6f70, 0x6e6f7071, 0x80000000, 0x00000000}};
     acc(m1);
 
     BOOST_CHECK_EQUAL("85e655d6417a17953363376a624cde5c76e09589cac5f811cc4b32c1f20e533a", (extract::hash<hash_t>(acc)));

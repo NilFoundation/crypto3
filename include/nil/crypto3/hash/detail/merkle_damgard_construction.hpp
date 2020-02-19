@@ -87,7 +87,7 @@ namespace nil {
                     block_type b;
                     std::move(block.begin(), block.end(), b.begin());
                     std::fill(b.begin() + seen, b.end(), 0);
-                    auto t = seen / sizeof(b[0]) + 1;
+                    length_type t = seen / sizeof(b[0]) + 1;
                     imploder_step<endian_type, 1, word_bits, 0>::step(1, b[seen / sizeof(b[0]) + 1]);
                     // imploder_step<endian_type, 1, word_bits, seen % block_bits>::step(1, b[seen / block_bits]);
                     append_length<length_bits>(b, seen);

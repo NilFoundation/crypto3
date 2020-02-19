@@ -183,8 +183,7 @@ namespace nil {
              *
              * @return
              */
-            template<typename Hash, typename SinglePassRange,
-                     typename HashAccumulator = hash::accumulator_set<Hash>>
+            template<typename Hash, typename SinglePassRange, typename HashAccumulator = hash::accumulator_set<Hash>>
             detail::range_hash_impl<detail::value_hash_impl<HashAccumulator>> hash(const SinglePassRange &r) {
 
                 typedef detail::value_hash_impl<HashAccumulator> StreamHashImpl;

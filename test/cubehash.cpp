@@ -44,65 +44,65 @@ BOOST_TEST_DONT_PRINT_LOG_VALUE(cubehash_hash_512_digest_t)
 typedef hash::cubehash<16, 32, 256>::digest_type cubehash_hash_256_digest_t;
 BOOST_TEST_DONT_PRINT_LOG_VALUE(cubehash_hash_256_digest_t)
 
-static const std::unordered_map<std::string, std::string> string_512_data
-    = {{"",
-        "4a1d00bbcfcb5a9562fb981e7f7db335"
-        "0fe2658639d948b9d57452c22328bb32"
-        "f468b072208450bad5ee178271408be0"
-        "b16e5633ac8a1e3cf9864cfbfc8e043a"},
-       {"a",
-        "2b3fa7a97d1e369a469c9e5d5d4e52fe"
-        "37bc8befb369dc0923372c2eae1d91ee"
-        "a9f69407f433bb49ab6ceaeeea739bb7"
-        "52c1e33f69eda9a479e5a5b941968c75"},
-       {"abc",
-        "f63d6fa89ca9fe7ab2e171be52cf193f"
-        "0c8ac9f62bad297032c1e7571046791a"
-        "7e8964e5c8d91880d6f9c2a54176b051"
-        "98901047438e05ac4ef38d45c0282673"},
-       {"message digest",
-        "7542d158eb956be75911c15ee566c3b7"
-        "e54493fe3b1616223b4b27543754b0bf"
-        "aa840e5efb1f7d3b41b85bad7631f47d"
-        "35c46e7e66c6f3771ae76da629f2df8b"},
-       {"abcdefghijklmnopqrstuvwxyz",
-        "8f2cf3bed40d6be82aa2d3204857f014"
-        "4a8d616c999c2e3f98b47f7a60530bf0"
-        "f8206620874cee7b233c941b8fd4746d"
-        "bc8bdca2ef3dea1ee1c9c3b6ea02d79b"},
-       {"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789",
-        "4fa279c9bf54119f9b743932f06a7334"
-        "0e83bf88f8db0edf0bf09bc26383e4f3"
-        "d3c8aa9d8406167a1d6f6c0f0dc65046"
-        "55434924571fe900f36d79eacfbdc7f5"},
-       {"12345678901234567890123456789012345678901234567890123456789012345678901234567890",
-        "cd18a5048d961b62f270edd87f9cd5c4"
-        "1d3970a2b6f763bc173a2b05b9637e5a"
-        "15c77ea3cf9484b34f458cbf71708722"
-        "b271bb1349a4a17b6dd065bde8f1dfc1"}};
+static const std::unordered_map<std::string, std::string> string_512_data = {
+    {"",
+     "4a1d00bbcfcb5a9562fb981e7f7db335"
+     "0fe2658639d948b9d57452c22328bb32"
+     "f468b072208450bad5ee178271408be0"
+     "b16e5633ac8a1e3cf9864cfbfc8e043a"},
+    {"a",
+     "2b3fa7a97d1e369a469c9e5d5d4e52fe"
+     "37bc8befb369dc0923372c2eae1d91ee"
+     "a9f69407f433bb49ab6ceaeeea739bb7"
+     "52c1e33f69eda9a479e5a5b941968c75"},
+    {"abc",
+     "f63d6fa89ca9fe7ab2e171be52cf193f"
+     "0c8ac9f62bad297032c1e7571046791a"
+     "7e8964e5c8d91880d6f9c2a54176b051"
+     "98901047438e05ac4ef38d45c0282673"},
+    {"message digest",
+     "7542d158eb956be75911c15ee566c3b7"
+     "e54493fe3b1616223b4b27543754b0bf"
+     "aa840e5efb1f7d3b41b85bad7631f47d"
+     "35c46e7e66c6f3771ae76da629f2df8b"},
+    {"abcdefghijklmnopqrstuvwxyz",
+     "8f2cf3bed40d6be82aa2d3204857f014"
+     "4a8d616c999c2e3f98b47f7a60530bf0"
+     "f8206620874cee7b233c941b8fd4746d"
+     "bc8bdca2ef3dea1ee1c9c3b6ea02d79b"},
+    {"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789",
+     "4fa279c9bf54119f9b743932f06a7334"
+     "0e83bf88f8db0edf0bf09bc26383e4f3"
+     "d3c8aa9d8406167a1d6f6c0f0dc65046"
+     "55434924571fe900f36d79eacfbdc7f5"},
+    {"12345678901234567890123456789012345678901234567890123456789012345678901234567890",
+     "cd18a5048d961b62f270edd87f9cd5c4"
+     "1d3970a2b6f763bc173a2b05b9637e5a"
+     "15c77ea3cf9484b34f458cbf71708722"
+     "b271bb1349a4a17b6dd065bde8f1dfc1"}};
 
-static const std::unordered_map<std::string, std::string> string_256_data
-    = {{"",
-        "44c6de3ac6c73c391bf0906cb7482600"
-        "ec06b216c7c54a2a8688a6a42676577d"},
-       {"a",
-        "251e622d2a9004212a9114f4a4eacbbe"
-        "f11cfe2ee40e41ac8b033a1b499a53f6"},
-       {"abc",
-        "a220b4bf5023e750c2a34dcd5564a852"
-        "3d32e17fab6fbe0f18a0b0bf5a65632b"},
-       {"message digest",
-        "da81a92056cf05a407517c0a61a89c7c"
-        "6045593bfedd66d6733545f2d1b90d9a"},
-       {"abcdefghijklmnopqrstuvwxyz",
-        "27f9139ee6c7086b304c592595c8aaa3"
-        "3be76fd112ce605bf5f956b00d1a0847"},
-       {"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789",
-        "a858626aa4cca75bbe02283f56f12a98"
-        "7def23783a3d327de40f736f4ce92cc6"},
-       {"12345678901234567890123456789012345678901234567890123456789012345678901234567890",
-        "227bd791e19fadab25282433639a73de"
-        "cfed5b69ecde8a0aee0766d879e13e7b"}};
+static const std::unordered_map<std::string, std::string> string_256_data = {
+    {"",
+     "44c6de3ac6c73c391bf0906cb7482600"
+     "ec06b216c7c54a2a8688a6a42676577d"},
+    {"a",
+     "251e622d2a9004212a9114f4a4eacbbe"
+     "f11cfe2ee40e41ac8b033a1b499a53f6"},
+    {"abc",
+     "a220b4bf5023e750c2a34dcd5564a852"
+     "3d32e17fab6fbe0f18a0b0bf5a65632b"},
+    {"message digest",
+     "da81a92056cf05a407517c0a61a89c7c"
+     "6045593bfedd66d6733545f2d1b90d9a"},
+    {"abcdefghijklmnopqrstuvwxyz",
+     "27f9139ee6c7086b304c592595c8aaa3"
+     "3be76fd112ce605bf5f956b00d1a0847"},
+    {"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789",
+     "a858626aa4cca75bbe02283f56f12a98"
+     "7def23783a3d327de40f736f4ce92cc6"},
+    {"12345678901234567890123456789012345678901234567890123456789012345678901234567890",
+     "227bd791e19fadab25282433639a73de"
+     "cfed5b69ecde8a0aee0766d879e13e7b"}};
 
 BOOST_AUTO_TEST_SUITE(cubehash_test_suite)
 

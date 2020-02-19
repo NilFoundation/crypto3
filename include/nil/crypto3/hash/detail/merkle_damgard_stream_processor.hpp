@@ -87,8 +87,8 @@ namespace nil {
                 template<typename Dummy>
                 typename boost::enable_if_c<length_bits && sizeof(Dummy)>::type append_length(length_type length) {
                     using namespace nil::crypto3::detail;
-                    using namespace boost::accumulators;
-                    length_type seen = count(acc);
+
+                    length_type seen = accumulators::extract::bits_count(acc);
                     // Convert the input into words
                     block_type block;
                     pack<endian_type, value_bits, word_bits>(value_array, block);
@@ -187,9 +187,8 @@ namespace nil {
 
                 digest_type end_message() {
                     using namespace nil::crypto3::detail;
-                    using namespace boost::accumulators;
 
-                    length_type seen = count(acc), length = seen;
+                    length_type seen = accumulators::extract::bits_count(acc), length = seen;
 
                     // Add a 1 bit
 #ifdef CRYPTO3_HASH_NO_OPTIMIZATION
