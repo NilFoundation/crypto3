@@ -11,6 +11,7 @@
 #define CRYPTO3_STREEBOG_FUNCTIONS_HPP
 
 #include <boost/endian/arithmetic.hpp>
+#include <boost/endian/conversion.hpp>
 
 #include <nil/crypto3/hash/detail/streebog/basic_streebog_policy.hpp>
 
@@ -53,29 +54,23 @@ namespace nil {
                         pack(block, r);
 
                         for (int i = 0; i < block_words; ++i) {
-                            block[i] = boost::endian::native_to_little(
+                            block[i] =
+                                boost::endian::native_to_little(
                                     &policy_type::substitution[0 * policy_type::substitution_words + r[i + 0 * 8]]) ^
-                                       boost::endian::native_to_little(
-                                               policy_type::substitution[1 * policy_type::substitution_words +
-                                                                         r[i + 1 * 8]]) ^
-                                       boost::endian::native_to_little(
-                                               policy_type::substitution[2 * policy_type::substitution_words +
-                                                                         r[i + 2 * 8]]) ^
-                                       boost::endian::native_to_little(
-                                               policy_type::substitution[3 * policy_type::substitution_words +
-                                                                         r[i + 3 * 8]]) ^
-                                       boost::endian::native_to_little(
-                                               policy_type::substitution[4 * policy_type::substitution_words +
-                                                                         r[i + 4 * 8]]) ^
-                                       boost::endian::native_to_little(
-                                               policy_type::substitution[5 * policy_type::substitution_words +
-                                                                         r[i + 5 * 8]]) ^
-                                       boost::endian::native_to_little(
-                                               policy_type::substitution[6 * policy_type::substitution_words +
-                                                                         r[i + 6 * 8]]) ^
-                                       boost::endian::native_to_little(
-                                               policy_type::substitution[7 * policy_type::substitution_words +
-                                                                         r[i + 7 * 8]]);
+                                boost::endian::native_to_little(
+                                    policy_type::substitution[1 * policy_type::substitution_words + r[i + 1 * 8]]) ^
+                                boost::endian::native_to_little(
+                                    policy_type::substitution[2 * policy_type::substitution_words + r[i + 2 * 8]]) ^
+                                boost::endian::native_to_little(
+                                    policy_type::substitution[3 * policy_type::substitution_words + r[i + 3 * 8]]) ^
+                                boost::endian::native_to_little(
+                                    policy_type::substitution[4 * policy_type::substitution_words + r[i + 4 * 8]]) ^
+                                boost::endian::native_to_little(
+                                    policy_type::substitution[5 * policy_type::substitution_words + r[i + 5 * 8]]) ^
+                                boost::endian::native_to_little(
+                                    policy_type::substitution[6 * policy_type::substitution_words + r[i + 6 * 8]]) ^
+                                boost::endian::native_to_little(
+                                    policy_type::substitution[7 * policy_type::substitution_words + r[i + 7 * 8]]);
                         }
 
                         r.fill(0);
@@ -93,8 +88,9 @@ namespace nil {
 
                         for (size_t i = 0; i < 12; ++i) {
                             lps(K);
-                            load_le(C, reinterpret_cast<const uint8_t *>(&policy_type::round_constants[i *
-                                                                                                       policy_type::substitutions_amount]),
+                            load_le(C,
+                                    reinterpret_cast<const uint8_t *>(
+                                        &policy_type::round_constants[i * policy_type::substitutions_amount]),
                                     8);
 
                             for (size_t j = 0; j != 8; ++j) {
@@ -125,9 +121,9 @@ namespace nil {
                         }
                     }
                 };
-            }
-        }
-    }
-}
+            }    // namespace detail
+        }        // namespace hash
+    }            // namespace crypto3
+}    // namespace nil
 
-#endif //CRYPTO3_STREEBOG_FUNCTIONS_HPP
+#endif    // CRYPTO3_STREEBOG_FUNCTIONS_HPP

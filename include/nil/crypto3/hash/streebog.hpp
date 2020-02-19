@@ -12,7 +12,7 @@
 
 #include <nil/crypto3/hash/detail/state_adder.hpp>
 #include <nil/crypto3/hash/detail/miyaguchi_preneel_compressor.hpp>
-#include <nil/crypto3/hash/detail/merkle_damgard_state_preprocessor.hpp>
+#include <nil/crypto3/hash/detail/merkle_damgard_stream_processor.hpp>
 #include <nil/crypto3/hash/detail/merkle_damgard_construction.hpp>
 
 #include <nil/crypto3/hash/detail/streebog/streebog_policy.hpp>

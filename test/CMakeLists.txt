@@ -41,7 +41,7 @@ set(TESTS_NAMES
     "md4"
     "md5"
     "ghash"
-#    "keccak"
+    "keccak"
     "ripemd"
     "pack"
     "tiger"
@@ -51,7 +51,7 @@ set(TESTS_NAMES
     "skein"
     "sm3"
     "static_digest"
-    #    "streebog"
+    "streebog"
     "whirlpool")
 
 foreach(TEST_NAME ${TESTS_NAMES})
