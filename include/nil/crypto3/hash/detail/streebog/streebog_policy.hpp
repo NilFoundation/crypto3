@@ -27,16 +27,16 @@ namespace nil {
 
                     struct iv_generator {
                         state_type const &operator()() const {
-                            constexpr static const state_type H0 = {{
-                                                                            0x0101010101010101, 0x0101010101010101, 0x0101010101010101, 0x0101010101010101, 0x0101010101010101, 0x0101010101010101, 0x0101010101010101, 0x0101010101010101
-                                                                    }};
+                            constexpr static const state_type H0 = {
+                                {0x0101010101010101, 0x0101010101010101, 0x0101010101010101, 0x0101010101010101,
+                                 0x0101010101010101, 0x0101010101010101, 0x0101010101010101, 0x0101010101010101}};
                             return H0;
                         }
                     };
                 };
-            }
-        }
-    }
-}
+            }    // namespace detail
+        }        // namespace hash
+    }            // namespace crypto3
+}    // namespace nil
 
-#endif //CRYPTO3_STREEBOG_POLICY_HPP
+#endif    // CRYPTO3_STREEBOG_POLICY_HPP

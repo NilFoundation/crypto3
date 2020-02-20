@@ -88,10 +88,8 @@ namespace nil {
 
                         for (size_t i = 0; i < 12; ++i) {
                             lps(K);
-                            load_le(C,
-                                    reinterpret_cast<const uint8_t *>(
-                                        &policy_type::round_constants[i * policy_type::substitutions_amount]),
-                                    8);
+                            C = boost::endian::native_to_little(reinterpret_cast<const uint8_t *>(
+                                &policy_type::round_constants[i * policy_type::substitutions_amount]));
 
                             for (size_t j = 0; j != 8; ++j) {
                                 A[j] ^= C[j];

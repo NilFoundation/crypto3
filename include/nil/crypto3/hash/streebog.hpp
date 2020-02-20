@@ -60,27 +60,27 @@ namespace nil {
                         hN[i] ^= M[i];
                     }
 
-                    for (size_t i = 0; i < 12; ++i) {
-                        for (size_t j = 0; j != 8; ++j) {
-                            A[j] ^= force_le(STREEBOG_C[i][j]);
+                    for (size_t i = 0; i < policy_type::round_constants_words; ++i) {
+                        for (size_t j = 0; j != block_words; ++j) {
+                            A[j] ^= force_le(policy_type::round_constants[i][j]);
                         }
                         lps(A);
 
                         lps(hN);
-                        for (size_t j = 0; j != 8; ++j) {
+                        for (size_t j = 0; j != block_words; ++j) {
                             hN[j] ^= A[j];
                         }
                     }
 
-                    for (size_t i = 0; i != 8; ++i) {
+                    for (size_t i = 0; i != block_words; ++i) {
                         m_h[i] ^= hN[i] ^ M[i];
                     }
 
                     if (!last_block) {
                         word_type carry = 0;
-                        for (int i = 0; i < 8; i++) {
-                            const word_type m = force_le(M[i]);
-                            const word_type hi = force_le(m_S[i]);
+                        for (int i = 0; i < block_words; i++) {
+                            const word_type m = boost::endian::native_to_little(M[i]);
+                            const word_type hi = boost::endian::native_to_little(m_S[i]);
                             const word_type t = hi + m;
 
                             m_S[i] = force_le(t + carry);
@@ -131,7 +131,7 @@ namespace nil {
                         constexpr static const std::size_t value_bits = ValueBits;
                     };
 
-                    typedef merkle_damgard_state_preprocessor<construction, StateAccumulator, params_type> type;
+                    typedef merkle_damgard_stream_processor<construction, StateAccumulator, params_type> type;
                 };
 
                 constexpr static const std::size_t digest_bits = policy_type::digest_bits;
