@@ -20,12 +20,17 @@ namespace nil {
                 struct camellia_functions : public basic_camellia_policy<KeyBits> {
                     typedef basic_camellia_policy<KeyBits> policy_type;
 
+                    typedef typename policy_type::byte_type byte_type;
+
+                    constexpr static const std::size_t word_bits = policy_type::word_bits;
+                    typedef typename policy_type::word_type word_type;
+
                     /*
                      * We use the slow byte-wise version of F in the first and last rounds
                      * to help protect against timing attacks
                      */
-                    uint64_t f_slow(uint64_t v, uint64_t K) {
-                        constexpr static const uint8_t sbox[256] = {
+                    word_type static f_slow(word_type v, word_type K) {
+                        constexpr static const byte_type sbox[256] = {
                             0x70, 0x82, 0x2C, 0xEC, 0xB3, 0x27, 0xC0, 0xE5, 0xE4, 0x85, 0x57, 0x35, 0xEA, 0x0C, 0xAE,
                             0x41, 0x23, 0xEF, 0x6B, 0x93, 0x45, 0x19, 0xA5, 0x21, 0xED, 0x0E, 0x4F, 0x4E, 0x1D, 0x65,
                             0x92, 0xBD, 0x86, 0xB8, 0xAF, 0x8F, 0x7C, 0xEB, 0x1F, 0xCE, 0x3E, 0x30, 0xDC, 0x5F, 0x5E,
@@ -45,36 +50,36 @@ namespace nil {
                             0x40, 0x28, 0xD3, 0x7B, 0xBB, 0xC9, 0x43, 0xC1, 0x15, 0xE3, 0xAD, 0xF4, 0x77, 0xC7, 0x80,
                             0x9E};
 
-                        const uint64_t x = v ^ K;
+                        const word_type x = v ^ K;
 
-                        const uint8_t t1 = sbox[policy_type::template extract_uint_t<CHAR_BIT>(x, 0)];
-                        const uint8_t t2 =
+                        const byte_type t1 = sbox[policy_type::template extract_uint_t<CHAR_BIT>(x, 0)];
+                        const byte_type t2 =
                             policy_type::template rotl<1>(sbox[policy_type::template extract_uint_t<CHAR_BIT>(x, 1)]);
-                        const uint8_t t3 =
+                        const byte_type t3 =
                             policy_type::template rotl<7>(sbox[policy_type::template extract_uint_t<CHAR_BIT>(x, 2)]);
-                        const uint8_t t4 =
+                        const byte_type t4 =
                             sbox[policy_type::template rotl<1>(policy_type::template extract_uint_t<CHAR_BIT>(x, 3))];
-                        const uint8_t t5 =
+                        const byte_type t5 =
                             policy_type::template rotl<1>(sbox[policy_type::template extract_uint_t<CHAR_BIT>(x, 4)]);
-                        const uint8_t t6 =
+                        const byte_type t6 =
                             policy_type::template rotl<7>(sbox[policy_type::template extract_uint_t<CHAR_BIT>(x, 5)]);
-                        const uint8_t t7 =
+                        const byte_type t7 =
                             sbox[policy_type::template rotl<1>(policy_type::template extract_uint_t<CHAR_BIT>(x, 6))];
-                        const uint8_t t8 = sbox[policy_type::template extract_uint_t<CHAR_BIT>(x, 7)];
+                        const byte_type t8 = sbox[policy_type::template extract_uint_t<CHAR_BIT>(x, 7)];
 
-                        const uint8_t y1 = t1 ^ t3 ^ t4 ^ t6 ^ t7 ^ t8;
-                        const uint8_t y2 = t1 ^ t2 ^ t4 ^ t5 ^ t7 ^ t8;
-                        const uint8_t y3 = t1 ^ t2 ^ t3 ^ t5 ^ t6 ^ t8;
-                        const uint8_t y4 = t2 ^ t3 ^ t4 ^ t5 ^ t6 ^ t7;
-                        const uint8_t y5 = t1 ^ t2 ^ t6 ^ t7 ^ t8;
-                        const uint8_t y6 = t2 ^ t3 ^ t5 ^ t7 ^ t8;
-                        const uint8_t y7 = t3 ^ t4 ^ t5 ^ t6 ^ t8;
-                        const uint8_t y8 = t1 ^ t4 ^ t5 ^ t6 ^ t7;
+                        const byte_type y1 = t1 ^ t3 ^ t4 ^ t6 ^ t7 ^ t8;
+                        const byte_type y2 = t1 ^ t2 ^ t4 ^ t5 ^ t7 ^ t8;
+                        const byte_type y3 = t1 ^ t2 ^ t3 ^ t5 ^ t6 ^ t8;
+                        const byte_type y4 = t2 ^ t3 ^ t4 ^ t5 ^ t6 ^ t7;
+                        const byte_type y5 = t1 ^ t2 ^ t6 ^ t7 ^ t8;
+                        const byte_type y6 = t2 ^ t3 ^ t5 ^ t7 ^ t8;
+                        const byte_type y7 = t3 ^ t4 ^ t5 ^ t6 ^ t8;
+                        const byte_type y8 = t1 ^ t4 ^ t5 ^ t6 ^ t7;
 
-                        return policy_type::template make_uint_t<64>(y1, y2, y3, y4, y5, y6, y7, y8);
+                        return policy_type::template make_uint_t<word_bits>(y1, y2, y3, y4, y5, y6, y7, y8);
                     };
 
-                    inline uint64_t f(uint64_t v, uint64_t K) {
+                    inline word_type f(word_type v, word_type K) {
                         const uint64_t x = v ^ K;
 
                         return basic_camellia_policy<KeyBits>::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(
@@ -95,7 +100,7 @@ namespace nil {
                                                                                                                     7)];
                     }
 
-                    inline uint64_t fl(uint64_t v, uint64_t K) {
+                    inline word_type fl(word_type v, word_type K) {
                         uint32_t x1 = static_cast<uint32_t>(v >> 32);
                         uint32_t x2 = static_cast<uint32_t>(v & 0xFFFFFFFF);
 
@@ -105,10 +110,10 @@ namespace nil {
                         x2 ^= policy_type::template rotl<1>(x1 & k1);
                         x1 ^= (x2 | k2);
 
-                        return ((static_cast<uint64_t>(x1) << 32) | x2);
+                        return ((static_cast<word_type>(x1) << 32) | x2);
                     }
 
-                    inline uint64_t flinv(uint64_t v, uint64_t K) {
+                    inline word_type flinv(word_type v, word_type K) {
                         uint32_t x1 = static_cast<uint32_t>(v >> 32);
                         uint32_t x2 = static_cast<uint32_t>(v & 0xFFFFFFFF);
 
@@ -118,7 +123,7 @@ namespace nil {
                         x1 ^= (x2 | k2);
                         x2 ^= policy_type::template rotl<1>(x1 & k1);
 
-                        return ((static_cast<uint64_t>(x1) << 32) | x2);
+                        return ((static_cast<word_type>(x1) << 32) | x2);
                     }
                 };
             }    // namespace detail

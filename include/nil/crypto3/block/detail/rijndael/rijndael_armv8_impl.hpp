@@ -10,11 +10,10 @@
 #ifndef CRYPTO3_RIJNDAEL_ARMV8_IMPL_HPP
 #define CRYPTO3_RIJNDAEL_ARMV8_IMPL_HPP
 
-#include <nil/crypto3/block/rijndael.hpp>
-
-#include <arm_neon.h>
+#include <nil/crypto3/block/detail/rijndael_impl.hpp>
 
 #include <cstddef>
+#include <arm_neon.h>
 
 namespace nil {
     namespace crypto3 {
@@ -52,31 +51,34 @@ namespace nil {
         B3 = veorq_u8(vaesdq_u8(B3, K), K2); \
     } while (0)
 
-                template<std::size_t KeyBitsImpl, std::size_t BlockBitsImpl>
+                template<std::size_t KeyBitsImpl, std::size_t BlockBitsImpl, typename PolicyType>
                 class basic_armv8_rijndael_impl {
                     static_assert(BlockBitsImpl != 128, "Wrong block size!");
                 };
 
-                template<std::size_t KeyBitsImpl>
-                class basic_armv8_rijndael_impl<KeyBitsImpl, 128>;
+                template<std::size_t KeyBitsImpl, typename PolicyType>
+                class basic_armv8_rijndael_impl<KeyBitsImpl, 128, PolicyType>;
 
-                template<std::size_t KeyBitsImpl, std::size_t BlockBitsImpl>
-                class armv8_rijndael_impl : public basic_armv8_rijndael_impl<KeyBitsImpl, BlockBitsImpl> {
+                template<std::size_t KeyBitsImpl, std::size_t BlockBitsImpl, typename PolicyType>
+                class rijndael_armv8_impl : public basic_armv8_rijndael_impl<KeyBitsImpl, BlockBitsImpl, PolicyType> {
                     static_assert(BlockBitsImpl != 128, "Wrong block size!");
                 };
 
-                template<std::size_t KeyBitsImpl>
-                class armv8_rijndael_impl<KeyBitsImpl, 128>;
+                template<std::size_t KeyBitsImpl, typename PolicyType>
+                class rijndael_armv8_impl<KeyBitsImpl, 128, PolicyType>;
 
-                template<std::size_t KeyBitsImpl>
-                class basic_armv8_rijndael_impl<KeyBitsImpl, 128> {
+                template<std::size_t KeyBitsImpl, typename PolicyType>
+                class basic_armv8_rijndael_impl<KeyBitsImpl, 128, PolicyType> {
                 protected:
-                    typedef rijndael<KeyBitsImpl, 128> basic_type;
+                    typedef PolicyType policy_type;
+                    typedef typename policy_type::block_type block_type;
+                    typedef typename policy_type::key_type key_type;
+                    typedef typename policy_type::key_schedule_type key_schedule_type;
 
                 public:
-                    static inline void schedule_key(const typename basic_type::key_type &key,
-                                                    typename basic_type::key_schedule_type encryption_key,
-                                                    typename basic_type::key_schedule_type &decryption_key) {
+                    static inline void schedule_key(const key_type &key,
+                                                    key_schedule_type encryption_key,
+                                                    key_schedule_type &decryption_key) {
                         rijndael_impl<KeyBitsImpl, 128>::schedule_key(key, encryption_key, decryption_key);
 
                         for (typename basic_type::key_schedule_type::value_type &c : encryption_key) {
@@ -86,15 +88,13 @@ namespace nil {
                             c = reverse_bytes(c);
                         }
                     }
-                }
-            };    // namespace detail
+                };
+            }    // namespace detail
 
-            template<>
-            class armv8_rijndael_impl<128, 128> : public basic_armv8_rijndael_impl<128, 128> {
+            template<typename PolicyType>
+            class rijndael_armv8_impl<128, 128, PolicyType> : public basic_armv8_rijndael_impl<128, 128, PolicyType> {
             public:
-                static typename basic_type::block_type
-                    encrypt_block(const typename basic_type::block_type &plaintext,
-                                  const typename basic_type::key_schedule_type &encryption_key) {
+                static block_type encrypt_block(const block_type &plaintext, const key_schedule_type &encryption_key) {
                     typename basic_type::block_type out = {0};
 
                     const uint8_t *skey = reinterpret_cast<const uint8_t *>(encryption_key.data());
@@ -128,10 +128,8 @@ namespace nil {
                     return out;
                 }
 
-                static typename basic_type::block_type
-                    decrypt_block(const typename basic_type::block_type &plaintext,
-                                  const typename basic_type::key_schedule_type &decryption_key) {
-                    typename basic_type::block_type out = {0};
+                static block_type decrypt_block(const block_type &plaintext, const key_schedule_type &decryption_key) {
+                    block_type out = {0};
 
                     const uint8_t *skey = reinterpret_cast<const uint8_t *>(decryption_key.data());
                     const uint8_t *mkey = reinterpret_cast<const uint8_t *>(m_MD.data());
@@ -166,13 +164,11 @@ namespace nil {
                 }
             };
 
-            template<>
-            class armv8_rijndael_impl<192, 128> : public basic_armv8_rijndael_impl<192, 128> {
+            template<typename PolicyType>
+            class rijndael_armv8_impl<192, 128, PolicyType> : public basic_armv8_rijndael_impl<192, 128, PolicyType> {
             public:
-                static typename basic_type::block_type
-                    encrypt_block(const typename basic_type::block_type &plaintext,
-                                  const typename basic_type::key_schedule_type &encryption_key) {
-                    typename basic_type::block_type out = {0};
+                static block_type encrypt_block(const block_type &plaintext, const key_schedule_type &encryption_key) {
+                    block_type out = {0};
 
                     const uint8_t *skey = reinterpret_cast<const uint8_t *>(encryption_key.data());
                     const uint8_t *mkey = reinterpret_cast<const uint8_t *>(m_ME.data());
@@ -209,10 +205,8 @@ namespace nil {
                     return out;
                 }
 
-                static typename basic_type::block_type
-                    decrypt_block(const typename basic_type::block_type &plaintext,
-                                  const typename basic_type::key_schedule_type &decryption_key) {
-                    typename basic_type::block_type out = {0};
+                static block_type decrypt_block(const block_type &plaintext, const key_schedule_type &decryption_key) {
+                    block_type out = {0};
                     const uint8_t *skey = reinterpret_cast<const uint8_t *>(decryption_key.data());
                     const uint8_t *mkey = reinterpret_cast<const uint8_t *>(m_MD.data());
 
@@ -249,13 +243,11 @@ namespace nil {
                 }
             };
 
-            template<>
-            class armv8_rijndael_impl<256, 128> : public basic_armv8_rijndael_impl<256, 128> {
+            template<typename PolicyType>
+            class rijndael_armv8_impl<256, 128, PolicyType> : public basic_armv8_rijndael_impl<256, 128, PolicyType> {
             public:
-                static typename basic_type::block_type
-                    encrypt_block(const typename basic_type::block_type &plaintext,
-                                  const typename basic_type::key_schedule_type &encryption_key) {
-                    typename basic_type::block_type out = {0};
+                static block_type encrypt_block(const block_type &plaintext, const key_schedule_type &encryption_key) {
+                    block_type out = {0};
                     const uint8_t *skey = reinterpret_cast<const uint8_t *>(encryption_key.data());
                     const uint8_t *mkey = reinterpret_cast<const uint8_t *>(m_ME.data());
 
@@ -295,9 +287,7 @@ namespace nil {
                     return out;
                 }
 
-                static typename basic_type::block_type
-                    decrypt_block(const typename basic_type::block_type &plaintext,
-                                  const typename basic_type::key_schedule_type &decryption_key) {
+                static block_type decrypt_block(const block_type &plaintext, const key_schedule_type &decryption_key) {
                     const uint8_t *skey = reinterpret_cast<const uint8_t *>(decryption_key.data());
                     const uint8_t *mkey = reinterpret_cast<const uint8_t *>(m_MD.data());
 
@@ -340,6 +330,5 @@ namespace nil {
         }    // namespace block
     }        // namespace crypto3
 }    // namespace nil
-}
 
 #endif    // CRYPTO3_RIJNDAEL_ARMV8_IMPL_HPP

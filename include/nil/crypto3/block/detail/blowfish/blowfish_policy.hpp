@@ -13,6 +13,7 @@
 #include <array>
 
 #include <nil/crypto3/block/detail/blowfish/blowfish_functions.hpp>
+
 #include <nil/crypto3/block/detail/utilities/secmem.hpp>
 
 namespace nil {

@@ -66,7 +66,6 @@ namespace nil {
                  * The second half of the AES-256 key expansion (other half same as AES-128)
                  */
                 CRYPTO3_FUNC_ISA("ssse3,aes")
-
                 __m128i aes_256_key_expansion(__m128i key, __m128i key2) {
                     __m128i key_with_rcon = _mm_aeskeygenassist_si128(key2, 0x00);
                     key_with_rcon = _mm_shuffle_epi32(key_with_rcon, _MM_SHUFFLE(2, 2, 2, 2));
@@ -77,45 +76,13 @@ namespace nil {
                     return _mm_xor_si128(key, key_with_rcon);
                 }
 
-#define AES_ENC_4_ROUNDS(K)           \
-    do {                              \
-        B0 = _mm_aesenc_si128(B0, K); \
-        B1 = _mm_aesenc_si128(B1, K); \
-        B2 = _mm_aesenc_si128(B2, K); \
-        B3 = _mm_aesenc_si128(B3, K); \
-    } while (0)
-
-#define AES_ENC_4_LAST_ROUNDS(K)          \
-    do {                                  \
-        B0 = _mm_aesenclast_si128(B0, K); \
-        B1 = _mm_aesenclast_si128(B1, K); \
-        B2 = _mm_aesenclast_si128(B2, K); \
-        B3 = _mm_aesenclast_si128(B3, K); \
-    } while (0)
-
-#define AES_DEC_4_ROUNDS(K)           \
-    do {                              \
-        B0 = _mm_aesdec_si128(B0, K); \
-        B1 = _mm_aesdec_si128(B1, K); \
-        B2 = _mm_aesdec_si128(B2, K); \
-        B3 = _mm_aesdec_si128(B3, K); \
-    } while (0)
-
-#define AES_DEC_4_LAST_ROUNDS(K)          \
-    do {                                  \
-        B0 = _mm_aesdeclast_si128(B0, K); \
-        B1 = _mm_aesdeclast_si128(B1, K); \
-        B2 = _mm_aesdeclast_si128(B2, K); \
-        B3 = _mm_aesdeclast_si128(B3, K); \
-    } while (0)
-
                 template<std::size_t KeyBitsImpl, std::size_t BlockBitsImpl, typename PolicyType>
-                class ni_rijndael_impl {
+                class rijndael_ni_impl {
                     BOOST_STATIC_ASSERT(PolicyType::block_bits == 128 && BlockBitsImpl == 128);
                 };
 
                 template<typename PolicyType>
-                class ni_rijndael_impl<128, 128, PolicyType> {
+                class rijndael_ni_impl<128, 128, PolicyType> {
                     typedef PolicyType policy_type;
                     typedef typename policy_type::block_type block_type;
                     typedef typename policy_type::key_type key_type;
@@ -125,7 +92,6 @@ namespace nil {
 
                 public:
                     CRYPTO3_FUNC_ISA("ssse3,aes")
-
                     static block_type encrypt_block(const block_type &plaintext,
                                                     const key_schedule_type &encryption_key) {
                         block_type out = {0};
@@ -167,7 +133,6 @@ namespace nil {
                     }
 
                     CRYPTO3_FUNC_ISA("ssse3,aes")
-
                     static block_type decrypt_block(const block_type &plaintext,
                                                     const key_schedule_type &decryption_key) {
                         block_type out = {0};
@@ -209,7 +174,6 @@ namespace nil {
                     }
 
                     CRYPTO3_FUNC_ISA("ssse3,aes")
-
                     static void schedule_key(const key_type &input_key,
                                              key_schedule_type &encryption_key,
                                              key_schedule_type &decryption_key) {
@@ -260,7 +224,7 @@ namespace nil {
                 };
 
                 template<typename PolicyType>
-                class ni_rijndael_impl<192, 128, PolicyType> {
+                class rijndael_ni_impl<192, 128, PolicyType> {
                 protected:
                     typedef PolicyType policy_type;
                     typedef typename policy_type::block_type block_type;
@@ -271,7 +235,6 @@ namespace nil {
 
                 public:
                     CRYPTO3_FUNC_ISA("ssse3,aes")
-
                     static block_type encrypt_block(const block_type &plaintext,
                                                     const key_schedule_type &encryption_key) {
                         block_type out = {0};
@@ -317,7 +280,6 @@ namespace nil {
                     }
 
                     CRYPTO3_FUNC_ISA("ssse3,aes")
-
                     static block_type decrypt_block(const block_type &plaintext,
                                                     const key_schedule_type &decryption_key) {
                         block_type out = {0};
@@ -363,7 +325,6 @@ namespace nil {
                     }
 
                     CRYPTO3_FUNC_ISA("ssse3,aes")
-
                     static void schedule_key(const key_type &input_key,
                                              key_schedule_type &encryption_key,
                                              key_schedule_type &decryption_key) {
@@ -408,7 +369,7 @@ namespace nil {
                 };
 
                 template<typename PolicyType>
-                class ni_rijndael_impl<256, 128, PolicyType> {
+                class rijndael_ni_impl<256, 128, PolicyType> {
                 protected:
                     typedef PolicyType policy_type;
                     typedef typename policy_type::block_type block_type;
@@ -419,7 +380,6 @@ namespace nil {
 
                 public:
                     CRYPTO3_FUNC_ISA("ssse3,aes")
-
                     static block_type encrypt_block(const block_type &plaintext,
                                                     const key_schedule_type &encryption_key) {
                         block_type out = {0};
@@ -469,7 +429,6 @@ namespace nil {
                     }
 
                     CRYPTO3_FUNC_ISA("ssse3,aes")
-
                     static block_type decrypt_block(const block_type &plaintext,
                                                     const key_schedule_type &decryption_key) {
                         block_type out = {0};
@@ -519,7 +478,6 @@ namespace nil {
                     }
 
                     CRYPTO3_FUNC_ISA("ssse3,aes")
-
                     static void schedule_key(const key_type &input_key,
                                              key_schedule_type &encryption_key,
                                              key_schedule_type &decryption_key) {
