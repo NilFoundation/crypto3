@@ -177,7 +177,7 @@ namespace nil {
                     return impl_type::decrypt_block(plaintext, decryption_key);
                 }
 
-            private:
+            protected:
                 key_schedule_type encryption_key, decryption_key;
             };
 
