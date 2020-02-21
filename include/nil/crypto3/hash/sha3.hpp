@@ -14,7 +14,7 @@
 
 #include <nil/crypto3/hash/detail/sponge_construction.hpp>
 #include <nil/crypto3/hash/detail/sponge_stream_processor.hpp>
-#include <nil/crypto3/hash/detail/sha3_functions.hpp>
+#include <nil/crypto3/hash/detail/sha3/sha3_functions.hpp>
 
 namespace nil {
     namespace crypto3 {
