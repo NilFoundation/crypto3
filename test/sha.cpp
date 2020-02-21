@@ -9,7 +9,6 @@
 
 #define BOOST_TEST_MODULE sha_test
 
-//#define CRYPTO3_HASH_SHOW_PROGRESS
 #include <nil/crypto3/hash/algorithm/hash.hpp>
 
 #include <nil/crypto3/hash/sha.hpp>

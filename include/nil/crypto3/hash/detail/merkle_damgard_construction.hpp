@@ -69,29 +69,28 @@ namespace nil {
                 BOOST_STATIC_ASSERT(!length_bits || length_bits % word_bits == 0);
 
             public:
-                inline merkle_damgard_construction &process_block(const block_type &block) {
-                    compressor_functor().process_block(state_, block);
+                template<typename Integer = std::size_t>
+                inline merkle_damgard_construction &process_block(const block_type &block, Integer seen = Integer()) {
+                    compressor_functor::process_block(state_, block);
                     return *this;
                 }
 
-                inline digest_type end_message(length_type seen = length_type()) {
-                    digest_type d = digest();
+                inline digest_type end_message(const block_type &block = block_type(),
+                                               length_type seen = length_type()) {
+                    digest_type d = digest(block, seen);
                     reset();
                     return d;
                 }
 
-                inline digest_type digest(length_type seen = length_type()) {
+                inline digest_type digest(const block_type &block = block_type(), length_type seen = length_type()) {
                     using namespace nil::crypto3::detail;
 
                     block_type b;
-
-                    if (!(seen % block_bits)) {
-                        std::fill(std::begin(b), std::end(b), 0);
-                    } else if (!((seen + length_bits) % block_bits)) {
-                        std::fill(b.begin() + seen % block_bits, b.end(), 0);
-                    }
-
-                    imploder_step<endian_type, 1, word_bits, 0>::step(1, b[seen % block_bits + 1]);
+                    std::move(block.begin(), block.end(), b.begin());
+                    std::fill(b.begin() + seen, b.end(), 0);
+                    length_type t = seen / sizeof(b[0]) + 1;
+                    imploder_step<endian_type, 1, word_bits, 0>::step(1, b[seen / sizeof(b[0]) + 1]);
+                    // imploder_step<endian_type, 1, word_bits, seen % block_bits>::step(1, b[seen / block_bits]);
                     append_length<length_bits>(b, seen);
 
                     finalizer_functor finalizer;

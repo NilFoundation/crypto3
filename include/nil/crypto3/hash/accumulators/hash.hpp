@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2019 Nil Foundation AG
 // Copyright (c) 2018-2019 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2019 Aleksey Moskvin <zerg1996@yandex.ru>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -22,8 +23,12 @@
 #include <nil/crypto3/detail/make_array.hpp>
 #include <nil/crypto3/detail/static_digest.hpp>
 
+#include <nil/crypto3/hash/accumulators/bits_count.hpp>
+
 #include <nil/crypto3/hash/accumulators/parameters/bits.hpp>
 #include <nil/crypto3/hash/accumulators/parameters/salt.hpp>
+
+#include <boost/accumulators/statistics/count.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -55,92 +60,95 @@ namespace nil {
                     constexpr static const std::size_t length_words = length_bits / word_bits;
                     BOOST_STATIC_ASSERT(!length_bits || length_bits % word_bits == 0);
 
-                    typedef boost::container::static_vector<word_type, block_words> cache_type;
-
                 public:
                     typedef typename hash_type::digest_type result_type;
 
                     // The constructor takes an argument pack.
-                    hash_impl(boost::accumulators::dont_care) : seen(0) {
+                    hash_impl(boost::accumulators::dont_care) : seen_bits(0), cache_words(0) {
                     }
 
                     template<typename ArgumentPack>
                     inline void operator()(const ArgumentPack &args) {
-                        resolve_type(args[boost::accumulators::sample], args[bits | std::size_t()]);
+                        seen_bits = extract::bits_count(args);
+                        resolve_type(args[boost::accumulators::sample],
+                                     args[::nil::crypto3::accumulators::bits | std::size_t()]);
                     }
 
                     inline result_type result(boost::accumulators::dont_care) const {
                         construction_type res = construction;
-
-                        if (!cache.empty()) {
-                            block_type ib = {0};
-                            std::move(cache.begin(), cache.end(), ib.begin());
-                            return res.process_block(ib).digest();
-                        } else {
-                            return res.digest();
-                        }
+                        return res.digest(cache, seen_bits % block_bits);
                     }
 
                 protected:
+                    inline void resolve_type(const block_type &value, std::size_t bits) {
+                        process(value, bits);
+                    }
+
                     inline void resolve_type(const word_type &value, std::size_t bits) {
-                        if (bits == std::size_t()) {
-                            process(value, word_bits);
-                        } else {
-                            process(value, bits);
+                        process(value, bits);
+                    }
+
+                    inline void cache_block(const block_type &value) {
+                        length_type i = 0, cache_count = seen_bits % block_bits, j = cache_count / word_bits;
+
+                        while (cache_count != block_words) {
+                            cache[cache_words + j] = value[i];
+                            ++cache_words;
+                            ++i;
+                        }
+                        if (cache_count == block_words) {
+                            cache_words = 0;
+                            process(value, 0);
                         }
                     }
 
-                    inline void resolve_type(const block_type &value, std::size_t bits) {
-                        if (bits == std::size_t()) {
-                            process(value, block_bits);
+                    inline void process(const block_type &value, std::size_t bits) {
+                        length_type cached_bits = (seen_bits - bits) % block_bits;
+
+                        if (cached_bits != 0) {
+                            std::move(value.begin(), value.begin() + (block_bits - cached_bits),
+                                      cache.begin() + cached_bits);
+                            cached_bits += block_bits - cached_bits;
+                            if (cached_bits == block_bits) {
+                                construction.process_block(cache, seen_bits);
+                                std::move(value.begin() + (block_bits - cached_bits), value.end(), cache.begin());
+                            }
                         } else {
-                            process(value, bits);
+                            if (bits == block_bits) {
+                                construction.process_block(value, seen_bits);
+                            } else {
+                                std::move(value.begin(), value.end(), cache.begin());
+                            }
                         }
                     }
 
                     inline void process(const word_type &value, std::size_t bits) {
-                        if (seen % block_bits) {
+                        length_type cached_bits = (seen_bits - bits) % block_bits;
 
-                        }
-                        if (cache.size() == cache.max_size()) {
-                            block_type ib = {0};
-                            std::move(cache.begin(), cache.end(), ib.begin());
-                            construction.process_block(ib);
-
-                            cache.clear();
-                        }
-
-                        cache.push_back(value);
-                        seen += bits;
-                    }
-
-                    inline void process(const block_type &block, std::size_t bits) {
-                        if (cache.empty()) {
-                            construction.process_block(block);
+                        if (cached_bits != 0) {
+                            cache[cached_bits + 1] = value;
+                            cached_bits += block_bits - cached_bits;
+                            if (cached_bits == block_bits) {
+                                construction.process_block(cache);
+                            }
                         } else {
-                            block_type b = make_array<block_words>(cache.begin(), cache.end());
-                            typename block_type::const_iterator itr = block.begin() + (cache.max_size() - cache.size());
-
-                            std::move(block.begin(), itr, b.end());
-
-                            construction.process_block(b);
-
-                            cache.clear();
-                            cache.insert(cache.end(), itr, block.end());
+                            if (bits == block_bits) {
+//                                construction.process_block(value);
+                            } else {
+                                cache[0] = value;
+                            }
                         }
-
-                        seen += bits;
                     }
 
-                    length_type seen;
-                    cache_type cache;
+                    length_type seen_bits, cache_words;
+                    block_type cache;
                     construction_type construction;
                 };
             }    // namespace impl
 
             namespace tag {
                 template<typename Hash>
-                struct hash : boost::accumulators::depends_on<> {
+                struct hash : boost::accumulators::depends_on<bits_count> {
                     typedef Hash hash_type;
 
                     /// INTERNAL ONLY

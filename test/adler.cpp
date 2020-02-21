@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2019 Nil Foundation AG
 // Copyright (c) 2018-2019 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2019 Aleksey Moskvin
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -114,20 +115,8 @@ BOOST_DATA_TEST_CASE(adler_various_range_value_hash, boost::unit_test::data::mak
     BOOST_CHECK_EQUAL(out, array_element.second);
 }
 
-BOOST_DATA_TEST_CASE(adler_string_range_value_hash, boost::unit_test::data::make(string_data), array_element) {
-    std::string out = hash<adler<32>>(array_element.first);
-
-    BOOST_CHECK_EQUAL(out, array_element.second);
-}
-
 BOOST_DATA_TEST_CASE(adler_various_itr_value_hash, boost::unit_test::data::make(byte_data), array_element) {
     std::vector<uint8_t> out = hash<adler<32>>(array_element.first.begin(), array_element.first.end());
-
-    BOOST_CHECK_EQUAL(out, array_element.second);
-}
-
-BOOST_DATA_TEST_CASE(adler_string_itr_value_hash, boost::unit_test::data::make(string_data), array_element) {
-    std::string out = hash<adler<32>>(array_element.first.begin(), array_element.first.end());
 
     BOOST_CHECK_EQUAL(out, array_element.second);
 }
@@ -135,6 +124,18 @@ BOOST_DATA_TEST_CASE(adler_string_itr_value_hash, boost::unit_test::data::make(s
 BOOST_DATA_TEST_CASE(adler_iterator_itr_hash, boost::unit_test::data::make(byte_data), array_element) {
     std::vector<uint8_t> out;
     hash<adler<32>>(array_element.first.begin(), array_element.first.end(), std::back_inserter(out));
+
+    BOOST_CHECK_EQUAL(out, array_element.second);
+}
+
+BOOST_DATA_TEST_CASE(adler_string_various_range_value_hash, boost::unit_test::data::make(string_data), array_element) {
+    std::string out = hash<adler<32>>(array_element.first);
+
+    BOOST_CHECK_EQUAL(out, array_element.second);
+}
+
+BOOST_DATA_TEST_CASE(adler_string_various_itr_value_hash, boost::unit_test::data::make(string_data), array_element) {
+    std::string out = hash<adler<32>>(array_element.first.begin(), array_element.first.end());
 
     BOOST_CHECK_EQUAL(out, array_element.second);
 }

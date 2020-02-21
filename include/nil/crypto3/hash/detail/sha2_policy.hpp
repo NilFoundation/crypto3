@@ -22,7 +22,7 @@ namespace nil {
         namespace hash {
             namespace detail {
 
-                template<unsigned CipherVersion>
+                template<std::size_t CipherVersion>
                 struct basic_sha2_policy {
 
                     constexpr static const std::size_t cipher_version = CipherVersion;

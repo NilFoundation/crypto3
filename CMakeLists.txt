@@ -44,80 +44,64 @@ option(CRYPTO3_HASH_WHIRLPOOL "Build with Whirlpool hash support" TRUE)
 list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
      include/nil/crypto3/hash/algorithm/hash.hpp
 
-     include/nil/crypto3/hash/adaptor/hashed.hpp
-     )
+     include/nil/crypto3/hash/adaptor/hashed.hpp)
 
 if(CRYPTO3_HASH_BLAKE2B)
     list(APPEND ${CURRENT_PROJECT_NAME}_BLAKE2B_HEADERS
          include/nil/crypto3/hash/blake2b.hpp
 
          include/nil/crypto3/hash/detail/blake2b/blake2b_policy.hpp
-         include/nil/crypto3/hash/detail/blake2b/blake2b_functions.hpp
-         )
+         include/nil/crypto3/hash/detail/blake2b/blake2b_functions.hpp)
 
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_BLAKE2B)
     list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-         ${${CURRENT_PROJECT_NAME}_BLAKE2B_HEADERS}
-         )
+         ${${CURRENT_PROJECT_NAME}_BLAKE2B_HEADERS})
     list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-         ${${CURRENT_PROJECT_NAME}_BLAKE2B_SOURCES}
-         )
+         ${${CURRENT_PROJECT_NAME}_BLAKE2B_SOURCES})
 endif()
 
 if(CRYPTO3_HASH_CHECKSUM_ADLER)
     list(APPEND ${CURRENT_PROJECT_NAME}_ADLER32_HEADERS
-         include/nil/crypto3/hash/adler.hpp
-         )
+         include/nil/crypto3/hash/adler.hpp)
 
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_ADLER)
     list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-         ${${CURRENT_PROJECT_NAME}_ADLER32_HEADERS}
-         )
+         ${${CURRENT_PROJECT_NAME}_ADLER32_HEADERS})
     list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-         ${${CURRENT_PROJECT_NAME}_ADLER32_SOURCES}
-         )
+         ${${CURRENT_PROJECT_NAME}_ADLER32_SOURCES})
 endif()
 
 if(CRYPTO3_HASH_CHECKSUM_CRC)
     list(APPEND ${CURRENT_PROJECT_NAME}_CRC_HEADERS
-         include/nil/crypto3/hash/crc.hpp
-         )
+         include/nil/crypto3/hash/crc.hpp)
 
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_CRC)
     list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-         ${${CURRENT_PROJECT_NAME}_CRC_HEADERS}
-         )
+         ${${CURRENT_PROJECT_NAME}_CRC_HEADERS})
     list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-         ${${CURRENT_PROJECT_NAME}_CRC_SOURCES}
-         )
+         ${${CURRENT_PROJECT_NAME}_CRC_SOURCES})
 endif()
 
 if(CRYPTO3_HASH_GOST_34_11)
     list(APPEND ${CURRENT_PROJECT_NAME}_GOST_34_11_HEADERS
-         include/nil/crypto3/hash/gost_3411.hpp
-         )
+         include/nil/crypto3/hash/gost_3411.hpp)
 
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_GOST_34_11)
     list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-         ${${CURRENT_PROJECT_NAME}_GOST_34_11_HEADERS}
-         )
+         ${${CURRENT_PROJECT_NAME}_GOST_34_11_HEADERS})
     list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-         ${${CURRENT_PROJECT_NAME}_GOST_34_11_SOURCES}
-         )
+         ${${CURRENT_PROJECT_NAME}_GOST_34_11_SOURCES})
 endif()
 
 if(CRYPTO3_HASH_KECCAK)
     list(APPEND ${CURRENT_PROJECT_NAME}_KECCAK_HEADERS
-         include/nil/crypto3/hash/keccak.hpp
-         )
+         include/nil/crypto3/hash/keccak.hpp)
 
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_KECCAK)
     list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-         ${${CURRENT_PROJECT_NAME}_KECCAK_HEADERS}
-         )
+         ${${CURRENT_PROJECT_NAME}_KECCAK_HEADERS})
     list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-         ${${CURRENT_PROJECT_NAME}_KECCAK_SOURCES}
-         )
+         ${${CURRENT_PROJECT_NAME}_KECCAK_SOURCES})
 endif()
 
 if(CRYPTO3_HASH_MD4)

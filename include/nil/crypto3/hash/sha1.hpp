@@ -12,9 +12,9 @@
 
 #include <nil/crypto3/block/shacal1.hpp>
 
-#include <nil/crypto3/hash/detail/davies_meyer_compressor.hpp>
 #include <nil/crypto3/hash/detail/sha1_policy.hpp>
 #include <nil/crypto3/hash/detail/state_adder.hpp>
+#include <nil/crypto3/hash/detail/davies_meyer_compressor.hpp>
 #include <nil/crypto3/hash/detail/merkle_damgard_construction.hpp>
 #include <nil/crypto3/hash/detail/merkle_damgard_stream_processor.hpp>
 
@@ -61,7 +61,6 @@ namespace nil {
                 constexpr static const std::size_t digest_bits = policy_type::digest_bits;
                 typedef typename policy_type::digest_type digest_type;
             };
-
         }    // namespace hash
     }        // namespace crypto3
 }    // namespace nil

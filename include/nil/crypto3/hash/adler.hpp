@@ -294,9 +294,7 @@ namespace nil {
             template<std::size_t DigestBits>
             struct adler {
                 struct construction {
-                    struct params_type {
-
-                    };
+                    struct params_type {};
 
                     typedef basic_adler<DigestBits> type;
                 };

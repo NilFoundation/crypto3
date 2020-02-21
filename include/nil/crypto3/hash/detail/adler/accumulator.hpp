@@ -48,8 +48,8 @@ namespace nil {
                     typedef hash::adler<DigestBits> hash_type;
                     typedef typename hash_type::construction::type construction_type;
 
-                    constexpr static const std::size_t word_bits = construction_type::word_bits;
-                    typedef typename construction_type::word_type word_type;
+                    constexpr static const std::size_t value_bits = construction_type::value_bits;
+                    typedef typename construction_type::value_type value_type;
 
                     constexpr static const std::size_t state_bits = construction_type::state_bits;
                     constexpr static const std::size_t state_words = construction_type::state_words;
@@ -78,9 +78,9 @@ namespace nil {
                     }
 
                 protected:
-                    inline void resolve_type(const word_type &value, std::size_t bits) {
+                    inline void resolve_type(const value_type &value, std::size_t bits) {
                         if (bits == std::size_t()) {
-                            process(value, word_bits);
+                            process(value, value_bits);
                         } else {
                             process(value, bits);
                         }
@@ -98,10 +98,10 @@ namespace nil {
                              typename = typename std::enable_if<
                                  ::nil::crypto3::detail::is_iterator<InputIterator>::value>::type>
                     inline void resolve_type(InputIterator p, std::size_t bits) {
-                        construction(p, p + bits / word_bits);
+                        construction(p, p + bits / value_bits);
                     }
 
-                    inline void process(const word_type &value, std::size_t bits) {
+                    inline void process(const value_type &value, std::size_t bits) {
                         construction(value);
                     }
 

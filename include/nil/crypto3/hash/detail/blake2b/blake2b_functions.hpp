@@ -45,8 +45,10 @@ namespace nil {
                         b = basic_functions<64>::template rotr<63>(b ^ c);
                     }
 
-                    template<size_t i0, size_t i1, size_t i2, size_t i3, size_t i4, size_t i5, size_t i6, size_t i7, size_t i8, size_t i9, size_t iA, size_t iB, size_t iC, size_t iD, size_t iE, size_t iF>
-                    inline static void round(state_type &v, const state_type &M) {
+                    template<size_t i0, size_t i1, size_t i2, size_t i3, size_t i4, size_t i5, size_t i6, size_t i7,
+                             size_t i8, size_t i9, size_t iA, size_t iB, size_t iC, size_t iD, size_t iE, size_t iF>
+                    inline static void round(std::array<word_type, state_words * 2> &v,
+                                             const std::array<word_type, state_words * 2> &M) {
                         g(v[0], v[4], v[8], v[12], M[i0], M[i1]);
                         g(v[1], v[5], v[9], v[13], M[i2], M[i3]);
                         g(v[2], v[6], v[10], v[14], M[i4], M[i5]);
@@ -57,9 +59,9 @@ namespace nil {
                         g(v[3], v[4], v[9], v[14], M[iE], M[iF]);
                     }
                 };
-            }
-        }
-    }
-}
+            }    // namespace detail
+        }        // namespace hash
+    }            // namespace crypto3
+}    // namespace nil
 
-#endif //CRYPTO3_BLAKE2B_FUNCTIONS_HPP
+#endif    // CRYPTO3_BLAKE2B_FUNCTIONS_HPP
