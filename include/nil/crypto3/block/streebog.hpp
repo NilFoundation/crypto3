@@ -56,6 +56,7 @@ namespace nil {
                 };
 
                 streebog(const key_type &key) {
+                    schedule_key(key);
                 }
 
                 ~streebog() {
@@ -67,7 +68,7 @@ namespace nil {
                 }
 
                 inline block_type decrypt(const block_type &ciphertext) const {
-                    return decrypt_block(ciphertext);
+                    return {};
                 }
 
             protected:
