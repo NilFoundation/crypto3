@@ -12,6 +12,7 @@
 
 #include <boost/assert.hpp>
 #include <boost/concept_check.hpp>
+
 #include <boost/range/begin.hpp>
 #include <boost/range/end.hpp>
 #include <boost/range/concepts.hpp>
@@ -44,7 +45,7 @@ namespace nil {
 
                     return std::move(result.begin(), result.end(), out);
                 };
-            }
+            }    // namespace detail
 
             /*!
              * @brief
@@ -94,8 +95,8 @@ namespace nil {
 
                 return range;
             };
-        }
-    }
-}
+        }    // namespace mac
+    }        // namespace crypto3
+}    // namespace nil
 
-#endif //CRYPTO3_MAC_VERIFY_HPP
+#endif    // CRYPTO3_MAC_VERIFY_HPP

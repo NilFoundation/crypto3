@@ -10,8 +10,9 @@
 #ifndef CRYPTO3_MAC_POLY1305_POLICY_HPP
 #define CRYPTO3_MAC_POLY1305_POLICY_HPP
 
-#include <boost/container/static_vector.hpp>
 #include <boost/integer.hpp>
+
+#include <boost/container/static_vector.hpp>
 
 #include <nil/crypto3/mac/detail/basic_functions.hpp>
 

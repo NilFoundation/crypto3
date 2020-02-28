@@ -19,8 +19,8 @@
 #include <boost/accumulators/framework/depends_on.hpp>
 #include <boost/accumulators/framework/parameters/sample.hpp>
 
-#include <nil/crypto3/mac/detail/make_array.hpp>
-#include <nil/crypto3/mac/detail/static_digest.hpp>
+#include <nil/crypto3/detail/make_array.hpp>
+#include <nil/crypto3/detail/static_digest.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -82,7 +82,6 @@ namespace nil {
 
                 protected:
                     inline void process(const block_type &block, std::size_t bits) {
-
                     }
 
                     block::cipher<cipher_type, mode_type, padding_type> cipher;
