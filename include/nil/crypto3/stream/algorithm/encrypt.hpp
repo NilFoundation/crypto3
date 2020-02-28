@@ -37,6 +37,8 @@ namespace nil {
          *
          * @param first
          * @param last
+         * @param key_first
+         * @param key_last
          * @param out
          *
          * @return
@@ -61,18 +63,17 @@ namespace nil {
          *
          * @tparam StreamCipher
          * @tparam InputIterator
-         * @tparam OutputIterator
-         * @tparam StreamEncrypter
+         * @tparam OutputAccumulator
          *
          * @param first
          * @param last
-         * @param out
+         * @param acc
          *
          * @return
          */
-        template<
-            typename StreamCipher, typename InputIterator,
-            typename OutputAccumulator = typename stream::stream_accumulator<typename StreamCipher::stream_encrypter_type>>
+        template<typename StreamCipher, typename InputIterator,
+                 typename OutputAccumulator =
+                     typename stream::stream_accumulator<typename StreamCipher::stream_encrypter_type>>
         OutputAccumulator &encrypt(InputIterator first, InputIterator last, OutputAccumulator &acc) {
 
             typedef typename StreamCipher::stream_encrypter_type EncryptionMode;
@@ -98,9 +99,9 @@ namespace nil {
          *
          * @return
          */
-        template<
-            typename StreamCipher, typename SinglePassRange,
-            typename OutputAccumulator = typename stream::stream_accumulator<typename StreamCipher::stream_encrypter_type>>
+        template<typename StreamCipher, typename SinglePassRange,
+                 typename OutputAccumulator =
+                     typename stream::stream_accumulator<typename StreamCipher::stream_encrypter_type>>
         OutputAccumulator &encrypt(const SinglePassRange &r, OutputAccumulator &acc) {
 
             typedef typename StreamCipher::stream_encrypter_type EncryptionMode;
@@ -119,14 +120,19 @@ namespace nil {
          *
          * @tparam StreamCipher
          * @tparam InputIterator
-         * @tparam CipherState
+         * @tparam KeyIterator
+         * @tparam CipherAccumulator
+         *
          * @param first
          * @param last
+         * @param key_first
+         * @param key_last
+         *
          * @return
          */
-        template<
-            typename StreamCipher, typename InputIterator, typename KeyIterator,
-            typename CipherAccumulator = typename stream::stream_accumulator<typename StreamCipher::stream_encrypter_type>>
+        template<typename StreamCipher, typename InputIterator, typename KeyIterator,
+                 typename CipherAccumulator =
+                     typename stream::stream_accumulator<typename StreamCipher::stream_encrypter_type>>
         stream::detail::range_cipher_impl<stream::detail::value_cipher_impl<CipherAccumulator>>
             encrypt(InputIterator first, InputIterator last, KeyIterator key_first, KeyIterator key_last) {
             typedef stream::detail::value_cipher_impl<CipherAccumulator> StreamEncrypterImpl;
@@ -142,10 +148,13 @@ namespace nil {
          *
          * @tparam StreamCipher
          * @tparam SinglePassRange
+         * @tparam KeyRange
          * @tparam OutputIterator
-         * @tparam CipherState
+         *
          * @param rng
+         * @param key
          * @param out
+         *
          * @return
          */
         template<typename StreamCipher, typename SinglePassRange, typename KeyRange, typename OutputIterator>
@@ -167,13 +176,17 @@ namespace nil {
          *
          * @tparam StreamCipher
          * @tparam SinglePassRange
-         * @tparam CipherState
+         * @tparam KeyRange
+         * @tparam CipherAccumulator
+         *
          * @param r
+         * @param key
+         *
          * @return
          */
-        template<
-            typename StreamCipher, typename SinglePassRange, typename KeyRange,
-            typename CipherAccumulator = typename stream::stream_accumulator<typename StreamCipher::stream_encrypter_type>>
+        template<typename StreamCipher, typename SinglePassRange, typename KeyRange,
+                 typename CipherAccumulator =
+                     typename stream::stream_accumulator<typename StreamCipher::stream_encrypter_type>>
         stream::detail::range_cipher_impl<stream::detail::value_cipher_impl<CipherAccumulator>>
             encrypt(const SinglePassRange &r, const KeyRange &key) {
 
