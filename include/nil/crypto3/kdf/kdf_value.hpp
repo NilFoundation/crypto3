@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_MAC_VALUE_HPP
-#define CRYPTO3_MAC_VALUE_HPP
+#ifndef CRYPTO3_KDF_VALUE_HPP
+#define CRYPTO3_KDF_VALUE_HPP
 
 #include <type_traits>
 #include <iterator>
@@ -22,13 +22,13 @@ namespace nil {
     namespace crypto3 {
         namespace mac {
             namespace detail {
-                template<typename MacAccumulator>
+                template<typename KdfAccumulator>
                 struct ref_cipher_impl {
-                    typedef MacAccumulator accumulator_set_type;
+                    typedef KdfAccumulator accumulator_set_type;
                     typedef
                         typename boost::mpl::front<typename accumulator_set_type::features_type>::type accumulator_type;
 
-                    typedef typename MacAccumulator::mode_type mode_type;
+                    typedef typename KdfAccumulator::mode_type mode_type;
                     typedef typename mode_type::encoder_type cipher_type;
 
                     ref_cipher_impl(const accumulator_set_type &acc) : accumulator_set(acc) {
@@ -37,13 +37,13 @@ namespace nil {
                     accumulator_set_type &accumulator_set;
                 };
 
-                template<typename MacAccumulator>
+                template<typename KdfAccumulator>
                 struct value_cipher_impl {
-                    typedef MacAccumulator accumulator_set_type;
+                    typedef KdfAccumulator accumulator_set_type;
                     typedef
                         typename boost::mpl::front<typename accumulator_set_type::features_type>::type accumulator_type;
 
-                    typedef typename MacAccumulator::mode_type mode_type;
+                    typedef typename KdfAccumulator::mode_type mode_type;
                     typedef typename mode_type::encoder_type cipher_type;
 
                     value_cipher_impl(const accumulator_set_type &acc) : accumulator_set(acc) {
@@ -198,7 +198,7 @@ namespace nil {
                     }
                 };
             }    // namespace detail
-        }        // namespace block
+        }        // namespace mac
     }            // namespace crypto3
 }    // namespace nil
 

@@ -68,7 +68,7 @@ namespace nil {
                     }
 
                     uint32_t counter = 1;
-                    secure_vector <uint8_t> result;
+                    secure_vector<uint8_t> result;
                     for (size_t i = 0; i < reps; i++) {
                         auxfunc.update_be(counter++);
                         auxfunc.update(secret, secret_len);
@@ -115,7 +115,7 @@ namespace nil {
                     }
 
                     uint32_t counter = 1;
-                    secure_vector <uint8_t> result;
+                    secure_vector<uint8_t> result;
                     for (size_t i = 0; i < reps; i++) {
                         auxfunc.update_be(counter++);
                         auxfunc.update(secret, secret_len);
@@ -131,7 +131,7 @@ namespace nil {
                 }
             };
         }    // namespace kdf
-    }    // namespace crypto3
+    }        // namespace crypto3
 }    // namespace nil
 
 #endif

@@ -43,10 +43,9 @@ namespace nil {
 
                     return offset;
                 }
-
             };
-        }
-    }
-}
+        }    // namespace kdf
+    }        // namespace crypto3
+}    // namespace nil
 
 #endif
