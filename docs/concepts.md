@@ -1,6 +1,6 @@
-# Concepts
+# Stream Cipher Concepts # {#stream_concepts}
 
-## Stream Cipher Concept
+## Stream Cipher Concept ## {#stream_concept}
 
 A ```StreamCipher``` is an object intended to compute non-isomorphic permutations over variable-sized ```Integral``` blobs of data.
 
