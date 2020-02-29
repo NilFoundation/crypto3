@@ -1,4 +1,4 @@
-# Manual # {#codec_manual}
+# Codec Manual # {#codec_manual}
 
 ## Basic Example
 
