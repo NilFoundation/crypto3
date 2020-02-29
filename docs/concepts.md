@@ -1,3 +1,3 @@
-# Concepts
+# Message Authentication Codes Concepts {#mac_concepts}
 
-# Message Authentication Codes Concepts
+## Message Authentication Code Concept {#mac_concept} 
