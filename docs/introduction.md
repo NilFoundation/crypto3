@@ -1,4 +1,4 @@
-# Introduction # {#codec_introduction}
+# Codec Introduction # {#codec_introduction}
 
 The Crypto3.Codec library extends the Nil Foundation's
 cryptography suite and provides a set of encoding

@@ -38,14 +38,14 @@ namespace nil {
             };
 
             /*!
-             * @brief Codec state managing container
+             * @brief Accumulator set with codec accumulator predefined params.
              *
              * Meets the requirements of AccumulatorSet
              *
              * @tparam ProcessingMode Codec state preprocessing mode type (e.g. isomorphic_encoding_mode<base64>)
              */
             template<typename ProcessingMode>
-            using codec_accumulator = boost::accumulators::accumulator_set<
+            using accumulator_set = boost::accumulators::accumulator_set<
                 digest<ProcessingMode::output_block_bits>,
                 boost::accumulators::features<accumulators::tag::codec<ProcessingMode>>, std::size_t>;
         }    // namespace codec
