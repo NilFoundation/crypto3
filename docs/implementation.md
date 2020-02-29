@@ -1,4 +1,4 @@
-# Implementation {#hash_impl}
+# Hash Implementation {#hash_impl}
 
 Hashes usage is usually split to three stages:
 
