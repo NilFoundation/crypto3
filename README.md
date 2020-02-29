@@ -14,7 +14,7 @@ To actually include this library in a project it is required to:
 ## Dependencies
 
 ### Internal
-* [Hashes](https://github.com/nilfoundation/hash) (testing purposes only)
+* [Hash](https://github.com/nilfoundation/hash) (testing purposes only)
 
 ### External
 * [Boost](https://boost.org) (>= 1.58)
