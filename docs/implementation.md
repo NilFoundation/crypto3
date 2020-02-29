@@ -1,4 +1,4 @@
-# Implementation # {#block_ciphers_impl}
+# Block Ciphers Implementation # {#block_ciphers_impl}
 
 Block ciphers usage is usually split to three stages:
 
