@@ -1,5 +1,4 @@
-Summary
-=======
+# Chia Network VDF Competition Summary # {#chia_vdf_summary}
 
 For the VDF, Lehmer's algorithm for calculating the GCD has been extended to reduce a quadratic form. Also, a SIMD two's complement implementation of integers is used and Lehmer's algorithm is parallelized to some extent to make better use of superscalar CPU cores (it still runs on a single thread).
 
@@ -9,8 +8,7 @@ Some methods for increasing the speed of both implementations are discussed.
 
 The only dependencies are GMP. The first sample entry code is used as a fallback; it is licensed under the Apache license. The CUDA runtime is required to build and run the GPU code.
 
-Lehmer's algorithm for reduction of quadratic forms
---------------------------------------------------
+## Lehmer's algorithm for reduction of quadratic forms
 
 Lehmer's algorithm is used for calculating the GCD. It is described here:
 https://gmplib.org/manual/Lehmer_0027s-Algorithm.html#Lehmer_0027s-Algorithm
@@ -128,8 +126,7 @@ It is possible to parallelize the GCD and reduce algorithms by having a master c
 
 This algorithm is implemented in simd_integer_reduce.h and simd_integer_reduce_asm.h.
 
-SIMD integers
--------------
+## SIMD integers
 
 There is a custom integer implementation. Due to time constraints it is only used for GCD and reduce. It has a 2x speedup on Skylake client core over the fastest possible scalar implementation for 1024-bit integer multiplication but this is not achieved because the code is not optimized fully. It would be faster with AVX-512 instructions but they are not supported by the Skylake client core. The main performance limitation is that the AVX2 instructions only support 32 bit multiplication. There are some AVX-512 instructions that support larger integer multiplications and it is also possible to extract the low part of the double multiplication by repeating the multiplication with an FMA and subtracting the high part. This was not done.
 
@@ -154,8 +151,7 @@ The top two limbs of the denominator are used to calculate the fixed point inver
 
 The non-assembly SIMD integer implementation is in the simd_integer_* files that don't end with "asm". It is only used for testing the assembly code. simd_integer_test.cpp has some test code for manual testing.
 
-Assembly code
--------------
+## Assembly code
 
 Currently, the assembly code is only used to calculate the GCD and reduction due to development time constraints. There is a division implementation but it hasn't been compiled. There are also integer multiplication implementations but they are not optimized as well as they could be.
 
@@ -194,8 +190,7 @@ If there is a SIMD integer where only the highest limbs are known and the lower 
 
 The size of the head is too large so this algorithm doesn't work very well. It should probably use multiple cores as described earlier. The algorithm is overly complicated and the multi-core version would also be simpler. The GCD algorithm can be modified to get about a 2x speedup by interleaving the integers so that each SIMD lane has one limb from each integer (a, b, two cofactors). Scalar carrying can then be used and the head size can be shrunk to a couple of limbs. Also, matrix batching should be disabled since there ought to be enough throughput available in the GCD calculations to do a LSB scalar carry concurrently with the multiplications. For reduce there is not enough throughput available since it runs at 5 bits per iteration instead of 1.8 bits, so the multicore implementation also should be used.
 
-Optimizations of other VDF code
--------------------------------
+## Optimizations of other VDF code
 
 The code in vdf_new.h is only used for testing because it is slower.
 
@@ -216,8 +211,7 @@ For squaring, the GCD is always 1 because it is between a and b. The GCD is stil
 
 If the code has a bug in it, then the discriminant will probably change (the main exception is if the sign of b is wrong but everything else is right). To detect this, the discriminant is calculated periodically and the current state is snapshotted. If the discriminant later becomes wrong, the state is rolled back to the last snapshot and the sample entry code is used until the next checkpoint to skip over that state that triggers the bug. The assembly code is used from then on so the performance overheads of both checking for bugs and recovering from them is negligible. No rollbacks were observed during testing. This is also useful if overclocking is being done since it does not have to be 100% stable.
 
-GPU integers
-------------
+## GPU integers
 
 The GPU implementation was run on a Pascal NVIDIA GPU. It would run faster on a Volta due to performance issues caused by the compiler and the 32 bit multipliers on Volta (Pascal is 16 bits). It uses some double instructions but not enough to cause throughput issues; I'm not sure what the latency is though. There are performance issues caused by carrying introducing large dependency chains; this is less of a problem on Volta.
 
@@ -227,8 +221,7 @@ Since all of the integers are fixed size, there need to be bounds on the sizes o
 
 This runs at 25 million classgroup multiplications per second on a 1080 TI at 1.9 GHz with 170 bit discriminants (64 registers per thread). This makes the baby step algorithm require too much storage and I/O. A single Sandy Bridge core at 3GHz runs at 50 thousand multiplications per second of the same size so the speedup is 500x over a single-core CPU based implementation. The speedup would be higher if the GPU code were optimized better, used Lehmer's algorithm, were written by hand in SASS using 3rd party tools, ran on a 2080 TI, etc.
 
-Parallel pollard rho algorithm
-------------------------------
+## Parallel pollard rho algorithm
 
 The method used is similar to this paper:
 https://www.researchgate.net/publication/249012586_Parallelized_Pollard's_Rho_algorithm_for_ECDLP_on_Graphic_Cards
