@@ -47,68 +47,52 @@ endif()
 configure_file(${CMAKE_CURRENT_LIST_DIR}/cmake/build.hpp.in
                ${CMAKE_BINARY_DIR}/include/nil/${CMAKE_WORKSPACE_NAME}/build.hpp @ONLY)
 
-list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-     )
+list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS)
 
-list(APPEND ${CURRENT_PROJECT_NAME}_UNGROUPED_SOURCES
-     )
+list(APPEND ${CURRENT_PROJECT_NAME}_UNGROUPED_SOURCES)
 
 if(CRYPTO3_STREAM_CHACHA)
     list(APPEND ${CURRENT_PROJECT_NAME}_CHACHA_HEADERS
-         include/nil/crypto3/stream/chacha.hpp
-         )
+         include/nil/crypto3/stream/chacha.hpp)
 
     list(APPEND ${CURRENT_PROJECT_NAME}_CHACHA_SOURCES
-         src/chacha_policy.cpp
-         )
+         src/chacha_policy.cpp)
     list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-         ${${CURRENT_PROJECT_NAME}_CHACHA_HEADERS}
-         )
+         ${${CURRENT_PROJECT_NAME}_CHACHA_HEADERS})
     list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-         ${${CURRENT_PROJECT_NAME}_CHACHA_SOURCES}
-         )
+         ${${CURRENT_PROJECT_NAME}_CHACHA_SOURCES})
 endif()
 
 if(CRYPTO3_STREAM_SALSA20)
     list(APPEND ${CURRENT_PROJECT_NAME}_SALSA20_HEADERS
-         include/nil/crypto3/stream/salsa20.hpp
-         )
+         include/nil/crypto3/stream/salsa20.hpp)
 
     list(APPEND ${CURRENT_PROJECT_NAME}_SALSA20_SOURCES
-         src/salsa20_policy.cpp
-         )
+         src/salsa20_policy.cpp)
 
     list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-         ${${CURRENT_PROJECT_NAME}_SALSA20_HEADERS}
-         )
+         ${${CURRENT_PROJECT_NAME}_SALSA20_HEADERS})
     list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-         ${${CURRENT_PROJECT_NAME}_SALSA20_SOURCES}
-         )
+         ${${CURRENT_PROJECT_NAME}_SALSA20_SOURCES})
 endif()
 
 if(CRYPTO3_STREAM_RC4)
     list(APPEND ${CURRENT_PROJECT_NAME}_RC4_HEADERS
-         include/nil/crypto3/stream/rc4.hpp
-         )
+         include/nil/crypto3/stream/rc4.hpp)
 
-    list(APPEND ${CURRENT_PROJECT_NAME}_RC4_SOURCES
-         )
+    list(APPEND ${CURRENT_PROJECT_NAME}_RC4_SOURCES)
 
     list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-         ${${CURRENT_PROJECT_NAME}_RC4_HEADERS}
-         )
+         ${${CURRENT_PROJECT_NAME}_RC4_HEADERS})
     list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-         ${${CURRENT_PROJECT_NAME}_RC4_SOURCES}
-         )
+         ${${CURRENT_PROJECT_NAME}_RC4_SOURCES})
 endif()
 
 list(APPEND ${CURRENT_PROJECT_NAME}_HEADERS
-     ${${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS}
-     )
+     ${${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS})
 
 list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-     ${${CURRENT_PROJECT_NAME}_UNGROUPED_SOURCES}
-     )
+     ${${CURRENT_PROJECT_NAME}_UNGROUPED_SOURCES})
 
 cm_setup_version(VERSION 0.1.0 PREFIX ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME})
 

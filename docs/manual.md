@@ -1,1 +1,1 @@
-# Manual
+# Stream Ciphers Manual # {#stream_manual}
