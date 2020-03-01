@@ -1,4 +1,5 @@
-# Encoding for =nil; Foundation's Cryptography Suite
+# Encoding for =nil; Foundation's Cryptography Suite 
+[![Build Status](https://travis-ci.com/NilFoundation/codec.svg?branch=master)](https://travis-ci.com/NilFoundation/codec)
 
 Encoding for =nil; Foundation's cryptography suite.
 
