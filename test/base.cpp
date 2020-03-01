@@ -139,7 +139,7 @@ BOOST_DATA_TEST_CASE(base32_single_range_random_encode_decode,
                          boost::unit_test::data::xrange(std::numeric_limits<std::uint8_t>::max()),
                      random_sample, index) {
     std::array<std::uint8_t, sizeof(decltype(random_sample))> arr = to_byte_array(random_sample);
-    arr[arr.size() - 1] = std::max((std::uint8_t)1, arr[arr.size() - 1]); // Compliant with RFC 4648
+    arr[arr.size() - 1] = std::max((std::uint8_t)1, arr[arr.size() - 1]);    // Compliant with RFC 4648
     std::vector<std::uint8_t> enc = encode<base<32>>(arr);
     std::vector<std::uint8_t> out = decode<base<32>>(enc);
     BOOST_CHECK_EQUAL_COLLECTIONS(out.begin(), out.end(), arr.begin(), arr.end());
@@ -226,7 +226,7 @@ BOOST_DATA_TEST_CASE(base32_alias_decode_failure, boost::unit_test::data::make(b
 
 BOOST_DATA_TEST_CASE(base32_accumulator_encode, boost::unit_test::data::make(base32_valid_data), array_element) {
     typedef typename base<32>::stream_encoder_type codec_mode;
-    typedef codec_accumulator<codec_mode> accumulator_type;
+    typedef codec::accumulator_set<codec_mode> accumulator_type;
 
     accumulator_type acc;
 
@@ -248,12 +248,12 @@ BOOST_DATA_TEST_CASE(base58_single_range_random_encode_decode,
                          boost::unit_test::data::xrange(std::numeric_limits<std::uint8_t>::max()),
                      random_sample, index) {
     std::array<std::uint8_t, sizeof(decltype(random_sample))> arr = to_byte_array(random_sample);
-    for (auto i: arr) {
+    for (auto i : arr) {
         std::cout << (int)i << ' ';
     }
     std::cout << std::endl;
     std::vector<std::uint8_t> enc = encode<base<58>>(arr);
-    for (auto i: enc) {
+    for (auto i : enc) {
         std::cout << (int)i << ' ';
     }
     std::cout << std::endl;
@@ -290,8 +290,9 @@ BOOST_DATA_TEST_CASE(base58_iterator_range_decode, boost::unit_test::data::make(
 }
 
 BOOST_DATA_TEST_CASE(base58_decode_failure, boost::unit_test::data::make(base_invalid_data), array_element) {
-        std::vector<uint8_t> out;
-        BOOST_REQUIRE_THROW(decode<base<58>>(array_element.begin(), array_element.end(), std::back_inserter(out)), base_decode_error<58>);
+    std::vector<uint8_t> out;
+    BOOST_REQUIRE_THROW(decode<base<58>>(array_element.begin(), array_element.end(), std::back_inserter(out)),
+                        base_decode_error<58>);
 }
 
 BOOST_DATA_TEST_CASE(base58_alias_single_range_encode, boost::unit_test::data::make(base58_valid_data), array_element) {
@@ -331,7 +332,8 @@ BOOST_DATA_TEST_CASE(base58_alias_iterator_range_decode, boost::unit_test::data:
 
 BOOST_DATA_TEST_CASE(base58_alias_decode_failure, boost::unit_test::data::make(base_58_invalid_data), array_element) {
     std::vector<uint8_t> out;
-    BOOST_REQUIRE_THROW(decode<base<58>>(array_element.begin(), array_element.end(), std::back_inserter(out)), base_decode_error<58>);
+    BOOST_REQUIRE_THROW(decode<base<58>>(array_element.begin(), array_element.end(), std::back_inserter(out)),
+                        base_decode_error<58>);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -344,7 +346,7 @@ BOOST_DATA_TEST_CASE(base64_single_range_random_encode_decode,
                          boost::unit_test::data::xrange(std::numeric_limits<std::uint8_t>::max()),
                      random_sample, index) {
     std::array<std::uint8_t, sizeof(decltype(random_sample))> arr = to_byte_array(random_sample);
-    arr[arr.size() - 1] = std::max((std::uint8_t)1, arr[arr.size() - 1]); // Compliant with RFC 4648
+    arr[arr.size() - 1] = std::max((std::uint8_t)1, arr[arr.size() - 1]);    // Compliant with RFC 4648
     std::vector<std::uint8_t> enc = encode<base<64>>(arr);
     std::vector<std::uint8_t> out = decode<base<64>>(enc);
 
