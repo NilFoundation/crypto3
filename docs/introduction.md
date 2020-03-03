@@ -19,7 +19,7 @@ Crypto3.Stream library contains following block ciphers:
 * [Salsa20](@ref salsa20)
 * [RC4](@ref rc4)
 
-## Dependencies ## {#mac_dependencies}
+## Dependencies ## {#stream_dependencies}
 
 Internal dependencies:
 
