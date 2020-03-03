@@ -2,7 +2,7 @@
 #// Copyright (c) 2018-2019 Nil Foundation AG
 #// Copyright (c) 2018-2019 Mikhail Komarov <nemo@nil.foundation>
 #// Copyright (c) 2019 Moskvin Aleksey <zerg1996@yandex.ru>
-#//
+#//---------------------------------------------------------------------------//
 
 language: cpp
 
@@ -543,6 +543,7 @@ before_install:
         fi
     - if [[ $TRAVIS_OS_NAME == osx ]]; then
         brew update;
+        brew update cmake;
       fi
 
 install:
