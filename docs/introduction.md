@@ -10,10 +10,9 @@ Crypto3.Hash consists of several parts to review:
 
 ## Dependencies ## {#hashes_dependencies}
 
-In-suite dependencies:
+Internal dependencies:
+1. [Crypto3.Block](https://github.com/nilfoundation/block.git)
+2. [Crypto3.Codec](https://github.com/nilfoundation/codec.git)
 
-1. Crypto3.Block
-2. Crypto3.Codec (testing purposes only)
-
-Outer dependencies:
-1. Boost (>= 1.58)
+External dependencies:
+1. [Boost](https://boost.org) (>= 1.58)
