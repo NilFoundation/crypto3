@@ -107,17 +107,21 @@ namespace nil {
                 typedef
                     typename std::conditional<BlockBits == 128 && (KeyBits == 128 || KeyBits == 192 || KeyBits == 256),
 #if defined(CRYPTO3_HAS_RIJNDAEL_NI)
-                                              detail::ni_rijndael_impl<KeyBits, BlockBits, policy_type>,
+                                              detail::rijndael_ni_impl<KeyBits, BlockBits, policy_type>,
 #elif defined(CRYPTO3_HAS_RIJNDAEL_SSSE3)
                                               detail::rijndael_ssse3_impl<KeyBits, BlockBits, policy_type>,
 #elif defined(CRYPTO3_HAS_RIJNDAEL_ARMV8)
-                                              detail::armv8_rijndael_impl<KeyBits, BlockBits, policy_type>,
+                                              detail::rijndael_armv8_impl<KeyBits, BlockBits, policy_type>,
 #elif defined(CRYPTO3_HAS_RIJNDAEL_POWER8)
                                               detail::rijndael_power8_impl<KeyBits, BlockBits, policy_type>,
 #else
                                               detail::rijndael_impl<KeyBits, BlockBits, policy_type>,
 #endif
                                               detail::rijndael_impl<KeyBits, BlockBits, policy_type>>::type impl_type;
+
+                constexpr static const std::size_t key_schedule_words = policy_type::key_schedule_words;
+                constexpr static const std::size_t key_schedule_bytes = policy_type::key_schedule_bytes;
+                typedef typename policy_type::key_schedule_type key_schedule_type;
 
             public:
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
@@ -136,13 +140,9 @@ namespace nil {
                 constexpr static const std::uint8_t rounds = policy_type::rounds;
                 typedef typename policy_type::round_constants_type round_constants_type;
 
-                constexpr static const std::size_t key_schedule_words = policy_type::key_schedule_words;
-                constexpr static const std::size_t key_schedule_bytes = policy_type::key_schedule_bytes;
-                typedef typename policy_type::key_schedule_type key_schedule_type;
-
                 template<template<typename, typename> class Mode, typename StateAccumulator, std::size_t ValueBits,
                          typename Padding>
-                struct stream_cipher {
+                struct stream_processor {
                     struct params_type {
                         typedef typename stream_endian::little_octet_big_bit endian_type;
 
@@ -177,7 +177,7 @@ namespace nil {
                     return impl_type::decrypt_block(plaintext, decryption_key);
                 }
 
-            private:
+            protected:
                 key_schedule_type encryption_key, decryption_key;
             };
 

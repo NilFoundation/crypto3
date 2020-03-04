@@ -21,7 +21,9 @@
 
 #include <nil/crypto3/block/rijndael.hpp>
 
+using namespace nil::crypto3;
 using namespace nil::crypto3::block;
+using namespace nil::crypto3::detail;
 
 namespace boost {
     namespace test_tools {

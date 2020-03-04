@@ -7,10 +7,10 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_CAST_HPP
-#define CRYPTO3_CAST_HPP
+#ifndef CRYPTO3_STREEBOG_CIPHER_HPP
+#define CRYPTO3_STREEBOG_CIPHER_HPP
 
-#include <nil/crypto3/block/detail/cast/cast_policy.hpp>
+#include <nil/crypto3/block/detail/streebog/streebog_functions.hpp>
 
 #include <nil/crypto3/block/detail/block_stream_processor.hpp>
 #include <nil/crypto3/block/detail/cipher_modes.hpp>
@@ -18,42 +18,24 @@
 namespace nil {
     namespace crypto3 {
         namespace block {
-            /*!
-             * @brief Cast-family ciphers. Variants available: Cast128, Cast256.
-             *
-             * Cast128. A 64-bit cipher, commonly used in OpenPGP.
-             *
-             * Cast256. A 128-bit cipher that was a contestent in the NIST AES competition.
-             * Rarely used, and now probably would be deprecated in crypto3. Use AES or Serpent
-             * instead.
-             *
-             * @ingroup block
-             *
-             * @tparam BlockBits Block cipher block bits. Does not represent the actual block bits value. Actual
-             * block bits value is BlockBits / 2. Available values are: 128, 256.
-             * @tparam KeyBits Block cipher key bits.
-             */
             template<std::size_t BlockBits, std::size_t KeyBits>
-            class cast {
-            protected:
-                typedef typename detail::cast_policy<BlockBits, KeyBits> policy_type;
-
-                typedef typename policy_type::rotation_key_schedule_type rotation_key_schedule_type;
-                typedef typename policy_type::key_schedule_type key_schedule_type;
+            class streebog {
+                typedef detail::streebog_functions<BlockBits, KeyBits> policy_type;
 
             public:
-                constexpr static const std::size_t rounds = policy_type::rounds;
-
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
                 typedef typename policy_type::word_type word_type;
+
+                constexpr static const std::size_t key_bits = policy_type::key_bits;
+                constexpr static const std::size_t key_words = policy_type::key_words;
+                typedef typename policy_type::key_type key_type;
 
                 constexpr static const std::size_t block_bits = policy_type::block_bits;
                 constexpr static const std::size_t block_words = policy_type::block_words;
                 typedef typename policy_type::block_type block_type;
 
-                constexpr static const std::size_t key_bits = policy_type::key_bits;
-                constexpr static const std::size_t key_words = policy_type::key_words;
-                typedef typename policy_type::key_type key_type;
+                static const std::size_t rounds = policy_type::rounds;
+                typedef typename policy_type::key_schedule_type key_schedule_type;
 
                 template<template<typename, typename> class Mode, typename StateAccumulator, std::size_t ValueBits,
                          typename Padding>
@@ -65,8 +47,7 @@ namespace nil {
                         constexpr static const std::size_t length_bits = policy_type::word_bits * 2;
                     };
 
-                    typedef block_stream_processor<Mode<cast<BlockBits, KeyBits>, Padding>, StateAccumulator, params_type>
-                        type_;
+                    typedef block_stream_processor<Mode<streebog, Padding>, StateAccumulator, params_type> type_;
 #ifdef CRYPTO3_BLOCK_NO_HIDE_INTERNAL_TYPES
                     typedef type_ type;
 #else
@@ -74,13 +55,12 @@ namespace nil {
 #endif
                 };
 
-                cast(const key_type &key) {
+                streebog(const key_type &key) {
                     schedule_key(key);
                 }
 
-                virtual ~cast() {
-                    key_schedule.fill(0);
-                    rkey_schedule.fill(0);
+                ~streebog() {
+                    encryption_key.fill(0);
                 }
 
                 inline block_type encrypt(const block_type &plaintext) const {
@@ -88,26 +68,42 @@ namespace nil {
                 }
 
                 inline block_type decrypt(const block_type &ciphertext) const {
-                    return decrypt_block(ciphertext);
+                    return {};
                 }
 
             protected:
-                key_schedule_type key_schedule;
-                rotation_key_schedule_type rkey_schedule;
+                key_schedule_type encryption_key;
 
                 inline block_type encrypt_block(const block_type &plaintext) const {
-                    return policy_type::encrypt_block(plaintext, key_schedule, rkey_schedule);
+                    block_type ciphertext = plaintext, A = plaintext, C;
+
+                    for (size_t i = 0; i != block_words; ++i) {
+                        ciphertext[i] ^= encryption_key[i];
+                    }
+
+                    for (size_t i = 0; i < rounds; ++i) {
+                        policy_type::lps(ciphertext);
+                        C = boost::endian::native_to_little(reinterpret_cast<const uint8_t *>(
+                            &policy_type::round_constants[i * policy_type::substitutions_amount]));
+
+                        for (size_t j = 0; j != block_words; ++j) {
+                            A[j] ^= C[j];
+                        }
+                        policy_type::lps(A);
+                        for (size_t j = 0; j != block_words; ++j) {
+                            ciphertext[j] ^= A[j];
+                        }
+                    }
                 }
 
                 inline block_type decrypt_block(const block_type &ciphertext) const {
-                    return policy_type::decrypt_block(ciphertext, key_schedule, rkey_schedule);
                 }
 
                 inline void schedule_key(const key_type &key) {
-                    policy_type::schedule_key(key, key_schedule, rkey_schedule);
                 }
             };
         }    // namespace block
     }        // namespace crypto3
 }    // namespace nil
-#endif
+
+#endif    // CRYPTO3_STREEBOG_HPP

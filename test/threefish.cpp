@@ -25,17 +25,16 @@
 #include <nil/crypto3/codec/hex.hpp>
 
 using namespace nil::crypto3;
-using namespace nil::crypto3::block;
 
 template<std::size_t Size>
 class fixture {
 public:
-    typedef threefish<Size> cipher_type;
+    typedef block::threefish<Size> cipher_type;
     typedef typename cipher_type::key_type key_type;
     typedef typename cipher_type::tweak_type tweak_type;
     typedef typename cipher_type::block_type block_type;
 
-    typedef block::digest<Size> digest_type;
+    typedef digest<Size> digest_type;
 };
 
 BOOST_TEST_DONT_PRINT_LOG_VALUE(fixture<256>::digest_type)
@@ -51,7 +50,7 @@ BOOST_FIXTURE_TEST_CASE(threefish_256_encrypt1, fixture<256>) {
     cipher_type cipher((key_type()));
     block_type ciphertext = cipher.encrypt(block_type());
     digest_type d;
-    pack_n<stream_endian::little_octet_big_bit, cipher_type::word_bits, octet_bits>(
+    detail::pack_n<stream_endian::little_octet_big_bit, cipher_type::word_bits, octet_bits>(
         ciphertext.begin(), cipher_type::block_bits / cipher_type::word_bits, std::back_inserter(d),
         cipher_type::block_bits * octet_bits / cipher_type::word_bits);
 
@@ -96,7 +95,7 @@ BOOST_FIXTURE_TEST_CASE(threefish_512_encrypt1, fixture<512>) {
     cipher_type cipher((key_type()));
     block_type ciphertext = cipher.encrypt(block_type());
     digest_type d;
-    pack_n<stream_endian::little_octet_big_bit, cipher_type::word_bits, octet_bits>(
+    detail::pack_n<stream_endian::little_octet_big_bit, cipher_type::word_bits, octet_bits>(
         ciphertext.begin(), cipher_type::block_bits / cipher_type::word_bits, std::back_inserter(d),
         cipher_type::block_bits * octet_bits / cipher_type::word_bits);
 
@@ -148,7 +147,7 @@ BOOST_FIXTURE_TEST_CASE(threefish_1024_encrypt1, fixture<1024>) {
     cipher_type cipher((key_type()));
     block_type ciphertext = cipher.encrypt(block_type());
     digest_type d;
-    pack_n<stream_endian::little_octet_big_bit, cipher_type::word_bits, octet_bits>(
+    detail::pack_n<stream_endian::little_octet_big_bit, cipher_type::word_bits, octet_bits>(
         ciphertext.begin(), cipher_type::block_bits / cipher_type::word_bits, std::back_inserter(d),
         cipher_type::block_bits * octet_bits / cipher_type::word_bits);
 

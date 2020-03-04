@@ -13,6 +13,8 @@
 #include <boost/integer.hpp>
 #include <boost/static_assert.hpp>
 
+#include <nil/crypto3/detail/make_uint_t.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace block {
@@ -23,33 +25,6 @@ namespace nil {
 
                     constexpr static const std::size_t word_bits = WordBits;
                     typedef typename boost::uint_t<word_bits>::exact word_type;
-
-                    template<std::size_t Size, typename Integer>
-                    static inline typename boost::uint_t<Size>::exact extract_uint_t(Integer v, std::size_t position) {
-                        return static_cast<typename boost::uint_t<Size>::exact>(
-                            v >> (((~position) & (sizeof(Integer) - 1)) << 3));
-                    }
-
-                    template<std::size_t Size, typename T>
-                    static inline typename boost::uint_t<Size>::exact
-                        make_uint_t(const std::initializer_list<T> &args) {
-                        typedef typename std::initializer_list<T>::value_type value_type;
-                        typename boost::uint_t<Size>::exact result = 0;
-
-#pragma clang loop unroll(full)
-                        for (const value_type &itr : args) {
-                            result = static_cast<typename boost::uint_t<Size>::exact>(
-                                (result << std::numeric_limits<value_type>::digits) | itr);
-                        }
-
-                        return result;
-                    }
-
-                    template<std::size_t Size, typename... Args>
-                    static inline typename boost::uint_t<Size>::exact make_uint_t(Args... args) {
-                        return basic_functions<WordBits>::template make_uint_t<
-                            Size, typename std::tuple_element<0, std::tuple<Args...>>::type>({args...});
-                    }
 
                     static inline word_type shr(word_type x, std::size_t n) {
                         return x >> n;

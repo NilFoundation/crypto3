@@ -19,9 +19,9 @@ namespace nil {
     namespace crypto3 {
         namespace block {
             /*!
-             * @brief Cipher state managing container
+             * @brief Accumulator set with pre-defined block cipher accumulator params.
              *
-             * Meets the requirements of CipherStateContainer, ConceptContainer, SequenceContainer, Container
+             * Meets the requirements of AccumulatorSet
              *
              * @tparam Mode Cipher state preprocessing mode type (e.g. isomorphic_encryption_mode<aes128>)
              * @tparam Endian
@@ -29,8 +29,8 @@ namespace nil {
              * @tparam LengthBits
              */
             template<typename ProcessingMode>
-            using block_accumulator_set = boost::accumulators::accumulator_set<
-                block::digest<ProcessingMode::input_block_bits>,
+            using accumulator_set = boost::accumulators::accumulator_set<
+                digest<ProcessingMode::input_block_bits>,
                 boost::accumulators::features<accumulators::tag::block<ProcessingMode>>>;
         }    // namespace block
     }        // namespace crypto3

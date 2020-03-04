@@ -1,4 +1,4 @@
-# Manual {#block_ciphers_manual} #
+# Block Ciphers Manual {#block_ciphers_manual} #
 
 ## Quick Start ##
 
@@ -36,7 +36,7 @@ int main(int argc, char *argv[]) {
 ## Stateful encryption ##
 
 In case of accumulative encryption requirement is present, following example demonstrates 
-[accumulator](@ref block_accumulator_set) usage:
+[accumulator](@ref block::accumulator_set) usage:
 
 ```cpp
 #include <nil/crypto3/block/aria.hpp>
@@ -45,6 +45,6 @@ In case of accumulative encryption requirement is present, following example dem
 using namespace nil::crypto3;
 
 int main(int argc, char *argv[]) {
-   block_accumulator_set<block::aria> acc;
+   block::accumulator_set<block::aria> acc;
 }
 ```

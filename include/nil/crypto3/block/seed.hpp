@@ -49,7 +49,7 @@ namespace nil {
 
                 template<template<typename, typename> class Mode, typename StateAccumulator, std::size_t ValueBits,
                          typename Padding>
-                struct stream_cipher {
+                struct stream_processor {
                     struct params_type {
                         typedef typename stream_endian::little_octet_big_bit endian_type;
 
@@ -173,7 +173,7 @@ namespace nil {
                                                   key_schedule[2 * i];
 
                         uint32_t T = (WK[0] & 0xFF) << 24;
-                        WK[0] = (WK[0] >> 8) | (policy_type::template extract_uint_t<CHAR_BIT>(WK[1], 3) << 24);
+                        WK[0] = (WK[0] >> 8) | (::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(WK[1], 3) << 24);
                         WK[1] = (WK[1] >> 8) | T;
 
                         key_schedule[2 * i + 2] = policy_type::g(WK[0] + WK[2] - policy_type::round_constants[i + 1],
@@ -184,8 +184,8 @@ namespace nil {
                                                                  policy_type::s2_constants, policy_type::s3_constants) ^
                                                   key_schedule[2 * i + 2];
 
-                        T = policy_type::template extract_uint_t<CHAR_BIT>(WK[3], 0);
-                        WK[3] = (WK[3] << 8) | policy_type::template extract_uint_t<CHAR_BIT>(WK[2], 0);
+                        T = ::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(WK[3], 0);
+                        WK[3] = (WK[3] << 8) | ::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(WK[2], 0);
                         WK[2] = (WK[2] << 8) | T;
                     }
                 }

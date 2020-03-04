@@ -7,19 +7,18 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_BLOCK_PACK_HPP
-#define CRYPTO3_BLOCK_PACK_HPP
+#ifndef CRYPTO3_PACK_HPP
+#define CRYPTO3_PACK_HPP
 
-#include <nil/crypto3/block/detail/stream_endian.hpp>
-#include <nil/crypto3/block/detail/exploder.hpp>
-#include <nil/crypto3/block/detail/imploder.hpp>
+#include <nil/crypto3/detail/type_traits.hpp>
+#include <nil/crypto3/detail/stream_endian.hpp>
+#include <nil/crypto3/detail/exploder.hpp>
+#include <nil/crypto3/detail/imploder.hpp>
 
 #include <boost/assert.hpp>
 #include <boost/static_assert.hpp>
 
-#include <boost/multiprecision/cpp_int.hpp>
-
-#ifndef CRYPTO3_BLOCK_NO_OPTIMIZATION
+#ifndef CRYPTO3_NO_OPTIMIZATION
 
 #include <boost/detail/endian.hpp>
 #include <boost/utility/enable_if.hpp>
@@ -28,10 +27,8 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace block {
-            using namespace boost::multiprecision;
-
-#ifndef CRYPTO3_BLOCK_NO_OPTIMIZATION
+        namespace detail {
+#ifndef CRYPTO3_NO_OPTIMIZATION
 
             template<int UnitBits, int InputBits, int OutputBits, typename InT, typename OutT>
             struct host_can_memcpy {
@@ -140,7 +137,7 @@ namespace nil {
             template<typename Endianness, int InputBits, int OutputBits>
             struct packer : real_packer<Endianness, InputBits, OutputBits> {
 
-#ifndef CRYPTO3_BLOCK_NO_OPTIMIZATION
+#ifndef CRYPTO3_NO_OPTIMIZATION
 
                 using real_packer<Endianness, InputBits, OutputBits>::pack_n;
 
@@ -180,14 +177,17 @@ namespace nil {
             }
 
             template<typename Endianness, int InValueBits, int OutValueBits, typename InputIterator1, typename CatT1,
-                     typename InputIterator2>
+                     typename InputIterator2,
+                     typename = typename std::enable_if<detail::is_iterator<InputIterator1>::value>::type,
+                     typename = typename std::enable_if<detail::is_iterator<InputIterator2>::value>::type>
             void pack(InputIterator1 b1, InputIterator1 e1, CatT1, InputIterator2 b2) {
                 typedef packer<Endianness, InValueBits, OutValueBits> packer_type;
                 packer_type::pack(b1, e1, b2);
             }
 
             template<typename Endianness, int InValueBits, int OutValueBits, typename InputIterator1,
-                     typename InputIterator2>
+                     typename InputIterator2,
+                     typename = typename std::enable_if<detail::is_iterator<InputIterator2>::value>::type>
             void pack(InputIterator1 b1, InputIterator1 e1, InputIterator2 b2) {
                 typedef typename std::iterator_traits<InputIterator1>::iterator_category cat1;
                 pack<Endianness, InValueBits, OutValueBits>(b1, e1, cat1(), b2);
@@ -219,19 +219,14 @@ namespace nil {
                 pack_n<Endianness, InValueBits, OutValueBits>(in.data(), in.size(), out.data(), out.size());
             }
 
-            template<typename Endianness, int InValueBits, int OutValueBits, typename InputType, typename Backend,
-                     expression_template_option ExpressionTemplates>
-            void pack(const InputType &in, number<Backend, ExpressionTemplates> &out) {
-                import_bits(in, out);
-                BOOST_ASSERT(msb(out) == OutValueBits);
+            template<typename Endianness, int InValueBits, int OutValueBits, typename InputIterator,
+                     typename OutputType,
+                     typename = typename std::enable_if<!std::is_arithmetic<OutputType>::value>::type>
+            inline void pack(InputIterator first, InputIterator last, OutputType &out) {
+                pack_n<Endianness, InValueBits, OutValueBits>(first, std::distance(first, last), out.begin(),
+                    out.size());
             }
-
-            template<typename Endianness, int InValueBits, int OutValueBits, typename OutputType, typename Backend,
-                     expression_template_option ExpressionTemplates>
-            void pack(const number<Backend, ExpressionTemplates> &in, OutputType &out) {
-                export_bits(in, out);
-            }
-        }    // namespace block
+        }    // namespace detail
     }        // namespace crypto3
 }    // namespace nil
 

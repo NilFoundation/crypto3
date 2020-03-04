@@ -27,10 +27,10 @@ namespace nil {
 
                     inline static word_type g(word_type X, const constants_type &s0, const constants_type &s1,
                                               const constants_type &s2, const constants_type &s3) {
-                        return (s0[basic_functions<WordBits>::template extract_uint_t<CHAR_BIT>(X, 3)] ^
-                                s1[basic_functions<WordBits>::template extract_uint_t<CHAR_BIT>(X, 2)] ^
-                                s2[basic_functions<WordBits>::template extract_uint_t<CHAR_BIT>(X, 1)] ^
-                                s3[basic_functions<WordBits>::template extract_uint_t<CHAR_BIT>(X, 0)]);
+                        return (s0[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(X, 3)] ^
+                                s1[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(X, 2)] ^
+                                s2[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(X, 1)] ^
+                                s3[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(X, 0)]);
                     }
                 };
             }    // namespace detail

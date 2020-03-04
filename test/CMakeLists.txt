@@ -19,7 +19,9 @@ macro(define_block_cipher_test name)
 
                                ${Boost_INCLUDE_DIRS})
 
-    set_target_properties(block_${name}_test PROPERTIES CXX_STANDARD 14)
+    if(NOT CMAKE_CXX_STANDARD)
+        set_target_properties(block_${name}_test PROPERTIES CXX_STANDARD 14)
+    endif()
 
     get_target_property(target_type Boost::unit_test_framework TYPE)
     if(target_type STREQUAL "SHARED_LIB")
@@ -45,8 +47,9 @@ set(TESTS_NAMES
     "seed"
     "serpent"
     "shacal"
+    "streebog"
     "sm4"
-    "threefish"
+#    "threefish"
     "twofish"
     "xtea"
     )

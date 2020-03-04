@@ -65,7 +65,7 @@ namespace nil {
 
                 template<template<typename, typename> class Mode, typename StateAccumulator, std::size_t ValueBits,
                          typename Padding>
-                struct stream_cipher {
+                struct stream_processor {
                     struct params_type {
                         typedef typename stream_endian::little_octet_big_bit endian_type;
 

@@ -1,4 +1,4 @@
-# Implementation # {#block_ciphers_impl}
+# Block Ciphers Implementation # {#block_ciphers_impl}
 
 Block ciphers usage is usually split to three stages:
 
@@ -227,7 +227,7 @@ has conversion operator in some way as follows:
 class A {
 public:
     operator uint128_t() {
-        return (vals << (3U * CHAR_BIT)) & (val16 << 16) & valc 
+        return (vals << (3U * CHAR_BIT)) & (val16 << 16) & valc;
     }
 
     std::size_t vals;
@@ -277,7 +277,7 @@ Encryption contains an accumulation step, which is implemented with
 
 All the concepts are held.
 
-Block ciphers contains pre-defined [`block_accumulator_set`](@ref block_accumulator_set), 
+Block ciphers contains pre-defined [`block::accumulator_set`](@ref block::accumulator_set), 
 which is a `boost::accumulator_set` with pre-filled 
 [`block` accumulator](@ref accumulators::block).
 

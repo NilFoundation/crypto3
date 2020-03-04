@@ -42,6 +42,8 @@ namespace nil {
                 typedef detail::md4_policy policy_type;
 
             public:
+                constexpr static const std::size_t rounds = policy_type::rounds;
+
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
                 typedef policy_type::word_type word_type;
 
@@ -55,7 +57,7 @@ namespace nil {
 
                 template<template<typename, typename> class Mode, typename StateAccumulator, std::size_t ValueBits,
                          typename Padding>
-                struct stream_cipher {
+                struct stream_processor {
                     struct params_type {
                         typedef typename stream_endian::little_octet_big_bit endian_type;
 
