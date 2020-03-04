@@ -13,9 +13,8 @@ Crypto3.Block consists of several parts to review:
 
 ## Dependencies ## {#block_ciphers_dependencies}
 
-In-suite dependencies:
-
+Internal dependencies:
 Crypto3.Block has no dependencies on other suite libraries and can be used standalone.
 
-Outer dependencies:
-1. Boost (>= 1.58)
+External dependencies:
+1. [Boost](https://boost.org) (>= 1.58)
