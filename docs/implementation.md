@@ -1,4 +1,4 @@
-# Implementation {#hash_impl}
+# Hash Implementation {#hashes_impl}
 
 Hashes usage is usually split to three stages:
 
@@ -8,7 +8,7 @@ equivalent to calling it once with all of the arguments concatenated.
 3. Finalization. Accumulated hash data is required to be finalized, padded and 
 prepared to be retrieved by user.  
 
-## Architecture Overview {#hash_arch}
+## Architecture Overview {#hashes_arch}
 
 Hashes library architecture consists of several parts listed below:
 
@@ -37,7 +37,7 @@ node [shape="box"]
 }
 @enddot
 
-## Algorithms {#hash_algorithms}
+## Algorithms {#hashes_algorithms}
 
 Implementation of a library is considered to be highly
 compliant with STL. So the crucial point is to have
@@ -97,7 +97,7 @@ Algorithms are no more than an internal structures initializer wrapper. In this
 particular case algorithm would initialize stream processor fed with accumulator 
 set with [`hash` accumulator](@ref accumulators::hash) inside initialized with `Hash`.
 
-## Stream Data Processing {#hash_stream}
+## Stream Data Processing {#hashes_stream}
 
 Hashes are usually defined for processing `Integral` value typed byte sequences 
 of specific size packed in blocks (e.g. [sha2](@ref hash::sha2) is defined for 
@@ -177,7 +177,7 @@ them and passes to `AccumulatorSet` reference as cipher input of format required
 The rest of data not even to block size gets converted too and fed value by 
 value to the same `AccumulatorSet` reference.
 
-## Data Type Conversion {#hash_data}
+## Data Type Conversion {#hashes_data}
  
 Since block cipher algorithms are usually defined for `Integral` types or 
 byte sequences of unique format for each cipher, encryption function being 
@@ -230,8 +230,8 @@ public:
 
 This part is handled internally with ```stream_processor``` configured for each particular cipher. 
    
-## Hash Algorithms {#hash_pol}
+## Hash Algorithms {#hashes_pol}
 
-## Accumulators {#hash_acc}
+## Accumulators {#hashes_acc}
 
-## Value Postprocessors {#hash_val}
+## Value Postprocessors {#hashes_val}
