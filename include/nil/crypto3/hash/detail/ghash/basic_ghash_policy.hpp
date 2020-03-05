@@ -11,7 +11,7 @@
 #define CRYPTO3_HASH_GHASH_BASIC_POLICY_HPP
 
 #include <nil/crypto3/detail/static_digest.hpp>
-
+#include <vector>
 namespace nil {
     namespace crypto3 {
         namespace hash {
