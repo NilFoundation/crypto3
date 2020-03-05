@@ -140,7 +140,7 @@ namespace nil {
                 void append_length<0>(block_type &block, length_type length) {
                 }*/
                 template<typename Dummy>
-                typename boost::disable_if_c<length_bits && sizeof(Dummy)>::type append_length(length_type) {
+                typename boost::disable_if_c<length_bits && sizeof(Dummy)>::type append_length(block_type &block, length_type length) {
                     // No appending requested, so nothing to do
                 }
 
