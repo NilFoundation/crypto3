@@ -15,6 +15,8 @@
 
 #include <nil/crypto3/hash/detail/nop_finalizer.hpp>
 
+#include <boost/utility/enable_if.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace hash {
@@ -91,7 +93,7 @@ namespace nil {
                     length_type t = seen / sizeof(b[0]) + 1;
                     imploder_step<endian_type, 1, word_bits, 0>::step(1, b[seen / sizeof(b[0]) + 1]);
                     // imploder_step<endian_type, 1, word_bits, seen % block_bits>::step(1, b[seen / block_bits]);
-                    append_length<length_bits>(b, seen);
+                    append_length<int>(b, seen);
 
                     finalizer_functor finalizer;
                     finalizer(state_);
@@ -118,8 +120,8 @@ namespace nil {
                 }
 
             protected:
-                template<std::size_t LengthBits>
-                void append_length(block_type &block, length_type length) {
+                template<typename Dummy>
+                typename boost::enable_if_c<length_bits && sizeof(Dummy)>::type append_length(block_type &block, length_type length) {
                     using namespace nil::crypto3::detail;
 
                     // Append length
@@ -133,9 +135,13 @@ namespace nil {
                     // Process the last block
                     process_block(block);
                 }
-
+                /*
                 template<>
                 void append_length<0>(block_type &block, length_type length) {
+                }*/
+                template<typename Dummy>
+                typename boost::disable_if_c<length_bits && sizeof(Dummy)>::type append_length(block_type &block, length_type length) {
+                    // No appending requested, so nothing to do
                 }
 
                 state_type state_;
