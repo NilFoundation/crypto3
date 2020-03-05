@@ -16,10 +16,10 @@
 namespace nil {
     namespace crypto3 {
         /*!
-         * @defgroup stream Stream Ciphers
+         * @addtogroup stream Stream Ciphers
          * @brief
          *
-         * @defgroup stream_algorithms Algorithms
+         * @addtogroup stream_algorithms Algorithms
          * @ingroup stream
          * @brief Algorithms are meant to provide stream cipher encryption
          * interface similar to STL algorithms' one.
