@@ -19,7 +19,7 @@ namespace nil {
     namespace crypto3 {
         namespace hash {
             /*!
-             * @defgroup hash Hash Functions & Checksums
+             * @addtogroup hash Hash Functions & Checksums
              *
              * @brief Hash functions are one-way functions, which map data of arbitrary size to a
              * fixed output length. Most of the hash functions in crypto3 are designed to be
@@ -38,7 +38,7 @@ namespace nil {
              * concatenated. After completing a hash computation (eg using ``final``), the
              * internal state is reset to begin hashing a new message.
              *
-             * @defgroup hash_algorithms Algorithms
+             * @addtogroup hash_algorithms Algorithms
              * @ingroup hash
              * @brief Algorithms are meant to provide hashing interface similar to STL algorithms' one.
              */
