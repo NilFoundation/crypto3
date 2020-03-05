@@ -68,7 +68,7 @@
             void Function(##__VA_ARGS__);                                            \
         };                                                                           \
                                                                                      \
-        struct Derived : Fallback {};                                         \
+        struct Derived : Fallback {};                                                \
                                                                                      \
         template<typename C, C>                                                      \
         struct ChT;                                                                  \
@@ -90,7 +90,7 @@
             void Function(##__VA_ARGS__) const;                                            \
         };                                                                                 \
                                                                                            \
-        struct Derived : Fallback {};                                               \
+        struct Derived : Fallback {};                                                      \
                                                                                            \
         template<typename C, C>                                                            \
         struct ChT;                                                                        \
@@ -185,6 +185,8 @@ namespace nil {
             GENERATE_HAS_MEMBER(block_bits)
             GENERATE_HAS_MEMBER(digest_bits)
             GENERATE_HAS_MEMBER(key_bits)
+            GENERATE_HAS_MEMBER(min_key_bits)
+            GENERATE_HAS_MEMBER(max_key_bits)
             GENERATE_HAS_MEMBER(key_schedule_bits)
             GENERATE_HAS_MEMBER(word_bits)
 
@@ -218,26 +220,26 @@ namespace nil {
 
             template<typename Container>
             struct is_container {
-                static const bool value =
-                    has_const_iterator<Container>::value && has_begin<Container>::value && has_end<Container>::value;
+                static const bool value
+                    = has_const_iterator<Container>::value && has_begin<Container>::value && has_end<Container>::value;
             };
 
             template<typename T>
             struct is_codec {
-                static const bool value = has_encoded_value_type<T>::value && has_encoded_value_bits<T>::value &&
-                                          has_decoded_value_type<T>::value && has_decoded_value_bits<T>::value &&
-                                          has_encoded_block_type<T>::value && has_encoded_block_bits<T>::value &&
-                                          has_decoded_block_type<T>::value && has_decoded_block_bits<T>::value &&
-                                          has_encode<T>::value && has_decode<T>::value;
+                static const bool value = has_encoded_value_type<T>::value && has_encoded_value_bits<T>::value
+                                          && has_decoded_value_type<T>::value && has_decoded_value_bits<T>::value
+                                          && has_encoded_block_type<T>::value && has_encoded_block_bits<T>::value
+                                          && has_decoded_block_type<T>::value && has_decoded_block_bits<T>::value
+                                          && has_encode<T>::value && has_decode<T>::value;
                 typedef T type;
             };
 
             template<typename T>
             struct is_block_cipher {
-                static const bool value = has_word_type<T>::value && has_word_bits<T>::value &&
-                                          has_block_type<T>::value && has_block_bits<T>::value &&
-                                          has_key_type<T>::value && has_key_bits<T>::value && has_rounds<T>::value &&
-                                          has_encrypt<T>::value && has_decrypt<T>::value;
+                static const bool value = has_word_type<T>::value && has_word_bits<T>::value && has_block_type<T>::value
+                                          && has_block_bits<T>::value && has_key_type<T>::value
+                                          && has_key_bits<T>::value && has_rounds<T>::value && has_encrypt<T>::value
+                                          && has_decrypt<T>::value;
                 typedef T type;
             };
 
@@ -262,17 +264,25 @@ namespace nil {
                 static two test_construction_params(...);
 
             public:
-                static const bool value = has_digest_type<T>::value && has_digest_bits<T>::value &&
-                                          sizeof(test_construction_type<T>(0)) == sizeof(one) &&
-                                          sizeof(test_construction_params<T>(0)) == sizeof(one);
+                static const bool value = has_digest_type<T>::value && has_digest_bits<T>::value
+                                          && sizeof(test_construction_type<T>(0)) == sizeof(one)
+                                          && sizeof(test_construction_params<T>(0)) == sizeof(one);
                 typedef T type;
             };
 
             template<typename T>
             struct is_mac {
-                static const bool value = has_digest_type<T>::value && has_digest_bits<T>::value &&
-                                          has_block_type<T>::value && has_block_bits<T>::value &&
-                                          has_key_type<T>::value && has_key_bits<T>::value;
+                static const bool value = has_digest_type<T>::value && has_digest_bits<T>::value
+                                          && has_block_type<T>::value && has_block_bits<T>::value
+                                          && has_key_type<T>::value && has_key_bits<T>::value;
+                typedef T type;
+            };
+
+            template<typename T>
+            struct is_kdf {
+                static const bool value = has_digest_type<T>::value && has_digest_bits<T>::value
+                                          && has_key_type<T>::value && has_max_key_bits<T>::value
+                                          && has_min_key_bits<T>::value;
                 typedef T type;
             };
 
