@@ -10,6 +10,8 @@
 #ifndef CRYPTO3_MAKE_UINT_T_HPP
 #define CRYPTO3_MAKE_UINT_T_HPP
 
+#include <tuple>
+
 namespace nil {
     namespace crypto3 {
         namespace detail {
