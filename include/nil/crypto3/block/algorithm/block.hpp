@@ -11,7 +11,7 @@
 #define CRYPTO3_BLOCK_ALGORITHM_HPP
 
 /*!
- * @defgroup block_algorithms Algorithms
+ * @addtogroup block_algorithms Algorithms
  * @ingroup block
  * @brief Algorithms are meant to provide encryption interface similar to STL algorithms'
  * one.
