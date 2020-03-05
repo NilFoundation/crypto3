@@ -21,12 +21,12 @@ namespace nil {
     namespace crypto3 {
         namespace mac {
             /*!
-             * @defgroup mac Message Authentication Codes
+             * @addtogroup mac Message Authentication Codes
              *
              * @brief A message authentication code (MAC) can be used to verify the
              * integrity of data and the authenticity of a message.
              *
-             * @defgroup mac_algorithms Algorithms
+             * @addtogroup mac_algorithms Algorithms
              * @ingroup mac
              * @brief Algorithms are meant to provide message authentication codes computation
              * interface similar to STL algorithms' one.
