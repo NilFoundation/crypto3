@@ -17,7 +17,7 @@ namespace nil {
     namespace crypto3 {
         namespace kdf {
             /*!
-             * @defgroup kdf Key Derivation Functions
+             * @addtogroup kdf Key Derivation Functions
              *
              * @brief Key derivation function (KDF) derives one or more secret keys
              * from a secret value such as a master key, a password, or a passphrase
@@ -28,7 +28,7 @@ namespace nil {
              * functions are popular examples of pseudorandom functions used for key
              * derivation.
              *
-             * @defgroup kdf_algorithms Algorithms
+             * @addtogroup kdf_algorithms Algorithms
              * @ingroup kdf
              * @brief Algorithms are meant to provide key derivation interface similar to STL algorithms' one.
              */
