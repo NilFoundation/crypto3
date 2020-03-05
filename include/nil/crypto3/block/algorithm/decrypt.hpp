@@ -16,7 +16,7 @@
 namespace nil {
     namespace crypto3 {
         /*!
-         * @defgroup block_algorithms Algorithms
+         * @addtogroup block_algorithms Algorithms
          * @ingroup block
          * @brief Algorithms are meant to provide decryption interface similar to STL algorithms' one.
          */
