@@ -20,6 +20,13 @@ namespace nil {
              * typically 64 or 128 bits. It is a cryptographic primitive used
              * to generate higher level operations such as authenticated encryption.
              */
+
+            /*!
+             * @brief
+             * @tparam Cipher
+             * @tparam Mode
+             * @tparam Padding
+             */
             template<typename Cipher, typename Mode, typename Padding>
             struct cipher : public Mode::template bind<Cipher, Padding>::type {
                 typedef std::size_t size_type;
