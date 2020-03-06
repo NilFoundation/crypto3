@@ -39,14 +39,14 @@ namespace nil {
              * internal state is reset to begin hashing a new message.
              *
              * @addtogroup hash_algorithms Algorithms
-             * @ingroup hash
+             * @addtogroup hash
              * @brief Algorithms are meant to provide hashing interface similar to STL algorithms' one.
              */
 
             /*!
              * @brief
              *
-             * @ingroup hash_algorithms
+             * @addtogroup hash_algorithms
              *
              * @tparam Hash
              * @tparam InputIterator
@@ -73,7 +73,7 @@ namespace nil {
             /*!
              * @brief
              *
-             * @ingroup hash_algorithms
+             * @addtogroup hash_algorithms
              *
              * @tparam Hash
              * @tparam InputIterator
@@ -99,7 +99,7 @@ namespace nil {
             /*!
              * @brief
              *
-             * @ingroup hash_algorithms
+             * @addtogroup hash_algorithms
              *
              * @tparam Hash
              * @tparam InputIterator
@@ -123,7 +123,7 @@ namespace nil {
             /*!
              * @brief
              *
-             * @ingroup hash_algorithms
+             * @addtogroup hash_algorithms
              *
              * @tparam Hash
              * @tparam SinglePassRange
@@ -148,7 +148,7 @@ namespace nil {
             /*!
              * @brief
              *
-             * @ingroup hash_algorithms
+             * @addtogroup hash_algorithms
              *
              * @tparam Hash
              * @tparam SinglePassRange
@@ -173,7 +173,7 @@ namespace nil {
             /*!
              * @brief
              *
-             * @ingroup hash_algorithms
+             * @addtogroup hash_algorithms
              *
              * @tparam Hash
              * @tparam SinglePassRange

@@ -52,7 +52,7 @@ namespace nil {
              * "personalization string" which can create variants of the hash. This
              * is useful for domain separation.
              *
-             * @ingroup hash
+             * @addtogroup hash
              */
             template<std::size_t DigestBits>
             class skein {

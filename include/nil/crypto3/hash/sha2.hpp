@@ -24,7 +24,7 @@ namespace nil {
             /*!
              * @brief
              * @tparam Version
-             * @ingroup hash
+             * @addtogroup hash
              */
             template<std::size_t Version>
             class sha2 {
