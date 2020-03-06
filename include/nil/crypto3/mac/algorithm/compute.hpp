@@ -10,12 +10,8 @@
 #ifndef CRYPTO3_MAC_COMPUTE_HPP
 #define CRYPTO3_MAC_COMPUTE_HPP
 
-#include <boost/assert.hpp>
-#include <boost/concept_check.hpp>
-
-#include <boost/range/begin.hpp>
-#include <boost/range/end.hpp>
-#include <boost/range/concepts.hpp>
+#include <nil/crypto3/mac/mac_value.hpp>
+#include <nil/crypto3/mac/mac_state.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -31,21 +27,6 @@ namespace nil {
              * @brief Algorithms are meant to provide message authentication codes computation
              * interface similar to STL algorithms' one.
              */
-
-            namespace detail {
-                template<typename Encoder, typename InputIterator, typename OutputIterator>
-                OutputIterator compute_impl(InputIterator first, InputIterator last, OutputIterator out, Encoder pred) {
-                    typedef typename std::iterator_traits<InputIterator>::value_type value_type;
-
-                    BOOST_STATIC_ASSERT(std::numeric_limits<value_type>::is_specialized);
-
-                    pred.compute(first, last);
-
-                    typename Encoder::result_type result = pred.get();
-
-                    return std::move(result.begin(), result.end(), out);
-                };
-            }    // namespace detail
 
             /*!
              * @brief

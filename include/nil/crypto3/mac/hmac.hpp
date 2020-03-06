@@ -10,9 +10,10 @@
 #ifndef CRYPTO3_MAC_HMAC_HPP
 #define CRYPTO3_MAC_HMAC_HPP
 
+#include <nil/crypto3/detail/pack.hpp>
+
 #include <nil/crypto3/mac/detail/hmac/accumulator.hpp>
 #include <nil/crypto3/mac/detail/hmac/hmac_policy.hpp>
-#include <nil/crypto3/mac/detail/pack.hpp>
 
 #include <nil/crypto3/hash/hash_state.hpp>
 #include <nil/crypto3/hash/algorithm/hash.hpp>
