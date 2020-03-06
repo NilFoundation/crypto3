@@ -37,163 +37,129 @@ option(CRYPTO3_MAC_ANSI_X919 "Build with ANSI X919 MAC support" TRUE)
 
 if(CRYPTO3_MAC_CBC)
     list(APPEND ${CURRENT_PROJECT_NAME}_CBC_MAC_HEADERS
-         include/nil/crypto3/mac/cbc_mac.hpp
-         )
+         include/nil/crypto3/mac/cbc_mac.hpp)
 
     list(APPEND ${CURRENT_PROJECT_NAME}_CBC_MAC_SOURCES)
 
     add_definitions(-DCRYPTO3_HAS_CBC_MAC)
     list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-         ${${CURRENT_PROJECT_NAME}_CBC_MAC_HEADERS}
-         )
+         ${${CURRENT_PROJECT_NAME}_CBC_MAC_HEADERS})
     list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-         ${${CURRENT_PROJECT_NAME}_CBC_MAC_SOURCES}
-         )
+         ${${CURRENT_PROJECT_NAME}_CBC_MAC_SOURCES})
 endif()
 
 if(CRYPTO3_MAC_CMAC)
     list(APPEND ${CURRENT_PROJECT_NAME}_CMAC_HEADERS
-         include/nil/crypto3/mac/cmac.hpp
-         )
+         include/nil/crypto3/mac/cmac.hpp)
 
-    list(APPEND ${CURRENT_PROJECT_NAME}_CMAC_SOURCES
-         )
+    list(APPEND ${CURRENT_PROJECT_NAME}_CMAC_SOURCES)
 
     add_definitions(-DCRYPTO3_HAS_CMAC)
     list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-         ${${CURRENT_PROJECT_NAME}_CMAC_HEADERS}
-         )
+         ${${CURRENT_PROJECT_NAME}_CMAC_HEADERS})
     list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-         ${${CURRENT_PROJECT_NAME}_CMAC_SOURCES}
-         )
+         ${${CURRENT_PROJECT_NAME}_CMAC_SOURCES})
 endif()
 
 if(CRYPTO3_MAC_GMAC)
     list(APPEND ${CURRENT_PROJECT_NAME}_GMAC_HEADERS
-         include/nil/crypto3/mac/gmac.hpp
-         )
+         include/nil/crypto3/mac/gmac.hpp)
 
     list(APPEND ${CURRENT_PROJECT_NAME}_GMAC_SOURCES)
 
     add_definitions(-DCRYPTO3_HAS_GMAC)
     list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-         ${${CURRENT_PROJECT_NAME}_GMAC_HEADERS}
-         )
+         ${${CURRENT_PROJECT_NAME}_GMAC_HEADERS})
     list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-         ${${CURRENT_PROJECT_NAME}_GMAC_SOURCES}
-         )
+         ${${CURRENT_PROJECT_NAME}_GMAC_SOURCES})
 endif()
 
 if(CRYPTO3_MAC_HMAC)
     list(APPEND ${CURRENT_PROJECT_NAME}_HMAC_HEADERS
-         include/nil/crypto3/mac/hmac.hpp
-         )
+         include/nil/crypto3/mac/hmac.hpp)
 
     list(APPEND ${CURRENT_PROJECT_NAME}_HMAC_SOURCES)
 
     add_definitions(-DCRYPTO3_HAS_HMAC)
     list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-         ${${CURRENT_PROJECT_NAME}_HMAC_HEADERS}
-         )
+         ${${CURRENT_PROJECT_NAME}_HMAC_HEADERS})
     list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-         ${${CURRENT_PROJECT_NAME}_HMAC_SOURCES}
-         )
+         ${${CURRENT_PROJECT_NAME}_HMAC_SOURCES})
 endif()
 
 if(CRYPTO3_MAC_GMAC)
     list(APPEND ${CURRENT_PROJECT_NAME}_GMAC_HEADERS
-         include/nil/crypto3/mac/gmac.hpp
-         )
+         include/nil/crypto3/mac/gmac.hpp)
 
     list(APPEND ${CURRENT_PROJECT_NAME}_GMAC_SOURCES)
 
     add_definitions(-DCRYPTO3_HAS_GMAC)
     list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-         ${${CURRENT_PROJECT_NAME}_GMAC_HEADERS}
-         )
+         ${${CURRENT_PROJECT_NAME}_GMAC_HEADERS})
     list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-         ${${CURRENT_PROJECT_NAME}_GMAC_SOURCES}
-         )
+         ${${CURRENT_PROJECT_NAME}_GMAC_SOURCES})
 endif()
 
 if(CRYPTO3_MAC_POLY1305)
     list(APPEND ${CURRENT_PROJECT_NAME}_MAC_POLY1305_HEADERS
-         include/nil/crypto3/mac/poly1305.hpp
-         )
+         include/nil/crypto3/mac/poly1305.hpp)
 
-    list(APPEND ${CURRENT_PROJECT_NAME}_MAC_POLY1305_SOURCES
-         )
+    list(APPEND ${CURRENT_PROJECT_NAME}_MAC_POLY1305_SOURCES)
 
     add_definitions(-DCRYPTO3_HAS_POLY1305)
     list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-         ${${CURRENT_PROJECT_NAME}_MAC_POLY1305_HEADERS}
-         )
+         ${${CURRENT_PROJECT_NAME}_MAC_POLY1305_HEADERS})
     list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-         ${${CURRENT_PROJECT_NAME}_MAC_POLY1305_SOURCES}
-         )
+         ${${CURRENT_PROJECT_NAME}_MAC_POLY1305_SOURCES})
 endif()
 
 if(CRYPTO3_MAC_SIPHASH)
     list(APPEND ${CURRENT_PROJECT_NAME}_SIPHASH_HEADERS
-         include/nil/crypto3/mac/siphash.hpp
-         )
+         include/nil/crypto3/mac/siphash.hpp)
 
-    list(APPEND ${CURRENT_PROJECT_NAME}_SIPHASH_SOURCES
-         )
+    list(APPEND ${CURRENT_PROJECT_NAME}_SIPHASH_SOURCES)
 
     add_definitions(-DCRYPTO3_HAS_SIPHASH)
     list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-         ${${CURRENT_PROJECT_NAME}_SIPHASH_HEADERS}
-         )
+         ${${CURRENT_PROJECT_NAME}_SIPHASH_HEADERS})
     list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-         ${${CURRENT_PROJECT_NAME}_SIPHASH_SOURCES}
-         )
+         ${${CURRENT_PROJECT_NAME}_SIPHASH_SOURCES})
 endif()
 
 if(CRYPTO3_MAC_ANSI_X919)
     list(APPEND ${CURRENT_PROJECT_NAME}_X919_HEADERS
-         include/nil/crypto3/mac/x919_mac.hpp
-         )
+         include/nil/crypto3/mac/x919_mac.hpp)
 
-    list(APPEND ${CURRENT_PROJECT_NAME}_X919_SOURCES
-         )
+    list(APPEND ${CURRENT_PROJECT_NAME}_X919_SOURCES)
 
     add_definitions(-DCRYPTO3_HAS_ANSI_X919_MAC)
     list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-         ${${CURRENT_PROJECT_NAME}_X919_HEADERS}
-         )
+         ${${CURRENT_PROJECT_NAME}_X919_HEADERS})
     list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-         ${${CURRENT_PROJECT_NAME}_X919_SOURCES}
-         )
+         ${${CURRENT_PROJECT_NAME}_X919_SOURCES})
 endif()
 
 list(APPEND ${CURRENT_PROJECT_NAME}_HEADERS
-     ${${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS}
-     )
+     ${${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS})
 
 list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-     ${${CURRENT_PROJECT_NAME}_UNGROUPED_SOURCES}
-     )
+     ${${CURRENT_PROJECT_NAME}_UNGROUPED_SOURCES})
 
 cm_setup_version(VERSION 0.1.0 PREFIX ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME})
 
-add_library(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
-            ${${CURRENT_PROJECT_NAME}_HEADERS}
-            ${${CURRENT_PROJECT_NAME}_SOURCES}
-            )
-set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES
-                      LINKER_LANGUAGE CXX
-                      EXPORT_NAME ${CURRENT_PROJECT_NAME}
-                      CXX_STANDARD 14)
+add_library(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE)
 
-target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PUBLIC
+set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES
+                      EXPORT_NAME ${CURRENT_PROJECT_NAME})
+
+target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
                       ${CMAKE_WORKSPACE_NAME}::block
                       ${CMAKE_WORKSPACE_NAME}::hash
                       ${CMAKE_WORKSPACE_NAME}::modes
 
                       ${Boost_LIBRARIES})
 
-target_include_directories(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PRIVATE
+target_include_directories(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
                            "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
                            "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>"
 
@@ -203,10 +169,6 @@ cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
           INCLUDE include
           NAMESPACE ${CMAKE_WORKSPACE_NAME}::)
 
-if(APPLE OR NOT ${CMAKE_TARGET_ARCHITECTURE} STREQUAL ${CMAKE_HOST_SYSTEM_PROCESSOR})
-    set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES
-                          XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "${APPLE_CODE_SIGN_IDENTITY}"
-                          XCODE_ATTRIBUTE_DEVELOPMENT_TEAM "${CMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM}")
+if(BUILD_TESTS)
+    add_subdirectory(test)
 endif()
-
-add_subdirectory(test)
