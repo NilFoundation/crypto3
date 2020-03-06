@@ -19,11 +19,11 @@
 namespace nil {
     namespace crypto3 {
         namespace kdf {
-            template<typename MessageAuthenticationCode>
+            template<typename KeyDerivationFunction>
             using accumulator_set = boost::accumulators::accumulator_set<
-                digest<MessageAuthenticationCode::input_block_bits>,
-                boost::accumulators::features<accumulators::tag::hash<typename MessageAuthenticationCode::hash_type>,
-                                              accumulators::tag::kdf<MessageAuthenticationCode>>>;
+                digest<KeyDerivationFunction::input_block_bits>,
+                boost::accumulators::features<accumulators::tag::hash<typename KeyDerivationFunction::hash_type>,
+                                              accumulators::tag::kdf<KeyDerivationFunction>>>;
         }    // namespace kdf
     }        // namespace crypto3
 }    // namespace nil
