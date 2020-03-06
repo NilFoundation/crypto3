@@ -27,7 +27,7 @@ namespace nil {
              * Rarely used, and now probably would be deprecated in crypto3. Use AES or Serpent
              * instead.
              *
-             * @ingroup block
+             * @addtogroup block
              *
              * @tparam BlockBits Block cipher block bits. Does not represent the actual block bits value. Actual
              * block bits value is BlockBits / 2. Available values are: 128, 256.

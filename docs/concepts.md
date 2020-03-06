@@ -28,9 +28,9 @@ The following static data member definitions must be valid and have their specif
 
 |Expression          |Type             |Requirements and Notes                 |
 |--------------------|-----------------|---------------------------------------|
-|```X::word_bits```  |```std::size_t```|```Integral``` amount of bits in ```WordType```|
-|```X::key_bits```   |```std::size_t```|```Integral``` amount of bits in ```KeyType```|
-|```X::block_bits``` |```std::size_t```|```Integral``` amount of bits in ```BlockType```|
+|```X::word_bits```  |```std::size_t```|```Integral``` bits amount in ```WordType```|
+|```X::key_bits```   |```std::size_t```|```Integral``` bits amount in ```KeyType```|
+|```X::block_bits``` |```std::size_t```|```Integral``` bits amount in ```BlockType```|
 |```X::block_words```|```std::size_t```|```Integral``` amount of ```WordType``` values in ```BlockType```|
 |```X::rounds```     |```std::size_t```|```Integral``` amount of rounds the algorithm does.|
 

@@ -17,14 +17,14 @@ namespace nil {
     namespace crypto3 {
         /*!
          * @addtogroup block_algorithms Algorithms
-         * @ingroup block
+         * @addtogroup block
          * @brief Algorithms are meant to provide decryption interface similar to STL algorithms' one.
          */
 
         /*!
          * @brief
          *
-         * @ingroup block_algorithms
+         * @addtogroup block_algorithms
          *
          * @tparam BlockCipher
          * @tparam InputIterator
@@ -55,7 +55,7 @@ namespace nil {
         /*!
          * @brief
          *
-         * @ingroup block_algorithms
+         * @addtogroup block_algorithms
          *
          * @tparam BlockCipher
          * @tparam InputIterator
@@ -81,7 +81,7 @@ namespace nil {
         /*!
          * @brief
          *
-         * @ingroup block_algorithms
+         * @addtogroup block_algorithms
          *
          * @tparam BlockCipher
          * @tparam SinglePassRange
@@ -106,7 +106,7 @@ namespace nil {
         /*!
          * @brief
          *
-         * @ingroup block_algorithms
+         * @addtogroup block_algorithms
          *
          * @tparam BlockCipher
          * @tparam InputIterator
@@ -135,7 +135,7 @@ namespace nil {
         /*!
          * @brief
          *
-         * @ingroup block_algorithms
+         * @addtogroup block_algorithms
          *
          * @tparam BlockCipher
          * @tparam SinglePassRange
@@ -162,7 +162,7 @@ namespace nil {
         /*!
          * @brief
          *
-         * @ingroup block_algorithms
+         * @addtogroup block_algorithms
          *
          * @tparam BlockCipher
          * @tparam SinglePassRange

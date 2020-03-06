@@ -29,7 +29,7 @@ namespace nil {
              * All are somewhat common in some industries such as finance.
              * Avoid in new code.
              *
-             * @ingroup block
+             * @addtogroup block
              */
             class des {
             protected:

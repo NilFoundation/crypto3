@@ -26,7 +26,7 @@ namespace nil {
             /*!
              * @brief Aria. South Korean cipher used in industry there. No reason
              * to use it otherwise.
-             * @ingroup block
+             * @addtogroup block
              *
              * @tparam KeyBits Block cipher key bits. Supported values are: 128, 192, 256
              *

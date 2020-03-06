@@ -12,7 +12,7 @@
 
 /*!
  * @addtogroup block_algorithms Algorithms
- * @ingroup block
+ * @addtogroup block
  * @brief Algorithms are meant to provide encryption interface similar to STL algorithms'
  * one.
  */

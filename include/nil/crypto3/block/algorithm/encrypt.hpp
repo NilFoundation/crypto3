@@ -20,7 +20,7 @@ namespace nil {
         /*!
          * @brief
          *
-         * @ingroup block_algorithms
+         * @addtogroup block_algorithms
          *
          * @tparam BlockCipher
          * @tparam InputIterator
@@ -51,7 +51,7 @@ namespace nil {
         /*!
          * @brief
          *
-         * @ingroup block_algorithms
+         * @addtogroup block_algorithms
          *
          * @tparam BlockCipher
          * @tparam InputIterator
@@ -78,7 +78,7 @@ namespace nil {
         /*!
          * @brief
          *
-         * @ingroup block_algorithms
+         * @addtogroup block_algorithms
          *
          * @tparam BlockCipher
          * @tparam SinglePassRange
@@ -103,7 +103,7 @@ namespace nil {
         /*!
          * @brief
          *
-         * @ingroup block_algorithms
+         * @addtogroup block_algorithms
          *
          * @tparam BlockCipher
          * @tparam InputIterator
@@ -131,7 +131,7 @@ namespace nil {
         /*!
          * @brief
          *
-         * @ingroup block_algorithms
+         * @addtogroup block_algorithms
          *
          * @tparam BlockCipher
          * @tparam SinglePassRange
@@ -159,7 +159,7 @@ namespace nil {
         /*!
          * @brief
          *
-         * @ingroup block_algorithms
+         * @addtogroup block_algorithms
          *
          * @tparam BlockCipher
          * @tparam SinglePassRange

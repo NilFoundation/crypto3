@@ -22,7 +22,7 @@ namespace nil {
              * @brief Blowfish. A 64-bit cipher popular in the pre-AES era.
              * Very slow key setup. Also used (with bcrypt) for password hashing.
              *
-             * @ingroup block
+             * @addtogroup block
              */
             class blowfish {
             protected:
