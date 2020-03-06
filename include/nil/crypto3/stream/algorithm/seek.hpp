@@ -20,7 +20,7 @@ namespace nil {
          * @brief
          *
          * @addtogroup stream_algorithms Algorithms
-         * @ingroup stream
+         * @addtogroup stream
          * @brief Algorithms are meant to provide encryption interface similar to STL algorithms'
          * one.
          */
@@ -28,7 +28,7 @@ namespace nil {
         /*!
          * @brief
          *
-         * @ingroup stream_algorithms
+         * @addtogroup stream_algorithms
          *
          * @tparam StreamCipher
          * @tparam InputIterator
@@ -57,7 +57,7 @@ namespace nil {
         /*!
          * @brief
          *
-         * @ingroup stream_algorithms
+         * @addtogroup stream_algorithms
          *
          * @tparam StreamCipher
          * @tparam InputIterator
@@ -86,7 +86,7 @@ namespace nil {
         /*!
          * @brief
          *
-         * @ingroup stream_algorithms
+         * @addtogroup stream_algorithms
          *
          * @tparam StreamCipher
          * @tparam SinglePassRange
@@ -114,7 +114,7 @@ namespace nil {
         /*!
          * @brief
          *
-         * @ingroup stream_algorithms
+         * @addtogroup stream_algorithms
          *
          * @tparam StreamCipher
          * @tparam InputIterator
@@ -141,7 +141,7 @@ namespace nil {
         /*!
          * @brief
          *
-         * @ingroup stream_algorithms
+         * @addtogroup stream_algorithms
          *
          * @tparam StreamCipher
          * @tparam SinglePassRange
@@ -169,7 +169,7 @@ namespace nil {
         /*!
          * @brief
          *
-         * @ingroup stream_algorithms
+         * @addtogroup stream_algorithms
          *
          * @tparam StreamCipher
          * @tparam SinglePassRange
