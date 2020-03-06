@@ -49,13 +49,17 @@ namespace nil {
                 typedef typename policy_type::hash_type hash_type;
                 typedef typename policy_type::mac_type mac_type;
 
+                constexpr static const std::size_t salt_bits = policy_type::salt_bits;
+                typedef typename policy_type::salt_type salt_type;
+
                 constexpr static const std::size_t min_key_bits = policy_type::min_key_bits;
                 constexpr static const std::size_t max_key_bits = policy_type::max_key_bits;
                 typedef typename policy_type::key_type key_type;
 
-                static void process(const key_type &key) {
-                    mac_type mac(key);
+                sp800_56a(const salt_type &salt) : mac(salt) {
+                }
 
+                static void process(const key_type &key) {
                     const uint64_t kRepsUpperBound = (1ULL << 32U);
 
                     const size_t digest_len = auxfunc.output_length();
@@ -82,6 +86,9 @@ namespace nil {
 
                     return key_len;
                 }
+
+            protected:
+                mac_type mac;
             };
 
             /*!
@@ -96,9 +103,15 @@ namespace nil {
                 typedef typename policy_type::hash_type hash_type;
                 typedef typename policy_type::mac_type mac_type;
 
+                constexpr static const std::size_t salt_bits = policy_type::salt_bits;
+                typedef typename policy_type::salt_type salt_type;
+
                 constexpr static const std::size_t min_key_bits = policy_type::min_key_bits;
                 constexpr static const std::size_t max_key_bits = policy_type::max_key_bits;
                 typedef typename policy_type::key_type key_type;
+
+                sp800_56a(const salt_type &salt) : mac(salt) {
+                }
 
                 static void process(const key_type &key) {
                     mac_type mac(key);
@@ -129,6 +142,9 @@ namespace nil {
 
                     return key_len;
                 }
+
+            protected:
+                mac_type mac;
             };
         }    // namespace kdf
     }        // namespace crypto3

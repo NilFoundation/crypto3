@@ -32,7 +32,13 @@ namespace nil {
                 struct counter : sp800_108_mode<MessageAuthenticationCode> {
                     typedef typename sp800_108_mode<MessageAuthenticationCode>::mac_type mac_type;
 
-                    inline static void process() {
+                    constexpr static const std::size_t secret_bits = mac_type::key_bits;
+                    typedef typename mac_type::key_type secret_type;
+
+                    counter(const secret_type &key) : mac(key) {
+                    }
+
+                    inline void process() {
                         const std::size_t prf_len = m_prf->output_length();
                         const uint8_t delim = 0;
                         const uint32_t length = static_cast<uint32_t>(key_len * 8);
@@ -69,6 +75,9 @@ namespace nil {
 
                         return key_len;
                     }
+
+                protected:
+                    mac_type mac;
                 };
 
                 /*!
@@ -79,7 +88,13 @@ namespace nil {
                 struct feedback : sp800_108_mode<MessageAuthenticationCode> {
                     typedef typename sp800_108_mode<MessageAuthenticationCode>::mac_type mac_type;
 
-                    inline static void process() {
+                    constexpr static const std::size_t secret_bits = mac_type::key_bits;
+                    typedef typename mac_type::key_type secret_type;
+
+                    feedback(const secret_type &key) : mac(key) {
+                    }
+
+                    inline void process() {
                         const uint32_t length = static_cast<uint32_t>(key_len * 8);
                         const std::size_t prf_len = m_prf->output_length();
                         const std::size_t iv_len = (salt_len >= prf_len ? prf_len : 0);
@@ -120,6 +135,9 @@ namespace nil {
 
                         return key_len;
                     }
+
+                protected:
+                    mac_type mac;
                 };
 
                 /*!
@@ -130,7 +148,13 @@ namespace nil {
                 struct pipeline : sp800_108_mode<MessageAuthenticationCode> {
                     typedef typename sp800_108_mode<MessageAuthenticationCode>::mac_type mac_type;
 
-                    inline static void process() {
+                    constexpr static const std::size_t secret_bits = mac_type::key_bits;
+                    typedef typename mac_type::key_type secret_type;
+
+                    pipeline(const secret_type &key) : mac(key) {
+                    }
+
+                    inline void process() {
                         const uint32_t length = static_cast<uint32_t>(key_len * 8);
                         const std::size_t prf_len = m_prf->output_length();
                         const uint8_t delim = 0;
@@ -180,6 +204,9 @@ namespace nil {
 
                         return key_len;
                     }
+
+                protected:
+                    mac_type mac;
                 };
             }    // namespace mode
 
@@ -196,9 +223,18 @@ namespace nil {
                 typedef typename policy_type::mode_type mode_type;
                 typedef typename policy_type::mac_type mac_type;
 
-                static void process() {
-                    mode_type::process();
+                constexpr static const std::size_t secret_bits = mode_type::secret_bits;
+                typedef typename mode_type::secret_type secret_type;
+
+                sp800_108(const secret_type &key) : mode(key) {
                 }
+
+                void process() {
+                    mode.process();
+                }
+
+            protected:
+                mode_type mode;
             };
         }    // namespace kdf
     }        // namespace crypto3

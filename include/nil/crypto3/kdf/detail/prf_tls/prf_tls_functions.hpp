@@ -26,16 +26,8 @@ namespace nil {
                     typedef typename policy_type::mac_type2 mac_type2;
 
                     template<typename MessageAuthenticationCode>
-                    static void P_hash(uint8_t out[], size_t out_len, MessageAuthenticationCode &mac,
-                                       const uint8_t secret[], size_t secret_len, const uint8_t salt[],
-                                       size_t salt_len) {
-                        try {
-                            mac.set_key(secret, secret_len);
-                        } catch (Invalid_Key_Length &) {
-                            throw Internal_Error("The premaster secret of " + std::to_string(secret_len) +
-                                                 " bytes is too long for the PRF");
-                        }
-
+                    static void p_hash(uint8_t out[], size_t out_len, MessageAuthenticationCode &mac,
+                                       const uint8_t salt[], size_t salt_len) {
                         secure_vector<uint8_t> A(salt, salt + salt_len);
                         secure_vector<uint8_t> h;
 

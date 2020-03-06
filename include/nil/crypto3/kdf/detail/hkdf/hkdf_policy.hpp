@@ -18,16 +18,22 @@ namespace nil {
                 struct hkdf_policy {
                     typedef MessageAuthenticationCode mac_type;
 
-                    constexpr static const std::size_t min_key_bits = mac_type::min_key_bits;
-                    constexpr static const std::size_t max_key_bits = mac_type::max_key_bits;
+                    constexpr static const std::size_t salt_bits = mac_type::key_bits;
+                    typedef typename mac_type::key_type salt_type;
+
+                    constexpr static const std::size_t secret_bits = mac_type::key_bits;
+                    typedef typename mac_type::key_type secret_type;
+
+                    constexpr static const std::size_t min_key_bits = mac_type::key_bits;
+                    constexpr static const std::size_t max_key_bits = mac_type::key_bits;
                     typedef typename mac_type::key_type key_type;
 
                     constexpr static const std::size_t digest_bits = mac_type::digest_bits;
                     typedef typename mac_type::digest_type digest_type;
                 };
-            }
-        }
-    }
-}
+            }    // namespace detail
+        }        // namespace kdf
+    }            // namespace crypto3
+}    // namespace nil
 
 #endif    // CRYPTO3_HKDF_POLICY_HPP

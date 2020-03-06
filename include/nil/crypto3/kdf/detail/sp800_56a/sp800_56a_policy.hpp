@@ -38,9 +38,11 @@ namespace nil {
                     typedef Hash hash_type;
                     typedef mac::hmac<Hash> mac_type;
 
-                    constexpr static const std::size_t min_key_bits = mac_type::min_key_bits;
-                    constexpr static const std::size_t max_key_bits = mac_type::max_key_bits;
-                    typedef typename mac_type::key_type key_type;
+                    constexpr static const std::size_t min_key_bits = 0;
+                    constexpr static const std::size_t max_key_bits = 2ULL >> 32ULL;
+
+                    constexpr static const std::size_t salt_bits = mac_type::key_bits;
+                    typedef typename mac_type::key_type salt_type;
                 };
             }    // namespace detail
         }        // namespace kdf

@@ -29,6 +29,15 @@ namespace nil {
                 constexpr static const std::size_t digest_bits = policy_type::digest_bits;
                 typedef typename policy_type::digest_type digest_type;
 
+                constexpr static const std::size_t secret_bits = policy_type::secret_bits;
+                typedef typename policy_type::secret_type secret_type;
+
+                constexpr static const std::size_t label_bits = policy_type::label_bits;
+                typedef typename policy_type::label_type label_type;
+
+                constexpr static const std::size_t salt_bits = policy_type::salt_bits;
+                typedef typename policy_type::salt_type salt_type;
+
                 static inline digest_type process() {
                     digest_type digest;
                     process(digest);

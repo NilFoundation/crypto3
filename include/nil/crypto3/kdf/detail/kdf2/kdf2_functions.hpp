@@ -21,6 +21,15 @@ namespace nil {
                     typedef kdf2_policy<Hash> policy_type;
 
                     typedef typename policy_type::hash_type hash_type;
+
+                    constexpr static const std::size_t secret_bits = policy_type::secret_bits;
+                    typedef typename policy_type::secret_type secret_type;
+
+                    constexpr static const std::size_t label_bits = policy_type::label_bits;
+                    typedef typename policy_type::label_type label_type;
+
+                    constexpr static const std::size_t salt_bits = policy_type::salt_bits;
+                    typedef typename policy_type::salt_type salt_type;
                 };
             }    // namespace detail
         }        // namespace kdf
