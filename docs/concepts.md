@@ -28,8 +28,8 @@ The following static data member definitions must be valid and have their specif
 |---------------------------|------------------|-------------------------------|
 |```X::encoded_block_values```|```std::size_t```|```Integral``` amount of values in ```EncodedBlock```|
 |```X::decoded_block_values```|```std::size_t```|```Integral``` amount of values in ```DecodedBlock```|
-|```X::encoded_block_bits```|```std::size_t```|```Integral``` amount of bits in ```EncodedBlock```|
-|```X::decoded_block_bits```|```std::size_t```|```Integral``` amount of bits in ```DecodedBlock```|
+|```X::encoded_block_bits```|```std::size_t```|```Integral``` bits amount in ```EncodedBlock```|
+|```X::decoded_block_bits```|```std::size_t```|```Integral``` bits amount in ```DecodedBlock```|
 
 The following expressions must be valid and have their specified effects
 

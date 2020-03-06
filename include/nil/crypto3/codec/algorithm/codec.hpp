@@ -17,7 +17,7 @@ namespace nil {
              * @addtogroup codec Encoding & Decoding
              *
              * @addtogroup codec_algorithms Algorithms
-             * @ingroup codec
+             * @addtogroup codec
              * @brief Encoding algorithms are meant to provide encoding interface similar to STL algorithms' one.
              */
         }

@@ -22,7 +22,7 @@ namespace nil {
              * @addtogroup codec Encoding & Decoding
              *
              * @addtogroup codec_algorithms Algorithms
-             * @ingroup codec
+             * @addtogroup codec
              * @brief Algorithms are meant to provide decoding interface similar to STL algorithms' one.
              */
         }
@@ -32,7 +32,7 @@ namespace nil {
          * in the range, defined by [first, last), and inserts the result to
          * another range beginning at out.
          *
-         * @ingroup codec_algorithms
+         * @addtogroup codec_algorithms
          *
          * @tparam Decoder Must meet the requirements of Codec which determines the
          * particular algorithm to be used with range given.
@@ -64,7 +64,7 @@ namespace nil {
          * type convertible to the type satisfying SequenceContainer with the value
          * type satisfying Integral concept requirements.
          *
-         * @ingroup codec_algorithms
+         * @addtogroup codec_algorithms
          *
          * @tparam Decoder Must meet the requirements of Codec which determines the
          * particular algorithm to be used with range given.
@@ -95,7 +95,7 @@ namespace nil {
          * in the range, defined by rng and inserts the result to destination
          * range beginning at out.
          *
-         * @ingroup codec_algorithms
+         * @addtogroup codec_algorithms
          *
          * @tparam Decoder Must meet the requirements of Codec which determines the
          * particular algorithm to be used with range given.
@@ -125,7 +125,7 @@ namespace nil {
          * in the range, defined by rng and inserts the result to destination
          * range beginning at out.
          *
-         * @ingroup codec_algorithms
+         * @addtogroup codec_algorithms
          *
          * @tparam Decoder Must meet the requirements of Codec which determines the
          * particular algorithm to be used with range given.
@@ -154,7 +154,7 @@ namespace nil {
          * in the range, defined by rng and inserts the result to destination
          * range beginning at out.
          *
-         * @ingroup codec_algorithms
+         * @addtogroup codec_algorithms
          *
          * @tparam Decoder Must meet the requirements of Codec which determines the
          * particular algorithm to be used with range given.
@@ -184,7 +184,7 @@ namespace nil {
          * type convertible to the type satisfying SequenceContainer with the value
          * type satisfying Integral concept requirements.
          *
-         * @ingroup codec_algorithms
+         * @addtogroup codec_algorithms
          *
          * @tparam Decoder Must meet the requirements of Codec which determines the
          * particular algorithm to be used with range given.
