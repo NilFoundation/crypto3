@@ -64,7 +64,7 @@ namespace nil {
              * systems. Possibly vulnerable to side channels due to its use of table
              * lookups. Prefer Skein-512 or BLAKE2b in new code.
              *
-             * @ingroup hash
+             * @addtogroup hash
              */
             template<std::size_t DigestBits = 192, std::size_t Passes = 3>
             class tiger {

@@ -44,7 +44,7 @@ namespace nil {
              * is (unlike almost all other hashes) potentially vulnerable to cache
              * based side channels. Prefer Skein-512 or BLAKE2b in new code.
              *
-             * @ingroup hash
+             * @addtogroup hash
              */
             class whirlpool {
                 typedef detail::whirlpool_policy policy_type;
