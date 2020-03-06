@@ -27,7 +27,7 @@ namespace nil {
              * integrity of data and the authenticity of a message.
              *
              * @addtogroup mac_algorithms Algorithms
-             * @ingroup mac
+             * @addtogroup mac
              * @brief Algorithms are meant to provide message authentication codes computation
              * interface similar to STL algorithms' one.
              */
