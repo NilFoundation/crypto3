@@ -22,14 +22,14 @@ namespace nil {
              * derivation.
              *
              * @addtogroup kdf_algorithms Algorithms
-             * @ingroup kdf
+             * @addtogroup kdf
              * @brief Algorithms are meant to provide key derivation interface similar to STL algorithms' one.
              */
 
             /*!
              * @brief
              *
-             * @ingroup kdf_algorithms
+             * @addtogroup kdf_algorithms
              *
              * @tparam Kdf
              * @tparam InputIterator
@@ -50,7 +50,7 @@ namespace nil {
             /*!
              * @brief
              *
-             * @ingroup kdf_algorithms
+             * @addtogroup kdf_algorithms
              *
              * @tparam Kdf
              * @tparam InputIterator
@@ -69,7 +69,7 @@ namespace nil {
             /*!
              * @brief
              *
-             * @ingroup kdf_algorithms
+             * @addtogroup kdf_algorithms
              *
              * @tparam Kdf
              * @tparam SinglePassRange
@@ -87,7 +87,7 @@ namespace nil {
             /*!
              * @brief
              *
-             * @ingroup kdf_algorithms
+             * @addtogroup kdf_algorithms
              *
              * @tparam Kdf
              * @tparam SinglePassRange
