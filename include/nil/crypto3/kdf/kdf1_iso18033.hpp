@@ -24,6 +24,8 @@ namespace nil {
                 typedef detail::kdf_iso18033_functions<Hash> policy_type;
 
             public:
+                typedef typename policy_type::hash_type hash_type;
+
                 static void process() {
                     uint32_t counter = 0;
                     secure_vector<uint8_t> h;
