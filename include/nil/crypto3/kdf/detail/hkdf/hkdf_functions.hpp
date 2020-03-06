@@ -21,6 +21,9 @@ namespace nil {
                     typedef hkdf_policy<MessageAuthenticationCode> policy_type;
                     typedef typename policy_type::mac_type mac_type;
 
+                    constexpr static const std::size_t salt_bits = policy_type::salt_bits;
+                    typedef typename policy_type::salt_type salt_type;
+
                     constexpr static const std::size_t min_key_bits = policy_type::min_key_bits;
                     constexpr static const std::size_t max_key_bits = policy_type::max_key_bits;
                     typedef typename policy_type::key_type key_type;
@@ -33,9 +36,7 @@ namespace nil {
                      * @param mac
                      * @param key
                      */
-                    static void expand(digest_type &digest, const key_type &secret) {
-                        mac_type mac(secret);
-
+                    static void expand(digest_type &digest, const mac_type &mac) {
                         uint8_t counter = 1;
                         secure_vector<uint8_t> h;
                         size_t offset = 0;
@@ -60,8 +61,7 @@ namespace nil {
                      * @tparam SecretInputIterator
                      * @param key
                      */
-                    static void extract(digest_type &digest, const key_type &salt = key_type()) {
-                        mac_type mac(salt);
+                    static void extract(digest_type &digest, const mac_type &mac) {
                         secure_vector<uint8_t> prk;
 
                         m_prf->update(secret, secret_len);

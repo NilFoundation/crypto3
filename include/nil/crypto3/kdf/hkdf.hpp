@@ -10,6 +10,8 @@
 #ifndef CRYPTO3_KDF_HKDF_HPP
 #define CRYPTO3_KDF_HKDF_HPP
 
+#include <nil/crypto3/detail/pack.hpp>
+
 #include <nil/crypto3/kdf/detail/hkdf/hkdf_functions.hpp>
 
 namespace nil {
@@ -36,22 +38,41 @@ namespace nil {
                 constexpr static const std::size_t max_key_bits = policy_type::max_key_bits;
                 typedef typename policy_type::key_type key_type;
 
+                constexpr static const std::size_t secret_bits = policy_type::secret_bits;
+                typedef typename policy_type::secret_type secret_type;
+
+                constexpr static const std::size_t label_bits = policy_type::label_bits;
+                typedef typename policy_type::label_type label_type;
+
+                constexpr static const std::size_t salt_bits = policy_type::salt_bits;
+                typedef typename policy_type::salt_type salt_type;
+
                 constexpr static const std::size_t digest_bits = policy_type::digest_bits;
                 typedef typename policy_type::digest_type digest_type;
 
-                static inline digest_type process(const key_type &key) {
+                hkdf(const secret_type &secret, const salt_type &salt = salt_type()) :
+                    extract_mac(salt.size() ? salt : [&]() -> salt_type {
+                        salt_type ret;
+                        ret.fill(0);
+                        pack(hash_type::digest_bits, ret);
+                        return ret;
+                    }()),
+                    expand_mac(secret) {
+                }
+
+                inline digest_type process(const key_type &key) {
                     digest_type digest;
                     compute(digest, key);
                     return digest;
                 }
 
-                static inline void process(digest_type &digest, const key_type &key) {
-                    policy_type::extract(digest, secret, secret_len, salt, salt_len, nullptr, 0);
-                    return policy_type::expand(digest, key, nullptr, 0, label, label_len);
+                inline void process(digest_type &digest, const key_type &key) {
+                    policy_type::extract(digest, expand_mac, salt, salt_len, nullptr, 0);
+                    policy_type::expand(digest, extract_mac);
                 }
 
             protected:
-                mac_type mac;
+                mac_type extract_mac, expand_mac;
             };
         }    // namespace kdf
     }        // namespace crypto3

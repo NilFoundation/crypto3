@@ -68,7 +68,7 @@
             void Function(##__VA_ARGS__);                                            \
         };                                                                           \
                                                                                      \
-        struct Derived : Fallback {};                                         \
+        struct Derived : Fallback {};                                                \
                                                                                      \
         template<typename C, C>                                                      \
         struct ChT;                                                                  \
@@ -90,7 +90,7 @@
             void Function(##__VA_ARGS__) const;                                            \
         };                                                                                 \
                                                                                            \
-        struct Derived : Fallback {};                                               \
+        struct Derived : Fallback {};                                                      \
                                                                                            \
         template<typename C, C>                                                            \
         struct ChT;                                                                        \
@@ -174,6 +174,9 @@ namespace nil {
             GENERATE_HAS_MEMBER_TYPE(block_type)
             GENERATE_HAS_MEMBER_TYPE(digest_type)
             GENERATE_HAS_MEMBER_TYPE(key_type)
+            GENERATE_HAS_MEMBER_TYPE(secret_type)
+            GENERATE_HAS_MEMBER_TYPE(salt_type)
+            GENERATE_HAS_MEMBER_TYPE(label_type)
             GENERATE_HAS_MEMBER_TYPE(key_schedule_type)
             GENERATE_HAS_MEMBER_TYPE(word_type)
 
@@ -185,6 +188,9 @@ namespace nil {
             GENERATE_HAS_MEMBER(block_bits)
             GENERATE_HAS_MEMBER(digest_bits)
             GENERATE_HAS_MEMBER(key_bits)
+            GENERATE_HAS_MEMBER(secret_bits)
+            GENERATE_HAS_MEMBER(salt_bits)
+            GENERATE_HAS_MEMBER(label_bits)
             GENERATE_HAS_MEMBER(key_schedule_bits)
             GENERATE_HAS_MEMBER(word_bits)
 
@@ -273,6 +279,15 @@ namespace nil {
                 static const bool value = has_digest_type<T>::value && has_digest_bits<T>::value &&
                                           has_block_type<T>::value && has_block_bits<T>::value &&
                                           has_key_type<T>::value && has_key_bits<T>::value;
+                typedef T type;
+            };
+
+            template<typename T>
+            struct is_kdf {
+                static const bool value = has_digest_type<T>::value && has_digest_bits<T>::value &&
+                                          has_secret_bits<T>::value && has_secret_type<T>::value &&
+                                          has_salt_bits<T>::value && has_salt_type<T>::value &&
+                                          has_label_bits<T>::value && has_label_type<T>::value;
                 typedef T type;
             };
 

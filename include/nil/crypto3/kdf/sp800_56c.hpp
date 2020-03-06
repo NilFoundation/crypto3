@@ -28,9 +28,15 @@ namespace nil {
                 typedef MessageAuthenticationCode mac_type;
                 typedef KeyDerivationFunction kdf_type;
 
+                constexpr static const std::size_t salt_bits = policy_type::salt_bits;
+                typedef typename policy_type::salt_type salt_type;
+
                 constexpr static const std::size_t min_key_bits = policy_type::min_key_bits;
                 constexpr static const std::size_t max_key_bits = policy_type::max_key_bits;
                 typedef typename policy_type::key_type key_type;
+
+                sp800_56c(const salt_type &key) : mac(key) {
+                }
 
                 static void process(const key_type &key) {
                     secure_vector<uint8_t> k_dk;
@@ -44,6 +50,8 @@ namespace nil {
 
                     return key_len;
                 }
+
+                mac_type mac;
             };
         }    // namespace kdf
     }        // namespace crypto3

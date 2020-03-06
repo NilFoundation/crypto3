@@ -47,6 +47,18 @@ namespace nil {
                 typedef typename policy_type::mac_type1 mac_type1;
                 typedef typename policy_type::mac_type2 mac_type2;
 
+                constexpr static const std::size_t secret_bits = policy_type::secret_bits;
+                typedef typename policy_type::secret_type secret_type;
+
+                constexpr static const std::size_t label_bits = policy_type::label_bits;
+                typedef typename policy_type::label_type label_type;
+
+                constexpr static const std::size_t salt_bits = policy_type::salt_bits;
+                typedef typename policy_type::salt_type salt_type;
+
+                prf_tls(const secret_type &secret) : mac1(secret), mac2(secret) {
+                }
+
                 static void process() {
                     const size_t S1_len = (secret_len + 1) / 2, S2_len = (secret_len + 1) / 2;
                     const uint8_t *S1 = secret;
@@ -57,12 +69,15 @@ namespace nil {
                     msg += std::make_pair(label, label_len);
                     msg += std::make_pair(salt, salt_len);
 
-                    policy_type::template p_hash<mac_type2>(key, key_len, *m_hmac_md5, S1, S1_len, msg.data(),
-                                                            msg.size());
-                    policy_type::template p_hash<mac_type1>(key, key_len, *m_hmac_sha1, S2, S2_len, msg.data(),
-                                                            msg.size());
+                    policy_type::template p_hash<mac_type2>(key, key_len, mac2, msg.data(), msg.size());
+                    policy_type::template p_hash<mac_type1>(key, key_len, mac1, msg.data(), msg.size());
+
                     return key_len;
                 }
+
+            protected:
+                mac_type1 mac1;
+                mac_type2 mac2;
             };
 
             /*!
@@ -77,6 +92,18 @@ namespace nil {
                 typedef typename policy_type::mac_type1 mac_type1;
                 typedef typename policy_type::mac_type2 mac_type2;
 
+                constexpr static const std::size_t secret_bits = policy_type::secret_bits;
+                typedef typename policy_type::secret_type secret_type;
+
+                constexpr static const std::size_t label_bits = policy_type::label_bits;
+                typedef typename policy_type::label_type label_type;
+
+                constexpr static const std::size_t salt_bits = policy_type::salt_bits;
+                typedef typename policy_type::salt_type salt_type;
+
+                prf_tls(const secret_type &secret) : mac1(secret), mac2(secret) {
+                }
+
                 static void process() {
                     const size_t S1_len = (secret_len + 1) / 2, S2_len = (secret_len + 1) / 2;
                     const uint8_t *S1 = secret;
@@ -87,12 +114,21 @@ namespace nil {
                     msg += std::make_pair(label, label_len);
                     msg += std::make_pair(salt, salt_len);
 
+<<<<<<< HEAD
                     policy_type::template p_hash<mac_type2>(key, key_len, *m_hmac_md5, S1, S1_len, msg.data(),
                                                             msg.size());
                     policy_type::template p_hash<mac_type1>(key, key_len, *m_hmac_sha1, S2, S2_len, msg.data(),
                                                             msg.size());
+=======
+                    policy_type::template p_hash<mac_type2>(key, key_len, mac2, msg.data(), msg.size());
+                    policy_type::template p_hash<mac_type1>(key, key_len, mac1, msg.data(), msg.size());
+>>>>>>> 1-concept-compliance
                     return key_len;
                 }
+
+            protected:
+                mac_type1 mac1;
+                mac_type2 mac2;
             };
 
             /*!
@@ -108,6 +144,18 @@ namespace nil {
                 typedef typename policy_type::mac_type1 mac_type1;
                 typedef typename policy_type::mac_type2 mac_type2;
 
+                constexpr static const std::size_t secret_bits = policy_type::secret_bits;
+                typedef typename policy_type::secret_type secret_type;
+
+                constexpr static const std::size_t label_bits = policy_type::label_bits;
+                typedef typename policy_type::label_type label_type;
+
+                constexpr static const std::size_t salt_bits = policy_type::salt_bits;
+                typedef typename policy_type::salt_type salt_type;
+
+                prf_tls(const secret_type &secret) : mac(secret) {
+                }
+
                 static void process() {
                     secure_vector<uint8_t> msg;
 
@@ -115,10 +163,17 @@ namespace nil {
                     msg += std::make_pair(label, label_len);
                     msg += std::make_pair(salt, salt_len);
 
+<<<<<<< HEAD
                     policy_type::template p_hash<mac_type1>(key, key_len, *m_mac, secret, secret_len, msg.data(),
                                                             msg.size());
+=======
+                    policy_type::template P_hash<mac_type1>(key, key_len, mac, msg.data(), msg.size());
+>>>>>>> 1-concept-compliance
                     return key_len;
                 }
+
+            protected:
+                mac_type1 mac;
             };
         }    // namespace kdf
     }        // namespace crypto3
