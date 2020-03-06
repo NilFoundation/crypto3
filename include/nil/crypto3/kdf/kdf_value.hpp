@@ -10,17 +10,16 @@
 #ifndef CRYPTO3_KDF_VALUE_HPP
 #define CRYPTO3_KDF_VALUE_HPP
 
-#include <type_traits>
-#include <iterator>
-
 #include <boost/assert.hpp>
 #include <boost/concept_check.hpp>
 
 #include <boost/range/concepts.hpp>
 
+#include <nil/crypto3/kdf/accumulators/kdf.hpp>
+
 namespace nil {
     namespace crypto3 {
-        namespace mac {
+        namespace kdf {
             namespace detail {
                 template<typename KdfAccumulator>
                 struct ref_cipher_impl {
@@ -198,7 +197,7 @@ namespace nil {
                     }
                 };
             }    // namespace detail
-        }        // namespace mac
+        }        // namespace kdf
     }            // namespace crypto3
 }    // namespace nil
 
