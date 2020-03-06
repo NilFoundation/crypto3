@@ -5,7 +5,7 @@
 A ```KeyDerivationFunction``` is an object intended to compute non-isomorphic permutations from non-fixed size
  elements integral field to fixed-size elements integral field,
 
-### Requirements ### {#block_ciphers_concepts_requirements}
+### Requirements ### {#kdf_concepts_requirements}
 
 The type ```X``` satisfies ```KeyDerivationFunction``` if
 
@@ -39,4 +39,4 @@ The following expressions must be valid and have their specified effects
 
 |Expression                 |Requirements      |Return Type                    |
 |---------------------------|------------------|-------------------------------|
-|```X(key_type)```|Constructs stateful ```BlockCipher``` object with input key of ```key_type```|```KeyDerivationFunction```|
+|```X(key_type)```|Constructs stateful ```KeyDerivationFunction``` object with input key of ```key_type```|```KeyDerivationFunction```|
