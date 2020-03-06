@@ -4,7 +4,7 @@
 
 A ```MessageAuthenticationCode``` is an object intended to compute non-isomorphic permutations over particular sized integers (e.g. rijndael).
 
-### Requirements ### {#block_ciphers_concepts_requirements}
+### Requirements ### {#mac_concepts_requirements}
 
 The type ```X``` satisfies ```MessageAuthenticationCode``` if
 
