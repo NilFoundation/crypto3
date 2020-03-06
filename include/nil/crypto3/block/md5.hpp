@@ -26,7 +26,7 @@ namespace nil {
              * @brief MD5 block cipher. Stands as a foundation for
              * @ref nil::crypto3::hash::md5 "MD5" hash.
              *
-             * @ingroup block
+             * @addtogroup block
              *
              * Encrypt implemented directly from the RFC as found at
              * http://www.faqs.org/rfcs/rfc1321.html

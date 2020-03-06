@@ -25,7 +25,7 @@ namespace nil {
              * @brief Xtea. A 64-bit cipher popular for its simple implementation.
              * Avoid in new code.
              *
-             * @ingroup block
+             * @addtogroup block
              */
             class xtea {
             protected:

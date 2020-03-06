@@ -25,7 +25,7 @@ namespace nil {
              * @brief Noekeon. A fast 128-bit cipher by the designers of AES.
              * Easily secured against side channels.
              *
-             * @ingroup block
+             * @addtogroup block
              */
             class noekeon {
             protected:

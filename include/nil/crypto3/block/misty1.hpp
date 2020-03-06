@@ -26,7 +26,7 @@ namespace nil {
              * and ISO. Seemingly secure, but quite slow and saw little
              * adoption. No reason to use it in new code.
              *
-             * @ingroup block
+             * @addtogroup block
              */
             class misty1 {
             protected:
