@@ -269,7 +269,7 @@ namespace nil {
                     /*!
                      * @brief Output Feedback Mode (OFB)
                      *
-                     * @ingroup block_modes
+                     * @addtogroup block_modes
                      *
                      * @tparam Cipher
                      * @tparam Allocator

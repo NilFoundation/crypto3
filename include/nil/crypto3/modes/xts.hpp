@@ -434,7 +434,7 @@ namespace nil {
                  * @tparam Cipher
                  * @tparam Padding
                  *
-                 * @ingroup block_modes
+                 * @addtogroup block_modes
                  */
                 template<typename Cipher, template<typename> class Padding,
                          template<typename, typename> class CiphertextStealingMode = cts0>
