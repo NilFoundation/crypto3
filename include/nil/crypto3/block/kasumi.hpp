@@ -25,7 +25,7 @@ namespace nil {
              * @brief Kasumi. A 64-bit cipher used in 3GPP mobile phone protocols.
              * There is no reason to use it outside of this context.
              *
-             * @addtogroup block
+             * @ingroup block
              */
             class kasumi {
             protected:

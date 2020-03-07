@@ -27,7 +27,7 @@ namespace nil {
              * Widely considered the most conservative design. Fairly slow,
              * especially if no SIMD instruction set is available.
              *
-             * @addtogroup block
+             * @ingroup block
              * @tparam KeyBits Block cipher key bits. Available values are: 128, 192, 256
              */
             template<std::size_t KeyBits>

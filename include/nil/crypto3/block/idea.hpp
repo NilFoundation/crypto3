@@ -26,7 +26,7 @@ namespace nil {
              * 128-bit key. Somewhat common due to its use in PGP. Avoid in new
              * designs.
              *
-             * @addtogroup block
+             * @ingroup block
              */
             class idea {
             protected:

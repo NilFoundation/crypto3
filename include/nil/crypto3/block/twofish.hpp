@@ -25,7 +25,7 @@ namespace nil {
              * @brief Twofish. An AES contender. Somewhat complicated key setup
              * and a "kitchen sink" design.
              *
-             * @addtogroup block
+             * @ingroup block
              *
              * @tparam KeyBits Block cipher key bits. Available values are: 128, 192, 256.
              */

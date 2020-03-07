@@ -22,7 +22,7 @@ namespace nil {
     namespace crypto3 {
         namespace block {
             /*!
-             * @addtogroup block
+             * @ingroup block
              * @brief Camellia. A Japanese design standardized by ISO, NESSIE and
              * CRYPTREC. Somewhat common. Comes in three variants, Camellia-128,
              * Camellia-192, and Camellia-256. Prefer AES or Serpent in new designs.

@@ -21,7 +21,7 @@ namespace nil {
             /*!
              * @brief
              *
-             * @addtogroup block
+             * @ingroup block
              *
              * @tparam BlockBits
              * @tparam KeyBits

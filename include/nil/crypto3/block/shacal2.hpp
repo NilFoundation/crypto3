@@ -31,7 +31,7 @@ namespace nil {
              * up to a 512-bit key. Fast and seemingly very secure, but obscure.
              * Standardized by NESSIE.
              *
-             * @addtogroup block
+             * @ingroup block
              *
              * Encrypt implemented directly from the SHA standard as found at
              * http://csrc.nist.gov/publications/fips/fips180-2/fips180-2.pdf

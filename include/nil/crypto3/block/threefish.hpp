@@ -29,7 +29,7 @@ namespace nil {
              * tweakable block cipher used in the Skein hash function via
              * Merkle-Damgård construction. Very fast on 64-bit processors.
              *
-             * @addtogroup block
+             * @ingroup block
              *
              * Encrypt implemented directly from the Skein standard as found at
              * http://www.skein-hash.info/sites/default/files/skein1.2.pdf

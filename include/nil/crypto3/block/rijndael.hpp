@@ -45,7 +45,7 @@ namespace nil {
             /*!
              * @brief Rijndael. AES competition winner.
              *
-             * @addtogroup block
+             * @ingroup block
              *
              * Generic Rijndael cipher implementation. Contains AES-standardized
              * cipher modifications with timing-attack and cache-line leaking

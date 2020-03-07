@@ -94,7 +94,7 @@ namespace nil {
              * the standard does not actually define these Sboxes; they are considered
              * a local configuration issue. Several different sets are used.
              *
-             * @addtogroup block
+             * @ingroup block
              */
             template<typename ParamsType = cbr_params>
             class gost_28147_89 {

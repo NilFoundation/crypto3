@@ -19,7 +19,7 @@ namespace nil {
              * @brief Shacal1. Merkle-Damgård construction foundation for
              * @ref nil::crypto3::hash::sha1 "SHA1" hashes.
              *
-             * @addtogroup block
+             * @ingroup block
              *
              * Implemented directly from the SHA standard as found at
              * http://csrc.nist.gov/publications/fips/fips180-2/fips180-2.pdf

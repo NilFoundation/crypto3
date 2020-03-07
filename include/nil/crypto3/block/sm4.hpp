@@ -25,7 +25,7 @@ namespace nil {
              * in certain commercial applications in China. Quite slow. Probably
              * no reason to use it outside of legal requirements.
              *
-             * @addtogroup block
+             * @ingroup block
              */
             class sm4 {
             protected:

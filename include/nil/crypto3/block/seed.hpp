@@ -24,7 +24,7 @@ namespace nil {
              * @brief Seed. A older South Korean cipher, widely used in industry
              * there.
              *
-             * @addtogroup block
+             * @ingroup block
              */
             class seed {
             protected:
