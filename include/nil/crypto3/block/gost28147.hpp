@@ -52,7 +52,7 @@ namespace nil {
             };
 
             /**
-             * Default GOST parameters are the ones given in GOST R 34.11 for
+             * @brief Default GOST parameters are the ones given in GOST R 34.11 for
              * testing purposes; these sboxes are also used by Crypto++, and,
              * at least according to Wikipedia, the Central Bank of Russian
              * Federation
@@ -123,7 +123,9 @@ namespace nil {
                 constexpr static const std::size_t key_words = policy_type::key_words;
                 typedef typename policy_type::key_type key_type;
 
-                template<template<typename, typename> class Mode, typename StateAccumulator, std::size_t ValueBits,
+                template<template<typename, typename> class Mode,
+                         typename StateAccumulator,
+                         std::size_t ValueBits,
                          typename Padding>
                 struct stream_processor {
                     struct params_type {

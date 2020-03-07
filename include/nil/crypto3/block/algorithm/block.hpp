@@ -15,6 +15,10 @@ namespace nil {
         /*!
          * @defgroup block Block Ciphers
          *
+         * @brief Block ciphers are a n-bit permutation for some small ```n```,
+         * typically 64 or 128 bits. It is a cryptographic primitive used
+         * to generate higher level operations such as authenticated encryption.
+         *
          * @defgroup block_algorithms Algorithms
          * @ingroup block
          * @brief Algorithms are meant to provide encryption interface similar to STL algorithms' one.

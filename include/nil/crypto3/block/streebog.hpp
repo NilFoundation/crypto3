@@ -18,6 +18,14 @@
 namespace nil {
     namespace crypto3 {
         namespace block {
+            /*!
+             * @brief
+             *
+             * @addtogroup block
+             *
+             * @tparam BlockBits
+             * @tparam KeyBits
+             */
             template<std::size_t BlockBits, std::size_t KeyBits>
             class streebog {
                 typedef detail::streebog_functions<BlockBits, KeyBits> policy_type;

@@ -14,14 +14,6 @@ namespace nil {
     namespace crypto3 {
         namespace block {
             /*!
-             * @addtogroup block Block Ciphers
-             *
-             * @brief Block ciphers are a n-bit permutation for some small ```n```,
-             * typically 64 or 128 bits. It is a cryptographic primitive used
-             * to generate higher level operations such as authenticated encryption.
-             */
-
-            /*!
              * @brief
              * @tparam Cipher
              * @tparam Mode

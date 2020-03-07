@@ -23,6 +23,8 @@ namespace nil {
              *
              * Meets the requirements of AccumulatorSet
              *
+             * @addtogroup block
+             *
              * @tparam Mode Cipher state preprocessing mode type (e.g. isomorphic_encryption_mode<aes128>)
              * @tparam Endian
              * @tparam ValueBits

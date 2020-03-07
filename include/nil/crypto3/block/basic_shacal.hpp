@@ -23,6 +23,8 @@ namespace nil {
     namespace crypto3 {
         namespace block {
             /*!
+             * @addtogroup block
+             *
              * Encrypt implemented directly from the SHA standard as found at
              * http://csrc.nist.gov/publications/fips/fips180-2/fips180-2.pdf
              *
