@@ -178,7 +178,7 @@ namespace nil {
                  *
                  * @tparam Cipher
                  * @tparam Padding
-                 * @tparam CiphertextStealingMode
+                 * @tparam Allocator
                  */
                 template<typename Cipher,
                          template<typename>
@@ -202,6 +202,12 @@ namespace nil {
                     };
                 };
 
+                /*!
+                 * @brief
+                 * @tparam Cipher
+                 * @tparam Padding
+                 * @tparam Allocator
+                 */
                 template<typename Cipher,
                          template<typename>
                          class Padding,

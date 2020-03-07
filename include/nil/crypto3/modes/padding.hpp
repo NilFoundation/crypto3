@@ -24,6 +24,7 @@ namespace nil {
                     /*!
                      * @brief  Block Cipher Mode Padding Method
                      * @tparam Cipher Block cipher used
+                     *
                      * This class is pretty limited, it cannot deal well with
                      * randomized padding methods, or any padding method that
                      * wants to add more than one block. For instance, it should

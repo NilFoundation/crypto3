@@ -319,6 +319,14 @@ namespace nil {
                     };
                 }    // namespace detail
 
+                /*!
+                 * @brief
+                 * @tparam Cipher
+                 * @tparam Padding
+                 * @tparam CiphertextStealingMode
+                 *
+                 * @addtogroup block_modes
+                 */
                 template<typename Cipher, template<typename> class Padding,
                          template<typename, template<typename> class> class CiphertextStealingMode = cts0>
                 struct output_feedback_mode {

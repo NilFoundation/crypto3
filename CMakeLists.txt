@@ -19,6 +19,7 @@ include(CMSetupVersion)
 
 cm_find_package(${CMAKE_WORKSPACE_NAME}_block)
 cm_find_package(${CMAKE_WORKSPACE_NAME}_codec)
+cm_find_package(${CMAKE_WORKSPACE_NAME}_hash)
 
 list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS)
 
@@ -128,6 +129,7 @@ set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES
 target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
                       ${CMAKE_WORKSPACE_NAME}::block
                       ${CMAKE_WORKSPACE_NAME}::codec
+                      ${CMAKE_WORKSPACE_NAME}::hash
 
                       ${Boost_LIBRARIES})
 
