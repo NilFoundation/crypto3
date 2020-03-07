@@ -34,6 +34,7 @@ namespace nil {
              * Note that unlike PBKDF2, OpenPGP S2K's "iterations" are defined as
              * the number of bytes hashed.
              * @tparam Hash
+             * @ingroup pbkdf
              */
             template<typename Hash>
             class pgp_s2k {

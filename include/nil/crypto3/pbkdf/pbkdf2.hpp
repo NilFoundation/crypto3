@@ -11,6 +11,7 @@
 #define CRYPTO3_PBKDF_PBKDF2_HPP
 
 #include <nil/crypto3/pbkdf/detail/pbkdf2/pbkdf2_functions.hpp>
+
 #include <chrono>
 
 namespace nil {
@@ -19,6 +20,7 @@ namespace nil {
             /*!
              * @brief
              * @tparam MessageAuthenticationCode
+             * @ingroup pbkdf
              */
             template<typename MessageAuthenticationCode>
             class pbkdf2 {

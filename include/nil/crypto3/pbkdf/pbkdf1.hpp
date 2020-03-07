@@ -22,6 +22,7 @@ namespace nil {
              * Can only generate a key up to the size of the hash output.
              * Unless needed for backwards compatibility, use PKCS5_PBKDF2
              * @tparam Hash
+             * @ingroup pbkdf
              */
             template<typename Hash>
             class pkcs5_pkbdf1 {
