@@ -253,7 +253,7 @@ namespace nil {
             /*!
              * @brief
              *
-             * @addtogroup hash_algorithms
+             * @ingroup hash_algorithms
              *
              * @tparam Hasher
              * @tparam InputIterator
@@ -276,7 +276,7 @@ namespace nil {
             /*!
              * @brief
              *
-             * @addtogroup hash_algorithms
+             * @ingroup hash_algorithms
              *
              * @tparam Hasher
              * @tparam InputIterator
@@ -297,7 +297,7 @@ namespace nil {
             /*!
              * @brief
              *
-             * @addtogroup hash_algorithms
+             * @ingroup hash_algorithms
              *
              * @tparam Hasher
              * @tparam SinglePassRange
@@ -318,7 +318,7 @@ namespace nil {
             /*!
              * @brief
              *
-             * @addtogroup hash_algorithms
+             * @ingroup hash_algorithms
              *
              * @tparam Hasher
              * @tparam SinglePassRange
