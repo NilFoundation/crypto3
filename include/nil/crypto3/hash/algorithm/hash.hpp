@@ -46,7 +46,7 @@ namespace nil {
             /*!
              * @brief
              *
-             * @addtogroup hash_algorithms
+             * @ingroup hash_algorithms
              *
              * @tparam Hash
              * @tparam InputIterator
@@ -73,7 +73,7 @@ namespace nil {
             /*!
              * @brief
              *
-             * @addtogroup hash_algorithms
+             * @ingroup hash_algorithms
              *
              * @tparam Hash
              * @tparam InputIterator
@@ -99,7 +99,7 @@ namespace nil {
             /*!
              * @brief
              *
-             * @addtogroup hash_algorithms
+             * @ingroup hash_algorithms
              *
              * @tparam Hash
              * @tparam InputIterator
@@ -123,7 +123,7 @@ namespace nil {
             /*!
              * @brief
              *
-             * @addtogroup hash_algorithms
+             * @ingroup hash_algorithms
              *
              * @tparam Hash
              * @tparam SinglePassRange
@@ -148,7 +148,7 @@ namespace nil {
             /*!
              * @brief
              *
-             * @addtogroup hash_algorithms
+             * @ingroup hash_algorithms
              *
              * @tparam Hash
              * @tparam SinglePassRange
@@ -173,7 +173,7 @@ namespace nil {
             /*!
              * @brief
              *
-             * @addtogroup hash_algorithms
+             * @ingroup hash_algorithms
              *
              * @tparam Hash
              * @tparam SinglePassRange
