@@ -1,0 +1,58 @@
+cmake_minimum_required(VERSION 2.8.11)
+
+cmake_policy(SET CMP0042 NEW)
+cmake_policy(SET CMP0028 NEW)
+
+cm_project(passhash WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME})
+
+if(NOT Boost_FOUND)
+    cm_find_package(Boost)
+endif()
+
+cm_find_package(CM)
+include(CMDeploy)
+include(CMSetupVersion)
+
+cm_find_package(${CMAKE_WORKSPACE_NAME}_codec)
+cm_find_package(${CMAKE_WORKSPACE_NAME}_mac)
+cm_find_package(${CMAKE_WORKSPACE_NAME}_passhash)
+
+list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
+     include/nil/crypto3/passhash/bcrypt.hpp
+     include/nil/crypto3/passhash/passhash9.hpp)
+
+list(APPEND ${CURRENT_PROJECT_NAME}_UNGROUPED_SOURCES)
+
+list(APPEND ${CURRENT_PROJECT_NAME}_HEADERS
+     ${${CURRENT_PROJECT_NAME}_PRIVATE_HEADERS}
+     ${${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS})
+
+list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
+     ${${CURRENT_PROJECT_NAME}_UNGROUPED_SOURCES})
+
+cm_setup_version(VERSION 0.1.0 PREFIX ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME})
+
+add_library(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE)
+set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES
+                      EXPORT_NAME ${CURRENT_PROJECT_NAME})
+
+target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
+                      ${CMAKE_WORKSPACE_NAME}::codec
+                      ${CMAKE_WORKSPACE_NAME}::mac
+                      ${CMAKE_WORKSPACE_NAME}::passhash
+
+                      ${Boost_LIBRARIES})
+
+target_include_directories(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
+                           "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+                           "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>"
+
+                           ${Boost_INCLUDE_DIRS})
+
+cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
+          INCLUDE include
+          NAMESPACE ${CMAKE_WORKSPACE_NAME}::)
+
+if(BUILD_TESTS)
+    add_subdirectory(test)
+endif()
