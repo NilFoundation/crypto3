@@ -21,7 +21,7 @@ namespace nil {
             /*!
              * @brief
              * @tparam Passhash
-             * @addtogroup passhash
+             * @ingroup passhash
              */
             template<typename Passhash>
             using accumulator_set = boost::accumulators::accumulator_set<

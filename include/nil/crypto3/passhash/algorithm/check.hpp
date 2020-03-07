@@ -21,7 +21,7 @@ namespace nil {
             /*!
              * @brief
              *
-             * @addtogroup passhash_algorithms
+             * @ingroup passhash_algorithms
              *
              * @tparam Hasher
              * @tparam InputIterator
@@ -45,7 +45,7 @@ namespace nil {
             /*!
              * @brief
              *
-             * @addtogroup passhash_algorithms
+             * @ingroup passhash_algorithms
              *
              * @tparam Hasher
              * @tparam InputIterator
@@ -71,7 +71,7 @@ namespace nil {
             /*!
              * @brief
              *
-             * @addtogroup passhash_algorithms
+             * @ingroup passhash_algorithms
              *
              * @tparam Hasher
              * @tparam InputIterator
@@ -95,7 +95,7 @@ namespace nil {
             /*!
              * @brief
              *
-             * @addtogroup passhash_algorithms
+             * @ingroup passhash_algorithms
              *
              * @tparam Hasher
              * @tparam InputIterator
@@ -120,7 +120,7 @@ namespace nil {
             /*!
              * @brief
              *
-             * @addtogroup passhash_algorithms
+             * @ingroup passhash_algorithms
              *
              * @tparam Hasher
              * @tparam SinglePassRange
@@ -146,7 +146,7 @@ namespace nil {
             /*!
              * @brief
              *
-             * @addtogroup passhash_algorithms
+             * @ingroup passhash_algorithms
              *
              * @tparam Hasher
              * @tparam SinglePassRange
@@ -173,7 +173,7 @@ namespace nil {
             /*!
              * @brief
              *
-             * @addtogroup passhash_algorithms
+             * @ingroup passhash_algorithms
              *
              * @tparam Hasher
              * @tparam SinglePassRange
@@ -196,7 +196,7 @@ namespace nil {
             /*!
              * @brief
              *
-             * @addtogroup passhash_algorithms
+             * @ingroup passhash_algorithms
              *
              * @tparam Hasher
              * @tparam SinglePassRange
