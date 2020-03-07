@@ -482,7 +482,7 @@ namespace nil {
                  * @tparam Cipher
                  * @tparam Padding
                  *
-                 * @addtogroup block_modes
+                 * @ingroup block_modes
                  */
                 template<typename Cipher, template<typename> class Padding,
                          template<typename, template<typename> class> class CiphertextStealingMode = cts0>
@@ -509,7 +509,7 @@ namespace nil {
                  * @tparam Padding
                  * @tparam CiphertextStealingMode
                  *
-                 * @addtogroup block_modes
+                 * @ingroup block_modes
                  */
                 template<typename Cipher, template<typename> class Padding,
                          template<typename, template<typename> class> class CiphertextStealingMode>

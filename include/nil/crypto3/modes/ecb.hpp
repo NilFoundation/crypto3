@@ -325,7 +325,7 @@ namespace nil {
                  * @tparam Cipher
                  * @tparam Padding
                  *
-                 * @addtogroup block_modes
+                 * @ingroup block_modes
                  */
                 template<typename Cipher, template<typename> class Padding,
                          template<typename, typename> class CiphertextStealingMode = cts0>
@@ -350,7 +350,7 @@ namespace nil {
                  * @tparam Cipher
                  * @tparam Padding
                  *
-                 * @addtogroup block_modes
+                 * @ingroup block_modes
                  */
                 template<typename Cipher, template<typename> class Padding>
                 using ecb = electronic_code_book<Cipher, Padding>;

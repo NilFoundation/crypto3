@@ -24,7 +24,7 @@ namespace nil {
                  * @tparam Cipher
                  * @tparam Padding
                  *
-                 * @addtogroup block_modes
+                 * @ingroup block_modes
                  */
                 template<std::size_t Version, typename Cipher, typename Padding>
                 struct ciphertext_stealing_mode {};
@@ -34,7 +34,7 @@ namespace nil {
                  * @tparam Cipher
                  * @tparam Padding
                  *
-                 * @addtogroup block_modes
+                 * @ingroup block_modes
                  */
                 template<typename Cipher, typename Padding>
                 struct ciphertext_stealing_mode<0, Cipher, Padding> {};
@@ -44,7 +44,7 @@ namespace nil {
                  * @tparam Cipher
                  * @tparam Padding
                  *
-                 * @addtogroup block_modes
+                 * @ingroup block_modes
                  */
                 template<typename Cipher, typename Padding>
                 struct ciphertext_stealing_mode<1, Cipher, Padding> {};
@@ -54,7 +54,7 @@ namespace nil {
                  * @tparam Cipher
                  * @tparam Padding
                  *
-                 * @addtogroup block_modes
+                 * @ingroup block_modes
                  */
                 template<typename Cipher, typename Padding>
                 struct ciphertext_stealing_mode<2, Cipher, Padding> {};
@@ -64,7 +64,7 @@ namespace nil {
                  * @tparam Cipher
                  * @tparam Padding
                  *
-                 * @addtogroup block_modes
+                 * @ingroup block_modes
                  */
                 template<typename Cipher, typename Padding>
                 struct ciphertext_stealing_mode<3, Cipher, Padding> {};
@@ -76,7 +76,7 @@ namespace nil {
                  * @tparam Cipher
                  * @tparam Padding
                  *
-                 * @addtogroup block_modes
+                 * @ingroup block_modes
                  */
                 template<std::size_t Version, typename Cipher, typename Padding>
                 using cts = ciphertext_stealing_mode<Version, Cipher, Padding>;
@@ -86,7 +86,7 @@ namespace nil {
                  * @tparam Cipher
                  * @tparam Padding
                  *
-                 * @addtogroup block_modes
+                 * @ingroup block_modes
                  */
                 template<typename Cipher, typename Padding>
                 using cts0 = ciphertext_stealing_mode<0, Cipher, Padding>;
@@ -96,7 +96,7 @@ namespace nil {
                  * @tparam Cipher
                  * @tparam Padding
                  *
-                 * @addtogroup block_modes
+                 * @ingroup block_modes
                  */
                 template<typename Cipher, typename Padding>
                 using cts1 = ciphertext_stealing_mode<1, Cipher, Padding>;
@@ -106,7 +106,7 @@ namespace nil {
                  * @tparam Cipher
                  * @tparam Padding
                  *
-                 * @addtogroup block_modes
+                 * @ingroup block_modes
                  */
                 template<typename Cipher, typename Padding>
                 using cts2 = ciphertext_stealing_mode<2, Cipher, Padding>;
@@ -116,7 +116,7 @@ namespace nil {
                  * @tparam Cipher
                  * @tparam Padding
                  *
-                 * @addtogroup block_modes
+                 * @ingroup block_modes
                  */
                 template<typename Cipher, typename Padding>
                 using cts3 = ciphertext_stealing_mode<3, Cipher, Padding>;
