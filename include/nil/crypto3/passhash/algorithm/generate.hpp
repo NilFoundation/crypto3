@@ -26,7 +26,6 @@ namespace nil {
              * @tparam Hasher
              * @tparam InputIterator
              * @tparam OutputIterator
-             * @tparam Passhash
              *
              * @param first
              * @param last
@@ -34,11 +33,7 @@ namespace nil {
              *
              * @return
              */
-            template<typename Hasher,
-                     typename InputIterator,
-                     typename OutputIterator,
-                     typename Passhash = typename itr_stream_hash_traits<Hasher, InputIterator>::type,
-                     typename = typename std::enable_if<detail::is_stream_hash<Passhash>::value>::type>
+            template<typename Hasher, typename InputIterator, typename OutputIterator>
             OutputIterator generate(InputIterator first, InputIterator last, OutputIterator out) {
 
                 typedef detail::value_hash_impl<Passhash> PasshashImpl;
@@ -55,18 +50,13 @@ namespace nil {
              * @tparam Hasher
              * @tparam InputIterator
              * @tparam OutputIterator
-             * @tparam Passhash
+             *
              * @param first
              * @param last
-             * @param out
              * @param sh
              * @return
              */
-            template<typename Hasher,
-                     typename InputIterator,
-                     typename OutputIterator,
-                     typename Passhash = typename itr_stream_hash_traits<Hasher, InputIterator>::type,
-                     typename = typename std::enable_if<detail::is_stream_hash<Passhash>::value>::type>
+            template<typename Hasher, typename InputIterator, typename OutputIterator>
             OutputIterator generate(InputIterator first, InputIterator last, Passhash &sh) {
 
                 typedef detail::ref_hash_impl<Passhash> PasshashImpl;
@@ -82,15 +72,12 @@ namespace nil {
              *
              * @tparam Hasher
              * @tparam InputIterator
-             * @tparam Passhash
+             *
              * @param first
              * @param last
              * @return
              */
-            template<typename Hasher,
-                     typename InputIterator,
-                     typename Passhash = typename itr_stream_hash_traits<Hasher, InputIterator>::type,
-                     typename = typename std::enable_if<detail::is_stream_hash<Passhash>::value>::type>
+            template<typename Hasher, typename InputIterator>
             detail::range_hash_impl<Hasher, detail::value_hash_impl<Passhash>> generate(InputIterator first,
                                                                                         InputIterator last) {
                 typedef detail::value_hash_impl<Passhash> PasshashImpl;

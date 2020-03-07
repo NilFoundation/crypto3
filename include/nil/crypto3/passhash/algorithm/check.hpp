@@ -26,7 +26,6 @@ namespace nil {
              * @tparam Hasher
              * @tparam InputIterator
              * @tparam OutputIterator
-             * @tparam Passhash
              *
              * @param first
              * @param last
@@ -34,11 +33,7 @@ namespace nil {
              *
              * @return
              */
-            template<typename Hasher,
-                     typename InputIterator,
-                     typename OutputIterator,
-                     typename Passhash = typename itr_stream_hash_traits<Hasher, InputIterator>::type,
-                     typename = typename std::enable_if<detail::is_stream_hash<Passhash>::value>::type>
+            template<typename Hasher, typename InputIterator, typename OutputIterator>
             OutputIterator check(InputIterator first, InputIterator last, OutputIterator out) {
 
                 typedef detail::value_hash_impl<Passhash> PasshashImpl;
@@ -55,19 +50,17 @@ namespace nil {
              * @tparam Hasher
              * @tparam InputIterator
              * @tparam OutputIterator
-             * @tparam Passhash
+             *
              * @param first
              * @param last
              * @param out
              * @param sh
+             *
              * @return
              */
-            template<typename Hasher,
-                     typename InputIterator,
-                     typename OutputIterator,
-                     typename Passhash = typename itr_stream_hash_traits<Hasher, InputIterator>::type,
-                     typename = typename std::enable_if<detail::is_stream_hash<Passhash>::value>::type>
-            OutputIterator check(InputIterator first, InputIterator last, Passhash &sh) {
+            template<typename Hasher, typename InputIterator, typename PasshashAccumulator =
+                passhash::accumulator_set<Hashes>>
+            OutputIterator check(InputIterator first, InputIterator last, PasshashAccumulator &sh) {
 
                 typedef detail::ref_hash_impl<Passhash> PasshashImpl;
                 typedef detail::itr_hash_impl<Hasher, PasshashImpl, OutputIterator> HashImpl;
@@ -92,7 +85,7 @@ namespace nil {
                      typename Passhash = typename itr_stream_hash_traits<Hasher, InputIterator>::type,
                      typename = typename std::enable_if<detail::is_stream_hash<Passhash>::value>::type>
             detail::range_hash_impl<Hasher, detail::value_hash_impl<Passhash>> check(InputIterator first,
-                                                                                       InputIterator last) {
+                                                                                     InputIterator last) {
                 typedef detail::value_hash_impl<Passhash> PasshashImpl;
                 typedef detail::range_hash_impl<Hasher, PasshashImpl> HashImpl;
 
@@ -217,7 +210,7 @@ namespace nil {
                      typename Passhash = typename range_stream_hash_traits<Hasher, SinglePassRange>::type,
                      typename = typename std::enable_if<detail::is_stream_hash<Passhash>::value>::type>
             detail::range_hash_impl<Hasher, detail::ref_hash_impl<Passhash>> check(const SinglePassRange &rng,
-                                                                                     Passhash &sh) {
+                                                                                   Passhash &sh) {
                 typedef detail::ref_hash_impl<Passhash> PasshashImpl;
                 typedef detail::range_hash_impl<Hasher, PasshashImpl> HashImpl;
 

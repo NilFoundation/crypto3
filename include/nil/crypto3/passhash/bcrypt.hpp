@@ -44,7 +44,7 @@ namespace nil {
              * embedded NULLs so this is not an issue, but might cause interop
              * problems if another library needs to validate the password hashes.)
              *
-             * @addtogroup passhash
+             * @ingroup passhash
              *
              * @tparam BlockCipher
              * @see https://www.usenix.org/legacy/event/usenix99/provos/provos.pdf

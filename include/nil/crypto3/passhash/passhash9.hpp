@@ -39,7 +39,7 @@ namespace nil {
              * Passhash9 hashes look like:
              * "$9$AAAKxwMGNPSdPkOKJS07Xutm3+1Cr3ytmbnkjO6LjHzCMcMQXvcT"
              *
-             * @addtogroup passhash
+             * @ingroup passhash
              *
              * @note This function should be secure with the proper parameters, and will remain in
              * the library for the forseeable future, but it is specific to the library rather than
@@ -84,8 +84,8 @@ namespace nil {
                     std::unique_ptr<MessageAuthenticationCode> prf = get_pbkdf_prf(alg_id);
 
                     if (!prf) {
-                        throw std::invalid_argument("Passhash9: Algorithm id " + std::to_string(alg_id)
-                                                    + " is not defined");
+                        throw std::invalid_argument("Passhash9: Algorithm id " + std::to_string(alg_id) +
+                                                    " is not defined");
                     }
 
                     PKCS5_PBKDF2 kdf(prf.release());    // takes ownership of pointer
@@ -113,8 +113,8 @@ namespace nil {
                  * @return
                  */
                 static bool check(const std::string &pass, const std::string &hash) {
-                    const size_t BINARY_LENGTH
-                        = ALGID_BYTES + WORKFACTOR_BYTES + PASSHASH9_PBKDF_OUTPUT_LEN + SALT_BYTES;
+                    const size_t BINARY_LENGTH =
+                        ALGID_BYTES + WORKFACTOR_BYTES + PASSHASH9_PBKDF_OUTPUT_LEN + SALT_BYTES;
 
                     const size_t BASE64_LENGTH = MAGIC_PREFIX.size() + (BINARY_LENGTH * 8) / 6;
 
@@ -144,8 +144,8 @@ namespace nil {
                     }
 
                     if (work_factor > 512) {
-                        throw std::invalid_argument("Requested passhash9 work factor " + std::to_string(work_factor)
-                                                    + " is too large");
+                        throw std::invalid_argument("Requested passhash9 work factor " + std::to_string(work_factor) +
+                                                    " is too large");
                     }
 
                     const size_t kdf_iterations = WORK_FACTOR_SCALE * work_factor;
@@ -158,10 +158,10 @@ namespace nil {
 
                     PKCS5_PBKDF2 kdf(pbkdf_prf.release());    // takes ownership of pointer
 
-                    secure_vector<uint8_t> cmp
-                        = kdf.derive_key(PASSHASH9_PBKDF_OUTPUT_LEN, pass, &bin[ALGID_BYTES + WORKFACTOR_BYTES],
-                                         SALT_BYTES, kdf_iterations)
-                              .bits_of();
+                    secure_vector<uint8_t> cmp =
+                        kdf.derive_key(PASSHASH9_PBKDF_OUTPUT_LEN, pass, &bin[ALGID_BYTES + WORKFACTOR_BYTES],
+                                       SALT_BYTES, kdf_iterations)
+                            .bits_of();
 
                     return constant_time_compare(cmp.data(), &bin[ALGID_BYTES + WORKFACTOR_BYTES + SALT_BYTES],
                                                  PASSHASH9_PBKDF_OUTPUT_LEN);
