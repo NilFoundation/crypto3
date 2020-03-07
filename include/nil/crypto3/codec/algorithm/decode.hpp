@@ -10,6 +10,8 @@
 #ifndef CRYPTO3_DECODE_HPP
 #define CRYPTO3_DECODE_HPP
 
+#include <nil/crypto3/codec/algorithm/codec.hpp>
+
 #include <nil/crypto3/codec/codec_value.hpp>
 #include <nil/crypto3/codec/codec_state.hpp>
 
@@ -17,16 +19,6 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace codec {
-            /*!
-             * @addtogroup codec Encoding & Decoding
-             *
-             * @addtogroup codec_algorithms Algorithms
-             * @addtogroup codec
-             * @brief Algorithms are meant to provide decoding interface similar to STL algorithms' one.
-             */
-        }
-
         /*!
          * @brief Decodes the elements with particular codec defined with Decoder
          * in the range, defined by [first, last), and inserts the result to

@@ -12,15 +12,13 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace codec {
-            /*!
-             * @addtogroup codec Encoding & Decoding
-             *
-             * @addtogroup codec_algorithms Algorithms
-             * @addtogroup codec
-             * @brief Encoding algorithms are meant to provide encoding interface similar to STL algorithms' one.
-             */
-        }
+        /*!
+         * @defgroup codec Codecs
+         *
+         * @defgroup codec_algorithms Algorithms
+         * @ingroup codec
+         * @brief Encoding algorithms are meant to provide encoding interface similar to STL algorithms' one.
+         */
     }    // namespace crypto3
 }    // namespace nil
 
