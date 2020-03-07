@@ -20,7 +20,7 @@ namespace nil {
         /*!
          * @brief
          *
-         * @addtogroup stream_algorithms
+         * @ingroup stream_algorithms
          *
          * @tparam StreamCipher
          * @tparam InputIterator
@@ -49,7 +49,7 @@ namespace nil {
         /*!
          * @brief
          *
-         * @addtogroup stream_algorithms
+         * @ingroup stream_algorithms
          *
          * @tparam StreamCipher
          * @tparam InputIterator
@@ -78,7 +78,7 @@ namespace nil {
         /*!
          * @brief
          *
-         * @addtogroup stream_algorithms
+         * @ingroup stream_algorithms
          *
          * @tparam StreamCipher
          * @tparam SinglePassRange
@@ -106,7 +106,7 @@ namespace nil {
         /*!
          * @brief
          *
-         * @addtogroup stream_algorithms
+         * @ingroup stream_algorithms
          *
          * @tparam StreamCipher
          * @tparam InputIterator
@@ -133,7 +133,7 @@ namespace nil {
         /*!
          * @brief
          *
-         * @addtogroup stream_algorithms
+         * @ingroup stream_algorithms
          *
          * @tparam StreamCipher
          * @tparam SinglePassRange
@@ -161,7 +161,7 @@ namespace nil {
         /*!
          * @brief
          *
-         * @addtogroup stream_algorithms
+         * @ingroup stream_algorithms
          *
          * @tparam StreamCipher
          * @tparam SinglePassRange
