@@ -16,12 +16,6 @@
 namespace nil {
     namespace crypto3 {
         /*!
-         * @addtogroup block_algorithms Algorithms
-         * @addtogroup block
-         * @brief Algorithms are meant to provide decryption interface similar to STL algorithms' one.
-         */
-
-        /*!
          * @brief
          *
          * @addtogroup block_algorithms
@@ -143,6 +137,7 @@ namespace nil {
          * @tparam OutputIterator
          *
          * @param rng
+         * @param key
          * @param out
          *
          * @return
@@ -170,6 +165,7 @@ namespace nil {
          * @tparam CipherAccumulator
          *
          * @param r
+         * @param key
          *
          * @return
          */

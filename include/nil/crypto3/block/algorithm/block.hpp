@@ -10,11 +10,16 @@
 #ifndef CRYPTO3_BLOCK_ALGORITHM_HPP
 #define CRYPTO3_BLOCK_ALGORITHM_HPP
 
-/*!
- * @addtogroup block_algorithms Algorithms
- * @addtogroup block
- * @brief Algorithms are meant to provide encryption interface similar to STL algorithms'
- * one.
- */
+namespace nil {
+    namespace crypto3 {
+        /*!
+         * @defgroup block Block Ciphers
+         *
+         * @defgroup block_algorithms Algorithms
+         * @ingroup block
+         * @brief Algorithms are meant to provide encryption interface similar to STL algorithms' one.
+         */
+    }    // namespace crypto3
+}    // namespace nil
 
 #endif    // CRYPTO3_BLOCK_HPP

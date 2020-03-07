@@ -55,12 +55,11 @@ namespace nil {
          *
          * @tparam BlockCipher
          * @tparam InputIterator
-         * @tparam OutputIterator
-         * @tparam StreamEncrypter
+         * @tparam OutputAccumulator
          *
          * @param first
          * @param last
-         * @param out
+         * @param acc
          *
          * @return
          */
@@ -107,7 +106,8 @@ namespace nil {
          *
          * @tparam BlockCipher
          * @tparam InputIterator
-         * @tparam CipherState
+         * @tparam KeyIterator
+         * @tparam CipherAccumulator
          *
          * @param first
          * @param last
@@ -116,9 +116,9 @@ namespace nil {
          *
          * @return
          */
-        template<typename BlockCipher, typename InputIterator, typename KeyIterator,
-                 typename CipherAccumulator =
-                     typename block::accumulator_set<typename BlockCipher::stream_encrypter_type>>
+        template<
+            typename BlockCipher, typename InputIterator, typename KeyIterator,
+            typename CipherAccumulator = typename block::accumulator_set<typename BlockCipher::stream_encrypter_type>>
         block::detail::range_cipher_impl<block::detail::value_cipher_impl<CipherAccumulator>>
             encrypt(InputIterator first, InputIterator last, KeyIterator key_first, KeyIterator key_last) {
 
@@ -135,8 +135,8 @@ namespace nil {
          *
          * @tparam BlockCipher
          * @tparam SinglePassRange
+         * @tparam KeyRange
          * @tparam OutputIterator
-         * @tparam CipherState
          *
          * @param rng
          * @param key
@@ -163,7 +163,8 @@ namespace nil {
          *
          * @tparam BlockCipher
          * @tparam SinglePassRange
-         * @tparam CipherState
+         * @tparam KeyRange
+         * @tparam CipherAccumulator
          *
          * @param r
          * @param key
