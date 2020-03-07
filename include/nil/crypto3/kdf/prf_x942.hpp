@@ -20,6 +20,7 @@ namespace nil {
             /*!
              * @brief PRF from ANSI X9.42.
              * @tparam Hash
+             * @ingroup kdf
              */
             template<typename Hash = hash::sha1>
             class x942_prf {

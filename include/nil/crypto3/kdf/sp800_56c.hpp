@@ -19,6 +19,7 @@ namespace nil {
              * @brief NIST SP 800-56C KDF
              * @tparam MessageAuthenticationCode
              * @tparam KeyDerivationFunction
+             * @ingroup kdf
              */
             template<typename MessageAuthenticationCode, typename KeyDerivationFunction>
             class sp800_56c {

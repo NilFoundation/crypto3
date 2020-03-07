@@ -18,6 +18,7 @@ namespace nil {
             /*!
              * @brief KDF1 from ISO 18033-2
              * @tparam Hash
+             * @ingroup kdf
              */
             template<typename Hash>
             class kdf1_18033 {

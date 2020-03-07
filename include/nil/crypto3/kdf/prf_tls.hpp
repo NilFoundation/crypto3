@@ -25,6 +25,7 @@ namespace nil {
              * @tparam Version
              * @tparam MessageAuthenticationCode1
              * @tparam MessageAuthenticationCode2
+             * @ingroup kdf
              */
             template<std::size_t Version, typename MessageAuthenticationCode1, typename MessageAuthenticationCode2>
             class prf_tls {};
@@ -33,6 +34,7 @@ namespace nil {
              * @brief PRF used in TLS 1.0/1.1 with no MAC selection option.
              * @tparam MessageAuthenticationCode1 TLS 1.0/1.1 requires for this type to be a HMAC(SHA1).
              * @tparam MessageAuthenticationCode2 TLS 1.0/1.1 requires for this type to be a HMAC(MD5).
+             * @ingroup kdf
              *
              * @note Default-defined message authentication code types are not recommended to be changed in case of
              * TLS 1.0/1.1 compatibility is required. Explicitly TLS 1.0/1.1-compliant version is defined below.
@@ -82,6 +84,7 @@ namespace nil {
 
             /*!
              * @brief Explicitly TLS 1.0/1.1-compliant PRF version.
+             * @ingroup kdf
              */
             template<>
             class prf_tls<1, mac::hmac<hash::sha1>, mac::hmac<hash::md5>> {
@@ -114,15 +117,8 @@ namespace nil {
                     msg += std::make_pair(label, label_len);
                     msg += std::make_pair(salt, salt_len);
 
-<<<<<<< HEAD
-                    policy_type::template p_hash<mac_type2>(key, key_len, *m_hmac_md5, S1, S1_len, msg.data(),
-                                                            msg.size());
-                    policy_type::template p_hash<mac_type1>(key, key_len, *m_hmac_sha1, S2, S2_len, msg.data(),
-                                                            msg.size());
-=======
                     policy_type::template p_hash<mac_type2>(key, key_len, mac2, msg.data(), msg.size());
                     policy_type::template p_hash<mac_type1>(key, key_len, mac1, msg.data(), msg.size());
->>>>>>> 1-concept-compliance
                     return key_len;
                 }
 
@@ -134,6 +130,7 @@ namespace nil {
             /*!
              * @brief PRF used in TLS 1.2
              * @tparam MessageAuthenticationCode
+             * @ingroup kdf
              */
             template<typename MessageAuthenticationCode>
             class prf_tls<2, MessageAuthenticationCode, MessageAuthenticationCode> {
@@ -163,12 +160,7 @@ namespace nil {
                     msg += std::make_pair(label, label_len);
                     msg += std::make_pair(salt, salt_len);
 
-<<<<<<< HEAD
-                    policy_type::template p_hash<mac_type1>(key, key_len, *m_mac, secret, secret_len, msg.data(),
-                                                            msg.size());
-=======
                     policy_type::template P_hash<mac_type1>(key, key_len, mac, msg.data(), msg.size());
->>>>>>> 1-concept-compliance
                     return key_len;
                 }
 

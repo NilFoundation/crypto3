@@ -22,6 +22,7 @@ namespace nil {
             /*!
              * @brief KDF defined in NIST SP 800-56a revision 2 (Single-step key-derivation function)
              * @tparam Construction
+             * @ingroup kdf
              */
             template<typename Construction, typename = void>
             class sp800_56a {};
@@ -29,6 +30,7 @@ namespace nil {
             /*!
              * @brief Hash version of SP 800-56a KDF.
              * @tparam Hash
+             * @ingroup kdf
              */
             template<typename Hash>
             class sp800_56a<Hash, typename std::enable_if<is_hash<Hash>::value>::type> {
@@ -39,6 +41,7 @@ namespace nil {
             /*!
              * @brief MAC version of SP 800-56a KDF.
              * @tparam MessageAuthenticationCode
+             * @ingroup kdf
              */
             template<typename MessageAuthenticationCode>
             class sp800_56a<MessageAuthenticationCode,
@@ -94,6 +97,7 @@ namespace nil {
             /*!
              * @brief Strictly standard-compliant SP 800-56a version
              * @tparam Hash
+             * @ingroup kdf
              */
             template<typename Hash>
             class sp800_56a<mac::hmac<Hash>, typename std::enable_if<is_mac<mac::hmac<Hash>>::value>::type> {

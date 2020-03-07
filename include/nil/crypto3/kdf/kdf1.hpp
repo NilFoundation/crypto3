@@ -18,6 +18,7 @@ namespace nil {
             /*!
              * @brief KDF1, from IEEE 1363
              * @tparam Hash
+             * @ingroup kdf
              */
             template<typename Hash>
             class kdf1 {

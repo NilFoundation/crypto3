@@ -19,6 +19,7 @@ namespace nil {
                 /*!
                  * @brief sp800_108 key derivation function policy base class
                  * @tparam MessageAuthenticationCode
+                 * @ingroup kdf
                  */
                 template<typename MessageAuthenticationCode>
                 struct sp800_108_mode {
@@ -27,6 +28,7 @@ namespace nil {
                 /*!
                  * @brief NIST SP 800-108 KDF Counter Mode (5.1)
                  * @tparam MessageAuthenticationCode
+                 * @ingroup kdf
                  */
                 template<typename MessageAuthenticationCode>
                 struct counter : sp800_108_mode<MessageAuthenticationCode> {
@@ -83,6 +85,7 @@ namespace nil {
                 /*!
                  * @brief  NIST SP 800-108 KDF Feedback Mode (5.2)
                  * @tparam MessageAuthenticationCode
+                 * @ingroup kdf
                  */
                 template<typename MessageAuthenticationCode>
                 struct feedback : sp800_108_mode<MessageAuthenticationCode> {
@@ -143,6 +146,7 @@ namespace nil {
                 /*!
                  * @brief NIST SP 800-108 KDF Double Pipeline Mode (5.3)
                  * @tparam MessageAuthenticationCode
+                 * @ingroup kdf
                  */
                 template<typename MessageAuthenticationCode>
                 struct pipeline : sp800_108_mode<MessageAuthenticationCode> {
@@ -214,6 +218,7 @@ namespace nil {
              * @brief NIST SP 800-108 KDF
              * @tparam Mode Mode intended to be used
              * @tparam MessageAuthenticationCode
+             * @ingroup kdf
              */
             template<typename MessageAuthenticationCode, template<typename> class Mode>
             class sp800_108 {

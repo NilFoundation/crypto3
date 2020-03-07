@@ -25,6 +25,7 @@ namespace nil {
              * @brief
              * @tparam Hash
              * @tparam MessageAuthenticationCode
+             * @ingroup kdf
              */
             template<typename Hash, typename MessageAuthenticationCode = mac::hmac<Hash>>
             class hkdf {
