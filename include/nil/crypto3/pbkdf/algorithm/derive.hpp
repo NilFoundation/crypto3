@@ -17,7 +17,7 @@ namespace nil {
     namespace crypto3 {
         namespace pbkdf {
             /*!
-             * @addtogroup pbkdf Password Based Key Derivation Functions
+             * @defgroup pbkdf Password Based Key Derivation Functions
              *
              * @brief There are various procedures for turning a passphrase into a arbitrary
              * length key for use with a symmetric cipher. A general interface for
@@ -39,8 +39,8 @@ namespace nil {
              * "PBKDF2(SHA-256)" with at least 100000 iterations and a 16 byte salt
              * is recommend for new applications.
              *
-             * @addtogroup pbkdf_algorithms Algorithms
-             * @addtogroup pbkdf
+             * @defgroup pbkdf_algorithms Algorithms
+             * @ingroup pbkdf
              * @brief Algorithms are meant to provide key derivation interface similar to STL algorithms' one.
              */
 
