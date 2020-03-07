@@ -119,7 +119,7 @@ namespace nil {
                 typedef typename policy_type::digest_type digest_type;
             };
 
-            template<std::size_t h>
+            template<unsigned h>
             class cubehash<h, 0, 0> : cubehash<CRYPTO3_HASH_CUBEHASH_DEFAULT_R, CRYPTO3_HASH_CUBEHASH_DEFAULT_B, h> {};
 
         }    // namespace hash
