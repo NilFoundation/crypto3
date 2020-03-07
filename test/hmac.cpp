@@ -10,6 +10,7 @@
 #define BOOST_TEST_MODULE hmac_test
 
 #include <nil/crypto3/mac/algorithm/compute.hpp>
+#include <nil/crypto3/mac/algorithm/verify.hpp>
 
 #include <nil/crypto3/mac/hmac.hpp>
 
