@@ -433,6 +433,7 @@ namespace nil {
                  * @brief IEEE P1619 XTS Mode
                  * @tparam Cipher
                  * @tparam Padding
+                 * @tparam CiphertextStealingMode
                  *
                  * @addtogroup block_modes
                  */

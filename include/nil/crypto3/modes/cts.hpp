@@ -12,6 +12,8 @@
 
 #include <cstdlib>
 
+#include <nil/crypto3/modes/mode.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace block {
@@ -21,6 +23,7 @@ namespace nil {
                  * @tparam Version
                  * @tparam Cipher
                  * @tparam Padding
+                 *
                  * @addtogroup block_modes
                  */
                 template<std::size_t Version, typename Cipher, typename Padding>
@@ -30,6 +33,7 @@ namespace nil {
                  * @brief
                  * @tparam Cipher
                  * @tparam Padding
+                 *
                  * @addtogroup block_modes
                  */
                 template<typename Cipher, typename Padding>
@@ -39,6 +43,7 @@ namespace nil {
                  * @brief
                  * @tparam Cipher
                  * @tparam Padding
+                 *
                  * @addtogroup block_modes
                  */
                 template<typename Cipher, typename Padding>
@@ -48,6 +53,7 @@ namespace nil {
                  * @brief
                  * @tparam Cipher
                  * @tparam Padding
+                 *
                  * @addtogroup block_modes
                  */
                 template<typename Cipher, typename Padding>
@@ -57,6 +63,7 @@ namespace nil {
                  * @brief
                  * @tparam Cipher
                  * @tparam Padding
+                 *
                  * @addtogroup block_modes
                  */
                 template<typename Cipher, typename Padding>

@@ -12,6 +12,7 @@
 
 #include <boost/integer.hpp>
 
+#include <nil/crypto3/modes/mode.hpp>
 #include <nil/crypto3/modes/cts.hpp>
 
 #include <nil/crypto3/codec/algorithm/encode.hpp>
@@ -344,6 +345,13 @@ namespace nil {
                     };
                 };
 
+                /*!
+                 * @brief
+                 * @tparam Cipher
+                 * @tparam Padding
+                 *
+                 * @addtogroup block_modes
+                 */
                 template<typename Cipher, template<typename> class Padding>
                 using ecb = electronic_code_book<Cipher, Padding>;
             }    // namespace modes

@@ -15,6 +15,7 @@
 
 #include <boost/static_assert.hpp>
 
+#include <nil/crypto3/modes/mode.hpp>
 #include <nil/crypto3/modes/cts.hpp>
 
 namespace nil {
@@ -450,8 +451,11 @@ namespace nil {
 
                 /*!
                  * @brief Cipher Feedback Mode (CBC).
+                 *
                  * @tparam Cipher
+                 * @tparam FeedbackBits
                  * @tparam Padding
+                 * @tparam CiphertextStealingMode
                  *
                  * @addtogroup block_modes
                  */
@@ -479,12 +483,21 @@ namespace nil {
                     };
                 };
 
+                /*!
+                 * @brief
+                 * @tparam Cipher
+                 * @tparam FeedbackBits
+                 * @tparam Padding
+                 * @tparam CiphertextStealingMode
+                 *
+                 * @addtogroup block_modes
+                 */
                 template<typename Cipher, std::size_t FeedbackBits, template<typename> class Padding,
                          template<typename, typename> class CiphertextStealingMode = cts0>
                 using cfb = cipher_feedback<Cipher, FeedbackBits, Padding, CiphertextStealingMode>;
             }    // namespace modes
         }        // namespace block
-    }    // namespace crypto3
+    }            // namespace crypto3
 }    // namespace nil
 
 #endif

@@ -12,6 +12,7 @@
 
 #include <boost/integer.hpp>
 
+#include <nil/crypto3/modes/mode.hpp>
 #include <nil/crypto3/modes/cts.hpp>
 #include <nil/crypto3/modes/padding.hpp>
 
@@ -501,6 +502,15 @@ namespace nil {
                     };
                 };
 
+                /*!
+                 * @brief
+                 *
+                 * @tparam Cipher
+                 * @tparam Padding
+                 * @tparam CiphertextStealingMode
+                 *
+                 * @addtogroup block_modes
+                 */
                 template<typename Cipher, template<typename> class Padding,
                          template<typename, template<typename> class> class CiphertextStealingMode>
                 using ctr = counter<Cipher, Padding, CiphertextStealingMode>;

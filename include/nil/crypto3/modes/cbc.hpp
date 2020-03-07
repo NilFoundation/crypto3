@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2019 Nil Foundation AG
-// Copyright (c) 2019 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2019-2020 Nil Foundation AG
+// Copyright (c) 2019-2020 Mikhail Komarov <nemo@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -12,6 +12,7 @@
 
 #include <boost/integer.hpp>
 
+#include <nil/crypto3/modes/mode.hpp>
 #include <nil/crypto3/modes/cts.hpp>
 #include <nil/crypto3/modes/padding.hpp>
 
@@ -588,6 +589,14 @@ namespace nil {
                     };
                 };
 
+                /*!
+                 * @brief
+                 * @tparam Cipher
+                 * @tparam Padding
+                 * @tparam CiphertextStealingMode
+                 *
+                 * @addtogroup block_modes
+                 */
                 template<typename Cipher, template<typename> class Padding,
                          template<typename, template<typename> class> class CiphertextStealingMode>
                 using cbc = cipher_block_chaining<Cipher, Padding, CiphertextStealingMode>;

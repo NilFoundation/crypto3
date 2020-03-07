@@ -345,8 +345,18 @@ namespace nil {
                     };
                 };
 
-                template<typename Cipher, template<typename> class Padding>
-                using ofb = output_feedback_mode<Cipher, Padding>;
+                /*!
+                 * @brief
+                 *
+                 * @tparam Cipher
+                 * @tparam Padding
+                 * @tparam CiphertextStealingMode
+                 *
+                 * @addtogroup block_modes
+                 */
+                template<typename Cipher, template<typename> class Padding,
+                         template<typename, template<typename> class> class CiphertextStealingMode = cts0>
+                using ofb = output_feedback_mode<Cipher, Padding, CiphertextStealingMode>;
             }    // namespace modes
         }        // namespace block
     }            // namespace crypto3
