@@ -12,6 +12,9 @@
 
 #include <nil/crypto3/passhash/algorithm/passhash.hpp>
 
+#include <nil/crypto3/passhash/passhash_value.hpp>
+#include <nil/crypto3/passhash/passhash_state.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace passhash {

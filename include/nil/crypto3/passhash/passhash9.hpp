@@ -39,6 +39,8 @@ namespace nil {
              * Passhash9 hashes look like:
              * "$9$AAAKxwMGNPSdPkOKJS07Xutm3+1Cr3ytmbnkjO6LjHzCMcMQXvcT"
              *
+             * @addtogroup passhash
+             *
              * @note This function should be secure with the proper parameters, and will remain in
              * the library for the forseeable future, but it is specific to the library rather than
              * being a widely used password hash. Prefer bcrypt.

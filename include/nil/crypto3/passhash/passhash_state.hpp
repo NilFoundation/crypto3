@@ -18,6 +18,11 @@
 namespace nil {
     namespace crypto3 {
         namespace passhash {
+            /*!
+             * @brief
+             * @tparam Passhash
+             * @addtogroup passhash
+             */
             template<typename Passhash>
             using accumulator_set = boost::accumulators::accumulator_set<
                 static_digest<Passhash::input_block_bits>,

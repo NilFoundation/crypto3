@@ -15,7 +15,7 @@ namespace nil {
         namespace passhash {
 
             /*!
-             * @addtogroup passhash Password Hashing Functions
+             * @defgroup passhash Password Hashing Functions
              *
              * @brief Storing passwords for user authentication purposes in plaintext is the
              * simplest but least secure method; when an attacker compromises the
@@ -81,8 +81,8 @@ namespace nil {
              * bcrypt approach requires over 4 KiB of RAM (for the Blowfish key
              * round_constants_words) and may also make some hardware attacks more expensive.
              *
-             * @addtogroup passhash_algorithms Algorithms
-             * @addtogroup passhash
+             * @defgroup passhash_algorithms Algorithms
+             * @ingroup passhash
              * @brief Algorithms are meant to provide password hashing.
              */
         }
