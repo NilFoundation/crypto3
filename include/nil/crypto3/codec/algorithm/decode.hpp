@@ -24,7 +24,7 @@ namespace nil {
          * in the range, defined by [first, last), and inserts the result to
          * another range beginning at out.
          *
-         * @addtogroup codec_algorithms
+         * @ingroup codec_algorithms
          *
          * @tparam Decoder Must meet the requirements of Codec which determines the
          * particular algorithm to be used with range given.
@@ -56,7 +56,7 @@ namespace nil {
          * type convertible to the type satisfying SequenceContainer with the value
          * type satisfying Integral concept requirements.
          *
-         * @addtogroup codec_algorithms
+         * @ingroup codec_algorithms
          *
          * @tparam Decoder Must meet the requirements of Codec which determines the
          * particular algorithm to be used with range given.
@@ -87,7 +87,7 @@ namespace nil {
          * in the range, defined by rng and inserts the result to destination
          * range beginning at out.
          *
-         * @addtogroup codec_algorithms
+         * @ingroup codec_algorithms
          *
          * @tparam Decoder Must meet the requirements of Codec which determines the
          * particular algorithm to be used with range given.
@@ -117,7 +117,7 @@ namespace nil {
          * in the range, defined by rng and inserts the result to destination
          * range beginning at out.
          *
-         * @addtogroup codec_algorithms
+         * @ingroup codec_algorithms
          *
          * @tparam Decoder Must meet the requirements of Codec which determines the
          * particular algorithm to be used with range given.
@@ -146,7 +146,7 @@ namespace nil {
          * in the range, defined by rng and inserts the result to destination
          * range beginning at out.
          *
-         * @addtogroup codec_algorithms
+         * @ingroup codec_algorithms
          *
          * @tparam Decoder Must meet the requirements of Codec which determines the
          * particular algorithm to be used with range given.
@@ -176,7 +176,7 @@ namespace nil {
          * type convertible to the type satisfying SequenceContainer with the value
          * type satisfying Integral concept requirements.
          *
-         * @addtogroup codec_algorithms
+         * @ingroup codec_algorithms
          *
          * @tparam Decoder Must meet the requirements of Codec which determines the
          * particular algorithm to be used with range given.
