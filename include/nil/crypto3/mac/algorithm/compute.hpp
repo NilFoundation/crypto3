@@ -28,7 +28,6 @@ namespace nil {
              * @param first
              * @param last
              * @param out
-             * @param sh
              * @return
              */
             template<typename MessageAuthenticationCode, typename InputIterator, typename OutputIterator>
@@ -44,13 +43,20 @@ namespace nil {
              *
              * @param rng
              * @param out
-             * @param sh
              * @return
              */
             template<typename MessageAuthenticationCode, typename SinglePassRange, typename OutputIterator>
             OutputIterator compute(const SinglePassRange &rng, OutputIterator out) {
             }
 
+            /*!
+             * @brief
+             * @tparam MessageAuthenticationCode
+             * @tparam OutputRange
+             * @tparam SinglePassRange
+             * @param rng
+             * @return
+             */
             template<typename MessageAuthenticationCode, typename OutputRange, typename SinglePassRange>
             OutputRange compute(const SinglePassRange &rng) {
             }
