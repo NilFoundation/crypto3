@@ -18,6 +18,7 @@ namespace nil {
             /*!
              * @brief CTR-BE (Counter mode, big-endian). Converts BlockCipher to StreamCipher.
              * @tparam BlockCipher
+             * @ingroup stream
              */
             template<typename BlockCipher, std::size_t CtrBits = BlockCipher::block_bits>
             class ctr {

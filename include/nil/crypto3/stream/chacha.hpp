@@ -18,6 +18,7 @@ namespace nil {
             /*!
              * @brief DJB's ChaCha (https://cr.yp.to/chacha.html)
              * @tparam Rounds Amount of rounds
+             * @ingroup stream
              * @note Currently only 8, 12 or 20 rounds are supported, all others
              * will throw an exception
              */

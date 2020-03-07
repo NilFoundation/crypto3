@@ -15,6 +15,13 @@
 namespace nil {
     namespace crypto3 {
         namespace stream {
+            /*!
+             * @brief
+             * @tparam IVBits
+             * @tparam KeyBits
+             * @tparam Rounds
+             * @ingroup stream
+             */
             template<std::size_t IVBits, std::size_t KeyBits, std::size_t Rounds = 20>
             class salsa20 {
                 typedef detail::salsa20_functions<IVBits, KeyBits, Rounds> policy_type;

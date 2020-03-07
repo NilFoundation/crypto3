@@ -15,6 +15,12 @@
 namespace nil {
     namespace crypto3 {
         namespace stream {
+            /*!
+             * @brief
+             * @tparam IVBits
+             * @tparam KeyBits
+             * @ingroup stream
+             */
             template<std::size_t IVBits, std::size_t KeyBits>
             class rc4 {
                 typedef detail::rc4_functions<IVBits, KeyBits> policy_type;
