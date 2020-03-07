@@ -10,21 +10,13 @@
 #ifndef CRYPTO3_STREAM_ENCRYPT_HPP
 #define CRYPTO3_STREAM_ENCRYPT_HPP
 
+#include <nil/crypto3/stream/algorithm/stream.hpp>
+
 #include <nil/crypto3/stream/cipher_value.hpp>
 #include <nil/crypto3/stream/cipher_state.hpp>
 
 namespace nil {
     namespace crypto3 {
-        /*!
-         * @addtogroup stream Stream Ciphers
-         * @brief
-         *
-         * @addtogroup stream_algorithms Algorithms
-         * @addtogroup stream
-         * @brief Algorithms are meant to provide stream cipher encryption
-         * interface similar to STL algorithms' one.
-         */
-
         /*!
          * @brief
          *

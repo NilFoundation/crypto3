@@ -18,6 +18,7 @@
 
 #include <nil/crypto3/stream/algorithm/encrypt.hpp>
 #include <nil/crypto3/stream/algorithm/decrypt.hpp>
+#include <nil/crypto3/stream/algorithm/seek.hpp>
 
 #include <nil/crypto3/stream/salsa20.hpp>
 
