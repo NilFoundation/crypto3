@@ -13,14 +13,14 @@
 namespace nil {
     namespace crypto3 {
         /*!
-         * @defgroup cipher_modes
+         * @defgroup cipher_modes Cipher Modes
          * @brief
          *
-         * @defgroup block_modes
+         * @defgroup block_modes Block Cipher Modes
          * @ingroup cipher_modes
          * @brief
          *
-         * @defgroup stream_modes
+         * @defgroup stream_modes Stream Cipher Modes
          * @ingroup cipher_modes
          * @brief
          */
