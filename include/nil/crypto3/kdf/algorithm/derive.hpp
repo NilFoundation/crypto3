@@ -29,7 +29,7 @@ namespace nil {
             /*!
              * @brief
              *
-             * @addtogroup kdf_algorithms
+             * @ingroup kdf_algorithms
              *
              * @tparam Kdf
              * @tparam InputIterator
@@ -50,7 +50,7 @@ namespace nil {
             /*!
              * @brief
              *
-             * @addtogroup kdf_algorithms
+             * @ingroup kdf_algorithms
              *
              * @tparam Kdf
              * @tparam InputIterator
@@ -69,7 +69,7 @@ namespace nil {
             /*!
              * @brief
              *
-             * @addtogroup kdf_algorithms
+             * @ingroup kdf_algorithms
              *
              * @tparam Kdf
              * @tparam SinglePassRange
@@ -87,7 +87,7 @@ namespace nil {
             /*!
              * @brief
              *
-             * @addtogroup kdf_algorithms
+             * @ingroup kdf_algorithms
              *
              * @tparam Kdf
              * @tparam SinglePassRange
