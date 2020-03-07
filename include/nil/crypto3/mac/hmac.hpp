@@ -27,6 +27,7 @@ namespace nil {
             /*!
              * @brief
              * @tparam Hash
+             * @ingroup mac
              */
             template<typename Hash>
             class hmac {

@@ -21,6 +21,7 @@ namespace nil {
             /*!
              * @brief CMAC, also known as OMAC1
              * @tparam BlockCipher
+             * @ingroup mac
              */
             template<typename BlockCipher>
             class cmac {

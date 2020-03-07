@@ -20,6 +20,7 @@ namespace nil {
             /*!
              * @brief DES/3DES-based MAC from ANSI X9.19
              * @tparam BlockCipher
+             * @ingroup mac
              */
             template<typename BlockCipher = block::des>
             class ansi_x919_mac {

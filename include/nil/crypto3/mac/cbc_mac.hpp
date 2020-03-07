@@ -22,6 +22,7 @@ namespace nil {
             /*!
              * @brief CBC-MAC
              * @tparam BlockCipher
+             * @ingroup mac
              */
             template<typename BlockCipher>
             class cbc_mac {

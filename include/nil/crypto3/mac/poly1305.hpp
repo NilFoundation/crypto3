@@ -20,6 +20,7 @@ namespace nil {
             /*!
              * @brief DJB's Poly1305
              * @note Each key can only be used once
+             * @ingroup mac
              */
             class poly_1305 {
                 typedef detail::poly1305_functions policy_type;

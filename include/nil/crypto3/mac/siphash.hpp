@@ -19,6 +19,7 @@ namespace nil {
              * @brief
              * @tparam Rounds
              * @tparam FinalRounds
+             * @ingroup mac
              */
             template<std::size_t Rounds = 2, std::size_t FinalRounds = 4>
             class siphash {

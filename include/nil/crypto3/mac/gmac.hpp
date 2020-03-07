@@ -23,6 +23,7 @@ namespace nil {
              * @brief GMAC
              * @tparam BlockCipher
              * @tparam Hash
+             * @ingroup mac
              */
             template<typename BlockCipher, typename Hash = hash::ghash>
             class gmac {
