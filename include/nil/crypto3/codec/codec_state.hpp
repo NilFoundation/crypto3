@@ -42,6 +42,8 @@ namespace nil {
              *
              * Meets the requirements of AccumulatorSet
              *
+             * @ingroup codec
+             *
              * @tparam ProcessingMode Codec state preprocessing mode type (e.g. isomorphic_encoding_mode<base64>)
              */
             template<typename ProcessingMode>

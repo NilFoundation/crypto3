@@ -38,6 +38,7 @@ namespace nil {
 
             /*!
              * @brief Base encoder preprocessor functor
+             * @ingroup codec
              * @tparam Version Base encoder version selector. Available values are: 32, 58, 64
              *
              * @note This particular implementation gets selected with Version == 58.
@@ -66,6 +67,7 @@ namespace nil {
 
             /*!
              * @brief Base encoder finalizer functor
+             * @ingroup codec
              * @tparam Version Base encoder version selector. Available values are: 32, 58, 64
              *
              * @note This particular implementation gets selected with Version == 58.
@@ -100,6 +102,7 @@ namespace nil {
 
             /*!
              * @brief Base encoder preprocessor functor
+             * @ingroup codec
              * @tparam Version Base encoder version selector. Available values are: 32, 58, 64
              *
              * @note This particular implementation gets selected with Version != 58.
@@ -116,6 +119,7 @@ namespace nil {
 
             /*!
              * @brief
+             * @ingroup codec
              * @tparam Version
              */
             template<std::size_t Version>
@@ -147,6 +151,7 @@ namespace nil {
 
             /*!
              * @brief
+             * @ingroup codec
              * @tparam Version
              */
             template<std::size_t Version, typename = detail::static_range<true>>
@@ -183,6 +188,7 @@ namespace nil {
 
             /*!
              * @brief Base decoder finalizer functor
+             * @ingroup codec
              * @tparam Version Base encoder version selector. Available values are: 32, 58, 64
              *
              * Base decoder finalizer
@@ -245,6 +251,7 @@ namespace nil {
 
             /*!
              * @brief Base codec implements Base-family encoding. Meets the requirements of Codec.
+             * @ingroup codec
              * @tparam Version Base encoder version selector. Available values are: 32, 58, 64
              * @note This particular implementation gets resolved for base58
              */
@@ -311,6 +318,7 @@ namespace nil {
 
             /*!
              * @brief Base codec implements Base-family encoding. Meets the requirements of Codec.
+             * @ingroup codec
              * @tparam Version Base encoder version selector. Available values are: 32, 58, 64.
              * @note This particular implementation is defined for base32 and base64
              */
@@ -377,16 +385,19 @@ namespace nil {
 
             /*!
              * @brief Type alias for base<32>
+             * @ingroup codec
              */
             typedef base<32> base32;
 
             /*!
              * @brief Type alias for base<58>
+             * @ingroup codec
              */
             typedef base<58> base58;
 
             /*!
              * @brief Type alias for base<64>
+             * @ingroup codec
              */
             typedef base<64> base64;
         }    // namespace codec

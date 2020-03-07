@@ -107,6 +107,7 @@ namespace nil {
 
             /*!
              * @brief Hex codec. Meets the requirements of Codec.
+             * @ingroup codec
              * @tparam Mode Hex encoder mode selector. Defines which case to use - upper or lower
              */
             template<typename Mode = mode::upper>
