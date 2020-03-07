@@ -26,7 +26,7 @@ namespace nil {
              * @brief SHA1. Widely adopted NSA designed hash function. Starting
              * to show significant signs of weakness, and collisions can now be
              * generated. Avoid in new designs.
-             * @addtogroup hash
+             * @ingroup hash
              */
             class sha1 {
                 typedef detail::sha1_policy policy_type;

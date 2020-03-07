@@ -189,6 +189,10 @@ namespace nil {
                 }
             };
 
+            /*!
+             * @brief
+             * @ingroup hash
+             */
             class sm3 {
                 typedef detail::sm3_policy policy_type;
 

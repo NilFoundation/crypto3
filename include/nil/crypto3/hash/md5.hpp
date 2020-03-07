@@ -25,7 +25,7 @@ namespace nil {
             /*!
              * @brief MD5. Non-cryptographically secure checksum.
              *
-             * @addtogroup hash
+             * @ingroup hash
              */
             struct md5 {
                 typedef detail::md5_policy policy_type;

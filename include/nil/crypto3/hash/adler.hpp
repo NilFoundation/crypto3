@@ -287,9 +287,8 @@ namespace nil {
              * @brief Adler. Non-cryptographically secure checksum. Adler32
              * checksum is used in the zlib format. 32 bit output.
              *
-             * @addtogroup hash
+             * @ingroup hash
              * @tparam DigestBits
-             * s
              */
             template<std::size_t DigestBits>
             struct adler {

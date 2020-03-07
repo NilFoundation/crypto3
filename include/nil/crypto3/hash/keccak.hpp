@@ -27,6 +27,11 @@ namespace nil {
             public:
             };
 
+            /*!
+             * @brief
+             * @tparam DigestBits
+             * @ingroup hash
+             */
             template<std::size_t DigestBits = 512>
             class keccak_1600 {
                 typedef detail::keccak_1600_functions<DigestBits> policy_type;

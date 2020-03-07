@@ -88,7 +88,7 @@ namespace nil {
              * Can output a hash of any length between 1 and 64 bytes, this is specified by passing
              * a value to the constructor with the desired length.
              *
-             * @addtogroup hash
+             * @ingroup hash
              * @tparam DigestBits
              */
             template<std::size_t DigestBits>

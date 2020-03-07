@@ -221,7 +221,7 @@ namespace nil {
             /*!
              * @brief CRC. Non-cryptographically secure checksum.
              *
-             * @addtogroup hash
+             * @ingroup hash
              *
              * @tparam DigestBits
              * @tparam TruncPoly

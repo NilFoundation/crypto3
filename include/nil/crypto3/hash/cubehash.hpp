@@ -79,7 +79,7 @@ namespace nil {
             /*!
              * @brief Cubehash. Cubehash 16/32 modification was a SHA-3 competitor submitted to NIST.
              *
-             * @addtogroup hash
+             * @ingroup hash
              *
              * @tparam r
              * @tparam b

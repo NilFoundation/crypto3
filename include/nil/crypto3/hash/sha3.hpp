@@ -19,6 +19,11 @@
 namespace nil {
     namespace crypto3 {
         namespace hash {
+            /*!
+             * @brief
+             * @tparam DigestBits
+             * @ingroup hash
+             */
             template<std::size_t DigestBits>
             using sha3_compressor = keccak_1600_compressor<DigestBits>;
 

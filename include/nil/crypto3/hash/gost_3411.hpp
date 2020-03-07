@@ -36,6 +36,11 @@ namespace nil {
                 }
             };
 
+            /*!
+             * @brief
+             * @tparam ParamsType
+             * @ingroup hash
+             */
             template<typename ParamsType = block::cbr_params>
             class gost_3411 {
                 typedef detail::gost_3411_policy policy_type;

@@ -26,7 +26,7 @@ namespace nil {
              * @brief SHA. Initial SHA hash construction. Not considered to b a
              * cryptographically secure primitive lately.
              *
-             * @addtogroup hash
+             * @ingroup hash
              */
             class sha {
                 typedef detail::sha_policy policy_type;

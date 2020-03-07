@@ -256,7 +256,7 @@ namespace nil {
             /*!
              * @brief Ripemd. Family of configurable hashes, developed as an open alternative to SHA.
              *
-             * @addtogroup hash
+             * @ingroup hash
              *
              * @tparam DigestBits
              */

@@ -24,7 +24,7 @@ namespace nil {
             /*!
              * @brief MD4. Non-cryptographically secure checksum.
              *
-             * @addtogroup hash
+             * @ingroup hash
              */
             class md4 {
                 typedef detail::md4_policy policy_type;

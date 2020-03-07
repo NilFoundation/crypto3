@@ -29,7 +29,7 @@ namespace nil {
              * it is vulnerable to side channels. There is no reason to use it unless
              * compatibility is needed.
              *
-             * @addtogroup hash
+             * @ingroup hash
              */
             template<std::size_t DigestBits>
             class streebog {
