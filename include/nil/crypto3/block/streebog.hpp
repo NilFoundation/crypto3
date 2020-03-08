@@ -91,8 +91,8 @@ namespace nil {
 
                     for (size_t i = 0; i < rounds; ++i) {
                         policy_type::lps(ciphertext);
-                        C = boost::endian::native_to_little(reinterpret_cast<const uint8_t *>(
-                            &policy_type::round_constants[i * policy_type::substitutions_amount]));
+                        C = boost::endian::native_to_little(
+                            &policy_type::round_constants[i * policy_type::substitutions_amount]);
 
                         for (size_t j = 0; j != block_words; ++j) {
                             A[j] ^= C[j];
