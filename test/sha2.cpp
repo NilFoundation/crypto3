@@ -51,6 +51,19 @@ BOOST_AUTO_TEST_SUITE(sha2_test_suite)
 // http://csrc.nist.gov/groups/ST/toolkit/documents/Examples/SHA_All.pdf
 //
 
+/*
+static const std::unordered_map<std::string, std::string> string_data = {
+{"abc","ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"}
+};
+
+
+BOOST_DATA_TEST_CASE(sha2_256_string_various_range_value_hash, boost::unit_test::data::make(string_data), array_element) {
+    std::string out = hash<sha2<256>>(array_element.first);
+
+    BOOST_CHECK_EQUAL(out, array_element.second);
+}*/
+
+
 BOOST_AUTO_TEST_CASE(sha2_224_subbyte) {
     // From http://csrc.nist.gov/groups/STM/cavp/documents/shs/SHAVS.pdf
 

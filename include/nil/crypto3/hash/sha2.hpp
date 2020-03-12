@@ -32,6 +32,9 @@ namespace nil {
                 typedef block::shacal2<policy_type::cipher_version> block_cipher_type;
 
             public:
+
+                //Warning: stream processor params_type::length_bits is deduced from construction params_type
+
                 struct construction {
                     struct params_type {
                         typedef typename stream_endian::big_octet_big_bit digest_endian;
@@ -40,8 +43,7 @@ namespace nil {
                         constexpr static const std::size_t digest_bits = policy_type::digest_bits;
                     };
                     typedef merkle_damgard_construction<params_type, typename policy_type::iv_generator,
-                                                        davies_meyer_compressor<block_cipher_type, detail::state_adder>>
-                        type;
+                                                        davies_meyer_compressor<block_cipher_type, detail::state_adder>> type;
                 };
 
                 template<typename StateAccumulator, std::size_t ValueBits>

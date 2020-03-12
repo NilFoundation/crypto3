@@ -36,10 +36,10 @@ namespace nil {
              * @tparam StateAccumulator
              * @tparam Params
              */
-            template<typename Hash, typename StateAccumulator, typename Params>
+            template<typename Construction, typename StateAccumulator, typename Params>
             class merkle_damgard_stream_processor {
             protected:
-                typedef typename Hash::type construction_type;
+                typedef typename Construction::type construction_type;
                 typedef StateAccumulator accumulator_type;
                 typedef Params params_type;
 
@@ -216,7 +216,7 @@ namespace nil {
                 }
 
                 digest_type digest() const {
-                    return merkle_damgard_stream_processor(*this).end_message();
+                    return end_message();
                 }
 
             public:
