@@ -22,7 +22,7 @@
 #include <boost/integer.hpp>
 #include <boost/static_assert.hpp>
 #include <boost/utility/enable_if.hpp>
-#include <iostream>
+//#include <iostream>
 
 namespace nil {
     namespace crypto3 {
@@ -192,7 +192,9 @@ namespace nil {
                 merkle_damgard_stream_processor &end_message() {
                     using namespace nil::crypto3::detail;
 
-                    length_type seen = accumulators::extract::bits_count(acc), length = seen;
+                    length_type seen = accumulators::extract::bits_count(acc), length = seen + cache_size * value_bits;
+
+                    //std::cout<<"Seen: "<<seen<<" Len:"<<length<<"\n";
 
                     // Add a 1 bit
 #ifdef CRYPTO3_HASH_NO_OPTIMIZATION
@@ -205,14 +207,17 @@ namespace nil {
                     
                     imploder_step<endian_type, 1, value_bits, 0>::step(1, pad);
                     update_one(pad);
+                    //std::cout<<"Pad:"<<(std::size_t)pad <<"\n";
 #endif
-                    //seen += value_bits;
+                    seen += (cache_size + 1) * value_bits;
                     // Pad with 0 bits
+                    //std::cout<<"Cache size before while:"<<(std::size_t)cache_size <<"\n";
                     while ((seen + length_bits) % block_bits != 0) {
                         update_one(value_type());
-                        //seen += value_bits;
+                        seen += value_bits;
                     }
-
+                    update_one(value_type());
+                    //std::cout<<"Cache size after while:"<<(std::size_t)cache_size <<"\n";
                     // Append length
                     append_length<int>(length);
 
@@ -224,6 +229,7 @@ namespace nil {
             public:
                 merkle_damgard_stream_processor(accumulator_type &acc) :
                     acc(acc), value_array(), block_hash(), cache_size(0) {
+                        reset();
                 }
 
                 virtual ~merkle_damgard_stream_processor() {
