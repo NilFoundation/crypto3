@@ -16,7 +16,7 @@
 #include <nil/crypto3/hash/detail/nop_finalizer.hpp>
 
 #include <boost/utility/enable_if.hpp>
-
+#include <iostream>
 namespace nil {
     namespace crypto3 {
         namespace hash {
@@ -91,7 +91,8 @@ namespace nil {
                     std::move(block.begin(), block.end(), b.begin());
                     std::fill(b.begin() + seen, b.end(), 0);
                     length_type t = seen / sizeof(b[0]) + 1;
-                    imploder_step<endian_type, 1, word_bits, 0>::step(1, b[seen / sizeof(b[0]) + 1]);
+                    //std::cout << "Call " << b[t] << ":" << word_bits << " ";
+                    imploder_step<endian_type, 1, word_bits, 0>::step(1, b[t]);
                     // imploder_step<endian_type, 1, word_bits, seen % block_bits>::step(1, b[seen / block_bits]);
                     append_length<int>(b, seen);
 

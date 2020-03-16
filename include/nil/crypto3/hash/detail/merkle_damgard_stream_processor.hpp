@@ -22,6 +22,7 @@
 #include <boost/integer.hpp>
 #include <boost/static_assert.hpp>
 #include <boost/utility/enable_if.hpp>
+#include <iostream>
 
 namespace nil {
     namespace crypto3 {
@@ -112,10 +113,6 @@ namespace nil {
 
             public:
                 merkle_damgard_stream_processor &update_one(value_type value) {
-                    using namespace boost::accumulators;
-                    length_type seen = accumulators::extract::bits_count(acc);
-                    std::size_t i = seen % block_bits;
-                    std::size_t j = i / value_bits;
                     value_array[cache_size] = value;
                     ++cache_size;
                     if (cache_size == block_values) {
@@ -133,9 +130,10 @@ namespace nil {
 #ifndef CRYPTO3_HASH_NO_OPTIMIZATION
                     length_type seen = accumulators::extract::bits_count(acc);
                     if (seen % block_bits != 0) {
-                        for (; n && (block_bits - seen % block_bits); --n, ++p) {
+                        for (; n && (seen % block_bits); --n, ++p) {
                             value_array[cache_size] = *p;
                             ++cache_size;
+                            seen += value_bits;
                         }
                         process_block(cache_size * value_bits);
                         cache_size = 0;
@@ -163,15 +161,21 @@ namespace nil {
                 template<typename InputIterator>
                 inline merkle_damgard_stream_processor &operator()(InputIterator b, InputIterator e,
                                                                    std::random_access_iterator_tag) {
-                    return update_n(b, e - b);
+                    //return update_n(b, e - b);
+                    while (b != e) {
+                        update_one(*b++);
+                    }
+
+                    return end_message();
                 }
 
                 template<typename InputIterator, typename Category>
-                inline merkle_damgard_stream_processor &operator()(InputIterator first, InputIterator last, Category) {
-                    while (first != last) {
-                        update_one(*first++);
+                inline merkle_damgard_stream_processor &operator()(InputIterator b, InputIterator e, Category) {
+                    while (b != e) {
+                        update_one(*b++);
                     }
-                    return *this;
+
+                    return end_message();
                 }
 
                 template<typename InputIterator>
@@ -185,7 +189,7 @@ namespace nil {
                     return update_n(c.data(), c.size());
                 }
 
-                digest_type end_message() {
+                merkle_damgard_stream_processor &end_message() {
                     using namespace nil::crypto3::detail;
 
                     length_type seen = accumulators::extract::bits_count(acc), length = seen;
@@ -198,13 +202,15 @@ namespace nil {
                     update_one(padding_values[0]);
 #else
                     value_type pad = 0;
+                    
                     imploder_step<endian_type, 1, value_bits, 0>::step(1, pad);
                     update_one(pad);
 #endif
-
+                    //seen += value_bits;
                     // Pad with 0 bits
                     while ((seen + length_bits) % block_bits != 0) {
                         update_one(value_type());
+                        //seen += value_bits;
                     }
 
                     // Append length
@@ -212,11 +218,7 @@ namespace nil {
 
                     cache_size = 0;
                     // Calculate static_digest and reset block_hash
-                    return block_hash.end_message();
-                }
-
-                digest_type digest() const {
-                    return end_message();
+                    return *this;
                 }
 
             public:
