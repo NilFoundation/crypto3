@@ -113,6 +113,7 @@ namespace nil {
 
             public:
                 merkle_damgard_stream_processor &update_one(value_type value) {
+                    //std::cout << "Value bits one:" << value_bits << "\n";
                     value_array[cache_size] = value;
                     ++cache_size;
                     if (cache_size == block_values) {
@@ -125,6 +126,7 @@ namespace nil {
 
                 template<typename InputIterator>
                 merkle_damgard_stream_processor &update_n(InputIterator p, size_t n) {
+                    //std::cout << "Value bits:" << value_bits << "\n";
                     using namespace nil::crypto3::detail;
                     using namespace boost::accumulators;
 #ifndef CRYPTO3_HASH_NO_OPTIMIZATION
@@ -153,20 +155,16 @@ namespace nil {
                         value_array[cache_size] = *p;
                         ++cache_size;
                     }
-                    process_block(cache_size * value_bits);
-                    cache_size = 0;
+                    //process_block(cache_size * value_bits);
+                    //cache_size = 0;
                     return *this;
                 }
 
                 template<typename InputIterator>
                 inline merkle_damgard_stream_processor &operator()(InputIterator b, InputIterator e,
                                                                    std::random_access_iterator_tag) {
-                    //return update_n(b, e - b);
-                    while (b != e) {
-                        update_one(*b++);
-                    }
-
-                    return end_message();
+                    
+                    return update_n(b, e - b).end_message();
                 }
 
                 template<typename InputIterator, typename Category>

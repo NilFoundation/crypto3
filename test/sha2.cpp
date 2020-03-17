@@ -52,29 +52,6 @@ BOOST_AUTO_TEST_SUITE(sha2_test_suite)
 //
 
 /*
-static const std::unordered_map<std::string, std::string> string_data = {
-{"abc","ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"}
-};
-
-
-BOOST_DATA_TEST_CASE(sha2_256_string_various_range_value_hash, boost::unit_test::data::make(string_data), array_element) {
-    std::string out = hash<sha2<256>>(array_element.first);
-
-    BOOST_CHECK_EQUAL(out, array_element.second);
-}*/
-
-
-BOOST_AUTO_TEST_CASE(sha2_224_subbyte_1) {
-    // From http://csrc.nist.gov/groups/STM/cavp/documents/shs/SHAVS.pdf
-
-    // B.1/1
-    std::array<char, 10> a = {'\x00','\x64','\x70','\xd5','\x7d','\xad','\x98','\x93','\xdc','\x03'};        //0x68
-    sha2<224>::digest_type d = hash<sha2<224>>(a);
-
-    BOOST_CHECK_EQUAL("c90026cda5ad24115059c62ae9add57793ade445d4742273288bbce7", std::to_string(d).data());
-}
-
-
 BOOST_AUTO_TEST_CASE(sha2_224_subbyte) {
     // From http://csrc.nist.gov/groups/STM/cavp/documents/shs/SHAVS.pdf
 
@@ -86,56 +63,30 @@ BOOST_AUTO_TEST_CASE(sha2_224_subbyte) {
 }
 
 
+BOOST_AUTO_TEST_CASE(sha2_224_subbyte1) {
+    // From http://csrc.nist.gov/groups/STM/cavp/documents/shs/SHAVS.pdf
 
-/*
-BOOST_FIXTURE_TEST_CASE(sha2_224_accumulator_new, fixture<224>) {
+    // B.1/1
+    std::array<char, 10> a = {'\x00','\x64','\x70','\xd5','\x7d','\xad','\x98','\x93','\xdc','\x03'};
+    sha2<224>::digest_type d = hash<sha2<224>>(a);
 
+    BOOST_CHECK_EQUAL("c90026cda5ad24115059c62ae9add57793ade445d4742273288bbce7", std::to_string(d).data());
+}
+*/
+BOOST_AUTO_TEST_CASE(sha2_224_subbyte2) {
+    // From http://csrc.nist.gov/groups/STM/cavp/documents/shs/SHAVS.pdf
+
+    // B.1/1
     std::array<bool, 5> a = {0, 1, 1, 0, 1};
-
-    acc(a);
-
-    hash_t::digest_type s = extract::hash<hash_t>(acc);
+    sha2<224>::digest_type d = hash<sha2<224>>(a);
 
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
-    std::printf("%s\n", std::to_string(s).data());
+    std::printf("%s\n", std::to_string(d).data());
 #endif
 
-    BOOST_CHECK_EQUAL("248d6a61d20638b8e5c026930c3e6039a33ce45964ff2167f6ecedd419db06c1", s);
-}*/
-
+    BOOST_CHECK_EQUAL("e3b048552c3c387bcab37f6eb06bb79b96a4aee5ff27f51531a9551a", std::to_string(d).data());
+}
 /*
-BOOST_FIXTURE_TEST_CASE(sha2_256_accumulator3, fixture<256>) {
-    // Example from appendix B.2:
-    // echo -n "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq" | sha256sum
-    hash_t::construction::type::block_type m1 = {
-        {0x61626364, 0x62636465, 0x63646566, 0x64656667, 0x65666768, 0x66676869, 0x6768696a, 0x68696a6b, 0x696a6b6c,
-         0x6a6b6c6d, 0x6b6c6d6e, 0x6c6d6e6f, 0x6d6e6f70, 0x6e6f7071, 0x80000000, 0x00000000}};
-    acc(m1);
-
-    BOOST_CHECK_EQUAL("85e655d6417a17953363376a624cde5c76e09589cac5f811cc4b32c1f20e533a", (extract::hash<hash_t>(acc)));
-
-    hash_t::construction::type::block_type m2 = {{}};
-    m2[15] = 0x000001c0;
-    acc(m2);
-
-    hash_t::digest_type s = extract::hash<hash_t>(acc);
-
-#ifdef CRYPTO3_HASH_SHOW_PROGRESS
-    std::printf("%s\n", std::to_string(s).data());
-#endif
-
-    BOOST_CHECK_EQUAL("248d6a61d20638b8e5c026930c3e6039a33ce45964ff2167f6ecedd419db06c1", s);
-}*/
-
-
-
-
-
-
-
-
-
-
 BOOST_AUTO_TEST_CASE(sha2_256_subbyte) {
     // C.1/1
     std::array<bool, 5> a = {0, 1, 1, 0, 1};
@@ -609,6 +560,6 @@ BOOST_AUTO_TEST_CASE(sha512_various_hash2) {
         "e718483d0ce769644e2e42c7bc15b4638e1f98b13b2044285632a803afa973eb"
         "de0ff244877ea60a4cb0432ce577c31beb009c5c2c49aa2e4eadb217ad8cc09b",
         std::to_string(h).data());
-}
+}*/
 
 BOOST_AUTO_TEST_SUITE_END()
