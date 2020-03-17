@@ -190,7 +190,7 @@ namespace nil {
                 merkle_damgard_stream_processor &end_message() {
                     using namespace nil::crypto3::detail;
 
-                    length_type seen = accumulators::extract::bits_count(acc), length = seen + cache_size * value_bits;
+                    length_type seen = accumulators::extract::bits_count(acc) + cache_size * value_bits, length = seen;
 
                     //std::cout<<"Seen: "<<seen<<" Len:"<<length<<"\n";
 
@@ -207,14 +207,13 @@ namespace nil {
                     update_one(pad);
                     //std::cout<<"Pad:"<<(std::size_t)pad <<"\n";
 #endif
-                    seen += (cache_size + 1) * value_bits;
+                    seen += value_bits;
                     // Pad with 0 bits
                     //std::cout<<"Cache size before while:"<<(std::size_t)cache_size <<"\n";
                     while ((seen + length_bits) % block_bits != 0) {
                         update_one(value_type());
                         seen += value_bits;
                     }
-                    update_one(value_type());
                     //std::cout<<"Cache size after while:"<<(std::size_t)cache_size <<"\n";
                     // Append length
                     append_length<int>(length);
