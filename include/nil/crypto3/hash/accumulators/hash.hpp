@@ -110,12 +110,12 @@ namespace nil {
                                       cache.begin() + cached_bits);
                             cached_bits += block_bits - cached_bits;
                             if (cached_bits == block_bits) {
-                                construction.process_block(cache);
+                                construction.process_block(cache, seen_bits);
                                 std::move(value.begin() + (block_bits - cached_bits), value.end(), cache.begin());
                             }
                         } else {
                             if (bits == block_bits) {
-                                construction.process_block(value);
+                                construction.process_block(value, seen_bits);
                             } else {
                                 std::move(value.begin(), value.end(), cache.begin());
                             }
@@ -133,7 +133,7 @@ namespace nil {
                             }
                         } else {
                             if (bits == block_bits) {
-                                construction.process_block(value);
+//                                construction.process_block(value);
                             } else {
                                 cache[0] = value;
                             }

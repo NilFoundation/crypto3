@@ -15,6 +15,8 @@
 
 #include <nil/crypto3/hash/detail/nop_finalizer.hpp>
 
+#include <boost/utility/enable_if.hpp>
+//#include <iostream>
 namespace nil {
     namespace crypto3 {
         namespace hash {
@@ -69,8 +71,9 @@ namespace nil {
                 BOOST_STATIC_ASSERT(!length_bits || length_bits % word_bits == 0);
 
             public:
-                inline merkle_damgard_construction &process_block(const block_type &block) {
-                    compressor_functor().process_block(state_, block);
+                template<typename Integer = std::size_t>
+                inline merkle_damgard_construction &process_block(const block_type &block, Integer seen = Integer()) {
+                    compressor_functor::process_block(state_, block);
                     return *this;
                 }
 
@@ -84,13 +87,17 @@ namespace nil {
                 inline digest_type digest(const block_type &block = block_type(), length_type seen = length_type()) {
                     using namespace nil::crypto3::detail;
 
-                    block_type b;
+                    /*block_type b;
                     std::move(block.begin(), block.end(), b.begin());
                     std::fill(b.begin() + seen, b.end(), 0);
-                    auto t = seen / sizeof(b[0]) + 1;
-                    imploder_step<endian_type, 1, word_bits, 0>::step(1, b[seen / sizeof(b[0]) + 1]);
+                    length_type t = seen / sizeof(b[0]) + 1;
+                    //std::cout << "Call " << b[t] << ":" << word_bits << " ";
+                    imploder_step<endian_type, 1, word_bits, 0>::step(1, b[t]);
                     // imploder_step<endian_type, 1, word_bits, seen % block_bits>::step(1, b[seen / block_bits]);
-                    append_length<length_bits>(b, seen);
+                    append_length<int>(b, seen);*/
+
+                    //std::cout<<"Seen me:" << seen << "\n";
+                    process_block(block, seen);
 
                     finalizer_functor finalizer;
                     finalizer(state_);
@@ -117,8 +124,8 @@ namespace nil {
                 }
 
             protected:
-                template<std::size_t LengthBits>
-                void append_length(block_type &block, length_type length) {
+                template<typename Dummy>
+                typename boost::enable_if_c<length_bits && sizeof(Dummy)>::type append_length(block_type &block, length_type length) {
                     using namespace nil::crypto3::detail;
 
                     // Append length
@@ -132,9 +139,13 @@ namespace nil {
                     // Process the last block
                     process_block(block);
                 }
-
+                /*
                 template<>
                 void append_length<0>(block_type &block, length_type length) {
+                }*/
+                template<typename Dummy>
+                typename boost::disable_if_c<length_bits && sizeof(Dummy)>::type append_length(block_type &block, length_type length) {
+                    // No appending requested, so nothing to do
                 }
 
                 state_type state_;

@@ -14,11 +14,16 @@
 
 #include <nil/crypto3/hash/detail/sponge_construction.hpp>
 #include <nil/crypto3/hash/detail/sponge_stream_processor.hpp>
-#include <nil/crypto3/hash/detail/sha3_functions.hpp>
+#include <nil/crypto3/hash/detail/sha3/sha3_functions.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace hash {
+            /*!
+             * @brief
+             * @tparam DigestBits
+             * @ingroup hash
+             */
             template<std::size_t DigestBits>
             using sha3_compressor = keccak_1600_compressor<DigestBits>;
 

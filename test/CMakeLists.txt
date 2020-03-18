@@ -7,7 +7,6 @@ if(NOT Boost_UNIT_TEST_FRAMEWORK_FOUND)
 endif()
 
 cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
-
                        ${CMAKE_WORKSPACE_NAME}::block
 
                        ${Boost_LIBRARIES})
@@ -34,25 +33,26 @@ macro(define_hash_test name)
 endmacro()
 
 set(TESTS_NAMES
-    "adler"
-    "blake2b"
-    "crc"
-    "cubehash"
-    "md4"
-    "md5"
-    "ghash"
-    "keccak"
-    "ripemd"
-    "pack"
-    "tiger"
-    "sha"
+#    "adler"
+#    "blake2b"
+#    "crc"
+#    "cubehash"
+#    "md4"
+#    "md5"
+#    "ghash"
+#    "keccak"
+#    "ripemd"
+#    "pack"
+#    "tiger"
+#    "sha"
     "sha2"
-    "sha3"
-    "skein"
-    "sm3"
-    "static_digest"
-    #    "streebog"
-    "whirlpool")
+#    "sha3"
+#    "skein"
+#    "sm3"
+#    "static_digest"
+#    "streebog"
+#    "whirlpool"
+)
 
 foreach(TEST_NAME ${TESTS_NAMES})
     define_hash_test(${TEST_NAME})

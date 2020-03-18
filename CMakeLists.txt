@@ -56,8 +56,6 @@ if(CRYPTO3_HASH_BLAKE2B)
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_BLAKE2B)
     list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
          ${${CURRENT_PROJECT_NAME}_BLAKE2B_HEADERS})
-    list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-         ${${CURRENT_PROJECT_NAME}_BLAKE2B_SOURCES})
 endif()
 
 if(CRYPTO3_HASH_CHECKSUM_ADLER)
@@ -67,8 +65,6 @@ if(CRYPTO3_HASH_CHECKSUM_ADLER)
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_ADLER)
     list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
          ${${CURRENT_PROJECT_NAME}_ADLER32_HEADERS})
-    list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-         ${${CURRENT_PROJECT_NAME}_ADLER32_SOURCES})
 endif()
 
 if(CRYPTO3_HASH_CHECKSUM_CRC)
@@ -78,8 +74,6 @@ if(CRYPTO3_HASH_CHECKSUM_CRC)
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_CRC)
     list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
          ${${CURRENT_PROJECT_NAME}_CRC_HEADERS})
-    list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-         ${${CURRENT_PROJECT_NAME}_CRC_SOURCES})
 endif()
 
 if(CRYPTO3_HASH_GOST_34_11)
@@ -89,8 +83,6 @@ if(CRYPTO3_HASH_GOST_34_11)
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_GOST_34_11)
     list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
          ${${CURRENT_PROJECT_NAME}_GOST_34_11_HEADERS})
-    list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-         ${${CURRENT_PROJECT_NAME}_GOST_34_11_SOURCES})
 endif()
 
 if(CRYPTO3_HASH_KECCAK)
@@ -100,68 +92,51 @@ if(CRYPTO3_HASH_KECCAK)
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_KECCAK)
     list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
          ${${CURRENT_PROJECT_NAME}_KECCAK_HEADERS})
-    list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-         ${${CURRENT_PROJECT_NAME}_KECCAK_SOURCES})
 endif()
 
 if(CRYPTO3_HASH_MD4)
     list(APPEND ${CURRENT_PROJECT_NAME}_MD4_HEADERS
-         include/nil/crypto3/hash/md4.hpp
-         )
+         include/nil/crypto3/hash/md4.hpp)
 
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_MD4)
     list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-         ${${CURRENT_PROJECT_NAME}_MD4_HEADERS}
-         )
-    list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-         ${${CURRENT_PROJECT_NAME}_MD4_SOURCES}
-         )
+         ${${CURRENT_PROJECT_NAME}_MD4_HEADERS})
 endif()
 
 if(CRYPTO3_HASH_MD5)
     list(APPEND ${CURRENT_PROJECT_NAME}_MD5_HEADERS
-         include/nil/crypto3/hash/md5.hpp
-         )
+         include/nil/crypto3/hash/md5.hpp)
 
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_MD5)
     list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-         ${${CURRENT_PROJECT_NAME}_MD5_HEADERS}
-         )
+         ${${CURRENT_PROJECT_NAME}_MD5_HEADERS})
 endif()
 
 if(CRYPTO3_HASH_RIPEMD)
     list(APPEND ${CURRENT_PROJECT_NAME}_RIPEMD_HEADERS
          include/nil/crypto3/hash/detail/ripemd/ripemd_functions.hpp
          include/nil/crypto3/hash/detail/ripemd/ripemd_policy.hpp
-         include/nil/crypto3/hash/ripemd.hpp
-         )
+         include/nil/crypto3/hash/ripemd.hpp)
 
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_RIPEMD)
     list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-         ${${CURRENT_PROJECT_NAME}_RIPEMD_HEADERS}
-         )
-    list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-         ${${CURRENT_PROJECT_NAME}_RIPEMD_SOURCES}
-         )
+         ${${CURRENT_PROJECT_NAME}_RIPEMD_HEADERS})
 endif()
 
 if(CRYPTO3_HASH_SHA1)
     list(APPEND ${CURRENT_PROJECT_NAME}_SHA1_HEADERS
          include/nil/crypto3/hash/sha.hpp
-         include/nil/crypto3/hash/sha1.hpp
-         )
+         include/nil/crypto3/hash/sha1.hpp)
 
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_SHA1)
     list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-         ${${CURRENT_PROJECT_NAME}_SHA1_HEADERS}
-         )
+         ${${CURRENT_PROJECT_NAME}_SHA1_HEADERS})
 endif()
 
 if(CRYPTO3_HASH_SHA2)
     list(APPEND ${CURRENT_PROJECT_NAME}_SHA2_HEADERS
          include/nil/crypto3/hash/sha.hpp
-         include/nil/crypto3/hash/sha2.hpp
-         )
+         include/nil/crypto3/hash/sha2.hpp)
 
     list(APPEND ${CURRENT_PROJECT_NAME}_SHA2_SOURCES)
 
@@ -169,119 +144,75 @@ if(CRYPTO3_HASH_SHA2)
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_SHA2_64)
 
     list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-         ${${CURRENT_PROJECT_NAME}_SHA2_HEADERS}
-         )
-    list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-         ${${CURRENT_PROJECT_NAME}_SHA2_SOURCES}
-         )
+         ${${CURRENT_PROJECT_NAME}_SHA2_HEADERS})
 endif()
 
 if(CRYPTO3_HASH_SHA3)
     list(APPEND ${CURRENT_PROJECT_NAME}_SHA3_HEADERS
-         include/nil/crypto3/hash/sha3.hpp
-         )
+         include/nil/crypto3/hash/sha3.hpp)
 
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_SHA3)
     list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-         ${${CURRENT_PROJECT_NAME}_SHA3_HEADERS}
-         )
-    list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-         ${${CURRENT_PROJECT_NAME}_SHA3_SOURCES}
-         )
+         ${${CURRENT_PROJECT_NAME}_SHA3_HEADERS})
 endif()
 
 if(CRYPTO3_HASH_SKEIN)
     list(APPEND ${CURRENT_PROJECT_NAME}_SKEIN_512_HEADERS
-         include/nil/crypto3/hash/skein.hpp
-         )
+         include/nil/crypto3/hash/skein.hpp)
 
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_SKEIN_512)
     list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-         ${${CURRENT_PROJECT_NAME}_SKEIN_512_HEADERS}
-         )
-    list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-         ${${CURRENT_PROJECT_NAME}_SKEIN_512_SOURCES}
-         )
+         ${${CURRENT_PROJECT_NAME}_SKEIN_512_HEADERS})
 endif()
 
 if(CRYPTO3_HASH_SM3)
     list(APPEND ${CURRENT_PROJECT_NAME}_SM3_HEADERS
-         include/nil/crypto3/hash/sm3.hpp
-         )
+         include/nil/crypto3/hash/sm3.hpp)
 
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_SM3)
     list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-         ${${CURRENT_PROJECT_NAME}_SM3_HEADERS}
-         )
-    list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-         ${${CURRENT_PROJECT_NAME}_SM3_SOURCES}
-         )
+         ${${CURRENT_PROJECT_NAME}_SM3_HEADERS})
 endif()
 
 if(CRYPTO3_HASH_STREEBOG)
     list(APPEND ${CURRENT_PROJECT_NAME}_STREEBOG_HEADERS
-         include/nil/crypto3/hash/streebog.hpp
-         )
+         include/nil/crypto3/hash/streebog.hpp)
 
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_STREEBOG)
     list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-         ${${CURRENT_PROJECT_NAME}_STREEBOG_HEADERS}
-         )
-    list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-         ${${CURRENT_PROJECT_NAME}_STREEBOG_SOURCES}
-         )
+         ${${CURRENT_PROJECT_NAME}_STREEBOG_HEADERS})
 endif()
 
 if(CRYPTO3_HASH_TIGER)
     list(APPEND ${CURRENT_PROJECT_NAME}_TIGER_HEADERS
-         include/nil/crypto3/hash/tiger.hpp
-         )
+         include/nil/crypto3/hash/tiger.hpp)
 
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_TIGER)
     list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-         ${${CURRENT_PROJECT_NAME}_TIGER_HEADERS}
-         )
-    list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-         ${${CURRENT_PROJECT_NAME}_TIGER_SOURCES}
-         )
+         ${${CURRENT_PROJECT_NAME}_TIGER_HEADERS})
 endif()
 
 if(CRYPTO3_HASH_WHIRLPOOL)
     list(APPEND ${CURRENT_PROJECT_NAME}_WHIRLPOOL_HEADERS
-         include/nil/crypto3/hash/whirlpool.hpp
-         )
+         include/nil/crypto3/hash/whirlpool.hpp)
 
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_WHIRLPOOL)
     list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-         ${${CURRENT_PROJECT_NAME}_WHIRLPOOL_HEADERS}
-         )
-    list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-         ${${CURRENT_PROJECT_NAME}_WHIRLPOOL_SOURCES}
-         )
+         ${${CURRENT_PROJECT_NAME}_WHIRLPOOL_HEADERS})
 endif()
 
 if(CRYPTO3_HASH_CUBEHASH)
     list(APPEND ${CURRENT_PROJECT_NAME}_CUBEHASH_HEADERS
          include/nil/crypto3/hash/cubehash.hpp
-         include/nil/crypto3/hash/detail/cubehash_policy.hpp
-         )
-
-    list(APPEND ${CURRENT_PROJECT_NAME}_CUBEHASH_SOURCES
-         src/cubehash/cubehash.cpp
-         )
+         include/nil/crypto3/hash/detail/cubehash_policy.hpp)
 
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_CUBEHASH)
     list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-         ${${CURRENT_PROJECT_NAME}_CUBEHASH_HEADERS}
-         )
-    list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-         ${${CURRENT_PROJECT_NAME}_CUBEHASH_SOURCES}
-         )
+         ${${CURRENT_PROJECT_NAME}_CUBEHASH_HEADERS})
 endif()
 
 list(APPEND ${CURRENT_PROJECT_NAME}_HEADERS
-     ${${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS}
-     )
+     ${${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS})
 
 cm_setup_version(VERSION 0.1.0 PREFIX ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME})
 

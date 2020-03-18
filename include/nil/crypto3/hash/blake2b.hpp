@@ -46,9 +46,11 @@ namespace nil {
 
                 static void process_block(state_type &state, const block_type &block, value_type seen = value_type(),
                                           value_type finalizator = value_type()) {
-                    state_type v = state, M = {0};
+                    std::array<word_type, state_words * 2> v, M;
+                    M.fill(0);
 
-                    v.insert(v.end(), iv_generator()().begin(), iv_generator()().end());
+                    std::move(state.begin(), state.end(), v.end());
+                    std::move(iv_generator()().begin(), iv_generator()().end(), v.end());
 
                     std::array<typename state_type::value_type, 2> s = {seen, 0x00};
 
@@ -75,8 +77,8 @@ namespace nil {
                     policy_type::template round<0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15>(v, M);
                     policy_type::template round<14, 10, 4, 8, 9, 15, 13, 6, 1, 12, 0, 2, 11, 7, 5, 3>(v, M);
 
-                    for (size_t i = 0; i < 8; i++) {
-                        state[i] ^= v[i] ^ v[i + 8];
+                    for (size_t i = 0; i < state_words; i++) {
+                        state[i] ^= v[i] ^ v[i + state_words];
                     }
                 }
             };
@@ -115,7 +117,7 @@ namespace nil {
                     struct params_type {
                         typedef typename stream_endian::little_octet_big_bit endian;
 
-                        constexpr static const std::size_t length_bits = construction::params_type::word_bits;
+                        constexpr static const std::size_t length_bits = construction::params_type::length_bits;
                         constexpr static const std::size_t value_bits = ValueBits;
                     };
 

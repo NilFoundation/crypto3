@@ -53,13 +53,13 @@ namespace nil {
                 typedef typename compressor_functor::block_type block_type;
 
                 constexpr static const std::size_t digest_bits = Params::digest_bits;
-
                 constexpr static const std::size_t digest_bytes = digest_bits / octet_bits;
                 constexpr static const std::size_t digest_words = digest_bits / word_bits;
                 typedef static_digest<digest_bits> digest_type;
 
-                inline sponge_construction &process_block(const block_type &block) {
-                    compressor_functor()(state_, block);
+                template<typename Integer = std::size_t>
+                inline sponge_construction &process_block(const block_type &block, Integer seen = Integer()) {
+                    compressor_functor::process_block(state_, block);
                     return *this;
                 }
 

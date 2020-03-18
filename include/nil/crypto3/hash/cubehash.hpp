@@ -119,8 +119,8 @@ namespace nil {
                 typedef typename policy_type::digest_type digest_type;
             };
 
-            template<std::size_t h>
-            struct cubehash<h, 0, 0> : cubehash<CRYPTO3_HASH_CUBEHASH_DEFAULT_R, CRYPTO3_HASH_CUBEHASH_DEFAULT_B, h> {};
+            template<unsigned h>
+            class cubehash<h, 0, 0> : cubehash<CRYPTO3_HASH_CUBEHASH_DEFAULT_R, CRYPTO3_HASH_CUBEHASH_DEFAULT_B, h> {};
 
         }    // namespace hash
     }        // namespace crypto3

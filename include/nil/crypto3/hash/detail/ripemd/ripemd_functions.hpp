@@ -51,7 +51,7 @@ namespace nil {
                         }
                     };
 
-                    template<class F>
+                    template<typename F>
                     inline static void transform(word_type &a, word_type &b, word_type &c, word_type &d, word_type x,
                                                  word_type k, word_type s) {
                         word_type T = basic_functions<WordBits>::rotl(a + F()(b, c, d) + x + k, s);
@@ -72,9 +72,9 @@ namespace nil {
                         b = T;
                     }
                 };
-            }
-        }
-    }
-}
+            }    // namespace detail
+        }        // namespace hash
+    }            // namespace crypto3
+}    // namespace nil
 
-#endif //CRYPTO3_RIPEMD_FUNCTIONS_HPP
+#endif    // CRYPTO3_RIPEMD_FUNCTIONS_HPP

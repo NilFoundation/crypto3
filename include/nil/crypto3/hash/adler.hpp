@@ -289,7 +289,6 @@ namespace nil {
              *
              * @ingroup hash
              * @tparam DigestBits
-             * s
              */
             template<std::size_t DigestBits>
             struct adler {

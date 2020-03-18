@@ -15,6 +15,10 @@
 
 #include <nil/crypto3/detail/pack.hpp>
 
+#include <nil/crypto3/hash/accumulators/bits_count.hpp>
+#include <nil/crypto3/hash/accumulators/parameters/bits.hpp>
+#include <nil/crypto3/hash/accumulators/parameters/salt.hpp>
+
 #include <boost/integer.hpp>
 #include <boost/static_assert.hpp>
 #include <boost/utility/enable_if.hpp>
@@ -35,7 +39,7 @@ namespace nil {
             template<typename Hash, typename StateAccumulator, typename Params>
             class haifa_stream_processor {
             protected:
-                typedef Hash construction_type;
+                typedef typename Hash::type construction_type;
                 typedef StateAccumulator accumulator_type;
                 typedef Params params_type;
 
@@ -60,13 +64,6 @@ namespace nil {
                 typedef typename construction_type::digest_type digest_type;
 
             protected:
-                constexpr static const std::size_t digest_length_bits = params_type::digest_length_bits;
-                // FIXME: do something more intelligent than capping at 64
-                constexpr static const std::size_t digest_length_type_bits =
-                    digest_length_bits < word_bits ? word_bits : digest_length_bits > 64 ? 64 : digest_length_bits;
-                typedef typename boost::uint_t<digest_length_type_bits>::least digest_length_type;
-                constexpr static const std::size_t digest_length_words = digest_length_bits / word_bits;
-
                 constexpr static const std::size_t length_bits = params_type::length_bits;
                 // FIXME: do something more intelligent than capping at 64
                 constexpr static const std::size_t length_type_bits =
@@ -176,7 +173,7 @@ namespace nil {
                 template<typename InputIterator>
                 inline haifa_stream_processor &operator()(InputIterator b, InputIterator e) {
                     typedef typename std::iterator_traits<InputIterator>::iterator_category cat;
-                    return update(b, e, cat());
+                    return operator()(b, e, cat());
                 }
 
                 template<typename ContainerT>

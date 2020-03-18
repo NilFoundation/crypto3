@@ -1,6 +1,6 @@
-## Hash Concepts
+## Hash Concepts {#hashes_concepts}
 
-## Hash Concept
+## Hash Concept {#hashes_concept}
 
 A ```Hash``` is a function object for which the output depends only on the input and has a very low probability of yielding the same output given different input values.
 

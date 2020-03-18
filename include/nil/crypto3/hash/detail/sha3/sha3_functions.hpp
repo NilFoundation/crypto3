@@ -10,7 +10,7 @@
 #ifndef CRYPTO3_SHA3_FUNCTIONS_HPP
 #define CRYPTO3_SHA3_FUNCTIONS_HPP
 
-#include <nil/crypto3/hash/detail/sha3_policy.hpp>
+#include <nil/crypto3/hash/detail/sha3/sha3_policy.hpp>
 
 namespace nil {
     namespace crypto3 {
