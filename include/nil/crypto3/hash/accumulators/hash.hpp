@@ -76,7 +76,7 @@ namespace nil {
 
                     inline result_type result(boost::accumulators::dont_care) const {
                         construction_type res = construction;
-                        return res.digest(cache, seen_bits % block_bits);
+                        return res.digest(cache, seen_bits);
                     }
 
                 protected:
@@ -104,20 +104,35 @@ namespace nil {
 
                     inline void process(const block_type &value, std::size_t bits) {
                         length_type cached_bits = (seen_bits - bits) % block_bits;
+                        length_type needed_to_fill_bits = block_bits - cached_bits;
+
+                        length_type new_bits_to_append = (needed_to_fill_bits > bits)? bits : needed_to_fill_bits;
 
                         if (cached_bits != 0) {
-                            std::move(value.begin(), value.begin() + (block_bits - cached_bits),
+                            //If there are already any bits in the cache
+
+                            std::move(value.begin(), value.begin() + new_bits_to_append,
                                       cache.begin() + cached_bits);
-                            cached_bits += block_bits - cached_bits;
-                            if (cached_bits == block_bits) {
+
+                            if (cached_bits + new_bits_to_append == block_bits) {
+                                //If there are enough bits in the incoming value to fill the block
                                 construction.process_block(cache, seen_bits);
-                                std::move(value.begin() + (block_bits - cached_bits), value.end(), cache.begin());
+
+                                if (bits > new_bits_to_append){
+                                    //If there are some remaining bits in the incoming value - put them into the cache
+                                    std::move(value.begin() + new_bits_to_append, value.begin() + bits, cache.begin());
+                                }
+
                             }
+
                         } else {
+                            //If there are no bits in the cache
                             if (bits == block_bits) {
+                                //The incoming value is a full block
                                 construction.process_block(value, seen_bits);
                             } else {
-                                std::move(value.begin(), value.end(), cache.begin());
+                                //The incoming value is not a full block
+                                std::move(value.begin(), value.begin() + bits, cache.begin());
                             }
                         }
                     }
@@ -132,11 +147,7 @@ namespace nil {
                                 construction.process_block(cache);
                             }
                         } else {
-                            if (bits == block_bits) {
-//                                construction.process_block(value);
-                            } else {
-                                cache[0] = value;
-                            }
+                            cache[0] = value;
                         }
                     }
 
