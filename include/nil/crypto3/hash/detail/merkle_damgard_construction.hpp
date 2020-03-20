@@ -16,6 +16,8 @@
 #include <nil/crypto3/hash/detail/nop_finalizer.hpp>
 
 #include <boost/utility/enable_if.hpp>
+
+#include <algorithm>
 //#include <iostream>
 namespace nil {
     namespace crypto3 {
@@ -82,25 +84,54 @@ namespace nil {
                     digest_type d = digest(block, seen);
                     reset();
                     return d;
+                }              
+ 
+                // this function is defined only for processing words in big-endian format
+                // crutch-crutch-crutch
+                void implode(word_type pad, int pad_bits, word_type &w, int word_bits, int data_bits) {
+                    int const shift = word_bits - (pad_bits + data_bits);
+                    word_type pad_least = pad << shift;
+                    w |= pad_least;
                 }
 
                 inline digest_type digest(const block_type &block = block_type(), length_type seen = length_type()) {
                     using namespace nil::crypto3::detail;
-
-                    /*block_type b;
-                    std::move(block.begin(), block.end(), b.begin());
-                    std::fill(b.begin() + seen, b.end(), 0);
-                    length_type t = seen / sizeof(b[0]) + 1;
-                    //std::cout << "Call " << b[t] << ":" << word_bits << " ";
-                    imploder_step<endian_type, 1, word_bits, 0>::step(1, b[t]);
-                    // imploder_step<endian_type, 1, word_bits, seen % block_bits>::step(1, b[seen / block_bits]);
-                    append_length<int>(b, seen);*/
-
-                    //std::cout<<"Seen me:" << seen << "\n";
-                    process_block(block, seen);
-
+                    block_type b;
+                    length_type head_bits = seen % block_bits; // the number of significant bits in block
+                    length_type head_words = head_bits / word_bits; // the number of significant words
+                    length_type last_bits = head_bits % word_bits; // the number of significant bits in the last significant word 
+                    // Case of full block
+                    if (!head_bits) {
+                        process_block(block);
+                        std::fill(b.begin(), b.end(), 0);
+                    }
+                    // Case of incomplete block 
+                    else {
+                        std::move(block.begin(), block.end(), b.begin());
+                        // Remove possible garbage from the block
+                        std::fill(b.begin() + head_words + 1, b.end(), 0);
+                        // Set to zero the tail bits of word with last significant bits 
+                        word_type mask = 0;
+                        if (last_bits) {
+                            //imploder_step<endian_type, last_bits, word_bits, 0>::step(~word_type(), mask);
+                            implode(~word_type(), last_bits, mask, word_bits, 0);
+                        }
+                        b[head_words] &= mask;
+                    }
+                    // Fill the block with bit 1 and length
+                    //imploder_step<endian_type, 1, word_bits, last_bits>::step(1, b[head_words]);
+                    implode(1, 1, b[head_words], word_bits, last_bits);
+                    // Create new block if there is no sufficient data to hold length in the current block
+                    if (head_bits > block_bits - length_bits - 1) {
+                        process_block(b);
+                        std::fill(b.begin(), b.end(), 0);                            
+                    }
+                    // Append length to last block
+                    append_length<int>(b, seen);
+                    // Apply finalizer                   
                     finalizer_functor finalizer;
                     finalizer(state_);
+                    // Convert digest to byte representation
                     digest_type d;
                     pack_n<endian_type, word_bits, octet_bits>(state_.data(), digest_words, d.data(), digest_bytes);
                     return d;
