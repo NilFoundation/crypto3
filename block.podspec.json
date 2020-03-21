@@ -76,6 +76,5 @@
         }
       ]
     }
-  ],
-  "source_files": "include/**/*"
+  ]
 }
