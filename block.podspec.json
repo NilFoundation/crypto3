@@ -23,13 +23,13 @@
   },
   "subspecs": [
     {
-      "name": "detail",
+      "name": "nil/crypto3/detail",
       "source_files": [
         "include/nil/crypto3/detail/*.{hpp}"
       ]
     },
     {
-      "name": "block",
+      "name": "nil/crypto3/block",
       "source_files": [
         "include/nil/crypto3/block/*.{hpp}"
       ],
