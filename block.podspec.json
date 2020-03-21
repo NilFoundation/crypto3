@@ -14,7 +14,7 @@
   },
   "source": {
     "git": "https://github.com/nilfoundation/block.git",
-    "branch": "master"
+    "branch": "15-cocoapods-podspec"
   },
   "xcconfig": {
     "CLANG_CXX_LANGUAGE_STANDARD": "c++14",
