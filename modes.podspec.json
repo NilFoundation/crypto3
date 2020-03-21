@@ -23,27 +23,32 @@
   },
   "subspecs": [
     {
-      "name": "nil",
+      "name": "include",
       "subspecs": [
         {
-          "name": "crypto3",
+          "name": "nil",
           "subspecs": [
             {
-              "name": "detail",
-              "source_files": [
-                "include/nil/crypto3/detail/*.{hpp}"
-              ]
-            },
-            {
-              "name": "modes",
-              "source_files": [
-                "include/nil/crypto3/modes/*.{hpp}"
-              ],
+              "name": "crypto3",
               "subspecs": [
                 {
-                  "name": "aead",
+                  "name": "detail",
                   "source_files": [
-                    "include/nil/crypto3/modes/aead/*.{hpp}"
+                    "include/nil/crypto3/detail/*.{hpp}"
+                  ]
+                },
+                {
+                  "name": "modes",
+                  "source_files": [
+                    "include/nil/crypto3/modes/*.{hpp}"
+                  ],
+                  "subspecs": [
+                    {
+                      "name": "aead",
+                      "source_files": [
+                        "include/nil/crypto3/modes/aead/*.{hpp}"
+                      ]
+                    }
                   ]
                 }
               ]
