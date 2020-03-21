@@ -21,6 +21,76 @@
     "CLANG_CXX_LIBRARY": "libc++",
     "HEADER_SEARCH_PATHS": "\"${PODS_ROOT}/include/\""
   },
-  "requires_arc": false,
-  "source_files": "include/**/*"
+  "subspecs": [
+    {
+      "name": "nil",
+      "subspecs": [
+        {
+          "name": "crypto3",
+          "subspecs": [
+            {
+              "name": "detail",
+              "source_files": [
+                "include/nil/crypto3/detail/*.{hpp}"
+              ]
+            },
+            {
+              "name": "passhash",
+              "source_files": [
+                "include/nil/crypto3/passhash/*.{hpp}"
+              ],
+              "subspecs": [
+                {
+                  "name": "algorithm",
+                  "source_files": [
+                    "include/nil/crypto3/passhash/algorithm/*.{hpp}"
+                  ]
+                },
+                {
+                  "name": "adaptor",
+                  "source_files": [
+                    "include/nil/crypto3/passhash/adaptor/*.{hpp}"
+                  ]
+                },
+                {
+                  "name": "accumulators",
+                  "source_files": [
+                    "include/nil/crypto3/passhash/accumulators/*.{hpp}"
+                  ],
+                  "subspecs": [
+                    {
+                      "name": "parameters",
+                      "source_files": [
+                        "include/nil/crypto3/passhash/accumulators/parameters/*.{hpp}"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "detail",
+                  "source_files": [
+                    "include/nil/crypto3/passhash/detail/*.{hpp}"
+                  ],
+                  "subspecs": [
+                    {
+                      "name": "bcrypt",
+                      "source_files": [
+                        "include/nil/crypto3/passhash/detail/bcrypt/*.{hpp}"
+                      ]
+                    },
+                    {
+                      "name": "passhash9",
+                      "source_files": [
+                        "include/nil/crypto3/passhash/detail/passhash9/*.{hpp}"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
 }
