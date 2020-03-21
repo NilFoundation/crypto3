@@ -23,39 +23,44 @@
   },
   "subspecs": [
     {
-      "name": "nil/crypto3/detail",
-      "source_files": [
-        "include/nil/crypto3/detail/*.{hpp}"
-      ]
-    },
-    {
-      "name": "nil/crypto3/block",
-      "source_files": [
-        "include/nil/crypto3/block/*.{hpp}"
-      ],
+      "name": "nil",
       "subspecs": [
         {
-          "name": "algorithm",
+          "name": "detail",
           "source_files": [
-            "include/nil/crypto3/block/algorithm/*.{hpp}"
+            "include/nil/crypto3/detail/*.{hpp}"
           ]
         },
         {
-          "name": "adaptor",
+          "name": "block",
           "source_files": [
-            "include/nil/crypto3/block/adaptor/*.{hpp}"
-          ]
-        },
-        {
-          "name": "accumulators",
-          "source_files": [
-            "include/nil/crypto3/block/accumulators/*.{hpp}"
+            "include/nil/crypto3/block/*.{hpp}"
           ],
           "subspecs": [
             {
-              "name": "parameters",
+              "name": "algorithm",
               "source_files": [
-                "include/nil/crypto3/block/accumulators/parameters/*.{hpp}"
+                "include/nil/crypto3/block/algorithm/*.{hpp}"
+              ]
+            },
+            {
+              "name": "adaptor",
+              "source_files": [
+                "include/nil/crypto3/block/adaptor/*.{hpp}"
+              ]
+            },
+            {
+              "name": "accumulators",
+              "source_files": [
+                "include/nil/crypto3/block/accumulators/*.{hpp}"
+              ],
+              "subspecs": [
+                {
+                  "name": "parameters",
+                  "source_files": [
+                    "include/nil/crypto3/block/accumulators/parameters/*.{hpp}"
+                  ]
+                }
               ]
             }
           ]
