@@ -23,53 +23,58 @@
   },
   "subspecs": [
     {
-      "name": "nil",
+      "name": "include",
       "subspecs": [
         {
-          "name": "crypto3",
+          "name": "nil",
           "subspecs": [
             {
-              "name": "detail",
-              "source_files": [
-                "include/nil/crypto3/detail/*.{hpp}"
-              ]
-            },
-            {
-              "name": "codec",
-              "source_files": [
-                "include/nil/crypto3/codec/*.{hpp}"
-              ],
+              "name": "crypto3",
               "subspecs": [
-                {
-                  "name": "algorithm",
-                  "source_files": [
-                    "include/nil/crypto3/codec/algorithm/*.{hpp}"
-                  ]
-                },
-                {
-                  "name": "adaptor",
-                  "source_files": [
-                    "include/nil/crypto3/codec/adaptor/*.{hpp}"
-                  ]
-                },
-                {
-                  "name": "accumulators",
-                  "source_files": [
-                    "include/nil/crypto3/codec/accumulators/*.{hpp}"
-                  ],
-                  "subspecs": [
-                    {
-                      "name": "parameters",
-                      "source_files": [
-                        "include/nil/crypto3/codec/accumulators/parameters/*.{hpp}"
-                      ]
-                    }
-                  ]
-                },
                 {
                   "name": "detail",
                   "source_files": [
-                    "include/nil/crypto3/codec/detail/*.{hpp}"
+                    "include/nil/crypto3/detail/*.{hpp}"
+                  ]
+                },
+                {
+                  "name": "codec",
+                  "source_files": [
+                    "include/nil/crypto3/codec/*.{hpp}"
+                  ],
+                  "subspecs": [
+                    {
+                      "name": "algorithm",
+                      "source_files": [
+                        "include/nil/crypto3/codec/algorithm/*.{hpp}"
+                      ]
+                    },
+                    {
+                      "name": "adaptor",
+                      "source_files": [
+                        "include/nil/crypto3/codec/adaptor/*.{hpp}"
+                      ]
+                    },
+                    {
+                      "name": "accumulators",
+                      "source_files": [
+                        "include/nil/crypto3/codec/accumulators/*.{hpp}"
+                      ],
+                      "subspecs": [
+                        {
+                          "name": "parameters",
+                          "source_files": [
+                            "include/nil/crypto3/codec/accumulators/parameters/*.{hpp}"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "name": "detail",
+                      "source_files": [
+                        "include/nil/crypto3/codec/detail/*.{hpp}"
+                      ]
+                    }
                   ]
                 }
               ]
