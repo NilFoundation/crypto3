@@ -23,77 +23,82 @@
   },
   "subspecs": [
     {
-      "name": "nil",
+      "name": "include",
       "subspecs": [
         {
-          "name": "crypto3",
+          "name": "nil",
           "subspecs": [
             {
-              "name": "detail",
-              "source_files": [
-                "include/nil/crypto3/detail/*.{hpp}"
-              ]
-            },
-            {
-              "name": "stream",
-              "source_files": [
-                "include/nil/crypto3/stream/*.{hpp}"
-              ],
+              "name": "crypto3",
               "subspecs": [
-                {
-                  "name": "algorithm",
-                  "source_files": [
-                    "include/nil/crypto3/stream/algorithm/*.{hpp}"
-                  ]
-                },
-                {
-                  "name": "adaptor",
-                  "source_files": [
-                    "include/nil/crypto3/stream/adaptor/*.{hpp}"
-                  ]
-                },
-                {
-                  "name": "accumulators",
-                  "source_files": [
-                    "include/nil/crypto3/stream/accumulators/*.{hpp}"
-                  ],
-                  "subspecs": [
-                    {
-                      "name": "parameters",
-                      "source_files": [
-                        "include/nil/crypto3/stream/accumulators/parameters/*.{hpp}"
-                      ]
-                    }
-                  ]
-                },
                 {
                   "name": "detail",
                   "source_files": [
-                    "include/nil/crypto3/stream/detail/*.{hpp}"
+                    "include/nil/crypto3/detail/*.{hpp}"
+                  ]
+                },
+                {
+                  "name": "stream",
+                  "source_files": [
+                    "include/nil/crypto3/stream/*.{hpp}"
                   ],
                   "subspecs": [
                     {
-                      "name": "chacha",
+                      "name": "algorithm",
                       "source_files": [
-                        "include/nil/crypto3/stream/detail/chacha/*.{hpp}"
+                        "include/nil/crypto3/stream/algorithm/*.{hpp}"
                       ]
                     },
                     {
-                      "name": "ctr",
+                      "name": "adaptor",
                       "source_files": [
-                        "include/nil/crypto3/stream/detail/ctr/*.{hpp}"
+                        "include/nil/crypto3/stream/adaptor/*.{hpp}"
                       ]
                     },
                     {
-                      "name": "rc4",
+                      "name": "accumulators",
                       "source_files": [
-                        "include/nil/crypto3/stream/detail/rc4/*.{hpp}"
+                        "include/nil/crypto3/stream/accumulators/*.{hpp}"
+                      ],
+                      "subspecs": [
+                        {
+                          "name": "parameters",
+                          "source_files": [
+                            "include/nil/crypto3/stream/accumulators/parameters/*.{hpp}"
+                          ]
+                        }
                       ]
                     },
                     {
-                      "name": "salsa20",
+                      "name": "detail",
                       "source_files": [
-                        "include/nil/crypto3/stream/detail/salsa20/*.{hpp}"
+                        "include/nil/crypto3/stream/detail/*.{hpp}"
+                      ],
+                      "subspecs": [
+                        {
+                          "name": "chacha",
+                          "source_files": [
+                            "include/nil/crypto3/stream/detail/chacha/*.{hpp}"
+                          ]
+                        },
+                        {
+                          "name": "ctr",
+                          "source_files": [
+                            "include/nil/crypto3/stream/detail/ctr/*.{hpp}"
+                          ]
+                        },
+                        {
+                          "name": "rc4",
+                          "source_files": [
+                            "include/nil/crypto3/stream/detail/rc4/*.{hpp}"
+                          ]
+                        },
+                        {
+                          "name": "salsa20",
+                          "source_files": [
+                            "include/nil/crypto3/stream/detail/salsa20/*.{hpp}"
+                          ]
+                        }
                       ]
                     }
                   ]
