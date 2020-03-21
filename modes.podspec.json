@@ -21,6 +21,36 @@
     "CLANG_CXX_LIBRARY": "libc++",
     "HEADER_SEARCH_PATHS": "\"${PODS_ROOT}/include/\""
   },
-  "requires_arc": false,
-  "source_files": "include/**/*"
+  "subspecs": [
+    {
+      "name": "nil",
+      "subspecs": [
+        {
+          "name": "crypto3",
+          "subspecs": [
+            {
+              "name": "detail",
+              "source_files": [
+                "include/nil/crypto3/detail/*.{hpp}"
+              ]
+            },
+            {
+              "name": "modes",
+              "source_files": [
+                "include/nil/crypto3/modes/*.{hpp}"
+              ],
+              "subspecs": [
+                {
+                  "name": "aead",
+                  "source_files": [
+                    "include/nil/crypto3/modes/aead/*.{hpp}"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
 }
