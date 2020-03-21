@@ -21,7 +21,46 @@
     "CLANG_CXX_LIBRARY": "libc++",
     "HEADER_SEARCH_PATHS": "\"${PODS_ROOT}/include/\""
   },
-  "public_header_files": "include/**/*.{hpp}",
-  "header_dir": "include",
-  "header_mappings_dir": "include"
+  "subspecs": [
+    {
+      "name": "detail",
+      "source_files": [
+        "include/nil/crypto3/detail/*.{hpp}"
+      ]
+    },
+    {
+      "name": "block",
+      "source_files": [
+        "include/nil/crypto3/block/*.{hpp}"
+      ],
+      "subspecs": [
+        {
+          "name": "algorithm",
+          "source_files": [
+            "include/nil/crypto3/block/algorithm/*.{hpp}"
+          ]
+        },
+        {
+          "name": "adaptor",
+          "source_files": [
+            "include/nil/crypto3/block/adaptor/*.{hpp}"
+          ]
+        },
+        {
+          "name": "accumulators",
+          "source_files": [
+            "include/nil/crypto3/block/accumulators/*.{hpp}"
+          ],
+          "subspecs": [
+            {
+              "name": "parameters",
+              "source_files": [
+                "include/nil/crypto3/block/accumulators/parameters/*.{hpp}"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
 }
