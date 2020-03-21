@@ -1,0 +1,25 @@
+{
+  "name": "Crypto3.PBKDF",
+  "version": "0.1.0",
+  "summary": "=nil; Crypto3 C++ Cryptography Suite Cipher PBKDF",
+  "description": "Crypto3.PBKDF library extends the =nil; Foundation's cryptography suite and provides a set of password-based key derivation functions implemented in way C++ standard library implies: concepts, algorithms, predictable behavior, latest standard features support and clean architecture without compromising security and performance.",
+  "homepage": "http://crypto3.nil.foundation/projects/crypto3",
+  "license": "Boost Software License",
+  "authors": {
+    "Mikhail Komarov": "nemo@nil.foundation"
+  },
+  "platforms": {
+    "ios": "5.0",
+    "osx": "10.7"
+  },
+  "source": {
+    "git": "https://github.com/nilfoundation/pbkdf.git",
+    "branch": "master"
+  },
+  "xcconfig": {
+    "CLANG_CXX_LANGUAGE_STANDARD": "c++14",
+    "CLANG_CXX_LIBRARY": "libc++",
+    "HEADER_SEARCH_PATHS": "\"${PODS_ROOT}/include/\""
+  },
+  "requires_arc": false
+}
