@@ -21,6 +21,82 @@
     "CLANG_CXX_LIBRARY": "libc++",
     "HEADER_SEARCH_PATHS": "\"${PODS_ROOT}/include/\""
   },
-  "requires_arc": false,
-  "source_files": "include/**/*"
+  "subspecs": [
+    {
+      "name": "nil",
+      "subspecs": [
+        {
+          "name": "crypto3",
+          "subspecs": [
+            {
+              "name": "detail",
+              "source_files": [
+                "include/nil/crypto3/detail/*.{hpp}"
+              ]
+            },
+            {
+              "name": "pbkdf",
+              "source_files": [
+                "include/nil/crypto3/pbkdf/*.{hpp}"
+              ],
+              "subspecs": [
+                {
+                  "name": "algorithm",
+                  "source_files": [
+                    "include/nil/crypto3/pbkdf/algorithm/*.{hpp}"
+                  ]
+                },
+                {
+                  "name": "adaptor",
+                  "source_files": [
+                    "include/nil/crypto3/pbkdf/adaptor/*.{hpp}"
+                  ]
+                },
+                {
+                  "name": "accumulators",
+                  "source_files": [
+                    "include/nil/crypto3/pbkdf/accumulators/*.{hpp}"
+                  ],
+                  "subspecs": [
+                    {
+                      "name": "parameters",
+                      "source_files": [
+                        "include/nil/crypto3/pbkdf/accumulators/parameters/*.{hpp}"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "detail",
+                  "source_files": [
+                    "include/nil/crypto3/pbkdf/detail/*.{hpp}"
+                  ],
+                  "subspecs": [
+                    {
+                      "name": "pbkdf1",
+                      "source_files": [
+                        "include/nil/crypto3/pbkdf/detail/pbkdf1/*.{hpp}"
+                      ]
+                    },
+                    {
+                      "name": "pbkdf2",
+                      "source_files": [
+                        "include/nil/crypto3/pbkdf/detail/pbkdf2/*.{hpp}"
+                      ]
+                    },
+                    {
+                      "name": "pgp_s2k",
+                      "source_files": [
+                        "include/nil/crypto3/pbkdf/detail/pgp_s2k/*.{hpp}"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
 }
