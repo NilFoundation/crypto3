@@ -23,53 +23,58 @@
   },
   "subspecs": [
     {
-      "name": "nil",
+      "name": "include",
       "subspecs": [
         {
-          "name": "crypto3",
+          "name": "nil",
           "subspecs": [
             {
-              "name": "detail",
-              "source_files": [
-                "include/nil/crypto3/detail/*.{hpp}"
-              ]
-            },
-            {
-              "name": "vdf",
-              "source_files": [
-                "include/nil/crypto3/vdf/*.{hpp}"
-              ],
+              "name": "crypto3",
               "subspecs": [
-                {
-                  "name": "algorithm",
-                  "source_files": [
-                    "include/nil/crypto3/vdf/algorithm/*.{hpp}"
-                  ]
-                },
-                {
-                  "name": "adaptor",
-                  "source_files": [
-                    "include/nil/crypto3/vdf/adaptor/*.{hpp}"
-                  ]
-                },
-                {
-                  "name": "accumulators",
-                  "source_files": [
-                    "include/nil/crypto3/vdf/accumulators/*.{hpp}"
-                  ],
-                  "subspecs": [
-                    {
-                      "name": "parameters",
-                      "source_files": [
-                        "include/nil/crypto3/vdf/accumulators/parameters/*.{hpp}"
-                      ]
-                    }
-                  ]
-                },
                 {
                   "name": "detail",
                   "source_files": [
-                    "include/nil/crypto3/vdf/detail/*.{hpp}"
+                    "include/nil/crypto3/detail/*.{hpp}"
+                  ]
+                },
+                {
+                  "name": "vdf",
+                  "source_files": [
+                    "include/nil/crypto3/vdf/*.{hpp}"
+                  ],
+                  "subspecs": [
+                    {
+                      "name": "algorithm",
+                      "source_files": [
+                        "include/nil/crypto3/vdf/algorithm/*.{hpp}"
+                      ]
+                    },
+                    {
+                      "name": "adaptor",
+                      "source_files": [
+                        "include/nil/crypto3/vdf/adaptor/*.{hpp}"
+                      ]
+                    },
+                    {
+                      "name": "accumulators",
+                      "source_files": [
+                        "include/nil/crypto3/vdf/accumulators/*.{hpp}"
+                      ],
+                      "subspecs": [
+                        {
+                          "name": "parameters",
+                          "source_files": [
+                            "include/nil/crypto3/vdf/accumulators/parameters/*.{hpp}"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "name": "detail",
+                      "source_files": [
+                        "include/nil/crypto3/vdf/detail/*.{hpp}"
+                      ]
+                    }
                   ]
                 }
               ]
