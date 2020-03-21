@@ -23,185 +23,190 @@
   },
   "subspecs": [
     {
-      "name": "nil",
+      "name": "include",
       "subspecs": [
         {
-          "name": "crypto3",
+          "name": "nil",
           "subspecs": [
             {
-              "name": "detail",
-              "source_files": [
-                "include/nil/crypto3/detail/*.{hpp}"
-              ]
-            },
-            {
-              "name": "block",
-              "source_files": [
-                "include/nil/crypto3/block/*.{hpp}"
-              ],
+              "name": "crypto3",
               "subspecs": [
-                {
-                  "name": "algorithm",
-                  "source_files": [
-                    "include/nil/crypto3/block/algorithm/*.{hpp}"
-                  ]
-                },
-                {
-                  "name": "adaptor",
-                  "source_files": [
-                    "include/nil/crypto3/block/adaptor/*.{hpp}"
-                  ]
-                },
-                {
-                  "name": "accumulators",
-                  "source_files": [
-                    "include/nil/crypto3/block/accumulators/*.{hpp}"
-                  ],
-                  "subspecs": [
-                    {
-                      "name": "parameters",
-                      "source_files": [
-                        "include/nil/crypto3/block/accumulators/parameters/*.{hpp}"
-                      ]
-                    }
-                  ]
-                },
                 {
                   "name": "detail",
                   "source_files": [
-                    "include/nil/crypto3/block/detail/*.{hpp}"
+                    "include/nil/crypto3/detail/*.{hpp}"
+                  ]
+                },
+                {
+                  "name": "block",
+                  "source_files": [
+                    "include/nil/crypto3/block/*.{hpp}"
                   ],
                   "subspecs": [
                     {
-                      "name": "aria",
+                      "name": "algorithm",
                       "source_files": [
-                        "include/nil/crypto3/block/detail/aria/*.{hpp}"
+                        "include/nil/crypto3/block/algorithm/*.{hpp}"
                       ]
                     },
                     {
-                      "name": "blowfish",
+                      "name": "adaptor",
                       "source_files": [
-                        "include/nil/crypto3/block/detail/blowfish/*.{hpp}"
+                        "include/nil/crypto3/block/adaptor/*.{hpp}"
                       ]
                     },
                     {
-                      "name": "camellia",
+                      "name": "accumulators",
                       "source_files": [
-                        "include/nil/crypto3/block/detail/camellia/*.{hpp}"
+                        "include/nil/crypto3/block/accumulators/*.{hpp}"
+                      ],
+                      "subspecs": [
+                        {
+                          "name": "parameters",
+                          "source_files": [
+                            "include/nil/crypto3/block/accumulators/parameters/*.{hpp}"
+                          ]
+                        }
                       ]
                     },
                     {
-                      "name": "cast",
+                      "name": "detail",
                       "source_files": [
-                        "include/nil/crypto3/block/detail/cast/*.{hpp}"
-                      ]
-                    },
-                    {
-                      "name": "des",
-                      "source_files": [
-                        "include/nil/crypto3/block/detail/des/*.{hpp}"
-                      ]
-                    },
-                    {
-                      "name": "gost_28147_89",
-                      "source_files": [
-                        "include/nil/crypto3/block/detail/gost_28147_89/*.{hpp}"
-                      ]
-                    },
-                    {
-                      "name": "idea",
-                      "source_files": [
-                        "include/nil/crypto3/block/detail/idea/*.{hpp}"
-                      ]
-                    },
-                    {
-                      "name": "kasumi",
-                      "source_files": [
-                        "include/nil/crypto3/block/detail/kasumi/*.{hpp}"
-                      ]
-                    },
-                    {
-                      "name": "md4",
-                      "source_files": [
-                        "include/nil/crypto3/block/detail/md4/*.{hpp}"
-                      ]
-                    },
-                    {
-                      "name": "md5",
-                      "source_files": [
-                        "include/nil/crypto3/block/detail/md5/*.{hpp}"
-                      ]
-                    },
-                    {
-                      "name": "misty1",
-                      "source_files": [
-                        "include/nil/crypto3/block/detail/misty1/*.{hpp}"
-                      ]
-                    },
-                    {
-                      "name": "noekeon",
-                      "source_files": [
-                        "include/nil/crypto3/block/detail/noekeon/*.{hpp}"
-                      ]
-                    },
-                    {
-                      "name": "rijndael",
-                      "source_files": [
-                        "include/nil/crypto3/block/detail/rijndael/*.{hpp}"
-                      ]
-                    },
-                    {
-                      "name": "seed",
-                      "source_files": [
-                        "include/nil/crypto3/block/detail/seed/*.{hpp}"
-                      ]
-                    },
-                    {
-                      "name": "serpent",
-                      "source_files": [
-                        "include/nil/crypto3/block/detail/serpent/*.{hpp}"
-                      ]
-                    },
-                    {
-                      "name": "shacal",
-                      "source_files": [
-                        "include/nil/crypto3/block/detail/shacal/*.{hpp}"
-                      ]
-                    },
-                    {
-                      "name": "sm4",
-                      "source_files": [
-                        "include/nil/crypto3/block/detail/sm4/*.{hpp}"
-                      ]
-                    },
-                    {
-                      "name": "streebog",
-                      "source_files": [
-                        "include/nil/crypto3/block/detail/streebog/*.{hpp}"
-                      ]
-                    },
-                    {
-                      "name": "threefish",
-                      "source_files": [
-                        "include/nil/crypto3/block/detail/threefish/*.{hpp}"
-                      ]
-                    },
-                    {
-                      "name": "twofish",
-                      "source_files": [
-                        "include/nil/crypto3/block/detail/twofish/*.{hpp}"
-                      ]
-                    },
-                    {
-                      "name": "utilities",
-                      "source_files": [
-                        "include/nil/crypto3/block/detail/utilities/*.{hpp}"
-                      ]
-                    },
-                    {
-                      "name": "xtea",
-                      "source_files": [
-                        "include/nil/crypto3/block/detail/xtea/*.{hpp}"
+                        "include/nil/crypto3/block/detail/*.{hpp}"
+                      ],
+                      "subspecs": [
+                        {
+                          "name": "aria",
+                          "source_files": [
+                            "include/nil/crypto3/block/detail/aria/*.{hpp}"
+                          ]
+                        },
+                        {
+                          "name": "blowfish",
+                          "source_files": [
+                            "include/nil/crypto3/block/detail/blowfish/*.{hpp}"
+                          ]
+                        },
+                        {
+                          "name": "camellia",
+                          "source_files": [
+                            "include/nil/crypto3/block/detail/camellia/*.{hpp}"
+                          ]
+                        },
+                        {
+                          "name": "cast",
+                          "source_files": [
+                            "include/nil/crypto3/block/detail/cast/*.{hpp}"
+                          ]
+                        },
+                        {
+                          "name": "des",
+                          "source_files": [
+                            "include/nil/crypto3/block/detail/des/*.{hpp}"
+                          ]
+                        },
+                        {
+                          "name": "gost_28147_89",
+                          "source_files": [
+                            "include/nil/crypto3/block/detail/gost_28147_89/*.{hpp}"
+                          ]
+                        },
+                        {
+                          "name": "idea",
+                          "source_files": [
+                            "include/nil/crypto3/block/detail/idea/*.{hpp}"
+                          ]
+                        },
+                        {
+                          "name": "kasumi",
+                          "source_files": [
+                            "include/nil/crypto3/block/detail/kasumi/*.{hpp}"
+                          ]
+                        },
+                        {
+                          "name": "md4",
+                          "source_files": [
+                            "include/nil/crypto3/block/detail/md4/*.{hpp}"
+                          ]
+                        },
+                        {
+                          "name": "md5",
+                          "source_files": [
+                            "include/nil/crypto3/block/detail/md5/*.{hpp}"
+                          ]
+                        },
+                        {
+                          "name": "misty1",
+                          "source_files": [
+                            "include/nil/crypto3/block/detail/misty1/*.{hpp}"
+                          ]
+                        },
+                        {
+                          "name": "noekeon",
+                          "source_files": [
+                            "include/nil/crypto3/block/detail/noekeon/*.{hpp}"
+                          ]
+                        },
+                        {
+                          "name": "rijndael",
+                          "source_files": [
+                            "include/nil/crypto3/block/detail/rijndael/*.{hpp}"
+                          ]
+                        },
+                        {
+                          "name": "seed",
+                          "source_files": [
+                            "include/nil/crypto3/block/detail/seed/*.{hpp}"
+                          ]
+                        },
+                        {
+                          "name": "serpent",
+                          "source_files": [
+                            "include/nil/crypto3/block/detail/serpent/*.{hpp}"
+                          ]
+                        },
+                        {
+                          "name": "shacal",
+                          "source_files": [
+                            "include/nil/crypto3/block/detail/shacal/*.{hpp}"
+                          ]
+                        },
+                        {
+                          "name": "sm4",
+                          "source_files": [
+                            "include/nil/crypto3/block/detail/sm4/*.{hpp}"
+                          ]
+                        },
+                        {
+                          "name": "streebog",
+                          "source_files": [
+                            "include/nil/crypto3/block/detail/streebog/*.{hpp}"
+                          ]
+                        },
+                        {
+                          "name": "threefish",
+                          "source_files": [
+                            "include/nil/crypto3/block/detail/threefish/*.{hpp}"
+                          ]
+                        },
+                        {
+                          "name": "twofish",
+                          "source_files": [
+                            "include/nil/crypto3/block/detail/twofish/*.{hpp}"
+                          ]
+                        },
+                        {
+                          "name": "utilities",
+                          "source_files": [
+                            "include/nil/crypto3/block/detail/utilities/*.{hpp}"
+                          ]
+                        },
+                        {
+                          "name": "xtea",
+                          "source_files": [
+                            "include/nil/crypto3/block/detail/xtea/*.{hpp}"
+                          ]
+                        }
                       ]
                     }
                   ]
