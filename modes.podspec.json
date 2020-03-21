@@ -21,5 +21,6 @@
     "CLANG_CXX_LIBRARY": "libc++",
     "HEADER_SEARCH_PATHS": "\"${PODS_ROOT}/include/\""
   },
-  "requires_arc": false
+  "requires_arc": false,
+  "source_files": "include/**/*"
 }
