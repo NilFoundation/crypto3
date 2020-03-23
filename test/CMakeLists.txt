@@ -1,3 +1,12 @@
+#---------------------------------------------------------------------------#
+# Copyright (c) 2018-2019 Nil Foundation AG
+# Copyright (c) 2018-2019 Mikhail Komarov <nemo@nilfoundation.org>
+#
+# Distributed under the Boost Software License, Version 1.0
+# See accompanying file LICENSE_1_0.txt or copy at
+# http://www.boost.org/LICENSE_1_0.txt
+#---------------------------------------------------------------------------#
+
 include(CMTest)
 
 if(NOT Boost_UNIT_TEST_FRAMEWORK_FOUND)
@@ -49,7 +58,7 @@ set(TESTS_NAMES
     "shacal"
     "streebog"
     "sm4"
-#    "threefish"
+    #    "threefish"
     "twofish"
     "xtea"
     )
