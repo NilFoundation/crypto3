@@ -1,3 +1,12 @@
+#---------------------------------------------------------------------------#
+# Copyright (c) 2018-2019 Nil Foundation AG
+# Copyright (c) 2018-2019 Mikhail Komarov <nemo@nilfoundation.org>
+#
+# Distributed under the Boost Software License, Version 1.0
+# See accompanying file LICENSE_1_0.txt or copy at
+# http://www.boost.org/LICENSE_1_0.txt
+#---------------------------------------------------------------------------#
+
 # Try to find the MPIRXX libraries
 # MPIRXX_FOUND - system has MPIRXX lib
 # MPIRXX_INCLUDE_DIR - the MPIRXX include directory

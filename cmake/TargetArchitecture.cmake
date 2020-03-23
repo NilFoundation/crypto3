@@ -1,4 +1,11 @@
-
+#---------------------------------------------------------------------------#
+# Copyright (c) 2018-2019 Nil Foundation AG
+# Copyright (c) 2018-2019 Mikhail Komarov <nemo@nilfoundation.org>
+#
+# Distributed under the Boost Software License, Version 1.0
+# See accompanying file LICENSE_1_0.txt or copy at
+# http://www.boost.org/LICENSE_1_0.txt
+#---------------------------------------------------------------------------#
 # https://qt.gitorious.org/qt/qtbase/blobs/master/src/corelib/global/qprocessordetection.h
 # Currently handles arm (v5, v6, v7), x86 (32/64), ia64, and ppc (32/64)
 
