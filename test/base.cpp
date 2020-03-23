@@ -1,6 +1,5 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2019 Nil Foundation AG
-// Copyright (c) 2018-2019 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2019 Moskvin Aleksey <zerg1996@yandex.ru>
 //
 // Distributed under the Boost Software License, Version 1.0
