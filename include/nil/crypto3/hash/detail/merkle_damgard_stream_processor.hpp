@@ -103,7 +103,7 @@ namespace nil {
                 template<typename InputIterator>
                 merkle_damgard_stream_processor &update_n(InputIterator p, size_t n) {
                     for (; n; --n) {
-                        update_one(*p++)
+                        update_one(*p++);
                     }
                         
                     return *this;

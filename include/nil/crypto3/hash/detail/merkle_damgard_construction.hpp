@@ -18,7 +18,6 @@
 #include <boost/utility/enable_if.hpp>
 
 #include <algorithm>
-//#include <iostream>
 
 namespace nil {
     namespace crypto3 {
@@ -74,8 +73,7 @@ namespace nil {
                 BOOST_STATIC_ASSERT(!length_bits || length_bits % word_bits == 0);
 
             public:
-                template<typename Integer = std::size_t>
-                inline merkle_damgard_construction &process_block(const block_type &block, Integer seen = Integer()) {
+                inline merkle_damgard_construction &process_block(const block_type &block) {
                     compressor_functor::process_block(state_, block);
                     return *this;
                 }
@@ -85,20 +83,21 @@ namespace nil {
                     digest_type d = digest(block, seen);
                     reset();
                     return d;
-                }              
+                }
 
-                static void print_word(word_type &word) {
+                /*static void print_word(const word_type &word) {
                     for (length_type j = 0; j != word_bits; ++j)
                         std::cout << (bool) (word & (left_bits<word_type>(1) >> j));                    
                 }
 
-                static void print_bits(block_type &block) {
+                static void print_bits(const block_type &block) {
+                    std::cout<<"Here is the block: \n";
                     for (length_type i = 0; i != block_words; ++i) {
                         std::cout << "Word " << i << ": ";
                         print_word(block[i]);
                         std::cout << std::endl;
                     }
-                }
+                }*/
 
                 // Creates mask with shift left bits
                 template<typename T>
@@ -110,22 +109,24 @@ namespace nil {
                 template<typename T>
                 static T right_bits(length_type shift) {
                     return ~(~T() << shift);
-                }                  
+                }   
 
                 template<typename Endianness>
                 struct endian_shift;
 
-                template<int UnitBits> 
+                template<int UnitBits>
                 struct endian_shift<stream_endian::big_unit_big_bit<UnitBits>> {
-                    static word_type& to_msb(word_type &w, length_type shift) {                        
+                    static word_type& to_msb(word_type &w, length_type shift) {
+                        //shift to most significant bits according to endianness
                         w <<= shift;
                         return w;
                     }
                 };
 
-                template<int UnitBits> 
+                template<int UnitBits>
                 struct endian_shift<stream_endian::little_unit_big_bit<UnitBits>> {
                     static word_type& to_msb(word_type &w, length_type shift) {
+                        //shift to most significant bits according to endianness
                         length_type shift_rem = shift % UnitBits;
                         length_type shift_unit_bits = shift - shift_rem;
                         
@@ -148,9 +149,10 @@ namespace nil {
                     }
                 };
 
-                template<int UnitBits> 
+                template<int UnitBits>
                 struct endian_shift<stream_endian::big_unit_little_bit<UnitBits>> {
                     static word_type& to_msb(word_type &w, length_type shift) {
+                        //shift to most significant bits according to endianness
                         length_type shift_rem = shift % UnitBits;
                         length_type shift_unit_bits = shift - shift_rem;
 
@@ -177,6 +179,7 @@ namespace nil {
                 template<int UnitBits> 
                 struct endian_shift<stream_endian::little_unit_little_bit<UnitBits>> {
                     static word_type& to_msb(word_type &w, length_type shift) {
+                        //shift to most significant bits according to endianness
                         w >>= shift;
                         return w;
                     }
@@ -187,7 +190,9 @@ namespace nil {
 
                 template<int UnitBits>
                 struct injector<stream_endian::big_unit_big_bit<UnitBits>> {
-                    static void inject(word_type w, length_type word_seen, block_type &b, length_type block_seen) {
+                    static void inject(word_type w, length_type word_seen, block_type &b, length_type &block_seen) {
+                        //Insert word_seen-bit part of word into the block b according to endianness
+
                         // Check whether we fall out of the block
                         if (block_seen + word_seen <= block_bits) {
                             length_type last_word_ind = block_seen / word_bits;
@@ -200,6 +205,23 @@ namespace nil {
                             // If we fall out of the block word, push the remainder of element to the next block word
                             if (last_word_seen + word_seen > word_bits)
                                 b[last_word_ind + 1] = w << (word_bits - last_word_seen);
+
+                            //block_seen += word_seen;
+                        }
+                    }
+
+                    static void inject(block_type &b_src, length_type b_src_seen, block_type &b_dst, length_type &b_dst_seen) {
+                        //Insert word_seen-bit part of word into the block b according to endianness
+
+                        // Check whether we fall out of the block
+                        if (b_src_seen + b_dst_seen <= block_bits) {
+                            
+                            for (length_type i = 0; i< (b_src_seen / word_bits); i++){
+                                inject(b_src[i], word_bits, b_dst, b_dst_seen);
+                            }
+
+                            inject(b_src[b_src_seen / word_bits + (b_src_seen%word_bits? 1 : 0)], b_src_seen%word_bits, b_dst, b_dst_seen);
+
                         }
                     }
                 };
@@ -207,6 +229,8 @@ namespace nil {
                 template<int UnitBits>
                 struct injector<stream_endian::little_unit_big_bit<UnitBits>> {
                     static void inject(word_type w, length_type word_seen, block_type &b, length_type block_seen) {
+                        //Insert word_seen-bit part of word into the block b according to endianness
+
                         // Check whether we fall out of the block
                         if (block_seen + word_seen <= block_bits) {
                             length_type last_word_ind = block_seen / word_bits;
@@ -254,11 +278,28 @@ namespace nil {
                             }
                         }
                     }
+
+                    static void inject(block_type &b_src, length_type b_src_seen, block_type &b_dst, length_type &b_dst_seen) {
+                        //Insert word_seen-bit part of word into the block b according to endianness
+
+                        // Check whether we fall out of the block
+                        if (b_src_seen + b_dst_seen <= block_bits) {
+                            
+                            for (length_type i = 0; i< (b_src_seen / word_bits); i++){
+                                inject(b_src[i], word_bits, b_dst, b_dst_seen);
+                            }
+
+                            inject(b_src[b_src_seen / word_bits + (b_src_seen%word_bits? 1 : 0)], b_src_seen%word_bits, b_dst, b_dst_seen);
+
+                        }
+                    }
                 };
 
                 template<int UnitBits>
                 struct injector<stream_endian::big_unit_little_bit<UnitBits>> {
                     static void inject(word_type w, length_type word_seen, block_type &b, length_type block_seen) {
+                        //Insert word_seen-bit part of word into the block b according to endianness
+
                         // Check whether we fall out of the block
                         if (block_seen + word_seen <= block_bits) {
                             length_type last_word_ind = block_seen / word_bits;
@@ -306,11 +347,28 @@ namespace nil {
                             }
                         }
                     }
+
+                    static void inject(block_type &b_src, length_type b_src_seen, block_type &b_dst, length_type &b_dst_seen) {
+                        //Insert word_seen-bit part of word into the block b according to endianness
+
+                        // Check whether we fall out of the block
+                        if (b_src_seen + b_dst_seen <= block_bits) {
+                            
+                            for (length_type i = 0; i< (b_src_seen / word_bits); i++){
+                                inject(b_src[i], word_bits, b_dst, b_dst_seen);
+                            }
+
+                            inject(b_src[b_src_seen / word_bits + (b_src_seen%word_bits? 1 : 0)], b_src_seen%word_bits, b_dst, b_dst_seen);
+
+                        }
+                    }
                 };
 
                 template<int UnitBits>
                 struct injector<stream_endian::little_unit_little_bit<UnitBits>> {
                     static void inject(word_type w, length_type word_seen, block_type &b, length_type block_seen) {
+                        //Insert word_seen-bit part of word into the block b according to endianness
+
                         // Check whether we fall out of the block
                         if (block_seen + word_seen <= block_bits) {
                             length_type last_word_ind = block_seen / word_bits;
@@ -325,31 +383,49 @@ namespace nil {
                                 b[last_word_ind + 1] = w >> (word_bits - last_word_seen);
                         }
                     }
+
+                    static void inject(block_type &b_src, length_type b_src_seen, block_type &b_dst, length_type &b_dst_seen) {
+                        //Insert word_seen-bit part of word into the block b according to endianness
+
+                        // Check whether we fall out of the block
+                        if (b_src_seen + b_dst_seen <= block_bits) {
+                            
+                            for (length_type i = 0; i< (b_src_seen / word_bits); i++){
+                                inject(b_src[i], word_bits, b_dst, b_dst_seen);
+                            }
+
+                            inject(b_src[b_src_seen / word_bits + (b_src_seen%word_bits? 1 : 0)], b_src_seen%word_bits, b_dst, b_dst_seen);
+
+                        }
+                    }
                 };
 
                 inline digest_type digest(const block_type &block = block_type(), length_type seen = length_type()) {
+                    
                     using namespace nil::crypto3::detail;
                     block_type b;
                     length_type head_bits = seen % block_bits; // the number of significant bits in block
-                    length_type head_words = seen / word_bits; // the number of significant block words
+                    length_type head_words = (seen / word_bits) % block_words; // the number of significant block words
+
                     // Case of full block
                     if (!head_bits) {
-                        process_block(block);
                         std::fill(b.begin(), b.end(), 0);
                     }
                     // Case of incomplete block 
                     else {
+                        
                         std::move(block.begin(), block.end(), b.begin());
+
                         // Remove possible garbage from the block
-                        print_bits(b);
                         std::fill(b.begin() + head_words + 1, b.end(), 0);
+                        
                     }
                     // Fill the block with bit 1 and length
                     std::array<bool, word_bits> bit_one = {{1}};
                     std::array<word_type, 1> bit_one_word = {0};
                     pack<endian_type, 1, word_bits>(bit_one, bit_one_word);
                     injector<endian_type>::inject(bit_one_word[0], 1, b, head_bits);
-                    print_bits(b);
+                    
                     // Create new block if there is no sufficient data to hold length in the current block
                     if (head_bits > block_bits - length_bits - 1) {
                         process_block(b);
@@ -357,7 +433,10 @@ namespace nil {
                     }
                     // Append length to last block
                     append_length<int>(b, seen);
-                    print_bits(b);
+
+                    // Process the last block
+                    process_block(b);
+
                     // Apply finalizer                   
                     finalizer_functor finalizer;
                     finalizer(state_);
@@ -410,8 +489,7 @@ namespace nil {
                         block[block_words - i] = length_words_array[length_words - i];
                     }
 
-                    // Process the last block
-                    process_block(block);
+                    
                 }
                 /*
                 template<>
