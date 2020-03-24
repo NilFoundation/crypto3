@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_SUITE(sha2_test_suite)
 // http://csrc.nist.gov/groups/ST/toolkit/documents/Examples/SHA_All.pdf
 //
 
-
+/*
 BOOST_AUTO_TEST_CASE(sha2_224_subbyte0) {
     // From http://csrc.nist.gov/groups/STM/cavp/documents/shs/SHAVS.pdf
 
@@ -63,33 +63,13 @@ BOOST_AUTO_TEST_CASE(sha2_224_subbyte0) {
     std::printf("%s\n", std::to_string(d).data());
 #endif
 
-    BOOST_CHECK_EQUAL("e3b048552c3c387bcab37f6eb06bb79b96a4aee5ff27f51531a9551c", std::to_string(d).data());
-}
-/*
-BOOST_AUTO_TEST_CASE(sha2_224_subbyte) {
+    BOOST_CHECK_EQUAL("", std::to_string(d).data());
+}*/
+
+
+BOOST_AUTO_TEST_CASE(sha2_224_shortmsg_bit) {
     // From http://csrc.nist.gov/groups/STM/cavp/documents/shs/SHAVS.pdf
-
-    // B.1/1
-    std::array<char, 1> a = {'\x84'};        //0x68
-    sha2<224>::digest_type d = hash<sha2<224>>(a);
-
-    BOOST_CHECK_EQUAL("3cd36921df5d6963e73739cf4d20211e2d8877c19cff087ade9d0e3a", std::to_string(d).data());
-}
-
-
-BOOST_AUTO_TEST_CASE(sha2_224_subbyte1) {
-    // From http://csrc.nist.gov/groups/STM/cavp/documents/shs/SHAVS.pdf
-
-    // B.1/1
-    std::array<char, 10> a = {'\x00','\x64','\x70','\xd5','\x7d','\xad','\x98','\x93','\xdc','\x03'};
-    sha2<224>::digest_type d = hash<sha2<224>>(a);
-
-    BOOST_CHECK_EQUAL("c90026cda5ad24115059c62ae9add57793ade445d4742273288bbce7", std::to_string(d).data());
-}
-
-BOOST_AUTO_TEST_CASE(sha2_224_subbyte2) {
-    // From http://csrc.nist.gov/groups/STM/cavp/documents/shs/SHAVS.pdf
-
+    //      https://csrc.nist.gov/Projects/Cryptographic-Algorithm-Validation-Program/Secure-Hashing#shavs
     // B.1/1
     std::array<bool, 5> a = {0, 1, 1, 0, 1};
     sha2<224>::digest_type d = hash<sha2<224>>(a);
@@ -102,7 +82,7 @@ BOOST_AUTO_TEST_CASE(sha2_224_subbyte2) {
 }
 
 
-BOOST_AUTO_TEST_CASE(sha2_224_subbyte3) {
+BOOST_AUTO_TEST_CASE(sha2_224_shortmsg_bit1) {
     // From http://csrc.nist.gov/groups/STM/cavp/documents/shs/SHAVS.pdf
 
     // B.1/1
@@ -116,7 +96,7 @@ BOOST_AUTO_TEST_CASE(sha2_224_subbyte3) {
     BOOST_CHECK_EQUAL("869944dc261b4affdcd429d00f0bc5c43f2fe545bef20a77980098cd", std::to_string(d).data());
 }
 
-BOOST_AUTO_TEST_CASE(sha2_256_subbyte) {
+BOOST_AUTO_TEST_CASE(sha2_224_shortmsg_bit2) {
     // C.1/1
     std::array<bool, 5> a = {0, 1, 1, 0, 1};
     sha2<256>::digest_type d = hash<sha2<256>>(a);
@@ -126,7 +106,47 @@ BOOST_AUTO_TEST_CASE(sha2_256_subbyte) {
     BOOST_CHECK_EQUAL("d6d3e02a31a84a8caa9718ed6c2057be09db45e7823eb5079ce7a573a3760f95", std::to_string(d).data());
 }
 
-BOOST_AUTO_TEST_CASE(sha2_384_subbyte) {
+
+BOOST_AUTO_TEST_CASE(sha2_224_shortmsg_byte) {
+    // From http://csrc.nist.gov/groups/STM/cavp/documents/shs/SHAVS.pdf
+    //      https://csrc.nist.gov/Projects/Cryptographic-Algorithm-Validation-Program/Secure-Hashing#shavs
+    // B.1/1
+    std::array<char, 1> a = {'\x84'};
+    sha2<224>::digest_type d = hash<sha2<224>>(a);
+
+    BOOST_CHECK_EQUAL("3cd36921df5d6963e73739cf4d20211e2d8877c19cff087ade9d0e3a", std::to_string(d).data());
+}
+
+
+BOOST_AUTO_TEST_CASE(sha2_224_shortmsg_byte1) {
+    // From http://csrc.nist.gov/groups/STM/cavp/documents/shs/SHAVS.pdf
+    //      https://csrc.nist.gov/Projects/Cryptographic-Algorithm-Validation-Program/Secure-Hashing#shavs
+    // B.1/1
+    std::array<char, 10> a = {'\x00','\x64','\x70','\xd5','\x7d','\xad','\x98','\x93','\xdc','\x03'};
+    sha2<224>::digest_type d = hash<sha2<224>>(a);
+
+    BOOST_CHECK_EQUAL("c90026cda5ad24115059c62ae9add57793ade445d4742273288bbce7", std::to_string(d).data());
+}
+
+
+BOOST_AUTO_TEST_CASE(sha2_256_shortmsg_byte) {
+    // From https://csrc.nist.gov/Projects/Cryptographic-Algorithm-Validation-Program/Secure-Hashing#shavs
+    std::array<char, 7> a = {'\x06', '\xe0', '\x76', '\xf5', '\xa4', '\x42', '\xd5'};
+    sha2<256>::digest_type d = hash<sha2<256>>(a);
+
+    BOOST_CHECK_EQUAL("3fd877e27450e6bbd5d74bb82f9870c64c66e109418baa8e6bbcff355e287926", std::to_string(d).data());
+}
+
+
+BOOST_AUTO_TEST_CASE(sha2_256_shortmsg_byte1) {
+    // From https://csrc.nist.gov/Projects/Cryptographic-Algorithm-Validation-Program/Secure-Hashing#shavs
+    std::array<char, 22> a = {'\xea', '\x15', '\x7c', '\x02', '\xeb', '\xaf', '\x1b', '\x22', '\xde', '\x22', '\x1b', '\x53', '\xf2', '\x35', '\x39', '\x36', '\xd2', '\x35', '\x9d', '\x1e', '\x1c', '\x97'};
+    sha2<256>::digest_type d = hash<sha2<256>>(a);
+
+    BOOST_CHECK_EQUAL("9df5c16a3f580406f07d96149303d8c408869b32053b726cf3defd241e484957", std::to_string(d).data());
+}
+
+BOOST_AUTO_TEST_CASE(sha2_384_shortmsg_bit) {
     // D.1/1
     std::array<bool, 5> a = {0, 0, 0, 1, 0};
     sha2<384>::digest_type d = hash<sha2<384>>(a);
@@ -138,7 +158,24 @@ BOOST_AUTO_TEST_CASE(sha2_384_subbyte) {
         std::to_string(d).data());
 }
 
-BOOST_AUTO_TEST_CASE(sha2_512_subbyte) {
+BOOST_AUTO_TEST_CASE(sha2_384_shortmsg_byte) {
+    // From https://csrc.nist.gov/Projects/Cryptographic-Algorithm-Validation-Program/Secure-Hashing#shavs
+    std::array<char, 2> a = {'\x6e','\xce'};
+    sha2<384>::digest_type d = hash<sha2<384>>(a);
+
+    BOOST_CHECK_EQUAL("53d4773da50d8be4145d8f3a7098ff3691a554a29ae6f652cc7121eb8bc96fd2210e06ae2fa2a36c4b3b3497341e70f0", std::to_string(d).data());
+}
+
+
+BOOST_AUTO_TEST_CASE(sha2_384_shortmsg_byte2) {
+    // From https://csrc.nist.gov/Projects/Cryptographic-Algorithm-Validation-Program/Secure-Hashing#shavs
+    std::array<char, 12> a = {'\x22', '\x09', '\x11', '\x2e', '\xe7', '\x79', '\xbf', '\x6d', '\x95', '\x71', '\x11', '\x05'};
+    sha2<384>::digest_type d = hash<sha2<384>>(a);
+
+    BOOST_CHECK_EQUAL("09c54bf533a26c7447caa5783db2ec7ef5e55752da7f2a2c4e360982a94ec1ca2cb6a157d34eed28de978b4145e17ebc", std::to_string(d).data());
+}
+
+BOOST_AUTO_TEST_CASE(sha2_512_shortmsg_bit) {
     // E.1/1
     std::array<bool, 5> a = {1, 0, 1, 1, 0};
     sha2<512>::digest_type d = hash<sha2<512>>(a);
@@ -151,12 +188,22 @@ BOOST_AUTO_TEST_CASE(sha2_512_subbyte) {
         std::to_string(d).data());
 }
 
-BOOST_FIXTURE_TEST_CASE(sha2_256_empty_accumulator, fixture<256>) {
-    BOOST_CHECK_NO_THROW(hash_t::digest_type s = (extract::hash<hash_t>(acc)));
 
-#ifdef CRYPTO3_HASH_SHOW_PROGRESS
-    std::printf("%s\n", std::to_string(s).data());
-#endif
+BOOST_AUTO_TEST_CASE(sha2_512_shortmsg_byte) {
+    // From https://csrc.nist.gov/Projects/Cryptographic-Algorithm-Validation-Program/Secure-Hashing#shavs
+    std::array<char, 5> a = {'\xeb', '\x0c', '\xa9', '\x46', '\xc1'};
+    sha2<512>::digest_type d = hash<sha2<512>>(a);
+
+    BOOST_CHECK_EQUAL("d39ecedfe6e705a821aee4f58bfc489c3d9433eb4ac1b03a97e321a2586b40dd0522f40fa5aef36afff591a78c916bfc6d1ca515c4983dd8695b1ec7951d723e", std::to_string(d).data());
+}
+
+
+BOOST_AUTO_TEST_CASE(sha2_512_shortmsg_byte2) {
+    // From https://csrc.nist.gov/Projects/Cryptographic-Algorithm-Validation-Program/Secure-Hashing#shavs
+    std::array<char, 20> a = {'\xe0', '\x70', '\x56', '\xd4', '\xf7', '\x27', '\x7b', '\xc5', '\x48', '\x09', '\x95', '\x77', '\x72', '\x0a', '\x58', '\x1e', '\xec', '\x94', '\x14', '\x1d'};
+    sha2<512>::digest_type d = hash<sha2<512>>(a);
+
+    BOOST_CHECK_EQUAL("59f1856303ff165e2ab5683dddeb6e8ad81f15bb578579b999eb5746680f22cfec6dba741e591ca4d9e53904837701b374be74bbc0847a92179ac2b67496d807", std::to_string(d).data());
 }
 
 BOOST_FIXTURE_TEST_CASE(sha2_256_accumulator1, fixture<256>) {
@@ -634,5 +681,5 @@ BOOST_AUTO_TEST_CASE(sha512_various_hash2) {
         "de0ff244877ea60a4cb0432ce577c31beb009c5c2c49aa2e4eadb217ad8cc09b",
         std::to_string(h).data());
 }
-*/
+
 BOOST_AUTO_TEST_SUITE_END()

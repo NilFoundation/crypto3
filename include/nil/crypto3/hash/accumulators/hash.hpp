@@ -2,6 +2,7 @@
 // Copyright (c) 2018-2019 Nil Foundation AG
 // Copyright (c) 2018-2019 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2019 Aleksey Moskvin <zerg1996@yandex.ru>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -41,6 +42,8 @@ namespace nil {
                     typedef typename hash_type::construction::type construction_type;
                     typedef typename hash_type::construction::params_type params_type;
 
+                    typedef typename params_type::digest_endian endian_type;
+
                     constexpr static const std::size_t word_bits = construction_type::word_bits;
                     typedef typename construction_type::word_type word_type;
 
@@ -64,19 +67,19 @@ namespace nil {
                     typedef typename hash_type::digest_type result_type;
 
                     // The constructor takes an argument pack.
-                    hash_impl(boost::accumulators::dont_care) : seen_bits(0), cache_words(0) {
+                    hash_impl(boost::accumulators::dont_care) : total_seen(0), cache_words(0) {
                     }
 
                     template<typename ArgumentPack>
                     inline void operator()(const ArgumentPack &args) {
-                        seen_bits = extract::bits_count(args);
+                        total_seen = extract::bits_count(args);
                         resolve_type(args[boost::accumulators::sample],
                                      args[::nil::crypto3::accumulators::bits | std::size_t()]);
                     }
 
                     inline result_type result(boost::accumulators::dont_care) const {
                         construction_type res = construction;
-                        return res.digest(cache, seen_bits);
+                        return res.digest(cache, total_seen);
                     }
 
                 protected:
@@ -102,56 +105,77 @@ namespace nil {
                         }
                     }
 
-                    inline void process(const block_type &value, std::size_t bits) {
-                        length_type cached_bits = (seen_bits - bits) % block_bits;
-                        length_type needed_to_fill_bits = block_bits - cached_bits;
-
-                        length_type new_bits_to_append = (needed_to_fill_bits > bits)? bits : needed_to_fill_bits;
-
+                    inline void process(const block_type &value, std::size_t value_seen) {
+                        length_type cached_bits = (total_seen - value_seen) % block_bits;
+                        
                         if (cached_bits != 0) {
                             //If there are already any bits in the cache
+
+                            length_type needed_to_fill_bits = block_bits - cached_bits;
+                            length_type new_bits_to_append = (needed_to_fill_bits > value_seen)? value_seen : needed_to_fill_bits;
+
 
                             std::move(value.begin(), value.begin() + new_bits_to_append,
                                       cache.begin() + cached_bits);
 
                             if (cached_bits + new_bits_to_append == block_bits) {
                                 //If there are enough bits in the incoming value to fill the block
-                                construction.process_block(cache, seen_bits);
+                                construction.process_block(cache);
 
-                                if (bits > new_bits_to_append){
+                                if (value_seen > new_bits_to_append){
                                     //If there are some remaining bits in the incoming value - put them into the cache
-                                    std::move(value.begin() + new_bits_to_append, value.begin() + bits, cache.begin());
+                                    std::move(value.begin() + new_bits_to_append, value.begin() + value_seen, cache.begin());
+                                }
+
+                            }
+
+
+
+
+
+
+
+                        } else {
+                            //If there are no bits in the cache
+                            if (value_seen == block_bits) {
+                                //The incoming value is a full block
+                                construction.process_block(value);
+                            } else {
+                                //The incoming value is not a full block
+                                std::move(value.begin(), value.begin() + value_seen/word_bits + (value_seen%word_bits? 1 : 0), cache.begin());
+                            }
+                        }
+                    }
+
+                    inline void process(const word_type &value, std::size_t value_seen) {
+                        length_type cached_bits = (seen_bits - bits) % block_bits;
+
+
+                        
+
+                        if (cached_bits != 0) {
+                            length_type needed_to_fill_bits = block_bits - cached_bits;
+                            length_type new_bits_to_append = (needed_to_fill_bits > value_seen)? value_seen : needed_to_fill_bits;
+
+                            construction::injector<endian_type>::inject(value, new_bits_to_append, cache, cached_bits);
+
+                            if (cached_bits + new_bits_to_append == block_bits) {
+                                //If there are enough bits in the incoming value to fill the block
+                                construction.process_block(cache);
+
+                                if (value_seen > new_bits_to_append){
+                                    //If there are some remaining bits in the incoming value - put them into the cache, which is now empty
+                                    construction::injector<endian_type>::inject(value, new_bits_to_append, cache, 0, false);
                                 }
 
                             }
 
                         } else {
-                            //If there are no bits in the cache
-                            if (bits == block_bits) {
-                                //The incoming value is a full block
-                                construction.process_block(value, seen_bits);
-                            } else {
-                                //The incoming value is not a full block
-                                std::move(value.begin(), value.begin() + bits, cache.begin());
-                            }
-                        }
-                    }
-
-                    inline void process(const word_type &value, std::size_t bits) {
-                        length_type cached_bits = (seen_bits - bits) % block_bits;
-
-                        if (cached_bits != 0) {
-                            cache[cached_bits + 1] = value;
-                            cached_bits += block_bits - cached_bits;
-                            if (cached_bits == block_bits) {
-                                construction.process_block(cache);
-                            }
-                        } else {
                             cache[0] = value;
                         }
                     }
 
-                    length_type seen_bits, cache_words;
+                    length_type total_seen;
                     block_type cache;
                     construction_type construction;
                 };

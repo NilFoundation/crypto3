@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2019 Nil Foundation AG
 // Copyright (c) 2018-2019 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -44,15 +45,11 @@ namespace nil {
                 typedef Params params_type;
 
                 constexpr static const std::size_t word_bits = construction_type::word_bits;
-                typedef typename construction_type::word_type word_type;
 
                 constexpr static const std::size_t block_bits = construction_type::block_bits;
-                constexpr static const std::size_t block_words = construction_type::block_words;
                 typedef typename construction_type::block_type block_type;
 
             public:
-                typedef typename construction_type::digest_type digest_type;
-
                 typedef typename params_type::endian endian_type;
 
                 constexpr static const std::size_t value_bits = params_type::value_bits;
@@ -67,7 +64,7 @@ namespace nil {
                 constexpr static const std::size_t length_type_bits =
                     length_bits < word_bits ? word_bits : length_bits > 64 ? 64 : length_bits;
                 typedef typename boost::uint_t<length_type_bits>::least length_type;
-                constexpr static const std::size_t length_words = length_bits / word_bits;
+
                 BOOST_STATIC_ASSERT(!length_bits || length_bits % word_bits == 0);
                 BOOST_STATIC_ASSERT(block_bits % value_bits == 0);
 
@@ -82,32 +79,6 @@ namespace nil {
 
                     // Process the block
                     acc(block, accumulators::bits = bb);
-                }
-
-                template<typename Dummy>
-                typename boost::enable_if_c<length_bits && sizeof(Dummy)>::type append_length(length_type length) {
-                    using namespace nil::crypto3::detail;
-
-                    length_type seen = accumulators::extract::bits_count(acc);
-                    // Convert the input into words
-                    block_type block;
-                    pack<endian_type, value_bits, word_bits>(value_array, block);
-
-                    // Append length
-                    std::array<length_type, 1> length_array = {{length}};
-                    std::array<word_type, length_words> length_words_array;
-                    pack<endian_type, length_bits, word_bits>(length_array, length_words_array);
-                    for (std::size_t i = length_words; i; --i) {
-                        block[block_words - i] = length_words_array[length_words - i];
-                    }
-
-                    // Process the last block
-                    acc(block, accumulators::bits = seen % block_bits);
-                }
-
-                template<typename Dummy>
-                typename boost::disable_if_c<length_bits && sizeof(Dummy)>::type append_length(length_type) {
-                    // No appending requested, so nothing to do
                 }
 
             public:
@@ -131,38 +102,10 @@ namespace nil {
 
                 template<typename InputIterator>
                 merkle_damgard_stream_processor &update_n(InputIterator p, size_t n) {
-                    //std::cout << "Value bits:" << value_bits << "\n";
-                    using namespace nil::crypto3::detail;
-                    using namespace boost::accumulators;
-#ifndef CRYPTO3_HASH_NO_OPTIMIZATION
-                    length_type seen = accumulators::extract::bits_count(acc);
-                    if (seen % block_bits != 0) {
-                        // Process first values out of n that can be placed into the same block
-                        for (; n && (seen % block_bits); --n, ++p) {
-                            value_array[cache_size] = *p;
-                            ++cache_size;
-                            seen += value_bits;
-                        }
-                        process_block(cache_size * value_bits);
-                        cache_size = 0;
+                    for (; n; --n) {
+                        update_one(*p++)
                     }
-                    for (; n >= block_values; n -= block_values, p += block_values) {
-                        // Convert the input into words
-                        block_type block;
-                        pack_n<endian_type, value_bits, word_bits>(p, block_values, std::begin(block), block_words);
-
-                        // Process the block
-                        std::size_t bb = block_bits;
-                        acc(block, accumulators::bits = bb);
-                    }
-#endif
-                    // Process last values out of n
-                    for (; n; --n, ++p) {
-                        value_array[cache_size] = *p;
-                        ++cache_size;
-                    }
-                    //process_block(cache_size * value_bits);
-                    //cache_size = 0;
+                        
                     return *this;
                 }
 
@@ -197,47 +140,10 @@ namespace nil {
                     return update_n(c.data(), c.size());
                 }
 
-                merkle_damgard_stream_processor &end_message() {
-                    using namespace nil::crypto3::detail;
-                    // seen is the number of processed bits
-                    // The length of message is the sum of current acc size and number of cached elements 
-                    length_type seen = accumulators::extract::bits_count(acc) + cache_size * value_bits, length = seen;
-
-                    //std::cout<<"Seen: "<<seen<<" Len:"<<length<<"\n";
-
-                    // Add a 1 bit
-#ifdef CRYPTO3_HASH_NO_OPTIMIZATION
-                    std::array<bool, value_bits> padding_bits = {{1}};
-                    std::array<value_type, 1> padding_values;
-                    pack<endian_type, 1, value_bits>(padding_bits, padding_values);
-                    update_one(padding_values[0]);
-#else
-                    value_type pad = 0;
-                    
-                    imploder_step<endian_type, 1, value_bits, 0>::step(1, pad);
-                    update_one(pad);
-                    
-#endif
-                    // Add value_bits size of value {1 bit} to processed bits number
-                    seen += value_bits;
-                    // Pad with 0 bits
-                    //std::cout<<"Cache size before while:"<<(std::size_t)cache_size <<"\n";
-                    while ((seen + length_bits) % block_bits != 0) {
-                        update_one(value_type());
-                        seen += value_bits;
-                    }
-                    //std::cout<<"Cache size after while:"<<(std::size_t)cache_size <<"\n";
-                    // Append length
-                    append_length<int>(length);
-
-                    cache_size = 0;
-                    
-                    return *this;
-                }
 
             public:
                 merkle_damgard_stream_processor(accumulator_type &acc) :
-                    acc(acc), value_array(), block_hash(), cache_size(0) {
+                    acc(acc), value_array(), cache_size(0) {
                 }
 
                 virtual ~merkle_damgard_stream_processor() {
@@ -254,14 +160,12 @@ namespace nil {
 
                 void reset() {
                     cache_size = 0;
-                    block_hash.reset();
                 }
 
             private:
                 accumulator_type &acc;
 
                 value_array_type value_array;
-                construction_type block_hash;
                 length_type cache_size;
             };
         }    // namespace hash
