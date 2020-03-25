@@ -1,5 +1,5 @@
 {
-  "name": "Crypto3.MAC",
+  "name": "crypto3.mac",
   "version": "0.1.0",
   "summary": "=nil; Crypto3 C++ Cryptography Suite MAC",
   "description": "Crypto3.MAC library extends the =nil; Foundation's cryptography suite and provides a set of message authentication codes implemented in way C++ standard library implies: concepts, algorithms, predictable behavior, latest standard features support and clean architecture without compromising security and performance.",
