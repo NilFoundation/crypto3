@@ -1,5 +1,5 @@
 {
-  "name": "Crypto3.PBKDF",
+  "name": "crypto3.pbkdf",
   "version": "0.1.0",
   "summary": "=nil; Crypto3 C++ Cryptography Suite Cipher PBKDF",
   "description": "Crypto3.PBKDF library extends the =nil; Foundation's cryptography suite and provides a set of password-based key derivation functions implemented in way C++ standard library implies: concepts, algorithms, predictable behavior, latest standard features support and clean architecture without compromising security and performance.",
