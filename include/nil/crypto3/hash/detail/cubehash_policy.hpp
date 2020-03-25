@@ -14,7 +14,7 @@
 
 #include <nil/crypto3/detail/static_digest.hpp>
 
-#include <nil/crypto3/hash/detail/basic_functions.hpp>
+#include <nil/crypto3/detail/basic_functions.hpp>
 
 #include <boost/static_assert.hpp>
 
@@ -43,7 +43,7 @@ namespace nil {
                 // For details, see http://cubehash.cr.yp.to/
                 //
 
-                struct basic_cubehash_policy : public basic_functions<32> {
+                struct basic_cubehash_policy : public ::nil::crypto3::detail::basic_functions<32> {
 
                     // Note that this is a policy for a compressor,
                     // so it used different terminology from the c policies

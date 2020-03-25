@@ -11,18 +11,18 @@
 #define CRYPTO3_BLAKE2B_POLICY_HPP
 
 #include <nil/crypto3/detail/static_digest.hpp>
-#include <nil/crypto3/hash/detail/basic_functions.hpp>
+#include <nil/crypto3/detail/basic_functions.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace hash {
             namespace detail {
                 template<std::size_t DigestBits>
-                struct blake2b_policy : public basic_functions<64> {
+                struct blake2b_policy : public ::nil::crypto3::detail::basic_functions<64> {
                     constexpr static const std::size_t rounds = 12;
 
-                    constexpr static const std::size_t word_bits = basic_functions<64>::word_bits;
-                    typedef typename basic_functions<64>::word_type word_type;
+                    constexpr static const std::size_t word_bits = ::nil::crypto3::detail::basic_functions<64>::word_bits;
+                    typedef typename ::nil::crypto3::detail::basic_functions<64>::word_type word_type;
 
                     constexpr static const std::size_t digest_bits = DigestBits;
                     typedef static_digest<digest_bits> digest_type;

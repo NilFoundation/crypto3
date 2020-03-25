@@ -28,7 +28,7 @@
 
 #include <nil/crypto3/hash/accumulators/parameters/bits.hpp>
 #include <nil/crypto3/hash/accumulators/parameters/salt.hpp>
-#include <nil/crypto3/detail/inject.hpp>
+//#include <nil/crypto3/detail/inject.hpp>
 
 #include <boost/accumulators/statistics/count.hpp>
 
@@ -44,9 +44,7 @@ namespace nil {
                     typedef typename hash_type::construction::params_type params_type;
 
 
-                    typedef typename params_type::digest_endian ;
-
-                    typedef typename ::nil::crypto3::detail::endianness_utils<hash_type>::injector_struct::inject inject;
+                    typedef typename params_type::digest_endian endian_type;
 
 
                     constexpr static const std::size_t word_bits = construction_type::word_bits;
@@ -432,7 +430,7 @@ namespace nil {
                             length_type new_bits_to_append = (needed_to_fill_bits > value_seen)? value_seen : needed_to_fill_bits;
 
                             //injector<endian_type>::inject(value, new_bits_to_append, cache, cached_bits);
-                            inject(value, new_bits_to_append, cache, cached_bits);
+                            injector<endian_type>::inject(value, new_bits_to_append, cache, cached_bits);
 
                             if (cached_bits == block_bits) {
                                 //If there are enough bits in the incoming value to fill the block

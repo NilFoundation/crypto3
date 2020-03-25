@@ -10,16 +10,16 @@
 #ifndef CRYPTO3_BASIC_TIGER_POLICY_HPP
 #define CRYPTO3_BASIC_TIGER_POLICY_HPP
 
-#include <nil/crypto3/hash/detail/basic_functions.hpp>
+#include <nil/crypto3/detail/basic_functions.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace hash {
             namespace detail {
                 template<std::size_t DigestBits>
-                struct basic_tiger_policy : public basic_functions<64> {
-                    constexpr static const std::size_t word_bits = basic_functions<64>::word_bits;
-                    typedef typename basic_functions<64>::word_type word_type;
+                struct basic_tiger_policy : public ::nil::crypto3::detail::basic_functions<64> {
+                    constexpr static const std::size_t word_bits = ::nil::crypto3::detail::basic_functions<64>::word_bits;
+                    typedef typename ::nil::crypto3::detail::basic_functions<64>::word_type word_type;
 
                     constexpr static const std::size_t block_bits = DigestBits;
                     constexpr static const std::size_t block_words = block_bits / word_bits;

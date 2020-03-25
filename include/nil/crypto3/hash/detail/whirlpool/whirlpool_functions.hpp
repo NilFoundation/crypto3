@@ -10,13 +10,13 @@
 #ifndef CRYPTO3_WHIRLPOOL_FUNCTIONS_HPP
 #define CRYPTO3_WHIRLPOOL_FUNCTIONS_HPP
 
-#include <nil/crypto3/hash/detail/basic_functions.hpp>
+#include <nil/crypto3/detail/basic_functions.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace hash {
             namespace detail {
-                struct whirlpool_functions : public basic_functions<64> {
+                struct whirlpool_functions : public ::nil::crypto3::detail::basic_functions<64> {
 
                 };
             }

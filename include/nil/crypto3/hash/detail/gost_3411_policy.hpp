@@ -11,17 +11,17 @@
 #define CRYPTO3_GOST_3411_POLICY_HPP
 
 #include <nil/crypto3/detail/static_digest.hpp>
-#include <nil/crypto3/hash/detail/basic_functions.hpp>
+#include <nil/crypto3/detail/basic_functions.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace hash {
             namespace detail {
-                struct gost_3411_policy : public basic_functions<32> {
+                struct gost_3411_policy : public ::nil::crypto3::detail::basic_functions<32> {
                     constexpr static const std::size_t rounds = 32;
 
-                    constexpr static const std::size_t word_bits = basic_functions<32>::word_bits;
-                    typedef typename basic_functions<32>::word_type word_type;
+                    constexpr static const std::size_t word_bits = ::nil::crypto3::detail::basic_functions<32>::word_bits;
+                    typedef typename ::nil::crypto3::detail::basic_functions<32>::word_type word_type;
 
                     constexpr static const std::size_t digest_bits = 256;
                     typedef static_digest<digest_bits> digest_type;

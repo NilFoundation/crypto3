@@ -10,14 +10,14 @@
 #ifndef CRYPTO3_SKEIN_POLICY_HPP
 #define CRYPTO3_SKEIN_POLICY_HPP
 
-#include <nil/crypto3/hash/detail/basic_functions.hpp>
+#include <nil/crypto3/detail/basic_functions.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace hash {
             namespace detail {
                 template<std::size_t DigestBits>
-                struct skein_policy : public basic_functions<64> {
+                struct skein_policy : public ::nil::crypto3::detail::basic_functions<64> {
                     typedef typename block::threefish<DigestBits> block_cipher_type;
 
                     constexpr static const std::size_t digest_bits = DigestBits;

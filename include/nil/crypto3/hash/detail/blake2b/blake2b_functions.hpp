@@ -35,6 +35,8 @@ namespace nil {
 
                     inline static void g(word_type &a, word_type &b, word_type &c, word_type &d, word_type M0,
                                          word_type M1) {
+                        using namespace ::nil::crypto3::detail;
+
                         a = a + b + M0;
                         d = basic_functions<64>::template rotr<32>(d ^ a);
                         c = c + d;

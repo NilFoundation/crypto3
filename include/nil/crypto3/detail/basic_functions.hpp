@@ -14,13 +14,11 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace hash {
-            namespace detail {
+        namespace detail {
 
-                using block::detail::basic_functions;
+            using block::detail::basic_functions;
 
-            }    // namespace detail
-        }        // namespace hash
+        }    // namespace detail
     }            // namespace crypto3
 }    // namespace nil
 
