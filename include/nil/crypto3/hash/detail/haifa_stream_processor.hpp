@@ -1,11 +1,13 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2019 Nil Foundation AG
 // Copyright (c) 2018-2019 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
+
 
 #ifndef CRYPTO3_HASH_HAIFA_STATE_PREPROCESSOR_HPP
 #define CRYPTO3_HASH_HAIFA_STATE_PREPROCESSOR_HPP
@@ -36,20 +38,16 @@ namespace nil {
              * @tparam StateAccumulator
              * @tparam Params
              */
-            template<typename Hash, typename StateAccumulator, typename Params>
+            template<typename Construction, typename StateAccumulator, typename Params>
             class haifa_stream_processor {
             protected:
-                typedef typename Hash::type construction_type;
+                typedef typename Construction::type construction_type;
                 typedef StateAccumulator accumulator_type;
                 typedef Params params_type;
 
-                typedef typename boost::uint_t<CHAR_BIT> byte_type;
-
                 constexpr static const std::size_t word_bits = construction_type::word_bits;
-                typedef typename construction_type::word_type word_type;
 
                 constexpr static const std::size_t block_bits = construction_type::block_bits;
-                constexpr static const std::size_t block_words = construction_type::block_words;
                 typedef typename construction_type::block_type block_type;
 
             public:
@@ -61,113 +59,75 @@ namespace nil {
                 constexpr static const std::size_t block_values = block_bits / value_bits;
                 typedef std::array<value_type, block_values> value_array_type;
 
-                typedef typename construction_type::digest_type digest_type;
-
             protected:
                 constexpr static const std::size_t length_bits = params_type::length_bits;
                 // FIXME: do something more intelligent than capping at 64
                 constexpr static const std::size_t length_type_bits =
                     length_bits < word_bits ? word_bits : length_bits > 64 ? 64 : length_bits;
                 typedef typename boost::uint_t<length_type_bits>::least length_type;
-                constexpr static const std::size_t length_words = length_bits / word_bits;
+
                 BOOST_STATIC_ASSERT(!length_bits || length_bits % word_bits == 0);
                 BOOST_STATIC_ASSERT(block_bits % value_bits == 0);
 
                 BOOST_STATIC_ASSERT(!length_bits || value_bits <= length_bits);
 
-                void process_block() {
+                inline void process_block(std::size_t bb = block_bits) {
+                    using namespace nil::crypto3::detail;
+
                     // Convert the input into words
                     block_type block;
-                    ::nil::crypto3::detail::pack<endian_type, value_bits, word_bits>(value_array, block);
+                    pack<endian_type, value_bits, word_bits>(value_array, block);
 
                     // Process the block
-                    std::size_t bb = block_bits;
                     acc(block, accumulators::bits = bb);
-
-                    // Reset seen if we don't need to track the length
-                    if (!length_bits) {
-                        seen = 0;
-                    }
-                }
-
-                template<typename Dummy>
-                typename boost::enable_if_c<length_bits && sizeof(Dummy)>::type append_length(length_type length) {
-                    // Convert the input into words
-                    block_type block;
-                    ::nil::crypto3::detail::pack<endian_type, value_bits, word_bits>(value_array, block);
-
-                    // Append length
-                    std::array<length_type, 1> length_array = {{length}};
-                    std::array<word_type, length_words> length_words_array;
-                    ::nil::crypto3::detail::pack<endian_type, length_bits, word_bits>(length_array, length_words_array);
-                    for (std::size_t i = length_words; i; --i) {
-                        block[block_words - i] = length_words_array[length_words - i];
-                    }
-
-                    // Process the last block
-                    std::size_t bb = block_bits;
-                    acc(block, accumulators::bits = bb, accumulators::salt = construction_type::salt_value);
-                }
-
-                template<typename Dummy>
-                typename boost::disable_if_c<length_bits && sizeof(Dummy)>::type append_length(length_type) {
-                    // No appending requested, so nothing to do
                 }
 
             public:
                 haifa_stream_processor &update_one(value_type value) {
-                    std::size_t i = seen % block_bits;
-                    std::size_t j = i / value_bits;
-                    value_array[j] = value;
-                    seen += value_bits;
-                    if (i == block_bits - value_bits) {
+                    //std::cout << "Value bits one:" << value_bits << "\n";
+                    value_array[cache_size] = value;
+                    ++cache_size;
+                    if (cache_size == block_values) {
                         // Process the completed block
                         process_block();
+                        cache_size = 0;
                     }
+                    return *this;
+                }
+
+                haifa_stream_processor &update_last() {
+                    process_block(cache_size * value_bits);
+                    cache_size = 0;
                     return *this;
                 }
 
                 template<typename InputIterator>
                 haifa_stream_processor &update_n(InputIterator p, size_t n) {
-#ifndef CRYPTO3_HASH_NO_OPTIMIZATION
-                    for (; n && (seen % block_bits); --n, ++p) {
-                        update_one(*p);
+                    for (; n; --n) {
+                        update_one(*p++);
                     }
-                    for (; n >= block_values; n -= block_values, p += block_values) {
-                        // Convert the input into words
-                        block_type block;
-                        ::nil::crypto3::detail::pack_n<endian_type, value_bits, word_bits>(
-                            p, block_values, std::begin(block), block_words);
-
-                        // Process the block
-                        std::size_t bb = block_bits;
-                        acc(block, accumulators::bits = bb);
-                        seen += block_bits;
-
-                        // Reset seen if we don't need to track the length
-                        if (!length_bits) {
-                            seen = 0;
-                        }
-                    }
-#endif
-                    for (; n; --n, ++p) {
-                        update_one(*p);
-                    }
+                        
                     return *this;
                 }
 
                 template<typename InputIterator>
                 inline haifa_stream_processor &operator()(InputIterator b, InputIterator e,
-                                                          std::random_access_iterator_tag) {
-                    return update_n(b, e - b);
+                                                                   std::random_access_iterator_tag) {
+                     while (b != e) {
+                        update_one(*b++);
+                    }
+
+                    return update_last();
+                    //return update_n(b, e - b).end_message();
                 }
 
                 template<typename InputIterator, typename Category>
-                inline haifa_stream_processor &operator()(InputIterator first, InputIterator last, Category) {
-                    while (first != last) {
-                        update_one(*first++);
+                inline haifa_stream_processor &operator()(InputIterator b, InputIterator e, Category) {
+                    while (b != e) {
+                        update_one(*b++);
                     }
-                    return *this;
+
+                    return update_last();
                 }
 
                 template<typename InputIterator>
@@ -181,60 +141,36 @@ namespace nil {
                     return update_n(c.data(), c.size());
                 }
 
-                digest_type end_message() {
-                    using namespace nil::crypto3::detail;
-
-                    length_type length = seen;
-
-                    // Add a 1 bit
-#ifdef CRYPTO3_HASH_NO_OPTIMIZATION
-                    std::array<bool, ValueBits> padding_bits = {{1}};
-                    std::array<value_type, 1> padding_values;
-                    ::nil::crypto3::detail::pack<endian, 1, ValueBits>(padding_bits, padding_values);
-                    update_one(padding_values[0]);
-#else
-                    value_type pad = 0;
-                    ::nil::crypto3::detail::imploder_step<endian_type, 1, value_bits, 0>::step(1, pad);
-                    update_one(pad);
-#endif
-
-                    // Pad with 0 bits
-                    while ((seen + length_bits) % block_bits != 0) {
-                        update_one(value_type());
-                    }
-
-                    // Append length
-                    append_length<int>(length);
-
-                    // Reset for next message
-                    seen = 0;
-
-                    // Calculate static_digest and reset block_hash
-                    return block_hash.end_message();
-                }
-
-                digest_type digest() const {
-                    return haifa_stream_processor(*this).end_message();
-                }
 
             public:
-                haifa_stream_processor(accumulator_type &acc) : acc(acc), value_array(), block_hash(), seen() {
+                haifa_stream_processor(accumulator_type &acc) :
+                    acc(acc), value_array(), cache_size(0) {
+                }
+
+                virtual ~haifa_stream_processor() {
+                    //                    using namespace nil::crypto3::detail;
+                    //
+                    //                    // Convert the input into words
+                    //                    block_type block;
+                    //                    pack<endian_type, value_bits, word_bits>(value_array, block);
+                    //
+                    //                    // Process the block
+                    //                    std::size_t bb = block_bits;
+                    //                    acc(block, accumulators::bits = bb);
                 }
 
                 void reset() {
-                    seen = 0;
-                    block_hash.reset();
+                    cache_size = 0;
                 }
 
             private:
                 accumulator_type &acc;
 
                 value_array_type value_array;
-                construction_type block_hash;
-                length_type seen;
+                length_type cache_size;
             };
         }    // namespace hash
     }        // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_HASH_STREAM_PROCESSOR_HPP
+#endif
