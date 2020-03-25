@@ -1,5 +1,5 @@
 {
-  "name": "Crypto3.Passhash",
+  "name": "crypto3.passhash",
   "version": "0.1.0",
   "summary": "=nil; Crypto3 C++ Cryptography Suite Cipher Passhash",
   "description": "Crypto3.Passhash library extends the =nil; Foundation's cryptography suite and provides a set of password hashing techniques implemented in way C++ standard library implies: concepts, algorithms, predictable behavior, latest standard features support and clean architecture without compromising security and performance.",
