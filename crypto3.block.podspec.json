@@ -1,5 +1,5 @@
 {
-  "name": "Crypto3.Block",
+  "name": "crypto3.block",
   "version": "0.1.0",
   "summary": "=nil; Crypto3 C++ Cryptography Suite Block Ciphers",
   "description": "Crypto3.Block library extends the =nil; Foundation's cryptography suite and provides a set of block ciphers implemented in way C++ standard library implies: concepts, algorithms, predictable behavior, latest standard features support and clean architecture without compromising security and performance.",
