@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2019 Nil Foundation AG
 // Copyright (c) 2018-2019 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -21,7 +22,7 @@ namespace nil {
         namespace detail {
 
             template<typename Endianness, std::size_t WordBits>
-            struct endian_shift ;//: public ::nil::crypto3::detail::basic_functions<WordBits>  ;
+            struct endian_shift;
 
             template<int UnitBits, std::size_t WordBits>
             struct endian_shift<stream_endian::big_unit_big_bit<UnitBits>, WordBits> : public ::nil::crypto3::detail::basic_functions<WordBits>   {

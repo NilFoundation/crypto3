@@ -12,48 +12,35 @@
 #ifndef CRYPTO3_INJECT_HASH_HPP
 #define CRYPTO3_INJECT_HASH_HPP
 
-#include <boost/parameter/value_type.hpp>
 
-#include <boost/accumulators/framework/accumulator_base.hpp>
-#include <boost/accumulators/framework/extractor.hpp>
-#include <boost/accumulators/framework/depends_on.hpp>
-#include <boost/accumulators/framework/parameters/sample.hpp>
-
-#include <boost/container/static_vector.hpp>
-
-#include <nil/crypto3/detail/make_array.hpp>
-#include <nil/crypto3/detail/static_digest.hpp>
 #include <nil/crypto3/detail/stream_endian.hpp>
 #include <nil/crypto3/detail/basic_functions.hpp>
 #include <nil/crypto3/detail/unbounded_shift.hpp>
 
-
-#include <nil/crypto3/hash/accumulators/bits_count.hpp>
-
-#include <nil/crypto3/hash/accumulators/parameters/bits.hpp>
-#include <nil/crypto3/hash/accumulators/parameters/salt.hpp>
-
-#include <boost/accumulators/statistics/count.hpp>
-
 namespace nil {
     namespace crypto3 {
         namespace detail {
-            
-
-                /*
                 
-                template<typename Endianness>
-                struct injector;
+                template<typename Endianness, std::size_t WordBits, std::size_t BlockWords, std::size_t BlockBits>
+                struct word_injector;
 
-                template<int UnitBits>
-                struct injector<stream_endian::big_unit_big_bit<UnitBits>> {
-                    static void inject(word_type w, length_type word_seen, block_type &b, length_type &block_seen) {
+                template<int UnitBits, std::size_t WordBits, std::size_t BlockWords, std::size_t BlockBits>
+                struct word_injector<stream_endian::big_unit_big_bit<UnitBits>, WordBits, BlockWords, BlockBits> : public basic_functions<WordBits>{
+
+                    constexpr static const std::size_t word_bits = ::nil::crypto3::detail::basic_functions<WordBits>::word_bits;
+                    typedef typename ::nil::crypto3::detail::basic_functions<WordBits>::word_type word_type;
+
+                    typedef std::array<word_type, BlockWords> block_type;
+
+                    //constexpr static const std::size_t  block_bits = word_bits * BlockWords ;
+
+                    static void inject(word_type w, size_t word_seen, block_type &b, size_t &block_seen) {
                         //Insert word_seen-bit part of word into the block b according to endianness
-                        using namespace nil::crypto3::detail;
+                        
                         // Check whether we fall out of the block
-                        if (block_seen + word_seen <= block_bits) {
-                            length_type last_word_ind = block_seen / word_bits;
-                            length_type last_word_seen = block_seen % word_bits;
+                        if (block_seen + word_seen <= BlockBits) {
+                            size_t last_word_ind = block_seen / word_bits;
+                            size_t last_word_seen = block_seen % word_bits;
                             // Remove garbage
                             w &= high_bits<word_type, word_bits>(~word_type(), word_seen);
                             b[last_word_ind] &= high_bits<word_type, word_bits>(~word_type(), last_word_seen);
@@ -67,50 +54,41 @@ namespace nil {
                             block_seen += word_seen;
                         }
                     }
-
-                    static void inject(const block_type &b_src, length_type b_src_seen, block_type &b_dst, length_type &b_dst_seen) {
-                        //Insert word_seen-bit part of word into the block b according to endianness
-
-                        // Check whether we fall out of the block
-                        if (b_src_seen + b_dst_seen <= block_bits) {
-                            
-                            for (length_type i = 0; i< (b_src_seen / word_bits); i++){
-                                inject(b_src[i], word_bits, b_dst, b_dst_seen);
-                            }
-
-                            if(b_src_seen%word_bits){
-                                inject(b_src[b_src_seen / word_bits], b_src_seen%word_bits, b_dst, b_dst_seen);
-                            }
-
-                        }
-                    }
                 };
 
-                template<int UnitBits>
-                struct injector<stream_endian::little_unit_big_bit<UnitBits>> {
-                    static void inject(word_type w, length_type word_seen, block_type &b, length_type block_seen) {
+                template<int UnitBits, std::size_t WordBits, std::size_t BlockWords, std::size_t BlockBits>
+                struct word_injector<stream_endian::little_unit_big_bit<UnitBits>, WordBits, BlockWords, BlockBits> : public basic_functions<WordBits>{
+
+                    constexpr static const std::size_t word_bits = ::nil::crypto3::detail::basic_functions<WordBits>::word_bits;
+                    typedef typename ::nil::crypto3::detail::basic_functions<WordBits>::word_type word_type;
+
+                    typedef std::array<word_type, BlockWords> block_type;
+
+                    //constexpr static const std::size_t  block_bits = word_bits * BlockWords ;
+
+                    static void inject(word_type w, size_t word_seen, block_type &b, size_t block_seen) {
                         //Insert word_seen-bit part of word into the block b according to endianness
-                        using namespace nil::crypto3::detail;
+                        
                         // Check whether we fall out of the block
-                        if (block_seen + word_seen <= block_bits) {
-                            length_type last_word_ind = block_seen / word_bits;
-                            length_type last_word_seen = block_seen % word_bits;
+                        if (block_seen + word_seen <= BlockBits) {
+                            size_t last_word_ind = block_seen / word_bits;
+                            size_t last_word_seen = block_seen % word_bits;
                             // Remove garbage
-                            length_type w_rem = word_seen % UnitBits;
-                            length_type w_unit_bits = word_seen - w_rem;
+                            size_t w_rem = word_seen % UnitBits;
+                            size_t w_unit_bits = word_seen - w_rem;
                             word_type mask = low_bits<word_type, word_bits>(~word_type(), w_unit_bits) 
                             | (low_bits<word_type, word_bits>(~word_type(), w_rem) << (w_unit_bits + UnitBits - w_rem)); 
                             w &= mask; 
-                            length_type b_rem = last_word_seen % UnitBits;
-                            length_type b_unit_bits = last_word_seen - b_rem;
+                            size_t b_rem = last_word_seen % UnitBits;
+                            size_t b_unit_bits = last_word_seen - b_rem;
                             mask = low_bits<word_type, word_bits>(~word_type(), b_unit_bits) 
                             | (low_bits<word_type, word_bits>(~word_type(), b_rem) << (b_unit_bits + UnitBits - b_rem));
                             b[last_word_ind] &= mask;   
                             // Split and combine parts of unit values
-                            length_type sz[2] = {UnitBits - b_rem, b_rem};
+                            size_t sz[2] = {UnitBits - b_rem, b_rem};
                             word_type masks[2] = {low_bits<word_type, word_bits>(~word_type(), UnitBits - b_rem) << b_rem, 
                                 low_bits<word_type, word_bits>(~word_type(), b_rem)};
-                            length_type bw_space = word_bits - last_word_seen;
+                            size_t bw_space = word_bits - last_word_seen;
                             word_type w_split = 0;
                             std::size_t sz_ind = 0;
                               
@@ -143,48 +121,41 @@ namespace nil {
                             block_seen += word_seen;
                         }
                     }
-
-                    static void inject(const block_type &b_src, length_type b_src_seen, block_type &b_dst, length_type &b_dst_seen) {
-                        //Insert word_seen-bit part of word into the block b according to endianness
-
-                        // Check whether we fall out of the block
-                        if (b_src_seen + b_dst_seen <= block_bits) {
-                            
-                            for (length_type i = 0; i< (b_src_seen / word_bits); i++){
-                                inject(b_src[i], word_bits, b_dst, b_dst_seen);
-                            }
-
-                            inject(b_src[b_src_seen / word_bits + (b_src_seen%word_bits? 1 : 0)], b_src_seen%word_bits, b_dst, b_dst_seen);
-
-                        }
-                    }
                 };
 
-                template<int UnitBits>
-                struct injector<stream_endian::big_unit_little_bit<UnitBits>> {
-                    static void inject(word_type w, length_type word_seen, block_type &b, length_type block_seen) {
+                template<int UnitBits, std::size_t WordBits, std::size_t BlockWords, std::size_t BlockBits>
+                struct word_injector<stream_endian::big_unit_little_bit<UnitBits>, WordBits, BlockWords, BlockBits> : public basic_functions<WordBits>{
+
+                    constexpr static const std::size_t word_bits = ::nil::crypto3::detail::basic_functions<WordBits>::word_bits;
+                    typedef typename ::nil::crypto3::detail::basic_functions<WordBits>::word_type word_type;
+
+                    typedef std::array<word_type, BlockWords> block_type;
+
+                    //constexpr static const std::size_t  block_bits = word_bits * BlockWords ;
+
+                    static void inject(word_type w, size_t word_seen, block_type &b, size_t block_seen) {
                         //Insert word_seen-bit part of word into the block b according to endianness
                         using namespace nil::crypto3::detail;
                         // Check whether we fall out of the block
-                        if (block_seen + word_seen <= block_bits) {
-                            length_type last_word_ind = block_seen / word_bits;
-                            length_type last_word_seen = block_seen % word_bits;
+                        if (block_seen + word_seen <= BlockBits) {
+                            size_t last_word_ind = block_seen / word_bits;
+                            size_t last_word_seen = block_seen % word_bits;
                             // Remove garbage
-                            length_type w_rem = word_seen % UnitBits;
-                            length_type w_unit_bits = word_seen - w_rem;
+                            size_t w_rem = word_seen % UnitBits;
+                            size_t w_unit_bits = word_seen - w_rem;
                             word_type mask = high_bits<word_type, word_bits>(~word_type(), w_unit_bits) 
                             | (high_bits<word_type, word_bits>(~word_type(), w_rem) >> (w_unit_bits + UnitBits - w_rem)); 
                             w &= mask; 
-                            length_type b_rem = last_word_seen % UnitBits;
-                            length_type b_unit_bits = last_word_seen - b_rem;
+                            size_t b_rem = last_word_seen % UnitBits;
+                            size_t b_unit_bits = last_word_seen - b_rem;
                             mask = high_bits<word_type, word_bits>(~word_type(), b_unit_bits) 
                             | (high_bits<word_type, word_bits>(~word_type(), b_rem) >> (b_unit_bits + UnitBits - b_rem));
                             b[last_word_ind] &= mask; 
                             // Split and combine parts of unit values 
-                            length_type sz[2] = {UnitBits - b_rem, b_rem};
+                            size_t sz[2] = {UnitBits - b_rem, b_rem};
                             word_type masks[2] = {high_bits<word_type, word_bits>(~word_type(), UnitBits - b_rem) >> b_rem, 
                                 high_bits<word_type, word_bits>(~word_type(), b_rem)};
-                            length_type bw_space = word_bits - last_word_seen;
+                            size_t bw_space = word_bits - last_word_seen;
                             word_type w_split = 0;
                             std::size_t sz_ind = 0;
                              
@@ -216,32 +187,25 @@ namespace nil {
                             block_seen += word_seen;
                         }
                     }
-
-                    static void inject(const block_type &b_src, length_type b_src_seen, block_type &b_dst, length_type &b_dst_seen) {
-                        //Insert word_seen-bit part of word into the block b according to endianness
-
-                        // Check whether we fall out of the block
-                        if (b_src_seen + b_dst_seen <= block_bits) {
-                            
-                            for (length_type i = 0; i< (b_src_seen / word_bits); i++){
-                                inject(b_src[i], word_bits, b_dst, b_dst_seen);
-                            }
-
-                            inject(b_src[b_src_seen / word_bits + (b_src_seen%word_bits? 1 : 0)], b_src_seen%word_bits, b_dst, b_dst_seen);
-
-                        }
-                    }
                 };
 
-                template<int UnitBits>
-                struct injector<stream_endian::little_unit_little_bit<UnitBits>> {
-                    static void inject(word_type w, length_type word_seen, block_type &b, length_type block_seen) {
+                template<int UnitBits, std::size_t WordBits, std::size_t BlockWords, std::size_t BlockBits>
+                struct word_injector<stream_endian::little_unit_little_bit<UnitBits>, WordBits, BlockWords, BlockBits> : public basic_functions<WordBits>{
+
+                    constexpr static const std::size_t word_bits = ::nil::crypto3::detail::basic_functions<WordBits>::word_bits;
+                    typedef typename ::nil::crypto3::detail::basic_functions<WordBits>::word_type word_type;
+
+                    typedef std::array<word_type, BlockWords> block_type;
+
+                    //constexpr static const std::size_t  block_bits = word_bits * BlockWords ;
+
+                    static void inject(word_type w, size_t word_seen, block_type &b, size_t block_seen) {
                         //Insert word_seen-bit part of word into the block b according to endianness
                         using namespace nil::crypto3::detail;
                         // Check whether we fall out of the block
-                        if (block_seen + word_seen <= block_bits) {
-                            length_type last_word_ind = block_seen / word_bits;
-                            length_type last_word_seen = block_seen % word_bits;
+                        if (block_seen + word_seen <= BlockBits) {
+                            size_t last_word_ind = block_seen / word_bits;
+                            size_t last_word_seen = block_seen % word_bits;
                             // Remove garbage
                             w &= low_bits<word_type, word_bits>(~word_type(), word_seen);
                             b[last_word_ind] &= low_bits<word_type, word_bits>(~word_type(), last_word_seen);
@@ -254,24 +218,39 @@ namespace nil {
                             block_seen += word_seen;
                         }
                     }
+                };
 
-                    static void inject(const block_type &b_src, length_type b_src_seen, block_type &b_dst, length_type &b_dst_seen) {
+                template<typename Endianness, std::size_t WordBits, std::size_t BlockWords, std::size_t BlockBits>
+                struct injector: word_injector<Endianness, WordBits, BlockWords, BlockBits>{
+
+                    constexpr static const std::size_t word_bits = ::nil::crypto3::detail::basic_functions<WordBits>::word_bits;
+                    typedef typename ::nil::crypto3::detail::basic_functions<WordBits>::word_type word_type;
+
+                    typedef std::array<word_type, BlockWords> block_type;
+
+                    //constexpr static const std::size_t  block_bits = word_bits * BlockWords ;
+
+                    static void inject(const block_type &b_src, size_t b_src_seen, block_type &b_dst, size_t &b_dst_seen) {
                         //Insert word_seen-bit part of word into the block b according to endianness
 
                         // Check whether we fall out of the block
-                        if (b_src_seen + b_dst_seen <= block_bits) {
+                        if (b_src_seen + b_dst_seen <= BlockBits) {
                             
-                            for (length_type i = 0; i< (b_src_seen / word_bits); i++){
+                            for (size_t i = 0; i< (b_src_seen / word_bits); i++){
                                 inject(b_src[i], word_bits, b_dst, b_dst_seen);
                             }
 
-                            inject(b_src[b_src_seen / word_bits + (b_src_seen%word_bits? 1 : 0)], b_src_seen%word_bits, b_dst, b_dst_seen);
+                            if(b_src_seen%word_bits){
+                                inject(b_src[b_src_seen / word_bits], b_src_seen%word_bits, b_dst, b_dst_seen);
+                            }
 
                         }
                     }
-                };
 
-                */
+                    static void inject(word_type w, size_t word_seen, block_type &b, size_t &block_seen){
+                        word_injector<Endianness, WordBits, BlockWords, BlockBits>::inject(w, word_seen, b, block_seen);
+                    }
+                };
                     
         }        // namespace detail
     }            // namespace crypto3

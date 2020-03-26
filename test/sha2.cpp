@@ -66,7 +66,7 @@ BOOST_AUTO_TEST_CASE(sha2_224_subbyte0) {
     BOOST_CHECK_EQUAL("", std::to_string(d).data());
 }*/
 
-/*
+
 BOOST_AUTO_TEST_CASE(sha2_224_shortmsg_bit) {
     // From http://csrc.nist.gov/groups/STM/cavp/documents/shs/SHAVS.pdf
     //      https://csrc.nist.gov/Projects/Cryptographic-Algorithm-Validation-Program/Secure-Hashing#shavs
@@ -79,8 +79,8 @@ BOOST_AUTO_TEST_CASE(sha2_224_shortmsg_bit) {
 #endif
 
     BOOST_CHECK_EQUAL("e3b048552c3c387bcab37f6eb06bb79b96a4aee5ff27f51531a9551c", std::to_string(d).data());
-}*/
-/*
+}
+
 
 BOOST_AUTO_TEST_CASE(sha2_224_shortmsg_bit1) {
     // From http://csrc.nist.gov/groups/STM/cavp/documents/shs/SHAVS.pdf
@@ -205,7 +205,7 @@ BOOST_AUTO_TEST_CASE(sha2_512_shortmsg_byte2) {
 
     BOOST_CHECK_EQUAL("59f1856303ff165e2ab5683dddeb6e8ad81f15bb578579b999eb5746680f22cfec6dba741e591ca4d9e53904837701b374be74bbc0847a92179ac2b67496d807", std::to_string(d).data());
 }
-
+/*
 BOOST_FIXTURE_TEST_CASE(sha2_256_accumulator1, fixture<256>) {
     // 0-length input: echo -n | sha256sum
 
@@ -245,7 +245,7 @@ BOOST_FIXTURE_TEST_CASE(sha2_256_accumulator3, fixture<256>) {
     // echo -n "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq" | sha256sum
     hash_t::construction::type::block_type m1 = {
         {0x61626364, 0x62636465, 0x63646566, 0x64656667, 0x65666768, 0x66676869, 0x6768696a, 0x68696a6b, 0x696a6b6c,
-         0x6a6b6c6d, 0x6b6c6d6e, 0x6c6d6e6f, 0x61016f70, 0x6e6f0171, 0x80000000, 0x00000000}};
+         0x6a6b6c6d, 0x6b6c6d6e, 0x6c6d6e6f, 0x61010101, 0x01010101, 0x80000000, 0x00000000}};
     acc(m1, nil::crypto3::accumulators::bits =(512 - 64 - 64 + 8));
 
     hash_t::digest_type s = extract::hash<hash_t>(acc);
@@ -253,7 +253,7 @@ BOOST_FIXTURE_TEST_CASE(sha2_256_accumulator3, fixture<256>) {
     BOOST_CHECK_EQUAL("1afbf54773a9a85be9ba0b691b6b21560772969e1bec2dd3cd77a56f39ba61bf", std::to_string(s).data());
 
     hash_t::construction::type::block_type m2 = {
-        {0x6d6e6f70, 0x6e6f7071, 0x6d6e6f70, 0x6e6f7071, 0x6d6e6f70, 0x6e6f7071, 0x6768696a, 0x68696a6b, 0x696a6b6c,
+        {0x6d6e6f70, 0x6e6f7071, 0x6d6e6f70, 0x6e6f7071, 0x6d6e6f70, 0x6e6f7071, 0x0168696a, 0x68696a6b, 0x696a6b6c,
          0x6a6b6c6d, 0x6b6c6d6e, 0x6c6d6e6f, 0x6d010170, 0x6e6f7071, 0x80080000, 0x00000000}};
 
     acc(m2, nil::crypto3::accumulators::bits = 64 + 64 + 64);

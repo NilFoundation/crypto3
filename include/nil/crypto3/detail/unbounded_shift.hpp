@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2019 Nil Foundation AG
 // Copyright (c) 2018-2019 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Alexander Sokolov <asokolov@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -84,82 +85,7 @@ namespace nil {
                 T highmask = ((bool) shift) * unbounded_shl<T>(~T(), type_bits - shift);
                 return x & highmask;
             }
-
-            /*
-                template<typename Endianness>
-                struct endian_shift;
-
-                template<int UnitBits>
-                struct endian_shift<stream_endian::big_unit_big_bit<UnitBits>> {
-                    static word_type& to_msb(word_type &w, length_type shift) {
-                        //shift to most significant bits according to endianness
-                        w <<= shift;
-                        return w;
-                    }
-                };
-
-                template<int UnitBits>
-                struct endian_shift<stream_endian::little_unit_big_bit<UnitBits>> {
-                    static word_type& to_msb(word_type &w, length_type shift) {
-                        //shift to most significant bits according to endianness
-                        length_type shift_rem = shift % UnitBits;
-                        length_type shift_unit_bits = shift - shift_rem;
-                        
-                        length_type sz[2] = {UnitBits - shift_rem, shift_rem};
-                        length_type masks[2] = {low_bits<word_type, word_bits>(~word_type(), sz[0]) << shift_unit_bits, 
-                        low_bits<word_type, word_bits>(~word_type(), sz[1]) << (shift_unit_bits + UnitBits + sz[0])};
-                        length_type bits_left = word_bits - shift;
-                        word_type w_combined = 0;
-                        int ind = 0;
-
-                        while (bits_left) {
-                            w_combined |= (!ind ? ((w & masks[0]) << shift_rem) : ((w & masks[1]) >> (UnitBits + sz[0])));
-                            bits_left -= sz[ind];
-                            masks[ind] <<= UnitBits;
-                            ind = 1 - ind;
-                        }
-
-                        w = w_combined >> shift_unit_bits;
-                        return w;
-                    }
-                };
-
-                template<int UnitBits>
-                struct endian_shift<stream_endian::big_unit_little_bit<UnitBits>> {
-                    static word_type& to_msb(word_type &w, length_type shift) {
-                        //shift to most significant bits according to endianness
-                        length_type shift_rem = shift % UnitBits;
-                        length_type shift_unit_bits = shift - shift_rem;
-
-                        length_type sz[2] = {UnitBits - shift_rem, shift_rem};
-                        word_type masks[2] = {high_bits<word_type, word_bits>(~word_type(), sz[0]) >> shift_unit_bits, 
-                        high_bits<word_type, word_bits>(~word_type(), sz[1]) >> (shift_unit_bits + UnitBits + sz[0])};
-
-                        length_type bits_left = word_bits - shift;
-                        word_type w_combined = 0;
-                        int ind = 0;
-
-                        while (bits_left) {
-                            w_combined |= (!ind ? ((w & masks[0]) >> shift_rem) : ((w & masks[1]) << (UnitBits + sz[0])));
-                            bits_left -= sz[ind];
-                            masks[ind] >>= UnitBits;
-                            ind = 1 - ind;
-                        }
-
-                        w = w_combined << shift_unit_bits;
-                        return w;
-                    }
-                };
-
-                template<int UnitBits> 
-                struct endian_shift<stream_endian::little_unit_little_bit<UnitBits>> {
-                    static word_type& to_msb(word_type &w, length_type shift) {
-                        //shift to most significant bits according to endianness
-                        w >>= shift;
-                        return w;
-                    }
-                };
-                */
+            
         }    // namespace detail
     }        // namespace crypto3
 }    // namespace nil
