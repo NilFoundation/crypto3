@@ -1,7 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2019 Nil Foundation AG
 // Copyright (c) 2018-2019 Mikhail Komarov <nemo@nil.foundation>
-// Copyright (c) 2019 Aleksey Moskvin <zerg1996@yandex.ru>
 // Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
@@ -36,7 +35,7 @@ namespace nil {
 
                     static void inject(word_type w, size_t word_seen, block_type &b, size_t &block_seen) {
                         //Insert word_seen-bit part of word into the block b according to endianness
-                        
+
                         // Check whether we fall out of the block
                         if (block_seen + word_seen <= BlockBits) {
                             size_t last_word_ind = block_seen / word_bits;
