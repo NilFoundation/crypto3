@@ -1,6 +1,8 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2019 Nil Foundation AG
 // Copyright (c) 2018-2019 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2020 Alexander Sokolov <asokolov@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -78,7 +80,8 @@ namespace nil {
 
                 typedef ::nil::crypto3::detail::injector<endian_type, word_bits, block_words, block_bits> injector;
             public:
-                inline merkle_damgard_construction &process_block(const block_type &block) {
+                template<typename Integer = std::size_t>
+                inline merkle_damgard_construction &process_block(const block_type &block, Integer seen = Integer()) {
                     compressor_functor::process_block(state_, block);
                     return *this;
                 }
