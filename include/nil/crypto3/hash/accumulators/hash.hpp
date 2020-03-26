@@ -28,7 +28,7 @@
 
 #include <nil/crypto3/hash/accumulators/parameters/bits.hpp>
 #include <nil/crypto3/hash/accumulators/parameters/salt.hpp>
-//#include <nil/crypto3/detail/inject.hpp>
+#include <nil/crypto3/detail/inject.hpp>
 
 #include <boost/accumulators/statistics/count.hpp>
 
@@ -435,7 +435,7 @@ namespace nil {
                             if (cached_bits == block_bits) {
                                 //If there are enough bits in the incoming value to fill the block
 
-                                construction.process_block(cache, cached_bits);
+                                construction.process_block(cache);
 
                                 if (value_seen > new_bits_to_append){
                                     //If there are some remaining bits in the incoming value - put them into the cache, which is now empty
@@ -475,7 +475,7 @@ namespace nil {
                             //If there are no bits in the cache
                             if (value_seen == block_bits) {
                                 //The incoming value is a full block
-                                construction.process_block(value, value_seen);
+                                construction.process_block(value);
                             } else {
                                 //The incoming value is not a full block
                                 std::move(value.begin(), value.begin() + value_seen/word_bits + (value_seen%word_bits? 1 : 0), cache.begin());
@@ -495,7 +495,7 @@ namespace nil {
 
                             if (cached_bits + new_bits_to_append == block_bits) {
                                 //If there are enough bits in the incoming value to fill the block
-                                construction.process_block(cache, cached_bits);
+                                construction.process_block(cache);
 
                                 if (value_seen > new_bits_to_append){
                                     //If there are some remaining bits in the incoming value - put them into the cache, which is now empty

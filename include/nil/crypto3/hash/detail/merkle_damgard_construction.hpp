@@ -13,6 +13,7 @@
 #include <nil/crypto3/detail/static_digest.hpp>
 #include <nil/crypto3/detail/pack.hpp>
 #include <nil/crypto3/detail/stream_endian.hpp>
+#include <nil/crypto3/detail/unbounded_shift.hpp>
 #include <nil/crypto3/hash/detail/nop_finalizer.hpp>
 
 #include <boost/utility/enable_if.hpp>
@@ -73,8 +74,7 @@ namespace nil {
                 BOOST_STATIC_ASSERT(!length_bits || length_bits % word_bits == 0);
 
             public:
-                template<typename Integer = std::size_t>
-                inline merkle_damgard_construction &process_block(const block_type &block, Integer seen = Integer()) {
+                inline merkle_damgard_construction &process_block(const block_type &block) {
                     compressor_functor::process_block(state_, block);
                     return *this;
                 }
@@ -86,18 +86,19 @@ namespace nil {
                     return d;
                 }
 
-                // Creates mask with shift left bits
-                template<typename T>
-                static T left_bits(length_type shift) {
-                    return (shift == word_bits || shift == length_bits)? ~T() : ~(~T() >> shift);
+                /*static void print_word(const word_type &word) {
+                    for (length_type j = 0; j != word_bits; ++j)
+                        std::cout << (bool) (word & (high_bits<word_type, word_bits>(~word_type(), 1) >> j));                    
                 }
 
-                // Creates mask with shift right bits
-                template<typename T>
-                static T right_bits(length_type shift) {
-                    return (shift == word_bits || shift == length_bits) ? ~T() : ~(~T() << shift);
-                }   
-  
+                static void print_bits(const block_type &block) {
+                    std::cout<<"Here is the block: \n";
+                    for (length_type i = 0; i != block_words; ++i) {
+                        std::cout << "Word " << i << ": ";
+                        print_word(block[i]);
+                        std::cout << std::endl;
+                    }
+                }*/
 
                 template<typename Endianness>
                 struct endian_shift;
@@ -115,12 +116,13 @@ namespace nil {
                 struct endian_shift<stream_endian::little_unit_big_bit<UnitBits>> {
                     static word_type& to_msb(word_type &w, length_type shift) {
                         //shift to most significant bits according to endianness
+                        using namespace nil::crypto3::detail;
                         length_type shift_rem = shift % UnitBits;
                         length_type shift_unit_bits = shift - shift_rem;
                         
                         length_type sz[2] = {UnitBits - shift_rem, shift_rem};
-                        length_type masks[2] = {right_bits<word_type>(sz[0]) << shift_unit_bits, 
-                        right_bits<word_type>(sz[1]) << (shift_unit_bits + UnitBits + sz[0])};
+                        word_type masks[2] = {low_bits<word_type, word_bits>(~word_type(), sz[0]) << shift_unit_bits, 
+                        low_bits<word_type, word_bits>(~word_type(), sz[1]) << (shift_unit_bits + UnitBits + sz[0])};
                         length_type bits_left = word_bits - shift;
                         word_type w_combined = 0;
                         int ind = 0;
@@ -141,12 +143,13 @@ namespace nil {
                 struct endian_shift<stream_endian::big_unit_little_bit<UnitBits>> {
                     static word_type& to_msb(word_type &w, length_type shift) {
                         //shift to most significant bits according to endianness
+                        using namespace nil::crypto3::detail;
                         length_type shift_rem = shift % UnitBits;
                         length_type shift_unit_bits = shift - shift_rem;
 
                         length_type sz[2] = {UnitBits - shift_rem, shift_rem};
-                        length_type masks[2] = {left_bits<word_type>(sz[0]) >> shift_unit_bits, 
-                        left_bits<word_type>(sz[1]) >> (shift_unit_bits + UnitBits + sz[0])};
+                        word_type masks[2] = {high_bits<word_type, word_bits>(~word_type(), sz[0]) >> shift_unit_bits, 
+                        high_bits<word_type, word_bits>(~word_type(), sz[1]) >> (shift_unit_bits + UnitBits + sz[0])};
 
                         length_type bits_left = word_bits - shift;
                         word_type w_combined = 0;
@@ -180,14 +183,14 @@ namespace nil {
                 struct injector<stream_endian::big_unit_big_bit<UnitBits>> {
                     static void inject(word_type w, length_type word_seen, block_type &b, length_type &block_seen) {
                         //Insert word_seen-bit part of word into the block b according to endianness
-
+                        using namespace nil::crypto3::detail;
                         // Check whether we fall out of the block
                         if (block_seen + word_seen <= block_bits) {
                             length_type last_word_ind = block_seen / word_bits;
                             length_type last_word_seen = block_seen % word_bits;
                             // Remove garbage
-                            w &= left_bits<word_type>(word_seen);
-                            b[last_word_ind] &= left_bits<word_type>(last_word_seen);
+                            w &= high_bits<word_type, word_bits>(~word_type(), word_seen);
+                            b[last_word_ind] &= high_bits<word_type, word_bits>(~word_type(), last_word_seen);
                             // Add significant word bits to block word
                             b[last_word_ind] |= (w >> last_word_seen);
                             // If we fall out of the block word, push the remainder of element to the next block word
@@ -218,7 +221,7 @@ namespace nil {
                 struct injector<stream_endian::little_unit_big_bit<UnitBits>> {
                     static void inject(word_type w, length_type word_seen, block_type &b, length_type block_seen) {
                         //Insert word_seen-bit part of word into the block b according to endianness
-
+                        using namespace nil::crypto3::detail;
                         // Check whether we fall out of the block
                         if (block_seen + word_seen <= block_bits) {
                             length_type last_word_ind = block_seen / word_bits;
@@ -226,15 +229,18 @@ namespace nil {
                             // Remove garbage
                             length_type w_rem = word_seen % UnitBits;
                             length_type w_unit_bits = word_seen - w_rem;
-                            word_type mask = right_bits<word_type>(w_unit_bits) | (right_bits<word_type>(w_rem) << (w_unit_bits + UnitBits - w_rem)); 
+                            word_type mask = low_bits<word_type, word_bits>(~word_type(), w_unit_bits) 
+                            | (low_bits<word_type, word_bits>(~word_type(), w_rem) << (w_unit_bits + UnitBits - w_rem)); 
                             w &= mask; 
                             length_type b_rem = last_word_seen % UnitBits;
                             length_type b_unit_bits = last_word_seen - b_rem;
-                            mask = right_bits<word_type>(b_unit_bits) | (right_bits<word_type>(b_rem) << (b_unit_bits + UnitBits - b_rem));
+                            mask = low_bits<word_type, word_bits>(~word_type(), b_unit_bits) 
+                            | (low_bits<word_type, word_bits>(~word_type(), b_rem) << (b_unit_bits + UnitBits - b_rem));
                             b[last_word_ind] &= mask;   
                             // Split and combine parts of unit values
                             length_type sz[2] = {UnitBits - b_rem, b_rem};
-                            word_type masks[2] = {right_bits<word_type>(UnitBits - b_rem) << b_rem, right_bits<word_type>(b_rem)};
+                            word_type masks[2] = {low_bits<word_type, word_bits>(~word_type(), UnitBits - b_rem) << b_rem, 
+                                low_bits<word_type, word_bits>(~word_type(), b_rem)};
                             length_type bw_space = word_bits - last_word_seen;
                             word_type w_split = 0;
                             std::size_t sz_ind = 0;
@@ -252,8 +258,8 @@ namespace nil {
                             if (w) {
                                 w >>= (word_bits - b_unit_bits - UnitBits);
                                 w_split = 0;
-                                masks[0] = right_bits<word_type>(UnitBits - b_rem) << b_rem; 
-                                masks[1] = right_bits<word_type>(b_rem);
+                                masks[0] = low_bits<word_type, word_bits>(~word_type(), UnitBits - b_rem) << b_rem; 
+                                masks[1] = low_bits<word_type, word_bits>(~word_type(), b_rem);
 
                                 while (w) {
                                     w_split |= (!sz_ind ? ((w & masks[0]) >> b_rem) : ((w & masks[1]) << (UnitBits + sz[0]))); 
@@ -287,7 +293,7 @@ namespace nil {
                 struct injector<stream_endian::big_unit_little_bit<UnitBits>> {
                     static void inject(word_type w, length_type word_seen, block_type &b, length_type block_seen) {
                         //Insert word_seen-bit part of word into the block b according to endianness
-
+                        using namespace nil::crypto3::detail;
                         // Check whether we fall out of the block
                         if (block_seen + word_seen <= block_bits) {
                             length_type last_word_ind = block_seen / word_bits;
@@ -295,15 +301,18 @@ namespace nil {
                             // Remove garbage
                             length_type w_rem = word_seen % UnitBits;
                             length_type w_unit_bits = word_seen - w_rem;
-                            word_type mask = left_bits<word_type>(w_unit_bits) | (left_bits<word_type>(w_rem) >> (w_unit_bits + UnitBits - w_rem)); 
+                            word_type mask = high_bits<word_type, word_bits>(~word_type(), w_unit_bits) 
+                            | (high_bits<word_type, word_bits>(~word_type(), w_rem) >> (w_unit_bits + UnitBits - w_rem)); 
                             w &= mask; 
                             length_type b_rem = last_word_seen % UnitBits;
                             length_type b_unit_bits = last_word_seen - b_rem;
-                            mask = left_bits<word_type>(b_unit_bits) | (left_bits<word_type>(b_rem) >> (b_unit_bits + UnitBits - b_rem));
+                            mask = high_bits<word_type, word_bits>(~word_type(), b_unit_bits) 
+                            | (high_bits<word_type, word_bits>(~word_type(), b_rem) >> (b_unit_bits + UnitBits - b_rem));
                             b[last_word_ind] &= mask; 
                             // Split and combine parts of unit values 
                             length_type sz[2] = {UnitBits - b_rem, b_rem};
-                            word_type masks[2] = {left_bits<word_type>(UnitBits - b_rem) >> b_rem, left_bits<word_type>(b_rem)};
+                            word_type masks[2] = {high_bits<word_type, word_bits>(~word_type(), UnitBits - b_rem) >> b_rem, 
+                                high_bits<word_type, word_bits>(~word_type(), b_rem)};
                             length_type bw_space = word_bits - last_word_seen;
                             word_type w_split = 0;
                             std::size_t sz_ind = 0;
@@ -321,8 +330,8 @@ namespace nil {
                             if (w) {
                                 w <<= (word_bits - b_unit_bits - UnitBits);
                                 w_split = 0;
-                                masks[0] = left_bits<word_type>(UnitBits - b_rem) >> b_rem; 
-                                masks[1] = left_bits<word_type>(b_rem);
+                                masks[0] = high_bits<word_type, word_bits>(~word_type(), UnitBits - b_rem) >> b_rem; 
+                                masks[1] = high_bits<word_type, word_bits>(~word_type(), b_rem);
 
                                 while (w) {
                                     w_split |= (!sz_ind ? ((w & masks[0]) << b_rem) : ((w & masks[1]) >> (UnitBits + sz[0]))); 
@@ -356,14 +365,14 @@ namespace nil {
                 struct injector<stream_endian::little_unit_little_bit<UnitBits>> {
                     static void inject(word_type w, length_type word_seen, block_type &b, length_type block_seen) {
                         //Insert word_seen-bit part of word into the block b according to endianness
-
+                        using namespace nil::crypto3::detail;
                         // Check whether we fall out of the block
                         if (block_seen + word_seen <= block_bits) {
                             length_type last_word_ind = block_seen / word_bits;
                             length_type last_word_seen = block_seen % word_bits;
                             // Remove garbage
-                            w &= right_bits<word_type>(word_seen);
-                            b[last_word_ind] &= right_bits<word_type>(last_word_seen);
+                            w &= low_bits<word_type, word_bits>(~word_type(), word_seen);
+                            b[last_word_ind] &= low_bits<word_type, word_bits>(~word_type(), last_word_seen);
                             // Add significant word bits to block word
                             b[last_word_ind] |= (w << last_word_seen);
                             // If we fall out of the block word, push the remainder of element to the next block word
@@ -465,7 +474,7 @@ namespace nil {
 
                     length_type tail_len = is_greater ? word_bits : length_bits;
                     for (length_type i = 0; i != tail_len; ++i)
-                        length_bits_array[i + is_greater * word_bits] = length & (left_bits<length_type>(1) >> i);
+                        length_bits_array[i + is_greater * word_bits] = length & (high_bits<length_type, length_bits>(~length_type(), 1) >> i);
 
                     // Append length
                     std::array<word_type, length_words> length_words_array;
@@ -476,8 +485,6 @@ namespace nil {
                     for (std::size_t i = length_words; i; --i) {
                         block[block_words - i] = length_words_array[length_words - i];
                     }
-
-                    
                 }
                 /*
                 template<>

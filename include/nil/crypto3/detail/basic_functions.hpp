@@ -18,6 +18,7 @@ namespace nil {
 
             using block::detail::basic_functions;
 
+
         }    // namespace detail
     }            // namespace crypto3
 }    // namespace nil
