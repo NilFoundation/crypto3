@@ -31,8 +31,8 @@ namespace nil {
                     constexpr static const std::size_t block_words = block_bits / word_bits;
                     typedef std::array<word_type, block_words> block_type;
 
-                    constexpr static const std::size_t state_bits = 1024;
-                    constexpr static const std::size_t state_words = 2 * state_bits / word_bits;
+                    constexpr static const std::size_t state_bits = 512;
+                    constexpr static const std::size_t state_words = state_bits / word_bits;
                     typedef std::array<word_type, state_words> state_type;
 
                     constexpr static const std::size_t salt_bits = 64;

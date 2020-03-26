@@ -4491,7 +4491,7 @@ BOOST_TEST_DONT_PRINT_LOG_VALUE(blake2b<384>::construction::type::digest_type)
 BOOST_TEST_DONT_PRINT_LOG_VALUE(blake2b<512>::construction::type::digest_type)
 
 BOOST_AUTO_TEST_SUITE(blake2b_test_suite)
-
+/*
 BOOST_DATA_TEST_CASE(blake2b_224_string_various_range_value_hash, boost::unit_test::data::make(string_data_224),
                      array_element) {
     std::string out = hash<blake2b<224>>(array_element.first);
@@ -4547,5 +4547,48 @@ BOOST_DATA_TEST_CASE(blake2b_512_string_various_itr_value_hash, boost::unit_test
 
     BOOST_CHECK_EQUAL(out, array_element.second);
 }
+*/
+
+BOOST_AUTO_TEST_CASE(blake2b_224_shortmsg_byte1) {
+    // "abc"
+    std::array<char, 3> a = {'\x61','\x62','\x63'};
+    blake2b<224>::digest_type d = hash<blake2b<224>>(a);
+
+    BOOST_CHECK_EQUAL("9bd237b02a29e43bdd6738afa5b53ff0eee178d6210b618e4511aec8", std::to_string(d).data());
+}
+
+BOOST_AUTO_TEST_CASE(blake2b_256_shortmsg_byte1) {
+    // "abc"
+    std::array<char, 3> a = {'\x61','\x62','\x63'};
+    blake2b<256>::digest_type d = hash<blake2b<256>>(a);
+
+    BOOST_CHECK_EQUAL("bddd813c634239723171ef3fee98579b94964e3bb1cb3e427262c8c068d52319", std::to_string(d).data());
+}
+
+BOOST_AUTO_TEST_CASE(blake2b_384_shortmsg_byte1) {
+    // "abc"
+    std::array<char, 3> a = {'\x61','\x62','\x63'};
+    blake2b<384>::digest_type d = hash<blake2b<384>>(a);
+
+    BOOST_CHECK_EQUAL("6f56a82c8e7ef526dfe182eb5212f7db9df1317e57815dbda46083fc30f54ee6"
+                      "c66ba83be64b302d7cba6ce15bb556f4", std::to_string(d).data());
+}
+
+BOOST_AUTO_TEST_CASE(blake2b_224_longmsg_byte1) {
+    std::array<char, 113> a = { '\xBE','\xFA','\xB5','\x74','\x39','\x6D','\x7F','\x8B','\x67','\x05','\xE2', 
+                                '\xD5','\xB5','\x8B','\x2C','\x1C','\x82','\x0B','\xB2','\x4E','\x3F','\x4B',
+                                '\xAE','\x3E','\x8F','\xBC','\xD3','\x6D','\xBF','\x73','\x4E','\xE1','\x4E',
+                                '\x5D','\x6A','\xB9','\x72','\xAE','\xDD','\x35','\x40','\x23','\x54','\x66',
+                                '\xE8','\x25','\x85','\x0E','\xE4','\xC5','\x12','\xEA','\x97','\x95','\xAB',
+                                '\xFD','\x33','\xF3','\x30','\xD9','\xFD','\x7F','\x79','\xE6','\x2B','\xBB',
+                                '\x63','\xA6','\xEA','\x85','\xDE','\x15','\xBE','\xAE','\xEA','\x6F','\x8D',
+                                '\x20','\x4A','\x28','\x95','\x60','\x59','\xE2','\x63','\x2D','\x11','\x86',
+                                '\x1D','\xFB','\x0E','\x65','\xBC','\x07','\xAC','\x8A','\x15','\x93','\x88',
+                                '\xD5','\xC3','\x27','\x7E','\x22','\x72','\x86','\xF6','\x5F','\xF5','\xE5','\xB5','\xAE', '\xC1'};
+    blake2b<224>::digest_type d = hash<blake2b<224>>(a);
+
+    BOOST_CHECK_EQUAL("3d6c866ebaa149e0c6ad8ba5e9a685e1ad56d81a00fb99d9020f11c0", std::to_string(d).data());
+}
+
 
 BOOST_AUTO_TEST_SUITE_END()

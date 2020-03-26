@@ -73,7 +73,8 @@ namespace nil {
                 BOOST_STATIC_ASSERT(!length_bits || length_bits % word_bits == 0);
 
             public:
-                inline merkle_damgard_construction &process_block(const block_type &block) {
+                template<typename Integer = std::size_t>
+                inline merkle_damgard_construction &process_block(const block_type &block, Integer seen = Integer()) {
                     compressor_functor::process_block(state_, block);
                     return *this;
                 }
@@ -85,31 +86,18 @@ namespace nil {
                     return d;
                 }
 
-                /*static void print_word(const word_type &word) {
-                    for (length_type j = 0; j != word_bits; ++j)
-                        std::cout << (bool) (word & (left_bits<word_type>(1) >> j));                    
-                }
-
-                static void print_bits(const block_type &block) {
-                    std::cout<<"Here is the block: \n";
-                    for (length_type i = 0; i != block_words; ++i) {
-                        std::cout << "Word " << i << ": ";
-                        print_word(block[i]);
-                        std::cout << std::endl;
-                    }
-                }*/
-
                 // Creates mask with shift left bits
                 template<typename T>
                 static T left_bits(length_type shift) {
-                    return ~(~T() >> shift);
+                    return (shift == word_bits || shift == length_bits)? ~T() : ~(~T() >> shift);
                 }
 
                 // Creates mask with shift right bits
                 template<typename T>
                 static T right_bits(length_type shift) {
-                    return ~(~T() << shift);
+                    return (shift == word_bits || shift == length_bits) ? ~T() : ~(~T() << shift);
                 }   
+  
 
                 template<typename Endianness>
                 struct endian_shift;
