@@ -114,7 +114,7 @@ namespace nil {
                             std::size_t new_bits_to_append = (needed_to_fill_bits > value_seen)? value_seen : needed_to_fill_bits;
 
                             injector::inject(value, new_bits_to_append, cache, cached_bits);
-
+                            // FIXME: this case is never true
                             if (cached_bits == block_bits) {
                                 //If there are enough bits in the incoming value to fill the block
 
