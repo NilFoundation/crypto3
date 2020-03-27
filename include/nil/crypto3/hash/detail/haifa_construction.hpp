@@ -12,11 +12,10 @@
 #ifndef CRYPTO3_HASH_HAIFA_CONSTRUCTION_HPP
 #define CRYPTO3_HASH_HAIFA_CONSTRUCTION_HPP
 
-#include <nil/crypto3/hash/detail/nop_finalizer.hpp>
+#include <nil/crypto3/detail/finalizer.hpp>
 
 #include <nil/crypto3/detail/static_digest.hpp>
 #include <nil/crypto3/detail/pack.hpp>
-#include <nil/crypto3/detail/inject.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -37,7 +36,7 @@ namespace nil {
              *
              * @note https://eprint.iacr.org/2007/278.pdf
              */
-            template<typename Params, typename IV, typename Compressor, typename Finalizer = nop_finalizer>
+            template<typename Params, typename IV, typename Compressor, typename Finalizer = ::nil::crypto3::detail::nop_finalizer>
             class haifa_construction {
             public:
                 typedef Compressor compressor_functor;
@@ -93,31 +92,24 @@ namespace nil {
                 }
 
                 inline digest_type digest(const block_type &block = block_type(), length_type seen = length_type()) {
-                    // FIXME: this message padding works only for blake2b hash                     
                     using namespace nil::crypto3::detail;
+
                     block_type b;
-                    length_type head_bits = seen % block_bits; // the number of significant bits in block
-                    length_type head_words = (seen / word_bits) % block_words; // the number of significant block words
-                        
                     std::move(block.begin(), block.end(), b.begin());
-                    // Remove possible garbage from the block
-                    std::fill(b.begin() + head_words + 1, b.end(), 0);
-                    injector::inject(0, word_bits - (head_bits % word_bits), b, head_bits);
+
+                    // Apply finalizer
+                    finalizer_functor finalizer;
+                    finalizer(b, seen);
 
                     // Process the last block
                     process_block(b, seen, salt_value);
 
-                    // Apply finalizer                   
-                    finalizer_functor finalizer;
-                    finalizer(state_);
-                    
                     // Convert digest to byte representation
                     std::array<octet_type, state_bits / octet_bits> d_full;
                     pack_n<endian_type, word_bits, octet_bits>(state_.data(), state_words, d_full.data(), state_bits / octet_bits);
 
                     digest_type d;
-                    for (size_t i = 0; i != digest_bytes; ++i)
-                        d[i] = d_full[i];
+                    std::copy(d_full.begin(), d_full.begin() + digest_bytes, d.begin());
                     
                     return d;
                 }

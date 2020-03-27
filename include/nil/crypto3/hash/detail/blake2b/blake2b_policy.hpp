@@ -36,7 +36,7 @@ namespace nil {
                     typedef std::array<word_type, state_words> state_type;
 
                     constexpr static const std::size_t salt_bits = 64;
-                    typedef typename boost::uint_t<64>::exact salt_type;
+                    typedef typename boost::uint_t<salt_bits>::exact salt_type;
                     constexpr static const salt_type salt_value = 0xFFFFFFFFFFFFFFFF;
 
                     struct iv_generator {

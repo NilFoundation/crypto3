@@ -15,8 +15,6 @@
 #include <nil/crypto3/hash/detail/haifa_construction.hpp>
 #include <nil/crypto3/hash/detail/haifa_stream_processor.hpp>
 
-#include <iostream>
-
 namespace nil {
     namespace crypto3 {
         namespace hash {
@@ -105,8 +103,11 @@ namespace nil {
                         constexpr static const std::size_t digest_bits = policy_type::digest_bits;
                     };
 
+                    typedef ::nil::crypto3::detail::finalizer<typename params_type::digest_endian, typename policy_type::word_type, 
+                                                              policy_type::word_bits, policy_type::block_bits> 
+                        finalizer;
                     typedef haifa_construction<params_type, typename policy_type::iv_generator,
-                                               blake2b_compressor<DigestBits>>
+                                               blake2b_compressor<DigestBits>, finalizer>
                         type;
 
                     constexpr static const std::size_t word_bits = policy_type::word_bits;
