@@ -45,9 +45,7 @@ namespace nil {
                     typedef typename hash_type::construction::type construction_type;
                     typedef typename hash_type::construction::params_type params_type;
 
-
                     typedef typename params_type::digest_endian endian_type;
-
 
                     constexpr static const std::size_t word_bits = construction_type::word_bits;
                     typedef typename construction_type::word_type word_type;
@@ -80,7 +78,9 @@ namespace nil {
 
                     template<typename ArgumentPack>
                     inline void operator()(const ArgumentPack &args) {
-                        total_seen = extract::bits_count(args);
+
+                        //FixMe
+                        //total_seen = extract::bits_count(args);
                         resolve_type(args[boost::accumulators::sample],
                                      args[::nil::crypto3::accumulators::bits | std::size_t()]);
                     }
@@ -92,11 +92,13 @@ namespace nil {
 
                 protected:
 
-                    inline void resolve_type(const block_type &value, std::size_t bits) {
+                    inline void resolve_type(const block_type &value, std::size_t bits = block_bits) {
+                        total_seen += bits;
                         process(value, bits);
                     }
 
-                    inline void resolve_type(const word_type &value, std::size_t bits) {
+                    inline void resolve_type(const word_type &value, std::size_t bits = word_bits) {
+                        total_seen += bits;
                         process(value, bits);
                     }
 
@@ -113,7 +115,7 @@ namespace nil {
                             std::size_t new_bits_to_append = (needed_to_fill_bits > value_seen)? value_seen : needed_to_fill_bits;
 
                             injector::inject(value, new_bits_to_append, cache, cached_bits);
-                            // FIXME: this case is never true
+                            
                             if (cached_bits == block_bits) {
                                 //If there are enough bits in the incoming value to fill the block
 
@@ -121,33 +123,10 @@ namespace nil {
 
                                 if (value_seen > new_bits_to_append){
                                     //If there are some remaining bits in the incoming value - put them into the cache, which is now empty
-
-                                    std::size_t added_words = new_bits_to_append/word_bits;
-
-
-
-                                    std::size_t remaining_bits = value_seen - new_bits_to_append;
-
-                                    std::size_t remaining_in_last_word_bits = (remaining_bits > (word_bits - new_bits_to_append%word_bits) )? word_bits - new_bits_to_append%word_bits : remaining_bits;
-
-                                    remaining_bits -= remaining_in_last_word_bits;
-
-                                    word_type first_word_shifted = value[added_words];
-
-                                    endian_shift<endian_type, word_bits>::to_msb(first_word_shifted, new_bits_to_append%word_bits);
                                     
                                     cached_bits = 0;
 
-                                    injector::inject(first_word_shifted, remaining_in_last_word_bits, cache, cached_bits);
-
-                                    for (std::size_t i = 0; i< (remaining_bits / word_bits); i++){
-                                         injector::inject(value[added_words + 1 + i], word_bits, cache, cached_bits);
-                                        
-                                    }
-
-                                    if(remaining_bits % word_bits){
-                                        injector::inject(value[added_words + 1 + remaining_bits / word_bits + (remaining_bits % word_bits? 1 : 0)], remaining_bits % word_bits, cache, cached_bits);
-                                    }
+                                    injector::inject(value, value_seen - new_bits_to_append, cache, cached_bits, new_bits_to_append);
 
                                 }
 
@@ -184,11 +163,7 @@ namespace nil {
                                     //If there are some remaining bits in the incoming value - put them into the cache, which is now empty
                                     cached_bits = 0;
 
-                                    word_type word_shifted = value;
-
-                                    endian_shift<endian_type, word_bits>::to_msb(word_shifted, new_bits_to_append);
-
-                                    injector::inject(word_shifted, value_seen - new_bits_to_append, cache, cached_bits);
+                                    injector::inject(value, value_seen - new_bits_to_append, cache, cached_bits, new_bits_to_append);
                                 }
 
                             }
@@ -227,4 +202,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_ACCUMULATORS_BLOCK_HPP
+#endif    // CRYPTO3_ACCUMULATORS_HASH_HPP

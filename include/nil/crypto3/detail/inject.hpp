@@ -15,6 +15,7 @@
 #include <nil/crypto3/detail/stream_endian.hpp>
 #include <nil/crypto3/detail/basic_functions.hpp>
 #include <nil/crypto3/detail/unbounded_shift.hpp>
+#include <nil/crypto3/detail/endian_shift.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -232,25 +233,42 @@ namespace nil {
 
                     typedef std::array<word_type, BlockWords> block_type;
 
-                    static void inject(const block_type &b_src, std::size_t b_src_seen, block_type &b_dst, std::size_t &b_dst_seen) {
+                    static void inject(const block_type &b_src, std::size_t b_src_seen, block_type &b_dst, std::size_t &b_dst_seen, std::size_t block_shift = 0) {
                         //Insert word_seen-bit part of word into the block b according to endianness
 
                         // Check whether we fall out of the block
                         if (b_src_seen + b_dst_seen <= BlockBits) {
+
+                            std::size_t first_word_ind = block_shift / word_bits;
+                            std::size_t word_shift = block_shift % word_bits;
+
+                            std::size_t first_word_seen = (word_bits - word_shift) > b_src_seen ? b_src_seen : (word_bits - word_shift);
+
+                            inject(b_src[first_word_ind], first_word_seen, b_dst, b_dst_seen, word_shift);
+
+                            b_src_seen -= first_word_seen;
                             
                             for (std::size_t i = 0; i< (b_src_seen / word_bits); i++){
-                                inject(b_src[i], word_bits, b_dst, b_dst_seen);
+                                inject(b_src[first_word_ind + 1 + i], word_bits, b_dst, b_dst_seen);
                             }
 
                             if(b_src_seen%word_bits){
-                                inject(b_src[b_src_seen / word_bits], b_src_seen%word_bits, b_dst, b_dst_seen);
+                                inject(b_src[first_word_ind + 1 + b_src_seen / word_bits], b_src_seen%word_bits, b_dst, b_dst_seen);
                             }
 
                         }
                     }
 
-                    static void inject(word_type w, std::size_t word_seen, block_type &b, std::size_t &block_seen){
-                        word_injector<Endianness, WordBits, BlockWords, BlockBits>::inject(w, word_seen, b, block_seen);
+                    static void inject(word_type w, std::size_t word_seen, block_type &b, std::size_t &block_seen, std::size_t word_shift = 0){
+                        
+                        word_type word_shifted = w;
+
+                        if (word_shift > 0){
+                            endian_shift<Endianness, word_bits>::to_msb(word_shifted, word_shift);
+                        }
+
+                        word_injector<Endianness, WordBits, BlockWords, BlockBits>::inject(word_shifted, word_seen, b, block_seen);
+
                     }
                 };
                     
