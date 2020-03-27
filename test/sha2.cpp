@@ -51,20 +51,6 @@ BOOST_AUTO_TEST_SUITE(sha2_test_suite)
 // http://csrc.nist.gov/groups/ST/toolkit/documents/Examples/SHA_All.pdf
 //
 
-/*
-BOOST_AUTO_TEST_CASE(sha2_224_subbyte0) {
-    // From http://csrc.nist.gov/groups/STM/cavp/documents/shs/SHAVS.pdf
-
-    // B.1/1
-    std::array<bool, 50> a = {0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1};
-    sha2<224>::digest_type d = hash<sha2<224>>(a);
-
-#ifdef CRYPTO3_HASH_SHOW_PROGRESS
-    std::printf("%s\n", std::to_string(d).data());
-#endif
-
-    BOOST_CHECK_EQUAL("", std::to_string(d).data());
-}*/
 
 
 BOOST_AUTO_TEST_CASE(sha2_224_shortmsg_bit) {
@@ -415,9 +401,9 @@ BOOST_AUTO_TEST_CASE(sha256_preprocessor1) {
 BOOST_AUTO_TEST_CASE(sha256_preprocessor2) {
     // Example from Appendix B.1
     accumulator_set<sha2<256>> acc;
-    acc('a', nil::crypto3::accumulators::bits = 1);
-    acc('b', nil::crypto3::accumulators::bits = 1);
-    acc('c', nil::crypto3::accumulators::bits = 1);
+    acc(0x61000000, nil::crypto3::accumulators::bits = 8);
+    acc(0x62000000, nil::crypto3::accumulators::bits = 8);
+    acc(0x63000000, nil::crypto3::accumulators::bits = 8);
 
     sha2<256>::digest_type s = extract::hash<sha2<256>>(acc);
 
@@ -428,13 +414,13 @@ BOOST_AUTO_TEST_CASE(sha256_preprocessor2) {
     BOOST_CHECK_EQUAL("ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad",
         std::to_string(s).data());
 }
-/*
+
 BOOST_AUTO_TEST_CASE(sha256_preprocessor3) {
 
     // Example from Appendix B.3
     accumulator_set<sha2<256>> acc;
-    for (unsigned i = 0; i < 1000000; ++i) {
-        acc('a');
+    for (unsigned i = 0; i < 62; ++i) {
+        acc(0x61000000, nil::crypto3::accumulators::bits = 8);
     }
     sha2<256>::digest_type s = extract::hash<sha2<256>>(acc);
 
@@ -442,10 +428,59 @@ BOOST_AUTO_TEST_CASE(sha256_preprocessor3) {
     std::printf("%s\n", std::to_string(s).data());
 #endif
 
-    BOOST_CHECK_EQUAL("cdc76e5c9914fb9281a1c7e284d73e67f1809a48a497200e046d39ccc7112cd0",
+    BOOST_CHECK_EQUAL("f506898cc7c2e092f9eb9fadae7ba50383f5b46a2a4fe5597dbb553a78981268",
         std::to_string(s).data());
 }
 
+
+BOOST_AUTO_TEST_CASE(sha256_preprocessor4) {
+
+    // Example from Appendix B.3
+    accumulator_set<sha2<256>> acc;
+
+    sha2<256>::construction::type::block_type m1 = {
+        {0x61616161, 0x61616161, 0x61616161, 0x61616161, 0x61616161, 0x61616161, 0x61616161, 0x61616161,
+         0x61616161, 0x61616161, 0x61616161, 0x61616161, 0x61616161, 0x61616161, 0x61616161, 0x61610101}};
+
+    acc(m1, nil::crypto3::accumulators::bits = 62*8);
+    //for (unsigned i = 0; i < 63; ++i) {
+        acc(0x61000000, nil::crypto3::accumulators::bits = 8);
+    //}
+    sha2<256>::digest_type s = extract::hash<sha2<256>>(acc);
+
+#ifdef CRYPTO3_HASH_SHOW_PROGRESS
+    std::printf("%s\n", std::to_string(s).data());
+#endif
+
+    BOOST_CHECK_EQUAL("f506898cc7c2e092f9eb9fadae7ba50383f5b46a2a4fe5597dbb553a78981268",
+        std::to_string(s).data());
+}
+
+
+BOOST_AUTO_TEST_CASE(sha256_preprocessor5) {
+
+    // Example from Appendix B.3
+    accumulator_set<sha2<256>> acc;
+
+    sha2<256>::construction::type::block_type m1 = {
+        {0x61616161, 0x61616161, 0x61616161, 0x61616161, 0x61616161, 0x61616161, 0x61616161, 0x61616161,
+         0x61616161, 0x61616161, 0x61616161, 0x61616161, 0x61616161, 0x61616161, 0x61616161, 0x61616101}};
+
+    acc(m1, nil::crypto3::accumulators::bits = 63*8);
+    //for (unsigned i = 0; i < 63; ++i) {
+        //acc(0x61000000, nil::crypto3::accumulators::bits = 8);
+    //}
+    sha2<256>::digest_type s = extract::hash<sha2<256>>(acc);
+
+#ifdef CRYPTO3_HASH_SHOW_PROGRESS
+    std::printf("%s\n", std::to_string(s).data());
+#endif
+
+    BOOST_CHECK_EQUAL("f506898cc7c2e092f9eb9fadae7ba50383f5b46a2a4fe5597dbb553a78981268",
+        std::to_string(s).data());
+}
+
+/*
 BOOST_AUTO_TEST_CASE(sha384_preprocessor1) {
     accumulator_set<sha2<384>> acc;
     sha2<384>::digest_type s = extract::hash<sha2<384>>(acc);

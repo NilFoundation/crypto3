@@ -78,9 +78,6 @@ namespace nil {
 
                     template<typename ArgumentPack>
                     inline void operator()(const ArgumentPack &args) {
-
-                        //FixMe
-                        //total_seen = extract::bits_count(args);
                         resolve_type(args[boost::accumulators::sample],
                                      args[::nil::crypto3::accumulators::bits | std::size_t()]);
                     }
@@ -101,7 +98,6 @@ namespace nil {
                         total_seen += bits;
                         process(value, bits);
                     }
-
 
                     inline void process(const block_type &value, std::size_t value_seen) {
                         using namespace ::nil::crypto3::detail;
@@ -155,7 +151,7 @@ namespace nil {
 
                             injector::inject(value, new_bits_to_append, cache, cached_bits);
 
-                            if (cached_bits + new_bits_to_append == block_bits) {
+                            if (cached_bits == block_bits) {
                                 //If there are enough bits in the incoming value to fill the block
                                 construction.process_block(cache, total_seen - value_seen + new_bits_to_append);
 
@@ -171,6 +167,7 @@ namespace nil {
                         } else {
                             cache[0] = value;
                         }
+
                     }
 
                     std::size_t total_seen;

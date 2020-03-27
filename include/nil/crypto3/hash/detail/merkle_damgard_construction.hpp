@@ -92,6 +92,18 @@ namespace nil {
                     reset();
                     return d;
                 }
+
+                static void print_word(const word_type &w) {
+                        using namespace::nil::crypto3::detail;
+                        for (size_t i = 0; i != word_bits; ++i)
+                            std::cout << (bool) (w & (high_bits<word_type, word_bits>(~word_type(), 1) >> i));
+                        std::cout << std::endl;
+                    }
+
+                    static void print_block(const block_type &b) {
+                        for (size_t i = 0; i != block_words; ++i)
+                            print_word(b[i]);
+                    }
                 
 
                 inline digest_type digest(const block_type &block = block_type(), length_type seen = length_type()) {
@@ -127,7 +139,7 @@ namespace nil {
                     }
                     // Append length to last block
                     append_length<int>(b, seen);
-
+                    
                     // Process the last block
                     process_block(b);
 
