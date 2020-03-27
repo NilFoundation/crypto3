@@ -98,8 +98,8 @@ namespace nil {
                     
                     using namespace nil::crypto3::detail;
                     block_type b;
-                    length_type head_bits = seen % block_bits; // the number of significant bits in block
-                    length_type head_words = (seen / word_bits) % block_words; // the number of significant block words
+                    std::size_t head_bits = seen % block_bits; // the number of significant bits in block
+                    std::size_t head_words = (seen / word_bits) % block_words; // the number of significant block words
 
                     // Case of full block
                     if (!head_bits) {
@@ -166,7 +166,7 @@ namespace nil {
                     bool is_greater = length_bits > 64;
                     // FIXME2: here we consider that length_bits == 2 * word_bits
                     if (is_greater)
-                        for (length_type i = 0; i != word_bits; ++i)
+                        for (std::size_t i = 0; i != word_bits; ++i)
                             length_bits_array[i] = false;                        
 
                     length_type tail_len = is_greater ? word_bits : length_bits;

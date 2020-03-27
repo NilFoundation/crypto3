@@ -31,7 +31,6 @@
 
 #include <nil/crypto3/hash/accumulators/parameters/bits.hpp>
 #include <nil/crypto3/hash/accumulators/parameters/salt.hpp>
-#include <nil/crypto3/detail/inject.hpp>
 
 #include <boost/accumulators/statistics/count.hpp>
 
