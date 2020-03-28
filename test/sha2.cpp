@@ -609,43 +609,5 @@ BOOST_AUTO_TEST_CASE(sha224_range_hash) {
     BOOST_CHECK_EQUAL("23097d223405d8228642a477bda255b32aadbce4bda0b3f7e36c9da7", std::to_string(h).data());
 }
 
-BOOST_AUTO_TEST_CASE(sha224_iterator_range_hash) {
-}
-
-BOOST_AUTO_TEST_CASE(sha512_various_hash1) {
-    accumulator_set<sha2<512>> acc;
-    sha2<512>::stream_processor<accumulator_set<sha2<512>>, 16>::type pp(acc);
-    for (unsigned i = 0; i < 1000000 / 2; ++i) {
-        pp.update_one(('a' << 8) | 'a');
-    }
-    sha2<512>::digest_type h = extract::hash<sha2<512>>(acc);
-
-#ifdef CRYPTO3_HASH_SHOW_PROGRESS
-    std::printf("%s\n", std::to_string(s).data());
-#endif
-
-    BOOST_CHECK_EQUAL(
-        "e718483d0ce769644e2e42c7bc15b4638e1f98b13b2044285632a803afa973eb"
-        "de0ff244877ea60a4cb0432ce577c31beb009c5c2c49aa2e4eadb217ad8cc09b",
-        std::to_string(h).data());
-}
-
-BOOST_AUTO_TEST_CASE(sha512_various_hash2) {
-    accumulator_set<sha2<512>> acc;
-    sha2<512>::stream_processor<accumulator_set<sha2<512>>, 32>::type pp(acc);
-    for (unsigned i = 0; i < 1000000 / 4; ++i) {
-        pp.update_one(('a' << 24) | ('a' << 16) | ('a' << 8) | 'a');
-    }
-    sha2<512>::digest_type h = extract::hash<sha2<512>>(acc);
-
-#ifdef CRYPTO3_HASH_SHOW_PROGRESS
-    std::printf("%s\n", std::to_string(s).data());
-#endif
-
-    BOOST_CHECK_EQUAL(
-        "e718483d0ce769644e2e42c7bc15b4638e1f98b13b2044285632a803afa973eb"
-        "de0ff244877ea60a4cb0432ce577c31beb009c5c2c49aa2e4eadb217ad8cc09b",
-        std::to_string(h).data());
-}
 
 BOOST_AUTO_TEST_SUITE_END()

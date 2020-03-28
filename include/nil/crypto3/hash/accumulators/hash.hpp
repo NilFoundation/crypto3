@@ -73,7 +73,7 @@ namespace nil {
                     typedef typename hash_type::digest_type result_type;
 
                     // The constructor takes an argument pack.
-                    hash_impl(boost::accumulators::dont_care) : total_seen(0) {
+                    hash_impl(boost::accumulators::dont_care) : total_seen(0), filled(false) {
                     }
 
                     template<typename ArgumentPack>
@@ -84,10 +84,16 @@ namespace nil {
 
                     inline result_type result(boost::accumulators::dont_care) const {
                         construction_type res = construction;
+
+                        if (filled){
+                            res.process_block(cache, total_seen);
+                        }
+                        
                         return res.digest(cache, total_seen);
                     }
 
                 protected:
+
 
                     inline void resolve_type(const block_type &value, std::size_t bits = block_bits) {
                         total_seen += bits;
@@ -102,6 +108,12 @@ namespace nil {
                     inline void process(const block_type &value, std::size_t value_seen) {
                         using namespace ::nil::crypto3::detail;
 
+                        if (filled){
+                            construction.process_block(cache, total_seen - value_seen);
+                            filled = false;
+                        }
+
+
                         std::size_t cached_bits = (total_seen - value_seen) % block_bits;
 
                         if (cached_bits != 0) {
@@ -114,10 +126,14 @@ namespace nil {
                             
                             if (cached_bits == block_bits) {
                                 //If there are enough bits in the incoming value to fill the block
-
-                                construction.process_block(cache, total_seen - value_seen + new_bits_to_append);
+                                filled = true;
 
                                 if (value_seen > new_bits_to_append){
+
+                                    
+                                    construction.process_block(cache, total_seen - value_seen + new_bits_to_append);
+                                    filled = false;
+                                    
                                     //If there are some remaining bits in the incoming value - put them into the cache, which is now empty
                                     
                                     cached_bits = 0;
@@ -132,7 +148,9 @@ namespace nil {
                             //If there are no bits in the cache
                             if (value_seen == block_bits) {
                                 //The incoming value is a full block
-                                construction.process_block(value, total_seen);
+                                
+                                construction.process_block(cache, total_seen);
+
                             } else {
                                 //The incoming value is not a full block
                                 std::move(value.begin(), value.begin() + value_seen/word_bits + (value_seen%word_bits? 1 : 0), cache.begin());
@@ -142,6 +160,11 @@ namespace nil {
 
                     inline void process(const word_type &value, std::size_t value_seen) {
                         using namespace ::nil::crypto3::detail;
+
+                        if (filled){
+                            construction.process_block(cache, total_seen - value_seen);
+                            filled = false;
+                        }
 
                         std::size_t cached_bits = (total_seen - value_seen) % block_bits;
 
@@ -153,9 +176,14 @@ namespace nil {
 
                             if (cached_bits == block_bits) {
                                 //If there are enough bits in the incoming value to fill the block
-                                construction.process_block(cache, total_seen - value_seen + new_bits_to_append);
+
+                                filled = true;
 
                                 if (value_seen > new_bits_to_append){
+
+                                    construction.process_block(cache, total_seen - value_seen + new_bits_to_append);
+                                    filled = false;
+                                    
                                     //If there are some remaining bits in the incoming value - put them into the cache, which is now empty
                                     cached_bits = 0;
 
@@ -170,6 +198,7 @@ namespace nil {
 
                     }
 
+                    bool filled;
                     std::size_t total_seen;
                     block_type cache;
                     construction_type construction;
