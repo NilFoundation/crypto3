@@ -3,8 +3,8 @@
 
 #include <nil/crypto3/asn1/asn1_oid.hpp>
 
-#include <boost/multiprecision/cpp_int.hpp>
 #include <boost/multiprecision/number.hpp>
+#include <boost/multiprecision/cpp_int.hpp>
 #include <boost/multiprecision/cpp_int/cpp_int_config.hpp>
 
 namespace nil {
@@ -34,7 +34,7 @@ namespace nil {
 
             template<>
             struct nist<256> : public ec_group_info<256> {
-                typedef ec_group_info<256>::number_type number_type;
+                typedef typename ec_group_info<256>::number_type number_type;
 
                 constexpr static const number_type p =
                     0xFFFFFFFF00000001000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFF_cppui256;
@@ -56,7 +56,7 @@ namespace nil {
 
             template<>
             struct nist<384> : public ec_group_info<384> {
-                typedef ec_group_info<384>::number_type number_type;
+                typedef typename ec_group_info<384>::number_type number_type;
 
                 constexpr static const number_type p =
                     0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFF0000000000000000FFFFFFFF_cppui384;
@@ -78,7 +78,7 @@ namespace nil {
 
             template<>
             struct nist<521> : public ec_group_info<521> {
-                typedef ec_group_info<521>::number_type number_type;
+                typedef typename ec_group_info<521>::number_type number_type;
 
                 constexpr static const number_type p =
                     0x1FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF_cppui521;
@@ -103,7 +103,7 @@ namespace nil {
 
             template<>
             struct brainpool_r1<160> : public ec_group_info<160> {
-                typedef ec_group_info<160>::number_type number_type;
+                typedef typename ec_group_info<160>::number_type number_type;
 
                 constexpr static const number_type p = 0xE95E4A5F737059DC60DFC7AD95B3D8139515620F_cppui160;
                 constexpr static const number_type a = 0x340E7BE2A280EB74E2BE61BADA745D97E8F7C300_cppui160;
@@ -121,7 +121,7 @@ namespace nil {
 
             template<>
             struct brainpool_r1<192> : public ec_group_info<192> {
-                typedef ec_group_info<192>::number_type number_type;
+                typedef typename ec_group_info<192>::number_type number_type;
 
                 constexpr static const number_type p = 0xC302F41D932A36CDA7A3463093D18DB78FCE476DE1A86297_cppui192;
                 constexpr static const number_type a = 0x6A91174076B1E0E19C39C031FE8685C1CAE040E5C69A28EF_cppui192;
@@ -139,7 +139,7 @@ namespace nil {
 
             template<>
             struct brainpool_r1<224> : public ec_group_info<224> {
-                typedef ec_group_info<224>::number_type number_type;
+                typedef typename ec_group_info<224>::number_type number_type;
 
                 constexpr static const number_type p =
                     0xD7C134AA264366862A18302575D1D787B09F075797DA89F57EC8C0FF_cppui224;
@@ -163,7 +163,7 @@ namespace nil {
 
             template<>
             struct brainpool_r1<256> : public ec_group_info<256> {
-                typedef ec_group_info<256>::number_type number_type;
+                typedef typename ec_group_info<256>::number_type number_type;
 
                 constexpr static const number_type p =
                     0xA9FB57DBA1EEA9BC3E660A909D838D726E3BF623D52620282013481D1F6E5377_cppui256;
@@ -187,7 +187,7 @@ namespace nil {
 
             template<>
             struct brainpool_r1<320> : public ec_group_info<320> {
-                typedef ec_group_info<320>::number_type number_type;
+                typedef typename ec_group_info<320>::number_type number_type;
 
                 constexpr static const number_type p =
                     0xD35E472036BC4FB7E13C785ED201E065F98FCFA6F6F40DEF4F92B9EC7893EC28FCD412B1F1B32E27_cppui320;
@@ -211,7 +211,7 @@ namespace nil {
 
             template<>
             struct brainpool_r1<384> : public ec_group_info<384> {
-                typedef ec_group_info<384>::number_type number_type;
+                typedef typename ec_group_info<384>::number_type number_type;
 
                 constexpr static const number_type p =
                     0x8CB91E82A3386D280F5D6F7E50E641DF152F7109ED5456B412B1DA197FB71123ACD3A729901D1A71874700133107EC53_cppui384;
@@ -235,7 +235,7 @@ namespace nil {
 
             template<>
             struct brainpool_r1<512> : public ec_group_info<512> {
-                typedef ec_group_info<512>::number_type number_type;
+                typedef typename ec_group_info<512>::number_type number_type;
 
                 constexpr static const number_type p =
                     0xAADD9DB8DBE9C48B3FD4E6AE33C9FC07CB308DB3B3C9D20ED6639CCA703308717D4D9B009BC66842AECDA12AE6A380E62881FF2F2D82C68528AA6056583A48F3_cppui512;
@@ -262,7 +262,7 @@ namespace nil {
 
             template<>
             struct frp_v1<256> : public ec_group_info<256> {
-                typedef ec_group_info<256>::number_type number_type;
+                typedef typename ec_group_info<256>::number_type number_type;
 
                 constexpr static const number_type p =
                     0xF1FD178C0B3AD58F10126DE8CE42435B3961ADBCABC8CA6DE8FCF353D86E9C03_cppui256;
@@ -287,7 +287,7 @@ namespace nil {
 
             template<>
             struct gost_A<256> : public ec_group_info<256> {
-                typedef ec_group_info<256>::number_type number_type;
+                typedef typename ec_group_info<256>::number_type number_type;
 
                 constexpr static const number_type p =
                     0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFD97_cppui256;
@@ -316,7 +316,7 @@ namespace nil {
 
             template<>
             struct secp_k1<160> : public ec_group_info<160> {
-                typedef ec_group_info<160>::number_type number_type;
+                typedef typename ec_group_info<160>::number_type number_type;
 
                 constexpr static const number_type p = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFAC73_cppui160;
                 constexpr static const number_type a = 0x0_cppui160;
@@ -334,7 +334,7 @@ namespace nil {
 
             template<>
             struct secp_r1<160> : public ec_group_info<160> {
-                typedef ec_group_info<160>::number_type number_type;
+                typedef typename ec_group_info<160>::number_type number_type;
 
                 constexpr static const number_type p = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF7FFFFFFF_cppui160;
                 constexpr static const number_type a = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF7FFFFFFC_cppui160;
@@ -352,7 +352,7 @@ namespace nil {
 
             template<>
             struct secp_r2<160> : public ec_group_info<160> {
-                typedef ec_group_info<160>::number_type number_type;
+                typedef typename ec_group_info<160>::number_type number_type;
 
                 constexpr static const number_type p = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFAC73_cppui160;
                 constexpr static const number_type a = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFAC70_cppui160;
@@ -370,7 +370,7 @@ namespace nil {
 
             template<>
             struct secp_k1<192> : public ec_group_info<192> {
-                typedef ec_group_info<192>::number_type number_type;
+                typedef typename ec_group_info<192>::number_type number_type;
 
                 constexpr static const number_type p = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFEE37_cppui192;
                 constexpr static const number_type a = 0x0_cppui192;
@@ -388,7 +388,7 @@ namespace nil {
 
             template<>
             struct secp_r1<192> : public ec_group_info<192> {
-                typedef ec_group_info<192>::number_type number_type;
+                typedef typename ec_group_info<192>::number_type number_type;
 
                 constexpr static const number_type p = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFEE37_cppui192;
                 constexpr static const number_type a = 0x0_cppui192;
@@ -406,7 +406,7 @@ namespace nil {
 
             template<>
             struct secp_k1<224> : public ec_group_info<224> {
-                typedef ec_group_info<224>::number_type number_type;
+                typedef typename ec_group_info<224>::number_type number_type;
 
                 constexpr static const number_type p =
                     0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFE56D_cppui224;
@@ -428,7 +428,7 @@ namespace nil {
 
             template<>
             struct secp_r1<224> : public ec_group_info<224> {
-                typedef ec_group_info<224>::number_type number_type;
+                typedef typename ec_group_info<224>::number_type number_type;
 
                 constexpr static const number_type p =
                     0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF000000000000000000000001_cppui224;
@@ -452,7 +452,7 @@ namespace nil {
 
             template<>
             struct secp_k1<256> : public ec_group_info<256> {
-                typedef ec_group_info<256>::number_type number_type;
+                typedef typename ec_group_info<256>::number_type number_type;
 
                 constexpr static const number_type p =
                     0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F_cppui256;
@@ -477,7 +477,7 @@ namespace nil {
 
             template<>
             struct sm2p_v1<256> : public ec_group_info<256> {
-                typedef ec_group_info<256>::number_type number_type;
+                typedef typename ec_group_info<256>::number_type number_type;
 
                 constexpr static const number_type p =
                     0xFFFFFFFEFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF00000000FFFFFFFFFFFFFFFF_cppui256;
@@ -510,7 +510,7 @@ namespace nil {
 
             template<>
             struct x962_p_v2<192> : public ec_group_info<192> {
-                typedef ec_group_info<192>::number_type number_type;
+                typedef typename ec_group_info<192>::number_type number_type;
 
                 constexpr static const number_type p = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFFFFFFFFFF_cppui192;
                 constexpr static const number_type a = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFFFFFFFFFC_cppui192;
@@ -528,7 +528,7 @@ namespace nil {
 
             template<>
             struct x962_p_v3<192> : public ec_group_info<192> {
-                typedef ec_group_info<192>::number_type number_type;
+                typedef typename ec_group_info<192>::number_type number_type;
 
                 constexpr static const number_type p = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFFFFFFFFFF_cppui192;
                 constexpr static const number_type a = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFFFFFFFFFC_cppui192;
@@ -546,7 +546,7 @@ namespace nil {
 
             template<>
             struct x962_p_v1<239> : public ec_group_info<239> {
-                typedef ec_group_info<239>::number_type number_type;
+                typedef typename ec_group_info<239>::number_type number_type;
 
                 constexpr static const number_type p =
                     0x7FFFFFFFFFFFFFFFFFFFFFFF7FFFFFFFFFFF8000000000007FFFFFFFFFFF_cppui239;
@@ -570,7 +570,7 @@ namespace nil {
 
             template<>
             struct x962_p_v2<239> : public ec_group_info<239> {
-                typedef ec_group_info<239>::number_type number_type;
+                typedef typename ec_group_info<239>::number_type number_type;
 
                 constexpr static const number_type p =
                     0x7FFFFFFFFFFFFFFFFFFFFFFF7FFFFFFFFFFF8000000000007FFFFFFFFFFF_cppui239;
@@ -594,7 +594,7 @@ namespace nil {
 
             template<>
             struct x962_p_v3<239> : public ec_group_info<239> {
-                typedef ec_group_info<239>::number_type number_type;
+                typedef typename ec_group_info<239>::number_type number_type;
 
                 constexpr static const number_type p =
                     0x7FFFFFFFFFFFFFFFFFFFFFFF7FFFFFFFFFFF8000000000007FFFFFFFFFFF_cppui239;

@@ -14,8 +14,8 @@
 namespace nil {
     namespace crypto3 {
         /*!
-         * @defgroup sign_algorithms Algorithms
-         * @ingroup sign
+         * @addtogroup sign_algorithms Algorithms
+         * @addtogroup sign
          * @brief Algorithms are meant to provide signing interface similar to STL algorithms' one.
          */
 
@@ -156,7 +156,7 @@ namespace nil {
         /*!
          * @brief
          *
-         * @ingroup sign_algorithms
+         * @addtogroup sign_algorithms
          *
          * @tparam Signer
          * @tparam InputIterator
@@ -183,7 +183,7 @@ namespace nil {
         /*!
          * @brief
          *
-         * @ingroup sign_algorithms
+         * @addtogroup sign_algorithms
          *
          * @tparam Signer
          * @tparam InputIterator
@@ -209,7 +209,7 @@ namespace nil {
         /*!
          * @brief
          *
-         * @ingroup sign_algorithms
+         * @addtogroup sign_algorithms
          *
          * @tparam Signer
          * @tparam InputIterator
@@ -231,7 +231,7 @@ namespace nil {
         /*!
          * @brief
          *
-         * @ingroup sign_algorithms
+         * @addtogroup sign_algorithms
          *
          * @tparam Signer
          * @tparam InputIterator
@@ -254,7 +254,7 @@ namespace nil {
         /*!
          * @brief
          *
-         * @ingroup sign_algorithms
+         * @addtogroup sign_algorithms
          *
          * @tparam Signer
          * @tparam SinglePassRange
@@ -277,7 +277,7 @@ namespace nil {
         /*!
          * @brief
          *
-         * @ingroup sign_algorithms
+         * @addtogroup sign_algorithms
          *
          * @tparam Signer
          * @tparam SinglePassRange
@@ -301,7 +301,7 @@ namespace nil {
         /*!
          * @brief
          *
-         * @ingroup sign_algorithms
+         * @addtogroup sign_algorithms
          *
          * @tparam Signer
          * @tparam SinglePassRange
@@ -323,7 +323,7 @@ namespace nil {
         /*!
          * @brief
          *
-         * @ingroup sign_algorithms
+         * @addtogroup sign_algorithms
          *
          * @tparam Signer
          * @tparam SinglePassRange

@@ -7,15 +7,15 @@
 namespace nil {
     namespace crypto3 {
         /*!
-         * @defgroup decrypt_algorithms Algorithms
-         * @ingroup decrypt
+         * @addtogroup decrypt_algorithms Algorithms
+         * @addtogroup decrypt
          * @brief Algorithms are meant to provide decrypting interface similar to STL algorithms' one.
          */
 
         /*!
          * @brief
          *
-         * @ingroup decrypt_algorithms
+         * @addtogroup decrypt_algorithms
          *
          * @tparam PublicKeyCipher
          * @tparam InputIterator
@@ -43,7 +43,7 @@ namespace nil {
         /*!
          * @brief
          *
-         * @ingroup decrypt_algorithms
+         * @addtogroup decrypt_algorithms
          *
          * @tparam PublicKeyCipher
          * @tparam InputIterator
@@ -70,7 +70,7 @@ namespace nil {
         /*!
          * @brief
          *
-         * @ingroup decrypt_algorithms
+         * @addtogroup decrypt_algorithms
          *
          * @tparam PublicKeyCipher
          * @tparam InputIterator
@@ -94,7 +94,7 @@ namespace nil {
         /*!
          * @brief
          *
-         * @ingroup decrypt_algorithms
+         * @addtogroup decrypt_algorithms
          *
          * @tparam PublicKeyCipher
          * @tparam InputIterator
@@ -118,7 +118,7 @@ namespace nil {
         /*!
          * @brief
          *
-         * @ingroup decrypt_algorithms
+         * @addtogroup decrypt_algorithms
          *
          * @tparam PublicKeyCipher
          * @tparam SinglePassRange
@@ -142,7 +142,7 @@ namespace nil {
         /*!
          * @brief
          *
-         * @ingroup decrypt_algorithms
+         * @addtogroup decrypt_algorithms
          *
          * @tparam Decrypter
          * @tparam SinglePassRange
@@ -167,7 +167,7 @@ namespace nil {
         /*!
          * @brief
          *
-         * @ingroup decrypt_algorithms
+         * @addtogroup decrypt_algorithms
          *
          * @tparam PublicKeyCipher
          * @tparam SinglePassRange
@@ -190,7 +190,7 @@ namespace nil {
         /*!
          * @brief
          *
-         * @ingroup decrypt_algorithms
+         * @addtogroup decrypt_algorithms
          *
          * @tparam PublicKeyCipher
          * @tparam SinglePassRange

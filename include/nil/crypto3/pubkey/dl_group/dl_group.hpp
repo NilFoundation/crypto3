@@ -507,7 +507,8 @@ namespace nil {
              * Multiply and reduce an integer modulo p
              * @return (x*y) % p
              */
-            number<Backend, ExpressionTemplates> multiply_mod_p(const number<Backend, ExpressionTemplates> &x, const number<Backend, ExpressionTemplates> &y) const {
+            number<Backend, ExpressionTemplates> multiply_mod_p(const number<Backend, ExpressionTemplates> &x,
+                                                                const number<Backend, ExpressionTemplates> &y) const {
                 return m_mod_p.multiply(x, y);
             }
 
@@ -530,14 +531,17 @@ namespace nil {
              * Throws if q is unset on this DL_Group
              * @return (x*y) % q
              */
-            number<Backend, ExpressionTemplates> multiply_mod_q(const number<Backend, ExpressionTemplates> &x, const number<Backend, ExpressionTemplates> &y) const;
+            number<Backend, ExpressionTemplates> multiply_mod_q(const number<Backend, ExpressionTemplates> &x,
+                                                                const number<Backend, ExpressionTemplates> &y) const;
 
             /**
              * Multiply and reduce an integer modulo q
              * Throws if q is unset on this DL_Group
              * @return (x*y*z) % q
              */
-            number<Backend, ExpressionTemplates> multiply_mod_q(const number<Backend, ExpressionTemplates> &x, const number<Backend, ExpressionTemplates> &y, const number<Backend, ExpressionTemplates> &z) const;
+            number<Backend, ExpressionTemplates> multiply_mod_q(const number<Backend, ExpressionTemplates> &x,
+                                                                const number<Backend, ExpressionTemplates> &y,
+                                                                const number<Backend, ExpressionTemplates> &z) const;
 
             /**
              * Square and reduce an integer modulo q
@@ -572,13 +576,17 @@ namespace nil {
              *
              * @return (g^x) % p
              */
-            number<Backend, ExpressionTemplates> power_g_p(const number<Backend, ExpressionTemplates> &x, size_t max_x_bits) const;
+            number<Backend, ExpressionTemplates> power_g_p(const number<Backend, ExpressionTemplates> &x,
+                                                           size_t max_x_bits) const;
 
             /**
              * Multi-exponentiate
              * Return (g^x * y^z) % p
              */
-            number<Backend, ExpressionTemplates> multi_exponentiate(const number<Backend, ExpressionTemplates> &x, const number<Backend, ExpressionTemplates> &y, const number<Backend, ExpressionTemplates> &z) const {
+            number<Backend, ExpressionTemplates>
+                multi_exponentiate(const number<Backend, ExpressionTemplates> &x,
+                                   const number<Backend, ExpressionTemplates> &y,
+                                   const number<Backend, ExpressionTemplates> &z) const {
                 return monty_multi_exp(m_monty_params, get_g(), x, y, z);
             }
 
@@ -687,6 +695,80 @@ namespace nil {
             size_t m_estimated_strength;
             size_t m_exponent_bits;
         };
+
+        class dl_group_data final {
+        public:
+            dl_group_data(const number<Backend, ExpressionTemplates> &p, const number<Backend, ExpressionTemplates> &q,
+                          const number<Backend, ExpressionTemplates> &g) :
+                m_p(p),
+                m_q(q), m_g(g), m_mod_p(p), m_monty_params(std::make_shared<montgomery_params>(m_p, m_mod_p)),
+                m_monty(monty_precompute(m_monty_params, m_g, /*window bits=*/4)), m_p_bits(p.bits()),
+                m_estimated_strength(dl_work_factor(m_p_bits)), m_exponent_bits(dl_exponent_size(m_p_bits)) {
+            }
+
+            ~dl_group_data() = default;
+
+            dl_group_data(const dl_group_data &other) = delete;
+
+            dl_group_data &operator=(const dl_group_data &other) = delete;
+
+            const number<Backend, ExpressionTemplates> &p() const {
+                return m_p;
+            }
+
+            const number<Backend, ExpressionTemplates> &q() const {
+                return m_q;
+            }
+
+            const number<Backend, ExpressionTemplates> &g() const {
+                return m_g;
+            }
+
+        private:
+            number<Backend, ExpressionTemplates> m_p;
+            number<Backend, ExpressionTemplates> m_q;
+            number<Backend, ExpressionTemplates> m_g;
+            modular_reducer m_mod_p;
+            std::shared_ptr<const montgomery_params> m_monty_params;
+            std::shared_ptr<const montgomery_exponentation_state> m_monty;
+            size_t m_p_bits;
+            size_t m_estimated_strength;
+            size_t m_exponent_bits;
+        };
+
+        // static
+        std::shared_ptr<dl_group_data> dl_group::ber_decode_dl_group(const uint8_t *data, size_t data_len,
+                                                                     dl_group::format format) {
+            number<Backend, ExpressionTemplates> p, q, g;
+
+            ber_decoder decoder(data, data_len);
+            ber_decoder ber = decoder.start_cons(SEQUENCE);
+
+            if (format == dl_group::ANSI_X9_57) {
+                ber.decode(p).decode(q).decode(g).verify_end();
+            } else if (format == dl_group::ANSI_X9_42) {
+                ber.decode(p).decode(g).decode(q).discard_remaining();
+            } else if (format == dl_group::PKCS_3) {
+                // q is left as zero
+                ber.decode(p).decode(g).discard_remaining();
+            } else {
+                throw std::invalid_argument("Unknown dl_group encoding " + std::to_string(format));
+            }
+
+            return std::make_shared<dl_group_data>(p, q, g);
+        }
+
+        const dl_group_data &dl_group::data() const {
+            if (m_data) {
+                return *m_data;
+            }
+
+            throw invalid_state("dl_group uninitialized");
+        }
+
+        std::shared_ptr<const montgomery_params> dl_group::monty_params_p() const {
+            return data().monty_params_p();
+        }
     }    // namespace crypto3
 }    // namespace nil
 
