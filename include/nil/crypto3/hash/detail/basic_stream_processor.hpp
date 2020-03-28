@@ -8,8 +8,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_HASH_MERKLE_DAMGARD_STREAM_PROCESSOR_HPP
-#define CRYPTO3_HASH_MERKLE_DAMGARD_STREAM_PROCESSOR_HPP
+#ifndef CRYPTO3_HASH_BASIC_STREAM_PROCESSOR_HPP
+#define CRYPTO3_HASH_BASIC_STREAM_PROCESSOR_HPP
 
 #include <array>
 #include <iterator>
@@ -38,7 +38,7 @@ namespace nil {
              * @tparam Params
              */
             template<typename Construction, typename StateAccumulator, typename Params>
-            class merkle_damgard_stream_processor {
+            class basic_stream_processor {
             protected:
                 typedef typename Construction::type construction_type;
                 typedef StateAccumulator accumulator_type;
@@ -82,7 +82,7 @@ namespace nil {
                 }
 
             public:
-                merkle_damgard_stream_processor &update_one(value_type value) {
+                basic_stream_processor &update_one(value_type value) {
                     //std::cout << "Value bits one:" << value_bits << "\n";
                     value_array[cache_size] = value;
                     ++cache_size;
@@ -94,14 +94,14 @@ namespace nil {
                     return *this;
                 }
 
-                merkle_damgard_stream_processor &update_last() {
+                basic_stream_processor &update_last() {
                     process_block(cache_size * value_bits);
                     cache_size = 0;
                     return *this;
                 }
 
                 template<typename InputIterator>
-                merkle_damgard_stream_processor &update_n(InputIterator p, size_t n) {
+                basic_stream_processor &update_n(InputIterator p, size_t n) {
                     for (; n; --n) {
                         update_one(*p++);
                     }
@@ -110,7 +110,7 @@ namespace nil {
                 }
 
                 template<typename InputIterator>
-                inline merkle_damgard_stream_processor &operator()(InputIterator b, InputIterator e,
+                inline basic_stream_processor &operator()(InputIterator b, InputIterator e,
                                                                    std::random_access_iterator_tag) {
                      while (b != e) {
                         update_one(*b++);
@@ -121,7 +121,7 @@ namespace nil {
                 }
 
                 template<typename InputIterator, typename Category>
-                inline merkle_damgard_stream_processor &operator()(InputIterator b, InputIterator e, Category) {
+                inline basic_stream_processor &operator()(InputIterator b, InputIterator e, Category) {
                     while (b != e) {
                         update_one(*b++);
                     }
@@ -130,23 +130,23 @@ namespace nil {
                 }
 
                 template<typename InputIterator>
-                inline merkle_damgard_stream_processor &operator()(InputIterator b, InputIterator e) {
+                inline basic_stream_processor &operator()(InputIterator b, InputIterator e) {
                     typedef typename std::iterator_traits<InputIterator>::iterator_category cat;
                     return operator()(b, e, cat());
                 }
 
                 template<typename ContainerT>
-                inline merkle_damgard_stream_processor &operator()(const ContainerT &c) {
+                inline basic_stream_processor &operator()(const ContainerT &c) {
                     return update_n(c.data(), c.size());
                 }
 
 
             public:
-                merkle_damgard_stream_processor(accumulator_type &acc) :
+                basic_stream_processor(accumulator_type &acc) :
                     acc(acc), value_array(), cache_size(0) {
                 }
 
-                virtual ~merkle_damgard_stream_processor() {
+                virtual ~basic_stream_processor() {
                     //                    using namespace nil::crypto3::detail;
                     //
                     //                    // Convert the input into words

@@ -14,7 +14,7 @@
 
 #include <nil/crypto3/hash/detail/keccak/keccak_functions.hpp>
 
-#include <nil/crypto3/hash/detail/sponge_stream_processor.hpp>
+#include <nil/crypto3/hash/detail/basic_stream_processor.hpp>
 #include <nil/crypto3/hash/detail/sponge_construction.hpp>
 
 namespace nil {
@@ -58,7 +58,7 @@ namespace nil {
                         constexpr static const std::size_t value_bits = ValueBits;
                     };
 
-                    typedef sponge_stream_processor<construction, StateAccumulator, params_type> type;
+                    typedef basic_stream_processor<construction, StateAccumulator, params_type> type;
                 };
 
                 constexpr static const std::size_t digest_bits = policy_type::digest_bits;

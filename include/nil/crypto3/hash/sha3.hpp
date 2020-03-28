@@ -13,7 +13,7 @@
 #include <nil/crypto3/hash/keccak.hpp>
 
 #include <nil/crypto3/hash/detail/sponge_construction.hpp>
-#include <nil/crypto3/hash/detail/sponge_stream_processor.hpp>
+#include <nil/crypto3/hash/detail/basic_stream_processor.hpp>
 #include <nil/crypto3/hash/detail/sha3/sha3_functions.hpp>
 
 namespace nil {
@@ -53,7 +53,7 @@ namespace nil {
                         constexpr static const std::size_t length_bits = construction::params_type::length_bits;
                         constexpr static const std::size_t value_bits = ValueBits;
                     };
-                    typedef sponge_stream_processor<construction, StateAccumulator, params_type> type;
+                    typedef basic_stream_processor<construction, StateAccumulator, params_type> type;
                 };
 
                 constexpr static const std::size_t digest_bits = policy_type::digest_bits;

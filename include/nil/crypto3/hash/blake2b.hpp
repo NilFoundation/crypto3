@@ -13,7 +13,7 @@
 #include <nil/crypto3/hash/detail/blake2b/blake2b_functions.hpp>
 
 #include <nil/crypto3/hash/detail/haifa_construction.hpp>
-#include <nil/crypto3/hash/detail/haifa_stream_processor.hpp>
+#include <nil/crypto3/hash/detail/basic_stream_processor.hpp>
 #include <nil/crypto3/hash/detail/finalizer.hpp>
 
 
@@ -125,7 +125,7 @@ namespace nil {
                         constexpr static const std::size_t value_bits = ValueBits;
                     };
 
-                    typedef haifa_stream_processor<construction, StateAccumulator, params_type> type;
+                    typedef basic_stream_processor<construction, StateAccumulator, params_type> type;
                 };
 
                 constexpr static const std::size_t digest_bits = DigestBits;
