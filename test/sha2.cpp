@@ -516,9 +516,9 @@ BOOST_AUTO_TEST_CASE(sha384_preprocessor1) {
 BOOST_AUTO_TEST_CASE(sha384_preprocessor2) {
     // Example from Appendix D.1
     accumulator_set<sha2<384>> acc;
-    acc(0x61000000, nil::crypto3::accumulators::bits = 8);
-    acc(0x62000000, nil::crypto3::accumulators::bits = 8);
-    acc(0x63000000, nil::crypto3::accumulators::bits = 8);
+    acc(UINT64_C(0x6100000000000000), nil::crypto3::accumulators::bits = 8);
+    acc(UINT64_C(0x6200000000000000), nil::crypto3::accumulators::bits = 8);
+    acc(UINT64_C(0x6300000000000000), nil::crypto3::accumulators::bits = 8);
     sha2<384>::digest_type s = extract::hash<sha2<384>>(acc);
 
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
@@ -536,7 +536,7 @@ BOOST_AUTO_TEST_CASE(sha384_preprocessor3) {
     // Example from Appendix D.3
     accumulator_set<sha2<384>> acc;
     for (unsigned i = 0; i < 1000000; ++i) {
-        acc(0x61000000, nil::crypto3::accumulators::bits = 8);
+        acc(UINT64_C(0x6100000000000000), nil::crypto3::accumulators::bits = 8);
     }
     sha2<384>::digest_type s = extract::hash<sha2<384>>(acc);
 
@@ -549,7 +549,7 @@ BOOST_AUTO_TEST_CASE(sha384_preprocessor3) {
         "7972cec5704c2a5b07b8b3dc38ecc4ebae97ddd87f3d8985",
         std::to_string(s).data());
 }
-/*
+
 BOOST_AUTO_TEST_CASE(sha512_preprocessor1) {
     accumulator_set<sha2<512>> acc;
     sha2<512>::digest_type s = extract::hash<sha2<512>>(acc);
@@ -567,9 +567,9 @@ BOOST_AUTO_TEST_CASE(sha512_preprocessor1) {
 BOOST_AUTO_TEST_CASE(sha512_preprocessor2) {
     // Example from Appendix C.1
     accumulator_set<sha2<512>> acc;
-    acc('a');
-    acc('b');
-    acc('c');
+    acc(UINT64_C(0x6100000000000000), nil::crypto3::accumulators::bits = 8);
+    acc(UINT64_C(0x6200000000000000), nil::crypto3::accumulators::bits = 8);
+    acc(UINT64_C(0x6300000000000000), nil::crypto3::accumulators::bits = 8);
 
     sha2<512>::digest_type s = extract::hash<sha2<512>>(acc);
 
@@ -587,7 +587,7 @@ BOOST_AUTO_TEST_CASE(sha512_preprocessor3) {
     // Example from Appendix C.3
     accumulator_set<sha2<512>> acc;
     for (unsigned i = 0; i < 1000000; ++i) {
-        acc('a');
+        acc(UINT64_C(0x6100000000000000), nil::crypto3::accumulators::bits = 8);
     }
     sha2<512>::digest_type s = extract::hash<sha2<512>>(acc);
 
@@ -647,5 +647,5 @@ BOOST_AUTO_TEST_CASE(sha512_various_hash2) {
         "de0ff244877ea60a4cb0432ce577c31beb009c5c2c49aa2e4eadb217ad8cc09b",
         std::to_string(h).data());
 }
-*/
+
 BOOST_AUTO_TEST_SUITE_END()
