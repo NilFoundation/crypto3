@@ -10,14 +10,14 @@ namespace nil {
     namespace crypto3 {
         namespace pubkey {
 
-            class CECPQ1_key final {
+            class cecpq1_key final {
             public:
                 secure_vector<uint8_t> m_x25519;
                 newhope_poly m_newhope;
             };
 
             template<typename UniformRandomGenerator>
-            void CECPQ1_offer(uint8_t *offer_message, CECPQ1_key *offer_key_output, UniformRandomGenerator &rng) {
+            void cecpq1_offer(uint8_t *offer_message, cecpq1_key *offer_key_output, UniformRandomGenerator &rng) {
                 offer_key_output->m_x25519 = rng.random_vec(32);
                 curve25519_basepoint(send, offer_key_output->m_x25519.data());
 
@@ -25,7 +25,7 @@ namespace nil {
             }
 
             template<typename UniformRandomGenerator>
-            void CECPQ1_accept(uint8_t *shared_key, uint8_t *accept_message, const uint8_t *offer_message,
+            void cecpq1_accept(uint8_t *shared_key, uint8_t *accept_message, const uint8_t *offer_message,
                                UniformRandomGenerator &rng) {
                 secure_vector<uint8_t> x25519_key = rng.random_vec(32);
 
@@ -36,7 +36,7 @@ namespace nil {
                 newhope_sharedb(shared_key + 32, send + 32, received + 32, rng, Newhope_Mode::BoringSSL);
             }
 
-            void CECPQ1_finish(uint8_t *shared_key, const CECPQ1_key &offer_key, const uint8_t *accept_message) {
+            void cecpq1_finish(uint8_t *shared_key, const cecpq1_key &offer_key, const uint8_t *accept_message) {
                 curve25519_donna(shared_key, offer_key.m_x25519.data(), received);
 
                 newhope_shareda(shared_key + 32, &offer_key.m_newhope, received + 32, Newhope_Mode::BoringSSL);
