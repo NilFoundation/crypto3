@@ -12,7 +12,7 @@
 #ifndef CRYPTO3_HASH_HAIFA_CONSTRUCTION_HPP
 #define CRYPTO3_HASH_HAIFA_CONSTRUCTION_HPP
 
-#include <nil/crypto3/detail/finalizer.hpp>
+#include <nil/crypto3/hash/detail/finalizer.hpp>
 
 #include <nil/crypto3/detail/static_digest.hpp>
 #include <nil/crypto3/detail/pack.hpp>
@@ -36,7 +36,7 @@ namespace nil {
              *
              * @note https://eprint.iacr.org/2007/278.pdf
              */
-            template<typename Params, typename IV, typename Compressor, typename Finalizer = ::nil::crypto3::detail::nop_finalizer>
+            template<typename Params, typename IV, typename Compressor, typename Finalizer = ::nil::crypto3::hash::detail::nop_finalizer>
             class haifa_construction {
             public:
                 typedef Compressor compressor_functor;
