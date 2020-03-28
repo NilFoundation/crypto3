@@ -8,8 +8,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_HASH_BASIC_STREAM_PROCESSOR_HPP
-#define CRYPTO3_HASH_BASIC_STREAM_PROCESSOR_HPP
+#ifndef CRYPTO3_HASH_HASH_STREAM_PROCESSOR_HPP
+#define CRYPTO3_HASH_HASH_STREAM_PROCESSOR_HPP
 
 #include <array>
 #include <iterator>
@@ -38,7 +38,7 @@ namespace nil {
              * @tparam Params
              */
             template<typename Construction, typename StateAccumulator, typename Params>
-            class basic_stream_processor {
+            class hash_stream_processor {
             protected:
                 typedef typename Construction::type construction_type;
                 typedef StateAccumulator accumulator_type;
@@ -56,7 +56,7 @@ namespace nil {
                 typedef typename boost::uint_t<value_bits>::least value_type;
                 BOOST_STATIC_ASSERT(word_bits % value_bits == 0);
                 constexpr static const std::size_t block_values = block_bits / value_bits;
-                typedef std::array<value_type, block_values> value_array_type;
+                typedef std::array<value_type, block_values> cache_type;
 
             protected:
                 constexpr static const std::size_t length_bits = params_type::length_bits;
@@ -70,103 +70,84 @@ namespace nil {
 
                 BOOST_STATIC_ASSERT(!length_bits || value_bits <= length_bits);
 
-                inline void process_block(std::size_t bb = block_bits) {
+                inline void process_block(std::size_t block_seen = block_bits) {
                     using namespace nil::crypto3::detail;
 
                     // Convert the input into words
                     block_type block;
-                    pack<endian_type, value_bits, word_bits>(value_array, block);
+                    pack<endian_type, value_bits, word_bits>(cache, block);
 
                     // Process the block
-                    acc(block, accumulators::bits = bb);
+                    acc(block, accumulators::bits = block_seen);
                 }
 
             public:
-                basic_stream_processor &update_one(value_type value) {
-                    //std::cout << "Value bits one:" << value_bits << "\n";
-                    value_array[cache_size] = value;
-                    ++cache_size;
-                    if (cache_size == block_values) {
+                inline void update_one(value_type value) {
+                    cache[cache_seen] = value;
+                    ++cache_seen;
+                    if (cache_seen == block_values) {
                         // Process the completed block
                         process_block();
-                        cache_size = 0;
+                        cache_seen = 0;
                     }
-                    return *this;
                 }
 
-                basic_stream_processor &update_last() {
-                    process_block(cache_size * value_bits);
-                    cache_size = 0;
-                    return *this;
-                }
 
                 template<typename InputIterator>
-                basic_stream_processor &update_n(InputIterator p, size_t n) {
+                inline void update_n(InputIterator p, size_t n) {
                     for (; n; --n) {
                         update_one(*p++);
                     }
-                        
-                    return *this;
                 }
 
                 template<typename InputIterator>
-                inline basic_stream_processor &operator()(InputIterator b, InputIterator e,
-                                                                   std::random_access_iterator_tag) {
-                     while (b != e) {
-                        update_one(*b++);
-                    }
+                inline void update_n(InputIterator first, InputIterator last) {
+                    std::size_t n = std::distance(first, last);
+                    update_n(first, n);
+                }
 
-                    return update_last();
-                    //return update_n(b, e - b).end_message();
+                template<typename InputIterator>
+                inline void operator()(InputIterator b, InputIterator e,
+                                                                   std::random_access_iterator_tag) {
+                    update_n(b, e);
                 }
 
                 template<typename InputIterator, typename Category>
-                inline basic_stream_processor &operator()(InputIterator b, InputIterator e, Category) {
+                inline  void operator()(InputIterator b, InputIterator e, Category) {
                     while (b != e) {
                         update_one(*b++);
                     }
-
-                    return update_last();
                 }
 
                 template<typename InputIterator>
-                inline basic_stream_processor &operator()(InputIterator b, InputIterator e) {
+                inline void operator()(InputIterator b, InputIterator e) {
                     typedef typename std::iterator_traits<InputIterator>::iterator_category cat;
-                    return operator()(b, e, cat());
+                    
+                    operator()(b, e, cat());
                 }
 
                 template<typename ContainerT>
-                inline basic_stream_processor &operator()(const ContainerT &c) {
-                    return update_n(c.data(), c.size());
+                inline void operator()(const ContainerT &c) {
+                    update_n(c.data(), c.size());
                 }
-
 
             public:
-                basic_stream_processor(accumulator_type &acc) :
-                    acc(acc), value_array(), cache_size(0) {
+                hash_stream_processor(accumulator_type &acc) :
+                    acc(acc), cache(), cache_seen(0) {
                 }
 
-                virtual ~basic_stream_processor() {
-                    //                    using namespace nil::crypto3::detail;
-                    //
-                    //                    // Convert the input into words
-                    //                    block_type block;
-                    //                    pack<endian_type, value_bits, word_bits>(value_array, block);
-                    //
-                    //                    // Process the block
-                    //                    std::size_t bb = block_bits;
-                    //                    acc(block, accumulators::bits = bb);
-                }
-
-                void reset() {
-                    cache_size = 0;
+                virtual ~hash_stream_processor() {
+                    if (!cache.empty()) {
+                        process_block(cache_seen * value_bits);
+                        cache_seen = 0;
+                    }
                 }
 
             private:
                 accumulator_type &acc;
 
-                value_array_type value_array;
-                length_type cache_size;
+                cache_type cache;
+                length_type cache_seen;
             };
         }    // namespace hash
     }        // namespace crypto3

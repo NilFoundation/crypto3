@@ -16,7 +16,7 @@
 #include <nil/crypto3/hash/detail/state_adder.hpp>
 #include <nil/crypto3/hash/detail/davies_meyer_compressor.hpp>
 #include <nil/crypto3/hash/detail/merkle_damgard_construction.hpp>
-#include <nil/crypto3/hash/detail/basic_stream_processor.hpp>
+#include <nil/crypto3/hash/detail/hash_stream_processor.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -55,7 +55,7 @@ namespace nil {
                         constexpr static const std::size_t value_bits = ValueBits;
                     };
 
-                    typedef basic_stream_processor<construction, StateAccumulator, params_type> type;
+                    typedef hash_stream_processor<construction, StateAccumulator, params_type> type;
                 };
 
                 constexpr static const std::size_t digest_bits = policy_type::digest_bits;
