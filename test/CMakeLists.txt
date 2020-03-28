@@ -34,7 +34,7 @@ endmacro()
 
 set(TESTS_NAMES
 #    "adler"
-   "blake2b"
+#    "blake2b"
 #    "crc"
 #    "cubehash"
 #    "md4"
@@ -45,7 +45,7 @@ set(TESTS_NAMES
 #    "pack"
 #    "tiger"
 #    "sha"
-    "sha2"
+     "sha2"
 #    "sha3"
 #    "skein"
 #    "sm3"

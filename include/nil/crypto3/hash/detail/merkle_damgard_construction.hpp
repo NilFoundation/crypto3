@@ -12,18 +12,13 @@
 #ifndef CRYPTO3_HASH_MERKLE_DAMGARD_CONSTRUCTION_HPP
 #define CRYPTO3_HASH_MERKLE_DAMGARD_CONSTRUCTION_HPP
 
+#include <nil/crypto3/hash/detail/finalizer.hpp>
+
 #include <nil/crypto3/detail/static_digest.hpp>
 #include <nil/crypto3/detail/pack.hpp>
-#include <nil/crypto3/detail/stream_endian.hpp>
 #include <nil/crypto3/detail/unbounded_shift.hpp>
-#include <nil/crypto3/detail/endian_shift.hpp>
-#include <nil/crypto3/detail/inject.hpp>
-
-#include <nil/crypto3/hash/detail/nop_finalizer.hpp>
 
 #include <boost/utility/enable_if.hpp>
-
-#include <algorithm>
 
 namespace nil {
     namespace crypto3 {
@@ -44,7 +39,7 @@ namespace nil {
              *
              * @note http://www.merkle.com/papers/Thesis1979.pdf
              */
-            template<typename Params, typename IV, typename Compressor, typename Finalizer = nop_finalizer>
+            template<typename Params, typename IV, typename Compressor, typename Finalizer = ::nil::crypto3::hash::detail::nop_finalizer>
             class merkle_damgard_construction {
             public:
                 typedef IV iv_generator;
@@ -78,7 +73,9 @@ namespace nil {
                 constexpr static const std::size_t length_words = length_bits / word_bits;
                 BOOST_STATIC_ASSERT(!length_bits || length_bits % word_bits == 0);
 
-                typedef ::nil::crypto3::detail::injector<endian_type, word_bits, block_words, block_bits> injector;
+                //typedef ::nil::crypto3::hash::detail::length_adder<endian_type, length_type, word_bits, block_words, 
+                                                                   //length_type_bits, length_bits> 
+                    //length_adder;
             public:
                 template<typename Integer = std::size_t>
                 inline merkle_damgard_construction &process_block(const block_type &block, Integer seen = Integer()) {
@@ -86,69 +83,28 @@ namespace nil {
                     return *this;
                 }
 
-                inline digest_type end_message(const block_type &block = block_type(),
-                                               length_type seen = length_type()) {
-                    digest_type d = digest(block, seen);
-                    reset();
-                    return d;
-                }
-
-                static void print_word(const word_type &w) {
-                        using namespace::nil::crypto3::detail;
-                        for (size_t i = 0; i != word_bits; ++i)
-                            std::cout << (bool) (w & (high_bits<word_type, word_bits>(~word_type(), 1) >> i));
-                        std::cout << std::endl;
-                    }
-
-                    static void print_block(const block_type &b) {
-                        for (size_t i = 0; i != block_words; ++i)
-                            print_word(b[i]);
-                    }
-                
-
-                inline digest_type digest(const block_type &block = block_type(), length_type seen = length_type()) {
-                    
-                    using namespace nil::crypto3::detail;
+                inline digest_type digest(const block_type &block = block_type(), length_type total_seen = length_type()) {
                     block_type b;
-                    std::size_t head_bits = seen % block_bits; // the number of significant bits in block
-                    std::size_t head_words = (seen / word_bits) % block_words; // the number of significant block words
-
-                    // Case of full block
-                    if (!head_bits) {
+                    std::move(block.begin(), block.end(), b.begin());
+                    std::size_t block_seen = total_seen % block_bits;
+                    /*Process block if block is full
+                    if (total_seen && !block_seen)
+                        process_block(b);*/
+                    // Apply finalizer
+                    finalizer_functor finalizer;
+                    finalizer(b, block_seen);
+                    // Process block if total length cannot be appended
+                    if (block_seen + length_bits > block_bits) {
+                        process_block(b);
                         std::fill(b.begin(), b.end(), 0);
                     }
-                    // Case of incomplete block 
-                    else {
-                        
-                        std::move(block.begin(), block.end(), b.begin());
-
-                        // Remove possible garbage from the block
-                        std::fill(b.begin() + head_words + 1, b.end(), 0);
-                        
-                    }
-                    // Fill the block with bit 1 and length
-                    std::array<bool, word_bits> bit_one = {{1}};
-                    std::array<word_type, 1> bit_one_word = {0};
-                    pack<endian_type, 1, word_bits>(bit_one, bit_one_word);
-                    injector::inject(bit_one_word[0], 1, b, head_bits);
-                    
-                    // Create new block if there is no sufficient data to hold length in the current block
-                    if (head_bits > block_bits - length_bits - 1) {
-                        process_block(b);
-                        std::fill(b.begin(), b.end(), 0);                            
-                    }
-                    // Append length to last block
-                    append_length<int>(b, seen);
-                    
+                    // Append total length to the last block
+                    append_length<int>(b, total_seen);
                     // Process the last block
                     process_block(b);
-
-                    // Apply finalizer                   
-                    finalizer_functor finalizer;
-                    finalizer(state_);
                     // Convert digest to byte representation
                     digest_type d;
-                    pack_n<endian_type, word_bits, octet_bits>(state_.data(), digest_words, d.data(), digest_bytes);
+                    nil::crypto3::detail::pack_n<endian_type, word_bits, octet_bits>(state_.data(), digest_words, d.data(), digest_bytes);
                     return d;
                 }
 
@@ -173,27 +129,21 @@ namespace nil {
                 template<typename Dummy>
                 typename boost::enable_if_c<length_bits && sizeof(Dummy)>::type append_length(block_type &block, length_type length) {
                     using namespace nil::crypto3::detail;
+                    // Obtain bit representation of total_seen
                     std::array<bool, length_bits> length_bits_array;
-                    // FIXME1: message length can be more than 2^64 - 1 if we use 512-bit hash
-                    bool is_greater = length_bits > 64;
-                    // FIXME2: here we consider that length_bits == 2 * word_bits
-                    if (is_greater)
-                        for (std::size_t i = 0; i != word_bits; ++i)
-                            length_bits_array[i] = false;                        
+                    length_bits_array.fill(false);
+                    length_type mask = high_bits<length_type, length_type_bits>(~length_type(), 1);
 
-                    length_type tail_len = is_greater ? word_bits : length_bits;
-                    for (length_type i = 0; i != tail_len; ++i)
-                        length_bits_array[i + is_greater * word_bits] = length & (high_bits<length_type, length_bits>(~length_type(), 1) >> i);
-
-                    // Append length
-                    std::array<word_type, length_words> length_words_array;
-                    for (std::size_t i = 0; i != length_words; ++i)
-                        length_words_array[i] = 0;
-
-                    pack<endian_type, 1, word_bits>(length_bits_array, length_words_array);
-                    for (std::size_t i = length_words; i; --i) {
-                        block[block_words - i] = length_words_array[length_words - i];
+                    for (std::size_t i = length_bits - length_type_bits; i != length_bits; ++i) {
+                        length_bits_array[i] = length & mask;
+                        mask >>= 1;
                     }
+                    // Convert bit representation of total_seen to its word representation
+                    std::array<word_type, length_words> length_words_array;
+                    pack<endian_type, 1, word_bits>(length_bits_array, length_words_array);
+                    // Add total_seen to block
+                    for (std::size_t i = length_words; i; --i)
+                        block[block_words - i] = length_words_array[length_words - i];
                 }
                 /*
                 template<>
@@ -203,7 +153,6 @@ namespace nil {
                 typename boost::disable_if_c<length_bits && sizeof(Dummy)>::type append_length(block_type &block, length_type length) {
                     // No appending requested, so nothing to do
                 }
-
                 state_type state_;
             };
 

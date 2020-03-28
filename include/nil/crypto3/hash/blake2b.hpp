@@ -105,11 +105,11 @@ namespace nil {
                         constexpr static const std::size_t digest_bits = policy_type::digest_bits;
                     };
 
-                    typedef ::nil::crypto3::hash::detail::finalizer<typename params_type::digest_endian, typename policy_type::word_type, 
-                                                              policy_type::word_bits, policy_type::block_bits> 
-                        finalizer;
+                    typedef ::nil::crypto3::hash::detail::blake2b_finalizer<typename params_type::digest_endian, 
+                                typename policy_type::word_type, policy_type::word_bits, policy_type::block_bits> 
+                        blake2b_finalizer;
                     typedef haifa_construction<params_type, typename policy_type::iv_generator,
-                                               blake2b_compressor<DigestBits>, finalizer>
+                                               blake2b_compressor<DigestBits>, blake2b_finalizer>
                         type;
 
                     constexpr static const std::size_t word_bits = policy_type::word_bits;
