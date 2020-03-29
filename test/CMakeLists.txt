@@ -38,7 +38,7 @@ set(TESTS_NAMES
 #    "crc"
 #    "cubehash"
 #    "md4"
-#    "md5"
+    "md5"
 #    "ghash"
 #    "keccak"
 #    "ripemd"

@@ -79,7 +79,7 @@ namespace nil {
                             injector::inject(bit_one_word[0], 1, block, block_seen);
                         } 
                     };
-
+                    /*
                     template<typename Endianness, typename SeenType, std::size_t WordBits, std::size_t BlockWords, 
                             std::size_t SeenTypeBits, std::size_t LengthBits>
                     struct length_adder : public ::nil::crypto3::detail::basic_functions<WordBits> {
@@ -116,7 +116,7 @@ namespace nil {
                         static typename boost::disable_if_c<LengthBits && sizeof(Dummy)>::type append_length(block_type &block, SeenType total_seen) {
                             // No appending requested, so nothing to do
                         }   
-                    };
+                    };*/
                      
             }       // namespace detail
         }       //namespace hash

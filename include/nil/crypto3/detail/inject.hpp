@@ -64,7 +64,7 @@ namespace nil {
 
                     typedef std::array<word_type, BlockWords> block_type;
 
-                    static void inject(word_type w, std::size_t word_seen, block_type &b, std::size_t block_seen) {
+                    static void inject(word_type w, std::size_t word_seen, block_type &b, std::size_t &block_seen) {
                         //Insert word_seen-bit part of word into the block b according to endianness
                         
                         // Check whether we fall out of the block
@@ -133,7 +133,7 @@ namespace nil {
 
                     typedef std::array<word_type, BlockWords> block_type;
 
-                    static void inject(word_type w, std::size_t word_seen, block_type &b, std::size_t block_seen) {
+                    static void inject(word_type w, std::size_t word_seen, block_type &b, std::size_t &block_seen) {
                         //Insert word_seen-bit part of word into the block b according to endianness
                         
                         // Check whether we fall out of the block
@@ -201,7 +201,7 @@ namespace nil {
 
                     typedef std::array<word_type, BlockWords> block_type;
 
-                    static void inject(word_type w, std::size_t word_seen, block_type &b, std::size_t block_seen) {
+                    static void inject(word_type w, std::size_t word_seen, block_type &b, std::size_t &block_seen) {
                         //Insert word_seen-bit part of word into the block b according to endianness
                         
                         // Check whether we fall out of the block
