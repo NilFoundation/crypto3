@@ -1,5 +1,4 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2019 Nil Foundation AG
 // Copyright (c) 2018-2019 Mikhail Komarov <nemo@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
@@ -18,9 +17,8 @@ namespace nil {
 
             using block::detail::basic_functions;
 
-
         }    // namespace detail
-    }            // namespace crypto3
+    }        // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_HASH_DETAIL_BASIC_FUNCTIONS_HPP

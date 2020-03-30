@@ -65,7 +65,6 @@ namespace nil {
                     constexpr static const std::size_t length_words = length_bits / word_bits;
                     BOOST_STATIC_ASSERT(!length_bits || length_bits % word_bits == 0);
 
-
                     typedef ::nil::crypto3::detail::injector<endian_type, word_bits, block_words, block_bits> injector;
 
                 public:
@@ -87,8 +86,6 @@ namespace nil {
                     }
 
                 protected:
-
-
                     inline void resolve_type(const block_type &value, std::size_t bits = block_bits) {
                         total_seen += bits;
                         process(value, bits);
@@ -102,52 +99,53 @@ namespace nil {
                     inline void process(const block_type &value, std::size_t value_seen) {
                         using namespace ::nil::crypto3::detail;
 
-                        if (filled){
+                        if (filled) {
                             construction.process_block(cache, total_seen - value_seen);
                             filled = false;
                         }
 
-
                         std::size_t cached_bits = (total_seen - value_seen) % block_bits;
 
                         if (cached_bits != 0) {
-                            //If there are already any bits in the cache
+                            // If there are already any bits in the cache
 
                             std::size_t needed_to_fill_bits = block_bits - cached_bits;
-                            std::size_t new_bits_to_append = (needed_to_fill_bits > value_seen)? value_seen : needed_to_fill_bits;
+                            std::size_t new_bits_to_append =
+                                (needed_to_fill_bits > value_seen) ? value_seen : needed_to_fill_bits;
 
                             injector::inject(value, new_bits_to_append, cache, cached_bits);
-                            
+
                             if (cached_bits == block_bits) {
-                                //If there are enough bits in the incoming value to fill the block
+                                // If there are enough bits in the incoming value to fill the block
                                 filled = true;
 
-                                if (value_seen > new_bits_to_append){
+                                if (value_seen > new_bits_to_append) {
 
-                                    
                                     construction.process_block(cache, total_seen - value_seen + new_bits_to_append);
                                     filled = false;
-                                    
-                                    //If there are some remaining bits in the incoming value - put them into the cache, which is now empty
-                                    
+
+                                    // If there are some remaining bits in the incoming value - put them into the cache,
+                                    // which is now empty
+
                                     cached_bits = 0;
 
-                                    injector::inject(value, value_seen - new_bits_to_append, cache, cached_bits, new_bits_to_append);
-
+                                    injector::inject(
+                                        value, value_seen - new_bits_to_append, cache, cached_bits, new_bits_to_append);
                                 }
-
                             }
 
                         } else {
-                            //If there are no bits in the cache
+                            // If there are no bits in the cache
                             if (value_seen == block_bits) {
-                                //The incoming value is a full block
-                                
+                                // The incoming value is a full block
+
                                 construction.process_block(cache, total_seen);
 
                             } else {
-                                //The incoming value is not a full block
-                                std::move(value.begin(), value.begin() + value_seen/word_bits + (value_seen%word_bits? 1 : 0), cache.begin());
+                                // The incoming value is not a full block
+                                std::move(value.begin(),
+                                          value.begin() + value_seen / word_bits + (value_seen % word_bits ? 1 : 0),
+                                          cache.begin());
                             }
                         }
                     }
@@ -155,7 +153,7 @@ namespace nil {
                     inline void process(const word_type &value, std::size_t value_seen) {
                         using namespace ::nil::crypto3::detail;
 
-                        if (filled){
+                        if (filled) {
                             construction.process_block(cache, total_seen - value_seen);
                             filled = false;
                         }
@@ -164,32 +162,33 @@ namespace nil {
 
                         if (cached_bits != 0) {
                             std::size_t needed_to_fill_bits = block_bits - cached_bits;
-                            std::size_t new_bits_to_append = (needed_to_fill_bits > value_seen)? value_seen : needed_to_fill_bits;
+                            std::size_t new_bits_to_append =
+                                (needed_to_fill_bits > value_seen) ? value_seen : needed_to_fill_bits;
 
                             injector::inject(value, new_bits_to_append, cache, cached_bits);
 
                             if (cached_bits == block_bits) {
-                                //If there are enough bits in the incoming value to fill the block
+                                // If there are enough bits in the incoming value to fill the block
 
                                 filled = true;
 
-                                if (value_seen > new_bits_to_append){
+                                if (value_seen > new_bits_to_append) {
 
                                     construction.process_block(cache, total_seen - value_seen + new_bits_to_append);
                                     filled = false;
-                                    
-                                    //If there are some remaining bits in the incoming value - put them into the cache, which is now empty
+
+                                    // If there are some remaining bits in the incoming value - put them into the cache,
+                                    // which is now empty
                                     cached_bits = 0;
 
-                                    injector::inject(value, value_seen - new_bits_to_append, cache, cached_bits, new_bits_to_append);
+                                    injector::inject(
+                                        value, value_seen - new_bits_to_append, cache, cached_bits, new_bits_to_append);
                                 }
-
                             }
 
                         } else {
                             cache[0] = value;
                         }
-
                     }
 
                     bool filled;

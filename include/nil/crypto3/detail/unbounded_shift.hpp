@@ -84,7 +84,6 @@ namespace nil {
                 T highmask = ((bool) shift) * unbounded_shl<T>(~T(), type_bits - shift);
                 return x & highmask;
             }
-            
         }    // namespace detail
     }        // namespace crypto3
 }    // namespace nil

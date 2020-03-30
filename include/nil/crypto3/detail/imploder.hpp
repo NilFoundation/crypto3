@@ -33,7 +33,7 @@ namespace nil {
                 template<typename InputValue, typename OutputValue>
                 static void step(InputValue z, OutputValue &x) {
                     int const shift = OutputBits - (InputBits + k);
-                    
+
                     OutputValue y = low_bits<InputBits>(OutputValue(z));
                     x |= unbounded_shl<shift>(y);
                 }
@@ -46,9 +46,9 @@ namespace nil {
                     int const kb = (k % UnitBits);
                     int const ku = k - kb;
                     int const shift =
-                                    InputBits >= UnitBits ?
-                                    k :
-                                    OutputBits >= UnitBits ? ku + (UnitBits - (InputBits + kb)) : OutputBits - (InputBits + kb);
+                        InputBits >= UnitBits ?
+                            k :
+                            OutputBits >= UnitBits ? ku + (UnitBits - (InputBits + kb)) : OutputBits - (InputBits + kb);
                     OutputValue y = low_bits<InputBits>(OutputValue(z));
                     x |= unbounded_shl<shift>(y);
                 }
@@ -60,10 +60,9 @@ namespace nil {
                 static void step(InputValue z, OutputValue &x) {
                     int const kb = (k % UnitBits);
                     int const ku = k - kb;
-                    int const shift = 
-                                    InputBits >= UnitBits ?
-                                    OutputBits - (InputBits + k) :
-                                    OutputBits >= UnitBits ? OutputBits - (UnitBits + ku) + kb : kb;
+                    int const shift = InputBits >= UnitBits ?
+                                          OutputBits - (InputBits + k) :
+                                          OutputBits >= UnitBits ? OutputBits - (UnitBits + ku) + kb : kb;
 
                     OutputValue y = low_bits<InputBits>(OutputValue(z));
                     x |= unbounded_shl<shift>(y);
