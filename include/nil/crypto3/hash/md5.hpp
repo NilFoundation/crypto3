@@ -39,11 +39,13 @@ namespace nil {
                         constexpr static const std::size_t digest_bits = policy_type::digest_bits;
                     };
 
-                    typedef ::nil::crypto3::hash::detail::md_finalizer<typename params_type::digest_endian, 
-                                block_cipher_type::word_bits, block_cipher_type::key_bits> 
+                    typedef detail::md_finalizer<typename params_type::digest_endian, block_cipher_type::word_bits,
+                                                 block_cipher_type::key_bits>
                         md_finalizer;
                     typedef merkle_damgard_construction<params_type, policy_type::iv_generator,
-                            davies_meyer_compressor<block_cipher_type, detail::state_adder>, md_finalizer> type;
+                                                        davies_meyer_compressor<block_cipher_type, detail::state_adder>,
+                                                        md_finalizer>
+                        type;
                 };
 
                 template<typename StateAccumulator, std::size_t ValueBits>

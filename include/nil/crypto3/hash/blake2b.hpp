@@ -52,7 +52,8 @@ namespace nil {
                     std::move(state.begin(), state.end(), v.begin());
                     std::move(iv_generator()().begin(), iv_generator()().end(), v.begin() + state_words);
 
-                    std::array<typename state_type::value_type, 2> s = {seen / CHAR_BIT + ((seen % CHAR_BIT) ? 1 : 0), 0x00};
+                    std::array<typename state_type::value_type, 2> s = {seen / CHAR_BIT + ((seen % CHAR_BIT) ? 1 : 0),
+                                                                        0x00};
 
                     v[12] ^= s[0];
                     v[13] ^= s[1];
@@ -104,8 +105,9 @@ namespace nil {
                         constexpr static const std::size_t digest_bits = policy_type::digest_bits;
                     };
 
-                    typedef ::nil::crypto3::hash::detail::blake2b_finalizer<typename params_type::digest_endian, 
-                                typename policy_type::word_type, policy_type::word_bits, policy_type::block_bits> 
+                    typedef detail::blake2b_finalizer<typename params_type::digest_endian,
+                                                      typename policy_type::word_type, policy_type::word_bits,
+                                                      policy_type::block_bits>
                         blake2b_finalizer;
                     typedef haifa_construction<params_type, typename policy_type::iv_generator,
                                                blake2b_compressor<DigestBits>, blake2b_finalizer>
