@@ -17,8 +17,10 @@ namespace nil {
             namespace detail {
                 template<std::size_t WordBits>
                 struct ripemd_functions : public ::nil::crypto3::detail::basic_functions<WordBits> {
-                    constexpr static const std::size_t word_bits = ::nil::crypto3::detail::basic_functions<WordBits>::word_bits;
-                    typedef typename ::nil::crypto3::detail::basic_functions<WordBits>::word_type word_type;
+                    typedef ::nil::crypto3::detail::basic_functions<WordBits> policy_type;
+                    
+                    constexpr static const std::size_t word_bits = policy_type::word_bits;
+                    typedef typename policy_type::word_type word_type;
 
                     struct f1 {
                         inline word_type operator()(word_type x, word_type y, word_type z) const {
