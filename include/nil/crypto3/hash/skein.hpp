@@ -83,7 +83,7 @@ namespace nil {
                         constexpr static const std::size_t value_bits = ValueBits;
                     };
 
-                    typedef hash_stream_processor<construction, StateAccumulator, params_type> type;
+                    typedef block_stream_processor<construction, StateAccumulator, params_type> type;
                 };
 
                 constexpr static const std::size_t digest_bits = policy_type::digest_bits;
