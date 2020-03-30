@@ -35,7 +35,7 @@ namespace nil {
              *
              * @note https://eprint.iacr.org/2007/278.pdf
              */
-            template<typename Params, typename IV, typename Compressor, typename Finalizer = ::nil::crypto3::hash::detail::nop_finalizer>
+            template<typename Params, typename IV, typename Compressor, typename Finalizer = detail::nop_finalizer>
             class haifa_construction {
             public:
                 typedef Compressor compressor_functor;
@@ -62,7 +62,8 @@ namespace nil {
 
                 constexpr static const std::size_t digest_bits = Params::digest_bits;
                 constexpr static const std::size_t digest_bytes = digest_bits / octet_bits;
-                constexpr static const std::size_t digest_words = digest_bits / word_bits + ((digest_bits % word_bits) ? 1 : 0);
+                constexpr static const std::size_t digest_words =
+                    digest_bits / word_bits + ((digest_bits % word_bits) ? 1 : 0);
                 typedef static_digest<digest_bits> digest_type;
 
             protected:
@@ -99,11 +100,12 @@ namespace nil {
 
                     // Convert digest to byte representation
                     std::array<octet_type, state_bits / octet_bits> d_full;
-                    pack_n<endian_type, word_bits, octet_bits>(state_.data(), state_words, d_full.data(), state_bits / octet_bits);
+                    pack_n<endian_type, word_bits, octet_bits>(state_.data(), state_words, d_full.data(),
+                                                               state_bits / octet_bits);
 
                     digest_type d;
                     std::copy(d_full.begin(), d_full.begin() + digest_bytes, d.begin());
-                    
+
                     return d;
                 }
 
