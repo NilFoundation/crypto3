@@ -18,11 +18,12 @@ namespace nil {
             namespace detail {
                 template<std::size_t DigestBits>
                 struct blake2b_policy : public ::nil::crypto3::detail::basic_functions<64> {
+                    typedef ::nil::crypto3::detail::basic_functions<64> policy_type;
+
                     constexpr static const std::size_t rounds = 12;
 
-                    constexpr static const std::size_t word_bits =
-                        ::nil::crypto3::detail::basic_functions<64>::word_bits;
-                    typedef typename ::nil::crypto3::detail::basic_functions<64>::word_type word_type;
+                    constexpr static const std::size_t word_bits = policy_type::word_bits;
+                    typedef typename policy_type::word_type word_type;
 
                     constexpr static const std::size_t digest_bits = DigestBits;
                     typedef static_digest<digest_bits> digest_type;
