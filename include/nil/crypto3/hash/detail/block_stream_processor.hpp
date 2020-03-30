@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_HASH_HASH_STREAM_PROCESSOR_HPP
-#define CRYPTO3_HASH_HASH_STREAM_PROCESSOR_HPP
+#ifndef CRYPTO3_HASH_BLOCK_STREAM_PROCESSOR_HPP
+#define CRYPTO3_HASH_BLOCK_STREAM_PROCESSOR_HPP
 
 #include <array>
 #include <iterator>
