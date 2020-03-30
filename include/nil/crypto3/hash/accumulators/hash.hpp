@@ -84,11 +84,6 @@ namespace nil {
 
                     inline result_type result(boost::accumulators::dont_care) const {
                         construction_type res = construction;
-
-                        if (filled){
-                            res.process_block(cache, total_seen);
-                        }
-                        
                         return res.digest(cache, total_seen);
                     }
 

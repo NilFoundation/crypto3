@@ -87,9 +87,9 @@ namespace nil {
                     block_type b;
                     std::move(block.begin(), block.end(), b.begin());
                     std::size_t block_seen = total_seen % block_bits;
-                    /*Process block if block is full
+                    //Process block if block is full
                     if (total_seen && !block_seen)
-                        process_block(b);*/
+                        process_block(b);
                     // Apply finalizer
                     finalizer_functor finalizer;
                     finalizer(b, block_seen);
@@ -129,19 +129,11 @@ namespace nil {
                 template<typename Dummy>
                 typename boost::enable_if_c<length_bits && sizeof(Dummy)>::type append_length(block_type &block, length_type length) {
                     using namespace nil::crypto3::detail;
-                    // Obtain bit representation of total_seen
-                    std::array<bool, length_bits> length_bits_array;
-                    length_bits_array.fill(false);
-                    length_type mask = high_bits<length_type, length_type_bits>(~length_type(), 1);
 
-                    for (std::size_t i = length_bits - length_type_bits; i != length_bits; ++i) {
-                        length_bits_array[i] = length & mask;
-                        mask >>= 1;
-                    }
-                    // Convert bit representation of total_seen to its word representation
+                    std::array<length_type, 1> length_array = {{length}};
                     std::array<word_type, length_words> length_words_array;
-                    pack<endian_type, 1, word_bits>(length_bits_array, length_words_array);
-                    // Add total_seen to block
+                    pack<endian_type, length_bits, word_bits>(length_array, length_words_array);
+                    // Append length
                     for (std::size_t i = length_words; i; --i)
                         block[block_words - i] = length_words_array[length_words - i];
                 }

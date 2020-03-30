@@ -85,12 +85,6 @@ namespace nil {
                     return *this;
                 }
 
-                inline digest_type end_message() {
-                    digest_type d = digest();
-                    reset();
-                    return d;
-                }
-
                 inline digest_type digest(const block_type &block = block_type(), length_type seen = length_type()) {
                     using namespace nil::crypto3::detail;
 

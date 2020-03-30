@@ -78,6 +78,7 @@ namespace nil {
                             word_type mask = low_bits<word_type, word_bits>(~word_type(), w_unit_bits) 
                             | (low_bits<word_type, word_bits>(~word_type(), w_rem) << (w_unit_bits + UnitBits - w_rem)); 
                             w &= mask; 
+
                             std::size_t b_rem = last_word_seen % UnitBits;
                             std::size_t b_unit_bits = last_word_seen - b_rem;
                             mask = low_bits<word_type, word_bits>(~word_type(), b_unit_bits) 
@@ -89,13 +90,14 @@ namespace nil {
                             word_type masks[2] = {low_bits<word_type, word_bits>(~word_type(), UnitBits - b_rem) << b_rem, 
                                 low_bits<word_type, word_bits>(~word_type(), b_rem)};
                             std::size_t bw_space = word_bits - last_word_seen;
+                            std::size_t w_space = word_seen;
                             word_type w_split = 0;
                             std::size_t sz_ind = 0;
-                              
-                            while (bw_space && w) {
+                            
+                            while (bw_space && w_space) {
                                 w_split |= (!sz_ind ? ((w & masks[0]) >> b_rem) : ((w & masks[1]) << (UnitBits + sz[0]))); 
                                 bw_space -= sz[sz_ind];
-                                w &= ~masks[sz_ind];
+                                w_space -= (w_space >= sz[sz_ind]) ? sz[sz_ind] : (w_space % sz[sz_ind]);
                                 masks[sz_ind] <<= UnitBits;
                                 sz_ind = 1 - sz_ind;
                             }
@@ -104,15 +106,15 @@ namespace nil {
                             b[last_word_ind] |= w_split << b_unit_bits;
 
                             // If we fall out of the block word, push the remainder of element to the next block word
-                            if (w) {
+                            if (last_word_seen + word_seen > word_bits) {
                                 w >>= (word_bits - b_unit_bits - UnitBits);
                                 w_split = 0;
                                 masks[0] = low_bits<word_type, word_bits>(~word_type(), UnitBits - b_rem) << b_rem; 
                                 masks[1] = low_bits<word_type, word_bits>(~word_type(), b_rem);
 
-                                while (w) {
+                                while (w_space) {
                                     w_split |= (!sz_ind ? ((w & masks[0]) >> b_rem) : ((w & masks[1]) << (UnitBits + sz[0]))); 
-                                    w &= ~masks[sz_ind];
+                                    w_space -= (w_space >= sz[sz_ind]) ? sz[sz_ind] : (w_space % sz[sz_ind]);
                                     masks[sz_ind] <<= UnitBits;
                                     sz_ind = 1 - sz_ind;
                                 }
@@ -158,13 +160,14 @@ namespace nil {
                             word_type masks[2] = {high_bits<word_type, word_bits>(~word_type(), UnitBits - b_rem) >> b_rem, 
                                 high_bits<word_type, word_bits>(~word_type(), b_rem)};
                             std::size_t bw_space = word_bits - last_word_seen;
+                            std::size_t w_space = word_bits;
                             word_type w_split = 0;
                             std::size_t sz_ind = 0;
                              
-                            while (bw_space && w) {
+                            while (bw_space && w_space) {
                                 w_split |= (!sz_ind ? ((w & masks[0]) << b_rem) : ((w & masks[1]) >> (UnitBits + sz[0]))); 
                                 bw_space -= sz[sz_ind];
-                                w &= ~masks[sz_ind];
+                                w_space -= (w_space >= sz[sz_ind]) ? sz[sz_ind] : (w_space % sz[sz_ind]);
                                 masks[sz_ind] >>= UnitBits;
                                 sz_ind = 1 - sz_ind;
                             }
@@ -173,15 +176,15 @@ namespace nil {
                             b[last_word_ind] |= w_split >> b_unit_bits;
 
                             // If we fall out of the block word, push the remainder of element to the next block word
-                            if (w) {
+                            if (last_word_seen + word_seen > word_bits) {
                                 w <<= (word_bits - b_unit_bits - UnitBits);
                                 w_split = 0;
                                 masks[0] = high_bits<word_type, word_bits>(~word_type(), UnitBits - b_rem) >> b_rem; 
                                 masks[1] = high_bits<word_type, word_bits>(~word_type(), b_rem);
 
-                                while (w) {
+                                while (w_space) {
                                     w_split |= (!sz_ind ? ((w & masks[0]) << b_rem) : ((w & masks[1]) >> (UnitBits + sz[0]))); 
-                                    w &= ~masks[sz_ind];
+                                    w_space -= (w_space >= sz[sz_ind]) ? sz[sz_ind] : (w_space % sz[sz_ind]);
                                     masks[sz_ind] >>= UnitBits;
                                     sz_ind = 1 - sz_ind;
                                 }
