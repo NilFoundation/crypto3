@@ -14,7 +14,7 @@ namespace nil {
         namespace hash {
             struct nop_finalizer {
                 template<typename T>
-                void operator()(T &) {
+                void operator()(T &, T = T()) {
                 }
             };
         }    // namespace hash

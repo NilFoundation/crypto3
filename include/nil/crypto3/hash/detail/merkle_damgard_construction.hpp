@@ -11,7 +11,8 @@
 #ifndef CRYPTO3_HASH_MERKLE_DAMGARD_CONSTRUCTION_HPP
 #define CRYPTO3_HASH_MERKLE_DAMGARD_CONSTRUCTION_HPP
 
-#include <nil/crypto3/hash/detail/finalizer.hpp>
+#include <nil/crypto3/hash/detail/nop_finalizer.hpp>
+#include <nil/crypto3/hash/detail/merkle_damgard_finalizer.hpp>
 
 #include <nil/crypto3/detail/static_digest.hpp>
 #include <nil/crypto3/detail/pack.hpp>
@@ -38,7 +39,7 @@ namespace nil {
              *
              * @note http://www.merkle.com/papers/Thesis1979.pdf
              */
-            template<typename Params, typename IV, typename Compressor, typename Finalizer = detail::nop_finalizer>
+            template<typename Params, typename IV, typename Compressor, typename Finalizer = nop_finalizer>
             class merkle_damgard_construction {
             public:
                 typedef IV iv_generator;
@@ -72,9 +73,9 @@ namespace nil {
                 constexpr static const std::size_t length_words = length_bits / word_bits;
                 BOOST_STATIC_ASSERT(!length_bits || length_bits % word_bits == 0);
 
-                //typedef ::nil::crypto3::hash::detail::length_adder<endian_type, length_type, word_bits, block_words, 
-                                                                   //length_type_bits, length_bits> 
-                    //length_adder;
+                // typedef ::nil::crypto3::hash::detail::length_adder<endian_type, length_type, word_bits, block_words,
+                // length_type_bits, length_bits>
+                // length_adder;
             public:
                 template<typename Integer = std::size_t>
                 inline merkle_damgard_construction &process_block(const block_type &block, Integer seen = Integer()) {
@@ -82,11 +83,12 @@ namespace nil {
                     return *this;
                 }
 
-                inline digest_type digest(const block_type &block = block_type(), length_type total_seen = length_type()) {
+                inline digest_type digest(const block_type &block = block_type(),
+                                          length_type total_seen = length_type()) {
                     block_type b;
                     std::move(block.begin(), block.end(), b.begin());
                     std::size_t block_seen = total_seen % block_bits;
-                    //Process block if block is full
+                    // Process block if block is full
                     if (total_seen && !block_seen)
                         process_block(b);
                     // Apply finalizer
@@ -103,7 +105,8 @@ namespace nil {
                     process_block(b);
                     // Convert digest to byte representation
                     digest_type d;
-                    nil::crypto3::detail::pack_n<endian_type, word_bits, octet_bits>(state_.data(), digest_words, d.data(), digest_bytes);
+                    nil::crypto3::detail::pack_n<endian_type, word_bits, octet_bits>(state_.data(), digest_words,
+                                                                                     d.data(), digest_bytes);
                     return d;
                 }
 
@@ -126,7 +129,8 @@ namespace nil {
 
             protected:
                 template<typename Dummy>
-                typename boost::enable_if_c<length_bits && sizeof(Dummy)>::type append_length(block_type &block, length_type length) {
+                typename boost::enable_if_c<length_bits && sizeof(Dummy)>::type append_length(block_type &block,
+                                                                                              length_type length) {
                     using namespace nil::crypto3::detail;
 
                     std::array<length_type, 1> length_array = {{length}};
@@ -141,7 +145,8 @@ namespace nil {
                 void append_length<0>(block_type &block, length_type length) {
                 }*/
                 template<typename Dummy>
-                typename boost::disable_if_c<length_bits && sizeof(Dummy)>::type append_length(block_type &block, length_type length) {
+                typename boost::disable_if_c<length_bits && sizeof(Dummy)>::type append_length(block_type &block,
+                                                                                               length_type length) {
                     // No appending requested, so nothing to do
                 }
                 state_type state_;
