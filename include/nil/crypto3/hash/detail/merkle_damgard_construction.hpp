@@ -1,5 +1,4 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2019 Nil Foundation AG
 // Copyright (c) 2018-2019 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 // Copyright (c) 2020 Alexander Sokolov <asokolov@nil.foundation>

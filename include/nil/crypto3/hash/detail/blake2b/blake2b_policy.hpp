@@ -1,5 +1,4 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2019 Nil Foundation AG
 // Copyright (c) 2018-2019 Mikhail Komarov <nemo@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
@@ -21,7 +20,8 @@ namespace nil {
                 struct blake2b_policy : public ::nil::crypto3::detail::basic_functions<64> {
                     constexpr static const std::size_t rounds = 12;
 
-                    constexpr static const std::size_t word_bits = ::nil::crypto3::detail::basic_functions<64>::word_bits;
+                    constexpr static const std::size_t word_bits =
+                        ::nil::crypto3::detail::basic_functions<64>::word_bits;
                     typedef typename ::nil::crypto3::detail::basic_functions<64>::word_type word_type;
 
                     constexpr static const std::size_t digest_bits = DigestBits;

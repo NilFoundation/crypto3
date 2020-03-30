@@ -1,5 +1,4 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2019 Nil Foundation AG
 // Copyright (c) 2018-2019 Mikhail Komarov <nemo@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
@@ -17,12 +16,10 @@ namespace nil {
         namespace hash {
             namespace detail {
                 template<std::size_t DigestBits>
-                struct skein_512_functions : public ::nil::crypto3::detail::basic_functions<64> {
+                struct skein_512_functions : public ::nil::crypto3::detail::basic_functions<64> {};
+            }    // namespace detail
+        }        // namespace hash
+    }            // namespace crypto3
+}    // namespace nil
 
-                };
-            }
-        }
-    }
-}
-
-#endif //CRYPTO3_SKEIN_512_FUNCTIONS_HPP
+#endif    // CRYPTO3_SKEIN_512_FUNCTIONS_HPP

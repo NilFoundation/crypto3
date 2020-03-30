@@ -1,5 +1,4 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2019 Nil Foundation AG
 // Copyright (c) 2018-2019 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
@@ -38,7 +37,7 @@ namespace nil {
              * @tparam Params
              */
             template<typename Construction, typename StateAccumulator, typename Params>
-            class hash_stream_processor {
+            class block_stream_processor {
             protected:
                 typedef typename Construction::type construction_type;
                 typedef StateAccumulator accumulator_type;
@@ -132,11 +131,11 @@ namespace nil {
                 }
 
             public:
-                hash_stream_processor(accumulator_type &acc) :
+                block_stream_processor(accumulator_type &acc) :
                     acc(acc), cache(), cache_seen(0) {
                 }
 
-                virtual ~hash_stream_processor() {
+                virtual ~block_stream_processor() {
                     if (!cache.empty()) {
                         process_block(cache_seen * value_bits);
                         cache_seen = 0;
