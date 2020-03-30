@@ -17,10 +17,12 @@ namespace nil {
         namespace hash {
             namespace detail {
                 struct gost_3411_policy : public ::nil::crypto3::detail::basic_functions<32> {
+                    typedef ::nil::crypto3::detail::basic_functions<32> policy_type;
+
                     constexpr static const std::size_t rounds = 32;
 
-                    constexpr static const std::size_t word_bits = ::nil::crypto3::detail::basic_functions<32>::word_bits;
-                    typedef typename ::nil::crypto3::detail::basic_functions<32>::word_type word_type;
+                    constexpr static const std::size_t word_bits = policy_type::word_bits;
+                    typedef typename policy_type::word_type word_type;
 
                     constexpr static const std::size_t digest_bits = 256;
                     typedef static_digest<digest_bits> digest_type;
