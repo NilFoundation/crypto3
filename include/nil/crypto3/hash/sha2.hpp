@@ -16,6 +16,7 @@
 #include <nil/crypto3/hash/detail/davies_meyer_compressor.hpp>
 #include <nil/crypto3/hash/detail/merkle_damgard_construction.hpp>
 #include <nil/crypto3/hash/detail/block_stream_processor.hpp>
+#include <nil/crypto3/hash/detail/merkle_damgard_finalizer.hpp>
 
 namespace nil {
     namespace crypto3 {

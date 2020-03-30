@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2019 Mikhail Komarov <nemo@nil.foundation>
-//
+// Copyright (c) 2020 Alexander Sokolov <asokolov@nil.foundation>
+
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt
@@ -16,6 +17,7 @@
 #include <nil/crypto3/hash/detail/davies_meyer_compressor.hpp>
 #include <nil/crypto3/hash/detail/merkle_damgard_construction.hpp>
 #include <nil/crypto3/hash/detail/block_stream_processor.hpp>
+#include <nil/crypto3/hash/detail/merkle_damgard_finalizer.hpp>
 
 namespace nil {
     namespace crypto3 {

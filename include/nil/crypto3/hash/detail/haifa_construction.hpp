@@ -11,7 +11,7 @@
 #ifndef CRYPTO3_HASH_HAIFA_CONSTRUCTION_HPP
 #define CRYPTO3_HASH_HAIFA_CONSTRUCTION_HPP
 
-#include <nil/crypto3/hash/detail/finalizer.hpp>
+#include <nil/crypto3/hash/detail/nop_finalizer.hpp>
 
 #include <nil/crypto3/detail/static_digest.hpp>
 #include <nil/crypto3/detail/pack.hpp>

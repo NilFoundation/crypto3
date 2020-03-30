@@ -16,6 +16,7 @@
 #include <nil/crypto3/hash/detail/davies_meyer_compressor.hpp>
 #include <nil/crypto3/hash/detail/merkle_damgard_construction.hpp>
 #include <nil/crypto3/hash/detail/block_stream_processor.hpp>
+#include <nil/crypto3/hash/detail/merkle_damgard_finalizer.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -37,9 +38,13 @@ namespace nil {
                         constexpr static const std::size_t length_bits = block_cipher_type::word_bits * 2;
                         constexpr static const std::size_t digest_bits = policy_type::digest_bits;
                     };
-
+                   
+                    typedef detail::merkle_damgard_finalizer<typename params_type::digest_endian, block_cipher_type::word_bits,
+                                                block_cipher_type::key_bits>
+                        merkle_damgard_finalizer;
                     typedef merkle_damgard_construction<params_type, policy_type::iv_generator,
-                                                        davies_meyer_compressor<block_cipher_type, detail::state_adder>>
+                                                        davies_meyer_compressor<block_cipher_type, detail::state_adder>,
+                                                        merkle_damgard_finalizer>
                         type;
                 };
 

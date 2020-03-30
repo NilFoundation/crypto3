@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2019 Mikhail Komarov <nemo@nil.foundation>
-//
+// Copyright (c) 2020 Alexander Sokolov <asokolov@nil.foundation>
+
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt
@@ -104,9 +105,7 @@ namespace nil {
                         constexpr static const std::size_t digest_bits = policy_type::digest_bits;
                     };
 
-                    typedef detail::blake2b_finalizer<typename params_type::digest_endian,
-                                                      typename policy_type::word_type, policy_type::word_bits,
-                                                      policy_type::block_bits>
+                    typedef detail::blake2b_finalizer<typename params_type::digest_endian, DigestBits>
                         blake2b_finalizer;
                     typedef haifa_construction<params_type, typename policy_type::iv_generator,
                                                blake2b_compressor<DigestBits>, blake2b_finalizer>

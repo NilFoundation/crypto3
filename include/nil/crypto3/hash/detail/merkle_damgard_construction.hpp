@@ -39,7 +39,7 @@ namespace nil {
              *
              * @note http://www.merkle.com/papers/Thesis1979.pdf
              */
-            template<typename Params, typename IV, typename Compressor, typename Finalizer = nop_finalizer>
+            template<typename Params, typename IV, typename Compressor, typename Finalizer = detail::nop_finalizer>
             class merkle_damgard_construction {
             public:
                 typedef IV iv_generator;
