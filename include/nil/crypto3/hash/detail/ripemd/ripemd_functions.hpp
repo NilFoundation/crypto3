@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2019 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -55,7 +55,7 @@ namespace nil {
                     template<typename F>
                     inline static void transform(word_type &a, word_type &b, word_type &c, word_type &d, word_type x,
                                                  word_type k, word_type s) {
-                        word_type T = ::nil::crypto3::detail::basic_functions<WordBits>::rotl(a + F()(b, c, d) + x + k, s);
+                        word_type T = policy_type::rotl(a + F()(b, c, d) + x + k, s);
                         a = d;
                         d = c;
                         c = b;
@@ -65,10 +65,10 @@ namespace nil {
                     template<typename Functor>
                     inline static void transform(word_type &a, word_type &b, word_type &c, word_type &d, word_type &e,
                                                  word_type x, word_type k, word_type s) {
-                        word_type T = ::nil::crypto3::detail::basic_functions<WordBits>::rotl(a + Functor()(b, c, d) + x + k, s) + e;
+                        word_type T = policy_type::rotl(a + Functor()(b, c, d) + x + k, s) + e;
                         a = e;
                         e = d;
-                        d = ::nil::crypto3::detail::basic_functions<WordBits>::template rotl<10>(c);
+                        d = policy_type::template rotl<10>(c);
                         c = b;
                         b = T;
                     }
