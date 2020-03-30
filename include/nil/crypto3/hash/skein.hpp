@@ -15,7 +15,7 @@
 
 #include <nil/crypto3/hash/detail/state_adder.hpp>
 #include <nil/crypto3/hash/detail/matyas_meyer_oseas_compressor.hpp>
-#include <nil/crypto3/hash/detail/hash_stream_processor.hpp>
+#include <nil/crypto3/hash/detail/block_stream_processor.hpp>
 #include <nil/crypto3/hash/detail/merkle_damgard_construction.hpp>
 
 #include <string>

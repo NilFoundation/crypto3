@@ -12,7 +12,7 @@
 #include <nil/crypto3/hash/keccak.hpp>
 
 #include <nil/crypto3/hash/detail/sponge_construction.hpp>
-#include <nil/crypto3/hash/detail/hash_stream_processor.hpp>
+#include <nil/crypto3/hash/detail/block_stream_processor.hpp>
 #include <nil/crypto3/hash/detail/sha3/sha3_functions.hpp>
 
 namespace nil {

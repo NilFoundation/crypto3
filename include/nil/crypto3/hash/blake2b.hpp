@@ -11,11 +11,10 @@
 #define CRYPTO3_BLAKE2B_HPP
 
 #include <nil/crypto3/hash/detail/blake2b/blake2b_functions.hpp>
+#include <nil/crypto3/hash/detail/blake2b/blake2b_finalizer.hpp>
 
 #include <nil/crypto3/hash/detail/haifa_construction.hpp>
 #include <nil/crypto3/hash/detail/block_stream_processor.hpp>
-#include <nil/crypto3/hash/detail/finalizer.hpp>
-
 
 namespace nil {
     namespace crypto3 {

@@ -12,7 +12,7 @@
 #include <nil/crypto3/hash/detail/ripemd/ripemd_policy.hpp>
 
 #include <nil/crypto3/hash/detail/merkle_damgard_construction.hpp>
-#include <nil/crypto3/hash/detail/hash_stream_processor.hpp>
+#include <nil/crypto3/hash/detail/block_stream_processor.hpp>
 
 namespace nil {
     namespace crypto3 {

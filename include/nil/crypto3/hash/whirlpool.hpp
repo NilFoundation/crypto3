@@ -12,7 +12,7 @@
 #include <nil/crypto3/hash/detail/state_adder.hpp>
 #include <nil/crypto3/hash/detail/miyaguchi_preneel_compressor.hpp>
 #include <nil/crypto3/hash/detail/merkle_damgard_construction.hpp>
-#include <nil/crypto3/hash/detail/hash_stream_processor.hpp>
+#include <nil/crypto3/hash/detail/block_stream_processor.hpp>
 
 #include <nil/crypto3/hash/detail/whirlpool/whirlpool_cipher.hpp>
 

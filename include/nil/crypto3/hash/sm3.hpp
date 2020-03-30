@@ -9,7 +9,7 @@
 #ifndef CRYPTO3_SM3_HPP
 #define CRYPTO3_SM3_HPP
 
-#include <nil/crypto3/hash/detail/hash_stream_processor.hpp>
+#include <nil/crypto3/hash/detail/block_stream_processor.hpp>
 #include <nil/crypto3/hash/detail/merkle_damgard_construction.hpp>
 #include <nil/crypto3/hash/detail/state_adder.hpp>
 
