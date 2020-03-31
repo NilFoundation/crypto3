@@ -86,9 +86,9 @@ namespace nil {
                     }
 
                 protected:
-                    inline void resolve_type(const block_type &value, std::size_t bits = block_bits) {
-                        total_seen += bits;
-                        process(value, bits);
+                    inline void resolve_type(const block_type &value, std::size_t bits) {
+                        total_seen += bits == 0 ? block_bits : bits;
+                        process(value, bits == 0 ? block_bits : bits);
                     }
 
                     inline void resolve_type(const word_type &value, std::size_t bits = word_bits) {
