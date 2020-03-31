@@ -51,8 +51,7 @@ set(TESTS_NAMES
     "sm3"
     "static_digest"
     "streebog"
-    "whirlpool"
-    )
+    "whirlpool")
 
 foreach(TEST_NAME ${TESTS_NAMES})
     define_hash_test(${TEST_NAME})
