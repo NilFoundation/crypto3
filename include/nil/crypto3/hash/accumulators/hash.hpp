@@ -91,7 +91,7 @@ namespace nil {
                         process(value, bits == 0 ? block_bits : bits);
                     }
 
-                    inline void resolve_type(const word_type &value, std::size_t bits = word_bits) {
+                    inline void resolve_type(const word_type &value, std::size_t bits) {
                         total_seen += bits == 0 ? word_bits : bits;
                         process(value, bits == 0 ? word_bits : bits);
                     }
