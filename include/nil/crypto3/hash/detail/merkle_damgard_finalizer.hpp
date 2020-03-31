@@ -15,8 +15,9 @@ namespace nil {
     namespace crypto3 {
         namespace hash {
             namespace detail {
-                template<typename Endianness, std::size_t WordBits, std::size_t BlockBits>
+                template<typename Endianness, typename PolicyType>
                 class merkle_damgard_finalizer : public ::nil::crypto3::detail::basic_functions<WordBits> {
+                    typedef PolicyType hash_policy_type;
                     typedef ::nil::crypto3::detail::basic_functions<WordBits> policy_type;
 
                     constexpr static const std::size_t block_words = BlockBits / WordBits;
