@@ -22,7 +22,8 @@ namespace nil {
             template<std::size_t DigestBits>
             class blake2b_compressor {
             protected:
-                typedef detail::blake2b_functions<DigestBits> policy_type;
+                typedef detail::blake2b_functions<DigestBits> policy_functions;
+                typedef detail::blake2b_policy<DigestBits> policy_type;
 
                 typedef typename policy_type::byte_type byte_type;
                 typedef typename policy_type::state_type::value_type value_type;
