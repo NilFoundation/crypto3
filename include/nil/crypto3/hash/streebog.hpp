@@ -56,7 +56,6 @@ namespace nil {
                     struct params_type {
                         typedef typename stream_endian::little_octet_big_bit endian;
 
-                        constexpr static const std::size_t length_bits = construction::params_type::length_bits;
                         constexpr static const std::size_t value_bits = ValueBits;
                     };
 

@@ -32,7 +32,6 @@ namespace nil {
                 typedef block::shacal2<policy_type::cipher_version> block_cipher_type;
 
             public:
-                // Warning: stream processor params_type::length_bits is deduced from construction params_type
 
                 struct construction {
                     struct params_type {
