@@ -9,6 +9,7 @@
 #ifndef CRYPTO3_HASH_DETAIL_SHA2_POLICY_HPP
 #define CRYPTO3_HASH_DETAIL_SHA2_POLICY_HPP
 
+#include <nil/crypto3/block/shacal2.hpp>
 #include <nil/crypto3/block/detail/shacal/shacal2_policy.hpp>
 
 #include <nil/crypto3/detail/static_digest.hpp>
@@ -26,9 +27,6 @@ namespace nil {
 
                     constexpr static const std::size_t cipher_version = CipherVersion;
                     typedef block::shacal2<cipher_version> block_cipher_type;
-
-                    typedef typename block_cipher_type::block_type state_type;
-
 
                     constexpr static const std::size_t word_bits = block_cipher_type::word_bits;
                     typedef typename block_cipher_type::word_type word_type;

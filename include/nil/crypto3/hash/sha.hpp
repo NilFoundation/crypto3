@@ -22,14 +22,14 @@ namespace nil {
         namespace hash {
 
             /*!
-             * @brief SHA. Initial SHA hash construction. Not considered to b a
+             * @brief SHA. Initial SHA hash construction. Not considered to be a
              * cryptographically secure primitive lately.
              *
              * @ingroup hash
              */
             class sha {
                 typedef detail::sha_policy policy_type;
-                typedef block::shacal block_cipher_type;
+                typedef policy_type::block_cipher_type block_cipher_type;
 
             public:
                 struct construction {

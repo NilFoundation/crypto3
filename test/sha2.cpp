@@ -192,24 +192,6 @@ BOOST_AUTO_TEST_CASE(sha2_512_shortmsg_byte2) {
     BOOST_CHECK_EQUAL("59f1856303ff165e2ab5683dddeb6e8ad81f15bb578579b999eb5746680f22cfec6dba741e591ca4d9e53904837701b374be74bbc0847a92179ac2b67496d807", std::to_string(d).data());
 }
 
-BOOST_FIXTURE_TEST_CASE(sha2_256_accumulator1, fixture<256>) {
-    // 0-length input: echo -n | sha256sum
-
-    // A single 1 bit after the (empty) message,
-    // then pad with 0s,
-    // then add the length, which is also 0
-    hash_t::construction::type::block_type m = {{0x80000000u}};
-    acc(m);
-
-    hash_t::digest_type s = extract::hash<hash_t>(acc);
-
-#ifdef CRYPTO3_HASH_SHOW_PROGRESS
-    std::printf("%s\n", std::to_string(s).data());
-#endif
-
-    BOOST_CHECK_EQUAL("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", s);
-}
-
 BOOST_FIXTURE_TEST_CASE(sha2_256_accumulator2, fixture<256>) {
     // Example from appendix B.1: echo -n "abc" | sha256sum
     hash_t::construction::type::block_type m = {{}};
@@ -252,28 +234,6 @@ BOOST_FIXTURE_TEST_CASE(sha2_256_accumulator3, fixture<256>) {
     BOOST_CHECK_EQUAL("26eba60be9d10a6484d03392b011d481b33e9b0038175942876ced989c68cab1", std::to_string(s).data());
 }
 
-
-BOOST_FIXTURE_TEST_CASE(sha2_384_accumulator1, fixture<384>) {
-    // 0-length input: echo -n | sha256sum
-
-    // A single 1 bit after the (empty) message,
-    // then pad with 0s,
-    // then add the length, which is also 0
-    hash_t::construction::type::block_type m = {{UINT64_C(0x8000000000000000)}};
-    acc(m);
-
-    hash_t::digest_type s = extract::hash<hash_t>(acc);
-
-#ifdef CRYPTO3_HASH_SHOW_PROGRESS
-    std::printf("%s\n", std::to_string(s).data());
-#endif
-
-    BOOST_CHECK_EQUAL(
-        "38b060a751ac96384cd9327eb1b1e36a21fdb71114be0743"
-        "4c0cc7bf63f6e1da274edebfe76f65fbd51ad2f14898b95b",
-        std::to_string(s).data());
-}
-
 BOOST_FIXTURE_TEST_CASE(sha2_384_accumulator2, fixture<384>) {
     // Example from appendix D.1: echo -n "abc" | sha384sum
     hash_t::construction::type::block_type m = {{}};
@@ -311,28 +271,6 @@ BOOST_FIXTURE_TEST_CASE(sha2_384_accumulator3, fixture<384>) {
     BOOST_CHECK_EQUAL(
         "09330c33f71147e83d192fc782cd1b4753111b173b3b05d2"
         "2fa08086e3b0f712fcc7c71a557e2db966c3e9fa91746039",
-        std::to_string(s).data());
-}
-
-
-BOOST_FIXTURE_TEST_CASE(sha2_512_accumulator1, fixture<512>) {
-    // 0-length input: echo -n | sha512sum
-
-    // A single 1 bit after the (empty) message,
-    // then pad with 0s,
-    // then add the length, which is also 0
-    hash_t::construction::type::block_type m = {{}};
-    acc(m, nil::crypto3::accumulators::bits = 0);
-
-    hash_t::digest_type s = extract::hash<hash_t>(acc);
-
-#ifdef CRYPTO3_HASH_SHOW_PROGRESS
-    std::printf("%s\n", std::to_string(s).data());
-#endif
-
-    BOOST_CHECK_EQUAL(
-        "cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce"
-        "47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e",
         std::to_string(s).data());
 }
 

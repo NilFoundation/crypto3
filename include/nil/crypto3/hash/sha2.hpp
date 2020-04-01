@@ -9,8 +9,6 @@
 #ifndef CRYPTO3_HASH_SHA2_HPP
 #define CRYPTO3_HASH_SHA2_HPP
 
-#include <nil/crypto3/block/shacal2.hpp>
-
 #include <nil/crypto3/hash/detail/sha2/sha2_policy.hpp>
 #include <nil/crypto3/hash/detail/state_adder.hpp>
 #include <nil/crypto3/hash/detail/davies_meyer_compressor.hpp>
@@ -29,7 +27,7 @@ namespace nil {
             template<std::size_t Version>
             class sha2 {
                 typedef detail::sha2_policy<Version> policy_type;
-                typedef policy_type::block_cipher_type block_cipher_type;
+                typedef typename policy_type::block_cipher_type block_cipher_type;
 
             public:
 
@@ -45,7 +43,7 @@ namespace nil {
                 constexpr static const std::size_t block_bits = policy_type::block_bits;
                 constexpr static const std::size_t block_words = policy_type::block_words;
                 typedef typename policy_type::block_type block_type;
-                
+
                 constexpr static const std::size_t digest_bits = policy_type::digest_bits;
                 typedef typename policy_type::digest_type digest_type;
 
@@ -53,7 +51,7 @@ namespace nil {
                     struct params_type {
                         typedef typename stream_endian::big_octet_big_bit digest_endian;
 
-                        constexpr static const std::size_t length_bits = block_cipher_type::word_bits * 2;
+                        constexpr static const std::size_t length_bits = word_bits * 2;
                         constexpr static const std::size_t digest_bits = policy_type::digest_bits;
                     };
 
