@@ -49,10 +49,6 @@ namespace nil {
                     constexpr static const std::size_t word_bits = construction_type::word_bits;
                     typedef typename construction_type::word_type word_type;
 
-                    constexpr static const std::size_t state_bits = construction_type::state_bits;
-                    constexpr static const std::size_t state_words = construction_type::state_words;
-                    typedef typename construction_type::state_type state_type;
-
                     constexpr static const std::size_t block_bits = construction_type::block_bits;
                     constexpr static const std::size_t block_words = construction_type::block_words;
                     typedef typename construction_type::block_type block_type;

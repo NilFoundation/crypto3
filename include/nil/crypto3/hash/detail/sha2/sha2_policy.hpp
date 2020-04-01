@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2019 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -11,10 +12,11 @@
 
 #include <nil/crypto3/block/shacal2.hpp>
 #include <nil/crypto3/block/detail/shacal/shacal2_policy.hpp>
+#include <nil/crypto3/hash/detail/davies_meyer_compressor.hpp>
+#include <nil/crypto3/hash/detail/state_adder.hpp>
 
 #include <nil/crypto3/detail/static_digest.hpp>
 
-#include <boost/cstdint.hpp>
 #include <array>
 
 namespace nil {
@@ -38,6 +40,13 @@ namespace nil {
                     constexpr static const std::size_t block_bits = block_cipher_type::key_bits;
                     constexpr static const std::size_t block_words = block_cipher_type::key_words;
                     typedef typename block_cipher_type::key_type block_type;
+
+                    constexpr static const std::size_t length_bits = word_bits * 2;
+
+                    typedef typename stream_endian::big_octet_big_bit digest_endian;
+                    typedef typename stream_endian::big_octet_big_bit stream_processor_endian;
+
+                    typedef davies_meyer_compressor<block_cipher_type, detail::state_adder> compressor;
 
                 };
 

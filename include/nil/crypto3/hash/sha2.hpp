@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2019 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -10,8 +11,6 @@
 #define CRYPTO3_HASH_SHA2_HPP
 
 #include <nil/crypto3/hash/detail/sha2/sha2_policy.hpp>
-#include <nil/crypto3/hash/detail/state_adder.hpp>
-#include <nil/crypto3/hash/detail/davies_meyer_compressor.hpp>
 #include <nil/crypto3/hash/detail/merkle_damgard_construction.hpp>
 #include <nil/crypto3/hash/detail/block_stream_processor.hpp>
 #include <nil/crypto3/hash/detail/merkle_damgard_finalizer.hpp>
@@ -36,10 +35,6 @@ namespace nil {
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
                 typedef typename policy_type::word_type word_type;
 
-                constexpr static const std::size_t state_bits = policy_type::state_bits;
-                constexpr static const std::size_t state_words = policy_type::state_words;
-                typedef typename policy_type::state_type state_type;
-
                 constexpr static const std::size_t block_bits = policy_type::block_bits;
                 constexpr static const std::size_t block_words = policy_type::block_words;
                 typedef typename policy_type::block_type block_type;
@@ -49,15 +44,16 @@ namespace nil {
 
                 struct construction {
                     struct params_type {
-                        typedef typename stream_endian::big_octet_big_bit digest_endian;
+                        typedef typename policy_type::digest_endian digest_endian;
 
-                        constexpr static const std::size_t length_bits = word_bits * 2;
+                        constexpr static const std::size_t length_bits = policy_type::length_bits;
                         constexpr static const std::size_t digest_bits = policy_type::digest_bits;
+                        
                     };
 
                     typedef merkle_damgard_construction<
                         params_type, typename policy_type::iv_generator,
-                        davies_meyer_compressor<block_cipher_type, detail::state_adder>,
+                        typename policy_type::compressor,
                         detail::merkle_damgard_finalizer<typename params_type::digest_endian, policy_type>>
                         type;
                 };
@@ -65,8 +61,8 @@ namespace nil {
                 template<typename StateAccumulator, std::size_t ValueBits>
                 struct stream_processor {
                     struct params_type {
-                        typedef typename stream_endian::big_octet_big_bit endian;
-
+                        typedef typename policy_type::stream_processor_endian stream_processor_endian;
+                        
                         constexpr static const std::size_t value_bits = ValueBits;
                     };
 

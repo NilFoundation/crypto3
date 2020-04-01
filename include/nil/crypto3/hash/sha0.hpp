@@ -11,7 +11,7 @@
 
 #include <nil/crypto3/block/shacal.hpp>
 
-#include <nil/crypto3/hash/detail/sha_policy.hpp>
+#include <nil/crypto3/hash/detail/sha0/sha0_policy.hpp>
 #include <nil/crypto3/hash/detail/state_adder.hpp>
 #include <nil/crypto3/hash/detail/davies_meyer_compressor.hpp>
 #include <nil/crypto3/hash/detail/merkle_damgard_construction.hpp>
@@ -27,8 +27,8 @@ namespace nil {
              *
              * @ingroup hash
              */
-            class sha {
-                typedef detail::sha_policy policy_type;
+            class sha0 {
+                typedef detail::sha0_policy policy_type;
                 typedef policy_type::block_cipher_type block_cipher_type;
 
             public:
@@ -59,7 +59,7 @@ namespace nil {
                 typedef policy_type::digest_type digest_type;
             };
 
-            typedef sha sha0;
+            typedef sha0 sha;
 
         }    // namespace hash
     }        // namespace crypto3

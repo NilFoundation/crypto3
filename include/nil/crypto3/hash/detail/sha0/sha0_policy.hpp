@@ -17,7 +17,7 @@ namespace nil {
     namespace crypto3 {
         namespace hash {
             namespace detail {
-                struct sha_policy {
+                struct sha0_policy {
                     typedef block::detail::shacal_policy cipher_policy;
                     typedef cipher_policy::block_type state_type;
 
@@ -38,8 +38,6 @@ namespace nil {
                         }
                     };
                 };
-
-                typedef sha_policy sha0_policy;
 
             }    // namespace detail
         }        // namespace hash
