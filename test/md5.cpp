@@ -49,24 +49,6 @@ public:
 
 BOOST_AUTO_TEST_SUITE(md5_test_suite)
 
-BOOST_FIXTURE_TEST_CASE(md5_accumulator1, fixture) {
-    // 0-length input: echo -n | md5sum
-
-    // A single 1 bit after the (empty) message,
-    // then pad with 0s,
-    // then add the length, which is also 0
-    md5::construction::type::block_type m = {{0x80000000u}};
-    acc(m);
-
-    md5::digest_type s = extract::hash<md5>(acc);
-
-#ifdef CRYPTO3_HASH_SHOW_PROGRESS
-    std::printf("%s\n", std::to_string(s).data());
-#endif
-
-    BOOST_CHECK_EQUAL("d41d8cd98f00b204e9800998ecf8427e", std::to_string(s).data());
-}
-
 BOOST_FIXTURE_TEST_CASE(md5_accumulator2, fixture) {
     // echo -n "abc" | md5sum
     md5::construction::type::block_type m = {{}};

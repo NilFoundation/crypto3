@@ -9,9 +9,9 @@
 #ifndef CRYPTO3_HASH_DETAIL_MD5_POLICY_HPP
 #define CRYPTO3_HASH_DETAIL_MD5_POLICY_HPP
 
-#include <nil/crypto3/detail/static_digest.hpp>
+#include <nil/crypto3/block/md5.hpp>
 
-#include <nil/crypto3/block/detail/md5/md5_policy.hpp>
+#include <nil/crypto3/detail/static_digest.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -19,10 +19,24 @@ namespace nil {
             namespace detail {
 
                 struct md5_policy {
-                    typedef block::detail::md5_policy cipher_policy;
-                    typedef cipher_policy::block_type state_type;
+                    typedef block::md5 block_cipher_type;
 
-                    constexpr static const std::size_t digest_bits = cipher_policy::block_bits;
+                    constexpr static const std::size_t word_bits = block_cipher_type::word_bits;
+                    typedef typename block_cipher_type::word_type word_type;
+
+                    constexpr static const std::size_t state_bits = block_cipher_type::block_bits;
+                    constexpr static const std::size_t state_words = block_cipher_type::block_words;
+                    typedef typename block_cipher_type::block_type state_type;
+
+                    constexpr static const std::size_t block_bits = block_cipher_type::key_bits;
+                    constexpr static const std::size_t block_words = block_cipher_type::key_words;
+                    typedef typename block_cipher_type::key_type block_type;
+
+                    constexpr static const std::size_t length_bits = word_bits * 2;
+
+                    typedef typename stream_endian::little_octet_big_bit digest_endian;
+
+                    constexpr static const std::size_t digest_bits = state_bits;
                     typedef static_digest<digest_bits> digest_type;
 
                     struct iv_generator {

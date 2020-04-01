@@ -49,7 +49,7 @@ namespace nil {
                         typedef typename policy_type::digest_endian digest_endian;
 
                         constexpr static const std::size_t length_bits = policy_type::length_bits;
-                        constexpr static const std::size_t digest_bits = policy_type::digest_bits;  
+                        constexpr static const std::size_t digest_bits = policy_type::digest_bits;
                     };
 
                     typedef merkle_damgard_construction<
@@ -69,7 +69,9 @@ namespace nil {
 
                     typedef block_stream_processor<construction, StateAccumulator, params_type> type;
                 };
+
             };
+            
         }    // namespace hash
     }        // namespace crypto3
 }    // namespace nil

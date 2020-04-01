@@ -82,23 +82,6 @@ BOOST_AUTO_TEST_CASE(md4_accumulator1) {
     BOOST_CHECK_EQUAL("0123456789abcdeffedcba9876543210", std::to_string(s));
 }*/
 
-BOOST_FIXTURE_TEST_CASE(md4_accumulator1, fixture) {
-    // 0-length input
-
-    // A single 1 bit after the (empty) message,
-    // then pad with 0s,
-    // then add the length, which is also 0.
-    // Remember that MD4 is little-octet, big-bit endian
-    md4::construction::type::block_type m = {{0x00000080u}};
-    acc(m);
-    md4::construction::type::digest_type s = extract::hash<md4>(acc);
-
-#ifdef CRYPTO3_HASH_SHOW_PROGRESS
-    std::printf("%s\n", std::to_string(s));
-#endif
-
-    BOOST_CHECK_EQUAL("31d6cfe0d16ae931b73c59d7e0c089c0", std::to_string(s));
-}
 
 BOOST_FIXTURE_TEST_CASE(md4_accumulator2, fixture) {
     // "abc" 
