@@ -75,8 +75,6 @@ namespace nil {
                 constexpr static const std::size_t length_words = length_bits / word_bits;
                 BOOST_STATIC_ASSERT(!length_bits || length_bits % word_bits == 0);
 
-                typedef ::nil::crypto3::detail::injector<endian_type, word_bits, block_words, block_bits> injector;
-
             public:
                 template<typename Integer = std::size_t>
                 inline haifa_construction &process_block(const block_type &block, Integer seen,
@@ -85,7 +83,8 @@ namespace nil {
                     return *this;
                 }
 
-                inline digest_type digest(const block_type &block = block_type(), length_type seen = length_type()) {
+                inline digest_type digest(const block_type &block = block_type(), 
+                                          length_type total_seen = length_type()) {
                     using namespace nil::crypto3::detail;
 
                     block_type b;
@@ -93,10 +92,10 @@ namespace nil {
 
                     // Apply finalizer
                     finalizer_functor finalizer;
-                    finalizer(b, seen);
+                    finalizer(b, total_seen);
 
                     // Process the last block
-                    process_block(b, seen, salt_value);
+                    process_block(b, total_seen, salt_value);
 
                     // Convert digest to byte representation
                     std::array<octet_type, state_bits / octet_bits> d_full;

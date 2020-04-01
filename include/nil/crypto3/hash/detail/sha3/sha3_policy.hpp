@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2019 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Alexander Sokolov <asokolov@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -10,6 +11,9 @@
 #define CRYPTO3_SHA3_POLICY_HPP
 
 #include <nil/crypto3/detail/basic_functions.hpp>
+#include <nil/crypto3/detail/static_digest.hpp>
+
+#include <array>
 
 namespace nil {
     namespace crypto3 {
@@ -18,25 +22,39 @@ namespace nil {
                 template<std::size_t DigestBits>
                 struct sha3_policy : public ::nil::crypto3::detail::basic_functions<64> {
                     typedef ::nil::crypto3::detail::basic_functions<64> policy_type;
-                    
+
+                    constexpr static const std::size_t digest_bits = DigestBits; 
+                    typedef static_digest<digest_bits> digest_type;
+
                     constexpr static const std::size_t word_bits = policy_type::word_bits;
                     typedef typename policy_type::word_type word_type;
 
-                    constexpr static const std::size_t block_bits = DigestBits;
-                    constexpr static const std::size_t block_words = DigestBits / word_bits;
+                    constexpr static const std::size_t state_bits = 1600;
+                    constexpr static const std::size_t state_words = state_bits / word_bits;
+                    typedef typename std::array<word_type, state_words> state_type;
+
+                    constexpr static const std::size_t block_bits = state_bits - 2 * digest_bits;
+                    constexpr static const std::size_t block_words = block_bits / word_bits;
                     typedef typename std::array<word_type, block_words> block_type;
 
                     constexpr static const std::size_t rounds = 24;
 
-                    constexpr static const std::size_t round_constants_size = rounds;
-                    typedef typename std::array<word_type, round_constants_size> round_constants_type;
-                    constexpr static const round_constants_type round_constants = {
-                        0x0000000000000001, 0x0000000000008082, 0x800000000000808a, 0x8000000080008000,
-                        0x000000000000808b, 0x0000000080000001, 0x8000000080008081, 0x8000000000008009,
-                        0x000000000000008a, 0x0000000000000088, 0x0000000080008009, 0x000000008000000a,
-                        0x000000008000808b, 0x800000000000008b, 0x8000000000008089, 0x8000000000008003,
-                        0x8000000000008002, 0x8000000000000080, 0x000000000000800a, 0x800000008000000a,
-                        0x8000000080008081, 0x8000000000008080, 0x0000000080000001, 0x8000000080008008};
+                    struct iv_generator {
+                        state_type const &operator()() const {
+                            static state_type const H0 = {
+                            UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000), 
+                            UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000), 
+                            UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000), 
+                            UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000), 
+                            UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000), 
+                            UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000), 
+                            UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000),
+                            UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000),
+                            UINT64_C(0x0000000000000000)};
+                            return H0;
+                        }
+                    };
+
                 };
             }    // namespace detail
         }        // namespace hash

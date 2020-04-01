@@ -46,7 +46,7 @@ set(TESTS_NAMES
 #    "tiger"
     "sha0"
     "sha2"
-#    "sha3"
+    "sha3"
 #    "skein"
 #    "sm3"
 #    "static_digest"
