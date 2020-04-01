@@ -5,77 +5,30 @@
 A ```Hash``` is a function object for which the output depends only on the input and has a very low probability of yielding the same output given different input values.
 
 ### Requirements
-The type ```T``` satisfies ```Hash``` if:
-   * The type T satisfies ```FunctionObject```, ```CopyConstructible```, ```Destructible```, and
-   
+The type ```X``` satisfies ```Hash``` if:
+
 Given
-* ```h```, a value of type ```T``` or ```const T```, whose argument type is ```Key```
-* ```k```, a value of type convertible to ```Key``` or ```const Key```
-* ```u```, an lvalue expression of type ```Key```
+* ```WordType```, the type named by ```X::word_type```
+* ```BlockType```, the type named by ```X::block_type```
+* ```DigestType```, the type named by ```X::digest_type```
+* ```StreamProcessor```, the type template named by ```X::stream_processor```
 
-The following expressions must be valid and have their specified effects
+The following type members must be valid and have their specified effects
+
+|Expression                   |Type                    |Requirements and Notes |
+|-----------------------------|------------------------|-----------------------|
+|```X::block_type```          |```BlockType```         |```BlockType``` type is a ```SequenceContainer``` of type ```T``` or ```std::array<T>```|
+|```X::word_type```           |```WordType```          |```WordType``` type satisfies ```Integral``` concept|
+|```X::digest_type```         |```DigestType```        |```DigestType``` type is a ```SequenceContainer``` of type ```T``` or ```std::array<T>```|
+
+The following static data member definitions must be valid and have their specified effects
+
+|Expression          |Type             |Requirements and Notes                 |
+|--------------------|-----------------|---------------------------------------|
+|```X::word_bits```  |```std::size_t```|```Integral``` bits amount in ```WordType```|
+|```X::block_bits``` |```std::size_t```|```Integral``` bits amount in ```BlockType```|
+|```X::digest_bits```|```std::size_t```|```Integral``` bits amount in ```DigestType```|
+|```X::block_words```|```std::size_t```|```Integral``` amount of ```WordType``` values in ```BlockType```|
 
 
-### HashAlgorithm Concept
- 
-Models of the ```HashAlgorithm``` concept are policies to be provided as template arguments to other
-templates. They provide access to the set of types needed to generically compute and store digests with
-a particular algorithm. (For example, the ```hash``` algorithm templates are parametrized by a
-HashAlgorithm)
-
-A type ```T``` modelling the ```HashAlgorithm``` concept must support the following:
-
-- ```T::stream_processor<ValueBits>::type``` 
-must model the ```StreamCipher<ValueBits>``` concept.
-Not all possible values of ```ValueBits``` need be accepted. Typically, small powers of 2 (1, 2, 4, 8, 16, 32, 64) are accepted.
-
-- ```T::digest_type```
-an instantiation of the static_digest class template.
-must match the ```digest_type``` of the ```StreamCipher<ValueBits>``` policies mentioned above for any allowed choice
-of ```ValueBits```
-
-### StreamCipher<ValueBits> Concept
-
-A type ```T``` modelling the ```StreamCipher<ValueBits>``` concept must be:
- - Default-Constructible
- - Copy-Constructible
- - Copy-Assignable
- 
- and must support the following:
-
-- ```T::digest_type``` 
-an instantiation of the static_digest class template.
-
-- ```T::value_type```
-an unsigned fundamental integral type that can hold least ```ValueBits``` bits
-
-- ```T h; h.reset();``` (equivalent to ```T h = T();```)
-
-- ```T h; T::digest_type d = h.end_message();```
-returns the static_digest of all input provided since the last reset, then resets
-(equivalent to ```digest_type d = h.static_digest(); h.reset();```, though typically more efficient if the hash involves 
-padding or finalization)
-
-- ```const T hc; T::digest_type d = hc.static_digest();```
-returns the static_digest of all input provided since the last reset
-(equivalent to ```digest_type d = T(hc).end_message();```, though typically more efficient if the hash
-involves neither padding nor finalization)
-
-- ```value_type x; h.update_one(x);```
-Feeds the low ```ValueBits``` bits of x as input to the hash algorithm
-
-- ```InputIterator1 b, e; h.update(b, e);``` Equivalent to:
-
-      for (InputIterator1 i = b; i != e; ++i) {
-          h.update_one(i);
-      }
-
-- ```InputIterator1 b; size_t n; h.update_n(b, n);``` Equivalent to:
-
-      InputIterator1 i = b; 
-      for (size_t j = 0; j != n; ++j) {
-          h.update_one(i++);
-      }
-
-Each ```HashAlgorithm``` model provides access to all its associated ```StreamCipher``` models; Those ```StreamCipher```
-models are generally not accessible in other ways.
+  
