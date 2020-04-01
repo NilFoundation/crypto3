@@ -28,15 +28,8 @@ namespace nil {
             struct davies_meyer_compressor {
                 typedef BlockCipher block_cipher_type;
 
-                constexpr static const std::size_t word_bits = block_cipher_type::word_bits;
-                typedef typename block_cipher_type::word_type word_type;
-
-                constexpr static const std::size_t state_bits = block_cipher_type::block_bits;
-                constexpr static const std::size_t state_words = block_cipher_type::block_words;
                 typedef typename block_cipher_type::block_type state_type;
 
-                constexpr static const std::size_t block_bits = block_cipher_type::key_bits;
-                constexpr static const std::size_t block_words = block_cipher_type::key_words;
                 typedef typename block_cipher_type::key_type block_type;
 
                 inline static void process_block(state_type &state, const block_type &block) {

@@ -29,9 +29,25 @@ namespace nil {
             template<std::size_t Version>
             class sha2 {
                 typedef detail::sha2_policy<Version> policy_type;
-                typedef block::shacal2<policy_type::cipher_version> block_cipher_type;
+                typedef policy_type::block_cipher_type block_cipher_type;
 
             public:
+
+                constexpr static const std::size_t version = Version;
+
+                constexpr static const std::size_t word_bits = policy_type::word_bits;
+                typedef typename policy_type::word_type word_type;
+
+                constexpr static const std::size_t state_bits = policy_type::state_bits;
+                constexpr static const std::size_t state_words = policy_type::state_words;
+                typedef typename policy_type::state_type state_type;
+
+                constexpr static const std::size_t block_bits = policy_type::block_bits;
+                constexpr static const std::size_t block_words = policy_type::block_words;
+                typedef typename policy_type::block_type block_type;
+                
+                constexpr static const std::size_t digest_bits = policy_type::digest_bits;
+                typedef typename policy_type::digest_type digest_type;
 
                 struct construction {
                     struct params_type {
@@ -59,8 +75,6 @@ namespace nil {
                     typedef block_stream_processor<construction, StateAccumulator, params_type> type;
                 };
 
-                constexpr static const std::size_t digest_bits = policy_type::digest_bits;
-                typedef typename policy_type::digest_type digest_type;
             };
 
         }    // namespace hash
