@@ -44,7 +44,7 @@ set(TESTS_NAMES
 #    "ripemd"
 #    "pack"
 #    "tiger"
-#    "sha"
+    "sha0"
     "sha2"
 #    "sha3"
 #    "skein"

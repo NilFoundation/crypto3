@@ -32,8 +32,6 @@ namespace nil {
 
             public:
 
-                constexpr static const std::size_t version = Version;
-
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
                 typedef typename policy_type::word_type word_type;
 

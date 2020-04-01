@@ -32,8 +32,6 @@ namespace nil {
 
             public:
 
-                constexpr static const std::size_t version = Version;
-
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
                 typedef typename policy_type::word_type word_type;
 
@@ -69,6 +67,8 @@ namespace nil {
 
                     typedef block_stream_processor<construction, StateAccumulator, params_type> type;
                 };
+
+            };
 
             typedef sha0 sha;
 
