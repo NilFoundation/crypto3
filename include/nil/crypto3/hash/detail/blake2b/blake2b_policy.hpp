@@ -17,28 +17,32 @@ namespace nil {
         namespace hash {
             namespace detail {
                 template<std::size_t DigestBits>
-                struct blake2b_policy {
-                    typedef ::nil::crypto3::detail::basic_functions<64> policy_type;
+                struct blake2b_policy : public ::nil::crypto3::detail::basic_functions<64> {
+                    //typedef ::nil::crypto3::detail::basic_functions<64> policy_type;
 
-                    constexpr static const std::size_t rounds = 12;
+                    //constexpr static const std::size_t word_bits = policy_type::word_bits;
+                    //typedef typename policy_type::word_type word_type;
 
-                    constexpr static const std::size_t word_bits = policy_type::word_bits;
-                    typedef typename policy_type::word_type word_type;
+                    //constexpr static const std::size_t word_bits = basic_functions<64>::word_bits;
+                    //typedef typename basic_functions<64>::word_type word_type;
 
-                    constexpr static const std::size_t digest_bits = DigestBits;
-                    typedef static_digest<digest_bits> digest_type;
-
-                    constexpr static const std::size_t block_bits = 1024;
-                    constexpr static const std::size_t block_words = block_bits / word_bits;
-                    typedef std::array<word_type, block_words> block_type;
 
                     constexpr static const std::size_t state_bits = 512;
                     constexpr static const std::size_t state_words = state_bits / word_bits;
                     typedef std::array<word_type, state_words> state_type;
 
-                    constexpr static const std::size_t salt_bits = 64;
-                    typedef typename boost::uint_t<salt_bits>::exact salt_type;
-                    constexpr static const salt_type salt_value = 0xFFFFFFFFFFFFFFFF;
+                    constexpr static const std::size_t block_bits = 1024;
+                    constexpr static const std::size_t block_words = block_bits / word_bits;
+                    typedef std::array<word_type, block_words> block_type;
+
+                    constexpr static const std::size_t length_bits = word_bits;
+
+                    typedef typename stream_endian::little_octet_big_bit digest_endian;
+
+                    constexpr static const std::size_t digest_bits = DigestBits;
+                    typedef static_digest<digest_bits> digest_type;
+
+                    constexpr static const std::size_t rounds = 12;
 
                     struct iv_generator {
                         state_type const &operator()() const {
@@ -48,6 +52,10 @@ namespace nil {
                             return H0;
                         }
                     };
+
+                    constexpr static const std::size_t salt_bits = 64;
+                    typedef typename boost::uint_t<salt_bits>::exact salt_type;
+                    constexpr static const salt_type salt_value = 0xFFFFFFFFFFFFFFFF;
                 };
             }    // namespace detail
         }        // namespace hash
