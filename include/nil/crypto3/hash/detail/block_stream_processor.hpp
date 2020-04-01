@@ -49,7 +49,7 @@ namespace nil {
                 typedef typename construction_type::block_type block_type;
 
             public:
-                typedef typename params_type::stream_processor_endian endian_type;
+                typedef typename params_type::digest_endian endian_type;
 
                 constexpr static const std::size_t value_bits = params_type::value_bits;
                 typedef typename boost::uint_t<value_bits>::least value_type;

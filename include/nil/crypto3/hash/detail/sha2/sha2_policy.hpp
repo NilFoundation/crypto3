@@ -11,9 +11,6 @@
 #define CRYPTO3_HASH_DETAIL_SHA2_POLICY_HPP
 
 #include <nil/crypto3/block/shacal2.hpp>
-#include <nil/crypto3/block/detail/shacal/shacal2_policy.hpp>
-#include <nil/crypto3/hash/detail/davies_meyer_compressor.hpp>
-#include <nil/crypto3/hash/detail/state_adder.hpp>
 
 #include <nil/crypto3/detail/static_digest.hpp>
 
@@ -44,9 +41,6 @@ namespace nil {
                     constexpr static const std::size_t length_bits = word_bits * 2;
 
                     typedef typename stream_endian::big_octet_big_bit digest_endian;
-                    typedef typename stream_endian::big_octet_big_bit stream_processor_endian;
-
-                    typedef davies_meyer_compressor<block_cipher_type, detail::state_adder> compressor;
 
                 };
 

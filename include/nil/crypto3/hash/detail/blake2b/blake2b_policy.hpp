@@ -17,7 +17,7 @@ namespace nil {
         namespace hash {
             namespace detail {
                 template<std::size_t DigestBits>
-                struct blake2b_policy : public ::nil::crypto3::detail::basic_functions<64> {
+                struct blake2b_policy {
                     typedef ::nil::crypto3::detail::basic_functions<64> policy_type;
 
                     constexpr static const std::size_t rounds = 12;
