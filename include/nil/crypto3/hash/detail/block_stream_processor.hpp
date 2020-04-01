@@ -58,16 +58,8 @@ namespace nil {
                 typedef std::array<value_type, block_values> cache_type;
 
             protected:
-                constexpr static const std::size_t length_bits = params_type::length_bits;
-                // FIXME: do something more intelligent than capping at 64
-                constexpr static const std::size_t length_type_bits =
-                    length_bits < word_bits ? word_bits : length_bits > 64 ? 64 : length_bits;
-                typedef typename boost::uint_t<length_type_bits>::least length_type;
 
-                BOOST_STATIC_ASSERT(!length_bits || length_bits % word_bits == 0);
                 BOOST_STATIC_ASSERT(block_bits % value_bits == 0);
-
-                BOOST_STATIC_ASSERT(!length_bits || value_bits <= length_bits);
 
                 inline void process_block(std::size_t block_seen = block_bits) {
                     using namespace nil::crypto3::detail;
@@ -146,7 +138,7 @@ namespace nil {
                 accumulator_type &acc;
 
                 cache_type cache;
-                length_type cache_seen;
+                std::size_t cache_seen;
             };
         }    // namespace hash
     }        // namespace crypto3

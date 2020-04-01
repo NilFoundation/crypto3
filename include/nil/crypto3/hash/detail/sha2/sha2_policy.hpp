@@ -28,6 +28,9 @@ namespace nil {
 
                     typedef block::detail::shacal2_policy<cipher_version> cipher_policy;
                     typedef typename cipher_policy::block_type state_type;
+ ;
+                private:
+                    typedef davies_meyer_compressor<block::shacal2<cipher_version>, detail::state_adder> compressor;
                 };
 
                 template<std::size_t Version>
@@ -35,6 +38,7 @@ namespace nil {
 
                 template<>
                 struct sha2_policy<224> : basic_sha2_policy<256> {
+
 
                     constexpr static const std::size_t digest_bits = 224;
                     constexpr static const std::uint8_t ieee1363_hash_id = 0x38;

@@ -11,7 +11,7 @@
 
 #include <nil/crypto3/block/shacal2.hpp>
 
-#include <nil/crypto3/hash/detail/sha2_policy.hpp>
+#include <nil/crypto3/hash/detail/sha2/sha2_policy.hpp>
 #include <nil/crypto3/hash/detail/state_adder.hpp>
 #include <nil/crypto3/hash/detail/davies_meyer_compressor.hpp>
 #include <nil/crypto3/hash/detail/merkle_damgard_construction.hpp>
@@ -54,7 +54,6 @@ namespace nil {
                     struct params_type {
                         typedef typename stream_endian::big_octet_big_bit endian;
 
-                        constexpr static const std::size_t length_bits = construction::params_type::length_bits;
                         constexpr static const std::size_t value_bits = ValueBits;
                     };
 
