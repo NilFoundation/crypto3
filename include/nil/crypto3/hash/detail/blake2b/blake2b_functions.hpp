@@ -23,16 +23,9 @@ namespace nil {
                 struct blake2b_functions : public blake2b_policy<DigestBits> {
                     typedef blake2b_policy<DigestBits> policy_type;
 
-                    constexpr static const std::size_t word_bits = policy_type::word_bits;
                     typedef typename policy_type::word_type word_type;
 
-                    constexpr static const std::size_t block_bits = policy_type::block_bits;
-                    constexpr static const std::size_t block_words = policy_type::block_words;
-                    typedef typename policy_type::block_type block_type;
-
-                    constexpr static const std::size_t state_bits = policy_type::state_bits;
                     constexpr static const std::size_t state_words = policy_type::state_words;
-                    typedef typename policy_type::state_type state_type;
 
                     inline static void g(word_type &a, word_type &b, word_type &c, word_type &d, word_type M0,
                                          word_type M1) {

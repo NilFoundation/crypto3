@@ -17,9 +17,9 @@ namespace nil {
     namespace crypto3 {
         namespace hash {
             namespace detail {
-                template<typename Endianness, std::size_t DigestBits>
+                template<typename Endianness, typename PolicyType>
                 class blake2b_finalizer {
-                    typedef blake2b_policy<DigestBits> policy_type;
+                    typedef PolicyType policy_type;
 
                     constexpr static const std::size_t word_bits = policy_type::word_bits;
                     typedef typename policy_type::word_type word_type;

@@ -61,7 +61,7 @@ namespace nil {
                     constexpr static const std::size_t length_words = length_bits / word_bits;
                     BOOST_STATIC_ASSERT(!length_bits || length_bits % word_bits == 0);
 
-                    typedef ::nil::crypto3::detail::injector<endian_type, word_bits, block_words, block_bits> injector;
+                    typedef ::nil::crypto3::detail::injector<endian_type, word_bits, block_words, block_bits> injector_type;
 
                 public:
                     typedef typename hash_type::digest_type result_type;
@@ -109,7 +109,7 @@ namespace nil {
                             std::size_t new_bits_to_append =
                                 (needed_to_fill_bits > value_seen) ? value_seen : needed_to_fill_bits;
 
-                            injector::inject(value, new_bits_to_append, cache, cached_bits);
+                            injector_type::inject(value, new_bits_to_append, cache, cached_bits);
 
                             if (cached_bits == block_bits) {
                                 // If there are enough bits in the incoming value to fill the block
@@ -125,7 +125,7 @@ namespace nil {
 
                                     cached_bits = 0;
 
-                                    injector::inject(
+                                    injector_type::inject(
                                         value, value_seen - new_bits_to_append, cache, cached_bits, new_bits_to_append);
                                 }
                             }
@@ -161,7 +161,7 @@ namespace nil {
                             std::size_t new_bits_to_append =
                                 (needed_to_fill_bits > value_seen) ? value_seen : needed_to_fill_bits;
 
-                            injector::inject(value, new_bits_to_append, cache, cached_bits);
+                            injector_type::inject(value, new_bits_to_append, cache, cached_bits);
 
                             if (cached_bits == block_bits) {
                                 // If there are enough bits in the incoming value to fill the block
@@ -177,7 +177,7 @@ namespace nil {
                                     // which is now empty
                                     cached_bits = 0;
 
-                                    injector::inject(
+                                    injector_type::inject(
                                         value, value_seen - new_bits_to_append, cache, cached_bits, new_bits_to_append);
                                 }
                             }
