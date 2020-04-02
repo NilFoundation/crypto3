@@ -21,13 +21,9 @@ namespace nil {
             namespace detail {
                 template<std::size_t DigestBits>
                 struct sha3_policy : public ::nil::crypto3::detail::basic_functions<64> {
-                    typedef ::nil::crypto3::detail::basic_functions<64> policy_type;
 
                     constexpr static const std::size_t digest_bits = DigestBits; 
                     typedef static_digest<digest_bits> digest_type;
-
-                    constexpr static const std::size_t word_bits = policy_type::word_bits;
-                    typedef typename policy_type::word_type word_type;
 
                     constexpr static const std::size_t state_bits = 1600;
                     constexpr static const std::size_t state_words = state_bits / word_bits;
@@ -35,7 +31,11 @@ namespace nil {
 
                     constexpr static const std::size_t block_bits = state_bits - 2 * digest_bits;
                     constexpr static const std::size_t block_words = block_bits / word_bits;
-                    typedef typename std::array<word_type, block_words> block_type;
+                    typedef std::array<word_type, block_words> block_type;
+
+                    constexpr static const std::size_t length_bits = 0;
+
+                    typedef typename stream_endian::big_octet_little_bit digest_endian;
 
                     constexpr static const std::size_t rounds = 24;
 

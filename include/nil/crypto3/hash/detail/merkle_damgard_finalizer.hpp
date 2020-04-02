@@ -33,10 +33,6 @@ namespace nil {
                     constexpr static const std::size_t digest_bits = policy_type::digest_bits;
                     typedef typename policy_type::digest_type digest_type;
 
-                    /*constexpr static const std::size_t block_words = BlockBits / WordBits;
-
-                    typedef typename policy_type::word_type word_type;
-                    typedef std::array<word_type, block_words> block_type;*/
 
                     typedef ::nil::crypto3::detail::injector<Endianness, word_bits, block_words, block_bits> injector_type;
 

@@ -19,14 +19,6 @@ namespace nil {
             namespace detail {
                 template<std::size_t DigestBits>
                 struct blake2b_policy : public ::nil::crypto3::detail::basic_functions<64> {
-                    //typedef ::nil::crypto3::detail::basic_functions<64> policy_type;
-
-                    //constexpr static const std::size_t word_bits = policy_type::word_bits;
-                    //typedef typename policy_type::word_type word_type;
-
-                    //constexpr static const std::size_t word_bits = basic_functions<64>::word_bits;
-                    //typedef typename basic_functions<64>::word_type word_type;
-
 
                     constexpr static const std::size_t state_bits = 512;
                     constexpr static const std::size_t state_words = state_bits / word_bits;

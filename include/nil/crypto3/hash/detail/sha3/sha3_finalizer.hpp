@@ -15,18 +15,23 @@ namespace nil {
     namespace crypto3 {
         namespace hash {
             namespace detail {
-                template<typename Endianness, std::size_t DigestBits>
+                template<typename Endianness, typename PolicyType>
                 class sha3_finalizer {
-                    typedef sha3_policy<DigestBits> policy_type;
+                    typedef PolicyType policy_type;
 
                     constexpr static const std::size_t word_bits = policy_type::word_bits;
                     typedef typename policy_type::word_type word_type;
 
+                    constexpr static const std::size_t state_bits = policy_type::state_bits;
+                    constexpr static const std::size_t state_words = policy_type::state_words;
+                    typedef typename policy_type::state_type state_type;
+
                     constexpr static const std::size_t block_bits = policy_type::block_bits;
                     constexpr static const std::size_t block_words = policy_type::block_words;
                     typedef typename policy_type::block_type block_type;
-
-                    typedef typename policy_type::state_type state_type;
+                    
+                    constexpr static const std::size_t digest_bits = policy_type::digest_bits;
+                    typedef typename policy_type::digest_type digest_type;
 
                     typedef ::nil::crypto3::detail::injector<Endianness, word_bits, block_words, block_bits>
                         injector_type;
