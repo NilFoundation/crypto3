@@ -16,7 +16,6 @@
 namespace nil {
     namespace crypto3 {
         namespace stream_endian {
-
             // General versions; There should be no need to use these directly
 
             template<int UnitBits>
@@ -51,8 +50,7 @@ namespace nil {
             typedef host_unit<CHAR_BIT> host_byte;
 
         }    // namespace stream_endian
-
     }    // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_BLOCK_STREAM_ENDIAN_HPP
+#endif    // CRYPTO3_STREAM_ENDIAN_HPP

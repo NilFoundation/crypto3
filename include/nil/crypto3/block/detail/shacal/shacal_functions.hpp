@@ -9,7 +9,7 @@
 #ifndef CRYPTO3_BLOCK_CIPHERS_DETAIL_SHACAL_FUNCTIONS_HPP
 #define CRYPTO3_BLOCK_CIPHERS_DETAIL_SHACAL_FUNCTIONS_HPP
 
-#include <nil/crypto3/block/detail/basic_functions.hpp>
+#include <nil/crypto3/detail/basic_functions.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -25,8 +25,8 @@ namespace nil {
                  * Specifically, subsection 4.1
                  */
                 template<std::size_t WordBits>
-                struct basic_shacal_functions : public basic_functions<WordBits> {
-                    typedef typename basic_functions<WordBits>::word_type word_type;
+                struct basic_shacal_functions : public ::nil::crypto3::detail::basic_functions<WordBits> {
+                    typedef typename ::nil::crypto3::detail::basic_functions<WordBits>::word_type word_type;
 
                     static word_type Ch(word_type x, word_type y, word_type z) {
                         return (x & y) ^ (~x & z);

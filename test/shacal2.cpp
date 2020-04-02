@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -9,23 +10,11 @@
 #define BOOST_TEST_MODULE shacal_cipher_test
 
 #include <iostream>
-#include <unordered_map>
 
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
 
-#include <nil/crypto3/hash/sha1.hpp>
-#include <nil/crypto3/hash/sha2.hpp>
-
-#include <nil/crypto3/hash/hash_state.hpp>
-
-#include <nil/crypto3/hash/detail/block_stream_processor.hpp>
-#include <nil/crypto3/hash/detail/davies_meyer_compressor.hpp>
-#include <nil/crypto3/hash/detail/merkle_damgard_construction.hpp>
-
-#include <nil/crypto3/block/shacal.hpp>
-#include <nil/crypto3/block/shacal1.hpp>
 #include <nil/crypto3/block/shacal2.hpp>
 
 #include <nil/crypto3/block/algorithm/encrypt.hpp>
@@ -81,7 +70,7 @@ BOOST_AUTO_TEST_CASE(shacal1_single_block_encrypt2) {
     owcft::state_type const H1 = {{0xda39a3ee, 0x5e6b4b0d, 0x3255bfef, 0x95601890, 0xafd80709}};
     BOOST_CHECK_EQUAL(H, H1);
 }
-/*
+
 struct shacal_params_type {
     constexpr static const std::size_t length_bits = 64 * 2;
     constexpr static const std::size_t digest_bits = 160;
@@ -273,5 +262,5 @@ BOOST_AUTO_TEST_CASE(shacal2_512_accumulator2) {
         "f09ae159827fc6e4c03894e6ecf4616395d3479f80d66ed3ac81a64ea0445f32";
     BOOST_CHECK_EQUAL(ed, std::to_string(d).data());
 }
-*/
+
 BOOST_AUTO_TEST_SUITE_END()

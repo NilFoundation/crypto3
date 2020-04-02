@@ -121,4 +121,4 @@ namespace nil {
     }        // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_BLOCK_DETAIL_IMPLODER_HPP
+#endif    // CRYPTO3_DETAIL_IMPLODER_HPP
