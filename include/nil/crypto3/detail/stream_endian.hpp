@@ -53,4 +53,4 @@ namespace nil {
     }    // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_HASH_STREAM_ENDIAN_HPP
+#endif    // CRYPTO3_STREAM_ENDIAN_HPP

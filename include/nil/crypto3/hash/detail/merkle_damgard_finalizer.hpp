@@ -11,6 +11,8 @@
 #ifndef CRYPTO3_MERKLE_DAMGARD_FINALIZER_HPP
 #define CRYPTO3_MERKLE_DAMGARD_FINALIZER_HPP
 
+#include <nil/crypto3/detail/inject.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace hash {

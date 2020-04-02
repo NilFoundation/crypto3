@@ -6,9 +6,10 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_HASH_PACK_HPP
-#define CRYPTO3_HASH_PACK_HPP
+#ifndef CRYPTO3_PACK_HPP
+#define CRYPTO3_PACK_HPP
 
+#include <nil/crypto3/detail/type_traits.hpp>
 #include <nil/crypto3/detail/stream_endian.hpp>
 #include <nil/crypto3/detail/exploder.hpp>
 #include <nil/crypto3/detail/imploder.hpp>
@@ -26,7 +27,6 @@
 namespace nil {
     namespace crypto3 {
         namespace detail {
-
 #ifndef CRYPTO3_NO_OPTIMIZATION
 
             template<int UnitBits, int InputBits, int OutputBits, typename InT, typename OutT>
@@ -136,7 +136,7 @@ namespace nil {
             template<typename Endianness, int InputBits, int OutputBits>
             struct packer : real_packer<Endianness, InputBits, OutputBits> {
 
-#ifndef CRYPTO3_HASH_NO_OPTIMIZATION
+#ifndef CRYPTO3_NO_OPTIMIZATION
 
                 using real_packer<Endianness, InputBits, OutputBits>::pack_n;
 
@@ -221,4 +221,4 @@ namespace nil {
     }        // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_HASH_PACK_HPP
+#endif    // CRYPTO3_PACK_HPP

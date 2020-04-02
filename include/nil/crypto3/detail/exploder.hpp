@@ -140,4 +140,4 @@ namespace nil {
     }        // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_HASH_DETAIL_EXPLODER_HPP
+#endif    // CRYPTO3_DETAIL_EXPLODER_HPP

@@ -32,7 +32,6 @@ namespace nil {
                 template<typename InputValue, typename OutputValue>
                 static void step(InputValue z, OutputValue &x) {
                     int const shift = OutputBits - (InputBits + k);
-
                     OutputValue y = low_bits<InputBits>(OutputValue(z));
                     x |= unbounded_shl<shift>(y);
                 }
@@ -62,7 +61,6 @@ namespace nil {
                     int const shift = InputBits >= UnitBits ?
                                           OutputBits - (InputBits + k) :
                                           OutputBits >= UnitBits ? OutputBits - (UnitBits + ku) + kb : kb;
-
                     OutputValue y = low_bits<InputBits>(OutputValue(z));
                     x |= unbounded_shl<shift>(y);
                 }
@@ -73,7 +71,6 @@ namespace nil {
                 template<typename InputValue, typename OutputValue>
                 static void step(InputValue z, OutputValue &x) {
                     int const shift = k;
-
                     OutputValue y = low_bits<InputBits>(OutputValue(z));
                     x |= unbounded_shl<shift>(y);
                 }
@@ -119,8 +116,9 @@ namespace nil {
                 static void implode(InIter &, OutputValue &) {
                 }
             };
+
         }    // namespace detail
     }        // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_HASH_DETAIL_IMPLODER_HPP
+#endif    // CRYPTO3_DETAIL_IMPLODER_HPP
