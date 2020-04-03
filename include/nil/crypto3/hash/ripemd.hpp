@@ -273,19 +273,17 @@ namespace nil {
                         constexpr static const std::size_t digest_bits = policy_type::digest_bits;
                     };
 
-                    typedef detail::merkle_damgard_finalizer<typename params_type::digest_endian, policy_type::word_bits,
-                                                 policy_type::block_bits>
-                        merkle_damgard_finalizer;
-                    typedef merkle_damgard_construction<params_type, typename policy_type::iv_generator,
-                                                        ripemd_compressor<DigestBits>,
-                                                        merkle_damgard_finalizer>
+                    typedef merkle_damgard_construction<
+                        params_type, typename policy_type::iv_generator,
+                        ripemd_compressor<DigestBits>,
+                        detail::merkle_damgard_finalizer<typename params_type::digest_endian, policy_type>>
                         type;
                 };
 
                 template<typename StateAccumulator, std::size_t ValueBits>
                 struct stream_processor {
                     struct params_type {
-                        typedef typename stream_endian::little_octet_big_bit endian;
+                        typedef typename stream_endian::little_octet_big_bit digest_endian;
 
                         constexpr static const std::size_t value_bits = ValueBits;
                     };

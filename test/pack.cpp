@@ -1,5 +1,4 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2019 Nil Foundation AG
 // Copyright (c) 2018-2019 Mikhail Komarov <nemo@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
@@ -14,8 +13,6 @@
 
 #include <nil/crypto3/detail/pack.hpp>
 
-#include <nil/crypto3/hash/hash_state.hpp>
-
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
@@ -26,8 +23,8 @@
 #include <cassert>
 #include <cstdio>
 
+using namespace nil::crypto3;
 using namespace nil::crypto3::detail;
-using namespace nil::crypto3::hash;
 using namespace nil::crypto3::stream_endian;
 
 BOOST_AUTO_TEST_SUITE(hash_pack_test_suite)
@@ -281,6 +278,10 @@ BOOST_AUTO_TEST_CASE(hash_pack_explodell8) {
     BOOST_CHECK(out == eout);
 }
 
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(hash_pack_implode_test_suite)
+
 BOOST_AUTO_TEST_CASE(hash_pack_implodebb1) {
     std::array<uint32_t, 2> in = {{0x01234567, 0x89ABCDEF}};
     std::array<uint32_t, 2> out {};
@@ -521,6 +522,9 @@ BOOST_AUTO_TEST_CASE(hash_pack_implodell8) {
     BOOST_CHECK(out == eout);
 }
 
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(hash_pack_various_test_suite)
 BOOST_AUTO_TEST_CASE(hash_pack_various1) {
     using namespace std;
     istringstream iss("-1 -2 -4 -8");

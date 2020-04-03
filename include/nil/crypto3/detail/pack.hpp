@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2019 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -72,12 +72,12 @@ namespace nil {
             struct real_packer<Endianness, Bits, Bits, false, false> {
 
                 template<typename InIter, typename OutIter>
-                inline static void pack_n(InIter in, size_t in_n, OutIter out) {
+                static void pack_n(InIter in, size_t in_n, OutIter out) {
                     std::copy(in, in + in_n, out);
                 }
 
                 template<typename InIter, typename OutIter>
-                inline static void pack(InIter in, InIter in_e, OutIter out) {
+                static void pack(InIter in, InIter in_e, OutIter out) {
                     std::copy(in, in_e, out);
                 }
             };
@@ -88,7 +88,7 @@ namespace nil {
                 BOOST_STATIC_ASSERT(InputBits % OutputBits == 0);
 
                 template<typename InIter, typename OutIter>
-                inline static void pack_n(InIter in, size_t in_n, OutIter out) {
+                static void pack_n(InIter in, size_t in_n, OutIter out) {
                     while (in_n--) {
                         typedef typename std::iterator_traits<InIter>::value_type InValue;
                         InValue const value = *in++;
@@ -97,7 +97,7 @@ namespace nil {
                 }
 
                 template<typename InIter, typename OutIter>
-                inline static void pack(InIter in, InIter in_e, OutIter out) {
+                static void pack(InIter in, InIter in_e, OutIter out) {
                     while (in != in_e) {
                         typedef typename std::iterator_traits<InIter>::value_type InValue;
                         InValue const value = *in++;
@@ -112,7 +112,7 @@ namespace nil {
                 BOOST_STATIC_ASSERT(OutputBits % InputBits == 0);
 
                 template<typename InIter, typename OutIter>
-                inline static void pack_n(InIter in, size_t in_n, OutIter out) {
+                static void pack_n(InIter in, size_t in_n, OutIter out) {
                     size_t out_n = in_n / (OutputBits / InputBits);
                     while (out_n--) {
                         typedef typename detail::outvalue_helper<OutIter, OutputBits>::type OutValue;
@@ -123,7 +123,7 @@ namespace nil {
                 }
 
                 template<typename InIter, typename OutIter>
-                inline static void pack(InIter in, InIter in_e, OutIter out) {
+                static void pack(InIter in, InIter in_e, OutIter out) {
                     while (in != in_e) {
                         typedef typename detail::outvalue_helper<OutIter, OutputBits>::type OutValue;
                         OutValue value = OutValue();
@@ -141,15 +141,13 @@ namespace nil {
                 using real_packer<Endianness, InputBits, OutputBits>::pack_n;
 
                 template<typename InT, typename OutT>
-                inline static
-                    typename std::enable_if<can_memcpy<Endianness, InputBits, OutputBits, InT, OutT>::value>::type
+                static typename std::enable_if<can_memcpy<Endianness, InputBits, OutputBits, InT, OutT>::value>::type
                     pack_n(InT const *in, size_t n, OutT *out) {
                     std::memcpy(out, in, n * sizeof(InT));
                 }
 
                 template<typename InT, typename OutT>
-                inline static
-                    typename std::enable_if<can_memcpy<Endianness, InputBits, OutputBits, InT, OutT>::value>::type
+                static typename std::enable_if<can_memcpy<Endianness, InputBits, OutputBits, InT, OutT>::value>::type
                     pack_n(InT *in, size_t n, OutT *out) {
                     std::memcpy(out, in, n * sizeof(InT));
                 }
@@ -159,64 +157,74 @@ namespace nil {
 
             template<typename Endianness, int InValueBits, int OutValueBits, typename InputIterator1,
                      typename InputIterator2>
-            inline void pack_n(InputIterator1 in, size_t in_n, InputIterator2 out) {
+            void pack_n(InputIterator1 in, size_t in_n, InputIterator2 out) {
                 typedef packer<Endianness, InValueBits, OutValueBits> packer_type;
                 packer_type::pack_n(in, in_n, out);
             }
 
             template<typename Endianness, int InValueBits, int OutValueBits, typename InputIterator1,
                      typename InputIterator2>
-            inline void pack_n(InputIterator1 in, size_t in_n, InputIterator2 out, size_t out_n) {
+            void pack_n(InputIterator1 in, size_t in_n, InputIterator2 out, size_t out_n) {
                 BOOST_ASSERT(in_n * InValueBits == out_n * OutValueBits);
                 pack_n<Endianness, InValueBits, OutValueBits>(in, in_n, out);
             }
 
             template<typename Endianness, int InValueBits, int OutValueBits, typename InputIterator1,
                      typename InputIterator2>
-            inline void pack(InputIterator1 b1, InputIterator1 e1, std::random_access_iterator_tag, InputIterator2 b2) {
+            void pack(InputIterator1 b1, InputIterator1 e1, std::random_access_iterator_tag, InputIterator2 b2) {
                 pack_n<Endianness, InValueBits, OutValueBits>(b1, e1 - b1, b2);
             }
 
             template<typename Endianness, int InValueBits, int OutValueBits, typename InputIterator1, typename CatT1,
-                     typename InputIterator2>
-            inline void pack(InputIterator1 b1, InputIterator1 e1, CatT1, InputIterator2 b2) {
+                     typename InputIterator2,
+                     typename = typename std::enable_if<detail::is_iterator<InputIterator1>::value>::type,
+                     typename = typename std::enable_if<detail::is_iterator<InputIterator2>::value>::type>
+            void pack(InputIterator1 b1, InputIterator1 e1, CatT1, InputIterator2 b2) {
                 typedef packer<Endianness, InValueBits, OutValueBits> packer_type;
                 packer_type::pack(b1, e1, b2);
             }
 
             template<typename Endianness, int InValueBits, int OutValueBits, typename InputIterator1,
-                     typename InputIterator2>
-            inline void pack(InputIterator1 b1, InputIterator1 e1, InputIterator2 b2) {
+                     typename InputIterator2,
+                     typename = typename std::enable_if<detail::is_iterator<InputIterator2>::value>::type>
+            void pack(InputIterator1 b1, InputIterator1 e1, InputIterator2 b2) {
                 typedef typename std::iterator_traits<InputIterator1>::iterator_category cat1;
                 pack<Endianness, InValueBits, OutValueBits>(b1, e1, cat1(), b2);
             }
 
             template<typename Endianness, int InValueBits, int OutValueBits, typename InputIterator1,
                      typename InputIterator2>
-            inline void pack(InputIterator1 b1, InputIterator1 e1, std::random_access_iterator_tag, InputIterator2 b2,
-                             InputIterator2 e2, std::random_access_iterator_tag) {
+            void pack(InputIterator1 b1, InputIterator1 e1, std::random_access_iterator_tag, InputIterator2 b2,
+                      InputIterator2 e2, std::random_access_iterator_tag) {
                 pack_n<Endianness, InValueBits, OutValueBits>(b1, e1 - b1, b2, e2 - b2);
             }
 
             template<typename Endianness, int InValueBits, int OutValueBits, typename InputIterator1, typename CatT1,
                      typename InputIterator2, typename CatT2>
-            inline void pack(InputIterator1 b1, InputIterator1 e1, CatT1, InputIterator2 b2, InputIterator2, CatT2) {
+            void pack(InputIterator1 b1, InputIterator1 e1, CatT1, InputIterator2 b2, InputIterator2, CatT2) {
                 pack<Endianness, InValueBits, OutValueBits>(b1, e1, b2);
             }
 
             template<typename Endianness, int InValueBits, int OutValueBits, typename InputIterator1,
                      typename InputIterator2>
-            inline void pack(InputIterator1 b1, InputIterator1 e1, InputIterator2 b2, InputIterator2 e2) {
+            void pack(InputIterator1 b1, InputIterator1 e1, InputIterator2 b2, InputIterator2 e2) {
                 typedef typename std::iterator_traits<InputIterator1>::iterator_category cat1;
                 typedef typename std::iterator_traits<InputIterator2>::iterator_category cat2;
                 pack<Endianness, InValueBits, OutValueBits>(b1, e1, cat1(), b2, e2, cat2());
             }
 
             template<typename Endianness, int InValueBits, int OutValueBits, typename InputType, typename OutputType>
-            inline void pack(const InputType &in, OutputType &out) {
+            void pack(const InputType &in, OutputType &out) {
                 pack_n<Endianness, InValueBits, OutValueBits>(in.data(), in.size(), out.data(), out.size());
             }
 
+            template<typename Endianness, int InValueBits, int OutValueBits, typename InputIterator,
+                     typename OutputType,
+                     typename = typename std::enable_if<!std::is_arithmetic<OutputType>::value>::type>
+            inline void pack(InputIterator first, InputIterator last, OutputType &out) {
+                pack_n<Endianness, InValueBits, OutValueBits>(first, std::distance(first, last), out.begin(),
+                    out.size());
+            }
         }    // namespace detail
     }        // namespace crypto3
 }    // namespace nil
