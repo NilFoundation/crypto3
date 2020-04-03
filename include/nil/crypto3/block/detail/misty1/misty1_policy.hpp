@@ -11,13 +11,13 @@
 
 #include <array>
 
-#include <nil/crypto3/block/detail/basic_functions.hpp>
+#include <nil/crypto3/detail/basic_functions.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace block {
             namespace detail {
-                struct misty1_policy : basic_functions<16> {
+                struct misty1_policy : ::nil::crypto3::detail::basic_functions<16> {
                     constexpr static const std::size_t rounds = 8;
 
                     constexpr static const std::size_t block_bits = 64;

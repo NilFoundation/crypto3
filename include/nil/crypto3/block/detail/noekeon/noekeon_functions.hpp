@@ -9,15 +9,16 @@
 #ifndef CRYPTO3_NOEKEON_FUNCTIONS_CPP_HPP
 #define CRYPTO3_NOEKEON_FUNCTIONS_CPP_HPP
 
-#include <nil/crypto3/block/detail/basic_functions.hpp>
+#include <nil/crypto3/detail/basic_functions.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace block {
             namespace detail {
                 template<std::size_t WordBits>
-                struct noekeon_functions : public basic_functions<WordBits> {
-                    typedef typename basic_functions<WordBits>::word_type word_type;
+                struct noekeon_functions : public ::nil::crypto3::detail::basic_functions<WordBits> {
+                    typedef ::nil::crypto3::detail::basic_functions<WordBits> policy_type;
+                    typedef typename policy_type::word_type word_type;
 
                     /*
                      * Noekeon's Theta Operation
@@ -25,8 +26,8 @@ namespace nil {
                     inline static void theta(word_type &A0, word_type &A1, word_type &A2, word_type &A3,
                                              const word_type *EK) {
                         word_type T = A0 ^ A2;
-                        T ^= basic_functions<WordBits>::template rotl<8>(T) ^
-                             basic_functions<WordBits>::template rotr<8>(T);
+                        T ^= policy_type::template rotl<8>(T) ^
+                             policy_type::template rotr<8>(T);
                         A1 ^= T;
                         A3 ^= T;
 
@@ -36,8 +37,8 @@ namespace nil {
                         A3 ^= EK[3];
 
                         T = A1 ^ A3;
-                        T ^= basic_functions<WordBits>::template rotl<8>(T) ^
-                             basic_functions<WordBits>::template rotr<8>(T);
+                        T ^= policy_type::template rotl<8>(T) ^
+                             policy_type::template rotr<8>(T);
                         A0 ^= T;
                         A2 ^= T;
                     }
@@ -47,14 +48,14 @@ namespace nil {
                      */
                     inline static void theta(word_type &A0, word_type &A1, word_type &A2, word_type &A3) {
                         word_type T = A0 ^ A2;
-                        T ^= basic_functions<WordBits>::template rotl<8>(T) ^
-                             basic_functions<WordBits>::template rotr<8>(T);
+                        T ^= policy_type::template rotl<8>(T) ^
+                             policy_type::template rotr<8>(T);
                         A1 ^= T;
                         A3 ^= T;
 
                         T = A1 ^ A3;
-                        T ^= basic_functions<WordBits>::template rotl<8>(T) ^
-                             basic_functions<WordBits>::template rotr<8>(T);
+                        T ^= policy_type::template rotl<8>(T) ^
+                             policy_type::template rotr<8>(T);
                         A0 ^= T;
                         A2 ^= T;
                     }

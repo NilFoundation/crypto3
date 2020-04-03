@@ -9,17 +9,17 @@
 #ifndef CRYPTO3_STREEBOG_CIPHER_POLICY_HPP
 #define CRYPTO3_STREEBOG_CIPHER_POLICY_HPP
 
-#include <nil/crypto3/block/detail/basic_functions.hpp>
+#include <nil/crypto3/detail/basic_functions.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace block {
             namespace detail {
                 template<std::size_t BlockBits, std::size_t KeyBits>
-                struct streebog_policy : public basic_functions<64> {
-                    constexpr static const std::size_t word_bits = basic_functions<64>::word_bits;
+                struct streebog_policy : public ::nil::crypto3::detail::basic_functions<64> {
+                    constexpr static const std::size_t word_bits = ::nil::crypto3::detail::basic_functions<64>::word_bits;
                     constexpr static const std::size_t word_bytes = word_bits / CHAR_BIT;
-                    typedef typename basic_functions<64>::word_type word_type;
+                    typedef typename ::nil::crypto3::detail::basic_functions<64>::word_type word_type;
 
                     constexpr static const std::size_t block_bits = BlockBits;
                     constexpr static const std::size_t block_words = block_bits / word_bits;

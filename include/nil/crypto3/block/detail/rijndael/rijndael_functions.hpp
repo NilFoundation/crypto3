@@ -13,17 +13,17 @@
 
 #include <nil/crypto3/block/algorithm/copy_n_if.hpp>
 
-#include <nil/crypto3/block/detail/basic_functions.hpp>
+#include <nil/crypto3/detail/basic_functions.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace block {
             namespace detail {
                 template<std::size_t WordBits, std::size_t BlockBits>
-                struct rijndael_functions : public basic_functions<WordBits> {
-                    typedef typename basic_functions<WordBits>::byte_type byte_type;
+                struct rijndael_functions : public ::nil::crypto3::detail::basic_functions<WordBits> {
+                    typedef typename ::nil::crypto3::detail::basic_functions<WordBits>::byte_type byte_type;
 
-                    constexpr static const std::size_t word_bits = basic_functions<WordBits>::word_bits;
+                    constexpr static const std::size_t word_bits = ::nil::crypto3::detail::basic_functions<WordBits>::word_bits;
                     constexpr static const std::size_t word_bytes = word_bits / CHAR_BIT;
                     typedef std::array<byte_type, word_bytes> word_type;
 
@@ -71,8 +71,8 @@ namespace nil {
                         }
                     }
 
-                    inline static typename basic_functions<WordBits>::word_type
-                        rotate_left(typename basic_functions<WordBits>::word_type x) {
+                    inline static typename ::nil::crypto3::detail::basic_functions<WordBits>::word_type
+                        rotate_left(typename ::nil::crypto3::detail::basic_functions<WordBits>::word_type x) {
                         uint8_t c = reinterpret_cast<uint8_t *>(&x)[0];
                         for (int i = 0; i < 3; i++) {
                             reinterpret_cast<uint8_t *>(&x)[i] = reinterpret_cast<uint8_t *>(&x)[i + 1];

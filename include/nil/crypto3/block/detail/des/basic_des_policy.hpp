@@ -9,17 +9,19 @@
 #ifndef CRYPTO3_BASIC_DES_POLICY_HPP
 #define CRYPTO3_BASIC_DES_POLICY_HPP
 
-#include <nil/crypto3/block/detail/basic_functions.hpp>
+#include <nil/crypto3/detail/basic_functions.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace block {
             namespace detail {
-                struct basic_des_policy : public basic_functions<32> {
-                    typedef typename basic_functions<32>::byte_type byte_type;
+                struct basic_des_policy : public ::nil::crypto3::detail::basic_functions<32> {
+                    typedef ::nil::crypto3::detail::basic_functions<32> policy_type;
 
-                    constexpr static const std::size_t word_bits = basic_functions<32>::word_bits;
-                    typedef typename basic_functions<32>::word_type word_type;
+                    typedef typename policy_type::byte_type byte_type;
+
+                    constexpr static const std::size_t word_bits = policy_type::word_bits;
+                    typedef typename policy_type::word_type word_type;
 
                     constexpr static const std::size_t substitution_size = 256;
                     typedef std::array<word_type, substitution_size> substitution_type;

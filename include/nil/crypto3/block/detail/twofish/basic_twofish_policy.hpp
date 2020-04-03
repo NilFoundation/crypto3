@@ -11,14 +11,14 @@
 
 #include <array>
 
-#include <nil/crypto3/block/detail/basic_functions.hpp>
+#include <nil/crypto3/detail/basic_functions.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace block {
             namespace detail {
                 template<std::size_t KeyBits>
-                struct basic_twofish_policy : basic_functions<32> {
+                struct basic_twofish_policy : ::nil::crypto3::detail::basic_functions<32> {
                     constexpr static const std::size_t rounds = 16;
 
                     constexpr static const std::size_t block_bits = 128;

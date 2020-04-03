@@ -9,15 +9,15 @@
 #ifndef CRYPTO3_BASIC_CAST_POLICY_HPP
 #define CRYPTO3_BASIC_CAST_POLICY_HPP
 
-#include <nil/crypto3/block/detail/basic_functions.hpp>
+#include <nil/crypto3/detail/basic_functions.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace block {
             namespace detail {
                 template<std::size_t Version, std::size_t KeyBits>
-                struct basic_cast_policy : basic_functions<32> {
-                    typedef typename basic_functions<32>::word_type word_type;
+                struct basic_cast_policy : ::nil::crypto3::detail::basic_functions<32> {
+                    typedef typename ::nil::crypto3::detail::basic_functions<32>::word_type word_type;
 
                     constexpr static const std::size_t block_bits = Version / 2;
                     constexpr static const std::size_t block_words = block_bits / word_bits;

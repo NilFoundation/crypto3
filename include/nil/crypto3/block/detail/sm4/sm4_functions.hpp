@@ -9,16 +9,19 @@
 #ifndef CRYPTO3_SM4_FUNCTIONS_CPP_HPP
 #define CRYPTO3_SM4_FUNCTIONS_CPP_HPP
 
-#include <nil/crypto3/block/detail/basic_functions.hpp>
+#include <nil/crypto3/detail/basic_functions.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace block {
             namespace detail {
                 template<std::size_t WordBits>
-                struct sm4_functions : public basic_functions<WordBits> {
-                    typedef typename basic_functions<WordBits>::byte_type byte_type;
-                    typedef typename basic_functions<WordBits>::word_type word_type;
+                struct sm4_functions : public ::nil::crypto3::detail::basic_functions<WordBits> {
+                    typedef ::nil::crypto3::detail::basic_functions<WordBits> policy_type;
+                    typedef typename policy_type::word_type word_type;
+
+                    typedef typename policy_type::byte_type byte_type;
+                    typedef typename policy_type::word_type word_type;
 
                     constexpr static const std::size_t constants_size = 256;
                     typedef std::array<byte_type, constants_size> constants_type;
@@ -32,19 +35,19 @@ namespace nil {
                             constants[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(b, 3)]);
 
                         // L linear transform
-                        return t ^ (basic_functions<WordBits>::template rotl<2>(t)) ^
-                               basic_functions<WordBits>::template rotl<10>(t) ^
-                               basic_functions<WordBits>::template rotl<18>(t) ^
-                               basic_functions<WordBits>::template rotl<24>(t);
+                        return t ^ (policy_type::template rotl<2>(t)) ^
+                               policy_type::template rotl<10>(t) ^
+                               policy_type::template rotl<18>(t) ^
+                               policy_type::template rotl<24>(t);
                     }
 
                     inline static word_type t(word_type b, const transposed_constants_type &constants) {
                         return constants[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(b, 0)] ^
-                               (basic_functions<WordBits>::template rotr<8>(
+                               (policy_type::template rotr<8>(
                                    constants[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(b, 1)])) ^
-                               basic_functions<WordBits>::template rotr<16>(
+                               policy_type::template rotr<16>(
                                    constants[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(b, 2)]) ^
-                               basic_functions<WordBits>::template rotr<24>(
+                               policy_type::template rotr<24>(
                                    constants[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(b, 3)]);
                     }
 
@@ -57,8 +60,8 @@ namespace nil {
                             constants[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(b, 3)]);
 
                         // L' linear transform
-                        return t ^ (basic_functions<WordBits>::template rotl<13>(t)) ^
-                               basic_functions<WordBits>::template rotl<23>(t);
+                        return t ^ (policy_type::template rotl<13>(t)) ^
+                               policy_type::template rotl<23>(t);
                     }
                 };
             }    // namespace detail

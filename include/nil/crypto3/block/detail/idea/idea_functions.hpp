@@ -9,7 +9,7 @@
 #ifndef CRYPTO3_IDEA_FUNCTIONS_HPP
 #define CRYPTO3_IDEA_FUNCTIONS_HPP
 
-#include <nil/crypto3/block/detail/basic_functions.hpp>
+#include <nil/crypto3/detail/basic_functions.hpp>
 #include <nil/crypto3/block/detail/utilities/constant_time_utilities.hpp>
 
 namespace nil {
@@ -17,8 +17,8 @@ namespace nil {
         namespace block {
             namespace detail {
                 template<std::size_t WordBits>
-                struct idea_functions : public basic_functions<WordBits> {
-                    typedef typename basic_functions<WordBits>::word_type word_type;
+                struct idea_functions : public ::nil::crypto3::detail::basic_functions<WordBits> {
+                    typedef typename ::nil::crypto3::detail::basic_functions<WordBits>::word_type word_type;
 
                     /*
                      * Multiplication modulo 65537

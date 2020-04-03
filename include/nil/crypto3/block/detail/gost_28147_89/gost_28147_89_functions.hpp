@@ -9,15 +9,15 @@
 #ifndef CRYPTO3_GOST_28147_89_FUNCTIONS_CPP_HPP
 #define CRYPTO3_GOST_28147_89_FUNCTIONS_CPP_HPP
 
-#include <nil/crypto3/block/detail/basic_functions.hpp>
+#include <nil/crypto3/detail/basic_functions.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace block {
             namespace detail {
                 template<std::size_t WordBits>
-                struct gost_28147_89_functions : public basic_functions<WordBits> {
-                    typedef typename basic_functions<WordBits>::word_type word_type;
+                struct gost_28147_89_functions : public ::nil::crypto3::detail::basic_functions<WordBits> {
+                    typedef typename ::nil::crypto3::detail::basic_functions<WordBits>::word_type word_type;
                 };
             }    // namespace detail
         }        // namespace block

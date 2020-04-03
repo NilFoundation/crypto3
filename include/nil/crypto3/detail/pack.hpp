@@ -229,4 +229,4 @@ namespace nil {
     }        // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_BLOCK_PACK_HPP
+#endif    // CRYPTO3_PACK_HPP
