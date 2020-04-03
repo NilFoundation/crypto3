@@ -16,6 +16,8 @@
 #include <nil/crypto3/hash/detail/sha3/sha3_policy.hpp>
 #include <nil/crypto3/hash/detail/sha3/sha3_finalizer.hpp>
 
+#include <boost/endian/conversion.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace hash {
@@ -40,7 +42,13 @@ namespace nil {
                     for (std::size_t i = 0; i != block_words; ++i)
                         state[i] ^= block[i];
 
+                    for (std::size_t i = 0; i != state_words; ++i) 
+                        boost::endian::endian_reverse_inplace(state[i]);                    
+
                     policy_type::permute(state);
+
+                    for (std::size_t i = 0; i != state_words; ++i) 
+                        boost::endian::endian_reverse_inplace(state[i]);
                 }
             };
 
@@ -51,7 +59,7 @@ namespace nil {
              */
             template<std::size_t DigestBits = 512>
             class sha3 {
-                typedef detail::sha3_functions<DigestBits> policy_type;
+                typedef detail::sha3_policy<DigestBits> policy_type;
 
             public:
 

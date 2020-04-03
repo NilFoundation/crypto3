@@ -93,7 +93,7 @@ namespace nil {
                                     pad_zeros(block, block_seen, 1);
                                     pad_one(block, block_seen);
                                     pad_one(block, block_seen);
-                                    pad_zeros(block, block_seen, block_bits - block_seen - 4);
+                                    pad_zeros(block, block_seen, block_bits - block_seen - 1);
                                     pad_one(block, block_seen);
                                     break;                            
                             }
@@ -106,21 +106,21 @@ namespace nil {
                                     clear(block, block_seen);
                                     pad_one(block, block_seen);
                                     pad_one(block, block_seen);
-                                    pad_zeros(block, block_seen, block_bits - 3);
+                                    pad_zeros(block, block_seen, block_bits - 1);
                                     pad_one(block, block_seen);                                    
                                     break;
                                 case 2:
                                     // pad 10*1
                                     clear(block, block_seen);
                                     pad_one(block, block_seen);
-                                    pad_zeros(block, block_seen, block_bits - 2);
+                                    pad_zeros(block, block_seen, block_bits - 1);
                                     pad_one(block, block_seen); 
                                     break;
                                 case 3:
                                     // pad 0*1
                                     clear(block, block_seen);
                                     pad_zeros(block, block_seen, block_bits - 1);
-                                    pad_one(block, block_seen); 
+                                    pad_one(block, block_seen);
                                     break;                         
                             }                            
                         }
