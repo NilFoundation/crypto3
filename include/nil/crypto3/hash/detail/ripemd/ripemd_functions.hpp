@@ -1,5 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
+//
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -9,17 +11,16 @@
 #ifndef CRYPTO3_RIPEMD_FUNCTIONS_HPP
 #define CRYPTO3_RIPEMD_FUNCTIONS_HPP
 
-#include <nil/crypto3/detail/basic_functions.hpp>
+#include <nil/crypto3/hash/detail/ripemd/ripemd_policy.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace hash {
             namespace detail {
-                template<std::size_t WordBits>
-                struct ripemd_functions : public ::nil::crypto3::detail::basic_functions<WordBits> {
-                    typedef ::nil::crypto3::detail::basic_functions<WordBits> policy_type;
+                template<std::size_t DigestBits>
+                struct ripemd_functions : public ripemd_policy<DigestBits> {
+                    typedef ripemd_policy<DigestBits> policy_type;
                     
-                    constexpr static const std::size_t word_bits = policy_type::word_bits;
                     typedef typename policy_type::word_type word_type;
 
                     struct f1 {

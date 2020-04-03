@@ -1,5 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2019 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
+//
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -10,6 +12,7 @@
 #define CRYPTO3_RIPEMD_160_HPP
 
 #include <nil/crypto3/hash/detail/ripemd/ripemd_policy.hpp>
+#include <nil/crypto3/hash/detail/ripemd/ripemd_functions.hpp>
 
 #include <nil/crypto3/hash/detail/merkle_damgard_construction.hpp>
 #include <nil/crypto3/hash/detail/block_stream_processor.hpp>
@@ -20,7 +23,7 @@ namespace nil {
         namespace hash {
             template<std::size_t DigestBits>
             struct basic_ripemd_compressor {
-                typedef detail::ripemd_policy<DigestBits> policy_type;
+                typedef detail::ripemd_functions<DigestBits> policy_type;
 
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
                 typedef typename policy_type::word_type word_type;
@@ -253,6 +256,15 @@ namespace nil {
                 }
             };
 
+
+
+
+
+
+
+
+
+
             /*!
              * @brief Ripemd. Family of configurable hashes, developed as an open alternative to SHA.
              *
@@ -265,11 +277,22 @@ namespace nil {
                 typedef detail::ripemd_policy<DigestBits> policy_type;
 
             public:
+
+                constexpr static const std::size_t word_bits = policy_type::word_bits;
+                typedef typename policy_type::word_type word_type;
+
+                constexpr static const std::size_t block_bits = policy_type::block_bits;
+                constexpr static const std::size_t block_words = policy_type::block_words;
+                typedef typename policy_type::block_type block_type;
+                
+                constexpr static const std::size_t digest_bits = DigestBits;
+                typedef typename policy_type::digest_type digest_type;
+                
                 struct construction {
                     struct params_type {
-                        typedef typename stream_endian::little_octet_big_bit digest_endian;
+                        typedef typename policy_type::digest_endian digest_endian;
 
-                        constexpr static const std::size_t length_bits = policy_type::word_bits * 2;
+                        constexpr static const std::size_t length_bits = policy_type::length_bits;
                         constexpr static const std::size_t digest_bits = policy_type::digest_bits;
                     };
 
@@ -283,7 +306,7 @@ namespace nil {
                 template<typename StateAccumulator, std::size_t ValueBits>
                 struct stream_processor {
                     struct params_type {
-                        typedef typename stream_endian::little_octet_big_bit digest_endian;
+                        typedef typename policy_type::digest_endian digest_endian;
 
                         constexpr static const std::size_t value_bits = ValueBits;
                     };
@@ -291,8 +314,6 @@ namespace nil {
                     typedef block_stream_processor<construction, StateAccumulator, params_type> type;
                 };
 
-                constexpr static const std::size_t digest_bits = DigestBits;
-                typedef typename policy_type::digest_type digest_type;
             };
 
             typedef ripemd<128> ripemd128;
