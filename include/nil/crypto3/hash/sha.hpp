@@ -10,7 +10,7 @@
 #ifndef CRYPTO3_HASH_SHA_HPP
 #define CRYPTO3_HASH_SHA_HPP
 
-#include <nil/crypto3/hash/detail/sha0/sha0_policy.hpp>
+#include <nil/crypto3/hash/detail/sha/sha_policy.hpp>
 #include <nil/crypto3/hash/detail/state_adder.hpp>
 #include <nil/crypto3/hash/detail/davies_meyer_compressor.hpp>
 #include <nil/crypto3/hash/detail/merkle_damgard_construction.hpp>
@@ -26,8 +26,8 @@ namespace nil {
              *
              * @ingroup hash
              */
-            class sha0 {
-                typedef detail::sha0_policy policy_type;
+            class sha {
+                typedef detail::sha_policy policy_type;
                 typedef typename policy_type::block_cipher_type block_cipher_type;
 
             public:
@@ -70,7 +70,7 @@ namespace nil {
 
             };
 
-            typedef sha0 sha;
+            typedef sha sha0;
 
         }    // namespace hash
     }        // namespace crypto3

@@ -51,7 +51,7 @@ set(TESTS_NAMES
     "md5"
     "pack"
     "ripemd"
-    "sha0"
+    "sha"
     "sha2"
 #     "sha3"
 #    "skein"
