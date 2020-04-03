@@ -256,15 +256,6 @@ namespace nil {
                 }
             };
 
-
-
-
-
-
-
-
-
-
             /*!
              * @brief Ripemd. Family of configurable hashes, developed as an open alternative to SHA.
              *
@@ -284,10 +275,10 @@ namespace nil {
                 constexpr static const std::size_t block_bits = policy_type::block_bits;
                 constexpr static const std::size_t block_words = policy_type::block_words;
                 typedef typename policy_type::block_type block_type;
-                
+
                 constexpr static const std::size_t digest_bits = DigestBits;
                 typedef typename policy_type::digest_type digest_type;
-                
+
                 struct construction {
                     struct params_type {
                         typedef typename policy_type::digest_endian digest_endian;
