@@ -7,7 +7,7 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#define BOOST_TEST_MODULE shacal_cipher_test
+#define BOOST_TEST_MODULE shacal2_cipher_test
 
 #include <iostream>
 
@@ -15,12 +15,21 @@
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
 
+#include <nil/crypto3/hash/sha2.hpp>
+
+#include <nil/crypto3/hash/hash_state.hpp>
+
+#include <nil/crypto3/hash/detail/block_stream_processor.hpp>
+#include <nil/crypto3/hash/detail/davies_meyer_compressor.hpp>
+#include <nil/crypto3/hash/detail/merkle_damgard_construction.hpp>
+
 #include <nil/crypto3/block/shacal2.hpp>
 
 #include <nil/crypto3/block/algorithm/encrypt.hpp>
 #include <nil/crypto3/block/algorithm/decrypt.hpp>
 
 using namespace nil::crypto3;
+using namespace nil::crypto3::block;
 
 struct state_adder {
     template<typename T>
@@ -33,70 +42,10 @@ struct state_adder {
     }
 };
 
-BOOST_TEST_DONT_PRINT_LOG_VALUE(block::shacal1::block_type)
 BOOST_TEST_DONT_PRINT_LOG_VALUE(block::shacal2<256>::block_type)
 BOOST_TEST_DONT_PRINT_LOG_VALUE(block::shacal2<512>::block_type)
 
 BOOST_AUTO_TEST_SUITE(shacal_test_suite)
-
-BOOST_AUTO_TEST_CASE(shacal1_single_block_encrypt1) {
-    typedef block::shacal1 bct;
-
-    // Test with the equivalent of SHA-1("")
-    bct::block_type plaintext = {{0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476, 0xc3d2e1f0}};
-    bct::key_type key = {{0x80000000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
-
-    bct cipher(key);
-    bct::block_type ciphertext = cipher.encrypt(plaintext);
-    bct::block_type expected_ciphertext = {{0x72f480ed, 0x6e9d9f84, 0x999ae2f1, 0x852dc41a, 0xec052519}};
-
-    BOOST_CHECK_EQUAL(ciphertext, expected_ciphertext);
-
-    bct::block_type new_plaintext = cipher.decrypt(ciphertext);
-    BOOST_CHECK_EQUAL(plaintext, new_plaintext);
-}
-
-BOOST_AUTO_TEST_CASE(shacal1_single_block_encrypt2) {
-    typedef block::shacal1 bct;
-    typedef hash::davies_meyer_compressor<bct, state_adder> owcft;
-
-    // Test with the equivalent of SHA-256("")
-    owcft::state_type const H0 = {{0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476, 0xc3d2e1f0}};
-    owcft::block_type block = {{0x80000000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
-    owcft::state_type H = H0;
-
-    owcft f;
-    f.process_block(H, block);
-    owcft::state_type const H1 = {{0xda39a3ee, 0x5e6b4b0d, 0x3255bfef, 0x95601890, 0xafd80709}};
-    BOOST_CHECK_EQUAL(H, H1);
-}
-
-struct shacal_params_type {
-    constexpr static const std::size_t length_bits = 64 * 2;
-    constexpr static const std::size_t digest_bits = 160;
-
-    typedef stream_endian::big_octet_big_bit digest_endian;
-};
-
-BOOST_AUTO_TEST_CASE(shacal1_single_block_encrypt3) {
-    typedef block::shacal1 bct;
-    typedef hash::davies_meyer_compressor<bct, state_adder> owcft;
-    typedef hash::merkle_damgard_construction<shacal_params_type, hash::detail::sha1_policy::iv_generator, owcft> bht;
-
-    // Test with the equivalent of SHA-1("")
-    bht::block_type block = {{0x80000000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
-    bht bh;
-    bh.process_block(block);
-    bht::digest_type h = bh.end_message();
-
-#ifdef CRYPTO3_HASH_SHOW_PROGRESS
-    std::cout << h.cstring() std::endl;
-#endif
-
-    const char *eh = "da39a3ee5e6b4b0d3255bfef95601890afd80709";
-
-    BOOST_CHECK_EQUAL(eh, std::to_string(h).data());
-}
 
 BOOST_AUTO_TEST_CASE(shacal2_single_block_encrypt1) {
     typedef block::shacal2<256> bct;
@@ -151,7 +100,7 @@ BOOST_AUTO_TEST_CASE(shacal2_single_block_encrypt3) {
     bht::block_type block = {{0x80000000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
     bht bh;
     bh.process_block(block);
-    bht::digest_type h = bh.end_message();
+    bht::digest_type h = bh.digest();
 
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
     std::cout << h std::endl;

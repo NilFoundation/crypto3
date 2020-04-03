@@ -21,7 +21,6 @@ namespace nil {
                     typedef typename policy_type::word_type word_type;
 
                     typedef typename policy_type::byte_type byte_type;
-                    typedef typename policy_type::word_type word_type;
 
                     constexpr static const std::size_t constants_size = 256;
                     typedef std::array<byte_type, constants_size> constants_type;
