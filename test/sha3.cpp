@@ -278,7 +278,7 @@ BOOST_FIXTURE_TEST_CASE(sha3_224_accumulator2, fixture<224>) {
     BOOST_CHECK_EQUAL("e642824c3f8cf24ad09234ee7d3c766fc9a3a5168d0c94ad73b46fdf", std::to_string(s).data());
 } 
 
-/*BOOST_FIXTURE_TEST_CASE(sha3_224_accumulator3, fixture<224>) {
+BOOST_FIXTURE_TEST_CASE(sha3_224_accumulator3, fixture<224>) {
     // https://csrc.nist.gov/CSRC/media/Projects/Cryptographic-Standards-and-Guidelines/documents/examples/SHA3-224_1600.pdf
     hash_t::construction::type::block_type m1 = {
         {UINT64_C(0xa3a3a3a3a3a3a3a3), UINT64_C(0xa3a3a3a3a3a3a3a3), UINT64_C(0xa3a3a3a3a3a3a3a3),
@@ -289,9 +289,9 @@ BOOST_FIXTURE_TEST_CASE(sha3_224_accumulator2, fixture<224>) {
          UINT64_C(0xa3a3a3a3a3a3a3a3), UINT64_C(0xa3000102094000b8), UINT64_C(0x67283609c1251003)}};
     acc(m1, nil::crypto3::accumulators::bits =(16 * 64 + 8));
 
-    //hash_t::digest_type s = extract::hash<hash_t>(acc);
+    hash_t::digest_type s = extract::hash<hash_t>(acc);
 
-    //BOOST_CHECK_EQUAL("f434c78aa907e811d189dfe93223461f4fa0bcc28d5b445e70b24cc8", std::to_string(s).data());
+    BOOST_CHECK_EQUAL("f434c78aa907e811d189dfe93223461f4fa0bcc28d5b445e70b24cc8", std::to_string(s).data());
 
     hash_t::construction::type::block_type m2 = {
         {UINT64_C(0xa3a3a3a3a3a3a3a3), UINT64_C(0xa3a3a3a3a3a3a3a3), UINT64_C(0xa3a3a3a3a3a3a3a3),
@@ -303,13 +303,148 @@ BOOST_FIXTURE_TEST_CASE(sha3_224_accumulator2, fixture<224>) {
 
     acc(m2, nil::crypto3::accumulators::bits = 9 * 64 - 8);
 
-    hash_t::digest_type s = extract::hash<hash_t>(acc);
+    s = extract::hash<hash_t>(acc);
 
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
     std::printf("%s\n", std::to_string(s).data());
 #endif
 
     BOOST_CHECK_EQUAL("9376816aba503f72f96ce7eb65ac095deee3be4bf9bbc2a1cb7e11e0", std::to_string(s).data());
-} */
+}
+
+BOOST_FIXTURE_TEST_CASE(sha3_256_accumulator1, fixture<256>) {
+    // bit string {1, 1, 0, 0, 1}
+    hash_t::construction::type::block_type m = {{}};
+    m[0] = UINT64_C(0x1300000000000000);
+    acc(m, nil::crypto3::accumulators::bits = 5);
+
+    hash_t::digest_type s = extract::hash<hash_t>(acc);
+
+#ifdef CRYPTO3_HASH_SHOW_PROGRESS
+    std::printf("%s\n", std::to_string(s).data());
+#endif
+
+    BOOST_CHECK_EQUAL("7b0047cf5a456882363cbf0fb05322cf65f4b7059a46365e830132e3b5d957af", std::to_string(s).data());
+}
+
+BOOST_FIXTURE_TEST_CASE(sha3_256_accumulator2, fixture<256>) {
+    // echo -n "abc" | sha3sum -a 256
+    hash_t::construction::type::block_type m = {{}};
+
+    m[0] = UINT64_C(0x6162630000000000);
+    acc(m, nil::crypto3::accumulators::bits = 24);
+
+    hash_t::digest_type s = extract::hash<hash_t>(acc);
+
+#ifdef CRYPTO3_HASH_SHOW_PROGRESS
+    std::printf("%s\n", std::to_string(s).data());
+#endif
+
+    BOOST_CHECK_EQUAL("3a985da74fe225b2045c172d6bd390bd855f086e3e9d525b46bfe24511431532", std::to_string(s).data());
+}
+
+BOOST_FIXTURE_TEST_CASE(sha3_256_accumulator3, fixture<256>) {
+    // https://csrc.nist.gov/CSRC/media/Projects/Cryptographic-Standards-and-Guidelines/documents/examples/SHA3-256_1600.pdf
+    hash_t::construction::type::block_type m1 = {
+        {UINT64_C(0xa3a3a3a3a3a3a3a3), UINT64_C(0xa3a3a3a3a3a3a3a3), UINT64_C(0xa3a3a3a3a3a3a3a3),
+         UINT64_C(0xa3a3a3a3a3a3a3a3), UINT64_C(0xa3a3a3a3a3a3a3a3), UINT64_C(0xa3a3a3a3a3a3a3a3),
+         UINT64_C(0xa3a3a3a3a3a3a3a3), UINT64_C(0xa3a3a3a3a3a3a3a3), UINT64_C(0xa3a3a3a3a3a3a3a3),
+         UINT64_C(0xa3a3a3a3a3a3a3a3), UINT64_C(0xa3a3a3a3a3a3a3a3), UINT64_C(0xa3a3a3a3a3a3a3a3),
+         UINT64_C(0xa3a3a3a3a3a3a3a3), UINT64_C(0xa3a3a3a3a3a3a3a3), UINT64_C(0xa3a3a3a3a3a3a3a3),
+         UINT64_C(0xa3a3a3a3a3a3a3a3), UINT64_C(0xa3000102094000b8)}};
+    acc(m1, nil::crypto3::accumulators::bits =(16 * 64 + 8));
+
+    hash_t::digest_type s = extract::hash<hash_t>(acc);
+
+    BOOST_CHECK_EQUAL("7e23024b73e352998831831553db3c2867858bb4889d53a3be1af099dd79c0e1", std::to_string(s).data());
+
+    hash_t::construction::type::block_type m2 = {
+        {UINT64_C(0xa3a3a3a3a3a3a3a3), UINT64_C(0xa3a3a3a3a3a3a3a3), UINT64_C(0xa3a3a3a3a3a3a3a3),
+         UINT64_C(0xa3a3a3a3a3a3a3a3), UINT64_C(0xa3a3a3a3a3a3a3a3), UINT64_C(0xa3a3a3a3a3a3a3a3),
+         UINT64_C(0xa3a3a3a3a3a3a3a3), UINT64_C(0xa3a3a3a3a3a3a3a3), UINT64_C(0xa3a3a3a3a3a3a300),
+         UINT64_C(0x6a6b6c6d6e6f7071), UINT64_C(0x6b6c6d6e6f707172), UINT64_C(0x6c6d6e6f70717273),
+         UINT64_C(0x6d6e6f7071727374), UINT64_C(0x6e6f707172737475), UINT64_C(0x0000000000000000),
+         UINT64_C(0x0000000000000000), UINT64_C(0xc5000102094000b8)}};
+
+    acc(m2, nil::crypto3::accumulators::bits = 9 * 64 - 8);
+
+    s = extract::hash<hash_t>(acc);
+
+#ifdef CRYPTO3_HASH_SHOW_PROGRESS
+    std::printf("%s\n", std::to_string(s).data());
+#endif
+
+    BOOST_CHECK_EQUAL("79f38adec5c20307a98ef76e8324afbfd46cfd81b22e3973c65fa1bd9de31787", std::to_string(s).data());
+}
+
+BOOST_FIXTURE_TEST_CASE(sha3_384_accumulator1, fixture<384>) {
+    // bit string {1, 1, 0, 0, 1}
+    hash_t::construction::type::block_type m = {{}};
+    m[0] = UINT64_C(0x1300000000000000);
+    acc(m, nil::crypto3::accumulators::bits = 5);
+
+    hash_t::digest_type s = extract::hash<hash_t>(acc);
+
+#ifdef CRYPTO3_HASH_SHOW_PROGRESS
+    std::printf("%s\n", std::to_string(s).data());
+#endif
+
+    BOOST_CHECK_EQUAL("737c9b491885e9bf7428e792741a7bf8dca9653471c3e148473f2c236b6a0a64"
+                      "55eb1dce9f779b4b6b237fef171b1c64", std::to_string(s).data());
+}
+
+BOOST_FIXTURE_TEST_CASE(sha3_384_accumulator2, fixture<384>) {
+    // echo -n "abc" | sha3sum -a 384
+    hash_t::construction::type::block_type m = {{}};
+
+    m[0] = UINT64_C(0x6162630000000000);
+    acc(m, nil::crypto3::accumulators::bits = 24);
+
+    hash_t::digest_type s = extract::hash<hash_t>(acc);
+
+#ifdef CRYPTO3_HASH_SHOW_PROGRESS
+    std::printf("%s\n", std::to_string(s).data());
+#endif
+
+    BOOST_CHECK_EQUAL("ec01498288516fc926459f58e2c6ad8df9b473cb0fc08c2596da7cf0e49be4b2"
+                      "98d88cea927ac7f539f1edf228376d25", std::to_string(s).data());
+}
+
+BOOST_FIXTURE_TEST_CASE(sha3_512_accumulator1, fixture<512>) {
+    // bit string {1, 1, 0, 0, 1}
+    hash_t::construction::type::block_type m = {{}};
+    m[0] = UINT64_C(0x1300000000000000);
+    acc(m, nil::crypto3::accumulators::bits = 5);
+
+    hash_t::digest_type s = extract::hash<hash_t>(acc);
+
+#ifdef CRYPTO3_HASH_SHOW_PROGRESS
+    std::printf("%s\n", std::to_string(s).data());
+#endif
+
+    BOOST_CHECK_EQUAL("a13e01494114c09800622a70288c432121ce70039d753cadd2e006e4d961cb27"
+                      "544c1481e5814bdceb53be6733d5e099795e5e81918addb058e22a9f24883f37", std::to_string(s).data());
+}
+
+BOOST_FIXTURE_TEST_CASE(sha3_512_accumulator2, fixture<512>) {
+    // echo -n "abc" | sha3sum -a 512
+    hash_t::construction::type::block_type m = {{}};
+
+    m[0] = UINT64_C(0x6162630000000000);
+    acc(m, nil::crypto3::accumulators::bits = 24);
+
+    hash_t::digest_type s = extract::hash<hash_t>(acc);
+
+#ifdef CRYPTO3_HASH_SHOW_PROGRESS
+    std::printf("%s\n", std::to_string(s).data());
+#endif
+
+    BOOST_CHECK_EQUAL("b751850b1a57168a5693cd924b6b096e08f621827444f70d884f5d0240d2712e"
+                      "10e116e9192af3c91a7ec57647e3934057340b4cf408d5a56592f8274eec53f0", std::to_string(s).data());
+}
+
+
+
+
 
 BOOST_AUTO_TEST_SUITE_END()
