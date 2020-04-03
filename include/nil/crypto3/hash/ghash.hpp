@@ -13,7 +13,7 @@
 #include <nil/crypto3/hash/detail/ghash/ghash_policy.hpp>
 
 #include <nil/crypto3/hash/detail/merkle_damgard_construction.hpp>
-#include <nil/crypto3/hash/detail/merkle_damgard_stream_processor.hpp>
+#include <nil/crypto3/hash/detail/block_stream_processor.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -64,11 +64,10 @@ namespace nil {
                     struct params_type {
                         typedef typename stream_endian::little_octet_big_bit endian;
 
-                        constexpr static const std::size_t length_bits = construction::params_type::length_bits;
                         constexpr static const std::size_t value_bits = ValueBits;
                     };
 
-                    typedef merkle_damgard_stream_processor<construction, StateAccumulator, params_type> type;
+                    typedef block_stream_processor<construction, StateAccumulator, params_type> type;
                 };
 
                 constexpr static const std::size_t digest_bits = policy_type::digest_bits;

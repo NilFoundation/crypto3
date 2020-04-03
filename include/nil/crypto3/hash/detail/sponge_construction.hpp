@@ -31,7 +31,7 @@ namespace nil {
              * For a Wide Pipe construction, use a digest that will
              * truncate the internal state.
              */
-            template<typename Params, typename IV, typename Compressor, typename Finalizer = nop_finalizer>
+            template<typename Params, typename IV, typename Compressor, typename Finalizer = detail::nop_finalizer>
             class sponge_construction {
             public:
                 typedef IV iv_generator;
@@ -62,19 +62,38 @@ namespace nil {
                     return *this;
                 }
 
-                digest_type end_message() {
-                    digest_type d = digest();
-                    reset();
-                    return d;
-                }
+                digest_type digest(const block_type &block = block_type(), 
+                                   std::size_t total_seen = std::size_t()) {
+                    block_type b;
+                    std::move(block.begin(), block.end(), b.begin());
+                    std::size_t block_seen = total_seen % block_bits;
+                    // Process block if block is full
+                    if (total_seen && !block_seen)
+                        process_block(b);
 
-                digest_type digest() {
-                    using namespace nil::crypto3::detail;
-
+                    std::size_t copy_seen = block_seen;
+                    // Apply finalizer
                     finalizer_functor finalizer;
-                    finalizer(state_);
+                    finalizer(b, block_seen);
+                    process_block(b);
+
+                    // If block is not the last, process it
+                    if (!finalizer.is_last_block()) {
+                        finalizer(b, copy_seen);
+                        process_block(b);
+                    }
+
+                    // Squeezing step of sponge function calculation
+                    squeeze(state_);
+
+                     // Convert digest to byte representation
+                    std::array<octet_type, state_bits / octet_bits> d_full;
+                    nil::crypto3::detail::pack_n<endian_type, word_bits, octet_bits>(state_.data(), state_words, d_full.data(),
+                                                               state_bits / octet_bits);
+
                     digest_type d;
-                    pack_n<endian_type, word_bits, octet_bits>(state_.data(), digest_words, d.data(), digest_bytes);
+                    std::copy(d_full.begin(), d_full.begin() + digest_bytes, d.begin());
+
                     return d;
                 }
 
@@ -93,6 +112,33 @@ namespace nil {
 
                 state_type const &state() const {
                     return state_;
+                }
+
+
+                void squeeze(state_type &state) {
+                    state_type temp_state;
+                    std::fill(temp_state.begin(), temp_state.end(), 0);
+
+                    block_type block_of_zeros;
+                    std::fill(block_of_zeros.begin(), block_of_zeros.end(), 0);
+
+                    std::size_t digest_blocks = digest_bits / block_bits;
+                    std::size_t last_digest_bits = digest_bits % block_bits;
+
+                    for (std::size_t i = 0; i != digest_blocks; ++i) {
+                        for (std::size_t j = 0; j != block_words; ++j)
+                            temp_state[i * block_words + j] = state[j];
+                        process_block(block_of_zeros); 
+                    }
+
+                    if (last_digest_bits) {
+                        std::size_t last_digest_words = last_digest_bits / word_bits + 
+                                                        ((last_digest_bits % word_bits) ? 1 : 0);
+                        for (std::size_t j = 0; j != last_digest_words; ++j)
+                            temp_state[digest_blocks * block_words + j] = state[j];
+                    }
+
+                    state = temp_state;
                 }
 
             private:

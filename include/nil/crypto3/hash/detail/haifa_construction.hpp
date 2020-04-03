@@ -33,7 +33,7 @@ namespace nil {
              *
              * @note https://eprint.iacr.org/2007/278.pdf
              */
-            template<typename Params, typename IV, typename Compressor, typename Finalizer = nop_finalizer>
+            template<typename Params, typename IV, typename Compressor, typename Finalizer = detail::nop_finalizer>
             class haifa_construction {
             public:
                 typedef Compressor compressor_functor;
@@ -60,7 +60,8 @@ namespace nil {
 
                 constexpr static const std::size_t digest_bits = Params::digest_bits;
                 constexpr static const std::size_t digest_bytes = digest_bits / octet_bits;
-                constexpr static const std::size_t digest_words = digest_bits / word_bits;
+                constexpr static const std::size_t digest_words =
+                    digest_bits / word_bits + ((digest_bits % word_bits) ? 1 : 0);
                 typedef static_digest<digest_bits> digest_type;
 
             protected:
@@ -80,19 +81,28 @@ namespace nil {
                     return *this;
                 }
 
-                digest_type end_message() {
-                    digest_type d = digest();
-                    reset();
-                    return d;
-                }
-
-                digest_type digest(const block_type &block = block_type(), length_type seen = length_type()) {
+                inline digest_type digest(const block_type &block = block_type(), 
+                                          length_type total_seen = length_type()) {
                     using namespace nil::crypto3::detail;
 
+                    block_type b;
+                    std::move(block.begin(), block.end(), b.begin());
+
+                    // Apply finalizer
                     finalizer_functor finalizer;
-                    finalizer(state_);
+                    finalizer(b, total_seen);
+
+                    // Process the last block
+                    process_block(b, total_seen, salt_value);
+
+                    // Convert digest to byte representation
+                    std::array<octet_type, state_bits / octet_bits> d_full;
+                    pack_n<endian_type, word_bits, octet_bits>(state_.data(), state_words, d_full.data(),
+                                                               state_bits / octet_bits);
+
                     digest_type d;
-                    pack_n<endian_type, word_bits, octet_bits>(state_.data(), digest_words, d.data(), digest_bytes);
+                    std::copy(d_full.begin(), d_full.begin() + digest_bytes, d.begin());
+
                     return d;
                 }
 
@@ -102,7 +112,7 @@ namespace nil {
 
                 void reset(const state_type &s) {
                     state_ = s;
-                    state_[0] ^= 0x01010000U ^ (state_bits / CHAR_BIT);
+                    state_[0] ^= 0x01010000U ^ (digest_bits / CHAR_BIT);
                 }
 
                 void reset() {
@@ -122,4 +132,4 @@ namespace nil {
     }        // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_HASH_MERKLE_DAMGARD_BLOCK_HASH_HPP
+#endif    // CRYPTO3_HASH_HAIFA_CONSTRUCTION_HPP

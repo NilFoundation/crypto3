@@ -9,15 +9,17 @@
 #ifndef CRYPTO3_SM3_FUNCTIONS_HPP
 #define CRYPTO3_SM3_FUNCTIONS_HPP
 
-#include <nil/crypto3/hash/detail/basic_functions.hpp>
+#include <nil/crypto3/detail/basic_functions.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace hash {
             namespace detail {
-                struct sm3_functions : public basic_functions<32> {
-                    constexpr static const std::size_t word_bits = basic_functions<32>::word_bits;
-                    typedef typename basic_functions<32>::word_type word_type;
+                struct sm3_functions : public ::nil::crypto3::detail::basic_functions<32> {
+                    typedef ::nil::crypto3::detail::basic_functions<32> policy_type;
+                    
+                    constexpr static const std::size_t word_bits = policy_type::word_bits;
+                    typedef typename policy_type::word_type word_type;
 
                     inline static word_type p0(word_type X) {
                         return X ^ rotl<9>(X) ^ rotl<17>(X);

@@ -11,14 +11,14 @@
 
 #include <nil/crypto3/block/streebog.hpp>
 
-#include <nil/crypto3/hash/detail/basic_functions.hpp>
+#include <nil/crypto3/detail/basic_functions.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace hash {
             namespace detail {
                 template<std::size_t DigestBits>
-                struct streebog_policy : public basic_functions<64> {
+                struct streebog_policy : public ::nil::crypto3::detail::basic_functions<64> {
                     typedef block::streebog<DigestBits, DigestBits> block_cipher_type;
 
                     constexpr static const std::size_t digest_bits = DigestBits;
@@ -37,7 +37,7 @@ namespace nil {
                 };
 
                 template<>
-                struct streebog_policy<512> : public basic_functions<64> {
+                struct streebog_policy<512> : public ::nil::crypto3::detail::basic_functions<64> {
                     typedef block::streebog<512, 512> block_cipher_type;
 
                     constexpr static const std::size_t digest_bits = block_cipher_type::block_bits;

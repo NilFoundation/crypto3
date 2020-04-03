@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -12,25 +13,26 @@
 #include <array>
 
 #include <nil/crypto3/detail/static_digest.hpp>
-
-#include <nil/crypto3/hash/detail/ripemd/ripemd_functions.hpp>
+#include <nil/crypto3/detail/basic_functions.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace hash {
             namespace detail {
                 template<std::size_t DigestBits>
-                struct basic_ripemd_policy : public ripemd_functions<32> {
-                    constexpr static const std::size_t word_bits = ripemd_functions<32>::word_bits;
-                    typedef ripemd_functions<32>::word_type word_type;
-
+                struct basic_ripemd_policy : public ::nil::crypto3::detail::basic_functions<32>  {
+                    
                     constexpr static const std::size_t block_bits = 512;
                     constexpr static const std::size_t block_words = block_bits / word_bits;
                     typedef std::array<word_type, block_words> block_type;
 
+                    constexpr static const std::size_t length_bits = word_bits * 2;
+
+                    typedef typename stream_endian::little_octet_big_bit digest_endian;
+
                     constexpr static const std::size_t digest_bits = DigestBits;
                     typedef static_digest<digest_bits> digest_type;
-
+                    
                     constexpr static const std::uint8_t ieee1363_hash_id = 0x33;
                     typedef std::array<std::uint8_t, 15> pkcs_id_type;
 
@@ -89,7 +91,7 @@ namespace nil {
                 template<>
                 struct ripemd_policy<128> : public basic_ripemd_policy<128> {
                     constexpr static const std::size_t word_bits = basic_ripemd_policy<128>::word_bits;
-                    typedef basic_ripemd_policy<128>::word_type word_type;
+                    //typedef basic_ripemd_policy<128>::word_type word_type;
 
                     constexpr static const std::size_t state_words = 4;
                     constexpr static const std::size_t state_bits = state_words * word_bits;
@@ -106,7 +108,7 @@ namespace nil {
                 template<>
                 struct ripemd_policy<160> : public basic_ripemd_policy<160> {
                     constexpr static const std::size_t word_bits = basic_ripemd_policy<160>::word_bits;
-                    typedef basic_ripemd_policy<160>::word_type word_type;
+                    //typedef basic_ripemd_policy<160>::word_type word_type;
 
                     constexpr static const std::size_t state_words = 5;
                     constexpr static const std::size_t state_bits = state_words * word_bits;
@@ -123,7 +125,7 @@ namespace nil {
                 template<>
                 struct ripemd_policy<256> : public basic_ripemd_policy<256> {
                     constexpr static const std::size_t word_bits = basic_ripemd_policy<256>::word_bits;
-                    typedef basic_ripemd_policy<256>::word_type word_type;
+                    //typedef basic_ripemd_policy<256>::word_type word_type;
 
                     constexpr static const std::size_t state_words = 8;
                     constexpr static const std::size_t state_bits = state_words * word_bits;
@@ -141,7 +143,7 @@ namespace nil {
                 template<>
                 struct ripemd_policy<320> : public basic_ripemd_policy<320> {
                     constexpr static const std::size_t word_bits = basic_ripemd_policy<320>::word_bits;
-                    typedef basic_ripemd_policy<320>::word_type word_type;
+                    //typedef basic_ripemd_policy<320>::word_type word_type;
 
                     constexpr static const std::size_t state_words = 10;
                     constexpr static const std::size_t state_bits = state_words * word_bits;

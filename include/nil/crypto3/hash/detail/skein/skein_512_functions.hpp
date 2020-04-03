@@ -9,19 +9,17 @@
 #ifndef CRYPTO3_SKEIN_512_FUNCTIONS_HPP
 #define CRYPTO3_SKEIN_512_FUNCTIONS_HPP
 
-#include <nil/crypto3/hash/detail/basic_functions.hpp>
+#include <nil/crypto3/detail/basic_functions.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace hash {
             namespace detail {
                 template<std::size_t DigestBits>
-                struct skein_512_functions : public basic_functions<64> {
+                struct skein_512_functions : public ::nil::crypto3::detail::basic_functions<64> {};
+            }    // namespace detail
+        }        // namespace hash
+    }            // namespace crypto3
+}    // namespace nil
 
-                };
-            }
-        }
-    }
-}
-
-#endif //CRYPTO3_SKEIN_512_FUNCTIONS_HPP
+#endif    // CRYPTO3_SKEIN_512_FUNCTIONS_HPP

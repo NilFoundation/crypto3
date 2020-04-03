@@ -9,16 +9,18 @@
 #ifndef CRYPTO3_KECCAK_POLICY_HPP
 #define CRYPTO3_KECCAK_POLICY_HPP
 
-#include <nil/crypto3/hash/detail/basic_functions.hpp>
+#include <nil/crypto3/detail/basic_functions.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace hash {
             namespace detail {
                 template<std::size_t DigestBits>
-                class keccak_1600_policy : public basic_functions<64> {
-                    constexpr static const std::size_t word_bits = basic_functions<64>::word_bits;
-                    typedef typename basic_functions<64>::word_type word_type;
+                class keccak_1600_policy : public ::nil::crypto3::detail::basic_functions<64> {
+                    typedef ::nil::crypto3::detail::basic_functions<64> policy_type;
+                    
+                    constexpr static const std::size_t word_bits = policy_type::word_bits;
+                    typedef typename policy_type::word_type word_type;
 
                     constexpr static const std::size_t block_bits = DigestBits;
                     constexpr static const std::size_t block_words = DigestBits / word_bits;

@@ -7,10 +7,10 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_HASH_SHA2_HPP
-#define CRYPTO3_HASH_SHA2_HPP
+#ifndef CRYPTO3_HASH_SHA_HPP
+#define CRYPTO3_HASH_SHA_HPP
 
-#include <nil/crypto3/hash/detail/sha2/sha2_policy.hpp>
+#include <nil/crypto3/hash/detail/sha0/sha0_policy.hpp>
 #include <nil/crypto3/hash/detail/state_adder.hpp>
 #include <nil/crypto3/hash/detail/davies_meyer_compressor.hpp>
 #include <nil/crypto3/hash/detail/merkle_damgard_construction.hpp>
@@ -21,18 +21,16 @@ namespace nil {
     namespace crypto3 {
         namespace hash {
             /*!
-             * @brief SHA2
-             * @tparam Version
+             * @brief SHA. Initial SHA hash construction. Not considered to be a
+             * cryptographically secure primitive lately.
+             *
              * @ingroup hash
              */
-            template<std::size_t Version>
-            class sha2 {
-                typedef detail::sha2_policy<Version> policy_type;
+            class sha0 {
+                typedef detail::sha0_policy policy_type;
                 typedef typename policy_type::block_cipher_type block_cipher_type;
 
             public:
-
-                constexpr static const std::size_t version = Version;
 
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
                 typedef typename policy_type::word_type word_type;
@@ -63,7 +61,7 @@ namespace nil {
                 struct stream_processor {
                     struct params_type {
                         typedef typename policy_type::digest_endian digest_endian;
-                        
+
                         constexpr static const std::size_t value_bits = ValueBits;
                     };
 
@@ -71,9 +69,11 @@ namespace nil {
                 };
 
             };
-            
+
+            typedef sha0 sha;
+
         }    // namespace hash
     }        // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_HASH_SHA2_HPP
+#endif    // CRYPTO3_HASH_SHA_HPP

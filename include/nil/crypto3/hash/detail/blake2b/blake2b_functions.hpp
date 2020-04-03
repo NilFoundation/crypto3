@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -21,27 +22,22 @@ namespace nil {
             namespace detail {
                 template<std::size_t DigestBits>
                 struct blake2b_functions : public blake2b_policy<DigestBits> {
-                    constexpr static const std::size_t word_bits = blake2b_policy<DigestBits>::word_bits;
-                    typedef typename blake2b_policy<DigestBits>::word_type word_type;
+                    typedef blake2b_policy<DigestBits> policy_type;
 
-                    constexpr static const std::size_t block_bits = blake2b_policy<DigestBits>::block_bits;
-                    constexpr static const std::size_t block_words = blake2b_policy<DigestBits>::block_words;
-                    typedef typename blake2b_policy<DigestBits>::block_type block_type;
+                    typedef typename policy_type::word_type word_type;
 
-                    constexpr static const std::size_t state_bits = blake2b_policy<DigestBits>::state_bits;
-                    constexpr static const std::size_t state_words = blake2b_policy<DigestBits>::state_words;
-                    typedef typename blake2b_policy<DigestBits>::state_type state_type;
+                    constexpr static const std::size_t state_words = policy_type::state_words;
 
                     inline static void g(word_type &a, word_type &b, word_type &c, word_type &d, word_type M0,
                                          word_type M1) {
                         a = a + b + M0;
-                        d = basic_functions<64>::template rotr<32>(d ^ a);
+                        d = policy_type::template rotr<32>(d ^ a);
                         c = c + d;
-                        b = basic_functions<64>::template rotr<24>(b ^ c);
+                        b = policy_type::template rotr<24>(b ^ c);
                         a = a + b + M1;
-                        d = basic_functions<64>::template rotr<16>(d ^ a);
+                        d = policy_type::template rotr<16>(d ^ a);
                         c = c + d;
-                        b = basic_functions<64>::template rotr<63>(b ^ c);
+                        b = policy_type::template rotr<63>(b ^ c);
                     }
 
                     template<size_t i0, size_t i1, size_t i2, size_t i3, size_t i4, size_t i5, size_t i6, size_t i7,

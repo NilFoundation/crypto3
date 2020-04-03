@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -9,11 +10,10 @@
 #ifndef CRYPTO3_HASH_DETAIL_SHA2_POLICY_HPP
 #define CRYPTO3_HASH_DETAIL_SHA2_POLICY_HPP
 
-#include <nil/crypto3/block/detail/shacal/shacal2_policy.hpp>
+#include <nil/crypto3/block/shacal2.hpp>
 
 #include <nil/crypto3/detail/static_digest.hpp>
 
-#include <boost/cstdint.hpp>
 #include <array>
 
 namespace nil {
@@ -25,9 +25,23 @@ namespace nil {
                 struct basic_sha2_policy {
 
                     constexpr static const std::size_t cipher_version = CipherVersion;
+                    typedef block::shacal2<cipher_version> block_cipher_type;
 
-                    typedef block::detail::shacal2_policy<cipher_version> cipher_policy;
-                    typedef typename cipher_policy::block_type state_type;
+                    constexpr static const std::size_t word_bits = block_cipher_type::word_bits;
+                    typedef typename block_cipher_type::word_type word_type;
+
+                    constexpr static const std::size_t state_bits = block_cipher_type::block_bits;
+                    constexpr static const std::size_t state_words = block_cipher_type::block_words;
+                    typedef typename block_cipher_type::block_type state_type;
+
+                    constexpr static const std::size_t block_bits = block_cipher_type::key_bits;
+                    constexpr static const std::size_t block_words = block_cipher_type::key_words;
+                    typedef typename block_cipher_type::key_type block_type;
+
+                    constexpr static const std::size_t length_bits = word_bits * 2;
+
+                    typedef typename stream_endian::big_octet_big_bit digest_endian;
+
                 };
 
                 template<std::size_t Version>

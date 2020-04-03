@@ -116,8 +116,9 @@ namespace nil {
                 static void implode(InIter &, OutputValue &) {
                 }
             };
+
         }    // namespace detail
     }        // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_HASH_DETAIL_IMPLODER_HPP
+#endif    // CRYPTO3_DETAIL_IMPLODER_HPP

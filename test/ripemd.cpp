@@ -47,7 +47,6 @@ BOOST_TEST_DONT_PRINT_LOG_VALUE(ripemd<256>::construction::type::digest_type)
 BOOST_TEST_DONT_PRINT_LOG_VALUE(ripemd<320>::construction::type::digest_type)
 
 static const std::unordered_map<std::string, std::string> string_128_data = {
-    {"", "cdf26213a150dc3ecb610f18f6b38b46"},
     {"a", "86be7afa339d0fc7cfc785e72f578d33"},
     {"abc", "c14a12199c66e4ba84636b0f69144c77"},
     {"message digest", "9e327b3d6e523062afc1132d7df9d1b8"},
@@ -56,7 +55,6 @@ static const std::unordered_map<std::string, std::string> string_128_data = {
     {"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789", "d1e959eb179c911faea4624c60c5c702"}};
 
 static const std::unordered_map<std::string, std::string> string_160_data = {
-    {"", "9c1185a5c5e9fc54612808977ee8f548b2258d31"},
     {"a", "0bdc9d2d256b3ee9daae347be6f4dc835a467ffe"},
     {"abc", "8eb208f7e05d987a9b044a8e98c6b087f15a0bfc"},
     {"message digest", "5d0689ef49d2fae572b881b123a85ffa21595f36"},
@@ -65,7 +63,6 @@ static const std::unordered_map<std::string, std::string> string_160_data = {
     {"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789", "b0e20b6e3116640286ed3a87a5713079b21f5189"}};
 
 static const std::unordered_map<std::string, std::string> string_256_data = {
-    {"", "02ba4c4e5f8ecd1877fc52d64d30e37a2d9774fb1e5d026380ae0168e3c5522d"},
     {"a", "f9333e45d857f5d90a91bab70a1eba0cfb1be4b0783c9acfcd883a9134692925"},
     {"abc", "afbd6e228b9d8cbbcef5ca2d03e6dba10ac0bc7dcbe4680e1e42d2e975459b65"},
     {"message digest", "87e971759a1ce47a514d5c914c392c9018c7c46bc14465554afcdf54a5070c0e"},
@@ -76,7 +73,6 @@ static const std::unordered_map<std::string, std::string> string_256_data = {
      "5740a408ac16b720b84424ae931cbb1fe363d1d0bf4017f1a89f7ea6de77a0b8"}};
 
 static const std::unordered_map<std::string, std::string> string_320_data = {
-    {"", "22d65d5661536cdc75c1fdf5c6de7b41b9f27325ebc61e8557177d705a0ec880151c3a32a00899b8"},
     {"a", "ce78850638f92658a5a585097579926dda667a5716562cfcf6fbe77f63542f99b04705d6970dff5d"},
     {"abc", "de4c01b3054f8930a79d09ae738e92301e5a17085beffdc1b8d116713e74f82fa942d64cdbc4682d"},
     {"message digest", "3a8e28502ed45d422f68844f9dd316e7b98533fa3f2a91d29f84d425c88d6b4eff727df66a7c0197"},
