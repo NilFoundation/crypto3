@@ -11,46 +11,47 @@
 
 #include <boost/endian/arithmetic.hpp>
 
-#include <nil/crypto3/block/detail/basic_functions.hpp>
+#include <nil/crypto3/detail/basic_functions.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace block {
             namespace detail {
                 template<std::size_t WordBits>
-                struct serpent_functions : public basic_functions<WordBits> {
-                    typedef typename basic_functions<WordBits>::word_type word_type;
+                struct serpent_functions : public ::nil::crypto3::detail::basic_functions<WordBits> {
+                    typedef ::nil::crypto3::detail::basic_functions<WordBits> policy_type;
+                    typedef typename policy_type::word_type word_type;
 
                     /*
                      * Serpent's Linear Transform
                      */
                     inline static void transform(word_type &B0, word_type &B1, word_type &B2, word_type &B3) {
-                        B0 = basic_functions<WordBits>::rotl<13>(B0);
-                        B2 = basic_functions<WordBits>::rotl<3>(B2);
+                        B0 = policy_type::rotl<13>(B0);
+                        B2 = policy_type::rotl<3>(B2);
                         B1 ^= B0 ^ B2;
                         B3 ^= B2 ^ (B0 << 3);
-                        B1 = basic_functions<WordBits>::rotl<1>(B1);
-                        B3 = basic_functions<WordBits>::rotl<7>(B3);
+                        B1 = policy_type::rotl<1>(B1);
+                        B3 = policy_type::rotl<7>(B3);
                         B0 ^= B1 ^ B3;
                         B2 ^= B3 ^ (B1 << 7);
-                        B0 = basic_functions<WordBits>::rotl<5>(B0);
-                        B2 = basic_functions<WordBits>::rotl<22>(B2);
+                        B0 = policy_type::rotl<5>(B0);
+                        B2 = policy_type::rotl<22>(B2);
                     }
 
                     /*
                      * Serpent's Inverse Linear Transform
                      */
                     inline static void i_transform(word_type &B0, word_type &B1, word_type &B2, word_type &B3) {
-                        B2 = basic_functions<WordBits>::rotr<22>(B2);
-                        B0 = basic_functions<WordBits>::rotr<5>(B0);
+                        B2 = policy_type::rotr<22>(B2);
+                        B0 = policy_type::rotr<5>(B0);
                         B2 ^= B3 ^ (B1 << 7);
                         B0 ^= B1 ^ B3;
-                        B3 = basic_functions<WordBits>::rotr<7>(B3);
-                        B1 = basic_functions<WordBits>::rotr<1>(B1);
+                        B3 = policy_type::rotr<7>(B3);
+                        B1 = policy_type::rotr<1>(B1);
                         B3 ^= B2 ^ (B0 << 3);
                         B1 ^= B0 ^ B2;
-                        B2 = basic_functions<WordBits>::rotr<3>(B2);
-                        B0 = basic_functions<WordBits>::rotr<13>(B0);
+                        B2 = policy_type::rotr<3>(B2);
+                        B0 = policy_type::rotr<13>(B0);
                     }
                 };
 

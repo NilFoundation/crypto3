@@ -32,6 +32,7 @@
 #include <nil/crypto3/block/algorithm/decrypt.hpp>
 
 using namespace nil::crypto3;
+using namespace nil::crypto3::block;
 
 struct state_adder {
     template<typename T>
@@ -44,9 +45,9 @@ struct state_adder {
     }
 };
 
-BOOST_TEST_DONT_PRINT_LOG_VALUE(block::shacal1::block_type)
-BOOST_TEST_DONT_PRINT_LOG_VALUE(block::shacal2<256>::block_type)
-BOOST_TEST_DONT_PRINT_LOG_VALUE(block::shacal2<512>::block_type)
+BOOST_TEST_DONT_PRINT_LOG_VALUE(shacal1::block_type)
+BOOST_TEST_DONT_PRINT_LOG_VALUE(shacal2<256>::block_type)
+BOOST_TEST_DONT_PRINT_LOG_VALUE(shacal2<512>::block_type)
 
 BOOST_AUTO_TEST_SUITE(shacal_test_suite)
 

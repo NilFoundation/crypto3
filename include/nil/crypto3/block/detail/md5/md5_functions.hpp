@@ -9,13 +9,13 @@
 #ifndef CRYPTO3_MD5_FUNCTIONS_HPP
 #define CRYPTO3_MD5_FUNCTIONS_HPP
 
-#include <nil/crypto3/block/detail/basic_functions.hpp>
+#include <nil/crypto3/detail/basic_functions.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace block {
             namespace detail {
-                struct md5_functions : public basic_functions<32> {
+                struct md5_functions : public ::nil::crypto3::detail::basic_functions<32> {
                     static word_type ff(word_type x, word_type y, word_type z) {
                         return (x & y) | (~x & z);
                     }

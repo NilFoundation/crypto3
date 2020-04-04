@@ -9,15 +9,15 @@
 #ifndef CRYPTO3_BLOWFISH_FUNCTIONS_CPP_HPP
 #define CRYPTO3_BLOWFISH_FUNCTIONS_CPP_HPP
 
-#include <nil/crypto3/block/detail/basic_functions.hpp>
+#include <nil/crypto3/detail/basic_functions.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace block {
             namespace detail {
                 template<std::size_t WordBits>
-                struct blowfish_functions : public basic_functions<WordBits> {
-                    typedef basic_functions<WordBits> policy_type;
+                struct blowfish_functions : public ::nil::crypto3::detail::basic_functions<WordBits> {
+                    typedef ::nil::crypto3::detail::basic_functions<WordBits> policy_type;
                     typedef typename policy_type::word_type word_type;
 
                     constexpr static const std::size_t constants_size = 256;

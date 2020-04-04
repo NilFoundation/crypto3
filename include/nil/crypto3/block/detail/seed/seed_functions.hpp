@@ -11,15 +11,15 @@
 
 #include <boost/endian/arithmetic.hpp>
 
-#include <nil/crypto3/block/detail/basic_functions.hpp>
+#include <nil/crypto3/detail/basic_functions.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace block {
             namespace detail {
                 template<std::size_t WordBits>
-                struct seed_functions : public basic_functions<WordBits> {
-                    typedef typename basic_functions<WordBits>::word_type word_type;
+                struct seed_functions : public ::nil::crypto3::detail::basic_functions<WordBits> {
+                    typedef typename ::nil::crypto3::detail::basic_functions<WordBits>::word_type word_type;
 
                     constexpr static const std::size_t constants_size = 256;
                     typedef std::array<word_type, constants_size> constants_type;

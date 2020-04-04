@@ -9,6 +9,7 @@
 #define BOOST_TEST_MODULE blowfish_cipher_test
 
 #include <iostream>
+#include <unordered_map>
 
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
@@ -20,6 +21,20 @@
 #include <nil/crypto3/block/blowfish.hpp>
 
 using namespace nil::crypto3;
+using namespace nil::crypto3::block;
+using namespace nil::crypto3::detail;
+
+namespace boost {
+    namespace test_tools {
+        namespace tt_detail {
+            template<template<typename, typename> class P, typename K, typename V>
+            struct print_log_value<P<K, V>> {
+                void operator()(std::ostream&, P<K, V> const&) {
+                }
+            };
+        }    // namespace tt_detail
+    }        // namespace test_tools
+}    // namespace boost
 
 struct state_adder {
     template<typename T>

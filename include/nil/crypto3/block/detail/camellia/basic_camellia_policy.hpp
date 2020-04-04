@@ -11,7 +11,7 @@
 
 #include <array>
 
-#include <nil/crypto3/block/detail/basic_functions.hpp>
+#include <nil/crypto3/detail/basic_functions.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -19,8 +19,8 @@ namespace nil {
             namespace detail {
 
                 template<std::size_t KeyBits>
-                struct basic_camellia_policy : public basic_functions<64> {
-                    typedef basic_functions<64> policy_type;
+                struct basic_camellia_policy : public ::nil::crypto3::detail::basic_functions<64> {
+                    typedef ::nil::crypto3::detail::basic_functions<64> policy_type;
 
                     constexpr static const std::size_t word_bits = policy_type::word_bits;
                     typedef typename policy_type::word_type word_type;

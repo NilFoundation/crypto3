@@ -11,7 +11,7 @@
 
 #include <array>
 
-#include <nil/crypto3/block/detail/basic_functions.hpp>
+#include <nil/crypto3/detail/basic_functions.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -19,7 +19,7 @@ namespace nil {
             namespace detail {
 
                 template<std::size_t KeyBits>
-                struct basic_threefish_policy : public basic_functions<64> {
+                struct basic_threefish_policy : public ::nil::crypto3::detail::basic_functions<64> {
 
                     constexpr static const std::size_t block_bits = KeyBits;
                     constexpr static const std::size_t block_words = block_bits / word_bits;

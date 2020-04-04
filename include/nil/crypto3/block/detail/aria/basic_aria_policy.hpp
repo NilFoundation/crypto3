@@ -11,14 +11,14 @@
 
 #include <array>
 
-#include <nil/crypto3/block/detail/basic_functions.hpp>
+#include <nil/crypto3/detail/basic_functions.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace block {
             namespace detail {
                 template<std::size_t KeyBits>
-                struct basic_aria_policy : public basic_functions<32> {
+                struct basic_aria_policy : public ::nil::crypto3::detail::basic_functions<32> {
                     constexpr static const std::size_t block_bits = 128;
                     constexpr static const std::size_t block_words = block_bits / word_bits;
                     typedef std::array<word_type, block_words> block_type;

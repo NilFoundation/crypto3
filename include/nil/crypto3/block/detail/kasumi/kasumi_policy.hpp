@@ -11,15 +11,15 @@
 
 #include <array>
 
-#include <nil/crypto3/block/detail/basic_functions.hpp>
+#include <nil/crypto3/detail/basic_functions.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace block {
             namespace detail {
-                struct kasumi_policy : basic_functions<16> {
-                    constexpr static const std::size_t word_bits = basic_functions<16>::word_bits;
-                    typedef typename basic_functions<16>::word_type word_type;
+                struct kasumi_policy : ::nil::crypto3::detail::basic_functions<16> {
+                    constexpr static const std::size_t word_bits = ::nil::crypto3::detail::basic_functions<16>::word_bits;
+                    typedef typename ::nil::crypto3::detail::basic_functions<16>::word_type word_type;
 
                     constexpr static const std::size_t block_bits = 64;
                     constexpr static const std::size_t block_words = block_bits / word_bits;

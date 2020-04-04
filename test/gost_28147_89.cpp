@@ -6,7 +6,7 @@
 // See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
-#define BOOST_TEST_MODULE gost_28147_cipher_test
+#define BOOST_TEST_MODULE gost_28147_89_cipher_test
 
 #include <iostream>
 
@@ -17,8 +17,9 @@
 #include <nil/crypto3/block/algorithm/encrypt.hpp>
 #include <nil/crypto3/block/algorithm/decrypt.hpp>
 
-#include <nil/crypto3/block/gost28147.hpp>
+#include <nil/crypto3/block/gost_28147_89.hpp>
 
+using namespace nil::crypto3;
 using namespace nil::crypto3::block;
 
 struct state_adder {
@@ -32,10 +33,10 @@ struct state_adder {
     }
 };
 
-BOOST_TEST_DONT_PRINT_LOG_VALUE(block::shacal1::block_type)
-BOOST_TEST_DONT_PRINT_LOG_VALUE(block::shacal2<256>::block_type)
-BOOST_TEST_DONT_PRINT_LOG_VALUE(block::shacal2<512>::block_type)
 
-BOOST_AUTO_TEST_SUITE(gost28147_test_suite)
+BOOST_AUTO_TEST_SUITE(gost_28147_89_test_suite)
+
+BOOST_AUTO_TEST_CASE(gost_28147_89_test) {
+}
 
 BOOST_AUTO_TEST_SUITE_END()
