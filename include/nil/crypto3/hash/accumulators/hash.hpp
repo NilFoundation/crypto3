@@ -134,8 +134,9 @@ namespace nil {
                             // If there are no bits in the cache
                             if (value_seen == block_bits) {
                                 // The incoming value is a full block
+                                filled = true;
 
-                                construction.process_block(cache, total_seen);
+                                std::move(value.begin(), value.end(), cache.begin());
 
                             } else {
                                 // The incoming value is not a full block

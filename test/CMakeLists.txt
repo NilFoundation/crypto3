@@ -53,7 +53,7 @@ set(TESTS_NAMES
     "ripemd"
     "sha"
     "sha2"
-#     "sha3"
+    "sha3"
 #    "skein"
 #    "sm3"
 #    "static_digest"
