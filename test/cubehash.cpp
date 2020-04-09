@@ -11,8 +11,6 @@
 
 #include <nil/crypto3/hash/algorithm/hash.hpp>
 
-#include <nil/crypto3/hash/detail/cubehash_policy.hpp>
-
 #include <nil/crypto3/hash/cubehash.hpp>
 #include <nil/crypto3/hash/hash_state.hpp>
 

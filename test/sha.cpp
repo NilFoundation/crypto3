@@ -12,7 +12,7 @@
 
 #include <nil/crypto3/hash/algorithm/hash.hpp>
 
-#include <nil/crypto3/hash/sha0.hpp>
+#include <nil/crypto3/hash/sha.hpp>
 #include <nil/crypto3/hash/hash_state.hpp>
 
 #include <cassert>
@@ -41,8 +41,8 @@ using namespace nil::crypto3::accumulators;
 BOOST_AUTO_TEST_SUITE(sha_test_suite)
 
 
-BOOST_AUTO_TEST_CASE(sha0_shortmsg_bit) {    
-    sha0::digest_type d = hash<sha0>(std::string("abc"));
+BOOST_AUTO_TEST_CASE(sha0_shortmsg_bit) {
+    sha::digest_type d = hash<sha>(std::string("abc"));
 
     BOOST_CHECK_EQUAL("0164b8a914cd2a5e74c4f7ff082c4d97f1edf880", std::to_string(d).data());
 }

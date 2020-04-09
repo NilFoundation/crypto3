@@ -434,11 +434,13 @@ namespace nil {
                     // CubeHash is only defined for h in {8, 16, 24, ..., 512}
                     BOOST_STATIC_ASSERT(h != 0);
                     BOOST_STATIC_ASSERT(h <= 512);
-                    BOOST_STATIC_ASSERT(h % 8 == 0);
+                    BOOST_STATIC_ASSERT(h % CHAR_BIT == 0);
 
-                    constexpr static const std::size_t block_bits = b * 8;
+                    constexpr static const std::size_t block_bits = b * CHAR_BIT;
                     constexpr static const std::size_t block_words = block_bits / word_bits;
                     typedef std::array<word_type, block_words> block_type;
+
+                    typedef typename stream_endian::little_octet_big_bit digest_endian;
 
                     constexpr static const std::size_t digest_bits = h;
                     typedef static_digest<digest_bits> digest_type;
@@ -473,7 +475,7 @@ namespace nil {
 #ifdef CRYPTO3_HASH_SHOW_PROGRESS
                             printf("Generating static IV for CubeHash%d/%d-%d.\n", r, b, h);
 #endif
-                            state_type state = {{h / 8, b, r}};
+                            state_type state = {{h / CHAR_BIT, b, r}};
                             transform_10r(state);
                             return state;
                         }

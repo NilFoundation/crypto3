@@ -26,12 +26,11 @@ namespace nil {
              *
              * @ingroup hash
              */
-            class sha0 {
+            class sha {
                 typedef detail::sha0_policy policy_type;
                 typedef typename policy_type::block_cipher_type block_cipher_type;
 
             public:
-
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
                 typedef typename policy_type::word_type word_type;
 
@@ -67,10 +66,9 @@ namespace nil {
 
                     typedef block_stream_processor<construction, StateAccumulator, params_type> type;
                 };
-
             };
 
-            typedef sha0 sha;
+            typedef sha sha0;
 
         }    // namespace hash
     }        // namespace crypto3
