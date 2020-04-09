@@ -6,8 +6,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_WHIRLPOOL_HPP
-#define CRYPTO3_WHIRLPOOL_HPP
+#ifndef CRYPTO3_HASH_WHIRLPOOL_HPP
+#define CRYPTO3_HASH_WHIRLPOOL_HPP
 
 #include <nil/crypto3/hash/detail/state_adder.hpp>
 #include <nil/crypto3/hash/detail/miyaguchi_preneel_compressor.hpp>
@@ -52,7 +52,7 @@ namespace nil {
             public:
                 struct construction {
                     struct params_type {
-                        typedef typename stream_endian::big_octet_big_bit digest_endian;
+                        typedef typename policy_type::digest_endian digest_endian;
 
                         constexpr static const std::size_t length_bits = policy_type::word_bits * 2;
                         constexpr static const std::size_t digest_bits = policy_type::digest_bits;
@@ -67,7 +67,7 @@ namespace nil {
                 template<typename StateAccumulator, std::size_t ValueBits>
                 struct stream_processor {
                     struct params_type {
-                        typedef typename stream_endian::big_octet_big_bit endian;
+                        typedef typename policy_type::digest_endian digest_endian;
 
                         constexpr static const std::size_t value_bits = ValueBits;
                     };

@@ -80,6 +80,8 @@ namespace nil {
 
                 inline digest_type digest(const block_type &block = block_type(),
                                           length_type total_seen = length_type()) {
+                    using namespace nil::crypto3::detail;
+
                     block_type b = block;
                     std::size_t block_seen = total_seen % block_bits;
                     // Process block if block is full
@@ -98,8 +100,7 @@ namespace nil {
                     process_block(b);
                     // Convert digest to byte representation
                     digest_type d;
-                    nil::crypto3::detail::pack_n<endian_type, word_bits, octet_bits>(state_.data(), digest_words,
-                                                                                     d.data(), digest_bytes);
+                    pack_n<endian_type, word_bits, octet_bits>(state_.data(), digest_words, d.data(), digest_bytes);
                     return d;
                 }
 

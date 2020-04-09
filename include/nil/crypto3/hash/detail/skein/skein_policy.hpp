@@ -19,6 +19,8 @@ namespace nil {
                 struct skein_policy : public ::nil::crypto3::detail::basic_functions<64> {
                     typedef typename block::threefish<DigestBits> block_cipher_type;
 
+                    typedef typename stream_endian::little_octet_big_bit digest_endian;
+
                     constexpr static const std::size_t digest_bits = DigestBits;
                     typedef static_digest<digest_bits> digest_type;
 
@@ -37,9 +39,9 @@ namespace nil {
                         }
                     };
                 };
-            }
-        }
-    }
-}
+            }    // namespace detail
+        }        // namespace hash
+    }            // namespace crypto3
+}    // namespace nil
 
-#endif //CRYPTO3_SKEIN_POLICY_HPP
+#endif    // CRYPTO3_SKEIN_POLICY_HPP
