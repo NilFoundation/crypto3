@@ -41,7 +41,8 @@ namespace nil {
                             // Pad with zeros last significant word if it is incomplete
                             if (total_seen % word_bits) {
                                 word_type block_seen = total_seen % block_bits;
-                                injector_type::inject(word_type(), word_bits - block_seen % word_bits, block, block_seen);
+                                injector_type::inject(word_type(), word_bits - block_seen % word_bits, block,
+                                                      block_seen);
                             }
                         }
                     }

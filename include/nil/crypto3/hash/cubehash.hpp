@@ -58,9 +58,8 @@ namespace nil {
             template<unsigned r, unsigned b, unsigned h>
             struct cubehash_finalizer {
                 typedef detail::cubehash_policy<r, b, h> policy_type;
-                typedef typename policy_type::state_type state_type;
 
-                cubehash_finalizer() = default;
+                typedef typename policy_type::state_type state_type;
 
                 inline void operator()(state_type &state, std::size_t = std::size_t()) const {
                     state[31] ^= 1;

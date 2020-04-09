@@ -30,18 +30,20 @@ namespace nil {
                     constexpr static const std::size_t digest_bits = block_bits;
                     typedef static_digest<digest_bits> digest_type;
 
+                    typedef typename stream_endian::little_octet_big_bit digest_endian;
+
                     struct iv_generator {
                         state_type const &operator()() const {
-                            constexpr static const state_type H0 = {{
-                                                                            0x7380166fUL, 0x4914b2b9UL, 0x172442d7UL, 0xda8a0600UL, 0xa96f30bcUL, 0x163138aaUL, 0xe38dee4dUL, 0xb0fb0e4eUL
-                                                                    }};
+                            constexpr static const state_type H0 = {{0x7380166fUL, 0x4914b2b9UL, 0x172442d7UL,
+                                                                     0xda8a0600UL, 0xa96f30bcUL, 0x163138aaUL,
+                                                                     0xe38dee4dUL, 0xb0fb0e4eUL}};
                             return H0;
                         }
                     };
                 };
-            }
-        }
-    }
-}
+            }    // namespace detail
+        }        // namespace hash
+    }            // namespace crypto3
+}    // namespace nil
 
-#endif //CRYPTO3_SM3_POLICY_HPP
+#endif    // CRYPTO3_SM3_POLICY_HPP

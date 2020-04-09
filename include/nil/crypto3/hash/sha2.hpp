@@ -31,7 +31,6 @@ namespace nil {
                 typedef typename policy_type::block_cipher_type block_cipher_type;
 
             public:
-
                 constexpr static const std::size_t version = Version;
 
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
@@ -63,15 +62,13 @@ namespace nil {
                 struct stream_processor {
                     struct params_type {
                         typedef typename policy_type::digest_endian digest_endian;
-                        
+
                         constexpr static const std::size_t value_bits = ValueBits;
                     };
 
                     typedef block_stream_processor<construction, StateAccumulator, params_type> type;
                 };
-
             };
-            
         }    // namespace hash
     }        // namespace crypto3
 }    // namespace nil

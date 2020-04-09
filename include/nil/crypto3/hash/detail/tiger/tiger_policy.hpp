@@ -24,6 +24,8 @@ namespace nil {
 
                     constexpr static const std::size_t passes = Passes;
 
+                    typedef typename stream_endian::little_octet_big_bit digest_endian;
+
                     constexpr static const std::size_t digest_bits = DigestBits;
                     typedef static_digest<DigestBits> digest_type;
 
@@ -33,14 +35,15 @@ namespace nil {
 
                     struct iv_generator {
                         state_type const &operator()() const {
-                            constexpr static const state_type H0 = {{0x0123456789ABCDEF, 0xFEDCBA9876543210, 0xF096A5B4C3B2E187}};
+                            constexpr static const state_type H0 = {
+                                {0x0123456789ABCDEF, 0xFEDCBA9876543210, 0xF096A5B4C3B2E187}};
                             return H0;
                         }
                     };
                 };
-            }
-        }
-    }
-}
+            }    // namespace detail
+        }        // namespace hash
+    }            // namespace crypto3
+}    // namespace nil
 
-#endif //CRYPTO3_TIGER_POLICY_HPP
+#endif    // CRYPTO3_TIGER_POLICY_HPP
