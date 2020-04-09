@@ -31,6 +31,8 @@ namespace nil {
                     constexpr static const std::size_t key_schedule_words = block_words;
                     typedef key_type key_schedule_type;
 
+                    typedef typename stream_endian::big_octet_big_bit digest_endian;
+
                     constexpr static const std::size_t digest_bits = block_bits;
                     typedef static_digest<digest_bits> digest_type;
 
