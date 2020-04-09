@@ -97,7 +97,6 @@ namespace nil {
                 typedef detail::blake2b_policy<DigestBits> policy_type;
 
             public:
-
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
                 typedef typename policy_type::word_type word_type;
 
@@ -116,14 +115,10 @@ namespace nil {
                         constexpr static const std::size_t digest_bits = policy_type::digest_bits;
                     };
 
-                    typedef detail::blake2b_finalizer<typename params_type::digest_endian, policy_type>
-                        blake2b_finalizer;
-                    typedef haifa_construction<params_type, typename policy_type::iv_generator,
-                                               blake2b_compressor<DigestBits>, blake2b_finalizer>
+                    typedef haifa_construction<
+                        params_type, typename policy_type::iv_generator, blake2b_compressor<DigestBits>,
+                        detail::blake2b_finalizer<typename params_type::digest_endian, policy_type>>
                         type;
-
-                    constexpr static const std::size_t word_bits = policy_type::word_bits;
-                    typedef typename policy_type::word_type word_type;
                 };
 
                 template<typename StateAccumulator, std::size_t ValueBits>
@@ -136,7 +131,6 @@ namespace nil {
 
                     typedef block_stream_processor<construction, StateAccumulator, params_type> type;
                 };
-
             };
 
         }    // namespace hash
