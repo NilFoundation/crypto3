@@ -18,7 +18,7 @@ namespace nil {
     namespace crypto3 {
         namespace hash {
             namespace detail {
-                struct sha0_policy {
+                struct sha_policy {
                     typedef block::shacal0 block_cipher_type;
 
                     constexpr static const std::size_t word_bits = block_cipher_type::word_bits;
@@ -55,7 +55,7 @@ namespace nil {
                     };
                 };
 
-                typedef sha0_policy sha_policy;
+                typedef sha_policy sha_policy;
             }    // namespace detail
         }        // namespace hash
     }            // namespace crypto3
