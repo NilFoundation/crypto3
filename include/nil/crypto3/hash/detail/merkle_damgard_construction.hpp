@@ -83,8 +83,7 @@ namespace nil {
 
                 inline digest_type digest(const block_type &block = block_type(),
                                           length_type total_seen = length_type()) {
-                    block_type b;
-                    std::move(block.begin(), block.end(), b.begin());
+                    block_type b = block;
                     std::size_t block_seen = total_seen % block_bits;
                     // Process block if block is full
                     if (total_seen && !block_seen)
