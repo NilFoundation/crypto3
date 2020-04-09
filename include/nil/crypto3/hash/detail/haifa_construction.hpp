@@ -83,7 +83,7 @@ namespace nil {
                     return *this;
                 }
 
-                inline digest_type digest(const block_type &block = block_type(), 
+                inline digest_type digest(const block_type &block = block_type(),
                                           length_type total_seen = length_type()) {
                     using namespace nil::crypto3::detail;
 

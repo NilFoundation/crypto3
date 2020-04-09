@@ -18,8 +18,6 @@
 #include <nil/crypto3/detail/pack.hpp>
 #include <nil/crypto3/detail/unbounded_shift.hpp>
 
-#include <boost/utility/enable_if.hpp>
-
 namespace nil {
     namespace crypto3 {
         namespace hash {
@@ -73,9 +71,6 @@ namespace nil {
                 constexpr static const std::size_t length_words = length_bits / word_bits;
                 BOOST_STATIC_ASSERT(!length_bits || length_bits % word_bits == 0);
 
-                // typedef ::nil::crypto3::hash::detail::length_adder<endian_type, length_type, word_bits, block_words,
-                // length_type_bits, length_bits>
-                // length_adder;
             public:
                 template<typename Integer = std::size_t>
                 inline merkle_damgard_construction &process_block(const block_type &block, Integer seen = Integer()) {
@@ -127,8 +122,8 @@ namespace nil {
 
             protected:
                 template<typename Dummy>
-                typename boost::enable_if_c<length_bits && sizeof(Dummy)>::type append_length(block_type &block,
-                                                                                              length_type length) {
+                typename std::enable_if<length_bits && sizeof(Dummy)>::type append_length(block_type &block,
+                                                                                          length_type length) {
                     using namespace nil::crypto3::detail;
 
                     std::array<length_type, 1> length_array = {{length}};
@@ -143,8 +138,8 @@ namespace nil {
                 void append_length<0>(block_type &block, length_type length) {
                 }*/
                 template<typename Dummy>
-                typename boost::disable_if_c<length_bits && sizeof(Dummy)>::type append_length(block_type &block,
-                                                                                               length_type length) {
+                typename std::enable_if<!(length_bits || sizeof(Dummy))>::type append_length(block_type &block,
+                                                                                             length_type length) {
                     // No appending requested, so nothing to do
                 }
                 state_type state_;
