@@ -29,7 +29,7 @@ namespace nil {
                     constexpr static const std::size_t block_bits = policy_type::block_bits;
                     constexpr static const std::size_t block_words = policy_type::block_words;
                     typedef typename policy_type::block_type block_type;
-                    
+
                     constexpr static const std::size_t digest_bits = policy_type::digest_bits;
                     typedef typename policy_type::digest_type digest_type;
 
@@ -39,8 +39,8 @@ namespace nil {
                     bool is_last;
 
                 public:
-
-                    sha3_finalizer() : is_last(true) {}
+                    sha3_finalizer() : is_last(true) {
+                    }
 
                     bool is_last_block() const {
                         return is_last;
@@ -67,18 +67,17 @@ namespace nil {
                     }
 
                     void operator()(block_type &block, std::size_t &block_seen) {
-
                         if (is_last) {
-                            switch(block_bits - block_seen) {
+                            switch (block_bits - block_seen) {
                                 case 1:
-                                    // pad 0; 
+                                    // pad 0;
                                     pad_zeros(block, block_seen, 1);
                                     is_last = false;
                                     break;
                                 case 2:
                                     // pad 01;
                                     pad_zeros(block, block_seen, 1);
-                                    pad_one(block, block_seen); 
+                                    pad_one(block, block_seen);
                                     is_last = false;
                                     break;
                                 case 3:
@@ -95,37 +94,34 @@ namespace nil {
                                     pad_one(block, block_seen);
                                     pad_zeros(block, block_seen, block_bits - block_seen - 1);
                                     pad_one(block, block_seen);
-                                    break;                            
+                                    break;
                             }
-                        }
-
-                        else {
-                            switch(block_bits - block_seen) {
+                        } else {
+                            switch (block_bits - block_seen) {
                                 case 1:
                                     // pad 110*1
                                     clear(block, block_seen);
                                     pad_one(block, block_seen);
                                     pad_one(block, block_seen);
                                     pad_zeros(block, block_seen, block_bits - 1);
-                                    pad_one(block, block_seen);                                    
+                                    pad_one(block, block_seen);
                                     break;
                                 case 2:
                                     // pad 10*1
                                     clear(block, block_seen);
                                     pad_one(block, block_seen);
                                     pad_zeros(block, block_seen, block_bits - 1);
-                                    pad_one(block, block_seen); 
+                                    pad_one(block, block_seen);
                                     break;
                                 case 3:
                                     // pad 0*1
                                     clear(block, block_seen);
                                     pad_zeros(block, block_seen, block_bits - 1);
                                     pad_one(block, block_seen);
-                                    break;                         
-                            }                            
+                                    break;
+                            }
                         }
                     }
-
                 };
             }    // namespace detail
         }        // namespace hash

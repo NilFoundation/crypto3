@@ -303,7 +303,6 @@ namespace nil {
 
                     typedef block_stream_processor<construction, StateAccumulator, params_type> type;
                 };
-
             };
 
             typedef ripemd<128> ripemd128;

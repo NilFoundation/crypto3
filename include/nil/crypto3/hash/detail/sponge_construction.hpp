@@ -62,8 +62,7 @@ namespace nil {
                     return *this;
                 }
 
-                digest_type digest(const block_type &block = block_type(), 
-                                   std::size_t total_seen = std::size_t()) {
+                digest_type digest(const block_type &block = block_type(), std::size_t total_seen = std::size_t()) {
                     block_type b;
                     std::move(block.begin(), block.end(), b.begin());
                     std::size_t block_seen = total_seen % block_bits;
@@ -86,10 +85,10 @@ namespace nil {
                     // Squeezing step of sponge function calculation
                     squeeze(state_);
 
-                     // Convert digest to byte representation
+                    // Convert digest to byte representation
                     std::array<octet_type, state_bits / octet_bits> d_full;
-                    nil::crypto3::detail::pack_n<endian_type, word_bits, octet_bits>(state_.data(), state_words, d_full.data(),
-                                                               state_bits / octet_bits);
+                    nil::crypto3::detail::pack_n<endian_type, word_bits, octet_bits>(
+                        state_.data(), state_words, d_full.data(), state_bits / octet_bits);
 
                     digest_type d;
                     std::copy(d_full.begin(), d_full.begin() + digest_bytes, d.begin());
@@ -114,7 +113,6 @@ namespace nil {
                     return state_;
                 }
 
-
                 void squeeze(state_type &state) {
                     state_type temp_state;
                     std::fill(temp_state.begin(), temp_state.end(), 0);
@@ -128,12 +126,12 @@ namespace nil {
                     for (std::size_t i = 0; i != digest_blocks; ++i) {
                         for (std::size_t j = 0; j != block_words; ++j)
                             temp_state[i * block_words + j] = state[j];
-                        process_block(block_of_zeros); 
+                        process_block(block_of_zeros);
                     }
 
                     if (last_digest_bits) {
-                        std::size_t last_digest_words = last_digest_bits / word_bits + 
-                                                        ((last_digest_bits % word_bits) ? 1 : 0);
+                        std::size_t last_digest_words =
+                            last_digest_bits / word_bits + ((last_digest_bits % word_bits) ? 1 : 0);
                         for (std::size_t j = 0; j != last_digest_words; ++j)
                             temp_state[digest_blocks * block_words + j] = state[j];
                     }

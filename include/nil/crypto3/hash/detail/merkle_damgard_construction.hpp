@@ -90,8 +90,7 @@ namespace nil {
                     if (total_seen && !block_seen)
                         process_block(b);
                     // Apply finalizer
-                    finalizer_functor finalizer;
-                    finalizer(b, block_seen);
+                    finalizer_functor()(b, block_seen);
                     // Process block if total length cannot be appended
                     if (block_seen + length_bits > block_bits) {
                         process_block(b);

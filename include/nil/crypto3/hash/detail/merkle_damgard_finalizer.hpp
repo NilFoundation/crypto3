@@ -31,12 +31,12 @@ namespace nil {
                     constexpr static const std::size_t block_bits = policy_type::block_bits;
                     constexpr static const std::size_t block_words = policy_type::block_words;
                     typedef typename policy_type::block_type block_type;
-                    
+
                     constexpr static const std::size_t digest_bits = policy_type::digest_bits;
                     typedef typename policy_type::digest_type digest_type;
 
-
-                    typedef ::nil::crypto3::detail::injector<Endianness, word_bits, block_words, block_bits> injector_type;
+                    typedef ::nil::crypto3::detail::injector<Endianness, word_bits, block_words, block_bits>
+                        injector_type;
 
                 public:
                     void operator()(block_type &block, std::size_t &block_seen) {
@@ -53,9 +53,9 @@ namespace nil {
                         injector_type::inject(bit_one_word[0], 1, block, block_seen);
                     }
                 };
-            }  // namespace detail
-        }      // namespace hash
-    }          // namespace crypto3
+            }    // namespace detail
+        }        // namespace hash
+    }            // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_MERKLE_DAMGARD_FINALIZER_HPP

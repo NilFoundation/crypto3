@@ -21,6 +21,8 @@ namespace nil {
                 struct streebog_policy : public ::nil::crypto3::detail::basic_functions<64> {
                     typedef block::streebog<DigestBits, DigestBits> block_cipher_type;
 
+                    typedef typename stream_endian::little_octet_big_bit digest_endian;
+
                     constexpr static const std::size_t digest_bits = DigestBits;
                     typedef static_digest<DigestBits> digest_type;
 
