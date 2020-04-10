@@ -43,7 +43,7 @@ set(TESTS_NAMES
     "pack"
     "rijndael"
     "aria"
-#    "blowfish"
+    "blowfish"
     "camellia"
     "cast"
     "des"
@@ -55,13 +55,12 @@ set(TESTS_NAMES
     "seed"
     "serpent"
     "shacal"
-#    "shacal2"
+    "shacal2"
     "streebog"
     "sm4"
-#    "threefish"
+    "threefish"
     "twofish"
-    "xtea"
-    )
+    "xtea")
 
 foreach(TEST_NAME ${TESTS_NAMES})
     define_block_cipher_test(${TEST_NAME})

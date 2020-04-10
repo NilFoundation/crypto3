@@ -110,22 +110,6 @@ BOOST_AUTO_TEST_CASE(shacal2_single_block_encrypt3) {
     BOOST_CHECK_EQUAL(eh, std::to_string(h).data());
 }
 
-BOOST_AUTO_TEST_CASE(shacal_accumulator) {
-    hash::accumulator_set<hash::sha1> acc;
-    // perl -e 'for ($x = 1000000000; $x--;) {print "a";}' | sha1sum
-    for (unsigned n = 1000000000; n--;) {
-        acc('a');
-    }
-    typename hash::sha1::digest_type d = accumulators::extract::hash<hash::sha1>(acc);
-
-#ifdef CRYPTO3_HASH_SHOW_PROGRESS
-    printf("%s\n", std::to_string(d).data());
-#endif
-
-    const char *ed = "d0f3e4f2f31c665abbd8f518e848d5cb80ca78f7";
-    BOOST_CHECK_EQUAL(ed, std::to_string(d).data());
-}
-
 BOOST_AUTO_TEST_CASE(shacal2_512_encrypt1) {
     constexpr static const std::size_t SHA = 512;
 

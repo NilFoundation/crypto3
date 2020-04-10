@@ -27,9 +27,15 @@ using namespace nil::crypto3::detail;
 namespace boost {
     namespace test_tools {
         namespace tt_detail {
-            template<template<typename, typename> class P, typename K, typename V>
-            struct print_log_value<P<K, V>> {
-                void operator()(std::ostream&, P<K, V> const&) {
+            template<template<typename...> class P, typename... T>
+            struct print_log_value<P<T...>> {
+                void operator()(std::ostream &, P<T...> const &) {
+                }
+            };
+
+            template<template<typename, std::size_t> class P, typename T, std::size_t S>
+            struct print_log_value<P<T, S>> {
+                void operator()(std::ostream &, P<T, S> const &) {
                 }
             };
         }    // namespace tt_detail
@@ -46,7 +52,6 @@ struct state_adder {
         }
     }
 };
-
 
 BOOST_AUTO_TEST_SUITE(blowfish_test_suite)
 
