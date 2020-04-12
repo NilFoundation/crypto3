@@ -9,213 +9,175 @@
 #ifndef CRYPTO3_PUBKEY_DECRYPT_HPP
 #define CRYPTO3_PUBKEY_DECRYPT_HPP
 
-#include <nil/crypto3/pubkey/detail/stream_postprocessor.hpp>
-#include <nil/crypto3/pubkey/pk_keys.hpp>
+#include <nil/crypto3/pubkey/cipher_value.hpp>
+#include <nil/crypto3/pubkey/cipher_state.hpp>
 
 namespace nil {
     namespace crypto3 {
         /*!
-         * @addtogroup decrypt_algorithms Algorithms
-         * @addtogroup decrypt
-         * @brief Algorithms are meant to provide decrypting interface similar to STL algorithms' one.
-         */
-
-        /*!
          * @brief
          *
-         * @addtogroup decrypt_algorithms
+         * @ingroup block_algorithms
          *
          * @tparam PublicKeyCipher
          * @tparam InputIterator
+         * @tparam KeyIterator
          * @tparam OutputIterator
-         * @tparam StreamDecrypter
          *
          * @param first
          * @param last
+         * @param key_first
+         * @param key_last
          * @param out
          *
          * @return
          */
-        template<
-            typename PublicKeyCipher, typename InputIterator, typename PrivateKeyIterator, typename OutputIterator,
-            typename StreamDecrypter = typename detail::itr_stream_encrypt_traits<PublicKeyCipher, InputIterator>::type>
-        OutputIterator decrypt(InputIterator first, InputIterator last, PrivateKeyIterator key_first,
-                               PrivateKeyIterator key_last, OutputIterator out) {
+        template<typename PublicKeyCipher, typename InputIterator, typename KeyIterator, typename OutputIterator>
+        OutputIterator decrypt(InputIterator first, InputIterator last, KeyIterator key_first, KeyIterator key_last,
+                               OutputIterator out) {
 
-            typedef detail::value_encrypt_impl<StreamDecrypter> StreamDecrypterImpl;
-            typedef detail::itr_encrypt_impl<PublicKeyCipher, StreamDecrypterImpl, OutputIterator> DecrypterImpl;
+            typedef typename PublicKeyCipher::stream_decrypter_type DecryptionMode;
+            typedef typename pubkey::accumulator_set<DecryptionMode> CipherAccumulator;
 
-            return DecrypterImpl(first, last, std::move(out), StreamDecrypter(PublicKeyCipher(key_first, key_last)));
+            typedef pubkey::detail::value_cipher_impl<CipherAccumulator> StreamDecrypterImpl;
+            typedef pubkey::detail::itr_cipher_impl<StreamDecrypterImpl, OutputIterator> DecrypterImpl;
+
+            return DecrypterImpl(first, last, std::move(out), CiperState(PublicKeyCipher(key_first, key_last)));
         }
 
         /*!
          * @brief
          *
-         * @addtogroup decrypt_algorithms
+         * @ingroup block_algorithms
          *
          * @tparam PublicKeyCipher
          * @tparam InputIterator
-         * @tparam OutputIterator
-         * @tparam StreamDecrypter
+         * @tparam OutputAccumulator
+         *
          * @param first
          * @param last
-         * @param out
-         * @param sh
+         * @param acc
+         *
          * @return
          */
-        template<
-            typename PublicKeyCipher, typename InputIterator, typename OutputIterator,
-            typename StreamDecrypter = typename detail::itr_stream_encrypt_traits<PublicKeyCipher, InputIterator>::type>
-        OutputIterator decrypt(InputIterator first, InputIterator last, OutputIterator out,
-                               const private_key<PublicKeyCipher> &key) {
+        template<typename PublicKeyCipher, typename InputIterator,
+                 typename OutputAccumulator =
+                     typename pubkey::accumulator_set<typename PublicKeyCipher::stream_decrypter_type>>
+        OutputAccumulator &decrypt(InputIterator first, InputIterator last, OutputAccumulator &acc) {
 
-            typedef detail::ref_encrypt_impl<StreamDecrypter> StreamDecrypterImpl;
-            typedef detail::itr_encrypt_impl<PublicKeyCipher, StreamDecrypterImpl, OutputIterator> DecrypterImpl;
+            typedef pubkey::detail::ref_cipher_impl<OutputAccumulator> StreamDecrypterImpl;
+            typedef pubkey::detail::range_cipher_impl<StreamDecrypterImpl> DecrypterImpl;
 
-            return DecrypterImpl(first, last, std::move(out), sh);
+            return DecrypterImpl(first, last, acc);
         }
 
         /*!
          * @brief
          *
-         * @addtogroup decrypt_algorithms
-         *
-         * @tparam PublicKeyCipher
-         * @tparam InputIterator
-         * @tparam StreamDecrypter
-         * @param first
-         * @param last
-         * @return
-         */
-        template<
-            typename PublicKeyCipher, typename InputIterator, typename PrivateKeyIterator,
-            typename StreamDecrypter = typename detail::itr_stream_encrypt_traits<PublicKeyCipher, InputIterator>::type>
-        detail::range_encrypt_impl<PublicKeyCipher, detail::value_encrypt_impl<StreamDecrypter>>
-            decrypt(InputIterator first, InputIterator last, PrivateKeyIterator key_first,
-                    PrivateKeyIterator key_last) {
-            typedef detail::value_encrypt_impl<StreamDecrypter> StreamDecrypterImpl;
-            typedef detail::range_encrypt_impl<PublicKeyCipher, StreamDecrypterImpl> DecrypterImpl;
-
-            return DecrypterImpl(first, last, StreamDecrypter(PublicKeyCipher(key_first, key_last)));
-        }
-
-        /*!
-         * @brief
-         *
-         * @addtogroup decrypt_algorithms
-         *
-         * @tparam PublicKeyCipher
-         * @tparam InputIterator
-         * @tparam StreamDecrypter
-         * @param first
-         * @param last
-         * @param sh
-         * @return
-         */
-        template<
-            typename PublicKeyCipher, typename InputIterator,
-            typename StreamDecrypter = typename detail::itr_stream_encrypt_traits<PublicKeyCipher, InputIterator>::type>
-        detail::range_encrypt_impl<PublicKeyCipher, detail::ref_encrypt_impl<StreamDecrypter>>
-            decrypt(InputIterator first, InputIterator last, const private_key<PublicKeyCipher> &key) {
-            typedef detail::ref_encrypt_impl<StreamDecrypter> StreamDecrypterImpl;
-            typedef detail::range_encrypt_impl<PublicKeyCipher, StreamDecrypterImpl> DecrypterImpl;
-
-            return DecrypterImpl(first, last, sh);
-        }
-
-        /*!
-         * @brief
-         *
-         * @addtogroup decrypt_algorithms
+         * @ingroup block_algorithms
          *
          * @tparam PublicKeyCipher
          * @tparam SinglePassRange
-         * @tparam OutputIterator
-         * @tparam StreamDecrypter
-         * @param rng
-         * @param out
-         * @return
-         */
-        template<typename PublicKeyCipher, typename SinglePassRange, typename PrivateKeyRange, typename OutputIterator,
-                 typename StreamDecrypter =
-                     typename detail::range_stream_encrypt_traits<PublicKeyCipher, SinglePassRange>::type>
-        OutputIterator decrypt(const SinglePassRange &rng, const PrivateKeyRange &key, OutputIterator out) {
-
-            typedef detail::value_encrypt_impl<StreamDecrypter> StreamDecrypterImpl;
-            typedef detail::itr_encrypt_impl<PublicKeyCipher, StreamDecrypterImpl, OutputIterator> DecrypterImpl;
-
-            return DecrypterImpl(rng, std::move(out), StreamDecrypter(PublicKeyCipher(key)));
-        }
-
-        /*!
-         * @brief
+         * @tparam OutputAccumulator
          *
-         * @addtogroup decrypt_algorithms
-         *
-         * @tparam Decrypter
-         * @tparam SinglePassRange
-         * @tparam OutputIterator
-         * @tparam StreamDecrypter
-         * @param rng
-         * @param out
-         * @param sh
-         * @return
-         */
-        template<
-            typename Decrypter, typename SinglePassRange, typename OutputIterator,
-            typename StreamDecrypter = typename detail::range_stream_encrypt_traits<Decrypter, SinglePassRange>::type>
-        OutputIterator decrypt(const SinglePassRange &rng, OutputIterator out, StreamDecrypter &sh) {
-
-            typedef detail::ref_encrypt_impl<StreamDecrypter> StreamDecrypterImpl;
-            typedef detail::itr_encrypt_impl<Decrypter, StreamDecrypterImpl, OutputIterator> DecrypterImpl;
-
-            return DecrypterImpl(rng, std::move(out), sh);
-        }
-
-        /*!
-         * @brief
-         *
-         * @addtogroup decrypt_algorithms
-         *
-         * @tparam PublicKeyCipher
-         * @tparam SinglePassRange
-         * @tparam StreamDecrypter
          * @param r
+         * @param acc
+         *
          * @return
          */
-        template<typename PublicKeyCipher, typename SinglePassRange, typename PrivateKeyRange,
-                 typename StreamDecrypter =
-                     typename detail::range_stream_encrypt_traits<PublicKeyCipher, SinglePassRange>::type>
-        detail::range_encrypt_impl<PublicKeyCipher, detail::value_encrypt_impl<StreamDecrypter>>
-            decrypt(const SinglePassRange &r, const PrivateKeyRange &key) {
+        template<typename PublicKeyCipher, typename SinglePassRange,
+                 typename OutputAccumulator =
+                     typename pubkey::accumulator_set<typename PublicKeyCipher::stream_decrypter_type>>
+        OutputAccumulator &decrypt(const SinglePassRange &r, OutputAccumulator &acc) {
 
-            typedef detail::value_encrypt_impl<StreamDecrypter> StreamDecrypterImpl;
-            typedef detail::range_encrypt_impl<PublicKeyCipher, StreamDecrypterImpl> DecrypterImpl;
+            typedef pubkey::detail::ref_cipher_impl<OutputAccumulator> StreamDecrypterImpl;
+            typedef pubkey::detail::range_cipher_impl<StreamDecrypterImpl> DecrypterImpl;
 
-            return DecrypterImpl(r, StreamDecrypter(PublicKeyCipher(key)));
+            return DecrypterImpl(r, acc);
         }
 
         /*!
          * @brief
          *
-         * @addtogroup decrypt_algorithms
+         * @ingroup block_algorithms
+         *
+         * @tparam PublicKeyCipher
+         * @tparam InputIterator
+         * @tparam KeyIterator
+         * @tparam CipherAccumulator
+         *
+         * @param first
+         * @param last
+         * @param key_first
+         * @param key_last
+         *
+         * @return
+         */
+        template<typename PublicKeyCipher, typename InputIterator, typename KeyIterator,
+                 typename CipherAccumulator =
+                     typename pubkey::accumulator_set<typename PublicKeyCipher::stream_decrypter_type>>
+        pubkey::detail::range_cipher_impl<pubkey::detail::value_cipher_impl<CipherAccumulator>>
+            decrypt(InputIterator first, InputIterator last, KeyIterator key_first, KeyIterator key_last) {
+
+            typedef pubkey::detail::value_cipher_impl<CipherAccumulator> StreamDecrypterImpl;
+            typedef pubkey::detail::range_cipher_impl<StreamDecrypterImpl> DecrypterImpl;
+
+            return DecrypterImpl(first, last, CipherAccumulator(PublicKeyCipher(key_first, key_last)));
+        }
+
+        /*!
+         * @brief
+         *
+         * @ingroup block_algorithms
          *
          * @tparam PublicKeyCipher
          * @tparam SinglePassRange
-         * @tparam StreamHash
+         * @tparam KeyRange
+         * @tparam OutputIterator
+         *
          * @param rng
-         * @param sh
+         * @param key
+         * @param out
+         *
          * @return
          */
-        template<
-            typename PublicKeyCipher, typename SinglePassRange,
-            typename StreamHash = typename detail::range_stream_encrypt_traits<PublicKeyCipher, SinglePassRange>::type>
-        detail::range_encrypt_impl<PublicKeyCipher, detail::ref_encrypt_impl<StreamHash>>
-            decrypt(const SinglePassRange &rng, StreamHash &sh) {
-            typedef detail::ref_encrypt_impl<StreamHash> StreamDecrypterImpl;
-            typedef detail::range_encrypt_impl<PublicKeyCipher, StreamDecrypterImpl> DecrypterImpl;
+        template<typename PublicKeyCipher, typename SinglePassRange, typename KeyRange, typename OutputIterator>
+        OutputIterator decrypt(const SinglePassRange &rng, const KeyRange &key, OutputIterator out) {
 
-            return DecrypterImpl(rng, sh);
+            typedef typename PublicKeyCipher::stream_decrypter_type DecryptionMode;
+            typedef typename pubkey::accumulator_set<DecryptionMode> CipherAccumulator;
+
+            typedef pubkey::detail::value_cipher_impl<CipherAccumulator> StreamDecrypterImpl;
+            typedef pubkey::detail::itr_cipher_impl<StreamDecrypterImpl, OutputIterator> DecrypterImpl;
+
+            return DecrypterImpl(rng, std::move(out), CipherState(PublicKeyCipher(key)));
+        }
+
+        /*!
+         * @brief
+         *
+         * @ingroup block_algorithms
+         *
+         * @tparam PublicKeyCipher
+         * @tparam SinglePassRange
+         * @tparam KeyRange
+         * @tparam CipherAccumulator
+         *
+         * @param r
+         * @param key
+         *
+         * @return
+         */
+        template<typename PublicKeyCipher, typename SinglePassRange, typename KeyRange,
+                 typename CipherAccumulator =
+                     typename pubkey::accumulator_set<typename PublicKeyCipher::stream_decrypter_type>>
+        pubkey::detail::range_cipher_impl<pubkey::detail::value_cipher_impl<CipherAccumulator>>
+            decrypt(const SinglePassRange &r, const KeyRange &key) {
+
+            typedef pubkey::detail::value_cipher_impl<CipherAccumulator> StreamDecrypterImpl;
+            typedef pubkey::detail::range_cipher_impl<StreamDecrypterImpl> DecrypterImpl;
+
+            return DecrypterImpl(r, CipherState(PublicKeyCipher(key)));
         }
     }    // namespace crypto3
 }    // namespace nil

@@ -168,7 +168,7 @@ namespace nil {
 
 #if defined(CRYPTO3_HAS_DIFFIE_HELLMAN)
             if (alg_name == "DH") {
-                return std::unique_ptr<private_key_policy>(new DH_PrivateKey(alg_id, key_bits));
+                return std::unique_ptr<private_key_policy>(new dh_private_key(alg_id, key_bits));
             }
 #endif
 

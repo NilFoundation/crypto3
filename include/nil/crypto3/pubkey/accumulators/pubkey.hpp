@@ -18,9 +18,9 @@
 
 #include <boost/container/static_vector.hpp>
 
-#include <nil/crypto3/pubkey/accumulators/parameters/bits.hpp>
+#include <nil/crypto3/detail/digest.hpp>
 
-#include <nil/crypto3/pubkey/detail/digest.hpp>
+#include <nil/crypto3/pubkey/accumulators/parameters/bits.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -49,7 +49,7 @@ namespace nil {
                     typedef boost::container::static_vector<input_value_type, input_block_values> cache_type;
 
                 public:
-                    typedef pubkey::digest<output_block_bits> result_type;
+                    typedef digest<output_block_bits> result_type;
 
                     template<typename Args>
                     // The constructor takes an argument pack.

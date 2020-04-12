@@ -8,6 +8,8 @@
 
 #define BOOST_TEST_MODULE ecdsa_test
 
+#include <nil/crypto3/pubkey/algorithm/encrypt.hpp>
+#include <nil/crypto3/pubkey/algorithm/decrypt.hpp>
 #include <nil/crypto3/pubkey/algorithm/sign.hpp>
 #include <nil/crypto3/pubkey/algorithm/verify.hpp>
 
@@ -28,7 +30,6 @@
 #include <nil/crypto3/pubkey/elgamal.hpp>
 #include <nil/crypto3/pubkey/gost_3410.hpp>
 #include <nil/crypto3/pubkey/keypair.hpp>
-#include <nil/crypto3/pubkey/mceies.hpp>
 #include <nil/crypto3/pubkey/mceliece.hpp>
 #include <nil/crypto3/pubkey/newhope.hpp>
 #include <nil/crypto3/pubkey/pbes2.hpp>

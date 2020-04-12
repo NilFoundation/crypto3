@@ -82,7 +82,7 @@ namespace nil {
             /**
              * DLIES Decryption
              */
-            class dlies_Decryptor final : public pk_decryptor {
+            class dlies_decryptor final : public pk_decryptor {
             public:
                 /**
                  * Stream mode: use KDF to provide a stream of bytes to xor with the message
@@ -95,7 +95,7 @@ namespace nil {
                  *
                  * input = (ephemeral) public key + ciphertext + tag
                  */
-                dlies_Decryptor(const dh_private_key &own_priv_key, RandomNumberGenerator &rng, kdf *kdf,
+                dlies_decryptor(const dh_private_key &own_priv_key, RandomNumberGenerator &rng, kdf *kdf,
                                 MessageAuthenticationCode *mac, size_t mac_key_len = 20);
 
                 /**
@@ -111,7 +111,7 @@ namespace nil {
                  *
                  * input = (ephemeral) public key + ciphertext + tag
                  */
-                dlies_Decryptor(const dh_private_key &own_priv_key, RandomNumberGenerator &rng, kdf *kdf,
+                dlies_decryptor(const dh_private_key &own_priv_key, RandomNumberGenerator &rng, kdf *kdf,
                                 cipher_mode *cipher, size_t cipher_key_len, MessageAuthenticationCode *mac,
                                 size_t mac_key_len = 20);
 
@@ -135,12 +135,12 @@ namespace nil {
                 InitializationVector m_iv;
             };
 
-            dlies_Encryptor::dlies__encryptor(const DH_PrivateKey &own_priv_key, RandomNumberGenerator &rng, kdf *kdf,
+            dlies_encryptor::dlies_encryptor(const dh_private_key &own_priv_key, RandomNumberGenerator &rng, kdf *kdf,
                                               MessageAuthenticationCode *mac, size_t mac_key_length) :
-                dlies_Encryptor(own_priv_key, rng, kdf, nullptr, 0, mac, mac_key_length) {
+                dlies_encryptor(own_priv_key, rng, kdf, nullptr, 0, mac, mac_key_length) {
             }
 
-            dlies_Encryptor::dlies__encryptor(const DH_PrivateKey &own_priv_key, RandomNumberGenerator &rng, kdf *kdf,
+            dlies_encryptor::dlies_encryptor(const dh_private_key &own_priv_key, RandomNumberGenerator &rng, kdf *kdf,
                                               cipher_mode *cipher, size_t cipher_key_len,
                                               MessageAuthenticationCode *mac, size_t mac_key_length) :
                 m_other_pub_key(),
@@ -148,7 +148,7 @@ namespace nil {
                 m_cipher(cipher), m_cipher_key_len(cipher_key_len), m_mac(mac), m_mac_keylen(mac_key_length),
                 m_iv() {BOOST_ASSERT(kdf != nullptr) BOOST_ASSERT(mac != nullptr)}
 
-                std::vector<uint8_t> dlies_Encryptor::enc(const uint8_t in[], size_t length,
+                std::vector<uint8_t> dlies_encryptor::enc(const uint8_t in[], size_t length,
                                                           RandomNumberGenerator &) const {
                 if (m_other_pub_key.empty()) {
                     throw Invalid_State("DLIES: The other key was never set");
@@ -199,7 +199,7 @@ namespace nil {
              * Return the max size, in bytes, of a message
              * Not_Implemented if DLIES is used in XOR encryption mode
              */
-            size_t dlies_Encryptor::maximum_input_size() const {
+            size_t dlies_encryptor::maximum_input_size() const {
                 if (m_cipher) {
                     // no limit in block cipher mode
                     return std::numeric_limits<size_t>::max();
@@ -209,7 +209,7 @@ namespace nil {
                 }
             }
 
-            dlies_Decryptor::dlies_Decryptor(const DH_PrivateKey &own_priv_key, RandomNumberGenerator &rng, kdf *kdf,
+            dlies_decryptor::dlies_decryptor(const dh_private_key &own_priv_key, RandomNumberGenerator &rng, kdf *kdf,
                                              cipher_mode *cipher, size_t cipher_key_len, MessageAuthenticationCode *mac,
                                              size_t mac_key_length) :
                 m_pub_key_size(own_priv_key.public_value().size()),
@@ -217,12 +217,12 @@ namespace nil {
                 m_mac(mac), m_mac_keylen(mac_key_length),
                 m_iv() {BOOST_ASSERT(kdf != nullptr) BOOST_ASSERT(mac != nullptr)}
 
-                dlies_Decryptor::dlies_Decryptor(const DH_PrivateKey &own_priv_key, RandomNumberGenerator &rng,
+                dlies_decryptor::dlies_decryptor(const dh_private_key &own_priv_key, RandomNumberGenerator &rng,
                                                  kdf *kdf, MessageAuthenticationCode *mac, size_t mac_key_length) :
-                dlies_Decryptor(own_priv_key, rng, kdf, nullptr, 0, mac, mac_key_length) {
+                dlies_decryptor(own_priv_key, rng, kdf, nullptr, 0, mac, mac_key_length) {
             }
 
-            secure_vector<uint8_t> dlies_Decryptor::do_decrypt(uint8_t &valid_mask, const uint8_t msg[],
+            secure_vector<uint8_t> dlies_decryptor::do_decrypt(uint8_t &valid_mask, const uint8_t msg[],
                                                                size_t length) const {
                 if (length < m_pub_key_size + m_mac->output_length()) {
                     throw decoding_error("DLIES decryption: ciphertext is too short");

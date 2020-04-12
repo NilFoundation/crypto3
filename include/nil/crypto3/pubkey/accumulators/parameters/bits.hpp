@@ -10,6 +10,7 @@
 #define CRYPTO3_PUBKEY_ACCUMULATORS_PARAMETERS_BITS_HPP
 
 #include <boost/parameter/keyword.hpp>
+
 #include <boost/accumulators/accumulators_fwd.hpp>
 
 namespace nil {
