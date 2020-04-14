@@ -65,7 +65,7 @@ namespace nil {
 
                     template<typename ArgumentPack>
                     inline result_type result(const ArgumentPack &args) const {
-                        result_type res = digest;
+                        result_type res = internal_digest;
 
                         if (!cache.empty()) {
                             input_block_type ib = {0};
@@ -105,7 +105,7 @@ namespace nil {
                             input_block_type ib = {0};
                             std::move(cache.begin(), cache.end(), ib.begin());
                             output_block_type ob = stream_mode_type::process_block(ib);
-                            std::move(ob.begin(), ob.end(), std::inserter(digest, digest.end()));
+                            std::move(ob.begin(), ob.end(), std::inserter(internal_digest, internal_digest.end()));
 
                             cache.clear();
                         }
@@ -131,13 +131,13 @@ namespace nil {
                             cache.insert(cache.end(), itr, block.end());
                         }
 
-                        std::move(ob.begin(), ob.end(), std::inserter(digest, digest.end()));
+                        std::move(ob.begin(), ob.end(), std::inserter(internal_digest, internal_digest.end()));
                         seen += input_block_bits;
                     }
 
                     std::size_t seen;
                     cache_type cache;
-                    result_type digest;
+                    result_type internal_digest;
                 };
             }    // namespace impl
 
