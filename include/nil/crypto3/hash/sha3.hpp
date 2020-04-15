@@ -15,6 +15,7 @@
 #include <nil/crypto3/hash/detail/sha3/sha3_functions.hpp>
 #include <nil/crypto3/hash/detail/sha3/sha3_policy.hpp>
 #include <nil/crypto3/hash/detail/sha3/sha3_finalizer.hpp>
+#include <nil/crypto3/hash/detail/sha3/sha3_padding.hpp>
 
 #include <boost/endian/conversion.hpp>
 
@@ -82,7 +83,8 @@ namespace nil {
 
                     typedef sponge_construction<
                         params_type, typename policy_type::iv_generator, sha3_compressor<DigestBits>,
-                        detail::sha3_finalizer<typename params_type::digest_endian, policy_type>>
+                        detail::sha3_padding<typename params_type::digest_endian, policy_type>,
+                        detail::sha3_finalizer<policy_type>>
                         type;
                 };
 

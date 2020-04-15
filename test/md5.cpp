@@ -43,6 +43,13 @@ namespace boost {
 
 BOOST_TEST_DONT_PRINT_LOG_VALUE(md5::construction::type::digest_type)
 
+class fixture {
+public:
+    accumulator_set<md5> acc;
+    virtual ~fixture() {
+    }
+};
+
 static const std::unordered_map<std::string, std::string> string_data = {
     {"a", "0cc175b9c0f1b6a831c399e269772661"},
     {"\x24", "c3e97dd6e97fb5125688c97f36720cbe"},
@@ -54,13 +61,6 @@ static const std::unordered_map<std::string, std::string> string_data = {
     {"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789", "d174ab98d277d9f5a5611c2c9f419d9f"},
     {"12345678901234567890123456789012345678901234567890123456789012345678901234567890",
      "57edf4a22be3c955ac49da2e2107b67a"}};
-
-class fixture {
-public:
-    accumulator_set<md5> acc;
-    virtual ~fixture() {
-    }
-};
 
 
 BOOST_AUTO_TEST_SUITE(md5_stream_processor_test_suite)
