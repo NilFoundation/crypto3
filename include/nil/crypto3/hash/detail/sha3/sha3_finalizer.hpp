@@ -11,11 +11,13 @@
 
 #include <nil/crypto3/hash/detail/sha3/sha3_policy.hpp>
 
+#include <boost/endian/conversion.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace hash {
             namespace detail {
-                template<typename Endianness, typename PolicyType>
+                template<typename PolicyType>
                 class sha3_finalizer {
                     typedef PolicyType policy_type;
 
@@ -31,96 +33,39 @@ namespace nil {
                     typedef typename policy_type::block_type block_type;
 
                     constexpr static const std::size_t digest_bits = policy_type::digest_bits;
+                    constexpr static const std::size_t digest_blocks = digest_bits / block_bits;
+                    constexpr static const std::size_t last_digest_bits = digest_bits % block_bits;
+                    constexpr static const std::size_t last_digest_words =
+                        last_digest_bits / word_bits + ((last_digest_bits % word_bits) ? 1 : 0);
+                    
                     typedef typename policy_type::digest_type digest_type;
-
-                    typedef ::nil::crypto3::detail::injector<Endianness, word_bits, block_words, block_bits>
-                        injector_type;
-
-                    bool is_last;
+                    typedef sha3_functions<digest_bits> policy_func_type;
 
                 public:
-                    sha3_finalizer() : is_last(true) {
-                    }
+                    void operator()(state_type &state) {
+                        state_type temp_state;
+                        std::fill(temp_state.begin(), temp_state.end(), 0);
 
-                    bool is_last_block() const {
-                        return is_last;
-                    }
+                        for (std::size_t i = 0; i != digest_blocks; ++i) {
+                            for (std::size_t j = 0; j != block_words; ++j)
+                                temp_state[i * block_words + j] = state[j];
+                            
+                            for (std::size_t i = 0; i != state_words; ++i)
+                                boost::endian::endian_reverse_inplace(state[i]);
 
-                    void pad_one(block_type &block, std::size_t &block_seen) {
-                        // Get bit 1 in the endianness used by the hash
-                        std::array<bool, word_bits> bit_one = {1};
-                        std::array<word_type, 1> bit_one_word = {0};
-                        ::nil::crypto3::detail::pack<Endianness, 1, word_bits>(bit_one, bit_one_word);
-                        // Add 1 bit to block
-                        injector_type::inject(bit_one_word[0], 1, block, block_seen);
-                    }
+                            policy_func_type::permute(state);
 
-                    void pad_zeros(block_type &block, std::size_t &block_seen, std::size_t num) {
-                        block_type zeros;
-                        std::fill(zeros.begin(), zeros.end(), 0);
-                        injector_type::inject(zeros, num, block, block_seen);
-                    }
+                            for (std::size_t i = 0; i != state_words; ++i)
+                                boost::endian::endian_reverse_inplace(state[i]);
 
-                    void clear(block_type &block, std::size_t &block_seen) {
-                        block_seen = 0;
-                        std::fill(block.begin(), block.end(), 0);
-                    }
-
-                    void operator()(block_type &block, std::size_t &block_seen) {
-                        if (is_last) {
-                            switch (block_bits - block_seen) {
-                                case 1:
-                                    // pad 0;
-                                    pad_zeros(block, block_seen, 1);
-                                    is_last = false;
-                                    break;
-                                case 2:
-                                    // pad 01;
-                                    pad_zeros(block, block_seen, 1);
-                                    pad_one(block, block_seen);
-                                    is_last = false;
-                                    break;
-                                case 3:
-                                    // pad 011;
-                                    pad_zeros(block, block_seen, 1);
-                                    pad_one(block, block_seen);
-                                    pad_one(block, block_seen);
-                                    is_last = false;
-                                    break;
-                                default:
-                                    // pad 0110*1
-                                    pad_zeros(block, block_seen, 1);
-                                    pad_one(block, block_seen);
-                                    pad_one(block, block_seen);
-                                    pad_zeros(block, block_seen, block_bits - block_seen - 1);
-                                    pad_one(block, block_seen);
-                                    break;
-                            }
-                        } else {
-                            switch (block_bits - block_seen) {
-                                case 1:
-                                    // pad 110*1
-                                    clear(block, block_seen);
-                                    pad_one(block, block_seen);
-                                    pad_one(block, block_seen);
-                                    pad_zeros(block, block_seen, block_bits - 1);
-                                    pad_one(block, block_seen);
-                                    break;
-                                case 2:
-                                    // pad 10*1
-                                    clear(block, block_seen);
-                                    pad_one(block, block_seen);
-                                    pad_zeros(block, block_seen, block_bits - 1);
-                                    pad_one(block, block_seen);
-                                    break;
-                                case 3:
-                                    // pad 0*1
-                                    clear(block, block_seen);
-                                    pad_zeros(block, block_seen, block_bits - 1);
-                                    pad_one(block, block_seen);
-                                    break;
-                            }
                         }
+
+                        if (last_digest_bits) {
+                            for (std::size_t j = 0; j != last_digest_words; ++j)
+                                temp_state[digest_blocks * block_words + j] = state[j];
+                        }
+
+                        state = temp_state;
                     }
                 };
             }    // namespace detail

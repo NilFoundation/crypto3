@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2019 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Alexander Sokolov <asokolov@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -31,12 +32,14 @@ namespace nil {
              * For a Wide Pipe construction, use a digest that will
              * truncate the internal state.
              */
-            template<typename Params, typename IV, typename Compressor, typename Finalizer = detail::nop_finalizer>
+            template<typename Params, typename IV, typename Compressor, typename Padding, 
+            typename Finalizer = detail::nop_finalizer>
             class sponge_construction {
             public:
                 typedef IV iv_generator;
                 typedef Compressor compressor_functor;
                 typedef Finalizer finalizer_functor;
+                typedef Padding padding_functor;
 
                 typedef typename Params::digest_endian endian_type;
 
@@ -63,27 +66,27 @@ namespace nil {
                 }
 
                 digest_type digest(const block_type &block = block_type(), std::size_t total_seen = std::size_t()) {
-                    block_type b;
-                    std::move(block.begin(), block.end(), b.begin());
+                    block_type b = block;
                     std::size_t block_seen = total_seen % block_bits;
                     // Process block if block is full
                     if (total_seen && !block_seen)
                         process_block(b);
 
                     std::size_t copy_seen = block_seen;
-                    // Apply finalizer
-                    finalizer_functor finalizer;
-                    finalizer(b, block_seen);
+                    // Pad last message block
+                    padding_functor padding;
+                    padding(b, block_seen);
                     process_block(b);
 
-                    // If block is not the last, process it
-                    if (!finalizer.is_last_block()) {
-                        finalizer(b, copy_seen);
+                    // Process additional block if not all bits were padded
+                    if (!padding.is_last_block()) {
+                        std::fill(b.begin(), b.end(), 0);
+                        padding.process_last(b, copy_seen);
                         process_block(b);
                     }
 
-                    // Squeezing step of sponge function calculation
-                    squeeze(state_);
+                    // Apply finalizer
+                    finalizer_functor()(state_);
 
                     // Convert digest to byte representation
                     std::array<octet_type, state_bits / octet_bits> d_full;
@@ -111,32 +114,6 @@ namespace nil {
 
                 state_type const &state() const {
                     return state_;
-                }
-
-                void squeeze(state_type &state) {
-                    state_type temp_state;
-                    std::fill(temp_state.begin(), temp_state.end(), 0);
-
-                    block_type block_of_zeros;
-                    std::fill(block_of_zeros.begin(), block_of_zeros.end(), 0);
-
-                    std::size_t digest_blocks = digest_bits / block_bits;
-                    std::size_t last_digest_bits = digest_bits % block_bits;
-
-                    for (std::size_t i = 0; i != digest_blocks; ++i) {
-                        for (std::size_t j = 0; j != block_words; ++j)
-                            temp_state[i * block_words + j] = state[j];
-                        process_block(block_of_zeros);
-                    }
-
-                    if (last_digest_bits) {
-                        std::size_t last_digest_words =
-                            last_digest_bits / word_bits + ((last_digest_bits % word_bits) ? 1 : 0);
-                        for (std::size_t j = 0; j != last_digest_words; ++j)
-                            temp_state[digest_blocks * block_words + j] = state[j];
-                    }
-
-                    state = temp_state;
                 }
 
             private:
