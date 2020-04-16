@@ -18,7 +18,6 @@
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
-#include <boost/foreach.hpp>
 
 #include <nil/crypto3/hash/algorithm/hash.hpp>
 
@@ -53,30 +52,25 @@ public:
 
 const char *test_data = "data/sha1.json";
 
-BOOST_AUTO_TEST_SUITE(sha1_stream_processor_filedriven_test_suite)
-
-BOOST_AUTO_TEST_CASE(sha1_string_various_range_value_hash) {
-
+boost::property_tree::ptree string_data() {
     boost::property_tree::ptree string_data;
     boost::property_tree::read_json(test_data, string_data);
 
-    BOOST_FOREACH(boost::property_tree::ptree::value_type &array_element, string_data) {
-        std::string out = hash<sha1>(array_element.first);
-
-        BOOST_CHECK_EQUAL(out, array_element.second.data());
-    }
+    return string_data; 
 }
 
-BOOST_AUTO_TEST_CASE(sha1_string_various_itr_value_hash) {
+BOOST_AUTO_TEST_SUITE(sha1_stream_processor_filedriven_test_suite)
 
-    boost::property_tree::ptree string_data;
-    boost::property_tree::read_json(test_data, string_data);
+BOOST_DATA_TEST_CASE(sha1_string_various_range_value_hash, string_data(), array_element) {
+    std::string out = hash<sha1>(array_element.first);
 
-    BOOST_FOREACH(boost::property_tree::ptree::value_type &array_element, string_data) {
-        std::string out = hash<sha1>(array_element.first.begin(), array_element.first.end());
+    BOOST_CHECK_EQUAL(out, array_element.second.data());
+}
 
-        BOOST_CHECK_EQUAL(out, array_element.second.data());
-    }
+BOOST_DATA_TEST_CASE(sha1_string_various_itr_value_hash, string_data(), array_element) {
+    std::string out = hash<sha1>(array_element.first.begin(), array_element.first.end());
+
+    BOOST_CHECK_EQUAL(out, array_element.second.data());
 }
 
 BOOST_AUTO_TEST_SUITE_END()
