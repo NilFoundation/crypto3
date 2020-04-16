@@ -12,6 +12,7 @@
 #include <nil/crypto3/hash/detail/tiger/tiger_policy.hpp>
 
 #include <nil/crypto3/hash/detail/merkle_damgard_construction.hpp>
+#include <nil/crypto3/hash/detail/merkle_damgard_padding.hpp>
 #include <nil/crypto3/hash/detail/block_stream_processor.hpp>
 
 namespace nil {
@@ -78,8 +79,10 @@ namespace nil {
                         constexpr static const std::size_t digest_bits = policy_type::digest_bits;
                     };
 
-                    typedef merkle_damgard_construction<params_type, typename policy_type::iv_generator,
-                                                        tiger_compressor<DigestBits, Passes>>
+                    typedef merkle_damgard_construction<
+                        params_type, typename policy_type::iv_generator,
+                        tiger_compressor<DigestBits, Passes>,
+                        detail::merkle_damgard_padding<typename params_type::digest_endian, policy_type>>
                         type;
                 };
 

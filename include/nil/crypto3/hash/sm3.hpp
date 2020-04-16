@@ -11,6 +11,7 @@
 
 #include <nil/crypto3/hash/detail/block_stream_processor.hpp>
 #include <nil/crypto3/hash/detail/merkle_damgard_construction.hpp>
+#include <nil/crypto3/hash/detail/merkle_damgard_padding.hpp>
 #include <nil/crypto3/hash/detail/state_adder.hpp>
 
 #include <nil/crypto3/hash/detail/sm3/sm3_policy.hpp>
@@ -204,7 +205,9 @@ namespace nil {
                         constexpr static const std::size_t digest_bits = policy_type::digest_bits;
                     };
 
-                    typedef merkle_damgard_construction<params_type, typename policy_type::iv_generator, sm3_compressor>
+                    typedef merkle_damgard_construction<
+                        params_type, typename policy_type::iv_generator, sm3_compressor,
+                        detail::merkle_damgard_padding<typename params_type::digest_endian, policy_type>>
                         type;
                 };
 
