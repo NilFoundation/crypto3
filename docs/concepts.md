@@ -1,4 +1,4 @@
-# Hash Concepts # {#hashes_concepts}
+# Concepts # {#hashes_concepts}
 
 ## Hash Concept ## {#hashes_concept}
 

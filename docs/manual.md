@@ -1,1 +1,1 @@
-# Hashes Manual # {#hashes_manual}
+# Manual # {#hashes_manual}
