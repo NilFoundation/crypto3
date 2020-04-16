@@ -1,1 +1,1 @@
-# Password Hashes Manual # {#passhash_manual}
+# Manual # {#passhash_manual}

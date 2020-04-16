@@ -1,4 +1,4 @@
-# Password Hashing Introduction # {#passhash_introduction}
+# Introduction # {#passhash_introduction}
 
 The Crypto3.Passhash library extends the =nil; Foundation's cryptography suite and provides a set password hashes
  implemented in way C++ standard library implies: concepts, algorithms, predictable behavior, latest standard features support and clean architecture without compromising security and performance.

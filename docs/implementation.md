@@ -1,1 +1,1 @@
-# Passhashes Implementation {#passhash_impl}
+# Implementation {#passhash_impl}
