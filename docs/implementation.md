@@ -1,4 +1,4 @@
-# Cipher Modes {#cipher_modes_impl}
+# Implementation {#modes_impl}
 
 Cipher modes usage is usually split to three stages:
 

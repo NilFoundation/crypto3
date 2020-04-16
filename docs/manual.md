@@ -1,1 +1,1 @@
-# Cipher Modes Manual # {#modes_manual}
+# Manual # {#modes_manual}
