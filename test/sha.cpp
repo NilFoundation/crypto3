@@ -10,20 +10,20 @@
 
 #define BOOST_TEST_MODULE sha_test
 
-#include <nil/crypto3/hash/algorithm/hash.hpp>
-
-#include <nil/crypto3/hash/sha.hpp>
-#include <nil/crypto3/hash/hash_state.hpp>
-
-#include <cassert>
-#include <cstring>
-#include <unordered_map>
-
-#include <boost/cstdint.hpp>
+#include <iostream>
 
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
+
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/foreach.hpp>
+
+#include <nil/crypto3/hash/algorithm/hash.hpp>
+
+#include <nil/crypto3/hash/sha.hpp>
+#include <nil/crypto3/hash/hash_state.hpp>
 
 using namespace nil::crypto3::hash;
 using namespace nil::crypto3::accumulators;
@@ -51,19 +51,37 @@ public:
     }
 };
 
-static const std::unordered_map<std::string, std::string> string_data = {
-    {"abc", "0164b8a914cd2a5e74c4f7ff082c4d97f1edf880"},
-    {"abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq", "d2516ee1acfa5baf33dfc1c471e438449ef134c8"},
-};
+const char *test_data = "data/sha.json";
 
+BOOST_AUTO_TEST_SUITE(sha_stream_processor_filedriven_test_suite)
+
+BOOST_AUTO_TEST_CASE(sha_string_various_range_value_hash) {
+
+    boost::property_tree::ptree string_data;
+    boost::property_tree::read_json(test_data, string_data);
+
+    BOOST_FOREACH(boost::property_tree::ptree::value_type &array_element, string_data) {
+        std::string out = hash<sha>(array_element.first);
+
+        BOOST_CHECK_EQUAL(out, array_element.second.data());
+    }
+}
+
+BOOST_AUTO_TEST_CASE(sha_string_various_itr_value_hash) {
+
+    boost::property_tree::ptree string_data;
+    boost::property_tree::read_json(test_data, string_data);
+
+    BOOST_FOREACH(boost::property_tree::ptree::value_type &array_element, string_data) {
+        std::string out = hash<sha>(array_element.first.begin(), array_element.first.end());
+
+        BOOST_CHECK_EQUAL(out, array_element.second.data());
+    }
+}
+
+BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(sha_stream_processor_test_suite)
-
-BOOST_DATA_TEST_CASE(sha_range_hash, boost::unit_test::data::make(string_data), array_element) {
-    std::string out = hash<sha>(array_element.first);
-
-    BOOST_CHECK_EQUAL(out, array_element.second);
-}
 
 BOOST_AUTO_TEST_CASE(sha_shortmsg_byte) {
 	// https://nvlpubs.nist.gov/nistpubs/Legacy/FIPS/NIST.FIPS.180.pdf

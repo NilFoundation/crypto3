@@ -10,23 +10,20 @@
 
 #define BOOST_TEST_MODULE md4_test
 
-#include <nil/crypto3/hash/algorithm/hash.hpp>
-
-#include <nil/crypto3/hash/md4.hpp>
-#include <nil/crypto3/hash/hash_state.hpp>
+#include <iostream>
 
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
 
-#include <boost/static_assert.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/foreach.hpp>
 
-#include <iostream>
-#include <string>
-#include <unordered_map>
+#include <nil/crypto3/hash/algorithm/hash.hpp>
 
-#include <cstdio>
-#include <cstring>
+#include <nil/crypto3/hash/md4.hpp>
+#include <nil/crypto3/hash/hash_state.hpp>
 
 using namespace nil::crypto3::hash;
 using namespace nil::crypto3::accumulators;
@@ -52,23 +49,37 @@ public:
     }
 };
 
-static const std::unordered_map<std::string, std::string> string_data = {
-    {"a", "bde52cb31de33e46245e05fbdbd6fb24"},
-    {"abc", "a448017aaf21d8525fc10ae87aa6729d"},
-    {"message digest", "d9130a8164549fe818874806e1c7014b"},
-    {"abcdefghijklmnopqrstuvwxyz", "d79e1c308aa5bbcdeea8ed63df412da9"},
-    {"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789", "043f8582f241db351ce627e153e7f0e4"},
-    {"12345678901234567890123456789012345678901234567890123456789012345678901234567890",
-     "e33b4ddc9c38f2199c3e7b164fcc0536"}};
+const char *test_data = "data/md4.json";
 
+BOOST_AUTO_TEST_SUITE(md4_stream_processor_filedriven_test_suite)
+
+BOOST_AUTO_TEST_CASE(md4_string_various_range_value_hash) {
+
+    boost::property_tree::ptree string_data;
+    boost::property_tree::read_json(test_data, string_data);
+
+    BOOST_FOREACH(boost::property_tree::ptree::value_type &array_element, string_data) {
+        std::string out = hash<md4>(array_element.first);
+
+        BOOST_CHECK_EQUAL(out, array_element.second.data());
+    }
+}
+
+BOOST_AUTO_TEST_CASE(md4_string_various_itr_value_hash) {
+
+    boost::property_tree::ptree string_data;
+    boost::property_tree::read_json(test_data, string_data);
+
+    BOOST_FOREACH(boost::property_tree::ptree::value_type &array_element, string_data) {
+        std::string out = hash<md4>(array_element.first.begin(), array_element.first.end());
+
+        BOOST_CHECK_EQUAL(out, array_element.second.data());
+    }
+}
+
+BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(md4_stream_processor_test_suite)
-
-BOOST_DATA_TEST_CASE(md4_return_range_hash, boost::unit_test::data::make(string_data), array_element) {
-    std::string out = hash<md4>(array_element.first);
-
-    BOOST_CHECK_EQUAL(out, array_element.second);
-}
 
 BOOST_AUTO_TEST_CASE(md4_shortmsg_byte1) { 
     // "a"

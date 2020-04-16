@@ -10,20 +10,20 @@
 
 #define BOOST_TEST_MODULE sha1_test
 
-#include <nil/crypto3/hash/algorithm/hash.hpp>
-
-#include <nil/crypto3/hash/sha1.hpp>
-#include <nil/crypto3/hash/hash_state.hpp>
-
-#include <cassert>
-#include <cstring>
-#include <unordered_map>
-
-#include <boost/cstdint.hpp>
+#include <iostream>
 
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
+
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/foreach.hpp>
+
+#include <nil/crypto3/hash/algorithm/hash.hpp>
+
+#include <nil/crypto3/hash/sha1.hpp>
+#include <nil/crypto3/hash/hash_state.hpp>
 
 using namespace nil::crypto3::hash;
 using namespace nil::crypto3::accumulators;
@@ -51,24 +51,37 @@ public:
     }
 };
 
-static const std::unordered_map<std::string, std::string> string_data = {
-    {"a", "86f7e437faa5a7fce15d1ddcb9eaeaea377667b8"},
-    {"abc", "a9993e364706816aba3e25717850c26c9cd0d89d"},
-    {"message digest", "c12252ceda8be8994d5fa0290a47231c1d16aae3"},
-    {"abcdefghijklmnopqrstuvwxyz", "32d10c7b8cf96570ca04ce37f2a19d84240d3a89"},
-    {"abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq", "84983e441c3bd26ebaae4aa1f95129e5e54670f1"},
-    {"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789", "761c457bf73b14d27e9e9265c46f4b4dda11f940"}, 
-    {"abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghijklmn"
-     "hijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstnopqrstu", "a49b2446a02c645bf419f995b67091253a04a259"}};
+const char *test_data = "data/sha1.json";
 
+BOOST_AUTO_TEST_SUITE(sha1_stream_processor_filedriven_test_suite)
+
+BOOST_AUTO_TEST_CASE(sha1_string_various_range_value_hash) {
+
+    boost::property_tree::ptree string_data;
+    boost::property_tree::read_json(test_data, string_data);
+
+    BOOST_FOREACH(boost::property_tree::ptree::value_type &array_element, string_data) {
+        std::string out = hash<sha1>(array_element.first);
+
+        BOOST_CHECK_EQUAL(out, array_element.second.data());
+    }
+}
+
+BOOST_AUTO_TEST_CASE(sha1_string_various_itr_value_hash) {
+
+    boost::property_tree::ptree string_data;
+    boost::property_tree::read_json(test_data, string_data);
+
+    BOOST_FOREACH(boost::property_tree::ptree::value_type &array_element, string_data) {
+        std::string out = hash<sha1>(array_element.first.begin(), array_element.first.end());
+
+        BOOST_CHECK_EQUAL(out, array_element.second.data());
+    }
+}
+
+BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(sha1_stream_processor_test_suite)
-
-BOOST_DATA_TEST_CASE(sha1_range_hash, boost::unit_test::data::make(string_data), array_element) {
-    std::string out = hash<sha1>(array_element.first);
-
-    BOOST_CHECK_EQUAL(out, array_element.second);
-}
 
 BOOST_AUTO_TEST_CASE(sha1_shortmsg_byte1) {
     // echo -n "a" | sha1sum 
