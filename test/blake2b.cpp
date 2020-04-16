@@ -53,14 +53,15 @@ public:
     virtual ~fixture() {
     }
 };
+    
+const char *test_data = "data/blake2b.json";
 
-
-BOOST_AUTO_TEST_SUITE(blake2b_stream_processor_test_suite)
+BOOST_AUTO_TEST_SUITE(blake2b_stream_processor_filedriven_test_suite)
 
 BOOST_AUTO_TEST_CASE(blake2b_224_string_various_range_value_hash) {
 
     boost::property_tree::ptree string_data;
-    boost::property_tree::read_json("blake2b.json", string_data);
+    boost::property_tree::read_json(test_data, string_data);
     boost::property_tree::ptree string_data_224 = string_data.get_child("data_224");
 
     BOOST_FOREACH(boost::property_tree::ptree::value_type &array_element, string_data_224) {
@@ -73,7 +74,7 @@ BOOST_AUTO_TEST_CASE(blake2b_224_string_various_range_value_hash) {
 BOOST_AUTO_TEST_CASE(blake2b_224_string_various_itr_value_hash) {
 
     boost::property_tree::ptree string_data;
-    boost::property_tree::read_json("blake2b.json", string_data);
+    boost::property_tree::read_json(test_data, string_data);
     boost::property_tree::ptree string_data_224 = string_data.get_child("data_224");
 
     BOOST_FOREACH(boost::property_tree::ptree::value_type &array_element, string_data_224) {
@@ -86,7 +87,7 @@ BOOST_AUTO_TEST_CASE(blake2b_224_string_various_itr_value_hash) {
 BOOST_AUTO_TEST_CASE(blake2b_256_string_various_range_value_hash) {
 
     boost::property_tree::ptree string_data;
-    boost::property_tree::read_json("blake2b.json", string_data);
+    boost::property_tree::read_json(test_data, string_data);
     boost::property_tree::ptree string_data_256 = string_data.get_child("data_256");
 
     BOOST_FOREACH(boost::property_tree::ptree::value_type &array_element, string_data_256) {
@@ -99,7 +100,7 @@ BOOST_AUTO_TEST_CASE(blake2b_256_string_various_range_value_hash) {
 BOOST_AUTO_TEST_CASE(blake2b_256_string_various_itr_value_hash) {
 
     boost::property_tree::ptree string_data;
-    boost::property_tree::read_json("blake2b.json", string_data);
+    boost::property_tree::read_json(test_data, string_data);
     boost::property_tree::ptree string_data_256 = string_data.get_child("data_256");
 
     BOOST_FOREACH(boost::property_tree::ptree::value_type &array_element, string_data_256) {
@@ -112,7 +113,7 @@ BOOST_AUTO_TEST_CASE(blake2b_256_string_various_itr_value_hash) {
 BOOST_AUTO_TEST_CASE(blake2b_384_string_various_range_value_hash) {
 
     boost::property_tree::ptree string_data;
-    boost::property_tree::read_json("blake2b.json", string_data);
+    boost::property_tree::read_json(test_data, string_data);
     boost::property_tree::ptree string_data_384 = string_data.get_child("data_384");
 
     BOOST_FOREACH(boost::property_tree::ptree::value_type &array_element, string_data_384) {
@@ -125,7 +126,7 @@ BOOST_AUTO_TEST_CASE(blake2b_384_string_various_range_value_hash) {
 BOOST_AUTO_TEST_CASE(blake2b_384_string_various_itr_value_hash) {
 
     boost::property_tree::ptree string_data;
-    boost::property_tree::read_json("blake2b.json", string_data);
+    boost::property_tree::read_json(test_data, string_data);
     boost::property_tree::ptree string_data_384 = string_data.get_child("data_384");
 
     BOOST_FOREACH(boost::property_tree::ptree::value_type &array_element, string_data_384) {
@@ -138,7 +139,7 @@ BOOST_AUTO_TEST_CASE(blake2b_384_string_various_itr_value_hash) {
 BOOST_AUTO_TEST_CASE(blake2b_512_string_various_range_value_hash) {
 
     boost::property_tree::ptree string_data;
-    boost::property_tree::read_json("blake2b.json", string_data);
+    boost::property_tree::read_json(test_data, string_data);
     boost::property_tree::ptree string_data_512 = string_data.get_child("data_512");
 
     BOOST_FOREACH(boost::property_tree::ptree::value_type &array_element, string_data_512) {
@@ -151,7 +152,7 @@ BOOST_AUTO_TEST_CASE(blake2b_512_string_various_range_value_hash) {
 BOOST_AUTO_TEST_CASE(blake2b_512_string_various_itr_value_hash) {
 
     boost::property_tree::ptree string_data;
-    boost::property_tree::read_json("blake2b.json", string_data);
+    boost::property_tree::read_json(test_data, string_data);
     boost::property_tree::ptree string_data_512 = string_data.get_child("data_512");
 
     BOOST_FOREACH(boost::property_tree::ptree::value_type &array_element, string_data_512) {
@@ -160,7 +161,9 @@ BOOST_AUTO_TEST_CASE(blake2b_512_string_various_itr_value_hash) {
         BOOST_CHECK_EQUAL(out, array_element.second.data());
     }
 }
+BOOST_AUTO_TEST_SUITE_END()
 
+BOOST_AUTO_TEST_SUITE(blake2b_stream_processor_test_suite)
 
 BOOST_AUTO_TEST_CASE(blake2b_224_shortmsg_byte1) {
     // "a"
