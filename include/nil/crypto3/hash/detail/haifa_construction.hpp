@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Alexander Sokolov <asokolov@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -33,10 +34,12 @@ namespace nil {
              *
              * @note https://eprint.iacr.org/2007/278.pdf
              */
-            template<typename Params, typename IV, typename Compressor, typename Finalizer = detail::nop_finalizer>
+            template<typename Params, typename IV, typename Compressor, typename Padding,
+            typename Finalizer = detail::nop_finalizer>
             class haifa_construction {
             public:
                 typedef Compressor compressor_functor;
+                typedef Padding padding_functor;
                 typedef Finalizer finalizer_functor;
 
                 typedef typename Params::digest_endian endian_type;
@@ -82,18 +85,23 @@ namespace nil {
                 }
 
                 inline digest_type digest(const block_type &block = block_type(),
-                                          length_type total_seen = length_type()) {
+                                          std::size_t total_seen = length_type()) {
                     using namespace nil::crypto3::detail;
 
-                    block_type b;
-                    std::move(block.begin(), block.end(), b.begin());
+                    block_type b = block;
+                    // Process block if it is full
+                    if (total_seen && !(total_seen % block_bits))
+                        process_block(b, total_seen);
+
+                    // Pad last message block
+                    padding_functor padding;
+                    padding(b, total_seen);
+
+                    // Process last block 
+                    process_block(b, total_seen, salt_value);
 
                     // Apply finalizer
-                    finalizer_functor finalizer;
-                    finalizer(b, total_seen);
-
-                    // Process the last block
-                    process_block(b, total_seen, salt_value);
+                    finalizer_functor()(state_);
 
                     // Convert digest to byte representation
                     std::array<octet_type, state_bits / octet_bits> d_full;

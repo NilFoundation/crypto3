@@ -15,7 +15,7 @@ namespace nil {
         	namespace detail {
 	            struct nop_finalizer {
 	                template<typename T>
-	                void operator()(T &, T = T()) {
+	                void operator()(T &) {
 	                }
 	            };
         	}	// namespace detail

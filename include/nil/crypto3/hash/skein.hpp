@@ -17,6 +17,7 @@
 #include <nil/crypto3/hash/detail/block_stream_processor.hpp>
 #include <nil/crypto3/hash/detail/matyas_meyer_oseas_compressor.hpp>
 #include <nil/crypto3/hash/detail/merkle_damgard_construction.hpp>
+#include <nil/crypto3/hash/detail/merkle_damgard_padding.hpp>
 
 #include <string>
 #include <memory>
@@ -70,7 +71,8 @@ namespace nil {
                     typedef merkle_damgard_construction<
                         params_type, typename policy_type::iv_generator,
                         matyas_meyer_oseas_compressor<block_cipher_type, detail::state_adder,
-                                                      skein_key_converter<DigestBits>>>
+                                                      skein_key_converter<DigestBits>>,
+                        detail::merkle_damgard_padding<typename params_type::digest_endian, policy_type>>
                         type;
                 };
 

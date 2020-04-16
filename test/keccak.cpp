@@ -8,20 +8,17 @@
 
 #define BOOST_TEST_MODULE keccak_test
 
-#include <nil/crypto3/detail/static_digest.hpp>
-
-#include <nil/crypto3/hash/keccak.hpp>
-#include <nil/crypto3/hash/hash_state.hpp>
-
-#include <nil/crypto3/hash/algorithm/hash.hpp>
+#include <iostream>
 
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
 
-#include <boost/static_assert.hpp>
+#include <nil/crypto3/hash/algorithm/hash.hpp>
 
-#include <iostream>
+#include <nil/crypto3/hash/keccak.hpp>
+#include <nil/crypto3/hash/hash_state.hpp>
+
 #include <string>
 #include <unordered_map>
 
@@ -66,40 +63,40 @@ BOOST_AUTO_TEST_SUITE(keccak_test_suite)
 
 BOOST_DATA_TEST_CASE(keccak_1600_range_itr_hash, boost::unit_test::data::make(byte_data), array_element) {
     std::vector<uint8_t> out;
-    hash<keccak_1600>(array_element.first, std::back_inserter(out));
+    hash<keccak_1600<512>>(array_element.first, std::back_inserter(out));
 
     BOOST_CHECK_EQUAL(out, array_element.second);
 }
 
 BOOST_DATA_TEST_CASE(keccak_1600_various_range_value_hash, boost::unit_test::data::make(byte_data), array_element) {
-    std::vector<uint8_t> out = hash<keccak_1600>(array_element.first);
+    std::vector<uint8_t> out = hash<keccak_1600<512>>(array_element.first);
 
     BOOST_CHECK_EQUAL(out, array_element.second);
 }
 
 BOOST_DATA_TEST_CASE(keccak_1600_various_itr_value_hash, boost::unit_test::data::make(byte_data), array_element) {
-    std::vector<uint8_t> out = hash<keccak_1600>(array_element.first.begin(), array_element.first.end());
+    std::vector<uint8_t> out = hash<keccak_1600<512>>(array_element.first.begin(), array_element.first.end());
 
     BOOST_CHECK_EQUAL(out, array_element.second);
 }
 
 BOOST_DATA_TEST_CASE(keccak_1600_iterator_itr_hash, boost::unit_test::data::make(byte_data), array_element) {
     std::vector<uint8_t> out;
-    hash<keccak_1600>(array_element.first.begin(), array_element.first.end(), std::back_inserter(out));
+    hash<keccak_1600<512>>(array_element.first.begin(), array_element.first.end(), std::back_inserter(out));
 
     BOOST_CHECK_EQUAL(out, array_element.second);
 }
 
 BOOST_DATA_TEST_CASE(keccak_1600_string_various_range_value_hash, boost::unit_test::data::make(string_data),
                      array_element) {
-    std::string out = hash<keccak_1600>(array_element.first);
+    std::string out = hash<keccak_1600<512>>(array_element.first);
 
     BOOST_CHECK_EQUAL(out, array_element.second);
 }
 
 BOOST_DATA_TEST_CASE(keccak_1600_string_various_itr_value_hash, boost::unit_test::data::make(string_data),
                      array_element) {
-    std::string out = hash<keccak_1600>(array_element.first.begin(), array_element.first.end());
+    std::string out = hash<keccak_1600<512>>(array_element.first.begin(), array_element.first.end());
 
     BOOST_CHECK_EQUAL(out, array_element.second);
 }

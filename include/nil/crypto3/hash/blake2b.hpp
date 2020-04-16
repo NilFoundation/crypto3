@@ -12,7 +12,7 @@
 #define CRYPTO3_HASH_BLAKE2B_HPP
 
 #include <nil/crypto3/hash/detail/blake2b/blake2b_functions.hpp>
-#include <nil/crypto3/hash/detail/blake2b/blake2b_finalizer.hpp>
+#include <nil/crypto3/hash/detail/blake2b/blake2b_padding.hpp>
 
 #include <nil/crypto3/hash/detail/haifa_construction.hpp>
 #include <nil/crypto3/hash/detail/block_stream_processor.hpp>
@@ -117,7 +117,7 @@ namespace nil {
 
                     typedef haifa_construction<
                         params_type, typename policy_type::iv_generator, blake2b_compressor<DigestBits>,
-                        detail::blake2b_finalizer<typename params_type::digest_endian, policy_type>>
+                        detail::blake2b_padding<typename params_type::digest_endian, policy_type>>
                         type;
                 };
 

@@ -8,8 +8,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_BLAKE2B_FINALIZER_HPP
-#define CRYPTO3_BLAKE2B_FINALIZER_HPP
+#ifndef CRYPTO3_BLAKE2B_PADDING_HPP
+#define CRYPTO3_BLAKE2B_PADDING_HPP
 
 #include <nil/crypto3/hash/detail/blake2b/blake2b_policy.hpp>
 
@@ -18,7 +18,7 @@ namespace nil {
         namespace hash {
             namespace detail {
                 template<typename Endianness, typename PolicyType>
-                class blake2b_finalizer {
+                class blake2b_padding {
                     typedef PolicyType policy_type;
 
                     constexpr static const std::size_t word_bits = policy_type::word_bits;
@@ -52,4 +52,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_BLAKE2B_FINALIZER_HPP
+#endif    // CRYPTO3_BLAKE2B_PADDING_HPP

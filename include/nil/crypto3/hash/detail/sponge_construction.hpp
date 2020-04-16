@@ -38,8 +38,8 @@ namespace nil {
             public:
                 typedef IV iv_generator;
                 typedef Compressor compressor_functor;
-                typedef Finalizer finalizer_functor;
                 typedef Padding padding_functor;
+                typedef Finalizer finalizer_functor;
 
                 typedef typename Params::digest_endian endian_type;
 
@@ -65,10 +65,13 @@ namespace nil {
                     return *this;
                 }
 
-                digest_type digest(const block_type &block = block_type(), std::size_t total_seen = std::size_t()) {
+                inline digest_type digest(const block_type &block = block_type(), 
+                                          std::size_t total_seen = std::size_t()) {
+                    using namespace nil::crypto3::detail;
+
                     block_type b = block;
                     std::size_t block_seen = total_seen % block_bits;
-                    // Process block if block is full
+                    // Process block if it is full
                     if (total_seen && !block_seen)
                         process_block(b);
 
@@ -90,8 +93,8 @@ namespace nil {
 
                     // Convert digest to byte representation
                     std::array<octet_type, state_bits / octet_bits> d_full;
-                    nil::crypto3::detail::pack_n<endian_type, word_bits, octet_bits>(
-                        state_.data(), state_words, d_full.data(), state_bits / octet_bits);
+                    pack_n<endian_type, word_bits, octet_bits>(state_.data(), state_words, d_full.data(), 
+                                                               state_bits / octet_bits);
 
                     digest_type d;
                     std::copy(d_full.begin(), d_full.begin() + digest_bytes, d.begin());
@@ -124,4 +127,4 @@ namespace nil {
     }        // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_HASH_MERKLE_DAMGARD_BLOCK_HASH_HPP
+#endif    // CRYPTO3_HASH_SPONGE_CONSTRUCTION_HPP

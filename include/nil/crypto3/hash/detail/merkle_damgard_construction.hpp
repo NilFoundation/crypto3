@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Alexander Sokolov <asokolov@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -10,11 +11,9 @@
 #define CRYPTO3_HASH_MERKLE_DAMGARD_CONSTRUCTION_HPP
 
 #include <nil/crypto3/hash/detail/nop_finalizer.hpp>
-#include <nil/crypto3/hash/detail/merkle_damgard_finalizer.hpp>
 
 #include <nil/crypto3/detail/static_digest.hpp>
 #include <nil/crypto3/detail/pack.hpp>
-#include <nil/crypto3/detail/unbounded_shift.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -35,11 +34,13 @@ namespace nil {
              *
              * @note http://www.merkle.com/papers/Thesis1979.pdf
              */
-            template<typename Params, typename IV, typename Compressor, typename Finalizer = detail::nop_finalizer>
+            template<typename Params, typename IV, typename Compressor, typename Padding,
+            typename Finalizer = detail::nop_finalizer>
             class merkle_damgard_construction {
             public:
                 typedef IV iv_generator;
                 typedef Compressor compressor_functor;
+                typedef Padding padding_functor;
                 typedef Finalizer finalizer_functor;
 
                 typedef typename Params::digest_endian endian_type;
@@ -85,17 +86,26 @@ namespace nil {
                     // Process block if block is full
                     if (total_seen && !block_seen)
                         process_block(b);
-                    // Apply finalizer
-                    finalizer_functor()(b, block_seen);
+                    
+                    // Pad last message block
+                    padding_functor padding;
+                    padding(b, block_seen);
+                    
                     // Process block if total length cannot be appended
                     if (block_seen + length_bits > block_bits) {
                         process_block(b);
                         std::fill(b.begin(), b.end(), 0);
                     }
+                    
                     // Append total length to the last block
                     append_length<int>(b, total_seen);
+                    
                     // Process the last block
                     process_block(b);
+                    
+                    // Apply finalizer
+                    finalizer_functor()(state_);
+
                     // Convert digest to byte representation
                     digest_type d;
                     pack_n<endian_type, word_bits, octet_bits>(state_.data(), digest_words, d.data(), digest_bytes);

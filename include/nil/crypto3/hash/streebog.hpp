@@ -13,6 +13,7 @@
 #include <nil/crypto3/hash/detail/miyaguchi_preneel_compressor.hpp>
 #include <nil/crypto3/hash/detail/block_stream_processor.hpp>
 #include <nil/crypto3/hash/detail/merkle_damgard_construction.hpp>
+#include <nil/crypto3/hash/detail/merkle_damgard_padding.hpp>
 
 #include <nil/crypto3/hash/detail/streebog/streebog_functions.hpp>
 
@@ -47,7 +48,8 @@ namespace nil {
                     typedef merkle_damgard_construction<
                         params_type, typename policy_type::iv_generator,
                         miyaguchi_preneel_compressor<block_cipher_type, detail::state_adder,
-                                                     streebog_key_converter<DigestBits>>>
+                                                     streebog_key_converter<DigestBits>>,
+                        detail::merkle_damgard_padding<typename params_type::digest_endian, policy_type>>
                         type;
                 };
 
