@@ -1,1 +1,1 @@
-# Password Based Key Derivation Functions Manual # {#pbkdf_manual}
+# Manual # {#pbkdf_manual}
