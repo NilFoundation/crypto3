@@ -15,6 +15,9 @@
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
 
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
+
 #include <nil/crypto3/hash/algorithm/hash.hpp>
 
 #include <nil/crypto3/hash/sha2.hpp>
@@ -22,6 +25,23 @@
 
 using namespace nil::crypto3::hash;
 using namespace nil::crypto3::accumulators;
+
+namespace boost {
+    namespace test_tools {
+        namespace tt_detail {
+            template<template<typename, typename> class P, typename K, typename V>
+            struct print_log_value<P<K, V>> {
+                void operator()(std::ostream&, P<K, V> const&) {
+                }
+            };
+        }    // namespace tt_detail
+    }        // namespace test_tools
+}    // namespace boost
+
+BOOST_TEST_DONT_PRINT_LOG_VALUE(sha2<224>::digest_type)
+BOOST_TEST_DONT_PRINT_LOG_VALUE(sha2<256>::digest_type)
+BOOST_TEST_DONT_PRINT_LOG_VALUE(sha2<384>::digest_type)
+BOOST_TEST_DONT_PRINT_LOG_VALUE(sha2<512>::digest_type)
 
 template<std::size_t Size>
 class fixture {
@@ -33,12 +53,45 @@ public:
     }
 };
 
-BOOST_TEST_DONT_PRINT_LOG_VALUE(sha2<224>::digest_type)
-BOOST_TEST_DONT_PRINT_LOG_VALUE(sha2<256>::digest_type)
-BOOST_TEST_DONT_PRINT_LOG_VALUE(sha2<384>::digest_type)
-BOOST_TEST_DONT_PRINT_LOG_VALUE(sha2<512>::digest_type)
+const char *test_data = "data/sha2.json";
 
-BOOST_AUTO_TEST_SUITE(sha2_test_suite)
+boost::property_tree::ptree string_data(const char *child_name) {
+    boost::property_tree::ptree root_data;
+    boost::property_tree::read_json(test_data, root_data);
+    boost::property_tree::ptree string_data = root_data.get_child(child_name);
+
+    return string_data;
+}
+
+BOOST_AUTO_TEST_SUITE(sha2_stream_processor_filedriven_test_suite)
+
+BOOST_DATA_TEST_CASE(sha2_224_range_hash, string_data("data_224"), array_element) {
+    std::string out = hash<sha2<224>>(array_element.first);
+
+    BOOST_CHECK_EQUAL(out, array_element.second.data());
+}
+
+BOOST_DATA_TEST_CASE(sha2_256_range_hash, string_data("data_256"), array_element) {
+    std::string out = hash<sha2<256>>(array_element.first);
+
+    BOOST_CHECK_EQUAL(out, array_element.second.data());
+}
+
+BOOST_DATA_TEST_CASE(sha2_384_range_hash, string_data("data_384"), array_element) {
+    std::string out = hash<sha2<384>>(array_element.first);
+
+    BOOST_CHECK_EQUAL(out, array_element.second.data());
+}
+
+BOOST_DATA_TEST_CASE(sha2_512_range_hash, string_data("data_512"), array_element) {
+    std::string out = hash<sha2<512>>(array_element.first);
+
+    BOOST_CHECK_EQUAL(out, array_element.second.data());
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(sha2_stream_processor_test_suite)
 
 //
 // Appendix references are from
@@ -49,8 +102,6 @@ BOOST_AUTO_TEST_SUITE(sha2_test_suite)
 // Additional test vectors from
 // http://csrc.nist.gov/groups/ST/toolkit/documents/Examples/SHA_All.pdf
 //
-
-
 
 BOOST_AUTO_TEST_CASE(sha2_224_shortmsg_bit) {
     // From http://csrc.nist.gov/groups/STM/cavp/documents/shs/SHAVS.pdf
@@ -190,6 +241,10 @@ BOOST_AUTO_TEST_CASE(sha2_512_shortmsg_byte2) {
 
     BOOST_CHECK_EQUAL("59f1856303ff165e2ab5683dddeb6e8ad81f15bb578579b999eb5746680f22cfec6dba741e591ca4d9e53904837701b374be74bbc0847a92179ac2b67496d807", std::to_string(d).data());
 }
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(sha2_accumulator_test_suite)
 
 BOOST_FIXTURE_TEST_CASE(sha2_256_accumulator2, fixture<256>) {
     // Example from appendix B.1: echo -n "abc" | sha256sum

@@ -10,21 +10,19 @@
 
 #define BOOST_TEST_MODULE md5_test
 
+#include <iostream>
+
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
+
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
 
 #include <nil/crypto3/hash/algorithm/hash.hpp>
 
 #include <nil/crypto3/hash/md5.hpp>
 #include <nil/crypto3/hash/hash_state.hpp>
-
-#include <iostream>
-#include <string>
-#include <unordered_map>
-
-#include <cstdio>
-#include <cstring>
 
 using namespace nil::crypto3::hash;
 using namespace nil::crypto3::accumulators;
@@ -50,26 +48,32 @@ public:
     }
 };
 
-static const std::unordered_map<std::string, std::string> string_data = {
-    {"a", "0cc175b9c0f1b6a831c399e269772661"},
-    {"\x24", "c3e97dd6e97fb5125688c97f36720cbe"},
-    {"abc", "900150983cd24fb0d6963f7d28e17f72"},
-    {"message digest", "f96b697d7cb7938d525a2f31aaf161d0"},
-    {"abcdefghijklmnopqrstuvwxyz", "c3fcd3d76192e4007dfb496cca67e13b"},
-    {"The quick brown fox jumped over the lazy dog's back","e38ca1d920c4b8b8d3946b2c72f01680"},
-    {"abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq","8215ef0796a20bcaaae116d3876c664a"},
-    {"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789", "d174ab98d277d9f5a5611c2c9f419d9f"},
-    {"12345678901234567890123456789012345678901234567890123456789012345678901234567890",
-     "57edf4a22be3c955ac49da2e2107b67a"}};
+const char *test_data = "data/md5.json";
 
+boost::property_tree::ptree string_data() {
+    boost::property_tree::ptree string_data;
+    boost::property_tree::read_json(test_data, string_data);
 
-BOOST_AUTO_TEST_SUITE(md5_stream_processor_test_suite)
+    return string_data; 
+}
 
-BOOST_DATA_TEST_CASE(md5_range_hash, boost::unit_test::data::make(string_data), array_element) {
+BOOST_AUTO_TEST_SUITE(md5_stream_processor_filedriven_test_suite)
+
+BOOST_DATA_TEST_CASE(md5_string_various_range_value_hash, string_data(), array_element) {
     std::string out = hash<md5>(array_element.first);
 
-    BOOST_CHECK_EQUAL(out, array_element.second);
+    BOOST_CHECK_EQUAL(out, array_element.second.data());
 }
+
+BOOST_DATA_TEST_CASE(md5_string_various_itr_value_hash, string_data(), array_element) {
+    std::string out = hash<md5>(array_element.first.begin(), array_element.first.end());
+
+    BOOST_CHECK_EQUAL(out, array_element.second.data());
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(md5_stream_processor_test_suite)
 
 BOOST_AUTO_TEST_CASE(md5_shortmsg_byte1) {
     // echo -n "a" | md5sum 
