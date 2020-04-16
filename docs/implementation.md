@@ -1,1 +1,1 @@
-# Message Authentication Codes Implementation {#mac_impl}
+# Implementation {#mac_impl}

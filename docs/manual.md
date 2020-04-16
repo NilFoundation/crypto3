@@ -1,1 +1,1 @@
-# Message Authentication Codes Manual # {#mac_manual}
+# Manual # {#mac_manual}

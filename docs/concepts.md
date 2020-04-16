@@ -1,4 +1,4 @@
-# Message Authentication Codes Concepts # {#mac_concepts}
+# Concepts # {#mac_concepts}
 
 ## MessageAuthenticationCode Concept ## {#mac_concept}
 
