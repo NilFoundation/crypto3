@@ -1,5 +1,5 @@
-# Codecs {#codecs}
-@subpage codecs_introduction
-@subpage codecs_manual
-@subpage codecs_concepts
-@subpage codecs_impl
+# Codecs {#codec_index}
+@subpage codec_introduction
+@subpage codec_manual
+@subpage codec_concepts
+@subpage codec_impl
