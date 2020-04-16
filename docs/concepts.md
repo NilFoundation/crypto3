@@ -1,4 +1,4 @@
-# Stream Ciphers Concepts # {#stream_ciphers_concepts}
+# Concepts # {#stream_ciphers_concepts}
 
 ## Stream Ciphers Concept ## {#stream_ciphers_concept}
 

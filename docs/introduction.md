@@ -1,4 +1,4 @@
-# Stream Ciphers Introduction # {#stream_ciphers_introduction}
+# Introduction # {#stream_ciphers_introduction}
 
 The Crypto3.Stream library extends the Nil Foundation's cryptography suite and provides a set of stream ciphers
  implemented in way C++ standard library implies: concepts, algorithms, predictable behavior, latest standard features

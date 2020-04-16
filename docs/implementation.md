@@ -1,1 +1,1 @@
-# Stream Ciphers Implementation # {#stream_ciphers_impl}
+# Implementation # {#stream_ciphers_impl}
