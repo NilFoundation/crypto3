@@ -1,4 +1,4 @@
-# Codec Concepts # {#codec_concepts}
+# Concepts # {#codec_concepts}
 
 ## Codec Concept ## {#codec_concept}
 

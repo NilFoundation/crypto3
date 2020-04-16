@@ -1,4 +1,4 @@
-# Codec Implementation # {#codec_impl}
+# Implementation # {#codec_impl}
 
 Encoders/decoders usage is usually split to three stages:
 
