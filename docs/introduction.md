@@ -1,4 +1,4 @@
-# Block Ciphers Introduction # {#block_ciphers_introduction}
+# Introduction # {#block_ciphers_introduction}
 
 Crypto3.Block library extends the =nil; Foundation's
 cryptography suite and provides a set of block ciphers

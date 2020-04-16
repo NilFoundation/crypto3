@@ -1,4 +1,4 @@
-# Block Ciphers Concepts # {#block_ciphers_concepts}
+# Concepts # {#block_ciphers_concepts}
 
 ## BlockCipher Concept ## {#block_cipher_concept}
 
