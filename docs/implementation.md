@@ -1,1 +1,1 @@
-# Key Derivation Functions Implementation {#kdf_impl}
+# Implementation {#kdf_impl}

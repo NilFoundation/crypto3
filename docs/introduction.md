@@ -1,4 +1,4 @@
-# Key Derivation Functions Introduction # {#kdf_introduction}
+# Introduction # {#kdf_introduction}
 
 The Crypto3.Kdf library extends the Nil Foundation's cryptography suite and provides a set of key derivation
  functions implemented in way C++ standard library implies: concepts, algorithms, predictable behavior, latest standard features support and clean architecture without compromising security and performance.

@@ -1,1 +1,1 @@
-# Key Derivation Functions Manual {#kdf_manual}
+# Manual {#kdf_manual}
