@@ -18,7 +18,6 @@
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
-#include <boost/foreach.hpp>
 
 #include <nil/crypto3/hash/algorithm/hash.hpp>
 
@@ -56,111 +55,64 @@ public:
     
 const char *test_data = "data/blake2b.json";
 
+boost::property_tree::ptree string_data(const char *child_name) {
+    boost::property_tree::ptree root_data;
+    boost::property_tree::read_json(test_data, root_data);
+    boost::property_tree::ptree string_data = root_data.get_child(child_name);
+
+    return string_data;
+}
+
 BOOST_AUTO_TEST_SUITE(blake2b_stream_processor_filedriven_test_suite)
 
-BOOST_AUTO_TEST_CASE(blake2b_224_string_various_range_value_hash) {
+BOOST_DATA_TEST_CASE(blake2b_224_string_various_range_value_hash, string_data("data_224"), array_element) {
+    std::string out = hash<blake2b<224>>(array_element.first);
 
-    boost::property_tree::ptree string_data;
-    boost::property_tree::read_json(test_data, string_data);
-    boost::property_tree::ptree string_data_224 = string_data.get_child("data_224");
-
-    BOOST_FOREACH(boost::property_tree::ptree::value_type &array_element, string_data_224) {
-        std::string out = hash<blake2b<224>>(array_element.first);
-
-        BOOST_CHECK_EQUAL(out, array_element.second.data());
-    }
+    BOOST_CHECK_EQUAL(out, array_element.second.data());
 }
 
-BOOST_AUTO_TEST_CASE(blake2b_224_string_various_itr_value_hash) {
+BOOST_DATA_TEST_CASE(blake2b_224_string_various_itr_value_hash, string_data("data_224"), array_element) {
+    std::string out = hash<blake2b<224>>(array_element.first.begin(), array_element.first.end());
 
-    boost::property_tree::ptree string_data;
-    boost::property_tree::read_json(test_data, string_data);
-    boost::property_tree::ptree string_data_224 = string_data.get_child("data_224");
-
-    BOOST_FOREACH(boost::property_tree::ptree::value_type &array_element, string_data_224) {
-        std::string out = hash<blake2b<224>>(array_element.first.begin(), array_element.first.end());
-
-        BOOST_CHECK_EQUAL(out, array_element.second.data());
-    }
+    BOOST_CHECK_EQUAL(out, array_element.second.data());
 }
 
-BOOST_AUTO_TEST_CASE(blake2b_256_string_various_range_value_hash) {
+BOOST_DATA_TEST_CASE(blake2b_256_string_various_range_value_hash, string_data("data_256"), array_element) {
+    std::string out = hash<blake2b<256>>(array_element.first);
 
-    boost::property_tree::ptree string_data;
-    boost::property_tree::read_json(test_data, string_data);
-    boost::property_tree::ptree string_data_256 = string_data.get_child("data_256");
-
-    BOOST_FOREACH(boost::property_tree::ptree::value_type &array_element, string_data_256) {
-        std::string out = hash<blake2b<256>>(array_element.first);
-
-        BOOST_CHECK_EQUAL(out, array_element.second.data());
-    }
+    BOOST_CHECK_EQUAL(out, array_element.second.data());
 }
 
-BOOST_AUTO_TEST_CASE(blake2b_256_string_various_itr_value_hash) {
+BOOST_DATA_TEST_CASE(blake2b_256_string_various_itr_value_hash, string_data("data_256"), array_element) {
+    std::string out = hash<blake2b<256>>(array_element.first.begin(), array_element.first.end());
 
-    boost::property_tree::ptree string_data;
-    boost::property_tree::read_json(test_data, string_data);
-    boost::property_tree::ptree string_data_256 = string_data.get_child("data_256");
-
-    BOOST_FOREACH(boost::property_tree::ptree::value_type &array_element, string_data_256) {
-        std::string out = hash<blake2b<256>>(array_element.first.begin(), array_element.first.end());
-
-        BOOST_CHECK_EQUAL(out, array_element.second.data());
-    }
+    BOOST_CHECK_EQUAL(out, array_element.second.data());
 }
 
-BOOST_AUTO_TEST_CASE(blake2b_384_string_various_range_value_hash) {
+BOOST_DATA_TEST_CASE(blake2b_384_string_various_range_value_hash, string_data("data_384"), array_element) {
+    std::string out = hash<blake2b<384>>(array_element.first);
 
-    boost::property_tree::ptree string_data;
-    boost::property_tree::read_json(test_data, string_data);
-    boost::property_tree::ptree string_data_384 = string_data.get_child("data_384");
-
-    BOOST_FOREACH(boost::property_tree::ptree::value_type &array_element, string_data_384) {
-        std::string out = hash<blake2b<384>>(array_element.first);
-
-        BOOST_CHECK_EQUAL(out, array_element.second.data());
-    }
+    BOOST_CHECK_EQUAL(out, array_element.second.data());
 }
 
-BOOST_AUTO_TEST_CASE(blake2b_384_string_various_itr_value_hash) {
+BOOST_DATA_TEST_CASE(blake2b_384_string_various_itr_value_hash, string_data("data_384"), array_element) {
+    std::string out = hash<blake2b<384>>(array_element.first.begin(), array_element.first.end());
 
-    boost::property_tree::ptree string_data;
-    boost::property_tree::read_json(test_data, string_data);
-    boost::property_tree::ptree string_data_384 = string_data.get_child("data_384");
-
-    BOOST_FOREACH(boost::property_tree::ptree::value_type &array_element, string_data_384) {
-        std::string out = hash<blake2b<384>>(array_element.first.begin(), array_element.first.end());
-
-        BOOST_CHECK_EQUAL(out, array_element.second.data());
-    }
+    BOOST_CHECK_EQUAL(out, array_element.second.data());
 }
 
-BOOST_AUTO_TEST_CASE(blake2b_512_string_various_range_value_hash) {
+BOOST_DATA_TEST_CASE(blake2b_512_string_various_range_value_hash, string_data("data_512"), array_element) {
+    std::string out = hash<blake2b<512>>(array_element.first);
 
-    boost::property_tree::ptree string_data;
-    boost::property_tree::read_json(test_data, string_data);
-    boost::property_tree::ptree string_data_512 = string_data.get_child("data_512");
-
-    BOOST_FOREACH(boost::property_tree::ptree::value_type &array_element, string_data_512) {
-        std::string out = hash<blake2b<512>>(array_element.first);
-
-        BOOST_CHECK_EQUAL(out, array_element.second.data());
-    }
+    BOOST_CHECK_EQUAL(out, array_element.second.data());
 }
 
-BOOST_AUTO_TEST_CASE(blake2b_512_string_various_itr_value_hash) {
+BOOST_DATA_TEST_CASE(blake2b_512_string_various_itr_value_hash, string_data("data_512"), array_element) {
+    std::string out = hash<blake2b<512>>(array_element.first.begin(), array_element.first.end());
 
-    boost::property_tree::ptree string_data;
-    boost::property_tree::read_json(test_data, string_data);
-    boost::property_tree::ptree string_data_512 = string_data.get_child("data_512");
-
-    BOOST_FOREACH(boost::property_tree::ptree::value_type &array_element, string_data_512) {
-        std::string out = hash<blake2b<512>>(array_element.first.begin(), array_element.first.end());
-
-        BOOST_CHECK_EQUAL(out, array_element.second.data());
-    }
+    BOOST_CHECK_EQUAL(out, array_element.second.data());
 }
+
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(blake2b_stream_processor_test_suite)
