@@ -1,1 +1,1 @@
-# Verfiaible Delay Functions Manual # {#vdf_manual}
+# Manual # {#vdf_manual}
