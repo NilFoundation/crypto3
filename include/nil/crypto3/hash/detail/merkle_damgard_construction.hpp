@@ -132,12 +132,9 @@ namespace nil {
                     for (std::size_t i = length_words; i; --i)
                         block[block_words - i] = length_words_array[length_words - i];
                 }
-                /*
-                template<>
-                void append_length<0>(block_type &block, length_type length) {
-                }*/
+
                 template<typename Dummy>
-                typename std::enable_if<!(length_bits || sizeof(Dummy))>::type append_length(block_type &block,
+                typename std::enable_if<!(length_bits && sizeof(Dummy))>::type append_length(block_type &block,
                                                                                              length_type length) {
                     // No appending requested, so nothing to do
                 }
