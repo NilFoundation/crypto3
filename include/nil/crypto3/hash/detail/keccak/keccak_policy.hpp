@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Alexander Sokolov <asokolov@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -24,8 +25,8 @@ namespace nil {
                     constexpr static const std::size_t state_bits = 1600;
                     constexpr static const std::size_t state_words = state_bits / word_bits;
                     typedef typename std::array<word_type, state_words> state_type;
-                    // FIXME: define block_bits as the value of template parameter
-                    constexpr static const std::size_t block_bits = 1024;
+ 
+                    constexpr static const std::size_t block_bits = state_bits - 2 * digest_bits;
                     constexpr static const std::size_t block_words = block_bits / word_bits;
                     typedef std::array<word_type, block_words> block_type;
 
