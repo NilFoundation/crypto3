@@ -6,8 +6,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_KASUMI_HPP
-#define CRYPTO3_KASUMI_HPP
+#ifndef CRYPTO3_BLOCK_KASUMI_HPP
+#define CRYPTO3_BLOCK_KASUMI_HPP
 
 #include <boost/endian/arithmetic.hpp>
 #include <boost/endian/conversion.hpp>

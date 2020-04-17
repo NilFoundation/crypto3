@@ -6,8 +6,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_BLOCK_CIPHERS_SHACAL2_HPP
-#define CRYPTO3_BLOCK_CIPHERS_SHACAL2_HPP
+#ifndef CRYPTO3_BLOCK_SHACAL2_HPP
+#define CRYPTO3_BLOCK_SHACAL2_HPP
 
 #include <nil/crypto3/block/detail/shacal/shacal2_policy.hpp>
 
@@ -82,7 +82,7 @@ namespace nil {
 #ifdef CRYPTO3_BLOCK_NO_HIDE_INTERNAL_TYPES
                     typedef type_ type;
 #else
-                    struct type : type_ {};
+                    struct type : type_ { };
 #endif
                 };
 

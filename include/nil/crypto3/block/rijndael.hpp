@@ -6,8 +6,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_RIJNDAEL_HPP
-#define CRYPTO3_RIJNDAEL_HPP
+#ifndef CRYPTO3_BLOCK_RIJNDAEL_HPP
+#define CRYPTO3_BLOCK_RIJNDAEL_HPP
 
 #include <boost/range/adaptor/sliced.hpp>
 
@@ -179,12 +179,6 @@ namespace nil {
             protected:
                 key_schedule_type encryption_key, decryption_key;
             };
-
-            /*!
-             * @brief AES block cipher. Equals to Rijndael block cipher with 128 bit block length.
-             */
-            template<std::size_t KeyBits>
-            using aes = rijndael<KeyBits, 128>;
         }    // namespace block
     }        // namespace crypto3
 }    // namespace nil

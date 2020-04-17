@@ -6,8 +6,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_BLOCK_CIPHERS_MD5_HPP
-#define CRYPTO3_BLOCK_CIPHERS_MD5_HPP
+#ifndef CRYPTO3_BLOCK_MD5_HPP
+#define CRYPTO3_BLOCK_MD5_HPP
 
 #include <nil/crypto3/block/detail/md5/md5_policy.hpp>
 

@@ -6,8 +6,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_STREEBOG_CIPHER_HPP
-#define CRYPTO3_STREEBOG_CIPHER_HPP
+#ifndef CRYPTO3_BLOCK_STREEBOG_CIPHER_HPP
+#define CRYPTO3_BLOCK_STREEBOG_CIPHER_HPP
 
 #include <nil/crypto3/block/detail/streebog/streebog_functions.hpp>
 

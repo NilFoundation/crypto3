@@ -6,8 +6,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_BLOCK_CIPHERS_SHACAL1_HPP
-#define CRYPTO3_BLOCK_CIPHERS_SHACAL1_HPP
+#ifndef CRYPTO3_BLOCK_SHACAL1_HPP
+#define CRYPTO3_BLOCK_SHACAL1_HPP
 
 #include <nil/crypto3/block/basic_shacal.hpp>
 
