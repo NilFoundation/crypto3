@@ -1,7 +1,9 @@
 # Introduction # {#codec_introduction}
 
-The Crypto3.Codec library extends the Nil Foundation's
-cryptography suite and provides a set of encoding
+@tableofcontents
+
+The Crypto3.Codec library extends the =nil; Crypto3 C++
+ cryptography suite and provides a set of encoding
 algorithms implemented in way C++ standard library
 implies: concepts, algorithms, predictable behavior,
 latest standard features support and clean architecture

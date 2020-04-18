@@ -1,5 +1,7 @@
 # Concepts # {#codec_concepts}
 
+@tableofcontents
+
 ## Codec Concept ## {#codec_concept}
 
 A ```Codec``` is an object intended to compute isomorphic integral permutations (e.g. base64).

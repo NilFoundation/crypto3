@@ -1,5 +1,7 @@
 # Implementation # {#codec_impl}
 
+@tableofcontents
+
 Encoders/decoders usage is usually split to three stages:
 
 1. Initialization. Implicit stage, in most cases no state scheduling is required.

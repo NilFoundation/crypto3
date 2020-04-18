@@ -1,5 +1,7 @@
 # Manual # {#codec_manual}
 
+@tableofcontents
+
 ## Basic Example
 
 ```
