@@ -8,8 +8,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------////
 
-#ifndef CRYPTO3_MERKLE_DAMGARD_FINALIZER_HPP
-#define CRYPTO3_MERKLE_DAMGARD_FINALIZER_HPP
+#ifndef CRYPTO3_MERKLE_DAMGARD_PADDING_HPP
+#define CRYPTO3_MERKLE_DAMGARD_PADDING_HPP
 
 #include <nil/crypto3/detail/inject.hpp>
 
@@ -18,7 +18,7 @@ namespace nil {
         namespace hash {
             namespace detail {
                 template<typename Endianness, typename PolicyType>
-                class merkle_damgard_finalizer {
+                class merkle_damgard_padding {
                     typedef PolicyType policy_type;
 
                     constexpr static const std::size_t word_bits = policy_type::word_bits;
@@ -58,4 +58,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_MERKLE_DAMGARD_FINALIZER_HPP
+#endif    // CRYPTO3_MERKLE_DAMGARD_PADDING_HPP

@@ -15,7 +15,7 @@
 
 #include <nil/crypto3/hash/detail/merkle_damgard_construction.hpp>
 #include <nil/crypto3/hash/detail/block_stream_processor.hpp>
-#include <nil/crypto3/hash/detail/merkle_damgard_finalizer.hpp>
+#include <nil/crypto3/hash/detail/merkle_damgard_padding.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -287,7 +287,7 @@ namespace nil {
 
                     typedef merkle_damgard_construction<
                         params_type, typename policy_type::iv_generator, ripemd_compressor<DigestBits>,
-                        detail::merkle_damgard_finalizer<typename params_type::digest_endian, policy_type>>
+                        detail::merkle_damgard_padding<typename params_type::digest_endian, policy_type>>
                         type;
                 };
 

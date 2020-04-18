@@ -12,6 +12,7 @@
 #include <nil/crypto3/hash/detail/state_adder.hpp>
 #include <nil/crypto3/hash/detail/miyaguchi_preneel_compressor.hpp>
 #include <nil/crypto3/hash/detail/merkle_damgard_construction.hpp>
+#include <nil/crypto3/hash/detail/merkle_damgard_padding.hpp>
 #include <nil/crypto3/hash/detail/block_stream_processor.hpp>
 
 #include <nil/crypto3/hash/detail/whirlpool/whirlpool_cipher.hpp>
@@ -60,7 +61,8 @@ namespace nil {
 
                     typedef merkle_damgard_construction<
                         params_type, typename policy_type::iv_generator,
-                        miyaguchi_preneel_compressor<block_cipher_type, detail::state_adder, whirlpool_key_converter>>
+                        miyaguchi_preneel_compressor<block_cipher_type, detail::state_adder, whirlpool_key_converter>,
+                        detail::merkle_damgard_padding<typename params_type::digest_endian, policy_type>>
                         type;
                 };
 
