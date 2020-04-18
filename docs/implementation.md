@@ -1,5 +1,7 @@
 # Implementation {#hashes_impl}
 
+@tableofcontents
+
 Hashes usage is usually split to three stages:
 
 1. Initialization. Implicit stage with creation of accumulator to be used.
