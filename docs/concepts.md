@@ -1,5 +1,7 @@
 # Concepts # {#kdf_concepts}
 
+@tableofcontents
+
 ## Key Derivation Function Concept ## {#kdf_concept}
 
 A ```KeyDerivationFunction``` is an object intended to compute non-isomorphic permutations from non-fixed size
