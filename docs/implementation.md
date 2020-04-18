@@ -1,5 +1,7 @@
 # Implementation # {#block_ciphers_impl}
 
+@tableofcontents
+
 Block ciphers usage is usually split to three stages:
 
 1. Initialization (key scheduling)

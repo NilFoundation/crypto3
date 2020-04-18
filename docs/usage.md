@@ -1,5 +1,7 @@
 # Usage {#block_ciphers_usage_manual}
 
+@tableofcontents
+
 ## Quick Start
 
 The easiest way to use Crypto3.Block library is to use an algorithm with explicit key initialization and
