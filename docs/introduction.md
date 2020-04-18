@@ -1,5 +1,7 @@
 # Introduction # {#modes_introduction}
 
+@tableofcontents
+
 The Crypto3.Modes library extends the =nil; Foundation's cryptography suite and provides a set of block and
  stream cipher modes implemented in way C++ standard library implies: concepts, algorithms, predictable
   behavior, latest standard features support and clean architecture without compromising security and performance.
