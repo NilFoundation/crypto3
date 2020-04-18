@@ -1,5 +1,7 @@
 # Introduction # {#mac_introduction}
 
+@tableofcontents
+
 Crypto3.Mac library extends the =nil; Crypto3 cryptography suite and provides a set of message
  authentication codes implemented in way C++ standard library implies: concepts, algorithms, predictable behavior, latest standard features support and clean architecture without compromising security and performance.
  

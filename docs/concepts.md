@@ -1,5 +1,7 @@
 # Concepts # {#mac_concepts}
 
+@tableofcontents
+
 ## MessageAuthenticationCode Concept ## {#mac_concept}
 
 A ```MessageAuthenticationCode``` is an object intended to compute non-isomorphic permutations over particular sized integers (e.g. rijndael).
