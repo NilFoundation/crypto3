@@ -1,4 +1,8 @@
-# Chia Network VDF Competition Summary # {#chia_vdf_summary}
+# Chia Network VDF Competition # {#chia_vdf_impl}
+
+@tableofcontents
+
+## Summary
 
 For the VDF, Lehmer's algorithm for calculating the GCD has been extended to reduce a quadratic form. Also, a SIMD two's complement implementation of integers is used and Lehmer's algorithm is parallelized to some extent to make better use of superscalar CPU cores (it still runs on a single thread).
 

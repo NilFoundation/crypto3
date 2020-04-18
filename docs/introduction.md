@@ -1,5 +1,7 @@
 # Introduction # {#vdf_introduction}
 
+@tableofcontents
+
 Crypto3.VDF library extends the =nil; Foundation's cryptography suite and provides a set of verifiable delay functions
  implemented in way C++ standard library implies: concepts, algorithms, predictable behavior, latest standard features support and clean architecture without compromising security and performance.
  
