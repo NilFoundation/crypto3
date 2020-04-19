@@ -42,9 +42,8 @@ const char *test_data = "data/hex.json";
 boost::property_tree::ptree mode_data(const char *mode) {
     boost::property_tree::ptree root_data;
     boost::property_tree::read_json(test_data, root_data);
-    boost::property_tree::ptree string_data = root_data.get_child(mode);
 
-    return string_data;
+    return root_data.get_child(mode);
 }
 
 BOOST_AUTO_TEST_SUITE(hex_codec_algorithm_test_suite)
