@@ -13,6 +13,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <array>
 #include <iterator>
 #include <algorithm>
 
@@ -47,9 +48,8 @@ const char *test_data = "data/base.json";
 boost::property_tree::ptree base_data(const char *child_name) {
     boost::property_tree::ptree root_data;
     boost::property_tree::read_json(test_data, root_data);
-    boost::property_tree::ptree base_data = root_data.get_child(child_name);
 
-    return base_data;
+    return root_data.get_child(child_name);
 }
 
 BOOST_AUTO_TEST_SUITE(base32_codec_filedriven_test_suite)

@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Alexander Sokolov <asokolov@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -9,7 +10,10 @@
 #define BOOST_TEST_MODULE hex_encoding_test
 
 #include <string>
+#include <vector>
+#include <array>
 #include <iterator>
+#include <algorithm>
 
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
@@ -134,6 +138,49 @@ BOOST_DATA_TEST_CASE(hex_lower_iterator_iterator_decode, mode_data("lower_mode")
     std::string result;
     decode<hex<mode::lower>>(array_element.second.data().begin(), array_element.second.data().end(), std::back_inserter(result));
     BOOST_CHECK_EQUAL(result, array_element.first);
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+
+template<std::size_t Size, typename Integer>
+static inline typename boost::uint_t<Size>::exact extract_uint_t(Integer v, std::size_t position) {
+    return static_cast<typename boost::uint_t<Size>::exact>(v >> (((~position) & (sizeof(Integer) - 1)) << 3));
+}
+
+template<typename Integer>
+std::array<std::uint8_t, sizeof(Integer)> to_byte_array(Integer i) {
+    std::array<std::uint8_t, sizeof(Integer)> res;
+    for (int itr = 0; itr < sizeof(Integer); itr++) {
+        res[itr] = extract_uint_t<CHAR_BIT>(i, itr);
+    }
+    return res;
+}
+
+BOOST_AUTO_TEST_SUITE(hex_codec_random_data_test_suite)
+
+BOOST_DATA_TEST_CASE(hex_upper_single_range_random_encode_decode,
+                     boost::unit_test::data::random(std::numeric_limits<std::uintmax_t>::min(),
+                                                    std::numeric_limits<std::uintmax_t>::max()) ^
+                         boost::unit_test::data::xrange(std::numeric_limits<std::uint8_t>::max()),
+                     random_sample, index) {
+    std::array<std::uint8_t, sizeof(decltype(random_sample))> arr = to_byte_array(random_sample);
+    arr[arr.size() - 1] = std::max((std::uint8_t)1, arr[arr.size() - 1]);    // Compliant with RFC 4648
+    std::vector<std::uint8_t> enc = encode<hex<mode::upper>>(arr);
+    std::vector<std::uint8_t> out = decode<hex<mode::upper>>(enc);
+    BOOST_CHECK_EQUAL_COLLECTIONS(out.begin(), out.end(), arr.begin(), arr.end());
+}
+
+BOOST_DATA_TEST_CASE(hex_lower_single_range_random_encode_decode,
+                     boost::unit_test::data::random(std::numeric_limits<std::uintmax_t>::min(),
+                                                    std::numeric_limits<std::uintmax_t>::max()) ^
+                         boost::unit_test::data::xrange(std::numeric_limits<std::uint8_t>::max()),
+                     random_sample, index) {
+    std::array<std::uint8_t, sizeof(decltype(random_sample))> arr = to_byte_array(random_sample);
+    arr[arr.size() - 1] = std::max((std::uint8_t)1, arr[arr.size() - 1]);    // Compliant with RFC 4648
+    std::vector<std::uint8_t> enc = encode<hex<mode::lower>>(arr);
+    std::vector<std::uint8_t> out = decode<hex<mode::lower>>(enc);
+    BOOST_CHECK_EQUAL_COLLECTIONS(out.begin(), out.end(), arr.begin(), arr.end());
 }
 
 BOOST_AUTO_TEST_SUITE_END()
