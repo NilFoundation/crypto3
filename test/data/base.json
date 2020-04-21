@@ -1,0 +1,52 @@
+{
+    "base_32":
+    {
+        "f": "MY======",
+        "fo": "MZXQ====",
+        "foo": "MZXW6===",
+        "foob": "MZXW6YQ=",
+        "fooba": "MZXW6YTB",
+        "foobar": "MZXW6YTBOI======"
+    }, 
+
+    "base_58":
+    {
+        "f": "2m",
+        "fo": "8o8",
+        "foo": "bQbp",
+        "foob": "3csAg9",
+        "fooba": "CZJRhmz",
+        "foobar": "t1Zv2yaZ"
+    },
+
+    "base_64":
+    {
+        "f": "Zg==",
+        "fo": "Zm8=",
+        "foo": "Zm9v",
+        "foob": "Zm9vYg==",
+        "fooba": "Zm9vYmE=",
+        "foobar": "Zm9vYmFy"
+    },
+
+    "base_invalid":
+    {
+        "": "ZOOL!isnotvalidbase64",
+        "": "Neitheris:this?"
+    },
+
+    "base_58_invalid":
+    {
+        "": "0",
+        "": "O",
+        "": "I",
+        "": "l",
+        "": "3mJr0",
+        "": "O3yxU",
+        "": "3sNI",
+        "": "4kl8",
+        "": "s!5<",
+        "": "t$@mX<*",
+        "": "AreYouEvenLookingAtThese?"
+    }
+}
