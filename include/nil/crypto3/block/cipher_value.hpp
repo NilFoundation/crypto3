@@ -9,8 +9,8 @@
 #ifndef CRYPTO3_BLOCK_CIPHER_VALUE_HPP
 #define CRYPTO3_BLOCK_CIPHER_VALUE_HPP
 
-#include <type_traits>
-#include <iterator>
+//#include <type_traits>
+//#include <iterator>
 
 #include <boost/assert.hpp>
 #include <boost/concept_check.hpp>

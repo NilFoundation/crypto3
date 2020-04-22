@@ -59,7 +59,7 @@ BOOST_AUTO_TEST_CASE(blowfish_single_block_encrypt1) {
     typedef block::blowfish bct;
 
     // Test with the equivalent of SHA-1("")
-    bct::block_type plaintext = {{0x004bd6ef, 0x09176062}};
+    /*bct::block_type plaintext = {{0x004bd6ef, 0x09176062}};
     bct::key_type key = {{0x58402364, 0x1aba6176}};
 
     bct cipher(key);
@@ -69,7 +69,16 @@ BOOST_AUTO_TEST_CASE(blowfish_single_block_encrypt1) {
     BOOST_CHECK_EQUAL(ciphertext, expected_ciphertext);
 
     bct::block_type new_plaintext = cipher.decrypt(ciphertext);
-    BOOST_CHECK_EQUAL(plaintext, new_plaintext);
+    BOOST_CHECK_EQUAL(plaintext, new_plaintext);*/
+
+
+    std::array<char, 1> a = {'\x84'};
+    bct::key_type key = {{0x58402364, 0x1aba6176}};
+    auto e = encrypt<bct>(std::string("abc"),key);
+    
+    auto d = decrypt<bct>(e,key);
+
+    BOOST_CHECK_EQUAL(std::string("abc"),d);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
