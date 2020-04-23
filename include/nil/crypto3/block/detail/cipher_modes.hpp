@@ -15,26 +15,6 @@ namespace nil {
             namespace detail {
                 
                 template<typename Cipher, typename Padding>
-                struct nop_cipher_mode {
-                    typedef Cipher cipher_type;
-
-                    typedef typename Cipher::block_type block_type;
-
-                    inline block_type begin_message(const block_type &plaintext) {
-                        return cipher_type::encrypt(plaintext);
-                    }
-
-                    inline block_type process_block(const block_type &plaintext) {
-                        return cipher_type::encrypt(plaintext);
-                    }
-
-                    inline block_type end_message(const block_type &plaintext) {
-                        return cipher_type::encrypt(plaintext);
-                    }
-                };
-
-
-                template<typename Cipher, typename Padding>
                 struct isomorphic_policy {
                     typedef std::size_t size_type;
 

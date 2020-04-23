@@ -32,9 +32,6 @@ namespace nil {
                 typedef typename policy_type::constants_type constants_type;
 
             public:
-                typedef typename detail::isomorphic_encoding_mode<hex<blowfish> stream_encoder_type;
-                typedef typename detail::isomorphic_decoding_mode<hex<blowfish> stream_decoder_type;
-
 
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
                 typedef typename policy_type::word_type word_type;

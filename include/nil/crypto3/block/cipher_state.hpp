@@ -31,7 +31,7 @@ namespace nil {
              */
             template<typename ProcessingMode>
             using accumulator_set = 
-                boost::accumulators::accumulator_set<digest<ProcessingMode::input_block_bits>,
+                boost::accumulators::accumulator_set<digest<ProcessingMode::block_bits>,
                                                     boost::accumulators::features<accumulators::tag::block<ProcessingMode>>,
                                                     std::size_t>;
         }    // namespace block

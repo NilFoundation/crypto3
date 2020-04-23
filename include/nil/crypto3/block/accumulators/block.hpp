@@ -150,7 +150,7 @@ namespace nil {
                     /// INTERNAL ONLY
                     ///
 
-                    typedef boost::mpl::always<accumulators::impl::block_impl<Mode>> impl;
+                    typedef boost::mpl::always<accumulators::impl::block_impl<mode_type>> impl;
                 };
             }    // namespace tag
 
