@@ -13,7 +13,7 @@ namespace nil {
     namespace crypto3 {
         namespace block {
             namespace detail {
-                
+
                 template<typename Cipher, typename Padding>
                 struct isomorphic_policy {
                     typedef std::size_t size_type;
@@ -109,9 +109,9 @@ namespace nil {
                     typedef detail::isomorphic_encryption_policy<cipher_type, padding_type> encryption_policy;
                     typedef detail::isomorphic_decryption_policy<cipher_type, padding_type> decryption_policy;
 
-                    template<template<typename, typename> class Policy>
+                    template<typename Policy>
                     struct bind {
-                        typedef detail::isomorphic<Policy<cipher_type, padding_type>> type;
+                        typedef detail::isomorphic<Policy> type;
                     };
                 };
             }    // namespace modes
