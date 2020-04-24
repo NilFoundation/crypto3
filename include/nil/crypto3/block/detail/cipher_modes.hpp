@@ -73,25 +73,26 @@ namespace nil {
                     typedef typename policy_type::size_type size_type;
 
                     typedef typename cipher_type::key_type key_type;
-                    typedef typename policy_type::iv_type iv_type;
+
+                    typedef typename cipher_type::block_type block_type;
+                    typedef typename cipher_type::word_type word_type;
 
                     constexpr static const size_type block_bits = policy_type::block_bits;
                     constexpr static const size_type block_words = policy_type::block_words;
-                    typedef typename cipher_type::block_type block_type;
-
+                    
                     isomorphic(const cipher_type &cipher) : cipher(cipher) {
                     }
 
-                    block_type begin_message(const block_type &plaintext, const iv_type &iv = iv_type()) {
-                        return policy_type::begin_message(cipher, plaintext, iv);
+                    block_type begin_message(const block_type &plaintext) {
+                        return policy_type::begin_message(cipher, plaintext);
                     }
 
                     block_type process_block(const block_type &plaintext) {
                         return policy_type::process_block(cipher, plaintext);
                     }
 
-                    block_type end_message(const block_type &plaintext, const iv_type &iv = iv_type()) {
-                        return policy_type::end_message(cipher, plaintext, iv);
+                    block_type end_message(const block_type &plaintext) {
+                        return policy_type::end_message(cipher, plaintext);
                     }
 
                 protected:
