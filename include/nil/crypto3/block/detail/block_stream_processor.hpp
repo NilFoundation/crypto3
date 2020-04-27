@@ -20,6 +20,7 @@
 #include <boost/utility/enable_if.hpp>
 
 #include <boost/range/algorithm/copy.hpp>
+#include <nil/crypto3/detail/stream_endian.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -38,7 +39,8 @@ namespace nil {
                 constexpr static const std::size_t output_block_bits = mode_type::output_block_bits;
 
             public:
-                typedef typename params_type::endian_type endian_type;
+                typedef typename mode_type::endian_type endian_type;
+                typedef typename mode_type::input_endian_type input_endian_type;
 
                 constexpr static const std::size_t value_bits = params_type::value_bits;
                 typedef typename boost::uint_t<value_bits>::least value_type;
@@ -57,6 +59,26 @@ namespace nil {
                 BOOST_STATIC_ASSERT(input_block_bits % value_bits == 0);
 
                 BOOST_STATIC_ASSERT(!length_bits || value_bits <= length_bits);
+
+                template<typename Endianness = input_endian_type>
+                typename std::enable_if<Endianness == stream_endian::big_octet_big_bit>::type
+                process_block(std::size_t block_seen = block_bits) {
+                    acc(cache, accumulators::bits = block_seen);
+                }
+
+                template<typename Endianness = input_endian_type>
+                typename std::enable_if<!(Endianness == stream_endian::big_octet_big_bit)>::type
+                process_block(std::size_t block_seen = block_bits) {
+                    using namespace nil::crypto3::detail;
+
+                    // Convert the input into words
+                    block_type block;
+                    pack<endian_type, value_bits, word_bits>(cache, block);
+
+                    // Process the block
+                    acc(block, accumulators::bits = block_seen);
+                }
+
 
                 void update_one(value_type value) {
                     std::size_t i = seen % input_block_bits;

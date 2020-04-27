@@ -172,7 +172,7 @@ namespace nil {
                     return impl_type::encrypt_block(plaintext, encryption_key);
                 }
 
-                block_type decrypt(const block_type &plaintext) const {
+                inline block_type decrypt(const block_type &plaintext) const {
                     return impl_type::decrypt_block(plaintext, decryption_key);
                 }
 

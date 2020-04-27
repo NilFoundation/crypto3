@@ -9,6 +9,8 @@
 #ifndef CRYPTO3_CIPHER_MODES_HPP
 #define CRYPTO3_CIPHER_MODES_HPP
 
+#include <nil/crypto3/detail/stream_endian.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace block {
@@ -24,12 +26,17 @@ namespace nil {
                     constexpr static const size_type block_bits = cipher_type::block_bits;
                     constexpr static const size_type block_words = cipher_type::block_words;
                     typedef typename cipher_type::block_type block_type;
+
+                    typedef typename cipher_type::endian_type endian_type;
                 };
 
                 template<typename Cipher, typename Padding>
                 struct isomorphic_encryption_policy : public isomorphic_policy<Cipher, Padding> {
                     typedef typename isomorphic_policy<Cipher, Padding>::cipher_type cipher_type;
                     typedef typename isomorphic_policy<Cipher, Padding>::block_type block_type;
+
+                    //There should be user's system endianness
+                    typedef typename stream_endian::big_octet_big_bit input_endian_type;
 
                     inline static block_type begin_message(const cipher_type &cipher, const block_type &plaintext) {
                         return cipher.encrypt(plaintext);
@@ -48,6 +55,8 @@ namespace nil {
                 struct isomorphic_decryption_policy : public isomorphic_policy<Cipher, Padding> {
                     typedef typename isomorphic_policy<Cipher, Padding>::cipher_type cipher_type;
                     typedef typename isomorphic_policy<Cipher, Padding>::block_type block_type;
+
+                    typedef typename cipher_type::endian_type input_endian_type;
 
                     inline static block_type begin_message(const cipher_type &cipher, const block_type &ciphertext) {
                         return cipher.decrypt(ciphertext);
@@ -74,11 +83,16 @@ namespace nil {
 
                     typedef typename cipher_type::key_type key_type;
 
+                    typedef typename policy_type::input_endian_type input_endian_type;
+                    typedef typename policy_type::endian_type endian_type;
+
                     typedef typename cipher_type::block_type block_type;
                     typedef typename cipher_type::word_type word_type;
 
+
                     constexpr static const size_type block_bits = policy_type::block_bits;
                     constexpr static const size_type block_words = policy_type::block_words;
+                    
                     
                     isomorphic(const cipher_type &cipher) : cipher(cipher) {
                     }

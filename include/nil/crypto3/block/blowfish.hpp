@@ -45,12 +45,12 @@ namespace nil {
 
                 constexpr static const std::size_t rounds = policy_type::rounds;
 
+                typedef typename policy_type::endian_type endian_type;
+
                 template<template<typename, typename> class Mode, typename StateAccumulator, std::size_t ValueBits,
                          typename Padding>
                 struct stream_processor {
                     struct params_type {
-                        typedef typename stream_endian::little_octet_big_bit endian_type;
-
                         constexpr static const std::size_t value_bits = ValueBits;
                         constexpr static const std::size_t length_bits = policy_type::word_bits * 2;
                     };

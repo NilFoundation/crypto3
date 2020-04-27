@@ -11,9 +11,12 @@
 
 #include <array>
 
+#include <nil/crypto3/detail/stream_endian.hpp>
+
 #include <nil/crypto3/block/detail/blowfish/blowfish_functions.hpp>
 
 #include <nil/crypto3/block/detail/utilities/secmem.hpp>
+
 
 namespace nil {
     namespace crypto3 {
@@ -31,6 +34,8 @@ namespace nil {
 
                     constexpr static const std::size_t permutations_size = 18;
                     typedef std::array<word_type, permutations_size> permutations_type;
+
+                    typedef typename stream_endian::little_octet_big_bit endian_type;
 
                     constexpr static const permutations_type permutations = {
                         0x243F6A88, 0x85A308D3, 0x13198A2E, 0x03707344, 0xA4093822, 0x299F31D0,

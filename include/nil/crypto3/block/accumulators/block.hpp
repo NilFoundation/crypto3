@@ -21,8 +21,10 @@
 #include <nil/crypto3/detail/make_array.hpp>
 #include <nil/crypto3/detail/digest.hpp>
 
+
 #include <nil/crypto3/block/accumulators/parameters/cipher.hpp>
 #include <nil/crypto3/block/accumulators/parameters/bits.hpp>
+#include <nil/crypto3/block/detail/cipher_modes.hpp>
 
 #include <nil/crypto3/block/cipher.hpp>
 
@@ -37,7 +39,7 @@ namespace nil {
                     typedef typename Mode::cipher_type cipher_type;
                     typedef typename Mode::padding_type padding_type;
 
-                    typedef typename mode_type::finalizer_type finalizer_type;
+                    typedef typename mode_type::endian_type endian_type;
 
                     constexpr static const std::size_t word_bits = mode_type::word_bits;
                     typedef typename mode_type::word_type word_type;
@@ -61,7 +63,9 @@ namespace nil {
 
                     template<typename ArgumentPack>
                     inline void operator()(const ArgumentPack &args) {
-                        return process(args[boost::accumulators::sample]);
+                        //return process(args[boost::accumulators::sample]);
+                        resolve_type(args[boost::accumulators::sample],
+                                     args[::nil::crypto3::accumulators::bits | std::size_t()]);
                     }
 
                     inline result_type result(boost::accumulators::dont_care) const {
@@ -84,21 +88,17 @@ namespace nil {
                     }
 
                 protected:
-                    inline void resolve_type(const word_type &value, std::size_t bits) {
-                        if (bits == std::size_t()) {
-                            process(value, word_bits);
-                        } else {
-                            process(value, bits);
-                        }
-                    }
 
                     inline void resolve_type(const block_type &value, std::size_t bits) {
-                        if (bits == std::size_t()) {
-                            process(value, block_bits);
-                        } else {
-                            process(value, bits);
-                        }
+                        total_seen += bits == 0 ? block_bits : bits;
+                        process(value, bits == 0 ? block_bits : bits);
                     }
+
+                    inline void resolve_type(const word_type &value, std::size_t bits) {
+                        total_seen += bits == 0 ? word_bits : bits;
+                        process(value, bits == 0 ? word_bits : bits);
+                    }
+
 
                     inline void process(const word_type &value, std::size_t bits) {
                         if (cache.size() == cache.max_size()) {
@@ -136,7 +136,7 @@ namespace nil {
 
                     block::cipher<cipher_type, mode_type, padding_type> cipher;
 
-                    std::size_t seen;
+                    std::size_t total_seen;
                     cache_type cache;
                     result_type dgst;
                 };
