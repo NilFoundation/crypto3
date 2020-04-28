@@ -63,7 +63,6 @@ namespace nil {
 
                     template<typename ArgumentPack>
                     inline void operator()(const ArgumentPack &args) {
-                        //return process(args[boost::accumulators::sample]);
                         resolve_type(args[boost::accumulators::sample],
                                      args[::nil::crypto3::accumulators::bits | std::size_t()]);
                     }
@@ -71,18 +70,9 @@ namespace nil {
                     inline result_type result(boost::accumulators::dont_care) const {
                         result_type res = dgst;
 
-                        if (!cache.empty()) {
-                            block_type ib = {0};
-                            std::move(cache.begin(), cache.end(), ib.begin());
-                            block_type ob = cipher.end_message(ib);
-                            std::move(ob.begin(), ob.end(), std::inserter(res, res.end()));
-                        }
+                        result_type new_dgst_part = mode_type.end_message(cache, previous_block, total_seen);
 
-                        if (seen % block_bits) {
-                            finalizer_type(block_bits - seen % block_bits)(res);
-                        } else {
-                            finalizer_type(0)(res);
-                        }
+                        res.append(new_dgst_part);
 
                         return res;
                     }
@@ -90,54 +80,140 @@ namespace nil {
                 protected:
 
                     inline void resolve_type(const block_type &value, std::size_t bits) {
-                        total_seen += bits == 0 ? block_bits : bits;
+                        //total_seen += bits == 0 ? block_bits : bits;
                         process(value, bits == 0 ? block_bits : bits);
                     }
 
                     inline void resolve_type(const word_type &value, std::size_t bits) {
-                        total_seen += bits == 0 ? word_bits : bits;
+                        //total_seen += bits == 0 ? word_bits : bits;
                         process(value, bits == 0 ? word_bits : bits);
                     }
 
-
-                    inline void process(const word_type &value, std::size_t bits) {
-                        if (cache.size() == cache.max_size()) {
-                            block_type ib = {0};
-                            std::move(cache.begin(), cache.end(), ib.begin());
-                            block_type ob = dgst.empty() ? cipher.begin_message(ib) : cipher.process_block(ib);
-                            std::move(ob.begin(), ob.end(), std::inserter(dgst, dgst.end()));
-
-                            cache.clear();
+                    inline void process_block(){
+                        if (dgst.empty()){
+                            result_type new_dgst_part = mode_type.begin_message(cache, previous_block, total_seen);
+                            dgst.append(new_dgst_part);
+                        }
+                        else{
+                            result_type new_dgst_part = mode_type.process_block(cache, previous_block, total_seen);
+                            dgst.append(new_dgst_part);
                         }
 
-                        cache.push_back(value);
-                        seen += bits;
+                        std::move(cache.begin(), cache.end(), previous_block.begin());
+                        filled = false;
                     }
 
-                    inline void process(const block_type &block, std::size_t bits) {
-                        block_type ob;
-                        if (cache.empty()) {
-                            ob = dgst.empty() ? cipher.begin_message(block) : cipher.process_block(block);
+
+                    inline void process(const block_type &value, std::size_t value_seen) {
+                        using namespace ::nil::crypto3::detail;
+
+                        if (filled) {
+                            process_block();
+                        }
+
+                        std::size_t cached_bits = total_seen % block_bits;
+
+                        if (cached_bits != 0 ) {
+                            // If there are already any bits in the cache
+
+                            std::size_t needed_to_fill_bits = block_bits - cached_bits;
+                            std::size_t new_bits_to_append =
+                                (needed_to_fill_bits > value_seen) ? value_seen : needed_to_fill_bits;
+
+                            injector_type::inject(value, new_bits_to_append, cache, cached_bits);
+                            total_seen += new_bits_to_append;
+
+                            if (cached_bits == block_bits) {
+                                // If there are enough bits in the incoming value to fill the block
+                                filled = true;
+
+                                if (value_seen > new_bits_to_append) {
+
+                                    process_block();
+
+                                    // If there are some remaining bits in the incoming value - put them into the cache,
+                                    // which is now empty
+
+                                    cached_bits = 0;
+
+                                    injector_type::inject(
+                                        value, value_seen - new_bits_to_append, cache, cached_bits, new_bits_to_append);
+
+                                    total_seen += value_seen - new_bits_to_append;
+                                }
+                            }
+
                         } else {
-                            block_type b = make_array<block_words>(cache.begin(), cache.end());
-                            typename block_type::const_iterator itr = block.begin() + (cache.max_size() - cache.size());
 
-                            std::copy(block.begin(), itr, b.end());
+                            total_seen += value_seen;
 
-                            ob = dgst.empty() ? cipher.begin_message(b) : cipher.process_block(b);
+                            // If there are no bits in the cache
+                            if (value_seen == block_bits) {
+                                // The incoming value is a full block
+                                filled = true;
 
-                            cache.clear();
-                            cache.insert(cache.end(), itr, block.end());
+                                std::move(value.begin(), value.end(), cache.begin());
+
+                            } else {
+                                // The incoming value is not a full block
+                                std::move(value.begin(),
+                                          value.begin() + value_seen / word_bits + (value_seen % word_bits ? 1 : 0),
+                                          cache.begin());
+                            }
+                        }
+                    }
+                    
+                    inline void process(const word_type &value, std::size_t value_seen) {
+                        using namespace ::nil::crypto3::detail;
+
+                        if (filled) {
+                            process_block();
                         }
 
-                        std::move(ob.begin(), ob.end(), std::inserter(dgst, dgst.end()));
-                        seen += bits;
+                        std::size_t cached_bits = total_seen % block_bits;
+
+                        if (cached_bits%word_bits != 0) {
+                            std::size_t needed_to_fill_bits = block_bits - cached_bits;
+                            std::size_t new_bits_to_append =
+                                (needed_to_fill_bits > value_seen) ? value_seen : needed_to_fill_bits;
+
+                            injector_type::inject(value, new_bits_to_append, cache, cached_bits);
+                            total_seen += new_bits_to_append;
+
+                            if (cached_bits == block_bits) {
+                                // If there are enough bits in the incoming value to fill the block
+
+                                filled = true;
+
+                                if (value_seen > new_bits_to_append) {
+
+                                    process_block();
+
+                                    // If there are some remaining bits in the incoming value - put them into the cache,
+                                    // which is now empty
+                                    cached_bits = 0;
+
+                                    injector_type::inject(
+                                        value, value_seen - new_bits_to_append, cache, cached_bits, new_bits_to_append);
+
+                                    total_seen += value_seen - new_bits_to_append;
+                                }
+                            }
+
+                        } else {
+                            cache[cached_bits/word_bits] = value;
+
+                            total_seen += value_seen;
+                        }
                     }
 
-                    block::cipher<cipher_type, mode_type, padding_type> cipher;
+                    //block::cipher<cipher_type, mode_type, padding_type> cipher;
 
+
+                    bool filled;
                     std::size_t total_seen;
-                    cache_type cache;
+                    block_type cache;
+                    block_type previous_block;
                     result_type dgst;
                 };
             }    // namespace impl
@@ -159,20 +235,6 @@ namespace nil {
                 typename boost::mpl::apply<AccumulatorSet, tag::block<Mode>>::type::result_type
                     block(const AccumulatorSet &acc) {
                     return boost::accumulators::extract_result<tag::block<Mode>>(acc);
-                }
-
-                template<typename Cipher, typename AccumulatorSet>
-                typename boost::mpl::apply<AccumulatorSet,
-                                           tag::block<typename Cipher::stream_encrypter_mode>>::type::result_type
-                    encrypt(const AccumulatorSet &acc) {
-                    return boost::accumulators::extract_result<tag::block<typename Cipher::stream_encrypter_mode>>(acc);
-                }
-
-                template<typename Cipher, typename AccumulatorSet>
-                typename boost::mpl::apply<AccumulatorSet,
-                                           tag::block<typename Cipher::stream_encrypter_mode>>::type::result_type
-                    decrypt(const AccumulatorSet &acc) {
-                    return boost::accumulators::extract_result<tag::block<typename Cipher::stream_decrypter_mode>>(acc);
                 }
             }    // namespace extract
         }        // namespace accumulators

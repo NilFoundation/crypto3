@@ -59,15 +59,15 @@ namespace nil {
                 BOOST_STATIC_ASSERT(input_block_bits % value_bits == 0);
 
                 BOOST_STATIC_ASSERT(!length_bits || value_bits <= length_bits);
-
+/*
                 template<typename Endianness = input_endian_type>
-                typename std::enable_if<Endianness == stream_endian::big_octet_big_bit>::type
+                typename std::enable_if<!(Endianness == stream_endian::big_octet_big_bit)>::type
                 process_block(std::size_t block_seen = block_bits) {
                     acc(cache, accumulators::bits = block_seen);
                 }
 
                 template<typename Endianness = input_endian_type>
-                typename std::enable_if<!(Endianness == stream_endian::big_octet_big_bit)>::type
+                typename std::enable_if<Endianness == stream_endian::big_octet_big_bit>::type
                 process_block(std::size_t block_seen = block_bits) {
                     using namespace nil::crypto3::detail;
 
@@ -78,6 +78,7 @@ namespace nil {
                     // Process the block
                     acc(block, accumulators::bits = block_seen);
                 }
+                */
 
 
                 void update_one(value_type value) {
