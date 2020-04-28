@@ -20,7 +20,9 @@
 
 #include <nil/crypto3/detail/make_array.hpp>
 #include <nil/crypto3/detail/digest.hpp>
+#include <nil/crypto3/detail/inject.hpp>
 
+#include <nil/crypto3/block/accumulators/bits_count.hpp>
 
 #include <nil/crypto3/block/accumulators/parameters/cipher.hpp>
 #include <nil/crypto3/block/accumulators/parameters/bits.hpp>
@@ -44,21 +46,17 @@ namespace nil {
                     constexpr static const std::size_t word_bits = mode_type::word_bits;
                     typedef typename mode_type::word_type word_type;
 
-                    constexpr static const std::size_t state_bits = mode_type::state_bits;
-                    constexpr static const std::size_t state_words = mode_type::state_words;
-                    typedef typename mode_type::state_type state_type;
-
                     constexpr static const std::size_t block_bits = mode_type::block_bits;
                     constexpr static const std::size_t block_words = mode_type::block_words;
                     typedef typename mode_type::block_type block_type;
 
-                    typedef boost::container::static_vector<word_type, block_words> cache_type;
+                    typedef ::nil::crypto3::detail::injector<endian_type, word_bits, block_words, block_bits> injector_type;
 
                 public:
                     typedef digest<block_bits> result_type;
 
                     template<typename Args>
-                    block_impl(const Args &args) : cipher(args[accumulators::cipher]), seen(0) {
+                    block_impl(const Args &args) : total_seen(0), filled(false) {
                     }
 
                     template<typename ArgumentPack>
@@ -70,7 +68,7 @@ namespace nil {
                     inline result_type result(boost::accumulators::dont_care) const {
                         result_type res = dgst;
 
-                        result_type new_dgst_part = mode_type.end_message(cache, previous_block, total_seen);
+                        result_type new_dgst_part = mode_type::end_message(cache, previous_block, total_seen);
 
                         res.append(new_dgst_part);
 
@@ -80,22 +78,20 @@ namespace nil {
                 protected:
 
                     inline void resolve_type(const block_type &value, std::size_t bits) {
-                        //total_seen += bits == 0 ? block_bits : bits;
                         process(value, bits == 0 ? block_bits : bits);
                     }
 
                     inline void resolve_type(const word_type &value, std::size_t bits) {
-                        //total_seen += bits == 0 ? word_bits : bits;
                         process(value, bits == 0 ? word_bits : bits);
                     }
 
                     inline void process_block(){
                         if (dgst.empty()){
-                            result_type new_dgst_part = mode_type.begin_message(cache, previous_block, total_seen);
+                            result_type new_dgst_part = mode_type::begin_message(cache, previous_block, total_seen);
                             dgst.append(new_dgst_part);
                         }
                         else{
-                            result_type new_dgst_part = mode_type.process_block(cache, previous_block, total_seen);
+                            result_type new_dgst_part = mode_type::process_block(cache, previous_block, total_seen);
                             dgst.append(new_dgst_part);
                         }
 
@@ -207,9 +203,6 @@ namespace nil {
                         }
                     }
 
-                    //block::cipher<cipher_type, mode_type, padding_type> cipher;
-
-
                     bool filled;
                     std::size_t total_seen;
                     block_type cache;
@@ -220,7 +213,7 @@ namespace nil {
 
             namespace tag {
                 template<typename Mode>
-                struct block : boost::accumulators::depends_on<> {
+                struct block : boost::accumulators::depends_on<bits_count> {
                     typedef Mode mode_type;
 
                     /// INTERNAL ONLY

@@ -92,7 +92,8 @@ namespace nil {
 
                     constexpr static const size_type block_bits = policy_type::block_bits;
                     constexpr static const size_type block_words = policy_type::block_words;
-                    
+                    constexpr static const size_type word_bits = cipher_type::word_bits;
+
                     
                     isomorphic(const cipher_type &cipher) : cipher(cipher) {
                     }

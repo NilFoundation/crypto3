@@ -18,6 +18,7 @@
 #include <boost/range/concepts.hpp>
 
 #include <nil/crypto3/block/accumulators/block.hpp>
+#include <nil/crypto3/block/cipher_state.hpp>
 
 namespace nil {
     namespace crypto3 {

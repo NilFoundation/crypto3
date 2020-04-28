@@ -63,7 +63,7 @@ namespace nil {
                 template<typename Endianness = input_endian_type>
                 typename std::enable_if<!(Endianness == stream_endian::big_octet_big_bit)>::type
                 process_block(std::size_t block_seen = block_bits) {
-                    acc(cache, accumulators::bits = block_seen);
+                    acc(cache, accumulators::block_bits = block_seen);
                 }
 
                 template<typename Endianness = input_endian_type>
@@ -76,7 +76,7 @@ namespace nil {
                     pack<endian_type, value_bits, word_bits>(cache, block);
 
                     // Process the block
-                    acc(block, accumulators::bits = block_seen);
+                    acc(block, accumulators::block_bits = block_seen);
                 }
                 */
 
