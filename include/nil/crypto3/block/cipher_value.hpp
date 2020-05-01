@@ -30,8 +30,8 @@ namespace nil {
                     typedef
                         typename boost::mpl::front<typename accumulator_set_type::features_type>::type accumulator_type;
 
-                    typedef typename CipherAccumulator::mode_type mode_type;
-                    typedef typename mode_type::encoder_type cipher_type;
+                    typedef typename accumulator_type::mode_type mode_type;
+                    typedef typename mode_type::cipher_type cipher_type;
 
                     ref_cipher_impl(const accumulator_set_type &acc) : accumulator_set(acc) {
                     }
@@ -45,8 +45,8 @@ namespace nil {
                     typedef
                         typename boost::mpl::front<typename accumulator_set_type::features_type>::type accumulator_type;
 
-                    typedef typename CipherAccumulator::mode_type mode_type;
-                    typedef typename mode_type::encoder_type cipher_type;
+                    typedef typename accumulator_type::mode_type mode_type;
+                    typedef typename mode_type::cipher_type cipher_type;
 
                     value_cipher_impl(const accumulator_set_type &acc) : accumulator_set(acc) {
                     }

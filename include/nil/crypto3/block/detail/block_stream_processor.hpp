@@ -32,11 +32,8 @@ namespace nil {
                 typedef StateAccumulator accumulator_type;
                 typedef Params params_type;
 
-                typedef typename mode_type::input_block_type input_block_type;
-                constexpr static const std::size_t input_block_bits = mode_type::input_block_bits;
-
-                typedef typename mode_type::output_block_type output_block_type;
-                constexpr static const std::size_t output_block_bits = mode_type::output_block_bits;
+                typedef typename mode_type::block_type input_block_type;
+                constexpr static const std::size_t input_block_bits = mode_type::block_bits;
 
             public:
                 typedef typename mode_type::endian_type endian_type;

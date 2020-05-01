@@ -26,6 +26,7 @@
 
 #include <nil/crypto3/block/accumulators/parameters/cipher.hpp>
 #include <nil/crypto3/block/accumulators/parameters/bits.hpp>
+#include <boost/accumulators/framework/parameters/sample.hpp>
 #include <nil/crypto3/block/detail/cipher_modes.hpp>
 
 #include <nil/crypto3/block/cipher.hpp>
@@ -56,7 +57,7 @@ namespace nil {
                     typedef digest<block_bits> result_type;
 
                     template<typename Args>
-                    block_impl(const Args &args) : total_seen(0), filled(false) {
+                    block_impl(const Args &args) : total_seen(0), filled(false), mode (args[boost::accumulators::sample])  {
                     }
 
                     template<typename ArgumentPack>
@@ -68,7 +69,7 @@ namespace nil {
                     inline result_type result(boost::accumulators::dont_care) const {
                         result_type res = dgst;
 
-                        result_type new_dgst_part = mode_type::end_message(cache, previous_block, total_seen);
+                        result_type new_dgst_part = mode.end_message(cache, previous_block, total_seen);
 
                         res.append(new_dgst_part);
 
@@ -87,11 +88,11 @@ namespace nil {
 
                     inline void process_block(){
                         if (dgst.empty()){
-                            result_type new_dgst_part = mode_type::begin_message(cache, previous_block, total_seen);
+                            result_type new_dgst_part = mode.begin_message(cache, previous_block, total_seen);
                             dgst.append(new_dgst_part);
                         }
                         else{
-                            result_type new_dgst_part = mode_type::process_block(cache, previous_block, total_seen);
+                            result_type new_dgst_part = mode.process_block(cache, previous_block, total_seen);
                             dgst.append(new_dgst_part);
                         }
 
@@ -202,6 +203,9 @@ namespace nil {
                             total_seen += value_seen;
                         }
                     }
+
+                    cipher_type cipher;
+                    mode_type mode;
 
                     bool filled;
                     std::size_t total_seen;

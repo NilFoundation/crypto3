@@ -18,6 +18,8 @@
 
 #include <nil/crypto3/block/detail/cipher_modes.hpp>
 
+#include <nil/crypto3/block/accumulators/parameters/cipher.hpp>
+
 namespace nil {
     namespace crypto3 {
 
@@ -64,7 +66,7 @@ namespace nil {
             typedef block::detail::value_cipher_impl<CipherAccumulator> StreamEncrypterImpl;
             typedef block::detail::itr_cipher_impl<StreamEncrypterImpl, OutputIterator> EncrypterImpl;
 
-            return EncrypterImpl(first, last, std::move(out), CiperState(BlockCipher(key_first, key_last)));
+            return EncrypterImpl(first, last, std::move(out), CipherAccumulator(BlockCipher(key_first, key_last)));
         }
 
         /*!
@@ -107,7 +109,7 @@ namespace nil {
          *
          * @return
          */
-        /*
+        
         template<
             typename BlockCipher, typename SinglePassRange,
             typename OutputAccumulator = typename block::accumulator_set<typename block::modes::isomorphic <
@@ -119,7 +121,7 @@ namespace nil {
             typedef block::detail::range_cipher_impl<StreamEncrypterImpl> EncrypterImpl;
 
             return EncrypterImpl(r, acc);
-        }*/
+        }
 
         /*!
          * @brief
@@ -175,7 +177,7 @@ namespace nil {
             typedef block::detail::value_cipher_impl<CipherAccumulator> StreamEncrypterImpl;
             typedef block::detail::itr_cipher_impl<StreamEncrypterImpl, OutputIterator> EncrypterImpl;
 
-            return EncrypterImpl(rng, std::move(out), CipherState(BlockCipher(key)));
+            return EncrypterImpl(rng, std::move(out), CipherAccumulator(BlockCipher(key)));
         }
 
         /*!
@@ -203,7 +205,7 @@ namespace nil {
             typedef block::detail::value_cipher_impl<CipherAccumulator> StreamEncrypterImpl;
             typedef block::detail::range_cipher_impl<StreamEncrypterImpl> EncrypterImpl;
 
-            return EncrypterImpl(r, CipherState(BlockCipher(key)));
+            return EncrypterImpl(r, CipherAccumulator(BlockCipher(key)));
         }
     }    // namespace crypto3
 }    // namespace nil
