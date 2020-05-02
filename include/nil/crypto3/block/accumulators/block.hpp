@@ -51,13 +51,15 @@ namespace nil {
                     constexpr static const std::size_t block_words = mode_type::block_words;
                     typedef typename mode_type::block_type block_type;
 
-                    typedef ::nil::crypto3::detail::injector<endian_type, word_bits, block_words, block_bits> injector_type;
+                    typedef ::nil::crypto3::detail::injector<endian_type, word_bits, block_words, block_bits>
+                        injector_type;
 
                 public:
                     typedef digest<block_bits> result_type;
 
                     template<typename Args>
-                    block_impl(const Args &args) : total_seen(0), filled(false), mode (args[boost::accumulators::sample])  {
+                    block_impl(const Args &args) :
+                        total_seen(0), filled(false), mode(args[boost::accumulators::sample]) {
                     }
 
                     template<typename ArgumentPack>
@@ -72,7 +74,7 @@ namespace nil {
 
                         block_type ob = mode.end_message(cache, previous_block, total_seen);
 
-                        std::copy(ob.begin(), ob.end(), std::inserter(new_dgst_part, new_dgst_part.end()));
+                        std::move(ob.begin(), ob.end(), std::inserter(new_dgst_part, new_dgst_part.end()));
 
                         res.insert(res.end(), new_dgst_part.begin(), new_dgst_part.end());
 
@@ -82,7 +84,6 @@ namespace nil {
                     }
 
                 protected:
-
                     inline void resolve_type(const block_type &value, std::size_t bits) {
                         process(value, bits == 0 ? block_bits : bits);
                     }
@@ -91,29 +92,18 @@ namespace nil {
                         process(value, bits == 0 ? word_bits : bits);
                     }
 
-                    inline void process_block(){
-                        if (dgst.empty()){
-                            result_type new_dgst_part;
+                    inline void process_block() {
+                        if (dgst.empty()) {
                             previous_block = mode.begin_message(cache, previous_block, total_seen);
-
-                            std::copy(previous_block.begin(), previous_block.end(), std::inserter(new_dgst_part, new_dgst_part.end()));
-
-                            dgst.insert(dgst.end(), new_dgst_part.begin(), new_dgst_part.end());
-
-                        }
-                        else{
-                            result_type new_dgst_part;
+                            pack<endian_type>(previous_block.begin(), previous_block.end(), dgst.end());
+                        } else {
                             previous_block = mode.process_block(cache, previous_block, total_seen);
-
-                            std::copy(previous_block.begin(), previous_block.end(), std::inserter(new_dgst_part, new_dgst_part.end()));
-
-                            dgst.insert(dgst.end(), new_dgst_part.begin(), new_dgst_part.end());
+                            pack<digest_endian>(previous_block.begin(), previous_block.end(), dgst.end());
                         }
 
                         std::move(cache.begin(), cache.end(), previous_block.begin());
                         filled = false;
                     }
-
 
                     inline void process(const block_type &value, std::size_t value_seen) {
                         using namespace ::nil::crypto3::detail;
@@ -124,7 +114,7 @@ namespace nil {
 
                         std::size_t cached_bits = total_seen % block_bits;
 
-                        if (cached_bits != 0 ) {
+                        if (cached_bits != 0) {
                             // If there are already any bits in the cache
 
                             std::size_t needed_to_fill_bits = block_bits - cached_bits;
@@ -147,8 +137,8 @@ namespace nil {
 
                                     cached_bits = 0;
 
-                                    injector_type::inject(
-                                        value, value_seen - new_bits_to_append, cache, cached_bits, new_bits_to_append);
+                                    injector_type::inject(value, value_seen - new_bits_to_append, cache, cached_bits,
+                                                          new_bits_to_append);
 
                                     total_seen += value_seen - new_bits_to_append;
                                 }
@@ -173,7 +163,7 @@ namespace nil {
                             }
                         }
                     }
-                    
+
                     inline void process(const word_type &value, std::size_t value_seen) {
                         using namespace ::nil::crypto3::detail;
 
@@ -183,7 +173,7 @@ namespace nil {
 
                         std::size_t cached_bits = total_seen % block_bits;
 
-                        if (cached_bits%word_bits != 0) {
+                        if (cached_bits % word_bits != 0) {
                             std::size_t needed_to_fill_bits = block_bits - cached_bits;
                             std::size_t new_bits_to_append =
                                 (needed_to_fill_bits > value_seen) ? value_seen : needed_to_fill_bits;
@@ -204,15 +194,15 @@ namespace nil {
                                     // which is now empty
                                     cached_bits = 0;
 
-                                    injector_type::inject(
-                                        value, value_seen - new_bits_to_append, cache, cached_bits, new_bits_to_append);
+                                    injector_type::inject(value, value_seen - new_bits_to_append, cache, cached_bits,
+                                                          new_bits_to_append);
 
                                     total_seen += value_seen - new_bits_to_append;
                                 }
                             }
 
                         } else {
-                            cache[cached_bits/word_bits] = value;
+                            cache[cached_bits / word_bits] = value;
 
                             total_seen += value_seen;
                         }
