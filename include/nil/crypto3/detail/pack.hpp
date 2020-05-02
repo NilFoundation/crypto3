@@ -26,6 +26,12 @@
 namespace nil {
     namespace crypto3 {
         namespace detail {
+            /*!
+             * @defgroup pack Pack functions
+             *
+             */
+
+
 #ifndef CRYPTO3_NO_OPTIMIZATION
 
             template<int UnitBits, int InputBits, int OutputBits, typename InT, typename OutT>
@@ -154,6 +160,24 @@ namespace nil {
 #endif
             };
 
+
+            /*!
+             * @brief
+             *
+             * @ingroup pack
+             *
+             * @tparam Endianness
+             * @tparam InValueBits
+             * @tparam OutValueBits
+             * @tparam InputIterator1
+             * @tparam InputIterator2
+             *
+             * @param in
+             * @param in_n
+             * @param out
+             *
+             * @return
+             */
             template<typename Endianness, int InValueBits, int OutValueBits, typename InputIterator1,
                      typename InputIterator2>
             void pack_n(InputIterator1 in, size_t in_n, InputIterator2 out) {
@@ -161,6 +185,24 @@ namespace nil {
                 packer_type::pack_n(in, in_n, out);
             }
 
+            /*!
+             * @brief
+             *
+             * @ingroup pack
+             *
+             * @tparam Endianness
+             * @tparam InValueBits
+             * @tparam OutValueBits
+             * @tparam InputIterator1
+             * @tparam InputIterator2
+             *
+             * @param in
+             * @param in_n
+             * @param out
+             * @param out_n
+             *
+             * @return
+             */
             template<typename Endianness, int InValueBits, int OutValueBits, typename InputIterator1,
                      typename InputIterator2>
             void pack_n(InputIterator1 in, size_t in_n, InputIterator2 out, size_t out_n) {
@@ -168,12 +210,49 @@ namespace nil {
                 pack_n<Endianness, InValueBits, OutValueBits>(in, in_n, out);
             }
 
+            /*!
+             * @brief
+             *
+             * @ingroup pack
+             *
+             * @tparam Endianness
+             * @tparam InValueBits
+             * @tparam OutValueBits
+             * @tparam InputIterator1
+             * @tparam InputIterator2
+             *
+             * @param b1
+             * @param e1
+             * @param tag1
+             * @param b2
+             *
+             * @return
+             */
             template<typename Endianness, int InValueBits, int OutValueBits, typename InputIterator1,
                      typename InputIterator2>
             void pack(InputIterator1 b1, InputIterator1 e1, std::random_access_iterator_tag, InputIterator2 b2) {
                 pack_n<Endianness, InValueBits, OutValueBits>(b1, e1 - b1, b2);
             }
 
+            /*!
+             * @brief
+             *
+             * @ingroup pack
+             *
+             * @tparam Endianness
+             * @tparam InValueBits
+             * @tparam OutValueBits
+             * @tparam InputIterator1
+             * @tparam CatT1
+             * @tparam InputIterator2
+             *
+             * @param b1
+             * @param e1
+             * @param catt1
+             * @param b2
+             *
+             * @return
+             */
             template<typename Endianness, int InValueBits, int OutValueBits, typename InputIterator1, typename CatT1,
                      typename InputIterator2,
                      typename = typename std::enable_if<detail::is_iterator<InputIterator1>::value>::type,
@@ -183,6 +262,23 @@ namespace nil {
                 packer_type::pack(b1, e1, b2);
             }
 
+            /*!
+             * @brief
+             *
+             * @ingroup pack
+             *
+             * @tparam Endianness
+             * @tparam InValueBits
+             * @tparam OutValueBits
+             * @tparam InputIterator1
+             * @tparam InputIterator2
+             *
+             * @param b1
+             * @param e1
+             * @param b2
+             *
+             * @return
+             */
             template<typename Endianness, int InValueBits, int OutValueBits, typename InputIterator1,
                      typename InputIterator2,
                      typename = typename std::enable_if<detail::is_iterator<InputIterator2>::value>::type>
@@ -191,6 +287,26 @@ namespace nil {
                 pack<Endianness, InValueBits, OutValueBits>(b1, e1, cat1(), b2);
             }
 
+            /*!
+             * @brief
+             *
+             * @ingroup pack
+             *
+             * @tparam Endianness
+             * @tparam InValueBits
+             * @tparam OutValueBits
+             * @tparam InputIterator1
+             * @tparam InputIterator2
+             *
+             * @param b1
+             * @param e1
+             * @param tag1
+             * @param b2
+             * @param e2
+             * @param tag2
+             *
+             * @return
+             */
             template<typename Endianness, int InValueBits, int OutValueBits, typename InputIterator1,
                      typename InputIterator2>
             void pack(InputIterator1 b1, InputIterator1 e1, std::random_access_iterator_tag, InputIterator2 b2,
@@ -198,12 +314,51 @@ namespace nil {
                 pack_n<Endianness, InValueBits, OutValueBits>(b1, e1 - b1, b2, e2 - b2);
             }
 
+            /*!
+             * @brief
+             *
+             * @ingroup pack
+             *
+             * @tparam Endianness
+             * @tparam InValueBits
+             * @tparam OutValueBits
+             * @tparam InputIterator1
+             * @tparam CatT1
+             * @tparam InputIterator2
+             * @tparam CatT2
+             *
+             * @param b1
+             * @param e1
+             * @param catt1
+             * @param b2
+             * @param catt2
+             *
+             * @return
+             */
             template<typename Endianness, int InValueBits, int OutValueBits, typename InputIterator1, typename CatT1,
                      typename InputIterator2, typename CatT2>
             void pack(InputIterator1 b1, InputIterator1 e1, CatT1, InputIterator2 b2, InputIterator2, CatT2) {
                 pack<Endianness, InValueBits, OutValueBits>(b1, e1, b2);
             }
 
+            /*!
+             * @brief
+             *
+             * @ingroup pack
+             *
+             * @tparam Endianness
+             * @tparam InValueBits
+             * @tparam OutValueBits
+             * @tparam InputIterator1
+             * @tparam InputIterator2
+             *
+             * @param b1
+             * @param e1
+             * @param b2
+             * @param e2
+             *
+             * @return
+             */
             template<typename Endianness, int InValueBits, int OutValueBits, typename InputIterator1,
                      typename InputIterator2>
             void pack(InputIterator1 b1, InputIterator1 e1, InputIterator2 b2, InputIterator2 e2) {
@@ -212,11 +367,44 @@ namespace nil {
                 pack<Endianness, InValueBits, OutValueBits>(b1, e1, cat1(), b2, e2, cat2());
             }
 
+            /*!
+             * @brief
+             *
+             * @ingroup pack
+             *
+             * @tparam Endianness
+             * @tparam InValueBits
+             * @tparam OutValueBits
+             * @tparam InputType
+             * @tparam OutputType
+             *
+             * @param in
+             * @param out
+             *
+             * @return
+             */
             template<typename Endianness, int InValueBits, int OutValueBits, typename InputType, typename OutputType>
             void pack(const InputType &in, OutputType &out) {
                 pack_n<Endianness, InValueBits, OutValueBits>(in.data(), in.size(), out.data(), out.size());
             }
 
+            /*!
+             * @brief
+             *
+             * @ingroup pack
+             *
+             * @tparam Endianness
+             * @tparam InValueBits
+             * @tparam OutValueBits
+             * @tparam InputIterator
+             * @tparam OutputType
+             *
+             * @param first
+             * @param last
+             * @param out
+             *
+             * @return
+             */
             template<typename Endianness, int InValueBits, int OutValueBits, typename InputIterator,
                      typename OutputType,
                      typename = typename std::enable_if<!std::is_arithmetic<OutputType>::value>::type>
