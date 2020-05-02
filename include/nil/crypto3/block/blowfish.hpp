@@ -63,6 +63,7 @@ namespace nil {
                     key_expansion(key, salt);
                 }
 
+                
                 virtual ~blowfish() {
                     permutations.fill(0);
                     constants.fill(0);

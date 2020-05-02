@@ -68,10 +68,15 @@ namespace nil {
 
                     inline result_type result(boost::accumulators::dont_care) const {
                         result_type res = dgst;
+                        result_type new_dgst_part;
 
-                        result_type new_dgst_part = mode.end_message(cache, previous_block, total_seen);
+                        block_type ob = mode.end_message(cache, previous_block, total_seen);
 
-                        res.append(new_dgst_part);
+                        std::copy(ob.begin(), ob.end(), std::inserter(new_dgst_part, new_dgst_part.end()));
+
+                        res.insert(res.end(), new_dgst_part.begin(), new_dgst_part.end());
+
+                        std::reverse(res.begin(), res.end());
 
                         return res;
                     }
@@ -88,12 +93,21 @@ namespace nil {
 
                     inline void process_block(){
                         if (dgst.empty()){
-                            result_type new_dgst_part = mode.begin_message(cache, previous_block, total_seen);
-                            dgst.append(new_dgst_part);
+                            result_type new_dgst_part;
+                            previous_block = mode.begin_message(cache, previous_block, total_seen);
+
+                            std::copy(previous_block.begin(), previous_block.end(), std::inserter(new_dgst_part, new_dgst_part.end()));
+
+                            dgst.insert(dgst.end(), new_dgst_part.begin(), new_dgst_part.end());
+
                         }
                         else{
-                            result_type new_dgst_part = mode.process_block(cache, previous_block, total_seen);
-                            dgst.append(new_dgst_part);
+                            result_type new_dgst_part;
+                            previous_block = mode.process_block(cache, previous_block, total_seen);
+
+                            std::copy(previous_block.begin(), previous_block.end(), std::inserter(new_dgst_part, new_dgst_part.end()));
+
+                            dgst.insert(dgst.end(), new_dgst_part.begin(), new_dgst_part.end());
                         }
 
                         std::move(cache.begin(), cache.end(), previous_block.begin());
