@@ -43,7 +43,7 @@ namespace nil {
             struct can_memcpy<stream_endian::host_unit<UnitBits>, InputBits, OutputBits, InT, OutT>
                 : host_can_memcpy<UnitBits, InputBits, OutputBits, InT, OutT> { };
 
-#ifdef BOOST_ENDIAN_LITTLE_BYTE
+#ifdef BOOST_ENDIAN_LITTLE_BYTE_AVAILABLE
             template<int UnitBits, int InputBits, int OutputBits, typename InT, typename OutT>
             struct can_memcpy<stream_endian::little_unit_big_bit<UnitBits>, InputBits, OutputBits, InT, OutT>
                 : host_can_memcpy<UnitBits, InputBits, OutputBits, InT, OutT> { };
@@ -52,7 +52,7 @@ namespace nil {
                 : host_can_memcpy<UnitBits, InputBits, OutputBits, InT, OutT> { };
 #endif
 
-#ifdef BOOST_ENDIAN_BIG_BYTE
+#ifdef BOOST_ENDIAN_BIG_BYTE_AVAILABLE
             template<int UnitBits, int InputBits, int OutputBits, typename InT, typename OutT>
             struct can_memcpy<stream_endian::big_unit_big_bit<UnitBits>, InputBits, OutputBits, InT, OutT>
                 : host_can_memcpy<UnitBits, InputBits, OutputBits, InT, OutT> { };
