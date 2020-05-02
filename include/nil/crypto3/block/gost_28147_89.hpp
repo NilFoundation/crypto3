@@ -138,11 +138,7 @@ namespace nil {
                                                    StateAccumulator,
                                                    params_type>
                         type_;
-#ifdef CRYPTO3_BLOCK_NO_HIDE_INTERNAL_TYPES
-                    typedef type_ type;
-#else
-                    struct type : type_ {};
-#endif
+
                 };
 
                 gost_28147_89(const key_type &key,

@@ -66,11 +66,7 @@ namespace nil {
 
                     typedef block_stream_processor<Mode<cast<BlockBits, KeyBits>, Padding>, StateAccumulator, params_type>
                         type_;
-#ifdef CRYPTO3_BLOCK_NO_HIDE_INTERNAL_TYPES
-                    typedef type_ type;
-#else
-                    struct type : type_ {};
-#endif
+
                 };
 
                 cast(const key_type &key) {

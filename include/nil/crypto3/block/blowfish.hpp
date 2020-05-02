@@ -55,11 +55,7 @@ namespace nil {
                     };
 
                     typedef block_stream_processor<Mode, StateAccumulator, params_type> type;
-/*#ifdef CRYPTO3_BLOCK_NO_HIDE_INTERNAL_TYPES
-                    typedef type_ type;
-#else
-                    struct type : type_ {};
-#endif*/
+
                 };
 
                 blowfish(const key_type &key, const salt_type &salt = salt_type()) :

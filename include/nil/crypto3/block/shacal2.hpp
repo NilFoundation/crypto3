@@ -79,11 +79,7 @@ namespace nil {
 
                     typedef block_stream_processor<Mode<shacal2<BlockBits>, Padding>, StateAccumulator, params_type>
                         type_;
-#ifdef CRYPTO3_BLOCK_NO_HIDE_INTERNAL_TYPES
-                    typedef type_ type;
-#else
-                    struct type : type_ { };
-#endif
+
                 };
 
                 shacal2(const key_type &key) : schedule(build_schedule(key)) {

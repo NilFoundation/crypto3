@@ -59,11 +59,7 @@ namespace nil {
                     };
 
                     typedef block_stream_processor<Mode<misty1, Padding>, StateAccumulator, params_type> type_;
-#ifdef CRYPTO3_BLOCK_NO_HIDE_INTERNAL_TYPES
-                    typedef type_ type;
-#else
-                    struct type : type_ {};
-#endif
+
                 };
 
                 misty1(const key_type &key) {
