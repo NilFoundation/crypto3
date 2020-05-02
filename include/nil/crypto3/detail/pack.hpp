@@ -19,8 +19,7 @@
 
 #ifndef CRYPTO3_NO_OPTIMIZATION
 
-#include <boost/endian.hpp>
-#include <boost/utility/enable_if.hpp>
+#include <boost/predef/other/endian.h>
 
 #endif
 
