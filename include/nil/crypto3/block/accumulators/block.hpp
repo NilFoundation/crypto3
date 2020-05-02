@@ -98,7 +98,7 @@ namespace nil {
                             pack<endian_type>(previous_block.begin(), previous_block.end(), dgst.end());
                         } else {
                             previous_block = mode.process_block(cache, previous_block, total_seen);
-                            pack<digest_endian>(previous_block.begin(), previous_block.end(), dgst.end());
+                            pack<endian_type>(previous_block.begin(), previous_block.end(), dgst.end());
                         }
 
                         std::move(cache.begin(), cache.end(), previous_block.begin());
