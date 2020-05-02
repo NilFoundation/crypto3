@@ -19,8 +19,7 @@
 
 #ifndef CRYPTO3_NO_OPTIMIZATION
 
-#include <boost/endian.hpp>
-#include <boost/utility/enable_if.hpp>
+#include <boost/predef/other/endian.h>
 
 #endif
 
@@ -42,24 +41,24 @@ namespace nil {
 
             template<int UnitBits, int InputBits, int OutputBits, typename InT, typename OutT>
             struct can_memcpy<stream_endian::host_unit<UnitBits>, InputBits, OutputBits, InT, OutT>
-                : host_can_memcpy<UnitBits, InputBits, OutputBits, InT, OutT> {};
+                : host_can_memcpy<UnitBits, InputBits, OutputBits, InT, OutT> { };
 
-#ifdef CRYPTO3_TARGET_CPU_IS_LITTLE_ENDIAN
+#ifdef BOOST_ENDIAN_LITTLE_BYTE
             template<int UnitBits, int InputBits, int OutputBits, typename InT, typename OutT>
             struct can_memcpy<stream_endian::little_unit_big_bit<UnitBits>, InputBits, OutputBits, InT, OutT>
-                : host_can_memcpy<UnitBits, InputBits, OutputBits, InT, OutT> {};
+                : host_can_memcpy<UnitBits, InputBits, OutputBits, InT, OutT> { };
             template<int UnitBits, int InputBits, int OutputBits, typename InT, typename OutT>
             struct can_memcpy<stream_endian::little_unit_little_bit<UnitBits>, InputBits, OutputBits, InT, OutT>
-                : host_can_memcpy<UnitBits, InputBits, OutputBits, InT, OutT> {};
+                : host_can_memcpy<UnitBits, InputBits, OutputBits, InT, OutT> { };
 #endif
 
-#ifdef CRYPTO3_TARGET_CPU_IS_BIG_ENDIAN
+#ifdef BOOST_ENDIAN_BIG_BYTE
             template<int UnitBits, int InputBits, int OutputBits, typename InT, typename OutT>
             struct can_memcpy<stream_endian::big_unit_big_bit<UnitBits>, InputBits, OutputBits, InT, OutT>
-                : host_can_memcpy<UnitBits, InputBits, OutputBits, InT, OutT> {};
+                : host_can_memcpy<UnitBits, InputBits, OutputBits, InT, OutT> { };
             template<int UnitBits, int InputBits, int OutputBits, typename InT, typename OutT>
             struct can_memcpy<stream_endian::big_unit_little_bit<UnitBits>, InputBits, OutputBits, InT, OutT>
-                : host_can_memcpy<UnitBits, InputBits, OutputBits, InT, OutT> {};
+                : host_can_memcpy<UnitBits, InputBits, OutputBits, InT, OutT> { };
 #endif
 
 #endif
@@ -223,7 +222,7 @@ namespace nil {
                      typename = typename std::enable_if<!std::is_arithmetic<OutputType>::value>::type>
             inline void pack(InputIterator first, InputIterator last, OutputType &out) {
                 pack_n<Endianness, InValueBits, OutValueBits>(first, std::distance(first, last), out.begin(),
-                    out.size());
+                                                              out.size());
             }
         }    // namespace detail
     }        // namespace crypto3
