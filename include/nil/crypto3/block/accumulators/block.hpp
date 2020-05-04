@@ -70,13 +70,12 @@ namespace nil {
 
                     inline result_type result(boost::accumulators::dont_care) const {
                         result_type res = dgst;
-                        result_type new_dgst_part;
 
-                        block_type ob = mode.end_message(cache, previous_block, total_seen);
+                        block_type processed_block = mode.end_message(cache, previous_block, total_seen);
 
-                        std::move(ob.begin(), ob.end(), std::inserter(new_dgst_part, new_dgst_part.end()));
+                        std::move(processed_block.begin(), processed_block.end(), std::inserter(new_dgst_part, new_dgst_part.end()));
 
-                        res.insert(res.end(), new_dgst_part.begin(), new_dgst_part.end());
+                        res.insert(res.end(), processed_block.begin(), processed_block.end());
 
                         std::reverse(res.begin(), res.end());
 
@@ -93,15 +92,19 @@ namespace nil {
                     }
 
                     inline void process_block() {
+                        block_type processed_block;
                         if (dgst.empty()) {
-                            previous_block = mode.begin_message(cache, previous_block, total_seen);
-                            pack<endian_type>(previous_block.begin(), previous_block.end(), dgst.end());
+                            processed_block = mode.begin_message(cache, total_seen);
                         } else {
-                            previous_block = mode.process_block(cache, previous_block, total_seen);
-                            pack<endian_type>(previous_block.begin(), previous_block.end(), dgst.end());
+                            processed_block = mode.process_block(cache, total_seen);
                         }
 
-                        std::move(cache.begin(), cache.end(), previous_block.begin());
+                        pack<endian_type>(processed_block.begin(), processed_block.end(), dgst.end());
+
+                        std::move(processed_block.begin(), processed_block.end(), std::inserter(new_dgst_part, new_dgst_part.end()));
+
+                        res.insert(res.end(), processed_block.begin(), processed_block.end());
+                        
                         filled = false;
                     }
 
@@ -208,13 +211,11 @@ namespace nil {
                         }
                     }
 
-                    cipher_type cipher;
                     mode_type mode;
 
                     bool filled;
                     std::size_t total_seen;
                     block_type cache;
-                    block_type previous_block;
                     result_type dgst;
                 };
             }    // namespace impl

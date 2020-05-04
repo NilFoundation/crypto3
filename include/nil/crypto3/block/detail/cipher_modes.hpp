@@ -98,19 +98,22 @@ namespace nil {
                     isomorphic(const cipher_type &cipher) : cipher(cipher) {
                     }
 
-                    block_type begin_message(const block_type &plaintext, const block_type &previous_block, std::size_t total_seen) {
-                        return policy_type::begin_message(cipher, plaintext, previous_block, total_seen);
+                    block_type begin_message(const block_type &plaintext, std::size_t total_seen) {
+                        previous = policy_type::begin_message(cipher, plaintext, total_seen);
+                        return previous;
                     }
 
-                    block_type process_block(const block_type &plaintext, const block_type &previous_block, std::size_t total_seen) {
-                        return policy_type::process_block(cipher, plaintext, previous_block, total_seen);
+                    block_type process_block(const block_type &plaintext, std::size_t total_seen) {
+                        previous = policy_type::process_block(cipher, plaintext, previous, total_seen);
+                        return previous;
                     }
 
-                    block_type end_message(const block_type &plaintext, const block_type &previous_block, std::size_t total_seen) {
-                        return policy_type::end_message(cipher, plaintext, previous_block, total_seen);
+                    block_type end_message(const block_type &plaintext, std::size_t total_seen) {
+                        return policy_type::end_message(cipher, plaintext, previous, total_seen);
                     }
 
                 protected:
+                    block_type previous;
                     cipher_type cipher;
                 };
             }    // namespace detail
