@@ -234,8 +234,8 @@ namespace nil {
             template<typename Endianness1, typename Endianness2, int InValueBits, int OutValueBits, typename InputIterator1,
                      typename InputIterator2>
             void pack_n(InputIterator1 in, size_t in_n, InputIterator2 out) {
-                typedef packer<Endianness1, Endianness2, InValueBits, OutValueBits> packer_type;
-                packer_type::pack_n(in, in_n, out);
+                // typedef packer<Endianness1, Endianness2, InValueBits, OutValueBits> packer_type;
+                // packer_type::pack_n(in, in_n, out);
             }
 
             /*!
@@ -521,8 +521,8 @@ namespace nil {
                      typename = typename std::enable_if<detail::is_iterator<InputIterator1>::value>::type,
                      typename = typename std::enable_if<detail::is_iterator<InputIterator2>::value>::type>
             void pack(InputIterator1 b1, InputIterator1 e1, CatT1, InputIterator2 b2) {
-                typedef packer<Endianness1, Endianness2, InValueBits, OutValueBits> packer_type;
-                packer_type::pack(b1, e1, b2);
+                //typedef packer<Endianness1, Endianness2, InValueBits, OutValueBits> packer_type;
+                //packer_type::pack(b1, e1, b2);
             }
 
             /*!
