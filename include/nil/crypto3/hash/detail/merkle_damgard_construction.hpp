@@ -34,8 +34,11 @@ namespace nil {
              *
              * @note http://www.merkle.com/papers/Thesis1979.pdf
              */
-            template<typename Params, typename IV, typename Compressor, typename Padding,
-            typename Finalizer = detail::nop_finalizer>
+            template<typename Params,
+                     typename IV,
+                     typename Compressor,
+                     typename Padding,
+                     typename Finalizer = detail::nop_finalizer>
             class merkle_damgard_construction {
             public:
                 typedef IV iv_generator;
@@ -86,23 +89,23 @@ namespace nil {
                     // Process block if block is full
                     if (total_seen && !block_seen)
                         process_block(b);
-                    
+
                     // Pad last message block
                     padding_functor padding;
                     padding(b, block_seen);
-                    
+
                     // Process block if total length cannot be appended
                     if (block_seen + length_bits > block_bits) {
                         process_block(b);
                         std::fill(b.begin(), b.end(), 0);
                     }
-                    
+
                     // Append total length to the last block
                     append_length<int>(b, total_seen);
-                    
+
                     // Process the last block
                     process_block(b);
-                    
+
                     // Apply finalizer
                     finalizer_functor()(state_);
 
