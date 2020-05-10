@@ -15,8 +15,10 @@
 #include <nil/crypto3/detail/type_traits.hpp>
 
 #include <boost/static_assert.hpp>
+#include <boost/endian/conversion.hpp>
 
 #include <algorithm>
+#include <iterator>
 
 namespace nil {
     namespace crypto3 {
@@ -32,7 +34,7 @@ namespace nil {
                 template<typename InIter, typename OutIter>
                 static void pack_n(InIter in, size_t n, OutIter out) {
                     std::copy(in, in + n, out);
-                }                
+                }
 
                 template<typename InIter, typename OutIter>
                 static void pack(InIter in_begin, InIter in_end, OutIter out) {
@@ -84,7 +86,7 @@ namespace nil {
                     }
                 }
             };
-                
+
 
             template<template<int> class Endian, int UnitBits1, int UnitBits2>
             struct new_packer<Endian<UnitBits1>, Endian<UnitBits2>, UnitBits1, UnitBits2, false, true> {
@@ -104,7 +106,7 @@ namespace nil {
                             *out++ = OutValue(low_bits<UnitBits2>(unbounded_shr(*in, shift)));
                         }
                     }
-                }   
+                }
 
                 template<typename InIter, typename OutIter>
                 static void pack(InIter in_begin, InIter in_end, OutIter out) {
@@ -118,9 +120,117 @@ namespace nil {
                             *out++ = OutValue(low_bits<UnitBits2>(unbounded_shr(*in_begin, shift)));
                         }
                     }
-                }                
+                }
             };
 
+            /* Case of different byte endians */
+            template<template<int> class Endian1, template<int> class Endian2, int UnitBits>
+            struct new_packer<Endian1<UnitBits>, Endian2<UnitBits>, UnitBits, UnitBits, false, false> {
+
+                template<typename InIter, typename OutIter>
+                static void pack_n(InIter in, size_t n, OutIter out) {
+                    std::copy(in, in + n, out);
+
+                    for (OutIter it = out; it != (out + n); ++it)
+                        boost::endian::endian_reverse_inplace(*it);
+                }
+                
+                template<typename InIter, typename OutIter>
+                static void pack(InIter in_begin, InIter in_end, OutIter out) {
+                    std::copy(in_begin, in_end, out);
+
+                    OutIter out_end = out + std::distance(in_begin, in_end);
+                    for (OutIter it = out; it != out_end; ++it)
+                        boost::endian::endian_reverse_inplace(*it);
+                }
+            };
+
+            template<template<int> class Endian1, template<int> class Endian2, int UnitBits1, int UnitBits2>
+            struct new_packer<Endian1<UnitBits1>, Endian2<UnitBits2>, UnitBits1, UnitBits2, true, false> {
+
+                BOOST_STATIC_ASSERT(!(UnitBits2 % UnitBits1));
+
+                template<typename InIter, typename OutIter>
+                static void pack_n(InIter in, size_t n, OutIter out) {
+
+                    typedef typename std::iterator_traits<OutIter>::value_type OutValue;
+                    int const in_units = UnitBits2 / UnitBits1;
+                    InIter in_end = in + n;
+                    
+                    while (in != in_end) {
+
+                        OutValue out_val = OutValue();
+
+                        for (int shift = UnitBits2, i = 0; i != in_units; ++i) {
+                            shift -= UnitBits1;
+                            out_val |= unbounded_shl(low_bits<UnitBits1>(OutValue(*in++)), shift);
+                        }
+
+                        *out++ = boost::endian::endian_reverse(out_val);
+                    }
+                }
+
+                template<typename InIter, typename OutIter>
+                static void pack(InIter in_begin, InIter in_end, OutIter out) {
+
+                    typedef typename std::iterator_traits<OutIter>::value_type OutValue;
+                    int const in_units = UnitBits2 / UnitBits1;
+                    
+                    while (in_begin != in_end) {
+
+                        OutValue out_val = OutValue();
+
+                        for (int shift = UnitBits2, i = 0; i != in_units; ++i) {
+                            shift -= UnitBits1;
+                            out_val |= unbounded_shl(low_bits<UnitBits1>(OutValue(*in_begin++)), shift);
+                        }
+
+                        *out++ = boost::endian::endian_reverse(out_val);
+                    }
+                }
+            };
+
+
+            template<template<int> class Endian1, template<int> class Endian2, int UnitBits1, int UnitBits2>
+            struct new_packer<Endian1<UnitBits1>, Endian2<UnitBits2>, UnitBits1, UnitBits2, false, true> {
+
+                BOOST_STATIC_ASSERT(!(UnitBits1 % UnitBits2));
+
+                template<typename InIter, typename OutIter>
+                static void pack_n(InIter in, size_t n, OutIter out) {
+
+                    typedef typename std::iterator_traits<InIter>::value_type InValue;
+                    typedef typename std::iterator_traits<OutIter>::value_type OutValue;
+                    int const in_units = UnitBits1 / UnitBits2;
+                    InIter in_end = in + n;
+                    
+                    for (; in != in_end; ++in) {
+                        InValue in_val = boost::endian::endian_reverse(*in);
+
+                        for (int shift = UnitBits1, i = 0; i != in_units; ++i) {
+                            shift -= UnitBits2;
+                            *out++ = OutValue(low_bits<UnitBits2>(unbounded_shr(in_val, shift)));
+                        }
+                    }
+                }
+
+                template<typename InIter, typename OutIter>
+                static void pack(InIter in_begin, InIter in_end, OutIter out) {
+
+                    typedef typename std::iterator_traits<InIter>::value_type InValue;
+                    typedef typename std::iterator_traits<OutIter>::value_type OutValue;
+                    int const in_units = UnitBits1 / UnitBits2;
+                    
+                    for (; in_begin != in_end; ++in_begin) {
+                        InValue in_val = boost::endian::endian_reverse(*in_begin);
+
+                        for (int shift = UnitBits1, i = 0; i != in_units; ++i) {
+                            shift -= UnitBits2;
+                            *out++ = OutValue(low_bits<UnitBits2>(unbounded_shr(in_val, shift)));
+                        }
+                    }
+                }
+            };
 
         }    // namespace detail
     }        // namespace crypto3
