@@ -18,7 +18,7 @@
 #include <cmath>
 
 #include <gmp.h>
-#include <libff/common/utils.hpp>
+#include <nil/crypto3/ff/common/utils.hpp>
 
 namespace libfqfft {
 

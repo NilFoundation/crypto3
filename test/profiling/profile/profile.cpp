@@ -25,8 +25,8 @@
 #include <sys/resource.h>
 #include <unistd.h>
 
-#include <libff/algebra/curves/edwards/edwards_pp.hpp>
-#include <libff/common/double.hpp>
+#include <nil/crypto3/ff/algebra/curves/edwards/edwards_pp.hpp>
+#include <nil/crypto3/ff/common/double.hpp>
 #include <omp.h>
 
 #include <libfqfft/evaluation_domain/domains/arithmetic_sequence_domain.hpp>

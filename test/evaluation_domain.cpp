@@ -9,7 +9,7 @@
 #include <vector>
 
 #include <gtest/gtest.h>
-#include <libff/algebra/curves/mnt/mnt4/mnt4_pp.hpp>
+#include <nil/crypto3/ff/algebra/curves/mnt/mnt4/mnt4_pp.hpp>
 #include <stdint.h>
 
 #include <libfqfft/evaluation_domain/domains/arithmetic_sequence_domain.hpp>
