@@ -31,7 +31,6 @@ namespace nil {
              *
              */
 
-
 #ifndef CRYPTO3_NO_OPTIMIZATION
 
             template<int UnitBits, int InputBits, int OutputBits, typename InT, typename OutT>
@@ -160,7 +159,7 @@ namespace nil {
 #endif
             };
 
-//pack_n functions for single endianness parameter
+            // pack_n functions for single endianness parameter
 
             /*!
              * @brief pack_n function for single endianness parameter
@@ -211,7 +210,7 @@ namespace nil {
                 pack_n<Endianness, InValueBits, OutValueBits>(in, in_n, out);
             }
 
-//pack_n functions for dual endianness parameter
+            // pack_n functions for dual endianness parameter
 
             /*!
              * @brief pack_n function for dual endianness parameter
@@ -231,8 +230,8 @@ namespace nil {
              *
              * @return
              */
-            template<typename Endianness1, typename Endianness2, int InValueBits, int OutValueBits, typename InputIterator1,
-                     typename InputIterator2>
+            template<typename Endianness1, typename Endianness2, int InValueBits, int OutValueBits,
+                     typename InputIterator1, typename InputIterator2>
             void pack_n(InputIterator1 in, size_t in_n, InputIterator2 out) {
                 // typedef packer<Endianness1, Endianness2, InValueBits, OutValueBits> packer_type;
                 // packer_type::pack_n(in, in_n, out);
@@ -257,14 +256,14 @@ namespace nil {
              *
              * @return
              */
-            template<typename Endianness1, typename Endianness2, int InValueBits, int OutValueBits, typename InputIterator1,
-                     typename InputIterator2>
+            template<typename Endianness1, typename Endianness2, int InValueBits, int OutValueBits,
+                     typename InputIterator1, typename InputIterator2>
             void pack_n(InputIterator1 in, size_t in_n, InputIterator2 out, size_t out_n) {
                 BOOST_ASSERT(in_n * InValueBits == out_n * OutValueBits);
                 pack_n<Endianness1, Endianness2, InValueBits, OutValueBits>(in, in_n, out);
             }
 
-//pack functions for single endianness parameter
+            // pack functions for single endianness parameter
 
             /*!
              * @brief pack function for single endianness parameter
@@ -469,7 +468,7 @@ namespace nil {
                                                               out.size());
             }
 
-//pack functions for dual endianness parameter
+            // pack functions for dual endianness parameter
 
             /*!
              * @brief pack function for dual endianness parameter
@@ -490,8 +489,8 @@ namespace nil {
              *
              * @return
              */
-            template<typename Endianness1, typename Endianness2, int InValueBits, int OutValueBits, typename InputIterator1,
-                     typename InputIterator2>
+            template<typename Endianness1, typename Endianness2, int InValueBits, int OutValueBits,
+                     typename InputIterator1, typename InputIterator2>
             void pack(InputIterator1 b1, InputIterator1 e1, std::random_access_iterator_tag, InputIterator2 b2) {
                 pack_n<Endianness1, Endianness2, InValueBits, OutValueBits>(b1, e1 - b1, b2);
             }
@@ -516,13 +515,13 @@ namespace nil {
              *
              * @return
              */
-            template<typename Endianness1, typename Endianness2, int InValueBits, int OutValueBits, typename InputIterator1, typename CatT1,
-                     typename InputIterator2,
+            template<typename Endianness1, typename Endianness2, int InValueBits, int OutValueBits,
+                     typename InputIterator1, typename CatT1, typename InputIterator2,
                      typename = typename std::enable_if<detail::is_iterator<InputIterator1>::value>::type,
                      typename = typename std::enable_if<detail::is_iterator<InputIterator2>::value>::type>
             void pack(InputIterator1 b1, InputIterator1 e1, CatT1, InputIterator2 b2) {
-                //typedef packer<Endianness1, Endianness2, InValueBits, OutValueBits> packer_type;
-                //packer_type::pack(b1, e1, b2);
+                // typedef packer<Endianness1, Endianness2, InValueBits, OutValueBits> packer_type;
+                // packer_type::pack(b1, e1, b2);
             }
 
             /*!
@@ -543,8 +542,8 @@ namespace nil {
              *
              * @return
              */
-            template<typename Endianness1, typename Endianness2, int InValueBits, int OutValueBits, typename InputIterator1,
-                     typename InputIterator2,
+            template<typename Endianness1, typename Endianness2, int InValueBits, int OutValueBits,
+                     typename InputIterator1, typename InputIterator2,
                      typename = typename std::enable_if<detail::is_iterator<InputIterator2>::value>::type>
             void pack(InputIterator1 b1, InputIterator1 e1, InputIterator2 b2) {
                 typedef typename std::iterator_traits<InputIterator1>::iterator_category cat1;
@@ -572,8 +571,8 @@ namespace nil {
              *
              * @return
              */
-            template<typename Endianness1, typename Endianness2, int InValueBits, int OutValueBits, typename InputIterator1,
-                     typename InputIterator2>
+            template<typename Endianness1, typename Endianness2, int InValueBits, int OutValueBits,
+                     typename InputIterator1, typename InputIterator2>
             void pack(InputIterator1 b1, InputIterator1 e1, std::random_access_iterator_tag, InputIterator2 b2,
                       InputIterator2 e2, std::random_access_iterator_tag) {
                 pack_n<Endianness1, Endianness2, InValueBits, OutValueBits>(b1, e1 - b1, b2, e2 - b2);
@@ -601,8 +600,8 @@ namespace nil {
              *
              * @return
              */
-            template<typename Endianness1, typename Endianness2, int InValueBits, int OutValueBits, typename InputIterator1, typename CatT1,
-                     typename InputIterator2, typename CatT2>
+            template<typename Endianness1, typename Endianness2, int InValueBits, int OutValueBits,
+                     typename InputIterator1, typename CatT1, typename InputIterator2, typename CatT2>
             void pack(InputIterator1 b1, InputIterator1 e1, CatT1, InputIterator2 b2, InputIterator2, CatT2) {
                 pack<Endianness1, Endianness2, InValueBits, OutValueBits>(b1, e1, b2);
             }
@@ -626,8 +625,8 @@ namespace nil {
              *
              * @return
              */
-            template<typename Endianness1, typename Endianness2, int InValueBits, int OutValueBits, typename InputIterator1,
-                     typename InputIterator2>
+            template<typename Endianness1, typename Endianness2, int InValueBits, int OutValueBits,
+                     typename InputIterator1, typename InputIterator2>
             void pack(InputIterator1 b1, InputIterator1 e1, InputIterator2 b2, InputIterator2 e2) {
                 typedef typename std::iterator_traits<InputIterator1>::iterator_category cat1;
                 typedef typename std::iterator_traits<InputIterator2>::iterator_category cat2;
@@ -651,9 +650,11 @@ namespace nil {
              *
              * @return
              */
-            template<typename Endianness1, typename Endianness2, int InValueBits, int OutValueBits, typename InputType, typename OutputType>
+            template<typename Endianness1, typename Endianness2, int InValueBits, int OutValueBits, typename InputType,
+                     typename OutputType>
             void pack(const InputType &in, OutputType &out) {
-                pack_n<Endianness1, Endianness2, InValueBits, OutValueBits>(in.data(), in.size(), out.data(), out.size());
+                pack_n<Endianness1, Endianness2, InValueBits, OutValueBits>(in.data(), in.size(), out.data(),
+                                                                            out.size());
             }
 
             /*!
@@ -674,12 +675,12 @@ namespace nil {
              *
              * @return
              */
-            template<typename Endianness1, typename Endianness2, int InValueBits, int OutValueBits, typename InputIterator,
-                     typename OutputType,
+            template<typename Endianness1, typename Endianness2, int InValueBits, int OutValueBits,
+                     typename InputIterator, typename OutputType,
                      typename = typename std::enable_if<!std::is_arithmetic<OutputType>::value>::type>
             inline void pack(InputIterator first, InputIterator last, OutputType &out) {
-                pack_n<Endianness1, Endianness2, InValueBits, OutValueBits>(first, std::distance(first, last), out.begin(),
-                                                              out.size());
+                pack_n<Endianness1, Endianness2, InValueBits, OutValueBits>(first, std::distance(first, last),
+                                                                            out.begin(), out.size());
             }
         }    // namespace detail
     }        // namespace crypto3
