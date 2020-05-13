@@ -13,7 +13,7 @@
 #include <array>
 #include <iterator>
 
-#include <nil/crypto3/detail/pack.hpp>
+#include <nil/crypto3/detail/new_pack.hpp>
 
 #include <nil/crypto3/hash/accumulators/bits_count.hpp>
 #include <nil/crypto3/hash/accumulators/parameters/bits.hpp>
@@ -59,6 +59,9 @@ namespace nil {
 
             protected:
 
+                typedef ::nil::crypto3::detail::new_packer<stream_endian::little_octet_big_bit, endian_type, 
+                    value_bits, word_bits> cache_packer;
+
                 BOOST_STATIC_ASSERT(block_bits % value_bits == 0);
 
                 inline void process_block(std::size_t block_seen = block_bits) {
@@ -66,7 +69,7 @@ namespace nil {
 
                     // Convert the input into words
                     block_type block;
-                    pack<endian_type, value_bits, word_bits>(cache, block);
+                    cache_packer::pack(cache.begin(), cache.end(), block.begin());
 
                     // Process the block
                     acc(block, accumulators::bits = block_seen);

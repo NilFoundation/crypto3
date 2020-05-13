@@ -29,7 +29,7 @@ namespace nil {
                Handling the case of bit endianness is to be done */
 
             template<typename InEndian, typename OutEndian, size_t InValBits, size_t OutValBits>
-            struct packer {
+            struct new_packer {
 
                 template<typename InIter, typename OutIter, typename Dummy = size_t>
                 static typename std::enable_if<(InValBits == OutValBits) && sizeof(Dummy)>::type
