@@ -84,7 +84,7 @@ namespace nil {
 
                     typedef sponge_construction<
                         params_type, typename policy_type::iv_generator, keccak_1600_compressor<DigestBits>,
-                        detail::keccak_1600_padding<typename params_type::digest_endian, policy_type>,
+                        detail::keccak_1600_padding<policy_type>,
                         detail::keccak_1600_finalizer<policy_type>>
                         type;
                 };

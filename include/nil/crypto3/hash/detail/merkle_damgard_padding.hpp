@@ -19,9 +19,11 @@ namespace nil {
     namespace crypto3 {
         namespace hash {
             namespace detail {
-                template<typename Endianness, typename PolicyType>
+                template<typename Hash>
                 class merkle_damgard_padding {
-                    typedef PolicyType policy_type;
+                    typedef Hash policy_type;
+
+                    typedef typename policy_type::digest_endian endian_type;
 
                     constexpr static const std::size_t word_bits = policy_type::word_bits;
                     typedef typename policy_type::word_type word_type;
@@ -37,10 +39,10 @@ namespace nil {
                     constexpr static const std::size_t digest_bits = policy_type::digest_bits;
                     typedef typename policy_type::digest_type digest_type;
 
-                    typedef ::nil::crypto3::detail::injector<Endianness, word_bits, block_words, block_bits>
+                    typedef ::nil::crypto3::detail::injector<endian_type, word_bits, block_words, block_bits>
                         injector_type;
 
-                    typedef ::nil::crypto3::detail::new_packer<stream_endian::big_octet_big_bit, Endianness,
+                    typedef ::nil::crypto3::detail::new_packer<stream_endian::big_octet_big_bit, endian_type,
                         octet_bits, word_bits> bit_packer;
 
                 public:

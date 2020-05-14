@@ -40,9 +40,9 @@ namespace nil {
                 template<typename Hash>
                 struct hash_impl : boost::accumulators::accumulator_base {
                 protected:
-                    typedef Hash hash_type;
-                    typedef typename hash_type::construction::type construction_type;
-                    typedef typename hash_type::construction::params_type params_type;
+                    typedef Hash policy_type;
+                    typedef typename policy_type::construction::type construction_type;
+                    typedef typename policy_type::construction::params_type params_type;
 
                     typedef typename params_type::digest_endian endian_type;
 
@@ -64,7 +64,7 @@ namespace nil {
                     typedef ::nil::crypto3::detail::injector<endian_type, word_bits, block_words, block_bits> injector_type;
 
                 public:
-                    typedef typename hash_type::digest_type result_type;
+                    typedef typename policy_type::digest_type result_type;
 
                     // The constructor takes an argument pack.
                     hash_impl(boost::accumulators::dont_care) : total_seen(0), filled(false) {
