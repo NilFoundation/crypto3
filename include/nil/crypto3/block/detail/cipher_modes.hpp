@@ -38,15 +38,15 @@ namespace nil {
                     //There should be user's system endianness
                     typedef typename stream_endian::big_octet_big_bit input_endian_type;
 
-                    inline static block_type begin_message(const cipher_type &cipher, const block_type &plaintext, const block_type &previous_block, std::size_t total_seen) {
+                    inline static block_type begin_message(const cipher_type &cipher, const block_type &plaintext) {
                         return cipher.encrypt(plaintext);
                     }
 
-                    inline static block_type process_block(const cipher_type &cipher, const block_type &plaintext, const block_type &previous_block, std::size_t total_seen) {
+                    inline static block_type process_block(const cipher_type &cipher, const block_type &plaintext) {
                         return cipher.encrypt(plaintext);
                     }
 
-                    inline static block_type end_message(const cipher_type &cipher, const block_type &plaintext, const block_type &previous_block, std::size_t total_seen) {
+                    inline static block_type end_message(const cipher_type &cipher, const block_type &plaintext) {
                         return cipher.encrypt(plaintext);
                     }
                 };
@@ -58,15 +58,15 @@ namespace nil {
 
                     typedef typename cipher_type::endian_type input_endian_type;
 
-                    inline static block_type begin_message(const cipher_type &cipher, const block_type &ciphertext, const block_type &previous_block, std::size_t total_seen) {
+                    inline static block_type begin_message(const cipher_type &cipher, const block_type &ciphertext) {
                         return cipher.decrypt(ciphertext);
                     }
 
-                    inline static block_type process_block(const cipher_type &cipher, const block_type &ciphertext, const block_type &previous_block, std::size_t total_seen) {
+                    inline static block_type process_block(const cipher_type &cipher, const block_type &ciphertext) {
                         return cipher.decrypt(ciphertext);
                     }
 
-                    inline static block_type end_message(const cipher_type &cipher, const block_type &ciphertext, const block_type &previous_block, std::size_t total_seen) {
+                    inline static block_type end_message(const cipher_type &cipher, const block_type &ciphertext) {
                         return cipher.decrypt(ciphertext);
                     }
                 };
@@ -97,21 +97,19 @@ namespace nil {
                     }
 
                     block_type begin_message(const block_type &plaintext, std::size_t total_seen) {
-                        previous = policy_type::begin_message(cipher, plaintext, total_seen);
-                        return previous;
+                        return policy_type::begin_message(cipher, plaintext);
                     }
 
                     block_type process_block(const block_type &plaintext, std::size_t total_seen) {
-                        previous = policy_type::process_block(cipher, plaintext, previous, total_seen);
-                        return previous;
+                        return policy_type::process_block(cipher, plaintext);
+                        
                     }
 
                     block_type end_message(const block_type &plaintext, std::size_t total_seen) {
-                        return policy_type::end_message(cipher, plaintext, previous, total_seen);
+                        return policy_type::end_message(cipher, plaintext);
                     }
 
                 protected:
-                    block_type previous;
                     cipher_type cipher;
                 };
             }    // namespace detail
