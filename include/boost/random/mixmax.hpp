@@ -18,7 +18,7 @@
 #define BOOST_RANDOM_MIXMAX_HPP
 
 #include <sstream>
-#include <array>
+#include <boost/array.hpp>
 
 #include <boost/random/detail/seed.hpp>
 #include <boost/random/detail/seed_impl.hpp>
@@ -73,7 +73,7 @@ public:
     
 private: // DATATYPES
     struct rng_state_st{
-        std::array<std::uint64_t, Ndim> V;
+        boost::array<std::uint64_t, Ndim> V;
         std::uint64_t sumtot;
         int counter;
     };
@@ -134,7 +134,7 @@ public: // SEEDING FUNCTIONS
     friend std::basic_istream<CharT,Traits>&
     operator>> (std::basic_istream<CharT,Traits> &in, mixmax_engine& me){
         // will set std::ios::failbit if the input format is not right
-        std::array<std::uint64_t, Ndim> vec;
+        boost::array<std::uint64_t, Ndim> vec;
         std::uint64_t sum=0, savedsum=0, counter=0;
         in >> counter >> std::ws;
         BOOST_ASSERT(counter==Ndim);
