@@ -76,6 +76,9 @@ namespace nil {
                 constexpr static const std::size_t length_words = length_bits / word_bits;
                 BOOST_STATIC_ASSERT(!length_bits || length_bits % word_bits == 0);
 
+                typedef ::nil::crypto3::detail::packer<endian_type, stream_endian::little_octet_big_bit,
+                    word_bits, octet_bits> state_packer;
+
             public:
                 template<typename Integer = std::size_t>
                 inline haifa_construction &process_block(const block_type &block, Integer seen,
@@ -105,8 +108,7 @@ namespace nil {
 
                     // Convert digest to byte representation
                     std::array<octet_type, state_bits / octet_bits> d_full;
-                    pack_n<endian_type, word_bits, octet_bits>(state_.data(), state_words, d_full.data(),
-                                                               state_bits / octet_bits);
+                    state_packer::pack(state_.begin(), state_.end(), d_full.begin());
 
                     digest_type d;
                     std::copy(d_full.begin(), d_full.begin() + digest_bytes, d.begin());

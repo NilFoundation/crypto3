@@ -203,7 +203,8 @@ namespace nil {
                     a[i] = std::toupper(c, source.getloc()) - 'A' + 0xA;
                 }
             }
-            detail::pack<stream_endian::big_bit, 4, 8>(a, d);
+            detail::packer<stream_endian::big_bit, stream_endian::big_bit, 4, 8>
+                ::pack(a.begin(), a.end(), d.begin());
             return source;
         }
     }    // namespace crypto3
