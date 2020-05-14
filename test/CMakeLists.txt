@@ -49,7 +49,6 @@ set(TESTS_NAMES
 #    "keccak"
     "md4"
     "md5"
-    "new_pack"
     "pack"
     "ripemd"
     "sha"

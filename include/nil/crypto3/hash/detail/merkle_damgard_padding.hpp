@@ -12,7 +12,7 @@
 #define CRYPTO3_MERKLE_DAMGARD_PADDING_HPP
 
 #include <nil/crypto3/detail/inject.hpp>
-#include <nil/crypto3/detail/new_pack.hpp>
+#include <nil/crypto3/detail/pack.hpp>
 #include <nil/crypto3/detail/octet.hpp>
 
 namespace nil {
@@ -42,7 +42,7 @@ namespace nil {
                     typedef ::nil::crypto3::detail::injector<endian_type, word_bits, block_words, block_bits>
                         injector_type;
 
-                    typedef ::nil::crypto3::detail::new_packer<stream_endian::big_octet_big_bit, endian_type,
+                    typedef ::nil::crypto3::detail::packer<stream_endian::big_octet_big_bit, endian_type,
                         octet_bits, word_bits> bit_packer;
 
                 public:

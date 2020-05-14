@@ -13,7 +13,7 @@
 #include <nil/crypto3/hash/detail/nop_finalizer.hpp>
 
 #include <nil/crypto3/detail/static_digest.hpp>
-#include <nil/crypto3/detail/new_pack.hpp>
+#include <nil/crypto3/detail/pack.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -70,10 +70,10 @@ namespace nil {
                 constexpr static const std::size_t length_words = length_bits / word_bits;
                 BOOST_STATIC_ASSERT(!length_bits || length_bits % word_bits == 0);
 
-                typedef ::nil::crypto3::detail::new_packer<endian_type, endian_type, length_bits, 
+                typedef ::nil::crypto3::detail::packer<endian_type, endian_type, length_bits, 
                     word_bits> length_packer;
 
-                typedef ::nil::crypto3::detail::new_packer<endian_type, stream_endian::little_octet_big_bit,
+                typedef ::nil::crypto3::detail::packer<endian_type, stream_endian::little_octet_big_bit,
                     word_bits, octet_bits> state_packer;
 
             public:

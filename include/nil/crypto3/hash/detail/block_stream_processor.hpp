@@ -13,7 +13,7 @@
 #include <array>
 #include <iterator>
 
-#include <nil/crypto3/detail/new_pack.hpp>
+#include <nil/crypto3/detail/pack.hpp>
 
 #include <nil/crypto3/hash/accumulators/bits_count.hpp>
 #include <nil/crypto3/hash/accumulators/parameters/bits.hpp>
@@ -59,7 +59,7 @@ namespace nil {
 
             protected:
 
-                typedef ::nil::crypto3::detail::new_packer<stream_endian::little_octet_big_bit, endian_type, 
+                typedef ::nil::crypto3::detail::packer<stream_endian::little_octet_big_bit, endian_type, 
                     value_bits, word_bits> cache_packer;
 
                 BOOST_STATIC_ASSERT(block_bits % value_bits == 0);
