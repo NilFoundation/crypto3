@@ -20,7 +20,6 @@
 #include <boost/utility/enable_if.hpp>
 
 #include <boost/range/algorithm/copy.hpp>
-#include <nil/crypto3/detail/stream_endian.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -32,12 +31,14 @@ namespace nil {
                 typedef StateAccumulator accumulator_type;
                 typedef Params params_type;
 
-                typedef typename mode_type::block_type input_block_type;
-                constexpr static const std::size_t input_block_bits = mode_type::block_bits;
+                typedef typename mode_type::input_block_type input_block_type;
+                constexpr static const std::size_t input_block_bits = mode_type::input_block_bits;
+
+                typedef typename mode_type::output_block_type output_block_type;
+                constexpr static const std::size_t output_block_bits = mode_type::output_block_bits;
 
             public:
-                typedef typename mode_type::endian_type endian_type;
-                typedef typename mode_type::input_endian_type input_endian_type;
+                typedef typename params_type::endian_type endian_type;
 
                 constexpr static const std::size_t value_bits = params_type::value_bits;
                 typedef typename boost::uint_t<value_bits>::least value_type;
@@ -52,31 +53,13 @@ namespace nil {
                     length_bits < input_block_bits ? input_block_bits : length_bits > 64 ? 64 : length_bits;
                 typedef typename boost::uint_t<length_type_bits>::least length_type;
 
+                typedef ::nil::crypto3::detail::packer<stream_endian::little_octet_big_bit, endian_type, 
+                    value_bits, input_block_bits / block_values> block_packer;
+
                 BOOST_STATIC_ASSERT(!length_bits || length_bits % input_block_bits == 0);
                 BOOST_STATIC_ASSERT(input_block_bits % value_bits == 0);
 
                 BOOST_STATIC_ASSERT(!length_bits || value_bits <= length_bits);
-/*
-                template<typename Endianness = input_endian_type>
-                typename std::enable_if<!(Endianness == stream_endian::big_octet_big_bit)>::type
-                process_block(std::size_t block_seen = block_bits) {
-                    acc(cache, accumulators::block_bits = block_seen);
-                }
-
-                template<typename Endianness = input_endian_type>
-                typename std::enable_if<Endianness == stream_endian::big_octet_big_bit>::type
-                process_block(std::size_t block_seen = block_bits) {
-                    using namespace nil::crypto3::detail;
-
-                    // Convert the input into words
-                    block_type block;
-                    pack<endian_type, value_bits, word_bits>(cache, block);
-
-                    // Process the block
-                    acc(block, accumulators::block_bits = block_seen);
-                }
-                */
-
 
                 void update_one(value_type value) {
                     std::size_t i = seen % input_block_bits;
@@ -85,8 +68,7 @@ namespace nil {
                     if (i == input_block_bits - value_bits) {
                         // Convert the input into words
                         input_block_type block = {0};
-                        ::nil::crypto3::detail::pack<endian_type, value_bits, input_block_bits / block_values>(
-                            cache.begin(), cache.end(), block);
+                        block_packer::pack(cache.begin(), cache.end(), block.begin());
 
                         // Process the block
                         state(block);
@@ -110,8 +92,7 @@ namespace nil {
                     for (; n >= block_values; n -= block_values, first += block_values) {
                         // Convert the input into words
                         input_block_type block = {0};
-                        ::nil::crypto3::detail::pack<endian_type, value_bits, input_block_bits / block_values>(
-                            first, first + block_values, block);
+                        block_packer::pack(first, first + block_values, block.begin());
                         seen += value_bits * block_values;
 
                         state(block);
@@ -136,8 +117,7 @@ namespace nil {
                 virtual ~block_stream_processor() {
                     if (!cache.empty()) {
                         input_block_type block = {0};
-                        ::nil::crypto3::detail::pack<endian_type, value_bits, input_block_bits / block_values>(
-                            cache.begin(), cache.begin() + cache.size(), block);
+                        block_packer::pack(cache.begin(), cache.begin() + cache.size(), block.begin());
                         typename input_block_type::const_iterator v = block.cbegin();
                         for (length_type itr = seen - (seen % input_block_bits); itr < seen; itr += value_bits) {
                             state(*v++);
