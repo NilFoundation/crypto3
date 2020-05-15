@@ -1,6 +1,6 @@
-# Verifiable Delay Functions for =nil; Foundation's Cryptography Suite
+# Fast Fourier Transforms  for =nil; Foundation's Cryptography Suite
 
-Verifiable delay functions for =nil; Foundation's cryptography suite
+Fast Fourier Transforms  for =nil; Foundation's cryptography suite
 
 ## Building
 
@@ -15,7 +15,8 @@ To actually include this library in a project it is required to:
 
 ### Internal
 
-None
+* [Pairings?](https://github.com/NilFoundation/Pairings)
+* [Finite fields?](https://github.com/NilFoundation/ff)
 
 ### External
 * [Boost](https://boost.org) (>= 1.58)
