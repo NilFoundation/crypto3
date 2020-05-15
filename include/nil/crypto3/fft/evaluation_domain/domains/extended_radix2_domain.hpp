@@ -12,9 +12,9 @@
 
 #include <vector>
 
-#include <libfqfft/evaluation_domain/evaluation_domain.hpp>
+#include <nil/crypto3/fft/evaluation_domain/evaluation_domain.hpp>
 
-#include <libfqfft/evaluation_domain/domains/basic_radix2_domain_aux.hpp>
+#include <nil/crypto3/fft/evaluation_domain/domains/basic_radix2_domain_aux.hpp>
 
 namespace libfqfft {
 
