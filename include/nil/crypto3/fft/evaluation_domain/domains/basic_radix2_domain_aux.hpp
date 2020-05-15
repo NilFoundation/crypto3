@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef BASIC_RADIX2_DOMAIN_AUX_TCC_
-#define BASIC_RADIX2_DOMAIN_AUX_TCC_
+#ifndef CRYPTO3_FFT_BASIC_RADIX2_DOMAIN_AUX_HPP
+#define CRYPTO3_FFT_BASIC_RADIX2_DOMAIN_AUX_HPP
 
 #include <algorithm>
 #include <vector>
@@ -19,7 +19,7 @@
 
 #include <nil/crypto3/ff/algebra/fields/field_utils.hpp>
 
-#include <libfqfft/tools/exceptions.hpp>
+#include <nil/crypto3/fft/tools/exceptions.hpp>
 
 #ifdef DEBUG
 #include <nil/crypto3/ff/common/profiling.hpp>
@@ -232,4 +232,4 @@ namespace libfqfft {
 
 }    // namespace libfqfft
 
-#endif    // BASIC_RADIX2_DOMAIN_AUX_TCC_
+#endif    // CRYPTO3_FFT_BASIC_RADIX2_DOMAIN_AUX_HPP

@@ -13,11 +13,11 @@
 #include <vector>
 
 #include <nil/crypto3/fft/evaluation_domain/evaluation_domain.hpp>
+#include <nil/crypto3/fft/evaluation_domain/domains/basic_radix2_domain_aux.hpp>
+
 #include <nil/crypto3/ff/algebra/fields/field_utils.hpp>
 #include <nil/crypto3/ff/common/double.hpp>
 #include <nil/crypto3/ff/common/utils.hpp>
-
-#include <nil/crypto3/fft/evaluation_domain/domains/basic_radix2_domain_aux.hpp>
 
 namespace libfqfft {
 
