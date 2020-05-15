@@ -1,15 +1,11 @@
-/** @file
- *****************************************************************************
-
- Implementation of interfaces for extended GCD routines.
-
- See xgcd.hpp .
-
- *****************************************************************************
- * @author     This file is part of libfqfft, developed by SCIPR Lab
- *             and contributors (see AUTHORS).
- * @copyright  MIT license (see LICENSE file)
- *****************************************************************************/
+//---------------------------------------------------------------------------//
+// Copyright (c) 2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
+//
+// Distributed under the Boost Software License, Version 1.0
+// See accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt
+//---------------------------------------------------------------------------//
 
 #ifndef XGCD_TCC_
 #define XGCD_TCC_

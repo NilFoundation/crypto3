@@ -1,21 +1,11 @@
-/** @file
- *****************************************************************************
-
- Imeplementation of interfaces for evaluation domains.
-
- See evaluation_domain.hpp .
-
- We currently implement, and select among, three types of domains:
- - "basic radix-2": the domain has size m = 2^k and consists of the m-th roots of unity
- - "extended radix-2": the domain has size m = 2^{k+1} and consists of "the m-th roots of unity" union "a coset"
- - "step radix-2": the domain has size m = 2^k + 2^r and consists of "the 2^k-th roots of unity" union "a coset of
- 2^r-th roots of unity"
-
- *****************************************************************************
- * @author     This file is part of libfqfft, developed by SCIPR Lab
- *             and contributors (see AUTHORS).
- * @copyright  MIT license (see LICENSE file)
- *****************************************************************************/
+//---------------------------------------------------------------------------//
+// Copyright (c) 2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
+//
+// Distributed under the Boost Software License, Version 1.0
+// See accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt
+//---------------------------------------------------------------------------//
 
 #ifndef GET_EVALUATION_DOMAIN_TCC_
 #define GET_EVALUATION_DOMAIN_TCC_

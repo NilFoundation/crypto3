@@ -1,15 +1,11 @@
-/** @file
- *****************************************************************************
-
- Implementation of interfaces for naive evaluation routines.
-
- See naive_evaluate.hpp .
-
- *****************************************************************************
- * @author     This file is part of libfqfft, developed by SCIPR Lab
- *             and contributors (see AUTHORS).
- * @copyright  MIT license (see LICENSE file)
- *****************************************************************************/
+//---------------------------------------------------------------------------//
+// Copyright (c) 2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
+//
+// Distributed under the Boost Software License, Version 1.0
+// See accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt
+//---------------------------------------------------------------------------//
 
 #ifndef NAIVE_EVALUATE_TCC_
 #define NAIVE_EVALUATE_TCC_

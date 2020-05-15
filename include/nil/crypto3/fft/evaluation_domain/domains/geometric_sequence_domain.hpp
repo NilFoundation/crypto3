@@ -1,15 +1,11 @@
-/** @file
- *****************************************************************************
-
- Declaration of interfaces for the "geometric sequence" evaluation domain.
-
- These functions use a geometric sequence of size m to perform evaluation.
-
- *****************************************************************************
- * @author     This file is part of libfqfft, developed by SCIPR Lab
- *             and contributors (see AUTHORS).
- * @copyright  MIT license (see LICENSE file)
- *****************************************************************************/
+//---------------------------------------------------------------------------//
+// Copyright (c) 2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
+//
+// Distributed under the Boost Software License, Version 1.0
+// See accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt
+//---------------------------------------------------------------------------//
 
 #ifndef GEOMETRIC_SEQUENCE_DOMAIN_HPP
 #define GEOMETRIC_SEQUENCE_DOMAIN_HPP

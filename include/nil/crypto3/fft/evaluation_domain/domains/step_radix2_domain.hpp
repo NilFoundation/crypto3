@@ -1,16 +1,11 @@
-/** @file
- *****************************************************************************
-
- Declaration of interfaces for the "step radix-2" evaluation domain.
-
- Roughly, the domain has size m = 2^k + 2^r and consists of
- "the 2^k-th roots of unity" union "a coset of 2^r-th roots of unity".
-
- *****************************************************************************
- * @author     This file is part of libfqfft, developed by SCIPR Lab
- *             and contributors (see AUTHORS).
- * @copyright  MIT license (see LICENSE file)
- *****************************************************************************/
+//---------------------------------------------------------------------------//
+// Copyright (c) 2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
+//
+// Distributed under the Boost Software License, Version 1.0
+// See accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt
+//---------------------------------------------------------------------------//
 
 #ifndef STEP_RADIX2_DOMAIN_HPP_
 #define STEP_RADIX2_DOMAIN_HPP_
