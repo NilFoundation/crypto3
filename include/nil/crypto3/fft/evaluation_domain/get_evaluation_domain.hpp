@@ -24,6 +24,14 @@
 
 namespace libfqfft {
 
+    /*!
+    @brief
+     A convenience method for choosing an evaluation domain
+     Returns an evaluation domain object in which the domain S has size
+     |S| >= min_size.
+     The function chooses from different supported domains, depending on min_size.
+    */
+
     template<typename FieldT>
     std::shared_ptr<evaluation_domain<FieldT>> get_evaluation_domain(const size_t min_size) {
         std::shared_ptr<evaluation_domain<FieldT>> result;
