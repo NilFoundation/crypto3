@@ -15,7 +15,7 @@ To actually include this library in a project it is required to:
 
 ### Internal
 
-* [Pairings?](https://github.com/NilFoundation/Pairings)
+* [Pairings?](https://github.com/NilFoundation/pairing)
 * [Finite fields?](https://github.com/NilFoundation/ff)
 
 ### External

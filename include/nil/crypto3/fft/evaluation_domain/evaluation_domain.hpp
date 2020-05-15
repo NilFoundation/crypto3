@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef EVALUATION_DOMAIN_HPP_
-#define EVALUATION_DOMAIN_HPP_
+#ifndef CRYPTO3_FFT_EVALUATION_DOMAIN_HPP
+#define CRYPTO3_FFT_EVALUATION_DOMAIN_HPP
 
 #include <vector>
 
@@ -83,4 +83,4 @@ namespace libfqfft {
 
 }    // namespace libfqfft
 
-#endif    // EVALUATION_DOMAIN_HPP_
+#endif    // CRYPTO3_FFT_EVALUATION_DOMAIN_HPP
