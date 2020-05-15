@@ -22,61 +22,65 @@
 #include <nil/crypto3/fft/evaluation_domain/evaluation_domain.hpp>
 #include <nil/crypto3/fft/tools/exceptions.hpp>
 
-namespace libfqfft {
+namespace nil {
+    namespace crypto3 {
+        namespace math {
 
-    /*!
-    @brief
-     A convenience method for choosing an evaluation domain
-     Returns an evaluation domain object in which the domain S has size
-     |S| >= min_size.
-     The function chooses from different supported domains, depending on min_size.
-    */
+            /*!
+            @brief
+             A convenience method for choosing an evaluation domain
+             Returns an evaluation domain object in which the domain S has size
+             |S| >= min_size.
+             The function chooses from different supported domains, depending on min_size.
+            */
 
-    template<typename FieldT>
-    std::shared_ptr<evaluation_domain<FieldT>> get_evaluation_domain(const size_t min_size) {
-        std::shared_ptr<evaluation_domain<FieldT>> result;
+            template<typename FieldT>
+            std::shared_ptr<evaluation_domain<FieldT>> get_evaluation_domain(const size_t min_size) {
+                std::shared_ptr<evaluation_domain<FieldT>> result;
 
-        const size_t big = 1ul << (libff::log2(min_size) - 1);
-        const size_t small = min_size - big;
-        const size_t rounded_small = (1ul << libff::log2(small));
+                const size_t big = 1ul << (libff::log2(min_size) - 1);
+                const size_t small = min_size - big;
+                const size_t rounded_small = (1ul << libff::log2(small));
 
-        try {
-            result.reset(new basic_radix2_domain<FieldT>(min_size));
-        } catch (...) {
-            try {
-                result.reset(new extended_radix2_domain<FieldT>(min_size));
-            } catch (...) {
                 try {
-                    result.reset(new step_radix2_domain<FieldT>(min_size));
+                    result.reset(new basic_radix2_domain<FieldT>(min_size));
                 } catch (...) {
                     try {
-                        result.reset(new basic_radix2_domain<FieldT>(big + rounded_small));
+                        result.reset(new extended_radix2_domain<FieldT>(min_size));
                     } catch (...) {
                         try {
-                            result.reset(new extended_radix2_domain<FieldT>(big + rounded_small));
+                            result.reset(new step_radix2_domain<FieldT>(min_size));
                         } catch (...) {
                             try {
-                                result.reset(new step_radix2_domain<FieldT>(big + rounded_small));
+                                result.reset(new basic_radix2_domain<FieldT>(big + rounded_small));
                             } catch (...) {
                                 try {
-                                    result.reset(new geometric_sequence_domain<FieldT>(min_size));
+                                    result.reset(new extended_radix2_domain<FieldT>(big + rounded_small));
                                 } catch (...) {
                                     try {
-                                        result.reset(new arithmetic_sequence_domain<FieldT>(min_size));
+                                        result.reset(new step_radix2_domain<FieldT>(big + rounded_small));
                                     } catch (...) {
-                                        throw DomainSizeException("get_evaluation_domain: no matching domain");
+                                        try {
+                                            result.reset(new geometric_sequence_domain<FieldT>(min_size));
+                                        } catch (...) {
+                                            try {
+                                                result.reset(new arithmetic_sequence_domain<FieldT>(min_size));
+                                            } catch (...) {
+                                                throw DomainSizeException("get_evaluation_domain: no matching domain");
+                                            }
+                                        }
                                     }
                                 }
                             }
                         }
                     }
                 }
+
+                return result;
             }
-        }
 
-        return result;
-    }
-
-}    // namespace libfqfft
+        }    // namespace math
+    }        // namespace crypto3
+}    // namespace nil
 
 #endif    // CRYPTO3_FFT_GET_EVALUATION_DOMAIN_HPP
