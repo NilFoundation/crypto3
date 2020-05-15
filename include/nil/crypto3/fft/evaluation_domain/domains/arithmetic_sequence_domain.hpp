@@ -7,12 +7,14 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef ARITHMETIC_SEQUENCE_DOMAIN_HPP
-#define ARITHMETIC_SEQUENCE_DOMAIN_HPP
+#ifndef CRYPTO3_FFT_ARITHMETIC_SEQUENCE_DOMAIN_HPP
+#define CRYPTO3_FFT_ARITHMETIC_SEQUENCE_DOMAIN_HPP
 
-#include <libfqfft/evaluation_domain/evaluation_domain.hpp>
-#include <libfqfft/evaluation_domain/domains/basic_radix2_domain_aux.hpp>
-#include <libfqfft/polynomial_arithmetic/basis_change.hpp>
+#include <vector>
+
+#include <nil/crypto3/fft/evaluation_domain/evaluation_domain.hpp>
+#include <nil/crypto3/fft/evaluation_domain/domains/basic_radix2_domain_aux.hpp>
+#include <nil/crypto3/fft/polynomial_arithmetic/basis_change.hpp>
 
 #ifdef MULTICORE
 #include <omp.h>
@@ -23,7 +25,6 @@ namespace libfqfft {
     template<typename FieldT>
     struct arithmetic_sequence_domain : public evaluation_domain<FieldT> {
 
-        template<typename FieldT>
         arithmetic_sequence_domain(const size_t m) : evaluation_domain<FieldT>(m) {
             if (m <= 1)
                 throw InvalidSizeException("arithmetic(): expected m > 1");
@@ -33,7 +34,6 @@ namespace libfqfft {
             precomputation_sentinel = 0;
         }
 
-        template<typename FieldT>
         void FFT(std::vector<FieldT> &a) {
             if (a.size() != m)
                 throw DomainSizeException("arithmetic: expected a.size() == m");
@@ -65,7 +65,6 @@ namespace libfqfft {
             }
         }
 
-        template<typename FieldT>
         void iFFT(std::vector<FieldT> &a) {
             if (a.size() != m)
                 throw DomainSizeException("arithmetic: expected a.size() == m");
@@ -96,19 +95,16 @@ namespace libfqfft {
             newton_to_monomial_basis(a, subproduct_tree, m);
         }
 
-        template<typename FieldT>
         void cosetFFT(std::vector<FieldT> &a, const FieldT &g) {
             _multiply_by_coset(a, g);
             FFT(a);
         }
 
-        template<typename FieldT>
         void icosetFFT(std::vector<FieldT> &a, const FieldT &g) {
             iFFT(a);
             _multiply_by_coset(a, g.inverse());
         }
 
-        template<typename FieldT>
         std::vector<FieldT> evaluate_all_lagrange_polynomials(const FieldT &t) {
             /* Compute Lagrange polynomial of size m, with m+1 points (x_0, y_0), ... ,(x_m, y_m) */
             /* Evaluate for x = t */
@@ -159,7 +155,6 @@ namespace libfqfft {
             return l;
         }
 
-        template<typename FieldT>
         FieldT get_domain_element(const size_t idx) {
             if (!precomputation_sentinel)
                 do_precomputation();
@@ -167,7 +162,6 @@ namespace libfqfft {
             return arithmetic_sequence[idx];
         }
 
-        template<typename FieldT>
         FieldT compute_vanishing_polynomial(const FieldT &t) {
             if (!precomputation_sentinel)
                 do_precomputation();
@@ -180,7 +174,6 @@ namespace libfqfft {
             return Z;
         }
 
-        template<typename FieldT>
         void add_poly_Z(const FieldT &coeff, std::vector<FieldT> &H) {
             if (H.size() != m + 1)
                 throw DomainSizeException("arithmetic: expected H.size() == m+1");
@@ -209,7 +202,6 @@ namespace libfqfft {
             }
         }
 
-        template<typename FieldT>
         void divide_by_Z_on_coset(std::vector<FieldT> &P) {
             const FieldT coset = arithmetic_generator; /* coset in arithmetic sequence? */
             const FieldT Z_inverse_at_coset = compute_vanishing_polynomial(coset).inverse();
@@ -218,7 +210,6 @@ namespace libfqfft {
             }
         }
 
-        template<typename FieldT>
         void do_precomputation() {
             compute_subproduct_tree(log2(m), subproduct_tree);
 
@@ -243,4 +234,4 @@ namespace libfqfft {
 
 }    // namespace libfqfft
 
-#endif    // ARITHMETIC_SEQUENCE_DOMAIN_TCC_
+#endif    // CRYPTO3_FFT_ARITHMETIC_SEQUENCE_DOMAIN_HPP
