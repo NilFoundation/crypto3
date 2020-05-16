@@ -132,14 +132,14 @@ namespace nil {
                 }
 
                 virtual ~block_stream_processor() {
-                    if (!cache.empty()) {
+                    /*if (!cache.empty()) {
                         input_block_type block = {0};
                         packer_type::pack(cache.begin(), cache.begin() + cache.size(), block.begin());
                         typename input_block_type::const_iterator v = block.cbegin();
                         for (length_type itr = seen - (seen % input_block_bits); itr < seen; itr += value_bits) {
                             state(*v++);
                         }
-                    }
+                    }*/
                 }
 
                 template<typename InputIterator>

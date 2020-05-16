@@ -99,8 +99,6 @@ namespace nil {
                     }
 
                     inline void process_block() {
-                        std::cout << "In process block" << std::endl;
-
                         using namespace ::nil::crypto3::detail;
 
                         block_type processed_block;
