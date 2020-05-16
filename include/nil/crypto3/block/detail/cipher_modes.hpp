@@ -105,7 +105,7 @@ namespace nil {
                         
                     }
 
-                    block_type end_message(const block_type &plaintext, std::size_t total_seen) {
+                    block_type end_message(const block_type &plaintext, std::size_t total_seen) const {
                         return policy_type::end_message(cipher, plaintext);
                     }
 

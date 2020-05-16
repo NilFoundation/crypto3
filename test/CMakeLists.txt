@@ -41,9 +41,9 @@ endmacro()
 
 set(TESTS_NAMES
 #    "pack"
-#    "rijndael"
+    "rijndael"
 #    "aria"
-    "blowfish"
+#    "blowfish"
 #    "camellia"
 #    "cast"
 #    "des"

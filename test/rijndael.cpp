@@ -188,40 +188,54 @@ inline bool operator!=(const byte_string &lhs, const byte_string &rhs) {
 
 template<std::size_t K, std::size_t B>
 struct cipher_fixture {
+
+private:
+    typedef packer<stream_endian::big_octet_big_bit, stream_endian::little_octet_big_bit,
+            sizeof(byte_string::value_type) * CHAR_BIT,
+            sizeof(typename rijndael<K, B>::key_type::value_type) * CHAR_BIT>
+            key_packer;
+
+    typedef packer<stream_endian::big_octet_big_bit, stream_endian::little_octet_big_bit,
+            sizeof(byte_string::value_type) * CHAR_BIT,
+            sizeof(typename rijndael<K, B>::block_type::value_type) * CHAR_BIT>
+            block_packer;
+
+    typedef packer<stream_endian::little_octet_big_bit, stream_endian::big_octet_big_bit,
+            sizeof(typename rijndael<K, B>::block_type::value_type) * CHAR_BIT,
+            sizeof(byte_string::value_type) * CHAR_BIT>
+            text_packer;
+
+public:
     cipher_fixture(const std::string &ckey, const std::string &cplaintext, const std::string &ccipher_text) :
         original_plaintext(cplaintext), original_cipher_text(ccipher_text), cipher_text(ccipher_text.size() / 2),
-        plaintext(ccipher_text.size() / 2), c(key) {
+        plaintext(ccipher_text.size() / 2) { //c(key) {
         byte_string packed_string(ckey);
-        pack<stream_endian::little_octet_big_bit, sizeof(byte_string::value_type) * CHAR_BIT,
-             sizeof(typename rijndael<K, B>::key_type::value_type) * CHAR_BIT>(packed_string, key);
-        c = rijndael<K, B>(key);
+        key_packer::pack(packed_string.begin(), packed_string.end(), key.begin());
+        //c = rijndael<K, B>(key);
     }
 
-    void encrypt() {
+    void encrypt_1() {
         typename rijndael<K, B>::block_type block, result;
-        pack<stream_endian::little_octet_big_bit, sizeof(byte_string::value_type) * CHAR_BIT,
-             sizeof(typename rijndael<K, B>::block_type::value_type) * CHAR_BIT>(original_plaintext, block);
+        block_packer::pack(original_plaintext.begin(), original_plaintext.end(), block.begin());
+        
+        result = encrypt<rijndael<K, B>>(block, key);
 
-        result = c.encrypt(block);
-
-        pack<stream_endian::little_octet_big_bit, sizeof(typename rijndael<K, B>::block_type::value_type) * CHAR_BIT,
-             sizeof(byte_string::value_type) * CHAR_BIT>(result, cipher_text);
+        text_packer::pack(result.begin(), result.end(), cipher_text.begin());
     }
 
     void decrypt() {
         typename rijndael<K, B>::block_type block, result;
-        pack<stream_endian::little_octet_big_bit, sizeof(byte_string::value_type) * CHAR_BIT,
-             sizeof(typename rijndael<K, B>::block_type::value_type) * CHAR_BIT>(cipher_text, block);
+        block_packer::pack(cipher_text.begin(), cipher_text.end(), block.begin());
 
-        result = c.decrypt(block);
-        pack<stream_endian::little_octet_big_bit, sizeof(typename rijndael<K, B>::block_type::value_type) * CHAR_BIT,
-             sizeof(byte_string::value_type) * CHAR_BIT>(result, plaintext);
+        result = decrypt(block.begin(), block.end(), key.begin(), key.end());
+
+        text_packer::pack(result.begin(), result.end(), plaintext.begin());
     }
 
     typename rijndael<K, B>::key_type key;
     const byte_string original_plaintext, original_cipher_text;
     byte_string cipher_text, plaintext;
-    rijndael<K, B> c;
+    //rijndael<K, B> c;
 };
 
 BOOST_AUTO_TEST_SUITE(rijndael_cipher_test_suite)
@@ -231,12 +245,13 @@ BOOST_AUTO_TEST_CASE(rijndael_128_128_cipher) {
     cipher_fixture<128, 128> f("000102030405060708090a0b0c0d0e0f", "00112233445566778899aabbccddeeff",
                                "69c4e0d86a7b0430d8cdb78070b4c55a");
 
-    f.encrypt();
-    BOOST_CHECK_EQUAL(f.cipher_text, f.original_cipher_text);
-    f.decrypt();
-    BOOST_CHECK_EQUAL(f.plaintext, f.original_plaintext);
-}
 
+    f.encrypt_1();
+    BOOST_CHECK_EQUAL(f.cipher_text, f.original_cipher_text);
+    //f.decrypt();
+    //BOOST_CHECK_EQUAL(f.plaintext, f.original_plaintext);
+}
+/*
 BOOST_AUTO_TEST_CASE(rijndael_160_128_cipher) {
     cipher_fixture<160, 128> f("2b7e151628aed2a6abf7158809cf4f3c762e7160", "3243f6a8885a308d313198a2e0370734",
                                "231d844639b31b412211cfe93712b880");
@@ -493,6 +508,6 @@ BOOST_AUTO_TEST_CASE(rijndael_256_256_cipher) {
     BOOST_CHECK_EQUAL(f.cipher_text, f.original_cipher_text);
     f.decrypt();
     BOOST_CHECK_EQUAL(f.plaintext, f.original_plaintext);
-}
+}*/
 
 BOOST_AUTO_TEST_SUITE_END()

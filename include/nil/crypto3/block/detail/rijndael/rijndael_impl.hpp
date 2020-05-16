@@ -167,14 +167,15 @@ namespace nil {
 
                         return state;
                     }
-
+                    
                     static void schedule_key(const key_type &key, key_schedule_type &encryption_key,
                                              key_schedule_type &decryption_key) {
                         // the first key_words words are the original key
-                        ::nil::crypto3::detail::pack<stream_endian::little_octet_big_bit, CHAR_BIT,
-                                                     policy_type::word_bits>(
-                            key.begin(), key.begin() + policy_type::key_words * policy_type::word_bytes,
-                            encryption_key.begin(), encryption_key.begin() + policy_type::key_words);
+                        ::nil::crypto3::detail::packer<stream_endian::big_octet_big_bit, 
+                                                       stream_endian::little_octet_big_bit, CHAR_BIT, 
+                                                       policy_type::word_bits>::pack(
+                        key.begin(), key.begin() + policy_type::key_words * policy_type::word_bytes,
+                        encryption_key.begin());
 
 #pragma clang loop unroll(full)
                         for (std::size_t i = policy_type::key_words; i < policy_type::key_schedule_words; ++i) {
@@ -189,8 +190,10 @@ namespace nil {
                         }
 
                         std::array<typename policy_type::byte_type, policy_type::key_schedule_bytes> bekey = {0};
-                        ::nil::crypto3::detail::pack<stream_endian::little_octet_big_bit, policy_type::word_bits,
-                                                     CHAR_BIT>(encryption_key, bekey);
+                        ::nil::crypto3::detail::packer<stream_endian::little_octet_big_bit,
+                                                       stream_endian::big_octet_big_bit, policy_type::word_bits, 
+                                                       CHAR_BIT>::pack(
+                        encryption_key.begin(), encryption_key.end(), bekey.begin());
 
 #pragma clang loop unroll(full)
                         for (std::uint8_t round = 1; round < policy_type::rounds; ++round) {
@@ -200,8 +203,10 @@ namespace nil {
                                  bekey.begin() + round * policy_type::block_bytes);
                         }
 
-                        ::nil::crypto3::detail::pack<stream_endian::little_octet_big_bit, CHAR_BIT,
-                                                     policy_type::word_bits>(bekey, decryption_key);
+                        ::nil::crypto3::detail::packer<stream_endian::big_octet_big_bit,
+                                                       stream_endian::little_octet_big_bit, CHAR_BIT,
+                                                       policy_type::word_bits>::pack(
+                        bekey.begin(), bekey.end(), decryption_key.begin());
                     }
                 };
             }    // namespace detail

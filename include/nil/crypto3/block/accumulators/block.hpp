@@ -54,6 +54,9 @@ namespace nil {
                     typedef ::nil::crypto3::detail::injector<endian_type, word_bits, block_words, block_bits>
                         injector_type;
 
+                    typedef ::nil::crypto3::detail::packer<endian_type, endian_type, word_bits, octet_bits> 
+                        packer_type;
+
                 public:
                     typedef digest<block_bits> result_type;
 
@@ -69,15 +72,19 @@ namespace nil {
                     }
 
                     inline result_type result(boost::accumulators::dont_care) const {
+                        using namespace ::nil::crypto3::detail;
+
                         result_type res = dgst;
 
-                        block_type processed_block = mode.end_message(cache, previous_block, total_seen);
+                        block_type processed_block = mode.end_message(cache, total_seen);
 
-                        std::move(processed_block.begin(), processed_block.end(), std::inserter(new_dgst_part, new_dgst_part.end()));
+                        packer_type::pack(processed_block.begin(), processed_block.end(), res.end());
+
+                        /*std::move(processed_block.begin(), processed_block.end(), std::inserter(new_dgst_part, new_dgst_part.end()));
 
                         res.insert(res.end(), processed_block.begin(), processed_block.end());
 
-                        std::reverse(res.begin(), res.end());
+                        std::reverse(res.begin(), res.end());*/
 
                         return res;
                     }
@@ -92,6 +99,10 @@ namespace nil {
                     }
 
                     inline void process_block() {
+                        std::cout << "In process block" << std::endl;
+
+                        using namespace ::nil::crypto3::detail;
+
                         block_type processed_block;
                         if (dgst.empty()) {
                             processed_block = mode.begin_message(cache, total_seen);
@@ -99,11 +110,11 @@ namespace nil {
                             processed_block = mode.process_block(cache, total_seen);
                         }
 
-                        pack<endian_type>(processed_block.begin(), processed_block.end(), dgst.end());
+                        packer_type::pack(processed_block.begin(), processed_block.end(), dgst.end());
 
-                        std::move(processed_block.begin(), processed_block.end(), std::inserter(new_dgst_part, new_dgst_part.end()));
+                        /*std::move(processed_block.begin(), processed_block.end(), std::inserter(new_dgst_part, new_dgst_part.end()));
 
-                        res.insert(res.end(), processed_block.begin(), processed_block.end());
+                        res.insert(res.end(), processed_block.begin(), processed_block.end());*/
                         
                         filled = false;
                     }
