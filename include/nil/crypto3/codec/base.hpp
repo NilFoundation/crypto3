@@ -55,7 +55,7 @@ namespace nil {
                 template<typename T>
                 void operator()(const T &block) {
                     typename T::const_iterator itr = block.cbegin();
-                    while (*itr == '\0' and itr != block.cend()) {
+                    while (*itr == '\0' && itr != block.cend()) {
                         ++itr;
                     }
                     leading_zeros = std::distance(block.begin(), itr);
