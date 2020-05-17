@@ -51,10 +51,13 @@ namespace nil {
                     constexpr static const std::size_t block_words = mode_type::block_words;
                     typedef typename mode_type::block_type block_type;
 
-                    typedef ::nil::crypto3::detail::injector<endian_type, word_bits, block_words, block_bits>
-                        injector_type;
+                    constexpr static const std::size_t value_bits = sizeof(typename block_type::value_type) * CHAR_BIT;
+                    constexpr static const std::size_t block_values = block_bits / value_bits;
 
-                    typedef ::nil::crypto3::detail::packer<endian_type, endian_type, word_bits, octet_bits> 
+                    typedef ::nil::crypto3::detail::injector<endian_type, value_bits, block_values, 
+                        block_bits> injector_type;
+
+                    typedef ::nil::crypto3::detail::packer<endian_type, endian_type, value_bits, octet_bits> 
                         packer_type;
 
                 public:
@@ -77,14 +80,11 @@ namespace nil {
                         result_type res = dgst;
 
                         block_type processed_block = mode.end_message(cache, total_seen);
+ 
+                        res = ::nil::crypto3::resize<block_bits>(res, res.size() + block_values);
 
-                        packer_type::pack(processed_block.begin(), processed_block.end(), res.end());
-
-                        /*std::move(processed_block.begin(), processed_block.end(), std::inserter(new_dgst_part, new_dgst_part.end()));
-
-                        res.insert(res.end(), processed_block.begin(), processed_block.end());
-
-                        std::reverse(res.begin(), res.end());*/
+                        packer_type::pack(processed_block.begin(), processed_block.end(), 
+                            res.end() - block_values);
 
                         return res;
                     }
@@ -110,10 +110,6 @@ namespace nil {
 
                         packer_type::pack(processed_block.begin(), processed_block.end(), dgst.end());
 
-                        /*std::move(processed_block.begin(), processed_block.end(), std::inserter(new_dgst_part, new_dgst_part.end()));
-
-                        res.insert(res.end(), processed_block.begin(), processed_block.end());*/
-                        
                         filled = false;
                     }
 

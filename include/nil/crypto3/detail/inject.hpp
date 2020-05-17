@@ -89,7 +89,8 @@ namespace nil {
 
                         // Split and combine parts of unit values
                         std::size_t sz[2] = {UnitBits - b_rem, b_rem};
-                        word_type masks[2] = {low_bits<word_type, word_bits>(~word_type(), UnitBits - b_rem) << b_rem,
+                        word_type masks[2] = {unbounded_shl(low_bits<word_type, word_bits>(~word_type(), 
+                                              UnitBits - b_rem), b_rem),
                                               low_bits<word_type, word_bits>(~word_type(), b_rem)};
                         std::size_t bw_space = word_bits - last_word_seen;
                         std::size_t w_space = word_seen;

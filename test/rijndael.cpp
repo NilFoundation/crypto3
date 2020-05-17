@@ -15,6 +15,9 @@
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
 
+#include <boost/foreach.hpp>
+#include <iomanip>
+
 #include <nil/crypto3/block/algorithm/encrypt.hpp>
 #include <nil/crypto3/block/algorithm/decrypt.hpp>
 
@@ -208,17 +211,17 @@ private:
 public:
     cipher_fixture(const std::string &ckey, const std::string &cplaintext, const std::string &ccipher_text) :
         original_plaintext(cplaintext), original_cipher_text(ccipher_text), cipher_text(ccipher_text.size() / 2),
-        plaintext(ccipher_text.size() / 2) { //c(key) {
+        plaintext(ccipher_text.size() / 2), c(key) {
         byte_string packed_string(ckey);
         key_packer::pack(packed_string.begin(), packed_string.end(), key.begin());
-        //c = rijndael<K, B>(key);
+        c = rijndael<K, B>(key);
     }
 
-    void encrypt_1() {
+    void encrypt() {
         typename rijndael<K, B>::block_type block, result;
         block_packer::pack(original_plaintext.begin(), original_plaintext.end(), block.begin());
-        
-        result = encrypt<rijndael<K, B>>(block, key);
+
+        result = c.encrypt(block);
 
         text_packer::pack(result.begin(), result.end(), cipher_text.begin());
     }
@@ -227,7 +230,7 @@ public:
         typename rijndael<K, B>::block_type block, result;
         block_packer::pack(cipher_text.begin(), cipher_text.end(), block.begin());
 
-        result = decrypt(block.begin(), block.end(), key.begin(), key.end());
+        result = c.decrypt(block);
 
         text_packer::pack(result.begin(), result.end(), plaintext.begin());
     }
@@ -235,23 +238,91 @@ public:
     typename rijndael<K, B>::key_type key;
     const byte_string original_plaintext, original_cipher_text;
     byte_string cipher_text, plaintext;
-    //rijndael<K, B> c;
+    rijndael<K, B> c;
 };
 
 BOOST_AUTO_TEST_SUITE(rijndael_cipher_test_suite)
 
+BOOST_AUTO_TEST_CASE(rijndael_128_128_no_fixture) {
+
+    typedef rijndael<128, 128> BlockCipher;
+
+    const std::string ckey("000102030405060708090a0b0c0d0e0f");
+    BlockCipher::key_type key; 
+
+    // convert string key to cipher key
+    byte_string packed_string(ckey);
+    typedef packer<stream_endian::big_octet_big_bit, stream_endian::little_octet_big_bit,
+        sizeof(byte_string::value_type) * CHAR_BIT,
+        sizeof(typename BlockCipher::key_type::value_type) * CHAR_BIT>
+        key_packer;
+    key_packer::pack(packed_string.begin(), packed_string.end(), key.begin());
+    
+
+    /* typedef BlockCipher::key_type::value_type key_value_type;
+    BOOST_FOREACH(key_value_type &value, key) {
+        std::cout << "Key value: " 
+                  << std::hex << std::setfill('0') << std::setw(2) << (uint32_t) value << std::endl; 
+    } */
+
+    // construct key schedule using cipher class
+    BlockCipher cipher(key);
+
+    // convert data string to block
+    const std::string data("00112233445566778899aabbccddeeff");
+    byte_string byte_data(data);
+    BlockCipher::block_type block;
+    typedef packer<stream_endian::big_octet_big_bit, stream_endian::little_octet_big_bit,
+            sizeof(byte_string::value_type) * CHAR_BIT,
+            sizeof(typename BlockCipher::block_type::value_type) * CHAR_BIT>
+            block_packer;
+    block_packer::pack(byte_data.begin(), byte_data.end(), block.begin());
+
+
+    /* typedef BlockCipher::block_type::value_type block_value_type;
+    BOOST_FOREACH(block_value_type &value, block) {
+        std::cout << "Block value: " 
+                  << std::hex << std::setfill('0') << std::setw(2) << (uint32_t) value << std::endl; 
+    } */
+
+    // expected ciphertext
+    const std::string str_ctext("69c4e0d86a7b0430d8cdb78070b4c55a");
+    byte_string expected_ciphertext(str_ctext);     
+    byte_string ciphertext(str_ctext.size() / 2);
+
+    // encrypt block
+    typedef typename block::accumulator_set<typename block::modes::isomorphic<
+            BlockCipher, nop_padding>::template bind<encryption_policy<BlockCipher>>::type>
+            CipherAccumulator;
+    
+    typedef block::detail::range_cipher_impl<block::detail::value_cipher_impl<CipherAccumulator>>
+            ::result_type res_type;
+
+    res_type result = encrypt<BlockCipher>(block, key);
+    
+
+    // pack obtained ciphertext into convenient byte representation
+    typedef packer<stream_endian::little_octet_big_bit, stream_endian::big_octet_big_bit,
+            sizeof(typename res_type::value_type) * CHAR_BIT,
+            sizeof(byte_string::value_type) * CHAR_BIT>
+            res_packer;
+
+    res_packer::pack(result.begin(), result.end(), ciphertext.begin());
+
+    BOOST_CHECK_EQUAL(expected_ciphertext, ciphertext);
+}
+/*
 // B = 128
 BOOST_AUTO_TEST_CASE(rijndael_128_128_cipher) {
     cipher_fixture<128, 128> f("000102030405060708090a0b0c0d0e0f", "00112233445566778899aabbccddeeff",
                                "69c4e0d86a7b0430d8cdb78070b4c55a");
 
-
-    f.encrypt_1();
+    f.encrypt();
     BOOST_CHECK_EQUAL(f.cipher_text, f.original_cipher_text);
-    //f.decrypt();
-    //BOOST_CHECK_EQUAL(f.plaintext, f.original_plaintext);
+    f.decrypt();
+    BOOST_CHECK_EQUAL(f.plaintext, f.original_plaintext);
 }
-/*
+
 BOOST_AUTO_TEST_CASE(rijndael_160_128_cipher) {
     cipher_fixture<160, 128> f("2b7e151628aed2a6abf7158809cf4f3c762e7160", "3243f6a8885a308d313198a2e0370734",
                                "231d844639b31b412211cfe93712b880");
