@@ -15,9 +15,6 @@
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
 
-#include <boost/foreach.hpp>
-#include <iomanip>
-
 #include <nil/crypto3/block/algorithm/encrypt.hpp>
 #include <nil/crypto3/block/algorithm/decrypt.hpp>
 
@@ -193,134 +190,92 @@ template<std::size_t K, std::size_t B>
 struct cipher_fixture {
 
 private:
-    typedef packer<stream_endian::big_octet_big_bit, stream_endian::little_octet_big_bit,
-            sizeof(byte_string::value_type) * CHAR_BIT,
-            sizeof(typename rijndael<K, B>::key_type::value_type) * CHAR_BIT>
-            key_packer;
+    typedef rijndael<K, B> cipher;
+
+    typedef typename cipher::key_type key_type;
+    typedef typename key_type::value_type key_value_type;
+
+    typedef typename cipher::block_type block_type; 
+    typedef typename block_type::value_type block_value_type;
+
+    typedef typename byte_string::value_type byte_type;
+    
+    constexpr static std::size_t const byte_bits = sizeof(byte_type) * CHAR_BIT; 
+    constexpr static std::size_t const key_val_bits = sizeof(key_value_type) * CHAR_BIT;
+    constexpr static std::size_t const block_val_bits = sizeof(block_value_type) * CHAR_BIT;
 
     typedef packer<stream_endian::big_octet_big_bit, stream_endian::little_octet_big_bit,
-            sizeof(byte_string::value_type) * CHAR_BIT,
-            sizeof(typename rijndael<K, B>::block_type::value_type) * CHAR_BIT>
-            block_packer;
+            byte_bits, key_val_bits> key_packer;
+
+    typedef packer<stream_endian::big_octet_big_bit, stream_endian::little_octet_big_bit,
+            byte_bits, block_val_bits> block_packer;
+
+    typedef typename block::accumulator_set<typename block::modes::isomorphic<cipher, 
+            nop_padding>::template bind<encryption_policy<cipher>>::type> encrypt_accumulator;
+
+    typedef typename block::accumulator_set<typename block::modes::isomorphic<cipher, 
+            nop_padding>::template bind<decryption_policy<cipher>>::type> decrypt_accumulator;
+
+    typedef typename block::detail::range_cipher_impl<block::detail::value_cipher_impl
+            <encrypt_accumulator>>::result_type encrypt_type;
+
+    typedef typename block::detail::range_cipher_impl<block::detail::value_cipher_impl
+            <decrypt_accumulator>>::result_type decrypt_type;
+
+    typedef typename encrypt_type::value_type encrypt_value_type;
+    typedef typename decrypt_type::value_type decrypt_value_type;
+
+    constexpr static std::size_t const encrypt_val_bits = sizeof(encrypt_value_type) * CHAR_BIT;
+    constexpr static std::size_t const decrypt_val_bits = sizeof(decrypt_value_type) * CHAR_BIT;
 
     typedef packer<stream_endian::little_octet_big_bit, stream_endian::big_octet_big_bit,
-            sizeof(typename rijndael<K, B>::block_type::value_type) * CHAR_BIT,
-            sizeof(byte_string::value_type) * CHAR_BIT>
-            text_packer;
+            encrypt_val_bits, byte_bits> ciphertext_packer;
+
+    typedef packer<stream_endian::little_octet_big_bit, stream_endian::big_octet_big_bit,
+            decrypt_val_bits, byte_bits> plaintext_packer;
 
 public:
-    cipher_fixture(const std::string &ckey, const std::string &cplaintext, const std::string &ccipher_text) :
-        original_plaintext(cplaintext), original_cipher_text(ccipher_text), cipher_text(ccipher_text.size() / 2),
-        plaintext(ccipher_text.size() / 2), c(key) {
-        byte_string packed_string(ckey);
-        key_packer::pack(packed_string.begin(), packed_string.end(), key.begin());
-        c = rijndael<K, B>(key);
+    cipher_fixture(const std::string &ckey, const std::string &cplaintext, const std::string &cciphertext) :
+        given_plaintext(cplaintext), given_ciphertext(cciphertext), ciphertext(cciphertext.size() / 2),
+        plaintext(cplaintext.size() / 2) {
+
+        byte_string byte_key(ckey);
+        key_packer::pack(byte_key.begin(), byte_key.end(), key.begin());
     }
 
     void encrypt() {
-        typename rijndael<K, B>::block_type block, result;
-        block_packer::pack(original_plaintext.begin(), original_plaintext.end(), block.begin());
+        block_type block;
+        block_packer::pack(given_plaintext.begin(), given_plaintext.end(), block.begin());
 
-        result = c.encrypt(block);
+        encrypt_type result = ::nil::crypto3::encrypt<cipher>(block, key);
 
-        text_packer::pack(result.begin(), result.end(), cipher_text.begin());
+        ciphertext_packer::pack(result.begin(), result.end(), ciphertext.begin());
     }
 
     void decrypt() {
-        typename rijndael<K, B>::block_type block, result;
-        block_packer::pack(cipher_text.begin(), cipher_text.end(), block.begin());
+        block_type block;
+        block_packer::pack(given_ciphertext.begin(), given_ciphertext.end(), block.begin());
 
-        result = c.decrypt(block);
+        decrypt_type result = ::nil::crypto3::decrypt<cipher>(block, key);
 
-        text_packer::pack(result.begin(), result.end(), plaintext.begin());
+        plaintext_packer::pack(result.begin(), result.end(), plaintext.begin());
     }
 
-    typename rijndael<K, B>::key_type key;
-    const byte_string original_plaintext, original_cipher_text;
-    byte_string cipher_text, plaintext;
-    rijndael<K, B> c;
+    key_type key;
+    byte_string plaintext, ciphertext;
+    const byte_string given_plaintext, given_ciphertext;
 };
 
 BOOST_AUTO_TEST_SUITE(rijndael_cipher_test_suite)
-
-BOOST_AUTO_TEST_CASE(rijndael_128_128_no_fixture) {
-
-    typedef rijndael<128, 128> BlockCipher;
-
-    const std::string ckey("000102030405060708090a0b0c0d0e0f");
-    BlockCipher::key_type key; 
-
-    // convert string key to cipher key
-    byte_string packed_string(ckey);
-    typedef packer<stream_endian::big_octet_big_bit, stream_endian::little_octet_big_bit,
-        sizeof(byte_string::value_type) * CHAR_BIT,
-        sizeof(typename BlockCipher::key_type::value_type) * CHAR_BIT>
-        key_packer;
-    key_packer::pack(packed_string.begin(), packed_string.end(), key.begin());
-    
-
-    /* typedef BlockCipher::key_type::value_type key_value_type;
-    BOOST_FOREACH(key_value_type &value, key) {
-        std::cout << "Key value: " 
-                  << std::hex << std::setfill('0') << std::setw(2) << (uint32_t) value << std::endl; 
-    } */
-
-    // construct key schedule using cipher class
-    BlockCipher cipher(key);
-
-    // convert data string to block
-    const std::string data("00112233445566778899aabbccddeeff");
-    byte_string byte_data(data);
-    BlockCipher::block_type block;
-    typedef packer<stream_endian::big_octet_big_bit, stream_endian::little_octet_big_bit,
-            sizeof(byte_string::value_type) * CHAR_BIT,
-            sizeof(typename BlockCipher::block_type::value_type) * CHAR_BIT>
-            block_packer;
-    block_packer::pack(byte_data.begin(), byte_data.end(), block.begin());
-
-
-    /* typedef BlockCipher::block_type::value_type block_value_type;
-    BOOST_FOREACH(block_value_type &value, block) {
-        std::cout << "Block value: " 
-                  << std::hex << std::setfill('0') << std::setw(2) << (uint32_t) value << std::endl; 
-    } */
-
-    // expected ciphertext
-    const std::string str_ctext("69c4e0d86a7b0430d8cdb78070b4c55a");
-    byte_string expected_ciphertext(str_ctext);     
-    byte_string ciphertext(str_ctext.size() / 2);
-
-    // encrypt block
-    typedef typename block::accumulator_set<typename block::modes::isomorphic<
-            BlockCipher, nop_padding>::template bind<encryption_policy<BlockCipher>>::type>
-            CipherAccumulator;
-    
-    typedef block::detail::range_cipher_impl<block::detail::value_cipher_impl<CipherAccumulator>>
-            ::result_type res_type;
-
-    res_type result = encrypt<BlockCipher>(block, key);
-    
-
-    // pack obtained ciphertext into convenient byte representation
-    typedef packer<stream_endian::little_octet_big_bit, stream_endian::big_octet_big_bit,
-            sizeof(typename res_type::value_type) * CHAR_BIT,
-            sizeof(byte_string::value_type) * CHAR_BIT>
-            res_packer;
-
-    res_packer::pack(result.begin(), result.end(), ciphertext.begin());
-
-    BOOST_CHECK_EQUAL(expected_ciphertext, ciphertext);
-}
-/*
 // B = 128
 BOOST_AUTO_TEST_CASE(rijndael_128_128_cipher) {
     cipher_fixture<128, 128> f("000102030405060708090a0b0c0d0e0f", "00112233445566778899aabbccddeeff",
                                "69c4e0d86a7b0430d8cdb78070b4c55a");
 
     f.encrypt();
-    BOOST_CHECK_EQUAL(f.cipher_text, f.original_cipher_text);
+    BOOST_CHECK_EQUAL(f.ciphertext, f.given_ciphertext);
     f.decrypt();
-    BOOST_CHECK_EQUAL(f.plaintext, f.original_plaintext);
+    BOOST_CHECK_EQUAL(f.plaintext, f.given_plaintext);
 }
 
 BOOST_AUTO_TEST_CASE(rijndael_160_128_cipher) {
@@ -328,9 +283,9 @@ BOOST_AUTO_TEST_CASE(rijndael_160_128_cipher) {
                                "231d844639b31b412211cfe93712b880");
 
     f.encrypt();
-    BOOST_CHECK_EQUAL(f.cipher_text, f.original_cipher_text);
+    BOOST_CHECK_EQUAL(f.ciphertext, f.given_ciphertext);
     f.decrypt();
-    BOOST_CHECK_EQUAL(f.plaintext, f.original_plaintext);
+    BOOST_CHECK_EQUAL(f.plaintext, f.given_plaintext);
 }
 
 BOOST_AUTO_TEST_CASE(rijndael_192_128_cipher) {
@@ -338,9 +293,9 @@ BOOST_AUTO_TEST_CASE(rijndael_192_128_cipher) {
                                "dda97ca4864cdfe06eaf70a0ec0d7191");
 
     f.encrypt();
-    BOOST_CHECK_EQUAL(f.cipher_text, f.original_cipher_text);
+    BOOST_CHECK_EQUAL(f.ciphertext, f.given_ciphertext);
     f.decrypt();
-    BOOST_CHECK_EQUAL(f.plaintext, f.original_plaintext);
+    BOOST_CHECK_EQUAL(f.plaintext, f.given_plaintext);
 }
 
 BOOST_AUTO_TEST_CASE(rijndael_224_128_cipher) {
@@ -348,9 +303,9 @@ BOOST_AUTO_TEST_CASE(rijndael_224_128_cipher) {
                                "3243f6a8885a308d313198a2e0370734", "8faa8fe4dee9eb17caa4797502fc9d3f");
 
     f.encrypt();
-    BOOST_CHECK_EQUAL(f.cipher_text, f.original_cipher_text);
+    BOOST_CHECK_EQUAL(f.ciphertext, f.given_ciphertext);
     f.decrypt();
-    BOOST_CHECK_EQUAL(f.plaintext, f.original_plaintext);
+    BOOST_CHECK_EQUAL(f.plaintext, f.given_plaintext);
 }
 
 BOOST_AUTO_TEST_CASE(rijndael_256_128_cipher) {
@@ -358,9 +313,9 @@ BOOST_AUTO_TEST_CASE(rijndael_256_128_cipher) {
                                "00112233445566778899aabbccddeeff", "8ea2b7ca516745bfeafc49904b496089");
 
     f.encrypt();
-    BOOST_CHECK_EQUAL(f.cipher_text, f.original_cipher_text);
+    BOOST_CHECK_EQUAL(f.ciphertext, f.given_ciphertext);
     f.decrypt();
-    BOOST_CHECK_EQUAL(f.plaintext, f.original_plaintext);
+    BOOST_CHECK_EQUAL(f.plaintext, f.given_plaintext);
 }
 
 // B = 160
@@ -369,9 +324,9 @@ BOOST_AUTO_TEST_CASE(rijndael_128_160_cipher) {
                                "16e73aec921314c29df905432bc8968ab64b1f51");
 
     f.encrypt();
-    BOOST_CHECK_EQUAL(f.cipher_text, f.original_cipher_text);
+    BOOST_CHECK_EQUAL(f.ciphertext, f.given_ciphertext);
     f.decrypt();
-    BOOST_CHECK_EQUAL(f.plaintext, f.original_plaintext);
+    BOOST_CHECK_EQUAL(f.plaintext, f.given_plaintext);
 }
 
 BOOST_AUTO_TEST_CASE(rijndael_160_160_cipher) {
@@ -379,9 +334,9 @@ BOOST_AUTO_TEST_CASE(rijndael_160_160_cipher) {
                                "0553eb691670dd8a5a5b5addf1aa7450f7a0e587");
 
     f.encrypt();
-    BOOST_CHECK_EQUAL(f.cipher_text, f.original_cipher_text);
+    BOOST_CHECK_EQUAL(f.ciphertext, f.given_ciphertext);
     f.decrypt();
-    BOOST_CHECK_EQUAL(f.plaintext, f.original_plaintext);
+    BOOST_CHECK_EQUAL(f.plaintext, f.given_plaintext);
 }
 
 BOOST_AUTO_TEST_CASE(rijndael_192_160_cipher) {
@@ -389,9 +344,9 @@ BOOST_AUTO_TEST_CASE(rijndael_192_160_cipher) {
                                "3243f6a8885a308d313198a2e03707344a409382", "73cd6f3423036790463aa9e19cfcde894ea16623");
 
     f.encrypt();
-    BOOST_CHECK_EQUAL(f.cipher_text, f.original_cipher_text);
+    BOOST_CHECK_EQUAL(f.ciphertext, f.given_ciphertext);
     f.decrypt();
-    BOOST_CHECK_EQUAL(f.plaintext, f.original_plaintext);
+    BOOST_CHECK_EQUAL(f.plaintext, f.given_plaintext);
 }
 
 BOOST_AUTO_TEST_CASE(rijndael_224_160_cipher) {
@@ -399,9 +354,9 @@ BOOST_AUTO_TEST_CASE(rijndael_224_160_cipher) {
                                "3243f6a8885a308d313198a2e03707344a409382", "601b5dcd1cf4ece954c740445340bf0afdc048df");
 
     f.encrypt();
-    BOOST_CHECK_EQUAL(f.cipher_text, f.original_cipher_text);
+    BOOST_CHECK_EQUAL(f.ciphertext, f.given_ciphertext);
     f.decrypt();
-    BOOST_CHECK_EQUAL(f.plaintext, f.original_plaintext);
+    BOOST_CHECK_EQUAL(f.plaintext, f.given_plaintext);
 }
 
 BOOST_AUTO_TEST_CASE(rijndael_256_160_cipher) {
@@ -409,9 +364,9 @@ BOOST_AUTO_TEST_CASE(rijndael_256_160_cipher) {
                                "3243f6a8885a308d313198a2e03707344a409382", "579e930b36c1529aa3e86628bacfe146942882cf");
 
     f.encrypt();
-    BOOST_CHECK_EQUAL(f.cipher_text, f.original_cipher_text);
+    BOOST_CHECK_EQUAL(f.ciphertext, f.given_ciphertext);
     f.decrypt();
-    BOOST_CHECK_EQUAL(f.plaintext, f.original_plaintext);
+    BOOST_CHECK_EQUAL(f.plaintext, f.given_plaintext);
 }
 
 // B = 192
@@ -420,9 +375,9 @@ BOOST_AUTO_TEST_CASE(rijndael_128_192_cipher) {
                                "b24d275489e82bb8f7375e0d5fcdb1f481757c538b65148a");
 
     f.encrypt();
-    BOOST_CHECK_EQUAL(f.cipher_text, f.original_cipher_text);
+    BOOST_CHECK_EQUAL(f.ciphertext, f.given_ciphertext);
     f.decrypt();
-    BOOST_CHECK_EQUAL(f.plaintext, f.original_plaintext);
+    BOOST_CHECK_EQUAL(f.plaintext, f.given_plaintext);
 }
 
 BOOST_AUTO_TEST_CASE(rijndael_160_192_cipher) {
@@ -431,9 +386,9 @@ BOOST_AUTO_TEST_CASE(rijndael_160_192_cipher) {
                                "738dae25620d3d3beff4a037a04290d73eb33521a63ea568");
 
     f.encrypt();
-    BOOST_CHECK_EQUAL(f.cipher_text, f.original_cipher_text);
+    BOOST_CHECK_EQUAL(f.ciphertext, f.given_ciphertext);
     f.decrypt();
-    BOOST_CHECK_EQUAL(f.plaintext, f.original_plaintext);
+    BOOST_CHECK_EQUAL(f.plaintext, f.given_plaintext);
 }
 
 BOOST_AUTO_TEST_CASE(rijndael_192_192_cipher) {
@@ -442,9 +397,9 @@ BOOST_AUTO_TEST_CASE(rijndael_192_192_cipher) {
                                "725ae43b5f3161de806a7c93e0bca93c967ec1ae1b71e1cf");
 
     f.encrypt();
-    BOOST_CHECK_EQUAL(f.cipher_text, f.original_cipher_text);
+    BOOST_CHECK_EQUAL(f.ciphertext, f.given_ciphertext);
     f.decrypt();
-    BOOST_CHECK_EQUAL(f.plaintext, f.original_plaintext);
+    BOOST_CHECK_EQUAL(f.plaintext, f.given_plaintext);
 }
 
 BOOST_AUTO_TEST_CASE(rijndael_224_192_cipher) {
@@ -453,9 +408,9 @@ BOOST_AUTO_TEST_CASE(rijndael_224_192_cipher) {
                                "bbfc14180afbf6a36382a061843f0b63e769acdc98769130");
 
     f.encrypt();
-    BOOST_CHECK_EQUAL(f.cipher_text, f.original_cipher_text);
+    BOOST_CHECK_EQUAL(f.ciphertext, f.given_ciphertext);
     f.decrypt();
-    BOOST_CHECK_EQUAL(f.plaintext, f.original_plaintext);
+    BOOST_CHECK_EQUAL(f.plaintext, f.given_plaintext);
 }
 
 BOOST_AUTO_TEST_CASE(rijndael_256_192_cipher) {
@@ -464,9 +419,9 @@ BOOST_AUTO_TEST_CASE(rijndael_256_192_cipher) {
                                "0ebacf199e3315c2e34b24fcc7c46ef4388aa475d66c194c");
 
     f.encrypt();
-    BOOST_CHECK_EQUAL(f.cipher_text, f.original_cipher_text);
+    BOOST_CHECK_EQUAL(f.ciphertext, f.given_ciphertext);
     f.decrypt();
-    BOOST_CHECK_EQUAL(f.plaintext, f.original_plaintext);
+    BOOST_CHECK_EQUAL(f.plaintext, f.given_plaintext);
 }
 
 // B = 224
@@ -476,9 +431,9 @@ BOOST_AUTO_TEST_CASE(rijndael_128_224_cipher) {
                                "b0a8f78f6b3c66213f792ffd2a61631f79331407a5e5c8d3793aceb1");
 
     f.encrypt();
-    BOOST_CHECK_EQUAL(f.cipher_text, f.original_cipher_text);
+    BOOST_CHECK_EQUAL(f.ciphertext, f.given_ciphertext);
     f.decrypt();
-    BOOST_CHECK_EQUAL(f.plaintext, f.original_plaintext);
+    BOOST_CHECK_EQUAL(f.plaintext, f.given_plaintext);
 }
 
 BOOST_AUTO_TEST_CASE(rijndael_160_224_cipher) {
@@ -487,9 +442,9 @@ BOOST_AUTO_TEST_CASE(rijndael_160_224_cipher) {
                                "08b99944edfce33a2acb131183ab0168446b2d15e958480010f545e3");
 
     f.encrypt();
-    BOOST_CHECK_EQUAL(f.cipher_text, f.original_cipher_text);
+    BOOST_CHECK_EQUAL(f.ciphertext, f.given_ciphertext);
     f.decrypt();
-    BOOST_CHECK_EQUAL(f.plaintext, f.original_plaintext);
+    BOOST_CHECK_EQUAL(f.plaintext, f.given_plaintext);
 }
 
 BOOST_AUTO_TEST_CASE(rijndael_192_224_cipher) {
@@ -498,9 +453,9 @@ BOOST_AUTO_TEST_CASE(rijndael_192_224_cipher) {
                                "be4c597d8f7efe22a2f7e5b1938e2564d452a5bfe72399c7af1101e2");
 
     f.encrypt();
-    BOOST_CHECK_EQUAL(f.cipher_text, f.original_cipher_text);
+    BOOST_CHECK_EQUAL(f.ciphertext, f.given_ciphertext);
     f.decrypt();
-    BOOST_CHECK_EQUAL(f.plaintext, f.original_plaintext);
+    BOOST_CHECK_EQUAL(f.plaintext, f.given_plaintext);
 }
 
 BOOST_AUTO_TEST_CASE(rijndael_224_224_cipher) {
@@ -509,9 +464,9 @@ BOOST_AUTO_TEST_CASE(rijndael_224_224_cipher) {
                                "ef529598ecbce297811b49bbed2c33bbe1241d6e1a833dbe119569e8");
 
     f.encrypt();
-    BOOST_CHECK_EQUAL(f.cipher_text, f.original_cipher_text);
+    BOOST_CHECK_EQUAL(f.ciphertext, f.given_ciphertext);
     f.decrypt();
-    BOOST_CHECK_EQUAL(f.plaintext, f.original_plaintext);
+    BOOST_CHECK_EQUAL(f.plaintext, f.given_plaintext);
 }
 
 BOOST_AUTO_TEST_CASE(rijndael_256_224_cipher) {
@@ -520,9 +475,9 @@ BOOST_AUTO_TEST_CASE(rijndael_256_224_cipher) {
                                "02fafc200176ed05deb8edb82a3555b0b10d47a388dfd59cab2f6c11");
 
     f.encrypt();
-    BOOST_CHECK_EQUAL(f.cipher_text, f.original_cipher_text);
+    BOOST_CHECK_EQUAL(f.ciphertext, f.given_ciphertext);
     f.decrypt();
-    BOOST_CHECK_EQUAL(f.plaintext, f.original_plaintext);
+    BOOST_CHECK_EQUAL(f.plaintext, f.given_plaintext);
 }
 
 // B = 256
@@ -532,9 +487,9 @@ BOOST_AUTO_TEST_CASE(rijndael_128_256_cipher) {
                                "7d15479076b69a46ffb3b3beae97ad8313f622f67fedb487de9f06b9ed9c8f19");
 
     f.encrypt();
-    BOOST_CHECK_EQUAL(f.cipher_text, f.original_cipher_text);
+    BOOST_CHECK_EQUAL(f.ciphertext, f.given_ciphertext);
     f.decrypt();
-    BOOST_CHECK_EQUAL(f.plaintext, f.original_plaintext);
+    BOOST_CHECK_EQUAL(f.plaintext, f.given_plaintext);
 }
 
 BOOST_AUTO_TEST_CASE(rijndael_160_256_cipher) {
@@ -543,9 +498,9 @@ BOOST_AUTO_TEST_CASE(rijndael_160_256_cipher) {
                                "514f93fb296b5ad16aa7df8b577abcbd484decacccc7fb1f18dc567309ceeffd");
 
     f.encrypt();
-    BOOST_CHECK_EQUAL(f.cipher_text, f.original_cipher_text);
+    BOOST_CHECK_EQUAL(f.ciphertext, f.given_ciphertext);
     f.decrypt();
-    BOOST_CHECK_EQUAL(f.plaintext, f.original_plaintext);
+    BOOST_CHECK_EQUAL(f.plaintext, f.given_plaintext);
 }
 
 BOOST_AUTO_TEST_CASE(rijndael_192_256_cipher) {
@@ -554,9 +509,9 @@ BOOST_AUTO_TEST_CASE(rijndael_192_256_cipher) {
                                "5d7101727bb25781bf6715b0e6955282b9610e23a43c2eb062699f0ebf5887b2");
 
     f.encrypt();
-    BOOST_CHECK_EQUAL(f.cipher_text, f.original_cipher_text);
+    BOOST_CHECK_EQUAL(f.ciphertext, f.given_ciphertext);
     f.decrypt();
-    BOOST_CHECK_EQUAL(f.plaintext, f.original_plaintext);
+    BOOST_CHECK_EQUAL(f.plaintext, f.given_plaintext);
 }
 
 BOOST_AUTO_TEST_CASE(rijndael_224_256_cipher) {
@@ -565,9 +520,9 @@ BOOST_AUTO_TEST_CASE(rijndael_224_256_cipher) {
                                "d56c5a63627432579e1dd308b2c8f157b40a4bfb56fea1377b25d3ed3d6dbf80");
 
     f.encrypt();
-    BOOST_CHECK_EQUAL(f.cipher_text, f.original_cipher_text);
+    BOOST_CHECK_EQUAL(f.ciphertext, f.given_ciphertext);
     f.decrypt();
-    BOOST_CHECK_EQUAL(f.plaintext, f.original_plaintext);
+    BOOST_CHECK_EQUAL(f.plaintext, f.given_plaintext);
 }
 
 BOOST_AUTO_TEST_CASE(rijndael_256_256_cipher) {
@@ -576,9 +531,9 @@ BOOST_AUTO_TEST_CASE(rijndael_256_256_cipher) {
                                "a49406115dfb30a40418aafa4869b7c6a886ff31602a7dd19c889dc64f7e4e7a");
 
     f.encrypt();
-    BOOST_CHECK_EQUAL(f.cipher_text, f.original_cipher_text);
+    BOOST_CHECK_EQUAL(f.ciphertext, f.given_ciphertext);
     f.decrypt();
-    BOOST_CHECK_EQUAL(f.plaintext, f.original_plaintext);
-}*/
+    BOOST_CHECK_EQUAL(f.plaintext, f.given_plaintext);
+}
 
 BOOST_AUTO_TEST_SUITE_END()

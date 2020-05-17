@@ -56,7 +56,7 @@ namespace nil {
                     typedef typename isomorphic_policy<Cipher, Padding>::cipher_type cipher_type;
                     typedef typename isomorphic_policy<Cipher, Padding>::block_type block_type;
 
-                    typedef typename cipher_type::endian_type input_endian_type;
+                    typedef typename stream_endian::big_octet_big_bit input_endian_type;
 
                     inline static block_type begin_message(const cipher_type &cipher, const block_type &ciphertext) {
                         return cipher.decrypt(ciphertext);
