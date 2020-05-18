@@ -10,10 +10,15 @@
 
 #include <iostream>
 #include <unordered_map>
+#include <cstdint>
+#include <iomanip>
 
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
+
+#include <boost/assert.hpp>
+#include <boost/foreach.hpp>
 
 #include <nil/crypto3/block/algorithm/encrypt.hpp>
 #include <nil/crypto3/block/algorithm/decrypt.hpp>
@@ -265,6 +270,59 @@ public:
     byte_string plaintext, ciphertext;
     const byte_string given_plaintext, given_ciphertext;
 };
+
+template<typename BlockCipher, typename Integer,
+         typename UserEndianT = stream_endian::little_octet_big_bit>
+class conversion {
+    typedef BlockCipher cipher;
+    typedef typename cipher::endian_type endian_type;
+
+    constexpr std::size_t static const int_bits = sizeof(Integer) * CHAR_BIT;
+    constexpr std::size_t static const byte_str_bits = sizeof(byte_string::value_type) * CHAR_BIT;
+
+    typedef packer<UserEndianT, endian_type, byte_str_bits, int_bits> string_packer;
+    typedef packer<endian_type, UserEndianT, int_bits, byte_str_bits> array_packer;
+
+    // constexpr std::size_t const block_bits = cipher::block_bits; 
+    // constexpr std::size_t const key_bits = cipher::key_bits;
+
+public:
+    
+    template<std::size_t StrBits, typename Array = std::array<Integer, StrBits / int_bits>>
+    static void bstr_to_arr(const byte_string &str, Array &a) {
+        
+        BOOST_ASSERT(str.size() * byte_str_bits == StrBits);
+
+        string_packer::pack(str.begin(), str.end(), a.begin());
+    }
+
+
+    template<std::size_t StrBits, typename Array = std::array<Integer, StrBits / int_bits>>
+    static void arr_to_bstr(const Array &a, byte_string &str) {
+        
+        BOOST_ASSERT(str.size() * byte_str_bits == StrBits);
+
+        array_packer::pack(a.begin(), a.end(), str.begin());
+    }
+};
+
+BOOST_AUTO_TEST_SUITE(conversions)
+
+BOOST_AUTO_TEST_CASE(string_to_array) {
+
+    byte_string const given_str("00112233445566778899aabbccddeeff");
+
+    std::array<uint32_t, 4> a;
+    conversion<rijndael<128, 128>, uint32_t>::bstr_to_arr<128>(given_str, a);
+    
+    byte_string str(16);
+    conversion<rijndael<128, 128>, uint32_t>::arr_to_bstr<128>(a, str);
+
+    BOOST_CHECK_EQUAL(str, given_str);
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
 
 BOOST_AUTO_TEST_SUITE(rijndael_cipher_test_suite)
 // B = 128
