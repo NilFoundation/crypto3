@@ -1,7 +1,9 @@
 cmake_minimum_required(VERSION 2.8.11)
 
-cmake_policy(SET CMP0042 NEW)
 cmake_policy(SET CMP0028 NEW)
+cmake_policy(SET CMP0042 NEW)
+cmake_policy(SET CMP0048 NEW)
+cmake_policy(SET CMP0076 NEW)
 
 if(NOT ${CMAKE_WORKSPACE_NAME} STREQUAL crypto3)
     cm_workspace(crypto3)
