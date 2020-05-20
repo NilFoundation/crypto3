@@ -8,8 +8,10 @@
 
 cmake_minimum_required(VERSION 2.8.11)
 
-cmake_policy(SET CMP0042 NEW)
 cmake_policy(SET CMP0028 NEW)
+cmake_policy(SET CMP0042 NEW)
+cmake_policy(SET CMP0048 NEW)
+cmake_policy(SET CMP0076 NEW)
 
 cm_project(passhash WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME})
 
