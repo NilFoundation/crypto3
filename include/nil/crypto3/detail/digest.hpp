@@ -110,7 +110,7 @@ namespace nil {
                 return od;
 
             digest<DigestBits> nd(new_size, octet_type());
-            std::size_t bytes = sizeof(octet_type) * (old_size < new_size ? old_size : new_size) / octet_bits;
+            std::size_t bytes = sizeof(octet_type) * (old_size < new_size ? old_size : new_size);
             std::memcpy(nd.data(), od.data(), bytes);
             return nd;
         }

@@ -108,7 +108,10 @@ namespace nil {
                             processed_block = mode.process_block(cache, total_seen);
                         }
 
-                        packer_type::pack(processed_block.begin(), processed_block.end(), dgst.end());
+                        dgst = ::nil::crypto3::resize<block_bits>(dgst, dgst.size() + block_values);
+
+                        packer_type::pack(processed_block.begin(), processed_block.end(), 
+                            dgst.end() - block_values);
 
                         filled = false;
                     }
