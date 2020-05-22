@@ -15,7 +15,6 @@
 
 #include <nil/cas/fft/evaluation_domain/domains/basic_radix2_domain_aux.hpp>
 #include <nil/cas/fft/kronecker_substitution/kronecker_substitution.hpp>
-#include <nil/cas/fft/tools/exceptions.hpp>
 
 #ifdef MULTICORE
 #include <omp.h>
@@ -126,8 +125,8 @@ namespace nil {
             template<typename FieldT>
             void _polynomial_multiplication_on_fft(std::vector<FieldT> &c, const std::vector<FieldT> &a,
                                                    const std::vector<FieldT> &b) {
-                const size_t n = libff::get_power_of_two(a.size() + b.size() - 1);
-                FieldT omega = libff::get_root_of_unity<FieldT>(n);
+                const size_t n = ff::get_power_of_two(a.size() + b.size() - 1);
+                FieldT omega = ff::get_root_of_unity<FieldT>(n);
 
                 std::vector<FieldT> u(a);
                 std::vector<FieldT> v(b);
@@ -175,8 +174,8 @@ namespace nil {
             std::vector<FieldT> _polynomial_multiplication_transpose(const size_t &n, const std::vector<FieldT> &a,
                                                                      const std::vector<FieldT> &c) {
                 const size_t m = a.size();
-                if (c.size() - 1 > m + n)
-                    throw InvalidSizeException("expected c.size() - 1 <= m + n");
+                //if (c.size() - 1 > m + n)
+                    //throw InvalidSizeException("expected c.size() - 1 <= m + n");
 
                 std::vector<FieldT> r(a);
                 _reverse(r, m);

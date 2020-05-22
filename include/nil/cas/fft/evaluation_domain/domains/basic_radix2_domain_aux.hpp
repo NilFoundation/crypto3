@@ -19,8 +19,6 @@
 
 #include <nil/cas/ff/algebra/fields/field_utils.hpp>
 
-#include <nil/cas/fft/tools/exceptions.hpp>
-
 #ifdef DEBUG
 #include <nil/cas/ff/common/profiling.hpp>
 #endif
@@ -49,12 +47,12 @@ namespace nil {
             template<typename FieldT>
             void _basic_serial_radix2_FFT(std::vector<FieldT> &a, const FieldT &omega) {
                 const size_t n = a.size(), logn = log2(n);
-                if (n != (1u << logn))
-                    throw DomainSizeException("expected n == (1u << logn)");
+                //if (n != (1u << logn))
+                    //throw DomainSizeException("expected n == (1u << logn)");
 
                 /* swapping in place (from Storer's book) */
                 for (size_t k = 0; k < n; ++k) {
-                    const size_t rk = libff::bitreverse(k, logn);
+                    const size_t rk = ff::bitreverse(k, logn);
                     if (k < rk)
                         std::swap(a[k], a[rk]);
                 }
@@ -89,8 +87,8 @@ namespace nil {
 
                 const size_t m = a.size();
                 const size_t log_m = log2(m);
-                if (m != 1ul << log_m)
-                    throw DomainSizeException("expected m == 1ul<<log_m");
+                //if (m != 1ul << log_m)
+                    //throw DomainSizeException("expected m == 1ul<<log_m");
 
                 if (log_m < log_cpus) {
                     _basic_serial_radix2_FFT(a, omega);
@@ -156,7 +154,7 @@ namespace nil {
                 const size_t log_cpus = ((num_cpus & (num_cpus - 1)) == 0 ? log2(num_cpus) : log2(num_cpus) - 1);
 
         #ifdef DEBUG
-                libff::print_indent();
+                ff::print_indent();
                 printf("* Invoking parallel FFT on 2^%zu CPUs (omp_get_max_threads = %zu)\n", log_cpus, num_cpus);
         #endif
 
@@ -188,10 +186,10 @@ namespace nil {
                     return std::vector<FieldT>(1, FieldT::one());
                 }
 
-                if (m != (1u << libff::log2(m)))
-                    throw DomainSizeException("expected m == (1u << log2(m))");
+                //if (m != (1u << ff::log2(m)))
+                    //throw DomainSizeException("expected m == (1u << log2(m))");
 
-                const FieldT omega = libff::get_root_of_unity<FieldT>(m);
+                const FieldT omega = ff::get_root_of_unity<FieldT>(m);
 
                 std::vector<FieldT> u(m, FieldT::zero());
 

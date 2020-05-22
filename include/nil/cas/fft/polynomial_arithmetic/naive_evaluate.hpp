@@ -13,8 +13,6 @@
 #include <algorithm>
 #include <vector>
 
-#include <nil/cas/fft/tools/exceptions.hpp>
-
 namespace nil {
     namespace cas {
         namespace fft {
