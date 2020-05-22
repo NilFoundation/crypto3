@@ -1,13 +1,14 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_TYPE_TRAITS_HPP
-#define CRYPTO3_TYPE_TRAITS_HPP
+#ifndef CAS_TYPE_TRAITS_HPP
+#define CAS_TYPE_TRAITS_HPP
 
 #define GENERATE_HAS_MEMBER_TYPE(Type)                                                \
                                                                                       \
@@ -160,138 +161,17 @@
     };
 
 namespace nil {
-    namespace crypto3 {
+    namespace cas {
         namespace detail {
-            GENERATE_HAS_MEMBER_TYPE(iterator)
-            GENERATE_HAS_MEMBER_TYPE(const_iterator)
-
-            GENERATE_HAS_MEMBER_TYPE(encoded_value_type)
-            GENERATE_HAS_MEMBER_TYPE(encoded_block_type)
-            GENERATE_HAS_MEMBER_TYPE(decoded_value_type)
-            GENERATE_HAS_MEMBER_TYPE(decoded_block_type)
-
-            GENERATE_HAS_MEMBER_TYPE(block_type)
-            GENERATE_HAS_MEMBER_TYPE(digest_type)
-            GENERATE_HAS_MEMBER_TYPE(key_type)
-            GENERATE_HAS_MEMBER_TYPE(key_schedule_type)
-            GENERATE_HAS_MEMBER_TYPE(word_type)
-
-            GENERATE_HAS_MEMBER(encoded_value_bits)
-            GENERATE_HAS_MEMBER(encoded_block_bits)
-            GENERATE_HAS_MEMBER(decoded_value_bits)
-            GENERATE_HAS_MEMBER(decoded_block_bits)
-
-            GENERATE_HAS_MEMBER(block_bits)
-            GENERATE_HAS_MEMBER(digest_bits)
-            GENERATE_HAS_MEMBER(key_bits)
-            GENERATE_HAS_MEMBER(min_key_bits)
-            GENERATE_HAS_MEMBER(max_key_bits)
-            GENERATE_HAS_MEMBER(key_schedule_bits)
-            GENERATE_HAS_MEMBER(word_bits)
-
-            GENERATE_HAS_MEMBER(rounds)
-
-            GENERATE_HAS_MEMBER_CONST_RETURN_FUNCTION(begin, const_iterator)
-            GENERATE_HAS_MEMBER_CONST_RETURN_FUNCTION(end, const_iterator)
-
-            GENERATE_HAS_MEMBER_RETURN_FUNCTION(encode, block_type)
-            GENERATE_HAS_MEMBER_RETURN_FUNCTION(decode, block_type)
-
-            GENERATE_HAS_MEMBER_RETURN_FUNCTION(encrypt, block_type)
-            GENERATE_HAS_MEMBER_RETURN_FUNCTION(decrypt, block_type)
-
-            GENERATE_HAS_MEMBER_FUNCTION(generate)
-            GENERATE_HAS_MEMBER_CONST_FUNCTION(check)
 
             template<typename T>
-            struct is_iterator {
-                static char test(...);
-
-                template<typename U, typename = typename std::iterator_traits<U>::difference_type,
-                         typename = typename std::iterator_traits<U>::pointer,
-                         typename = typename std::iterator_traits<U>::reference,
-                         typename = typename std::iterator_traits<U>::value_type,
-                         typename = typename std::iterator_traits<U>::iterator_category>
-                static long test(U &&);
-
-                constexpr static bool value = std::is_same<decltype(test(std::declval<T>())), long>::value;
+            struct domain_category {
+                
             };
 
-            template<typename Container>
-            struct is_container {
-                static const bool value
-                    = has_const_iterator<Container>::value && has_begin<Container>::value && has_end<Container>::value;
-            };
 
-            template<typename T>
-            struct is_codec {
-                static const bool value = has_encoded_value_type<T>::value && has_encoded_value_bits<T>::value
-                                          && has_decoded_value_type<T>::value && has_decoded_value_bits<T>::value
-                                          && has_encoded_block_type<T>::value && has_encoded_block_bits<T>::value
-                                          && has_decoded_block_type<T>::value && has_decoded_block_bits<T>::value
-                                          && has_encode<T>::value && has_decode<T>::value;
-                typedef T type;
-            };
-
-            template<typename T>
-            struct is_block_cipher {
-                static const bool value = has_word_type<T>::value && has_word_bits<T>::value && has_block_type<T>::value
-                                          && has_block_bits<T>::value && has_key_type<T>::value
-                                          && has_key_bits<T>::value && has_rounds<T>::value && has_encrypt<T>::value
-                                          && has_decrypt<T>::value;
-                typedef T type;
-            };
-
-            template<typename T>
-            struct is_hash {
-            private:
-                typedef char one;
-                typedef struct {
-                    char array[2];
-                } two;
-
-                template<typename C>
-                static one test_construction_type(typename C::construction::type *);
-
-                template<typename C>
-                static two test_construction_type(...);
-
-                template<typename C>
-                static one test_construction_params(typename C::construction::params_type *);
-
-                template<typename C>
-                static two test_construction_params(...);
-
-            public:
-                static const bool value = has_digest_type<T>::value && has_digest_bits<T>::value
-                                          && sizeof(test_construction_type<T>(0)) == sizeof(one)
-                                          && sizeof(test_construction_params<T>(0)) == sizeof(one);
-                typedef T type;
-            };
-
-            template<typename T>
-            struct is_mac {
-                static const bool value = has_digest_type<T>::value && has_digest_bits<T>::value
-                                          && has_block_type<T>::value && has_block_bits<T>::value
-                                          && has_key_type<T>::value && has_key_bits<T>::value;
-                typedef T type;
-            };
-
-            template<typename T>
-            struct is_kdf {
-                static const bool value = has_digest_type<T>::value && has_digest_bits<T>::value
-                                          && has_key_type<T>::value && has_max_key_bits<T>::value
-                                          && has_min_key_bits<T>::value;
-                typedef T type;
-            };
-
-            template<typename T>
-            struct is_passhash {
-                static const bool value = has_generate<T>::value && has_check<T>::value;
-                typedef T type;
-            };
         }    // namespace detail
-    }        // namespace crypto3
+    }        // namespace cas
 }    // namespace nil
 
-#endif    // CRYPTO3_TYPE_TRAITS_HPP
+#endif    // CAS_TYPE_TRAITS_HPP
