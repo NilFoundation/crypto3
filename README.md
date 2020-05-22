@@ -1,6 +1,6 @@
-# Fast Fourier Transforms for =nil; Foundation's Cryptography Suite
+# Fast Fourier Transforms
 
-Fast Fourier Transforms  for =nil; Foundation's cryptography suite
+nil; Foundation C++ Computer Algebra System Fast Fourier Transforms
 
 ## Building
 
@@ -15,8 +15,8 @@ To actually include this library in a project it is required to:
 
 ### Internal
 
-* [Pairings?](https://github.com/NilFoundation/pairing)
-* [Finite fields?](https://github.com/NilFoundation/ff)
+* [Pairings](https://github.com/NilFoundation/pairing)
+* [Finite fields](https://github.com/NilFoundation/ff)
 
 ### External
 * [Boost](https://boost.org) (>= 1.58)
