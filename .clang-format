@@ -58,7 +58,7 @@ IncludeCategories:
         Priority:        1
     -   Regex:           '^(<(boost)/)'
         Priority:        2
-    -   Regex:           '^(<(nil\/crypto3)/)'
+    -   Regex:           '^(<(nil\/cas)/)'
         Priority:        3
     -   Regex:           '.*'
         Priority:        4

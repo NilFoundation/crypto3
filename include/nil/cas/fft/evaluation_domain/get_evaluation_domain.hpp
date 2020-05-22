@@ -7,24 +7,24 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_FFT_GET_EVALUATION_DOMAIN_HPP
-#define CRYPTO3_FFT_GET_EVALUATION_DOMAIN_HPP
+#ifndef CAS_FFT_GET_EVALUATION_DOMAIN_HPP
+#define CAS_FFT_GET_EVALUATION_DOMAIN_HPP
 
 #include <memory>
 
-#include <nil/crypto3/fft/evaluation_domain/evaluation_domain.hpp>
+#include <nil/cas/fft/evaluation_domain/evaluation_domain.hpp>
 
-#include <nil/crypto3/fft/evaluation_domain/domains/arithmetic_sequence_domain.hpp>
-#include <nil/crypto3/fft/evaluation_domain/domains/basic_radix2_domain.hpp>
-#include <nil/crypto3/fft/evaluation_domain/domains/extended_radix2_domain.hpp>
-#include <nil/crypto3/fft/evaluation_domain/domains/geometric_sequence_domain.hpp>
-#include <nil/crypto3/fft/evaluation_domain/domains/step_radix2_domain.hpp>
-#include <nil/crypto3/fft/evaluation_domain/evaluation_domain.hpp>
-#include <nil/crypto3/fft/tools/exceptions.hpp>
+#include <nil/cas/fft/evaluation_domain/domains/arithmetic_sequence_domain.hpp>
+#include <nil/cas/fft/evaluation_domain/domains/basic_radix2_domain.hpp>
+#include <nil/cas/fft/evaluation_domain/domains/extended_radix2_domain.hpp>
+#include <nil/cas/fft/evaluation_domain/domains/geometric_sequence_domain.hpp>
+#include <nil/cas/fft/evaluation_domain/domains/step_radix2_domain.hpp>
+#include <nil/cas/fft/evaluation_domain/evaluation_domain.hpp>
+#include <nil/cas/fft/tools/exceptions.hpp>
 
 namespace nil {
-    namespace crypto3 {
-        namespace math {
+    namespace cas {
+        namespace fft {
 
             /*!
             @brief
@@ -79,8 +79,8 @@ namespace nil {
                 return result;
             }
 
-        }    // namespace math
-    }        // namespace crypto3
+        }    // namespace fft
+    }        // namespace cas
 }    // namespace nil
 
-#endif    // CRYPTO3_FFT_GET_EVALUATION_DOMAIN_HPP
+#endif    // CAS_FFT_GET_EVALUATION_DOMAIN_HPP

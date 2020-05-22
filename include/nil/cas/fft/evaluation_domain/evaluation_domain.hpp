@@ -7,14 +7,14 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_FFT_EVALUATION_DOMAIN_HPP
-#define CRYPTO3_FFT_EVALUATION_DOMAIN_HPP
+#ifndef CAS_FFT_EVALUATION_DOMAIN_HPP
+#define CAS_FFT_EVALUATION_DOMAIN_HPP
 
 #include <vector>
 
 namespace nil {
-    namespace crypto3 {
-        namespace math {
+    namespace cas {
+        namespace fft {
 
             /**
              * An evaluation domain.
@@ -82,8 +82,8 @@ namespace nil {
                 virtual void divide_by_Z_on_coset(std::vector<FieldT> &P) = 0;
             };
 
-        }    // namespace math
-    }        // namespace crypto3
+        }    // namespace fft
+    }        // namespace cas
 }    // namespace nil
 
-#endif    // CRYPTO3_FFT_EVALUATION_DOMAIN_HPP
+#endif    // CAS_FFT_EVALUATION_DOMAIN_HPP

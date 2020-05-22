@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_FFT_BASIC_RADIX2_DOMAIN_AUX_HPP
-#define CRYPTO3_FFT_BASIC_RADIX2_DOMAIN_AUX_HPP
+#ifndef CAS_FFT_BASIC_RADIX2_DOMAIN_AUX_HPP
+#define CAS_FFT_BASIC_RADIX2_DOMAIN_AUX_HPP
 
 #include <algorithm>
 #include <vector>
@@ -17,12 +17,12 @@
 #include <omp.h>
 #endif
 
-#include <nil/crypto3/ff/algebra/fields/field_utils.hpp>
+#include <nil/cas/ff/algebra/fields/field_utils.hpp>
 
-#include <nil/crypto3/fft/tools/exceptions.hpp>
+#include <nil/cas/fft/tools/exceptions.hpp>
 
 #ifdef DEBUG
-#include <nil/crypto3/ff/common/profiling.hpp>
+#include <nil/cas/ff/common/profiling.hpp>
 #endif
 
 
@@ -34,8 +34,8 @@
 #endif
 
 namespace nil {
-    namespace crypto3 {
-        namespace math {
+    namespace cas {
+        namespace fft {
 
 
             /*!
@@ -234,8 +234,8 @@ namespace nil {
                 return u;
             };
 
-        }    // namespace math
-    }        // namespace crypto3
+        }    // namespace fft
+    }        // namespace cas
 }    // namespace nil
 
-#endif    // CRYPTO3_FFT_BASIC_RADIX2_DOMAIN_AUX_HPP
+#endif    // CAS_FFT_BASIC_RADIX2_DOMAIN_AUX_HPP

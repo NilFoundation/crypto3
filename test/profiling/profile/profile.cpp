@@ -23,17 +23,17 @@
 #include <sys/resource.h>
 #include <unistd.h>
 
-#include <nil/crypto3/ff/algebra/curves/edwards/edwards_pp.hpp>
-#include <nil/crypto3/ff/common/double.hpp>
+#include <nil/cas/ff/algebra/curves/edwards/edwards_pp.hpp>
+#include <nil/cas/ff/common/double.hpp>
 #include <omp.h>
 
-#include <libfqfft/evaluation_domain/domains/arithmetic_sequence_domain.hpp>
-#include <libfqfft/evaluation_domain/domains/basic_radix2_domain.hpp>
-#include <libfqfft/evaluation_domain/domains/extended_radix2_domain.hpp>
-#include <libfqfft/evaluation_domain/domains/geometric_sequence_domain.hpp>
-#include <libfqfft/evaluation_domain/domains/step_radix2_domain.hpp>
+#include <nil/cas/fft/evaluation_domain/domains/arithmetic_sequence_domain.hpp>
+#include <nil/cas/fft/evaluation_domain/domains/basic_radix2_domain.hpp>
+#include <nil/cas/fft/evaluation_domain/domains/extended_radix2_domain.hpp>
+#include <nil/cas/fft/evaluation_domain/domains/geometric_sequence_domain.hpp>
+#include <nil/cas/fft/evaluation_domain/domains/step_radix2_domain.hpp>
 
-using namespace libfqfft;
+using namespace nil::cas::fft;
 
 /* https://stackoverflow.com/questions/26237419/faster-than-rand */
 static unsigned int seed = 5149;
