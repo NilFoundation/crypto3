@@ -32,8 +32,8 @@ namespace nil {
              * For a Wide Pipe construction, use a digest that will
              * truncate the internal state.
              */
-            template<typename Params, typename IV, typename Compressor, typename Padding, 
-            typename Finalizer = detail::nop_finalizer>
+            template<typename Params, typename IV, typename Compressor, typename Padding,
+                     typename Finalizer = detail::nop_finalizer>
             class sponge_construction {
             public:
                 typedef IV iv_generator;
@@ -65,7 +65,7 @@ namespace nil {
                     return *this;
                 }
 
-                inline digest_type digest(const block_type &block = block_type(), 
+                inline digest_type digest(const block_type &block = block_type(),
                                           std::size_t total_seen = std::size_t()) {
                     using namespace nil::crypto3::detail;
 
@@ -93,7 +93,7 @@ namespace nil {
 
                     // Convert digest to byte representation
                     std::array<octet_type, state_bits / octet_bits> d_full;
-                    pack_n<endian_type, word_bits, octet_bits>(state_.data(), state_words, d_full.data(), 
+                    pack_n<endian_type, word_bits, octet_bits>(state_.data(), state_words, d_full.data(),
                                                                state_bits / octet_bits);
 
                     digest_type d;

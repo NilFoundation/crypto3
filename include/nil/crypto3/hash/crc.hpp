@@ -135,11 +135,12 @@ namespace nil {
                 }
 
                 digest_type digest() const {
+                    using namespace ::nil::crypto3::detail;
+
                     word_type x = crc_.checksum();
                     digest_type d;
                     // TODO: Justify bit order
-                    ::nil::crypto3::detail::pack_n<stream_endian::big_bit, digest_bits, octet_bits>(
-                        &x, 1, d.data(), digest_bits / octet_bits);
+                    pack_n<stream_endian::big_bit, digest_bits, octet_bits>(&x, 1, d.data(), digest_bits / octet_bits);
                     return d;
                 }
 
@@ -234,9 +235,7 @@ namespace nil {
             class crc {
             public:
                 struct construction {
-                    struct params_type {
-
-                    };
+                    struct params_type { };
                     typedef basic_crc<DigestBits, TruncPoly, InitRem, FinalXor, ReflectIn, ReflectRem> type;
                 };
 

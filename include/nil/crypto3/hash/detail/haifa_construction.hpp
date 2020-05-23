@@ -35,7 +35,7 @@ namespace nil {
              * @note https://eprint.iacr.org/2007/278.pdf
              */
             template<typename Params, typename IV, typename Compressor, typename Padding,
-            typename Finalizer = detail::nop_finalizer>
+                     typename Finalizer = detail::nop_finalizer>
             class haifa_construction {
             public:
                 typedef Compressor compressor_functor;
@@ -76,8 +76,9 @@ namespace nil {
                 constexpr static const std::size_t length_words = length_bits / word_bits;
                 BOOST_STATIC_ASSERT(!length_bits || length_bits % word_bits == 0);
 
-                typedef ::nil::crypto3::detail::packer<endian_type, stream_endian::little_octet_big_bit,
-                    word_bits, octet_bits> state_packer;
+                typedef ::nil::crypto3::detail::packer<endian_type, stream_endian::little_octet_big_bit, word_bits,
+                                                       octet_bits>
+                    state_packer;
 
             public:
                 template<typename Integer = std::size_t>
@@ -100,7 +101,7 @@ namespace nil {
                     padding_functor padding;
                     padding(b, total_seen);
 
-                    // Process last block 
+                    // Process last block
                     process_block(b, total_seen, salt_value);
 
                     // Apply finalizer
