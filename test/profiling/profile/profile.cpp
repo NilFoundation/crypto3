@@ -27,11 +27,11 @@
 #include <nil/crypto3/ff/common/double.hpp>
 #include <omp.h>
 
-#include <libfqfft/evaluation_domain/domains/arithmetic_sequence_domain.hpp>
-#include <libfqfft/evaluation_domain/domains/basic_radix2_domain.hpp>
-#include <libfqfft/evaluation_domain/domains/extended_radix2_domain.hpp>
-#include <libfqfft/evaluation_domain/domains/geometric_sequence_domain.hpp>
-#include <libfqfft/evaluation_domain/domains/step_radix2_domain.hpp>
+#include <nil/crypto3/fft/evaluation_domain/domains/arithmetic_sequence_domain.hpp>
+#include <nil/crypto3/fft/evaluation_domain/domains/basic_radix2_domain.hpp>
+#include <nil/crypto3/fft/evaluation_domain/domains/extended_radix2_domain.hpp>
+#include <nil/crypto3/fft/evaluation_domain/domains/geometric_sequence_domain.hpp>
+#include <nil/crypto3/fft/evaluation_domain/domains/step_radix2_domain.hpp>
 
 using namespace libfqfft;
 
@@ -206,10 +206,10 @@ int main(int argc, char* argv[]) {
         omp_set_num_threads(num_threads);
 
 #ifdef PROF_DOUBLE
-        profile<libff::Double>(domain_sizes, profiling_type, path, type, num_threads, key);
+        profile<ff::Double>(domain_sizes, profiling_type, path, type, num_threads, key);
 #else
-        libff::edwards_pp::init_public_params();
-        profile<libff::Fr<libff::edwards_pp>>(domain_sizes, profiling_type, path, type, num_threads, key);
+        ff::edwards_pp::init_public_params();
+        profile<ff::Fr<ff::edwards_pp>>(domain_sizes, profiling_type, path, type, num_threads, key);
 #endif
     }
 

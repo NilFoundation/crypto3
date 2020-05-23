@@ -54,7 +54,7 @@ namespace nil {
 
                 /* swapping in place (from Storer's book) */
                 for (size_t k = 0; k < n; ++k) {
-                    const size_t rk = libff::bitreverse(k, logn);
+                    const size_t rk = ff::bitreverse(k, logn);
                     if (k < rk)
                         std::swap(a[k], a[rk]);
                 }
@@ -156,7 +156,7 @@ namespace nil {
                 const size_t log_cpus = ((num_cpus & (num_cpus - 1)) == 0 ? log2(num_cpus) : log2(num_cpus) - 1);
 
         #ifdef DEBUG
-                libff::print_indent();
+                ff::print_indent();
                 printf("* Invoking parallel FFT on 2^%zu CPUs (omp_get_max_threads = %zu)\n", log_cpus, num_cpus);
         #endif
 
@@ -188,10 +188,10 @@ namespace nil {
                     return std::vector<FieldT>(1, FieldT::one());
                 }
 
-                if (m != (1u << libff::log2(m)))
+                if (m != (1u << ff::log2(m)))
                     throw DomainSizeException("expected m == (1u << log2(m))");
 
-                const FieldT omega = libff::get_root_of_unity<FieldT>(m);
+                const FieldT omega = ff::get_root_of_unity<FieldT>(m);
 
                 std::vector<FieldT> u(m, FieldT::zero());
 

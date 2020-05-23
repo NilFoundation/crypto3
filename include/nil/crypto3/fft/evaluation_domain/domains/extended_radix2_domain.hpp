@@ -27,8 +27,8 @@ namespace nil {
                     if (m <= 1)
                         throw InvalidSizeException("extended_radix2(): expected m > 1");
 
-                    if (!std::is_same<FieldT, libff::Double>::value) {
-                        const size_t logm = libff::log2(m);
+                    if (!std::is_same<FieldT, ff::Double>::value) {
+                        const size_t logm = ff::log2(m);
                         if (logm != (FieldT::s + 1))
                             throw DomainSizeException("extended_radix2(): expected logm == FieldT::s + 1");
                     }
@@ -36,12 +36,12 @@ namespace nil {
                     small_m = m / 2;
 
                     try {
-                        omega = libff::get_root_of_unity<FieldT>(small_m);
+                        omega = ff::get_root_of_unity<FieldT>(small_m);
                     } catch (const std::invalid_argument &e) {
                         throw DomainSizeException(e.what());
                     }
 
-                    shift = libff::coset_shift<FieldT>();
+                    shift = ff::coset_shift<FieldT>();
                 }
 
                 void FFT(std::vector<FieldT> &a) {
@@ -51,7 +51,7 @@ namespace nil {
                     std::vector<FieldT> a0(small_m, FieldT::zero());
                     std::vector<FieldT> a1(small_m, FieldT::zero());
 
-                    const FieldT shift_to_small_m = shift ^ libff::bigint<1>(small_m);
+                    const FieldT shift_to_small_m = shift ^ ff::bigint<1>(small_m);
 
                     FieldT shift_i = FieldT::one();
                     for (size_t i = 0; i < small_m; ++i) {
@@ -82,7 +82,7 @@ namespace nil {
                     _basic_radix2_FFT(a0, omega_inverse);
                     _basic_radix2_FFT(a1, omega_inverse);
 
-                    const FieldT shift_to_small_m = shift ^ libff::bigint<1>(small_m);
+                    const FieldT shift_to_small_m = shift ^ ff::bigint<1>(small_m);
                     const FieldT sconst = (FieldT(small_m) * (FieldT::one() - shift_to_small_m)).inverse();
 
                     const FieldT shift_inverse = shift.inverse();
@@ -112,8 +112,8 @@ namespace nil {
 
                     std::vector<FieldT> result(m, FieldT::zero());
 
-                    const FieldT t_to_small_m = t ^ libff::bigint<1>(small_m);
-                    const FieldT shift_to_small_m = shift ^ libff::bigint<1>(small_m);
+                    const FieldT t_to_small_m = t ^ ff::bigint<1>(small_m);
+                    const FieldT shift_to_small_m = shift ^ ff::bigint<1>(small_m);
                     const FieldT one_over_denom = (shift_to_small_m - FieldT::one()).inverse();
                     const FieldT T0_coeff = (t_to_small_m - shift_to_small_m) * (-one_over_denom);
                     const FieldT T1_coeff = (t_to_small_m - FieldT::one()) * one_over_denom;

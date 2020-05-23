@@ -38,9 +38,9 @@ namespace nil {
             std::shared_ptr<evaluation_domain<FieldT>> get_evaluation_domain(const size_t min_size) {
                 std::shared_ptr<evaluation_domain<FieldT>> result;
 
-                const size_t big = 1ul << (libff::log2(min_size) - 1);
+                const size_t big = 1ul << (ff::log2(min_size) - 1);
                 const size_t small = min_size - big;
-                const size_t rounded_small = (1ul << libff::log2(small));
+                const size_t rounded_small = (1ul << ff::log2(small));
 
                 try {
                     result.reset(new basic_radix2_domain<FieldT>(min_size));

@@ -27,20 +27,20 @@ namespace nil {
                     if (m <= 1)
                         throw InvalidSizeException("step_radix2(): expected m > 1");
 
-                    big_m = 1ul << (libff::log2(m) - 1);
+                    big_m = 1ul << (ff::log2(m) - 1);
                     small_m = m - big_m;
 
-                    if (small_m != 1ul << libff::log2(small_m))
+                    if (small_m != 1ul << ff::log2(small_m))
                         throw DomainSizeException("step_radix2(): expected small_m == 1ul<<log2(small_m)");
 
                     try {
-                        omega = libff::get_root_of_unity<FieldT>(1ul << libff::log2(m));
+                        omega = ff::get_root_of_unity<FieldT>(1ul << ff::log2(m));
                     } catch (const std::invalid_argument &e) {
                         throw DomainSizeException(e.what());
                     }
 
                     big_omega = omega.squared();
-                    small_omega = libff::get_root_of_unity<FieldT>(small_m);
+                    small_omega = ff::get_root_of_unity<FieldT>(small_m);
                 }
 
                 void FFT(std::vector<FieldT> &a) {
@@ -58,7 +58,7 @@ namespace nil {
                     }
 
                     std::vector<FieldT> e(small_m, FieldT::zero());
-                    const size_t compr = 1ul << (libff::log2(big_m) - libff::log2(small_m));
+                    const size_t compr = 1ul << (ff::log2(big_m) - ff::log2(small_m));
                     for (size_t i = 0; i < small_m; ++i) {
                         for (size_t j = 0; j < compr; ++j) {
                             e[i] += d[i + j * small_m];
@@ -66,7 +66,7 @@ namespace nil {
                     }
 
                     _basic_radix2_FFT(c, omega.squared());
-                    _basic_radix2_FFT(e, libff::get_root_of_unity<FieldT>(small_m));
+                    _basic_radix2_FFT(e, ff::get_root_of_unity<FieldT>(small_m));
 
                     for (size_t i = 0; i < big_m; ++i) {
                         a[i] = c[i];
@@ -85,7 +85,7 @@ namespace nil {
                     std::vector<FieldT> U1(a.begin() + big_m, a.end());
 
                     _basic_radix2_FFT(U0, omega.squared().inverse());
-                    _basic_radix2_FFT(U1, libff::get_root_of_unity<FieldT>(small_m).inverse());
+                    _basic_radix2_FFT(U1, ff::get_root_of_unity<FieldT>(small_m).inverse());
 
                     const FieldT U0_size_inv = FieldT(big_m).inverse();
                     for (size_t i = 0; i < big_m; ++i) {
@@ -109,7 +109,7 @@ namespace nil {
                         a[i] = U0[i];
                     }
 
-                    const size_t compr = 1ul << (libff::log2(big_m) - libff::log2(small_m));
+                    const size_t compr = 1ul << (ff::log2(big_m) - ff::log2(small_m));
                     for (size_t i = 0; i < small_m; ++i) {
                         for (size_t j = 1; j < compr; ++j) {
                             U1[i] -= tmp[i + j * small_m];

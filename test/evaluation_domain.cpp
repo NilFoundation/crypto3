@@ -14,13 +14,13 @@
 #include <nil/crypto3/ff/algebra/curves/mnt/mnt4/mnt4_pp.hpp>
 #include <stdint.h>
 
-#include <libfqfft/evaluation_domain/domains/arithmetic_sequence_domain.hpp>
-#include <libfqfft/evaluation_domain/domains/basic_radix2_domain.hpp>
-#include <libfqfft/evaluation_domain/domains/extended_radix2_domain.hpp>
-#include <libfqfft/evaluation_domain/domains/geometric_sequence_domain.hpp>
-#include <libfqfft/evaluation_domain/domains/step_radix2_domain.hpp>
-#include <libfqfft/polynomial_arithmetic/naive_evaluate.hpp>
-#include <libfqfft/tools/exceptions.hpp>
+#include <nil/crypto3/fft/evaluation_domain/domains/arithmetic_sequence_domain.hpp>
+#include <nil/crypto3/fft/evaluation_domain/domains/basic_radix2_domain.hpp>
+#include <nil/crypto3/fft/evaluation_domain/domains/extended_radix2_domain.hpp>
+#include <nil/crypto3/fft/evaluation_domain/domains/geometric_sequence_domain.hpp>
+#include <nil/crypto3/fft/evaluation_domain/domains/step_radix2_domain.hpp>
+#include <nil/crypto3/fft/polynomial_arithmetic/naive_evaluate.hpp>
+#include <nil/crypto3/fft/tools/exceptions.hpp>
 
 namespace libfqfft {
 
@@ -32,11 +32,11 @@ namespace libfqfft {
     class EvaluationDomainTest : public ::testing::Test {
     protected:
         virtual void SetUp() {
-            libff::mnt4_pp::init_public_params();
+            ff::mnt4_pp::init_public_params();
         }
     };
 
-    typedef ::testing::Types<libff::Fr<libff::mnt4_pp>, libff::Double> FieldT; /* List Extend Here */
+    typedef ::testing::Types<ff::Fr<ff::mnt4_pp>, ff::Double> FieldT; /* List Extend Here */
     TYPED_TEST_CASE(EvaluationDomainTest, FieldT);
 
     TYPED_TEST(EvaluationDomainTest, FFT) {

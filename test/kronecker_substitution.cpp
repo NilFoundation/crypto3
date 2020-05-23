@@ -12,13 +12,13 @@
 #include <gtest/gtest.h>
 #include <stdint.h>
 
-#include <libfqfft/polynomial_arithmetic/basic_operations.hpp>
+#include <nil/crypto3/fft/polynomial_arithmetic/basic_operations.hpp>
 
 namespace libfqfft {
 
     template<typename T>
     class KroneckerSubstitutionTest : public ::testing::Test { };
-    typedef ::testing::Types<libff::Double> FieldT; /* List Extend Here */
+    typedef ::testing::Types<ff::Double> FieldT; /* List Extend Here */
     TYPED_TEST_CASE(KroneckerSubstitutionTest, FieldT);
 
     TYPED_TEST(KroneckerSubstitutionTest, StandardPolynomialMultiplication) {
