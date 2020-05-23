@@ -7,19 +7,19 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_FFT_BASIS_CHANGE_HPP
-#define CRYPTO3_FFT_BASIS_CHANGE_HPP
+#ifndef CAS_FFT_BASIS_CHANGE_HPP
+#define CAS_FFT_BASIS_CHANGE_HPP
 
 #include <algorithm>
 #include <vector>
 
-#include <nil/crypto3/fft/evaluation_domain/domains/basic_radix2_domain_aux.hpp>
-#include <nil/crypto3/fft/polynomial_arithmetic/basic_operations.hpp>
-#include <nil/crypto3/fft/polynomial_arithmetic/xgcd.hpp>
+#include <nil/cas/fft/evaluation_domain/domains/basic_radix2_domain_aux.hpp>
+#include <nil/cas/fft/polynomial_arithmetic/basic_operations.hpp>
+#include <nil/cas/fft/polynomial_arithmetic/xgcd.hpp>
 
 namespace nil {
-    namespace crypto3 {
-        namespace math {
+    namespace cas {
+        namespace fft {
 
             /**
              * Compute the Subproduct Tree of degree 2^M and store it in Tree T.
@@ -231,8 +231,8 @@ namespace nil {
                 }
             }
 
-        }    // namespace math
-    }        // namespace crypto3
+        }    // namespace fft
+    }        // namespace cas
 }    // namespace nil
 
-#endif    // CRYPTO3_FFT_BASIS_CHANGE_HPP
+#endif    // CAS_FFT_BASIS_CHANGE_HPP

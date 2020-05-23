@@ -1,8 +1,8 @@
 {
-  "name": "crypto3.fft",
+  "name": "cas.fft",
   "version": "0.1.0",
-  "summary": "=nil; Crypto3 C++ Cryptography Suite Fast Fourier Transforms",
-  "description": "Crypto3.FFT library extends the =nil; Foundation's cryptography suite and provides a set of Fast Fourier Transforms implemented in way C++ standard library implies: concepts, algorithms, predictable behavior, latest standard features support and clean architecture without compromising security and performance.",
+  "summary": "=nil; Foundation C++ Computer Algebra System Fast Fourier Transforms",
+  "description": "CAS.FFT library extends the =nil; Foundation's computer algebra system and provides a set of Fast Fourier Transforms evaluation algorithms implemented in way C++ standard library implies: concepts, algorithms, predictable behavior, latest standard features support and clean architecture without compromising security and performance.",
   "homepage": "http://crypto3.nil.foundation/projects/crypto3",
   "license": "Boost Software License",
   "authors": {

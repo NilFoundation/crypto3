@@ -7,19 +7,19 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_FFT_KRONECKER_SUBSTITUTION_HPP
-#define CRYPTO3_FFT_KRONECKER_SUBSTITUTION_HPP
+#ifndef CAS_FFT_KRONECKER_SUBSTITUTION_HPP
+#define CAS_FFT_KRONECKER_SUBSTITUTION_HPP
 
 #include <vector>
 #include <algorithm>
 #include <cmath>
 
 #include <gmp.h>
-#include <nil/crypto3/ff/common/utils.hpp>
+#include <nil/cas/ff/common/utils.hpp>
 
 namespace nil {
-    namespace crypto3 {
-        namespace math {
+    namespace cas {
+        namespace fft {
             /*!
              * @brief Given two polynomial vectors, A and B, the function performs
              * polynomial multiplication and returns the resulting polynomial vector.
@@ -169,8 +169,8 @@ namespace nil {
                 _condense(v3);
             }
 
-        }    // namespace math
-    }        // namespace crypto3
+        }    // namespace fft
+    }        // namespace cas
 }    // namespace nil
 
-#endif    // CRYPTO3_FFT_KRONECKER_SUBSTITUTION_HPP
+#endif    // CAS_FFT_KRONECKER_SUBSTITUTION_HPP

@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_FFT_BASIC_RADIX2_DOMAIN_AUX_HPP
-#define CRYPTO3_FFT_BASIC_RADIX2_DOMAIN_AUX_HPP
+#ifndef CAS_FFT_BASIC_RADIX2_DOMAIN_AUX_HPP
+#define CAS_FFT_BASIC_RADIX2_DOMAIN_AUX_HPP
 
 #include <algorithm>
 #include <vector>
@@ -17,12 +17,10 @@
 #include <omp.h>
 #endif
 
-#include <nil/crypto3/ff/algebra/fields/field_utils.hpp>
-
-#include <nil/crypto3/fft/tools/exceptions.hpp>
+#include <nil/cas/ff/algebra/fields/field_utils.hpp>
 
 #ifdef DEBUG
-#include <nil/crypto3/ff/common/profiling.hpp>
+#include <nil/cas/ff/common/profiling.hpp>
 #endif
 
 
@@ -34,8 +32,8 @@
 #endif
 
 namespace nil {
-    namespace crypto3 {
-        namespace math {
+    namespace cas {
+        namespace fft {
 
 
             /*!
@@ -49,8 +47,8 @@ namespace nil {
             template<typename FieldT>
             void _basic_serial_radix2_FFT(std::vector<FieldT> &a, const FieldT &omega) {
                 const size_t n = a.size(), logn = log2(n);
-                if (n != (1u << logn))
-                    throw DomainSizeException("expected n == (1u << logn)");
+                //if (n != (1u << logn))
+                    //throw DomainSizeException("expected n == (1u << logn)");
 
                 /* swapping in place (from Storer's book) */
                 for (size_t k = 0; k < n; ++k) {
@@ -89,8 +87,8 @@ namespace nil {
 
                 const size_t m = a.size();
                 const size_t log_m = log2(m);
-                if (m != 1ul << log_m)
-                    throw DomainSizeException("expected m == 1ul<<log_m");
+                //if (m != 1ul << log_m)
+                    //throw DomainSizeException("expected m == 1ul<<log_m");
 
                 if (log_m < log_cpus) {
                     _basic_serial_radix2_FFT(a, omega);
@@ -234,8 +232,8 @@ namespace nil {
                 return u;
             };
 
-        }    // namespace math
-    }        // namespace crypto3
+        }    // namespace fft
+    }        // namespace cas
 }    // namespace nil
 
-#endif    // CRYPTO3_FFT_BASIC_RADIX2_DOMAIN_AUX_HPP
+#endif    // CAS_FFT_BASIC_RADIX2_DOMAIN_AUX_HPP

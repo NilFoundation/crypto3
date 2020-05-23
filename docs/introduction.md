@@ -1,16 +1,16 @@
-# Introduction # {#vdf_introduction}
+# Introduction # {#fft_introduction}
 
 @tableofcontents
 
-Crypto3.VDF library extends the =nil; Foundation's cryptography suite and provides a set of verifiable delay functions
+CAS.FFT library extends the =nil; Foundation's computer algebra system and provides a set of Fast Fourier Transforms evaluation algorithms
  implemented in way C++ standard library implies: concepts, algorithms, predictable behavior, latest standard features support and clean architecture without compromising security and performance.
  
-Crypto3.VDF consists of several parts to review:
+CAS.FFT consists of several parts to review:
 * [Manual](@ref vdf_manual).
 * [Implementation](@ref vdf_impl).
 * [Concepts](@ref vdf_concepts).
 
-## Dependencies ## {#vdf_dependencies}
+## Dependencies ## {#fft_dependencies}
 
 Internal dependencies:
 

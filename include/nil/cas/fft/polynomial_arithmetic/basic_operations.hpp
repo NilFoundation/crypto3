@@ -7,23 +7,22 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_FFT_BASIC_OPERATIONS_HPP
-#define CRYPTO3_FFT_BASIC_OPERATIONS_HPP
+#ifndef CAS_FFT_BASIC_OPERATIONS_HPP
+#define CAS_FFT_BASIC_OPERATIONS_HPP
 
 #include <algorithm>
 #include <vector>
 
-#include <nil/crypto3/fft/evaluation_domain/domains/basic_radix2_domain_aux.hpp>
-#include <nil/crypto3/fft/kronecker_substitution/kronecker_substitution.hpp>
-#include <nil/crypto3/fft/tools/exceptions.hpp>
+#include <nil/cas/fft/evaluation_domain/domains/basic_radix2_domain_aux.hpp>
+#include <nil/cas/fft/kronecker_substitution/kronecker_substitution.hpp>
 
 #ifdef MULTICORE
 #include <omp.h>
 #endif
 
 namespace nil {
-    namespace crypto3 {
-        namespace math {
+    namespace cas {
+        namespace fft {
 
             /**
              * Returns true if polynomial A is a zero polynomial.
@@ -175,8 +174,8 @@ namespace nil {
             std::vector<FieldT> _polynomial_multiplication_transpose(const size_t &n, const std::vector<FieldT> &a,
                                                                      const std::vector<FieldT> &c) {
                 const size_t m = a.size();
-                if (c.size() - 1 > m + n)
-                    throw InvalidSizeException("expected c.size() - 1 <= m + n");
+                //if (c.size() - 1 > m + n)
+                    //throw InvalidSizeException("expected c.size() - 1 <= m + n");
 
                 std::vector<FieldT> r(a);
                 _reverse(r, m);
@@ -228,8 +227,8 @@ namespace nil {
                 _condense(q);
             }
 
-        }    // namespace math
-    }        // namespace crypto3
+        }    // namespace fft
+    }        // namespace cas
 }    // namespace nil
 
-#endif    // CRYPTO3_FFT_BASIC_OPERATIONS_HPP
+#endif    // CAS_FFT_BASIC_OPERATIONS_HPP

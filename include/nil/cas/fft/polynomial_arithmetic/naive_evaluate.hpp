@@ -7,17 +7,15 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_FFT_NAIVE_EVALUATE_HPP
-#define CRYPTO3_FFT_NAIVE_EVALUATE_HPP
+#ifndef CAS_FFT_NAIVE_EVALUATE_HPP
+#define CAS_FFT_NAIVE_EVALUATE_HPP
 
 #include <algorithm>
 #include <vector>
 
-#include <nil/crypto3/fft/tools/exceptions.hpp>
-
 namespace nil {
-    namespace crypto3 {
-        namespace math {
+    namespace cas {
+        namespace fft {
 
             /*!
              * @brief
@@ -79,9 +77,9 @@ namespace nil {
                 return num * denom.inverse();
             }
             
-        }    // namespace math
-    }        // namespace crypto3
+        }    // namespace fft
+    }        // namespace cas
 }    // namespace nil
 
 
-#endif    // CRYPTO3_FFT_NAIVE_EVALUATE_HPP
+#endif    // CAS_FFT_NAIVE_EVALUATE_HPP

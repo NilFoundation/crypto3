@@ -7,22 +7,22 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_FFT_ARITHMETIC_SEQUENCE_DOMAIN_HPP
-#define CRYPTO3_FFT_ARITHMETIC_SEQUENCE_DOMAIN_HPP
+#ifndef CAS_FFT_ARITHMETIC_SEQUENCE_DOMAIN_HPP
+#define CAS_FFT_ARITHMETIC_SEQUENCE_DOMAIN_HPP
 
 #include <vector>
 
-#include <nil/crypto3/fft/evaluation_domain/evaluation_domain.hpp>
-#include <nil/crypto3/fft/evaluation_domain/domains/basic_radix2_domain_aux.hpp>
-#include <nil/crypto3/fft/polynomial_arithmetic/basis_change.hpp>
+#include <nil/cas/fft/evaluation_domain/evaluation_domain.hpp>
+#include <nil/cas/fft/evaluation_domain/domains/basic_radix2_domain_aux.hpp>
+#include <nil/cas/fft/polynomial_arithmetic/basis_change.hpp>
 
 #ifdef MULTICORE
 #include <omp.h>
 #endif
 
 namespace nil {
-    namespace crypto3 {
-        namespace math {
+    namespace cas {
+        namespace fft {
 
             template<typename FieldT>
             struct arithmetic_sequence_domain : public evaluation_domain<FieldT> {
@@ -234,8 +234,8 @@ namespace nil {
                 FieldT arithmetic_generator;
             };
 
-        }    // namespace math
-    }        // namespace crypto3
+        }    // namespace fft
+    }        // namespace cas
 }    // namespace nil
 
-#endif    // CRYPTO3_FFT_ARITHMETIC_SEQUENCE_DOMAIN_HPP
+#endif    // CAS_FFT_ARITHMETIC_SEQUENCE_DOMAIN_HPP

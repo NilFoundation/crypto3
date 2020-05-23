@@ -7,18 +7,18 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_FFT_STEP_RADIX2_DOMAIN_HPP
-#define CRYPTO3_FFT_STEP_RADIX2_DOMAIN_HPP
+#ifndef CAS_FFT_STEP_RADIX2_DOMAIN_HPP
+#define CAS_FFT_STEP_RADIX2_DOMAIN_HPP
 
 #include <vector>
 
-#include <nil/crypto3/fft/evaluation_domain/evaluation_domain.hpp>
+#include <nil/cas/fft/evaluation_domain/evaluation_domain.hpp>
 
-#include <nil/crypto3/fft/evaluation_domain/domains/basic_radix2_domain_aux.hpp>
+#include <nil/cas/fft/evaluation_domain/domains/basic_radix2_domain_aux.hpp>
 
 namespace nil {
-    namespace crypto3 {
-        namespace math {
+    namespace cas {
+        namespace fft {
 
             template<typename FieldT>
             struct step_radix2_domain : public evaluation_domain<FieldT> {
@@ -227,8 +227,8 @@ namespace nil {
                 FieldT small_omega;
             };
 
-        }    // namespace math
-    }        // namespace crypto3
+        }    // namespace fft
+    }        // namespace cas
 }    // namespace nil
 
-#endif    // CRYPTO3_FFT_STEP_RADIX2_DOMAIN_HPP
+#endif    // CAS_FFT_STEP_RADIX2_DOMAIN_HPP
