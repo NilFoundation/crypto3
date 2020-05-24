@@ -71,9 +71,6 @@
                     },
                     {
                       "name": "detail",
-                      "source_files": [
-                        "include/nil/crypto3/passhash/detail/*.{hpp}"
-                      ],
                       "subspecs": [
                         {
                           "name": "bcrypt",
