@@ -50,12 +50,6 @@
                       ]
                     },
                     {
-                      "name": "adaptor",
-                      "source_files": [
-                        "include/nil/crypto3/passhash/adaptor/*.{hpp}"
-                      ]
-                    },
-                    {
                       "name": "accumulators",
                       "source_files": [
                         "include/nil/crypto3/passhash/accumulators/*.{hpp}"
