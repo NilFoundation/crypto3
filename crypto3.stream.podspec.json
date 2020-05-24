@@ -50,12 +50,6 @@
                       ]
                     },
                     {
-                      "name": "adaptor",
-                      "source_files": [
-                        "include/nil/crypto3/stream/adaptor/*.{hpp}"
-                      ]
-                    },
-                    {
                       "name": "accumulators",
                       "source_files": [
                         "include/nil/crypto3/stream/accumulators/*.{hpp}"
@@ -71,9 +65,6 @@
                     },
                     {
                       "name": "detail",
-                      "source_files": [
-                        "include/nil/crypto3/stream/detail/*.{hpp}"
-                      ],
                       "subspecs": [
                         {
                           "name": "chacha",
