@@ -59,14 +59,6 @@
                       "name": "accumulators",
                       "source_files": [
                         "include/nil/crypto3/kdf/accumulators/*.{hpp}"
-                      ],
-                      "subspecs": [
-                        {
-                          "name": "parameters",
-                          "source_files": [
-                            "include/nil/crypto3/kdf/accumulators/parameters/*.{hpp}"
-                          ]
-                        }
                       ]
                     },
                     {
