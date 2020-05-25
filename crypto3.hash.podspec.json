@@ -144,7 +144,7 @@
                         {
                           "name": "whirlpool",
                           "source_files": [
-                            "include/nil/crypto3/hash/detail//*.{hpp}"
+                            "include/nil/crypto3/hash/detail/whirlpool/*.{hpp}"
                           ]
                         }
                       ]
