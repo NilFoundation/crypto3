@@ -186,8 +186,8 @@ namespace nil {
                     return std::vector<FieldT>(1, FieldT::one());
                 }
 
-                if (m != (1u << ff::log2(m)))
-                    throw DomainSizeException("expected m == (1u << log2(m))");
+                //if (m != (1u << ff::log2(m)))
+                    //throw DomainSizeException("expected m == (1u << log2(m))");
 
                 const FieldT omega = ff::get_root_of_unity<FieldT>(m);
 

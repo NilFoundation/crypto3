@@ -33,7 +33,7 @@ protected:
     virtual void SetUp() {
         ff::mnt4_pp::init_public_params();
     }
-};*/
+};
 
 /*typedef ::testing::Types<libff::Fr<libff::mnt4_pp>, libff::Double> FieldT;*/ /* List Extend Here */
 /*TYPED_TEST_CASE(EvaluationDomainTest, FieldT);

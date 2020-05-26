@@ -24,29 +24,29 @@ namespace nil {
             struct extended_radix2_domain : public evaluation_domain<FieldT> {
 
                 extended_radix2_domain(const size_t m) : evaluation_domain<FieldT>(m) {
-                    if (m <= 1)
-                        throw InvalidSizeException("extended_radix2(): expected m > 1");
+                    //if (m <= 1)
+                        //throw InvalidSizeException("extended_radix2(): expected m > 1");
 
                     if (!std::is_same<FieldT, ff::Double>::value) {
                         const size_t logm = ff::log2(m);
-                        if (logm != (FieldT::s + 1))
-                            throw DomainSizeException("extended_radix2(): expected logm == FieldT::s + 1");
+                        //if (logm != (FieldT::s + 1))
+                            //throw DomainSizeException("extended_radix2(): expected logm == FieldT::s + 1");
                     }
 
                     small_m = m / 2;
 
-                    try {
-                        omega = ff::get_root_of_unity<FieldT>(small_m);
-                    } catch (const std::invalid_argument &e) {
-                        throw DomainSizeException(e.what());
-                    }
+                    //try {
+                    omega = ff::get_root_of_unity<FieldT>(small_m);
+                    //} catch (const std::invalid_argument &e) {
+                    //    throw DomainSizeException(e.what());
+                    //}
 
                     shift = ff::coset_shift<FieldT>();
                 }
 
                 void FFT(std::vector<FieldT> &a) {
-                    if (a.size() != m)
-                        throw DomainSizeException("extended_radix2: expected a.size() == m");
+                    //if (a.size() != this->m)
+                        //throw DomainSizeException("extended_radix2: expected a.size() == this->m");
 
                     std::vector<FieldT> a0(small_m, FieldT::zero());
                     std::vector<FieldT> a1(small_m, FieldT::zero());
@@ -71,8 +71,8 @@ namespace nil {
                 }
 
                 void iFFT(std::vector<FieldT> &a) {
-                    if (a.size() != m)
-                        throw DomainSizeException("extended_radix2: expected a.size() == m");
+                    //if (a.size() != this->m)
+                        //throw DomainSizeException("extended_radix2: expected a.size() == this->m");
 
                     // note: this is not in-place
                     std::vector<FieldT> a0(a.begin(), a.begin() + small_m);
@@ -110,7 +110,7 @@ namespace nil {
                     const std::vector<FieldT> T0 = _basic_radix2_evaluate_all_lagrange_polynomials(small_m, t);
                     const std::vector<FieldT> T1 = _basic_radix2_evaluate_all_lagrange_polynomials(small_m, t * shift.inverse());
 
-                    std::vector<FieldT> result(m, FieldT::zero());
+                    std::vector<FieldT> result(this->m, FieldT::zero());
 
                     const FieldT t_to_small_m = t ^ ff::bigint<1>(small_m);
                     const FieldT shift_to_small_m = shift ^ ff::bigint<1>(small_m);
@@ -138,12 +138,12 @@ namespace nil {
                 }
 
                 void add_poly_Z(const FieldT &coeff, std::vector<FieldT> &H) {
-                    if (H.size() != m + 1)
-                        throw DomainSizeException("extended_radix2: expected H.size() == m+1");
+                    //if (H.size() != m + 1)
+                        //throw DomainSizeException("extended_radix2: expected H.size() == m+1");
 
                     const FieldT shift_to_small_m = shift ^ small_m;
 
-                    H[m] += coeff;
+                    H[this->m] += coeff;
                     H[small_m] -= coeff * (shift_to_small_m + FieldT::one());
                     H[0] += coeff * shift_to_small_m;
                 }

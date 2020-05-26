@@ -24,28 +24,28 @@ namespace nil {
             struct step_radix2_domain : public evaluation_domain<FieldT> {
 
                 step_radix2_domain(const size_t m) : evaluation_domain<FieldT>(m) {
-                    if (m <= 1)
-                        throw InvalidSizeException("step_radix2(): expected m > 1");
+                    //if (m <= 1)
+                        //throw InvalidSizeException("step_radix2(): expected m > 1");
 
                     big_m = 1ul << (ff::log2(m) - 1);
                     small_m = m - big_m;
 
-                    if (small_m != 1ul << ff::log2(small_m))
-                        throw DomainSizeException("step_radix2(): expected small_m == 1ul<<log2(small_m)");
+                    //if (small_m != 1ul << ff::log2(small_m))
+                        //throw DomainSizeException("step_radix2(): expected small_m == 1ul<<log2(small_m)");
 
-                    try {
-                        omega = ff::get_root_of_unity<FieldT>(1ul << ff::log2(m));
-                    } catch (const std::invalid_argument &e) {
-                        throw DomainSizeException(e.what());
-                    }
+                    //try {
+                    omega = ff::get_root_of_unity<FieldT>(1ul << ff::log2(m));
+                    //} catch (const std::invalid_argument &e) {
+                    //    throw DomainSizeException(e.what());
+                    //}
 
                     big_omega = omega.squared();
                     small_omega = ff::get_root_of_unity<FieldT>(small_m);
                 }
 
                 void FFT(std::vector<FieldT> &a) {
-                    if (a.size() != m)
-                        throw DomainSizeException("step_radix2: expected a.size() == m");
+                    //if (a.size() != this->m)
+                        //throw DomainSizeException("step_radix2: expected a.size() == this->m");
 
                     std::vector<FieldT> c(big_m, FieldT::zero());
                     std::vector<FieldT> d(big_m, FieldT::zero());
@@ -78,8 +78,8 @@ namespace nil {
                 }
 
                 void iFFT(std::vector<FieldT> &a) {
-                    if (a.size() != m)
-                        throw DomainSizeException("step_radix2: expected a.size() == m");
+                    //if (a.size() != this->m)
+                        //throw DomainSizeException("step_radix2: expected a.size() == this->m");
 
                     std::vector<FieldT> U0(a.begin(), a.begin() + big_m);
                     std::vector<FieldT> U1(a.begin() + big_m, a.end());
@@ -149,7 +149,7 @@ namespace nil {
                     std::vector<FieldT> inner_big = _basic_radix2_evaluate_all_lagrange_polynomials(big_m, t);
                     std::vector<FieldT> inner_small = _basic_radix2_evaluate_all_lagrange_polynomials(small_m, t * omega.inverse());
 
-                    std::vector<FieldT> result(m, FieldT::zero());
+                    std::vector<FieldT> result(this->m, FieldT::zero());
 
                     const FieldT L0 = (t ^ small_m) - (omega ^ small_m);
                     const FieldT omega_to_small_m = omega ^ small_m;
@@ -182,12 +182,12 @@ namespace nil {
                 }
 
                 void add_poly_Z(const FieldT &coeff, std::vector<FieldT> &H) {
-                    if (H.size() != m + 1)
-                        throw DomainSizeException("step_radix2: expected H.size() == m+1");
+                    //if (H.size() != this->m + 1)
+                        //throw DomainSizeException("step_radix2: expected H.size() == this->m+1");
 
                     const FieldT omega_to_small_m = omega ^ small_m;
 
-                    H[m] += coeff;
+                    H[this->m] += coeff;
                     H[big_m] -= coeff * omega_to_small_m;
                     H[small_m] -= coeff;
                     H[0] += coeff * omega_to_small_m;

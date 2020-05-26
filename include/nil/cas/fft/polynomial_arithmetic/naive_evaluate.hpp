@@ -29,8 +29,8 @@ namespace nil {
              */    
             template<typename FieldT>
             FieldT evaluate_polynomial(const size_t &m, const std::vector<FieldT> &coeff, const FieldT &t) {
-                if (m != coeff.size())
-                    throw DomainSizeException("expected m == coeff.size()");
+                //if (m != coeff.size())
+                    //throw DomainSizeException("expected m == coeff.size()");
 
                 FieldT result = FieldT::zero();
 
@@ -57,10 +57,10 @@ namespace nil {
             template<typename FieldT>
             FieldT evaluate_lagrange_polynomial(const size_t &m, const std::vector<FieldT> &domain, const FieldT &t,
                                                 const size_t &idx) {
-                if (m != domain.size())
-                    throw DomainSizeException("expected m == domain.size()");
-                if (idx >= m)
-                    throw InvalidSizeException("expected idx < m");
+                //if (m != domain.size())
+                    //throw DomainSizeException("expected m == domain.size()");
+                //if (idx >= m)
+                    //throw InvalidSizeException("expected idx < m");
 
                 FieldT num = FieldT::one();
                 FieldT denom = FieldT::one();

@@ -28,32 +28,32 @@ namespace nil {
             struct basic_radix2_domain : public evaluation_domain<FieldT> {
 
                 basic_radix2_domain(const size_t m) : evaluation_domain<FieldT>(m) {
-                    if (m <= 1)
-                        throw InvalidSizeException("basic_radix2(): expected m > 1");
+                    //if (m <= 1)
+                        //throw InvalidSizeException("basic_radix2(): expected m > 1");
 
                     if (!std::is_same<FieldT, ff::Double>::value) {
                         const size_t logm = ff::log2(m);
-                        if (logm > (FieldT::s))
-                            throw DomainSizeException("basic_radix2(): expected logm <= FieldT::s");
+                        //if (logm > (FieldT::s))
+                            //throw DomainSizeException("basic_radix2(): expected logm <= FieldT::s");
                     }
 
-                    try {
-                        omega = ff::get_root_of_unity<FieldT>(m);
-                    } catch (const std::invalid_argument &e) {
-                        throw DomainSizeException(e.what());
-                    }
+                    //try {
+                    omega = ff::get_root_of_unity<FieldT>(m);
+                    //} catch (const std::invalid_argument &e) {
+                        //throw DomainSizeException(e.what());
+                    //}
                 }
 
-                FFT(std::vector<FieldT> &a) {
-                    if (a.size() != m)
-                        throw DomainSizeException("basic_radix2: expected a.size() == m");
+                void FFT(std::vector<FieldT> &a) {
+                    //if (a.size() != this->m)
+                        //throw DomainSizeException("basic_radix2: expected a.size() == this->m");
 
                     _basic_radix2_FFT(a, omega);
                 }
 
-                iFFT(std::vector<FieldT> &a) {
-                    if (a.size() != m)
-                        throw DomainSizeException("basic_radix2: expected a.size() == m");
+                void iFFT(std::vector<FieldT> &a) {
+                    //if (a.size() != this->m)
+                        //throw DomainSizeException("basic_radix2: expected a.size() == this->m");
 
                     _basic_radix2_FFT(a, omega.inverse());
 
@@ -74,7 +74,7 @@ namespace nil {
                 }
 
                 std::vector<FieldT> evaluate_all_lagrange_polynomials(const FieldT &t) {
-                    return _basic_radix2_evaluate_all_lagrange_polynomials(m, t);
+                    return _basic_radix2_evaluate_all_lagrange_polynomials(this->m, t);
                 }
 
                 FieldT get_domain_element(const size_t idx) {
@@ -82,21 +82,21 @@ namespace nil {
                 }
 
                 FieldT compute_vanishing_polynomial(const FieldT &t) {
-                    return (t ^ m) - FieldT::one();
+                    return (t ^ this->m) - FieldT::one();
                 }
 
                 void add_poly_Z(const FieldT &coeff, std::vector<FieldT> &H) {
-                    if (H.size() != m + 1)
-                        throw DomainSizeException("basic_radix2: expected H.size() == m+1");
+                    //if (H.size() != this->m + 1)
+                        //throw DomainSizeException("basic_radix2: expected H.size() == this->m+1");
 
-                    H[m] += coeff;
+                    H[this->m] += coeff;
                     H[0] -= coeff;
                 }
 
                 void divide_by_Z_on_coset(std::vector<FieldT> &P) {
                     const FieldT coset = FieldT::multiplicative_generator;
                     const FieldT Z_inverse_at_coset = compute_vanishing_polynomial(coset).inverse();
-                    for (size_t i = 0; i < m; ++i) {
+                    for (size_t i = 0; i < this->m; ++i) {
                         P[i] *= Z_inverse_at_coset;
                     }
                 }

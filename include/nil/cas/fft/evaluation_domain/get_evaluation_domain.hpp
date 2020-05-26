@@ -67,7 +67,7 @@ namespace nil {
                                             try {
                                                 result.reset(new arithmetic_sequence_domain<FieldT>(min_size));
                                             } catch (...) {
-                                                throw DomainSizeException("get_evaluation_domain: no matching domain");
+                                                throw "get_evaluation_domain: no matching domain";
                                             }
                                         }
                                     }
