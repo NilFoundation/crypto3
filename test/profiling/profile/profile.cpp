@@ -27,19 +27,11 @@
 #include <nil/cas/ff/common/double.hpp>
 #include <omp.h>
 
-<<<<<<< HEAD
-#include <nil/crypto3/fft/evaluation_domain/domains/arithmetic_sequence_domain.hpp>
-#include <nil/crypto3/fft/evaluation_domain/domains/basic_radix2_domain.hpp>
-#include <nil/crypto3/fft/evaluation_domain/domains/extended_radix2_domain.hpp>
-#include <nil/crypto3/fft/evaluation_domain/domains/geometric_sequence_domain.hpp>
-#include <nil/crypto3/fft/evaluation_domain/domains/step_radix2_domain.hpp>
-=======
 #include <nil/cas/fft/evaluation_domain/domains/arithmetic_sequence_domain.hpp>
 #include <nil/cas/fft/evaluation_domain/domains/basic_radix2_domain.hpp>
 #include <nil/cas/fft/evaluation_domain/domains/extended_radix2_domain.hpp>
 #include <nil/cas/fft/evaluation_domain/domains/geometric_sequence_domain.hpp>
 #include <nil/cas/fft/evaluation_domain/domains/step_radix2_domain.hpp>
->>>>>>> 0d62061d49911d1e9a117ce021ac9568c63471e7
 
 using namespace nil::cas::fft;
 

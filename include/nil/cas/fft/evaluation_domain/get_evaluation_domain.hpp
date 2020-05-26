@@ -20,6 +20,7 @@
 #include <nil/cas/fft/evaluation_domain/domains/geometric_sequence_domain.hpp>
 #include <nil/cas/fft/evaluation_domain/domains/step_radix2_domain.hpp>
 #include <nil/cas/fft/evaluation_domain/evaluation_domain.hpp>
+
 #include <nil/cas/fft/tools/exceptions.hpp>
 
 namespace nil {

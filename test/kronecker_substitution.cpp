@@ -9,28 +9,16 @@
 
 #include <vector>
 
-#include <gtest/gtest.h>
-#include <stdint.h>
+#include <cstdint>
 
-<<<<<<< HEAD
-#include <nil/crypto3/fft/polynomial_arithmetic/basic_operations.hpp>
-=======
 #include <nil/cas/fft/polynomial_arithmetic/basic_operations.hpp>
->>>>>>> 0d62061d49911d1e9a117ce021ac9568c63471e7
 
 using namespace nil::cas::fft;
 
-<<<<<<< HEAD
-    template<typename T>
-    class KroneckerSubstitutionTest : public ::testing::Test { };
-    typedef ::testing::Types<ff::Double> FieldT; /* List Extend Here */
-    TYPED_TEST_CASE(KroneckerSubstitutionTest, FieldT);
-=======
 /*template<typename T>
 class KroneckerSubstitutionTest : public ::testing::Test { };
 typedef ::testing::Types<libff::Double> FieldT;*/ /* List Extend Here */
 /*TYPED_TEST_CASE(KroneckerSubstitutionTest, FieldT);
->>>>>>> 0d62061d49911d1e9a117ce021ac9568c63471e7
 
 TYPED_TEST(KroneckerSubstitutionTest, StandardPolynomialMultiplication) {
 

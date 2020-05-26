@@ -12,13 +12,8 @@
 //#include <gtest/gtest.h>
 #include <stdint.h>
 
-<<<<<<< HEAD
-#include <nil/crypto3/fft/polynomial_arithmetic/basic_operations.hpp>
-#include <nil/crypto3/fft/polynomial_arithmetic/xgcd.hpp>
-=======
 #include <nil/cas/fft/polynomial_arithmetic/basic_operations.hpp>
 #include <nil/cas/fft/polynomial_arithmetic/xgcd.hpp>
->>>>>>> 0d62061d49911d1e9a117ce021ac9568c63471e7
 
 using namespace nil::cas::fft;
 /*
@@ -27,14 +22,7 @@ class PolynomialArithmeticTest : public ::testing::Test { };
 typedef ::testing::Types<ff::Double> FieldT;*/ /* List Extend Here */
 /*TYPED_TEST_CASE(PolynomialArithmeticTest, FieldT);
 
-<<<<<<< HEAD
-    template<typename T>
-    class PolynomialArithmeticTest : public ::testing::Test { };
-    typedef ::testing::Types<ff::Double> FieldT; /* List Extend Here */
-    TYPED_TEST_CASE(PolynomialArithmeticTest, FieldT);
-=======
 TYPED_TEST(PolynomialArithmeticTest, PolynomialAdditionSame) {
->>>>>>> 0d62061d49911d1e9a117ce021ac9568c63471e7
 
     std::vector<TypeParam> a = {1, 3, 4, 25, 6, 7, 7, 2};
     std::vector<TypeParam> b = {9, 3, 11, 14, 7, 1, 5, 8};
