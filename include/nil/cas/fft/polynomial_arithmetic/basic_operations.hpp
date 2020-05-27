@@ -110,15 +110,6 @@ namespace nil {
             }
 
             /**
-             * Perform the multiplication of two polynomials, polynomial A * polynomial B, and stores result in polynomial C.
-             */
-            template<typename FieldT>
-            void _polynomial_multiplication(std::vector<FieldT> &c, const std::vector<FieldT> &a,
-                                            const std::vector<FieldT> &b) {
-                _polynomial_multiplication_on_fft(c, a, b);
-            }
-
-            /**
              * Perform the multiplication of two polynomials, polynomial A * polynomial B, using FFT, and stores result in
              * polynomial C.
              */
@@ -153,6 +144,15 @@ namespace nil {
                 const FieldT sconst = FieldT(n).inverse();
                 std::transform(c.begin(), c.end(), c.begin(), std::bind1st(std::multiplies<FieldT>(), sconst));
                 _condense(c);
+            }
+
+            /**
+             * Perform the multiplication of two polynomials, polynomial A * polynomial B, and stores result in polynomial C.
+             */
+            template<typename FieldT>
+            void _polynomial_multiplication(std::vector<FieldT> &c, const std::vector<FieldT> &a,
+                                            const std::vector<FieldT> &b) {
+                _polynomial_multiplication_on_fft(c, a, b);
             }
 
             /**
