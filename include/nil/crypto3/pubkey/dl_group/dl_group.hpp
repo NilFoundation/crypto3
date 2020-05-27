@@ -21,6 +21,7 @@ namespace nil {
     namespace crypto3 {
 
         using namespace boost::multiprecision;
+        using namespace boost::integer;
 
         class montgomery_params;
 
