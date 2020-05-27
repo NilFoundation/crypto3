@@ -21,6 +21,7 @@ endif()
 
 cm_find_package(${CMAKE_WORKSPACE_NAME}_asn1)
 cm_find_package(${CMAKE_WORKSPACE_NAME}_codec)
+cm_find_package(${CMAKE_WORKSPACE_NAME}_ff)
 cm_find_package(${CMAKE_WORKSPACE_NAME}_hash)
 cm_find_package(${CMAKE_WORKSPACE_NAME}_modes)
 cm_find_package(${CMAKE_WORKSPACE_NAME}_pk_pad)
@@ -422,6 +423,7 @@ target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
                       ${${CURRENT_PROJECT_NAME}_LIBRARIES}
                       ${CMAKE_WORKSPACE_NAME}::asn1
                       ${CMAKE_WORKSPACE_NAME}::codec
+                      ${CMAKE_WORKSPACE_NAME}::ff
                       ${CMAKE_WORKSPACE_NAME}::hash
                       ${CMAKE_WORKSPACE_NAME}::modes
                       ${CMAKE_WORKSPACE_NAME}::pk_pad
