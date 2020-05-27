@@ -14,7 +14,7 @@
 #include <algorithm>
 #include <cmath>
 
-#include <gmp.h>
+#include </usr/include/x86_64-linux-gnu/gmp.h>
 #include <nil/cas/ff/common/utils.hpp>
 
 namespace nil {
@@ -167,6 +167,16 @@ namespace nil {
                 free(m1);
 
                 _condense(v3);
+            }
+
+            /**
+             * Perform the multiplication of two polynomials, polynomial A * polynomial B, using Kronecker Substitution, and
+             * stores result in polynomial C.
+             */
+            template<typename FieldT>
+            void _polynomial_multiplication_on_kronecker(std::vector<FieldT> &c, const std::vector<FieldT> &a,
+                                                         const std::vector<FieldT> &b) {
+                kronecker_substitution(c, a, b);
             }
 
         }    // namespace fft

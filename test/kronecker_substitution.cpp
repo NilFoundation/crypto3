@@ -7,51 +7,54 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#include <vector>
+#define BOOST_TEST_MODULE kronecker_substitution_test
 
+#include <vector>
 #include <cstdint>
 
+#include <boost/test/unit_test.hpp>
+#include <boost/test/data/test_case.hpp>
+#include <boost/test/data/monomorphic.hpp>
+
 #include <nil/cas/fft/polynomial_arithmetic/basic_operations.hpp>
+#include <nil/cas/fft/kronecker_substitution/kronecker_substitution.hpp>
 
 using namespace nil::cas::fft;
 
-/*template<typename T>
-class KroneckerSubstitutionTest : public ::testing::Test { };
-typedef ::testing::Types<libff::Double> FieldT;*/ /* List Extend Here */
-/*TYPED_TEST_CASE(KroneckerSubstitutionTest, FieldT);
+typedef nil::cas::ff::Double FieldT;
 
-TYPED_TEST(KroneckerSubstitutionTest, StandardPolynomialMultiplication) {
+BOOST_AUTO_TEST_SUITE(kronecker_substitution_test_suite)
 
-    std::vector<TypeParam> a = {1, 2, 3, 1};
-    std::vector<TypeParam> b = {1, 2, 1, 1};
-    std::vector<TypeParam> c(1, TypeParam::zero());
+BOOST_AUTO_TEST_CASE(standard_polynomial_multiplication) {
 
-    _polynomial_multiplication_on_kronecker(c, a, b);
-
-    std::vector<TypeParam> c_answer(1, TypeParam::zero());
-    _polynomial_multiplication(c_answer, a, b);
-
-    for (size_t i = 0; i < c_answer.size(); i++) {
-        EXPECT_TRUE(c_answer[i] == c[i]);
-    }
-}
-
-TYPED_TEST(KroneckerSubstitutionTest, SquaredPolynomialMultiplication) {
-
-    std::vector<TypeParam> a = {1, 2, 3, 1};
-    std::vector<TypeParam> b = a;
-    std::vector<TypeParam> c(1, TypeParam::zero());
+    std::vector<FieldT> a = {1, 2, 3, 1};
+    std::vector<FieldT> b = {1, 2, 1, 1};
+    std::vector<FieldT> c(1, FieldT::zero());
 
     _polynomial_multiplication_on_kronecker(c, a, b);
 
-    std::vector<TypeParam> c_answer(1, TypeParam::zero());
+    std::vector<FieldT> c_answer(1, FieldT::zero());
     _polynomial_multiplication(c_answer, a, b);
 
     for (size_t i = 0; i < c_answer.size(); i++) {
-        EXPECT_TRUE(c_answer[i] == c[i]);
+        BOOST_CHECK(c_answer[i] == c[i]);
     }
-}*/
-
-int main() {
-    return 0;
 }
+
+BOOST_AUTO_TEST_CASE(squared_polynomial_multiplication) {
+
+    std::vector<FieldT> a = {1, 2, 3, 1};
+    std::vector<FieldT> b = a;
+    std::vector<FieldT> c(1, FieldT::zero());
+
+    _polynomial_multiplication_on_kronecker(c, a, b);
+
+    std::vector<FieldT> c_answer(1, FieldT::zero());
+    _polynomial_multiplication(c_answer, a, b);
+
+    for (size_t i = 0; i < c_answer.size(); i++) {
+        BOOST_CHECK(c_answer[i] == c[i]);
+    }
+}
+
+BOOST_AUTO_TEST_SUITE_END()

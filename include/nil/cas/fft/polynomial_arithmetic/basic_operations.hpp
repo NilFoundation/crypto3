@@ -14,7 +14,6 @@
 #include <vector>
 
 #include <nil/cas/fft/evaluation_domain/domains/basic_radix2_domain_aux.hpp>
-#include <nil/cas/fft/kronecker_substitution/kronecker_substitution.hpp>
 
 #ifdef MULTICORE
 #include <omp.h>
@@ -153,16 +152,6 @@ namespace nil {
             void _polynomial_multiplication(std::vector<FieldT> &c, const std::vector<FieldT> &a,
                                             const std::vector<FieldT> &b) {
                 _polynomial_multiplication_on_fft(c, a, b);
-            }
-
-            /**
-             * Perform the multiplication of two polynomials, polynomial A * polynomial B, using Kronecker Substitution, and
-             * stores result in polynomial C.
-             */
-            template<typename FieldT>
-            void _polynomial_multiplication_on_kronecker(std::vector<FieldT> &c, const std::vector<FieldT> &a,
-                                                         const std::vector<FieldT> &b) {
-                kronecker_substitution(c, a, b);
             }
 
             /**
