@@ -73,8 +73,8 @@ namespace nil {
                                           const std::vector<std::vector<std::vector<FieldT>>> &T,
                                           const size_t &n) {
                 size_t m = log2(n);
-                if (T.size() != m + 1u)
-                    throw DomainSizeException("expected T.size() == m + 1");
+                //if (T.size() != m + 1u)
+                    //throw DomainSizeException("expected T.size() == m + 1");
 
                 /* MonomialToNewton */
                 std::vector<FieldT> I(T[m][0]);
@@ -128,8 +128,8 @@ namespace nil {
                                           const std::vector<std::vector<std::vector<FieldT>>> &T,
                                           const size_t &n) {
                 size_t m = log2(n);
-                if (T.size() != m + 1u)
-                    throw DomainSizeException("expected T.size() == m + 1");
+                //if (T.size() != m + 1u)
+                    //throw DomainSizeException("expected T.size() == m + 1");
 
                 std::vector<std::vector<FieldT>> f(n);
                 for (size_t i = 0; i < n; i++) {

@@ -41,7 +41,10 @@ macro(define_fft_test name)
     endif()
 endmacro()
 
-set(TESTS_NAMES "evaluation_domain" "kronecker_substitution" "polynomial_arithmetic")
+set(TESTS_NAMES 
+# "evaluation_domain" 
+"kronecker_substitution" 
+"polynomial_arithmetic")
 
 foreach(TEST_NAME ${TESTS_NAMES})
     define_fft_test(${TEST_NAME})
