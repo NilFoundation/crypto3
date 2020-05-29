@@ -17,11 +17,9 @@ namespace nil {
     namespace crypto3 {
         namespace hash {
             namespace detail {
-                template<typename PolicyType>
+                template<typename Endianness, typename PolicyType>
                 class keccak_1600_padding {
                     typedef PolicyType policy_type;
-
-                    typedef typename policy_type::digest_endian endian_type;
 
                     constexpr static const std::size_t word_bits = policy_type::word_bits;
                     typedef typename policy_type::word_type word_type;
@@ -37,7 +35,7 @@ namespace nil {
                     constexpr static const std::size_t digest_bits = policy_type::digest_bits;
                     typedef typename policy_type::digest_type digest_type;
 
-                    typedef ::nil::crypto3::detail::injector<endian_type, word_bits, block_words, block_bits>
+                    typedef ::nil::crypto3::detail::injector<Endianness, word_bits, block_words, block_bits>
                         injector_type;
 
                     bool is_last;

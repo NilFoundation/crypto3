@@ -102,7 +102,7 @@ namespace nil {
 
                     typedef merkle_damgard_construction<
                         params_type, typename policy_type::iv_generator, cubehash_compressor<r, b, h>,
-                        detail::merkle_damgard_padding<policy_type>,
+                        detail::merkle_damgard_padding<typename params_type::digest_endian, policy_type>,
                         cubehash_finalizer<r, b, h>>
                         type;
                 };
