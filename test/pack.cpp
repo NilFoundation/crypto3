@@ -282,4 +282,27 @@ BOOST_AUTO_TEST_CASE(little_to_big_explode) {
     BOOST_CHECK(out == res);
 }
 
+BOOST_AUTO_TEST_CASE(little_bit_to_big_bit_implode) {
+
+    std::array<uint16_t, 4> in = {{0x0f19, 0x5628, 0xca73, 0xbe4d}};
+    std::array<uint32_t, 2> out {};
+    std::array<uint32_t, 2> res = {{0xf0986a14, 0x53ce7db2}};
+
+    packer<big_octet_little_bit, big_octet_big_bit, 16, 32>::pack(in.begin(), in.end(), out.begin());
+
+    BOOST_CHECK(out == res);
+}
+
+
+BOOST_AUTO_TEST_CASE(little_bit_to_big_bit_equal) {
+
+    std::array<uint16_t, 4> in = {{0x0f19, 0x5628, 0xca73, 0xbe4d}};
+    std::array<uint16_t, 4> out {};
+    std::array<uint16_t, 4> res = {{0x98f0, 0x146a, 0xce53, 0xb27d}};
+
+    packer<little_octet_little_bit, big_octet_big_bit, 16, 16>::pack(in.begin(), in.end(), out.begin());
+
+    BOOST_CHECK(out == res);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

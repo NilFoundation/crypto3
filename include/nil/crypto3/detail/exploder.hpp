@@ -11,12 +11,13 @@
 
 #include <nil/crypto3/detail/stream_endian.hpp>
 #include <nil/crypto3/detail/unbounded_shift.hpp>
+#include <nil/crypto3/detail/reverse_bits.hpp>
 
 #include <boost/integer.hpp>
 #include <boost/static_assert.hpp>
+#include <boost/endian/conversion.hpp>
 
 #include <iterator>
-
 #include <climits>
 #include <cstring>
 
@@ -36,10 +37,58 @@ namespace nil {
                 typedef typename boost::uint_t<OutBits>::least type;
             };
 
-            template<typename Endianness, int InputBits, int OutputBits, int k>
+            template<typename InputEndianness, typename OutputEndianness, int InputBits, int OutputBits, int k>
             struct exploder_step;
 
             template<int UnitBits, int InputBits, int OutputBits, int k>
+            struct exploder_step<stream_endian::big_unit_big_bit<UnitBits>, 
+                                 stream_endian::big_unit_big_bit<UnitBits>, InputBits, OutputBits, k> {
+                template<typename InputValue, typename OutputIterator>
+                static void step(InputValue const &in, OutputIterator &out) {
+                    int const shift = InputBits - (OutputBits + k);
+                    typedef typename outvalue_helper<OutputIterator, OutputBits>::type OutValue;  
+                    InputValue in_to_out = unbounded_shr<shift>(in);
+                    *out++ = OutValue(low_bits<OutputBits>(in_to_out));
+                } 
+            };
+
+            template<int UnitBits, int InputBits, int OutputBits, int k>
+            struct exploder_step<stream_endian::little_unit_big_bit<UnitBits>, 
+                                 stream_endian::big_unit_big_bit<UnitBits>, InputBits, OutputBits, k> {
+                template<typename InputValue, typename OutputIterator>
+                static void step(InputValue const &in, OutputIterator &out) {
+                    int const shift = k;
+                    typedef typename outvalue_helper<OutputIterator, OutputBits>::type OutValue;  
+                    InputValue in_to_out = unbounded_shr<shift>(in);
+                    *out++ = boost::endian::endian_reverse(OutValue(low_bits<OutputBits>(in_to_out)));
+                }
+            };
+
+            template<int UnitBits, int InputBits, int OutputBits, int k>
+            struct exploder_step<stream_endian::big_unit_big_bit<UnitBits>, 
+                                 stream_endian::little_unit_big_bit<UnitBits>, InputBits, OutputBits, k> {
+                template<typename InputValue, typename OutputIterator>
+                static void step(InputValue const &in, OutputIterator &out) {
+                    int const shift = InputBits - (OutputBits + k);
+                    typedef typename outvalue_helper<OutputIterator, OutputBits>::type OutValue;  
+                    InputValue in_to_out = unbounded_shr<shift>(in);
+                    *out++ = boost::endian::endian_reverse(OutValue(low_bits<OutputBits>(in_to_out)));
+                }
+            };
+
+            template<int UnitBits, int InputBits, int OutputBits, int k>
+            struct exploder_step<stream_endian::little_unit_big_bit<UnitBits>, 
+                                 stream_endian::little_unit_big_bit<UnitBits>, InputBits, OutputBits, k> {
+                template<typename InputValue, typename OutputIterator>
+                static void step(InputValue const &in, OutputIterator &out) {
+                    int const shift = k;
+                    typedef typename outvalue_helper<OutputIterator, OutputBits>::type OutValue;  
+                    InputValue in_to_out = unbounded_shr<shift>(in);
+                    *out++ = OutValue(low_bits<OutputBits>(in_to_out));
+                }
+            };
+
+            /*template<int UnitBits, int InputBits, int OutputBits, int k>
             struct exploder_step<stream_endian::big_unit_big_bit<UnitBits>, InputBits, OutputBits, k> {
                 template<typename InputValue, typename OutIter>
                 static void step(InputValue const &x, OutIter &out) {
@@ -103,13 +152,14 @@ namespace nil {
                     std::memcpy(&value, (char *)&x + k / CHAR_BIT, OutputBits / CHAR_BIT);
                     *out++ = value;
                 }
-            };
+            };*/
 
-            template<typename Endianness, int InputBits, int OutputBits, int k = 0>
+            template<typename InputEndianness, typename OutputEndianness, int InputBits, int OutputBits, int k = 0>
             struct exploder;
 
-            template<template<int> class Endian, int UnitBits, int InputBits, int OutputBits, int k>
-            struct exploder<Endian<UnitBits>, InputBits, OutputBits, k> {
+            template<template<int> class InputEndian, template<int> class OutputEndian, int UnitBits, 
+                     int InputBits, int OutputBits, int k>
+            struct exploder<InputEndian<UnitBits>, OutputEndian<UnitBits>, InputBits, OutputBits, k> {
 
                 // To keep the implementation managable, input and output sizes must
                 // be multiples or factors of the unit size.
@@ -118,9 +168,10 @@ namespace nil {
                 BOOST_STATIC_ASSERT(!(InputBits % UnitBits && UnitBits % InputBits));
                 BOOST_STATIC_ASSERT(!(OutputBits % UnitBits && UnitBits % OutputBits));
 
-                typedef Endian<UnitBits> Endianness;
-                typedef exploder_step<Endianness, InputBits, OutputBits, k> step_type;
-                typedef exploder<Endianness, InputBits, OutputBits, k + OutputBits> next_type;
+                typedef InputEndian<UnitBits> InputEndianness;
+                typedef OutputEndian<UnitBits> OutputEndianness;
+                typedef exploder_step<InputEndianness, OutputEndianness, InputBits, OutputBits, k> step_type;
+                typedef exploder<InputEndianness, OutputEndianness, InputBits, OutputBits, k + OutputBits> next_type;
 
                 template<typename InputValue, typename OutIter>
                 static void explode(InputValue const &x, OutIter &out) {
@@ -129,8 +180,9 @@ namespace nil {
                 }
             };
 
-            template<template<int> class Endian, int UnitBits, int InputBits, int OutputBits>
-            struct exploder<Endian<UnitBits>, InputBits, OutputBits, InputBits> {
+            template<template<int> class InputEndian, template<int> class OutputEndian, int UnitBits, 
+                     int InputBits, int OutputBits>
+            struct exploder<InputEndian<UnitBits>, OutputEndian<UnitBits>, InputBits, OutputBits, InputBits> {
                 template<typename InputValue, typename OutIter>
                 static void explode(InputValue const &, OutIter &) {
                 }

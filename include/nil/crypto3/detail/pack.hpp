@@ -14,7 +14,7 @@
 #include <nil/crypto3/detail/stream_endian.hpp>
 #include <nil/crypto3/detail/exploder.hpp>
 #include <nil/crypto3/detail/imploder.hpp>
-#include <nil/crypto3/detail/octet.hpp>
+#include <nil/crypto3/detail/reverse_bits.hpp>
 
 #include <boost/static_assert.hpp>
 #include <boost/endian/conversion.hpp>
@@ -22,6 +22,9 @@
 #include <algorithm>
 #include <iterator>
 #include <type_traits>
+#include <climits>
+
+#include <iostream>
 
 namespace nil {
     namespace crypto3 {
@@ -268,410 +271,117 @@ namespace nil {
                 : host_can_memcpy<UnitBits, InputBits, OutputBits, InT, OutT> { };
 #endif
 
+            template<typename Endianness, int UnitBits>
+            struct is_big_bit {
+                constexpr static const bool value = 
+                    std::is_same<Endianness, stream_endian::big_unit_big_bit<UnitBits>>::value ||
+                    std::is_same<Endianness, stream_endian::little_unit_big_bit<UnitBits>>::value;
+            };
+
+            template<typename Endianness, int UnitBits>
+            struct is_little_bit {
+                constexpr static const bool value = 
+                    std::is_same<Endianness, stream_endian::big_unit_little_bit<UnitBits>>::value ||
+                    std::is_same<Endianness, stream_endian::little_unit_little_bit<UnitBits>>::value;
+            };
+
+            template<typename InputEndianness, typename OutputEndianness, int UnitBits>
+            struct is_same_bit {
+                constexpr static const bool value = 
+                    is_big_bit<InputEndianness, UnitBits>::value && 
+                    is_big_bit<OutputEndianness, UnitBits>::value ||
+                    is_little_bit<InputEndianness, UnitBits>::value && 
+                    is_little_bit<OutputEndianness, UnitBits>::value;
+            };
+
             template<typename InputEndianness, typename OutputEndianness, std::size_t InputValueBits,
                      std::size_t OutputValueBits,
-                     bool EndiannessEquality = std::is_same<InputEndianness, OutputEndianness>::value,
-                     bool Explode = (InputValueBits > OutputValueBits),
-                     bool Implode = (InputValueBits < OutputValueBits)>
+                     bool Implode = (InputValueBits < OutputValueBits),
+                     bool Explode = (InputValueBits > OutputValueBits)>
             struct packer { };
 
-            template<typename InputEndianness, typename OutputEndianness, std::size_t InputValueBits,
-                     std::size_t OutputValueBits>
-            struct packer<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits, true, false, false> {
-                template<typename InputType, typename OutputType>
-                inline static typename std::enable_if<can_memcpy<InputEndianness, OutputEndianness, InputValueBits,
-                                                                 OutputValueBits, InputType, OutputType>::value>::type
-                    pack_n(InputType const *in, size_t n, OutputType *out) {
-                    std::memcpy(out, in, n * sizeof(InputType));
-                }
+            template<int UnitBits, template<int> class InputEndian, 
+                     template<int> class OutputEndian, std::size_t ValueBits>
+            struct packer<InputEndian<UnitBits>, OutputEndian<UnitBits>, ValueBits, ValueBits, false, false> {
 
-                template<typename InputType, typename OutputType>
-                inline static typename std::enable_if<can_memcpy<InputEndianness, OutputEndianness, InputValueBits,
-                                                                 OutputValueBits, InputType, OutputType>::value>::type
-                    pack_n(InputType *in, size_t n, OutputType *out) {
-                    std::memcpy(out, in, n * sizeof(InputType));
-                }
+                typedef InputEndian<UnitBits> InputEndianness;
+                typedef OutputEndian<UnitBits> OutputEndianness;
 
-                template<typename InputIterator, typename OutputIterator>
+                template<typename InputIterator, typename OutputIterator, typename Dummy = void>
                 inline static typename std::enable_if<
-                    can_memcpy<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits,
-                               typename std::iterator_traits<InputIterator>::value_type,
-                               typename std::iterator_traits<OutputIterator>::value_type>::value>::type
-                    pack(InputIterator first, InputIterator last, OutputIterator out) {
-                    return pack_n(*first, std::distance(first, last), *out);
+                    is_same_bit<InputEndianness, OutputEndianness, UnitBits>::value, Dummy>::type 
+                    bit_pack(InputIterator first, InputIterator last, OutputIterator out) {
+                    // wrong when endians are same byte
+                    std::transform(first, last, out, 
+                        [](typename std::iterator_traits<InputIterator>::value_type const &elem) {
+                        return boost::endian::endian_reverse(elem);});
                 }
 
-                template<typename InputIterator, typename OutputIterator>
-                inline void pack(InputIterator first, InputIterator last, OutputIterator out) {
+                template<typename InputIterator, typename OutputIterator, typename Dummy = void>
+                inline static typename std::enable_if<
+                    !is_same_bit<InputEndianness, OutputEndianness, UnitBits>::value, Dummy>::type 
+                    bit_pack(InputIterator first, InputIterator last, OutputIterator out) {
+                    // wrong when endians are same byte
+                    std::transform(first, last, out, 
+                        [](typename std::iterator_traits<InputIterator>::value_type const &elem) {
+                        return boost::endian::endian_reverse(reverse_bits<UnitBits>(elem));});
+                }
+
+                template<typename InputIterator, typename OutputIterator, typename Dummy = void>
+                inline static typename std::enable_if<
+                    std::is_same<InputEndianness, OutputEndianness>::value, Dummy>::type 
+                    pack(InputIterator first, InputIterator last, OutputIterator out) {
                     std::copy(first, last, out);
                 }
+
+                template<typename InputIterator, typename OutputIterator, typename Dummy = void>
+                inline static typename std::enable_if<
+                    !std::is_same<InputEndianness, OutputEndianness>::value, Dummy>::type 
+                    pack(InputIterator first, InputIterator last, OutputIterator out) {
+                    bit_pack(first, last, out);
+                }
             };
 
             template<typename InputEndianness, typename OutputEndianness, std::size_t InputValueBits,
                      std::size_t OutputValueBits>
-            struct packer<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits, true, false, true> { };
-
-            template<typename OutputEndianness, std::size_t InputValueBits, std::size_t OutputValueBits>
-            struct packer<stream_endian::little_octet_big_bit, OutputEndianness, InputValueBits, OutputValueBits, true,
-                          false, true> {
-                BOOST_STATIC_ASSERT(OutputValueBits % InputValueBits == 0);
-
-                template<typename InputIterator, typename OutputIterator>
-                inline static void pack_n(InputIterator in, size_t in_n, OutputIterator out) {
-                    size_t out_n = in_n / (OutputValueBits / InputValueBits);
-                    while (out_n--) {
-                        typedef typename detail::outvalue_helper<OutputIterator, OutputValueBits>::type OutValue;
-                        OutValue value = OutValue();
-                        detail::imploder<OutputEndianness, InputValueBits, OutputValueBits>::implode(in, value);
-                        *out++ = value;
-                    }
-                }
-
-                template<typename InputIterator, typename OutputIterator>
-                inline static void pack(InputIterator in, InputIterator in_e, OutputIterator out) {
-                    while (in != in_e) {
-                        typedef typename detail::outvalue_helper<OutputIterator, OutputValueBits>::type OutValue;
-                        OutValue value = OutValue();
-                        detail::imploder<OutputEndianness, InputValueBits, OutputValueBits>::implode(in, value);
-                        *out++ = value;
-                    }
-                }
-            };
-
-            template<typename OutputEndianness, std::size_t InputValueBits, std::size_t OutputValueBits>
-            struct packer<stream_endian::big_octet_big_bit, OutputEndianness, InputValueBits, OutputValueBits, true,
-                          false, true> {
-                BOOST_STATIC_ASSERT(OutputValueBits % InputValueBits == 0);
-
+            struct packer<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits, true, false> {
                 template<typename InputIterator, typename OutputIterator>
                 inline static void pack(InputIterator first, InputIterator last, OutputIterator out) {
-
                     typedef typename std::iterator_traits<OutputIterator>::value_type OutValue;
-                    constexpr static const std::size_t out_invalues = OutputValueBits / InputValueBits;
+                    typedef detail::imploder<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits>
+                        imploder;
 
                     while (first != last) {
-
-                        OutValue out_val = OutValue();
-
-                        for (size_t shift = OutputValueBits, i = 0; i != out_invalues; ++i) {
-                            shift -= InputValueBits;
-                            out_val |= unbounded_shl(low_bits<InputValueBits>(OutValue(*first)), shift);
-                            ++first;
-                        }
-
-                        *out++ = out_val;
+                        OutValue value = OutValue();
+                        imploder::implode(first, value);
+                        *out++ = value;
                     }
                 }
             };
 
             template<typename InputEndianness, typename OutputEndianness, std::size_t InputValueBits,
                      std::size_t OutputValueBits>
-            struct packer<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits, true, true, false> { };
-
-            template<typename OutputEndianness, std::size_t InputValueBits, std::size_t OutputValueBits>
-            struct packer<stream_endian::little_octet_big_bit, OutputEndianness, InputValueBits, OutputValueBits, true,
-                          true, false> {
-                BOOST_STATIC_ASSERT(InputValueBits % OutputValueBits == 0);
-
+            struct packer<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits, false, true> {
                 template<typename InputIterator, typename OutputIterator>
-                inline static void pack_n(InputIterator in, size_t in_n, OutputIterator out) {
-                    while (in_n--) {
-                        typedef typename std::iterator_traits<InputIterator>::value_type InValue;
-                        InValue const value = *in++;
-                        detail::exploder<OutputEndianness, InputValueBits, OutputValueBits>::explode(value, out);
-                    }
-                }
+                inline static void pack(InputIterator first, InputIterator last, OutputIterator out) {
+                    typedef typename std::iterator_traits<InputIterator>::value_type InValue;
+                    typedef detail::exploder<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits>
+                        exploder;
 
-                template<typename InputIterator, typename OutputIterator>
-                inline static void pack(InputIterator in, InputIterator in_e, OutputIterator out) {
-                    while (in != in_e) {
-                        typedef typename std::iterator_traits<InputIterator>::value_type InValue;
-                        InValue const value = *in++;
-                        detail::exploder<OutputEndianness, InputValueBits, OutputValueBits>::explode(value, out);
+                    while (first != last) {
+                        InValue const value = *first++;
+                        exploder::explode(value, out);
                     }
                 }
             };
 
-            template<typename InputEndianness, typename OutputEndianness, std::size_t InputValueBits,
-                     std::size_t OutputValueBits>
-            struct packer<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits, true, true, true> {
-                template<typename InputIterator, typename OutputIterator>
-                inline void pack(InputIterator first, InputIterator last, OutputIterator out) {
-                    std::copy(first, last, out);
-                }
-            };
-
-            template<typename InputEndianness, typename OutputEndianness, std::size_t InputValueBits,
-                     std::size_t OutputValueBits>
-            struct packer<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits, false, false, false> {
-                BOOST_STATIC_ASSERT(InputValueBits >= octet_bits);
-
-                template<typename InputIterator, typename OutputIterator>
-                inline void pack(InputIterator first, InputIterator last, OutputIterator out) {
-                    std::transform(first, last, out, [&](typename std::iterator_traits<InputIterator>::value_type &v) {
-                        return boost::endian::endian_reverse_inplace(v);
-                    });
-                }
-            };
-
-            template<typename InputEndianness, typename OutputEndianness, std::size_t InputValueBits,
-                     std::size_t OutputValueBits>
-            struct packer<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits, false, false, true> { };
-
-            template<typename InputEndianness, typename OutputEndianness, std::size_t InputValueBits,
-                     std::size_t OutputValueBits>
-            struct packer<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits, false, true, false> { };
-
-            template<typename InputEndianness, typename OutputEndianness, std::size_t InputValueBits,
-                     std::size_t OutputValueBits>
-            struct packer<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits, false, true, true> {
-                BOOST_STATIC_ASSERT(InputValueBits > octet_bits && !(InputValueBits % octet_bits));
-                BOOST_STATIC_ASSERT(!(OutputValueBits % octet_bits));
-
-                template<typename InputIterator, typename OutputIterator>
-                inline void pack(InputIterator first, InputIterator last, OutputIterator out) {
-                    std::transform(first, last, out, [&](typename std::iterator_traits<InputIterator>::value_type &v) {
-                        return boost::endian::endian_reverse_inplace(v);
-                    });
-                }
-            };
-
-            template<typename InputEndianness, typename OutputEndianness, size_t InValBits, size_t OutValBits,
-                     typename InputIterator, typename OutputIterator>
-            static typename std::enable_if<(InValBits == octet_bits) && (InValBits < OutValBits)>::type
-                pack(InputIterator in_b, InputIterator in_e, OutputIterator out) {
-
-                BOOST_STATIC_ASSERT(!(OutValBits % octet_bits));
-
-                typedef typename std::iterator_traits<OutputIterator>::value_type OutValue;
-                constexpr static size_t const out_octets = OutValBits / octet_bits;
-
-                while (in_b != in_e) {
-
-                    OutValue out_val = OutValue();
-
-                    for (size_t shift = OutValBits, i = 0; i != out_octets; ++i) {
-                        shift -= octet_bits;
-                        out_val |= unbounded_shl(low_bits<octet_bits>(OutValue(*in_b++)), shift);
-                    }
-
-                    *out++ = std::is_same<OutputEndianness, stream_endian::little_octet_big_bit>::value ?
-                                 boost::endian::endian_reverse(out_val) :
-                                 out_val;
-                }
+            template<typename InputEndianness, typename OutputEndianness, std::size_t InputValueBits, 
+                     std::size_t OutputValueBits, typename InputIterator, typename OutputIterator>
+            void pack(InputIterator first, InputIterator last, OutputIterator out) {
+                typedef packer<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits> packer;
+                packer::pack(first, last, out);
             }
 
-            template<typename InputEndianness, typename OutputEndianness, size_t InValBits, size_t OutValBits,
-                     typename InputIterator, typename OutputIterator>
-            static
-                typename std::enable_if<(InValBits > octet_bits) && (InValBits < OutValBits) &&
-                                        std::is_same<InputEndianness, stream_endian::big_octet_big_bit>::value &&
-                                        std::is_same<OutputEndianness, stream_endian::big_octet_big_bit>::value>::type
-                pack(InputIterator in_b, InputIterator in_e, OutputIterator out) {
-
-                BOOST_STATIC_ASSERT(!(OutValBits % InValBits));
-
-                typedef typename std::iterator_traits<OutputIterator>::value_type OutValue;
-                constexpr static size_t const out_invalues = OutValBits / InValBits;
-
-                while (in_b != in_e) {
-
-                    OutValue out_val = OutValue();
-
-                    for (size_t shift = OutValBits, i = 0; i != out_invalues; ++i) {
-                        shift -= InValBits;
-                        out_val |= unbounded_shl(low_bits<InValBits>(OutValue(*in_b++)), shift);
-                    }
-
-                    *out++ = out_val;
-                }
-            }
-
-            template<typename InputEndianness, typename OutputEndianness, size_t InValBits, size_t OutValBits,
-                     typename InputIterator, typename OutputIterator>
-            static
-                typename std::enable_if<(InValBits > octet_bits) && (InValBits > OutValBits) &&
-                                        std::is_same<InputEndianness, stream_endian::big_octet_big_bit>::value &&
-                                        std::is_same<OutputEndianness, stream_endian::big_octet_big_bit>::value>::type
-                pack(InputIterator in_b, InputIterator in_e, OutputIterator out) {
-
-                BOOST_STATIC_ASSERT(!(InValBits % OutValBits));
-
-                typedef typename std::iterator_traits<OutputIterator>::value_type OutValue;
-                constexpr static size_t const in_outvalues = InValBits / OutValBits;
-
-                for (; in_b != in_e; ++in_b)
-                    for (size_t shift = InValBits, i = 0; i != in_outvalues; ++i) {
-                        shift -= OutValBits;
-                        *out++ = OutValue(low_bits<OutValBits>(unbounded_shr(*in_b, shift)));
-                    }
-            }
-
-            template<typename InputEndianness, typename OutputEndianness, size_t InValBits, size_t OutValBits,
-                     typename InputIterator, typename OutputIterator>
-            static typename std::enable_if<
-                (InValBits > octet_bits) && (InValBits < OutValBits) &&
-                std::is_same<InputEndianness, stream_endian::little_octet_big_bit>::value &&
-                std::is_same<OutputEndianness, stream_endian::little_octet_big_bit>::value>::type
-                pack(InputIterator in_b, InputIterator in_e, OutputIterator out) {
-
-                BOOST_STATIC_ASSERT(!(OutValBits % InValBits));
-
-                typedef typename std::iterator_traits<OutputIterator>::value_type OutValue;
-                constexpr static size_t const out_invalues = OutValBits / InValBits;
-
-                while (in_b != in_e) {
-
-                    OutValue out_val = OutValue();
-
-                    for (size_t shift = 0, i = 0; i != out_invalues; shift += InValBits, ++i)
-                        out_val |= unbounded_shl(low_bits<InValBits>(OutValue(*in_b++)), shift);
-
-                    *out++ = out_val;
-                }
-            }
-
-            template<typename InputEndianness, typename OutputEndianness, size_t InValBits, size_t OutValBits,
-                     typename InputIterator, typename OutputIterator>
-            static typename std::enable_if<
-                (InValBits > octet_bits) && (InValBits > OutValBits) &&
-                std::is_same<InputEndianness, stream_endian::little_octet_big_bit>::value &&
-                std::is_same<OutputEndianness, stream_endian::little_octet_big_bit>::value>::type
-                pack(InputIterator in_b, InputIterator in_e, OutputIterator out) {
-
-                BOOST_STATIC_ASSERT(!(InValBits % OutValBits));
-
-                typedef typename std::iterator_traits<OutputIterator>::value_type OutValue;
-                constexpr static size_t const in_outvalues = InValBits / OutValBits;
-
-                for (; in_b != in_e; ++in_b)
-                    for (size_t shift = 0, i = 0; i != in_outvalues; shift += OutValBits, ++i)
-                        *out++ = OutValue(low_bits<OutValBits>(unbounded_shr(*in_b, shift)));
-            }
-
-            template<typename InputEndianness, typename OutputEndianness, size_t InValBits, size_t OutValBits,
-                     typename InputIterator, typename OutputIterator>
-            static typename std::enable_if<
-                (InValBits > octet_bits) && (InValBits < OutValBits) &&
-                std::is_same<InputEndianness, stream_endian::big_octet_big_bit>::value &&
-                std::is_same<OutputEndianness, stream_endian::little_octet_big_bit>::value>::type
-                pack(InputIterator in_b, InputIterator in_e, OutputIterator out) {
-
-                BOOST_STATIC_ASSERT(!(OutValBits % InValBits));
-
-                typedef typename std::iterator_traits<OutputIterator>::value_type OutValue;
-                constexpr static size_t const out_invalues = OutValBits / InValBits;
-
-                while (in_b != in_e) {
-
-                    OutValue out_val = OutValue();
-
-                    for (size_t shift = OutValBits, i = 0; i != out_invalues; ++i) {
-                        shift -= InValBits;
-                        out_val |= unbounded_shl(low_bits<InValBits>(OutValue(*in_b++)), shift);
-                    }
-
-                    *out++ = boost::endian::endian_reverse(out_val);
-                }
-            }
-
-            template<typename InputEndianness, typename OutputEndianness, size_t InValBits, size_t OutValBits,
-                     typename InputIterator, typename OutputIterator>
-            static typename std::enable_if<
-                (InValBits > octet_bits) && (InValBits > OutValBits) &&
-                std::is_same<InputEndianness, stream_endian::big_octet_big_bit>::value &&
-                std::is_same<OutputEndianness, stream_endian::little_octet_big_bit>::value>::type
-                pack(InputIterator in_b, InputIterator in_e, OutputIterator out) {
-
-                BOOST_STATIC_ASSERT(!(InValBits % OutValBits));
-
-                typedef typename std::iterator_traits<OutputIterator>::value_type OutValue;
-                constexpr static size_t const in_outvalues = InValBits / OutValBits;
-
-                for (; in_b != in_e; ++in_b)
-                    for (size_t shift = InValBits, i = 0; i != in_outvalues; ++i) {
-                        shift -= OutValBits;
-                        *out = OutValue(low_bits<OutValBits>(unbounded_shr(*in_b, shift)));
-                        boost::endian::endian_reverse_inplace(*out++);
-                    }
-            }
-
-            template<typename InputEndianness, typename OutputEndianness, size_t InValBits, size_t OutValBits,
-                     typename InputIterator, typename OutputIterator>
-            static
-                typename std::enable_if<(InValBits > octet_bits) && (InValBits < OutValBits) &&
-                                        std::is_same<InputEndianness, stream_endian::little_octet_big_bit>::value &&
-                                        std::is_same<OutputEndianness, stream_endian::big_octet_big_bit>::value>::type
-                pack(InputIterator in_b, InputIterator in_e, OutputIterator out) {
-
-                BOOST_STATIC_ASSERT(!(OutValBits % InValBits));
-
-                typedef typename std::iterator_traits<InputIterator>::value_type InValue;
-                typedef typename std::iterator_traits<OutputIterator>::value_type OutValue;
-                constexpr static size_t const out_invalues = OutValBits / InValBits;
-
-                while (in_b != in_e) {
-
-                    OutValue out_val = OutValue();
-
-                    for (size_t shift = OutValBits, i = 0; i != out_invalues; ++i) {
-                        InValue in_val = boost::endian::endian_reverse(*in_b++);
-                        shift -= InValBits;
-                        out_val |= unbounded_shl(low_bits<InValBits>(OutValue(in_val)), shift);
-                    }
-
-                    *out++ = out_val;
-                }
-            }
-
-            template<typename InputEndianness, typename OutputEndianness, size_t InValBits, size_t OutValBits,
-                     typename InputIterator, typename OutputIterator>
-            static
-                typename std::enable_if<(InValBits > octet_bits) && (InValBits > OutValBits) &&
-                                        std::is_same<InputEndianness, stream_endian::little_octet_big_bit>::value &&
-                                        std::is_same<OutputEndianness, stream_endian::big_octet_big_bit>::value>::type
-                pack(InputIterator in_b, InputIterator in_e, OutputIterator out) {
-
-                BOOST_STATIC_ASSERT(!(InValBits % OutValBits));
-
-                typedef typename std::iterator_traits<InputIterator>::value_type InValue;
-                typedef typename std::iterator_traits<OutputIterator>::value_type OutValue;
-                constexpr static size_t const in_outvalues = InValBits / OutValBits;
-
-                for (; in_b != in_e; ++in_b) {
-
-                    InValue in_val = boost::endian::endian_reverse(*in_b);
-
-                    for (size_t shift = InValBits, i = 0; i != in_outvalues; ++i) {
-                        shift -= OutValBits;
-                        *out++ = OutValue(low_bits<OutValBits>(unbounded_shr(in_val, shift)));
-                    }
-                }
-            }
-
-            template<typename InputEndianness, typename OutputEndianness, size_t InValBits, size_t OutValBits,
-                     typename InputIterator, typename OutputIterator>
-            static typename std::enable_if<(InValBits < octet_bits) && (OutValBits == octet_bits) &&
-                                           std::is_same<InputEndianness, OutputEndianness>::value &&
-                                           std::is_same<InputEndianness, stream_endian::big_bit>::value>::type
-                pack(InputIterator in_b, InputIterator in_e, OutputIterator out) {
-
-                BOOST_STATIC_ASSERT(!(octet_bits % InValBits));
-
-                constexpr static size_t const octet_invalues = octet_bits / InValBits;
-
-                while (in_b != in_e) {
-
-                    octet_type out_val = octet_type();
-
-                    for (size_t shift = octet_bits, i = 0; i != octet_invalues; ++i) {
-                        shift -= InValBits;
-                        out_val |= unbounded_shl(low_bits<InValBits>(octet_type(*in_b++)), shift);
-                    }
-
-                    *out++ = out_val;
-                }
-            }
         }    // namespace detail
     }        // namespace crypto3
 }    // namespace nil
