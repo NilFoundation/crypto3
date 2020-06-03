@@ -11,7 +11,7 @@
 
 #include <nil/crypto3/detail/stream_endian.hpp>
 #include <nil/crypto3/detail/unbounded_shift.hpp>
-#include <nil/crypto3/detail/reverse_bits.hpp>
+#include <nil/crypto3/detail/reverser.hpp>
 
 #include <boost/integer.hpp>
 #include <boost/static_assert.hpp>

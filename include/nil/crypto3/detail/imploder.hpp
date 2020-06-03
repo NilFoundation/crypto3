@@ -11,14 +11,10 @@
 
 #include <nil/crypto3/detail/stream_endian.hpp>
 #include <nil/crypto3/detail/unbounded_shift.hpp>
-#include <nil/crypto3/detail/reverse_bits.hpp>
+#include <nil/crypto3/detail/reverser.hpp>
 
 #include <boost/static_assert.hpp>
-#include <boost/endian/conversion.hpp>
-
-#include <iterator>
-#include <climits>
-#include <cstring>
+#include <boost/type_traits/is_same.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -27,125 +23,33 @@ namespace nil {
             // By definition, for all imploders, InputBits < OutputBits,
             // so we're taking many smaller values and combining them into one value
 
-            template<typename InputEndianness, typename OutputEndianness, int InputBits, int OutputBits, int k>
-            struct imploder_step;
+            template<typename OutputEndianness, int UnitBits, int InputBits, int OutputBits, int k, 
+                     bool IsLittleUnit = is_little_unit<OutputEndianness, UnitBits>::value>
+            struct imploder_shift;
 
-            template<int UnitBits, int InputBits, int OutputBits, int k>
-            struct imploder_step<stream_endian::big_unit_big_bit<UnitBits>, 
-                                 stream_endian::big_unit_big_bit<UnitBits>, InputBits, OutputBits, k> {
+            template<typename OutputEndianness, int UnitBits, int InputBits, int OutputBits, int k>
+            struct imploder_shift<OutputEndianness, UnitBits, InputBits, OutputBits, k, false> {
+                constexpr static int const value = OutputBits - (InputBits + k); 
+            };
 
+            template<typename OutputEndianness, int UnitBits, int InputBits, int OutputBits, int k>
+            struct imploder_shift<OutputEndianness, UnitBits, InputBits, OutputBits, k, true> {
+                constexpr static int const value = k;
+            };
+
+            template<typename InputEndianness, typename OutputEndianness, int UnitBits, 
+                     int InputBits, int OutputBits, int k>
+            struct imploder_step {
                 template<typename InputValue, typename OutputValue>
                 static void step(InputValue &in, OutputValue &out) {
-                    int const shift = OutputBits - (InputBits + k);
-                    OutputValue in_to_out = low_bits<InputBits>(OutputValue(in));
-                    out |= unbounded_shl<shift>(in_to_out);
+                    constexpr static int const shift = 
+                        imploder_shift<OutputEndianness, UnitBits, InputBits, OutputBits, k>::value;
+                    InputValue tmp = in;
+                    unit_reverser<InputEndianness, OutputEndianness, UnitBits>::reverse(tmp);
+                    bit_reverser<InputEndianness, OutputEndianness, UnitBits>::reverse(tmp);
+                    out |= unbounded_shl<shift>(low_bits<InputBits>(OutputValue(tmp)));
                 }
             };
-
-            template<int UnitBits, int InputBits, int OutputBits, int k>
-            struct imploder_step<stream_endian::little_unit_big_bit<UnitBits>, 
-                                 stream_endian::big_unit_big_bit<UnitBits>, InputBits, OutputBits, k> {
-
-                template<typename InputValue, typename OutputValue>
-                static void step(InputValue &in, OutputValue &out) {
-                    int const shift = OutputBits - (InputBits + k);
-                    OutputValue in_to_out = low_bits<InputBits>(OutputValue(boost::endian::endian_reverse(in)));
-                    out |= unbounded_shl<shift>(in_to_out);
-                }
-            };
-
-            template<int UnitBits, int InputBits, int OutputBits, int k>
-            struct imploder_step<stream_endian::big_unit_little_bit<UnitBits>, 
-                                 stream_endian::big_unit_big_bit<UnitBits>, InputBits, OutputBits, k> {
-
-                template<typename InputValue, typename OutputValue>
-                static void step(InputValue &in, OutputValue &out) {
-                    int const shift = OutputBits - (InputBits + k);
-                    OutputValue in_to_out = low_bits<InputBits>(OutputValue(reverse_bits<UnitBits>(in)));
-                    out |= unbounded_shl<shift>(in_to_out);
-                }
-            };
-
-            template<int UnitBits, int InputBits, int OutputBits, int k>
-            struct imploder_step<stream_endian::big_unit_big_bit<UnitBits>, 
-                                 stream_endian::little_unit_big_bit<UnitBits>, InputBits, OutputBits, k> {
-                template<typename InputValue, typename OutputValue>
-                static void step(InputValue &in, OutputValue &out) {
-                    int const shift = k;
-                    OutputValue in_to_out = low_bits<InputBits>(OutputValue(boost::endian::endian_reverse(in)));
-                    out |= unbounded_shl<shift>(in_to_out);
-                }
-            };
-
-            template<int UnitBits, int InputBits, int OutputBits, int k>
-            struct imploder_step<stream_endian::little_unit_big_bit<UnitBits>,
-                                 stream_endian::little_unit_big_bit<UnitBits>, InputBits, OutputBits, k> {
-                template<typename InputValue, typename OutputValue>
-                static void step(InputValue &in, OutputValue &out) {
-                    int const shift = k;
-                    OutputValue in_to_out = low_bits<InputBits>(OutputValue(in));
-                    out |= unbounded_shl<shift>(in_to_out);
-                }
-            };
-
-            /*template<int UnitBits, int InputBits, int OutputBits, int k>
-            struct imploder_step<stream_endian::big_unit_big_bit<UnitBits>, InputBits, OutputBits, k> {
-                template<typename InputValue, typename OutputValue>
-                static void step(InputValue z, OutputValue &x) {
-                    int const shift = OutputBits - (InputBits + k);
-                    OutputValue y = low_bits<InputBits>(OutputValue(z));
-                    x |= unbounded_shl<shift>(y);
-                }
-            };
-
-            template<int UnitBits, int InputBits, int OutputBits, int k>
-            struct imploder_step<stream_endian::little_unit_big_bit<UnitBits>, InputBits, OutputBits, k> {
-                template<typename InputValue, typename OutputValue>
-                static void step(InputValue z, OutputValue &x) {
-                    int const kb = (k % UnitBits);
-                    int const ku = k - kb;
-                    int const shift =
-                        InputBits >= UnitBits ?
-                            k :
-                            OutputBits >= UnitBits ? ku + (UnitBits - (InputBits + kb)) : OutputBits - (InputBits + kb);
-                    OutputValue y = low_bits<InputBits>(OutputValue(z));
-                    x |= unbounded_shl<shift>(y);
-                }
-            };
-
-            template<int UnitBits, int InputBits, int OutputBits, int k>
-            struct imploder_step<stream_endian::big_unit_little_bit<UnitBits>, InputBits, OutputBits, k> {
-                template<typename InputValue, typename OutputValue>
-                static void step(InputValue z, OutputValue &x) {
-                    int const kb = (k % UnitBits);
-                    int const ku = k - kb;
-                    int const shift = InputBits >= UnitBits ?
-                                          OutputBits - (InputBits + k) :
-                                          OutputBits >= UnitBits ? OutputBits - (UnitBits + ku) + kb : kb;
-                    OutputValue y = low_bits<InputBits>(OutputValue(z));
-                    x |= unbounded_shl<shift>(y);
-                }
-            };
-
-            template<int UnitBits, int InputBits, int OutputBits, int k>
-            struct imploder_step<stream_endian::little_unit_little_bit<UnitBits>, InputBits, OutputBits, k> {
-                template<typename InputValue, typename OutputValue>
-                static void step(InputValue z, OutputValue &x) {
-                    int const shift = k;
-                    OutputValue y = low_bits<InputBits>(OutputValue(z));
-                    x |= unbounded_shl<shift>(y);
-                }
-            };
-
-            template<int UnitBits, int InputBits, int OutputBits, int k>
-            struct imploder_step<stream_endian::host_unit<UnitBits>, InputBits, OutputBits, k> {
-                template<typename InputValue, typename OutputValue>
-                static void step(InputValue z, OutputValue &x) {
-                    BOOST_STATIC_ASSERT(sizeof(InputValue) * CHAR_BIT == InputBits);
-                    BOOST_STATIC_ASSERT(sizeof(OutputValue) * CHAR_BIT == OutputBits);
-                    std::memcpy((char *)&x + k / CHAR_BIT, &z, InputBits / CHAR_BIT);
-                }
-            };*/
 
             template<typename InputEndianness, typename OutputEndianness, int InputBits, int OutputBits, int k = 0>
             struct imploder;
@@ -163,7 +67,7 @@ namespace nil {
 
                 typedef InputEndian<UnitBits> InputEndianness;
                 typedef OutputEndian<UnitBits> OutputEndianness;
-                typedef imploder_step<InputEndianness, OutputEndianness, InputBits, OutputBits, k> step_type;
+                typedef imploder_step<InputEndianness, OutputEndianness, UnitBits, InputBits, OutputBits, k> step_type;
                 typedef imploder<InputEndianness, OutputEndianness, InputBits, OutputBits, k + InputBits> next_type;
 
                 template<typename InIter, typename OutputValue>
