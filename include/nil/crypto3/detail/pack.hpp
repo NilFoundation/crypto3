@@ -271,29 +271,6 @@ namespace nil {
                 : host_can_memcpy<UnitBits, InputBits, OutputBits, InT, OutT> { };
 #endif
 
-            /*template<typename Endianness, int UnitBits>
-            struct is_big_bit {
-                constexpr static const bool value = 
-                    std::is_same<Endianness, stream_endian::big_unit_big_bit<UnitBits>>::value ||
-                    std::is_same<Endianness, stream_endian::little_unit_big_bit<UnitBits>>::value;
-            };
-
-            template<typename Endianness, int UnitBits>
-            struct is_little_bit {
-                constexpr static const bool value = 
-                    std::is_same<Endianness, stream_endian::big_unit_little_bit<UnitBits>>::value ||
-                    std::is_same<Endianness, stream_endian::little_unit_little_bit<UnitBits>>::value;
-            };
-
-            template<typename InputEndianness, typename OutputEndianness, int UnitBits>
-            struct is_same_bit {
-                constexpr static const bool value = 
-                    is_big_bit<InputEndianness, UnitBits>::value && 
-                    is_big_bit<OutputEndianness, UnitBits>::value ||
-                    is_little_bit<InputEndianness, UnitBits>::value && 
-                    is_little_bit<OutputEndianness, UnitBits>::value;
-            };*/
-
             template<typename InputEndianness, typename OutputEndianness, std::size_t InputValueBits,
                      std::size_t OutputValueBits,
                      bool Implode = (InputValueBits < OutputValueBits),
@@ -359,7 +336,7 @@ namespace nil {
                 }
             };
 
-            /*template<typename InputEndianness, typename OutputEndianness, std::size_t InputValueBits,
+            template<typename InputEndianness, typename OutputEndianness, std::size_t InputValueBits,
                      std::size_t OutputValueBits>
             struct packer<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits, false, true> {
                 template<typename InputIterator, typename OutputIterator>
@@ -373,7 +350,7 @@ namespace nil {
                         exploder::explode(value, out);
                     }
                 }
-            };*/
+            };
 
             template<typename InputEndianness, typename OutputEndianness, std::size_t InputValueBits, 
                      std::size_t OutputValueBits, typename InputIterator, typename OutputIterator>

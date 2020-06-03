@@ -14,7 +14,6 @@
 #include <nil/crypto3/detail/reverser.hpp>
 
 #include <boost/static_assert.hpp>
-#include <boost/type_traits/is_same.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -40,10 +39,11 @@ namespace nil {
             template<typename InputEndianness, typename OutputEndianness, int UnitBits, 
                      int InputBits, int OutputBits, int k>
             struct imploder_step {
+                constexpr static int const shift = 
+                    imploder_shift<OutputEndianness, UnitBits, InputBits, OutputBits, k>::value;
+
                 template<typename InputValue, typename OutputValue>
                 static void step(InputValue &in, OutputValue &out) {
-                    constexpr static int const shift = 
-                        imploder_shift<OutputEndianness, UnitBits, InputBits, OutputBits, k>::value;
                     InputValue tmp = in;
                     unit_reverser<InputEndianness, OutputEndianness, UnitBits>::reverse(tmp);
                     bit_reverser<InputEndianness, OutputEndianness, UnitBits>::reverse(tmp);
