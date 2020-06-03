@@ -49,7 +49,7 @@ namespace nil {
                 typedef bit_in_one_unit_reverser<UnitBits, k + CHAR_BIT> next_type;
                 typedef typename boost::uint_t<UnitBits>::exact UnitType;
 
-                static void reverse(UnitType &in, UnitType &out) {
+                inline static void reverse(UnitType &in, UnitType &out) {
                     int const shift = UnitBits - (CHAR_BIT + k);
                     byte_type byte = byte_type(low_bits<CHAR_BIT>(unbounded_shr(in, shift)));
                     reverse_b64(byte);
@@ -61,7 +61,7 @@ namespace nil {
 
             template<int UnitBits>
             struct bit_in_one_unit_reverser<UnitBits, UnitBits> {
-                static void reverse(typename boost::uint_t<UnitBits>::exact &, 
+                inline static void reverse(typename boost::uint_t<UnitBits>::exact &,
                     typename boost::uint_t<UnitBits>::exact &) {
                 }
             };
@@ -94,7 +94,7 @@ namespace nil {
                 typedef typename boost::uint_t<UnitBits>::exact UnitType;
 
                 template<typename ValueType>
-                static void reverse(ValueType &in, ValueType &out) {
+                inline static void reverse(ValueType &in, ValueType &out) {
                     int const shift = InputBits - (UnitBits + k);
                     UnitType unit = UnitType(low_bits<UnitBits>(unbounded_shr(in, shift)));
                     reverse_bits(unit);
@@ -107,7 +107,7 @@ namespace nil {
             template<int InputBits, int UnitBits>
             struct bit_in_unit_reverser<InputBits, UnitBits, InputBits> {
                 template<typename ValueType>
-                static void reverse(ValueType &, ValueType &) {
+                inline static void reverse(ValueType &, ValueType &) {
                 }
             };
 
@@ -142,14 +142,14 @@ namespace nil {
             template<typename InputEndianness, typename OutputEndianness, int UnitBits>
             struct bit_reverser<InputEndianness, OutputEndianness, UnitBits, true> {
                 template<typename ValueType>
-                static void reverse(ValueType &) {
+                inline static void reverse(ValueType &) {
                 }
             };
 
             template<typename InputEndianness, typename OutputEndianness, int UnitBits>
             struct bit_reverser<InputEndianness, OutputEndianness, UnitBits, false> {
                 template<typename ValueType, int ValueBits = sizeof(ValueType) * CHAR_BIT>
-                static void reverse(ValueType &val) {
+                inline static void reverse(ValueType &val) {
                     ValueType out = ValueType();
                     bit_in_unit_reverser<ValueBits, UnitBits>::reverse(val, out);
                     val = out;
@@ -167,7 +167,7 @@ namespace nil {
                 typedef typename boost::uint_t<UnitBits>::exact UnitType;
 
                 template<typename ValueType>
-                static void reverse(ValueType &in, ValueType &out) {
+                inline static void reverse(ValueType &in, ValueType &out) {
                     int const shift = InputBits - (UnitBits + k);
                     UnitType unit = UnitType(low_bits<UnitBits>(unbounded_shr(in, shift)));
                     boost::endian::endian_reverse_inplace(unit);
@@ -180,7 +180,7 @@ namespace nil {
             template<int InputBits, int UnitBits>
             struct byte_in_unit_reverser<InputBits, UnitBits, InputBits> {
                 template<typename ValueType>
-                static void reverse(ValueType &, ValueType &) {
+                inline static void reverse(ValueType &, ValueType &) {
                 }
             };
 
@@ -218,7 +218,7 @@ namespace nil {
                 typename boost::enable_if_c<is_same_unit<InputEndianness, OutputEndianness, 
                                             UnitBits>::value>::type> {
                 template<typename ValueType>
-                static void reverse(ValueType &) {
+                inline static void reverse(ValueType &) {
                 }
             };
 
@@ -228,7 +228,7 @@ namespace nil {
                 typename boost::enable_if_c<!is_same_unit<InputEndianness, OutputEndianness, UnitBits>::value 
                                             && UnitBits == CHAR_BIT>::type> {
                 template<typename ValueType>
-                static void reverse(ValueType &val) {
+                inline static void reverse(ValueType &val) {
                     boost::endian::endian_reverse_inplace(val);
                 }
             };
@@ -239,7 +239,7 @@ namespace nil {
                 typename boost::enable_if_c<!is_same_unit<InputEndianness, OutputEndianness, UnitBits>::value 
                                             && (UnitBits > CHAR_BIT)>::type> {
                 template<typename ValueType, int ValueBits = sizeof(ValueType) * CHAR_BIT>
-                static void reverse(ValueType &val) {
+                inline static void reverse(ValueType &val) {
                     boost::endian::endian_reverse_inplace(val);
                     ValueType out = ValueType();
                     byte_in_unit_reverser<ValueBits, UnitBits>::reverse(val, out);

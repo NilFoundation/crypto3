@@ -43,7 +43,7 @@ namespace nil {
                     imploder_shift<OutputEndianness, UnitBits, InputBits, OutputBits, k>::value;
 
                 template<typename InputValue, typename OutputValue>
-                static void step(InputValue &in, OutputValue &out) {
+                inline static void step(InputValue &in, OutputValue &out) {
                     InputValue tmp = in;
                     unit_reverser<InputEndianness, OutputEndianness, UnitBits>::reverse(tmp);
                     bit_reverser<InputEndianness, OutputEndianness, UnitBits>::reverse(tmp);
@@ -71,7 +71,7 @@ namespace nil {
                 typedef imploder<InputEndianness, OutputEndianness, InputBits, OutputBits, k + InputBits> next_type;
 
                 template<typename InIter, typename OutputValue>
-                static void implode(InIter &in, OutputValue &x) {
+                inline static void implode(InIter &in, OutputValue &x) {
                     step_type::step(*in++, x);
                     next_type::implode(in, x);
                 }
@@ -81,7 +81,7 @@ namespace nil {
                      int InputBits, int OutputBits>
             struct imploder<InputEndian<UnitBits>, OutputEndian<UnitBits>, InputBits, OutputBits, OutputBits> {
                 template<typename InIter, typename OutputValue>
-                static void implode(InIter &, OutputValue &) {
+                inline static void implode(InIter &, OutputValue &) {
                 }
             };
 

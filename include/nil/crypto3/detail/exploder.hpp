@@ -53,7 +53,7 @@ namespace nil {
                         exploder_shift<InputEndianness, UnitBits, InputBits, OutputBits, k>::value;
 
                 template<typename InputValue, typename OutputIterator>
-                static void step(InputValue const &in, OutputIterator &out) {
+                inline static void step(InputValue const &in, OutputIterator &out) {
                     typedef typename outvalue_helper<OutputIterator, OutputBits>::type OutValue;
                     OutValue tmp = OutValue(low_bits<OutputBits>(unbounded_shr<shift>(in)));
                     unit_reverser<InputEndianness, OutputEndianness, UnitBits>::reverse(tmp);
@@ -82,7 +82,7 @@ namespace nil {
                 typedef exploder<InputEndianness, OutputEndianness, InputBits, OutputBits, k + OutputBits> next_type;
 
                 template<typename InputValue, typename OutIter>
-                static void explode(InputValue const &x, OutIter &out) {
+                inline static void explode(InputValue const &x, OutIter &out) {
                     step_type::step(x, out);
                     next_type::explode(x, out);
                 }
@@ -92,7 +92,7 @@ namespace nil {
                      int InputBits, int OutputBits>
             struct exploder<InputEndian<UnitBits>, OutputEndian<UnitBits>, InputBits, OutputBits, InputBits> {
                 template<typename InputValue, typename OutIter>
-                static void explode(InputValue const &, OutIter &) {
+                inline static void explode(InputValue const &, OutIter &) {
                 }
             };
 

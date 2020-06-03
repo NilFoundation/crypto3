@@ -354,7 +354,7 @@ namespace nil {
 
             template<typename InputEndianness, typename OutputEndianness, std::size_t InputValueBits, 
                      std::size_t OutputValueBits, typename InputIterator, typename OutputIterator>
-            void pack(InputIterator first, InputIterator last, OutputIterator out) {
+            inline void pack(InputIterator first, InputIterator last, OutputIterator out) {
                 typedef packer<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits> packer;
                 packer::pack(first, last, out);
             }
