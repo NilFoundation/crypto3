@@ -144,6 +144,11 @@ namespace nil {
                 template<typename ValueType>
                 inline static void reverse(ValueType &) {
                 }
+
+                template<typename ValueType>
+                inline static ValueType reverse(ValueType const &val) {
+                    return val;
+                }
             };
 
             template<typename InputEndianness, typename OutputEndianness, int UnitBits>
@@ -153,6 +158,14 @@ namespace nil {
                     ValueType out = ValueType();
                     bit_in_unit_reverser<ValueBits, UnitBits>::reverse(val, out);
                     val = out;
+                }
+
+                template<typename ValueType, int ValueBits = sizeof(ValueType) * CHAR_BIT>
+                inline static ValueType reverse(ValueType const &val) {
+                    ValueType tmp = val;
+                    ValueType out = ValueType();
+                    bit_in_unit_reverser<ValueBits, UnitBits>::reverse(tmp, out);
+                    return out;
                 }
             };
 
@@ -220,6 +233,11 @@ namespace nil {
                 template<typename ValueType>
                 inline static void reverse(ValueType &) {
                 }
+
+                template<typename ValueType>
+                inline static ValueType reverse(ValueType const &val) {
+                    return val;
+                }
             };
 
             // Case of byte unit
@@ -230,6 +248,11 @@ namespace nil {
                 template<typename ValueType>
                 inline static void reverse(ValueType &val) {
                     boost::endian::endian_reverse_inplace(val);
+                }
+
+                template<typename ValueType>
+                inline static ValueType reverse(ValueType const &val) {
+                    return boost::endian::endian_reverse(val);
                 }
             };
 
@@ -244,6 +267,14 @@ namespace nil {
                     ValueType out = ValueType();
                     byte_in_unit_reverser<ValueBits, UnitBits>::reverse(val, out);
                     val = out;
+                }
+
+                template<typename ValueType, int ValueBits = sizeof(ValueType) * CHAR_BIT>
+                inline static ValueType reverse(ValueType const &val) {
+                    ValueType tmp = boost::endian::endian_reverse(val);
+                    ValueType out = ValueType();
+                    byte_in_unit_reverser<ValueBits, UnitBits>::reverse(tmp, out);
+                    return out;
                 }
             };
 

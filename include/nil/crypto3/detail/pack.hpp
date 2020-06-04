@@ -17,14 +17,12 @@
 #include <nil/crypto3/detail/reverser.hpp>
 
 #include <boost/static_assert.hpp>
-#include <boost/endian/conversion.hpp>
+#include <boost/utility/enable_if.hpp>
+#include <boost/type_traits/is_same.hpp>
 
 #include <algorithm>
 #include <iterator>
-#include <type_traits>
 #include <climits>
-
-#include <iostream>
 
 namespace nil {
     namespace crypto3 {
@@ -277,47 +275,32 @@ namespace nil {
                      bool Explode = (InputValueBits > OutputValueBits)>
             struct packer { };
 
-            /*template<int UnitBits, template<int> class InputEndian, 
+            template<int UnitBits, template<int> class InputEndian, 
                      template<int> class OutputEndian, std::size_t ValueBits>
             struct packer<InputEndian<UnitBits>, OutputEndian<UnitBits>, ValueBits, ValueBits, false, false> {
 
                 typedef InputEndian<UnitBits> InputEndianness;
                 typedef OutputEndian<UnitBits> OutputEndianness;
 
-                template<typename InputIterator, typename OutputIterator, typename Dummy = void>
-                inline static typename std::enable_if<
-                    is_same_bit<InputEndianness, OutputEndianness, UnitBits>::value, Dummy>::type 
-                    bit_pack(InputIterator first, InputIterator last, OutputIterator out) {
-                    // wrong when endians are same byte
-                    std::transform(first, last, out, 
-                        [](typename std::iterator_traits<InputIterator>::value_type const &elem) {
-                        return boost::endian::endian_reverse(elem);});
-                }
+                typedef unit_reverser<InputEndianness, OutputEndianness, UnitBits> units_reverser;
+                typedef bit_reverser<InputEndianness, OutputEndianness, UnitBits> bits_reverser;
 
                 template<typename InputIterator, typename OutputIterator, typename Dummy = void>
-                inline static typename std::enable_if<
-                    !is_same_bit<InputEndianness, OutputEndianness, UnitBits>::value, Dummy>::type 
-                    bit_pack(InputIterator first, InputIterator last, OutputIterator out) {
-                    // wrong when endians are same byte
-                    std::transform(first, last, out, 
-                        [](typename std::iterator_traits<InputIterator>::value_type const &elem) {
-                        return boost::endian::endian_reverse(reverse_bits<UnitBits>(elem));});
-                }
-
-                template<typename InputIterator, typename OutputIterator, typename Dummy = void>
-                inline static typename std::enable_if<
-                    std::is_same<InputEndianness, OutputEndianness>::value, Dummy>::type 
+                inline static typename boost::enable_if_c<
+                    boost::is_same<InputEndianness, OutputEndianness>::value, Dummy>::type 
                     pack(InputIterator first, InputIterator last, OutputIterator out) {
                     std::copy(first, last, out);
                 }
 
                 template<typename InputIterator, typename OutputIterator, typename Dummy = void>
-                inline static typename std::enable_if<
-                    !std::is_same<InputEndianness, OutputEndianness>::value, Dummy>::type 
+                inline static typename boost::enable_if_c<
+                    !boost::is_same<InputEndianness, OutputEndianness>::value, Dummy>::type 
                     pack(InputIterator first, InputIterator last, OutputIterator out) {
-                    bit_pack(first, last, out);
+                    std::transform(first, last, out, 
+                        [](typename std::iterator_traits<InputIterator>::value_type const &elem) {
+                        return units_reverser::reverse(bits_reverser::reverse(elem));});
                 }
-            };*/
+            };
 
             template<typename InputEndianness, typename OutputEndianness, std::size_t InputValueBits,
                      std::size_t OutputValueBits>
@@ -354,7 +337,7 @@ namespace nil {
 
             template<typename InputEndianness, typename OutputEndianness, std::size_t InputValueBits, 
                      std::size_t OutputValueBits, typename InputIterator, typename OutputIterator>
-            inline void pack(InputIterator first, InputIterator last, OutputIterator out) {
+            void pack(InputIterator first, InputIterator last, OutputIterator out) {
                 typedef packer<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits> packer;
                 packer::pack(first, last, out);
             }

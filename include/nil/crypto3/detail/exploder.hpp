@@ -16,6 +16,8 @@
 #include <boost/integer.hpp>
 #include <boost/static_assert.hpp>
 
+#include <iterator>
+
 namespace nil {
     namespace crypto3 {
         namespace detail {

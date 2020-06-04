@@ -356,7 +356,222 @@ BOOST_AUTO_TEST_CASE(lulb_to_lulb) {
 
 BOOST_AUTO_TEST_SUITE_END()
 
-/*
+
 BOOST_AUTO_TEST_SUITE(pack_equal_test_suite)
 
-BOOST_AUTO_TEST_SUITE_END()*/
+BOOST_AUTO_TEST_CASE(bubb_to_bubb_1) {
+
+    std::array<uint32_t, 2> in = {{0x01928374, 0x65473829}};
+    std::array<uint32_t, 2> out {};
+
+    pack<big_octet_big_bit, big_octet_big_bit, 32, 32>(in.begin(), in.end(), out.begin());
+
+    BOOST_CHECK(out == in);
+}
+
+BOOST_AUTO_TEST_CASE(bubb_to_bubb_2) {
+
+    std::array<uint8_t, 2> in = {{0x01, 0x23}};
+    std::array<uint8_t, 2> out {};
+
+    pack<big_octet_big_bit, big_octet_big_bit, 8, 8>(in.begin(), in.end(), out.begin());
+
+    BOOST_CHECK(out == in);
+}
+
+BOOST_AUTO_TEST_CASE(bubb_to_bubb_3) {
+
+    std::array<uint8_t, 2> in = {{0xC, 0x4}};
+    std::array<uint8_t, 2> out {};
+
+    pack<big_octet_big_bit, big_octet_big_bit, 4, 4>(in.begin(), in.end(), out.begin());
+
+    BOOST_CHECK(out == in);
+}
+
+BOOST_AUTO_TEST_CASE(lubb_to_lubb_1) {
+
+    std::array<uint32_t, 2> in = {{0x01928374, 0x65473829}};
+    std::array<uint32_t, 2> out {};
+
+    pack<little_octet_big_bit, little_octet_big_bit, 32, 32>(in.begin(), in.end(), out.begin());
+
+    BOOST_CHECK(out == in);
+}
+
+BOOST_AUTO_TEST_CASE(lubb_to_lubb_2) {
+
+    std::array<uint8_t, 2> in = {{0x01, 0x23}};
+    std::array<uint8_t, 2> out {};
+
+    pack<little_octet_big_bit, little_octet_big_bit, 8, 8>(in.begin(), in.end(), out.begin());
+
+    BOOST_CHECK(out == in);
+}
+
+BOOST_AUTO_TEST_CASE(lubb_to_lubb_3) {
+
+    std::array<uint8_t, 2> in = {{0xC, 0x4}};
+    std::array<uint8_t, 2> out {};
+
+    pack<little_octet_big_bit, little_octet_big_bit, 4, 4>(in.begin(), in.end(), out.begin());
+
+    BOOST_CHECK(out == in);
+}
+
+BOOST_AUTO_TEST_CASE(bulb_to_bulb_1) {
+
+    std::array<uint32_t, 2> in = {{0x01928374, 0x65473829}};
+    std::array<uint32_t, 2> out {};
+
+    pack<big_octet_little_bit, big_octet_little_bit, 32, 32>(in.begin(), in.end(), out.begin());
+
+    BOOST_CHECK(out == in);
+}
+
+BOOST_AUTO_TEST_CASE(bulb_to_bulb_2) {
+
+    std::array<uint8_t, 2> in = {{0x01, 0x23}};
+    std::array<uint8_t, 2> out {};
+
+    pack<big_octet_little_bit, big_octet_little_bit, 8, 8>(in.begin(), in.end(), out.begin());
+
+    BOOST_CHECK(out == in);
+}
+
+BOOST_AUTO_TEST_CASE(bulb_to_bulb_3) {
+
+    std::array<uint8_t, 2> in = {{0xC, 0x4}};
+    std::array<uint8_t, 2> out {};
+
+    pack<big_octet_little_bit, big_octet_little_bit, 4, 4>(in.begin(), in.end(), out.begin());
+
+    BOOST_CHECK(out == in);
+}
+
+BOOST_AUTO_TEST_CASE(lulb_to_lulb_1) {
+
+    std::array<uint32_t, 2> in = {{0x01928374, 0x65473829}};
+    std::array<uint32_t, 2> out {};
+
+    pack<little_octet_little_bit, little_octet_little_bit, 32, 32>(in.begin(), in.end(), out.begin());
+
+    BOOST_CHECK(out == in);
+}
+
+BOOST_AUTO_TEST_CASE(lulb_to_lulb_2) {
+
+    std::array<uint8_t, 2> in = {{0x01, 0x23}};
+    std::array<uint8_t, 2> out {};
+
+    pack<little_octet_little_bit, little_octet_little_bit, 8, 8>(in.begin(), in.end(), out.begin());
+
+    BOOST_CHECK(out == in);
+}
+
+BOOST_AUTO_TEST_CASE(lulb_to_lulb_3) {
+
+    std::array<uint8_t, 2> in = {{0xC, 0x4}};
+    std::array<uint8_t, 2> out {};
+
+    pack<little_octet_little_bit, little_octet_little_bit, 4, 4>(in.begin(), in.end(), out.begin());
+
+    BOOST_CHECK(out == in);
+}
+
+BOOST_AUTO_TEST_CASE(bubb_to_lubb_1) {
+
+    std::array<uint8_t, 4> in = {{0x89, 0xad, 0x56, 0xef}};
+    std::array<uint8_t, 4> out {};
+
+    pack<big_octet_big_bit, little_octet_big_bit, 8, 8>(in.begin(), in.end(), out.begin());
+
+    BOOST_CHECK(out == in);
+}
+
+BOOST_AUTO_TEST_CASE(bubb_to_lubb_2) {
+
+    std::array<uint8_t, 4> in = {{0x8, 0xa, 0x5, 0xe}};
+    std::array<uint8_t, 4> out {};
+
+    pack<big_octet_big_bit, little_octet_big_bit, 4, 4>(in.begin(), in.end(), out.begin());
+
+    BOOST_CHECK(out == in);
+}
+
+BOOST_AUTO_TEST_CASE(bubb_to_lubb_3) {
+
+    std::array<uint16_t, 4> in = {{0x89ad, 0x56ef, 0x7340, 0x12cb}};
+    std::array<uint16_t, 4> out {};
+    std::array<uint16_t, 4> res = {{0xad89, 0xef56, 0x4073, 0xcb12}};
+
+    pack<big_octet_big_bit, little_octet_big_bit, 16, 16>(in.begin(), in.end(), out.begin());
+
+    BOOST_CHECK(out == res);
+}
+
+BOOST_AUTO_TEST_CASE(bubb_to_bulb_1) {
+
+    std::array<uint8_t, 4> in = {{0x89, 0xad, 0x56, 0xef}};
+    std::array<uint8_t, 4> out {};
+    std::array<uint8_t, 4> res = {{0x91, 0xb5, 0x6a, 0xf7}};
+
+    pack<big_octet_big_bit, big_octet_little_bit, 8, 8>(in.begin(), in.end(), out.begin());
+
+    BOOST_CHECK(out == res);
+}
+
+BOOST_AUTO_TEST_CASE(bubb_to_bulb_2) {
+
+    std::array<uint16_t, 4> in = {{0x89ad, 0x56ef, 0x7340, 0x12cb}};
+    std::array<uint16_t, 4> out {};
+    std::array<uint16_t, 4> res = {{0x91b5, 0x6af7, 0xce02, 0x48d3}};
+
+    pack<big_octet_big_bit, big_octet_little_bit, 16, 16>(in.begin(), in.end(), out.begin());
+
+    BOOST_CHECK(out == res);
+}
+
+BOOST_AUTO_TEST_CASE(lubb_to_bubb_1) {
+
+    std::array<uint8_t, 4> in = {{0x89, 0xad, 0x56, 0xef}};
+    std::array<uint8_t, 4> out {};
+
+    pack<little_octet_big_bit, big_octet_big_bit, 8, 8>(in.begin(), in.end(), out.begin());
+
+    BOOST_CHECK(out == in);
+}
+
+BOOST_AUTO_TEST_CASE(lubb_to_bubb_2) {
+
+    std::array<uint8_t, 4> in = {{0x8, 0xa, 0x5, 0xe}};
+    std::array<uint8_t, 4> out {};
+
+    pack<little_octet_big_bit, big_octet_big_bit, 4, 4>(in.begin(), in.end(), out.begin());
+
+    BOOST_CHECK(out == in);
+}
+
+BOOST_AUTO_TEST_CASE(lubb_to_bubb_3) {
+
+    std::array<uint32_t, 2> in = {{0x89ad56ef, 0x734012cb}};
+    std::array<uint32_t, 2> out {};
+    std::array<uint32_t, 2> res = {{0xef56ad89, 0xcb124073}};
+
+    pack<little_octet_big_bit, big_octet_big_bit, 32, 32>(in.begin(), in.end(), out.begin());
+
+    BOOST_CHECK(out == res);
+}
+
+BOOST_AUTO_TEST_CASE(lulb_to_bubb_1) {
+
+    std::array<uint16_t, 4> in = {{0x0f19, 0x5628, 0xca73, 0xbe4d}};
+    std::array<uint16_t, 4> out {};
+    std::array<uint16_t, 4> res = {{0x98f0, 0x146a, 0xce53, 0xb27d}};
+
+    pack<little_octet_little_bit, big_octet_big_bit, 16, 16>(in.begin(), in.end(), out.begin());
+
+    BOOST_CHECK(out == res);
+}
+
+BOOST_AUTO_TEST_SUITE_END()
