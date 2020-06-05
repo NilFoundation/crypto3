@@ -38,7 +38,7 @@ int main(int argc, char *argv[]) {
  
 ```
 
-## Stateful encryption
+## Stateful hashing
 
 In case of accumulative hash requirement is present, following example demonstrates 
 [accumulator](@ref hash::accumulator_set) usage:
