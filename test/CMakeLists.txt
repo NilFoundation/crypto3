@@ -46,7 +46,7 @@ set(TESTS_NAMES
 #    "crc"
 #    "cubehash"
     "ghash"
-#    "keccak"
+    "keccak"
     "md4"
     "md5"
     "pack"
@@ -54,14 +54,13 @@ set(TESTS_NAMES
     "sha"
     "sha1"
     "sha2"
-#    "sha3"
+    "sha3"
     "skein"
     "sm3"
     "static_digest"
     "streebog"
     "tiger"
-    "whirlpool"
-)
+    "whirlpool")
 
 foreach(TEST_NAME ${TESTS_NAMES})
     define_hash_test(${TEST_NAME})
