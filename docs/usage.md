@@ -51,11 +51,9 @@ using namespace nil::crypto3;
 
 int main(int argc, char *argv[]) {
 	hash::accumulator_set<hash::md5> acc;
-
 	std::string input = "abc";
-
 	hash<hash::md5>(input.begin(), input.end(), acc);
-
 	std::string out = std::to_string(extract::hash<hash::md5>(acc));
+    assert(out == "900150983cd24fb0d6963f7d28e17f72");
 }
 ```
