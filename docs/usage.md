@@ -8,8 +8,8 @@ The easiest way to use Crypto3.Hash library is to use an algorithm with implicit
  
 ```cpp
 
-#include <nil/crypto3/block/aes.hpp>
-#include <nil/crypto3/block/algorithm/encrypt.hpp>
+#include <nil/crypto3/hash/md5.hpp>
+#include <nil/crypto3/hash/algorithm/hash.hpp>
 
 using namespace nil::crypto3;
 
@@ -25,8 +25,8 @@ Similar technique is available for ranges:
 
 ```cpp
 
-#include <nil/crypto3/block/aes.hpp>
-#include <nil/crypto3/block/algorithm/encrypt.hpp>
+#include <nil/crypto3/hash/md5.hpp>
+#include <nil/crypto3/hash/algorithm/hash.hpp>
 
 using namespace nil::crypto3;
 
@@ -44,8 +44,8 @@ In case of accumulative hash requirement is present, following example demonstra
 [accumulator](@ref hash::accumulator_set) usage:
 
 ```cpp
-#include <nil/crypto3/block/aria.hpp>
-#include <nil/crypto3/block/algorithm/encrypt.hpp>
+#include <nil/crypto3/hash/md5.hpp>
+#include <nil/crypto3/hash/algorithm/hash.hpp>
 
 using namespace nil::crypto3;
 
