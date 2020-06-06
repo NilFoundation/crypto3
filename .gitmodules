@@ -4,3 +4,9 @@
 [submodule "cmake/modules"]
 	path = cmake/modules
 	url = https://github.com/BoostCMake/cmake_modules.git
+[submodule "libs/hash"]
+	path = libs/hash
+	url = https://github.com/nilfoundation/hash.git
+[submodule "libs/codec"]
+	path = libs/codec
+	url = https://github.com/nilfoundation/codec.git
