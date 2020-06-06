@@ -73,7 +73,8 @@ script:
     - echo $CXXSTD
     - cmake -DBUILD_SHARED_LIBS=TRUE -DBUILD_TESTS=TRUE -DCMAKE_CXX_STANDARD=$(echo $CXXSTD | sed 's/[^0-9z]*//g') ..;
     - make -j$proc tests-block;
-    - ctest .
+    - make -j$proc check-block;
+    #- ctest .
 
 notifications:
     email:
