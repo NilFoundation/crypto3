@@ -1,4 +1,5 @@
 # Block Ciphers for =nil; Foundation's Cryptography Suite
+[![Build Status](https://travis-ci.com/NilFoundation/block.svg?branch=standalone)](https://travis-ci.com/NilFoundation/block)
 
 Block ciphers for =nil; Foundation's cryptography suite.
 
