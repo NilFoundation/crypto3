@@ -73,12 +73,6 @@ namespace nil {
                 constexpr static const std::size_t length_words = length_bits / word_bits;
                 BOOST_STATIC_ASSERT(!length_bits || length_bits % word_bits == 0);
 
-                typedef ::nil::crypto3::detail::packer<endian_type, endian_type, length_bits, 
-                    word_bits> length_packer;
-
-                typedef ::nil::crypto3::detail::packer<endian_type, stream_endian::little_octet_big_bit,
-                    word_bits, octet_bits> state_packer;
-
             public:
                 template<typename Integer = std::size_t>
                 inline merkle_damgard_construction &process_block(const block_type &block, Integer seen = Integer()) {
@@ -117,7 +111,7 @@ namespace nil {
 
                     // Convert digest to byte representation
                     digest_type d;
-                    state_packer::pack(state_.begin(), state_.end(), d.begin());
+                    pack_from<endian_type, word_bits, octet_bits>(state_.begin(), state_.end(), d.begin());
                     return d;
                 }
 
@@ -146,7 +140,8 @@ namespace nil {
 
                     std::array<length_type, 1> length_array = {{length}};
                     std::array<word_type, length_words> length_words_array;
-                    length_packer::pack(length_array.begin(), length_array.end(), length_words_array.begin());
+                    pack<endian_type, endian_type, length_bits, word_bits>(length_array.begin(), 
+                        length_array.end(), length_words_array.begin());
                     // Append length
                     for (std::size_t i = length_words; i; --i)
                         block[block_words - i] = length_words_array[length_words - i];

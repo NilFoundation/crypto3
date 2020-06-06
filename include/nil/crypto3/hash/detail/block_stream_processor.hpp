@@ -58,9 +58,6 @@ namespace nil {
 
             protected:
 
-                typedef ::nil::crypto3::detail::packer<stream_endian::little_octet_big_bit, endian_type, 
-                    value_bits, word_bits> cache_packer;
-
                 BOOST_STATIC_ASSERT(block_bits % value_bits == 0);
 
                 inline void process_block(std::size_t block_seen = block_bits) {
@@ -68,7 +65,7 @@ namespace nil {
 
                     // Convert the input into words
                     block_type block;
-                    cache_packer::pack(cache.begin(), cache.end(), block.begin());
+                    pack_to<endian_type, value_bits, word_bits>(cache.begin(), cache.end(), block.begin());
 
                     // Process the block
                     acc(block, accumulators::bits = block_seen);

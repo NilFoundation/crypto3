@@ -19,6 +19,7 @@
 #include <boost/static_assert.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_same.hpp>
+#include <boost/predef/other/endian.h>
 
 #include <algorithm>
 #include <iterator>
@@ -337,9 +338,40 @@ namespace nil {
 
             template<typename InputEndianness, typename OutputEndianness, std::size_t InputValueBits, 
                      std::size_t OutputValueBits, typename InputIterator, typename OutputIterator>
-            void pack(InputIterator first, InputIterator last, OutputIterator out) {
+            inline void pack(InputIterator first, InputIterator last, OutputIterator out) {
                 typedef packer<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits> packer;
                 packer::pack(first, last, out);
+            }
+
+            template<typename OutputEndianness, std::size_t InputValueBits, std::size_t OutputValueBits, 
+                     int UnitBits = CHAR_BIT, typename InputIterator, typename OutputIterator>
+            inline void pack_to(InputIterator first, InputIterator last, OutputIterator out) {
+
+#ifdef BOOST_ENDIAN_BIG_BYTE
+                typedef packer<stream_endian::big_octet_big_bit, OutputEndianness, 
+                        InputValueBits, OutputValueBits> packer;
+#elif defined(BOOST_ENDIAN_LITTLE_BYTE)
+                typedef packer<stream_endian::little_octet_big_bit, OutputEndianness, 
+                        InputValueBits, OutputValueBits> packer;
+#endif
+
+                packer::pack(first, last, out);              
+            }
+
+
+            template<typename InputEndianness, std::size_t InputValueBits, std::size_t OutputValueBits, 
+                     int UnitBits = CHAR_BIT, typename InputIterator, typename OutputIterator>            
+            inline void pack_from(InputIterator first, InputIterator last, OutputIterator out) {
+
+#ifdef BOOST_ENDIAN_BIG_BYTE
+                typedef packer<InputEndianness, stream_endian::big_octet_big_bit,  
+                        InputValueBits, OutputValueBits> packer;
+#elif defined(BOOST_ENDIAN_LITTLE_BYTE)
+                typedef packer<InputEndianness, stream_endian::little_octet_big_bit,  
+                        InputValueBits, OutputValueBits> packer;
+#endif
+
+                packer::pack(first, last, out); 
             }
 
         }    // namespace detail

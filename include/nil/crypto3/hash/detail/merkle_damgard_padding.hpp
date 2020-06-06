@@ -42,9 +42,6 @@ namespace nil {
                     typedef ::nil::crypto3::detail::injector<endian_type, word_bits, block_words, block_bits>
                         injector_type;
 
-                    typedef ::nil::crypto3::detail::packer<stream_endian::big_octet_big_bit, endian_type,
-                        octet_bits, word_bits> bit_packer;
-
                 public:
                     void operator()(block_type &block, std::size_t &block_seen) {
                         using namespace nil::crypto3::detail;
@@ -57,7 +54,8 @@ namespace nil {
                         // Get bit 1 in the endianness used by the hash
                         std::array<octet_type, word_bits / octet_bits> bit_one = {{0x80}};
                         std::array<word_type, 1> bit_one_word {};
-                        bit_packer::pack(bit_one.begin(), bit_one.end(), bit_one_word.begin());
+                        pack<stream_endian::big_octet_big_bit, endian_type, octet_bits, word_bits>(
+                            bit_one.begin(), bit_one.end(), bit_one_word.begin());
 
                         // Add 1 bit to block
                         injector_type::inject(bit_one_word[0], 1, block, block_seen);
