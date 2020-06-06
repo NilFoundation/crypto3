@@ -16,8 +16,8 @@ Hashes library architecture consists of several parts listed below:
 
 1. Algorithms
 2. Stream Processors
-3. Constructions and Compressors
-4. Accumulators
+3. Accumulators
+4. Constructions and Compressors
 5. Value Processors
 
 @dot
@@ -28,9 +28,9 @@ node [shape="box"]
 
   a [label="Algorithms" color="#F5F2F1" fontcolor="#F5F2F1" URL="@ref hash_algorithms"];
   b [label="Stream Processors" color="#F5F2F1" fontcolor="#F5F2F1" URL="@ref hash_stream"];
-  c [label="Constructions and Compressors" color="#F5F2F1" fontcolor="#F5F2F1" URL="@ref hash_pol"];
-  d [label="Accumulators" color="#F5F2F1" fontcolor="#F5F2F1" URL="@ref hash_acc"];
-  e [label="Value Processors" color="#F5F2F1" fontcolor="#F5F2F1" URL="@ref hash_val"];
+  c [label="Accumulators" color="#F5F2F1" fontcolor="#F5F2F1" URL="@ref hash_accumulators"];
+  d [label="Constructions and Compressors" color="#F5F2F1" fontcolor="#F5F2F1" URL="@ref hash_policy"];
+  e [label="Value Processors" color="#F5F2F1" fontcolor="#F5F2F1" URL="@ref hash_value"];
   
   a -> b;
   b -> c;
@@ -102,13 +102,13 @@ set with [`hash` accumulator](@ref accumulators::hash) inside initialized with `
 ## Stream Data Processing {#hashes_stream}
 
 Hashes are usually defined for processing `Integral` value typed byte sequences 
-of specific size packed in blocks (e.g. [sha2](@ref hash::sha2) is defined for 
+of specific size packed in blocks (e.g. [`sha2`](@ref hash::sha2) is defined for 
 blocks of words which are actually plain `n`-sized arrays of `uint32_t` ). 
 Input data in the implementation proposed is supposed to be a various-length 
 input stream, which length could be not even to block size.
   
 This requires an introduction of stream processor specified with particular 
-parameter set unique for each [`Hash`](@ref hash_concept) type, which takes 
+parameter set unique for each [`Hash`](@ref hashes_concept) type, which takes 
 input data stream and gets it split to blocks filled with converted to 
 appropriate size integers (words in the cryptography meaning, not machine words).
   
@@ -169,7 +169,7 @@ struct2:w3 -> struct3:bl0
 
 @enddot
 
-Now with this a [`Hash`](@ref hash_concept) instance of [sha2](@ref hash::sha2) 
+Now with this a [`Hash`](@ref hashes_concept) instance of [`sha2`](@ref hash::sha2) 
 can be fed.
 
 This mechanism is handled with `stream_processor` template class specified for 
