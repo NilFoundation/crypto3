@@ -320,6 +320,21 @@ BOOST_FIXTURE_TEST_CASE(sha3_224_accumulator1, fixture<224>) {
 }
 
 BOOST_FIXTURE_TEST_CASE(sha3_224_accumulator2, fixture<224>) {
+    // bit string {1, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 1, 1, 0}
+    hash_t::construction::type::block_type m = {{}};
+    m[0] = UINT64_C(0x53587B1900000000);
+    acc(m, nil::crypto3::accumulators::bits = 30);
+
+    hash_t::digest_type s = extract::hash<hash_t>(acc);
+
+#ifdef CRYPTO3_HASH_SHOW_PROGRESS
+    std::printf("%s\n", std::to_string(s).data());
+#endif
+
+    BOOST_CHECK_EQUAL("d666a514cc9dba25ac1ba69ed3930460deaac9851b5f0baab007df3b", std::to_string(s).data());
+}
+
+BOOST_FIXTURE_TEST_CASE(sha3_224_accumulator3, fixture<224>) {
     // echo -n "abc" | sha3sum
     hash_t::construction::type::block_type m = {{}};
 
@@ -335,7 +350,7 @@ BOOST_FIXTURE_TEST_CASE(sha3_224_accumulator2, fixture<224>) {
     BOOST_CHECK_EQUAL("e642824c3f8cf24ad09234ee7d3c766fc9a3a5168d0c94ad73b46fdf", std::to_string(s).data());
 }
 
-BOOST_FIXTURE_TEST_CASE(sha3_224_accumulator3, fixture<224>) {
+BOOST_FIXTURE_TEST_CASE(sha3_224_accumulator4, fixture<224>) {
     // https://csrc.nist.gov/CSRC/media/Projects/Cryptographic-Standards-and-Guidelines/documents/examples/SHA3-224_1600.pdf
     hash_t::construction::type::block_type m1 = {
         {UINT64_C(0xa3a3a3a3a3a3a3a3), UINT64_C(0xa3a3a3a3a3a3a3a3), UINT64_C(0xa3a3a3a3a3a3a3a3),

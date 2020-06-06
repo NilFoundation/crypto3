@@ -40,8 +40,8 @@ namespace nil {
                         std::size_t last_word_seen = block_seen % word_bits;
 
                         // Remove garbage
-                        w &= high_bits<word_type, word_bits>(~word_type(), word_seen);
-                        b[last_word_ind] &= high_bits<word_type, word_bits>(~word_type(), last_word_seen);
+                        w &= high_bits<word_bits>(~word_type(), word_seen);
+                        b[last_word_ind] &= high_bits<word_bits>(~word_type(), last_word_seen);
 
                         // Add significant word bits to block word
                         b[last_word_ind] |= (w >> last_word_seen);
@@ -76,21 +76,21 @@ namespace nil {
                         std::size_t w_rem = word_seen % UnitBits;
                         std::size_t w_unit_bits = word_seen - w_rem;
                         word_type mask =
-                            low_bits<word_type, word_bits>(~word_type(), w_unit_bits) |
-                            (low_bits<word_type, word_bits>(~word_type(), w_rem) << (w_unit_bits + UnitBits - w_rem));
+                            low_bits<word_bits>(~word_type(), w_unit_bits) |
+                            (low_bits<word_bits>(~word_type(), w_rem) << (w_unit_bits + UnitBits - w_rem));
                         w &= mask;
 
                         std::size_t b_rem = last_word_seen % UnitBits;
                         std::size_t b_unit_bits = last_word_seen - b_rem;
                         mask =
-                            low_bits<word_type, word_bits>(~word_type(), b_unit_bits) |
-                            (low_bits<word_type, word_bits>(~word_type(), b_rem) << (b_unit_bits + UnitBits - b_rem));
+                            low_bits<word_bits>(~word_type(), b_unit_bits) |
+                            (low_bits<word_bits>(~word_type(), b_rem) << (b_unit_bits + UnitBits - b_rem));
                         b[last_word_ind] &= mask;
 
                         // Split and combine parts of unit values
                         std::size_t sz[2] = {UnitBits - b_rem, b_rem};
-                        word_type masks[2] = {low_bits<word_type, word_bits>(~word_type(), UnitBits - b_rem) << b_rem,
-                                              low_bits<word_type, word_bits>(~word_type(), b_rem)};
+                        word_type masks[2] = {low_bits<word_bits>(~word_type(), UnitBits - b_rem) << b_rem,
+                                              low_bits<word_bits>(~word_type(), b_rem)};
                         std::size_t bw_space = word_bits - last_word_seen;
                         std::size_t w_space = word_seen;
                         word_type w_split = 0;
@@ -111,9 +111,9 @@ namespace nil {
                         if (last_word_seen + word_seen > word_bits) {
                             w >>= (word_bits - b_unit_bits - UnitBits);
                             w_split = 0;
-                            masks[0] = low_bits<word_type, word_bits>(~word_type(), UnitBits - b_rem)
+                            masks[0] = low_bits<word_bits>(~word_type(), UnitBits - b_rem)
                                        << (b_rem + UnitBits);
-                            masks[1] = low_bits<word_type, word_bits>(~word_type(), b_rem);
+                            masks[1] = low_bits<word_bits>(~word_type(), b_rem);
 
                             while (w_space) {
                                 w_split |=
@@ -152,20 +152,20 @@ namespace nil {
                         std::size_t w_rem = word_seen % UnitBits;
                         std::size_t w_unit_bits = word_seen - w_rem;
                         word_type mask =
-                            high_bits<word_type, word_bits>(~word_type(), w_unit_bits) |
-                            (high_bits<word_type, word_bits>(~word_type(), w_rem) >> (w_unit_bits + UnitBits - w_rem));
+                            high_bits<word_bits>(~word_type(), w_unit_bits) |
+                            (high_bits<word_bits>(~word_type(), w_rem) >> (w_unit_bits + UnitBits - w_rem));
                         w &= mask;
                         std::size_t b_rem = last_word_seen % UnitBits;
                         std::size_t b_unit_bits = last_word_seen - b_rem;
                         mask =
-                            high_bits<word_type, word_bits>(~word_type(), b_unit_bits) |
-                            (high_bits<word_type, word_bits>(~word_type(), b_rem) >> (b_unit_bits + UnitBits - b_rem));
+                            high_bits<word_bits>(~word_type(), b_unit_bits) |
+                            (high_bits<word_bits>(~word_type(), b_rem) >> (b_unit_bits + UnitBits - b_rem));
                         b[last_word_ind] &= mask;
 
                         // Split and combine parts of unit values
                         std::size_t sz[2] = {UnitBits - b_rem, b_rem};
-                        word_type masks[2] = {high_bits<word_type, word_bits>(~word_type(), UnitBits - b_rem) >> b_rem,
-                                              high_bits<word_type, word_bits>(~word_type(), b_rem)};
+                        word_type masks[2] = {high_bits<word_bits>(~word_type(), UnitBits - b_rem) >> b_rem,
+                                              high_bits<word_bits>(~word_type(), b_rem)};
                         std::size_t bw_space = word_bits - last_word_seen;
                         std::size_t w_space = word_seen;
                         word_type w_split = 0;
@@ -187,8 +187,8 @@ namespace nil {
                             w <<= (word_bits - b_unit_bits - UnitBits);
                             w_split = 0;
                             masks[0] =
-                                high_bits<word_type, word_bits>(~word_type(), UnitBits - b_rem) >> (b_rem + UnitBits);
-                            masks[1] = high_bits<word_type, word_bits>(~word_type(), b_rem);
+                                high_bits<word_bits>(~word_type(), UnitBits - b_rem) >> (b_rem + UnitBits);
+                            masks[1] = high_bits<word_bits>(~word_type(), b_rem);
 
                             while (w_space) {
                                 w_split |=
@@ -223,8 +223,8 @@ namespace nil {
                         std::size_t last_word_seen = block_seen % word_bits;
 
                         // Remove garbage
-                        w &= low_bits<word_type, word_bits>(~word_type(), word_seen);
-                        b[last_word_ind] &= low_bits<word_type, word_bits>(~word_type(), last_word_seen);
+                        w &= low_bits<word_bits>(~word_type(), word_seen);
+                        b[last_word_ind] &= low_bits<word_bits>(~word_type(), last_word_seen);
 
                         // Add significant word bits to block word
                         b[last_word_ind] |= (w << last_word_seen);

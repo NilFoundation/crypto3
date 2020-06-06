@@ -67,20 +67,20 @@ namespace nil {
                 return T(x & ~highmask);
             }
 
-            template<size_t Shift, typename T, size_t TypeBits>
+            template<size_t Shift, size_t TypeBits, typename T>
             T low_bits(T x) {
                 constexpr size_t real_shift = TypeBits - Shift;
                 T lowmask = ((bool) Shift) * unbounded_shr<real_shift, T>(~T());
                 return x & lowmask;
             }
 
-            template<typename T, size_t type_bits>
+            template<size_t type_bits, typename T>
             T low_bits(T x, size_t shift) {
                 T lowmask = ((bool) shift) * unbounded_shr<T>(~T(), type_bits - shift);
                 return x & lowmask;
             }
 
-            template<typename T, size_t type_bits>
+            template<size_t type_bits, typename T>
             T high_bits(T x, size_t shift) {
                 T highmask = ((bool) shift) * unbounded_shl<T>(~T(), type_bits - shift);
                 return x & highmask;
