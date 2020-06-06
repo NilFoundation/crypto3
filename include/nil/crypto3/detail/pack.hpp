@@ -344,7 +344,7 @@ namespace nil {
             }
 
             template<typename OutputEndianness, std::size_t InputValueBits, std::size_t OutputValueBits, 
-                     int UnitBits = CHAR_BIT, typename InputIterator, typename OutputIterator>
+                     typename InputIterator, typename OutputIterator>
             inline void pack_to(InputIterator first, InputIterator last, OutputIterator out) {
 
 #ifdef BOOST_ENDIAN_BIG_BYTE
@@ -353,6 +353,13 @@ namespace nil {
 #elif defined(BOOST_ENDIAN_LITTLE_BYTE)
                 typedef packer<stream_endian::little_octet_big_bit, OutputEndianness, 
                         InputValueBits, OutputValueBits> packer;
+#elif defined(BOOST_ENDIAN_BIG_WORD)
+                typedef packer<stream_endian::big_unit_big_bit<CRYPTO3_MP_WORD_BITS>, OutputEndianness, 
+                        InputValueBits, OutputValueBits> packer;
+#elif defined(BOOST_ENDIAN_LITTLE_WORD)
+                typedef packer<stream_endian::little_unit_big_bit<CRYPTO3_MP_WORD_BITS>, OutputEndianness, 
+                        InputValueBits, OutputValueBits> packer;
+                // else what error?
 #endif
 
                 packer::pack(first, last, out);              
@@ -360,7 +367,7 @@ namespace nil {
 
 
             template<typename InputEndianness, std::size_t InputValueBits, std::size_t OutputValueBits, 
-                     int UnitBits = CHAR_BIT, typename InputIterator, typename OutputIterator>            
+                     typename InputIterator, typename OutputIterator>            
             inline void pack_from(InputIterator first, InputIterator last, OutputIterator out) {
 
 #ifdef BOOST_ENDIAN_BIG_BYTE
@@ -369,6 +376,13 @@ namespace nil {
 #elif defined(BOOST_ENDIAN_LITTLE_BYTE)
                 typedef packer<InputEndianness, stream_endian::little_octet_big_bit,  
                         InputValueBits, OutputValueBits> packer;
+#elif defined(BOOST_ENDIAN_BIG_WORD)
+                typedef packer<InputEndianness, stream_endian::big_unit_big_bit<CRYPTO3_MP_WORD_BITS>, 
+                        InputValueBits, OutputValueBits> packer;
+#elif defined(BOOST_ENDIAN_LITTLE_WORD)
+                typedef packer<InputEndianness, stream_endian::little_unit_big_bit<CRYPTO3_MP_WORD_BITS>, 
+                        InputValueBits, OutputValueBits> packer;
+                // else what error?
 #endif
 
                 packer::pack(first, last, out); 
