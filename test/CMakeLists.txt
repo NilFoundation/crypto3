@@ -40,27 +40,28 @@ macro(define_block_cipher_test name)
 endmacro()
 
 set(TESTS_NAMES
-    "pack"
+#    "pack"
     "rijndael"
-    "aria"
-    "blowfish"
-    "camellia"
-    "cast"
-    "des"
-    "gost_28147_89"
-    "idea"
-    "kasumi"
-    "misty1"
-    "noekeon"
-    "seed"
-    "serpent"
-    "shacal"
-    "shacal2"
-    "streebog"
-    "sm4"
-    "threefish"
-    "twofish"
-    "xtea")
+#    "aria"
+#    "blowfish"
+#    "camellia"
+#    "cast"
+#    "des"
+#    "gost_28147_89"
+#    "idea"
+#    "kasumi"
+#    "misty1"
+#    "noekeon"
+#    "seed"
+#    "serpent"
+#    "shacal"
+#    "shacal2"
+#    "streebog"
+#    "sm4"
+#    "threefish"
+#    "twofish"
+#    "xtea"
+    )
 
 foreach(TEST_NAME ${TESTS_NAMES})
     define_block_cipher_test(${TEST_NAME})
