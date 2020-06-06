@@ -47,7 +47,7 @@ set(TESTS_NAMES
     "camellia"
     "cast"
     "des"
-    "gost_28147_89"
+#    "gost_28147_89"
     "idea"
     "kasumi"
     "misty1"
