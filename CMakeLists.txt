@@ -74,11 +74,11 @@ else()
     target_architecture(CMAKE_TARGET_ARCHITECTURE)
 endif()
 
-define_target_architecture(${CMAKE_PROJECT_NAME} ${CMAKE_TARGET_ARCHITECTURE})
-define_target_endianness(${CMAKE_PROJECT_NAME} ${CMAKE_TARGET_ARCHITECTURE})
-define_target_platform_features(${CMAKE_PROJECT_NAME})
+define_target_architecture(${CURRENT_UPPER_PROJECT_NAME} ${CMAKE_TARGET_ARCHITECTURE})
+define_target_endianness(${CURRENT_UPPER_PROJECT_NAME} ${CMAKE_TARGET_ARCHITECTURE})
+define_target_platform_features(${CURRENT_UPPER_PROJECT_NAME})
 
-define_target_platform_size(${CMAKE_PROJECT_NAME} ${CMAKE_TARGET_ARCHITECTURE})
+define_target_platform_size(${CURRENT_UPPER_PROJECT_NAME} ${CMAKE_TARGET_ARCHITECTURE})
 
 check_sse()
 check_avx()
