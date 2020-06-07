@@ -545,10 +545,6 @@ cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
           INCLUDE include
           NAMESPACE ${CMAKE_WORKSPACE_NAME}::)
 
-
-add_subdirectories("${CMAKE_CURRENT_LIST_DIR}/libs"
-                   SUBMODULE_DEFINITION_HEADER "cm_project\\(")
-
 if(BUILD_TESTS)
     add_subdirectory(test)
 endif()
