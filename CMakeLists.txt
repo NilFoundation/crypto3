@@ -95,18 +95,18 @@ else()
     target_architecture(CMAKE_TARGET_ARCHITECTURE)
 endif()
 
-define_target_architecture(${CURRENT_UPPER_PROJECT_NAME} ${CMAKE_TARGET_ARCHITECTURE})
-define_target_endianness(${CURRENT_UPPER_PROJECT_NAME} ${CMAKE_TARGET_ARCHITECTURE})
-define_target_platform_features(${CURRENT_UPPER_PROJECT_NAME})
+define_target_architecture(${CMAKE_UPPER_WORKSPACE_NAME} ${CMAKE_TARGET_ARCHITECTURE})
+define_target_endianness(${CMAKE_UPPER_WORKSPACE_NAME} ${CMAKE_TARGET_ARCHITECTURE})
+define_target_platform_features(${CMAKE_UPPER_WORKSPACE_NAME})
 
-define_target_platform_size(${CURRENT_UPPER_PROJECT_NAME} ${CMAKE_TARGET_ARCHITECTURE})
+define_target_platform_size(${CMAKE_UPPER_WORKSPACE_NAME} ${CMAKE_TARGET_ARCHITECTURE})
 
 check_sse()
 check_avx()
 
-#if(NOT Boost_CONTAINER_FOUND OR NOT Boost_FOUND)
-#    cm_find_package(Boost COMPONENTS container)
-#endif()
+if(NOT Boost_CONTAINER_FOUND OR NOT Boost_FOUND)
+    cm_find_package(Boost COMPONENTS container)
+endif()
 
 configure_file(${CMAKE_CURRENT_LIST_DIR}/cmake/build.hpp.in
                ${CMAKE_BINARY_DIR}/include/nil/${CMAKE_WORKSPACE_NAME}/build.hpp @ONLY)
