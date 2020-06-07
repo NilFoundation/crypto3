@@ -29,14 +29,15 @@ namespace nil {
             typedef typename boost::uint_t<CHAR_BIT>::exact byte_type;
 
             // Reverses bits in a byte
-            // http://graphics.stanford.edu/~seander/bithacks.html#ReverseByteWith64BitsDiv
-            inline void reverse_b64(byte_type &b) {
-                b = (b * 0x0202020202ULL & 0x010884422010ULL) % 1023;
-            }
+            inline void reverse_byte(byte_type &b) {
 
-            // http://graphics.stanford.edu/~seander/bithacks.html#ReverseByteWith32Bits
-            inline void reverse_b32(byte_type &b) {
+#if (CRYPTO3_MP_WORD_BITS == 32)
+                // http://graphics.stanford.edu/~seander/bithacks.html#ReverseByteWith32Bits                
                 b = unbounded_shr<16>(((b * 0x0802LU & 0x22110LU) | (b * 0x8020LU & 0x88440LU)) * 0x10101LU);
+#elif (CRYPTO3_MP_WORD_BITS == 64)
+                // http://graphics.stanford.edu/~seander/bithacks.html#ReverseByteWith64BitsDiv                
+                b = (b * 0x0202020202ULL & 0x010884422010ULL) % 1023;
+#endif
             }
 
             /* bit_in_one_unit_reverser reverses sequence of bits in a unit bigger than byte */
@@ -52,7 +53,7 @@ namespace nil {
                 inline static void reverse(UnitType &in, UnitType &out) {
                     int const shift = UnitBits - (CHAR_BIT + k);
                     byte_type byte = byte_type(low_bits<CHAR_BIT>(unbounded_shr(in, shift)));
-                    reverse_b64(byte);
+                    reverse_byte(byte);
                     out |= unbounded_shl(low_bits<CHAR_BIT>(UnitType(byte)), shift);
 
                     next_type::reverse(in, out);
@@ -80,7 +81,7 @@ namespace nil {
             template<typename UnitType, int UnitBits = sizeof(UnitType) * CHAR_BIT, 
                      typename boost::enable_if_c<(UnitBits == CHAR_BIT), int>::type = 0>
             inline void reverse_bits(UnitType &unit) {
-                reverse_b64(unit); // choose between reverse_b32 depending on architecture
+                reverse_byte(unit);
             }
 
             /* bit_in_unit_reverser reverses sequence of bits in each unit */
