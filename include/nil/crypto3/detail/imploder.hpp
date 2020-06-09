@@ -22,13 +22,17 @@ namespace nil {
             // By definition, for all imploders, InputValueBits < OutputValueBits,
             // so we're taking many smaller values and combining them into one value
 
+            /*!
+             * @defgroup imploder Imploder functions
+             */
+
              /*!
              * @brief imploder_shift trait is used to determine whether the input elements are packed into 
              * an output element in reverse order. Since the input and output types are integral now, this 
              * trait contains the shift indicating the position of input element in the output element when 
              * k input bits have already been processed.
              * 
-             * @ingroup pack
+             * @ingroup imploder
              *
              * @tparam OutputEndianness
              * @tparam UnitBits
@@ -58,7 +62,7 @@ namespace nil {
              * order of units and bits in the input value, respectively. Shift constant is determined 
              * by the imploder_shift trait.
              * 
-             * @ingroup pack
+             * @ingroup imploder
              *
              * @tparam InputEndianness
              * @tparam OutputEndianness
@@ -89,7 +93,7 @@ namespace nil {
              * input values packed into the output value. The recursion ends when all elements the output 
              * value can hold have already been processed, i.e. when k == OutputBits.
              * 
-             * @ingroup pack
+             * @ingroup imploder
              *
              * @tparam InputEndianness
              * @tparam OutputEndianness

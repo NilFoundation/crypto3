@@ -25,6 +25,10 @@ namespace nil {
             // By definition, for all exploders, InputValueBits > OutputValueBits,
             // so we're taking one value and splitting it into many smaller values
 
+            /*!
+             * @defgroup exploder Exploder functions
+             */
+
              /*!
              * @brief outvalue_helper trait is used to determine the output value type. 
              * If OutBits is not an exact power of two for which the type uint_t is defined, the type 
@@ -32,12 +36,12 @@ namespace nil {
              * struct definition, this case is possible, when OutputBits is a factor of UnitBits less
              * than UnitBits, and UnitBits is no more than CHAR_BIT.
              * 
-             * @ingroup pack
+             * @ingroup exploder
              *
              * @tparam OutIter
              * @tparam OutBits
              * @tparam T
-             */            
+             */
             template<typename OutIter, int OutBits, typename T = typename std::iterator_traits<OutIter>::value_type>
             struct outvalue_helper {
                 typedef T type;
@@ -53,7 +57,7 @@ namespace nil {
              * this trait contains the shift indicating the position of output element derived from the 
              * input element when k output bits have already been processed.
              * 
-             * @ingroup pack
+             * @ingroup exploder
              *
              * @tparam InputEndianness
              * @tparam UnitBits
@@ -83,7 +87,7 @@ namespace nil {
              * order of units and bits in the output value, respectively. Shift constant is determined 
              * by the exploder_shift trait.
              * 
-             * @ingroup pack
+             * @ingroup exploder
              *
              * @tparam InputEndianness
              * @tparam OutputEndianness
@@ -104,7 +108,7 @@ namespace nil {
                     OutValue tmp = OutValue(low_bits<OutputBits>(unbounded_shr<shift>(in)));
                     unit_reverser<InputEndianness, OutputEndianness, UnitBits>::reverse(tmp);
                     bit_reverser<InputEndianness, OutputEndianness, UnitBits>::reverse(tmp);
-                    *out++ = tmp;                    
+                    *out++ = tmp;
                 }
             };
 
@@ -115,7 +119,7 @@ namespace nil {
              * output values derived from the input value. The recursion ends when all elements the input 
              * value can hold have already been processed, i.e. when k == InputBits.
              * 
-             * @ingroup pack
+             * @ingroup exploder
              *
              * @tparam InputEndianness
              * @tparam OutputEndianness

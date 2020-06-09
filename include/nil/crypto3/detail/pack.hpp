@@ -60,7 +60,7 @@ namespace nil {
             /*!
              * @brief can_memcpy trait is derived from host_can_memcpy trait and is invoked depending on
              * data endianness. Note that there is a single endianness template parameter since otherwise
-             * we have to transform data in accordance with endianness conversion rules. 
+             * we have to transform data in accordance with endianness conversion rules.
              * 
              * @ingroup pack
              *
@@ -97,7 +97,7 @@ namespace nil {
 
             /*!
              * @brief Trait to determine the possibility of fast data copy for iterator-based containers.
-             * Currently, input and output iterators must meet RandomAccessIterator requirements. 
+             * Currently, input and output iterators must meet RandomAccessIterator requirements.
              * 
              * @ingroup pack
              *
@@ -122,7 +122,7 @@ namespace nil {
              * The choice of packer depends on the following conditions: 
              * 1. input and output chunk size relation (equal, less, or greater);
              * 2. input and output endianness relation (same or different);
-             * 3. the possibility of fast data copy using memcpy.   
+             * 3. the possibility of fast data copy using memcpy.
              * 
              * @ingroup pack
              *
@@ -158,7 +158,7 @@ namespace nil {
                 /*!
                  * @brief Packs n InputType elements pointed by constant pointer in 
                  * (which, hence, cannot be iterated) into OutType elements pointed by out.
-                 * This function is invoked only if memcpy call is possible.     
+                 * This function is invoked only if memcpy call is possible.
                  *
                  * @ingroup pack
                  *
@@ -181,7 +181,7 @@ namespace nil {
 
                 /*!
                  * @brief Packs n InputType elements pointed by pointer in into OutType elements pointed by out.
-                 * This function is invoked only if memcpy call is possible.     
+                 * This function is invoked only if memcpy call is possible.
                  *
                  * @ingroup pack
                  *
@@ -203,7 +203,7 @@ namespace nil {
                 }
 
                 /*!
-                 * @brief Packs in_n elements iterated by in into elements iterated by out. 
+                 * @brief Packs in_n elements iterated by in into elements iterated by out.
                  *
                  * @ingroup pack
                  *
@@ -225,7 +225,7 @@ namespace nil {
                  * @brief Packs elements in range [first, last) into elements iterated by out.
                  * This function is invoked only if memcpy call for iterators is possible.
                  * Currently, this requires for input and output iterators to meet RandomAccessIterator 
-                 * requirements. However, the restriction can be weakened to ContiguousIterator usage. 
+                 * requirements. However, the restriction can be weakened to ContiguousIterator usage.
                  *
                  * @ingroup pack
                  *
@@ -252,7 +252,7 @@ namespace nil {
                  * @brief Packs elements in range [first, last) into elements iterated by out.
                  * This function is invoked only if memcpy call for iterators is not possible.
                  * Currently, this is true for input and output iterators not meeting RandomAccessIterator 
-                 * requirements. 
+                 * requirements.
                  *
                  * @ingroup pack
                  *
@@ -542,7 +542,7 @@ namespace nil {
 
             /*!
              * @brief Packs elements from the range [first, last) into elements starting from out. 
-             * Works for input containers meeting RandomAccessIterator requirements.  
+             * Works for input containers meeting RandomAccessIterator requirements.
              *
              * @ingroup pack
              *
@@ -570,7 +570,7 @@ namespace nil {
             /*!
              * @brief Packs elements from the range [first, last) into elements starting from out. 
              * Works for input containers meeting InCatT category requirements and output containers 
-             * meeting OutputIterator requirements. 
+             * meeting OutputIterator requirements.
              *
              * @ingroup pack
              *
