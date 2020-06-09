@@ -19,14 +19,14 @@ namespace nil {
     namespace crypto3 {
         namespace detail {
 
-            // By definition, for all imploders, InputBits < OutputBits,
+            // By definition, for all imploders, InputValueBits < OutputValueBits,
             // so we're taking many smaller values and combining them into one value
 
              /*!
-             * @brief imploder_shift trait is used to determine whether the order of input elements
-             * packed into an output element is reversed. Since the input and output types are integral 
-             * now, this trait contains the shift indicating the position of input element in the output 
-             * element when its k bits have already been processed.
+             * @brief imploder_shift trait is used to determine whether the input elements are packed into 
+             * an output element in reverse order. Since the input and output types are integral now, this 
+             * trait contains the shift indicating the position of input element in the output element when 
+             * k input bits have already been processed.
              * 
              * @ingroup pack
              *
@@ -53,10 +53,10 @@ namespace nil {
 
              /*!
              * @brief imploder_step packs an input value represented in InputEndianness endianness
-             * into an output value represented in OutputEndianness endianness when k bits of output
+             * into an output value represented in OutputEndianness endianness when k input bits
              * have already been processed. It uses unit_reverser and bit_reverser to deal with the 
              * order of units and bits in the input value, respectively. Shift constant is determined 
-             * by imploder_shift trait.
+             * by the imploder_shift trait.
              * 
              * @ingroup pack
              *

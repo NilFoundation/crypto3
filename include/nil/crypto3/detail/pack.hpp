@@ -35,7 +35,7 @@ namespace nil {
 
             /*!
              * @brief The group of traits below is used to determine the possibility of fast data copy.
-             * By fast data copy we mean that the data stored contiguously in the memory, so it can be 
+             * By fast data copy we mean that the data is stored contiguously in the memory, so it can be 
              * copied faster byte-by-byte. Currently, fast data copy is implemented by memcpy function call.
              */
 

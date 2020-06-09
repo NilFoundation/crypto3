@@ -22,9 +22,22 @@ namespace nil {
     namespace crypto3 {
         namespace detail {
 
-            // By definition, for all exploders, InputBits > OutputBits,
+            // By definition, for all exploders, InputValueBits > OutputValueBits,
             // so we're taking one value and splitting it into many smaller values
 
+             /*!
+             * @brief outvalue_helper trait is used to determine the output value type. 
+             * If OutBits is not an exact power of two for which the type uint_t is defined, the type 
+             * with the least power of two bits greater than OutBits is taken. Due to current exploder
+             * struct definition, this case is possible, when OutputBits is a factor of UnitBits less
+             * than UnitBits, and UnitBits is no more than CHAR_BIT.
+             * 
+             * @ingroup pack
+             *
+             * @tparam OutIter
+             * @tparam OutBits
+             * @tparam T
+             */            
             template<typename OutIter, int OutBits, typename T = typename std::iterator_traits<OutIter>::value_type>
             struct outvalue_helper {
                 typedef T type;
@@ -34,6 +47,21 @@ namespace nil {
                 typedef typename boost::uint_t<OutBits>::least type;
             };
 
+             /*!
+             * @brief exploder_shift trait is used to determine whether the output elements are splitted 
+             * from an input element in reverse order. Since the input and output types are integral now, 
+             * this trait contains the shift indicating the position of output element derived from the 
+             * input element when k output bits have already been processed.
+             * 
+             * @ingroup pack
+             *
+             * @tparam InputEndianness
+             * @tparam UnitBits
+             * @tparam InputBits
+             * @tparam OutputBits
+             * @tparam k
+             * @tparam IsLittleUnit
+             */
             template<typename InputEndianness, int UnitBits, int InputBits, int OutputBits, int k, 
                      bool IsLittleUnit = is_little_unit<InputEndianness, UnitBits>::value>
             struct exploder_shift;
@@ -48,6 +76,22 @@ namespace nil {
                 constexpr static int const value = k;
             };
 
+             /*!
+             * @brief exploder_step obtains an output value represented in OutputEndianness endianness
+             * from an input value represented in InputEndianness endianness when k output bits
+             * have already been processed. It uses unit_reverser and bit_reverser to deal with the 
+             * order of units and bits in the output value, respectively. Shift constant is determined 
+             * by the exploder_shift trait.
+             * 
+             * @ingroup pack
+             *
+             * @tparam InputEndianness
+             * @tparam OutputEndianness
+             * @tparam UnitBits
+             * @tparam InputBits
+             * @tparam OutputBits
+             * @tparam k
+             */
             template<typename InputEndianness, typename OutputEndianness, int UnitBits, 
                      int InputBits, int OutputBits, int k>
             struct exploder_step {
@@ -64,6 +108,21 @@ namespace nil {
                 }
             };
 
+             /*!
+             * @brief exploder forms a sequence of output values represented in OutputEndianness endianness
+             * from an input value represented in InputEndianness endianness. The function explode is 
+             * invoked recursively, and the parameter k is used to track the number of already processed 
+             * output values derived from the input value. The recursion ends when all elements the input 
+             * value can hold have already been processed, i.e. when k == InputBits.
+             * 
+             * @ingroup pack
+             *
+             * @tparam InputEndianness
+             * @tparam OutputEndianness
+             * @tparam InputBits
+             * @tparam OutputBits
+             * @tparam k
+             */
             template<typename InputEndianness, typename OutputEndianness, int InputBits, int OutputBits, int k = 0>
             struct exploder;
 
