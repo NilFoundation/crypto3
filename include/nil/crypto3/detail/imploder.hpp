@@ -22,6 +22,21 @@ namespace nil {
             // By definition, for all imploders, InputBits < OutputBits,
             // so we're taking many smaller values and combining them into one value
 
+             /*!
+             * @brief imploder_shift trait is used to determine whether the order of input elements
+             * packed into an output element is reversed. Since the input and output types are integral 
+             * now, this trait contains the shift indicating the position of input element in the output 
+             * element when its k bits have already been processed.
+             * 
+             * @ingroup pack
+             *
+             * @tparam OutputEndianness
+             * @tparam UnitBits
+             * @tparam InputBits
+             * @tparam OutputBits
+             * @tparam k
+             * @tparam IsLittleUnit
+             */
             template<typename OutputEndianness, int UnitBits, int InputBits, int OutputBits, int k, 
                      bool IsLittleUnit = is_little_unit<OutputEndianness, UnitBits>::value>
             struct imploder_shift;
@@ -36,6 +51,22 @@ namespace nil {
                 constexpr static int const value = k;
             };
 
+             /*!
+             * @brief imploder_step packs an input value represented in InputEndianness endianness
+             * into an output value represented in OutputEndianness endianness when k bits of output
+             * have already been processed. It uses unit_reverser and bit_reverser to deal with the 
+             * order of units and bits in the input value, respectively. Shift constant is determined 
+             * by imploder_shift trait.
+             * 
+             * @ingroup pack
+             *
+             * @tparam InputEndianness
+             * @tparam OutputEndianness
+             * @tparam UnitBits
+             * @tparam InputBits
+             * @tparam OutputBits
+             * @tparam k
+             */
             template<typename InputEndianness, typename OutputEndianness, int UnitBits, 
                      int InputBits, int OutputBits, int k>
             struct imploder_step {
@@ -51,6 +82,21 @@ namespace nil {
                 }
             };
 
+             /*!
+             * @brief imploder processes a sequence of input values represented in InputEndianness endianness
+             * into an output value represented in OutputEndianness endianness. The function implode is 
+             * invoked recursively, and the parameter k is used to track the number of already processed 
+             * input values packed into the output value. The recursion ends when all elements the output 
+             * value can hold have already been processed, i.e. when k == OutputBits.
+             * 
+             * @ingroup pack
+             *
+             * @tparam InputEndianness
+             * @tparam OutputEndianness
+             * @tparam InputBits
+             * @tparam OutputBits
+             * @tparam k
+             */
             template<typename InputEndianness, typename OutputEndianness, int InputBits, int OutputBits, int k = 0>
             struct imploder;
 
