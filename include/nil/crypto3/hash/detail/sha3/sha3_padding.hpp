@@ -17,9 +17,9 @@ namespace nil {
     namespace crypto3 {
         namespace hash {
             namespace detail {
-                template<typename Endianness, typename PolicyType>
+                template<typename Hash>
                 class sha3_padding {
-                    typedef PolicyType policy_type;
+                    typedef Hash policy_type;
 
                     constexpr static const std::size_t word_bits = policy_type::word_bits;
                     typedef typename policy_type::word_type word_type;
