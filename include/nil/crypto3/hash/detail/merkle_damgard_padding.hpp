@@ -46,9 +46,12 @@ namespace nil {
                         std::fill(block_of_zeros.begin(), block_of_zeros.end(), 0);
                         injector_type::inject(block_of_zeros, block_bits - block_seen, block, seen_copy);
                         // Get bit 1 in the endianness used by the hash
-                        std::array<bool, word_bits> bit_one = {1};
-                        std::array<word_type, 1> bit_one_word = {0};
-                        ::nil::crypto3::detail::pack<Endianness, 1, word_bits>(bit_one, bit_one_word);
+
+                        std::array<octet_type, word_bits / octet_bits> bit_one = {{0x80}};
+                        std::array<word_type, 1> bit_one_word {};
+                        pack<stream_endian::big_octet_big_bit, endian_type, octet_bits, word_bits>(
+                            bit_one.begin(), bit_one.end(), bit_one_word.begin());
+
                         // Add 1 bit to block
                         injector_type::inject(bit_one_word[0], 1, block, block_seen);
                     }

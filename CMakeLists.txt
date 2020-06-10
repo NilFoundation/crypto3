@@ -49,6 +49,8 @@ option(CRYPTO3_HASH_STREEBOG "Build with Streebog hash support" TRUE)
 option(CRYPTO3_HASH_TIGER "Build with Tiger hash support" TRUE)
 option(CRYPTO3_HASH_WHIRLPOOL "Build with Whirlpool hash support" TRUE)
 
+define_target_platform_size(${CMAKE_UPPER_WORKSPACE_NAME} ${CMAKE_TARGET_ARCHITECTURE})
+
 list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
      include/nil/crypto3/hash/algorithm/hash.hpp
 

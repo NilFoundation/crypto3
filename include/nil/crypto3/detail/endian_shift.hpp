@@ -50,8 +50,8 @@ namespace nil {
                     std::size_t shift_unit_bits = shift - shift_rem;
 
                     std::size_t sz[2] = {UnitBits - shift_rem, shift_rem};
-                    std::size_t masks[2] = {low_bits<word_type, word_bits>(~word_type(), sz[0]) << shift_unit_bits,
-                                            low_bits<word_type, word_bits>(~word_type(), sz[1])
+                    std::size_t masks[2] = {low_bits<word_bits>(~word_type(), sz[0]) << shift_unit_bits,
+                                            low_bits<word_bits>(~word_type(), sz[1])
                                                 << (shift_unit_bits + UnitBits + sz[0])};
                     std::size_t bits_left = word_bits - shift;
 
@@ -83,8 +83,8 @@ namespace nil {
                     std::size_t shift_unit_bits = shift - shift_rem;
 
                     std::size_t sz[2] = {UnitBits - shift_rem, shift_rem};
-                    word_type masks[2] = {high_bits<word_type, word_bits>(~word_type(), sz[0]) >> shift_unit_bits,
-                                          high_bits<word_type, word_bits>(~word_type(), sz[1]) >>
+                    word_type masks[2] = {high_bits<word_bits>(~word_type(), sz[0]) >> shift_unit_bits,
+                                          high_bits<word_bits>(~word_type(), sz[1]) >>
                                               (shift_unit_bits + UnitBits + sz[0])};
 
                     std::size_t bits_left = word_bits - shift;

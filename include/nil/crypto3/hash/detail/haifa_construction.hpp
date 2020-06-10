@@ -35,7 +35,7 @@ namespace nil {
              * @note https://eprint.iacr.org/2007/278.pdf
              */
             template<typename Params, typename IV, typename Compressor, typename Padding,
-            typename Finalizer = detail::nop_finalizer>
+                     typename Finalizer = detail::nop_finalizer>
             class haifa_construction {
             public:
                 typedef Compressor compressor_functor;
@@ -97,7 +97,7 @@ namespace nil {
                     padding_functor padding;
                     padding(b, total_seen);
 
-                    // Process last block 
+                    // Process last block
                     process_block(b, total_seen, salt_value);
 
                     // Apply finalizer
@@ -105,9 +105,7 @@ namespace nil {
 
                     // Convert digest to byte representation
                     std::array<octet_type, state_bits / octet_bits> d_full;
-                    pack_n<endian_type, word_bits, octet_bits>(state_.data(), state_words, d_full.data(),
-                                                               state_bits / octet_bits);
-
+                    pack_from<endian_type, word_bits, octet_bits>(state_.begin(), state_.end(), d_full.begin());
                     digest_type d;
                     std::copy(d_full.begin(), d_full.begin() + digest_bytes, d.begin());
 

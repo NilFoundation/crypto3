@@ -43,8 +43,8 @@ endmacro()
 set(TESTS_NAMES
     "adler"
     "blake2b"
-    "crc"
-    "cubehash"
+#    "crc"
+#    "cubehash"
     "ghash"
     "keccak"
     "md4"

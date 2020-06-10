@@ -13,8 +13,8 @@
 
 namespace nil {
     namespace crypto3 {
-        constexpr static const std::size_t octet_bits = CHAR_BIT;
-        typedef boost::uint_t<octet_bits>::least octet_type;
+	        constexpr static const std::size_t octet_bits = CHAR_BIT;
+	        typedef boost::uint_t<octet_bits>::least octet_type;
     }    // namespace crypto3
 }    // namespace nil
 
