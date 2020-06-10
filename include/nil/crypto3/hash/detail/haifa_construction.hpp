@@ -106,7 +106,6 @@ namespace nil {
                     // Convert digest to byte representation
                     std::array<octet_type, state_bits / octet_bits> d_full;
                     pack_from<endian_type, word_bits, octet_bits>(state_.begin(), state_.end(), d_full.begin());
-
                     digest_type d;
                     std::copy(d_full.begin(), d_full.begin() + digest_bytes, d.begin());
 

@@ -111,9 +111,8 @@ namespace nil {
                         if (last_word_seen + word_seen > word_bits) {
                             w >>= (word_bits - b_unit_bits - UnitBits);
                             w_split = 0;
-                            masks[0] = low_bits<word_bits>(~word_type(), UnitBits - b_rem)
-                                       << (b_rem + UnitBits);
-                            masks[1] = low_bits<word_bits>(~word_type(), b_rem);
+                            masks[0] = low_bits<word_type, word_bits>(~word_type(), UnitBits - b_rem) << (b_rem + UnitBits);
+                            masks[1] = low_bits<word_type, word_bits>(~word_type(), b_rem);
 
                             while (w_space) {
                                 w_split |=
@@ -186,10 +185,8 @@ namespace nil {
                         if (last_word_seen + word_seen > word_bits) {
                             w <<= (word_bits - b_unit_bits - UnitBits);
                             w_split = 0;
-                            masks[0] =
-                                high_bits<word_bits>(~word_type(), UnitBits - b_rem) >> (b_rem + UnitBits);
-                            masks[1] = high_bits<word_bits>(~word_type(), b_rem);
-
+                            masks[0] = high_bits<word_type, word_bits>(~word_type(), UnitBits - b_rem) >> (b_rem + UnitBits);
+                            masks[1] = high_bits<word_type, word_bits>(~word_type(), b_rem);
                             while (w_space) {
                                 w_split |=
                                     (!sz_ind ? ((w & masks[0]) << b_rem) : ((w & masks[1]) >> (UnitBits + sz[0])));

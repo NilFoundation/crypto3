@@ -66,7 +66,6 @@ namespace nil {
                     // Convert the input into words
                     block_type block;
                     pack_to<endian_type, value_bits, word_bits>(cache.begin(), cache.end(), block.begin());
-
                     // Process the block
                     acc(block, accumulators::bits = block_seen);
                 }

@@ -2,22 +2,6 @@
 
 Hashes for =nil; Foundation's cryptography suite.
 
-The following hashes are currently fully implemented:
-
-- blake2b
-- md4
-- md5
-- ripemd
-- sha
-- sha1 
-
-The following hashes are almost finished:
-
-- keccak
-- sha2
-- sha3
-
-
 ## Building
 
 This library uses Boost CMake build modules (https://github.com/BoostCMake/cmake_modules.git). 

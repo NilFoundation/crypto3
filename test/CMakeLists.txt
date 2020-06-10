@@ -41,7 +41,7 @@ macro(define_hash_test name)
 endmacro()
 
 set(TESTS_NAMES
-#    "adler"
+    "adler"
     "blake2b"
 #    "crc"
 #    "cubehash"
