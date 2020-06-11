@@ -241,7 +241,7 @@ namespace nil {
                                typename std::iterator_traits<OutputIterator>::value_type>::value &&
                     can_memcpy_itr<InputIterator, OutputIterator>::value>::type
                     pack(InputIterator first, InputIterator last, OutputIterator out) {
-                    pack_n(&(*first), std::distance(first, last), &(*out));
+                    pack_n(first, std::distance(first, last), out);
                 }
 
                 /*!
@@ -511,6 +511,7 @@ namespace nil {
                      std::size_t OutputValueBits, typename InputIterator, typename OutputIterator>
             inline void pack_n(InputIterator in, std::size_t in_n, OutputIterator out) {
                 typedef packer<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits> packer_type;
+
                 packer_type::pack_n(in, in_n, out);
             }
 
@@ -537,6 +538,7 @@ namespace nil {
                      std::size_t OutputValueBits, typename InputIterator, typename OutputIterator>
             inline void pack_n(InputIterator in, std::size_t in_n, OutputIterator out, std::size_t out_n) {
                 BOOST_ASSERT(in_n * InputValueBits == out_n * OutputValueBits);
+
                 pack_n<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits>(in, in_n, out);
             }
 
@@ -595,6 +597,7 @@ namespace nil {
                      typename = typename std::enable_if<detail::is_iterator<OutputIterator>::value>::type>
             inline void pack(InputIterator first, InputIterator last, InCatT, OutputIterator out) {
                 typedef packer<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits> packer_type;
+
                 packer_type::pack(first, last, out);
             }
 
@@ -621,6 +624,7 @@ namespace nil {
                      typename = typename std::enable_if<detail::is_iterator<OutputIterator>::value>::type>
             inline void pack(InputIterator first, InputIterator last, OutputIterator out) {
                 typedef typename std::iterator_traits<InputIterator>::iterator_category in_cat;
+
                 pack<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits>(first, last, in_cat(), out);
             }
 
@@ -712,6 +716,7 @@ namespace nil {
                              OutputIterator out_last) {
                 typedef typename std::iterator_traits<InputIterator>::iterator_category in_cat;
                 typedef typename std::iterator_traits<OutputIterator>::iterator_category out_cat;
+
                 pack<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits>(
                     in_first, in_last, in_cat(), out_first, out_last, out_cat());
             }
