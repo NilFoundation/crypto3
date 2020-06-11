@@ -38,6 +38,7 @@ namespace nil {
             template<std::size_t... I,
                      typename InputIterator,
                      typename Array = std::array<ValueType<InputIterator>, sizeof...(I)>>
+
             Array make_array(InputIterator first, indices<I...>) {
                 return Array {{(void(I), *first++)...}};
             }
