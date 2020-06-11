@@ -25,7 +25,6 @@ include(CMSetupVersion)
 
 cm_find_package(${CMAKE_WORKSPACE_NAME}_codec)
 cm_find_package(${CMAKE_WORKSPACE_NAME}_mac)
-cm_find_package(${CMAKE_WORKSPACE_NAME}_passhash)
 
 list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
      include/nil/crypto3/passhash/bcrypt.hpp
@@ -49,7 +48,6 @@ set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES
 target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
                       ${CMAKE_WORKSPACE_NAME}::codec
                       ${CMAKE_WORKSPACE_NAME}::mac
-                      ${CMAKE_WORKSPACE_NAME}::passhash
 
                       ${Boost_LIBRARIES})
 

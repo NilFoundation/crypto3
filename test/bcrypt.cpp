@@ -27,7 +27,6 @@
 #include <cstdio>
 #include <cstring>
 
-using namespace nil::crypto3::hash;
 using namespace nil::crypto3::accumulators;
 
 typedef std::unordered_map<std::string, std::string>::value_type string_data_value;
