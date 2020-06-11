@@ -95,24 +95,6 @@ namespace nil {
 #endif
 
             /*!
-             * @brief Trait to determine the possibility of fast data copy for iterator-based containers.
-             * Currently, input and output iterators must meet RandomAccessIterator requirements.
-             *
-             * @ingroup pack
-             *
-             * @tparam InputIterator
-             * @tparam OutputIterator
-             */
-            template<typename InputIterator, typename OutputIterator>
-            struct can_memcpy_itr {
-                constexpr static bool const value =
-                    std::is_same<typename std::iterator_traits<InputIterator>::iterator_category,
-                                 std::random_access_iterator_tag>::value &&
-                    std::is_same<typename std::iterator_traits<OutputIterator>::iterator_category,
-                                 std::random_access_iterator_tag>::value;
-            };
-
-            /*!
              * @brief Packer is used to transform input data divided into chunks of the bit size InputValueBits
              * represented in input endianness (InputEndianness)
              * into output data (of the same bit length) divided into chunks of the bit size OutputValueBits
@@ -220,8 +202,7 @@ namespace nil {
 
                 /*!
                  * @brief Packs elements in range [first, last) into elements iterated by out.
-                 * This function is invoked only if memcpy call for iterators is possible.
-                 * Currently, this requires for input and output iterators to meet RandomAccessIterator
+                 * This function is invoked only if input and output iterators meet RandomAccessIterator
                  * requirements. However, the restriction can be weakened to ContiguousIterator usage.
                  *
                  * @ingroup pack
@@ -231,24 +212,46 @@ namespace nil {
                  *
                  * @param first
                  * @param last
+                 * @param random_access_iterator_tag
                  * @param out
+                 * @param random_access_iterator_tag
                  *
                  * @return
                  */
                 template<typename InputIterator, typename OutputIterator>
-                inline static typename std::enable_if<
-                    can_memcpy<Endianness, ValueBits, typename std::iterator_traits<InputIterator>::value_type,
-                               typename std::iterator_traits<OutputIterator>::value_type>::value &&
-                    can_memcpy_itr<InputIterator, OutputIterator>::value>::type
-                    pack(InputIterator first, InputIterator last, OutputIterator out) {
+                inline static void pack(InputIterator first, InputIterator last, std::random_access_iterator_tag, 
+                    OutputIterator out, std::random_access_iterator_tag) {
                     pack_n(first, std::distance(first, last), out);
                 }
 
                 /*!
                  * @brief Packs elements in range [first, last) into elements iterated by out.
-                 * This function is invoked only if memcpy call for iterators is not possible.
-                 * Currently, this is true for input and output iterators not meeting RandomAccessIterator
+                 * This function is invoked only if input or output iterator doesn't meet RandomAccessIterator
                  * requirements.
+                 *
+                 * @ingroup pack
+                 *
+                 * @tparam InputIterator
+                 * @tparam InCatT
+                 * @tparam OutputIterator
+                 * @tparam OutCatT
+                 *
+                 * @param first
+                 * @param last
+                 * @param InCatT
+                 * @param out
+                 * @param OutCatT
+                 *
+                 * @return
+                 */
+                template<typename InputIterator, typename InCatT, typename OutputIterator, typename OutCatT>
+                inline static void pack(InputIterator first, InputIterator last, InCatT, OutputIterator out, OutCatT) {
+                    std::copy(first, last, out);
+                }
+
+
+                /*!
+                 * @brief Generic function that chooses pack function depending on input and output iterator category.
                  *
                  * @ingroup pack
                  *
@@ -262,13 +265,12 @@ namespace nil {
                  * @return
                  */
                 template<typename InputIterator, typename OutputIterator>
-                inline static typename std::enable_if<
-                    !can_memcpy<Endianness, ValueBits, typename std::iterator_traits<InputIterator>::value_type,
-                                typename std::iterator_traits<OutputIterator>::value_type>::value ||
-                    !can_memcpy_itr<InputIterator, OutputIterator>::value>::type
-                    pack(InputIterator first, InputIterator last, OutputIterator out) {
-                    std::copy(first, last, out);
+                inline static void pack(InputIterator first, InputIterator last, OutputIterator out) {
+                    typedef typename std::iterator_traits<InputIterator>::iterator_category in_cat;
+                    typedef typename std::iterator_traits<OutputIterator>::iterator_category out_cat;
+                    pack(first, last, in_cat(), out, out_cat());
                 }
+
             };
 
             /*!
