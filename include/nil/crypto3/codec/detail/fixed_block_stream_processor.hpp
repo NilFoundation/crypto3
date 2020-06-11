@@ -67,8 +67,10 @@ namespace nil {
                     if (i == input_block_bits - value_bits) {
                         // Convert the input into words
                         input_block_type block = {0};
-                        ::nil::crypto3::detail::pack<endian_type, value_bits, input_value_bits>(cache.begin(),
-                                                                                                cache.end(), block);
+                        //::nil::crypto3::detail::pack<endian_type, value_bits, input_value_bits>(cache.begin(),
+                        //                                                                        cache.end(), block);
+
+                        ::nil::crypto3::detail::pack_to<endian_type, value_bits, input_value_bits>(cache.begin(), cache.end(), block.begin());
 
                         // Process the block
                         std::size_t ibb = input_block_bits;
@@ -95,6 +97,10 @@ namespace nil {
                         input_block_type block = {0};
                         ::nil::crypto3::detail::pack<endian_type, value_bits, input_value_bits>(
                             first, first + block_values, block);
+
+                        ::nil::crypto3::detail::pack_to<endian_type, value_bits, input_value_bits>(first, first + block_values, block.begin());
+
+
                         seen += value_bits * block_values;
 
                         std::size_t ibb = input_block_bits;
