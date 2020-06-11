@@ -111,12 +111,14 @@ namespace nil {
              * @tparam OutputEndianness
              * @tparam InputValueBits
              * @tparam OutputValueBits
+             * @tparam InputType
+             * @tparam OutputType             
              * @tparam SameEndianness
              * @tparam Implode
              * @tparam Explode
              */
             template<typename InputEndianness, typename OutputEndianness, std::size_t InputValueBits,
-                     std::size_t OutputValueBits,
+                     std::size_t OutputValueBits, typename InputType, typename OutputType,
                      bool SameEndianness = std::is_same<InputEndianness, OutputEndianness>::value,
                      bool Implode = (InputValueBits < OutputValueBits),
                      bool Explode = (InputValueBits > OutputValueBits)>
@@ -133,9 +135,11 @@ namespace nil {
              *
              * @tparam Endianness
              * @tparam ValueBits
+             * @tparam InputType
+             * @tparam OutputType
              */
-            template<typename Endianness, std::size_t ValueBits>
-            struct packer<Endianness, Endianness, ValueBits, ValueBits, true, false, false> {
+            template<typename Endianness, std::size_t ValueBits, typename InputType, typename OutputType>
+            struct packer<Endianness, Endianness, ValueBits, ValueBits, InputType, OutputType, true, false, false> {
                 /*!
                  * @brief Packs n InputType elements pointed by constant pointer in
                  * (which, hence, cannot be iterated) into OutType elements pointed by out.
@@ -143,16 +147,12 @@ namespace nil {
                  *
                  * @ingroup pack
                  *
-                 * @tparam InputType
-                 * @tparam OutputType
-                 *
                  * @param in
                  * @param n
                  * @param out
                  *
                  * @return
                  */
-                template<typename InputType, typename OutputType>
                 inline static
                     typename std::enable_if<can_memcpy<Endianness, ValueBits, InputType, OutputType>::value>::type
                     pack_n(InputType const *in, std::size_t n, OutputType *out) {
@@ -165,16 +165,12 @@ namespace nil {
                  *
                  * @ingroup pack
                  *
-                 * @tparam InputType
-                 * @tparam OutputType
-                 *
                  * @param in
                  * @param n
                  * @param out
                  *
                  * @return
                  */
-                template<typename InputType, typename OutputType>
                 inline static
                     typename std::enable_if<can_memcpy<Endianness, ValueBits, InputType, OutputType>::value>::type
                     pack_n(InputType *in, std::size_t n, OutputType *out) {
@@ -286,10 +282,13 @@ namespace nil {
              * @tparam InputEndian
              * @tparam OutputEndian
              * @tparam ValueBits
+             * @tparam InputType
+             * @tparam OutputType
              */
             template<int UnitBits, template<int> class InputEndian, template<int> class OutputEndian,
-                     std::size_t ValueBits>
-            struct packer<InputEndian<UnitBits>, OutputEndian<UnitBits>, ValueBits, ValueBits, false, false, false> {
+                     std::size_t ValueBits, typename InputType, typename OutputType>
+            struct packer<InputEndian<UnitBits>, OutputEndian<UnitBits>, ValueBits, ValueBits, InputType, 
+                          OutputType, false, false, false> {
 
                 typedef InputEndian<UnitBits> InputEndianness;
                 typedef OutputEndian<UnitBits> OutputEndianness;
@@ -299,16 +298,24 @@ namespace nil {
 
                 template<typename InputIterator, typename OutputIterator>
                 inline static void pack_n(InputIterator in, std::size_t in_n, OutputIterator out) {
+
+                    BOOST_STATIC_ASSERT(std::is_same<typename std::iterator_traits<InputIterator>::value_type, 
+                                        InputType>::value);
+
                     std::transform(in, in + in_n, out,
-                                   [](typename std::iterator_traits<InputIterator>::value_type const &elem) {
+                                   [](InputType const &elem) {
                                        return units_reverser::reverse(bits_reverser::reverse(elem));
                                    });
                 }
 
                 template<typename InputIterator, typename OutputIterator>
                 inline static void pack(InputIterator first, InputIterator last, OutputIterator out) {
+
+                    BOOST_STATIC_ASSERT(std::is_same<typename std::iterator_traits<InputIterator>::value_type, 
+                                        InputType>::value);
+
                     std::transform(first, last, out,
-                                   [](typename std::iterator_traits<InputIterator>::value_type const &elem) {
+                                   [](InputType const &elem) {
                                        return units_reverser::reverse(bits_reverser::reverse(elem));
                                    });
                 }
@@ -326,12 +333,14 @@ namespace nil {
              * @tparam OutputEndianness
              * @tparam InputValueBits
              * @tparam OutputValueBits
+             * @tparam InputType
+             * @tparam OutputType
              * @tparam SameEndianness
              */
             template<typename InputEndianness, typename OutputEndianness, std::size_t InputValueBits,
-                     std::size_t OutputValueBits, bool SameEndianness>
-            struct packer<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits, SameEndianness, true,
-                          false> {
+                     std::size_t OutputValueBits, typename InputType, typename OutputType, bool SameEndianness>
+            struct packer<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits, InputType, OutputType,
+                          SameEndianness, true, false> {
 
                 BOOST_STATIC_ASSERT(!(OutputValueBits % InputValueBits));
 
@@ -339,11 +348,13 @@ namespace nil {
 
                 template<typename InputIterator, typename OutputIterator>
                 inline static void pack_n(InputIterator in, std::size_t in_n, OutputIterator out) {
-                    typedef typename std::iterator_traits<OutputIterator>::value_type OutValue;
+                    BOOST_STATIC_ASSERT(std::is_same<typename std::iterator_traits<OutputIterator>::value_type, 
+                                        OutputType>::value);
+
                     std::size_t out_n = in_n / (OutputValueBits / InputValueBits);
 
                     while (out_n--) {
-                        OutValue value = OutValue();
+                        OutputType value = OutputType();
                         imploder::implode(in, value);
                         *out++ = value;
                     }
@@ -351,10 +362,11 @@ namespace nil {
 
                 template<typename InputIterator, typename OutputIterator>
                 inline static void pack(InputIterator first, InputIterator last, OutputIterator out) {
-                    typedef typename std::iterator_traits<OutputIterator>::value_type OutValue;
+                    BOOST_STATIC_ASSERT(std::is_same<typename std::iterator_traits<OutputIterator>::value_type, 
+                                        OutputType>::value);
 
                     while (first != last) {
-                        OutValue value = OutValue();
+                        OutputType value = OutputType();
                         imploder::implode(first, value);
                         *out++ = value;
                     }
@@ -373,12 +385,14 @@ namespace nil {
              * @tparam OutputEndianness
              * @tparam InputValueBits
              * @tparam OutputValueBits
+             * @tparam InputType
+             * @tparam OutputType
              * @tparam SameEndianness
              */
             template<typename InputEndianness, typename OutputEndianness, std::size_t InputValueBits,
-                     std::size_t OutputValueBits, bool SameEndianness>
-            struct packer<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits, SameEndianness, false,
-                          true> {
+                     std::size_t OutputValueBits, typename InputType, typename OutputType, bool SameEndianness>
+            struct packer<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits, InputType, OutputType,
+                          SameEndianness, false, true> {
 
                 BOOST_STATIC_ASSERT(!(InputValueBits % OutputValueBits));
 
@@ -386,22 +400,74 @@ namespace nil {
 
                 template<typename InputIterator, typename OutputIterator>
                 inline static void pack_n(InputIterator in, std::size_t in_n, OutputIterator out) {
-                    typedef typename std::iterator_traits<InputIterator>::value_type InValue;
+                    BOOST_STATIC_ASSERT(std::is_same<typename std::iterator_traits<InputIterator>::value_type, 
+                                 InputType>::value);
 
                     while (in_n--) {
-                        InValue const value = *in++;
+                        InputType const value = *in++;
                         exploder::explode(value, out);
                     }
                 }
 
                 template<typename InputIterator, typename OutputIterator>
                 inline static void pack(InputIterator first, InputIterator last, OutputIterator out) {
-                    typedef typename std::iterator_traits<InputIterator>::value_type InValue;
+                    BOOST_STATIC_ASSERT(std::is_same<typename std::iterator_traits<InputIterator>::value_type, 
+                                 InputType>::value);
 
                     while (first != last) {
-                        InValue const value = *first++;
+                        InputType const value = *first++;
                         exploder::explode(value, out);
                     }
+                }
+            };
+
+            /*!
+             * @brief This packer deals with bool input and output data elements.
+             *
+             * @ingroup pack
+             *
+             * @tparam InputEndianness
+             * @tparam OutputEndianness
+             * @tparam InputValueBits
+             * @tparam OutputValueBits
+             * @tparam SameEndianness
+             * @tparam Implode
+             * @tparam Explode
+             */
+            template<typename InputEndianness, typename OutputEndianness, std::size_t InputValueBits, 
+                     std::size_t OutputValueBits, bool SameEndianness, bool Implode, bool Explode>
+            struct packer<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits, bool, bool, 
+                SameEndianness, Implode, Explode> {
+
+                template<typename InputIterator, typename OutputIterator>
+                inline static void pack(InputIterator first, InputIterator last, OutputIterator out) {
+                    std::copy(first, last, out);
+                }
+            };
+
+            template<typename InputEndianness, typename OutputEndianness, std::size_t InputValueBits, 
+                     std::size_t OutputValueBits, typename OutputType, bool SameEndianness, bool Implode, bool Explode>
+            struct packer<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits, bool, OutputType, 
+                SameEndianness, Implode, Explode> {
+
+                BOOST_STATIC_ASSERT(!std::is_same<OutputType, bool>::value);
+
+                template<typename InputIterator, typename OutputIterator>
+                inline static void pack(InputIterator first, InputIterator last, OutputIterator out) {
+                    std::copy(first, last, out);
+                }
+            };
+
+            template<typename InputEndianness, typename OutputEndianness, std::size_t InputValueBits, 
+                     std::size_t OutputValueBits, typename InputType, bool SameEndianness, bool Implode, bool Explode>
+            struct packer<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits, InputType, bool, 
+                SameEndianness, Implode, Explode> {
+
+                BOOST_STATIC_ASSERT(!std::is_same<InputType, bool>::value);
+
+                template<typename InputIterator, typename OutputIterator>
+                inline static void pack(InputIterator first, InputIterator last, OutputIterator out) {
+                    std::copy(first, last, out);
                 }
             };
 
@@ -427,19 +493,24 @@ namespace nil {
                      typename InputIterator, typename OutputIterator>
             inline void pack_to(InputIterator first, InputIterator last, OutputIterator out) {
 
+                typedef typename std::iterator_traits<InputIterator>::value_type InputType;
+                typedef typename std::iterator_traits<OutputIterator>::value_type OutputType;
+
 #ifdef BOOST_ENDIAN_BIG_BYTE_AVAILABLE
-                typedef packer<stream_endian::big_octet_big_bit, OutputEndianness, InputValueBits, OutputValueBits>
+                typedef packer<stream_endian::big_octet_big_bit, OutputEndianness, InputValueBits, OutputValueBits,
+                               InputType, OutputType> 
                     packer_type;
 #elif defined(BOOST_ENDIAN_LITTLE_BYTE_AVAILABLE)
-                typedef packer<stream_endian::little_octet_big_bit, OutputEndianness, InputValueBits, OutputValueBits>
+                typedef packer<stream_endian::little_octet_big_bit, OutputEndianness, InputValueBits, OutputValueBits,
+                               InputType, OutputType> 
                     packer_type;
 #elif defined(BOOST_ENDIAN_BIG_WORD_AVAILABLE)
                 typedef packer<stream_endian::big_unit_big_bit<CRYPTO3_MP_WORD_BITS>, OutputEndianness, InputValueBits,
-                               OutputValueBits>
+                               OutputValueBits, InputType, OutputType>
                     packer_type;
 #elif defined(BOOST_ENDIAN_LITTLE_WORD_AVAILABLE)
                 typedef packer<stream_endian::little_unit_big_bit<CRYPTO3_MP_WORD_BITS>, OutputEndianness,
-                               InputValueBits, OutputValueBits>
+                               InputValueBits, OutputValueBits, InputType, OutputType>
                     packer_type;
 #else
 #error "Unknown endianness"
@@ -470,19 +541,24 @@ namespace nil {
                      typename InputIterator, typename OutputIterator>
             inline void pack_from(InputIterator first, InputIterator last, OutputIterator out) {
 
+                typedef typename std::iterator_traits<InputIterator>::value_type InputType;
+                typedef typename std::iterator_traits<OutputIterator>::value_type OutputType;
+
 #ifdef BOOST_ENDIAN_BIG_BYTE_AVAILABLE
-                typedef packer<InputEndianness, stream_endian::big_octet_big_bit, InputValueBits, OutputValueBits>
+                typedef packer<InputEndianness, stream_endian::big_octet_big_bit, InputValueBits, OutputValueBits,
+                               InputType, OutputType>
                     packer_type;
 #elif defined(BOOST_ENDIAN_LITTLE_BYTE_AVAILABLE)
-                typedef packer<InputEndianness, stream_endian::little_octet_big_bit, InputValueBits, OutputValueBits>
+                typedef packer<InputEndianness, stream_endian::little_octet_big_bit, InputValueBits, OutputValueBits,
+                               InputType, OutputType>
                     packer_type;
 #elif defined(BOOST_ENDIAN_BIG_WORD_AVAILABLE)
                 typedef packer<InputEndianness, stream_endian::big_unit_big_bit<CRYPTO3_MP_WORD_BITS>, InputValueBits,
-                               OutputValueBits>
+                               OutputValueBits, InputType, OutputType>
                     packer_type;
 #elif defined(BOOST_ENDIAN_LITTLE_WORD_AVAILABLE)
                 typedef packer<InputEndianness, stream_endian::little_unit_big_bit<CRYPTO3_MP_WORD_BITS>,
-                               InputValueBits, OutputValueBits>
+                               InputValueBits, OutputValueBits, InputType, OutputType>
                     packer_type;
 #else
 #error "Unknown endianness"
@@ -512,7 +588,11 @@ namespace nil {
             template<typename InputEndianness, typename OutputEndianness, std::size_t InputValueBits,
                      std::size_t OutputValueBits, typename InputIterator, typename OutputIterator>
             inline void pack_n(InputIterator in, std::size_t in_n, OutputIterator out) {
-                typedef packer<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits> packer_type;
+                typedef typename std::iterator_traits<InputIterator>::value_type InputType;
+                typedef typename std::iterator_traits<OutputIterator>::value_type OutputType;                
+                typedef packer<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits,
+                               InputType, OutputType> 
+                    packer_type;
 
                 packer_type::pack_n(in, in_n, out);
             }
@@ -598,7 +678,11 @@ namespace nil {
                      typename = typename std::enable_if<detail::is_iterator<InputIterator>::value>::type,
                      typename = typename std::enable_if<detail::is_iterator<OutputIterator>::value>::type>
             inline void pack(InputIterator first, InputIterator last, InCatT, OutputIterator out) {
-                typedef packer<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits> packer_type;
+                typedef typename std::iterator_traits<InputIterator>::value_type InputType;
+                typedef typename std::iterator_traits<OutputIterator>::value_type OutputType;
+                typedef packer<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits, 
+                               InputType, OutputType> 
+                    packer_type;
 
                 packer_type::pack(first, last, out);
             }
