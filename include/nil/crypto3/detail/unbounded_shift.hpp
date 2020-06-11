@@ -51,16 +51,16 @@ namespace nil {
                 return unbounded_shifter<Shift, T>::shr(x);
             }
 
-            template<typename T> 
+            template<typename T>
             T unbounded_shl(T x, std::size_t n) {
                 return x << n;
-            }  
+            }
 
-            template<typename T> 
+            template<typename T>
             T unbounded_shr(T x, std::size_t n) {
                 return x >> n;
-            }            
-            // FIXME: it wouldn't work when Shift == sizeof(T) * CHAR_BIT             
+            }
+            // FIXME: it wouldn't work when Shift == sizeof(T) * CHAR_BIT
             template<int Shift, typename T>
             T low_bits(T x) {
                 T highmask = unbounded_shl<Shift, T>(~T());
@@ -70,19 +70,19 @@ namespace nil {
             template<size_t Shift, size_t TypeBits, typename T>
             T low_bits(T x) {
                 constexpr size_t real_shift = TypeBits - Shift;
-                T lowmask = ((bool) Shift) * unbounded_shr<real_shift, T>(~T());
+                T lowmask = ((bool)Shift) * unbounded_shr<real_shift, T>(~T());
                 return x & lowmask;
             }
 
             template<size_t type_bits, typename T>
             T low_bits(T x, size_t shift) {
-                T lowmask = ((bool) shift) * unbounded_shr<T>(~T(), type_bits - shift);
+                T lowmask = ((bool)shift) * unbounded_shr<T>(~T(), type_bits - shift);
                 return x & lowmask;
             }
 
             template<size_t type_bits, typename T>
             T high_bits(T x, size_t shift) {
-                T highmask = ((bool) shift) * unbounded_shl<T>(~T(), type_bits - shift);
+                T highmask = ((bool)shift) * unbounded_shl<T>(~T(), type_bits - shift);
                 return x & highmask;
             }
         }    // namespace detail

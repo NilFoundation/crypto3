@@ -41,7 +41,6 @@ namespace nil {
                     constexpr static const std::size_t length_bits = word_bits * 2;
 
                     typedef typename stream_endian::big_octet_big_bit digest_endian;
-
                 };
 
                 template<std::size_t Version>

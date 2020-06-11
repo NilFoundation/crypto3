@@ -17,7 +17,7 @@ namespace nil {
             namespace detail {
                 struct sm3_functions : public ::nil::crypto3::detail::basic_functions<32> {
                     typedef ::nil::crypto3::detail::basic_functions<32> policy_type;
-                    
+
                     constexpr static const std::size_t word_bits = policy_type::word_bits;
                     typedef typename policy_type::word_type word_type;
 
@@ -27,11 +27,11 @@ namespace nil {
 
                     inline static word_type ff1(word_type X, word_type Y, word_type Z) {
                         return (X & Y) | ((X | Y) & Z);
-                        //return (X & Y) | (X & Z) | (Y & Z);
+                        // return (X & Y) | (X & Z) | (Y & Z);
                     }
 
                     inline static word_type gg1(word_type X, word_type Y, word_type Z) {
-                        //return (X & Y) | (~X & Z);
+                        // return (X & Y) | (~X & Z);
                         return ((Z ^ (X & (Y ^ Z))));
                     }
 
@@ -72,9 +72,9 @@ namespace nil {
                         return p1(W0 ^ W7 ^ rotl<15>(W13)) ^ rotl<7>(W3) ^ W10;
                     }
                 };
-            }
-        }
-    }
-}
+            }    // namespace detail
+        }        // namespace hash
+    }            // namespace crypto3
+}    // namespace nil
 
-#endif //CRYPTO3_SM3_FUNCTIONS_HPP
+#endif    // CRYPTO3_SM3_FUNCTIONS_HPP

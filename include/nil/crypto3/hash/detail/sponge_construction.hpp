@@ -32,7 +32,10 @@ namespace nil {
              * For a Wide Pipe construction, use a digest that will
              * truncate the internal state.
              */
-            template<typename Params, typename IV, typename Compressor, typename Padding,
+            template<typename Params,
+                     typename IV,
+                     typename Compressor,
+                     typename Padding,
                      typename Finalizer = detail::nop_finalizer>
             class sponge_construction {
             public:

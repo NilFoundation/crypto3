@@ -15,12 +15,10 @@ namespace nil {
     namespace crypto3 {
         namespace hash {
             namespace detail {
-                struct whirlpool_functions : public ::nil::crypto3::detail::basic_functions<64> {
+                struct whirlpool_functions : public ::nil::crypto3::detail::basic_functions<64> { };
+            }    // namespace detail
+        }        // namespace hash
+    }            // namespace crypto3
+}    // namespace nil
 
-                };
-            }
-        }
-    }
-}
-
-#endif //CRYPTO3_WHIRLPOOL_FUNCTIONS_HPP
+#endif    // CRYPTO3_WHIRLPOOL_FUNCTIONS_HPP

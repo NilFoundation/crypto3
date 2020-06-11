@@ -16,7 +16,7 @@ namespace nil {
         namespace hash {
             namespace detail {
                 template<std::size_t DigestBits>
-                struct skein_512_functions : public ::nil::crypto3::detail::basic_functions<64> {};
+                struct skein_512_functions : public ::nil::crypto3::detail::basic_functions<64> { };
             }    // namespace detail
         }        // namespace hash
     }            // namespace crypto3

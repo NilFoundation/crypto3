@@ -75,16 +75,14 @@ namespace nil {
                         // Remove garbage
                         std::size_t w_rem = word_seen % UnitBits;
                         std::size_t w_unit_bits = word_seen - w_rem;
-                        word_type mask =
-                            low_bits<word_bits>(~word_type(), w_unit_bits) |
-                            (low_bits<word_bits>(~word_type(), w_rem) << (w_unit_bits + UnitBits - w_rem));
+                        word_type mask = low_bits<word_bits>(~word_type(), w_unit_bits) |
+                                         (low_bits<word_bits>(~word_type(), w_rem) << (w_unit_bits + UnitBits - w_rem));
                         w &= mask;
 
                         std::size_t b_rem = last_word_seen % UnitBits;
                         std::size_t b_unit_bits = last_word_seen - b_rem;
-                        mask =
-                            low_bits<word_bits>(~word_type(), b_unit_bits) |
-                            (low_bits<word_bits>(~word_type(), b_rem) << (b_unit_bits + UnitBits - b_rem));
+                        mask = low_bits<word_bits>(~word_type(), b_unit_bits) |
+                               (low_bits<word_bits>(~word_type(), b_rem) << (b_unit_bits + UnitBits - b_rem));
                         b[last_word_ind] &= mask;
 
                         // Split and combine parts of unit values
@@ -156,9 +154,8 @@ namespace nil {
                         w &= mask;
                         std::size_t b_rem = last_word_seen % UnitBits;
                         std::size_t b_unit_bits = last_word_seen - b_rem;
-                        mask =
-                            high_bits<word_bits>(~word_type(), b_unit_bits) |
-                            (high_bits<word_bits>(~word_type(), b_rem) >> (b_unit_bits + UnitBits - b_rem));
+                        mask = high_bits<word_bits>(~word_type(), b_unit_bits) |
+                               (high_bits<word_bits>(~word_type(), b_rem) >> (b_unit_bits + UnitBits - b_rem));
                         b[last_word_ind] &= mask;
 
                         // Split and combine parts of unit values

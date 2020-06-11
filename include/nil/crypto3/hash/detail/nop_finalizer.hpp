@@ -12,15 +12,15 @@
 namespace nil {
     namespace crypto3 {
         namespace hash {
-        	namespace detail {
-	            struct nop_finalizer {
-	                template<typename T>
-	                void operator()(T &) {
-	                }
-	            };
-        	}	// namespace detail
-        }    	// namespace hash
-    }        // namespace crypto3
+            namespace detail {
+                struct nop_finalizer {
+                    template<typename T>
+                    void operator()(T &) {
+                    }
+                };
+            }    // namespace detail
+        }        // namespace hash
+    }            // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_NOP_FINALIZER_HPP

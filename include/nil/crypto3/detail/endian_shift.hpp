@@ -30,7 +30,7 @@ namespace nil {
                 constexpr static const std::size_t word_bits = basic_functions<WordBits>::word_bits;
                 typedef typename basic_functions<WordBits>::word_type word_type;
 
-                static word_type& to_msb(word_type& w, std::size_t shift) {
+                static word_type &to_msb(word_type &w, std::size_t shift) {
                     // shift to most significant bits according to endianness
                     w <<= shift;
                     return w;
@@ -44,7 +44,7 @@ namespace nil {
                 constexpr static const std::size_t word_bits = basic_functions<WordBits>::word_bits;
                 typedef typename basic_functions<WordBits>::word_type word_type;
 
-                static word_type& to_msb(word_type& w, std::size_t shift) {
+                static word_type &to_msb(word_type &w, std::size_t shift) {
                     // shift to most significant bits according to endianness
                     std::size_t shift_rem = shift % UnitBits;
                     std::size_t shift_unit_bits = shift - shift_rem;
@@ -77,7 +77,7 @@ namespace nil {
                 constexpr static const std::size_t word_bits = basic_functions<WordBits>::word_bits;
                 typedef typename basic_functions<WordBits>::word_type word_type;
 
-                static word_type& to_msb(word_type& w, std::size_t shift) {
+                static word_type &to_msb(word_type &w, std::size_t shift) {
                     // shift to most significant bits according to endianness
                     std::size_t shift_rem = shift % UnitBits;
                     std::size_t shift_unit_bits = shift - shift_rem;
@@ -110,7 +110,7 @@ namespace nil {
                 constexpr static const std::size_t word_bits = basic_functions<WordBits>::word_bits;
                 typedef typename basic_functions<WordBits>::word_type word_type;
 
-                static word_type& to_msb(word_type& w, std::size_t shift) {
+                static word_type &to_msb(word_type &w, std::size_t shift) {
 
                     // shift to most significant bits according to endianness
                     w >>= shift;

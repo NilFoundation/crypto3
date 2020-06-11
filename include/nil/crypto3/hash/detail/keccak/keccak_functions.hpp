@@ -31,29 +31,29 @@ namespace nil {
                     static inline void permute(state_type &A) {
 
                         constexpr static const round_constants_type round_constants = {
-                        UINT64_C(0x0000000000000001), UINT64_C(0x0000000000008082), UINT64_C(0x800000000000808a),
-                        UINT64_C(0x8000000080008000), UINT64_C(0x000000000000808b), UINT64_C(0x0000000080000001),
-                        UINT64_C(0x8000000080008081), UINT64_C(0x8000000000008009), UINT64_C(0x000000000000008a),
-                        UINT64_C(0x0000000000000088), UINT64_C(0x0000000080008009), UINT64_C(0x000000008000000a),
-                        UINT64_C(0x000000008000808b), UINT64_C(0x800000000000008b), UINT64_C(0x8000000000008089),
-                        UINT64_C(0x8000000000008003), UINT64_C(0x8000000000008002), UINT64_C(0x8000000000000080),
-                        UINT64_C(0x000000000000800a), UINT64_C(0x800000008000000a), UINT64_C(0x8000000080008081),
-                        UINT64_C(0x8000000000008080), UINT64_C(0x0000000080000001), UINT64_C(0x8000000080008008)};
+                            UINT64_C(0x0000000000000001), UINT64_C(0x0000000000008082), UINT64_C(0x800000000000808a),
+                            UINT64_C(0x8000000080008000), UINT64_C(0x000000000000808b), UINT64_C(0x0000000080000001),
+                            UINT64_C(0x8000000080008081), UINT64_C(0x8000000000008009), UINT64_C(0x000000000000008a),
+                            UINT64_C(0x0000000000000088), UINT64_C(0x0000000080008009), UINT64_C(0x000000008000000a),
+                            UINT64_C(0x000000008000808b), UINT64_C(0x800000000000008b), UINT64_C(0x8000000000008089),
+                            UINT64_C(0x8000000000008003), UINT64_C(0x8000000000008002), UINT64_C(0x8000000000000080),
+                            UINT64_C(0x000000000000800a), UINT64_C(0x800000008000000a), UINT64_C(0x8000000080008081),
+                            UINT64_C(0x8000000000008080), UINT64_C(0x0000000080000001), UINT64_C(0x8000000080008008)};
 
                         for (typename round_constants_type::value_type c : round_constants) {
-                            const word_type C0 = A[0] ^A[5] ^A[10] ^A[15] ^A[20];
-                            const word_type C1 = A[1] ^A[6] ^A[11] ^A[16] ^A[21];
-                            const word_type C2 = A[2] ^A[7] ^A[12] ^A[17] ^A[22];
-                            const word_type C3 = A[3] ^A[8] ^A[13] ^A[18] ^A[23];
-                            const word_type C4 = A[4] ^A[9] ^A[14] ^A[19] ^A[24];
+                            const word_type C0 = A[0] ^ A[5] ^ A[10] ^ A[15] ^ A[20];
+                            const word_type C1 = A[1] ^ A[6] ^ A[11] ^ A[16] ^ A[21];
+                            const word_type C2 = A[2] ^ A[7] ^ A[12] ^ A[17] ^ A[22];
+                            const word_type C3 = A[3] ^ A[8] ^ A[13] ^ A[18] ^ A[23];
+                            const word_type C4 = A[4] ^ A[9] ^ A[14] ^ A[19] ^ A[24];
 
-                            const word_type D0 = policy_type::template rotl<1>(C0) ^C3;
-                            const word_type D1 = policy_type::template rotl<1>(C1) ^C4;
-                            const word_type D2 = policy_type::template rotl<1>(C2) ^C0;
-                            const word_type D3 = policy_type::template rotl<1>(C3) ^C1;
-                            const word_type D4 = policy_type::template rotl<1>(C4) ^C2;
+                            const word_type D0 = policy_type::template rotl<1>(C0) ^ C3;
+                            const word_type D1 = policy_type::template rotl<1>(C1) ^ C4;
+                            const word_type D2 = policy_type::template rotl<1>(C2) ^ C0;
+                            const word_type D3 = policy_type::template rotl<1>(C3) ^ C1;
+                            const word_type D4 = policy_type::template rotl<1>(C4) ^ C2;
 
-                            const word_type B00 = A[0] ^D1;
+                            const word_type B00 = A[0] ^ D1;
                             const word_type B10 = policy_type::template rotl<1>(A[1] ^ D2);
                             const word_type B20 = policy_type::template rotl<62>(A[2] ^ D3);
                             const word_type B05 = policy_type::template rotl<28>(A[3] ^ D4);
@@ -109,9 +109,9 @@ namespace nil {
                         }
                     }
                 };
-            }
-        }
-    }
-}
+            }    // namespace detail
+        }        // namespace hash
+    }            // namespace crypto3
+}    // namespace nil
 
-#endif //CRYPTO3_KECCAK_FUNCTIONS_HPP
+#endif    // CRYPTO3_KECCAK_FUNCTIONS_HPP
