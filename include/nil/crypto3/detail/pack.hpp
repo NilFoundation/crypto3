@@ -324,7 +324,7 @@ namespace nil {
              * @tparam OutputEndianness
              * @tparam InputValueBits
              * @tparam OutputValueBits
-             * @tparam Dummy
+             * @tparam SameEndianness
              */
             template<typename InputEndianness, typename OutputEndianness, std::size_t InputValueBits,
                      std::size_t OutputValueBits, bool SameEndianness>
@@ -371,7 +371,7 @@ namespace nil {
              * @tparam OutputEndianness
              * @tparam InputValueBits
              * @tparam OutputValueBits
-             * @tparam Dummy
+             * @tparam SameEndianness
              */
             template<typename InputEndianness, typename OutputEndianness, std::size_t InputValueBits,
                      std::size_t OutputValueBits, bool SameEndianness>
