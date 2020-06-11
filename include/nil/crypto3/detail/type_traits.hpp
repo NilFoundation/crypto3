@@ -18,9 +18,9 @@
         using No = char[1];                                                           \
                                                                                       \
         struct Fallback {                                                             \
-            struct Type {};                                                           \
+            struct Type { };                                                          \
         };                                                                            \
-        struct Derived : T, Fallback {};                                              \
+        struct Derived : T, Fallback { };                                             \
                                                                                       \
         template<class U>                                                             \
         static No &test(typename U::Type *);                                          \
@@ -32,7 +32,7 @@
     };                                                                                \
                                                                                       \
     template<class T>                                                                 \
-    struct has_##Type : public std::integral_constant<bool, HasMemberType_##Type<T>::RESULT> {};
+    struct has_##Type : public std::integral_constant<bool, HasMemberType_##Type<T>::RESULT> { };
 
 #define GENERATE_HAS_MEMBER(member)                                                   \
                                                                                       \
@@ -45,7 +45,7 @@
         struct Fallback {                                                             \
             int member;                                                               \
         };                                                                            \
-        struct Derived : T, Fallback {};                                              \
+        struct Derived : T, Fallback { };                                             \
                                                                                       \
         template<class U>                                                             \
         static No &test(decltype(U::member) *);                                       \
@@ -57,7 +57,7 @@
     };                                                                                \
                                                                                       \
     template<class T>                                                                 \
-    struct has_##member : public std::integral_constant<bool, HasMember_##member<T>::RESULT> {};
+    struct has_##member : public std::integral_constant<bool, HasMember_##member<T>::RESULT> { };
 
 #define GENERATE_HAS_MEMBER_FUNCTION(Function, ...)                                  \
                                                                                      \
@@ -67,7 +67,7 @@
             void Function(##__VA_ARGS__);                                            \
         };                                                                           \
                                                                                      \
-        struct Derived : Fallback {};                                                \
+        struct Derived : Fallback { };                                               \
                                                                                      \
         template<typename C, C>                                                      \
         struct ChT;                                                                  \
@@ -89,7 +89,7 @@
             void Function(##__VA_ARGS__) const;                                            \
         };                                                                                 \
                                                                                            \
-        struct Derived : Fallback {};                                                      \
+        struct Derived : Fallback { };                                                     \
                                                                                            \
         template<typename C, C>                                                            \
         struct ChT;                                                                        \
@@ -117,7 +117,7 @@
             type Function(##__VA_ARGS__);                                                    \
         };                                                                                   \
                                                                                              \
-        struct Derived : TType, Fallback {};                                                 \
+        struct Derived : TType, Fallback { };                                                \
                                                                                              \
         template<typename C, C>                                                              \
         struct ChT;                                                                          \
@@ -145,7 +145,7 @@
             type Function(##__VA_ARGS__) const;                                              \
         };                                                                                   \
                                                                                              \
-        struct Derived : TType, Fallback {};                                                 \
+        struct Derived : TType, Fallback { };                                                \
                                                                                              \
         template<typename C, C>                                                              \
         struct ChT;                                                                          \
@@ -219,26 +219,26 @@ namespace nil {
 
             template<typename Container>
             struct is_container {
-                static const bool value
-                    = has_const_iterator<Container>::value && has_begin<Container>::value && has_end<Container>::value;
+                static const bool value =
+                    has_const_iterator<Container>::value && has_begin<Container>::value && has_end<Container>::value;
             };
 
             template<typename T>
             struct is_codec {
-                static const bool value = has_encoded_value_type<T>::value && has_encoded_value_bits<T>::value
-                                          && has_decoded_value_type<T>::value && has_decoded_value_bits<T>::value
-                                          && has_encoded_block_type<T>::value && has_encoded_block_bits<T>::value
-                                          && has_decoded_block_type<T>::value && has_decoded_block_bits<T>::value
-                                          && has_encode<T>::value && has_decode<T>::value;
+                static const bool value = has_encoded_value_type<T>::value && has_encoded_value_bits<T>::value &&
+                                          has_decoded_value_type<T>::value && has_decoded_value_bits<T>::value &&
+                                          has_encoded_block_type<T>::value && has_encoded_block_bits<T>::value &&
+                                          has_decoded_block_type<T>::value && has_decoded_block_bits<T>::value &&
+                                          has_encode<T>::value && has_decode<T>::value;
                 typedef T type;
             };
 
             template<typename T>
             struct is_block_cipher {
-                static const bool value = has_word_type<T>::value && has_word_bits<T>::value && has_block_type<T>::value
-                                          && has_block_bits<T>::value && has_key_type<T>::value
-                                          && has_key_bits<T>::value && has_rounds<T>::value && has_encrypt<T>::value
-                                          && has_decrypt<T>::value;
+                static const bool value = has_word_type<T>::value && has_word_bits<T>::value &&
+                                          has_block_type<T>::value && has_block_bits<T>::value &&
+                                          has_key_type<T>::value && has_key_bits<T>::value && has_rounds<T>::value &&
+                                          has_encrypt<T>::value && has_decrypt<T>::value;
                 typedef T type;
             };
 
@@ -263,25 +263,25 @@ namespace nil {
                 static two test_construction_params(...);
 
             public:
-                static const bool value = has_digest_type<T>::value && has_digest_bits<T>::value
-                                          && sizeof(test_construction_type<T>(0)) == sizeof(one)
-                                          && sizeof(test_construction_params<T>(0)) == sizeof(one);
+                static const bool value = has_digest_type<T>::value && has_digest_bits<T>::value &&
+                                          sizeof(test_construction_type<T>(0)) == sizeof(one) &&
+                                          sizeof(test_construction_params<T>(0)) == sizeof(one);
                 typedef T type;
             };
 
             template<typename T>
             struct is_mac {
-                static const bool value = has_digest_type<T>::value && has_digest_bits<T>::value
-                                          && has_block_type<T>::value && has_block_bits<T>::value
-                                          && has_key_type<T>::value && has_key_bits<T>::value;
+                static const bool value = has_digest_type<T>::value && has_digest_bits<T>::value &&
+                                          has_block_type<T>::value && has_block_bits<T>::value &&
+                                          has_key_type<T>::value && has_key_bits<T>::value;
                 typedef T type;
             };
 
             template<typename T>
             struct is_kdf {
-                static const bool value = has_digest_type<T>::value && has_digest_bits<T>::value
-                                          && has_key_type<T>::value && has_max_key_bits<T>::value
-                                          && has_min_key_bits<T>::value;
+                static const bool value = has_digest_type<T>::value && has_digest_bits<T>::value &&
+                                          has_key_type<T>::value && has_max_key_bits<T>::value &&
+                                          has_min_key_bits<T>::value;
                 typedef T type;
             };
 

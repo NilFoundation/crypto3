@@ -57,9 +57,6 @@ namespace nil {
                     typedef ::nil::crypto3::detail::injector<endian_type, value_bits, block_values, 
                         block_bits> injector_type;
 
-                    typedef ::nil::crypto3::detail::packer<endian_type, endian_type, value_bits, octet_bits> 
-                        packer_type;
-
                 public:
                     typedef digest<block_bits> result_type;
 
@@ -83,8 +80,8 @@ namespace nil {
  
                         res = ::nil::crypto3::resize<block_bits>(res, res.size() + block_values);
 
-                        packer_type::pack(processed_block.begin(), processed_block.end(), 
-                            res.end() - block_values);
+                        pack<endian_type, endian_type, value_bits, octet_bits>(
+                            processed_block.begin(), processed_block.end(), res.end() - block_values);
 
                         return res;
                     }
@@ -110,8 +107,8 @@ namespace nil {
 
                         dgst = ::nil::crypto3::resize<block_bits>(dgst, dgst.size() + block_values);
 
-                        packer_type::pack(processed_block.begin(), processed_block.end(), 
-                            dgst.end() - block_values);
+                        pack<endian_type, endian_type, value_bits, octet_bits>(
+                            processed_block.begin(), processed_block.end(), dgst.end() - block_values);
 
                         filled = false;
                     }

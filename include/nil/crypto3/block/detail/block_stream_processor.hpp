@@ -56,9 +56,6 @@ namespace nil {
                 BOOST_STATIC_ASSERT(input_block_bits % value_bits == 0);
 
                 BOOST_STATIC_ASSERT(!length_bits || value_bits <= length_bits);
-
-                typedef ::nil::crypto3::detail::packer<input_endian_type, endian_type, value_bits, 
-                    input_block_bits / block_values> packer_type;
 /*
                 template<typename Endianness = input_endian_type>
                 typename std::enable_if<!(Endianness == stream_endian::big_octet_big_bit)>::type
@@ -79,13 +76,16 @@ namespace nil {
 
 
                 void update_one(value_type value) {
+                    using namespace nil::crypto3::detail;
+
                     std::size_t i = seen % input_block_bits;
                     cache[i / value_bits] = value;
                     seen += value_bits;
                     if (i == input_block_bits - value_bits) {
                         // Convert the input into words
                         input_block_type block = {0};
-                        packer_type::pack(cache.begin(), cache.end(), block.begin());
+                        pack<input_endian_type, endian_type, value_bits, input_block_bits / block_values>(
+                            cache.begin(), cache.end(), block.begin());
 
                         // Process the block
                         state(block);
@@ -99,6 +99,8 @@ namespace nil {
 
                 template<typename InputIterator>
                 inline void update_n(InputIterator first, InputIterator last) {
+                    using namespace nil::crypto3::detail;
+                    
                     std::size_t n = std::distance(first, last);
 #ifndef CRYPTO3_BLOCK_NO_OPTIMIZATION
 #pragma clang loop unroll(full)
@@ -109,7 +111,8 @@ namespace nil {
                     for (; n >= block_values; n -= block_values, first += block_values) {
                         // Convert the input into words
                         input_block_type block = {0};
-                        packer_type::pack(first, first + block_values, block.begin());
+                        pack<input_endian_type, endian_type, value_bits, input_block_bits / block_values>(
+                            first, first + block_values, block.begin());
                         seen += value_bits * block_values;
 
                         state(block);

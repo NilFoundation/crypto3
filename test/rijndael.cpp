@@ -224,54 +224,53 @@ public:
     cipher_fixture(const char *ck, const char *cp, const char *cc) {
         byte_string const k(ck), p(cp), c(cc);
 
-        packer<stream_endian::big_octet_big_bit, endian_type, CHAR_BIT, key_value_bits>::pack(k.begin(), 
-            k.end(), key.begin());
+        pack<stream_endian::big_octet_big_bit, endian_type, CHAR_BIT, key_value_bits>(k.begin(), k.end(),
+            key.begin());
 
-        packer<stream_endian::big_octet_big_bit, NativeEndianT, CHAR_BIT, input_value_bits>::pack(p.begin(), 
-            p.end(), input_plaintext.begin());
+        pack<stream_endian::big_octet_big_bit, NativeEndianT, CHAR_BIT, input_value_bits>(p.begin(), p.end(),
+            input_plaintext.begin());
 
-        packer<stream_endian::big_octet_big_bit, NativeEndianT, CHAR_BIT, input_value_bits>::pack(c.begin(), 
-            c.end(), input_ciphertext.begin());
+        pack<stream_endian::big_octet_big_bit, NativeEndianT, CHAR_BIT, input_value_bits>(c.begin(), c.end(),
+            input_ciphertext.begin());
     }
 
     cipher_fixture(const byte_string &k, const byte_string &p, const byte_string &c) {
-        packer<stream_endian::big_octet_big_bit, endian_type, CHAR_BIT, key_value_bits>::pack(k.begin(), 
-            k.end(), key.begin());        
+        pack<stream_endian::big_octet_big_bit, endian_type, CHAR_BIT, key_value_bits>(k.begin(), k.end(),
+            key.begin());        
 
-        packer<stream_endian::big_octet_big_bit, NativeEndianT, CHAR_BIT, input_value_bits>::pack(p.begin(), 
-            p.end(), input_plaintext.begin());
+        pack<stream_endian::big_octet_big_bit, NativeEndianT, CHAR_BIT, input_value_bits>(p.begin(), p.end(),
+            input_plaintext.begin());
 
-        packer<stream_endian::big_octet_big_bit, NativeEndianT, CHAR_BIT, input_value_bits>::pack(c.begin(), 
-            c.end(), input_ciphertext.begin());
+        pack<stream_endian::big_octet_big_bit, NativeEndianT, CHAR_BIT, input_value_bits>(c.begin(), c.end(),
+            input_ciphertext.begin());
     }
 
     cipher_fixture(const InputKeyT &k, const InputBlockT &p, const InputBlockT &c) : input_plaintext(p), 
         input_ciphertext(c) {
-        packer<NativeEndianT, endian_type, input_key_value_bits, key_value_bits>::pack(k.begin(), k.end(), 
-            key.begin());
+        pack<NativeEndianT, endian_type, input_key_value_bits, key_value_bits>(k.begin(), k.end(), key.begin());
     }
 
     void encrypt() {
         std::vector<block_value_type> block_data(input_plaintext.size() * 
             sizeof(input_value_type) / sizeof(block_value_type));
-        packer<NativeEndianT, endian_type, input_value_bits, block_value_bits>::pack(input_plaintext.begin(), 
+        pack<NativeEndianT, endian_type, input_value_bits, block_value_bits>(input_plaintext.begin(), 
             input_plaintext.end(), block_data.begin());
 
         encrypt_type ciphertext = ::nil::crypto3::encrypt<block_cipher>(block_data, key);
 
-        packer<endian_type, NativeEndianT, encrypt_value_bits, input_value_bits>::pack(ciphertext.begin(), 
+        pack<endian_type, NativeEndianT, encrypt_value_bits, input_value_bits>(ciphertext.begin(), 
             ciphertext.end(), output_ciphertext.begin());
     }
 
     void decrypt() {
         std::vector<block_value_type> block_data(input_ciphertext.size() * 
             sizeof(input_value_type) / sizeof(block_value_type));
-        packer<NativeEndianT, endian_type, input_value_bits, block_value_bits>::pack(input_ciphertext.begin(),
+        pack<NativeEndianT, endian_type, input_value_bits, block_value_bits>(input_ciphertext.begin(),
             input_ciphertext.end(), block_data.begin());
 
         decrypt_type plaintext = ::nil::crypto3::decrypt<block_cipher>(block_data, key);
 
-        packer<endian_type, NativeEndianT, decrypt_value_bits, input_value_bits>::pack(plaintext.begin(),
+        pack<endian_type, NativeEndianT, decrypt_value_bits, input_value_bits>(plaintext.begin(),
             plaintext.end(), output_plaintext.begin());
     }
 
