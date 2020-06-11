@@ -32,12 +32,12 @@ namespace nil {
 
             typedef typename boost::uint_t<CHAR_BIT>::exact byte_type;
 
-             /*!
+            /*!
              * @brief This function reverses bit order in the byte b depending on the machine word size.
              * The underlying algorithms used in this function are described in
              * http://graphics.stanford.edu/~seander/bithacks.html#ReverseByteWith32Bits and in
              * http://graphics.stanford.edu/~seander/bithacks.html#ReverseByteWith64BitsDiv .
-             * 
+             *
              * @ingroup reverser
              *
              * @param b
@@ -53,13 +53,13 @@ namespace nil {
 #endif
             }
 
-             /*!
-             * @brief bit_in_unit_byte_reverser transforms the sequence of bits in each byte of 
+            /*!
+             * @brief bit_in_unit_byte_reverser transforms the sequence of bits in each byte of
              * the input unit into reversed sequence of bits in each byte of the output unit.
              * The function reverse is recursively invoked and the parameter k is used to track
              * the number of already processed input bytes. The recursion ends, when all input
              * bytes have been processed, i.e. when k == UnitBits.
-             * 
+             *
              * @ingroup reverser
              *
              * @tparam UnitBits
@@ -86,7 +86,7 @@ namespace nil {
             template<int UnitBits>
             struct bit_in_unit_byte_reverser<UnitBits, UnitBits> {
                 inline static void reverse(typename boost::uint_t<UnitBits>::exact &,
-                    typename boost::uint_t<UnitBits>::exact &) {
+                                           typename boost::uint_t<UnitBits>::exact &) {
                 }
             };
 
@@ -96,9 +96,9 @@ namespace nil {
 
             /*!
              * @brief This function deals with the case of UnitBits > CHAR_BIT. To reverse
-             * the order of bits, first, it reverses the byte order of unit, and then, it 
-             * invokes bit_in_unit_byte_reverser to reverse bits in each byte of unit. 
-             * 
+             * the order of bits, first, it reverses the byte order of unit, and then, it
+             * invokes bit_in_unit_byte_reverser to reverse bits in each byte of unit.
+             *
              * @ingroup reverser
              *
              * @tparam UnitType
@@ -108,8 +108,9 @@ namespace nil {
              *
              * @return
              */
-            template<typename UnitType, int UnitBits = sizeof(UnitType) * CHAR_BIT, 
-                     typename boost::enable_if_c<(UnitBits > CHAR_BIT), int>::type = 0>
+            template<typename UnitType,
+                     int UnitBits = sizeof(UnitType) * CHAR_BIT,
+                     typename std::enable_if<(UnitBits > CHAR_BIT), int>::type = 0>
             inline void reverse_bits(UnitType &unit) {
                 boost::endian::endian_reverse_inplace(unit);
                 UnitType out = UnitType();
@@ -117,7 +118,7 @@ namespace nil {
                 unit = out;
             }
             /*!
-             * @brief This function deals with the special case of UnitBits == CHAR_BIT, 
+             * @brief This function deals with the special case of UnitBits == CHAR_BIT,
              * it just reverses the bit order in the byte.
              * @ingroup reverser
              *
@@ -128,19 +129,20 @@ namespace nil {
              *
              * @return
              */
-            template<typename UnitType, int UnitBits = sizeof(UnitType) * CHAR_BIT, 
-                     typename boost::enable_if_c<(UnitBits == CHAR_BIT), int>::type = 0>
+            template<typename UnitType,
+                     int UnitBits = sizeof(UnitType) * CHAR_BIT,
+                     typename std::enable_if<(UnitBits == CHAR_BIT), int>::type = 0>
             inline void reverse_bits(UnitType &unit) {
                 reverse_byte(unit);
             }
 
             /*!
-             * @brief bit_in_unit_reverser transforms the sequence of bits in each unit of 
+             * @brief bit_in_unit_reverser transforms the sequence of bits in each unit of
              * the input value into reversed sequence of bytes in each unit of the output value.
              * The function reverse is recursively invoked and the parameter k is used to track
              * the number of already processed input units. The recursion ends, when all input
              * units have been processed, i.e. when k == InputBits.
-             * 
+             *
              * @ingroup reverser
              *
              * @tparam InputBits
@@ -181,7 +183,7 @@ namespace nil {
             /*!
              * @brief Trait to determine whether the order of bits defined by Endianness endianness
              * is big.
-             * 
+             *
              * @ingroup reverser
              *
              * @tparam Endianness
@@ -189,15 +191,15 @@ namespace nil {
              */
             template<typename Endianness, int UnitBits>
             struct is_big_bit {
-                constexpr static const bool value = 
-                    boost::is_same<Endianness, stream_endian::big_unit_big_bit<UnitBits>>::value || 
-                    boost::is_same<Endianness, stream_endian::little_unit_big_bit<UnitBits>>::value;
+                constexpr static const bool value =
+                    std::is_same<Endianness, stream_endian::big_unit_big_bit<UnitBits>>::value ||
+                    std::is_same<Endianness, stream_endian::little_unit_big_bit<UnitBits>>::value;
             };
 
             /*!
              * @brief Trait to determine whether the order of bits defined by Endianness endianness
              * is little.
-             * 
+             *
              * @ingroup reverser
              *
              * @tparam Endianness
@@ -205,15 +207,15 @@ namespace nil {
              */
             template<typename Endianness, int UnitBits>
             struct is_little_bit {
-                constexpr static const bool value = 
-                    boost::is_same<Endianness, stream_endian::big_unit_little_bit<UnitBits>>::value || 
-                    boost::is_same<Endianness, stream_endian::little_unit_little_bit<UnitBits>>::value;
+                constexpr static const bool value =
+                    std::is_same<Endianness, stream_endian::big_unit_little_bit<UnitBits>>::value ||
+                    std::is_same<Endianness, stream_endian::little_unit_little_bit<UnitBits>>::value;
             };
 
             /*!
              * @brief Trait to determine whether the orders of bits defined by Endianness1 endianness
              * and Endianness2 endianness are the same.
-             * 
+             *
              * @ingroup reverser
              *
              * @tparam Endianness1
@@ -222,16 +224,16 @@ namespace nil {
              */
             template<typename Endianness1, typename Endianness2, int UnitBits>
             struct is_same_bit {
-                constexpr static const bool value = 
-                    (is_big_bit<Endianness1, UnitBits>::value && is_big_bit<Endianness2, UnitBits>::value) || 
+                constexpr static const bool value =
+                    (is_big_bit<Endianness1, UnitBits>::value && is_big_bit<Endianness2, UnitBits>::value) ||
                     (is_little_bit<Endianness1, UnitBits>::value && is_little_bit<Endianness2, UnitBits>::value);
             };
 
             /*!
-             * @brief bit_reverser reverses the sequence of bits in each unit of the given value, 
-             * if InputEndianness and OutputEndianness endiannesses have different bit orders, and 
+             * @brief bit_reverser reverses the sequence of bits in each unit of the given value,
+             * if InputEndianness and OutputEndianness endiannesses have different bit orders, and
              * does nothing, otherwise.
-             * 
+             *
              * @ingroup reverser
              *
              * @tparam InputEndianness
@@ -239,14 +241,16 @@ namespace nil {
              * @tparam UnitBits
              * @tparam IsSameBit
              */
-            template<typename InputEndianness, typename OutputEndianness, int UnitBits, 
-            bool IsSameBit = is_same_bit<InputEndianness, OutputEndianness, UnitBits>::value>
+            template<typename InputEndianness,
+                     typename OutputEndianness,
+                     int UnitBits,
+                     bool IsSameBit = is_same_bit<InputEndianness, OutputEndianness, UnitBits>::value>
             struct bit_reverser;
 
             /*!
-             * @brief This bit_reverser is a dummy and deals with the case of the endiannesses with 
+             * @brief This bit_reverser is a dummy and deals with the case of the endiannesses with
              * the same order of bits.
-             * 
+             *
              * @ingroup reverser
              *
              * @tparam InputEndianness
@@ -266,9 +270,9 @@ namespace nil {
             };
 
             /*!
-             * @brief This bit_reverser deals with the case of the endiannesses with different order of 
+             * @brief This bit_reverser deals with the case of the endiannesses with different order of
              * bits and invokes bit_in_unit_reverser which reverses bits in each unit of the input value.
-             * 
+             *
              * @ingroup reverser
              *
              * @tparam InputEndianness
@@ -294,12 +298,12 @@ namespace nil {
             };
 
             /*!
-             * @brief byte_in_unit_reverser transforms the sequence of bytes in each unit of 
+             * @brief byte_in_unit_reverser transforms the sequence of bytes in each unit of
              * the input value into reversed sequence of bytes in each unit of the output value.
              * The function reverse is recursively invoked and the parameter k is used to track
              * the number of already processed input units. The recursion ends, when all input
              * units have been processed, i.e. when k == InputBits.
-             * 
+             *
              * @ingroup reverser
              *
              * @tparam InputBits
@@ -340,7 +344,7 @@ namespace nil {
             /*!
              * @brief Trait to determine whether the order of units defined by Endianness endianness
              * is big.
-             * 
+             *
              * @ingroup reverser
              *
              * @tparam Endianness
@@ -348,15 +352,15 @@ namespace nil {
              */
             template<typename Endianness, int UnitBits>
             struct is_big_unit {
-                constexpr static const bool value = 
-                    boost::is_same<Endianness, stream_endian::big_unit_big_bit<UnitBits>>::value || 
-                    boost::is_same<Endianness, stream_endian::big_unit_little_bit<UnitBits>>::value;
+                constexpr static const bool value =
+                    std::is_same<Endianness, stream_endian::big_unit_big_bit<UnitBits>>::value ||
+                    std::is_same<Endianness, stream_endian::big_unit_little_bit<UnitBits>>::value;
             };
 
             /*!
              * @brief Trait to determine whether the order of units defined by Endianness endianness
              * is little.
-             * 
+             *
              * @ingroup reverser
              *
              * @tparam Endianness
@@ -364,15 +368,15 @@ namespace nil {
              */
             template<typename Endianness, int UnitBits>
             struct is_little_unit {
-                constexpr static const bool value = 
-                    boost::is_same<Endianness, stream_endian::little_unit_big_bit<UnitBits>>::value || 
-                    boost::is_same<Endianness, stream_endian::little_unit_little_bit<UnitBits>>::value;
+                constexpr static const bool value =
+                    std::is_same<Endianness, stream_endian::little_unit_big_bit<UnitBits>>::value ||
+                    std::is_same<Endianness, stream_endian::little_unit_little_bit<UnitBits>>::value;
             };
 
             /*!
              * @brief Trait to determine whether the orders of units defined by Endianness1 endianness
              * and Endianness2 endianness are the same.
-             * 
+             *
              * @ingroup reverser
              *
              * @tparam Endianness1
@@ -381,16 +385,15 @@ namespace nil {
              */
             template<typename Endianness1, typename Endianness2, int UnitBits>
             struct is_same_unit {
-                constexpr static const bool value = 
-                    (is_big_unit<Endianness1, UnitBits>::value && is_big_unit<Endianness2, UnitBits>::value) || 
+                constexpr static const bool value =
+                    (is_big_unit<Endianness1, UnitBits>::value && is_big_unit<Endianness2, UnitBits>::value) ||
                     (is_little_unit<Endianness1, UnitBits>::value && is_little_unit<Endianness2, UnitBits>::value);
             };
 
-            
             /*!
-             * @brief unit_reverser reverses the sequence of units in the given value, if InputEndianness 
+             * @brief unit_reverser reverses the sequence of units in the given value, if InputEndianness
              * and OutputEndianness endiannesses have different unit orders, and does nothing, otherwise.
-             * 
+             *
              * @ingroup reverser
              *
              * @tparam InputEndianness
@@ -402,9 +405,9 @@ namespace nil {
             struct unit_reverser;
 
             /*!
-             * @brief This unit_reverser is a dummy and deals with the case of the endiannesses with 
-             * the same order of units. 
-             * 
+             * @brief This unit_reverser is a dummy and deals with the case of the endiannesses with
+             * the same order of units.
+             *
              * @ingroup reverser
              *
              * @tparam InputEndianness
@@ -412,9 +415,11 @@ namespace nil {
              * @tparam UnitBits
              */
             template<typename InputEndianness, typename OutputEndianness, int UnitBits>
-            struct unit_reverser<InputEndianness, OutputEndianness, UnitBits, 
-                typename boost::enable_if_c<is_same_unit<InputEndianness, OutputEndianness, 
-                                            UnitBits>::value>::type> {
+            struct unit_reverser<
+                InputEndianness,
+                OutputEndianness,
+                UnitBits,
+                typename std::enable_if<is_same_unit<InputEndianness, OutputEndianness, UnitBits>::value>::type> {
                 template<typename ValueType>
                 inline static void reverse(ValueType &) {
                 }
@@ -427,8 +432,8 @@ namespace nil {
 
             /*!
              * @brief This unit_reverser deals with the case of UnitBits == CHAR_BIT. This case is
-             * special since it is sufficient to reverse the order of bytes in an input value. 
-             * 
+             * special since it is sufficient to reverse the order of bytes in an input value.
+             *
              * @ingroup reverser
              *
              * @tparam InputEndianness
@@ -436,9 +441,12 @@ namespace nil {
              * @tparam UnitBits
              */
             template<typename InputEndianness, typename OutputEndianness, int UnitBits>
-            struct unit_reverser<InputEndianness, OutputEndianness, UnitBits, 
-                typename boost::enable_if_c<!is_same_unit<InputEndianness, OutputEndianness, UnitBits>::value 
-                                            && UnitBits == CHAR_BIT>::type> {
+            struct unit_reverser<
+                InputEndianness,
+                OutputEndianness,
+                UnitBits,
+                typename std::enable_if<!is_same_unit<InputEndianness, OutputEndianness, UnitBits>::value &&
+                                        UnitBits == CHAR_BIT>::type> {
                 template<typename ValueType>
                 inline static void reverse(ValueType &val) {
                     boost::endian::endian_reverse_inplace(val);
@@ -451,10 +459,10 @@ namespace nil {
             };
 
             /*!
-             * @brief This unit_reverser deals with the case of UnitBits > CHAR_BIT. To reverse the 
-             * order of units, first, it reverses the byte order in an input value, and then, it 
+             * @brief This unit_reverser deals with the case of UnitBits > CHAR_BIT. To reverse the
+             * order of units, first, it reverses the byte order in an input value, and then, it
              * invokes byte_in_unit_reverser to reverse the byte order in each unit of the input value.
-             * 
+             *
              * @ingroup reverser
              *
              * @tparam InputEndianness
@@ -462,9 +470,12 @@ namespace nil {
              * @tparam UnitBits
              */
             template<typename InputEndianness, typename OutputEndianness, int UnitBits>
-            struct unit_reverser<InputEndianness, OutputEndianness, UnitBits, 
-                typename boost::enable_if_c<!is_same_unit<InputEndianness, OutputEndianness, UnitBits>::value 
-                                            && (UnitBits > CHAR_BIT)>::type> {
+            struct unit_reverser<
+                InputEndianness,
+                OutputEndianness,
+                UnitBits,
+                typename std::enable_if<!is_same_unit<InputEndianness, OutputEndianness, UnitBits>::value &&
+                                        (UnitBits > CHAR_BIT)>::type> {
                 template<typename ValueType, int ValueBits = sizeof(ValueType) * CHAR_BIT>
                 inline static void reverse(ValueType &val) {
                     boost::endian::endian_reverse_inplace(val);
@@ -481,7 +492,6 @@ namespace nil {
                     return out;
                 }
             };
-
         }    // namespace detail
     }        // namespace crypto3
 }    // namespace nil

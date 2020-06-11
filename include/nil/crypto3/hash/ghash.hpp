@@ -55,10 +55,9 @@ namespace nil {
                         constexpr static const std::size_t digest_bits = policy_type::digest_bits;
                     };
 
-                    typedef merkle_damgard_construction<
-                        params_type, typename policy_type::iv_generator,
-                        ghash_compressor<Allocator>,
-                        detail::merkle_damgard_padding<policy_type>>
+                    typedef merkle_damgard_construction<params_type, typename policy_type::iv_generator,
+                                                        ghash_compressor<Allocator>,
+                                                        detail::merkle_damgard_padding<policy_type>>
                         type;
                 };
 

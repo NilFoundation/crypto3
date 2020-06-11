@@ -102,8 +102,7 @@ namespace nil {
 
                     typedef merkle_damgard_construction<
                         params_type, typename policy_type::iv_generator, cubehash_compressor<r, b, h>,
-                        detail::merkle_damgard_padding<policy_type>,
-                        cubehash_finalizer<r, b, h>>
+                        detail::merkle_damgard_padding<policy_type>, cubehash_finalizer<r, b, h>>
                         type;
                 };
 
@@ -123,7 +122,7 @@ namespace nil {
             };
 
             template<unsigned h>
-            class cubehash<h, 0, 0> : cubehash<CRYPTO3_HASH_CUBEHASH_DEFAULT_R, CRYPTO3_HASH_CUBEHASH_DEFAULT_B, h> {};
+            class cubehash<h, 0, 0> : cubehash<CRYPTO3_HASH_CUBEHASH_DEFAULT_R, CRYPTO3_HASH_CUBEHASH_DEFAULT_B, h> { };
 
         }    // namespace hash
     }        // namespace crypto3

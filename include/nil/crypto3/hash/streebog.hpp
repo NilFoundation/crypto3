@@ -21,7 +21,7 @@ namespace nil {
     namespace crypto3 {
         namespace hash {
             template<std::size_t DigestBits>
-            class streebog_key_converter {};
+            class streebog_key_converter { };
 
             /*!
              * @brief Streebog (GOST R 34.11-2012). RFC 6986. Newly designed Russian

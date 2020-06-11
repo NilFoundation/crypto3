@@ -78,14 +78,13 @@ namespace nil {
                     struct params_type {
                         typedef typename policy_type::digest_endian digest_endian;
 
-                        constexpr static const std::size_t length_bits = policy_type::length_bits; 
+                        constexpr static const std::size_t length_bits = policy_type::length_bits;
                         constexpr static const std::size_t digest_bits = policy_type::digest_bits;
                     };
 
                     typedef sponge_construction<
                         params_type, typename policy_type::iv_generator, keccak_1600_compressor<DigestBits>,
-                        detail::keccak_1600_padding<policy_type>,
-                        detail::keccak_1600_finalizer<policy_type>>
+                        detail::keccak_1600_padding<policy_type>, detail::keccak_1600_finalizer<policy_type>>
                         type;
                 };
 

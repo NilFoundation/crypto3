@@ -34,10 +34,7 @@ namespace nil {
              *
              * @note http://www.merkle.com/papers/Thesis1979.pdf
              */
-            template<typename Params,
-                     typename IV,
-                     typename Compressor,
-                     typename Padding,
+            template<typename Params, typename IV, typename Compressor, typename Padding,
                      typename Finalizer = detail::nop_finalizer>
             class merkle_damgard_construction {
             public:
@@ -140,8 +137,8 @@ namespace nil {
 
                     std::array<length_type, 1> length_array = {{length}};
                     std::array<word_type, length_words> length_words_array;
-                    pack<endian_type, endian_type, length_bits, word_bits>(length_array.begin(), 
-                        length_array.end(), length_words_array.begin());
+                    pack<endian_type, endian_type, length_bits, word_bits>(length_array.begin(), length_array.end(),
+                                                                           length_words_array.begin());
                     // Append length
                     for (std::size_t i = length_words; i; --i)
                         block[block_words - i] = length_words_array[length_words - i];
