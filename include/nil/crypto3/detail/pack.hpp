@@ -17,13 +17,12 @@
 #include <nil/crypto3/detail/reverser.hpp>
 
 #include <boost/static_assert.hpp>
-#include <boost/utility/enable_if.hpp>
 #include <boost/predef/other/endian.h>
-#include <boost/type_traits/is_same.hpp>
 
 #include <algorithm>
-#include <iterator>
 #include <climits>
+#include <iterator>
+#include <type_traits>
 
 namespace nil {
     namespace crypto3 {
@@ -107,10 +106,10 @@ namespace nil {
             template<typename InputIterator, typename OutputIterator>
             struct can_memcpy_itr {
                 constexpr static bool const value =
-                    boost::is_same<typename std::iterator_traits<InputIterator>::iterator_category,
-                                   std::random_access_iterator_tag>::value &&
-                    boost::is_same<typename std::iterator_traits<OutputIterator>::iterator_category,
-                                   std::random_access_iterator_tag>::value;
+                    std::is_same<typename std::iterator_traits<InputIterator>::iterator_category,
+                                 std::random_access_iterator_tag>::value &&
+                    std::is_same<typename std::iterator_traits<OutputIterator>::iterator_category,
+                                 std::random_access_iterator_tag>::value;
             };
 
             /*!
@@ -136,7 +135,7 @@ namespace nil {
              */
             template<typename InputEndianness, typename OutputEndianness, std::size_t InputValueBits,
                      std::size_t OutputValueBits,
-                     bool SameEndianness = boost::is_same<InputEndianness, OutputEndianness>::value,
+                     bool SameEndianness = std::is_same<InputEndianness, OutputEndianness>::value,
                      bool Implode = (InputValueBits < OutputValueBits),
                      bool Explode = (InputValueBits > OutputValueBits)>
             struct packer { };
@@ -164,7 +163,6 @@ namespace nil {
                  *
                  * @tparam InputType
                  * @tparam OutputType
-                 * @tparam Dummy
                  *
                  * @param in
                  * @param n
@@ -172,10 +170,9 @@ namespace nil {
                  *
                  * @return
                  */
-                template<typename InputType, typename OutputType, typename Dummy = void>
+                template<typename InputType, typename OutputType>
                 inline static
-                    typename boost::enable_if_c<can_memcpy<Endianness, ValueBits, InputType, OutputType>::value,
-                                                Dummy>::type
+                    typename std::enable_if<can_memcpy<Endianness, ValueBits, InputType, OutputType>::value>::type
                     pack_n(InputType const *in, std::size_t n, OutputType *out) {
                     std::memcpy(out, in, n * sizeof(InputType));
                 }
@@ -188,7 +185,6 @@ namespace nil {
                  *
                  * @tparam InputType
                  * @tparam OutputType
-                 * @tparam Dummy
                  *
                  * @param in
                  * @param n
@@ -196,10 +192,9 @@ namespace nil {
                  *
                  * @return
                  */
-                template<typename InputType, typename OutputType, typename Dummy = void>
+                template<typename InputType, typename OutputType>
                 inline static
-                    typename boost::enable_if_c<can_memcpy<Endianness, ValueBits, InputType, OutputType>::value,
-                                                Dummy>::type
+                    typename std::enable_if<can_memcpy<Endianness, ValueBits, InputType, OutputType>::value>::type
                     pack_n(InputType *in, std::size_t n, OutputType *out) {
                     std::memcpy(out, in, n * sizeof(InputType));
                 }
@@ -233,7 +228,6 @@ namespace nil {
                  *
                  * @tparam InputIterator
                  * @tparam OutputIterator
-                 * @tparam Dummy
                  *
                  * @param first
                  * @param last
@@ -241,12 +235,11 @@ namespace nil {
                  *
                  * @return
                  */
-                template<typename InputIterator, typename OutputIterator, typename Dummy = void>
-                inline static typename boost::enable_if_c<
+                template<typename InputIterator, typename OutputIterator>
+                inline static typename std::enable_if<
                     can_memcpy<Endianness, ValueBits, typename std::iterator_traits<InputIterator>::value_type,
                                typename std::iterator_traits<OutputIterator>::value_type>::value &&
-                        can_memcpy_itr<InputIterator, OutputIterator>::value,
-                    Dummy>::type
+                    can_memcpy_itr<InputIterator, OutputIterator>::value>::type
                     pack(InputIterator first, InputIterator last, OutputIterator out) {
                     pack_n(&(*first), std::distance(first, last), &(*out));
                 }
@@ -261,7 +254,6 @@ namespace nil {
                  *
                  * @tparam InputIterator
                  * @tparam OutputIterator
-                 * @tparam Dummy
                  *
                  * @param first
                  * @param last
@@ -269,12 +261,11 @@ namespace nil {
                  *
                  * @return
                  */
-                template<typename InputIterator, typename OutputIterator, typename Dummy = void>
-                inline static typename boost::enable_if_c<
+                template<typename InputIterator, typename OutputIterator>
+                inline static typename std::enable_if<
                     !can_memcpy<Endianness, ValueBits, typename std::iterator_traits<InputIterator>::value_type,
                                 typename std::iterator_traits<OutputIterator>::value_type>::value ||
-                        !can_memcpy_itr<InputIterator, OutputIterator>::value,
-                    Dummy>::type
+                    !can_memcpy_itr<InputIterator, OutputIterator>::value>::type
                     pack(InputIterator first, InputIterator last, OutputIterator out) {
                     std::copy(first, last, out);
                 }
@@ -336,8 +327,9 @@ namespace nil {
              * @tparam Dummy
              */
             template<typename InputEndianness, typename OutputEndianness, std::size_t InputValueBits,
-                     std::size_t OutputValueBits, bool Dummy>
-            struct packer<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits, Dummy, true, false> {
+                     std::size_t OutputValueBits, bool SameEndianness>
+            struct packer<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits, SameEndianness, true,
+                          false> {
 
                 BOOST_STATIC_ASSERT(!(OutputValueBits % InputValueBits));
 
@@ -382,8 +374,9 @@ namespace nil {
              * @tparam Dummy
              */
             template<typename InputEndianness, typename OutputEndianness, std::size_t InputValueBits,
-                     std::size_t OutputValueBits, bool Dummy>
-            struct packer<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits, Dummy, false, true> {
+                     std::size_t OutputValueBits, bool SameEndianness>
+            struct packer<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits, SameEndianness, false,
+                          true> {
 
                 BOOST_STATIC_ASSERT(!(InputValueBits % OutputValueBits));
 
@@ -598,8 +591,8 @@ namespace nil {
              */
             template<typename InputEndianness, typename OutputEndianness, std::size_t InputValueBits,
                      std::size_t OutputValueBits, typename InputIterator, typename InCatT, typename OutputIterator,
-                     typename boost::enable_if_c<detail::is_iterator<InputIterator>::value, int>::type = 0,
-                     typename boost::enable_if_c<detail::is_iterator<OutputIterator>::value, int>::type = 0>
+                     typename = typename std::enable_if<detail::is_iterator<InputIterator>::value>::type,
+                     typename = typename std::enable_if<detail::is_iterator<OutputIterator>::value>::type>
             inline void pack(InputIterator first, InputIterator last, InCatT, OutputIterator out) {
                 typedef packer<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits> packer_type;
                 packer_type::pack(first, last, out);
@@ -625,7 +618,7 @@ namespace nil {
              */
             template<typename InputEndianness, typename OutputEndianness, std::size_t InputValueBits,
                      std::size_t OutputValueBits, typename InputIterator, typename OutputIterator,
-                     typename boost::enable_if_c<detail::is_iterator<OutputIterator>::value, int>::type = 0>
+                     typename = typename std::enable_if<detail::is_iterator<OutputIterator>::value>::type>
             inline void pack(InputIterator first, InputIterator last, OutputIterator out) {
                 typedef typename std::iterator_traits<InputIterator>::iterator_category in_cat;
                 pack<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits>(first, last, in_cat(), out);
@@ -767,7 +760,7 @@ namespace nil {
              */
             template<typename InputEndianness, typename OutputEndianness, std::size_t InputValueBits,
                      std::size_t OutputValueBits, typename InputIterator, typename OutputType,
-                     typename boost::enable_if_c<!std::is_arithmetic<OutputType>::value, int>::type = 0>
+                     typename = typename std::enable_if<!std::is_arithmetic<OutputType>::value>::type>
             inline void pack(InputIterator first, InputIterator last, OutputType &out) {
                 pack_n<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits>(
                     first, std::distance(first, last), out.begin(), out.size());

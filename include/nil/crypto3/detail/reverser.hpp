@@ -110,7 +110,7 @@ namespace nil {
              */
             template<typename UnitType,
                      int UnitBits = sizeof(UnitType) * CHAR_BIT,
-                     typename boost::enable_if_c<(UnitBits > CHAR_BIT), int>::type = 0>
+                     typename std::enable_if<(UnitBits > CHAR_BIT), int>::type = 0>
             inline void reverse_bits(UnitType &unit) {
                 boost::endian::endian_reverse_inplace(unit);
                 UnitType out = UnitType();
@@ -131,7 +131,7 @@ namespace nil {
              */
             template<typename UnitType,
                      int UnitBits = sizeof(UnitType) * CHAR_BIT,
-                     typename boost::enable_if_c<(UnitBits == CHAR_BIT), int>::type = 0>
+                     typename std::enable_if<(UnitBits == CHAR_BIT), int>::type = 0>
             inline void reverse_bits(UnitType &unit) {
                 reverse_byte(unit);
             }
@@ -192,8 +192,8 @@ namespace nil {
             template<typename Endianness, int UnitBits>
             struct is_big_bit {
                 constexpr static const bool value =
-                    boost::is_same<Endianness, stream_endian::big_unit_big_bit<UnitBits>>::value ||
-                    boost::is_same<Endianness, stream_endian::little_unit_big_bit<UnitBits>>::value;
+                    std::is_same<Endianness, stream_endian::big_unit_big_bit<UnitBits>>::value ||
+                    std::is_same<Endianness, stream_endian::little_unit_big_bit<UnitBits>>::value;
             };
 
             /*!
@@ -208,8 +208,8 @@ namespace nil {
             template<typename Endianness, int UnitBits>
             struct is_little_bit {
                 constexpr static const bool value =
-                    boost::is_same<Endianness, stream_endian::big_unit_little_bit<UnitBits>>::value ||
-                    boost::is_same<Endianness, stream_endian::little_unit_little_bit<UnitBits>>::value;
+                    std::is_same<Endianness, stream_endian::big_unit_little_bit<UnitBits>>::value ||
+                    std::is_same<Endianness, stream_endian::little_unit_little_bit<UnitBits>>::value;
             };
 
             /*!
@@ -353,8 +353,8 @@ namespace nil {
             template<typename Endianness, int UnitBits>
             struct is_big_unit {
                 constexpr static const bool value =
-                    boost::is_same<Endianness, stream_endian::big_unit_big_bit<UnitBits>>::value ||
-                    boost::is_same<Endianness, stream_endian::big_unit_little_bit<UnitBits>>::value;
+                    std::is_same<Endianness, stream_endian::big_unit_big_bit<UnitBits>>::value ||
+                    std::is_same<Endianness, stream_endian::big_unit_little_bit<UnitBits>>::value;
             };
 
             /*!
@@ -369,8 +369,8 @@ namespace nil {
             template<typename Endianness, int UnitBits>
             struct is_little_unit {
                 constexpr static const bool value =
-                    boost::is_same<Endianness, stream_endian::little_unit_big_bit<UnitBits>>::value ||
-                    boost::is_same<Endianness, stream_endian::little_unit_little_bit<UnitBits>>::value;
+                    std::is_same<Endianness, stream_endian::little_unit_big_bit<UnitBits>>::value ||
+                    std::is_same<Endianness, stream_endian::little_unit_little_bit<UnitBits>>::value;
             };
 
             /*!
@@ -419,7 +419,7 @@ namespace nil {
                 InputEndianness,
                 OutputEndianness,
                 UnitBits,
-                typename boost::enable_if_c<is_same_unit<InputEndianness, OutputEndianness, UnitBits>::value>::type> {
+                typename std::enable_if<is_same_unit<InputEndianness, OutputEndianness, UnitBits>::value>::type> {
                 template<typename ValueType>
                 inline static void reverse(ValueType &) {
                 }
@@ -445,8 +445,8 @@ namespace nil {
                 InputEndianness,
                 OutputEndianness,
                 UnitBits,
-                typename boost::enable_if_c<!is_same_unit<InputEndianness, OutputEndianness, UnitBits>::value &&
-                                            UnitBits == CHAR_BIT>::type> {
+                typename std::enable_if<!is_same_unit<InputEndianness, OutputEndianness, UnitBits>::value &&
+                                        UnitBits == CHAR_BIT>::type> {
                 template<typename ValueType>
                 inline static void reverse(ValueType &val) {
                     boost::endian::endian_reverse_inplace(val);
@@ -474,8 +474,8 @@ namespace nil {
                 InputEndianness,
                 OutputEndianness,
                 UnitBits,
-                typename boost::enable_if_c<!is_same_unit<InputEndianness, OutputEndianness, UnitBits>::value &&
-                                            (UnitBits > CHAR_BIT)>::type> {
+                typename std::enable_if<!is_same_unit<InputEndianness, OutputEndianness, UnitBits>::value &&
+                                        (UnitBits > CHAR_BIT)>::type> {
                 template<typename ValueType, int ValueBits = sizeof(ValueType) * CHAR_BIT>
                 inline static void reverse(ValueType &val) {
                     boost::endian::endian_reverse_inplace(val);
@@ -492,7 +492,6 @@ namespace nil {
                     return out;
                 }
             };
-
         }    // namespace detail
     }        // namespace crypto3
 }    // namespace nil
