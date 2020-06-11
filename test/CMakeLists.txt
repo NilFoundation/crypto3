@@ -21,19 +21,19 @@ cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
                        ${Boost_LIBRARIES})
 
 macro(define_passhash_test name)
-    cm_test(NAME ${name}_test SOURCES ${name}.cpp)
+    cm_test(NAME passhash_${name}_test SOURCES ${name}.cpp)
 
-    target_include_directories(${name}_test PRIVATE
+    target_include_directories(passhash_${name}_test PRIVATE
                                "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
                                "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>"
 
                                ${Boost_INCLUDE_DIRS})
 
-    set_target_properties(${name}_test PROPERTIES CXX_STANDARD 14)
+    set_target_properties(passhash_${name}_test PROPERTIES CXX_STANDARD 14)
 
     get_target_property(target_type Boost::unit_test_framework TYPE)
     if(target_type STREQUAL "SHARED_LIB")
-        target_compile_definitions(${name}_test PRIVATE BOOST_TEST_DYN_LINK)
+        target_compile_definitions(passhash_${name}_test PRIVATE BOOST_TEST_DYN_LINK)
     elseif(target_type STREQUAL "STATIC_LIB")
 
     endif()
