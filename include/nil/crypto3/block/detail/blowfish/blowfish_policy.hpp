@@ -172,6 +172,9 @@ namespace nil {
                         0x85CBFE4E, 0x8AE88DD8, 0x7AAAF9B0, 0x4CF9AA7E, 0x1948C25C, 0x02FB8A8C, 0x01C36AE4, 0xD6EBE1F9,
                         0x90D4F869, 0xA65CDEA0, 0x3F09252D, 0xC208E69F, 0xB74E6132, 0xCE77E25B, 0x578FDFE3, 0x3AC372E6};
                 };
+
+                constexpr typename blowfish_policy::permutations_type const blowfish_policy::permutations;
+                constexpr typename blowfish_policy::plain_constants_type const blowfish_policy::constants;
             }    // namespace detail
         }        // namespace block
     }            // namespace crypto3

@@ -1,4 +1,5 @@
 # Block Ciphers for =nil; Foundation's Cryptography Suite
+[![Build Status](https://travis-ci.com/NilFoundation/block.svg?branch=master)](https://travis-ci.com/NilFoundation/block)
 
 Block ciphers for =nil; Foundation's cryptography suite.
 
@@ -14,7 +15,8 @@ To actually include this library in a project it is required to:
 ## Dependencies
 
 ### Internal
-* [Hash](https://github.com/nilfoundation/hash) (testing purposes only)
+
+None
 
 ### External
 * [Boost](https://boost.org) (>= 1.58)

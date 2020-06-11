@@ -1,6 +1,8 @@
 # Introduction # {#block_ciphers_introduction}
 
-Crypto3.Block library extends the =nil; Foundation's
+@tableofcontents
+
+Crypto3.Block library extends the =nil; Crypto3 C++
 cryptography suite and provides a set of block ciphers
 implemented in way C++ standard library implies: 
 concepts, algorithms, predictable behavior, latest 

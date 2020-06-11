@@ -93,7 +93,11 @@ struct shacal2_params_type {
 BOOST_AUTO_TEST_CASE(shacal2_single_block_encrypt3) {
     typedef block::shacal2<256> bct;
     typedef hash::davies_meyer_compressor<bct, state_adder> owcft;
-    typedef hash::merkle_damgard_construction<shacal2_params_type, hash::detail::sha2_policy<256>::iv_generator, owcft>
+    typedef hash::detail::merkle_damgard_padding<typename shacal2_params_type::digest_endian,
+                                                 hash::detail::sha2_policy<256>>
+        pt;
+    typedef hash::merkle_damgard_construction<shacal2_params_type, hash::detail::sha2_policy<256>::iv_generator, owcft,
+                                              pt>
         bht;
 
     // Test with the equivalent of SHA-256("")

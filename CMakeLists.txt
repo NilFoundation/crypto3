@@ -6,11 +6,12 @@
 # http://www.boost.org/LICENSE_1_0.txt
 #---------------------------------------------------------------------------#
 
-cmake_minimum_required(VERSION 2.8.11)
+cmake_minimum_required(VERSION 3.12.4)
 
-cmake_policy(SET CMP0042 NEW)
 cmake_policy(SET CMP0028 NEW)
+cmake_policy(SET CMP0042 NEW)
 cmake_policy(SET CMP0048 NEW)
+cmake_policy(SET CMP0057 NEW)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake"
      "${CMAKE_CURRENT_LIST_DIR}/cmake/packages"
@@ -20,11 +21,28 @@ include(CMConfig)
 include(CMDeploy)
 include(CMSetupVersion)
 
-if(NOT ${CMAKE_WORKSPACE_NAME} STREQUAL crypto3)
+if(NOT CMAKE_WORKSPACE_NAME OR NOT ("${CMAKE_WORKSPACE_NAME}" STREQUAL "crypto3"))
     cm_workspace(crypto3)
 endif()
 
 cm_project(block WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME} LANGUAGES C CXX)
+
+macro(cm_find_package NAME)
+    if(NOT "${NAME}" MATCHES "^${CMAKE_WORKSPACE_NAME}_.*$" AND NOT "${NAME}" STREQUAL CM)
+        find_package(${ARGV})
+    else()
+        set(${ARGV0}_FOUND ON CACHE BOOL "")
+    endif()
+endmacro()
+
+if(NOT Boost_FOUND)
+    if(BUILD_TESTS)
+        cm_find_package(Boost REQUIRED COMPONENTS container unit_test_framework)
+    else()
+        cm_find_package(Boost REQUIRED COMPONENTS container)
+    endif()
+endif()
+
 
 include(TargetArchitecture)
 include(TargetConfiguration)
@@ -32,6 +50,9 @@ include(PlatformConfiguration)
 
 include(CheckSSE)
 include(CheckAVX)
+
+
+cm_find_package(${CMAKE_WORKSPACE_NAME}_block)
 
 option(BUILD_WITH_CCACHE "Build with ccache usage" TRUE)
 option(BUILD_TESTS "Build unit tests" FALSE)
@@ -74,11 +95,11 @@ else()
     target_architecture(CMAKE_TARGET_ARCHITECTURE)
 endif()
 
-define_target_architecture(${CMAKE_PROJECT_NAME} ${CMAKE_TARGET_ARCHITECTURE})
-define_target_endianness(${CMAKE_PROJECT_NAME} ${CMAKE_TARGET_ARCHITECTURE})
-define_target_platform_features(${CMAKE_PROJECT_NAME})
+define_target_architecture(${CMAKE_UPPER_WORKSPACE_NAME} ${CMAKE_TARGET_ARCHITECTURE})
+define_target_endianness(${CMAKE_UPPER_WORKSPACE_NAME} ${CMAKE_TARGET_ARCHITECTURE})
+define_target_platform_features(${CMAKE_UPPER_WORKSPACE_NAME})
 
-define_target_platform_size(${CMAKE_PROJECT_NAME} ${CMAKE_TARGET_ARCHITECTURE})
+define_target_platform_size(${CMAKE_UPPER_WORKSPACE_NAME} ${CMAKE_TARGET_ARCHITECTURE})
 
 check_sse()
 check_avx()
