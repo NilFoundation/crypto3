@@ -50,10 +50,10 @@ namespace nil {
                     std::size_t shift_unit_bits = shift - shift_rem;
 
                     std::size_t sz[2] = {UnitBits - shift_rem, shift_rem};
-                    word_type masks[2] = {unbounded_shl(low_bits<word_bits>(~word_type(), sz[0]), 
-                                          shift_unit_bits),
-                                          unbounded_shl(low_bits<word_bits>(~word_type(), sz[1]),
-                                          shift_unit_bits + UnitBits + sz[0])};
+                    word_type masks[2];
+                    masks[0] = unbounded_shl(low_bits<word_bits>(~word_type(), sz[0]), shift_unit_bits);
+                    masks[1] = unbounded_shl(low_bits<word_bits>(~word_type(), sz[1]), 
+                               shift_unit_bits + UnitBits + sz[0]);
                     std::size_t bits_left = word_bits - shift;
 
                     word_type w_combined = 0;
