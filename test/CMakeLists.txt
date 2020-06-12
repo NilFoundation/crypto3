@@ -16,7 +16,6 @@ endif()
 
 cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
                        ${CMAKE_WORKSPACE_NAME}::block
-
                        ${Boost_LIBRARIES})
 
 macro(define_hash_test name)

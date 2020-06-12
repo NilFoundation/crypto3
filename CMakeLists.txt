@@ -8,13 +8,14 @@
 
 cmake_minimum_required(VERSION 2.8.11)
 
-cmake_policy(SET CMP0042 NEW)
 cmake_policy(SET CMP0028 NEW)
+cmake_policy(SET CMP0042 NEW)
+
+cmake_policy(SET CMP0057 NEW)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake"
      "${CMAKE_CURRENT_LIST_DIR}/cmake/packages"
      "${CMAKE_CURRENT_LIST_DIR}/cmake/modules/share/modules/cmake")
-
 
 include(CMConfig)
 include(CMDeploy)
@@ -42,12 +43,14 @@ if(NOT Boost_FOUND)
     endif()
 endif()
 
+
 include(TargetArchitecture)
 include(TargetConfiguration)
 include(PlatformConfiguration)
 
 include(CheckSSE)
 include(CheckAVX)
+
 
 cm_find_package(${CMAKE_WORKSPACE_NAME}_hash)
 
