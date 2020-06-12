@@ -11,11 +11,13 @@
 
 #include <array>
 #include <iterator>
+#include <climits>
 
 #include <nil/crypto3/detail/pack.hpp>
 #include <nil/crypto3/detail/digest.hpp>
 
 #include <boost/integer.hpp>
+#include <boost/cstdint.hpp>
 #include <boost/static_assert.hpp>
 #include <boost/utility/enable_if.hpp>
 
@@ -47,12 +49,14 @@ namespace nil {
 
             private:
                 constexpr static const std::size_t length_bits = params_type::length_bits;
-                // FIXME: do something more intelligent than capping at 64
-                //constexpr static const std::size_t length_type_bits =
-                    //length_bits < input_block_bits ? input_block_bits : length_bits > 64 ? 64 : length_bits;
-                typedef typename boost::uint_t<64>::least length_type;
+                constexpr static const std::size_t word_bits = mode_type::word_bits;
+                // FIXME: do something more intelligent than capping at sizeof(boost::uintmax_t) * CHAR_BIT
+                constexpr static const std::size_t length_type_bits =
+                    length_bits < word_bits ? word_bits : length_bits > sizeof(boost::uintmax_t) * CHAR_BIT 
+                    ? sizeof(boost::uintmax_t) * CHAR_BIT : length_bits;
+                typedef typename boost::uint_t<length_type_bits>::least length_type;
 
-                //BOOST_STATIC_ASSERT(!length_bits || length_bits % input_block_bits == 0);
+                BOOST_STATIC_ASSERT(!length_bits || length_bits % word_bits == 0);
                 BOOST_STATIC_ASSERT(input_block_bits % value_bits == 0);
 
                 BOOST_STATIC_ASSERT(!length_bits || value_bits <= length_bits);
