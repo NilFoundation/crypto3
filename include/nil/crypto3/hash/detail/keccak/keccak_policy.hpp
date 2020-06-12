@@ -19,42 +19,45 @@ namespace nil {
                 template<std::size_t DigestBits>
                 struct keccak_1600_policy : public ::nil::crypto3::detail::basic_functions<64> {
 
-                    constexpr static const std::size_t digest_bits = DigestBits; 
+                    constexpr static const std::size_t digest_bits = DigestBits;
                     typedef static_digest<digest_bits> digest_type;
 
                     constexpr static const std::size_t state_bits = 1600;
                     constexpr static const std::size_t state_words = state_bits / word_bits;
                     typedef typename std::array<word_type, state_words> state_type;
- 
+
                     constexpr static const std::size_t block_bits = state_bits - 2 * digest_bits;
                     constexpr static const std::size_t block_words = block_bits / word_bits;
                     typedef std::array<word_type, block_words> block_type;
 
                     constexpr static const std::size_t length_bits = 0;
 
-                    typedef typename stream_endian::big_octet_little_bit digest_endian;
+                    typedef typename stream_endian::big_octet_big_bit digest_endian;
 
                     constexpr static const std::size_t rounds = 24;
 
                     struct iv_generator {
                         state_type const &operator()() const {
-                            static state_type const H0 = {
-                            UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000), 
-                            UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000), 
-                            UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000), 
-                            UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000), 
-                            UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000), 
-                            UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000), 
-                            UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000),
-                            UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000),
-                            UINT64_C(0x0000000000000000)};
+                            static state_type const H0 = {UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000),
+                                                          UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000),
+                                                          UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000),
+                                                          UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000),
+                                                          UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000),
+                                                          UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000),
+                                                          UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000),
+                                                          UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000),
+                                                          UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000),
+                                                          UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000),
+                                                          UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000),
+                                                          UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000),
+                                                          UINT64_C(0x0000000000000000)};
                             return H0;
                         }
                     };
                 };
-            }
-        }
-    }
-}
+            }    // namespace detail
+        }        // namespace hash
+    }            // namespace crypto3
+}    // namespace nil
 
-#endif //CRYPTO3_KECCAK_POLICY_HPP
+#endif    // CRYPTO3_KECCAK_POLICY_HPP

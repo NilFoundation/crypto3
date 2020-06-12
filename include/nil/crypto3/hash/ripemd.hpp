@@ -37,7 +37,7 @@ namespace nil {
             };
 
             template<std::size_t DigestBits>
-            struct ripemd_compressor : public basic_ripemd_compressor<DigestBits> {};
+            struct ripemd_compressor : public basic_ripemd_compressor<DigestBits> { };
 
             template<>
             struct ripemd_compressor<128> : public basic_ripemd_compressor<128> {
@@ -285,9 +285,9 @@ namespace nil {
                         constexpr static const std::size_t digest_bits = policy_type::digest_bits;
                     };
 
-                    typedef merkle_damgard_construction<
-                        params_type, typename policy_type::iv_generator, ripemd_compressor<DigestBits>,
-                        detail::merkle_damgard_padding<typename params_type::digest_endian, policy_type>>
+                    typedef merkle_damgard_construction<params_type, typename policy_type::iv_generator,
+                                                        ripemd_compressor<DigestBits>,
+                                                        detail::merkle_damgard_padding<policy_type>>
                         type;
                 };
 

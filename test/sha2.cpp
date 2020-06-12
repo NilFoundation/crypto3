@@ -78,9 +78,9 @@ BOOST_DATA_TEST_CASE(sha2_256_range_hash, string_data("data_256"), array_element
 }
 
 BOOST_DATA_TEST_CASE(sha2_384_range_hash, string_data("data_384"), array_element) {
-    std::string out = hash<sha2<384>>(array_element.first);
+    sha2<384>::digest_type out = hash<sha2<384>>(array_element.first);
 
-    BOOST_CHECK_EQUAL(out, array_element.second.data());
+   BOOST_CHECK_EQUAL(std::to_string(out).data(), array_element.second.data());
 }
 
 BOOST_DATA_TEST_CASE(sha2_512_range_hash, string_data("data_512"), array_element) {

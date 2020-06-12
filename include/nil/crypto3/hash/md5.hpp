@@ -32,7 +32,6 @@ namespace nil {
                 typedef typename policy_type::block_cipher_type block_cipher_type;
 
             public:
-
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
                 typedef typename policy_type::word_type word_type;
 
@@ -50,11 +49,10 @@ namespace nil {
                         constexpr static const std::size_t length_bits = policy_type::length_bits;
                         constexpr static const std::size_t digest_bits = policy_type::digest_bits;
                     };
-                    
-                    typedef merkle_damgard_construction<
-                        params_type, typename policy_type::iv_generator,
-                        davies_meyer_compressor<block_cipher_type, detail::state_adder>,
-                        detail::merkle_damgard_padding<typename params_type::digest_endian, policy_type>>
+
+                    typedef merkle_damgard_construction<params_type, typename policy_type::iv_generator,
+                                                        davies_meyer_compressor<block_cipher_type, detail::state_adder>,
+                                                        detail::merkle_damgard_padding<policy_type>>
                         type;
                 };
 
@@ -68,7 +66,6 @@ namespace nil {
 
                     typedef block_stream_processor<construction, StateAccumulator, params_type> type;
                 };
-
             };
 
         }    // namespace hash

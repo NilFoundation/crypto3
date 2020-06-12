@@ -17,9 +17,9 @@ namespace nil {
     namespace crypto3 {
         namespace hash {
             namespace detail {
-                template<typename Endianness, typename PolicyType>
+                template<typename Hash>
                 class keccak_1600_padding {
-                    typedef PolicyType policy_type;
+                    typedef Hash policy_type;
 
                     constexpr static const std::size_t word_bits = policy_type::word_bits;
                     typedef typename policy_type::word_type word_type;
@@ -35,7 +35,8 @@ namespace nil {
                     constexpr static const std::size_t digest_bits = policy_type::digest_bits;
                     typedef typename policy_type::digest_type digest_type;
 
-                    typedef ::nil::crypto3::detail::injector<Endianness, word_bits, block_words, block_bits>
+                    typedef ::nil::crypto3::detail::injector<stream_endian::big_octet_little_bit, word_bits,
+                                                             block_words, block_bits>
                         injector_type;
 
                     bool is_last;
@@ -52,19 +53,26 @@ namespace nil {
                         using namespace nil::crypto3::detail;
 
                         if ((block_bits - block_seen) > 1) {
+                            // try to handle bit NIST tests
+                            /*if (block_seen % octet_bits) {
+                                pack<stream_endian::big_octet_big_bit, stream_endian::big_octet_little_bit,
+                                word_bits, word_bits>(block.begin(), block.end(), block.begin());
+                            }*/
                             // pad 1
-                            injector_type::inject(high_bits<word_type, word_bits>(~word_type(), 1) >> 7, 1, block, block_seen);
+                            injector_type::inject(unbounded_shr(high_bits<word_bits>(~word_type(), 1), 7), 1, block,
+                                                  block_seen);
                             // pad 0*
                             block_type zeros;
                             std::fill(zeros.begin(), zeros.end(), 0);
                             injector_type::inject(zeros, block_bits - 1 - block_seen, block, block_seen);
                             // pad 1
-                            injector_type::inject(high_bits<word_type, word_bits>(~word_type(), 1) >> 7, 1, block, block_seen);
+                            injector_type::inject(unbounded_shr(high_bits<word_bits>(~word_type(), 1), 7), 1, block,
+                                                  block_seen);
                         }
 
                         else {
                             is_last = false;
-                            block[block_words - 1] &= ~high_bits<word_type, word_bits>(~word_type(), 1);
+                            block[block_words - 1] &= ~high_bits<word_bits>(~word_type(), 1);
                         }
                     }
 
@@ -76,7 +84,8 @@ namespace nil {
                         std::fill(zeros.begin(), zeros.end(), 0);
                         injector_type::inject(zeros, block_bits - 1, block, block_seen);
                         // pad 1
-                        injector_type::inject(high_bits<word_type, word_bits>(~word_type(), 1) >> 7, 1, block, block_seen);
+                        injector_type::inject(unbounded_shr(high_bits<word_bits>(~word_type(), 1), 7), 1, block,
+                                              block_seen);
                     }
                 };
             }    // namespace detail

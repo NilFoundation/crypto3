@@ -112,6 +112,15 @@ BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(keccak_stream_processor_test_suite)
 
+/* BOOST_AUTO_TEST_CASE(keccak_224_shortmsg_bit1) {
+    // Known-answer test from https://keccak.team/archives.html
+    // Len = 5, Msg = 48 
+    std::array<bool, 5> a = {0, 1, 0, 0, 1};
+    keccak_1600<224>::digest_type d = hash<keccak_1600<224>>(a);
+
+    BOOST_CHECK_EQUAL("e4384016d64610d75e0a5d73821a02d524e847a25a571b5940cd6450", std::to_string(d).data());
+}*/
+
 BOOST_AUTO_TEST_CASE(keccak_224_shortmsg_byte1) {
     // "a" 
     std::array<char, 1> a = {'\x61'};

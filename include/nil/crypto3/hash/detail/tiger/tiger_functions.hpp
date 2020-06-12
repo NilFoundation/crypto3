@@ -10,6 +10,7 @@
 #define CRYPTO3_TIGER_FUNCTIONS_HPP
 
 #include <nil/crypto3/hash/detail/tiger/basic_tiger_policy.hpp>
+#include <nil/crypto3/detail/make_uint_t.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -50,97 +51,97 @@ namespace nil {
 
                     inline static void pass(word_type &A, word_type &B, word_type &C, block_type &X, byte_type mul) {
                         C ^= X[0];
-                        A -= policy_type::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(C, 7)] ^
-                             policy_type::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(C, 5)] ^
-                             policy_type::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(C, 3)] ^
-                             policy_type::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(C, 1)];
-                        B += policy_type::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(C, 0)] ^
-                             policy_type::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(C, 2)] ^
-                             policy_type::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(C, 4)] ^
-                             policy_type::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(C, 6)];
+                        A -= policy_type::sbox1[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(C, 7)] ^
+                             policy_type::sbox2[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(C, 5)] ^
+                             policy_type::sbox3[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(C, 3)] ^
+                             policy_type::sbox4[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(C, 1)];
+                        B += policy_type::sbox1[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(C, 0)] ^
+                             policy_type::sbox2[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(C, 2)] ^
+                             policy_type::sbox3[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(C, 4)] ^
+                             policy_type::sbox4[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(C, 6)];
                         B *= mul;
 
                         A ^= X[1];
-                        B -= policy_type::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(A, 7)] ^
-                             policy_type::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(A, 5)] ^
-                             policy_type::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(A, 3)] ^
-                             policy_type::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(A, 1)];
-                        C += policy_type::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(A, 0)] ^
-                             policy_type::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(A, 2)] ^
-                             policy_type::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(A, 4)] ^
-                             policy_type::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(A, 6)];
+                        B -= policy_type::sbox1[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(A, 7)] ^
+                             policy_type::sbox2[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(A, 5)] ^
+                             policy_type::sbox3[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(A, 3)] ^
+                             policy_type::sbox4[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(A, 1)];
+                        C += policy_type::sbox1[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(A, 0)] ^
+                             policy_type::sbox2[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(A, 2)] ^
+                             policy_type::sbox3[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(A, 4)] ^
+                             policy_type::sbox4[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(A, 6)];
                         C *= mul;
 
                         B ^= X[2];
-                        C -= policy_type::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(B, 7)] ^
-                             policy_type::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(B, 5)] ^
-                             policy_type::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(B, 3)] ^
-                             policy_type::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(B, 1)];
-                        A += policy_type::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(B, 0)] ^
-                             policy_type::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(B, 2)] ^
-                             policy_type::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(B, 4)] ^
-                             policy_type::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(B, 6)];
+                        C -= policy_type::sbox1[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(B, 7)] ^
+                             policy_type::sbox2[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(B, 5)] ^
+                             policy_type::sbox3[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(B, 3)] ^
+                             policy_type::sbox4[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(B, 1)];
+                        A += policy_type::sbox1[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(B, 0)] ^
+                             policy_type::sbox2[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(B, 2)] ^
+                             policy_type::sbox3[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(B, 4)] ^
+                             policy_type::sbox4[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(B, 6)];
                         A *= mul;
 
                         C ^= X[3];
-                        A -= policy_type::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(C, 7)] ^
-                             policy_type::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(C, 5)] ^
-                             policy_type::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(C, 3)] ^
-                             policy_type::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(C, 1)];
-                        B += policy_type::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(C, 0)] ^
-                             policy_type::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(C, 2)] ^
-                             policy_type::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(C, 4)] ^
-                             policy_type::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(C, 6)];
+                        A -= policy_type::sbox1[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(C, 7)] ^
+                             policy_type::sbox2[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(C, 5)] ^
+                             policy_type::sbox3[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(C, 3)] ^
+                             policy_type::sbox4[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(C, 1)];
+                        B += policy_type::sbox1[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(C, 0)] ^
+                             policy_type::sbox2[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(C, 2)] ^
+                             policy_type::sbox3[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(C, 4)] ^
+                             policy_type::sbox4[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(C, 6)];
                         B *= mul;
 
                         A ^= X[4];
-                        B -= policy_type::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(A, 7)] ^
-                             policy_type::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(A, 5)] ^
-                             policy_type::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(A, 3)] ^
-                             policy_type::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(A, 1)];
-                        C += policy_type::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(A, 0)] ^
-                             policy_type::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(A, 2)] ^
-                             policy_type::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(A, 4)] ^
-                             policy_type::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(A, 6)];
+                        B -= policy_type::sbox1[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(A, 7)] ^
+                             policy_type::sbox2[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(A, 5)] ^
+                             policy_type::sbox3[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(A, 3)] ^
+                             policy_type::sbox4[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(A, 1)];
+                        C += policy_type::sbox1[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(A, 0)] ^
+                             policy_type::sbox2[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(A, 2)] ^
+                             policy_type::sbox3[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(A, 4)] ^
+                             policy_type::sbox4[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(A, 6)];
                         C *= mul;
 
                         B ^= X[5];
-                        C -= policy_type::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(B, 7)] ^
-                             policy_type::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(B, 5)] ^
-                             policy_type::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(B, 3)] ^
-                             policy_type::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(B, 1)];
-                        A += policy_type::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(B, 0)] ^
-                             policy_type::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(B, 2)] ^
-                             policy_type::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(B, 4)] ^
-                             policy_type::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(B, 6)];
+                        C -= policy_type::sbox1[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(B, 7)] ^
+                             policy_type::sbox2[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(B, 5)] ^
+                             policy_type::sbox3[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(B, 3)] ^
+                             policy_type::sbox4[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(B, 1)];
+                        A += policy_type::sbox1[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(B, 0)] ^
+                             policy_type::sbox2[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(B, 2)] ^
+                             policy_type::sbox3[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(B, 4)] ^
+                             policy_type::sbox4[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(B, 6)];
                         A *= mul;
 
                         C ^= X[6];
-                        A -= policy_type::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(C, 7)] ^
-                             policy_type::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(C, 5)] ^
-                             policy_type::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(C, 3)] ^
-                             policy_type::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(C, 1)];
-                        B += policy_type::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(C, 0)] ^
-                             policy_type::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(C, 2)] ^
-                             policy_type::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(C, 4)] ^
-                             policy_type::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(C, 6)];
+                        A -= policy_type::sbox1[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(C, 7)] ^
+                             policy_type::sbox2[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(C, 5)] ^
+                             policy_type::sbox3[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(C, 3)] ^
+                             policy_type::sbox4[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(C, 1)];
+                        B += policy_type::sbox1[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(C, 0)] ^
+                             policy_type::sbox2[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(C, 2)] ^
+                             policy_type::sbox3[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(C, 4)] ^
+                             policy_type::sbox4[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(C, 6)];
                         B *= mul;
 
                         A ^= X[7];
-                        B -= policy_type::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(A, 7)] ^
-                             policy_type::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(A, 5)] ^
-                             policy_type::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(A, 3)] ^
-                             policy_type::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(A, 1)];
-                        C += policy_type::sbox1[policy_type::template extract_uint_t<CHAR_BIT>(A, 0)] ^
-                             policy_type::sbox2[policy_type::template extract_uint_t<CHAR_BIT>(A, 2)] ^
-                             policy_type::sbox3[policy_type::template extract_uint_t<CHAR_BIT>(A, 4)] ^
-                             policy_type::sbox4[policy_type::template extract_uint_t<CHAR_BIT>(A, 6)];
+                        B -= policy_type::sbox1[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(A, 7)] ^
+                             policy_type::sbox2[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(A, 5)] ^
+                             policy_type::sbox3[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(A, 3)] ^
+                             policy_type::sbox4[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(A, 1)];
+                        C += policy_type::sbox1[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(A, 0)] ^
+                             policy_type::sbox2[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(A, 2)] ^
+                             policy_type::sbox3[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(A, 4)] ^
+                             policy_type::sbox4[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(A, 6)];
                         C *= mul;
                     }
                 };
-            }
-        }
-    }
-}
+            }    // namespace detail
+        }        // namespace hash
+    }            // namespace crypto3
+}    // namespace nil
 
-#endif //CRYPTO3_TIGER_FUNCTIONS_HPP
+#endif    // CRYPTO3_TIGER_FUNCTIONS_HPP

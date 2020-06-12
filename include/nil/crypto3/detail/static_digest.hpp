@@ -53,7 +53,7 @@ namespace nil {
          */
 
         template<std::size_t DigestBits>
-        class static_digest : public std::array<octet_type, DigestBits / octet_bits> {};
+        class static_digest : public std::array<octet_type, DigestBits / octet_bits> { };
 
         namespace detail {
             template<std::size_t DigestBits, typename OutputIterator>
@@ -203,7 +203,7 @@ namespace nil {
                     a[i] = std::toupper(c, source.getloc()) - 'A' + 0xA;
                 }
             }
-            detail::pack<stream_endian::big_bit, 4, 8>(a, d);
+            detail::pack<stream_endian::big_bit, stream_endian::big_bit, 4, 8>(a.begin(), a.end(), d.begin());
             return source;
         }
     }    // namespace crypto3

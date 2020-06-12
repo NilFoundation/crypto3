@@ -130,11 +130,11 @@ namespace nil {
                 }
 
                 inline digest_type digest() const {
+                    using namespace ::nil::crypto3::detail;
                     word_type x = (state_[0] << (DigestBits / 2)) | state_[1];
                     digest_type d;
                     // RFC 1950, Section 2.2 stores the ADLER-32 in big-endian
-                    ::nil::crypto3::detail::pack_n<stream_endian::big_bit, digest_bits, octet_bits>(
-                        &x, 1, d.data(), digest_bits / octet_bits);
+                    pack_n<stream_endian::big_bit, digest_bits, octet_bits>(&x, 1, d.data(), digest_bits / octet_bits);
                     return d;
                 }
 
@@ -292,7 +292,7 @@ namespace nil {
             template<std::size_t DigestBits>
             struct adler {
                 struct construction {
-                    struct params_type {};
+                    struct params_type { };
 
                     typedef basic_adler<DigestBits> type;
                 };

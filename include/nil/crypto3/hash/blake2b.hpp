@@ -115,9 +115,8 @@ namespace nil {
                         constexpr static const std::size_t digest_bits = policy_type::digest_bits;
                     };
 
-                    typedef haifa_construction<
-                        params_type, typename policy_type::iv_generator, blake2b_compressor<DigestBits>,
-                        detail::blake2b_padding<typename params_type::digest_endian, policy_type>>
+                    typedef haifa_construction<params_type, typename policy_type::iv_generator,
+                                               blake2b_compressor<DigestBits>, detail::blake2b_padding<policy_type>>
                         type;
                 };
 
