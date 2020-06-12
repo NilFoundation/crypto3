@@ -15,7 +15,7 @@
 #include <cmath>
 
 #include </usr/include/x86_64-linux-gnu/gmp.h>
-#include <nil/cas/ff/common/utils.hpp>
+#include <nil/cas/ff/common/utilities.hpp>
 
 namespace nil {
     namespace cas {
