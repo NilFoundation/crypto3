@@ -70,10 +70,13 @@ script:
         fi;
     - sudo ./b2 -j$proc install || true;
     - cd $TRAVIS_BUILD_DIR && mkdir cmake-build && cd cmake-build;
+    - git clone git@github.com:NilFoundation/block.git ../block;
+    - ls -lah && pwd && ls -lah ../;
     - echo $CXXSTD
     - cmake -DBUILD_SHARED_LIBS=TRUE -DBUILD_TESTS=TRUE -DCMAKE_CXX_STANDARD=$(echo $CXXSTD | sed 's/[^0-9z]*//g') ..;
     - make -j$proc tests-hash;
-    - ctest .
+    - make -j$proc check-block;
+    #- ctest .
 
 notifications:
     email:
