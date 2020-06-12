@@ -32,7 +32,6 @@ namespace nil {
                 typedef typename policy_type::constants_type constants_type;
 
             public:
-
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
                 typedef typename policy_type::word_type word_type;
 
@@ -55,7 +54,6 @@ namespace nil {
                     };
 
                     typedef block_stream_processor<Mode, StateAccumulator, params_type> type;
-
                 };
 
                 blowfish(const key_type &key, const salt_type &salt = salt_type()) :
@@ -63,7 +61,6 @@ namespace nil {
                     key_expansion(key, salt);
                 }
 
-                
                 virtual ~blowfish() {
                     permutations.fill(0);
                     constants.fill(0);

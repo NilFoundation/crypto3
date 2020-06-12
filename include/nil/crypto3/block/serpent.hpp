@@ -78,7 +78,6 @@ namespace nil {
                     };
 
                     typedef block_stream_processor<Mode<serpent, Padding>, StateAccumulator, params_type> type_;
-
                 };
 
             protected:

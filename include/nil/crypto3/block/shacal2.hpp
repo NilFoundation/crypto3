@@ -79,7 +79,6 @@ namespace nil {
 
                     typedef block_stream_processor<Mode<shacal2<BlockBits>, Padding>, StateAccumulator, params_type>
                         type_;
-
                 };
 
                 shacal2(const key_type &key) : schedule(build_schedule(key)) {

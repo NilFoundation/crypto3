@@ -58,7 +58,6 @@ namespace nil {
                     };
 
                     typedef block_stream_processor<Mode<kasumi, Padding>, StateAccumulator, params_type> type_;
-
                 };
 
                 kasumi(const key_type &key) {

@@ -52,15 +52,15 @@ namespace nil {
                     std::size_t sz[2] = {UnitBits - shift_rem, shift_rem};
                     word_type masks[2];
                     masks[0] = unbounded_shl(low_bits<word_bits>(~word_type(), sz[0]), shift_unit_bits);
-                    masks[1] = unbounded_shl(low_bits<word_bits>(~word_type(), sz[1]), 
-                               shift_unit_bits + UnitBits + sz[0]);
+                    masks[1] =
+                        unbounded_shl(low_bits<word_bits>(~word_type(), sz[1]), shift_unit_bits + UnitBits + sz[0]);
                     std::size_t bits_left = word_bits - shift;
 
                     word_type w_combined = 0;
                     int ind = 0;
 
                     while (bits_left) {
-                        w_combined |= (!ind ? unbounded_shl(w & masks[0], shift_rem) : 
+                        w_combined |= (!ind ? unbounded_shl(w & masks[0], shift_rem) :
                                               unbounded_shr(w & masks[1], UnitBits + sz[0]));
                         bits_left -= sz[ind];
                         masks[ind] = unbounded_shl(masks[ind], UnitBits);
@@ -85,17 +85,16 @@ namespace nil {
                     std::size_t shift_unit_bits = shift - shift_rem;
 
                     std::size_t sz[2] = {UnitBits - shift_rem, shift_rem};
-                    word_type masks[2] = {unbounded_shr(high_bits<word_bits>(~word_type(), sz[0]),
-                                          shift_unit_bits),
-                                          unbounded_shr(high_bits<word_bits>(~word_type(), sz[1]),
-                                          shift_unit_bits + UnitBits + sz[0])};
+                    word_type masks[2] = {
+                        unbounded_shr(high_bits<word_bits>(~word_type(), sz[0]), shift_unit_bits),
+                        unbounded_shr(high_bits<word_bits>(~word_type(), sz[1]), shift_unit_bits + UnitBits + sz[0])};
 
                     std::size_t bits_left = word_bits - shift;
                     word_type w_combined = 0;
                     int ind = 0;
 
                     while (bits_left) {
-                        w_combined |= (!ind ? unbounded_shr(w & masks[0], shift_rem) : 
+                        w_combined |= (!ind ? unbounded_shr(w & masks[0], shift_rem) :
                                               unbounded_shl(w & masks[1], UnitBits + sz[0]));
                         bits_left -= sz[ind];
                         masks[ind] = unbounded_shr(masks[ind], UnitBits);

@@ -57,7 +57,6 @@ namespace nil {
                     };
 
                     typedef block_stream_processor<Mode<seed, Padding>, StateAccumulator, params_type> type_;
-
                 };
 
                 seed(const key_type &key) {

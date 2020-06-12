@@ -75,16 +75,15 @@ namespace nil {
                         // Remove garbage
                         std::size_t w_rem = word_seen % UnitBits;
                         std::size_t w_unit_bits = word_seen - w_rem;
-                        word_type mask = low_bits<word_bits>(~word_type(), w_unit_bits) |
-                                         unbounded_shl(low_bits<word_bits>(~word_type(), w_rem),
-                                         w_unit_bits + UnitBits - w_rem);
+                        word_type mask =
+                            low_bits<word_bits>(~word_type(), w_unit_bits) |
+                            unbounded_shl(low_bits<word_bits>(~word_type(), w_rem), w_unit_bits + UnitBits - w_rem);
                         w &= mask;
 
                         std::size_t b_rem = last_word_seen % UnitBits;
                         std::size_t b_unit_bits = last_word_seen - b_rem;
                         mask = low_bits<word_bits>(~word_type(), b_unit_bits) |
-                               unbounded_shl(low_bits<word_bits>(~word_type(), b_rem), 
-                               b_unit_bits + UnitBits - b_rem);
+                               unbounded_shl(low_bits<word_bits>(~word_type(), b_rem), b_unit_bits + UnitBits - b_rem);
                         b[last_word_ind] &= mask;
 
                         // Split and combine parts of unit values
@@ -98,7 +97,7 @@ namespace nil {
                         std::size_t sz_ind = 0;
 
                         while (bw_space && w_space) {
-                            w_split |= (!sz_ind ? unbounded_shr(w & masks[0], b_rem) : 
+                            w_split |= (!sz_ind ? unbounded_shr(w & masks[0], b_rem) :
                                                   unbounded_shl(w & masks[1], UnitBits + sz[0]));
                             bw_space -= sz[sz_ind];
                             w_space -= (w_space >= sz[sz_ind]) ? sz[sz_ind] : w_space;
@@ -113,11 +112,12 @@ namespace nil {
                         if (last_word_seen + word_seen > word_bits) {
                             w = unbounded_shr(w, word_bits - b_unit_bits - UnitBits);
                             w_split = 0;
-                            masks[0] = unbounded_shl(low_bits<word_bits>(~word_type(), UnitBits - b_rem), b_rem + UnitBits);
+                            masks[0] =
+                                unbounded_shl(low_bits<word_bits>(~word_type(), UnitBits - b_rem), b_rem + UnitBits);
                             masks[1] = low_bits<word_bits>(~word_type(), b_rem);
 
                             while (w_space) {
-                                w_split |= (!sz_ind ? unbounded_shr(w & masks[0], b_rem) : 
+                                w_split |= (!sz_ind ? unbounded_shr(w & masks[0], b_rem) :
                                                       unbounded_shl(w & masks[1], UnitBits + sz[0]));
                                 w_space -= (w_space >= sz[sz_ind]) ? sz[sz_ind] : w_space;
                                 masks[sz_ind] = unbounded_shl(masks[sz_ind], UnitBits);
@@ -152,28 +152,28 @@ namespace nil {
                         // Remove garbage
                         std::size_t w_rem = word_seen % UnitBits;
                         std::size_t w_unit_bits = word_seen - w_rem;
-                        word_type mask = high_bits<word_bits>(~word_type(), w_unit_bits) |
-                                         unbounded_shr(high_bits<word_bits>(~word_type(), w_rem), 
-                                         w_unit_bits + UnitBits - w_rem);
+                        word_type mask =
+                            high_bits<word_bits>(~word_type(), w_unit_bits) |
+                            unbounded_shr(high_bits<word_bits>(~word_type(), w_rem), w_unit_bits + UnitBits - w_rem);
                         w &= mask;
                         std::size_t b_rem = last_word_seen % UnitBits;
                         std::size_t b_unit_bits = last_word_seen - b_rem;
                         mask = high_bits<word_bits>(~word_type(), b_unit_bits) |
-                               unbounded_shr(high_bits<word_bits>(~word_type(), b_rem), 
-                               b_unit_bits + UnitBits - b_rem);
+                               unbounded_shr(high_bits<word_bits>(~word_type(), b_rem), b_unit_bits + UnitBits - b_rem);
                         b[last_word_ind] &= mask;
 
                         // Split and combine parts of unit values
                         std::size_t sz[2] = {UnitBits - b_rem, b_rem};
-                        word_type masks[2] = {unbounded_shr(high_bits<word_bits>(~word_type(), UnitBits - b_rem), b_rem),
-                                              high_bits<word_bits>(~word_type(), b_rem)};
+                        word_type masks[2] = {
+                            unbounded_shr(high_bits<word_bits>(~word_type(), UnitBits - b_rem), b_rem),
+                            high_bits<word_bits>(~word_type(), b_rem)};
                         std::size_t bw_space = word_bits - last_word_seen;
                         std::size_t w_space = word_seen;
                         word_type w_split = 0;
                         std::size_t sz_ind = 0;
 
                         while (bw_space && w_space) {
-                            w_split |= (!sz_ind ? unbounded_shl(w & masks[0], b_rem) : 
+                            w_split |= (!sz_ind ? unbounded_shl(w & masks[0], b_rem) :
                                                   unbounded_shr(w & masks[1], UnitBits + sz[0]));
                             bw_space -= sz[sz_ind];
                             w_space -= (w_space >= sz[sz_ind]) ? sz[sz_ind] : w_space;
@@ -188,11 +188,12 @@ namespace nil {
                         if (last_word_seen + word_seen > word_bits) {
                             w = unbounded_shl(w, word_bits - b_unit_bits - UnitBits);
                             w_split = 0;
-                            masks[0] = unbounded_shr(high_bits<word_bits>(~word_type(), UnitBits - b_rem), b_rem + UnitBits);
+                            masks[0] =
+                                unbounded_shr(high_bits<word_bits>(~word_type(), UnitBits - b_rem), b_rem + UnitBits);
                             masks[1] = high_bits<word_bits>(~word_type(), b_rem);
 
                             while (w_space) {
-                                w_split |= (!sz_ind ? unbounded_shl(w & masks[0], b_rem) : 
+                                w_split |= (!sz_ind ? unbounded_shl(w & masks[0], b_rem) :
                                                       unbounded_shr(w & masks[1], UnitBits + sz[0]));
                                 w_space -= (w_space >= sz[sz_ind]) ? sz[sz_ind] : w_space;
                                 masks[sz_ind] = unbounded_shr(masks[sz_ind], UnitBits);

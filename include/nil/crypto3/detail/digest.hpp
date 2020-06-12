@@ -76,7 +76,6 @@ namespace nil {
             }
         }    // namespace detail
 
-
         /*!
          *
          * @tparam NewBits
@@ -103,7 +102,7 @@ namespace nil {
          */
         template<std::size_t DigestBits>
         digest<DigestBits> resize(const digest<DigestBits> &od, std::size_t new_size) {
-            
+
             std::size_t old_size = od.size();
 
             if (new_size == old_size)

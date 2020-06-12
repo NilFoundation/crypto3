@@ -60,7 +60,6 @@ namespace nil {
                     };
 
                     typedef block_stream_processor<Mode<des, Padding>, StateAccumulator, params_type> type_;
-
                 };
 
                 des(const key_type &key) {
@@ -143,7 +142,6 @@ namespace nil {
 
                     typedef block_stream_processor<Mode<triple_des<KeyBits>, Padding>, StateAccumulator, params_type>
                         type;
-
                 };
 
                 triple_des(const key_type &key) {

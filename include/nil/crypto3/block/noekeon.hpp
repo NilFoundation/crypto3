@@ -58,7 +58,6 @@ namespace nil {
                     };
 
                     typedef block_stream_processor<Mode<noekeon, Padding>, StateAccumulator, params_type> type_;
-
                 };
 
                 noekeon(const key_type &key) {

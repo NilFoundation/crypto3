@@ -17,7 +17,6 @@
 
 #include <nil/crypto3/block/detail/utilities/secmem.hpp>
 
-
 namespace nil {
     namespace crypto3 {
         namespace block {

@@ -59,7 +59,6 @@ namespace nil {
                     };
 
                     typedef block_stream_processor<Mode<misty1, Padding>, StateAccumulator, params_type> type_;
-
                 };
 
                 misty1(const key_type &key) {

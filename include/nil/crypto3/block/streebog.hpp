@@ -55,7 +55,6 @@ namespace nil {
                     };
 
                     typedef block_stream_processor<Mode<streebog, Padding>, StateAccumulator, params_type> type_;
-
                 };
 
                 streebog(const key_type &key) {

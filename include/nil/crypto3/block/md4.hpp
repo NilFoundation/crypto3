@@ -65,7 +65,6 @@ namespace nil {
                     };
 
                     typedef block_stream_processor<Mode<md4, Padding>, StateAccumulator, params_type> type_;
-
                 };
 
                 md4(const key_type &k) : key(k) {

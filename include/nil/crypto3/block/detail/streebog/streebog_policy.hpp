@@ -17,7 +17,8 @@ namespace nil {
             namespace detail {
                 template<std::size_t BlockBits, std::size_t KeyBits>
                 struct streebog_policy : public ::nil::crypto3::detail::basic_functions<64> {
-                    constexpr static const std::size_t word_bits = ::nil::crypto3::detail::basic_functions<64>::word_bits;
+                    constexpr static const std::size_t word_bits =
+                        ::nil::crypto3::detail::basic_functions<64>::word_bits;
                     constexpr static const std::size_t word_bytes = word_bits / CHAR_BIT;
                     typedef typename ::nil::crypto3::detail::basic_functions<64>::word_type word_type;
 

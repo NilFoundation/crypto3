@@ -129,7 +129,7 @@ namespace nil {
 
                 constexpr static const std::size_t key_bits = policy_type::key_bits;
                 constexpr static const std::size_t key_words = policy_type::key_words;
-//                typedef typename policy_type::key_schedule_word_type key_schedule_word_type;
+                //                typedef typename policy_type::key_schedule_word_type key_schedule_word_type;
                 typedef typename policy_type::key_type key_type;
 
                 constexpr static const std::size_t block_bits = policy_type::block_bits;
@@ -147,7 +147,6 @@ namespace nil {
                     };
 
                     typedef block_stream_processor<Mode, StateAccumulator, params_type> type;
-
                 };
 
                 typedef typename stream_endian::little_octet_big_bit endian_type;

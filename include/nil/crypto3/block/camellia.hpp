@@ -61,8 +61,8 @@ namespace nil {
                         constexpr static const std::size_t length_bits = policy_type::word_bits * 2;
                     };
 
-                    typedef block_stream_processor<Mode<camellia<KeyBits>, Padding>, StateAccumulator, params_type> type_;
-
+                    typedef block_stream_processor<Mode<camellia<KeyBits>, Padding>, StateAccumulator, params_type>
+                        type_;
                 };
 
                 camellia(const key_type &key) {

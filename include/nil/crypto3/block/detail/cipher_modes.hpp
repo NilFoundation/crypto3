@@ -35,7 +35,7 @@ namespace nil {
                     typedef typename isomorphic_policy<Cipher, Padding>::cipher_type cipher_type;
                     typedef typename isomorphic_policy<Cipher, Padding>::block_type block_type;
 
-                    //There should be user's system endianness
+                    // There should be user's system endianness
                     typedef typename stream_endian::big_octet_big_bit input_endian_type;
 
                     inline static block_type begin_message(const cipher_type &cipher, const block_type &plaintext) {
@@ -92,7 +92,7 @@ namespace nil {
                     constexpr static const size_type block_bits = policy_type::block_bits;
                     constexpr static const size_type block_words = policy_type::block_words;
                     constexpr static const size_type word_bits = cipher_type::word_bits;
-                    
+
                     isomorphic(const cipher_type &cipher) : cipher(cipher) {
                     }
 
@@ -102,7 +102,6 @@ namespace nil {
 
                     block_type process_block(const block_type &plaintext, std::size_t total_seen) {
                         return policy_type::process_block(cipher, plaintext);
-                        
                     }
 
                     block_type end_message(const block_type &plaintext, std::size_t total_seen) const {

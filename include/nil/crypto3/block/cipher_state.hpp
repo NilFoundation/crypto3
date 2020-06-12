@@ -30,10 +30,9 @@ namespace nil {
              * @tparam LengthBits
              */
             template<typename ProcessingMode>
-            using accumulator_set = 
-                boost::accumulators::accumulator_set<digest<ProcessingMode::block_bits>,
-                                                    boost::accumulators::features<accumulators::tag::block<ProcessingMode>>,
-                                                    std::size_t>;
+            using accumulator_set = boost::accumulators::accumulator_set<
+                digest<ProcessingMode::block_bits>,
+                boost::accumulators::features<accumulators::tag::block<ProcessingMode>>, std::size_t>;
         }    // namespace block
     }        // namespace crypto3
 }    // namespace nil

@@ -25,7 +25,7 @@ namespace nil {
 
         namespace {
 
-            uint64_t flags_by_ios_machine_type(const std::string& machine) {
+            uint64_t flags_by_ios_machine_type(const std::string &machine) {
                 /*
                  * This relies on a map of known machine names to features. This
                  * will quickly grow out of date as new products are introduced, but
@@ -68,7 +68,7 @@ namespace nil {
                 if (version == 0)
                     return 0;
 
-                for (const version_info& info : min_versions) {
+                for (const version_info &info : min_versions) {
                     if (info.name != product)
                         continue;
 
@@ -89,7 +89,7 @@ namespace nil {
 
 #endif
 
-        uint64_t cpuid::detect_cpu_features(size_t* cache_line_size) {
+        uint64_t cpuid::detect_cpu_features(size_t *cache_line_size) {
             uint64_t detected_features = 0;
 
 #if defined(CRYPTO3_TARGET_OS_HAS_GETAUXVAL)

@@ -40,14 +40,15 @@ namespace nil {
         OutputIterator decrypt(InputIterator first, InputIterator last, KeyIterator key_first, KeyIterator key_last,
                                OutputIterator out) {
 
-            typedef typename block::modes::isomorphic < BlockCipher,
-                                            nop_padding>::template bind <decryption_policy<BlockCipher>>::type DecryptionMode;
+            typedef typename block::modes::isomorphic<BlockCipher, nop_padding>::template bind<
+                decryption_policy<BlockCipher>>::type DecryptionMode;
             typedef typename block::accumulator_set<DecryptionMode> CipherAccumulator;
 
             typedef block::detail::value_cipher_impl<CipherAccumulator> StreamDecrypterImpl;
             typedef block::detail::itr_cipher_impl<StreamDecrypterImpl, OutputIterator> DecrypterImpl;
 
-            return DecrypterImpl(first, last, std::move(out), CipherAccumulator(DecryptionMode(BlockCipher(key_first, key_last))));
+            return DecrypterImpl(first, last, std::move(out),
+                                 CipherAccumulator(DecryptionMode(BlockCipher(key_first, key_last))));
         }
 
         /*!
@@ -65,10 +66,9 @@ namespace nil {
          *
          * @return
          */
-        template<
-            typename BlockCipher, typename InputIterator,
-            typename OutputAccumulator = typename block::accumulator_set<typename block::modes::isomorphic < BlockCipher,
-                                            nop_padding>::template bind <decryption_policy<BlockCipher>>::type>>
+        template<typename BlockCipher, typename InputIterator,
+                 typename OutputAccumulator = typename block::accumulator_set<typename block::modes::isomorphic<
+                     BlockCipher, nop_padding>::template bind<decryption_policy<BlockCipher>>::type>>
         OutputAccumulator &decrypt(InputIterator first, InputIterator last, OutputAccumulator &acc) {
 
             typedef block::detail::ref_cipher_impl<OutputAccumulator> StreamDecrypterImpl;
@@ -91,11 +91,10 @@ namespace nil {
          *
          * @return
          */
-        template<
-            typename BlockCipher, typename SinglePassRange,
-            typename OutputAccumulator = typename block::accumulator_set<typename block::modes::isomorphic < BlockCipher,
-                                            nop_padding>::template bind <typename block::modes::isomorphic<BlockCipher,
-                                            nop_padding>::decryption_policy>::type>>
+        template<typename BlockCipher, typename SinglePassRange,
+                 typename OutputAccumulator = typename block::accumulator_set<
+                     typename block::modes::isomorphic<BlockCipher, nop_padding>::template bind<
+                         typename block::modes::isomorphic<BlockCipher, nop_padding>::decryption_policy>::type>>
         OutputAccumulator &decrypt(const SinglePassRange &r, OutputAccumulator &acc) {
 
             typedef block::detail::ref_cipher_impl<OutputAccumulator> StreamDecrypterImpl;
@@ -121,15 +120,14 @@ namespace nil {
          *
          * @return
          */
-        template<
-            typename BlockCipher, typename InputIterator, typename KeyIterator,
-            typename CipherAccumulator = typename block::accumulator_set<typename block::modes::isomorphic < BlockCipher,
-                                            nop_padding>::template bind <decryption_policy<BlockCipher>>::type>>
+        template<typename BlockCipher, typename InputIterator, typename KeyIterator,
+                 typename CipherAccumulator = typename block::accumulator_set<typename block::modes::isomorphic<
+                     BlockCipher, nop_padding>::template bind<decryption_policy<BlockCipher>>::type>>
         block::detail::range_cipher_impl<block::detail::value_cipher_impl<CipherAccumulator>>
             decrypt(InputIterator first, InputIterator last, KeyIterator key_first, KeyIterator key_last) {
 
-            typedef typename block::modes::isomorphic < BlockCipher,
-                                            nop_padding>::template bind <decryption_policy<BlockCipher>>::type DecryptionMode;
+            typedef typename block::modes::isomorphic<BlockCipher, nop_padding>::template bind<
+                decryption_policy<BlockCipher>>::type DecryptionMode;
 
             typedef block::detail::value_cipher_impl<CipherAccumulator> StreamDecrypterImpl;
             typedef block::detail::range_cipher_impl<StreamDecrypterImpl> DecrypterImpl;
@@ -156,8 +154,8 @@ namespace nil {
         template<typename BlockCipher, typename SinglePassRange, typename KeyRange, typename OutputIterator>
         OutputIterator decrypt(const SinglePassRange &rng, const KeyRange &key, OutputIterator out) {
 
-            typedef typename block::modes::isomorphic < BlockCipher,
-                                            nop_padding>::template bind <decryption_policy<BlockCipher>>::type DecryptionMode;
+            typedef typename block::modes::isomorphic<BlockCipher, nop_padding>::template bind<
+                decryption_policy<BlockCipher>>::type DecryptionMode;
             typedef typename block::accumulator_set<DecryptionMode> CipherAccumulator;
 
             typedef block::detail::value_cipher_impl<CipherAccumulator> StreamDecrypterImpl;
@@ -181,15 +179,14 @@ namespace nil {
          *
          * @return
          */
-        template<
-            typename BlockCipher, typename SinglePassRange,
-            typename CipherAccumulator = typename block::accumulator_set<typename block::modes::isomorphic < BlockCipher,
-                                            nop_padding>::template bind <decryption_policy<BlockCipher>>::type>>
+        template<typename BlockCipher, typename SinglePassRange,
+                 typename CipherAccumulator = typename block::accumulator_set<typename block::modes::isomorphic<
+                     BlockCipher, nop_padding>::template bind<decryption_policy<BlockCipher>>::type>>
         block::detail::range_cipher_impl<block::detail::value_cipher_impl<CipherAccumulator>>
             decrypt(const SinglePassRange &r, typename BlockCipher::key_type &key) {
 
-            typedef typename block::modes::isomorphic < BlockCipher,
-                                            nop_padding>::template bind <decryption_policy<BlockCipher>>::type DecryptionMode;
+            typedef typename block::modes::isomorphic<BlockCipher, nop_padding>::template bind<
+                decryption_policy<BlockCipher>>::type DecryptionMode;
 
             typedef block::detail::value_cipher_impl<CipherAccumulator> StreamDecrypterImpl;
             typedef block::detail::range_cipher_impl<StreamDecrypterImpl> DecrypterImpl;

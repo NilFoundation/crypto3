@@ -51,33 +51,35 @@ namespace nil {
                 constexpr static const std::size_t length_bits = params_type::length_bits;
                 constexpr static const std::size_t word_bits = mode_type::word_bits;
                 // FIXME: do something more intelligent than capping at sizeof(boost::uintmax_t) * CHAR_BIT
-                constexpr static const std::size_t length_type_bits =
-                    length_bits < word_bits ? word_bits : length_bits > sizeof(boost::uintmax_t) * CHAR_BIT 
-                    ? sizeof(boost::uintmax_t) * CHAR_BIT : length_bits;
+                constexpr static const std::size_t length_type_bits = length_bits < word_bits ?
+                                                                          word_bits :
+                                                                          length_bits >
+                                                                                  sizeof(boost::uintmax_t) * CHAR_BIT ?
+                                                                          sizeof(boost::uintmax_t) * CHAR_BIT :
+                                                                          length_bits;
                 typedef typename boost::uint_t<length_type_bits>::least length_type;
 
                 BOOST_STATIC_ASSERT(!length_bits || length_bits % word_bits == 0);
                 BOOST_STATIC_ASSERT(input_block_bits % value_bits == 0);
 
                 BOOST_STATIC_ASSERT(!length_bits || value_bits <= length_bits);
-/*
-                template<typename Endianness = input_endian_type>
-                typename std::enable_if<!(Endianness == stream_endian::big_octet_big_bit)>::type
-                process_block(std::size_t block_seen = block_bits) {
-                    acc(cache, accumulators::block_bits = block_seen);
-                }
-                template<typename Endianness = input_endian_type>
-                typename std::enable_if<Endianness == stream_endian::big_octet_big_bit>::type
-                process_block(std::size_t block_seen = block_bits) {
-                    using namespace nil::crypto3::detail;
-                    // Convert the input into words
-                    block_type block;
-                    pack<endian_type, value_bits, word_bits>(cache, block);
-                    // Process the block
-                    acc(block, accumulators::block_bits = block_seen);
-                }
-                */
-
+                /*
+                                template<typename Endianness = input_endian_type>
+                                typename std::enable_if<!(Endianness == stream_endian::big_octet_big_bit)>::type
+                                process_block(std::size_t block_seen = block_bits) {
+                                    acc(cache, accumulators::block_bits = block_seen);
+                                }
+                                template<typename Endianness = input_endian_type>
+                                typename std::enable_if<Endianness == stream_endian::big_octet_big_bit>::type
+                                process_block(std::size_t block_seen = block_bits) {
+                                    using namespace nil::crypto3::detail;
+                                    // Convert the input into words
+                                    block_type block;
+                                    pack<endian_type, value_bits, word_bits>(cache, block);
+                                    // Process the block
+                                    acc(block, accumulators::block_bits = block_seen);
+                                }
+                                */
 
                 void update_one(value_type value) {
                     using namespace nil::crypto3::detail;
@@ -104,7 +106,7 @@ namespace nil {
                 template<typename InputIterator>
                 inline void update_n(InputIterator first, InputIterator last) {
                     using namespace nil::crypto3::detail;
-                    
+
                     std::size_t n = std::distance(first, last);
 #ifndef CRYPTO3_BLOCK_NO_OPTIMIZATION
 #pragma clang loop unroll(full)

@@ -138,7 +138,6 @@ namespace nil {
                                                    StateAccumulator,
                                                    params_type>
                         type_;
-
                 };
 
                 gost_28147_89(const key_type &key,

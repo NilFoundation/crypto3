@@ -34,10 +34,8 @@ namespace nil {
                             constants[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(b, 3)]);
 
                         // L linear transform
-                        return t ^ (policy_type::template rotl<2>(t)) ^
-                               policy_type::template rotl<10>(t) ^
-                               policy_type::template rotl<18>(t) ^
-                               policy_type::template rotl<24>(t);
+                        return t ^ (policy_type::template rotl<2>(t)) ^ policy_type::template rotl<10>(t) ^
+                               policy_type::template rotl<18>(t) ^ policy_type::template rotl<24>(t);
                     }
 
                     inline static word_type t(word_type b, const transposed_constants_type &constants) {
@@ -59,8 +57,7 @@ namespace nil {
                             constants[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(b, 3)]);
 
                         // L' linear transform
-                        return t ^ (policy_type::template rotl<13>(t)) ^
-                               policy_type::template rotl<23>(t);
+                        return t ^ (policy_type::template rotl<13>(t)) ^ policy_type::template rotl<23>(t);
                     }
                 };
             }    // namespace detail

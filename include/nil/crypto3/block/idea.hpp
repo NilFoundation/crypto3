@@ -59,7 +59,6 @@ namespace nil {
                     };
 
                     typedef block_stream_processor<Mode<idea, Padding>, StateAccumulator, params_type> type_;
-
                 };
 
                 idea(const key_type &key) {
