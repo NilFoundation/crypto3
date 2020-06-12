@@ -129,7 +129,7 @@ namespace nil {
 
                 constexpr static const std::size_t key_bits = policy_type::key_bits;
                 constexpr static const std::size_t key_words = policy_type::key_words;
-                typedef typename policy_type::key_schedule_word_type key_schedule_word_type;
+                //                typedef typename policy_type::key_schedule_word_type key_schedule_word_type;
                 typedef typename policy_type::key_type key_type;
 
                 constexpr static const std::size_t block_bits = policy_type::block_bits;
@@ -139,25 +139,17 @@ namespace nil {
                 constexpr static const std::uint8_t rounds = policy_type::rounds;
                 typedef typename policy_type::round_constants_type round_constants_type;
 
-                template<template<typename, typename> class Mode, typename StateAccumulator, std::size_t ValueBits,
-                         typename Padding>
+                template<class Mode, typename StateAccumulator, std::size_t ValueBits>
                 struct stream_processor {
                     struct params_type {
-                        typedef typename stream_endian::little_octet_big_bit endian_type;
-
                         constexpr static const std::size_t value_bits = ValueBits;
                         constexpr static const std::size_t length_bits = policy_type::word_bits * 2;
                     };
 
-                    typedef block_stream_processor<Mode<rijndael<KeyBits, BlockBits>, Padding>, StateAccumulator,
-                                                   params_type>
-                        type_;
-#ifdef CRYPTO3_BLOCK_NO_HIDE_INTERNAL_TYPES
-                    typedef type_ type;
-#else
-                    struct type : type_ {};
-#endif
+                    typedef block_stream_processor<Mode, StateAccumulator, params_type> type;
                 };
+
+                typedef typename stream_endian::little_octet_big_bit endian_type;
 
                 rijndael(const key_type &key) : encryption_key({0}), decryption_key({0}) {
                     impl_type::schedule_key(key, encryption_key, decryption_key);

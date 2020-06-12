@@ -44,22 +44,16 @@ namespace nil {
 
                 constexpr static const std::size_t rounds = policy_type::rounds;
 
-                template<template<typename, typename> class Mode, typename StateAccumulator, std::size_t ValueBits,
-                         typename Padding>
+                typedef typename policy_type::endian_type endian_type;
+
+                template<class Mode, typename StateAccumulator, std::size_t ValueBits>
                 struct stream_processor {
                     struct params_type {
-                        typedef typename stream_endian::little_octet_big_bit endian_type;
-
                         constexpr static const std::size_t value_bits = ValueBits;
                         constexpr static const std::size_t length_bits = policy_type::word_bits * 2;
                     };
 
-                    typedef block_stream_processor<Mode<blowfish, Padding>, StateAccumulator, params_type> type_;
-#ifdef CRYPTO3_BLOCK_NO_HIDE_INTERNAL_TYPES
-                    typedef type_ type;
-#else
-                    struct type : type_ {};
-#endif
+                    typedef block_stream_processor<Mode, StateAccumulator, params_type> type;
                 };
 
                 blowfish(const key_type &key, const salt_type &salt = salt_type()) :

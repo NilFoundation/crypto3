@@ -9,10 +9,13 @@
 #ifndef CRYPTO3_CIPHER_MODES_HPP
 #define CRYPTO3_CIPHER_MODES_HPP
 
+#include <nil/crypto3/detail/stream_endian.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace block {
             namespace detail {
+
                 template<typename Cipher, typename Padding>
                 struct isomorphic_policy {
                     typedef std::size_t size_type;
@@ -23,12 +26,17 @@ namespace nil {
                     constexpr static const size_type block_bits = cipher_type::block_bits;
                     constexpr static const size_type block_words = cipher_type::block_words;
                     typedef typename cipher_type::block_type block_type;
+
+                    typedef typename cipher_type::endian_type endian_type;
                 };
 
                 template<typename Cipher, typename Padding>
                 struct isomorphic_encryption_policy : public isomorphic_policy<Cipher, Padding> {
                     typedef typename isomorphic_policy<Cipher, Padding>::cipher_type cipher_type;
                     typedef typename isomorphic_policy<Cipher, Padding>::block_type block_type;
+
+                    // There should be user's system endianness
+                    typedef typename stream_endian::big_octet_big_bit input_endian_type;
 
                     inline static block_type begin_message(const cipher_type &cipher, const block_type &plaintext) {
                         return cipher.encrypt(plaintext);
@@ -47,6 +55,8 @@ namespace nil {
                 struct isomorphic_decryption_policy : public isomorphic_policy<Cipher, Padding> {
                     typedef typename isomorphic_policy<Cipher, Padding>::cipher_type cipher_type;
                     typedef typename isomorphic_policy<Cipher, Padding>::block_type block_type;
+
+                    typedef typename stream_endian::big_octet_big_bit input_endian_type;
 
                     inline static block_type begin_message(const cipher_type &cipher, const block_type &ciphertext) {
                         return cipher.decrypt(ciphertext);
@@ -72,25 +82,30 @@ namespace nil {
                     typedef typename policy_type::size_type size_type;
 
                     typedef typename cipher_type::key_type key_type;
-                    typedef typename policy_type::iv_type iv_type;
+
+                    typedef typename policy_type::input_endian_type input_endian_type;
+                    typedef typename policy_type::endian_type endian_type;
+
+                    typedef typename cipher_type::block_type block_type;
+                    typedef typename cipher_type::word_type word_type;
 
                     constexpr static const size_type block_bits = policy_type::block_bits;
                     constexpr static const size_type block_words = policy_type::block_words;
-                    typedef typename cipher_type::block_type block_type;
+                    constexpr static const size_type word_bits = cipher_type::word_bits;
 
                     isomorphic(const cipher_type &cipher) : cipher(cipher) {
                     }
 
-                    block_type begin_message(const block_type &plaintext, const iv_type &iv = iv_type()) {
-                        return policy_type::begin_message(cipher, plaintext, iv);
+                    block_type begin_message(const block_type &plaintext, std::size_t total_seen) {
+                        return policy_type::begin_message(cipher, plaintext);
                     }
 
-                    block_type process_block(const block_type &plaintext) {
+                    block_type process_block(const block_type &plaintext, std::size_t total_seen) {
                         return policy_type::process_block(cipher, plaintext);
                     }
 
-                    block_type end_message(const block_type &plaintext, const iv_type &iv = iv_type()) {
-                        return policy_type::end_message(cipher, plaintext, iv);
+                    block_type end_message(const block_type &plaintext, std::size_t total_seen) const {
+                        return policy_type::end_message(cipher, plaintext);
                     }
 
                 protected:
@@ -108,9 +123,9 @@ namespace nil {
                     typedef detail::isomorphic_encryption_policy<cipher_type, padding_type> encryption_policy;
                     typedef detail::isomorphic_decryption_policy<cipher_type, padding_type> decryption_policy;
 
-                    template<template<typename, typename> class Policy>
+                    template<typename Policy>
                     struct bind {
-                        typedef detail::isomorphic<Policy<cipher_type, padding_type>> type;
+                        typedef detail::isomorphic<Policy> type;
                     };
                 };
             }    // namespace modes

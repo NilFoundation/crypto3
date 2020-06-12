@@ -27,7 +27,7 @@ namespace nil {
          * PowerPC specific block: check for AltiVec using either
          * sysctl or by reading processor version number register.
          */
-        uint64_t cpuid::detect_cpu_features(size_t* cache_line_size) {
+        uint64_t cpuid::detect_cpu_features(size_t *cache_line_size) {
             CRYPTO3_UNUSED(cache_line_size);
 
 #if defined(CRYPTO3_TARGET_OS_IS_DARWIN) || defined(CRYPTO3_TARGET_OS_IS_OPENBSD)

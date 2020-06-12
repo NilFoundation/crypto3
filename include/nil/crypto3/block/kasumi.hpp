@@ -58,11 +58,6 @@ namespace nil {
                     };
 
                     typedef block_stream_processor<Mode<kasumi, Padding>, StateAccumulator, params_type> type_;
-#ifdef CRYPTO3_BLOCK_NO_HIDE_INTERNAL_TYPES
-                    typedef type_ type;
-#else
-                    struct type : type_ {};
-#endif
                 };
 
                 kasumi(const key_type &key) {

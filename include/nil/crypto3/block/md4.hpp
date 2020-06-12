@@ -65,11 +65,6 @@ namespace nil {
                     };
 
                     typedef block_stream_processor<Mode<md4, Padding>, StateAccumulator, params_type> type_;
-#ifdef CRYPTO3_BLOCK_NO_HIDE_INTERNAL_TYPES
-                    typedef type_ type;
-#else
-                    struct type : type_ {};
-#endif
                 };
 
                 md4(const key_type &k) : key(k) {

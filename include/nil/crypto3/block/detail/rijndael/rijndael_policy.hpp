@@ -151,7 +151,8 @@ namespace nil {
                         basic_rijndael_policy<KeyBits, BlockBits>::block_words * (rounds + 1);
                     constexpr static const std::size_t key_schedule_bytes = key_schedule_words * word_bytes;
 
-                    typedef typename ::nil::crypto3::detail::basic_functions<word_bits>::word_type key_schedule_word_type;
+                    typedef
+                        typename ::nil::crypto3::detail::basic_functions<word_bits>::word_type key_schedule_word_type;
                     typedef std::array<key_schedule_word_type, key_schedule_words> key_schedule_type;
                 };
 

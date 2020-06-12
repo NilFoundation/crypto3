@@ -9,8 +9,8 @@
 #ifndef CRYPTO3_BLOCK_CIPHER_VALUE_HPP
 #define CRYPTO3_BLOCK_CIPHER_VALUE_HPP
 
-#include <type_traits>
-#include <iterator>
+//#include <type_traits>
+//#include <iterator>
 
 #include <boost/assert.hpp>
 #include <boost/concept_check.hpp>
@@ -18,6 +18,7 @@
 #include <boost/range/concepts.hpp>
 
 #include <nil/crypto3/block/accumulators/block.hpp>
+#include <nil/crypto3/block/cipher_state.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -29,8 +30,8 @@ namespace nil {
                     typedef
                         typename boost::mpl::front<typename accumulator_set_type::features_type>::type accumulator_type;
 
-                    typedef typename CipherAccumulator::mode_type mode_type;
-                    typedef typename mode_type::encoder_type cipher_type;
+                    typedef typename accumulator_type::mode_type mode_type;
+                    typedef typename mode_type::cipher_type cipher_type;
 
                     ref_cipher_impl(const accumulator_set_type &acc) : accumulator_set(acc) {
                     }
@@ -44,8 +45,8 @@ namespace nil {
                     typedef
                         typename boost::mpl::front<typename accumulator_set_type::features_type>::type accumulator_type;
 
-                    typedef typename CipherAccumulator::mode_type mode_type;
-                    typedef typename mode_type::encoder_type cipher_type;
+                    typedef typename accumulator_type::mode_type mode_type;
+                    typedef typename mode_type::cipher_type cipher_type;
 
                     value_cipher_impl(const accumulator_set_type &acc) : accumulator_set(acc) {
                     }

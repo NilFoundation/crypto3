@@ -6,8 +6,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_CODEC_ACCUMULATORS_PARAMETERS_CIPHER_HPP
-#define CRYPTO3_CODEC_ACCUMULATORS_PARAMETERS_CIPHER_HPP
+#ifndef CRYPTO3_BLOCK_ACCUMULATORS_PARAMETERS_CIPHER_HPP
+#define CRYPTO3_BLOCK_ACCUMULATORS_PARAMETERS_CIPHER_HPP
 
 #include <boost/parameter/keyword.hpp>
 #include <boost/accumulators/accumulators_fwd.hpp>

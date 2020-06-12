@@ -19,7 +19,7 @@ namespace nil {
         namespace block {
             namespace detail {
                 template<std::size_t Version, std::size_t KeyBits>
-                struct cast_functions : public basic_cast_policy<Version, KeyBits> {};
+                struct cast_functions : public basic_cast_policy<Version, KeyBits> { };
 
                 template<std::size_t KeyBits>
                 struct cast_functions<128, KeyBits> : public basic_cast_policy<128, KeyBits> {

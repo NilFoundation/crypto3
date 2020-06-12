@@ -19,15 +19,15 @@ namespace nil {
 
 #if defined(CRYPTO3_TARGET_CPU_IS_X86_FAMILY)
 
-        uint64_t cpuid::detect_cpu_features(size_t* cache_line_size) {
+        uint64_t cpuid::detect_cpu_features(size_t *cache_line_size) {
 #if defined(CRYPTO3_BUILD_COMPILER_IS_MSVC)
-#define X86_CPUID(type, out)      \
-    do {                          \
-        __cpuid((int*)out, type); \
+#define X86_CPUID(type, out)       \
+    do {                           \
+        __cpuid((int *)out, type); \
     } while (0)
 #define X86_CPUID_SUBLEVEL(type, level, out) \
     do {                                     \
-        __cpuidex((int*)out, type, level);   \
+        __cpuidex((int *)out, type, level);  \
     } while (0)
 
 #elif defined(CRYPTO3_BUILD_COMPILER_IS_INTEL)
@@ -37,7 +37,7 @@ namespace nil {
     } while (0)
 #define X86_CPUID_SUBLEVEL(type, level, out) \
     do {                                     \
-        __cpuidex((int*)out, type, level);   \
+        __cpuidex((int *)out, type, level);  \
     } while (0)
 
 #elif defined(CRYPTO3_TARGET_ARCHITECTURE_IS_X86_64) && defined(CRYPTO3_USE_GCC_INLINE_ASM)

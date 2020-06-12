@@ -26,8 +26,7 @@ namespace nil {
                     inline static void theta(word_type &A0, word_type &A1, word_type &A2, word_type &A3,
                                              const word_type *EK) {
                         word_type T = A0 ^ A2;
-                        T ^= policy_type::template rotl<8>(T) ^
-                             policy_type::template rotr<8>(T);
+                        T ^= policy_type::template rotl<8>(T) ^ policy_type::template rotr<8>(T);
                         A1 ^= T;
                         A3 ^= T;
 
@@ -37,8 +36,7 @@ namespace nil {
                         A3 ^= EK[3];
 
                         T = A1 ^ A3;
-                        T ^= policy_type::template rotl<8>(T) ^
-                             policy_type::template rotr<8>(T);
+                        T ^= policy_type::template rotl<8>(T) ^ policy_type::template rotr<8>(T);
                         A0 ^= T;
                         A2 ^= T;
                     }
@@ -48,14 +46,12 @@ namespace nil {
                      */
                     inline static void theta(word_type &A0, word_type &A1, word_type &A2, word_type &A3) {
                         word_type T = A0 ^ A2;
-                        T ^= policy_type::template rotl<8>(T) ^
-                             policy_type::template rotr<8>(T);
+                        T ^= policy_type::template rotl<8>(T) ^ policy_type::template rotr<8>(T);
                         A1 ^= T;
                         A3 ^= T;
 
                         T = A1 ^ A3;
-                        T ^= policy_type::template rotl<8>(T) ^
-                             policy_type::template rotr<8>(T);
+                        T ^= policy_type::template rotl<8>(T) ^ policy_type::template rotr<8>(T);
                         A0 ^= T;
                         A2 ^= T;
                     }

@@ -18,7 +18,8 @@ namespace nil {
         namespace block {
             namespace detail {
                 struct kasumi_policy : ::nil::crypto3::detail::basic_functions<16> {
-                    constexpr static const std::size_t word_bits = ::nil::crypto3::detail::basic_functions<16>::word_bits;
+                    constexpr static const std::size_t word_bits =
+                        ::nil::crypto3::detail::basic_functions<16>::word_bits;
                     typedef typename ::nil::crypto3::detail::basic_functions<16>::word_type word_type;
 
                     constexpr static const std::size_t block_bits = 64;

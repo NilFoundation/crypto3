@@ -21,4 +21,4 @@ namespace nil {
     }        // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_BITS_HPP
+#endif    // CRYPTO3_BLOCK_ACCUMULATORS_PARAMETERS_BITS_HPP

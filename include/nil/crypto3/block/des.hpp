@@ -60,11 +60,6 @@ namespace nil {
                     };
 
                     typedef block_stream_processor<Mode<des, Padding>, StateAccumulator, params_type> type_;
-#ifdef CRYPTO3_BLOCK_NO_HIDE_INTERNAL_TYPES
-                    typedef type_ type;
-#else
-                    struct type : type_ {};
-#endif
                 };
 
                 des(const key_type &key) {
@@ -146,12 +141,7 @@ namespace nil {
                     };
 
                     typedef block_stream_processor<Mode<triple_des<KeyBits>, Padding>, StateAccumulator, params_type>
-                        type_;
-#ifdef CRYPTO3_BLOCK_NO_HIDE_INTERNAL_TYPES
-                    typedef type_ type;
-#else
-                    struct type : type_ {};
-#endif
+                        type;
                 };
 
                 triple_des(const key_type &key) {

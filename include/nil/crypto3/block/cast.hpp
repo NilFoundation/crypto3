@@ -64,13 +64,9 @@ namespace nil {
                         constexpr static const std::size_t length_bits = policy_type::word_bits * 2;
                     };
 
-                    typedef block_stream_processor<Mode<cast<BlockBits, KeyBits>, Padding>, StateAccumulator, params_type>
+                    typedef block_stream_processor<Mode<cast<BlockBits, KeyBits>, Padding>, StateAccumulator,
+                                                   params_type>
                         type_;
-#ifdef CRYPTO3_BLOCK_NO_HIDE_INTERNAL_TYPES
-                    typedef type_ type;
-#else
-                    struct type : type_ {};
-#endif
                 };
 
                 cast(const key_type &key) {

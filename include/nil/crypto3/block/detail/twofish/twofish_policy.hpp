@@ -16,7 +16,7 @@ namespace nil {
         namespace block {
             namespace detail {
                 template<std::size_t KeyBits>
-                struct twofish_policy : public twofish_functions<KeyBits> {};
+                struct twofish_policy : public twofish_functions<KeyBits> { };
 
                 template<>
                 struct twofish_policy<128> : public twofish_functions<128> {
