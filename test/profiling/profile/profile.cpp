@@ -23,7 +23,7 @@
 #include <sys/resource.h>
 #include <unistd.h>
 
-#include <nil/cas/ff/algebra/curves/edwards/edwards_pp.hpp>
+#include <nil/cas/ff/curves/edwards/edwards_pp.hpp>
 #include <nil/cas/ff/common/double.hpp>
 #include <omp.h>
 

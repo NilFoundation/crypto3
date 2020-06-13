@@ -11,7 +11,7 @@
 #include <vector>
 
 //#include <gtest/gtest.h>
-#include <nil/cas/ff/algebra/curves/mnt/mnt4/mnt4_pp.hpp>
+#include <nil/cas/ff/curves/mnt/mnt4/mnt4_pp.hpp>
 #include <stdint.h>
 
 #include <nil/cas/fft/evaluation_domain/domains/arithmetic_sequence_domain.hpp>

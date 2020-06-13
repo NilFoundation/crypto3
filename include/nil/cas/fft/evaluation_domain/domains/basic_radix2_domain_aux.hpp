@@ -17,7 +17,7 @@
 #include <omp.h>
 #endif
 
-#include <nil/cas/ff/algebra/fields/field_utils.hpp>
+#include <nil/cas/ff/fields/field_utils.hpp>
 
 #ifdef DEBUG
 #include <nil/cas/ff/common/profiling.hpp>

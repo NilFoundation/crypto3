@@ -15,7 +15,7 @@
 #include <nil/cas/fft/evaluation_domain/evaluation_domain.hpp>
 #include <nil/cas/fft/evaluation_domain/domains/basic_radix2_domain_aux.hpp>
 
-#include <nil/cas/ff/algebra/fields/field_utils.hpp>
+#include <nil/cas/ff/fields/field_utils.hpp>
 #include <nil/cas/ff/common/double.hpp>
 #include <nil/cas/ff/common/utils.hpp>
 
