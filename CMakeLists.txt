@@ -21,9 +21,12 @@ cm_find_package(CM)
 include(CMDeploy)
 include(CMSetupVersion)
 
-if(NOT Boost_FOUND)
-    cm_find_package(Boost REQUIRED)
-endif()
+include(TargetArchitecture)
+include(TargetConfiguration)
+include(PlatformConfiguration)
+
+include(CheckSSE)
+include(CheckAVX)
 
 cm_find_package(${CMAKE_WORKSPACE_NAME}_block)
 
@@ -49,7 +52,26 @@ option(CRYPTO3_HASH_STREEBOG "Build with Streebog hash support" TRUE)
 option(CRYPTO3_HASH_TIGER "Build with Tiger hash support" TRUE)
 option(CRYPTO3_HASH_WHIRLPOOL "Build with Whirlpool hash support" TRUE)
 
+set(BUILD_WITH_TARGET_ARCHITECTURE "" CACHE STRING "Target build architecture")
+
+if(BUILD_WITH_TARGET_ARCHITECTURE)
+    set(CMAKE_TARGET_ARCHITECTURE ${BUILD_WITH_TARGET_ARCHITECTURE})
+else()
+    target_architecture(CMAKE_TARGET_ARCHITECTURE)
+endif()
+
+define_target_architecture(${CMAKE_UPPER_WORKSPACE_NAME} ${CMAKE_TARGET_ARCHITECTURE})
+define_target_endianness(${CMAKE_UPPER_WORKSPACE_NAME} ${CMAKE_TARGET_ARCHITECTURE})
+define_target_platform_features(${CMAKE_UPPER_WORKSPACE_NAME})
+
 define_target_platform_size(${CMAKE_UPPER_WORKSPACE_NAME} ${CMAKE_TARGET_ARCHITECTURE})
+
+check_sse()
+check_avx()
+
+if(NOT Boost_FOUND)
+    cm_find_package(Boost REQUIRED)
+endif()
 
 list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
      include/nil/crypto3/hash/algorithm/hash.hpp
