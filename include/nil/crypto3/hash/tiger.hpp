@@ -18,6 +18,7 @@
 namespace nil {
     namespace crypto3 {
         namespace hash {
+
             template<std::size_t DigestBits = 192, std::size_t Passes = 3>
             struct tiger_compressor {
                 typedef detail::tiger_policy<DigestBits, Passes> policy_type;
@@ -34,6 +35,7 @@ namespace nil {
                 typedef typename policy_type::block_type block_type;
 
                 static inline void process_block(state_type &state, const block_type &block) {
+
                     word_type A = state[0], B = state[1], C = state[2];
 
                     block_type input = block;
@@ -56,7 +58,9 @@ namespace nil {
                     state[0] ^= A;
                     state[1] = B - state[1];
                     state[2] += C;
+
                 }
+
             };
 
             /*!

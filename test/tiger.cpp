@@ -43,6 +43,13 @@ namespace boost {
 BOOST_AUTO_TEST_SUITE(tiger_test_suite)
 
 BOOST_AUTO_TEST_CASE(tiger_range_hash) {
+	std::cout << "hello\n" << std::flush;
+	std::string input = "abc";
+	std::string out = hash<tiger<192>>(input.begin(), input.end());
+	std::cout << "lol\n" << std::flush;
+
+	BOOST_CHECK_EQUAL("2aab1484e8c158f2bfb8c5ff41b57a525129131c957b5f93", out);
+    std::cout << "kek\n"<< std::flush;
 }
 
 BOOST_AUTO_TEST_SUITE_END()

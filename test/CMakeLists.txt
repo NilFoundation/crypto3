@@ -42,25 +42,26 @@ endmacro()
 
 set(TESTS_NAMES
 #    "adler"
-    "blake2b"
+#    "blake2b"
 #    "crc"
 #    "cubehash"
-    "ghash"
-    "keccak"
-    "md4"
-    "md5"
-    "pack"
-    "ripemd"
-    "sha"
-    "sha1"
-    "sha2"
-    "sha3"
-    "skein"
-    "sm3"
-    "static_digest"
-    "streebog"
+#    "ghash"
+#    "keccak"
+#    "md4"
+#    "md5"
+#    "pack"
+#    "ripemd"
+#    "sha"
+#    "sha1"
+#    "sha2"
+#    "sha3"
+#    "skein"
+#    "sm3"
+#    "static_digest"
+#    "streebog"
     "tiger"
-    "whirlpool")
+#    "whirlpool"
+)
 
 foreach(TEST_NAME ${TESTS_NAMES})
     define_hash_test(${TEST_NAME})

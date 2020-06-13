@@ -22,7 +22,7 @@ namespace nil {
                     constexpr static const std::size_t word_bits = policy_type::word_bits;
                     typedef typename policy_type::word_type word_type;
 
-                    constexpr static const std::size_t block_bits = DigestBits;
+                    constexpr static const std::size_t block_bits = 512;
                     constexpr static const std::size_t block_words = block_bits / word_bits;
                     typedef std::array<word_type, block_words> block_type;
 
