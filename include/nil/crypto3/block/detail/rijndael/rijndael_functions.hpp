@@ -32,7 +32,7 @@ namespace nil {
                     typedef std::array<byte_type, constants_size> constants_type;
                     typedef std::array<word_type, constants_size> prefetched_constants_type;
 
-                    constexpr static const constants_type log_ = {
+                    alignas(64) constexpr static const constants_type log_ = {
                         0,   0,   25,  1,   50,  2,   26,  198, 75,  199, 27,  104, 51,  238, 223, 3,   100, 4,   224,
                         14,  52,  141, 129, 239, 76,  113, 8,   200, 248, 105, 28,  193, 125, 194, 29,  181, 249, 185,
                         39,  106, 77,  228, 166, 114, 154, 201, 9,   120, 101, 47,  138, 5,   33,  15,  225, 36,  18,
@@ -48,7 +48,7 @@ namespace nil {
                         35,  32,  46,  137, 180, 124, 184, 38,  119, 153, 227, 165, 103, 74,  237, 222, 197, 49,  254,
                         24,  13,  99,  140, 128, 192, 247, 112, 7};
 
-                    constexpr static const constants_type pow_ = {
+                    alignas(64) constexpr static const constants_type pow_ = {
                         1,   3,   5,   15,  17,  51,  85,  255, 26,  46,  114, 150, 161, 248, 19,  53,  95,  225, 56,
                         72,  216, 115, 149, 164, 247, 2,   6,   10,  30,  34,  102, 170, 229, 52,  92,  228, 55,  89,
                         235, 38,  106, 190, 217, 112, 144, 171, 230, 49,  83,  245, 4,   12,  20,  60,  68,  204, 79,
@@ -138,10 +138,6 @@ namespace nil {
 
                         return result;
                     }
-
-#define AES_T(T, K, V0, V1, V2, V3)                                                         \
-    (K ^ T[extract_uint_t<CHAR_BIT>(V0, 0)] ^ rotr<8>(T[extract_uint_t<CHAR_BIT>(V1, 1)]) ^ \
-     rotr<16>(T[extract_uint_t<CHAR_BIT>(V2, 2)]) ^ rotr<24>(T[extract_uint_t<CHAR_BIT>(V3, 3)]))
                 };
 
                 template<std::size_t KeyBits, std::size_t BlockBits>
