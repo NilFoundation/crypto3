@@ -17,7 +17,7 @@
 
 #include <nil/cas/ff/fields/field_utils.hpp>
 #include <nil/cas/ff/common/double.hpp>
-#include <nil/cas/ff/common/utils.hpp>
+#include <nil/cas/ff/common/utilities.hpp>
 
 
 namespace nil {
