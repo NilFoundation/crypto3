@@ -17,6 +17,7 @@
 #include <omp.h>
 #endif
 
+#include <nil/cas/ff/common/utilities.hpp>
 #include <nil/cas/ff/fields/field_utils.hpp>
 
 #ifdef DEBUG
