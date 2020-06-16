@@ -182,12 +182,12 @@ value to the same `AccumulatorSet` reference.
 
 ## Data Type Conversion {#hashes_data}
  
-Since block cipher algorithms are usually defined for `Integral` types or 
-byte sequences of unique format for each cipher, encryption function being 
-generic requirement should be handled with particular cipher-specific input data 
+Since hash algorithms are usually defined for `Integral` types or 
+byte sequences of unique format for each hash, its function being 
+generic requirement should be handled with particular hash-specific input data 
 format converter.
   
-For example `Rijndael` cipher is defined over blocks of 32 bit words, which 
+For example `SHA2` hash is defined over blocks of 32 bit words, which 
 could be represented with `uint32_t`. This means all the input data should be 
 in some way converted to 4 byte sized `Integral` type. In case of 
 `InputIterator` is defined over some range of `Integral` value type, this is is 
@@ -196,7 +196,7 @@ both input stream and required data format are satisfy the same concept.
     
 The more case with input data being presented by sequence of various type `T` 
 requires for the `T` to has conversion operator `operator Integral()` to the 
-type required by particular `BlockCipher` policy.   
+type required by particular `Hash` policy.   
  
 Example. Let us assume the following class is presented:
 ```cpp
@@ -209,14 +209,14 @@ public:
 ```
 
 Now let us assume there exists an initialized and filled with random values 
-```SequenceContainer``` of value type ```A```:
+`SequenceContainer` of value type `A`:
 
 ```cpp
 std::vector<A> a;
 ```
 
-To feed the ```BlockCipher``` with the data presented, it is required to convert ```A``` to ```Integral``` type which
- is only available if ```A``` has conversion operator in some way as follows:
+To feed the `Hash` with the data presented, it is required to convert `A` to `Integral` type which
+ is only available if `A` has conversion operator in some way as follows:
  
 ```cpp
 class A {
@@ -231,7 +231,7 @@ public:
 };
 ``` 
 
-This part is handled internally with ```stream_processor``` configured for each particular cipher. 
+This part is handled internally with `block_stream_processor` configured for each particular cipher. 
    
 ## Hash Policies {#hashes_policies}
 
