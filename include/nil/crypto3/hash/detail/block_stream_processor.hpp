@@ -62,7 +62,6 @@ namespace nil {
 
                 inline void process_block(std::size_t block_seen = block_bits) {
                     using namespace nil::crypto3::detail;
-
                     // Convert the input into words
                     block_type block;
                     pack_to<endian_type, value_bits, word_bits>(cache.begin(), cache.end(), block.begin());
@@ -80,7 +79,6 @@ namespace nil {
                         cache_seen = 0;
                     }
                 }
-
 
                 template<typename InputIterator>
                 inline void update_n(InputIterator p, size_t n) {
@@ -139,7 +137,7 @@ namespace nil {
                 std::size_t cache_seen;
             };
         }    // namespace hash
-    }        // namespace crypto3
+    }    // namespace crypto3
 }    // namespace nil
 
 #endif

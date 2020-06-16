@@ -32,6 +32,8 @@
 
 #include <boost/accumulators/statistics/count.hpp>
 
+#include <nil/crypto3/detail/unbounded_shift.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace accumulators {
@@ -92,6 +94,7 @@ namespace nil {
                     }
 
                     inline void process(const block_type &value, std::size_t value_seen) {
+
                         using namespace ::nil::crypto3::detail;
 
                         if (filled) {
