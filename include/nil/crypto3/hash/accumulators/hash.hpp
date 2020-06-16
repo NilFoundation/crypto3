@@ -23,7 +23,6 @@
 #include <nil/crypto3/detail/make_array.hpp>
 #include <nil/crypto3/detail/static_digest.hpp>
 #include <nil/crypto3/detail/endian_shift.hpp>
-#include <nil/crypto3/detail/unbounded_shift.hpp>
 #include <nil/crypto3/detail/inject.hpp>
 
 #include <nil/crypto3/hash/accumulators/bits_count.hpp>
@@ -31,8 +30,6 @@
 #include <nil/crypto3/hash/accumulators/parameters/bits.hpp>
 
 #include <boost/accumulators/statistics/count.hpp>
-
-#include <nil/crypto3/detail/unbounded_shift.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -94,7 +91,6 @@ namespace nil {
                     }
 
                     inline void process(const block_type &value, std::size_t value_seen) {
-
                         using namespace ::nil::crypto3::detail;
 
                         if (filled) {

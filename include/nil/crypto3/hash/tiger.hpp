@@ -15,8 +15,6 @@
 #include <nil/crypto3/hash/detail/merkle_damgard_padding.hpp>
 #include <nil/crypto3/hash/detail/block_stream_processor.hpp>
 
-#include <nil/crypto3/detail/unbounded_shift.hpp>
-
 namespace nil {
     namespace crypto3 {
         namespace hash {

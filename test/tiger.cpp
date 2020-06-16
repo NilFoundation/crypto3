@@ -24,7 +24,6 @@
 #include <unordered_map>
 
 #include <cstdio>
-#include <vector>
 
 using namespace nil::crypto3::hash;
 
