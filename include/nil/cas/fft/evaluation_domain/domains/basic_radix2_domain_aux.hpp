@@ -17,11 +17,11 @@
 #include <omp.h>
 #endif
 
-#include <nil/cas/ff/common/utilities.hpp>
-#include <nil/cas/ff/fields/field_utils.hpp>
+#include <nil/algebra/common/utilities.hpp>
+#include <nil/algebra/fields/field_utils.hpp>
 
 #ifdef DEBUG
-#include <nil/cas/ff/common/profiling.hpp>
+#include <nil/algebra/algebra/common/profiling.hpp>
 #endif
 
 
@@ -33,7 +33,7 @@
 #endif
 
 namespace nil {
-    namespace cas {
+    namespace algebra {
         namespace fft {
 
 
@@ -155,7 +155,7 @@ namespace nil {
                 const size_t log_cpus = ((num_cpus & (num_cpus - 1)) == 0 ? log2(num_cpus) : log2(num_cpus) - 1);
 
         #ifdef DEBUG
-                ff::print_indent();
+                algebra::print_indent();
                 printf("* Invoking parallel FFT on 2^%zu CPUs (omp_get_max_threads = %zu)\n", log_cpus, num_cpus);
         #endif
 
@@ -187,7 +187,7 @@ namespace nil {
                     return std::vector<FieldT>(1, FieldT::one());
                 }
 
-                //if (m != (1u << ff::log2(m)))
+                //if (m != (1u << algebra::log2(m)))
                     //throw DomainSizeException("expected m == (1u << log2(m))");
 
                 const FieldT omega = ff::get_root_of_unity<FieldT>(m);
@@ -234,7 +234,7 @@ namespace nil {
             };
 
         }    // namespace fft
-    }        // namespace cas
+    }        // namespace algebra
 }    // namespace nil
 
 #endif    // CAS_FFT_BASIC_RADIX2_DOMAIN_AUX_HPP

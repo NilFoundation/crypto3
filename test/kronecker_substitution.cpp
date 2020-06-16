@@ -21,7 +21,7 @@
 
 using namespace nil::cas::fft;
 
-typedef nil::cas::ff::Double FieldT;
+typedef nil::algebra::Double FieldT;
 
 BOOST_AUTO_TEST_SUITE(kronecker_substitution_test_suite)
 

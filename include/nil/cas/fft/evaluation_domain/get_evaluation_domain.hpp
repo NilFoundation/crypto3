@@ -24,7 +24,7 @@
 #include <nil/cas/fft/tools/exceptions.hpp>
 
 namespace nil {
-    namespace cas {
+    namespace algebra {
         namespace fft {
 
             /*!
@@ -81,7 +81,7 @@ namespace nil {
             }
 
         }    // namespace fft
-    }        // namespace cas
+    }        // namespace algebra
 }    // namespace nil
 
 #endif    // CAS_FFT_GET_EVALUATION_DOMAIN_HPP

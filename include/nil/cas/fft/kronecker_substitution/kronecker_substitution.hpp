@@ -15,10 +15,10 @@
 #include <cmath>
 
 #include </usr/include/x86_64-linux-gnu/gmp.h>
-#include <nil/cas/ff/common/utilities.hpp>
+#include <nil/algebra/common/utilities.hpp>
 
 namespace nil {
-    namespace cas {
+    namespace algebra {
         namespace fft {
             /*!
              * @brief Given two polynomial vectors, A and B, the function performs
@@ -180,7 +180,7 @@ namespace nil {
             }
 
         }    // namespace fft
-    }        // namespace cas
+    }        // namespace algebra
 }    // namespace nil
 
 #endif    // CAS_FFT_KRONECKER_SUBSTITUTION_HPP

@@ -23,8 +23,8 @@
 #include <sys/resource.h>
 #include <unistd.h>
 
-#include <nil/cas/ff/curves/edwards/edwards_pp.hpp>
-#include <nil/cas/ff/common/double.hpp>
+#include <nil/algebra/curves/edwards/edwards_pp.hpp>
+#include <nil/algebra/common/double.hpp>
 #include <omp.h>
 
 #include <nil/cas/fft/evaluation_domain/domains/arithmetic_sequence_domain.hpp>

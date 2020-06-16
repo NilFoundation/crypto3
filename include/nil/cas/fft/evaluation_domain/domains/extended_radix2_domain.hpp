@@ -17,7 +17,7 @@
 
 
 namespace nil {
-    namespace cas {
+    namespace algebra {
         namespace fft {
 
             template<typename FieldT>
@@ -174,7 +174,7 @@ namespace nil {
             };
 
         }    // namespace fft
-    }        // namespace cas
+    }        // namespace algebra
 }    // namespace nil
 
 #endif    // CAS_FFT_EXTENDED_RADIX2_DOMAIN_HPP

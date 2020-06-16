@@ -161,7 +161,7 @@
     };
 
 namespace nil {
-    namespace cas {
+    namespace algebra {
         namespace detail {
 
             template<typename T>
@@ -171,7 +171,7 @@ namespace nil {
 
 
         }    // namespace detail
-    }        // namespace cas
+    }        // namespace algebra
 }    // namespace nil
 
 #endif    // CAS_TYPE_TRAITS_HPP

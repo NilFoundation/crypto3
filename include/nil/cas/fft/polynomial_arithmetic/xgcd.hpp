@@ -17,7 +17,7 @@
 #include <nil/cas/fft/polynomial_arithmetic/basic_operations.hpp>
 
 namespace nil {
-    namespace cas {
+    namespace algebra {
         namespace fft {
 
             /*!
@@ -71,7 +71,7 @@ namespace nil {
             }
 
         }    // namespace fft
-    }        // namespace cas
+    }        // namespace algebra
 }    // namespace nil
 
 #endif    // CAS_FFT_XGCD_HPP

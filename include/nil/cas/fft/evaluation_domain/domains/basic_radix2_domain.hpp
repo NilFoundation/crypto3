@@ -15,13 +15,13 @@
 #include <nil/cas/fft/evaluation_domain/evaluation_domain.hpp>
 #include <nil/cas/fft/evaluation_domain/domains/basic_radix2_domain_aux.hpp>
 
-#include <nil/cas/ff/fields/field_utils.hpp>
-#include <nil/cas/ff/common/double.hpp>
-#include <nil/cas/ff/common/utils.hpp>
+#include <nil/algebra/fields/field_utils.hpp>
+#include <nil/algebra/common/double.hpp>
+#include <nil/algebra/common/utils.hpp>
 
 
 namespace nil {
-    namespace cas {
+    namespace algebra {
         namespace fft {
 
             template<typename FieldT>
@@ -105,7 +105,7 @@ namespace nil {
                 FieldT omega;
             };
         }    // namespace fft
-    }        // namespace cas
+    }        // namespace algebra
 }    // namespace nil
 
 #endif    // CAS_FFT_BASIC_RADIX2_DOMAIN_HPP

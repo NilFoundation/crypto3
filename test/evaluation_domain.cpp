@@ -11,7 +11,7 @@
 #include <vector>
 
 //#include <gtest/gtest.h>
-#include <nil/cas/ff/curves/mnt/mnt4/mnt4_pp.hpp>
+#include <nil/algebra/curves/mnt/mnt4/mnt4_pp.hpp>
 #include <stdint.h>
 
 #include <nil/cas/fft/evaluation_domain/domains/arithmetic_sequence_domain.hpp>
@@ -31,7 +31,7 @@ using namespace nil::cas::fft;
 class EvaluationDomainTest : public ::testing::Test {
 protected:
     virtual void SetUp() {
-        ff::mnt4_pp::init_public_params();
+        algebra::mnt4_pp::init_public_params();
     }
 };
 

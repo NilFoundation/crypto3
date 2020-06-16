@@ -18,7 +18,7 @@
 #include <nil/cas/fft/polynomial_arithmetic/xgcd.hpp>
 
 namespace nil {
-    namespace cas {
+    namespace algebra {
         namespace fft {
 
             /**
@@ -232,7 +232,7 @@ namespace nil {
             }
 
         }    // namespace fft
-    }        // namespace cas
+    }        // namespace algebra
 }    // namespace nil
 
 #endif    // CAS_FFT_BASIS_CHANGE_HPP

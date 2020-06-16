@@ -17,7 +17,7 @@
 #include <nil/cas/fft/evaluation_domain/domains/basic_radix2_domain_aux.hpp>
 
 namespace nil {
-    namespace cas {
+    namespace algebra {
         namespace fft {
 
             template<typename FieldT>
@@ -30,7 +30,7 @@ namespace nil {
                     big_m = 1ul << (ff::log2(m) - 1);
                     small_m = m - big_m;
 
-                    //if (small_m != 1ul << ff::log2(small_m))
+                    //if (small_m != 1ul << algebra::log2(small_m))
                         //throw DomainSizeException("step_radix2(): expected small_m == 1ul<<log2(small_m)");
 
                     //try {
@@ -228,7 +228,7 @@ namespace nil {
             };
 
         }    // namespace fft
-    }        // namespace cas
+    }        // namespace algebra
 }    // namespace nil
 
 #endif    // CAS_FFT_STEP_RADIX2_DOMAIN_HPP

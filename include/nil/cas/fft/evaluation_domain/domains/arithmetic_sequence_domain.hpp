@@ -21,7 +21,7 @@
 #endif
 
 namespace nil {
-    namespace cas {
+    namespace algebra {
         namespace fft {
 
             template<typename FieldT>
@@ -235,7 +235,7 @@ namespace nil {
             };
 
         }    // namespace fft
-    }        // namespace cas
+    }        // namespace algebra
 }    // namespace nil
 
 #endif    // CAS_FFT_ARITHMETIC_SEQUENCE_DOMAIN_HPP

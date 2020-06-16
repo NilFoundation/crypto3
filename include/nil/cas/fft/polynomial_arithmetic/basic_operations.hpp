@@ -20,7 +20,7 @@
 #endif
 
 namespace nil {
-    namespace cas {
+    namespace algebra {
         namespace fft {
 
             /**
@@ -217,7 +217,7 @@ namespace nil {
             }
 
         }    // namespace fft
-    }        // namespace cas
+    }        // namespace algebra
 }    // namespace nil
 
 #endif    // CAS_FFT_BASIC_OPERATIONS_HPP

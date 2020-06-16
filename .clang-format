@@ -58,7 +58,7 @@ IncludeCategories:
         Priority:        1
     -   Regex:           '^(<(boost)/)'
         Priority:        2
-    -   Regex:           '^(<(nil\/cas)/)'
+    -   Regex:           '^(<(nil\/algebra)/)'
         Priority:        3
     -   Regex:           '.*'
         Priority:        4
