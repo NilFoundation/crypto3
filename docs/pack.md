@@ -1,10 +1,10 @@
-# Pack algorithms 
+# Pack algorithms {#pack}
 
 @tableofcontents
 
 ## Introduction
 
-This document provides a detailed description of pack algorithms used in the current project. Briefly, pack algorithms are used throughout the project to transform data divided into chunks with one parameters into the data divided into chunks with another parameters. The dependence of algorithms on these parameters is discussed further in the Section [Algorithms](##algorithms).
+This document provides a detailed description of pack algorithms used in the current project. Briefly, pack algorithms are used throughout the project to transform data divided into chunks with one parameters into the data divided into chunks with another parameters. The dependence of algorithms on these parameters is discussed further in the Section [Algorithms](##pack_algorithms).
 
 ## Basic notions and assumptions
 
@@ -26,7 +26,7 @@ Note that if the unit is byte, then the first two endiannesses coincide with wel
 
 All the notation not described in this section will be introduced on the fly.
 
-## Algorithms
+## Algorithms ## {#pack_algorithms}
 
 Pack algorithms are intended to transform byte-aligned data divided into chunks of bit size denoted by `InputValueBits` into byte-aligned data divided into chunks of bit size denoted by `OutputValueBits`. Moreover, we suppose that all input and output data chunks consist of units ordered in accordance with the corresponding endiannesses. We will refer to these endiannesses as `InputEndianness` and `OutputEndianness`, respectively.
 
@@ -207,7 +207,7 @@ Data chunk order reversal tranforms a group of consecutive input chunks with uni
 The choice of endianness depends on an algorithm where this step is carried out (imploder or exploder).
 2. If the endianness on the previous step is `little_bit`, set shift equal to `OutputBits` - (`InputBits` + already_processed_bits) in the case of imploder, and to `InputBits` - (`OutputBits` + already_processed_bits) in the case of exploder. Otherwise, set shift equal to already_processed_bits.
 
-By already_processed_bits we mean the number of already processed (i.e. combined or splitted) input chunks multiplied by the number bits in a byte. The shift is later used either to retrieve or to accumulate input chunks (see [Imploder](###imploder)).
+By already_processed_bits we mean the number of already processed (i.e. combined or splitted) input chunks multiplied by the number bits in a byte. The shift is later used either to retrieve or to accumulate input chunks (see [Imploder](###pack_imploder)).
 
 ### Unit order reversal
 
@@ -231,7 +231,7 @@ Bit order reversal transforms the order of bits in each input chunk unit. It can
 
 Note that if unit is byte, the first step can be omitted.
 
-### Imploder
+### Imploder ### {#pack_imploder}
 
 Recall that imploder algorithm deals with the case `InputValueBits` < `OutputValueBits` and converts data from `InputEndianness` to `OutputEndianness` order.
 
@@ -275,7 +275,7 @@ Here ```OR``` denotes logical OR operation and ``` << ``` denotes left shift ope
 
 ### Exploder
 
-Exploder algorithm deals with the case `InputValueBits` > `OutputValueBits`, converts data from `InputEndianness` to `OutputEndianness` order and is the same as the imploder algorithm described in Section [Imploder](###imploder) except for several points:
+Exploder algorithm deals with the case `InputValueBits` > `OutputValueBits`, converts data from `InputEndianness` to `OutputEndianness` order and is the same as the imploder algorithm described in Section [Imploder](###pack_imploder) except for several points:
 
 * the condition of shift choice is replaced with `InputEndianness` instead of `OutputEndianness`;
 * right shift operation instead of left shift operation is used;
