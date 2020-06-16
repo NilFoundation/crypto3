@@ -16,9 +16,10 @@ Hashes library architecture consists of several parts listed below:
 
 1. Algorithms
 2. Stream Processors
-3. Accumulators
+3. Hash Policies
 4. Constructions and Compressors
-5. Value Processors
+5. Accumulators
+6. Value Processors
 
 @dot
 digraph hash_arch {
@@ -45,7 +46,7 @@ node [shape="box"]
 
 Implementation of a library is considered to be highly
 compliant with STL. So the crucial point is to have
-ciphers to be usable in the same way as STL algorithms
+hashes to be usable in the same way as STL algorithms
 do.
 
 STL algorithms library mostly consists of generic iterator and since C++20 
@@ -173,10 +174,10 @@ struct2:w3 -> struct3:bl0
 Now with this a [`Hash`](@ref hashes_concept) instance of [`SHA2`](@ref hash::sha2) 
 can be fed.
 
-This mechanism is handled with `block_stream_processor` template class specified for 
-each particular cipher with parameters required. Hashes suppose only one type 
+This mechanism is handled with `stream_processor` template class specified for 
+each particular hash with parameters required. Hashes suppose only one type 
 of stream processor exist - the one which split the data to blocks, converts 
-them and passes to `AccumulatorSet` reference as cipher input of format required. 
+them and passes to `AccumulatorSet` reference as hash input of format required. 
 The rest of data not even to block size gets converted too and fed value by 
 value to the same `AccumulatorSet` reference.
 
@@ -231,10 +232,35 @@ public:
 };
 ``` 
 
-This part is handled internally with `block_stream_processor` configured for each particular cipher. 
+This part is handled internally with `stream_processor` configured for each particular hash. 
    
 ## Hash Policies {#hashes_policies}
+
+Hash policies architecturally are completely stateless.
+Hash policies are required to be compliant with [`Hash` concept](@ref hash_concept). 
+Thus, a policy has to contain all the data corresponding to the `Hash` and defined in 
+the [`Hash` concept](@ref hash_concept).
+
+Among other things a hash policy should contain information about its compressor and construction. For example, for `SHA2` there are Merkle-Damgaard construction and Davies-Meyer compressor. 
+
+## Constructions and Compressors
+
 
 ## Accumulators {#hashes_accumulators}
 
 ## Value Postprocessors {#hashes_value}
+
+Since the accumulator output type is strictly tied to [`digest_type`](@ref hash::digest_type)
+of particular [`Hash`](@ref hash_concept) policy, the output 
+format in generic is closely tied to digest type too. Digest type is usually
+defined as fixed or variable length byte array, which is not always the format of 
+container or range user likes to store output in. It could easily be a 
+`std::vector<uint32_t>` or a `std::string`, so there is a [`hash_value`](@ref hash_value)
+state holder which is made to be implicitly convertible to various container and 
+range types with internal data repacking implemented.
+
+Such a state holder is split to a couple of types:
+1. Value holder. Intended to have an internal output data storage. 
+Actually stores the `AccumulatorSet` with digest data.
+2. Reference holder. Intended to store a reference to external `AccumulatorSet`, 
+which is usable in case of data gets appended to existing accumulator.
