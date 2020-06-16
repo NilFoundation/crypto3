@@ -28,14 +28,16 @@ node [shape="box"]
 
   a [label="Algorithms" color="#F5F2F1" fontcolor="#F5F2F1" URL="@ref hash_algorithms"];
   b [label="Stream Processors" color="#F5F2F1" fontcolor="#F5F2F1" URL="@ref hash_stream"];
-  c [label="Accumulators" color="#F5F2F1" fontcolor="#F5F2F1" URL="@ref hash_accumulators"];
+  c [label="Hash Policies" color="#F5F2F1" fontcolor="#F5F2F1" URL="@ref hash_policy"];
   d [label="Constructions and Compressors" color="#F5F2F1" fontcolor="#F5F2F1" URL="@ref hash_policy"];
-  e [label="Value Processors" color="#F5F2F1" fontcolor="#F5F2F1" URL="@ref hash_value"];
+  e [label="Accumulators" color="#F5F2F1" fontcolor="#F5F2F1" URL="@ref hash_accumulators"];
+  f [label="Value Processors" color="#F5F2F1" fontcolor="#F5F2F1" URL="@ref hash_value"];
   
   a -> b;
   b -> c;
   c -> d;
   d -> e;
+  e -> f;
 }
 @enddot
 
@@ -102,7 +104,7 @@ set with [`hash` accumulator](@ref accumulators::hash) inside initialized with `
 ## Stream Data Processing {#hashes_stream}
 
 Hashes are usually defined for processing `Integral` value typed byte sequences 
-of specific size packed in blocks (e.g. [`sha2`](@ref hash::sha2) is defined for 
+of specific size packed in blocks (e.g. [`SHA2`](@ref hash::sha2) is defined for 
 blocks of words which are actually plain `n`-sized arrays of `uint32_t` ). 
 Input data in the implementation proposed is supposed to be a various-length 
 input stream, which length could be not even to block size.
@@ -125,8 +127,7 @@ struct1 [label="0x00 | 0x01 | 0x02 | 0x03 | 0x04 | 0x05 | 0x06 | 0x07 | 0x08 | 0
 }
 @enddot
 
-Lets assume the selected cipher to be used is Rijndael with 32 bit word size, 128 bit block size and 128
- bit key size. This means input data stream needs to be converted to 32 bit words and merged to 128 bit
+Lets assume the selected hash to be used is SHA2 with 32 bit word size and 512 bit block size. This means input data stream needs to be converted to 32 bit words and merged to 512 bit
   blocks as follows:
   
 @dot
@@ -169,10 +170,10 @@ struct2:w3 -> struct3:bl0
 
 @enddot
 
-Now with this a [`Hash`](@ref hashes_concept) instance of [`sha2`](@ref hash::sha2) 
+Now with this a [`Hash`](@ref hashes_concept) instance of [`SHA2`](@ref hash::sha2) 
 can be fed.
 
-This mechanism is handled with `stream_processor` template class specified for 
+This mechanism is handled with `block_stream_processor` template class specified for 
 each particular cipher with parameters required. Hashes suppose only one type 
 of stream processor exist - the one which split the data to blocks, converts 
 them and passes to `AccumulatorSet` reference as cipher input of format required. 
@@ -232,8 +233,8 @@ public:
 
 This part is handled internally with ```stream_processor``` configured for each particular cipher. 
    
-## Hash Algorithms {#hashes_pol}
+## Hash Policies {#hashes_policies}
 
-## Accumulators {#hashes_acc}
+## Accumulators {#hashes_accumulators}
 
-## Value Postprocessors {#hashes_val}
+## Value Postprocessors {#hashes_value}

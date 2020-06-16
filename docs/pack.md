@@ -207,7 +207,7 @@ Data chunk order reversal tranforms a group of consecutive input chunks with uni
 The choice of endianness depends on an algorithm where this step is carried out (imploder or exploder).
 2. If the endianness on the previous step is `little_bit`, set shift equal to `OutputBits` - (`InputBits` + already_processed_bits) in the case of imploder, and to `InputBits` - (`OutputBits` + already_processed_bits) in the case of exploder. Otherwise, set shift equal to already_processed_bits.
 
-By already_processed_bits we mean the number of already processed (i.e. combined or splitted) input chunks multiplied by the number bits in a byte. The shift is later used either to retrieve or to accumulate input chunks (see [Imploder](###pack_imploder)).
+By already_processed_bits we mean the number of already processed (i.e. combined or splitted) input chunks multiplied by the number bits in a byte. The shift is later used either to retrieve or to accumulate input chunks (see [`Imploder`](@ref #pack_imploder)).
 
 ### Unit order reversal
 
