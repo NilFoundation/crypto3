@@ -94,12 +94,12 @@ namespace nil {
 #ifdef CRYPTO3_BLOCK_NO_OPTIMIZATION
 
                     for (unsigned t = 0; t < rounds; ++t) {
-                        word_type T = policy_type::ROTL<5>(a) + policy_type::f(t, b, c, d) + e +
+                        word_type T = policy_type::rotl<5>(a) + policy_type::f(t, b, c, d) + e +
                                       policy_type::constants[t] + round_constants_words[t];
 
                         e = d;
                         d = c;
-                        c = policy_type::ROTL<30>(b);
+                        c = policy_type::rotl<30>(b);
                         b = a;
                         a = T;
 
