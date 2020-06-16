@@ -19,7 +19,6 @@
 #include <nil/algebra/common/double.hpp>
 #include <nil/algebra/common/utils.hpp>
 
-
 namespace nil {
     namespace algebra {
         namespace fft {
