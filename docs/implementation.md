@@ -248,6 +248,50 @@ Among other things a hash policy should contain information about its compressor
 
 ## Accumulators {#hashes_accumulators}
 
+
+The Hashing contains an accumulation step, which is implemented with 
+[Boost.Accumulators](https://boost.org/libs/accumulators) library.
+
+All the concepts are held.
+
+Hashes contain pre-defined [`block::accumulator_set`](@ref hash::accumulator_set), 
+which is a `boost::accumulator_set` with pre-filled 
+[`hash` accumulator](@ref accumulators::hash).
+
+Hash accumulator accepts only one either `block_type::value_type` or `block_type` 
+at insert.
+
+Accumulator is implemented as a caching one. This means there is an input cache 
+sized as same as particular `Hash::block_type`, which accumulates 
+unprocessed data. After it gets `filled`, data gets hashed, then it gets moved 
+to the main accumulator storage, then cache gets emptied. 
+ 
+[`hash` accumulator](@ref accumulators::hash) internally uses
+[`bit_count` accumulator](@ref accumulators::bit_count) and designed to be 
+combined with other accumulators available for
+[Boost.Accumulators](https://boost.org/libs/accumulators).
+ 
+Example. Let's assume there is an accumulator set, which intention is to encrypt 
+all the incoming data with [`rijndael<128, 128>` cipher](@ref block::rijndael)
+and to compute a [`sha2<256>` hash](@ref hash::sha2) of all the incoming data
+as well.
+
+This means there will be an accumulator set defined as follows:
+```cpp
+using namespace boost::accumulators;
+using namespace nil::crypto3;
+
+boost::accumulator_set<
+    accumulators::block<block::rijndael<128, 128>>,
+    accumulators::hash<hash::sha2<256>>> acc;
+```
+
+Extraction is supposed to be defined as follows:
+```cpp
+std::string hash = extract::hash<hash::sha2<256>>(acc);
+std::string ciphertext = extract::block<block::rijndael<128, 128>>(acc);
+```
+
 ## Value Postprocessors {#hashes_value}
 
 Since the accumulator output type is strictly tied to [`digest_type`](@ref hash::digest_type)
