@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CAS_FFT_KRONECKER_SUBSTITUTION_HPP
-#define CAS_FFT_KRONECKER_SUBSTITUTION_HPP
+#ifndef ALGEBRA_FFT_KRONECKER_SUBSTITUTION_HPP
+#define ALGEBRA_FFT_KRONECKER_SUBSTITUTION_HPP
 
 #include <vector>
 #include <algorithm>
@@ -183,4 +183,4 @@ namespace nil {
     }        // namespace algebra
 }    // namespace nil
 
-#endif    // CAS_FFT_KRONECKER_SUBSTITUTION_HPP
+#endif    // ALGEBRA_FFT_KRONECKER_SUBSTITUTION_HPP

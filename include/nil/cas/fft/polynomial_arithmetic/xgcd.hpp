@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CAS_FFT_XGCD_HPP
-#define CAS_FFT_XGCD_HPP
+#ifndef ALGEBRA_FFT_XGCD_HPP
+#define ALGEBRA_FFT_XGCD_HPP
 
 #include <algorithm>
 #include <vector>
@@ -74,4 +74,4 @@ namespace nil {
     }        // namespace algebra
 }    // namespace nil
 
-#endif    // CAS_FFT_XGCD_HPP
+#endif    // ALGEBRA_FFT_XGCD_HPP

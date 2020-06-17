@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CAS_TYPE_TRAITS_HPP
-#define CAS_TYPE_TRAITS_HPP
+#ifndef ALGEBRA_TYPE_TRAITS_HPP
+#define ALGEBRA_TYPE_TRAITS_HPP
 
 #define GENERATE_HAS_MEMBER_TYPE(Type)                                                \
                                                                                       \
@@ -174,4 +174,4 @@ namespace nil {
     }        // namespace algebra
 }    // namespace nil
 
-#endif    // CAS_TYPE_TRAITS_HPP
+#endif    // ALGEBRA_TYPE_TRAITS_HPP

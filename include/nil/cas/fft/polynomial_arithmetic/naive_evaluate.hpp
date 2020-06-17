@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CAS_FFT_NAIVE_EVALUATE_HPP
-#define CAS_FFT_NAIVE_EVALUATE_HPP
+#ifndef ALGEBRA_FFT_NAIVE_EVALUATE_HPP
+#define ALGEBRA_FFT_NAIVE_EVALUATE_HPP
 
 #include <algorithm>
 #include <vector>
@@ -82,4 +82,4 @@ namespace nil {
 }    // namespace nil
 
 
-#endif    // CAS_FFT_NAIVE_EVALUATE_HPP
+#endif    // ALGEBRA_FFT_NAIVE_EVALUATE_HPP

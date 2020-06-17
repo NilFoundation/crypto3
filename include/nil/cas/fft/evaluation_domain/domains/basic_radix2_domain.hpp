@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CAS_FFT_BASIC_RADIX2_DOMAIN_HPP
-#define CAS_FFT_BASIC_RADIX2_DOMAIN_HPP
+#ifndef ALGEBRA_FFT_BASIC_RADIX2_DOMAIN_HPP
+#define ALGEBRA_FFT_BASIC_RADIX2_DOMAIN_HPP
 
 #include <vector>
 
@@ -107,4 +107,4 @@ namespace nil {
     }        // namespace algebra
 }    // namespace nil
 
-#endif    // CAS_FFT_BASIC_RADIX2_DOMAIN_HPP
+#endif    // ALGEBRA_FFT_BASIC_RADIX2_DOMAIN_HPP

@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CAS_FFT_BASIC_OPERATIONS_HPP
-#define CAS_FFT_BASIC_OPERATIONS_HPP
+#ifndef ALGEBRA_FFT_BASIC_OPERATIONS_HPP
+#define ALGEBRA_FFT_BASIC_OPERATIONS_HPP
 
 #include <algorithm>
 #include <vector>
@@ -220,4 +220,4 @@ namespace nil {
     }        // namespace algebra
 }    // namespace nil
 
-#endif    // CAS_FFT_BASIC_OPERATIONS_HPP
+#endif    // ALGEBRA_FFT_BASIC_OPERATIONS_HPP
