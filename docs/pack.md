@@ -1,10 +1,10 @@
-# Pack algorithms 
+# Pack algorithms {#pack}
 
 @tableofcontents
 
 ## Introduction
 
-This document provides a detailed description of pack algorithms used in the current project. Briefly, pack algorithms are used throughout the project to transform data divided into chunks with one parameters into the data divided into chunks with another parameters. The dependence of algorithms on these parameters is discussed further in the Section [Algorithms](##algorithms).
+This document provides a detailed description of pack algorithms used in the current project. Briefly, pack algorithms are used throughout the project to transform data divided into chunks with one parameters into the data divided into chunks with another parameters. The dependence of algorithms on these parameters is discussed further in the Section [Algorithms](##pack_algorithms).
 
 ## Basic notions and assumptions
 
@@ -26,7 +26,7 @@ Note that if the unit is byte, then the first two endiannesses coincide with wel
 
 All the notation not described in this section will be introduced on the fly.
 
-## Algorithms
+## Algorithms ## {#pack_algorithms}
 
 Pack algorithms are intended to transform byte-aligned data divided into chunks of bit size denoted by `InputValueBits` into byte-aligned data divided into chunks of bit size denoted by `OutputValueBits`. Moreover, we suppose that all input and output data chunks consist of units ordered in accordance with the corresponding endiannesses. We will refer to these endiannesses as `InputEndianness` and `OutputEndianness`, respectively.
 
@@ -42,34 +42,154 @@ It is important to note that the combining and splitting operations in imploder 
 
 Consider first the case of `little_unit_big_bit`-to-`big_unit_big_bit` conversion. 
 ```cpp
-std::array<uint16_t, 2> in = {0x1234, 0x5678};
-std::array<uint32_t, 1> out = {0x34127856};
+std::array<uint16_t, 2> input = {0x1234, 0x5678};
+std::array<uint32_t, 1> output = {0x34127856};
 ```
+
+input:
+
+@dot
+digraph bytes {
+bgcolor="#222222";
+node [shape=record color="#F5F2F1" fontcolor="#F5F2F1"];
+
+struct1 [label="0x12 | 0x34 "];
+
+struct2 [label="0x56 | 0x78 "];
+
+}
+@enddot
+
+output:
+
+@dot
+digraph bytes {
+bgcolor="#222222";
+node [shape=record color="#F5F2F1" fontcolor="#F5F2F1"];
+
+struct1 [label="0x34 | 0x12 | 0x78 | 0x56 "];
+
+}
+@enddot
+
 In the example above we suppose that the unit of arrays is byte. It is easy to see, that the value written to the out array is obtained by combining each input chunk byte data in reverse byte order.
 
 It may seem at first look that all same endianness conversions are simplicity itself, but that&#39;s not quite true. To dive deeper into the problem of endianness conversion, consider the inverse conversion.
 
 ```cpp
-std::array<uint16_t, 4> in = {0x1234, 0x5678};
-std::array<uint32_t, 2> out {0x78563412};
+std::array<uint16_t, 4> input = {0x1234, 0x5678};
+std::array<uint32_t, 2> output {0x78563412};
 ```
-In this example, `in` array units are ordered in `big_unit_big_bit` endianness and `out` array units are ordered in `little_unit_big_bit` endianness (supposing that the unit is byte). One can see that in addition to reverse byte order we have the reverse order of input chunks in the *out* array.
+
+
+input:
+
+@dot
+digraph bytes {
+bgcolor="#222222";
+node [shape=record color="#F5F2F1" fontcolor="#F5F2F1"];
+
+struct1 [label="0x12 | 0x34 "];
+
+struct2 [label="0x56 | 0x78 "];
+
+}
+@enddot
+
+output:
+
+@dot
+digraph bytes {
+bgcolor="#222222";
+node [shape=record color="#F5F2F1" fontcolor="#F5F2F1"];
+
+struct1 [label="0x78 | 0x56 | 0x34 | 0x12 "];
+
+}
+@enddot
+
+
+In this example, `input` array units are ordered in `big_unit_big_bit` endianness and `output` array units are ordered in `little_unit_big_bit` endianness (supposing that the unit is byte). One can see that in addition to reverse byte order we have the reverse order of input chunks in the *out* array.
 
 An interested reader may wonder why changing of endiannesses leads to such a strange effect. Well, the answer to this question lies in the following convention: all data divided into chunks with units ordered in `big_unit_big_bit` endianness will stay unchanged when tranforming to data with chunk units ordered in `big_unit_big_bit` endianness. Let us explain it with the following example.
 
 ```cpp
-std::array<uint16_t, 4> in = {0x1234, 0x5678, 0x90ab, 0xcdef};
-std::array<uint64_t, 1> out = {0x1234567890abcdef};
+std::array<uint16_t, 4> input = {0x1234, 0x5678, 0x90ab, 0xcdef};
+std::array<uint64_t, 1> output = {0x1234567890abcdef};
 ```
-Here it is easy to see that the data from `in` was just concatenated into the `out` data with no additional tranformations. Now, notice that the first and the second example described in this section implicitly rely on the above-described convention. In the first example the input data is concatenated in reverse byte order, and in the second example the byte order is reversed after the input data concatenation.
+
+
+input:
+
+@dot
+digraph bytes {
+bgcolor="#222222";
+node [shape=record color="#F5F2F1" fontcolor="#F5F2F1"];
+
+struct1 [label="0x12 | 0x34 "];
+
+struct2 [label="0x56 | 0x78 "];
+
+struct3 [label="0x90 | 0xab "];
+
+struct4 [label="0xcd | 0xef "];
+}
+@enddot
+
+output:
+
+@dot
+digraph bytes {
+bgcolor="#222222";
+node [shape=record color="#F5F2F1" fontcolor="#F5F2F1"];
+
+struct1 [label="0x12 | 0x34 | 0x56 | 0x78 | 0x90 | 0xab | 0xcd | 0xef"];
+
+}
+@enddot
+
+Here it is easy to see that the data from `input` was just concatenated into the `output` data with no additional tranformations. Now, notice that the first and the second example described in this section implicitly rely on the above-described convention. In the first example the input data is concatenated in reverse byte order, and in the second example the byte order is reversed after the input data concatenation.
 
 We haven&#39;t touched the case of endian conversion with bit reversals yet. Let us see at the following example:
 
 ```cpp
-std::array<uint8_t, 4> in = {0x12, 0x34, 0x56, 0x78};
-std::array<uint16_t, 2> out = {0x482c, 0x6a1e};
+std::array<uint8_t, 4> input = {0x12, 0x34, 0x56, 0x78};
+std::array<uint16_t, 2> output = {0x482c, 0x6a1e};
 ```
-In this example, `in` array units are ordered in `big_unit_little_bit` endianness and `out` array units are ordered in `big_unit_big_bit` endianness (supposing that the unit is byte). Writing the byte ```0x12``` in binary form gives us ```00010010```, its reverse binary form is ```01001000```, which gives us ```0x48``` in hex representation. The same transformations are applied to the remaining bytes.
+
+
+input:
+
+@dot
+digraph bytes {
+bgcolor="#222222";
+node [shape=record color="#F5F2F1" fontcolor="#F5F2F1"];
+
+struct1 [label="0x12"];
+
+struct2 [label="0x34"];
+
+struct3 [label="0x56"];
+
+struct4 [label="0x78"];
+}
+@enddot
+
+output:
+
+@dot
+digraph bytes {
+bgcolor="#222222";
+node [shape=record color="#F5F2F1" fontcolor="#F5F2F1"];
+
+struct1 [label="0x48 | 0x2c"];
+
+struct2 [label="0x6a | 0x1e"];
+
+}
+@enddot
+
+In this example, `input` array units are ordered in `big_unit_little_bit` endianness and `output` array units are ordered in `big_unit_big_bit` endianness (supposing that the unit is byte). Writing the byte ```0x12``` in binary form gives us ```00010010```, its reverse binary form is ```01001000```, which gives us ```0x48``` in hex representation. The same transformations are applied to the remaining bytes.
 
 To conclude, there are three types of reversals that we must deal with in pack algorithms:
 
@@ -87,7 +207,7 @@ Data chunk order reversal tranforms a group of consecutive input chunks with uni
 The choice of endianness depends on an algorithm where this step is carried out (imploder or exploder).
 2. If the endianness on the previous step is `little_bit`, set shift equal to `OutputBits` - (`InputBits` + already_processed_bits) in the case of imploder, and to `InputBits` - (`OutputBits` + already_processed_bits) in the case of exploder. Otherwise, set shift equal to already_processed_bits.
 
-By already_processed_bits we mean the number of already processed (i.e. combined or splitted) input chunks multiplied by the number bits in a byte. The shift is later used either to retrieve or to accumulate input chunks (see [Imploder](###imploder)).
+By already_processed_bits we mean the number of already processed (i.e. combined or splitted) input chunks multiplied by the number bits in a byte. The shift is later used either to retrieve or to accumulate input chunks (see [`Imploder`](@ref #pack_imploder)).
 
 ### Unit order reversal
 
@@ -111,7 +231,7 @@ Bit order reversal transforms the order of bits in each input chunk unit. It can
 
 Note that if unit is byte, the first step can be omitted.
 
-### Imploder
+### Imploder ### {#pack_imploder}
 
 Recall that imploder algorithm deals with the case `InputValueBits` < `OutputValueBits` and converts data from `InputEndianness` to `OutputEndianness` order.
 
@@ -155,7 +275,7 @@ Here ```OR``` denotes logical OR operation and ``` << ``` denotes left shift ope
 
 ### Exploder
 
-Exploder algorithm deals with the case `InputValueBits` > `OutputValueBits`, converts data from `InputEndianness` to `OutputEndianness` order and is the same as the imploder algorithm described in Section [Imploder](###imploder) except for several points:
+Exploder algorithm deals with the case `InputValueBits` > `OutputValueBits`, converts data from `InputEndianness` to `OutputEndianness` order and is the same as the imploder algorithm described in Section [Imploder](###pack_imploder) except for several points:
 
 * the condition of shift choice is replaced with `InputEndianness` instead of `OutputEndianness`;
 * right shift operation instead of left shift operation is used;
