@@ -27,18 +27,20 @@ color="#222222";
 rankdir="TB"
 node [shape="box"]
 
-  a [label="Algorithms" color="#F5F2F1" fontcolor="#F5F2F1" URL="@ref hash_algorithms"];
-  b [label="Stream Processors" color="#F5F2F1" fontcolor="#F5F2F1" URL="@ref hash_stream"];
-  c [label="Hash Policies" color="#F5F2F1" fontcolor="#F5F2F1" URL="@ref hash_policy"];
-  d [label="Constructions and Compressors" color="#F5F2F1" fontcolor="#F5F2F1" URL="@ref hash_policy"];
-  e [label="Accumulators" color="#F5F2F1" fontcolor="#F5F2F1" URL="@ref hash_accumulators"];
-  f [label="Value Processors" color="#F5F2F1" fontcolor="#F5F2F1" URL="@ref hash_value"];
+  a [label="Algorithms" color="#F5F2F1" fontcolor="#F5F2F1" URL="@ref hashes_algorithms"];
+  b [label="Stream Processors" color="#F5F2F1" fontcolor="#F5F2F1" URL="@ref hashes_stream"];
+  c [label="Data Type Conversion" color="#F5F2F1" fontcolor="#F5F2F1" URL="@ref hashes_data"];
+  d [label="Hash Policies" color="#F5F2F1" fontcolor="#F5F2F1" URL="@ref hashes_policies"];
+  e [label="Constructions and Compressors" color="#F5F2F1" fontcolor="#F5F2F1" URL="@ref hashes_constructions_compressors"];
+  f [label="Accumulators" color="#F5F2F1" fontcolor="#F5F2F1" URL="@ref hashes_accumulators"];
+  g [label="Value Processors" color="#F5F2F1" fontcolor="#F5F2F1" URL="@ref hashes_value"];
   
   a -> b;
   b -> c;
   c -> d;
   d -> e;
   e -> f;
+  f -> g;
 }
 @enddot
 
@@ -241,13 +243,22 @@ Hash policies are required to be compliant with [`Hash` concept](@ref hash_conce
 Thus, a policy has to contain all the data corresponding to the `Hash` and defined in 
 the [`Hash` concept](@ref hash_concept).
 
-Among other things a hash policy should contain information about its compressor and construction. For example, for `SHA2` there are Merkle-Damgaard construction and Davies-Meyer compressor. 
+Among other things a hash policy should contain information about its compressor and construction. 
+For example, for `SHA2` there are Merkle-Damgaard construction and Davies-Meyer compressor. 
 
-## Constructions and Compressors
+## Constructions and Compressors {#hashes_constructions_compressors}
 
+Constructions and Compressors used by a `Hash` should be defined in its [`policy`](@ref hashes_policies). 
+Construction defines how the message should be padded, if its size is not multiple of `block_bits` and how 
+the hashed messaged should be finalized. Construction also calls the compressor inside itself while processing 
+a message block.
+
+For example, [`sha2` hash](@ref hash::sha2) has Merkle-Damgaard construction with default Merkle-Damgaard padding 
+and Davies-Meyer compressor. It means each message block is being processed by Davies-Meyer compressor. The last 
+message block is being padded before processing using Merkle-Damgaard padding. After processing last block message 
+is being finalizing by appending length of the input message to the end of result.
 
 ## Accumulators {#hashes_accumulators}
-
 
 The Hashing contains an accumulation step, which is implemented with 
 [Boost.Accumulators](https://boost.org/libs/accumulators) library.
