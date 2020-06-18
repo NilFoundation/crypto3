@@ -49,11 +49,11 @@ namespace nil {
              * @tparam InT
              * @tparam OutT
              */
-            template<int UnitBits, int ValueBits, typename InT, typename OutT>
+            template<int UnitBits, int InputBits, int OutputBits, typename InT, typename OutT>
             struct host_can_memcpy {
-                constexpr static const bool value = !(UnitBits % CHAR_BIT) && ValueBits >= UnitBits &&
-                                                    sizeof(InT) * CHAR_BIT == ValueBits &&
-                                                    sizeof(OutT) * CHAR_BIT == ValueBits;
+                constexpr static const bool value = !(UnitBits % CHAR_BIT) && InputBits >= UnitBits &&
+                                                    OutputBits >= UnitBits && sizeof(InT) * CHAR_BIT == InputBits &&
+                                                    sizeof(OutT) * CHAR_BIT == OutputBits;
             };
 
             /*!
@@ -68,30 +68,31 @@ namespace nil {
              * @tparam InT
              * @tparam OutT
              */
-            template<typename Endianness, int ValueBits, typename InT, typename OutT>
+            template<typename Endianness, int InputBits, int OutputBits, typename InT, typename OutT>
             struct can_memcpy {
-                constexpr static const bool value = sizeof(InT) == sizeof(OutT);
+                constexpr static const bool value = InputBits == OutputBits && sizeof(InT) == sizeof(OutT);
             };
 
-            template<int UnitBits, int ValueBits, typename InT, typename OutT>
-            struct can_memcpy<stream_endian::host_unit<UnitBits>, ValueBits, InT, OutT>
-                : host_can_memcpy<UnitBits, ValueBits, InT, OutT> { };
+            template<int UnitBits, int InputBits, int OutputBits, typename InT, typename OutT>
+            struct can_memcpy<stream_endian::host_unit<UnitBits>, InputBits, OutputBits, InT, OutT>
+                : host_can_memcpy<UnitBits, InputBits, OutputBits, InT, OutT> { };
 
 #ifdef CRYPTO3_TARGET_CPU_IS_LITTLE_ENDIAN
-            template<int UnitBits, int ValueBits, typename InT, typename OutT>
-            struct can_memcpy<stream_endian::little_unit_big_bit<UnitBits>, ValueBits, InT, OutT>
-                : host_can_memcpy<UnitBits, ValueBits, InT, OutT> { };
-            template<int UnitBits, int ValueBits, typename InT, typename OutT>
-            struct can_memcpy<stream_endian::little_unit_little_bit<UnitBits>, ValueBits, InT, OutT>
-                : host_can_memcpy<UnitBits, ValueBits, InT, OutT> { };
+            template<int UnitBits, int InputBits, int OutputBits, typename InT, typename OutT>
+            struct can_memcpy<stream_endian::little_unit_big_bit<UnitBits>, InputBits, OutputBits, InT, OutT>
+                : host_can_memcpy<UnitBits, InputBits, OutputBits, InT, OutT> { };
+
+            template<int UnitBits, int InputBits, int OutputBits, typename InT, typename OutT>
+            struct can_memcpy<stream_endian::little_unit_little_bit<UnitBits>, InputBits, OutputBits, InT, OutT>
+                : host_can_memcpy<UnitBits, InputBits, OutputBits, InT, OutT> { };
 
 #elif defined(CRYPTO3_TARGET_CPU_IS_BIG_ENDIAN)
-            template<int UnitBits, int ValueBits, typename InT, typename OutT>
+            template<int UnitBits, int InputBits, int OutputBits, typename InT, typename OutT>
             struct can_memcpy<stream_endian::big_unit_big_bit<UnitBits>, ValueBits, InT, OutT>
-                : host_can_memcpy<UnitBits, ValueBits, InT, OutT> { };
+                : host_can_memcpy<UnitBits, InputBits, OutputBits, InT, OutT> { };
             template<int UnitBits, int InputBits, int OutputBits, typename InT, typename OutT>
             struct can_memcpy<stream_endian::big_unit_little_bit<UnitBits>, ValueBits, InT, OutT>
-                : host_can_memcpy<UnitBits, ValueBits, InT, OutT> { };
+                : host_can_memcpy<UnitBits, InputBits, OutputBits, , InT, OutT> { };
 #endif
 
             /*!
@@ -112,7 +113,7 @@ namespace nil {
              * @tparam InputValueBits
              * @tparam OutputValueBits
              * @tparam InputType
-             * @tparam OutputType             
+             * @tparam OutputType
              * @tparam SameEndianness
              * @tparam Implode
              * @tparam Explode
@@ -139,8 +140,8 @@ namespace nil {
              * @tparam OutputType
              */
             template<typename Endianness, std::size_t ValueBits, typename InputType, typename OutputType>
-            struct real_packer<Endianness, Endianness, ValueBits, ValueBits, InputType, OutputType, true, 
-                               false, false> {
+            struct real_packer<Endianness, Endianness, ValueBits, ValueBits, InputType, OutputType, true, false,
+                               false> {
                 /*!
                  * @brief Packs n InputType elements pointed by constant pointer in
                  * (which, hence, cannot be iterated) into OutType elements pointed by out.
@@ -154,8 +155,9 @@ namespace nil {
                  *
                  * @return
                  */
-                inline static
-                    typename std::enable_if<can_memcpy<Endianness, ValueBits, InputType, OutputType>::value>
+                template<std::size_t InputValueBits, std::size_t OutputValueBits>
+                inline static typename std::enable_if<
+                    can_memcpy<Endianness, InputValueBits, OutputValueBits, InputType, OutputType>::value>
                     pack_n(InputType const *in, std::size_t n, OutputType *out) {
                     std::memcpy(out, in, n * sizeof(InputType));
                 }
@@ -172,8 +174,9 @@ namespace nil {
                  *
                  * @return
                  */
-                inline static
-                    typename std::enable_if<can_memcpy<Endianness, ValueBits, InputType, OutputType>::value>
+                template<std::size_t InputValueBits, std::size_t OutputValueBits>
+                inline static typename std::enable_if<
+                    can_memcpy<Endianness, InputValueBits, OutputValueBits, InputType, OutputType>::value>
                     pack_n(InputType *in, std::size_t n, OutputType *out) {
                     std::memcpy(out, in, n * sizeof(InputType));
                 }
@@ -216,8 +219,8 @@ namespace nil {
                  * @return
                  */
                 template<typename InputIterator, typename OutputIterator>
-                inline static void pack(InputIterator first, InputIterator last, std::random_access_iterator_tag, 
-                    OutputIterator out, std::random_access_iterator_tag) {
+                inline static void pack(InputIterator first, InputIterator last, std::random_access_iterator_tag,
+                                        OutputIterator out, std::random_access_iterator_tag) {
                     pack_n(first, std::distance(first, last), out);
                 }
 
@@ -246,7 +249,6 @@ namespace nil {
                     std::copy(first, last, out);
                 }
 
-
                 /*!
                  * @brief Generic function that chooses pack function depending on input and output iterator category.
                  *
@@ -263,11 +265,12 @@ namespace nil {
                  */
                 template<typename InputIterator, typename OutputIterator>
                 inline static void pack(InputIterator first, InputIterator last, OutputIterator out) {
+
                     typedef typename std::iterator_traits<InputIterator>::iterator_category in_cat;
                     typedef typename std::iterator_traits<OutputIterator>::iterator_category out_cat;
+
                     pack(first, last, in_cat(), out, out_cat());
                 }
-
             };
 
             /*!
@@ -288,8 +291,8 @@ namespace nil {
              */
             template<int UnitBits, template<int> class InputEndian, template<int> class OutputEndian,
                      std::size_t ValueBits, typename InputType, typename OutputType>
-            struct real_packer<InputEndian<UnitBits>, OutputEndian<UnitBits>, ValueBits, ValueBits, InputType, 
-                          OutputType, false, false, false> {
+            struct real_packer<InputEndian<UnitBits>, OutputEndian<UnitBits>, ValueBits, ValueBits, InputType,
+                               OutputType, false, false, false> {
 
                 typedef InputEndian<UnitBits> InputEndianness;
                 typedef OutputEndian<UnitBits> OutputEndianness;
@@ -300,19 +303,17 @@ namespace nil {
                 template<typename InputIterator, typename OutputIterator>
                 inline static void pack_n(InputIterator in, std::size_t in_n, OutputIterator out) {
 
-                    std::transform(in, in + in_n, out,
-                                   [](InputType const &elem) {
-                                       return units_reverser::reverse(bits_reverser::reverse(elem));
-                                   });
+                    std::transform(in, in + in_n, out, [](InputType const &elem) {
+                        return units_reverser::reverse(bits_reverser::reverse(elem));
+                    });
                 }
 
                 template<typename InputIterator, typename OutputIterator>
                 inline static void pack(InputIterator first, InputIterator last, OutputIterator out) {
 
-                    std::transform(first, last, out,
-                                   [](InputType const &elem) {
-                                       return units_reverser::reverse(bits_reverser::reverse(elem));
-                                   });
+                    std::transform(first, last, out, [](InputType const &elem) {
+                        return units_reverser::reverse(bits_reverser::reverse(elem));
+                    });
                 }
             };
 
@@ -334,7 +335,7 @@ namespace nil {
              */
             template<typename InputEndianness, typename OutputEndianness, std::size_t InputValueBits,
                      std::size_t OutputValueBits, typename InputType, typename OutputType, bool SameEndianness>
-            struct real_packer<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits, InputType, 
+            struct real_packer<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits, InputType,
                                OutputType, SameEndianness, true, false> {
 
                 BOOST_STATIC_ASSERT(!(OutputValueBits % InputValueBits));
@@ -380,7 +381,7 @@ namespace nil {
              */
             template<typename InputEndianness, typename OutputEndianness, std::size_t InputValueBits,
                      std::size_t OutputValueBits, typename InputType, typename OutputType, bool SameEndianness>
-            struct real_packer<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits, InputType, 
+            struct real_packer<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits, InputType,
                                OutputType, SameEndianness, false, true> {
 
                 BOOST_STATIC_ASSERT(!(InputValueBits % OutputValueBits));
@@ -416,25 +417,25 @@ namespace nil {
              * @tparam InputType
              * @tparam OutputType
              */
-            template<typename InputEndianness, typename OutputEndianness, std::size_t InputValueBits, 
+            template<typename InputEndianness, typename OutputEndianness, std::size_t InputValueBits,
                      std::size_t OutputValueBits, typename InputType, typename OutputType>
             struct packer {
 
                 template<typename InputIterator, typename OutputIterator>
                 inline static void pack_n(InputIterator in, std::size_t n, OutputIterator out) {
-                    typedef real_packer<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits,
-                                        InputType, OutputType> 
+                    typedef real_packer<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits, InputType,
+                                        OutputType>
                         packer_type;
-                    
+
                     packer_type::pack_n(in, n, out);
                 }
 
                 template<typename InputIterator, typename OutputIterator>
                 inline static void pack(InputIterator first, InputIterator last, OutputIterator out) {
-                    typedef real_packer<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits,
-                                        InputType, OutputType> 
+                    typedef real_packer<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits, InputType,
+                                        OutputType>
                         packer_type;
-                    
+
                     packer_type::pack(first, last, out);
                 }
             };
@@ -449,25 +450,23 @@ namespace nil {
              * @tparam InputValueBits
              * @tparam OutputValueBits
              */
-            template<typename InputEndianness, typename OutputEndianness, std::size_t InputValueBits, 
+            template<typename InputEndianness, typename OutputEndianness, std::size_t InputValueBits,
                      std::size_t OutputValueBits>
             struct packer<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits, bool, bool> {
 
                 template<typename InputIterator, typename OutputIterator>
                 inline static void pack_n(InputIterator in, std::size_t n, OutputIterator out) {
-                    typedef real_packer<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits,
-                                        bool, bool> 
+                    typedef real_packer<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits, bool, bool>
                         packer_type;
-                    
+
                     packer_type::pack_n(in, n, out);
                 }
 
                 template<typename InputIterator, typename OutputIterator>
                 inline static void pack(InputIterator first, InputIterator last, OutputIterator out) {
-                    typedef real_packer<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits,
-                                        bool, bool> 
+                    typedef real_packer<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits, bool, bool>
                         packer_type;
-                    
+
                     packer_type::pack(first, last, out);
                 }
             };
@@ -483,25 +482,25 @@ namespace nil {
              * @tparam OutputValueBits
              * @tparam OutputType
              */
-            template<typename InputEndianness, typename OutputEndianness, std::size_t InputValueBits, 
+            template<typename InputEndianness, typename OutputEndianness, std::size_t InputValueBits,
                      std::size_t OutputValueBits, typename OutputType>
             struct packer<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits, bool, OutputType> {
 
                 template<typename InputIterator, typename OutputIterator>
                 inline static void pack_n(InputIterator in, std::size_t n, OutputIterator out) {
-                    typedef real_packer<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits,
-                                        bool, OutputType> 
+                    typedef real_packer<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits, bool,
+                                        OutputType>
                         packer_type;
-                    
+
                     packer_type::pack_n(in, n, out);
                 }
 
                 template<typename InputIterator, typename OutputIterator>
                 inline static void pack(InputIterator first, InputIterator last, OutputIterator out) {
-                    typedef real_packer<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits,
-                                        bool, OutputType> 
+                    typedef real_packer<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits, bool,
+                                        OutputType>
                         packer_type;
-                    
+
                     packer_type::pack(first, last, out);
                 }
             };
@@ -517,25 +516,25 @@ namespace nil {
              * @tparam OutputValueBits
              * @tparam InputType
              */
-            template<typename InputEndianness, typename OutputEndianness, std::size_t InputValueBits, 
+            template<typename InputEndianness, typename OutputEndianness, std::size_t InputValueBits,
                      std::size_t OutputValueBits, typename InputType>
             struct packer<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits, InputType, bool> {
 
                 template<typename InputIterator, typename OutputIterator>
                 inline static void pack_n(InputIterator in, std::size_t n, OutputIterator out) {
-                    typedef real_packer<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits,
-                                        InputType, bool> 
+                    typedef real_packer<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits, InputType,
+                                        bool>
                         packer_type;
-                    
+
                     packer_type::pack_n(in, n, out);
                 }
 
                 template<typename InputIterator, typename OutputIterator>
                 inline static void pack(InputIterator first, InputIterator last, OutputIterator out) {
-                    typedef real_packer<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits,
-                                        InputType, bool> 
+                    typedef real_packer<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits, InputType,
+                                        bool>
                         packer_type;
-                    
+
                     packer_type::pack(first, last, out);
                 }
             };
@@ -567,11 +566,11 @@ namespace nil {
 
 #ifdef BOOST_ENDIAN_BIG_BYTE_AVAILABLE
                 typedef packer<stream_endian::big_octet_big_bit, OutputEndianness, InputValueBits, OutputValueBits,
-                               InputType, OutputType> 
+                               InputType, OutputType>
                     packer_type;
 #elif defined(BOOST_ENDIAN_LITTLE_BYTE_AVAILABLE)
                 typedef packer<stream_endian::little_octet_big_bit, OutputEndianness, InputValueBits, OutputValueBits,
-                               InputType, OutputType> 
+                               InputType, OutputType>
                     packer_type;
 #elif defined(BOOST_ENDIAN_BIG_WORD_AVAILABLE)
                 typedef packer<stream_endian::big_unit_big_bit<CRYPTO3_MP_WORD_BITS>, OutputEndianness, InputValueBits,
@@ -658,9 +657,9 @@ namespace nil {
                      std::size_t OutputValueBits, typename InputIterator, typename OutputIterator>
             inline void pack_n(InputIterator in, std::size_t in_n, OutputIterator out) {
                 typedef typename std::iterator_traits<InputIterator>::value_type InputType;
-                typedef typename std::iterator_traits<OutputIterator>::value_type OutputType;                
-                typedef packer<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits,
-                               InputType, OutputType> 
+                typedef typename std::iterator_traits<OutputIterator>::value_type OutputType;
+                typedef packer<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits, InputType,
+                               OutputType>
                     packer_type;
 
                 packer_type::pack_n(in, in_n, out);
@@ -749,8 +748,8 @@ namespace nil {
             inline void pack(InputIterator first, InputIterator last, InCatT, OutputIterator out) {
                 typedef typename std::iterator_traits<InputIterator>::value_type InputType;
                 typedef typename std::iterator_traits<OutputIterator>::value_type OutputType;
-                typedef packer<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits, 
-                               InputType, OutputType> 
+                typedef packer<InputEndianness, OutputEndianness, InputValueBits, OutputValueBits, InputType,
+                               OutputType>
                     packer_type;
 
                 packer_type::pack(first, last, out);
