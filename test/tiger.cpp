@@ -24,7 +24,6 @@
 #include <unordered_map>
 
 #include <cstdio>
-#include <cstring>
 
 using namespace nil::crypto3::hash;
 
@@ -41,8 +40,14 @@ namespace boost {
 }    // namespace boost
 
 BOOST_AUTO_TEST_SUITE(tiger_test_suite)
-
+	
 BOOST_AUTO_TEST_CASE(tiger_range_hash) {
+
+	std::string input = "a";
+
+	std::string out = hash<tiger<192>>(input.begin(), input.end());
+
+	BOOST_CHECK_EQUAL("67e6ae8e9e968999f70a23e72aeaa9251cbc7c78a7916636", out);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
