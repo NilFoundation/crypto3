@@ -49,11 +49,11 @@ namespace nil {
              * @tparam InT
              * @tparam OutT
              */
-            template<int UnitBits, int ValueBits, typename InT, typename OutT>
+            template<int UnitBits, int InputBits, int OutputBits, typename InT, typename OutT>
             struct host_can_memcpy {
-                constexpr static const bool value = !(UnitBits % CHAR_BIT) && ValueBits >= UnitBits &&
-                                                    sizeof(InT) * CHAR_BIT == ValueBits &&
-                                                    sizeof(OutT) * CHAR_BIT == ValueBits;
+                constexpr static const bool value = !(UnitBits % CHAR_BIT) && InputBits >= UnitBits &&
+                                                    OutputBits >= UnitBits && sizeof(InT) * CHAR_BIT == InputBits &&
+                                                    sizeof(OutT) * CHAR_BIT == OutputBits;
             };
 
             /*!
@@ -68,30 +68,31 @@ namespace nil {
              * @tparam InT
              * @tparam OutT
              */
-            template<typename Endianness, int ValueBits, typename InT, typename OutT>
+            template<typename Endianness, int InputBits, int OutputBits, typename InT, typename OutT>
             struct can_memcpy {
-                constexpr static const bool value = sizeof(InT) == sizeof(OutT);
+                constexpr static const bool value = InputBits == OutputBits && sizeof(InT) == sizeof(OutT);
             };
 
-            template<int UnitBits, int ValueBits, typename InT, typename OutT>
-            struct can_memcpy<stream_endian::host_unit<UnitBits>, ValueBits, InT, OutT>
-                : host_can_memcpy<UnitBits, ValueBits, InT, OutT> { };
+            template<int UnitBits, int InputBits, int OutputBits, typename InT, typename OutT>
+            struct can_memcpy<stream_endian::host_unit<UnitBits>, InputBits, OutputBits, InT, OutT>
+                : host_can_memcpy<UnitBits, InputBits, OutputBits, InT, OutT> { };
 
 #ifdef CRYPTO3_TARGET_CPU_IS_LITTLE_ENDIAN
-            template<int UnitBits, int ValueBits, typename InT, typename OutT>
-            struct can_memcpy<stream_endian::little_unit_big_bit<UnitBits>, ValueBits, InT, OutT>
-                : host_can_memcpy<UnitBits, ValueBits, InT, OutT> { };
-            template<int UnitBits, int ValueBits, typename InT, typename OutT>
-            struct can_memcpy<stream_endian::little_unit_little_bit<UnitBits>, ValueBits, InT, OutT>
-                : host_can_memcpy<UnitBits, ValueBits, InT, OutT> { };
+            template<int UnitBits, int InputBits, int OutputBits, typename InT, typename OutT>
+            struct can_memcpy<stream_endian::little_unit_big_bit<UnitBits>, InputBits, OutputBits, InT, OutT>
+                : host_can_memcpy<UnitBits, InputBits, OutputBits, InT, OutT> { };
+
+            template<int UnitBits, int InputBits, int OutputBits, typename InT, typename OutT>
+            struct can_memcpy<stream_endian::little_unit_little_bit<UnitBits>, InputBits, OutputBits, InT, OutT>
+                : host_can_memcpy<UnitBits, InputBits, OutputBits, InT, OutT> { };
 
 #elif defined(CRYPTO3_TARGET_CPU_IS_BIG_ENDIAN)
-            template<int UnitBits, int ValueBits, typename InT, typename OutT>
+            template<int UnitBits, int InputBits, int OutputBits, typename InT, typename OutT>
             struct can_memcpy<stream_endian::big_unit_big_bit<UnitBits>, ValueBits, InT, OutT>
-                : host_can_memcpy<UnitBits, ValueBits, InT, OutT> { };
+                : host_can_memcpy<UnitBits, InputBits, OutputBits, InT, OutT> { };
             template<int UnitBits, int InputBits, int OutputBits, typename InT, typename OutT>
             struct can_memcpy<stream_endian::big_unit_little_bit<UnitBits>, ValueBits, InT, OutT>
-                : host_can_memcpy<UnitBits, ValueBits, InT, OutT> { };
+                : host_can_memcpy<UnitBits, InputBits, OutputBits, , InT, OutT> { };
 #endif
 
             /*!
@@ -154,8 +155,9 @@ namespace nil {
                  *
                  * @return
                  */
-                inline static
-                    typename std::enable_if<can_memcpy<Endianness, ValueBits, InputType, OutputType>::value>::type
+                template<std::size_t InputValueBits, std::size_t OutputValueBits>
+                inline static typename std::enable_if<
+                    can_memcpy<Endianness, InputValueBits, OutputValueBits, InputType, OutputType>::value>::type
                     pack_n(InputType const *in, std::size_t n, OutputType *out) {
                     std::memcpy(out, in, n * sizeof(InputType));
                 }
@@ -172,8 +174,9 @@ namespace nil {
                  *
                  * @return
                  */
-                inline static
-                    typename std::enable_if<can_memcpy<Endianness, ValueBits, InputType, OutputType>::value>::type
+                template<std::size_t InputValueBits, std::size_t OutputValueBits>
+                inline static typename std::enable_if<
+                    can_memcpy<Endianness, InputValueBits, OutputValueBits, InputType, OutputType>::value>::type
                     pack_n(InputType *in, std::size_t n, OutputType *out) {
                     std::memcpy(out, in, n * sizeof(InputType));
                 }
@@ -262,8 +265,10 @@ namespace nil {
                  */
                 template<typename InputIterator, typename OutputIterator>
                 inline static void pack(InputIterator first, InputIterator last, OutputIterator out) {
+
                     typedef typename std::iterator_traits<InputIterator>::iterator_category in_cat;
                     typedef typename std::iterator_traits<OutputIterator>::iterator_category out_cat;
+
                     pack(first, last, in_cat(), out, out_cat());
                 }
             };
