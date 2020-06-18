@@ -108,6 +108,15 @@ if(CRYPTO3_HASH_BLAKE2B)
          ${${CURRENT_PROJECT_NAME}_BLAKE2B_HEADERS})
 endif()
 
+if(CRYPTO3_HASH_CHECKSUM_CRC)
+    list(APPEND ${CURRENT_PROJECT_NAME}_CRC_HEADERS
+         include/nil/crypto3/hash/crc.hpp)
+
+    add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_CRC)
+    list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
+         ${${CURRENT_PROJECT_NAME}_CRC_HEADERS})
+endif()
+
 if(CRYPTO3_HASH_KECCAK)
     list(APPEND ${CURRENT_PROJECT_NAME}_KECCAK_HEADERS
          include/nil/crypto3/hash/keccak.hpp)
