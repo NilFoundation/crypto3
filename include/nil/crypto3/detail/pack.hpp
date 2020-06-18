@@ -157,7 +157,7 @@ namespace nil {
                  */
                 template<std::size_t InputValueBits, std::size_t OutputValueBits>
                 inline static typename std::enable_if<
-                    can_memcpy<Endianness, InputValueBits, OutputValueBits, InputType, OutputType>::value>
+                    can_memcpy<Endianness, InputValueBits, OutputValueBits, InputType, OutputType>::value>::type
                     pack_n(InputType const *in, std::size_t n, OutputType *out) {
                     std::memcpy(out, in, n * sizeof(InputType));
                 }
@@ -176,7 +176,7 @@ namespace nil {
                  */
                 template<std::size_t InputValueBits, std::size_t OutputValueBits>
                 inline static typename std::enable_if<
-                    can_memcpy<Endianness, InputValueBits, OutputValueBits, InputType, OutputType>::value>
+                    can_memcpy<Endianness, InputValueBits, OutputValueBits, InputType, OutputType>::value>::type
                     pack_n(InputType *in, std::size_t n, OutputType *out) {
                     std::memcpy(out, in, n * sizeof(InputType));
                 }
