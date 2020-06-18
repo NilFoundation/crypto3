@@ -59,7 +59,8 @@ namespace nil {
                     constexpr static const std::size_t length_words = length_bits / word_bits;
                     BOOST_STATIC_ASSERT(!length_bits || length_bits % word_bits == 0);
 
-                    typedef ::nil::crypto3::detail::injector<endian_type, word_bits, block_words, block_bits> injector_type;
+                    typedef ::nil::crypto3::detail::injector<endian_type, word_bits, block_words, block_bits>
+                        injector_type;
 
                 public:
                     typedef typename hash_type::digest_type result_type;
@@ -81,12 +82,12 @@ namespace nil {
 
                 protected:
                     inline void resolve_type(const block_type &value, std::size_t bits) {
-                        //total_seen += bits == 0 ? block_bits : bits;
+                        // total_seen += bits == 0 ? block_bits : bits;
                         process(value, bits == 0 ? block_bits : bits);
                     }
 
                     inline void resolve_type(const word_type &value, std::size_t bits) {
-                        //total_seen += bits == 0 ? word_bits : bits;
+                        // total_seen += bits == 0 ? word_bits : bits;
                         process(value, bits == 0 ? word_bits : bits);
                     }
 
@@ -100,7 +101,7 @@ namespace nil {
 
                         std::size_t cached_bits = total_seen % block_bits;
 
-                        if (cached_bits != 0 ) {
+                        if (cached_bits != 0) {
                             // If there are already any bits in the cache
 
                             std::size_t needed_to_fill_bits = block_bits - cached_bits;
@@ -161,7 +162,7 @@ namespace nil {
 
                         std::size_t cached_bits = total_seen % block_bits;
 
-                        if (cached_bits%word_bits != 0) {
+                        if (cached_bits % word_bits != 0) {
                             std::size_t needed_to_fill_bits = block_bits - cached_bits;
                             std::size_t new_bits_to_append =
                                 (needed_to_fill_bits > value_seen) ? value_seen : needed_to_fill_bits;
@@ -191,7 +192,7 @@ namespace nil {
                             }
 
                         } else {
-                            cache[cached_bits/word_bits] = value;
+                            cache[cached_bits / word_bits] = value;
 
                             total_seen += value_seen;
                         }

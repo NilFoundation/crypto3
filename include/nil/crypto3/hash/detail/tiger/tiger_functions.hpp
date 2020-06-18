@@ -139,9 +139,9 @@ namespace nil {
                         C *= mul;
                     }
                 };
-            }
-        }
-    }
-}
+            }    // namespace detail
+        }        // namespace hash
+    }            // namespace crypto3
+}    // namespace nil
 
-#endif //CRYPTO3_TIGER_FUNCTIONS_HPP
+#endif    // CRYPTO3_TIGER_FUNCTIONS_HPP

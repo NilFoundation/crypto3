@@ -1,4 +1,5 @@
 # Hashes for =nil; Foundation's Cryptography Suite
+[![Build Status](https://travis-ci.com/NilFoundation/hash.svg?branch=master)](https://travis-ci.com/NilFoundation/hash)
 
 Hashes for =nil; Foundation's cryptography suite.
 

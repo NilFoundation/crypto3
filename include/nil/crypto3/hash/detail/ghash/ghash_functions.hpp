@@ -40,7 +40,7 @@ namespace nil {
                     block_type gcm_multiply(const block_type &block) {
                         const uint64_t mask = 0xFFFFFFFFFFFFFFFF;
 
-                        block_type in = block, out{word_type(), word_type()};
+                        block_type in = block, out {word_type(), word_type()};
 
                         for (size_t i = 0; i != rounds; ++i) {
                             const word_type x0_mask = (mask + (in[0] >> 63)) ^ mask;
@@ -49,10 +49,10 @@ namespace nil {
                             in[0] <<= 1;
                             in[1] <<= 1;
 
-//                            out[0] ^= m_HM[4 * i] & x0_mask;
-//                            out[1] ^= m_HM[4 * i + 1] & x0_mask;
-//                            out[0] ^= m_HM[4 * i + 2] & x1_mask;
-//                            out[1] ^= m_HM[4 * i + 3] & x1_mask;
+                            //                            out[0] ^= m_HM[4 * i] & x0_mask;
+                            //                            out[1] ^= m_HM[4 * i + 1] & x0_mask;
+                            //                            out[0] ^= m_HM[4 * i + 2] & x1_mask;
+                            //                            out[1] ^= m_HM[4 * i + 3] & x1_mask;
                         }
 
                         return {boost::endian::native_to_big(out[0]), boost::endian::native_to_big(out[1])};

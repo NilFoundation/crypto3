@@ -23,28 +23,33 @@ namespace nil {
             // including a wrapped predicate as appropriate.
             template<typename P, typename It>
             struct transform_iterator_gen {
-                typedef boost::transform_iterator<typename boost::range_detail::default_constructible_unary_fn_gen<P,
-                        typename boost::transform_iterator<P, It>::reference>::type, It> type;
+                typedef boost::transform_iterator<typename boost::range_detail::default_constructible_unary_fn_gen<
+                                                      P,
+                                                      typename boost::transform_iterator<P, It>::reference>::type,
+                                                  It>
+                    type;
             };
 
             template<class F, class R>
-            struct encoded_range : public boost::iterator_range<
-                    typename transform_iterator_gen<F, typename boost::range_iterator<R>::type>::type> {
+            struct encoded_range
+                : public boost::iterator_range<
+                      typename transform_iterator_gen<F, typename boost::range_iterator<R>::type>::type> {
             private:
-                typedef typename transform_iterator_gen<F,
-                        typename boost::range_iterator<R>::type>::type transform_iter_t;
+                typedef
+                    typename transform_iterator_gen<F, typename boost::range_iterator<R>::type>::type transform_iter_t;
 
-                typedef boost::iterator_range <transform_iter_t> base;
+                typedef boost::iterator_range<transform_iter_t> base;
 
             public:
-                typedef typename boost::range_detail::default_constructible_unary_fn_gen<F,
-                        typename boost::transform_iterator<F,
-                                typename boost::range_iterator<R>::type>::reference>::type transform_fn_type;
+                typedef typename boost::range_detail::default_constructible_unary_fn_gen<
+                    F,
+                    typename boost::transform_iterator<F, typename boost::range_iterator<R>::type>::reference>::type
+                    transform_fn_type;
 
                 typedef R source_range_type;
 
-                encoded_range(transform_fn_type f, R &r) : base(transform_iter_t(boost::begin(r), f),
-                                                                transform_iter_t(boost::end(r), f)) {
+                encoded_range(transform_fn_type f, R &r) :
+                    base(transform_iter_t(boost::begin(r), f), transform_iter_t(boost::end(r), f)) {
                 }
             };
 
@@ -57,33 +62,32 @@ namespace nil {
             template<class SinglePassRange, class UnaryFunction>
             inline encoded_range<UnaryFunction, SinglePassRange> operator|(SinglePassRange &r,
                                                                            const encode_holder<UnaryFunction> &f) {
-                BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept < SinglePassRange > ));
+                BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<SinglePassRange>));
 
                 return encoded_range<UnaryFunction, SinglePassRange>(f.val, r);
             }
 
             template<class SinglePassRange, class UnaryFunction>
-            inline encoded_range<UnaryFunction, const SinglePassRange> operator|(const SinglePassRange &r,
-                                                                                 const encode_holder<
-                                                                                         UnaryFunction> &f) {
+            inline encoded_range<UnaryFunction, const SinglePassRange>
+                operator|(const SinglePassRange &r, const encode_holder<UnaryFunction> &f) {
                 BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange>));
 
                 return encoded_range<UnaryFunction, const SinglePassRange>(f.val, r);
             }
 
-        } // 'detail'
+        }    // namespace detail
 
         using detail::encoded_range;
 
         namespace adaptors {
             namespace {
                 const range_detail::forwarder<detail::encode_holder> encoded =
-                        detail::forwarder<detail::encode_holder>();
+                    detail::forwarder<detail::encode_holder>();
             }
 
             template<class UnaryFunction, class SinglePassRange>
             inline encoded_range<UnaryFunction, SinglePassRange> transform(SinglePassRange &rng, UnaryFunction fn) {
-                BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept < SinglePassRange > ));
+                BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<SinglePassRange>));
 
                 return encoded_range<UnaryFunction, SinglePassRange>(fn, rng);
             }
@@ -95,8 +99,8 @@ namespace nil {
 
                 return encoded_range<UnaryFunction, const SinglePassRange>(fn, rng);
             }
-        } // 'adaptors'
-    }
-}
+        }    // namespace adaptors
+    }        // namespace crypto3
+}    // namespace nil
 
-#endif //CRYPTO3_HASHED_HPP
+#endif    // CRYPTO3_HASHED_HPP

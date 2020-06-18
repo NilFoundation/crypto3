@@ -2,11 +2,11 @@
 
 @tableofcontents
 
-## Hash Concept ## {#hashes_concept}
+## Hash Concept ## {#hash_concept}
 
 A ```Hash``` is a function object for which the output depends only on the input and has a very low probability of yielding the same output given different input values.
 
-### Requirements ### {#hashes_concepts_requirements}
+### Requirements ### {#hash_concepts_requirements}
 The type ```X``` satisfies ```Hash``` if:
 
 Given

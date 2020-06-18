@@ -20,8 +20,8 @@ namespace nil {
         namespace hash {
             namespace detail {
                 template<std::size_t DigestBits>
-                struct basic_ripemd_policy : public ::nil::crypto3::detail::basic_functions<32>  {
-                    
+                struct basic_ripemd_policy : public ::nil::crypto3::detail::basic_functions<32> {
+
                     constexpr static const std::size_t block_bits = 512;
                     constexpr static const std::size_t block_words = block_bits / word_bits;
                     typedef std::array<word_type, block_words> block_type;
@@ -32,7 +32,7 @@ namespace nil {
 
                     constexpr static const std::size_t digest_bits = DigestBits;
                     typedef static_digest<digest_bits> digest_type;
-                    
+
                     constexpr static const std::uint8_t ieee1363_hash_id = 0x33;
                     typedef std::array<std::uint8_t, 15> pkcs_id_type;
 
@@ -86,12 +86,12 @@ namespace nil {
                     basic_ripemd_policy<DigestSize>::s2;
 
                 template<std::size_t DigestBits>
-                struct ripemd_policy : public basic_ripemd_policy<DigestBits> {};
+                struct ripemd_policy : public basic_ripemd_policy<DigestBits> { };
 
                 template<>
                 struct ripemd_policy<128> : public basic_ripemd_policy<128> {
                     constexpr static const std::size_t word_bits = basic_ripemd_policy<128>::word_bits;
-                    //typedef basic_ripemd_policy<128>::word_type word_type;
+                    // typedef basic_ripemd_policy<128>::word_type word_type;
 
                     constexpr static const std::size_t state_words = 4;
                     constexpr static const std::size_t state_bits = state_words * word_bits;
@@ -108,7 +108,7 @@ namespace nil {
                 template<>
                 struct ripemd_policy<160> : public basic_ripemd_policy<160> {
                     constexpr static const std::size_t word_bits = basic_ripemd_policy<160>::word_bits;
-                    //typedef basic_ripemd_policy<160>::word_type word_type;
+                    // typedef basic_ripemd_policy<160>::word_type word_type;
 
                     constexpr static const std::size_t state_words = 5;
                     constexpr static const std::size_t state_bits = state_words * word_bits;
@@ -125,7 +125,7 @@ namespace nil {
                 template<>
                 struct ripemd_policy<256> : public basic_ripemd_policy<256> {
                     constexpr static const std::size_t word_bits = basic_ripemd_policy<256>::word_bits;
-                    //typedef basic_ripemd_policy<256>::word_type word_type;
+                    // typedef basic_ripemd_policy<256>::word_type word_type;
 
                     constexpr static const std::size_t state_words = 8;
                     constexpr static const std::size_t state_bits = state_words * word_bits;
@@ -143,7 +143,7 @@ namespace nil {
                 template<>
                 struct ripemd_policy<320> : public basic_ripemd_policy<320> {
                     constexpr static const std::size_t word_bits = basic_ripemd_policy<320>::word_bits;
-                    //typedef basic_ripemd_policy<320>::word_type word_type;
+                    // typedef basic_ripemd_policy<320>::word_type word_type;
 
                     constexpr static const std::size_t state_words = 10;
                     constexpr static const std::size_t state_bits = state_words * word_bits;

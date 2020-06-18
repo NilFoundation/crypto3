@@ -57,7 +57,6 @@ namespace nil {
                 typedef std::array<value_type, block_values> cache_type;
 
             protected:
-
                 BOOST_STATIC_ASSERT(block_bits % value_bits == 0);
 
                 inline void process_block(std::size_t block_seen = block_bits) {
@@ -94,13 +93,12 @@ namespace nil {
                 }
 
                 template<typename InputIterator>
-                inline void operator()(InputIterator b, InputIterator e,
-                                                                   std::random_access_iterator_tag) {
+                inline void operator()(InputIterator b, InputIterator e, std::random_access_iterator_tag) {
                     update_n(b, e);
                 }
 
                 template<typename InputIterator, typename Category>
-                inline  void operator()(InputIterator b, InputIterator e, Category) {
+                inline void operator()(InputIterator b, InputIterator e, Category) {
                     while (b != e) {
                         update_one(*b++);
                     }
@@ -109,7 +107,7 @@ namespace nil {
                 template<typename InputIterator>
                 inline void operator()(InputIterator b, InputIterator e) {
                     typedef typename std::iterator_traits<InputIterator>::iterator_category cat;
-                    
+
                     operator()(b, e, cat());
                 }
 
@@ -119,8 +117,7 @@ namespace nil {
                 }
 
             public:
-                block_stream_processor(accumulator_type &acc) :
-                    acc(acc), cache(), cache_seen(0) {
+                block_stream_processor(accumulator_type &acc) : acc(acc), cache(), cache_seen(0) {
                 }
 
                 virtual ~block_stream_processor() {

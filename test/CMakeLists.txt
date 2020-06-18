@@ -16,7 +16,6 @@ endif()
 
 cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
                        ${CMAKE_WORKSPACE_NAME}::block
-
                        ${Boost_LIBRARIES})
 
 macro(define_hash_test name)
@@ -41,27 +40,27 @@ macro(define_hash_test name)
 endmacro()
 
 set(TESTS_NAMES
-#    "adler"
-#    "blake2b"
-#    "crc"
-#    "cubehash"
-#    "ghash"
-#    "keccak"
-#    "md4"
-#    "md5"
-#    "pack"
-#    "ripemd"
-#    "sha"
-#    "sha1"
-#    "sha2"
-#    "sha3"
-#    "skein"
-#    "sm3"
-#    "static_digest"
-#    "streebog"
+    "adler"
+    "blake2b"
+    "crc"
+    "cubehash"
+    "ghash"
+    "keccak"
+    "md4"
+    "md5"
+    "pack"
+    "ripemd"
+    "sha"
+    "sha1"
+    "sha2"
+    "sha3"
+    "skein"
+    "sm3"
+    "static_digest"
+    "streebog"
     "tiger"
-#    "whirlpool"
-)
+    "whirlpool"
+    )
 
 foreach(TEST_NAME ${TESTS_NAMES})
     define_hash_test(${TEST_NAME})

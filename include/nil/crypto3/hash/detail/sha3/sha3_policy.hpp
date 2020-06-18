@@ -22,7 +22,7 @@ namespace nil {
                 template<std::size_t DigestBits>
                 struct sha3_policy : public ::nil::crypto3::detail::basic_functions<64> {
 
-                    constexpr static const std::size_t digest_bits = DigestBits; 
+                    constexpr static const std::size_t digest_bits = DigestBits;
                     typedef static_digest<digest_bits> digest_type;
 
                     constexpr static const std::size_t state_bits = 1600;
@@ -41,20 +41,22 @@ namespace nil {
 
                     struct iv_generator {
                         state_type const &operator()() const {
-                            static state_type const H0 = {
-                            UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000), 
-                            UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000), 
-                            UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000), 
-                            UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000), 
-                            UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000), 
-                            UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000), 
-                            UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000),
-                            UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000),
-                            UINT64_C(0x0000000000000000)};
+                            static state_type const H0 = {UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000),
+                                                          UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000),
+                                                          UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000),
+                                                          UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000),
+                                                          UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000),
+                                                          UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000),
+                                                          UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000),
+                                                          UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000),
+                                                          UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000),
+                                                          UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000),
+                                                          UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000),
+                                                          UINT64_C(0x0000000000000000), UINT64_C(0x0000000000000000),
+                                                          UINT64_C(0x0000000000000000)};
                             return H0;
                         }
                     };
-
                 };
             }    // namespace detail
         }        // namespace hash
