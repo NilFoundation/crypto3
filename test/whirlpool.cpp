@@ -42,7 +42,14 @@ namespace boost {
 
 BOOST_AUTO_TEST_SUITE(whirlpool_test_suite)
 
-BOOST_AUTO_TEST_CASE(whirlpool_range_hash) {
+	
+BOOST_AUTO_TEST_CASE(whirlpool_iterator_hash) {
+
+	std::string input = "abc";
+
+	std::string out = hash<whirlpool>(input.begin(), input.end());
+
+	BOOST_CHECK_EQUAL("4e2448a4c6f486bb16b6562c73b4020bf3043e3a731bce721ae1b303d97e6d4c7181eebdb6c57e277d0e34957114cbd6c797fc9d95d8b582d225292076d4eef5", out);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

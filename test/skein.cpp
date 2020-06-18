@@ -42,7 +42,13 @@ namespace boost {
 
 BOOST_AUTO_TEST_SUITE(skein_test_suite)
 
-BOOST_AUTO_TEST_CASE(skein_256_range_hash) {
+BOOST_AUTO_TEST_CASE(skein_224_iterator_hash) {
+
+	std::string input = std::string(1, char(204));	
+
+	std::string out = hash<skein<224>>(input.begin(), input.end());
+
+	BOOST_CHECK_EQUAL("23f031a6a4378039b66a5a178bad217eaec094b7fcba663a47ddcf33", out);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

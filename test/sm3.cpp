@@ -42,7 +42,12 @@ namespace boost {
 
 BOOST_AUTO_TEST_SUITE(sm3_test_suite)
 
-BOOST_AUTO_TEST_CASE(sm3_range_hash) {
+BOOST_AUTO_TEST_CASE(sm3_iterator_hash) {
+	std::string input = "abc";
+
+	std::string out = hash<sm3>(input.begin(), input.end());
+
+	BOOST_CHECK_EQUAL("66c7f0f462eeedd9d1f2d46bdc10e4e24167c4875cf2f7a2297da02b8f4ba8e0", out);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

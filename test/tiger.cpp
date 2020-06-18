@@ -41,7 +41,7 @@ namespace boost {
 
 BOOST_AUTO_TEST_SUITE(tiger_test_suite)
 	
-BOOST_AUTO_TEST_CASE(tiger_range_hash) {
+BOOST_AUTO_TEST_CASE(tiger_iterator_hash) {
 
 	std::string input = "a";
 
