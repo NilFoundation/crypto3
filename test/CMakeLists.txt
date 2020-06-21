@@ -13,8 +13,6 @@ if(NOT Boost_UNIT_TEST_FRAMEWORK_FOUND)
 endif()
 
 cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
-                       #${CMAKE_WORKSPACE_NAME}::codec
-                       #${CMAKE_WORKSPACE_NAME}::hash
                        ${Boost_LIBRARIES})
 
 macro(define_block_cipher_test name)
@@ -39,8 +37,6 @@ macro(define_block_cipher_test name)
 endmacro()
 
 set(TESTS_NAMES
-#    "pack"
-    "rijndael"
 #    "aria"
 #    "blowfish"
 #    "camellia"
@@ -49,15 +45,19 @@ set(TESTS_NAMES
 #    "gost_28147_89"
 #    "idea"
 #    "kasumi"
+    "md4"
+    "md5"
 #    "misty1"
 #    "noekeon"
+    "pack"
+    "rijndael"
 #    "seed"
 #    "serpent"
-#    "shacal"
-#    "shacal2"
+    "shacal"
+    "shacal2"
 #    "streebog"
 #    "sm4"
-#    "threefish"
+    "threefish"
 #    "twofish"
 #    "xtea"
     )

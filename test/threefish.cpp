@@ -20,8 +20,6 @@
 
 #include <nil/crypto3/block/threefish.hpp>
 
-#include <nil/crypto3/codec/algorithm/decode.hpp>
-#include <nil/crypto3/codec/hex.hpp>
 
 using namespace nil::crypto3;
 
@@ -43,27 +41,6 @@ BOOST_TEST_DONT_PRINT_LOG_VALUE(fixture<512>::block_type)
 BOOST_TEST_DONT_PRINT_LOG_VALUE(fixture<1024>::block_type)
 
 BOOST_AUTO_TEST_SUITE(threefish_test_suite)
-
-BOOST_FIXTURE_TEST_CASE(threefish_256_encrypt1, fixture<256>) {
-    // All-zero key, tweak, and plaintext
-    cipher_type cipher((key_type()));
-    block_type ciphertext = cipher.encrypt(block_type());
-    digest_type d;
-    detail::pack_n<stream_endian::little_octet_big_bit, cipher_type::word_bits, octet_bits>(
-        ciphertext.begin(), cipher_type::block_bits / cipher_type::word_bits, std::back_inserter(d),
-        cipher_type::block_bits * octet_bits / cipher_type::word_bits);
-
-#ifdef CRYPTO3_HASH_SHOW_PROGRESS
-    std::cout << d << std::endl;
-#endif
-
-    std::string string_digest = decode<codec::hex<codec::mode::lower>>(d);
-#ifdef CRYPTO3_BLOCK_THREEFISH_OLD_ROTATION_CONSTANTS
-    BOOST_CHECK_EQUAL(string_digest, "e39756f9f3b6cf3ff91d2bc3d324ce618574ea1623b2367f88382e2a93afa858");
-#else
-    BOOST_CHECK_EQUAL(string_digest, "eb373aaeb6f28d3f6343799c778aadae98c87a2888b43842b06295c7d76af54b");
-#endif
-}
 
 BOOST_FIXTURE_TEST_CASE(threefish_256_encrypt2, fixture<256>) {
     tweak_type t = {{UINT64_C(0x0706050403020100), UINT64_C(0x0F0E0D0C0B0A0908)}};
@@ -87,31 +64,6 @@ BOOST_FIXTURE_TEST_CASE(threefish_256_encrypt2, fixture<256>) {
 #endif
 
     BOOST_CHECK_EQUAL(ct, ect);
-}
-
-BOOST_FIXTURE_TEST_CASE(threefish_512_encrypt1, fixture<512>) {
-    // All-zero key, tweak, and plaintext
-    cipher_type cipher((key_type()));
-    block_type ciphertext = cipher.encrypt(block_type());
-    digest_type d;
-    detail::pack_n<stream_endian::little_octet_big_bit, cipher_type::word_bits, octet_bits>(
-        ciphertext.begin(), cipher_type::block_bits / cipher_type::word_bits, std::back_inserter(d),
-        cipher_type::block_bits * octet_bits / cipher_type::word_bits);
-
-#ifdef CRYPTO3_HASH_SHOW_PROGRESS
-    std::cout << d std::endl;
-#endif
-
-    std::string string_digest = decode<codec::hex<codec::mode::lower>>(d);
-#ifdef CRYPTO3_HASH_THREEFISH_OLD_ROTATION_CONSTANTS
-    BOOST_CHECK_EQUAL(string_digest,
-                      "408be942494492eab19daa3e96ad19aedfc41f4e55f8a2626c1e46d54547a713"
-                      "d43b21f0de1a10881ed5c4adefdad1c4172cd768c8fc28d0dde9df018042fe3e");
-#else
-    BOOST_CHECK_EQUAL(string_digest,
-                      "54c48fea2dac72222c0380d1a1a9f7684d47bd90fc491724dc599e1824b6b30a"
-                      "e22db97e841482db209c0e6974c2111ad6c691984919c11f987fc2d132379fb4");
-#endif
 }
 
 BOOST_FIXTURE_TEST_CASE(threefish_512_encrypt2, fixture<512>) {
@@ -139,35 +91,6 @@ BOOST_FIXTURE_TEST_CASE(threefish_512_encrypt2, fixture<512>) {
 #endif
 
     BOOST_CHECK_EQUAL(ct, ect);
-}
-
-BOOST_FIXTURE_TEST_CASE(threefish_1024_encrypt1, fixture<1024>) {
-    // All-zero key, tweak, and plaintext
-    cipher_type cipher((key_type()));
-    block_type ciphertext = cipher.encrypt(block_type());
-    digest_type d;
-    detail::pack_n<stream_endian::little_octet_big_bit, cipher_type::word_bits, octet_bits>(
-        ciphertext.begin(), cipher_type::block_bits / cipher_type::word_bits, std::back_inserter(d),
-        cipher_type::block_bits * octet_bits / cipher_type::word_bits);
-
-#ifdef CRYPTO3_HASH_SHOW_PROGRESS
-    std::cout << d std::endl;
-#endif
-
-    std::string string_digest = decode<codec::hex<codec::mode::lower>>(d);
-#ifdef CRYPTO3_HASH_THREEFISH_OLD_ROTATION_CONSTANTS
-    BOOST_CHECK_EQUAL(string_digest,
-                      "43cf2a34cb1668e38c2e19ea1757d6b31ac6dead02fea99459d8a0331bdc7273"
-                      "a1f7e9495d60402d1f8b43e48a5ac4f9d9d30965835e07f5455b87f963fdbca6"
-                      "df66b4446b91ffdd27634573f6e0e4c19633cf80da8fe11b890bcf639ac67b34"
-                      "7f87c5daa1acc1b8cd0303f4a9168c0b9b7b78baa6fc68db2cbd3337b8519170");
-#else
-    BOOST_CHECK_EQUAL(string_digest,
-                      "71bdc133e22bdc347d4eb02d9a7535f82de8d4c32622e0fd492083aace875edc"
-                      "6114e11fd928665e3a2947f2e92897d2f62a2afbb98d20a9e2a5ddfc6cdad498"
-                      "644874786afe373b7853672a6da106725e946b45d48ed270ed4843f1a5ac7a23"
-                      "97cc46f04d3736d8536612823db0ac1ffaa29e6fcc6eab4ff3f36cfaec59468a");
-#endif
 }
 
 BOOST_FIXTURE_TEST_CASE(threefish_1024_encrypt2, fixture<1024>) {

@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_BLOCK_BITS_COUNT_HPP
-#define CRYPTO3_BLOCK_BITS_COUNT_HPP
+#ifndef CRYPTO3_BITS_COUNT_HPP
+#define CRYPTO3_BITS_COUNT_HPP
 
 #include <boost/mpl/always.hpp>
 
