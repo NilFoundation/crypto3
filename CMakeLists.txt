@@ -50,8 +50,6 @@ include(PlatformConfiguration)
 include(CheckSSE)
 include(CheckAVX)
 
-cm_find_package(${CMAKE_WORKSPACE_NAME}_hash)
-
 option(BUILD_WITH_CCACHE "Build with ccache usage" TRUE)
 option(BUILD_TESTS "Build unit tests" FALSE)
 
