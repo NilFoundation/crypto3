@@ -51,6 +51,7 @@ set(TESTS_NAMES
     "sha2"
     "sha3"
     "static_digest"
+    "tiger"
     )
 
 foreach(TEST_NAME ${TESTS_NAMES})
