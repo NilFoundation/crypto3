@@ -20,6 +20,8 @@
 #include <nil/crypto3/block/accumulators/block.hpp>
 #include <nil/crypto3/block/cipher_state.hpp>
 
+#include <nil/crypto3/detail/digest.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace block {
@@ -131,7 +133,7 @@ namespace nil {
                         return this->accumulator_set;
                     }
 
-#ifdef CRYPTO3_ASCII_STRING_CODEC_OUTPUT
+#ifndef CRYPTO3_RAW_HASH_STRING_OUTPUT
 
                     template<typename Char, typename CharTraits, typename Alloc>
                     operator std::basic_string<Char, CharTraits, Alloc>() const {
