@@ -297,25 +297,36 @@ boost::property_tree::ptree string_data(const char *child_name) {
     return root_data.get_child(child_name);
 }
 
+template <typename BlockCipher>
+typename BlockCipher::key_type key_value(const std::string inp_k){
+
+    typedef BlockCipher block_cipher;
+
+    typedef typename block_cipher::key_type key_type;
+    typedef typename block_cipher::endian_type endian_type;
+
+    constexpr static std::size_t const key_value_bits = sizeof(typename key_type::value_type) * CHAR_BIT; 
+
+    byte_string const k(inp_k);
+
+    key_type key;
+    
+    pack<stream_endian::big_octet_big_bit, endian_type, CHAR_BIT, key_value_bits>(k.begin(), k.end(),
+        key.begin());
+
+    return key;
+}
 
 BOOST_AUTO_TEST_SUITE(rijndael_stream_processor_filedriven_test_suite)
 
 BOOST_AUTO_TEST_CASE(rijndael_128_128_1) {
 
-    std::string key = "000102030405060708090a0b0c0d0e0f";
-    std::string input = "00112233445566778899aabbccddeeff", out = "";
+    std::string key = "00112233445566778899aabbccddeeff";
+    std::string input = "000102030405060708090a0b0c0d0e0f";
 
-    typedef typename block::aes<128>::key_type key_type;
-
-    typedef typename block::aes<128>::endian_type endian_type;
-
-    constexpr static std::size_t const key_value_bits = sizeof(typename key_type::value_type) * CHAR_BIT;
-    pack<stream_endian::big_octet_big_bit, endian_type, CHAR_BIT, key_value_bits>(byte_string(key).begin(), byte_string(key).end(),
-            key.begin());
-
-    encrypt<block::aes<128>>(input.begin(), input.end(), key, out.end());
+    std::string out = encrypt<block::rijndael<128, 128>>(input, key_value<rijndael<128, 128>>(key));
     
-    BOOST_CHECK_EQUAL(out, "d718fbd6ab644c739da95f3be6451778");
+    BOOST_CHECK_EQUAL(out, "69c4e0d86a7b0430d8cdb78070b4c55a");
 }
 
 BOOST_DATA_TEST_CASE(rijndael_128_128, string_data("key_128_block_128"), triples) {
