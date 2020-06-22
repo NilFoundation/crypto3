@@ -1,15 +1,13 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2020 Alexander Sokolov <asokolov@nil.foundation>
-// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
-// Copyright (c) 2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Pavel Kharitonov <ipavrus@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------////
 
-#ifndef CRYPTO3_MERKLE_DAMGARD_PADDING_HPP
-#define CRYPTO3_MERKLE_DAMGARD_PADDING_HPP
+#ifndef CRYPTO3_TIGER_PADDING_HPP
+#define CRYPTO3_TIGER_PADDING_HPP
 
 #include <nil/crypto3/detail/inject.hpp>
 #include <nil/crypto3/detail/pack.hpp>
@@ -20,7 +18,7 @@ namespace nil {
         namespace hash {
             namespace detail {
                 template<typename Hash>
-                class merkle_damgard_padding {
+                class tiger_padding {
                     typedef Hash policy_type;
 
                     typedef typename policy_type::digest_endian endian_type;
@@ -66,4 +64,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_MERKLE_DAMGARD_PADDING_HPP
+#endif    // CRYPTO3_TIGERS_PADDING_HPP

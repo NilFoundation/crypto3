@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Pavel Kharitonov <ipavrus@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -81,7 +82,7 @@ namespace nil {
 
                     typedef merkle_damgard_construction<params_type, typename policy_type::iv_generator,
                                                         tiger_compressor<DigestBits, Passes>,
-                                                        detail::merkle_damgard_padding<policy_type>>
+                                                        detail::tiger_padding<policy_type>>
                         type;
                 };
 
