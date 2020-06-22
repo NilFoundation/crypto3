@@ -318,7 +318,7 @@ typename BlockCipher::key_type key_value(const std::string inp_k){
 }
 
 BOOST_AUTO_TEST_SUITE(rijndael_stream_processor_filedriven_test_suite)
-
+/*
 BOOST_AUTO_TEST_CASE(rijndael_128_128_1) {
 
     std::string key = "00112233445566778899aabbccddeeff";
@@ -327,7 +327,7 @@ BOOST_AUTO_TEST_CASE(rijndael_128_128_1) {
     std::string out = encrypt<block::rijndael<128, 128>>(input, key_value<rijndael<128, 128>>(key));
     
     BOOST_CHECK_EQUAL(out, "69c4e0d86a7b0430d8cdb78070b4c55a");
-}
+}*/
 
 BOOST_DATA_TEST_CASE(rijndael_128_128, string_data("key_128_block_128"), triples) {
 

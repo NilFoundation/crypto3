@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -15,6 +16,9 @@
 
 #include <nil/crypto3/detail/pack.hpp>
 #include <nil/crypto3/detail/digest.hpp>
+
+#include <nil/crypto3/block/accumulators/bits_count.hpp>
+#include <nil/crypto3/block/accumulators/parameters/bits.hpp>
 
 #include <boost/integer.hpp>
 #include <boost/cstdint.hpp>
@@ -34,22 +38,22 @@ namespace nil {
                 typedef StateAccumulator accumulator_type;
                 typedef Params params_type;
 
-                typedef typename mode_type::block_type input_block_type;
-                constexpr static const std::size_t input_block_bits = mode_type::block_bits;
+                typedef typename mode_type::block_type block_type;
+                constexpr static const std::size_t block_bits = mode_type::block_bits;
 
+                constexpr static const std::size_t word_bits = mode_type::word_bits;
             public:
                 typedef typename mode_type::endian_type endian_type;
                 typedef typename mode_type::input_endian_type input_endian_type;
 
                 constexpr static const std::size_t value_bits = params_type::value_bits;
                 typedef typename boost::uint_t<value_bits>::least value_type;
-                BOOST_STATIC_ASSERT(input_block_bits % value_bits == 0);
-                constexpr static const std::size_t block_values = input_block_bits / value_bits;
+                BOOST_STATIC_ASSERT(block_bits % value_bits == 0);
+                constexpr static const std::size_t block_values = block_bits / value_bits;
                 typedef std::array<value_type, block_values> cache_type;
 
             private:
                 constexpr static const std::size_t length_bits = params_type::length_bits;
-                constexpr static const std::size_t word_bits = mode_type::word_bits;
                 // FIXME: do something more intelligent than capping at sizeof(boost::uintmax_t) * CHAR_BIT
                 constexpr static const std::size_t length_type_bits = length_bits < word_bits ?
                                                                           word_bits :
@@ -60,46 +64,27 @@ namespace nil {
                 typedef typename boost::uint_t<length_type_bits>::least length_type;
 
                 BOOST_STATIC_ASSERT(!length_bits || length_bits % word_bits == 0);
-                BOOST_STATIC_ASSERT(input_block_bits % value_bits == 0);
+                BOOST_STATIC_ASSERT(block_bits % value_bits == 0);
 
                 BOOST_STATIC_ASSERT(!length_bits || value_bits <= length_bits);
-                /*
-                                template<typename Endianness = input_endian_type>
-                                typename std::enable_if<!(Endianness == stream_endian::big_octet_big_bit)>::type
-                                process_block(std::size_t block_seen = block_bits) {
-                                    acc(cache, accumulators::block_bits = block_seen);
-                                }
-                                template<typename Endianness = input_endian_type>
-                                typename std::enable_if<Endianness == stream_endian::big_octet_big_bit>::type
-                                process_block(std::size_t block_seen = block_bits) {
-                                    using namespace nil::crypto3::detail;
-                                    // Convert the input into words
-                                    block_type block;
-                                    pack<endian_type, value_bits, word_bits>(cache, block);
-                                    // Process the block
-                                    acc(block, accumulators::block_bits = block_seen);
-                                }
-                                */
 
-                void update_one(value_type value) {
+                inline void process_block(std::size_t block_seen = block_bits) {
                     using namespace nil::crypto3::detail;
+                    // Convert the input into words
+                    block_type block;
+                    pack_to<endian_type, value_bits, word_bits>(cache.begin(), cache.end(), block.begin());
+                    // Process the block
+                    acc(block, accumulators::bits = block_seen);
+                }
 
-                    std::size_t i = seen % input_block_bits;
-                    cache[i / value_bits] = value;
-                    seen += value_bits;
-                    if (i == input_block_bits - value_bits) {
-                        // Convert the input into words
-                        input_block_type block = {0};
-                        pack<input_endian_type, endian_type, value_bits, input_block_bits / block_values>(
-                            cache.begin(), cache.end(), block.begin());
-
-                        // Process the block
-                        state(block);
-
-                        // Reset seen if we don't need to track the length
-                        if (!length_bits) {
-                            seen = 0;
-                        }
+            public:
+                inline void update_one(value_type value) {
+                    cache[cache_seen] = value;
+                    ++cache_seen;
+                    if (cache_seen == block_values) {
+                        // Process the completed block
+                        process_block();
+                        cache_seen = 0;
                     }
                 }
 
@@ -110,22 +95,26 @@ namespace nil {
                     std::size_t n = std::distance(first, last);
 #ifndef CRYPTO3_BLOCK_NO_OPTIMIZATION
 #pragma clang loop unroll(full)
-                    for (; n && (seen % input_block_bits); --n, ++first) {
+                    for (; n && (cache_seen % block_bits); --n, ++first) {
                         update_one(*first);
                     }
 #pragma clang loop unroll(full)
                     for (; n >= block_values; n -= block_values, first += block_values) {
                         // Convert the input into words
-                        input_block_type block = {0};
-                        pack<input_endian_type, endian_type, value_bits, input_block_bits / block_values>(
-                            first, first + block_values, block.begin());
-                        seen += value_bits * block_values;
+                        block_type block = {0};
+                        //pack<input_endian_type, endian_type, value_bits, block_bits / block_values>(
+                        //    first, first + block_values, block.begin());
 
-                        state(block);
 
-                        // Reset seen if we don't need to track the length
+                        pack_to<endian_type, value_bits, word_bits>(first, first + block_values, block.begin());
+
+                        cache_seen += value_bits * block_values;
+
+                        acc(block);
+
+                        // Reset cache_seen if we don't need to track the length
                         if (!length_bits) {
-                            seen = 0;
+                            cache_seen = 0;
                         }
                     }
 #endif
@@ -137,7 +126,7 @@ namespace nil {
                 }
 
             public:
-                block_stream_processor(StateAccumulator &s) : state(s), cache(cache_type()), seen(0) {
+                block_stream_processor(StateAccumulator &s) : acc(s), cache(cache_type()), cache_seen(0) {
                 }
 
                 virtual ~block_stream_processor() {
@@ -173,12 +162,12 @@ namespace nil {
                 }
 
                 void reset() {
-                    seen = 0;
+                    cache_seen = 0;
                 }
 
-                StateAccumulator &state;
+                StateAccumulator &acc;
 
-                length_type seen;
+                length_type cache_seen;
                 cache_type cache;
             };
         }    // namespace block
