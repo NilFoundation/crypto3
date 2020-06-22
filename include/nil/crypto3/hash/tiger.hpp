@@ -12,7 +12,7 @@
 #include <nil/crypto3/hash/detail/tiger/tiger_policy.hpp>
 
 #include <nil/crypto3/hash/detail/merkle_damgard_construction.hpp>
-#include <nil/crypto3/hash/detail/merkle_damgard_padding.hpp>
+#include <nil/crypto3/hash/detail/tiger/tiger_padding.hpp>
 #include <nil/crypto3/hash/detail/block_stream_processor.hpp>
 
 namespace nil {
@@ -37,9 +37,7 @@ namespace nil {
                 static inline void process_block(state_type &state, const block_type &block) {
 
                     word_type A = state[0], B = state[1], C = state[2];
-
                     block_type input = block;
-
                     policy_type::pass(A, B, C, input, 5);
                     policy_type::mix(input);
                     policy_type::pass(C, A, B, input, 7);
@@ -58,7 +56,6 @@ namespace nil {
                     state[0] ^= A;
                     state[1] = B - state[1];
                     state[2] += C;
-
                 }
             };
 
@@ -78,7 +75,7 @@ namespace nil {
                     struct params_type {
                         typedef typename policy_type::digest_endian digest_endian;
 
-                        constexpr static const std::size_t length_bits = policy_type::word_bits * 2;
+                        constexpr static const std::size_t length_bits = policy_type::word_bits;
                         constexpr static const std::size_t digest_bits = policy_type::digest_bits;
                     };
 
