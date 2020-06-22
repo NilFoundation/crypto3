@@ -300,6 +300,24 @@ boost::property_tree::ptree string_data(const char *child_name) {
 
 BOOST_AUTO_TEST_SUITE(rijndael_stream_processor_filedriven_test_suite)
 
+BOOST_AUTO_TEST_CASE(rijndael_128_128_1) {
+
+    std::string key = "000102030405060708090a0b0c0d0e0f";
+    std::string input = "00112233445566778899aabbccddeeff", out = "";
+
+    typedef typename block::aes<128>::key_type key_type;
+
+    typedef typename block::aes<128>::endian_type endian_type;
+
+    constexpr static std::size_t const key_value_bits = sizeof(typename key_type::value_type) * CHAR_BIT;
+    pack<stream_endian::big_octet_big_bit, endian_type, CHAR_BIT, key_value_bits>(byte_string(key).begin(), byte_string(key).end(),
+            key.begin());
+
+    encrypt<block::aes<128>>(input.begin(), input.end(), key, out.end());
+    
+    BOOST_CHECK_EQUAL(out, "d718fbd6ab644c739da95f3be6451778");
+}
+
 BOOST_DATA_TEST_CASE(rijndael_128_128, string_data("key_128_block_128"), triples) {
 
     byte_string const p(triples.first);

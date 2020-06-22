@@ -55,8 +55,8 @@ namespace nil {
          *
          * @return
          */
-        template<typename BlockCipher, typename InputIterator, typename KeyIterator, typename OutputIterator>
-        OutputIterator encrypt(InputIterator first, InputIterator last, KeyIterator key_first, KeyIterator key_last,
+        template<typename BlockCipher, typename InputIterator, typename KeyRange, typename OutputIterator>
+        OutputIterator encrypt(InputIterator first, InputIterator last, const KeyRange &key,
                                OutputIterator out) {
 
             typedef typename block::modes::isomorphic<BlockCipher, nop_padding>::template bind<
@@ -67,7 +67,7 @@ namespace nil {
             typedef block::detail::itr_cipher_impl<StreamEncrypterImpl, OutputIterator> EncrypterImpl;
 
             return EncrypterImpl(first, last, std::move(out),
-                                 CipherAccumulator(EncryptionMode(BlockCipher(key_first, key_last))));
+                                 CipherAccumulator(EncryptionMode(BlockCipher(key))));
         }
 
         /*!
