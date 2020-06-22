@@ -44,7 +44,6 @@ namespace nil {
                 constexpr static const std::size_t word_bits = mode_type::word_bits;
             public:
                 typedef typename mode_type::endian_type endian_type;
-                typedef typename mode_type::input_endian_type input_endian_type;
 
                 constexpr static const std::size_t value_bits = params_type::value_bits;
                 typedef typename boost::uint_t<value_bits>::least value_type;

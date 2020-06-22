@@ -318,17 +318,19 @@ typename BlockCipher::key_type key_value(const std::string inp_k){
 }
 
 BOOST_AUTO_TEST_SUITE(rijndael_stream_processor_filedriven_test_suite)
-/*
+
 BOOST_AUTO_TEST_CASE(rijndael_128_128_1) {
 
     std::string key = "00112233445566778899aabbccddeeff";
     std::string input = "000102030405060708090a0b0c0d0e0f";
 
-    std::string out = encrypt<block::rijndael<128, 128>>(input, key_value<rijndael<128, 128>>(key));
+    rijndael<128, 128>::key_type processed_key = key_value<rijndael<128, 128>>(key);
+
+    std::string out = encrypt<block::rijndael<128, 128>>(input, processed_key);
     
     BOOST_CHECK_EQUAL(out, "69c4e0d86a7b0430d8cdb78070b4c55a");
-}*/
-
+}
+/*
 BOOST_DATA_TEST_CASE(rijndael_128_128, string_data("key_128_block_128"), triples) {
 
     byte_string const p(triples.first);
@@ -408,6 +410,7 @@ BOOST_AUTO_TEST_SUITE_END()
 
 /*  NIST SP 800-38A AES tests 
     https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38a.pdf */
+/*
 BOOST_AUTO_TEST_SUITE(aes_stream_processor_test_suite)
 // F.1.1, F.1.2
 BOOST_AUTO_TEST_CASE(aes_128_cipher) {
@@ -796,5 +799,5 @@ BOOST_AUTO_TEST_CASE(rijndael_256_256_cipher) {
     f.decrypt();
     f.check_decrypt();
 }
-
+*/
 BOOST_AUTO_TEST_SUITE_END()
