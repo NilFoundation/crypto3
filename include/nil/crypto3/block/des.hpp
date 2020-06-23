@@ -49,18 +49,18 @@ namespace nil {
                 constexpr static const std::size_t key_words = policy_type::key_words;
                 typedef typename policy_type::key_type key_type;
 
-                template<template<typename, typename> class Mode, typename StateAccumulator, std::size_t ValueBits,
-                         typename Padding>
+                template<class Mode, typename StateAccumulator, std::size_t ValueBits>
                 struct stream_processor {
                     struct params_type {
-                        typedef typename stream_endian::little_octet_big_bit endian_type;
 
                         constexpr static const std::size_t value_bits = ValueBits;
                         constexpr static const std::size_t length_bits = policy_type::word_bits * 2;
                     };
 
-                    typedef block_stream_processor<Mode<des, Padding>, StateAccumulator, params_type> type_;
+                    typedef block_stream_processor<Mode, StateAccumulator, params_type> type;
                 };
+
+                typedef typename stream_endian::little_octet_big_bit endian_type;
 
                 des(const key_type &key) {
                     schedule_key(key);

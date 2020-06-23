@@ -25,7 +25,6 @@
 #include <nil/crypto3/block/algorithm/encrypt.hpp>
 #include <nil/crypto3/block/algorithm/decrypt.hpp>
 
-#include <nil/crypto3/block/aes.hpp>
 #include <nil/crypto3/block/blowfish.hpp>
 
 #include <nil/crypto3/block/detail/key_value.hpp>
