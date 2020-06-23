@@ -20,6 +20,8 @@
 
 #include <nil/crypto3/block/accumulators/parameters/cipher.hpp>
 
+#include <nil/crypto3/block/detail/key_value.hpp>
+
 namespace nil {
     namespace crypto3 {
 
@@ -110,7 +112,7 @@ namespace nil {
          *
          * @return
          */
-
+/*
         template<typename BlockCipher, typename SinglePassRange,
                  typename OutputAccumulator = typename block::accumulator_set<
                      typename block::modes::isomorphic<BlockCipher, nop_padding>::template bind<
@@ -122,7 +124,7 @@ namespace nil {
 
             return EncrypterImpl(r, acc);
         }
-
+*/
         /*!
          * @brief
          *
@@ -200,11 +202,11 @@ namespace nil {
          * @return
          */
 
-        template<typename BlockCipher, typename SinglePassRange,
+        template<typename BlockCipher, typename SinglePassRange, typename KeyInputType,
                  typename CipherAccumulator = typename block::accumulator_set<typename block::modes::isomorphic<
                      BlockCipher, nop_padding>::template bind<encryption_policy<BlockCipher>>::type>>
         block::detail::range_cipher_impl<block::detail::value_cipher_impl<CipherAccumulator>>
-            encrypt(const SinglePassRange &r, typename BlockCipher::key_type &key) {
+            encrypt(const SinglePassRange &r, KeyInputType &key) {
 
             typedef typename block::modes::isomorphic<BlockCipher, nop_padding>::template bind<
                 encryption_policy<BlockCipher>>::type EncryptionMode;
@@ -212,7 +214,7 @@ namespace nil {
             typedef block::detail::value_cipher_impl<CipherAccumulator> StreamEncrypterImpl;
             typedef block::detail::range_cipher_impl<StreamEncrypterImpl> EncrypterImpl;
 
-            return EncrypterImpl(r, CipherAccumulator(EncryptionMode(BlockCipher(key))));
+            return EncrypterImpl(r, CipherAccumulator(EncryptionMode(BlockCipher(block::detail::key_value<BlockCipher>(key)))));
         }
     }    // namespace crypto3
 }    // namespace nil

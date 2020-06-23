@@ -27,6 +27,8 @@
 #include <nil/crypto3/block/aes.hpp>
 #include <nil/crypto3/block/rijndael.hpp>
 
+#include <nil/crypto3/block/detail/key_value.hpp>
+
 using namespace nil::crypto3;
 using namespace nil::crypto3::block;
 using namespace nil::crypto3::detail;
@@ -296,7 +298,7 @@ boost::property_tree::ptree string_data(const char *child_name) {
     boost::property_tree::read_json(test_data, root_data);
     return root_data.get_child(child_name);
 }
-
+/*
 template <typename BlockCipher>
 typename BlockCipher::key_type key_value(const std::vector<char>  k){
 
@@ -309,11 +311,11 @@ typename BlockCipher::key_type key_value(const std::vector<char>  k){
 
     key_type key;
     
-    pack<stream_endian::big_octet_big_bit, endian_type, CHAR_BIT, key_value_bits>(k.begin(), k.end(),
+    pack_to<endian_type, CHAR_BIT, key_value_bits>(k.begin(), k.end(),
         key.begin());
 
     return key;
-}
+}*/
 
 BOOST_AUTO_TEST_SUITE(rijndael_stream_processor_filedriven_test_suite)
 
@@ -322,9 +324,9 @@ BOOST_AUTO_TEST_CASE(rijndael_128_128_1) {
     std::vector<char> input = {'\x00', '\x11', '\x22', '\x33', '\x44', '\x55', '\x66', '\x77', '\x88', '\x99', '\xaa', '\xbb', '\xcc', '\xdd', '\xee', '\xff'};
     std::vector<char> key = {'\x00', '\x01', '\x02', '\x03', '\x04', '\x05', '\x06', '\x07', '\x08', '\x09', '\x0a', '\x0b', '\x0c', '\x0d', '\x0e', '\x0f'};
 
-    rijndael<128, 128>::key_type processed_key = key_value<rijndael<128, 128>>(key);
+    rijndael<128, 128>::key_type processed_key = ::nil::crypto3::block::detail::key_value<rijndael<128, 128>>(key);
 
-    std::string out = encrypt<block::rijndael<128, 128>>(input, processed_key);
+    std::string out = encrypt<block::rijndael<128, 128>>(input, key);
     
     BOOST_CHECK_EQUAL(out, "69c4e0d86a7b0430d8cdb78070b4c55a");
 }
