@@ -71,7 +71,7 @@ namespace nil {
                     using namespace nil::crypto3::detail;
                     // Convert the input into words
                     block_type block;
-                    pack_to<endian_type, value_bits, word_bits>(cache.begin(), cache.end(), block.begin());
+                    pack_to<endian_type, value_bits, block_bits / block_values>(cache.begin(), cache.end(), block.begin());
                     // Process the block
                     acc(block, accumulators::bits = block_seen);
                 }
@@ -87,7 +87,7 @@ namespace nil {
                     }
                 }
 
-                template<typename InputIterator>
+                /*template<typename InputIterator>
                 inline void update_n(InputIterator first, InputIterator last) {
                     using namespace nil::crypto3::detail;
 
@@ -122,6 +122,19 @@ namespace nil {
                     for (; n; --n, ++first) {
                         update_one(*first);
                     }
+                }*/
+
+                template<typename InputIterator>
+                inline void update_n(InputIterator p, size_t n) {
+                    for (; n; --n) {
+                        update_one(*p++);
+                    }
+                }
+
+                template<typename InputIterator>
+                inline void update_n(InputIterator first, InputIterator last) {
+                    std::size_t n = std::distance(first, last);
+                    update_n(first, n);
                 }
 
             public:
@@ -129,6 +142,10 @@ namespace nil {
                 }
 
                 virtual ~block_stream_processor() {
+                    if (cache_seen != 0) {
+                        process_block(cache_seen * value_bits);
+                        cache_seen = 0;
+                    }
                 }
 
                 template<typename InputIterator>

@@ -298,7 +298,7 @@ boost::property_tree::ptree string_data(const char *child_name) {
 }
 
 template <typename BlockCipher>
-typename BlockCipher::key_type key_value(const std::string inp_k){
+typename BlockCipher::key_type key_value(const std::vector<char>  k){
 
     typedef BlockCipher block_cipher;
 
@@ -306,8 +306,6 @@ typename BlockCipher::key_type key_value(const std::string inp_k){
     typedef typename block_cipher::endian_type endian_type;
 
     constexpr static std::size_t const key_value_bits = sizeof(typename key_type::value_type) * CHAR_BIT; 
-
-    byte_string const k(inp_k);
 
     key_type key;
     
@@ -321,8 +319,8 @@ BOOST_AUTO_TEST_SUITE(rijndael_stream_processor_filedriven_test_suite)
 
 BOOST_AUTO_TEST_CASE(rijndael_128_128_1) {
 
-    std::string key = "00112233445566778899aabbccddeeff";
-    std::string input = "000102030405060708090a0b0c0d0e0f";
+    std::vector<char> input = {'\x00', '\x11', '\x22', '\x33', '\x44', '\x55', '\x66', '\x77', '\x88', '\x99', '\xaa', '\xbb', '\xcc', '\xdd', '\xee', '\xff'};
+    std::vector<char> key = {'\x00', '\x01', '\x02', '\x03', '\x04', '\x05', '\x06', '\x07', '\x08', '\x09', '\x0a', '\x0b', '\x0c', '\x0d', '\x0e', '\x0f'};
 
     rijndael<128, 128>::key_type processed_key = key_value<rijndael<128, 128>>(key);
 
@@ -330,6 +328,7 @@ BOOST_AUTO_TEST_CASE(rijndael_128_128_1) {
     
     BOOST_CHECK_EQUAL(out, "69c4e0d86a7b0430d8cdb78070b4c55a");
 }
+
 /*
 BOOST_DATA_TEST_CASE(rijndael_128_128, string_data("key_128_block_128"), triples) {
 
