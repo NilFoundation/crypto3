@@ -194,103 +194,6 @@ inline bool operator!=(const byte_string &lhs, const byte_string &rhs) {
     return lhs.s_ != rhs.s_;
 }
 
-
-template<typename BlockCipher, typename InputKeyT, typename InputBlockT,  
-         typename NativeEndianT = stream_endian::little_octet_big_bit>
-class cipher_fixture {
-
-    typedef BlockCipher block_cipher;
-    typedef typename block_cipher::key_type key_type;
-    typedef typename block_cipher::endian_type endian_type;
-
-    typedef typename InputBlockT::value_type input_value_type;
-    typedef typename block_cipher::block_type::value_type block_value_type;
-
-    typedef typename block::detail::range_cipher_impl<block::detail::value_cipher_impl
-    <typename block::accumulator_set<typename block::modes::isomorphic<block_cipher, 
-    nop_padding>::template bind<encryption_policy<block_cipher>>::type>>>::result_type encrypt_type;
-
-    typedef typename block::detail::range_cipher_impl<block::detail::value_cipher_impl
-    <typename block::accumulator_set<typename block::modes::isomorphic<block_cipher, 
-    nop_padding>::template bind<decryption_policy<block_cipher>>::type>>>::result_type decrypt_type;
-
-    constexpr static std::size_t const input_value_bits = sizeof(input_value_type) * CHAR_BIT;
-    constexpr static std::size_t const input_key_value_bits = sizeof(typename InputKeyT::value_type) * CHAR_BIT;
-    constexpr static std::size_t const block_value_bits = sizeof(block_value_type) * CHAR_BIT;
-    constexpr static std::size_t const key_value_bits = sizeof(typename key_type::value_type) * CHAR_BIT; 
-    constexpr static std::size_t const encrypt_value_bits = sizeof(typename encrypt_type::value_type) * CHAR_BIT;
-    constexpr static std::size_t const decrypt_value_bits = sizeof(typename decrypt_type::value_type) * CHAR_BIT;
-
-public:
-
-    cipher_fixture(const char *ck, const char *cp, const char *cc) {
-        byte_string const k(ck), p(cp), c(cc);
-
-        pack<stream_endian::big_octet_big_bit, endian_type, CHAR_BIT, key_value_bits>(k.begin(), k.end(),
-            key.begin());
-
-        pack<stream_endian::big_octet_big_bit, NativeEndianT, CHAR_BIT, input_value_bits>(p.begin(), p.end(),
-            input_plaintext.begin());
-
-        pack<stream_endian::big_octet_big_bit, NativeEndianT, CHAR_BIT, input_value_bits>(c.begin(), c.end(),
-            input_ciphertext.begin());
-    }
-
-    cipher_fixture(const byte_string &k, const byte_string &p, const byte_string &c) {
-        pack<stream_endian::big_octet_big_bit, endian_type, CHAR_BIT, key_value_bits>(k.begin(), k.end(),
-            key.begin());        
-
-        pack<stream_endian::big_octet_big_bit, NativeEndianT, CHAR_BIT, input_value_bits>(p.begin(), p.end(),
-            input_plaintext.begin());
-
-        pack<stream_endian::big_octet_big_bit, NativeEndianT, CHAR_BIT, input_value_bits>(c.begin(), c.end(),
-            input_ciphertext.begin());
-    }
-
-    cipher_fixture(const InputKeyT &k, const InputBlockT &p, const InputBlockT &c) : input_plaintext(p), 
-        input_ciphertext(c) {
-        pack<NativeEndianT, endian_type, input_key_value_bits, key_value_bits>(k.begin(), k.end(), key.begin());
-    }
-
-    void encrypt() {
-        std::vector<block_value_type> block_data(input_plaintext.size() * 
-            sizeof(input_value_type) / sizeof(block_value_type));
-        pack<NativeEndianT, endian_type, input_value_bits, block_value_bits>(input_plaintext.begin(), 
-            input_plaintext.end(), block_data.begin());
-
-        encrypt_type ciphertext = ::nil::crypto3::encrypt<block_cipher>(block_data, key);
-
-        pack<endian_type, NativeEndianT, encrypt_value_bits, input_value_bits>(ciphertext.begin(), 
-            ciphertext.end(), output_ciphertext.begin());
-    }
-
-    void decrypt() {
-        std::vector<block_value_type> block_data(input_ciphertext.size() * 
-            sizeof(input_value_type) / sizeof(block_value_type));
-        pack<NativeEndianT, endian_type, input_value_bits, block_value_bits>(input_ciphertext.begin(),
-            input_ciphertext.end(), block_data.begin());
-
-        decrypt_type plaintext = ::nil::crypto3::decrypt<block_cipher>(block_data, key);
-
-        pack<endian_type, NativeEndianT, decrypt_value_bits, input_value_bits>(plaintext.begin(),
-            plaintext.end(), output_plaintext.begin());
-    }
-
-    void check_encrypt() const {
-        BOOST_ASSERT(input_ciphertext == output_ciphertext);
-    }
-
-    void check_decrypt() const {
-        BOOST_ASSERT(input_plaintext == output_plaintext);
-    }
-
-private:
-
-    key_type key;
-    InputBlockT input_plaintext, input_ciphertext;
-    InputBlockT output_plaintext, output_ciphertext;
-};
-
 const char *test_data = "data/rijndael.json";
 
 boost::property_tree::ptree string_data(const char *child_name) {
@@ -298,24 +201,6 @@ boost::property_tree::ptree string_data(const char *child_name) {
     boost::property_tree::read_json(test_data, root_data);
     return root_data.get_child(child_name);
 }
-/*
-template <typename BlockCipher>
-typename BlockCipher::key_type key_value(const std::vector<char>  k){
-
-    typedef BlockCipher block_cipher;
-
-    typedef typename block_cipher::key_type key_type;
-    typedef typename block_cipher::endian_type endian_type;
-
-    constexpr static std::size_t const key_value_bits = sizeof(typename key_type::value_type) * CHAR_BIT; 
-
-    key_type key;
-    
-    pack_to<endian_type, CHAR_BIT, key_value_bits>(k.begin(), k.end(),
-        key.begin());
-
-    return key;
-}*/
 
 BOOST_AUTO_TEST_SUITE(rijndael_stream_processor_filedriven_test_suite)
 
@@ -324,13 +209,22 @@ BOOST_AUTO_TEST_CASE(rijndael_128_128_1) {
     std::vector<char> input = {'\x00', '\x11', '\x22', '\x33', '\x44', '\x55', '\x66', '\x77', '\x88', '\x99', '\xaa', '\xbb', '\xcc', '\xdd', '\xee', '\xff'};
     std::vector<char> key = {'\x00', '\x01', '\x02', '\x03', '\x04', '\x05', '\x06', '\x07', '\x08', '\x09', '\x0a', '\x0b', '\x0c', '\x0d', '\x0e', '\x0f'};
 
-    rijndael<128, 128>::key_type processed_key = ::nil::crypto3::block::detail::key_value<rijndael<128, 128>>(key);
-
     std::string out = encrypt<block::rijndael<128, 128>>(input, key);
     
     BOOST_CHECK_EQUAL(out, "69c4e0d86a7b0430d8cdb78070b4c55a");
 }
 
+BOOST_AUTO_TEST_CASE(rijndael_128_128_2) {
+
+    std::string input = "00112233445566778899aabbccddeeff";
+    std::string key = "000102030405060708090a0b0c0d0e0f";
+
+    byte_string bk(key), bi(input);
+
+    std::string out = encrypt<block::rijndael<128, 128>>(bi, bk);
+    
+    BOOST_CHECK_EQUAL(out, "69c4e0d86a7b0430d8cdb78070b4c55a");
+}
 /*
 BOOST_DATA_TEST_CASE(rijndael_128_128, string_data("key_128_block_128"), triples) {
 
