@@ -57,8 +57,8 @@ set(TESTS_NAMES
 #    "shacal2"
 #    "streebog"
 #    "sm4"
-    "threefish"
-#    "twofish"
+#    "threefish"
+    "twofish"
 #    "xtea"
     )
 
