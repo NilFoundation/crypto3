@@ -147,4 +147,24 @@ BOOST_FIXTURE_TEST_CASE(threefish_1024_encrypt2, fixture<1024>) {
     BOOST_CHECK_EQUAL(ct, ect);
 }
 
+BOOST_AUTO_TEST_CASE(threefish_1) {
+
+    std::vector<char> input = {'\xb1', '\xa2', '\xbb', '\xc6', '\xef', '\x60', '\x25', '\xbc', 
+    '\x40', '\xeb', '\x38', '\x22', '\x16', '\x1f', '\x36', '\xe3', '\x75', '\xd1', '\xbb', 
+    '\x0a', '\xee', '\x31', '\x86', '\xfb', '\xd1', '\x9e', '\x47', '\xc5', '\xd4', '\x79', 
+    '\x94', '\x7b', '\x7b', '\xc2', '\xf8', '\x58', '\x6e', '\x35', '\xf0', '\xcf', '\xf7', 
+    '\xe7', '\xf0', '\x30', '\x84', '\xb0', '\xb7', '\xb1', '\xf1', '\xab', '\x39', '\x61', 
+    '\xa5', '\x80', '\xa3', '\xe9', '\x7e', '\xb4', '\x1e', '\xa1', '\x4a', '\x6d', '\x7b', '\xbe'};
+    std::vector<char> key = {'\xf1', '\x3c', '\xa0', '\x67', '\x60', '\xdd', '\x9b', '\xbe', 
+    '\xab', '\x87', '\xb6', '\xc5', '\x6f', '\x3b', '\xbb', '\xdb', '\xe9', '\xd0', '\x8a', 
+    '\x77', '\x97', '\x8b', '\x94', '\x2a', '\xc0', '\x2d', '\x47', '\x1d', '\xc1', '\x02', 
+    '\x68', '\xf2', '\x26', '\x1c', '\x3d', '\x43', '\x30', '\xd6', '\xca', '\x34', '\x1f', 
+    '\x4b', '\xd4', '\x11', '\x5d', '\xee', '\x16', '\xa2', '\x1d', '\xcd', '\xa2', '\xa3', 
+    '\x4a', '\x0a', '\x76', '\xfb', '\xa9', '\x76', '\x17', '\x4e', '\x4c', '\xf1', '\xe3', '\x06'};
+
+    std::string out = encrypt<block::threefish<512>>(input, key);
+    
+    BOOST_CHECK_EQUAL(out, "1bec82cba1357566b34e1cf1fbf123a141c8f4089f6e4ce3209aea10095aec93c900d068bdc7f7a2dd58513c11dec956b93169b1c4f24cede31a265de83e36b4");
+}
+
 BOOST_AUTO_TEST_SUITE_END()
