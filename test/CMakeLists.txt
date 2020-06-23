@@ -43,7 +43,7 @@ set(TESTS_NAMES
 #    "blowfish"
 #    "camellia"
 #    "cast"
-    "des"
+#    "des"
 #    "gost_28147_89"
 #    "idea"
 #    "kasumi"
@@ -57,7 +57,7 @@ set(TESTS_NAMES
 #    "shacal2"
 #    "streebog"
 #    "sm4"
-#    "threefish"
+    "threefish"
 #    "twofish"
 #    "xtea"
     )
