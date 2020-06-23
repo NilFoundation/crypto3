@@ -52,7 +52,13 @@ namespace nil {
          */
 
         template<std::size_t DigestBits>
-        class digest : public boost::container::small_vector<octet_type, DigestBits / octet_bits> { };
+        struct digest : public boost::container::small_vector<octet_type, DigestBits / octet_bits> { 
+
+
+            digest(): boost::container::small_vector<octet_type, DigestBits / octet_bits>(){};
+
+            digest(std::size_t sz, octet_type ot): boost::container::small_vector<octet_type, DigestBits / octet_bits>(sz, ot){};
+        };
 
 
         //template<std::size_t DigestBits>
