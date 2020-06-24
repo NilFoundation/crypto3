@@ -76,6 +76,7 @@ namespace nil {
             }
         }    // namespace detail
 
+
         /*!
          *
          * @tparam NewBits
@@ -85,9 +86,31 @@ namespace nil {
          * (0, NewBits - OldBits) bits.
          */
         template<unsigned NewBits, unsigned OldBits>
-        digest<NewBits> resize(const boost::container::small_vector<octet_type, OldBits / octet_bits> &od) {
+        digest<NewBits> reserve(const boost::container::small_vector<octet_type, OldBits / octet_bits> &od) {
             digest<NewBits> nd;
             unsigned bytes = sizeof(octet_type) * (NewBits < OldBits ? NewBits : OldBits) / octet_bits;
+            std::memcpy(nd.data(), od.data(), bytes);
+            return nd;
+        }
+
+        /*!
+         *
+         * @tparam DigestBits
+         * @param od
+         * @param new_size
+         * @return Digest containing the first min(od.size(), new_size) octets of the argument digest followed by max
+         * (0, new_size - od.size()) zero octets.
+         */
+        template<std::size_t DigestBits>
+        digest<DigestBits> resize(const digest<DigestBits> &od, std::size_t new_size) {
+            
+            std::size_t old_size = od.size();
+
+            if (new_size == old_size)
+                return od;
+
+            digest<DigestBits> nd(new_size, octet_type());
+            std::size_t bytes = sizeof(octet_type) * (old_size < new_size ? old_size : new_size);
             std::memcpy(nd.data(), od.data(), bytes);
             return nd;
         }
@@ -188,7 +211,7 @@ namespace nil {
                     a[i] = std::toupper(c, source.getloc()) - 'A' + 0xA;
                 }
             }
-            detail::pack<stream_endian::big_bit, 4, 8>(a, d);
+            detail::pack<stream_endian::big_bit, stream_endian::big_bit, 4, 8>(a.begin(), a.end(), d.begin());
             return source;
         }
     }    // namespace crypto3
@@ -202,4 +225,4 @@ namespace std {
     }
 }    // namespace std
 
-#endif    // CRYPTO3_CODEC_DIGEST_HPP
+#endif    // CRYPTO3_DIGEST_HPP
