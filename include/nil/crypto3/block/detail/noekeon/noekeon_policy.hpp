@@ -36,6 +36,8 @@ namespace nil {
                                                                              0x4D, 0x9A, 0x2F, 0x5E, 0xBC, 0x63,
                                                                              0xC6, 0x97, 0x35, 0x6A, 0xD4};
                 };
+
+                constexpr typename noekeon_policy::constants_type const noekeon_policy::round_constants;
             }    // namespace detail
         }        // namespace block
     }            // namespace crypto3

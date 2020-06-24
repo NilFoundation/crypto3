@@ -590,6 +590,14 @@ namespace nil {
                         0x9273540deda2f122ULL, 0xc797d02fd3f14261ULL, 0xe1e2f06a284d674aULL, 0xd2be8c74c97cfd80ULL,
                         0x9a494faf67707e71ULL, 0xb3dbd1eca9908293ULL, 0x72d14d3493b2e388ULL, 0xd6a30f258c153427ULL};
                 };
+
+                template<std::size_t BlockBits, std::size_t KeyBits>
+                constexpr typename streebog_policy<BlockBits, KeyBits>::substitution_type const
+                    streebog_policy<BlockBits, KeyBits>::substitution;
+
+                template<std::size_t BlockBits, std::size_t KeyBits>
+                constexpr typename streebog_policy<BlockBits, KeyBits>::round_constants_type const
+                    streebog_policy<BlockBits, KeyBits>::round_constants;
             }    // namespace detail
         }        // namespace block
     }            // namespace crypto3

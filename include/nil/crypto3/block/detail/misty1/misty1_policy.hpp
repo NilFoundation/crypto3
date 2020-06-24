@@ -113,6 +113,11 @@ namespace nil {
                         0x008F, 0x0040, 0x01B5, 0x00BE, 0x0078, 0x0000, 0x00AC, 0x0110, 0x015E, 0x0124, 0x0002, 0x01BC,
                         0x00A2, 0x00EA, 0x0070, 0x01FC, 0x0116, 0x015C, 0x004C, 0x01C2};
                 };
+
+                constexpr typename misty1_policy::s9_substitution_type const misty1_policy::s9_substitution;
+                constexpr typename misty1_policy::s7_substitution_type const misty1_policy::s7_substitution;
+                constexpr typename misty1_policy::decryption_key_order_type const misty1_policy::decryption_key_order;
+                constexpr typename misty1_policy::encryption_key_order_type const misty1_policy::encryption_key_order;
             }    // namespace detail
         }        // namespace block
     }            // namespace crypto3

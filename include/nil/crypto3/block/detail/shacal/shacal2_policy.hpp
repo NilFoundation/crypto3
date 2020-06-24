@@ -58,7 +58,7 @@ namespace nil {
                          0xc67178f2}};
                 };
 
-                constexpr shacal2_policy<256>::constants_type const shacal2_policy<256>::constants;
+                constexpr typename shacal2_policy<256>::constants_type const shacal2_policy<256>::constants;
 
                 template<>
                 struct shacal2_policy<512> : basic_shacal2_policy<64> {
@@ -97,7 +97,7 @@ namespace nil {
                          UINT64_C(0x5fcb6fab3ad6faec), UINT64_C(0x6c44198c4a475817)}};
                 };
 
-                constexpr shacal2_policy<512>::constants_type const shacal2_policy<512>::constants;
+                constexpr typename shacal2_policy<512>::constants_type const shacal2_policy<512>::constants;
             }    // namespace detail
         }        // namespace block
     }            // namespace crypto3

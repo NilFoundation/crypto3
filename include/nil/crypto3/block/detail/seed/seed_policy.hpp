@@ -177,6 +177,12 @@ namespace nil {
                         0x07333437, 0xC7E3E427, 0x04202424, 0x84A0A424, 0xCBC3C80B, 0x43535013, 0x0A02080A, 0x87838407,
                         0xC9D1D819, 0x4C404C0C, 0x83838003, 0x8F838C0F, 0xCEC2CC0E, 0x0B33383B, 0x4A42480A, 0x87B3B437};
                 };
+
+                constexpr typename seed_policy::constants_type const seed_policy::s0_constants;
+                constexpr typename seed_policy::constants_type const seed_policy::s1_constants;
+                constexpr typename seed_policy::constants_type const seed_policy::s2_constants;
+                constexpr typename seed_policy::constants_type const seed_policy::s3_constants;
+                constexpr typename seed_policy::round_constants_type const seed_policy::round_constants;
             }    // namespace detail
         }        // namespace block
     }            // namespace crypto3

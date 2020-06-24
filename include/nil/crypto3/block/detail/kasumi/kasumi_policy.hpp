@@ -101,14 +101,11 @@ namespace nil {
                         0x0008, 0x00ED, 0x000F, 0x0178, 0x01B4, 0x01D0, 0x003B, 0x01CD};
                 };
 
-                constexpr const typename kasumi_policy::s7_substitution_type
-                    kasumi_policy::s7_substitution;
+                constexpr const typename kasumi_policy::s7_substitution_type kasumi_policy::s7_substitution;
 
-                constexpr const typename kasumi_policy::s9_substitution_type
-                    kasumi_policy::s9_substitution;
+                constexpr const typename kasumi_policy::s9_substitution_type kasumi_policy::s9_substitution;
 
-                constexpr const typename kasumi_policy::round_constants_type
-                    kasumi_policy::round_constants;
+                constexpr const typename kasumi_policy::round_constants_type kasumi_policy::round_constants;
             }    // namespace detail
         }        // namespace block
     }            // namespace crypto3
