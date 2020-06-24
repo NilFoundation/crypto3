@@ -39,6 +39,7 @@ endmacro()
 set(TESTS_NAMES
     "pack"
     "rijndael"
+    "kasumi"
     "md4"
     "md5"
     "shacal"
