@@ -259,6 +259,43 @@ namespace nil {
                         0x4C29CA4C, 0x141C1014, 0x73D72173, 0xCCB4F0CC, 0x09D4D309, 0x108A5D10, 0xE2510FE2, 0x00000000,
                         0x9A196F9A, 0xE01A9DE0, 0x8F94368F, 0xE6C742E6, 0xECC94AEC, 0xFDD25EFD, 0xAB7FC1AB, 0xD8A8E0D8};
                 };
+
+                template<std::size_t KeyBits>
+                constexpr const typename basic_twofish_policy<KeyBits>::polyexpr_substitution_type
+                    basic_twofish_policy<KeyBits>::exp_to_poly;
+
+                template<std::size_t KeyBits>
+                constexpr const typename basic_twofish_policy<KeyBits>::polyexpr_substitution_type
+                    basic_twofish_policy<KeyBits>::poly_to_exp;
+
+                template<std::size_t KeyBits>
+                constexpr const typename basic_twofish_policy<KeyBits>::substitution_type
+                    basic_twofish_policy<KeyBits>::q0;
+
+                template<std::size_t KeyBits>
+                constexpr const typename basic_twofish_policy<KeyBits>::substitution_type
+                    basic_twofish_policy<KeyBits>::q1;
+
+                template<std::size_t KeyBits>
+                constexpr const typename basic_twofish_policy<KeyBits>::mds_substitution_type
+                    basic_twofish_policy<KeyBits>::mds0;
+
+                template<std::size_t KeyBits>
+                constexpr const typename basic_twofish_policy<KeyBits>::mds_substitution_type
+                    basic_twofish_policy<KeyBits>::mds1;
+
+                template<std::size_t KeyBits>
+                constexpr const typename basic_twofish_policy<KeyBits>::mds_substitution_type
+                    basic_twofish_policy<KeyBits>::mds2;
+
+                template<std::size_t KeyBits>
+                constexpr const typename basic_twofish_policy<KeyBits>::mds_substitution_type
+                    basic_twofish_policy<KeyBits>::mds3;
+
+                template<std::size_t KeyBits>
+                constexpr const typename basic_twofish_policy<KeyBits>::round_substitution_type
+                    basic_twofish_policy<KeyBits>::round_substitution;
+
             }    // namespace detail
         }        // namespace block
     }            // namespace crypto3

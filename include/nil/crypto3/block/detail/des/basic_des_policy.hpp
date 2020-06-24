@@ -563,6 +563,44 @@ namespace nil {
                         0x0101010000000101, 0x0101014000000101, 0x0101010001000101, 0x0101014001000101,
                         0x0101010000010101, 0x0101014000010101, 0x0101010001010101, 0x0101014001010101};
                 };
+
+
+                constexpr const typename basic_des_policy::substitution_type
+                    basic_des_policy::sbox1;
+
+                constexpr const typename basic_des_policy::substitution_type
+                    basic_des_policy::sbox2;
+
+                constexpr const typename basic_des_policy::substitution_type
+                    basic_des_policy::sbox3;
+
+                constexpr const typename basic_des_policy::substitution_type
+                    basic_des_policy::sbox4;
+
+                constexpr const typename basic_des_policy::substitution_type
+                    basic_des_policy::sbox5;
+
+                constexpr const typename basic_des_policy::substitution_type
+                    basic_des_policy::sbox6;
+
+                constexpr const typename basic_des_policy::substitution_type
+                    basic_des_policy::sbox7;
+
+                constexpr const typename basic_des_policy::substitution_type
+                    basic_des_policy::sbox8;
+
+                constexpr const typename basic_des_policy::table_type
+                    basic_des_policy::iptab1;
+
+                constexpr const typename basic_des_policy::table_type
+                    basic_des_policy::iptab2;
+
+                constexpr const typename basic_des_policy::table_type
+                    basic_des_policy::fptab1;
+
+                constexpr const typename basic_des_policy::table_type
+                    basic_des_policy::fptab2;
+
             }    // namespace detail
         }        // namespace block
     }            // namespace crypto3

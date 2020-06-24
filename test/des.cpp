@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -9,63 +10,221 @@
 #define BOOST_TEST_MODULE des_cipher_test
 
 #include <iostream>
-#include <unordered_map>
+#include <cstdint>
 
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
+
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
+
+#include <boost/foreach.hpp>
+#include <boost/assert.hpp>
 
 #include <nil/crypto3/block/algorithm/encrypt.hpp>
 #include <nil/crypto3/block/algorithm/decrypt.hpp>
 
 #include <nil/crypto3/block/des.hpp>
 
+#include <nil/crypto3/block/detail/key_value.hpp>
+
+using namespace nil::crypto3;
 using namespace nil::crypto3::block;
+using namespace nil::crypto3::detail;
 
 namespace boost {
     namespace test_tools {
         namespace tt_detail {
             template<template<typename, typename> class P, typename K, typename V>
             struct print_log_value<P<K, V>> {
-                void operator()(std::ostream&, P<K, V> const&) {
+                void operator()(std::ostream &, P<K, V> const &) {
                 }
             };
         }    // namespace tt_detail
     }        // namespace test_tools
 }    // namespace boost
 
-static const std::unordered_map<std::string, std::vector<uint8_t>> valid_data = {
-    {"Zg==", {0x66}},
-    {"Zm8=", {0x66, 0x6F}},
-    {"Zm9v", {0x66, 0x6F, 0x6F}},
-    {"aGVsbG8gd29ybGQ=", {0x68, 0x65, 0x6C, 0x6C, 0x6F, 0x20, 0x77, 0x6F, 0x72, 0x6C, 0x64}},
-    {"aGVsbG8gd29ybGQh", {0x68, 0x65, 0x6C, 0x6C, 0x6F, 0x20, 0x77, 0x6F, 0x72, 0x6C, 0x64, 0x21}},
-    {"SGVsbG8sIHdvcmxkLg==", {0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x2C, 0x20, 0x77, 0x6F, 0x72, 0x6C, 0x64, 0x2E}},
-    {"VGhlIDEyIGNoYXJz", {0x54, 0x68, 0x65, 0x20, 0x31, 0x32, 0x20, 0x63, 0x68, 0x61, 0x72, 0x73}},
-    {"VGhlIDEzIGNoYXJzLg==", {0x54, 0x68, 0x65, 0x20, 0x31, 0x33, 0x20, 0x63, 0x68, 0x61, 0x72, 0x73, 0x2E}},
-    {"VGhlIDE0IGNoYXJzLi4=", {0x54, 0x68, 0x65, 0x20, 0x31, 0x34, 0x20, 0x63, 0x68, 0x61, 0x72, 0x73, 0x2E, 0x2E}},
-    {"VGhlIDE1IGNoYXJzLi4u",
-     {0x54, 0x68, 0x65, 0x20, 0x31, 0x35, 0x20, 0x63, 0x68, 0x61, 0x72, 0x73, 0x2E, 0x2E, 0x2E}},
-    {"QW4gVVRGLTggdXVtbDogw7w=",
-     {0x41, 0x6E, 0x20, 0x55, 0x54, 0x46, 0x2D, 0x38, 0x20, 0x75, 0x75, 0x6D, 0x6C, 0x3A, 0x20, 0xC3, 0xBC}},
-    {"V2VpcmQgR2VybWFuIDIgYnl0ZSB0aGluZzogw58u",
-     {0x57, 0x65, 0x69, 0x72, 0x64, 0x20, 0x47, 0x65, 0x72, 0x6D, 0x61, 0x6E, 0x20, 0x32, 0x20,
-      0x62, 0x79, 0x74, 0x65, 0x20, 0x74, 0x68, 0x69, 0x6E, 0x67, 0x3A, 0x20, 0xC3, 0x9F, 0x2E}},
-    {"mw==", {0x9B}},
-    {"HGA=", {0x1C, 0x60}},
-    {"gTS9", {0x81, 0x34, 0xBD}},
-    {"Xmz/3g==", {0x5E, 0x6C, 0xFF, 0xDE}},
-    {"ss3w3H8=", {0xb2, 0xcd, 0xf0, 0xdc, 0x7f}},
-    {"/FYt2tQO", {0xfc, 0x56, 0x2d, 0xda, 0xd4, 0x0e}},
-    {"KbIyLohB6A==", {0x29, 0xb2, 0x32, 0x2e, 0x88, 0x41, 0xe8}},
-    {"Dw/O2Ul6r5I=", {0x0f, 0x0f, 0xce, 0xd9, 0x49, 0x7a, 0xaf, 0x92}},
-    {"Jw+xiYKADaZA", {0x27, 0x0f, 0xb1, 0x89, 0x82, 0x80, 0x0d, 0xa6, 0x40}}};
+class byte_string {
+    typedef std::vector<unsigned char> vec_type;
 
-static const std::vector<std::string> invalid_data = {"ZOOL!isnotvalidbase64", "Neitheris:this?"};
+    vec_type s_;
 
-BOOST_AUTO_TEST_SUITE(des_encode_test_suite)
+public:
+    typedef vec_type::size_type size_type;
+    typedef vec_type::value_type value_type;
+    typedef vec_type::pointer pointer;
+    typedef vec_type::const_pointer const_pointer;
+    typedef vec_type::reference reference;
+    typedef vec_type::const_reference const_reference;
+    typedef vec_type::iterator iterator;
+    typedef vec_type::const_iterator const_iterator;
 
-BOOST_DATA_TEST_CASE(des_single_range_encode, boost::unit_test::data::make(valid_data), array_element) {
+    explicit byte_string(size_type n, const value_type &value = value_type()) : s_(n, value) {
+    }
+
+    template<typename InputIterator>
+    byte_string(InputIterator first, InputIterator last) : s_(first, last) {
+    }
+
+    byte_string(const std::string &src) {
+        assert(!(src.size() % 2));
+        // const unsigned char* src = static_cast<const unsigned char*>(vsrc);
+        s_.resize(src.size() / 2);
+        unsigned int j = 0;
+        for (unsigned int i = 0; i < src.size();) {
+            if (src[i] >= '0' && src[i] <= '9') {
+                s_[j] = 16 * (src[i] - '0');
+            } else if (src[i] >= 'a' && src[i] <= 'f') {
+                s_[j] = 16 * (src[i] - 'a' + 10);
+            } else if (src[i] >= 'A' && src[i] <= 'F') {
+                s_[j] = 16 * (src[i] - 'A' + 10);
+            }
+            ++i;
+            if (src[i] >= '0' && src[i] <= '9') {
+                s_[j] += src[i] - '0';
+            } else if (src[i] >= 'a' && src[i] <= 'f') {
+                s_[j] += src[i] - 'a' + 10;
+            } else if (src[i] >= 'A' && src[i] <= 'F') {
+                s_[j] = 16 * (src[i] - 'A' + 10);
+            }
+            ++i;
+            ++j;
+        }
+
+        /*for (size_type i = 0; i < len;)
+        {
+          value_type x;
+          if (src[i] >= '0' && src[i] <= '9')
+            x = 16 * (src[i] - '0');
+          else if (src[i] >= 'a' && src[i] <= 'f')
+            x = 16 * (src[i] - 'a' + 10);
+          ++i;
+          if (src[i] >= '0' && src[i] <= '9')
+            x += src[i] - '0';
+          else if (src[i] >= 'a' && src[i] <= 'f')
+            x += src[i] - 'a' + 10;
+          s_.push_back(x);
+          ++i;
+        }*/
+    }
+
+    byte_string(const byte_string &copy) : s_(copy.s_) {
+    }
+
+    size_type size() const {
+        return s_.size();
+    }
+
+    pointer data() {
+        return &s_[0];
+    }
+
+    const_pointer data() const {
+        return &s_[0];
+    }
+
+    reference operator[](size_type i) {
+        return s_[i];
+    }
+
+    const_reference operator[](size_type i) const {
+        return s_[i];
+    }
+
+    void reserve(size_type n) {
+        s_.reserve(n);
+    }
+
+    void resize(size_type n, value_type c = value_type()) {
+        s_.resize(n, c);
+    }
+
+    iterator begin() {
+        return s_.begin();
+    }
+
+    const_iterator begin() const {
+        return s_.begin();
+    }
+
+    iterator end() {
+        return s_.end();
+    }
+
+    const_iterator end() const {
+        return s_.end();
+    }
+
+    iterator erase(iterator loc) {
+        return s_.erase(loc);
+    }
+
+    iterator erase(iterator first, iterator last) {
+        return s_.erase(first, last);
+    }
+
+    friend bool operator==(const byte_string &, const byte_string &);
+
+    friend bool operator!=(const byte_string &, const byte_string &);
+
+    byte_string &operator+=(const byte_string &rhs) {
+        s_.insert(s_.end(), rhs.s_.begin(), rhs.s_.end());
+        return *this;
+    }
+};
+
+template<typename charT, class traits>
+std::basic_ostream<charT, traits> &operator<<(std::basic_ostream<charT, traits> &out, const byte_string &s) {
+    byte_string::size_type bufsize = s.size() * 2 + 1;
+    char buf[bufsize];
+    for (byte_string::size_type i = 0; i < s.size(); ++i) {
+        std::sprintf(buf + i * 2, "%02x", s[i]);
+    }
+    buf[bufsize - 1] = '\0';
+    out << buf;
+    return out;
 }
+
+inline bool operator==(const byte_string &lhs, const byte_string &rhs) {
+    return lhs.s_ == rhs.s_;
+}
+
+inline bool operator!=(const byte_string &lhs, const byte_string &rhs) {
+    return lhs.s_ != rhs.s_;
+}
+
+const char *test_data = "data/des.json";
+
+boost::property_tree::ptree string_data(const char *child_name) {
+    boost::property_tree::ptree root_data;
+    boost::property_tree::read_json(test_data, root_data);
+    return root_data.get_child(child_name);
+}
+
+BOOST_AUTO_TEST_SUITE(des_stream_processor_filedriven_test_suite)
+
+BOOST_AUTO_TEST_CASE(des_1) {
+
+    std::vector<char> input = {'\x05', '\x9b', '\x5e', '\x08', '\x51', '\xcf', '\x14', '\x3a'};
+    std::vector<char> key = {'\x01', '\x13', '\xb9', '\x70', '\xfd', '\x34', '\xf2', '\xce'};
+
+    std::string out = encrypt<block::des>(input, key);
+    
+    BOOST_CHECK_EQUAL(out, "86a560f10ec6d85b");
+}
+/*
+BOOST_DATA_TEST_CASE(des_ecb, string_data("ecb_fixed_key"), triples) {
+
+    byte_string const p(triples.first);
+
+    BOOST_FOREACH(boost::property_tree::ptree::value_type pair, triples.second) {
+        byte_string const k(pair.first); 
+
+        std::string out = encrypt<block::des>(p, k);
+
+        BOOST_CHECK_EQUAL(out, pair.second.data());
+    }
+}*/
 
 BOOST_AUTO_TEST_SUITE_END()

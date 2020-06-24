@@ -47,6 +47,8 @@ set(TESTS_NAMES
     "gost_28147_89"
     "idea"
     "kasumi"
+    "md4"
+    "md5"
     "misty1"
     "noekeon"
     "seed"

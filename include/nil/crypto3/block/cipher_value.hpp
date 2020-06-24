@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -19,6 +20,8 @@
 
 #include <nil/crypto3/block/accumulators/block.hpp>
 #include <nil/crypto3/block/cipher_state.hpp>
+
+#include <nil/crypto3/detail/digest.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -131,7 +134,7 @@ namespace nil {
                         return this->accumulator_set;
                     }
 
-#ifdef CRYPTO3_ASCII_STRING_CODEC_OUTPUT
+#ifndef CRYPTO3_RAW_HASH_STRING_OUTPUT
 
                     template<typename Char, typename CharTraits, typename Alloc>
                     operator std::basic_string<Char, CharTraits, Alloc>() const {

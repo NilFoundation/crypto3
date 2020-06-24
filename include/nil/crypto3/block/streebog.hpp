@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -44,18 +45,18 @@ namespace nil {
                 static const std::size_t rounds = policy_type::rounds;
                 typedef typename policy_type::key_schedule_type key_schedule_type;
 
-                template<template<typename, typename> class Mode, typename StateAccumulator, std::size_t ValueBits,
-                         typename Padding>
+                template<class Mode, typename StateAccumulator, std::size_t ValueBits>
                 struct stream_processor {
                     struct params_type {
-                        typedef typename stream_endian::little_octet_big_bit endian_type;
 
                         constexpr static const std::size_t value_bits = ValueBits;
                         constexpr static const std::size_t length_bits = policy_type::word_bits * 2;
                     };
 
-                    typedef block_stream_processor<Mode<streebog, Padding>, StateAccumulator, params_type> type_;
+                    typedef block_stream_processor<Mode, StateAccumulator, params_type> type;
                 };
+
+                typedef typename stream_endian::little_octet_big_bit endian_type;
 
                 streebog(const key_type &key) {
                     schedule_key(key);

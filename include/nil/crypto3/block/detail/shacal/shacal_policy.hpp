@@ -51,7 +51,7 @@ namespace nil {
                     }};
                 };
 
-                constexpr shacal_policy::constants_type const shacal_policy::constants;
+                constexpr typename shacal_policy::constants_type const shacal_policy::constants;
 
                 typedef shacal_policy shacal0_policy;
 

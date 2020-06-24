@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -35,9 +36,6 @@ namespace nil {
                     typedef typename isomorphic_policy<Cipher, Padding>::cipher_type cipher_type;
                     typedef typename isomorphic_policy<Cipher, Padding>::block_type block_type;
 
-                    // There should be user's system endianness
-                    typedef typename stream_endian::big_octet_big_bit input_endian_type;
-
                     inline static block_type begin_message(const cipher_type &cipher, const block_type &plaintext) {
                         return cipher.encrypt(plaintext);
                     }
@@ -55,8 +53,6 @@ namespace nil {
                 struct isomorphic_decryption_policy : public isomorphic_policy<Cipher, Padding> {
                     typedef typename isomorphic_policy<Cipher, Padding>::cipher_type cipher_type;
                     typedef typename isomorphic_policy<Cipher, Padding>::block_type block_type;
-
-                    typedef typename stream_endian::big_octet_big_bit input_endian_type;
 
                     inline static block_type begin_message(const cipher_type &cipher, const block_type &ciphertext) {
                         return cipher.decrypt(ciphertext);
@@ -83,7 +79,6 @@ namespace nil {
 
                     typedef typename cipher_type::key_type key_type;
 
-                    typedef typename policy_type::input_endian_type input_endian_type;
                     typedef typename policy_type::endian_type endian_type;
 
                     typedef typename cipher_type::block_type block_type;

@@ -98,6 +98,10 @@ namespace nil {
                         0x78186060, 0x30F3C3C3, 0x897CF5F5, 0x5CEFB3B3, 0xD23AE8E8, 0xACDF7373, 0x794C3535, 0xA0208080,
                         0x9D78E5E5, 0x56EDBBBB, 0x235E7D7D, 0xC63EF8F8, 0x8BD45F5F, 0xE7C82F2F, 0xDD39E4E4, 0x68492121};
                 };
+
+                constexpr sm4_policy::constants_type const sm4_policy::constants;
+                constexpr sm4_policy::transposed_constants_type const sm4_policy::transposed_constants;
+                constexpr sm4_policy::key_schedule_type const sm4_policy::ck;
             }    // namespace detail
         }        // namespace block
     }            // namespace crypto3

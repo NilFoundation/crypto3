@@ -42,8 +42,8 @@ namespace nil {
                                                                                    0xFEDC, 0xBA98, 0x7654, 0x3210};
 
                     constexpr static const std::size_t s7_sbox_size = 128;
-                    typedef std::array<byte_type, s7_sbox_size> s7_substutution_type;
-                    constexpr static const s7_substutution_type s7_substitution = {
+                    typedef std::array<byte_type, s7_sbox_size> s7_substitution_type;
+                    constexpr static const s7_substitution_type s7_substitution = {
                         0x36, 0x32, 0x3E, 0x38, 0x16, 0x22, 0x5E, 0x60, 0x26, 0x06, 0x3F, 0x5D, 0x02, 0x12, 0x7B, 0x21,
                         0x37, 0x71, 0x27, 0x72, 0x15, 0x43, 0x41, 0x0C, 0x2F, 0x49, 0x2E, 0x1B, 0x19, 0x6F, 0x7C, 0x51,
                         0x35, 0x09, 0x79, 0x4F, 0x34, 0x3C, 0x3A, 0x30, 0x65, 0x7F, 0x28, 0x78, 0x68, 0x46, 0x47, 0x2B,
@@ -100,6 +100,12 @@ namespace nil {
                         0x0125, 0x0143, 0x0088, 0x017C, 0x002B, 0x0042, 0x003C, 0x01C7, 0x0155, 0x01BD, 0x00CA, 0x01B0,
                         0x0008, 0x00ED, 0x000F, 0x0178, 0x01B4, 0x01D0, 0x003B, 0x01CD};
                 };
+
+                constexpr const typename kasumi_policy::s7_substitution_type kasumi_policy::s7_substitution;
+
+                constexpr const typename kasumi_policy::s9_substitution_type kasumi_policy::s9_substitution;
+
+                constexpr const typename kasumi_policy::round_constants_type kasumi_policy::round_constants;
             }    // namespace detail
         }        // namespace block
     }            // namespace crypto3

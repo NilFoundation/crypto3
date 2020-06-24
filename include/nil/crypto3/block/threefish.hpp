@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -62,19 +63,18 @@ namespace nil {
                 typedef typename policy_type::key_schedule_type key_schedule_type;
                 typedef typename policy_type::tweak_schedule_type tweak_schedule_type;
 
-                template<template<typename, typename> class Mode, typename StateAccumulator, std::size_t ValueBits,
-                         typename Padding>
+                template<class Mode, typename StateAccumulator, std::size_t ValueBits>
                 struct stream_processor {
                     struct params_type {
-                        typedef typename stream_endian::little_octet_big_bit endian_type;
 
                         constexpr static const std::size_t value_bits = ValueBits;
                         constexpr static const std::size_t length_bits = policy_type::word_bits * 2;
                     };
 
-                    typedef block_stream_processor<Mode<threefish<KeyBits>, Padding>, StateAccumulator, params_type>
-                        type;
+                    typedef block_stream_processor<Mode, StateAccumulator, params_type> type;
                 };
+
+                typedef typename stream_endian::little_octet_big_bit endian_type;
 
                 threefish(const key_type &key = key_type(), const tweak_type &tweak = tweak_type()) {
                     schedule_key(key);

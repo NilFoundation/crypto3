@@ -11,6 +11,9 @@
 
 #include <nil/crypto3/block/detail/twofish/basic_twofish_policy.hpp>
 
+#include <nil/crypto3/detail/basic_functions.hpp>
+#include <nil/crypto3/detail/make_uint_t.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace block {
@@ -25,14 +28,14 @@ namespace nil {
 
                     inline static void tf_e(word_type A, word_type B, word_type &C, word_type &D, word_type RK1,
                                             word_type RK2, const expanded_substitution_type &SB) {
-                        word_type X = SB[policy_type::template extract_uint_t<CHAR_BIT>(A, 3)] ^
-                                      SB[256 + policy_type::template extract_uint_t<CHAR_BIT>(A, 2)] ^
-                                      SB[512 + policy_type::template extract_uint_t<CHAR_BIT>(A, 1)] ^
-                                      SB[768 + policy_type::template extract_uint_t<CHAR_BIT>(A, 0)];
-                        word_type Y = SB[policy_type::template extract_uint_t<CHAR_BIT>(B, 0)] ^
-                                      SB[256 + policy_type::template extract_uint_t<CHAR_BIT>(B, 3)] ^
-                                      SB[512 + policy_type::template extract_uint_t<CHAR_BIT>(B, 2)] ^
-                                      SB[768 + policy_type::template extract_uint_t<CHAR_BIT>(B, 1)];
+                        word_type X = SB[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(A, 3)] ^
+                                      SB[512 + ::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(A, 1)] ^
+                                      SB[256 + ::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(A, 2)] ^
+                                      SB[768 + ::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(A, 0)];
+                        word_type Y = SB[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(B, 0)] ^
+                                      SB[256 + ::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(B, 3)] ^
+                                      SB[512 + ::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(B, 2)] ^
+                                      SB[768 + ::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(B, 1)];
 
                         X += Y;
                         Y += X;
@@ -46,14 +49,14 @@ namespace nil {
 
                     inline static void tf_d(word_type A, word_type B, word_type &C, word_type &D, word_type RK1,
                                             word_type RK2, const expanded_substitution_type &SB) {
-                        word_type X = SB[policy_type::template extract_uint_t<CHAR_BIT>(A, 3)] ^
-                                      SB[256 + policy_type::template extract_uint_t<CHAR_BIT>(A, 2)] ^
-                                      SB[512 + policy_type::template extract_uint_t<CHAR_BIT>(A, 1)] ^
-                                      SB[768 + policy_type::template extract_uint_t<CHAR_BIT>(A, 0)];
-                        word_type Y = SB[policy_type::template extract_uint_t<CHAR_BIT>(B, 0)] ^
-                                      SB[256 + policy_type::template extract_uint_t<CHAR_BIT>(B, 3)] ^
-                                      SB[512 + policy_type::template extract_uint_t<CHAR_BIT>(B, 2)] ^
-                                      SB[768 + policy_type::template extract_uint_t<CHAR_BIT>(B, 1)];
+                        word_type X = SB[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(A, 3)] ^
+                                      SB[256 + ::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(A, 2)] ^
+                                      SB[512 + ::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(A, 1)] ^
+                                      SB[768 + ::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(A, 0)];
+                        word_type Y = SB[::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(B, 0)] ^
+                                      SB[256 + ::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(B, 3)] ^
+                                      SB[512 + ::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(B, 2)] ^
+                                      SB[768 + ::nil::crypto3::detail::extract_uint_t<CHAR_BIT>(B, 1)];
 
                         X += Y;
                         Y += X;
