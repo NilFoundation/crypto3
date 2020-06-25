@@ -22,7 +22,7 @@ namespace nil {
                         ::nil::crypto3::detail::basic_functions<16>::word_bits;
                     typedef typename ::nil::crypto3::detail::basic_functions<16>::word_type word_type;
 
-                    constexpr static const std::size_t block_bits = 64;
+                    constexpr static const std::size_t block_bits = 128;
                     constexpr static const std::size_t block_words = block_bits / word_bits;
                     typedef std::array<word_type, block_words> block_type;
 

@@ -71,7 +71,7 @@ namespace nil {
                     using namespace nil::crypto3::detail;
                     // Convert the input into words
                     block_type block;
-                    pack_to<endian_type, value_bits, block_bits / block_values>(cache.begin(), cache.end(), block.begin());
+                    pack_to<endian_type, value_bits, word_bits>(cache.begin(), cache.end(), block.begin());
                     // Process the block
                     acc(block, accumulators::bits = block_seen);
                 }
