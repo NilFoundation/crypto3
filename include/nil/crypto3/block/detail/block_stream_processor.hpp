@@ -42,6 +42,10 @@ namespace nil {
                 constexpr static const std::size_t block_bits = mode_type::block_bits;
 
                 constexpr static const std::size_t word_bits = mode_type::word_bits;
+
+
+                    constexpr static const std::size_t actual_bits = sizeof(typename block_type::value_type) * CHAR_BIT;
+
             public:
                 typedef typename mode_type::endian_type endian_type;
 
@@ -71,7 +75,7 @@ namespace nil {
                     using namespace nil::crypto3::detail;
                     // Convert the input into words
                     block_type block;
-                    pack_to<endian_type, value_bits, block_bits / block_values>(cache.begin(), cache.end(), block.begin());
+                    pack_to<endian_type, value_bits, actual_bits>(cache.begin(), cache.end(), block.begin());
                     // Process the block
                     acc(block, accumulators::bits = block_seen);
                 }
@@ -86,43 +90,6 @@ namespace nil {
                         cache_seen = 0;
                     }
                 }
-
-                /*template<typename InputIterator>
-                inline void update_n(InputIterator first, InputIterator last) {
-                    using namespace nil::crypto3::detail;
-
-                    std::size_t n = std::distance(first, last);
-#ifndef CRYPTO3_BLOCK_NO_OPTIMIZATION
-#pragma clang loop unroll(full)
-                    for (; n && (cache_seen % block_bits); --n, ++first) {
-                        update_one(*first);
-                    }
-#pragma clang loop unroll(full)
-                    for (; n >= block_values; n -= block_values, first += block_values) {
-                        // Convert the input into words
-                        block_type block = {0};
-                        //pack<input_endian_type, endian_type, value_bits, block_bits / block_values>(
-                        //    first, first + block_values, block.begin());
-
-
-                        pack_to<endian_type, value_bits, word_bits>(first, first + block_values, block.begin());
-
-                        cache_seen += value_bits * block_values;
-
-                        acc(block);
-
-                        // Reset cache_seen if we don't need to track the length
-                        if (!length_bits) {
-                            cache_seen = 0;
-                        }
-                    }
-#endif
-
-#pragma clang loop unroll(full)
-                    for (; n; --n, ++first) {
-                        update_one(*first);
-                    }
-                }*/
 
                 template<typename InputIterator>
                 inline void update_n(InputIterator p, size_t n) {
