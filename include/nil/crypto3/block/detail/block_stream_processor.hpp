@@ -42,6 +42,10 @@ namespace nil {
                 constexpr static const std::size_t block_bits = mode_type::block_bits;
 
                 constexpr static const std::size_t word_bits = mode_type::word_bits;
+
+
+                    constexpr static const std::size_t actual_bits = sizeof(typename block_type::value_type) * CHAR_BIT;
+
             public:
                 typedef typename mode_type::endian_type endian_type;
 
@@ -71,7 +75,7 @@ namespace nil {
                     using namespace nil::crypto3::detail;
                     // Convert the input into words
                     block_type block;
-                    pack_to<endian_type, value_bits, word_bits>(cache.begin(), cache.end(), block.begin());
+                    pack_to<endian_type, value_bits, actual_bits>(cache.begin(), cache.end(), block.begin());
                     // Process the block
                     acc(block, accumulators::bits = block_seen);
                 }
