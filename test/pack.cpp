@@ -7,7 +7,7 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#define BOOST_TEST_MODULE hash_pack_test
+#define BOOST_TEST_MODULE block_pack_test
 
 #include <boost/array.hpp>
 #include <boost/cstdint.hpp>
