@@ -108,7 +108,9 @@ if(NOT Boost_CONTAINER_FOUND OR NOT Boost_FOUND)
     cm_find_package(Boost COMPONENTS container)
 endif()
 
-configure_file(${CMAKE_CURRENT_LIST_DIR}/cmake/build.hpp.in
+set(BUILD_WITH_CONFIGURATION_FILE_DIR "${CMAKE_CURRENT_LIST_DIR}/cmake" CACHE STRING "Directory for build.hpp lookup")
+
+configure_file(${BUILD_WITH_CONFIGURATION_FILE_DIR}/build.hpp.in
                ${CMAKE_BINARY_DIR}/include/nil/${CMAKE_WORKSPACE_NAME}/build.hpp @ONLY)
 
 list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
