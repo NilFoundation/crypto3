@@ -52,7 +52,7 @@ boost::property_tree::ptree base_data(const char *child_name) {
     return root_data.get_child(child_name);
 }
 
-BOOST_AUTO_TEST_SUITE(base32_codec_filedriven_test_suite)
+BOOST_AUTO_TEST_SUITE(base32_codec_data_driven_test_suite)
 
 BOOST_DATA_TEST_CASE(base32_single_range_encode, base_data("base_32"), array_element) {
     std::string out = encode<base<32>>(array_element.first);
@@ -159,7 +159,7 @@ BOOST_DATA_TEST_CASE(base32_accumulator_encode, base_data("base_32"), array_elem
 BOOST_AUTO_TEST_SUITE_END()
 
 
-BOOST_AUTO_TEST_SUITE(base58_codec_filedriven_test_suite)
+BOOST_AUTO_TEST_SUITE(base58_codec_data_driven_test_suite)
 
 BOOST_DATA_TEST_CASE(base58_single_range_encode, base_data("base_58"), array_element) {
     std::string out = encode<base<58>>(array_element.first);
@@ -244,7 +244,7 @@ BOOST_DATA_TEST_CASE(base58_alias_decode_failure, base_data("base_58_invalid"), 
 BOOST_AUTO_TEST_SUITE_END()
 
 
-BOOST_AUTO_TEST_SUITE(base64_codec_filedriven_test_suite)
+BOOST_AUTO_TEST_SUITE(base64_codec_data_driven_test_suite)
 
 BOOST_DATA_TEST_CASE(base64_single_range_encode, base_data("base_64"), array_element) {
     std::string out = encode<base<64>>(array_element.first);
