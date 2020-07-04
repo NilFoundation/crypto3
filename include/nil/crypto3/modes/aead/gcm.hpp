@@ -16,7 +16,7 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace hash {
+        namespace hashes {
             struct ghash;
         }
         namespace stream {
@@ -272,7 +272,7 @@ namespace nil {
                  */
                 template<typename BlockCipher, template<typename> class Padding, std::size_t TagBits = 16,
 
-                         typename Hash = hash::ghash, typename StreamCipher = stream::ctr<BlockCipher>,
+                         typename Hash = hashes::ghash, typename StreamCipher = stream::ctr<BlockCipher>,
                          template<typename> class Allocator = std::allocator>
                 struct gcm {
                     typedef BlockCipher cipher_type;
