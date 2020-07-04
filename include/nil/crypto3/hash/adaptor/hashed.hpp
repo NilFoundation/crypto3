@@ -31,7 +31,7 @@ namespace nil {
             };
 
             template<class F, class R>
-            struct encoded_range
+            struct hashed_range
                 : public boost::iterator_range<
                       typename transform_iterator_gen<F, typename boost::range_iterator<R>::type>::type> {
             private:
@@ -48,56 +48,56 @@ namespace nil {
 
                 typedef R source_range_type;
 
-                encoded_range(transform_fn_type f, R &r) :
+                hashed_range(transform_fn_type f, R &r) :
                     base(transform_iter_t(boost::begin(r), f), transform_iter_t(boost::end(r), f)) {
                 }
             };
 
             template<class T>
-            struct encode_holder : boost::range_detail::holder<T> {
-                encode_holder(T r) : boost::range_detail::holder<T>(r) {
+            struct hash_holder : boost::range_detail::holder<T> {
+                hash_holder(T r) : boost::range_detail::holder<T>(r) {
                 }
             };
 
             template<class SinglePassRange, class UnaryFunction>
-            inline encoded_range<UnaryFunction, SinglePassRange> operator|(SinglePassRange &r,
-                                                                           const encode_holder<UnaryFunction> &f) {
+            inline hashed_range<UnaryFunction, SinglePassRange> operator|(SinglePassRange &r,
+                                                                          const hash_holder<UnaryFunction> &f) {
                 BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<SinglePassRange>));
 
-                return encoded_range<UnaryFunction, SinglePassRange>(f.val, r);
+                return hashed_range<UnaryFunction, SinglePassRange>(f.val, r);
             }
 
             template<class SinglePassRange, class UnaryFunction>
-            inline encoded_range<UnaryFunction, const SinglePassRange>
-                operator|(const SinglePassRange &r, const encode_holder<UnaryFunction> &f) {
+            inline hashed_range<UnaryFunction, const SinglePassRange> operator|(const SinglePassRange &r,
+                                                                                const hash_holder<UnaryFunction> &f) {
                 BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange>));
 
-                return encoded_range<UnaryFunction, const SinglePassRange>(f.val, r);
+                return hashed_range<UnaryFunction, const SinglePassRange>(f.val, r);
             }
 
         }    // namespace detail
 
-        using detail::encoded_range;
+        using detail::hashed_range;
 
         namespace adaptors {
             namespace {
-                const range_detail::forwarder<detail::encode_holder> encoded =
-                    detail::forwarder<detail::encode_holder>();
+                const range_detail::forwarder<detail::hash_holder> hashed =
+                    detail::forwarder<detail::hash_holder>();
             }
 
             template<class UnaryFunction, class SinglePassRange>
-            inline encoded_range<UnaryFunction, SinglePassRange> transform(SinglePassRange &rng, UnaryFunction fn) {
+            inline hashed_range<UnaryFunction, SinglePassRange> transform(SinglePassRange &rng, UnaryFunction fn) {
                 BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<SinglePassRange>));
 
-                return encoded_range<UnaryFunction, SinglePassRange>(fn, rng);
+                return hashed_range<UnaryFunction, SinglePassRange>(fn, rng);
             }
 
             template<class UnaryFunction, class SinglePassRange>
-            inline encoded_range<UnaryFunction, const SinglePassRange> transform(const SinglePassRange &rng,
-                                                                                 UnaryFunction fn) {
+            inline hashed_range<UnaryFunction, const SinglePassRange> transform(const SinglePassRange &rng,
+                                                                                UnaryFunction fn) {
                 BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange>));
 
-                return encoded_range<UnaryFunction, const SinglePassRange>(fn, rng);
+                return hashed_range<UnaryFunction, const SinglePassRange>(fn, rng);
             }
         }    // namespace adaptors
     }        // namespace crypto3
