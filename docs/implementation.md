@@ -298,7 +298,7 @@ combined with other accumulators available for
  
 Example. Let's assume there is an accumulator set, which intention is to encrypt 
 all the incoming data with [`rijndael<128, 128>` cipher](@ref block::rijndael)
-and to compute a [`sha2<256>` hash](@ref hash::sha2) of all the incoming data
+and to compute a [`sha2<256>` hashes](@ref hashes::sha2) of all the incoming data
 as well.
 
 This means there will be an accumulator set defined as follows:
@@ -308,12 +308,12 @@ using namespace nil::crypto3;
 
 boost::accumulator_set<
     accumulators::block<block::rijndael<128, 128>>,
-    accumulators::hash<hash::sha2<256>>> acc;
+    accumulators::hash<hashes::sha2<256>>> acc;
 ```
 
 Extraction is supposed to be defined as follows:
 ```cpp
-std::string hash = extract::hash<hash::sha2<256>>(acc);
+std::string hash = extract::hash<hashes::sha2<256>>(acc);
 std::string ciphertext = extract::block<block::rijndael<128, 128>>(acc);
 ```
 
@@ -333,3 +333,4 @@ Such a state holder is split to a couple of types:
 Actually stores the `AccumulatorSet` with digest data.
 2. Reference holder. Intended to store a reference to external `AccumulatorSet`, 
 which is usable in case of data gets appended to existing accumulator.
+

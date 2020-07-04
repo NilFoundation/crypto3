@@ -16,7 +16,7 @@ namespace nil {
         namespace block {
             /*!
              * @brief Shacal. Merkle-Damgård construction foundation for
-             * @ref nil::crypto3::hash::sha "SHA" hashes.
+             * @ref nil::crypto3::hashes::sha "SHA" hashes.
              *
              * @ingroup block
              *

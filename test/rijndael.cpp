@@ -203,7 +203,7 @@ boost::property_tree::ptree string_data(const char *child_name) {
     return root_data.get_child(child_name);
 }
 
-BOOST_AUTO_TEST_SUITE(rijndael_stream_processor_filedriven_test_suite)
+BOOST_AUTO_TEST_SUITE(rijndael_stream_processor_data_driven_test_suite)
 
 BOOST_AUTO_TEST_CASE(rijndael_128_128_1) {
 

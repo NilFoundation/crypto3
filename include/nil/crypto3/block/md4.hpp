@@ -24,7 +24,7 @@ namespace nil {
         namespace block {
             /*!
              * @brief MD4 block cipher. Stands as a foundation for
-             * @ref nil::crypto3::hash::md4 "MD4" hash.
+             * @ref nil::crypto3::hashes::md4 "MD4" hashes.
              *
              * @ingroup block
              *

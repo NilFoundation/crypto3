@@ -27,7 +27,7 @@ namespace nil {
 
             /*!
              * @brief Shacal2. Merkle-Damgård construction foundation for
-             * @ref nil::crypto3::hash::sha2 "SHA2" hashes. Accepts
+             * @ref nil::crypto3::hashes::sha2 "SHA2" hashes. Accepts
              * up to a 512-bit key. Fast and seemingly very secure, but obscure.
              * Standardized by NESSIE.
              *
