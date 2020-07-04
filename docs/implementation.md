@@ -107,7 +107,7 @@ set with [`hash` accumulator](@ref accumulators::hash) inside initialized with `
 ## Stream Data Processing {#hashes_stream}
 
 Hashes are usually defined for processing `Integral` value typed byte sequences 
-of specific size packed in blocks (e.g. [`SHA2`](@ref hash::sha2) is defined for 
+of specific size packed in blocks (e.g. [`SHA2`](@ref hashes::sha2) is defined for 
 blocks of words which are actually plain `n`-sized arrays of `uint32_t` ). 
 Input data in the implementation proposed is supposed to be a various-length 
 input stream, which length could be not even to block size.
@@ -173,7 +173,7 @@ struct2:w3 -> struct3:bl0
 
 @enddot
 
-Now with this a [`Hash`](@ref hashes_concept) instance of [`SHA2`](@ref hash::sha2) 
+Now with this a [`Hash`](@ref hashes_concept) instance of [`SHA2`](@ref hashes::sha2) 
 can be fed.
 
 This mechanism is handled with `stream_processor` template class specified for 
@@ -244,7 +244,7 @@ Thus, a policy has to contain all the data corresponding to the `Hash` and defin
 the [`Hash` concept](@ref hash_concept).
 
 Among other things a hash policy should contain information about its compressor and construction. 
-For example, for `SHA2` there are Merkle-Damgaard construction and Davies-Meyer compressor. 
+For example, for `SHA2` there are Merkle-Damgard construction and Davies-Meyer compressor. 
 
 ## Constructions and Compressors {#hashes_constructions_compressors}
 
@@ -253,9 +253,9 @@ Construction defines how the message should be padded, if its size is not multip
 the hashed messaged should be finalized. Construction also calls the compressor inside itself while processing 
 a message block.
 
-For example, [`sha2` hash](@ref hash::sha2) has Merkle-Damgaard construction with default Merkle-Damgaard padding 
+For example, [`sha2` hashes](@ref hashes::sha2) has Merkle-Damgard construction with default Merkle-Damgard padding 
 and Davies-Meyer compressor. It means each message block is being processed by Davies-Meyer compressor. The last 
-message block is being padded before processing using Merkle-Damgaard padding. After processing last block message 
+message block is being padded before processing using Merkle-Damgard padding. After processing last block message 
 is being finalizing by appending length of the input message to the end of result.
 
 ## Accumulators {#hashes_accumulators}
@@ -265,7 +265,7 @@ The Hashing contains an accumulation step, which is implemented with
 
 All the concepts are held.
 
-Hashes contain pre-defined [`block::accumulator_set`](@ref hash::accumulator_set), 
+Hash contain pre-defined [`block::accumulator_set`](@ref accumulator_set), 
 which is a `boost::accumulator_set` with pre-filled 
 [`hash` accumulator](@ref accumulators::hash).
 
@@ -284,7 +284,7 @@ combined with other accumulators available for
  
 Example. Let's assume there is an accumulator set, which intention is to encrypt 
 all the incoming data with [`rijndael<128, 128>` cipher](@ref block::rijndael)
-and to compute a [`sha2<256>` hash](@ref hash::sha2) of all the incoming data
+and to compute a [`sha2<256>` hashes](@ref hashes::sha2) of all the incoming data
 as well.
 
 This means there will be an accumulator set defined as follows:
@@ -294,18 +294,18 @@ using namespace nil::crypto3;
 
 boost::accumulator_set<
     accumulators::block<block::rijndael<128, 128>>,
-    accumulators::hash<hash::sha2<256>>> acc;
+    accumulators::hashes<hashes::sha2<256>>> acc;
 ```
 
 Extraction is supposed to be defined as follows:
 ```cpp
-std::string hash = extract::hash<hash::sha2<256>>(acc);
+std::string hashes = extract::hash<hashes::sha2<256>>(acc);
 std::string ciphertext = extract::block<block::rijndael<128, 128>>(acc);
 ```
 
 ## Value Postprocessors {#hashes_value}
 
-Since the accumulator output type is strictly tied to [`digest_type`](@ref hash::digest_type)
+Since the accumulator output type is strictly tied to [`digest_type`](@ref hashes::digest_type)
 of particular [`Hash`](@ref hash_concept) policy, the output 
 format in generic is closely tied to digest type too. Digest type is usually
 defined as fixed or variable length byte array, which is not always the format of 

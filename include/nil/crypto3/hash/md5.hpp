@@ -20,12 +20,12 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace hash {
+        namespace hashes {
 
             /*!
              * @brief MD5. Non-cryptographically secure checksum.
              *
-             * @ingroup hash
+             * @ingroup hashes
              */
             struct md5 {
                 typedef detail::md5_policy policy_type;
@@ -68,7 +68,7 @@ namespace nil {
                 };
             };
 
-        }    // namespace hash
+        }    // namespace hashes
     }        // namespace crypto3
 }    // namespace nil
 

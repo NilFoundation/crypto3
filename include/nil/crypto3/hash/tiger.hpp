@@ -18,7 +18,7 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace hash {
+        namespace hashes {
 
             template<std::size_t DigestBits = 192, std::size_t Passes = 3>
             struct tiger_compressor {
@@ -61,11 +61,11 @@ namespace nil {
             };
 
             /*!
-             * @brief Tiger. An older 192-bit hash function, optimized for 64-bit
+             * @brief Tiger. An older 192-bit hashes function, optimized for 64-bit
              * systems. Possibly vulnerable to side channels due to its use of table
              * lookups. Prefer Skein-512 or BLAKE2b in new code.
              *
-             * @ingroup hash
+             * @ingroup hashes
              */
             template<std::size_t DigestBits = 192, std::size_t Passes = 3>
             class tiger {
@@ -100,7 +100,7 @@ namespace nil {
                 constexpr static const std::size_t digest_bits = policy_type::digest_bits;
                 typedef typename policy_type::digest_type digest_type;
             };
-        }    // namespace hash
+        }    // namespace hashes
     }        // namespace crypto3
 }    // namespace nil
 

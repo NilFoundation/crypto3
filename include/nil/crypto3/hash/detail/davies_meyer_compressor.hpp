@@ -13,7 +13,7 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace hash {
+        namespace hashes {
             /*!
              *
              * @tparam BlockCipher
@@ -46,7 +46,7 @@ namespace nil {
                     f(state, new_state);
                 }
             };
-        }    // namespace hash
+        }    // namespace hashes
     }        // namespace crypto3
 }    // namespace nil
 

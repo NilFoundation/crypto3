@@ -20,11 +20,11 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace hash {
+        namespace hashes {
             /*!
              * @brief SHA2
              * @tparam Version
-             * @ingroup hash
+             * @ingroup hashes
              */
             template<std::size_t Version>
             class sha2 {
@@ -69,7 +69,7 @@ namespace nil {
                     typedef block_stream_processor<construction, StateAccumulator, params_type> type;
                 };
             };
-        }    // namespace hash
+        }    // namespace hashes
     }        // namespace crypto3
 }    // namespace nil
 

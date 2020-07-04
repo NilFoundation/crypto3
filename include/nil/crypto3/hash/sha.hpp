@@ -20,12 +20,12 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace hash {
+        namespace hashes {
             /*!
-             * @brief SHA. Initial SHA hash construction. Not considered to be a
+             * @brief SHA. Initial SHA hashes construction. Not considered to be a
              * cryptographically secure primitive lately.
              *
-             * @ingroup hash
+             * @ingroup hashes
              */
             class sha {
                 typedef detail::sha_policy policy_type;
@@ -70,7 +70,7 @@ namespace nil {
 
             typedef sha sha0;
 
-        }    // namespace hash
+        }    // namespace hashes
     }        // namespace crypto3
 }    // namespace nil
 
