@@ -6,8 +6,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_BLOCK_CIPHERS_DETAIL_SHACAL2_POLICY_HPP
-#define CRYPTO3_BLOCK_CIPHERS_DETAIL_SHACAL2_POLICY_HPP
+#ifndef CRYPTO3_BLOCK_DETAIL_SHACAL2_POLICY_HPP
+#define CRYPTO3_BLOCK_DETAIL_SHACAL2_POLICY_HPP
 
 #include <array>
 
@@ -20,11 +20,11 @@ namespace nil {
         namespace block {
             namespace detail {
 
-                template<unsigned W>
-                struct basic_shacal2_policy : shacal2_functions<W> {
+                template<unsigned WordBits>
+                struct basic_shacal2_policy : public shacal2_functions<WordBits> {
 
-                    using shacal2_functions<W>::word_bits;
-                    typedef typename shacal2_functions<W>::word_type word_type;
+                    using shacal2_functions<WordBits>::word_bits;
+                    typedef typename shacal2_functions<WordBits>::word_type word_type;
 
                     constexpr static const std::size_t block_words = 8;
                     constexpr static const std::size_t block_bits = block_words * word_bits;
@@ -39,7 +39,7 @@ namespace nil {
                 struct shacal2_policy;
 
                 template<>
-                struct shacal2_policy<256> : basic_shacal2_policy<32> {
+                struct shacal2_policy<256> : public basic_shacal2_policy<32> {
 
                     constexpr static const std::size_t rounds = 64;
                     typedef std::array<word_type, rounds> key_schedule_type;
@@ -58,10 +58,10 @@ namespace nil {
                          0xc67178f2}};
                 };
 
-                constexpr typename shacal2_policy<256>::constants_type const shacal2_policy<256>::constants;
+                constexpr typename shacal2_policy<256ul>::constants_type const shacal2_policy<256ul>::constants;
 
                 template<>
-                struct shacal2_policy<512> : basic_shacal2_policy<64> {
+                struct shacal2_policy<512> : public basic_shacal2_policy<64> {
 
                     constexpr static const std::size_t rounds = 80;
                     typedef std::array<word_type, rounds> key_schedule_type;
