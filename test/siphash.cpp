@@ -186,7 +186,7 @@ BOOST_AUTO_TEST_SUITE(crc_mac_test_suite)
         const char *const text = "Sample #1";
 
         const byte_string keystr(key, 128);
-        mac::siphash<hash::sha1> h(keystr.begin(), keystr.end());
+        mac::siphash<hashes::sha1> h(keystr.begin(), keystr.end());
         h.compute(text, 9, false);
         BOOST_CHECK_EQUAL(h, "4f4ca3d5d68ba7cc0a1208c9c61e9c5da0403c0a");
     }
@@ -196,7 +196,7 @@ BOOST_AUTO_TEST_SUITE(crc_mac_test_suite)
         const char *const text = "Sample #2";
 
         const byte_string keystr(key, 40);
-        mac::siphash<hash::sha1> h(keystr.begin(), keystr.end());
+        mac::siphash<hashes::sha1> h(keystr.begin(), keystr.end());
         h.compute(text, 9, false);
         BOOST_CHECK_EQUAL(h, "0922d3405faa3d194f82a45830737d5cc6c75d24");
     }
@@ -206,7 +206,7 @@ BOOST_AUTO_TEST_SUITE(crc_mac_test_suite)
         const char *const text = "Sample #3";
 
         const byte_string keystr(key, 200);
-        mac::siphash<hash::sha1> h(keystr.begin(), keystr.end());
+        mac::siphash<hashes::sha1> h(keystr.begin(), keystr.end());
         h.compute(text, 9, false);
         BOOST_CHECK_EQUAL(h, "bcf41eab8bb2d802f3d05caf7cb092ecf8d1a3aa");
     }

@@ -15,7 +15,7 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace hash {
+        namespace hashes {
             class ghash;
         }
         namespace mac {
@@ -25,7 +25,7 @@ namespace nil {
              * @tparam Hash
              * @ingroup mac
              */
-            template<typename BlockCipher, typename Hash = hash::ghash>
+            template<typename BlockCipher, typename Hash = hashes::ghash>
             class gmac {
                 typedef detail::gmac_policy<BlockCipher, Hash> policy_type;
 
