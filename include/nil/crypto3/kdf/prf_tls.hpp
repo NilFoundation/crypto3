@@ -87,8 +87,8 @@ namespace nil {
              * @ingroup kdf
              */
             template<>
-            class prf_tls<1, mac::hmac<hash::sha1>, mac::hmac<hash::md5>> {
-                typedef detail::prf_tls_functions<1, mac::hmac<hash::sha1>, mac::hmac<hash::md5>> policy_type;
+            class prf_tls<1, mac::hmac<hashes::sha1>, mac::hmac<hashes::md5>> {
+                typedef detail::prf_tls_functions<1, mac::hmac<hashes::sha1>, mac::hmac<hashes::md5>> policy_type;
 
             public:
                 constexpr static const std::size_t version = policy_type::version;
