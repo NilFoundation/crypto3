@@ -19,7 +19,7 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace hash {
+        namespace hashes {
             template<std::size_t DigestBits>
             struct basic_ripemd_compressor {
                 typedef detail::ripemd_functions<DigestBits> policy_type;
@@ -258,7 +258,7 @@ namespace nil {
             /*!
              * @brief Ripemd. Family of configurable hashes, developed as an open alternative to SHA.
              *
-             * @ingroup hash
+             * @ingroup hashes
              *
              * @tparam DigestBits
              */
@@ -307,7 +307,7 @@ namespace nil {
             typedef ripemd<160> ripemd160;
             typedef ripemd<256> ripemd256;
             typedef ripemd<320> ripemd320;
-        }    // namespace hash
+        }    // namespace hashes
     }        // namespace crypto3
 }    // namespace nil
 

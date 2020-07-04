@@ -17,7 +17,7 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace hash {
+        namespace hashes {
             namespace detail {
                 template<std::size_t DigestBits>
                 struct sha3_policy : public ::nil::crypto3::detail::basic_functions<64> {
@@ -59,7 +59,7 @@ namespace nil {
                     };
                 };
             }    // namespace detail
-        }        // namespace hash
+        }        // namespace hashes
     }            // namespace crypto3
 }    // namespace nil
 

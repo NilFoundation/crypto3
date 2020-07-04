@@ -14,7 +14,7 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace hash {
+        namespace hashes {
             namespace detail {
                 template<std::size_t DigestBits>
                 struct basic_tiger_policy : public ::nil::crypto3::detail::basic_functions<64> {
@@ -315,7 +315,7 @@ namespace nil {
                 constexpr const typename basic_tiger_policy<DigestBits>::substitution_type
                     basic_tiger_policy<DigestBits>::sbox4;
             }    // namespace detail
-        }        // namespace hash
+        }        // namespace hashes
     }            // namespace crypto3
 }    // namespace nil
 

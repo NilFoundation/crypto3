@@ -20,12 +20,12 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace hash {
+        namespace hashes {
             /*!
-             * @brief SHA1. Widely adopted NSA designed hash function. Starting
+             * @brief SHA1. Widely adopted NSA designed hashes function. Starting
              * to show significant signs of weakness, and collisions can now be
              * generated. Avoid in new designs.
-             * @ingroup hash
+             * @ingroup hashes
              */
             class sha1 {
                 typedef detail::sha1_policy policy_type;
@@ -67,7 +67,7 @@ namespace nil {
                     typedef block_stream_processor<construction, StateAccumulator, params_type> type;
                 };
             };
-        }    // namespace hash
+        }    // namespace hashes
     }        // namespace crypto3
 }    // namespace nil
 

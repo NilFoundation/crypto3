@@ -17,7 +17,7 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace hash {
+        namespace hashes {
             /*!
              * @brief
              * @tparam DigestEndian
@@ -26,7 +26,7 @@ namespace nil {
              * @tparam Compressor
              * @tparam Finalizer
              *
-             * The Sponge construction builds a block hash from a
+             * The Sponge construction builds a block hashes from a
              * one-way compressor.  As this version operated on the block
              * level, it doesn't contain any padding or other strengthening.
              * For a Wide Pipe construction, use a digest that will
@@ -125,7 +125,7 @@ namespace nil {
                 state_type state_;
             };
 
-        }    // namespace hash
+        }    // namespace hashes
     }        // namespace crypto3
 }    // namespace nil
 

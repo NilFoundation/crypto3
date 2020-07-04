@@ -16,7 +16,7 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace hash {
+        namespace hashes {
             namespace detail {
                 struct md4_policy {
                     typedef block::md4 block_cipher_type;
@@ -48,7 +48,7 @@ namespace nil {
                 };
 
             }    // namespace detail
-        }        // namespace hash
+        }        // namespace hashes
     }            // namespace crypto3
 }    // namespace nil
 

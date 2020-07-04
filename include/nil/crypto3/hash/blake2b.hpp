@@ -19,7 +19,7 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace hash {
+        namespace hashes {
             template<std::size_t DigestBits>
             class blake2b_compressor {
             protected:
@@ -85,11 +85,11 @@ namespace nil {
             };
 
             /*!
-             * @brief Blake2b. A recently designed hash function. Very fast on 64-bit processors.
-             * Can output a hash of any length between 1 and 64 bytes, this is specified by passing
+             * @brief Blake2b. A recently designed hashes function. Very fast on 64-bit processors.
+             * Can output a hashes of any length between 1 and 64 bytes, this is specified by passing
              * a value to the constructor with the desired length.
              *
-             * @ingroup hash
+             * @ingroup hashes
              * @tparam DigestBits
              */
             template<std::size_t DigestBits>
@@ -132,7 +132,7 @@ namespace nil {
                 };
             };
 
-        }    // namespace hash
+        }    // namespace hashes
     }        // namespace crypto3
 }    // namespace nil
 

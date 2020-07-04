@@ -15,7 +15,7 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace hash {
+        namespace hashes {
             namespace detail {
                 template<typename Hash>
                 class blake2b_padding {
@@ -50,7 +50,7 @@ namespace nil {
                     }
                 };
             }    // namespace detail
-        }        // namespace hash
+        }        // namespace hashes
     }            // namespace crypto3
 }    // namespace nil
 
