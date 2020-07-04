@@ -19,12 +19,12 @@ namespace nil {
             struct blowfish;
         }
 
-        namespace hash {
+        namespace hashes {
             struct sha1;
 
             template<std::size_t Version>
             struct sha2;
-        }    // namespace hash
+        }    // namespace hashes
 
         namespace mac {
             template<typename Hash>
@@ -55,9 +55,9 @@ namespace nil {
                 };
 
                 template<std::size_t Workfactor, typename ParamsType>
-                struct passhash9_policy<mac::hmac<hash::sha1>, Workfactor, ParamsType>
-                    : passhash9_functions<mac::hmac<hash::sha1>, Workfactor, ParamsType> {
-                    typedef mac::hmac<hash::sha1> mac_type;
+                struct passhash9_policy<mac::hmac<hashes::sha1>, Workfactor, ParamsType>
+                    : passhash9_functions<mac::hmac<hashes::sha1>, Workfactor, ParamsType> {
+                    typedef mac::hmac<hashes::sha1> mac_type;
                     typedef ParamsType params_type;
 
                     typedef const char* prefix_type;
@@ -75,9 +75,9 @@ namespace nil {
                 };
 
                 template<std::size_t Workfactor, typename ParamsType>
-                struct passhash9_policy<mac::hmac<hash::sha2<256>>, Workfactor, ParamsType>
-                    : passhash9_functions<mac::hmac<hash::sha2<256>>, Workfactor, ParamsType> {
-                    typedef mac::hmac<hash::sha2<256>> mac_type;
+                struct passhash9_policy<mac::hmac<hashes::sha2<256>>, Workfactor, ParamsType>
+                    : passhash9_functions<mac::hmac<hashes::sha2<256>>, Workfactor, ParamsType> {
+                    typedef mac::hmac<hashes::sha2<256>> mac_type;
                     typedef ParamsType params_type;
 
                     typedef const char* prefix_type;
@@ -115,9 +115,9 @@ namespace nil {
                 };
 
                 template<std::size_t Workfactor, typename ParamsType>
-                struct passhash9_policy<mac::hmac<hash::sha2<384>>, Workfactor, ParamsType>
-                    : passhash9_functions<mac::hmac<hash::sha2<384>>, Workfactor, ParamsType> {
-                    typedef mac::hmac<hash::sha2<384>> mac_type;
+                struct passhash9_policy<mac::hmac<hashes::sha2<384>>, Workfactor, ParamsType>
+                    : passhash9_functions<mac::hmac<hashes::sha2<384>>, Workfactor, ParamsType> {
+                    typedef mac::hmac<hashes::sha2<384>> mac_type;
                     typedef ParamsType params_type;
 
                     typedef const char* prefix_type;
@@ -135,9 +135,9 @@ namespace nil {
                 };
 
                 template<std::size_t Workfactor, typename ParamsType>
-                struct passhash9_policy<mac::hmac<hash::sha2<512>>, Workfactor, ParamsType>
-                    : passhash9_functions<mac::hmac<hash::sha2<512>>, Workfactor, ParamsType> {
-                    typedef mac::hmac<hash::sha2<512>> mac_type;
+                struct passhash9_policy<mac::hmac<hashes::sha2<512>>, Workfactor, ParamsType>
+                    : passhash9_functions<mac::hmac<hashes::sha2<512>>, Workfactor, ParamsType> {
+                    typedef mac::hmac<hashes::sha2<512>> mac_type;
                     typedef ParamsType params_type;
 
                     typedef const char* prefix_type;
