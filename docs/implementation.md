@@ -102,7 +102,7 @@ set with [`hash` accumulator](@ref accumulators::hash) inside initialized with `
 ## Stream Data Processing {#modes_stream}
 
 Hashes are usually defined for processing `Integral` value typed byte sequences 
-of specific size packed in blocks (e.g. [sha2](@ref hash::sha2) is defined for 
+of specific size packed in blocks (e.g. [sha2](@ref nil::crypto3::hashes::sha2) is defined for 
 blocks of words which are actually plain `n`-sized arrays of `uint32_t` ). 
 Input data in the implementation proposed is supposed to be a various-length 
 input stream, which length could be not even to block size.
@@ -169,7 +169,7 @@ struct2:w3 -> struct3:bl0
 
 @enddot
 
-Now with this a [`Hash`](@ref modes_concept) instance of [sha2](@ref hash::sha2) 
+Now with this a [`Hash`](@ref modes_concept) instance of [sha2](@ref nil::crypto3::hashes::sha2) 
 can be fed.
 
 This mechanism is handled with `stream_processor` template class specified for 
