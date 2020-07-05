@@ -279,9 +279,9 @@ Encryption contains an accumulation step, which is implemented with
 
 All the concepts are held.
 
-Block ciphers contains pre-defined [`block::accumulator_set`](@ref block::accumulator_set), 
+Block ciphers contains pre-defined [`block::accumulator_set`](@ref nil::crypto3::block::accumulator_set), 
 which is a `boost::accumulator_set` with pre-filled 
-[`block` accumulator](@ref accumulators::block).
+[`block` accumulator](@ref nil::crypto3::accumulators::block).
 
 Block accumulator accepts only one either `block_type::value_type` or `block_type` 
 at insert.
