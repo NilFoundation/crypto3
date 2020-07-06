@@ -9,6 +9,8 @@
 #ifndef CRYPTO3_BLOCK_ALGORITHM_HPP
 #define CRYPTO3_BLOCK_ALGORITHM_HPP
 
+#include <cstdint>
+
 namespace nil {
     namespace crypto3 {
         namespace block {
