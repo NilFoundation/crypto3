@@ -57,47 +57,6 @@ function(define_target_endianness prefix_name target_architecture)
     endif()
 endfunction()
 
-function(define_target_platform_size prefix_name target_architecture)
-    string(TOUPPER ${target_architecture} UPPER_TARGET_ARCHITECTURE)
-    string(TOUPPER ${prefix_name} UPPER_PREFIX_NAME)
-
-    if(${CMAKE_TARGET_ARCHITECTURE} STREQUAL ${CMAKE_HOST_SYSTEM_PROCESSOR})
-        #        check_type_size(int CMAKE_TARGET_INTEGER_SIZE_BYTE)
-        #        math(EXPR CMAKE_TARGET_INTEGER_SIZE_BITS "${CMAKE_TARGET_INTEGER_SIZE_BYTE} * 8")
-        #        add_definitions(-D${UPPER_PREFIX_NAME}_MP_WORD_BITS=${CMAKE_TARGET_INTEGER_SIZE_BITS})
-
-        if(${UPPER_TARGET_ARCHITECTURE} STREQUAL "ALPHA" OR
-           ${UPPER_TARGET_ARCHITECTURE} STREQUAL "ARM64" OR
-           ${UPPER_TARGET_ARCHITECTURE} STREQUAL "X86_64" OR
-           ${UPPER_TARGET_ARCHITECTURE} STREQUAL "SPARC64" OR
-           ${UPPER_TARGET_ARCHITECTURE} STREQUAL "PPC64" OR
-           ${UPPER_TARGET_ARCHITECTURE} STREQUAL "S390X")
-            add_definitions(-D${UPPER_PREFIX_NAME}_MP_WORD_BITS=64)
-            add_definitions(-D${UPPER_PREFIX_NAME}_TARGET_CPU_HAS_NATIVE_64BIT)
-        else()
-            add_definitions(-D${UPPER_PREFIX_NAME}_MP_WORD_BITS=32)
-        endif()
-    else()
-        if(${UPPER_TARGET_ARCHITECTURE} STREQUAL "ALPHA" OR
-           ${UPPER_TARGET_ARCHITECTURE} STREQUAL "ARM64" OR
-           ${UPPER_TARGET_ARCHITECTURE} STREQUAL "X86_64" OR
-           ${UPPER_TARGET_ARCHITECTURE} STREQUAL "SPARC64" OR
-           ${UPPER_TARGET_ARCHITECTURE} STREQUAL "PPC64" OR
-           ${UPPER_TARGET_ARCHITECTURE} STREQUAL "S390X")
-            add_definitions(-D${UPPER_PREFIX_NAME}_MP_WORD_BITS=64)
-            add_definitions(-D${UPPER_PREFIX_NAME}_TARGET_CPU_HAS_NATIVE_64BIT)
-        else()
-            add_definitions(-D${UPPER_PREFIX_NAME}_MP_WORD_BITS=32)
-        endif()
-    endif()
-
-    if(${UPPER_TARGET_ARCHITECTURE} STREQUAL "X86_64")
-        add_definitions(-D${UPPER_PREFIX_NAME}_MP_USE_X86_64_ASM)
-    elseif(${UPPER_TARGET_ARCHITECTURE} STREQUAL "X86")
-        add_definitions(-D${UPPER_PREFIX_NAME}_MP_USE_X86_32_ASM)
-    endif()
-endfunction()
-
 function(define_target_platform_features prefix_name)
     include(CheckSymbolExists)
 
