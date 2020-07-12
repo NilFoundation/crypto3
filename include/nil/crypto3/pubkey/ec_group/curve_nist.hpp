@@ -27,9 +27,9 @@ namespace nil {
                  * order, return word i (or 0 if out of range)
                  */
                 inline uint32_t get_uint32_t(const number<Backend, ExpressionTemplates> &x, size_t i) {
-#if (CRYPTO3_MP_WORD_BITS == 32)
+#if (BOOST_ARCH_CURRENT_WORD_BITS == 32)
                     return x.word_at(i);
-#elif (CRYPTO3_MP_WORD_BITS == 64)
+#elif (BOOST_ARCH_CURRENT_WORD_BITS == 64)
                     return static_cast<uint32_t>(x.word_at(i / 2) >> ((i % 2) * 32));
 #else
 #error "Not implemented"
@@ -43,9 +43,9 @@ namespace nil {
                 template<typename T>
                 inline void set_uint32_t(number<Backend, ExpressionTemplates> &x, size_t i, T v_in) {
                     const uint32_t v = static_cast<uint32_t>(v_in);
-#if (CRYPTO3_MP_WORD_BITS == 32)
+#if (BOOST_ARCH_CURRENT_WORD_BITS == 32)
                     x.set_word_at(i, v);
-#elif (CRYPTO3_MP_WORD_BITS == 64)
+#elif (BOOST_ARCH_CURRENT_WORD_BITS == 64)
                     const word shift_32 = (i % 2) * 32;
                     const word w = (x.word_at(i / 2) & (static_cast<word>(0xFFFFFFFF) << (32 - shift_32))) |
                                    (static_cast<word>(v) << shift_32);

@@ -68,7 +68,7 @@ namespace nil {
                     // Now find the actual carry in bit 522
                     const uint8_t bit_522_set = x.word_at(p_full_words) >> (p_top_bits);
 
-#if (CRYPTO3_MP_WORD_BITS == 64)
+#if (BOOST_ARCH_CURRENT_WORD_BITS == 64)
                     static const word p521_words[9] = {0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF,
                                                        0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF,
                                                        0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0x1FF};
@@ -79,7 +79,7 @@ namespace nil {
                      * top bit is set, it is possible we have x == 2**521 - 1 so check for that.
                      */
                     if (bit_522_set) {
-#if (CRYPTO3_MP_WORD_BITS == 64)
+#if (BOOST_ARCH_CURRENT_WORD_BITS == 64)
                         bigint_sub2(x.mutable_data(), x.size(), p521_words, 9);
 #else
                         x -= p;

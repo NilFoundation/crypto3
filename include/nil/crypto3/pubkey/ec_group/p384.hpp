@@ -192,7 +192,7 @@ namespace nil {
                     This is a table of (i*P-384) % 2**384 for i in 1...4
                     */
                     static const uint32_t p384_mults[5][p384_limbs] = {
-#if (CRYPTO3_MP_WORD_BITS == 64)
+#if (BOOST_ARCH_CURRENT_WORD_BITS == 64)
                         {0x00000000FFFFFFFF, 0xFFFFFFFF00000000, 0xFFFFFFFFFFFFFFFE, 0xFFFFFFFFFFFFFFFF,
                          0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF},
                         {0x00000001FFFFFFFE, 0xFFFFFFFE00000000, 0xFFFFFFFFFFFFFFFD, 0xFFFFFFFFFFFFFFFF,

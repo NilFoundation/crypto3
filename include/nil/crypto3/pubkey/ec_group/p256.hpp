@@ -158,7 +158,7 @@ namespace nil {
                     This is a table of (i*P-256) % 2**256 for i in 1...10
                     */
                     static const uint32_t p256_mults[11][p256_limbs] = {
-#if (CRYPTO3_MP_WORD_BITS == 64)
+#if (BOOST_ARCH_CURRENT_WORD_BITS == 64)
                         {0xFFFFFFFFFFFFFFFF, 0x00000000FFFFFFFF, 0x0000000000000000, 0xFFFFFFFF00000001},
                         {0xFFFFFFFFFFFFFFFE, 0x00000001FFFFFFFF, 0x0000000000000000, 0xFFFFFFFE00000002},
                         {0xFFFFFFFFFFFFFFFD, 0x00000002FFFFFFFF, 0x0000000000000000, 0xFFFFFFFD00000003},
