@@ -84,8 +84,6 @@ define_target_architecture(${CMAKE_UPPER_WORKSPACE_NAME} ${CMAKE_TARGET_ARCHITEC
 define_target_endianness(${CMAKE_UPPER_WORKSPACE_NAME} ${CMAKE_TARGET_ARCHITECTURE})
 define_target_platform_features(${CMAKE_UPPER_WORKSPACE_NAME})
 
-define_target_platform_size(${CMAKE_UPPER_WORKSPACE_NAME} ${CMAKE_TARGET_ARCHITECTURE})
-
 check_sse()
 check_avx()
 
