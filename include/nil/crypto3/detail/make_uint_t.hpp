@@ -11,6 +11,8 @@
 
 #include <tuple>
 
+#include <boost/integer.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace detail {
