@@ -50,7 +50,7 @@ namespace nil {
 #elif (BOOST_ARCH_CURRENT_WORD_BITS == 64)
                 b = (b * 0x0202020202ULL & 0x010884422010ULL) % 1023;
 #else                
-#warning "BOOST_ARCH_CURRENT_WORD_BITS not set"
+#error "BOOST_ARCH_CURRENT_WORD_BITS not set"
 #endif
             }
 
