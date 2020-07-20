@@ -69,15 +69,7 @@ function(define_target_platform_features prefix_name)
             add_definitions(-D${UPPER_PREFIX_NAME}_TARGET_OS_HAS_ARC4RANDOM)
             add_definitions(-D${UPPER_PREFIX_NAME}_TARGET_OS_HAS_MEMSET_S)
         else()
-            add_definitions(-D${UPPER_PREFIX_NAME}_TARGET_OS_HAS_CLOCK_GETTIME)
             add_definitions(-D${UPPER_PREFIX_NAME}_TARGET_OS_HAS_POSIX_MLOCK)
-        endif()
-
-        check_symbol_exists(clock_gettime sys/time.h HAVE_CLOCK_GETTIME)
-        check_symbol_exists(gettimeofday sys/time.h HAVE_GETTIMEOFDAY)
-
-        if(HAVE_GETTIMEOFDAY)
-            add_definitions(-D${UPPER_PREFIX_NAME}_TARGET_OS_HAS_GETTIMEOFDAY)
         endif()
 
         add_definitions(-D${UPPER_PREFIX_NAME}_TARGET_OS_TYPE_IS_UNIX)

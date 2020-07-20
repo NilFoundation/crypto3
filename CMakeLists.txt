@@ -398,12 +398,10 @@ if(CRYPTO3_BLOCK_SERPENT)
          )
 
     list(APPEND ${CURRENT_PROJECT_NAME}_PRIVATE_HEADERS
-         ${${CURRENT_PROJECT_NAME}_PRIVATE_SERPENT_HEADERS}
-         )
+         ${${CURRENT_PROJECT_NAME}_PRIVATE_SERPENT_HEADERS})
 
     list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-         ${${CURRENT_PROJECT_NAME}_SERPENT_SOURCES}
-         )
+         ${${CURRENT_PROJECT_NAME}_SERPENT_SOURCES})
 endif()
 
 if(CRYPTO3_BLOCK_SHACAL2)
@@ -415,56 +413,44 @@ if(CRYPTO3_BLOCK_SHACAL2)
          include/nil/crypto3/block/detail/shacal/shacal_policy.hpp
          include/nil/crypto3/block/detail/shacal/shacal_functions.hpp
          include/nil/crypto3/block/detail/shacal/shacal1_policy.hpp
-         include/nil/crypto3/block/detail/shacal/shacal2_policy.hpp
-         )
+         include/nil/crypto3/block/detail/shacal/shacal2_policy.hpp)
 
-    list(APPEND ${CURRENT_PROJECT_NAME}_SHACAL2_SOURCES
-
-         )
+    list(APPEND ${CURRENT_PROJECT_NAME}_SHACAL2_SOURCES)
 
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_SHACAL2)
     list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-         ${${CURRENT_PROJECT_NAME}_PUBLIC_SHACAL2_HEADERS}
-         )
+         ${${CURRENT_PROJECT_NAME}_PUBLIC_SHACAL2_HEADERS})
 
     list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-         ${${CURRENT_PROJECT_NAME}_SHACAL2_SOURCES}
-         )
+         ${${CURRENT_PROJECT_NAME}_SHACAL2_SOURCES})
 endif()
 
 if(CRYPTO3_BLOCK_SM4)
     list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_SM4_HEADERS
          include/nil/crypto3/block/detail/sm4/sm4_functions.hpp
          include/nil/crypto3/block/detail/sm4/sm4_policy.hpp
-         include/nil/crypto3/block/sm4.hpp
-         )
+         include/nil/crypto3/block/sm4.hpp)
 
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_SM4)
     list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-         ${${CURRENT_PROJECT_NAME}_PUBLIC_SM4_HEADERS}
-         )
+         ${${CURRENT_PROJECT_NAME}_PUBLIC_SM4_HEADERS})
 
     list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-         ${${CURRENT_PROJECT_NAME}_SM4_SOURCES}
-         )
+         ${${CURRENT_PROJECT_NAME}_SM4_SOURCES})
 endif()
 
 if(CRYPTO3_BLOCK_THREEFISH)
     list(APPEND ${CURRENT_PROJECT_NAME}_THREEFISH_HEADERS
          include/nil/crypto3/block/threefish.hpp
-         include/nil/crypto3/block/detail/threefish/threefish_policy.hpp
-         )
+         include/nil/crypto3/block/detail/threefish/threefish_policy.hpp)
 
-    list(APPEND ${CURRENT_PROJECT_NAME}_THREEFISH_SOURCES
-         )
+    list(APPEND ${CURRENT_PROJECT_NAME}_THREEFISH_SOURCES)
 
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_THREEFISH)
     list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-         ${${CURRENT_PROJECT_NAME}_THREEFISH_HEADERS}
-         )
+         ${${CURRENT_PROJECT_NAME}_THREEFISH_HEADERS})
     list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-         ${${CURRENT_PROJECT_NAME}_THREEFISH_SOURCES}
-         )
+         ${${CURRENT_PROJECT_NAME}_THREEFISH_SOURCES})
 endif()
 
 if(CRYPTO3_BLOCK_TWOFISH)
@@ -472,42 +458,34 @@ if(CRYPTO3_BLOCK_TWOFISH)
          include/nil/crypto3/block/twofish.hpp
          include/nil/crypto3/block/detail/twofish/basic_twofish_policy.hpp
          include/nil/crypto3/block/detail/twofish/twofish_policy.hpp
-         include/nil/crypto3/block/detail/twofish/twofish_functions.hpp
-         )
+         include/nil/crypto3/block/detail/twofish/twofish_functions.hpp)
 
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_TWOFISH)
     list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-         ${${CURRENT_PROJECT_NAME}_TWOFISH_HEADERS}
-         )
+         ${${CURRENT_PROJECT_NAME}_TWOFISH_HEADERS})
     list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-         ${${CURRENT_PROJECT_NAME}_TWOFISH_SOURCES}
-         )
+         ${${CURRENT_PROJECT_NAME}_TWOFISH_SOURCES})
 endif()
 
 if(CRYPTO3_BLOCK_XTEA)
     list(APPEND ${CURRENT_PROJECT_NAME}_XTEA_HEADERS
          include/nil/crypto3/block/xtea.hpp
          include/nil/crypto3/block/detail/xtea/xtea_functions.hpp
-         include/nil/crypto3/block/detail/xtea/xtea_policy.hpp
-         )
+         include/nil/crypto3/block/detail/xtea/xtea_policy.hpp)
 
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_XTEA)
     list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-         ${${CURRENT_PROJECT_NAME}_XTEA_HEADERS}
-         )
+         ${${CURRENT_PROJECT_NAME}_XTEA_HEADERS})
     list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-         ${${CURRENT_PROJECT_NAME}_XTEA_SOURCES}
-         )
+         ${${CURRENT_PROJECT_NAME}_XTEA_SOURCES})
 endif()
 
 list(APPEND ${CURRENT_PROJECT_NAME}_HEADERS
      ${${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS}
-     ${${CURRENT_PROJECT_NAME}_PRIVATE_HEADERS}
-     )
+     ${${CURRENT_PROJECT_NAME}_PRIVATE_HEADERS})
 
 list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-     ${${CURRENT_PROJECT_NAME}_UNGROUPED_SOURCES}
-     )
+     ${${CURRENT_PROJECT_NAME}_UNGROUPED_SOURCES})
 
 cm_setup_version(VERSION 0.1.0 PREFIX ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME})
 
