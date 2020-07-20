@@ -45,7 +45,7 @@ namespace nil {
             struct can_memcpy<stream_endian::host_unit<UnitBits>, InputBits, OutputBits, InT, OutT>
                 : host_can_memcpy<UnitBits, InputBits, OutputBits, InT, OutT> {};
 
-#ifdef CRYPTO3_TARGET_CPU_IS_LITTLE_ENDIAN
+#ifdef BOOST_ENDIAN_LITTLE_BYTE_AVAILABLE
             template<int UnitBits, int InputBits, int OutputBits, typename InT, typename OutT>
             struct can_memcpy<stream_endian::little_unit_big_bit<UnitBits>, InputBits, OutputBits, InT, OutT>
                 : host_can_memcpy<UnitBits, InputBits, OutputBits, InT, OutT> {};
