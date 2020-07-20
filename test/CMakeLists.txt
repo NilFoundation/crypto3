@@ -13,7 +13,9 @@ if(NOT Boost_UNIT_TEST_FRAMEWORK_FOUND)
 endif()
 
 cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
-                       ${Boost_LIBRARIES})
+                       ${Boost_LIBRARIES}
+
+                       Boost::predef)
 
 macro(define_block_cipher_test name)
     cm_test(NAME block_${name}_test SOURCES ${name}.cpp)

@@ -265,7 +265,7 @@ namespace nil {
             if (count > 0) {
 #if defined(CRYPTO3_TARGET_CPU_IS_LITTLE_ENDIAN)
                 std::memcpy(out, in, sizeof(T) * count);
-#elif defined(CRYPTO3_TARGET_CPU_IS_BIG_ENDIAN)
+#elif defined(BOOST_ENDIAN_BIG_BYTE_AVAILABLE)
                 std::memcpy(out, in, sizeof(T) * count);
                 const size_t blocks = count - (count % 4);
                 const size_t left = count - blocks;

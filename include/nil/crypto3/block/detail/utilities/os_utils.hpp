@@ -155,7 +155,7 @@ namespace nil {
             fall back to std::chrono.
             */
 
-#if defined(CRYPTO3_TARGET_OS_HAS_CLOCK_GETTIME)
+#if defined(BOOST_HAS_CLOCK_GETTIME)
 
             // The ordering here is somewhat arbitrary...
             const clockid_t clock_types[] = {
@@ -194,7 +194,7 @@ namespace nil {
          * available, normalized to nanoseconds resolution.
          */
         uint64_t get_system_timestamp_ns() {
-#if defined(CRYPTO3_TARGET_OS_HAS_CLOCK_GETTIME)
+#if defined(BOOST_HAS_CLOCK_GETTIME)
             struct timespec ts;
             if (::clock_gettime(CLOCK_REALTIME, &ts) == 0) {
                 return (static_cast<uint64_t>(ts.tv_sec) * 1000000000) + static_cast<uint64_t>(ts.tv_nsec);

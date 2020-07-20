@@ -13,7 +13,6 @@
 #include <vector>
 
 #include <nil/crypto3/build.hpp>
-#include <nil/crypto3/block/detail/utilities/assert.hpp>
 
 #ifdef CRYPTO3_HAS_LOCKING_ALLOCATOR
 
