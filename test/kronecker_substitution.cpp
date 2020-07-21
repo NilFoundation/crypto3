@@ -16,8 +16,8 @@
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
 
-#include <nil/cas/fft/polynomial_arithmetic/basic_operations.hpp>
-#include <nil/cas/fft/kronecker_substitution/kronecker_substitution.hpp>
+#include <nil/algebra/fft/polynomial_arithmetic/basic_operations.hpp>
+#include <nil/algebra/fft/kronecker_substitution/kronecker_substitution.hpp>
 
 using namespace nil::cas::fft;
 

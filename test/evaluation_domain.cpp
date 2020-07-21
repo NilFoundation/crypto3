@@ -14,12 +14,12 @@
 #include <nil/algebra/curves/mnt/mnt4/mnt4_pp.hpp>
 #include <stdint.h>
 
-#include <nil/cas/fft/evaluation_domain/domains/arithmetic_sequence_domain.hpp>
-#include <nil/cas/fft/evaluation_domain/domains/basic_radix2_domain.hpp>
-#include <nil/cas/fft/evaluation_domain/domains/extended_radix2_domain.hpp>
-#include <nil/cas/fft/evaluation_domain/domains/geometric_sequence_domain.hpp>
-#include <nil/cas/fft/evaluation_domain/domains/step_radix2_domain.hpp>
-#include <nil/cas/fft/polynomial_arithmetic/naive_evaluate.hpp>
+#include <nil/algebra/fft/evaluation_domain/domains/arithmetic_sequence_domain.hpp>
+#include <nil/algebra/fft/evaluation_domain/domains/basic_radix2_domain.hpp>
+#include <nil/algebra/fft/evaluation_domain/domains/extended_radix2_domain.hpp>
+#include <nil/algebra/fft/evaluation_domain/domains/geometric_sequence_domain.hpp>
+#include <nil/algebra/fft/evaluation_domain/domains/step_radix2_domain.hpp>
+#include <nil/algebra/fft/polynomial_arithmetic/naive_evaluate.hpp>
 
 using namespace nil::cas::fft;
 

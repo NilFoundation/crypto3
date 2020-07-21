@@ -27,11 +27,11 @@
 #include <nil/algebra/common/double.hpp>
 #include <omp.h>
 
-#include <nil/cas/fft/evaluation_domain/domains/arithmetic_sequence_domain.hpp>
-#include <nil/cas/fft/evaluation_domain/domains/basic_radix2_domain.hpp>
-#include <nil/cas/fft/evaluation_domain/domains/extended_radix2_domain.hpp>
-#include <nil/cas/fft/evaluation_domain/domains/geometric_sequence_domain.hpp>
-#include <nil/cas/fft/evaluation_domain/domains/step_radix2_domain.hpp>
+#include <nil/algebra/fft/evaluation_domain/domains/arithmetic_sequence_domain.hpp>
+#include <nil/algebra/fft/evaluation_domain/domains/basic_radix2_domain.hpp>
+#include <nil/algebra/fft/evaluation_domain/domains/extended_radix2_domain.hpp>
+#include <nil/algebra/fft/evaluation_domain/domains/geometric_sequence_domain.hpp>
+#include <nil/algebra/fft/evaluation_domain/domains/step_radix2_domain.hpp>
 
 using namespace nil::cas::fft;
 

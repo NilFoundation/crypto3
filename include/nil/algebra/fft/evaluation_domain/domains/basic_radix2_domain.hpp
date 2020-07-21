@@ -12,8 +12,8 @@
 
 #include <vector>
 
-#include <nil/cas/fft/evaluation_domain/evaluation_domain.hpp>
-#include <nil/cas/fft/evaluation_domain/domains/basic_radix2_domain_aux.hpp>
+#include <nil/algebra/fft/evaluation_domain/evaluation_domain.hpp>
+#include <nil/algebra/fft/evaluation_domain/domains/basic_radix2_domain_aux.hpp>
 
 #include <nil/algebra/fields/field_utils.hpp>
 #include <nil/algebra/common/double.hpp>

@@ -16,8 +16,8 @@
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
 
-#include <nil/cas/fft/polynomial_arithmetic/basic_operations.hpp>
-#include <nil/cas/fft/polynomial_arithmetic/xgcd.hpp>
+#include <nil/algebra/fft/polynomial_arithmetic/basic_operations.hpp>
+#include <nil/algebra/fft/polynomial_arithmetic/xgcd.hpp>
 
 using namespace nil::cas::fft;
 

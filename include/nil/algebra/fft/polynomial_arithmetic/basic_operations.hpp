@@ -13,7 +13,7 @@
 #include <algorithm>
 #include <vector>
 
-#include <nil/cas/fft/evaluation_domain/domains/basic_radix2_domain_aux.hpp>
+#include <nil/algebra/fft/evaluation_domain/domains/basic_radix2_domain_aux.hpp>
 
 #ifdef MULTICORE
 #include <omp.h>
