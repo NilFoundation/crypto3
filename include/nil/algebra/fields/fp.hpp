@@ -21,15 +21,15 @@ namespace nil {
          * of words. It is optimized for tight memory consumption, so the modulus p is
          * passed as a template parameter, to avoid per-element overheads.
          */
-        template<std::size_t PBits, typename NumberType &Modulus>
+        template<std::size_t ModulusBits, typename NumberType &Modulus>
         struct fp {
-            using number_type = NumberType;
-
-        private:
             typedef NumberType number_type;
-            typedef detail::point<fp<Modulus>, number_type> point_type;
+            typedef point<fp<Modulus>, number_type> point_type;
 
-        public:
+            constexpr static const std::size_t modulus_bits = ModulusBits;
+            typedef number<backends::cpp_int_backend<modulus_bits, modulus_bits, unsigned_magnitude, unchecked, void>>
+                modulus_type;
+
             constexpr fp(const point_fp &point) : top_non_residue(point) {
             }    // init point for non_residue in fp2 or higher
             constexpr fp() {
@@ -42,8 +42,6 @@ namespace nil {
 
             constexpr const point_fp top_non_residue;
             constexpr static const number_type g = 0x02;
-
-            constexpr static const std::size_t num_bits = PBits;
         };
 
     }    // namespace algebra
