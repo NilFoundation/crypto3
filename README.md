@@ -1,6 +1,6 @@
-# Finite Fields and Elliptic Curves
+# =nil; Foundation's Algebraic Constructions Module
 
-=nil; Foundation C++ Computer Algebra System Finite Fields and Elliptic Curves
+=nil; Foundation's Algebraic Constructions (finite fields, curves) module.
 
 ## Building
 
@@ -15,8 +15,7 @@ To actually include this library in a project it is required to:
 
 ### Internal
 
-* [Pairings](https://github.com/NilFoundation/pairing)
-* [Finite fields](https://github.com/NilFoundation/ff)
+None
 
 ### External
 * [Boost](https://boost.org) (>= 1.58)
