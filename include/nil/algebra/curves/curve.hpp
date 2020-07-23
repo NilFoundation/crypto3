@@ -16,18 +16,22 @@
 
 namespace nil {
     namespace algebra {
-
-        template<typename Element1, typename Element2, typename A, typename B>
+        /*!
+         * @brief Element type traits for elliptic curve E: y^2 = x^3 + ax + b over GF(p)
+         * @tparam Element1
+         * @tparam A
+         * @tparam B
+         */
+        template<typename Element1, typename A, typename B>
         struct elliptic {
             typedef
                 typename boost::mpl::multiplies<typename Element1::x, typename Element1::x, typename Element1::x>::type
                     xpow3;
-            typedef typename boost::mpl::multiplies<typename Element2::y, typename Element2::y>::type ypow2;
+            typedef typename boost::mpl::multiplies<typename Element1::y, typename Element1::y>::type ypow2;
             typedef typename boost::mpl::multiplies<typename Element1::x, A>::type ax;
 
-            using type =
-                typename sqrt<typename boost::mpl::plus<typename boost::mpl::multiplies<xs, xs>::type,
-                                                        typename boost::mpl::multiplies<ys, ys>::type>::type>::type;
+            typedef typename std::enable_if<
+                std::is_same<ypow2, typename boost::mpl::plus<xpow3, ax, typename B::x>::type>::value>::type type;
         };
 
         /**

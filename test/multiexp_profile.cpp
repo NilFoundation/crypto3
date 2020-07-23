@@ -14,7 +14,7 @@
 #include <nil/algebra/scalar_multiplication/multiexp.hpp>
 #include <nil/algebra/common/rng.hpp>
 
-using namespace nil::cas::ff;
+using namespace nil::algebra;
 
 template<typename GroupT>
 using run_result_t = std::pair<long long, std::vector<GroupT>>;

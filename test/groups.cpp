@@ -18,7 +18,7 @@
 
 #include <boost/multiprecision/modular/base_params.hpp>
 
-using namespace nil::cas::ff;
+using namespace nil::algebra;
 
 template<typename GroupT>
 void test_mixed_add() {

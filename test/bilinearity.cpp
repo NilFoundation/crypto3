@@ -15,7 +15,7 @@
 #include <nil/algebra/curves/mnt/mnt4/mnt4_pp.hpp>
 #include <nil/algebra/curves/mnt/mnt6/mnt6_pp.hpp>
 
-using namespace nil::cas::ff;
+using namespace nil::algebra;
 
 template<typename ppT>
 void pairing_test() {
