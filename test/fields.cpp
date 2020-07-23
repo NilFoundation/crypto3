@@ -16,12 +16,8 @@
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
 
-#include <nil/algebra/curves/edwards/edwards_pp.hpp>
-#include <nil/algebra/curves/mnt/mnt4/mnt4_pp.hpp>
-#include <nil/algebra/curves/mnt/mnt6/mnt6_pp.hpp>
-#include <nil/algebra/curves/bn128/bn128_pp.hpp>
-#include <nil/algebra/curves/alt_bn128/alt_bn128_pp.hpp>
-#include <nil/algebra/fields/fp6_3over2.hpp>
+#include <nil/algebra/curves/curve.hpp>
+#include <nil/algebra/curves/curve_gfp.hpp>
 
 #include <boost/multiprecision/modular/base_params.hpp>
 

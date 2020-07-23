@@ -7,13 +7,13 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef ALGEBRA_ALGO_FP2_IMPL_HPP
-#define ALGEBRA_ALGO_FP2_IMPL_HPP
+#ifndef ALGEBRA_ALGO_FP3_IMPL_HPP
+#define ALGEBRA_ALGO_FP3_IMPL_HPP
 
 #include <boost/multiprecision/ressol.hpp>
 
+#include <nil/algebra/fields/fp3.hpp>
 #include <nil/algebra/fields/fp2.hpp>
-#include <nil/algebra/fields/fp.hpp>
 #include <nil/algebra/fields/element.hpp>
 
 namespace nil {
@@ -23,9 +23,9 @@ namespace nil {
         struct basic_operations;
 
         template<typename NumberType &Modulus, typename NumberType>
-        struct basic_operations<fp2<Modulus>> {
+        struct basic_operations<fp3<Modulus>> {
         private:
-            using policy_type = fp2<Modulus>;
+            using policy_type = fp3<Modulus>;
             using fp_type = fp<Modulus>;
             using point = detail::point<policy_type, NumberType>;
 
@@ -130,4 +130,4 @@ namespace nil {
     }    // namespace algebra
 }    // namespace nil
 
-#endif    // ALGEBRA_ALGO_FP2_IMPL_HPP
+#endif    // ALGEBRA_ALGO_FP3_IMPL_HPP

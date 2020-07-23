@@ -16,7 +16,7 @@ namespace nil {
     namespace algebra {
         namespace fields {
             template<typename Field, typename NumberType>
-            using point = std::array<NumberType, Field::arity>;
+            using element = std::array<NumberType, Field::arity>;
         }
     }    // namespace algebra
 }    // namespace nil

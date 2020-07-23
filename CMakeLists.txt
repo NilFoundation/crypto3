@@ -70,9 +70,6 @@ target_include_directories(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTER
 target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
                       boost::multiprecision
 
-                      ${CMAKE_WORKSPACE_NAME}_block
-                      ${CMAKE_WORKSPACE_NAME}_hash
-
                       ${Boost_LIBRARIES})
 
 cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INCLUDE include NAMESPACE ${CMAKE_WORKSPACE_NAME}::)

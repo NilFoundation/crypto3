@@ -10,10 +10,25 @@
 #ifndef ALGEBRA_CURVES_GFP_HPP
 #define ALGEBRA_CURVES_GFP_HPP
 
-#include <nil/algebra/fields/detail/point.hpp>
+#include <boost/mpl/arithmetic.hpp>
+
+#include <nil/algebra/fields/element.hpp>
 
 namespace nil {
     namespace algebra {
+
+        template<typename Element1, typename Element2, typename A, typename B>
+        struct elliptic {
+            typedef
+                typename boost::mpl::multiplies<typename Element1::x, typename Element1::x, typename Element1::x>::type
+                    xpow3;
+            typedef typename boost::mpl::multiplies<typename Element2::y, typename Element2::y>::type ypow2;
+            typedef typename boost::mpl::multiplies<typename Element1::x, A>::type ax;
+
+            using type =
+                typename sqrt<typename boost::mpl::plus<typename boost::mpl::multiplies<xs, xs>::type,
+                                                        typename boost::mpl::multiplies<ys, ys>::type>::type>::type;
+        };
 
         /**
          * @brief This class represents an elliptic curve over GF(p)
@@ -22,17 +37,15 @@ namespace nil {
          *
          * @tparam Number Satisfies Number concept requirements.
          *
-         * @note There should not be any reason for applications to use this
-         * type. If you need EC primitives use the interfaces ec_group and
-         * point_gfp
          */
 
-        template<typename FieldType>
+        template<typename FieldType, typename Expression>
         struct curve {
-            using number_type = NumberType;
+            typedef FieldType field_type;
+            typedef typename field_type::number_type number_type;
 
-            constexpr curve_gfp(number_type p, number_type a, number_type b, number_type x, number_type y,
-                                number_type order) :
+            constexpr curve(number_type p, number_type a, number_type b, number_type x, number_type y,
+                            number_type order) :
                 p(p),
                 a(a), b(b), x(x), y(y) {
             }
