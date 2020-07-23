@@ -16,8 +16,6 @@
 
 #include <boost/math/tools/polynomial.hpp>
 
-#include <nil/algebra/common/utilities.hpp>
-
 namespace nil {
     namespace algebra {
         namespace fft {
@@ -29,7 +27,9 @@ namespace nil {
              * [Gathen and Gerhard, Modern Computer Algebra 3rd Ed., Section 8.4].
              */
             template<typename FieldT>
-            void kronecker_substitution(std::vector<FieldT>& v3, const std::vector<FieldT>& v1, const std::vector<FieldT>& v2) {
+            void kronecker_substitution(const boost::math::tools::polynomial<FieldT>& v3,
+                                        const boost::math::tools::polynomial<FieldT>& v1,
+                                        const boost::math::tools::polynomial<FieldT>& v2) {
                 /* Initialize */
                 bool square = (v1 == v2) ? 1 : 0;
 
@@ -171,12 +171,12 @@ namespace nil {
             }
 
             /**
-             * Perform the multiplication of two polynomials, polynomial A * polynomial B, using Kronecker Substitution, and
-             * stores result in polynomial C.
+             * Perform the multiplication of two polynomials, polynomial A * polynomial B, using Kronecker Substitution,
+             * and stores result in polynomial C.
              */
             template<typename FieldT>
-            void _polynomial_multiplication_on_kronecker(std::vector<FieldT> &c, const std::vector<FieldT> &a,
-                                                         const std::vector<FieldT> &b) {
+            void _polynomial_multiplication_on_kronecker(std::vector<FieldT>& c, const std::vector<FieldT>& a,
+                                                         const std::vector<FieldT>& b) {
                 kronecker_substitution(c, a, b);
             }
 
