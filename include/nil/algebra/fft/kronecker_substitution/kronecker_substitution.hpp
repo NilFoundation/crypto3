@@ -44,8 +44,8 @@ namespace nil {
                 size_t b = 2 * (v1_max * v2_max).as_bigint().num_bits() + 1;
 
                 /* Number of limbs needed in total */
-                size_t k1 = ff::div_ceil(n1 * b, GMP_NUMB_BITS);
-                size_t k2 = ff::div_ceil(n2 * b, GMP_NUMB_BITS);
+                size_t k1 = algebra::div_ceil(n1 * b, GMP_NUMB_BITS);
+                size_t k2 = algebra::div_ceil(n2 * b, GMP_NUMB_BITS);
 
                 /* Output polynomial */
                 v3.resize(n3, FieldT::zero());
