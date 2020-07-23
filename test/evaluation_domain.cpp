@@ -9,10 +9,9 @@
 
 #include <memory>
 #include <vector>
+#include <cstdint>
 
-//#include <gtest/gtest.h>
 #include <nil/algebra/curves/mnt/mnt4/mnt4_pp.hpp>
-#include <stdint.h>
 
 #include <nil/algebra/fft/evaluation_domain/domains/arithmetic_sequence_domain.hpp>
 #include <nil/algebra/fft/evaluation_domain/domains/basic_radix2_domain.hpp>
@@ -21,7 +20,7 @@
 #include <nil/algebra/fft/evaluation_domain/domains/step_radix2_domain.hpp>
 #include <nil/algebra/fft/polynomial_arithmetic/naive_evaluate.hpp>
 
-using namespace nil::cas::fft;
+using namespace nil::algebra::fft;
 
 /**
  * Note: Templatized type referenced with TypeParam (instead of canonical FieldT)

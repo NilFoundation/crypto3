@@ -19,7 +19,7 @@
 #include <nil/algebra/fft/polynomial_arithmetic/basic_operations.hpp>
 #include <nil/algebra/fft/polynomial_arithmetic/xgcd.hpp>
 
-using namespace nil::cas::fft;
+using namespace nil::algebra::fft;
 
 typedef nil::algebra::Double FieldT;
 

@@ -13,6 +13,8 @@
 #include <algorithm>
 #include <vector>
 
+#include <boost/math/tools/polynomial.hpp>
+
 #include <nil/algebra/fft/evaluation_domain/domains/basic_radix2_domain_aux.hpp>
 #include <nil/algebra/fft/polynomial_arithmetic/basic_operations.hpp>
 #include <nil/algebra/fft/polynomial_arithmetic/xgcd.hpp>

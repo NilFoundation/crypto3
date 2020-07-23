@@ -14,7 +14,8 @@
 #include <algorithm>
 #include <cmath>
 
-#include </usr/include/x86_64-linux-gnu/gmp.h>
+#include <boost/math/tools/polynomial.hpp>
+
 #include <nil/algebra/common/utilities.hpp>
 
 namespace nil {

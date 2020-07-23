@@ -18,7 +18,7 @@ cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
 
                        boost::multiprecision
 
-                       ${CMAKE_WORKSPACE_NAME}::ff
+                       ${CMAKE_WORKSPACE_NAME}::algebra
 
                        ${Boost_LIBRARIES})
 
@@ -41,10 +41,10 @@ macro(define_fft_test name)
     endif()
 endmacro()
 
-set(TESTS_NAMES 
-# "evaluation_domain" 
-"kronecker_substitution" 
-"polynomial_arithmetic")
+set(TESTS_NAMES
+    "evaluation_domain"
+    "kronecker_substitution"
+    "polynomial_arithmetic")
 
 foreach(TEST_NAME ${TESTS_NAMES})
     define_fft_test(${TEST_NAME})

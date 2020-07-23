@@ -33,7 +33,7 @@
 #include <nil/algebra/fft/evaluation_domain/domains/geometric_sequence_domain.hpp>
 #include <nil/algebra/fft/evaluation_domain/domains/step_radix2_domain.hpp>
 
-using namespace nil::cas::fft;
+using namespace nil::algebra::fft;
 
 /* https://stackoverflow.com/questions/26237419/faster-than-rand */
 static unsigned int seed = 5149;
