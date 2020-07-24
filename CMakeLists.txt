@@ -68,7 +68,7 @@ target_include_directories(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTER
 target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
                       boost::multiprecision
 
-                      ${CMAKE_WORKSPACE_NAME}::ff
+                      ${CMAKE_WORKSPACE_NAME}::algebra
 
                       ${Boost_LIBRARIES})
 
