@@ -43,7 +43,6 @@ if(NOT Boost_FOUND)
     endif()
 endif()
 
-
 include(TargetArchitecture)
 include(TargetConfiguration)
 include(PlatformConfiguration)
@@ -106,9 +105,6 @@ if(NOT Boost_CONTAINER_FOUND OR NOT Boost_FOUND)
 endif()
 
 set(BUILD_WITH_CONFIGURATION_FILE_DIR "${CMAKE_CURRENT_LIST_DIR}/cmake" CACHE STRING "Directory for build.hpp lookup")
-
-configure_file(${BUILD_WITH_CONFIGURATION_FILE_DIR}/build.hpp.in
-               ${CMAKE_BINARY_DIR}/include/nil/${CMAKE_WORKSPACE_NAME}/build.hpp @ONLY)
 
 list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
      include/nil/crypto3/block/algorithm/encrypt.hpp
@@ -270,7 +266,6 @@ if(CRYPTO3_BLOCK_GOST_28147_89)
          include/nil/crypto3/block/detail/gost_28147_89/gost_28147_89_functions.hpp
          include/nil/crypto3/block/detail/gost_28147_89/gost_28147_89_policy.hpp
          include/nil/crypto3/block/detail/gost_28147_89/gost_28147_89_parameters.hpp
-
          )
 
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_GOST_28147_89)
@@ -509,6 +504,9 @@ elseif(${CMAKE_TARGET_ARCHITECTURE} STREQUAL "ppc64")
 endif()
 
 target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
+
+                      boost_config
+                      boost_predef
 
                       ${Boost_LIBRARIES})
 

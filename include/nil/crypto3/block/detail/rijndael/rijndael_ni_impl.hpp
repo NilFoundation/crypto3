@@ -35,7 +35,6 @@ namespace nil {
                 }
 
                 BOOST_ATTRIBUTE_TARGET("ssse3,aes")
-
                 void aes_192_key_expansion(__m128i *K1, __m128i *K2, __m128i key2_with_rcon, uint32_t out[],
                                            bool last) {
                     __m128i key1 = *K1;
