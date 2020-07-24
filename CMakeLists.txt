@@ -48,9 +48,6 @@ option(BUILD_TESTS "Build unit tests" FALSE)
 
 set(BUILD_WITH_CONFIGURATION_FILE_DIR "${CMAKE_CURRENT_LIST_DIR}/cmake" CACHE STRING "Directory for build.hpp lookup")
 
-configure_file(${BUILD_WITH_CONFIGURATION_FILE_DIR}/build.hpp.in
-               ${CMAKE_BINARY_DIR}/include/nil/${CMAKE_WORKSPACE_NAME}/build.hpp @ONLY)
-
 list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
      include/nil/crypto3/codec/detail/base_policy.hpp
      include/nil/crypto3/codec/detail/hex_policy.hpp
