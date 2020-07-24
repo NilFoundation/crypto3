@@ -61,7 +61,7 @@ namespace nil {
 
 #define mm_xor3(x, y, z) _mm_xor_si128(x, _mm_xor_si128(y, z))
 
-                CRYPTO3_FUNC_ISA("ssse3")
+                BOOST_ATTRIBUTE_TARGET("ssse3")
                 __m128i aes_schedule_transform(__m128i input, __m128i table_1, __m128i table_2) {
                     __m128i i_1 = _mm_and_si128(low_nibs, input);
                     __m128i i_2 = _mm_srli_epi32(_mm_andnot_si128(low_nibs, input), 4);
@@ -69,7 +69,7 @@ namespace nil {
                     return _mm_xor_si128(_mm_shuffle_epi8(table_1, i_1), _mm_shuffle_epi8(table_2, i_2));
                 }
 
-                CRYPTO3_FUNC_ISA("ssse3") __m128i aes_schedule_mangle(__m128i k, uint8_t round_no) {
+                BOOST_ATTRIBUTE_TARGET("ssse3") __m128i aes_schedule_mangle(__m128i k, uint8_t round_no) {
                     __m128i t = _mm_shuffle_epi8(_mm_xor_si128(k, _mm_set1_epi8(0x5B)), mc_forward[0]);
 
                     __m128i t2 = t;
@@ -81,11 +81,11 @@ namespace nil {
                     return _mm_shuffle_epi8(t2, sr[round_no % 4]);
                 }
 
-                CRYPTO3_FUNC_ISA("ssse3") __m128i aes_schedule_192_smear(__m128i x, __m128i y) {
+                BOOST_ATTRIBUTE_TARGET("ssse3") __m128i aes_schedule_192_smear(__m128i x, __m128i y) {
                     return mm_xor3(y, _mm_shuffle_epi32(x, 0xFE), _mm_shuffle_epi32(y, 0x80));
                 }
 
-                CRYPTO3_FUNC_ISA("ssse3") __m128i aes_schedule_mangle_dec(__m128i k, uint8_t round_no) {
+                BOOST_ATTRIBUTE_TARGET("ssse3") __m128i aes_schedule_mangle_dec(__m128i k, uint8_t round_no) {
                     const __m128i dsk[8] = {_mm_set_epi32(0x4AED9334, 0x82255BFC, 0xB6116FC8, 0x7ED9A700),
                                             _mm_set_epi32(0x8BB89FAC, 0xE9DAFDCE, 0x45765162, 0x27143300),
                                             _mm_set_epi32(0x4622EE8A, 0xADC90561, 0x27438FEB, 0xCCA86400),
@@ -110,7 +110,7 @@ namespace nil {
                     return _mm_shuffle_epi8(output, sr[round_no % 4]);
                 }
 
-                CRYPTO3_FUNC_ISA("ssse3") __m128i aes_schedule_mangle_last(__m128i k, uint8_t round_no) {
+                BOOST_ATTRIBUTE_TARGET("ssse3") __m128i aes_schedule_mangle_last(__m128i k, uint8_t round_no) {
                     const __m128i out_tr1 = _mm_set_epi32(0xF7974121, 0xDEBE6808, 0xFF9F4929, 0xD6B66000);
                     const __m128i out_tr2 = _mm_set_epi32(0xE10D5DB1, 0xB05C0CE0, 0x01EDBD51, 0x50BCEC00);
 
@@ -119,7 +119,7 @@ namespace nil {
                     return aes_schedule_transform(k, out_tr1, out_tr2);
                 }
 
-                CRYPTO3_FUNC_ISA("ssse3") __m128i aes_schedule_mangle_last_dec(__m128i k) {
+                BOOST_ATTRIBUTE_TARGET("ssse3") __m128i aes_schedule_mangle_last_dec(__m128i k) {
                     const __m128i deskew1 = _mm_set_epi32(0x1DFEB95A, 0x5DBEF91A, 0x07E4A340, 0x47A4E300);
                     const __m128i deskew2 = _mm_set_epi32(0x2841C2AB, 0xF49D1E77, 0x5F36B5DC, 0x83EA6900);
 
@@ -127,7 +127,7 @@ namespace nil {
                     return aes_schedule_transform(k, deskew1, deskew2);
                 }
 
-                CRYPTO3_FUNC_ISA("ssse3") __m128i aes_schedule_round(__m128i *rcon, __m128i input1, __m128i input2) {
+                BOOST_ATTRIBUTE_TARGET("ssse3") __m128i aes_schedule_round(__m128i *rcon, __m128i input1, __m128i input2) {
                     if (rcon) {
                         input2 = _mm_xor_si128(_mm_alignr_epi8(_mm_setzero_si128(), *rcon, 15), input2);
 
@@ -157,7 +157,7 @@ namespace nil {
                     return mm_xor3(_mm_shuffle_epi8(sb1u, t5), _mm_shuffle_epi8(sb1t, t6), smeared);
                 }
 
-                CRYPTO3_FUNC_ISA("ssse3") __m128i aes_ssse3_encrypt(__m128i B, const __m128i *keys, size_t rounds) {
+                BOOST_ATTRIBUTE_TARGET("ssse3") __m128i aes_ssse3_encrypt(__m128i B, const __m128i *keys, size_t rounds) {
                     const __m128i sb2u = _mm_set_epi32(0x5EB7E955, 0xBC982FCD, 0xE27A93C6, 0x0B712400);
                     const __m128i sb2t = _mm_set_epi32(0xC2A163C8, 0xAB82234A, 0x69EB8840, 0x0AE12900);
 
@@ -209,7 +209,7 @@ namespace nil {
                     }
                 }
 
-                CRYPTO3_FUNC_ISA("ssse3") __m128i aes_ssse3_decrypt(__m128i B, const __m128i *keys, size_t rounds) {
+                BOOST_ATTRIBUTE_TARGET("ssse3") __m128i aes_ssse3_decrypt(__m128i B, const __m128i *keys, size_t rounds) {
                     const __m128i k_dipt1 = _mm_set_epi32(0x154A411E, 0x114E451A, 0x0F505B04, 0x0B545F00);
                     const __m128i k_dipt2 = _mm_set_epi32(0x12771772, 0xF491F194, 0x86E383E6, 0x60056500);
 

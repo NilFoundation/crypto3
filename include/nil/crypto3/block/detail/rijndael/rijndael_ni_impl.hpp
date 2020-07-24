@@ -13,9 +13,10 @@
 
 #include <wmmintrin.h>
 
-#include <nil/crypto3/build.hpp>
+#include <boost/config.hpp>
 
-#include <nil/crypto3/block/detail/utilities/loadstore.hpp>
+#include <nil/crypto3/detail/make_uint_t.hpp>
+#include <nil/crypto3/detail/pack.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -24,7 +25,7 @@ namespace nil {
              * @cond DETAIL_IMPL
              */
             namespace detail {
-                CRYPTO3_FUNC_ISA("ssse3,aes")
+                BOOST_ATTRIBUTE_TARGET("ssse3,aes")
                 __m128i aes_128_key_expansion(__m128i key, __m128i key_with_rcon) {
                     key_with_rcon = _mm_shuffle_epi32(key_with_rcon, _MM_SHUFFLE(3, 3, 3, 3));
                     key = _mm_xor_si128(key, _mm_slli_si128(key, 4));
@@ -33,7 +34,7 @@ namespace nil {
                     return _mm_xor_si128(key, key_with_rcon);
                 }
 
-                CRYPTO3_FUNC_ISA("ssse3,aes")
+                BOOST_ATTRIBUTE_TARGET("ssse3,aes")
 
                 void aes_192_key_expansion(__m128i *K1, __m128i *K2, __m128i key2_with_rcon, uint32_t out[],
                                            bool last) {
@@ -64,7 +65,7 @@ namespace nil {
                 /*
                  * The second half of the AES-256 key expansion (other half same as AES-128)
                  */
-                CRYPTO3_FUNC_ISA("ssse3,aes")
+                BOOST_ATTRIBUTE_TARGET("ssse3,aes")
                 __m128i aes_256_key_expansion(__m128i key, __m128i key2) {
                     __m128i key_with_rcon = _mm_aeskeygenassist_si128(key2, 0x00);
                     key_with_rcon = _mm_shuffle_epi32(key_with_rcon, _MM_SHUFFLE(2, 2, 2, 2));
@@ -90,7 +91,7 @@ namespace nil {
                     BOOST_STATIC_ASSERT(PolicyType::key_bits == 128);
 
                 public:
-                    CRYPTO3_FUNC_ISA("ssse3,aes")
+                    BOOST_ATTRIBUTE_TARGET("ssse3,aes")
                     static block_type encrypt_block(const block_type &plaintext,
                                                     const key_schedule_type &encryption_key) {
                         block_type out = {0};
@@ -131,7 +132,7 @@ namespace nil {
                         return out;
                     }
 
-                    CRYPTO3_FUNC_ISA("ssse3,aes")
+                    BOOST_ATTRIBUTE_TARGET("ssse3,aes")
                     static block_type decrypt_block(const block_type &plaintext,
                                                     const key_schedule_type &decryption_key) {
                         block_type out = {0};
@@ -172,7 +173,7 @@ namespace nil {
                         return out;
                     }
 
-                    CRYPTO3_FUNC_ISA("ssse3,aes")
+                    BOOST_ATTRIBUTE_TARGET("ssse3,aes")
                     static void schedule_key(const key_type &input_key,
                                              key_schedule_type &encryption_key,
                                              key_schedule_type &decryption_key) {
@@ -233,7 +234,7 @@ namespace nil {
                     BOOST_STATIC_ASSERT(PolicyType::key_bits == 192);
 
                 public:
-                    CRYPTO3_FUNC_ISA("ssse3,aes")
+                    BOOST_ATTRIBUTE_TARGET("ssse3,aes")
                     static block_type encrypt_block(const block_type &plaintext,
                                                     const key_schedule_type &encryption_key) {
                         block_type out = {0};
@@ -278,7 +279,7 @@ namespace nil {
                         return out;
                     }
 
-                    CRYPTO3_FUNC_ISA("ssse3,aes")
+                    BOOST_ATTRIBUTE_TARGET("ssse3,aes")
                     static block_type decrypt_block(const block_type &plaintext,
                                                     const key_schedule_type &decryption_key) {
                         block_type out = {0};
@@ -323,7 +324,36 @@ namespace nil {
                         return out;
                     }
 
-                    CRYPTO3_FUNC_ISA("ssse3,aes")
+                    /**
+                     * Load a variable number of little-endian words
+                     * @param out the output array of words
+                     * @param in the input array of bytes
+                     * @param count how many words are in in
+                     */
+                    template<typename T>
+                    static inline void load_le(T out[], const uint8_t in[], size_t count) {
+                        if (count > 0) {
+#if defined(BOOST_ENDIAN_LITTLE_BYTE_AVAILABLE)
+                            std::memcpy(out, in, sizeof(T) * count);
+#elif defined(BOOST_ENDIAN_BIG_BYTE_AVAILABLE)
+                            std::memcpy(out, in, sizeof(T) * count);
+                            const size_t blocks = count - (count % 4);
+                            const size_t left = count - blocks;
+
+                            for (size_t i = 0; i != blocks; i += 4)
+                                bswap_4(out + i);
+
+                            for (size_t i = 0; i != left; ++i)
+                                out[blocks + i] = boost::endian::endian_reverse(out[blocks + i]);
+#else
+                            for (size_t i = 0; i != count; ++i) {
+                                out[i] = load_le<T>(in, i);
+                            }
+#endif
+                        }
+                    }
+
+                    BOOST_ATTRIBUTE_TARGET("ssse3,aes")
                     static void schedule_key(const key_type &input_key,
                                              key_schedule_type &encryption_key,
                                              key_schedule_type &decryption_key) {
@@ -378,7 +408,7 @@ namespace nil {
                     BOOST_STATIC_ASSERT(PolicyType::key_bits == 256);
 
                 public:
-                    CRYPTO3_FUNC_ISA("ssse3,aes")
+                    BOOST_ATTRIBUTE_TARGET("ssse3,aes")
                     static block_type encrypt_block(const block_type &plaintext,
                                                     const key_schedule_type &encryption_key) {
                         block_type out = {0};
@@ -427,7 +457,7 @@ namespace nil {
                         return out;
                     }
 
-                    CRYPTO3_FUNC_ISA("ssse3,aes")
+                    BOOST_ATTRIBUTE_TARGET("ssse3,aes")
                     static block_type decrypt_block(const block_type &plaintext,
                                                     const key_schedule_type &decryption_key) {
                         block_type out = {0};
@@ -476,7 +506,7 @@ namespace nil {
                         return out;
                     }
 
-                    CRYPTO3_FUNC_ISA("ssse3,aes")
+                    BOOST_ATTRIBUTE_TARGET("ssse3,aes")
                     static void schedule_key(const key_type &input_key,
                                              key_schedule_type &encryption_key,
                                              key_schedule_type &decryption_key) {

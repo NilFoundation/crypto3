@@ -51,7 +51,6 @@ include(PlatformConfiguration)
 include(CheckSSE)
 include(CheckAVX)
 
-
 cm_find_package(${CMAKE_WORKSPACE_NAME}_block)
 
 option(BUILD_WITH_CCACHE "Build with ccache usage" TRUE)

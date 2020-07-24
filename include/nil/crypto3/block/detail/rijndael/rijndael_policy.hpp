@@ -17,6 +17,7 @@ namespace nil {
             namespace detail {
                 template<std::size_t KeyBits, std::size_t BlockBits>
                 struct basic_rijndael_policy : rijndael_functions<32, BlockBits> {
+                    constexpr static const std::size_t byte_bits = rijndael_functions<32, BlockBits>::byte_bits;
                     typedef typename rijndael_functions<32, BlockBits>::byte_type byte_type;
 
                     constexpr static const std::size_t word_bits = rijndael_functions<32, BlockBits>::word_bits;
@@ -24,7 +25,7 @@ namespace nil {
                     typedef typename rijndael_functions<32, BlockBits>::word_type word_type;
 
                     constexpr static const std::size_t block_bits = BlockBits;
-                    constexpr static const std::size_t block_bytes = BlockBits / CHAR_BIT;
+                    constexpr static const std::size_t block_bytes = BlockBits / byte_bits;
                     constexpr static const std::size_t block_words = block_bits / word_bits;
                     typedef std::array<byte_type, block_bytes> block_type;
 
@@ -36,7 +37,7 @@ namespace nil {
                     constexpr static const std::size_t round_constants_size = 30;
                     typedef std::array<byte_type, round_constants_size> round_constants_type;
 
-                    BOOST_ALIGNAS(64) constexpr static const round_constants_type round_constants = {
+                    BOOST_ALIGNMENT(64) constexpr static const round_constants_type round_constants = {
                         0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36, 0x6c, 0xd8, 0xab, 0x4d, 0x9a,
                         0x2f, 0x5e, 0xbc, 0x63, 0xc6, 0x97, 0x35, 0x6a, 0xd4, 0xb3, 0x7d, 0xfa, 0xef, 0xc5, 0x91};
 
@@ -65,7 +66,7 @@ namespace nil {
                     typedef typename rijndael_functions<32, block_bits>::prefetched_constants_type
                         prefetched_constants_type;
 
-                    BOOST_ALIGNAS(64) constexpr static const constants_type constants = {
+                    BOOST_ALIGNMENT(64) constexpr static const constants_type constants = {
                         0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5, 0x30, 0x01, 0x67, 0x2b, 0xfe, 0xd7, 0xab, 0x76,
                         0xca, 0x82, 0xc9, 0x7d, 0xfa, 0x59, 0x47, 0xf0, 0xad, 0xd4, 0xa2, 0xaf, 0x9c, 0xa4, 0x72, 0xc0,
                         0xb7, 0xfd, 0x93, 0x26, 0x36, 0x3f, 0xf7, 0xcc, 0x34, 0xa5, 0xe5, 0xf1, 0x71, 0xd8, 0x31, 0x15,
@@ -83,7 +84,7 @@ namespace nil {
                         0xe1, 0xf8, 0x98, 0x11, 0x69, 0xd9, 0x8e, 0x94, 0x9b, 0x1e, 0x87, 0xe9, 0xce, 0x55, 0x28, 0xdf,
                         0x8c, 0xa1, 0x89, 0x0d, 0xbf, 0xe6, 0x42, 0x68, 0x41, 0x99, 0x2d, 0x0f, 0xb0, 0x54, 0xbb, 0x16};
 
-                    BOOST_ALIGNAS(64) constexpr static constants_type const inverted_constants = {
+                    BOOST_ALIGNMENT(64) constexpr static constants_type const inverted_constants = {
                         0x52, 0x09, 0x6a, 0xd5, 0x30, 0x36, 0xa5, 0x38, 0xbf, 0x40, 0xa3, 0x9e, 0x81, 0xf3, 0xd7, 0xfb,
                         0x7c, 0xe3, 0x39, 0x82, 0x9b, 0x2f, 0xff, 0x87, 0x34, 0x8e, 0x43, 0x44, 0xc4, 0xde, 0xe9, 0xcb,
                         0x54, 0x7b, 0x94, 0x32, 0xa6, 0xc2, 0x23, 0x3d, 0xee, 0x4c, 0x95, 0x0b, 0x42, 0xfa, 0xc3, 0x4e,
@@ -103,15 +104,15 @@ namespace nil {
                 };
 
                 template<std::size_t KeyBits, std::size_t BlockBits>
-                BOOST_ALIGNAS(64) constexpr typename basic_rijndael_policy<KeyBits, BlockBits>::round_constants_type const
+                BOOST_ALIGNMENT(64) constexpr typename basic_rijndael_policy<KeyBits, BlockBits>::round_constants_type const
                     basic_rijndael_policy<KeyBits, BlockBits>::round_constants;
 
                 template<std::size_t KeyBits, std::size_t BlockBits>
-                BOOST_ALIGNAS(64) constexpr typename basic_rijndael_policy<KeyBits, BlockBits>::constants_type const
+                BOOST_ALIGNMENT(64) constexpr typename basic_rijndael_policy<KeyBits, BlockBits>::constants_type const
                     basic_rijndael_policy<KeyBits, BlockBits>::constants;
 
                 template<std::size_t KeyBits, std::size_t BlockBits>
-                BOOST_ALIGNAS(64) constexpr typename basic_rijndael_policy<KeyBits, BlockBits>::constants_type const
+                BOOST_ALIGNMENT(64) constexpr typename basic_rijndael_policy<KeyBits, BlockBits>::constants_type const
                     basic_rijndael_policy<KeyBits, BlockBits>::inverted_constants;
 
                 template<std::size_t KeyBits, std::size_t BlockBits>

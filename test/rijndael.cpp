@@ -207,11 +207,13 @@ BOOST_AUTO_TEST_SUITE(rijndael_stream_processor_data_driven_test_suite)
 
 BOOST_AUTO_TEST_CASE(rijndael_128_128_1) {
 
-    std::vector<char> input = {'\x00', '\x11', '\x22', '\x33', '\x44', '\x55', '\x66', '\x77', '\x88', '\x99', '\xaa', '\xbb', '\xcc', '\xdd', '\xee', '\xff'};
-    std::vector<char> key = {'\x00', '\x01', '\x02', '\x03', '\x04', '\x05', '\x06', '\x07', '\x08', '\x09', '\x0a', '\x0b', '\x0c', '\x0d', '\x0e', '\x0f'};
+    std::vector<char> input = {'\x00', '\x11', '\x22', '\x33', '\x44', '\x55', '\x66', '\x77',
+                               '\x88', '\x99', '\xaa', '\xbb', '\xcc', '\xdd', '\xee', '\xff'};
+    std::vector<char> key = {'\x00', '\x01', '\x02', '\x03', '\x04', '\x05', '\x06', '\x07',
+                             '\x08', '\x09', '\x0a', '\x0b', '\x0c', '\x0d', '\x0e', '\x0f'};
 
     std::string out = encrypt<block::rijndael<128, 128>>(input, key);
-    
+
     BOOST_CHECK_EQUAL(out, "69c4e0d86a7b0430d8cdb78070b4c55a");
 }
 
@@ -223,7 +225,7 @@ BOOST_AUTO_TEST_CASE(rijndael_128_128_2) {
     byte_string bk(key), bi(input);
 
     std::string out = encrypt<block::rijndael<128, 128>>(bi, bk);
-    
+
     BOOST_CHECK_EQUAL(out, "69c4e0d86a7b0430d8cdb78070b4c55a");
 }
 
@@ -231,8 +233,8 @@ BOOST_DATA_TEST_CASE(rijndael_128_128, string_data("key_128_block_128"), triples
 
     byte_string const p(triples.first);
 
-    BOOST_FOREACH(boost::property_tree::ptree::value_type pair, triples.second) {
-        byte_string const k(pair.first); 
+    BOOST_FOREACH (boost::property_tree::ptree::value_type pair, triples.second) {
+        byte_string const k(pair.first);
 
         std::string out = encrypt<block::rijndael<128, 128>>(p, k);
 
@@ -240,14 +242,13 @@ BOOST_DATA_TEST_CASE(rijndael_128_128, string_data("key_128_block_128"), triples
     }
 }
 
-
-BOOST_DATA_TEST_CASE(rijndael_160_128, string_data("key_160_block_128"), triples) {
+ BOOST_DATA_TEST_CASE(rijndael_160_128, string_data("key_160_block_128"), triples) {
 
     byte_string const p(triples.first);
 
     BOOST_FOREACH(boost::property_tree::ptree::value_type pair, triples.second) {
-        byte_string const k(pair.first); 
-        
+        byte_string const k(pair.first);
+
         std::string out = encrypt<block::rijndael<160, 128>>(p, k);
 
         BOOST_CHECK_EQUAL(out, pair.second.data());
@@ -255,39 +256,39 @@ BOOST_DATA_TEST_CASE(rijndael_160_128, string_data("key_160_block_128"), triples
 }
 
 
-BOOST_DATA_TEST_CASE(rijndael_192_128, string_data("key_192_block_128"), triples) {
+ BOOST_DATA_TEST_CASE(rijndael_192_128, string_data("key_192_block_128"), triples) {
 
     byte_string const p(triples.first);
 
     BOOST_FOREACH(boost::property_tree::ptree::value_type pair, triples.second) {
-        byte_string const k(pair.first); 
-        
+        byte_string const k(pair.first);
+
         std::string out = encrypt<block::rijndael<192, 128>>(p, k);
 
         BOOST_CHECK_EQUAL(out, pair.second.data());
     }
 }
 
-BOOST_DATA_TEST_CASE(rijndael_224_128, string_data("key_224_block_128"), triples) {
+ BOOST_DATA_TEST_CASE(rijndael_224_128, string_data("key_224_block_128"), triples) {
 
     byte_string const p(triples.first);
 
     BOOST_FOREACH(boost::property_tree::ptree::value_type pair, triples.second) {
-        byte_string const k(pair.first); 
-        
+        byte_string const k(pair.first);
+
         std::string out = encrypt<block::rijndael<224, 128>>(p, k);
 
         BOOST_CHECK_EQUAL(out, pair.second.data());
     }
 }
 
-BOOST_DATA_TEST_CASE(rijndael_256_128, string_data("key_256_block_128"), triples) {
+ BOOST_DATA_TEST_CASE(rijndael_256_128, string_data("key_256_block_128"), triples) {
 
     byte_string const p(triples.first);
 
     BOOST_FOREACH(boost::property_tree::ptree::value_type pair, triples.second) {
-        byte_string const k(pair.first); 
-        
+        byte_string const k(pair.first);
+
         std::string out = encrypt<block::rijndael<256, 128>>(p, k);
 
         BOOST_CHECK_EQUAL(out, pair.second.data());
@@ -296,70 +297,80 @@ BOOST_DATA_TEST_CASE(rijndael_256_128, string_data("key_256_block_128"), triples
 
 BOOST_AUTO_TEST_SUITE_END()
 
-/*  NIST SP 800-38A AES tests 
+/*  NIST SP 800-38A AES tests
     https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38a.pdf */
 
 BOOST_AUTO_TEST_SUITE(aes_stream_processor_test_suite)
 // F.1.1, F.1.2
 BOOST_AUTO_TEST_CASE(aes_128_cipher_usage) {
 
-    std::string input = "\x6b\xc1\xbe\xe2\x2e\x40\x9f\x96\xe9\x3d\x7e\x11\x73\x93\x17\x2a\xae\x2d\x8a\x57\x1e\x03\xac\x9c\x9e\xb7\x6f\xac\x45\xaf\x8e\x51"
-                        "\x30\xc8\x1c\x46\xa3\x5c\xe4\x11\xe5\xfb\xc1\x19\x1a\x0a\x52\xef\xf6\x9f\x24\x45\xdf\x4f\x9b\x17\xad\x2b\x41\x7b\xe6\x6c\x37\x10";
+    std::string input =
+        "\x6b\xc1\xbe\xe2\x2e\x40\x9f\x96\xe9\x3d\x7e\x11\x73\x93\x17\x2a\xae\x2d\x8a\x57\x1e\x03\xac\x9c\x9e\xb7\x6f"
+        "\xac\x45\xaf\x8e\x51"
+        "\x30\xc8\x1c\x46\xa3\x5c\xe4\x11\xe5\xfb\xc1\x19\x1a\x0a\x52\xef\xf6\x9f\x24\x45\xdf\x4f\x9b\x17\xad\x2b\x41"
+        "\x7b\xe6\x6c\x37\x10";
 
     std::string key = "\x2b\x7e\x15\x16\x28\xae\xd2\xa6\xab\xf7\x15\x88\x09\xcf\x4f\x3c";
 
     std::string out = encrypt<block::aes<128>>(input, key);
-    
-    BOOST_CHECK_EQUAL(out, "3ad77bb40d7a3660a89ecaf32466ef97f5d3d58503b9699de785895a96fdbaaf"
-                            "43b1cd7f598ece23881b00e3ed0306887b0c785e27e8ad3f8223207104725dd4");
+
+    BOOST_CHECK_EQUAL(out,
+                      "3ad77bb40d7a3660a89ecaf32466ef97f5d3d58503b9699de785895a96fdbaaf"
+                      "43b1cd7f598ece23881b00e3ed0306887b0c785e27e8ad3f8223207104725dd4");
 }
 
 BOOST_AUTO_TEST_CASE(aes_128_cipher) {
 
-    std::string input = "6bc1bee22e409f96e93d7e117393172aae2d8a571e03ac9c9eb76fac45af8e51"
-                        "30c81c46a35ce411e5fbc1191a0a52eff69f2445df4f9b17ad2b417be66c3710";
+    std::string input =
+        "6bc1bee22e409f96e93d7e117393172aae2d8a571e03ac9c9eb76fac45af8e51"
+        "30c81c46a35ce411e5fbc1191a0a52eff69f2445df4f9b17ad2b417be66c3710";
 
     std::string key = "2b7e151628aed2a6abf7158809cf4f3c";
 
     byte_string bk(key), bi(input);
 
     std::string out = encrypt<block::aes<128>>(bi, bk);
-    
-    BOOST_CHECK_EQUAL(out, "3ad77bb40d7a3660a89ecaf32466ef97f5d3d58503b9699de785895a96fdbaaf"
-                            "43b1cd7f598ece23881b00e3ed0306887b0c785e27e8ad3f8223207104725dd4");
+
+    BOOST_CHECK_EQUAL(out,
+                      "3ad77bb40d7a3660a89ecaf32466ef97f5d3d58503b9699de785895a96fdbaaf"
+                      "43b1cd7f598ece23881b00e3ed0306887b0c785e27e8ad3f8223207104725dd4");
 }
 
 // F.1.3, F.1.4
 BOOST_AUTO_TEST_CASE(aes_192_cipher) {
-    std::string input = "6bc1bee22e409f96e93d7e117393172aae2d8a571e03ac9c9eb76fac45af8e51"
-                        "30c81c46a35ce411e5fbc1191a0a52eff69f2445df4f9b17ad2b417be66c3710";
+    std::string input =
+        "6bc1bee22e409f96e93d7e117393172aae2d8a571e03ac9c9eb76fac45af8e51"
+        "30c81c46a35ce411e5fbc1191a0a52eff69f2445df4f9b17ad2b417be66c3710";
 
     std::string key = "8e73b0f7da0e6452c810f32b809079e562f8ead2522c6b7b";
 
     byte_string bk(key), bi(input);
 
     std::string out = encrypt<block::aes<192>>(bi, bk);
-    
-    BOOST_CHECK_EQUAL(out, "bd334f1d6e45f25ff712a214571fa5cc974104846d0ad3ad7734ecb3ecee4eef"
-                            "ef7afd2270e2e60adce0ba2face6444e9a4b41ba738d6c72fb16691603c18e0e");
+
+    BOOST_CHECK_EQUAL(out,
+                      "bd334f1d6e45f25ff712a214571fa5cc974104846d0ad3ad7734ecb3ecee4eef"
+                      "ef7afd2270e2e60adce0ba2face6444e9a4b41ba738d6c72fb16691603c18e0e");
 }
 
 // F.1.5, F.1.6
 BOOST_AUTO_TEST_CASE(aes_256_cipher) {
-    std::string input = "6bc1bee22e409f96e93d7e117393172aae2d8a571e03ac9c9eb76fac45af8e51"
-                        "30c81c46a35ce411e5fbc1191a0a52eff69f2445df4f9b17ad2b417be66c3710";
+    std::string input =
+        "6bc1bee22e409f96e93d7e117393172aae2d8a571e03ac9c9eb76fac45af8e51"
+        "30c81c46a35ce411e5fbc1191a0a52eff69f2445df4f9b17ad2b417be66c3710";
 
     std::string key = "603deb1015ca71be2b73aef0857d77811f352c073b6108d72d9810a30914dff4";
 
     byte_string bk(key), bi(input);
 
     std::string out = encrypt<block::aes<256>>(bi, bk);
-    
-    BOOST_CHECK_EQUAL(out, "f3eed1bdb5d2a03c064b5a7e3db181f8591ccb10d410ed26dc5ba74a31362870"
-                            "b6ed21b99ca6f4f9f153e7b1beafed1d23304b7a39f9f3ff067d8d8f9e24ecc7");
+
+    BOOST_CHECK_EQUAL(out,
+                      "f3eed1bdb5d2a03c064b5a7e3db181f8591ccb10d410ed26dc5ba74a31362870"
+                      "b6ed21b99ca6f4f9f153e7b1beafed1d23304b7a39f9f3ff067d8d8f9e24ecc7");
 }
 
-BOOST_AUTO_TEST_SUITE_END() 
+BOOST_AUTO_TEST_SUITE_END()
 
 /*
 BOOST_AUTO_TEST_SUITE(aes_various_containers_test_suite)
@@ -390,7 +401,7 @@ BOOST_AUTO_TEST_CASE(aes_128_with_array_16) {
 }
 
 BOOST_AUTO_TEST_CASE(aes_128_with_array_8) {
-    std::array<uint8_t, 16> const k = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 
+    std::array<uint8_t, 16> const k = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a,
                                        0x0b, 0x0c, 0x0d, 0x0e, 0x0f};
     std::array<uint8_t, 16> const p = {0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa,
                                        0xbb, 0xcc, 0xdd, 0xee, 0xff};

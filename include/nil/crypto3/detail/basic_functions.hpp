@@ -19,7 +19,8 @@ namespace nil {
         namespace detail {
             template<std::size_t WordBits>
             struct basic_functions {
-                typedef typename boost::uint_t<CHAR_BIT>::exact byte_type;
+                constexpr static const std::size_t byte_bits = CHAR_BIT;
+                typedef typename boost::uint_t<byte_bits>::exact byte_type;
 
                 constexpr static const std::size_t word_bits = WordBits;
                 typedef typename boost::uint_t<word_bits>::exact word_type;
@@ -65,7 +66,8 @@ namespace nil {
 
             template<>
             struct basic_functions<32> {
-                typedef typename boost::uint_t<CHAR_BIT>::exact byte_type;
+                constexpr static const std::size_t byte_bits = CHAR_BIT;
+                typedef typename boost::uint_t<byte_bits>::exact byte_type;
 
                 constexpr static const std::size_t word_bits = 32;
                 typedef typename boost::uint_t<word_bits>::exact word_type;
