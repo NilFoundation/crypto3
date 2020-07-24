@@ -2,7 +2,7 @@
 #include <nil/crypto3/utilities/memory_operations.hpp>
 #include <nil/crypto3/utilities/loadstore.hpp>
 
-#if defined(CRYPTO3_TARGET_CPU_IS_X86_FAMILY)
+#if defined(BOOST_ARCH_X86)
 
 #if defined(CRYPTO3_BUILD_COMPILER_IS_MSVC)
 #include <intrin.h>
@@ -17,7 +17,7 @@
 namespace nil {
     namespace crypto3 {
 
-#if defined(CRYPTO3_TARGET_CPU_IS_X86_FAMILY)
+#if defined(BOOST_ARCH_X86)
 
         uint64_t cpuid::detect_cpu_features(size_t *cache_line_size) {
 #if defined(CRYPTO3_BUILD_COMPILER_IS_MSVC)

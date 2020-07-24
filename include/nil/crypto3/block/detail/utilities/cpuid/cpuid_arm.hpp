@@ -1,6 +1,6 @@
 #include <nil/crypto3/utilities/cpuid/cpuid.hpp>
 
-#if defined(CRYPTO3_TARGET_CPU_IS_ARM_FAMILY)
+#if defined(BOOST_ARCH_ARM)
 
 #if defined(CRYPTO3_TARGET_OS_HAS_GETAUXVAL)
 #include <sys/auxv.h>
@@ -19,7 +19,7 @@
 namespace nil {
     namespace crypto3 {
 
-#if defined(CRYPTO3_TARGET_CPU_IS_ARM_FAMILY)
+#if defined(BOOST_ARCH_ARM)
 
 #if defined(CRYPTO3_TARGET_OS_IS_IOS)
 

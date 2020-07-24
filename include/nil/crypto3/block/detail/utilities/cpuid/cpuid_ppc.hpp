@@ -1,7 +1,7 @@
 #include <nil/crypto3/utilities/cpuid/cpuid.hpp>
 #include <nil/crypto3/utilities/os_utils.hpp>
 
-#if defined(CRYPTO3_TARGET_CPU_IS_PPC_FAMILY)
+#if defined(BOOST_ARCH_PPC)
 
 /*
  * On Darwin and OpenBSD ppc, use sysctl to detect AltiVec
@@ -21,7 +21,7 @@
 namespace nil {
     namespace crypto3 {
 
-#if defined(CRYPTO3_TARGET_CPU_IS_PPC_FAMILY)
+#if defined(BOOST_ARCH_PPC)
 
         /*
          * PowerPC specific block: check for AltiVec using either

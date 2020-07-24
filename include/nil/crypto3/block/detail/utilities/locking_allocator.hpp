@@ -32,7 +32,7 @@ namespace nil {
                 return m_pool->allocate(n);
             }
 
-            bool deallocate(void *p, size_t num_elems, size_t elem_size) CRYPTO3_NOEXCEPT {
+            bool deallocate(void *p, size_t num_elems, size_t elem_size) BOOST_NOEXCEPT {
                 if (!m_pool) {
                     return false;
                 }

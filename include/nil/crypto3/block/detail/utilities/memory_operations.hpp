@@ -12,8 +12,6 @@
 #include <cstring>
 #include <vector>
 
-#include <nil/crypto3/build.hpp>
-
 #ifdef CRYPTO3_HAS_LOCKING_ALLOCATOR
 
 #include <nil/crypto3/block/detail/utilities/locking_allocator.hpp>

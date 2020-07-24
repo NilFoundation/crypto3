@@ -131,7 +131,7 @@ namespace nil {
                 return nullptr;
             }
 
-            bool deallocate(void *p, std::size_t n) CRYPTO3_NOEXCEPT {
+            bool deallocate(void *p, std::size_t n) BOOST_NOEXCEPT {
                 if (!detail::ptr_in_pool(m_pool, m_pool_size, p, n)) {
                     return false;
                 }

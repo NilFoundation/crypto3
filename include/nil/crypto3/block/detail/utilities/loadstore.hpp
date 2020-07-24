@@ -13,7 +13,7 @@
 #define CRYPTO3_ENDIAN_N2B(x) (x)
 #define CRYPTO3_ENDIAN_B2N(x) (x)
 
-#elif defined(CRYPTO3_TARGET_CPU_IS_LITTLE_ENDIAN)
+#elif defined(BOOST_ENDIAN_LITTLE_BYTE_AVAILABLE)
 #define CRYPTO3_ENDIAN_N2L(x) (x)
 #define CRYPTO3_ENDIAN_L2N(x) (x)
 #define CRYPTO3_ENDIAN_N2B(x) boost::endian::endian_reverse(x)
@@ -263,7 +263,7 @@ namespace nil {
         template<typename T>
         inline void load_le(T out[], const uint8_t in[], size_t count) {
             if (count > 0) {
-#if defined(CRYPTO3_TARGET_CPU_IS_LITTLE_ENDIAN)
+#if defined(BOOST_ENDIAN_LITTLE_BYTE_AVAILABLE)
                 std::memcpy(out, in, sizeof(T) * count);
 #elif defined(BOOST_ENDIAN_BIG_BYTE_AVAILABLE)
                 std::memcpy(out, in, sizeof(T) * count);
@@ -347,7 +347,7 @@ namespace nil {
 #if defined(CRYPTO3_TARGET_CPU_IS_BIG_ENDIAN)
                 std::memcpy(out, in, sizeof(T) * count);
 
-#elif defined(CRYPTO3_TARGET_CPU_IS_LITTLE_ENDIAN)
+#elif defined(BOOST_ENDIAN_LITTLE_BYTE_AVAILABLE)
                 std::memcpy(out, in, sizeof(T) * count);
                 const size_t blocks = count - (count % 4);
                 const size_t left = count - blocks;

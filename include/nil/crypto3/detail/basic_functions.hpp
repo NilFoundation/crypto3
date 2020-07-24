@@ -62,6 +62,62 @@ namespace nil {
                     return shl<n>(x) | shr<word_bits - n>(x);
                 }
             };
+
+            template<>
+            struct basic_functions<32> {
+                typedef typename boost::uint_t<CHAR_BIT>::exact byte_type;
+
+                constexpr static const std::size_t word_bits = 32;
+                typedef typename boost::uint_t<word_bits>::exact word_type;
+
+                static inline word_type shr(word_type x, std::size_t n) {
+                    return x >> n;
+                }
+
+                template<std::size_t n>
+                static inline word_type shr(word_type x) {
+                    BOOST_STATIC_ASSERT(n < word_bits);
+                    return x >> n;
+                }
+
+                static inline word_type shl(word_type x, std::size_t n) {
+                    return x << n;
+                }
+
+                template<std::size_t n>
+                static inline word_type shl(word_type x) {
+                    BOOST_STATIC_ASSERT(n < word_bits);
+                    return x << n;
+                }
+
+                static inline word_type rotr(word_type x, std::size_t n) {
+#if defined(BOOST_ARCH_X86)
+                    asm("rorl %1,%0" : "+r"(x) : "c"(static_cast<uint8_t>(n)));
+                    return x;
+#else
+                    return shr(x, n) | shl(x, word_bits - n);
+#endif
+                }
+
+                template<std::size_t n>
+                static inline word_type rotr(word_type x) {
+                    return shr<n>(x) | shl<word_bits - n>(x);
+                }
+
+                static inline word_type rotl(word_type x, std::size_t n) {
+#if defined(BOOST_ARCH_X86)
+                    asm("roll %1,%0" : "+r"(x) : "c"(static_cast<uint8_t>(n)));
+                    return x;
+#else
+                    return shl(x, n) | shr(x, word_bits - n);
+#endif
+                }
+
+                template<std::size_t n>
+                static inline word_type rotl(word_type x) {
+                    return shl<n>(x) | shr<word_bits - n>(x);
+                }
+            };
         }    // namespace detail
     }        // namespace crypto3
 }    // namespace nil

@@ -50,18 +50,18 @@ namespace nil {
             }
 #else
 
-            secure_allocator() CRYPTO3_NOEXCEPT = default;
+            secure_allocator() BOOST_NOEXCEPT = default;
 
-            secure_allocator(const secure_allocator &) CRYPTO3_NOEXCEPT = default;
+            secure_allocator(const secure_allocator &) BOOST_NOEXCEPT = default;
 
-            secure_allocator &operator=(const secure_allocator &) CRYPTO3_NOEXCEPT = default;
+            secure_allocator &operator=(const secure_allocator &) BOOST_NOEXCEPT = default;
 
-            ~secure_allocator() CRYPTO3_NOEXCEPT = default;
+            ~secure_allocator() BOOST_NOEXCEPT = default;
 
 #endif
 
             template<typename U>
-            secure_allocator(const secure_allocator<U> &) CRYPTO3_NOEXCEPT {
+            secure_allocator(const secure_allocator<U> &) BOOST_NOEXCEPT {
             }
 
             T *allocate(std::size_t n) {

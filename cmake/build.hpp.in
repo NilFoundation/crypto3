@@ -163,7 +163,7 @@ Each read generates 32 bits of output
 
 /* Target identification and feature test macros */
 
-#if defined(CRYPTO3_TARGET_CPU_IS_LITTLE_ENDIAN) || \
+#if defined(BOOST_ENDIAN_LITTLE_BYTE_AVAILABLE) || \
     defined(CRYPTO3_TARGET_CPU_IS_BIG_ENDIAN)
 #define CRYPTO3_TARGET_CPU_HAS_KNOWN_ENDIANNESS
 #endif
@@ -190,9 +190,9 @@ Each read generates 32 bits of output
 #if defined(_MSC_VER) && (_MSC_VER < 1900)
 // noexcept is not supported in VS 2013
 #include <yvals.h>
-#define CRYPTO3_NOEXCEPT _NOEXCEPT
+#define BOOST_NOEXCEPT _NOEXCEPT
 #else
-#define CRYPTO3_NOEXCEPT noexcept
+#define BOOST_NOEXCEPT noexcept
 #endif
 
 /*
@@ -353,14 +353,14 @@ Each read generates 32 bits of output
 #endif
 
 /*
-* Define CRYPTO3_NOEXCEPT (for MSVC 2013)
+* Define BOOST_NOEXCEPT (for MSVC 2013)
 */
 #if defined(CRYPTO3_BUILD_COMPILER_IS_MSVC_2013)
 // noexcept is not supported in VS 2013
 #include <yvals.h>
-#define CRYPTO3_NOEXCEPT _NOEXCEPT
+#define BOOST_NOEXCEPT _NOEXCEPT
 #else
-#define CRYPTO3_NOEXCEPT noexcept
+#define BOOST_NOEXCEPT noexcept
 #endif
 
 /*
@@ -369,7 +369,7 @@ Each read generates 32 bits of output
 #if defined(CRYPTO3_BUILD_COMPILER_IS_MSVC_2013)
 #define CRYPTO3_ALIGNAS(n) /**/
 #else
-#define CRYPTO3_ALIGNAS(n) alignas(n)
+#define CRYPTO3_ALIGNAS(n) BOOST_ALIGNAS(n)
 #endif
 
 /*
