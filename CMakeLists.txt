@@ -505,8 +505,8 @@ endif()
 
 target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
 
-                      boost_config
-                      boost_predef
+                      $<TARGET_NAME_IF_EXISTS:boost_config>
+                      $<TARGET_NAME_IF_EXISTS:boost_predef>
 
                       ${Boost_LIBRARIES})
 

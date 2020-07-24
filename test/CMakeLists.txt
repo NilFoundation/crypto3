@@ -15,8 +15,8 @@ endif()
 cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
                        ${Boost_LIBRARIES}
 
-                       boost_config
-                       boost_predef)
+                       $<TARGET_NAME_IF_EXISTS:boost_config>
+                       $<TARGET_NAME_IF_EXISTS:boost_predef>)
 
 macro(define_block_cipher_test name)
     cm_test(NAME block_${name}_test SOURCES ${name}.cpp)
