@@ -10,6 +10,8 @@
 #ifndef CRYPTO3_STREAM_CHACHA_SSE2_IMPL_HPP
 #define CRYPTO3_STREAM_CHACHA_SSE2_IMPL_HPP
 
+#include <boost/config.hpp>
+
 #include <nil/crypto3/stream/detail/chacha/chacha_policy.hpp>
 
 #include <emmintrin.h>
@@ -36,7 +38,7 @@ namespace nil {
                         chacha_x4(&output[64 * 4], schedule);
                     }
 
-                    CRYPTO3_FUNC_ISA("sse2")
+                    BOOST_ATTRIBUTE_TARGET("sse2")
                     static void chacha_x4(uint8_t output[64 * 4], key_schedule_type &schedule) {
                         const __m128i *input_mm = reinterpret_cast<const __m128i *>(input);
                         __m128i *output_mm = reinterpret_cast<__m128i *>(output);

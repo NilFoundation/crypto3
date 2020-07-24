@@ -9,7 +9,7 @@
 #ifndef CRYPTO3_STREAM_CHACHA_AVX2_IMPL_HPP
 #define CRYPTO3_STREAM_CHACHA_AVX2_IMPL_HPP
 
-#include <nil/crypto3/build.hpp>
+#include <boost/config.hpp>
 
 #include <nil/crypto3/stream/detail/chacha/chacha_policy.hpp>
 
@@ -32,7 +32,7 @@ namespace nil {
                     constexpr static const std::size_t min_key_schedule_size = policy_type::key_schedule_size;
                     typedef typename policy_type::key_schedule_type key_schedule_type;
 
-                    CRYPTO3_FUNC_ISA("avx2")
+                    BOOST_ATTRIBUTE_TARGET("avx2")
                     static void chacha_x8(uint8_t output[64 * 8], key_schedule_type& schedule) {
                         _mm256_zeroupper();
 
