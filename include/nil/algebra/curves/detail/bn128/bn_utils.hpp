@@ -12,8 +12,6 @@
 
 #include <vector>
 
-#include <nil/cas/pairing/include/bn.h>
-
 namespace nil {
     namespace algebra {
 

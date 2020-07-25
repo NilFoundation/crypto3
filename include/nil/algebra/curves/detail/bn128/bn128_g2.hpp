@@ -12,10 +12,8 @@
 
 #include <vector>
 
-#include <nil/cas/pairing/include/bn.h>
-
-#include <nil/algebra/curves/bn128/bn128_init.hpp>
-#include <nil/algebra/curves/bn128/bn_utils.hpp>
+#include <nil/algebra/curves/detail/bn128/bn128_init.hpp>
+#include <nil/algebra/curves/detail/bn128/bn_utils.hpp>
 
 #include <boost/multiprecision/cpp_int/multiply.hpp>
 #include <boost/multiprecision/modular/base_params.hpp>

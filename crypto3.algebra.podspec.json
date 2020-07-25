@@ -1,12 +1,13 @@
 {
-  "name": "cas.algebra",
+  "name": "crypto3.algebra",
   "version": "0.1.0",
   "summary": "=nil; Foundation C++ Computer Algebra System Finite Fields and Elliptic Curves",
-  "description": "CAS.FFT library extends the =nil; Foundation's computer algebra system and provides a set of Finite Fields and Elliptic Curves evaluation algorithms implemented in way C++ standard library implies: concepts, algorithms, predictable behavior, latest standard features support and clean architecture without compromising security and performance.",
+  "description": "Algebra system provides a set of Finite Fields, Elliptic Curves and Pairings evaluation algorithms implemented in way C++ standard library implies: concepts, algorithms, predictable behavior, latest standard features support and clean architecture without compromising security and performance.",
   "homepage": "http://crypto3.nil.foundation/projects/crypto3",
   "license": "Boost Software License",
   "authors": {
-    "Mikhail Komarov": "nemo@nil.foundation"
+    "Mikhail Komarov": "nemo@nil.foundation",
+    "Nikita Kaskov": "nbering@nil.foundation"
   },
   "platforms": {
     "ios": "5.0",

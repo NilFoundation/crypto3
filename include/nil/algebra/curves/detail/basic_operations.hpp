@@ -31,7 +31,7 @@ namespace nil {
         using sub = basic_operations<NumberType, Curve>::sub;
 
         template<typename NumberType, typename Curve>
-        using double_of = basic_operations<NumberType, Curve>::double;
+        using double_of = basic_operations<NumberType, Curve>::double_of;
 
         template<typename NumberType, typename Curve>
         using mul = basic_operations<NumberType, Curve>::mul;

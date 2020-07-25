@@ -10,12 +10,11 @@
 #ifndef ALGEBRA_FF_BN128_PP_HPP
 #define ALGEBRA_FF_BN128_PP_HPP
 
-#include <nil/algebra/curves/bn128/bn128_g1.hpp>
-#include <nil/algebra/curves/bn128/bn128_g2.hpp>
-#include <nil/algebra/curves/bn128/bn128_gt.hpp>
-#include <nil/algebra/curves/bn128/bn128_init.hpp>
-#include <nil/algebra/curves/bn128/bn128_pairing.hpp>
-#include <nil/algebra/curves/public_params.hpp>
+#include <nil/algebra/curves/detail/bn128/bn128_g1.hpp>
+#include <nil/algebra/curves/detail/bn128/bn128_g2.hpp>
+#include <nil/algebra/curves/detail/bn128/bn128_gt.hpp>
+#include <nil/algebra/curves/detail/bn128/bn128_init.hpp>
+#include <nil/algebra/curves/detail/bn128/bn128_pairing.hpp>
 
 namespace nil {
     namespace algebra {

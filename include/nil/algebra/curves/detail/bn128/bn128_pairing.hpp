@@ -12,12 +12,10 @@
 
 #include <sstream>
 
-#include <nil/cas/pairing/include/bn.h>
-
-#include <nil/algebra/curves/bn128/bn128_g1.hpp>
-#include <nil/algebra/curves/bn128/bn128_g2.hpp>
-#include <nil/algebra/curves/bn128/bn128_gt.hpp>
-#include <nil/algebra/curves/bn128/bn128_init.hpp>
+#include <nil/algebra/curves/detail/bn128/bn128_g1.hpp>
+#include <nil/algebra/curves/detail/bn128/bn128_g2.hpp>
+#include <nil/algebra/curves/detail/bn128/bn128_gt.hpp>
+#include <nil/algebra/curves/detail/bn128/bn128_init.hpp>
 
 namespace nil {
     namespace algebra {

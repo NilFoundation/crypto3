@@ -12,11 +12,10 @@
 
 #include <nil/algebra/pairing/include/bn.h>
 
-#include <nil/algebra/curves/bn128/bn128_g1.hpp>
-#include <nil/algebra/curves/bn128/bn128_g2.hpp>
-#include <nil/algebra/curves/bn128/bn128_gt.hpp>
+#include <nil/algebra/curves/detail/bn128/bn128_g1.hpp>
+#include <nil/algebra/curves/detail/bn128/bn128_g2.hpp>
+#include <nil/algebra/curves/detail/bn128/bn128_gt.hpp>
 
-#include <nil/algebra/curves/public_params.hpp>
 #include <nil/algebra/fields/fp.hpp>
 
 #include <boost/multiprecision/modular/base_params.hpp>

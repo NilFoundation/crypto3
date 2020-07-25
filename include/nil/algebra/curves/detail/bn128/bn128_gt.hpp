@@ -10,9 +10,6 @@
 #ifndef ALGEBRA_FF_BN128_GT_HPP
 #define ALGEBRA_FF_BN128_GT_HPP
 
-#include <nil/cas/pairing/include/bn.h>
-
-#include <nil/algebra/fields/field_utils.hpp>
 #include <nil/algebra/fields/fp.hpp>
 
 #include <boost/multiprecision/modular/base_params.hpp>

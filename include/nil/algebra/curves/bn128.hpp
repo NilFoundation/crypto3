@@ -10,7 +10,7 @@
 #ifndef ALGEBRA_PAIRING_BN128_HPP
 #define ALGEBRA_PAIRING_BN128_HPP
 
-#include <nil/algebra/curves/fp_curve.hpp>
+#include <nil/algebra/curves/curbe_gfp.hpp>
 
 namespace nil {
     namespace algebra {
