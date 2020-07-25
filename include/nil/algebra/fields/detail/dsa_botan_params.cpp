@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef ALGEBRA_FIELD_MODP_SRP_PARAMS_HPP
-#define ALGEBRA_FIELD_MODP_SRP_PARAMS_HPP
+#ifndef ALGEBRA_FIELD_DSA_BOTAN_PARAMS_HPP
+#define ALGEBRA_FIELD_DSA_BOTAN_PARAMS_HPP
 
 #include <nil/algebra/fields/detail/params.hpp>
 
@@ -16,13 +16,16 @@ namespace nil {
     namespace algebra {
         namespace detail {
 
-            template<std::size_t ModulusBits, std::size_t GeneratorBits = CHAR_BIT>
-            struct arithmetic_params<modp_srp<ModulusBits, GeneratorBits>> : public params<modp_srp<ModulusBits, GeneratorBits>> {
-                constexpr static const number_type euler = 0;
+            struct arithmetic_params<dsa_botan<2048>> : public params<dsa_botan<2048>> {
+                constexpr static const number_type euler = 0x8CD7D450F86F0AD94EEE4CE469A8756D1EBD1058241943EAFFB0B354585E924D_cppui256;
             };
-        
+
+            struct arithmetic_params<dsa_botan<3072>> : public params<dsa_botan<3072>> {
+                constexpr static const number_type euler = 0xB3EBD364EC69EF8CF3BAF643B75734B16339B2E49E5CDE1B59C1E9FB40EE0C5B_cppui256;
+            };
+
         }    // namespace detail
     }    // namespace algebra
 }    // namespace nil
 
-#endif    // ALGEBRA_FIELD_MODP_SRP_PARAMS_HPP
+#endif    // ALGEBRA_FIELD_DSA_BOTAN_PARAMS_HPP
