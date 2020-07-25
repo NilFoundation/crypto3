@@ -13,21 +13,18 @@
 #include <boost/multiprecision/ressol.hpp>
 
 #include <nil/algebra/fields/fp4.hpp>
-#include <nil/algebra/fields/element.hpp>
+#include <nil/algebra/fields/detail/arithmetic_operations.hpp>
 
 namespace nil {
     namespace algebra {
         namespace detail {
-
-            template<typename Field, typename NumberType>
-            struct arithmetic_operations;
 
             template<typename NumberType &Modulus, typename NumberType>
             struct arithmetic_operations<fp2<Modulus>> {
             private:
                 using policy_type = fp2<Modulus>;
                 using fp_type = fp<Modulus>;
-                using point = detail::point<policy_type, NumberType>;
+                using point = detail::element<policy_type, NumberType>;
 
             public:
                 inline static point zero() const {

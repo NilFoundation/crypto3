@@ -11,20 +11,17 @@
 #define ALGEBRA_ALGO_FP_IMPL_HPP
 
 #include <nil/algebra/fields/fp.hpp>
-#include <nil/algebra/fields/detail/point.hpp>
+#include <nil/algebra/fields/detail/arithmetic_operations.hpp>
 
 namespace nil {
     namespace algebra {
         namespace detail {
 
-            template<typename NumberType, typename Field>
-            struct arithmetic_operations;
-
             template<typename NumberType, typename NumberType &Modulus>
             struct arithmetic_operations<fp<Modulus>> {
             private:
                 using policy_type = fp<Modulus>;
-                using point = detail::point<policy_type, NumberType>;
+                using point = detail::element<policy_type, NumberType>;
 
             public:
                 inline static point zero() const {
