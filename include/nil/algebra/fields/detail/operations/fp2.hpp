@@ -7,13 +7,14 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef ALGEBRA_ALGO_FP12_IMPL_HPP
-#define ALGEBRA_ALGO_FP12_IMPL_HPP
+#ifndef ALGEBRA_ALGO_FP2_IMPL_HPP
+#define ALGEBRA_ALGO_FP2_IMPL_HPP
 
 #include <boost/multiprecision/ressol.hpp>
 
-#include <nil/algebra/fields/fp12.hpp>
-#include <nil/algebra/fields/detail/arithmetic_operations.hpp>
+#include <nil/algebra/fields/fp2.hpp>
+#include <nil/algebra/fields/fp.hpp>
+#include <nil/algebra/fields/detail/operations/operations.hpp>
 
 namespace nil {
     namespace algebra {
@@ -24,7 +25,7 @@ namespace nil {
             private:
                 using policy_type = fp2<Modulus>;
                 using fp_type = fp<Modulus>;
-                using point = element<policy_type, NumberType>;
+                using point = detail::element<policy_type, NumberType>;
 
             public:
                 inline static point zero() const {
@@ -123,9 +124,9 @@ namespace nil {
                     return invert(policy_type::policy_modular(A, policy_type::mod));
                 }
             }
-            
+        
         }    // namespace detail
     }    // namespace algebra
 }    // namespace nil
 
-#endif    // ALGEBRA_ALGO_FP12_IMPL_HPP
+#endif    // ALGEBRA_ALGO_FP2_IMPL_HPP

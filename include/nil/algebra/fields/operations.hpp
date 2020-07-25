@@ -12,9 +12,6 @@
 
 #include <nil/algebra/detail/type_traits.hpp>
 
-#include <nil/algebra/fields/algorithm/detail/fp_impl.hpp>
-#include <nil/algebra/fields/algorithm/detail/fp2_impl.hpp>
-
 namespace nil {
     namespace algebra {
 

@@ -11,7 +11,7 @@
 #define ALGEBRA_ALGO_FP_IMPL_HPP
 
 #include <nil/algebra/fields/fp.hpp>
-#include <nil/algebra/fields/detail/arithmetic_operations.hpp>
+#include <nil/algebra/fields/detail/operations/operations.hpp>
 
 namespace nil {
     namespace algebra {

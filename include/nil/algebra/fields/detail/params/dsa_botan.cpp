@@ -10,7 +10,7 @@
 #ifndef ALGEBRA_FIELD_DSA_BOTAN_PARAMS_HPP
 #define ALGEBRA_FIELD_DSA_BOTAN_PARAMS_HPP
 
-#include <nil/algebra/fields/detail/params.hpp>
+#include <nil/algebra/fields/detail/params/params.hpp>
 
 namespace nil {
     namespace algebra {
