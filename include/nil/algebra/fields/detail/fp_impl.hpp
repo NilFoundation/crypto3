@@ -18,10 +18,10 @@ namespace nil {
         namespace detail {
 
             template<typename NumberType, typename Field>
-            struct basic_operations;
+            struct arithmetic_operations;
 
             template<typename NumberType, typename NumberType &Modulus>
-            struct basic_operations<fp<Modulus>> {
+            struct arithmetic_operations<fp<Modulus>> {
             private:
                 using policy_type = fp<Modulus>;
                 using point = detail::point<policy_type, NumberType>;

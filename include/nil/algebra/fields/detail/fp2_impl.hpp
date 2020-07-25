@@ -21,10 +21,10 @@ namespace nil {
         namespace detail {
 
             template<typename Field, typename NumberType>
-            struct basic_operations;
+            struct arithmetic_operations;
 
             template<typename NumberType &Modulus, typename NumberType>
-            struct basic_operations<fp2<Modulus>> {
+            struct arithmetic_operations<fp2<Modulus>> {
             private:
                 using policy_type = fp2<Modulus>;
                 using fp_type = fp<Modulus>;

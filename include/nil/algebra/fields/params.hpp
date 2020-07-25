@@ -28,8 +28,13 @@ namespace nil {
         };
 
         template<typename FieldType>
-        struct basic_params : public params<FieldType> {
+        struct arithmetic_params : public params<FieldType> {
             constexpr static const number_type euler = (modulus - 1) / 2;
+        };
+
+        template<std::size_t ModulusBits, std::size_t GeneratorBits = CHAR_BIT>
+        struct arithmetic_params<modp_srp<ModulusBits, GeneratorBits>> : public params<FieldType> {
+            constexpr static const number_type euler = 0;
         };
     }    // namespace algebra
 }    // namespace nil

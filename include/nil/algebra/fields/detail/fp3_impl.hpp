@@ -18,13 +18,13 @@
 
 namespace nil {
     namespace algebra {
-            namespace detail {
+        namespace detail {
 
             template<typename Field, typename NumberType>
-            struct basic_operations;
+            struct arithmetic_operations;
 
             template<typename NumberType &Modulus, typename NumberType>
-            struct basic_operations<fp3<Modulus>> {
+            struct arithmetic_operations<fp3<Modulus>> {
             private:
                 using policy_type = fp3<Modulus>;
                 using fp_type = fp<Modulus>;
