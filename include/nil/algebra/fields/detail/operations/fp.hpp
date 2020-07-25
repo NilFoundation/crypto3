@@ -20,7 +20,7 @@ namespace nil {
             template<typename NumberType, typename NumberType &Modulus>
             struct arithmetic_operations<fp<Modulus>> {
             private:
-                using policy_type = fp<Modulus>;
+                using policy_type = arithmetic_params<fp<Modulus>>;
                 using point = detail::element<policy_type, NumberType>;
 
             public:
