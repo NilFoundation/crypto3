@@ -26,8 +26,7 @@ namespace nil {
          */
         template<std::size_t ModulusBits, std::size_t GeneratorBits>
         struct fp {
-            typedef NumberType number_type;
-            typedef point<fp<Modulus>, number_type> point_type;
+            typedef point<fp<ModulusBits, GeneratorBits>, number_type> point_type;
 
             constexpr static const std::size_t modulus_bits = ModulusBits;
             typedef number<backends::cpp_int_backend<modulus_bits, modulus_bits, unsigned_magnitude, unchecked, void>>

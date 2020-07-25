@@ -6,8 +6,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_PUBKEY_ED25519_FE_HPP
-#define CRYPTO3_PUBKEY_ED25519_FE_HPP
+#ifndef CRYPTO3_ALGEBRA_ED25519_FE_HPP
+#define CRYPTO3_ALGEBRA_ED25519_FE_HPP
 
 #include <nil/crypto3/utilities/memory_operations.hpp>
 

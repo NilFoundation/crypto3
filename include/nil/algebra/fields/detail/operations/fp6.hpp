@@ -18,21 +18,18 @@
 namespace nil {
     namespace algebra {
         namespace detail {
+            template<std::size_t ModulusBits, std::size_t GeneratorBits>
+            struct arithmetic_operations<fp6<ModulusBits, GeneratorBits>> {
+                typedef arithmetic_params<fp6<ModulusBits, GeneratorBits>> params_type;
+                typedef fp<ModulusBits, GeneratorBits> fp_type;
+                typedef element<policy_type, NumberType> value_type;
 
-            template<typename NumberType &Modulus, typename NumberType>
-            struct arithmetic_operations<fp2<Modulus>> {
-            private:
-                using policy_type = arithmetic_params<fp2<Modulus>>;
-                using fp_type = fp<Modulus>;
-                using point = detail::element<policy_type, NumberType>;
-
-            public:
-                inline static point zero() const {
-                    return point(zero<fp_type, NumberType>()[0], zero<fp_type, NumberType>()[0]);
+                inline static value_type zero() const {
+                    return {zero<fp_type, NumberType>()[0], zero<fp_type, NumberType>()[0]};
                 }
 
-                inline static point one() const {
-                    return point(one<fp_type, NumberType>()[0], zero<fp_type, NumberType>()[0]);
+                inline static value_type one() const {
+                    return {one<fp_type, NumberType>()[0], zero<fp_type, NumberType>()[0]};
                 }
 
                 inline static bool eq(const NumberType &A0, const NumberType &A1, const NumberType &B0,
@@ -40,7 +37,7 @@ namespace nil {
                     return (A0 == B0) && (A1 == B1);
                 }
 
-                inline static bool eq(const point &A, const point &B) const {
+                inline static bool eq(const value_type &A, const value_type &B) const {
                     return (A[0] == B[0]) && (A[1] == B[1]);
                 }
 
@@ -49,59 +46,59 @@ namespace nil {
                     return (A0 != B0) || (A1 != B1);
                 }
 
-                inline static bool neq(const point &A, const point &B) const {
+                inline static bool neq(const value_type &A, const value_type &B) const {
                     return (A[0] != B[0]) || (A[1] != B[1]);
                 }
 
-                inline static point add(const NumberType &A0, const NumberType &A1, const NumberType &B0,
-                                        const NumberType &B1) const {
-                    return point(A0 + B0, A1 + B1);
+                inline static value_type add(const NumberType &A0, const NumberType &A1, const NumberType &B0,
+                                             const NumberType &B1) const {
+                    return {A0 + B0, A1 + B1};
                 }
 
-                inline static point add(const point &A, const point &B) const {
-                    return point(A[0] + B[0], A[1] + B[1]);
+                inline static value_type add(const value_type &A, const value_type &B) const {
+                    return {A[0] + B[0], A[1] + B[1]};
                 }
 
-                inline static point sub(const NumberType &A0, const NumberType &A1, const NumberType &B0,
-                                        const NumberType &B1) const {
-                    return point(A0 - B0, A1 - B1);
+                inline static value_type sub(const NumberType &A0, const NumberType &A1, const NumberType &B0,
+                                             const NumberType &B1) const {
+                    return {A0 - B0, A1 - B1};
                 }
 
-                inline static point sub(const point &A, const point &B) const {
-                    return point(A[0] - B[0], A[1] - B[1]);
+                inline static value_type sub(const value_type &A, const value_type &B) const {
+                    return {A[0] - B[0], A[1] - B[1]};
                 }
 
-                inline static point mul(const NumberType &A0, const NumberType &A1, const NumberType &B0,
-                                        const NumberType &B1) const {
+                inline static value_type mul(const NumberType &A0, const NumberType &A1, const NumberType &B0,
+                                             const NumberType &B1) const {
 
                     const NumberType A0B0 = A0 * B0, A1B1 = A1 * B1;
 
-                    return point(A0B0 + policy_type::non_residue, (A0 + A1) * (B0 + B1) - A0B0 - A1B1);
+                    return {A0B0 + params_type::non_residue, (A0 + A1) * (B0 + B1) - A0B0 - A1B1};
                 }
 
-                inline static point mul(const point &A, const point &B) const {
+                inline static value_type mul(const value_type &A, const value_type &B) const {
                     const NumberType A0B0 = A[0] * B[0], A1B1 = A[1] * B[1];
 
-                    return point(A0B0 + policy_type::non_residue, (A[0] + A[1]) * (B[0] + B[1]) - A0B0 - A1B1);
+                    return {A0B0 + params_type::non_residue, (A[0] + A[1]) * (B[0] + B[1]) - A0B0 - A1B1};
                 }
 
-                inline static point sqrt(const NumberType &A0, const NumberType &B0) const {
+                inline static value_type sqrt(const NumberType &A0, const NumberType &B0) const {
 
                     // compute square root with Tonelli--Shanks
                 }
 
-                inline static point square(const NumberType &A0, const NumberType &A1) const {
+                inline static value_type square(const NumberType &A0, const NumberType &A1) const {
                     return mul(A0, A1, A0, A1);    // maybe can be done more effective
                 }
 
-                inline static point square(const point &A) const {
+                inline static value_type square(const value_type &A) const {
                     return mul(A, A);    // maybe can be done more effective
                 }
 
-                inline static policy_type::policy_modular pow(const NumberType &A0, const NumberType &B0) const {
+                inline static params_type::policy_modular pow(const NumberType &A0, const NumberType &B0) const {
                 }
 
-                inline static policy_type::policy_modular invert(const NumberType &A0, const NumberType &B0) const {
+                inline static params_type::policy_modular invert(const NumberType &A0, const NumberType &B0) const {
 
                     // The following needs to be adapted to our concepts:
 
@@ -120,12 +117,11 @@ namespace nil {
 
                     // compute square root with Tonelli--Shanks
                     // (does not terminate if not a square!)
-                    return invert(policy_type::policy_modular(A, policy_type::mod));
+                    return invert(params_type::policy_modular(A, params_type::mod));
                 }
             }
-            
         }    // namespace detail
-    }    // namespace algebra
+    }        // namespace algebra
 }    // namespace nil
 
 #endif    // ALGEBRA_ALGO_FP6_IMPL_HPP

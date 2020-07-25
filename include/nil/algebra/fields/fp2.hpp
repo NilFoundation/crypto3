@@ -23,13 +23,11 @@ namespace nil {
          *
          * ASSUMPTION: p = 1 (mod 6)
          */
-        template<typename NumberType &Modulus>
+        template<std::size_t ModulusBits, std::size_t GeneratorBits>
         struct fp2 {
-        private:
-            using point_fp = detail::point<fp<Modulus>, NumberType>;
-            using point_fp2 = detail::point<fp2<Modulus>, NumberType>;
+            using point_fp = element<fp<ModulusBits, GeneratorBits>, NumberType>;
+            using point_fp2 = element<fp2<ModulusBits, GeneratorBits>, NumberType>;
 
-        public:
             constexpr fp2(const point_fp2 &point) : top_non_residue(point) {
             }    // init point for non_residue in fp3 or higher
 

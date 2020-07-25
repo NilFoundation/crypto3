@@ -21,7 +21,7 @@ namespace nil {
             };
 
         }    // namespace detail
-    }    // namespace algebra
+    }        // namespace algebra
 }    // namespace nil
 
 #endif    // ALGEBRA_FIELD_DSA_JCE_PARAMS_HPP

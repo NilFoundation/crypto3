@@ -15,12 +15,10 @@
 namespace nil {
     namespace algebra {
         namespace detail {
-
-            template<typename NumberType, typename Field>
+            template<typename Field>
             struct arithmetic_operations;
-            
         }    // namespace detail
-    }    // namespace algebra
+    }        // namespace algebra
 }    // namespace nil
 
 #endif    // ALGEBRA_ALGO_FP_IMPL_HPP

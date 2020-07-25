@@ -11,102 +11,101 @@
 #define ALGEBRA_ALGO_FP_IMPL_HPP
 
 #include <nil/algebra/fields/fp.hpp>
+#include <nil/algebra/fields/detail/params/params.hpp>
 #include <nil/algebra/fields/detail/operations/operations.hpp>
 
 namespace nil {
     namespace algebra {
         namespace detail {
 
-            template<typename NumberType, typename NumberType &Modulus>
-            struct arithmetic_operations<fp<Modulus>> {
-            private:
-                using policy_type = arithmetic_params<fp<Modulus>>;
-                using point = detail::element<policy_type, NumberType>;
+            template<std::size_t ModulusBits, std::size_t GeneratorBits>
+            struct arithmetic_operations<fp> {
+                typedef arithmetic_params<fp<ModulusBits, GeneratorBits>> params_type;
+                typedef element<policy_type, NumberType> value_type;
 
-            public:
-                inline static point zero() const {
-                    return point(NumberType(0));
+                inline static value_type zero() const {
+                    return value_type(NumberType(0));
                 }
 
-                inline static point one() const {
-                    return point(NumberType(1));
+                inline static value_type one() const {
+                    return value_type(NumberType(1));
                 }
 
                 inline static bool eq(const NumberType &A, const NumberType &B) const {
                     return A == B;
                 }
 
-                inline static bool eq(const point &A, const point &B) const {
+                inline static bool eq(const value_type &A, const value_type &B) const {
                     return A != B;
                 }
 
                 inline static bool neq(const NumberType &A, const NumberType &B) const {
-                    return neq(point(A), point(B));
+                    return neq(value_type(A), value_type(B));
                 }
 
-                inline static bool neq(const point &A, const point &B) const {
+                inline static bool neq(const value_type &A, const value_type &B) const {
                     return A[0] != B[0];
                 }
 
-                inline static point add(const NumberType &A, const NumberType &B) const {
-                    return point(A + B);
+                inline static value_type add(const NumberType &A, const NumberType &B) const {
+                    return {A + B};
                 }
 
-                inline static point add(const point &A, const point &B) const {
-                    return point(A[0] + B[0]);
+                inline static value_type add(const value_type &A, const value_type &B) const {
+                    return {A[0] + B[0]};
                 }
 
-                inline static point sub(const NumberType &A, const NumberType &B) const {
-                    return point(A - B);
+                inline static value_type sub(const NumberType &A, const NumberType &B) const {
+                    return {A - B};
                 }
 
-                inline static point sub(const point &A, const point &B) const {
-                    return point(A[0] - B[0]);
+                inline static value_type sub(const value_type &A, const value_type &B) const {
+                    return {A[0] - B[0]};
                 }
 
-                inline static point mul(const NumberType &A, const NumberType &B) const {
-                    return point(A * B);
+                inline static value_type mul(const NumberType &A, const NumberType &B) const {
+                    return {A * B};
                 }
 
-                inline static point mul(const point &A, const point &B) const {
-                    return point(A[0] * B[0]);
+                inline static value_type mul(const value_type &A, const value_type &B) const {
+                    return {A[0] * B[0]};
                 }
 
-                inline static point sqrt(const NumberType &A) const {
-                    return point(sqrt(A));
+                inline static value_type sqrt(const NumberType &A) const {
+                    return {sqrt(A)};
                 }
 
-                inline static point sqrt(const point &A) const {
-                    return point(sqrt(A[0]));
+                inline static value_type sqrt(const value_type &A) const {
+                    return {sqrt(A[0])};
                 }
 
-                inline static point square(const NumberType &A) const {
+                inline static value_type square(const NumberType &A) const {
                     return mul(A, A);    // maybe can be done more effective
                 }
 
-                inline static point square(const point &A) const {
+                inline static value_type square(const value_type &A) const {
                     return mul(A, A);    // maybe can be done more effective
                 }
 
-                inline static point pow(const NumberType &A, const NumberType &power) const {
-                    return point(pow(A, power));
+                inline static value_type pow(const NumberType &A, const NumberType &power) const {
+                    return {pow(A, power)};
                 }
 
-                inline static point pow(const point &A, const NumberType &power) const {
-                    return point(A[0], power);
+                inline static value_type pow(const value_type &A, const NumberType &power) const {
+                    return {A[0], power};
                 }
 
-                inline static point invert(const NumberType &A) const {
-                    return point(invert(A));
+                inline static value_type invert(const NumberType &A) const {
+                    return {invert(A)};
                 }
 
-                inline static point invert(const point &A) const {
-                    return point(A[0]);
+                inline static value_type invert(const value_type &A) const {
+                    return {A[0]};
                 }
             }
-            
+
         }    // namespace detail
-    }    // namespace algebra
+    }        // namespace algebra
 }    // namespace nil
 
 #endif    // ALGEBRA_ALGO_FP_IMPL_HPP
