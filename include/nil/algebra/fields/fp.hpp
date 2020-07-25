@@ -38,8 +38,6 @@ namespace nil {
                 backends::cpp_int_backend<generator_bits, generator_bits, unsigned_magnitude, unchecked, void>>
                 generator_type;
 
-
-
             constexpr fp(const point_fp &point) : top_non_residue(point) {
             }    // init point for non_residue in fp2 or higher
             constexpr fp() {

@@ -19,37 +19,37 @@ namespace nil {
     namespace algebra {
 
         template<typename NumberType, typename Field>
-        using zero = basic_operations<NumberType, Field>::zero;
+        using zero = detail::basic_operations<NumberType, Field>::zero;
 
         template<typename NumberType, typename Field>
-        using one = basic_operations<NumberType, Field>::one;
+        using one = detail::basic_operations<NumberType, Field>::one;
 
         template<typename NumberType, typename Field>
-        using eq = basic_operations<NumberType, Field>::neq;
+        using eq = detail::basic_operations<NumberType, Field>::neq;
 
         template<typename NumberType, typename Field>
-        using neq = basic_operations<NumberType, Field>::neq;
+        using neq = detail::basic_operations<NumberType, Field>::neq;
 
         template<typename NumberType, typename Field>
-        using add = basic_operations<NumberType, Field>::add;
+        using add = detail::basic_operations<NumberType, Field>::add;
 
         template<typename NumberType, typename Field>
-        using sub = basic_operations<NumberType, Field>::sub;
+        using sub = detail::basic_operations<NumberType, Field>::sub;
 
         template<typename NumberType, typename Field>
-        using mul = basic_operations<NumberType, Field>::mul;
+        using mul = detail::basic_operations<NumberType, Field>::mul;
 
         template<typename NumberType, typename Field>
-        using sqrt = basic_operations<NumberType, Field>::sqrt;
+        using sqrt = detail::basic_operations<NumberType, Field>::sqrt;
 
         template<typename NumberType, typename Field>
-        using square = basic_operations<NumberType, Field>::square;
+        using square = detail::basic_operations<NumberType, Field>::square;
 
         template<typename NumberType, typename Field>
-        using pow = basic_operations<NumberType, Field>::pow;
+        using pow = detail::basic_operations<NumberType, Field>::pow;
 
         template<typename NumberType, typename Field>
-        using invert = basic_operations<NumberType, Field>::invert;
+        using invert = detail::basic_operations<NumberType, Field>::invert;
 
     }    // namespace algebra
 }    // namespace nil
