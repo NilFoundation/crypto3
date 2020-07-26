@@ -80,10 +80,6 @@ else()
     target_architecture(CMAKE_TARGET_ARCHITECTURE)
 endif()
 
-define_target_architecture(${CMAKE_UPPER_WORKSPACE_NAME} ${CMAKE_TARGET_ARCHITECTURE})
-define_target_endianness(${CMAKE_UPPER_WORKSPACE_NAME} ${CMAKE_TARGET_ARCHITECTURE})
-define_target_platform_features(${CMAKE_UPPER_WORKSPACE_NAME})
-
 check_sse()
 check_avx()
 
