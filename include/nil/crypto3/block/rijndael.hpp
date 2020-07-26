@@ -108,7 +108,7 @@ namespace nil {
                     typename std::conditional<BlockBits == 128 && (KeyBits == 128 || KeyBits == 192 || KeyBits == 256),
 #if defined(CRYPTO3_HAS_RIJNDAEL_NI)
                                               detail::rijndael_ni_impl<KeyBits, BlockBits, policy_type>,
-#elif defined(CRYPTO3_HAS_RIJNDAEL_SSSE3)
+#elif defined(CRYPTO3_HAS_RIJNDAEL_SSSE3) || BOOST_HW_SIMD_X86 >= BOOST_HW_SIMD_X86_SSSE3_VERSION
                                               detail::rijndael_ssse3_impl<KeyBits, BlockBits, policy_type>,
 #elif defined(CRYPTO3_HAS_RIJNDAEL_ARMV8)
                                               detail::rijndael_armv8_impl<KeyBits, BlockBits, policy_type>,
