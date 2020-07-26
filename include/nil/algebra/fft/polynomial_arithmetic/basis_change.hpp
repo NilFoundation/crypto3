@@ -28,8 +28,8 @@ namespace nil {
              * Below we make use of the Subproduct Tree description from
              * [Bostan and Schost 2005. Polynomial Evaluation and Interpolation on Special Sets of Points], on page 7.
              */
-            template<typename FieldT>
-            void compute_subproduct_tree(const size_t &m, std::vector<std::vector<std::vector<FieldT>>> &T) {
+            template<typename FieldType>
+            void compute_subproduct_tree(const size_t &m, std::vector<std::vector<std::vector<FieldType>>> &T) {
                 if (T.size() != m + 1)
                     T.resize(m + 1);
 
@@ -40,18 +40,18 @@ namespace nil {
                  */
 
                 /* Precompute the first row. */
-                T[0] = std::vector<std::vector<FieldT>>(1u << m);
+                T[0] = std::vector<std::vector<FieldType>>(1u << m);
                 for (size_t j = 0; j < (1u << m); j++) {
-                    T[0][j] = std::vector<FieldT>(2, FieldT::one());
-                    T[0][j][0] = FieldT(-j);
+                    T[0][j] = std::vector<FieldType>(2, FieldType::one());
+                    T[0][j][0] = FieldType(-j);
                 }
 
-                std::vector<FieldT> a;
-                std::vector<FieldT> b;
+                std::vector<FieldType> a;
+                std::vector<FieldType> b;
 
                 size_t index = 0;
                 for (size_t i = 1; i <= m; i++) {
-                    T[i] = std::vector<std::vector<FieldT>>(1u << (m - i));
+                    T[i] = std::vector<std::vector<FieldType>>(1u << (m - i));
                     for (size_t j = 0; j < (1u << (m - i)); j++) {
                         a = T[i - 1][index];
                         index++;
@@ -68,32 +68,33 @@ namespace nil {
             /**
              * Perform the general change of basis from Monomial to Newton Basis with Subproduct Tree T.
              * Below we make use of the MonomialToNewton and TNewtonToMonomial pseudocode from
-             * [Bostan and Schost 2005. Polynomial Evaluation and Interpolation on Special Sets of Points], on page 12 and 14.
+             * [Bostan and Schost 2005. Polynomial Evaluation and Interpolation on Special Sets of Points], on page 12
+             * and 14.
              */
-            template<typename FieldT>
-            void monomial_to_newton_basis(std::vector<FieldT> &a,
-                                          const std::vector<std::vector<std::vector<FieldT>>> &T,
+            template<typename FieldType>
+            void monomial_to_newton_basis(std::vector<FieldType> &a,
+                                          const std::vector<std::vector<std::vector<FieldType>>> &T,
                                           const size_t &n) {
                 size_t m = log2(n);
-                //if (T.size() != m + 1u)
-                    //throw DomainSizeException("expected T.size() == m + 1");
+                // if (T.size() != m + 1u)
+                // throw DomainSizeException("expected T.size() == m + 1");
 
                 /* MonomialToNewton */
-                std::vector<FieldT> I(T[m][0]);
+                std::vector<FieldType> I(T[m][0]);
                 _reverse(I, n);
 
-                std::vector<FieldT> mod(n + 1, FieldT::zero());
-                mod[n] = FieldT::one();
+                std::vector<FieldType> mod(n + 1, FieldType::zero());
+                mod[n] = FieldType::one();
 
                 _polynomial_xgcd(mod, I, mod, mod, I);
 
                 I.resize(n);
 
-                std::vector<FieldT> Q(_polynomial_multiplication_transpose(n - 1, I, a));
+                std::vector<FieldType> Q(_polynomial_multiplication_transpose(n - 1, I, a));
                 _reverse(Q, n);
 
                 /* TNewtonToMonomial */
-                std::vector<std::vector<FieldT>> c(n);
+                std::vector<std::vector<FieldType>> c(n);
                 c[0] = Q;
 
                 size_t row_length;
@@ -106,7 +107,8 @@ namespace nil {
 
                     /* NB: unsigned reverse iteration */
                     for (size_t j = (1u << (m - i - 1)) - 1; j < (1u << (m - i - 1)); j--) {
-                        c[2 * j + 1] = _polynomial_multiplication_transpose((1u << i) - 1, T[i][row_length - 2 * j], c[j]);
+                        c[2 * j + 1] =
+                            _polynomial_multiplication_transpose((1u << i) - 1, T[i][row_length - 2 * j], c[j]);
                         c[2 * j] = c[j];
                         c[2 * j].resize(c_vec);
                     }
@@ -125,21 +127,21 @@ namespace nil {
              * Below we make use of the NewtonToMonomial pseudocode from
              * [Bostan and Schost 2005. Polynomial Evaluation and Interpolation on Special Sets of Points], on page 11.
              */
-            template<typename FieldT>
-            void newton_to_monomial_basis(std::vector<FieldT> &a,
-                                          const std::vector<std::vector<std::vector<FieldT>>> &T,
+            template<typename FieldType>
+            void newton_to_monomial_basis(std::vector<FieldType> &a,
+                                          const std::vector<std::vector<std::vector<FieldType>>> &T,
                                           const size_t &n) {
                 size_t m = log2(n);
-                //if (T.size() != m + 1u)
-                    //throw DomainSizeException("expected T.size() == m + 1");
+                // if (T.size() != m + 1u)
+                // throw DomainSizeException("expected T.size() == m + 1");
 
-                std::vector<std::vector<FieldT>> f(n);
+                std::vector<std::vector<FieldType>> f(n);
                 for (size_t i = 0; i < n; i++) {
-                    f[i] = std::vector<FieldT>(1, a[i]);
+                    f[i] = std::vector<FieldType>(1, a[i]);
                 }
 
                 /* NewtonToMonomial */
-                std::vector<FieldT> temp(1, FieldT::zero());
+                std::vector<FieldType> temp(1, FieldType::zero());
                 for (size_t i = 0; i < m; i++) {
                     for (size_t j = 0; j < (1u << (m - i - 1)); j++) {
                         _polynomial_multiplication(temp, T[i][2 * j], f[2 * j + 1]);
@@ -155,22 +157,22 @@ namespace nil {
              * Below we make use of the psuedocode from
              * [Bostan & Schost 2005. Polynomial Evaluation and Interpolation on Special Sets of Points] on page 26.
              */
-            template<typename FieldT>
-            void monomial_to_newton_basis_geometric(std::vector<FieldT> &a,
-                                                    const std::vector<FieldT> &geometric_sequence,
-                                                    const std::vector<FieldT> &geometric_triangular_sequence,
+            template<typename FieldType>
+            void monomial_to_newton_basis_geometric(std::vector<FieldType> &a,
+                                                    const std::vector<FieldType> &geometric_sequence,
+                                                    const std::vector<FieldType> &geometric_triangular_sequence,
                                                     const size_t &n) {
-                std::vector<FieldT> u(n, FieldT::zero());
-                std::vector<FieldT> w(n, FieldT::zero());
-                std::vector<FieldT> z(n, FieldT::zero());
-                std::vector<FieldT> f(n, FieldT::zero());
-                u[0] = FieldT::one();
+                std::vector<FieldType> u(n, FieldType::zero());
+                std::vector<FieldType> w(n, FieldType::zero());
+                std::vector<FieldType> z(n, FieldType::zero());
+                std::vector<FieldType> f(n, FieldType::zero());
+                u[0] = FieldType::one();
                 w[0] = a[0];
-                z[0] = FieldT::one();
+                z[0] = FieldType::one();
                 f[0] = a[0];
 
                 for (size_t i = 1; i < n; i++) {
-                    u[i] = u[i - 1] * geometric_sequence[i] * (FieldT::one() - geometric_sequence[i]).inverse();
+                    u[i] = u[i - 1] * geometric_sequence[i] * (FieldType::one() - geometric_sequence[i]).inverse();
                     w[i] = a[i] * (u[i].inverse());
                     z[i] = u[i] * geometric_triangular_sequence[i].inverse();
                     f[i] = w[i] * geometric_triangular_sequence[i];
@@ -183,9 +185,9 @@ namespace nil {
 
                 w = _polynomial_multiplication_transpose(n - 1, z, f);
 
-        #ifdef MULTICORE
-        #pragma omp parallel for
-        #endif
+#ifdef MULTICORE
+#pragma omp parallel for
+#endif
                 for (size_t i = 0; i < n; i++) {
                     a[i] = w[i] * z[i];
                 }
@@ -196,26 +198,26 @@ namespace nil {
              * Below we make use of the psuedocode from
              * [Bostan & Schost 2005. Polynomial Evaluation and Interpolation on Special Sets of Points] on page 26.
              */
-            template<typename FieldT>
-            void newton_to_monomial_basis_geometric(std::vector<FieldT> &a,
-                                                    const std::vector<FieldT> &geometric_sequence,
-                                                    const std::vector<FieldT> &geometric_triangular_sequence,
+            template<typename FieldType>
+            void newton_to_monomial_basis_geometric(std::vector<FieldType> &a,
+                                                    const std::vector<FieldType> &geometric_sequence,
+                                                    const std::vector<FieldType> &geometric_triangular_sequence,
                                                     const size_t &n) {
-                std::vector<FieldT> v(n, FieldT::zero());
-                std::vector<FieldT> u(n, FieldT::zero());
-                std::vector<FieldT> w(n, FieldT::zero());
-                std::vector<FieldT> z(n, FieldT::zero());
+                std::vector<FieldType> v(n, FieldType::zero());
+                std::vector<FieldType> u(n, FieldType::zero());
+                std::vector<FieldType> w(n, FieldType::zero());
+                std::vector<FieldType> z(n, FieldType::zero());
                 v[0] = a[0];
-                u[0] = FieldT::one();
+                u[0] = FieldType::one();
                 w[0] = a[0];
-                z[0] = FieldT::one();
+                z[0] = FieldType::one();
 
                 for (size_t i = 1; i < n; i++) {
                     v[i] = a[i] * geometric_triangular_sequence[i];
                     if (i % 2 == 1)
                         v[i] = -v[i];
 
-                    u[i] = u[i - 1] * geometric_sequence[i] * (FieldT::one() - geometric_sequence[i]).inverse();
+                    u[i] = u[i - 1] * geometric_sequence[i] * (FieldType::one() - geometric_sequence[i]).inverse();
                     w[i] = v[i] * u[i].inverse();
 
                     z[i] = u[i] * geometric_triangular_sequence[i].inverse();
@@ -225,9 +227,9 @@ namespace nil {
 
                 w = _polynomial_multiplication_transpose(n - 1, u, w);
 
-        #ifdef MULTICORE
-        #pragma omp parallel for
-        #endif
+#ifdef MULTICORE
+#pragma omp parallel for
+#endif
                 for (size_t i = 0; i < n; i++) {
                     a[i] = w[i] * z[i];
                 }

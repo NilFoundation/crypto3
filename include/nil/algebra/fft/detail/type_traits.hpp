@@ -10,6 +10,8 @@
 #ifndef ALGEBRA_TYPE_TRAITS_HPP
 #define ALGEBRA_TYPE_TRAITS_HPP
 
+#include <boost/integer/static_log2.hpp>
+
 #define GENERATE_HAS_MEMBER_TYPE(Type)                                                \
                                                                                       \
     template<class T>                                                                 \
@@ -19,9 +21,9 @@
         using No = char[1];                                                           \
                                                                                       \
         struct Fallback {                                                             \
-            struct Type {};                                                           \
+            struct Type { };                                                          \
         };                                                                            \
-        struct Derived : T, Fallback {};                                              \
+        struct Derived : T, Fallback { };                                             \
                                                                                       \
         template<class U>                                                             \
         static No &test(typename U::Type *);                                          \
@@ -33,7 +35,7 @@
     };                                                                                \
                                                                                       \
     template<class T>                                                                 \
-    struct has_##Type : public std::integral_constant<bool, HasMemberType_##Type<T>::RESULT> {};
+    struct has_##Type : public std::integral_constant<bool, HasMemberType_##Type<T>::RESULT> { };
 
 #define GENERATE_HAS_MEMBER(member)                                                   \
                                                                                       \
@@ -46,7 +48,7 @@
         struct Fallback {                                                             \
             int member;                                                               \
         };                                                                            \
-        struct Derived : T, Fallback {};                                              \
+        struct Derived : T, Fallback { };                                             \
                                                                                       \
         template<class U>                                                             \
         static No &test(decltype(U::member) *);                                       \
@@ -58,7 +60,7 @@
     };                                                                                \
                                                                                       \
     template<class T>                                                                 \
-    struct has_##member : public std::integral_constant<bool, HasMember_##member<T>::RESULT> {};
+    struct has_##member : public std::integral_constant<bool, HasMember_##member<T>::RESULT> { };
 
 #define GENERATE_HAS_MEMBER_FUNCTION(Function, ...)                                  \
                                                                                      \
@@ -68,7 +70,7 @@
             void Function(##__VA_ARGS__);                                            \
         };                                                                           \
                                                                                      \
-        struct Derived : Fallback {};                                                \
+        struct Derived : Fallback { };                                               \
                                                                                      \
         template<typename C, C>                                                      \
         struct ChT;                                                                  \
@@ -90,7 +92,7 @@
             void Function(##__VA_ARGS__) const;                                            \
         };                                                                                 \
                                                                                            \
-        struct Derived : Fallback {};                                                      \
+        struct Derived : Fallback { };                                                     \
                                                                                            \
         template<typename C, C>                                                            \
         struct ChT;                                                                        \
@@ -118,7 +120,7 @@
             type Function(##__VA_ARGS__);                                                    \
         };                                                                                   \
                                                                                              \
-        struct Derived : TType, Fallback {};                                                 \
+        struct Derived : TType, Fallback { };                                                \
                                                                                              \
         template<typename C, C>                                                              \
         struct ChT;                                                                          \
@@ -146,7 +148,7 @@
             type Function(##__VA_ARGS__) const;                                              \
         };                                                                                   \
                                                                                              \
-        struct Derived : TType, Fallback {};                                                 \
+        struct Derived : TType, Fallback { };                                                \
                                                                                              \
         template<typename C, C>                                                              \
         struct ChT;                                                                          \
@@ -163,13 +165,27 @@
 namespace nil {
     namespace algebra {
         namespace detail {
+            template<std::size_t m>
+            struct is_basic_radix2_domain() {
+                constexpr static bool const value =
+                    (m > 1) && !(m & (m - 1)) && (boost::static_log2<m>::value <= FieldType::s);
+            }
 
-            template<typename T>
-            struct domain_category {
-                
-            };
+            template<std::size_t m>
+            struct is_extended_radix2_domain() {
+                constexpr static bool const value =
+                    (m > 1) && !(m & (m - 1)) && (boost::static_log2<m>::value == FieldType::s + 1);
+            }
 
+            template<std::size_t m>
+            struct is_step_radix2_domain() {
+            private:
+                constexpr std::size_t const small_m = m - (1ul << (boost::static_log2<m>::value - 1));
 
+            public:
+                constexpr static bool const value =
+                    (m > 1) && (m & (m - 1)) && (boost::static_log2<m> <= FieldType::s) && !(small_m & (small_m - 1));
+            }
         }    // namespace detail
     }        // namespace algebra
 }    // namespace nil

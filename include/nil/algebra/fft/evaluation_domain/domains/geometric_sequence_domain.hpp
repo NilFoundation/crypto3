@@ -25,19 +25,19 @@ namespace nil {
     namespace algebra {
         namespace fft {
 
-            template<typename FieldT>
-            struct geometric_sequence_domain : public evaluation_domain<FieldT> {
+            template<typename FieldType>
+            struct geometric_sequence_domain : public evaluation_domain<FieldType> {
 
-                geometric_sequence_domain(const size_t m) : evaluation_domain<FieldT>(m) {
+                geometric_sequence_domain(const size_t m) : evaluation_domain<FieldType>(m) {
                     //if (m <= 1)
                         //throw InvalidSizeException("geometric(): expected m > 1");
-                    //if (FieldT::geometric_generator() == FieldT::zero())
-                        //throw InvalidSizeException("geometric(): expected FieldT::geometric_generator() != FieldT::zero()");
+                    //if (FieldType::geometric_generator() == FieldType::zero())
+                        //throw InvalidSizeException("geometric(): expected FieldType::geometric_generator() != FieldType::zero()");
 
                     precomputation_sentinel = 0;
                 }
 
-                void FFT(std::vector<FieldT> &a) {
+                void FFT(std::vector<FieldType> &a) {
                     //if (a.size() != this->m)
                         //throw DomainSizeException("geometric: expected a.size() == this->m");
 
@@ -47,14 +47,14 @@ namespace nil {
                     monomial_to_newton_basis_geometric(a, geometric_sequence, geometric_triangular_sequence, this->m);
 
                     /* Newton to Evaluation */
-                    std::vector<FieldT> T(this->m);
-                    T[0] = FieldT::one();
+                    std::vector<FieldType> T(this->m);
+                    T[0] = FieldType::one();
 
-                    std::vector<FieldT> g(this->m);
+                    std::vector<FieldType> g(this->m);
                     g[0] = a[0];
 
                     for (size_t i = 1; i < this->m; i++) {
-                        T[i] = T[i - 1] * (geometric_sequence[i] - FieldT::one()).inverse();
+                        T[i] = T[i - 1] * (geometric_sequence[i] - FieldType::one()).inverse();
                         g[i] = geometric_triangular_sequence[i] * a[i];
                     }
 
@@ -69,7 +69,7 @@ namespace nil {
                     }
                 }
 
-                void iFFT(std::vector<FieldT> &a) {
+                void iFFT(std::vector<FieldType> &a) {
                     //if (a.size() != this->m)
                         //throw DomainSizeException("geometric: expected a.size() == this->m");
 
@@ -77,15 +77,15 @@ namespace nil {
                         do_precomputation();
 
                     /* Interpolation to Newton */
-                    std::vector<FieldT> T(this->m);
-                    T[0] = FieldT::one();
+                    std::vector<FieldType> T(this->m);
+                    T[0] = FieldType::one();
 
-                    std::vector<FieldT> W(this->m);
+                    std::vector<FieldType> W(this->m);
                     W[0] = a[0] * T[0];
 
-                    FieldT prev_T = T[0];
+                    FieldType prev_T = T[0];
                     for (size_t i = 1; i < this->m; i++) {
-                        prev_T *= (geometric_sequence[i] - FieldT::one()).inverse();
+                        prev_T *= (geometric_sequence[i] - FieldType::one()).inverse();
 
                         W[i] = a[i] * prev_T;
                         T[i] = geometric_triangular_sequence[i] * prev_T;
@@ -106,17 +106,17 @@ namespace nil {
                     newton_to_monomial_basis_geometric(a, geometric_sequence, geometric_triangular_sequence, this->m);
                 }
 
-                void cosetFFT(std::vector<FieldT> &a, const FieldT &g) {
+                void cosetFFT(std::vector<FieldType> &a, const FieldType &g) {
                     _multiply_by_coset(a, g);
                     FFT(a);
                 }
 
-                void icosetFFT(std::vector<FieldT> &a, const FieldT &g) {
+                void icosetFFT(std::vector<FieldType> &a, const FieldType &g) {
                     iFFT(a);
                     _multiply_by_coset(a, g.inverse());
                 }
 
-                std::vector<FieldT> evaluate_all_lagrange_polynomials(const FieldT &t) {
+                std::vector<FieldType> evaluate_all_lagrange_polynomials(const FieldType &t) {
                     /* Compute Lagrange polynomial of size m, with m+1 points (x_0, y_0), ... ,(x_m, y_m) */
                     /* Evaluate for x = t */
                     /* Return coeffs for each l_j(x) = (l / l_i[j]) * w[j] */
@@ -133,8 +133,8 @@ namespace nil {
                     for (size_t i = 0; i < this->m; ++i) {
                         if (geometric_sequence[i] == t)    // i.e., t equals a[i]
                         {
-                            std::vector<FieldT> res(this->m, FieldT::zero());
-                            res[i] = FieldT::one();
+                            std::vector<FieldType> res(this->m, FieldType::zero());
+                            res[i] = FieldType::one();
                             return res;
                         }
                     }
@@ -143,26 +143,26 @@ namespace nil {
                      * Otherwise, if t does not equal any of the geometric progression values,
                      * then compute each Lagrange coefficient.
                      */
-                    std::vector<FieldT> l(this->m);
+                    std::vector<FieldType> l(this->m);
                     l[0] = t - geometric_sequence[0];
 
-                    std::vector<FieldT> g(this->m);
-                    g[0] = FieldT::zero();
+                    std::vector<FieldType> g(this->m);
+                    g[0] = FieldType::zero();
 
-                    FieldT l_vanish = l[0];
-                    FieldT g_vanish = FieldT::one();
+                    FieldType l_vanish = l[0];
+                    FieldType g_vanish = FieldType::one();
                     for (size_t i = 1; i < this->m; i++) {
                         l[i] = t - geometric_sequence[i];
-                        g[i] = FieldT::one() - geometric_sequence[i];
+                        g[i] = FieldType::one() - geometric_sequence[i];
 
                         l_vanish *= l[i];
                         g_vanish *= g[i];
                     }
 
-                    FieldT r = geometric_sequence[this->m - 1].inverse();
-                    FieldT r_i = r;
+                    FieldType r = geometric_sequence[this->m - 1].inverse();
+                    FieldType r_i = r;
 
-                    std::vector<FieldT> g_i(this->m);
+                    std::vector<FieldType> g_i(this->m);
                     g_i[0] = g_vanish.inverse();
 
                     l[0] = l_vanish * l[0].inverse() * g_i[0];
@@ -175,42 +175,42 @@ namespace nil {
                     return l;
                 }
 
-                FieldT get_domain_element(const size_t idx) {
+                FieldType get_domain_element(const size_t idx) {
                     if (!precomputation_sentinel)
                         do_precomputation();
 
                     return geometric_sequence[idx];
                 }
 
-                FieldT compute_vanishing_polynomial(const FieldT &t) {
+                FieldType compute_vanishing_polynomial(const FieldType &t) {
                     if (!precomputation_sentinel)
                         do_precomputation();
 
                     /* Notes: Z = prod_{i = 0 to m} (t - a[i]) */
                     /* Better approach: Montgomery Trick + Divide&Conquer/FFT */
-                    FieldT Z = FieldT::one();
+                    FieldType Z = FieldType::one();
                     for (size_t i = 0; i < this->m; i++) {
                         Z *= (t - geometric_sequence[i]);
                     }
                     return Z;
                 }
 
-                void add_poly_Z(const FieldT &coeff, std::vector<FieldT> &H) {
+                void add_poly_Z(const FieldType &coeff, std::vector<FieldType> &H) {
                     //if (H.size() != m + 1)
                         //throw DomainSizeException("geometric: expected H.size() == m+1");
 
                     if (!precomputation_sentinel)
                         do_precomputation();
 
-                    std::vector<FieldT> x(2, FieldT::zero());
+                    std::vector<FieldType> x(2, FieldType::zero());
                     x[0] = -geometric_sequence[0];
-                    x[1] = FieldT::one();
+                    x[1] = FieldType::one();
 
-                    std::vector<FieldT> t(2, FieldT::zero());
+                    std::vector<FieldType> t(2, FieldType::zero());
 
                     for (size_t i = 1; i < this->m + 1; i++) {
                         t[0] = -geometric_sequence[i];
-                        t[1] = FieldT::one();
+                        t[1] = FieldType::one();
 
                         _polynomial_multiplication(x, x, t);
                     }
@@ -223,23 +223,23 @@ namespace nil {
                     }
                 }
 
-                void divide_by_Z_on_coset(std::vector<FieldT> &P) {
-                    const FieldT coset = FieldT::multiplicative_generator; /* coset in geometric sequence? */
-                    const FieldT Z_inverse_at_coset = compute_vanishing_polynomial(coset).inverse();
+                void divide_by_Z_on_coset(std::vector<FieldType> &P) {
+                    const FieldType coset = FieldType::multiplicative_generator; /* coset in geometric sequence? */
+                    const FieldType Z_inverse_at_coset = compute_vanishing_polynomial(coset).inverse();
                     for (size_t i = 0; i < this->m; ++i) {
                         P[i] *= Z_inverse_at_coset;
                     }
                 }
 
                 void do_precomputation() {
-                    geometric_sequence = std::vector<FieldT>(this->m, FieldT::zero());
-                    geometric_sequence[0] = FieldT::one();
+                    geometric_sequence = std::vector<FieldType>(this->m, FieldType::zero());
+                    geometric_sequence[0] = FieldType::one();
 
-                    geometric_triangular_sequence = std::vector<FieldT>(this->m, FieldT::zero());
-                    geometric_triangular_sequence[0] = FieldT::one();
+                    geometric_triangular_sequence = std::vector<FieldType>(this->m, FieldType::zero());
+                    geometric_triangular_sequence[0] = FieldType::one();
 
                     for (size_t i = 1; i < this->m; i++) {
-                        geometric_sequence[i] = geometric_sequence[i - 1] * FieldT::geometric_generator();
+                        geometric_sequence[i] = geometric_sequence[i - 1] * FieldType::geometric_generator();
                         geometric_triangular_sequence[i] =
                             geometric_triangular_sequence[i - 1] * geometric_sequence[i - 1];
                     }
@@ -248,8 +248,8 @@ namespace nil {
                 }
             private:
                 bool precomputation_sentinel;
-                std::vector<FieldT> geometric_sequence;
-                std::vector<FieldT> geometric_triangular_sequence;
+                std::vector<FieldType> geometric_sequence;
+                std::vector<FieldType> geometric_triangular_sequence;
             };
 
         }    // namespace fft

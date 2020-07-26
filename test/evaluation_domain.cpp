@@ -23,7 +23,7 @@
 using namespace nil::algebra::fft;
 
 /**
- * Note: Templatized type referenced with TypeParam (instead of canonical FieldT)
+ * Note: Templatized type referenced with TypeParam (instead of canonical FieldType)
  * https://github.com/google/googletest/blob/master/googletest/docs/AdvancedGuide.md#typed-tests
  */
 /*template<typename T>
@@ -34,8 +34,8 @@ protected:
     }
 };
 
-/*typedef ::testing::Types<libff::Fr<libff::mnt4_pp>, libff::Double> FieldT;*/ /* List Extend Here */
-/*TYPED_TEST_CASE(EvaluationDomainTest, FieldT);
+/*typedef ::testing::Types<libff::Fr<libff::mnt4_pp>, libff::Double> FieldType;*/ /* List Extend Here */
+/*TYPED_TEST_CASE(EvaluationDomainTest, FieldType);
 
 TYPED_TEST(EvaluationDomainTest, FFT) {
 

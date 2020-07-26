@@ -45,8 +45,8 @@ namespace nil {
              Below we make use of pseudocode from [CLRS 2n Ed, pp. 864].
              Also, note that it's the caller's responsibility to multiply by 1/N.
              */
-            template<typename FieldT>
-            void _basic_serial_radix2_FFT(std::vector<FieldT> &a, const FieldT &omega) {
+            template<typename FieldType>
+            void _basic_serial_radix2_FFT(std::vector<FieldType> &a, const FieldType &omega) {
                 const size_t n = a.size(), logn = log2(n);
                 //if (n != (1u << logn))
                     //throw DomainSizeException("expected n == (1u << logn)");
@@ -61,13 +61,13 @@ namespace nil {
                 size_t m = 1;    // invariant: m = 2^{s-1}
                 for (size_t s = 1; s <= logn; ++s) {
                     // w_m is 2^s-th root of unity now
-                    const FieldT w_m = omega ^ (n / (2 * m));
+                    const FieldType w_m = omega ^ (n / (2 * m));
 
                     asm volatile("/* pre-inner */");
                     for (size_t k = 0; k < n; k += 2 * m) {
-                        FieldT w = FieldT::one();
+                        FieldType w = FieldType::one();
                         for (size_t j = 0; j < m; ++j) {
-                            const FieldT t = w * a[k + j + m];
+                            const FieldType t = w * a[k + j + m];
                             a[k + j + m] = a[k + j] - t;
                             a[k + j] += t;
                             w *= w_m;
@@ -82,8 +82,8 @@ namespace nil {
              * @brief A multi-thread version of _basic_radix2_FFT. Inner implementation.
              *
              */
-            template<typename FieldT>
-            void _basic_parallel_radix2_FFT_inner(std::vector<FieldT> &a, const FieldT &omega, const size_t log_cpus) {
+            template<typename FieldType>
+            void _basic_parallel_radix2_FFT_inner(std::vector<FieldType> &a, const FieldType &omega, const size_t log_cpus) {
                 const size_t num_cpus = 1ul << log_cpus;
 
                 const size_t m = a.size();
@@ -96,19 +96,19 @@ namespace nil {
                     return;
                 }
 
-                std::vector<std::vector<FieldT>> tmp(num_cpus);
+                std::vector<std::vector<FieldType>> tmp(num_cpus);
                 for (size_t j = 0; j < num_cpus; ++j) {
-                    tmp[j].resize(1ul << (log_m - log_cpus), FieldT::zero());
+                    tmp[j].resize(1ul << (log_m - log_cpus), FieldType::zero());
                 }
 
         #ifdef MULTICORE
         #pragma omp parallel for
         #endif
                 for (size_t j = 0; j < num_cpus; ++j) {
-                    const FieldT omega_j = omega ^ j;
-                    const FieldT omega_step = omega ^ (j << (log_m - log_cpus));
+                    const FieldType omega_j = omega ^ j;
+                    const FieldType omega_step = omega ^ (j << (log_m - log_cpus));
 
-                    FieldT elt = FieldT::one();
+                    FieldType elt = FieldType::one();
                     for (size_t i = 0; i < 1ul << (log_m - log_cpus); ++i) {
                         for (size_t s = 0; s < num_cpus; ++s) {
                             // invariant: elt is omega^(j*idx)
@@ -120,7 +120,7 @@ namespace nil {
                     }
                 }
 
-                const FieldT omega_num_cpus = omega ^ num_cpus;
+                const FieldType omega_num_cpus = omega ^ num_cpus;
 
         #ifdef MULTICORE
         #pragma omp parallel for
@@ -145,8 +145,8 @@ namespace nil {
              * @brief A multi-thread version of _basic_radix2_FFT.
              *
              */
-            template<typename FieldT>
-            void _basic_parallel_radix2_FFT(std::vector<FieldT> &a, const FieldT &omega) {
+            template<typename FieldType>
+            void _basic_parallel_radix2_FFT(std::vector<FieldType> &a, const FieldType &omega) {
         #ifdef MULTICORE
                 const size_t num_cpus = omp_get_max_threads();
         #else
@@ -169,9 +169,9 @@ namespace nil {
             /*!
              * @brief Translate the vector a to a coset defined by g.
              */
-            template<typename FieldT>
-            void _multiply_by_coset(std::vector<FieldT> &a, const FieldT &g) {
-                FieldT u = g;
+            template<typename FieldType>
+            void _multiply_by_coset(std::vector<FieldType> &a, const FieldType &g) {
+                FieldType u = g;
                 for (size_t i = 1; i < a.size(); ++i) {
                     a[i] *= u;
                     u *= g;
@@ -181,30 +181,30 @@ namespace nil {
             /*!
              * @brief Compute the m Lagrange coefficients, relative to the set S={omega^{0},...,omega^{m-1}}, at the field element t.
              */
-            template<typename FieldT>
-            std::vector<FieldT> _basic_radix2_evaluate_all_lagrange_polynomials(const size_t m, const FieldT &t) {
+            template<typename FieldType>
+            std::vector<FieldType> _basic_radix2_evaluate_all_lagrange_polynomials(const size_t m, const FieldType &t) {
                 if (m == 1) {
-                    return std::vector<FieldT>(1, FieldT::one());
+                    return std::vector<FieldType>(1, FieldType::one());
                 }
 
                 //if (m != (1u << algebra::log2(m)))
                     //throw DomainSizeException("expected m == (1u << log2(m))");
 
-                const FieldT omega = ff::get_root_of_unity<FieldT>(m);
+                const FieldType omega = ff::get_root_of_unity<FieldType>(m);
 
-                std::vector<FieldT> u(m, FieldT::zero());
+                std::vector<FieldType> u(m, FieldType::zero());
 
                 /*
                  If t equals one of the roots of unity in S={omega^{0},...,omega^{m-1}}
                  then output 1 at the right place, and 0 elsewhere
                  */
 
-                if ((t ^ m) == (FieldT::one())) {
-                    FieldT omega_i = FieldT::one();
+                if ((t ^ m) == (FieldType::one())) {
+                    FieldType omega_i = FieldType::one();
                     for (size_t i = 0; i < m; ++i) {
                         if (omega_i == t)    // i.e., t equals omega^i
                         {
-                            u[i] = FieldT::one();
+                            u[i] = FieldType::one();
                             return u;
                         }
 
@@ -221,9 +221,9 @@ namespace nil {
                  Below we use the fact that v_{0} = 1/m and v_{i+1} = \omega * v_{i}.
                  */
 
-                const FieldT Z = (t ^ m) - FieldT::one();
-                FieldT l = Z * FieldT(m).inverse();
-                FieldT r = FieldT::one();
+                const FieldType Z = (t ^ m) - FieldType::one();
+                FieldType l = Z * FieldType(m).inverse();
+                FieldType r = FieldType::one();
                 for (size_t i = 0; i < m; ++i) {
                     u[i] = l * (t - r).inverse();
                     l *= omega;
