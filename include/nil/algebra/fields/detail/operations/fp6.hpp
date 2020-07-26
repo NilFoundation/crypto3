@@ -13,7 +13,7 @@
 #include <boost/multiprecision/ressol.hpp>
 
 #include <nil/algebra/fields/fp6.hpp>
-#include <nil/algebra/fields/detail/operations/operations.hpp>
+#include <nil/algebra/fields/detail/operations/arithmetic.hpp>
 
 namespace nil {
     namespace algebra {

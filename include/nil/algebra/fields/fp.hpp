@@ -26,7 +26,7 @@ namespace nil {
          */
         template<std::size_t ModulusBits, std::size_t GeneratorBits>
         struct fp {
-            typedef point<fp<ModulusBits, GeneratorBits>, number_type> point_type;
+            typedef element<fp<ModulusBits, GeneratorBits>, number_type> value_type;
 
             constexpr static const std::size_t modulus_bits = ModulusBits;
             typedef number<backends::cpp_int_backend<modulus_bits, modulus_bits, unsigned_magnitude, unchecked, void>>
@@ -37,14 +37,14 @@ namespace nil {
                 backends::cpp_int_backend<generator_bits, generator_bits, unsigned_magnitude, unchecked, void>>
                 generator_type;
 
-            constexpr fp(const point_fp &point) : top_non_residue(point) {
+            constexpr fp(const value_type &point) : top_non_residue(point) {
             }    // init point for non_residue in fp2 or higher
             constexpr fp() {
             }    // init point for non_residue in itself
 
             constexpr static const std::size_t arity = 1;
 
-            constexpr const point_fp top_non_residue;
+            constexpr const value_type top_non_residue;
         };
 
     }    // namespace algebra
