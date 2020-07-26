@@ -22,7 +22,7 @@
 
 #include <nil/crypto3/block/detail/rijndael/rijndael_ni_impl.hpp>
 
-#elif defined(CRYPTO3_HAS_RIJNDAEL_SSSE3)
+#elif defined(CRYPTO3_HAS_RIJNDAEL_SSSE3) || BOOST_HW_SIMD_X86 >= BOOST_HW_SIMD_X86_SSSE3_VERSION
 
 #include <nil/crypto3/block/detail/rijndael/rijndael_ssse3_impl.hpp>
 
