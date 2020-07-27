@@ -56,6 +56,6 @@ namespace {
         FUZZER_ASSERT_EQUAL(S1, S3);
     }
 
-}
+}    // namespace
 
 #endif

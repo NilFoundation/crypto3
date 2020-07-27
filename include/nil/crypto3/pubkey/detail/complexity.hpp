@@ -6,16 +6,14 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_PUBKEY_WORKFACTOR_HPP
-#define CRYPTO3_PUBKEY_WORKFACTOR_HPP
-
-#include <nil/crypto3/utilities/types.hpp>
+#ifndef CRYPTO3_PUBKEY_COMPLEXITY_HPP
+#define CRYPTO3_PUBKEY_COMPLEXITY_HPP
 
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
             namespace detail {
-                size_t nfs_workfactor(size_t bits, double k) {
+                std::size_t nfs_workfactor(std::size_t bits, double k) {
                     // approximates natural logarithm of integer of given bitsize
                     const double log2_e = std::log2(std::exp(1));
                     const double log_p = bits / log2_e;
@@ -26,7 +24,7 @@ namespace nil {
                     const double est = 1.92 * std::pow(log_p * log_log_p * log_log_p, 1.0 / 3.0);
 
                     // return log2 of the workfactor
-                    return static_cast<size_t>(std::log2(k) + log2_e * est);
+                    return static_cast<std::size_t>(std::log2(k) + log2_e * est);
                 }
             }    // namespace detail
 
@@ -41,16 +39,16 @@ namespace nil {
              * the exponent size for performance reasons.
              */
 
-            size_t dl_exponent_size(size_t prime_group_size) {
+            std::size_t dl_exponent_size(std::size_t prime_group_size) {
                 /*
                 This uses a slightly tweaked version of the standard work factor
                 function above. It assumes k is 1 (thus overestimating the strength
                 of the prime group by 5-6 bits), and always returns at least 128 bits
                 (this only matters for very small primes).
                 */
-                const size_t MIN_WORKFACTOR = 64;
+                const std::size_t MIN_WORKFACTOR = 64;
 
-                return 2 * std::max<std::size_t>(MIN_WORKFACTOR, detail::nfs_workfactor(prime_group_size, 1));
+                return 2 * std::max<std::std::size_t>(MIN_WORKFACTOR, detail::nfs_workfactor(prime_group_size, 1));
             }
 
             /**
@@ -59,7 +57,7 @@ namespace nil {
              * @return estimated security level for this modulus
              */
 
-            size_t if_work_factor(size_t n_bits) {
+            std::size_t if_work_factor(std::size_t n_bits) {
                 // RFC 3766 estimates k at .02 and o(1) to be effectively zero for sizes of interest
 
                 return detail::nfs_workfactor(n_bits, .02);
@@ -71,7 +69,7 @@ namespace nil {
              * @return estimated security level for this group
              */
 
-            size_t dl_work_factor(size_t prime_group_size) {
+            std::size_t dl_work_factor(std::size_t prime_group_size) {
                 // Lacking better estimates...
                 return if_work_factor(prime_group_size);
             }
@@ -82,7 +80,7 @@ namespace nil {
              * @return estimated security level for this group
              */
 
-            size_t ecp_work_factor(size_t prime_group_size) {
+            std::size_t ecp_work_factor(std::size_t prime_group_size) {
                 return prime_group_size / 2;
             }
         }    // namespace pubkey

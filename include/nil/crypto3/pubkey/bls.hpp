@@ -6,8 +6,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_PUBKEY_DSA_HPP
-#define CRYPTO3_PUBKEY_DSA_HPP
+#ifndef CRYPTO3_PUBKEY_BLS_HPP
+#define CRYPTO3_PUBKEY_BLS_HPP
 
 #include <nil/crypto3/pubkey/dl_algorithm.hpp>
 #include <nil/crypto3/pubkey/dl_group/dl_group.hpp>
@@ -17,9 +17,9 @@ namespace nil {
         namespace pubkey {
 
             /**
-             * DSA Public Key
+             * BLS Public Key
              */
-            class dsa_public_key_policy : public virtual dl_scheme_public_key {
+            class bls_public_key_policy : public virtual dl_scheme_public_key {
             public:
                 /**
                  * Get the OID of the underlying public key scheme.
@@ -30,7 +30,7 @@ namespace nil {
                 }
 
                 std::string algo_name() const override {
-                    return "DSA";
+                    return "BLS";
                 }
 
                 dl_group::format group_format() const override {
@@ -50,7 +50,7 @@ namespace nil {
                  * @param alg_id the X.509 algorithm identifier
                  * @param key_bits DER encoded public key bits
                  */
-                dsa_public_key_policy(const algorithm_identifier &alg_id, const std::vector<uint8_t> &key_bits) :
+                bls_public_key_policy(const algorithm_identifier &alg_id, const std::vector<uint8_t> &key_bits) :
                     dl_scheme_public_key(alg_id, key_bits, dl_group::ANSI_X9_57) {
                 }
 
@@ -60,7 +60,7 @@ namespace nil {
                  * @param y the public value y = g^x mod p
                  */
                 template<typename Backend, expression_template_option ExpressionTemplates>
-                dsa_public_key_policy(const dl_group<number<Backend, ExpressionTemplates>> &group,
+                bls_public_key_policy(const dl_group<number<Backend, ExpressionTemplates>> &group,
                                       const number<Backend, ExpressionTemplates> &y) :
                     m_group(group),
                     m_y(y) {
@@ -70,20 +70,20 @@ namespace nil {
                     create_verification_op(const std::string &params, const std::string &provider) const override;
 
             protected:
-                dsa_public_key_policy() = default;
+                bls_public_key_policy() = default;
             };
 
             /**
-             * DSA Private Key
+             * BLS Private Key
              */
-            class dsa_private_key_policy final : public dsa_public_key_policy, public virtual dl_scheme_private_key {
+            class bls_private_key_policy final : public bls_public_key_policy, public virtual dl_scheme_private_key {
             public:
                 /**
                  * Load a private key.
                  * @param alg_id the X.509 algorithm identifier
                  * @param key_bits DER encoded key bits in ANSI X9.57 format
                  */
-                dsa_private_key_policy(const algorithm_identifier &alg_id, const secure_vector<uint8_t> &key_bits);
+                bls_private_key_policy(const algorithm_identifier &alg_id, const secure_vector<uint8_t> &key_bits);
 
                 /**
                  * Create a private key.
@@ -91,7 +91,7 @@ namespace nil {
                  * @param group the underlying DL group
                  * @param private_key the private key (if zero, a new random key is generated)
                  */
-                dsa_private_key_policy(random_number_generator &rng, const dl_group &group,
+                bls_private_key_policy(random_number_generator &rng, const dl_group &group,
                                        const number<Backend, ExpressionTemplates> &private_key = 0);
 
                 bool check_key(random_number_generator &rng, bool strong) const override;
@@ -102,25 +102,25 @@ namespace nil {
                                         const std::string &provider) const override;
             };
 
-            class dsa {
+            class bls {
             public:
-                typedef dsa_public_key_policy public_key_policy;
-                typedef dsa_private_key_policy private_key_policy;
+                typedef bls_public_key_policy public_key_policy;
+                typedef bls_private_key_policy private_key_policy;
             };
 
             /*
-             * dsa_public_key_policy Constructor
+             * bls_public_key_policy Constructor
              */
-            dsa_public_key_policy::dsa_public_key_policy(const dl_group &grp,
+            bls_public_key_policy::bls_public_key_policy(const dl_group &grp,
                                                          const number<Backend, ExpressionTemplates> &y1) {
                 m_group = grp;
                 m_y = y1;
             }
 
             /*
-             * Create a DSA private key
+             * Create a BLS private key
              */
-            dsa_private_key_policy::dsa_private_key_policy(random_number_generator &rng, const dl_group &grp,
+            bls_private_key_policy::bls_private_key_policy(random_number_generator &rng, const dl_group &grp,
                                                            const number<Backend, ExpressionTemplates> &x_arg) {
                 m_group = grp;
 
@@ -133,16 +133,16 @@ namespace nil {
                 m_y = m_group.power_g_p(m_x);
             }
 
-            dsa_private_key_policy::dsa_private_key_policy(const algorithm_identifier &alg_id,
+            bls_private_key_policy::bls_private_key_policy(const algorithm_identifier &alg_id,
                                                            const secure_vector<uint8_t> &key_bits) :
                 dl_scheme_private_key(alg_id, key_bits, dl_group::ANSI_X9_57) {
                 m_y = m_group.power_g_p(m_x);
             }
 
             /*
-             * Check Private DSA Parameters
+             * Check Private BLS Parameters
              */
-            bool dsa_private_key_policy::check_key(random_number_generator &rng, bool strong) const {
+            bool bls_private_key_policy::check_key(random_number_generator &rng, bool strong) const {
                 if (!dl_scheme_private_key::check_key(rng, strong) || m_x >= group_q()) {
                     return false;
                 }
@@ -157,13 +157,13 @@ namespace nil {
             namespace {
 
                 /**
-                 * Object that can create a DSA signature
+                 * Object that can create a BLS signature
                  */
-                class dsa_signature_operation final : public pk_operations::signature_with_emsa {
+                class bls_signature_operation final : public pk_operations::signature_with_emsa {
                 public:
-                    dsa_signature_operation(const dsa_private_key_policy &dsa, const std::string &emsa) :
-                        pk_operations::signature_with_emsa(emsa), m_group(dsa.get_group()), m_x(dsa.get_x()),
-                        m_mod_q(dsa.group_q()) {
+                    bls_signature_operation(const bls_private_key_policy &bls, const std::string &emsa) :
+                        pk_operations::signature_with_emsa(emsa), m_group(bls.get_group()), m_x(bls.get_x()),
+                        m_mod_q(bls.group_q()) {
 #if defined(CRYPTO3_HAS_RFC6979)
                         m_rfc6979_hash = hash_for_emsa(emsa);
 #endif
@@ -185,7 +185,7 @@ namespace nil {
 #endif
                 };
 
-                secure_vector<uint8_t> dsa_signature_operation::raw_sign(const uint8_t msg[], size_t msg_len,
+                secure_vector<uint8_t> bls_signature_operation::raw_sign(const uint8_t msg[], size_t msg_len,
                                                                          random_number_generator &rng) {
                     const number<Backend, ExpressionTemplates> &q = m_group.get_q();
 
@@ -210,20 +210,20 @@ namespace nil {
 
                     // With overwhelming probability, a bug rather than actual zero r/s
                     if (r == 0 || s == 0) {
-                        throw internal_error("Computed zero r/s during DSA signature");
+                        throw internal_error("Computed zero r/s during BLS signature");
                     }
 
                     return number<Backend, ExpressionTemplates>::encode_fixed_length_int_pair(r, s, q.bytes());
                 }
 
                 /**
-                 * Object that can verify a DSA signature
+                 * Object that can verify a BLS signature
                  */
-                class dsa_verification_operation final : public pk_operations::verification_with_emsa {
+                class bls_verification_operation final : public pk_operations::verification_with_emsa {
                 public:
-                    dsa_verification_operation(const dsa_public_key_policy &dsa, const std::string &emsa) :
-                        pk_operations::verification_with_emsa(emsa), m_group(dsa.get_group()), m_y(dsa.get_y()),
-                        m_mod_q(dsa.group_q()) {
+                    bls_verification_operation(const bls_public_key_policy &bls, const std::string &emsa) :
+                        pk_operations::verification_with_emsa(emsa), m_group(bls.get_group()), m_y(bls.get_y()),
+                        m_mod_q(bls.group_q()) {
                     }
 
                     size_t max_input_bits() const override {
@@ -243,7 +243,7 @@ namespace nil {
                     modular_reducer m_mod_q;
                 };
 
-                bool dsa_verification_operation::verify(const uint8_t msg[], size_t msg_len, const uint8_t sig[],
+                bool bls_verification_operation::verify(const uint8_t msg[], size_t msg_len, const uint8_t sig[],
                                                         size_t sig_len) {
                     const number<Backend, ExpressionTemplates> &q = m_group.get_q();
                     const size_t q_bytes = q.bytes();
@@ -273,18 +273,18 @@ namespace nil {
             }    // namespace
 
             std::unique_ptr<pk_operations::verification>
-                dsa_public_key_policy::create_verification_op(const std::string &params,
+                bls_public_key_policy::create_verification_op(const std::string &params,
                                                               const std::string &provider) const {
                 if (provider == "core" || provider.empty()) {
-                    return std::unique_ptr<pk_operations::verification>(new dsa_verification_operation(*this, params));
+                    return std::unique_ptr<pk_operations::verification>(new bls_verification_operation(*this, params));
                 }
                 throw Provider_Not_Found(algo_name(), provider);
             }
 
-            std::unique_ptr<pk_operations::signature> dsa_private_key_policy::create_signature_op(
+            std::unique_ptr<pk_operations::signature> bls_private_key_policy::create_signature_op(
                 random_number_generator & /*random*/, const std::string &params, const std::string &provider) const {
                 if (provider == "core" || provider.empty()) {
-                    return std::unique_ptr<pk_operations::signature>(new dsa_signature_operation(*this, params));
+                    return std::unique_ptr<pk_operations::signature>(new bls_signature_operation(*this, params));
                 }
                 throw Provider_Not_Found(algo_name(), provider);
             }

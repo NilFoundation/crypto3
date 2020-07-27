@@ -9,15 +9,15 @@
 #ifndef CRYPTO3_PUBKEY_SIGN_HPP
 #define CRYPTO3_PUBKEY_SIGN_HPP
 
-#include <nil/crypto3/pubkey/cipher_value.hpp>
-#include <nil/crypto3/pubkey/cipher_state.hpp>
+#include <nil/crypto3/pubkey/scheme_value.hpp>
+#include <nil/crypto3/pubkey/scheme_state.hpp>
 
 namespace nil {
     namespace crypto3 {
         /*!
          * @brief
          *
-         * @ingroup block_algorithms
+         * @ingroup pubkey_algorithms
          *
          * @tparam PublicKeySigner
          * @tparam InputIterator
@@ -48,7 +48,7 @@ namespace nil {
         /*!
          * @brief
          *
-         * @ingroup block_algorithms
+         * @ingroup pubkey_algorithms
          *
          * @tparam PublicKeySigner
          * @tparam InputIterator
@@ -74,7 +74,7 @@ namespace nil {
         /*!
          * @brief
          *
-         * @ingroup block_algorithms
+         * @ingroup pubkey_algorithms
          *
          * @tparam PublicKeyCipher
          * @tparam SinglePassRange
@@ -99,12 +99,12 @@ namespace nil {
         /*!
          * @brief
          *
-         * @ingroup block_algorithms
+         * @ingroup pubkey_algorithms
          *
          * @tparam PublicKeyCipher
          * @tparam InputIterator
          * @tparam KeyIterator
-         * @tparam CipherAccumulator
+         * @tparam SchemeAccumulator
          *
          * @param first
          * @param last
@@ -115,20 +115,20 @@ namespace nil {
          */
         template<
             typename PublicKeyCipher, typename InputIterator, typename KeyIterator,
-            typename CipherAccumulator = typename pubkey::accumulator_set<typename PublicKeyCipher::stream_signer_type>>
-        pubkey::detail::range_scheme_impl<pubkey::detail::value_scheme_impl<CipherAccumulator>>
+            typename SchemeAccumulator = typename pubkey::accumulator_set<typename PublicKeyCipher::stream_signer_type>>
+        pubkey::detail::range_scheme_impl<pubkey::detail::value_scheme_impl<SchemeAccumulator>>
             sign(InputIterator first, InputIterator last, KeyIterator key_first, KeyIterator key_last) {
 
-            typedef pubkey::detail::value_scheme_impl<CipherAccumulator> StreamSignerImpl;
+            typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamSignerImpl;
             typedef pubkey::detail::range_scheme_impl<StreamSignerImpl> SignerImpl;
 
-            return SignerImpl(first, last, CipherAccumulator(PublicKeyCipher(key_first, key_last)));
+            return SignerImpl(first, last, SchemeAccumulator(PublicKeyCipher(key_first, key_last)));
         }
 
         /*!
          * @brief
          *
-         * @ingroup block_algorithms
+         * @ingroup pubkey_algorithms
          *
          * @tparam PublicKeyCipher
          * @tparam SinglePassRange
@@ -145,9 +145,9 @@ namespace nil {
         OutputIterator sign(const SinglePassRange &rng, const KeyRange &key, OutputIterator out) {
 
             typedef typename PublicKeyCipher::stream_signer_type SignionMode;
-            typedef typename pubkey::accumulator_set<SignionMode> CipherAccumulator;
+            typedef typename pubkey::accumulator_set<SignionMode> SchemeAccumulator;
 
-            typedef pubkey::detail::value_scheme_impl<CipherAccumulator> StreamSignerImpl;
+            typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamSignerImpl;
             typedef pubkey::detail::itr_scheme_impl<StreamSignerImpl, OutputIterator> SignerImpl;
 
             return SignerImpl(rng, std::move(out), CipherState(PublicKeyCipher(key)));
@@ -156,12 +156,12 @@ namespace nil {
         /*!
          * @brief
          *
-         * @ingroup block_algorithms
+         * @ingroup pubkey_algorithms
          *
          * @tparam PublicKeyCipher
          * @tparam SinglePassRange
          * @tparam KeyRange
-         * @tparam CipherAccumulator
+         * @tparam SchemeAccumulator
          *
          * @param r
          * @param key
@@ -170,11 +170,11 @@ namespace nil {
          */
         template<
             typename PublicKeyCipher, typename SinglePassRange, typename KeyRange,
-            typename CipherAccumulator = typename pubkey::accumulator_set<typename PublicKeyCipher::stream_signer_type>>
-        pubkey::detail::range_scheme_impl<pubkey::detail::value_scheme_impl<CipherAccumulator>>
+            typename SchemeAccumulator = typename pubkey::accumulator_set<typename PublicKeyCipher::stream_signer_type>>
+        pubkey::detail::range_scheme_impl<pubkey::detail::value_scheme_impl<SchemeAccumulator>>
             sign(const SinglePassRange &r, const KeyRange &key) {
 
-            typedef pubkey::detail::value_scheme_impl<CipherAccumulator> StreamSignerImpl;
+            typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamSignerImpl;
             typedef pubkey::detail::range_scheme_impl<StreamSignerImpl> SignerImpl;
 
             return SignerImpl(r, CipherState(PublicKeyCipher(key)));

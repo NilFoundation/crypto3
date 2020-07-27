@@ -137,13 +137,13 @@ namespace nil {
             };
 
             dlies_encryptor::dlies_encryptor(const dh_private_key &own_priv_key, RandomNumberGenerator &rng, kdf *kdf,
-                                              MessageAuthenticationCode *mac, size_t mac_key_length) :
+                                             MessageAuthenticationCode *mac, size_t mac_key_length) :
                 dlies_encryptor(own_priv_key, rng, kdf, nullptr, 0, mac, mac_key_length) {
             }
 
             dlies_encryptor::dlies_encryptor(const dh_private_key &own_priv_key, RandomNumberGenerator &rng, kdf *kdf,
-                                              cipher_mode *cipher, size_t cipher_key_len,
-                                              MessageAuthenticationCode *mac, size_t mac_key_length) :
+                                             cipher_mode *cipher, size_t cipher_key_len, MessageAuthenticationCode *mac,
+                                             size_t mac_key_length) :
                 m_other_pub_key(),
                 m_own_pub_key(own_priv_key.public_value()), m_ka(own_priv_key, rng, "Raw"), m_kdf(kdf),
                 m_cipher(cipher), m_cipher_key_len(cipher_key_len), m_mac(mac), m_mac_keylen(mac_key_length),

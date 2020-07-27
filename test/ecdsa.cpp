@@ -34,7 +34,6 @@
 #include <nil/crypto3/pubkey/newhope.hpp>
 #include <nil/crypto3/pubkey/pbes2.hpp>
 #include <nil/crypto3/pubkey/pem.hpp>
-#include <nil/crypto3/pubkey/pk_algs.hpp>
 #include <nil/crypto3/pubkey/pk_keys.hpp>
 #include <nil/crypto3/pubkey/pk_operations.hpp>
 #include <nil/crypto3/pubkey/pk_ops_fwd.hpp>
@@ -44,7 +43,7 @@
 #include <nil/crypto3/pubkey/rsa.hpp>
 #include <nil/crypto3/pubkey/sm2.hpp>
 #include <nil/crypto3/pubkey/sm2_encrypt.hpp>
-#include <nil/crypto3/pubkey/workfactor.hpp>
+#include <nil/crypto3/pubkey/complexity.hpp>
 #include <nil/crypto3/pubkey/x509_key.hppecdsa.hpp>
 
 #include <boost/test/unit_test.hpp>

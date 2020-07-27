@@ -968,7 +968,6 @@ namespace nil {
             s[29] = s11 >> 1;
             s[30] = s11 >> 9;
             s[31] = s11 >> 17;
-
         }
 
         void sc_muladd(uint8_t *, const uint8_t *, const uint8_t *, const uint8_t *) {

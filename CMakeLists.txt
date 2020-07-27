@@ -30,39 +30,37 @@ cm_find_package(${CMAKE_WORKSPACE_NAME}_utilities)
 option(BUILD_TESTS "Build unit tests" FALSE)
 
 list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-     include//nil/crypto3/pubkey/algorithm/sign.hpp
-     include//nil/crypto3/pubkey/algorithm/encrypt.hpp
-     include//nil/crypto3/pubkey/algorithm/decrypt.hpp
-     include//nil/crypto3/pubkey/algorithm/verify.hpp
+     include/nil/crypto3/pubkey/algorithm/sign.hpp
+     include/nil/crypto3/pubkey/algorithm/encrypt.hpp
+     include/nil/crypto3/pubkey/algorithm/decrypt.hpp
+     include/nil/crypto3/pubkey/algorithm/verify.hpp
 
-     include//nil/crypto3/pubkey/pk_algs.hpp
-     include//nil/crypto3/pubkey/blinding.hpp
-     include//nil/crypto3/pubkey/pk_keys.hpp
-     include//nil/crypto3/pubkey/pk_operations.hpp
-     include//nil/crypto3/pubkey/pk_ops_fwd.hpp
-     include//nil/crypto3/pubkey/pkcs8.hpp
-     include//nil/crypto3/pubkey/pubkey.hpp
-     include//nil/crypto3/pubkey/x509_key.hpp
-     include//nil/crypto3/pubkey/workfactor.hpp
-     include//nil/crypto3/pubkey/keypair.hpp
-     include//nil/crypto3/pubkey/ecies.hpp
-     include//nil/crypto3/pubkey/ecc_key.hpp
+     include/nil/crypto3/pubkey/blinding.hpp
+     include/nil/crypto3/pubkey/pk_keys.hpp
+     include/nil/crypto3/pubkey/pk_ops_fwd.hpp
+     include/nil/crypto3/pubkey/pkcs8.hpp
+     include/nil/crypto3/pubkey/pubkey.hpp
+     include/nil/crypto3/pubkey/x509_key.hpp
+     include/nil/crypto3/pubkey/workfactor.hpp
+     include/nil/crypto3/pubkey/keypair.hpp
+     include/nil/crypto3/pubkey/ecies.hpp
+     include/nil/crypto3/pubkey/ecc_key.hpp
 
-     include//nil/crypto3/pubkey/dl_group/dl_group.hpp
-     include//nil/crypto3/pubkey/dl_group/dl_algorithm.hpp
-     include//nil/crypto3/pubkey/dl_group/dl_group_info.hpp
+     include/nil/crypto3/pubkey/dl_group/dl_group.hpp
+     include/nil/crypto3/pubkey/dl_group/dl_algorithm.hpp
+     include/nil/crypto3/pubkey/dl_group/dl_group_info.hpp
 
-     include//nil/crypto3/pubkey/ec_group/curve_gfp.hpp
-     include//nil/crypto3/pubkey/ec_group/curve_nist.hpp
-     include//nil/crypto3/pubkey/ec_group/p192.hpp
-     include//nil/crypto3/pubkey/ec_group/p224.hpp
-     include//nil/crypto3/pubkey/ec_group/p256.hpp
-     include//nil/crypto3/pubkey/ec_group/p384.hpp
-     include//nil/crypto3/pubkey/ec_group/p521.hpp
-     include//nil/crypto3/pubkey/ec_group/curve_montgomery.hpp
-     include//nil/crypto3/pubkey/ec_group/ec_group.hpp
-     include//nil/crypto3/pubkey/ec_group/point_gfp.hpp
-     include//nil/crypto3/pubkey/ec_group/point_mul.hpp)
+     include/nil/crypto3/pubkey/ec_group/curve_gfp.hpp
+     include/nil/crypto3/pubkey/ec_group/curve_nist.hpp
+     include/nil/crypto3/pubkey/ec_group/p192.hpp
+     include/nil/crypto3/pubkey/ec_group/p224.hpp
+     include/nil/crypto3/pubkey/ec_group/p256.hpp
+     include/nil/crypto3/pubkey/ec_group/p384.hpp
+     include/nil/crypto3/pubkey/ec_group/p521.hpp
+     include/nil/crypto3/pubkey/ec_group/curve_montgomery.hpp
+     include/nil/crypto3/pubkey/ec_group/ec_group.hpp
+     include/nil/crypto3/pubkey/ec_group/point_gfp.hpp
+     include/nil/crypto3/pubkey/ec_group/point_mul.hpp)
 
 list(APPEND ${CURRENT_PROJECT_NAME}_PRIVATE_HEADERS
      include/nil/crypto3/pubkey/detail/pk_ops_impl.hpp)
@@ -91,7 +89,7 @@ option(CRYPTO3_PUBKEY_SM2 "Build with SM2 public key scheme support" TRUE)
 
 if(CRYPTO3_PUBKEY_NEWHOPE)
     list(APPEND ${CURRENT_PROJECT_NAME}_NEWHOPE_HEADERS
-         include//nil/crypto3/pubkey/newhope.hpp)
+         include/nil/crypto3/pubkey/newhope.hpp)
 
     list(APPEND ${CURRENT_PROJECT_NAME}_NEWHOPE_SOURCES)
 
@@ -104,7 +102,7 @@ endif()
 
 if(CRYPTO3_PUBKEY_RFC6979)
     list(APPEND ${CURRENT_PROJECT_NAME}_RFC6979_HEADERS
-         include//nil/crypto3/pubkey/rfc6979.hpp)
+         include/nil/crypto3/pubkey/rfc6979.hpp)
 
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_RFC6979)
     list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
@@ -115,7 +113,7 @@ endif()
 
 if(CRYPTO3_PUBKEY_PBES2)
     list(APPEND ${CURRENT_PROJECT_NAME}_PBES2_HEADERS
-         include//nil/crypto3/pubkey/pbes2.hpp)
+         include/nil/crypto3/pubkey/pbes2.hpp)
 
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_PBES2)
     list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
@@ -126,7 +124,7 @@ endif()
 
 if(CRYPTO3_PUBKEY_PEM)
     list(APPEND ${CURRENT_PROJECT_NAME}_PEM_HEADERS
-         include//nil/crypto3/pubkey/pem.hpp)
+         include/nil/crypto3/pubkey/pem.hpp)
 
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_PEM)
     list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
@@ -137,7 +135,7 @@ endif()
 
 if(CRYPTO3_PUBKEY_RSA)
     list(APPEND ${CURRENT_PROJECT_NAME}_RSA_HEADERS
-         include//nil/crypto3/pubkey/rsa.hpp)
+         include/nil/crypto3/pubkey/rsa.hpp)
 
     list(APPEND ${CURRENT_PROJECT_NAME}_RSA_SOURCES)
 
@@ -153,7 +151,7 @@ endif()
 
 if(CRYPTO3_PUBKEY_DSA)
     list(APPEND ${CURRENT_PROJECT_NAME}_DSA_HEADERS
-         include//nil/crypto3/pubkey/dsa.hpp)
+         include/nil/crypto3/pubkey/dsa.hpp)
 
     list(APPEND ${CURRENT_PROJECT_NAME}_DSA_SOURCES)
 
@@ -169,7 +167,7 @@ endif()
 
 if(CRYPTO3_PUBKEY_DIFFIE_HELLMAN)
     list(APPEND ${CURRENT_PROJECT_NAME}_DIFFIE_HELLMAN_HEADERS
-         include//nil/crypto3/pubkey/dh.hpp)
+         include/nil/crypto3/pubkey/dh.hpp)
 
     list(APPEND ${CURRENT_PROJECT_NAME}_DIFFIE_HELLMAN_SOURCES)
 
@@ -182,7 +180,7 @@ endif()
 
 if(CRYPTO3_PUBKEY_ECDSA)
     list(APPEND ${CURRENT_PROJECT_NAME}_ECDSA_HEADERS
-         include//nil/crypto3/pubkey/ecdsa.hpp)
+         include/nil/crypto3/pubkey/ecdsa.hpp)
 
     list(APPEND ${CURRENT_PROJECT_NAME}_ECDSA_SOURCES)
 
@@ -199,7 +197,7 @@ endif()
 
 if(CRYPTO3_PUBKEY_ECGDSA)
     list(APPEND ${CURRENT_PROJECT_NAME}_ECGDSA_HEADERS
-         include//nil/crypto3/pubkey/ecgdsa.hpp)
+         include/nil/crypto3/pubkey/ecgdsa.hpp)
 
     list(APPEND ${CURRENT_PROJECT_NAME}_ECGDSA_SOURCES)
 
@@ -216,7 +214,7 @@ endif()
 
 if(CRYPTO3_PUBKEY_ECKCDSA)
     list(APPEND ${CURRENT_PROJECT_NAME}_ECKCDSA_HEADERS
-         include//nil/crypto3/pubkey/eckcdsa.hpp)
+         include/nil/crypto3/pubkey/eckcdsa.hpp)
 
     list(APPEND ${CURRENT_PROJECT_NAME}_ECKCDSA_SOURCES)
 
@@ -229,11 +227,11 @@ endif()
 
 if(CRYPTO3_PUBKEY_ED25519)
     list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_ED25519_HEADERS
-         include//nil/crypto3/pubkey/ed25519.hpp)
+         include/nil/crypto3/pubkey/ed25519.hpp)
 
     list(APPEND ${CURRENT_PROJECT_NAME}_PRIVATE_ED25519_HEADERS
-         include//nil/crypto3/pubkey/detail/ed25519/ed25519_fe.hpp
-         include//nil/crypto3/pubkey/detail/ed25519/ed25519_internal.hpp)
+         include/nil/crypto3/pubkey/detail/ed25519/ed25519_fe.hpp
+         include/nil/crypto3/pubkey/detail/ed25519/ed25519_internal.hpp)
 
     list(APPEND ${CURRENT_PROJECT_NAME}_ED25519_SOURCES)
 
@@ -248,7 +246,7 @@ endif()
 
 if(CRYPTO3_PUBKEY_GOST_34_10_2001)
     list(APPEND ${CURRENT_PROJECT_NAME}_GOST_34_10_2001_HEADERS
-         include//nil/crypto3/pubkey/gost_3410.hpp)
+         include/nil/crypto3/pubkey/gost_3410.hpp)
 
     list(APPEND ${CURRENT_PROJECT_NAME}_GOST_34_10_2001_SOURCES)
 
@@ -265,7 +263,7 @@ endif()
 
 if(CRYPTO3_PUBKEY_ELGAMAL)
     list(APPEND ${CURRENT_PROJECT_NAME}_ELGAMAL_HEADERS
-         include//nil/crypto3/pubkey/elgamal.hpp)
+         include/nil/crypto3/pubkey/elgamal.hpp)
 
     list(APPEND ${CURRENT_PROJECT_NAME}_ELGAMAL_SOURCES)
 
@@ -278,7 +276,7 @@ endif()
 
 if(CRYPTO3_PUBKEY_ECDH)
     list(APPEND ${CURRENT_PROJECT_NAME}_ECDH_HEADERS
-         include//nil/crypto3/pubkey/ecdh.hpp)
+         include/nil/crypto3/pubkey/ecdh.hpp)
 
     list(APPEND ${CURRENT_PROJECT_NAME}_ECDH_SOURCES)
 
@@ -294,7 +292,7 @@ endif()
 
 if(CRYPTO3_PUBKEY_CURVE_25519)
     list(APPEND ${CURRENT_PROJECT_NAME}_CURVE_25519_HEADERS
-         include//nil/crypto3/pubkey/curve25519.hpp)
+         include/nil/crypto3/pubkey/curve25519.hpp)
 
     list(APPEND ${CURRENT_PROJECT_NAME}_CURVE_25519_SOURCES)
 
@@ -307,13 +305,13 @@ endif()
 
 if(CRYPTO3_PUBKEY_MCELIECE)
     list(APPEND ${CURRENT_PROJECT_NAME}_MCELIECE_PUBLIC_HEADERS
-         include//nil/crypto3/pubkey/mceliece.hpp)
+         include/nil/crypto3/pubkey/mceliece.hpp)
 
     list(APPEND ${CURRENT_PROJECT_NAME}_MCELIECE_INTERNAL_HEADERS
-         include//nil/crypto3/pubkey/detail/mceliece/polyn_gf2m.hpp
-         include//nil/crypto3/pubkey/detail/mceliece/gf2m_small_m.hpp
-         include//nil/crypto3/pubkey/detail/mceliece/code_based_util.hpp
-         include//nil/crypto3/pubkey/detail/mceliece/mce_internal.hpp)
+         include/nil/crypto3/pubkey/detail/mceliece/polyn_gf2m.hpp
+         include/nil/crypto3/pubkey/detail/mceliece/gf2m_small_m.hpp
+         include/nil/crypto3/pubkey/detail/mceliece/code_based_util.hpp
+         include/nil/crypto3/pubkey/detail/mceliece/mce_internal.hpp)
 
     list(APPEND ${CURRENT_PROJECT_NAME}_MCELIECE_SOURCES)
 
@@ -330,7 +328,7 @@ endif()
 
 if(CRYPTO3_PUBKEY_DLIES)
     list(APPEND ${CURRENT_PROJECT_NAME}_DLIES_PUBLIC_HEADERS
-         include//nil/crypto3/pubkey/dlies.hpp)
+         include/nil/crypto3/pubkey/dlies.hpp)
 
     list(APPEND ${CURRENT_PROJECT_NAME}_DLIES_SOURCES)
 
@@ -344,7 +342,7 @@ endif()
 
 if(CRYPTO3_PUBKEY_MCEIES)
     list(APPEND ${CURRENT_PROJECT_NAME}_MCEIES_PUBLIC_HEADERS
-         include//nil/crypto3/pubkey/mceies.hpp)
+         include/nil/crypto3/pubkey/mceies.hpp)
 
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_MCEIES)
     list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
@@ -356,8 +354,8 @@ endif()
 
 if(CRYPTO3_PUBKEY_SM2)
     list(APPEND ${CURRENT_PROJECT_NAME}_SM2_PUBLIC_HEADERS
-         include//nil/crypto3/pubkey/sm2.hpp
-         include//nil/crypto3/pubkey/sm2_encrypt.hpp)
+         include/nil/crypto3/pubkey/sm2.hpp
+         include/nil/crypto3/pubkey/sm2_encrypt.hpp)
 
     list(APPEND ${CURRENT_PROJECT_NAME}_SM2_SOURCES)
 

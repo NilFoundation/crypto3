@@ -11,7 +11,7 @@ namespace {
         }
     }
 
-}
+}    // namespace
 
 void fuzz(const uint8_t in[], size_t len) {
     if (len >= 256) {

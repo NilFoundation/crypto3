@@ -20,13 +20,13 @@ namespace nil {
             // General versions; There should be no need to use these directly
 
             template<int UnitBits>
-            struct big_unit_big_bit {};
+            struct big_unit_big_bit { };
             template<int UnitBits>
-            struct little_unit_little_bit {};
+            struct little_unit_little_bit { };
             template<int UnitBits>
-            struct big_unit_little_bit {};
+            struct big_unit_little_bit { };
             template<int UnitBits>
-            struct little_unit_big_bit {};
+            struct little_unit_big_bit { };
             template<int UnitBits>
             struct host_unit {
                 BOOST_STATIC_ASSERT(UnitBits % CHAR_BIT == 0);

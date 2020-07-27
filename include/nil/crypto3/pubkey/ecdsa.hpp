@@ -10,7 +10,7 @@
 #define CRYPTO3_PUBKEY_ECDSA_KEY_HPP
 
 #include <nil/crypto3/pubkey/ecc_key.hpp>
-#include <nil/crypto3/pubkey/keypair.hpp>
+#include <nil/crypto3/pubkey/detail/consistency.hpp>
 
 namespace nil {
     namespace crypto3 {

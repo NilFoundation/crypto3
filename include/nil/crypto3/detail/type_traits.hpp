@@ -18,9 +18,9 @@
         using No = char[1];                                                           \
                                                                                       \
         struct Fallback {                                                             \
-            struct Type {};                                                           \
+            struct Type { };                                                          \
         };                                                                            \
-        struct Derived : T, Fallback {};                                              \
+        struct Derived : T, Fallback { };                                             \
                                                                                       \
         template<class U>                                                             \
         static No &test(typename U::Type *);                                          \
@@ -32,7 +32,7 @@
     };                                                                                \
                                                                                       \
     template<class T>                                                                 \
-    struct has_##Type : public std::integral_constant<bool, HasMemberType_##Type<T>::RESULT> {};
+    struct has_##Type : public std::integral_constant<bool, HasMemberType_##Type<T>::RESULT> { };
 
 #define GENERATE_HAS_MEMBER(member)                                                   \
                                                                                       \
@@ -45,7 +45,7 @@
         struct Fallback {                                                             \
             int member;                                                               \
         };                                                                            \
-        struct Derived : T, Fallback {};                                              \
+        struct Derived : T, Fallback { };                                             \
                                                                                       \
         template<class U>                                                             \
         static No &test(decltype(U::member) *);                                       \
@@ -57,7 +57,7 @@
     };                                                                                \
                                                                                       \
     template<class T>                                                                 \
-    struct has_##member : public std::integral_constant<bool, HasMember_##member<T>::RESULT> {};
+    struct has_##member : public std::integral_constant<bool, HasMember_##member<T>::RESULT> { };
 
 namespace nil {
     namespace crypto3 {
@@ -119,7 +119,7 @@ namespace nil {
                         iter end() const;
                     };
 
-                    struct Derived : TType, Fallback {};
+                    struct Derived : TType, Fallback { };
 
                     template<typename C, C>
                     struct ChT;
@@ -158,8 +158,7 @@ namespace nil {
             struct is_block_cipher {
                 static const bool value = has_word_type<T>::value && has_word_bits<T>::value &&
                                           has_block_type<T>::value && has_block_bits<T>::value &&
-                                          has_key_type<T>::value && has_key_bits<T>::value &&
-                                          has_rounds<T>::value;
+                                          has_key_type<T>::value && has_key_bits<T>::value && has_rounds<T>::value;
                 typedef T type;
             };
 

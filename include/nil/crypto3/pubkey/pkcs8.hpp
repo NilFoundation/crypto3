@@ -245,8 +245,8 @@ namespace nil {
              * @return loaded private key object
              */
 
-            std::unique_ptr<private_key_policy> load_key(data_source &source,
-                                                         std::function<std::string()> get_passphrase);
+            std::unique_ptr<private_key_policy>
+                load_key(data_source &source, std::function<std::string()> get_passphrase);
 
             /** Load an encrypted key from a data source.
              * @param source the data source providing the encoded key
@@ -609,8 +609,8 @@ namespace nil {
             /*
              * Extract an encrypted private key and return it
              */
-            private_key_policy *
-                load_key(const std::string &fsname, random_number_generator &rng, const std::string &pass) {
+            private_key_policy *load_key(const std::string &fsname, random_number_generator &rng,
+                                         const std::string &pass) {
                 CRYPTO3_UNUSED(rng);
                 data_source_stream in(fsname);
                 return pkcs8::load_key(in, [pass]() { return pass; }).release();

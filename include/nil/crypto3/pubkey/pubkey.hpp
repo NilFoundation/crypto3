@@ -10,12 +10,6 @@
 #define CRYPTO3_PUBKEY_HPP
 
 #include <nil/crypto3/pubkey/pk_keys.hpp>
-#include <nil/crypto3/pubkey/pk_ops_fwd.hpp>
-
-#if defined(CRYPTO3_HAS_SYSTEM_RNG)
-#include <nil/crypto3/random/system_rng/system_rng.hpp>
-#define CRYPTO3_PUBKEY_INCLUDE_DEPRECATED_CONSTRUCTORS
-#endif
 
 namespace nil {
     namespace crypto3 {
@@ -158,23 +152,6 @@ namespace nil {
              */
             pk_signer(const private_key_policy &key, random_number_generator &rng, const std::string &emsa,
                       signature_format format = IEEE_1363, const std::string &provider = "");
-
-#if defined(CRYPTO3_PUBKEY_INCLUDE_DEPRECATED_CONSTRUCTORS)
-            /**
-             * Construct a PK Signer.
-             * @param key the key to use inside this signer
-             * @param emsa the emsa to use
-             * An example would be "EMSA1(SHA-224)".
-             * @param format the signature format to use
-             */
-            CRYPTO3_DEPRECATED("Use constructor taking a RNG object")
-            pk_signer(const private_key_policy &key,
-                      const std::string &emsa,
-                      signature_format format = IEEE_1363,
-                      const std::string &provider = "") :
-                pk_signer(key, system_rng(), emsa, format, provider) {
-            }
-#endif
 
             ~pk_signer();
 
@@ -392,19 +369,6 @@ namespace nil {
             pk_key_agreement(const private_key_policy &key, random_number_generator &rng, const std::string &kdf,
                              const std::string &provider = "");
 
-#if defined(CRYPTO3_PUBKEY_INCLUDE_DEPRECATED_CONSTRUCTORS)
-            /**
-             * Construct a PK Key Agreement.
-             * @param key the key to use
-             * @param kdf name of the kdf to use (or 'Raw' for no kdf)
-             * @param provider the algo provider to use (or empty for default)
-             */
-            CRYPTO3_DEPRECATED("Use constructor taking a RNG object")
-            pk_key_agreement(const private_key_policy &key, const std::string &kdf, const std::string &provider = "") :
-                pk_key_agreement(key, system_rng(), kdf, provider) {
-            }
-#endif
-
             ~pk_key_agreement();
 
             // For ECIES
@@ -486,20 +450,6 @@ namespace nil {
             pk_encryptor_eme(const public_key_policy &key, random_number_generator &rng, const std::string &padding,
                              const std::string &provider = "");
 
-#if defined(CRYPTO3_PUBKEY_INCLUDE_DEPRECATED_CONSTRUCTORS)
-            /**
-             * Construct an instance.
-             * @param key the key to use inside the encryptor
-             * @param padding the message encoding scheme to use (eg "OAEP(SHA-256)")
-             */
-            CRYPTO3_DEPRECATED("Use constructor taking a RNG object")
-            pk_encryptor_eme(const public_key_policy &key,
-                             const std::string &padding,
-                             const std::string &provider = "") :
-                pk_encryptor_eme(key, system_rng(), padding, provider) {
-            }
-#endif
-
             ~pk_encryptor_eme();
 
             pk_encryptor_eme &operator=(const pk_encryptor_eme &) = delete;
@@ -527,18 +477,6 @@ namespace nil {
             pk_decryptor_eme(const private_key_policy &key, random_number_generator &rng, const std::string &eme,
                              const std::string &provider = "");
 
-#if defined(CRYPTO3_PUBKEY_INCLUDE_DEPRECATED_CONSTRUCTORS)
-            /**
-             * Construct an instance.
-             * @param key the key to use inside the decryptor
-             * @param eme the message encoding scheme to use (eg "OAEP(SHA-256)")
-             */
-            CRYPTO3_DEPRECATED("Use constructor taking a RNG object")
-            pk_decryptor_eme(const private_key_policy &key, const std::string &eme, const std::string &provider = "") :
-                pk_decryptor_eme(key, system_rng(), eme, provider) {
-            }
-#endif
-
             ~pk_decryptor_eme();
 
             pk_decryptor_eme &operator=(const pk_decryptor_eme &) = delete;
@@ -565,15 +503,6 @@ namespace nil {
              */
             pk_kem_encryptor(const public_key_policy &key, random_number_generator &rng,
                              const std::string &kem_param = "", const std::string &provider = "");
-
-#if defined(CRYPTO3_PUBKEY_INCLUDE_DEPRECATED_CONSTRUCTORS)
-            CRYPTO3_DEPRECATED("Use constructor taking a RNG object")
-            pk_kem_encryptor(const public_key_policy &key,
-                             const std::string &kem_param = "",
-                             const std::string &provider = "") :
-                pk_kem_encryptor(key, system_rng(), kem_param, provider) {
-            }
-#endif
 
             ~pk_kem_encryptor();
 
@@ -640,15 +569,6 @@ namespace nil {
              */
             pk_kem_decryptor(const private_key_policy &key, random_number_generator &rng,
                              const std::string &kem_param = "", const std::string &provider = "");
-
-#if defined(CRYPTO3_PUBKEY_INCLUDE_DEPRECATED_CONSTRUCTORS)
-            CRYPTO3_DEPRECATED("Use constructor taking a RNG object")
-            pk_kem_decryptor(const private_key_policy &key,
-                             const std::string &kem_param = "",
-                             const std::string &provider = "") :
-                pk_kem_decryptor(key, system_rng(), kem_param, provider) {
-            }
-#endif
 
             ~pk_kem_decryptor();
 

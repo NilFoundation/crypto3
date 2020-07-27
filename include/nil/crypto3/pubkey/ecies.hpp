@@ -303,9 +303,9 @@ namespace nil {
                     }
 
                     std::unique_ptr<pk_operations::key_agreement>
-                    create_key_agreement_op(random_number_generator &rng,
-                                            const std::string &params,
-                                            const std::string &provider) const override;
+                        create_key_agreement_op(random_number_generator &rng,
+                                                const std::string &params,
+                                                const std::string &provider) const override;
 
                 private:
                     ecdh_private_key m_key;
@@ -326,8 +326,8 @@ namespace nil {
                         point_gfp input_point = group.os2ecp(w, w_len);
                         input_point.randomize_repr(m_rng);
 
-                        const point_gfp S
-                            = group.blinded_var_point_multiply(input_point, m_key.private_value(), m_rng, m_ws);
+                        const point_gfp S =
+                            group.blinded_var_point_multiply(input_point, m_key.private_value(), m_rng, m_ws);
 
                         if (S.on_the_curve() == false) {
                             throw internal_error("ECDH agreed value was not on the curve");
@@ -342,9 +342,9 @@ namespace nil {
                 };
 
                 std::unique_ptr<pk_operations::key_agreement>
-                ecies_private_key::create_key_agreement_op(random_number_generator &rng,
-                                                           const std::string & /*params*/,
-                                                           const std::string & /*provider*/) const {
+                    ecies_private_key::create_key_agreement_op(random_number_generator &rng,
+                                                               const std::string & /*params*/,
+                                                               const std::string & /*provider*/) const {
                     return std::unique_ptr<pk_operations::key_agreement>(new ecies_ecdh_ka_operation(*this, rng));
                 }
 
@@ -362,9 +362,8 @@ namespace nil {
                                                       random_number_generator &rng) {
                     const ecdh_private_key *ecdh_key = dynamic_cast<const ecdh_private_key *>(&private_key);
 
-                    if (ecdh_key == nullptr
-                        && (ecies_params.cofactor_mode() || ecies_params.old_cofactor_mode()
-                            || ecies_params.check_mode())) {
+                    if (ecdh_key == nullptr && (ecies_params.cofactor_mode() || ecies_params.old_cofactor_mode() ||
+                                                ecies_params.check_mode())) {
                         // assume we have a private key from an external provider (e.g. pkcs#11):
                         // there is no way to determine or control whether the provider uses cofactor mode or not.
                         // ISO 18033 does not allow cofactor mode in combination with old cofactor mode or check mode
@@ -421,7 +420,7 @@ namespace nil {
                 // Note: the argument `m_params.secret_length()` passed for `key_len` will only be used by providers
                 // because "Raw" is passed to the `pk_key_agreement` if the implementation of botan is used.
                 const symmetric_key peh = m_ka.derive_key(m_params.domain().get_order().bytes(),
-                    other_public_key_bin.data(), other_public_key_bin.size());
+                                                          other_public_key_bin.data(), other_public_key_bin.size());
                 derivation_input.insert(derivation_input.end(), peh.begin(), peh.end());
 
                 // ISO 18033: encryption step g / decryption step i
@@ -451,7 +450,7 @@ namespace nil {
                                                      const std::string &dem_algo_spec, size_t dem_key_len,
                                                      const std::string &mac_spec, size_t mac_key_len) :
                 ecies_system_params(domain, kdf_spec, dem_algo_spec, dem_key_len, mac_spec, mac_key_len,
-                    point_gfp::UNCOMPRESSED, ecies_flags::NONE) {
+                                    point_gfp::UNCOMPRESSED, ecies_flags::NONE) {
             }
 
             std::unique_ptr<MessageAuthenticationCode> ecies_system_params::create_mac() const {
@@ -475,8 +474,8 @@ namespace nil {
                 if (ecies_params.compression_type() != point_gfp::UNCOMPRESSED) {
                     // ISO 18033: step d
                     // convert only if necessary; m_eph_public_key_bin has been initialized with the uncompressed format
-                    m_eph_public_key_bin
-                        = m_params.domain().os2ecp(m_eph_public_key_bin).encode(ecies_params.compression_type());
+                    m_eph_public_key_bin =
+                        m_params.domain().os2ecp(m_eph_public_key_bin).encode(ecies_params.compression_type());
                 }
             }
 
