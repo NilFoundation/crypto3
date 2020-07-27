@@ -26,7 +26,6 @@
 #include <boost/utility/enable_if.hpp>
 
 #include <boost/range/algorithm/copy.hpp>
-#include <nil/crypto3/detail/stream_endian.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -43,8 +42,7 @@ namespace nil {
 
                 constexpr static const std::size_t word_bits = mode_type::word_bits;
 
-
-                    constexpr static const std::size_t actual_bits = sizeof(typename block_type::value_type) * CHAR_BIT;
+                constexpr static const std::size_t actual_bits = sizeof(typename block_type::value_type) * CHAR_BIT;
 
             public:
                 typedef typename mode_type::endian_type endian_type;
