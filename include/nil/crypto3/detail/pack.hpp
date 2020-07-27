@@ -18,6 +18,7 @@
 
 #include <boost/static_assert.hpp>
 #include <boost/predef/other/endian.h>
+#include <boost/predef/architecture.h>
 
 #include <algorithm>
 #include <climits>
@@ -77,7 +78,7 @@ namespace nil {
             struct can_memcpy<stream_endian::host_unit<UnitBits>, InputBits, OutputBits, InT, OutT>
                 : host_can_memcpy<UnitBits, InputBits, OutputBits, InT, OutT> { };
 
-#ifdef CRYPTO3_TARGET_CPU_IS_LITTLE_ENDIAN
+#ifdef BOOST_ENDIAN_LITTLE_BYTE_AVAILABLE
             template<int UnitBits, int InputBits, int OutputBits, typename InT, typename OutT>
             struct can_memcpy<stream_endian::little_unit_big_bit<UnitBits>, InputBits, OutputBits, InT, OutT>
                 : host_can_memcpy<UnitBits, InputBits, OutputBits, InT, OutT> { };
@@ -86,7 +87,7 @@ namespace nil {
             struct can_memcpy<stream_endian::little_unit_little_bit<UnitBits>, InputBits, OutputBits, InT, OutT>
                 : host_can_memcpy<UnitBits, InputBits, OutputBits, InT, OutT> { };
 
-#elif defined(CRYPTO3_TARGET_CPU_IS_BIG_ENDIAN)
+#elif defined(BOOST_ENDIAN_BIG_BYTE_AVAILABLE)
             template<int UnitBits, int InputBits, int OutputBits, typename InT, typename OutT>
             struct can_memcpy<stream_endian::big_unit_big_bit<UnitBits>, ValueBits, InT, OutT>
                 : host_can_memcpy<UnitBits, InputBits, OutputBits, InT, OutT> { };
@@ -573,11 +574,11 @@ namespace nil {
                                InputType, OutputType>
                     packer_type;
 #elif defined(BOOST_ENDIAN_BIG_WORD_AVAILABLE)
-                typedef packer<stream_endian::big_unit_big_bit<CRYPTO3_MP_WORD_BITS>, OutputEndianness, InputValueBits,
+                typedef packer<stream_endian::big_unit_big_bit<BOOST_ARCH_CURRENT_WORD_BITS>, OutputEndianness, InputValueBits,
                                OutputValueBits, InputType, OutputType>
                     packer_type;
 #elif defined(BOOST_ENDIAN_LITTLE_WORD_AVAILABLE)
-                typedef packer<stream_endian::little_unit_big_bit<CRYPTO3_MP_WORD_BITS>, OutputEndianness,
+                typedef packer<stream_endian::little_unit_big_bit<BOOST_ARCH_CURRENT_WORD_BITS>, OutputEndianness,
                                InputValueBits, OutputValueBits, InputType, OutputType>
                     packer_type;
 #else
@@ -621,11 +622,11 @@ namespace nil {
                                InputType, OutputType>
                     packer_type;
 #elif defined(BOOST_ENDIAN_BIG_WORD_AVAILABLE)
-                typedef packer<InputEndianness, stream_endian::big_unit_big_bit<CRYPTO3_MP_WORD_BITS>, InputValueBits,
+                typedef packer<InputEndianness, stream_endian::big_unit_big_bit<BOOST_ARCH_CURRENT_WORD_BITS>, InputValueBits,
                                OutputValueBits, InputType, OutputType>
                     packer_type;
 #elif defined(BOOST_ENDIAN_LITTLE_WORD_AVAILABLE)
-                typedef packer<InputEndianness, stream_endian::little_unit_big_bit<CRYPTO3_MP_WORD_BITS>,
+                typedef packer<InputEndianness, stream_endian::little_unit_big_bit<BOOST_ARCH_CURRENT_WORD_BITS>,
                                InputValueBits, OutputValueBits, InputType, OutputType>
                     packer_type;
 #else

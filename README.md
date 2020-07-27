@@ -16,6 +16,7 @@ To actually include this library in a project it is required to:
 
 ### Internal
 * [Block Ciphers](https://github.com/nilfoundation/block.git)
+* [Predef](https://github.com/nilfoundation/predef.git) (until https://github.com/boostorg/predef/pull/108 and https://github.com/boostorg/predef/pull/107 are accepted)
 
 ### External
 * [Boost](https://boost.org) (>= 1.58)
