@@ -419,13 +419,11 @@ set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES
 
 target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
                       ${${CURRENT_PROJECT_NAME}_LIBRARIES}
-                      ${CMAKE_WORKSPACE_NAME}::asn1
-                      ${CMAKE_WORKSPACE_NAME}::codec
                       ${CMAKE_WORKSPACE_NAME}::algebra
+                      ${CMAKE_WORKSPACE_NAME}::codec
                       ${CMAKE_WORKSPACE_NAME}::hash
                       ${CMAKE_WORKSPACE_NAME}::modes
                       ${CMAKE_WORKSPACE_NAME}::pk_pad
-                      ${CMAKE_WORKSPACE_NAME}::utilities
 
                       boost::multiprecision
 
