@@ -18,10 +18,10 @@ namespace nil {
         namespace hashes {
             namespace detail {
 
-                template<typename FieldType, std::size_t t, std::size_t c, std::size_t DigestBits, std::size_t M = 128,
-                         bool strength = true>
-                struct poseidon_functions : public poseidon_policy<FieldType, t, c, DigestBits, M, strength> {
-                    typedef poseidon_policy<FieldType, t, c, DigestBits, M, strength> policy_type;
+                template<typename FieldType, std::size_t Arity, std::size_t c, std::size_t DigestBits,
+                         std::size_t M = 128, bool strength = true>
+                struct poseidon_functions : public poseidon_policy<FieldType, Arity, c, DigestBits, M, strength> {
+                    typedef poseidon_policy<FieldType, Arity, c, DigestBits, M, strength> policy_type;
 
                     constexpr static std::size_t const state_bits = policy_type::state_bits;
                     constexpr static std::size_t const state_words = policy_type::state_words;
@@ -33,7 +33,8 @@ namespace nil {
                     typedef std::pair<std::size_t, std::size_t> rounds_type;
 
                     // TODO: constexpr
-                    std::size_t const round_constants_size = (std::get<0>(num_rounds) + std::get<1>(num_rounds)) * t;
+                    std::size_t const round_constants_size =
+                        (std::get<0>(num_rounds) + std::get<1>(num_rounds)) * Arity;
                     typedef typename std::array<FieldType, round_constants_size> round_constants_type;
 
                     // static variant only for bls12-381 - filecoin oriented implementation
@@ -42,7 +43,7 @@ namespace nil {
                     std::pair<std::size_t, std::size_t> get_num_rounds() {
                         std::size_t full_rounds = 6;
                         std::size_t part_rounds;
-                        switch (t) {
+                        switch (Arity) {
                             case 2:
                             case 3:
                                 part_rounds = 55;
@@ -84,8 +85,7 @@ namespace nil {
 
                     static inline void permute(state_type &A) {
                     }
-                }
-
+                };
             }    // namespace detail
         }        // namespace hashes
     }            // namespace crypto3

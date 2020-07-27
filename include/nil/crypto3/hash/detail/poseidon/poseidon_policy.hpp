@@ -32,20 +32,21 @@ namespace nil {
                  * @tparam strength
                  */
                 // at this moment only for bls12-381 - filecoin oriented implementation
-                template<typename FieldType, std::size_t t, std::size_t c, std::size_t DigestBits, std::size_t M = 128,
+                template<typename FieldType, std::size_t Arity, std::size_t c, std::size_t DigestBits, std::size_t M =
+                                                                                                         128,
                          bool strength = true>
                 struct poseidon_policy {
 
-                    BOOST_STATIC_ASSERT_MSG(t > c, "t should consist of capacity and rate");
+                    BOOST_STATIC_ASSERT_MSG(Arity > c, "Arity should consist of capacity and rate");
 
                     constexpr static std::size_t const digest_bits = DigestBits;
 
-                    constexpr static std::size_t const state_bits = t * FieldType::modulus_bits;
-                    constexpr static std::size_t const state_words = t;
+                    constexpr static std::size_t const state_bits = Arity * FieldType::modulus_bits;
+                    constexpr static std::size_t const state_words = Arity;
                     typedef std::array<typename FieldType::value_type, state_words> state_type;
 
-                    constexpr static std::size_t const block_bits = (t - c) * FieldType::modulus_bits;
-                    constexpr static std::size_t const block_words = t - c;
+                    constexpr static std::size_t const block_bits = (Arity - c) * FieldType::modulus_bits;
+                    constexpr static std::size_t const block_words = Arity - c;
                     typedef std::array<typename FieldType::value_type, block_words> block_type;
 
                     constexpr static std::size_t const sec_level = M;
