@@ -9,12 +9,12 @@
 #ifndef CRYPTO3_HASH_POSEIDON_HPP
 #define CRYPTO3_HASH_POSEIDON_HPP
 
+#include <nil/crypto3/hash/detail/poseidon/poseidon_functions.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace hashes {
-
-            
-
+            struct
         }
     }
 }

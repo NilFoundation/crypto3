@@ -48,14 +48,14 @@ set(TESTS_NAMES
     "md4"
     "md5"
     "pack"
+    "poseidon"
     "ripemd"
     "sha"
     "sha1"
     "sha2"
     "sha3"
     "static_digest"
-    "tiger"
-    )
+    "tiger")
 
 foreach(TEST_NAME ${TESTS_NAMES})
     define_hash_test(${TEST_NAME})

@@ -18,27 +18,14 @@ namespace nil {
         namespace hashes {
             namespace detail {
 
-                template<
-                    typename FieldT,
-                    std::size_t t,
-                    std::size_t c,
-                    std::size_t DigestBits,
-                    std::size_t M = 128,
-                    bool strength = true
-                >
-                struct poseidon_functions {
-                    typedef poseidon_policy<
-                        FieldT,
-                        t,
-                        c,
-                        DigestBits,
-                        M,
-                        strength
-                    > policy_type;
+                template<typename FieldType, std::size_t t, std::size_t c, std::size_t DigestBits, std::size_t M = 128,
+                         bool strength = true>
+                struct poseidon_functions : public poseidon_policy<FieldType, t, c, DigestBits, M, strength> {
+                    typedef poseidon_policy<FieldType, t, c, DigestBits, M, strength> policy_type;
 
                     constexpr static std::size_t const state_bits = policy_type::state_bits;
                     constexpr static std::size_t const state_words = policy_type::state_words;
-                    typedef policy_type::state_type state_type;
+                    typedef typename policy_type::state_type state_type;
 
                     // TODO: constexpr
                     // (full_rounds, partial_rounds)
@@ -47,12 +34,11 @@ namespace nil {
 
                     // TODO: constexpr
                     std::size_t const round_constants_size = (std::get<0>(num_rounds) + std::get<1>(num_rounds)) * t;
-                    typedef typename std::array<FieldT, round_constants_size> round_constants_type;
-
-                    
+                    typedef typename std::array<FieldType, round_constants_size> round_constants_type;
 
                     // static variant only for bls12-381 - filecoin oriented implementation
-                    // this round numbers seems not to be right according current version of the script https://extgit.iaik.tugraz.at/krypto/hadeshash/-/tree/c984df1034874adf5cb5784bf86b609b0a8d6f99
+                    // this round numbers seems not to be right according current version of the script
+                    // https://extgit.iaik.tugraz.at/krypto/hadeshash/-/tree/c984df1034874adf5cb5784bf86b609b0a8d6f99
                     std::pair<std::size_t, std::size_t> get_num_rounds() {
                         std::size_t full_rounds = 6;
                         std::size_t part_rounds;
@@ -97,16 +83,12 @@ namespace nil {
                     }
 
                     static inline void permute(state_type &A) {
-                        
                     }
-
-
                 }
 
-            }       // detail
-        }       // hashes
-    }       // crypto3
-}       // nil
+            }    // namespace detail
+        }        // namespace hashes
+    }            // namespace crypto3
+}    // namespace nil
 
-
-#endif      // CRYPTO3_HASH_POSEIDON_FUNCTIONS_HPP
+#endif    // CRYPTO3_HASH_POSEIDON_FUNCTIONS_HPP
