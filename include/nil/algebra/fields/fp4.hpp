@@ -19,33 +19,24 @@ namespace nil {
          * Arithmetic in the field F[p^2].
          *
          * Let p := modulus. This interface provides arithmetic for the extension field
-         * Fp2 = Fp[U]/(U^2-non_residue), where non_residue is in Fp.
+         * Fp4 = Fp2[V]/(V^2-U) where Fp2 = Fp[U]/(U^2-non_residue) and non_residue is in Fp.
          *
          * ASSUMPTION: p = 1 (mod 6)
          */
-        template<typename NumberType &Modulus>
-        struct fp4 {
-        private:
-            using point_fp = detail::point<fp<Modulus>, NumberType>;
-            using point_fp4 = detail::point<fp4<Modulus>, NumberType>;
+        
+        template<std::size_t ModulusBits, std::size_t GeneratorBits>
+        struct fp2 {
+            typedef element<fp<ModulusBits, GeneratorBits>, number_type> non_residue_type;
 
-        public:
-            constexpr fp4(const point_fp4 &point) : top_non_residue(point) {
-            }    // init point for non_residue in fp3 or higher
+            constexpr static const std::size_t modulus_bits = ModulusBits;
+            typedef number<backends::cpp_int_backend<modulus_bits, modulus_bits, unsigned_magnitude, unchecked, void>>
+                modulus_type;
 
-            constexpr fp4(const point_fp &point) : non_residue(fp(point)) {
-            }    // init point for non_residue in itself
-
-            constexpr static const std::size_t arity = 4;
-
-            constexpr static const NumberType p = Modulus;
-            constexpr static const NumberType q;
-
-            constexpr const point_fp4 top_non_residue;
-            constexpr const point_fp non_residue = 0;
-            constexpr static const NumberType g;
-
-            constexpr static const std::size_t num_bits = 0;
+            constexpr static const std::size_t generator_bits = GeneratorBits;
+            typedef number<
+                backends::cpp_int_backend<generator_bits, generator_bits, unsigned_magnitude, unchecked, void>>
+                generator_type;
+                
         };
 
         template<typename NumberType, const NumberType &modulus>
