@@ -26,18 +26,19 @@ namespace nil {
                 typedef arithmetic_params<fp2<ModulusBits, GeneratorBits>> params_type;
                 typedef fp<ModulusBits, GeneratorBits> fp_type;
             public:
-                typedef params_type::value_type value_type;
+                typedef params_type::modulus_type modulus_type;
+                typedef element<params_type, modulus_type> value_type;
 
                 inline static value_type zero() const {
-                    return value_type(zero<fp_type, NumberType>()[0], zero<fp_type, NumberType>()[0]);
+                    return value_type(zero<fp_type>()[0], zero<fp_type>()[0]);
                 }
 
                 inline static value_type one() const {
-                    return value_type(one<fp_type, NumberType>()[0], zero<fp_type, NumberType>()[0]);
+                    return value_type(one<fp_type>()[0], zero<fp_type>()[0]);
                 }
 
-                inline static bool eq(const NumberType &A0, const NumberType &A1, const NumberType &B0,
-                                      const NumberType &B1) const {
+                inline static bool eq(const modulus_type &A0, const modulus_type &A1, const modulus_type &B0,
+                                      const modulus_type &B1) const {
                     return (A0 == B0) && (A1 == B1);
                 }
 
@@ -45,8 +46,8 @@ namespace nil {
                     return (A[0] == B[0]) && (A[1] == B[1]);
                 }
 
-                inline static bool neq(const NumberType &A0, const NumberType &A1, const NumberType &B0,
-                                       const NumberType &B1) const {
+                inline static bool neq(const modulus_type &A0, const modulus_type &A1, const modulus_type &B0,
+                                       const modulus_type &B1) const {
                     return (A0 != B0) || (A1 != B1);
                 }
 
@@ -54,8 +55,8 @@ namespace nil {
                     return (A[0] != B[0]) || (A[1] != B[1]);
                 }
 
-                inline static value_type add(const NumberType &A0, const NumberType &A1, const NumberType &B0,
-                                             const NumberType &B1) const {
+                inline static value_type add(const modulus_type &A0, const modulus_type &A1, const modulus_type &B0,
+                                             const modulus_type &B1) const {
                     return value_type(A0 + B0, A1 + B1);
                 }
 
@@ -63,8 +64,8 @@ namespace nil {
                     return value_type(A[0] + B[0], A[1] + B[1]);
                 }
 
-                inline static value_type sub(const NumberType &A0, const NumberType &A1, const NumberType &B0,
-                                             const NumberType &B1) const {
+                inline static value_type sub(const modulus_type &A0, const modulus_type &A1, const modulus_type &B0,
+                                             const modulus_type &B1) const {
                     return value_type(A0 - B0, A1 - B1);
                 }
 
@@ -72,26 +73,26 @@ namespace nil {
                     return value_type(A[0] - B[0], A[1] - B[1]);
                 }
 
-                inline static value_type mul(const NumberType &A0, const NumberType &A1, const NumberType &B0,
-                                             const NumberType &B1) const {
+                inline static value_type mul(const modulus_type &A0, const modulus_type &A1, const modulus_type &B0,
+                                             const modulus_type &B1) const {
 
-                    const NumberType A0B0 = A0 * B0, A1B1 = A1 * B1;
+                    const modulus_type A0B0 = A0 * B0, A1B1 = A1 * B1;
 
                     return value_type(A0B0 + params_type::non_residue, (A0 + A1) * (B0 + B1) - A0B0 - A1B1);
                 }
 
                 inline static value_type mul(const value_type &A, const value_type &B) const {
-                    const NumberType A0B0 = A[0] * B[0], A1B1 = A[1] * B[1];
+                    const modulus_type A0B0 = A[0] * B[0], A1B1 = A[1] * B[1];
 
                     return value_type(A0B0 + params_type::non_residue, (A[0] + A[1]) * (B[0] + B[1]) - A0B0 - A1B1);
                 }
 
-                inline static value_type sqrt(const NumberType &A0, const NumberType &B0) const {
+                inline static value_type sqrt(const modulus_type &A0, const modulus_type &B0) const {
 
                     // compute square root with Tonelli--Shanks
                 }
 
-                inline static value_type square(const NumberType &A0, const NumberType &A1) const {
+                inline static value_type square(const modulus_type &A0, const modulus_type &A1) const {
                     return mul(A0, A1, A0, A1);    // maybe can be done more effective
                 }
 
@@ -99,10 +100,10 @@ namespace nil {
                     return mul(A, A);    // maybe can be done more effective
                 }
 
-                inline static params_type::policy_modular pow(const NumberType &A0, const NumberType &B0) const {
+                inline static params_type::policy_modular pow(const modulus_type &A0, const modulus_type &B0) const {
                 }
 
-                inline static params_type::policy_modular invert(const NumberType &A0, const NumberType &B0) const {
+                inline static params_type::policy_modular invert(const modulus_type &A0, const modulus_type &B0) const {
 
                     // The following needs to be adapted to our concepts:
 
