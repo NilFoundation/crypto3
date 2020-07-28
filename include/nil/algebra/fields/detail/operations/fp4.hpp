@@ -13,111 +13,88 @@
 #include <boost/multiprecision/ressol.hpp>
 
 #include <nil/algebra/fields/fp4.hpp>
-#include <nil/algebra/fields/detail/operations/operations.hpp>
+#include <nil/algebra/fields/fp2.hpp>
+#include <nil/algebra/fields/fp.hpp>
+#include <nil/algebra/fields/detail/operations/arithmetic.hpp>
 
 namespace nil {
     namespace algebra {
         namespace detail {
+
             template<std::size_t ModulusBits, std::size_t GeneratorBits>
             struct arithmetic_operations<fp4<ModulusBits, GeneratorBits>> {
+            private:
                 typedef arithmetic_params<fp4<ModulusBits, GeneratorBits>> params_type;
                 typedef fp<ModulusBits, GeneratorBits> fp_type;
-                typedef element<params_type, NumberType> value_type;
+                typedef fp2<ModulusBits, GeneratorBits> fp2_type;
+                constexpr static const non_residue = params_type::non_residue[0];
+            public:
+                typedef params_type::modulus_type modulus_type;
+                typedef element<params_type, modulus_type> value_type;
 
                 inline static value_type zero() const {
-                    return value_type(zero<fp_type, NumberType>()[0], zero<fp_type, NumberType>()[0]);
+                    return {zero<fp2_type>(), zero<fp2_type>()};
                 }
 
                 inline static value_type one() const {
-                    return value_type(one<fp_type, NumberType>()[0], zero<fp_type, NumberType>()[0]);
-                }
-
-                inline static bool eq(const NumberType &A0, const NumberType &A1, const NumberType &B0,
-                                      const NumberType &B1) const {
-                    return (A0 == B0) && (A1 == B1);
+                    return {one<fp2_type>(), zero<fp2_type>()};
                 }
 
                 inline static bool eq(const value_type &A, const value_type &B) const {
-                    return (A[0] == B[0]) && (A[1] == B[1]);
-                }
-
-                inline static bool neq(const NumberType &A0, const NumberType &A1, const NumberType &B0,
-                                       const NumberType &B1) const {
-                    return (A0 != B0) || (A1 != B1);
+                    return (A[0] == B[0]) && (A[1] == B[1]) && (A[2] == B[2]);
                 }
 
                 inline static bool neq(const value_type &A, const value_type &B) const {
-                    return (A[0] != B[0]) || (A[1] != B[1]);
-                }
-
-                inline static value_type add(const NumberType &A0, const NumberType &A1, const NumberType &B0,
-                                             const NumberType &B1) const {
-                    return value_type(A0 + B0, A1 + B1);
+                    return (A[0] != B[0]) || (A[1] != B[1]) || (A[2] == B[2]);
                 }
 
                 inline static value_type add(const value_type &A, const value_type &B) const {
-                    return value_type(A[0] + B[0], A[1] + B[1]);
-                }
-
-                inline static value_type sub(const NumberType &A0, const NumberType &A1, const NumberType &B0,
-                                             const NumberType &B1) const {
-                    return value_type(A0 - B0, A1 - B1);
+                    return {add<fp2_type>(A[0], B[0]), add<fp2_type>(A[1], B[1])};
                 }
 
                 inline static value_type sub(const value_type &A, const value_type &B) const {
-                    return value_type(A[0] - B[0], A[1] - B[1]);
-                }
-
-                inline static value_type mul(const NumberType &A0, const NumberType &A1, const NumberType &B0,
-                                             const NumberType &B1) const {
-
-                    const NumberType A0B0 = A0 * B0, A1B1 = A1 * B1;
-
-                    return value_type(A0B0 + params_type::non_residue, (A0 + A1) * (B0 + B1) - A0B0 - A1B1);
+                    return {A[0] - B[0], A[1] - B[1], A[2] - B[2]};
                 }
 
                 inline static value_type mul(const value_type &A, const value_type &B) const {
-                    const NumberType A0B0 = A[0] * B[0], A1B1 = A[1] * B[1];
+                    const modulus_type A0B0 = A[0] * B[0], A1B1 = A[1] * B[1], A2B2 = A[2] * B[2];
 
-                    return value_type(A0B0 + params_type::non_residue, (A[0] + A[1]) * (B[0] + B[1]) - A0B0 - A1B1);
+                    return {A0B0 + non_residue * ( A[1] + A[2] ) * ( B[1] + B[2] ) - A1B1 - A2B2,
+                            ( A[0] + A[1] ) * ( B[0] + B[1] ) - A0B0 - A1B1 + non_residue * A2B2,
+                            ( A[0] + A[2] ) * ( B[0] + B[2] ) - A0B0 + A1B1 - A2B2};
                 }
 
-                inline static value_type sqrt(const NumberType &A0, const NumberType &B0) const {
+                inline static value_type sqrt(const value_type &A) const {
 
                     // compute square root with Tonelli--Shanks
-                }
-
-                inline static value_type square(const NumberType &A0, const NumberType &A1) const {
-                    return mul(A0, A1, A0, A1);    // maybe can be done more effective
                 }
 
                 inline static value_type square(const value_type &A) const {
                     return mul(A, A);    // maybe can be done more effective
                 }
 
-                inline static params_type::policy_modular pow(const NumberType &A0, const NumberType &B0) const {
+                template <typename PowerType>
+                inline static value_type pow(const value_type &A, const PowerType &power) const {
                 }
 
-                inline static params_type::policy_modular invert(const NumberType &A0, const NumberType &B0) const {
+                inline static value_type invert(const value_type &A) const {
+                    
+                    /* From "High-Speed Software Implementation of the Optimal Ate Pairing over Barreto-Naehrig Curves"; Algorithm 17 */
 
-                    // The following needs to be adapted to our concepts:
+                    const modulus_type &A0 = A[0], &A1 = A[1], &A1 = A[2];
 
-                    const my_Fp &a = this->c0, &b = this->c1;
+                    const modulus_type t0 = A0.squared();
+                    const modulus_type t1 = A1.squared();
+                    const modulus_type t2 = A2.squared();
+                    const modulus_type t3 = A0*A1;
+                    const modulus_type t4 = A0*A2;
+                    const modulus_type t5 = A1*A2;
+                    const modulus_type c0 = t0 - non_residue * t5;
+                    const modulus_type c1 = non_residue * t2 - t3;
+                    const modulus_type c2 = t1 - t4; // typo in paper referenced above. should be "-" as per Scott, but is "*"
+                    const modulus_type t6 = (A0 * c0 + non_residue * (A2 * c1 + A1 * c2)).inverse();
+                    return {t6 * c0, t6 * c1, t6 * c2};
 
-                    /* From "High-Speed Software Implementation of the Optimal Ate Pairing over Barreto-Naehrig Curves";
-                     * Algorithm 8 */
-                    const my_Fp t0 = a.squared();
-                    const my_Fp t1 = b.squared();
-                    const my_Fp t2 = t0 - non_residue * t1;
-                    const my_Fp t3 = t2.inverse();
-                    const my_Fp c0 = a * t3;
-                    const my_Fp c1 = -(b * t3);
-
-                    return Fp2_model<n, modulus>(c0, c1);
-
-                    // compute square root with Tonelli--Shanks
-                    // (does not terminate if not a square!)
-                    return invert(params_type::policy_modular(A, params_type::mod));
                 }
             }
         }    // namespace detail

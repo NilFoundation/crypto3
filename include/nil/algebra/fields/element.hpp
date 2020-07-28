@@ -18,6 +18,9 @@ namespace nil {
         namespace fields {
             template<typename Field, typename NumberType>
             using element = std::array<NumberType, basic_params<Field>::arity>;
+
+            template<typename NumberType>
+            using element = std::array<NumberType, basic_params<Field>::arity>;
         }
     }    // namespace algebra
 }    // namespace nil

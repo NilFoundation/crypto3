@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef ALGEBRA_ALGO_FP2_IMPL_HPP
-#define ALGEBRA_ALGO_FP2_IMPL_HPP
+#ifndef ALGEBRA_ALGO_FP3_IMPL_HPP
+#define ALGEBRA_ALGO_FP3_IMPL_HPP
 
 #include <boost/multiprecision/ressol.hpp>
 
@@ -99,4 +99,4 @@ namespace nil {
     }        // namespace algebra
 }    // namespace nil
 
-#endif    // ALGEBRA_ALGO_FP2_IMPL_HPP
+#endif    // ALGEBRA_ALGO_FP3_IMPL_HPP
