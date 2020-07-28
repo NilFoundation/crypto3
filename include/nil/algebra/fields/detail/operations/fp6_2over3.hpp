@@ -27,7 +27,7 @@ namespace nil {
                 typedef arithmetic_params<fp6_2over3<ModulusBits, GeneratorBits>> params_type;
                 typedef fp<ModulusBits, GeneratorBits> fp_type;
                 typedef fp3<ModulusBits, GeneratorBits> fp3_type;
-                typedef element<arithmetic_params<fp2<ModulusBits, GeneratorBits>>, modulus_type> fp3_value_type;
+                typedef element<arithmetic_params<fp3<ModulusBits, GeneratorBits>>, modulus_type> fp3_value_type;
 
                 constexpr static const non_residue = params_type::non_residue[0];
             public:
@@ -59,6 +59,9 @@ namespace nil {
                 }
 
                 inline static value_type mul(const value_type &A, const value_type &B) const {
+
+                    /* Devegili OhEig Scott Dahab --- Multiplication and Squaring on Pairing-Friendly Fields.pdf; Section 3 (Karatsuba) */
+
                     const fp3_value_type A0B0 = mul<fp3_type>(A[0], B[0]), A1B1 = mul<fp3_type>(A[1], B[1]);
 
                     return {A0B0 + mul_by_non_residue(A1B1),
@@ -82,11 +85,11 @@ namespace nil {
                     
                     /* From "High-Speed Software Implementation of the Optimal Ate Pairing over Barreto-Naehrig Curves"; Algorithm 8 */
                     const fp3_value_type &A0 = A[0], &A1 = A[1];
-                    const fp3_value_type t1 = square<fp2_type>(A1);
-                    const fp3_value_type t0 = square<fp2_type>(A0) - mul_by_non_residue(t1);
-                    const fp3_value_type new_t1 = invert<fp2_type>(t0);
+                    const fp3_value_type t1 = square<fp3_type>(A1);
+                    const fp3_value_type t0 = square<fp3_type>(A0) - mul_by_non_residue(t1);
+                    const fp3_value_type new_t1 = invert<fp3_type>(t0);
 
-                    return {mul<fp2_type>(A0, new_t1), uminus<fp2_type>(mul<fp2_type>A1, new_t1)};
+                    return {mul<fp3_type>(A0, new_t1), uminus<fp3_type>(mul<fp3_type>A1, new_t1)};
 
                 }
 

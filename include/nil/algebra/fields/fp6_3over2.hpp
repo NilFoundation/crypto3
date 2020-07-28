@@ -20,13 +20,13 @@ namespace nil {
          * Arithmetic in the finite field F[(p^2)^3].
          *
          * Let p := modulus. This interface provides arithmetic for the extension field
-         * Fp6 = Fp2[V]/(V^3-non_residue) where non_residue is in Fp.
+         * Fp6 = Fp2[V]/(V^3-non_residue) where non_residue is in Fp2.
          *
          * ASSUMPTION: p = 1 (mod 6)
          */
         template<std::size_t ModulusBits, std::size_t GeneratorBits>
         struct fp6_3over2 {
-            typedef element<fp<ModulusBits, GeneratorBits>, number_type> non_residue_type;
+            typedef element<fp2<ModulusBits, GeneratorBits>, number_type> non_residue_type;
 
             constexpr static const std::size_t modulus_bits = ModulusBits;
             typedef number<backends::cpp_int_backend<modulus_bits, modulus_bits, unsigned_magnitude, unchecked, void>>
