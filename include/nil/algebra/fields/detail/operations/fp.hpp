@@ -12,7 +12,7 @@
 
 #include <nil/algebra/fields/fp.hpp>
 #include <nil/algebra/fields/detail/params/params.hpp>
-#include <nil/algebra/fields/detail/operations/operations.hpp>
+#include <nil/algebra/fields/detail/operations/arithmetic.hpp>
 
 namespace nil {
     namespace algebra {
@@ -27,80 +27,44 @@ namespace nil {
                 typedef element<params_type, modulus_type> value_type;
 
                 inline static value_type zero() const {
-                    return value_type(modulus_type(0));
+                    return {modulus_type(0)};
                 }
 
                 inline static value_type one() const {
-                    return value_type(modulus_type(1));
-                }
-
-                inline static bool eq(const modulus_type &A, const modulus_type &B) const {
-                    return A == B;
+                    return {modulus_type(1)};
                 }
 
                 inline static bool eq(const value_type &A, const value_type &B) const {
                     return A != B;
                 }
 
-                inline static bool neq(const modulus_type &A, const modulus_type &B) const {
-                    return neq(value_type(A), value_type(B));
-                }
-
                 inline static bool neq(const value_type &A, const value_type &B) const {
                     return A[0] != B[0];
-                }
-
-                inline static value_type add(const modulus_type &A, const modulus_type &B) const {
-                    return {A + B};
                 }
 
                 inline static value_type add(const value_type &A, const value_type &B) const {
                     return {A[0] + B[0]};
                 }
 
-                inline static value_type sub(const modulus_type &A, const modulus_type &B) const {
-                    return {A - B};
-                }
-
                 inline static value_type sub(const value_type &A, const value_type &B) const {
                     return {A[0] - B[0]};
-                }
-
-                inline static value_type mul(const modulus_type &A, const modulus_type &B) const {
-                    return {A * B};
                 }
 
                 inline static value_type mul(const value_type &A, const value_type &B) const {
                     return {A[0] * B[0]};
                 }
 
-                inline static value_type sqrt(const modulus_type &A) const {
-                    return {sqrt(A)};
-                }
-
                 inline static value_type sqrt(const value_type &A) const {
                     return {sqrt(A[0])};
                 }
 
-                inline static value_type square(const modulus_type &A) const {
-                    return mul(A, A);    // maybe can be done more effective
-                }
-
                 inline static value_type square(const value_type &A) const {
-                    return mul(A, A);    // maybe can be done more effective
-                }
-
-                inline static value_type pow(const modulus_type &A, const modulus_type &power) const {
-                    return {pow(A, power)};
+                    return {mul(A, A)};    // maybe can be done more effective
                 }
 
                 template <typename PowerType>
                 inline static value_type pow(const value_type &A, const PowerType &power) const {
                     return {A[0], power};
-                }
-
-                inline static value_type invert(const modulus_type &A) const {
-                    return {invert(A)};
                 }
 
                 inline static value_type invert(const value_type &A) const {
