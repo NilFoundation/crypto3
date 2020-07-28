@@ -22,9 +22,11 @@ namespace nil {
 
             template<std::size_t ModulusBits, std::size_t GeneratorBits>
             struct arithmetic_operations<fp2<ModulusBits, GeneratorBits>> {
+            private:
                 typedef arithmetic_params<fp2<ModulusBits, GeneratorBits>> params_type;
                 typedef fp<ModulusBits, GeneratorBits> fp_type;
-                typedef element<params_type, NumberType> value_type;
+            public:
+                typedef params_type::value_type value_type;
 
                 inline static value_type zero() const {
                     return value_type(zero<fp_type, NumberType>()[0], zero<fp_type, NumberType>()[0]);

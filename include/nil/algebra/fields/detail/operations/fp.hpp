@@ -20,8 +20,10 @@ namespace nil {
 
             template<std::size_t ModulusBits, std::size_t GeneratorBits>
             struct arithmetic_operations<fp> {
+            private:
                 typedef arithmetic_params<fp<ModulusBits, GeneratorBits>> params_type;
-                typedef element<policy_type, NumberType> value_type;
+            public:
+                typedef params_type::value_type value_type;
 
                 inline static value_type zero() const {
                     return value_type(NumberType(0));

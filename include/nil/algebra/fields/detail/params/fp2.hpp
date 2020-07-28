@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef ALGEBRA_FIELD_MODP_SRP_PARAMS_HPP
-#define ALGEBRA_FIELD_MODP_SRP_PARAMS_HPP
+#ifndef ALGEBRA_FIELD_FP2_PARAMS_HPP
+#define ALGEBRA_FIELD_FP2_PARAMS_HPP
 
 #include <nil/algebra/fields/detail/params/params.hpp>
 
@@ -17,12 +17,12 @@ namespace nil {
         namespace detail {
 
             template<std::size_t ModulusBits, std::size_t GeneratorBits = CHAR_BIT>
-            struct arithmetic_params<modp_srp<ModulusBits, GeneratorBits>> : public basic_params<modp_srp<ModulusBits, GeneratorBits>> {
-                constexpr static const number_type euler = 0;
+            struct basic_params<fp2<ModulusBits, GeneratorBits>> : public params<fp2<ModulusBits, GeneratorBits>> {
+                constexpr static const std::size_t arity = 2;
             };
         
         }    // namespace detail
     }    // namespace algebra
 }    // namespace nil
 
-#endif    // ALGEBRA_FIELD_MODP_SRP_PARAMS_HPP
+#endif    // ALGEBRA_FIELD_FP2_PARAMS_HPP

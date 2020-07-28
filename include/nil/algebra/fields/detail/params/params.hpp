@@ -28,10 +28,16 @@ namespace nil {
                 typedef typename field_type::generator_type generator_type;
 
                 constexpr static const generator_type generator = field_type::generator;
+
             };
 
             template<typename FieldType>
-            struct arithmetic_params : public params<FieldType> {
+            struct basic_params : public params<FieldType> {
+                constexpr static const std::size_t arity = 1;
+            };
+
+            template<typename FieldType>
+            struct arithmetic_params : public basic_params<FieldType> {
                 constexpr static const number_type euler = (modulus - 1) / 2;
             };
 

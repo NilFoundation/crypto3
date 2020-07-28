@@ -11,12 +11,13 @@
 #define ALGEBRA_FIELDS_POINT_HPP
 
 #include <array>
+#include <nil/algebra/fields/detail/params/params.hpp>
 
 namespace nil {
     namespace algebra {
         namespace fields {
             template<typename Field, typename NumberType>
-            using element = std::array<NumberType, Field::arity>;
+            using element = std::array<NumberType, basic_params<Field>::arity>;
         }
     }    // namespace algebra
 }    // namespace nil

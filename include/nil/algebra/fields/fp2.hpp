@@ -25,25 +25,17 @@ namespace nil {
          */
         template<std::size_t ModulusBits, std::size_t GeneratorBits>
         struct fp2 {
-            typedef element<fp<ModulusBits, GeneratorBits>, number_type> fp_value_type;
-            typedef element<fp2<ModulusBits, GeneratorBits>, number_type> fp2_value_type;
+            typedef element<fp<ModulusBits, GeneratorBits>, number_type> non_residue_type;
 
-            constexpr fp2(const fp2_value_type &point) : top_non_residue(point) {
-            }    // init point for non_residue in fp3 or higher
+            constexpr static const std::size_t modulus_bits = ModulusBits;
+            typedef number<backends::cpp_int_backend<modulus_bits, modulus_bits, unsigned_magnitude, unchecked, void>>
+                modulus_type;
 
-            constexpr fp2(const fp_value_type &point) : non_residue(fp(point)) {
-            }    // init point for non_residue in itself
-
-            constexpr static const std::size_t arity = 2;
-
-            constexpr static const NumberType p = Modulus;
-            constexpr static const NumberType q;
-
-            constexpr const fp2_value_type top_non_residue;
-            constexpr const fp_value_type non_residue = 0;
-            constexpr static const NumberType g;
-
-            constexpr static const std::size_t num_bits = 0;
+            constexpr static const std::size_t generator_bits = GeneratorBits;
+            typedef number<
+                backends::cpp_int_backend<generator_bits, generator_bits, unsigned_magnitude, unchecked, void>>
+                generator_type;
+                
         };
 
         template<typename NumberType, const NumberType &modulus>
