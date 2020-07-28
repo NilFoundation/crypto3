@@ -10,6 +10,7 @@
 #ifndef ALGEBRA_FF_FP2_HPP
 #define ALGEBRA_FF_FP2_HPP
 
+#include <nil/algebra/fields/element.hpp>
 #include <nil/algebra/fields/fp.hpp>
 
 namespace nil {
@@ -35,7 +36,7 @@ namespace nil {
             typedef number<
                 backends::cpp_int_backend<generator_bits, generator_bits, unsigned_magnitude, unchecked, void>>
                 generator_type;
-                
+
         };
 
         template<typename NumberType, const NumberType &modulus>

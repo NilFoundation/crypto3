@@ -7,23 +7,26 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef ALGEBRA_FF_FP_HPP
-#define ALGEBRA_FF_FP_HPP
+#ifndef ALGEBRA_FF_FP6_3OVER2_HPP
+#define ALGEBRA_FF_FP6_3OVER2_HPP
 
-#include <boost/multiprecision/number.hpp>
-#include <boost/multiprecision/cpp_int.hpp>
+#include <nil/algebra/fields/element.hpp>
+#include <nil/algebra/fields/fp.hpp>
 
 namespace nil {
     namespace algebra {
+                
         /**
-         * Arithmetic in the finite field F[p], for prime p of fixed length.
+         * Arithmetic in the finite field F[(p^2)^3].
          *
-         * This class implements Fp-arithmetic, for a large prime p, using a fixed number
-         * of words. It is optimized for tight memory consumption, so the modulus p is
-         * passed as a template parameter, to avoid per-element overheads.
+         * Let p := modulus. This interface provides arithmetic for the extension field
+         * Fp6 = Fp2[V]/(V^3-non_residue) where non_residue is in Fp.
+         *
+         * ASSUMPTION: p = 1 (mod 6)
          */
         template<std::size_t ModulusBits, std::size_t GeneratorBits>
-        struct fp {
+        struct fp6_3over2 {
+            typedef element<fp<ModulusBits, GeneratorBits>, number_type> non_residue_type;
 
             constexpr static const std::size_t modulus_bits = ModulusBits;
             typedef number<backends::cpp_int_backend<modulus_bits, modulus_bits, unsigned_magnitude, unchecked, void>>
@@ -33,10 +36,10 @@ namespace nil {
             typedef number<
                 backends::cpp_int_backend<generator_bits, generator_bits, unsigned_magnitude, unchecked, void>>
                 generator_type;
-
+                
         };
 
     }    // namespace algebra
 }    // namespace nil
 
-#endif    // ALGEBRA_FF_FP_HPP
+#endif    // ALGEBRA_FF_FP6_3OVER2_HPP
