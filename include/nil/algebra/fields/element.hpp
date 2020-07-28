@@ -17,10 +17,15 @@ namespace nil {
     namespace algebra {
         namespace fields {
             template<typename Field, typename NumberType>
-            using element = std::array<NumberType, basic_params<Field>::arity>;
+            struct element {
+            	using type = std::array<NumberType, basic_params<Field>::arity>;
+            }
 
             template<typename NumberType>
-            using element = std::array<NumberType, basic_params<Field>::arity>;
+            struct element<fp4> {
+            	using type = std::array<element<fp2, NumberType>, 2>;
+            }
+            
         }
     }    // namespace algebra
 }    // namespace nil
