@@ -101,19 +101,35 @@ namespace nil {
                 }
 
                 template <typename PowerType>
-                inline static params_type::policy_modular pow(const modulus_type &A0, const modulus_type &A1, const PowerType &power) const {
+                inline static value_type pow(const modulus_type &A0, const modulus_type &A1, const PowerType &power) const {
                 }
 
                 template <typename PowerType>
-                inline static params_type::policy_modular pow(const value_type &A, const PowerType &power) const {
+                inline static value_type pow(const value_type &A, const PowerType &power) const {
                 }
 
-                inline static params_type::policy_modular invert(const modulus_type &A0, const modulus_type &A1) const {
-
-                    const modulus_type &a = A0, &b = A1;
+                inline static value_type invert(const modulus_type &A0, const modulus_type &A1) const {
 
                     /* From "High-Speed Software Implementation of the Optimal Ate Pairing over Barreto-Naehrig Curves";
                      * Algorithm 8 */
+                    const modulus_type t0 = A0.squared();
+                    const modulus_type t1 = A1.squared();
+                    const modulus_type t2 = t0 - non_residue[0] * t1;
+                    const modulus_type t3 = t2.inverse();
+                    const modulus_type c0 = A0 * t3;
+                    const modulus_type c1 = -(A1 * t3);
+
+                    return value_type(c0, c1);
+
+                }
+
+                inline static value_type invert(const value_type &A) const {
+
+                    /* From "High-Speed Software Implementation of the Optimal Ate Pairing over Barreto-Naehrig Curves";
+                     * Algorithm 8 */
+
+                    const modulus_type &A0 = A[0], &A1 = A[1];
+                    
                     const modulus_type t0 = A0.squared();
                     const modulus_type t1 = A1.squared();
                     const modulus_type t2 = t0 - non_residue[0] * t1;
