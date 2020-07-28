@@ -25,6 +25,7 @@ namespace nil {
             private:
                 typedef arithmetic_params<fp2<ModulusBits, GeneratorBits>> params_type;
                 typedef fp<ModulusBits, GeneratorBits> fp_type;
+                constexpr static const non_residue = params_type::non_residue[0];
             public:
                 typedef params_type::modulus_type modulus_type;
                 typedef element<params_type, modulus_type> value_type;
@@ -56,7 +57,7 @@ namespace nil {
                 inline static value_type mul(const value_type &A, const value_type &B) const {
                     const modulus_type A0B0 = A[0] * B[0], A1B1 = A[1] * B[1];
 
-                    return {A0B0 + params_type::non_residue, (A[0] + A[1]) * (B[0] + B[1]) - A0B0 - A1B1};
+                    return {A0B0 + non_residue * A1B1, (A[0] + A[1]) * (B[0] + B[1]) - A0B0 - A1B1};
                 }
 
                 inline static value_type sqrt(const value_type &A) const {
@@ -81,7 +82,7 @@ namespace nil {
                     
                     const modulus_type t0 = A0.squared();
                     const modulus_type t1 = A1.squared();
-                    const modulus_type t2 = t0 - non_residue[0] * t1;
+                    const modulus_type t2 = t0 - non_residue * t1;
                     const modulus_type t3 = t2.inverse();
                     const modulus_type c0 = A0 * t3;
                     const modulus_type c1 = -(A1 * t3);
