@@ -94,7 +94,8 @@ namespace nil {
                     return {pow(A, power)};
                 }
 
-                inline static value_type pow(const value_type &A, const modulus_type &power) const {
+                template <typename PowerType>
+                inline static value_type pow(const value_type &A, const PowerType &power) const {
                     return {A[0], power};
                 }
 

@@ -100,29 +100,29 @@ namespace nil {
                     return mul(A, A);    // maybe can be done more effective
                 }
 
-                inline static params_type::policy_modular pow(const modulus_type &A0, const modulus_type &B0) const {
+                template <typename PowerType>
+                inline static params_type::policy_modular pow(const modulus_type &A0, const modulus_type &A1, const PowerType &power) const {
                 }
 
-                inline static params_type::policy_modular invert(const modulus_type &A0, const modulus_type &B0) const {
+                template <typename PowerType>
+                inline static params_type::policy_modular pow(const value_type &A, const PowerType &power) const {
+                }
 
-                    // The following needs to be adapted to our concepts:
+                inline static params_type::policy_modular invert(const modulus_type &A0, const modulus_type &A1) const {
 
-                    const my_Fp &a = this->c0, &b = this->c1;
+                    const modulus_type &a = A0, &b = A1;
 
                     /* From "High-Speed Software Implementation of the Optimal Ate Pairing over Barreto-Naehrig Curves";
                      * Algorithm 8 */
-                    const my_Fp t0 = a.squared();
-                    const my_Fp t1 = b.squared();
-                    const my_Fp t2 = t0 - non_residue * t1;
-                    const my_Fp t3 = t2.inverse();
-                    const my_Fp c0 = a * t3;
-                    const my_Fp c1 = -(b * t3);
+                    const modulus_type t0 = A0.squared();
+                    const modulus_type t1 = A1.squared();
+                    const modulus_type t2 = t0 - non_residue[0] * t1;
+                    const modulus_type t3 = t2.inverse();
+                    const modulus_type c0 = A0 * t3;
+                    const modulus_type c1 = -(A1 * t3);
 
-                    return Fp2_model<n, modulus>(c0, c1);
+                    return value_type(c0, c1);
 
-                    // compute square root with Tonelli--Shanks
-                    // (does not terminate if not a square!)
-                    return invert(params_type::policy_modular(A, params_type::mod));
                 }
             }
         }    // namespace detail
