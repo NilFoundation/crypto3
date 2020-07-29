@@ -39,7 +39,7 @@ list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
      include/nil/crypto3/pubkey/pk_keys.hpp
      include/nil/crypto3/pubkey/pk_ops_fwd.hpp
      include/nil/crypto3/pubkey/pkcs8.hpp
-     include/nil/crypto3/pubkey/pubkey.hpp
+     include/nil/crypto3/pubkey/scheme.hpp
      include/nil/crypto3/pubkey/x509_key.hpp
      include/nil/crypto3/pubkey/workfactor.hpp
      include/nil/crypto3/pubkey/keypair.hpp

@@ -6,13 +6,29 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_PUBKEY_HPP
-#define CRYPTO3_PUBKEY_HPP
+#ifndef CRYPTO3_SCHEME_HPP
+#define CRYPTO3_SCHEME_HPP
 
 #include <nil/crypto3/pubkey/pk_keys.hpp>
 
 namespace nil {
     namespace crypto3 {
+        namespace pubkey {
+            /*!
+             * @brief
+             * @tparam Cipher
+             * @tparam Mode
+             * @tparam Padding
+             */
+            template<typename Cipher, typename Mode, typename Padding>
+            struct scheme : public Mode::template bind<Cipher, Padding>::type {
+                typedef std::size_t size_type;
+
+                typedef Cipher cipher_type;
+                typedef Mode mode_type;
+                typedef Padding padding_strategy;
+            };
+        }    // namespace pubkey
 
         class random_number_generator;
 
@@ -906,7 +922,7 @@ namespace nil {
 
                     const std::vector<uint8_t> reencoded = der_encode_signature(real_sig, m_parts, m_part_size);
 
-                    if (reencoded.size() != length || same_mem(reencoded.data(), sig, reencoded.size()) == false) {
+                    if (reencoded.size() != length || !same_mem(reencoded.data(), sig, reencoded.size())) {
                         throw decoding_error("pk_verifier: signature is not the canonical DER encoding");
                     }
 

@@ -119,11 +119,10 @@ namespace nil {
                                         const std::string &provider) const override;
             };
 
-            template<typename CurveType, typename NumberType = typename CurveType::number_type>
-            class ecgdsa {
-            public:
-                typedef ecgdsa_public_key<CurveType, NumberType> public_key_policy;
-                typedef ecgdsa_private_key<CurveType, NumberType> private_key_policy;
+            template<typename CurveType>
+            struct ecgdsa {
+                typedef ecgdsa_public_key<CurveType> public_key_policy;
+                typedef ecgdsa_private_key<CurveType> private_key_policy;
             };
 
             namespace {

@@ -59,9 +59,110 @@
     template<class T>                                                                 \
     struct has_##member : public std::integral_constant<bool, HasMember_##member<T>::RESULT> { };
 
+#define GENERATE_HAS_MEMBER_FUNCTION(Function, ...)                                  \
+                                                                                     \
+    template<typename T>                                                             \
+    struct has_##Function {                                                          \
+        struct Fallback {                                                            \
+            void Function(##__VA_ARGS__);                                            \
+        };                                                                           \
+                                                                                     \
+        struct Derived : Fallback { };                                               \
+                                                                                     \
+        template<typename C, C>                                                      \
+        struct ChT;                                                                  \
+                                                                                     \
+        template<typename C>                                                         \
+        static char (&f(ChT<void (Fallback::*)(##__VA_ARGS__), &C::Function> *))[1]; \
+                                                                                     \
+        template<typename C>                                                         \
+        static char (&f(...))[2];                                                    \
+                                                                                     \
+        static bool const value = sizeof(f<Derived>(0)) == 2;                        \
+    };
+
+#define GENERATE_HAS_MEMBER_CONST_FUNCTION(Function, ...)                                  \
+                                                                                           \
+    template<typename T>                                                                   \
+    struct has_##Function {                                                                \
+        struct Fallback {                                                                  \
+            void Function(##__VA_ARGS__) const;                                            \
+        };                                                                                 \
+                                                                                           \
+        struct Derived : Fallback { };                                                     \
+                                                                                           \
+        template<typename C, C>                                                            \
+        struct ChT;                                                                        \
+                                                                                           \
+        template<typename C>                                                               \
+        static char (&f(ChT<void (Fallback::*)(##__VA_ARGS__) const, &C::Function> *))[1]; \
+                                                                                           \
+        template<typename C>                                                               \
+        static char (&f(...))[2];                                                          \
+                                                                                           \
+        static bool const value = sizeof(f<Derived>(0)) == 2;                              \
+    };
+
+#define GENERATE_HAS_MEMBER_RETURN_FUNCTION(Function, ReturnType, ...)                       \
+                                                                                             \
+    template<typename T>                                                                     \
+    struct has_##Function {                                                                  \
+        struct Dummy {                                                                       \
+            typedef void ReturnType;                                                         \
+        };                                                                                   \
+        typedef typename std::conditional<has_##ReturnType<T>::value, T, Dummy>::type TType; \
+        typedef typename TType::ReturnType type;                                             \
+                                                                                             \
+        struct Fallback {                                                                    \
+            type Function(##__VA_ARGS__);                                                    \
+        };                                                                                   \
+                                                                                             \
+        struct Derived : TType, Fallback { };                                                \
+                                                                                             \
+        template<typename C, C>                                                              \
+        struct ChT;                                                                          \
+                                                                                             \
+        template<typename C>                                                                 \
+        static char (&f(ChT<type (Fallback::*)(##__VA_ARGS__), &C::Function> *))[1];         \
+                                                                                             \
+        template<typename C>                                                                 \
+        static char (&f(...))[2];                                                            \
+                                                                                             \
+        static bool const value = sizeof(f<Derived>(0)) == 2;                                \
+    };
+
+#define GENERATE_HAS_MEMBER_CONST_RETURN_FUNCTION(Function, ReturnType, ...)                 \
+                                                                                             \
+    template<typename T>                                                                     \
+    struct has_##Function {                                                                  \
+        struct Dummy {                                                                       \
+            typedef void ReturnType;                                                         \
+        };                                                                                   \
+        typedef typename std::conditional<has_##ReturnType<T>::value, T, Dummy>::type TType; \
+        typedef typename TType::ReturnType type;                                             \
+                                                                                             \
+        struct Fallback {                                                                    \
+            type Function(##__VA_ARGS__) const;                                              \
+        };                                                                                   \
+                                                                                             \
+        struct Derived : TType, Fallback { };                                                \
+                                                                                             \
+        template<typename C, C>                                                              \
+        struct ChT;                                                                          \
+                                                                                             \
+        template<typename C>                                                                 \
+        static char (&f(ChT<type (Fallback::*)(##__VA_ARGS__) const, &C::Function> *))[1];   \
+                                                                                             \
+        template<typename C>                                                                 \
+        static char (&f(...))[2];                                                            \
+                                                                                             \
+        static bool const value = sizeof(f<Derived>(0)) == 2;                                \
+    };
+
 namespace nil {
     namespace crypto3 {
         namespace detail {
+            GENERATE_HAS_MEMBER_TYPE(iterator)
             GENERATE_HAS_MEMBER_TYPE(const_iterator)
 
             GENERATE_HAS_MEMBER_TYPE(encoded_value_type)
@@ -83,10 +184,24 @@ namespace nil {
             GENERATE_HAS_MEMBER(block_bits)
             GENERATE_HAS_MEMBER(digest_bits)
             GENERATE_HAS_MEMBER(key_bits)
+            GENERATE_HAS_MEMBER(min_key_bits)
+            GENERATE_HAS_MEMBER(max_key_bits)
             GENERATE_HAS_MEMBER(key_schedule_bits)
             GENERATE_HAS_MEMBER(word_bits)
 
             GENERATE_HAS_MEMBER(rounds)
+
+            GENERATE_HAS_MEMBER_CONST_RETURN_FUNCTION(begin, const_iterator)
+            GENERATE_HAS_MEMBER_CONST_RETURN_FUNCTION(end, const_iterator)
+
+            GENERATE_HAS_MEMBER_RETURN_FUNCTION(encode, block_type)
+            GENERATE_HAS_MEMBER_RETURN_FUNCTION(decode, block_type)
+
+            GENERATE_HAS_MEMBER_RETURN_FUNCTION(encrypt, block_type)
+            GENERATE_HAS_MEMBER_RETURN_FUNCTION(decrypt, block_type)
+
+            GENERATE_HAS_MEMBER_FUNCTION(generate)
+            GENERATE_HAS_MEMBER_CONST_FUNCTION(check)
 
             template<typename T>
             struct is_iterator {
@@ -104,45 +219,8 @@ namespace nil {
 
             template<typename Container>
             struct is_container {
-            private:
-                template<typename T>
-                struct has_begin_end {
-                    struct Dummy {
-                        typedef void const_iterator;
-                    };
-                    typedef typename std::conditional<has_const_iterator<T>::value, T, Dummy>::type TType;
-                    typedef typename TType::const_iterator iter;
-
-                    struct Fallback {
-                        iter begin() const;
-
-                        iter end() const;
-                    };
-
-                    struct Derived : TType, Fallback { };
-
-                    template<typename C, C>
-                    struct ChT;
-
-                    template<typename C>
-                    static char (&f(ChT<iter (Fallback::*)() const, &C::begin> *))[1];
-
-                    template<typename C>
-                    static char (&f(...))[2];
-
-                    template<typename C>
-                    static char (&g(ChT<iter (Fallback::*)() const, &C::end> *))[1];
-
-                    template<typename C>
-                    static char (&g(...))[2];
-
-                    static bool const beg_value = sizeof(f<Derived>(0)) == 2;
-                    static bool const end_value = sizeof(g<Derived>(0)) == 2;
-                };
-
-            public:
-                static const bool value = has_const_iterator<Container>::value && has_begin_end<Container>::beg_value &&
-                                          has_begin_end<Container>::end_value;
+                static const bool value =
+                    has_const_iterator<Container>::value && has_begin<Container>::value && has_end<Container>::value;
             };
 
             template<typename T>
@@ -150,7 +228,8 @@ namespace nil {
                 static const bool value = has_encoded_value_type<T>::value && has_encoded_value_bits<T>::value &&
                                           has_decoded_value_type<T>::value && has_decoded_value_bits<T>::value &&
                                           has_encoded_block_type<T>::value && has_encoded_block_bits<T>::value &&
-                                          has_decoded_block_type<T>::value && has_decoded_block_bits<T>::value;
+                                          has_decoded_block_type<T>::value && has_decoded_block_bits<T>::value &&
+                                          has_encode<T>::value && has_decode<T>::value;
                 typedef T type;
             };
 
@@ -158,7 +237,8 @@ namespace nil {
             struct is_block_cipher {
                 static const bool value = has_word_type<T>::value && has_word_bits<T>::value &&
                                           has_block_type<T>::value && has_block_bits<T>::value &&
-                                          has_key_type<T>::value && has_key_bits<T>::value && has_rounds<T>::value;
+                                          has_key_type<T>::value && has_key_bits<T>::value && has_rounds<T>::value &&
+                                          has_encrypt<T>::value && has_decrypt<T>::value;
                 typedef T type;
             };
 
@@ -196,8 +276,22 @@ namespace nil {
                                           has_key_type<T>::value && has_key_bits<T>::value;
                 typedef T type;
             };
+
+            template<typename T>
+            struct is_kdf {
+                static const bool value = has_digest_type<T>::value && has_digest_bits<T>::value &&
+                                          has_key_type<T>::value && has_max_key_bits<T>::value &&
+                                          has_min_key_bits<T>::value;
+                typedef T type;
+            };
+
+            template<typename T>
+            struct is_passhash {
+                static const bool value = has_generate<T>::value && has_check<T>::value;
+                typedef T type;
+            };
         }    // namespace detail
     }        // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_CODEC_TYPE_TRAITS_HPP
+#endif    // CRYPTO3_TYPE_TRAITS_HPP

@@ -7,16 +7,15 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_CIPHER_MODES_HPP
-#define CRYPTO3_CIPHER_MODES_HPP
+#ifndef CRYPTO3_SCHEME_MODES_HPP
+#define CRYPTO3_SCHEME_MODES_HPP
 
 #include <nil/crypto3/detail/stream_endian.hpp>
 
 namespace nil {
     namespace crypto3 {
-        namespace block {
+        namespace pubkey {
             namespace detail {
-
                 template<typename Cipher, typename Padding>
                 struct isomorphic_policy {
                     typedef std::size_t size_type;
@@ -109,7 +108,6 @@ namespace nil {
             }    // namespace detail
 
             namespace modes {
-
                 template<typename Cipher, template<typename> class Padding>
                 struct isomorphic {
                     typedef Cipher cipher_type;
@@ -124,7 +122,7 @@ namespace nil {
                     };
                 };
             }    // namespace modes
-        }        // namespace block
+        }        // namespace pubkey
     }            // namespace crypto3
 }    // namespace nil
 

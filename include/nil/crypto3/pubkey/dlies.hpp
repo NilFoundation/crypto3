@@ -9,7 +9,7 @@
 #ifndef CRYPTO3_PUBKEY_DLIES_HPP
 #define CRYPTO3_PUBKEY_DLIES_HPP
 
-#include <nil/crypto3/pubkey/pubkey.hpp>
+#include <nil/crypto3/pubkey/scheme.hpp>
 #include <nil/crypto3/pubkey/dh.hpp>
 
 #include <nil/crypto3/modes/cipher_mode.hpp>

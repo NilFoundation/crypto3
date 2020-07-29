@@ -17,7 +17,7 @@
 #include <nil/crypto3/pubkey/ecdh.hpp>
 #include <nil/crypto3/pubkey/ec_group/ec_group.hpp>
 #include <nil/crypto3/pubkey/ec_group/point_gfp.hpp>
-#include <nil/crypto3/pubkey/pubkey.hpp>
+#include <nil/crypto3/pubkey/scheme.hpp>
 
 #include <nil/crypto3/utilities/secmem.hpp>
 

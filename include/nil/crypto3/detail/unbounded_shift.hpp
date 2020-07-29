@@ -1,5 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Alexander Sokolov <asokolov@nil.foundation>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -11,18 +13,20 @@
 
 #include <boost/assert.hpp>
 
+#include <nil/crypto3/detail/stream_endian.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace detail {
 
-            template<int N, typename T>
+            template<int Shift, typename T>
             struct unbounded_shifter {
                 static T shl(T x) {
-                    return unbounded_shifter<N - 1, T>::shl(T(x << 1));
+                    return unbounded_shifter<Shift - 1, T>::shl(T(x << 1));
                 }
 
                 static T shr(T x) {
-                    return unbounded_shifter<N - 1, T>::shr(T(x >> 1));
+                    return unbounded_shifter<Shift - 1, T>::shr(T(x >> 1));
                 }
             };
 
@@ -37,24 +41,52 @@ namespace nil {
                 }
             };
 
-            template<int N, typename T>
+            template<int Shift, typename T>
             T unbounded_shl(T x) {
-                return unbounded_shifter<N, T>::shl(x);
+                return unbounded_shifter<Shift, T>::shl(x);
             }
 
-            template<int N, typename T>
+            template<int Shift, typename T>
             T unbounded_shr(T x) {
-                return unbounded_shifter<N, T>::shr(x);
+                return unbounded_shifter<Shift, T>::shr(x);
             }
 
-            template<int N, typename T>
+            template<typename T>
+            T unbounded_shl(T x, std::size_t n) {
+                return x << n;
+            }
+
+            template<typename T>
+            T unbounded_shr(T x, std::size_t n) {
+                return x >> n;
+            }
+            // FIXME: it wouldn't work when Shift == sizeof(T) * CHAR_BIT
+            template<int Shift, typename T>
             T low_bits(T x) {
-                T highmask = unbounded_shl<N, T>(~T());
+                T highmask = unbounded_shl<Shift, T>(~T());
                 return T(x & ~highmask);
             }
 
+            template<size_t Shift, size_t TypeBits, typename T>
+            T low_bits(T x) {
+                constexpr size_t real_shift = TypeBits - Shift;
+                T lowmask = ((bool)Shift) * unbounded_shr<real_shift, T>(~T());
+                return x & lowmask;
+            }
+
+            template<size_t type_bits, typename T>
+            T low_bits(T x, size_t shift) {
+                T lowmask = ((bool)shift) * unbounded_shr<T>(~T(), type_bits - shift);
+                return x & lowmask;
+            }
+
+            template<size_t type_bits, typename T>
+            T high_bits(T x, size_t shift) {
+                T highmask = ((bool)shift) * unbounded_shl<T>(~T(), type_bits - shift);
+                return x & highmask;
+            }
         }    // namespace detail
     }        // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_BLOCK_DETAIL_UNBOUNDED_SHIFT_HPP
+#endif    // CRYPTO3_HASH_DETAIL_UNBOUNDED_SHIFT_HPP

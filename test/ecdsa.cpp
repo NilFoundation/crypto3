@@ -38,7 +38,7 @@
 #include <nil/crypto3/pubkey/pk_operations.hpp>
 #include <nil/crypto3/pubkey/pk_ops_fwd.hpp>
 #include <nil/crypto3/pubkey/pkcs8.hpp>
-#include <nil/crypto3/pubkey/pubkey.hpp>
+#include <nil/crypto3/pubkey/scheme.hpp>
 #include <nil/crypto3/pubkey/rfc6979.hpp>
 #include <nil/crypto3/pubkey/rsa.hpp>
 #include <nil/crypto3/pubkey/sm2.hpp>
