@@ -35,7 +35,7 @@ namespace nil {
                 }
 
                 inline static bool eq(const value_type &A, const value_type &B) const {
-                    return A != B;
+                    return A[0] == B[0];
                 }
 
                 inline static bool neq(const value_type &A, const value_type &B) const {
