@@ -131,19 +131,19 @@ namespace nil {
                 c.resize(n, FieldType::zero());
 
 #ifdef MULTICORE
-                _basic_parallel_radix2_FFT(u, omega);
-                _basic_parallel_radix2_FFT(v, omega);
+                detail::basic_parallel_radix2_FFT(u, omega);
+                detail::basic_parallel_radix2_FFT(v, omega);
 #else
-                _basic_serial_radix2_FFT(u, omega);
-                _basic_serial_radix2_FFT(v, omega);
+                detail::basic_serial_radix2_FFT(u, omega);
+                detail::basic_serial_radix2_FFT(v, omega);
 #endif
 
                 std::transform(u.begin(), u.end(), v.begin(), c.begin(), std::multiplies<FieldType>());
 
 #ifdef MULTICORE
-                _basic_parallel_radix2_FFT(c, omega.inverse());
+                detail::basic_parallel_radix2_FFT(c, omega.inverse());
 #else
-                _basic_serial_radix2_FFT(c, omega.inverse());
+                detail::basic_serial_radix2_FFT(c, omega.inverse());
 #endif
 
                 const FieldType sconst = FieldType(n).inverse();

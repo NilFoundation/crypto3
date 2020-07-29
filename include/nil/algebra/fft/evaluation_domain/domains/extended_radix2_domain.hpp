@@ -15,38 +15,37 @@
 #include <nil/algebra/fft/evaluation_domain/evaluation_domain.hpp>
 #include <nil/algebra/fft/evaluation_domain/domains/basic_radix2_domain_aux.hpp>
 
-
 namespace nil {
     namespace algebra {
         namespace fft {
 
-            template<typename FieldType>
-            struct extended_radix2_domain : public evaluation_domain<FieldType> {
+            template<typename FieldType, std::size_t MinSize>
+            struct extended_radix2_domain : public evaluation_domain<FieldType, MinSize> {
 
                 extended_radix2_domain(const size_t m) : evaluation_domain<FieldType>(m) {
-                    //if (m <= 1)
-                        //throw InvalidSizeException("extended_radix2(): expected m > 1");
+                    if (m <= 1)
+                        throw InvalidSizeException("extended_radix2(): expected m > 1");
 
                     if (!std::is_same<FieldType, ff::Double>::value) {
                         const size_t logm = ff::log2(m);
-                        //if (logm != (FieldType::s + 1))
-                            //throw DomainSizeException("extended_radix2(): expected logm == FieldType::s + 1");
+                        if (logm != (FieldType::s + 1))
+                            throw DomainSizeException("extended_radix2(): expected logm == FieldType::s + 1");
                     }
 
                     small_m = m / 2;
 
-                    //try {
-                    omega = ff::get_root_of_unity<FieldType>(small_m);
-                    //} catch (const std::invalid_argument &e) {
-                    //    throw DomainSizeException(e.what());
-                    //}
+                    try {
+                        omega = detail::unity_root<FieldType>(small_m);
+                    } catch (const std::invalid_argument &e) {
+                        throw DomainSizeException(e.what());
+                    }
 
-                    shift = ff::coset_shift<FieldType>();
+                    shift = detail::coset_shift<FieldType>();
                 }
 
                 void FFT(std::vector<FieldType> &a) {
-                    //if (a.size() != this->m)
-                        //throw DomainSizeException("extended_radix2: expected a.size() == this->m");
+                    if (a.size() != this->m)
+                        throw DomainSizeException("extended_radix2: expected a.size() == this->m");
 
                     std::vector<FieldType> a0(small_m, FieldType::zero());
                     std::vector<FieldType> a1(small_m, FieldType::zero());
@@ -71,8 +70,8 @@ namespace nil {
                 }
 
                 void iFFT(std::vector<FieldType> &a) {
-                    //if (a.size() != this->m)
-                        //throw DomainSizeException("extended_radix2: expected a.size() == this->m");
+                    if (a.size() != this->m)
+                        throw DomainSizeException("extended_radix2: expected a.size() == this->m");
 
                     // note: this is not in-place
                     std::vector<FieldType> a0(a.begin(), a.begin() + small_m);
@@ -97,18 +96,20 @@ namespace nil {
                 }
 
                 void cosetFFT(std::vector<FieldType> &a, const FieldType &g) {
-                    _multiply_by_coset(a, g);
+                    detail::multiply_by_coset(a, g);
                     FFT(a);
                 }
 
                 void icosetFFT(std::vector<FieldType> &a, const FieldType &g) {
                     iFFT(a);
-                    _multiply_by_coset(a, g.inverse());
+                    detail::multiply_by_coset(a, g.inverse());
                 }
 
                 std::vector<FieldType> evaluate_all_lagrange_polynomials(const FieldType &t) {
-                    const std::vector<FieldType> T0 = _basic_radix2_evaluate_all_lagrange_polynomials(small_m, t);
-                    const std::vector<FieldType> T1 = _basic_radix2_evaluate_all_lagrange_polynomials(small_m, t * shift.inverse());
+                    const std::vector<FieldType> T0 =
+                        detail::basic_radix2_evaluate_all_lagrange_polynomials(small_m, t);
+                    const std::vector<FieldType> T1 =
+                        detail::basic_radix2_evaluate_all_lagrange_polynomials(small_m, t * shift.inverse());
 
                     std::vector<FieldType> result(this->m, FieldType::zero());
 
@@ -138,8 +139,8 @@ namespace nil {
                 }
 
                 void add_poly_Z(const FieldType &coeff, std::vector<FieldType> &H) {
-                    //if (H.size() != m + 1)
-                        //throw DomainSizeException("extended_radix2: expected H.size() == m+1");
+                    if (H.size() != m + 1)
+                        throw DomainSizeException("extended_radix2: expected H.size() == m+1");
 
                     const FieldType shift_to_small_m = shift ^ small_m;
 
@@ -156,7 +157,7 @@ namespace nil {
 
                     const FieldType Z0 = (coset_to_small_m - FieldType::one()) * (coset_to_small_m - shift_to_small_m);
                     const FieldType Z1 = (coset_to_small_m * shift_to_small_m - FieldType::one()) *
-                                      (coset_to_small_m * shift_to_small_m - shift_to_small_m);
+                                         (coset_to_small_m * shift_to_small_m - shift_to_small_m);
 
                     const FieldType Z0_inverse = Z0.inverse();
                     const FieldType Z1_inverse = Z1.inverse();

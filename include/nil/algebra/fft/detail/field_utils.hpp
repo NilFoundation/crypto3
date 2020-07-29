@@ -11,6 +11,7 @@
 #define ALGEBRA_FIELD_UTILS_HPP
 
 #include <type_traits>
+#include <complex>
 
 namespace nil {
     namespace algebra {
@@ -27,20 +28,20 @@ namespace nil {
                     unity_root(const size_t n) {
                     const double PI = 3.141592653589793238460264338328L;
 
-                    return FieldType(cos(2 * PI / n), sin(2 * PI / n));
+                    return typename FieldType::value_type(cos(2 * PI / n), sin(2 * PI / n));
                 }
 
                 template<typename FieldType>
                 typename std::enable_if<!std::is_same<typename FieldType::value_type, std::complex<double>>::value,
                                         FieldType>::type
                     unity_root(const size_t n) {
-                    const std::size_t logn = log2(n);
+                    const std::size_t logn = std::log2(n);
                     if (n != (1u << logn))
                         throw std::invalid_argument("expected n == (1u << logn)");
                     if (logn > FieldType::s)
                         throw std::invalid_argument("expected logn <= FieldType::s");
 
-                    FieldType omega = FieldType::root_of_unity;
+                    typename FieldType::value_type omega = FieldType::root_of_unity;
                     for (size_t i = FieldType::s; i > logn; --i) {
                         omega *= omega;
                     }

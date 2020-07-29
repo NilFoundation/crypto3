@@ -29,17 +29,18 @@ namespace nil {
             struct geometric_sequence_domain : public evaluation_domain<FieldType> {
 
                 geometric_sequence_domain(const size_t m) : evaluation_domain<FieldType>(m) {
-                    //if (m <= 1)
-                        //throw InvalidSizeException("geometric(): expected m > 1");
-                    //if (FieldType::geometric_generator() == FieldType::zero())
-                        //throw InvalidSizeException("geometric(): expected FieldType::geometric_generator() != FieldType::zero()");
+                    if (m <= 1)
+                        throw InvalidSizeException("geometric(): expected m > 1");
+                    if (FieldType::geometric_generator() == FieldType::zero())
+                        throw InvalidSizeException(
+                            "geometric(): expected FieldType::geometric_generator() != FieldType::zero()");
 
                     precomputation_sentinel = 0;
                 }
 
                 void FFT(std::vector<FieldType> &a) {
-                    //if (a.size() != this->m)
-                        //throw DomainSizeException("geometric: expected a.size() == this->m");
+                    if (a.size() != this->m)
+                        throw DomainSizeException("geometric: expected a.size() == this->m");
 
                     if (!precomputation_sentinel)
                         do_precomputation();
@@ -61,17 +62,17 @@ namespace nil {
                     _polynomial_multiplication(a, g, T);
                     a.resize(this->m);
 
-            #ifdef MULTICORE
-            #pragma omp parallel for
-            #endif
+#ifdef MULTICORE
+#pragma omp parallel for
+#endif
                     for (size_t i = 0; i < this->m; i++) {
                         a[i] *= T[i].inverse();
                     }
                 }
 
                 void iFFT(std::vector<FieldType> &a) {
-                    //if (a.size() != this->m)
-                        //throw DomainSizeException("geometric: expected a.size() == this->m");
+                    if (a.size() != this->m)
+                        throw DomainSizeException("geometric: expected a.size() == this->m");
 
                     if (!precomputation_sentinel)
                         do_precomputation();
@@ -96,9 +97,9 @@ namespace nil {
                     _polynomial_multiplication(a, W, T);
                     a.resize(this->m);
 
-            #ifdef MULTICORE
-            #pragma omp parallel for
-            #endif
+#ifdef MULTICORE
+#pragma omp parallel for
+#endif
                     for (size_t i = 0; i < this->m; i++) {
                         a[i] *= geometric_triangular_sequence[i].inverse();
                     }
@@ -107,13 +108,13 @@ namespace nil {
                 }
 
                 void cosetFFT(std::vector<FieldType> &a, const FieldType &g) {
-                    _multiply_by_coset(a, g);
+                    detail::multiply_by_coset(a, g);
                     FFT(a);
                 }
 
                 void icosetFFT(std::vector<FieldType> &a, const FieldType &g) {
                     iFFT(a);
-                    _multiply_by_coset(a, g.inverse());
+                    detail::multiply_by_coset(a, g.inverse());
                 }
 
                 std::vector<FieldType> evaluate_all_lagrange_polynomials(const FieldType &t) {
@@ -196,8 +197,8 @@ namespace nil {
                 }
 
                 void add_poly_Z(const FieldType &coeff, std::vector<FieldType> &H) {
-                    //if (H.size() != m + 1)
-                        //throw DomainSizeException("geometric: expected H.size() == m+1");
+                    if (H.size() != m + 1)
+                        throw DomainSizeException("geometric: expected H.size() == m+1");
 
                     if (!precomputation_sentinel)
                         do_precomputation();
@@ -215,9 +216,9 @@ namespace nil {
                         _polynomial_multiplication(x, x, t);
                     }
 
-            #ifdef MULTICORE
-            #pragma omp parallel for
-            #endif
+#ifdef MULTICORE
+#pragma omp parallel for
+#endif
                     for (size_t i = 0; i < this->m + 1; i++) {
                         H[i] += (x[i] * coeff);
                     }
@@ -246,6 +247,7 @@ namespace nil {
 
                     precomputation_sentinel = 1;
                 }
+
             private:
                 bool precomputation_sentinel;
                 std::vector<FieldType> geometric_sequence;

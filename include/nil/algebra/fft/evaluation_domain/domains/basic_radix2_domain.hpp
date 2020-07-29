@@ -20,30 +20,24 @@
 namespace nil {
     namespace algebra {
         namespace fft {
+            template<typename FieldType, std::size_t MinSize>
+            struct basic_radix2_domain : public evaluation_domain<FieldType, MinSize> {
+                static_assert(MinSize > 1, "m is expected to be > 1");
+                static_assert(boost::static_log2<MinSize>::value <= FieldType::s, "expected logm <= FieldType::s");
 
-            template<typename FieldType, std::size_t M>
-            struct basic_radix2_domain : public evaluation_domain<FieldType, M> {
-                static_assert(M > 1, "m is expected to be > 1");
-                static_assert(boost::static_log2<M>::value <= FieldType::s, "expected logm <= FieldType::s");
-
-                basic_radix2_domain(const size_t m) {
-                    try {
-                        omega = detail::unity_root<FieldType>(m);
-                    } catch (const std::invalid_argument &e) {
-                        throw DomainSizeException(e.what());
-                    }
-                }
+                constexpr static const std::size_t min_size = MinSize;
+                constexpr static const std::size_t omega = detail::unity_root<FieldType>(MinSize);
 
                 void FFT(std::vector<FieldType> &a) {
-                    // if (a.size() != this->m)
-                    // throw DomainSizeException("basic_radix2: expected a.size() == this->m");
+                    if (a.size() != MinSize)
+                        throw DomainSizeException("basic_radix2: expected a.size() == MinSize");
 
                     _basic_radix2_FFT(a, omega);
                 }
 
                 void iFFT(std::vector<FieldType> &a) {
-                    if (a.size() != this->m)
-                        throw DomainSizeException("basic_radix2: expected a.size() == this->m");
+                    if (a.size() != MinSize)
+                        throw DomainSizeException("basic_radix2: expected a.size() == MinSize");
 
                     _basic_radix2_FFT(a, omega.inverse());
 
@@ -54,17 +48,17 @@ namespace nil {
                 }
 
                 void cosetFFT(std::vector<FieldType> &a, const FieldType &g) {
-                    _multiply_by_coset(a, g);
+                    detail::multiply_by_coset(a, g);
                     FFT(a);
                 }
 
                 void icosetFFT(std::vector<FieldType> &a, const FieldType &g) {
                     iFFT(a);
-                    _multiply_by_coset(a, g.inverse());
+                    detail::multiply_by_coset(a, g.inverse());
                 }
 
                 std::vector<FieldType> evaluate_all_lagrange_polynomials(const FieldType &t) {
-                    return _basic_radix2_evaluate_all_lagrange_polynomials(this->m, t);
+                    return detail::basic_radix2_evaluate_all_lagrange_polynomials(MinSize, t);
                 }
 
                 FieldType get_domain_element(const size_t idx) {
@@ -72,27 +66,27 @@ namespace nil {
                 }
 
                 FieldType compute_vanishing_polynomial(const FieldType &t) {
-                    return (t ^ this->m) - FieldType::one();
+                    return (t ^ MinSize) - FieldType::one();
                 }
 
                 void add_poly_Z(const FieldType &coeff, std::vector<FieldType> &H) {
-                    // if (H.size() != this->m + 1)
-                    // throw DomainSizeException("basic_radix2: expected H.size() == this->m+1");
+                    if (H.size() != MinSize + 1)
+                        throw DomainSizeException("basic_radix2: expected H.size() == MinSize+1");
 
-                    H[this->m] += coeff;
+                    H[MinSize] += coeff;
                     H[0] -= coeff;
                 }
 
                 void divide_by_Z_on_coset(std::vector<FieldType> &P) {
                     const FieldType coset = FieldType::multiplicative_generator;
                     const FieldType Z_inverse_at_coset = compute_vanishing_polynomial(coset).inverse();
-                    for (size_t i = 0; i < this->m; ++i) {
+                    for (size_t i = 0; i < MinSize; ++i) {
                         P[i] *= Z_inverse_at_coset;
                     }
                 }
 
             private:
-                FieldType omega;
+                typename FieldType::value_type omega;
             };
         }    // namespace fft
     }        // namespace algebra

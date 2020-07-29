@@ -27,9 +27,9 @@ namespace nil {
              * [Gathen and Gerhard, Modern Computer Algebra 3rd Ed., Section 8.4].
              */
             template<typename FieldType>
-            void kronecker_substitution(const boost::math::tools::polynomial<FieldType>& v3,
-                                        const boost::math::tools::polynomial<FieldType>& v1,
-                                        const boost::math::tools::polynomial<FieldType>& v2) {
+            void kronecker_substitution(const boost::math::tools::polynomial<typename FieldType::value_type>& v3,
+                                        const boost::math::tools::polynomial<typename FieldType::value_type>& v1,
+                                        const boost::math::tools::polynomial<typename FieldType::value_type>& v2) {
                 /* Initialize */
                 bool square = (v1 == v2) ? 1 : 0;
 
