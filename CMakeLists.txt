@@ -66,8 +66,7 @@ list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
      include/nil/crypto3/codec/algorithm/encode.hpp
      include/nil/crypto3/codec/algorithm/decode.hpp
 
-     include/nil/crypto3/codec/adaptor/encoded.hpp
-     include/nil/crypto3/codec/adaptor/decoded.hpp)
+     include/nil/crypto3/codec/adaptor/coded.hpp)
 
 list(APPEND ${CURRENT_PROJECT_NAME}_UNGROUPED_SOURCES)
 
