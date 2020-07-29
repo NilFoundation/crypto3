@@ -367,43 +367,6 @@ if(CRYPTO3_PUBKEY_SM2)
          ${${CURRENT_PROJECT_NAME}_SM2_SOURCES})
 endif()
 
-if(CRYPTO3_PUBKEY_XMSS)
-    list(APPEND ${CURRENT_PROJECT_NAME}_XMSS_PUBLIC_HEADERS
-         include/nil/crypto3/pubkey/xmss/atomic.hpp
-         include/nil/crypto3/pubkey/xmss/xmss.hpp
-         include/nil/crypto3/pubkey/xmss/xmss_address.hpp
-         include/nil/crypto3/pubkey/xmss/xmss_common_ops.hpp
-         include/nil/crypto3/pubkey/xmss/xmss_hash.hpp
-         include/nil/crypto3/pubkey/xmss/xmss_index_registry.hpp
-         include/nil/crypto3/pubkey/xmss/xmss_key_pair.hpp
-         include/nil/crypto3/pubkey/xmss/xmss_parameters.hpp
-         include/nil/crypto3/pubkey/xmss/xmss_privatekey.hpp
-         include/nil/crypto3/pubkey/xmss/xmss_publickey.hpp
-         include/nil/crypto3/pubkey/xmss/xmss_signature_operation.hpp
-         include/nil/crypto3/pubkey/xmss/xmss_tools.hpp
-         include/nil/crypto3/pubkey/xmss/xmss_verification_operation.hpp
-         include/nil/crypto3/pubkey/xmss/xmss_wots_addressed_privatekey.hpp
-         include/nil/crypto3/pubkey/xmss/xmss_wots_parameters.hpp
-         include/nil/crypto3/pubkey/xmss/xmss_wots_privatekey.hpp
-         include/nil/crypto3/pubkey/xmss/xmss_wots_publickey.hpp)
-
-    list(APPEND ${CURRENT_PROJECT_NAME}_XMSS_PRIVATE_HEADERS
-         include/nil/crypto3/pubkey/xmss/xmss_signature.hpp
-         include/nil/crypto3/pubkey/xmss/xmss_wots_addressed_public_key.hpp)
-
-    list(APPEND ${CURRENT_PROJECT_NAME}_XMSS_SOURCES)
-
-    add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_XMSS)
-    list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
-         ${${CURRENT_PROJECT_NAME}_XMSS_PUBLIC_HEADERS})
-
-    list(APPEND ${CURRENT_PROJECT_NAME}_PRIVATE_HEADERS
-         ${${CURRENT_PROJECT_NAME}_XMSS_PRIVATE_HEADERS})
-
-    list(APPEND ${CURRENT_PROJECT_NAME}_SOURCES
-         ${${CURRENT_PROJECT_NAME}_XMSS_SOURCES})
-endif()
-
 list(APPEND ${CURRENT_PROJECT_NAME}_HEADERS
      ${${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS})
 
@@ -423,14 +386,9 @@ target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
                       ${CMAKE_WORKSPACE_NAME}::codec
                       ${CMAKE_WORKSPACE_NAME}::hash
                       ${CMAKE_WORKSPACE_NAME}::modes
-<<<<<<< HEAD
                       ${CMAKE_WORKSPACE_NAME}::pkpad
-                      ${CMAKE_WORKSPACE_NAME}::utilities
-=======
-                      ${CMAKE_WORKSPACE_NAME}::pk_pad
->>>>>>> 110cdfa3eec9ccc3dcbabcd2d26438b72d47708e
 
-                      boost::multiprecision
+                      $<TARGET_NAME_IF_EXISTS:boost_multiprecision>
 
                       ${Boost_LIBRARIES})
 
