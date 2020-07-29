@@ -59,14 +59,6 @@ namespace nil {
 
             fe25519 &operator=(const fe25519 &other) = default;
 
-#if !defined(CRYPTO3_BUILD_COMPILER_IS_MSVC_2013)
-
-            fe25519(fe25519 &&other) = default;
-
-            fe25519 &operator=(fe25519 &&other) = default;
-
-#endif
-
             /*!
              * @brief Ignores top bit of h.
              * @param b
