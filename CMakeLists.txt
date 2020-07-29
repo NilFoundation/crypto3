@@ -5,6 +5,10 @@ cmake_policy(SET CMP0042 NEW)
 cmake_policy(SET CMP0048 NEW)
 cmake_policy(SET CMP0076 NEW)
 
+if(NOT ${CMAKE_WORKSPACE_NAME} STREQUAL crypto3)
+    cm_workspace(crypto3)
+endif()
+
 cm_project(pkpad WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME})
 
 cm_find_package(CM)
@@ -12,14 +16,11 @@ include(CMDeploy)
 include(CMSetupVersion)
 
 if(NOT Boost_FOUND)
-    cm_find_package(Boost)
+    cm_find_package(Boost COMPONENTS random REQUIRED)
 endif()
 
-cm_find_package(${CMAKE_WORKSPACE_NAME}_asn1)
 cm_find_package(${CMAKE_WORKSPACE_NAME}_codec)
 cm_find_package(${CMAKE_WORKSPACE_NAME}_hash)
-cm_find_package(${CMAKE_WORKSPACE_NAME}_random)
-cm_find_package(${CMAKE_WORKSPACE_NAME}_utilities)
 
 list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
      include/nil/crypto3/pkpad/algorithm/pad.hpp
@@ -229,11 +230,8 @@ set_target_properties(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} PROPERTIES
                       EXPORT_NAME ${CURRENT_PROJECT_NAME})
 
 target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
-                      ${CMAKE_WORKSPACE_NAME}::asn1
                       ${CMAKE_WORKSPACE_NAME}::codec
                       ${CMAKE_WORKSPACE_NAME}::hash
-                      ${CMAKE_WORKSPACE_NAME}::random
-                      ${CMAKE_WORKSPACE_NAME}::utilities
 
                       ${Boost_LIBRARIES})
 
