@@ -26,6 +26,8 @@
 #include <nil/crypto3/codec/algorithm/encode.hpp>
 #include <nil/crypto3/codec/algorithm/decode.hpp>
 
+#include <nil/crypto3/codec/adaptor/coded.hpp>
+
 #include <nil/crypto3/codec/base.hpp>
 
 using namespace nil::crypto3::codec;
@@ -51,6 +53,17 @@ boost::property_tree::ptree base_data(const char *child_name) {
 
     return root_data.get_child(child_name);
 }
+
+BOOST_AUTO_TEST_SUITE(base32_codec_data_driven_test_suite)
+
+BOOST_DATA_TEST_CASE(base32_single_range_adaptor_encode, base_data("base_32"), array_element) {
+    std::string enc = array_element.first | adaptors::encoded<base<32>>;
+    std::string dec = array_element.second.data() | adaptors::decoded<base<32>>;
+
+    BOOST_CHECK_EQUAL(enc, array_element.second.data());
+    BOOST_CHECK_EQUAL(dec, array_element.first.data());
+}
+BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(base32_codec_data_driven_test_suite)
 
@@ -158,7 +171,6 @@ BOOST_DATA_TEST_CASE(base32_accumulator_encode, base_data("base_32"), array_elem
 
 BOOST_AUTO_TEST_SUITE_END()
 
-
 BOOST_AUTO_TEST_SUITE(base58_codec_data_driven_test_suite)
 
 BOOST_DATA_TEST_CASE(base58_single_range_encode, base_data("base_58"), array_element) {
@@ -197,8 +209,9 @@ BOOST_DATA_TEST_CASE(base58_iterator_range_decode, base_data("base_58"), array_e
 
 BOOST_DATA_TEST_CASE(base58_decode_failure, base_data("base_58_invalid"), array_element) {
     std::string out;
-    BOOST_REQUIRE_THROW(decode<base<58>>(array_element.second.data().begin(), array_element.second.data().end(), 
-                        std::back_inserter(out)), base_decode_error<58>);
+    BOOST_REQUIRE_THROW(decode<base<58>>(array_element.second.data().begin(), array_element.second.data().end(),
+                                         std::back_inserter(out)),
+                        base_decode_error<58>);
 }
 
 BOOST_DATA_TEST_CASE(base58_alias_single_range_encode, base_data("base_58"), array_element) {
@@ -237,12 +250,12 @@ BOOST_DATA_TEST_CASE(base58_alias_iterator_range_decode, base_data("base_58"), a
 
 BOOST_DATA_TEST_CASE(base58_alias_decode_failure, base_data("base_58_invalid"), array_element) {
     std::string out;
-    BOOST_REQUIRE_THROW(decode<base58>(array_element.second.data().begin(), array_element.second.data().end(), 
-                        std::back_inserter(out)), base_decode_error<58>);
+    BOOST_REQUIRE_THROW(
+        decode<base58>(array_element.second.data().begin(), array_element.second.data().end(), std::back_inserter(out)),
+        base_decode_error<58>);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
-
 
 BOOST_AUTO_TEST_SUITE(base64_codec_data_driven_test_suite)
 
@@ -335,7 +348,6 @@ BOOST_DATA_TEST_CASE(base64_alias_decode_failure, base_data("base_invalid"), arr
 }
 
 BOOST_AUTO_TEST_SUITE_END()
-
 
 template<std::size_t Size, typename Integer>
 static inline typename boost::uint_t<Size>::exact extract_uint_t(Integer v, std::size_t position) {
