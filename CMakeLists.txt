@@ -19,13 +19,11 @@ if(NOT Boost_FOUND)
     cm_find_package(Boost REQUIRED)
 endif()
 
-cm_find_package(${CMAKE_WORKSPACE_NAME}_asn1)
 cm_find_package(${CMAKE_WORKSPACE_NAME}_codec)
-cm_find_package(${CMAKE_WORKSPACE_NAME}_ff)
+cm_find_package(${CMAKE_WORKSPACE_NAME}_algebra)
 cm_find_package(${CMAKE_WORKSPACE_NAME}_hash)
 cm_find_package(${CMAKE_WORKSPACE_NAME}_modes)
-cm_find_package(${CMAKE_WORKSPACE_NAME}_pk_pad)
-cm_find_package(${CMAKE_WORKSPACE_NAME}_utilities)
+cm_find_package(${CMAKE_WORKSPACE_NAME}_pkpad)
 
 option(BUILD_TESTS "Build unit tests" FALSE)
 
