@@ -164,7 +164,7 @@ namespace nil {
                 }
 
                 size_t estimated_strength() const override {
-                    return ecp_work_factor(key_length());
+                    return ec_discrete_logarithm(key_length());
                 }
 
             protected:

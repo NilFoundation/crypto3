@@ -242,7 +242,7 @@ namespace nil {
             }
 
             size_t rsa_public_key::estimated_strength() const {
-                return if_work_factor(key_length());
+                return integer_factorization(key_length());
             }
 
             algorithm_identifier rsa_public_key::algorithm_identifier() const {

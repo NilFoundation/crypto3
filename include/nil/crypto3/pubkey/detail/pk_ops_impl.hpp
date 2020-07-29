@@ -10,8 +10,8 @@
 #define CRYPTO3_PK_OPERATION_IMPL_HPP
 
 #include <nil/crypto3/pubkey/pk_operations.hpp>
-#include <nil/crypto3/pk_pad/eme.hpp>
-#include <nil/crypto3/pk_pad/emsa.hpp>
+#include <nil/crypto3/pkpad/eme.hpp>
+#include <nil/crypto3/pkpad/emsa.hpp>
 #include <nil/crypto3/kdf/kdf.hpp>
 
 namespace nil {

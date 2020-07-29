@@ -140,7 +140,7 @@ if(CRYPTO3_PUBKEY_RSA)
     list(APPEND ${CURRENT_PROJECT_NAME}_RSA_SOURCES)
 
     list(APPEND ${CURRENT_PROJECT_NAME}_LIBRARIES
-         ${CMAKE_WORKSPACE_NAME}::pk_pad)
+         ${CMAKE_WORKSPACE_NAME}::pkpad)
 
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_RSA)
     list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
@@ -156,7 +156,7 @@ if(CRYPTO3_PUBKEY_DSA)
     list(APPEND ${CURRENT_PROJECT_NAME}_DSA_SOURCES)
 
     list(APPEND ${CURRENT_PROJECT_NAME}_LIBRARIES
-         ${CMAKE_WORKSPACE_NAME}::pk_pad)
+         ${CMAKE_WORKSPACE_NAME}::pkpad)
 
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_DSA)
     list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
@@ -186,7 +186,7 @@ if(CRYPTO3_PUBKEY_ECDSA)
 
     list(APPEND ${CURRENT_PROJECT_NAME}_LIBRARIES
          ${CMAKE_WORKSPACE_NAME}::asn1
-         ${CMAKE_WORKSPACE_NAME}::pk_pad)
+         ${CMAKE_WORKSPACE_NAME}::pkpad)
 
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_ECDSA)
     list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
@@ -203,7 +203,7 @@ if(CRYPTO3_PUBKEY_ECGDSA)
 
     list(APPEND ${CURRENT_PROJECT_NAME}_LIBRARIES
          ${CMAKE_WORKSPACE_NAME}::asn1
-         ${CMAKE_WORKSPACE_NAME}::pk_pad)
+         ${CMAKE_WORKSPACE_NAME}::pkpad)
 
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_ECGDSA)
     list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
@@ -424,7 +424,7 @@ target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
                       ${CMAKE_WORKSPACE_NAME}::algebra
                       ${CMAKE_WORKSPACE_NAME}::hash
                       ${CMAKE_WORKSPACE_NAME}::modes
-                      ${CMAKE_WORKSPACE_NAME}::pk_pad
+                      ${CMAKE_WORKSPACE_NAME}::pkpad
                       ${CMAKE_WORKSPACE_NAME}::utilities
 
                       boost::multiprecision
