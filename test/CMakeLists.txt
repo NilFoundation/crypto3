@@ -19,7 +19,8 @@ cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
 
                        ${Boost_LIBRARIES}
 
-                       Boost::predef)
+                       $<TARGET_NAME_IF_EXISTS:boost_config>
+                       $<TARGET_NAME_IF_EXISTS:boost_predef>)
 
 macro(define_hash_test name)
     cm_test(NAME hash_${name}_test SOURCES ${name}.cpp)
@@ -54,8 +55,7 @@ set(TESTS_NAMES
     "sha2"
     "sha3"
     "static_digest"
-    "tiger"
-    )
+    "tiger")
 
 foreach(TEST_NAME ${TESTS_NAMES})
     define_hash_test(${TEST_NAME})
