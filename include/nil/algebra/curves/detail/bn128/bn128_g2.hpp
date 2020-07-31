@@ -30,6 +30,9 @@ namespace nil {
         template <typename ModulusBits, typename GeneratorBits>
         using value_type = element<params_type<ModulusBits, GeneratorBits>, modulus_type<ModulusBits, GeneratorBits>>;
 
+        template <typename ModulusBits, typename GeneratorBits>
+        using fp2_type = fp2<ModulusBits, GeneratorBits>;
+
         struct bn128_G2 {
 
             bn128_G2() {
@@ -294,42 +297,9 @@ namespace nil {
 
         private:
             static value_type sqrt(const value_type &el) {
-                size_t v = bn128_Fq2_s;
-                value_type z = bn128_Fq2_nqr_to_t;
-                value_type w = mie::power(el, bn128_Fq2_t_minus_1_over_2);
-                value_type x = el * w;
-                value_type b = x * w;
-
-                // compute square root with Tonelli--Shanks
-                // (does not terminate if not a square!)
-
-                while (b != value_type(1)) {
-                    size_t m = 0;
-                    value_type b2m = b;
-                    while (b2m != value_type(bn::Fp(1), bn::Fp(0))) {
-                        // invariant: b2m = b^(2^m) after entering this loop
-                        square(b2m, b2m);
-                        m += 1;
-                    }
-
-                    int j = v - m - 1;
-                    w = z;
-                    while (j > 0) {
-                        square(w, w);
-                        --j;
-                    }    // w = z^2^(v-m-1)
-
-                    z = w * w;
-                    b = b * z;
-                    x = x * w;
-                    v = m;
-                }
-
-                return x;
+                return sqrt<fp2_type>(el);
             }
 
-            static std::vector<size_t> wnaf_window_table;
-            static std::vector<size_t> fixed_base_exp_window_table;
             static bn128_G2 G2_zero;
             static bn128_G2 G2_one;
 

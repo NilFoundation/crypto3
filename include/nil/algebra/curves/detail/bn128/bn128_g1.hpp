@@ -21,6 +21,18 @@
 namespace nil {
     namespace algebra {
 
+        template <typename ModulusBits, typename GeneratorBits>
+        using params_type = arithmetic_params<fp<ModulusBits, GeneratorBits>>;
+
+        template <typename ModulusBits, typename GeneratorBits>
+        using modulus_type = params_type<ModulusBits, GeneratorBits>::modulus_type;
+
+        template <typename ModulusBits, typename GeneratorBits>
+        using value_type = element<params_type<ModulusBits, GeneratorBits>, modulus_type<ModulusBits, GeneratorBits>>;
+
+        template <typename ModulusBits, typename GeneratorBits>
+        using fp_type = fp<ModulusBits, GeneratorBits>;
+
         struct bn128_G1 {
 
             bn128_G1() {
@@ -284,47 +296,8 @@ namespace nil {
             }
 
         private:
-            static bn::Fp sqrt(const bn::Fp &el) {
-                size_t v = bn128_Fq_s;
-                bn::Fp z = bn128_Fq_nqr_to_t;
-                bn::Fp w = mie::power(el, bn128_Fq_t_minus_1_over_2);
-                bn::Fp x = el * w;
-                bn::Fp b = x * w;
-
-                // compute square root with Tonelli--Shanks
-                // (does not terminate if not a square!)
-
-                while (b != bn::Fp(1)) {
-                    size_t m = 0;
-                    bn::Fp b2m = b;
-                    while (b2m != bn::Fp(1)) {
-                        // invariant: b2m = b^(2^m) after entering this loop
-                        square(b2m, b2m);
-                        m += 1;
-                    }
-
-                    int j = v - m - 1;
-                    w = z;
-                    while (j > 0) {
-                        square(w, w);
-                        --j;
-                    }    // w = z^2^(v-m-1)
-
-                    z = w * w;
-                    b = b * z;
-                    x = x * w;
-                    v = m;
-                }
-
-                return x;
-            }
-
-            bn::Fp coord[3];
-
-            static std::vector<size_t> wnaf_window_table;
-            static std::vector<size_t> fixed_base_exp_window_table;
-            static bn128_G1 G1_zero;
-            static bn128_G1 G1_one;
+            static value_type sqrt(const value_type &el) {
+                return sqrt<fp2_type>(el);
         };
 
         template<typename NumberType>
