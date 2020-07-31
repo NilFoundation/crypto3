@@ -29,8 +29,8 @@ namespace nil {
              */    
             template<typename FieldType>
             FieldType evaluate_polynomial(const size_t &m, const std::vector<FieldType> &coeff, const FieldType &t) {
-                //if (m != coeff.size())
-                    //throw DomainSizeException("expected m == coeff.size()");
+                if (m != coeff.size())
+                    throw DomainSizeException("expected m == coeff.size()");
 
                 FieldType result = FieldType::zero();
 
@@ -57,10 +57,10 @@ namespace nil {
             template<typename FieldType>
             FieldType evaluate_lagrange_polynomial(const size_t &m, const std::vector<FieldType> &domain, const FieldType &t,
                                                 const size_t &idx) {
-                //if (m != domain.size())
-                    //throw DomainSizeException("expected m == domain.size()");
-                //if (idx >= m)
-                    //throw InvalidSizeException("expected idx < m");
+                if (m != domain.size())
+                    throw DomainSizeException("expected m == domain.size()");
+                if (idx >= m)
+                    throw InvalidSizeException("expected idx < m");
 
                 FieldType num = FieldType::one();
                 FieldType denom = FieldType::one();

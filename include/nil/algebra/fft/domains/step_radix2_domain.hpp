@@ -12,9 +12,8 @@
 
 #include <vector>
 
-#include <nil/algebra/fft/evaluation_domain/evaluation_domain.hpp>
-
-#include <nil/algebra/fft/evaluation_domain/domains/basic_radix2_domain_aux.hpp>
+#include <nil/algebra/fft/evaluation_domain.hpp>
+#include <nil/algebra/fft/domains/basic_radix2_domain_aux.hpp>
 
 namespace nil {
     namespace algebra {
