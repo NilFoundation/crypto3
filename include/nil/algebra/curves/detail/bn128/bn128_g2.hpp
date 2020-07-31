@@ -21,6 +21,15 @@
 namespace nil {
     namespace algebra {
 
+        template <typename ModulusBits, typename GeneratorBits>
+        using params_type = arithmetic_params<fp2<ModulusBits, GeneratorBits>>;
+
+        template <typename ModulusBits, typename GeneratorBits>
+        using modulus_type = params_type<ModulusBits, GeneratorBits>::modulus_type;
+
+        template <typename ModulusBits, typename GeneratorBits>
+        using value_type = element<params_type<ModulusBits, GeneratorBits>, modulus_type<ModulusBits, GeneratorBits>>;
+
         struct bn128_G2 {
 
             bn128_G2() {
@@ -69,7 +78,7 @@ namespace nil {
 
                 /* now neither is O */
 
-                bn::Fp2 Z1sq, Z2sq, lhs, rhs;
+                value_type Z1sq, Z2sq, lhs, rhs;
                 square(Z1sq, coord[2]);
                 square(Z2sq, other.coord[2]);
                 mul(lhs, Z2sq, coord[0]);
@@ -79,7 +88,7 @@ namespace nil {
                     return false;
                 }
 
-                bn::Fp2 Z1cubed, Z2cubed;
+                value_type Z1cubed, Z2cubed;
                 mul(Z1cubed, Z1sq, coord[2]);
                 mul(Z2cubed, Z2sq, other.coord[2]);
                 mul(lhs, Z2cubed, coord[1]);
@@ -284,20 +293,20 @@ namespace nil {
             }
 
         private:
-            static bn::Fp2 sqrt(const bn::Fp2 &el) {
+            static value_type sqrt(const value_type &el) {
                 size_t v = bn128_Fq2_s;
-                bn::Fp2 z = bn128_Fq2_nqr_to_t;
-                bn::Fp2 w = mie::power(el, bn128_Fq2_t_minus_1_over_2);
-                bn::Fp2 x = el * w;
-                bn::Fp2 b = x * w;
+                value_type z = bn128_Fq2_nqr_to_t;
+                value_type w = mie::power(el, bn128_Fq2_t_minus_1_over_2);
+                value_type x = el * w;
+                value_type b = x * w;
 
                 // compute square root with Tonelli--Shanks
                 // (does not terminate if not a square!)
 
-                while (b != bn::Fp2(1)) {
+                while (b != value_type(1)) {
                     size_t m = 0;
-                    bn::Fp2 b2m = b;
-                    while (b2m != bn::Fp2(bn::Fp(1), bn::Fp(0))) {
+                    value_type b2m = b;
+                    while (b2m != value_type(bn::Fp(1), bn::Fp(0))) {
                         // invariant: b2m = b^(2^m) after entering this loop
                         square(b2m, b2m);
                         m += 1;

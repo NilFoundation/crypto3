@@ -46,22 +46,7 @@ namespace nil {
         template<typename FieldType, typename Expression>
         struct curve {
             typedef FieldType field_type;
-            typedef typename field_type::number_type number_type;
-
-            constexpr curve(number_type p, number_type a, number_type b, number_type x, number_type y,
-                            number_type order) :
-                p(p),
-                a(a), b(b), x(x), y(y) {
-            }
-
-            constexpr static const number_type p;
-            constexpr static const number_type a;
-            constexpr static const number_type b;
-
-            // generator coordinates:
-            constexpr static const number_type x;
-            constexpr static const number_type y;
-            constexpr static const number_type order;
+            typedef typename field_type::modulus_type number_type;
         };
 
     }    // namespace algebra
