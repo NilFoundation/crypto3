@@ -38,12 +38,17 @@ namespace nil {
     namespace crypto3 {
 
         BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(256)
-
+        /*
+			y^2 = x^3 + b
+			u^2 = -1
+			xi = xi_a + xi_b u
+			v^3 = xi
+			w^2 = v
+		*/
         struct bn128_snark1 : public ec_group_info<256> {
 	        typedef typename ec_group_info<256>::number_type number_type;
 
-	        constexpr static const number_type p =
-	            4965661367192848881;
+	        constexpr static const number_type p = 21888242871839275222246405745257275088696311157297823662689037894645226208583;
 	        constexpr static const number_type a =
 	            ?;
 	        constexpr static const number_type b = 0x03;
@@ -57,8 +62,7 @@ namespace nil {
         struct bn128_snark2 : public ec_group_info<256> {
 	        typedef typename ec_group_info<256>::number_type number_type;
 
-	        constexpr static const number_type p =
-	            4965661367192848881;
+	        constexpr static const number_type p = 21888242871839275222246405745257275088696311157297823662689037894645226208583;
 	        constexpr static const number_type a =
 	            ?;
 	        constexpr static const number_type b = 82;
