@@ -6,18 +6,18 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_PUBKEY_CURVE_NIST_P224_HPP
-#define CRYPTO3_PUBKEY_CURVE_NIST_P224_HPP
+#ifndef CRYPTO3_FF_CURVE_NIST_P224_HPP
+#define CRYPTO3_FF_CURVE_NIST_P224_HPP
 
 #include <memory>
 
 #include <boost/multiprecision/mask_bits.hpp>
 #include <boost/multiprecision/reduce_below.hpp>
 
-#include <nil/crypto3/pubkey/ec_group/curve_nist.hpp>
+#include <nil/crypto3/algebra/curves/curve_gfp.hpp>
 
 namespace nil {
-    namespace crypto3 {
+    namespace algebra {
 
         BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(224)
 
@@ -107,7 +107,7 @@ namespace nil {
                 reduce_below(x, p);
             }
         };
-    }        // namespace crypto3
+    }        // namespace algebra
 }    // namespace nil
 
-#endif    // CRYPTO3_CURVE_NIST_P224_HPP
+#endif    // CRYPTO3_FF_CURVE_NIST_P224_HPP

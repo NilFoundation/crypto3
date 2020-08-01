@@ -1,12 +1,13 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_PUBKEY_CURVE_NIST_P256_HPP
+#ifndef CRYPTO3_FF_CURVE_NIST_P256_HPP
 #define CRYPTO3_PUBKEY_CURVE_NIST_P256_HPP
 
 #include <memory>
@@ -19,7 +20,7 @@
 #include <nil/crypto3/utilities/assert.hpp>
 
 namespace nil {
-    namespace crypto3 {
+    namespace algebra {
 
         /**
          * The NIST P-256 curve
@@ -278,7 +279,7 @@ namespace nil {
                 return r;
             }
         };
-    }        // namespace crypto3
+    }        // namespace algebra
 }    // namespace nil
 
 #endif    // CRYPTO3_CURVE_NIST_P256_HPP

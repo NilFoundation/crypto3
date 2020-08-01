@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -19,7 +20,7 @@
 #include <nil/crypto3/utilities/assert.hpp>
 
 namespace nil {
-    namespace crypto3 {
+    namespace algebra {
 
         BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(384)
 
@@ -310,7 +311,7 @@ namespace nil {
                 return r;
             }
         };
-    }        // namespace crypto3
+    }        // namespace algebra
 }    // namespace nil
 
 #endif    // CRYPTO3_CURVE_NIST_P384_HPP

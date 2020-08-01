@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -18,7 +19,7 @@
 #include <vector>
 
 namespace nil {
-    namespace crypto3 {
+    namespace algebra {
 
         /**
          * Exception thrown if you try to convert a zero point to an affine
@@ -1022,7 +1023,7 @@ namespace nil {
             return std::make_pair(x, y);
         }
 
-    }    // namespace crypto3
+    }    // namespace algebra
 }    // namespace nil
 
 namespace std {

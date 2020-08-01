@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_PUBKEY_CURVE_FRP_V1_HPP
-#define CRYPTO3_PUBKEY_CURVE_FRP_V1_HPP
+#ifndef CRYPTO3_FF_CURVE_FRP_V1_HPP
+#define CRYPTO3_FF_CURVE_FRP_V1_HPP
 
 #include <memory>
 
@@ -16,10 +16,10 @@
 #include <boost/multiprecision/mask_bits.hpp>
 #include <boost/multiprecision/reduce_below.hpp>
 
-#include <nil/crypto3/pubkey/ec_group/curve_gfp.hpp>
+#include <nil/crypto3/algebra/curves/curve_gfp.hpp>
 
 namespace nil {
-    namespace crypto3 {
+    namespace algebra {
 
         BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(256)
 
@@ -43,7 +43,7 @@ namespace nil {
             constexpr static const number_type order =
                 0xF1FD178C0B3AD58F10126DE8CE42435B53DC67E140D2BF941FFDD459C6D655E1_cppui256;
         };
-    }        // namespace crypto3
+    }        // namespace algebra
 }    // namespace nil
 
-#endif    // CRYPTO3_PUBKEY_CURVE_FRP_V1_HPP
+#endif    // CRYPTO3_FF_CURVE_FRP_V1_HPP

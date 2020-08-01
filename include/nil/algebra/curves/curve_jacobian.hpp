@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_FF_CURVE_GFP_MONTGOMERY_HPP
-#define CRYPTO3_FF_CURVE_GFP_MONTGOMERY_HPP
+#ifndef CRYPTO3_FF_CURVE_GFP_JACOBIAN_HPP
+#define CRYPTO3_FF_CURVE_GFP_JACOBIAN_HPP
 
 #include <cstdint>
 
@@ -21,14 +21,14 @@ namespace nil {
     namespace algebra {
 
         template<typename NumberType>
-        class curve_montgomery : public curve_gfp<NumberType> {
+        class curve_jacobian : public curve_gfp<NumberType> {
         public:
             typedef typename curve_gfp<NumberType>::number_type number_type;
 
             constexpr static const std::size_t word_bits = NumberType::limb_bits;
 
             template<typename Backend, expression_template_option ExpressionTemplates>
-            curve_montgomery(const number<Backend, ExpressionTemplates> &p,
+            curve_jacobian(const number<Backend, ExpressionTemplates> &p,
                              const number<Backend, ExpressionTemplates> &a,
                              const number<Backend, ExpressionTemplates> &b) :
                 m_p(p),
@@ -171,4 +171,4 @@ namespace nil {
     }        // namespace algebra
 }    // namespace nil
 
-#endif    // CRYPTO3_FF_CURVE_GFP_MONTGOMERY_HPP
+#endif    // CRYPTO3_FF_CURVE_GFP_JACOBIAN_HPP

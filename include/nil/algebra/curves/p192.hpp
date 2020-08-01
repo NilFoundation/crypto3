@@ -6,8 +6,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_PUBKEY_CURVE_NIST_P192_HPP
-#define CRYPTO3_PUBKEY_CURVE_NIST_P192_HPP
+#ifndef CRYPTO3_FF_CURVE_NIST_P192_HPP
+#define CRYPTO3_FF_CURVE_GOST_A_HPP
 
 #include <memory>
 
@@ -18,7 +18,7 @@
 #include <nil/crypto3/pubkey/ec_group/curve_nist.hpp>
 
 namespace nil {
-    namespace crypto3 {
+    namespace algebra {
 
         BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(192)
 
@@ -94,7 +94,7 @@ namespace nil {
                 reduce_below(x, p);
             }
         };
-    }        // namespace crypto3
+    }        // namespace algebra
 }    // namespace nil
 
-#endif    // CRYPTO3_CURVE_NIST_P192_HPP
+#endif    // CRYPTO3_FF_CURVE_GOST_A_HPP

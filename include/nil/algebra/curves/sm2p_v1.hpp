@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_PUBKEY_CURVE_SM2P_V1_HPP
-#define CRYPTO3_PUBKEY_CURVE_SM2P_V1_HPP
+#ifndef CRYPTO3_FF_CURVE_SM2P_V1_HPP
+#define CRYPTO3_FF_CURVE_SM2P_V1_HPP
 
 #include <memory>
 
@@ -19,7 +19,7 @@
 #include <nil/crypto3/pubkey/ec_group/curve_gfp.hpp>
 
 namespace nil {
-    namespace crypto3 {
+    namespace algebra {
 
         BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(256)
         
@@ -47,7 +47,7 @@ namespace nil {
         };
 
         typedef sm2p_v1<256> sm2p256v1;
-    }        // namespace crypto3
+    }        // namespace algebra
 }    // namespace nil
 
-#endif    // CRYPTO3_PUBKEY_CURVE_SM2P_V1_HPP
+#endif    // CRYPTO3_FF_CURVE_SM2P_V1_HPP

@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_PUBKEY_CURVE_X962_P_HPP
-#define CRYPTO3_PUBKEY_CURVE_X962_P_HPP
+#ifndef CRYPTO3_FF_CURVE_X962_P_HPP
+#define CRYPTO3_FF_CURVE_X962_P_HPP
 
 #include <memory>
 
@@ -16,10 +16,10 @@
 #include <boost/multiprecision/mask_bits.hpp>
 #include <boost/multiprecision/reduce_below.hpp>
 
-#include <nil/crypto3/pubkey/ec_group/curve_gfp.hpp>
+#include <nil/crypto3/ff/ec_group/curve_gfp.hpp>
 
 namespace nil {
-    namespace crypto3 {
+    namespace algebra {
 
         BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(192)
         BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(239)
@@ -125,7 +125,7 @@ namespace nil {
         };
 
         typedef x962_p_v3<239> x962_p239v3;
-    }        // namespace crypto3
+    }        // namespace algebra
 }    // namespace nil
 
-#endif    // CRYPTO3_PUBKEY_CURVE_X962_P_HPP
+#endif    // CRYPTO3_FF_CURVE_X962_P_HPP
