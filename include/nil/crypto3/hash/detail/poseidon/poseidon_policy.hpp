@@ -11,45 +11,40 @@
 
 #include <nil/crypto3/detail/static_digest.hpp>
 
-#include <boost/static_assert.hpp>
-#include <boost/assert.hpp>
+// #include <boost/static_assert.hpp>
+// #include <boost/assert.hpp>
 
 #include <array>
-#include <utility>
 
 namespace nil {
     namespace crypto3 {
         namespace hashes {
             namespace detail {
 
+                // at this moment only for bls12-381 - filecoin oriented im
+
                 /*!
                  * @brief Poseidon internal parameters
-                 * @tparam FieldType
-                 * @tparam t arity of Poseidon permutation in Field elements
-                 * @tparam c capacity of sponge construction
-                 * @tparam DigestBits
-                 * @tparam M desired security level in bits
-                 * @tparam strength
+                 * @tparam FieldType type of field
+                 * @tparam element_type type of field element
+                 * @tparam t arity of Poseidon permutation in field elements
                  */
-                // at this moment only for bls12-381 - filecoin oriented im
-                template<typename FieldT, std::size_t t, std::size_t DigestBits, std::size_t M>
+                template<typename FieldT, typename element_type, std::size_t t>
                 struct base_poseidon_policy {
 
-                    constexpr static std::size_t const digest_bits = DigestBits;
+                    constexpr static std::size_t const word_bits = FieldT::modulus_bits;
+                    typedef element_type word_type;
 
-                    typedef FieldT word_type;
+                    constexpr static const std::size_t digest_bits = FieldT::modulus_bits;
+                    typedef static_digest<digest_bits> digest_type;
 
                     constexpr static std::size_t const state_bits = t * FieldT::modulus_bits;
                     constexpr static std::size_t const state_words = t;
-                    typedef std::array<FieldT, t> state_type;
+                    typedef std::array<word_type, t> state_type;
 
                     constexpr static std::size_t const block_bits = (t - 1) * FieldT::modulus_bits;
                     constexpr static std::size_t const block_words = t - 1;
-                    typedef std::array<FieldT, t - 1> block_type;
-
-                    constexpr static std::size_t const sec_level = M;
-
-                    constexpr static std::size_t const modulus_bits = FieldT::modulus_bits;
+                    typedef std::array<word_type, t - 1> block_type;
 
                     struct iv_generator {
                         // TODO: return-value seems not to be const in reality
@@ -58,7 +53,7 @@ namespace nil {
                             static state_type const H0 = [](){
                                 state_type H;
                                 H.fill(FieldT(0));
-                                return const_cast<state_type>(H);
+                                return H;
                             }();
                             return H0;
                         }
@@ -66,13 +61,13 @@ namespace nil {
                 };
 
 
-                template<typename FieldT, std::size_t t, std::size_t DigestBits, std::size_t M, bool strength>
+                template<typename FieldT, typename element_type, std::size_t t, bool strength>
                 struct poseidon_policy;
 
 
-                template<typename FieldT, std::size_t DigestBits, std::size_t M, bool strength>
-                struct poseidon_policy<FieldT, 2, DigestBits, M, strength> :
-                    base_poseidon_policy<FieldT, 2, DigestBits, M>
+                template<typename FieldT, typename element_type, bool strength>
+                struct poseidon_policy<FieldT, element_type, 2, strength>
+                    : base_poseidon_policy<FieldT, element_type, 2>
                 {
                     constexpr static std::size_t const full_rounds = 8;
                     constexpr static std::size_t const half_full_rounds = 4;
@@ -80,9 +75,9 @@ namespace nil {
                 };
 
 
-                template<typename FieldT, std::size_t DigestBits, std::size_t M, bool strength>
-                struct poseidon_policy<FieldT,3,DigestBits,M,strength> :
-                    base_poseidon_policy<FieldT, 3, DigestBits, M>
+                template<typename FieldT, typename element_type, bool strength>
+                struct poseidon_policy<FieldT, element_type, 3, strength>
+                    : base_poseidon_policy<FieldT, element_type, 3>
                 {
                     constexpr static std::size_t const full_rounds = 8;
                     constexpr static std::size_t const half_full_rounds = 4;
@@ -90,18 +85,18 @@ namespace nil {
                 };
 
 
-                template<typename FieldT, std::size_t DigestBits, std::size_t M, bool strength>
-                struct poseidon_policy<FieldT, 4, DigestBits, M, strength> :
-                    base_poseidon_policy< FieldT, 4, DigestBits, M>
+                template<typename FieldT, typename element_type, bool strength>
+                struct poseidon_policy<FieldT, element_type, 4, strength>
+                    : base_poseidon_policy<FieldT, element_type, 4>
                 {
                     constexpr static std::size_t const full_rounds = 8;
                     constexpr static std::size_t const half_full_rounds = 4;
                     constexpr static std::size_t const part_rounds = strength ? 70 : 56;
                 };
 
-                template<typename FieldT, std::size_t DigestBits, std::size_t M, bool strength>
-                struct poseidon_policy<FieldT, 5, DigestBits, M, strength> :
-                    base_poseidon_policy< FieldT, 5, DigestBits, M>
+                template<typename FieldT, typename element_type, bool strength>
+                struct poseidon_policy<FieldT, element_type, 5, strength>
+                    : base_poseidon_policy<FieldT, element_type, 5>
                 {
                     constexpr static std::size_t const full_rounds = 8;
                     constexpr static std::size_t const half_full_rounds = 4;
