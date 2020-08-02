@@ -21,3 +21,4 @@ To actually include this library in a project it is required to:
 
 ### External
 * [Boost](https://boost.org) (>= 1.58)
+
