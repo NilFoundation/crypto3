@@ -17,7 +17,7 @@
 
 #include <boost/range/concepts.hpp>
 
-#include <nil/crypto3/pubkey/accumulators/pubkey.hpp>
+#include <nil/crypto3/pubkey/accumulators/scheme.hpp>
 
 namespace nil {
     namespace crypto3 {

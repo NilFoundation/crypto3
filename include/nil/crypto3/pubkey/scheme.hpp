@@ -16,15 +16,15 @@ namespace nil {
         namespace pubkey {
             /*!
              * @brief
-             * @tparam Cipher
+             * @tparam Scheme
              * @tparam Mode
              * @tparam Padding
              */
-            template<typename Cipher, typename Mode, typename Padding>
-            struct scheme : public Mode::template bind<Cipher, Padding>::type {
+            template<typename Scheme, typename Mode, typename Padding>
+            struct scheme : public Mode::template bind<Scheme, Padding>::type {
                 typedef std::size_t size_type;
 
-                typedef Cipher cipher_type;
+                typedef Scheme cipher_type;
                 typedef Mode mode_type;
                 typedef Padding padding_strategy;
             };

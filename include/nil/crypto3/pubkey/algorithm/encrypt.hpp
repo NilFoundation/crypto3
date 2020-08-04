@@ -9,19 +9,27 @@
 #ifndef CRYPTO3_PUBKEY_ENCRYPT_HPP
 #define CRYPTO3_PUBKEY_ENCRYPT_HPP
 
+#include <nil/crypto3/pubkey/algorithm/pubkey.hpp>
+
 #include <nil/crypto3/pubkey/scheme_value.hpp>
 #include <nil/crypto3/pubkey/scheme_state.hpp>
 
+#include <nil/crypto3/pubkey/public_key.hpp>
+
 namespace nil {
     namespace crypto3 {
+        namespace pubkey {
+            template<typename Scheme>
+            using encryption_policy = typename pubkey::modes::isomorphic<Scheme, nop_padding>::encryption_policy;
+        }
         /*!
          * @brief
          *
          * @ingroup pubkey_algorithms
          *
-         * @tparam PublicKeyCipher
+         * @tparam Scheme
          * @tparam InputIterator
-         * @tparam PublicKeyIterator
+         * @tparam KeyIterator
          * @tparam OutputIterator
          *
          * @param first
@@ -32,17 +40,19 @@ namespace nil {
          *
          * @return
          */
-        template<typename PublicKeyCipher, typename InputIterator, typename PublicKeyIterator, typename OutputIterator>
-        OutputIterator encrypt(InputIterator first, InputIterator last, PublicKeyIterator key_first,
-                               PublicKeyIterator key_last, OutputIterator out) {
+        template<typename Scheme, typename InputIterator, typename KeyIterator, typename OutputIterator>
+        OutputIterator encrypt(InputIterator first, InputIterator last, KeyIterator key_first, KeyIterator key_last,
+                               OutputIterator out) {
 
-            typedef typename PublicKeyCipher::stream_encrypter_type EncryptionMode;
-            typedef typename pubkey::accumulator_set<EncryptionMode> SchemeAccumulator;
+            typedef typename Scheme::stream_encrypter_type EncrypterMode;
+            typedef typename pubkey::accumulator_set<typename pubkey::modes::isomorphic<
+                Scheme, pubkey::nop_padding>::template bind<pubkey::encryption_policy<Scheme>>::type>
+                EncrypterAccumulator;
 
-            typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamEncrypterImpl;
+            typedef pubkey::detail::value_scheme_impl<EncrypterAccumulator> StreamEncrypterImpl;
             typedef pubkey::detail::itr_scheme_impl<StreamEncrypterImpl, OutputIterator> EncrypterImpl;
 
-            return EncrypterImpl(first, last, std::move(out), CiperState(PublicKeyCipher(key_first, key_last)));
+            return EncrypterImpl(first, last, std::move(out), EncrypterState(Scheme(key_first, key_last)));
         }
 
         /*!
@@ -50,9 +60,40 @@ namespace nil {
          *
          * @ingroup pubkey_algorithms
          *
-         * @tparam PublicKeyCipher
+         * @tparam Scheme
          * @tparam InputIterator
-         * @tparam OutputAccumulator
+         * @tparam OutputIterator
+         *
+         * @param first
+         * @param last
+         * @param key
+         * @param out
+         *
+         * @return
+         */
+        template<typename Scheme, typename InputIterator, typename OutputIterator>
+        OutputIterator encrypt(InputIterator first, InputIterator last, const public_key<Scheme> &key,
+                               OutputIterator out) {
+
+            typedef typename Scheme::stream_encrypter_type EncrypterMode;
+            typedef typename pubkey::accumulator_set<typename pubkey::modes::isomorphic<
+                Scheme, pubkey::nop_padding>::template bind<pubkey::encryption_policy<Scheme>>::type>
+                EncrypterAccumulator;
+
+            typedef pubkey::detail::value_scheme_impl<EncrypterAccumulator> StreamEncrypterImpl;
+            typedef pubkey::detail::itr_scheme_impl<StreamEncrypterImpl, OutputIterator> EncrypterImpl;
+
+            return EncrypterImpl(first, last, std::move(out), EncrypterState(Scheme(key)));
+        }
+
+        /*!
+         * @brief
+         *
+         * @ingroup pubkey_algorithms
+         *
+         * @tparam Scheme
+         * @tparam InputIterator
+         * @tparam SchemeAccumulator
          *
          * @param first
          * @param last
@@ -60,12 +101,12 @@ namespace nil {
          *
          * @return
          */
-        template<typename PublicKeyCipher, typename InputIterator,
-                 typename OutputAccumulator =
-                     typename pubkey::accumulator_set<typename PublicKeyCipher::stream_encrypter_type>>
-        OutputAccumulator &encrypt(InputIterator first, InputIterator last, OutputAccumulator &acc) {
+        template<typename Scheme, typename InputIterator,
+                 typename SchemeAccumulator = typename pubkey::accumulator_set<typename pubkey::modes::isomorphic<
+                     Scheme, pubkey::nop_padding>::template bind<pubkey::encryption_policy<Scheme>>::type>>
+        SchemeAccumulator &encrypt(InputIterator first, InputIterator last, SchemeAccumulator &acc) {
 
-            typedef pubkey::detail::ref_scheme_impl<OutputAccumulator> StreamEncrypterImpl;
+            typedef pubkey::detail::ref_scheme_impl<SchemeAccumulator> StreamEncrypterImpl;
             typedef pubkey::detail::range_scheme_impl<StreamEncrypterImpl> EncrypterImpl;
 
             return EncrypterImpl(first, last, acc);
@@ -76,7 +117,7 @@ namespace nil {
          *
          * @ingroup pubkey_algorithms
          *
-         * @tparam PublicKeyCipher
+         * @tparam Scheme
          * @tparam SinglePassRange
          * @tparam OutputAccumulator
          *
@@ -85,9 +126,9 @@ namespace nil {
          *
          * @return
          */
-        template<typename PublicKeyCipher, typename SinglePassRange,
-                 typename OutputAccumulator =
-                     typename pubkey::accumulator_set<typename PublicKeyCipher::stream_encrypter_type>>
+        template<typename Scheme, typename SinglePassRange,
+                 typename OutputAccumulator = typename pubkey::accumulator_set<typename pubkey::modes::isomorphic<
+                     Scheme, pubkey::nop_padding>::template bind<pubkey::encryption_policy<Scheme>>::type>>
         OutputAccumulator &encrypt(const SinglePassRange &r, OutputAccumulator &acc) {
 
             typedef pubkey::detail::ref_scheme_impl<OutputAccumulator> StreamEncrypterImpl;
@@ -101,9 +142,9 @@ namespace nil {
          *
          * @ingroup pubkey_algorithms
          *
-         * @tparam PublicKeyCipher
+         * @tparam Scheme
          * @tparam InputIterator
-         * @tparam PublicKeyIterator
+         * @tparam KeyIterator
          * @tparam SchemeAccumulator
          *
          * @param first
@@ -113,16 +154,16 @@ namespace nil {
          *
          * @return
          */
-        template<typename PublicKeyCipher, typename InputIterator, typename PublicKeyIterator,
-                 typename SchemeAccumulator =
-                     typename pubkey::accumulator_set<typename PublicKeyCipher::stream_encrypter_type>>
+        template<typename Scheme, typename InputIterator, typename KeyIterator,
+                 typename SchemeAccumulator = typename pubkey::accumulator_set<typename pubkey::modes::isomorphic<
+                     Scheme, pubkey::nop_padding>::template bind<pubkey::encryption_policy<Scheme>>::type>>
         pubkey::detail::range_scheme_impl<pubkey::detail::value_scheme_impl<SchemeAccumulator>>
-            encrypt(InputIterator first, InputIterator last, PublicKeyIterator key_first, PublicKeyIterator key_last) {
+            encrypt(InputIterator first, InputIterator last, KeyIterator key_first, KeyIterator key_last) {
 
             typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamEncrypterImpl;
             typedef pubkey::detail::range_scheme_impl<StreamEncrypterImpl> EncrypterImpl;
 
-            return EncrypterImpl(first, last, SchemeAccumulator(PublicKeyCipher(key_first, key_last)));
+            return EncrypterImpl(first, last, SchemeAccumulator(Scheme(key_first, key_last)));
         }
 
         /*!
@@ -130,9 +171,9 @@ namespace nil {
          *
          * @ingroup pubkey_algorithms
          *
-         * @tparam PublicKeyCipher
+         * @tparam Scheme
          * @tparam SinglePassRange
-         * @tparam PublicKeyRange
+         * @tparam KeyRange
          * @tparam OutputIterator
          *
          * @param rng
@@ -141,16 +182,45 @@ namespace nil {
          *
          * @return
          */
-        template<typename PublicKeyCipher, typename SinglePassRange, typename PublicKeyRange, typename OutputIterator>
-        OutputIterator encrypt(const SinglePassRange &rng, const PublicKeyRange &key, OutputIterator out) {
+        template<typename Scheme, typename SinglePassRange, typename KeyRange, typename OutputIterator>
+        OutputIterator encrypt(const SinglePassRange &rng, const KeyRange &key, OutputIterator out) {
 
-            typedef typename PublicKeyCipher::stream_encrypter_type EncryptionMode;
-            typedef typename pubkey::accumulator_set<EncryptionMode> SchemeAccumulator;
+            typedef typename Scheme::stream_encrypter_type SignionMode;
+            typedef typename pubkey::accumulator_set<typename pubkey::modes::isomorphic<
+                Scheme, pubkey::nop_padding>::template bind<pubkey::encryption_policy<Scheme>>::type>
+                SchemeAccumulator;
 
             typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamEncrypterImpl;
             typedef pubkey::detail::itr_scheme_impl<StreamEncrypterImpl, OutputIterator> EncrypterImpl;
 
-            return EncrypterImpl(rng, std::move(out), CipherState(PublicKeyCipher(key)));
+            return EncrypterImpl(rng, std::move(out), SchemeState(Scheme(key)));
+        }
+
+        /*!
+         * @brief
+         *
+         * @tparam Scheme
+         * @tparam SinglePassRange
+         * @tparam OutputIterator
+         *
+         * @param rng
+         * @param key
+         * @param out
+         *
+         * @return
+         */
+        template<typename Scheme, typename SinglePassRange, typename OutputIterator>
+        OutputIterator encrypt(const SinglePassRange &rng, const public_key<Scheme> &key, OutputIterator out) {
+
+            typedef typename Scheme::stream_encrypter_type SignionMode;
+            typedef typename pubkey::accumulator_set<typename pubkey::modes::isomorphic<
+                Scheme, pubkey::nop_padding>::template bind<pubkey::encryption_policy<Scheme>>::type>
+                SchemeAccumulator;
+
+            typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamEncrypterImpl;
+            typedef pubkey::detail::itr_scheme_impl<StreamEncrypterImpl, OutputIterator> EncrypterImpl;
+
+            return EncrypterImpl(rng, std::move(out), SchemeState(Scheme(key)));
         }
 
         /*!
@@ -158,9 +228,9 @@ namespace nil {
          *
          * @ingroup pubkey_algorithms
          *
-         * @tparam PublicKeyCipher
+         * @tparam Scheme
          * @tparam SinglePassRange
-         * @tparam PublicKeyRange
+         * @tparam KeyRange
          * @tparam SchemeAccumulator
          *
          * @param r
@@ -168,16 +238,40 @@ namespace nil {
          *
          * @return
          */
-        template<typename PublicKeyCipher, typename SinglePassRange, typename PublicKeyRange,
-                 typename SchemeAccumulator =
-                     typename pubkey::accumulator_set<typename PublicKeyCipher::stream_encrypter_type>>
+        template<typename Scheme, typename SinglePassRange, typename KeyRange,
+                 typename SchemeAccumulator = typename pubkey::accumulator_set<typename pubkey::modes::isomorphic<
+                     Scheme, pubkey::nop_padding>::template bind<pubkey::encryption_policy<Scheme>>::type>>
         pubkey::detail::range_scheme_impl<pubkey::detail::value_scheme_impl<SchemeAccumulator>>
-            encrypt(const SinglePassRange &r, const PublicKeyRange &key) {
+            encrypt(const SinglePassRange &r, const KeyRange &key) {
 
             typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamEncrypterImpl;
             typedef pubkey::detail::range_scheme_impl<StreamEncrypterImpl> EncrypterImpl;
 
-            return EncrypterImpl(r, CipherState(PublicKeyCipher(key)));
+            return EncrypterImpl(r, SchemeState(Scheme(key)));
+        }
+
+        /*!
+         * @brief
+         *
+         * @tparam Scheme
+         * @tparam SinglePassRange
+         * @tparam SchemeAccumulator
+         *
+         * @param r
+         * @param key
+         *
+         * @return
+         */
+        template<typename Scheme, typename SinglePassRange,
+                 typename SchemeAccumulator = typename pubkey::accumulator_set<typename pubkey::modes::isomorphic<
+                     Scheme, pubkey::nop_padding>::template bind<pubkey::encryption_policy<Scheme>>::type>>
+        pubkey::detail::range_scheme_impl<pubkey::detail::value_scheme_impl<SchemeAccumulator>>
+            encrypt(const SinglePassRange &r, const public_key<Scheme> &key) {
+
+            typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamEncrypterImpl;
+            typedef pubkey::detail::range_scheme_impl<StreamEncrypterImpl> EncrypterImpl;
+
+            return EncrypterImpl(r, SchemeState(Scheme(key)));
         }
     }    // namespace crypto3
 }    // namespace nil

@@ -36,7 +36,7 @@ namespace nil {
         namespace accumulators {
             namespace impl {
                 template<typename Mode>
-                struct pubkey_impl : boost::accumulators::accumulator_base {
+                struct scheme_im : boost::accumulators::accumulator_base {
                 protected:
                     typedef Mode mode_type;
                     typedef typename Mode::cipher_type cipher_type;
@@ -61,7 +61,7 @@ namespace nil {
                     typedef digest<pubkey_bits> result_type;
 
                     template<typename Args>
-                    pubkey_impl(const Args &args) :
+                    scheme_im(const Args &args) :
                         total_seen(0), filled(false), mode(args[boost::accumulators::sample]) {
                     }
 
@@ -227,21 +227,21 @@ namespace nil {
 
             namespace tag {
                 template<typename Mode>
-                struct pubkey : boost::accumulators::depends_on<bits_count> {
+                struct scheme : boost::accumulators::depends_on<bits_count> {
                     typedef Mode mode_type;
 
                     /// INTERNAL ONLY
                     ///
 
-                    typedef boost::mpl::always<accumulators::impl::pubkey_impl<mode_type>> impl;
+                    typedef boost::mpl::always<accumulators::impl::scheme_im<mode_type>> impl;
                 };
             }    // namespace tag
 
             namespace extract {
                 template<typename Mode, typename AccumulatorSet>
-                typename boost::mpl::apply<AccumulatorSet, tag::pubkey<Mode>>::type::result_type
+                typename boost::mpl::apply<AccumulatorSet, tag::scheme<Mode>>::type::result_type
                     pubkey(const AccumulatorSet &acc) {
-                    return boost::accumulators::extract_result<tag::pubkey<Mode>>(acc);
+                    return boost::accumulators::extract_result<tag::scheme<Mode>>(acc);
                 }
             }    // namespace extract
         }        // namespace accumulators

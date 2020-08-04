@@ -14,49 +14,8 @@
 #include <nil/crypto3/asn1/asn1_oid.hpp>
 #include <nil/crypto3/asn1/alg_id.hpp>
 
-
-
 namespace nil {
     namespace crypto3 {
-
-        class random_number_generator;
-
-        template<typename Policy>
-        class public_key : public Policy::public_key_policy {
-        public:
-            typedef Policy policy_type;
-            typedef typename policy_type::public_key_policy key_policy_type;
-
-            typedef typename policy_type::key_type key_type;
-            typedef typename policy_type::key_schedule_type key_schedule_type;
-
-            public_key(const key_type &key) {
-            }
-
-        protected:
-            key_schedule_type key;
-        };
-
-        template<typename Policy>
-        class private_key : public public_key<Policy>, public Policy::private_key_policy {
-        public:
-            typedef typename public_key<Policy>::policy_type policy_type;
-            typedef typename policy_type::private_key_policy key_policy_type;
-
-            typedef typename public_key<Policy>::key_type key_type;
-            typedef typename public_key<Policy>::key_schedule_type key_schedule_type;
-
-            private_key(const key_type &key) : public_key<Policy>(key) {
-            }
-        };
-
-        template<typename Policy>
-        class agreement_key : public private_key<Policy> {
-        public:
-            typedef typename private_key<Policy>::policy_type policy_type;
-            typedef typename Policy::key_agreement_policy key_policy_type;
-        };
-
         /**
          * Public Key Base Class.
          */

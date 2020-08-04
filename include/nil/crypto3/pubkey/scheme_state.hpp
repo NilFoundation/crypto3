@@ -12,7 +12,7 @@
 #include <boost/accumulators/framework/accumulator_set.hpp>
 #include <boost/accumulators/framework/features.hpp>
 
-#include <nil/crypto3/pubkey/accumulators/pubkey.hpp>
+#include <nil/crypto3/pubkey/accumulators/scheme.hpp>
 
 namespace nil {
     namespace crypto3 {

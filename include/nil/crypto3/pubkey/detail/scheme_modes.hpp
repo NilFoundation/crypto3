@@ -16,53 +16,107 @@ namespace nil {
     namespace crypto3 {
         namespace pubkey {
             namespace detail {
-                template<typename Cipher, typename Padding>
+                template<typename Scheme, typename Padding>
                 struct isomorphic_policy {
                     typedef std::size_t size_type;
 
-                    typedef Cipher cipher_type;
+                    typedef Scheme scheme_type;
                     typedef Padding padding_type;
 
-                    constexpr static const size_type block_bits = cipher_type::block_bits;
-                    constexpr static const size_type block_words = cipher_type::block_words;
-                    typedef typename cipher_type::block_type block_type;
+                    constexpr static const size_type block_bits = scheme_type::block_bits;
+                    constexpr static const size_type block_words = scheme_type::block_words;
+                    typedef typename scheme_type::block_type block_type;
 
-                    typedef typename cipher_type::endian_type endian_type;
+                    typedef typename scheme_type::endian_type endian_type;
                 };
 
-                template<typename Cipher, typename Padding>
-                struct isomorphic_encryption_policy : public isomorphic_policy<Cipher, Padding> {
-                    typedef typename isomorphic_policy<Cipher, Padding>::cipher_type cipher_type;
-                    typedef typename isomorphic_policy<Cipher, Padding>::block_type block_type;
+                template<typename Scheme, typename Padding>
+                struct isomorphic_agreement_policy : public isomorphic_policy<Scheme, Padding> {
+                    typedef typename isomorphic_policy<Scheme, Padding>::cipher_type scheme_type;
+                    typedef typename isomorphic_policy<Scheme, Padding>::block_type block_type;
 
-                    inline static block_type begin_message(const cipher_type &cipher, const block_type &plaintext) {
+                    inline static block_type begin_message(const scheme_type &cipher, const block_type &plaintext) {
                         return cipher.encrypt(plaintext);
                     }
 
-                    inline static block_type process_block(const cipher_type &cipher, const block_type &plaintext) {
+                    inline static block_type process_block(const scheme_type &cipher, const block_type &plaintext) {
                         return cipher.encrypt(plaintext);
                     }
 
-                    inline static block_type end_message(const cipher_type &cipher, const block_type &plaintext) {
+                    inline static block_type end_message(const scheme_type &cipher, const block_type &plaintext) {
                         return cipher.encrypt(plaintext);
                     }
                 };
 
-                template<typename Cipher, typename Padding>
-                struct isomorphic_decryption_policy : public isomorphic_policy<Cipher, Padding> {
-                    typedef typename isomorphic_policy<Cipher, Padding>::cipher_type cipher_type;
-                    typedef typename isomorphic_policy<Cipher, Padding>::block_type block_type;
+                template<typename Scheme, typename Padding>
+                struct isomorphic_encryption_policy : public isomorphic_policy<Scheme, Padding> {
+                    typedef typename isomorphic_policy<Scheme, Padding>::cipher_type scheme_type;
+                    typedef typename isomorphic_policy<Scheme, Padding>::block_type block_type;
 
-                    inline static block_type begin_message(const cipher_type &cipher, const block_type &ciphertext) {
+                    inline static block_type begin_message(const scheme_type &cipher, const block_type &plaintext) {
+                        return cipher.encrypt(plaintext);
+                    }
+
+                    inline static block_type process_block(const scheme_type &cipher, const block_type &plaintext) {
+                        return cipher.encrypt(plaintext);
+                    }
+
+                    inline static block_type end_message(const scheme_type &cipher, const block_type &plaintext) {
+                        return cipher.encrypt(plaintext);
+                    }
+                };
+
+                template<typename Scheme, typename Padding>
+                struct isomorphic_decryption_policy : public isomorphic_policy<Scheme, Padding> {
+                    typedef typename isomorphic_policy<Scheme, Padding>::cipher_type scheme_type;
+                    typedef typename isomorphic_policy<Scheme, Padding>::block_type block_type;
+
+                    inline static block_type begin_message(const scheme_type &cipher, const block_type &ciphertext) {
                         return cipher.decrypt(ciphertext);
                     }
 
-                    inline static block_type process_block(const cipher_type &cipher, const block_type &ciphertext) {
+                    inline static block_type process_block(const scheme_type &cipher, const block_type &ciphertext) {
                         return cipher.decrypt(ciphertext);
                     }
 
-                    inline static block_type end_message(const cipher_type &cipher, const block_type &ciphertext) {
+                    inline static block_type end_message(const scheme_type &cipher, const block_type &ciphertext) {
                         return cipher.decrypt(ciphertext);
+                    }
+                };
+
+                template<typename Scheme, typename Padding>
+                struct isomorphic_signing_policy : public isomorphic_policy<Scheme, Padding> {
+                    typedef typename isomorphic_policy<Scheme, Padding>::cipher_type scheme_type;
+                    typedef typename isomorphic_policy<Scheme, Padding>::block_type block_type;
+
+                    inline static block_type begin_message(const scheme_type &cipher, const block_type &plaintext) {
+                        return cipher.encrypt(plaintext);
+                    }
+
+                    inline static block_type process_block(const scheme_type &cipher, const block_type &plaintext) {
+                        return cipher.encrypt(plaintext);
+                    }
+
+                    inline static block_type end_message(const scheme_type &cipher, const block_type &plaintext) {
+                        return cipher.encrypt(plaintext);
+                    }
+                };
+
+                template<typename Scheme, typename Padding>
+                struct isomorphic_verification_policy : public isomorphic_policy<Scheme, Padding> {
+                    typedef typename isomorphic_policy<Scheme, Padding>::cipher_type scheme_type;
+                    typedef typename isomorphic_policy<Scheme, Padding>::block_type block_type;
+
+                    inline static block_type begin_message(const scheme_type &cipher, const block_type &plaintext) {
+                        return cipher.encrypt(plaintext);
+                    }
+
+                    inline static block_type process_block(const scheme_type &cipher, const block_type &plaintext) {
+                        return cipher.encrypt(plaintext);
+                    }
+
+                    inline static block_type end_message(const scheme_type &cipher, const block_type &plaintext) {
+                        return cipher.encrypt(plaintext);
                     }
                 };
 
@@ -71,23 +125,19 @@ namespace nil {
                     typedef Policy policy_type;
 
                 public:
-                    typedef typename policy_type::cipher_type cipher_type;
+                    typedef typename policy_type::policy_type scheme_type;
                     typedef typename policy_type::padding_type padding_type;
 
                     typedef typename policy_type::size_type size_type;
 
-                    typedef typename cipher_type::key_type key_type;
+                    typedef typename scheme_type::key_type key_type;
 
                     typedef typename policy_type::endian_type endian_type;
 
-                    typedef typename cipher_type::block_type block_type;
-                    typedef typename cipher_type::word_type word_type;
+                    typedef typename scheme_type::block_type block_type;
+                    typedef typename scheme_type::word_type word_type;
 
-                    constexpr static const size_type block_bits = policy_type::block_bits;
-                    constexpr static const size_type block_words = policy_type::block_words;
-                    constexpr static const size_type word_bits = cipher_type::word_bits;
-
-                    isomorphic(const cipher_type &cipher) : cipher(cipher) {
+                    isomorphic(const scheme_type &cipher) : cipher(cipher) {
                     }
 
                     block_type begin_message(const block_type &plaintext, std::size_t total_seen) {
@@ -103,18 +153,21 @@ namespace nil {
                     }
 
                 protected:
-                    cipher_type cipher;
+                    scheme_type cipher;
                 };
             }    // namespace detail
 
             namespace modes {
-                template<typename Cipher, template<typename> class Padding>
+                template<typename Scheme, template<typename> class Padding>
                 struct isomorphic {
-                    typedef Cipher cipher_type;
-                    typedef Padding<Cipher> padding_type;
+                    typedef Scheme scheme_type;
+                    typedef Padding<Scheme> padding_type;
 
-                    typedef detail::isomorphic_encryption_policy<cipher_type, padding_type> encryption_policy;
-                    typedef detail::isomorphic_decryption_policy<cipher_type, padding_type> decryption_policy;
+                    typedef detail::isomorphic_agreement_policy<scheme_type, padding_type> agreement_policy;
+                    typedef detail::isomorphic_encryption_policy<scheme_type, padding_type> encryption_policy;
+                    typedef detail::isomorphic_decryption_policy<scheme_type, padding_type> decryption_policy;
+                    typedef detail::isomorphic_signing_policy<scheme_type, padding_type> signing_policy;
+                    typedef detail::isomorphic_verification_policy<scheme_type, padding_type> verification_policy;
 
                     template<typename Policy>
                     struct bind {

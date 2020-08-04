@@ -16,6 +16,24 @@ namespace nil {
     namespace crypto3 {
         namespace pubkey {
 
+            template<typename FieldType>
+            struct dsa_public_key {
+
+            };
+
+            template<typename FieldType>
+            struct dsa_private_key {
+
+            };
+
+            template<typename FieldType>
+            struct dsa {
+                typedef FieldType field_type;
+
+                typedef dsa_public_key<FieldType> public_key_type;
+                typedef dsa_private_key<FieldType> private_key_type;
+            };
+
             /**
              * DSA Public Key
              */
@@ -100,12 +118,6 @@ namespace nil {
                     create_signature_op(random_number_generator &rng,
                                         const std::string &params,
                                         const std::string &provider) const override;
-            };
-
-            class dsa {
-            public:
-                typedef dsa_public_key_policy public_key_policy;
-                typedef dsa_private_key_policy private_key_policy;
             };
 
             /*

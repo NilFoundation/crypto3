@@ -8,12 +8,16 @@
 
 #define BOOST_TEST_MODULE ecdsa_test
 
+#include <nil/crypto3/pubkey/algorithm/kem_encrypt.hpp>
+#include <nil/crypto3/pubkey/algorithm/kem_decrypt.hpp>
 #include <nil/crypto3/pubkey/algorithm/encrypt.hpp>
 #include <nil/crypto3/pubkey/algorithm/decrypt.hpp>
 #include <nil/crypto3/pubkey/algorithm/sign.hpp>
 #include <nil/crypto3/pubkey/algorithm/verify.hpp>
+#include <nil/crypto3/pubkey/algorithm/agree.hpp>
 
 #include <nil/crypto3/pubkey/ecdsa.hpp>
+#include <nil/crypto3/pubkey/bls.hpp>
 #include <nil/crypto3/pubkey/blinding.hpp>
 #include <nil/crypto3/pubkey/cecpq1.hpp>
 #include <nil/crypto3/pubkey/curve25519.hpp>
@@ -29,22 +33,19 @@
 #include <nil/crypto3/pubkey/ed25519.hpp>
 #include <nil/crypto3/pubkey/elgamal.hpp>
 #include <nil/crypto3/pubkey/gost_3410.hpp>
-#include <nil/crypto3/pubkey/keypair.hpp>
 #include <nil/crypto3/pubkey/mceliece.hpp>
 #include <nil/crypto3/pubkey/newhope.hpp>
 #include <nil/crypto3/pubkey/pbes2.hpp>
 #include <nil/crypto3/pubkey/pem.hpp>
 #include <nil/crypto3/pubkey/pk_keys.hpp>
-#include <nil/crypto3/pubkey/pk_operations.hpp>
-#include <nil/crypto3/pubkey/pk_ops_fwd.hpp>
 #include <nil/crypto3/pubkey/pkcs8.hpp>
 #include <nil/crypto3/pubkey/scheme.hpp>
-#include <nil/crypto3/pubkey/rfc6979.hpp>
+#include <nil/crypto3/pubkey/detail/rfc6979.hpp>
 #include <nil/crypto3/pubkey/rsa.hpp>
 #include <nil/crypto3/pubkey/sm2.hpp>
 #include <nil/crypto3/pubkey/sm2_encrypt.hpp>
-#include <nil/crypto3/pubkey/complexity.hpp>
-#include <nil/crypto3/pubkey/x509_key.hppecdsa.hpp>
+
+#include <nil/crypto3/pubkey/detail/complexity.hpp>
 
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
@@ -78,7 +79,7 @@ static const std::unordered_map<std::string, std::string> string_data = {
 BOOST_AUTO_TEST_SUITE(ecdsa_test_suite)
 
 BOOST_DATA_TEST_CASE(ecdsa_range_hash, boost::unit_test::data::make(string_data), array_element) {
-    std::string out = sign(array_element.first, public_key<ecdsa>());
+    std::string out = sign<ecdsa>(array_element.first);
 
     BOOST_CHECK_EQUAL(out, array_element.second);
 }

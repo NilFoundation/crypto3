@@ -6,8 +6,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_PUBKEY_ENCRYPT_HPP
-#define CRYPTO3_PUBKEY_ENCRYPT_HPP
+#ifndef CRYPTO3_PUBKEY_KEM_DECRYPT_HPP
+#define CRYPTO3_PUBKEY_KEM_DECRYPT_HPP
 
 #include <nil/crypto3/pubkey/scheme_value.hpp>
 #include <nil/crypto3/pubkey/scheme_state.hpp>

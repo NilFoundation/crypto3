@@ -22,6 +22,7 @@ endif()
 cm_find_package(${CMAKE_WORKSPACE_NAME}_codec)
 cm_find_package(${CMAKE_WORKSPACE_NAME}_algebra)
 cm_find_package(${CMAKE_WORKSPACE_NAME}_hash)
+cm_find_package(${CMAKE_WORKSPACE_NAME}_mac)
 cm_find_package(${CMAKE_WORKSPACE_NAME}_modes)
 cm_find_package(${CMAKE_WORKSPACE_NAME}_pkpad)
 
@@ -29,6 +30,7 @@ option(BUILD_TESTS "Build unit tests" FALSE)
 
 list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
      include/nil/crypto3/pubkey/algorithm/sign.hpp
+     include/nil/crypto3/pubkey/algorithm/agree.hpp
      include/nil/crypto3/pubkey/algorithm/encrypt.hpp
      include/nil/crypto3/pubkey/algorithm/decrypt.hpp
      include/nil/crypto3/pubkey/algorithm/verify.hpp
@@ -379,9 +381,12 @@ target_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTERFACE
                       ${CMAKE_WORKSPACE_NAME}::algebra
                       ${CMAKE_WORKSPACE_NAME}::codec
                       ${CMAKE_WORKSPACE_NAME}::hash
+                      ${CMAKE_WORKSPACE_NAME}::mac
                       ${CMAKE_WORKSPACE_NAME}::modes
                       ${CMAKE_WORKSPACE_NAME}::pkpad
 
+                      $<TARGET_NAME_IF_EXISTS:boost_predef>
+                      $<TARGET_NAME_IF_EXISTS:boost_config>
                       $<TARGET_NAME_IF_EXISTS:boost_multiprecision>
 
                       ${Boost_LIBRARIES})
