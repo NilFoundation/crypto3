@@ -75,19 +75,19 @@ namespace nil {
                 return (data[0] == B.data[0]) && (data[1] == B.data[1]);
             }
 
-            bool operator!=(const value_type &A, const value_type &B) const {
+            bool operator!=(const value_type &B) const {
                 return (data[0] != B.data[0]) || (data[1] != B.data[1]);
             }
 
-            value_type operator+(const value_type &A, const value_type &B) const {
+            value_type operator+(const value_type &B) const {
                 return {data[0] + B.data[0], data[1] + B.data[1]};
             }
 
-            value_type operator-(const value_type &A, const value_type &B) const {
+            value_type operator-(const value_type &B) const {
                 return {data[0] - B.data[0], data[1] - B.data[1]};
             }
 
-            value_type operator*(const value_type &A, const value_type &B) const {
+            value_type operator*(const value_type &B) const {
                 const underlying_type A0B0 = data[0] * B.data[0], A1B1 = data[1] * B.data[1];
 
                 return {A0B0 + non_residue * A1B1, (data[0] + data[1]) * (B.data[0] + B.data[1]) - A0B0 - A1B1};
@@ -113,8 +113,8 @@ namespace nil {
 
                 const underlying_type &A0 = data[0], &A1 = data[1];
                 
-                const underlying_type t0 = A0.squared();
-                const underlying_type t1 = A1.squared();
+                const underlying_type t0 = A0.square();
+                const underlying_type t1 = A1.square();
                 const underlying_type t2 = t0 - non_residue * t1;
                 const underlying_type t3 = t2.inverse();
                 const underlying_type c0 = A0 * t3;
