@@ -18,10 +18,21 @@
 namespace nil {
     namespace algebra {
 
-        class bn128_GT {
-        public:
+        template <typename ModulusBits, typename GeneratorBits>
+        using params_type = arithmetic_params<fp<ModulusBits, GeneratorBits>>;
+
+        template <typename ModulusBits, typename GeneratorBits>
+        using modulus_type = params_type<ModulusBits, GeneratorBits>::modulus_type;
+
+        template <typename ModulusBits, typename GeneratorBits>
+        using fp2_type = fp2<ModulusBits, GeneratorBits>;
+
+        template <typename ModulusBits, typename GeneratorBits>
+        using value_type = element<fp2_type<ModulusBits, GeneratorBits>>;
+
+        struct bn128_GT {
             static bn128_GT GT_one;
-            bn::Fp12 elem;
+            value_type elem;
 
             bn128_GT() {
                 elem.clear();
@@ -35,7 +46,7 @@ namespace nil {
 
             bn128_GT operator*(const bn128_GT &other) const {
                 bn128_GT result;
-                mul(result.elem, elem, other.elem);
+                result.elem = elem * other.elem;
                 return result;
             }
 
@@ -49,8 +60,6 @@ namespace nil {
                 return GT_one;
             }
 
-            static bn128_GT GT_one;
-            bn::Fp12 elem;
         };
 
         template<typename NumberType>

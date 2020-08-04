@@ -20,8 +20,34 @@
 namespace nil {
     namespace algebra {
 
+
+        template <typename ModulusBits, typename GeneratorBits>
+        using params_type = arithmetic_params<fp<ModulusBits, GeneratorBits>>;
+
+        template <typename ModulusBits, typename GeneratorBits>
+        using modulus_type = params_type<ModulusBits, GeneratorBits>::modulus_type;
+
+        template <typename ModulusBits, typename GeneratorBits>
+        using fp_type = fp<ModulusBits, GeneratorBits>;
+
+        template <typename ModulusBits, typename GeneratorBits>
+        using fp_value_type = element<fp_type<ModulusBits, GeneratorBits>>;
+
+        template <typename ModulusBits, typename GeneratorBits>
+        using fp2_type = fp2<ModulusBits, GeneratorBits>;
+
+        template <typename ModulusBits, typename GeneratorBits>
+        using fp2_value_type = element<fp2_type<ModulusBits, GeneratorBits>>;
+
+        template <typename ModulusBits, typename GeneratorBits>
+        using fp12_type = fp12_2over3over2<ModulusBits, GeneratorBits>;
+
+        template <typename ModulusBits, typename GeneratorBits>
+        using fp12_value_type = element<fp12_type<ModulusBits, GeneratorBits>>;
+
+
         struct bn128_ate_G1_precomp {
-            bn::Fp P[3];
+            fp_value_type P[3];
 
             bool operator==(const bn128_ate_G1_precomp &other) const {
                 return (P[0] == other.P[0] && P[1] == other.P[1] && P[2] == other.P[2]);
@@ -31,7 +57,7 @@ namespace nil {
         typedef bn::Fp6 bn128_ate_ell_coeffs;
 
         struct bn128_ate_G2_precomp {
-            bn::Fp2 Q[3];
+            fp2_value_type Q[3];
             std::vector<bn128_ate_ell_coeffs> coeffs;
 
             bool operator==(const bn128_ate_G2_precomp &other) const {
@@ -55,21 +81,17 @@ namespace nil {
         };
 
         bn128_ate_G1_precomp bn128_ate_precompute_G1(const bn128_G1 &P) {
-            enter_block("Call to bn128_ate_precompute_G1");
 
             bn128_ate_G1_precomp result;
             bn::ecop::NormalizeJac(result.P, P.coord);
 
-            leave_block("Call to bn128_ate_precompute_G1");
             return result;
         }
         bn128_ate_G2_precomp bn128_ate_precompute_G2(const bn128_G2 &Q) {
-            enter_block("Call to bn128_ate_precompute_G2");
 
             bn128_ate_G2_precomp result;
             bn::components::precomputeG2(result.coeffs, result.Q, Q.coord);
 
-            leave_block("Call to bn128_ate_precompute_G2");
             return result;
         }
 
@@ -89,10 +111,8 @@ namespace nil {
         }
 
         bn128_GT bn128_final_exponentiation(const bn128_Fq12 &elt) {
-            enter_block("Call to bn128_final_exponentiation");
             bn128_GT eltcopy = elt;
             eltcopy.elem.final_exp();
-            leave_block("Call to bn128_final_exponentiation");
             return eltcopy;
         }
 

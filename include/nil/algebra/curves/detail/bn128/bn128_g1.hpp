@@ -195,17 +195,13 @@ namespace nil {
                 // V = X1*I
                 V = coord[0] * I;
                 // X3 = r^2-J-2*V
-                result.coord[0] = r.square();
-                result.coord[0] -= (J + V + V);
+                result.coord[0] = r.square() - J - V - V;
                 // Y3 = r*(V-X3)-2*Y1*J
-                tmp = V - result.coord[0];
-                result.coord[1] = r * tmp;
+                result.coord[1] = r * (V - result.coord[0]);
                 tmp = coord[1] * J;
                 result.coord[1] -=  (tmp + tmp);
                 // Z3 = (Z1+H)^2-Z1Z1-HH
-                tmp = coord[2] + H;
-                result.coord[2] = tmp.square();
-                result.coord[2] -= (Z1Z1 + HH);
+                result.coord[2] = (coord[2] + H).square() - Z1Z1 - HH;
 
                 return result;
             }
@@ -231,14 +227,14 @@ namespace nil {
                       y^2 = x^3 + b z^6
                     */
                     value_type X2, Y2, Z2;
-                    X2 = coord[0].square();
-                    Y2 = coord[1].square();
-                    Z2 = coord[2].square();
+                    square(X2, coord[0]);
+                    square(Y2, coord[1]);
+                    square(Z2, coord[2]);
 
                     value_type X3, Z3, Z6;
-                    X3 = X2 * coord[0];
-                    Z3 = Z2 * coord[2];
-                    Z6 = Z3.square();
+                    mul(X3, X2, coord[0]);
+                    mul(Z3, Z2, coord[2]);
+                    square(Z6, Z3);
 
                     return (Y2 == X3 + bn128_coeff_b * Z6);
                 }
@@ -275,18 +271,19 @@ namespace nil {
 
                 for (size_t i = 0; i < vec.size(); ++i) {
                     value_type Z2, Z3;
-                    square(Z2, Z_vec[i]);
-                    mul(Z3, Z2, Z_vec[i]);
+                    Z2 = Z_vec[i].square();
+                    Z3 = Z2 * Z_vec[i];
 
-                    mul(vec[i].coord[0], vec[i].coord[0], Z2);
-                    mul(vec[i].coord[1], vec[i].coord[1], Z3);
+                    vec[i].coord[0] *=  Z2;
+                    vec[i].coord[1] *= Z3;
                     vec[i].coord[2] = one;
                 }
             }
 
         private:
             static value_type sqrt(const value_type &el) {
-                return sqrt<fp_type>(el);
+                return el.sqrt();
+            }
         };
 
         template<typename NumberType>

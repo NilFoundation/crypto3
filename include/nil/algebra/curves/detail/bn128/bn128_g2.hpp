@@ -22,17 +22,17 @@ namespace nil {
     namespace algebra {
 
         template <typename ModulusBits, typename GeneratorBits>
-        using params_type = arithmetic_params<fp2<ModulusBits, GeneratorBits>>;
+        using params_type = arithmetic_params<fp<ModulusBits, GeneratorBits>>;
 
         template <typename ModulusBits, typename GeneratorBits>
         using modulus_type = params_type<ModulusBits, GeneratorBits>::modulus_type;
 
         template <typename ModulusBits, typename GeneratorBits>
-        using value_type = element<params_type<ModulusBits, GeneratorBits>, modulus_type<ModulusBits, GeneratorBits>>;
-
-        template <typename ModulusBits, typename GeneratorBits>
         using fp2_type = fp2<ModulusBits, GeneratorBits>;
 
+        template <typename ModulusBits, typename GeneratorBits>
+        using value_type = element<fp2_type<ModulusBits, GeneratorBits>>;
+        
         struct bn128_G2 {
 
             bn128_G2() {
@@ -47,10 +47,10 @@ namespace nil {
                     coord[1] = 1;
                     coord[2] = 0;
                 } else {
-                    bn::Fp2 r;
+                    value_type r;
                     r = coord[2];
                     r.inverse();
-                    square(coord[2], r);
+                    coord[2] = r.square();
                     coord[0] *= coord[2];
                     r *= coord[2];
                     coord[1] *= r;
@@ -82,20 +82,20 @@ namespace nil {
                 /* now neither is O */
 
                 value_type Z1sq, Z2sq, lhs, rhs;
-                square(Z1sq, coord[2]);
-                square(Z2sq, other.coord[2]);
-                mul(lhs, Z2sq, coord[0]);
-                mul(rhs, Z1sq, other.coord[0]);
+                Z1sq = coord[2].square();
+                Z2sq = other.coord[2].square();
+                lhs = Z2sq * coord[0];
+                rhs = Z1sq * other.coord[0];
 
                 if (lhs != rhs) {
                     return false;
                 }
 
                 value_type Z1cubed, Z2cubed;
-                mul(Z1cubed, Z1sq, coord[2]);
-                mul(Z2cubed, Z2sq, other.coord[2]);
-                mul(lhs, Z2cubed, coord[1]);
-                mul(rhs, Z1cubed, other.coord[1]);
+                Z1cubed = Z1sq * coord[2];
+                Z2cubed = Z2sq * other.coord[2];
+                lhs = Z2cubed * coord[1];
+                rhs = Z1cubed * other.coord[1];
 
                 return (lhs == rhs);
             }
@@ -165,17 +165,13 @@ namespace nil {
 
                 // we know that Z2 = 1
 
-                bn::Fp2 Z1Z1;
-                square(Z1Z1, coord[2]);
-                const bn::Fp2 &U1 = coord[0];
-                bn::Fp2 U2;
-                mul(U2, other.coord[0], Z1Z1);
-                bn::Fp2 Z1_cubed;
-                mul(Z1_cubed, coord[2], Z1Z1);
+                value_type Z1Z1 = coord[2].square();
+                const value_type &U1 = coord[0];
+                value_type U2 = other.coord[0] * Z1Z1;
+                value_type Z1_cubed = coord[2] * Z1Z1;
 
-                const bn::Fp2 &S1 = coord[1];
-                bn::Fp2 S2;
-                mul(S2, other.coord[1], Z1_cubed);    // S2 = Y2*Z1*Z1Z1
+                const value_type &S1 = coord[1];
+                value_type S2 = other.coord[1] * Z1_cubed;    // S2 = Y2*Z1*Z1Z1
 
                 if (U1 == U2 && S1 == S2) {
                     // dbl case; nothing of above can be reused
@@ -183,37 +179,30 @@ namespace nil {
                 }
 
                 bn128_G2 result;
-                bn::Fp2 H, HH, I, J, r, V, tmp;
+                value_type H, HH, I, J, r, V, tmp;
                 // H = U2-X1
-                sub(H, U2, coord[0]);
+                H = U2 - coord[0];
                 // HH = H^2
-                square(HH, H);
+                HH = H.square();
                 // I = 4*HH
-                add(tmp, HH, HH);
-                add(I, tmp, tmp);
+                tmp = HH + HH;
+                I = tmp + tmp;
                 // J = H*I
-                mul(J, H, I);
+                J = H * I;
                 // r = 2*(S2-Y1)
-                sub(tmp, S2, coord[1]);
-                add(r, tmp, tmp);
+                tmp = S2 - coord[1];
+                r = tmp + tmp;
                 // V = X1*I
-                mul(V, coord[0], I);
+                V = coord[0] * I;
                 // X3 = r^2-J-2*V
-                square(result.coord[0], r);
-                sub(result.coord[0], result.coord[0], J);
-                sub(result.coord[0], result.coord[0], V);
-                sub(result.coord[0], result.coord[0], V);
+                result.coord[0] = r.square() - J - V -V;
                 // Y3 = r*(V-X3)-2*Y1*J
-                sub(tmp, V, result.coord[0]);
-                mul(result.coord[1], r, tmp);
-                mul(tmp, coord[1], J);
-                sub(result.coord[1], result.coord[1], tmp);
-                sub(result.coord[1], result.coord[1], tmp);
-                // Z3 = (Z1+H)^2-Z1Z1-HH
-                add(tmp, coord[2], H);
-                square(result.coord[2], tmp);
-                sub(result.coord[2], result.coord[2], Z1Z1);
-                sub(result.coord[2], result.coord[2], HH);
+                result.coord[1] = r * (V - result.coord[0]);
+                tmp = coord[1] * J;
+                result.coord[1] -=  (tmp + tmp);
+                // Z3 = (Z1+H)^2-Z1Z1-HH                
+                result.coord[2] = (coord[2] + H).square() - Z1Z1 - HH;
+
                 return result;
             }
 
@@ -237,12 +226,12 @@ namespace nil {
                       y^2 / z^6 = x^3 / z^6 + b
                       y^2 = x^3 + b z^6
                     */
-                    bn::Fp2 X2, Y2, Z2;
+                    value_type X2, Y2, Z2;
                     square(X2, coord[0]);
                     square(Y2, coord[1]);
                     square(Z2, coord[2]);
 
-                    bn::Fp2 X3, Z3, Z6;
+                    value_type X3, Z3, Z6;
                     mul(X3, X2, coord[0]);
                     mul(Z3, Z2, coord[2]);
                     square(Z6, Z3);
@@ -259,10 +248,6 @@ namespace nil {
                 return G2_one;
             }
 
-            static size_t size_in_bits() {
-                return 2 * base_field::size_in_bits() + 1;
-            }
-
             template<typename NumberType>
             static NumberType base_field_char() {
                 return base_field::field_char();
@@ -274,36 +259,36 @@ namespace nil {
             }
 
             static void batch_to_special_all_non_zeros(std::vector<bn128_G2> &vec) {
-                std::vector<bn::Fp2> Z_vec;
+                std::vector<value_type> Z_vec;
                 Z_vec.reserve(vec.size());
 
                 for (auto &el : vec) {
                     Z_vec.emplace_back(el.coord[2]);
                 }
-                bn_batch_invert<bn::Fp2>(Z_vec);
+                bn_batch_invert<value_type>(Z_vec);
 
-                const bn::Fp2 one = 1;
+                const value_type one = 1;
 
                 for (size_t i = 0; i < vec.size(); ++i) {
-                    bn::Fp2 Z2, Z3;
-                    square(Z2, Z_vec[i]);
-                    mul(Z3, Z2, Z_vec[i]);
+                    value_type Z2, Z3;
+                    Z2 = Z_vec[i].square();
+                    Z3 = Z2 * Z_vec[i];
 
-                    mul(vec[i].coord[0], vec[i].coord[0], Z2);
-                    mul(vec[i].coord[1], vec[i].coord[1], Z3);
+                    vec[i].coord[0] *=  Z2;
+                    vec[i].coord[1] *= Z3;
                     vec[i].coord[2] = one;
                 }
             }
 
         private:
             static value_type sqrt(const value_type &el) {
-                return sqrt<fp2_type>(el);
+                return el.sqrt();
             }
 
             static bn128_G2 G2_zero;
             static bn128_G2 G2_one;
 
-            bn::Fp2 coord[3];
+            value_type coord[3];
 
             typedef bn128_Fq base_field;
             typedef bn128_Fr scalar_field;
