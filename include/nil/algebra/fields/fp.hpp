@@ -23,7 +23,7 @@ namespace nil {
          * passed as a template parameter, to avoid per-element overheads.
          */
         template<std::size_t ModulusBits, std::size_t GeneratorBits>
-        struct fp_policy {
+        struct fp {
 
             constexpr static const std::size_t modulus_bits = ModulusBits;
             typedef number<backends::cpp_int_backend<modulus_bits, modulus_bits, unsigned_magnitude, unchecked, void>>
@@ -37,57 +37,64 @@ namespace nil {
         };
 
         template<typename NumberType>
-        struct fp {
+        struct element<fp> {
+
             using type = NumberType;
 
-            fp(type data) : data(data);
+        private:
+            using value_type = element<fp, NumberType>;
 
-            inline static fp zero() const {
-                return fp(type(0));
+            type data;
+
+        public:
+
+            value_type(type data) : data(data);
+
+            inline static value_type zero() const {
+                return value_type(type(0));
             }
 
-            inline static fp one() const {
-                return fp(type(1));
+            inline static value_type one() const {
+                return value_type(type(1));
             }
 
-            bool operator==(const fp &B) const {
+            bool operator==(const value_type &B) const {
                 return data == B.data;
             }
 
-            bool operator!=(const fp &B) const {
+            bool operator!=(const value_type &B) const {
                 return data != B.data;
             }
 
-            fp operator+(const fp &B) const {
+            value_type operator+(const value_type &B) const {
                 return data + B.data;
             }
 
-            fp operator-(const fp &B) const {
+            value_type operator-(const value_type &B) const {
                 return data - B.data;
             }
 
-            fp operator*(const fp &B) const {
+            value_type operator*(const value_type &B) const {
                 return data * B.data;
             }
 
-            fp sqrt() const {
+            value_type sqrt() const {
                 return sqrt(data);
             }
 
-            fp square() const {
+            value_type square() const {
                 return data * data;    // maybe can be done more effective
             }
 
-            fp pow(const PowerType &power) const {
+            template <typename PowerType>
+            value_type pow(const PowerType &power) const {
                 return power(data, power);
             }
 
-            fp invert() const {
+            value_type inverse() const {
                 return invert(data);
             }
 
-        private:
-            type data;
         }
 
     }    // namespace algebra
