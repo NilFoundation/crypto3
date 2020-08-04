@@ -38,11 +38,6 @@ namespace nil {
                 
         };
 
-        template<typename NumberType, const NumberType &modulus>
-        fp3_model<n, modulus> fp3_model<n, modulus>::Frobenius_map(unsigned long power) const {
-            return fp3_model<n, modulus>(c0, Frobenius_coeffs_c1[power % 2] * c1);
-        }
-
         template<std::size_t ModulusBits, std::size_t GeneratorBits>
         struct element<fp3<ModulusBits, GeneratorBits>> {
 
@@ -53,7 +48,7 @@ namespace nil {
 
         private:
 
-            using value_type = element<fp2<ModulusBits, GeneratorBits>>;
+            using value_type = element<fp3<ModulusBits, GeneratorBits>>;
 
             type data;
 
@@ -126,7 +121,7 @@ namespace nil {
 
             }
 
-        }
+        };
 
     }    // namespace algebra
 }    // namespace nil

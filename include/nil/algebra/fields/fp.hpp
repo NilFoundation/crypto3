@@ -99,7 +99,7 @@ namespace nil {
                 return invert(data);
             }
 
-        }
+        };
 
     }    // namespace algebra
 }    // namespace nil
