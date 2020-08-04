@@ -38,9 +38,9 @@ namespace nil {
             }
 
             static bn128_Fq12 miller_loop(const bn128_ate_G1_precomp &prec_P, const bn128_ate_G2_precomp &prec_Q) {
-                enter_block("Call to miller_loop<bn128_pp>");
+                
                 bn128_Fq12 result = bn128_ate_miller_loop(prec_P, prec_Q);
-                leave_block("Call to miller_loop<bn128_pp>");
+                
                 return result;
             }
 
@@ -48,9 +48,9 @@ namespace nil {
                                                  const bn128_ate_G2_precomp &prec_Q1,
                                                  const bn128_ate_G1_precomp &prec_P2,
                                                  const bn128_ate_G2_precomp &prec_Q2) {
-                enter_block("Call to double_miller_loop<bn128_pp>");
+                
                 bn128_Fq12 result = bn128_double_ate_miller_loop(prec_P1, prec_Q1, prec_P2, prec_Q2);
-                leave_block("Call to double_miller_loop<bn128_pp>");
+                
                 return result;
             }
 
