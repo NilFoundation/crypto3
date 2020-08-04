@@ -23,7 +23,7 @@ namespace nil {
          * passed as a template parameter, to avoid per-element overheads.
          */
         template<std::size_t ModulusBits, std::size_t GeneratorBits>
-        struct fp {
+        struct fp_policy {
 
             constexpr static const std::size_t modulus_bits = ModulusBits;
             typedef number<backends::cpp_int_backend<modulus_bits, modulus_bits, unsigned_magnitude, unchecked, void>>
@@ -35,6 +35,60 @@ namespace nil {
                 generator_type;
 
         };
+
+        template<typename NumberType>
+        struct fp {
+            using type = NumberType;
+
+            fp(type data) : data(data);
+
+            inline static fp zero() const {
+                return fp(type(0));
+            }
+
+            inline static fp one() const {
+                return fp(type(1));
+            }
+
+            bool operator==(const fp &B) const {
+                return data == B.data;
+            }
+
+            bool operator!=(const fp &B) const {
+                return data != B.data;
+            }
+
+            fp operator+(const fp &B) const {
+                return data + B.data;
+            }
+
+            fp operator-(const fp &B) const {
+                return data - B.data;
+            }
+
+            fp operator*(const fp &B) const {
+                return data * B.data;
+            }
+
+            fp sqrt() const {
+                return sqrt(data);
+            }
+
+            fp square() const {
+                return data * data;    // maybe can be done more effective
+            }
+
+            fp pow(const PowerType &power) const {
+                return power(data, power);
+            }
+
+            fp invert() const {
+                return invert(data);
+            }
+
+        private:
+            type data;
+        }
 
     }    // namespace algebra
 }    // namespace nil

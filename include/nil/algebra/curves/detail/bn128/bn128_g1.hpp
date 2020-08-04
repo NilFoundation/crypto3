@@ -35,11 +35,7 @@ namespace nil {
 
         struct bn128_G1 {
 
-            bn128_G1() {
-                coord[0] = G1_zero.coord[0];
-                coord[1] = G1_zero.coord[1];
-                coord[2] = G1_zero.coord[2];
-            }
+            value_type coord[3];
 
             typedef bn128_Fq base_field;
             typedef bn128_Fr scalar_field;
@@ -297,7 +293,7 @@ namespace nil {
 
         private:
             static value_type sqrt(const value_type &el) {
-                return sqrt<fp2_type>(el);
+                return sqrt<fp_type>(el);
         };
 
         template<typename NumberType>
