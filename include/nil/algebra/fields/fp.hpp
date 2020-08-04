@@ -62,6 +62,10 @@ namespace nil {
                 return value_type(type(1));
             }
 
+            bool is_zero() const {
+                return data == type(0);
+            }
+
             bool operator==(const value_type &B) const {
                 return data == B.data;
             }

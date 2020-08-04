@@ -67,7 +67,7 @@ namespace nil {
             }
 
             bool is_zero() const {
-                return coord[2].isZero();
+                return coord[2].is_zero();
             }
 
             bool operator==(const bn128_G2 &other) const {
