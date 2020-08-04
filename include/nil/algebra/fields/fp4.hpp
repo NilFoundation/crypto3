@@ -84,7 +84,7 @@ namespace nil {
             value_type operator*(const value_type &B) const {
                 const underlying_type A0B0 = data[0] * B.data[0], A1B1 = data[1] * B.data[1];
 
-                return {A0B0 + non_residue * A1B1, (data[0] + data[1]) * (B.data[0] + B.data[1]) - A0B0 - A1B1};
+                return {A0B0 +  mul_by_non_residue(A1B1), (data[0] + data[1]) * (B.data[0] + B.data[1]) - A0B0 - A1B1};
             }
 
             value_type sqrt() const {

@@ -39,8 +39,6 @@ namespace nil {
                 
         };
 
-
-
         template<std::size_t ModulusBits, std::size_t GeneratorBits>
         struct element<fp6_2over3<ModulusBits, GeneratorBits>> {
 
@@ -86,7 +84,7 @@ namespace nil {
             value_type operator*(const value_type &B) const {
                 const underlying_type A0B0 = data[0] * B.data[0], A1B1 = data[1] * B.data[1];
 
-                return {A0B0 + non_residue * A1B1, (data[0] + data[1]) * (B.data[0] + B.data[1]) - A0B0 - A1B1};
+                return {A0B0 + mul_by_non_residue(A1B1), (data[0] + data[1]) * (B.data[0] + B.data[1]) - A0B0 - A1B1};
             }
 
             value_type sqrt() const {
@@ -111,7 +109,7 @@ namespace nil {
                 
                 const underlying_type t0 = A0.square();
                 const underlying_type t1 = A1.square();
-                const underlying_type t2 = t0 - non_residue * t1;
+                const underlying_type t2 = t0 - mul_by_non_residue(t1);
                 const underlying_type t3 = t2.inverse();
                 const underlying_type c0 = A0 * t3;
                 const underlying_type c1 = -(A1 * t3);
