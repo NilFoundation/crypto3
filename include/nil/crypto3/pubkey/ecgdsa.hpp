@@ -14,6 +14,21 @@
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
+            template<typename CurveType>
+            struct ecgdsa_public_key {
+                typedef CurveType curve_type;
+            };
+
+            template<typename CurveType>
+            struct ecgdsa_private_key {
+                typedef CurveType curve_type;
+            };
+
+            template<typename CurveType>
+            struct ecgdsa {
+                typedef ecgdsa_public_key<CurveType> public_key_policy;
+                typedef ecgdsa_private_key<CurveType> private_key_policy;
+            };
 
             /**
              * This class represents ECGDSA public keys.
@@ -117,12 +132,6 @@ namespace nil {
                     create_signature_op(random_number_generator &rng,
                                         const std::string &params,
                                         const std::string &provider) const override;
-            };
-
-            template<typename CurveType>
-            struct ecgdsa {
-                typedef ecgdsa_public_key<CurveType> public_key_policy;
-                typedef ecgdsa_private_key<CurveType> private_key_policy;
             };
 
             namespace {

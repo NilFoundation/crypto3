@@ -14,11 +14,65 @@
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
+            template<typename FieldType>
+            struct ecdh_public_key {
+                typedef FieldType field_type;
+
+                typedef typename field_type::value_type value_type;
+
+                constexpr static const std::size_t key_bits = field_type::modulus_bits;
+                typedef typename field_type::modulus_type key_type;
+
+                constexpr static const std::size_t key_schedule_bits = field_type::modulus_bits;
+                typedef typename field_type::modulus_type key_schedule_type;
+
+                constexpr static const std::size_t signature_bits = field_type::modulus_bits * 2;
+                typedef std::tuple<value_type, value_type> signature_type;
+
+                inline static bool verify(const signature_type &val, const key_schedule_type &key) {
+
+                }
+            };
+
+            template<typename FieldType>
+            struct ecdh_private_key {
+                typedef FieldType field_type;
+
+                typedef typename field_type::value_type value_type;
+
+                constexpr static const std::size_t key_bits = field_type::modulus_bits;
+                typedef typename field_type::modulus_type key_type;
+
+                constexpr static const std::size_t key_schedule_bits = field_type::modulus_bits;
+                typedef typename field_type::modulus_type key_schedule_type;
+
+                constexpr static const std::size_t signature_bits = field_type::modulus_bits * 2;
+                typedef std::tuple<value_type, value_type> signature_type;
+
+                inline static bool agree(const signature_type &val, const key_schedule_type &key) {
+                    const ec_group m_group;
+                    boost::multiprecision::number<Backend, ExpressionTemplates> m_l_times_priv;
+                    random_number_generator &m_rng;
+                    std::vector<boost::multiprecision::number<Backend, ExpressionTemplates>> m_ws;
+//--------------
+
+                }
+            };
+
+            template<typename FieldType>
+            struct ecdh {
+                typedef FieldType field_type;
+
+                typedef ecdh_public_key<FieldType> public_key_type;
+                typedef ecdh_private_key<FieldType> private_key_type;
+            };
 
             /**
              * This class represents ECDH Public Keys.
              */
-            template<typename CurveType, typename NumberType = typename CurveType::number_type>
+            inline static bool verify(const signature_type &val, const key_schedule_type &key) {
+
+            }template<typename CurveType, typename NumberType = typename CurveType::number_type>
             class ecdh_public_key : public virtual ec_public_key<CurveType, NumberType> {
             public:
                 /**

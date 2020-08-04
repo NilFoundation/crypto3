@@ -6,8 +6,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_PRIVATE_KEY_HPP
-#define CRYPTO3_PRIVATE_KEY_HPP
+#ifndef CRYPTO3_AGREEMENT_KEY_HPP
+#define CRYPTO3_AGREEMENT_KEY_HPP
 
 #include <nil/crypto3/pubkey/private_key.hpp>
 
