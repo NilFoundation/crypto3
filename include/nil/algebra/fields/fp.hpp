@@ -36,13 +36,17 @@ namespace nil {
 
         };
 
-        template<typename NumberType>
-        struct element<fp> {
+        template<std::size_t ModulusBits, std::size_t GeneratorBits>
+        struct element<fp<ModulusBits, GeneratorBits>> {
 
-            using type = NumberType;
+            typedef arithmetic_params<fp<ModulusBits, GeneratorBits>> params_type;
+
+            typedef params_type::modulus_type modulus_type;
+
+            using type = modulus_type;
 
         private:
-            using value_type = element<fp, NumberType>;
+            using value_type = element<fp<ModulusBits, GeneratorBits>>;
 
             type data;
 

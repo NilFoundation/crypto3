@@ -45,16 +45,17 @@ namespace nil {
         }
         
 
-        template<typename NumberType>
-        struct element<fp2> {
+        template<std::size_t ModulusBits, std::size_t GeneratorBits>
+        struct element<fp2<ModulusBits, GeneratorBits>> {
 
-            using type = std::array<element<fp, NumberType>, 2>;
+
+            using underlying_type = element<fp<ModulusBits, GeneratorBits>>;
+
+            using type = std::array<underlying_type, 2>;
 
         private:
 
-            using underlying_type = element<fp, NumberType>;
-
-            using value_type = element<fp2, NumberType>;
+            using value_type = element<fp2<ModulusBits, GeneratorBits>>;
 
             type data;
 
