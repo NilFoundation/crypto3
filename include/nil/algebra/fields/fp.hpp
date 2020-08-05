@@ -86,6 +86,10 @@ namespace nil {
                 return data - B.data;
             }
 
+            value_type operator-() const {
+                return -data;
+            }
+
             value_type operator*(const value_type &B) const {
                 return data * B.data;
             }

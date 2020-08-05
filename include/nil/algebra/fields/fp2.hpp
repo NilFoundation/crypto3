@@ -70,6 +70,10 @@ namespace nil {
                 return (data[0] == underlying_type::zero()) && (data[1] == underlying_type::zero());
             }
 
+            bool is_one() const {
+                return (data[0] == underlying_type::one()) && (data[1] == underlying_type::zero());
+            }
+
             bool operator==(const value_type &B) const {
                 return (data[0] == B.data[0]) && (data[1] == B.data[1]);
             }
@@ -86,10 +90,53 @@ namespace nil {
                 return {data[0] - B.data[0], data[1] - B.data[1]};
             }
 
+            value_type operator-() const {
+                return zero()-data;
+            }
+
             value_type operator*(const value_type &B) const {
                 const underlying_type A0B0 = data[0] * B.data[0], A1B1 = data[1] * B.data[1];
 
                 return {A0B0 + non_residue * A1B1, (data[0] + data[1]) * (B.data[0] + B.data[1]) - A0B0 - A1B1};
+            }
+
+            /*
+                For pairing bn128
+                XITAG
+                u^2 = -1
+                xi = 9 + u
+                (a + bu)(9 + u) = (9a - b) + (a + 9b)u
+            */
+            value_type mul_xiC() {
+                return {data[0].dbl().dbl().dbl() + data[0] - data[1], data[1].dbl().dbl().dbl() + data[1] + data[0]};
+            }
+
+            // z = x * b
+            value_type mul_Fp_0C(const underlying_type &b) {
+                return {data[0] * b, data[1] * b};
+            }
+
+            /*
+                (a + bu)cu = -bc + acu,
+                where u is u^2 = -1.
+
+                2 * Fp mul
+                1 * Fp neg
+            */
+            value_type mul_Fp_1(const underlying_type &y_b) {
+                return {- (data[1] * y_b), data[0] * y_b};
+            }
+
+            value_type divBy2() const{
+                return {divBy2(data[0]), divBy2(data[1])};
+            }
+
+            value_type divBy4() const{
+                return {divBy4(data[0]), divBy4(data[1])};
+            }
+
+            value_type dbl() const {
+                return {data[0].dbl(), data[1].dbl()};
             }
 
             value_type sqrt() const {
@@ -124,6 +171,14 @@ namespace nil {
             }
 
         };
+
+        value_type addNC(const value_type &A, const value_type &B){
+
+        }
+
+        value_type subNC(const value_type &A, const value_type &B){
+
+        }
 
     }    // namespace algebra
 }    // namespace nil

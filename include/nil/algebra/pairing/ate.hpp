@@ -370,62 +370,30 @@ namespace bn {
             z.data = -x.data;
         }
 
-        /*
-            (a + b u)(c + d u) = (a c - b d) + (a d + b c)u
-             = (a c - b d) + ((a + b)(c + d) - a c - b d)u
-            N = 1 << 256
-            7p < N then 7(p-1)(p-1) < pN
-        */
         static inline void mulC(Fp2T &z, const Fp2T &x, const Fp2T &y) {
             z.data = x.data * y.data;
         }
 
         static inline void divBy2C(Fp2T &z, const Fp2T &x) {
-            Fp::divBy2(z.a_, x.a_);
-            Fp::divBy2(z.b_, x.b_);
+            z.data = x.data.divBy2();
         }
 
         static inline void divBy4(Fp2T &z, const Fp2T &x) {
-            Fp::divBy4(z.a_, x.a_);
-            Fp::divBy4(z.b_, x.b_);
+            z.data = x.data.divBy4();
         }
 
-        /*
-            XITAG
-            u^2 = -1
-            xi = 9 + u
-            (a + bu)(9 + u) = (9a - b) + (a + 9b)u
-        */
         static inline void mul_xiC(Fp2T &z, const Fp2T &x) {
-            assert(&z != &x);
-            z.a_ = x.a_ + x.a_;    // 2
-            z.a_ = z.a_ + z.a_;    // 4
-            z.a_ = z.a_ + z.a_;    // 8
-            z.a_ = z.a_ + x.a_;    // 9
-
-            z.a_ = z.a_ - x.b_;
-
-            z.b_ = x.b_ + x.b_;    // 2
-            z.b_ = z.b_ + z.b_;    // 4
-            z.b_ = z.b_ + z.b_;    // 8
-            z.b_ = z.b_ + x.b_;    // 9
-
-            z.b_ = z.b_ + x.a_;
+            z.data = x.data.mul_xiC();
         }
 
-        /*
-            (a + bu)^2 = (a - b)(a + b) + 2abu
-        */
         static inline void squareC(Fp2T &z, const Fp2T &x) {
             z.data = x.data.square();
         }
 
-        /*
-            1 / (a + b u) = (a - b u) / (a^2 + b^2)
-        */
         void inverse() {
             z.data = x.data.inverse();
         }
+
         void clear() {
             data.clear();
         }
@@ -439,8 +407,7 @@ namespace bn {
 
         // z = x * b
         static inline void mul_Fp_0C(Fp2T &z, const Fp2T &x, const Fp &b) {
-            z.a_ = x.a_ * b;
-            z.b_ = x.b_ * b;
+            z.data = x.data.mul_Fp_0C(b);
         }
 
         /*
@@ -463,8 +430,7 @@ namespace bn {
             1 * Fp neg
         */
         static inline void mul_Fp_1(Fp2T &z, const Fp &y_b) {
-            z.b_ = z.a_ * y_b;
-            z.a_ = - (z.b_ * y_b);
+            z.data = z_data.mul_Fp_1(y_b);
         }
 
         struct Dbl : public mie::local::addsubmul<Dbl, mie::local::hasNegative<Dbl>> {
@@ -630,7 +596,9 @@ namespace bn {
         typedef typename T::Fp Fp;
         typedef ParamT<Fp2> Param;
         typedef typename Fp2::Dbl Fp2Dbl;
-        Fp2 a_, b_, c_;
+
+        fp6_3_over_2_value_type data;
+        
         Fp6T() {
         }
         Fp6T(int x) : a_(x), b_(0), c_(0) {
@@ -667,83 +635,35 @@ namespace bn {
             return a_.is_zero() && b_.is_zero() && c_.is_zero();
         }
 
-        static inline void addC(Fp6T &z, const Fp6T &x, const Fp6T &y) {
-            z.a_ = x.a_ + y.a_;
-            z.b_ = x.b_ + y.b_;
-            z.c_ = x.c_ + y.c_;
-        }
-        static inline void subC(Fp6T &z, const Fp6T &x, const Fp6T &y) {
-            z.a_ = x.a_ - y.a_;
-            z.b_ = x.b_ - y.b_;
-            z.c_ = x.c_ - y.c_;
-        }
-        static inline void neg(Fp6T &z, const Fp6T &x) {
-            z.a_ = -x.a_;
-            z.b_ = -x.b_;
-            z.c_ = -x.c_;
+        static inline void addC(Fp2T &z, const Fp2T &x, const Fp2T &y) {
+            z.data = x.data + y.data;
         }
 
-        // 2120clk x 128
-        static inline void mulC(Fp6T &z, const Fp6T &x, const Fp6T &y) {
-            Dbl zd;
-            Dbl::mul(zd, x, y);
-            Dbl::mod(z, zd);
+        static inline void subC(Fp2T &z, const Fp2T &x, const Fp2T &y) {
+            z.data = x.data - y.data;
+        }
+
+        static inline void neg(Fp2T &z, const Fp2T &x) {
+            z.data = -x.data;
+        }
+
+        static inline void mulC(Fp2T &z, const Fp2T &x, const Fp2T &y) {
+            z.data = x.data * y.data;
         }
 
         /*
             1944clk * 2
         */
         static void square(Fp6T &z, const Fp6T &x) {
-            assert(&z != &x);
-            Fp2 v3, v4, v5;
-            Fp2::add(v4, x.a_, x.a_);
-            Fp2::mul(v4, v4, x.b_);
-            Fp2::square(v5, x.c_);
-            Fp2::mul_xi(z.b_, v5);
-            z.b_ += v4;
-            Fp2::sub(z.c_, v4, v5);
-            Fp2::square(v3, x.a_);
-            Fp2::sub(v4, x.a_, x.b_);
-            v4 += x.c_;
-            Fp2::add(v5, x.b_, x.b_);
-            Fp2::mul(v5, v5, x.c_);
-            Fp2::square(v4, v4);
-            Fp2::mul_xi(z.a_, v5);
-            z.a_ += v3;
-            z.c_ += v4;
-            z.c_ += v5;
-            z.c_ -= v3;
+            z.data = x.data.square();
         }
 
         void inverse() {
-            Fp6T z;
-            Fp2 t0, t1, t2, t4, t5;
-            Fp2::mul(t0, b_, c_);
-            Fp2::mul_xi(z.a_, t0);
-            Fp2::square(t0, a_);
-            Fp2::sub(z.a_, t0, z.a_);
-            Fp2::square(t1, b_);
-            Fp2::mul(t5, a_, c_);
-            Fp2::sub(z.c_, t1, t5);
-            Fp2::square(t2, c_);
-            Fp2::mul(t4, a_, b_);
-            Fp2::mul_xi(z.b_, t2);
-            z.b_ -= t4;
-            Fp2::mul(t1, a_, z.a_);
-            Fp2::mul(t5, c_, z.b_);
-            Fp2::mul_xi(t4, t5);
-            t1 += t4;
-            Fp2::mul(t5, b_, z.c_);
-            Fp2::mul_xi(t4, t5);
-            t1 += t4;
-            t1.inverse();
-            Fp2::mul(a_, z.a_, t1);
-            Fp2::mul(b_, z.b_, t1);
-            Fp2::mul(c_, z.c_, t1);
+            z.data = x.data.inverse();
         }
 
         bool operator==(const Fp6T &rhs) const {
-            return a_ == rhs.a_ && b_ == rhs.b_ && c_ == rhs.c_;
+            return data = rhs.data;
         }
         bool operator!=(const Fp6T &rhs) const {
             return !operator==(rhs);
@@ -780,7 +700,7 @@ namespace bn {
             t1 = R[1].square();
             // # 2
             t3 = t0 + t0;
-            Fp2::divBy2(t4, t4);
+            t4 = t4.divBy2();
             t5 = t0 + t1;
             // # 3
             t0 += t3;
@@ -795,21 +715,21 @@ namespace bn {
                 t2.b_ = t0.a_;
             } else {
                 // (a + bu) * binv_xi
-                Fp2::mul(t2, t0, ParamT<Fp2>::b_invxi);
+                t2 = t0 * ParamT<Fp2>::b_invxi;
             }
             // # 5
             t0 = R[0].square();
             t3 = t2 + t2;
             // ## 6
             t3 += t2;
-            Fp2::addNC(l.c_, t0, t0);
+            l.c_ = addNC(t0, t0);
             // ## 7
             R[0] = t1 - t3;
-            Fp2::addNC(l.c_, l.c_, t0);
+            l.c_ = addNC(l.c_, t0);
             t3 += t1;
             // # 8
             R[0] *= t4;
-            Fp2::divBy2(t3, t3);
+            t3 = t3.divBy2();
             // ## 9
             Fp2Dbl::square(T0, t3);
             Fp2Dbl::square(T1, t2);
@@ -833,9 +753,10 @@ namespace bn {
             l.b_ = -t3;
         }
         static void mulFp6_24_Fp_01(Fp6T &l, const Fp *P) {
-            Fp2::mul_Fp_0(l.c_, l.c_, P[0]);
-            Fp2::mul_Fp_0(l.b_, l.b_, P[1]);
+            l.c_ = l.c_.mul_Fp_0(P[0]);
+            l.b_ = l.b_.mul_Fp_0(P[1]);
         }
+        
         static void pointDblLineEvalC(Fp6T &l, Fp2 *R, const Fp *P) {
             pointDblLineEvalWithoutP(l, R);
             // # 16, #17

@@ -84,6 +84,10 @@ namespace nil {
                 return {data[0] - B.data[0], data[1] - B.data[1], data[2] - B.data[2]};
             }
 
+            value_type operator-() const {
+                return zero()-data;
+            }
+            
             value_type operator*(const value_type &B) const {
                 const underlying_type A0B0 = data[0] * B.data[0], A1B1 = data[1] * B.data[1], A2B2 = data[2] * B.data[2];
 
