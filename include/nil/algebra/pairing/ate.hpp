@@ -353,26 +353,21 @@ namespace bn {
         static void (*divBy2)(Fp2T &z, const Fp2T &x);
 
         static inline void addC(Fp2T &z, const Fp2T &x, const Fp2T &y) {
-            z.a_ = x.a_ + y.a_;
-            z.b_ = x.b_ + y.b_;
+            z.data = x.data + y.data;
         }
         static inline void addNC_C(Fp2T &z, const Fp2T &x, const Fp2T &y) {
-            z.a_ = addNC(x.a_, y.a_);
-            z.b_ = addNC(x.b_, y.b_);
+            z.data = addNC(x.data, y.data);
         }
 
         static inline void subNC_C(Fp2T &z, const Fp2T &x, const Fp2T &y) {
-            z.a_ = subNC(x.a_, y.a_);
-            z.b_ = subNC(x.b_, y.b_);
+            z.data = subNC(x.data, y.data);
         }
 
         static inline void subC(Fp2T &z, const Fp2T &x, const Fp2T &y) {
-            z.a_ = x.a_ - y.a_;
-            z.b_ = x.b_ - y.b_;
+            z.data = x.data - y.data;
         }
         static inline void neg(Fp2T &z, const Fp2T &x) {
-            z.a_ = -x.a_;
-            z.b_ = -x.b_;
+            z.data = -x.data;
         }
 
         /*
@@ -382,18 +377,7 @@ namespace bn {
             7p < N then 7(p-1)(p-1) < pN
         */
         static inline void mulC(Fp2T &z, const Fp2T &x, const Fp2T &y) {
-            typename Fp::Dbl d[3];
-            Fp s, t;
-            s = addNC(x.a_, y.a_);               // a + b
-            t = addNC(x.b_, y.b_);               // c + d
-            Fp::Dbl::mul(d[0], s, t);            // (a + b)(c + d)
-            Fp::Dbl::mul(d[1], x.a_, y.a_);      // ac
-            Fp::Dbl::mul(d[2], x.b_, y.b_);      // bd
-            Fp::Dbl::subNC(d[0], d[0], d[1]);    // (a + b)(c + d) - ac
-            Fp::Dbl::subNC(d[0], d[0], d[2]);    // (a + b)(c + d) - ac - bd
-            Fp::Dbl::mod(z.b_, d[0]);            // set z[1]
-            Fp::Dbl::sub(d[1], d[1], d[2]);      // ac - bd
-            Fp::Dbl::mod(z.a_, d[1]);            // set z[0]
+            z.data = x.data * y.data;
         }
 
         static inline void divBy2C(Fp2T &z, const Fp2T &x) {
@@ -433,31 +417,21 @@ namespace bn {
             (a + bu)^2 = (a - b)(a + b) + 2abu
         */
         static inline void squareC(Fp2T &z, const Fp2T &x) {
-            Fp t, tt;
-            t = x.b_ + x.b_;       // 2b
-            t *= x.a_;                    // 2ab
-            tt = x.a_ - x.b_;      // a - b
-            z.a_ = x.a_ + x.b_;    // a + b
-            z.a_ *= tt;                   // (a - b)(a + b)
-            z.b_ = t;
+            z.data = x.data.square();
         }
 
         /*
             1 / (a + b u) = (a - b u) / (a^2 + b^2)
         */
         void inverse() {
-            
-            t = (b_.square() + a_.square()).inverse();
-            a_ *= t;
-            b_ = b_.inverse() * t;
+            z.data = x.data.inverse();
         }
         void clear() {
-            a_.clear();
-            b_.clear();
+            data.clear();
         }
 
         bool operator==(const Fp2T &rhs) const {
-            return a_ == rhs.a_ && b_ == rhs.b_;
+            return data = rhs.data;
         }
         bool operator!=(const Fp2T &rhs) const {
             return !operator==(rhs);
@@ -645,63 +619,6 @@ namespace bn {
             }
         };
     };
-
-    template<class Fp>
-    void (*Fp2T<Fp>::add)(Fp2T<Fp> &out, const Fp2T<Fp> &x, const Fp2T<Fp> &y) = &(Fp2T<Fp>::addC);
-
-    template<class Fp>
-    void (*Fp2T<Fp>::addNC)(Fp2T<Fp> &out, const Fp2T<Fp> &x, const Fp2T<Fp> &y) = &(Fp2T<Fp>::addNC_C);
-
-    template<class Fp>
-    void (*Fp2T<Fp>::sub)(Fp2T<Fp> &out, const Fp2T<Fp> &x, const Fp2T<Fp> &y) = &(Fp2T<Fp>::subC);
-
-    template<class Fp>
-    void (*Fp2T<Fp>::subNC)(Fp2T<Fp> &out, const Fp2T<Fp> &x, const Fp2T<Fp> &y) = &(Fp2T<Fp>::subNC_C);
-
-    template<class Fp>
-    void (*Fp2T<Fp>::mul)(Fp2T<Fp> &out, const Fp2T<Fp> &x, const Fp2T<Fp> &y) = &(Fp2T<Fp>::mulC);
-
-    template<class Fp>
-    void (*Fp2T<Fp>::mul_xi)(Fp2T<Fp> &out, const Fp2T<Fp> &x) = &(Fp2T<Fp>::mul_xiC);
-
-    template<class Fp>
-    void (*Fp2T<Fp>::square)(Fp2T<Fp> &out, const Fp2T<Fp> &x) = &(Fp2T<Fp>::squareC);
-
-    template<class Fp>
-    void (*Fp2T<Fp>::mul_Fp_0)(Fp2T<Fp> &z, const Fp2T<Fp> &x, const Fp &y) = &(Fp2T<Fp>::mul_Fp_0C);
-
-    template<class Fp>
-    void (*Fp2T<Fp>::divBy2)(Fp2T<Fp> &out, const Fp2T<Fp> &x) = &(Fp2T<Fp>::divBy2C);
-
-    template<class Fp>
-    typename Fp2T<Fp>::Dbl::bin_op *Fp2T<Fp>::Dbl::add = &(Fp2T<Fp>::Dbl::addC);
-
-    template<class Fp>
-    typename Fp2T<Fp>::Dbl::bin_op *Fp2T<Fp>::Dbl::addNC = &(Fp2T<Fp>::Dbl::addNC_C);
-
-    template<class Fp>
-    typename Fp2T<Fp>::Dbl::uni_op *Fp2T<Fp>::Dbl::neg = &(Fp2T<Fp>::Dbl::negC);
-
-    template<class Fp>
-    typename Fp2T<Fp>::Dbl::bin_op *Fp2T<Fp>::Dbl::sub = &(Fp2T<Fp>::Dbl::subC);
-
-    template<class Fp>
-    typename Fp2T<Fp>::Dbl::bin_op *Fp2T<Fp>::Dbl::subNC = &(Fp2T<Fp>::Dbl::subNC_C);
-
-    template<class Fp>
-    typename Fp2T<Fp>::Dbl::uni_op *Fp2T<Fp>::Dbl::mul_xi = &(Fp2T<Fp>::Dbl::mul_xiC);
-
-    template<class Fp>
-    void (*Fp2T<Fp>::Dbl::mulOpt1)(Dbl &, const Fp2T &, const Fp2T &) = &(Fp2T<Fp>::Dbl::mulOpt1C);
-
-    template<class Fp>
-    void (*Fp2T<Fp>::Dbl::mulOpt2)(Dbl &, const Fp2T &, const Fp2T &) = &(Fp2T<Fp>::Dbl::mulOpt2C);
-
-    template<class Fp>
-    void (*Fp2T<Fp>::Dbl::square)(Dbl &, const Fp2T &) = &(Fp2T<Fp>::Dbl::squareC);
-
-    template<class Fp>
-    void (*Fp2T<Fp>::Dbl::mod)(Fp2T &, const Dbl &) = &(Fp2T<Fp>::Dbl::modC);
 
     /*
         Fp6T = Fp2[v] / (v^3 - Xi), Xi = -u - 1
@@ -1141,28 +1058,6 @@ namespace bn {
             }
         };
     };
-
-    template<class Fp2>
-    void (*Fp6T<Fp2>::add)(Fp6T<Fp2> &z, const Fp6T<Fp2> &x, const Fp6T<Fp2> &y) = &(Fp6T<Fp2>::addC);
-
-    template<class Fp2>
-    void (*Fp6T<Fp2>::sub)(Fp6T<Fp2> &z, const Fp6T<Fp2> &x, const Fp6T<Fp2> &y) = &(Fp6T<Fp2>::subC);
-
-    template<class Fp2>
-    void (*Fp6T<Fp2>::mul)(Fp6T<Fp2> &z, const Fp6T<Fp2> &x, const Fp6T<Fp2> &y) = &(Fp6T<Fp2>::mulC);
-
-    template<class Fp2>
-    void (*Fp6T<Fp2>::pointDblLineEval)(Fp6T<Fp2> &z, Fp2 *x,
-                                        const typename Fp2::Fp *y) = &(Fp6T<Fp2>::pointDblLineEvalC);
-
-    template<class Fp2>
-    void (*Fp6T<Fp2>::pointDblLineEvalWithoutP)(Fp6T<Fp2> &z, Fp2 *x) = &(Fp6T<Fp2>::pointDblLineEvalWithoutPC);
-
-    template<class Fp2>
-    void (*Fp6T<Fp2>::Dbl::mul)(Dbl &z, const Fp6T &x, const Fp6T &y) = &(Fp6T<Fp2>::Dbl::mulC);
-
-    template<class Fp2>
-    struct CompressT;
 
     /*
         Fp12T = Fp6[w] / (w^2 - v)
