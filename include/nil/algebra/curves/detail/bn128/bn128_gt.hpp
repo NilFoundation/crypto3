@@ -25,18 +25,22 @@ namespace nil {
         using modulus_type = params_type<ModulusBits, GeneratorBits>::modulus_type;
 
         template <typename ModulusBits, typename GeneratorBits>
-        using fp2_type = fp2<ModulusBits, GeneratorBits>;
+        using fp12_type = fp12<ModulusBits, GeneratorBits>;
 
         template <typename ModulusBits, typename GeneratorBits>
-        using value_type = element<fp2_type<ModulusBits, GeneratorBits>>;
+        using value_type = element<fp12_type<ModulusBits, GeneratorBits>>;
 
         struct bn128_GT {
-            static bn128_GT GT_one;
             value_type elem;
 
             bn128_GT() {
                 elem.clear();
             }
+
+            bn128_GT(value_type X){
+                elem = 1;
+            }
+
             bool operator==(const bn128_GT &other) const {
                 return (elem == other.elem);
             }

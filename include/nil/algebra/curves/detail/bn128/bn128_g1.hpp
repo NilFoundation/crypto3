@@ -35,10 +35,11 @@ namespace nil {
 
         struct bn128_G1 {
 
-            value_type coord[3];
-
-            typedef bn128_Fq base_field;
-            typedef bn128_Fr scalar_field;
+            bn128_G1(value_type X, value_type Y, value_type Z){
+                coord[0] = X;
+                coord[1] = Y;
+                coord[2] = Z;
+            }
 
             void to_affine_coordinates() {
                 if (is_zero()) {
@@ -241,11 +242,11 @@ namespace nil {
             }
 
             static bn128_G1 zero() {
-                return G1_zero;
+                return bn128_G1(1,1,0);
             }
 
             static bn128_G1 one() {
-                return G1_one;
+                return bn128_G1(1,2,1);
             }
 
             template<typename NumberType>
@@ -284,6 +285,18 @@ namespace nil {
             static value_type sqrt(const value_type &el) {
                 return el.sqrt();
             }
+
+            value_type coord[3];
+
+            typedef bn128_Fq base_field;
+            typedef bn128_Fr scalar_field;
+
+            /* additional parameters for square roots in Fq */
+            value_type bn128_coeff_b = value_type(3);
+            size_t bn128_Fq_s = 1;
+            value_type bn128_Fq_nqr_to_t = value_type(21888242871839275222246405745257275088696311157297823662689037894645226208582);
+            mie::Vuint bn128_Fq_t_minus_1_over_2 = mie::Vuint("5472060717959818805561601436314318772174077789324455915672259473661306552145");
+
         };
 
         template<typename NumberType>

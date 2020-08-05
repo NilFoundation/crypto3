@@ -41,6 +41,12 @@ namespace nil {
                 coord[2] = G2_zero.coord[2];
             }
 
+            bn128_G2(value_type X, value_type Y, value_type Z){
+                coord[0] = X;
+                coord[1] = Y;
+                coord[2] = Z;
+            }
+
             void to_affine_coordinates() {
                 if (is_zero()) {
                     coord[0] = 0;
@@ -241,11 +247,16 @@ namespace nil {
             }
 
             static bn128_G2 zero() {
-                return G2_zero;
+                return bn128_G2({1,0},{1,0},{0,0});
             }
 
             static bn128_G2 one() {
-                return G2_one;
+                return bn128_G2(
+                    {15267802884793550383558706039165621050290089775961208824303765753922461897946, 
+                        9034493566019742339402378670461897774509967669562610788113215988055021632533},
+                    {644888581738283025171396578091639672120333224302184904896215738366765861164,
+                        20532875081203448695448744255224543661959516361327385779878476709582931298750},
+                    {1,0});
             }
 
             template<typename NumberType>
@@ -285,13 +296,21 @@ namespace nil {
                 return el.sqrt();
             }
 
-            static bn128_G2 G2_zero;
-            static bn128_G2 G2_one;
-
             value_type coord[3];
 
             typedef bn128_Fq base_field;
             typedef bn128_Fr scalar_field;
+
+            /* additional parameters for square roots in Fq2 */
+            value_type bn128_twist_coeff_b = value_type({19485874751759354771024239261021720505790618469301721065564631296452457478373,
+                        266929791119991161246907387137283842545076965332900288569378510910307636690});
+            size_t bn128_Fq2_s = 4;
+            value_type bn128_Fq2_nqr_to_t = value_type({5033503716262624267312492558379982687175200734934877598599011485707452665730,
+                        314498342015008975724433667930697407966947188435857772134235984660852259084});
+            mie::Vuint bn128_Fq2_t_minus_1_over_2 = mie::Vuint(
+                "14971724250519463826312126413021210649976634891596900701138993820439690427699319920245032869357433"
+                "49909963"
+                "2259837909383182382988566862092145199781964621");
         };
 
         template<typename NumberType>
