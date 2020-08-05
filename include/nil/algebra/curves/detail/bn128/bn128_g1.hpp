@@ -35,6 +35,8 @@ namespace nil {
 
         struct bn128_G1 {
 
+            bn128_G1():bn128_G1(value_type::one(),value_type::one(),value_type::zero()){};
+
             bn128_G1(value_type X, value_type Y, value_type Z){
                 coord[0] = X;
                 coord[1] = Y;
@@ -43,9 +45,9 @@ namespace nil {
 
             void to_affine_coordinates() {
                 if (is_zero()) {
-                    coord[0] = 0;
-                    coord[1] = 1;
-                    coord[2] = 0;
+                    coord[0] = value_type::zero();
+                    coord[1] = value_type::one();
+                    coord[2] = value_type::zero();
                 } else {
                     value_type r;
                     r = coord[2];
@@ -242,7 +244,7 @@ namespace nil {
             }
 
             static bn128_G1 zero() {
-                return bn128_G1(1,1,0);
+                return bn128_G1();
             }
 
             static bn128_G1 one() {
@@ -268,8 +270,6 @@ namespace nil {
                 }
                 bn_batch_invert<value_type>(Z_vec);
 
-                const value_type one = 1;
-
                 for (size_t i = 0; i < vec.size(); ++i) {
                     value_type Z2, Z3;
                     Z2 = Z_vec[i].square();
@@ -277,7 +277,7 @@ namespace nil {
 
                     vec[i].coord[0] *=  Z2;
                     vec[i].coord[1] *= Z3;
-                    vec[i].coord[2] = one;
+                    vec[i].coord[2] = value_type::one();
                 }
             }
 

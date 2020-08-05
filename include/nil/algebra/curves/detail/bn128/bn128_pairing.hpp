@@ -39,13 +39,6 @@ namespace nil {
         template <typename ModulusBits, typename GeneratorBits>
         using fp2_value_type = element<fp2_type<ModulusBits, GeneratorBits>>;
 
-        template <typename ModulusBits, typename GeneratorBits>
-        using fp12_type = fp12_2over3over2<ModulusBits, GeneratorBits>;
-
-        template <typename ModulusBits, typename GeneratorBits>
-        using fp12_value_type = element<fp12_type<ModulusBits, GeneratorBits>>;
-
-
         struct bn128_ate_G1_precomp {
             fp_value_type P[3];
 

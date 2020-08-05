@@ -34,11 +34,11 @@ namespace nil {
             value_type elem;
 
             bn128_GT() {
-                elem.clear();
+                elem = value_type::zero();
             }
 
             bn128_GT(value_type X){
-                elem = 1;
+                elem = X;
             }
 
             bool operator==(const bn128_GT &other) const {
@@ -61,7 +61,7 @@ namespace nil {
             }
 
             static bn128_GT one() {
-                return GT_one;
+                return value_type::one();
             }
 
         };
