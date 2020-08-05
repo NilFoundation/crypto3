@@ -15,8 +15,6 @@
 
 #include "zm2.hpp"
 
-//#define BN_SUPPORT_SNARK
-
 #ifdef MIE_ATE_USE_GMP
 #include <gmpxx.h>
 
@@ -77,15 +75,10 @@ namespace bn {
 /*
     the current version supports only the following parameters
 */
-#ifdef BN_SUPPORT_SNARK
     const CurveParam CurveSNARK1 = {4965661367192848881, 3, 9, 1};
 
     // b/xi = 82 / (9 + u) = 9 - u
     const CurveParam CurveSNARK2 = {4965661367192848881, 82, 9, 1};
-#else
-    // b/xi = 2 / (1 - u) = 1 + u
-    const CurveParam CurveFp254BNb = {-((1LL << 62) + (1LL << 55) + (1LL << 0)), 2, 1, 1};
-#endif
 
     namespace util {
 
@@ -199,16 +192,14 @@ namespace bn {
         typedef std::vector<signed char> SignVec;
         static SignVec siTbl;
         static bool useNAF;
-#ifdef BN_SUPPORT_SNARK
+
         static SignVec zReplTbl;
-#endif
+
 
         static inline void init(const CurveParam &cp, int mode = -1, bool useMulx = true) {
-#ifdef BN_SUPPORT_SNARK
+
             bool supported = cp == CurveSNARK1 || cp == CurveSNARK2;
-#else
-            bool supported = cp == CurveFp254BNb;
-#endif
+
             if (!supported) {
                 fprintf(stderr, "not supported parameter\n");
                 exit(1);
@@ -256,16 +247,11 @@ namespace bn {
             i1 = 1;
 
             useNAF = util::getGoodRepl(siTbl, largest_c.abs());
-#ifdef BN_SUPPORT_SNARK
+
             util::getGoodRepl(zReplTbl, z.abs());
-#endif
         }
         static inline void init(int mode = -1, bool useMulx = true) {
-#ifdef BN_SUPPORT_SNARK
             init(CurveSNARK1, mode, useMulx);
-#else
-            init(CurveFp254BNb, mode, useMulx);
-#endif
         }
 
         // y = sum_{i=0}^4 c_i x^i
@@ -319,10 +305,9 @@ namespace bn {
     template<class Fp2>
     bool ParamT<Fp2>::useNAF;
 
-#ifdef BN_SUPPORT_SNARK
     template<class Fp2>
     typename ParamT<Fp2>::SignVec ParamT<Fp2>::zReplTbl;
-#endif
+
 
     /*
         mul_gamma(z, x) + z += y;
@@ -423,7 +408,6 @@ namespace bn {
             Fp::divBy4(z.b_, x.b_);
         }
 
-#ifdef BN_SUPPORT_SNARK
         /*
             XITAG
             u^2 = -1
@@ -444,76 +428,34 @@ namespace bn {
             Fp::add(z.b_, z.b_, x.b_);    // 9
             Fp::add(z.b_, z.b_, x.a_);
         }
-#else
-        /*
-            u^2 = -1
-            xi = 1 + u
-            (a + bu)(1 + u) = (a - b) + (a + b)u
-
-            2 * Fp add/sub
-        */
-        static inline void mul_xiC(Fp2T &z, const Fp2T &x) {
-            assert(&z != &x);
-            Fp::sub(z.a_, x.a_, x.b_);
-            Fp::add(z.b_, x.a_, x.b_);
-        }
-#endif
 
         /*
             (a + bu)^2 = (a - b)(a + b) + 2abu
         */
         static inline void squareC(Fp2T &z, const Fp2T &x) {
-#ifdef BN_SUPPORT_SNARK
             Fp t, tt;
-            Fp::add(t, x.b_, x.b_);       // 2b
+            t = x.b_ + x.b_;       // 2b
             t *= x.a_;                    // 2ab
-            Fp::sub(tt, x.a_, x.b_);      // a - b
-            Fp::add(z.a_, x.a_, x.b_);    // a + b
+            tt = x.a_ - x.b_;      // a - b
+            z.a_ = x.a_ + x.b_;    // a + b
             z.a_ *= tt;                   // (a - b)(a + b)
             z.b_ = t;
-#else
-            Fp t, tt;
-            Fp::addNC(t, x.b_, x.b_);       // 2b
-            t *= x.a_;                      // 2ab
-            Fp::sub(tt, x.a_, x.b_);        // a - b
-            Fp::addNC(z.a_, x.a_, x.a_);    // a + b
-            z.a_ *= tt;                     // (a - b)(a + b)
-            z.b_ = t;
-#endif
         }
 
         /*
             1 / (a + b u) = (a - b u) / (a^2 + b^2)
         */
         void inverse() {
-            Fp t;
-            Fp::mul(t, b_, b_);
-            Fp aa;
-            Fp::mul(aa, a_, a_);
-            t += aa;
-            Fp::inv(t, t);    // 7.5K@i7, 10Kclk@Opteron
+            
+            t = (b_.square() + a_.square()).inverse();
             a_ *= t;
-            Fp::neg(b_, b_);
-            b_ *= t;
+            b_ = b_.inverse() * t;
         }
         void clear() {
             a_.clear();
             b_.clear();
         }
 
-        std::string toString(int base = 10) const {
-            return ("[" + a_.toString(base) + "," + b_.toString(base) + "]");
-        }
-        friend std::ostream &operator<<(std::ostream &os, const Fp2T &x) {
-            return os << x.toString();
-        }
-        friend std::istream &operator>>(std::istream &is, Fp2T &x) {
-            char cl, cm, cr;
-            is >> cl >> x.a_ >> cm >> x.b_ >> cr;
-            if (cl == '[' && cm == ',' && cr == ']')
-                return is;
-            throw std::ios_base::failure("bad Fp2");
-        }
         bool operator==(const Fp2T &rhs) const {
             return a_ == rhs.a_ && b_ == rhs.b_;
         }
@@ -563,13 +505,6 @@ namespace bn {
             enum { SIZE = FpDbl::SIZE * 2 };
 
             FpDbl a_, b_;
-
-            std::string toString(int base = 10) const {
-                return ("[" + a_.toString(base) + "," + b_.toString(base) + "]");
-            }
-            friend inline std::ostream &operator<<(std::ostream &os, const Dbl &x) {
-                return os << x.toString();
-            }
 
             Dbl() {
             }
@@ -652,7 +587,6 @@ namespace bn {
                 FpDbl::subNC(z.b_, x.b_, y.b_);
             }
 
-#ifdef BN_SUPPORT_SNARK
             /*
                 XITAG
                 u^2 = -1
@@ -673,13 +607,6 @@ namespace bn {
                 FpDbl::add(z.b_, z.b_, x.b_);    // 9
                 FpDbl::add(z.b_, z.b_, x.a_);
             }
-#else
-            static void mul_xiC(Dbl &z, const Dbl &x) {
-                assert(&z != &x);
-                FpDbl::sub(z.a_, x.a_, x.b_);
-                FpDbl::add(z.b_, x.b_, x.a_);
-            }
-#endif
 
             static void mulOptC(Dbl &z, const Fp2T &x, const Fp2T &y, int mode) {
                 FpDbl d0;
@@ -910,16 +837,6 @@ namespace bn {
         bool operator!=(const Fp6T &rhs) const {
             return !operator==(rhs);
         }
-        friend std::ostream &operator<<(std::ostream &os, const Fp6T &x) {
-            return os << "[" << x.a_ << ",\n " << x.b_ << ",\n " << x.c_ << "]";
-        }
-        friend std::istream &operator>>(std::istream &is, Fp6T &x) {
-            char c1, c2, c3, c4;
-            is >> c1 >> x.a_ >> c2 >> x.b_ >> c3 >> x.c_ >> c4;
-            if (c1 == '[' && c2 == ',' && c3 == ',' && c4 == ']')
-                return is;
-            throw std::ios_base::failure("bad Fp6");
-        }
 
         static void (*add)(Fp6T &z, const Fp6T &x, const Fp6T &y);
         static void (*sub)(Fp6T &z, const Fp6T &x, const Fp6T &y);
@@ -947,17 +864,17 @@ namespace bn {
             // xp, yp = P[0], P[1]
 
             // # 1
-            Fp2::square(t0, R[2]);
-            Fp2::mul(t4, R[0], R[1]);
-            Fp2::square(t1, R[1]);
+            t0, R[2].square();
+            t4 = R[0] * R[1];
+            t1 = R[1].square();
             // # 2
-            Fp2::add(t3, t0, t0);
+            t3 = t0 + t0;
             Fp2::divBy2(t4, t4);
-            Fp2::add(t5, t0, t1);
+            t5 = t0 + t1;
             // # 3
             t0 += t3;
             // # 4
-#ifdef BN_SUPPORT_SNARK
+
             if (ParamT<Fp2>::b == 82) {
                 // (a + bu) * (9 - u) = (9a + b) + (9b - a)u
                 t3.a_ = t0.b_;
@@ -969,19 +886,14 @@ namespace bn {
                 // (a + bu) * binv_xi
                 Fp2::mul(t2, t0, ParamT<Fp2>::b_invxi);
             }
-#else
-            // (a + bu)(1 - u) = (a + b) + (b - a)u
-            Fp::add(t2.a_, t0.a_, t0.b_);
-            Fp::sub(t2.b_, t0.b_, t0.a_);
-#endif
             // # 5
-            Fp2::square(t0, R[0]);
-            Fp2::add(t3, t2, t2);
+            t0 = R[0].square();
+            t3 = t2 + t2;
             // ## 6
             t3 += t2;
             Fp2::addNC(l.c_, t0, t0);
             // ## 7
-            Fp2::sub(R[0], t1, t3);
+            R[0] = t1 - t3;
             Fp2::addNC(l.c_, l.c_, t0);
             t3 += t1;
             // # 8
@@ -992,25 +904,22 @@ namespace bn {
             Fp2Dbl::square(T1, t2);
             // # 10
             Fp2Dbl::addNC(T2, T1, T1);
-            Fp2::add(t3, R[1], R[2]);
+            t3 = R[1] + R[2];
             // # 11
-#ifdef BN_SUPPORT_SNARK
             Fp2Dbl::add(T2, T2, T1);
-#else
-            Fp2Dbl::addNC(T2, T2, T1);
-#endif
-            Fp2::square(t3, t3);
+
+            t3 = t3.square();
             // # 12
             t3 -= t5;
             // # 13
             T0 -= T2;
             // # 14
             Fp2Dbl::mod(R[1], T0);
-            Fp2::mul(R[2], t1, t3);
+            R[2] = t1 * t3;
             t2 -= t1;
             // # 15
             Fp2::mul_xi(l.a_, t2);
-            Fp2::neg(l.b_, t3);
+            l.b_ = -t3;
         }
         static void mulFp6_24_Fp_01(Fp6T &l, const Fp *P) {
             Fp2::mul_Fp_0(l.c_, l.c_, P[0]);
@@ -1034,16 +943,16 @@ namespace bn {
             Fp2 t1, t2, t3, t4;
             Fp2Dbl T1, T2;
             // # 1
-            Fp2::mul(t1, R[2], Q[0]);
-            Fp2::mul(t2, R[2], Q[1]);
+            t1 = R[2] * Q[0];
+            t2 = R[2] * Q[1];
             // # 2
-            Fp2::sub(t1, R[0], t1);
-            Fp2::sub(t2, R[1], t2);
+            t1 = R[0] - t1;
+            t2 = R[1] - t2);
             // # 3
-            Fp2::square(t3, t1);
+            t3 = t1.square();
             // # 4
-            Fp2::mul(R[0], t3, R[0]);
-            Fp2::square(t4, t2);
+            R[0] = t3 * R[0];
+            t4 = t2.square();
             // # 5
             t3 *= t1;
             t4 *= R[2];
@@ -1062,10 +971,10 @@ namespace bn {
             Fp2Dbl::sub(T2, T1, T2);
             // # 12
             Fp2Dbl::mod(R[1], T2);
-            Fp2::mul(R[0], t1, t4);
-            Fp2::mul(R[2], t3, R[2]);
+            R[0] = t1 * t4;
+            R[2] = t3 * R[2];
             // # 14
-            Fp2::neg(l.c_, t2);
+            l.c_ = - t2;
             // # 15
             Fp2Dbl::mulOpt1(T1, t2, Q[0]);
             Fp2Dbl::mulOpt1(T2, t1, Q[1]);
@@ -1096,13 +1005,6 @@ namespace bn {
             enum { SIZE = Fp2Dbl::SIZE * 3 };
 
             Fp2Dbl a_, b_, c_;
-
-            std::string toString(int base = 10) const {
-                return ("[" + a_.toString(base) + ",\n" + b_.toString(base) + ",\n" + c_.toString() + "]");
-            }
-            friend inline std::ostream &operator<<(std::ostream &os, const Dbl &x) {
-                return os << x.toString();
-            }
 
             Dbl() {
             }
@@ -1219,12 +1121,7 @@ namespace bn {
                 FpDbl::subNC(z.c_.b_, z.c_.b_, z.b_.b_);
                 /// c1 except xi * t2 term
                 // # 14, 15
-#ifdef BN_SUPPORT_SNARK
                 Fp2Dbl::mul_xi(z.b_, T2);    // store xi * t2 term
-#else
-                FpDbl::subOpt1(z.b_.a_, T2.a_, T2.b_);
-                FpDbl::add(z.b_.b_, T2.a_, T2.b_);
-#endif
                 // # 16
                 Fp2Dbl::add(z.b_, z.b_, z.c_);
                 // # 17
@@ -1333,16 +1230,6 @@ namespace bn {
         }
         bool operator!=(const Fp12T &rhs) const {
             return !operator==(rhs);
-        }
-        friend std::ostream &operator<<(std::ostream &os, const Fp12T &x) {
-            return os << "[" << x.a_ << ",\n " << x.b_ << "]";
-        }
-        friend std::istream &operator>>(std::istream &is, Fp12T &x) {
-            char c1, c2, c3;
-            is >> c1 >> x.a_ >> c2 >> x.b_ >> c3;
-            if (c1 == '[' && c2 == ',' && c3 == ']')
-                return is;
-            throw std::ios_base::failure("bad Fp12");
         }
         static inline void add(Fp12T &z, const Fp12T &x, const Fp12T &y) {
             Fp6::add(z.a_, x.a_, y.a_);
@@ -1558,15 +1445,10 @@ namespace bn {
             Fp::neg(z.b_.a_.b_, b_.a_.b_);
             Fp::neg(z.b_.b_.b_, b_.b_.b_);
             Fp::neg(z.b_.c_.b_, b_.c_.b_);
-#ifdef BN_SUPPORT_SNARK
+
             z.a_.b_ *= Param::gammar[1];
             z.a_.c_ *= Param::gammar[3];
-#else
-            assert(Param::gammar[1].a_ == 0);
-            assert(Param::gammar[3].b_ == 0);
-            Fp2::mul_Fp_1(z.a_.b_, Param::gammar[1].b_);
-            Fp2::mul_Fp_0(z.a_.c_, z.a_.c_, Param::gammar[3].a_);
-#endif
+
             z.b_.a_ *= Param::gammar[0];
             z.b_.b_ *= Param::gammar[2];
             z.b_.c_ *= Param::gammar[4];
@@ -1614,13 +1496,10 @@ namespace bn {
             Fp::neg(z.b_.b_.b_, b_.b_.b_);
             Fp::neg(z.b_.c_.b_, b_.c_.b_);
 
-#ifdef BN_SUPPORT_SNARK
+
             z.a_.b_ *= Param::gammar3[1];
             z.a_.c_ *= Param::gammar3[3];
-#else
-            z.a_.b_.mul_x();
-            Fp2::mul_Fp_0(z.a_.c_, z.a_.c_, Param::gammar3[3].a_);
-#endif
+
             z.b_.a_ *= Param::gammar3[0];
             z.b_.b_ *= Param::gammar3[2];
             z.b_.c_ *= Param::gammar3[4];
@@ -1653,7 +1532,7 @@ namespace bn {
 
             *this = final_exp(*this)
         */
-#ifdef BN_SUPPORT_SNARK
+
         static void pow_neg_t(Fp12T &out, const Fp12T &in) {
             out = in;
             Fp12T inConj;
@@ -1671,7 +1550,6 @@ namespace bn {
             // invert by conjugation
             Fp6::neg(out.b_, out.b_);
         }
-#endif
 
         void final_exp() {
             Fp12T f, f2z, f6z, f6z2, f12z3;
@@ -1679,7 +1557,6 @@ namespace bn {
             Fp12T &z = *this;
             mapToCyclo(f);
 
-#ifdef BN_SUPPORT_SNARK
             Fp12T::pow_neg_t(f2z, f);
             f2z.sqru();    // f2z = f^(-2*z)
             f2z.sqru(f6z);
@@ -1713,38 +1590,7 @@ namespace bn {
             // q(12*z^3 + 6z^2 + 4z) +
             // (12*z^3 + 12z^2 + 6z + 1))
             // see page 6 in the "Faster hashing to G2" paper
-#else
-            // Hard part starts from here.
-            // Computes addition chain.
-            typedef CompressT<Fp2> Compress;
-            Compress::fixed_power(f2z, f);
-            f2z.sqru();
-            f2z.sqru(f6z);
-            f6z *= f2z;
-            Compress::fixed_power(f6z2, f6z);
-            // A variable a is unnecessary only here.
-            f6z2.sqru(a);
-            Compress::fixed_power(f12z3, a);
-            // It will compute inversion of f2z, thus, conjugation free.
-            Fp6::neg(f6z.b_, f6z.b_);
-            Fp6::neg(f12z3.b_, f12z3.b_);
-            // Computes a and b.
-            Fp12T::mul(a, f12z3, f6z2);
-            a *= f6z;
-            Fp12T::mul(b, a, f2z);
-            // @note f2z, f6z, and f12z are unnecessary from here.
-            // Last part.
-            Fp12T::mul(z, a, f6z2);
-            z *= f;
-            b.Frobenius(f2z);
-            z *= f2z;
-            a.Frobenius2(f2z);
-            z *= f2z;
-            Fp6::neg(f.b_, f.b_);
-            b *= f;
-            b.Frobenius3(f2z);
-            z *= f2z;
-#endif
+
         }
 
         struct Dbl : public mie::local::addsubmul<Dbl, mie::local::hasNegative<Dbl>> {
@@ -1753,13 +1599,6 @@ namespace bn {
             enum { SIZE = Fp6Dbl::SIZE * 2 };
 
             Fp6Dbl a_, b_;
-
-            std::string toString(int base = 10) const {
-                return ("[" + a_.toString(base) + ",\n" + b_.toString(base) + "]");
-            }
-            friend inline std::ostream &operator<<(std::ostream &os, const Dbl &x) {
-                return os << x.toString();
-            }
 
             Dbl() {
             }
@@ -2036,15 +1875,6 @@ namespace bn {
             g3_ = c.g3_;
             g4_ = c.g4_;
             g5_ = c.g5_;
-        }
-
-        friend std::ostream &operator<<(std::ostream &os, const CompressT &x) {
-            os << "C[" << x.g2_ << ",\n"
-               << x.g3_ << ",\n"
-               << x.g4_ << ",\n"
-               << x.g5_ << ",\n"
-               << "]";
-            return os;
         }
 
     private:
@@ -2388,29 +2218,25 @@ namespace bn {
         */
         template<class FF>
         inline void ECAdd(FF *out, const FF *a, const FF *b) {
-            if (a[2].isZero()) {
+            if (a[2].is_zero()) {
                 copy(out, b);
                 return;
             }
-            if (b[2].isZero()) {
+            if (b[2].is_zero()) {
                 copy(out, a);
                 return;
             }
             FF Z1Z1, Z2Z2, U1, U2, t0, S1, t1, S2, H, t2, I, J, t3, r, V, t4, t5;
             FF t6, t7, t8, t9, t10, t11, t12, t13, t14;
-            FF::square(Z1Z1, a[2]);
-            FF::square(Z2Z2, b[2]);
-            FF::mul(U1, a[0], Z2Z2);
-            FF::mul(U2, b[0], Z1Z1);
-            FF::mul(t0, b[2], Z2Z2);
-            FF::mul(S1, a[1], t0);
-            FF::mul(t1, a[2], Z1Z1);
-            FF::mul(S2, b[1], t1);
-            FF::sub(H, U2, U1);
-            FF::sub(t3, S2, S1);
+            Z1Z1 = a[2].square();
+            Z2Z2 = b[2].square();
+            U1 = a[0] * Z2Z2;
+            S1 = a[1] * b[2] * Z2Z2;
+            H = b[0] * Z1Z1 - U1;
+            t3 = b[1] * a[2] * Z1Z1 - S1;
 
-            if (H.isZero()) {
-                if (t3.isZero()) {
+            if (H.is_zero()) {
+                if (t3.is_zero()) {
                     ECDouble(out, a);
                 } else {
                     out[2].clear();
@@ -2418,25 +2244,14 @@ namespace bn {
                 return;
             }
 
-            FF::add(t2, H, H);
-            FF::square(I, t2);
-            FF::mul(J, H, I);
-            FF::add(r, t3, t3);
-            FF::mul(V, U1, I);
-            FF::square(t4, r);
-            FF::add(t5, V, V);
-            FF::sub(t6, t4, J);
-            FF::sub(out[0], t6, t5);
-            FF::sub(t7, V, out[0]);
-            FF::mul(t8, S1, J);
-            FF::add(t9, t8, t8);
-            FF::mul(t10, r, t7);
-            FF::sub(out[1], t10, t9);
-            FF::add(t11, a[2], b[2]);
-            FF::square(t12, t11);
-            FF::sub(t13, t12, Z1Z1);
-            FF::sub(t14, t13, Z2Z2);
-            FF::mul(out[2], t14, H);
+            I = (H + H).square();
+            J = H * I;
+            r = t3 + t3;
+            V = U1 * I;
+            out[0] = r.square() - J - (V + V);
+            t8 = S1 * J;
+            out[1] = r * (V - out[0]) - (t8 + t8);
+            out[2] = ((a[2] + b[2]).square() - Z1Z1 - Z2Z2) * H;
         }
 
         /*
@@ -2513,7 +2328,7 @@ namespace bn {
             typedef Fp2T<Fp> Fp2;
             typedef ParamT<Fp2> Param;
             // applying Q[0] <- P[0]^q
-#ifdef BN_SUPPORT_SNARK
+
             Q[0].a_ = P[0].a_;
             Fp::neg(Q[0].b_, P[0].b_);
 
@@ -2526,44 +2341,27 @@ namespace bn {
 
             // Q[1] *= xi^((p-1)/2)
             Q[1] *= Param::gammar[2];
-#else
-            Q[0].a_ = P[0].a_;
-            Fp::neg(Q[0].b_, P[0].b_);
-            Fp2::mul_Fp_1(Q[0], Param::W2p.b_);
-            Q[1].a_ = P[1].a_;
-            Fp::neg(Q[1].b_, P[1].b_);
-            Q[1] *= Param::W3p;
-#endif
+
         }
 
         template<class Fp>
         void FrobEndOnTwist_2(Fp2T<Fp> *Q, const Fp2T<Fp> *P) {
-#ifdef BN_SUPPORT_SNARK
+
             Fp2T<Fp> scratch[2];
             FrobEndOnTwist_1(scratch, P);
             FrobEndOnTwist_1(Q, scratch);
-#else
-            typedef Fp2T<Fp> Fp2;
-            typedef ParamT<Fp2> Param;
-            Fp2::mul_Fp_0(Q[0], P[0], Param::Z);
-            Fp2::neg(Q[1], P[1]);
-#endif
+
         }
 
         template<class Fp>
         void FrobEndOnTwist_8(Fp2T<Fp> *Q, const Fp2T<Fp> *P) {
-#ifdef BN_SUPPORT_SNARK
+
             Fp2T<Fp> scratch2[2], scratch4[2], scratch6[2];
             FrobEndOnTwist_2(scratch2, P);
             FrobEndOnTwist_2(scratch4, scratch2);
             FrobEndOnTwist_2(scratch6, scratch4);
             FrobEndOnTwist_2(Q, scratch6);
-#else
-            typedef Fp2T<Fp> Fp2;
-            typedef ParamT<Fp2> Param;
-            Fp2::mul_Fp_0(Q[0], P[0], Param::Z);
-            Q[1] = P[1];
-#endif
+
         }
 
     }    // namespace ecop
@@ -2623,15 +2421,10 @@ namespace bn {
         Fp2 Q1[2];
         ecop::FrobEndOnTwist_1(Q1, Q);
         Fp2 Q2[2];
-#ifdef BN_SUPPORT_SNARK
+
         ecop::FrobEndOnTwist_2(Q2, Q);
         Fp2::neg(Q2[1], Q2[1]);
-#else
-        ecop::FrobEndOnTwist_8(Q2, Q);
-        // @memo z < 0
-        Fp6::neg(f.b_, f.b_);
-        Fp2::neg(T[1], T[1]);
-#endif
+
         Fp12 ft;
         Fp6::pointAddLineEval(d, T, Q1, P);          // 5k
         Fp6::pointAddLineEval(e, T, Q2, P);          // 5k
@@ -2685,7 +2478,7 @@ namespace bn {
             T r;
             r = p[2];
             r.inverse();
-            T::square(p[2], r);
+            p[2] = r.square();
             p[0] *= p[2];
             r *= p[2];
             p[1] *= r;
@@ -2764,31 +2557,6 @@ namespace bn {
         }
         bool isZero() const {
             return p[2].isZero();
-        }
-        friend inline std::ostream &operator<<(std::ostream &os, const EcT &self) {
-            if (self.isZero()) {
-                return os << '0';
-            } else {
-                self.normalize();
-                return os << self.p[0].toString(16) << '_' << self.p[1].toString(16);
-            }
-        }
-        friend inline std::istream &operator>>(std::istream &is, EcT &self) {
-            std::string str;
-            is >> str;
-            if (str == "0") {
-                self.clear();
-            } else {
-                self.p[2] = 1;
-                size_t pos = str.find('_');
-                if (pos == std::string::npos) {
-                    throw std::runtime_error("operator>>:bad format");
-                }
-                str[pos] = '\0';
-                self.p[0].set(&str[0]);
-                self.p[1].set(&str[pos + 1]);
-            }
-            return is;
         }
         EcT &operator+=(const EcT &rhs) {
             add(*this, *this, rhs);
@@ -2898,14 +2666,9 @@ namespace bn {
             Fp2 Q1[2];
             bn::ecop::FrobEndOnTwist_1(Q1, Q);
             Fp2 Q2[2];
-#ifdef BN_SUPPORT_SNARK
+
             bn::ecop::FrobEndOnTwist_2(Q2, Q);
             Fp2::neg(Q2[1], Q2[1]);
-#else
-            // @memo z < 0
-            ecop::FrobEndOnTwist_8(Q2, Q);
-            Fp2::neg(T[1], T[1]);
-#endif
 
             Fp6::pointAddLineEvalWithoutP(d, T, Q1);
             coeff.push_back(d);
@@ -2947,10 +2710,6 @@ namespace bn {
                 }
             }
 
-#ifndef BN_SUPPORT_SNARK
-            // @memo z < 0
-            Fp6::neg(f.b_, f.b_);
-#endif
             Fp12 ft;
 
             d = Qcoeff[idx];
@@ -2961,7 +2720,7 @@ namespace bn {
             Fp6::mulFp6_24_Fp_01(e, precP);
 
             Fp12::Dbl::mul_Fp2_024_Fp2_024(ft, d, e);
-            Fp12::mul(f, f, ft);
+            f *= ft;
         }
 
         inline void millerLoop2(Fp12 &f, const std::vector<Fp6> &Q1coeff, const Fp precP1[2],
@@ -3011,11 +2770,6 @@ namespace bn {
                 }
             }
 
-#ifndef BN_SUPPORT_SNARK
-            // @memo z < 0
-            Fp6::neg(f.b_, f.b_);
-#endif
-
             d1 = Q1coeff[idx];
             Fp6::mulFp6_24_Fp_01(d1, precP1);
 
@@ -3031,8 +2785,8 @@ namespace bn {
 
             Fp12::Dbl::mul_Fp2_024_Fp2_024(f1, d1, e1);
             Fp12::Dbl::mul_Fp2_024_Fp2_024(f2, d2, e2);
-            Fp12::mul(f, f, f1);
-            Fp12::mul(f, f, f2);
+            f *= f1;
+            f *= f2;
         }
 
     }    // namespace components
