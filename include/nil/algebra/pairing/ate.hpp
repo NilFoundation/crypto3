@@ -331,21 +331,16 @@ namespace bn {
     template<class T>
     struct Fp2T : public mie::local::addsubmul<Fp2T<T>, mie::local::hasNegative<Fp2T<T>>> {
         typedef T Fp;
-        Fp a_, b_;
-        Fp2T() {
-        }
-        Fp2T(int x) : a_(x), b_(0) {
-        }
-        Fp2T(const Fp &a, const Fp &b) : a_(a), b_(b) {
-        }
-        Fp *get() {
-            return &a_;
-        }
-        const Fp *get() const {
-            return &a_;
-        }
-        bool isZero() const {
-            return a_.isZero() && b_.isZero();
+        
+        fp2_value_type data;
+
+        Fp2T() : fp2_value_type();
+        Fp2T(int x) : data({x, 0});
+
+        Fp2T(const Fp &a, const Fp &b) : data({a,b});
+
+        bool is_zero() const {
+            return data.is_zero();
         }
         static void (*add)(Fp2T &z, const Fp2T &x, const Fp2T &y);
         static void (*addNC)(Fp2T &z, const Fp2T &x, const Fp2T &y);
@@ -483,7 +478,7 @@ namespace bn {
         void mul_x() {
             Fp t = b_;
             b_ = a_;
-            Fp::neg(a_, t);
+            a_ = -t;
         }
 
         /*
@@ -494,10 +489,8 @@ namespace bn {
             1 * Fp neg
         */
         static inline void mul_Fp_1(Fp2T &z, const Fp &y_b) {
-            Fp t;
-            Fp::mul(t, z.b_, y_b);
-            Fp::mul(z.b_, z.a_, y_b);
-            Fp::neg(z.a_, t);
+            z.b_ = z.a_ * y_b;
+            z.a_ = - (z.b_ * y_b);
         }
 
         struct Dbl : public mie::local::addsubmul<Dbl, mie::local::hasNegative<Dbl>> {
@@ -535,8 +528,8 @@ namespace bn {
                 a_.clear();
                 b_.clear();
             }
-            bool isZero() const {
-                return a_.isZero() && b_.isZero();
+            bool is_zero() const {
+                return a_.is_zero() && b_.is_zero();
             }
 
             friend inline bool operator==(const Dbl &x, const Dbl &y) {
@@ -637,11 +630,12 @@ namespace bn {
 
             static void squareC(Dbl &z, const Fp2T &x) {
                 Fp t0, t1;
-                Fp::addNC(t0, x.b_, x.b_);
+                t0 = addNC(x.b_, x.b_);
                 FpDbl::mul(z.b_, t0, x.a_);
-                Fp::addNC(t1, x.a_, Fp::getDirectP(1));    // RRR
-                Fp::subNC(t1, t1, x.b_);
-                Fp::addNC(t0, x.a_, x.b_);
+
+                t1 = addNC(x.a_, Fp::getDirectP(1));       // RRR
+                t1 = subNC(t1, x.b_);
+                t0 = addNC(x.a_, x.b_);
                 FpDbl::mul(z.a_, t0, t1);
             }
 
@@ -752,24 +746,24 @@ namespace bn {
             b_ = v1;
             c_ = v2;
         }
-        bool isZero() const {
-            return a_.isZero() && b_.isZero() && c_.isZero();
+        bool is_zero() const {
+            return a_.is_zero() && b_.is_zero() && c_.is_zero();
         }
 
         static inline void addC(Fp6T &z, const Fp6T &x, const Fp6T &y) {
-            Fp2::add(z.a_, x.a_, y.a_);
-            Fp2::add(z.b_, x.b_, y.b_);
-            Fp2::add(z.c_, x.c_, y.c_);
+            z.a_ = x.a_ + y.a_;
+            z.b_ = x.b_ + y.b_;
+            z.c_ = x.c_ + y.c_;
         }
         static inline void subC(Fp6T &z, const Fp6T &x, const Fp6T &y) {
-            Fp2::sub(z.a_, x.a_, y.a_);
-            Fp2::sub(z.b_, x.b_, y.b_);
-            Fp2::sub(z.c_, x.c_, y.c_);
+            z.a_ = x.a_ - y.a_;
+            z.b_ = x.b_ - y.b_;
+            z.c_ = x.c_ - y.c_;
         }
         static inline void neg(Fp6T &z, const Fp6T &x) {
-            Fp2::neg(z.a_, x.a_);
-            Fp2::neg(z.b_, x.b_);
-            Fp2::neg(z.c_, x.c_);
+            z.a_ = -x.a_;
+            z.b_ = -x.b_;
+            z.c_ = -x.c_;
         }
 
         // 2120clk x 128
@@ -1037,8 +1031,8 @@ namespace bn {
             const Fp2Dbl *get() const {
                 return &a_;
             }
-            bool isZero() const {
-                return a_.isZero() && b_.isZero() && c_.isZero();
+            bool is_zero() const {
+                return a_.is_zero() && b_.is_zero() && c_.is_zero();
             }
 
             friend inline bool operator==(const Dbl &x, const Dbl &y) {
@@ -1222,8 +1216,8 @@ namespace bn {
             b_.set(v3, v4, v5);
         }
 
-        bool isZero() const {
-            return a_.isZero() && b_.isZero();
+        bool is_zero() const {
+            return a_.is_zero() && b_.is_zero();
         }
         bool operator==(const Fp12T &rhs) const {
             return a_ == rhs.a_ && b_ == rhs.b_;
@@ -1621,8 +1615,8 @@ namespace bn {
             const Fp6Dbl *get() const {
                 return &a_;
             }
-            bool isZero() const {
-                return a_.isZero() && b_.isZero();
+            bool is_zero() const {
+                return a_.is_zero() && b_.is_zero();
             }
 
             friend inline bool operator==(const Dbl &x, const Dbl &y) {
@@ -1881,7 +1875,7 @@ namespace bn {
         void decompressBeforeInv(Fp2 &nume, Fp2 &denomi) const {
             assert(&nume != &denomi);
 
-            if (g2_.isZero()) {
+            if (g2_.is_zero()) {
                 Fp2::add(nume, g4_, g4_);
                 nume *= g5_;
                 denomi = g3_;
@@ -2473,7 +2467,7 @@ namespace bn {
             set(x, y, z, verify);
         }
         void normalize() const {
-            if (isZero() || p[2] == 1)
+            if (is_zero() || p[2] == 1)
                 return;
             T r;
             r = p[2];
@@ -2543,20 +2537,20 @@ namespace bn {
         bool operator==(const EcT &rhs) const {
             normalize();
             rhs.normalize();
-            if (isZero()) {
-                if (rhs.isZero())
+            if (is_zero()) {
+                if (rhs.is_zero())
                     return true;
                 return false;
             }
-            if (rhs.isZero())
+            if (rhs.is_zero())
                 return false;
             return p[0] == rhs.p[0] && p[1] == rhs.p[1];
         }
         bool operator!=(const EcT &rhs) const {
             return !operator==(rhs);
         }
-        bool isZero() const {
-            return p[2].isZero();
+        bool is_zero() const {
+            return p[2].is_zero();
         }
         EcT &operator+=(const EcT &rhs) {
             add(*this, *this, rhs);
@@ -2599,7 +2593,7 @@ namespace bn {
     inline void opt_atePairing(Fp12 &f, const Ec2 &Q, const Ec1 &P) {
         Q.normalize();
         P.normalize();
-        if (Q.isZero() || P.isZero()) {
+        if (Q.is_zero() || P.is_zero()) {
             f = 1;
             return;
         }

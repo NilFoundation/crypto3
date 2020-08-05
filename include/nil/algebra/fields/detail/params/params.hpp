@@ -38,7 +38,7 @@ namespace nil {
 
             template<typename FieldType>
             struct arithmetic_params : public basic_params<FieldType> {
-                constexpr static const number_type euler = (modulus - 1) / 2;
+                constexpr static const number_type q = (modulus - 1) / 2;
             };
 
         }    // namespace detail
