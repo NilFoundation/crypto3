@@ -45,9 +45,9 @@ namespace nil {
 
             void to_affine_coordinates() {
                 if (is_zero()) {
-                    coord[0] = 0;
-                    coord[1] = 1;
-                    coord[2] = 0;
+                    coord[0] = value_type::zero();
+                    coord[1] = value_type::one();
+                    coord[2] = value_type::zero();
                 } else {
                     value_type r;
                     r = coord[2];
@@ -56,7 +56,7 @@ namespace nil {
                     coord[0] *= coord[2];
                     r *= coord[2];
                     coord[1] *= r;
-                    coord[2] = 1;
+                    coord[2] = value_type::one();
                 }
             }
 
@@ -65,14 +65,14 @@ namespace nil {
             }
 
             bool is_special() const {
-                return (is_zero() || coord[2] == 1);
+                return (is_zero() || coord[2].is_one());
             }
 
             bool is_zero() const {
                 return coord[2].is_zero();
             }
 
-            bool operator==(const bn128_G2 &other) const {
+            bool operator==(const bn128_G1 &other) const {
                 if (is_zero()) {
                     return other.is_zero();
                 }
@@ -83,23 +83,11 @@ namespace nil {
 
                 /* now neither is O */
 
-                value_type Z1sq, Z2sq, lhs, rhs;
-                Z1sq = coord[2].square();
-                Z2sq = other.coord[2].square();
-                lhs = Z2sq * coord[0];
-                rhs = Z1sq * other.coord[0];
+                value_type Z1sq = coord[2].square();
+                value_type Z2sq = other.coord[2].square();
 
-                if (lhs != rhs) {
-                    return false;
-                }
-
-                value_type Z1cubed, Z2cubed;
-                Z1cubed = Z1sq * coord[2];
-                Z2cubed = Z2sq * other.coord[2];
-                lhs = Z2cubed * coord[1];
-                rhs = Z1cubed * other.coord[1];
-
-                return (lhs == rhs);
+                return (Z2sq * coord[0] == Z1sq * other.coord[0]) && 
+                            (Z2sq * other.coord[2] * coord[1] == Z1sq * coord[2] * other.coord[1]);
             }
 
             bool operator!=(const bn128_G2 &other) const {
@@ -229,14 +217,14 @@ namespace nil {
                       y^2 = x^3 + b z^6
                     */
                     value_type X2, Y2, Z2;
-                    square(X2, coord[0]);
-                    square(Y2, coord[1]);
-                    square(Z2, coord[2]);
+                    X2 = coord[0].square();
+                    Y2 = coord[1].square();
+                    Z2 = coord[2].square();
 
                     value_type X3, Z3, Z6;
-                    mul(X3, X2, coord[0]);
-                    mul(Z3, Z2, coord[2]);
-                    square(Z6, Z3);
+                    X3 = X2 * coord[0];
+                    Z3 = Z2 * coord[2];
+                    Z6 = Z3.square();
 
                     return (Y2 == X3 + bn128_twist_coeff_b * Z6);
                 }
@@ -298,13 +286,6 @@ namespace nil {
             /* additional parameters for square roots in Fq2 */
             value_type bn128_twist_coeff_b = value_type({19485874751759354771024239261021720505790618469301721065564631296452457478373,
                         266929791119991161246907387137283842545076965332900288569378510910307636690});
-            size_t bn128_Fq2_s = 4;
-            value_type bn128_Fq2_nqr_to_t = value_type({5033503716262624267312492558379982687175200734934877598599011485707452665730,
-                        314498342015008975724433667930697407966947188435857772134235984660852259084});
-            mie::Vuint bn128_Fq2_t_minus_1_over_2 = mie::Vuint(
-                "14971724250519463826312126413021210649976634891596900701138993820439690427699319920245032869357433"
-                "49909963"
-                "2259837909383182382988566862092145199781964621");
         };
 
         template<typename NumberType>
