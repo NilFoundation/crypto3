@@ -171,22 +171,28 @@ namespace bn {
     template<class Fp2>
     struct ParamT {
         typedef typename Fp2::Fp Fp;
+
+        using fp_value_type = Fp;
+        using fp2_value_type = Fp2;
+
+        using ?? = number_type;
+
         static mie::Vsint z;
         static mie::Vuint p;
         static mie::Vuint r;
         static mie::Vuint t;         /* trace of Frobenius */
         static mie::Vsint largest_c; /* 6z + 2, the largest coefficient of short vector */
-        static Fp Z;
-        static Fp2 W2p;
-        static Fp2 W3p;
-        static Fp2 gammar[5];
-        static Fp2 gammar2[5];
-        static Fp2 gammar3[5];
-        static Fp i0;    // 0
-        static Fp i1;    // 1
+        static fp_value_type Z;
+        static fp2_value_type W2p;
+        static fp2_value_type W3p;
+        static fp2_value_type gammar[5];
+        static fp2_value_type gammar2[5];
+        static fp2_value_type gammar3[5];
+        static fp_value_type i0;    // 0
+        static fp_value_type i1;    // 1
         static int b;
-        static Fp2 b_invxi;    // b/xi of twist E' : Y^2 = X^3 + b/xi
-        static Fp half;
+        static fp2_value_type b_invxi;    // b/xi of twist E' : Y^2 = X^3 + b/xi
+        static fp_value_type half;
 
         // Loop parameter for the Miller loop part of opt. ate pairing.
         typedef std::vector<signed char> SignVec;
@@ -198,21 +204,17 @@ namespace bn {
 
         static inline void init(const CurveParam &cp, int mode = -1, bool useMulx = true) {
 
-            bool supported = cp == CurveSNARK1 || cp == CurveSNARK2;
+            //bool supported = cp == CurveSNARK1 || cp == CurveSNARK2;
 
-            if (!supported) {
-                fprintf(stderr, "not supported parameter\n");
-                exit(1);
-            }
             mie::zmInit();
             const int64_t org_z = cp.z;    // NOTE: hard-coded Fp12::pow_neg_t too.
-            const int pCoff[] = {1, 6, 24, 36, 36};
-            const int rCoff[] = {1, 6, 18, 36, 36};
-            const int tCoff[] = {1, 0, 6, 0, 0};
+            
             z.set(org_z);
-            eval(p, z, pCoff);
-            eval(r, z, rCoff);
-            eval(t, z, tCoff);
+
+            const number_type p = 21888242871839275222246405745257275088696311157297823662689037894645226208583_cppui254;
+            const number_type r = 21888242871839275222246405745257275088548364400416034343698204186575808495617_cppui254;
+            const number_type r = 147946756881789318990833708069417712967_cppui128;
+            
             largest_c = 6 * z + 2;
             b = cp.b;    // set b before calling Fp::setModulo
             Fp::setModulo(p, mode, useMulx);
@@ -220,10 +222,9 @@ namespace bn {
             /*
                 b_invxi = b / xi
             */
-            Fp2 xi(cp.xi_a, cp.xi_b);
-            b_invxi = xi;
-            b_invxi.inverse();
-            b_invxi *= Fp2(b, 0);
+            fp2_value_type xi({cp.xi_a, cp.xi_b});
+            b_invxi = xi.inverse() * fp2_value({b, 0});
+
             gammar[0] = mie::power(xi, (p - 1) / 6);
 
             for (size_t i = 1; i < sizeof(gammar) / sizeof(*gammar); ++i) {
@@ -240,9 +241,11 @@ namespace bn {
 
             W2p = mie::power(xi, (p - 1) / 3);
             W3p = mie::power(xi, (p - 1) / 2);
-            Fp2 temp = mie::power(xi, (p * p - 1) / 6);
-            assert(temp.b_.isZero());
-            Fp::square(Z, -temp.a_);
+            fp2_value_type temp = mie::power(xi, (p * p - 1) / 6);
+            assert(temp.b_.is_zero());
+
+            Z = (-temp.a_).square();
+
             i0 = 0;
             i1 = 1;
 
@@ -355,26 +358,26 @@ namespace bn {
         static void (*divBy2)(Fp2T &z, const Fp2T &x);
 
         static inline void addC(Fp2T &z, const Fp2T &x, const Fp2T &y) {
-            Fp::add(z.a_, x.a_, y.a_);
-            Fp::add(z.b_, x.b_, y.b_);
+            z.a_ = x.a_ + y.a_;
+            z.b_ = x.b_ + y.b_;
         }
         static inline void addNC_C(Fp2T &z, const Fp2T &x, const Fp2T &y) {
-            Fp::addNC(z.a_, x.a_, y.a_);
-            Fp::addNC(z.b_, x.b_, y.b_);
+            z.a_ = addNC(x.a_, y.a_);
+            z.b_ = addNC(x.b_, y.b_);
         }
 
         static inline void subNC_C(Fp2T &z, const Fp2T &x, const Fp2T &y) {
-            Fp::subNC(z.a_, x.a_, y.a_);
-            Fp::subNC(z.b_, x.b_, y.b_);
+            z.a_ = subNC(x.a_, y.a_);
+            z.b_ = subNC(x.b_, y.b_);
         }
 
         static inline void subC(Fp2T &z, const Fp2T &x, const Fp2T &y) {
-            Fp::sub(z.a_, x.a_, y.a_);
-            Fp::sub(z.b_, x.b_, y.b_);
+            z.a_ = x.a_ - y.a_;
+            z.b_ = x.b_ - y.b_;
         }
         static inline void neg(Fp2T &z, const Fp2T &x) {
-            Fp::neg(z.a_, x.a_);
-            Fp::neg(z.b_, x.b_);
+            z.a_ = -x.a_;
+            z.b_ = -x.b_;
         }
 
         /*
@@ -386,8 +389,8 @@ namespace bn {
         static inline void mulC(Fp2T &z, const Fp2T &x, const Fp2T &y) {
             typename Fp::Dbl d[3];
             Fp s, t;
-            Fp::addNC(s, x.a_, x.b_);            // a + b
-            Fp::addNC(t, y.a_, y.b_);            // c + d
+            s = addNC(x.a_, y.a_);               // a + b
+            t = addNC(x.b_, y.b_);               // c + d
             Fp::Dbl::mul(d[0], s, t);            // (a + b)(c + d)
             Fp::Dbl::mul(d[1], x.a_, y.a_);      // ac
             Fp::Dbl::mul(d[2], x.b_, y.b_);      // bd
@@ -416,17 +419,19 @@ namespace bn {
         */
         static inline void mul_xiC(Fp2T &z, const Fp2T &x) {
             assert(&z != &x);
-            Fp::add(z.a_, x.a_, x.a_);    // 2
-            Fp::add(z.a_, z.a_, z.a_);    // 4
-            Fp::add(z.a_, z.a_, z.a_);    // 8
-            Fp::add(z.a_, z.a_, x.a_);    // 9
-            Fp::sub(z.a_, z.a_, x.b_);
+            z.a_ = x.a_ + x.a_;    // 2
+            z.a_ = z.a_ + z.a_;    // 4
+            z.a_ = z.a_ + z.a_;    // 8
+            z.a_ = z.a_ + x.a_;    // 9
 
-            Fp::add(z.b_, x.b_, x.b_);    // 2
-            Fp::add(z.b_, z.b_, z.b_);    // 4
-            Fp::add(z.b_, z.b_, z.b_);    // 8
-            Fp::add(z.b_, z.b_, x.b_);    // 9
-            Fp::add(z.b_, z.b_, x.a_);
+            z.a_ = z.a_ - x.b_;
+
+            z.b_ = x.b_ + x.b_;    // 2
+            z.b_ = z.b_ + z.b_;    // 4
+            z.b_ = z.b_ + z.b_;    // 8
+            z.b_ = z.b_ + x.b_;    // 9
+
+            z.b_ = z.b_ + x.a_;
         }
 
         /*
@@ -463,15 +468,10 @@ namespace bn {
             return !operator==(rhs);
         }
 
-        void set(const std::string &str) {
-            std::istringstream iss(str);
-            iss >> *this;
-        }
-
         // z = x * b
         static inline void mul_Fp_0C(Fp2T &z, const Fp2T &x, const Fp &b) {
-            Fp::mul(z.a_, x.a_, b);
-            Fp::mul(z.b_, x.b_, b);
+            z.a_ = x.a_ * b;
+            z.b_ = x.b_ * b;
         }
 
         /*

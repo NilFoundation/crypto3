@@ -25,10 +25,10 @@ namespace nil {
         
 
         template<std::size_t PBits>
-        struct sm2p_v1 : public ec_group_info<PBits> {};
+        struct sm2p_v1 : public curve_weierstrass_policy<PBits> {};
 
         template<>
-        struct sm2p_v1<256> : public ec_group_info<256> {
+        struct sm2p_v1<256> : public curve_weierstrass_policy<256> {
             typedef typename ec_group_info<256>::number_type number_type;
 
             constexpr static const number_type p =

@@ -24,10 +24,10 @@ namespace nil {
         BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(256)
 
         template<std::size_t PBits>
-        struct frp_v1 : public ec_group_info<PBits> {};
+        struct frp_v1 : public curve_weierstrass_policy<PBits> {};
 
         template<>
-        struct frp_v1<256> : public ec_group_info<256> {
+        struct frp_v1<256> : public curve_weierstrass_policy<256> {
             typedef typename ec_group_info<256>::number_type number_type;
 
             constexpr static const number_type p =

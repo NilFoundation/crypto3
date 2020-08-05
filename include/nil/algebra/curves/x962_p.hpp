@@ -25,16 +25,16 @@ namespace nil {
         BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(239)
         
         template<std::size_t PBits>
-        struct x962_p_v1 : public ec_group_info<PBits> {};
+        struct x962_p_v1 : public curve_weierstrass_policy<PBits> {};
 
         template<std::size_t PBits>
-        struct x962_p_v2 : public ec_group_info<PBits> {};
+        struct x962_p_v2 : public curve_weierstrass_policy<PBits> {};
 
         template<std::size_t PBits>
-        struct x962_p_v3 : public ec_group_info<PBits> {};
+        struct x962_p_v3 : public curve_weierstrass_policy<PBits> {};
 
         template<>
-        struct x962_p_v2<192> : public ec_group_info<192> {
+        struct x962_p_v2<192> : public curve_weierstrass_policy<192> {
             typedef typename ec_group_info<192>::number_type number_type;
 
             constexpr static const number_type p = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFFFFFFFFFF_cppui192;
@@ -49,7 +49,7 @@ namespace nil {
         typedef x962_p_v3<192> x962_p192v2;
 
         template<>
-        struct x962_p_v3<192> : public ec_group_info<192> {
+        struct x962_p_v3<192> : public curve_weierstrass_policy<192> {
             typedef typename ec_group_info<192>::number_type number_type;
 
             constexpr static const number_type p = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFFFFFFFFFF_cppui192;
@@ -64,7 +64,7 @@ namespace nil {
         typedef x962_p_v3<192> x962_p192v3;
 
         template<>
-        struct x962_p_v1<239> : public ec_group_info<239> {
+        struct x962_p_v1<239> : public curve_weierstrass_policy<239> {
             typedef typename ec_group_info<239>::number_type number_type;
 
             constexpr static const number_type p =
@@ -85,7 +85,7 @@ namespace nil {
         typedef x962_p_v3<239> x962_p239v1;
 
         template<>
-        struct x962_p_v2<239> : public ec_group_info<239> {
+        struct x962_p_v2<239> : public curve_weierstrass_policy<239> {
             typedef typename ec_group_info<239>::number_type number_type;
 
             constexpr static const number_type p =
@@ -106,7 +106,7 @@ namespace nil {
         typedef x962_p_v3<239> x962_p239v2;
 
         template<>
-        struct x962_p_v3<239> : public ec_group_info<239> {
+        struct x962_p_v3<239> : public curve_weierstrass_policy<239> {
             typedef typename ec_group_info<239>::number_type number_type;
 
             constexpr static const number_type p =
