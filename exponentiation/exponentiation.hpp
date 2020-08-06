@@ -3,6 +3,7 @@
 #define EXPONENTIATION_HPP_
 
 #include <cstdint>
+#include <boost/multiprecision/detail/default_ops.hpp>
 
 namespace nil {
     namespace algebra {
@@ -33,18 +34,6 @@ FieldT power(const FieldT &base, const PowerType &exponent)
 
     return result;
 }
-
-template<typename FieldT, typename PowerType>
-FieldT power(const FieldT &base, const unsigned long exponent)
-{
-    return power<FieldT>(base, (PowerType)(exponent));
-}
-
-template<typename FieldT, typename PowerType>
-FieldT power(const FieldT &base, const PowerType &exponent);
-
-template<typename FieldT>
-FieldT power(const FieldT &base, const unsigned long exponent);
 
 }
 }
