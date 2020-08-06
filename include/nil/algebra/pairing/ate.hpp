@@ -544,8 +544,8 @@ namespace bn {
             static void mulOptC(Dbl &z, const Fp2T &x, const Fp2T &y, int mode) {
                 FpDbl d0;
                 Fp s, t;
-                Fp::addNC(s, x.a_, x.b_);
-                Fp::addNC(t, y.a_, y.b_);
+                s = addNC(x.a_, x.b_);
+                t = addNC(y.a_, y.b_);
                 FpDbl::mul(d0, x.b_, y.b_);
                 FpDbl::mul(z.a_, x.a_, y.a_);
                 FpDbl::mul(z.b_, s, t);
@@ -756,7 +756,7 @@ namespace bn {
             l.c_ = l.c_.mul_Fp_0(P[0]);
             l.b_ = l.b_.mul_Fp_0(P[1]);
         }
-        
+
         static void pointDblLineEvalC(Fp6T &l, Fp2 *R, const Fp *P) {
             pointDblLineEvalWithoutP(l, R);
             // # 16, #17
@@ -926,8 +926,8 @@ namespace bn {
                 Fp2Dbl::mulOpt1(T1, x.b_, y.b_);
                 Fp2Dbl::mulOpt1(T2, x.c_, y.c_);
                 // # 2
-                Fp2::addNC(t0, x.b_, x.c_);
-                Fp2::addNC(t1, y.b_, y.c_);
+                t0 = addNC(x.b_, x.c_);
+                t1 = addNC(y.b_, y.c_);
                 // # 3
                 Fp2Dbl::mulOpt2(z.c_, t0, t1);
                 // # 4
@@ -941,8 +941,8 @@ namespace bn {
                 // # 8
                 Fp2Dbl::add(z.a_, z.b_, T0);
                 // # 9
-                Fp2::addNC(t0, x.a_, x.b_);
-                Fp2::addNC(t1, y.a_, y.b_);
+                t0 = addNC(x.a_, x.b_);
+                t1 = addNC(y.a_, y.b_);
                 // # 10
                 Fp2Dbl::mulOpt2(z.c_, t0, t1);
                 // # 11
@@ -957,8 +957,8 @@ namespace bn {
                 // # 16
                 Fp2Dbl::add(z.b_, z.b_, z.c_);
                 // # 17
-                Fp2::addNC(t0, x.a_, x.c_);
-                Fp2::addNC(t1, y.a_, y.c_);
+                t0 = addNC(x.a_, x.c_);
+                t1 = addNC(y.a_, y.c_);
                 // # 18
                 Fp2Dbl::mulOpt2(z.c_, t0, t1);
                 // # 19
@@ -993,6 +993,7 @@ namespace bn {
         typedef typename Fp2::Dbl Fp2Dbl;
         typedef typename Fp6::Dbl Fp6Dbl;
 
+        fp12_2over3over2_value_type data;
         Fp6 a_, b_;
         Fp12T() {
         }
@@ -1011,47 +1012,26 @@ namespace bn {
         }
 
         void clear() {
-            a_.clear();
-            b_.clear();
-        }
-
-        Fp *get() {
-            return a_.get();
-        }
-        const Fp *get() const {
-            return a_.get();
-        }
-        Fp2 *getFp2() {
-            return a_.getFp2();
-        }
-        const Fp2 *getFp2() const {
-            return a_.getFp2();
-        }
-        void set(const Fp2 &v0, const Fp2 &v1, const Fp2 &v2, const Fp2 &v3, const Fp2 &v4, const Fp2 &v5) {
-            a_.set(v0, v1, v2);
-            b_.set(v3, v4, v5);
+            data.clear();
         }
 
         bool is_zero() const {
-            return a_.is_zero() && b_.is_zero();
+            return data.is_zero();
         }
         bool operator==(const Fp12T &rhs) const {
-            return a_ == rhs.a_ && b_ == rhs.b_;
+            return data == rhs.data;
         }
         bool operator!=(const Fp12T &rhs) const {
             return !operator==(rhs);
         }
         static inline void add(Fp12T &z, const Fp12T &x, const Fp12T &y) {
-            Fp6::add(z.a_, x.a_, y.a_);
-            Fp6::add(z.b_, x.b_, y.b_);
+            z.data = x.data + y.data;
         }
         static inline void sub(Fp12T &z, const Fp12T &x, const Fp12T &y) {
-            Fp6::sub(z.a_, x.a_, y.a_);
-            Fp6::sub(z.b_, x.b_, y.b_);
+            z.data = x.data - y.data;
         }
         static inline void neg(Fp12T &z, const Fp12T &x) {
-            Fp6::neg(z.a_, x.a_);
-            Fp6::neg(z.b_, x.b_);
+            z.data = -x.data;
         }
 
         // 6.4k x 22
@@ -1063,8 +1043,8 @@ namespace bn {
             // # 1
             Fp6Dbl::mul(T0, x.a_, y.a_);
             Fp6Dbl::mul(T1, x.b_, y.b_);
-            Fp6::add(t0, x.a_, x.b_);
-            Fp6::add(t1, y.a_, y.b_);
+            t0 = x.a_ + x.b_;
+            t1 = y.a_ + y.b_;
             // # 2
             Fp6Dbl::mul(zd.a_, t0, t1);
             // # 3
@@ -1082,19 +1062,7 @@ namespace bn {
         */
         static void (*square)(Fp12T &z);
         static void squareC(Fp12T &z) {
-            Fp6 t0, t1;
-            // # 1, 2
-            Fp6::add(t0, z.a_, z.b_);
-            // b_.mul_gamma(t1); t1 += a_; # 3
-            mul_gamma_add<Fp6, Fp2>(t1, z.b_, z.a_);
-            // # 4
-            z.b_ *= z.a_;
-            Fp6::mul(z.a_, t0, t1);
-            // # 5, 6, 7 @note It's typo.
-            mul_gamma_add<Fp6, Fp2>(t1, z.b_, z.b_);
-            // # 8
-            z.a_ -= t1;
-            z.b_ += z.b_;
+            z.data = z.data.square();
         }
 
         /*
@@ -1119,7 +1087,7 @@ namespace bn {
             Fp2Dbl::square(T1, x1);
             Fp2Dbl::mul_xi(T2, T1);
             T2 += T0;
-            Fp2::add(z1, x0, x1);
+            z1 = x0 + x1;
             Fp2Dbl::mod(z0, T2);
             // overwrite z[0] (position 0).
             Fp2Dbl::square(T2, z1);
@@ -1173,43 +1141,33 @@ namespace bn {
             Fp2 t0, t1;
             sq_Fp4UseDbl(t0, t1, z0, z1);    // a^2 = t0 + t1*y
             // For A
-            Fp2::sub(z0, t0, z0);
+            z0 = t0 - z0;
             z0 += z0;
             z0 += t0;
 #if 0
 		Fp2_2z_add_3x(z1, t1);
 #else
-            Fp2::add(z1, t1, z1);
-            z1 += z1;
-            z1 += t1;
+            z1 = (t1 + z1).dbl() + t1;
 #endif
             // t0 and t1 are unnecessary from here.
             Fp2 t2, t3;
             sq_Fp4UseDbl(t0, t1, z2, z3);    // b^2 = t0 + t1*y
             sq_Fp4UseDbl(t2, t3, z4, z5);    // c^2 = t2 + t3*y
             // For C
-            Fp2::sub(z4, t0, z4);
-            z4 += z4;
-            z4 += t0;
+            z4 = (t0 - z4).dbl() + t0;
 #if 0
 		Fp2_2z_add_3x(z5, t1);
 #else
-            Fp2::add(z5, t1, z5);
-            z5 += z5;
-            z5 += t1;
+            z5 = (t1 + z5).dbl() + t1;
 #endif
             // For B
             Fp2::mul_xi(t0, t3);
 #if 0
 		Fp2_2z_add_3x(z2, t0);
 #else
-            Fp2::add(z2, t0, z2);
-            z2 += z2;
-            z2 += t0;
+            z2 = (t0 + z2).dbl() + t0;
 #endif
-            Fp2::sub(z3, t2, z3);
-            z3 += z3;
-            z3 += t2;
+            z3 = (t2 - z3).dbl() + t2;
         }
 
         /*
@@ -1221,19 +1179,7 @@ namespace bn {
         }
 
         void inverse() {
-            Fp6 tmp0;
-            Fp6 tmp1;
-            Fp2 tmp2;
-            Fp6::square(tmp0, a_);
-            Fp6::square(tmp1, b_);
-            Fp2::mul_xi(tmp2, tmp1.c_);
-            tmp0.a_ -= tmp2;
-            tmp0.b_ -= tmp1.a_;
-            tmp0.c_ -= tmp1.b_;
-            tmp0.inverse();
-            Fp6::mul(a_, a_, tmp0);
-            Fp6::mul(b_, b_, tmp0);
-            Fp6::neg(b_, b_);
+            data = data.inverse();
         }
 
         /*
@@ -1249,12 +1195,12 @@ namespace bn {
                 z.b_.b_.a_ = b_.b_.a_;
                 z.b_.c_.a_ = b_.c_.a_;
             }
-            Fp::neg(z.a_.a_.b_, a_.a_.b_);
-            Fp::neg(z.a_.b_.b_, a_.b_.b_);
-            Fp::neg(z.a_.c_.b_, a_.c_.b_);
-            Fp::neg(z.b_.a_.b_, b_.a_.b_);
-            Fp::neg(z.b_.b_.b_, b_.b_.b_);
-            Fp::neg(z.b_.c_.b_, b_.c_.b_);
+            z.a_.a_.b_ = -a_.a_.b_;
+            z.a_.b_.b_ = -a_.b_.b_;
+            z.a_.c_.b_ = -a_.c_.b_;
+            z.b_.a_.b_ = -b_.a_.b_;
+            z.b_.b_.b_ = -b_.b_.b_;
+            z.b_.c_.b_ = -b_.c_.b_;
 
             z.a_.b_ *= Param::gammar[1];
             z.a_.c_ *= Param::gammar[3];
@@ -1280,11 +1226,11 @@ namespace bn {
                 z.a_.a_ = a_.a_;
             }
             z.a_.a_ = a_.a_;
-            Fp2::mul_Fp_0(z.a_.b_, a_.b_, Param::gammar2[1].a_);
-            Fp2::mul_Fp_0(z.a_.c_, a_.c_, Param::gammar2[3].a_);
-            Fp2::mul_Fp_0(z.b_.a_, b_.a_, Param::gammar2[0].a_);
-            Fp2::mul_Fp_0(z.b_.b_, b_.b_, Param::gammar2[2].a_);
-            Fp2::mul_Fp_0(z.b_.c_, b_.c_, Param::gammar2[4].a_);
+            z.a_.b_ = a_.b_.mul_Fp_0(Param::gammar2[1].a_);
+            z.a_.c_ = a_.c_.mul_Fp_0(Param::gammar2[3].a_);
+            z.b_.a_ = b_.a_.mul_Fp_0(Param::gammar2[0].a_);
+            z.b_.b_ = b_.b_.mul_Fp_0(Param::gammar2[2].a_);
+            z.b_.c_ = b_.c_.mul_Fp_0(Param::gammar2[4].a_);
 #endif
         }
 
@@ -1293,18 +1239,19 @@ namespace bn {
 		Frobenius2(z);
 		z.Frobenius(z);
 #else
-            z.a_.a_.a_ = a_.a_.a_;
-            z.a_.b_.a_ = a_.b_.a_;
-            z.a_.c_.a_ = a_.c_.a_;
-            z.b_.a_.a_ = b_.a_.a_;
-            z.b_.b_.a_ = b_.b_.a_;
-            z.b_.c_.a_ = b_.c_.a_;
-            Fp::neg(z.a_.a_.b_, a_.a_.b_);
-            Fp::neg(z.a_.b_.b_, a_.b_.b_);
-            Fp::neg(z.a_.c_.b_, a_.c_.b_);
-            Fp::neg(z.b_.a_.b_, b_.a_.b_);
-            Fp::neg(z.b_.b_.b_, b_.b_.b_);
-            Fp::neg(z.b_.c_.b_, b_.c_.b_);
+            z.a_.a_.a_ =  a_.a_.a_;
+            z.a_.b_.a_ =  a_.b_.a_;
+            z.a_.c_.a_ =  a_.c_.a_;
+            z.b_.a_.a_ =  b_.a_.a_;
+            z.b_.b_.a_ =  b_.b_.a_;
+            z.b_.c_.a_ =  b_.c_.a_;
+
+            z.a_.a_.b_ = -a_.a_.b_;
+            z.a_.b_.b_ = -a_.b_.b_;
+            z.a_.c_.b_ = -a_.c_.b_;
+            z.b_.a_.b_ = -b_.a_.b_;
+            z.b_.b_.b_ = -b_.b_.b_;
+            z.b_.c_.b_ = -b_.c_.b_;
 
 
             z.a_.b_ *= Param::gammar3[1];
@@ -1326,8 +1273,8 @@ namespace bn {
             // conjugation, so this entire function computes
             // z^((p^6-1) * (p^2+1))
             z.a_ = a_;
-            Fp6::neg(z.b_, b_);
-            inverse();
+            z.b_ - b_;
+            data = data.inverse();
             z *= *this;
             z.Frobenius2(*this);
             z *= *this;
@@ -1347,7 +1294,7 @@ namespace bn {
             out = in;
             Fp12T inConj;
             inConj.a_ = in.a_;
-            Fp6::neg(inConj.b_, in.b_);    // in^-1 == in^(p^6)
+            inConj.b_ = -in.b_;    // in^-1 == in^(p^6)
 
             for (size_t i = 1; i < Param::zReplTbl.size(); i++) {
                 out.sqru();
@@ -1377,21 +1324,21 @@ namespace bn {
             // Compress::fixed_power(f12z3, a); // f12z3 = f^(-12*z^3)
             Fp12T::pow_neg_t(f12z3, a);
             // It will compute inversion of f2z, thus, conjugation free.
-            Fp6::neg(f6z.b_, f6z.b_);        // f6z = f^(6z)
-            Fp6::neg(f12z3.b_, f12z3.b_);    // f12z3 = f^(12*z^3)
+            f6z.b_ = -f6z.b_;        // f6z = f^(6z)
+            f12z3.b_ = -f12z3.b_;    // f12z3 = f^(12*z^3)
             // Computes a and b.
-            Fp12T::mul(a, f12z3, f6z2);    // a = f^(12*z^3 + 6z^2)
+            a = f12z3 * f6z2;    // a = f^(12*z^3 + 6z^2)
             a *= f6z;                      // a = f^(12*z^3 + 6z^2 + 6z)
-            Fp12T::mul(b, a, f2z);         // b = f^(12*z^3 + 6z^2 + 4z)w
+            b = a * f2z;         // b = f^(12*z^3 + 6z^2 + 4z)w
             // @note f2z, f6z, and f12z are unnecessary from here.
             // Last part.
-            Fp12T::mul(z, a, f6z2);    // z = f^(12*z^3 + 12z^2 + 6z)
+            z = a * f6z2;    // z = f^(12*z^3 + 12z^2 + 6z)
             z *= f;                    // z = f^(12*z^3 + 12z^2 + 6z + 1)
             b.Frobenius(f2z);          // f2z = f^(q(12*z^3 + 6z^2 + 4z))
             z *= f2z;                  // z = f^(q(12*z^3 + 6z^2 + 4z) + (12*z^3 + 12z^2 + 6z + 1))
             a.Frobenius2(f2z);         // f2z = f^(q^2(12*z^3 + 6z^2 + 6z))
             z *= f2z;    // z = f^(q^2(12*z^3 + 6z^2 + 6z) + q(12*z^3 + 6z^2 + 4z) + (12*z^3 + 12z^2 + 6z + 1))
-            Fp6::neg(f.b_, f.b_);    // f = -f
+            f.b_ = -f.b_;    // f = -f
             b *= f;                  // b = f^(12*z^3 + 6z^2 + 4z - 1)
             b.Frobenius3(f2z);       // f2z = f^(q^3(12*z^3 + 6z^2 + 4z - 1))
             z *= f2z;
@@ -1512,9 +1459,9 @@ namespace bn {
                 Fp2Dbl::mulOpt2(D0, z0, x0);
                 Fp2Dbl::mulOpt2(D2, z2, x2);
                 Fp2Dbl::mulOpt2(D4, z4, x4);
-                Fp2::add(t2, z0, z4);
-                Fp2::add(t1, z0, z2);
-                Fp2::add(s0, z1, z3);
+                t2 = z0 + z4;
+                t1 = z0 + z2;
+                s0 = z1 + z3;
                 s0 += z5;
                 // For z.a_.a_ = z0.
                 Fp2Dbl::mulOpt2(S1, z1, x2);
@@ -1532,7 +1479,7 @@ namespace bn {
                 T4 += T3;
                 Fp2Dbl::mod(z1, T4);
                 // For z.a_.c_ = z2.
-                Fp2::add(t0, x0, x2);
+                t0 = x0 + x2;
                 Fp2Dbl::mulOpt2(T3, t1, t0);
                 T3 -= D0;
                 T3 -= D2;
@@ -1541,9 +1488,9 @@ namespace bn {
                 T3 += T4;
                 // z3 needs z2.
                 // For z.b_.a_ = z3.
-                Fp2::add(t0, z2, z4);
+                t0 = z2 + z4;
                 Fp2Dbl::mod(z2, T3);
-                Fp2::add(t1, x2, x4);
+                t1 = x2 + x4;
                 Fp2Dbl::mulOpt2(T3, t0, t1);
                 T3 -= D2;
                 T3 -= D4;
@@ -1556,14 +1503,14 @@ namespace bn {
                 Fp2Dbl::mulOpt2(T3, z5, x2);
                 S1 += T3;
                 Fp2Dbl::mul_xi(T4, T3);
-                Fp2::add(t0, x0, x4);
+                t0 = x0 + x4;
                 Fp2Dbl::mulOpt2(T3, t2, t0);
                 T3 -= D0;
                 T3 -= D4;
                 T4 += T3;
                 Fp2Dbl::mod(z4, T4);
                 // For z.b_.c_ = z5.
-                Fp2::add(t0, x0, x2);
+                t0 = x0 + x2;
                 t0 += x4;
                 Fp2Dbl::mulOpt2(T3, s0, t0);
                 T3 -= S1;
@@ -1611,21 +1558,21 @@ namespace bn {
                 Fp2Dbl::mulOpt2(T00, x0, y0);
                 Fp2Dbl::mulOpt2(T22, x2, y2);
                 Fp2Dbl::mulOpt2(T44, x4, y4);
-                Fp2::add(z0, x0, x2);
-                Fp2::add(z1, y0, y2);
+                z0 = x0 + x2;
+                z1 = y0 + y2;
                 Fp2Dbl::mulOpt2(T02, z0, z1);
                 T02 -= T00;
                 T02 -= T22;
                 Fp2Dbl::mod(z2, T02);
-                Fp2::add(z0, x2, x4);
-                Fp2::add(z1, y2, y4);
+                z0 = x2 + x4;
+                z1 = y2 + y4;
                 Fp2Dbl::mulOpt2(T24, z0, z1);
                 T24 -= T22;
                 T24 -= T44;
                 Fp2Dbl::mul_xi(T02, T24);
                 Fp2Dbl::mod(z3, T02);
-                Fp2::add(z0, x4, x0);
-                Fp2::add(z1, y4, y0);
+                z0 = x4 + x0;
+                z1 = y4 + y0;
                 Fp2Dbl::mulOpt2(T40, z0, z1);
                 T40 -= T00;
                 T40 -= T44;
@@ -1692,19 +1639,13 @@ namespace bn {
             assert(&nume != &denomi);
 
             if (g2_.is_zero()) {
-                Fp2::add(nume, g4_, g4_);
+                nume = g4_.dbl();
                 nume *= g5_;
                 denomi = g3_;
             } else {
-                Fp2 t;
-                Fp2::square(nume, g5_);
-                Fp2::mul_xi(denomi, nume);
-                Fp2::square(nume, g4_);
-                Fp2::sub(t, nume, g3_);
-                t += t;
-                t += nume;
-                Fp2::add(nume, denomi, t);
-                Fp2::divBy4(nume, nume);
+                Fp2::mul_xi(denomi, g5_.square());
+                nume = g4_.square(nume, g4_);
+                nume = (denomi + ((nume - g3_).dbl() + nume)).divBy4();
                 denomi = g2_;
             }
         }
@@ -1714,13 +1655,9 @@ namespace bn {
             Fp2 &g0 = z_.getFp2()[0];
             Fp2 t0, t1;
             // Compute g0.
-            Fp2::square(t0, g1_);
-            Fp2::mul(t1, g3_, g4_);
-            t0 -= t1;
-            t0 += t0;
-            t0 -= t1;
-            Fp2::mul(t1, g2_, g5_);
-            t0 += t1;
+            t1 = g3_ * g4_;
+            t0 = (g1_.square() - t1).dbl() - t1 + g2_ * g5_;
+
             Fp2::mul_xi(g0, t0);
             g0.a_ += Param::i1;
         }
@@ -1750,7 +1687,7 @@ namespace bn {
             // # 9
             Fp2Dbl::mod(t2, T2);
             // # 1
-            Fp2::add(t0, z.g4_, z.g5_);
+            t0 = z.g4_ + z.g5_;
             Fp2Dbl::square(T2, t0);
             // # 2
             T0 += T1;
@@ -1758,7 +1695,7 @@ namespace bn {
             T2 -= T0;
             // # 3
             Fp2Dbl::mod(t0, T2);
-            Fp2::add(t1, z.g2_, z.g3_);
+            t1 = z.g2_ + z.g3_;
             Fp2Dbl::square(T3, t1);
             Fp2Dbl::square(T2, z.g2_);
             // # 4
@@ -1773,12 +1710,12 @@ namespace bn {
             // # 6
             z.g2_ += t1;
 #endif
-            Fp2::sub(t1, t2, z.g3_);
+            t1 = t2 - z.g3_;
             t1 += t1;
             // # 11 !!!!
             Fp2Dbl::square(T1, z.g3_);
             // # 10 !!!!
-            Fp2::add(z.g3_, t1, t2);
+            z.g3_ = t1 + t2;
             // # 12
             Fp2Dbl::mul_xi(T0, T1);
             // # 13
@@ -1786,7 +1723,7 @@ namespace bn {
             //		Fp2Dbl::addNC(T0, T0, T2); // QQQ : OK?
             // # 14
             Fp2Dbl::mod(t0, T0);
-            Fp2::sub(z.g4_, t0, z.g4_);
+            z.g4_ = t0 - z.g4_;
             z.g4_ += z.g4_;
             // # 15
             z.g4_ += t0;
@@ -1828,14 +1765,14 @@ namespace bn {
             CompressT::square_n(c62, 62 - 55);    // 13.6k
             c62.decompressBeforeInv(c62nume, c62denomi);
             Fp2 acc;
-            Fp2::mul(acc, c55denomi, c62denomi);
+            acc = c55denomi * c62denomi;
             acc.inverse();
             Fp2 t;
-            Fp2::mul(t, acc, c62denomi);
-            Fp2::mul(c55.g1_, c55nume, t);
+            t = acc * c62denomi;
+            c55.g1_ = c55nume * t;
             c55.decompressAfterInv();    // 1.1k
-            Fp2::mul(t, acc, c55denomi);
-            Fp2::mul(c62.g1_, c62nume, t);
+            t = acc * c55denomi;
+            c62.g1_ = c62nume * t;
             c62.decompressAfterInv();
             z *= x;    // 6.5k
             z *= d62;
@@ -1847,9 +1784,6 @@ namespace bn {
         CompressT(const CompressT &);
         void operator=(const CompressT &);
     };
-
-    template<class Fp2>
-    void (*CompressT<Fp2>::square_n)(CompressT &, int) = &(CompressT<Fp2>::square_nC);
 
     namespace ecop {
 
@@ -1871,9 +1805,9 @@ namespace bn {
                 return true;
 
             Fp Z6p_2;
-            Fp::square(Z6p_2, P[2]);
-            Fp::mul(Z6p_2, Z6p_2, P[2]);
-            Fp::square(Z6p_2, Z6p_2);
+            Z6p_2 = P[2].square();
+            Z6p_2 *= P[2];
+            Z6p_2 = Z6p_2.square();
             Z6p_2 *= Param::b;
             return P[1] * P[1] == P[0] * P[0] * P[0] + Z6p_2;
         }
@@ -1900,11 +1834,7 @@ namespace bn {
             if (P[2] == 0)
                 return true;
 
-            Fp ZZZ;
-            Fp::square(ZZZ, P[2]);
-            Fp::mul(ZZZ, ZZZ, P[2]);
-            ZZZ *= Param::b;
-            return P[1] * P[1] * P[2] == P[0] * P[0] * P[0] + ZZZ;
+            return P[1] * P[1] * P[2] == P[0] * P[0] * P[0] + P[2].square() * P[2] * Param::b;
         }
 
         /*
@@ -1917,11 +1847,8 @@ namespace bn {
 
             if (P[2] == 0)
                 return true;
-            Fp2 Z6p;
-            Fp2::square(Z6p, P[2]);
-            Fp2::mul(Z6p, Z6p, P[2]);
-            Fp2::square(Z6p, Z6p);
-            return P[1] * P[1] == P[0] * P[0] * P[0] + Param::b_invxi * Z6p;
+            
+            return P[1] * P[1] == P[0] * P[0] * P[0] + ((P[2].square() * P[2]).square()) * Param::b_invxi;
         }
 
         /*
@@ -1960,13 +1887,13 @@ namespace bn {
             } else if (in[2] == 1) {
                 copy(out, in);
             } else {
-                FF A, AA, t0;
-                A = in[2];
-                A.inverse();
-                FF::square(AA, A);
-                FF::mul(out[0], in[0], AA);
-                FF::mul(t0, AA, A);
-                FF::mul(out[1], in[1], t0);
+                FF A, AA;
+                
+                A = in[2].inverse();
+                AA = A.square();
+
+                out[0] = in[0] * AA;
+                out[1] = in[1] * AA * A;
                 out[2] = 1;
             }
         }
@@ -1984,9 +1911,9 @@ namespace bn {
                 copy(out, in);
             } else {
                 FF A = in[2];
-                A.inverse();
-                FF::mul(out[0], in[0], A);
-                FF::mul(out[1], in[1], A);
+                A = A.inverse();
+                out[0] = in[0] * A;
+                out[1] = in[1] * A;
                 out[2] = 1;
             }
         }
@@ -1997,29 +1924,16 @@ namespace bn {
         */
         template<class FF>
         inline void ECDouble(FF *out, const FF *in) {
-            FF A, B, C, D, E, F, t0, t1, t2, t3, t4, t5, t6, t7, t8;
-            FF::square(A, in[0]);
-            FF::square(B, in[1]);
-            FF::square(C, B);
-            FF::add(t0, in[0], B);
-            FF::square(t1, t0);
-            FF::sub(t2, t1, A);
-            FF::sub(t3, t2, C);
-            FF::add(D, t3, t3);
-            FF::add(E, A, A);
-            FF::add(E, E, A);
-            FF::square(F, E);
-            FF::add(t4, D, D);
-            FF::sub(out[0], F, t4);
-            FF::sub(t5, D, out[0]);
-            t6 = C;
-            t6 += t6;
-            t6 += t6;
-            t6 += t6;    // t6 = 8*C
-            FF::mul(t7, E, t5);
-            FF::mul(t8, in[1], in[2]);
-            FF::sub(out[1], t7, t6);
-            FF::add(out[2], t8, t8);
+            FF A, B, C, D, E;
+            A = in[0].square();
+            B = in[1].square();
+            C = B.square();
+            D = ((in[0] + B).square() - A - C).dbl();
+            E = A.dbl() + A;
+
+            out[0] = E.square() - D.dbl();
+            out[1] = E * (D - out[0]) - C.dbl().dbl().dbl();
+            out[2] = (in[1] * in[2]).dbl();
         }
 
         /*
@@ -2036,8 +1950,8 @@ namespace bn {
                 copy(out, a);
                 return;
             }
-            FF Z1Z1, Z2Z2, U1, U2, t0, S1, t1, S2, H, t2, I, J, t3, r, V, t4, t5;
-            FF t6, t7, t8, t9, t10, t11, t12, t13, t14;
+            FF Z1Z1, Z2Z2, U1, S1, H, I, J, t3, r, V;
+
             Z1Z1 = a[2].square();
             Z2Z2 = b[2].square();
             U1 = a[0] * Z2Z2;
@@ -2054,13 +1968,12 @@ namespace bn {
                 return;
             }
 
-            I = (H + H).square();
+            I = H.dbl().square();
             J = H * I;
-            r = t3 + t3;
+            r = t3.dbl();
             V = U1 * I;
             out[0] = r.square() - J - (V + V);
-            t8 = S1 * J;
-            out[1] = r * (V - out[0]) - (t8 + t8);
+            out[1] = r * (V - out[0]) - (S1 * J).dbl();
             out[2] = ((a[2] + b[2]).square() - Z1Z1 - Z2Z2) * H;
         }
 
@@ -2140,14 +2053,14 @@ namespace bn {
             // applying Q[0] <- P[0]^q
 
             Q[0].a_ = P[0].a_;
-            Fp::neg(Q[0].b_, P[0].b_);
+            Q[0].b_ = -P[0].b_;
 
             // Q[0] *= xi^((p-1)/3)
             Q[0] *= Param::gammar[1];
 
             // applying Q[1] <- P[1]^q
             Q[1].a_ = P[1].a_;
-            Fp::neg(Q[1].b_, P[1].b_);
+            Q[1].b_ = -P[1].b_;
 
             // Q[1] *= xi^((p-1)/2)
             Q[1] *= Param::gammar[2];
@@ -2212,7 +2125,7 @@ namespace bn {
             // 3.6k x 63
             Fp6::pointDblLineEval(l, T, P);
             // 4.7k x 63
-            Fp12::square(f);
+            f = f.square();
             // 4.48k x 63
             Fp12::Dbl::mul_Fp2_024(f, l);
 
@@ -2233,13 +2146,13 @@ namespace bn {
         Fp2 Q2[2];
 
         ecop::FrobEndOnTwist_2(Q2, Q);
-        Fp2::neg(Q2[1], Q2[1]);
+        Q2[1] = -Q2[1];
 
         Fp12 ft;
         Fp6::pointAddLineEval(d, T, Q1, P);          // 5k
         Fp6::pointAddLineEval(e, T, Q2, P);          // 5k
         Fp12::Dbl::mul_Fp2_024_Fp2_024(ft, d, e);    // 2.7k
-        Fp12::mul(f, f, ft);                         // 6.4k
+        f = f * ft;                         // 6.4k
         // final exponentiation
         f.final_exp();
     }
@@ -2341,7 +2254,7 @@ namespace bn {
         }
         template<class N>
         EcT &operator*=(const N &y) {
-            mul(*this, *this, y);
+            *this *= y;
             return *this;
         }
         template<class N>
@@ -2445,7 +2358,7 @@ namespace bn {
             Fp2 Qneg[2];
             if (Param::useNAF) {
                 Qneg[0] = Q[0];
-                Fp2::neg(Qneg[1], Q[1]);
+                Qneg[1] = -Q[1];
             }
 
             Fp6 d;
@@ -2478,7 +2391,7 @@ namespace bn {
             Fp2 Q2[2];
 
             bn::ecop::FrobEndOnTwist_2(Q2, Q);
-            Fp2::neg(Q2[1], Q2[1]);
+            Q2[1] = -Q2[1];
 
             Fp6::pointAddLineEvalWithoutP(d, T, Q1);
             coeff.push_back(d);
@@ -2507,7 +2420,7 @@ namespace bn {
             for (size_t i = 2; i < Param::siTbl.size(); i++) {
                 l = Qcoeff[idx];
                 idx++;
-                Fp12::square(f);
+                f = f.square();
                 Fp6::mulFp6_24_Fp_01(l, precP);
 
                 Fp12::Dbl::mul_Fp2_024(f, l);
@@ -2553,7 +2466,7 @@ namespace bn {
             Fp6 e2 = Q2coeff[idx];
             Fp6::mulFp6_24_Fp_01(e2, precP2);
             Fp12::Dbl::mul_Fp2_024_Fp2_024(f2, d2, e2);
-            Fp12::mul(f, f1, f2);
+            f = f1 * f2;
 
             idx++;
             bn::Fp6 l1, l2;
@@ -2561,7 +2474,7 @@ namespace bn {
                 l1 = Q1coeff[idx];
                 l2 = Q2coeff[idx];
                 idx++;
-                Fp12::square(f);
+                f = f.square();
 
                 Fp6::mulFp6_24_Fp_01(l1, precP1);
                 Fp6::mulFp6_24_Fp_01(l2, precP2);
