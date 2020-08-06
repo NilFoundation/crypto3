@@ -17,6 +17,52 @@
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
+            template<typename FieldType>
+            struct dlies_public_key {
+                typedef FieldType field_type;
+
+                typedef typename field_type::value_type value_type;
+                typedef typename field_type::number_type number_type;
+
+                constexpr static const std::size_t key_bits = field_type::field_type::modulus_bits;
+                typedef typename field_type::value_type key_type;
+
+                constexpr static const std::size_t key_schedule_bits = field_type::field_type::modulus_bits;
+                typedef typename field_type::value_type key_schedule_type;
+
+                constexpr static const std::size_t signature_bits = field_type::field_type::modulus_bits * 2;
+                typedef std::tuple<value_type, value_type> signature_type;
+            };
+
+            template<typename FieldType>
+            struct dlies_private_key {
+                typedef FieldType field_type;
+
+                typedef typename field_type::value_type value_type;
+                typedef typename field_type::number_type number_type;
+
+                constexpr static const std::size_t key_bits = field_type::field_type::modulus_bits;
+                typedef typename field_type::value_type key_type;
+
+                constexpr static const std::size_t key_schedule_bits = field_type::field_type::modulus_bits;
+                typedef typename field_type::value_type key_schedule_type;
+
+                constexpr static const std::size_t signature_bits = field_type::field_type::modulus_bits * 2;
+                typedef std::tuple<value_type, value_type> signature_type;
+            };
+
+            template<typename FieldType, typename KeyDerivationFunction, typename MessageAuthenticationCode>
+            struct dlies {
+                typedef FieldType field_type;
+                typedef KeyDerivationFunction kdf_type;
+                typedef MessageAuthenticationCode mac_type;
+
+                typedef dlies_public_key<field_type> public_key_type;
+                typedef dlies_private_key<field_type> private_key_type;
+
+                constexpr static const std::size_t public_key_bits = public_key_type::key_bits;
+                constexpr static const std::size_t private_key_bits = private_key_type::key_bits;
+            };
 
             /**
              * DLIES Encryption

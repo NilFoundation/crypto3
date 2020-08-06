@@ -37,9 +37,11 @@ namespace nil {
 
             };
 
-            template<typename CurveType>
+            template<typename CurveType, typename KeyDerivationFunction, typename MessageAuthenticationCode>
             struct ecies {
                 typedef CurveType curve_type;
+                typedef KeyDerivationFunction kdf_type;
+                typedef MessageAuthenticationCode mac_type;
 
                 typedef ecies_public_key<CurveType> public_key_type;
                 typedef ecies_private_key<CurveType> private_key_type;

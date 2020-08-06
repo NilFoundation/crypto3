@@ -76,13 +76,6 @@ namespace nil {
 
                         result_type res = dgst;
 
-                        pubkey_type processed_pubkey = mode.end_message(cache, total_seen);
-
-                        res = ::nil::crypto3::resize<pubkey_bits>(res, res.size() + pubkey_values);
-
-                        pack<endian_type, endian_type, value_bits, octet_bits>(
-                            processed_pubkey.begin(), processed_pubkey.end(), res.end() - pubkey_values);
-
                         return res;
                     }
 

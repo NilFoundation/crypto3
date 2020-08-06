@@ -16,8 +16,8 @@ namespace nil {
             typedef Scheme scheme_type;
             typedef typename scheme_type::public_key_type key_policy_type;
 
-            typedef typename scheme_type::key_type key_type;
-            typedef typename scheme_type::key_schedule_type key_schedule_type;
+            typedef typename key_policy_type::key_type key_type;
+            typedef typename key_policy_type::key_schedule_type key_schedule_type;
 
             public_key(const key_type &key) : pubkey(key) {
             }

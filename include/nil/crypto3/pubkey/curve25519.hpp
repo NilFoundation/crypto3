@@ -15,22 +15,6 @@ namespace nil {
     namespace crypto3 {
         namespace pubkey {
             namespace detail {
-                void size_check(size_t size, const char *thing) {
-                    if (size != 32) {
-                        throw decoding_error("Invalid size " + std::to_string(size) + " for Curve25519 " + thing);
-                    }
-                }
-
-                secure_vector<uint8_t> curve25519(const secure_vector<uint8_t> &secret, const uint8_t pubval[32]) {
-                    secure_vector<uint8_t> out(32);
-                    curve25519_donna(out.data(), secret.data(), pubval);
-                    return out;
-                }
-
-            }    // namespace detail
-
-            namespace {
-
 #if !defined(CRYPTO3_TARGET_HAS_NATIVE_UINT128)
                 typedef donna128 uint128_t;
 #endif
@@ -273,7 +257,7 @@ namespace nil {
                     t4 &= 0x7ffffffffffff;
 
                     store_le(out, combine_lower(t0, 0, t1, 51), combine_lower(t1, 13, t2, 38),
-                             combine_lower(t2, 26, t3, 25), combine_lower(t3, 39, t4, 12));
+                        combine_lower(t2, 26, t3, 25), combine_lower(t3, 39, t4, 12));
                 }
 
                 /* Input: Q, Q', Q-Q'
@@ -437,7 +421,98 @@ namespace nil {
                     /* 2^255 - 21 */ fmul(out, t0, a);
                 }
 
-            }    // namespace
+                /*
+             * The types above are just wrappers for curve25519_donna, plus defining
+             * encodings for public and private keys.
+             */
+                void curve25519_donna(uint8_t mypublic[32], const uint8_t secret[32], const uint8_t basepoint[32]) {
+                    ct::poison(secret, 32);
+                    ct::poison(basepoint, 32);
+
+                    uint64_t bp[5], x[5], z[5], zmone[5];
+                    uint8_t e[32];
+
+                    copy_mem(e, secret, 32);
+                    e[0] &= 248;
+                    e[31] &= 127;
+                    e[31] |= 64;
+
+                    fexpand(bp, basepoint);
+                    cmult(x, z, e, bp);
+                    crecip(zmone, z);
+                    fmul(z, x, zmone);
+                    fcontract(mypublic, z);
+
+                    ct::unpoison(secret, 32);
+                    ct::unpoison(basepoint, 32);
+                    ct::unpoison(mypublic, 32);
+                }
+
+                /**
+                 * Exponentiate by the x25519 base point
+                 * @param mypublic output value
+                 * @param secret random scalar
+                 */
+                void curve25519_basepoint(uint8_t mypublic[32], const uint8_t secret[32]) {
+                    const uint8_t basepoint[32] = {9};
+                    curve25519_donna(mypublic, secret, basepoint);
+                }
+
+                void size_check(size_t size, const char *thing) {
+                    if (size != 32) {
+                        throw decoding_error("Invalid size " + std::to_string(size) + " for Curve25519 " + thing);
+                    }
+                }
+
+                secure_vector<uint8_t> curve25519(const secure_vector<uint8_t> &secret, const uint8_t pubval[32]) {
+                    secure_vector<uint8_t> out(32);
+                    curve25519_donna(out.data(), secret.data(), pubval);
+                    return out;
+                }
+
+            }    // namespace detail
+
+            template<typename CurveType>
+            struct curve25519_public_key {
+                typedef CurveType curve_type;
+
+                typedef typename curve_type::value_type value_type;
+                typedef typename curve_type::number_type number_type;
+
+                constexpr static const std::size_t key_bits = curve_type::field_type::modulus_bits;
+                typedef typename curve_type::value_type key_type;
+
+                constexpr static const std::size_t key_schedule_bits = curve_type::field_type::modulus_bits;
+                typedef typename curve_type::value_type key_schedule_type;
+
+                constexpr static const std::size_t signature_bits = curve_type::field_type::modulus_bits * 2;
+                typedef std::tuple<value_type, value_type> signature_type;
+            };
+
+            template<typename CurveType>
+            struct curve25519_private_key {
+                typedef CurveType curve_type;
+
+                typedef typename curve_type::value_type value_type;
+                typedef typename curve_type::number_type number_type;
+
+                constexpr static const std::size_t key_bits = curve_type::field_type::modulus_bits;
+                typedef typename curve_type::value_type key_type;
+
+                constexpr static const std::size_t key_schedule_bits = curve_type::field_type::modulus_bits;
+                typedef typename curve_type::value_type key_schedule_type;
+
+                constexpr static const std::size_t signature_bits = curve_type::field_type::modulus_bits * 2;
+                typedef std::tuple<value_type, value_type> signature_type;
+            };
+
+            template<typename CurveType>
+            struct curve25519 {
+                typedef CurveType curve_type;
+
+                typedef curve25519_public_key<CurveType> public_key_type;
+                typedef curve25519_private_key<CurveType> private_key_type;
+            };
 
             class curve25519_public_key : public virtual public_key_policy {
             public:
@@ -583,43 +658,6 @@ namespace nil {
             private:
                 secure_vector<uint8_t> m_private;
             };
-
-            /*
-             * The types above are just wrappers for curve25519_donna, plus defining
-             * encodings for public and private keys.
-             */
-            void curve25519_donna(uint8_t mypublic[32], const uint8_t secret[32], const uint8_t basepoint[32]) {
-                ct::poison(secret, 32);
-                ct::poison(basepoint, 32);
-
-                uint64_t bp[5], x[5], z[5], zmone[5];
-                uint8_t e[32];
-
-                copy_mem(e, secret, 32);
-                e[0] &= 248;
-                e[31] &= 127;
-                e[31] |= 64;
-
-                fexpand(bp, basepoint);
-                cmult(x, z, e, bp);
-                crecip(zmone, z);
-                fmul(z, x, zmone);
-                fcontract(mypublic, z);
-
-                ct::unpoison(secret, 32);
-                ct::unpoison(basepoint, 32);
-                ct::unpoison(mypublic, 32);
-            }
-
-            /**
-             * Exponentiate by the x25519 base point
-             * @param mypublic output value
-             * @param secret random scalar
-             */
-            void curve25519_basepoint(uint8_t mypublic[32], const uint8_t secret[32]) {
-                const uint8_t basepoint[32] = {9};
-                curve25519_donna(mypublic, secret, basepoint);
-            }
 
             class curve25519 {
             public:

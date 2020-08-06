@@ -17,6 +17,37 @@
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
+            template<typename NumberType>
+            struct rsa_public_key {
+                typedef NumberType number_type;
+
+                constexpr static const std::size_t key_bits = 0;
+                typedef std::tuple<number_type, number_type> key_type;
+
+                constexpr static const std::size_t key_schedule_bits = key_bits;
+                typedef std::tuple<number_type, number_type> key_schedule_type;
+
+                typedef NumberType signature_type;
+            };
+
+            template<typename NumberType>
+            struct rsa_private_key {
+                typedef NumberType number_type;
+
+                constexpr static const std::size_t key_bits = 0;
+                typedef std::tuple<number_type, number_type, number_type, number_type, number_type> key_type;
+
+                constexpr static const std::size_t key_schedule_bits = key_bits;
+                typedef std::tuple<number_type, number_type, number_type, number_type, number_type> key_schedule_type;
+
+                typedef NumberType signature_type;
+            };
+
+            template<typename CurveType>
+            struct rsa {
+                typedef rsa_public_key<CurveType> public_key_type;
+                typedef rsa_private_key<CurveType> private_key_type;
+            };
 
             /**
              * RSA Public Key
@@ -229,12 +260,6 @@ namespace nil {
 
             private:
                 number<Backend, ExpressionTemplates> m_d, m_p, m_q, m_d1, m_d2, m_c;
-            };
-
-            class rsa {
-            public:
-                typedef rsa_public_key public_key_policy;
-                typedef rsa_private_key private_key_policy;
             };
 
             size_t rsa_public_key::key_length() const {

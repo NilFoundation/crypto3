@@ -14,6 +14,154 @@
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
+            namespace detail {
+                template<typename Hash>
+                std::vector<uint8_t> sm2_compute_za(HashFunction &hash, const std::string &user_id, const ec_group &domain,
+                                                    const point_gfp &pubkey) {
+                    if (user_id.size() >= 8192) {
+                        throw std::invalid_argument("SM2 user id too long to represent");
+                    }
+
+                    const uint16_t uid_len = static_cast<uint16_t>(8 * user_id.size());
+
+                    hash.update(extract_uint_t<CHAR_BIT>(uid_len, 0));
+                    hash.update(extract_uint_t<CHAR_BIT>(uid_len, 1));
+                    hash.update(user_id);
+
+                    const size_t p_bytes = domain.get_p_bytes();
+
+                    hash.update(number<Backend, ExpressionTemplates>::encode_1363(domain.a(), p_bytes));
+                    hash.update(number<Backend, ExpressionTemplates>::encode_1363(domain.b(), p_bytes));
+                    hash.update(number<Backend, ExpressionTemplates>::encode_1363(domain.get_g_x(), p_bytes));
+                    hash.update(number<Backend, ExpressionTemplates>::encode_1363(domain.get_g_y(), p_bytes));
+                    hash.update(number<Backend, ExpressionTemplates>::encode_1363(pubkey.get_affine_x(), p_bytes));
+                    hash.update(number<Backend, ExpressionTemplates>::encode_1363(pubkey.get_affine_y(), p_bytes));
+
+                    std::vector<uint8_t> za(hash.output_length());
+                    hash.final(za.data());
+
+                    return za;
+                }
+            }
+
+            template<typename CurveType>
+            struct sm2_public_key {
+                typedef CurveType curve_type;
+
+                typedef typename curve_type::value_type value_type;
+                typedef typename curve_type::number_type number_type;
+
+                constexpr static const std::size_t key_bits = curve_type::field_type::modulus_bits;
+                typedef typename curve_type::value_type key_type;
+
+                constexpr static const std::size_t key_schedule_bits = curve_type::field_type::modulus_bits;
+                typedef typename curve_type::value_type key_schedule_type;
+
+                constexpr static const std::size_t signature_bits = curve_type::field_type::modulus_bits * 2;
+                typedef std::tuple<value_type, value_type> signature_type;
+            };
+
+            template<typename CurveType>
+            struct sm2_private_key {
+                typedef CurveType curve_type;
+
+                typedef typename curve_type::value_type value_type;
+                typedef typename curve_type::number_type number_type;
+
+                constexpr static const std::size_t key_bits = curve_type::field_type::modulus_bits;
+                typedef typename curve_type::value_type key_type;
+
+                constexpr static const std::size_t key_schedule_bits = curve_type::field_type::modulus_bits;
+                typedef typename curve_type::value_type key_schedule_type;
+
+                constexpr static const std::size_t signature_bits = curve_type::field_type::modulus_bits * 2;
+                typedef std::tuple<value_type, value_type> signature_type;
+            };
+
+            template<typename CurveType>
+            struct sm2 {
+                typedef CurveType curve_type;
+
+                typedef sm2_public_key<CurveType> public_key_type;
+                typedef sm2_private_key<CurveType> private_key_type;
+            };
+
+            /**
+             * This class represents a public key used for SM2 encryption
+             */
+            class sm2_encryption_public_key : public virtual ec_public_key {
+            public:
+                /**
+                 * Create a public key from a given public point.
+                 * @param dom_par the domain parameters associated with this key
+                 * @param public_point the public point defining this key
+                 */
+                sm2_encryption_public_key(const ec_group &dom_par, const point_gfp &public_point) :
+                    ec_public_key(dom_par, public_point) {
+                }
+
+                /**
+                 * Load a public key.
+                 * @param alg_id the X.509 algorithm identifier
+                 * @param key_bits DER encoded public key bits
+                 */
+                sm2_encryption_public_key(const algorithm_identifier &alg_id, const std::vector<uint8_t> &key_bits) :
+                    ec_public_key(alg_id, key_bits) {
+                }
+
+                /**
+                 * Get the OID of the underlying public key scheme.
+                 * @return oid_t of the public key scheme
+                 */
+                static const oid_t oid() {
+                    return oid_t({1, 2, 156, 10197, 1, 301, 3});
+                }
+
+                /**
+                 * Get this keys algorithm name.
+                 * @result this keys algorithm name
+                 */
+                std::string algo_name() const override {
+                    return "SM2_Enc";
+                }
+
+                std::unique_ptr<pk_operations::encryption>
+                create_encryption_op(random_number_generator &rng,
+                                     const std::string &params,
+                                     const std::string &provider) const override;
+
+            protected:
+                sm2_encryption_public_key() = default;
+            };
+
+            /**
+             * This class represents a private key used for SM2 encryption
+             */
+            class sm2_encryption_private_key final : public sm2_encryption_public_key, public ec_private_key {
+            public:
+                /**
+                 * Load a private key
+                 * @param alg_id the X.509 algorithm identifier
+                 * @param key_bits ECPrivateKey bits
+                 */
+                sm2_encryption_private_key(const algorithm_identifier &alg_id, const secure_vector<uint8_t> &key_bits);
+
+                /**
+                 * Create a private key.
+                 * @param rng a random number generator
+                 * @param domain parameters to used for this key
+                 * @param x the private key (if zero, generate a new random key)
+                 */
+                sm2_encryption_private_key(random_number_generator &rng, const ec_group &domain,
+                                           const number<Backend, ExpressionTemplates> &x = 0);
+
+                bool check_key(random_number_generator &rng, bool) const override;
+
+                std::unique_ptr<pk_operations::decryption>
+                create_decryption_op(random_number_generator &rng,
+                                     const std::string &params,
+                                     const std::string &provider) const override;
+            };
 
             /**
              * This class represents SM2 Signature public keys
