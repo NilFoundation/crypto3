@@ -17,6 +17,92 @@
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
+            void ed25519_gen_keypair(uint8_t *pk, uint8_t *sk, const uint8_t seed[32]) {
+                uint8_t az[64];
+
+                SHA_512 sha;
+                sha.update(seed, 32);
+                sha.final(az);
+                az[0] &= 248;
+                az[31] &= 63;
+                az[31] |= 64;
+
+                ge_scalarmult_base(pk, az);
+
+                // todo copy_mem
+                memmove(sk, seed, 32);
+                memmove(sk + 32, pk, 32);
+            }
+
+            void ed25519_sign(uint8_t sig[64], const uint8_t *m, size_t mlen, const uint8_t *sk) {
+                uint8_t az[64];
+                uint8_t nonce[64];
+                uint8_t hram[64];
+
+                SHA_512 sha;
+
+                sha.update(sk, 32);
+                sha.final(az);
+                az[0] &= 248;
+                az[31] &= 63;
+                az[31] |= 64;
+
+                sha.update(az + 32, 32);
+                sha.update(m, mlen);
+                sha.final(nonce);
+
+                sc_reduce(nonce);
+                ge_scalarmult_base(sig, nonce);
+
+                sha.update(sig, 32);
+                sha.update(sk + 32, 32);
+                sha.update(m, mlen);
+                sha.final(hram);
+
+                sc_reduce(hram);
+                sc_muladd(sig + 32, hram, az, nonce);
+            }
+
+            bool ed25519_verify(const uint8_t *m, size_t mlen, const uint8_t sig[64], const uint8_t *pk) {
+                uint8_t h[64];
+                uint8_t rcheck[32];
+                ge_p3 A;
+                SHA_512 sha;
+
+                if (sig[63] & 224) {
+                    return false;
+                }
+                if (ge_frombytes_negate_vartime(&A, pk) != 0) {
+                    return false;
+                }
+
+                sha.update(sig, 32);
+                sha.update(pk, 32);
+                sha.update(m, mlen);
+                sha.final(h);
+                sc_reduce(h);
+
+                ge_double_scalarmult_vartime(rcheck, h, &A, sig + 32);
+
+                return constant_time_compare(rcheck, sig, 32);
+            }
+
+            template<typename CurveType>
+            struct ed25519_public_key {
+                typedef CurveType curve_type;
+            };
+
+            template<typename CurveType>
+            struct ed25519_private_key {
+                typedef CurveType curve_type;
+            };
+
+            template<typename CurveType>
+            struct ed25519 {
+                typedef ed25519_public_key<CurveType> public_key_policy;
+                typedef ed25519_private_key<CurveType> private_key_policy;
+            };
+
             class ed25519_public_key : public virtual public_key_policy {
             public:
                 /**
@@ -116,88 +202,6 @@ namespace nil {
             private:
                 secure_vector<uint8_t> m_private;
             };
-
-            void ed25519_gen_keypair(uint8_t pk[32], uint8_t sk[64], const uint8_t seed[32]);
-
-            void ed25519_sign(uint8_t sig[64], const uint8_t msg[], size_t msg_len, const uint8_t sk[64]);
-
-            bool ed25519_verify(const uint8_t msg[], size_t msg_len, const uint8_t sig[64], const uint8_t pk[32]);
-
-            class ed25519 {
-            public:
-                typedef ed25519_public_key public_key_policy;
-                typedef ed25519_private_key private_key_policy;
-            };
-
-            void ed25519_gen_keypair(uint8_t *pk, uint8_t *sk, const uint8_t seed[32]) {
-                uint8_t az[64];
-
-                SHA_512 sha;
-                sha.update(seed, 32);
-                sha.final(az);
-                az[0] &= 248;
-                az[31] &= 63;
-                az[31] |= 64;
-
-                ge_scalarmult_base(pk, az);
-
-                // todo copy_mem
-                memmove(sk, seed, 32);
-                memmove(sk + 32, pk, 32);
-            }
-
-            void ed25519_sign(uint8_t sig[64], const uint8_t *m, size_t mlen, const uint8_t *sk) {
-                uint8_t az[64];
-                uint8_t nonce[64];
-                uint8_t hram[64];
-
-                SHA_512 sha;
-
-                sha.update(sk, 32);
-                sha.final(az);
-                az[0] &= 248;
-                az[31] &= 63;
-                az[31] |= 64;
-
-                sha.update(az + 32, 32);
-                sha.update(m, mlen);
-                sha.final(nonce);
-
-                sc_reduce(nonce);
-                ge_scalarmult_base(sig, nonce);
-
-                sha.update(sig, 32);
-                sha.update(sk + 32, 32);
-                sha.update(m, mlen);
-                sha.final(hram);
-
-                sc_reduce(hram);
-                sc_muladd(sig + 32, hram, az, nonce);
-            }
-
-            bool ed25519_verify(const uint8_t *m, size_t mlen, const uint8_t sig[64], const uint8_t *pk) {
-                uint8_t h[64];
-                uint8_t rcheck[32];
-                ge_p3 A;
-                SHA_512 sha;
-
-                if (sig[63] & 224) {
-                    return false;
-                }
-                if (ge_frombytes_negate_vartime(&A, pk) != 0) {
-                    return false;
-                }
-
-                sha.update(sig, 32);
-                sha.update(pk, 32);
-                sha.update(m, mlen);
-                sha.final(h);
-                sc_reduce(h);
-
-                ge_double_scalarmult_vartime(rcheck, h, &A, sig + 32);
-
-                return constant_time_compare(rcheck, sig, 32);
-            }
 
             algorithm_identifier ed25519_public_key::algorithm_identifier() const {
                 // algorithm_identifier::USE_NULL_PARAM puts 0x05 0x00 in parameters

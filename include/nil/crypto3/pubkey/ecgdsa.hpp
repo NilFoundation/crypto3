@@ -18,8 +18,6 @@ namespace nil {
             struct ecgdsa_public_key {
                 typedef CurveType curve_type;
 
-                typedef CurveType curve_type;
-
                 typedef typename curve_type::value_type value_type;
                 typedef typename curve_type::number_type number_type;
 
@@ -77,8 +75,6 @@ namespace nil {
 
             template<typename CurveType>
             struct ecgdsa_private_key {
-                typedef CurveType curve_type;
-
                 typedef CurveType curve_type;
 
                 typedef typename curve_type::value_type value_type;

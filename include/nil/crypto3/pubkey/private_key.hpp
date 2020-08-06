@@ -21,12 +21,12 @@ namespace nil {
             typedef typename public_key<Scheme>::key_type key_type;
             typedef typename public_key<Scheme>::key_schedule_type key_schedule_type;
 
-            private_key(const key_type &key) : public_key<Scheme>(key), privkey(key){
+            private_key(const key_type &key) : public_key<Scheme>(key), privkey(key) {
             }
 
             key_schedule_type privkey;
         };
-    }
-}
+    }    // namespace crypto3
+}    // namespace nil
 
 #endif    // CRYPTO3_PRIVATE_KEY_HPP

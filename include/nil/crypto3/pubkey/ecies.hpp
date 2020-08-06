@@ -15,15 +15,36 @@
 #include <limits>
 
 #include <nil/crypto3/pubkey/ecdh.hpp>
-#include <nil/crypto3/pubkey/ec_group/ec_group.hpp>
-#include <nil/crypto3/pubkey/ec_group/point_gfp.hpp>
 #include <nil/crypto3/pubkey/scheme.hpp>
-
-#include <nil/crypto3/utilities/secmem.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
+            template<typename CurveType>
+            struct ecies_public_key {
+                typedef CurveType curve_type;
+            };
+
+            template<typename CurveType>
+            struct ecies_private_key {
+                typedef CurveType curve_type;
+
+            };
+
+            template<typename CurveType>
+            struct ecies_agreement_key {
+                typedef CurveType curve_type;
+
+            };
+
+            template<typename CurveType>
+            struct ecies {
+                typedef CurveType curve_type;
+
+                typedef ecies_public_key<CurveType> public_key_type;
+                typedef ecies_private_key<CurveType> private_key_type;
+                typedef ecies_agreement_key<CurveType> agreement_key_type;
+            };
 
             enum class ecies_flags : uint32_t {
                 NONE = 0,
