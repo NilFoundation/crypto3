@@ -13,43 +13,6 @@
 #include <stdexcept>
 #include <vector>
 
-#include "zm2.hpp"
-
-#ifdef MIE_ATE_USE_GMP
-#include <gmpxx.h>
-
-namespace mie {
-
-    inline size_t M_bitLen(const mpz_class &x) {
-        return mpz_sizeinbase(x.get_mpz_t(), 2);
-    }
-    inline size_t M_blockSize(const mpz_class &x) {
-        return x.get_mpz_t()->_mp_size;
-    }
-    inline mp_limb_t M_block(const mpz_class &x, size_t i) {
-        return x.get_mpz_t()->_mp_d[i];
-    }
-    inline uint32_t M_low32bit(const mpz_class &x) {
-        return (uint32_t)M_block(x, 0);
-    }
-
-    namespace util {
-        template<>
-        struct IntTag<mpz_class> {
-            typedef mp_limb_t value_type;
-            static inline value_type getBlock(const mpz_class &x, size_t i) {
-                return M_block(x, i);
-            }
-            static inline size_t getBlockSize(const mpz_class &x) {
-                return M_blockSize(x);
-            }
-        };
-    }    // namespace util
-}    // namespace mie
-#endif
-
-extern uint64_t debug_buf[128];    // for debug
-
 namespace bn {
 
     struct CurveParam {
@@ -334,82 +297,6 @@ namespace bn {
         
         fp2_value_type data;
 
-        Fp2T() : fp2_value_type();
-        Fp2T(int x) : data({x, 0});
-
-        Fp2T(const Fp &a, const Fp &b) : data({a,b});
-
-        bool is_zero() const {
-            return data.is_zero();
-        }
-        static void (*add)(Fp2T &z, const Fp2T &x, const Fp2T &y);
-        static void (*addNC)(Fp2T &z, const Fp2T &x, const Fp2T &y);
-        static void (*sub)(Fp2T &z, const Fp2T &x, const Fp2T &y);
-        static void (*subNC)(Fp2T &z, const Fp2T &x, const Fp2T &y);
-        static void (*mul)(Fp2T &z, const Fp2T &x, const Fp2T &y);
-        static void (*square)(Fp2T &z, const Fp2T &x);
-        static void (*mul_xi)(Fp2T &z, const Fp2T &x);
-        static void (*mul_Fp_0)(Fp2T &z, const Fp2T &x, const Fp &b);
-        static void (*divBy2)(Fp2T &z, const Fp2T &x);
-
-        static inline void addC(Fp2T &z, const Fp2T &x, const Fp2T &y) {
-            z.data = x.data + y.data;
-        }
-        static inline void addNC_C(Fp2T &z, const Fp2T &x, const Fp2T &y) {
-            z.data = addNC(x.data, y.data);
-        }
-
-        static inline void subNC_C(Fp2T &z, const Fp2T &x, const Fp2T &y) {
-            z.data = subNC(x.data, y.data);
-        }
-
-        static inline void subC(Fp2T &z, const Fp2T &x, const Fp2T &y) {
-            z.data = x.data - y.data;
-        }
-        static inline void neg(Fp2T &z, const Fp2T &x) {
-            z.data = -x.data;
-        }
-
-        static inline void mulC(Fp2T &z, const Fp2T &x, const Fp2T &y) {
-            z.data = x.data * y.data;
-        }
-
-        static inline void divBy2C(Fp2T &z, const Fp2T &x) {
-            z.data = x.data.divBy2();
-        }
-
-        static inline void divBy4(Fp2T &z, const Fp2T &x) {
-            z.data = x.data.divBy4();
-        }
-
-        static inline void mul_xiC(Fp2T &z, const Fp2T &x) {
-            z.data = x.data.mul_xiC();
-        }
-
-        static inline void squareC(Fp2T &z, const Fp2T &x) {
-            z.data = x.data.square();
-        }
-
-        void inverse() {
-            z.data = x.data.inverse();
-        }
-
-        void clear() {
-            data.clear();
-        }
-
-        bool operator==(const Fp2T &rhs) const {
-            return data = rhs.data;
-        }
-        bool operator!=(const Fp2T &rhs) const {
-            return !operator==(rhs);
-        }
-
-        // z = x * b
-        static inline void mul_Fp_0C(Fp2T &z, const Fp2T &x, const Fp &b) {
-            z.data = x.data.mul_Fp_0C(b);
-        }
-
         /*
             u^2 = -1
             (a + b)u = -b + au
@@ -429,9 +316,6 @@ namespace bn {
             2 * Fp mul
             1 * Fp neg
         */
-        static inline void mul_Fp_1(Fp2T &z, const Fp &y_b) {
-            z.data = z_data.mul_Fp_1(y_b);
-        }
 
         struct Dbl : public mie::local::addsubmul<Dbl, mie::local::hasNegative<Dbl>> {
             typedef typename Fp::Dbl FpDbl;
@@ -488,10 +372,6 @@ namespace bn {
             static bin_op *sub;
             static bin_op *subNC;
 
-            static void (*mulOpt1)(Dbl &z, const Fp2T &x, const Fp2T &y);
-            static void (*mulOpt2)(Dbl &z, const Fp2T &x, const Fp2T &y);
-            static void (*square)(Dbl &z, const Fp2T &x);
-            static void (*mod)(Fp2T &z, const Dbl &x);
 
             static uni_op *mul_xi;
 
@@ -598,80 +478,6 @@ namespace bn {
         typedef typename Fp2::Dbl Fp2Dbl;
 
         fp6_3_over_2_value_type data;
-        
-        Fp6T() {
-        }
-        Fp6T(int x) : a_(x), b_(0), c_(0) {
-        }
-        Fp6T(const Fp2 &a, const Fp2 &b, const Fp2 &c) : a_(a), b_(b), c_(c) {
-        }
-        Fp6T(const Fp &a0, const Fp &a1, const Fp &a2, const Fp &a3, const Fp &a4, const Fp &a5) :
-            a_(a0, a1), b_(a2, a3), c_(a4, a5) {
-        }
-        void clear() {
-            a_.clear();
-            b_.clear();
-            c_.clear();
-        }
-
-        Fp *get() {
-            return a_.get();
-        }
-        const Fp *get() const {
-            return a_.get();
-        }
-        Fp2 *getFp2() {
-            return &a_;
-        }
-        const Fp2 *getFp2() const {
-            return &a_;
-        }
-        void set(const Fp2 &v0, const Fp2 &v1, const Fp2 &v2) {
-            a_ = v0;
-            b_ = v1;
-            c_ = v2;
-        }
-        bool is_zero() const {
-            return a_.is_zero() && b_.is_zero() && c_.is_zero();
-        }
-
-        static inline void addC(Fp2T &z, const Fp2T &x, const Fp2T &y) {
-            z.data = x.data + y.data;
-        }
-
-        static inline void subC(Fp2T &z, const Fp2T &x, const Fp2T &y) {
-            z.data = x.data - y.data;
-        }
-
-        static inline void neg(Fp2T &z, const Fp2T &x) {
-            z.data = -x.data;
-        }
-
-        static inline void mulC(Fp2T &z, const Fp2T &x, const Fp2T &y) {
-            z.data = x.data * y.data;
-        }
-
-        /*
-            1944clk * 2
-        */
-        static void square(Fp6T &z, const Fp6T &x) {
-            z.data = x.data.square();
-        }
-
-        void inverse() {
-            z.data = x.data.inverse();
-        }
-
-        bool operator==(const Fp6T &rhs) const {
-            return data = rhs.data;
-        }
-        bool operator!=(const Fp6T &rhs) const {
-            return !operator==(rhs);
-        }
-
-        static void (*add)(Fp6T &z, const Fp6T &x, const Fp6T &y);
-        static void (*sub)(Fp6T &z, const Fp6T &x, const Fp6T &y);
-        static void (*mul)(Fp6T &z, const Fp6T &x, const Fp6T &y);
 
         static void (*pointDblLineEval)(Fp6T &l, Fp2 *R, const Fp *P);
         static void (*pointDblLineEvalWithoutP)(Fp6T &l, Fp2 *R);
@@ -695,11 +501,11 @@ namespace bn {
             // xp, yp = P[0], P[1]
 
             // # 1
-            t0, R[2].square();
+            t0 = R[2].square();
             t4 = R[0] * R[1];
             t1 = R[1].square();
             // # 2
-            t3 = t0 + t0;
+            t3 = t0.dbl();
             t4 = t4.divBy2();
             t5 = t0 + t1;
             // # 3
@@ -779,7 +585,7 @@ namespace bn {
             t2 = R[2] * Q[1];
             // # 2
             t1 = R[0] - t1;
-            t2 = R[1] - t2);
+            t2 = R[1] - t2;
             // # 3
             t3 = t1.square();
             // # 4
@@ -816,7 +622,7 @@ namespace bn {
             Fp2Dbl::mod(t2, T1);
             // ### @note: Be careful, below fomulas are typo.
             // # 18
-            Fp2::mul_xi(l.a_, t2);
+            l.a_ = t2.mul_xi();
             l.b_ = t1;
         }
         static void pointAddLineEval(Fp6T &l, Fp2 *R, const Fp2 *Q, const Fp *P) {
@@ -825,10 +631,10 @@ namespace bn {
             mulFp6_24_Fp_01(l, P);
         }
         static void mul_Fp_b(Fp6T &z, const Fp &x) {
-            Fp2::mul_Fp_0(z.b_, z.b_, x);
+            z.b_ = z.b_.mul_Fp_0(x);
         }
         static void mul_Fp_c(Fp6T &z, const Fp &x) {
-            Fp2::mul_Fp_0(z.c_, z.c_, x);
+            z.c_ = z.c_.mul_Fp_0(x);
         }
 
         struct Dbl : public mie::local::addsubmul<Dbl, mie::local::hasNegative<Dbl>> {
@@ -995,76 +801,7 @@ namespace bn {
 
         fp12_2over3over2_value_type data;
         Fp6 a_, b_;
-        Fp12T() {
-        }
-        Fp12T(int x) : a_(x), b_(0) {
-        }
-        Fp12T(const Fp6 &a, const Fp6 &b) : a_(a), b_(b) {
-        }
-        Fp12T(const Fp &a0, const Fp &a1, const Fp &a2, const Fp &a3, const Fp &a4, const Fp &a5, const Fp &a6,
-              const Fp &a7, const Fp &a8, const Fp &a9, const Fp &a10, const Fp &a11) :
-            a_(a0, a1, a2, a3, a4, a5),
-            b_(a6, a7, a8, a9, a10, a11) {
-        }
-
-        Fp12T(const Fp2 &a0, const Fp2 &a1, const Fp2 &a2, const Fp2 &a3, const Fp2 &a4, const Fp2 &a5) :
-            a_(a0, a1, a2), b_(a3, a4, a5) {
-        }
-
-        void clear() {
-            data.clear();
-        }
-
-        bool is_zero() const {
-            return data.is_zero();
-        }
-        bool operator==(const Fp12T &rhs) const {
-            return data == rhs.data;
-        }
-        bool operator!=(const Fp12T &rhs) const {
-            return !operator==(rhs);
-        }
-        static inline void add(Fp12T &z, const Fp12T &x, const Fp12T &y) {
-            z.data = x.data + y.data;
-        }
-        static inline void sub(Fp12T &z, const Fp12T &x, const Fp12T &y) {
-            z.data = x.data - y.data;
-        }
-        static inline void neg(Fp12T &z, const Fp12T &x) {
-            z.data = -x.data;
-        }
-
-        // 6.4k x 22
-        static void (*mul)(Fp12T &z, const Fp12T &x, const Fp12T &y);
-        static inline void mulC(Fp12T &z, const Fp12T &x, const Fp12T &y) {
-            Dbl zd;
-            Fp6 t0, t1;
-            Fp6Dbl T0, T1, T2;
-            // # 1
-            Fp6Dbl::mul(T0, x.a_, y.a_);
-            Fp6Dbl::mul(T1, x.b_, y.b_);
-            t0 = x.a_ + x.b_;
-            t1 = y.a_ + y.b_;
-            // # 2
-            Fp6Dbl::mul(zd.a_, t0, t1);
-            // # 3
-            Fp6Dbl::add(T2, T0, T1);
-            // # 4
-            Fp6Dbl::sub(zd.b_, zd.a_, T2);
-            // #6, 7, 8
-            mul_gamma_add<Fp6Dbl, Fp2Dbl>(zd.a_, T1, T0);
-            Dbl::mod(z, zd);
-        }
-
-        /*
-            z = *this * *this
-            4800clk x 64
-        */
-        static void (*square)(Fp12T &z);
-        static void squareC(Fp12T &z) {
-            z.data = z.data.square();
-        }
-
+        
         /*
             square over Fp4
             Operation Count:

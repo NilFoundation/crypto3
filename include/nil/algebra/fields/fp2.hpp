@@ -107,12 +107,12 @@ namespace nil {
                 xi = 9 + u
                 (a + bu)(9 + u) = (9a - b) + (a + 9b)u
             */
-            value_type mul_xiC() {
+            value_type mul_xi() {
                 return {data[0].dbl().dbl().dbl() + data[0] - data[1], data[1].dbl().dbl().dbl() + data[1] + data[0]};
             }
 
             // z = x * b
-            value_type mul_Fp_0C(const underlying_type &b) {
+            value_type mul_Fp_0(const underlying_type &b) {
                 return {data[0] * b, data[1] * b};
             }
 
