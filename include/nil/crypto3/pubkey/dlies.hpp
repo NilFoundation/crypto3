@@ -17,9 +17,11 @@
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
-            template<typename FieldType>
+            template<typename FieldType, typename KeyDerivationFunction, typename MessageAuthenticationCode>
             struct dlies_public_key {
                 typedef FieldType field_type;
+                typedef KeyDerivationFunction kdf_type;
+                typedef MessageAuthenticationCode mac_type;
 
                 typedef typename field_type::value_type value_type;
                 typedef typename field_type::number_type number_type;
@@ -34,9 +36,11 @@ namespace nil {
                 typedef std::tuple<value_type, value_type> signature_type;
             };
 
-            template<typename FieldType>
+            template<typename FieldType, typename KeyDerivationFunction, typename MessageAuthenticationCode>
             struct dlies_private_key {
                 typedef FieldType field_type;
+                typedef KeyDerivationFunction kdf_type;
+                typedef MessageAuthenticationCode mac_type;
 
                 typedef typename field_type::value_type value_type;
                 typedef typename field_type::number_type number_type;
@@ -57,8 +61,8 @@ namespace nil {
                 typedef KeyDerivationFunction kdf_type;
                 typedef MessageAuthenticationCode mac_type;
 
-                typedef dlies_public_key<field_type> public_key_type;
-                typedef dlies_private_key<field_type> private_key_type;
+                typedef dlies_public_key<field_type, kdf_type, mac_type> public_key_type;
+                typedef dlies_private_key<field_type, kdf_type, mac_type> private_key_type;
 
                 constexpr static const std::size_t public_key_bits = public_key_type::key_bits;
                 constexpr static const std::size_t private_key_bits = private_key_type::key_bits;

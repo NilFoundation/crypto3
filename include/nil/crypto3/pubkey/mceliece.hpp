@@ -100,6 +100,19 @@ namespace nil {
                 }
             }    // namespace detail
 
+            struct mc_eliece_public_key {
+
+            };
+
+            struct mc_eliece_private_key {
+
+            };
+
+            struct mc_eliece {
+                typedef mc_eliece_public_key public_key_type;
+                typedef mc_eliece_private_key private_key_type;
+            };
+
             class mc_eliece_public_key : public virtual public_key_policy {
             public:
                 explicit mc_eliece_public_key(const std::vector<uint8_t> &key_bits);
@@ -270,12 +283,6 @@ namespace nil {
                 ciphertext_out.swap(ciphertext);
                 error_mask_out.swap(error_mask);
             }
-
-            class mceliece {
-            public:
-                typedef mceliece_public_key public_key_policy;
-                typedef mceliece_private_key private_key_policy;
-            };
 
             mceliece_private_key::mceliece_private_key(polyn_gf2m const &goppa_polyn,
                                                        std::vector<uint32_t> const &parity_check_matrix_coeffs,

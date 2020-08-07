@@ -15,9 +15,10 @@ namespace nil {
     namespace crypto3 {
         namespace pubkey {
             namespace detail {
-                template<typename Hash>
-                std::vector<uint8_t> sm2_compute_za(HashFunction &hash, const std::string &user_id, const ec_group &domain,
-                                                    const point_gfp &pubkey) {
+                template<typename Hash, typename CurveType>
+                std::vector<uint8_t> sm2_compute_za(const std::string &user_id, const ec_group &domain, const
+                                                    typename CurveType::value_type
+                                                     &pubkey) {
                     if (user_id.size() >= 8192) {
                         throw std::invalid_argument("SM2 user id too long to represent");
                     }

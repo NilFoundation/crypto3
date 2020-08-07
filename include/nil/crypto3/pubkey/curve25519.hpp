@@ -659,12 +659,6 @@ namespace nil {
                 secure_vector<uint8_t> m_private;
             };
 
-            class curve25519 {
-            public:
-                typedef curve25519_public_key public_key_policy;
-                typedef curve25519_private_key private_key_policy;
-            };
-
             class curve25519_ka_operation final : public pk_operations::key_agreement_with_kdf {
             public:
                 curve25519_ka_operation(const curve25519_private_key &key, const std::string &kdf) :
