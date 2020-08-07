@@ -45,7 +45,6 @@ namespace nil {
                 typedef typename field_type::value_type value_type;
                 typedef typename field_type::number_type number_type;
 
-                constexpr static const std::size_t key_bits = field_type::field_type::modulus_bits;
                 typedef typename field_type::value_type key_type;
 
                 constexpr static const std::size_t key_schedule_bits = field_type::field_type::modulus_bits;

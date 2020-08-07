@@ -29,6 +29,9 @@ namespace nil {
 
                 constexpr static const std::size_t signature_bits = curve_type::field_type::modulus_bits * 2;
                 typedef std::tuple<value_type, value_type> signature_type;
+
+                inline static bool sign(signature_type &res, const number_type &val, const key_schedule_type &key) {
+                }
             };
 
             template<typename CurveType>
@@ -46,6 +49,9 @@ namespace nil {
 
                 constexpr static const std::size_t signature_bits = curve_type::field_type::modulus_bits * 2;
                 typedef std::tuple<value_type, value_type> signature_type;
+
+                inline static bool verify(signature_type &res, const number_type &val, const key_schedule_type &key) {
+                }
             };
 
             template<typename CurveType>

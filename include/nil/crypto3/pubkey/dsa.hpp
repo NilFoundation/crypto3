@@ -11,6 +11,8 @@
 
 #include <nil/crypto3/pubkey/dl_algorithm.hpp>
 
+#include <nil/crypto3/pubkey/detail/nonce_generator.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
@@ -75,9 +77,10 @@ namespace nil {
                 constexpr static const std::size_t signature_bits = field_type::modulus_bits * 2;
                 typedef std::tuple<value_type, value_type> signature_type;
 
-                template<typename Hash>
-                inline static bool sign(signature_type &res, const number_type &val, const key_schedule_type &key) {
-                    const number<Backend, ExpressionTemplates> &q = m_group.get_q();
+                template<typename NonceGenerator>
+                inline static bool sign(signature_type &res, const number_type &val, const key_schedule_type &key,
+                                        const number_type &k) {
+                    const number_type &q = m_group.get_q();
 
                     number<Backend, ExpressionTemplates> i(msg, msg_len, q.bits());
 
@@ -85,16 +88,15 @@ namespace nil {
                         i -= q;
                     }
 
-#if defined(CRYPTO3_HAS_RFC6979)
-                    CRYPTO3_UNUSED(random);
-                    const number<Backend, ExpressionTemplates> k = generate_rfc6979_nonce(m_x, q, i, m_rfc6979_hash);
-#else
-                    const number<Backend, ExpressionTemplates> k =
-                        number<Backend, ExpressionTemplates>::random_integer(rng, 1, q);
-#endif
+                    number_type k = NonceGenerator()(key, q, i);
 
-                    number<Backend, ExpressionTemplates> s = inverse_mod(k, q);
-                    const number<Backend, ExpressionTemplates> r = m_mod_q.reduce(m_group.power_g_p(k));
+//                    const number<Backend, ExpressionTemplates> k = (m_x, q, i,
+//                                                                                              m_rfc6979_hash);
+//                    const number<Backend, ExpressionTemplates> k =
+//                        number<Backend, ExpressionTemplates>::random_integer(rng, 1, q);
+
+                    number_type s = inverse_mod(k, q);
+                    const number_type r = m_mod_q.reduce(m_group.power_g_p(k));
 
                     s = m_mod_q.multiply(s, m_x * r + i);
 

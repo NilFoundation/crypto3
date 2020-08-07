@@ -11,8 +11,8 @@
 
 #include <boost/multiprecision/number.hpp>
 
-#include <nil/crypto3/pubkey/ecc_key.hpp>
 #include <nil/crypto3/pubkey/detail/consistency.hpp>
+#include <nil/crypto3/pubkey/detail/modes/rfc6979.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -76,11 +76,11 @@ namespace nil {
                 constexpr static const std::size_t signature_bits = curve_type::field_type::modulus_bits * 2;
                 typedef std::tuple<value_type, value_type> signature_type;
 
-                template<typename Hash>
+                template<typename NonceGenerator>
                 inline static bool sign(signature_type &res, const number_type &val, const key_schedule_type &key) {
                     BigInt m(msg, msg_len, m_group.get_order_bits());
 
-                    const BigInt k = generate_rfc6979_nonce(m_x, m_group.get_order(), m, m_rfc6979_hash);
+//                    const BigInt k = generate_rfc6979_nonce(m_x, m_group.get_order(), m, m_rfc6979_hash);
 
                     const BigInt k_inv = inverse_mod(k, m_group.get_order());
                     const BigInt r = m_group.mod_order(

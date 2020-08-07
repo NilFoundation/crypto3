@@ -26,7 +26,7 @@ namespace nil {
 
                 typedef Scheme cipher_type;
                 typedef Mode mode_type;
-                typedef Padding padding_strategy;
+                typedef Padding padding_type;
             };
         }    // namespace pubkey
 

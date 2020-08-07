@@ -49,7 +49,7 @@ namespace nil {
                     */
                     const std::size_t MIN_WORKFACTOR = 64;
 
-                    return 2 * std::max<std::std::size_t>(MIN_WORKFACTOR, detail::nfs_complexity(prime_group_size, 1));
+                    return 2 * std::max<std::size_t>(MIN_WORKFACTOR, detail::nfs_complexity(prime_group_size, 1));
                 }
 
                 /**
