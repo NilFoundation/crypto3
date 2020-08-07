@@ -15,14 +15,14 @@ FieldT power(const FieldT &base, const number<Backend, ExpressionTemplates> &exp
  
     bool found_one = false;
 
-    for (long i = do_max_bits(exponent); i >= 0; --i)
+    for (long i = do_msb(exponent); i >= 0; --i)
     {
         if (found_one)
         {
             result = result * result;
         }
 
-        if (do_test_bit(exponent))
+        if (do_bit_test(exponent))
         {
             found_one = true;
             result = result * base;
