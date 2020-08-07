@@ -19,17 +19,8 @@ namespace nil {
         class random_number_generator;
 
         template<typename Hash>
-        class emsa {
-        public:
+        struct emsa {
             typedef Hash hash_type;
-
-            virtual ~emsa() = default;
-
-            emsa(Hash &input_hash) : hash(input_hash) {
-            }
-
-        protected:
-            Hash &hash;
         };
 
         /**

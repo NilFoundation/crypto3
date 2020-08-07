@@ -39,11 +39,7 @@ namespace nil {
         }            // namespace pubkey
         template<typename Hasher, template<typename, typename...> class SequenceContainer = std::vector,
                  template<typename> class Allocator = secure_allocator>
-        class emsa_x931 : public emsa<Hasher> {
-        public:
-            emsa_x931(Hasher &input_hash) : emsa<Hasher>(input_hash) {
-            }
-
+        struct emsa_x931 : public emsa<Hasher> {
             template<typename InputIterator1, typename InputIterator2>
             bool verify(InputIterator1 first1, InputIterator1 last1, InputIterator2 first2, InputIterator2 last2,
                         std::size_t key_bits) const {

@@ -6,21 +6,17 @@
 namespace nil {
     namespace crypto3 {
 
-        template<typename Hasher>
-        class emsa_raw : public emsa<Hasher> {
-        public:
-            emsa_raw(Hasher &input_hash) : emsa<Hasher>(input_hash) {
-            }
-
+        template<typename Hash>
+        struct emsa_raw : public emsa<Hash> {
             template<typename UniformRandomBitGenerator, typename RandomNumberDistribution, typename InputIterator,
                      typename OutputIterator>
             OutputIterator encode(InputIterator first, InputIterator last, OutputIterator out,
                                   UniformRandomBitGenerator rand, RandomNumberDistribution dist) {
                 std::ptrdiff_t distance = std::distance(first, last);
 
-                if (Hasher::policy_type::digest_bits / 8 && distance != Hasher::policy_type::digest_bits / 8) {
+                if (Hash::policy_type::digest_bits / 8 && distance != Hash::policy_type::digest_bits / 8) {
                     throw std::invalid_argument(
-                        "emsa_raw was configured to use a " + std::to_string(Hasher::policy_type::digest_bits) +
+                        "emsa_raw was configured to use a " + std::to_string(Hash::policy_type::digest_bits) +
                         " byte hash but instead was used for a " + std::to_string(distance) + " hash");
                 }
 
@@ -33,7 +29,7 @@ namespace nil {
                 std::ptrdiff_t coded_size = std::distance(first1, last1);
                 std::ptrdiff_t raw_size = std::distance(first2, last2);
 
-                if (Hasher::policy_type::digest_bits / 8 && raw_size != Hasher::policy_type::digest_bits / 8) {
+                if (Hash::policy_type::digest_bits / 8 && raw_size != Hash::policy_type::digest_bits / 8) {
                     return false;
                 }
 

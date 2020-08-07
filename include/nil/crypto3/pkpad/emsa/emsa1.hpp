@@ -5,19 +5,15 @@
 
 namespace nil {
     namespace crypto3 {
-        template<typename Hasher>
-        class emsa1 : public emsa<Hasher> {
-        public:
-            emsa1(Hasher &hash) : emsa<Hasher>(hash) {
-            }
-
+        template<typename Hash>
+        struct emsa1 : public emsa<Hash> {
             template<typename UniformRandomBitGenerator, typename RandomNumberDistribution, typename InputIterator,
                      typename OutputIterator>
             OutputIterator encode(InputIterator first, InputIterator last, OutputIterator out,
                                   UniformRandomBitGenerator rand, RandomNumberDistribution dist) {
                 std::ptrdiff_t distance = std::distance(first, last);
 
-                if (distance != Hasher::policy_type::digest_bits / 8) {
+                if (distance != Hash::policy_type::digest_bits / 8) {
                     throw encoding_error("EMSA1::encoding_of: Invalid size for input");
                 }
                 return emsa1_encoding(first, last, output_bits);
@@ -29,7 +25,7 @@ namespace nil {
                 std::ptrdiff_t input_size = std::distance(first1, last1);
                 std::ptrdiff_t raw_size = std::distance(first2, last2);
 
-                if (raw_size != Hasher::policy_type::digest_bits) {
+                if (raw_size != Hash::policy_type::digest_bits) {
                     return false;
                 }
 
