@@ -24,7 +24,7 @@ namespace nil {
 
                 typedef Cipher cipher_type;
                 typedef Mode mode_type;
-                typedef Padding padding_strategy;
+                typedef Padding padding_type;
             };
         }    // namespace block
     }        // namespace crypto3
