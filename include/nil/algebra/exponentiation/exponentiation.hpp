@@ -3,29 +3,26 @@
 #define EXPONENTIATION_HPP_
 
 #include <cstdint>
-#include <boost/multiprecision/detail/default_ops.hpp>
+#include <boost/multiprecision/number.hpp>
 
 namespace nil {
     namespace algebra {
 
-template<typename FieldT, typename PowerType>
-FieldT power(const FieldT &base, const PowerType &exponent)
+template<typename FieldT, typename Backend, expression_template_option ExpressionTemplates>
+FieldT power(const FieldT &base, const number<Backend, ExpressionTemplates> &exponent)
 {	
-	using default_ops::eval_bit_test;
-	using default_ops::eval_msb;
-
     FieldT result = FieldT::one();
  
     bool found_one = false;
 
-    for (long i = eval_msb(exponent); i >= 0; --i)
+    for (long i = do_max_bits(exponent); i >= 0; --i)
     {
         if (found_one)
         {
             result = result * result;
         }
 
-        if (eval_bit_test(exponent, i))
+        if (do_test_bit(exponent))
         {
             found_one = true;
             result = result * base;
