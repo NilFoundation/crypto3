@@ -102,8 +102,8 @@ namespace nil {
             struct el_gamal {
                 typedef FieldType field_type;
 
-                typedef el_gamal_public_key<field_type> public_key_policy;
-                typedef el_gamal_private_key<field_type> private_key_policy;
+                typedef el_gamal_public_key<field_type> public_key_type;
+                typedef el_gamal_private_key<field_type> private_key_type;
             };
         }    // namespace pubkey
     }        // namespace crypto3

@@ -80,7 +80,7 @@ namespace nil {
                 inline static bool sign(signature_type &res, const number_type &val, const key_schedule_type &key) {
                     BigInt m(msg, msg_len, m_group.get_order_bits());
 
-//                    const BigInt k = generate_rfc6979_nonce(m_x, m_group.get_order(), m, m_rfc6979_hash);
+                    const BigInt k = NonceGenerator()(m_x, m_group.get_order(), m);
 
                     const BigInt k_inv = inverse_mod(k, m_group.get_order());
                     const BigInt r = m_group.mod_order(
@@ -102,9 +102,6 @@ namespace nil {
             struct ecdsa {
                 typedef ecdsa_public_key<CurveType> public_key_type;
                 typedef ecdsa_private_key<CurveType> private_key_type;
-
-                constexpr static const std::size_t public_key_bits = public_key_type::key_bits;
-                constexpr static const std::size_t private_key_bits = private_key_type::key_bits;
             };
         }    // namespace pubkey
     }        // namespace crypto3

@@ -62,7 +62,7 @@ namespace nil {
 
                     template<typename Args>
                     scheme_im(const Args &args) :
-                        total_seen(0), filled(false), mode(args[boost::accumulators::sample]) {
+                        total_seen(0), mode(args[boost::accumulators::sample]) {
                     }
 
                     template<typename ArgumentPack>
@@ -90,128 +90,18 @@ namespace nil {
 
                     inline void process_pubkey() {
                         using namespace ::nil::crypto3::detail;
-
-                        pubkey_type processed_pubkey;
-                        if (dgst.empty()) {
-                            processed_pubkey = mode.begin_message(cache, total_seen);
-                        } else {
-                            processed_pubkey = mode.process_pubkey(cache, total_seen);
-                        }
-
-                        dgst = ::nil::crypto3::resize<pubkey_bits>(dgst, dgst.size() + pubkey_values);
-
-                        pack<endian_type, endian_type, value_bits, octet_bits>(
-                            processed_pubkey.begin(), processed_pubkey.end(), dgst.end() - pubkey_values);
-
-                        filled = false;
                     }
 
                     inline void process(const pubkey_type &value, std::size_t value_seen) {
                         using namespace ::nil::crypto3::detail;
-
-                        if (filled) {
-                            process_pubkey();
-                        }
-
-                        std::size_t cached_bits = total_seen % pubkey_bits;
-
-                        if (cached_bits != 0) {
-                            // If there are already any bits in the cache
-
-                            std::size_t needed_to_fill_bits = pubkey_bits - cached_bits;
-                            std::size_t new_bits_to_append =
-                                (needed_to_fill_bits > value_seen) ? value_seen : needed_to_fill_bits;
-
-                            injector_type::inject(value, new_bits_to_append, cache, cached_bits);
-                            total_seen += new_bits_to_append;
-
-                            if (cached_bits == pubkey_bits) {
-                                // If there are enough bits in the incoming value to fill the pubkey
-                                filled = true;
-
-                                if (value_seen > new_bits_to_append) {
-
-                                    process_pubkey();
-
-                                    // If there are some remaining bits in the incoming value - put them into the cache,
-                                    // which is now empty
-
-                                    cached_bits = 0;
-
-                                    injector_type::inject(value, value_seen - new_bits_to_append, cache, cached_bits,
-                                                          new_bits_to_append);
-
-                                    total_seen += value_seen - new_bits_to_append;
-                                }
-                            }
-
-                        } else {
-
-                            total_seen += value_seen;
-
-                            // If there are no bits in the cache
-                            if (value_seen == pubkey_bits) {
-                                // The incoming value is a full pubkey
-                                filled = true;
-
-                                std::move(value.begin(), value.end(), cache.begin());
-
-                            } else {
-                                // The incoming value is not a full pubkey
-                                std::move(value.begin(),
-                                          value.begin() + value_seen / word_bits + (value_seen % word_bits ? 1 : 0),
-                                          cache.begin());
-                            }
-                        }
                     }
 
                     inline void process(const word_type &value, std::size_t value_seen) {
                         using namespace ::nil::crypto3::detail;
-
-                        if (filled) {
-                            process_pubkey();
-                        }
-
-                        std::size_t cached_bits = total_seen % pubkey_bits;
-
-                        if (cached_bits % word_bits != 0) {
-                            std::size_t needed_to_fill_bits = pubkey_bits - cached_bits;
-                            std::size_t new_bits_to_append =
-                                (needed_to_fill_bits > value_seen) ? value_seen : needed_to_fill_bits;
-
-                            injector_type::inject(value, new_bits_to_append, cache, cached_bits);
-                            total_seen += new_bits_to_append;
-
-                            if (cached_bits == pubkey_bits) {
-                                // If there are enough bits in the incoming value to fill the pubkey
-
-                                filled = true;
-
-                                if (value_seen > new_bits_to_append) {
-
-                                    process_pubkey();
-
-                                    // If there are some remaining bits in the incoming value - put them into the cache,
-                                    // which is now empty
-                                    cached_bits = 0;
-
-                                    injector_type::inject(value, value_seen - new_bits_to_append, cache, cached_bits,
-                                                          new_bits_to_append);
-
-                                    total_seen += value_seen - new_bits_to_append;
-                                }
-                            }
-
-                        } else {
-                            cache[cached_bits / word_bits] = value;
-
-                            total_seen += value_seen;
-                        }
                     }
 
                     mode_type mode;
 
-                    bool filled;
                     std::size_t total_seen;
                     pubkey_type cache;
                     result_type dgst;

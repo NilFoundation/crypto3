@@ -66,6 +66,7 @@ namespace nil {
 
                     template<typename T, typename S, typename Q>
                     inline result_type operator()(const T &t, const S &s, const Q &q) {
+
                     }
                 };
 
@@ -77,6 +78,7 @@ namespace nil {
 
                     template<typename T, typename S, typename Q>
                     inline result_type operator()(const T &t, const S &s, const Q &q) {
+                        return generate_rfc6979_nonce<Hash>(t, s, q);
                     }
                 };
             }    // namespace detail
