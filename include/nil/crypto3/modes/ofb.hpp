@@ -26,7 +26,7 @@ namespace nil {
                         typedef std::size_t size_type;
 
                         typedef Cipher cipher_type;
-                        typedef Padding padding_strategy;
+                        typedef Padding padding_type;
 
                         constexpr static const size_type block_bits = cipher_type::block_bits;
                         constexpr static const size_type block_words = cipher_type::block_words;
