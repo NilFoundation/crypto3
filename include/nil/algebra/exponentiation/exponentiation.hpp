@@ -22,7 +22,7 @@ FieldT power(const FieldT &base, const number<Backend, ExpressionTemplates> &exp
             result = result * result;
         }
 
-        if (do_bit_test(exponent))
+        if (do_bit_test(exponent, i))
         {
             found_one = true;
             result = result * base;
