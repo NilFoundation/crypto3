@@ -4,6 +4,7 @@
 
 #include <cstdint>
 #include <boost/multiprecision/number.hpp>
+#include <boost/multiprecision/detail/integer_ops.hpp>
 
 namespace nil {
     namespace algebra {
@@ -15,14 +16,14 @@ FieldT power(const FieldT &base, const number<Backend, ExpressionTemplates> &exp
  
     bool found_one = false;
 
-    for (long i = do_msb(exponent); i >= 0; --i)
+    for (long i = msb(exponent); i >= 0; --i)
     {
         if (found_one)
         {
             result = result * result;
         }
 
-        if (do_bit_test(exponent, i))
+        if (bit_test(exponent, i))
         {
             found_one = true;
             result = result * base;
