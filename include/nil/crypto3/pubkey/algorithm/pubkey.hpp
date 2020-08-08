@@ -11,6 +11,8 @@
 
 #include <cstdint>
 
+#include <nil/crypto3/pubkey/detail/modes/isomorphic.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace pubkey {

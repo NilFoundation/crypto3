@@ -32,7 +32,7 @@ namespace nil {
             template<typename ProcessingMode>
             using accumulator_set = boost::accumulators::accumulator_set<
                 digest<ProcessingMode::input_block_bits>,
-                boost::accumulators::features<accumulators::tag::pubkey<ProcessingMode>>>;
+                boost::accumulators::features<accumulators::tag::scheme<ProcessingMode>>>;
         }    // namespace pubkey
     }        // namespace crypto3
 }    // namespace nil

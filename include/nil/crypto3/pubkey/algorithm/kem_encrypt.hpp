@@ -9,8 +9,12 @@
 #ifndef CRYPTO3_PUBKEY_KEM_DECRYPT_HPP
 #define CRYPTO3_PUBKEY_KEM_DECRYPT_HPP
 
+#include <nil/crypto3/pubkey/algorithm/pubkey.hpp>
+
 #include <nil/crypto3/pubkey/scheme_value.hpp>
 #include <nil/crypto3/pubkey/scheme_state.hpp>
+
+#include <nil/crypto3/pubkey/public_key.hpp>
 
 namespace nil {
     namespace crypto3 {

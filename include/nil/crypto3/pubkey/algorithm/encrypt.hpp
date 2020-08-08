@@ -47,9 +47,9 @@ namespace nil {
             typedef typename Scheme::stream_encrypter_type EncrypterMode;
             typedef typename pubkey::accumulator_set<typename pubkey::modes::isomorphic<
                 Scheme, pubkey::nop_padding>::template bind<pubkey::encryption_policy<Scheme>>::type>
-                EncrypterAccumulator;
+                SchemeAccumulator;
 
-            typedef pubkey::detail::value_scheme_impl<EncrypterAccumulator> StreamEncrypterImpl;
+            typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamEncrypterImpl;
             typedef pubkey::detail::itr_scheme_impl<StreamEncrypterImpl, OutputIterator> EncrypterImpl;
 
             return EncrypterImpl(first, last, std::move(out), EncrypterState(Scheme(key_first, key_last)));
@@ -78,9 +78,9 @@ namespace nil {
             typedef typename Scheme::stream_encrypter_type EncrypterMode;
             typedef typename pubkey::accumulator_set<typename pubkey::modes::isomorphic<
                 Scheme, pubkey::nop_padding>::template bind<pubkey::encryption_policy<Scheme>>::type>
-                EncrypterAccumulator;
+                SchemeAccumulator;
 
-            typedef pubkey::detail::value_scheme_impl<EncrypterAccumulator> StreamEncrypterImpl;
+            typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamEncrypterImpl;
             typedef pubkey::detail::itr_scheme_impl<StreamEncrypterImpl, OutputIterator> EncrypterImpl;
 
             return EncrypterImpl(first, last, std::move(out), EncrypterState(Scheme(key)));
