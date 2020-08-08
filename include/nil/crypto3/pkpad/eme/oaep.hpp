@@ -1,10 +1,18 @@
+//---------------------------------------------------------------------------//
+// Copyright (c) 2020 Mikhail Komarov <nemo@nil.foundation>
+//
+// Distributed under the Boost Software License, Version 1.0
+// See accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt
+//---------------------------------------------------------------------------//
+
 #ifndef CRYPTO3_OAEP_HPP
 #define CRYPTO3_OAEP_HPP
 
-#include <nil/crypto3/pkpad/eme.hpp>
 #include <nil/crypto3/hash/algorithm/hash.hpp>
-#include <nil/crypto3/pkpad/mgf1/mgf1.hpp>
-#include <nil/crypto3/utilities/ct_utils.hpp>
+
+#include <nil/crypto3/pkpad/eme.hpp>
+#include <nil/crypto3/pkpad/mgf1.hpp>
 
 namespace nil {
     namespace crypto3 {

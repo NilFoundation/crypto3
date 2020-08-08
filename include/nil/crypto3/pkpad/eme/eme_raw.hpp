@@ -1,8 +1,15 @@
+//---------------------------------------------------------------------------//
+// Copyright (c) 2020 Mikhail Komarov <nemo@nil.foundation>
+//
+// Distributed under the Boost Software License, Version 1.0
+// See accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt
+//---------------------------------------------------------------------------//
+
 #ifndef CRYPTO3_EME_RAW_HPP
 #define CRYPTO3_EME_RAW_HPP
 
 #include <nil/crypto3/pkpad/eme.hpp>
-#include <nil/crypto3/utilities/ct_utils.hpp>
 
 namespace nil {
     namespace crypto3 {

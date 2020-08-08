@@ -1,4 +1,4 @@
-#define BOOST_TEST_MODULE base64_encoding_test
+#define BOOST_TEST_MODULE mgf1_encoding_test
 
 #include <iostream>
 #include <unordered_map>
@@ -7,7 +7,19 @@
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
 
-#include <nil/crypto3/pkpad/mgf1/mgf1.hpp>
+#include <nil/crypto3/pkpad/eme/eme_pkcs.hpp>
+#include <nil/crypto3/pkpad/eme/eme_raw.hpp>
+#include <nil/crypto3/pkpad/eme/oaep.hpp>
+#include <nil/crypto3/pkpad/emsa/emsa1.hpp>
+#include <nil/crypto3/pkpad/emsa/emsa_pkcs1.hpp>
+#include <nil/crypto3/pkpad/emsa/emsa_pssr.hpp>
+#include <nil/crypto3/pkpad/emsa/emsa_raw.hpp>
+#include <nil/crypto3/pkpad/emsa/emsa_x931.hpp>
+#include <nil/crypto3/pkpad/eme.hpp>
+#include <nil/crypto3/pkpad/emsa.hpp>
+#include <nil/crypto3/pkpad/iso9796.hpp>
+#include <nil/crypto3/pkpad/mgf1.hpp>
+#include <nil/crypto3/pkpad/padding.hpp>
 
 using namespace nil::crypto3::codec;
 
@@ -42,38 +54,38 @@ static const std::unordered_map<std::string, std::vector<uint8_t>> valid_data = 
                                                                                  {"Dw/O2Ul6r5I=",                             {0x0f, 0x0f, 0xce, 0xd9, 0x49, 0x7a, 0xaf, 0x92}},
                                                                                  {"Jw+xiYKADaZA",                             {0x27, 0x0f, 0xb1, 0x89, 0x82, 0x80, 0x0d, 0xa6, 0x40}}};
 
-static const std::vector<std::string> invalid_data = {"ZOOL!isnotvalidbase64", "Neitheris:this?"};
+static const std::vector<std::string> invalid_data = {"ZOOL!isnotvalidmgf1", "Neitheris:this?"};
 
-BOOST_AUTO_TEST_SUITE(base64_encode_test_suite)
+BOOST_AUTO_TEST_SUITE(mgf1_encode_test_suite)
 
-    BOOST_DATA_TEST_CASE(base64_single_range_encode, boost::unit_test::data::make(valid_data), array_element) {
-        std::vector<uint8_t> out = encode<encoder::base64>(array_element.second);
-
-        BOOST_CHECK_EQUAL(std::string(out.begin(), out.end()), array_element.first);
-    }
-
-    BOOST_DATA_TEST_CASE(base64_range_encode, boost::unit_test::data::make(valid_data), array_element) {
-        std::vector<uint8_t> out;
-        encode<encoder::base64>(array_element.second, std::back_inserter(out));
+    BOOST_DATA_TEST_CASE(mgf1_single_range_encode, boost::unit_test::data::make(valid_data), array_element) {
+        std::vector<uint8_t> out = encode<encoder::mgf1>(array_element.second);
 
         BOOST_CHECK_EQUAL(std::string(out.begin(), out.end()), array_element.first);
     }
 
-    BOOST_DATA_TEST_CASE(base64_iterator_range_encode, boost::unit_test::data::make(valid_data), array_element) {
+    BOOST_DATA_TEST_CASE(mgf1_range_encode, boost::unit_test::data::make(valid_data), array_element) {
         std::vector<uint8_t> out;
-        encode<encoder::base64>(array_element.second.begin(), array_element.second.end(), std::back_inserter(out));
+        encode<encoder::mgf1>(array_element.second, std::back_inserter(out));
 
         BOOST_CHECK_EQUAL(std::string(out.begin(), out.end()), array_element.first);
     }
 
-    BOOST_DATA_TEST_CASE(base64_iterator_range_decode, boost::unit_test::data::make(valid_data), array_element) {
+    BOOST_DATA_TEST_CASE(mgf1_iterator_range_encode, boost::unit_test::data::make(valid_data), array_element) {
         std::vector<uint8_t> out;
-        decode<decoder::base64>(array_element.first.begin(), array_element.first.end(), std::back_inserter(out));
+        encode<encoder::mgf1>(array_element.second.begin(), array_element.second.end(), std::back_inserter(out));
+
+        BOOST_CHECK_EQUAL(std::string(out.begin(), out.end()), array_element.first);
+    }
+
+    BOOST_DATA_TEST_CASE(mgf1_iterator_range_decode, boost::unit_test::data::make(valid_data), array_element) {
+        std::vector<uint8_t> out;
+        decode<decoder::mgf1>(array_element.first.begin(), array_element.first.end(), std::back_inserter(out));
         BOOST_CHECK_EQUAL(out, array_element.second);
     }
 
-    BOOST_DATA_TEST_CASE(base64_decode_failure, boost::unit_test::data::make(invalid_data), array_element) {
-        BOOST_REQUIRE_THROW(decode<decoder::base64>(array_element), base64_decode_error);
+    BOOST_DATA_TEST_CASE(mgf1_decode_failure, boost::unit_test::data::make(invalid_data), array_element) {
+        BOOST_REQUIRE_THROW(decode<decoder::mgf1>(array_element), mgf1_decode_error);
     }
 
 BOOST_AUTO_TEST_SUITE_END()

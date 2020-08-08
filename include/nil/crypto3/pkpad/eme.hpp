@@ -1,27 +1,24 @@
+//---------------------------------------------------------------------------//
+// Copyright (c) 2019 Mikhail Komarov <nemo@nil.foundation>
+//
+// Distributed under the Boost Software License, Version 1.0
+// See accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt
+//---------------------------------------------------------------------------//
+
 #ifndef CRYPTO3_PUBKEY_EME_ENCRYPTION_PAD_HPP
 #define CRYPTO3_PUBKEY_EME_ENCRYPTION_PAD_HPP
 
-#include <nil/crypto3/utilities/secmem.hpp>
-
 namespace nil {
     namespace crypto3 {
+        namespace pkpad {
+            template<typename Hash>
+            struct eme {
+                typedef Hash hash_type;
+            };
+        }
 
         class random_number_generator;
-
-        /**
-         * Encoding Method for Encryption
-         */
-        class eme {
-        public:
-            virtual ~eme() = default;
-
-            /**
-             * Return the maximum input size in bytes we can support
-             * @param key_bits the size of the key in bits
-             * @return upper bound of input in bytes
-             */
-            virtual std::size_t maximum_input_size(std::size_t key_bits) const = 0;
-        };
 
         /**
          * Encoding Method for Encryption

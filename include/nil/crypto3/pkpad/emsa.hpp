@@ -1,3 +1,11 @@
+//---------------------------------------------------------------------------//
+// Copyright (c) 2020 Mikhail Komarov <nemo@nil.foundation>
+//
+// Distributed under the Boost Software License, Version 1.0
+// See accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt
+//---------------------------------------------------------------------------//
+
 #ifndef CRYPTO3_PUBKEY_EMSA_HPP
 #define CRYPTO3_PUBKEY_EMSA_HPP
 
@@ -6,10 +14,6 @@
 #include <boost/range/begin.hpp>
 #include <boost/range/end.hpp>
 #include <boost/range/concepts.hpp>
-
-#include <nil/crypto3/utilities/secmem.hpp>
-
-#include <nil/crypto3/asn1/alg_id.hpp>
 
 namespace nil {
     namespace crypto3 {
