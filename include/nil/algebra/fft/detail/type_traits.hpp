@@ -166,19 +166,19 @@ namespace nil {
     namespace algebra {
         namespace detail {
             template<std::size_t m>
-            struct is_basic_radix2_domain() {
+            struct is_basic_radix2_domain {
                 constexpr static bool const value =
                     (m > 1) && !(m & (m - 1)) && (boost::static_log2<m>::value <= FieldType::s);
             }
 
             template<std::size_t m>
-            struct is_extended_radix2_domain() {
+            struct is_extended_radix2_domain {
                 constexpr static bool const value =
                     (m > 1) && !(m & (m - 1)) && (boost::static_log2<m>::value == FieldType::s + 1);
             }
 
             template<std::size_t m>
-            struct is_step_radix2_domain() {
+            struct is_step_radix2_domain {
             private:
                 constexpr std::size_t const small_m = m - (1ul << (boost::static_log2<m>::value - 1));
 

@@ -19,38 +19,42 @@ namespace nil {
     namespace algebra {
         namespace fft {
 
-            template<typename FieldType, std::size_t MinSize>
-            struct extended_radix2_domain : public evaluation_domain<FieldType, MinSize> {
+            template<typename FieldType>
+            class extended_radix2_domain : public evaluation_domain<FieldType> {
+            public:
+                size_t small_m;
+                FieldType omega;
+                FieldType shift;
 
                 extended_radix2_domain(const size_t m) : evaluation_domain<FieldType>(m) {
                     if (m <= 1)
-                        throw InvalidSizeException("extended_radix2(): expected m > 1");
+                        throw std::invalid_argument("extended_radix2(): expected m > 1");
 
-                    if (!std::is_same<FieldType, ff::Double>::value) {
-                        const size_t logm = ff::log2(m);
+                    if (!std::is_same<FieldType, algebra::Double>::value) {
+                        const size_t logm = algebra::log2(m);
                         if (logm != (FieldType::s + 1))
-                            throw DomainSizeException("extended_radix2(): expected logm == FieldType::s + 1");
+                            throw std::invalid_argument("extended_radix2(): expected logm == FieldType::s + 1");
                     }
 
                     small_m = m / 2;
 
                     try {
-                        omega = detail::unity_root<FieldType>(small_m);
+                        omega = unity_root<FieldType>(small_m);
                     } catch (const std::invalid_argument &e) {
-                        throw DomainSizeException(e.what());
+                        throw std::invalid_argument(e.what());
                     }
 
-                    shift = detail::coset_shift<FieldType>();
+                    shift = algebra::coset_shift<FieldType>();
                 }
 
                 void FFT(std::vector<FieldType> &a) {
                     if (a.size() != this->m)
-                        throw DomainSizeException("extended_radix2: expected a.size() == this->m");
+                        throw std::invalid_argument(("extended_radix2: expected a.size() == this->m");
 
                     std::vector<FieldType> a0(small_m, FieldType::zero());
                     std::vector<FieldType> a1(small_m, FieldType::zero());
 
-                    const FieldType shift_to_small_m = shift ^ ff::bigint<1>(small_m);
+                    const FieldType shift_to_small_m = shift ^ small_m;
 
                     FieldType shift_i = FieldType::one();
                     for (size_t i = 0; i < small_m; ++i) {
@@ -68,10 +72,9 @@ namespace nil {
                         a[i + small_m] = a1[i];
                     }
                 }
-
                 void iFFT(std::vector<FieldType> &a) {
                     if (a.size() != this->m)
-                        throw DomainSizeException("extended_radix2: expected a.size() == this->m");
+                        throw std::invalid_argument("extended_radix2: expected a.size() == this->m");
 
                     // note: this is not in-place
                     std::vector<FieldType> a0(a.begin(), a.begin() + small_m);
@@ -81,7 +84,7 @@ namespace nil {
                     _basic_radix2_FFT(a0, omega_inverse);
                     _basic_radix2_FFT(a1, omega_inverse);
 
-                    const FieldType shift_to_small_m = shift ^ ff::bigint<1>(small_m);
+                    const FieldType shift_to_small_m = shift ^ small_m;
                     const FieldType sconst = (FieldType(small_m) * (FieldType::one() - shift_to_small_m)).inverse();
 
                     const FieldType shift_inverse = shift.inverse();
@@ -94,27 +97,15 @@ namespace nil {
                         shift_inverse_i *= shift_inverse;
                     }
                 }
-
-                void cosetFFT(std::vector<FieldType> &a, const FieldType &g) {
-                    detail::multiply_by_coset(a, g);
-                    FFT(a);
-                }
-
-                void icosetFFT(std::vector<FieldType> &a, const FieldType &g) {
-                    iFFT(a);
-                    detail::multiply_by_coset(a, g.inverse());
-                }
-
                 std::vector<FieldType> evaluate_all_lagrange_polynomials(const FieldType &t) {
-                    const std::vector<FieldType> T0 =
-                        detail::basic_radix2_evaluate_all_lagrange_polynomials(small_m, t);
+                    const std::vector<FieldType> T0 = basic_radix2_evaluate_all_lagrange_polynomials(small_m, t);
                     const std::vector<FieldType> T1 =
-                        detail::basic_radix2_evaluate_all_lagrange_polynomials(small_m, t * shift.inverse());
+                        basic_radix2_evaluate_all_lagrange_polynomials(small_m, t * shift.inverse());
 
                     std::vector<FieldType> result(this->m, FieldType::zero());
 
-                    const FieldType t_to_small_m = t ^ ff::bigint<1>(small_m);
-                    const FieldType shift_to_small_m = shift ^ ff::bigint<1>(small_m);
+                    const FieldType t_to_small_m = t ^ small_m;
+                    const FieldType shift_to_small_m = shift ^ small_m;
                     const FieldType one_over_denom = (shift_to_small_m - FieldType::one()).inverse();
                     const FieldType T0_coeff = (t_to_small_m - shift_to_small_m) * (-one_over_denom);
                     const FieldType T1_coeff = (t_to_small_m - FieldType::one()) * one_over_denom;
@@ -139,8 +130,8 @@ namespace nil {
                 }
 
                 void add_poly_Z(const FieldType &coeff, std::vector<FieldType> &H) {
-                    if (H.size() != m + 1)
-                        throw DomainSizeException("extended_radix2: expected H.size() == m+1");
+                    if (H.size() != this->m + 1)
+                        throw std::invalid_argument("extended_radix2: expected H.size() == this->m+1");
 
                     const FieldType shift_to_small_m = shift ^ small_m;
 
@@ -167,13 +158,7 @@ namespace nil {
                         P[i + small_m] *= Z1_inverse;
                     }
                 }
-
-            private:
-                size_t small_m;
-                FieldType omega;
-                FieldType shift;
             };
-
         }    // namespace fft
     }        // namespace algebra
 }    // namespace nil

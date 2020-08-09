@@ -18,28 +18,38 @@
 namespace nil {
     namespace algebra {
         namespace fft {
+            template<typename FieldType>
+            class step_radix2_domain : public evaluation_domain<FieldType> {
+            public:
+                size_t big_m;
+                size_t small_m;
+                FieldType omega;
+                FieldType big_omega;
+                FieldType small_omega;
 
-            template<typename FieldType, std::size_t MinSize>
-            struct step_radix2_domain : public evaluation_domain<FieldType, MinSize> {
-                constexpr static const std::size_t min_size = MinSize;
-                constexpr static const std::size_t big_m = 1ul << (boost::static_log2<MinSize>::value - 1);
-                constexpr static const std::size_t small_m = MinSize - big_m;
-                constexpr static const std::size_t omega =
-                    detail::unity_root<FieldType>(1ul << boost::static_log2<MinSize>::value);
+                step_radix2_domain(const size_t m) : evaluation_domain<FieldType>(m) {
+                    if (m <= 1)
+                        throw std::invalid_argument("step_radix2(): expected m > 1");
 
-                static_assert(MinSize > 1, "step_radix2(): expected m > 1");
-                static_assert(small_m != 1ul << boost::static_log2<small_m>::value,
-                              "step_radix2(): expected small_m "
-                              "== 1ul<<log2(small_m)");
+                    big_m = 1ul << (algebra::log2(m) - 1);
+                    small_m = m - big_m;
 
-                step_radix2_domain() {
+                    if (small_m != 1ul << algebra::log2(small_m))
+                        throw std::invalid_argument("step_radix2(): expected small_m == 1ul<<log2(small_m)");
+
+                    try {
+                        omega = unity_root<FieldType>(1ul << algebra::log2(m));
+                    } catch (const std::invalid_argument &e) {
+                        throw std::invalid_argument(e.what());
+                    }
+
                     big_omega = omega.squared();
-                    small_omega = detail::unity_root<FieldType>(small_m);
+                    small_omega = unity_root<FieldType>(small_m);
                 }
 
                 void FFT(std::vector<FieldType> &a) {
-                    if (a.size() != MinSize)
-                        throw DomainSizeException("step_radix2: expected a.size() == MinSize");
+                    if (a.size() != this->m)
+                        throw std::invalid_argument("step_radix2: expected a.size() == this->m");
 
                     std::vector<FieldType> c(big_m, FieldType::zero());
                     std::vector<FieldType> d(big_m, FieldType::zero());
@@ -52,7 +62,7 @@ namespace nil {
                     }
 
                     std::vector<FieldType> e(small_m, FieldType::zero());
-                    const size_t compr = 1ul << (std::log2(big_m) - std::log2(small_m));
+                    const size_t compr = 1ul << (algebra::log2(big_m) - algebra::log2(small_m));
                     for (size_t i = 0; i < small_m; ++i) {
                         for (size_t j = 0; j < compr; ++j) {
                             e[i] += d[i + j * small_m];
@@ -60,7 +70,7 @@ namespace nil {
                     }
 
                     _basic_radix2_FFT(c, omega.squared());
-                    _basic_radix2_FFT(e, detail::unity_root<FieldType>(small_m));
+                    _basic_radix2_FFT(e, unity_root<FieldType>(small_m));
 
                     for (size_t i = 0; i < big_m; ++i) {
                         a[i] = c[i];
@@ -70,16 +80,15 @@ namespace nil {
                         a[i + big_m] = e[i];
                     }
                 }
-
                 void iFFT(std::vector<FieldType> &a) {
-                    if (a.size() != MinSize)
-                        throw DomainSizeException("step_radix2: expected a.size() == MinSize");
+                    if (a.size() != this->m)
+                        throw std::invalid_argument("step_radix2: expected a.size() == this->m");
 
                     std::vector<FieldType> U0(a.begin(), a.begin() + big_m);
                     std::vector<FieldType> U1(a.begin() + big_m, a.end());
 
                     _basic_radix2_FFT(U0, omega.squared().inverse());
-                    _basic_radix2_FFT(U1, detail::unity_root<FieldType>(small_m).inverse());
+                    _basic_radix2_FFT(U1, unity_root<FieldType>(small_m).inverse());
 
                     const FieldType U0_size_inv = FieldType(big_m).inverse();
                     for (size_t i = 0; i < big_m; ++i) {
@@ -103,7 +112,7 @@ namespace nil {
                         a[i] = U0[i];
                     }
 
-                    const size_t compr = 1ul << (log2(big_m) - log2(small_m));
+                    const size_t compr = 1ul << (algebra::log2(big_m) - algebra::log2(small_m));
                     for (size_t i = 0; i < small_m; ++i) {
                         for (size_t j = 1; j < compr; ++j) {
                             U1[i] -= tmp[i + j * small_m];
@@ -129,22 +138,12 @@ namespace nil {
                     }
                 }
 
-                void cosetFFT(std::vector<FieldType> &a, const FieldType &g) {
-                    detail::multiply_by_coset(a, g);
-                    FFT(a);
-                }
-
-                void icosetFFT(std::vector<FieldType> &a, const FieldType &g) {
-                    iFFT(a);
-                    detail::multiply_by_coset(a, g.inverse());
-                }
-
                 std::vector<FieldType> evaluate_all_lagrange_polynomials(const FieldType &t) {
-                    std::vector<FieldType> inner_big = detail::basic_radix2_evaluate_all_lagrange_polynomials(big_m, t);
+                    std::vector<FieldType> inner_big = basic_radix2_evaluate_all_lagrange_polynomials(big_m, t);
                     std::vector<FieldType> inner_small =
-                        detail::basic_radix2_evaluate_all_lagrange_polynomials(small_m, t * omega.inverse());
+                        basic_radix2_evaluate_all_lagrange_polynomials(small_m, t * omega.inverse());
 
-                    std::vector<FieldType> result(MinSize, FieldType::zero());
+                    std::vector<FieldType> result(this->m, FieldType::zero());
 
                     const FieldType L0 = (t ^ small_m) - (omega ^ small_m);
                     const FieldType omega_to_small_m = omega ^ small_m;
@@ -155,8 +154,7 @@ namespace nil {
                         elt *= big_omega_to_small_m;
                     }
 
-                    const FieldType L1 =
-                        ((t ^ big_m) - FieldType::one()) * ((omega ^ big_m) - FieldType::one()).inverse();
+                    const FieldType L1 = ((t ^ big_m) - FieldType::one()) * ((omega ^ big_m) - FieldType::one()).inverse();
 
                     for (size_t i = 0; i < small_m; ++i) {
                         result[big_m + i] = L1 * inner_small[i];
@@ -178,17 +176,16 @@ namespace nil {
                 }
 
                 void add_poly_Z(const FieldType &coeff, std::vector<FieldType> &H) {
-                    if (H.size() != MinSize + 1)
-                        throw DomainSizeException("step_radix2: expected H.size() == MinSize+1");
+                    if (H.size() != this->m + 1)
+                        throw std::invalid_argument("step_radix2: expected H.size() == this->m+1");
 
                     const FieldType omega_to_small_m = omega ^ small_m;
 
-                    H[MinSize] += coeff;
+                    H[this->m] += coeff;
                     H[big_m] -= coeff * omega_to_small_m;
                     H[small_m] -= coeff;
                     H[0] += coeff * omega_to_small_m;
                 }
-
                 void divide_by_Z_on_coset(std::vector<FieldType> &P) {
                     // (c^{2^k}-1) * (c^{2^r} * w^{2^{r+1}*i) - w^{2^r})
                     const FieldType coset = FieldType::multiplicative_generator;
@@ -214,15 +211,7 @@ namespace nil {
                         P[big_m + i] *= Z1_inverse;
                     }
                 }
-
-            private:
-                size_t big_m;
-                size_t small_m;
-                FieldType omega;
-                FieldType big_omega;
-                FieldType small_omega;
             };
-
         }    // namespace fft
     }        // namespace algebra
 }    // namespace nil

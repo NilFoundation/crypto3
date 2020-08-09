@@ -122,7 +122,7 @@ namespace nil {
             void _polynomial_multiplication_on_fft(std::vector<FieldType> &c, const std::vector<FieldType> &a,
                                                    const std::vector<FieldType> &b) {
                 const size_t n = algebra::get_power_of_two(a.size() + b.size() - 1);
-                FieldType omega = detail::unity_root<FieldType>(n);
+                FieldType omega = unity_root<FieldType>(n);
 
                 std::vector<FieldType> u(a);
                 std::vector<FieldType> v(b);

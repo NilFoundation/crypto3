@@ -12,6 +12,10 @@
 
 #include <vector>
 
+#include <boost/math/tools/polynomial.hpp>
+
+#include <nil/algebra/fft/detail/field_utils.hpp>
+
 namespace nil {
     namespace algebra {
         namespace fft {
@@ -19,9 +23,18 @@ namespace nil {
             /**
              * An evaluation domain.
              */
-            template<typename FieldType, std::size_t MinSize>
-            struct evaluation_domain {
-                constexpr static const std::size_t min_size = MinSize;
+            template<typename FieldType>
+            class evaluation_domain {
+            public:
+                const size_t m;
+
+                /**
+                 * Construct an evaluation domain S of size m, if possible.
+                 *
+                 * (See the function get_evaluation_domain below.)
+                 */
+                evaluation_domain(const size_t m) : m(m) {};
+
                 /**
                  * Get the idx-th element in S.
                  */
@@ -36,16 +49,6 @@ namespace nil {
                  * Compute the inverse FFT, over the domain S, of the vector a.
                  */
                 virtual void iFFT(std::vector<FieldType> &a) = 0;
-
-                /**
-                 * Compute the FFT, over the domain g*S, of the vector a.
-                 */
-                virtual void cosetFFT(std::vector<FieldType> &a, const FieldType &g) = 0;
-
-                /**
-                 * Compute the inverse FFT, over the domain g*S, of the vector a.
-                 */
-                virtual void icosetFFT(std::vector<FieldType> &a, const FieldType &g) = 0;
 
                 /**
                  * Evaluate all Lagrange polynomials.

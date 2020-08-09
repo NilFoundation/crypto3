@@ -34,23 +34,19 @@ namespace nil {
         namespace fft {
             namespace detail {
 
-                /*!
-                 * @brief Serial compute the radix-2 FFT of the vector a over the set S={omega^{0},...,omega^{m-1}}.
-                 *
-                 */
                 /*
-                 Below we make use of pseudocode from [CLRS 2n Ed, pp. 864].
-                 Also, note that it's the caller's responsibility to multiply by 1/N.
+                 * Below we make use of pseudocode from [CLRS 2n Ed, pp. 864].
+                 * Also, note that it's the caller's responsibility to multiply by 1/N.
                  */
                 template<typename FieldType>
                 void basic_serial_radix2_FFT(std::vector<FieldType> &a, const FieldType &omega) {
-                    const size_t n = a.size(), logn = std::log2(n);
+                    const size_t n = a.size(), logn = log2(n);
                     if (n != (1u << logn))
-                        throw DomainSizeException("expected n == (1u << logn)");
+                        throw std::invalid_argument("expected n == (1u << logn)");
 
                     /* swapping in place (from Storer's book) */
                     for (size_t k = 0; k < n; ++k) {
-                        const size_t rk = ff::bitreverse(k, logn);
+                        const size_t rk = algebra::bitreverse(k, logn);
                         if (k < rk)
                             std::swap(a[k], a[rk]);
                     }
@@ -75,20 +71,15 @@ namespace nil {
                     }
                 }
 
-                /*!
-                 * @brief A multi-thread version of _basic_radix2_FFT. Inner implementation.
-                 *
-                 */
                 template<typename FieldType>
-                void basic_parallel_radix2_FFT_inner(std::vector<FieldType> &a,
-                                                     const FieldType &omega,
-                                                     const size_t log_cpus) {
+                void basic_parallel_radix2_FFT_inner(std::vector<FieldType> &a, const FieldType &omega,
+                                                      const size_t log_cpus) {
                     const size_t num_cpus = 1ul << log_cpus;
 
                     const size_t m = a.size();
-                    const size_t log_m = std::log2(m);
+                    const size_t log_m = log2(m);
                     if (m != 1ul << log_m)
-                        throw DomainSizeException("expected m == 1ul<<log_m");
+                        throw std::invalid_argument("expected m == 1ul<<log_m");
 
                     if (log_m < log_cpus) {
                         basic_serial_radix2_FFT(a, omega);
@@ -140,10 +131,6 @@ namespace nil {
                     }
                 }
 
-                /*!
-                 * @brief A multi-thread version of _basic_radix2_FFT.
-                 *
-                 */
                 template<typename FieldType>
                 void basic_parallel_radix2_FFT(std::vector<FieldType> &a, const FieldType &omega) {
 #ifdef MULTICORE
@@ -151,8 +138,12 @@ namespace nil {
 #else
                     const size_t num_cpus = 1;
 #endif
-                    const size_t log_cpus =
-                        ((num_cpus & (num_cpus - 1)) == 0 ? std::log2(num_cpus) : std::log2(num_cpus) - 1);
+                    const size_t log_cpus = ((num_cpus & (num_cpus - 1)) == 0 ? log2(num_cpus) : log2(num_cpus) - 1);
+
+#ifdef DEBUG
+                    algebra::print_indent();
+                    printf("* Invoking parallel FFT on 2^%zu CPUs (omp_get_max_threads = %zu)\n", log_cpus, num_cpus);
+#endif
 
                     if (log_cpus == 0) {
                         basic_serial_radix2_FFT(a, omega);
@@ -161,33 +152,20 @@ namespace nil {
                     }
                 }
 
-                /*!
-                 * @brief Translate the vector a to a coset defined by g.
+                /**
+                 * Compute the m Lagrange coefficients, relative to the set S={omega^{0},...,omega^{m-1}}, at the field
+                 * element t.
                  */
                 template<typename FieldType>
-                void multiply_by_coset(std::vector<FieldType> &a, const FieldType &g) {
-                    FieldType u = g;
-                    for (size_t i = 1; i < a.size(); ++i) {
-                        a[i] *= u;
-                        u *= g;
-                    }
-                }
-
-                /*!
-                 * @brief Compute the m Lagrange coefficients, relative to the set S={omega^{0},...,omega^{m-1}}, at the
-                 * field element t.
-                 */
-                template<typename FieldType>
-                std::vector<FieldType> basic_radix2_evaluate_all_lagrange_polynomials(const size_t m,
-                                                                                      const FieldType &t) {
+                std::vector<FieldType> basic_radix2_evaluate_all_lagrange_polynomials(const size_t m, const FieldType &t) {
                     if (m == 1) {
                         return std::vector<FieldType>(1, FieldType::one());
                     }
 
                     if (m != (1u << algebra::log2(m)))
-                        throw DomainSizeException("expected m == (1u << log2(m))");
+                        throw std::invalid_argument("expected m == (1u << log2(m))");
 
-                    const FieldType omega = detail::unity_root<FieldType>(m);
+                    const FieldType omega = unity_root<FieldType>(m);
 
                     std::vector<FieldType> u(m, FieldType::zero());
 
@@ -228,7 +206,7 @@ namespace nil {
                     }
 
                     return u;
-                };
+                }
             }    // namespace detail
         }        // namespace fft
     }            // namespace algebra

@@ -34,7 +34,7 @@ protected:
     }
 };
 
-/*typedef ::testing::Types<libff::Fr<libff::mnt4_pp>, libff::Double> FieldType;*/ /* List Extend Here */
+/*typedef ::testing::Types<algebra::Fr<algebra::mnt4_pp>, algebra::Double> FieldType;*/ /* List Extend Here */
 /*TYPED_TEST_CASE(EvaluationDomainTest, FieldType);
 
 TYPED_TEST(EvaluationDomainTest, FFT) {
@@ -132,8 +132,10 @@ TYPED_TEST(EvaluationDomainTest, InverseCosetFFTofCosetFFT) {
                 domain.reset(new arithmetic_sequence_domain<TypeParam>(m));
 
             std::vector<TypeParam> a(f);
-            domain->cosetFFT(a, coset);
-            domain->icosetFFT(a, coset);
+            multiply_by_coset(a, coset);
+            domain->FFT(a, coset);
+            domain->iFFT(a, coset);
+            multiply_by_coset(a, coset.inverse());
 
             for (size_t i = 0; i < m; i++) {
                 EXPECT_TRUE(f[i] == a[i]);
