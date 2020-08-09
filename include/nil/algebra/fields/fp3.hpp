@@ -28,32 +28,31 @@ namespace nil {
             typedef element<fp<ModulusBits, GeneratorBits>, number_type> non_residue_type;
 
             constexpr static const std::size_t modulus_bits = ModulusBits;
-            typedef number<backends::cpp_int_backend<modulus_bits, modulus_bits, unsigned_magnitude, unchecked, void>>
+            typedef boost::multiprecision::number<
+                backends::cpp_int_backend<modulus_bits, modulus_bits, boost::multiprecision::unsigned_magnitude,
+                                          boost::multiprecision::unchecked, void>>
                 modulus_type;
 
             constexpr static const std::size_t generator_bits = GeneratorBits;
-            typedef number<
-                backends::cpp_int_backend<generator_bits, generator_bits, unsigned_magnitude, unchecked, void>>
+            typedef boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<
+                generator_bits, generator_bits, boost::multiprecision::unsigned_magnitude,
+                boost::multiprecision::unchecked, void>>
                 generator_type;
-                
         };
 
         template<std::size_t ModulusBits, std::size_t GeneratorBits>
         struct element<fp3<ModulusBits, GeneratorBits>> {
-
 
             using underlying_type = element<fp<ModulusBits, GeneratorBits>>;
 
             using type = std::array<underlying_type, 3>;
 
         private:
-
             using value_type = element<fp3<ModulusBits, GeneratorBits>>;
 
             type data;
 
         public:
-
             value_type(type data) : data(data);
 
             inline static value_type zero() const {
@@ -65,7 +64,8 @@ namespace nil {
             }
 
             bool is_zero() const {
-                return (data[0] == underlying_type::zero()) && (data[1] == underlying_type::zero()) && (data[2] == underlying_type::zero());
+                return (data[0] == underlying_type::zero()) && (data[1] == underlying_type::zero()) &&
+                       (data[2] == underlying_type::zero());
             }
 
             bool operator==(const value_type &B) const {
@@ -85,15 +85,16 @@ namespace nil {
             }
 
             value_type operator-() const {
-                return zero()-data;
+                return zero() - data;
             }
-            
-            value_type operator*(const value_type &B) const {
-                const underlying_type A0B0 = data[0] * B.data[0], A1B1 = data[1] * B.data[1], A2B2 = data[2] * B.data[2];
 
-                return {A0B0 + non_residue * ( data[1] + data[2] ) * ( B.data[1] + B.data[2] ) - A1B1 - A2B2,
-                            ( data[0] + data[1] ) * ( B.data[0] + B.data[1] ) - A0B0 - A1B1 + non_residue * A2B2,
-                            ( data[0] + data[2] ) * ( B.data[0] + B.data[2] ) - A0B0 + A1B1 - A2B2};
+            value_type operator*(const value_type &B) const {
+                const underlying_type A0B0 = data[0] * B.data[0], A1B1 = data[1] * B.data[1],
+                                      A2B2 = data[2] * B.data[2];
+
+                return {A0B0 + non_residue * (data[1] + data[2]) * (B.data[1] + B.data[2]) - A1B1 - A2B2,
+                        (data[0] + data[1]) * (B.data[0] + B.data[1]) - A0B0 - A1B1 + non_residue * A2B2,
+                        (data[0] + data[2]) * (B.data[0] + B.data[2]) - A0B0 + A1B1 - A2B2};
             }
 
             value_type sqrt() const {
@@ -102,33 +103,33 @@ namespace nil {
             }
 
             value_type square() const {
-                return data*data;    // maybe can be done more effective
+                return data * data;    // maybe can be done more effective
             }
 
-            template <typename PowerType>
+            template<typename PowerType>
             value_type pow(const PowerType &power) const {
             }
 
             value_type inverse() const {
-                
-                /* From "High-Speed Software Implementation of the Optimal Ate Pairing over Barreto-Naehrig Curves"; Algorithm 17 */
+
+                /* From "High-Speed Software Implementation of the Optimal Ate Pairing over Barreto-Naehrig Curves";
+                 * Algorithm 17 */
 
                 const underlying_type &A0 = data[0], &A1 = data[1], &A1 = data[2];
 
                 const underlying_type t0 = A0.square();
                 const underlying_type t1 = A1.square();
                 const underlying_type t2 = A2.square();
-                const underlying_type t3 = A0*A1;
-                const underlying_type t4 = A0*A2;
-                const underlying_type t5 = A1*A2;
+                const underlying_type t3 = A0 * A1;
+                const underlying_type t4 = A0 * A2;
+                const underlying_type t5 = A1 * A2;
                 const underlying_type c0 = t0 - non_residue * t5;
                 const underlying_type c1 = non_residue * t2 - t3;
-                const underlying_type c2 = t1 - t4; // typo in paper referenced above. should be "-" as per Scott, but is "*"
+                const underlying_type c2 =
+                    t1 - t4;    // typo in paper referenced above. should be "-" as per Scott, but is "*"
                 const underlying_type t6 = (A0 * c0 + non_residue * (A2 * c1 + A1 * c2)).inverse();
                 return {t6 * c0, t6 * c1, t6 * c2};
-
             }
-
         };
 
     }    // namespace algebra

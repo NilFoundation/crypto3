@@ -19,7 +19,31 @@
 #include <nil/algebra/curves/curve.hpp>
 #include <nil/algebra/curves/curve_gfp.hpp>
 
-#include <boost/multiprecision/modular/base_params.hpp>
+#include <nil/algebra/fields/bn128/fq.hpp>
+#include <nil/algebra/fields/bn128/fr.hpp>
+#include <nil/algebra/fields/detail/params/bn128/fq.hpp>
+#include <nil/algebra/fields/detail/params/bn128/fr.hpp>
+#include <nil/algebra/fields/detail/params/dsa_botan.hpp>
+#include <nil/algebra/fields/detail/params/dsa_jce.hpp>
+#include <nil/algebra/fields/detail/params/fp2.hpp>
+#include <nil/algebra/fields/detail/params/fp3.hpp>
+#include <nil/algebra/fields/detail/params/modp_srp.hpp>
+#include <nil/algebra/fields/detail/params/params.hpp>
+#include <nil/algebra/fields/dsa_botan.hpp>
+#include <nil/algebra/fields/dsa_jse.hpp>
+#include <nil/algebra/fields/ed25519_fe.hpp>
+#include <nil/algebra/fields/element.hpp>
+#include <nil/algebra/fields/ffdhe_ietf.hpp>
+#include <nil/algebra/fields/fp.hpp>
+#include <nil/algebra/fields/fp2.hpp>
+#include <nil/algebra/fields/fp3.hpp>
+#include <nil/algebra/fields/fp4.hpp>
+#include <nil/algebra/fields/fp6_2over3.hpp>
+#include <nil/algebra/fields/fp6_3over2.hpp>
+#include <nil/algebra/fields/fp12_2over3over2.hpp>
+#include <nil/algebra/fields/modp_ietf.hpp>
+#include <nil/algebra/fields/modp_srp.hpp>
+#include <nil/algebra/fields/operations.hpp>
 
 using namespace nil::algebra;
 

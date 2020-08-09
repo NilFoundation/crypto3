@@ -29,33 +29,31 @@ namespace nil {
             typedef fp<number_type> non_residue_type;
 
             constexpr static const std::size_t modulus_bits = ModulusBits;
-            typedef number<backends::cpp_int_backend<modulus_bits, modulus_bits, unsigned_magnitude, unchecked, void>>
+            typedef boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<
+                modulus_bits, modulus_bits, boost::multiprecision::unsigned_magnitude, boost::multiprecision::unchecked,
+                void>>
                 modulus_type;
 
             constexpr static const std::size_t generator_bits = GeneratorBits;
-            typedef number<
-                backends::cpp_int_backend<generator_bits, generator_bits, unsigned_magnitude, unchecked, void>>
+            typedef boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<
+                generator_bits, generator_bits, boost::multiprecision::unsigned_magnitude,
+                boost::multiprecision::unchecked, void>>
                 generator_type;
-
         };
-        
 
         template<std::size_t ModulusBits, std::size_t GeneratorBits>
         struct element<fp2<ModulusBits, GeneratorBits>> {
-
 
             using underlying_type = element<fp<ModulusBits, GeneratorBits>>;
 
             using type = std::array<underlying_type, 2>;
 
         private:
-
             using value_type = element<fp2<ModulusBits, GeneratorBits>>;
 
             type data;
 
         public:
-
             value_type(type data) : data(data);
 
             inline static value_type zero() const {
@@ -91,7 +89,7 @@ namespace nil {
             }
 
             value_type operator-() const {
-                return zero()-data;
+                return zero() - data;
             }
 
             value_type operator*(const value_type &B) const {
@@ -124,14 +122,14 @@ namespace nil {
                 1 * Fp neg
             */
             value_type mul_Fp_1(const underlying_type &y_b) {
-                return {- (data[1] * y_b), data[0] * y_b};
+                return {-(data[1] * y_b), data[0] * y_b};
             }
 
-            value_type divBy2() const{
+            value_type divBy2() const {
                 return {divBy2(data[0]), divBy2(data[1])};
             }
 
-            value_type divBy4() const{
+            value_type divBy4() const {
                 return {divBy4(data[0]), divBy4(data[1])};
             }
 
@@ -145,10 +143,10 @@ namespace nil {
             }
 
             value_type square() const {
-                return data*data;    // maybe can be done more effective
+                return data * data;    // maybe can be done more effective
             }
 
-            template <typename PowerType>
+            template<typename PowerType>
             value_type pow(const PowerType &power) const {
             }
 
@@ -158,7 +156,7 @@ namespace nil {
                  * Algorithm 8 */
 
                 const underlying_type &A0 = data[0], &A1 = data[1];
-                
+
                 const underlying_type t0 = A0.square();
                 const underlying_type t1 = A1.square();
                 const underlying_type t2 = t0 - non_residue * t1;
@@ -167,17 +165,13 @@ namespace nil {
                 const underlying_type c1 = -(A1 * t3);
 
                 return {c0, c1};
-
             }
-
         };
 
-        value_type addNC(const value_type &A, const value_type &B){
-
+        value_type addNC(const value_type &A, const value_type &B) {
         }
 
-        value_type subNC(const value_type &A, const value_type &B){
-
+        value_type subNC(const value_type &A, const value_type &B) {
         }
 
     }    // namespace algebra
