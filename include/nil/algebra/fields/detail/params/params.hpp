@@ -17,7 +17,7 @@ namespace nil {
             template<typename FieldType>
             struct params {
                 typedef FieldType field_type;
-                typedef field_type::number_type number_type;
+                typedef typename field_type::number_type number_type;
 
                 constexpr static const std::size_t modulus_bits = field_type::modulus_bits;
                 typedef typename field_type::modulus_type modulus_type;
