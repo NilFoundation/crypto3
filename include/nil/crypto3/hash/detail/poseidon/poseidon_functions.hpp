@@ -9,8 +9,6 @@
 #ifndef CRYPTO3_HASH_POSEIDON_FUNCTIONS_HPP
 #define CRYPTO3_HASH_POSEIDON_FUNCTIONS_HPP
 
-#define GRAIN_LFSR_STATE_LEN 80
-
 #include <nil/crypto3/hash/detail/poseidon/poseidon_policy.hpp>
 #include <nil/algebra/fields/element.hpp>
 #include <nil/algebra/fields/fp.hpp>
@@ -47,6 +45,8 @@ namespace nil {
 
                     constexpr static std::size_t const word_bits = policy_type::word_bits;
                     typedef typename policy_type::word_type word_type;
+
+                    constexpr static std::size_t const grain_lfsr_state_len = 80;
 
 
                     // TODO: add checks
@@ -120,11 +120,11 @@ namespace nil {
                         inline bool get_next_raw_bit() {
                             bool next_v = state[0] ^ state[13] ^ state[23] ^ state[38] ^ state[51] ^ state[62];
                             state >>= 1;
-                            state[GRAIN_LFSR_STATE_LEN - 1] = next_v;
+                            state[grain_lfsr_state_len - 1] = next_v;
                             return next_v;
                         }
 
-                        std::bitset<GRAIN_LFSR_STATE_LEN> state;
+                        std::bitset<grain_lfsr_state_len> state;
                     };
 
 
