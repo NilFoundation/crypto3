@@ -31,7 +31,7 @@ namespace nil {
                         throw std::invalid_argument("extended_radix2(): expected m > 1");
 
                     if (!std::is_same<typename FieldType::value_type, std::complex<double>>::value) {
-                        const size_t logm = algebra::log2(m);
+                        const size_t logm = static_cast<std::size_t>(std::ceil(std::log2(m)));
                         if (logm != (FieldType::s + 1))
                             throw std::invalid_argument("extended_radix2(): expected logm == FieldType::s + 1");
                     }
@@ -44,12 +44,12 @@ namespace nil {
                         throw std::invalid_argument(e.what());
                     }
 
-                    shift = algebra::coset_shift<FieldType>();
+                    shift = coset_shift<FieldType>();
                 }
 
                 void FFT(std::vector<FieldType> &a) {
                     if (a.size() != this->m)
-                        throw std::invalid_argument(("extended_radix2: expected a.size() == this->m");
+                        throw std::invalid_argument("extended_radix2: expected a.size() == this->m");
 
                     std::vector<FieldType> a0(small_m, FieldType::zero());
                     std::vector<FieldType> a1(small_m, FieldType::zero());

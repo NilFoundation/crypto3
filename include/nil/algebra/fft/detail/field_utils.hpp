@@ -34,7 +34,7 @@ namespace nil {
             typename std::enable_if<!std::is_same<typename FieldType::value_type, std::complex<double>>::value,
                                     FieldType>::type
                 unity_root(const size_t n) {
-                const std::size_t logn = std::log2(n);
+                const std::size_t logn = std::ceil(std::log2(n));
                 if (n != (1u << logn))
                     throw std::invalid_argument("expected n == (1u << logn)");
                 if (logn > FieldType::s)

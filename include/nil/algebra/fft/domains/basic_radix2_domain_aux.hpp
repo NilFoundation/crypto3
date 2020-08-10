@@ -162,7 +162,7 @@ namespace nil {
                         return std::vector<FieldType>(1, FieldType::one());
                     }
 
-                    if (m != (1u << algebra::log2(m)))
+                    if (m != (1u << static_cast<std::size_t>(std::ceil(std::log2(m)))))
                         throw std::invalid_argument("expected m == (1u << log2(m))");
 
                     const FieldType omega = unity_root<FieldType>(m);

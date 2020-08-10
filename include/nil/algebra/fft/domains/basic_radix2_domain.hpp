@@ -30,7 +30,7 @@ namespace nil {
                         throw std::invalid_argument("basic_radix2(): expected m > 1");
 
                     if (!std::is_same<typename FieldType::value_type, std::complex<double>>::value) {
-                        const size_t logm = algebra::log2(m);
+                        const size_t logm = static_cast<std::size_t>(std::ceil(std::log2(m)));
                         if (logm > (FieldType::s))
                             throw std::invalid_argument("basic_radix2(): expected logm <= FieldType::s");
                     }

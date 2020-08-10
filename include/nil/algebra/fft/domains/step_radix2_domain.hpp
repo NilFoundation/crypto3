@@ -31,14 +31,14 @@ namespace nil {
                     if (m <= 1)
                         throw std::invalid_argument("step_radix2(): expected m > 1");
 
-                    big_m = 1ul << (algebra::log2(m) - 1);
+                    big_m = 1ul << (static_cast<std::size_t>(std::ceil(std::log2(m))) - 1);
                     small_m = m - big_m;
 
-                    if (small_m != 1ul << algebra::log2(small_m))
+                    if (small_m != 1ul << static_cast<std::size_t>(std::ceil(std::log2(small_m))))
                         throw std::invalid_argument("step_radix2(): expected small_m == 1ul<<log2(small_m)");
 
                     try {
-                        omega = unity_root<FieldType>(1ul << algebra::log2(m));
+                        omega = unity_root<FieldType>(1ul << static_cast<std::size_t>(std::ceil(std::log2(m))));
                     } catch (const std::invalid_argument &e) {
                         throw std::invalid_argument(e.what());
                     }
@@ -62,7 +62,7 @@ namespace nil {
                     }
 
                     std::vector<FieldType> e(small_m, FieldType::zero());
-                    const size_t compr = 1ul << (algebra::log2(big_m) - algebra::log2(small_m));
+                    const size_t compr = 1ul << (static_cast<std::size_t>(std::ceil(std::log2(big_m))) - static_cast<std::size_t>(std::ceil(std::log2(small_m))));
                     for (size_t i = 0; i < small_m; ++i) {
                         for (size_t j = 0; j < compr; ++j) {
                             e[i] += d[i + j * small_m];
@@ -112,7 +112,7 @@ namespace nil {
                         a[i] = U0[i];
                     }
 
-                    const size_t compr = 1ul << (algebra::log2(big_m) - algebra::log2(small_m));
+                    const size_t compr = 1ul << (static_cast<std::size_t>(std::ceil(std::log2(big_m))) - static_cast<std::size_t>(std::ceil(std::log2(small_m))));
                     for (size_t i = 0; i < small_m; ++i) {
                         for (size_t j = 1; j < compr; ++j) {
                             U1[i] -= tmp[i + j * small_m];
