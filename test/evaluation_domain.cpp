@@ -13,17 +13,17 @@
 
 #include <nil/algebra/curves/mnt/mnt4/mnt4_pp.hpp>
 
-#include <nil/algebra/fft/evaluation_domain/domains/arithmetic_sequence_domain.hpp>
-#include <nil/algebra/fft/evaluation_domain/domains/basic_radix2_domain.hpp>
-#include <nil/algebra/fft/evaluation_domain/domains/extended_radix2_domain.hpp>
-#include <nil/algebra/fft/evaluation_domain/domains/geometric_sequence_domain.hpp>
-#include <nil/algebra/fft/evaluation_domain/domains/step_radix2_domain.hpp>
+#include <nil/algebra/fft/domains/arithmetic_sequence_domain.hpp>
+#include <nil/algebra/fft/domains/basic_radix2_domain.hpp>
+#include <nil/algebra/fft/domains/extended_radix2_domain.hpp>
+#include <nil/algebra/fft/domains/geometric_sequence_domain.hpp>
+#include <nil/algebra/fft/domains/step_radix2_domain.hpp>
 #include <nil/algebra/fft/polynomial_arithmetic/naive_evaluate.hpp>
 
 using namespace nil::algebra::fft;
 
 /**
- * Note: Templatized type referenced with TypeParam (instead of canonical FieldT)
+ * Note: Templatized type referenced with TypeParam (instead of canonical FieldType)
  * https://github.com/google/googletest/blob/master/googletest/docs/AdvancedGuide.md#typed-tests
  */
 /*template<typename T>
@@ -34,8 +34,8 @@ protected:
     }
 };
 
-/*typedef ::testing::Types<libff::Fr<libff::mnt4_pp>, libff::Double> FieldT;*/ /* List Extend Here */
-/*TYPED_TEST_CASE(EvaluationDomainTest, FieldT);
+/*typedef ::testing::Types<algebra::Fr<algebra::mnt4_pp>, algebra::Double> FieldType;*/ /* List Extend Here */
+/*TYPED_TEST_CASE(EvaluationDomainTest, FieldType);
 
 TYPED_TEST(EvaluationDomainTest, FFT) {
 
@@ -132,8 +132,10 @@ TYPED_TEST(EvaluationDomainTest, InverseCosetFFTofCosetFFT) {
                 domain.reset(new arithmetic_sequence_domain<TypeParam>(m));
 
             std::vector<TypeParam> a(f);
-            domain->cosetFFT(a, coset);
-            domain->icosetFFT(a, coset);
+            multiply_by_coset(a, coset);
+            domain->FFT(a, coset);
+            domain->iFFT(a, coset);
+            multiply_by_coset(a, coset.inverse());
 
             for (size_t i = 0; i < m; i++) {
                 EXPECT_TRUE(f[i] == a[i]);

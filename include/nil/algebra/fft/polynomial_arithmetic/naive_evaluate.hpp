@@ -27,12 +27,12 @@ namespace nil {
              * - a field element element t
              * The output is the polynomial P(x) evaluated at x = t.
              */    
-            template<typename FieldT>
-            FieldT evaluate_polynomial(const size_t &m, const std::vector<FieldT> &coeff, const FieldT &t) {
-                //if (m != coeff.size())
-                    //throw DomainSizeException("expected m == coeff.size()");
+            template<typename FieldType>
+            FieldType evaluate_polynomial(const size_t &m, const std::vector<FieldType> &coeff, const FieldType &t) {
+                if (m != coeff.size())
+                    throw DomainSizeException("expected m == coeff.size()");
 
-                FieldT result = FieldT::zero();
+                FieldType result = FieldType::zero();
 
                 /* NB: unsigned reverse iteration: cannot do i >= 0, but can do i < m
                    because unsigned integers are guaranteed to wrap around */
@@ -54,16 +54,16 @@ namespace nil {
              * - an index idx in {0,...,m-1}
              * The output is the polynomial L_{idx,S}(z) evaluated at z = t.
              */
-            template<typename FieldT>
-            FieldT evaluate_lagrange_polynomial(const size_t &m, const std::vector<FieldT> &domain, const FieldT &t,
+            template<typename FieldType>
+            FieldType evaluate_lagrange_polynomial(const size_t &m, const std::vector<FieldType> &domain, const FieldType &t,
                                                 const size_t &idx) {
-                //if (m != domain.size())
-                    //throw DomainSizeException("expected m == domain.size()");
-                //if (idx >= m)
-                    //throw InvalidSizeException("expected idx < m");
+                if (m != domain.size())
+                    throw DomainSizeException("expected m == domain.size()");
+                if (idx >= m)
+                    throw InvalidSizeException("expected idx < m");
 
-                FieldT num = FieldT::one();
-                FieldT denom = FieldT::one();
+                FieldType num = FieldType::one();
+                FieldType denom = FieldType::one();
 
                 for (size_t k = 0; k < m; ++k) {
                     if (k == idx) {
