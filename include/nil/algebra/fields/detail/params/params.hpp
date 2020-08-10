@@ -10,6 +10,8 @@
 #ifndef ALGEBRA_FIELD_PARAMS_HPP
 #define ALGEBRA_FIELD_PARAMS_HPP
 
+#include <cstdint>
+
 namespace nil {
     namespace algebra {
         namespace detail {
@@ -33,11 +35,15 @@ namespace nil {
 
             template<typename FieldType>
             struct basic_params : public params<FieldType> {
+                typedef typename params<FieldType>::number_type number_type;
+
                 constexpr static const std::size_t arity = 1;
             };
 
             template<typename FieldType>
             struct arithmetic_params : public basic_params<FieldType> {
+                typedef typename basic_params<FieldType>::number_type number_type;
+
                 constexpr static const number_type q = (modulus - 1) / 2;
             };
 
