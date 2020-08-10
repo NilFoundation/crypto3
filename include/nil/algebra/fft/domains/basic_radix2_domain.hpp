@@ -29,7 +29,7 @@ namespace nil {
                     if (m <= 1)
                         throw std::invalid_argument("basic_radix2(): expected m > 1");
 
-                    if (!std::is_same<FieldType, algebra::Double>::value) {
+                    if (!std::is_same<typename FieldType::value_type, std::complex<double>>::value) {
                         const size_t logm = algebra::log2(m);
                         if (logm > (FieldType::s))
                             throw std::invalid_argument("basic_radix2(): expected logm <= FieldType::s");
@@ -48,6 +48,7 @@ namespace nil {
 
                     _basic_radix2_FFT(a, omega);
                 }
+
                 void iFFT(std::vector<FieldType> &a) {
                     if (a.size() != this->m)
                         throw std::invalid_argument("basic_radix2: expected a.size() == this->m");
@@ -59,15 +60,19 @@ namespace nil {
                         a[i] *= sconst;
                     }
                 }
+
                 std::vector<FieldType> evaluate_all_lagrange_polynomials(const FieldType &t) {
                     return basic_radix2_evaluate_all_lagrange_polynomials(this->m, t);
                 }
+
                 FieldType get_domain_element(const size_t idx) {
                     return omega ^ idx;
                 }
+
                 FieldType compute_vanishing_polynomial(const FieldType &t) {
                     return (t ^ this->m) - FieldType::one();
                 }
+
                 void add_poly_Z(const FieldType &coeff, std::vector<FieldType> &H) {
                     if (H.size() != this->m + 1)
                         throw std::invalid_argument("basic_radix2: expected H.size() == this->m+1");
@@ -75,6 +80,7 @@ namespace nil {
                     H[this->m] += coeff;
                     H[0] -= coeff;
                 }
+
                 void divide_by_Z_on_coset(std::vector<FieldType> &P) {
                     const FieldType coset = FieldType::multiplicative_generator;
                     const FieldType Z_inverse_at_coset = this->compute_vanishing_polynomial(coset).inverse();
