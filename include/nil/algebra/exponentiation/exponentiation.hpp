@@ -16,8 +16,8 @@
 namespace nil {
     namespace algebra {
 
-template<typename FieldT, typename Backend, boost::multiprecision::expression_template_option ExpressionTemplates>
-FieldT power(const FieldT &base, const boost::multiprecision::number<Backend, ExpressionTemplates> &exponent)
+template<typename FieldT, typename PowerType>
+FieldT power(const FieldT &base, const PowerType &exponent)
 {	
     FieldT result = FieldT::one();
  

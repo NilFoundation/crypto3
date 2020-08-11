@@ -104,6 +104,7 @@ namespace nil {
 
             template <typename PowerType>
             value_type pow(const PowerType &power) const {
+                return power(data, power);
             }
 
             value_type inverse() const {

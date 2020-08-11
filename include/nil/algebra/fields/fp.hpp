@@ -13,6 +13,8 @@
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/cpp_int.hpp>
 
+#include <nil/algebra/exponentiation/exponentiation.hpp>
+
 namespace nil {
     namespace algebra {
         /**
