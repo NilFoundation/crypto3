@@ -100,6 +100,18 @@ namespace nil {
                 // compute square root with Tonelli--Shanks
             }
 
+            value_type mul_Fp_b(const element<fp> &B){
+                return {data[0], data[1].mul_Fp_0(b), data[2]};
+            }
+
+            value_type mul_Fp_c(const element<fp> &B){
+                return {data[0], data[1], data[2].mul_Fp_0(b)};
+            }
+
+            value_type mulFp6_24_Fp_01(const element<fp> B*){
+                return {data[0], data[1].mul_Fp_0(B[1]), data[2].mul_Fp_0(B[0])};
+            }
+
             value_type square() const {
                 return data*data;    // maybe can be done more effective
             }
