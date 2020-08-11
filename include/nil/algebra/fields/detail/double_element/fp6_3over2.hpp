@@ -40,10 +40,6 @@ namespace nil {
                     return {underlying_type::zero(), underlying_type::zero(), underlying_type::zero()};
                 }
 
-                inline static value_type one() const {
-                    return {underlying_type::one(), underlying_type::zero(), underlying_type::zero()};
-                }
-
                 bool operator==(const value_type &B) const {
                     return (data[0] == B.data[0]) && (data[1] == B.data[1]) && (data[2] == B.data[2]);
                 }
