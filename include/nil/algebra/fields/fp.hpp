@@ -13,7 +13,7 @@
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/cpp_int.hpp>
 
-#include <nil/algebra/exponentiation/exponentiation.hpp>
+#include <nil/algebra/fields/detail/exponentiation.hpp>
 
 namespace nil {
     namespace algebra {
@@ -111,7 +111,7 @@ namespace nil {
 
             template<typename PowerType>
             value_type pow(const PowerType &power) const {
-                return power(data, power);
+                return detail::power(data, power);
             }
 
             value_type inverse() const {

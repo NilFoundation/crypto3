@@ -15,25 +15,27 @@
 
 namespace nil {
     namespace algebra {
-        template<typename FieldType, typename PowerType>
-        FieldType power(const FieldType &base, const PowerType &exponent) {
-            FieldType result = FieldType::one();
+        namespace detail {
+            template<typename FieldType, typename PowerType>
+            FieldType power(const FieldType &base, const PowerType &exponent) {
+                FieldType result = FieldType::one();
 
-            bool found_one = false;
+                bool found_one = false;
 
-            for (long i = msb(exponent); i >= 0; --i) {
-                if (found_one) {
-                    result = result * result;
+                for (long i = msb(exponent); i >= 0; --i) {
+                    if (found_one) {
+                        result = result * result;
+                    }
+
+                    if (bit_test(exponent, i)) {
+                        found_one = true;
+                        result = result * base;
+                    }
                 }
 
-                if (bit_test(exponent, i)) {
-                    found_one = true;
-                    result = result * base;
-                }
+                return result;
             }
-
-            return result;
-        }
+        }    // namespace detail
     }    // namespace algebra
 }    // namespace nil
 

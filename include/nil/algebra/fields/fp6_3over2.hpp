@@ -13,6 +13,8 @@
 #include <nil/algebra/fields/element.hpp>
 #include <nil/algebra/fields/fp.hpp>
 
+#include <nil/algebra/fields/detail/exponentiation.hpp>
+
 namespace nil {
     namespace algebra {
                 
@@ -104,7 +106,7 @@ namespace nil {
 
             template <typename PowerType>
             value_type pow(const PowerType &power) const {
-                return power(data, power);
+                return detail::power(data, power);
             }
 
             value_type inverse() const {
