@@ -206,10 +206,10 @@ int main(int argc, char* argv[]) {
         omp_set_num_threads(num_threads);
 
 #ifdef PROF_DOUBLE
-        profile<ff::Double>(domain_sizes, profiling_type, path, type, num_threads, key);
+        profile<algebra::Double>(domain_sizes, profiling_type, path, type, num_threads, key);
 #else
-        ff::edwards_pp::init_public_params();
-        profile<ff::Fr<ff::edwards_pp>>(domain_sizes, profiling_type, path, type, num_threads, key);
+        algebra::edwards_pp::init_public_params();
+        profile<algebra::Fr<algebra::edwards_pp>>(domain_sizes, profiling_type, path, type, num_threads, key);
 #endif
     }
 
