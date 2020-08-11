@@ -45,17 +45,6 @@ namespace bn {
 
     namespace util {
 
-        template<class T>
-        void put(const T &x, size_t len) {
-            for (size_t i = 0; i < len; i++) {
-                printf("% 2d,", x[i]);
-            }
-            printf("\n");
-        }
-        template<class T>
-        void put(const T &x) {
-            put(x, x.size());
-        }
         template<class Vec>
         void convertToBinary(Vec &v, const mie::Vuint &x) {
             const size_t len = x.bitLen();
@@ -229,52 +218,6 @@ namespace bn {
         }
     };
 
-    template<class Fp2>
-    mie::Vsint ParamT<Fp2>::z;
-    template<class Fp2>
-    mie::Vuint ParamT<Fp2>::p;
-    template<class Fp2>
-    mie::Vuint ParamT<Fp2>::r;
-    template<class Fp2>
-    mie::Vuint ParamT<Fp2>::t;
-    template<class Fp2>
-    mie::Vsint ParamT<Fp2>::largest_c;
-
-    template<class Fp2>
-    typename Fp2::Fp ParamT<Fp2>::Z;
-    template<class Fp2>
-    typename Fp2::Fp ParamT<Fp2>::i0;
-    template<class Fp2>
-    typename Fp2::Fp ParamT<Fp2>::i1;
-    template<class Fp2>
-    int ParamT<Fp2>::b;
-    template<class Fp2>
-    Fp2 ParamT<Fp2>::b_invxi;
-
-    template<class Fp2>
-    typename Fp2::Fp ParamT<Fp2>::half;
-
-    template<class Fp2>
-    Fp2 ParamT<Fp2>::W2p;
-    template<class Fp2>
-    Fp2 ParamT<Fp2>::W3p;
-
-    template<class Fp2>
-    Fp2 ParamT<Fp2>::gammar[5];
-    template<class Fp2>
-    Fp2 ParamT<Fp2>::gammar2[5];
-    template<class Fp2>
-    Fp2 ParamT<Fp2>::gammar3[5];
-
-    template<class Fp2>
-    typename ParamT<Fp2>::SignVec ParamT<Fp2>::siTbl;
-    template<class Fp2>
-    bool ParamT<Fp2>::useNAF;
-
-    template<class Fp2>
-    typename ParamT<Fp2>::SignVec ParamT<Fp2>::zReplTbl;
-
-
     /*
         mul_gamma(z, x) + z += y;
     */
@@ -366,36 +309,29 @@ namespace bn {
             typedef void(uni_op)(Dbl &, const Dbl &);
             typedef void(bin_op)(Dbl &, const Dbl &, const Dbl &);
 
-            static bin_op *add;
-            static bin_op *addNC;
-            static uni_op *neg;
-            static bin_op *sub;
-            static bin_op *subNC;
-
-
             static uni_op *mul_xi;
 
-            static void addC(Dbl &z, const Dbl &x, const Dbl &y) {
+            static void add(Dbl &z, const Dbl &x, const Dbl &y) {
                 FpDbl::add(z.a_, x.a_, y.a_);
                 FpDbl::add(z.b_, x.b_, y.b_);
             }
 
-            static void addNC_C(Dbl &z, const Dbl &x, const Dbl &y) {
+            static void addNC(Dbl &z, const Dbl &x, const Dbl &y) {
                 FpDbl::addNC(z.a_, x.a_, y.a_);
                 FpDbl::addNC(z.b_, x.b_, y.b_);
             }
 
-            static void negC(Dbl &z, const Dbl &x) {
+            static void neg(Dbl &z, const Dbl &x) {
                 FpDbl::neg(z.a_, x.a_);
                 FpDbl::neg(z.b_, x.b_);
             }
 
-            static void subC(Dbl &z, const Dbl &x, const Dbl &y) {
+            static void sub(Dbl &z, const Dbl &x, const Dbl &y) {
                 FpDbl::sub(z.a_, x.a_, y.a_);
                 FpDbl::sub(z.b_, x.b_, y.b_);
             }
 
-            static void subNC_C(Dbl &z, const Dbl &x, const Dbl &y) {
+            static void subNC(Dbl &z, const Dbl &x, const Dbl &y) {
                 FpDbl::subNC(z.a_, x.a_, y.a_);
                 FpDbl::subNC(z.b_, x.b_, y.b_);
             }
@@ -406,7 +342,7 @@ namespace bn {
                 xi = 9 + u
                 (a + bu)(9 + u) = (9a - b) + (a + 9b)u
             */
-            static void mul_xiC(Dbl &z, const Dbl &x) {
+            static void mul_xi(Dbl &z, const Dbl &x) {
                 assert(&z != &x);
                 FpDbl::add(z.a_, x.a_, x.a_);    // 2
                 FpDbl::add(z.a_, z.a_, z.a_);    // 4
@@ -421,7 +357,7 @@ namespace bn {
                 FpDbl::add(z.b_, z.b_, x.a_);
             }
 
-            static void mulOptC(Dbl &z, const Fp2T &x, const Fp2T &y, int mode) {
+            static void mulOpt(Dbl &z, const Fp2T &x, const Fp2T &y, int mode) {
                 FpDbl d0;
                 Fp s, t;
                 s = addNC(x.a_, x.b_);
@@ -440,15 +376,15 @@ namespace bn {
                 }
             }
 
-            static void mulOpt1C(Dbl &z, const Fp2T &x, const Fp2T &y) {
+            static void mulOpt1(Dbl &z, const Fp2T &x, const Fp2T &y) {
                 mulOptC(z, x, y, 1);
             }
 
-            static void mulOpt2C(Dbl &z, const Fp2T &x, const Fp2T &y) {
+            static void mulOpt2(Dbl &z, const Fp2T &x, const Fp2T &y) {
                 mulOptC(z, x, y, 2);
             }
 
-            static void squareC(Dbl &z, const Fp2T &x) {
+            static void square(Dbl &z, const Fp2T &x) {
                 Fp t0, t1;
                 t0 = addNC(x.b_, x.b_);
                 FpDbl::mul(z.b_, t0, x.a_);
@@ -459,7 +395,7 @@ namespace bn {
                 FpDbl::mul(z.a_, t0, t1);
             }
 
-            static void modC(Fp2T &z, const Dbl &x) {
+            static void mod(Fp2T &z, const Dbl &x) {
                 FpDbl::mod(z.a_, x.a_);
                 FpDbl::mod(z.b_, x.b_);
             }
@@ -516,7 +452,7 @@ namespace bn {
                 // (a + bu) * (9 - u) = (9a + b) + (9b - a)u
                 t3.a_ = t0.b_;
                 t3.b_ = t0.a_;
-                Fp2::mul_xi(t0, t3);
+                t0 = t3.mul_xi();
                 t2.a_ = t0.b_;
                 t2.b_ = t0.a_;
             } else {
@@ -525,7 +461,7 @@ namespace bn {
             }
             // # 5
             t0 = R[0].square();
-            t3 = t2 + t2;
+            t3 = t2.dbl();
             // ## 6
             t3 += t2;
             l.c_ = addNC(t0, t0);
@@ -913,10 +849,6 @@ namespace bn {
         void sqru(Fp12T &zz) const {
             zz = *this;
             zz.sqru();
-        }
-
-        void inverse() {
-            data = data.inverse();
         }
 
         /*
@@ -1328,15 +1260,6 @@ namespace bn {
             }
         };
     };
-
-    template<class Fp6>
-    void (*Fp12T<Fp6>::square)(Fp12T &x) = &(Fp12T<Fp6>::squareC);
-
-    template<class Fp6>
-    void (*Fp12T<Fp6>::Dbl::mul_Fp2_024)(Fp12T &x, const Fp6 &y) = &(Fp12T<Fp6>::Dbl::mul_Fp2_024C);
-
-    template<class Fp6>
-    void (*Fp12T<Fp6>::mul)(Fp12T &z, const Fp12T &x, const Fp12T &y) = &(Fp12T<Fp6>::mulC);
 
     template<class T>
     struct CompressT {
