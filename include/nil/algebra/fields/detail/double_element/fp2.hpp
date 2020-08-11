@@ -92,10 +92,6 @@ namespace nil {
                     return {mod(data[0]), mod(data[1])};
                 }
 
-                value_type square() const {
-                    return data * data;    // maybe can be done more effective
-                }
-
                 /*
                     XITAG
                     u^2 = -1
@@ -107,6 +103,49 @@ namespace nil {
                 }
 
             };
+
+            double_element_type<fp2> mulOpt(const element_type<fp2> &A, const element_type<fp2> &B, int mode) {
+                FpDbl d0;
+                Fp s, t;
+                s = addNC(x.a_, x.b_);
+                t = addNC(y.a_, y.b_);
+                FpDbl::mul(d0, x.b_, y.b_);
+                FpDbl::mul(z.a_, x.a_, y.a_);
+                FpDbl::mul(z.b_, s, t);
+                FpDbl::subNC(z.b_, z.b_, z.a_);
+                FpDbl::subNC(z.b_, z.b_, d0);
+
+                if (mode == 1) {
+                    FpDbl::subOpt1(z.a_, z.a_, d0);
+
+                } else {
+                    FpDbl::sub(z.a_, z.a_, d0);
+                }
+            }
+
+            double_element_type<fp2> mulOpt1(const element_type<fp2> &A, const element_type<fp2> &B) {
+                return mulOpt(A, B, 1);
+            }
+
+            double_element_type<fp2> mulOpt2(const element_type<fp2> &A, const element_type<fp2> &B) {
+                return mulOpt(A, B, 2);
+            }
+
+            double_element_type<fp2> square(const element_type<fp2> &B){
+            {
+                Fp t0, t1;
+                Fp::addNC(t0, x.b_, x.b_);
+                FpDbl::mul(z.b_, t0, x.a_);
+                Fp::addNC(t1, x.a_, Fp::getDirectP(1)); // RRR
+                Fp::subNC(t1, t1, x.b_);
+                Fp::addNC(t0, x.a_, x.b_);
+                FpDbl::mul(z.a_, t0, t1);
+            }
+
+            double_element_type<fp2> mod(const element_type<fp2> &B){
+            {
+                return {mod(B.data[0]), mod(B.data[1])};
+            }
         }    // namespace detail
     }    // namespace algebra
 }    // namespace nil

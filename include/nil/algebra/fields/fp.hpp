@@ -97,6 +97,10 @@ namespace nil {
                 return data * B.data;
             }
 
+            value_type dbl() const {
+                return data + data;
+            }
+
             value_type sqrt() const {
                 return sqrt(data);
             }

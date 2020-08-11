@@ -90,6 +90,26 @@ namespace nil {
                     
                 }
             };
+
+            double_element_type<fp> mul(const element_type<fp> &A, const element_type<fp> &B) {
+                
+            }
+
+            double_element_type<fp> square(const element_type<fp> &B){
+            {
+                Fp t0, t1;
+                Fp::addNC(t0, x.b_, x.b_);
+                FpDbl::mul(z.b_, t0, x.a_);
+                Fp::addNC(t1, x.a_, Fp::getDirectP(1)); // RRR
+                Fp::subNC(t1, t1, x.b_);
+                Fp::addNC(t0, x.a_, x.b_);
+                FpDbl::mul(z.a_, t0, t1);
+            }
+
+            double_element_type<fp> mod(const element_type<fp> &B){
+            {
+                return {mod(B.data[0]), mod(B.data[1])};
+            }
         }    // namespace detail
     }    // namespace algebra
 }    // namespace nil
