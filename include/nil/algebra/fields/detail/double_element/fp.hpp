@@ -69,27 +69,27 @@ namespace nil {
                     return -data;
                 }
 
-                value_type operator*(const value_type &B) const {
-                    return data * B.data;
-                }
-
                 //data + data
                 value_type dbl() const {
-                    return ;
-                }
-
-                value_type addNC(const value_type &A, const value_type &B){
-
-                }
-
-                value_type subNC(const value_type &A, const value_type &B){
-
+                    return data + data;
                 }
 
                 value_type subOpt1() const {
                     
                 }
+
+                double_element_type<fp> mod(){
+                    
+                }
             };
+
+            double_element_type<fp> addNC(const double_element_type<fp> &A, const double_element_type<fp> &B){
+                return {addNC(data[0] + B.data[0]), addNC(data[1] + B.data[1])};
+            }
+
+            double_element_type<fp> subNC(const double_element_type<fp> &A, const double_element_type<fp> &B){
+                return {subNC(data[0] + B.data[0]), subNC(data[1] + B.data[1])};
+            }
 
             double_element_type<fp> mul(const element_type<fp> &A, const element_type<fp> &B) {
                 
@@ -106,10 +106,6 @@ namespace nil {
                 FpDbl::mul(z.a_, t0, t1);
             }
 
-            double_element_type<fp> mod(const element_type<fp> &B){
-            {
-                return {mod(B.data[0]), mod(B.data[1])};
-            }
         }    // namespace detail
     }    // namespace algebra
 }    // namespace nil

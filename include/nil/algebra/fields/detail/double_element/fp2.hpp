@@ -71,21 +71,9 @@ namespace nil {
                     return zero()-data;
                 }
 
-                value_type operator*(const value_type &B) const {
-                    
-                }
-
                 //data + data
                 value_type dbl() const {
                     return {data[0].dbl(), data[1].dbl()};
-                }
-
-                value_type addNC(const value_type &B){
-                    return {addNC(data[0] + B.data[0]), addNC(data[1] + B.data[1])};
-                }
-
-                value_type subNC(const value_type &B){
-                    return {subNC(data[0] + B.data[0]), subNC(data[1] + B.data[1])};
                 }
 
                 value_type subOpt1() const {
@@ -102,7 +90,19 @@ namespace nil {
                     return {data[0].dbl().dbl().dbl() + data[0] - data[1], data[1].dbl().dbl().dbl() + data[1] + data[0]};
                 }
 
+                element_type<fp2> mod(){
+                    return {data[0].mod(), data[1].mod()};
+                }
+
             };
+
+            double_element_type<fp2> addNC(const double_element_type<fp2> &A, const double_element_type<fp2> &B){
+                return {addNC(data[0] + B.data[0]), addNC(data[1] + B.data[1])};
+            }
+
+            double_element_type<fp2> subNC(const double_element_type<fp2> &A, const double_element_type<fp2> &B){
+                return {subNC(data[0] + B.data[0]), subNC(data[1] + B.data[1])};
+            }
 
             double_element_type<fp2> mulOpt(const element_type<fp2> &A, const element_type<fp2> &B, int mode) {
                 double_element_type<fp> d0;
@@ -136,7 +136,6 @@ namespace nil {
             }
 
             double_element_type<fp2> square(const element_type<fp2> &B){
-            {
                 element_type<fp>  t0, t1;
                 t0 = addNC(x.b_, x.b_);
                 z.b_ = mul(t0, x.a_);
@@ -144,11 +143,6 @@ namespace nil {
                 t1 = subNC(t1, x.b_);
                 t0 = addNC(x.a_, x.b_);
                 z.a_ = mul(t0, t1);
-            }
-
-            double_element_type<fp2> mod(const element_type<fp2> &B){
-            {
-                return {mod(B.data[0]), mod(B.data[1])};
             }
         }    // namespace detail
     }    // namespace algebra
