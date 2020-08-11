@@ -34,10 +34,13 @@ namespace nil {
                     typedef static_digest<digest_bits> digest_type;
 
                     constexpr static const std::uint8_t ieee1363_hash_id = 0x33;
-                    typedef std::array<std::uint8_t, 15> pkcs_id_type;
 
-                    constexpr static const pkcs_id_type pkcs_id = {0x30, 0x21, 0x30, 0x09, 0x06, 0x05, 0x2B, 0x0E,
-                                                                   0x03, 0x02, 0x1A, 0x05, 0x00, 0x04, 0x14};
+                    constexpr static const std::size_t pkcs_id_size = 15;
+                    constexpr static const std::size_t pkcs_id_bits = pkcs_id_size * CHAR_BIT;
+                    typedef std::array<std::uint8_t, pkcs_id_size> pkcs_id_type;
+
+                    constexpr static const pkcs_id_type pkcs_id = {0x30, 0x21, 0x30, 0x09, 0x06, 0x05, 0x2B, 0x24,
+                                                                   0x03, 0x02, 0x01, 0x05, 0x00, 0x04, 0x14};
 
                     constexpr static const std::size_t key_indexes_size = 80;
                     typedef std::array<byte_type, key_indexes_size> key_indexes_type;

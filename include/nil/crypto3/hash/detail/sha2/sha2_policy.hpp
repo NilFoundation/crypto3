@@ -52,12 +52,13 @@ namespace nil {
                     constexpr static const std::size_t digest_bits = 224;
                     constexpr static const std::uint8_t ieee1363_hash_id = 0x38;
 
-                    typedef static_digest<digest_bits> digest_type;
-                    typedef std::array<std::uint8_t, 19> pkcs_id_type;
+                    constexpr static const std::size_t pkcs_id_size = 0;
+                    constexpr static const std::size_t pkcs_id_bits = pkcs_id_size * CHAR_BIT;
+                    typedef std::array<std::uint8_t, pkcs_id_size> pkcs_id_type;
 
-                    constexpr static const pkcs_id_type pkcs_id = {0x30, 0x2D, 0x30, 0x0D, 0x06, 0x09, 0x60,
-                                                                   0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x02,
-                                                                   0x04, 0x05, 0x00, 0x04, 0x1C};
+                    constexpr static const pkcs_id_type pkcs_id = {};
+
+                    typedef static_digest<digest_bits> digest_type;
 
                     struct iv_generator {
                         state_type const &operator()() const {
@@ -75,7 +76,10 @@ namespace nil {
                     constexpr static const std::uint8_t ieee1363_hash_id = 0x34;
 
                     typedef static_digest<digest_bits> digest_type;
-                    typedef std::array<std::uint8_t, 19> pkcs_id_type;
+
+                    constexpr static const std::size_t pkcs_id_size = 19;
+                    constexpr static const std::size_t pkcs_id_bits = pkcs_id_size * CHAR_BIT;
+                    typedef std::array<std::uint8_t, pkcs_id_size> pkcs_id_type;
 
                     constexpr static const pkcs_id_type pkcs_id = {0x30, 0x2D, 0x30, 0x0D, 0x06, 0x09, 0x60,
                                                                    0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x02,
@@ -96,12 +100,13 @@ namespace nil {
                     constexpr static const std::size_t digest_bits = 384;
                     constexpr static const std::uint8_t ieee1363_hash_id = 0x36;
 
-                    typedef static_digest<digest_bits> digest_type;
-                    typedef std::array<std::uint8_t, 19> pkcs_id_type;
+                    constexpr static const std::size_t pkcs_id_size = 0;
+                    constexpr static const std::size_t pkcs_id_bits = pkcs_id_size * CHAR_BIT;
+                    typedef std::array<std::uint8_t, pkcs_id_size> pkcs_id_type;
 
-                    constexpr static const pkcs_id_type pkcs_id = {0x30, 0x2D, 0x30, 0x0D, 0x06, 0x09, 0x60,
-                                                                   0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x02,
-                                                                   0x04, 0x05, 0x00, 0x04, 0x30};
+                    constexpr static const pkcs_id_type pkcs_id = {};
+
+                    typedef static_digest<digest_bits> digest_type;
 
                     struct iv_generator {
                         state_type const &operator()() const {
@@ -121,7 +126,9 @@ namespace nil {
                     constexpr static const std::uint8_t ieee1363_hash_id = 0x35;
 
                     typedef static_digest<digest_bits> digest_type;
-                    typedef std::array<std::uint8_t, 19> pkcs_id_type;
+                    constexpr static const std::size_t pkcs_id_size = 19;
+                    constexpr static const std::size_t pkcs_id_bits = pkcs_id_size * CHAR_BIT;
+                    typedef std::array<std::uint8_t, pkcs_id_size> pkcs_id_type;
 
                     constexpr static const pkcs_id_type pkcs_id = {0x30, 0x2D, 0x30, 0x0D, 0x06, 0x09, 0x60,
                                                                    0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x02,

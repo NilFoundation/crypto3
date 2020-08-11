@@ -44,6 +44,12 @@ namespace nil {
                 constexpr static const std::size_t digest_bits = policy_type::digest_bits;
                 typedef typename policy_type::digest_type digest_type;
 
+                constexpr static const std::size_t pkcs_id_size = policy_type::pkcs_id_size;
+                constexpr static const std::size_t pkcs_id_bits = policy_type::pkcs_id_bits;
+                typedef typename policy_type::pkcs_id_type pkcs_id_type;
+
+                constexpr static const pkcs_id_type pkcs_id = policy_type::pkcs_id;
+
                 struct construction {
                     struct params_type {
                         typedef typename policy_type::digest_endian digest_endian;

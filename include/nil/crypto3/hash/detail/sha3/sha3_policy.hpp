@@ -20,7 +20,90 @@ namespace nil {
         namespace hashes {
             namespace detail {
                 template<std::size_t DigestBits>
-                struct sha3_policy : public ::nil::crypto3::detail::basic_functions<64> {
+                struct basic_sha3_policy : public ::nil::crypto3::detail::basic_functions<64> {
+                    typedef ::nil::crypto3::detail::basic_functions<64> policy_type;
+
+                    constexpr static const std::size_t word_bits = policy_type::word_bits;
+                    typedef typename policy_type::word_type word_type;
+
+                    constexpr static const std::size_t pkcs_id_size = 0;
+                    constexpr static const std::size_t pkcs_id_bits = pkcs_id_size * CHAR_BIT;
+                    typedef std::array<std::uint8_t, pkcs_id_size> pkcs_id_type;
+
+                    constexpr static const pkcs_id_type pkcs_id = {};
+                };
+
+                template<>
+                struct basic_sha3_policy<224> : public ::nil::crypto3::detail::basic_functions<64> {
+                    typedef ::nil::crypto3::detail::basic_functions<64> policy_type;
+
+                    constexpr static const std::size_t word_bits = policy_type::word_bits;
+                    typedef typename policy_type::word_type word_type;
+
+                    constexpr static const std::size_t pkcs_id_size = 19;
+                    constexpr static const std::size_t pkcs_id_bits = pkcs_id_size * CHAR_BIT;
+                    typedef std::array<std::uint8_t, pkcs_id_size> pkcs_id_type;
+
+                    constexpr static const pkcs_id_type pkcs_id = {0x30, 0x2D, 0x30, 0x0D, 0x06, 0x09, 0x60,
+                                                                   0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x02,
+                                                                   0x07, 0x05, 0x00, 0x04, 0x1C};
+                };
+
+                template<>
+                struct basic_sha3_policy<256> : public ::nil::crypto3::detail::basic_functions<64> {
+                    typedef ::nil::crypto3::detail::basic_functions<64> policy_type;
+
+                    constexpr static const std::size_t word_bits = policy_type::word_bits;
+                    typedef typename policy_type::word_type word_type;
+
+                    constexpr static const std::size_t pkcs_id_size = 19;
+                    constexpr static const std::size_t pkcs_id_bits = pkcs_id_size * CHAR_BIT;
+                    typedef std::array<std::uint8_t, pkcs_id_size> pkcs_id_type;
+
+                    constexpr static const pkcs_id_type pkcs_id = {0x30, 0x31, 0x30, 0x0D, 0x06, 0x09, 0x60,
+                                                                   0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x02,
+                                                                   0x08, 0x05, 0x00, 0x04, 0x20};
+                };
+
+                template<>
+                struct basic_sha3_policy<384> : public ::nil::crypto3::detail::basic_functions<64> {
+                    typedef ::nil::crypto3::detail::basic_functions<64> policy_type;
+
+                    constexpr static const std::size_t word_bits = policy_type::word_bits;
+                    typedef typename policy_type::word_type word_type;
+
+                    constexpr static const std::size_t pkcs_id_size = 19;
+                    constexpr static const std::size_t pkcs_id_bits = pkcs_id_size * CHAR_BIT;
+                    typedef std::array<std::uint8_t, pkcs_id_size> pkcs_id_type;
+
+                    constexpr static const pkcs_id_type pkcs_id = {0x30, 0x41, 0x30, 0x0D, 0x06, 0x09, 0x60,
+                                                                   0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x02,
+                                                                   0x09, 0x05, 0x00, 0x04, 0x30};
+                };
+
+                template<>
+                struct basic_sha3_policy<512> : public ::nil::crypto3::detail::basic_functions<64> {
+                    typedef ::nil::crypto3::detail::basic_functions<64> policy_type;
+
+                    constexpr static const std::size_t word_bits = policy_type::word_bits;
+                    typedef typename policy_type::word_type word_type;
+
+                    constexpr static const std::size_t pkcs_id_size = 19;
+                    constexpr static const std::size_t pkcs_id_bits = pkcs_id_size * CHAR_BIT;
+                    typedef std::array<std::uint8_t, pkcs_id_size> pkcs_id_type;
+
+                    constexpr static const pkcs_id_type pkcs_id = {0x30, 0x51, 0x30, 0x0D, 0x06, 0x09, 0x60,
+                                                                   0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x02,
+                                                                   0x0A, 0x05, 0x00, 0x04, 0x40};
+                };
+
+                template<std::size_t DigestBits>
+                struct sha3_policy : public basic_sha3_policy<DigestBits> {
+
+                    typedef basic_sha3_policy<DigestBits> policy_type;
+
+                    constexpr static const std::size_t word_bits = policy_type::word_bits;
+                    typedef typename policy_type::word_type word_type;
 
                     constexpr static const std::size_t digest_bits = DigestBits;
                     typedef static_digest<digest_bits> digest_type;
@@ -32,6 +115,12 @@ namespace nil {
                     constexpr static const std::size_t block_bits = state_bits - 2 * digest_bits;
                     constexpr static const std::size_t block_words = block_bits / word_bits;
                     typedef std::array<word_type, block_words> block_type;
+
+                    constexpr static const std::size_t pkcs_id_size = policy_type::pkcs_id_size;
+                    constexpr static const std::size_t pkcs_id_bits = policy_type::pkcs_id_bits;
+                    typedef typename policy_type::pkcs_id_type pkcs_id_type;
+
+                    constexpr static const pkcs_id_type pkcs_id = policy_type::pkcs_id;
 
                     constexpr static const std::size_t length_bits = 0;
 

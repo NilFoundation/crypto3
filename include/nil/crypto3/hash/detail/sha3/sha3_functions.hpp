@@ -29,6 +29,12 @@ namespace nil {
                     constexpr static const std::size_t round_constants_size = policy_type::rounds;
                     typedef typename std::array<word_type, round_constants_size> round_constants_type;
 
+                    constexpr static const std::size_t pkcs_id_size = policy_type::pkcs_id_size;
+                    constexpr static const std::size_t pkcs_id_bits = policy_type::pkcs_id_bits;
+                    typedef typename policy_type::pkcs_id_type pkcs_id_type;
+
+                    constexpr static const pkcs_id_type pkcs_id = policy_type::pkcs_id;
+
                     constexpr static const round_constants_type round_constants = {
                         UINT64_C(0x0000000000000001), UINT64_C(0x0000000000008082), UINT64_C(0x800000000000808a),
                         UINT64_C(0x8000000080008000), UINT64_C(0x000000000000808b), UINT64_C(0x0000000080000001),
