@@ -23,14 +23,12 @@ namespace nil {
             namespace detail {
 
                 // filecoin oriented implementation
-                template<typename field_type, typename element_type, std::size_t t, bool strength>
-                struct poseidon_functions
-                {
-                    typedef poseidon_policy<field_type, element_type, t, strength> policy_type;
-                    typedef poseidon_constants<field_type, element_type, t, strength> constants_type;
-                    typedef poseidon_mds_matrix<field_type, element_type, t, strength> mds_matrix_type;
+                template<typename FieldType, typename element_type, std::size_t t, bool strength>
+                struct poseidon_functions {
+                    typedef poseidon_policy<FieldType, element_type, t, strength> policy_type;
+                    typedef poseidon_constants<FieldType, element_type, t, strength> constants_type;
+                    typedef poseidon_mds_matrix<FieldType, element_type, t, strength> mds_matrix_type;
                     typedef typename mds_matrix_type::state_vector_type state_vector_type;
-                    
 
                     constexpr static std::size_t const state_bits = policy_type::state_bits;
                     constexpr static std::size_t const state_words = policy_type::state_words;
@@ -39,7 +37,7 @@ namespace nil {
                     constexpr static std::size_t const block_bits = policy_type::block_bits;
                     constexpr static std::size_t const block_words = policy_type::block_words;
                     typedef typename policy_type::block_type block_type;
-                    
+
                     constexpr static std::size_t const full_rounds = policy_type::full_rounds;
                     constexpr static std::size_t const half_full_rounds = policy_type::half_full_rounds;
                     constexpr static std::size_t const part_rounds = policy_type::part_rounds;
@@ -58,24 +56,22 @@ namespace nil {
                         for (std::size_t i = 0; i < state_words; i++)
                             A_vector[i] = A[i];
 
-                        
                         // first half of full rounds
-                        for(std::size_t i = 0; i < half_full_rounds; i++) {
+                        for (std::size_t i = 0; i < half_full_rounds; i++) {
                             // do_full_round(A, constants, round_number++);
                             constants.arc_sbox_full_round(A_vector, round_number++);
                             mds_matrix.product_with_mds_matrix(A_vector, A_vector);
                         }
 
                         // partial rounds
-                        for(std::size_t i = 0; i < part_rounds; i++) {
+                        for (std::size_t i = 0; i < part_rounds; i++) {
                             // do_part_round(A, constants, round_number++);
                             constants.arc_sbox_part_round(A_vector, round_number++);
                             mds_matrix.product_with_mds_matrix(A_vector, A_vector);
                         }
-                        
 
                         // second half of full rounds
-                        for(std::size_t i = 0; i < half_full_rounds; i++) {
+                        for (std::size_t i = 0; i < half_full_rounds; i++) {
                             // do_full_round(A, constants, round_number++);
                             constants.arc_sbox_full_round(A_vector, round_number++);
                             mds_matrix.product_with_mds_matrix(A_vector, A_vector);
@@ -83,7 +79,6 @@ namespace nil {
 
                         for (std::size_t i = 0; i < state_words; i++)
                             A[i] = A_vector[i];
-
                     }
 
                     // TODO: there is only round constants optimization. Matrix optimization need to be completed.
@@ -95,9 +90,9 @@ namespace nil {
                         state_vector_type A_vector(state_words);
                         for (std::size_t i = 0; i < state_words; i++)
                             A_vector[i] = A[i];
-                        
+
                         // first half of full rounds
-                        for(std::size_t i = 0; i < half_full_rounds; i++) {
+                        for (std::size_t i = 0; i < half_full_rounds; i++) {
                             constants.arc_sbox_full_round_optimized_first(A_vector, round_number++);
                             mds_matrix.product_with_mds_matrix(A_vector, A_vector);
                         }
@@ -106,23 +101,21 @@ namespace nil {
                         constants.arc_sbox_part_round_optimized_init(A_vector, round_number);
                         constants.arc_part_round_optimized_init(A_vector, round_number++);
                         mds_matrix.product_with_mds_matrix(A_vector, A_vector);
-                        for(std::size_t i = 1; i < part_rounds - 1; i++) {
+                        for (std::size_t i = 1; i < part_rounds - 1; i++) {
                             constants.sbox_arc_part_round_optimized(A_vector, round_number++);
                             mds_matrix.product_with_mds_matrix(A_vector, A_vector);
-                            
                         }
                         constants.sbox_part_round_optimized_last(A_vector, round_number++);
                         mds_matrix.product_with_mds_matrix(A_vector, A_vector);
-                        
+
                         // second half of full rounds
-                        for(std::size_t i = 0; i < half_full_rounds; i++) {
+                        for (std::size_t i = 0; i < half_full_rounds; i++) {
                             constants.arc_sbox_full_round_optimized_last(A_vector, round_number++);
                             mds_matrix.product_with_mds_matrix(A_vector, A_vector);
                         }
 
                         for (std::size_t i = 0; i < state_words; i++)
                             A[i] = A_vector[i];
-
                     }
                 };
             }    // namespace detail

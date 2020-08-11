@@ -12,6 +12,7 @@
 #include <nil/crypto3/hash/detail/poseidon/poseidon_policy.hpp>
 
 #include <boost/assert.hpp>
+#include <boost/multiprecision/cpp_int.hpp>
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/lu.hpp>
@@ -20,11 +21,11 @@ namespace nil {
     namespace crypto3 {
         namespace hashes {
             namespace detail {
-                template<typename field_type, typename element_type, std::size_t t, bool strength>
+                template<typename FieldType, typename element_type, std::size_t t, bool strength>
                 struct poseidon_mds_matrix {
-                    typedef poseidon_policy<field_type, element_type, t, strength> policy_type;
+                    typedef poseidon_policy<FieldType, element_type, t, strength> policy_type;
 
-                    constexpr static std::size_t const state_words = policy_type::state_words;
+                    constexpr static const std::size_t state_words = policy_type::state_words;
                     typedef typename policy_type::state_type state_type;
 
                     typedef boost::numeric::ublas::matrix<element_type> mds_matrix_type;
@@ -74,8 +75,8 @@ namespace nil {
                             mds_matrix_type mds_matrix(state_words, state_words);
                             for (std::size_t i = 0; i < state_words; i++) {
                                 for (std::size_t j = 0; j < state_words; j++) {
-                                    mds_matrix.insert_element(i, j, field_type(
-                                        cpp_int(i + (j + state_words))
+                                    mds_matrix.insert_element(i, j, FieldType(
+                                        boost::multiprecision::cpp_int(i + (j + state_words))
                                     ).get_inverse());
                                 }
                             }

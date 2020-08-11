@@ -20,11 +20,11 @@ namespace nil {
     namespace crypto3 {
         namespace hashes {
             namespace detail {
-                template<typename field_type, typename element_type, std::size_t t, bool strength>
+                template<typename FieldType, typename element_type, std::size_t t, bool strength>
                 struct poseidon_constants {
 
-                    typedef poseidon_policy<field_type, element_type, t, strength> policy_type;
-                    typedef poseidon_mds_matrix<field_type, element_type, t, strength> mds_matrix_type;
+                    typedef poseidon_policy<FieldType, element_type, t, strength> policy_type;
+                    typedef poseidon_mds_matrix<FieldType, element_type, t, strength> mds_matrix_type;
                     typedef typename mds_matrix_type::state_vector_type state_vector_type;
 
                     // constexpr static std::size_t const block_words = policy_type::block_words;
