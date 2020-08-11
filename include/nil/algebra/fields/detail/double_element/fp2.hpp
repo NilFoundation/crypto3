@@ -7,11 +7,13 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef ALGEBRA_FF_FP_DOUBLE_HPP
-#define ALGEBRA_FF_FP_DOUBLE_HPP
+#ifndef ALGEBRA_FF_FP2_DOUBLE_HPP
+#define ALGEBRA_FF_FP2_DOUBLE_HPP
 
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/cpp_int.hpp>
+
+#include <nil/algebra/fields/fp.hpp>
 
 namespace nil {
     namespace algebra {
@@ -73,20 +75,40 @@ namespace nil {
                     
                 }
 
-                value_type addNC(const value_type &A, const value_type &B){
+                //data + data
+                value_type dbl() const {
+                    return {data[0].dbl(), data[1].dbl()};
+                }
+
+                value_type addNC(const value_type &B){
                     return {addNC(data[0] + B.data[0]), addNC(data[1] + B.data[1])};
                 }
 
-                value_type subNC(const value_type &A, const value_type &B){
+                value_type subNC(const value_type &B){
                     return {subNC(data[0] + B.data[0]), subNC(data[1] + B.data[1])};
                 }
 
                 value_type subOpt1() const {
                     return {mod(data[0]), mod(data[1])};
                 }
+
+                value_type square() const {
+                    return data * data;    // maybe can be done more effective
+                }
+
+                /*
+                    XITAG
+                    u^2 = -1
+                    xi = 9 + u
+                    (a + bu)(9 + u) = (9a - b) + (a + 9b)u
+                */
+                value_type mul_xi() {
+                    return {data[0].dbl().dbl().dbl() + data[0] - data[1], data[1].dbl().dbl().dbl() + data[1] + data[0]};
+                }
+
             };
         }    // namespace detail
     }    // namespace algebra
 }    // namespace nil
 
-#endif    // ALGEBRA_FF_FP_DOUBLE_HPP
+#endif    // ALGEBRA_FF_FP2_DOUBLE_HPP

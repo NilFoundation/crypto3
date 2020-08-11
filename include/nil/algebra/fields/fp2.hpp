@@ -109,6 +109,16 @@ namespace nil {
                 return {data[0].dbl().dbl().dbl() + data[0] - data[1], data[1].dbl().dbl().dbl() + data[1] + data[0]};
             }
 
+            /*
+            u^2 = -1
+            (a + b)u = -b + au
+
+            1 * Fp neg
+            */
+            value_type mul_x() {
+                return {- data[1], data[0]};
+            }
+
             // z = x * b
             value_type mul_Fp_0(const underlying_type &b) {
                 return {data[0] * b, data[1] * b};

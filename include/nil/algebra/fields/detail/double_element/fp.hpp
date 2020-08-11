@@ -73,6 +73,11 @@ namespace nil {
                     return data * B.data;
                 }
 
+                //data + data
+                value_type dbl() const {
+                    return data.dbl();
+                }
+
                 value_type addNC(const value_type &A, const value_type &B){
 
                 }

@@ -7,15 +7,17 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef ALGEBRA_FIELDS_ELEMENT_HPP
-#define ALGEBRA_FIELDS_ELEMENT_HPP
+#ifndef ALGEBRA_FIELDS_DOUBLE_ELEMENT_HPP
+#define ALGEBRA_FIELDS_DOUBLE_ELEMENT_HPP
 
 namespace nil {
     namespace algebra {
-        template<typename Field>
-        struct element {
-        };
+        namespace detail {
+            template<typename Field>
+            struct double_element {
+            };
+        }
     }    // namespace algebra
 }    // namespace nil
 
-#endif    // ALGEBRA_FIELDS_ELEMENT_HPP
+#endif    // ALGEBRA_FIELDS_DOUBLE_ELEMENT_HPP

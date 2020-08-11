@@ -11,6 +11,7 @@
 #define ALGEBRA_FF_FP3_HPP
 
 #include <nil/algebra/fields/fp2.hpp>
+#include <nil/algebra/fields/element.hpp>
 
 namespace nil {
     namespace algebra {

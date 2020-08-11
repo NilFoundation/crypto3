@@ -236,22 +236,6 @@ namespace bn {
     */
     template<class T>
     struct Fp2T : public mie::local::addsubmul<Fp2T<T>, mie::local::hasNegative<Fp2T<T>>> {
-        typedef T Fp;
-        
-        fp2_value_type data;
-
-        /*
-            u^2 = -1
-            (a + b)u = -b + au
-
-            1 * Fp neg
-        */
-        void mul_x() {
-            Fp t = b_;
-            b_ = a_;
-            a_ = -t;
-        }
-
         /*
             (a + bu)cu = -bc + acu,
             where u is u^2 = -1.
@@ -264,98 +248,10 @@ namespace bn {
             typedef typename Fp::Dbl FpDbl;
             enum { SIZE = FpDbl::SIZE * 2 };
 
-            FpDbl a_, b_;
-
-            Dbl() {
-            }
-            Dbl(const Fp2T &x) : a_(x.a_), b_(x.b_) {
-            }
-            Dbl(const Fp &a, const Fp &b) : a_(a), b_(b) {
-            }
-            Dbl(const FpDbl &a, const FpDbl &b) : a_(a), b_(b) {
-            }
-            Dbl(const std::string &a, const std::string &b) : a_(a), b_(b) {
-            }
-
-            void setDirect(const mie::Vuint &a, const mie::Vuint &b) {
-                FpDbl::setDirect(a_, a);
-                FpDbl::setDirect(b_, b);
-            }
-            void setDirect(const FpDbl &a, const FpDbl &b) {
-                a_ = a;
-                b_ = b;
-            }
-            FpDbl *get() {
-                return &a_;
-            }
-            const FpDbl *get() const {
-                return &a_;
-            }
-            void clear() {
-                a_.clear();
-                b_.clear();
-            }
-            bool is_zero() const {
-                return a_.is_zero() && b_.is_zero();
-            }
-
-            friend inline bool operator==(const Dbl &x, const Dbl &y) {
-                return x.a_ == y.a_ && x.b_ == y.b_;
-            }
-            friend inline bool operator!=(const Dbl &x, const Dbl &y) {
-                return !(x == y);
-            }
-
             typedef void(uni_op)(Dbl &, const Dbl &);
             typedef void(bin_op)(Dbl &, const Dbl &, const Dbl &);
 
             static uni_op *mul_xi;
-
-            static void add(Dbl &z, const Dbl &x, const Dbl &y) {
-                FpDbl::add(z.a_, x.a_, y.a_);
-                FpDbl::add(z.b_, x.b_, y.b_);
-            }
-
-            static void addNC(Dbl &z, const Dbl &x, const Dbl &y) {
-                FpDbl::addNC(z.a_, x.a_, y.a_);
-                FpDbl::addNC(z.b_, x.b_, y.b_);
-            }
-
-            static void neg(Dbl &z, const Dbl &x) {
-                FpDbl::neg(z.a_, x.a_);
-                FpDbl::neg(z.b_, x.b_);
-            }
-
-            static void sub(Dbl &z, const Dbl &x, const Dbl &y) {
-                FpDbl::sub(z.a_, x.a_, y.a_);
-                FpDbl::sub(z.b_, x.b_, y.b_);
-            }
-
-            static void subNC(Dbl &z, const Dbl &x, const Dbl &y) {
-                FpDbl::subNC(z.a_, x.a_, y.a_);
-                FpDbl::subNC(z.b_, x.b_, y.b_);
-            }
-
-            /*
-                XITAG
-                u^2 = -1
-                xi = 9 + u
-                (a + bu)(9 + u) = (9a - b) + (a + 9b)u
-            */
-            static void mul_xi(Dbl &z, const Dbl &x) {
-                assert(&z != &x);
-                FpDbl::add(z.a_, x.a_, x.a_);    // 2
-                FpDbl::add(z.a_, z.a_, z.a_);    // 4
-                FpDbl::add(z.a_, z.a_, z.a_);    // 8
-                FpDbl::add(z.a_, z.a_, x.a_);    // 9
-                FpDbl::sub(z.a_, z.a_, x.b_);
-
-                FpDbl::add(z.b_, x.b_, x.b_);    // 2
-                FpDbl::add(z.b_, z.b_, z.b_);    // 4
-                FpDbl::add(z.b_, z.b_, z.b_);    // 8
-                FpDbl::add(z.b_, z.b_, x.b_);    // 9
-                FpDbl::add(z.b_, z.b_, x.a_);
-            }
 
             static void mulOpt(Dbl &z, const Fp2T &x, const Fp2T &y, int mode) {
                 FpDbl d0;
@@ -382,22 +278,6 @@ namespace bn {
 
             static void mulOpt2(Dbl &z, const Fp2T &x, const Fp2T &y) {
                 mulOptC(z, x, y, 2);
-            }
-
-            static void square(Dbl &z, const Fp2T &x) {
-                Fp t0, t1;
-                t0 = addNC(x.b_, x.b_);
-                FpDbl::mul(z.b_, t0, x.a_);
-
-                t1 = addNC(x.a_, Fp::getDirectP(1));       // RRR
-                t1 = subNC(t1, x.b_);
-                t0 = addNC(x.a_, x.b_);
-                FpDbl::mul(z.a_, t0, t1);
-            }
-
-            static void mod(Fp2T &z, const Dbl &x) {
-                FpDbl::mod(z.a_, x.a_);
-                FpDbl::mod(z.b_, x.b_);
             }
         };
     };
