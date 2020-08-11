@@ -26,14 +26,16 @@ namespace nil {
         struct fp {
 
             constexpr static const std::size_t modulus_bits = ModulusBits;
-            typedef number<backends::cpp_int_backend<modulus_bits, modulus_bits, unsigned_magnitude, unchecked, void>>
+            typedef boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<
+                modulus_bits, modulus_bits, boost::multiprecision::unsigned_magnitude, boost::multiprecision::unchecked,
+                void>>
                 modulus_type;
 
             constexpr static const std::size_t generator_bits = GeneratorBits;
-            typedef number<
-                backends::cpp_int_backend<generator_bits, generator_bits, unsigned_magnitude, unchecked, void>>
+            typedef boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<
+                generator_bits, generator_bits, boost::multiprecision::unsigned_magnitude,
+                boost::multiprecision::unchecked, void>>
                 generator_type;
-
         };
 
         template<std::size_t ModulusBits, std::size_t GeneratorBits>
@@ -51,7 +53,6 @@ namespace nil {
             type data;
 
         public:
-
             value_type(type data) : data(data);
 
             inline static value_type zero() const {
@@ -102,7 +103,7 @@ namespace nil {
                 return data * data;    // maybe can be done more effective
             }
 
-            template <typename PowerType>
+            template<typename PowerType>
             value_type pow(const PowerType &power) const {
                 return power(data, power);
             }
@@ -110,7 +111,6 @@ namespace nil {
             value_type inverse() const {
                 return invert(data);
             }
-
         };
 
     }    // namespace algebra
