@@ -12,7 +12,6 @@
 
 #include <nil/algebra/curves/bn128/bn128_pp.hpp>
 #include <nil/algebra/scalar_multiplication/multiexp.hpp>
-#include <nil/algebra/common/rng.hpp>
 
 using namespace nil::algebra;
 
