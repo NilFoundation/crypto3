@@ -105,21 +105,25 @@ namespace nil {
             };
 
             double_element_type<fp2> mulOpt(const element_type<fp2> &A, const element_type<fp2> &B, int mode) {
-                FpDbl d0;
-                Fp s, t;
-                s = addNC(x.a_, x.b_);
-                t = addNC(y.a_, y.b_);
-                FpDbl::mul(d0, x.b_, y.b_);
-                FpDbl::mul(z.a_, x.a_, y.a_);
-                FpDbl::mul(z.b_, s, t);
-                FpDbl::subNC(z.b_, z.b_, z.a_);
-                FpDbl::subNC(z.b_, z.b_, d0);
+                double_element_type<fp> d0;
+                double_element_type<fp2> z;
+                element_type<fp> s, t;
+
+                s = addNC(A.data[0], A.data[1]);
+                t = addNC(B.data[0], B.data[1]);
+                d0 = mul(A.data[1], B.data[1]);
+                
+                z.data[0] = mul(A.data[0], B.data[0]);
+
+                z.data[1] = mul(s, t);
+                z.data[1] = subNC(z.data[1], z.data[0]);
+                z.data[1] = subNC(z.data[1], d0);
 
                 if (mode == 1) {
-                    FpDbl::subOpt1(z.a_, z.a_, d0);
+                    z.data[0] = subOpt1(z.data[0], d0);
 
                 } else {
-                    FpDbl::sub(z.a_, z.a_, d0);
+                    z.data[0] = z.data[0] -  d0;
                 }
             }
 
@@ -133,13 +137,13 @@ namespace nil {
 
             double_element_type<fp2> square(const element_type<fp2> &B){
             {
-                Fp t0, t1;
-                Fp::addNC(t0, x.b_, x.b_);
-                FpDbl::mul(z.b_, t0, x.a_);
-                Fp::addNC(t1, x.a_, Fp::getDirectP(1)); // RRR
-                Fp::subNC(t1, t1, x.b_);
-                Fp::addNC(t0, x.a_, x.b_);
-                FpDbl::mul(z.a_, t0, t1);
+                element_type<fp>  t0, t1;
+                t0 = addNC(x.b_, x.b_);
+                z.b_ = mul(t0, x.a_);
+                t1 = addNC(x.a_, Fp::getDirectP(1)); // RRR
+                t1 = subNC(t1, x.b_);
+                t0 = addNC(x.a_, x.b_);
+                z.a_ = mul(t0, t1);
             }
 
             double_element_type<fp2> mod(const element_type<fp2> &B){

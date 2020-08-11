@@ -75,7 +75,7 @@ namespace nil {
 
                 //data + data
                 value_type dbl() const {
-                    return data.dbl();
+                    return ;
                 }
 
                 value_type addNC(const value_type &A, const value_type &B){
