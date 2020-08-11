@@ -49,6 +49,10 @@ namespace nil {
                         }
                     };
                 };
+
+                template<std::size_t DigestBits, std::size_t Passes>
+                constexpr typename tiger_policy<DigestBits, Passes>::pkcs_id_type const
+                    tiger_policy<DigestBits, Passes>::pkcs_id;
             }    // namespace detail
         }        // namespace hashes
     }            // namespace crypto3

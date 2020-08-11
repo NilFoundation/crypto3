@@ -98,6 +98,10 @@ namespace nil {
                 };
 
                 template<std::size_t DigestBits>
+                constexpr
+                    typename basic_sha3_policy<DigestBits>::pkcs_id_type const basic_sha3_policy<DigestBits>::pkcs_id;
+
+                template<std::size_t DigestBits>
                 struct sha3_policy : public basic_sha3_policy<DigestBits> {
 
                     typedef basic_sha3_policy<DigestBits> policy_type;

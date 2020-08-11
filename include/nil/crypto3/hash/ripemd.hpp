@@ -282,6 +282,7 @@ namespace nil {
                 typedef typename policy_type::pkcs_id_type pkcs_id_type;
 
                 constexpr static const pkcs_id_type pkcs_id = policy_type::pkcs_id;
+                constexpr static const std::uint8_t ieee1363_hash_id = policy_type::ieee1363_hash_id;
 
                 struct construction {
                     struct params_type {

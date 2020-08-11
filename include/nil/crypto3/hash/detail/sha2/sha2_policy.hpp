@@ -47,7 +47,7 @@ namespace nil {
                 struct sha2_policy;
 
                 template<>
-                struct sha2_policy<224> : basic_sha2_policy<256> {
+                struct sha2_policy<224> : public basic_sha2_policy<256> {
 
                     constexpr static const std::size_t digest_bits = 224;
                     constexpr static const std::uint8_t ieee1363_hash_id = 0x38;
@@ -70,7 +70,7 @@ namespace nil {
                 };
 
                 template<>
-                struct sha2_policy<256> : basic_sha2_policy<256> {
+                struct sha2_policy<256> : public basic_sha2_policy<256> {
 
                     constexpr static const std::size_t digest_bits = 256;
                     constexpr static const std::uint8_t ieee1363_hash_id = 0x34;
@@ -95,7 +95,7 @@ namespace nil {
                 };
 
                 template<>
-                struct sha2_policy<384> : basic_sha2_policy<512> {
+                struct sha2_policy<384> : public basic_sha2_policy<512> {
 
                     constexpr static const std::size_t digest_bits = 384;
                     constexpr static const std::uint8_t ieee1363_hash_id = 0x36;
@@ -120,7 +120,7 @@ namespace nil {
                 };
 
                 template<>
-                struct sha2_policy<512> : basic_sha2_policy<512> {
+                struct sha2_policy<512> : public basic_sha2_policy<512> {
 
                     constexpr static const std::size_t digest_bits = 512;
                     constexpr static const std::uint8_t ieee1363_hash_id = 0x35;
@@ -144,6 +144,14 @@ namespace nil {
                         }
                     };
                 };
+
+                constexpr typename sha2_policy<224>::pkcs_id_type const sha2_policy<224>::pkcs_id;
+
+                constexpr typename sha2_policy<256>::pkcs_id_type const sha2_policy<256>::pkcs_id;
+
+                constexpr typename sha2_policy<384>::pkcs_id_type const sha2_policy<384>::pkcs_id;
+
+                constexpr typename sha2_policy<512>::pkcs_id_type const sha2_policy<512>::pkcs_id;
 
             }    // namespace detail
         }        // namespace hashes
