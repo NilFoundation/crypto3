@@ -23,12 +23,15 @@ namespace nil {
                 mutable T p[3];
                 EcT() {
                 }
+
                 EcT(const T &x, const T &y, bool verify = true) {
                     set(x, y, verify);
                 }
+
                 EcT(const T &x, const T &y, const T &z, bool verify = true) {
                     set(x, y, z, verify);
                 }
+                
                 void normalize() const {
                     if (is_zero() || p[2] == 1)
                         return;
@@ -44,19 +47,23 @@ namespace nil {
                 static inline void dbl(EcT &R, const EcT &P) {
                     ecop::ECDouble(R.p, P.p);
                 }
+
                 static inline void add(EcT &R, const EcT &P, const EcT &Q) {
                     ecop::ECAdd(R.p, P.p, Q.p);
                 }
+
                 static inline void sub(EcT &R, const EcT &P, const EcT &Q) {
                     EcT negQ;
                     neg(negQ, Q);
                     add(R, P, negQ);
                 }
+
                 static inline void neg(EcT &R, const EcT &P) {
                     R.p[0] = P.p[0];
                     T::neg(R.p[1], P.p[1]);
                     R.p[2] = P.p[2];
                 }
+
                 template<class N>
                 static inline void mul(EcT &R, const EcT &P, const N &y) {
                     ecop::ScalarMult(R.p, P.p, y);
@@ -110,8 +117,8 @@ namespace nil {
                 }
             };
             
-            typedef EcT<element<fp2>> Ec2;
-            typedef EcT<element<fp>> Ec1;
+            typedef EcT<element_fp2> Ec2;
+            typedef EcT<element_fp> Ec1;
 
 
         }   //  namespace curve

@@ -35,7 +35,7 @@ namespace nil {
 
         template<>
         struct brainpool_r1<160> : public curve_weierstrass_policy<160> {
-            typedef typename ec_group_info<160>::number_type number_type;
+            typedef typename curve_weierstrass_policy<160>::number_type number_type;
 
             constexpr static const number_type p = 0xE95E4A5F737059DC60DFC7AD95B3D8139515620F_cppui160;
             constexpr static const number_type a = 0x340E7BE2A280EB74E2BE61BADA745D97E8F7C300_cppui160;
@@ -50,7 +50,7 @@ namespace nil {
 
         template<>
         struct brainpool_r1<192> : public curve_weierstrass_policy<192> {
-            typedef typename ec_group_info<192>::number_type number_type;
+            typedef typename curve_weierstrass_policy<192>::number_type number_type;
 
             constexpr static const number_type p = 0xC302F41D932A36CDA7A3463093D18DB78FCE476DE1A86297_cppui192;
             constexpr static const number_type a = 0x6A91174076B1E0E19C39C031FE8685C1CAE040E5C69A28EF_cppui192;

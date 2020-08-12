@@ -38,7 +38,7 @@ namespace nil {
 
         template<>
         struct secp_k1<160> : public curve_weierstrass_policy<160> {
-            typedef typename ec_group_info<160>::number_type number_type;
+            typedef typename curve_weierstrass_policy<160>::number_type number_type;
 
             constexpr static const number_type p = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFAC73_cppui160;
             constexpr static const number_type a = 0x0_cppui160;
@@ -53,7 +53,7 @@ namespace nil {
 
         template<>
         struct secp_r1<160> : public curve_weierstrass_policy<160> {
-            typedef typename ec_group_info<160>::number_type number_type;
+            typedef typename curve_weierstrass_policy<160>::number_type number_type;
 
             constexpr static const number_type p = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF7FFFFFFF_cppui160;
             constexpr static const number_type a = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF7FFFFFFC_cppui160;
@@ -68,7 +68,7 @@ namespace nil {
 
         template<>
         struct secp_r2<160> : public curve_weierstrass_policy<160> {
-            typedef typename ec_group_info<160>::number_type number_type;
+            typedef typename curve_weierstrass_policy<160>::number_type number_type;
 
             constexpr static const number_type p = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFAC73_cppui160;
             constexpr static const number_type a = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFAC70_cppui160;
@@ -83,7 +83,7 @@ namespace nil {
 
         template<>
         struct secp_k1<192> : public curve_weierstrass_policy<192> {
-            typedef typename ec_group_info<192>::number_type number_type;
+            typedef typename curve_weierstrass_policy<192>::number_type number_type;
 
             constexpr static const number_type p = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFEE37_cppui192;
             constexpr static const number_type a = 0x0_cppui192;
@@ -98,7 +98,7 @@ namespace nil {
 
         template<>
         struct secp_r1<192> : public curve_weierstrass_policy<192> {
-            typedef typename ec_group_info<192>::number_type number_type;
+            typedef typename curve_weierstrass_policy<192>::number_type number_type;
 
             constexpr static const number_type p = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFEE37_cppui192;
             constexpr static const number_type a = 0x0_cppui192;
@@ -113,7 +113,7 @@ namespace nil {
 
         template<>
         struct secp_k1<224> : public curve_weierstrass_policy<224> {
-            typedef typename ec_group_info<224>::number_type number_type;
+            typedef typename curve_weierstrass_policy<224>::number_type number_type;
 
             constexpr static const number_type p =
                 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFE56D_cppui224;
@@ -132,7 +132,7 @@ namespace nil {
 
         template<>
         struct secp_r1<224> : public curve_weierstrass_policy<224> {
-            typedef typename ec_group_info<224>::number_type number_type;
+            typedef typename curve_weierstrass_policy<224>::number_type number_type;
 
             constexpr static const number_type p =
                 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF000000000000000000000001_cppui224;
@@ -153,7 +153,7 @@ namespace nil {
 
         template<>
         struct secp_k1<256> : public curve_weierstrass_policy<256> {
-            typedef typename ec_group_info<256>::number_type number_type;
+            typedef typename curve_weierstrass_policy<256>::number_type number_type;
 
             constexpr static const number_type p =
                 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F_cppui256;

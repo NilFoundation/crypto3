@@ -28,7 +28,7 @@ namespace nil {
 
         template<>
         struct frp_v1<256> : public curve_weierstrass_policy<256> {
-            typedef typename ec_group_info<256>::number_type number_type;
+            typedef typename curve_weierstrass_policy<256>::number_type number_type;
 
             constexpr static const number_type p =
                 0xF1FD178C0B3AD58F10126DE8CE42435B3961ADBCABC8CA6DE8FCF353D86E9C03_cppui256;

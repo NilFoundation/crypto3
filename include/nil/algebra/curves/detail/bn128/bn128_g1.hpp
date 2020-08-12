@@ -59,9 +59,11 @@ namespace nil {
                     coord[2] = value_type::one();
                 }
             }
+
             void to_special() {
                 to_affine_coordinates();
             }
+            
             bool is_special() const {
                 return (is_zero() || coord[2].is_one());
             }

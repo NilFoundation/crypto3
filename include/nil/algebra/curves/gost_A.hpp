@@ -28,7 +28,7 @@ namespace nil {
 
         template<>
         struct gost_A<256> : public curve_weierstrass_policy<256> {
-            typedef typename ec_group_info<256>::number_type number_type;
+            typedef typename curve_weierstrass_policy<256>::number_type number_type;
 
             constexpr static const number_type p =
                 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFD97_cppui256;
