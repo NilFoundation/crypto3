@@ -20,27 +20,29 @@
 
 namespace nil {
     namespace algebra {
+        namespace curves {
 
-        BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(256)
-    
-        template<std::size_t PBits>
-        struct gost_A : public curve_weierstrass_policy<PBits> {};
+            BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(256)
+        
+            template<std::size_t PBits>
+            struct gost_A : public curve_weierstrass_policy<PBits> {};
 
-        template<>
-        struct gost_A<256> : public curve_weierstrass_policy<256> {
-            typedef typename curve_weierstrass_policy<256>::number_type number_type;
+            template<>
+            struct gost_A<256> : public curve_weierstrass_policy<256> {
+                typedef typename curve_weierstrass_policy<256>::number_type number_type;
 
-            constexpr static const number_type p =
-                0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFD97_cppui256;
-            constexpr static const number_type a =
-                0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFD94_cppui256;
-            constexpr static const number_type b = 0xA6_cppui256;
-            constexpr static const number_type x = 0x1_cppui256;
-            constexpr static const number_type y =
-                0x8D91E471E0989CDA27DF505A453F2B7635294F2DDF23E3B122ACC99C9E9F1E14_cppui256;
-            constexpr static const number_type order =
-                0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF6C611070995AD10045841B09B761B893_cppui256;
-        };
+                constexpr static const number_type p =
+                    0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFD97_cppui256;
+                constexpr static const number_type a =
+                    0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFD94_cppui256;
+                constexpr static const number_type b = 0xA6_cppui256;
+                constexpr static const number_type x = 0x1_cppui256;
+                constexpr static const number_type y =
+                    0x8D91E471E0989CDA27DF505A453F2B7635294F2DDF23E3B122ACC99C9E9F1E14_cppui256;
+                constexpr static const number_type order =
+                    0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF6C611070995AD10045841B09B761B893_cppui256;
+            };
+        }    // namespace curves
     }        // namespace algebra
 }    // namespace nil
 

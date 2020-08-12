@@ -21,21 +21,23 @@
 #include <nil/crypto3/utilities/assert.hpp>
 
 namespace nil {
-    namespace crypto3 {
+    namespace algebra {
+        namespace curves {
 
-        BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(521)
+            BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(521)
 
-        /**
-         * The NIST P-521 curve
-         */
-        template<std::size_t WordBits = limb_bits>
-        struct p521 : public curve_nist_policy<521, WordBits> {
-            typedef typename curve_nist_policy<521>::number_type number_type;
+            /**
+             * The NIST P-521 curve
+             */
+            template<std::size_t WordBits = limb_bits>
+            struct p521 : public curve_nist_policy<521, WordBits> {
+                typedef typename curve_nist_policy<521>::number_type number_type;
 
-            constexpr static const number_type p =
-                0x1FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF_cppui521;
+                constexpr static const number_type p =
+                    0x1FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF_cppui521;
 
-        };
+            };
+        }    // namespace curves
     }        // namespace crypto3
 }    // namespace nil
 

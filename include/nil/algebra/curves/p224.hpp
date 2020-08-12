@@ -18,19 +18,21 @@
 
 namespace nil {
     namespace algebra {
+        namespace curves {
 
-        BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(224)
+            BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(224)
 
-        /**
-         * The NIST P-224 curve
-         */
-        template<std::size_t WordBits = limb_bits>
-        struct p224 : public curve_nist_policy<224, WordBits> {
-            typedef typename curve_nist_policy<224>::number_type number_type;
+            /**
+             * The NIST P-224 curve
+             */
+            template<std::size_t WordBits = limb_bits>
+            struct p224 : public curve_nist_policy<224, WordBits> {
+                typedef typename curve_nist_policy<224>::number_type number_type;
 
-            constexpr static const number_type p = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF000000000000000000000001_cppui224;
+                constexpr static const number_type p = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF000000000000000000000001_cppui224;
 
-        };
+            };
+        }    // namespace curves
     }        // namespace algebra
 }    // namespace nil
 

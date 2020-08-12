@@ -21,17 +21,19 @@
 
 namespace nil {
     namespace algebra {
+        namespace curves {
 
-        /**
-         * The NIST P-256 curve
-         */
-        template<std::size_t WordBits = limb_bits>
-        struct p256 : public curve_nist_policy<256, WordBits> {
-            typedef typename curve_nist_policy<256>::number_type number_type;
+            /**
+             * The NIST P-256 curve
+             */
+            template<std::size_t WordBits = limb_bits>
+            struct p256 : public curve_nist_policy<256, WordBits> {
+                typedef typename curve_nist_policy<256>::number_type number_type;
 
-            constexpr static const number_type p =
-                0xFFFFFFFF00000001000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFF_cppui256;
-        };
+                constexpr static const number_type p =
+                    0xFFFFFFFF00000001000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFF_cppui256;
+            };
+        }    // namespace curves
     }        // namespace algebra
 }    // namespace nil
 

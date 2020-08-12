@@ -17,7 +17,6 @@ namespace nil {
     namespace algebra {
         namespace curve {
             namespace detail {
-                namespace ecop {
 
                     /*
                         @memo Jacobian coordinates: Y^2 = X^3 + b*Z^6
@@ -312,7 +311,6 @@ namespace nil {
 
                     }
 
-                }    // namespace ecop
             }   // namespace detail 
         }   //  namespace curve
     }   //  namespace algebra
