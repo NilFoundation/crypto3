@@ -6,14 +6,10 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_FF_CURVE_NIST_P192_HPP
-#define CRYPTO3_FF_CURVE_GOST_A_HPP
+#ifndef ALGEBRA_CURVES_NIST_P192_HPP
+#define ALGEBRA_CURVES_NIST_P192_HPP
 
 #include <memory>
-
-#include <boost/multiprecision/cpp_bin_float.hpp>
-#include <boost/multiprecision/mask_bits.hpp>
-#include <boost/multiprecision/reduce_below.hpp>
 
 #include <nil/crypto3/pubkey/ec_group/curve_nist.hpp>
 
@@ -27,8 +23,8 @@ namespace nil {
              * The NIST P-192 curve
              */
             template<std::size_t WordBits = limb_bits>
-            struct p192 : public curve_nist_policy<192, WordBits> {
-                typedef typename curve_nist_policy<192>::number_type number_type;
+            struct p192 : public curve_nist<192, WordBits> {
+                typedef typename curve_nist<192>::number_type number_type;
 
                 constexpr static const number_type p = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFFFFFFFFFF_cppui192;
             };
@@ -36,4 +32,4 @@ namespace nil {
     }        // namespace algebra
 }    // namespace nil
 
-#endif    // CRYPTO3_FF_CURVE_GOST_A_HPP
+#endif    // ALGEBRA_CURVES_NIST_P192_HPP

@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
@@ -7,16 +7,10 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_FF_CURVE_FRP_V1_HPP
-#define CRYPTO3_FF_CURVE_FRP_V1_HPP
+#ifndef ALGEBRA_CURVES_FRP_V1_HPP
+#define ALGEBRA_CURVES_FRP_V1_HPP
 
-#include <memory>
-
-#include <boost/multiprecision/cpp_bin_float.hpp>
-#include <boost/multiprecision/mask_bits.hpp>
-#include <boost/multiprecision/reduce_below.hpp>
-
-#include <nil/crypto3/algebra/curves/curve_gfp.hpp>
+#include <nil/crypto3/algebra/curves/curve_weierstrass.hpp>
 
 namespace nil {
     namespace algebra {
@@ -25,11 +19,11 @@ namespace nil {
             BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(256)
 
             template<std::size_t PBits>
-            struct frp_v1 : public curve_weierstrass_policy<PBits> {};
+            struct frp_v1 : public curve_weierstrass<PBits> {};
 
             template<>
-            struct frp_v1<256> : public curve_weierstrass_policy<256> {
-                typedef typename curve_weierstrass_policy<256>::number_type number_type;
+            struct frp_v1<256> : public curve_weierstrass<256> {
+                typedef typename curve_weierstrass<256>::number_type number_type;
 
                 constexpr static const number_type p =
                     0xF1FD178C0B3AD58F10126DE8CE42435B3961ADBCABC8CA6DE8FCF353D86E9C03_cppui256;
@@ -48,4 +42,4 @@ namespace nil {
     }        // namespace algebra
 }    // namespace nil
 
-#endif    // CRYPTO3_FF_CURVE_FRP_V1_HPP
+#endif    // ALGEBRA_CURVES_FRP_V1_HPP

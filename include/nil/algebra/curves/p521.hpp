@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_PUBKEY_CURVE_NIST_P521_HPP
-#define CRYPTO3_PUBKEY_CURVE_NIST_P521_HPP
+#ifndef ALGEBRA_CURVES_NIST_P521_HPP
+#define ALGEBRA_CURVES_NIST_P521_HPP
 
 #include <memory>
 
@@ -41,4 +41,4 @@ namespace nil {
     }        // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_CURVE_NIST_P521_HPP
+#endif    // ALGEBRA_CURVES_NIST_P521_HPP

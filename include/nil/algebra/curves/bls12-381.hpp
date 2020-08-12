@@ -10,7 +10,7 @@
 #ifndef ALGEBRA_CURVES_BLS12_381_HPP
 #define ALGEBRA_CURVES_BLS12_381_HPP
 
-#include <nil/crypto3/algebra/curves/curve_jacobian.hpp>
+#include <nil/crypto3/algebra/curves/curve_weierstrass.hpp>
 
 namespace nil {
     namespace algebra {
@@ -21,8 +21,8 @@ namespace nil {
 
 	        BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(254)
 
-	        struct bn128_snark1 : public curve_weierstrass_policy<254> {
-		        typedef typename curve_weierstrass_policy<254>::number_type number_type;
+	        struct bn128_snark1 : public curve_weierstrass<254> {
+		        typedef typename curve_weierstrass<254>::number_type number_type;
 
 		        constexpr static const number_type p = 0x1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaaab;
 		        constexpr static const number_type a = 0;

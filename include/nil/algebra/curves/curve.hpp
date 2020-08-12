@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef ALGEBRA_CURVES_GFP_HPP
-#define ALGEBRA_CURVES_GFP_HPP
+#ifndef ALGEBRA_CURVES_CURVE_HPP
+#define ALGEBRA_CURVES_CURVE_HPP
 
 #include <boost/mpl/arithmetic.hpp>
 
@@ -37,4 +37,4 @@ namespace nil {
     }    // namespace algebra
 }    // namespace nil
 
-#endif    // ALGEBRA_CURVES_GFP_HPP
+#endif    // ALGEBRA_CURVES_CURVE_HPP

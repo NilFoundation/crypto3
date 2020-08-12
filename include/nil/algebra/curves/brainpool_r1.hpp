@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------//
-// Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
@@ -7,16 +7,10 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_PUBKEY_CURVE_BRAINPOOL_R1_HPP
-#define CRYPTO3_PUBKEY_CURVE_BRAINPOOL_R1_HPP
+#ifndef ALGEBRA_CURVES_BRAINPOOL_R1_HPP
+#define ALGEBRA_CURVES_BRAINPOOL_R1_HPP
 
-#include <memory>
-
-#include <boost/multiprecision/cpp_bin_float.hpp>
-#include <boost/multiprecision/mask_bits.hpp>
-#include <boost/multiprecision/reduce_below.hpp>
-
-#include <nil/crypto3/pubkey/ec_group/curve_gfp.hpp>
+#include <nil/crypto3/pubkey/ec_group/curve_weierstrass.hpp>
 
 namespace nil {
     namespace algebra {
@@ -25,18 +19,17 @@ namespace nil {
             BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(160)
             BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(192)
             BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(224)
-            BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(239)
             BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(256)
             BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(320)
             BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(384)
             BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(521)
 
             template<std::size_t PBits>
-            struct brainpool_r1 : public curve_weierstrass_policy<PBits> {};
+            struct brainpool_r1 : public curve_weierstrass<PBits> {};
 
             template<>
-            struct brainpool_r1<160> : public curve_weierstrass_policy<160> {
-                typedef typename curve_weierstrass_policy<160>::number_type number_type;
+            struct brainpool_r1<160> : public curve_weierstrass<160> {
+                typedef typename curve_weierstrass<160>::number_type number_type;
 
                 constexpr static const number_type p = 0xE95E4A5F737059DC60DFC7AD95B3D8139515620F_cppui160;
                 constexpr static const number_type a = 0x340E7BE2A280EB74E2BE61BADA745D97E8F7C300_cppui160;
@@ -50,8 +43,8 @@ namespace nil {
             typedef brainpool_r1<160> brainpool160r1;
 
             template<>
-            struct brainpool_r1<192> : public curve_weierstrass_policy<192> {
-                typedef typename curve_weierstrass_policy<192>::number_type number_type;
+            struct brainpool_r1<192> : public curve_weierstrass<192> {
+                typedef typename curve_weierstrass<192>::number_type number_type;
 
                 constexpr static const number_type p = 0xC302F41D932A36CDA7A3463093D18DB78FCE476DE1A86297_cppui192;
                 constexpr static const number_type a = 0x6A91174076B1E0E19C39C031FE8685C1CAE040E5C69A28EF_cppui192;
@@ -65,7 +58,7 @@ namespace nil {
             typedef brainpool_r1<192> brainpool192r1;
 
             template<>
-            struct brainpool_r1<224> : public curve_weierstrass_policy<224> {
+            struct brainpool_r1<224> : public curve_weierstrass<224> {
                 typedef typename ec_group_info<224>::number_type number_type;
 
                 constexpr static const number_type p =
@@ -86,7 +79,7 @@ namespace nil {
             typedef brainpool_r1<224> brainpool224r1;
 
             template<>
-            struct brainpool_r1<256> : public curve_weierstrass_policy<256> {
+            struct brainpool_r1<256> : public curve_weierstrass<256> {
                 typedef typename ec_group_info<256>::number_type number_type;
 
                 constexpr static const number_type p =
@@ -107,7 +100,7 @@ namespace nil {
             typedef brainpool_r1<256> brainpool256r1;
 
             template<>
-            struct brainpool_r1<320> : public curve_weierstrass_policy<320> {
+            struct brainpool_r1<320> : public curve_weierstrass<320> {
                 typedef typename ec_group_info<320>::number_type number_type;
 
                 constexpr static const number_type p =
@@ -128,7 +121,7 @@ namespace nil {
             typedef brainpool_r1<320> brainpool320r1;
 
             template<>
-            struct brainpool_r1<384> : public curve_weierstrass_policy<384> {
+            struct brainpool_r1<384> : public curve_weierstrass<384> {
                 typedef typename ec_group_info<384>::number_type number_type;
 
                 constexpr static const number_type p =
@@ -149,7 +142,7 @@ namespace nil {
             typedef brainpool_r1<384> brainpool384r1;
 
             template<>
-            struct brainpool_r1<512> : public curve_weierstrass_policy<512> {
+            struct brainpool_r1<512> : public curve_weierstrass<512> {
                 typedef typename ec_group_info<512>::number_type number_type;
 
                 constexpr static const number_type p =
@@ -171,4 +164,4 @@ namespace nil {
     }        // namespace algebra
 }    // namespace nil
 
-#endif    // CRYPTO3_PUBKEY_CURVE_BRAINPOOL_R1_HPP
+#endif    // ALGEBRA_CURVES_BRAINPOOL_R1_HPP

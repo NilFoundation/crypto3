@@ -7,16 +7,10 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_FF_CURVE_GOST_A_HPP
-#define CRYPTO3_FF_CURVE_GOST_A_HPP
+#ifndef ALGEBRA_CURVES_GOST_A_HPP
+#define ALGEBRA_CURVES_GOST_A_HPP
 
-#include <memory>
-
-#include <boost/multiprecision/cpp_bin_float.hpp>
-#include <boost/multiprecision/mask_bits.hpp>
-#include <boost/multiprecision/reduce_below.hpp>
-
-#include <nil/crypto3/algebra/curves/curve_gfp.hpp>
+#include <nil/crypto3/algebra/curves/curve_weierstrass.hpp>
 
 namespace nil {
     namespace algebra {
@@ -25,11 +19,11 @@ namespace nil {
             BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(256)
         
             template<std::size_t PBits>
-            struct gost_A : public curve_weierstrass_policy<PBits> {};
+            struct gost_A : public curve_weierstrass<PBits> {};
 
             template<>
-            struct gost_A<256> : public curve_weierstrass_policy<256> {
-                typedef typename curve_weierstrass_policy<256>::number_type number_type;
+            struct gost_A<256> : public curve_weierstrass<256> {
+                typedef typename curve_weierstrass<256>::number_type number_type;
 
                 constexpr static const number_type p =
                     0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFD97_cppui256;
@@ -46,4 +40,4 @@ namespace nil {
     }        // namespace algebra
 }    // namespace nil
 
-#endif    // CRYPTO3_FF_CURVE_GOST_A_HPP
+#endif    // ALGEBRA_CURVES_GOST_A_HPP

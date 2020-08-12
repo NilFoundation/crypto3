@@ -7,10 +7,10 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef ALGEBRA_PAIRING_BN128_HPP
-#define ALGEBRA_PAIRING_BN128_HPP
+#ifndef ALGEBRA_CURVES_BN128_HPP
+#define ALGEBRA_CURVES_BN128_HPP
 
-#include <nil/crypto3/algebra/curves/curve_jacobian.hpp>
+#include <nil/crypto3/algebra/curves/curve_weierstrass.hpp>
 
 namespace nil {
     namespace algebra {
@@ -30,8 +30,8 @@ namespace nil {
 				v^3 = xi
 				w^2 = v
 			*/
-	        struct bn128_snark1 : public curve_weierstrass_policy<254> {
-		        typedef typename curve_weierstrass_policy<254>::number_type number_type;
+	        struct bn128_snark1 : public curve_weierstrass<254> {
+		        typedef typename curve_weierstrass<254>::number_type number_type;
 
 		        constexpr static const number_type p = 21888242871839275222246405745257275088696311157297823662689037894645226208583_cppui254;
 		        constexpr static const number_type a = 0;
@@ -42,8 +42,8 @@ namespace nil {
 	    	};
 
 	    	// b/xi = 82 / (9 + u) = 9 - u
-	        struct bn128_snark2 : public curve_weierstrass_policy<254> {
-		        typedef typename curve_weierstrass_policy<254>::number_type number_type;
+	        struct bn128_snark2 : public curve_weierstrass<254> {
+		        typedef typename curve_weierstrass<254>::number_type number_type;
 
 		        constexpr static const number_type p = 21888242871839275222246405745257275088696311157297823662689037894645226208583_cppui254;
 		        constexpr static const number_type a = 0;
@@ -54,8 +54,8 @@ namespace nil {
 	    	};
 
 	    	// herumi curve
-	        struct bn128_Fp254BNb : public curve_weierstrass_policy<254> {
-		        typedef typename curve_weierstrass_policy<254>::number_type number_type;
+	        struct bn128_Fp254BNb : public curve_weierstrass<254> {
+		        typedef typename curve_weierstrass<254>::number_type number_type;
 
 		        constexpr static const number_type p = 16798108731015832284940804142231733909889187121439069848933715426072753864723_cppui254;
 		        constexpr static const number_type a = 0;
@@ -68,4 +68,4 @@ namespace nil {
     }    // namespace algebra
 }    // namespace nil
 
-#endif    // ALGEBRA_PAIRING_BN128_HPP
+#endif    // ALGEBRA_CURVES_BN128_HPP

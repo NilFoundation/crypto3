@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef ALGEBRA_CURVES_EC_HPP
-#define ALGEBRA_CURVES_EC_HPP
+#ifndef ALGEBRA_CURVES_ELEMENT_BN128_HPP
+#define ALGEBRA_CURVES_ELEMENT_BN128_HPP
 
 #include <stdexcept>
 #include <vector>
@@ -18,7 +18,7 @@ namespace nil {
         namespace curve {
 
             template<class T>
-            class EcT_bn128 {
+            class element_bn128 {
             public:
                 mutable T p[3];
                 EcT_bn128() {
@@ -125,4 +125,4 @@ namespace nil {
     }   //  namespace algebra
 }   //  namespace nil
 
-#endif    // ALGEBRA_CURVES_EC_HPP
+#endif    // ALGEBRA_CURVES_ELEMENT_BN128_HPP
