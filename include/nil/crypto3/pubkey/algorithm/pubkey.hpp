@@ -24,9 +24,9 @@ namespace nil {
             struct nop_padding {
                 typedef std::size_t size_type;
 
-                typedef Scheme cipher_type;
+                typedef Scheme scheme_type;
             };
-        }    // namespace block
+        }    // namespace pubkey
 
         /*!
          * @defgroup pubkey Public Key Schemes
