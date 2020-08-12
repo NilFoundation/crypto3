@@ -7,9 +7,10 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef ALGEBRA_FF_MODP_IETF_HPP
-#define ALGEBRA_FF_MODP_IETF_HPP
+#ifndef ALGEBRA_FIELDS_MODP_IETF_HPP
+#define ALGEBRA_FIELDS_MODP_IETF_HPP
 
+#include <nil/algebra/fields/detail/element/modp_ietf.hpp>
 #include <nil/algebra/fields/fp.hpp>
 
 namespace nil {
@@ -45,6 +46,8 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x02;
 
+                typedef typename detail::element_modp_ietf<modulus_bits, generator_bits> value_type;
+
                 constexpr static const std::size_t arity = 1;
             };
 
@@ -61,6 +64,8 @@ namespace nil {
                 typedef typename policy_type::generator_type generator_type;
 
                 constexpr static const generator_type mul_generator = 0x02;
+
+                typedef typename detail::element_modp_ietf<modulus_bits, generator_bits> value_type;
 
                 constexpr static const std::size_t arity = 1;
             };
@@ -79,6 +84,8 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x02;
 
+                typedef typename detail::element_modp_ietf<modulus_bits, generator_bits> value_type;
+
                 constexpr static const std::size_t arity = 1;
             };
 
@@ -95,6 +102,8 @@ namespace nil {
                 typedef typename policy_type::generator_type generator_type;
 
                 constexpr static const generator_type mul_generator = 0x02;
+
+                typedef typename detail::element_modp_ietf<modulus_bits, generator_bits> value_type;
 
                 constexpr static const std::size_t arity = 1;
             };
@@ -113,6 +122,8 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x02;
 
+                typedef typename detail::element_modp_ietf<modulus_bits, generator_bits> value_type;
+
                 constexpr static const std::size_t arity = 1;
             };
 
@@ -129,6 +140,8 @@ namespace nil {
                 typedef typename policy_type::generator_type generator_type;
 
                 constexpr static const generator_type mul_generator = 0x02;
+
+                typedef typename detail::element_modp_ietf<modulus_bits, generator_bits> value_type;
 
                 constexpr static const std::size_t arity = 1;
             };
@@ -147,10 +160,12 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x02;
 
+                typedef typename detail::element_modp_ietf<modulus_bits, generator_bits> value_type;
+
                 constexpr static const std::size_t arity = 1;
             };
         }   // namespace fields
     }    // namespace algebra
 }    // namespace nil
 
-#endif    // ALGEBRA_FF_MODP_IETF_HPP
+#endif    // ALGEBRA_FIELDS_MODP_IETF_HPP
