@@ -12,11 +12,15 @@
 
 namespace nil {
     namespace algebra {
-        namespace detail {
-            template<typename Field>
-            struct double_element {
-            };
-        }
+        namespace fields {
+	        namespace detail {
+
+	            template<typename Field>
+	            struct double_element {
+	            };
+	            
+	        }
+	    }   // namespace fields
     }    // namespace algebra
 }    // namespace nil
 

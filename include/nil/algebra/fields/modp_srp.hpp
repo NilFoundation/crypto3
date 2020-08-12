@@ -15,6 +15,7 @@
 namespace nil {
     namespace algebra {
         namespace fields {
+            
             BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(1024)
             BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(1536)
             BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(2048)

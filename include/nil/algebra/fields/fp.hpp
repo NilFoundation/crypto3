@@ -18,6 +18,7 @@
 namespace nil {
     namespace algebra {
         namespace fields {
+            
             /**
              * Arithmetic in the finite field F[p], for prime p of fixed length.
              *
