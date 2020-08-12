@@ -36,10 +36,10 @@ namespace nil {
                     typedef typename std::iterator_traits<typename SinglePassRange::iterator>::value_type value_type;
                     BOOST_STATIC_ASSERT(std::numeric_limits<value_type>::is_specialized);
 
-                    constexpr static std::size_t const value_bits =
+                    constexpr static const std::size_t value_bits =
                         std::numeric_limits<value_type>::digits + std::numeric_limits<value_type>::is_signed;
 
-                    constexpr static std::size_t const key_value_bits =
+                    constexpr static const std::size_t key_value_bits =
                         sizeof(typename result_type::value_type) * CHAR_BIT;
 
                     result_type key;
@@ -61,10 +61,10 @@ namespace nil {
 
                     typedef typename std::iterator_traits<InputIterator>::value_type value_type;
 
-                    constexpr static std::size_t const value_bits =
+                    constexpr static const std::size_t value_bits =
                         std::numeric_limits<value_type>::digits + std::numeric_limits<value_type>::is_signed;
 
-                    constexpr static std::size_t const key_value_bits =
+                    constexpr static const std::size_t key_value_bits =
                         sizeof(typename result_type::value_type) * CHAR_BIT;
 
                     result_type key;
