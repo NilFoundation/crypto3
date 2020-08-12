@@ -44,6 +44,8 @@ namespace nil {
                 typedef typename policy_type::generator_type generator_type;
 
                 constexpr static const generator_type generator = 0x02;
+
+                constexpr static const std::size_t arity = 1;
             };
 
             struct modp_ietf<1536> : public fp<1536, CHAR_BIT> {
@@ -59,6 +61,8 @@ namespace nil {
                 typedef typename policy_type::generator_type generator_type;
 
                 constexpr static const generator_type generator = 0x02;
+
+                constexpr static const std::size_t arity = 1;
             };
 
             struct modp_ietf<2048> : public fp<2048, CHAR_BIT> {
@@ -74,6 +78,8 @@ namespace nil {
                 typedef typename policy_type::generator_type generator_type;
 
                 constexpr static const generator_type generator = 0x02;
+
+                constexpr static const std::size_t arity = 1;
             };
 
             struct modp_ietf<3072> : public fp<3072, CHAR_BIT> {
@@ -89,6 +95,8 @@ namespace nil {
                 typedef typename policy_type::generator_type generator_type;
 
                 constexpr static const generator_type generator = 0x02;
+
+                constexpr static const std::size_t arity = 1;
             };
 
             struct modp_ietf<4096> : public fp<4096, CHAR_BIT> {
@@ -104,6 +112,8 @@ namespace nil {
                 typedef typename policy_type::generator_type generator_type;
 
                 constexpr static const generator_type generator = 0x02;
+
+                constexpr static const std::size_t arity = 1;
             };
 
             struct modp_ietf<6144> : public fp<6144, CHAR_BIT> {
@@ -119,6 +129,8 @@ namespace nil {
                 typedef typename policy_type::generator_type generator_type;
 
                 constexpr static const generator_type generator = 0x02;
+
+                constexpr static const std::size_t arity = 1;
             };
 
             struct modp_ietf<8192> : public fp<8192, CHAR_BIT> {
@@ -134,6 +146,8 @@ namespace nil {
                 typedef typename policy_type::generator_type generator_type;
 
                 constexpr static const generator_type generator = 0x02;
+
+                constexpr static const std::size_t arity = 1;
             };
         }   // namespace fields
     }    // namespace algebra

@@ -42,7 +42,7 @@ namespace nil {
             };
 
             template<std::size_t ModulusBits, std::size_t GeneratorBits>
-            struct element<fp<ModulusBits, GeneratorBits>> {
+            struct element_fp : public element<fp<ModulusBits, GeneratorBits>> {
 
                 typedef params_type::modulus_type modulus_type;
 

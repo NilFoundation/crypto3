@@ -16,12 +16,12 @@ namespace nil {
     namespace algebra {
         namespace detail {
 
-            struct arithmetic_params<dsa_botan<2048>> : public basic_params<dsa_botan<2048>> {
+            struct arithmetic_params<dsa_botan<2048>> : public params<dsa_botan<2048>> {
                 constexpr static const number_type q =
                     0x8CD7D450F86F0AD94EEE4CE469A8756D1EBD1058241943EAFFB0B354585E924D_cppui256;
             };
 
-            struct arithmetic_params<dsa_botan<3072>> : public basic_params<dsa_botan<3072>> {
+            struct arithmetic_params<dsa_botan<3072>> : public params<dsa_botan<3072>> {
                 constexpr static const number_type q =
                     0xB3EBD364EC69EF8CF3BAF643B75734B16339B2E49E5CDE1B59C1E9FB40EE0C5B_cppui256;
             };

@@ -17,7 +17,7 @@ namespace nil {
         namespace detail {
 
             template<std::size_t ModulusBits, std::size_t GeneratorBits = CHAR_BIT>
-            struct arithmetic_params<modp_srp<ModulusBits, GeneratorBits>> : public basic_params<modp_srp<ModulusBits, GeneratorBits>> {
+            struct arithmetic_params<modp_srp<ModulusBits, GeneratorBits>> : public params<modp_srp<ModulusBits, GeneratorBits>> {
                 constexpr static const number_type q = 0;
             };
         

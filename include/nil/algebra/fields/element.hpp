@@ -16,10 +16,6 @@ namespace nil {
         struct element {
         	typedef arithmetic_params<Field> params_type;
         };
-
-        struct element_fp : public element<element_fp> {
-
-        };
     }    // namespace algebra
 }    // namespace nil
 
