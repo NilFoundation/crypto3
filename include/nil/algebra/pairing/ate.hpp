@@ -19,28 +19,6 @@ namespace bn {
     struct ParamT {
         typedef typename Fp2::Fp Fp;
 
-        using fp_value_type = Fp;
-        using fp2_value_type = Fp2;
-
-        using ?? = number_type;
-
-        static mie::Vsint z;
-        static mie::Vuint p;
-        static mie::Vuint r;
-        static mie::Vuint t;         /* trace of Frobenius */
-        static mie::Vsint largest_c; /* 6z + 2, the largest coefficient of short vector */
-        static fp_value_type Z;
-        static fp2_value_type W2p;
-        static fp2_value_type W3p;
-        static fp2_value_type gammar[5];
-        static fp2_value_type gammar2[5];
-        static fp2_value_type gammar3[5];
-        static fp_value_type i0;    // 0
-        static fp_value_type i1;    // 1
-        static int b;
-        static fp2_value_type b_invxi;    // b/xi of twist E' : Y^2 = X^3 + b/xi
-        static fp_value_type half;
-
         // Loop parameter for the Miller loop part of opt. ate pairing.
         typedef std::vector<signed char> SignVec;
         static SignVec siTbl;
@@ -53,7 +31,6 @@ namespace bn {
 
             //bool supported = cp == CurveSNARK1 || cp == CurveSNARK2;
 
-            mie::zmInit();
             const int64_t org_z = cp.z;    // NOTE: hard-coded Fp12::pow_neg_t too.
             
             z.set(org_z);
@@ -89,8 +66,7 @@ namespace bn {
             W2p = mie::power(xi, (p - 1) / 3);
             W3p = mie::power(xi, (p - 1) / 2);
             fp2_value_type temp = mie::power(xi, (p * p - 1) / 6);
-            assert(temp.b_.is_zero());
-
+            
             Z = (-temp.a_).square();
 
             i0 = 0;
@@ -167,7 +143,7 @@ namespace bn {
             t1 = g3_ * g4_;
             t0 = (g1_.square() - t1).dbl() - t1 + g2_ * g5_;
 
-            Fp2::mul_xi(g0, t0);
+            g0 = t0.mul_xi();
             g0.a_ += Param::i1;
         }
 
@@ -184,75 +160,65 @@ namespace bn {
         /*
             2275clk * 186 = 423Kclk QQQ
         */
-        static void squareC(CompressT &z) {
+        static void square(CompressT &z) {
             Fp2 t0, t1, t2;
             Fp2Dbl T0, T1, T2, T3;
-            Fp2Dbl::square(T0, z.g4_);
-            Fp2Dbl::square(T1, z.g5_);
+            T0 = square(z.g4_);
+            T1 = square(z.g5_);
             // # 7
-            Fp2Dbl::mul_xi(T2, T1);
+            T2 = T1.mul_xi();
             // # 8
             T2 += T0;
             // # 9
-            Fp2Dbl::mod(t2, T2);
+            t2 = T2.mod();
             // # 1
             t0 = z.g4_ + z.g5_;
-            Fp2Dbl::square(T2, t0);
+            T2 = square(t0);
             // # 2
             T0 += T1;
             //		Fp2Dbl::addNC(T0, T0, T1); // QQQ : OK?
             T2 -= T0;
             // # 3
-            Fp2Dbl::mod(t0, T2);
+            t0 = T2.mod();
             t1 = z.g2_ + z.g3_;
-            Fp2Dbl::square(T3, t1);
-            Fp2Dbl::square(T2, z.g2_);
+            T3 = square(t1);
+            T2 = square(z.g2_);
             // # 4
-            Fp2::mul_xi(t1, t0);
-#if 1    // RRR
-            Fp::_3z_add_2xC(z.g2_.a_, t1.a_);
-            Fp::_3z_add_2xC(z.g2_.b_, t1.b_);
-#else
-            // # 5
-            z.g2_ += t1;
-            z.g2_ += z.g2_;
-            // # 6
-            z.g2_ += t1;
-#endif
+            t1 = t0.mul_xi();
+            // RRR
+            z.g2_.a_ = t1.a_._3z_add_2xC();
+            z.g2_.b_ = t1.b_._3z_add_2xC();
+
             t1 = t2 - z.g3_;
             t1 += t1;
             // # 11 !!!!
-            Fp2Dbl::square(T1, z.g3_);
+            T1 = square(z.g3_);
             // # 10 !!!!
             z.g3_ = t1 + t2;
             // # 12
-            Fp2Dbl::mul_xi(T0, T1);
+            T0 = T1.mul_xi();
             // # 13
             T0 += T2;
             //		Fp2Dbl::addNC(T0, T0, T2); // QQQ : OK?
             // # 14
-            Fp2Dbl::mod(t0, T0);
+            t0 = T0.mod();
             z.g4_ = t0 - z.g4_;
             z.g4_ += z.g4_;
             // # 15
             z.g4_ += t0;
             // # 16
-            Fp2Dbl::addNC(T2, T2, T1);
+            T2 = addNC(T2, T1);
             T3 -= T2;
             // # 17
-            Fp2Dbl::mod(t0, T3);
-#if 1    // RRR
-            Fp::_3z_add_2xC(z.g5_.a_, t0.a_);
-            Fp::_3z_add_2xC(z.g5_.b_, t0.b_);
-#else
-            z.g5_ += t0;
-            z.g5_ += z.g5_;
-            z.g5_ += t0;    // # 18
-#endif
+            t0 = T3.mod();
+            // RRR
+            z.g5_.a_ = t0.a_._3z_add_2xC();
+            z.g5_.b_ = t0.b_._3z_add_2xC();
+
         }
-        static void square_nC(CompressT &z, int n) {
+        static void square_n(CompressT &z, int n) {
             for (int i = 0; i < n; i++) {
-                squareC(z);
+                square(z);
             }
         }
 
@@ -782,16 +748,6 @@ namespace bn {
 #pragma warning(pop)
 #endif
 
-    typedef mie::Fp Fp;
-    typedef Fp::Dbl FpDbl;
-    typedef Fp2T<Fp> Fp2;
-    typedef Fp2::Dbl Fp2Dbl;
-    typedef ParamT<Fp2> Param;
-    typedef Fp6T<Fp2> Fp6;
-    typedef Fp6::Dbl Fp6Dbl;
-    typedef Fp12T<Fp6> Fp12;
-    typedef Fp12::Dbl Fp12Dbl;
-    typedef CompressT<Fp2> Compress;
 
     typedef EcT<Fp2> Ec2;
     typedef EcT<Fp> Ec1;
@@ -816,23 +772,20 @@ namespace bn {
         return ecop::isOnECJac3(p);
     }
 
-    /*
-        see https://github.com/herumi/ate-pairing/blob/master/test/bn.cpp
-    */
     namespace components {
 
         /*
             inQ[3] : permit not-normalized
         */
-        inline void precomputeG2(std::vector<Fp6> &coeff, Fp2 Q[3], const Fp2 inQ[3]) {
+        inline void precomputeG2(std::vector<Fp6> &coeff, element<fp2> Q[3], const element<fp2> inQ[3]) {
             coeff.clear();
             bn::ecop::NormalizeJac(Q, inQ);
 
-            Fp2 T[3];
+            element<fp2> T[3];
             T[0] = Q[0];
             T[1] = Q[1];
-            T[2] = Fp2(1);
-            Fp2 Qneg[2];
+            T[2] = element<fp2>({1, 0});
+            element<fp2> Qneg[2];
             if (Param::useNAF) {
                 Qneg[0] = Q[0];
                 Qneg[1] = -Q[1];
@@ -863,9 +816,9 @@ namespace bn {
             }
 
             // addition step
-            Fp2 Q1[2];
+            element<fp2> Q1[2];
             bn::ecop::FrobEndOnTwist_1(Q1, Q);
-            Fp2 Q2[2];
+            element<fp2> Q2[2];
 
             bn::ecop::FrobEndOnTwist_2(Q2, Q);
             Q2[1] = -Q2[1];
@@ -881,7 +834,7 @@ namespace bn {
             precP : normalized point
         */
         inline void millerLoop(Fp12 &f, const std::vector<Fp6> &Qcoeff, const Fp precP[2]) {
-            assert(Param::siTbl[1] == 1);
+            
             size_t idx = 0;
 
             element<fp6_3over2> d = Qcoeff[idx];
