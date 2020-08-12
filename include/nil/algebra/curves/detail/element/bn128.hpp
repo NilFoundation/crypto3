@@ -18,17 +18,17 @@ namespace nil {
         namespace curve {
 
             template<class T>
-            class EcT {
+            class EcT_bn128 {
             public:
                 mutable T p[3];
-                EcT() {
+                EcT_bn128() {
                 }
 
-                EcT(const T &x, const T &y, bool verify = true) {
+                EcT_bn128(const T &x, const T &y, bool verify = true) {
                     set(x, y, verify);
                 }
 
-                EcT(const T &x, const T &y, const T &z, bool verify = true) {
+                EcT_bn128(const T &x, const T &y, const T &z, bool verify = true) {
                     set(x, y, z, verify);
                 }
                 
@@ -44,42 +44,42 @@ namespace nil {
                     p[2] = 1;
                 }
 
-                static inline void dbl(EcT &R, const EcT &P) {
+                static inline void dbl(EcT_bn128 &R, const EcT_bn128 &P) {
                     ecop::ECDouble(R.p, P.p);
                 }
 
-                static inline void add(EcT &R, const EcT &P, const EcT &Q) {
+                static inline void add(EcT_bn128 &R, const EcT_bn128 &P, const EcT_bn128 &Q) {
                     ecop::ECAdd(R.p, P.p, Q.p);
                 }
 
-                static inline void sub(EcT &R, const EcT &P, const EcT &Q) {
-                    EcT negQ;
+                static inline void sub(EcT_bn128 &R, const EcT_bn128 &P, const EcT_bn128 &Q) {
+                    EcT_bn128 negQ;
                     neg(negQ, Q);
                     add(R, P, negQ);
                 }
 
-                static inline void neg(EcT &R, const EcT &P) {
+                static inline void neg(EcT_bn128 &R, const EcT_bn128 &P) {
                     R.p[0] = P.p[0];
                     T::neg(R.p[1], P.p[1]);
                     R.p[2] = P.p[2];
                 }
 
                 template<class N>
-                static inline void mul(EcT &R, const EcT &P, const N &y) {
+                static inline void mul(EcT_bn128 &R, const EcT_bn128 &P, const N &y) {
                     ecop::ScalarMult(R.p, P.p, y);
                 }
                 template<class N>
-                EcT &operator*=(const N &y) {
+                EcT_bn128 &operator*=(const N &y) {
                     *this *= y;
                     return *this;
                 }
                 template<class N>
-                EcT operator*(const N &y) const {
-                    EcT c;
+                EcT_bn128 operator*(const N &y) const {
+                    EcT_bn128 c;
                     mul(c, *this, y);
                     return c;
                 }
-                bool operator==(const EcT &rhs) const {
+                bool operator==(const EcT_bn128 &rhs) const {
                     normalize();
                     rhs.normalize();
                     if (is_zero()) {
@@ -91,34 +91,34 @@ namespace nil {
                         return false;
                     return p[0] == rhs.p[0] && p[1] == rhs.p[1];
                 }
-                bool operator!=(const EcT &rhs) const {
+                bool operator!=(const EcT_bn128 &rhs) const {
                     return !operator==(rhs);
                 }
                 bool is_zero() const {
                     return p[2].is_zero();
                 }
-                EcT &operator+=(const EcT &rhs) {
+                EcT_bn128 &operator+=(const EcT_bn128 &rhs) {
                     add(*this, *this, rhs);
                     return *this;
                 }
-                EcT &operator-=(const EcT &rhs) {
+                EcT_bn128 &operator-=(const EcT_bn128 &rhs) {
                     sub(*this, *this, rhs);
                     return *this;
                 }
-                friend EcT operator+(const EcT &a, const EcT &b) {
-                    EcT c;
-                    EcT::add(c, a, b);
+                friend EcT_bn128 operator+(const EcT_bn128 &a, const EcT_bn128 &b) {
+                    EcT_bn128 c;
+                    EcT_bn128::add(c, a, b);
                     return c;
                 }
-                friend EcT operator-(const EcT &a, const EcT &b) {
-                    EcT c;
-                    EcT::sub(c, a, b);
+                friend EcT_bn128 operator-(const EcT_bn128 &a, const EcT_bn128 &b) {
+                    EcT_bn128 c;
+                    EcT_bn128::sub(c, a, b);
                     return c;
                 }
             };
             
-            typedef EcT<element_fp2> Ec2;
-            typedef EcT<element_fp> Ec1;
+            typedef EcT_bn128<element_fp2> Ec2;
+            typedef EcT_bn128<element_fp> Ec1;
 
 
         }   //  namespace curve
