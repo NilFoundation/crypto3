@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef ALGEBRA_EXPONENTIATION_HPP
-#define ALGEBRA_EXPONENTIATION_HPP
+#ifndef ALGEBRA_FIELDS_POWER_HPP
+#define ALGEBRA_FIELDS_POWER_HPP
 
 #include <cstdint>
 
@@ -16,28 +16,30 @@
 
 namespace nil {
     namespace algebra {
-        namespace detail {
-            template<typename FieldType, typename PowerType>
-            FieldType power(const FieldType &base, const PowerType &exponent) {
-                FieldType result = FieldType::one();
+        namespace fields {
+            namespace detail {
+                template<typename FieldType, typename PowerType>
+                FieldType power(const FieldType &base, const PowerType &exponent) {
+                    FieldType result = FieldType::one();
 
-                bool found_one = false;
+                    bool found_one = false;
 
-                for (long i = msb(exponent); i >= 0; --i) {
-                    if (found_one) {
-                        result = result.square();
+                    for (long i = msb(exponent); i >= 0; --i) {
+                        if (found_one) {
+                            result = result.square();
+                        }
+
+                        if (bit_test(exponent, i)) {
+                            found_one = true;
+                            result = result * base;
+                        }
                     }
 
-                    if (bit_test(exponent, i)) {
-                        found_one = true;
-                        result = result * base;
-                    }
+                    return result;
                 }
-
-                return result;
-            }
-        }    // namespace detail
+            }    // namespace detail
+        }   // namespace fields
     }    // namespace algebra
 }    // namespace nil
 
-#endif    // EXPONENTIATION_HPP_
+#endif    // ALGEBRA_FIELDS_POWER_HPP
