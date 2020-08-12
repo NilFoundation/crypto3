@@ -45,25 +45,24 @@ namespace nil {
             };
 
             template<std::size_t ModulusBits, std::size_t GeneratorBits>
-            struct element<fp2<ModulusBits, GeneratorBits>> {
+            struct element_fp2 : public element<fp2<ModulusBits, GeneratorBits>> {
 
-                using underlying_type = element<fp<ModulusBits, GeneratorBits>>;
+                using underlying_type = element_fp<ModulusBits, GeneratorBits>;
 
                 using type = std::array<underlying_type, 2>;
 
             private:
-                using value_type = element<fp2<ModulusBits, GeneratorBits>>;
 
                 type data;
 
             public:
-                value_type(type data) : data(data);
+                element_fp2(type data) : data(data);
 
-                inline static value_type zero() const {
+                inline static element_fp2 zero() const {
                     return {underlying_type::zero(), underlying_type::zero()};
                 }
 
-                inline static value_type one() const {
+                inline static element_fp2 one() const {
                     return {underlying_type::one(), underlying_type::zero()};
                 }
 
@@ -75,27 +74,27 @@ namespace nil {
                     return (data[0] == underlying_type::one()) && (data[1] == underlying_type::zero());
                 }
 
-                bool operator==(const value_type &B) const {
+                bool operator==(const element_fp2 &B) const {
                     return (data[0] == B.data[0]) && (data[1] == B.data[1]);
                 }
 
-                bool operator!=(const value_type &B) const {
+                bool operator!=(const element_fp2 &B) const {
                     return (data[0] != B.data[0]) || (data[1] != B.data[1]);
                 }
 
-                value_type operator+(const value_type &B) const {
+                element_fp2 operator+(const element_fp2 &B) const {
                     return {data[0] + B.data[0], data[1] + B.data[1]};
                 }
 
-                value_type operator-(const value_type &B) const {
+                element_fp2 operator-(const element_fp2 &B) const {
                     return {data[0] - B.data[0], data[1] - B.data[1]};
                 }
 
-                value_type operator-() const {
+                element_fp2 operator-() const {
                     return zero() - data;
                 }
 
-                value_type operator*(const value_type &B) const {
+                element_fp2 operator*(const element_fp2 &B) const {
                     const underlying_type A0B0 = data[0] * B.data[0], A1B1 = data[1] * B.data[1];
 
                     return {A0B0 + non_residue * A1B1, (data[0] + data[1]) * (B.data[0] + B.data[1]) - A0B0 - A1B1};
@@ -108,7 +107,7 @@ namespace nil {
                     xi = 9 + u
                     (a + bu)(9 + u) = (9a - b) + (a + 9b)u
                 */
-                value_type mul_xi() {
+                element_fp2 mul_xi() {
                     return {data[0].dbl().dbl().dbl() + data[0] - data[1], data[1].dbl().dbl().dbl() + data[1] + data[0]};
                 }
 
@@ -118,12 +117,12 @@ namespace nil {
 
                 1 * Fp neg
                 */
-                value_type mul_x() {
+                element_fp2 mul_x() {
                     return {- data[1], data[0]};
                 }
 
                 // z = x * b
-                value_type mul_Fp_0(const underlying_type &b) {
+                element_fp2 mul_Fp_0(const underlying_type &b) {
                     return {data[0] * b, data[1] * b};
                 }
 
@@ -134,41 +133,41 @@ namespace nil {
                     2 * Fp mul
                     1 * Fp neg
                 */
-                value_type mul_Fp_1(const underlying_type &y_b) {
+                element_fp2 mul_Fp_1(const underlying_type &y_b) {
                     return {-(data[1] * y_b), data[0] * y_b};
                 }
 
-                value_type _2z_add_3x() {
+                element_fp2 _2z_add_3x() {
                     return {data[0]._2z_add_3x(), data[1]._2z_add_3x()};
                 }
 
-                value_type divBy2() const {
+                element_fp2 divBy2() const {
                     return {divBy2(data[0]), divBy2(data[1])};
                 }
 
-                value_type divBy4() const {
+                element_fp2 divBy4() const {
                     return {divBy4(data[0]), divBy4(data[1])};
                 }
 
-                value_type dbl() const {
+                element_fp2 dbl() const {
                     return {data[0].dbl(), data[1].dbl()};
                 }
 
-                value_type sqrt() const {
+                element_fp2 sqrt() const {
 
                     // compute square root with Tonelli--Shanks
                 }
 
-                value_type square() const {
+                element_fp2 square() const {
                     return data * data;    // maybe can be done more effective
                 }
 
                 template<typename PowerType>
-                value_type pow(const PowerType &power) const {
+                element_fp2 pow(const PowerType &power) const {
                     return detail::power(data, power);
                 }
 
-                value_type inverse() const {
+                element_fp2 inverse() const {
 
                     /* From "High-Speed Software Implementation of the Optimal Ate Pairing over Barreto-Naehrig Curves";
                      * Algorithm 8 */
@@ -188,10 +187,10 @@ namespace nil {
 
             };
 
-            value_type addNC(const value_type &A, const value_type &B) {
+            element_fp2 addNC(const element_fp2 &A, const element_fp2 &B) {
             }
 
-            value_type subNC(const value_type &A, const value_type &B) {
+            element_fp2 subNC(const element_fp2 &A, const element_fp2 &B) {
             }
         }   // namespace fields
     }    // namespace algebra
