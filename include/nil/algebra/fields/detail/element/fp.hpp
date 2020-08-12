@@ -10,16 +10,13 @@
 #ifndef ALGEBRA_FIELDS_ELEMENT_FP_HPP
 #define ALGEBRA_FIELDS_ELEMENT_FP_HPP
 
-#include <boost/multiprecision/number.hpp>
-#include <boost/multiprecision/cpp_int.hpp>
-
-#include <nil/algebra/fields/detail/exponentiation.hpp>
+#include <nil/algebra/fields/element.hpp>
+#include <nil/algebra/fields/fp.hpp>
 
 namespace nil {
     namespace algebra {
         namespace fields {
             namespace detail {
-           
 
                 template<std::size_t ModulusBits, std::size_t GeneratorBits>
                 struct element_fp : public element<fp<ModulusBits, GeneratorBits>> {
