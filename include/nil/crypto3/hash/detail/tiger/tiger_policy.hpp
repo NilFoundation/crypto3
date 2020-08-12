@@ -29,6 +29,39 @@ namespace nil {
                     constexpr static const std::size_t digest_bits = DigestBits;
                     typedef static_digest<DigestBits> digest_type;
 
+                    constexpr static const std::size_t pkcs_id_size = 0;
+                    constexpr static const std::size_t pkcs_id_bits = pkcs_id_size * CHAR_BIT;
+                    typedef std::array<std::uint8_t, pkcs_id_size> pkcs_id_type;
+
+                    constexpr static const pkcs_id_type pkcs_id = {};
+
+                    constexpr static const std::size_t state_bits = tiger_functions<DigestBits>::state_bits;
+                    constexpr static const std::size_t state_words = tiger_functions<DigestBits>::state_words;
+                    typedef typename tiger_functions<DigestBits>::state_type state_type;
+
+                    struct iv_generator {
+                        state_type const &operator()() const {
+                            constexpr static const state_type H0 = {
+                                {0x0123456789ABCDEF, 0xFEDCBA9876543210, 0xF096A5B4C3B2E187}};
+                            return H0;
+                        }
+                    };
+                };
+
+                template<>
+                struct tiger_policy<192, 3> : public tiger_functions<192> {
+                    constexpr static const std::size_t digest_bits = 192;
+                    typedef static_digest<digest_bits> digest_type;
+
+                    typedef typename tiger_functions<digest_bits>::byte_type byte_type;
+
+                    constexpr static const std::size_t word_bits = tiger_functions<digest_bits>::word_bits;
+                    typedef typename tiger_functions<digest_bits>::word_type word_type;
+
+                    constexpr static const std::size_t passes = 3;
+
+                    typedef typename stream_endian::little_octet_big_bit digest_endian;
+
                     constexpr static const std::size_t pkcs_id_size = 19;
                     constexpr static const std::size_t pkcs_id_bits = pkcs_id_size * CHAR_BIT;
                     typedef std::array<std::uint8_t, pkcs_id_size> pkcs_id_type;
@@ -37,9 +70,9 @@ namespace nil {
                                                                    0x06, 0x01, 0x04, 0x01, 0xDA, 0x47, 0x0C,
                                                                    0x02, 0x05, 0x00, 0x04, 0x18};
 
-                    constexpr static const std::size_t state_bits = tiger_functions<DigestBits>::state_bits;
-                    constexpr static const std::size_t state_words = tiger_functions<DigestBits>::state_words;
-                    typedef typename tiger_functions<DigestBits>::state_type state_type;
+                    constexpr static const std::size_t state_bits = tiger_functions<digest_bits>::state_bits;
+                    constexpr static const std::size_t state_words = tiger_functions<digest_bits>::state_words;
+                    typedef typename tiger_functions<digest_bits>::state_type state_type;
 
                     struct iv_generator {
                         state_type const &operator()() const {
