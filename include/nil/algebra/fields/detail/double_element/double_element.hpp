@@ -16,8 +16,9 @@ namespace nil {
 	        namespace detail {
 
 	            template<typename Field>
-	            struct double_element {
-	            };
+		        struct double_element {
+		        	typedef arithmetic_params<Field> params_type;
+		        };
 	            
 	        }
 	    }   // namespace fields

@@ -19,27 +19,20 @@ namespace nil {
             namespace detail {
 
                 template<std::size_t ModulusBits, std::size_t GeneratorBits>
-                struct double_element<fp<ModulusBits, GeneratorBits>> {
-
-                    typedef arithmetic_params<fp<ModulusBits, GeneratorBits>> params_type;
+                struct double_element_fp : public double_element<fp<ModulusBits, GeneratorBits>> {
 
                     typedef params_type::double_number_type number_type;
 
-                private:
-                    using value_type = double_element<fp<ModulusBits, GeneratorBits>>;
-
                     number_type data;
 
-                public:
+                    double_element_fp(number_type data) : data(data);
 
-                    value_type(type data) : data(data);
-
-                    inline static value_type zero() const {
-                        return value_type(type(0));
+                    inline static double_element_fp zero() const {
+                        return double_element_fp(type(0));
                     }
 
-                    inline static value_type one() const {
-                        return value_type(type(1));
+                    inline static double_element_fp one() const {
+                        return double_element_fp(type(1));
                     }
 
                     bool is_zero() const {
@@ -50,55 +43,55 @@ namespace nil {
                         return data == type(1);
                     }
 
-                    bool operator==(const value_type &B) const {
+                    bool operator==(const double_element_fp &B) const {
                         return data == B.data;
                     }
 
-                    bool operator!=(const value_type &B) const {
+                    bool operator!=(const double_element_fp &B) const {
                         return data != B.data;
                     }
 
-                    value_type operator+(const value_type &B) const {
+                    double_element_fp operator+(const double_element_fp &B) const {
                         return data + B.data;
                     }
 
-                    value_type operator-(const value_type &B) const {
+                    double_element_fp operator-(const double_element_fp &B) const {
                         return data - B.data;
                     }
 
-                    value_type operator-() const {
+                    double_element_fp operator-() const {
                         return -data;
                     }
 
                     //data + data
-                    value_type dbl() const {
+                    double_element_fp dbl() const {
                         return data + data;
                     }
 
-                    value_type subOpt1() const {
+                    double_element_fp subOpt1() const {
                         
                     }
 
-                    double_element<fp> mod(){
+                    element_fp mod(){
                         
                     }
                 };
 
-                double_element<fp> addNC(const double_element<fp> &A, const double_element<fp> &B){
+                double_element_fp addNC(const double_element_fp &A, const double_element_fp &B){
                     return {addNC(data[0] + B.data[0]), addNC(data[1] + B.data[1])};
                 }
 
-                double_element<fp> subNC(const double_element<fp> &A, const double_element<fp> &B){
+                double_element_fp subNC(const double_element_fp &A, const double_element_fp &B){
                     return {subNC(data[0] + B.data[0]), subNC(data[1] + B.data[1])};
                 }
 
-                double_element<fp> mul(const element<fp> &A, const element<fp> &B) {
+                double_element_fp mul(const element_fp &A, const element_fp &B) {
                     
                 }
 
-                double_element<fp> square(const element<fp> &B){
+                double_element_fp square(const element_fp &B){
                 {
-                    element<fp> t0, t1;
+                    element_fp t0, t1;
                     t0 = addNC(x.b_, x.b_);
                     z.b_ = mul(t0, x.a_);
                     t1 = addNC(x.a_, Fp::getDirectP(1)); // RRR

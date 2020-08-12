@@ -21,22 +21,17 @@ namespace nil {
             namespace detail {
 
                 template<std::size_t ModulusBits, std::size_t GeneratorBits>
-                struct double_element<fp2<ModulusBits, GeneratorBits>> {
+                struct double_element_fp2 : public double_element<fp2<ModulusBits, GeneratorBits>> {
 
-                    typedef arithmetic_params<fp2<ModulusBits, GeneratorBits>> params_type;
+                    using underlying_type = double_element_fp<ModulusBits, GeneratorBits>;
 
-                    typedef params_type::double_number_type number_type;
+                    using value_type = std::array<underlying_type, 2>;
 
-                private:
-                    using value_type = double_element<fp2<ModulusBits, GeneratorBits>>;
+                    value_type data;
 
-                    number_type data;
+                    double_element_fp2(type data) : data(data);
 
-                public:
-
-                    value_type(type data) : data(data);
-
-                    inline static value_type zero() const {
+                    inline static double_element_fp2 zero() const {
                         return {underlying_type::zero(), underlying_type::zero()};
                     }
 
@@ -44,32 +39,32 @@ namespace nil {
                         return (data[0] == underlying_type::zero()) && (data[1] == underlying_type::zero());
                     }
 
-                    bool operator==(const value_type &B) const {
+                    bool operator==(const double_element_fp2 &B) const {
                         return (data[0] == B.data[0]) && (data[1] == B.data[1]);
                     }
 
-                    bool operator!=(const value_type &B) const {
+                    bool operator!=(const double_element_fp2 &B) const {
                         return (data[0] != B.data[0]) || (data[1] != B.data[1]);
                     }
 
-                    value_type operator+(const value_type &B) const {
+                    double_element_fp2 operator+(const double_element_fp2 &B) const {
                         return {data[0] + B.data[0], data[1] + B.data[1]};
                     }
 
-                    value_type operator-(const value_type &B) const {
+                    double_element_fp2 operator-(const double_element_fp2 &B) const {
                         return {data[0] - B.data[0], data[1] - B.data[1]};
                     }
 
-                    value_type operator-() const {
+                    double_element_fp2 operator-() const {
                         return zero()-data;
                     }
 
                     //data + data
-                    value_type dbl() const {
+                    double_element_fp2 dbl() const {
                         return {data[0].dbl(), data[1].dbl()};
                     }
 
-                    value_type subOpt1() const {
+                    double_element_fp2 subOpt1() const {
                         return {mod(data[0]), mod(data[1])};
                     }
 
@@ -79,27 +74,27 @@ namespace nil {
                         xi = 9 + u
                         (a + bu)(9 + u) = (9a - b) + (a + 9b)u
                     */
-                    value_type mul_xi() {
+                    double_element_fp2 mul_xi() {
                         return {data[0].dbl().dbl().dbl() + data[0] - data[1], data[1].dbl().dbl().dbl() + data[1] + data[0]};
                     }
 
-                    element<fp2> mod(){
+                    element_fp2 mod(){
                         return {data[0].mod(), data[1].mod()};
                     }
 
                 };
 
-                double_element<fp2> addNC(const double_element<fp2> &A, const double_element<fp2> &B){
+                double_element_fp2 addNC(const double_element_fp2 &A, const double_element_fp2 &B){
                     return {addNC(data[0] + B.data[0]), addNC(data[1] + B.data[1])};
                 }
 
-                double_element<fp2> subNC(const double_element<fp2> &A, const double_element<fp2> &B){
+                double_element_fp2 subNC(const double_element_fp2 &A, const double_element_fp2 &B){
                     return {subNC(data[0] + B.data[0]), subNC(data[1] + B.data[1])};
                 }
 
-                double_element<fp2> mulOpt(const element<fp2> &A, const element<fp2> &B, int mode) {
+                double_element_fp2 mulOpt(const element_fp2 &A, const element_fp2 &B, int mode) {
                     double_element<fp> d0;
-                    double_element<fp2> z;
+                    double_element_fp2 z;
                     element<fp> s, t;
 
                     s = addNC(A.data[0], A.data[1]);
@@ -120,16 +115,16 @@ namespace nil {
                     }
                 }
 
-                double_element<fp2> mulOpt1(const element<fp2> &A, const element<fp2> &B) {
+                double_element_fp2 mulOpt1(const element_fp2 &A, const element_fp2 &B) {
                     return mulOpt(A, B, 1);
                 }
 
-                double_element<fp2> mulOpt2(const element<fp2> &A, const element<fp2> &B) {
+                double_element_fp2 mulOpt2(const element_fp2 &A, const element_fp2 &B) {
                     return mulOpt(A, B, 2);
                 }
 
-                double_element<fp2> square(const element<fp2> &B){
-                    element<fp>  t0, t1;
+                double_element_fp2 square(const element_fp2 &B){
+                    element_fp  t0, t1;
                     t0 = addNC(x.b_, x.b_);
                     z.b_ = mul(t0, x.a_);
                     t1 = addNC(x.a_, Fp::getDirectP(1)); // RRR
