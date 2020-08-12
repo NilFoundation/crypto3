@@ -18,7 +18,7 @@
 namespace nil {
     namespace algebra {
         namespace fields {
-            
+
             /**
              * Arithmetic in the finite field F[p], for prime p of fixed length.
              *
@@ -50,19 +50,18 @@ namespace nil {
                 using type = modulus_type;
 
             private:
-                using value_type = element<fp<ModulusBits, GeneratorBits>>;
 
                 type data;
 
             public:
-                value_type(type data) : data(data);
+                element_fp(type data) : data(data);
 
-                inline static value_type zero() const {
-                    return value_type(type(0));
+                inline static element_fp zero() const {
+                    return element_fp(type(0));
                 }
 
-                inline static value_type one() const {
-                    return value_type(type(1));
+                inline static element_fp one() const {
+                    return element_fp(type(1));
                 }
 
                 bool is_zero() const {
@@ -73,52 +72,52 @@ namespace nil {
                     return data == type(1);
                 }
 
-                bool operator==(const value_type &B) const {
+                bool operator==(const element_fp &B) const {
                     return data == B.data;
                 }
 
-                bool operator!=(const value_type &B) const {
+                bool operator!=(const element_fp &B) const {
                     return data != B.data;
                 }
 
-                value_type operator+(const value_type &B) const {
+                element_fp operator+(const element_fp &B) const {
                     return data + B.data;
                 }
 
-                value_type operator-(const value_type &B) const {
+                element_fp operator-(const element_fp &B) const {
                     return data - B.data;
                 }
 
-                value_type operator-() const {
+                element_fp operator-() const {
                     return -data;
                 }
 
-                value_type operator*(const value_type &B) const {
+                element_fp operator*(const element_fp &B) const {
                     return data * B.data;
                 }
 
-                value_type dbl() const {
+                element_fp dbl() const {
                     return data + data;
                 }
 
-                value_type sqrt() const {
+                element_fp sqrt() const {
                     return sqrt(data);
                 }
 
-                value_type _2z_add_3x() {
+                element_fp _2z_add_3x() {
                     
                 }
 
-                value_type square() const {
+                element_fp square() const {
                     return data * data;    // maybe can be done more effective
                 }
 
                 template<typename PowerType>
-                value_type pow(const PowerType &power) const {
+                element_fp pow(const PowerType &power) const {
                     return detail::power(data, power);
                 }
 
-                value_type inverse() const {
+                element_fp inverse() const {
                     return invert(data);
                 }
             };
