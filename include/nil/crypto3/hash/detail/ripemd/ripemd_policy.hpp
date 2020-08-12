@@ -33,7 +33,7 @@ namespace nil {
                     constexpr static const std::size_t digest_bits = DigestBits;
                     typedef static_digest<digest_bits> digest_type;
 
-                    constexpr static const std::uint8_t ieee1363_hash_id = 0x33;
+                    constexpr static const std::uint8_t ieee1363_hash_id = 0x00;
 
                     constexpr static const std::size_t pkcs_id_size = 15;
                     constexpr static const std::size_t pkcs_id_bits = pkcs_id_size * CHAR_BIT;
@@ -104,6 +104,8 @@ namespace nil {
                     constexpr static const std::size_t state_bits = state_words * word_bits;
                     typedef std::array<word_type, state_words> state_type;
 
+                    constexpr static const std::uint8_t ieee1363_hash_id = 0x00;
+
                     struct iv_generator {
                         state_type const &operator()() const {
                             constexpr static const state_type H0 = {{0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476}};
@@ -120,6 +122,8 @@ namespace nil {
                     constexpr static const std::size_t state_words = 5;
                     constexpr static const std::size_t state_bits = state_words * word_bits;
                     typedef std::array<word_type, state_words> state_type;
+
+                    constexpr static const std::uint8_t ieee1363_hash_id = 0x31;
 
                     struct iv_generator {
                         state_type const &operator()() const {
@@ -138,6 +142,8 @@ namespace nil {
                     constexpr static const std::size_t state_bits = state_words * word_bits;
                     typedef std::array<word_type, state_words> state_type;
 
+                    constexpr static const std::uint8_t ieee1363_hash_id = 0x00;
+
                     struct iv_generator {
                         state_type const &operator()() const {
                             static state_type const H0 = {{0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476, 0x76543210,
@@ -155,6 +161,8 @@ namespace nil {
                     constexpr static const std::size_t state_words = 10;
                     constexpr static const std::size_t state_bits = state_words * word_bits;
                     typedef std::array<word_type, state_words> state_type;
+
+                    constexpr static const std::uint8_t ieee1363_hash_id = 0x00;
 
                     struct iv_generator {
                         state_type const &operator()() const {
