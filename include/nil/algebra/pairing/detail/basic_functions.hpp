@@ -7,11 +7,63 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef ALGEBRA_PAIRING_ATE_HPP
-#define ALGEBRA_PAIRING_ATE_HPP
+#ifndef ALGEBRA_PAIRING_BASIC_FUNCTIONS_HPP
+#define ALGEBRA_PAIRING_BASIC_FUNCTIONS_HPP
 
 #include <stdexcept>
 #include <vector>
+
+namespace nil{
+    namespace algebra{
+        namespace pairing{
+            namespace detail{
+
+                /*
+                    square over Fp4
+                    Operation Count:
+
+                    3 * Fp2Dbl::square
+                    2 * Fp2Dbl::mod
+                    1 * Fp2Dbl::mul_xi == 1 * (2 * Fp2::add/sub) == 2 * Fp2::add/sub
+                    3 * Fp2Dbl::add/sub == 3 * (2 * Fp2::add/sub) == 6 * Fp2::add/sub
+                    1 * Fp2::add/sub
+
+                    Total:
+
+                    3 * Fp2Dbl::square
+                    2 * Fp2Dbl::mod
+                    9 * Fp2::add/sub
+                 */
+                element <fp4> sq_Fp4UseDbl(const element<fp4> &B) {
+                    double_element<fp2> T0, T1, T2;
+                    element<fp2> z0, z1;
+                    T0 = x0.square();
+                    T1 = x1.square();
+                    T2 = T1.mul_xi();
+                    T2 += T0;
+                    z1 = x0 + x1;
+                    z0 = T2.mod();
+                    // overwrite z[0] (position 0).
+                    T2 = z1.square();
+                    T2 -= T0;
+                    T2 -= T1;
+                    z1 = T2.mod();
+                    return {z0, z1};
+                }
+
+
+
+
+
+            }       // namespace detail
+        }       // namespace pairing
+    }       // namespace algebra
+}    // namespace nil
+
+
+
+
+
 
 namespace bn {
 
@@ -127,7 +179,7 @@ namespace bn {
     */
     template<class T>
     struct Fp12T : public mie::local::addsubmul<Fp12T<T>> {
-        
+                
         void sqru() {
             Fp2 &z0(a_.a_);
             Fp2 &z4(a_.b_);
@@ -1155,4 +1207,4 @@ namespace bn {
 
 }    // namespace bn
 
-#endif    // ALGEBRA_PAIRING_ATE_HPP
+#endif    // ALGEBRA_PAIRING_BASIC_FUNCTIONS_HPP

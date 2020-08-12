@@ -25,7 +25,7 @@ namespace nil {
 
                 for (long i = msb(exponent); i >= 0; --i) {
                     if (found_one) {
-                        result = result * result;
+                        result = result.square();
                     }
 
                     if (bit_test(exponent, i)) {

@@ -82,24 +82,24 @@ namespace nil {
                     return {data[0].dbl().dbl().dbl() + data[0] - data[1], data[1].dbl().dbl().dbl() + data[1] + data[0]};
                 }
 
-                element_type<fp2> mod(){
+                element<fp2> mod(){
                     return {data[0].mod(), data[1].mod()};
                 }
 
             };
 
-            double_element_type<fp2> addNC(const double_element_type<fp2> &A, const double_element_type<fp2> &B){
+            double_element<fp2> addNC(const double_element<fp2> &A, const double_element<fp2> &B){
                 return {addNC(data[0] + B.data[0]), addNC(data[1] + B.data[1])};
             }
 
-            double_element_type<fp2> subNC(const double_element_type<fp2> &A, const double_element_type<fp2> &B){
+            double_element<fp2> subNC(const double_element<fp2> &A, const double_element<fp2> &B){
                 return {subNC(data[0] + B.data[0]), subNC(data[1] + B.data[1])};
             }
 
-            double_element_type<fp2> mulOpt(const element_type<fp2> &A, const element_type<fp2> &B, int mode) {
-                double_element_type<fp> d0;
-                double_element_type<fp2> z;
-                element_type<fp> s, t;
+            double_element<fp2> mulOpt(const element<fp2> &A, const element<fp2> &B, int mode) {
+                double_element<fp> d0;
+                double_element<fp2> z;
+                element<fp> s, t;
 
                 s = addNC(A.data[0], A.data[1]);
                 t = addNC(B.data[0], B.data[1]);
@@ -119,16 +119,16 @@ namespace nil {
                 }
             }
 
-            double_element_type<fp2> mulOpt1(const element_type<fp2> &A, const element_type<fp2> &B) {
+            double_element<fp2> mulOpt1(const element<fp2> &A, const element<fp2> &B) {
                 return mulOpt(A, B, 1);
             }
 
-            double_element_type<fp2> mulOpt2(const element_type<fp2> &A, const element_type<fp2> &B) {
+            double_element<fp2> mulOpt2(const element<fp2> &A, const element<fp2> &B) {
                 return mulOpt(A, B, 2);
             }
 
-            double_element_type<fp2> square(const element_type<fp2> &B){
-                element_type<fp>  t0, t1;
+            double_element<fp2> square(const element<fp2> &B){
+                element<fp>  t0, t1;
                 t0 = addNC(x.b_, x.b_);
                 z.b_ = mul(t0, x.a_);
                 t1 = addNC(x.a_, Fp::getDirectP(1)); // RRR

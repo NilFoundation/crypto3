@@ -73,14 +73,14 @@ namespace nil {
                     return {subNC(data[0] + B.data[0]), subNC(data[1] + B.data[1]), subNC(data[2] + B.data[2])};
                 }
 
-                element_type<fp6_3over2> mod(){
+                element<fp6_3over2> mod(){
                     return {data[0].mod(), data[1].mod(), B.data[2].mod()};
                 }
 
 
             };
 
-            double_element_type<fp6_3over2> mul(const element_type<fp6_3over2> &A, const element_type<fp6_3over2> &B) {
+            double_element<fp6_3over2> mul(const element<fp6_3over2> &A, const element<fp6_3over2> &B) {
                 Fp2 t0, t1;
                 Fp2Dbl T0, T1, T2;
                 // # 1
@@ -148,9 +148,9 @@ namespace nil {
                 l = (a,b,c) = (l00, l11, l02)
                 where P[2] == 1
             */
-            double_element_type<fp6_3over2> pointDblLineEvalWithoutP(element_type<fp2> *R) {
-                element_type<fp2> t0, t1, t2, t3, t4, t5;
-                double_element_type<fp2> T0, T1, T2;
+            double_element<fp6_3over2> pointDblLineEvalWithoutP(element<fp2> *R) {
+                element<fp2> t0, t1, t2, t3, t4, t5;
+                double_element<fp2> T0, T1, T2;
                 // X1, Y1, Z1 == R[0], R[1], R[2]
                 // xp, yp = P[0], P[1]
 
@@ -214,7 +214,7 @@ namespace nil {
             }
 
 
-            double_element_type<fp6_3over2> pointDblLineEvalWithoutP(element_type<fp2> *R, element_type<fp2> *P) {
+            double_element<fp6_3over2> pointDblLineEvalWithoutP(element<fp2> *R, element<fp2> *P) {
                 return pointDblLineEvalWithoutP(R).mulFp6_24_Fp_01(P);
             }
 
@@ -228,9 +228,9 @@ namespace nil {
             l = (a,b,c) = (l00, l11, l02)
             where Q[2] == 1, and P[2] == 1
         */
-        double_element_type<fp6_3over2> pointAddLineEvalWithoutP(element_type<fp2> *R, const element_type<fp2> *Q) {
-            element_type<fp2> t1, t2, t3, t4;
-            double_element_type<fp2> T1, T2;
+        double_element<fp6_3over2> pointAddLineEvalWithoutP(element<fp2> *R, const element<fp2> *Q) {
+            element<fp2> t1, t2, t3, t4;
+            double_element<fp2> T1, T2;
             // # 1
             t1 = R[2] * Q[0];
             t2 = R[2] * Q[1];
@@ -276,7 +276,7 @@ namespace nil {
             l.a_ = t2.mul_xi();
             l.b_ = t1;
         }
-        static void pointAddLineEval(element_type<fp2> *R, const element_type<fp2> *Q, const element_type<fp> *P) {
+        static void pointAddLineEval(element<fp2> *R, const element<fp2> *Q, const element<fp> *P) {
             return pointAddLineEvalWithoutP(R, Q).mulFp6_24_Fp_01(P);
         }
 

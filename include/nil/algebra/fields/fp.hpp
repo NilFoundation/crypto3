@@ -105,6 +105,10 @@ namespace nil {
                 return sqrt(data);
             }
 
+            value_type _2z_add_3x() {
+                
+            }
+
             value_type square() const {
                 return data * data;    // maybe can be done more effective
             }

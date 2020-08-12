@@ -78,32 +78,32 @@ namespace nil {
                     
                 }
 
-                double_element_type<fp> mod(){
+                double_element<fp> mod(){
                     
                 }
             };
 
-            double_element_type<fp> addNC(const double_element_type<fp> &A, const double_element_type<fp> &B){
+            double_element<fp> addNC(const double_element<fp> &A, const double_element<fp> &B){
                 return {addNC(data[0] + B.data[0]), addNC(data[1] + B.data[1])};
             }
 
-            double_element_type<fp> subNC(const double_element_type<fp> &A, const double_element_type<fp> &B){
+            double_element<fp> subNC(const double_element<fp> &A, const double_element<fp> &B){
                 return {subNC(data[0] + B.data[0]), subNC(data[1] + B.data[1])};
             }
 
-            double_element_type<fp> mul(const element_type<fp> &A, const element_type<fp> &B) {
+            double_element<fp> mul(const element<fp> &A, const element<fp> &B) {
                 
             }
 
-            double_element_type<fp> square(const element_type<fp> &B){
+            double_element<fp> square(const element<fp> &B){
             {
-                Fp t0, t1;
-                Fp::addNC(t0, x.b_, x.b_);
-                FpDbl::mul(z.b_, t0, x.a_);
-                Fp::addNC(t1, x.a_, Fp::getDirectP(1)); // RRR
-                Fp::subNC(t1, t1, x.b_);
-                Fp::addNC(t0, x.a_, x.b_);
-                FpDbl::mul(z.a_, t0, t1);
+                element<fp> t0, t1;
+                t0 = addNC(x.b_, x.b_);
+                z.b_ = mul(t0, x.a_);
+                t1 = addNC(x.a_, Fp::getDirectP(1)); // RRR
+                t1 = subNC(t1, x.b_);
+                t0 = addNC(x.a_, x.b_);
+                z.a_ = mul(t0, t1);
             }
 
         }    // namespace detail

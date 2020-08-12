@@ -131,6 +131,95 @@ namespace nil {
             }
         };
 
+        /*
+            (a + bw) -> (a - bw) gammar
+        */
+        element<fp12_2over3over2> Frobenius(element<fp12_2over3over2> A) {
+            /* this assumes (q-1)/6 is odd */
+        
+            z.a_.a_.a_ = A.a_.a_.a_;
+            z.a_.b_.a_ = A.a_.b_.a_;
+            z.a_.c_.a_ = A.a_.c_.a_;
+            z.b_.a_.a_ = A.b_.a_.a_;
+            z.b_.b_.a_ = A.b_.b_.a_;
+            z.b_.c_.a_ = A.b_.c_.a_;
+            
+            z.a_.a_.b_ = -A.a_.a_.b_;
+            z.a_.b_.b_ = -A.a_.b_.b_;
+            z.a_.c_.b_ = -A.a_.c_.b_;
+            z.b_.a_.b_ = -A.b_.a_.b_;
+            z.b_.b_.b_ = -A.b_.b_.b_;
+            z.b_.c_.b_ = -A.b_.c_.b_;
+
+            z.a_.b_ *= Param::gammar[1];
+            z.a_.c_ *= Param::gammar[3];
+
+            z.b_.a_ *= Param::gammar[0];
+            z.b_.b_ *= Param::gammar[2];
+            z.b_.c_ *= Param::gammar[4];
+        }
+
+        /*
+            gammar = c + dw
+            a + bw -> t = (a - bw)(c + dw)
+            ~t = (a + bw)(c - dw)
+            ~t * (c + dw) = (a + bw) * ((c + dw)(c - dw))
+            gammar2 = (c + dw)(c - dw) in Fp6
+        */
+        element<fp12_2over3over2> Frobenius2(element<fp12_2over3over2> A) {
+
+            
+            z.a_.a_ = A.a_.a_;
+            
+            z.a_.a_ = A.a_.a_;
+            z.a_.b_ = A.a_.b_.mul_Fp_0(Param::gammar2[1].a_);
+            z.a_.c_ = A.a_.c_.mul_Fp_0(Param::gammar2[3].a_);
+            z.b_.a_ = A.b_.a_.mul_Fp_0(Param::gammar2[0].a_);
+            z.b_.b_ = A.b_.b_.mul_Fp_0(Param::gammar2[2].a_);
+            z.b_.c_ = A.b_.c_.mul_Fp_0(Param::gammar2[4].a_);
+        }
+
+        element<fp12_2over3over2> Frobenius3(element<fp12_2over3over2> A) {
+            z.a_.a_.a_ =  A.a_.a_.a_;
+            z.a_.b_.a_ =  A.a_.b_.a_;
+            z.a_.c_.a_ =  A.a_.c_.a_;
+            z.b_.a_.a_ =  A.b_.a_.a_;
+            z.b_.b_.a_ =  A.b_.b_.a_;
+            z.b_.c_.a_ =  A.b_.c_.a_;
+
+            z.a_.a_.b_ = -A.a_.a_.b_;
+            z.a_.b_.b_ = -A.a_.b_.b_;
+            z.a_.c_.b_ = -A.a_.c_.b_;
+            z.b_.a_.b_ = -A.b_.a_.b_;
+            z.b_.b_.b_ = -A.b_.b_.b_;
+            z.b_.c_.b_ = -A.b_.c_.b_;
+
+
+            z.a_.b_ *= Param::gammar3[1];
+            z.a_.c_ *= Param::gammar3[3];
+
+            z.b_.a_ *= Param::gammar3[0];
+            z.b_.b_ *= Param::gammar3[2];
+            z.b_.c_ *= Param::gammar3[4];
+        }
+
+        /*
+            @note destory *this
+        */
+        element<fp12_2over3over2> mapToCyclo(element<fp12_2over3over2> A){
+            // (a + b*i) -> ((a - b*i) * (a + b*i)^(-1))^(q^2+1)
+            //
+            // See Beuchat page 9: raising to 6-th power is the same as
+            // conjugation, so this entire function computes
+            // z^((p^6-1) * (p^2+1))
+            z.a_ = A.a_;
+            z.b_ - A.b_;
+            data = A.data.inverse();
+            z *= A;
+            z.Frobenius2(A);
+            z *= A;
+        }
+
     }    // namespace algebra
 }    // namespace nil
 

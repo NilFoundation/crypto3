@@ -72,12 +72,12 @@ namespace nil {
                     return {subNC(data[0] + B.data[0]), subNC(data[1] + B.data[1])};
                 }
 
-                element_type<fp12_2over3over2> mod(){
+                element<fp12_2over3over2> mod(){
                     return {data[0].mod(), data[1].mod()};
                 }
             };
 
-            double_element_type<fp12_2over3over2> mul(const element_type<fp12_2over3over2> &A, const element_type<fp12_2over3over2> &B) {
+            double_element<fp12_2over3over2> mul(const element<fp12_2over3over2> &A, const element<fp12_2over3over2> &B) {
             }
 
             /*
@@ -103,22 +103,22 @@ namespace nil {
                 6  * Fp2Dbl::mod
                 56 * Fp2::add/sub
             */
-            double_element_type<fp12_2over3over2> mul_Fp2_024C(const element_type<fp6_3over2> &B) {
-                element_type<fp2> &z0 = z.a_.a_;
-                element_type<fp2> &z1 = z.a_.b_;
-                element_type<fp2> &z2 = z.a_.c_;
-                element_type<fp2> &z3 = z.b_.a_;
-                element_type<fp2> &z4 = z.b_.b_;
-                element_type<fp2> &z5 = z.b_.c_;
-                const element_type<fp2> &x0 = x.a_;
-                const element_type<fp2> &x2 = x.c_;
-                const element_type<fp2> &x4 = x.b_;
-                element_type<fp2> t0, t1, t2;
-                element_type<fp2> s0;
+            double_element<fp12_2over3over2> mul_Fp2_024C(const element<fp6_3over2> &B) {
+                element<fp2> &z0 = z.a_.a_;
+                element<fp2> &z1 = z.a_.b_;
+                element<fp2> &z2 = z.a_.c_;
+                element<fp2> &z3 = z.b_.a_;
+                element<fp2> &z4 = z.b_.b_;
+                element<fp2> &z5 = z.b_.c_;
+                const element<fp2> &x0 = x.a_;
+                const element<fp2> &x2 = x.c_;
+                const element<fp2> &x4 = x.b_;
+                element<fp2> t0, t1, t2;
+                element<fp2> s0;
 
-                double_element_type<fp2> T3, T4;
-                double_element_type<fp2> D0, D2, D4;
-                double_element_type<fp2> S1;
+                double_element<fp2> T3, T4;
+                double_element<fp2> D0, D2, D4;
+                double_element<fp2> S1;
 
                 D0 = mulOpt2(z0, x0);
                 D2 = mulOpt2(z2, x2);
@@ -190,20 +190,20 @@ namespace nil {
                 26 * Fp2::add/sub
                 call:2
             */
-            double_element_type<fp12_2over3over2> mul_Fp2_024C(const element_type<fp6_3over2> &B1, const element_type<fp6_3over2> &B2) {
-                element_type<fp2> &z0 = z.a_.a_;
-                element_type<fp2> &z1 = z.a_.b_;
-                element_type<fp2> &z2 = z.a_.c_;
-                element_type<fp2> &z3 = z.b_.a_;
-                element_type<fp2> &z4 = z.b_.b_;
-                element_type<fp2> &z5 = z.b_.c_;
-                const element_type<fp2> &x0 = cv2.a_;
-                const element_type<fp2> &x2 = cv2.c_;
-                const element_type<fp2> &x4 = cv2.b_;
-                const element_type<fp2> &y0 = cv3.a_;
-                const element_type<fp2> &y2 = cv3.c_;
-                const element_type<fp2> &y4 = cv3.b_;
-                double_element_type<fp2> T00, T22, T44, T02, T24, T40;
+            double_element<fp12_2over3over2> mul_Fp2_024C(const element<fp6_3over2> &B1, const element<fp6_3over2> &B2) {
+                element<fp2> &z0 = z.a_.a_;
+                element<fp2> &z1 = z.a_.b_;
+                element<fp2> &z2 = z.a_.c_;
+                element<fp2> &z3 = z.b_.a_;
+                element<fp2> &z4 = z.b_.b_;
+                element<fp2> &z5 = z.b_.c_;
+                const element<fp2> &x0 = cv2.a_;
+                const element<fp2> &x2 = cv2.c_;
+                const element<fp2> &x4 = cv2.b_;
+                const element<fp2> &y0 = cv3.a_;
+                const element<fp2> &y2 = cv3.c_;
+                const element<fp2> &y4 = cv3.b_;
+                double_element<fp2> T00, T22, T44, T02, T24, T40;
 
                 T00 = mulOpt2(x0, y0);
                 T22 = mulOpt2(x2, y2);
@@ -233,6 +233,37 @@ namespace nil {
                 T02 += T00;
                 z0 = T02.mod();
                 z5.clear();
+            }
+
+            /*
+                square over Fp4
+                Operation Count:
+
+                3 * Fp2Dbl::square
+                2 * Fp2Dbl::mod
+                1 * Fp2Dbl::mul_xi == 1 * (2 * Fp2::add/sub) == 2 * Fp2::add/sub
+                3 * Fp2Dbl::add/sub == 3 * (2 * Fp2::add/sub) == 6 * Fp2::add/sub
+                1 * Fp2::add/sub
+
+                Total:
+
+                3 * Fp2Dbl::square
+                2 * Fp2Dbl::mod
+                9 * Fp2::add/sub
+             */
+            static inline void sq_Fp4UseDbl(Fp2 &z0, Fp2 &z1, const Fp2 &x0, const Fp2 &x1) {
+                Fp2Dbl T0, T1, T2;
+                Fp2Dbl::square(T0, x0);
+                Fp2Dbl::square(T1, x1);
+                Fp2Dbl::mul_xi(T2, T1);
+                T2 += T0;
+                z1 = x0 + x1;
+                Fp2Dbl::mod(z0, T2);
+                // overwrite z[0] (position 0).
+                Fp2Dbl::square(T2, z1);
+                T2 -= T0;
+                T2 -= T1;
+                Fp2Dbl::mod(z1, T2);
             }
 
         }    // namespace detail
