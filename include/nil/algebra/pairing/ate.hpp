@@ -110,143 +110,6 @@ namespace bn {
         }
     };
 
-    /*
-        mul_gamma(z, x) + z += y;
-    */
-    template<class F, class G>
-    void mul_gamma_add(F &z, const F &x, const F &y) {
-        G::mul_xi(z.a_, x.c_);
-        z.a_ += y.a_;
-        G::add(z.b_, x.a_, y.b_);
-        G::add(z.c_, x.b_, y.c_);
-    }
-
-    /*
-        Fp12T = Fp6[w] / (w^2 - v)
-        x = a_ + b_ w
-    */
-    template<class T>
-    struct Fp12T : public mie::local::addsubmul<Fp12T<T>> {
-        
-        void sqru() {
-            Fp2 &z0(a_.a_);
-            Fp2 &z4(a_.b_);
-            Fp2 &z3(a_.c_);
-            Fp2 &z2(b_.a_);
-            Fp2 &z1(b_.b_);
-            Fp2 &z5(b_.c_);
-            Fp2 t0, t1;
-            sq_Fp4UseDbl(t0, t1, z0, z1);    // a^2 = t0 + t1*y
-            // For A
-            z0 = t0 - z0;
-            z0 += z0;
-            z0 += t0;
-#if 0
-		Fp2_2z_add_3x(z1, t1);
-#else
-            z1 = (t1 + z1).dbl() + t1;
-#endif
-            // t0 and t1 are unnecessary from here.
-            Fp2 t2, t3;
-            sq_Fp4UseDbl(t0, t1, z2, z3);    // b^2 = t0 + t1*y
-            sq_Fp4UseDbl(t2, t3, z4, z5);    // c^2 = t2 + t3*y
-            // For C
-            z4 = (t0 - z4).dbl() + t0;
-#if 0
-		Fp2_2z_add_3x(z5, t1);
-#else
-            z5 = (t1 + z5).dbl() + t1;
-#endif
-            // For B
-            Fp2::mul_xi(t0, t3);
-#if 0
-		Fp2_2z_add_3x(z2, t0);
-#else
-            z2 = (t0 + z2).dbl() + t0;
-#endif
-            z3 = (t2 - z3).dbl() + t2;
-        }
-
-        /*
-            This is same as sqru, but output given reference.
-        */
-        void sqru(Fp12T &zz) const {
-            zz = *this;
-            zz.sqru();
-        }
-
-        /*
-            Final exponentiation based on:
-            - Laura Fuentes-Casta{\~n}eda, Edward Knapp, and Francisco
-            Rodr\'{\i}guez-Henr\'{\i}quez.
-            Faster hashing to $\mathbb{G}_2$.
-            SAC 2011, pp. 412--430. doi:10.1007/978-3-642-28496-0_25.
-
-            *this = final_exp(*this)
-        */
-
-        static void pow_neg_t(Fp12T &out, const Fp12T &in) {
-            out = in;
-            Fp12T inConj;
-            inConj.a_ = in.a_;
-            inConj.b_ = -in.b_;    // in^-1 == in^(p^6)
-
-            for (size_t i = 1; i < Param::zReplTbl.size(); i++) {
-                out.sqru();
-                if (Param::zReplTbl[i] > 0) {
-                    Fp12T::mul(out, out, in);
-                } else if (Param::zReplTbl[i] < 0) {
-                    Fp12T::mul(out, out, inConj);
-                }
-            }
-            // invert by conjugation
-            Fp6::neg(out.b_, out.b_);
-        }
-
-        void final_exp() {
-            Fp12T f, f2z, f6z, f6z2, f12z3;
-            Fp12T a, b;
-            Fp12T &z = *this;
-            mapToCyclo(f);
-
-            Fp12T::pow_neg_t(f2z, f);
-            f2z.sqru();    // f2z = f^(-2*z)
-            f2z.sqru(f6z);
-            f6z *= f2z;    // f6z = f^(-6*z)
-            Fp12T::pow_neg_t(f6z2, f6z);
-            // A variable a is unnecessary only here.
-            f6z2.sqru(a);
-            // Compress::fixed_power(f12z3, a); // f12z3 = f^(-12*z^3)
-            Fp12T::pow_neg_t(f12z3, a);
-            // It will compute inversion of f2z, thus, conjugation free.
-            f6z.b_ = -f6z.b_;        // f6z = f^(6z)
-            f12z3.b_ = -f12z3.b_;    // f12z3 = f^(12*z^3)
-            // Computes a and b.
-            a = f12z3 * f6z2;    // a = f^(12*z^3 + 6z^2)
-            a *= f6z;                      // a = f^(12*z^3 + 6z^2 + 6z)
-            b = a * f2z;         // b = f^(12*z^3 + 6z^2 + 4z)w
-            // @note f2z, f6z, and f12z are unnecessary from here.
-            // Last part.
-            z = a * f6z2;    // z = f^(12*z^3 + 12z^2 + 6z)
-            z *= f;                    // z = f^(12*z^3 + 12z^2 + 6z + 1)
-            b.Frobenius(f2z);          // f2z = f^(q(12*z^3 + 6z^2 + 4z))
-            z *= f2z;                  // z = f^(q(12*z^3 + 6z^2 + 4z) + (12*z^3 + 12z^2 + 6z + 1))
-            a.Frobenius2(f2z);         // f2z = f^(q^2(12*z^3 + 6z^2 + 6z))
-            z *= f2z;    // z = f^(q^2(12*z^3 + 6z^2 + 6z) + q(12*z^3 + 6z^2 + 4z) + (12*z^3 + 12z^2 + 6z + 1))
-            f.b_ = -f.b_;    // f = -f
-            b *= f;                  // b = f^(12*z^3 + 6z^2 + 4z - 1)
-            b.Frobenius3(f2z);       // f2z = f^(q^3(12*z^3 + 6z^2 + 4z - 1))
-            z *= f2z;
-            // z = f^(q^3(12*z^3 + 6z^2 + 4z - 1) +
-            // q^2(12*z^3 + 6z^2 + 6z) +
-            // q(12*z^3 + 6z^2 + 4z) +
-            // (12*z^3 + 12z^2 + 6z + 1))
-            // see page 6 in the "Faster hashing to G2" paper
-
-        }
-
-    };
-
     template<class T>
     struct CompressT {
         typedef T Fp2;
@@ -748,7 +611,7 @@ namespace bn {
         Fp2 Qneg[2];
         if (Param::useNAF) {
             Qneg[0] = Q[0];
-            Fp2::neg(Qneg[1], Q[1]);
+            Qneg[1] = -Q[1];
         }
         // at 1.
         Fp6 d;
@@ -756,7 +619,7 @@ namespace bn {
         Fp6 e;
         assert(Param::siTbl[1] == 1);
         Fp6::pointAddLineEval(e, T, Q, P);
-        Fp12::Dbl::mul_Fp2_024_Fp2_024(f, d, e);
+        f = mul_Fp2_024_Fp2_024(d, e);
         // loop from 2.
         Fp6 l;
         // 844kclk
@@ -838,37 +701,12 @@ namespace bn {
             if (is_zero() || p[2] == 1)
                 return;
             T r;
-            r = p[2];
-            r.inverse();
+            r = p[2].inverse();
             p[2] = r.square();
             p[0] *= p[2];
             r *= p[2];
             p[1] *= r;
             p[2] = 1;
-        }
-
-        bool isValid() const;
-
-        void set(const T &x, const T &y, bool verify = true) {
-            p[0] = x;
-            p[1] = y;
-            p[2] = 1;
-            if (verify && !isValid()) {
-                throw std::runtime_error("set(x, y) : bad point");
-            }
-        }
-        void set(const T &x, const T &y, const T &z, bool verify = true) {
-            p[0] = x;
-            p[1] = y;
-            p[2] = z;
-            if (verify && !isValid()) {
-                throw std::runtime_error("set(x, y, z) : bad point");
-            }
-        }
-        void clear() {
-            p[0].clear();
-            p[1].clear();
-            p[2].clear();
         }
 
         static inline void dbl(EcT &R, const EcT &P) {
@@ -1046,13 +884,13 @@ namespace bn {
             assert(Param::siTbl[1] == 1);
             size_t idx = 0;
 
-            Fp6 d = Qcoeff[idx];
-            Fp6::mulFp6_24_Fp_01(d, precP);
+            element<fp6_3over2> d = Qcoeff[idx];
+            d = d.mulFp6_24_Fp_01(precP);
             idx++;
 
-            Fp6 e = Qcoeff[idx];
-            Fp6::mulFp6_24_Fp_01(e, precP);
-            Fp12::Dbl::mul_Fp2_024_Fp2_024(f, d, e);
+            element<fp6_3over2> e = Qcoeff[idx];
+            e = e.mulFp6_24_Fp_01(precP);
+            f = mul_Fp2_024_Fp2_024(d, e);
 
             idx++;
             bn::Fp6 l;
@@ -1060,28 +898,28 @@ namespace bn {
                 l = Qcoeff[idx];
                 idx++;
                 f = f.square();
-                Fp6::mulFp6_24_Fp_01(l, precP);
+                l = l.mulFp6_24_Fp_01(precP);
 
-                Fp12::Dbl::mul_Fp2_024(f, l);
+                f = l.mul_Fp2_024();
 
                 if (Param::siTbl[i]) {
                     l = Qcoeff[idx];
                     idx++;
-                    Fp6::mulFp6_24_Fp_01(l, precP);
-                    Fp12::Dbl::mul_Fp2_024(f, l);
+                    l = l.mulFp6_24_Fp_01(precP);
+                    f = l.mul_Fp2_024();
                 }
             }
 
-            Fp12 ft;
+            element<fp12_2over3over2> ft;
 
             d = Qcoeff[idx];
-            Fp6::mulFp6_24_Fp_01(d, precP);
+            d = d.mulFp6_24_Fp_01(precP);
             idx++;
 
             e = Qcoeff[idx];
-            Fp6::mulFp6_24_Fp_01(e, precP);
+            e = e.mulFp6_24_Fp_01(precP);
 
-            Fp12::Dbl::mul_Fp2_024_Fp2_024(ft, d, e);
+            ft = mul_Fp2_024_Fp2_024(d, e);
             f *= ft;
         }
 
@@ -1091,20 +929,20 @@ namespace bn {
             size_t idx = 0;
 
             Fp6 d1 = Q1coeff[idx];
-            Fp6::mulFp6_24_Fp_01(d1, precP1);
+            d1 = d1.mulFp6_24_Fp_01(precP1);
             Fp6 d2 = Q2coeff[idx];
-            Fp6::mulFp6_24_Fp_01(d2, precP2);
+            d2 = d2.mulFp6_24_Fp_01(precP2);
             idx++;
 
             Fp12 f1;
             Fp6 e1 = Q1coeff[idx];
-            Fp6::mulFp6_24_Fp_01(e1, precP1);
-            Fp12::Dbl::mul_Fp2_024_Fp2_024(f1, d1, e1);
+            e1 = e1.mulFp6_24_Fp_01(precP1);
+            f1 = mul_Fp2_024_Fp2_024(d1, e1);
 
             Fp12 f2;
             Fp6 e2 = Q2coeff[idx];
-            Fp6::mulFp6_24_Fp_01(e2, precP2);
-            Fp12::Dbl::mul_Fp2_024_Fp2_024(f2, d2, e2);
+            e2 = e2.mulFp6_24_Fp_01(precP2);
+            f2 = mul_Fp2_024_Fp2_024(d2, e2);
             f = f1 * f2;
 
             idx++;
@@ -1115,38 +953,38 @@ namespace bn {
                 idx++;
                 f = f.square();
 
-                Fp6::mulFp6_24_Fp_01(l1, precP1);
-                Fp6::mulFp6_24_Fp_01(l2, precP2);
+                l1 = l1.mulFp6_24_Fp_01(precP1);
+                l2 = l2.mulFp6_24_Fp_01(precP2);
 
-                Fp12::Dbl::mul_Fp2_024_Fp2_024(f1, l1, l2);
-                Fp12::mul(f, f, f1);
+                f1 = mul_Fp2_024_Fp2_024(l1, l2);
+                f = f * f1;
 
                 if (Param::siTbl[i]) {
                     l1 = Q1coeff[idx];
                     l2 = Q2coeff[idx];
                     idx++;
-                    Fp6::mulFp6_24_Fp_01(l1, precP1);
-                    Fp6::mulFp6_24_Fp_01(l2, precP2);
-                    Fp12::Dbl::mul_Fp2_024_Fp2_024(f1, l1, l2);
-                    Fp12::mul(f, f, f1);
+                    l1 = l1.mulFp6_24_Fp_01(precP1);
+                    l2 = l2.mulFp6_24_Fp_01(precP2);
+                    f1 = mul_Fp2_024_Fp2_024(l1, l2);
+                    f = f * f1;
                 }
             }
 
             d1 = Q1coeff[idx];
-            Fp6::mulFp6_24_Fp_01(d1, precP1);
+            d1 = d1.mulFp6_24_Fp_01(precP1);
 
             d2 = Q2coeff[idx];
-            Fp6::mulFp6_24_Fp_01(d2, precP2);
+            d2 = d2.mulFp6_24_Fp_01(precP2);
             idx++;
 
             e1 = Q1coeff[idx];
-            Fp6::mulFp6_24_Fp_01(e1, precP1);
+            e1 = e1.mulFp6_24_Fp_01(precP1);
 
             e2 = Q2coeff[idx];
-            Fp6::mulFp6_24_Fp_01(e2, precP2);
+            e2 = e2.mulFp6_24_Fp_01(precP2);
 
-            Fp12::Dbl::mul_Fp2_024_Fp2_024(f1, d1, e1);
-            Fp12::Dbl::mul_Fp2_024_Fp2_024(f2, d2, e2);
+            f1 = mul_Fp2_024_Fp2_024(d1, e1);
+            f2 = mul_Fp2_024_Fp2_024(d2, e2);
             f *= f1;
             f *= f2;
         }

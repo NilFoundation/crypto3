@@ -137,6 +137,10 @@ namespace nil {
                 return {-(data[1] * y_b), data[0] * y_b};
             }
 
+            value_type _2z_add_3x() {
+                return {data[0]._2z_add_3x(), data[1]._2z_add_3x()};
+            }
+
             value_type divBy2() const {
                 return {divBy2(data[0]), divBy2(data[1])};
             }
@@ -179,6 +183,8 @@ namespace nil {
 
                 return {c0, c1};
             }
+
+
         };
 
         value_type addNC(const value_type &A, const value_type &B) {

@@ -125,6 +125,42 @@ namespace nil {
 
             }
 
+
+            value_type sqru() {
+                element<fp2> &z0(a_.a_);
+                element<fp2> &z4(a_.b_);
+                element<fp2> &z3(a_.c_);
+                element<fp2> &z2(b_.a_);
+                element<fp2> &z1(b_.b_);
+                element<fp2> &z5(b_.c_);
+                element<fp4> t0t1;
+                element<fp2> t0 = t0t1.data[0], t1 = t0t1.data[1];
+
+                t0t1 = sq_Fp4UseDbl({z0, z1});    // a^2 = t0 + t1*y
+                // For A
+                z0 = t0 - z0;
+                z0 += z0;
+                z0 += t0;
+
+                z1 = (t1 + z1).dbl() + t1;
+
+                // t0 and t1 are unnecessary from here.
+                Fp2 t2, t3;
+                t0t1 = sq_Fp4UseDbl({z2, z3});    // b^2 = t0 + t1*y
+                t0t1 = sq_Fp4UseDbl({z4, z5});    // c^2 = t2 + t3*y
+                // For C
+                z4 = (t0 - z4).dbl() + t0;
+
+                z5 = (t1 + z5).dbl() + t1;
+
+                // For B
+                t0 = t3.mul_xi();
+
+                z2 = (t0 + z2).dbl() + t0;
+
+                z3 = (t2 - z3).dbl() + t2;
+            }
+
         private:
             inline static underlying_type mul_by_non_residue(const underlying_type &A){
                 return {non_residue * A.data[2], A.data[1], A.data[0]};
@@ -201,23 +237,6 @@ namespace nil {
             z.b_.a_ *= Param::gammar3[0];
             z.b_.b_ *= Param::gammar3[2];
             z.b_.c_ *= Param::gammar3[4];
-        }
-
-        /*
-            @note destory *this
-        */
-        element<fp12_2over3over2> mapToCyclo(element<fp12_2over3over2> A){
-            // (a + b*i) -> ((a - b*i) * (a + b*i)^(-1))^(q^2+1)
-            //
-            // See Beuchat page 9: raising to 6-th power is the same as
-            // conjugation, so this entire function computes
-            // z^((p^6-1) * (p^2+1))
-            z.a_ = A.a_;
-            z.b_ - A.b_;
-            data = A.data.inverse();
-            z *= A;
-            z.Frobenius2(A);
-            z *= A;
         }
 
     }    // namespace algebra
