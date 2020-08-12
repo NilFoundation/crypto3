@@ -7,26 +7,26 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef ALGEBRA_FIELD_BN128_FR_PARAMS_HPP
-#define ALGEBRA_FIELD_BN128_FR_PARAMS_HPP
-
-#include <boost/multipreicison/cpp_int.hpp>
+#ifndef ALGEBRA_FIELDS_BN128_FR_PARAMS_HPP
+#define ALGEBRA_FIELDS_BN128_FR_PARAMS_HPP
 
 #include <nil/algebra/fields/detail/params/params.hpp>
 
 namespace nil {
     namespace algebra {
-        namespace detail {
-            BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(254)
+        namespace fields {
+            namespace detail {
+                BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(254)
 
-            template<std::size_t ModulusBits, std::size_t GeneratorBits = CHAR_BIT>
-            struct arithmetic_params<bn128_fr<ModulusBits, GeneratorBits>> : public basic_params<modp_srp<ModulusBits, GeneratorBits>> {
-                constexpr static const number_type euler =
-                    10944121435919637611123202872628637544274182200208017171849102093287904247808_cppui254;
-            };
-        
-        }    // namespace detail
+                template<std::size_t ModulusBits, std::size_t GeneratorBits = CHAR_BIT>
+                struct arithmetic_params<bn128_fr<ModulusBits, GeneratorBits>> : public basic_params<modp_srp<ModulusBits, GeneratorBits>> {
+                    constexpr static const number_type euler =
+                        10944121435919637611123202872628637544274182200208017171849102093287904247808_cppui254;
+                };
+            
+            }    // namespace detail
+        }    // namespace fields
     }    // namespace algebra
 }    // namespace nil
 
-#endif    // ALGEBRA_FIELD_BN128_FR_PARAMS_HPP
+#endif    // ALGEBRA_FIELDS_BN128_FR_PARAMS_HPP

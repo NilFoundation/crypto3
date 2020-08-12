@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef ALGEBRA_FF_FP6_3OVER2_DOUBLE_HPP
-#define ALGEBRA_FF_FP6_3OVER2_DOUBLE_HPP
+#ifndef ALGEBRA_FIELDS_FP6_3OVER2_DOUBLE_HPP
+#define ALGEBRA_FIELDS_FP6_3OVER2_DOUBLE_HPP
 
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/cpp_int.hpp>

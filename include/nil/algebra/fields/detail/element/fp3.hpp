@@ -86,7 +86,7 @@ namespace nil {
 
                     template<typename PowerType>
                     element_fp3 pow(const PowerType &power) const {
-                        return detail::power(data, power);
+                        return power(data, power);
                     }
 
                     element_fp3 inverse() const {

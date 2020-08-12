@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef ALGEBRA_FF_FP3_HPP
-#define ALGEBRA_FF_FP3_HPP
+#ifndef ALGEBRA_FIELDS_FP3_HPP
+#define ALGEBRA_FIELDS_FP3_HPP
 
 #include <nil/algebra/fields/fp2.hpp>
 #include <nil/algebra/fields/element.hpp>
@@ -48,4 +48,4 @@ namespace nil {
     }    // namespace algebra
 }    // namespace nil
 
-#endif    // ALGEBRA_FF_FP2_HPP
+#endif    // ALGEBRA_FIELDS_FP3_HPP

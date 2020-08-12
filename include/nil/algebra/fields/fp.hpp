@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef ALGEBRA_FF_FP_HPP
-#define ALGEBRA_FF_FP_HPP
+#ifndef ALGEBRA_FIELDS_FP_HPP
+#define ALGEBRA_FIELDS_FP_HPP
 
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/cpp_int.hpp>
@@ -46,4 +46,4 @@ namespace nil {
     }    // namespace algebra
 }    // namespace nil
 
-#endif    // ALGEBRA_FF_FP_HPP
+#endif    // ALGEBRA_FIELDS_FP_HPP
