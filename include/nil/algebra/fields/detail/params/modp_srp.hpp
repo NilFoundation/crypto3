@@ -16,6 +16,8 @@ namespace nil {
     namespace algebra {
         namespace detail {
 
+        	BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(256)
+        	
             template<std::size_t ModulusBits, std::size_t GeneratorBits = CHAR_BIT>
             struct arithmetic_params<modp_srp<ModulusBits, GeneratorBits>> : public params<modp_srp<ModulusBits, GeneratorBits>> {
                 constexpr static const number_type q = 0;

@@ -16,6 +16,8 @@ namespace nil {
     namespace algebra {
         namespace detail {
 
+        	BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(256)
+        	
             struct arithmetic_params<dsa_jce<1024>> : public params<dsa_jce<1024>> {
                 constexpr static const number_type q = 0x9760508F15230BCCB292B982A2EB840BF0581CF5_cppui160;
             };

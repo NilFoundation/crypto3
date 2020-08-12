@@ -29,7 +29,7 @@ namespace nil {
                 constexpr static const std::size_t generator_bits = field_type::generator_bits;
                 typedef typename field_type::generator_type generator_type;
 
-                constexpr static const generator_type generator = field_type::generator;
+                constexpr static const generator_type mul_generator = field_type::mul_generator;
 
             };
 

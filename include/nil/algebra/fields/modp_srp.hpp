@@ -49,7 +49,7 @@ namespace nil {
                 constexpr static const std::size_t generator_bits = policy_type::generator_bits;
                 typedef typename policy_type::generator_type generator_type;
 
-                constexpr static const generator_type generator = 0x02;
+                constexpr static const generator_type mul_generator = 0x02;
 
                 constexpr static const std::size_t arity = 1;
             };
@@ -66,7 +66,7 @@ namespace nil {
                 constexpr static const std::size_t generator_bits = policy_type::generator_bits;
                 typedef typename policy_type::generator_type generator_type;
 
-                constexpr static const generator_type generator = 0x02;
+                constexpr static const generator_type mul_generator = 0x02;
 
                 constexpr static const std::size_t arity = 1;
             };
@@ -83,7 +83,7 @@ namespace nil {
                 constexpr static const std::size_t generator_bits = policy_type::generator_bits;
                 typedef typename policy_type::generator_type generator_type;
 
-                constexpr static const generator_type generator = 0x02;
+                constexpr static const generator_type mul_generator = 0x02;
 
                 constexpr static const std::size_t arity = 1;
             };
@@ -100,7 +100,7 @@ namespace nil {
                 constexpr static const std::size_t generator_bits = policy_type::generator_bits;
                 typedef typename policy_type::generator_type generator_type;
 
-                constexpr static const generator_type generator = 0x05;
+                constexpr static const generator_type mul_generator = 0x05;
 
                 constexpr static const std::size_t arity = 1;
             };
@@ -117,7 +117,7 @@ namespace nil {
                 constexpr static const std::size_t generator_bits = policy_type::generator_bits;
                 typedef typename policy_type::generator_type generator_type;
 
-                constexpr static const generator_type generator = 0x05;
+                constexpr static const generator_type mul_generator = 0x05;
 
                 constexpr static const std::size_t arity = 1;
             };
@@ -134,7 +134,7 @@ namespace nil {
                 constexpr static const std::size_t generator_bits = policy_type::generator_bits;
                 typedef typename policy_type::generator_type generator_type;
 
-                constexpr static const generator_type generator = 0x05;
+                constexpr static const generator_type mul_generator = 0x05;
 
                 constexpr static const std::size_t arity = 1;
             };
@@ -151,7 +151,7 @@ namespace nil {
                 constexpr static const std::size_t generator_bits = policy_type::generator_bits;
                 typedef typename policy_type::generator_type generator_type;
 
-                constexpr static const generator_type generator = 0x13;
+                constexpr static const generator_type mul_generator = 0x13;
 
                 constexpr static const std::size_t arity = 1;
             };
