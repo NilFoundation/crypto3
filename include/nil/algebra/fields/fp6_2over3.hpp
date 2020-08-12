@@ -17,120 +17,121 @@
 
 namespace nil {
     namespace algebra {
-                
-        /**
-         * Arithmetic in the finite field F[(p^3)^2].
-         *
-         * Let p := modulus. This interface provides arithmetic for the extension field
-         * Fp6 = Fp3[Y]/(Y^2-X) where Fp3 = Fp[X]/(X^3-non_residue) and non_residue is in Fp.
-         *
-         * ASSUMPTION: p = 1 (mod 6)
-         */
-        template<std::size_t ModulusBits, std::size_t GeneratorBits>
-        struct fp6_2over3 {
-            typedef element<fp<ModulusBits, GeneratorBits>, number_type> non_residue_type;
+        namespace fields {
+                    
+            /**
+             * Arithmetic in the finite field F[(p^3)^2].
+             *
+             * Let p := modulus. This interface provides arithmetic for the extension field
+             * Fp6 = Fp3[Y]/(Y^2-X) where Fp3 = Fp[X]/(X^3-non_residue) and non_residue is in Fp.
+             *
+             * ASSUMPTION: p = 1 (mod 6)
+             */
+            template<std::size_t ModulusBits, std::size_t GeneratorBits>
+            struct fp6_2over3 {
+                typedef element<fp<ModulusBits, GeneratorBits>, number_type> non_residue_type;
 
-            constexpr static const std::size_t modulus_bits = ModulusBits;
-            typedef number<backends::cpp_int_backend<modulus_bits, modulus_bits, unsigned_magnitude, unchecked, void>>
-                modulus_type;
+                constexpr static const std::size_t modulus_bits = ModulusBits;
+                typedef number<backends::cpp_int_backend<modulus_bits, modulus_bits, unsigned_magnitude, unchecked, void>>
+                    modulus_type;
 
-            constexpr static const std::size_t generator_bits = GeneratorBits;
-            typedef number<
-                backends::cpp_int_backend<generator_bits, generator_bits, unsigned_magnitude, unchecked, void>>
-                generator_type;
-                
-        };
+                constexpr static const std::size_t generator_bits = GeneratorBits;
+                typedef number<
+                    backends::cpp_int_backend<generator_bits, generator_bits, unsigned_magnitude, unchecked, void>>
+                    generator_type;
+                    
+            };
 
-        template<std::size_t ModulusBits, std::size_t GeneratorBits>
-        struct element<fp6_2over3<ModulusBits, GeneratorBits>> {
+            template<std::size_t ModulusBits, std::size_t GeneratorBits>
+            struct element<fp6_2over3<ModulusBits, GeneratorBits>> {
 
 
-            using underlying_type = element<fp3<ModulusBits, GeneratorBits>>;
+                using underlying_type = element<fp3<ModulusBits, GeneratorBits>>;
 
-            using type = std::array<underlying_type, 2>;
+                using type = std::array<underlying_type, 2>;
 
-        private:
+            private:
 
-            using value_type = element<fp6_2over3<ModulusBits, GeneratorBits>>;
+                using value_type = element<fp6_2over3<ModulusBits, GeneratorBits>>;
 
-            type data;
+                type data;
 
-        public:
+            public:
 
-            value_type(type data) : data(data);
+                value_type(type data) : data(data);
 
-            inline static value_type zero() const {
-                return {underlying_type::zero(), underlying_type::zero()};
-            }
+                inline static value_type zero() const {
+                    return {underlying_type::zero(), underlying_type::zero()};
+                }
 
-            inline static value_type one() const {
-                return {underlying_type::one(), underlying_type::zero()};
-            }
+                inline static value_type one() const {
+                    return {underlying_type::one(), underlying_type::zero()};
+                }
 
-            bool operator==(const value_type &B) const {
-                return (data[0] == B.data[0]) && (data[1] == B.data[1]);
-            }
+                bool operator==(const value_type &B) const {
+                    return (data[0] == B.data[0]) && (data[1] == B.data[1]);
+                }
 
-            bool operator!=(const value_type &B) const {
-                return (data[0] != B.data[0]) || (data[1] != B.data[1]);
-            }
+                bool operator!=(const value_type &B) const {
+                    return (data[0] != B.data[0]) || (data[1] != B.data[1]);
+                }
 
-            value_type operator+(const value_type &B) const {
-                return {data[0] + B.data[0], data[1] + B.data[1]};
-            }
+                value_type operator+(const value_type &B) const {
+                    return {data[0] + B.data[0], data[1] + B.data[1]};
+                }
 
-            value_type operator-(const value_type &B) const {
-                return {data[0] - B.data[0], data[1] - B.data[1]};
-            }
+                value_type operator-(const value_type &B) const {
+                    return {data[0] - B.data[0], data[1] - B.data[1]};
+                }
 
-            value_type operator-() const {
-                return zero()-data;
-            }
+                value_type operator-() const {
+                    return zero()-data;
+                }
 
-            value_type operator*(const value_type &B) const {
-                const underlying_type A0B0 = data[0] * B.data[0], A1B1 = data[1] * B.data[1];
+                value_type operator*(const value_type &B) const {
+                    const underlying_type A0B0 = data[0] * B.data[0], A1B1 = data[1] * B.data[1];
 
-                return {A0B0 + mul_by_non_residue(A1B1), (data[0] + data[1]) * (B.data[0] + B.data[1]) - A0B0 - A1B1};
-            }
+                    return {A0B0 + mul_by_non_residue(A1B1), (data[0] + data[1]) * (B.data[0] + B.data[1]) - A0B0 - A1B1};
+                }
 
-            value_type sqrt() const {
+                value_type sqrt() const {
 
-                // compute square root with Tonelli--Shanks
-            }
+                    // compute square root with Tonelli--Shanks
+                }
 
-            value_type square() const {
-                return data*data;    // maybe can be done more effective
-            }
+                value_type square() const {
+                    return data*data;    // maybe can be done more effective
+                }
 
-            template <typename PowerType>
-            value_type pow(const PowerType &power) const {
-                return detail::power(data, power);
-            }
+                template <typename PowerType>
+                value_type pow(const PowerType &power) const {
+                    return detail::power(data, power);
+                }
 
-            value_type inverse() const {
+                value_type inverse() const {
 
-                /* From "High-Speed Software Implementation of the Optimal Ate Pairing over Barreto-Naehrig Curves";
-                 * Algorithm 8 */
+                    /* From "High-Speed Software Implementation of the Optimal Ate Pairing over Barreto-Naehrig Curves";
+                     * Algorithm 8 */
 
-                const underlying_type &A0 = data[0], &A1 = data[1];
-                
-                const underlying_type t0 = A0.square();
-                const underlying_type t1 = A1.square();
-                const underlying_type t2 = t0 - mul_by_non_residue(t1);
-                const underlying_type t3 = t2.inverse();
-                const underlying_type c0 = A0 * t3;
-                const underlying_type c1 = -(A1 * t3);
+                    const underlying_type &A0 = data[0], &A1 = data[1];
+                    
+                    const underlying_type t0 = A0.square();
+                    const underlying_type t1 = A1.square();
+                    const underlying_type t2 = t0 - mul_by_non_residue(t1);
+                    const underlying_type t3 = t2.inverse();
+                    const underlying_type c0 = A0 * t3;
+                    const underlying_type c1 = -(A1 * t3);
 
-                return {c0, c1};
+                    return {c0, c1};
 
-            }
+                }
 
-        private:
-            inline static underlying_type mul_by_non_residue(const underlying_type &A){
-                return {non_residue * A.data[2], A.data[1], A.data[0]};
-            }
-        };
-
+            private:
+                inline static underlying_type mul_by_non_residue(const underlying_type &A){
+                    return {non_residue * A.data[2], A.data[1], A.data[0]};
+                }
+            };
+        }   // namespace fields
     }    // namespace algebra
 }    // namespace nil
 
