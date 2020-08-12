@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef ALGEBRA_FF_BN128_G1_HPP
-#define ALGEBRA_FF_BN128_G1_HPP
+#ifndef ALGEBRA_CURVES_BN128_G1_HPP
+#define ALGEBRA_CURVES_BN128_G1_HPP
 
 #include <vector>
 
@@ -20,275 +20,279 @@
 
 namespace nil {
     namespace algebra {
+        namespace curves {
+            namespace detail {
 
-        template <typename ModulusBits, typename GeneratorBits>
-        using params_type = arithmetic_params<fp<ModulusBits, GeneratorBits>>;
+                template <typename ModulusBits, typename GeneratorBits>
+                using params_type = arithmetic_params<fp<ModulusBits, GeneratorBits>>;
 
-        template <typename ModulusBits, typename GeneratorBits>
-        using modulus_type = params_type<ModulusBits, GeneratorBits>::modulus_type;
+                template <typename ModulusBits, typename GeneratorBits>
+                using modulus_type = params_type<ModulusBits, GeneratorBits>::modulus_type;
 
-        template <typename ModulusBits, typename GeneratorBits>
-        using fp_type = fp<ModulusBits, GeneratorBits>;
+                template <typename ModulusBits, typename GeneratorBits>
+                using fp_type = fp<ModulusBits, GeneratorBits>;
 
-        template <typename ModulusBits, typename GeneratorBits>
-        using value_type = element<fp_type<ModulusBits, GeneratorBits>>;
+                template <typename ModulusBits, typename GeneratorBits>
+                using value_type = element<fp_type<ModulusBits, GeneratorBits>>;
 
-        struct bn128_G1 {
+                struct bn128_G1 {
 
-            bn128_G1():bn128_G1(value_type::one(),value_type::one(),value_type::zero()){};
+                    bn128_G1():bn128_G1(value_type::one(),value_type::one(),value_type::zero()){};
 
-            bn128_G1(value_type X, value_type Y, value_type Z){
-                coord[0] = X;
-                coord[1] = Y;
-                coord[2] = Z;
-            }
+                    bn128_G1(value_type X, value_type Y, value_type Z){
+                        coord[0] = X;
+                        coord[1] = Y;
+                        coord[2] = Z;
+                    }
 
-            void to_affine_coordinates() {
-                if (is_zero()) {
-                    coord[0] = value_type::zero();
-                    coord[1] = value_type::one();
-                    coord[2] = value_type::zero();
-                } else {
-                    value_type r;
-                    r = coord[2];
-                    r.inverse();
-                    coord[2] = r.square();
-                    coord[0] *= coord[2];
-                    r *= coord[2];
-                    coord[1] *= r;
-                    coord[2] = value_type::one();
+                    void to_affine_coordinates() {
+                        if (is_zero()) {
+                            coord[0] = value_type::zero();
+                            coord[1] = value_type::one();
+                            coord[2] = value_type::zero();
+                        } else {
+                            value_type r;
+                            r = coord[2];
+                            r.inverse();
+                            coord[2] = r.square();
+                            coord[0] *= coord[2];
+                            r *= coord[2];
+                            coord[1] *= r;
+                            coord[2] = value_type::one();
+                        }
+                    }
+
+                    void to_special() {
+                        to_affine_coordinates();
+                    }
+                    
+                    bool is_special() const {
+                        return (is_zero() || coord[2].is_one());
+                    }
+
+                    bool is_zero() const {
+                        return coord[2].is_zero();
+                    }
+
+                    bool operator==(const bn128_G1 &other) const {
+                        if (is_zero()) {
+                            return other.is_zero();
+                        }
+
+                        if (other.is_zero()) {
+                            return false;
+                        }
+
+                        /* now neither is O */
+
+                        value_type Z1sq = coord[2].square();
+                        value_type Z2sq = other.coord[2].square();
+
+                        return (Z2sq * coord[0] == Z1sq * other.coord[0]) && 
+                                    (Z2sq * other.coord[2] * coord[1] == Z1sq * coord[2] * other.coord[1]);
+                    }
+
+                    bool operator!=(const bn128_G1 &other) const {
+                        return !(operator==(other));
+                    }
+
+                    bn128_G1 operator+(const bn128_G1 &other) const {
+                        // handle special cases having to do with O
+                        if (is_zero()) {
+                            return other;
+                        }
+
+                        if (other.is_zero()) {
+                            return *this;
+                        }
+
+                        // no need to handle points of order 2,4
+                        // (they cannot exist in a prime-order subgroup)
+
+                        // handle double case, and then all the rest
+                        if (operator==(other)) {
+                            return dbl();
+                        } else {
+                            return add(other);
+                        }
+                    }
+
+                    bn128_G1 operator-() const {
+                        bn128_G1 result(*this);
+                        neg(result.coord[1], result.coord[1]);
+                        return result;
+                    }
+
+                    bn128_G1 operator-(const bn128_G1 &other) const {
+                        return (*this) + (-other);
+                    }
+
+                    bn128_G1 add(const bn128_G1 &other) const {
+
+                        bn128_G1 result;
+                        bn::ecop::ECAdd(result.coord, coord, other.coord);
+                        return result;
+                    }
+
+                    bn128_G1 mixed_add(const bn128_G1 &other) const {
+                        if (is_zero()) {
+                            return other;
+                        }
+
+                        if (other.is_zero()) {
+                            return *this;
+                        }
+
+                        // no need to handle points of order 2,4
+                        // (they cannot exist in a prime-order subgroup)
+
+                        // check for doubling case
+
+                        // using Jacobian coordinates so:
+                        // (X1:Y1:Z1) = (X2:Y2:Z2)
+                        // iff
+                        // X1/Z1^2 == X2/Z2^2 and Y1/Z1^3 == Y2/Z2^3
+                        // iff
+                        // X1 * Z2^2 == X2 * Z1^2 and Y1 * Z2^3 == Y2 * Z1^3
+
+                        // we know that Z2 = 1
+
+                        value_type Z1Z1 = coord[2].square();
+                        
+                        value_type U2 = other.coord[0] * Z1Z1;
+
+                        value_type S2 = other.coord[1] * coord[2] * Z1Z1;;    // S2 = Y2*Z1*Z1Z1
+
+                        if (coord[0] == U2 && coord[1] == S2) {
+                            // dbl case; nothing of above can be reused
+                            return dbl();
+                        }
+
+                        bn128_G1 result;
+                        value_type H, HH, I, J, r, V, tmp;
+                        // H = U2-X1
+                        H = U2 - coord[0];
+                        // HH = H^2
+                        HH = H.square();
+                        // I = 4*HH
+                        tmp = HH + HH;
+                        I = tmp + tmp;
+                        // J = H*I
+                        J = H * I;
+                        // r = 2*(S2-Y1)
+                        tmp = S2 - coord[1];
+                        r = tmp + tmp;
+                        // V = X1*I
+                        V = coord[0] * I;
+                        // X3 = r^2-J-2*V
+                        result.coord[0] = r.square() - J - V - V;
+                        // Y3 = r*(V-X3)-2*Y1*J
+                        result.coord[1] = r * (V - result.coord[0]);
+                        tmp = coord[1] * J;
+                        result.coord[1] -=  (tmp + tmp);
+                        // Z3 = (Z1+H)^2-Z1Z1-HH
+                        result.coord[2] = (coord[2] + H).square() - Z1Z1 - HH;
+
+                        return result;
+                    }
+
+                    bn128_G1 dbl() const {
+
+                        bn128_G1 result;
+                        bn::ecop::ECDouble(result.coord, coord);
+                        return result;
+                    }
+
+                    bool is_well_formed() const {
+                        if (is_zero()) {
+                            return true;
+                        } else {
+                            /*
+                              y^2 = x^3 + b
+
+                              We are using Jacobian coordinates, so equation we need to check is actually
+
+                              (y/z^3)^2 = (x/z^2)^3 + b
+                              y^2 / z^6 = x^3 / z^6 + b
+                              y^2 = x^3 + b z^6
+                            */
+                            value_type X2, Y2, Z2;
+                            X2 = coord[0].square();
+                            Y2 = coord[1].square();
+                            Z2 = coord[2].square();
+
+                            value_type X3, Z3, Z6;
+                            X3 = X2 * coord[0];
+                            Z3 = Z2 * coord[2];
+                            Z6 = Z3.square();
+
+                            return (Y2 == X3 + bn128_coeff_b * Z6);
+                        }
+                    }
+
+                    static bn128_G1 zero() {
+                        return bn128_G1();
+                    }
+
+                    static bn128_G1 one() {
+                        return bn128_G1(1,2,1);
+                    }
+
+                    template<typename NumberType>
+                    static NumberType base_field_char() {
+                        return base_field::field_char();
+                    }
+
+                    template<typename NumberType>
+                    static NumberType order() {
+                        return scalar_field::field_char();
+                    }
+
+                    static void batch_to_special_all_non_zeros(std::vector<bn128_G1> &vec) {
+                        std::vector<value_type> Z_vec;
+                        Z_vec.reserve(vec.size());
+
+                        for (auto &el : vec) {
+                            Z_vec.emplace_back(el.coord[2]);
+                        }
+                        bn_batch_invert<value_type>(Z_vec);
+
+                        for (size_t i = 0; i < vec.size(); ++i) {
+                            value_type Z2, Z3;
+                            Z2 = Z_vec[i].square();
+                            Z3 = Z2 * Z_vec[i];
+
+                            vec[i].coord[0] *=  Z2;
+                            vec[i].coord[1] *= Z3;
+                            vec[i].coord[2] = value_type::one();
+                        }
+                    }
+
+                private:
+                    static value_type sqrt(const value_type &el) {
+                        return el.sqrt();
+                    }
+
+                    value_type coord[3];
+
+                    typedef bn128_Fq base_field;
+                    typedef bn128_Fr scalar_field;
+
+                    /* additional parameters for square roots in Fq */
+                    value_type bn128_coeff_b = value_type(3);
+                };
+
+                template<typename NumberType>
+                bn128_G1 operator*(const NumberType &lhs, const bn128_G1 &rhs) {
+                    return scalar_mul<bn128_G1, m>(rhs, lhs);
                 }
-            }
 
-            void to_special() {
-                to_affine_coordinates();
-            }
-            
-            bool is_special() const {
-                return (is_zero() || coord[2].is_one());
-            }
-
-            bool is_zero() const {
-                return coord[2].is_zero();
-            }
-
-            bool operator==(const bn128_G1 &other) const {
-                if (is_zero()) {
-                    return other.is_zero();
+                template<typename NumberType, const NumberType &modulus_p>
+                bn128_G1 operator*(const Fp_model<m, modulus_p> &lhs, const bn128_G1 &rhs) {
+                    return scalar_mul<bn128_G1, m>(rhs, lhs.as_bigint());
                 }
-
-                if (other.is_zero()) {
-                    return false;
-                }
-
-                /* now neither is O */
-
-                value_type Z1sq = coord[2].square();
-                value_type Z2sq = other.coord[2].square();
-
-                return (Z2sq * coord[0] == Z1sq * other.coord[0]) && 
-                            (Z2sq * other.coord[2] * coord[1] == Z1sq * coord[2] * other.coord[1]);
-            }
-
-            bool operator!=(const bn128_G1 &other) const {
-                return !(operator==(other));
-            }
-
-            bn128_G1 operator+(const bn128_G1 &other) const {
-                // handle special cases having to do with O
-                if (is_zero()) {
-                    return other;
-                }
-
-                if (other.is_zero()) {
-                    return *this;
-                }
-
-                // no need to handle points of order 2,4
-                // (they cannot exist in a prime-order subgroup)
-
-                // handle double case, and then all the rest
-                if (operator==(other)) {
-                    return dbl();
-                } else {
-                    return add(other);
-                }
-            }
-
-            bn128_G1 operator-() const {
-                bn128_G1 result(*this);
-                neg(result.coord[1], result.coord[1]);
-                return result;
-            }
-
-            bn128_G1 operator-(const bn128_G1 &other) const {
-                return (*this) + (-other);
-            }
-
-            bn128_G1 add(const bn128_G1 &other) const {
-
-                bn128_G1 result;
-                bn::ecop::ECAdd(result.coord, coord, other.coord);
-                return result;
-            }
-
-            bn128_G1 mixed_add(const bn128_G1 &other) const {
-                if (is_zero()) {
-                    return other;
-                }
-
-                if (other.is_zero()) {
-                    return *this;
-                }
-
-                // no need to handle points of order 2,4
-                // (they cannot exist in a prime-order subgroup)
-
-                // check for doubling case
-
-                // using Jacobian coordinates so:
-                // (X1:Y1:Z1) = (X2:Y2:Z2)
-                // iff
-                // X1/Z1^2 == X2/Z2^2 and Y1/Z1^3 == Y2/Z2^3
-                // iff
-                // X1 * Z2^2 == X2 * Z1^2 and Y1 * Z2^3 == Y2 * Z1^3
-
-                // we know that Z2 = 1
-
-                value_type Z1Z1 = coord[2].square();
-                
-                value_type U2 = other.coord[0] * Z1Z1;
-
-                value_type S2 = other.coord[1] * coord[2] * Z1Z1;;    // S2 = Y2*Z1*Z1Z1
-
-                if (coord[0] == U2 && coord[1] == S2) {
-                    // dbl case; nothing of above can be reused
-                    return dbl();
-                }
-
-                bn128_G1 result;
-                value_type H, HH, I, J, r, V, tmp;
-                // H = U2-X1
-                H = U2 - coord[0];
-                // HH = H^2
-                HH = H.square();
-                // I = 4*HH
-                tmp = HH + HH;
-                I = tmp + tmp;
-                // J = H*I
-                J = H * I;
-                // r = 2*(S2-Y1)
-                tmp = S2 - coord[1];
-                r = tmp + tmp;
-                // V = X1*I
-                V = coord[0] * I;
-                // X3 = r^2-J-2*V
-                result.coord[0] = r.square() - J - V - V;
-                // Y3 = r*(V-X3)-2*Y1*J
-                result.coord[1] = r * (V - result.coord[0]);
-                tmp = coord[1] * J;
-                result.coord[1] -=  (tmp + tmp);
-                // Z3 = (Z1+H)^2-Z1Z1-HH
-                result.coord[2] = (coord[2] + H).square() - Z1Z1 - HH;
-
-                return result;
-            }
-
-            bn128_G1 dbl() const {
-
-                bn128_G1 result;
-                bn::ecop::ECDouble(result.coord, coord);
-                return result;
-            }
-
-            bool is_well_formed() const {
-                if (is_zero()) {
-                    return true;
-                } else {
-                    /*
-                      y^2 = x^3 + b
-
-                      We are using Jacobian coordinates, so equation we need to check is actually
-
-                      (y/z^3)^2 = (x/z^2)^3 + b
-                      y^2 / z^6 = x^3 / z^6 + b
-                      y^2 = x^3 + b z^6
-                    */
-                    value_type X2, Y2, Z2;
-                    X2 = coord[0].square();
-                    Y2 = coord[1].square();
-                    Z2 = coord[2].square();
-
-                    value_type X3, Z3, Z6;
-                    X3 = X2 * coord[0];
-                    Z3 = Z2 * coord[2];
-                    Z6 = Z3.square();
-
-                    return (Y2 == X3 + bn128_coeff_b * Z6);
-                }
-            }
-
-            static bn128_G1 zero() {
-                return bn128_G1();
-            }
-
-            static bn128_G1 one() {
-                return bn128_G1(1,2,1);
-            }
-
-            template<typename NumberType>
-            static NumberType base_field_char() {
-                return base_field::field_char();
-            }
-
-            template<typename NumberType>
-            static NumberType order() {
-                return scalar_field::field_char();
-            }
-
-            static void batch_to_special_all_non_zeros(std::vector<bn128_G1> &vec) {
-                std::vector<value_type> Z_vec;
-                Z_vec.reserve(vec.size());
-
-                for (auto &el : vec) {
-                    Z_vec.emplace_back(el.coord[2]);
-                }
-                bn_batch_invert<value_type>(Z_vec);
-
-                for (size_t i = 0; i < vec.size(); ++i) {
-                    value_type Z2, Z3;
-                    Z2 = Z_vec[i].square();
-                    Z3 = Z2 * Z_vec[i];
-
-                    vec[i].coord[0] *=  Z2;
-                    vec[i].coord[1] *= Z3;
-                    vec[i].coord[2] = value_type::one();
-                }
-            }
-
-        private:
-            static value_type sqrt(const value_type &el) {
-                return el.sqrt();
-            }
-
-            value_type coord[3];
-
-            typedef bn128_Fq base_field;
-            typedef bn128_Fr scalar_field;
-
-            /* additional parameters for square roots in Fq */
-            value_type bn128_coeff_b = value_type(3);
-        };
-
-        template<typename NumberType>
-        bn128_G1 operator*(const NumberType &lhs, const bn128_G1 &rhs) {
-            return scalar_mul<bn128_G1, m>(rhs, lhs);
-        }
-
-        template<typename NumberType, const NumberType &modulus_p>
-        bn128_G1 operator*(const Fp_model<m, modulus_p> &lhs, const bn128_G1 &rhs) {
-            return scalar_mul<bn128_G1, m>(rhs, lhs.as_bigint());
-        }
+            }    // namespace detail
+        }    // namespace curves
     }    // namespace algebra
 }    // namespace nil
-#endif    // ALGEBRA_FF_BN128_G1_HPP
+#endif    // ALGEBRA_CURVES_BN128_G1_HPP
