@@ -34,9 +34,9 @@ namespace nil{
                     2 * Fp2Dbl::mod
                     9 * Fp2::add/sub
                  */
-                element <fp4> sq_Fp4UseDbl(const element<fp4> &B) {
-                    double_element<fp2> T0, T1, T2;
-                    element<fp2> z0, z1;
+                element_fp4 sq_Fp4UseDbl(const element_fp4 &B) {
+                    double_element_fp2 T0, T1, T2;
+                    element_fp2 z0, z1;
                     T0 = x0.square();
                     T1 = x1.square();
                     T2 = T1.mul_xi();
@@ -65,8 +65,8 @@ namespace nil{
                 */
 
                 element<fp12_2over3over2> pow_neg_t(const element<fp12_2over3over2> &A) {
-                    element <fp12_2over3over2> out = A;
-                    element <fp12_2over3over2> inConj;
+                    element_fp12_2over3over2 out = A;
+                    element_fp12_2over3over2 inConj;
                     inConj.a_ = A.a_;
                     inConj.b_ = -A.b_;    // in^-1 == in^(p^6)
 
@@ -101,9 +101,9 @@ namespace nil{
                 }
 
                 element<fp12_2over3over2> final_exp(element<fp12_2over3over2> A) {
-                    element <fp12_2over3over2> f, f2z, f6z, f6z2, f12z3;
-                    element <fp12_2over3over2> a, b;
-                    element <fp12_2over3over2> &z = A;
+                    element_fp12_2over3over2 f, f2z, f6z, f6z2, f12z3;
+                    element_fp12_2over3over2 a, b;
+                    element_fp12_2over3over2 &z = A;
                     f = mapToCyclo(f);
 
                     f2z = pow_neg_t(f);
@@ -142,6 +142,136 @@ namespace nil{
 
                 }
 
+
+
+                /*
+                    @memo Jacobian coordinates: Y^2 = X^3 + b*Z^6
+                */
+                template<class Fp>
+                inline bool isOnECJac3(const Fp *P) {
+                    typedef Fp2T<Fp> Fp2;
+                    typedef ParamT<Fp2> Param;
+                    if (P[2] == 0)
+                        return true;
+
+                    Fp Z6p_2;
+                    Z6p_2 = P[2].square();
+                    Z6p_2 *= P[2];
+                    Z6p_2 = Z6p_2.square();
+                    Z6p_2 *= Param::b;
+                    return P[1] * P[1] == P[0] * P[0] * P[0] + Z6p_2;
+                }
+
+                /*
+                    @memo Y^2=X^3+b
+                    Homogeneous.
+                */
+                template<class Fp>
+                inline bool isOnECHom2(const Fp *P) {
+                    typedef Fp2T<Fp> Fp2;
+                    typedef ParamT<Fp2> Param;
+                    return P[1] * P[1] == P[0] * P[0] * P[0] + Param::b;
+                }
+
+                /*
+                    @memo Y^2=X^3+b
+                    Homogeneous.
+                */
+                template<class Fp>
+                inline bool isOnECHom3(const Fp *P) {
+                    typedef Fp2T<Fp> Fp2;
+                    typedef ParamT<Fp2> Param;
+                    if (P[2] == 0)
+                        return true;
+
+                    return P[1] * P[1] * P[2] == P[0] * P[0] * P[0] + P[2].square() * P[2] * Param::b;
+                }
+
+                /*
+                    @memo Y^2=X^3+b/xi
+                */
+                template<class Fp2>
+                inline bool isOnTwistECJac3(const Fp2 *P) {
+                    typedef ParamT<Fp2> Param;
+
+                    if (P[2] == 0)
+                        return true;
+                    
+                    return P[1] * P[1] == P[0] * P[0] * P[0] + ((P[2].square() * P[2]).square()) * Param::b_invxi;
+                }
+
+                /*
+                    @memo Y^2=X^3+b/xi
+                    Homogeneous.
+                */
+                template<class Fp2>
+                inline bool isOnTwistECHom2(const Fp2 *P) {
+                    typedef ParamT<Fp2> Param;
+                    return P[1] * P[1] == (P[0] * P[0] * P[0] + Param::b_invxi);
+                }
+
+                /*
+                    @memo Y^2=X^3+b/xi
+                    Homogeneous.
+                */
+                template<class Fp2>
+                inline bool isOnTwistECHom3(const Fp2 *P) {
+                    typedef ParamT<Fp2> Param;
+                    if (P[2] == 0)
+                        return true;
+                    return P[1] * P[1] * P[2] == (P[0] * P[0] * P[0] + Param::b_invxi * P[2] * P[2] * P[2]);
+                }
+
+                /*
+                    For Jacobian coordinates
+                */
+                template<class FF>
+                inline void NormalizeJac(FF *out, const FF *in) {
+                    if (in[2] == 0) {
+                        out[0].clear();
+                        out[1].clear();
+                        out[2].clear();
+                    } else if (in[2] == 1) {
+                        copy(out, in);
+                    } else {
+                        FF A, AA;
+                        
+                        A = in[2].inverse();
+                        AA = A.square();
+
+                        out[0] = in[0] * AA;
+                        out[1] = in[1] * AA * A;
+                        out[2] = 1;
+                    }
+                }
+
+                /*
+                    For Homogeneous
+                */
+                template<class FF>
+                inline void NormalizeHom(FF *out, const FF *in) {
+                    if (in[2] == 0) {
+                        out[0].clear();
+                        out[1].clear();
+                        out[2].clear();
+                    } else if (in[2] == 1) {
+                        copy(out, in);
+                    } else {
+                        FF A = in[2];
+                        A = A.inverse();
+                        out[0] = in[0] * A;
+                        out[1] = in[1] * A;
+                        out[2] = 1;
+                    }
+                }
+
+                inline bool Ec2::isValid() const {
+                    return isOnTwistECJac3(p);
+                }
+
+                inline bool Ec1::isValid() const {
+                    return isOnECJac3(p);
+                }
             }       // namespace detail
         }       // namespace pairing
     }       // namespace algebra

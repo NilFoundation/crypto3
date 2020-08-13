@@ -99,7 +99,7 @@ namespace nil {
                     6  * Fp2Dbl::mod
                     56 * Fp2::add/sub
                 */
-                double_element_fp12_2over3over2 mul_Fp2_024C(const element_fp6_3over2 &B) {
+                double_element_fp12_2over3over2 mul_Fp2_024(const element_fp6_3over2 &B) {
                     element<fp2> &z0 = z.a_.a_;
                     element<fp2> &z1 = z.a_.b_;
                     element<fp2> &z2 = z.a_.c_;
@@ -186,7 +186,7 @@ namespace nil {
                     26 * Fp2::add/sub
                     call:2
                 */
-                double_element_fp12_2over3over2 mul_Fp2_024C(const element_fp6_3over2 &B1, const element_fp6_3over2 &B2) {
+                double_element_fp12_2over3over2 mul_Fp2_024_Fp2_024(const element_fp6_3over2 &B1, const element_fp6_3over2 &B2) {
                     element<fp2> &z0 = z.a_.a_;
                     element<fp2> &z1 = z.a_.b_;
                     element<fp2> &z2 = z.a_.c_;

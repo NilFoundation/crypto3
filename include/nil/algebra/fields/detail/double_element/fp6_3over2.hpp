@@ -209,7 +209,7 @@ namespace nil {
                     l.b_ = -t3;
                 }
 
-                double_element_fp6_3over2 pointDblLineEvalWithoutP(element_fp2 *R, element_fp2 *P) {
+                double_element_fp6_3over2 pointDblLineEval(element_fp2 *R, element_fp2 *P) {
                     return pointDblLineEvalWithoutP(R).mulFp6_24_Fp_01(P);
                 }
 
@@ -271,7 +271,7 @@ namespace nil {
                     l.b_ = t1;
                 }
                 
-                static void pointAddLineEval(element_fp2 *R, const element_fp2 *Q, const element<fp> *P) {
+                double_element_fp6_3over2 pointAddLineEval(element_fp2 *R, const element_fp2 *Q, const element<fp> *P) {
                     return pointAddLineEvalWithoutP(R, Q).mulFp6_24_Fp_01(P);
                 }
 
