@@ -1,5 +1,5 @@
-# Concepts # {#vdf_concepts}
+# Concepts # {#algebra_concepts}
 
 @tableofcontents
 
-## Verifiable Delay Function Concept ## {#vdf_concept}
+## Algebra Concept ## {#algebra_concept}
