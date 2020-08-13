@@ -111,12 +111,21 @@ node [shape="box"]
 
 ### Field Policies ### {#field_policies}
 
+A field policy describes its essential parameters such as `modulus`, `arity` or `mul_generator` - multiply generator. 
+
 ### Field Parameters ### {#field_parameters}
+
+Other field parameters are kept in the specific structures. All this structures inherit from basic `params` structure, containing all the basic parameters.
+
+For example, `arithmetic_params` structure keeps all the parameters needed for arithmetical operation evaluations.
 
 ### Field Element Algorithms ### {#field_element_algorithms}
 
+Field element corresponds an element of the field and has all the needed methods and overloaded arithmetic operators. The corresponding algorithms also defined here. As the backend they use now Boost::multiprecion, but it can be easily changed.
+
 ### Field Double-precision Algorithms ### {#field_double_precision_algorithms}
 
+For some elliptic curve operations and pairing algorithms its easier to provide intermediate evaluations using double-precision numbers. For these purposes we have specific structure with all the needed methods.
 
 ## Elliptic Curves Architecture ## {#curves_architecture}
 
