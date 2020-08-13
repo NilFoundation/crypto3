@@ -1,3 +1,3 @@
-# Manual # {#vdf_manual}
+# Manual # {#algebra_manual}
 
 @tableofcontents
