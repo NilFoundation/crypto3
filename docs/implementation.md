@@ -121,7 +121,7 @@ For example, `arithmetic_params` structure keeps all the parameters needed for a
 
 ### Field Element Algorithms ### {#field_element_algorithms}
 
-Field element corresponds an element of the field and has all the needed methods and overloaded arithmetic operators. The corresponding algorithms also defined here. As the backend they use now Boost::multiprecion, but it can be easily changed.
+Field element corresponds an element of the field and has all the needed methods and overloaded arithmetic operators. The corresponding algorithms are also defined here. As the backend they use now Boost::multiprecision, but it can be easily changed.
 
 ### Field Double-precision Algorithms ### {#field_double_precision_algorithms}
 
@@ -150,6 +150,19 @@ node [shape="box"]
 }
 @enddot
 
+### Curve Type Policies ### {#curve_type_policies}
+
+Curves implemented at the moment are one of two types: NIST curves (such as p521 curve) and Weierstrass curves (such as BLS12-381 or BN-128). Curve type policy describes parameters general for all the curves of the particular type.
+
+We also intend to generalize curve algorithms by making it curve type-determinable.
+
+### Curve Policies ### {#curve_policies}
+
+A field policy describes its parameters such as modulus `p`, coeffs `a` and `b` or generator coordinates `x`, `y`. It also contains elliptic curve `value_type` defining curve element type. 
+
+### Curve Element Algorithms ### {#curve_element_algorithms}
+
+Curve element corresponds an point of the curve and has all the needed methods and overloaded arithmetic operators. The corresponding algorithms based on the underlying field algorithms are also defined here.
 
 ## Pairing Architecture ## {#pairing_architecture}
 
