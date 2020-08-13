@@ -11,6 +11,7 @@
 #define ALGEBRA_CURVES_GOST_A_HPP
 
 #include <nil/crypto3/algebra/curves/curve_weierstrass.hpp>
+#include <nil/crypto3/algebra/curves/detail/element/gost_A.hpp>
 
 namespace nil {
     namespace algebra {

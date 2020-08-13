@@ -27,7 +27,6 @@ namespace nil {
             template<std::size_t ModulusBits, std::size_t GeneratorBits>
             struct bn128_fq : public fp<ModulusBits, GeneratorBits> { };
 
-            template<>
             struct bn128_fq<254, CHAR_BIT> : public fp<254, CHAR_BIT> {
                 typedef fp<254, CHAR_BIT> policy_type;
 

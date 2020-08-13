@@ -18,8 +18,12 @@ namespace nil {
             
 
             template<std::size_t PSize, std::size_t WordBits>
-            struct curve_nist : public curve<fp<>> {
-                typedef curve::number_type number_type;
+            struct curve_nist : public curve<fp<PSize, WordBits>> {
+            private:
+            	typedef curve<fp<PSize, WordBits>> policy_type;
+            public:
+            	typedef policy_type::field_type field_type;
+                typedef policy_type::number_type number_type;
             };
 
         }    // namespace curves

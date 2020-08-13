@@ -11,6 +11,7 @@
 #define ALGEBRA_CURVES_SECP_HPP
 
 #include <nil/crypto3/pubkey/ec_group/curve_weierstrass.hpp>
+#include <nil/crypto3/algebra/curves/detail/element/secp_k1.hpp>
 
 namespace nil {
     namespace algebra {

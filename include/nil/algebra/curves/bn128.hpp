@@ -11,6 +11,7 @@
 #define ALGEBRA_CURVES_BN128_HPP
 
 #include <nil/crypto3/algebra/curves/curve_weierstrass.hpp>
+#include <nil/crypto3/algebra/curves/detail/element/bn128.hpp>
 
 namespace nil {
     namespace algebra {
@@ -30,8 +31,12 @@ namespace nil {
 				v^3 = xi
 				w^2 = v
 			*/
-	        struct bn128_snark1 : public curve_weierstrass<254> {
-		        typedef typename curve_weierstrass<254>::number_type number_type;
+	        struct bn128_snark1 : public curve_weierstrass<nil::algebra::fields::bn128_fq<254>> {
+	        private:
+	        	typedef typename curve_weierstrass<nil::algebra::fields::bn128_fq<254>> policy_type;
+	        public:
+		        typedef typename policy_type::number_type number_type;
+		        typedef typename policy_type::field_type field_type;
 
 		        constexpr static const number_type p = 21888242871839275222246405745257275088696311157297823662689037894645226208583_cppui254;
 		        constexpr static const number_type a = 0;
@@ -39,11 +44,17 @@ namespace nil {
 		        constexpr static const number_type x = 0x09;
 		        constexpr static const number_type y = 0x01;
 		        constexpr static const number_type order = 21888242871839275222246405745257275088548364400416034343698204186575808495617_cppui254;
+
+		        typedef typename detail::element_bn128<field_type::value_type> value_type;
 	    	};
 
 	    	// b/xi = 82 / (9 + u) = 9 - u
-	        struct bn128_snark2 : public curve_weierstrass<254> {
-		        typedef typename curve_weierstrass<254>::number_type number_type;
+	        struct bn128_snark2 : public curve_weierstrass<<nil::algebra::fields::bn128_fq<254>>> {
+	        private:
+	        	typedef typename curve_weierstrass<nil::algebra::fields::bn128_fq<254>> policy_type;
+	        public:
+		        typedef typename policy_type::number_type number_type;
+		        typedef typename policy_type::field_type field_type;
 
 		        constexpr static const number_type p = 21888242871839275222246405745257275088696311157297823662689037894645226208583_cppui254;
 		        constexpr static const number_type a = 0;
@@ -51,11 +62,17 @@ namespace nil {
 		        constexpr static const number_type x = 0x09;
 		        constexpr static const number_type y = 0x01;
 		        constexpr static const number_type order = 21888242871839275222246405745257275088548364400416034343698204186575808495617_cppui254;
+
+		        typedef typename detail::element_bn128<field_type::value_type> value_type;
 	    	};
 
 	    	// herumi curve
-	        struct bn128_Fp254BNb : public curve_weierstrass<254> {
-		        typedef typename curve_weierstrass<254>::number_type number_type;
+	        struct bn128_Fp254BNb : public curve_weierstrass<<nil::algebra::fields::bn128_fq<254>>> {
+	        private:
+	        	typedef typename curve_weierstrass<nil::algebra::fields::bn128_fq<254>> policy_type;
+	        public:
+		        typedef typename policy_type::number_type number_type;
+		        typedef typename policy_type::field_type field_type;
 
 		        constexpr static const number_type p = 16798108731015832284940804142231733909889187121439069848933715426072753864723_cppui254;
 		        constexpr static const number_type a = 0;
@@ -63,6 +80,8 @@ namespace nil {
 		        constexpr static const number_type x = 0x01;
 		        constexpr static const number_type y = 0x01;
 		        constexpr static const number_type order = ?;
+
+		        typedef typename detail::element_bn128<field_type::value_type> value_type;
 	    	};
 	    }    // namespace curves
     }    // namespace algebra

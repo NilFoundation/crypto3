@@ -10,7 +10,7 @@
 #ifndef ALGEBRA_CURVES_ELEMENT_BN128_HPP
 #define ALGEBRA_CURVES_ELEMENT_BN128_HPP
 
-#include <stdexcept>
+#include <nil/crypto3/algebra/multiexp/bn128.hpp>
 #include <vector>
 
 namespace nil {

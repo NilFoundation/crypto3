@@ -10,14 +10,12 @@
 #ifndef ALGEBRA_CURVES_ECOP_HPP
 #define ALGEBRA_CURVES_ECOP_HPP
 
-#include <stdexcept>
 #include <vector>
 
 namespace nil {
     namespace algebra {
         namespace curve {
             namespace detail {
-
 
                     template<class Fp>
                     void FrobEndOnTwist_1(Fp2T<Fp> *Q, const Fp2T<Fp> *P) {

@@ -11,6 +11,7 @@
 #define ALGEBRA_CURVES_BRAINPOOL_R1_HPP
 
 #include <nil/crypto3/pubkey/ec_group/curve_weierstrass.hpp>
+#include <nil/crypto3/algebra/curves/detail/element/brainpool_r1.hpp>
 
 namespace nil {
     namespace algebra {
@@ -29,7 +30,11 @@ namespace nil {
 
             template<>
             struct brainpool_r1<160> : public curve_weierstrass<160> {
-                typedef typename curve_weierstrass<160>::number_type number_type;
+            private:
+                typedef typename curve_weierstrass<nil::algebra::fields::brainpool_r1<160>> policy_type;
+            public:
+                typedef typename policy_type::number_type number_type;
+                typedef typename policy_type::field_type field_type;
 
                 constexpr static const number_type p = 0xE95E4A5F737059DC60DFC7AD95B3D8139515620F_cppui160;
                 constexpr static const number_type a = 0x340E7BE2A280EB74E2BE61BADA745D97E8F7C300_cppui160;
@@ -38,13 +43,18 @@ namespace nil {
                 constexpr static const number_type y = 0x1667CB477A1A8EC338F94741669C976316DA6321_cppui160;
                 constexpr static const number_type order = 0xE95E4A5F737059DC60DF5991D45029409E60FC09_cppui160;
 
+                typedef typename detail::element_brainpool_r1<160, field_type::value_type> value_type;
             };
 
             typedef brainpool_r1<160> brainpool160r1;
 
             template<>
             struct brainpool_r1<192> : public curve_weierstrass<192> {
-                typedef typename curve_weierstrass<192>::number_type number_type;
+            private:
+                typedef typename curve_weierstrass<nil::algebra::fields::brainpool_r1<192>> policy_type;
+            public:
+                typedef typename policy_type::number_type number_type;
+                typedef typename policy_type::field_type field_type;
 
                 constexpr static const number_type p = 0xC302F41D932A36CDA7A3463093D18DB78FCE476DE1A86297_cppui192;
                 constexpr static const number_type a = 0x6A91174076B1E0E19C39C031FE8685C1CAE040E5C69A28EF_cppui192;
@@ -53,13 +63,18 @@ namespace nil {
                 constexpr static const number_type y = 0x14B690866ABD5BB88B5F4828C1490002E6773FA2FA299B8F_cppui192;
                 constexpr static const number_type order = 0xC302F41D932A36CDA7A3462F9E9E916B5BE8F1029AC4ACC1_cppui192;
 
+                typedef typename detail::element_brainpool_r1<192, field_type::value_type> value_type;
             };
 
             typedef brainpool_r1<192> brainpool192r1;
 
             template<>
             struct brainpool_r1<224> : public curve_weierstrass<224> {
-                typedef typename ec_group_info<224>::number_type number_type;
+            private:
+                typedef typename curve_weierstrass<nil::algebra::fields::brainpool_r1<224>> policy_type;
+            public:
+                typedef typename policy_type::number_type number_type;
+                typedef typename policy_type::field_type field_type;
 
                 constexpr static const number_type p =
                     0xD7C134AA264366862A18302575D1D787B09F075797DA89F57EC8C0FF_cppui224;
@@ -74,13 +89,18 @@ namespace nil {
                 constexpr static const number_type order =
                     0xD7C134AA264366862A18302575D0FB98D116BC4B6DDEBCA3A5A7939F_cppui224;
 
+                typedef typename detail::element_brainpool_r1<224, field_type::value_type> value_type;
             };
 
             typedef brainpool_r1<224> brainpool224r1;
 
             template<>
             struct brainpool_r1<256> : public curve_weierstrass<256> {
-                typedef typename ec_group_info<256>::number_type number_type;
+            private:
+                typedef typename curve_weierstrass<nil::algebra::fields::brainpool_r1<256>> policy_type;
+            public:
+                typedef typename policy_type::number_type number_type;
+                typedef typename policy_type::field_type field_type;
 
                 constexpr static const number_type p =
                     0xA9FB57DBA1EEA9BC3E660A909D838D726E3BF623D52620282013481D1F6E5377_cppui256;
@@ -95,13 +115,18 @@ namespace nil {
                 constexpr static const number_type order =
                     0xA9FB57DBA1EEA9BC3E660A909D838D718C397AA3B561A6F7901E0E82974856A7_cppui256;
 
+                typedef typename detail::element_brainpool_r1<256, field_type::value_type> value_type;
             };
 
             typedef brainpool_r1<256> brainpool256r1;
 
             template<>
             struct brainpool_r1<320> : public curve_weierstrass<320> {
-                typedef typename ec_group_info<320>::number_type number_type;
+            private:
+                typedef typename curve_weierstrass<nil::algebra::fields::brainpool_r1<320>> policy_type;
+            public:
+                typedef typename policy_type::number_type number_type;
+                typedef typename policy_type::field_type field_type;
 
                 constexpr static const number_type p =
                     0xD35E472036BC4FB7E13C785ED201E065F98FCFA6F6F40DEF4F92B9EC7893EC28FCD412B1F1B32E27_cppui320;
@@ -116,13 +141,18 @@ namespace nil {
                 constexpr static const number_type order =
                     0xD35E472036BC4FB7E13C785ED201E065F98FCFA5B68F12A32D482EC7EE8658E98691555B44C59311_cppui320;
 
+                typedef typename detail::element_brainpool_r1<320, field_type::value_type> value_type;
             };
 
             typedef brainpool_r1<320> brainpool320r1;
 
             template<>
             struct brainpool_r1<384> : public curve_weierstrass<384> {
-                typedef typename ec_group_info<384>::number_type number_type;
+            private:
+                typedef typename curve_weierstrass<nil::algebra::fields::brainpool_r1<384>> policy_type;
+            public:
+                typedef typename policy_type::number_type number_type;
+                typedef typename policy_type::field_type field_type;
 
                 constexpr static const number_type p =
                     0x8CB91E82A3386D280F5D6F7E50E641DF152F7109ED5456B412B1DA197FB71123ACD3A729901D1A71874700133107EC53_cppui384;
@@ -137,13 +167,18 @@ namespace nil {
                 constexpr static const number_type order =
                     0x8CB91E82A3386D280F5D6F7E50E641DF152F7109ED5456B31F166E6CAC0425A7CF3AB6AF6B7FC3103B883202E9046565_cppui384;
 
+                typedef typename detail::element_brainpool_r1<384, field_type::value_type> value_type;
             };
 
             typedef brainpool_r1<384> brainpool384r1;
 
             template<>
             struct brainpool_r1<512> : public curve_weierstrass<512> {
-                typedef typename ec_group_info<512>::number_type number_type;
+            private:
+                typedef typename curve_weierstrass<nil::algebra::fields::brainpool_r1<512>> policy_type;
+            public:
+                typedef typename policy_type::number_type number_type;
+                typedef typename policy_type::field_type field_type;
 
                 constexpr static const number_type p =
                     0xAADD9DB8DBE9C48B3FD4E6AE33C9FC07CB308DB3B3C9D20ED6639CCA703308717D4D9B009BC66842AECDA12AE6A380E62881FF2F2D82C68528AA6056583A48F3_cppui512;
@@ -157,6 +192,8 @@ namespace nil {
                     0x7DDE385D566332ECC0EABFA9CF7822FDF209F70024A57B1AA000C55B881F8111B2DCDE494A5F485E5BCA4BD88A2763AED1CA2B2FA8F0540678CD1E0F3AD80892_cppui512;
                 constexpr static const number_type order =
                     0xAADD9DB8DBE9C48B3FD4E6AE33C9FC07CB308DB3B3C9D20ED6639CCA70330870553E5C414CA92619418661197FAC10471DB1D381085DDADDB58796829CA90069_cppui512;
+
+                typedef typename detail::element_brainpool_r1<512, field_type::value_type> value_type;
             };
 
             typedef brainpool_r1<512> brainpool512r1;

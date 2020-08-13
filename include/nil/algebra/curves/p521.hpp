@@ -10,15 +10,8 @@
 #ifndef ALGEBRA_CURVES_NIST_P521_HPP
 #define ALGEBRA_CURVES_NIST_P521_HPP
 
-#include <memory>
-
-#include <boost/multiprecision/cpp_bin_float.hpp>
-#include <boost/multiprecision/mask_bits.hpp>
-#include <boost/multiprecision/reduce_below.hpp>
-
 #include <nil/crypto3/pubkey/ec_group/curve_nist.hpp>
-
-#include <nil/crypto3/utilities/assert.hpp>
+#include <nil/crypto3/algebra/curves/detail/element/p521.hpp>
 
 namespace nil {
     namespace algebra {

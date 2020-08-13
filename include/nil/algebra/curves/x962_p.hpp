@@ -11,6 +11,7 @@
 #define ALGEBRA_CURVES_X962_P_HPP
 
 #include <nil/crypto3/ff/ec_group/curve_weierstrass.hpp>
+#include <nil/crypto3/algebra/curves/detail/element/x962_p.hpp>
 
 namespace nil {
     namespace algebra {

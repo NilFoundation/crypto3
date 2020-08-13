@@ -11,6 +11,7 @@
 #define ALGEBRA_CURVES_SM2P_V1_HPP
 
 #include <nil/crypto3/pubkey/ec_group/curve_weierstrass.hpp>
+#include <nil/crypto3/algebra/curves/detail/element/sm2p_v1.hpp>
 
 namespace nil {
     namespace algebra {

@@ -11,6 +11,7 @@
 #define ALGEBRA_CURVES_NIST_P384_HPP
 
 #include <nil/crypto3/pubkey/ec_group/curve_nist.hpp>
+#include <nil/crypto3/algebra/curves/detail/element/p384.hpp>
 
 namespace nil {
     namespace algebra {
