@@ -21,27 +21,27 @@ namespace nil {
     namespace crypto3 {
         namespace hashes {
             namespace detail {
-                template<typename field_type, typename element_type, std::size_t t, bool strength>
+                template<typename FieldType, typename element_type, std::size_t t, bool strength>
                 struct poseidon_constants {
 
-                    typedef poseidon_policy<field_type, element_type, t, strength> policy_type;
-                    typedef poseidon_mds_matrix<field_type, element_type, t, strength> mds_matrix_type;
+                    typedef poseidon_policy<FieldType, element_type, t, strength> policy_type;
+                    typedef poseidon_mds_matrix<FieldType, element_type, t, strength> mds_matrix_type;
                     typedef typename mds_matrix_type::state_vector_type state_vector_type;
 
-                    // constexpr static std::size_t const block_words = policy_type::block_words;
+                    // constexpr static const std::size_t block_words = policy_type::block_words;
 
-                    constexpr static std::size_t const state_words = policy_type::state_words;
+                    constexpr static const std::size_t state_words = policy_type::state_words;
                     typedef typename policy_type::state_type state_type;
 
-                    constexpr static std::size_t const full_rounds = policy_type::full_rounds;
-                    constexpr static std::size_t const half_full_rounds = policy_type::half_full_rounds;
-                    constexpr static std::size_t const part_rounds = policy_type::part_rounds;
+                    constexpr static const std::size_t full_rounds = policy_type::full_rounds;
+                    constexpr static const std::size_t half_full_rounds = policy_type::half_full_rounds;
+                    constexpr static const std::size_t part_rounds = policy_type::part_rounds;
 
                     constexpr static std::size_t const round_constants_size = (full_rounds + part_rounds) * state_words;
                     constexpr static std::size_t const equivalent_round_constants_size = (full_rounds + 1) * state_words + part_rounds - 1;
                     typedef state_vector_type round_constants_type;
 
-                    constexpr static std::size_t const word_bits = policy_type::word_bits;
+                    constexpr static const std::size_t word_bits = policy_type::word_bits;
 
                     /*
                     * =============================================================================================================
@@ -120,7 +120,7 @@ namespace nil {
                     }
 
                 // private:
-                    constexpr static std::size_t const lfsr_state_len = 80;
+                    constexpr static const std::size_t lfsr_state_len = 80;
                     typedef std::bitset<lfsr_state_len> lfsr_state_type;
                     lfsr_state_type lfsr_state;
 

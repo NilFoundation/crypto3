@@ -6,10 +6,10 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-// #ifndef CRYPTO3_HASH_POSEIDON_HPP
-// #define CRYPTO3_HASH_POSEIDON_HPP
+#ifndef CRYPTO3_HASH_POSEIDON_HPP
+#define CRYPTO3_HASH_POSEIDON_HPP
 
-// #include <nil/crypto3/hash/detail/poseidon/poseidon_functions.hpp>
+#include <nil/crypto3/hash/detail/poseidon/poseidon_functions.hpp>
 // #include <nil/crypto3/hash/detail/sponge_construction.hpp>
 // #include <nil/crypto3/hash/detail/block_stream_processor.hpp>
 
@@ -36,7 +36,7 @@
 //                 static void process_block(state_type &state, const block_type &block) {
 //                     for (std::size_t i = state_words - block_words; i != state_words; ++i)
 //                         state[i] ^= block[i];
-                    
+
 //                     // for (std::size_t i = 0; i != state_words; ++i)
 //                     //     boost::endian::endian_reverse_inplace(state[i]);
 
@@ -72,7 +72,8 @@
 //                     };
 
 //                     typedef sponge_construction<
-//                         params_type, typename policy_type::iv_generator, poseidon_compressor<FieldT, element_type, t, strength>,
+//                         params_type, typename policy_type::iv_generator, poseidon_compressor<FieldT, element_type, t,
+//                         strength>,
 //                         // TODO: padding and finalizer
 //                         detail::poseidon_padding<policy_type>, detail::poseidon_finalizer<policy_type>>
 //                         type;
@@ -93,4 +94,4 @@
 //     }        // namespace crypto3
 // }    // namespace nil
 
-// #endif
+#endif
