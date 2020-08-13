@@ -17,6 +17,13 @@
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
+            namespace padding {
+                template<typename Scheme, typename Hash>
+                struct emsa3;
+                template<typename Scheme, typename Hash>
+                struct emsa4;
+            }
+
             template<typename NumberType>
             struct rsa_public_key {
                 typedef NumberType number_type;
@@ -45,8 +52,14 @@ namespace nil {
 
             template<typename CurveType>
             struct rsa {
+                typedef CurveType curve_type;
+
                 typedef rsa_public_key<CurveType> public_key_type;
                 typedef rsa_private_key<CurveType> private_key_type;
+
+                template<typename Hash>
+                using padding_types = std::tuple<padding::emsa3<rsa<CurveType>, Hash>, padding::emsa4<rsa<CurveType>,
+                                                                                                      Hash>>;
             };
 
             /**

@@ -9,12 +9,34 @@
 #ifndef CRYPTO3_PUBKEY_GOST_3410_KEY_HPP
 #define CRYPTO3_PUBKEY_GOST_3410_KEY_HPP
 
-#include <nil/crypto3/pubkey/ecc_key.hpp>
-
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
+            namespace padding {
+                template<typename Scheme, typename Hash>
+                struct emsa1;
+            }
+            template<typename CurveType>
+            struct gost_3410_public_key {
+                typedef CurveType curve_type;
+            };
 
+            template<typename CurveType>
+            struct gost_3410_private_key {
+                typedef CurveType curve_type;
+            };
+
+            template<typename CurveType>
+            struct gost_3410 {
+                typedef CurveType curve_type;
+
+                typedef gost_3410_public_key<CurveType> public_key_type;
+                typedef gost_3410_private_key<CurveType> private_key_type;
+
+                template<typename Hash>
+                using padding_types = std::tuple<padding::emsa1<gost_3410<CurveType>, Hash>>;
+
+            };
             /**
              * GOST-34.10 Public Key
              */
@@ -107,12 +129,6 @@ namespace nil {
                     create_signature_op(random_number_generator &rng,
                                         const std::string &params,
                                         const std::string &provider) const override;
-            };
-
-            class gost_3410 {
-            public:
-                typedef gost_3410_public_key public_key_policy;
-                typedef gost_3410_private_key private_key_policy;
             };
 
             std::vector<uint8_t> gost_3410_public_key::public_key_bits() const {

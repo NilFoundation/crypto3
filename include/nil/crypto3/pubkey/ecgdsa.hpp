@@ -14,6 +14,11 @@
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
+            namespace padding {
+                template<typename Scheme, typename Hash>
+                struct emsa1;
+            }
+
             template<typename CurveType>
             struct ecgdsa_public_key {
                 typedef CurveType curve_type;
@@ -125,8 +130,13 @@ namespace nil {
 
             template<typename CurveType>
             struct ecgdsa {
+                typedef CurveType curve_type;
+
                 typedef ecgdsa_public_key<CurveType> public_key_policy;
                 typedef ecgdsa_private_key<CurveType> private_key_policy;
+
+                template<typename Hash>
+                using padding_types = std::tuple<padding::emsa1<ecdsa<CurveType>, Hash>>;
             };
         }    // namespace pubkey
     }        // namespace crypto3

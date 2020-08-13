@@ -9,13 +9,15 @@
 #ifndef CRYPTO3_PUBKEY_DSA_HPP
 #define CRYPTO3_PUBKEY_DSA_HPP
 
-#include <nil/crypto3/pubkey/dl_algorithm.hpp>
-
 #include <nil/crypto3/pubkey/detail/nonce_generator.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
+            namespace padding {
+                template<typename Scheme, typename Hash>
+                struct emsa1;
+            }
 
             template<typename FieldType>
             struct dsa_public_key {
@@ -116,6 +118,9 @@ namespace nil {
 
                 typedef dsa_public_key<FieldType> public_key_type;
                 typedef dsa_private_key<FieldType> private_key_type;
+
+                template<typename Hash>
+                using padding_types = std::tuple<padding::emsa1<dsa<FieldType>, Hash>>;
             };
         }    // namespace pubkey
     }        // namespace crypto3
