@@ -130,7 +130,7 @@ namespace nil {
                     bn128_G1 add(const bn128_G1 &other) const {
 
                         bn128_G1 result;
-                        bn::ecop::ECAdd(result.coord, coord, other.coord);
+                        detail::ECAdd(result.coord, coord, other.coord);
                         return result;
                     }
 
@@ -199,7 +199,7 @@ namespace nil {
                     bn128_G1 dbl() const {
 
                         bn128_G1 result;
-                        bn::ecop::ECDouble(result.coord, coord);
+                        detail::ECDouble(result.coord, coord);
                         return result;
                     }
 

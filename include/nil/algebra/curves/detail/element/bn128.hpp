@@ -17,24 +17,26 @@ namespace nil {
     namespace algebra {
         namespace curve {
 
-            template<class T>
+            template<typename FieldT>
             struct element_bn128 {
-                mutable T p[3];
+                
+                FieldT p[3];
+
                 element_bn128() {
                 }
 
-                element_bn128(const T &x, const T &y, bool verify = true) {
-                    set(x, y, verify);
-                }
-
-                element_bn128(const T &x, const T &y, const T &z, bool verify = true) {
-                    set(x, y, z, verify);
+                element_bn128(const FieldT &x, const FieldT &y, const FieldT &z) {
+                    p[0] = x;
+                    p[1] = y;
+                    p[2] = z;   
                 }
                 
-                void normalize() const {
+                element_bn128 normalize() const {
+                    FieldT p_out[3];
+
                     if (is_zero() || p[2] == 1)
                         return;
-                    T r;
+                    FieldT r;
                     r = p[2].inverse();
                     p[2] = r.square();
                     p[0] *= p[2];
@@ -43,44 +45,91 @@ namespace nil {
                     p[2] = 1;
                 }
 
-                static inline void dbl(element_bn128 &R, const element_bn128 &P) {
-                    ecop::ECDouble(R.p, P.p);
+                /*
+                    Jacobi coordinate
+                    (p_out[0], p_out[1], p_out[2]) = 2(p[0], p[1], p[2])
+                */
+                element_bn128 dbl() const{
+                    FieldT A, B, C, D, E;
+                    A = p[0].square();
+                    B = p[1].square();
+                    C = B.square();
+                    D = ((p[0] + B).square() - A - C).dbl();
+                    E = A.dbl() + A;
+
+                    out[0] = E.square() - D.dbl();
+                    out[1] = E * (D - out[0]) - C.dbl().dbl().dbl();
+                    out[2] = (p[1] * p[2]).dbl();
                 }
 
+                /*
+                    Jacobi coordinate
+                    (p_out[0], p_out[1], p_out[2]) = (p[0], p[1], p[2]) + (B.p[0], B.p[1], B.p[2])
+                */
                 element_bn128 operator+(const element_bn128 &B) const {
-                static inline void add(element_bn128 &R, const element_bn128 &P, const element_bn128 &Q) {
-                    ecop::ECAdd(R.p, P.p, Q.p);
+                    FieldT p_out[3];
+
+                    if (p[2].is_zero()) {
+                            return element_bn128(B);
+                        }
+                        if (B.p[2].is_zero()) {
+                            return element_bn128(*this);
+                        }
+                        FieldT Z1Z1, Z2Z2, U1, S1, H, I, J, t3, r, V;
+
+                        Z1Z1 = p[2].square();
+                        Z2Z2 = B.p[2].square();
+                        U1 = p[0] * Z2Z2;
+                        S1 = p[1] * B.p[2] * Z2Z2;
+                        H = B.p[0] * Z1Z1 - U1;
+                        t3 = B.p[1] * p[2] * Z1Z1 - S1;
+
+                        if (H.is_zero()) {
+                            if (t3.is_zero()) {
+                                return dbl();
+                            } else {
+                                p_out[2].clear();
+                            }
+                            return;
+                        }
+
+                        I = H.dbl().square();
+                        J = H * I;
+                        r = t3.dbl();
+                        V = U1 * I;
+                        p_out[0] = r.square() - J - (V + V);
+                        p_out[1] = r * (V - p_out[0]) - (S1 * J).dbl();
+                        p_out[2] = ((p[2] + B.p[2]).square() - Z1Z1 - Z2Z2) * H;
                 }
 
                 element_bn128 operator-(const element_bn128 &B) const {
-                static inline void sub(element_bn128 &R, const element_bn128 &P, const element_bn128 &Q) {
-                    element_bn128 negQ;
-                    neg(negQ, Q);
-                    add(R, P, negQ);
+                    return *this + (-B);
                 }
 
                 element_bn128 operator-() const {
-                static inline void neg(element_bn128 &R, const element_bn128 &P) {
-                    R.p[0] = P.p[0];
-                    T::neg(R.p[1], P.p[1]);
-                    R.p[2] = P.p[2];
+                    return element_bn128({p[0], -p[1], p[2]});
                 }
 
-                template<class N>
-                element_bn128 operator*(const element_bn128 &B) const {
-                static inline void mul(element_bn128 &R, const element_bn128 &P, const N &y) {
-                    ecop::ScalarMult(R.p, P.p, y);
+                /*
+                    out = in * m
+                    @param out [out] Jacobi coord (out[0], out[1], out[2])
+                    @param in [in] Jacobi coord (in[0], in[1], in[2])
+                    @param m [in] scalar
+                    @note MSB first binary method.
+
+                    @note don't use Fp as INT
+                    the inner format of Fp is not compatible with mie::Vuint
+                */
+                template<typename NumberType>
+                element_bn128 operator*(const NumberType N) const {
+                    return multi_exp(*this, N);
                 }
+
                 template<class N>
                 element_bn128 &operator*=(const N &y) {
                     return *this * y;
                 }
-                template<class N>
-                element_bn128 operator*(const N &y) const {
-                    element_bn128 c;
-                    mul(c, *this, y);
-                    return c;
-                }
+
                 bool operator==(const element_bn128 &rhs) const {
                     normalize();
                     rhs.normalize();
@@ -93,15 +142,19 @@ namespace nil {
                         return false;
                     return p[0] == rhs.p[0] && p[1] == rhs.p[1];
                 }
+
                 bool operator!=(const element_bn128 &rhs) const {
                     return !operator==(rhs);
                 }
+
                 bool is_zero() const {
                     return p[2].is_zero();
                 }
+
                 element_bn128 &operator+=(const element_bn128 &rhs) {
                     return *this + rhs;
                 }
+
                 element_bn128 &operator-=(const element_bn128 &rhs) {
                     return *this - rhs;
                 }
