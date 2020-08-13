@@ -16,8 +16,8 @@ namespace nil {
         namespace pubkey {
             namespace padding {
 
-                template<typename Hash>
-                struct emsa_raw : public emsa<Hash> {
+                template<typename Scheme, typename Hash>
+                struct emsa_raw : public emsa<Scheme, Hash> {
                     template<typename UniformRandomBitGenerator, typename RandomNumberDistribution,
                              typename InputIterator, typename OutputIterator>
                     OutputIterator encode(InputIterator first, InputIterator last, OutputIterator out,
@@ -75,9 +75,9 @@ namespace nil {
                                       boost::end(range2), key_bits);
                     }
                 };
-            }
-            }
-    }    // namespace crypto3
+            }    // namespace padding
+        }        // namespace pubkey
+    }            // namespace crypto3
 }    // namespace nil
 
 #endif

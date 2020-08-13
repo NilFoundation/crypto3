@@ -40,8 +40,8 @@ namespace nil {
                     }
                 }    // namespace detail
 
-                template<typename Hash>
-                struct emsa_pkcs1v15_base : public emsa<Hash> {
+                template<typename Scheme, typename Hash>
+                struct emsa_pkcs1v15_base : public emsa<Scheme, Hash> {
                     template<typename InputMessageIterator, typename OutputIterator>
                     secure_vector<uint8_t> emsa3_encoding(InputMessageIterator first1, InputMessageIterator last1,
                                                           size_t output_bits) {
@@ -74,7 +74,7 @@ namespace nil {
                  * @brief * PKCS #1 v1.5 signature padding aka PKCS #1 block type 1 aka EMSA3 from IEEE 1363
                  * @tparam Hash
                  */
-                template<typename Hash>
+                template<typename Scheme, typename Hash>
                 struct emsa_pkcs1v15 : public emsa_pkcs1v15_base<Hash> {
                     template<typename InputIterator1, typename InputIterator2>
                     bool verify(InputIterator1 first1, InputIterator1 last1, InputIterator2 first2,
@@ -108,7 +108,7 @@ namespace nil {
                  * @tparam Hash
                  */
 
-                template<typename Hash>
+                template<typename Scheme, typename Hash>
                 struct emsa_pkcs1v15_raw : public emsa_pkcs1v15_base<Hash> {
                     template<typename InputIterator1, typename InputIterator2>
                     bool verify(InputIterator1 first1, InputIterator1 last1, InputIterator2 first2,

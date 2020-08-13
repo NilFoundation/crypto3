@@ -131,11 +131,11 @@ namespace nil {
                 }    // namespace detail
 
                 /*!
-         * @brief PSSR aka EMSA4 in IEEE 1363
-         * @tparam Hash
+                 * @brief PSSR aka EMSA4 in IEEE 1363
+                 * @tparam Hash
                  */
-                template<typename Hash>
-                struct emsa_pssr : public emsa<Hash> {
+                template<typename Scheme, typename Hash>
+                struct emsa_pssr : public emsa<Scheme, Hash> {
                     template<typename InputIterator1, typename InputIterator2>
                     bool verify(InputIterator1 first1, InputIterator1 last1, InputIterator2 first2,
                                 InputIterator2 last2, std::size_t key_bits) const {
@@ -269,9 +269,9 @@ namespace nil {
                         return ok;
                     }
                 };
-            }
-            }
-    }    // namespace crypto3
+            }    // namespace padding
+        }        // namespace pubkey
+    }            // namespace crypto3
 }    // namespace nil
 
 #endif
