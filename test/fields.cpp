@@ -47,8 +47,11 @@ BOOST_AUTO_TEST_SUITE(fields_manual_tests)
 
 BOOST_AUTO_TEST_CASE(fields_manual_test1) {
     
+    using value_type = fields::dsa_botan<2048, 2048>::value_type;
 
-    BOOST_CHECK_EQUAL("c12252ceda8be8994d5fa0290a47231c1d16aae3", "");
+    value_type e1 = value_type::one(), e2 = value_type::zero();
+
+    BOOST_CHECK_EQUAL(value_type::one(), e1 + e2);
 }
 
 
