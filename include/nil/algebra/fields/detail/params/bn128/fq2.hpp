@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef ALGEBRA_FIELDS_BN128_FR_PARAMS_HPP
-#define ALGEBRA_FIELDS_BN128_FR_PARAMS_HPP
+#ifndef ALGEBRA_FIELDS_BN128_FQ2_PARAMS_HPP
+#define ALGEBRA_FIELDS_BN128_FQ2_PARAMS_HPP
 
 #include <nil/algebra/fields/detail/params/params.hpp>
 
@@ -19,9 +19,9 @@ namespace nil {
                 BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(254)
 
                 template<std::size_t ModulusBits, std::size_t GeneratorBits = CHAR_BIT>
-                struct arithmetic_params<bn128_fr<ModulusBits, GeneratorBits>> : public params<bn128_fr<ModulusBits, GeneratorBits>> {
+                struct arithmetic_params<bn128_fq2<ModulusBits, GeneratorBits>> : public params<bn128_fq2<ModulusBits, GeneratorBits>> {
                     constexpr static const number_type q =
-                        10944121435919637611123202872628637544274182200208017171849102093287904247808_cppui254;
+                        10944121435919637611123202872628637544348155578648911831344518947322613104291_cppui254;
                 };
             
             }    // namespace detail
@@ -29,4 +29,4 @@ namespace nil {
     }    // namespace algebra
 }    // namespace nil
 
-#endif    // ALGEBRA_FIELDS_BN128_FR_PARAMS_HPP
+#endif    // ALGEBRA_FIELDS_BN128_FQ2_PARAMS_HPP

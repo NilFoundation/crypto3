@@ -23,52 +23,19 @@ namespace nil {
         namespace curves {
             namespace detail {
 
-                template <typename ModulusBits, typename GeneratorBits>
-                using params_type = arithmetic_params<fp<ModulusBits, GeneratorBits>>;
-
-                template <typename ModulusBits, typename GeneratorBits>
-                using modulus_type = params_type<ModulusBits, GeneratorBits>::modulus_type;
-
-                template <typename ModulusBits, typename GeneratorBits>
-                using fp_type = fp<ModulusBits, GeneratorBits>;
-
-                template <typename ModulusBits, typename GeneratorBits>
-                using value_type = element<fp_type<ModulusBits, GeneratorBits>>;
-
-                struct bn128_G1 {
-
-                    bn128_G1():bn128_G1(value_type::one(),value_type::one(),value_type::zero()){};
-
-                    bn128_G1(value_type X, value_type Y, value_type Z){
-                        coord[0] = X;
-                        coord[1] = Y;
-                        coord[2] = Z;
-                    }
-
-                    void to_affine_coordinates() {
-                        if (is_zero()) {
-                            coord[0] = value_type::zero();
-                            coord[1] = value_type::one();
-                            coord[2] = value_type::zero();
-                        } else {
-                            value_type r;
-                            r = coord[2];
-                            r.inverse();
-                            coord[2] = r.square();
-                            coord[0] *= coord[2];
-                            r *= coord[2];
-                            coord[1] *= r;
-                            coord[2] = value_type::one();
-                        }
-                    }
-
-                    void to_special() {
-                        to_affine_coordinates();
-                    }
+                <typename ModulusBits = 254, typename GeneratorBits = CHAR_BIT>
+                struct bn128_G1 : public element_bn128<bn128_fq<ModulusBits, GeneratorBits>::value_type>{
+                    using base_field = bn128_fq<ModulusBits, GeneratorBits>;
+                    using scalar_field = bn128_fr<ModulusBits, GeneratorBits>;
                     
-                    bool is_special() const {
-                        return (is_zero() || coord[2].is_one());
-                    }
+                    using value_type = base_field::value_type;
+                private:
+                    using policy_type = element_bn128<value_type>;
+                public:
+
+                    bn128_G1():policy_type(value_type::one(),value_type::one(),value_type::zero()){};
+
+                    bn128_G1(value_type X, value_type Y, value_type Z) : policy_type(X, Y, Z){};
 
                     bool is_zero() const {
                         return coord[2].is_zero();
@@ -94,44 +61,6 @@ namespace nil {
 
                     bool operator!=(const bn128_G1 &other) const {
                         return !(operator==(other));
-                    }
-
-                    bn128_G1 operator+(const bn128_G1 &other) const {
-                        // handle special cases having to do with O
-                        if (is_zero()) {
-                            return other;
-                        }
-
-                        if (other.is_zero()) {
-                            return *this;
-                        }
-
-                        // no need to handle points of order 2,4
-                        // (they cannot exist in a prime-order subgroup)
-
-                        // handle double case, and then all the rest
-                        if (operator==(other)) {
-                            return dbl();
-                        } else {
-                            return add(other);
-                        }
-                    }
-
-                    bn128_G1 operator-() const {
-                        bn128_G1 result(*this);
-                        neg(result.coord[1], result.coord[1]);
-                        return result;
-                    }
-
-                    bn128_G1 operator-(const bn128_G1 &other) const {
-                        return (*this) + (-other);
-                    }
-
-                    bn128_G1 add(const bn128_G1 &other) const {
-
-                        bn128_G1 result;
-                        detail::ECAdd(result.coord, coord, other.coord);
-                        return result;
                     }
 
                     bn128_G1 mixed_add(const bn128_G1 &other) const {
@@ -196,13 +125,6 @@ namespace nil {
                         return result;
                     }
 
-                    bn128_G1 dbl() const {
-
-                        bn128_G1 result;
-                        detail::ECDouble(result.coord, coord);
-                        return result;
-                    }
-
                     bool is_well_formed() const {
                         if (is_zero()) {
                             return true;
@@ -237,15 +159,15 @@ namespace nil {
                     static bn128_G1 one() {
                         return bn128_G1(1,2,1);
                     }
-
+                    
                     template<typename NumberType>
                     static NumberType base_field_char() {
-                        return base_field::field_char();
+                        return arithmetic_params<base_field>::q;
                     }
 
                     template<typename NumberType>
                     static NumberType order() {
-                        return scalar_field::field_char();
+                        return arithmetic_params<scalar_field>::q;
                     }
 
                     static void batch_to_special_all_non_zeros(std::vector<bn128_G1> &vec) {
@@ -269,28 +191,10 @@ namespace nil {
                     }
 
                 private:
-                    static value_type sqrt(const value_type &el) {
-                        return el.sqrt();
-                    }
-
-                    value_type coord[3];
-
-                    typedef bn128_Fq base_field;
-                    typedef bn128_Fr scalar_field;
-
                     /* additional parameters for square roots in Fq */
                     value_type bn128_coeff_b = value_type(3);
                 };
 
-                template<typename NumberType>
-                bn128_G1 operator*(const NumberType &lhs, const bn128_G1 &rhs) {
-                    return scalar_mul<bn128_G1, m>(rhs, lhs);
-                }
-
-                template<typename NumberType, const NumberType &modulus_p>
-                bn128_G1 operator*(const Fp_model<m, modulus_p> &lhs, const bn128_G1 &rhs) {
-                    return scalar_mul<bn128_G1, m>(rhs, lhs.as_bigint());
-                }
             }    // namespace detail
         }    // namespace curves
     }    // namespace algebra
