@@ -23,22 +23,10 @@ namespace nil {
             namespace detail {
 
                 template <typename ModulusBits, typename GeneratorBits>
-                using params_type = arithmetic_params<fp<ModulusBits, GeneratorBits>>;
+                using fp_value_type = element_fp<ModulusBits, GeneratorBits>;
 
                 template <typename ModulusBits, typename GeneratorBits>
-                using modulus_type = params_type<ModulusBits, GeneratorBits>::modulus_type;
-
-                template <typename ModulusBits, typename GeneratorBits>
-                using fp_type = fp<ModulusBits, GeneratorBits>;
-
-                template <typename ModulusBits, typename GeneratorBits>
-                using fp_value_type = element<fp_type<ModulusBits, GeneratorBits>>;
-
-                template <typename ModulusBits, typename GeneratorBits>
-                using fp2_type = fp2<ModulusBits, GeneratorBits>;
-
-                template <typename ModulusBits, typename GeneratorBits>
-                using fp2_value_type = element<fp2_type<ModulusBits, GeneratorBits>>;
+                using fp2_value_type = element_fp2<ModulusBits, GeneratorBits>;
 
                 struct bn128_ate_G1_precomp {
                     fp_value_type P[3];
@@ -48,7 +36,7 @@ namespace nil {
                     }
                 };
 
-                typedef bn::Fp6 bn128_ate_ell_coeffs;
+                typedef element_fp6_3over2 bn128_ate_ell_coeffs;
 
                 struct bn128_ate_G2_precomp {
                     fp2_value_type Q[3];
@@ -77,14 +65,14 @@ namespace nil {
                 bn128_ate_G1_precomp bn128_ate_precompute_G1(const bn128_G1 &P) {
 
                     bn128_ate_G1_precomp result;
-                    bn::ecop::NormalizeJac(result.P, P.coord);
+                    nil::algebra::pairing::detail::NormalizeJac(result.P, P.coord);
 
                     return result;
                 }
                 bn128_ate_G2_precomp bn128_ate_precompute_G2(const bn128_G2 &Q) {
 
                     bn128_ate_G2_precomp result;
-                    bn::components::precomputeG2(result.coeffs, result.Q, Q.coord);
+                    nil::algebra::pairing::precomputeG2(result.coeffs, result.Q, Q.coord);
 
                     return result;
                 }
@@ -94,13 +82,14 @@ namespace nil {
                                                         const bn128_ate_G1_precomp &prec_P2,
                                                         const bn128_ate_G2_precomp &prec_Q2) {
                     bn128_Fq12 f;
-                    bn::components::millerLoop2(f.elem, prec_Q1.coeffs, prec_P1.P, prec_Q2.coeffs, prec_P2.P);
+                    
+                    nil::algebra::pairing::millerLoop2(f.elem, prec_Q1.coeffs, prec_P1.P, prec_Q2.coeffs, prec_P2.P);
                     return f;
                 }
 
                 bn128_Fq12 bn128_ate_miller_loop(const bn128_ate_G1_precomp &prec_P, const bn128_ate_G2_precomp &prec_Q) {
                     bn128_Fq12 f;
-                    bn::components::millerLoop(f.elem, prec_Q.coeffs, prec_P.P);
+                    nil::algebra::pairing::millerLoop(f.elem, prec_Q.coeffs, prec_P.P);
                     return f;
                 }
 

@@ -22,18 +22,6 @@ namespace nil {
             namespace detail {
 
                 struct bn128_pp {
-                    typedef bn128_Fr Fp_type;
-                    typedef bn128_G1 G1_type;
-                    typedef bn128_G2 G2_type;
-                    typedef bn128_ate_G1_precomp G1_precomp_type;
-                    typedef bn128_ate_G2_precomp G2_precomp_type;
-                    typedef bn128_Fq Fq_type;
-                    typedef bn128_Fq12 Fqk_type;
-                    typedef bn128_GT GT_type;
-
-                    static void init_public_params() {
-                        init_bn128_params();
-                    }
 
                     static bn128_GT final_exponentiation(const bn128_Fq12 &elt) {
                         return bn128_final_exponentiation(elt);
@@ -55,9 +43,6 @@ namespace nil {
                         
                         return result;
                     }
-
-                private:
-                    static const bool has_affine_pairing = false;
                 };
                 
             }    // namespace detail
