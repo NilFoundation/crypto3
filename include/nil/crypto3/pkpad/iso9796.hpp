@@ -10,16 +10,14 @@
 #define CRYPTO3_ISO9796_HPP
 
 #include <nil/crypto3/pkpad/emsa.hpp>
-#include <nil/crypto3/pkpad/hash_id/hash_id.hpp>
-#include <nil/crypto3/pkpad/mgf1/mgf1.hpp>
-#include <nil/crypto3/utilities/ct_utils.hpp>
+#include <nil/crypto3/pkpad/mgf1.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
             namespace padding {
-                secure_vector<uint8_t> iso9796_encoding(const secure_vector<uint8_t> &msg, size_t output_bits,
-                                                        std::unique_ptr<HashFunction> &hash, size_t SALT_SIZE,
+                template<typename Hash>
+                secure_vector<uint8_t> iso9796_encoding(const secure_vector<uint8_t> &msg, size_t output_bits, size_t SALT_SIZE,
                                                         bool implicit, random_number_generator &rng) {
                     const size_t output_length = (output_bits + 7) / 8;
 
@@ -191,11 +189,8 @@ namespace nil {
             }    // namespace padding
         }        // namespace pubkey
 
-        template<typename Hasher>
-        class iso_9796 : public emsa<Hasher> {
-        public:
-            iso_9796(Hasher &hash) : emsa<Hasher>(hash) {
-            }
+        template<typename Scheme, typename Hash>
+struct  iso_9796 : public emsa<Scheme, Hash> {
 
         protected:
             template<typename InputIterator, typename OutputIterator>
@@ -375,12 +370,8 @@ namespace nil {
             }
         };
 
-        template<typename Hasher>
-        class iso_9796_ds2 : public iso_9796<Hasher> {
-        public:
-            iso_9796_ds2(Hasher &hash) : iso_9796<Hasher>(hash) {
-            }
-
+        template<typename Scheme, typename Hash>
+        struct  iso_9796_ds2 : public iso_9796<Scheme, Hash> {
             template<typename InputIterator1, typename InputIterator2>
             bool verify(InputIterator1 first1, InputIterator1 last1, InputIterator2 first2, InputIterator2 last2,
                         std::size_t key_bits) const {
@@ -393,12 +384,8 @@ namespace nil {
             }
         };
 
-        template<typename Hasher>
-        class iso_9796_ds3 : public iso_9796<Hasher> {
-        public:
-            iso_9796_ds3(Hasher &hash) : iso_9796<Hasher>(hash) {
-            }
-
+        template<typename Scheme, typename Hash>
+        struct iso_9796_ds3 : public iso_9796<Scheme, Hash> {
             template<typename InputIterator1, typename InputIterator2>
             bool verify(InputIterator1 first1, InputIterator1 last1, InputIterator2 first2, InputIterator2 last2,
                         std::size_t key_bits) const {
@@ -409,116 +396,6 @@ namespace nil {
             bool verify(const SinglePassRange1 &range1, const SinglePassRange2 &range2, std::size_t key_bits) const {
                 return verify(boost::begin(range1), boost::end(range1), boost::begin(range2), boost::end(range2), 0);
             }
-        };
-
-        /**
-         * ISO-9796-2 - Digital signature scheme 2 (probabilistic)
-         */
-        class ISO_9796_DS2 final : public emsa {
-        public:
-            /**
-             * @param hash function to use
-             * @param implicit whether or not the trailer is implicit
-             */
-            explicit ISO_9796_DS2(HashFunction *hash, bool implicit = false) :
-
-                m_hash(hash), m_implicit(implicit), m_SALT_SIZE(hash->output_length()) {
-            }
-
-            /**
-             * @param hash function to use
-             * @param implicit whether or not the trailer is implicit
-             * @param salt_size size of the salt to use in bytes
-             */
-            ISO_9796_DS2(HashFunction *hash, bool implicit, size_t salt_size) :
-
-                m_hash(hash), m_implicit(implicit), m_SALT_SIZE(salt_size) {
-            }
-
-            emsa *clone() override {
-                return new ISO_9796_DS2(m_hash->clone(), m_implicit, m_SALT_SIZE);
-            }
-
-            std::string name() const override {
-                return "ISO_9796_DS2(" + m_hash->name() + "," + (m_implicit ? "imp" : "exp") + "," +
-                       std::to_string(m_SALT_SIZE) + ")";
-            }
-
-        private:
-            void update(const uint8_t input[], size_t length) override {
-                // need to buffer message completely, before static_digest
-                m_msg_buffer.insert(m_msg_buffer.end(), input, input + length);
-            }
-
-            secure_vector<uint8_t> raw_data() override {
-                secure_vector<uint8_t> retbuffer = m_msg_buffer;
-                m_msg_buffer.clear();
-                return retbuffer;
-            }
-
-            secure_vector<uint8_t> encoding_of(const secure_vector<uint8_t> &msg, size_t output_bits,
-                                               random_number_generator &rng) override {
-                return iso9796_encoding(msg, output_bits, m_hash, m_SALT_SIZE, m_implicit, rng);
-            }
-
-            bool verify(const secure_vector<uint8_t> &coded, const secure_vector<uint8_t> &raw,
-                        size_t key_bits) override {
-                return iso9796_verification(const_coded, raw, key_bits, m_hash, m_SALT_SIZE);
-            }
-
-            std::unique_ptr<HashFunction> m_hash;
-            bool m_implicit;
-            size_t m_SALT_SIZE;
-            secure_vector<uint8_t> m_msg_buffer;
-        };
-
-        /**
-         * ISO-9796-2 - Digital signature scheme 3 (deterministic)
-         */
-        class ISO_9796_DS3 final : public emsa {
-        public:
-            /**
-             * @param hash function to use
-             * @param implicit whether or not the trailer is implicit
-             */
-            ISO_9796_DS3(HashFunction *hash, bool implicit = false) :
-
-                m_hash(hash), m_implicit(implicit) {
-            }
-
-            emsa *clone() override {
-                return new ISO_9796_DS3(m_hash->clone(), m_implicit);
-            }
-
-            std::string name() const override {
-                return "ISO_9796_DS3(" + m_hash->name() + "," + (m_implicit ? "imp" : "exp") + ")";
-            }
-
-        private:
-            void update(const uint8_t input[], size_t length) override {
-                // need to buffer message completely, before static_digest
-                m_msg_buffer.insert(m_msg_buffer.end(), input, input + length);
-            }
-
-            secure_vector<uint8_t> raw_data() override {
-                secure_vector<uint8_t> retbuffer = m_msg_buffer;
-                m_msg_buffer.clear();
-                return retbuffer;
-            }
-
-            secure_vector<uint8_t> encoding_of(const secure_vector<uint8_t> &msg, size_t output_bits,
-                                               random_number_generator &rng) override {
-                return iso9796_encoding(msg, output_bits, m_hash, 0, m_implicit, rng);
-            }
-
-            bool verify(const secure_vector<uint8_t> &coded, const secure_vector<uint8_t> &raw,
-                        size_t key_bits) override {
-                return iso9796_verification(const_coded, raw, key_bits, m_hash, 0);
-            }
-
-            std::unique_ptr<HashFunction> m_hash;
-            bool m_implicit;
-            secure_vector<uint8_t> m_msg_buffer;
         };
     }    // namespace crypto3
 }    // namespace nil
