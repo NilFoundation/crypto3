@@ -1,5 +1,5 @@
-# Verifiable Delay Functions {#vdf_index}
-@subpage vdf_introduction
-@subpage vdf_manual
-@subpage vdf_concepts
-@subpage chia_vdf_impl
+# Algebra {#algebra_index}
+@subpage algebra_introduction
+@subpage algebra_manual
+@subpage algebra_concepts
+@subpage algebra_impl
