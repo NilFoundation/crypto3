@@ -57,39 +57,27 @@ namespace nil {
                         state_vector_type A_vector(state_words);
                         for (std::size_t i = 0; i < state_words; i++)
                             A_vector[i] = A[i];
-
                         
                         // first half of full rounds
-                        for(std::size_t i = 0; i < half_full_rounds; i++) {
-                            // do_full_round(A, constants, round_number++);
-                            constants.arc_sbox_full_round(A_vector, round_number++);
-                            mds_matrix.product_with_mds_matrix(A_vector, A_vector);
-                        }
+                        for(std::size_t i = 0; i < half_full_rounds; i++)
+                            constants.arc_sbox_mds_full_round(A_vector, round_number++);
 
                         // partial rounds
-                        for(std::size_t i = 0; i < part_rounds; i++) {
-                            // do_part_round(A, constants, round_number++);
-                            constants.arc_sbox_part_round(A_vector, round_number++);
-                            mds_matrix.product_with_mds_matrix(A_vector, A_vector);
-                        }
+                        for(std::size_t i = 0; i < part_rounds; i++)
+                            constants.arc_sbox_mds_part_round(A_vector, round_number++);
                         
 
                         // second half of full rounds
-                        for(std::size_t i = 0; i < half_full_rounds; i++) {
-                            // do_full_round(A, constants, round_number++);
-                            constants.arc_sbox_full_round(A_vector, round_number++);
-                            mds_matrix.product_with_mds_matrix(A_vector, A_vector);
-                        }
+                        for(std::size_t i = 0; i < half_full_rounds; i++)
+                            constants.arc_sbox_mds_full_round(A_vector, round_number++);
 
                         for (std::size_t i = 0; i < state_words; i++)
                             A[i] = A_vector[i];
-
                     }
 
-                    // TODO: there is only round constants optimization. Matrix optimization need to be completed.
+
                     static inline void permute_optimized(state_type &A) {
                         constants_type constants;
-                        mds_matrix_type mds_matrix;
                         std::size_t round_number = 0;
 
                         state_vector_type A_vector(state_words);
@@ -98,31 +86,23 @@ namespace nil {
                         
                         // first half of full rounds
                         for(std::size_t i = 0; i < half_full_rounds; i++) {
-                            constants.arc_sbox_full_round_optimized_first(A_vector, round_number++);
-                            mds_matrix.product_with_mds_matrix(A_vector, A_vector);
+                            constants.arc_sbox_mds_full_round_optimized_first(A_vector, round_number++);
                         }
 
                         // partial rounds
-                        constants.arc_sbox_part_round_optimized_init(A_vector, round_number);
-                        constants.arc_part_round_optimized_init(A_vector, round_number++);
-                        mds_matrix.product_with_mds_matrix(A_vector, A_vector);
-                        for(std::size_t i = 1; i < part_rounds - 1; i++) {
-                            constants.sbox_arc_part_round_optimized(A_vector, round_number++);
-                            mds_matrix.product_with_mds_matrix(A_vector, A_vector);
-                            
+                        constants.arc_mds_part_round_optimized_init(A_vector, round_number);
+                        for(std::size_t i = 0; i < part_rounds - 1; i++) {
+                            constants.sbox_arc_mds_part_round_optimized(A_vector, round_number++);
                         }
-                        constants.sbox_part_round_optimized_last(A_vector, round_number++);
-                        mds_matrix.product_with_mds_matrix(A_vector, A_vector);
+                        constants.sbox_mds_part_round_optimized_last(A_vector, round_number++);
                         
                         // second half of full rounds
                         for(std::size_t i = 0; i < half_full_rounds; i++) {
-                            constants.arc_sbox_full_round_optimized_last(A_vector, round_number++);
-                            mds_matrix.product_with_mds_matrix(A_vector, A_vector);
+                            constants.arc_sbox_mds_full_round_optimized_last(A_vector, round_number++);
                         }
 
                         for (std::size_t i = 0; i < state_words; i++)
                             A[i] = A_vector[i];
-
                     }
                 };
             }    // namespace detail

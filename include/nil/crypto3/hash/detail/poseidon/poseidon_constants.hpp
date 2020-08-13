@@ -12,8 +12,9 @@
 #include <nil/crypto3/hash/detail/poseidon/poseidon_policy.hpp>
 #include <nil/crypto3/hash/detail/poseidon/poseidon_mds_matrix.hpp>
 
-
 #include <boost/assert.hpp>
+
+#include <bitset>
 
 
 namespace nil {
@@ -37,71 +38,85 @@ namespace nil {
                     constexpr static std::size_t const part_rounds = policy_type::part_rounds;
 
                     constexpr static std::size_t const round_constants_size = (full_rounds + part_rounds) * state_words;
-                    typedef state_vector_type round_constants_type;
-
                     constexpr static std::size_t const equivalent_round_constants_size = (full_rounds + 1) * state_words + part_rounds - 1;
-                    typedef state_vector_type equivalent_round_constants_type;
+                    typedef state_vector_type round_constants_type;
 
                     constexpr static std::size_t const word_bits = policy_type::word_bits;
 
-                    inline void arc_sbox_full_round_optimized_first(state_vector_type &A, std::size_t round_number) {
-                        BOOST_ASSERT_MSG(round_number < half_full_rounds, "error: arc_sbox_full_round_optimized_first");
+                    /*
+                    * =============================================================================================================
+                    * Optimized
+                    * =============================================================================================================
+                    */
+
+                    inline void arc_sbox_mds_full_round_optimized_first(state_vector_type &A, std::size_t round_number) {
+                        BOOST_ASSERT_MSG(round_number < half_full_rounds, "wrong using: arc_sbox_mds_full_round_optimized_first");
                         std::size_t constant_number_base = round_number * state_words;
                         for (std::size_t i = 0; i < state_words; i++) {
                             A[i] += get_equivalent_round_constant(constant_number_base + i);
                             A[i] = A[i] * A[i] * A[i] * A[i] * A[i];
                         }
+                        mds_matrix.product_with_mds_matrix(A, A);
                     }
 
-                    inline void arc_sbox_full_round_optimized_last(state_vector_type &A, std::size_t round_number) {
-                        BOOST_ASSERT_MSG(round_number >= half_full_rounds + part_rounds, "error: arc_sbox_full_round_optimized_last");
+                    inline void arc_sbox_mds_full_round_optimized_last(state_vector_type &A, std::size_t round_number) {
+                        BOOST_ASSERT_MSG(round_number >= half_full_rounds + part_rounds, "wrong using: arc_sbox_mds_full_round_optimized_last");
                         std::size_t constant_number_base = (half_full_rounds + 1) * state_words + (part_rounds - 1)
                                                         + (round_number - half_full_rounds - part_rounds) * state_words;
                         for (std::size_t i = 0; i < state_words; i++) {
                             A[i] += get_equivalent_round_constant(constant_number_base + i);
                             A[i] = A[i] * A[i] * A[i] * A[i] * A[i];
                         }
+                        mds_matrix.product_with_mds_matrix(A, A);
                     }
 
-                    inline void arc_sbox_part_round_optimized_init(state_vector_type &A, std::size_t round_number) {
-                        BOOST_ASSERT_MSG(round_number == half_full_rounds, "error: arc_sbox_part_round_optimized_init");
+                    inline void arc_mds_part_round_optimized_init(state_vector_type &A, std::size_t round_number) {
+                        BOOST_ASSERT_MSG(round_number == half_full_rounds, "wrong using: arc_mds_part_round_optimized_init");
                         std::size_t constant_number_base = half_full_rounds * state_words;
                         for (std::size_t i = 0; i < state_words; i++) {
                             A[i] += get_equivalent_round_constant(constant_number_base + i);
                         }
-                        A[0] = A[0] * A[0] * A[0] * A[0] * A[0];
+                        mds_matrix.product_with_equivalent_mds_matrix_init(A, A, round_number);
                     }
 
-                    inline void arc_part_round_optimized_init(state_vector_type &A, std::size_t round_number) {
-                        BOOST_ASSERT_MSG(round_number == half_full_rounds, "error: arc_part_round_optimized_init");
-                        std::size_t constant_number_base = half_full_rounds * state_words + state_words;
-                        A[0] += get_equivalent_round_constant(constant_number_base);
-                    }
-
-                    inline void sbox_arc_part_round_optimized(state_vector_type &A, std::size_t round_number) {
-                        BOOST_ASSERT_MSG(round_number > half_full_rounds
-                                        && round_number < half_full_rounds + part_rounds - 1, "error: arc_sbox_part_round_optimized");
+                    inline void sbox_arc_mds_part_round_optimized(state_vector_type &A, std::size_t round_number) {
+                        BOOST_ASSERT_MSG(round_number >= half_full_rounds
+                                        && round_number < half_full_rounds + part_rounds - 1, "wrong using: sbox_arc_mds_part_round_optimized");
                         std::size_t constant_number_base = (half_full_rounds + 1) * state_words + (round_number - half_full_rounds - 1) + 1;
                         A[0] = A[0] * A[0] * A[0] * A[0] * A[0];
                         A[0] += get_equivalent_round_constant(constant_number_base);
+                        mds_matrix.product_with_equivalent_mds_matrix(A, A, round_number);
                     }
 
-                    inline void sbox_part_round_optimized_last(state_vector_type &A, std::size_t round_number) {
-                        BOOST_ASSERT_MSG(round_number == half_full_rounds + part_rounds - 1, "error: sbox_part_round_optimized_last");
+                    inline void sbox_mds_part_round_optimized_last(state_vector_type &A, std::size_t round_number) {
+                        BOOST_ASSERT_MSG(round_number == half_full_rounds + part_rounds - 1, "wrong using: sbox_mds_part_round_optimized_last");
                         A[0] = A[0] * A[0] * A[0] * A[0] * A[0];
+                        mds_matrix.product_with_equivalent_mds_matrix(A, A, round_number);
                     }
 
-                    inline void arc_sbox_full_round(state_vector_type &A, std::size_t round_number) {
+                    /*
+                    * =============================================================================================================
+                    * Default
+                    * =============================================================================================================
+                    */
+
+                    inline void arc_sbox_mds_full_round(state_vector_type &A, std::size_t round_number) {
+                        BOOST_ASSERT_MSG(round_number < half_full_rounds
+                                        || round_number >= half_full_rounds + part_rounds, "wrong using: arc_sbox_mds_full_round");
                         for (std::size_t i = 0; i < state_words; i++) {
                             A[i] += get_round_constant(round_number * state_words + i);
                             A[i] = A[i] * A[i] * A[i] * A[i] * A[i];
                         }
+                        mds_matrix.product_with_mds_matrix(A, A);
                     }
 
-                    inline void arc_sbox_part_round(state_vector_type &A, std::size_t round_number) {
+                    inline void arc_sbox_mds_part_round(state_vector_type &A, std::size_t round_number) {
+                        BOOST_ASSERT_MSG(round_number >= half_full_rounds
+                                        && round_number < half_full_rounds + part_rounds, "wrong using: arc_sbox_mds_part_round");
                         for (std::size_t i = 0; i < state_words; i++)
                             A[i] += get_round_constant(round_number * state_words + i);
                         A[0] = A[0] * A[0] * A[0] * A[0] * A[0];
+                        mds_matrix.product_with_mds_matrix(A, A);
                     }
 
                 // private:
@@ -114,10 +129,9 @@ namespace nil {
                     }
 
                     // See https://extgit.iaik.tugraz.at/krypto/hadeshash/-/blob/d9382dbd933cc559bd12ee3fa7d32ea934ace43d/code/poseidonperm_x3_64_24_optimized.sage#L40
-                    inline equivalent_round_constants_type const &generate_equivalent_round_constants() {
-                        static equivalent_round_constants_type const equivalent_round_constants = [this](){
-                            // cout << "generate_equivalent_round_constants" << '\n';
-                            equivalent_round_constants_type equivalent_round_constants(equivalent_round_constants_size);
+                    inline round_constants_type const &generate_equivalent_round_constants() {
+                        static round_constants_type const equivalent_round_constants = [this](){
+                            round_constants_type equivalent_round_constants(equivalent_round_constants_size);
                             mds_matrix_type mds_matrix;
                             round_constants_type round_constants = generate_round_constants();
                             state_vector_type inv_cip1(state_words);
@@ -161,7 +175,6 @@ namespace nil {
 
                     inline round_constants_type const &generate_round_constants() {
                         static round_constants_type const round_constants = [this](){
-                            // cout << "generate_round_constants" << '\n';
                             round_constants_type round_constants(round_constants_size);
                             lfsr_state_init();
                             for (std::size_t i = 0; i < round_constants_size; i++)
@@ -227,6 +240,8 @@ namespace nil {
                         lfsr_state[lfsr_state_len - 1] = next_v;
                         return next_v;
                     }
+
+                    mds_matrix_type mds_matrix;
                 };
 
             }    // namespace detail

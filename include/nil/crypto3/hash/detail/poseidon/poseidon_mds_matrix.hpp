@@ -10,6 +10,7 @@
 #define CRYPTO3_HASH_POSEIDON_MDS_MATRIX_HPP
 
 #include <nil/crypto3/hash/detail/poseidon/poseidon_policy.hpp>
+#include <nil/algebra/fields/operations.hpp>
 
 #include <boost/assert.hpp>
 #include <boost/numeric/ublas/vector.hpp>
@@ -25,10 +26,16 @@ namespace nil {
                     typedef poseidon_policy<field_type, element_type, t, strength> policy_type;
 
                     constexpr static std::size_t const state_words = policy_type::state_words;
-                    typedef typename policy_type::state_type state_type;
+                    constexpr static std::size_t const half_full_rounds = policy_type::half_full_rounds;
+                    constexpr static std::size_t const part_rounds = policy_type::part_rounds;
 
                     typedef boost::numeric::ublas::matrix<element_type> mds_matrix_type;
                     typedef boost::numeric::ublas::vector<element_type> state_vector_type;
+                    typedef std::array<state_vector_type, part_rounds> subvectors_collection;
+                    // (M', M_0_0, w_hat_list, v_list)
+                    enum : std::size_t { M_i, M_0_0, w_hat_list, v_list };
+                    typedef std::tuple<mds_matrix_type, element_type, subvectors_collection,
+                        subvectors_collection> equivalent_mds_matrix_type;
 
                     inline void product_with_mds_matrix(state_vector_type const &A_vector_in, state_vector_type &A_vector_out) const {
                         A_vector_out = boost::numeric::ublas::prod(A_vector_in, get_mds_matrix());
@@ -38,10 +45,31 @@ namespace nil {
                         A_vector_out = boost::numeric::ublas::prod(A_vector_in, get_inverse_mds_matrix());
                     }
 
+                    inline void product_with_equivalent_mds_matrix_init(state_vector_type const &A_vector_in, state_vector_type &A_vector_out, std::size_t round_number) const {
+                        BOOST_ASSERT_MSG(round_number == half_full_rounds, "wrong using: product_with_equivalent_mds_matrix_init");
+                        A_vector_out = boost::numeric::ublas::prod(A_vector_in, std::get<M_i>(get_equivalent_mds_matrix()));
+                    }
+
+
+                    inline void product_with_equivalent_mds_matrix(state_vector_type const &A_vector_in, state_vector_type &A_vector_out, std::size_t round_number) const {
+                        BOOST_ASSERT_MSG(round_number >= half_full_rounds && round_number < half_full_rounds + part_rounds, "wrong using: product_with_equivalent_mds_matrix");
+                        equivalent_mds_matrix_type const equivalent_mds_matrix = get_equivalent_mds_matrix();
+                        std::size_t const matrix_number_base = part_rounds - (round_number - half_full_rounds) - 1;
+                        state_vector_type temp_vector(state_words);
+                        element_type A_0 = A_vector_in[0];
+                        temp_vector[0] = std::get<M_0_0>(equivalent_mds_matrix);
+                        boost::numeric::ublas::subrange(temp_vector, 1, temp_vector.size()) =
+                            std::get<w_hat_list>(equivalent_mds_matrix)[matrix_number_base];
+                        // if (round_number == half_full_rounds)
+                        //     cout << temp_vector << '\n' << '\n' << '\n' ;
+                        A_vector_out[0] = boost::numeric::ublas::inner_prod(A_vector_in, temp_vector);
+                        for (std::size_t i = 1; i < state_words; i++)
+                            A_vector_out[i] = A_0 * std::get<v_list>(equivalent_mds_matrix)[matrix_number_base][i - 1] + A_vector_in[i];
+                    }
+
                 // private:
                     // See http://www.crystalclearsoftware.com/cgi-bin/boost_wiki/wiki.pl?LU_Matrix_Inversion
                     inline bool InvertMatrix(mds_matrix_type const &mds_matrix, mds_matrix_type &inverse) const {
-                        // mds_matrix_type mds_matrix = get_mds_matrix();
                         mds_matrix_type mds_matrix_temp(mds_matrix);
                         // using namespace boost::numeric::ublas;
                         typedef boost::numeric::ublas::permutation_matrix<std::size_t> pmatrix;
@@ -74,9 +102,12 @@ namespace nil {
                             mds_matrix_type mds_matrix(state_words, state_words);
                             for (std::size_t i = 0; i < state_words; i++) {
                                 for (std::size_t j = 0; j < state_words; j++) {
-                                    mds_matrix.insert_element(i, j, field_type(
-                                        cpp_int(i + (j + state_words))
-                                    ).get_inverse());
+                                    // mds_matrix.insert_element(i, j, field_type(
+                                    //     cpp_int(i + (j + state_words))
+                                    // ).get_inverse());
+                                    mds_matrix.insert_element(i, j,
+                                        algebra::invert<typename element_type::type, field_type>(element_type(i + j + state_words))
+                                    );
                                 }
                             }
                             return mds_matrix;
@@ -84,10 +115,38 @@ namespace nil {
                         return mds_matrix;
                     }
 
-                    // inline 
+                    inline equivalent_mds_matrix_type const &get_equivalent_mds_matrix() const {
+                        static equivalent_mds_matrix_type const equivalent_mds_matrix = [this](){
+                            mds_matrix_type const mds_matrix = get_mds_matrix();
+                            mds_matrix_type M_mul(mds_matrix);
+                            mds_matrix_type M_i(
+                                boost::numeric::ublas::identity_matrix<element_type>(M_mul.size1()));
+                            mds_matrix_type M_hat_inverse(state_words - 1, state_words - 1);
+                            subvectors_collection w_hat_list;
+                            subvectors_collection v_list;
+                            for (std::size_t i = 0; i < part_rounds; i++) {
+                                InvertMatrix(boost::numeric::ublas::subrange(M_mul, 1, M_mul.size1(), 1, M_mul.size2()),
+                                    M_hat_inverse);
+                                // if (i < 10)
+                                //     cout << M_mul << '\n' << '\n' << '\n' ;
+                                w_hat_list[i] = boost::numeric::ublas::prod(M_hat_inverse,
+                                    boost::numeric::ublas::subrange(
+                                        boost::numeric::ublas::column(M_mul, 0), 1, M_mul.size1()));
+                                
+                                v_list[i] = boost::numeric::ublas::subrange(
+                                    boost::numeric::ublas::row(M_mul, 0), 1, M_mul.size2());
+                                // if (i < 10)
+                                //     cout << w_hat_list[i] << '\n' << '\n' << '\n' ;
+                                boost::numeric::ublas::subrange(M_i, 1, M_i.size1(), 1, M_i.size2()) =
+                                    boost::numeric::ublas::subrange(M_mul, 1, M_mul.size1(), 1, M_mul.size2());
+                                M_mul = boost::numeric::ublas::prod(mds_matrix, M_i);
+                            }
+                            // cout << M_i << '\n' << '\n' << '\n' ;
+                            return equivalent_mds_matrix_type{M_i, mds_matrix(0, 0), w_hat_list, v_list};
+                        }();
+                        return equivalent_mds_matrix;
+                    }
                 };
-
-
             }    // namespace detail
         }        // namespace hashes
     }            // namespace crypto3
