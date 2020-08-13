@@ -24,6 +24,9 @@ namespace nil {
 
                 template<std::size_t ModulusBits, std::size_t GeneratorBits>
                 struct element_fp3 : public element<fp3<ModulusBits, GeneratorBits>>  {
+                private:
+                    typedef element<fp3<ModulusBits, GeneratorBits>> policy_type;
+                public:
 
                     using underlying_type = element_fp<ModulusBits, GeneratorBits>;
 

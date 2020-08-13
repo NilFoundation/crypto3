@@ -20,7 +20,7 @@ namespace nil {
 
                 template<std::size_t ModulusBits, std::size_t GeneratorBits>
                 struct element_modp_ietf : public element_fp<ModulusBits, GeneratorBits> {
-                }
+                };
                 
             }   // namespace detail
         }   // namespace fields

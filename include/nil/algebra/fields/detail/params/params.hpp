@@ -18,7 +18,7 @@ namespace nil {
                 template<typename FieldType>
                 struct params {
                     typedef FieldType field_type;
-                    typedef typename field_type::number_type number_type;
+                    typedef typename field_type::modulus_type number_type;
 
                     constexpr static const std::size_t modulus_bits = field_type::modulus_bits;
                     typedef typename field_type::modulus_type modulus_type;
@@ -34,8 +34,11 @@ namespace nil {
 
                 template<typename FieldType>
                 struct arithmetic_params : public params<FieldType> {
+                private:
+                    typedef params<FieldType> policy_type;
+                public:
 
-                    constexpr static const number_type q = (modulus - 1) / 2;
+                    constexpr static const typename policy_type::number_type q = (policy_type::modulus - 1) / 2;
                 };
 
             }    // namespace detail

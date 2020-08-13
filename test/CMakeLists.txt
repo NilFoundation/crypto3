@@ -39,7 +39,11 @@ macro(define_algebra_test name)
     endif()
 endmacro()
 
-set(TESTS_NAMES "fields" "groups" "bilinearity")
+set(TESTS_NAMES 
+"fields"
+#"groups"
+#"bilinearity"
+)
 
 foreach(TEST_NAME ${TESTS_NAMES})
     define_algebra_test(${TEST_NAME})

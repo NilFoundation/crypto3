@@ -11,7 +11,7 @@
 #define ALGEBRA_FIELDS_ELEMENT_BN128_FQ_HPP
 
 #include <nil/algebra/fields/detail/element/fp.hpp>
-#include <nil/algebra/fields/bn128_fq.hpp>
+#include <nil/algebra/fields/bn128/fq.hpp>
 
 namespace nil {
     namespace algebra {
@@ -20,7 +20,7 @@ namespace nil {
 
                 template<std::size_t ModulusBits, std::size_t GeneratorBits>
                 struct element_bn128_fq : public element_fp<ModulusBits, GeneratorBits> {
-                }
+                };
                 
             }   // namespace detail
         }   // namespace fields

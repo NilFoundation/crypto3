@@ -28,11 +28,12 @@ namespace nil {
              * @tparam ModulusBits
              * @tparam GeneratorBits
              */
-            template<std::size_t ModulusBits, std::size_t GeneratorBits = 8>
+            template<std::size_t ModulusBits, std::size_t GeneratorBits>
             struct ffdhe_ietf : public fp<ModulusBits, GeneratorBits> { };
 
-            struct ffdhe_ietf<2048> : public fp<2048, 8> {
-                typedef fp<2048, 8> policy_type;
+            template <>
+            struct ffdhe_ietf<2048, CHAR_BIT> : public fp<2048, CHAR_BIT> {
+                typedef fp<2048, CHAR_BIT> policy_type;
 
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                 typedef typename policy_type::modulus_type modulus_type;
@@ -50,8 +51,8 @@ namespace nil {
                 constexpr static const std::size_t arity = 1;
             };
 
-            struct ffdhe_ietf<3072> : public fp<3072, 8> {
-                typedef fp<3072, 8> policy_type;
+            struct ffdhe_ietf<3072> : public fp<3072, CHAR_BIT> {
+                typedef fp<3072, CHAR_BIT> policy_type;
 
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                 typedef typename policy_type::modulus_type modulus_type;

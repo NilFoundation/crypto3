@@ -32,7 +32,8 @@ namespace nil {
             template<std::size_t ModulusBits, std::size_t GeneratorBits>
             struct modp_ietf : public fp<ModulusBits, GeneratorBits> { };
 
-            struct modp_ietf<1024> : public fp<1024, CHAR_BIT> {
+            template <>
+            struct modp_ietf<1024, CHAR_BIT> : public fp<1024, CHAR_BIT> {
                 typedef fp<1024, CHAR_BIT> policy_type;
 
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
@@ -51,7 +52,8 @@ namespace nil {
                 constexpr static const std::size_t arity = 1;
             };
 
-            struct modp_ietf<1536> : public fp<1536, CHAR_BIT> {
+            template <>
+            struct modp_ietf<1536, CHAR_BIT> : public fp<1536, CHAR_BIT> {
                 typedef fp<1536, CHAR_BIT> policy_type;
 
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
@@ -70,7 +72,8 @@ namespace nil {
                 constexpr static const std::size_t arity = 1;
             };
 
-            struct modp_ietf<2048> : public fp<2048, CHAR_BIT> {
+            template <>
+            struct modp_ietf<2048, CHAR_BIT> : public fp<2048, CHAR_BIT> {
                 typedef fp<2048, CHAR_BIT> policy_type;
 
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
@@ -89,7 +92,8 @@ namespace nil {
                 constexpr static const std::size_t arity = 1;
             };
 
-            struct modp_ietf<3072> : public fp<3072, CHAR_BIT> {
+            template <>
+            struct modp_ietf<3072, CHAR_BIT> : public fp<3072, CHAR_BIT> {
                 typedef fp<3072, CHAR_BIT> policy_type;
 
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
@@ -108,7 +112,8 @@ namespace nil {
                 constexpr static const std::size_t arity = 1;
             };
 
-            struct modp_ietf<4096> : public fp<4096, CHAR_BIT> {
+            template <>
+            struct modp_ietf<4096, CHAR_BIT> : public fp<4096, CHAR_BIT> {
                 typedef fp<4096, CHAR_BIT> policy_type;
 
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
@@ -127,7 +132,8 @@ namespace nil {
                 constexpr static const std::size_t arity = 1;
             };
 
-            struct modp_ietf<6144> : public fp<6144, CHAR_BIT> {
+            template <>
+            struct modp_ietf<6144, CHAR_BIT> : public fp<6144, CHAR_BIT> {
                 typedef fp<6144, CHAR_BIT> policy_type;
 
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
@@ -146,7 +152,8 @@ namespace nil {
                 constexpr static const std::size_t arity = 1;
             };
 
-            struct modp_ietf<8192> : public fp<8192, CHAR_BIT> {
+            template <>
+            struct modp_ietf<8192, CHAR_BIT> : public fp<8192, CHAR_BIT> {
                 typedef fp<8192, CHAR_BIT> policy_type;
 
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;

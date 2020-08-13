@@ -24,10 +24,11 @@ namespace nil {
              * @tparam ModulusBits
              * @tparam GeneratorBits
              */
-            template<std::size_t ModulusBits, std::size_t GeneratorBits>
+            template<std::size_t ModulusBits, std::size_t GeneratorBits = CHAR_BIT>
             struct bn128_fq : public fp<ModulusBits, GeneratorBits> { };
 
-            struct bn128_fq<254, CHAR_BIT> : public fp<254, CHAR_BIT> {
+            template <>
+            struct bn128_fq<254> : public fp<254, CHAR_BIT> {
                 typedef fp<254, CHAR_BIT> policy_type;
 
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;

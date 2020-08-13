@@ -10,13 +10,15 @@
 #ifndef ALGEBRA_FIELDS_ELEMENT_HPP
 #define ALGEBRA_FIELDS_ELEMENT_HPP
 
+#include <nil/algebra/fields/detail/params/params.hpp>
+
 namespace nil {
     namespace algebra {
     	namespace fields {
 
 	        template<typename Field>
 	        struct element {
-	        	typedef arithmetic_params<Field> params_type;
+	        	typedef detail::arithmetic_params<Field> params_type;
 	        };
 	        
         }   // namespace fields

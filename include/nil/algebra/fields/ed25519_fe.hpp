@@ -9,8 +9,6 @@
 #ifndef CRYPTO3_ALGEBRA_ED25519_FE_HPP
 #define CRYPTO3_ALGEBRA_ED25519_FE_HPP
 
-#include <nil/crypto3/utilities/memory_operations.hpp>
-
 namespace nil {
     namespace algebra {
         namespace fields {

@@ -20,23 +20,24 @@ namespace nil {
 
                 template<std::size_t ModulusBits, std::size_t GeneratorBits>
                 struct element_fp : public element<fp<ModulusBits, GeneratorBits>> {
+                
+                private:
+                    typedef element<fp<ModulusBits, GeneratorBits>> policy_type;
+                public:
 
-                    typedef params_type::modulus_type modulus_type;
+                    typedef typename policy_type::params_type::modulus_type modulus_type;
 
                     using type = modulus_type;
 
-                private:
-
                     type data;
 
-                public:
-                    element_fp(type data) : data(data);
+                    element_fp(type data) : data(data){};
 
-                    inline static element_fp zero() const {
+                    inline static element_fp zero() {
                         return element_fp(type(0));
                     }
 
-                    inline static element_fp one() const {
+                    inline static element_fp one() {
                         return element_fp(type(1));
                     }
 

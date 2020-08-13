@@ -25,7 +25,9 @@ namespace nil {
 
                 template<std::size_t ModulusBits, std::size_t GeneratorBits>
                 struct element_fp12_2over3over2 : public element<fp12_2over3over2<ModulusBits, GeneratorBits>> {
-
+                private:
+                    typedef element<fp12_2over3over2<ModulusBits, GeneratorBits>> policy_type;
+                public:
 
                     using underlying_type = element_fp6_3over2<ModulusBits, GeneratorBits>;
 

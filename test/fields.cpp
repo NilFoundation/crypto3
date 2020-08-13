@@ -16,22 +16,17 @@
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
 
-#include <nil/algebra/curves/curve.hpp>
-#include <nil/algebra/curves/curve_gfp.hpp>
-
 #include <nil/algebra/fields/bn128/fq.hpp>
 #include <nil/algebra/fields/bn128/fr.hpp>
 #include <nil/algebra/fields/detail/params/bn128/fq.hpp>
 #include <nil/algebra/fields/detail/params/bn128/fr.hpp>
 #include <nil/algebra/fields/detail/params/dsa_botan.hpp>
 #include <nil/algebra/fields/detail/params/dsa_jce.hpp>
-#include <nil/algebra/fields/detail/params/fp2.hpp>
-#include <nil/algebra/fields/detail/params/fp3.hpp>
 #include <nil/algebra/fields/detail/params/modp_srp.hpp>
 #include <nil/algebra/fields/detail/params/params.hpp>
 #include <nil/algebra/fields/dsa_botan.hpp>
-#include <nil/algebra/fields/dsa_jse.hpp>
-#include <nil/algebra/fields/ed25519_fe.hpp>
+#include <nil/algebra/fields/dsa_jce.hpp>
+//#include <nil/algebra/fields/ed25519_fe.hpp>
 #include <nil/algebra/fields/element.hpp>
 #include <nil/algebra/fields/ffdhe_ietf.hpp>
 #include <nil/algebra/fields/fp.hpp>
@@ -43,10 +38,24 @@
 #include <nil/algebra/fields/fp12_2over3over2.hpp>
 #include <nil/algebra/fields/modp_ietf.hpp>
 #include <nil/algebra/fields/modp_srp.hpp>
-#include <nil/algebra/fields/operations.hpp>
 
 using namespace nil::algebra;
 
+
+BOOST_AUTO_TEST_SUITE(fields_manual_tests)
+
+
+BOOST_AUTO_TEST_CASE(fields_manual_test1) {
+    
+
+    BOOST_CHECK_EQUAL("c12252ceda8be8994d5fa0290a47231c1d16aae3", "");
+}
+
+
+BOOST_AUTO_TEST_SUITE_END()
+
+
+/*
 template<typename FieldT, typename NumberType>
 void test_field() {
     NumberType rand1  = NumberType ("76749407");
@@ -260,3 +269,4 @@ int main(void) {
     test_field<Fr<bn128_pp>>();
     test_field<Fq<bn128_pp>>();
 }
+*/

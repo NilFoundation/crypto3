@@ -20,6 +20,7 @@ namespace nil {
             struct basic_params;
 
             BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(2048)
+            BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(3072)
 
             /*!
              * @brief DSA group
@@ -29,7 +30,8 @@ namespace nil {
             template<std::size_t ModulusBits, std::size_t GeneratorBits>
             struct dsa_botan : public fp<ModulusBits, GeneratorBits> { };
 
-            struct dsa_botan<2048> : public fp<2048, 2048> {
+            template <>
+            struct dsa_botan<2048, 2048> : public fp<2048, 2048> {
                 typedef fp<2048, 2048> policy_type;
 
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
@@ -49,7 +51,8 @@ namespace nil {
                 constexpr static const std::size_t arity = 1;
             };
 
-            struct dsa_botan<3072> : public fp<3072, 3072> {
+            template <>
+            struct dsa_botan<3072, 3072> : public fp<3072, 3072> {
                 typedef fp<3072, 3072> policy_type;
 
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;

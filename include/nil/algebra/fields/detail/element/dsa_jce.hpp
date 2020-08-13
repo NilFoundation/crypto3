@@ -7,11 +7,11 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef ALGEBRA_FIELDS_ELEMENT_DSA_JSE_HPP
-#define ALGEBRA_FIELDS_ELEMENT_DSA_JSE_HPP
+#ifndef ALGEBRA_FIELDS_ELEMENT_DSA_JCE_HPP
+#define ALGEBRA_FIELDS_ELEMENT_DSA_JCE_HPP
 
 #include <nil/algebra/fields/detail/element/fp.hpp>
-#include <nil/algebra/fields/dsa_jse.hpp>
+#include <nil/algebra/fields/dsa_jce.hpp>
 
 namespace nil {
     namespace algebra {
@@ -19,12 +19,12 @@ namespace nil {
             namespace detail {
 
                 template<std::size_t ModulusBits, std::size_t GeneratorBits>
-                struct element_dsa_jse : public element_fp<ModulusBits, GeneratorBits> {
-                }
+                struct element_dsa_jce : public element_fp<ModulusBits, GeneratorBits> {
+                };
                 
             }   // namespace detail
         }   // namespace fields
     }    // namespace algebra
 }    // namespace nil
 
-#endif    // ALGEBRA_FIELDS_ELEMENT_DSA_JSE_HPP
+#endif    // ALGEBRA_FIELDS_ELEMENT_DSA_JCE_HPP

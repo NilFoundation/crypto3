@@ -22,7 +22,10 @@ namespace nil {
             	
                 template<std::size_t ModulusBits, std::size_t GeneratorBits = CHAR_BIT>
                 struct arithmetic_params<modp_srp<ModulusBits, GeneratorBits>> : public params<modp_srp<ModulusBits, GeneratorBits>> {
-                    constexpr static const number_type q = 0;
+                private:
+                    typedef params<modp_srp<ModulusBits, GeneratorBits>> policy_type;
+                public:
+                    constexpr static const typename policy_type::number_type q = 0;
                 };
             
             }    // namespace detail
