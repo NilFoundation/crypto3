@@ -10,10 +10,11 @@
 #ifndef ALGEBRA_FIELDS_FP2_HPP
 #define ALGEBRA_FIELDS_FP2_HPP
 
-#include <nil/algebra/fields/element.hpp>
-#include <nil/algebra/fields/fp.hpp>
+#include <boost/multiprecision/number.hpp>
+#include <boost/multiprecision/cpp_int.hpp>
 
-#include <nil/algebra/fields/detail/exponentiation.hpp>
+#include <nil/algebra/fields/element.hpp>
+#include <nil/algebra/fields/detail/element/fp.hpp>
 
 namespace nil {
     namespace algebra {
@@ -29,7 +30,7 @@ namespace nil {
              */
             template<std::size_t ModulusBits, std::size_t GeneratorBits>
             struct fp2 {
-                typedef fp<number_type> non_residue_type;
+                typedef detail::element_fp<ModulusBits, GeneratorBits> non_residue_type;
 
                 constexpr static const std::size_t modulus_bits = ModulusBits;
                 typedef boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<

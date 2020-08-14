@@ -10,7 +10,7 @@
 #ifndef ALGEBRA_FIELDS_ELEMENT_FP4_HPP
 #define ALGEBRA_FIELDS_ELEMENT_FP4_HPP
 
-#include <nil/algebra/fields/detail/element.hpp>
+#include <nil/algebra/fields/element.hpp>
 #include <nil/algebra/fields/detail/element/fp.hpp>
 #include <nil/algebra/fields/detail/element/fp2.hpp>
 

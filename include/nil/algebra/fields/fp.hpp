@@ -13,8 +13,6 @@
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/cpp_int.hpp>
 
-#include <nil/algebra/fields/detail/exponentiation.hpp>
-
 namespace nil {
     namespace algebra {
         namespace fields {

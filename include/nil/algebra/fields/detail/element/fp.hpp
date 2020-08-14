@@ -25,28 +25,28 @@ namespace nil {
                     typedef element<fp<ModulusBits, GeneratorBits>> policy_type;
                 public:
 
-                    typedef typename policy_type::params_type::modulus_type modulus_type;
+                    typedef typename policy_type::params_type::number_type number_type;
 
-                    using type = modulus_type;
+                    using value_type = number_type;
 
-                    type data;
+                    value_type data;
 
-                    element_fp(type data) : data(data){};
+                    element_fp(value_type data) : data(data){};
 
                     inline static element_fp zero() {
-                        return element_fp(type(0));
+                        return element_fp(value_type(0));
                     }
 
                     inline static element_fp one() {
-                        return element_fp(type(1));
+                        return element_fp(value_type(1));
                     }
 
                     bool is_zero() const {
-                        return data == type(0);
+                        return data == value_type(0);
                     }
 
                     bool is_one() const {
-                        return data == type(1);
+                        return data == value_type(1);
                     }
 
                     bool operator==(const element_fp &B) const {
