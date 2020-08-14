@@ -33,9 +33,9 @@ namespace nil {
                 typedef detail::element_fp<ModulusBits, GeneratorBits> non_residue_type;
 
                 constexpr static const std::size_t modulus_bits = ModulusBits;
-                typedef boost::multiprecision::number<
-                    backends::cpp_int_backend<modulus_bits, modulus_bits, boost::multiprecision::unsigned_magnitude,
-                                              boost::multiprecision::unchecked, void>>
+                typedef boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<
+                    modulus_bits, modulus_bits, boost::multiprecision::unsigned_magnitude, boost::multiprecision::unchecked,
+                    void>>
                     modulus_type;
 
                 constexpr static const std::size_t generator_bits = GeneratorBits;

@@ -35,13 +35,13 @@ namespace nil {
 
                     value_type data;
 
-                    element_fp6_2over3(value_type data) : data(data);
+                    element_fp6_2over3(value_type data) : data(data) {};
 
-                    inline static element_fp6_2over3 zero() const {
+                    inline static element_fp6_2over3 zero() {
                         return {underlying_type::zero(), underlying_type::zero()};
                     }
 
-                    inline static element_fp6_2over3 one() const {
+                    inline static element_fp6_2over3 one() {
                         return {underlying_type::one(), underlying_type::zero()};
                     }
 

@@ -35,13 +35,13 @@ namespace nil {
 
                     value_type data;
 
-                    element_fp4(value_type data) : data(data);
+                    element_fp4(value_type data) : data(data) {};
 
-                    inline static element_fp4 zero() const {
+                    inline static element_fp4 zero() {
                         return {underlying_type::zero(), underlying_type::zero()};
                     }
 
-                    inline static element_fp4 one() const {
+                    inline static element_fp4 one() {
                         return {underlying_type::one(), underlying_type::zero()};
                     }
 
