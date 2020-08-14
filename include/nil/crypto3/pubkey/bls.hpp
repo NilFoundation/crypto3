@@ -9,7 +9,7 @@
 #ifndef CRYPTO3_PUBKEY_BLS_HPP
 #define CRYPTO3_PUBKEY_BLS_HPP
 
-#include <nil/algebra/curves/bls12_381.hpp>
+#include <nil/algebra/curves/bls12.hpp>
 
 namespace nil {
     namespace crypto3 {
