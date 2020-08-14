@@ -16,7 +16,7 @@
 namespace nil {
     namespace algebra {
         namespace fields {
-            template<typename FieldType>
+            template<typename FieldTypeype>
             struct basic_params;
 
             BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(2048)
