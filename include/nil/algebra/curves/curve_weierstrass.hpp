@@ -16,10 +16,10 @@ namespace nil {
     namespace algebra {
         namespace curves {
 
-            template<typename FieldT>
-            struct curve_weierstrass : public curve<FieldT> {
+            template<typename FieldType>
+            struct curve_weierstrass : public curve<FieldType> {
             private:
-            	typedef curve<FieldT> policy_type;
+            	typedef curve<FieldType> policy_type;
             public:
             	typedef policy_type::field_type field_type;
                 typedef policy_type::number_type number_type;

@@ -27,9 +27,9 @@ namespace nil {
              *
              */
 
-            template<typename FieldType>
+            template<typename FieldTypeype>
             struct curve{
-                typedef FieldType field_type;
+                typedef FieldTypeype field_type;
                 typedef typename field_type::modulus_type number_type;
             };
 

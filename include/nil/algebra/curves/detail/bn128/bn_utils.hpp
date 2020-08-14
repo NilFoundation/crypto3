@@ -17,26 +17,26 @@ namespace nil {
         namespace curves {
             namespace detail {
 
-                template<typename FieldT>
-                void bn_batch_invert(std::vector<FieldT> &vec) {
-                    std::vector<FieldT> prod;
+                template<typename FieldType>
+                void bn_batch_invert(std::vector<FieldType> &vec) {
+                    std::vector<FieldType> prod;
                     prod.reserve(vec.size());
 
-                    FieldT acc = 1;
+                    FieldType acc = 1;
 
                     for (auto el : vec) {
                         assert(!el.isZero());
                         prod.emplace_back(acc);
-                        FieldT::mul(acc, acc, el);
+                        FieldType::mul(acc, acc, el);
                     }
 
-                    FieldT acc_inverse = acc;
+                    FieldType acc_inverse = acc;
                     acc_inverse.inverse();
 
                     for (long i = vec.size() - 1; i >= 0; --i) {
-                        const FieldT old_el = vec[i];
-                        FieldT::mul(vec[i], acc_inverse, prod[i]);
-                        FieldT::mul(acc_inverse, acc_inverse, old_el);
+                        const FieldType old_el = vec[i];
+                        FieldType::mul(vec[i], acc_inverse, prod[i]);
+                        FieldType::mul(acc_inverse, acc_inverse, old_el);
                     }
                 }
                 

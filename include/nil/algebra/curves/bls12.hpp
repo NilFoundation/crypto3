@@ -7,11 +7,11 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef ALGEBRA_CURVES_BLS12_381_HPP
-#define ALGEBRA_CURVES_BLS12_381_HPP
+#ifndef ALGEBRA_CURVES_BLS12_HPP
+#define ALGEBRA_CURVES_BLS12_HPP
 
 #include <nil/crypto3/algebra/curves/curve_weierstrass.hpp>
-#include <nil/crypto3/algebra/curves/detail/element/bls12_381.hpp>
+#include <nil/crypto3/algebra/curves/detail/element/bls12.hpp>
 
 namespace nil {
     namespace algebra {
@@ -22,7 +22,7 @@ namespace nil {
 
 	        BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(381)
 
-            template<std::size_t ModuleBits>
+            template<std::size_t ModulusBits>
             struct bls12 {
 
             };
@@ -42,7 +42,7 @@ namespace nil {
 		        constexpr static const number_type y = 0x08b3f481e3aaa0f1a09e30ed741d8ae4fcf5e095d5d00af600db18cb2c04b3edd03cc744a2888ae40caa232946c5e7e1_cppui381;
 		        constexpr static const number_type order = 0x73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000001_cppui381;
 
-		        typedef typename detail::element_bls12_381<field_type::value_type> value_type;
+		        typedef typename detail::element_bls12<field_type::value_type, 381> value_type;
 	    	};
 
             typedef bls12<381> bls12_381;

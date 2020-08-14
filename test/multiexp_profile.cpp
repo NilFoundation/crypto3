@@ -39,28 +39,28 @@ test_instances_t<GroupT> generate_group_elements(size_t count, size_t size) {
     return result;
 }
 
-template<typename FieldT>
-test_instances_t<FieldT> generate_scalars(size_t count, size_t size) {
+template<typename FieldType>
+test_instances_t<FieldType> generate_scalars(size_t count, size_t size) {
     // we use SHA512_rng because it is much faster than
-    // FieldT::random_element()
-    test_instances_t<FieldT> result(count);
+    // FieldType::random_element()
+    test_instances_t<FieldType> result(count);
 
     for (size_t i = 0; i < count; i++) {
         for (size_t j = 0; j < size; j++) {
-            result[i].push_back(SHA512_rng<FieldT>(i * size + j));
+            result[i].push_back(SHA512_rng<FieldType>(i * size + j));
         }
     }
 
     return result;
 }
 
-template<typename GroupT, typename FieldT, multi_exp_method Method>
-run_result_t<GroupT> profile_multiexp(test_instances_t<GroupT> group_elements, test_instances_t<FieldT> scalars) {
+template<typename GroupT, typename FieldType, multi_exp_method Method>
+run_result_t<GroupT> profile_multiexp(test_instances_t<GroupT> group_elements, test_instances_t<FieldType> scalars) {
     long long start_time = get_nsec_time();
 
     std::vector<GroupT> answers;
     for (size_t i = 0; i < group_elements.size(); i++) {
-        answers.push_back(multi_exp<GroupT, FieldT, Method>(group_elements[i].cbegin(), group_elements[i].cend(),
+        answers.push_back(multi_exp<GroupT, FieldType, Method>(group_elements[i].cbegin(), group_elements[i].cend(),
                                                             scalars[i].cbegin(), scalars[i].cend(), 1));
     }
 
@@ -69,22 +69,22 @@ run_result_t<GroupT> profile_multiexp(test_instances_t<GroupT> group_elements, t
     return run_result_t<GroupT>(time_delta, answers);
 }
 
-template<typename GroupT, typename FieldT>
+template<typename GroupT, typename FieldType>
 void print_performance_csv(size_t expn_start, size_t expn_end_fast, size_t expn_end_naive, bool compare_answers) {
     for (size_t expn = expn_start; expn <= expn_end_fast; expn++) {
         printf("%ld", expn);
         fflush(stdout);
 
         test_instances_t<GroupT> group_elements = generate_group_elements<GroupT>(10, 1 << expn);
-        test_instances_t<FieldT> scalars = generate_scalars<FieldT>(10, 1 << expn);
+        test_instances_t<FieldType> scalars = generate_scalars<FieldType>(10, 1 << expn);
 
         run_result_t<GroupT> result_bos_coster =
-            profile_multiexp<GroupT, FieldT, multi_exp_method_bos_coster>(group_elements, scalars);
+            profile_multiexp<GroupT, FieldType, multi_exp_method_bos_coster>(group_elements, scalars);
         printf("\t%lld", result_bos_coster.first);
         fflush(stdout);
 
         run_result_t<GroupT> result_djb =
-            profile_multiexp<GroupT, FieldT, multi_exp_method_BDLO12>(group_elements, scalars);
+            profile_multiexp<GroupT, FieldType, multi_exp_method_BDLO12>(group_elements, scalars);
         printf("\t%lld", result_djb.first);
         fflush(stdout);
 
@@ -94,7 +94,7 @@ void print_performance_csv(size_t expn_start, size_t expn_end_fast, size_t expn_
 
         if (expn <= expn_end_naive) {
             run_result_t<GroupT> result_naive =
-                profile_multiexp<GroupT, FieldT, multi_exp_method_naive>(group_elements, scalars);
+                profile_multiexp<GroupT, FieldType, multi_exp_method_naive>(group_elements, scalars);
             printf("\t%lld", result_naive.first);
             fflush(stdout);
 

@@ -18,26 +18,26 @@ namespace nil {
         namespace curve {
             namespace detail {
 
-                template<typename FieldT>
+                template<typename FieldType>
                 struct element_bn128 {
                     
-                    FieldT p[3];
+                    FieldType p[3];
 
                     element_bn128() {
                     }
 
-                    element_bn128(const FieldT &x, const FieldT &y, const FieldT &z) {
+                    element_bn128(const FieldType &x, const FieldType &y, const FieldType &z) {
                         p[0] = x;
                         p[1] = y;
                         p[2] = z;   
                     }
                     
                     element_bn128 normalize() const {
-                        FieldT p_out[3];
+                        FieldType p_out[3];
 
                         if (is_zero() || p[2] == 1)
                             return;
-                        FieldT r;
+                        FieldType r;
                         r = p[2].inverse();
                         p[2] = r.square();
                         p[0] *= p[2];
@@ -51,7 +51,7 @@ namespace nil {
                         (p_out[0], p_out[1], p_out[2]) = 2(p[0], p[1], p[2])
                     */
                     element_bn128 dbl() const{
-                        FieldT A, B, C, D, E;
+                        FieldType A, B, C, D, E;
                         A = p[0].square();
                         B = p[1].square();
                         C = B.square();
@@ -68,7 +68,7 @@ namespace nil {
                         (p_out[0], p_out[1], p_out[2]) = (p[0], p[1], p[2]) + (B.p[0], B.p[1], B.p[2])
                     */
                     element_bn128 operator+(const element_bn128 &B) const {
-                        FieldT p_out[3];
+                        FieldType p_out[3];
 
                         if (p[2].is_zero()) {
                                 return element_bn128(B);
@@ -76,7 +76,7 @@ namespace nil {
                             if (B.p[2].is_zero()) {
                                 return element_bn128(*this);
                             }
-                            FieldT Z1Z1, Z2Z2, U1, S1, H, I, J, t3, r, V;
+                            FieldType Z1Z1, Z2Z2, U1, S1, H, I, J, t3, r, V;
 
                             Z1Z1 = p[2].square();
                             Z2Z2 = B.p[2].square();
