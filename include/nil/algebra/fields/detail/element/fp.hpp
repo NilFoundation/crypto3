@@ -18,14 +18,13 @@ namespace nil {
         namespace fields {
             namespace detail {
 
-                template<std::size_t ModulusBits, std::size_t GeneratorBits>
-                struct element_fp : public element<fp<ModulusBits, GeneratorBits>> {
-                
+                template<typename FieldParams>
+                struct element_fp{
                 private:
-                    typedef element<fp<ModulusBits, GeneratorBits>> policy_type;
+                    typedef typename FieldParams policy_type;
                 public:
 
-                    typedef typename policy_type::params_type::number_type number_type;
+                    typedef typename policy_type::number_type number_type;
 
                     using value_type = number_type;
 

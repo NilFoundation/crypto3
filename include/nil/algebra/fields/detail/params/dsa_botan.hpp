@@ -27,6 +27,10 @@ namespace nil {
                 public:
                     constexpr static const typename policy_type::number_type q =
                         0x8CD7D450F86F0AD94EEE4CE469A8756D1EBD1058241943EAFFB0B354585E924D_cppui256;
+
+                    constexpr static const typename element_fp<policy_type> fp2_non_residue = ;
+                    constexpr static const typename element_fp2<policy_type> fp6_3over2_non_residue = ;
+                    constexpr static const typename element_fp2<policy_type> fp12_2over3over2_non_residue = ;
                 };
 
                 template <>

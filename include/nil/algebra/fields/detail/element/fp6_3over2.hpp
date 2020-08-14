@@ -23,11 +23,12 @@ namespace nil {
         namespace fields {
             namespace detail {
                         
-                template<std::size_t ModulusBits, std::size_t GeneratorBits>
-                struct element_fp6_3over2 : public element<fp6_3over2<ModulusBits, GeneratorBits>> {
+                template<typename FieldParams>
+                struct element_fp6_3over2{
                 private:
-                    typedef element<fp6_3over2<ModulusBits, GeneratorBits>> policy_type;
+                    typedef typename FieldParams policy_type;
                 public:
+                    using non_residue = policy_type::fp6_3over2_non_residue;
 
                     using underlying_type = element_fp2<ModulusBits, GeneratorBits>;
 

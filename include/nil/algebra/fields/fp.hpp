@@ -26,7 +26,7 @@ namespace nil {
              */
             template<std::size_t ModulusBits, std::size_t GeneratorBits>
             struct fp {
-
+                
                 constexpr static const std::size_t modulus_bits = ModulusBits;
                 typedef boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<
                     modulus_bits, modulus_bits, boost::multiprecision::unsigned_magnitude, boost::multiprecision::unchecked,

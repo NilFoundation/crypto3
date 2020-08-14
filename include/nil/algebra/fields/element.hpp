@@ -16,10 +16,8 @@ namespace nil {
     namespace algebra {
     	namespace fields {
 
-	        template<typename Field>
-	        struct element {
-	        	typedef detail::arithmetic_params<Field> params_type;
-	        };
+	        template<typename FieldParams>
+	        struct element {};
 	        
         }   // namespace fields
     }    // namespace algebra
