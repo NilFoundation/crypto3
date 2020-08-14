@@ -44,6 +44,8 @@ namespace nil {
 
 		        typedef typename detail::element_bls12<field_type::value_type, 381> value_type;
 	    	};
+
+            typedef bls12<381> bls12_381;
     	}    // namespace curves
     }    // namespace algebra
 }    // namespace nil
