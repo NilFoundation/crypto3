@@ -22,7 +22,13 @@ namespace nil {
 
 	        BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(254)
 
-	        struct bls12_381 : public curve_weierstrass<nil::algebra::fields::bls12_381_fq<254>> {
+            template<std::size_t ModuleBits>
+            struct bls12 {
+
+            };
+
+            template<>
+	        struct bls12<381> : public curve_weierstrass<nil::algebra::fields::bls12_381_fq<254>> {
 	        private:
 	        	typedef typename curve_weierstrass<nil::algebra::fields::bls12_381_fq<254>> policy_type;
 	        public:
@@ -38,6 +44,8 @@ namespace nil {
 
 		        typedef typename detail::element_bls12_381<field_type::value_type> value_type;
 	    	};
+
+            typedef bls12<381> bls12_381;
     	}    // namespace curves
     }    // namespace algebra
 }    // namespace nil
