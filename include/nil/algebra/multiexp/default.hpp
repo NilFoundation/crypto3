@@ -1,4 +1,5 @@
 //---------------------------------------------------------------------------//
+// Copyright (c) 2020 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2018-2020 Pavel Kharitonov <ipavrus@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
