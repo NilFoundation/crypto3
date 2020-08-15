@@ -42,7 +42,7 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x03;
 
-                typedef typename detail::element_bn128_fq2<modulus_bits, generator_bits> value_type;
+                typedef typename detail::element_fp2<detail::arithmetic_params<bn128_fq<254, CHAR_BIT>>> value_type;
 
                 constexpr static const std::size_t arity = 1;
 

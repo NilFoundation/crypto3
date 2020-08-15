@@ -29,21 +29,32 @@
 //#include <nil/algebra/fields/ed25519_fe.hpp>
 #include <nil/algebra/fields/element.hpp>
 //#include <nil/algebra/fields/ffdhe_ietf.hpp>
-#include <nil/algebra/fields/fp.hpp>
-#include <nil/algebra/fields/fp2.hpp>
-#include <nil/algebra/fields/fp3.hpp>
-#include <nil/algebra/fields/fp4.hpp>
-#include <nil/algebra/fields/fp6_2over3.hpp>
-#include <nil/algebra/fields/fp6_3over2.hpp>
-#include <nil/algebra/fields/fp12_2over3over2.hpp>
+//#include <nil/algebra/fields/fp.hpp>
+//#include <nil/algebra/fields/fp2.hpp>
+//#include <nil/algebra/fields/fp3.hpp>
+//#include <nil/algebra/fields/fp4.hpp>
+//#include <nil/algebra/fields/fp6_2over3.hpp>
+//#include <nil/algebra/fields/fp6_3over2.hpp>
+//#include <nil/algebra/fields/fp12_2over3over2.hpp>
 //#include <nil/algebra/fields/modp_ietf.hpp>
 //#include <nil/algebra/fields/modp_srp.hpp>
 
 using namespace nil::algebra;
 
+namespace boost {
+    namespace test_tools {
+        namespace tt_detail {
+            template<template<typename, typename> class P, typename K, typename V>
+            struct print_log_value<P<K, V>> {
+                void operator()(std::ostream &, P<K, V> const &) {
+                }
+            };
+        }    // namespace tt_detail
+    }        // namespace test_tools
+}    // namespace boost
+
 
 BOOST_AUTO_TEST_SUITE(fields_manual_tests)
-
 
 BOOST_AUTO_TEST_CASE(fields_manual_test1) {
     
@@ -51,9 +62,10 @@ BOOST_AUTO_TEST_CASE(fields_manual_test1) {
 
     value_type e1 = value_type::one(), e2 = value_type::zero();
 
-    BOOST_CHECK_EQUAL(value_type::one(), e1 + e2);
-}
+    std::cout << (value_type::one() == e1 + e2);
 
+    BOOST_CHECK_EQUAL("1", "");
+}
 
 BOOST_AUTO_TEST_SUITE_END()
 

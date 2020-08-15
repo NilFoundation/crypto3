@@ -28,7 +28,7 @@ namespace nil {
             struct bn128_fr : public fp<ModulusBits, GeneratorBits> { };
 
             template <>
-            struct bn128_fr<254> : public fp<254, CHAR_BIT> {
+            struct bn128_fr<254, CHAR_BIT> : public fp<254, CHAR_BIT> {
                 typedef fp<254, CHAR_BIT> policy_type;
 
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
@@ -42,7 +42,7 @@ namespace nil {
 
                 constexpr static const generator_type generator = 0x05;
 
-                typedef typename detail::element_bn128_fr<modulus_bits, generator_bits> value_type;
+                typedef typename detail::element_fp<detail::arithmetic_params<bn128_fr<254, CHAR_BIT>>> value_type;
 
                 constexpr static const std::size_t arity = 1;
             };

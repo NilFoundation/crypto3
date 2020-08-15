@@ -17,7 +17,7 @@ namespace nil {
     namespace algebra {
         namespace fields {
 
-            BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(254)
+            BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(381)
 
             /*!
              * @brief IETF IPsec groups
@@ -25,24 +25,24 @@ namespace nil {
              * @tparam GeneratorBits
              */
             template<std::size_t ModulusBits, std::size_t GeneratorBits = CHAR_BIT>
-            struct bn128_fq : public fp<ModulusBits, GeneratorBits> { };
+            struct bls12_fq : public fp<ModulusBits, GeneratorBits> { };
 
             template <>
-            struct bn128_fq<254, CHAR_BIT> : public fp<254, CHAR_BIT> {
-                typedef fp<254, CHAR_BIT> policy_type;
+            struct bls12_fq<381, CHAR_BIT> : public fp<381, CHAR_BIT> {
+                typedef fp<381, CHAR_BIT> policy_type;
 
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                 typedef typename policy_type::modulus_type modulus_type;
 
                 constexpr static const modulus_type modulus =
-                    21888242871839275222246405745257275088696311157297823662689037894645226208583_cppui254;
+                    0x1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaaab_cppui381;
 
                 constexpr static const std::size_t generator_bits = policy_type::generator_bits;
                 typedef typename policy_type::generator_type generator_type;
 
                 constexpr static const generator_type mul_generator = 0x03;
 
-                typedef typename detail::element_fp<detail::arithmetic_params<bn128_fq<254, CHAR_BIT>>> value_type;
+                typedef typename detail::element_fp<detail::arithmetic_params<bls12_fq<381, CHAR_BIT>>> value_type;
 
                 constexpr static const std::size_t arity = 1;
 

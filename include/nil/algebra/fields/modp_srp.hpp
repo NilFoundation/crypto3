@@ -54,7 +54,7 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x02;
 
-                typedef typename detail::element_modp_srp<modulus_bits, generator_bits> value_type;
+                typedef typename detail::element_fp<detail::arithmetic_params<modp_srp<modulus_bits, generator_bits>>> value_type;
 
                 constexpr static const std::size_t arity = 1;
             };
@@ -74,7 +74,7 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x02;
 
-                typedef typename detail::element_modp_srp<modulus_bits, generator_bits> value_type;
+                typedef typename detail::element_fp<detail::arithmetic_params<modp_srp<modulus_bits, generator_bits>>> value_type;
 
                 constexpr static const std::size_t arity = 1;
             };
@@ -94,7 +94,7 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x02;
 
-                typedef typename detail::element_modp_srp<modulus_bits, generator_bits> value_type;
+                typedef typename detail::element_fp<detail::arithmetic_params<modp_srp<modulus_bits, generator_bits>>> value_type;
 
                 constexpr static const std::size_t arity = 1;
             };
@@ -114,7 +114,7 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x05;
 
-                typedef typename detail::element_modp_srp<modulus_bits, generator_bits> value_type;
+                typedef typename detail::element_fp<detail::arithmetic_params<modp_srp<modulus_bits, generator_bits>>> value_type;
 
                 constexpr static const std::size_t arity = 1;
             };
@@ -134,7 +134,7 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x05;
 
-                typedef typename detail::element_modp_srp<modulus_bits, generator_bits> value_type;
+                typedef typename detail::element_fp<detail::arithmetic_params<modp_srp<modulus_bits, generator_bits>>> value_type;
 
                 constexpr static const std::size_t arity = 1;
             };
@@ -154,7 +154,7 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x05;
 
-                typedef typename detail::element_modp_srp<modulus_bits, generator_bits> value_type;
+                typedef typename detail::element_fp<detail::arithmetic_params<modp_srp<modulus_bits, generator_bits>>> value_type;
 
                 constexpr static const std::size_t arity = 1;
             };
@@ -174,7 +174,7 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x13;
 
-                typedef typename detail::element_modp_srp<modulus_bits, generator_bits> value_type;
+                typedef typename detail::element_fp<detail::arithmetic_params<modp_srp<modulus_bits, generator_bits>>> value_type;
 
                 constexpr static const std::size_t arity = 1;
             };

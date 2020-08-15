@@ -38,7 +38,8 @@ namespace nil {
 		        typedef typename policy_type::number_type number_type;
 		        typedef typename policy_type::field_type field_type;
 
-		        constexpr static const number_type p = 21888242871839275222246405745257275088696311157297823662689037894645226208583_cppui254;
+		        constexpr static const number_type p = 
+		        	21888242871839275222246405745257275088696311157297823662689037894645226208583_cppui254;
 		        constexpr static const number_type a = 0;
 		        constexpr static const number_type b = 0x03;
 		        constexpr static const number_type x = 0x09;
