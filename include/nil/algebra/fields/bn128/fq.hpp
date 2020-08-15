@@ -10,7 +10,7 @@
 #ifndef ALGEBRA_FIELDS_BN128_FQ_HPP
 #define ALGEBRA_FIELDS_BN128_FQ_HPP
 
-#include <nil/algebra/fields/detail/element/bn128/fq.hpp>
+#include <nil/algebra/fields/detail/params/bn128/fq.hpp>
 #include <nil/algebra/fields/fp.hpp>
 
 namespace nil {
@@ -35,7 +35,7 @@ namespace nil {
                 typedef typename policy_type::modulus_type modulus_type;
 
                 constexpr static const modulus_type modulus =
-                    21888242871839275222246405745257275088696311157297823662689037894645226208583_cppui254;
+                    0x30644E72E131A029B85045B68181585D97816A916871CA8D3C208C16D87CFD47_cppui254;
 
                 constexpr static const std::size_t generator_bits = policy_type::generator_bits;
                 typedef typename policy_type::generator_type generator_type;

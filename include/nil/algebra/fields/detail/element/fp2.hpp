@@ -10,12 +10,10 @@
 #ifndef ALGEBRA_FIELDS_ELEMENT_FP2_HPP
 #define ALGEBRA_FIELDS_ELEMENT_FP2_HPP
 
-#include <nil/algebra/fields/element.hpp>
 #include <nil/algebra/fields/detail/element/fp.hpp>
+#include <nil/algebra/fields/detail/exponentiation.hpp>
 
 #include <nil/algebra/fields/fp2.hpp>
-
-#include <nil/algebra/fields/detail/exponentiation.hpp>
 
 namespace nil {
     namespace algebra {

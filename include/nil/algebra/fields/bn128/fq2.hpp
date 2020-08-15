@@ -7,10 +7,10 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef ALGEBRA_FIELDS_BN128_FQ_HPP
-#define ALGEBRA_FIELDS_BN128_FQ_HPP
+#ifndef ALGEBRA_FIELDS_BN128_FQ2_HPP
+#define ALGEBRA_FIELDS_BN128_FQ2_HPP
 
-#include <nil/algebra/fields/detail/element/bn128/fq.hpp>
+#include <nil/algebra/fields/detail/params/bn128/fq.hpp>
 #include <nil/algebra/fields/fp2.hpp>
 
 namespace nil {
@@ -52,4 +52,4 @@ namespace nil {
     }    // namespace algebra
 }    // namespace nil
 
-#endif    // ALGEBRA_FIELDS_BN128_FQ_HPP
+#endif    // ALGEBRA_FIELDS_BN128_FQ2_HPP

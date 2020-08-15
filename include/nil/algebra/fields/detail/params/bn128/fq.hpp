@@ -10,7 +10,11 @@
 #ifndef ALGEBRA_FIELDS_BN128_FQ_PARAMS_HPP
 #define ALGEBRA_FIELDS_BN128_FQ_PARAMS_HPP
 
+#include <nil/algebra/fields/detail/element/fp.hpp>
+#include <nil/algebra/fields/detail/element/fp2.hpp>
 #include <nil/algebra/fields/detail/params/params.hpp>
+
+#include <nil/algebra/fields/bn128/fq.hpp>
 
 namespace nil {
     namespace algebra {
@@ -22,9 +26,18 @@ namespace nil {
                 struct arithmetic_params<bn128_fq<ModulusBits, GeneratorBits>> : public params<bn128_fq<ModulusBits, GeneratorBits>> {
                 private:
                     typedef params<bn128_fq<ModulusBits, GeneratorBits>> policy_type;
+                    typedef arithmetic_params<bn128_fq<ModulusBits, GeneratorBits>> element_policy_type;
                 public:
                     constexpr static const typename policy_type::number_type q =
-                        10944121435919637611123202872628637544348155578648911831344518947322613104291_cppui254;
+                        0x183227397098D014DC2822DB40C0AC2ECBC0B548B438E5469E10460B6C3E7EA3_cppui254;
+
+                    typedef element_fp<element_policy_type> fp2_non_residue_type;
+                    typedef element_fp2<element_policy_type> fp6_3over2_non_residue_type;
+                    typedef element_fp2<element_policy_type> fp12_2over3over2_non_residue_type;
+
+                    static const fp2_non_residue_type fp2_non_residue = fp2_non_residue_type(0x30644E72E131A029B85045B68181585D97816A916871CA8D3C208C16D87CFD46_cppui254);
+                    static const fp6_3over2_non_residue_type fp6_3over2_non_residue = fp6_3over2_non_residue_type({element_fp<element_policy_type>(9), element_fp<element_policy_type>(1)});
+                    static const fp12_2over3over2_non_residue_type fp12_2over3over2_non_residue = fp12_2over3over2_non_residue_type({element_fp<element_policy_type>(9), element_fp<element_policy_type>(1)});
                 };
             
             }    // namespace detail

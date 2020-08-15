@@ -10,15 +10,12 @@
 #ifndef ALGEBRA_FIELDS_DSA_BOTAN_HPP
 #define ALGEBRA_FIELDS_DSA_BOTAN_HPP
 
-#include <nil/algebra/fields/detail/element/dsa_botan.hpp>
+#include <nil/algebra/fields/detail/params/dsa_botan.hpp>
 #include <nil/algebra/fields/fp.hpp>
 
 namespace nil {
     namespace algebra {
         namespace fields {
-            template<typename FieldTypeype>
-            struct basic_params;
-
             BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(2048)
             BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(3072)
 

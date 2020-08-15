@@ -10,7 +10,6 @@
 #ifndef ALGEBRA_FIELDS_ELEMENT_FP_HPP
 #define ALGEBRA_FIELDS_ELEMENT_FP_HPP
 
-#include <nil/algebra/fields/element.hpp>
 #include <nil/algebra/fields/fp.hpp>
 
 namespace nil {
@@ -30,7 +29,8 @@ namespace nil {
 
                     value_type data;
 
-                    element_fp(value_type data) : data(data){};
+                    template <typename NumberType>
+                    element_fp(NumberType data) : data(data){};
 
                     inline static element_fp zero() {
                         return element_fp(value_type(0));

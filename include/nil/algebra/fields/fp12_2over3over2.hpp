@@ -13,9 +13,6 @@
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/cpp_int.hpp>
 
-#include <nil/algebra/fields/element.hpp>
-#include <nil/algebra/fields/detail/element/fp2.hpp>
-
 namespace nil {
     namespace algebra {
         namespace fields {

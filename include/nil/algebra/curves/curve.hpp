@@ -12,8 +12,6 @@
 
 #include <boost/mpl/arithmetic.hpp>
 
-#include <nil/algebra/fields/element.hpp>
-
 namespace nil {
     namespace algebra {
         namespace curves {

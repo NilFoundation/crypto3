@@ -10,7 +10,7 @@
 #ifndef ALGEBRA_FIELDS_DSA_JCE_HPP
 #define ALGEBRA_FIELDS_DSA_JCE_HPP
 
-#include <nil/algebra/fields/detail/element/dsa_jce.hpp>
+#include <nil/algebra/fields/detail/params/dsa_jce.hpp>
 #include <nil/algebra/fields/fp.hpp>
 
 namespace nil {

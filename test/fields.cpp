@@ -18,16 +18,17 @@
 
 //#include <nil/algebra/fields/bn128/fq.hpp>
 //#include <nil/algebra/fields/bn128/fr.hpp>
-//#include <nil/algebra/fields/detail/params/bn128/fq.hpp>
+#include <nil/algebra/fields/detail/params/bn128/fq.hpp>
 //#include <nil/algebra/fields/detail/params/bn128/fr.hpp>
 #include <nil/algebra/fields/detail/params/dsa_botan.hpp>
 //#include <nil/algebra/fields/detail/params/dsa_jce.hpp>
 //#include <nil/algebra/fields/detail/params/modp_srp.hpp>
 //#include <nil/algebra/fields/detail/params/params.hpp>
+#include <nil/algebra/fields/bn128/fq.hpp>
+//#include <nil/algebra/fields/bn128/fr.hpp>
 #include <nil/algebra/fields/dsa_botan.hpp>
 //#include <nil/algebra/fields/dsa_jce.hpp>
 //#include <nil/algebra/fields/ed25519_fe.hpp>
-#include <nil/algebra/fields/element.hpp>
 //#include <nil/algebra/fields/ffdhe_ietf.hpp>
 //#include <nil/algebra/fields/fp.hpp>
 //#include <nil/algebra/fields/fp2.hpp>
@@ -58,7 +59,7 @@ BOOST_AUTO_TEST_SUITE(fields_manual_tests)
 
 BOOST_AUTO_TEST_CASE(fields_manual_test1) {
     
-    using value_type = fields::dsa_botan<2048, 2048>::value_type;
+    using value_type = fields::bn128_fq<254>::value_type;
 
     value_type e1 = value_type::one(), e2 = value_type::zero();
 
