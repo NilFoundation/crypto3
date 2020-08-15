@@ -21,7 +21,7 @@ namespace nil {
                 template<typename FieldParams>
                 struct element_fp{
                 private:
-                    typedef typename FieldParams policy_type;
+                    typedef FieldParams policy_type;
                 public:
 
                     typedef typename policy_type::number_type number_type;

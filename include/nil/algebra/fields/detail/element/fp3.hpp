@@ -25,11 +25,11 @@ namespace nil {
                 template<typename FieldParams>
                 struct element_fp3{
                 private:
-                    typedef typename FieldParams policy_type;
+                    typedef FieldParams policy_type;
                 public:
-                    using non_residue = policy_type::fp3_non_residue;
+                    using non_residue = typename policy_type::fp3_non_residue;
 
-                    using underlying_type = element_fp<ModulusBits, GeneratorBits>;
+                    using underlying_type = element_fp<FieldParams>;
 
                     using value_type = std::array<underlying_type, 3>;
 

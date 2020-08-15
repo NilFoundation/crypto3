@@ -18,8 +18,8 @@ namespace nil {
         namespace fields {
             namespace detail {
 
-                template<std::size_t ModulusBits, std::size_t GeneratorBits>
-                struct element_dsa_botan : public element_fp<ModulusBits, GeneratorBits> {
+                template<typename FieldParams>
+                struct element_dsa_botan : public element_fp<FieldParams> {
                 };
                 
             }   // namespace detail

@@ -30,7 +30,6 @@ namespace nil {
              */
             template<std::size_t ModulusBits, std::size_t GeneratorBits>
             struct fp2 {
-                typedef detail::element_fp<ModulusBits, GeneratorBits> non_residue_type;
 
                 constexpr static const std::size_t modulus_bits = ModulusBits;
                 typedef boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<
