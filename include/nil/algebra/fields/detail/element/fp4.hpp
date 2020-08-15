@@ -28,7 +28,7 @@ namespace nil {
                 private:
                     typedef FieldParams policy_type;
                 public:
-                    using non_residue = typename policy_type::fp4_non_residue;
+                    static const typename policy_type::fp4_non_residue_type non_residue = policy_type::fp4_non_residue;
 
                     using underlying_type = element_fp2<FieldParams>;
 
