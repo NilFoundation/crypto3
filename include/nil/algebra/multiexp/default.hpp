@@ -7,17 +7,17 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef BOOST_MULTIPRECISION_MULTIEXP_HPP
-#define BOOST_MULTIPRECISION_MULTIEXP_HPP
+#ifndef ALGEBRA_MULTIEXP_HPP
+#define ALGEBRA_MULTIEXP_HPP
 
 #include <cstdint>
 
-#include <boost/algebra/fields/detail/exponentiation.hpp>
-#include <boost/algebra/fields/detail/fp.hpp>
+#include <nil/algebra/fields/fp.hpp>
+
+#include <nil/algebra/fields/detail/exponentiation.hpp>
 
 namespace nil {
     namespace algebra {
-
         template<typename T>
         T eval_multi_exp(typename std::vector<T>::const_iterator vec_start,
                          typename std::vector<T>::const_iterator scalar_start, size_t num_groups,
