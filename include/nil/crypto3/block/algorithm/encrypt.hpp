@@ -233,8 +233,8 @@ namespace nil {
          *
          * @return
          */
-        template<typename BlockCipher, typename SinglePassRange, typename KeyPassRange, typename OutputIterator>
-        OutputIterator encrypt(const SinglePassRange &rng, const KeyPassRange &key, OutputIterator out) {
+        template<typename BlockCipher, typename SinglePassRange, typename KeySinglePassRange, typename OutputIterator>
+        OutputIterator encrypt(const SinglePassRange &rng, const KeySinglePassRange &key, OutputIterator out) {
 
             typedef typename block::modes::isomorphic<BlockCipher, block::nop_padding>::template bind<
                 block::encryption_policy<BlockCipher>>::type EncryptionMode;
@@ -253,7 +253,7 @@ namespace nil {
          *
          * @tparam BlockCipher
          * @tparam SinglePassRange
-         * @tparam KeyPassRange
+         * @tparam KeySinglePassRange
          * @tparam OutputRange
          *
          * @param rng
@@ -262,8 +262,8 @@ namespace nil {
          *
          * @return
          */
-        template<typename BlockCipher, typename SinglePassRange, typename KeyPassRange, typename OutputRange>
-        OutputRange &encrypt(const SinglePassRange &rng, const KeyPassRange &key, OutputRange &out) {
+        template<typename BlockCipher, typename SinglePassRange, typename KeySinglePassRange, typename OutputRange>
+        OutputRange &encrypt(const SinglePassRange &rng, const KeySinglePassRange &key, OutputRange &out) {
 
             typedef typename block::modes::isomorphic<BlockCipher, block::nop_padding>::template bind<
                 block::encryption_policy<BlockCipher>>::type EncryptionMode;
@@ -293,11 +293,11 @@ namespace nil {
          * @return
          */
 
-        template<typename BlockCipher, typename SinglePassRange, typename KeyPassRange,
+        template<typename BlockCipher, typename SinglePassRange, typename KeySinglePassRange,
                  typename CipherAccumulator = typename block::accumulator_set<typename block::modes::isomorphic<
                      BlockCipher, block::nop_padding>::template bind<block::encryption_policy<BlockCipher>>::type>>
         block::detail::range_cipher_impl<block::detail::value_cipher_impl<CipherAccumulator>>
-            encrypt(const SinglePassRange &r, const KeyPassRange &key) {
+            encrypt(const SinglePassRange &r, const KeySinglePassRange &key) {
 
             typedef typename block::modes::isomorphic<BlockCipher, block::nop_padding>::template bind<
                 block::encryption_policy<BlockCipher>>::type EncryptionMode;
