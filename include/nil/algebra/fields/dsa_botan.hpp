@@ -13,11 +13,11 @@
 #include <nil/algebra/fields/detail/params/dsa_botan.hpp>
 #include <nil/algebra/fields/fp.hpp>
 
+#include <nil/algebra/detail/boost_defines.hpp>
+
 namespace nil {
     namespace algebra {
         namespace fields {
-            BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(2048)
-            BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(3072)
 
             /*!
              * @brief DSA group

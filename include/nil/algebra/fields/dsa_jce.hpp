@@ -13,10 +13,11 @@
 #include <nil/algebra/fields/detail/params/dsa_jce.hpp>
 #include <nil/algebra/fields/fp.hpp>
 
+#include <nil/algebra/detail/boost_defines.hpp>
+
 namespace nil {
     namespace algebra {
         namespace fields {
-            BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(1024)
 
             /*!
              * @brief DSA group

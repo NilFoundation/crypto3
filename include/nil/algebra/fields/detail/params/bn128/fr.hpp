@@ -20,7 +20,6 @@ namespace nil {
     namespace algebra {
         namespace fields {
             namespace detail {
-                BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(254)
 
                 template<std::size_t ModulusBits, std::size_t GeneratorBits>
                 struct arithmetic_params<bn128_fr<ModulusBits, GeneratorBits>> : public params<bn128_fr<ModulusBits, GeneratorBits>> {

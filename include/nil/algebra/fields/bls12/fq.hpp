@@ -13,11 +13,11 @@
 #include <nil/algebra/fields/detail/element/bn128/fq.hpp>
 #include <nil/algebra/fields/fp.hpp>
 
+#include <nil/algebra/detail/boost_defines.hpp>
+
 namespace nil {
     namespace algebra {
         namespace fields {
-
-            BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(381)
 
             /*!
              * @brief IETF IPsec groups

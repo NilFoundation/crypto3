@@ -13,17 +13,11 @@
 #include <nil/algebra/fields/detail/element/modp_srp.hpp>
 #include <nil/algebra/fields/fp.hpp>
 
+#include <nil/algebra/detail/boost_defines.hpp>
+
 namespace nil {
     namespace algebra {
         namespace fields {
-            
-            BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(1024)
-            BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(1536)
-            BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(2048)
-            BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(3072)
-            BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(4096)
-            BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(6144)
-            BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(8192)
 
             /*!
              * @brief SRP groups
