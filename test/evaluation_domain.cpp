@@ -7,66 +7,59 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
+#define BOOST_TEST_MODULE fft_evaluation_domain_test
+
+#include <boost/test/unit_test.hpp>
+
 #include <memory>
 #include <vector>
 #include <cstdint>
-
-#include <nil/algebra/curves/mnt/mnt4/mnt4_pp.hpp>
 
 #include <nil/algebra/fft/domains/arithmetic_sequence_domain.hpp>
 #include <nil/algebra/fft/domains/basic_radix2_domain.hpp>
 #include <nil/algebra/fft/domains/extended_radix2_domain.hpp>
 #include <nil/algebra/fft/domains/geometric_sequence_domain.hpp>
 #include <nil/algebra/fft/domains/step_radix2_domain.hpp>
+
 #include <nil/algebra/fft/polynomial_arithmetic/naive_evaluate.hpp>
 
 using namespace nil::algebra::fft;
 
 /**
- * Note: Templatized type referenced with TypeParam (instead of canonical FieldType)
+ * Note: Templatized type referenced with FieldType (instead of canonical FieldType)
  * https://github.com/google/googletest/blob/master/googletest/docs/AdvancedGuide.md#typed-tests
  */
-/*template<typename T>
-class EvaluationDomainTest : public ::testing::Test {
-protected:
-    virtual void SetUp() {
-        algebra::mnt4_pp::init_public_params();
-    }
-};
 
-/*typedef ::testing::Types<algebra::Fr<algebra::mnt4_pp>, algebra::Double> FieldType;*/ /* List Extend Here */
-/*TYPED_TEST_CASE(EvaluationDomainTest, FieldType);
-
-TYPED_TEST(EvaluationDomainTest, FFT) {
-
+template<typename FieldType>
+void test_fft() {
     const size_t m = 4;
-    std::vector<TypeParam> f = {2, 5, 3, 8};
+    std::vector<FieldType> f = {2, 5, 3, 8};
 
-    std::shared_ptr<evaluation_domain<TypeParam>> domain;
+    std::shared_ptr<evaluation_domain<FieldType>> domain;
     for (int key = 0; key < 5; key++) {
         try {
             if (key == 0)
-                domain.reset(new basic_radix2_domain<TypeParam>(m));
+                domain.reset(new basic_radix2_domain<FieldType>(m));
             else if (key == 1)
-                domain.reset(new extended_radix2_domain<TypeParam>(m));
+                domain.reset(new extended_radix2_domain<FieldType>(m));
             else if (key == 2)
-                domain.reset(new step_radix2_domain<TypeParam>(m));
+                domain.reset(new step_radix2_domain<FieldType>(m));
             else if (key == 3)
-                domain.reset(new geometric_sequence_domain<TypeParam>(m));
+                domain.reset(new geometric_sequence_domain<FieldType>(m));
             else if (key == 4)
-                domain.reset(new arithmetic_sequence_domain<TypeParam>(m));
+                domain.reset(new arithmetic_sequence_domain<FieldType>(m));
 
-            std::vector<TypeParam> a(f);
+            std::vector<FieldType> a(f);
             domain->FFT(a);
 
-            std::vector<TypeParam> idx(m);
+            std::vector<FieldType> idx(m);
             for (size_t i = 0; i < m; i++) {
                 idx[i] = domain->get_domain_element(i);
             }
 
             for (size_t i = 0; i < m; i++) {
-                TypeParam e = evaluate_polynomial(m, f, idx[i]);
-                EXPECT_TRUE(e == a[i]);
+                FieldType e = evaluate_polynomial(m, f, idx[i]);
+                BOOST_CHECK(e == a[i]);
             }
         } catch (DomainSizeException &e) {
             printf("%s - skipping\n", e.what());
@@ -76,31 +69,31 @@ TYPED_TEST(EvaluationDomainTest, FFT) {
     }
 }
 
-TYPED_TEST(EvaluationDomainTest, InverseFFTofFFT) {
-
+template<typename FieldType>
+void test_inverse_fft_to_fft() {
     const size_t m = 4;
-    std::vector<TypeParam> f = {2, 5, 3, 8};
+    std::vector<FieldType> f = {2, 5, 3, 8};
 
-    std::shared_ptr<evaluation_domain<TypeParam>> domain;
+    std::shared_ptr<evaluation_domain<FieldType>> domain;
     for (int key = 0; key < 5; key++) {
         try {
             if (key == 0)
-                domain.reset(new basic_radix2_domain<TypeParam>(m));
+                domain.reset(new basic_radix2_domain<FieldType>(m));
             else if (key == 1)
-                domain.reset(new extended_radix2_domain<TypeParam>(m));
+                domain.reset(new extended_radix2_domain<FieldType>(m));
             else if (key == 2)
-                domain.reset(new step_radix2_domain<TypeParam>(m));
+                domain.reset(new step_radix2_domain<FieldType>(m));
             else if (key == 3)
-                domain.reset(new geometric_sequence_domain<TypeParam>(m));
+                domain.reset(new geometric_sequence_domain<FieldType>(m));
             else if (key == 4)
-                domain.reset(new arithmetic_sequence_domain<TypeParam>(m));
+                domain.reset(new arithmetic_sequence_domain<FieldType>(m));
 
-            std::vector<TypeParam> a(f);
+            std::vector<FieldType> a(f);
             domain->FFT(a);
             domain->iFFT(a);
 
             for (size_t i = 0; i < m; i++) {
-                EXPECT_TRUE(f[i] == a[i]);
+                BOOST_CHECK(f[i] == a[i]);
             }
         } catch (const DomainSizeException &e) {
             printf("%s - skipping\n", e.what());
@@ -110,35 +103,35 @@ TYPED_TEST(EvaluationDomainTest, InverseFFTofFFT) {
     }
 }
 
-TYPED_TEST(EvaluationDomainTest, InverseCosetFFTofCosetFFT) {
-
+template<typename FieldType>
+void test_inverse_coset_ftt_to_coset_fft() {
     const size_t m = 4;
-    std::vector<TypeParam> f = {2, 5, 3, 8};
+    std::vector<FieldType> f = {2, 5, 3, 8};
 
-    TypeParam coset = TypeParam::multiplicative_generator;
+    FieldType coset = FieldType::multiplicative_generator;
 
-    std::shared_ptr<evaluation_domain<TypeParam>> domain;
+    std::shared_ptr<evaluation_domain<FieldType>> domain;
     for (int key = 0; key < 3; key++) {
         try {
             if (key == 0)
-                domain.reset(new basic_radix2_domain<TypeParam>(m));
+                domain.reset(new basic_radix2_domain<FieldType>(m));
             else if (key == 1)
-                domain.reset(new extended_radix2_domain<TypeParam>(m));
+                domain.reset(new extended_radix2_domain<FieldType>(m));
             else if (key == 2)
-                domain.reset(new step_radix2_domain<TypeParam>(m));
+                domain.reset(new step_radix2_domain<FieldType>(m));
             else if (key == 3)
-                domain.reset(new geometric_sequence_domain<TypeParam>(m));
+                domain.reset(new geometric_sequence_domain<FieldType>(m));
             else if (key == 4)
-                domain.reset(new arithmetic_sequence_domain<TypeParam>(m));
+                domain.reset(new arithmetic_sequence_domain<FieldType>(m));
 
-            std::vector<TypeParam> a(f);
+            std::vector<FieldType> a(f);
             multiply_by_coset(a, coset);
             domain->FFT(a, coset);
             domain->iFFT(a, coset);
             multiply_by_coset(a, coset.inverse());
 
             for (size_t i = 0; i < m; i++) {
-                EXPECT_TRUE(f[i] == a[i]);
+                BOOST_CHECK(f[i] == a[i]);
             }
         } catch (const DomainSizeException &e) {
             printf("%s - skipping\n", e.what());
@@ -148,38 +141,38 @@ TYPED_TEST(EvaluationDomainTest, InverseCosetFFTofCosetFFT) {
     }
 }
 
-TYPED_TEST(EvaluationDomainTest, LagrangeCoefficients) {
-
+template<typename FieldType>
+void test_lagrange_coefficients() {
     const size_t m = 8;
-    TypeParam t = TypeParam(10);
+    FieldType t = FieldType(10);
 
-    std::shared_ptr<evaluation_domain<TypeParam>> domain;
+    std::shared_ptr<evaluation_domain<FieldType>> domain;
     for (int key = 0; key < 5; key++) {
 
         try {
             if (key == 0)
-                domain.reset(new basic_radix2_domain<TypeParam>(m));
+                domain.reset(new basic_radix2_domain<FieldType>(m));
             else if (key == 1)
-                domain.reset(new extended_radix2_domain<TypeParam>(m));
+                domain.reset(new extended_radix2_domain<FieldType>(m));
             else if (key == 2)
-                domain.reset(new step_radix2_domain<TypeParam>(m));
+                domain.reset(new step_radix2_domain<FieldType>(m));
             else if (key == 3)
-                domain.reset(new geometric_sequence_domain<TypeParam>(m));
+                domain.reset(new geometric_sequence_domain<FieldType>(m));
             else if (key == 4)
-                domain.reset(new arithmetic_sequence_domain<TypeParam>(m));
+                domain.reset(new arithmetic_sequence_domain<FieldType>(m));
 
-            std::vector<TypeParam> a;
+            std::vector<FieldType> a;
             a = domain->evaluate_all_lagrange_polynomials(t);
 
-            std::vector<TypeParam> d(m);
+            std::vector<FieldType> d(m);
             for (size_t i = 0; i < m; i++) {
                 d[i] = domain->get_domain_element(i);
             }
 
             for (size_t i = 0; i < m; i++) {
-                TypeParam e = evaluate_lagrange_polynomial(m, d, t, i);
+                FieldType e = evaluate_lagrange_polynomial(m, d, t, i);
                 printf("%ld == %ld\n", e.as_ulong(), a[i].as_ulong());
-                EXPECT_TRUE(e == a[i]);
+                BOOST_CHECK(e == a[i]);
             }
         } catch (const DomainSizeException &e) {
             printf("%s - skipping\n", e.what());
@@ -189,41 +182,59 @@ TYPED_TEST(EvaluationDomainTest, LagrangeCoefficients) {
     }
 }
 
-TYPED_TEST(EvaluationDomainTest, ComputeZ) {
-
+template<typename FieldType>
+void test_compute_z() {
     const size_t m = 8;
-    TypeParam t = TypeParam(10);
+    FieldType t = FieldType(10);
 
-    std::shared_ptr<evaluation_domain<TypeParam>> domain;
+    std::shared_ptr<evaluation_domain<FieldType>> domain;
     for (int key = 0; key < 5; key++) {
         try {
             if (key == 0)
-                domain.reset(new basic_radix2_domain<TypeParam>(m));
+                domain.reset(new basic_radix2_domain<FieldType>(m));
             else if (key == 1)
-                domain.reset(new extended_radix2_domain<TypeParam>(m));
+                domain.reset(new extended_radix2_domain<FieldType>(m));
             else if (key == 2)
-                domain.reset(new step_radix2_domain<TypeParam>(m));
+                domain.reset(new step_radix2_domain<FieldType>(m));
             else if (key == 3)
-                domain.reset(new geometric_sequence_domain<TypeParam>(m));
+                domain.reset(new geometric_sequence_domain<FieldType>(m));
             else if (key == 4)
-                domain.reset(new arithmetic_sequence_domain<TypeParam>(m));
+                domain.reset(new arithmetic_sequence_domain<FieldType>(m));
 
-            TypeParam a;
+            FieldType a;
             a = domain->compute_vanishing_polynomial(t);
 
-            TypeParam Z = TypeParam::one();
+            FieldType Z = FieldType::one();
             for (size_t i = 0; i < m; i++) {
                 Z *= (t - domain->get_domain_element(i));
             }
 
-            EXPECT_TRUE(Z == a);
+            BOOST_CHECK(Z == a);
         } catch (const DomainSizeException &e) {
             printf("%s - skipping\n", e.what());
         } catch (const InvalidSizeException &e) {
             printf("%s - skipping\n", e.what());
         }
     }
-}*/
-int main() {
-    return 0;
 }
+
+BOOST_AUTO_TEST_SUITE(fft_evaluation_domain_test_suite)
+
+BOOST_AUTO_TEST_CASE(fft) {
+    test_fft<algebra::mnt4>();
+}
+
+BOOST_AUTO_TEST_CASE(inverse_fft_to_fft) {
+    test_inverse_fft_to_fft<algebra::mnt4>();
+}
+BOOST_AUTO_TEST_CASE(inverse_coset_ftt_to_coset_fft) {
+    test_inverse_coset_ftt_to_coset_fft<algebra::mnt4>();
+}
+BOOST_AUTO_TEST_CASE(lagrange_coefficients) {
+    test_lagrange_coefficients<algebra::mnt4>();
+}
+BOOST_AUTO_TEST_CASE(compute_z) {
+    test_compute_z<algebra::mnt4>();
+}
+
+BOOST_AUTO_TEST_SUITE_END()
