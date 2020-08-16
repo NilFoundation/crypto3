@@ -6,8 +6,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_PUBKEY_ALGORITHM_HPP
-#define CRYPTO3_PUBKEY_ALGORITHM_HPP
+#ifndef CRYPTO3_PUBKEY_MODES_ALGORITHM_HPP
+#define CRYPTO3_PUBKEY_MODES_ALGORITHM_HPP
 
 #include <cstdint>
 
@@ -41,4 +41,4 @@ namespace nil {
     }    // namespace crypto3
 }    // namespace nil
 
-#endif    // CRYPTO3_PUBKEY_HPP
+#endif    // CRYPTO3_PUBKEY_MODES_HPP

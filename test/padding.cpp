@@ -8,7 +8,16 @@
 
 #define BOOST_TEST_MODULE padding_test
 
-#include <nil/crypto3/modes/padding.hpp>
+#include <nil/crypto3/pubkey/modes/threshold/algorithm/agree.hpp>
+#include <nil/crypto3/pubkey/modes/threshold/algorithm/decrypt.hpp>
+#include <nil/crypto3/pubkey/modes/threshold/algorithm/encrypt.hpp>
+#include <nil/crypto3/pubkey/modes/threshold/algorithm/kem_decrypt.hpp>
+#include <nil/crypto3/pubkey/modes/threshold/algorithm/kem_encrypt.hpp>
+#include <nil/crypto3/pubkey/modes/threshold/algorithm/pubkey.hpp>
+#include <nil/crypto3/pubkey/modes/threshold/algorithm/sign.hpp>
+#include <nil/crypto3/pubkey/modes/threshold/algorithm/verify.hpp>
+
+#include <nil/crypto3/pubkey/modes/threshold/mode.hpp>
 
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
