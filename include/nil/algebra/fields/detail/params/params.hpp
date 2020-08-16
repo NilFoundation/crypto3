@@ -36,9 +36,11 @@ namespace nil {
                 struct arithmetic_params : public params<FieldTypeype> {
                 private:
                     typedef params<FieldTypeype> policy_type;
+                    typedef arithmetic_params<FieldTypeype> element_policy_type;
                 public:
+                    typedef typename policy_type::number_type number_type;
 
-                    constexpr static const typename policy_type::number_type q = (policy_type::modulus - 1) / 2;
+                    constexpr static const number_type q = (policy_type::modulus - 1) / 2;
                 };
 
             }    // namespace detail

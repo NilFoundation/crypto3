@@ -37,11 +37,11 @@ namespace nil {
                     element_fp3(value_type data) : data(data) {};
 
                     inline static element_fp3 zero() {
-                        return {underlying_type::zero(), underlying_type::zero(), underlying_type::zero()};
+                        return element_fp3({underlying_type::zero(), underlying_type::zero(), underlying_type::zero()});
                     }
 
                     inline static element_fp3 one() {
-                        return {underlying_type::one(), underlying_type::zero(), underlying_type::zero()};
+                        return element_fp3({underlying_type::one(), underlying_type::zero(), underlying_type::zero()});
                     }
 
                     bool is_zero() const {
@@ -58,24 +58,24 @@ namespace nil {
                     }
 
                     element_fp3 operator+(const element_fp3 &B) const {
-                        return {data[0] + B.data[0], data[1] + B.data[1], data[2] + B.data[2]};
+                        return element_fp3({data[0] + B.data[0], data[1] + B.data[1], data[2] + B.data[2]});
                     }
 
                     element_fp3 operator-(const element_fp3 &B) const {
-                        return {data[0] - B.data[0], data[1] - B.data[1], data[2] - B.data[2]};
+                        return element_fp3({data[0] - B.data[0], data[1] - B.data[1], data[2] - B.data[2]});
                     }
 
                     element_fp3 operator-() const {
-                        return zero() - data;
+                        return zero() - *this;
                     }
 
                     element_fp3 operator*(const element_fp3 &B) const {
                         const underlying_type A0B0 = data[0] * B.data[0], A1B1 = data[1] * B.data[1],
                                               A2B2 = data[2] * B.data[2];
 
-                        return {A0B0 + non_residue * (data[1] + data[2]) * (B.data[1] + B.data[2]) - A1B1 - A2B2,
+                        return element_fp3({A0B0 + non_residue * (data[1] + data[2]) * (B.data[1] + B.data[2]) - A1B1 - A2B2,
                                 (data[0] + data[1]) * (B.data[0] + B.data[1]) - A0B0 - A1B1 + non_residue * A2B2,
-                                (data[0] + data[2]) * (B.data[0] + B.data[2]) - A0B0 + A1B1 - A2B2};
+                                (data[0] + data[2]) * (B.data[0] + B.data[2]) - A0B0 + A1B1 - A2B2});
                     }
 
                     element_fp3 sqrt() const {
@@ -84,7 +84,7 @@ namespace nil {
                     }
 
                     element_fp3 square() const {
-                        return data * data;    // maybe can be done more effective
+                        return (*this) * (*this);    // maybe can be done more effective
                     }
 
                     template<typename PowerType>
@@ -110,7 +110,7 @@ namespace nil {
                         const underlying_type c2 =
                             t1 - t4;    // typo in paper referenced above. should be "-" as per Scott, but is "*"
                         const underlying_type t6 = (A0 * c0 + non_residue * (A2 * c1 + A1 * c2)).inverse();
-                        return {t6 * c0, t6 * c1, t6 * c2};
+                        return element_fp3({t6 * c0, t6 * c1, t6 * c2});
                     }
                 };
                 

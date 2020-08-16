@@ -24,8 +24,11 @@ namespace nil {
                 struct arithmetic_params<modp_srp<ModulusBits, GeneratorBits>> : public params<modp_srp<ModulusBits, GeneratorBits>> {
                 private:
                     typedef params<modp_srp<ModulusBits, GeneratorBits>> policy_type;
+                    typedef arithmetic_params<modp_srp<ModulusBits, GeneratorBits>> element_policy_type;
                 public:
-                    constexpr static const typename policy_type::number_type q = 0;
+                    typedef typename policy_type::number_type number_type;
+
+                    constexpr static const number_type q = 0;
                 };
             
             }    // namespace detail

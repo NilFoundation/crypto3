@@ -28,17 +28,19 @@ namespace nil {
                     typedef params<bn128_fr<ModulusBits, GeneratorBits>> policy_type;
                     typedef arithmetic_params<bn128_fr<ModulusBits, GeneratorBits>> element_policy_type;
                 public:
-                    constexpr static const typename policy_type::number_type q =
+                    typedef typename policy_type::number_type number_type;
+
+                    constexpr static const number_type q =
                         183227397098D014DC2822DB40C0AC2E9419F4243CDCB848A1F0FAC9F8000000_cppui254;
 
                     typedef element_fp<element_policy_type> fp2_non_residue_type;
                     typedef element_fp2<element_policy_type> fp6_3over2_non_residue_type;
                     typedef element_fp2<element_policy_type> fp12_2over3over2_non_residue_type;
 
-                    constexpr static const typename policy_type::number_type fp2_non_residue = 
+                    constexpr static const number_type fp2_non_residue = 
                         0x30644E72E131A029B85045B68181585D97816A916871CA8D3C208C16D87CFD46_cppui254;
-                    constexpr static const std::array<typename policy_type::number_type, 2> fp6_3over2_non_residue = {9, 1};
-                    constexpr static const std::array<typename policy_type::number_type, 2> fp12_2over3over2_non_residue = {9, 1};
+                    constexpr static const std::array<number_type, 2> fp6_3over2_non_residue = {9, 1};
+                    constexpr static const std::array<number_type, 2> fp12_2over3over2_non_residue = {9, 1};
                 };
             
             }    // namespace detail
