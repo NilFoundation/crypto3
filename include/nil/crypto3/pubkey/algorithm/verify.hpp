@@ -20,7 +20,7 @@ namespace nil {
     namespace crypto3 {
         namespace pubkey {
             template<typename Scheme>
-            using verification_policy = typename pubkey::modes::isomorphic<Scheme, nop_padding>::verification_policy;
+            using verifying_policy = typename pubkey::modes::isomorphic<Scheme, nop_padding>::verifying_policy;
         }
         /*!
          * @brief
@@ -40,18 +40,53 @@ namespace nil {
          *
          * @return
          */
-        template<typename Scheme, typename InputIterator, typename KeyIterator, typename OutputIterator>
-        OutputIterator verify(InputIterator first, InputIterator last, KeyIterator key_first, KeyIterator key_last,
-                            OutputIterator out) {
+        template<typename Scheme, typename InputIterator, typename KeyInputIterator, typename OutputIterator>
+        OutputIterator verify(InputIterator first, InputIterator last, KeyInputIterator key_first,
+                               KeyInputIterator key_last, OutputIterator out) {
 
-            typedef typename Scheme::stream_verifyer_type VerificatorMode;
-            typedef typename pubkey::accumulator_set<typename pubkey::modes::isomorphic<
-                Scheme, pubkey::nop_padding>::template bind<pubkey::verification_policy<Scheme>>::type> VerificatorAccumulator;
+            typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
+            pubkey::verifying_policy<Scheme>>::type SchemeMode;
+            typedef typename pubkey::accumulator_set<SchemeMode> SchemeAccumulator;
 
-            typedef pubkey::detail::value_scheme_impl<VerificatorAccumulator> StreamVerificatorImpl;
-            typedef pubkey::detail::itr_scheme_impl<StreamVerificatorImpl, OutputIterator> VerificatorImpl;
+            typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamSignerImpl;
+            typedef pubkey::detail::itr_scheme_impl<StreamSignerImpl, OutputIterator> SignerImpl;
 
-            return VerificatorImpl(first, last, std::move(out), VerificatorState(Scheme(key_first, key_last)));
+            return SignerImpl(first, last, std::move(out),
+                SchemeAccumulator(SchemeMode(
+                    Scheme(pubkey::detail::key_value<Scheme>(key_first, key_last)))));
+        }
+
+        /*!
+         * @brief
+         *
+         * @ingroup pubkey_algorithms
+         *
+         * @tparam Scheme
+         * @tparam InputIterator
+         * @tparam KeySinglePassRange
+         * @tparam OutputIterator
+         *
+         * @param first
+         * @param last
+         * @param key
+         * @param out
+         *
+         * @return
+         */
+        template<typename Scheme, typename InputIterator, typename KeySinglePassRange, typename OutputIterator>
+        OutputIterator verify(InputIterator first, InputIterator last, const KeySinglePassRange &key,
+                               OutputIterator out) {
+
+            typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
+            pubkey::verifying_policy<Scheme>>::type SchemeMode;
+            typedef typename pubkey::accumulator_set<SchemeMode> SchemeAccumulator;
+
+            typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamSignerImpl;
+            typedef pubkey::detail::itr_scheme_impl<StreamSignerImpl, OutputIterator> SignerImpl;
+
+            return SignerImpl(
+                first, last, std::move(out),
+                SchemeAccumulator(SchemeMode(Scheme(pubkey::detail::key_value<Scheme>(key)))));
         }
 
         /*!
@@ -72,16 +107,18 @@ namespace nil {
          */
         template<typename Scheme, typename InputIterator, typename OutputIterator>
         OutputIterator verify(InputIterator first, InputIterator last, const public_key<Scheme> &key,
-                            OutputIterator out) {
+                               OutputIterator out) {
 
-            typedef typename Scheme::stream_verifyer_type VerificatorMode;
-            typedef typename pubkey::accumulator_set<typename pubkey::modes::isomorphic<
-                Scheme, pubkey::nop_padding>::template bind<pubkey::verification_policy<Scheme>>::type> VerificatorAccumulator;
+            typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
+                pubkey::verifying_policy<Scheme>>::type SchemeMode;
+            typedef typename pubkey::accumulator_set<SchemeMode> SchemeAccumulator;
 
-            typedef pubkey::detail::value_scheme_impl<VerificatorAccumulator> StreamVerificatorImpl;
-            typedef pubkey::detail::itr_scheme_impl<StreamVerificatorImpl, OutputIterator> VerificatorImpl;
+            typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamSignerImpl;
+            typedef pubkey::detail::itr_scheme_impl<StreamSignerImpl, OutputIterator> SignerImpl;
 
-            return VerificatorImpl(first, last, std::move(out), VerificatorState(Scheme(key)));
+            return SignerImpl(
+                first, last, std::move(out),
+                SchemeAccumulator(SchemeMode(Scheme(key))));
         }
 
         /*!
@@ -91,7 +128,7 @@ namespace nil {
          *
          * @tparam Scheme
          * @tparam InputIterator
-         * @tparam SchemeAccumulator
+         * @tparam OutputAccumulator
          *
          * @param first
          * @param last
@@ -100,14 +137,16 @@ namespace nil {
          * @return
          */
         template<typename Scheme, typename InputIterator,
-                 typename SchemeAccumulator = typename pubkey::accumulator_set<typename pubkey::modes::isomorphic<
-                     Scheme, pubkey::nop_padding>::template bind<pubkey::verification_policy<Scheme>>::type>>
-        SchemeAccumulator &verify(InputIterator first, InputIterator last, SchemeAccumulator &acc) {
+                 typename OutputAccumulator = typename pubkey::accumulator_set<typename pubkey::modes::isomorphic<
+                     Scheme, pubkey::nop_padding>::template bind<pubkey::verifying_policy<Scheme>>::type>>
+        typename std::enable_if<boost::accumulators::detail::is_accumulator_set<OutputAccumulator>::value,
+                                OutputAccumulator>::type &
+        verify(InputIterator first, InputIterator last, OutputAccumulator &acc) {
 
-            typedef pubkey::detail::ref_scheme_impl<SchemeAccumulator> StreamVerificatorImpl;
-            typedef pubkey::detail::range_scheme_impl<StreamVerificatorImpl> VerificatorImpl;
+            typedef pubkey::detail::ref_scheme_impl<OutputAccumulator> StreamSignerImpl;
+            typedef pubkey::detail::range_scheme_impl<StreamSignerImpl> SignerImpl;
 
-            return VerificatorImpl(first, last, acc);
+            return SignerImpl(first, last, std::forward<OutputAccumulator>(acc));
         }
 
         /*!
@@ -124,15 +163,19 @@ namespace nil {
          *
          * @return
          */
+
         template<typename Scheme, typename SinglePassRange,
-                 typename OutputAccumulator = typename pubkey::accumulator_set<typename pubkey::modes::isomorphic<
-                     Scheme, pubkey::nop_padding>::template bind<pubkey::verification_policy<Scheme>>::type>>
-        OutputAccumulator &verify(const SinglePassRange &r, OutputAccumulator &acc) {
+                 typename OutputAccumulator = typename pubkey::accumulator_set<
+                     typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
+                         typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::verifying_policy>::type>>
+        typename std::enable_if<boost::accumulators::detail::is_accumulator_set<OutputAccumulator>::value,
+                                OutputAccumulator>::type &
+        verify(const SinglePassRange &r, OutputAccumulator &acc) {
 
-            typedef pubkey::detail::ref_scheme_impl<OutputAccumulator> StreamVerificatorImpl;
-            typedef pubkey::detail::range_scheme_impl<StreamVerificatorImpl> VerificatorImpl;
+            typedef pubkey::detail::ref_scheme_impl<OutputAccumulator> StreamSignerImpl;
+            typedef pubkey::detail::range_scheme_impl<StreamSignerImpl> SignerImpl;
 
-            return VerificatorImpl(r, acc);
+            return SignerImpl(r, acc);
         }
 
         /*!
@@ -152,16 +195,85 @@ namespace nil {
          *
          * @return
          */
-        template<typename Scheme, typename InputIterator, typename KeyIterator,
+        template<typename Scheme, typename InputIterator, typename KeyInputIterator,
                  typename SchemeAccumulator = typename pubkey::accumulator_set<typename pubkey::modes::isomorphic<
-                     Scheme, pubkey::nop_padding>::template bind<pubkey::verification_policy<Scheme>>::type>>
+                     Scheme, pubkey::nop_padding>::template bind<pubkey::verifying_policy<Scheme>>::type>>
         pubkey::detail::range_scheme_impl<pubkey::detail::value_scheme_impl<SchemeAccumulator>>
-        verify(InputIterator first, InputIterator last, KeyIterator key_first, KeyIterator key_last) {
+        verify(InputIterator first, InputIterator last, KeyInputIterator key_first, KeyInputIterator key_last) {
 
-            typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamVerificatorImpl;
-            typedef pubkey::detail::range_scheme_impl<StreamVerificatorImpl> VerificatorImpl;
+            typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
+            pubkey::verifying_policy<Scheme>>::type SchemeMode;
 
-            return VerificatorImpl(first, last, SchemeAccumulator(Scheme(key_first, key_last)));
+            typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamSignerImpl;
+            typedef pubkey::detail::range_scheme_impl<StreamSignerImpl> SignerImpl;
+
+            return SignerImpl(first, last,
+                SchemeAccumulator(SchemeMode(
+                    Scheme(pubkey::detail::key_value<Scheme>(key_first, key_last)))));
+        }
+
+        /*!
+         * @brief
+         *
+         * @tparam Scheme
+         * @tparam InputIterator
+         * @tparam KeySinglePassRange
+         * @tparam SchemeAccumulator
+         *
+         * @param first
+         * @param last
+         * @param key
+         *
+         * @return
+         */
+        template<typename Scheme, typename InputIterator, typename KeySinglePassRange,
+                 typename SchemeAccumulator = typename pubkey::accumulator_set<typename pubkey::modes::isomorphic<
+                     Scheme, pubkey::nop_padding>::template bind<pubkey::verifying_policy<Scheme>>::type>>
+        pubkey::detail::range_scheme_impl<pubkey::detail::value_scheme_impl<SchemeAccumulator>>
+        verify(InputIterator first, InputIterator last, const KeySinglePassRange &key) {
+
+            typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
+            pubkey::verifying_policy<Scheme>>::type SchemeMode;
+
+            typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamSignerImpl;
+            typedef pubkey::detail::range_scheme_impl<StreamSignerImpl> SignerImpl;
+
+            return SignerImpl(
+                first, last,
+                SchemeAccumulator(SchemeMode(Scheme(pubkey::detail::key_value<Scheme>(key)))));
+        }
+
+        /*!
+         * @brief
+         *
+         * @ingroup pubkey_algorithms
+         *
+         * @tparam Scheme
+         * @tparam InputIterator
+         * @tparam KeySinglePassRange
+         * @tparam SchemeAccumulator
+         *
+         * @param first
+         * @param last
+         * @param key
+         *
+         * @return
+         */
+        template<typename Scheme, typename InputIterator,
+                 typename SchemeAccumulator = typename pubkey::accumulator_set<typename pubkey::modes::isomorphic<
+                     Scheme, pubkey::nop_padding>::template bind<pubkey::verifying_policy<Scheme>>::type>>
+        pubkey::detail::range_scheme_impl<pubkey::detail::value_scheme_impl<SchemeAccumulator>>
+        verify(InputIterator first, InputIterator last, const public_key<Scheme> &key) {
+
+            typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
+                pubkey::verifying_policy<Scheme>>::type SchemeMode;
+
+            typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamSignerImpl;
+            typedef pubkey::detail::range_scheme_impl<StreamSignerImpl> SignerImpl;
+
+            return SignerImpl(
+                first, last,
+                SchemeAccumulator(SchemeMode(Scheme(pubkey::detail::key_value<Scheme>(key)))));
         }
 
         /*!
@@ -180,21 +292,25 @@ namespace nil {
          *
          * @return
          */
-        template<typename Scheme, typename SinglePassRange, typename KeyRange, typename OutputIterator>
-        OutputIterator verify(const SinglePassRange &rng, const KeyRange &key, OutputIterator out) {
+        template<typename Scheme, typename SinglePassRange, typename KeySinglePassRange, typename OutputIterator>
+        OutputIterator verify(const SinglePassRange &rng, const KeySinglePassRange &key, OutputIterator out) {
 
-            typedef typename Scheme::stream_verifyer_type SignionMode;
-            typedef typename pubkey::accumulator_set<typename pubkey::modes::isomorphic<
-                Scheme, pubkey::nop_padding>::template bind<pubkey::verification_policy<Scheme>>::type> SchemeAccumulator;
+            typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
+            pubkey::verifying_policy<Scheme>>::type SchemeMode;
+            typedef typename pubkey::accumulator_set<SchemeMode> SchemeAccumulator;
 
-            typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamVerificatorImpl;
-            typedef pubkey::detail::itr_scheme_impl<StreamVerificatorImpl, OutputIterator> VerificatorImpl;
+            typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamSignerImpl;
+            typedef pubkey::detail::itr_scheme_impl<StreamSignerImpl, OutputIterator> SignerImpl;
 
-            return VerificatorImpl(rng, std::move(out), SchemeState(Scheme(key)));
+            return SignerImpl(
+                rng, std::move(out),
+                SchemeAccumulator(SchemeMode(Scheme(pubkey::detail::key_value<Scheme>(key)))));
         }
 
         /*!
          * @brief
+         *
+         * @ingroup pubkey_algorithms
          *
          * @tparam Scheme
          * @tparam SinglePassRange
@@ -207,17 +323,78 @@ namespace nil {
          * @return
          */
         template<typename Scheme, typename SinglePassRange, typename OutputIterator>
-        OutputIterator verify(const SinglePassRange &rng, const public_key<Scheme> &key, OutputIterator out) {
+        OutputIterator verify(const SinglePassRange &rng, const public_key<Scheme> &key, OutputIterator
+                                                                                                           out) {
 
-            typedef typename Scheme::stream_verifyer_type SignionMode;
-            typedef typename pubkey::accumulator_set<typename pubkey::modes::isomorphic<
-                Scheme, pubkey::nop_padding>::template bind<pubkey::verification_policy<Scheme>>::type>
-                SchemeAccumulator;
+            typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
+                pubkey::verifying_policy<Scheme>>::type SchemeMode;
+            typedef typename pubkey::accumulator_set<SchemeMode> SchemeAccumulator;
 
-            typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamVerificatorImpl;
-            typedef pubkey::detail::itr_scheme_impl<StreamVerificatorImpl, OutputIterator> VerificatorImpl;
+            typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamSignerImpl;
+            typedef pubkey::detail::itr_scheme_impl<StreamSignerImpl, OutputIterator> SignerImpl;
 
-            return VerificatorImpl(rng, std::move(out), SchemeState(Scheme(key)));
+            return SignerImpl(
+                rng, std::move(out),
+                SchemeAccumulator(SchemeMode(Scheme(pubkey::detail::key_value<Scheme>(key)))));
+        }
+
+        /*!
+         * @brief
+         *
+         * @tparam Scheme
+         * @tparam SinglePassRange
+         * @tparam KeySinglePassRange
+         * @tparam OutputRange
+         *
+         * @param rng
+         * @param key
+         * @param out
+         *
+         * @return
+         */
+        template<typename Scheme, typename SinglePassRange, typename KeySinglePassRange, typename OutputRange>
+        OutputRange &verify(const SinglePassRange &rng, const KeySinglePassRange &key, OutputRange &out) {
+
+            typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
+            pubkey::verifying_policy<Scheme>>::type SchemeMode;
+            typedef typename pubkey::accumulator_set<SchemeMode> SchemeAccumulator;
+
+            typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamSignerImpl;
+            typedef pubkey::detail::range_scheme_impl<StreamSignerImpl> SignerImpl;
+
+            return SignerImpl(
+                rng, std::move(out),
+                SchemeAccumulator(SchemeMode(Scheme(pubkey::detail::key_value<Scheme>(key)))));
+        }
+
+        /*!
+         * @brief
+         *
+         * * @ingroup pubkey_algorithms
+         *
+         * @tparam Scheme
+         * @tparam SinglePassRange
+         * @tparam OutputRange
+         *
+         * @param rng
+         * @param key
+         * @param out
+         *
+         * @return
+         */
+        template<typename Scheme, typename SinglePassRange, typename OutputRange>
+        OutputRange &verify(const SinglePassRange &rng, const public_key<Scheme> &key, OutputRange &out) {
+
+            typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
+                pubkey::verifying_policy<Scheme>>::type SchemeMode;
+            typedef typename pubkey::accumulator_set<SchemeMode> SchemeAccumulator;
+
+            typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamSignerImpl;
+            typedef pubkey::detail::range_scheme_impl<StreamSignerImpl> SignerImpl;
+
+            return SignerImpl(
+                rng, std::move(out),
+                SchemeAccumulator(SchemeMode(Scheme(pubkey::detail::key_value<Scheme>(key)))));
         }
 
         /*!
@@ -235,20 +412,26 @@ namespace nil {
          *
          * @return
          */
-        template<typename Scheme, typename SinglePassRange, typename KeyRange,
+        template<typename Scheme, typename SinglePassRange, typename KeySinglePassRange,
                  typename SchemeAccumulator = typename pubkey::accumulator_set<typename pubkey::modes::isomorphic<
-                     Scheme, pubkey::nop_padding>::template bind<pubkey::verification_policy<Scheme>>::type>>
+                     Scheme, pubkey::nop_padding>::template bind<pubkey::verifying_policy<Scheme>>::type>>
         pubkey::detail::range_scheme_impl<pubkey::detail::value_scheme_impl<SchemeAccumulator>>
-        verify(const SinglePassRange &r, const KeyRange &key) {
+        verify(const SinglePassRange &r, const KeySinglePassRange &key) {
 
-            typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamVerificatorImpl;
-            typedef pubkey::detail::range_scheme_impl<StreamVerificatorImpl> VerificatorImpl;
+            typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
+            pubkey::verifying_policy<Scheme>>::type SchemeMode;
 
-            return VerificatorImpl(r, SchemeState(Scheme(key)));
+            typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamSignerImpl;
+            typedef pubkey::detail::range_scheme_impl<StreamSignerImpl> SignerImpl;
+
+            return SignerImpl(
+                r, SchemeAccumulator(SchemeMode(Scheme(pubkey::detail::key_value<Scheme>(key)))));
         }
 
         /*!
          * @brief
+         *
+         * @ingroup pubkey_algorithms
          *
          * @tparam Scheme
          * @tparam SinglePassRange
@@ -261,14 +444,18 @@ namespace nil {
          */
         template<typename Scheme, typename SinglePassRange,
                  typename SchemeAccumulator = typename pubkey::accumulator_set<typename pubkey::modes::isomorphic<
-                     Scheme, pubkey::nop_padding>::template bind<pubkey::verification_policy<Scheme>>::type>>
+                     Scheme, pubkey::nop_padding>::template bind<pubkey::verifying_policy<Scheme>>::type>>
         pubkey::detail::range_scheme_impl<pubkey::detail::value_scheme_impl<SchemeAccumulator>>
         verify(const SinglePassRange &r, const public_key<Scheme> &key) {
 
-            typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamVerificatorImpl;
-            typedef pubkey::detail::range_scheme_impl<StreamVerificatorImpl> VerificatorImpl;
+            typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
+                pubkey::verifying_policy<Scheme>>::type SchemeMode;
 
-            return VerificatorImpl(r, SchemeState(Scheme(key)));
+            typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamSignerImpl;
+            typedef pubkey::detail::range_scheme_impl<StreamSignerImpl> SignerImpl;
+
+            return SignerImpl(
+                r, SchemeAccumulator(SchemeMode(Scheme(pubkey::detail::key_value<Scheme>(key)))));
         }
     }    // namespace crypto3
 }    // namespace nil

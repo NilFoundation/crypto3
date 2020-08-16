@@ -40,19 +40,53 @@ namespace nil {
          *
          * @return
          */
-        template<typename Scheme, typename InputIterator, typename KeyIterator, typename OutputIterator>
-        OutputIterator agree(InputIterator first, InputIterator last, KeyIterator key_first, KeyIterator key_last,
-                             OutputIterator out) {
+        template<typename Scheme, typename InputIterator, typename KeyInputIterator, typename OutputIterator>
+        OutputIterator agree(InputIterator first, InputIterator last, KeyInputIterator key_first,
+                               KeyInputIterator key_last, OutputIterator out) {
 
-            typedef typename Scheme::stream_agreeer_type AgreementMode;
-            typedef typename pubkey::accumulator_set<typename pubkey::modes::isomorphic<
-                Scheme, pubkey::nop_padding>::template bind<pubkey::agreement_policy<Scheme>>::type>
-                AgreementAccumulator;
+            typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
+            pubkey::agreement_policy<Scheme>>::type AgreementMode;
+            typedef typename pubkey::accumulator_set<AgreementMode> SchemeAccumulator;
 
-            typedef pubkey::detail::value_scheme_impl<AgreementAccumulator> StreamAgreementImpl;
-            typedef pubkey::detail::itr_scheme_impl<StreamAgreementImpl, OutputIterator> AgreementImpl;
+            typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamEncrypterImpl;
+            typedef pubkey::detail::itr_scheme_impl<StreamEncrypterImpl, OutputIterator> EncrypterImpl;
 
-            return AgreementImpl(first, last, std::move(out), AgreementState(Scheme(key_first, key_last)));
+            return EncrypterImpl(first, last, std::move(out),
+                SchemeAccumulator(AgreementMode(
+                    Scheme(pubkey::detail::key_value<Scheme>(key_first, key_last)))));
+        }
+
+        /*!
+         * @brief
+         *
+         * @ingroup pubkey_algorithms
+         *
+         * @tparam Scheme
+         * @tparam InputIterator
+         * @tparam KeySinglePassRange
+         * @tparam OutputIterator
+         *
+         * @param first
+         * @param last
+         * @param key
+         * @param out
+         *
+         * @return
+         */
+        template<typename Scheme, typename InputIterator, typename KeySinglePassRange, typename OutputIterator>
+        OutputIterator agree(InputIterator first, InputIterator last, const KeySinglePassRange &key,
+                               OutputIterator out) {
+
+            typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
+            pubkey::agreement_policy<Scheme>>::type AgreementMode;
+            typedef typename pubkey::accumulator_set<AgreementMode> SchemeAccumulator;
+
+            typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamEncrypterImpl;
+            typedef pubkey::detail::itr_scheme_impl<StreamEncrypterImpl, OutputIterator> EncrypterImpl;
+
+            return EncrypterImpl(
+                first, last, std::move(out),
+                SchemeAccumulator(AgreementMode(Scheme(pubkey::detail::key_value<Scheme>(key)))));
         }
 
         /*!
@@ -73,17 +107,18 @@ namespace nil {
          */
         template<typename Scheme, typename InputIterator, typename OutputIterator>
         OutputIterator agree(InputIterator first, InputIterator last, const agreement_key<Scheme> &key,
-                             OutputIterator out) {
+                               OutputIterator out) {
 
-            typedef typename Scheme::stream_agreeer_type AgreementMode;
-            typedef typename pubkey::accumulator_set<typename pubkey::modes::isomorphic<
-                Scheme, pubkey::nop_padding>::template bind<pubkey::agreement_policy<Scheme>>::type>
-                AgreementAccumulator;
+            typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
+                pubkey::agreement_policy<Scheme>>::type AgreementMode;
+            typedef typename pubkey::accumulator_set<AgreementMode> SchemeAccumulator;
 
-            typedef pubkey::detail::value_scheme_impl<AgreementAccumulator> StreamAgreementImpl;
-            typedef pubkey::detail::itr_scheme_impl<StreamAgreementImpl, OutputIterator> AgreementImpl;
+            typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamEncrypterImpl;
+            typedef pubkey::detail::itr_scheme_impl<StreamEncrypterImpl, OutputIterator> EncrypterImpl;
 
-            return AgreementImpl(first, last, std::move(out), AgreementState(Scheme(key)));
+            return EncrypterImpl(
+                first, last, std::move(out),
+                SchemeAccumulator(AgreementMode(Scheme(key))));
         }
 
         /*!
@@ -93,7 +128,7 @@ namespace nil {
          *
          * @tparam Scheme
          * @tparam InputIterator
-         * @tparam SchemeAccumulator
+         * @tparam OutputAccumulator
          *
          * @param first
          * @param last
@@ -102,14 +137,16 @@ namespace nil {
          * @return
          */
         template<typename Scheme, typename InputIterator,
-                 typename SchemeAccumulator = typename pubkey::accumulator_set<typename pubkey::modes::isomorphic<
+                 typename OutputAccumulator = typename pubkey::accumulator_set<typename pubkey::modes::isomorphic<
                      Scheme, pubkey::nop_padding>::template bind<pubkey::agreement_policy<Scheme>>::type>>
-        SchemeAccumulator &agree(InputIterator first, InputIterator last, SchemeAccumulator &acc) {
+        typename std::enable_if<boost::accumulators::detail::is_accumulator_set<OutputAccumulator>::value,
+                                OutputAccumulator>::type &
+        agree(InputIterator first, InputIterator last, OutputAccumulator &acc) {
 
-            typedef pubkey::detail::ref_scheme_impl<SchemeAccumulator> StreamAgreementImpl;
-            typedef pubkey::detail::range_scheme_impl<StreamAgreementImpl> AgreementImpl;
+            typedef pubkey::detail::ref_scheme_impl<OutputAccumulator> StreamEncrypterImpl;
+            typedef pubkey::detail::range_scheme_impl<StreamEncrypterImpl> EncrypterImpl;
 
-            return AgreementImpl(first, last, acc);
+            return EncrypterImpl(first, last, std::forward<OutputAccumulator>(acc));
         }
 
         /*!
@@ -119,22 +156,26 @@ namespace nil {
          *
          * @tparam Scheme
          * @tparam SinglePassRange
-         * @tparam SchemeAccumulator
+         * @tparam OutputAccumulator
          *
          * @param r
          * @param acc
          *
          * @return
          */
+
         template<typename Scheme, typename SinglePassRange,
-                 typename SchemeAccumulator = typename pubkey::accumulator_set<typename pubkey::modes::isomorphic<
-                     Scheme, pubkey::nop_padding>::template bind<pubkey::agreement_policy<Scheme>>::type>>
-        SchemeAccumulator &agree(const SinglePassRange &r, SchemeAccumulator &acc) {
+                 typename OutputAccumulator = typename pubkey::accumulator_set<
+                     typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
+                         typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::agreement_policy>::type>>
+        typename std::enable_if<boost::accumulators::detail::is_accumulator_set<OutputAccumulator>::value,
+                                OutputAccumulator>::type &
+        agree(const SinglePassRange &r, OutputAccumulator &acc) {
 
-            typedef pubkey::detail::ref_scheme_impl<SchemeAccumulator> StreamAgreementImpl;
-            typedef pubkey::detail::range_scheme_impl<StreamAgreementImpl> AgreementImpl;
+            typedef pubkey::detail::ref_scheme_impl<OutputAccumulator> StreamEncrypterImpl;
+            typedef pubkey::detail::range_scheme_impl<StreamEncrypterImpl> EncrypterImpl;
 
-            return AgreementImpl(r, acc);
+            return EncrypterImpl(r, acc);
         }
 
         /*!
@@ -154,16 +195,85 @@ namespace nil {
          *
          * @return
          */
-        template<typename Scheme, typename InputIterator, typename KeyIterator,
+        template<typename Scheme, typename InputIterator, typename KeyInputIterator,
                  typename SchemeAccumulator = typename pubkey::accumulator_set<typename pubkey::modes::isomorphic<
                      Scheme, pubkey::nop_padding>::template bind<pubkey::agreement_policy<Scheme>>::type>>
         pubkey::detail::range_scheme_impl<pubkey::detail::value_scheme_impl<SchemeAccumulator>>
-            agree(InputIterator first, InputIterator last, KeyIterator key_first, KeyIterator key_last) {
+        agree(InputIterator first, InputIterator last, KeyInputIterator key_first, KeyInputIterator key_last) {
 
-            typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamAgreementImpl;
-            typedef pubkey::detail::range_scheme_impl<StreamAgreementImpl> AgreementImpl;
+            typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
+            pubkey::agreement_policy<Scheme>>::type AgreementMode;
 
-            return AgreementImpl(first, last, SchemeAccumulator(Scheme(key_first, key_last)));
+            typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamEncrypterImpl;
+            typedef pubkey::detail::range_scheme_impl<StreamEncrypterImpl> EncrypterImpl;
+
+            return EncrypterImpl(first, last,
+                SchemeAccumulator(AgreementMode(
+                    Scheme(pubkey::detail::key_value<Scheme>(key_first, key_last)))));
+        }
+
+        /*!
+         * @brief
+         *
+         * @tparam Scheme
+         * @tparam InputIterator
+         * @tparam KeySinglePassRange
+         * @tparam SchemeAccumulator
+         *
+         * @param first
+         * @param last
+         * @param key
+         *
+         * @return
+         */
+        template<typename Scheme, typename InputIterator, typename KeySinglePassRange,
+                 typename SchemeAccumulator = typename pubkey::accumulator_set<typename pubkey::modes::isomorphic<
+                     Scheme, pubkey::nop_padding>::template bind<pubkey::agreement_policy<Scheme>>::type>>
+        pubkey::detail::range_scheme_impl<pubkey::detail::value_scheme_impl<SchemeAccumulator>>
+        agree(InputIterator first, InputIterator last, const KeySinglePassRange &key) {
+
+            typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
+            pubkey::agreement_policy<Scheme>>::type AgreementMode;
+
+            typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamEncrypterImpl;
+            typedef pubkey::detail::range_scheme_impl<StreamEncrypterImpl> EncrypterImpl;
+
+            return EncrypterImpl(
+                first, last,
+                SchemeAccumulator(AgreementMode(Scheme(pubkey::detail::key_value<Scheme>(key)))));
+        }
+
+        /*!
+         * @brief
+         *
+         * @ingroup pubkey_algorithms
+         *
+         * @tparam Scheme
+         * @tparam InputIterator
+         * @tparam KeySinglePassRange
+         * @tparam SchemeAccumulator
+         *
+         * @param first
+         * @param last
+         * @param key
+         *
+         * @return
+         */
+        template<typename Scheme, typename InputIterator,
+                 typename SchemeAccumulator = typename pubkey::accumulator_set<typename pubkey::modes::isomorphic<
+                     Scheme, pubkey::nop_padding>::template bind<pubkey::agreement_policy<Scheme>>::type>>
+        pubkey::detail::range_scheme_impl<pubkey::detail::value_scheme_impl<SchemeAccumulator>>
+        agree(InputIterator first, InputIterator last, const agreement_key<Scheme> &key) {
+
+            typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
+                pubkey::agreement_policy<Scheme>>::type AgreementMode;
+
+            typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamEncrypterImpl;
+            typedef pubkey::detail::range_scheme_impl<StreamEncrypterImpl> EncrypterImpl;
+
+            return EncrypterImpl(
+                first, last,
+                SchemeAccumulator(AgreementMode(Scheme(pubkey::detail::key_value<Scheme>(key)))));
         }
 
         /*!
@@ -182,22 +292,25 @@ namespace nil {
          *
          * @return
          */
-        template<typename Scheme, typename SinglePassRange, typename KeyRange, typename OutputIterator>
-        OutputIterator agree(const SinglePassRange &rng, const KeyRange &key, OutputIterator out) {
+        template<typename Scheme, typename SinglePassRange, typename KeySinglePassRange, typename OutputIterator>
+        OutputIterator agree(const SinglePassRange &rng, const KeySinglePassRange &key, OutputIterator out) {
 
-            typedef typename Scheme::stream_agreeer_type SignionMode;
-            typedef typename pubkey::accumulator_set<typename pubkey::modes::isomorphic<
-                Scheme, pubkey::nop_padding>::template bind<pubkey::agreement_policy<Scheme>>::type>
-                SchemeAccumulator;
+            typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
+            pubkey::agreement_policy<Scheme>>::type AgreementMode;
+            typedef typename pubkey::accumulator_set<AgreementMode> SchemeAccumulator;
 
-            typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamAgreementImpl;
-            typedef pubkey::detail::itr_scheme_impl<StreamAgreementImpl, OutputIterator> AgreementImpl;
+            typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamEncrypterImpl;
+            typedef pubkey::detail::itr_scheme_impl<StreamEncrypterImpl, OutputIterator> EncrypterImpl;
 
-            return AgreementImpl(rng, std::move(out), SchemeState(Scheme(key)));
+            return EncrypterImpl(
+                rng, std::move(out),
+                SchemeAccumulator(AgreementMode(Scheme(pubkey::detail::key_value<Scheme>(key)))));
         }
 
         /*!
          * @brief
+         *
+         * @ingroup pubkey_algorithms
          *
          * @tparam Scheme
          * @tparam SinglePassRange
@@ -210,17 +323,78 @@ namespace nil {
          * @return
          */
         template<typename Scheme, typename SinglePassRange, typename OutputIterator>
-        OutputIterator agree(const SinglePassRange &rng, const agreement_key<Scheme> &key, OutputIterator out) {
+        OutputIterator agree(const SinglePassRange &rng, const agreement_key<Scheme> &key, OutputIterator
+                                                                                                           out) {
 
-            typedef typename Scheme::stream_agreeer_type SignionMode;
-            typedef typename pubkey::accumulator_set<typename pubkey::modes::isomorphic<
-                Scheme, pubkey::nop_padding>::template bind<pubkey::agreement_policy<Scheme>>::type>
-                SchemeAccumulator;
+            typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
+                pubkey::agreement_policy<Scheme>>::type AgreementMode;
+            typedef typename pubkey::accumulator_set<AgreementMode> SchemeAccumulator;
 
-            typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamAgreementImpl;
-            typedef pubkey::detail::itr_scheme_impl<StreamAgreementImpl, OutputIterator> AgreementImpl;
+            typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamEncrypterImpl;
+            typedef pubkey::detail::itr_scheme_impl<StreamEncrypterImpl, OutputIterator> EncrypterImpl;
 
-            return AgreementImpl(rng, std::move(out), SchemeState(Scheme(key)));
+            return EncrypterImpl(
+                rng, std::move(out),
+                SchemeAccumulator(AgreementMode(Scheme(pubkey::detail::key_value<Scheme>(key)))));
+        }
+
+        /*!
+         * @brief
+         *
+         * @tparam Scheme
+         * @tparam SinglePassRange
+         * @tparam KeySinglePassRange
+         * @tparam OutputRange
+         *
+         * @param rng
+         * @param key
+         * @param out
+         *
+         * @return
+         */
+        template<typename Scheme, typename SinglePassRange, typename KeySinglePassRange, typename OutputRange>
+        OutputRange &agree(const SinglePassRange &rng, const KeySinglePassRange &key, OutputRange &out) {
+
+            typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
+            pubkey::agreement_policy<Scheme>>::type AgreementMode;
+            typedef typename pubkey::accumulator_set<AgreementMode> SchemeAccumulator;
+
+            typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamEncrypterImpl;
+            typedef pubkey::detail::range_scheme_impl<StreamEncrypterImpl> EncrypterImpl;
+
+            return EncrypterImpl(
+                rng, std::move(out),
+                SchemeAccumulator(AgreementMode(Scheme(pubkey::detail::key_value<Scheme>(key)))));
+        }
+
+        /*!
+         * @brief
+         *
+         * * @ingroup pubkey_algorithms
+         *
+         * @tparam Scheme
+         * @tparam SinglePassRange
+         * @tparam OutputRange
+         *
+         * @param rng
+         * @param key
+         * @param out
+         *
+         * @return
+         */
+        template<typename Scheme, typename SinglePassRange, typename OutputRange>
+        OutputRange &agree(const SinglePassRange &rng, const agreement_key<Scheme> &key, OutputRange &out) {
+
+            typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
+                pubkey::agreement_policy<Scheme>>::type AgreementMode;
+            typedef typename pubkey::accumulator_set<AgreementMode> SchemeAccumulator;
+
+            typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamEncrypterImpl;
+            typedef pubkey::detail::range_scheme_impl<StreamEncrypterImpl> EncrypterImpl;
+
+            return EncrypterImpl(
+                rng, std::move(out),
+                SchemeAccumulator(AgreementMode(Scheme(pubkey::detail::key_value<Scheme>(key)))));
         }
 
         /*!
@@ -238,20 +412,26 @@ namespace nil {
          *
          * @return
          */
-        template<typename Scheme, typename SinglePassRange, typename KeyRange,
+        template<typename Scheme, typename SinglePassRange, typename KeySinglePassRange,
                  typename SchemeAccumulator = typename pubkey::accumulator_set<typename pubkey::modes::isomorphic<
                      Scheme, pubkey::nop_padding>::template bind<pubkey::agreement_policy<Scheme>>::type>>
         pubkey::detail::range_scheme_impl<pubkey::detail::value_scheme_impl<SchemeAccumulator>>
-            agree(const SinglePassRange &r, const KeyRange &key) {
+        agree(const SinglePassRange &r, const KeySinglePassRange &key) {
 
-            typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamAgreementImpl;
-            typedef pubkey::detail::range_scheme_impl<StreamAgreementImpl> AgreementImpl;
+            typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
+            pubkey::agreement_policy<Scheme>>::type AgreementMode;
 
-            return AgreementImpl(r, SchemeState(Scheme(key)));
+            typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamEncrypterImpl;
+            typedef pubkey::detail::range_scheme_impl<StreamEncrypterImpl> EncrypterImpl;
+
+            return EncrypterImpl(
+                r, SchemeAccumulator(AgreementMode(Scheme(pubkey::detail::key_value<Scheme>(key)))));
         }
 
         /*!
          * @brief
+         *
+         * @ingroup pubkey_algorithms
          *
          * @tparam Scheme
          * @tparam SinglePassRange
@@ -266,12 +446,16 @@ namespace nil {
                  typename SchemeAccumulator = typename pubkey::accumulator_set<typename pubkey::modes::isomorphic<
                      Scheme, pubkey::nop_padding>::template bind<pubkey::agreement_policy<Scheme>>::type>>
         pubkey::detail::range_scheme_impl<pubkey::detail::value_scheme_impl<SchemeAccumulator>>
-            agree(const SinglePassRange &r, const agreement_key<Scheme> &key) {
+        agree(const SinglePassRange &r, const agreement_key<Scheme> &key) {
 
-            typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamAgreementImpl;
-            typedef pubkey::detail::range_scheme_impl<StreamAgreementImpl> AgreementImpl;
+            typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
+                pubkey::agreement_policy<Scheme>>::type AgreementMode;
 
-            return AgreementImpl(r, SchemeState(Scheme(key)));
+            typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamEncrypterImpl;
+            typedef pubkey::detail::range_scheme_impl<StreamEncrypterImpl> EncrypterImpl;
+
+            return EncrypterImpl(
+                r, SchemeAccumulator(AgreementMode(Scheme(pubkey::detail::key_value<Scheme>(key)))));
         }
     }    // namespace crypto3
 }    // namespace nil

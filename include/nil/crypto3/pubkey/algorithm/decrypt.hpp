@@ -14,7 +14,7 @@
 #include <nil/crypto3/pubkey/scheme_value.hpp>
 #include <nil/crypto3/pubkey/scheme_state.hpp>
 
-#include <nil/crypto3/pubkey/public_key.hpp>
+#include <nil/crypto3/pubkey/private_key.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -40,19 +40,53 @@ namespace nil {
          *
          * @return
          */
-        template<typename Scheme, typename InputIterator, typename KeyIterator, typename OutputIterator>
-        OutputIterator decrypt(InputIterator first, InputIterator last, KeyIterator key_first, KeyIterator key_last,
-                               OutputIterator out) {
+        template<typename Scheme, typename InputIterator, typename KeyInputIterator, typename OutputIterator>
+        OutputIterator decrypt(InputIterator first, InputIterator last, KeyInputIterator key_first,
+                               KeyInputIterator key_last, OutputIterator out) {
 
-            typedef typename Scheme::stream_decrypter_type DecrypterMode;
-            typedef typename pubkey::accumulator_set<typename pubkey::modes::isomorphic<
-                Scheme, pubkey::nop_padding>::template bind<pubkey::decryption_policy<Scheme>>::type>
-                DecrypterAccumulator;
+            typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
+            pubkey::decryption_policy<Scheme>>::type SchemeMode;
+            typedef typename pubkey::accumulator_set<SchemeMode> SchemeAccumulator;
 
-            typedef pubkey::detail::value_scheme_impl<DecrypterAccumulator> StreamDecrypterImpl;
+            typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamDecrypterImpl;
             typedef pubkey::detail::itr_scheme_impl<StreamDecrypterImpl, OutputIterator> DecrypterImpl;
 
-            return DecrypterImpl(first, last, std::move(out), DecrypterState(Scheme(key_first, key_last)));
+            return DecrypterImpl(first, last, std::move(out),
+                SchemeAccumulator(SchemeMode(
+                    Scheme(pubkey::detail::key_value<Scheme>(key_first, key_last)))));
+        }
+
+        /*!
+         * @brief
+         *
+         * @ingroup pubkey_algorithms
+         *
+         * @tparam Scheme
+         * @tparam InputIterator
+         * @tparam KeySinglePassRange
+         * @tparam OutputIterator
+         *
+         * @param first
+         * @param last
+         * @param key
+         * @param out
+         *
+         * @return
+         */
+        template<typename Scheme, typename InputIterator, typename KeySinglePassRange, typename OutputIterator>
+        OutputIterator decrypt(InputIterator first, InputIterator last, const KeySinglePassRange &key,
+                               OutputIterator out) {
+
+            typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
+            pubkey::decryption_policy<Scheme>>::type SchemeMode;
+            typedef typename pubkey::accumulator_set<SchemeMode> SchemeAccumulator;
+
+            typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamDecrypterImpl;
+            typedef pubkey::detail::itr_scheme_impl<StreamDecrypterImpl, OutputIterator> DecrypterImpl;
+
+            return DecrypterImpl(
+                first, last, std::move(out),
+                SchemeAccumulator(SchemeMode(Scheme(pubkey::detail::key_value<Scheme>(key)))));
         }
 
         /*!
@@ -72,18 +106,19 @@ namespace nil {
          * @return
          */
         template<typename Scheme, typename InputIterator, typename OutputIterator>
-        OutputIterator decrypt(InputIterator first, InputIterator last, const public_key<Scheme> &key,
+        OutputIterator decrypt(InputIterator first, InputIterator last, const private_key<Scheme> &key,
                                OutputIterator out) {
 
-            typedef typename Scheme::stream_decrypter_type DecrypterMode;
-            typedef typename pubkey::accumulator_set<typename pubkey::modes::isomorphic<
-                Scheme, pubkey::nop_padding>::template bind<pubkey::decryption_policy<Scheme>>::type>
-                DecrypterAccumulator;
+            typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
+                pubkey::decryption_policy<Scheme>>::type SchemeMode;
+            typedef typename pubkey::accumulator_set<SchemeMode> SchemeAccumulator;
 
-            typedef pubkey::detail::value_scheme_impl<DecrypterAccumulator> StreamDecrypterImpl;
+            typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamDecrypterImpl;
             typedef pubkey::detail::itr_scheme_impl<StreamDecrypterImpl, OutputIterator> DecrypterImpl;
 
-            return DecrypterImpl(first, last, std::move(out), DecrypterState(Scheme(key)));
+            return DecrypterImpl(
+                first, last, std::move(out),
+                SchemeAccumulator(SchemeMode(Scheme(key))));
         }
 
         /*!
@@ -93,7 +128,7 @@ namespace nil {
          *
          * @tparam Scheme
          * @tparam InputIterator
-         * @tparam SchemeAccumulator
+         * @tparam OutputAccumulator
          *
          * @param first
          * @param last
@@ -102,14 +137,16 @@ namespace nil {
          * @return
          */
         template<typename Scheme, typename InputIterator,
-                 typename SchemeAccumulator = typename pubkey::accumulator_set<typename pubkey::modes::isomorphic<
+                 typename OutputAccumulator = typename pubkey::accumulator_set<typename pubkey::modes::isomorphic<
                      Scheme, pubkey::nop_padding>::template bind<pubkey::decryption_policy<Scheme>>::type>>
-        SchemeAccumulator &decrypt(InputIterator first, InputIterator last, SchemeAccumulator &acc) {
+        typename std::enable_if<boost::accumulators::detail::is_accumulator_set<OutputAccumulator>::value,
+                                OutputAccumulator>::type &
+        decrypt(InputIterator first, InputIterator last, OutputAccumulator &acc) {
 
-            typedef pubkey::detail::ref_scheme_impl<SchemeAccumulator> StreamDecrypterImpl;
+            typedef pubkey::detail::ref_scheme_impl<OutputAccumulator> StreamDecrypterImpl;
             typedef pubkey::detail::range_scheme_impl<StreamDecrypterImpl> DecrypterImpl;
 
-            return DecrypterImpl(first, last, acc);
+            return DecrypterImpl(first, last, std::forward<OutputAccumulator>(acc));
         }
 
         /*!
@@ -126,10 +163,14 @@ namespace nil {
          *
          * @return
          */
+
         template<typename Scheme, typename SinglePassRange,
-                 typename OutputAccumulator = typename pubkey::accumulator_set<typename pubkey::modes::isomorphic<
-                     Scheme, pubkey::nop_padding>::template bind<pubkey::decryption_policy<Scheme>>::type>>
-        OutputAccumulator &decrypt(const SinglePassRange &r, OutputAccumulator &acc) {
+                 typename OutputAccumulator = typename pubkey::accumulator_set<
+                     typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
+                         typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::decryption_policy>::type>>
+        typename std::enable_if<boost::accumulators::detail::is_accumulator_set<OutputAccumulator>::value,
+                                OutputAccumulator>::type &
+        decrypt(const SinglePassRange &r, OutputAccumulator &acc) {
 
             typedef pubkey::detail::ref_scheme_impl<OutputAccumulator> StreamDecrypterImpl;
             typedef pubkey::detail::range_scheme_impl<StreamDecrypterImpl> DecrypterImpl;
@@ -154,16 +195,85 @@ namespace nil {
          *
          * @return
          */
-        template<typename Scheme, typename InputIterator, typename KeyIterator,
+        template<typename Scheme, typename InputIterator, typename KeyInputIterator,
                  typename SchemeAccumulator = typename pubkey::accumulator_set<typename pubkey::modes::isomorphic<
                      Scheme, pubkey::nop_padding>::template bind<pubkey::decryption_policy<Scheme>>::type>>
         pubkey::detail::range_scheme_impl<pubkey::detail::value_scheme_impl<SchemeAccumulator>>
-            decrypt(InputIterator first, InputIterator last, KeyIterator key_first, KeyIterator key_last) {
+        decrypt(InputIterator first, InputIterator last, KeyInputIterator key_first, KeyInputIterator key_last) {
+
+            typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
+            pubkey::decryption_policy<Scheme>>::type SchemeMode;
 
             typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamDecrypterImpl;
             typedef pubkey::detail::range_scheme_impl<StreamDecrypterImpl> DecrypterImpl;
 
-            return DecrypterImpl(first, last, SchemeAccumulator(Scheme(key_first, key_last)));
+            return DecrypterImpl(first, last,
+                SchemeAccumulator(SchemeMode(
+                    Scheme(pubkey::detail::key_value<Scheme>(key_first, key_last)))));
+        }
+
+        /*!
+         * @brief
+         *
+         * @tparam Scheme
+         * @tparam InputIterator
+         * @tparam KeySinglePassRange
+         * @tparam SchemeAccumulator
+         *
+         * @param first
+         * @param last
+         * @param key
+         *
+         * @return
+         */
+        template<typename Scheme, typename InputIterator, typename KeySinglePassRange,
+                 typename SchemeAccumulator = typename pubkey::accumulator_set<typename pubkey::modes::isomorphic<
+                     Scheme, pubkey::nop_padding>::template bind<pubkey::decryption_policy<Scheme>>::type>>
+        pubkey::detail::range_scheme_impl<pubkey::detail::value_scheme_impl<SchemeAccumulator>>
+        decrypt(InputIterator first, InputIterator last, const KeySinglePassRange &key) {
+
+            typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
+            pubkey::decryption_policy<Scheme>>::type SchemeMode;
+
+            typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamDecrypterImpl;
+            typedef pubkey::detail::range_scheme_impl<StreamDecrypterImpl> DecrypterImpl;
+
+            return DecrypterImpl(
+                first, last,
+                SchemeAccumulator(SchemeMode(Scheme(pubkey::detail::key_value<Scheme>(key)))));
+        }
+
+        /*!
+         * @brief
+         *
+         * @ingroup pubkey_algorithms
+         *
+         * @tparam Scheme
+         * @tparam InputIterator
+         * @tparam KeySinglePassRange
+         * @tparam SchemeAccumulator
+         *
+         * @param first
+         * @param last
+         * @param key
+         *
+         * @return
+         */
+        template<typename Scheme, typename InputIterator,
+                 typename SchemeAccumulator = typename pubkey::accumulator_set<typename pubkey::modes::isomorphic<
+                     Scheme, pubkey::nop_padding>::template bind<pubkey::decryption_policy<Scheme>>::type>>
+        pubkey::detail::range_scheme_impl<pubkey::detail::value_scheme_impl<SchemeAccumulator>>
+        decrypt(InputIterator first, InputIterator last, const private_key<Scheme> &key) {
+
+            typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
+                pubkey::decryption_policy<Scheme>>::type SchemeMode;
+
+            typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamDecrypterImpl;
+            typedef pubkey::detail::range_scheme_impl<StreamDecrypterImpl> DecrypterImpl;
+
+            return DecrypterImpl(
+                first, last,
+                SchemeAccumulator(SchemeMode(Scheme(pubkey::detail::key_value<Scheme>(key)))));
         }
 
         /*!
@@ -182,22 +292,25 @@ namespace nil {
          *
          * @return
          */
-        template<typename Scheme, typename SinglePassRange, typename KeyRange, typename OutputIterator>
-        OutputIterator decrypt(const SinglePassRange &rng, const KeyRange &key, OutputIterator out) {
+        template<typename Scheme, typename SinglePassRange, typename KeySinglePassRange, typename OutputIterator>
+        OutputIterator decrypt(const SinglePassRange &rng, const KeySinglePassRange &key, OutputIterator out) {
 
-            typedef typename Scheme::stream_decrypter_type SignionMode;
-            typedef typename pubkey::accumulator_set<typename pubkey::modes::isomorphic<
-                Scheme, pubkey::nop_padding>::template bind<pubkey::decryption_policy<Scheme>>::type>
-                SchemeAccumulator;
+            typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
+            pubkey::decryption_policy<Scheme>>::type SchemeMode;
+            typedef typename pubkey::accumulator_set<SchemeMode> SchemeAccumulator;
 
             typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamDecrypterImpl;
             typedef pubkey::detail::itr_scheme_impl<StreamDecrypterImpl, OutputIterator> DecrypterImpl;
 
-            return DecrypterImpl(rng, std::move(out), SchemeState(Scheme(key)));
+            return DecrypterImpl(
+                rng, std::move(out),
+                SchemeAccumulator(SchemeMode(Scheme(pubkey::detail::key_value<Scheme>(key)))));
         }
 
         /*!
          * @brief
+         *
+         * @ingroup pubkey_algorithms
          *
          * @tparam Scheme
          * @tparam SinglePassRange
@@ -210,17 +323,78 @@ namespace nil {
          * @return
          */
         template<typename Scheme, typename SinglePassRange, typename OutputIterator>
-        OutputIterator decrypt(const SinglePassRange &rng, const public_key<Scheme> &key, OutputIterator out) {
+        OutputIterator decrypt(const SinglePassRange &rng, const private_key<Scheme> &key, OutputIterator
+                                                                                                           out) {
 
-            typedef typename Scheme::stream_decrypter_type SignionMode;
-            typedef typename pubkey::accumulator_set<typename pubkey::modes::isomorphic<
-                Scheme, pubkey::nop_padding>::template bind<pubkey::decryption_policy<Scheme>>::type>
-                SchemeAccumulator;
+            typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
+                pubkey::decryption_policy<Scheme>>::type SchemeMode;
+            typedef typename pubkey::accumulator_set<SchemeMode> SchemeAccumulator;
 
             typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamDecrypterImpl;
             typedef pubkey::detail::itr_scheme_impl<StreamDecrypterImpl, OutputIterator> DecrypterImpl;
 
-            return DecrypterImpl(rng, std::move(out), SchemeState(Scheme(key)));
+            return DecrypterImpl(
+                rng, std::move(out),
+                SchemeAccumulator(SchemeMode(Scheme(pubkey::detail::key_value<Scheme>(key)))));
+        }
+
+        /*!
+         * @brief
+         *
+         * @tparam Scheme
+         * @tparam SinglePassRange
+         * @tparam KeySinglePassRange
+         * @tparam OutputRange
+         *
+         * @param rng
+         * @param key
+         * @param out
+         *
+         * @return
+         */
+        template<typename Scheme, typename SinglePassRange, typename KeySinglePassRange, typename OutputRange>
+        OutputRange &decrypt(const SinglePassRange &rng, const KeySinglePassRange &key, OutputRange &out) {
+
+            typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
+            pubkey::decryption_policy<Scheme>>::type SchemeMode;
+            typedef typename pubkey::accumulator_set<SchemeMode> SchemeAccumulator;
+
+            typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamDecrypterImpl;
+            typedef pubkey::detail::range_scheme_impl<StreamDecrypterImpl> DecrypterImpl;
+
+            return DecrypterImpl(
+                rng, std::move(out),
+                SchemeAccumulator(SchemeMode(Scheme(pubkey::detail::key_value<Scheme>(key)))));
+        }
+
+        /*!
+         * @brief
+         *
+         * * @ingroup pubkey_algorithms
+         *
+         * @tparam Scheme
+         * @tparam SinglePassRange
+         * @tparam OutputRange
+         *
+         * @param rng
+         * @param key
+         * @param out
+         *
+         * @return
+         */
+        template<typename Scheme, typename SinglePassRange, typename OutputRange>
+        OutputRange &decrypt(const SinglePassRange &rng, const private_key<Scheme> &key, OutputRange &out) {
+
+            typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
+                pubkey::decryption_policy<Scheme>>::type SchemeMode;
+            typedef typename pubkey::accumulator_set<SchemeMode> SchemeAccumulator;
+
+            typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamDecrypterImpl;
+            typedef pubkey::detail::range_scheme_impl<StreamDecrypterImpl> DecrypterImpl;
+
+            return DecrypterImpl(
+                rng, std::move(out),
+                SchemeAccumulator(SchemeMode(Scheme(pubkey::detail::key_value<Scheme>(key)))));
         }
 
         /*!
@@ -238,20 +412,26 @@ namespace nil {
          *
          * @return
          */
-        template<typename Scheme, typename SinglePassRange, typename KeyRange,
+        template<typename Scheme, typename SinglePassRange, typename KeySinglePassRange,
                  typename SchemeAccumulator = typename pubkey::accumulator_set<typename pubkey::modes::isomorphic<
                      Scheme, pubkey::nop_padding>::template bind<pubkey::decryption_policy<Scheme>>::type>>
         pubkey::detail::range_scheme_impl<pubkey::detail::value_scheme_impl<SchemeAccumulator>>
-            decrypt(const SinglePassRange &r, const KeyRange &key) {
+        decrypt(const SinglePassRange &r, const KeySinglePassRange &key) {
+
+            typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
+            pubkey::decryption_policy<Scheme>>::type SchemeMode;
 
             typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamDecrypterImpl;
             typedef pubkey::detail::range_scheme_impl<StreamDecrypterImpl> DecrypterImpl;
 
-            return DecrypterImpl(r, SchemeState(Scheme(key)));
+            return DecrypterImpl(
+                r, SchemeAccumulator(SchemeMode(Scheme(pubkey::detail::key_value<Scheme>(key)))));
         }
 
         /*!
          * @brief
+         *
+         * @ingroup pubkey_algorithms
          *
          * @tparam Scheme
          * @tparam SinglePassRange
@@ -266,12 +446,16 @@ namespace nil {
                  typename SchemeAccumulator = typename pubkey::accumulator_set<typename pubkey::modes::isomorphic<
                      Scheme, pubkey::nop_padding>::template bind<pubkey::decryption_policy<Scheme>>::type>>
         pubkey::detail::range_scheme_impl<pubkey::detail::value_scheme_impl<SchemeAccumulator>>
-            decrypt(const SinglePassRange &r, const public_key<Scheme> &key) {
+        decrypt(const SinglePassRange &r, const private_key<Scheme> &key) {
+
+            typedef typename pubkey::modes::isomorphic<Scheme, pubkey::nop_padding>::template bind<
+                pubkey::decryption_policy<Scheme>>::type SchemeMode;
 
             typedef pubkey::detail::value_scheme_impl<SchemeAccumulator> StreamDecrypterImpl;
             typedef pubkey::detail::range_scheme_impl<StreamDecrypterImpl> DecrypterImpl;
 
-            return DecrypterImpl(r, SchemeState(Scheme(key)));
+            return DecrypterImpl(
+                r, SchemeAccumulator(SchemeMode(Scheme(pubkey::detail::key_value<Scheme>(key)))));
         }
     }    // namespace crypto3
 }    // namespace nil
