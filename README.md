@@ -1,6 +1,6 @@
-# Threshold Public Key Cryptography for =nil; Foundation's Cryptography Suite 
+# Public Key Cryptography Modes for =nil; Foundation's Cryptography Suite 
 
-Threshold and aggregatable public key cryptography schemes for =nil; Foundation's cryptography suite
+Public key cryptography modes library for =nil; Foundation's cryptography suite. Includes threshold, aggregatable modes for schemes defined within pubkey library.
 
 ## Building
 
