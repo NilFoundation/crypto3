@@ -32,14 +32,6 @@ namespace nil {
                 public:
                     constexpr static const typename policy_type::number_type q =
                         0x8CD7D450F86F0AD94EEE4CE469A8756D1EBD1058241943EAFFB0B354585E924D_cppui256;
-
-                    typedef element_fp<element_policy_type> fp2_non_residue_type;
-                    typedef element_fp2<element_policy_type> fp6_3over2_non_residue_type;
-                    typedef element_fp2<element_policy_type> fp12_2over3over2_non_residue_type;
-
-                    static const fp2_non_residue_type fp2_non_residue();
-                    static const fp6_3over2_non_residue_type fp6_3over2_non_residue();
-                    static const fp12_2over3over2_non_residue_type fp12_2over3over2_non_residue();
                 };
 
                 template <>
@@ -50,14 +42,6 @@ namespace nil {
                 public:
                     constexpr static const typename policy_type::number_type q =
                         0xB3EBD364EC69EF8CF3BAF643B75734B16339B2E49E5CDE1B59C1E9FB40EE0C5B_cppui256;
-                    
-                    typedef element_fp<element_policy_type> fp2_non_residue_type;
-                    typedef element_fp2<element_policy_type> fp6_3over2_non_residue_type;
-                    typedef element_fp2<element_policy_type> fp12_2over3over2_non_residue_type;
-
-                    static const fp2_non_residue_type fp2_non_residue();
-                    static const fp6_3over2_non_residue_type fp6_3over2_non_residue();
-                    static const fp12_2over3over2_non_residue_type fp12_2over3over2_non_residue();
                 };
             }    // namespace detail
         }    // namespace fields

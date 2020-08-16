@@ -24,7 +24,7 @@ namespace nil {
              * @tparam ModulusBits
              * @tparam GeneratorBits
              */
-            template<std::size_t ModulusBits, std::size_t GeneratorBits>
+            template<std::size_t ModulusBits, std::size_t GeneratorBits = CHAR_BIT>
             struct bn128_fq2 : public fp2<ModulusBits, GeneratorBits> { };
 
             template <>
@@ -35,7 +35,7 @@ namespace nil {
                 typedef typename policy_type::modulus_type modulus_type;
 
                 constexpr static const modulus_type modulus =
-                    21888242871839275222246405745257275088696311157297823662689037894645226208583_cppui254;
+                    0x30644E72E131A029B85045B68181585D97816A916871CA8D3C208C16D87CFD47_cppui254;
 
                 constexpr static const std::size_t generator_bits = policy_type::generator_bits;
                 typedef typename policy_type::generator_type generator_type;

@@ -26,7 +26,8 @@ namespace nil {
                 private:
                     typedef FieldParams policy_type;
                 public:
-                    static const typename policy_type::fp6_2over3_non_residue non_residue = policy_type::fp6_2over3_non_residue;
+                    static const typename policy_type::fp6_2over3_non_residue_type 
+                        non_residue = policy_type::fp6_2over3_non_residue_type(policy_type::fp6_2over3_non_residue);
 
                     using underlying_type = element_fp3<FieldParams>;
 

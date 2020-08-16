@@ -35,9 +35,10 @@ namespace nil {
                     typedef element_fp2<element_policy_type> fp6_3over2_non_residue_type;
                     typedef element_fp2<element_policy_type> fp12_2over3over2_non_residue_type;
 
-                    static const fp2_non_residue_type fp2_non_residue = fp2_non_residue_type(0x30644E72E131A029B85045B68181585D97816A916871CA8D3C208C16D87CFD46_cppui254);
-                    static const fp6_3over2_non_residue_type fp6_3over2_non_residue = fp6_3over2_non_residue_type({element_fp<element_policy_type>(9), element_fp<element_policy_type>(1)});
-                    static const fp12_2over3over2_non_residue_type fp12_2over3over2_non_residue = fp12_2over3over2_non_residue_type({element_fp<element_policy_type>(9), element_fp<element_policy_type>(1)});
+                    constexpr static const typename policy_type::number_type fp2_non_residue = 
+                        0x30644E72E131A029B85045B68181585D97816A916871CA8D3C208C16D87CFD46_cppui254;
+                    constexpr static const std::array<typename policy_type::number_type, 2> fp6_3over2_non_residue = {9, 1};
+                    constexpr static const std::array<typename policy_type::number_type, 2> fp12_2over3over2_non_residue = {9, 1};
                 };
             
             }    // namespace detail
