@@ -15,7 +15,7 @@
 
 namespace nil {
     namespace algebra {
-            namespace fields {
+        namespace fields {
 
             /**
              * Arithmetic in the field F[p^2].

@@ -13,7 +13,7 @@
 #include <nil/algebra/fields/detail/element/modp_srp.hpp>
 #include <nil/algebra/fields/fp.hpp>
 
-#include <nil/algebra/detail/boost_defines.hpp>
+#include <nil/algebra/detail/mp_def.hpp>
 
 namespace nil {
     namespace algebra {

@@ -13,7 +13,7 @@
 #include <nil/algebra/fields/detail/params/dsa_botan.hpp>
 #include <nil/algebra/fields/fp.hpp>
 
-#include <nil/algebra/detail/boost_defines.hpp>
+#include <nil/algebra/detail/mp_def.hpp>
 
 namespace nil {
     namespace algebra {

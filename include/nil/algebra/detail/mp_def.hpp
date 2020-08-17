@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef ALGEBRA_BOOST_DEFINES_HPP
-#define ALGEBRA_BOOST_DEFINES_HPP
+#ifndef ALGEBRA_MP_DEFINES_HPP
+#define ALGEBRA_MP_DEFINES_HPP
 
 
 BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(254)
@@ -22,4 +22,4 @@ BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(6144)
 BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(8192)
 
 
-#endif    // ALGEBRA_BOOST_DEFINES_HPP
+#endif    // ALGEBRA_MP_DEFINES_HPP
