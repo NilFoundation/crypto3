@@ -16,7 +16,7 @@ namespace nil {
          * @brief
          *
          * @defgroup pubkey_scheme_modes Public Key Cryptography Schemes Modes
-         * @ingroup pubkey_scheme_modes
+         * @ingroup scheme_modes
          * @brief
          */
     }
