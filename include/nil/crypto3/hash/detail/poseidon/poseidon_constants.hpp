@@ -21,14 +21,13 @@ namespace nil {
     namespace crypto3 {
         namespace hashes {
             namespace detail {
-                template<typename FieldType, typename element_type, std::size_t t, bool strength>
+                template<typename FieldType, std::size_t Arity, bool strength>
                 struct poseidon_constants {
 
-                    typedef poseidon_policy<FieldType, element_type, t, strength> policy_type;
-                    typedef poseidon_mds_matrix<FieldType, element_type, t, strength> mds_matrix_type;
+                    typedef poseidon_policy<FieldType, Arity, strength> policy_type;
+                    typedef poseidon_mds_matrix<FieldType, Arity, strength> mds_matrix_type;
+                    typedef typename FieldType::value_type ElementType;
                     typedef typename mds_matrix_type::state_vector_type state_vector_type;
-
-                    // constexpr static const std::size_t block_words = policy_type::block_words;
 
                     constexpr static const std::size_t state_words = policy_type::state_words;
                     typedef typename policy_type::state_type state_type;
@@ -37,8 +36,8 @@ namespace nil {
                     constexpr static const std::size_t half_full_rounds = policy_type::half_full_rounds;
                     constexpr static const std::size_t part_rounds = policy_type::part_rounds;
 
-                    constexpr static std::size_t const round_constants_size = (full_rounds + part_rounds) * state_words;
-                    constexpr static std::size_t const equivalent_round_constants_size = (full_rounds + 1) * state_words + part_rounds - 1;
+                    constexpr static const std::size_t round_constants_size = (full_rounds + part_rounds) * state_words;
+                    constexpr static const std::size_t equivalent_round_constants_size = (full_rounds + 1) * state_words + part_rounds - 1;
                     typedef state_vector_type round_constants_type;
 
                     constexpr static const std::size_t word_bits = policy_type::word_bits;
@@ -124,13 +123,13 @@ namespace nil {
                     typedef std::bitset<lfsr_state_len> lfsr_state_type;
                     lfsr_state_type lfsr_state;
 
-                    inline element_type const &get_equivalent_round_constant(std::size_t constant_number) {
+                    inline const ElementType &get_equivalent_round_constant(std::size_t constant_number) {
                         return generate_equivalent_round_constants()[constant_number];
                     }
 
                     // See https://extgit.iaik.tugraz.at/krypto/hadeshash/-/blob/d9382dbd933cc559bd12ee3fa7d32ea934ace43d/code/poseidonperm_x3_64_24_optimized.sage#L40
-                    inline round_constants_type const &generate_equivalent_round_constants() {
-                        static round_constants_type const equivalent_round_constants = [this](){
+                    inline const round_constants_type &generate_equivalent_round_constants() {
+                        static const round_constants_type equivalent_round_constants = [this](){
                             round_constants_type equivalent_round_constants(equivalent_round_constants_size);
                             mds_matrix_type mds_matrix;
                             round_constants_type round_constants = generate_round_constants();
@@ -169,12 +168,12 @@ namespace nil {
                         return equivalent_round_constants;
                     }
 
-                    inline element_type const &get_round_constant(std::size_t constant_number) {
+                    inline const ElementType &get_round_constant(std::size_t constant_number) {
                         return generate_round_constants()[constant_number];
                     }
 
-                    inline round_constants_type const &generate_round_constants() {
-                        static round_constants_type const round_constants = [this](){
+                    inline const round_constants_type &generate_round_constants() {
+                        static const round_constants_type round_constants = [this](){
                             round_constants_type round_constants(round_constants_size);
                             lfsr_state_init();
                             for (std::size_t i = 0; i < round_constants_size; i++)
@@ -196,7 +195,7 @@ namespace nil {
                         for (i = 11; i >= 0; i--)
                             lfsr_state[offset++] = (word_bits >> i) & 1;
                         for (i = 11; i >= 0; i--)
-                            lfsr_state[offset++] = (t >> i) & 1;
+                            lfsr_state[offset++] = (Arity >> i) & 1;
                         for (i = 9; i >= 0; i--)
                             lfsr_state[offset++] = (full_rounds >> i) & 1;
                         for (i = 9; i >= 0; i--)
@@ -209,8 +208,8 @@ namespace nil {
                     }
 
                     // get next element
-                    inline element_type get_next_element() {
-                        typename element_type::type round_const;
+                    inline ElementType get_next_element() {
+                        typename ElementType::number_type round_const;
                         while (true) {
                             round_const = 0;
                             round_const |= get_next_bit();
@@ -218,10 +217,10 @@ namespace nil {
                                 round_const <<= 1;
                                 round_const |= get_next_bit();
                             }
-                            if (round_const < typename element_type::type("0x73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000001")) // filecoin oriented - remake when integrate in the project
+                            if (round_const < ElementType::modulus) // filecoin oriented - remake when integrate in the project
                                 break;
-                        }        
-                        return element_type(round_const);
+                        }
+                        return ElementType(round_const);
                     }
 
                     inline bool get_next_bit() {

@@ -29,14 +29,15 @@ namespace nil {
                  * @tparam ElementType type of field element
                  * @tparam t arity of Poseidon permutation in field elements
                  */
-                template<typename FieldType, typename ElementType, std::size_t Arity>
+                template<typename FieldType, std::size_t Arity>
                 struct base_poseidon_policy {
+                    typedef typename FieldType::value_type ElementType;
 
                     constexpr static const std::size_t word_bits = FieldType::modulus_bits;
-                    typedef FieldType word_type;
+                    typedef ElementType word_type;
 
                     constexpr static const std::size_t digest_bits = FieldType::modulus_bits;
-                    typedef static_digest<digest_bits> digest_type;
+                    typedef ElementType digest_type;
 
                     constexpr static const std::size_t state_bits = Arity * FieldType::modulus_bits;
                     constexpr static const std::size_t state_words = Arity;
@@ -45,12 +46,12 @@ namespace nil {
                     constexpr static const std::size_t block_bits = (Arity - 1) * FieldType::modulus_bits;
                     constexpr static const std::size_t block_words = Arity - 1;
                     typedef std::array<ElementType, Arity - 1> block_type;
-                    
+
                     struct iv_generator {
                         // TODO: return-value seems not to be const in reality
                         // TODO: maybe it would be done in constexpr way
-                        state_type const &operator()() const {
-                            static state_type const H0 = [](){
+                        const state_type &operator()() const {
+                            static const state_type H0 = [](){
                                 state_type H;
                                 H.fill(ElementType(0));
                                 return H;
@@ -61,13 +62,13 @@ namespace nil {
                 };
 
 
-                template<typename FieldType, typename ElementType, std::size_t Arity, bool strength>
+                template<typename FieldType, std::size_t Arity, bool strength>
                 struct poseidon_policy;
 
 
-                template<typename FieldType, typename ElementType, bool strength>
-                struct poseidon_policy<FieldType, ElementType, 2, strength> :
-                    base_poseidon_policy<FieldType, ElementType, 2>
+                template<typename FieldType, bool strength>
+                struct poseidon_policy<FieldType, 2, strength> :
+                    base_poseidon_policy<FieldType, 2>
                 {
                     constexpr static const std::size_t full_rounds = 8;
                     constexpr static const std::size_t half_full_rounds = 4;
@@ -75,9 +76,9 @@ namespace nil {
                 };
 
 
-                template<typename FieldType, typename ElementType, bool strength>
-                struct poseidon_policy<FieldType, ElementType, 3, strength> :
-                    base_poseidon_policy<FieldType, ElementType, 3>
+                template<typename FieldType, bool strength>
+                struct poseidon_policy<FieldType, 3, strength> :
+                    base_poseidon_policy<FieldType, 3>
                 {
                     constexpr static const std::size_t full_rounds = 8;
                     constexpr static const std::size_t half_full_rounds = 4;
@@ -85,27 +86,27 @@ namespace nil {
                 };
 
 
-                template<typename FieldType, typename ElementType, bool strength>
-                struct poseidon_policy<FieldType, ElementType, 4, strength> :
-                    base_poseidon_policy< FieldType, ElementType, 4>
+                template<typename FieldType, bool strength>
+                struct poseidon_policy<FieldType, 4, strength> :
+                    base_poseidon_policy< FieldType, 4>
                 {
                     constexpr static const std::size_t full_rounds = 8;
                     constexpr static const std::size_t half_full_rounds = 4;
                     constexpr static const std::size_t part_rounds = strength ? 70 : 56;
                 };
 
-                template<typename FieldType, typename ElementType, bool strength>
-                struct poseidon_policy<FieldType, ElementType, 5, strength> :
-                    base_poseidon_policy< FieldType, ElementType, 5>
+                template<typename FieldType, bool strength>
+                struct poseidon_policy<FieldType, 5, strength> :
+                    base_poseidon_policy< FieldType, 5>
                 {
                     constexpr static const std::size_t full_rounds = 8;
                     constexpr static const std::size_t half_full_rounds = 4;
                     constexpr static const std::size_t part_rounds = strength ? 70 : 56;
                 };
 
-                template<typename FieldType, typename ElementType, bool strength>
-                struct poseidon_policy<FieldType, ElementType, 9, strength> :
-                    base_poseidon_policy< FieldType, ElementType, 9>
+                template<typename FieldType, bool strength>
+                struct poseidon_policy<FieldType, 9, strength> :
+                    base_poseidon_policy< FieldType, 9>
                 {
                     constexpr static const std::size_t full_rounds = 8;
                     constexpr static const std::size_t half_full_rounds = 4;
