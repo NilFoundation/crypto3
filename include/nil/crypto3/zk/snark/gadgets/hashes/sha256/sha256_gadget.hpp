@@ -100,29 +100,30 @@ namespace nil {
                     gadget<FieldType>(pb),
                     prev_output(prev_output), new_block(new_block), output(output) {
                     /* message schedule and inputs for it */
-                    packed_W.allocate(pb, 64);
+                    packed_W.allocate(pb, block::detail::shacal2_policy<256>::rounds);
                     message_schedule.reset(new sha256_message_schedule_gadget<FieldType>(pb, new_block, packed_W));
 
                     /* initalize */
-                    round_a.push_back(pb_linear_combination_array<FieldType>(prev_output.rbegin() + 7 * 32,
-                                                                             prev_output.rbegin() + 8 * 32));
-                    round_b.push_back(pb_linear_combination_array<FieldType>(prev_output.rbegin() + 6 * 32,
-                                                                             prev_output.rbegin() + 7 * 32));
-                    round_c.push_back(pb_linear_combination_array<FieldType>(prev_output.rbegin() + 5 * 32,
-                                                                             prev_output.rbegin() + 6 * 32));
-                    round_d.push_back(pb_linear_combination_array<FieldType>(prev_output.rbegin() + 4 * 32,
-                                                                             prev_output.rbegin() + 5 * 32));
-                    round_e.push_back(pb_linear_combination_array<FieldType>(prev_output.rbegin() + 3 * 32,
-                                                                             prev_output.rbegin() + 4 * 32));
-                    round_f.push_back(pb_linear_combination_array<FieldType>(prev_output.rbegin() + 2 * 32,
-                                                                             prev_output.rbegin() + 3 * 32));
-                    round_g.push_back(pb_linear_combination_array<FieldType>(prev_output.rbegin() + 1 * 32,
-                                                                             prev_output.rbegin() + 2 * 32));
-                    round_h.push_back(pb_linear_combination_array<FieldType>(prev_output.rbegin() + 0 * 32,
-                                                                             prev_output.rbegin() + 1 * 32));
+                    round_a.push_back(pb_linear_combination_array<FieldType>(prev_output.rbegin() + 7 *
+                                                                                                        hashes::sha2<256>::word_bits,
+                                                                             prev_output.rbegin() + 8 * hashes::sha2<256>::word_bits));
+                    round_b.push_back(pb_linear_combination_array<FieldType>(prev_output.rbegin() + 6 * hashes::sha2<256>::word_bits,
+                                                                             prev_output.rbegin() + 7 * hashes::sha2<256>::word_bits));
+                    round_c.push_back(pb_linear_combination_array<FieldType>(prev_output.rbegin() + 5 * hashes::sha2<256>::word_bits,
+                                                                             prev_output.rbegin() + 6 * hashes::sha2<256>::word_bits));
+                    round_d.push_back(pb_linear_combination_array<FieldType>(prev_output.rbegin() + 4 * hashes::sha2<256>::word_bits,
+                                                                             prev_output.rbegin() + 5 * hashes::sha2<256>::word_bits));
+                    round_e.push_back(pb_linear_combination_array<FieldType>(prev_output.rbegin() + 3 * hashes::sha2<256>::word_bits,
+                                                                             prev_output.rbegin() + 4 * hashes::sha2<256>::word_bits));
+                    round_f.push_back(pb_linear_combination_array<FieldType>(prev_output.rbegin() + 2 * hashes::sha2<256>::word_bits,
+                                                                             prev_output.rbegin() + 3 * hashes::sha2<256>::word_bits));
+                    round_g.push_back(pb_linear_combination_array<FieldType>(prev_output.rbegin() + 1 * hashes::sha2<256>::word_bits,
+                                                                             prev_output.rbegin() + 2 * hashes::sha2<256>::word_bits));
+                    round_h.push_back(pb_linear_combination_array<FieldType>(prev_output.rbegin() + 0 * hashes::sha2<256>::word_bits,
+                                                                             prev_output.rbegin() + 1 * hashes::sha2<256>::word_bits));
 
                     /* do the rounds */
-                    for (std::size_t i = 0; i < 64; ++i) {
+                    for (std::size_t i = 0; i < block::detail::shacal2_policy<256>::rounds; ++i) {
                         round_h.push_back(round_g[i]);
                         round_g.push_back(round_f[i]);
                         round_f.push_back(round_e[i]);
@@ -131,11 +132,11 @@ namespace nil {
                         round_b.push_back(round_a[i]);
 
                         pb_variable_array<FieldType> new_round_a_variables;
-                        new_round_a_variables.allocate(pb, 32);
+                        new_round_a_variables.allocate(pb, hashes::sha2<256>::word_bits);
                         round_a.emplace_back(new_round_a_variables);
 
                         pb_variable_array<FieldType> new_round_e_variables;
-                        new_round_e_variables.allocate(pb, 32);
+                        new_round_e_variables.allocate(pb, hashes::sha2<256>::word_bits);
                         round_e.emplace_back(new_round_e_variables);
 
                         round_functions.push_back(sha256_round_function_gadget<FieldType>(
@@ -151,17 +152,17 @@ namespace nil {
                         reduce_output.push_back(lastbits_gadget<FieldType>(
                             pb,
                             unreduced_output[i],
-                            32 + 1,
+                            hashes::sha2<256>::word_bits + 1,
                             reduced_output[i],
-                            pb_variable_array<FieldType>(output.bits.rbegin() + (7 - i) * 32,
-                                                         output.bits.rbegin() + (8 - i) * 32)));
+                            pb_variable_array<FieldType>(output.bits.rbegin() + (7 - i) * hashes::sha2<256>::word_bits,
+                                                         output.bits.rbegin() + (8 - i) * hashes::sha2<256>::word_bits)));
                     }
                 }
 
                 template<typename FieldType>
                 void sha256_compression_function_gadget<FieldType>::generate_r1cs_constraints() {
                     message_schedule->generate_r1cs_constraints();
-                    for (std::size_t i = 0; i < 64; ++i) {
+                    for (std::size_t i = 0; i < block::detail::shacal2_policy<256>::rounds; ++i) {
                         round_functions[i].generate_r1cs_constraints();
                     }
 
@@ -186,7 +187,7 @@ namespace nil {
                 void sha256_compression_function_gadget<FieldType>::generate_r1cs_witness() {
                     message_schedule->generate_r1cs_witness();
 
-                    for (std::size_t i = 0; i < 64; ++i) {
+                    for (std::size_t i = 0; i < block::detail::shacal2_policy<256>::rounds; ++i) {
                         round_functions[i].generate_r1cs_witness();
                     }
 
@@ -226,7 +227,7 @@ namespace nil {
                     const block_variable<FieldType> &input_block,
                     const digest_variable<FieldType> &output) :
                     gadget<FieldType>(pb) {
-                    assert(block_length == SHA256_block_size);
+                    assert(block_length == hashes::sha2<256>::block_bits);
                     assert(input_block.bits.size() == block_length);
                     f.reset(new sha256_compression_function_gadget<FieldType>(pb, SHA256_default_IV<FieldType>(pb),
                                                                               input_block.bits, output));
@@ -245,21 +246,21 @@ namespace nil {
 
                 template<typename FieldType>
                 std::size_t sha256_two_to_one_hash_gadget<FieldType>::get_block_len() {
-                    return SHA256_block_size;
+                    return hashes::sha2<256>::block_bits;
                 }
 
                 template<typename FieldType>
                 std::size_t sha256_two_to_one_hash_gadget<FieldType>::get_digest_len() {
-                    return SHA256_digest_size;
+                    return hashes::sha2<256>::digest_bits;
                 }
 
                 template<typename FieldType>
                 std::vector<bool> sha256_two_to_one_hash_gadget<FieldType>::get_hash(const std::vector<bool> &input) {
                     protoboard<FieldType> pb;
 
-                    block_variable<FieldType> input_variable(pb, SHA256_block_size);
-                    digest_variable<FieldType> output_variable(pb, SHA256_digest_size);
-                    sha256_two_to_one_hash_gadget<FieldType> f(pb, SHA256_block_size, input_variable, output_variable);
+                    block_variable<FieldType> input_variable(pb, hashes::sha2<256>::block_bits);
+                    digest_variable<FieldType> output_variable(pb, hashes::sha2<256>::digest_bits);
+                    sha256_two_to_one_hash_gadget<FieldType> f(pb, hashes::sha2<256>::block_bits, input_variable, output_variable);
 
                     input_variable.generate_r1cs_witness(input);
                     f.generate_r1cs_witness();

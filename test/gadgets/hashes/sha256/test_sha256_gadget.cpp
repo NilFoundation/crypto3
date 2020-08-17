@@ -15,11 +15,11 @@ template<typename FieldType>
 void test_two_to_one() {
     protoboard<FieldType> pb;
 
-    digest_variable<FieldType> left(pb, SHA256_digest_size, "left");
-    digest_variable<FieldType> right(pb, SHA256_digest_size, "right");
-    digest_variable<FieldType> output(pb, SHA256_digest_size, "output");
+    digest_variable<FieldType> left(pb, hashes::sha2<256>::digest_bits);
+    digest_variable<FieldType> right(pb, hashes::sha2<256>::digest_bits);
+    digest_variable<FieldType> output(pb, hashes::sha2<256>::digest_bits);
 
-    sha256_two_to_one_hash_gadget<FieldType> f(pb, left, right, output, "f");
+    sha256_two_to_one_hash_gadget<FieldType> f(pb, left, right, output);
     f.generate_r1cs_constraints();
     printf("Number of constraints for sha256_two_to_one_hash_gadget: %zu\n", pb.num_constraints());
 

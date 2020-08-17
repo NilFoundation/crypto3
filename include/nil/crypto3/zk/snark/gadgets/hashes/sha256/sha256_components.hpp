@@ -21,10 +21,6 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-
-                const std::size_t SHA256_digest_size = 256;
-                const std::size_t SHA256_block_size = 512;
-
                 template<typename FieldType>
                 pb_linear_combination_array<FieldType> SHA256_default_IV(protoboard<FieldType> &pb);
 
@@ -109,14 +105,14 @@ namespace nil {
                 pb_linear_combination_array<FieldType> SHA256_default_IV(protoboard<FieldType> &pb) {
                     using namespace hashes::detail;
 
-                    typename sha2_policy<256>::state_type iv =
-                        sha2_policy<256>::iv_generator()();
+                    typename sha2_policy<256>::state_type iv = sha2_policy<256>::iv_generator()();
 
                     pb_linear_combination_array<FieldType> result;
-                    result.reserve(SHA256_digest_size);
+                    result.reserve(hashes::sha2<256>::digest_bits);
 
-                    for (std::size_t i = 0; i < SHA256_digest_size; ++i) {
-                        int iv_val = (iv[i / 32] >> (31 - (i % 32))) & 1;
+                    for (std::size_t i = 0; i < hashes::sha2<256>::digest_bits; ++i) {
+                        int iv_val =
+                            iv[i / hashes::sha2<256>::word_bits] >> (31 - (i % hashes::sha2<256>::word_bits)) & 1;
 
                         pb_linear_combination<FieldType> iv_element;
                         iv_element.assign(pb, iv_val * pb_variable<FieldType>(0));
@@ -140,7 +136,7 @@ namespace nil {
                     pack_W.resize(16);
                     for (std::size_t i = 0; i < 16; ++i) {
                         W_bits[i] =
-                            pb_variable_array<FieldType>(M.rbegin() + (15 - i) * 32, M.rbegin() + (16 - i) * 32);
+                            pb_variable_array<FieldType>(M.rbegin() + (15 - i) * hashes::sha2<256>::word_bits, M.rbegin() + (16 - i) * hashes::sha2<256>::word_bits);
                         pack_W[i].reset(new packing_gadget<FieldType>(pb, W_bits[i], packed_W[i]));
                     }
 
@@ -152,7 +148,7 @@ namespace nil {
                     unreduced_W.resize(64);
                     mod_reduce_W.resize(64);
 
-                    for (std::size_t i = 16; i < 64; ++i) {
+                    for (std::size_t i = 16; i < block::detail::shacal2_policy<256>::rounds; ++i) {
                         /* allocate result variables for sigma0/sigma1 invocations */
                         sigma0[i].allocate(pb);
                         sigma1[i].allocate(pb);
@@ -167,11 +163,11 @@ namespace nil {
                         unreduced_W[i].allocate(pb);
 
                         /* allocate the bit representation of packed_W[i] */
-                        W_bits[i].allocate(pb, 32);
+                        W_bits[i].allocate(pb, hashes::sha2<256>::word_bits);
 
                         /* and finally reduce this into packed and bit representations */
                         mod_reduce_W[i].reset(
-                            new lastbits_gadget<FieldType>(pb, unreduced_W[i], 32 + 2, packed_W[i], W_bits[i]));
+                            new lastbits_gadget<FieldType>(pb, unreduced_W[i], hashes::sha2<256>::word_bits + 2, packed_W[i], W_bits[i]));
                     }
                 }
 
@@ -181,7 +177,7 @@ namespace nil {
                         pack_W[i]->generate_r1cs_constraints(false);    // do not enforce bitness here; caller be aware.
                     }
 
-                    for (std::size_t i = 16; i < 64; ++i) {
+                    for (std::size_t i = 16; i < block::detail::shacal2_policy<256>::rounds; ++i) {
                         compute_sigma0[i]->generate_r1cs_constraints();
                         compute_sigma1[i]->generate_r1cs_constraints();
 
@@ -198,7 +194,7 @@ namespace nil {
                         pack_W[i]->generate_r1cs_witness_from_bits();
                     }
 
-                    for (std::size_t i = 16; i < 64; ++i) {
+                    for (std::size_t i = 16; i < block::detail::shacal2_policy<256>::rounds; ++i) {
                         compute_sigma0[i]->generate_r1cs_witness();
                         compute_sigma1[i]->generate_r1cs_witness();
 
@@ -255,9 +251,9 @@ namespace nil {
                     packed_new_e.allocate(pb);
 
                     mod_reduce_new_a.reset(
-                        new lastbits_gadget<FieldType>(pb, unreduced_new_a, 32 + 3, packed_new_a, new_a));
+                        new lastbits_gadget<FieldType>(pb, unreduced_new_a, hashes::sha2<256>::word_bits + 3, packed_new_a, new_a));
                     mod_reduce_new_e.reset(
-                        new lastbits_gadget<FieldType>(pb, unreduced_new_e, 32 + 3, packed_new_e, new_e));
+                        new lastbits_gadget<FieldType>(pb, unreduced_new_e, hashes::sha2<256>::word_bits + 3, packed_new_e, new_e));
                 }
 
                 template<typename FieldType>
