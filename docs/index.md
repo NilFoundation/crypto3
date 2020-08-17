@@ -1,5 +1,5 @@
-# Password-Based Key Derivation Functions {#pbkdf_index}
-@subpage pbkdf_introduction
-@subpage pbkdf_manual
-@subpage pbkdf_concepts
-@subpage pbkdf_impl
+# Password-Based Key Derivation Functions {#pkpad_index}
+@subpage pkpad_introduction
+@subpage pkpad_manual
+@subpage pkpad_concepts
+@subpage pkpad_impl

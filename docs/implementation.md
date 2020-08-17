@@ -1,3 +1,3 @@
-# Implementation {#pbkdf_impl}
+# Implementation {#pkpad_impl}
 
 @tableofcontents
