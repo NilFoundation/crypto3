@@ -47,7 +47,7 @@ namespace nil {
                  * queried at an arbitrary position, see implementation of
                  * generate_benes_topology for details.)
                  */
-                typedef std::vector<std::vector<std::pair<size_t, size_t>>> benes_topology;
+                typedef std::vector<std::vector<std::pair<std::size_t, std::size_t>>> benes_topology;
 
                 /**
                  * A routing assigns a bit to each switch in a Benes network.
@@ -68,14 +68,14 @@ namespace nil {
                  * - benes_num_columns(8) = 6,
                  * and so on.
                  */
-                size_t benes_num_columns(size_t num_packets);
+                std::size_t benes_num_columns(std::size_t num_packets);
 
                 /**
                  * Return the topology of a Benes network for a given number of packets.
                  *
                  * See benes_topology (above) for details.
                  */
-                benes_topology generate_benes_topology(size_t num_packets);
+                benes_topology generate_benes_topology(std::size_t num_packets);
 
                 /**
                  * Route the given permutation on a Benes network of suitable size.
@@ -104,7 +104,7 @@ namespace nil {
                  * For example, all cross edges in the 0-th column flip the most
                  * significant bit of row_idx.
                  */
-                size_t benes_cross_edge_mask(const size_t dimension, const size_t column_idx) {
+                std::size_t benes_cross_edge_mask(const std::size_t dimension, const std::size_t column_idx) {
                     return (column_idx < dimension ? 1ul << (dimension - 1 - column_idx) :
                                                      1ul << (column_idx - dimension));
                 }
@@ -124,9 +124,9 @@ namespace nil {
                  * - row_idx' of the destination packet (column_idx+1, row_idx') at
                  *   the bottom subnetwork (if use_top = false)
                  */
-                size_t benes_lhs_packet_destination(const size_t dimension, const size_t column_idx,
-                                                    const size_t row_idx, const bool use_top) {
-                    const size_t mask = benes_cross_edge_mask(dimension, column_idx);
+                std::size_t benes_lhs_packet_destination(const std::size_t dimension, const std::size_t column_idx,
+                                                    const std::size_t row_idx, const bool use_top) {
+                    const std::size_t mask = benes_cross_edge_mask(dimension, column_idx);
                     return (use_top ? row_idx & ~mask : row_idx | mask);
                 }
 
@@ -145,7 +145,7 @@ namespace nil {
                  * - row_idx' of the destination packet (column_idx-1, row_idx') at
                  *   the bottom subnetwork (if use_top = false)
                  */
-                size_t benes_rhs_packet_source(const size_t dimension, const size_t column_idx, const size_t row_idx,
+                std::size_t benes_rhs_packet_source(const std::size_t dimension, const std::size_t column_idx, const std::size_t row_idx,
                                                const bool use_top) {
                     return benes_lhs_packet_destination(dimension, column_idx - 1, row_idx, use_top); /* by symmetry */
                 }
@@ -155,8 +155,8 @@ namespace nil {
                  * return the switch setting that would route its packet using the top
                  * subnetwork.
                  */
-                bool benes_get_switch_setting_from_subnetwork(const size_t dimension, const size_t column_idx,
-                                                              const size_t row_idx, const bool use_top) {
+                bool benes_get_switch_setting_from_subnetwork(const std::size_t dimension, const std::size_t column_idx,
+                                                              const std::size_t row_idx, const bool use_top) {
                     return (row_idx != benes_lhs_packet_destination(dimension, column_idx, row_idx, use_top));
                 }
 
@@ -166,9 +166,9 @@ namespace nil {
                  * benes_cross_edge_mask), this returns row_idx' of the "cross"
                  * destination.
                  */
-                size_t benes_packet_cross_destination(const size_t dimension, const size_t column_idx,
-                                                      const size_t row_idx) {
-                    const size_t mask = benes_cross_edge_mask(dimension, column_idx);
+                std::size_t benes_packet_cross_destination(const std::size_t dimension, const std::size_t column_idx,
+                                                      const std::size_t row_idx) {
+                    const std::size_t mask = benes_cross_edge_mask(dimension, column_idx);
                     return row_idx ^ mask;
                 }
 
@@ -178,28 +178,28 @@ namespace nil {
                  * comment by benes_cross_edge_mask), this returns row_idx' of the
                  * "cross" source packet.
                  */
-                size_t benes_packet_cross_source(const size_t dimension, const size_t column_idx,
-                                                 const size_t packet_idx) {
+                std::size_t benes_packet_cross_source(const std::size_t dimension, const std::size_t column_idx,
+                                                 const std::size_t packet_idx) {
                     return benes_packet_cross_destination(dimension, column_idx - 1, packet_idx); /* by symmetry */
                 }
 
-                size_t benes_num_columns(size_t num_packets) {
-                    const size_t dimension = static_cast<std::size_t>(std::ceil(std::log2(num_packets)));
+                std::size_t benes_num_columns(std::size_t num_packets) {
+                    const std::size_t dimension = static_cast<std::size_t>(std::ceil(std::log2(num_packets)));
                     assert(num_packets == 1ul << dimension);
 
                     return 2 * dimension;
                 }
 
-                benes_topology generate_benes_topology(size_t num_packets) {
-                    const size_t num_columns = benes_num_columns(num_packets);
-                    const size_t dimension = static_cast<std::size_t>(std::ceil(std::log2(num_packets)));
+                benes_topology generate_benes_topology(std::size_t num_packets) {
+                    const std::size_t num_columns = benes_num_columns(num_packets);
+                    const std::size_t dimension = static_cast<std::size_t>(std::ceil(std::log2(num_packets)));
                     assert(num_packets == 1ul << dimension);
 
                     benes_topology result(num_columns);
 
-                    for (size_t column_idx = 0; column_idx < num_columns; ++column_idx) {
+                    for (std::size_t column_idx = 0; column_idx < num_columns; ++column_idx) {
                         result[column_idx].resize(num_packets);
-                        for (size_t packet_idx = 0; packet_idx < num_packets; ++packet_idx) {
+                        for (std::size_t packet_idx = 0; packet_idx < num_packets; ++packet_idx) {
                             result[column_idx][packet_idx].first = packet_idx;
                             result[column_idx][packet_idx].second =
                                 benes_packet_cross_destination(dimension, column_idx, packet_idx);
@@ -220,13 +220,13 @@ namespace nil {
                  * subnetwork_offset, and
                  * - piinv is the inverse of pi.
                  */
-                void route_benes_inner(const size_t dimension,
+                void route_benes_inner(const std::size_t dimension,
                                        const integer_permutation &permutation,
                                        const integer_permutation &permutation_inv,
-                                       const size_t column_idx_start,
-                                       const size_t column_idx_end,
-                                       const size_t subnetwork_offset,
-                                       const size_t subnetwork_size,
+                                       const std::size_t column_idx_start,
+                                       const std::size_t column_idx_end,
+                                       const std::size_t subnetwork_offset,
+                                       const std::size_t subnetwork_size,
                                        benes_routing &routing) {
 #ifdef DEBUG
                     assert(permutation.size() == subnetwork_size);
@@ -240,8 +240,8 @@ namespace nil {
                     }
                     std::vector<bool> lhs_routed(subnetwork_size, false); /* adjusted by subnetwork_offset */
 
-                    size_t w = subnetwork_offset; /* left-hand-side vertex to be routed. */
-                    size_t last_unrouted = subnetwork_offset;
+                    std::size_t w = subnetwork_offset; /* left-hand-side vertex to be routed. */
+                    std::size_t last_unrouted = subnetwork_offset;
 
                     integer_permutation new_permutation(subnetwork_offset, subnetwork_offset + subnetwork_size - 1);
                     integer_permutation new_permutation_inv(subnetwork_offset, subnetwork_offset + subnetwork_size - 1);
@@ -254,7 +254,7 @@ namespace nil {
                          */
 
                         /* route w to its target on RHS, wprime = pi[w], using upper network */
-                        size_t wprime = permutation.get(w);
+                        std::size_t wprime = permutation.get(w);
 
                         /* route (column_idx_start, w) forward via top subnetwork */
                         routing[column_idx_start][w] =
@@ -271,8 +271,8 @@ namespace nil {
 
                         /* now the other neighbor of wprime must be back-routed via the lower network, so get vprime,
                          * the neighbor on RHS and v, its target on LHS */
-                        const size_t vprime = benes_packet_cross_source(dimension, column_idx_end, wprime);
-                        const size_t v = permutation_inv.get(vprime);
+                        const std::size_t vprime = benes_packet_cross_source(dimension, column_idx_end, wprime);
+                        const std::size_t v = permutation_inv.get(vprime);
                         assert(!lhs_routed[v - subnetwork_offset]);
 
                         /* back-route (column_idx_end, vprime) using the lower subnetwork */
@@ -327,9 +327,9 @@ namespace nil {
                 }
 
                 benes_routing get_benes_routing(const integer_permutation &permutation) {
-                    const size_t num_packets = permutation.size();
-                    const size_t num_columns = benes_num_columns(num_packets);
-                    const size_t dimension = static_cast<std::size_t>(std::ceil(std::log2(num_packets)));
+                    const std::size_t num_packets = permutation.size();
+                    const std::size_t num_columns = benes_num_columns(num_packets);
+                    const std::size_t dimension = static_cast<std::size_t>(std::ceil(std::log2(num_packets)));
 
                     benes_routing routing(num_columns, std::vector<bool>(num_packets));
 
@@ -342,18 +342,18 @@ namespace nil {
                 /* auxiliary function that is used in valid_benes_routing below */
                 template<typename T>
                 std::vector<std::vector<T>> route_by_benes(const benes_routing &routing, const std::vector<T> &start) {
-                    const size_t num_packets = start.size();
-                    const size_t num_columns = benes_num_columns(num_packets);
-                    const size_t dimension = static_cast<std::size_t>(std::ceil(std::log2(num_packets)));
+                    const std::size_t num_packets = start.size();
+                    const std::size_t num_columns = benes_num_columns(num_packets);
+                    const std::size_t dimension = static_cast<std::size_t>(std::ceil(std::log2(num_packets)));
 
                     std::vector<std::vector<T>> res(num_columns + 1, std::vector<T>(num_packets));
                     res[0] = start;
 
-                    for (size_t column_idx = 0; column_idx < num_columns; ++column_idx) {
-                        const size_t mask = benes_cross_edge_mask(dimension, column_idx);
+                    for (std::size_t column_idx = 0; column_idx < num_columns; ++column_idx) {
+                        const std::size_t mask = benes_cross_edge_mask(dimension, column_idx);
 
-                        for (size_t packet_idx = 0; packet_idx < num_packets; ++packet_idx) {
-                            size_t next_packet_idx =
+                        for (std::size_t packet_idx = 0; packet_idx < num_packets; ++packet_idx) {
+                            std::size_t next_packet_idx =
                                 (routing[column_idx][packet_idx] == false) ? packet_idx : packet_idx ^ mask;
                             res[column_idx + 1][next_packet_idx] = res[column_idx][packet_idx];
                         }
@@ -363,17 +363,17 @@ namespace nil {
                 }
 
                 bool valid_benes_routing(const integer_permutation &permutation, const benes_routing &routing) {
-                    const size_t num_packets = permutation.size();
-                    const size_t num_columns = benes_num_columns(num_packets);
+                    const std::size_t num_packets = permutation.size();
+                    const std::size_t num_columns = benes_num_columns(num_packets);
 
-                    std::vector<size_t> input_packets(num_packets);
-                    for (size_t packet_idx = 0; packet_idx < num_packets; ++packet_idx) {
+                    std::vector<std::size_t> input_packets(num_packets);
+                    for (std::size_t packet_idx = 0; packet_idx < num_packets; ++packet_idx) {
                         input_packets[packet_idx] = packet_idx;
                     }
 
-                    const std::vector<std::vector<size_t>> routed_packets = route_by_benes(routing, input_packets);
+                    const std::vector<std::vector<std::size_t>> routed_packets = route_by_benes(routing, input_packets);
 
-                    for (size_t packet_idx = 0; packet_idx < num_packets; ++packet_idx) {
+                    for (std::size_t packet_idx = 0; packet_idx < num_packets; ++packet_idx) {
                         if (routed_packets[num_columns][permutation.get(packet_idx)] != input_packets[packet_idx]) {
                             return false;
                         }

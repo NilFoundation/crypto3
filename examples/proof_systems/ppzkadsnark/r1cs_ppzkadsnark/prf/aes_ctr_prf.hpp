@@ -34,7 +34,7 @@ namespace nil {
                     unsigned char seed_bytes[16];
                     mpz_t aux, Fr_mod;
                     unsigned char random_bytes[16 * 3];
-                    size_t exp_len;
+                    std::size_t exp_len;
 
                     mpz_init(aux);
                     mpz_init(Fr_mod);

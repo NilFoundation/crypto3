@@ -106,8 +106,8 @@ namespace nil {
 
                                                             tinyram_opcode_ANSWER};
 
-                typedef size_t reg_count_t;    // type for the number of registers
-                typedef size_t reg_width_t;    // type for the width of a register
+                typedef std::size_t reg_count_t;    // type for the number of registers
+                typedef std::size_t reg_width_t;    // type for the width of a register
 
                 extern std::map<tinyram_opcode, std::string> tinyram_opcode_names;
 
@@ -118,7 +118,7 @@ namespace nil {
                 void ensure_tinyram_opcode_value_map();
 
                 class tinyram_program;
-                typedef std::vector<size_t> tinyram_input_tape;
+                typedef std::vector<std::size_t> tinyram_input_tape;
                 typedef typename tinyram_input_tape::const_iterator tinyram_input_tape_iterator;
 
                 class tinyram_architecture_params {
@@ -131,26 +131,26 @@ namespace nil {
                         assert(w == 1ul << static_cast<std::size_t>(std::ceil(std::log2(w))));
                     };
 
-                    size_t address_size() const;
-                    size_t value_size() const;
-                    size_t cpu_state_size() const;
-                    size_t initial_pc_addr() const;
+                    std::size_t address_size() const;
+                    std::size_t value_size() const;
+                    std::size_t cpu_state_size() const;
+                    std::size_t initial_pc_addr() const;
 
                     std::vector<bool> initial_cpu_state() const;
                     memory_contents initial_memory_contents(const tinyram_program &program,
                                                             const tinyram_input_tape &primary_input) const;
 
-                    size_t opcode_width() const;
-                    size_t reg_arg_width() const;
-                    size_t instruction_padding_width() const;
-                    size_t reg_arg_or_imm_width() const;
+                    std::size_t opcode_width() const;
+                    std::size_t reg_arg_width() const;
+                    std::size_t instruction_padding_width() const;
+                    std::size_t reg_arg_or_imm_width() const;
 
-                    size_t dwaddr_len() const;
-                    size_t subaddr_len() const;
+                    std::size_t dwaddr_len() const;
+                    std::size_t subaddr_len() const;
 
-                    size_t bytes_in_word() const;
+                    std::size_t bytes_in_word() const;
 
-                    size_t instr_size() const;
+                    std::size_t instr_size() const;
 
                     bool operator==(const tinyram_architecture_params &other) const;
 
@@ -167,17 +167,17 @@ namespace nil {
                 public:
                     tinyram_opcode opcode;
                     bool arg2_is_imm;
-                    size_t desidx;
-                    size_t arg1idx;
-                    size_t arg2idx_or_imm;
+                    std::size_t desidx;
+                    std::size_t arg1idx;
+                    std::size_t arg2idx_or_imm;
 
                     tinyram_instruction(const tinyram_opcode &opcode,
                                         const bool arg2_is_imm,
-                                        const size_t &desidx,
-                                        const size_t &arg1idx,
-                                        const size_t &arg2idx_or_imm);
+                                        const std::size_t &desidx,
+                                        const std::size_t &arg1idx,
+                                        const std::size_t &arg2idx_or_imm);
 
-                    size_t as_dword(const tinyram_architecture_params &ap) const;
+                    std::size_t as_dword(const tinyram_architecture_params &ap) const;
                 };
 
                 tinyram_instruction random_tinyram_instruction(const tinyram_architecture_params &ap);
@@ -188,7 +188,7 @@ namespace nil {
                 class tinyram_program {
                 public:
                     std::vector<tinyram_instruction> instructions;
-                    size_t size() const {
+                    std::size_t size() const {
                         return instructions.size();
                     }
                     void add_instruction(const tinyram_instruction &instr);
@@ -198,7 +198,7 @@ namespace nil {
                                                           std::istream &preprocessed);
 
                 memory_store_trace tinyram_boot_trace_from_program_and_input(const tinyram_architecture_params &ap,
-                                                                             const size_t boot_trace_size_bound,
+                                                                             const std::size_t boot_trace_size_bound,
                                                                              const tinyram_program &program,
                                                                              const tinyram_input_tape &primary_input);
 
@@ -291,8 +291,8 @@ namespace nil {
 
                 std::vector<tinyram_instruction> generate_tinyram_prelude(const tinyram_architecture_params &ap) {
                     std::vector<tinyram_instruction> result;
-                    const size_t increment = algebra::log2(ap.w) / 8;
-                    const size_t mem_start = 1ul << (ap.w - 1);
+                    const std::size_t increment = algebra::log2(ap.w) / 8;
+                    const std::size_t mem_start = 1ul << (ap.w - 1);
                     result.emplace_back(
                         tinyram_instruction(tinyram_opcode_STOREW, true, 0, 0, 0));    // 0: store.w 0, r0
                     result.emplace_back(
@@ -309,21 +309,21 @@ namespace nil {
                     return result;
                 }
 
-                size_t tinyram_architecture_params::address_size() const {
+                std::size_t tinyram_architecture_params::address_size() const {
                     return dwaddr_len();
                 }
 
-                size_t tinyram_architecture_params::value_size() const {
+                std::size_t tinyram_architecture_params::value_size() const {
                     return 2 * w;
                 }
 
-                size_t tinyram_architecture_params::cpu_state_size() const {
+                std::size_t tinyram_architecture_params::cpu_state_size() const {
                     return k * w + 2; /* + flag + tape1_exhausted */
                 }
 
-                size_t tinyram_architecture_params::initial_pc_addr() const {
+                std::size_t tinyram_architecture_params::initial_pc_addr() const {
                     /* the initial PC address is memory units for the RAM reduction */
-                    const size_t initial_pc_addr = generate_tinyram_prelude(*this).size();
+                    const std::size_t initial_pc_addr = generate_tinyram_prelude(*this).size();
                     return initial_pc_addr;
                 }
 
@@ -338,17 +338,17 @@ namespace nil {
                     // remember that memory consists of 1ul<<dwaddr_len() double words (!)
                     memory_contents m;
 
-                    for (size_t i = 0; i < program.instructions.size(); ++i) {
+                    for (std::size_t i = 0; i < program.instructions.size(); ++i) {
                         m[i] = program.instructions[i].as_dword(*this);
                     }
 
-                    const size_t input_addr = 1ul << (dwaddr_len() - 1);
-                    size_t latest_double_word =
+                    const std::size_t input_addr = 1ul << (dwaddr_len() - 1);
+                    std::size_t latest_double_word =
                         (1ull << (w - 1)) +
                         primary_input.size();    // the first word will contain 2^{w-1} + input_size (the
                     // location where the last input word was stored)
 
-                    for (size_t i = 0; i < primary_input.size() / 2 + 1; ++i) {
+                    for (std::size_t i = 0; i < primary_input.size() / 2 + 1; ++i) {
                         if (2 * i < primary_input.size()) {
                             latest_double_word += (primary_input[2 * i] << w);
                         }
@@ -363,36 +363,36 @@ namespace nil {
                     return m;
                 }
 
-                size_t tinyram_architecture_params::opcode_width() const {
+                std::size_t tinyram_architecture_params::opcode_width() const {
                     return algebra::log2(
-                        static_cast<size_t>(tinyram_opcode_ANSWER)); /* assumption: answer is the last */
+                        static_cast<std::size_t>(tinyram_opcode_ANSWER)); /* assumption: answer is the last */
                 }
 
-                size_t tinyram_architecture_params::reg_arg_width() const {
+                std::size_t tinyram_architecture_params::reg_arg_width() const {
                     return static_cast<std::size_t>(std::ceil(std::log2(k)));
                 }
 
-                size_t tinyram_architecture_params::instruction_padding_width() const {
+                std::size_t tinyram_architecture_params::instruction_padding_width() const {
                     return 2 * w - (opcode_width() + 1 + 2 * reg_arg_width() + reg_arg_or_imm_width());
                 }
 
-                size_t tinyram_architecture_params::reg_arg_or_imm_width() const {
+                std::size_t tinyram_architecture_params::reg_arg_or_imm_width() const {
                     return std::max(w, reg_arg_width());
                 }
 
-                size_t tinyram_architecture_params::dwaddr_len() const {
+                std::size_t tinyram_architecture_params::dwaddr_len() const {
                     return w - (static_cast<std::size_t>(std::ceil(std::log2(w))) - 2);
                 }
 
-                size_t tinyram_architecture_params::subaddr_len() const {
+                std::size_t tinyram_architecture_params::subaddr_len() const {
                     return static_cast<std::size_t>(std::ceil(std::log2(w))) - 2;
                 }
 
-                size_t tinyram_architecture_params::bytes_in_word() const {
+                std::size_t tinyram_architecture_params::bytes_in_word() const {
                     return w / 8;
                 }
 
-                size_t tinyram_architecture_params::instr_size() const {
+                std::size_t tinyram_architecture_params::instr_size() const {
                     return 2 * w;
                 }
 
@@ -416,15 +416,15 @@ namespace nil {
 
                 tinyram_instruction::tinyram_instruction(const tinyram_opcode &opcode,
                                                          const bool arg2_is_imm,
-                                                         const size_t &desidx,
-                                                         const size_t &arg1idx,
-                                                         const size_t &arg2idx_or_imm) :
+                                                         const std::size_t &desidx,
+                                                         const std::size_t &arg1idx,
+                                                         const std::size_t &arg2idx_or_imm) :
                     opcode(opcode),
                     arg2_is_imm(arg2_is_imm), desidx(desidx), arg1idx(arg1idx), arg2idx_or_imm(arg2idx_or_imm) {
                 }
 
-                size_t tinyram_instruction::as_dword(const tinyram_architecture_params &ap) const {
-                    size_t result = static_cast<size_t>(opcode);
+                std::size_t tinyram_instruction::as_dword(const tinyram_architecture_params &ap) const {
+                    std::size_t result = static_cast<std::size_t>(opcode);
                     result = (result << 1) | (arg2_is_imm ? 1 : 0);
                     result = (result << algebra::log2(ap.k)) | desidx;
                     result = (result << algebra::log2(ap.k)) | arg1idx;
@@ -441,9 +441,9 @@ namespace nil {
                 tinyram_instruction random_tinyram_instruction(const tinyram_architecture_params &ap) {
                     const tinyram_opcode opcode = (tinyram_opcode)(std::rand() % (1ul << ap.opcode_width()));
                     const bool arg2_is_imm = std::rand() & 1;
-                    const size_t desidx = std::rand() % (1ul << ap.reg_arg_width());
-                    const size_t arg1idx = std::rand() % (1ul << ap.reg_arg_width());
-                    const size_t arg2idx_or_imm = std::rand() % (1ul << ap.reg_arg_or_imm_width());
+                    const std::size_t desidx = std::rand() % (1ul << ap.reg_arg_width());
+                    const std::size_t arg1idx = std::rand() % (1ul << ap.reg_arg_width());
+                    const std::size_t arg2idx_or_imm = std::rand() % (1ul << ap.reg_arg_or_imm_width());
                     return {opcode, arg2_is_imm, desidx, arg1idx, arg2idx_or_imm};
                 }
 
@@ -460,7 +460,7 @@ namespace nil {
                     std::string instr, line;
 
                     while (preprocessed >> instr) {
-                        size_t immflag, des, a1;
+                        std::size_t immflag, des, a1;
                         long long int a2;
                         if (preprocessed.good()) {
                             preprocessed >> immflag >> des >> a1 >> a2;
@@ -473,22 +473,22 @@ namespace nil {
                 }
 
                 memory_store_trace tinyram_boot_trace_from_program_and_input(const tinyram_architecture_params &ap,
-                                                                             const size_t boot_trace_size_bound,
+                                                                             const std::size_t boot_trace_size_bound,
                                                                              const tinyram_program &program,
                                                                              const tinyram_input_tape &primary_input) {
                     // TODO: document the reverse order here
 
                     memory_store_trace result;
 
-                    size_t boot_pos = boot_trace_size_bound - 1;
-                    for (size_t i = 0; i < program.instructions.size(); ++i) {
+                    std::size_t boot_pos = boot_trace_size_bound - 1;
+                    for (std::size_t i = 0; i < program.instructions.size(); ++i) {
                         result.set_trace_entry(boot_pos--, std::make_pair(i, program.instructions[i].as_dword(ap)));
                     }
 
-                    const size_t primary_input_base_addr = (1ul << (ap.dwaddr_len() - 1));
+                    const std::size_t primary_input_base_addr = (1ul << (ap.dwaddr_len() - 1));
 
-                    for (size_t j = 0; j < primary_input.size(); j += 2) {
-                        const size_t memory_dword =
+                    for (std::size_t j = 0; j < primary_input.size(); j += 2) {
+                        const std::size_t memory_dword =
                             primary_input[j] + ((j + 1 < primary_input.size() ? primary_input[j + 1] : 0) << ap.w);
                         result.set_trace_entry(boot_pos--, std::make_pair(primary_input_base_addr + j, memory_dword));
                     }
@@ -499,7 +499,7 @@ namespace nil {
                 tinyram_input_tape load_tape(std::istream &tape) {
                     tinyram_input_tape result;
 
-                    size_t cell;
+                    std::size_t cell;
                     while (tape >> cell) {
                         result.emplace_back(cell);
                     }

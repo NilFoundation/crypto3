@@ -64,26 +64,26 @@ namespace nil {
 
                     ram_architecture_params<ramT> ap;
 
-                    size_t timestamp;
+                    std::size_t timestamp;
                     std::vector<bool> root_initial;
                     std::vector<bool> root;
-                    size_t pc_addr;
+                    std::size_t pc_addr;
                     std::vector<bool> cpu_state;
-                    size_t pc_addr_initial;
+                    std::size_t pc_addr_initial;
                     std::vector<bool> cpu_state_initial;
                     bool has_accepted;
 
-                    ram_pcd_message(const size_t type,
+                    ram_pcd_message(const std::size_t type,
                                     const ram_architecture_params<ramT> &ap,
-                                    const size_t timestamp,
+                                    const std::size_t timestamp,
                                     const std::vector<bool>
                                         root_initial,
                                     const std::vector<bool>
                                         root,
-                                    const size_t pc_addr,
+                                    const std::size_t pc_addr,
                                     const std::vector<bool>
                                         cpu_state,
-                                    const size_t pc_addr_initial,
+                                    const std::size_t pc_addr_initial,
                                     const std::vector<bool>
                                         cpu_state_initial,
                                     const bool has_accepted);
@@ -92,7 +92,7 @@ namespace nil {
                     r1cs_variable_assignment<FieldType> payload_as_r1cs_variable_assignment() const;
                     void print() const;
 
-                    static size_t unpacked_payload_size_in_bits(const ram_architecture_params<ramT> &ap);
+                    static std::size_t unpacked_payload_size_in_bits(const ram_architecture_params<ramT> &ap);
                 };
 
                 template<typename ramT>
@@ -228,11 +228,11 @@ namespace nil {
                     std::shared_ptr<bit_vector_copy_gadget<FieldType>> copy_temp_next_cpu_state;
 
                 public:
-                    const size_t addr_size;
-                    const size_t value_size;
-                    const size_t digest_size;
+                    const std::size_t addr_size;
+                    const std::size_t value_size;
+                    const std::size_t digest_size;
 
-                    size_t message_length;
+                    std::size_t message_length;
 
                     ram_compliance_predicate_handler(const ram_architecture_params<ramT> &ap);
                     void generate_r1cs_constraints();
@@ -246,21 +246,21 @@ namespace nil {
                     static std::shared_ptr<r1cs_pcd_message<FieldType>>
                         get_final_case_msg(const ram_architecture_params<ramT> &ap,
                                            const ram_boot_trace<ramT> &primary_input,
-                                           const size_t time_bound);
+                                           const std::size_t time_bound);
                 };
 
                 template<typename ramT>
-                ram_pcd_message<ramT>::ram_pcd_message(const size_t type,
+                ram_pcd_message<ramT>::ram_pcd_message(const std::size_t type,
                                                        const ram_architecture_params<ramT> &ap,
-                                                       const size_t timestamp,
+                                                       const std::size_t timestamp,
                                                        const std::vector<bool>
                                                            root_initial,
                                                        const std::vector<bool>
                                                            root,
-                                                       const size_t pc_addr,
+                                                       const std::size_t pc_addr,
                                                        const std::vector<bool>
                                                            cpu_state,
-                                                       const size_t pc_addr_initial,
+                                                       const std::size_t pc_addr_initial,
                                                        const std::vector<bool>
                                                            cpu_state_initial,
                                                        const bool has_accepted) :
@@ -268,7 +268,7 @@ namespace nil {
                     ap(ap), timestamp(timestamp), root_initial(root_initial), root(root), pc_addr(pc_addr),
                     cpu_state(cpu_state), pc_addr_initial(pc_addr_initial), cpu_state_initial(cpu_state_initial),
                     has_accepted(has_accepted) {
-                    const size_t digest_size = CRH_with_bit_out_gadget<FieldType>::get_digest_len();
+                    const std::size_t digest_size = CRH_with_bit_out_gadget<FieldType>::get_digest_len();
                     assert(static_cast<std::size_t>(std::ceil(std::log2(timestamp))) < ramT::timestamp_length);
                     assert(root_initial.size() == digest_size);
                     assert(root.size() == digest_size);
@@ -339,8 +339,8 @@ namespace nil {
                 }
 
                 template<typename ramT>
-                size_t ram_pcd_message<ramT>::unpacked_payload_size_in_bits(const ram_architecture_params<ramT> &ap) {
-                    const size_t digest_size = CRH_with_bit_out_gadget<FieldType>::get_digest_len();
+                std::size_t ram_pcd_message<ramT>::unpacked_payload_size_in_bits(const ram_architecture_params<ramT> &ap) {
+                    const std::size_t digest_size = CRH_with_bit_out_gadget<FieldType>::get_digest_len();
 
                     return (ramT::timestamp_length +     // timestamp
                             2 * digest_size +            // root, root_initial
@@ -354,9 +354,9 @@ namespace nil {
                                                                          const ram_architecture_params<ramT> &ap) :
                     r1cs_pcd_message_variable<ram_base_field<ramT>>(pb),
                     ap(ap) {
-                    const size_t unpacked_payload_size_in_bits =
+                    const std::size_t unpacked_payload_size_in_bits =
                         ram_pcd_message<ramT>::unpacked_payload_size_in_bits(ap);
-                    const size_t packed_payload_size =
+                    const std::size_t packed_payload_size =
                         (unpacked_payload_size_in_bits + FieldType::capacity() - 1) / FieldType::capacity();
                     packed_payload.allocate(pb, packed_payload_size);
 
@@ -365,7 +365,7 @@ namespace nil {
 
                 template<typename ramT>
                 void ram_pcd_message_variable<ramT>::allocate_unpacked_part() {
-                    const size_t digest_size = CRH_with_bit_out_gadget<FieldType>::get_digest_len();
+                    const std::size_t digest_size = CRH_with_bit_out_gadget<FieldType>::get_digest_len();
 
                     timestamp.allocate(this->pb, ramT::timestamp_length);
                     root_initial.allocate(this->pb, digest_size);
@@ -408,13 +408,13 @@ namespace nil {
                 template<typename ramT>
                 std::shared_ptr<r1cs_pcd_message<ram_base_field<ramT>>>
                     ram_pcd_message_variable<ramT>::get_message() const {
-                    const size_t type_val = this->pb.val(this->type).as_ulong();
-                    const size_t timestamp_val = timestamp.get_field_element_from_bits(this->pb).as_ulong();
+                    const std::size_t type_val = this->pb.val(this->type).as_ulong();
+                    const std::size_t timestamp_val = timestamp.get_field_element_from_bits(this->pb).as_ulong();
                     const std::vector<bool> root_initial_val = root_initial.get_bits(this->pb);
                     const std::vector<bool> root_val = root.get_bits(this->pb);
-                    const size_t pc_addr_val = pc_addr.get_field_element_from_bits(this->pb).as_ulong();
+                    const std::size_t pc_addr_val = pc_addr.get_field_element_from_bits(this->pb).as_ulong();
                     const std::vector<bool> cpu_state_val = cpu_state.get_bits(this->pb);
-                    const size_t pc_addr_initial_val = pc_addr_initial.get_field_element_from_bits(this->pb).as_ulong();
+                    const std::size_t pc_addr_initial_val = pc_addr_initial.get_field_element_from_bits(this->pb).as_ulong();
                     const std::vector<bool> cpu_state_initial_val = cpu_state_initial.get_bits(this->pb);
                     const bool has_accepted_val = (this->pb.val(has_accepted) == FieldType::one());
 
@@ -491,7 +491,7 @@ namespace nil {
                                                                                              1,
                                                                                              1,
                                                                                              true,
-                                                                                             std::set<size_t> {1}),
+                                                                                             std::set<std::size_t> {1}),
                     ap(ap), addr_size(ap.address_size()), value_size(ap.value_size()),
                     digest_size(CRH_with_bit_out_gadget<FieldType>::get_digest_len()) {
                     // TODO: assert that message has fields of lengths consistent with num_addresses/value_size (as a
@@ -520,7 +520,7 @@ namespace nil {
                     temp_next_pc_addr.allocate(this->pb, addr_size);
                     temp_next_cpu_state.allocate(this->pb, ap.cpu_state_size());
 
-                    const size_t chunk_size = FieldType::capacity();
+                    const std::size_t chunk_size = FieldType::capacity();
 
                     /*
                       Always:
@@ -724,7 +724,7 @@ namespace nil {
                       next.cpu_state_initial = cur.cpu_state_initial
                     */
                     copy_root_initial->generate_r1cs_witness();
-                    for (size_t i = 0; i < next->root_initial.size(); ++i) {
+                    for (std::size_t i = 0; i < next->root_initial.size(); ++i) {
                         this->pb.val(cur->root_initial[i]).print();
                         this->pb.val(next->root_initial[i]).print();
                         assert(this->pb.val(cur->root_initial[i]) == this->pb.val(next->root_initial[i]));
@@ -765,10 +765,10 @@ namespace nil {
                     this->pb.val(is_not_halt_case) = FieldType::one() - this->pb.val(do_halt);
 
                     // that instruction fetch was correctly executed
-                    const size_t int_pc_addr =
+                    const std::size_t int_pc_addr =
                         algebra::convert_bit_vector_to_field_element<FieldType>(cur->pc_addr.get_bits(this->pb))
                             .as_ulong();
-                    const size_t int_pc_val = ram_local_data_value->mem.get_value(int_pc_addr);
+                    const std::size_t int_pc_val = ram_local_data_value->mem.get_value(int_pc_addr);
                     std::vector<bool> pc_val_bv = algebra::int_list_to_bits({int_pc_val}, value_size);
                     std::reverse(pc_val_bv.begin(), pc_val_bv.end());
 
@@ -785,8 +785,8 @@ namespace nil {
                     // that CPU accepted on (cur, temp)
                     // Step 1: Get address and old witnesses for delegated memory.
                     cpu_checker->generate_r1cs_witness_address();
-                    const size_t int_ls_addr = ls_addr.get_field_element_from_bits(this->pb).as_ulong();
-                    const size_t int_ls_prev_val = ram_local_data_value->mem.get_value(int_ls_addr);
+                    const std::size_t int_ls_addr = ls_addr.get_field_element_from_bits(this->pb).as_ulong();
+                    const std::size_t int_ls_prev_val = ram_local_data_value->mem.get_value(int_ls_addr);
                     const merkle_authentication_path prev_path = ram_local_data_value->mem.get_path(int_ls_addr);
                     ls_prev_val.fill_with_bits_of_ulong(this->pb, int_ls_prev_val);
                     assert(ls_prev_val.get_field_element_from_bits(this->pb) == FieldType(int_ls_prev_val, true));
@@ -794,7 +794,7 @@ namespace nil {
                     cpu_checker->generate_r1cs_witness_other(ram_local_data_value->aux_it,
                                                              ram_local_data_value->aux_end);
 
-                    const size_t int_ls_next_val = ls_next_val.get_field_element_from_bits(this->pb).as_ulong();
+                    const std::size_t int_ls_next_val = ls_next_val.get_field_element_from_bits(this->pb).as_ulong();
                     ram_local_data_value->mem.set_value(int_ls_addr, int_ls_next_val);
 
                     // Step 4: Use both to satisfy load_store_checker
@@ -836,21 +836,21 @@ namespace nil {
                     ram_compliance_predicate_handler<ramT>::get_base_case_message(
                         const ram_architecture_params<ramT> &ap,
                         const ram_boot_trace<ramT> &primary_input) {
-                    const size_t num_addresses = 1ul << ap.address_size();
-                    const size_t value_size = ap.value_size();
+                    const std::size_t num_addresses = 1ul << ap.address_size();
+                    const std::size_t value_size = ap.value_size();
                     delegated_ra_memory<CRH_with_bit_out_gadget<FieldType>> mem(num_addresses, value_size,
                                                                                 primary_input.as_memory_contents());
 
-                    const size_t type = 0;
+                    const std::size_t type = 0;
 
-                    const size_t timestamp = 0;
+                    const std::size_t timestamp = 0;
 
                     const std::vector<bool> root_initial = mem.get_root();
-                    const size_t pc_addr_initial = ap.initial_pc_addr();
+                    const std::size_t pc_addr_initial = ap.initial_pc_addr();
                     const std::vector<bool> cpu_state_initial(ap.cpu_state_size(), false);
 
                     const std::vector<bool> root = root_initial;
-                    const size_t pc_addr = pc_addr_initial;
+                    const std::size_t pc_addr = pc_addr_initial;
                     const std::vector<bool> cpu_state = cpu_state_initial;
 
                     const bool has_accepted = false;
@@ -866,22 +866,22 @@ namespace nil {
                     ram_compliance_predicate_handler<ramT>::get_final_case_msg(
                         const ram_architecture_params<ramT> &ap,
                         const ram_boot_trace<ramT> &primary_input,
-                        const size_t time_bound) {
-                    const size_t num_addresses = 1ul << ap.address_size();
-                    const size_t value_size = ap.value_size();
+                        const std::size_t time_bound) {
+                    const std::size_t num_addresses = 1ul << ap.address_size();
+                    const std::size_t value_size = ap.value_size();
                     delegated_ra_memory<CRH_with_bit_out_gadget<FieldType>> mem(num_addresses, value_size,
                                                                                 primary_input.as_memory_contents());
 
-                    const size_t type = 1;
+                    const std::size_t type = 1;
 
-                    const size_t timestamp = time_bound;
+                    const std::size_t timestamp = time_bound;
 
                     const std::vector<bool> root_initial = mem.get_root();
-                    const size_t pc_addr_initial = ap.initial_pc_addr();
+                    const std::size_t pc_addr_initial = ap.initial_pc_addr();
                     const std::vector<bool> cpu_state_initial(ap.cpu_state_size(), false);
 
                     const std::vector<bool> root(root_initial.size(), false);
-                    const size_t pc_addr = 0;
+                    const std::size_t pc_addr = 0;
                     const std::vector<bool> cpu_state = cpu_state_initial;
 
                     const bool has_accepted = true;

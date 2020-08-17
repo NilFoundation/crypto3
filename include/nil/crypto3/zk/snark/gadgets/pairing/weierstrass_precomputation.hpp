@@ -254,8 +254,8 @@ namespace nil {
                     std::vector<std::shared_ptr<precompute_G2_gadget_addition_step<ppT>>> addition_steps;
                     std::vector<std::shared_ptr<precompute_G2_gadget_doubling_step<ppT>>> doubling_steps;
 
-                    size_t add_count;
-                    size_t dbl_count;
+                    std::size_t add_count;
+                    std::size_t dbl_count;
 
                     G2_precomputation<ppT> &precomp;    // important to have a reference here
 
@@ -330,7 +330,7 @@ namespace nil {
 
                     coeffs.resize(native_precomp.coeffs.size() +
                                   1);    // the last precomp remains for convenient programming
-                    for (size_t i = 0; i < native_precomp.coeffs.size(); ++i) {
+                    for (std::size_t i = 0; i < native_precomp.coeffs.size(); ++i) {
                         coeffs[i].reset(new precompute_G2_gadget_coeffs<ppT>());
                         coeffs[i]->RX.reset(new Fqe_variable<ppT>(pb, native_precomp.coeffs[i].old_RX));
                         coeffs[i]->RY.reset(new Fqe_variable<ppT>(pb, native_precomp.coeffs[i].old_RY));
@@ -529,7 +529,7 @@ namespace nil {
                     precomp.Q.reset(new G2_variable<ppT>(Q));
 
                     const auto &loop_count = pairing_selector<ppT>::pairing_loop_count;
-                    size_t coeff_count =
+                    std::size_t coeff_count =
                         1;    // the last RX/RY are unused in Miller loop, but will need to get allocated somehow
                     this->add_count = 0;
                     this->dbl_count = 0;
@@ -557,13 +557,13 @@ namespace nil {
                     doubling_steps.resize(dbl_count);
 
                     precomp.coeffs[0].reset(new precompute_G2_gadget_coeffs<ppT>(pb, Q));
-                    for (size_t i = 1; i < coeff_count; ++i) {
+                    for (std::size_t i = 1; i < coeff_count; ++i) {
                         precomp.coeffs[i].reset(new precompute_G2_gadget_coeffs<ppT>(pb));
                     }
 
-                    size_t add_id = 0;
-                    size_t dbl_id = 0;
-                    size_t coeff_id = 0;
+                    std::size_t add_id = 0;
+                    std::size_t dbl_id = 0;
+                    std::size_t coeff_id = 0;
 
                     found_nonzero = false;
                     for (long i = NAF.size() - 1; i >= 0; --i) {
@@ -589,11 +589,11 @@ namespace nil {
 
                 template<typename ppT>
                 void precompute_G2_gadget<ppT>::generate_r1cs_constraints() {
-                    for (size_t i = 0; i < dbl_count; ++i) {
+                    for (std::size_t i = 0; i < dbl_count; ++i) {
                         doubling_steps[i]->generate_r1cs_constraints();
                     }
 
-                    for (size_t i = 0; i < add_count; ++i) {
+                    for (std::size_t i = 0; i < add_count; ++i) {
                         addition_steps[i]->generate_r1cs_constraints();
                     }
                 }
@@ -605,8 +605,8 @@ namespace nil {
 
                     const auto &loop_count = pairing_selector<ppT>::pairing_loop_count;
 
-                    size_t add_id = 0;
-                    size_t dbl_id = 0;
+                    std::size_t add_id = 0;
+                    std::size_t dbl_id = 0;
 
                     bool found_nonzero = false;
                     std::vector<long> NAF = find_wnaf(1, loop_count);
@@ -648,7 +648,7 @@ namespace nil {
                     assert(precomp.coeffs.size() - 1 ==
                            native_precomp.coeffs
                                .size());    // the last precomp is unused, but remains for convenient programming
-                    for (size_t i = 0; i < native_precomp.coeffs.size(); ++i) {
+                    for (std::size_t i = 0; i < native_precomp.coeffs.size(); ++i) {
                         assert(precomp.coeffs[i]->RX->get_element() == native_precomp.coeffs[i].old_RX);
                         assert(precomp.coeffs[i]->RY->get_element() == native_precomp.coeffs[i].old_RY);
                         assert(precomp.coeffs[i]->gamma->get_element() == native_precomp.coeffs[i].gamma);

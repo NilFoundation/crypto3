@@ -55,7 +55,7 @@ namespace nil {
                     r1cs_ppzksnark_proof_variable(protoboard<FieldType> &pb);
                     void generate_r1cs_constraints();
                     void generate_r1cs_witness(const r1cs_ppzksnark_proof<other_curve<ppT>> &proof);
-                    static size_t size();
+                    static std::size_t size();
                 };
 
                 template<typename ppT>
@@ -75,7 +75,7 @@ namespace nil {
 
                     pb_variable_array<FieldType> all_bits;
                     pb_linear_combination_array<FieldType> all_vars;
-                    size_t input_size;
+                    std::size_t input_size;
 
                     std::vector<std::shared_ptr<G1_variable<ppT>>> all_G1_vars;
                     std::vector<std::shared_ptr<G2_variable<ppT>>> all_G2_vars;
@@ -95,12 +95,12 @@ namespace nil {
                     __attribute__((noinline))
                     r1cs_ppzksnark_verification_key_variable(protoboard<FieldType> &pb,
                                                              const pb_variable_array<FieldType> &all_bits,
-                                                             const size_t input_size);
+                                                             const std::size_t input_size);
                     void generate_r1cs_constraints(const bool enforce_bitness);
                     void generate_r1cs_witness(const r1cs_ppzksnark_verification_key<other_curve<ppT>> &vk);
                     void generate_r1cs_witness(const std::vector<bool> &vk_bits);
                     std::vector<bool> get_bits() const;
-                    static size_t __attribute__((noinline)) size_in_bits(const size_t input_size);
+                    static std::size_t __attribute__((noinline)) size_in_bits(const std::size_t input_size);
                     static std::vector<bool>
                         get_verification_key_bits(const r1cs_ppzksnark_verification_key<other_curve<ppT>> &r1cs_vk);
                 };
@@ -163,10 +163,10 @@ namespace nil {
                     r1cs_ppzksnark_preprocessed_r1cs_ppzksnark_verification_key_variable<ppT> pvk;
 
                     pb_variable_array<FieldType> input;
-                    size_t elt_size;
+                    std::size_t elt_size;
                     r1cs_ppzksnark_proof_variable<ppT> proof;
                     pb_variable<FieldType> result;
-                    const size_t input_len;
+                    const std::size_t input_len;
 
                     std::shared_ptr<G1_variable<ppT>> acc;
                     std::shared_ptr<G1_multiscalar_mul_gadget<ppT>> accumulate_input;
@@ -219,7 +219,7 @@ namespace nil {
                         protoboard<FieldType> &pb,
                         const r1cs_ppzksnark_preprocessed_r1cs_ppzksnark_verification_key_variable<ppT> &pvk,
                         const pb_variable_array<FieldType> &input,
-                        const size_t elt_size,
+                        const std::size_t elt_size,
                         const r1cs_ppzksnark_proof_variable<ppT> &proof,
                         const pb_variable<FieldType> &result);
                     void generate_r1cs_constraints();
@@ -238,7 +238,7 @@ namespace nil {
                     r1cs_ppzksnark_verifier_gadget(protoboard<FieldType> &pb,
                                                    const r1cs_ppzksnark_verification_key_variable<ppT> &vk,
                                                    const pb_variable_array<FieldType> &input,
-                                                   const size_t elt_size,
+                                                   const std::size_t elt_size,
                                                    const r1cs_ppzksnark_proof_variable<ppT> &proof,
                                                    const pb_variable<FieldType> &result);
 
@@ -249,8 +249,8 @@ namespace nil {
                 template<typename ppT>
                 r1cs_ppzksnark_proof_variable<ppT>::r1cs_ppzksnark_proof_variable(protoboard<FieldType> &pb) :
                     gadget<FieldType>(pb) {
-                    const size_t num_G1 = 7;
-                    const size_t num_G2 = 1;
+                    const std::size_t num_G1 = 7;
+                    const std::size_t num_G2 = 1;
 
                     g_A_g.reset(new G1_variable<ppT>(pb));
                     g_A_h.reset(new G1_variable<ppT>(pb));
@@ -266,7 +266,7 @@ namespace nil {
 
                     all_G1_checkers.resize(all_G1_vars.size());
 
-                    for (size_t i = 0; i < all_G1_vars.size(); ++i) {
+                    for (std::size_t i = 0; i < all_G1_vars.size(); ++i) {
                         all_G1_checkers[i].reset(new G1_checker_gadget<ppT>(pb, *all_G1_vars[i]));
                     }
                     G2_checker.reset(new G2_checker_gadget<ppT>(pb, *g_B_g));
@@ -296,11 +296,11 @@ namespace nil {
                     assert(G1_elems.size() == all_G1_vars.size());
                     assert(G2_elems.size() == all_G2_vars.size());
 
-                    for (size_t i = 0; i < G1_elems.size(); ++i) {
+                    for (std::size_t i = 0; i < G1_elems.size(); ++i) {
                         all_G1_vars[i]->generate_r1cs_witness(G1_elems[i]);
                     }
 
-                    for (size_t i = 0; i < G2_elems.size(); ++i) {
+                    for (std::size_t i = 0; i < G2_elems.size(); ++i) {
                         all_G2_vars[i]->generate_r1cs_witness(G2_elems[i]);
                     }
 
@@ -312,9 +312,9 @@ namespace nil {
                 }
 
                 template<typename ppT>
-                size_t r1cs_ppzksnark_proof_variable<ppT>::size() {
-                    const size_t num_G1 = 7;
-                    const size_t num_G2 = 1;
+                std::size_t r1cs_ppzksnark_proof_variable<ppT>::size() {
+                    const std::size_t num_G1 = 7;
+                    const std::size_t num_G2 = 1;
                     return (num_G1 * G1_variable<ppT>::num_field_elems + num_G2 * G2_variable<ppT>::num_field_elems);
                 }
 
@@ -322,11 +322,11 @@ namespace nil {
                 r1cs_ppzksnark_verification_key_variable<ppT>::r1cs_ppzksnark_verification_key_variable(
                     protoboard<FieldType> &pb,
                     const pb_variable_array<FieldType> &all_bits,
-                    const size_t input_size) :
+                    const std::size_t input_size) :
                     gadget<FieldType>(pb),
                     all_bits(all_bits), input_size(input_size) {
-                    const size_t num_G1 = 2 + (input_size + 1);
-                    const size_t num_G2 = 5;
+                    const std::size_t num_G1 = 2 + (input_size + 1);
+                    const std::size_t num_G2 = 5;
 
                     assert(all_bits.size() ==
                            (G1_variable<ppT>::size_in_bits() * num_G1 + G2_variable<ppT>::size_in_bits() * num_G2));
@@ -347,7 +347,7 @@ namespace nil {
                     this->encoded_IC_base.reset(new G1_variable<ppT>(pb));
                     this->all_G1_vars.emplace_back(this->encoded_IC_base);
 
-                    for (size_t i = 0; i < input_size; ++i) {
+                    for (std::size_t i = 0; i < input_size; ++i) {
                         this->encoded_IC_query[i].reset(new G1_variable<ppT>(pb));
                         all_G1_vars.emplace_back(this->encoded_IC_query[i]);
                     }
@@ -385,7 +385,7 @@ namespace nil {
 
                     assert(vk.encoded_IC_query.rest.indices.size() == input_size);
                     G1_elems.emplace_back(vk.encoded_IC_query.first);
-                    for (size_t i = 0; i < input_size; ++i) {
+                    for (std::size_t i = 0; i < input_size; ++i) {
                         assert(vk.encoded_IC_query.rest.indices[i] == i);
                         G1_elems.emplace_back(vk.encoded_IC_query.rest.values[i]);
                     }
@@ -393,11 +393,11 @@ namespace nil {
                     assert(G1_elems.size() == all_G1_vars.size());
                     assert(G2_elems.size() == all_G2_vars.size());
 
-                    for (size_t i = 0; i < G1_elems.size(); ++i) {
+                    for (std::size_t i = 0; i < G1_elems.size(); ++i) {
                         all_G1_vars[i]->generate_r1cs_witness(G1_elems[i]);
                     }
 
-                    for (size_t i = 0; i < G2_elems.size(); ++i) {
+                    for (std::size_t i = 0; i < G2_elems.size(); ++i) {
                         all_G2_vars[i]->generate_r1cs_witness(G2_elems[i]);
                     }
 
@@ -417,10 +417,10 @@ namespace nil {
                 }
 
                 template<typename ppT>
-                size_t r1cs_ppzksnark_verification_key_variable<ppT>::size_in_bits(const size_t input_size) {
-                    const size_t num_G1 = 2 + (input_size + 1);
-                    const size_t num_G2 = 5;
-                    const size_t result =
+                std::size_t r1cs_ppzksnark_verification_key_variable<ppT>::size_in_bits(const std::size_t input_size) {
+                    const std::size_t num_G1 = 2 + (input_size + 1);
+                    const std::size_t num_G2 = 5;
+                    const std::size_t result =
                         G1_variable<ppT>::size_in_bits() * num_G1 + G2_variable<ppT>::size_in_bits() * num_G2;
                     return result;
                 }
@@ -430,11 +430,11 @@ namespace nil {
                     const r1cs_ppzksnark_verification_key<other_curve<ppT>> &r1cs_vk) {
                     typedef algebra::Fr<ppT> FieldType;
 
-                    const size_t input_size_in_elts =
+                    const std::size_t input_size_in_elts =
                         r1cs_vk.encoded_IC_query.rest.indices
                             .size();    // this might be approximate for bound verification keys, however they are not
                     // supported by r1cs_ppzksnark_verification_key_variable
-                    const size_t vk_size_in_bits =
+                    const std::size_t vk_size_in_bits =
                         r1cs_ppzksnark_verification_key_variable<ppT>::size_in_bits(input_size_in_elts);
 
                     protoboard<FieldType> pb;
@@ -459,7 +459,7 @@ namespace nil {
                         const r1cs_ppzksnark_verification_key<other_curve<ppT>> &r1cs_vk) {
                     encoded_IC_base.reset(new G1_variable<ppT>(pb, r1cs_vk.encoded_IC_query.first));
                     encoded_IC_query.resize(r1cs_vk.encoded_IC_query.rest.indices.size());
-                    for (size_t i = 0; i < r1cs_vk.encoded_IC_query.rest.indices.size(); ++i) {
+                    for (std::size_t i = 0; i < r1cs_vk.encoded_IC_query.rest.indices.size(); ++i) {
                         assert(r1cs_vk.encoded_IC_query.rest.indices[i] == i);
                         encoded_IC_query[i].reset(new G1_variable<ppT>(pb, r1cs_vk.encoded_IC_query.rest.values[i]));
                     }
@@ -542,7 +542,7 @@ namespace nil {
                     protoboard<FieldType> &pb,
                     const r1cs_ppzksnark_preprocessed_r1cs_ppzksnark_verification_key_variable<ppT> &pvk,
                     const pb_variable_array<FieldType> &input,
-                    const size_t elt_size,
+                    const std::size_t elt_size,
                     const r1cs_ppzksnark_proof_variable<ppT> &proof,
                     const pb_variable<FieldType> &result) :
                     gadget<FieldType>(pb),
@@ -550,7 +550,7 @@ namespace nil {
                     // accumulate input and store base in acc
                     acc.reset(new G1_variable<ppT>(pb));
                     std::vector<G1_variable<ppT>> IC_terms;
-                    for (size_t i = 0; i < pvk.encoded_IC_query.size(); ++i) {
+                    for (std::size_t i = 0; i < pvk.encoded_IC_query.size(); ++i) {
                         IC_terms.emplace_back(*(pvk.encoded_IC_query[i]));
                     }
                     accumulate_input.reset(new G1_multiscalar_mul_gadget<ppT>(
@@ -720,7 +720,7 @@ namespace nil {
                     protoboard<FieldType> &pb,
                     const r1cs_ppzksnark_verification_key_variable<ppT> &vk,
                     const pb_variable_array<FieldType> &input,
-                    const size_t elt_size,
+                    const std::size_t elt_size,
                     const r1cs_ppzksnark_proof_variable<ppT> &proof,
                     const pb_variable<FieldType> &result) :
                     gadget<FieldType>(pb) {

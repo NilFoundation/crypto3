@@ -27,7 +27,7 @@ namespace nil {
                 /**
                  * Mnemonic typedefs.
                  */
-                typedef size_t var_index_t;
+                typedef std::size_t var_index_t;
                 typedef long integer_coeff_t;
 
                 /**
@@ -242,13 +242,13 @@ namespace nil {
 
                     bool operator==(const linear_combination<FieldType> &other) const;
 
-                    bool is_valid(const size_t num_variables) const;
+                    bool is_valid(const std::size_t num_variables) const;
 
-                    void print(const std::map<size_t, std::string> &variable_annotations =
-                                   std::map<size_t, std::string>()) const;
+                    void print(const std::map<std::size_t, std::string> &variable_annotations =
+                                   std::map<std::size_t, std::string>()) const;
                     void print_with_assignment(const std::vector<FieldType> &full_assignment,
-                                               const std::map<size_t, std::string> &variable_annotations =
-                                                   std::map<size_t, std::string>()) const;
+                                               const std::map<std::size_t, std::string> &variable_annotations =
+                                                   std::map<std::size_t, std::string>()) const;
 
                     friend std::ostream &operator<<<FieldType>(std::ostream &out,
                                                                const linear_combination<FieldType> &lc);
@@ -420,9 +420,9 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                bool linear_combination<FieldType>::is_valid(const size_t num_variables) const {
+                bool linear_combination<FieldType>::is_valid(const std::size_t num_variables) const {
                     /* check that all terms in linear combination are sorted */
-                    for (size_t i = 1; i < terms.size(); ++i) {
+                    for (std::size_t i = 1; i < terms.size(); ++i) {
                         if (terms[i - 1].index >= terms[i].index) {
                             return false;
                         }
@@ -439,7 +439,7 @@ namespace nil {
 
                 template<typename FieldType>
                 void linear_combination<FieldType>::print(
-                    const std::map<size_t, std::string> &variable_annotations) const {
+                    const std::map<std::size_t, std::string> &variable_annotations) const {
                     for (auto &lt : terms) {
                         if (lt.index == 0) {
                             printf("    1 * ");
@@ -456,7 +456,7 @@ namespace nil {
                 template<typename FieldType>
                 void linear_combination<FieldType>::print_with_assignment(
                     const std::vector<FieldType> &full_assignment,
-                    const std::map<size_t, std::string> &variable_annotations) const {
+                    const std::map<std::size_t, std::string> &variable_annotations) const {
                     for (auto &lt : terms) {
                         if (lt.index == 0) {
                             printf("    1 * ");
@@ -490,14 +490,14 @@ namespace nil {
                 std::istream &operator>>(std::istream &in, linear_combination<FieldType> &lc) {
                     lc.terms.clear();
 
-                    size_t s;
+                    std::size_t s;
                     in >> s;
 
                     algebra::consume_newline(in);
 
                     lc.terms.reserve(s);
 
-                    for (size_t i = 0; i < s; ++i) {
+                    for (std::size_t i = 0; i < s; ++i) {
                         linear_term<FieldType> lt;
                         in >> lt.index;
                         algebra::consume_newline(in);

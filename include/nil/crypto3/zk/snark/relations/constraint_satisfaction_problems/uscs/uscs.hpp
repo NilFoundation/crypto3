@@ -84,16 +84,16 @@ namespace nil {
                 template<typename FieldType>
                 class uscs_constraint_system {
                 public:
-                    size_t primary_input_size;
-                    size_t auxiliary_input_size;
+                    std::size_t primary_input_size;
+                    std::size_t auxiliary_input_size;
 
                     std::vector<uscs_constraint<FieldType>> constraints;
 
                     uscs_constraint_system() : primary_input_size(0), auxiliary_input_size(0) {};
 
-                    size_t num_inputs() const;
-                    size_t num_variables() const;
-                    size_t num_constraints() const;
+                    std::size_t num_inputs() const;
+                    std::size_t num_variables() const;
+                    std::size_t num_constraints() const;
 
                     bool is_valid() const;
                     bool is_satisfied(const uscs_primary_input<FieldType> &primary_input,
@@ -111,17 +111,17 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                size_t uscs_constraint_system<FieldType>::num_inputs() const {
+                std::size_t uscs_constraint_system<FieldType>::num_inputs() const {
                     return primary_input_size;
                 }
 
                 template<typename FieldType>
-                size_t uscs_constraint_system<FieldType>::num_variables() const {
+                std::size_t uscs_constraint_system<FieldType>::num_variables() const {
                     return primary_input_size + auxiliary_input_size;
                 }
 
                 template<typename FieldType>
-                size_t uscs_constraint_system<FieldType>::num_constraints() const {
+                std::size_t uscs_constraint_system<FieldType>::num_constraints() const {
                     return constraints.size();
                 }
 
@@ -130,7 +130,7 @@ namespace nil {
                     if (this->num_inputs() > this->num_variables())
                         return false;
 
-                    for (size_t c = 0; c < constraints.size(); ++c) {
+                    for (std::size_t c = 0; c < constraints.size(); ++c) {
                         if (!valid_vector(constraints[c], this->num_variables())) {
                             return false;
                         }
@@ -142,7 +142,7 @@ namespace nil {
                 template<typename FieldType>
                 void dump_uscs_constraint(const uscs_constraint<FieldType> &constraint,
                                           const uscs_variable_assignment<FieldType> &full_variable_assignment,
-                                          const std::map<size_t, std::string> &variable_annotations) {
+                                          const std::map<std::size_t, std::string> &variable_annotations) {
                     printf("terms:\n");
                     constraint.print_with_assignment(full_variable_assignment, variable_annotations);
                 }
@@ -158,7 +158,7 @@ namespace nil {
                     full_variable_assignment.insert(
                         full_variable_assignment.end(), auxiliary_input.begin(), auxiliary_input.end());
 
-                    for (size_t c = 0; c < constraints.size(); ++c) {
+                    for (std::size_t c = 0; c < constraints.size(); ++c) {
                         FieldType res = constraints[c].evaluate(full_variable_assignment);
                         if (!(res.squared() == FieldType::one())) {
                             return false;
@@ -201,7 +201,7 @@ namespace nil {
 
                     cs.constraints.clear();
 
-                    size_t s;
+                    std::size_t s;
                     in >> s;
 
                     char b;
@@ -209,7 +209,7 @@ namespace nil {
 
                     cs.constraints.reserve(s);
 
-                    for (size_t i = 0; i < s; ++i) {
+                    for (std::size_t i = 0; i < s; ++i) {
                         uscs_constraint<FieldType> c;
                         in >> c;
                         cs.constraints.emplace_back(c);
@@ -221,7 +221,7 @@ namespace nil {
                 template<typename FieldType>
                 void uscs_constraint_system<FieldType>::report_linear_constraint_statistics() const {
 #ifdef DEBUG
-                    for (size_t i = 0; i < constraints.size(); ++i) {
+                    for (std::size_t i = 0; i < constraints.size(); ++i) {
                         auto &constr = constraints[i];
                         bool a_is_const = true;
                         for (auto &t : constr.terms) {

@@ -32,7 +32,7 @@ namespace nil {
 
                 /**************************** TBCS gate **************************************/
 
-                typedef size_t tbcs_wire_t;
+                typedef std::size_t tbcs_wire_t;
 
                 /**
                  * Types of TBCS gates (2-input boolean gates).
@@ -95,8 +95,8 @@ namespace nil {
                     bool is_circuit_output;
 
                     bool evaluate(const tbcs_variable_assignment &input) const;
-                    void print(const std::map<size_t, std::string> &variable_annotations =
-                                   std::map<size_t, std::string>()) const;
+                    void print(const std::map<std::size_t, std::string> &variable_annotations =
+                                   std::map<std::size_t, std::string>()) const;
                     bool operator==(const tbcs_gate &other) const;
 
                     friend std::ostream &operator<<(std::ostream &out, const tbcs_gate &g);
@@ -129,19 +129,19 @@ namespace nil {
                  */
                 class tbcs_circuit {
                 public:
-                    size_t primary_input_size;
-                    size_t auxiliary_input_size;
+                    std::size_t primary_input_size;
+                    std::size_t auxiliary_input_size;
                     std::vector<tbcs_gate> gates;
 
                     tbcs_circuit() : primary_input_size(0), auxiliary_input_size(0) {
                     }
 
-                    size_t num_inputs() const;
-                    size_t num_gates() const;
-                    size_t num_wires() const;
+                    std::size_t num_inputs() const;
+                    std::size_t num_gates() const;
+                    std::size_t num_wires() const;
 
-                    std::vector<size_t> wire_depths() const;
-                    size_t depth() const;
+                    std::vector<std::size_t> wire_depths() const;
+                    std::size_t depth() const;
 
                     bool is_valid() const;
                     bool is_satisfied(const tbcs_primary_input &primary_input,
@@ -172,13 +172,13 @@ namespace nil {
                     const bool X = (left_wire == 0 ? true : input[left_wire - 1]);
                     const bool Y = (right_wire == 0 ? true : input[right_wire - 1]);
 
-                    const size_t pos = 3 - ((X ? 2 : 0) + (Y ? 1 : 0)); /* 3 - ... inverts position */
+                    const std::size_t pos = 3 - ((X ? 2 : 0) + (Y ? 1 : 0)); /* 3 - ... inverts position */
 
                     return (((int)type) & (1u << pos));
                 }
 
                 void print_tbcs_wire(const tbcs_wire_t wire,
-                                     const std::map<size_t, std::string> &variable_annotations) {
+                                     const std::map<std::size_t, std::string> &variable_annotations) {
                     /**
                      * The type tbcs_wire_t does not deserve promotion to a class,
                      * but still benefits from a dedicated printing mechanism.
@@ -193,7 +193,7 @@ namespace nil {
                     }
                 }
 
-                void tbcs_gate::print(const std::map<size_t, std::string> &variable_annotations) const {
+                void tbcs_gate::print(const std::map<std::size_t, std::string> &variable_annotations) const {
                     switch (this->type) {
                         case TBCS_GATE_CONSTANT_0:
                             printf("CONSTANT_0");
@@ -287,8 +287,8 @@ namespace nil {
                     return in;
                 }
 
-                std::vector<size_t> tbcs_circuit::wire_depths() const {
-                    std::vector<size_t> depths(num_inputs(), 1);
+                std::vector<std::size_t> tbcs_circuit::wire_depths() const {
+                    std::vector<std::size_t> depths(num_inputs(), 1);
 
                     for (auto &g : gates) {
                         depths.emplace_back(std::max(depths[g.left_wire], depths[g.right_wire]) + 1);
@@ -297,25 +297,25 @@ namespace nil {
                     return depths;
                 }
 
-                size_t tbcs_circuit::num_inputs() const {
+                std::size_t tbcs_circuit::num_inputs() const {
                     return primary_input_size + auxiliary_input_size;
                 }
 
-                size_t tbcs_circuit::num_gates() const {
+                std::size_t tbcs_circuit::num_gates() const {
                     return gates.size();
                 }
 
-                size_t tbcs_circuit::num_wires() const {
+                std::size_t tbcs_circuit::num_wires() const {
                     return num_inputs() + num_gates();
                 }
 
-                size_t tbcs_circuit::depth() const {
-                    std::vector<size_t> all_depths = this->wire_depths();
+                std::size_t tbcs_circuit::depth() const {
+                    std::vector<std::size_t> all_depths = this->wire_depths();
                     return *(std::max_element(all_depths.begin(), all_depths.end()));
                 }
 
                 bool tbcs_circuit::is_valid() const {
-                    for (size_t i = 0; i < num_gates(); ++i) {
+                    for (std::size_t i = 0; i < num_gates(); ++i) {
                         /**
                          * The output wire of gates[i] must have index 1+num_inputs+i.
                          * (The '1+' accounts for the index of the constant wire.)
@@ -418,7 +418,7 @@ namespace nil {
                     this->print_info();
                     algebra::print_indent();
                     printf("All gates:\n");
-                    for (size_t i = 0; i < gates.size(); ++i) {
+                    for (std::size_t i = 0; i < gates.size(); ++i) {
                         std::string annotation = "no annotation";
 #ifdef DEBUG
                         auto it = gate_annotations.find(i);

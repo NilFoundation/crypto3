@@ -32,7 +32,7 @@ namespace nil {
                   gadget_base_type (e.g. tinyram_gadget<FieldType>)
                   cpu_state_variable_type (must have pb_variable_array<FieldType> all_vars)
 
-                  The ramT class must also have a static size_t variable
+                  The ramT class must also have a static std::size_t variable
                   timestamp_length, which specifies the zk-SNARK reduction timestamp
                   length.
                 */
@@ -59,7 +59,7 @@ namespace nil {
                 using ram_architecture_params = typename ramT::architecture_params_type;
 
                 template<typename ramT>
-                using ram_input_tape = std::vector<size_t>;
+                using ram_input_tape = std::vector<std::size_t>;
 
                 /*
                   One should also make the following methods for ram_architecture_params
@@ -69,10 +69,10 @@ namespace nil {
 
                   TODO: make this base class)
 
-                  size_t address_size();
-                  size_t value_size();
-                  size_t cpu_state_size();
-                  size_t initial_pc_addr();
+                  std::size_t address_size();
+                  std::size_t value_size();
+                  std::size_t cpu_state_size();
+                  std::size_t initial_pc_addr();
                   std::vector<bool> initial_cpu_state();
                 */
 

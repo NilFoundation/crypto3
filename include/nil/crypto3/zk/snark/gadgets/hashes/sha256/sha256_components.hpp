@@ -20,8 +20,8 @@ namespace nil {
         namespace zk {
             namespace snark {
 
-                const size_t SHA256_digest_size = 256;
-                const size_t SHA256_block_size = 512;
+                const std::size_t SHA256_digest_size = 256;
+                const std::size_t SHA256_block_size = 512;
 
                 template<typename FieldType>
                 pb_linear_combination_array<FieldType> SHA256_default_IV(protoboard<FieldType> &pb);
@@ -121,7 +121,7 @@ namespace nil {
                     pb_linear_combination_array<FieldType> result;
                     result.reserve(SHA256_digest_size);
 
-                    for (size_t i = 0; i < SHA256_digest_size; ++i) {
+                    for (std::size_t i = 0; i < SHA256_digest_size; ++i) {
                         int iv_val = (SHA256_H[i / 32] >> (31 - (i % 32))) & 1;
 
                         pb_linear_combination<FieldType> iv_element;
@@ -144,7 +144,7 @@ namespace nil {
                     W_bits.resize(64);
 
                     pack_W.resize(16);
-                    for (size_t i = 0; i < 16; ++i) {
+                    for (std::size_t i = 0; i < 16; ++i) {
                         W_bits[i] =
                             pb_variable_array<FieldType>(M.rbegin() + (15 - i) * 32, M.rbegin() + (16 - i) * 32);
                         pack_W[i].reset(new packing_gadget<FieldType>(pb, W_bits[i], packed_W[i]));
@@ -158,7 +158,7 @@ namespace nil {
                     unreduced_W.resize(64);
                     mod_reduce_W.resize(64);
 
-                    for (size_t i = 16; i < 64; ++i) {
+                    for (std::size_t i = 16; i < 64; ++i) {
                         /* allocate result variables for sigma0/sigma1 invocations */
                         sigma0[i].allocate(pb);
                         sigma1[i].allocate(pb);
@@ -183,11 +183,11 @@ namespace nil {
 
                 template<typename FieldType>
                 void sha256_message_schedule_gadget<FieldType>::generate_r1cs_constraints() {
-                    for (size_t i = 0; i < 16; ++i) {
+                    for (std::size_t i = 0; i < 16; ++i) {
                         pack_W[i]->generate_r1cs_constraints(false);    // do not enforce bitness here; caller be aware.
                     }
 
-                    for (size_t i = 16; i < 64; ++i) {
+                    for (std::size_t i = 16; i < 64; ++i) {
                         compute_sigma0[i]->generate_r1cs_constraints();
                         compute_sigma1[i]->generate_r1cs_constraints();
 
@@ -200,11 +200,11 @@ namespace nil {
 
                 template<typename FieldType>
                 void sha256_message_schedule_gadget<FieldType>::generate_r1cs_witness() {
-                    for (size_t i = 0; i < 16; ++i) {
+                    for (std::size_t i = 0; i < 16; ++i) {
                         pack_W[i]->generate_r1cs_witness_from_bits();
                     }
 
-                    for (size_t i = 16; i < 64; ++i) {
+                    for (std::size_t i = 16; i < 64; ++i) {
                         compute_sigma0[i]->generate_r1cs_witness();
                         compute_sigma1[i]->generate_r1cs_witness();
 

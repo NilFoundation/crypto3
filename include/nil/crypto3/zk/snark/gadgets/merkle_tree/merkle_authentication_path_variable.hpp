@@ -24,24 +24,24 @@ namespace nil {
                 template<typename FieldType, typename HashT>
                 class merkle_authentication_path_variable : public gadget<FieldType> {
                 public:
-                    const size_t tree_depth;
+                    const std::size_t tree_depth;
                     std::vector<digest_variable<FieldType>> left_digests;
                     std::vector<digest_variable<FieldType>> right_digests;
 
-                    merkle_authentication_path_variable(protoboard<FieldType> &pb, const size_t tree_depth);
+                    merkle_authentication_path_variable(protoboard<FieldType> &pb, const std::size_t tree_depth);
 
                     void generate_r1cs_constraints();
-                    void generate_r1cs_witness(const size_t address, const merkle_authentication_path &path);
-                    merkle_authentication_path get_authentication_path(const size_t address) const;
+                    void generate_r1cs_witness(const std::size_t address, const merkle_authentication_path &path);
+                    merkle_authentication_path get_authentication_path(const std::size_t address) const;
                 };
 
                 template<typename FieldType, typename HashT>
                 merkle_authentication_path_variable<FieldType, HashT>::merkle_authentication_path_variable(
                     protoboard<FieldType> &pb,
-                    const size_t tree_depth) :
+                    const std::size_t tree_depth) :
                     gadget<FieldType>(pb),
                     tree_depth(tree_depth) {
-                    for (size_t i = 0; i < tree_depth; ++i) {
+                    for (std::size_t i = 0; i < tree_depth; ++i) {
                         left_digests.emplace_back(digest_variable<FieldType>(pb, HashT::get_digest_len()));
                         right_digests.emplace_back(digest_variable<FieldType>(pb, HashT::get_digest_len()));
                     }
@@ -49,7 +49,7 @@ namespace nil {
 
                 template<typename FieldType, typename HashT>
                 void merkle_authentication_path_variable<FieldType, HashT>::generate_r1cs_constraints() {
-                    for (size_t i = 0; i < tree_depth; ++i) {
+                    for (std::size_t i = 0; i < tree_depth; ++i) {
                         left_digests[i].generate_r1cs_constraints();
                         right_digests[i].generate_r1cs_constraints();
                     }
@@ -57,11 +57,11 @@ namespace nil {
 
                 template<typename FieldType, typename HashT>
                 void merkle_authentication_path_variable<FieldType, HashT>::generate_r1cs_witness(
-                    const size_t address,
+                    const std::size_t address,
                     const merkle_authentication_path &path) {
                     assert(path.size() == tree_depth);
 
-                    for (size_t i = 0; i < tree_depth; ++i) {
+                    for (std::size_t i = 0; i < tree_depth; ++i) {
                         if (address & (1ul << (tree_depth - 1 - i))) {
                             left_digests[i].generate_r1cs_witness(path[i]);
                         } else {
@@ -73,9 +73,9 @@ namespace nil {
                 template<typename FieldType, typename HashT>
                 merkle_authentication_path
                     merkle_authentication_path_variable<FieldType, HashT>::get_authentication_path(
-                        const size_t address) const {
+                        const std::size_t address) const {
                     merkle_authentication_path result;
-                    for (size_t i = 0; i < tree_depth; ++i) {
+                    for (std::size_t i = 0; i < tree_depth; ++i) {
                         if (address & (1ul << (tree_depth - 1 - i))) {
                             result.emplace_back(left_digests[i].get_digest());
                         } else {

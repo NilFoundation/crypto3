@@ -23,7 +23,7 @@ namespace nil {
                 template<typename FieldType>
                 class ram_tinyram {
                 public:
-                    static size_t timestamp_length;
+                    static std::size_t timestamp_length;
 
                     typedef FieldType base_field_type;
                     typedef tinyram_protoboard<FieldType> protoboard_type;
@@ -33,7 +33,7 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                size_t ram_tinyram<FieldType>::timestamp_length = 300;
+                std::size_t ram_tinyram<FieldType>::timestamp_length = 300;
 
             }    // namespace snark
         }        // namespace zk

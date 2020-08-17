@@ -86,31 +86,31 @@ namespace nil {
                     const std::shared_ptr<algebra::fft::evaluation_domain<FieldType>> domain =
                         algebra::fft::make_evaluation_domain<FieldType>(cs.num_constraints() + cs.num_inputs() + 1);
 
-                    std::vector<std::map<size_t, FieldType>> A_in_Lagrange_basis(cs.num_variables() + 1);
-                    std::vector<std::map<size_t, FieldType>> B_in_Lagrange_basis(cs.num_variables() + 1);
-                    std::vector<std::map<size_t, FieldType>> C_in_Lagrange_basis(cs.num_variables() + 1);
+                    std::vector<std::map<std::size_t, FieldType>> A_in_Lagrange_basis(cs.num_variables() + 1);
+                    std::vector<std::map<std::size_t, FieldType>> B_in_Lagrange_basis(cs.num_variables() + 1);
+                    std::vector<std::map<std::size_t, FieldType>> C_in_Lagrange_basis(cs.num_variables() + 1);
 
                     /**
                      * add and process the constraints
                      *     input_i * 0 = 0
                      * to ensure soundness of input consistency
                      */
-                    for (size_t i = 0; i <= cs.num_inputs(); ++i) {
+                    for (std::size_t i = 0; i <= cs.num_inputs(); ++i) {
                         A_in_Lagrange_basis[i][cs.num_constraints() + i] = FieldType::one();
                     }
                     /* process all other constraints */
-                    for (size_t i = 0; i < cs.num_constraints(); ++i) {
-                        for (size_t j = 0; j < cs.constraints[i].a.terms.size(); ++j) {
+                    for (std::size_t i = 0; i < cs.num_constraints(); ++i) {
+                        for (std::size_t j = 0; j < cs.constraints[i].a.terms.size(); ++j) {
                             A_in_Lagrange_basis[cs.constraints[i].a.terms[j].index][i] +=
                                 cs.constraints[i].a.terms[j].coeff;
                         }
 
-                        for (size_t j = 0; j < cs.constraints[i].b.terms.size(); ++j) {
+                        for (std::size_t j = 0; j < cs.constraints[i].b.terms.size(); ++j) {
                             B_in_Lagrange_basis[cs.constraints[i].b.terms[j].index][i] +=
                                 cs.constraints[i].b.terms[j].coeff;
                         }
 
-                        for (size_t j = 0; j < cs.constraints[i].c.terms.size(); ++j) {
+                        for (std::size_t j = 0; j < cs.constraints[i].c.terms.size(); ++j) {
                             C_in_Lagrange_basis[cs.constraints[i].c.terms[j].index][i] +=
                                 cs.constraints[i].c.terms[j].coeff;
                         }
@@ -161,26 +161,26 @@ namespace nil {
                      *     input_i * 0 = 0
                      * to ensure soundness of input consistency
                      */
-                    for (size_t i = 0; i <= cs.num_inputs(); ++i) {
+                    for (std::size_t i = 0; i <= cs.num_inputs(); ++i) {
                         At[i] = u[cs.num_constraints() + i];
                     }
                     /* process all other constraints */
-                    for (size_t i = 0; i < cs.num_constraints(); ++i) {
-                        for (size_t j = 0; j < cs.constraints[i].a.terms.size(); ++j) {
+                    for (std::size_t i = 0; i < cs.num_constraints(); ++i) {
+                        for (std::size_t j = 0; j < cs.constraints[i].a.terms.size(); ++j) {
                             At[cs.constraints[i].a.terms[j].index] += u[i] * cs.constraints[i].a.terms[j].coeff;
                         }
 
-                        for (size_t j = 0; j < cs.constraints[i].b.terms.size(); ++j) {
+                        for (std::size_t j = 0; j < cs.constraints[i].b.terms.size(); ++j) {
                             Bt[cs.constraints[i].b.terms[j].index] += u[i] * cs.constraints[i].b.terms[j].coeff;
                         }
 
-                        for (size_t j = 0; j < cs.constraints[i].c.terms.size(); ++j) {
+                        for (std::size_t j = 0; j < cs.constraints[i].c.terms.size(); ++j) {
                             Ct[cs.constraints[i].c.terms[j].index] += u[i] * cs.constraints[i].c.terms[j].coeff;
                         }
                     }
 
                     FieldType ti = FieldType::one();
-                    for (size_t i = 0; i < domain->m + 1; ++i) {
+                    for (std::size_t i = 0; i < domain->m + 1; ++i) {
                         Ht.emplace_back(ti);
                         ti *= t;
                     }
@@ -247,11 +247,11 @@ namespace nil {
                     std::vector<FieldType> aA(domain->m, FieldType::zero()), aB(domain->m, FieldType::zero());
 
                     /* account for the additional constraints input_i * 0 = 0 */
-                    for (size_t i = 0; i <= cs.num_inputs(); ++i) {
+                    for (std::size_t i = 0; i <= cs.num_inputs(); ++i) {
                         aA[i + cs.num_constraints()] = (i > 0 ? full_variable_assignment[i - 1] : FieldType::one());
                     }
                     /* account for all other constraints */
-                    for (size_t i = 0; i < cs.num_constraints(); ++i) {
+                    for (std::size_t i = 0; i < cs.num_constraints(); ++i) {
                         aA[i] += cs.constraints[i].a.evaluate(full_variable_assignment);
                         aB[i] += cs.constraints[i].b.evaluate(full_variable_assignment);
                     }
@@ -265,7 +265,7 @@ namespace nil {
 #pragma omp parallel for
 #endif
                     /* add coefficients of the polynomial (d2*A + d1*B - d3) + d1*d2*Z */
-                    for (size_t i = 0; i < domain->m; ++i) {
+                    for (std::size_t i = 0; i < domain->m; ++i) {
                         coefficients_for_H[i] = d2 * aA[i] + d1 * aB[i];
                     }
                     coefficients_for_H[0] -= d3;
@@ -281,13 +281,13 @@ namespace nil {
 #ifdef MULTICORE
 #pragma omp parallel for
 #endif
-                    for (size_t i = 0; i < domain->m; ++i) {
+                    for (std::size_t i = 0; i < domain->m; ++i) {
                         H_tmp[i] = aA[i] * aB[i];
                     }
                     std::vector<FieldType>().swap(aB);    // destroy aB
 
                     std::vector<FieldType> aC(domain->m, FieldType::zero());
-                    for (size_t i = 0; i < cs.num_constraints(); ++i) {
+                    for (std::size_t i = 0; i < cs.num_constraints(); ++i) {
                         aC[i] += cs.constraints[i].c.evaluate(full_variable_assignment);
                     }
 
@@ -299,7 +299,7 @@ namespace nil {
 #ifdef MULTICORE
 #pragma omp parallel for
 #endif
-                    for (size_t i = 0; i < domain->m; ++i) {
+                    for (std::size_t i = 0; i < domain->m; ++i) {
                         H_tmp[i] = (H_tmp[i] - aC[i]);
                     }
 
@@ -311,7 +311,7 @@ namespace nil {
 #ifdef MULTICORE
 #pragma omp parallel for
 #endif
-                    for (size_t i = 0; i < domain->m; ++i) {
+                    for (std::size_t i = 0; i < domain->m; ++i) {
                         coefficients_for_H[i] += H_tmp[i];
                     }
 

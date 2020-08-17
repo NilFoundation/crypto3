@@ -45,8 +45,8 @@ namespace nil {
                     std::shared_ptr<bit_vector_copy_gadget<FieldType>> check_next_root;
 
                 public:
-                    const size_t digest_size;
-                    const size_t tree_depth;
+                    const std::size_t digest_size;
+                    const std::size_t tree_depth;
 
                     pb_variable_array<FieldType> address_bits;
                     digest_variable<FieldType> prev_leaf_digest;
@@ -63,7 +63,7 @@ namespace nil {
 
                     merkle_tree_check_update_gadget(
                         protoboard<FieldType> &pb,
-                        const size_t tree_depth,
+                        const std::size_t tree_depth,
                         const pb_variable_array<FieldType> &address_bits,
                         const digest_variable<FieldType> &prev_leaf_digest,
                         const digest_variable<FieldType> &prev_root_digest,
@@ -76,9 +76,9 @@ namespace nil {
                     void generate_r1cs_constraints();
                     void generate_r1cs_witness();
 
-                    static size_t root_size_in_bits();
+                    static std::size_t root_size_in_bits();
                     /* for debugging purposes */
-                    static size_t expected_constraints(const size_t tree_depth);
+                    static std::size_t expected_constraints(const std::size_t tree_depth);
                 };
 
                 template<typename FieldType, typename HashT>
@@ -87,7 +87,7 @@ namespace nil {
                 template<typename FieldType, typename HashT>
                 merkle_tree_check_update_gadget<FieldType, HashT>::merkle_tree_check_update_gadget(
                     protoboard<FieldType> &pb,
-                    const size_t tree_depth,
+                    const std::size_t tree_depth,
                     const pb_variable_array<FieldType> &address_bits,
                     const digest_variable<FieldType> &prev_leaf_digest,
                     const digest_variable<FieldType> &prev_root_digest,
@@ -104,14 +104,14 @@ namespace nil {
                     assert(tree_depth > 0);
                     assert(tree_depth == address_bits.size());
 
-                    for (size_t i = 0; i < tree_depth - 1; ++i) {
+                    for (std::size_t i = 0; i < tree_depth - 1; ++i) {
                         prev_internal_output.emplace_back(digest_variable<FieldType>(pb, digest_size));
                         next_internal_output.emplace_back(digest_variable<FieldType>(pb, digest_size));
                     }
 
                     computed_next_root.reset(new digest_variable<FieldType>(pb, digest_size));
 
-                    for (size_t i = 0; i < tree_depth; ++i) {
+                    for (std::size_t i = 0; i < tree_depth; ++i) {
                         block_variable<FieldType> prev_inp(pb, prev_path.left_digests[i], prev_path.right_digests[i]);
                         prev_hasher_inputs.emplace_back(prev_inp);
                         prev_hashers.emplace_back(HashT(pb, 2 * digest_size, prev_inp,
@@ -123,7 +123,7 @@ namespace nil {
                                                         (i == 0 ? *computed_next_root : next_internal_output[i - 1])));
                     }
 
-                    for (size_t i = 0; i < tree_depth; ++i) {
+                    for (std::size_t i = 0; i < tree_depth; ++i) {
                         prev_propagators.emplace_back(digest_selector_gadget<FieldType>(
                             pb, digest_size, i < tree_depth - 1 ? prev_internal_output[i] : prev_leaf_digest,
                             address_bits[tree_depth - 1 - i], prev_path.left_digests[i], prev_path.right_digests[i]));
@@ -139,21 +139,21 @@ namespace nil {
                 template<typename FieldType, typename HashT>
                 void merkle_tree_check_update_gadget<FieldType, HashT>::generate_r1cs_constraints() {
                     /* ensure correct hash computations */
-                    for (size_t i = 0; i < tree_depth; ++i) {
+                    for (std::size_t i = 0; i < tree_depth; ++i) {
                         prev_hashers[i].generate_r1cs_constraints(
                             false);    // we check root outside and prev_left/prev_right above
                         next_hashers[i].generate_r1cs_constraints(true);    // however we must check right side hashes
                     }
 
                     /* ensure consistency of internal_left/internal_right with internal_output */
-                    for (size_t i = 0; i < tree_depth; ++i) {
+                    for (std::size_t i = 0; i < tree_depth; ++i) {
                         prev_propagators[i].generate_r1cs_constraints();
                         next_propagators[i].generate_r1cs_constraints();
                     }
 
                     /* ensure that prev auxiliary input and next auxiliary input match */
-                    for (size_t i = 0; i < tree_depth; ++i) {
-                        for (size_t j = 0; j < digest_size; ++j) {
+                    for (std::size_t i = 0; i < tree_depth; ++i) {
+                        for (std::size_t j = 0; j < digest_size; ++j) {
                             /*
                               addr * (prev_left - next_left) + (1 - addr) * (prev_right - next_right) = 0
                               addr * (prev_left - next_left - prev_right + next_right) = next_right - prev_right
@@ -206,22 +206,22 @@ namespace nil {
                 }
 
                 template<typename FieldType, typename HashT>
-                size_t merkle_tree_check_update_gadget<FieldType, HashT>::root_size_in_bits() {
+                std::size_t merkle_tree_check_update_gadget<FieldType, HashT>::root_size_in_bits() {
                     return HashT::get_digest_len();
                 }
 
                 template<typename FieldType, typename HashT>
-                size_t
-                    merkle_tree_check_update_gadget<FieldType, HashT>::expected_constraints(const size_t tree_depth) {
+                std::size_t
+                    merkle_tree_check_update_gadget<FieldType, HashT>::expected_constraints(const std::size_t tree_depth) {
                     /* NB: this includes path constraints */
-                    const size_t prev_hasher_constraints = tree_depth * HashT::expected_constraints(false);
-                    const size_t next_hasher_constraints = tree_depth * HashT::expected_constraints(true);
-                    const size_t prev_authentication_path_constraints = 2 * tree_depth * HashT::get_digest_len();
-                    const size_t prev_propagator_constraints = tree_depth * HashT::get_digest_len();
-                    const size_t next_propagator_constraints = tree_depth * HashT::get_digest_len();
-                    const size_t check_next_root_constraints =
+                    const std::size_t prev_hasher_constraints = tree_depth * HashT::expected_constraints(false);
+                    const std::size_t next_hasher_constraints = tree_depth * HashT::expected_constraints(true);
+                    const std::size_t prev_authentication_path_constraints = 2 * tree_depth * HashT::get_digest_len();
+                    const std::size_t prev_propagator_constraints = tree_depth * HashT::get_digest_len();
+                    const std::size_t next_propagator_constraints = tree_depth * HashT::get_digest_len();
+                    const std::size_t check_next_root_constraints =
                         3 * (HashT::get_digest_len() + (FieldType::capacity()) - 1) / FieldType::capacity();
-                    const size_t aux_equality_constraints = tree_depth * HashT::get_digest_len();
+                    const std::size_t aux_equality_constraints = tree_depth * HashT::get_digest_len();
 
                     return (prev_hasher_constraints + next_hasher_constraints + prev_authentication_path_constraints +
                             prev_propagator_constraints + next_propagator_constraints + check_next_root_constraints +
@@ -231,9 +231,9 @@ namespace nil {
                 template<typename FieldType, typename HashT>
                 void test_merkle_tree_check_update_gadget() {
                     /* prepare test */
-                    const size_t digest_len = HashT::get_digest_len();
+                    const std::size_t digest_len = HashT::get_digest_len();
 
-                    const size_t tree_depth = 16;
+                    const std::size_t tree_depth = 16;
                     std::vector<merkle_authentication_node> prev_path(tree_depth);
 
                     std::vector<bool> prev_load_hash(digest_len);
@@ -246,7 +246,7 @@ namespace nil {
 
                     std::vector<bool> address_bits;
 
-                    size_t address = 0;
+                    std::size_t address = 0;
                     for (long level = tree_depth - 1; level >= 0; --level) {
                         const bool computed_is_right = (std::rand() % 2);
                         address |= (computed_is_right ? 1ul << (tree_depth - 1 - level) : 0);
@@ -306,8 +306,8 @@ namespace nil {
                     address_bits_va.fill_with_bits(pb, address_bits);
                     assert(pb.is_satisfied());
 
-                    const size_t num_constraints = pb.num_constraints();
-                    const size_t expected_constraints =
+                    const std::size_t num_constraints = pb.num_constraints();
+                    const std::size_t expected_constraints =
                         merkle_tree_check_update_gadget<FieldType, HashT>::expected_constraints(tree_depth);
                     assert(num_constraints == expected_constraints);
                 }

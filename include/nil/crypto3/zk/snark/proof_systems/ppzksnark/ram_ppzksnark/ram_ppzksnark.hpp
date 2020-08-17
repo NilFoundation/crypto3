@@ -77,8 +77,8 @@ namespace nil {
 
                     r1cs_ppzksnark_proving_key<snark_ppT> r1cs_pk;
                     ram_ppzksnark_architecture_params<ram_ppzksnark_ppT> ap;
-                    size_t primary_input_size_bound;
-                    size_t time_bound;
+                    std::size_t primary_input_size_bound;
+                    std::size_t time_bound;
 
                     ram_ppzksnark_proving_key() {
                     }
@@ -86,8 +86,8 @@ namespace nil {
                     ram_ppzksnark_proving_key(ram_ppzksnark_proving_key<ram_ppzksnark_ppT> &&other) = default;
                     ram_ppzksnark_proving_key(r1cs_ppzksnark_proving_key<snark_ppT> &&r1cs_pk,
                                               const ram_ppzksnark_architecture_params<ram_ppzksnark_ppT> &ap,
-                                              const size_t primary_input_size_bound,
-                                              const size_t time_bound) :
+                                              const std::size_t primary_input_size_bound,
+                                              const std::size_t time_bound) :
                         r1cs_pk(std::move(r1cs_pk)),
                         ap(ap), primary_input_size_bound(primary_input_size_bound), time_bound(time_bound) {
                     }
@@ -125,10 +125,10 @@ namespace nil {
 
                     r1cs_ppzksnark_verification_key<snark_ppT> r1cs_vk;
                     ram_ppzksnark_architecture_params<ram_ppzksnark_ppT> ap;
-                    size_t primary_input_size_bound;
-                    size_t time_bound;
+                    std::size_t primary_input_size_bound;
+                    std::size_t time_bound;
 
-                    std::set<size_t> bound_primary_input_locations;
+                    std::set<std::size_t> bound_primary_input_locations;
 
                     ram_ppzksnark_verification_key() = default;
                     ram_ppzksnark_verification_key(const ram_ppzksnark_verification_key<ram_ppzksnark_ppT> &other) =
@@ -136,8 +136,8 @@ namespace nil {
                     ram_ppzksnark_verification_key(ram_ppzksnark_verification_key<ram_ppzksnark_ppT> &&other) = default;
                     ram_ppzksnark_verification_key(const r1cs_ppzksnark_verification_key<snark_ppT> &r1cs_vk,
                                                    const ram_ppzksnark_architecture_params<ram_ppzksnark_ppT> &ap,
-                                                   const size_t primary_input_size_bound,
-                                                   const size_t time_bound) :
+                                                   const std::size_t primary_input_size_bound,
+                                                   const std::size_t time_bound) :
                         r1cs_vk(r1cs_vk),
                         ap(ap), primary_input_size_bound(primary_input_size_bound), time_bound(time_bound) {
                     }
@@ -196,8 +196,8 @@ namespace nil {
                 template<typename ram_ppzksnark_ppT>
                 ram_ppzksnark_keypair<ram_ppzksnark_ppT>
                     ram_ppzksnark_generator(const ram_ppzksnark_architecture_params<ram_ppzksnark_ppT> &ap,
-                                            const size_t primary_input_size_bound,
-                                            const size_t time_bound);
+                                            const std::size_t primary_input_size_bound,
+                                            const std::size_t time_bound);
 
                 /**
                  * A prover algorithm for the RAM ppzkSNARK.
@@ -267,11 +267,11 @@ namespace nil {
 
                     ram_ppzksnark_verification_key<ram_ppzksnark_ppT> result(*this);
 
-                    const size_t packed_input_element_size =
+                    const std::size_t packed_input_element_size =
                         ram_universal_gadget<ram_ppT>::packed_input_element_size(ap);
 
                     for (auto it : primary_input.get_all_trace_entries()) {
-                        const size_t input_pos = it.first;
+                        const std::size_t input_pos = it.first;
                         const address_and_value av = it.second;
 
                         assert(input_pos < primary_input_size_bound);
@@ -326,8 +326,8 @@ namespace nil {
                 template<typename ram_ppzksnark_ppT>
                 ram_ppzksnark_keypair<ram_ppzksnark_ppT>
                     ram_ppzksnark_generator(const ram_ppzksnark_architecture_params<ram_ppzksnark_ppT> &ap,
-                                            const size_t primary_input_size_bound,
-                                            const size_t time_bound) {
+                                            const std::size_t primary_input_size_bound,
+                                            const std::size_t time_bound) {
                     typedef ram_ppzksnark_machine_pp<ram_ppzksnark_ppT> ram_ppT;
                     typedef ram_ppzksnark_snark_pp<ram_ppzksnark_ppT> snark_ppT;
 

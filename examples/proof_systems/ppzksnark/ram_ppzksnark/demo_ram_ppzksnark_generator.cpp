@@ -75,10 +75,10 @@ int main(int argc, const char *argv[]) {
     f_ap >> ap;
 
     std::ifstream f_rp(computation_bounds_fn);
-    size_t tinyram_input_size_bound, tinyram_program_size_bound, time_bound;
+    std::size_t tinyram_input_size_bound, tinyram_program_size_bound, time_bound;
     f_rp >> tinyram_input_size_bound >> tinyram_program_size_bound >> time_bound;
 
-    const size_t boot_trace_size_bound = tinyram_program_size_bound + tinyram_input_size_bound;
+    const std::size_t boot_trace_size_bound = tinyram_program_size_bound + tinyram_input_size_bound;
 
     const ram_ppzksnark_keypair<default_ram_ppzksnark_pp> keypair =
         ram_ppzksnark_generator<default_ram_ppzksnark_pp>(ap, boot_trace_size_bound, time_bound);

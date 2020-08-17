@@ -23,7 +23,7 @@
 using namespace nil::crypto3::zk::snark;
 
 template<typename ppT>
-void test_ram_zksnark(const size_t w, const size_t k, const size_t boot_trace_size_bound, const size_t time_bound) {
+void test_ram_zksnark(const std::size_t w, const std::size_t k, const std::size_t boot_trace_size_bound, const std::size_t time_bound) {
     typedef ram_zksnark_machine_pp<ppT> ramT;
     const ram_architecture_params<ramT> ap(w, k);
     const ram_example<ramT> example = gen_ram_example_complex<ramT>(ap, boot_trace_size_bound, time_bound, true);
@@ -35,11 +35,11 @@ void test_ram_zksnark(const size_t w, const size_t k, const size_t boot_trace_si
 BOOST_AUTO_TEST_SUITE(ram_zksnark_test_suite)
 BOOST_AUTO_TEST_CASE(ram_zksnark_test) {
 
-    const size_t w = 32;
-    const size_t k = 16;
+    const std::size_t w = 32;
+    const std::size_t k = 16;
 
-    const size_t boot_trace_size_bound = 20;
-    const size_t time_bound = 10;
+    const std::size_t boot_trace_size_bound = 20;
+    const std::size_t time_bound = 10;
 
     test_ram_zksnark<default_ram_zksnark_pp>(w, k, boot_trace_size_bound, time_bound);
 }

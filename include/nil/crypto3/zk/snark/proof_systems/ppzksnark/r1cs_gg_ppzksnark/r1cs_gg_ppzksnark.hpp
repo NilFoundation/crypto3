@@ -112,23 +112,23 @@ namespace nil {
                         H_query(std::move(H_query)), L_query(std::move(L_query)),
                         constraint_system(std::move(constraint_system)) {};
 
-                    size_t G1_size() const {
+                    std::size_t G1_size() const {
                         return 1 + A_query.size() + B_query.domain_size() + H_query.size() + L_query.size();
                     }
 
-                    size_t G2_size() const {
+                    std::size_t G2_size() const {
                         return 1 + B_query.domain_size();
                     }
 
-                    size_t G1_sparse_size() const {
+                    std::size_t G1_sparse_size() const {
                         return 1 + A_query.size() + B_query.size() + H_query.size() + L_query.size();
                     }
 
-                    size_t G2_sparse_size() const {
+                    std::size_t G2_sparse_size() const {
                         return 1 + B_query.size();
                     }
 
-                    size_t size_in_bits() const {
+                    std::size_t size_in_bits() const {
                         return (algebra::size_in_bits(A_query) + B_query.size_in_bits() +
                                 algebra::size_in_bits(H_query) + algebra::size_in_bits(L_query) +
                                 1 * algebra::G1<ppT>::size_in_bits() + 1 * algebra::G2<ppT>::size_in_bits());
@@ -184,19 +184,19 @@ namespace nil {
                         alpha_g1_beta_g2(alpha_g1_beta_g2),
                         gamma_g2(gamma_g2), delta_g2(delta_g2), gamma_ABC_g1(gamma_ABC_g1) {};
 
-                    size_t G1_size() const {
+                    std::size_t G1_size() const {
                         return gamma_ABC_g1.size();
                     }
 
-                    size_t G2_size() const {
+                    std::size_t G2_size() const {
                         return 2;
                     }
 
-                    size_t GT_size() const {
+                    std::size_t GT_size() const {
                         return 1;
                     }
 
-                    size_t size_in_bits() const {
+                    std::size_t size_in_bits() const {
                         // TODO: include GT size
                         return (gamma_ABC_g1.size_in_bits() + 2 * algebra::G2<ppT>::size_in_bits());
                     }
@@ -217,7 +217,7 @@ namespace nil {
                                                          const r1cs_gg_ppzksnark_verification_key<ppT> &vk);
                     friend std::istream &operator>><ppT>(std::istream &in, r1cs_gg_ppzksnark_verification_key<ppT> &vk);
 
-                    static r1cs_gg_ppzksnark_verification_key<ppT> dummy_verification_key(const size_t input_size);
+                    static r1cs_gg_ppzksnark_verification_key<ppT> dummy_verification_key(const std::size_t input_size);
                 };
 
                 /************************ Processed verification key *************************/
@@ -311,15 +311,15 @@ namespace nil {
                     r1cs_gg_ppzksnark_proof(algebra::G1<ppT> &&g_A, algebra::G2<ppT> &&g_B, algebra::G1<ppT> &&g_C) :
                         g_A(std::move(g_A)), g_B(std::move(g_B)), g_C(std::move(g_C)) {};
 
-                    size_t G1_size() const {
+                    std::size_t G1_size() const {
                         return 2;
                     }
 
-                    size_t G2_size() const {
+                    std::size_t G2_size() const {
                         return 1;
                     }
 
-                    size_t size_in_bits() const {
+                    std::size_t size_in_bits() const {
                         return G1_size() * algebra::G1<ppT>::size_in_bits() +
                                G2_size() * algebra::G2<ppT>::size_in_bits();
                     }
@@ -586,7 +586,7 @@ namespace nil {
 
                 template<typename ppT>
                 r1cs_gg_ppzksnark_verification_key<ppT>
-                    r1cs_gg_ppzksnark_verification_key<ppT>::dummy_verification_key(const size_t input_size) {
+                    r1cs_gg_ppzksnark_verification_key<ppT>::dummy_verification_key(const std::size_t input_size) {
                     r1cs_gg_ppzksnark_verification_key<ppT> result;
                     result.alpha_g1_beta_g2 = algebra::Fr<ppT>::random_element() * algebra::GT<ppT>::random_element();
                     result.gamma_g2 = algebra::G2<ppT>::random_element();
@@ -594,7 +594,7 @@ namespace nil {
 
                     algebra::G1<ppT> base = algebra::G1<ppT>::random_element();
                     algebra::G1_vector<ppT> v;
-                    for (size_t i = 0; i < input_size; ++i) {
+                    for (std::size_t i = 0; i < input_size; ++i) {
                         v.emplace_back(algebra::G1<ppT>::random_element());
                     }
 
@@ -624,9 +624,9 @@ namespace nil {
                     qap_instance_evaluation<algebra::Fr<ppT>> qap =
                         r1cs_to_qap_instance_map_with_evaluation(r1cs_copy, t);
 
-                    size_t non_zero_At = 0;
-                    size_t non_zero_Bt = 0;
-                    for (size_t i = 0; i < qap.num_variables() + 1; ++i) {
+                    std::size_t non_zero_At = 0;
+                    std::size_t non_zero_Bt = 0;
+                    for (std::size_t i = 0; i < qap.num_variables() + 1; ++i) {
                         if (!qap.At[i].is_zero()) {
                             ++non_zero_At;
                         }
@@ -646,7 +646,7 @@ namespace nil {
                     gamma_ABC.reserve(qap.num_inputs());
 
                     const algebra::Fr<ppT> gamma_ABC_0 = (beta * At[0] + alpha * Bt[0] + Ct[0]) * gamma_inverse;
-                    for (size_t i = 1; i < qap.num_inputs() + 1; ++i) {
+                    for (std::size_t i = 1; i < qap.num_inputs() + 1; ++i) {
                         gamma_ABC.emplace_back((beta * At[i] + alpha * Bt[i] + Ct[i]) * gamma_inverse);
                     }
 
@@ -654,8 +654,8 @@ namespace nil {
                     algebra::Fr_vector<ppT> Lt;
                     Lt.reserve(qap.num_variables() - qap.num_inputs());
 
-                    const size_t Lt_offset = qap.num_inputs() + 1;
-                    for (size_t i = 0; i < qap.num_variables() - qap.num_inputs(); ++i) {
+                    const std::size_t Lt_offset = qap.num_inputs() + 1;
+                    for (std::size_t i = 0; i < qap.num_variables() - qap.num_inputs(); ++i) {
                         Lt.emplace_back((beta * At[Lt_offset + i] + alpha * Bt[Lt_offset + i] + Ct[Lt_offset + i]) *
                                         delta_inverse);
                     }
@@ -668,24 +668,24 @@ namespace nil {
                     Ht.resize(Ht.size() - 2);
 
 #ifdef MULTICORE
-                    const size_t chunks = omp_get_max_threads();    // to override, set OMP_NUM_THREADS env var or call
+                    const std::size_t chunks = omp_get_max_threads();    // to override, set OMP_NUM_THREADS env var or call
                                                                     // omp_set_num_threads()
 #else
-                    const size_t chunks = 1;
+                    const std::size_t chunks = 1;
 #endif
 
                     const algebra::G1<ppT> g1_generator = algebra::G1<ppT>::random_element();
-                    const size_t g1_scalar_count = non_zero_At + non_zero_Bt + qap.num_variables();
-                    const size_t g1_scalar_size = algebra::Fr<ppT>::size_in_bits();
-                    const size_t g1_window_size = algebra::get_exp_window_size<algebra::G1<ppT>>(g1_scalar_count);
+                    const std::size_t g1_scalar_count = non_zero_At + non_zero_Bt + qap.num_variables();
+                    const std::size_t g1_scalar_size = algebra::Fr<ppT>::size_in_bits();
+                    const std::size_t g1_window_size = algebra::get_exp_window_size<algebra::G1<ppT>>(g1_scalar_count);
 
                     algebra::window_table<algebra::G1<ppT>> g1_table =
                         algebra::get_window_table(g1_scalar_size, g1_window_size, g1_generator);
 
                     const algebra::G2<ppT> G2_gen = algebra::G2<ppT>::random_element();
-                    const size_t g2_scalar_count = non_zero_Bt;
-                    const size_t g2_scalar_size = algebra::Fr<ppT>::size_in_bits();
-                    size_t g2_window_size = algebra::get_exp_window_size<algebra::G2<ppT>>(g2_scalar_count);
+                    const std::size_t g2_scalar_count = non_zero_Bt;
+                    const std::size_t g2_scalar_size = algebra::Fr<ppT>::size_in_bits();
+                    std::size_t g2_window_size = algebra::get_exp_window_size<algebra::G2<ppT>>(g2_scalar_count);
 
                     algebra::window_table<algebra::G2<ppT>> g2_table =
                         algebra::get_window_table(g2_scalar_size, g2_window_size, G2_gen);
@@ -772,10 +772,10 @@ namespace nil {
                     const algebra::Fr<ppT> s = algebra::Fr<ppT>::random_element();
 
 #ifdef MULTICORE
-                    const size_t chunks = omp_get_max_threads();    // to override, set OMP_NUM_THREADS env var or call
+                    const std::size_t chunks = omp_get_max_threads();    // to override, set OMP_NUM_THREADS env var or call
                                                                     // omp_set_num_threads()
 #else
-                    const size_t chunks = 1;
+                    const std::size_t chunks = 1;
 #endif
 
                     // TODO: sort out indexing

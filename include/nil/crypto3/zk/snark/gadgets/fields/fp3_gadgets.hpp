@@ -58,8 +58,8 @@ namespace nil {
                     void evaluate() const;
                     bool is_constant() const;
 
-                    static size_t size_in_bits();
-                    static size_t num_variables();
+                    static std::size_t size_in_bits();
+                    static std::size_t num_variables();
                 };
 
                 /**
@@ -254,12 +254,12 @@ namespace nil {
                 }
 
                 template<typename Fp3T>
-                size_t Fp3_variable<Fp3T>::size_in_bits() {
+                std::size_t Fp3_variable<Fp3T>::size_in_bits() {
                     return 3 * FieldType::size_in_bits();
                 }
 
                 template<typename Fp3T>
-                size_t Fp3_variable<Fp3T>::num_variables() {
+                std::size_t Fp3_variable<Fp3T>::num_variables() {
                     return 3;
                 }
 

@@ -81,7 +81,7 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                void test_ALU_and_gadget(const size_t w);
+                void test_ALU_and_gadget(const std::size_t w);
 
                 template<typename FieldType>
                 class ALU_or_gadget : public ALU_arithmetic_gadget<FieldType> {
@@ -114,7 +114,7 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                void test_ALU_or_gadget(const size_t w);
+                void test_ALU_or_gadget(const std::size_t w);
 
                 template<typename FieldType>
                 class ALU_xor_gadget : public ALU_arithmetic_gadget<FieldType> {
@@ -147,7 +147,7 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                void test_ALU_xor_gadget(const size_t w);
+                void test_ALU_xor_gadget(const std::size_t w);
 
                 template<typename FieldType>
                 class ALU_not_gadget : public ALU_arithmetic_gadget<FieldType> {
@@ -181,7 +181,7 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                void test_ALU_not_gadget(const size_t w);
+                void test_ALU_not_gadget(const std::size_t w);
 
                 template<typename FieldType>
                 class ALU_add_gadget : public ALU_arithmetic_gadget<FieldType> {
@@ -216,7 +216,7 @@ namespace nil {
                     void generate_r1cs_witness();
                 };
 
-                void test_ALU_add_gadget(const size_t w);
+                void test_ALU_add_gadget(const std::size_t w);
 
                 template<typename FieldType>
                 class ALU_sub_gadget : public ALU_arithmetic_gadget<FieldType> {
@@ -255,7 +255,7 @@ namespace nil {
                     void generate_r1cs_witness();
                 };
 
-                void test_ALU_sub_gadget(const size_t w);
+                void test_ALU_sub_gadget(const std::size_t w);
 
                 template<typename FieldType>
                 class ALU_mov_gadget : public ALU_arithmetic_gadget<FieldType> {
@@ -277,7 +277,7 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                void test_ALU_mov_gadget(const size_t w);
+                void test_ALU_mov_gadget(const std::size_t w);
 
                 template<typename FieldType>
                 class ALU_cmov_gadget : public ALU_arithmetic_gadget<FieldType> {
@@ -299,7 +299,7 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                void test_ALU_cmov_gadget(const size_t w);
+                void test_ALU_cmov_gadget(const std::size_t w);
 
                 template<typename FieldType>
                 class ALU_cmp_gadget : public ALU_arithmetic_gadget<FieldType> {
@@ -339,13 +339,13 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                void test_ALU_cmpe_gadget(const size_t w);
+                void test_ALU_cmpe_gadget(const std::size_t w);
 
                 template<typename FieldType>
-                void test_ALU_cmpa_gadget(const size_t w);
+                void test_ALU_cmpa_gadget(const std::size_t w);
 
                 template<typename FieldType>
-                void test_ALU_cmpae_gadget(const size_t w);
+                void test_ALU_cmpae_gadget(const std::size_t w);
 
                 template<typename FieldType>
                 class ALU_cmps_gadget : public ALU_arithmetic_gadget<FieldType> {
@@ -406,10 +406,10 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                void test_ALU_cmpg_gadget(const size_t w);
+                void test_ALU_cmpg_gadget(const std::size_t w);
 
                 template<typename FieldType>
-                void test_ALU_cmpge_gadget(const size_t w);
+                void test_ALU_cmpge_gadget(const std::size_t w);
 
                 template<typename FieldType>
                 class ALU_umul_gadget : public ALU_arithmetic_gadget<FieldType> {
@@ -457,10 +457,10 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                void test_ALU_mull_gadget(const size_t w);
+                void test_ALU_mull_gadget(const std::size_t w);
 
                 template<typename FieldType>
-                void test_ALU_umulh_gadget(const size_t w);
+                void test_ALU_umulh_gadget(const std::size_t w);
 
                 template<typename FieldType>
                 class ALU_smul_gadget : public ALU_arithmetic_gadget<FieldType> {
@@ -518,7 +518,7 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                void test_ALU_smulh_gadget(const size_t w);
+                void test_ALU_smulh_gadget(const std::size_t w);
 
                 template<typename FieldType>
                 class ALU_divmod_gadget : public ALU_arithmetic_gadget<FieldType> {
@@ -569,10 +569,10 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                void test_ALU_udiv_gadget(const size_t w);
+                void test_ALU_udiv_gadget(const std::size_t w);
 
                 template<typename FieldType>
-                void test_ALU_umod_gadget(const size_t w);
+                void test_ALU_umod_gadget(const std::size_t w);
 
                 template<typename FieldType>
                 class ALU_shr_shl_gadget : public ALU_arithmetic_gadget<FieldType> {
@@ -598,7 +598,7 @@ namespace nil {
                     pb_variable<FieldType> shl_result;
                     pb_variable<FieldType> shl_flag;
 
-                    size_t logw;
+                    std::size_t logw;
 
                     ALU_shr_shl_gadget(tinyram_protoboard<FieldType> &pb,
                                        const pb_variable_array<FieldType> &opcode_indicators,
@@ -623,7 +623,7 @@ namespace nil {
                         barrel_right_internal.allocate(pb, logw + 1);
 
                         shifted_out_bits.resize(logw);
-                        for (size_t i = 0; i < logw; ++i) {
+                        for (std::size_t i = 0; i < logw; ++i) {
                             shifted_out_bits[i].allocate(pb, 1ul << i);
                         }
 
@@ -647,10 +647,10 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                void test_ALU_shr_gadget(const size_t w);
+                void test_ALU_shr_gadget(const std::size_t w);
 
                 template<typename FieldType>
-                void test_ALU_shl_gadget(const size_t w);
+                void test_ALU_shl_gadget(const std::size_t w);
 
                 /* the code here is full of template lambda magic, but it is better to
                    have limited presence of such code than to have code duplication in
@@ -669,13 +669,13 @@ namespace nil {
                                                          )>;
 
                 template<class T, typename FieldType>
-                void brute_force_arithmetic_gadget(const size_t w,
-                                                   const size_t opcode,
+                void brute_force_arithmetic_gadget(const std::size_t w,
+                                                   const std::size_t opcode,
                                                    initializer_fn<T, FieldType>
                                                        initializer,
-                                                   std::function<size_t(size_t, bool, size_t, size_t)>
+                                                   std::function<std::size_t(std::size_t, bool, std::size_t, std::size_t)>
                                                        res_function,
-                                                   std::function<bool(size_t, bool, size_t, size_t)>
+                                                   std::function<bool(std::size_t, bool, std::size_t, std::size_t)>
                                                        flag_function)
                 /* parameters for res_function and flag_function are both desval, flag, arg1val, arg2val */
                 {
@@ -688,7 +688,7 @@ namespace nil {
 
                     pb_variable_array<FieldType> opcode_indicators;
                     opcode_indicators.allocate(pb, 1ul << ap.opcode_width());
-                    for (size_t i = 0; i < 1ul << ap.opcode_width(); ++i) {
+                    for (std::size_t i = 0; i < 1ul << ap.opcode_width(); ++i) {
                         pb.val(opcode_indicators[i]) = (i == opcode ? FieldType::one() : FieldType::zero());
                     }
 
@@ -709,22 +709,22 @@ namespace nil {
                     g.reset(initializer(pb, opcode_indicators, desval, arg1val, arg2val, flag, result, result_flag));
                     g->generate_r1cs_constraints();
 
-                    for (size_t des = 0; des < (1u << w); ++des) {
+                    for (std::size_t des = 0; des < (1u << w); ++des) {
                         pb.val(desval.packed) = FieldType(des);
                         desval.generate_r1cs_witness_from_packed();
 
                         for (char f = 0; f <= 1; ++f) {
                             pb.val(flag) = (f ? FieldType::one() : FieldType::zero());
 
-                            for (size_t arg1 = 0; arg1 < (1u << w); ++arg1) {
+                            for (std::size_t arg1 = 0; arg1 < (1u << w); ++arg1) {
                                 pb.val(arg1val.packed) = FieldType(arg1);
                                 arg1val.generate_r1cs_witness_from_packed();
 
-                                for (size_t arg2 = 0; arg2 < (1u << w); ++arg2) {
+                                for (std::size_t arg2 = 0; arg2 < (1u << w); ++arg2) {
                                     pb.val(arg2val.packed) = FieldType(arg2);
                                     arg2val.generate_r1cs_witness_from_packed();
 
-                                    size_t res = res_function(des, f, arg1, arg2);
+                                    std::size_t res = res_function(des, f, arg1, arg2);
                                     bool res_f = flag_function(des, f, arg1, arg2);
 #ifdef DEBUG
                                     printf(
@@ -757,7 +757,7 @@ namespace nil {
                 /* and */
                 template<typename FieldType>
                 void ALU_and_gadget<FieldType>::generate_r1cs_constraints() {
-                    for (size_t i = 0; i < this->pb.ap.w; ++i) {
+                    for (std::size_t i = 0; i < this->pb.ap.w; ++i) {
                         this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(
                             {this->arg1val.bits[i]}, {this->arg2val.bits[i]}, {this->res_word[i]}));
                     }
@@ -773,7 +773,7 @@ namespace nil {
 
                 template<typename FieldType>
                 void ALU_and_gadget<FieldType>::generate_r1cs_witness() {
-                    for (size_t i = 0; i < this->pb.ap.w; ++i) {
+                    for (std::size_t i = 0; i < this->pb.ap.w; ++i) {
                         bool b1 = this->pb.val(this->arg1val.bits[i]) == FieldType::one();
                         bool b2 = this->pb.val(this->arg2val.bits[i]) == FieldType::one();
 
@@ -786,7 +786,7 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                void test_ALU_and_gadget(const size_t w) {
+                void test_ALU_and_gadget(const std::size_t w) {
                     algebra::print_time("starting and test");
                     brute_force_arithmetic_gadget<ALU_and_gadget<FieldType>, FieldType>(
                         w,
@@ -802,15 +802,15 @@ namespace nil {
                             return new ALU_and_gadget<FieldType>(pb, opcode_indicators, desval, arg1val, arg2val, flag,
                                                                  result, result_flag, "ALU_and_gadget");
                         },
-                        [w](size_t des, bool f, size_t x, size_t y) -> size_t { return x & y; },
-                        [w](size_t des, bool f, size_t x, size_t y) -> bool { return (x & y) == 0; });
+                        [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> std::size_t { return x & y; },
+                        [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> bool { return (x & y) == 0; });
                     algebra::print_time("and tests successful");
                 }
 
                 /* or */
                 template<typename FieldType>
                 void ALU_or_gadget<FieldType>::generate_r1cs_constraints() {
-                    for (size_t i = 0; i < this->pb.ap.w; ++i) {
+                    for (std::size_t i = 0; i < this->pb.ap.w; ++i) {
                         this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>({pb_variable<FieldType>(0), this->arg1val.bits[i] * (-1)},
                                                                                 {pb_variable<FieldType>(0), this->arg2val.bits[i] * (-1)},
                                                                                 {pb_variable<FieldType>(0), this->res_word[i] * (-1)}));
@@ -827,7 +827,7 @@ namespace nil {
 
                 template<typename FieldType>
                 void ALU_or_gadget<FieldType>::generate_r1cs_witness() {
-                    for (size_t i = 0; i < this->pb.ap.w; ++i) {
+                    for (std::size_t i = 0; i < this->pb.ap.w; ++i) {
                         bool b1 = this->pb.val(this->arg1val.bits[i]) == FieldType::one();
                         bool b2 = this->pb.val(this->arg2val.bits[i]) == FieldType::one();
 
@@ -840,7 +840,7 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                void test_ALU_or_gadget(const size_t w) {
+                void test_ALU_or_gadget(const std::size_t w) {
                     algebra::print_time("starting or test");
                     brute_force_arithmetic_gadget<ALU_or_gadget<FieldType>, FieldType>(
                         w,
@@ -856,15 +856,15 @@ namespace nil {
                             return new ALU_or_gadget<FieldType>(pb, opcode_indicators, desval, arg1val, arg2val, flag,
                                                                 result, result_flag, "ALU_or_gadget");
                         },
-                        [w](size_t des, bool f, size_t x, size_t y) -> size_t { return x | y; },
-                        [w](size_t des, bool f, size_t x, size_t y) -> bool { return (x | y) == 0; });
+                        [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> std::size_t { return x | y; },
+                        [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> bool { return (x | y) == 0; });
                     algebra::print_time("or tests successful");
                 }
 
                 /* xor */
                 template<typename FieldType>
                 void ALU_xor_gadget<FieldType>::generate_r1cs_constraints() {
-                    for (size_t i = 0; i < this->pb.ap.w; ++i) {
+                    for (std::size_t i = 0; i < this->pb.ap.w; ++i) {
                         /* a = b ^ c <=> a = b + c - 2*b*c, (2*b)*c = b+c - a */
                         this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(
                             {this->arg1val.bits[i] * 2},
@@ -883,7 +883,7 @@ namespace nil {
 
                 template<typename FieldType>
                 void ALU_xor_gadget<FieldType>::generate_r1cs_witness() {
-                    for (size_t i = 0; i < this->pb.ap.w; ++i) {
+                    for (std::size_t i = 0; i < this->pb.ap.w; ++i) {
                         bool b1 = this->pb.val(this->arg1val.bits[i]) == FieldType::one();
                         bool b2 = this->pb.val(this->arg2val.bits[i]) == FieldType::one();
 
@@ -896,7 +896,7 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                void test_ALU_xor_gadget(const size_t w) {
+                void test_ALU_xor_gadget(const std::size_t w) {
                     algebra::print_time("starting xor test");
                     brute_force_arithmetic_gadget<ALU_xor_gadget<FieldType>, FieldType>(
                         w,
@@ -912,15 +912,15 @@ namespace nil {
                             return new ALU_xor_gadget<FieldType>(pb, opcode_indicators, desval, arg1val, arg2val, flag,
                                                                  result, result_flag, "ALU_xor_gadget");
                         },
-                        [w](size_t des, bool f, size_t x, size_t y) -> size_t { return x ^ y; },
-                        [w](size_t des, bool f, size_t x, size_t y) -> bool { return (x ^ y) == 0; });
+                        [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> std::size_t { return x ^ y; },
+                        [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> bool { return (x ^ y) == 0; });
                     algebra::print_time("xor tests successful");
                 }
 
                 /* not */
                 template<typename FieldType>
                 void ALU_not_gadget<FieldType>::generate_r1cs_constraints() {
-                    for (size_t i = 0; i < this->pb.ap.w; ++i) {
+                    for (std::size_t i = 0; i < this->pb.ap.w; ++i) {
                         this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(
                             {pb_variable<FieldType>(0)}, {pb_variable<FieldType>(0), this->arg2val.bits[i] * (-1)}, {this->res_word[i]}));
                     }
@@ -936,7 +936,7 @@ namespace nil {
 
                 template<typename FieldType>
                 void ALU_not_gadget<FieldType>::generate_r1cs_witness() {
-                    for (size_t i = 0; i < this->pb.ap.w; ++i) {
+                    for (std::size_t i = 0; i < this->pb.ap.w; ++i) {
                         bool b2 = this->pb.val(this->arg2val.bits[i]) == FieldType::one();
 
                         this->pb.val(this->res_word[i]) = (!b2 ? FieldType::one() : FieldType::zero());
@@ -948,7 +948,7 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                void test_ALU_not_gadget(const size_t w) {
+                void test_ALU_not_gadget(const std::size_t w) {
                     algebra::print_time("starting not test");
                     brute_force_arithmetic_gadget<ALU_not_gadget<FieldType>, FieldType>(
                         w,
@@ -964,8 +964,8 @@ namespace nil {
                             return new ALU_not_gadget<FieldType>(pb, opcode_indicators, desval, arg1val, arg2val, flag,
                                                                  result, result_flag, "ALU_not_gadget");
                         },
-                        [w](size_t des, bool f, size_t x, size_t y) -> size_t { return (1ul << w) - 1 - y; },
-                        [w](size_t des, bool f, size_t x, size_t y) -> bool { return ((1ul << w) - 1 - y) == 0; });
+                        [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> std::size_t { return (1ul << w) - 1 - y; },
+                        [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> bool { return ((1ul << w) - 1 - y) == 0; });
                     algebra::print_time("not tests successful");
                 }
 
@@ -992,7 +992,7 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                void test_ALU_add_gadget(const size_t w) {
+                void test_ALU_add_gadget(const std::size_t w) {
                     algebra::print_time("starting add test");
                     brute_force_arithmetic_gadget<ALU_add_gadget<FieldType>, FieldType>(
                         w,
@@ -1008,8 +1008,8 @@ namespace nil {
                             return new ALU_add_gadget<FieldType>(pb, opcode_indicators, desval, arg1val, arg2val, flag,
                                                                  result, result_flag, "ALU_add_gadget");
                         },
-                        [w](size_t des, bool f, size_t x, size_t y) -> size_t { return (x + y) % (1ul << w); },
-                        [w](size_t des, bool f, size_t x, size_t y) -> bool { return (x + y) >= (1ul << w); });
+                        [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> std::size_t { return (x + y) % (1ul << w); },
+                        [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> bool { return (x + y) >= (1ul << w); });
                     algebra::print_time("add tests successful");
                 }
 
@@ -1022,7 +1022,7 @@ namespace nil {
                     linear_combination<FieldType> a, b, c;
 
                     a.add_term(0, 1);
-                    for (size_t i = 0; i < this->pb.ap.w; ++i) {
+                    for (std::size_t i = 0; i < this->pb.ap.w; ++i) {
                         twoi = twoi + twoi;
                     }
                     b.add_term(0, twoi);
@@ -1044,7 +1044,7 @@ namespace nil {
                 template<typename FieldType>
                 void ALU_sub_gadget<FieldType>::generate_r1cs_witness() {
                     FieldType twoi = FieldType::one();
-                    for (size_t i = 0; i < this->pb.ap.w; ++i) {
+                    for (std::size_t i = 0; i < this->pb.ap.w; ++i) {
                         twoi = twoi + twoi;
                     }
 
@@ -1056,7 +1056,7 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                void test_ALU_sub_gadget(const size_t w) {
+                void test_ALU_sub_gadget(const std::size_t w) {
                     algebra::print_time("starting sub test");
                     brute_force_arithmetic_gadget<ALU_sub_gadget<FieldType>, FieldType>(
                         w,
@@ -1072,12 +1072,12 @@ namespace nil {
                             return new ALU_sub_gadget<FieldType>(pb, opcode_indicators, desval, arg1val, arg2val, flag,
                                                                  result, result_flag, "ALU_sub_gadget");
                         },
-                        [w](size_t des, bool f, size_t x, size_t y) -> size_t {
-                            const size_t unsigned_result = ((1ul << w) + x - y) % (1ul << w);
+                        [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> std::size_t {
+                            const std::size_t unsigned_result = ((1ul << w) + x - y) % (1ul << w);
                             return unsigned_result;
                         },
-                        [w](size_t des, bool f, size_t x, size_t y) -> bool {
-                            const size_t msb = ((1ul << w) + x - y) >> w;
+                        [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> bool {
+                            const std::size_t msb = ((1ul << w) + x - y) >> w;
                             return (msb == 0);
                         });
                     algebra::print_time("sub tests successful");
@@ -1099,7 +1099,7 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                void test_ALU_mov_gadget(const size_t w) {
+                void test_ALU_mov_gadget(const std::size_t w) {
                     algebra::print_time("starting mov test");
                     brute_force_arithmetic_gadget<ALU_mov_gadget<FieldType>, FieldType>(
                         w,
@@ -1115,8 +1115,8 @@ namespace nil {
                             return new ALU_mov_gadget<FieldType>(pb, opcode_indicators, desval, arg1val, arg2val, flag,
                                                                  result, result_flag, "ALU_mov_gadget");
                         },
-                        [w](size_t des, bool f, size_t x, size_t y) -> size_t { return y; },
-                        [w](size_t des, bool f, size_t x, size_t y) -> bool { return f; });
+                        [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> std::size_t { return y; },
+                        [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> bool { return f; });
                     algebra::print_time("mov tests successful");
                 }
 
@@ -1144,7 +1144,7 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                void test_ALU_cmov_gadget(const size_t w) {
+                void test_ALU_cmov_gadget(const std::size_t w) {
                     algebra::print_time("starting cmov test");
                     brute_force_arithmetic_gadget<ALU_cmov_gadget<FieldType>, FieldType>(
                         w,
@@ -1160,8 +1160,8 @@ namespace nil {
                             return new ALU_cmov_gadget<FieldType>(pb, opcode_indicators, desval, arg1val, arg2val, flag,
                                                                   result, result_flag, "ALU_cmov_gadget");
                         },
-                        [w](size_t des, bool f, size_t x, size_t y) -> size_t { return f ? y : des; },
-                        [w](size_t des, bool f, size_t x, size_t y) -> bool { return f; });
+                        [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> std::size_t { return f ? y : des; },
+                        [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> bool { return f; });
                     algebra::print_time("cmov tests successful");
                 }
 
@@ -1201,7 +1201,7 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                void test_ALU_cmpe_gadget(const size_t w) {
+                void test_ALU_cmpe_gadget(const std::size_t w) {
                     algebra::print_time("starting cmpe test");
                     brute_force_arithmetic_gadget<ALU_cmp_gadget<FieldType>, FieldType>(
                         w,
@@ -1226,13 +1226,13 @@ namespace nil {
                                                                  result, result_flag, cmpa_result, cmpa_result_flag,
                                                                  cmpae_result, cmpae_result_flag, "ALU_cmp_gadget");
                         },
-                        [w](size_t des, bool f, size_t x, size_t y) -> size_t { return des; },
-                        [w](size_t des, bool f, size_t x, size_t y) -> bool { return x == y; });
+                        [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> std::size_t { return des; },
+                        [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> bool { return x == y; });
                     algebra::print_time("cmpe tests successful");
                 }
 
                 template<typename FieldType>
-                void test_ALU_cmpa_gadget(const size_t w) {
+                void test_ALU_cmpa_gadget(const std::size_t w) {
                     algebra::print_time("starting cmpa test");
                     brute_force_arithmetic_gadget<ALU_cmp_gadget<FieldType>, FieldType>(
                         w,
@@ -1257,13 +1257,13 @@ namespace nil {
                                                                  cmpe_result, cmpe_result_flag, result, result_flag,
                                                                  cmpae_result, cmpae_result_flag, "ALU_cmp_gadget");
                         },
-                        [w](size_t des, bool f, size_t x, size_t y) -> size_t { return des; },
-                        [w](size_t des, bool f, size_t x, size_t y) -> bool { return x > y; });
+                        [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> std::size_t { return des; },
+                        [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> bool { return x > y; });
                     algebra::print_time("cmpa tests successful");
                 }
 
                 template<typename FieldType>
-                void test_ALU_cmpae_gadget(const size_t w) {
+                void test_ALU_cmpae_gadget(const std::size_t w) {
                     algebra::print_time("starting cmpae test");
                     brute_force_arithmetic_gadget<ALU_cmp_gadget<FieldType>, FieldType>(
                         w,
@@ -1288,8 +1288,8 @@ namespace nil {
                                 pb, opcode_indicators, desval, arg1val, arg2val, flag, cmpe_result, cmpe_result_flag,
                                 cmpa_result, cmpa_result_flag, result, result_flag, "ALU_cmp_gadget");
                         },
-                        [w](size_t des, bool f, size_t x, size_t y) -> size_t { return des; },
-                        [w](size_t des, bool f, size_t x, size_t y) -> bool { return x >= y; });
+                        [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> std::size_t { return des; },
+                        [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> bool { return x >= y; });
                     algebra::print_time("cmpae tests successful");
                 }
 
@@ -1337,7 +1337,7 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                void test_ALU_cmpg_gadget(const size_t w) {
+                void test_ALU_cmpg_gadget(const std::size_t w) {
                     algebra::print_time("starting cmpg test");
                     brute_force_arithmetic_gadget<ALU_cmps_gadget<FieldType>, FieldType>(
                         w,
@@ -1358,15 +1358,15 @@ namespace nil {
                                                                   result, result_flag, cmpge_result, cmpge_result_flag,
                                                                   "ALU_cmps_gadget");
                         },
-                        [w](size_t des, bool f, size_t x, size_t y) -> size_t { return des; },
-                        [w](size_t des, bool f, size_t x, size_t y) -> bool {
+                        [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> std::size_t { return des; },
+                        [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> bool {
                             return (algebra::from_twos_complement(x, w) > algebra::from_twos_complement(y, w));
                         });
                     algebra::print_time("cmpg tests successful");
                 }
 
                 template<typename FieldType>
-                void test_ALU_cmpge_gadget(const size_t w) {
+                void test_ALU_cmpge_gadget(const std::size_t w) {
                     algebra::print_time("starting cmpge test");
                     brute_force_arithmetic_gadget<ALU_cmps_gadget<FieldType>, FieldType>(
                         w,
@@ -1387,8 +1387,8 @@ namespace nil {
                                                                   cmpg_result, cmpg_result_flag, result, result_flag,
                                                                   "ALU_cmps_gadget");
                         },
-                        [w](size_t des, bool f, size_t x, size_t y) -> size_t { return des; },
-                        [w](size_t des, bool f, size_t x, size_t y) -> bool {
+                        [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> std::size_t { return des; },
+                        [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> bool {
                             return (algebra::from_twos_complement(x, w) >= algebra::from_twos_complement(y, w));
                         });
                     algebra::print_time("cmpge tests successful");
@@ -1432,7 +1432,7 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                void test_ALU_mull_gadget(const size_t w) {
+                void test_ALU_mull_gadget(const std::size_t w) {
                     algebra::print_time("starting mull test");
                     brute_force_arithmetic_gadget<ALU_umul_gadget<FieldType>, FieldType>(
                         w,
@@ -1453,13 +1453,13 @@ namespace nil {
                                                                   result, result_flag, umulh_result, umulh_flag,
                                                                   "ALU_umul_gadget");
                         },
-                        [w](size_t des, bool f, size_t x, size_t y) -> size_t { return (x * y) % (1ul << w); },
-                        [w](size_t des, bool f, size_t x, size_t y) -> bool { return ((x * y) >> w) != 0; });
+                        [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> std::size_t { return (x * y) % (1ul << w); },
+                        [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> bool { return ((x * y) >> w) != 0; });
                     algebra::print_time("mull tests successful");
                 }
 
                 template<typename FieldType>
-                void test_ALU_umulh_gadget(const size_t w) {
+                void test_ALU_umulh_gadget(const std::size_t w) {
                     algebra::print_time("starting umulh test");
                     brute_force_arithmetic_gadget<ALU_umul_gadget<FieldType>, FieldType>(
                         w,
@@ -1480,8 +1480,8 @@ namespace nil {
                                                                   mull_result, mull_flag, result, result_flag,
                                                                   "ALU_umul_gadget");
                         },
-                        [w](size_t des, bool f, size_t x, size_t y) -> size_t { return (x * y) >> w; },
-                        [w](size_t des, bool f, size_t x, size_t y) -> bool { return ((x * y) >> w) != 0; });
+                        [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> std::size_t { return (x * y) >> w; },
+                        [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> bool { return ((x * y) >> w) != 0; });
                     algebra::print_time("umulh tests successful");
                 }
 
@@ -1555,7 +1555,7 @@ namespace nil {
 
                     /* compute flag */
                     pack_top->generate_r1cs_witness_from_bits();
-                    size_t topval = this->pb.val(top).as_ulong();
+                    std::size_t topval = this->pb.val(top).as_ulong();
 
                     if (topval == 0) {
                         this->pb.val(is_top_empty) = FieldType::one();
@@ -1580,7 +1580,7 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                void test_ALU_smulh_gadget(const size_t w) {
+                void test_ALU_smulh_gadget(const std::size_t w) {
                     algebra::print_time("starting smulh test");
                     brute_force_arithmetic_gadget<ALU_smul_gadget<FieldType>, FieldType>(
                         w,
@@ -1596,12 +1596,12 @@ namespace nil {
                             return new ALU_smul_gadget<FieldType>(pb, opcode_indicators, desval, arg1val, arg2val, flag,
                                                                   result, result_flag, "ALU_smul_gadget");
                         },
-                        [w](size_t des, bool f, size_t x, size_t y) -> size_t {
-                            const size_t res = algebra::to_twos_complement(
+                        [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> std::size_t {
+                            const std::size_t res = algebra::to_twos_complement(
                                 (algebra::from_twos_complement(x, w) * algebra::from_twos_complement(y, w)), 2 * w);
                             return res >> w;
                         },
-                        [w](size_t des, bool f, size_t x, size_t y) -> bool {
+                        [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> bool {
                             const int res = algebra::from_twos_complement(x, w) * algebra::from_twos_complement(y, w);
                             const int truncated_res = algebra::from_twos_complement(
                                 algebra::to_twos_complement(res, 2 * w) & ((1ul << w) - 1), w);
@@ -1675,8 +1675,8 @@ namespace nil {
                         this->pb.val(B_inv) = this->pb.val(this->arg2val.packed).inverse();
                         this->pb.val(B_nonzero) = FieldType::one();
 
-                        const size_t A = this->pb.val(this->arg1val.packed).as_ulong();
-                        const size_t B = this->pb.val(this->arg2val.packed).as_ulong();
+                        const std::size_t A = this->pb.val(this->arg1val.packed).as_ulong();
+                        const std::size_t B = this->pb.val(this->arg2val.packed).as_ulong();
 
                         this->pb.val(A_aux) = this->pb.val(this->arg1val.packed);
 
@@ -1691,7 +1691,7 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                void test_ALU_udiv_gadget(const size_t w) {
+                void test_ALU_udiv_gadget(const std::size_t w) {
                     algebra::print_time("starting udiv test");
                     brute_force_arithmetic_gadget<ALU_divmod_gadget<FieldType>, FieldType>(
                         w,
@@ -1712,13 +1712,13 @@ namespace nil {
                                                                     flag, result, result_flag, umod_result, umod_flag,
                                                                     "ALU_divmod_gadget");
                         },
-                        [w](size_t des, bool f, size_t x, size_t y) -> size_t { return (y == 0 ? 0 : x / y); },
-                        [w](size_t des, bool f, size_t x, size_t y) -> bool { return (y == 0); });
+                        [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> std::size_t { return (y == 0 ? 0 : x / y); },
+                        [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> bool { return (y == 0); });
                     algebra::print_time("udiv tests successful");
                 }
 
                 template<typename FieldType>
-                void test_ALU_umod_gadget(const size_t w) {
+                void test_ALU_umod_gadget(const std::size_t w) {
                     algebra::print_time("starting umod test");
                     brute_force_arithmetic_gadget<ALU_divmod_gadget<FieldType>, FieldType>(
                         w,
@@ -1739,8 +1739,8 @@ namespace nil {
                                                                     flag, udiv_result, udiv_flag, result, result_flag,
                                                                     "ALU_divmod_gadget");
                         },
-                        [w](size_t des, bool f, size_t x, size_t y) -> size_t { return (y == 0 ? 0 : x % y); },
-                        [w](size_t des, bool f, size_t x, size_t y) -> bool { return (y == 0); });
+                        [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> std::size_t { return (y == 0 ? 0 : x % y); },
+                        [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> bool { return (y == 0); });
                     algebra::print_time("umod tests successful");
                 }
 
@@ -1762,9 +1762,9 @@ namespace nil {
                     /*
                       do logw iterations of barrel shifts
                     */
-                    for (size_t i = 0; i < logw; ++i) {
+                    for (std::size_t i = 0; i < logw; ++i) {
                         /* assert that shifted out part is bits */
-                        for (size_t j = 0; j < 1ul << i; ++j) {
+                        for (std::size_t j = 0; j < 1ul << i; ++j) {
                             generate_boolean_r1cs_constraint<FieldType>(this->pb, shifted_out_bits[i][j]);
                         }
 
@@ -1782,7 +1782,7 @@ namespace nil {
                         linear_combination<FieldType> a, b, c;
 
                         a.add_term(barrel_right_internal[i + 1], (FieldType(2) ^ (i + 1)) - FieldType::one());
-                        for (size_t j = 0; j < 1ul << i; ++j) {
+                        for (std::size_t j = 0; j < 1ul << i; ++j) {
                             a.add_term(shifted_out_bits[i][j], (FieldType(2) ^ j));
                         }
 
@@ -1849,7 +1849,7 @@ namespace nil {
                       (shfited_result) * (1-need_to_shift)
                     */
 
-                    for (size_t i = 0; i < logw; ++i) {
+                    for (std::size_t i = 0; i < logw; ++i) {
                         this->pb.val(barrel_right_internal[i + 1]) =
                             (this->pb.val(this->arg2val.bits[i]) == FieldType::zero()) ?
                                 this->pb.val(barrel_right_internal[i]) :
@@ -1890,7 +1890,7 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                void test_ALU_shr_gadget(const size_t w) {
+                void test_ALU_shr_gadget(const std::size_t w) {
                     algebra::print_time("starting shr test");
                     brute_force_arithmetic_gadget<ALU_shr_shl_gadget<FieldType>, FieldType>(
                         w,
@@ -1911,13 +1911,13 @@ namespace nil {
                                                                      flag, result, result_flag, shl_result, shl_flag,
                                                                      "ALU_shr_shl_gadget");
                         },
-                        [w](size_t des, bool f, size_t x, size_t y) -> size_t { return (x >> y); },
-                        [w](size_t des, bool f, size_t x, size_t y) -> bool { return (x & 1); });
+                        [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> std::size_t { return (x >> y); },
+                        [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> bool { return (x & 1); });
                     algebra::print_time("shr tests successful");
                 }
 
                 template<typename FieldType>
-                void test_ALU_shl_gadget(const size_t w) {
+                void test_ALU_shl_gadget(const std::size_t w) {
                     algebra::print_time("starting shl test");
                     brute_force_arithmetic_gadget<ALU_shr_shl_gadget<FieldType>, FieldType>(
                         w,
@@ -1938,8 +1938,8 @@ namespace nil {
                                                                      flag, shr_result, shr_flag, result, result_flag,
                                                                      "ALU_shr_shl_gadget");
                         },
-                        [w](size_t des, bool f, size_t x, size_t y) -> size_t { return (x << y) & ((1ul << w) - 1); },
-                        [w](size_t des, bool f, size_t x, size_t y) -> bool { return (x >> (w - 1)); });
+                        [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> std::size_t { return (x << y) & ((1ul << w) - 1); },
+                        [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> bool { return (x >> (w - 1)); });
                     algebra::print_time("shl tests successful");
                 }
 

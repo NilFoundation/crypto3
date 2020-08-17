@@ -93,7 +93,7 @@ int main(int argc, const char *argv[]) {
     printf("Will run on %zu register machine (word size = %zu)\n", ap.k, ap.w);
 
     std::ifstream f_rp(computation_bounds_fn);
-    size_t tinyram_input_size_bound, tinyram_program_size_bound, time_bound;
+    std::size_t tinyram_input_size_bound, tinyram_program_size_bound, time_bound;
     f_rp >> tinyram_input_size_bound >> tinyram_program_size_bound >> time_bound;
 
     std::ifstream processed(processed_assembly_fn);
@@ -117,7 +117,7 @@ int main(int argc, const char *argv[]) {
     printf("\nPress enter to continue.\n");
     std::cin.get();
 
-    const size_t boot_trace_size_bound = tinyram_program_size_bound + tinyram_input_size_bound;
+    const std::size_t boot_trace_size_bound = tinyram_program_size_bound + tinyram_input_size_bound;
     const ram_boot_trace<default_tinyram_ppzksnark_pp> boot_trace =
         tinyram_boot_trace_from_program_and_input(ap, boot_trace_size_bound, program, primary_input);
 

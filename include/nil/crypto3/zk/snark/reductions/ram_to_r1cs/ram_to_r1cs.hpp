@@ -27,15 +27,15 @@ namespace nil {
                 public:
                     typedef ram_base_field<ramT> FieldType;
 
-                    size_t boot_trace_size_bound;
+                    std::size_t boot_trace_size_bound;
 
                     ram_protoboard<ramT> main_protoboard;
                     pb_variable_array<FieldType> r1cs_input;
                     std::shared_ptr<ram_universal_gadget<ramT>> universal_gadget;
 
                     ram_to_r1cs(const ram_architecture_params<ramT> &ap,
-                                const size_t boot_trace_size_bound,
-                                const size_t time_bound);
+                                const std::size_t boot_trace_size_bound,
+                                const std::size_t time_bound);
                     void instance_map();
                     r1cs_constraint_system<FieldType> get_constraint_system() const;
                     r1cs_auxiliary_input<FieldType> auxiliary_input_map(const ram_boot_trace<ramT> &boot_trace,
@@ -51,17 +51,17 @@ namespace nil {
 
                     static r1cs_primary_input<ram_base_field<ramT>>
                         primary_input_map(const ram_architecture_params<ramT> &ap,
-                                          const size_t boot_trace_size_bound,
+                                          const std::size_t boot_trace_size_bound,
                                           const ram_boot_trace<ramT> &boot_trace);
                 };
 
                 template<typename ramT>
                 ram_to_r1cs<ramT>::ram_to_r1cs(const ram_architecture_params<ramT> &ap,
-                                               const size_t boot_trace_size_bound,
-                                               const size_t time_bound) :
+                                               const std::size_t boot_trace_size_bound,
+                                               const std::size_t time_bound) :
                     boot_trace_size_bound(boot_trace_size_bound),
                     main_protoboard(ap) {
-                    const size_t r1cs_input_size =
+                    const std::size_t r1cs_input_size =
                         ram_universal_gadget<ramT>::packed_input_size(ap, boot_trace_size_bound);
                     r1cs_input.allocate(main_protoboard, r1cs_input_size);
                     universal_gadget.reset(new ram_universal_gadget<ramT>(
@@ -103,8 +103,8 @@ namespace nil {
                                                                             const address_and_value &av) {
                     typedef ram_base_field<ramT> FieldType;
 
-                    const size_t address = av.first;
-                    const size_t contents = av.second;
+                    const std::size_t address = av.first;
+                    const std::size_t contents = av.second;
 
                     const std::vector<bool> address_bits = algebra::convert_field_element_to_bit_vector<FieldType>(
                         FieldType(address, true), ap.address_size());
@@ -124,18 +124,18 @@ namespace nil {
                 template<typename ramT>
                 r1cs_primary_input<ram_base_field<ramT>>
                     ram_to_r1cs<ramT>::primary_input_map(const ram_architecture_params<ramT> &ap,
-                                                         const size_t boot_trace_size_bound,
+                                                         const std::size_t boot_trace_size_bound,
                                                          const ram_boot_trace<ramT> &boot_trace) {
                     typedef ram_base_field<ramT> FieldType;
 
-                    const size_t packed_input_element_size = ram_universal_gadget<ramT>::packed_input_element_size(ap);
+                    const std::size_t packed_input_element_size = ram_universal_gadget<ramT>::packed_input_element_size(ap);
                     r1cs_primary_input<FieldType> result(
                         ram_universal_gadget<ramT>::packed_input_size(ap, boot_trace_size_bound));
 
-                    std::set<size_t> bound_input_locations;
+                    std::set<std::size_t> bound_input_locations;
 
                     for (auto it : boot_trace.get_all_trace_entries()) {
-                        const size_t input_pos = it.first;
+                        const std::size_t input_pos = it.first;
                         const address_and_value av = it.second;
 
                         assert(input_pos < boot_trace_size_bound);

@@ -41,7 +41,7 @@ namespace nil {
                     void generate_r1cs_equals_const_constraints(const Fp6T &el);
                     void generate_r1cs_witness(const Fp6T &el);
                     Fp6T get_element();
-                    Fp6_variable<Fp6T> Frobenius_map(const size_t power) const;
+                    Fp6_variable<Fp6T> Frobenius_map(const std::size_t power) const;
                     void evaluate() const;
                 };
 
@@ -237,7 +237,7 @@ namespace nil {
                 }
 
                 template<typename Fp6T>
-                Fp6_variable<Fp6T> Fp6_variable<Fp6T>::Frobenius_map(const size_t power) const {
+                Fp6_variable<Fp6T> Fp6_variable<Fp6T>::Frobenius_map(const std::size_t power) const {
                     pb_linear_combination<FieldType> new_c0c0, new_c0c1, new_c0c2, new_c1c0, new_c1c1, new_c1c2;
                     new_c0c0.assign(this->pb, c0.c0);
                     new_c0c1.assign(this->pb, c0.c1 * Fp3T::Frobenius_coeffs_c1[power % 3]);

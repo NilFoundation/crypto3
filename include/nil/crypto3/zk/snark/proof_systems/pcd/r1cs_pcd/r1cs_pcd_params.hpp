@@ -47,7 +47,7 @@ namespace nil {
                     }
 
                     r1cs_auxiliary_input<FieldType>
-                        as_r1cs_auxiliary_input(const std::vector<size_t> &incoming_message_payload_lengths) const;
+                        as_r1cs_auxiliary_input(const std::vector<std::size_t> &incoming_message_payload_lengths) const;
                 };
 
                 template<typename FieldType>
@@ -59,16 +59,16 @@ namespace nil {
                 template<typename FieldType>
                 r1cs_auxiliary_input<FieldType>
                     r1cs_pcd_compliance_predicate_auxiliary_input<FieldType>::as_r1cs_auxiliary_input(
-                        const std::vector<size_t> &incoming_message_payload_lengths) const {
-                    const size_t arity = incoming_messages.size();
+                        const std::vector<std::size_t> &incoming_message_payload_lengths) const {
+                    const std::size_t arity = incoming_messages.size();
 
                     r1cs_auxiliary_input<FieldType> result;
                     result.emplace_back(FieldType(arity));
 
-                    const size_t max_arity = incoming_message_payload_lengths.size();
+                    const std::size_t max_arity = incoming_message_payload_lengths.size();
                     assert(arity <= max_arity);
 
-                    for (size_t i = 0; i < arity; ++i) {
+                    for (std::size_t i = 0; i < arity; ++i) {
                         const r1cs_variable_assignment<FieldType> msg_as_r1cs_va =
                             incoming_messages[i]->as_r1cs_variable_assignment();
                         assert(msg_as_r1cs_va.size() == (1 + incoming_message_payload_lengths[i]));
@@ -76,7 +76,7 @@ namespace nil {
                     }
 
                     /* pad with dummy messages of appropriate size */
-                    for (size_t i = arity; i < max_arity; ++i) {
+                    for (std::size_t i = arity; i < max_arity; ++i) {
                         result.resize(result.size() + (1 + incoming_message_payload_lengths[i]), FieldType::zero());
                     }
 

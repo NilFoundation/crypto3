@@ -132,7 +132,7 @@ namespace nil {
                                 dw_contents_prev.bits.begin(), dw_contents_prev.bits.begin() + pb.ap.w)));
                     masked_out_bytes.resize(2 * pb.ap.bytes_in_word());
 
-                    for (size_t i = 0; i < 2 * pb.ap.bytes_in_word(); ++i) {
+                    for (std::size_t i = 0; i < 2 * pb.ap.bytes_in_word(); ++i) {
                         /* just subtract out the byte to be masked */
                         masked_out_bytes[i].assign(
                             pb, (dw_contents_prev.packed -
@@ -165,7 +165,7 @@ namespace nil {
                       Define shift so that masked_out_dw_contents_prev + shift * subcontents = dw_contents_next
                      */
                     linear_combination<FieldType> shift_lc = is_word0 * 1 + is_word1 * (FieldType(2) ^ this->pb.ap.w);
-                    for (size_t i = 0; i < 2 * this->pb.ap.bytes_in_word(); ++i) {
+                    for (std::size_t i = 0; i < 2 * this->pb.ap.bytes_in_word(); ++i) {
                         shift_lc = shift_lc + is_byte[i] * (FieldType(2) ^ (8 * i));
                     }
                     shift.assign(pb, shift_lc);
@@ -175,14 +175,14 @@ namespace nil {
                 void memory_masking_gadget<FieldType>::generate_r1cs_constraints() {
                     /* get indicator variables for is_subaddress[i] by adding constraints
                        is_subaddress[i] * (subaddress - i) = 0 and \sum_i is_subaddress[i] = 1 */
-                    for (size_t i = 0; i < 2 * this->pb.ap.bytes_in_word(); ++i) {
+                    for (std::size_t i = 0; i < 2 * this->pb.ap.bytes_in_word(); ++i) {
                         this->pb.add_r1cs_constraint(
                             r1cs_constraint<FieldType>(is_subaddress[i], subaddress.packed - i, 0));
                     }
                     this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(1, pb_sum<FieldType>(is_subaddress), 1));
 
                     /* get indicator variables is_byte_X */
-                    for (size_t i = 0; i < 2 * this->pb.ap.bytes_in_word(); ++i) {
+                    for (std::size_t i = 0; i < 2 * this->pb.ap.bytes_in_word(); ++i) {
                         this->pb.add_r1cs_constraint(
                             r1cs_constraint<FieldType>(access_is_byte, is_subaddress[i], is_byte[i]));
                     }
@@ -206,13 +206,13 @@ namespace nil {
                 template<typename FieldType>
                 void memory_masking_gadget<FieldType>::generate_r1cs_witness() {
                     /* get indicator variables is_subaddress */
-                    for (size_t i = 0; i < 2 * this->pb.ap.bytes_in_word(); ++i) {
+                    for (std::size_t i = 0; i < 2 * this->pb.ap.bytes_in_word(); ++i) {
                         this->pb.val(is_subaddress[i]) =
                             (this->pb.val(subaddress.packed) == FieldType(i)) ? FieldType::one() : FieldType::zero();
                     }
 
                     /* get indicator variables is_byte_X */
-                    for (size_t i = 0; i < 2 * this->pb.ap.bytes_in_word(); ++i) {
+                    for (std::size_t i = 0; i < 2 * this->pb.ap.bytes_in_word(); ++i) {
                         this->pb.val(is_byte[i]) = this->pb.val(is_subaddress[i]) * this->pb.lc_val(access_is_byte);
                     }
 

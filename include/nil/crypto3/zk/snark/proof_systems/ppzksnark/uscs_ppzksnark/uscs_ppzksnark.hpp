@@ -103,23 +103,23 @@ namespace nil {
                         alpha_V_g1_query(std::move(alpha_V_g1_query)), H_g1_query(std::move(H_g1_query)),
                         V_g2_query(std::move(V_g2_query)), constraint_system(std::move(constraint_system)) {};
 
-                    size_t G1_size() const {
+                    std::size_t G1_size() const {
                         return V_g1_query.size() + alpha_V_g1_query.size() + H_g1_query.size();
                     }
 
-                    size_t G2_size() const {
+                    std::size_t G2_size() const {
                         return V_g2_query.size();
                     }
 
-                    size_t G1_sparse_size() const {
+                    std::size_t G1_sparse_size() const {
                         return G1_size();
                     }
 
-                    size_t G2_sparse_size() const {
+                    std::size_t G2_sparse_size() const {
                         return G2_size();
                     }
 
-                    size_t size_in_bits() const {
+                    std::size_t size_in_bits() const {
                         return algebra::G1<ppT>::size_in_bits() * G1_size() +
                                algebra::G2<ppT>::size_in_bits() * G2_size();
                     }
@@ -173,15 +173,15 @@ namespace nil {
                         tilde_g2(tilde_g2),
                         alpha_tilde_g2(alpha_tilde_g2), Z_g2(Z_g2), encoded_IC_query(eIC) {};
 
-                    size_t G1_size() const {
+                    std::size_t G1_size() const {
                         return encoded_IC_query.size();
                     }
 
-                    size_t G2_size() const {
+                    std::size_t G2_size() const {
                         return 3;
                     }
 
-                    size_t size_in_bits() const {
+                    std::size_t size_in_bits() const {
                         return encoded_IC_query.size_in_bits() + 3 * algebra::G2<ppT>::size_in_bits();
                     }
 
@@ -199,7 +199,7 @@ namespace nil {
                                                          const uscs_ppzksnark_verification_key<ppT> &vk);
                     friend std::istream &operator>><ppT>(std::istream &in, uscs_ppzksnark_verification_key<ppT> &vk);
 
-                    static uscs_ppzksnark_verification_key<ppT> dummy_verification_key(const size_t input_size);
+                    static uscs_ppzksnark_verification_key<ppT> dummy_verification_key(const std::size_t input_size);
                 };
 
                 /************************ Processed verification key *************************/
@@ -300,15 +300,15 @@ namespace nil {
                         V_g1(std::move(V_g1)),
                         alpha_V_g1(std::move(alpha_V_g1)), H_g1(std::move(H_g1)), V_g2(std::move(V_g2)) {};
 
-                    size_t G1_size() const {
+                    std::size_t G1_size() const {
                         return 3;
                     }
 
-                    size_t G2_size() const {
+                    std::size_t G2_size() const {
                         return 1;
                     }
 
-                    size_t size_in_bits() const {
+                    std::size_t size_in_bits() const {
                         return G1_size() * algebra::G1<ppT>::size_in_bits() +
                                G2_size() * algebra::G2<ppT>::size_in_bits();
                     }
@@ -554,7 +554,7 @@ namespace nil {
 
                 template<typename ppT>
                 uscs_ppzksnark_verification_key<ppT>
-                    uscs_ppzksnark_verification_key<ppT>::dummy_verification_key(const size_t input_size) {
+                    uscs_ppzksnark_verification_key<ppT>::dummy_verification_key(const std::size_t input_size) {
                     uscs_ppzksnark_verification_key<ppT> result;
                     result.tilde_g2 = algebra::Fr<ppT>::random_element() * algebra::G2<ppT>::one();
                     result.alpha_tilde_g2 = algebra::Fr<ppT>::random_element() * algebra::G2<ppT>::one();
@@ -562,7 +562,7 @@ namespace nil {
 
                     algebra::G1<ppT> base = algebra::Fr<ppT>::random_element() * algebra::G1<ppT>::one();
                     algebra::G1_vector<ppT> v;
-                    for (size_t i = 0; i < input_size; ++i) {
+                    for (std::size_t i = 0; i < input_size; ++i) {
                         v.emplace_back(algebra::Fr<ppT>::random_element() * algebra::G1<ppT>::one());
                     }
 
@@ -603,17 +603,17 @@ namespace nil {
                     assert(Ht_table.size() == ssp_inst.degree() + 1);
                     assert(Xt_table.size() == ssp_inst.num_inputs() + 1);
                     assert(Vt_table_minus_Xt_table.size() == ssp_inst.num_variables() + 2 - ssp_inst.num_inputs() - 1);
-                    for (size_t i = 0; i < ssp_inst.num_inputs() + 1; ++i) {
+                    for (std::size_t i = 0; i < ssp_inst.num_inputs() + 1; ++i) {
                         assert(!Xt_table[i].is_zero());
                     }
 
                     const algebra::Fr<ppT> alpha = algebra::Fr<ppT>::random_element();
 
-                    const size_t g1_exp_count = Vt_table.size() + Vt_table_minus_Xt_table.size() + Ht_table.size();
-                    const size_t g2_exp_count = Vt_table_minus_Xt_table.size();
+                    const std::size_t g1_exp_count = Vt_table.size() + Vt_table_minus_Xt_table.size() + Ht_table.size();
+                    const std::size_t g2_exp_count = Vt_table_minus_Xt_table.size();
 
-                    size_t g1_window = algebra::get_exp_window_size<algebra::G1<ppT>>(g1_exp_count);
-                    size_t g2_window = algebra::get_exp_window_size<algebra::G2<ppT>>(g2_exp_count);
+                    std::size_t g1_window = algebra::get_exp_window_size<algebra::G1<ppT>>(g1_exp_count);
+                    std::size_t g2_window = algebra::get_exp_window_size<algebra::G2<ppT>>(g2_exp_count);
 
                     algebra::window_table<algebra::G1<ppT>> g1_table =
                         get_window_table(algebra::Fr<ppT>::size_in_bits(), g1_window, algebra::G1<ppT>::one());
@@ -697,10 +697,10 @@ namespace nil {
                     algebra::G2<ppT> V_g2 = pk.V_g2_query[0] + ssp_wit.d * pk.V_g2_query[pk.V_g2_query.size() - 1];
 
 #ifdef MULTICORE
-                    const size_t chunks = omp_get_max_threads();    // to override, set OMP_NUM_THREADS env var or call
+                    const std::size_t chunks = omp_get_max_threads();    // to override, set OMP_NUM_THREADS env var or call
                                                                     // omp_set_num_threads()
 #else
-                    const size_t chunks = 1;
+                    const std::size_t chunks = 1;
 #endif
 
                     // MAYBE LATER: do queries 1,2,4 at once for slightly better speed

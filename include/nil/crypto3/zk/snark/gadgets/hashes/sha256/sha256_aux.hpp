@@ -22,7 +22,7 @@ namespace nil {
                 class lastbits_gadget : public gadget<FieldType> {
                 public:
                     pb_variable<FieldType> X;
-                    size_t X_bits;
+                    std::size_t X_bits;
                     pb_variable<FieldType> result;
                     pb_linear_combination_array<FieldType> result_bits;
 
@@ -32,7 +32,7 @@ namespace nil {
 
                     lastbits_gadget(protoboard<FieldType> &pb,
                                     const pb_variable<FieldType> &X,
-                                    const size_t X_bits,
+                                    std::size_t X_bits,
                                     const pb_variable<FieldType> &result,
                                     const pb_linear_combination_array<FieldType> &result_bits);
 
@@ -56,7 +56,7 @@ namespace nil {
                                 const pb_linear_combination<FieldType> &A,
                                 const pb_linear_combination<FieldType> &B,
                                 const pb_linear_combination<FieldType> &C,
-                                const bool assume_C_is_zero,
+                                bool assume_C_is_zero,
                                 const pb_linear_combination<FieldType> &out);
 
                     void generate_r1cs_constraints();
@@ -78,9 +78,9 @@ namespace nil {
                     small_sigma_gadget(protoboard<FieldType> &pb,
                                        const pb_variable_array<FieldType> &W,
                                        const pb_variable<FieldType> &result,
-                                       const size_t rot1,
-                                       const size_t rot2,
-                                       const size_t shift);
+                                       std::size_t rot1,
+                                       std::size_t rot2,
+                                       std::size_t shift);
 
                     void generate_r1cs_constraints();
                     void generate_r1cs_witness();
@@ -101,9 +101,9 @@ namespace nil {
                     big_sigma_gadget(protoboard<FieldType> &pb,
                                      const pb_linear_combination_array<FieldType> &W,
                                      const pb_variable<FieldType> &result,
-                                     const size_t rot1,
-                                     const size_t rot2,
-                                     const size_t rot3);
+                                     std::size_t rot1,
+                                     std::size_t rot2,
+                                     std::size_t rot3);
 
                     void generate_r1cs_constraints();
                     void generate_r1cs_witness();
@@ -157,13 +157,13 @@ namespace nil {
                 template<typename FieldType>
                 lastbits_gadget<FieldType>::lastbits_gadget(protoboard<FieldType> &pb,
                                                             const pb_variable<FieldType> &X,
-                                                            const size_t X_bits,
+                                                            std::size_t X_bits,
                                                             const pb_variable<FieldType> &result,
                                                             const pb_linear_combination_array<FieldType> &result_bits) :
                     gadget<FieldType>(pb),
                     X(X), X_bits(X_bits), result(result), result_bits(result_bits) {
                     full_bits = result_bits;
-                    for (size_t i = result_bits.size(); i < X_bits; ++i) {
+                    for (std::size_t i = result_bits.size(); i < X_bits; ++i) {
                         pb_variable<FieldType> full_bits_overflow;
                         full_bits_overflow.allocate(pb);
                         full_bits.emplace_back(full_bits_overflow);
@@ -190,7 +190,7 @@ namespace nil {
                                                     const pb_linear_combination<FieldType> &A,
                                                     const pb_linear_combination<FieldType> &B,
                                                     const pb_linear_combination<FieldType> &C,
-                                                    const bool assume_C_is_zero,
+                                                    bool assume_C_is_zero,
                                                     const pb_linear_combination<FieldType> &out) :
                     gadget<FieldType>(pb),
                     A(A), B(B), C(C), assume_C_is_zero(assume_C_is_zero), out(out) {
@@ -233,14 +233,14 @@ namespace nil {
                 small_sigma_gadget<FieldType>::small_sigma_gadget(protoboard<FieldType> &pb,
                                                                   const pb_variable_array<FieldType> &W,
                                                                   const pb_variable<FieldType> &result,
-                                                                  const size_t rot1,
-                                                                  const size_t rot2,
-                                                                  const size_t shift) :
+                                                                  std::size_t rot1,
+                                                                  std::size_t rot2,
+                                                                  std::size_t shift) :
                     gadget<FieldType>(pb),
                     W(W), result(result) {
                     result_bits.allocate(pb, 32);
                     compute_bits.resize(32);
-                    for (size_t i = 0; i < 32; ++i) {
+                    for (std::size_t i = 0; i < 32; ++i) {
                         compute_bits[i].reset(new XOR3_gadget<FieldType>(
                             pb, SHA256_GADGET_ROTR(W, i, rot1), SHA256_GADGET_ROTR(W, i, rot2),
                             (i + shift < 32 ? W[i + shift] : pb_variable<FieldType>(0)), (i + shift >= 32), result_bits[i]));
@@ -250,7 +250,7 @@ namespace nil {
 
                 template<typename FieldType>
                 void small_sigma_gadget<FieldType>::generate_r1cs_constraints() {
-                    for (size_t i = 0; i < 32; ++i) {
+                    for (std::size_t i = 0; i < 32; ++i) {
                         compute_bits[i]->generate_r1cs_constraints();
                     }
 
@@ -259,7 +259,7 @@ namespace nil {
 
                 template<typename FieldType>
                 void small_sigma_gadget<FieldType>::generate_r1cs_witness() {
-                    for (size_t i = 0; i < 32; ++i) {
+                    for (std::size_t i = 0; i < 32; ++i) {
                         compute_bits[i]->generate_r1cs_witness();
                     }
 
@@ -270,14 +270,14 @@ namespace nil {
                 big_sigma_gadget<FieldType>::big_sigma_gadget(protoboard<FieldType> &pb,
                                                               const pb_linear_combination_array<FieldType> &W,
                                                               const pb_variable<FieldType> &result,
-                                                              const size_t rot1,
-                                                              const size_t rot2,
-                                                              const size_t rot3) :
+                                                              std::size_t rot1,
+                                                              std::size_t rot2,
+                                                              std::size_t rot3) :
                     gadget<FieldType>(pb),
                     W(W), result(result) {
                     result_bits.allocate(pb, 32);
                     compute_bits.resize(32);
-                    for (size_t i = 0; i < 32; ++i) {
+                    for (std::size_t i = 0; i < 32; ++i) {
                         compute_bits[i].reset(new XOR3_gadget<FieldType>(
                             pb, SHA256_GADGET_ROTR(W, i, rot1), SHA256_GADGET_ROTR(W, i, rot2),
                             SHA256_GADGET_ROTR(W, i, rot3), false, result_bits[i]));
@@ -288,7 +288,7 @@ namespace nil {
 
                 template<typename FieldType>
                 void big_sigma_gadget<FieldType>::generate_r1cs_constraints() {
-                    for (size_t i = 0; i < 32; ++i) {
+                    for (std::size_t i = 0; i < 32; ++i) {
                         compute_bits[i]->generate_r1cs_constraints();
                     }
 
@@ -297,7 +297,7 @@ namespace nil {
 
                 template<typename FieldType>
                 void big_sigma_gadget<FieldType>::generate_r1cs_witness() {
-                    for (size_t i = 0; i < 32; ++i) {
+                    for (std::size_t i = 0; i < 32; ++i) {
                         compute_bits[i]->generate_r1cs_witness();
                     }
 
@@ -319,7 +319,7 @@ namespace nil {
 
                 template<typename FieldType>
                 void choice_gadget<FieldType>::generate_r1cs_constraints() {
-                    for (size_t i = 0; i < 32; ++i) {
+                    for (std::size_t i = 0; i < 32; ++i) {
                         /*
                           result = x * y + (1-x) * z
                           result - z = x * (y - z)
@@ -332,7 +332,7 @@ namespace nil {
 
                 template<typename FieldType>
                 void choice_gadget<FieldType>::generate_r1cs_witness() {
-                    for (size_t i = 0; i < 32; ++i) {
+                    for (std::size_t i = 0; i < 32; ++i) {
                         this->pb.val(result_bits[i]) =
                             this->pb.lc_val(X[i]) * this->pb.lc_val(Y[i]) +
                             (FieldType::one() - this->pb.lc_val(X[i])) * this->pb.lc_val(Z[i]);
@@ -355,7 +355,7 @@ namespace nil {
 
                 template<typename FieldType>
                 void majority_gadget<FieldType>::generate_r1cs_constraints() {
-                    for (size_t i = 0; i < 32; ++i) {
+                    for (std::size_t i = 0; i < 32; ++i) {
                         /*
                           2*result + aux = x + y + z
                           x, y, z, aux -- bits
@@ -370,7 +370,7 @@ namespace nil {
 
                 template<typename FieldType>
                 void majority_gadget<FieldType>::generate_r1cs_witness() {
-                    for (size_t i = 0; i < 32; ++i) {
+                    for (std::size_t i = 0; i < 32; ++i) {
                         const long v =
                             (this->pb.lc_val(X[i]) + this->pb.lc_val(Y[i]) + this->pb.lc_val(Z[i])).as_ulong();
                         this->pb.val(result_bits[i]) = FieldType(v / 2);

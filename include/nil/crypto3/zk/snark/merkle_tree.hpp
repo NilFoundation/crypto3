@@ -25,7 +25,7 @@ namespace nil {
                     new_input.insert(new_input.end(), l.begin(), l.end());
                     new_input.insert(new_input.end(), r.begin(), r.end());
 
-                    const size_t digest_size = Hash::get_digest_len();
+                    const std::size_t digest_size = Hash::get_digest_len();
                     assert(l.size() == digest_size);
                     assert(r.size() == digest_size);
 
@@ -59,15 +59,15 @@ namespace nil {
                     constexpr static const std::size_t top_tree_arity = TopTreeArity;
 
                     std::vector<digest_type> hash_defaults;
-                    std::map<size_t, std::vector<bool>> values;
-                    std::map<size_t, digest_type> hashes;
+                    std::map<std::size_t, std::vector<bool>> values;
+                    std::map<std::size_t, digest_type> hashes;
 
-                    size_t depth;
-                    size_t value_size;
-                    size_t digest_size;
+                    std::size_t depth;
+                    std::size_t value_size;
+                    std::size_t digest_size;
 
-                    merkle_tree(const size_t depth, const size_t value_size) : depth(depth), value_size(value_size) {
-                        assert(depth < sizeof(size_t) * 8);
+                    merkle_tree(const std::size_t depth, const std::size_t value_size) : depth(depth), value_size(value_size) {
+                        assert(depth < sizeof(std::size_t) * 8);
 
                         digest_size = Hash::digest_bits;
                         assert(value_size <= digest_size);
@@ -75,29 +75,29 @@ namespace nil {
                         digest_type last;
                         hash_defaults.reserve(depth + 1);
                         hash_defaults.emplace_back(last);
-                        for (size_t i = 0; i < depth; ++i) {
+                        for (std::size_t i = 0; i < depth; ++i) {
                             last = two_to_one_CRH<Hash>(last, last);
                             hash_defaults.emplace_back(last);
                         }
 
                         std::reverse(hash_defaults.begin(), hash_defaults.end());
                     }
-                    merkle_tree(const size_t depth, const size_t value_size,
+                    merkle_tree(const std::size_t depth, const std::size_t value_size,
                                 const std::vector<std::vector<bool>> &contents_as_vector) :
                         merkle_tree<Hash>(depth, value_size) {
                         assert(algebra::log2(contents_as_vector.size()) <= depth);
-                        for (size_t address = 0; address < contents_as_vector.size(); ++address) {
-                            const size_t idx = address + (1ul << depth) - 1;
+                        for (std::size_t address = 0; address < contents_as_vector.size(); ++address) {
+                            const std::size_t idx = address + (1ul << depth) - 1;
                             values[idx] = contents_as_vector[address];
                             hashes[idx] = contents_as_vector[address];
                             hashes[idx].resize(digest_size);
                         }
 
-                        size_t idx_begin = (1ul << depth) - 1;
-                        size_t idx_end = contents_as_vector.size() + ((1ul << depth) - 1);
+                        std::size_t idx_begin = (1ul << depth) - 1;
+                        std::size_t idx_end = contents_as_vector.size() + ((1ul << depth) - 1);
 
                         for (int layer = depth; layer > 0; --layer) {
-                            for (size_t idx = idx_begin; idx < idx_end; idx += 2) {
+                            for (std::size_t idx = idx_begin; idx < idx_end; idx += 2) {
                                 digest_type l =
                                     hashes[idx];    // this is sound, because idx_begin is always a left child
                                 digest_type r = (idx + 1 < idx_end ? hashes[idx + 1] : hash_defaults[layer]);
@@ -111,17 +111,17 @@ namespace nil {
                         }
                     }
 
-                    merkle_tree(const size_t depth, const size_t value_size,
-                                const std::map<size_t, std::vector<bool>> &contents) :
+                    merkle_tree(const std::size_t depth, const std::size_t value_size,
+                                const std::map<std::size_t, std::vector<bool>> &contents) :
                         merkle_tree<Hash>(depth, value_size) {
 
                         if (!contents.empty()) {
                             assert(contents.rbegin()->first < 1ul << depth);
 
                             for (auto it = contents.begin(); it != contents.end(); ++it) {
-                                const size_t address = it->first;
+                                const std::size_t address = it->first;
                                 const std::vector<bool> value = it->second;
-                                const size_t idx = address + (1ul << depth) - 1;
+                                const std::size_t idx = address + (1ul << depth) - 1;
 
                                 values[address] = value;
                                 hashes[idx] = value;
@@ -134,7 +134,7 @@ namespace nil {
                                 auto next_last_it = hashes.begin();
 
                                 for (auto it = hashes.begin(); it != last_it; ++it) {
-                                    const size_t idx = it->first;
+                                    const std::size_t idx = it->first;
                                     const digest_type hash = it->second;
 
                                     if (idx % 2 == 0) {
@@ -159,7 +159,7 @@ namespace nil {
                         }
                     }
 
-                    std::vector<bool> get_value(const size_t address) const {
+                    std::vector<bool> get_value(const std::size_t address) const {
                         assert(static_cast<std::size_t>(std::ceil(std::log2(address))) <= depth);
 
                         auto it = values.find(address);
@@ -169,9 +169,9 @@ namespace nil {
 
                         return padded_result;
                     }
-                    void set_value(const size_t address, const std::vector<bool> &value) {
+                    void set_value(const std::size_t address, const std::vector<bool> &value) {
                         assert(static_cast<std::size_t>(std::ceil(std::log2(address))) <= depth);
-                        size_t idx = address + (1ul << depth) - 1;
+                        std::size_t idx = address + (1ul << depth) - 1;
 
                         assert(value.size() == value_size);
                         values[address] = value;
@@ -196,13 +196,13 @@ namespace nil {
                         auto it = hashes.find(0);
                         return (it == hashes.end() ? hash_defaults[0] : it->second);
                     }
-                    merkle_authentication_path_type get_path(const size_t address) const {
+                    merkle_authentication_path_type get_path(const std::size_t address) const {
                         typename Hash::merkle_authentication_path_type result(depth);
                         assert(static_cast<std::size_t>(std::ceil(std::log2(address))) <= depth);
-                        size_t idx = address + (1ul << depth) - 1;
+                        std::size_t idx = address + (1ul << depth) - 1;
 
-                        for (size_t layer = depth; layer > 0; --layer) {
-                            size_t sibling_idx = ((idx + 1) ^ 1) - 1;
+                        for (std::size_t layer = depth; layer > 0; --layer) {
+                            std::size_t sibling_idx = ((idx + 1) ^ 1) - 1;
                             auto it = hashes.find(sibling_idx);
                             if (layer == depth) {
                                 auto it2 = values.find(sibling_idx - ((1ul << depth) - 1));
@@ -220,7 +220,7 @@ namespace nil {
                     }
 
                     void dump() const {
-                        for (size_t i = 0; i < 1ul << depth; ++i) {
+                        for (std::size_t i = 0; i < 1ul << depth; ++i) {
                             auto it = values.find(i);
                             printf("[%zu] -> ", i);
                             const std::vector<bool> value =

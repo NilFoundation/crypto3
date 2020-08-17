@@ -20,11 +20,11 @@ namespace nil {
                 typedef std::vector<bool> set_commitment;
 
                 struct set_membership_proof {
-                    size_t address;
+                    std::size_t address;
                     merkle_authentication_path merkle_path;
 
                     bool operator==(const set_membership_proof &other) const;
-                    size_t size_in_bits() const;
+                    std::size_t size_in_bits() const;
                     friend std::ostream &operator<<(std::ostream &out, const set_membership_proof &other);
                     friend std::istream &operator>>(std::istream &in, set_membership_proof &other);
                 };
@@ -33,14 +33,14 @@ namespace nil {
                 class set_commitment_accumulator {
                 private:
                     std::shared_ptr<merkle_tree<HashT>> tree;
-                    std::map<std::vector<bool>, size_t> hash_to_pos;
+                    std::map<std::vector<bool>, std::size_t> hash_to_pos;
 
                 public:
-                    size_t depth;
-                    size_t digest_size;
-                    size_t value_size;
+                    std::size_t depth;
+                    std::size_t digest_size;
+                    std::size_t value_size;
 
-                    set_commitment_accumulator(const size_t max_entries, const size_t value_size = 0);
+                    set_commitment_accumulator(const std::size_t max_entries, const std::size_t value_size = 0);
 
                     void add(const std::vector<bool> &value);
                     bool is_in_set(const std::vector<bool> &value) const;
@@ -50,8 +50,8 @@ namespace nil {
                 };
 
                 template<typename HashT>
-                set_commitment_accumulator<HashT>::set_commitment_accumulator(const size_t max_entries,
-                                                                              const size_t value_size) :
+                set_commitment_accumulator<HashT>::set_commitment_accumulator(const std::size_t max_entries,
+                                                                              const std::size_t value_size) :
                     value_size(value_size) {
                     depth = static_cast<std::size_t>(std::ceil(std::log2(max_entries)));
                     digest_size = HashT::get_digest_len();
@@ -64,7 +64,7 @@ namespace nil {
                     assert(value_size == 0 || value.size() == value_size);
                     const std::vector<bool> hash = HashT::get_hash(value);
                     if (hash_to_pos.find(hash) == hash_to_pos.end()) {
-                        const size_t pos = hash_to_pos.size();
+                        const std::size_t pos = hash_to_pos.size();
                         tree->set_value(pos, hash);
                         hash_to_pos[hash] = pos;
                     }
@@ -100,7 +100,7 @@ namespace nil {
                     return (this->address == other.address && this->merkle_path == other.merkle_path);
                 }
 
-                size_t set_membership_proof::size_in_bits() const {
+                std::size_t set_membership_proof::size_in_bits() const {
                     if (merkle_path.empty()) {
                         return (8 * sizeof(address));
                     } else {
@@ -111,7 +111,7 @@ namespace nil {
                 std::ostream &operator<<(std::ostream &out, const set_membership_proof &proof) {
                     out << proof.address << "\n";
                     out << proof.merkle_path.size() << "\n";
-                    for (size_t i = 0; i < proof.merkle_path.size(); ++i) {
+                    for (std::size_t i = 0; i < proof.merkle_path.size(); ++i) {
                         algebra::output_bool_vector(out, proof.merkle_path[i]);
                     }
 
@@ -121,12 +121,12 @@ namespace nil {
                 std::istream &operator>>(std::istream &in, set_membership_proof &proof) {
                     in >> proof.address;
                     algebra::consume_newline(in);
-                    size_t tree_depth;
+                    std::size_t tree_depth;
                     in >> tree_depth;
                     algebra::consume_newline(in);
                     proof.merkle_path.resize(tree_depth);
 
-                    for (size_t i = 0; i < tree_depth; ++i) {
+                    for (std::size_t i = 0; i < tree_depth; ++i) {
                         algebra::input_bool_vector(in, proof.merkle_path[i]);
                     }
 

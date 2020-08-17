@@ -48,8 +48,8 @@ namespace nil {
                  * represent).
                  */
                 template<typename FieldType>
-                uscs_example<FieldType> generate_uscs_example_with_field_input(const size_t num_constraints,
-                                                                            const size_t num_inputs);
+                uscs_example<FieldType> generate_uscs_example_with_field_input(const std::size_t num_constraints,
+                                                                            const std::size_t num_inputs);
 
                 /**
                  * Generate a USCS example such that:
@@ -59,12 +59,12 @@ namespace nil {
                  * - the USCS input consists of binary values (as opposed to ``full'' field elements).
                  */
                 template<typename FieldType>
-                uscs_example<FieldType> generate_uscs_example_with_binary_input(const size_t num_constraints,
-                                                                             const size_t num_inputs);
+                uscs_example<FieldType> generate_uscs_example_with_binary_input(const std::size_t num_constraints,
+                                                                             const std::size_t num_inputs);
 
                 template<typename FieldType>
-                uscs_example<FieldType> generate_uscs_example_with_field_input(const size_t num_constraints,
-                                                                            const size_t num_inputs) {
+                uscs_example<FieldType> generate_uscs_example_with_field_input(const std::size_t num_constraints,
+                                                                            const std::size_t num_inputs) {
                     algebra::enter_block("Call to generate_uscs_example_with_field_input");
 
                     assert(num_inputs >= 1);
@@ -75,12 +75,12 @@ namespace nil {
                     cs.auxiliary_input_size = num_constraints - num_inputs;
 
                     uscs_variable_assignment<FieldType> full_variable_assignment;
-                    for (size_t i = 0; i < num_constraints; ++i) {
+                    for (std::size_t i = 0; i < num_constraints; ++i) {
                         full_variable_assignment.emplace_back(FieldType(std::rand()));
                     }
 
-                    for (size_t i = 0; i < num_constraints; ++i) {
-                        size_t x, y, z;
+                    for (std::size_t i = 0; i < num_constraints; ++i) {
+                        std::size_t x, y, z;
 
                         do {
                             x = std::rand() % num_constraints;
@@ -122,8 +122,8 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                uscs_example<FieldType> generate_uscs_example_with_binary_input(const size_t num_constraints,
-                                                                             const size_t num_inputs) {
+                uscs_example<FieldType> generate_uscs_example_with_binary_input(const std::size_t num_constraints,
+                                                                             const std::size_t num_inputs) {
                     algebra::enter_block("Call to generate_uscs_example_with_binary_input");
 
                     assert(num_inputs >= 1);
@@ -133,17 +133,17 @@ namespace nil {
                     cs.auxiliary_input_size = num_constraints;
 
                     uscs_variable_assignment<FieldType> full_variable_assignment;
-                    for (size_t i = 0; i < num_inputs; ++i) {
+                    for (std::size_t i = 0; i < num_inputs; ++i) {
                         full_variable_assignment.push_back(FieldType(std::rand() % 2));
                     }
 
-                    size_t lastvar = num_inputs - 1;
-                    for (size_t i = 0; i < num_constraints; ++i) {
+                    std::size_t lastvar = num_inputs - 1;
+                    for (std::size_t i = 0; i < num_constraints; ++i) {
                         ++lastvar;
 
                         /* chose two random bits and XOR them together */
-                        const size_t u = (i == 0 ? std::rand() % num_inputs : std::rand() % i);
-                        const size_t v = (i == 0 ? std::rand() % num_inputs : std::rand() % i);
+                        const std::size_t u = (i == 0 ? std::rand() % num_inputs : std::rand() % i);
+                        const std::size_t v = (i == 0 ? std::rand() % num_inputs : std::rand() % i);
 
                         uscs_constraint<FieldType> constr;
                         constr.add_term(u + 1, 1);

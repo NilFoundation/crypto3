@@ -180,7 +180,7 @@ namespace nil {
                                                          "g");
 
                     g.generate_r1cs_constraints();
-                    for (size_t i = 0; i < ap.k; ++i) {
+                    for (std::size_t i = 0; i < ap.k; ++i) {
                         pb.val(packed_registers[i]) = FieldType(1000 + i);
                     }
 

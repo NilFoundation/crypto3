@@ -26,7 +26,7 @@ namespace nil {
                 private:
                     const std::vector<pb_variable_array<FieldType>> vars;
                     const r1cs_constraint_system<FieldType> cs;
-                    std::map<size_t, size_t> cs_to_vars;
+                    std::map<std::size_t, std::size_t> cs_to_vars;
 
                 public:
                     gadget_from_r1cs(protoboard<FieldType> &pb,
@@ -46,7 +46,7 @@ namespace nil {
                     vars(vars), cs(cs) {
                     cs_to_vars[0] = 0; /* constant term maps to constant term */
 
-                    size_t cs_var_idx = 1;
+                    std::size_t cs_var_idx = 1;
                     for (auto va : vars) {
                         for (auto v : va) {
                             cs_to_vars[cs_var_idx] = v.index;
@@ -59,7 +59,7 @@ namespace nil {
 
                 template<typename FieldType>
                 void gadget_from_r1cs<FieldType>::generate_r1cs_constraints() {
-                    for (size_t i = 0; i < cs.num_constraints(); ++i) {
+                    for (std::size_t i = 0; i < cs.num_constraints(); ++i) {
                         const r1cs_constraint<FieldType> &constr = cs.constraints[i];
                         r1cs_constraint<FieldType> translated_constr;
 
@@ -89,11 +89,11 @@ namespace nil {
                     assert(cs.num_inputs() == primary_input.size());
                     assert(cs.num_variables() == primary_input.size() + auxiliary_input.size());
 
-                    for (size_t i = 0; i < primary_input.size(); ++i) {
+                    for (std::size_t i = 0; i < primary_input.size(); ++i) {
                         this->pb.val(pb_variable<FieldType>(cs_to_vars[i + 1])) = primary_input[i];
                     }
 
-                    for (size_t i = 0; i < auxiliary_input.size(); ++i) {
+                    for (std::size_t i = 0; i < auxiliary_input.size(); ++i) {
                         this->pb.val(pb_variable<FieldType>(cs_to_vars[primary_input.size() + i + 1])) =
                             auxiliary_input[i];
                     }

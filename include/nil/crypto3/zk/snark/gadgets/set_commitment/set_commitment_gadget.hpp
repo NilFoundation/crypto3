@@ -32,14 +32,14 @@ namespace nil {
                     std::shared_ptr<merkle_tree_check_read_gadget<FieldType, HashT>> check_membership;
 
                 public:
-                    size_t tree_depth;
+                    std::size_t tree_depth;
                     pb_variable_array<FieldType> element_bits;
                     set_commitment_variable<FieldType, HashT> root_digest;
                     set_membership_proof_variable<FieldType, HashT> proof;
                     pb_linear_combination<FieldType> check_successful;
 
                     set_commitment_gadget(protoboard<FieldType> &pb,
-                                          const size_t max_entries,
+                                          const std::size_t max_entries,
                                           const pb_variable_array<FieldType> &element_bits,
                                           const set_commitment_variable<FieldType, HashT> &root_digest,
                                           const set_membership_proof_variable<FieldType, HashT> &proof,
@@ -48,7 +48,7 @@ namespace nil {
                     void generate_r1cs_constraints();
                     void generate_r1cs_witness();
 
-                    static size_t root_size_in_bits();
+                    static std::size_t root_size_in_bits();
                 };
 
                 template<typename FieldType, typename HashT>
@@ -57,7 +57,7 @@ namespace nil {
                 template<typename FieldType, typename HashT>
                 set_commitment_gadget<FieldType, HashT>::set_commitment_gadget(
                     protoboard<FieldType> &pb,
-                    const size_t max_entries,
+                    const std::size_t max_entries,
                     const pb_variable_array<FieldType> &element_bits,
                     const set_commitment_variable<FieldType, HashT> &root_digest,
                     const set_membership_proof_variable<FieldType, HashT> &proof,
@@ -101,20 +101,20 @@ namespace nil {
                 }
 
                 template<typename FieldType, typename HashT>
-                size_t set_commitment_gadget<FieldType, HashT>::root_size_in_bits() {
+                std::size_t set_commitment_gadget<FieldType, HashT>::root_size_in_bits() {
                     return merkle_tree_check_read_gadget<FieldType, HashT>::root_size_in_bits();
                 }
 
                 template<typename FieldType, typename HashT>
                 void test_set_commitment_gadget() {
-                    const size_t digest_len = HashT::get_digest_len();
-                    const size_t max_set_size = 16;
-                    const size_t value_size = (HashT::get_block_len() > 0 ? HashT::get_block_len() : 10);
+                    const std::size_t digest_len = HashT::get_digest_len();
+                    const std::size_t max_set_size = 16;
+                    const std::size_t value_size = (HashT::get_block_len() > 0 ? HashT::get_block_len() : 10);
 
                     set_commitment_accumulator<HashT> accumulator(max_set_size, value_size);
 
                     std::vector<std::vector<bool>> set_elems;
-                    for (size_t i = 0; i < max_set_size; ++i) {
+                    for (std::size_t i = 0; i < max_set_size; ++i) {
                         std::vector<bool> elem(value_size);
                         std::generate(elem.begin(), elem.end(), [&]() { return std::rand() % 2; });
                         set_elems.emplace_back(elem);
@@ -137,7 +137,7 @@ namespace nil {
                     sc.generate_r1cs_constraints();
 
                     /* test all elements from set */
-                    for (size_t i = 0; i < max_set_size; ++i) {
+                    for (std::size_t i = 0; i < max_set_size; ++i) {
                         element_bits.fill_with_bits(pb, set_elems[i]);
                         pb.val(check_succesful) = FieldType::one();
                         proof.generate_r1cs_witness(accumulator.get_membership_proof(set_elems[i]));
@@ -148,7 +148,7 @@ namespace nil {
                     printf("membership tests OK\n");
 
                     /* test an element not in set */
-                    for (size_t i = 0; i < value_size; ++i) {
+                    for (std::size_t i = 0; i < value_size; ++i) {
                         pb.val(element_bits[i]) = FieldType(std::rand() % 2);
                     }
 

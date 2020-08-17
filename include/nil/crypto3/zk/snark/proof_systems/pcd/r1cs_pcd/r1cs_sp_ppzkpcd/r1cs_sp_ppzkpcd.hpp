@@ -95,7 +95,7 @@ namespace nil {
                     r1cs_sp_ppzkpcd_proving_key<PCD_ppT> &
                         operator=(const r1cs_sp_ppzkpcd_proving_key<PCD_ppT> &other) = default;
 
-                    size_t size_in_bits() const {
+                    std::size_t size_in_bits() const {
                         return (compliance_step_r1cs_pk.size_in_bits() + translation_step_r1cs_pk.size_in_bits() +
                                 compliance_step_r1cs_vk.size_in_bits() + translation_step_r1cs_vk.size_in_bits());
                     }
@@ -142,7 +142,7 @@ namespace nil {
                     r1cs_sp_ppzkpcd_verification_key<PCD_ppT> &
                         operator=(const r1cs_sp_ppzkpcd_verification_key<PCD_ppT> &other) = default;
 
-                    size_t size_in_bits() const {
+                    std::size_t size_in_bits() const {
                         return (compliance_step_r1cs_vk.size_in_bits() + translation_step_r1cs_vk.size_in_bits());
                     }
 
@@ -200,7 +200,7 @@ namespace nil {
                     r1cs_sp_ppzkpcd_processed_verification_key<PCD_ppT> &
                         operator=(const r1cs_sp_ppzkpcd_processed_verification_key<PCD_ppT> &other) = default;
 
-                    size_t size_in_bits() const {
+                    std::size_t size_in_bits() const {
                         return (compliance_step_r1cs_pvk.size_in_bits() + translation_step_r1cs_pvk.size_in_bits() +
                                 translation_step_r1cs_vk_bits.size());
                     }

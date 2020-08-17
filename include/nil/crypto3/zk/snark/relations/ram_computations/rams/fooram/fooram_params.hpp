@@ -29,11 +29,11 @@ namespace nil {
                     typedef fooram_cpu_checker<FieldType> cpu_checker_type;
                     typedef fooram_architecture_params architecture_params_type;
 
-                    static size_t timestamp_length;
+                    static std::size_t timestamp_length;
                 };
 
                 template<typename FieldType>
-                size_t ram_fooram<FieldType>::timestamp_length = 300;
+                std::size_t ram_fooram<FieldType>::timestamp_length = 300;
 
             }    // namespace snark
         }        // namespace zk

@@ -58,7 +58,7 @@ namespace nil {
 
                     void print() const;
 
-                    static size_t size_in_bits();
+                    static std::size_t size_in_bits();
 
                     static void batch_to_special_all_non_zeros(std::vector<knowledge_commitment<T1, T2>> &vec);
                 };
@@ -70,7 +70,7 @@ namespace nil {
                     &lhs,
                                                        const knowledge_commitment<T1, T2> &rhs);
 
-                template<typename T1, typename T2, mp_size_t m, const algebra::bigint<m> &modulus_p>
+                template<typename T1, typename T2, mp_std::size_t m, const algebra::bigint<m> &modulus_p>
                 knowledge_commitment<T1, T2> operator*(const algebra::Fp_model<m, modulus_p> &lhs,
                                                        const knowledge_commitment<T1, T2> &rhs);
 
@@ -154,7 +154,7 @@ namespace nil {
                     return knowledge_commitment<T1, T2>(lhs * rhs.g, lhs * rhs.h);
                 }
 
-                template<typename T1, typename T2, mp_size_t m, const algebra::bigint<m> &modulus_p>
+                template<typename T1, typename T2, mp_std::size_t m, const algebra::bigint<m> &modulus_p>
                 knowledge_commitment<T1, T2> operator*(const algebra::Fp_model<m, modulus_p> &lhs,
                                                        const knowledge_commitment<T1, T2> &rhs) {
                     return (lhs.as_bigint()) * rhs;
@@ -169,7 +169,7 @@ namespace nil {
                 }
 
                 template<typename T1, typename T2>
-                size_t knowledge_commitment<T1, T2>::size_in_bits() {
+                std::size_t knowledge_commitment<T1, T2>::size_in_bits() {
                     return T1::size_in_bits() + T2::size_in_bits();
                 }
 
@@ -199,7 +199,7 @@ namespace nil {
                     std::vector<T1> g_vec;
                     g_vec.reserve(vec.size());
 
-                    for (size_t i = 0; i < vec.size(); ++i) {
+                    for (std::size_t i = 0; i < vec.size(); ++i) {
                         if (!vec[i].g.is_zero()) {
                             g_vec.emplace_back(vec[i].g);
                         }
@@ -210,7 +210,7 @@ namespace nil {
                     T1 T1_zero_special = T1::zero();
                     T1_zero_special.to_special();
 
-                    for (size_t i = 0; i < vec.size(); ++i) {
+                    for (std::size_t i = 0; i < vec.size(); ++i) {
                         if (!vec[i].g.is_zero()) {
                             vec[i].g = *g_it;
                             ++g_it;
@@ -225,7 +225,7 @@ namespace nil {
                     std::vector<T2> h_vec;
                     h_vec.reserve(vec.size());
 
-                    for (size_t i = 0; i < vec.size(); ++i) {
+                    for (std::size_t i = 0; i < vec.size(); ++i) {
                         if (!vec[i].h.is_zero()) {
                             h_vec.emplace_back(vec[i].h);
                         }
@@ -236,7 +236,7 @@ namespace nil {
                     T2 T2_zero_special = T2::zero();
                     T2_zero_special.to_special();
 
-                    for (size_t i = 0; i < vec.size(); ++i) {
+                    for (std::size_t i = 0; i < vec.size(); ++i) {
                         if (!vec[i].h.is_zero()) {
                             vec[i].h = *h_it;
                             ++h_it;

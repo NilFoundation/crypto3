@@ -35,9 +35,9 @@ namespace nil {
                 template<typename T>
                 struct sparse_vector {
 
-                    std::vector<size_t> indices;
+                    std::vector<std::size_t> indices;
                     std::vector<T> values;
-                    size_t domain_size_;
+                    std::size_t domain_size_;
 
                     sparse_vector() = default;
                     sparse_vector(const sparse_vector<T> &other) = default;
@@ -47,7 +47,7 @@ namespace nil {
                     sparse_vector<T> &operator=(const sparse_vector<T> &other) = default;
                     sparse_vector<T> &operator=(sparse_vector<T> &&other) = default;
 
-                    T operator[](const size_t idx) const;
+                    T operator[](const std::size_t idx) const;
 
                     bool operator==(const sparse_vector<T> &other) const;
                     bool operator==(const std::vector<T> &other) const;
@@ -55,10 +55,10 @@ namespace nil {
                     bool is_valid() const;
                     bool empty() const;
 
-                    size_t domain_size() const;    // return domain_size_
-                    size_t
+                    std::size_t domain_size() const;    // return domain_size_
+                    std::size_t
                         size() const;    // return the number of indices (representing the number of non-zero entries)
-                    size_t size_in_bits() const;    // return the number bits needed to store the sparse vector
+                    std::size_t size_in_bits() const;    // return the number bits needed to store the sparse vector
 
                     /* return a pair consisting of the accumulated value and the sparse vector of non-accumulated values
                      */
@@ -66,7 +66,7 @@ namespace nil {
                     std::pair<T, sparse_vector<T>>
                         accumulate(const typename std::vector<FieldType>::const_iterator &it_begin,
                                    const typename std::vector<FieldType>::const_iterator &it_end,
-                                   const size_t offset) const;
+                                   const std::size_t offset) const;
 
                     friend std::ostream &operator<<<T>(std::ostream &out, const sparse_vector<T> &v);
                     friend std::istream &operator>><T>(std::istream &in, sparse_vector<T> &v);
@@ -86,7 +86,7 @@ namespace nil {
                 }
 
                 template<typename T>
-                T sparse_vector<T>::operator[](const size_t idx) const {
+                T sparse_vector<T>::operator[](const std::size_t idx) const {
                     auto it = std::lower_bound(indices.begin(), indices.end(), idx);
                     return (it != indices.end() && *it == idx) ? values[it - indices.begin()] : T();
                 }
@@ -97,7 +97,7 @@ namespace nil {
                         return false;
                     }
 
-                    size_t this_pos = 0, other_pos = 0;
+                    std::size_t this_pos = 0, other_pos = 0;
                     while (this_pos < this->indices.size() && other_pos < other.indices.size()) {
                         if (this->indices[this_pos] == other.indices[other_pos]) {
                             if (this->values[this_pos] != other.values[other_pos]) {
@@ -142,8 +142,8 @@ namespace nil {
                         return false;
                     }
 
-                    size_t j = 0;
-                    for (size_t i = 0; i < other.size(); ++i) {
+                    std::size_t j = 0;
+                    for (std::size_t i = 0; i < other.size(); ++i) {
                         if (this->indices[j] == i) {
                             if (this->values[j] != other[j]) {
                                 return false;
@@ -165,7 +165,7 @@ namespace nil {
                         return false;
                     }
 
-                    for (size_t i = 0; i + 1 < indices.size(); ++i) {
+                    for (std::size_t i = 0; i + 1 < indices.size(); ++i) {
                         if (indices[i] >= indices[i + 1]) {
                             return false;
                         }
@@ -184,18 +184,18 @@ namespace nil {
                 }
 
                 template<typename T>
-                size_t sparse_vector<T>::domain_size() const {
+                std::size_t sparse_vector<T>::domain_size() const {
                     return domain_size_;
                 }
 
                 template<typename T>
-                size_t sparse_vector<T>::size() const {
+                std::size_t sparse_vector<T>::size() const {
                     return indices.size();
                 }
 
                 template<typename T>
-                size_t sparse_vector<T>::size_in_bits() const {
-                    return indices.size() * (sizeof(size_t) * 8 + T::size_in_bits());
+                std::size_t sparse_vector<T>::size_in_bits() const {
+                    return indices.size() * (sizeof(std::size_t) * 8 + T::size_in_bits());
                 }
 
                 template<typename T>
@@ -203,26 +203,26 @@ namespace nil {
                 std::pair<T, sparse_vector<T>>
                     sparse_vector<T>::accumulate(const typename std::vector<FieldType>::const_iterator &it_begin,
                                                  const typename std::vector<FieldType>::const_iterator &it_end,
-                                                 const size_t offset) const {
+                                                 const std::size_t offset) const {
 #ifdef MULTICORE
-                    const size_t chunks = omp_get_max_threads();    // to override, set OMP_NUM_THREADS env var or call
+                    const std::size_t chunks = omp_get_max_threads();    // to override, set OMP_NUM_THREADS env var or call
                                                                     // omp_set_num_threads()
 #else
-                    const size_t chunks = 1;
+                    const std::size_t chunks = 1;
 #endif
 
                     T accumulated_value = T::zero();
                     sparse_vector<T> resulting_vector;
                     resulting_vector.domain_size_ = domain_size_;
 
-                    const size_t range_len = it_end - it_begin;
+                    const std::size_t range_len = it_end - it_begin;
                     bool in_block = false;
-                    size_t
+                    std::size_t
                         first_pos = -1,
                         last_pos =
                             -1;    // g++ -flto emits unitialized warning, even though in_block guards for such cases.
 
-                    for (size_t i = 0; i < indices.size(); ++i) {
+                    for (std::size_t i = 0; i < indices.size(); ++i) {
                         const bool matching_pos = (offset <= indices[i] && indices[i] < offset + range_len);
                         // printf("i = %zu, pos[i] = %zu, offset = %zu, w_size = %zu\n", i, indices[i], offset, w_size);
                         bool copy_over;
@@ -289,7 +289,7 @@ namespace nil {
                 std::ostream &operator<<(std::ostream &out, const sparse_vector<T> &v) {
                     out << v.domain_size_ << "\n";
                     out << v.indices.size() << "\n";
-                    for (const size_t &i : v.indices) {
+                    for (const std::size_t &i : v.indices) {
                         out << i << "\n";
                     }
 
@@ -306,11 +306,11 @@ namespace nil {
                     in >> v.domain_size_;
                     algebra::consume_newline(in);
 
-                    size_t s;
+                    std::size_t s;
                     in >> s;
                     algebra::consume_newline(in);
                     v.indices.resize(s);
-                    for (size_t i = 0; i < s; ++i) {
+                    for (std::size_t i = 0; i < s; ++i) {
                         in >> v.indices[i];
                         algebra::consume_newline(in);
                     }
@@ -320,7 +320,7 @@ namespace nil {
                     algebra::consume_newline(in);
                     v.values.reserve(s);
 
-                    for (size_t i = 0; i < s; ++i) {
+                    for (std::size_t i = 0; i < s; ++i) {
                         T t;
                         in >> t;
                         algebra::consume_OUTPUT_NEWLINE(in);

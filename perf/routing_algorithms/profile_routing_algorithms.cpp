@@ -15,7 +15,7 @@
 
 using namespace nil::crypto3::zk::snark;
 
-void profile_benes_algorithm(const size_t n) {
+void profile_benes_algorithm(const std::size_t n) {
     printf("* Size: %zu\n", n);
 
     assert(n == 1ul << static_cast<std::size_t>(std::ceil(std::log2(n))));
@@ -26,7 +26,7 @@ void profile_benes_algorithm(const size_t n) {
     const benes_routing routing = get_benes_routing(permutation);
 }
 
-void profile_as_waksman_algorithm(const size_t n) {
+void profile_as_waksman_algorithm(const std::size_t n) {
     printf("* Size: %zu\n", n);
 
     integer_permutation permutation(n);
@@ -36,11 +36,11 @@ void profile_as_waksman_algorithm(const size_t n) {
 }
 
 int main() {
-    for (size_t n = 1ul << 10; n <= 1ul << 20; n <<= 1) {
+    for (std::size_t n = 1ul << 10; n <= 1ul << 20; n <<= 1) {
         profile_benes_algorithm(n);
     }
 
-    for (size_t n = 1ul << 10; n <= 1ul << 20; n <<= 1) {
+    for (std::size_t n = 1ul << 10; n <= 1ul << 20; n <<= 1) {
         profile_as_waksman_algorithm(n);
     }
 }

@@ -22,7 +22,7 @@
 using namespace nil::crypto3::zk::snark;
 
 template<typename FieldType>
-void test_qap(const size_t qap_degree, const size_t num_inputs, const bool binary_input) {
+void test_qap(const std::size_t qap_degree, const std::size_t num_inputs, const bool binary_input) {
     /*
       We construct an instance where the QAP degree is qap_degree.
       So we generate an instance of R1CS where the number of constraints qap_degree - num_inputs - 1.
@@ -31,7 +31,7 @@ void test_qap(const size_t qap_degree, const size_t num_inputs, const bool binar
     */
     BOOST_CHECK(num_inputs + 1 <= qap_degree);
 
-    const size_t num_constraints = qap_degree - num_inputs - 1;
+    const std::size_t num_constraints = qap_degree - num_inputs - 1;
 
     r1cs_example<FieldType> example;
     if (binary_input) {
@@ -60,12 +60,12 @@ void test_qap(const size_t qap_degree, const size_t num_inputs, const bool binar
 BOOST_AUTO_TEST_SUITE(qap_test_suite)
 
 BOOST_AUTO_TEST_CASE(qap_test_case) {
-    const size_t num_inputs = 10;
+    const std::size_t num_inputs = 10;
 
-    const size_t basic_domain_size = 1ul << algebra::mnt6_Fr::s;
-    const size_t step_domain_size = (1ul << 10) + (1ul << 8);
-    const size_t extended_domain_size = 1ul << (algebra::mnt6_Fr::s + 1);
-    const size_t extended_domain_size_special = extended_domain_size - 1;
+    const std::size_t basic_domain_size = 1ul << algebra::mnt6_Fr::s;
+    const std::size_t step_domain_size = (1ul << 10) + (1ul << 8);
+    const std::size_t extended_domain_size = 1ul << (algebra::mnt6_Fr::s + 1);
+    const std::size_t extended_domain_size_special = extended_domain_size - 1;
 
     test_qap<algebra::Fr<algebra::mnt6_pp>>(basic_domain_size, num_inputs, true);
     test_qap<algebra::Fr<algebra::mnt6_pp>>(step_domain_size, num_inputs, true);

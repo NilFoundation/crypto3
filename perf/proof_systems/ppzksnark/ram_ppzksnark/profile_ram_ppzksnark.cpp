@@ -36,7 +36,7 @@ int main(int argc, const char *argv[]) {
         return 1;
     }
 
-    const size_t w = atoi(argv[1]), k = atoi(argv[2]), program_size = atoi(argv[3]), input_size = atoi(argv[4]),
+    const std::size_t w = atoi(argv[1]), k = atoi(argv[2]), program_size = atoi(argv[3]), input_size = atoi(argv[4]),
                  time_bound = atoi(argv[5]);
 
     typedef ram_ppzksnark_machine_pp<default_ram_ppzksnark_pp> machine_ppT;
@@ -44,7 +44,7 @@ int main(int argc, const char *argv[]) {
     const ram_ppzksnark_architecture_params<default_ram_ppzksnark_pp> ap(w, k);
 
     algebra::enter_block("Generate RAM example");
-    const size_t boot_trace_size_bound = program_size + input_size;
+    const std::size_t boot_trace_size_bound = program_size + input_size;
     const bool satisfiable = true;
     ram_example<machine_ppT> example =
         gen_ram_example_complex<machine_ppT>(ap, boot_trace_size_bound, time_bound, satisfiable);

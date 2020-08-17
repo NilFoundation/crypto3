@@ -22,7 +22,7 @@ using namespace nil::crypto3::zk::snark;
 /**
  * Test Benes network routing for all permutations on 2^static_cast<std::size_t>(std::ceil(std::log2(N))) elements.
  */
-void test_benes(const size_t N) {
+void test_benes(const std::size_t N) {
     integer_permutation permutation(1ul << static_cast<std::size_t>(std::ceil(std::log2(N))));
 
     do {
@@ -34,7 +34,7 @@ void test_benes(const size_t N) {
 /**
  * Test AS-Waksman network routing for all permutations on N elements.
  */
-void test_as_waksman(const size_t N) {
+void test_as_waksman(const std::size_t N) {
     integer_permutation permutation(N);
 
     do {
@@ -46,12 +46,12 @@ void test_as_waksman(const size_t N) {
 BOOST_AUTO_TEST_SUITE(routing_algorithms_test_suite)
 
 BOOST_AUTO_TEST_CASE(routing_algorithms_test) {
-    size_t bn_size = 8;
+    std::size_t bn_size = 8;
     printf("* for all permutations on %zu elements\n", bn_size);
     test_benes(bn_size);
 
-    size_t asw_max_size = 9;
-    for (size_t i = 2; i <= asw_max_size; ++i) {
+    std::size_t asw_max_size = 9;
+    for (std::size_t i = 2; i <= asw_max_size; ++i) {
         test_as_waksman(i);
     }
 }

@@ -150,7 +150,7 @@ namespace nil {
                         }
                     }
 
-                    for (size_t i = 0;
+                    for (std::size_t i = 0;
                          i < circuit.primary_input_size + circuit.auxiliary_input_size + circuit.gates.size();
                          ++i) {
                         /* require that 2 * wire - 1 \in {-1,1}, that is wire \in {0,1} */

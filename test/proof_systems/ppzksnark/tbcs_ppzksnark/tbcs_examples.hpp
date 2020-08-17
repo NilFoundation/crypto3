@@ -58,16 +58,16 @@ namespace nil {
                  * previous gates,
                  * - selecting a gate type at random (subject to the constraint "output = 0" if this is an output gate).
                  */
-                tbcs_example generate_tbcs_example(size_t primary_input_size,
-                                                   size_t auxiliary_input_size,
-                                                   size_t num_gates,
-                                                   size_t num_outputs) {
+                tbcs_example generate_tbcs_example(std::size_t primary_input_size,
+                                                   std::size_t auxiliary_input_size,
+                                                   std::size_t num_gates,
+                                                   std::size_t num_outputs) {
                     tbcs_example example;
-                    for (size_t i = 0; i < primary_input_size; ++i) {
+                    for (std::size_t i = 0; i < primary_input_size; ++i) {
                         example.primary_input.push_back(std::rand() % 2 == 0 ? false : true);
                     }
 
-                    for (size_t i = 0; i < auxiliary_input_size; ++i) {
+                    for (std::size_t i = 0; i < auxiliary_input_size; ++i) {
                         example.auxiliary_input.push_back(std::rand() % 2 == 0 ? false : true);
                     }
 
@@ -78,8 +78,8 @@ namespace nil {
                     all_vals.insert(all_vals.end(), example.primary_input.begin(), example.primary_input.end());
                     all_vals.insert(all_vals.end(), example.auxiliary_input.begin(), example.auxiliary_input.end());
 
-                    for (size_t i = 0; i < num_gates; ++i) {
-                        const size_t num_variables = primary_input_size + auxiliary_input_size + i;
+                    for (std::size_t i = 0; i < num_gates; ++i) {
+                        const std::size_t num_variables = primary_input_size + auxiliary_input_size + i;
                         tbcs_gate gate;
                         gate.left_wire = std::rand() % (num_variables + 1);
                         gate.right_wire = std::rand() % (num_variables + 1);

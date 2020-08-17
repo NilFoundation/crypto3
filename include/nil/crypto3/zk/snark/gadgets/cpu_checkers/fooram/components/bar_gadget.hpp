@@ -47,7 +47,7 @@ namespace nil {
                     std::shared_ptr<packing_gadget<FieldType>> unpack_result;
                     std::shared_ptr<packing_gadget<FieldType>> pack_Z;
 
-                    size_t width;
+                    std::size_t width;
                     bar_gadget(protoboard<FieldType> &pb,
                                const pb_linear_combination_array<FieldType> &X,
                                const FieldType &a,

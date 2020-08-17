@@ -22,13 +22,13 @@ namespace nil {
                 template<typename FieldType>
                 class digest_variable : public gadget<FieldType> {
                 public:
-                    size_t digest_size;
+                    std::size_t digest_size;
                     pb_variable_array<FieldType> bits;
 
-                    digest_variable<FieldType>(protoboard<FieldType> &pb, size_t digest_size);
+                    digest_variable<FieldType>(protoboard<FieldType> &pb, std::size_t digest_size);
 
                     digest_variable<FieldType>(protoboard<FieldType> &pb,
-                                               size_t digest_size,
+                                               std::size_t digest_size,
                                                const pb_variable_array<FieldType> &partial_bits,
                                                const pb_variable<FieldType> &padding);
 
@@ -40,10 +40,10 @@ namespace nil {
                 template<typename FieldType>
                 class block_variable : public gadget<FieldType> {
                 public:
-                    size_t block_size;
+                    std::size_t block_size;
                     pb_variable_array<FieldType> bits;
 
-                    block_variable(protoboard<FieldType> &pb, size_t block_size);
+                    block_variable(protoboard<FieldType> &pb, std::size_t block_size);
 
                     block_variable(protoboard<FieldType> &pb, const std::vector<pb_variable_array<FieldType>> &parts);
 
@@ -57,14 +57,14 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                digest_variable<FieldType>::digest_variable(protoboard<FieldType> &pb, size_t digest_size) :
+                digest_variable<FieldType>::digest_variable(protoboard<FieldType> &pb, std::size_t digest_size) :
                     gadget<FieldType>(pb), digest_size(digest_size) {
                     bits.allocate(pb, digest_size);
                 }
 
                 template<typename FieldType>
                 digest_variable<FieldType>::digest_variable(protoboard<FieldType> &pb,
-                                                            size_t digest_size,
+                                                            std::size_t digest_size,
                                                             const pb_variable_array<FieldType> &partial_bits,
                                                             const pb_variable<FieldType> &padding) :
                     gadget<FieldType>(pb),
@@ -78,7 +78,7 @@ namespace nil {
 
                 template<typename FieldType>
                 void digest_variable<FieldType>::generate_r1cs_constraints() {
-                    for (size_t i = 0; i < digest_size; ++i) {
+                    for (std::size_t i = 0; i < digest_size; ++i) {
                         generate_boolean_r1cs_constraint<FieldType>(this->pb, bits[i]);
                     }
                 }
@@ -94,7 +94,7 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                block_variable<FieldType>::block_variable(protoboard<FieldType> &pb, size_t block_size) :
+                block_variable<FieldType>::block_variable(protoboard<FieldType> &pb, std::size_t block_size) :
                     gadget<FieldType>(pb), block_size(block_size) {
                     bits.allocate(pb, block_size);
                 }

@@ -50,34 +50,34 @@ namespace nil {
                 template<typename FieldType>
                 class ssp_instance {
                 private:
-                    size_t num_variables_;
-                    size_t degree_;
-                    size_t num_inputs_;
+                    std::size_t num_variables_;
+                    std::size_t degree_;
+                    std::size_t num_inputs_;
 
                 public:
                     std::shared_ptr<algebra::fft::evaluation_domain<FieldType>> domain;
 
-                    std::vector<std::map<size_t, FieldType>> V_in_Lagrange_basis;
+                    std::vector<std::map<std::size_t, FieldType>> V_in_Lagrange_basis;
 
                     ssp_instance(const std::shared_ptr<algebra::fft::evaluation_domain<FieldType>> &domain,
-                                 const size_t num_variables,
-                                 const size_t degree,
-                                 const size_t num_inputs,
-                                 const std::vector<std::map<size_t, FieldType>> &V_in_Lagrange_basis);
+                                 const std::size_t num_variables,
+                                 const std::size_t degree,
+                                 const std::size_t num_inputs,
+                                 const std::vector<std::map<std::size_t, FieldType>> &V_in_Lagrange_basis);
                     ssp_instance(const std::shared_ptr<algebra::fft::evaluation_domain<FieldType>> &domain,
-                                 const size_t num_variables,
-                                 const size_t degree,
-                                 const size_t num_inputs,
-                                 std::vector<std::map<size_t, FieldType>> &&V_in_Lagrange_basis);
+                                 const std::size_t num_variables,
+                                 const std::size_t degree,
+                                 const std::size_t num_inputs,
+                                 std::vector<std::map<std::size_t, FieldType>> &&V_in_Lagrange_basis);
 
                     ssp_instance(const ssp_instance<FieldType> &other) = default;
                     ssp_instance(ssp_instance<FieldType> &&other) = default;
                     ssp_instance &operator=(const ssp_instance<FieldType> &other) = default;
                     ssp_instance &operator=(ssp_instance<FieldType> &&other) = default;
 
-                    size_t num_variables() const;
-                    size_t degree() const;
-                    size_t num_inputs() const;
+                    std::size_t num_variables() const;
+                    std::size_t degree() const;
+                    std::size_t num_inputs() const;
 
                     bool is_satisfied(const ssp_witness<FieldType> &witness) const;
                 };
@@ -95,9 +95,9 @@ namespace nil {
                 template<typename FieldType>
                 class ssp_instance_evaluation {
                 private:
-                    size_t num_variables_;
-                    size_t degree_;
-                    size_t num_inputs_;
+                    std::size_t num_variables_;
+                    std::size_t degree_;
+                    std::size_t num_inputs_;
 
                 public:
                     std::shared_ptr<algebra::fft::evaluation_domain<FieldType>> domain;
@@ -109,17 +109,17 @@ namespace nil {
                     FieldType Zt;
 
                     ssp_instance_evaluation(const std::shared_ptr<algebra::fft::evaluation_domain<FieldType>> &domain,
-                                            const size_t num_variables,
-                                            const size_t degree,
-                                            const size_t num_inputs,
+                                            const std::size_t num_variables,
+                                            const std::size_t degree,
+                                            const std::size_t num_inputs,
                                             const FieldType &t,
                                             const std::vector<FieldType> &Vt,
                                             const std::vector<FieldType> &Ht,
                                             const FieldType &Zt);
                     ssp_instance_evaluation(const std::shared_ptr<algebra::fft::evaluation_domain<FieldType>> &domain,
-                                            const size_t num_variables,
-                                            const size_t degree,
-                                            const size_t num_inputs,
+                                            const std::size_t num_variables,
+                                            const std::size_t degree,
+                                            const std::size_t num_inputs,
                                             const FieldType &t,
                                             std::vector<FieldType> &&Vt,
                                             std::vector<FieldType> &&Ht,
@@ -130,9 +130,9 @@ namespace nil {
                     ssp_instance_evaluation &operator=(const ssp_instance_evaluation<FieldType> &other) = default;
                     ssp_instance_evaluation &operator=(ssp_instance_evaluation<FieldType> &&other) = default;
 
-                    size_t num_variables() const;
-                    size_t degree() const;
-                    size_t num_inputs() const;
+                    std::size_t num_variables() const;
+                    std::size_t degree() const;
+                    std::size_t num_inputs() const;
 
                     bool is_satisfied(const ssp_witness<FieldType> &witness) const;
                 };
@@ -143,9 +143,9 @@ namespace nil {
                 template<typename FieldType>
                 class ssp_witness {
                 private:
-                    size_t num_variables_;
-                    size_t degree_;
-                    size_t num_inputs_;
+                    std::size_t num_variables_;
+                    std::size_t degree_;
+                    std::size_t num_inputs_;
 
                 public:
                     FieldType d;
@@ -153,15 +153,15 @@ namespace nil {
                     std::vector<FieldType> coefficients_for_Vs;
                     std::vector<FieldType> coefficients_for_H;
 
-                    ssp_witness(const size_t num_variables,
-                                const size_t degree,
-                                const size_t num_inputs,
+                    ssp_witness(const std::size_t num_variables,
+                                const std::size_t degree,
+                                const std::size_t num_inputs,
                                 const FieldType &d,
                                 const std::vector<FieldType> &coefficients_for_Vs,
                                 const std::vector<FieldType> &coefficients_for_H);
-                    ssp_witness(const size_t num_variables,
-                                const size_t degree,
-                                const size_t num_inputs,
+                    ssp_witness(const std::size_t num_variables,
+                                const std::size_t degree,
+                                const std::size_t num_inputs,
                                 const FieldType &d,
                                 const std::vector<FieldType> &coefficients_for_Vs,
                                 std::vector<FieldType> &&coefficients_for_H);
@@ -171,18 +171,18 @@ namespace nil {
                     ssp_witness &operator=(const ssp_witness<FieldType> &other) = default;
                     ssp_witness &operator=(ssp_witness<FieldType> &&other) = default;
 
-                    size_t num_variables() const;
-                    size_t degree() const;
-                    size_t num_inputs() const;
+                    std::size_t num_variables() const;
+                    std::size_t degree() const;
+                    std::size_t num_inputs() const;
                 };
 
                 template<typename FieldType>
                 ssp_instance<FieldType>::ssp_instance(
                     const std::shared_ptr<algebra::fft::evaluation_domain<FieldType>> &domain,
-                    const size_t num_variables,
-                    const size_t degree,
-                    const size_t num_inputs,
-                    const std::vector<std::map<size_t, FieldType>> &V_in_Lagrange_basis) :
+                    const std::size_t num_variables,
+                    const std::size_t degree,
+                    const std::size_t num_inputs,
+                    const std::vector<std::map<std::size_t, FieldType>> &V_in_Lagrange_basis) :
                     num_variables_(num_variables),
                     degree_(degree), num_inputs_(num_inputs), domain(domain), V_in_Lagrange_basis(V_in_Lagrange_basis) {
                 }
@@ -190,27 +190,27 @@ namespace nil {
                 template<typename FieldType>
                 ssp_instance<FieldType>::ssp_instance(
                     const std::shared_ptr<algebra::fft::evaluation_domain<FieldType>> &domain,
-                    const size_t num_variables,
-                    const size_t degree,
-                    const size_t num_inputs,
-                    std::vector<std::map<size_t, FieldType>> &&V_in_Lagrange_basis) :
+                    const std::size_t num_variables,
+                    const std::size_t degree,
+                    const std::size_t num_inputs,
+                    std::vector<std::map<std::size_t, FieldType>> &&V_in_Lagrange_basis) :
                     num_variables_(num_variables),
                     degree_(degree), num_inputs_(num_inputs), domain(domain),
                     V_in_Lagrange_basis(std::move(V_in_Lagrange_basis)) {
                 }
 
                 template<typename FieldType>
-                size_t ssp_instance<FieldType>::num_variables() const {
+                std::size_t ssp_instance<FieldType>::num_variables() const {
                     return num_variables_;
                 }
 
                 template<typename FieldType>
-                size_t ssp_instance<FieldType>::degree() const {
+                std::size_t ssp_instance<FieldType>::degree() const {
                     return degree_;
                 }
 
                 template<typename FieldType>
-                size_t ssp_instance<FieldType>::num_inputs() const {
+                std::size_t ssp_instance<FieldType>::num_inputs() const {
                     return num_inputs_;
                 }
 
@@ -225,14 +225,14 @@ namespace nil {
 
                     const std::vector<FieldType> u = this->domain->evaluate_all_lagrange_polynomials(t);
 
-                    for (size_t i = 0; i < this->num_variables() + 1; ++i) {
+                    for (std::size_t i = 0; i < this->num_variables() + 1; ++i) {
                         for (auto &el : V_in_Lagrange_basis[i]) {
                             Vt[i] += u[el.first] * el.second;
                         }
                     }
 
                     FieldType ti = FieldType::one();
-                    for (size_t i = 0; i < this->degree() + 1; ++i) {
+                    for (std::size_t i = 0; i < this->degree() + 1; ++i) {
                         Ht[i] = ti;
                         ti *= t;
                     }
@@ -251,9 +251,9 @@ namespace nil {
                 template<typename FieldType>
                 ssp_instance_evaluation<FieldType>::ssp_instance_evaluation(
                     const std::shared_ptr<algebra::fft::evaluation_domain<FieldType>> &domain,
-                    const size_t num_variables,
-                    const size_t degree,
-                    const size_t num_inputs,
+                    const std::size_t num_variables,
+                    const std::size_t degree,
+                    const std::size_t num_inputs,
                     const FieldType &t,
                     const std::vector<FieldType> &Vt,
                     const std::vector<FieldType> &Ht,
@@ -265,9 +265,9 @@ namespace nil {
                 template<typename FieldType>
                 ssp_instance_evaluation<FieldType>::ssp_instance_evaluation(
                     const std::shared_ptr<algebra::fft::evaluation_domain<FieldType>> &domain,
-                    const size_t num_variables,
-                    const size_t degree,
-                    const size_t num_inputs,
+                    const std::size_t num_variables,
+                    const std::size_t degree,
+                    const std::size_t num_inputs,
                     const FieldType &t,
                     std::vector<FieldType> &&Vt,
                     std::vector<FieldType> &&Ht,
@@ -278,17 +278,17 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                size_t ssp_instance_evaluation<FieldType>::num_variables() const {
+                std::size_t ssp_instance_evaluation<FieldType>::num_variables() const {
                     return num_variables_;
                 }
 
                 template<typename FieldType>
-                size_t ssp_instance_evaluation<FieldType>::degree() const {
+                std::size_t ssp_instance_evaluation<FieldType>::degree() const {
                     return degree_;
                 }
 
                 template<typename FieldType>
-                size_t ssp_instance_evaluation<FieldType>::num_inputs() const {
+                std::size_t ssp_instance_evaluation<FieldType>::num_inputs() const {
                     return num_inputs_;
                 }
 
@@ -349,9 +349,9 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                ssp_witness<FieldType>::ssp_witness(const size_t num_variables,
-                                                    const size_t degree,
-                                                    const size_t num_inputs,
+                ssp_witness<FieldType>::ssp_witness(const std::size_t num_variables,
+                                                    const std::size_t degree,
+                                                    const std::size_t num_inputs,
                                                     const FieldType &d,
                                                     const std::vector<FieldType> &coefficients_for_Vs,
                                                     const std::vector<FieldType> &coefficients_for_H) :
@@ -361,9 +361,9 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                ssp_witness<FieldType>::ssp_witness(const size_t num_variables,
-                                                    const size_t degree,
-                                                    const size_t num_inputs,
+                ssp_witness<FieldType>::ssp_witness(const std::size_t num_variables,
+                                                    const std::size_t degree,
+                                                    const std::size_t num_inputs,
                                                     const FieldType &d,
                                                     const std::vector<FieldType> &coefficients_for_Vs,
                                                     std::vector<FieldType> &&coefficients_for_H) :
@@ -373,17 +373,17 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                size_t ssp_witness<FieldType>::num_variables() const {
+                std::size_t ssp_witness<FieldType>::num_variables() const {
                     return num_variables_;
                 }
 
                 template<typename FieldType>
-                size_t ssp_witness<FieldType>::degree() const {
+                std::size_t ssp_witness<FieldType>::degree() const {
                     return degree_;
                 }
 
                 template<typename FieldType>
-                size_t ssp_witness<FieldType>::num_inputs() const {
+                std::size_t ssp_witness<FieldType>::num_inputs() const {
                     return num_inputs_;
                 }
             }    // namespace snark

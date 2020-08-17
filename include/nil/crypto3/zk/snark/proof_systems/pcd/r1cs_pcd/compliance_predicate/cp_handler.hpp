@@ -33,7 +33,7 @@ namespace nil {
                 template<typename FieldType>
                 class r1cs_pcd_message_variable : public gadget<FieldType> {
                 protected:
-                    size_t num_vars_at_construction;
+                    std::size_t num_vars_at_construction;
 
                 public:
                     pb_variable<FieldType> type;
@@ -56,7 +56,7 @@ namespace nil {
                 template<typename FieldType>
                 class r1cs_pcd_local_data_variable : public gadget<FieldType> {
                 protected:
-                    size_t num_vars_at_construction;
+                    std::size_t num_vars_at_construction;
 
                 public:
                     pb_variable_array<FieldType> all_vars;
@@ -85,18 +85,18 @@ namespace nil {
                     std::shared_ptr<r1cs_pcd_local_data_variable<FieldType>> local_data;
 
                 public:
-                    const size_t name;
-                    const size_t type;
-                    const size_t max_arity;
+                    const std::size_t name;
+                    const std::size_t type;
+                    const std::size_t max_arity;
                     const bool relies_on_same_type_inputs;
-                    const std::set<size_t> accepted_input_types;
+                    const std::set<std::size_t> accepted_input_types;
 
                     compliance_predicate_handler(const protoboardT &pb,
-                                                 const size_t name,
-                                                 const size_t type,
-                                                 const size_t max_arity,
+                                                 const std::size_t name,
+                                                 const std::size_t type,
+                                                 const std::size_t max_arity,
                                                  const bool relies_on_same_type_inputs,
-                                                 const std::set<size_t> accepted_input_types = std::set<size_t>());
+                                                 const std::set<std::size_t> accepted_input_types = std::set<std::size_t>());
                     virtual void generate_r1cs_constraints() = 0;
                     virtual void generate_r1cs_witness(
                         const std::vector<std::shared_ptr<r1cs_pcd_message<FieldType>>> &incoming_message_values,
@@ -106,8 +106,8 @@ namespace nil {
                     r1cs_variable_assignment<FieldType> get_full_variable_assignment() const;
 
                     std::shared_ptr<r1cs_pcd_message<FieldType>> get_outgoing_message() const;
-                    size_t get_arity() const;
-                    std::shared_ptr<r1cs_pcd_message<FieldType>> get_incoming_message(const size_t message_idx) const;
+                    std::size_t get_arity() const;
+                    std::shared_ptr<r1cs_pcd_message<FieldType>> get_incoming_message(const std::size_t message_idx) const;
                     std::shared_ptr<r1cs_pcd_local_data<FieldType>> get_local_data() const;
                     r1cs_variable_assignment<FieldType> get_witness() const;
                 };
@@ -127,7 +127,7 @@ namespace nil {
                      * only gadget allocating variables on the protoboard and needs to
                      * be updated, e.g., in multicore variable allocation scenario. */
 
-                    for (size_t var_idx = num_vars_at_construction + 1; var_idx <= this->pb.num_variables();
+                    for (std::size_t var_idx = num_vars_at_construction + 1; var_idx <= this->pb.num_variables();
                          ++var_idx) {
                         all_vars.emplace_back(pb_variable<FieldType>(var_idx));
                     }
@@ -149,7 +149,7 @@ namespace nil {
                 void r1cs_pcd_local_data_variable<FieldType>::update_all_vars() {
                     /* (the same NOTE as for r1cs_message_variable applies) */
 
-                    for (size_t var_idx = num_vars_at_construction + 1; var_idx <= this->pb.num_variables();
+                    for (std::size_t var_idx = num_vars_at_construction + 1; var_idx <= this->pb.num_variables();
                          ++var_idx) {
                         all_vars.emplace_back(pb_variable<FieldType>(var_idx));
                     }
@@ -164,11 +164,11 @@ namespace nil {
                 template<typename FieldType, typename protoboardT>
                 compliance_predicate_handler<FieldType, protoboardT>::compliance_predicate_handler(
                     const protoboardT &pb,
-                    const size_t name,
-                    const size_t type,
-                    const size_t max_arity,
+                    const std::size_t name,
+                    const std::size_t type,
+                    const std::size_t max_arity,
                     const bool relies_on_same_type_inputs,
-                    const std::set<size_t> &accepted_input_types) :
+                    const std::set<std::size_t> &accepted_input_types) :
                     pb(pb),
                     name(name), type(type), max_arity(max_arity),
                     relies_on_same_type_inputs(relies_on_same_type_inputs), accepted_input_types(accepted_input_types) {
@@ -183,7 +183,7 @@ namespace nil {
                     pb.val(outgoing_message->type) = FieldType(type);
                     pb.val(arity) = FieldType(incoming_message_values.size());
 
-                    for (size_t i = 0; i < incoming_message_values.size(); ++i) {
+                    for (std::size_t i = 0; i < incoming_message_values.size(); ++i) {
                         incoming_messages[i]->generate_r1cs_witness(incoming_message_values[i]);
                     }
 
@@ -195,23 +195,23 @@ namespace nil {
                     compliance_predicate_handler<FieldType, protoboardT>::get_compliance_predicate() const {
                     assert(incoming_messages.size() == max_arity);
 
-                    const size_t outgoing_message_payload_length = outgoing_message->all_vars.size() - 1;
+                    const std::size_t outgoing_message_payload_length = outgoing_message->all_vars.size() - 1;
 
-                    std::vector<size_t> incoming_message_payload_lengths(max_arity);
+                    std::vector<std::size_t> incoming_message_payload_lengths(max_arity);
                     std::transform(incoming_messages.begin(), incoming_messages.end(),
                                    incoming_message_payload_lengths.begin(),
                                    [](const std::shared_ptr<r1cs_pcd_message_variable<FieldType>> &msg) {
                                        return msg->all_vars.size() - 1;
                                    });
 
-                    const size_t local_data_length = local_data->all_vars.size();
+                    const std::size_t local_data_length = local_data->all_vars.size();
 
-                    const size_t all_but_witness_length =
+                    const std::size_t all_but_witness_length =
                         ((1 + outgoing_message_payload_length) + 1 +
                          (max_arity + std::accumulate(incoming_message_payload_lengths.begin(),
                                                       incoming_message_payload_lengths.end(), 0)) +
                          local_data_length);
-                    const size_t witness_length = pb.num_variables() - all_but_witness_length;
+                    const std::size_t witness_length = pb.num_variables() - all_but_witness_length;
 
                     r1cs_constraint_system<FieldType> constraint_system = pb.get_constraint_system();
                     constraint_system.primary_input_size = 1 + outgoing_message_payload_length;
@@ -242,14 +242,14 @@ namespace nil {
                 }
 
                 template<typename FieldType, typename protoboardT>
-                size_t compliance_predicate_handler<FieldType, protoboardT>::get_arity() const {
+                std::size_t compliance_predicate_handler<FieldType, protoboardT>::get_arity() const {
                     return pb.val(arity).as_ulong();
                 }
 
                 template<typename FieldType, typename protoboardT>
                 std::shared_ptr<r1cs_pcd_message<FieldType>>
                     compliance_predicate_handler<FieldType, protoboardT>::get_incoming_message(
-                        const size_t message_idx) const {
+                        const std::size_t message_idx) const {
                     assert(message_idx < max_arity);
                     return incoming_messages[message_idx]->get_message();
                 }
@@ -264,11 +264,11 @@ namespace nil {
                 r1cs_pcd_witness<FieldType> compliance_predicate_handler<FieldType, protoboardT>::get_witness() const {
                     const r1cs_variable_assignment<FieldType> va = pb.full_variable_assignment();
                     // outgoing_message + arity + incoming_messages + local_data
-                    const size_t witness_pos =
+                    const std::size_t witness_pos =
                         (outgoing_message->all_vars.size() + 1 +
                          std::accumulate(
                              incoming_messages.begin(), incoming_messages.end(), 0,
-                             [](size_t acc, const std::shared_ptr<r1cs_pcd_message_variable<FieldType>> &msg) {
+                             [](std::size_t acc, const std::shared_ptr<r1cs_pcd_message_variable<FieldType>> &msg) {
                                  return acc + msg->all_vars.size();
                              }) +
                          local_data->all_vars.size());

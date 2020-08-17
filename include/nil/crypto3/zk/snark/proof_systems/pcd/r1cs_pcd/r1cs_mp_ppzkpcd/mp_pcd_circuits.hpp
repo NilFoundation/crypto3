@@ -106,7 +106,7 @@ namespace nil {
 
                     mp_compliance_step_pcd_circuit_maker(
                         const r1cs_pcd_compliance_predicate<FieldType> &compliance_predicate,
-                        const size_t max_number_of_predicates);
+                        const std::size_t max_number_of_predicates);
                     void generate_r1cs_constraints();
                     r1cs_constraint_system<FieldType> get_circuit() const;
 
@@ -123,11 +123,11 @@ namespace nil {
                     r1cs_primary_input<FieldType> get_primary_input() const;
                     r1cs_auxiliary_input<FieldType> get_auxiliary_input() const;
 
-                    static size_t field_logsize();
-                    static size_t field_capacity();
-                    static size_t input_size_in_elts();
-                    static size_t input_capacity_in_bits();
-                    static size_t input_size_in_bits();
+                    static std::size_t field_logsize();
+                    static std::size_t field_capacity();
+                    static std::size_t input_size_in_elts();
+                    static std::size_t input_capacity_in_bits();
+                    static std::size_t input_size_in_bits();
                 };
 
                 /*************************** Translation step ********************************/
@@ -164,11 +164,11 @@ namespace nil {
                     r1cs_primary_input<FieldType> get_primary_input() const;
                     r1cs_auxiliary_input<FieldType> get_auxiliary_input() const;
 
-                    static size_t field_logsize();
-                    static size_t field_capacity();
-                    static size_t input_size_in_elts();
-                    static size_t input_capacity_in_bits();
-                    static size_t input_size_in_bits();
+                    static std::size_t field_logsize();
+                    static std::size_t field_capacity();
+                    static std::size_t input_size_in_elts();
+                    static std::size_t input_capacity_in_bits();
+                    static std::size_t input_size_in_bits();
                 };
 
                 /****************************** Input maps ***********************************/
@@ -192,26 +192,26 @@ namespace nil {
                 template<typename ppT>
                 mp_compliance_step_pcd_circuit_maker<ppT>::mp_compliance_step_pcd_circuit_maker(
                     const r1cs_pcd_compliance_predicate<FieldType> &compliance_predicate,
-                    const size_t max_number_of_predicates) :
+                    const std::size_t max_number_of_predicates) :
                     compliance_predicate(compliance_predicate) {
                     /* calculate some useful sizes */
-                    const size_t digest_size = CRH_with_field_out_gadget<FieldType>::get_digest_len();
-                    const size_t outgoing_msg_size_in_bits =
+                    const std::size_t digest_size = CRH_with_field_out_gadget<FieldType>::get_digest_len();
+                    const std::size_t outgoing_msg_size_in_bits =
                         field_logsize() * (1 + compliance_predicate.outgoing_message_payload_length);
                     assert(compliance_predicate.has_equal_input_lengths());
-                    const size_t translation_step_vk_size_in_bits =
+                    const std::size_t translation_step_vk_size_in_bits =
                         r1cs_ppzksnark_verification_key_variable<ppT>::size_in_bits(
                             mp_translation_step_pcd_circuit_maker<other_curve<ppT>>::input_size_in_elts());
-                    const size_t padded_verifier_input_size =
+                    const std::size_t padded_verifier_input_size =
                         mp_translation_step_pcd_circuit_maker<other_curve<ppT>>::input_capacity_in_bits();
-                    const size_t commitment_size =
+                    const std::size_t commitment_size =
                         set_commitment_gadget<FieldType, CRH_with_bit_out_gadget<FieldType>>::root_size_in_bits();
 
-                    const size_t output_block_size = commitment_size + outgoing_msg_size_in_bits;
-                    const size_t max_incoming_payload_length =
+                    const std::size_t output_block_size = commitment_size + outgoing_msg_size_in_bits;
+                    const std::size_t max_incoming_payload_length =
                         *std::max_element(compliance_predicate.incoming_message_payload_lengths.begin(),
                                           compliance_predicate.incoming_message_payload_lengths.end());
-                    const size_t max_input_block_size =
+                    const std::size_t max_input_block_size =
                         commitment_size + field_logsize() * (1 + max_incoming_payload_length);
 
                     CRH_with_bit_out_gadget<FieldType>::sample_randomness(
@@ -233,7 +233,7 @@ namespace nil {
                     incoming_message_types.resize(compliance_predicate.max_arity);
                     incoming_message_payloads.resize(compliance_predicate.max_arity);
                     incoming_message_vars.resize(compliance_predicate.max_arity);
-                    for (size_t i = 0; i < compliance_predicate.max_arity; ++i) {
+                    for (std::size_t i = 0; i < compliance_predicate.max_arity; ++i) {
                         incoming_message_types[i].allocate(pb);
                         incoming_message_payloads[i].allocate(pb,
                                                               compliance_predicate.incoming_message_payload_lengths[i]);
@@ -249,7 +249,7 @@ namespace nil {
 
                     /* convert compliance predicate from a constraint system into a gadget */
                     pb_variable_array<FieldType> incoming_messages_concat;
-                    for (size_t i = 0; i < compliance_predicate.max_arity; ++i) {
+                    for (std::size_t i = 0; i < compliance_predicate.max_arity; ++i) {
                         incoming_messages_concat.insert(incoming_messages_concat.end(),
                                                         incoming_message_vars[i].begin(),
                                                         incoming_message_vars[i].end());
@@ -267,8 +267,8 @@ namespace nil {
                         pb, outgoing_message_bits, outgoing_message_vars, field_logsize()));
 
                     incoming_messages_bits.resize(compliance_predicate.max_arity);
-                    for (size_t i = 0; i < compliance_predicate.max_arity; ++i) {
-                        const size_t incoming_msg_size_in_bits =
+                    for (std::size_t i = 0; i < compliance_predicate.max_arity; ++i) {
+                        const std::size_t incoming_msg_size_in_bits =
                             field_logsize() * (1 + compliance_predicate.incoming_message_payload_lengths[i]);
 
                         incoming_messages_bits[i].allocate(pb, incoming_msg_size_in_bits);
@@ -278,7 +278,7 @@ namespace nil {
 
                     /* allocate digests */
                     commitment_and_incoming_message_digests.resize(compliance_predicate.max_arity);
-                    for (size_t i = 0; i < compliance_predicate.max_arity; ++i) {
+                    for (std::size_t i = 0; i < compliance_predicate.max_arity; ++i) {
                         commitment_and_incoming_message_digests[i].allocate(pb, digest_size);
                     }
 
@@ -307,7 +307,7 @@ namespace nil {
                         translation_step_vks_bits.resize(compliance_predicate.max_arity);
                         membership_check_results.allocate(pb, compliance_predicate.max_arity);
 
-                        for (size_t i = 0; i < compliance_predicate.max_arity; ++i) {
+                        for (std::size_t i = 0; i < compliance_predicate.max_arity; ++i) {
                             translation_step_vks_bits[i].allocate(pb, translation_step_vk_size_in_bits);
 
                             membership_proofs.emplace_back(
@@ -328,7 +328,7 @@ namespace nil {
                     block_for_outgoing_message.reset(
                         new block_variable<FieldType>(pb, {commitment->bits, outgoing_message_bits}));
 
-                    for (size_t i = 0; i < compliance_predicate.max_arity; ++i) {
+                    for (std::size_t i = 0; i < compliance_predicate.max_arity; ++i) {
                         block_for_incoming_messages.emplace_back(
                             block_variable<FieldType>(pb, {commitment->bits, incoming_messages_bits[i]}));
                     }
@@ -337,8 +337,8 @@ namespace nil {
                     hash_outgoing_message.reset(new CRH_with_field_out_gadget<FieldType>(
                         pb, output_block_size, *block_for_outgoing_message, mp_compliance_step_pcd_circuit_input));
 
-                    for (size_t i = 0; i < compliance_predicate.max_arity; ++i) {
-                        const size_t input_block_size = commitment_size + incoming_messages_bits[i].size();
+                    for (std::size_t i = 0; i < compliance_predicate.max_arity; ++i) {
+                        const std::size_t input_block_size = commitment_size + incoming_messages_bits[i].size();
                         hash_incoming_messages.emplace_back(
                             CRH_with_field_out_gadget<FieldType>(pb, input_block_size, block_for_incoming_messages[i],
                                                                  commitment_and_incoming_message_digests[i]));
@@ -353,7 +353,7 @@ namespace nil {
                             pb, translation_step_vks_bits[0],
                             mp_translation_step_pcd_circuit_maker<other_curve<ppT>>::input_size_in_elts()));
                     } else {
-                        for (size_t i = 0; i < compliance_predicate.max_arity; ++i) {
+                        for (std::size_t i = 0; i < compliance_predicate.max_arity; ++i) {
                             translation_step_vks.emplace_back(r1cs_ppzksnark_verification_key_variable<ppT>(
                                 pb, translation_step_vks_bits[i],
                                 mp_translation_step_pcd_circuit_maker<other_curve<ppT>>::input_size_in_elts()));
@@ -363,7 +363,7 @@ namespace nil {
                     verification_results.allocate(pb, compliance_predicate.max_arity);
                     commitment_and_incoming_messages_digest_bits.resize(compliance_predicate.max_arity);
 
-                    for (size_t i = 0; i < compliance_predicate.max_arity; ++i) {
+                    for (std::size_t i = 0; i < compliance_predicate.max_arity; ++i) {
                         commitment_and_incoming_messages_digest_bits[i].allocate(pb, digest_size * field_logsize());
                         unpack_commitment_and_incoming_message_digests.emplace_back(
                             multipacking_gadget<FieldType>(pb,
@@ -394,25 +394,25 @@ namespace nil {
 
                 template<typename ppT>
                 void mp_compliance_step_pcd_circuit_maker<ppT>::generate_r1cs_constraints() {
-                    const size_t digest_size = CRH_with_bit_out_gadget<FieldType>::get_digest_len();
-                    const size_t dimension = knapsack_dimension<FieldType>::dimension;
+                    const std::size_t digest_size = CRH_with_bit_out_gadget<FieldType>::get_digest_len();
+                    const std::size_t dimension = knapsack_dimension<FieldType>::dimension;
                     unpack_outgoing_message->generate_r1cs_constraints(true);
 
-                    for (size_t i = 0; i < compliance_predicate.max_arity; ++i) {
+                    for (std::size_t i = 0; i < compliance_predicate.max_arity; ++i) {
                         unpack_incoming_messages[i].generate_r1cs_constraints(true);
                     }
 
-                    for (size_t i = 0; i < translation_step_vks.size(); ++i) {
+                    for (std::size_t i = 0; i < translation_step_vks.size(); ++i) {
                         translation_step_vks[i].generate_r1cs_constraints(true);
                     }
 
                     hash_outgoing_message->generate_r1cs_constraints();
 
-                    for (size_t i = 0; i < compliance_predicate.max_arity; ++i) {
+                    for (std::size_t i = 0; i < compliance_predicate.max_arity; ++i) {
                         hash_incoming_messages[i].generate_r1cs_constraints();
                     }
 
-                    for (size_t i = 0; i < compliance_predicate.max_arity; ++i) {
+                    for (std::size_t i = 0; i < compliance_predicate.max_arity; ++i) {
                         unpack_commitment_and_incoming_message_digests[i].generate_r1cs_constraints(true);
                     }
 
@@ -426,29 +426,29 @@ namespace nil {
 
                     compliance_predicate_as_gadget->generate_r1cs_constraints();
 
-                    for (size_t i = 0; i < compliance_predicate.max_arity; ++i) {
+                    for (std::size_t i = 0; i < compliance_predicate.max_arity; ++i) {
                         proof[i].generate_r1cs_constraints();
                     }
 
-                    for (size_t i = 0; i < compliance_predicate.max_arity; ++i) {
+                    for (std::size_t i = 0; i < compliance_predicate.max_arity; ++i) {
                         verifier[i].generate_r1cs_constraints();
                     }
 
                     generate_r1cs_equals_const_constraint<FieldType>(pb, zero, FieldType::zero());
 
-                    for (size_t i = 0; i < compliance_predicate.max_arity; ++i) {
+                    for (std::size_t i = 0; i < compliance_predicate.max_arity; ++i) {
                         generate_boolean_r1cs_constraint<FieldType>(pb, verification_results[i]);
                     }
 
                     /* either type = 0 or proof verified w.r.t. a valid verification key */
-                    for (size_t i = 0; i < compliance_predicate.max_arity; ++i) {
+                    for (std::size_t i = 0; i < compliance_predicate.max_arity; ++i) {
                         pb.add_r1cs_constraint(
                             r1cs_constraint<FieldType>(incoming_message_types[i], 1 - verification_results[i], 0));
                     }
 
                     if (compliance_predicate.relies_on_same_type_inputs) {
 
-                        for (size_t i = 0; i < compliance_predicate.max_arity; ++i) {
+                        for (std::size_t i = 0; i < compliance_predicate.max_arity; ++i) {
                             pb.add_r1cs_constraint(r1cs_constraint<FieldType>(
                                 incoming_message_types[i], incoming_message_types[i] - common_type, 0));
                         }
@@ -457,7 +457,7 @@ namespace nil {
                             r1cs_constraint<FieldType>(common_type, 1 - membership_check_results[0], 0));
 
                         auto it = compliance_predicate.accepted_input_types.begin();
-                        for (size_t i = 0; i < compliance_predicate.accepted_input_types.size(); ++i, ++it) {
+                        for (std::size_t i = 0; i < compliance_predicate.accepted_input_types.size(); ++i, ++it) {
                             pb.add_r1cs_constraint(
                                 r1cs_constraint<FieldType>((i == 0 ? common_type : common_type_check_aux[i - 1]),
                                                            common_type - FieldType(*it),
@@ -466,7 +466,7 @@ namespace nil {
                                                                 common_type_check_aux[i])));
                         }
                     } else {
-                        for (size_t i = 0; i < compliance_predicate.max_arity; ++i) {
+                        for (std::size_t i = 0; i < compliance_predicate.max_arity; ++i) {
                             pb.add_r1cs_constraint(r1cs_constraint<FieldType>(incoming_message_types[i],
                                                                               1 - membership_check_results[i], 0));
                         }
@@ -512,11 +512,11 @@ namespace nil {
                             compliance_predicate.incoming_message_payload_lengths));
 
                     unpack_outgoing_message->generate_r1cs_witness_from_packed();
-                    for (size_t i = 0; i < compliance_predicate.max_arity; ++i) {
+                    for (std::size_t i = 0; i < compliance_predicate.max_arity; ++i) {
                         unpack_incoming_messages[i].generate_r1cs_witness_from_packed();
                     }
 
-                    for (size_t i = 0; i < translation_step_vks.size(); ++i) {
+                    for (std::size_t i = 0; i < translation_step_vks.size(); ++i) {
                         translation_step_vks[i].generate_r1cs_witness(mp_translation_step_pcd_circuit_vks[i]);
                     }
 
@@ -525,8 +525,8 @@ namespace nil {
                     if (compliance_predicate.relies_on_same_type_inputs) {
                         /* all messages (except base case) must be of the same type */
                         this->pb.val(common_type) = FieldType::zero();
-                        size_t nonzero_type_idx = 0;
-                        for (size_t i = 0; i < compliance_predicate.max_arity; ++i) {
+                        std::size_t nonzero_type_idx = 0;
+                        for (std::size_t i = 0; i < compliance_predicate.max_arity; ++i) {
                             if (this->pb.val(incoming_message_types[i]) == 0) {
                                 continue;
                             }
@@ -545,13 +545,13 @@ namespace nil {
                         membership_checkers[0].generate_r1cs_witness();
 
                         auto it = compliance_predicate.accepted_input_types.begin();
-                        for (size_t i = 0; i < compliance_predicate.accepted_input_types.size(); ++i, ++it) {
+                        for (std::size_t i = 0; i < compliance_predicate.accepted_input_types.size(); ++i, ++it) {
                             pb.val(common_type_check_aux[i]) =
                                 ((i == 0 ? pb.val(common_type) : pb.val(common_type_check_aux[i - 1])) *
                                  (pb.val(common_type) - FieldType(*it)));
                         }
                     } else {
-                        for (size_t i = 0; i < membership_checkers.size(); ++i) {
+                        for (std::size_t i = 0; i < membership_checkers.size(); ++i) {
                             this->pb.val(membership_check_results[i]) =
                                 (this->pb.val(incoming_message_types[i]).is_zero() ? FieldType::zero() :
                                                                                      FieldType::one());
@@ -561,40 +561,40 @@ namespace nil {
                     }
 
                     hash_outgoing_message->generate_r1cs_witness();
-                    for (size_t i = 0; i < compliance_predicate.max_arity; ++i) {
+                    for (std::size_t i = 0; i < compliance_predicate.max_arity; ++i) {
                         hash_incoming_messages[i].generate_r1cs_witness();
                         unpack_commitment_and_incoming_message_digests[i].generate_r1cs_witness_from_packed();
                     }
 
-                    for (size_t i = 0; i < compliance_predicate.max_arity; ++i) {
+                    for (std::size_t i = 0; i < compliance_predicate.max_arity; ++i) {
                         proof[i].generate_r1cs_witness(translation_step_proofs[i]);
                         verifier[i].generate_r1cs_witness();
                     }
                 }
 
                 template<typename ppT>
-                size_t mp_compliance_step_pcd_circuit_maker<ppT>::field_logsize() {
+                std::size_t mp_compliance_step_pcd_circuit_maker<ppT>::field_logsize() {
                     return algebra::Fr<ppT>::size_in_bits();
                 }
 
                 template<typename ppT>
-                size_t mp_compliance_step_pcd_circuit_maker<ppT>::field_capacity() {
+                std::size_t mp_compliance_step_pcd_circuit_maker<ppT>::field_capacity() {
                     return algebra::Fr<ppT>::capacity();
                 }
 
                 template<typename ppT>
-                size_t mp_compliance_step_pcd_circuit_maker<ppT>::input_size_in_elts() {
-                    const size_t digest_size = CRH_with_field_out_gadget<FieldType>::get_digest_len();
+                std::size_t mp_compliance_step_pcd_circuit_maker<ppT>::input_size_in_elts() {
+                    const std::size_t digest_size = CRH_with_field_out_gadget<FieldType>::get_digest_len();
                     return digest_size;
                 }
 
                 template<typename ppT>
-                size_t mp_compliance_step_pcd_circuit_maker<ppT>::input_capacity_in_bits() {
+                std::size_t mp_compliance_step_pcd_circuit_maker<ppT>::input_capacity_in_bits() {
                     return input_size_in_elts() * field_capacity();
                 }
 
                 template<typename ppT>
-                size_t mp_compliance_step_pcd_circuit_maker<ppT>::input_size_in_bits() {
+                std::size_t mp_compliance_step_pcd_circuit_maker<ppT>::input_size_in_bits() {
                     return input_size_in_elts() * field_logsize();
                 }
 
@@ -669,29 +669,29 @@ namespace nil {
                 }
 
                 template<typename ppT>
-                size_t mp_translation_step_pcd_circuit_maker<ppT>::field_logsize() {
+                std::size_t mp_translation_step_pcd_circuit_maker<ppT>::field_logsize() {
                     return algebra::Fr<ppT>::size_in_bits();
                 }
 
                 template<typename ppT>
-                size_t mp_translation_step_pcd_circuit_maker<ppT>::field_capacity() {
+                std::size_t mp_translation_step_pcd_circuit_maker<ppT>::field_capacity() {
                     return algebra::Fr<ppT>::capacity();
                 }
 
                 template<typename ppT>
-                size_t mp_translation_step_pcd_circuit_maker<ppT>::input_size_in_elts() {
+                std::size_t mp_translation_step_pcd_circuit_maker<ppT>::input_size_in_elts() {
                     return algebra::div_ceil(
                         mp_compliance_step_pcd_circuit_maker<other_curve<ppT>>::input_size_in_bits(),
                         mp_translation_step_pcd_circuit_maker<ppT>::field_capacity());
                 }
 
                 template<typename ppT>
-                size_t mp_translation_step_pcd_circuit_maker<ppT>::input_capacity_in_bits() {
+                std::size_t mp_translation_step_pcd_circuit_maker<ppT>::input_capacity_in_bits() {
                     return input_size_in_elts() * field_capacity();
                 }
 
                 template<typename ppT>
-                size_t mp_translation_step_pcd_circuit_maker<ppT>::input_size_in_bits() {
+                std::size_t mp_translation_step_pcd_circuit_maker<ppT>::input_size_in_bits() {
                     return input_size_in_elts() * field_logsize();
                 }
 

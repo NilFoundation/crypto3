@@ -17,15 +17,15 @@ namespace nil {
             namespace snark {
 
                 template<typename FieldType>
-                r1cs_example<FieldType> gen_r1cs_example_from_protoboard(const size_t num_constraints,
-                                                                      const size_t num_inputs);
+                r1cs_example<FieldType> gen_r1cs_example_from_protoboard(const std::size_t num_constraints,
+                                                                      const std::size_t num_inputs);
 
                 /* NOTE: all examples here actually generate one constraint less to account for soundness constraint in
                  * QAP */
 
                 template<typename FieldType>
-                r1cs_example<FieldType> gen_r1cs_example_from_protoboard(const size_t num_constraints) {
-                    const size_t new_num_constraints = num_constraints - 1;
+                r1cs_example<FieldType> gen_r1cs_example_from_protoboard(const std::size_t num_constraints) {
+                    const std::size_t new_num_constraints = num_constraints - 1;
 
                     /* construct dummy example: inner products of two vectors */
                     protoboard<FieldType> pb;
@@ -43,7 +43,7 @@ namespace nil {
                     compute_inner_product.generate_r1cs_constraints();
 
                     /* fill in random example */
-                    for (size_t i = 0; i < new_num_constraints; ++i) {
+                    for (std::size_t i = 0; i < new_num_constraints; ++i) {
                         pb.val(A[i]) = FieldType::random_element();
                         pb.val(B[i]) = FieldType::random_element();
                     }

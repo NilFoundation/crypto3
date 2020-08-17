@@ -87,19 +87,19 @@ namespace nil {
                         return constraint_system.is_satisfied(primary_input(), auxiliary_input());
                     }
 
-                    size_t num_constraints() const {
+                    std::size_t num_constraints() const {
                         return constraint_system.num_constraints();
                     }
 
-                    size_t num_inputs() const {
+                    std::size_t num_inputs() const {
                         return constraint_system.num_inputs();
                     }
 
-                    size_t num_variables() const {
+                    std::size_t num_variables() const {
                         return next_free_var - 1;
                     }
 
-                    void set_input_sizes(const size_t primary_input_size) {
+                    void set_input_sizes(const std::size_t primary_input_size) {
                         assert(primary_input_size <= num_variables());
                         constraint_system.primary_input_size = primary_input_size;
                         constraint_system.auxiliary_input_size = num_variables() - primary_input_size;

@@ -54,15 +54,15 @@ namespace nil {
 
                     bool is_fully_accumulated() const;
 
-                    size_t domain_size() const;
-                    size_t size() const;
-                    size_t size_in_bits() const;
+                    std::size_t domain_size() const;
+                    std::size_t size() const;
+                    std::size_t size_in_bits() const;
 
                     template<typename FieldType>
                     accumulation_vector<T>
                         accumulate_chunk(const typename std::vector<FieldType>::const_iterator &it_begin,
                                          const typename std::vector<FieldType>::const_iterator &it_end,
-                                         const size_t offset) const;
+                                         const std::size_t offset) const;
                 };
 
                 template<typename T>
@@ -82,19 +82,19 @@ namespace nil {
                 }
 
                 template<typename T>
-                size_t accumulation_vector<T>::domain_size() const {
+                std::size_t accumulation_vector<T>::domain_size() const {
                     return rest.domain_size();
                 }
 
                 template<typename T>
-                size_t accumulation_vector<T>::size() const {
+                std::size_t accumulation_vector<T>::size() const {
                     return rest.domain_size();
                 }
 
                 template<typename T>
-                size_t accumulation_vector<T>::size_in_bits() const {
-                    const size_t first_size_in_bits = T::size_in_bits();
-                    const size_t rest_size_in_bits = rest.size_in_bits();
+                std::size_t accumulation_vector<T>::size_in_bits() const {
+                    const std::size_t first_size_in_bits = T::size_in_bits();
+                    const std::size_t rest_size_in_bits = rest.size_in_bits();
                     return first_size_in_bits + rest_size_in_bits;
                 }
 
@@ -103,7 +103,7 @@ namespace nil {
                 accumulation_vector<T> accumulation_vector<T>::accumulate_chunk(
                     const typename std::vector<FieldType>::const_iterator &it_begin,
                     const typename std::vector<FieldType>::const_iterator &it_end,
-                    const size_t offset) const {
+                    const std::size_t offset) const {
                     std::pair<T, sparse_vector<T>> acc_result =
                         rest.template accumulate<FieldType>(it_begin, it_end, offset);
                     T new_first = first + acc_result.first;

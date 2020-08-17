@@ -41,7 +41,7 @@ namespace nil {
                     void generate_r1cs_witness(const Fp4T &el);
                     Fp4T get_element();
 
-                    Fp4_variable<Fp4T> Frobenius_map(const size_t power) const;
+                    Fp4_variable<Fp4T> Frobenius_map(const std::size_t power) const;
                     void evaluate() const;
                 };
 
@@ -232,7 +232,7 @@ namespace nil {
                 }
 
                 template<typename Fp4T>
-                Fp4_variable<Fp4T> Fp4_variable<Fp4T>::Frobenius_map(const size_t power) const {
+                Fp4_variable<Fp4T> Fp4_variable<Fp4T>::Frobenius_map(const std::size_t power) const {
                     pb_linear_combination<FieldType> new_c0c0, new_c0c1, new_c1c0, new_c1c1;
                     new_c0c0.assign(this->pb, c0.c0);
                     new_c0c1.assign(this->pb, c0.c1 * Fp2T::Frobenius_coeffs_c1[power % 2]);

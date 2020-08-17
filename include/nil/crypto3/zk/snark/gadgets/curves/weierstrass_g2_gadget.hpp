@@ -46,8 +46,8 @@ namespace nil {
 
                     // (See a comment in r1cs_ppzksnark_verifier_gadget.hpp about why
                     // we mark this function noinline.) TODO: remove later
-                    static size_t __attribute__((noinline)) size_in_bits();
-                    static size_t num_variables();
+                    static std::size_t __attribute__((noinline)) size_in_bits();
+                    static std::size_t num_variables();
                 };
 
                 /**
@@ -108,12 +108,12 @@ namespace nil {
                 }
 
                 template<typename ppT>
-                size_t G2_variable<ppT>::size_in_bits() {
+                std::size_t G2_variable<ppT>::size_in_bits() {
                     return 2 * Fqe_variable<ppT>::size_in_bits();
                 }
 
                 template<typename ppT>
-                size_t G2_variable<ppT>::num_variables() {
+                std::size_t G2_variable<ppT>::num_variables() {
                     return 2 * Fqe_variable<ppT>::num_variables();
                 }
 

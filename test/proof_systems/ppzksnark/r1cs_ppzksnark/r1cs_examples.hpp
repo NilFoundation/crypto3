@@ -51,7 +51,7 @@ namespace nil {
                  * represent).
                  */
                 template<typename FieldType>
-                r1cs_example<FieldType> generate_r1cs_example_with_field_input(size_t num_constraints, size_t num_inputs);
+                r1cs_example<FieldType> generate_r1cs_example_with_field_input(std::size_t num_constraints, std::size_t num_inputs);
 
                 /**
                  * Generate a R1CS example such that:
@@ -61,10 +61,10 @@ namespace nil {
                  * - the R1CS input consists of binary values (as opposed to ``full'' field elements).
                  */
                 template<typename FieldType>
-                r1cs_example<FieldType> generate_r1cs_example_with_binary_input(size_t num_constraints, size_t num_inputs);
+                r1cs_example<FieldType> generate_r1cs_example_with_binary_input(std::size_t num_constraints, std::size_t num_inputs);
 
                 template<typename FieldType>
-                r1cs_example<FieldType> generate_r1cs_example_with_field_input(size_t num_constraints, size_t num_inputs) {
+                r1cs_example<FieldType> generate_r1cs_example_with_field_input(std::size_t num_constraints, std::size_t num_inputs) {
                     BOOST_CHECK(num_inputs <= num_constraints + 2);
 
                     r1cs_constraint_system<FieldType> cs;
@@ -77,7 +77,7 @@ namespace nil {
                     full_variable_assignment.push_back(a);
                     full_variable_assignment.push_back(b);
 
-                    for (size_t i = 0; i < num_constraints - 1; ++i) {
+                    for (std::size_t i = 0; i < num_constraints - 1; ++i) {
                         linear_combination<FieldType> A, B, C;
 
                         if (i % 2) {
@@ -106,7 +106,7 @@ namespace nil {
 
                     linear_combination<FieldType> A, B, C;
                     FieldType fin = FieldType::zero();
-                    for (size_t i = 1; i < cs.num_variables(); ++i) {
+                    for (std::size_t i = 1; i < cs.num_variables(); ++i) {
                         A.add_term(i, 1);
                         B.add_term(i, 1);
                         fin = fin + full_variable_assignment[i - 1];
@@ -132,8 +132,8 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                r1cs_example<FieldType> generate_r1cs_example_with_binary_input(size_t num_constraints,
-                                                                             size_t num_inputs) {
+                r1cs_example<FieldType> generate_r1cs_example_with_binary_input(std::size_t num_constraints,
+                                                                             std::size_t num_inputs) {
                     BOOST_CHECK(num_inputs >= 1);
 
                     r1cs_constraint_system<FieldType> cs;
@@ -141,15 +141,15 @@ namespace nil {
                     cs.auxiliary_input_size = num_constraints; /* we will add one auxiliary variable per constraint */
 
                     r1cs_variable_assignment<FieldType> full_variable_assignment;
-                    for (size_t i = 0; i < num_inputs; ++i) {
+                    for (std::size_t i = 0; i < num_inputs; ++i) {
                         full_variable_assignment.push_back(FieldType(std::rand() % 2));
                     }
 
-                    size_t lastvar = num_inputs - 1;
-                    for (size_t i = 0; i < num_constraints; ++i) {
+                    std::size_t lastvar = num_inputs - 1;
+                    for (std::size_t i = 0; i < num_constraints; ++i) {
                         ++lastvar;
-                        const size_t u = (i == 0 ? std::rand() % num_inputs : std::rand() % i);
-                        const size_t v = (i == 0 ? std::rand() % num_inputs : std::rand() % i);
+                        const std::size_t u = (i == 0 ? std::rand() % num_inputs : std::rand() % i);
+                        const std::size_t v = (i == 0 ? std::rand() % num_inputs : std::rand() % i);
 
                         /* chose two random bits and XOR them together:
                            res = u + v - 2 * u * v

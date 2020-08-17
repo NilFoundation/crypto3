@@ -120,9 +120,9 @@ namespace nil {
                     std::vector<std::shared_ptr<Fqk_sqr_gadget<ppT>>> dbl_sqrs;
                     std::vector<std::shared_ptr<Fqk_special_mul_gadget<ppT>>> add_muls;
 
-                    size_t f_count;
-                    size_t add_count;
-                    size_t dbl_count;
+                    std::size_t f_count;
+                    std::size_t add_count;
+                    std::size_t dbl_count;
 
                     G1_precomputation<ppT> prec_P;
                     G2_precomputation<ppT> prec_Q;
@@ -166,9 +166,9 @@ namespace nil {
                     std::vector<std::shared_ptr<Fqk_special_mul_gadget<ppT>>> dbl_muls2;
                     std::vector<std::shared_ptr<Fqk_special_mul_gadget<ppT>>> add_muls2;
 
-                    size_t f_count;
-                    size_t add_count;
-                    size_t dbl_count;
+                    std::size_t f_count;
+                    std::size_t add_count;
+                    std::size_t dbl_count;
 
                     G1_precomputation<ppT> prec_P1;
                     G2_precomputation<ppT> prec_Q1;
@@ -222,9 +222,9 @@ namespace nil {
                     std::vector<std::shared_ptr<Fqk_special_mul_gadget<ppT>>> dbl_muls3;
                     std::vector<std::shared_ptr<Fqk_special_mul_gadget<ppT>>> add_muls3;
 
-                    size_t f_count;
-                    size_t add_count;
-                    size_t dbl_count;
+                    std::size_t f_count;
+                    std::size_t add_count;
+                    std::size_t dbl_count;
 
                     G1_precomputation<ppT> prec_P1;
                     G2_precomputation<ppT> prec_Q1;
@@ -416,7 +416,7 @@ namespace nil {
                     g_RR_at_Ps.resize(dbl_count);
                     g_RQ_at_Ps.resize(add_count);
 
-                    for (size_t i = 0; i < f_count; ++i) {
+                    for (std::size_t i = 0; i < f_count; ++i) {
                         fs[i].reset(new Fqk_variable<ppT>(pb));
                     }
 
@@ -424,10 +424,10 @@ namespace nil {
                     dbl_muls.resize(dbl_count);
                     add_muls.resize(add_count);
 
-                    size_t add_id = 0;
-                    size_t dbl_id = 0;
-                    size_t f_id = 0;
-                    size_t prec_id = 0;
+                    std::size_t add_id = 0;
+                    std::size_t dbl_id = 0;
+                    std::size_t f_id = 0;
+                    std::size_t prec_id = 0;
 
                     found_nonzero = false;
                     for (long i = NAF.size() - 1; i >= 0; --i) {
@@ -463,13 +463,13 @@ namespace nil {
                 void mnt_miller_loop_gadget<ppT>::generate_r1cs_constraints() {
                     fs[0]->generate_r1cs_equals_const_constraints(FqkT::one());
 
-                    for (size_t i = 0; i < dbl_count; ++i) {
+                    for (std::size_t i = 0; i < dbl_count; ++i) {
                         doubling_steps[i]->generate_r1cs_constraints();
                         dbl_sqrs[i]->generate_r1cs_constraints();
                         dbl_muls[i]->generate_r1cs_constraints();
                     }
 
-                    for (size_t i = 0; i < add_count; ++i) {
+                    for (std::size_t i = 0; i < add_count; ++i) {
                         addition_steps[i]->generate_r1cs_constraints();
                         add_muls[i]->generate_r1cs_constraints();
                     }
@@ -479,8 +479,8 @@ namespace nil {
                 void mnt_miller_loop_gadget<ppT>::generate_r1cs_witness() {
                     fs[0]->generate_r1cs_witness(FqkT::one());
 
-                    size_t add_id = 0;
-                    size_t dbl_id = 0;
+                    std::size_t add_id = 0;
+                    std::size_t dbl_id = 0;
 
                     const auto &loop_count = pairing_selector<ppT>::pairing_loop_count;
 
@@ -598,7 +598,7 @@ namespace nil {
                     g_RR_at_P2s.resize(dbl_count);
                     g_RQ_at_P2s.resize(add_count);
 
-                    for (size_t i = 0; i < f_count; ++i) {
+                    for (std::size_t i = 0; i < f_count; ++i) {
                         fs[i].reset(new Fqk_variable<ppT>(pb));
                     }
 
@@ -608,10 +608,10 @@ namespace nil {
                     dbl_muls2.resize(dbl_count);
                     add_muls2.resize(add_count);
 
-                    size_t add_id = 0;
-                    size_t dbl_id = 0;
-                    size_t f_id = 0;
-                    size_t prec_id = 0;
+                    std::size_t add_id = 0;
+                    std::size_t dbl_id = 0;
+                    std::size_t f_id = 0;
+                    std::size_t prec_id = 0;
 
                     found_nonzero = false;
                     for (long i = NAF.size() - 1; i >= 0; --i) {
@@ -658,7 +658,7 @@ namespace nil {
                 void mnt_e_over_e_miller_loop_gadget<ppT>::generate_r1cs_constraints() {
                     fs[0]->generate_r1cs_equals_const_constraints(FqkT::one());
 
-                    for (size_t i = 0; i < dbl_count; ++i) {
+                    for (std::size_t i = 0; i < dbl_count; ++i) {
                         doubling_steps1[i]->generate_r1cs_constraints();
                         doubling_steps2[i]->generate_r1cs_constraints();
                         dbl_sqrs[i]->generate_r1cs_constraints();
@@ -666,7 +666,7 @@ namespace nil {
                         dbl_muls2[i]->generate_r1cs_constraints();
                     }
 
-                    for (size_t i = 0; i < add_count; ++i) {
+                    for (std::size_t i = 0; i < add_count; ++i) {
                         addition_steps1[i]->generate_r1cs_constraints();
                         addition_steps2[i]->generate_r1cs_constraints();
                         add_muls1[i]->generate_r1cs_constraints();
@@ -678,9 +678,9 @@ namespace nil {
                 void mnt_e_over_e_miller_loop_gadget<ppT>::generate_r1cs_witness() {
                     fs[0]->generate_r1cs_witness(FqkT::one());
 
-                    size_t add_id = 0;
-                    size_t dbl_id = 0;
-                    size_t f_id = 0;
+                    std::size_t add_id = 0;
+                    std::size_t dbl_id = 0;
+                    std::size_t f_id = 0;
 
                     const auto &loop_count = pairing_selector<ppT>::pairing_loop_count;
 
@@ -842,7 +842,7 @@ namespace nil {
                     g_RR_at_P3s.resize(dbl_count);
                     g_RQ_at_P3s.resize(add_count);
 
-                    for (size_t i = 0; i < f_count; ++i) {
+                    for (std::size_t i = 0; i < f_count; ++i) {
                         fs[i].reset(new Fqk_variable<ppT>(pb));
                     }
 
@@ -854,10 +854,10 @@ namespace nil {
                     dbl_muls3.resize(dbl_count);
                     add_muls3.resize(add_count);
 
-                    size_t add_id = 0;
-                    size_t dbl_id = 0;
-                    size_t f_id = 0;
-                    size_t prec_id = 0;
+                    std::size_t add_id = 0;
+                    std::size_t dbl_id = 0;
+                    std::size_t f_id = 0;
+                    std::size_t prec_id = 0;
 
                     found_nonzero = false;
                     for (long i = NAF.size() - 1; i >= 0; --i) {
@@ -914,7 +914,7 @@ namespace nil {
                 void mnt_e_times_e_over_e_miller_loop_gadget<ppT>::generate_r1cs_constraints() {
                     fs[0]->generate_r1cs_equals_const_constraints(FqkT::one());
 
-                    for (size_t i = 0; i < dbl_count; ++i) {
+                    for (std::size_t i = 0; i < dbl_count; ++i) {
                         doubling_steps1[i]->generate_r1cs_constraints();
                         doubling_steps2[i]->generate_r1cs_constraints();
                         doubling_steps3[i]->generate_r1cs_constraints();
@@ -924,7 +924,7 @@ namespace nil {
                         dbl_muls3[i]->generate_r1cs_constraints();
                     }
 
-                    for (size_t i = 0; i < add_count; ++i) {
+                    for (std::size_t i = 0; i < add_count; ++i) {
                         addition_steps1[i]->generate_r1cs_constraints();
                         addition_steps2[i]->generate_r1cs_constraints();
                         addition_steps3[i]->generate_r1cs_constraints();
@@ -938,9 +938,9 @@ namespace nil {
                 void mnt_e_times_e_over_e_miller_loop_gadget<ppT>::generate_r1cs_witness() {
                     fs[0]->generate_r1cs_witness(FqkT::one());
 
-                    size_t add_id = 0;
-                    size_t dbl_id = 0;
-                    size_t f_id = 0;
+                    std::size_t add_id = 0;
+                    std::size_t dbl_id = 0;
+                    std::size_t f_id = 0;
 
                     const auto &loop_count = pairing_selector<ppT>::pairing_loop_count;
 

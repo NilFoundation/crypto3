@@ -51,38 +51,38 @@ namespace nil {
                 template<typename FieldType>
                 class sap_instance {
                 private:
-                    size_t num_variables_;
-                    size_t degree_;
-                    size_t num_inputs_;
+                    std::size_t num_variables_;
+                    std::size_t degree_;
+                    std::size_t num_inputs_;
 
                 public:
                     std::shared_ptr<algebra::fft::evaluation_domain<FieldType>> domain;
 
-                    std::vector<std::map<size_t, FieldType>> A_in_Lagrange_basis;
-                    std::vector<std::map<size_t, FieldType>> C_in_Lagrange_basis;
+                    std::vector<std::map<std::size_t, FieldType>> A_in_Lagrange_basis;
+                    std::vector<std::map<std::size_t, FieldType>> C_in_Lagrange_basis;
 
                     sap_instance(const std::shared_ptr<algebra::fft::evaluation_domain<FieldType>> &domain,
-                                 const size_t num_variables,
-                                 const size_t degree,
-                                 const size_t num_inputs,
-                                 const std::vector<std::map<size_t, FieldType>> &A_in_Lagrange_basis,
-                                 const std::vector<std::map<size_t, FieldType>> &C_in_Lagrange_basis);
+                                 const std::size_t num_variables,
+                                 const std::size_t degree,
+                                 const std::size_t num_inputs,
+                                 const std::vector<std::map<std::size_t, FieldType>> &A_in_Lagrange_basis,
+                                 const std::vector<std::map<std::size_t, FieldType>> &C_in_Lagrange_basis);
 
                     sap_instance(const std::shared_ptr<algebra::fft::evaluation_domain<FieldType>> &domain,
-                                 const size_t num_variables,
-                                 const size_t degree,
-                                 const size_t num_inputs,
-                                 std::vector<std::map<size_t, FieldType>> &&A_in_Lagrange_basis,
-                                 std::vector<std::map<size_t, FieldType>> &&C_in_Lagrange_basis);
+                                 const std::size_t num_variables,
+                                 const std::size_t degree,
+                                 const std::size_t num_inputs,
+                                 std::vector<std::map<std::size_t, FieldType>> &&A_in_Lagrange_basis,
+                                 std::vector<std::map<std::size_t, FieldType>> &&C_in_Lagrange_basis);
 
                     sap_instance(const sap_instance<FieldType> &other) = default;
                     sap_instance(sap_instance<FieldType> &&other) = default;
                     sap_instance &operator=(const sap_instance<FieldType> &other) = default;
                     sap_instance &operator=(sap_instance<FieldType> &&other) = default;
 
-                    size_t num_variables() const;
-                    size_t degree() const;
-                    size_t num_inputs() const;
+                    std::size_t num_variables() const;
+                    std::size_t degree() const;
+                    std::size_t num_inputs() const;
 
                     bool is_satisfied(const sap_witness<FieldType> &witness) const;
                 };
@@ -101,9 +101,9 @@ namespace nil {
                 template<typename FieldType>
                 class sap_instance_evaluation {
                 private:
-                    size_t num_variables_;
-                    size_t degree_;
-                    size_t num_inputs_;
+                    std::size_t num_variables_;
+                    std::size_t degree_;
+                    std::size_t num_inputs_;
 
                 public:
                     std::shared_ptr<algebra::fft::evaluation_domain<FieldType>> domain;
@@ -115,18 +115,18 @@ namespace nil {
                     FieldType Zt;
 
                     sap_instance_evaluation(const std::shared_ptr<algebra::fft::evaluation_domain<FieldType>> &domain,
-                                            const size_t num_variables,
-                                            const size_t degree,
-                                            const size_t num_inputs,
+                                            const std::size_t num_variables,
+                                            const std::size_t degree,
+                                            const std::size_t num_inputs,
                                             const FieldType &t,
                                             const std::vector<FieldType> &At,
                                             const std::vector<FieldType> &Ct,
                                             const std::vector<FieldType> &Ht,
                                             const FieldType &Zt);
                     sap_instance_evaluation(const std::shared_ptr<algebra::fft::evaluation_domain<FieldType>> &domain,
-                                            const size_t num_variables,
-                                            const size_t degree,
-                                            const size_t num_inputs,
+                                            const std::size_t num_variables,
+                                            const std::size_t degree,
+                                            const std::size_t num_inputs,
                                             const FieldType &t,
                                             std::vector<FieldType> &&At,
                                             std::vector<FieldType> &&Ct,
@@ -138,9 +138,9 @@ namespace nil {
                     sap_instance_evaluation &operator=(const sap_instance_evaluation<FieldType> &other) = default;
                     sap_instance_evaluation &operator=(sap_instance_evaluation<FieldType> &&other) = default;
 
-                    size_t num_variables() const;
-                    size_t degree() const;
-                    size_t num_inputs() const;
+                    std::size_t num_variables() const;
+                    std::size_t degree() const;
+                    std::size_t num_inputs() const;
 
                     bool is_satisfied(const sap_witness<FieldType> &witness) const;
                 };
@@ -151,9 +151,9 @@ namespace nil {
                 template<typename FieldType>
                 class sap_witness {
                 private:
-                    size_t num_variables_;
-                    size_t degree_;
-                    size_t num_inputs_;
+                    std::size_t num_variables_;
+                    std::size_t degree_;
+                    std::size_t num_inputs_;
 
                 public:
                     FieldType d1, d2;
@@ -161,17 +161,17 @@ namespace nil {
                     std::vector<FieldType> coefficients_for_ACs;
                     std::vector<FieldType> coefficients_for_H;
 
-                    sap_witness(const size_t num_variables,
-                                const size_t degree,
-                                const size_t num_inputs,
+                    sap_witness(const std::size_t num_variables,
+                                const std::size_t degree,
+                                const std::size_t num_inputs,
                                 const FieldType &d1,
                                 const FieldType &d2,
                                 const std::vector<FieldType> &coefficients_for_ACs,
                                 const std::vector<FieldType> &coefficients_for_H);
 
-                    sap_witness(const size_t num_variables,
-                                const size_t degree,
-                                const size_t num_inputs,
+                    sap_witness(const std::size_t num_variables,
+                                const std::size_t degree,
+                                const std::size_t num_inputs,
                                 const FieldType &d1,
                                 const FieldType &d2,
                                 const std::vector<FieldType> &coefficients_for_ACs,
@@ -182,19 +182,19 @@ namespace nil {
                     sap_witness &operator=(const sap_witness<FieldType> &other) = default;
                     sap_witness &operator=(sap_witness<FieldType> &&other) = default;
 
-                    size_t num_variables() const;
-                    size_t degree() const;
-                    size_t num_inputs() const;
+                    std::size_t num_variables() const;
+                    std::size_t degree() const;
+                    std::size_t num_inputs() const;
                 };
 
                 template<typename FieldType>
                 sap_instance<FieldType>::sap_instance(
                     const std::shared_ptr<algebra::fft::evaluation_domain<FieldType>> &domain,
-                    const size_t num_variables,
-                    const size_t degree,
-                    const size_t num_inputs,
-                    const std::vector<std::map<size_t, FieldType>> &A_in_Lagrange_basis,
-                    const std::vector<std::map<size_t, FieldType>> &C_in_Lagrange_basis) :
+                    const std::size_t num_variables,
+                    const std::size_t degree,
+                    const std::size_t num_inputs,
+                    const std::vector<std::map<std::size_t, FieldType>> &A_in_Lagrange_basis,
+                    const std::vector<std::map<std::size_t, FieldType>> &C_in_Lagrange_basis) :
                     num_variables_(num_variables),
                     degree_(degree), num_inputs_(num_inputs), domain(domain), A_in_Lagrange_basis(A_in_Lagrange_basis),
                     C_in_Lagrange_basis(C_in_Lagrange_basis) {
@@ -203,11 +203,11 @@ namespace nil {
                 template<typename FieldType>
                 sap_instance<FieldType>::sap_instance(
                     const std::shared_ptr<algebra::fft::evaluation_domain<FieldType>> &domain,
-                    const size_t num_variables,
-                    const size_t degree,
-                    const size_t num_inputs,
-                    std::vector<std::map<size_t, FieldType>> &&A_in_Lagrange_basis,
-                    std::vector<std::map<size_t, FieldType>> &&C_in_Lagrange_basis) :
+                    const std::size_t num_variables,
+                    const std::size_t degree,
+                    const std::size_t num_inputs,
+                    std::vector<std::map<std::size_t, FieldType>> &&A_in_Lagrange_basis,
+                    std::vector<std::map<std::size_t, FieldType>> &&C_in_Lagrange_basis) :
                     num_variables_(num_variables),
                     degree_(degree), num_inputs_(num_inputs), domain(domain),
                     A_in_Lagrange_basis(std::move(A_in_Lagrange_basis)),
@@ -215,17 +215,17 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                size_t sap_instance<FieldType>::num_variables() const {
+                std::size_t sap_instance<FieldType>::num_variables() const {
                     return num_variables_;
                 }
 
                 template<typename FieldType>
-                size_t sap_instance<FieldType>::degree() const {
+                std::size_t sap_instance<FieldType>::degree() const {
                     return degree_;
                 }
 
                 template<typename FieldType>
-                size_t sap_instance<FieldType>::num_inputs() const {
+                std::size_t sap_instance<FieldType>::num_inputs() const {
                     return num_inputs_;
                 }
 
@@ -241,7 +241,7 @@ namespace nil {
 
                     const std::vector<FieldType> u = this->domain->evaluate_all_lagrange_polynomials(t);
 
-                    for (size_t i = 0; i < this->num_variables() + 1; ++i) {
+                    for (std::size_t i = 0; i < this->num_variables() + 1; ++i) {
                         for (auto &el : A_in_Lagrange_basis[i]) {
                             At[i] += u[el.first] * el.second;
                         }
@@ -252,7 +252,7 @@ namespace nil {
                     }
 
                     FieldType ti = FieldType::one();
-                    for (size_t i = 0; i < this->degree() + 1; ++i) {
+                    for (std::size_t i = 0; i < this->degree() + 1; ++i) {
                         Ht[i] = ti;
                         ti *= t;
                     }
@@ -272,9 +272,9 @@ namespace nil {
                 template<typename FieldType>
                 sap_instance_evaluation<FieldType>::sap_instance_evaluation(
                     const std::shared_ptr<algebra::fft::evaluation_domain<FieldType>> &domain,
-                    const size_t num_variables,
-                    const size_t degree,
-                    const size_t num_inputs,
+                    const std::size_t num_variables,
+                    const std::size_t degree,
+                    const std::size_t num_inputs,
                     const FieldType &t,
                     const std::vector<FieldType> &At,
                     const std::vector<FieldType> &Ct,
@@ -287,9 +287,9 @@ namespace nil {
                 template<typename FieldType>
                 sap_instance_evaluation<FieldType>::sap_instance_evaluation(
                     const std::shared_ptr<algebra::fft::evaluation_domain<FieldType>> &domain,
-                    const size_t num_variables,
-                    const size_t degree,
-                    const size_t num_inputs,
+                    const std::size_t num_variables,
+                    const std::size_t degree,
+                    const std::size_t num_inputs,
                     const FieldType &t,
                     std::vector<FieldType> &&At,
                     std::vector<FieldType> &&Ct,
@@ -301,17 +301,17 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                size_t sap_instance_evaluation<FieldType>::num_variables() const {
+                std::size_t sap_instance_evaluation<FieldType>::num_variables() const {
                     return num_variables_;
                 }
 
                 template<typename FieldType>
-                size_t sap_instance_evaluation<FieldType>::degree() const {
+                std::size_t sap_instance_evaluation<FieldType>::degree() const {
                     return degree_;
                 }
 
                 template<typename FieldType>
-                size_t sap_instance_evaluation<FieldType>::num_inputs() const {
+                std::size_t sap_instance_evaluation<FieldType>::num_inputs() const {
                     return num_inputs_;
                 }
 
@@ -377,9 +377,9 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                sap_witness<FieldType>::sap_witness(const size_t num_variables,
-                                                    const size_t degree,
-                                                    const size_t num_inputs,
+                sap_witness<FieldType>::sap_witness(const std::size_t num_variables,
+                                                    const std::size_t degree,
+                                                    const std::size_t num_inputs,
                                                     const FieldType &d1,
                                                     const FieldType &d2,
                                                     const std::vector<FieldType> &coefficients_for_ACs,
@@ -390,9 +390,9 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                sap_witness<FieldType>::sap_witness(const size_t num_variables,
-                                                    const size_t degree,
-                                                    const size_t num_inputs,
+                sap_witness<FieldType>::sap_witness(const std::size_t num_variables,
+                                                    const std::size_t degree,
+                                                    const std::size_t num_inputs,
                                                     const FieldType &d1,
                                                     const FieldType &d2,
                                                     const std::vector<FieldType> &coefficients_for_ACs,
@@ -403,17 +403,17 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                size_t sap_witness<FieldType>::num_variables() const {
+                std::size_t sap_witness<FieldType>::num_variables() const {
                     return num_variables_;
                 }
 
                 template<typename FieldType>
-                size_t sap_witness<FieldType>::degree() const {
+                std::size_t sap_witness<FieldType>::degree() const {
                     return degree_;
                 }
 
                 template<typename FieldType>
-                size_t sap_witness<FieldType>::num_inputs() const {
+                std::size_t sap_witness<FieldType>::num_inputs() const {
                     return num_inputs_;
                 }
             }    // namespace snark

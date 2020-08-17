@@ -47,11 +47,11 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                linear_combination<FieldType> random_linear_combination(const size_t num_variables) {
-                    const size_t terms = 1 + (std::rand() % 3);
+                linear_combination<FieldType> random_linear_combination(const std::size_t num_variables) {
+                    const std::size_t terms = 1 + (std::rand() % 3);
                     linear_combination<FieldType> result;
 
-                    for (size_t i = 0; i < terms; ++i) {
+                    for (std::size_t i = 0; i < terms; ++i) {
                         const FieldType coeff = FieldType(
                             std::rand());    // TODO: replace with FieldType::random_element(), when it becomes faster...
                         result = result + coeff * variable<FieldType>(std::rand() % (num_variables + 1));
@@ -77,16 +77,16 @@ namespace nil {
                  * combination, with appropriate coefficient, so that the linear combination evaluates to 0.
                  */
                 template<typename FieldType>
-                bacs_example<FieldType> generate_bacs_example(size_t primary_input_size,
-                                                           size_t auxiliary_input_size,
-                                                           size_t num_gates,
-                                                           size_t num_outputs) {
+                bacs_example<FieldType> generate_bacs_example(std::size_t primary_input_size,
+                                                           std::size_t auxiliary_input_size,
+                                                           std::size_t num_gates,
+                                                           std::size_t num_outputs) {
                     bacs_example<FieldType> example;
-                    for (size_t i = 0; i < primary_input_size; ++i) {
+                    for (std::size_t i = 0; i < primary_input_size; ++i) {
                         example.primary_input.emplace_back(FieldType::random_element());
                     }
 
-                    for (size_t i = 0; i < auxiliary_input_size; ++i) {
+                    for (std::size_t i = 0; i < auxiliary_input_size; ++i) {
                         example.auxiliary_input.emplace_back(FieldType::random_element());
                     }
 
@@ -97,8 +97,8 @@ namespace nil {
                     all_vals.insert(all_vals.end(), example.primary_input.begin(), example.primary_input.end());
                     all_vals.insert(all_vals.end(), example.auxiliary_input.begin(), example.auxiliary_input.end());
 
-                    for (size_t i = 0; i < num_gates; ++i) {
-                        const size_t num_variables = primary_input_size + auxiliary_input_size + i;
+                    for (std::size_t i = 0; i < num_gates; ++i) {
+                        const std::size_t num_variables = primary_input_size + auxiliary_input_size + i;
                         bacs_gate<FieldType> gate;
                         gate.lhs = random_linear_combination<FieldType>(num_variables);
                         gate.rhs = random_linear_combination<FieldType>(num_variables);

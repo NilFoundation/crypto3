@@ -22,13 +22,13 @@
 using namespace nil::crypto3::zk::snark;
 
 template<typename ppT>
-void test_ram_ppzksnark(const size_t w,
-                        const size_t k,
-                        const size_t program_size,
-                        const size_t input_size,
-                        const size_t time_bound) {
+void test_ram_ppzksnark(const std::size_t w,
+                        const std::size_t k,
+                        const std::size_t program_size,
+                        const std::size_t input_size,
+                        const std::size_t time_bound) {
     typedef ram_ppzksnark_machine_pp<ppT> machine_ppT;
-    const size_t boot_trace_size_bound = program_size + input_size;
+    const std::size_t boot_trace_size_bound = program_size + input_size;
     const bool satisfiable = true;
 
     const ram_ppzksnark_architecture_params<ppT> ap(w, k);
@@ -43,9 +43,9 @@ void test_ram_ppzksnark(const size_t w,
 BOOST_AUTO_TEST_SUITE(ram_ppzksnark_test_suite)
 
 BOOST_AUTO_TEST_CASE(ram_ppzksnark_test){
-    const size_t program_size = 100;
-    const size_t input_size = 2;
-    const size_t time_bound = 20;
+    const std::size_t program_size = 100;
+    const std::size_t input_size = 2;
+    const std::size_t time_bound = 20;
 
     // 16-bit TinyRAM with 16 registers
     test_ram_ppzksnark<default_ram_ppzksnark_pp>(16, 16, program_size, input_size, time_bound);

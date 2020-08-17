@@ -88,7 +88,7 @@ namespace nil {
                 public:
                     typedef ram_base_field<ramT> FieldType;
 
-                    size_t num_memory_lines;
+                    std::size_t num_memory_lines;
 
                     std::vector<memory_line_variable_gadget<ramT>> boot_lines;
                     std::vector<pb_variable_array<FieldType>> boot_line_bits;
@@ -110,13 +110,13 @@ namespace nil {
                     std::shared_ptr<as_waksman_routing_gadget<FieldType>> routing_network;
 
                 public:
-                    size_t boot_trace_size_bound;
-                    size_t time_bound;
+                    std::size_t boot_trace_size_bound;
+                    std::size_t time_bound;
                     pb_variable_array<FieldType> packed_input;
 
                     ram_universal_gadget(ram_protoboard<ramT> &pb,
-                                         const size_t boot_trace_size_bound,
-                                         const size_t time_bound,
+                                         const std::size_t boot_trace_size_bound,
+                                         const std::size_t time_bound,
                                          const pb_variable_array<FieldType> &packed_input);
 
                     void generate_r1cs_constraints();
@@ -127,22 +127,22 @@ namespace nil {
                     void print_execution_trace() const;
                     void print_memory_trace() const;
 
-                    static size_t packed_input_element_size(const ram_architecture_params<ramT> &ap);
-                    static size_t packed_input_size(const ram_architecture_params<ramT> &ap,
-                                                    const size_t boot_trace_size_bound);
+                    static std::size_t packed_input_element_size(const ram_architecture_params<ramT> &ap);
+                    static std::size_t packed_input_size(const ram_architecture_params<ramT> &ap,
+                                                    const std::size_t boot_trace_size_bound);
                 };
 
                 template<typename ramT>
                 ram_universal_gadget<ramT>::ram_universal_gadget(ram_protoboard<ramT> &pb,
-                                                                 const size_t boot_trace_size_bound,
-                                                                 const size_t time_bound,
+                                                                 const std::size_t boot_trace_size_bound,
+                                                                 const std::size_t time_bound,
                                                                  const pb_variable_array<FieldType> &packed_input) :
                     ram_gadget_base<ramT>(pb),
                     boot_trace_size_bound(boot_trace_size_bound), time_bound(time_bound), packed_input(packed_input) {
                     num_memory_lines = boot_trace_size_bound + (time_bound + 1) +
                                        time_bound; /* boot lines, (time_bound + 1) execution lines (including initial)
                                                       and time_bound load instruction lines */
-                    const size_t timestamp_size = static_cast<std::size_t>(std::ceil(std::log2(num_memory_lines)));
+                    const std::size_t timestamp_size = static_cast<std::size_t>(std::ceil(std::log2(num_memory_lines)));
 
                     /* allocate all lines on the execution side of the routing network */
                     execution_lines.reserve(1 + time_bound);
@@ -150,7 +150,7 @@ namespace nil {
                     unrouted_memory_lines.emplace_back(&execution_lines[0]);
 
                     boot_lines.reserve(boot_trace_size_bound);
-                    for (size_t i = 0; i < boot_trace_size_bound; ++i) {
+                    for (std::size_t i = 0; i < boot_trace_size_bound; ++i) {
                         boot_lines.emplace_back(memory_line_variable_gadget<ramT>(pb, timestamp_size, pb.ap));
                         unrouted_memory_lines.emplace_back(&boot_lines[i]);
                     }
@@ -158,7 +158,7 @@ namespace nil {
                     load_instruction_lines.reserve(time_bound +
                                                    1); /* the last line is NOT a memory line, but here just for uniform
                                                           coding (i.e. the (unused) result of next PC) */
-                    for (size_t i = 0; i < time_bound; ++i) {
+                    for (std::size_t i = 0; i < time_bound; ++i) {
                         load_instruction_lines.emplace_back(
                             memory_line_variable_gadget<ramT>(pb, timestamp_size, pb.ap));
                         unrouted_memory_lines.emplace_back(&load_instruction_lines[i]);
@@ -169,13 +169,13 @@ namespace nil {
                     load_instruction_lines.emplace_back(memory_line_variable_gadget<ramT>(pb, timestamp_size, pb.ap));
 
                     /* deal with packing of the input */
-                    const size_t line_size_bits = pb.ap.address_size() + pb.ap.value_size();
-                    const size_t max_chunk_size = FieldType::capacity();
-                    const size_t packed_line_size = (line_size_bits + (max_chunk_size - 1)) / max_chunk_size;
+                    const std::size_t line_size_bits = pb.ap.address_size() + pb.ap.value_size();
+                    const std::size_t max_chunk_size = FieldType::capacity();
+                    const std::size_t packed_line_size = (line_size_bits + (max_chunk_size - 1)) / max_chunk_size;
                     assert(packed_input.size() == packed_line_size * boot_trace_size_bound);
 
                     auto input_it = packed_input.begin();
-                    for (size_t i = 0; i < boot_trace_size_bound; ++i) {
+                    for (std::size_t i = 0; i < boot_trace_size_bound; ++i) {
                         /* note the reversed order */
                         pb_variable_array<FieldType> boot_line_bits;
                         boot_line_bits.insert(boot_line_bits.end(),
@@ -194,14 +194,14 @@ namespace nil {
                     }
 
                     /* deal with routing */
-                    for (size_t i = 0; i < num_memory_lines; ++i) {
+                    for (std::size_t i = 0; i < num_memory_lines; ++i) {
                         routed_memory_lines.emplace_back(memory_line_variable_gadget<ramT>(pb, timestamp_size, pb.ap));
                     }
 
                     routing_inputs.reserve(num_memory_lines);
                     routing_outputs.reserve(num_memory_lines);
 
-                    for (size_t i = 0; i < num_memory_lines; ++i) {
+                    for (std::size_t i = 0; i < num_memory_lines; ++i) {
                         routing_inputs.emplace_back(unrouted_memory_lines[i]->all_vars());
                         routing_outputs.emplace_back(routed_memory_lines[i].all_vars());
                     }
@@ -211,7 +211,7 @@ namespace nil {
 
                     /* deal with all checkers */
                     execution_checkers.reserve(time_bound);
-                    for (size_t i = 0; i < time_bound; ++i) {
+                    for (std::size_t i = 0; i < time_bound; ++i) {
                         execution_checkers.emplace_back(
                             ram_cpu_checker<ramT>(pb,
                                                   load_instruction_lines[i].address->bits,           // prev_pc_addr
@@ -227,7 +227,7 @@ namespace nil {
                     }
 
                     memory_checkers.reserve(num_memory_lines);
-                    for (size_t i = 0; i < num_memory_lines; ++i) {
+                    for (std::size_t i = 0; i < num_memory_lines; ++i) {
                         memory_checkers.emplace_back(memory_checker_gadget<ramT>(
                             pb, timestamp_size, *unrouted_memory_lines[i], routed_memory_lines[i]));
                     }
@@ -236,54 +236,54 @@ namespace nil {
 
                 template<typename ramT>
                 void ram_universal_gadget<ramT>::generate_r1cs_constraints() {
-                    for (size_t i = 0; i < boot_trace_size_bound; ++i) {
+                    for (std::size_t i = 0; i < boot_trace_size_bound; ++i) {
                         unpack_boot_lines[i].generate_r1cs_constraints(false);
                     }
 
                     /* ensure that we start with all zeros state */
-                    for (size_t i = 0; i < this->pb.ap.cpu_state_size(); ++i) {
+                    for (std::size_t i = 0; i < this->pb.ap.cpu_state_size(); ++i) {
                         generate_r1cs_equals_const_constraint<FieldType>(this->pb, execution_lines[0].cpu_state[i],
                                                                          FieldType::zero());
                     }
 
                     /* ensure increasing timestamps */
-                    for (size_t i = 0; i < num_memory_lines; ++i) {
+                    for (std::size_t i = 0; i < num_memory_lines; ++i) {
                         generate_r1cs_equals_const_constraint<FieldType>(
                             this->pb, unrouted_memory_lines[i]->timestamp->packed, FieldType(i));
                     }
 
                     /* ensure bitness of trace lines on the time side */
-                    for (size_t i = 0; i < boot_trace_size_bound; ++i) {
+                    for (std::size_t i = 0; i < boot_trace_size_bound; ++i) {
                         boot_lines[i].generate_r1cs_constraints(true);
                     }
 
                     execution_lines[0].generate_r1cs_constraints(true);
-                    for (size_t i = 0; i < time_bound; ++i) {
+                    for (std::size_t i = 0; i < time_bound; ++i) {
                         load_instruction_lines[i].generate_r1cs_constraints(true);
                         execution_lines[i + 1].generate_r1cs_constraints(true);
                     }
 
                     /* ensure bitness of trace lines on the memory side */
-                    for (size_t i = 0; i < num_memory_lines; ++i) {
+                    for (std::size_t i = 0; i < num_memory_lines; ++i) {
                         routed_memory_lines[i].generate_r1cs_constraints();
                     }
 
                     /* ensure that load instruction lines really do loads */
-                    for (size_t i = 0; i < time_bound; ++i) {
+                    for (std::size_t i = 0; i < time_bound; ++i) {
                         this->pb.add_r1cs_constraint(
                             r1cs_constraint<FieldType>(1, load_instruction_lines[i].contents_before->packed,
                                                        load_instruction_lines[i].contents_after->packed));
                     }
 
                     /* ensure correct execution */
-                    for (size_t i = 0; i < time_bound; ++i) {
+                    for (std::size_t i = 0; i < time_bound; ++i) {
                         execution_checkers[i].generate_r1cs_constraints();
                     }
 
                     /* check memory */
                     routing_network->generate_r1cs_constraints();
 
-                    for (size_t i = 0; i < num_memory_lines; ++i) {
+                    for (std::size_t i = 0; i < num_memory_lines; ++i) {
                         memory_checkers[i].generate_r1cs_constraints();
                     }
 
@@ -296,15 +296,15 @@ namespace nil {
                                                                      FieldType::one());
 
                     /* print constraint profiling */
-                    const size_t num_constraints = this->pb.num_constraints();
-                    const size_t num_variables = this->pb.num_variables();
+                    const std::size_t num_constraints = this->pb.num_constraints();
+                    const std::size_t num_variables = this->pb.num_variables();
                 }
 
                 template<typename ramT>
                 void ram_universal_gadget<ramT>::generate_r1cs_witness(const ram_boot_trace<ramT> &boot_trace,
                                                                        const ram_input_tape<ramT> &auxiliary_input) {
                     /* assign correct timestamps to all lines */
-                    for (size_t i = 0; i < num_memory_lines; ++i) {
+                    for (std::size_t i = 0; i < num_memory_lines; ++i) {
                         this->pb.val(unrouted_memory_lines[i]->timestamp->packed) = FieldType(i);
                         unrouted_memory_lines[i]->timestamp->generate_r1cs_witness_from_packed();
                     }
@@ -317,10 +317,10 @@ namespace nil {
                     memory_contents memory_after_boot;
 
                     for (auto it : boot_trace.get_all_trace_entries()) {
-                        const size_t boot_pos = it.first;
+                        const std::size_t boot_pos = it.first;
                         assert(boot_pos < boot_trace_size_bound);
-                        const size_t address = it.second.first;
-                        const size_t contents = it.second.second;
+                        const std::size_t address = it.second.first;
+                        const std::size_t contents = it.second.second;
 
                         this->pb.val(boot_lines[boot_pos].address->packed) = FieldType(address, true);
                         this->pb.val(boot_lines[boot_pos].contents_after->packed) = FieldType(contents, true);
@@ -338,10 +338,10 @@ namespace nil {
                         FieldType(this->pb.ap.initial_pc_addr(), true);
                     load_instruction_lines[0].address->generate_r1cs_witness_from_packed();
 
-                    for (size_t i = 0; i < time_bound; ++i) {
+                    for (std::size_t i = 0; i < time_bound; ++i) {
                         /* load instruction */
-                        const size_t pc_addr = this->pb.val(load_instruction_lines[i].address->packed).as_ulong();
-                        const size_t pc_val = mem_backend.get_value(pc_addr);
+                        const std::size_t pc_addr = this->pb.val(load_instruction_lines[i].address->packed).as_ulong();
+                        const std::size_t pc_val = mem_backend.get_value(pc_addr);
 
                         this->pb.val(load_instruction_lines[i].contents_before->packed) = FieldType(pc_val, true);
                         this->pb.val(load_instruction_lines[i].contents_after->packed) = FieldType(pc_val, true);
@@ -352,8 +352,8 @@ namespace nil {
                         execution_lines[i + 1].address->generate_r1cs_witness_from_bits();
 
                         /* fill it in */
-                        const size_t load_store_addr = this->pb.val(execution_lines[i + 1].address->packed).as_ulong();
-                        const size_t load_store_prev_val = mem_backend.get_value(load_store_addr);
+                        const std::size_t load_store_addr = this->pb.val(execution_lines[i + 1].address->packed).as_ulong();
+                        const std::size_t load_store_prev_val = mem_backend.get_value(load_store_addr);
 
                         this->pb.val(execution_lines[i + 1].contents_before->packed) =
                             FieldType(load_store_prev_val, true);
@@ -364,7 +364,7 @@ namespace nil {
 
                         /* update the memory possibly changed by the CPU checker */
                         execution_lines[i + 1].contents_after->generate_r1cs_witness_from_bits();
-                        const size_t load_store_next_val =
+                        const std::size_t load_store_next_val =
                             this->pb.val(execution_lines[i + 1].contents_after->packed).as_ulong();
                         mem_backend.set_value(load_store_addr, load_store_next_val);
 
@@ -384,10 +384,10 @@ namespace nil {
                       property.
                     */
 
-                    typedef std::pair<size_t, size_t> mem_pair; /* a pair of address, timestamp */
+                    typedef std::pair<std::size_t, std::size_t> mem_pair; /* a pair of address, timestamp */
                     std::vector<mem_pair> mem_pairs;
 
-                    for (size_t i = 0; i < this->num_memory_lines; ++i) {
+                    for (std::size_t i = 0; i < this->num_memory_lines; ++i) {
                         mem_pairs.emplace_back(
                             std::make_pair(this->pb.val(unrouted_memory_lines[i]->address->packed).as_ulong(),
                                            this->pb.val(unrouted_memory_lines[i]->timestamp->packed).as_ulong()));
@@ -396,44 +396,44 @@ namespace nil {
                     std::sort(mem_pairs.begin(), mem_pairs.end());
 
                     integer_permutation pi(this->num_memory_lines);
-                    for (size_t i = 0; i < this->num_memory_lines; ++i) {
-                        const size_t timestamp = this->pb.val(unrouted_memory_lines[i]->timestamp->packed).as_ulong();
-                        const size_t address = this->pb.val(unrouted_memory_lines[i]->address->packed).as_ulong();
+                    for (std::size_t i = 0; i < this->num_memory_lines; ++i) {
+                        const std::size_t timestamp = this->pb.val(unrouted_memory_lines[i]->timestamp->packed).as_ulong();
+                        const std::size_t address = this->pb.val(unrouted_memory_lines[i]->address->packed).as_ulong();
 
                         const auto it =
                             std::upper_bound(mem_pairs.begin(), mem_pairs.end(), std::make_pair(address, timestamp));
-                        const size_t prev = (it == mem_pairs.end() ? 0 : it->second);
+                        const std::size_t prev = (it == mem_pairs.end() ? 0 : it->second);
                         pi.set(prev, i);
                     }
 
                     /* route according to the memory permutation */
                     routing_network->generate_r1cs_witness(pi);
 
-                    for (size_t i = 0; i < this->num_memory_lines; ++i) {
+                    for (std::size_t i = 0; i < this->num_memory_lines; ++i) {
                         routed_memory_lines[i].generate_r1cs_witness_from_bits();
                     }
 
                     /* generate witness for memory checkers */
-                    for (size_t i = 0; i < this->num_memory_lines; ++i) {
+                    for (std::size_t i = 0; i < this->num_memory_lines; ++i) {
                         memory_checkers[i].generate_r1cs_witness();
                     }
 
                     /* repack back the input */
-                    for (size_t i = 0; i < boot_trace_size_bound; ++i) {
+                    for (std::size_t i = 0; i < boot_trace_size_bound; ++i) {
                         unpack_boot_lines[i].generate_r1cs_witness_from_bits();
                     }
                 }
 
                 template<typename ramT>
                 void ram_universal_gadget<ramT>::print_execution_trace() const {
-                    for (size_t i = 0; i < boot_trace_size_bound; ++i) {
+                    for (std::size_t i = 0; i < boot_trace_size_bound; ++i) {
                         printf("Boot process at t=#%zu: store %zu at %zu\n",
                                i,
                                this->pb.val(boot_lines[i].contents_after->packed).as_ulong(),
                                this->pb.val(boot_lines[i].address->packed).as_ulong());
                     }
 
-                    for (size_t i = 0; i < time_bound; ++i) {
+                    for (std::size_t i = 0; i < time_bound; ++i) {
                         printf("Execution step %zu:\n", i);
                         printf("  Loaded instruction %zu from address %zu (ts = %zu)\n",
                                this->pb.val(load_instruction_lines[i].contents_after->packed).as_ulong(),
@@ -457,7 +457,7 @@ namespace nil {
 
                 template<typename ramT>
                 void ram_universal_gadget<ramT>::print_memory_trace() const {
-                    for (size_t i = 0; i < num_memory_lines; ++i) {
+                    for (std::size_t i = 0; i < num_memory_lines; ++i) {
                         printf("Memory access #%zu:\n", i);
                         printf("  Time side  : ts = %zu, address = %zu, contents_before = %zu, contents_after = %zu\n",
                                this->pb.val(unrouted_memory_lines[i]->timestamp->packed).as_ulong(),
@@ -473,17 +473,17 @@ namespace nil {
                 }
 
                 template<typename ramT>
-                size_t ram_universal_gadget<ramT>::packed_input_element_size(const ram_architecture_params<ramT> &ap) {
-                    const size_t line_size_bits = ap.address_size() + ap.value_size();
-                    const size_t max_chunk_size = FieldType::capacity();
-                    const size_t packed_line_size = (line_size_bits + (max_chunk_size - 1)) / max_chunk_size;
+                std::size_t ram_universal_gadget<ramT>::packed_input_element_size(const ram_architecture_params<ramT> &ap) {
+                    const std::size_t line_size_bits = ap.address_size() + ap.value_size();
+                    const std::size_t max_chunk_size = FieldType::capacity();
+                    const std::size_t packed_line_size = (line_size_bits + (max_chunk_size - 1)) / max_chunk_size;
 
                     return packed_line_size;
                 }
 
                 template<typename ramT>
-                size_t ram_universal_gadget<ramT>::packed_input_size(const ram_architecture_params<ramT> &ap,
-                                                                     const size_t boot_trace_size_bound) {
+                std::size_t ram_universal_gadget<ramT>::packed_input_size(const ram_architecture_params<ramT> &ap,
+                                                                     const std::size_t boot_trace_size_bound) {
                     return packed_input_element_size(ap) * boot_trace_size_bound;
                 }
             }    // namespace snark

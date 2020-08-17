@@ -80,14 +80,14 @@ namespace nil {
                 ssp_instance<FieldType> uscs_to_ssp_instance_map(const uscs_constraint_system<FieldType> &cs) {
                     const std::shared_ptr<algebra::fft::evaluation_domain<FieldType>> domain =
                         algebra::fft::make_evaluation_domain<FieldType>(cs.num_constraints());
-                    std::vector<std::map<size_t, FieldType>> V_in_Lagrange_basis(cs.num_variables() + 1);
-                    for (size_t i = 0; i < cs.num_constraints(); ++i) {
-                        for (size_t j = 0; j < cs.constraints[i].terms.size(); ++j) {
+                    std::vector<std::map<std::size_t, FieldType>> V_in_Lagrange_basis(cs.num_variables() + 1);
+                    for (std::size_t i = 0; i < cs.num_constraints(); ++i) {
+                        for (std::size_t j = 0; j < cs.constraints[i].terms.size(); ++j) {
                             V_in_Lagrange_basis[cs.constraints[i].terms[j].index][i] +=
                                 cs.constraints[i].terms[j].coeff;
                         }
                     }
-                    for (size_t i = cs.num_constraints(); i < domain->m; ++i) {
+                    for (std::size_t i = cs.num_constraints(); i < domain->m; ++i) {
                         V_in_Lagrange_basis[0][i] += FieldType::one();
                     }
 
@@ -120,16 +120,16 @@ namespace nil {
                     const FieldType Zt = domain->compute_vanishing_polynomial(t);
 
                     const std::vector<FieldType> u = domain->evaluate_all_lagrange_polynomials(t);
-                    for (size_t i = 0; i < cs.num_constraints(); ++i) {
-                        for (size_t j = 0; j < cs.constraints[i].terms.size(); ++j) {
+                    for (std::size_t i = 0; i < cs.num_constraints(); ++i) {
+                        for (std::size_t j = 0; j < cs.constraints[i].terms.size(); ++j) {
                             Vt[cs.constraints[i].terms[j].index] += u[i] * cs.constraints[i].terms[j].coeff;
                         }
                     }
-                    for (size_t i = cs.num_constraints(); i < domain->m; ++i) {
+                    for (std::size_t i = cs.num_constraints(); i < domain->m; ++i) {
                         Vt[0] += u[i]; /* dummy constraint: 1^2 = 1 */
                     }
                     FieldType ti = FieldType::one();
-                    for (size_t i = 0; i < domain->m + 1; ++i) {
+                    for (std::size_t i = 0; i < domain->m + 1; ++i) {
                         Ht[i] = ti;
                         ti *= t;
                     }
@@ -183,10 +183,10 @@ namespace nil {
 
                     std::vector<FieldType> aA(domain->m, FieldType::zero());
                     assert(domain->m >= cs.num_constraints());
-                    for (size_t i = 0; i < cs.num_constraints(); ++i) {
+                    for (std::size_t i = 0; i < cs.num_constraints(); ++i) {
                         aA[i] += cs.constraints[i].evaluate(full_variable_assignment);
                     }
-                    for (size_t i = cs.num_constraints(); i < domain->m; ++i) {
+                    for (std::size_t i = cs.num_constraints(); i < domain->m; ++i) {
                         aA[i] += FieldType::one();
                     }
 
@@ -197,7 +197,7 @@ namespace nil {
 #pragma omp parallel for
 #endif
                     /* add coefficients of the polynomial 2*d*V(z) + d*d*Z(z) */
-                    for (size_t i = 0; i < domain->m; ++i) {
+                    for (std::size_t i = 0; i < domain->m; ++i) {
                         coefficients_for_H[i] = FieldType(2) * d * aA[i];
                     }
                     domain->add_poly_Z(d.squared(), coefficients_for_H);
@@ -209,7 +209,7 @@ namespace nil {
 #ifdef MULTICORE
 #pragma omp parallel for
 #endif
-                    for (size_t i = 0; i < domain->m; ++i) {
+                    for (std::size_t i = 0; i < domain->m; ++i) {
                         H_tmp[i] = aA[i].squared() - FieldType::one();
                     }
 
@@ -221,7 +221,7 @@ namespace nil {
 #ifdef MULTICORE
 #pragma omp parallel for
 #endif
-                    for (size_t i = 0; i < domain->m; ++i) {
+                    for (std::size_t i = 0; i < domain->m; ++i) {
                         coefficients_for_H[i] += H_tmp[i];
                     }
 

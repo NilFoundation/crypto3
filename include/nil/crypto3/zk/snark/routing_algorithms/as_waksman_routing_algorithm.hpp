@@ -79,7 +79,7 @@ namespace nil {
                  * two indices are set to be equal and the packet is always routed to
                  * the specified destination at the column_idx+1-th column.
                  */
-                typedef std::vector<std::vector<std::pair<size_t, size_t>>> as_waksman_topology;
+                typedef std::vector<std::vector<std::pair<std::size_t, std::size_t>>> as_waksman_topology;
 
                 /**
                  * A routing assigns a bit to each switch in the AS-Waksman routing network.
@@ -98,7 +98,7 @@ namespace nil {
                  * entries for the positions associated with the bottom ports of the
                  * switches, i.e. only canonical positions are present.
                  */
-                typedef std::vector<std::map<size_t, bool>> as_waksman_routing;
+                typedef std::vector<std::map<std::size_t, bool>> as_waksman_routing;
 
                 /**
                  * Return the number of (switch) columns in a AS-Waksman network for a given number of packets.
@@ -109,14 +109,14 @@ namespace nil {
                  * - as_waksman_num_columns(4) = 3,
                  * and so on.
                  */
-                size_t as_waksman_num_columns(const size_t num_packets);
+                std::size_t as_waksman_num_columns(const std::size_t num_packets);
 
                 /**
                  * Return the topology of an AS-Waksman network for a given number of packets.
                  *
                  * See as_waksman_topology (above) for details.
                  */
-                as_waksman_topology generate_as_waksman_topology(const size_t num_packets);
+                as_waksman_topology generate_as_waksman_topology(const std::size_t num_packets);
 
                 /**
                  * Route the given permutation on an AS-Waksman network of suitable size.
@@ -132,7 +132,7 @@ namespace nil {
                 /**
                  * Return the height of the AS-Waksman network's top sub-network.
                  */
-                size_t as_waksman_top_height(const size_t num_packets) {
+                std::size_t as_waksman_top_height(const std::size_t num_packets) {
                     return num_packets / 2;
                 }
 
@@ -147,11 +147,11 @@ namespace nil {
                  *
                  * If top = true, return the top wire, otherwise return bottom wire.
                  */
-                size_t as_waksman_switch_output(const size_t num_packets,
-                                                const size_t row_offset,
-                                                const size_t row_idx,
+                std::size_t as_waksman_switch_output(const std::size_t num_packets,
+                                                const std::size_t row_offset,
+                                                const std::size_t row_idx,
                                                 const bool use_top) {
-                    size_t relpos = row_idx - row_offset;
+                    std::size_t relpos = row_idx - row_offset;
                     assert(relpos % 2 == 0 && relpos + 1 < num_packets);
                     return row_offset + (relpos / 2) + (use_top ? 0 : as_waksman_top_height(num_packets));
                 }
@@ -162,15 +162,15 @@ namespace nil {
                  *
                  * This function is analogous to as_waksman_switch_output above.
                  */
-                size_t as_waksman_switch_input(const size_t num_packets,
-                                               const size_t row_offset,
-                                               const size_t row_idx,
+                std::size_t as_waksman_switch_input(const std::size_t num_packets,
+                                               const std::size_t row_offset,
+                                               const std::size_t row_idx,
                                                const bool use_top) {
                     /* Due to symmetry, this function equals as_waksman_switch_output. */
                     return as_waksman_switch_output(num_packets, row_offset, row_idx, use_top);
                 }
 
-                size_t as_waksman_num_columns(const size_t num_packets) {
+                std::size_t as_waksman_num_columns(const std::size_t num_packets) {
                     return (num_packets > 1 ? 2 * static_cast<std::size_t>(std::ceil(std::log2(num_packets))) - 1 : 0);
                 }
 
@@ -186,19 +186,19 @@ namespace nil {
                  *
                  * This function fills out neighbors[left] and neighbors[right-1].
                  */
-                void construct_as_waksman_inner(const size_t left,
-                                                const size_t right,
-                                                const size_t lo,
-                                                const size_t hi,
-                                                const std::vector<size_t> &rhs_dests,
+                void construct_as_waksman_inner(const std::size_t left,
+                                                const std::size_t right,
+                                                const std::size_t lo,
+                                                const std::size_t hi,
+                                                const std::vector<std::size_t> &rhs_dests,
                                                 as_waksman_topology &neighbors) {
                     if (left > right) {
                         return;
                     }
 
-                    const size_t subnetwork_size = (hi - lo + 1);
+                    const std::size_t subnetwork_size = (hi - lo + 1);
                     assert(rhs_dests.size() == subnetwork_size);
-                    const size_t subnetwork_width = as_waksman_num_columns(subnetwork_size);
+                    const std::size_t subnetwork_width = as_waksman_num_columns(subnetwork_size);
                     assert(right - left + 1 >= subnetwork_width);
 
                     if (right - left + 1 > subnetwork_width) {
@@ -206,14 +206,14 @@ namespace nil {
                          * If there is more space for the routing network than needed,
                          * just add straight edges. This also handles the size-1 base case.
                          */
-                        for (size_t packet_idx = lo; packet_idx <= hi; ++packet_idx) {
+                        for (std::size_t packet_idx = lo; packet_idx <= hi; ++packet_idx) {
                             neighbors[left][packet_idx].first = neighbors[left][packet_idx].second = packet_idx;
                             neighbors[right][packet_idx].first = neighbors[right][packet_idx].second =
                                 rhs_dests[packet_idx - lo];
                         }
 
-                        std::vector<size_t> new_rhs_dests(subnetwork_size, -1);
-                        for (size_t packet_idx = lo; packet_idx <= hi; ++packet_idx) {
+                        std::vector<std::size_t> new_rhs_dests(subnetwork_size, -1);
+                        for (std::size_t packet_idx = lo; packet_idx <= hi; ++packet_idx) {
                             new_rhs_dests[packet_idx - lo] = packet_idx;
                         }
 
@@ -227,7 +227,7 @@ namespace nil {
                          * Networks of size sz > 2 are handled by adding two columns of
                          * switches alongside the network and recursing.
                          */
-                        std::vector<size_t> new_rhs_dests(subnetwork_size, -1);
+                        std::vector<std::size_t> new_rhs_dests(subnetwork_size, -1);
 
                         /**
                          * This adds floor(sz/2) switches alongside the network.
@@ -236,7 +236,7 @@ namespace nil {
                          * even case can be eliminated (i.e., set to a constant). We handle
                          * this later.
                          */
-                        for (size_t row_idx = lo; row_idx < (subnetwork_size % 2 == 1 ? hi : hi + 1); row_idx += 2) {
+                        for (std::size_t row_idx = lo; row_idx < (subnetwork_size % 2 == 1 ? hi : hi + 1); row_idx += 2) {
                             neighbors[left][row_idx].first = neighbors[left][row_idx + 1].second =
                                 as_waksman_switch_output(subnetwork_size, lo, row_idx, true);
                             neighbors[left][row_idx].second = neighbors[left][row_idx + 1].first =
@@ -271,25 +271,25 @@ namespace nil {
                             neighbors[left][hi].second = neighbors[left][hi].first;
                         }
 
-                        const size_t d = as_waksman_top_height(subnetwork_size);
-                        const std::vector<size_t> new_rhs_dests_top(new_rhs_dests.begin(), new_rhs_dests.begin() + d);
-                        const std::vector<size_t> new_rhs_dests_bottom(new_rhs_dests.begin() + d, new_rhs_dests.end());
+                        const std::size_t d = as_waksman_top_height(subnetwork_size);
+                        const std::vector<std::size_t> new_rhs_dests_top(new_rhs_dests.begin(), new_rhs_dests.begin() + d);
+                        const std::vector<std::size_t> new_rhs_dests_bottom(new_rhs_dests.begin() + d, new_rhs_dests.end());
 
                         construct_as_waksman_inner(left + 1, right - 1, lo, lo + d - 1, new_rhs_dests_top, neighbors);
                         construct_as_waksman_inner(left + 1, right - 1, lo + d, hi, new_rhs_dests_bottom, neighbors);
                     }
                 }
 
-                as_waksman_topology generate_as_waksman_topology(const size_t num_packets) {
+                as_waksman_topology generate_as_waksman_topology(const std::size_t num_packets) {
                     assert(num_packets > 1);
-                    const size_t width = as_waksman_num_columns(num_packets);
+                    const std::size_t width = as_waksman_num_columns(num_packets);
 
                     as_waksman_topology neighbors(
                         width,
-                        std::vector<std::pair<size_t, size_t>>(num_packets, std::make_pair<size_t, size_t>(-1, -1)));
+                        std::vector<std::pair<std::size_t, std::size_t>>(num_packets, std::make_pair<std::size_t, std::size_t>(-1, -1)));
 
-                    std::vector<size_t> rhs_dests(num_packets);
-                    for (size_t packet_idx = 0; packet_idx < num_packets; ++packet_idx) {
+                    std::vector<std::size_t> rhs_dests(num_packets);
+                    for (std::size_t packet_idx = 0; packet_idx < num_packets; ++packet_idx) {
                         rhs_dests[packet_idx] = packet_idx;
                     }
 
@@ -305,7 +305,7 @@ namespace nil {
                  * This function is agnostic to column_idx, given row_offset, so we omit
                  * column_idx.
                  */
-                size_t as_waksman_get_canonical_row_idx(const size_t row_offset, const size_t row_idx) {
+                std::size_t as_waksman_get_canonical_row_idx(const std::size_t row_offset, const std::size_t row_idx) {
                     /* translate back relative to row_offset, clear LSB, and then translate forward */
                     return (((row_idx - row_offset) & ~1) + row_offset);
                 }
@@ -320,10 +320,10 @@ namespace nil {
                  * - the input position for the LHS switches, and
                  * - the output position for the RHS switches.
                  */
-                bool as_waksman_get_switch_setting_from_top_bottom_decision(const size_t row_offset,
-                                                                            const size_t packet_idx,
+                bool as_waksman_get_switch_setting_from_top_bottom_decision(const std::size_t row_offset,
+                                                                            const std::size_t packet_idx,
                                                                             const bool use_top) {
-                    const size_t row_idx = as_waksman_get_canonical_row_idx(row_offset, packet_idx);
+                    const std::size_t row_idx = as_waksman_get_canonical_row_idx(row_offset, packet_idx);
                     return (packet_idx == row_idx) ^ use_top;
                 }
 
@@ -337,10 +337,10 @@ namespace nil {
                  * - the input position for the RHS switches, and
                  * - the output position for the LHS switches.
                  */
-                bool as_waksman_get_top_bottom_decision_from_switch_setting(const size_t row_offset,
-                                                                            const size_t packet_idx,
+                bool as_waksman_get_top_bottom_decision_from_switch_setting(const std::size_t row_offset,
+                                                                            const std::size_t packet_idx,
                                                                             const bool switch_setting) {
-                    const size_t row_idx = as_waksman_get_canonical_row_idx(row_offset, packet_idx);
+                    const std::size_t row_idx = as_waksman_get_canonical_row_idx(row_offset, packet_idx);
                     return (row_idx == packet_idx) ^ switch_setting;
                 }
 
@@ -348,8 +348,8 @@ namespace nil {
                  * Given an output wire of a RHS switch, compute and return the output
                  * position of the other wire also connected to this switch.
                  */
-                size_t as_waksman_other_output_position(const size_t row_offset, const size_t packet_idx) {
-                    const size_t row_idx = as_waksman_get_canonical_row_idx(row_offset, packet_idx);
+                std::size_t as_waksman_other_output_position(const std::size_t row_offset, const std::size_t packet_idx) {
+                    const std::size_t row_idx = as_waksman_get_canonical_row_idx(row_offset, packet_idx);
                     return (1 - (packet_idx - row_idx)) + row_idx;
                 }
 
@@ -357,7 +357,7 @@ namespace nil {
                  * Given an input wire of a LHS switch, compute and return the input
                  * position of the other wire also connected to this switch.
                  */
-                size_t as_waksman_other_input_position(const size_t row_offset, const size_t packet_idx) {
+                std::size_t as_waksman_other_input_position(const std::size_t row_offset, const std::size_t packet_idx) {
                     /* Due to symmetry, this function equals as_waksman_other_output_position. */
                     return as_waksman_other_output_position(row_offset, packet_idx);
                 }
@@ -375,10 +375,10 @@ namespace nil {
                  *
                  * NOTE: due to offsets, neither pi or piinv are instances of integer_permutation.
                  */
-                void as_waksman_route_inner(const size_t left,
-                                            const size_t right,
-                                            const size_t lo,
-                                            const size_t hi,
+                void as_waksman_route_inner(const std::size_t left,
+                                            const std::size_t right,
+                                            const std::size_t lo,
+                                            const std::size_t hi,
                                             const integer_permutation &permutation,
                                             const integer_permutation &permutation_inv,
                                             as_waksman_routing &routing) {
@@ -386,8 +386,8 @@ namespace nil {
                         return;
                     }
 
-                    const size_t subnetwork_size = (hi - lo + 1);
-                    const size_t subnetwork_width = as_waksman_num_columns(subnetwork_size);
+                    const std::size_t subnetwork_size = (hi - lo + 1);
+                    const std::size_t subnetwork_width = as_waksman_num_columns(subnetwork_size);
                     assert(right - left + 1 >= subnetwork_width);
 
                     if (right - left + 1 > subnetwork_width) {
@@ -420,8 +420,8 @@ namespace nil {
                                                      false); /* offset by lo, i.e. lhs_routed[packet_idx-lo] is set if
                                                                                          packet packet_idx is routed */
 
-                        size_t to_route;
-                        size_t max_unrouted;
+                        std::size_t to_route;
+                        std::size_t max_unrouted;
                         bool route_left;
 
                         if (subnetwork_size % 2 == 1) {
@@ -445,11 +445,11 @@ namespace nil {
                                  * on RHS, so route the other value from that switch
                                  * using the lower subnetwork.
                                  */
-                                const size_t rhs_switch = as_waksman_get_canonical_row_idx(lo, permutation.get(hi));
+                                const std::size_t rhs_switch = as_waksman_get_canonical_row_idx(lo, permutation.get(hi));
                                 const bool rhs_switch_setting = as_waksman_get_switch_setting_from_top_bottom_decision(
                                     lo, permutation.get(hi), false);
                                 routing[right][rhs_switch] = rhs_switch_setting;
-                                size_t tprime = as_waksman_switch_input(subnetwork_size, lo, rhs_switch, false);
+                                std::size_t tprime = as_waksman_switch_input(subnetwork_size, lo, rhs_switch, false);
                                 new_permutation.set(hi, tprime);
                                 new_permutation_inv.set(tprime, hi);
 
@@ -477,14 +477,14 @@ namespace nil {
                              */
                             if (route_left) {
                                 /* If switch value has not been assigned, assign it arbitrarily. */
-                                const size_t lhs_switch = as_waksman_get_canonical_row_idx(lo, to_route);
+                                const std::size_t lhs_switch = as_waksman_get_canonical_row_idx(lo, to_route);
                                 if (routing[left].find(lhs_switch) == routing[left].end()) {
                                     routing[left][lhs_switch] = false;
                                 }
                                 const bool lhs_switch_setting = routing[left][lhs_switch];
                                 const bool use_top = as_waksman_get_top_bottom_decision_from_switch_setting(
                                     lo, to_route, lhs_switch_setting);
-                                const size_t t = as_waksman_switch_output(subnetwork_size, lo, lhs_switch, use_top);
+                                const std::size_t t = as_waksman_switch_output(subnetwork_size, lo, lhs_switch, use_top);
                                 if (permutation.get(to_route) == hi) {
                                     /**
                                      * We have routed to the straight wire for the odd case,
@@ -496,7 +496,7 @@ namespace nil {
                                     to_route = max_unrouted;
                                     route_left = true;
                                 } else {
-                                    const size_t rhs_switch =
+                                    const std::size_t rhs_switch =
                                         as_waksman_get_canonical_row_idx(lo, permutation.get(to_route));
                                     /**
                                      * We know that the corresponding switch on the right-hand side
@@ -505,7 +505,7 @@ namespace nil {
                                     assert(routing[right].find(rhs_switch) == routing[right].end());
                                     routing[right][rhs_switch] = as_waksman_get_switch_setting_from_top_bottom_decision(
                                         lo, permutation.get(to_route), use_top);
-                                    const size_t tprime =
+                                    const std::size_t tprime =
                                         as_waksman_switch_input(subnetwork_size, lo, rhs_switch, use_top);
                                     new_permutation.set(t, tprime);
                                     new_permutation_inv.set(tprime, t);
@@ -519,8 +519,8 @@ namespace nil {
                                  * We have arrived on the right-hand side, so the switch setting is fixed.
                                  * Next, we back route from here.
                                  */
-                                const size_t rhs_switch = as_waksman_get_canonical_row_idx(lo, to_route);
-                                const size_t lhs_switch =
+                                const std::size_t rhs_switch = as_waksman_get_canonical_row_idx(lo, to_route);
+                                const std::size_t lhs_switch =
                                     as_waksman_get_canonical_row_idx(lo, permutation_inv.get(to_route));
                                 assert(routing[right].find(rhs_switch) != routing[right].end());
                                 const bool rhs_switch_setting = routing[right][rhs_switch];
@@ -534,8 +534,8 @@ namespace nil {
                                 assert(it == routing[left].end() || it->second == lhs_switch_setting);
                                 routing[left][lhs_switch] = lhs_switch_setting;
 
-                                const size_t t = as_waksman_switch_input(subnetwork_size, lo, rhs_switch, use_top);
-                                const size_t tprime =
+                                const std::size_t t = as_waksman_switch_input(subnetwork_size, lo, rhs_switch, use_top);
+                                const std::size_t tprime =
                                     as_waksman_switch_output(subnetwork_size, lo, lhs_switch, use_top);
                                 new_permutation.set(tprime, t);
                                 new_permutation_inv.set(t, tprime);
@@ -572,7 +572,7 @@ namespace nil {
                             routing[left].erase(hi - 1);
                         }
 
-                        const size_t d = as_waksman_top_height(subnetwork_size);
+                        const std::size_t d = as_waksman_top_height(subnetwork_size);
                         const integer_permutation new_permutation_upper = new_permutation.slice(lo, lo + d - 1);
                         const integer_permutation new_permutation_lower = new_permutation.slice(lo + d, hi);
 
@@ -592,8 +592,8 @@ namespace nil {
                 }
 
                 as_waksman_routing get_as_waksman_routing(const integer_permutation &permutation) {
-                    const size_t num_packets = permutation.size();
-                    const size_t width = as_waksman_num_columns(num_packets);
+                    const std::size_t num_packets = permutation.size();
+                    const std::size_t width = as_waksman_num_columns(num_packets);
 
                     as_waksman_routing routing(width);
                     as_waksman_route_inner(
@@ -603,16 +603,16 @@ namespace nil {
 
                 bool valid_as_waksman_routing(const integer_permutation &permutation,
                                               const as_waksman_routing &routing) {
-                    const size_t num_packets = permutation.size();
-                    const size_t width = as_waksman_num_columns(num_packets);
+                    const std::size_t num_packets = permutation.size();
+                    const std::size_t width = as_waksman_num_columns(num_packets);
                     as_waksman_topology neighbors = generate_as_waksman_topology(num_packets);
 
                     integer_permutation curperm(num_packets);
 
-                    for (size_t column_idx = 0; column_idx < width; ++column_idx) {
+                    for (std::size_t column_idx = 0; column_idx < width; ++column_idx) {
                         integer_permutation nextperm(num_packets);
-                        for (size_t packet_idx = 0; packet_idx < num_packets; ++packet_idx) {
-                            size_t routed_packet_idx;
+                        for (std::size_t packet_idx = 0; packet_idx < num_packets; ++packet_idx) {
+                            std::size_t routed_packet_idx;
                             if (neighbors[column_idx][packet_idx].first == neighbors[column_idx][packet_idx].second) {
                                 routed_packet_idx = neighbors[column_idx][packet_idx].first;
                             } else {

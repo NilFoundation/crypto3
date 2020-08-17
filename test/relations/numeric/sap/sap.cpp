@@ -22,7 +22,7 @@
 using namespace nil::crypto3::zk::snark;
 
 template<typename FieldType>
-void test_sap(const size_t sap_degree, const size_t num_inputs, const bool binary_input) {
+void test_sap(const std::size_t sap_degree, const std::size_t num_inputs, const bool binary_input) {
     /*
       We construct an instance where the SAP degree is <= sap_degree.
       The R1CS-to-SAP reduction produces SAPs with degree
@@ -30,7 +30,7 @@ void test_sap(const size_t sap_degree, const size_t num_inputs, const bool binar
       So we generate an instance of R1CS where the number of constraints is
         (sap_degree - 1) / 2 - num_inputs.
     */
-    const size_t num_constraints = (sap_degree - 1) / 2 - num_inputs;
+    const std::size_t num_constraints = (sap_degree - 1) / 2 - num_inputs;
     BOOST_CHECK(num_constraints >= 1);
 
     r1cs_example<FieldType> example;
@@ -57,16 +57,16 @@ void test_sap(const size_t sap_degree, const size_t num_inputs, const bool binar
 BOOST_AUTO_TEST_SUITE(sap_test_suite)
 
 BOOST_AUTO_TEST_CASE(sap_test) {
-    const size_t num_inputs = 10;
+    const std::size_t num_inputs = 10;
 
     /**
      * due to the specifics of our reduction, we can only get SAPs with odd
      * degrees, so we can only test "special" versions of the domains
      */
 
-    const size_t basic_domain_size_special = (1ul << algebra::mnt6_Fr::s) - 1ul;
-    const size_t step_domain_size_special = (1ul << 10) + (1ul << 8) - 1ul;
-    const size_t extended_domain_size_special = (1ul << (algebra::mnt6_Fr::s + 1)) - 1ul;
+    const std::size_t basic_domain_size_special = (1ul << algebra::mnt6_Fr::s) - 1ul;
+    const std::size_t step_domain_size_special = (1ul << 10) + (1ul << 8) - 1ul;
+    const std::size_t extended_domain_size_special = (1ul << (algebra::mnt6_Fr::s + 1)) - 1ul;
 
     test_sap<algebra::Fr<algebra::mnt6_pp>>(basic_domain_size_special, num_inputs, true);
     test_sap<algebra::Fr<algebra::mnt6_pp>>(step_domain_size_special, num_inputs, true);

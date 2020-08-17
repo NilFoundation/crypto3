@@ -42,7 +42,7 @@ namespace nil {
                     memory_line_variable_gadget<ramT> line2;
 
                     memory_checker_gadget(ram_protoboard<ramT> &pb,
-                                          const size_t timestamp_size,
+                                          const std::size_t timestamp_size,
                                           const memory_line_variable_gadget<ramT> &line1,
                                           const memory_line_variable_gadget<ramT> &line2);
 
@@ -52,7 +52,7 @@ namespace nil {
 
                 template<typename ramT>
                 memory_checker_gadget<ramT>::memory_checker_gadget(ram_protoboard<ramT> &pb,
-                                                                   const size_t timestamp_size,
+                                                                   const std::size_t timestamp_size,
                                                                    const memory_line_variable_gadget<ramT> &line1,
                                                                    const memory_line_variable_gadget<ramT> &line2) :
                     ram_gadget_base<ramT>(pb),
@@ -65,7 +65,7 @@ namespace nil {
                                                          line2.timestamp->packed, timestamps_less, timestamps_leq));
 
                     /* compare the two addresses */
-                    const size_t address_size = pb.ap.address_size();
+                    const std::size_t address_size = pb.ap.address_size();
                     addresses_eq.allocate(pb);
                     addresses_leq.allocate(pb);
                     addresses_less.allocate(pb);

@@ -81,7 +81,7 @@ namespace nil {
                     set_commitment commitment_to_translation_step_r1cs_vks;
                     std::vector<set_membership_proof> compliance_step_r1cs_vk_membership_proofs;
 
-                    std::map<size_t, size_t> compliance_predicate_name_to_idx;
+                    std::map<std::size_t, std::size_t> compliance_predicate_name_to_idx;
 
                     r1cs_mp_ppzkpcd_proving_key() {};
                     r1cs_mp_ppzkpcd_proving_key(const r1cs_mp_ppzkpcd_proving_key<PCD_ppT> &other) = default;
@@ -94,7 +94,7 @@ namespace nil {
                         const std::vector<r1cs_ppzksnark_verification_key<B_pp>> &translation_step_r1cs_vk,
                         const set_commitment &commitment_to_translation_step_r1cs_vks,
                         const std::vector<set_membership_proof> &compliance_step_r1cs_vk_membership_proofs,
-                        const std::map<size_t, size_t> &compliance_predicate_name_to_idx) :
+                        const std::map<std::size_t, std::size_t> &compliance_predicate_name_to_idx) :
                         compliance_predicates(compliance_predicates),
                         compliance_step_r1cs_pks(compliance_step_r1cs_pks),
                         translation_step_r1cs_pks(translation_step_r1cs_pks),
@@ -108,7 +108,7 @@ namespace nil {
                     r1cs_mp_ppzkpcd_proving_key<PCD_ppT> &
                         operator=(const r1cs_mp_ppzkpcd_proving_key<PCD_ppT> &other) = default;
 
-                    size_t size_in_bits() const;
+                    std::size_t size_in_bits() const;
 
                     bool is_well_formed() const;
 
@@ -158,7 +158,7 @@ namespace nil {
                     r1cs_mp_ppzkpcd_verification_key<PCD_ppT> &
                         operator=(const r1cs_mp_ppzkpcd_verification_key<PCD_ppT> &other) = default;
 
-                    size_t size_in_bits() const;
+                    std::size_t size_in_bits() const;
 
                     bool operator==(const r1cs_mp_ppzkpcd_verification_key<PCD_ppT> &other) const;
                     friend std::ostream &operator<<<PCD_ppT>(std::ostream &out,
@@ -212,7 +212,7 @@ namespace nil {
                     r1cs_mp_ppzkpcd_processed_verification_key<PCD_ppT> &
                         operator=(const r1cs_mp_ppzkpcd_processed_verification_key<PCD_ppT> &other) = default;
 
-                    size_t size_in_bits() const;
+                    std::size_t size_in_bits() const;
 
                     bool operator==(const r1cs_mp_ppzkpcd_processed_verification_key<PCD_ppT> &other) const;
                     friend std::ostream &
@@ -259,17 +259,17 @@ namespace nil {
                 template<typename PCD_ppT>
                 class r1cs_mp_ppzkpcd_proof {
                 public:
-                    size_t compliance_predicate_idx;
+                    std::size_t compliance_predicate_idx;
                     r1cs_ppzksnark_proof<typename PCD_ppT::curve_B_pp> r1cs_proof;
 
                     r1cs_mp_ppzkpcd_proof() = default;
-                    r1cs_mp_ppzkpcd_proof(const size_t compliance_predicate_idx,
+                    r1cs_mp_ppzkpcd_proof(const std::size_t compliance_predicate_idx,
                                           const r1cs_ppzksnark_proof<typename PCD_ppT::curve_B_pp> &r1cs_proof) :
                         compliance_predicate_idx(compliance_predicate_idx),
                         r1cs_proof(r1cs_proof) {
                     }
 
-                    size_t size_in_bits() const;
+                    std::size_t size_in_bits() const;
 
                     bool operator==(const r1cs_mp_ppzkpcd_proof<PCD_ppT> &other) const;
                     friend std::ostream &operator<<<PCD_ppT>(std::ostream &out,
@@ -300,7 +300,7 @@ namespace nil {
                 template<typename PCD_ppT>
                 r1cs_mp_ppzkpcd_proof<PCD_ppT>
                     r1cs_mp_ppzkpcd_prover(const r1cs_mp_ppzkpcd_proving_key<PCD_ppT> &pk,
-                                           const size_t compliance_predicate_name,
+                                           const std::size_t compliance_predicate_name,
                                            const r1cs_mp_ppzkpcd_primary_input<PCD_ppT> &primary_input,
                                            const r1cs_mp_ppzkpcd_auxiliary_input<PCD_ppT> &auxiliary_input,
                                            const std::vector<r1cs_mp_ppzkpcd_proof<PCD_ppT>> &incoming_proofs);
@@ -339,11 +339,11 @@ namespace nil {
                                                      const r1cs_mp_ppzkpcd_proof<PCD_ppT> &proof);
 
                 template<typename PCD_ppT>
-                size_t r1cs_mp_ppzkpcd_proving_key<PCD_ppT>::size_in_bits() const {
-                    const size_t num_predicates = compliance_predicates.size();
+                std::size_t r1cs_mp_ppzkpcd_proving_key<PCD_ppT>::size_in_bits() const {
+                    const std::size_t num_predicates = compliance_predicates.size();
 
-                    size_t result = 0;
-                    for (size_t i = 0; i < num_predicates; ++i) {
+                    std::size_t result = 0;
+                    for (std::size_t i = 0; i < num_predicates; ++i) {
                         result +=
                             (compliance_predicates[i].size_in_bits() + compliance_step_r1cs_pks[i].size_in_bits() +
                              translation_step_r1cs_pks[i].size_in_bits() + compliance_step_r1cs_vks[i].size_in_bits() +
@@ -357,7 +357,7 @@ namespace nil {
 
                 template<typename PCD_ppT>
                 bool r1cs_mp_ppzkpcd_proving_key<PCD_ppT>::is_well_formed() const {
-                    const size_t num_predicates = compliance_predicates.size();
+                    const std::size_t num_predicates = compliance_predicates.size();
 
                     bool result;
                     result = result && (compliance_step_r1cs_pks.size() == num_predicates);
@@ -413,11 +413,11 @@ namespace nil {
                 }
 
                 template<typename PCD_ppT>
-                size_t r1cs_mp_ppzkpcd_verification_key<PCD_ppT>::size_in_bits() const {
-                    const size_t num_predicates = compliance_step_r1cs_vks.size();
+                std::size_t r1cs_mp_ppzkpcd_verification_key<PCD_ppT>::size_in_bits() const {
+                    const std::size_t num_predicates = compliance_step_r1cs_vks.size();
 
-                    size_t result = 0;
-                    for (size_t i = 0; i < num_predicates; ++i) {
+                    std::size_t result = 0;
+                    for (std::size_t i = 0; i < num_predicates; ++i) {
                         result +=
                             (compliance_step_r1cs_vks[i].size_in_bits() + translation_step_r1cs_vks[i].size_in_bits());
                     }
@@ -455,11 +455,11 @@ namespace nil {
                 }
 
                 template<typename PCD_ppT>
-                size_t r1cs_mp_ppzkpcd_processed_verification_key<PCD_ppT>::size_in_bits() const {
-                    const size_t num_predicates = compliance_step_r1cs_pvks.size();
+                std::size_t r1cs_mp_ppzkpcd_processed_verification_key<PCD_ppT>::size_in_bits() const {
+                    const std::size_t num_predicates = compliance_step_r1cs_pvks.size();
 
-                    size_t result = 0;
-                    for (size_t i = 0; i < num_predicates; ++i) {
+                    std::size_t result = 0;
+                    for (std::size_t i = 0; i < num_predicates; ++i) {
                         result += (compliance_step_r1cs_pvks[i].size_in_bits() +
                                    translation_step_r1cs_pvks[i].size_in_bits());
                     }
@@ -537,9 +537,9 @@ namespace nil {
                     algebra::enter_block("Call to r1cs_mp_ppzkpcd_generator");
 
                     r1cs_mp_ppzkpcd_keypair<PCD_ppT> keypair;
-                    const size_t translation_input_size =
+                    const std::size_t translation_input_size =
                         mp_translation_step_pcd_circuit_maker<curve_B_pp>::input_size_in_elts();
-                    const size_t vk_size_in_bits =
+                    const std::size_t vk_size_in_bits =
                         r1cs_ppzksnark_verification_key_variable<curve_A_pp>::size_in_bits(translation_input_size);
                     printf("%zu %zu\n", translation_input_size, vk_size_in_bits);
 
@@ -547,7 +547,7 @@ namespace nil {
                         compliance_predicates.size(), vk_size_in_bits);
 
                     algebra::enter_block("Perform type checks");
-                    std::map<size_t, size_t> type_counts;
+                    std::map<std::size_t, std::size_t> type_counts;
 
                     for (auto &cp : compliance_predicates) {
                         type_counts[cp.type] += 1;
@@ -555,7 +555,7 @@ namespace nil {
 
                     for (auto &cp : compliance_predicates) {
                         if (cp.relies_on_same_type_inputs) {
-                            for (size_t type : cp.accepted_input_types) {
+                            for (std::size_t type : cp.accepted_input_types) {
                                 assert(type_counts[type] == 1); /* each of accepted_input_types must be unique */
                             }
                         } else {
@@ -564,7 +564,7 @@ namespace nil {
                     }
                     algebra::leave_block("Perform type checks");
 
-                    for (size_t i = 0; i < compliance_predicates.size(); ++i) {
+                    for (std::size_t i = 0; i < compliance_predicates.size(); ++i) {
                         algebra::enter_block(FMT("",
                                                  "Process predicate %zu (with name %zu and type %zu)",
                                                  i,
@@ -611,7 +611,7 @@ namespace nil {
                         keypair.pk.translation_step_r1cs_pks.emplace_back(mp_translation_step_keypair.pk);
                         keypair.pk.compliance_step_r1cs_vks.emplace_back(mp_compliance_step_keypair.vk);
                         keypair.pk.translation_step_r1cs_vks.emplace_back(mp_translation_step_keypair.vk);
-                        const size_t cp_name = compliance_predicates[i].name;
+                        const std::size_t cp_name = compliance_predicates[i].name;
                         assert(keypair.pk.compliance_predicate_name_to_idx.find(cp_name) ==
                                keypair.pk.compliance_predicate_name_to_idx.end());    // all names must be distinct
                         keypair.pk.compliance_predicate_name_to_idx[cp_name] = i;
@@ -631,7 +631,7 @@ namespace nil {
                     const set_commitment cm = all_translation_vks.get_commitment();
                     keypair.pk.commitment_to_translation_step_r1cs_vks = cm;
                     keypair.vk.commitment_to_translation_step_r1cs_vks = cm;
-                    for (size_t i = 0; i < compliance_predicates.size(); ++i) {
+                    for (std::size_t i = 0; i < compliance_predicates.size(); ++i) {
                         const std::vector<bool> vk_bits =
                             r1cs_ppzksnark_verification_key_variable<curve_A_pp>::get_verification_key_bits(
                                 keypair.vk.translation_step_r1cs_vks[i]);
@@ -651,7 +651,7 @@ namespace nil {
                 template<typename PCD_ppT>
                 r1cs_mp_ppzkpcd_proof<PCD_ppT>
                     r1cs_mp_ppzkpcd_prover(const r1cs_mp_ppzkpcd_proving_key<PCD_ppT> &pk,
-                                           const size_t compliance_predicate_name,
+                                           const std::size_t compliance_predicate_name,
                                            const r1cs_mp_ppzkpcd_primary_input<PCD_ppT> &primary_input,
                                            const r1cs_mp_ppzkpcd_auxiliary_input<PCD_ppT> &auxiliary_input,
                                            const std::vector<r1cs_mp_ppzkpcd_proof<PCD_ppT>> &prev_proofs) {
@@ -668,7 +668,7 @@ namespace nil {
 #endif
                     auto it = pk.compliance_predicate_name_to_idx.find(compliance_predicate_name);
                     assert(it != pk.compliance_predicate_name_to_idx.end());
-                    const size_t compliance_predicate_idx = it->second;
+                    const std::size_t compliance_predicate_idx = it->second;
 
 #ifdef DEBUG
                     printf("Outgoing message:\n");
@@ -679,26 +679,26 @@ namespace nil {
                     assert(compliance_predicate_idx < pk.compliance_predicates.size());
                     assert(prev_proofs.size() <= pk.compliance_predicates[compliance_predicate_idx].max_arity);
 
-                    const size_t arity = prev_proofs.size();
-                    const size_t max_arity = pk.compliance_predicates[compliance_predicate_idx].max_arity;
+                    const std::size_t arity = prev_proofs.size();
+                    const std::size_t max_arity = pk.compliance_predicates[compliance_predicate_idx].max_arity;
 
                     if (pk.compliance_predicates[compliance_predicate_idx].relies_on_same_type_inputs) {
-                        const size_t input_predicate_idx = prev_proofs[0].compliance_predicate_idx;
-                        for (size_t i = 1; i < arity; ++i) {
+                        const std::size_t input_predicate_idx = prev_proofs[0].compliance_predicate_idx;
+                        for (std::size_t i = 1; i < arity; ++i) {
                             assert(prev_proofs[i].compliance_predicate_idx == input_predicate_idx);
                         }
                     }
 
                     std::vector<r1cs_ppzksnark_proof<curve_B_pp>> padded_proofs(max_arity);
-                    for (size_t i = 0; i < arity; ++i) {
+                    for (std::size_t i = 0; i < arity; ++i) {
                         padded_proofs[i] = prev_proofs[i].r1cs_proof;
                     }
 
                     std::vector<r1cs_ppzksnark_verification_key<curve_B_pp>> translation_step_vks;
                     std::vector<set_membership_proof> membership_proofs;
 
-                    for (size_t i = 0; i < arity; ++i) {
-                        const size_t input_predicate_idx = prev_proofs[i].compliance_predicate_idx;
+                    for (std::size_t i = 0; i < arity; ++i) {
+                        const std::size_t input_predicate_idx = prev_proofs[i].compliance_predicate_idx;
                         translation_step_vks.emplace_back(pk.translation_step_r1cs_vks[input_predicate_idx]);
                         membership_proofs.emplace_back(
                             pk.compliance_step_r1cs_vk_membership_proofs[input_predicate_idx]);
@@ -719,7 +719,7 @@ namespace nil {
                     }
 
                     /* pad with dummy vks/membership proofs */
-                    for (size_t i = arity; i < max_arity; ++i) {
+                    for (std::size_t i = arity; i < max_arity; ++i) {
                         printf("proof %zu will be a dummy\n", arity);
                         translation_step_vks.emplace_back(pk.translation_step_r1cs_vks[0]);
                         membership_proofs.emplace_back(pk.compliance_step_r1cs_vk_membership_proofs[0]);
@@ -823,7 +823,7 @@ namespace nil {
                     r1cs_mp_ppzkpcd_processed_verification_key<PCD_ppT> result;
                     result.commitment_to_translation_step_r1cs_vks = vk.commitment_to_translation_step_r1cs_vks;
 
-                    for (size_t i = 0; i < vk.compliance_step_r1cs_vks.size(); ++i) {
+                    for (std::size_t i = 0; i < vk.compliance_step_r1cs_vks.size(); ++i) {
                         const r1cs_ppzksnark_processed_verification_key<curve_A_pp> compliance_step_r1cs_pvk =
                             r1cs_ppzksnark_verifier_process_vk<curve_A_pp>(vk.compliance_step_r1cs_vks[i]);
                         const r1cs_ppzksnark_processed_verification_key<curve_B_pp> translation_step_r1cs_pvk =

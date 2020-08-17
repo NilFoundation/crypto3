@@ -50,14 +50,14 @@ namespace nil {
                     algebra::G2<snark_pp<default_r1cs_ppzkadsnark_pp>> Lambda_copy(Lambda);
                     Lambda_copy.to_affine_coordinates();
 
-                    for (size_t i = 0; i < 16; i++)
+                    for (std::size_t i = 0; i < 16; i++)
                         message[i] = label.label_bytes[i];
 
                     // More efficient way to get canonical point rep?
                     std::stringstream stream;
                     stream.rdbuf()->pubsetbuf(((char *)message) + 16, 320);
                     stream << Lambda_copy;
-                    size_t written = stream.tellp();
+                    std::size_t written = stream.tellp();
                     while (written < 320)
                         message[16 + written++] = 0;
 
@@ -65,7 +65,7 @@ namespace nil {
 
                     assert(sigmalen == 64 + 16 + 320);
 
-                    for (size_t i = 0; i < 64; i++)
+                    for (std::size_t i = 0; i < 64; i++)
                         sigma.sig_bytes[i] = signature[i];
 
                     return sigma;
@@ -82,17 +82,17 @@ namespace nil {
                     algebra::G2<snark_pp<default_r1cs_ppzkadsnark_pp>> Lambda_copy(Lambda);
                     Lambda_copy.to_affine_coordinates();
 
-                    for (size_t i = 0; i < 64; i++)
+                    for (std::size_t i = 0; i < 64; i++)
                         signature[i] = sig.sig_bytes[i];
 
-                    for (size_t i = 0; i < 16; i++)
+                    for (std::size_t i = 0; i < 16; i++)
                         signature[64 + i] = label.label_bytes[i];
 
                     // More efficient way to get canonical point rep?
                     std::stringstream stream;
                     stream.rdbuf()->pubsetbuf(((char *)signature) + 64 + 16, 320);
                     stream << Lambda_copy;
-                    size_t written = stream.tellp();
+                    std::size_t written = stream.tellp();
                     while (written < 320)
                         signature[64 + 16 + written++] = 0;
 
@@ -118,7 +118,7 @@ namespace nil {
                     unsigned char *pks[labels.size()];
 
                     unsigned char pk_copy[32];
-                    for (size_t i = 0; i < 32; i++) {
+                    for (std::size_t i = 0; i < 32; i++) {
                         pk_copy[i] = vk.vk_bytes[i];
                     }
 
@@ -127,16 +127,16 @@ namespace nil {
                     unsigned char *signaturemem = (unsigned char *)malloc(labels.size() * (64 + 16 + 320));
                     assert(signaturemem != NULL);
 
-                    for (size_t i = 0; i < labels.size(); i++) {
+                    for (std::size_t i = 0; i < labels.size(); i++) {
                         siglen[i] = 64 + 16 + 320;
                         messages[i] = messagemem + (64 + 16 + 320) * i;
                         signatures[i] = signaturemem + (64 + 16 + 320) * i;
                         pks[i] = pk_copy;
 
-                        for (size_t j = 0; j < 64; j++)
+                        for (std::size_t j = 0; j < 64; j++)
                             signaturemem[i * (64 + 16 + 320) + j] = sigs[i].sig_bytes[j];
 
-                        for (size_t j = 0; j < 16; j++)
+                        for (std::size_t j = 0; j < 16; j++)
                             signaturemem[i * (64 + 16 + 320) + 64 + j] = labels[i].label_bytes[j];
 
                         // More efficient way to get canonical point rep?
@@ -145,7 +145,7 @@ namespace nil {
                         stream.clear();
                         stream.rdbuf()->pubsetbuf((char *)(signaturemem + i * (64 + 16 + 320) + 64 + 16), 320);
                         stream << Lambda_copy;
-                        size_t written = stream.tellp();
+                        std::size_t written = stream.tellp();
                         while (written < 320)
                             signaturemem[i * (64 + 16 + 320) + 64 + 16 + written++] = 0;
                     }

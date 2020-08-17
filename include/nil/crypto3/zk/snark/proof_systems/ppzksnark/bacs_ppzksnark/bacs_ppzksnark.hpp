@@ -78,23 +78,23 @@ namespace nil {
 
                     bacs_ppzksnark_proving_key<ppT> &operator=(const bacs_ppzksnark_proving_key<ppT> &other) = default;
 
-                    size_t G1_size() const {
+                    std::size_t G1_size() const {
                         return r1cs_pk.G1_size();
                     }
 
-                    size_t G2_size() const {
+                    std::size_t G2_size() const {
                         return r1cs_pk.G2_size();
                     }
 
-                    size_t G1_sparse_size() const {
+                    std::size_t G1_sparse_size() const {
                         return r1cs_pk.G1_sparse_size();
                     }
 
-                    size_t G2_sparse_size() const {
+                    std::size_t G2_sparse_size() const {
                         return r1cs_pk.G2_sparse_size();
                     }
 
-                    size_t size_in_bits() const {
+                    std::size_t size_in_bits() const {
                         return r1cs_pk.size_in_bits();
                     }
 

@@ -22,8 +22,8 @@ namespace nil {
                 template<typename ramT>
                 struct ram_example {
                     ram_architecture_params<ramT> ap;
-                    size_t boot_trace_size_bound;
-                    size_t time_bound;
+                    std::size_t boot_trace_size_bound;
+                    std::size_t time_bound;
                     ram_boot_trace<ramT> boot_trace;
                     ram_input_tape<ramT> auxiliary_input;
                 };
@@ -33,10 +33,10 @@ namespace nil {
                  */
                 template<typename ramT>
                 ram_example<ramT> gen_ram_example_simple(const ram_architecture_params<ramT> &ap,
-                                                         size_t boot_trace_size_bound, size_t time_bound,
+                                                         std::size_t boot_trace_size_bound, std::size_t time_bound,
                                                          bool satisfiable = true) {
-                    const size_t program_size = boot_trace_size_bound / 2;
-                    const size_t input_size = boot_trace_size_bound - program_size;
+                    const std::size_t program_size = boot_trace_size_bound / 2;
+                    const std::size_t input_size = boot_trace_size_bound - program_size;
 
                     ram_example<ramT> result;
 
@@ -47,8 +47,8 @@ namespace nil {
                     tinyram_program prelude;
                     prelude.instructions = generate_tinyram_prelude(ap);
 
-                    size_t boot_pos = 0;
-                    for (size_t i = 0; i < prelude.instructions.size(); ++i) {
+                    std::size_t boot_pos = 0;
+                    for (std::size_t i = 0; i < prelude.instructions.size(); ++i) {
                         result.boot_trace.set_trace_entry(boot_pos++,
                                                           std::make_pair(i, prelude.instructions[i].as_dword(ap)));
                     }
@@ -61,7 +61,7 @@ namespace nil {
                         result.boot_trace.set_trace_entry(boot_pos++, random_tinyram_instruction(ap).as_dword(ap));
                     }
 
-                    for (size_t i = 0; i < input_size; ++i) {
+                    for (std::size_t i = 0; i < input_size; ++i) {
                         result.boot_trace.set_trace_entry(
                             boot_pos++,
                             std::make_pair((1ul << (ap.dwaddr_len() - 1)) + i, std::rand() % (1ul << (2 * ap.w))));
@@ -77,10 +77,10 @@ namespace nil {
                  */
                 template<typename ramT>
                 ram_example<ramT> gen_ram_example_complex(const ram_architecture_params<ramT> &ap,
-                                                          size_t boot_trace_size_bound, size_t time_bound,
+                                                          std::size_t boot_trace_size_bound, std::size_t time_bound,
                                                           bool satisfiable = true) {
-                    const size_t program_size = boot_trace_size_bound / 2;
-                    const size_t input_size = boot_trace_size_bound - program_size;
+                    const std::size_t program_size = boot_trace_size_bound / 2;
+                    const std::size_t input_size = boot_trace_size_bound - program_size;
 
                     BOOST_CHECK(2 * ap.w / 8 * program_size < 1ul << (ap.w - 1));
                     BOOST_CHECK(ap.w / 8 * input_size < 1ul << (ap.w - 1));
@@ -94,15 +94,15 @@ namespace nil {
                     tinyram_program prelude;
                     prelude.instructions = generate_tinyram_prelude(ap);
 
-                    size_t boot_pos = 0;
-                    for (size_t i = 0; i < prelude.instructions.size(); ++i) {
+                    std::size_t boot_pos = 0;
+                    for (std::size_t i = 0; i < prelude.instructions.size(); ++i) {
                         result.boot_trace.set_trace_entry(boot_pos++,
                                                           std::make_pair(i, prelude.instructions[i].as_dword(ap)));
                     }
 
-                    const size_t prelude_len = prelude.instructions.size();
-                    const size_t instr_addr = (prelude_len + 4) * (2 * ap.w / 8);
-                    const size_t input_addr =
+                    const std::size_t prelude_len = prelude.instructions.size();
+                    const std::size_t instr_addr = (prelude_len + 4) * (2 * ap.w / 8);
+                    const std::size_t input_addr =
                         (1ul << (ap.w - 1)) + (ap.w / 8);    // byte address of the first input word
 
                     result.boot_trace.set_trace_entry(
@@ -139,7 +139,7 @@ namespace nil {
                     result.boot_trace.set_trace_entry(
                         boot_pos++, std::make_pair(1ul << (ap.dwaddr_len() - 1), satisfiable ? 1ul << ap.w : 0));
 
-                    for (size_t i = 1; i < input_size; ++i) {
+                    for (std::size_t i = 1; i < input_size; ++i) {
                         result.boot_trace.set_trace_entry(
                             boot_pos++,
                             std::make_pair((1ul << (ap.dwaddr_len() - 1)) + i + 1, std::rand() % (1ul << (2 * ap.w))));

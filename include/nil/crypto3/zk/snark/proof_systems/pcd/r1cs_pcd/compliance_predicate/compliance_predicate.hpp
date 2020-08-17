@@ -37,9 +37,9 @@ namespace nil {
                 template<typename FieldType>
                 class r1cs_pcd_message {
                 public:
-                    size_t type;
+                    std::size_t type;
 
-                    r1cs_pcd_message(size_t type);
+                    r1cs_pcd_message(std::size_t type);
                     virtual r1cs_variable_assignment<FieldType> payload_as_r1cs_variable_assignment() const = 0;
                     r1cs_variable_assignment<FieldType> as_r1cs_variable_assignment() const;
 
@@ -111,33 +111,33 @@ namespace nil {
                 template<typename FieldType>
                 class r1cs_pcd_compliance_predicate {
                 public:
-                    size_t name;
-                    size_t type;
+                    std::size_t name;
+                    std::size_t type;
 
                     r1cs_constraint_system<FieldType> constraint_system;
 
-                    size_t outgoing_message_payload_length;
-                    size_t max_arity;
-                    std::vector<size_t> incoming_message_payload_lengths;
-                    size_t local_data_length;
-                    size_t witness_length;
+                    std::size_t outgoing_message_payload_length;
+                    std::size_t max_arity;
+                    std::vector<std::size_t> incoming_message_payload_lengths;
+                    std::size_t local_data_length;
+                    std::size_t witness_length;
 
                     bool relies_on_same_type_inputs;
-                    std::set<size_t> accepted_input_types;
+                    std::set<std::size_t> accepted_input_types;
 
                     r1cs_pcd_compliance_predicate() = default;
                     r1cs_pcd_compliance_predicate(r1cs_pcd_compliance_predicate<FieldType> &&other) = default;
                     r1cs_pcd_compliance_predicate(const r1cs_pcd_compliance_predicate<FieldType> &other) = default;
-                    r1cs_pcd_compliance_predicate(size_t name,
-                                                  size_t type,
+                    r1cs_pcd_compliance_predicate(std::size_t name,
+                                                  std::size_t type,
                                                   const r1cs_constraint_system<FieldType> &constraint_system,
-                                                  size_t outgoing_message_payload_length,
-                                                  size_t max_arity,
-                                                  const std::vector<size_t> &incoming_message_payload_lengths,
-                                                  size_t local_data_length,
-                                                  size_t witness_length,
+                                                  std::size_t outgoing_message_payload_length,
+                                                  std::size_t max_arity,
+                                                  const std::vector<std::size_t> &incoming_message_payload_lengths,
+                                                  std::size_t local_data_length,
+                                                  std::size_t witness_length,
                                                   bool relies_on_same_type_inputs,
-                                                  const std::set<size_t> &accepted_input_types = std::set<size_t>());
+                                                  const std::set<std::size_t> &accepted_input_types = std::set<std::size_t>());
 
                     r1cs_pcd_compliance_predicate<FieldType> &
                         operator=(const r1cs_pcd_compliance_predicate<FieldType> &other) = default;
@@ -173,7 +173,7 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                r1cs_pcd_message<FieldType>::r1cs_pcd_message(size_t type) : type(type) {
+                r1cs_pcd_message<FieldType>::r1cs_pcd_message(std::size_t type) : type(type) {
                 }
 
                 template<typename FieldType>
@@ -190,16 +190,16 @@ namespace nil {
 
                 template<typename FieldType>
                 r1cs_pcd_compliance_predicate<FieldType>::r1cs_pcd_compliance_predicate(
-                    size_t name,
-                    size_t type,
+                    std::size_t name,
+                    std::size_t type,
                     const r1cs_constraint_system<FieldType> &constraint_system,
-                    size_t outgoing_message_payload_length,
-                    size_t max_arity,
-                    const std::vector<size_t> &incoming_message_payload_lengths,
-                    size_t local_data_length,
-                    size_t witness_length,
+                    std::size_t outgoing_message_payload_length,
+                    std::size_t max_arity,
+                    const std::vector<std::size_t> &incoming_message_payload_lengths,
+                    std::size_t local_data_length,
+                    std::size_t witness_length,
                     bool relies_on_same_type_inputs,
-                    const std::set<size_t> &accepted_input_types) :
+                    const std::set<std::size_t> &accepted_input_types) :
                     name(name),
                     type(type), constraint_system(constraint_system),
                     outgoing_message_payload_length(outgoing_message_payload_length), max_arity(max_arity),
@@ -215,12 +215,12 @@ namespace nil {
                     const bool incoming_message_payload_lengths_well_specified =
                         (incoming_message_payload_lengths.size() == max_arity);
 
-                    size_t all_message_payload_lengths = outgoing_message_payload_length;
-                    for (size_t i = 0; i < incoming_message_payload_lengths.size(); ++i) {
+                    std::size_t all_message_payload_lengths = outgoing_message_payload_length;
+                    for (std::size_t i = 0; i < incoming_message_payload_lengths.size(); ++i) {
                         all_message_payload_lengths += incoming_message_payload_lengths[i];
                     }
-                    const size_t type_vec_length = max_arity + 1;
-                    const size_t arity_length = 1;
+                    const std::size_t type_vec_length = max_arity + 1;
+                    const std::size_t arity_length = 1;
 
                     const bool correct_num_inputs =
                         ((outgoing_message_payload_length + 1) == constraint_system.num_inputs());
@@ -234,7 +234,7 @@ namespace nil {
 
                 template<typename FieldType>
                 bool r1cs_pcd_compliance_predicate<FieldType>::has_equal_input_and_output_lengths() const {
-                    for (size_t i = 0; i < incoming_message_payload_lengths.size(); ++i) {
+                    for (std::size_t i = 0; i < incoming_message_payload_lengths.size(); ++i) {
                         if (incoming_message_payload_lengths[i] != outgoing_message_payload_length) {
                             return false;
                         }
@@ -245,7 +245,7 @@ namespace nil {
 
                 template<typename FieldType>
                 bool r1cs_pcd_compliance_predicate<FieldType>::has_equal_input_lengths() const {
-                    for (size_t i = 1; i < incoming_message_payload_lengths.size(); ++i) {
+                    for (std::size_t i = 1; i < incoming_message_payload_lengths.size(); ++i) {
                         if (incoming_message_payload_lengths[i] != incoming_message_payload_lengths[0]) {
                             return false;
                         }
@@ -274,7 +274,7 @@ namespace nil {
                     out << cp.type << "\n";
                     out << cp.max_arity << "\n";
                     assert(cp.max_arity == cp.incoming_message_payload_lengths.size());
-                    for (size_t i = 0; i < cp.max_arity; ++i) {
+                    for (std::size_t i = 0; i < cp.max_arity; ++i) {
                         out << cp.incoming_message_payload_lengths[i] << "\n";
                     }
                     out << cp.outgoing_message_payload_length << "\n";
@@ -296,7 +296,7 @@ namespace nil {
                     in >> cp.max_arity;
                     algebra::consume_newline(in);
                     cp.incoming_message_payload_lengths.resize(cp.max_arity);
-                    for (size_t i = 0; i < cp.max_arity; ++i) {
+                    for (std::size_t i = 0; i < cp.max_arity; ++i) {
                         in >> cp.incoming_message_payload_lengths[i];
                         algebra::consume_newline(in);
                     }
@@ -324,7 +324,7 @@ namespace nil {
                     assert(outgoing_message.payload_as_r1cs_variable_assignment().size() ==
                            outgoing_message_payload_length);
                     assert(incoming_messages.size() <= max_arity);
-                    for (size_t i = 0; i < incoming_messages.size(); ++i) {
+                    for (std::size_t i = 0; i < incoming_messages.size(); ++i) {
                         assert(incoming_messages[i].payload_as_r1cs_variable_assignment().size() ==
                                incoming_message_payload_lengths[i]);
                     }

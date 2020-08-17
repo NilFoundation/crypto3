@@ -24,15 +24,15 @@ namespace nil {
                  * (This takes additional time.)
                  */
                 template<typename PCD_ppT>
-                bool run_r1cs_sp_ppzkpcd_tally_example(const size_t wordsize,
-                                                       const size_t arity,
-                                                       const size_t depth,
+                bool run_r1cs_sp_ppzkpcd_tally_example(const std::size_t wordsize,
+                                                       const std::size_t arity,
+                                                       const std::size_t depth,
                                                        const bool test_serialization);
 
                 template<typename PCD_ppT>
-                bool run_r1cs_sp_ppzkpcd_tally_example(const size_t wordsize,
-                                                       const size_t arity,
-                                                       const size_t depth,
+                bool run_r1cs_sp_ppzkpcd_tally_example(const std::size_t wordsize,
+                                                       const std::size_t arity,
+                                                       const std::size_t depth,
                                                        const bool test_serialization) {
                     algebra::enter_block("Call to run_r1cs_sp_ppzkpcd_tally_example");
 
@@ -41,14 +41,14 @@ namespace nil {
                     bool all_accept = true;
 
                     algebra::enter_block("Generate all messages");
-                    size_t tree_size = 0;
-                    size_t nodes_in_layer = 1;
-                    for (size_t layer = 0; layer <= depth; ++layer) {
+                    std::size_t tree_size = 0;
+                    std::size_t nodes_in_layer = 1;
+                    for (std::size_t layer = 0; layer <= depth; ++layer) {
                         tree_size += nodes_in_layer;
                         nodes_in_layer *= arity;
                     }
-                    std::vector<size_t> tree_elems(tree_size);
-                    for (size_t i = 0; i < tree_size; ++i) {
+                    std::vector<std::size_t> tree_elems(tree_size);
+                    for (std::size_t i = 0; i < tree_size; ++i) {
                         tree_elems[i] = std::rand() % 10;
                         printf("tree_elems[%zu] = %zu\n", i, tree_elems[i]);
                     }
@@ -58,7 +58,7 @@ namespace nil {
                     std::vector<std::shared_ptr<r1cs_pcd_message<FieldType>>> tree_messages(tree_size);
 
                     algebra::enter_block("Generate compliance predicate");
-                    const size_t type = 1;
+                    const std::size_t type = 1;
                     tally_cp_handler<FieldType> tally(type, arity, wordsize);
                     tally.generate_r1cs_constraints();
                     r1cs_pcd_compliance_predicate<FieldType> tally_cp = tally.get_compliance_predicate();
@@ -82,8 +82,8 @@ namespace nil {
                     std::shared_ptr<r1cs_pcd_message<FieldType>> base_msg = tally.get_base_case_message();
                     nodes_in_layer /= arity;
                     for (long layer = depth; layer >= 0; --layer, nodes_in_layer /= arity) {
-                        for (size_t i = 0; i < nodes_in_layer; ++i) {
-                            const size_t cur_idx = (nodes_in_layer - 1) / (arity - 1) + i;
+                        for (std::size_t i = 0; i < nodes_in_layer; ++i) {
+                            const std::size_t cur_idx = (nodes_in_layer - 1) / (arity - 1) + i;
 
                             std::vector<std::shared_ptr<r1cs_pcd_message<FieldType>>> msgs(arity, base_msg);
                             std::vector<r1cs_sp_ppzkpcd_proof<PCD_ppT>> proofs(arity);
@@ -91,7 +91,7 @@ namespace nil {
                             const bool base_case = (arity * cur_idx + arity >= tree_size);
 
                             if (!base_case) {
-                                for (size_t i = 0; i < arity; ++i) {
+                                for (std::size_t i = 0; i < arity; ++i) {
                                     msgs[i] = tree_messages[arity * cur_idx + i + 1];
                                     proofs[i] = tree_proofs[arity * cur_idx + i + 1];
                                 }
@@ -132,7 +132,7 @@ namespace nil {
                             all_accept = all_accept && ans;
 
                             printf("\n");
-                            for (size_t i = 0; i < arity; ++i) {
+                            for (std::size_t i = 0; i < arity; ++i) {
                                 printf("Message %zu was:\n", i);
                                 msgs[i]->print();
                             }

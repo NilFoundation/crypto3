@@ -123,7 +123,7 @@ namespace nil {
 
                     one_as_addr.resize(next_pc_addr.size());
                     one_as_addr[0].assign(this->pb, 1);
-                    for (size_t i = 1; i < next_pc_addr.size(); ++i) {
+                    for (std::size_t i = 1; i < next_pc_addr.size(); ++i) {
                         one_as_addr[i].assign(this->pb, 0);
                     }
 

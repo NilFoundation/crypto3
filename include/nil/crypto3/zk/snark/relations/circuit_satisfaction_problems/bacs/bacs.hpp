@@ -62,8 +62,8 @@ namespace nil {
                     bool is_circuit_output;
 
                     FieldType evaluate(const bacs_variable_assignment<FieldType> &input) const;
-                    void print(const std::map<size_t, std::string> &variable_annotations =
-                                   std::map<size_t, std::string>()) const;
+                    void print(const std::map<std::size_t, std::string> &variable_annotations =
+                                   std::map<std::size_t, std::string>()) const;
 
                     bool operator==(const bacs_gate<FieldType> &other) const;
 
@@ -109,19 +109,19 @@ namespace nil {
                 template<typename FieldType>
                 class bacs_circuit {
                 public:
-                    size_t primary_input_size;
-                    size_t auxiliary_input_size;
+                    std::size_t primary_input_size;
+                    std::size_t auxiliary_input_size;
                     std::vector<bacs_gate<FieldType>> gates;
 
                     bacs_circuit() : primary_input_size(0), auxiliary_input_size(0) {
                     }
 
-                    size_t num_inputs() const;
-                    size_t num_gates() const;
-                    size_t num_wires() const;
+                    std::size_t num_inputs() const;
+                    std::size_t num_gates() const;
+                    std::size_t num_wires() const;
 
-                    std::vector<size_t> wire_depths() const;
-                    size_t depth() const;
+                    std::vector<std::size_t> wire_depths() const;
+                    std::size_t depth() const;
 
                     bool is_valid() const;
                     bool is_satisfied(const bacs_primary_input<FieldType> &primary_input,
@@ -153,7 +153,7 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                void bacs_gate<FieldType>::print(const std::map<size_t, std::string> &variable_annotations) const {
+                void bacs_gate<FieldType>::print(const std::map<std::size_t, std::string> &variable_annotations) const {
                     printf("(\n");
                     lhs.print(variable_annotations);
                     printf(")\n *\n(\n");
@@ -184,7 +184,7 @@ namespace nil {
 
                 template<typename FieldType>
                 std::istream &operator>>(std::istream &in, bacs_gate<FieldType> &g) {
-                    size_t tmp;
+                    std::size_t tmp;
                     in >> tmp;
                     algebra::consume_newline(in);
                     g.is_circuit_output = (tmp != 0 ? true : false);
@@ -199,28 +199,28 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                size_t bacs_circuit<FieldType>::num_inputs() const {
+                std::size_t bacs_circuit<FieldType>::num_inputs() const {
                     return primary_input_size + auxiliary_input_size;
                 }
 
                 template<typename FieldType>
-                size_t bacs_circuit<FieldType>::num_gates() const {
+                std::size_t bacs_circuit<FieldType>::num_gates() const {
                     return gates.size();
                 }
 
                 template<typename FieldType>
-                size_t bacs_circuit<FieldType>::num_wires() const {
+                std::size_t bacs_circuit<FieldType>::num_wires() const {
                     return num_inputs() + num_gates();
                 }
 
                 template<typename FieldType>
-                std::vector<size_t> bacs_circuit<FieldType>::wire_depths() const {
-                    std::vector<size_t> depths;
+                std::vector<std::size_t> bacs_circuit<FieldType>::wire_depths() const {
+                    std::vector<std::size_t> depths;
                     depths.emplace_back(0);
                     depths.resize(num_inputs() + 1, 1);
 
                     for (auto &g : gates) {
-                        size_t max_depth = 0;
+                        std::size_t max_depth = 0;
                         for (auto &t : g.lhs) {
                             max_depth = std::max(max_depth, depths[t.index]);
                         }
@@ -236,14 +236,14 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                size_t bacs_circuit<FieldType>::depth() const {
-                    std::vector<size_t> all_depths = this->wire_depths();
+                std::size_t bacs_circuit<FieldType>::depth() const {
+                    std::vector<std::size_t> all_depths = this->wire_depths();
                     return *(std::max_element(all_depths.begin(), all_depths.end()));
                 }
 
                 template<typename FieldType>
                 bool bacs_circuit<FieldType>::is_valid() const {
-                    for (size_t i = 0; i < num_gates(); ++i) {
+                    for (std::size_t i = 0; i < num_gates(); ++i) {
                         /**
                          * The output wire of gates[i] must have index 1+num_inputs+i.
                          * (The '1+' accounts for the the index of the constant wire.)
@@ -309,7 +309,7 @@ namespace nil {
                     const bacs_variable_assignment<FieldType> all_outputs =
                         get_all_outputs(primary_input, auxiliary_input);
 
-                    for (size_t i = 0; i < all_outputs.size(); ++i) {
+                    for (std::size_t i = 0; i < all_outputs.size(); ++i) {
                         if (!all_outputs[i].is_zero()) {
                             return false;
                         }
@@ -365,7 +365,7 @@ namespace nil {
                     this->print_info();
                     algebra::print_indent();
                     printf("All gates:\n");
-                    for (size_t i = 0; i < gates.size(); ++i) {
+                    for (std::size_t i = 0; i < gates.size(); ++i) {
                         std::string annotation = "no annotation";
 #ifdef DEBUG
                         auto it = gate_annotations.find(i);

@@ -272,25 +272,25 @@ namespace nil {
                         K_query(std::move(K_query)), rA_i_Z_g1(std::move(rA_i_Z_g1)),
                         constraint_system(std::move(constraint_system)) {};
 
-                    size_t G1_size() const {
+                    std::size_t G1_size() const {
                         return 2 * (A_query.domain_size() + C_query.domain_size()) + B_query.domain_size() +
                                H_query.size() + K_query.size() + 1;
                     }
 
-                    size_t G2_size() const {
+                    std::size_t G2_size() const {
                         return B_query.domain_size();
                     }
 
-                    size_t G1_sparse_size() const {
+                    std::size_t G1_sparse_size() const {
                         return 2 * (A_query.size() + C_query.size()) + B_query.size() + H_query.size() +
                                K_query.size() + 1;
                     }
 
-                    size_t G2_sparse_size() const {
+                    std::size_t G2_sparse_size() const {
                         return B_query.size();
                     }
 
-                    size_t size_in_bits() const {
+                    std::size_t size_in_bits() const {
                         return A_query.size_in_bits() + B_query.size_in_bits() + C_query.size_in_bits() +
                                algebra::size_in_bits(H_query) + algebra::size_in_bits(K_query) +
                                algebra::G1<snark_pp<ppT>>::size_in_bits();
@@ -359,15 +359,15 @@ namespace nil {
                         alphaB_g1(alphaB_g1), alphaC_g2(alphaC_g2), gamma_g2(gamma_g2), gamma_beta_g1(gamma_beta_g1),
                         gamma_beta_g2(gamma_beta_g2), rC_Z_g2(rC_Z_g2), A0(A0), Ain(Ain) {};
 
-                    size_t G1_size() const {
+                    std::size_t G1_size() const {
                         return 3 + Ain.size();
                     }
 
-                    size_t G2_size() const {
+                    std::size_t G2_size() const {
                         return 5;
                     }
 
-                    size_t size_in_bits() const {
+                    std::size_t size_in_bits() const {
                         return G1_size() * algebra::G1<snark_pp<ppT>>::size_in_bits() +
                                G2_size() * algebra::G2<snark_pp<ppT>>::size_in_bits();    // possible zksnark bug
                     }
@@ -386,7 +386,7 @@ namespace nil {
                                                          const r1cs_ppzkadsnark_verification_key<ppT> &vk);
                     friend std::istream &operator>><ppT>(std::istream &in, r1cs_ppzkadsnark_verification_key<ppT> &vk);
 
-                    static r1cs_ppzkadsnark_verification_key<ppT> dummy_verification_key(const size_t input_size);
+                    static r1cs_ppzkadsnark_verification_key<ppT> dummy_verification_key(const std::size_t input_size);
                 };
 
                 /************************ Processed verification key *************************/
@@ -510,15 +510,15 @@ namespace nil {
                         g_B(std::move(g_B)), g_C(std::move(g_C)), g_H(std::move(g_H)), g_K(std::move(g_K)),
                         g_Aau(std::move(g_Aau)), muA(std::move(muA)) {};
 
-                    size_t G1_size() const {
+                    std::size_t G1_size() const {
                         return 10;
                     }
 
-                    size_t G2_size() const {
+                    std::size_t G2_size() const {
                         return 1;
                     }
 
-                    size_t size_in_bits() const {
+                    std::size_t size_in_bits() const {
                         return G1_size() * algebra::G1<snark_pp<ppT>>::size_in_bits() +
                                G2_size() * algebra::G2<snark_pp<ppT>>::size_in_bits();
                     }
@@ -851,7 +851,7 @@ namespace nil {
                                    this->Ain == other.Ain &&
                                    this->proof_g_vki_precomp.size() == other.proof_g_vki_precomp.size());
                     if (result) {
-                        for (size_t i = 0; i < this->proof_g_vki_precomp.size(); i++)
+                        for (std::size_t i = 0; i < this->proof_g_vki_precomp.size(); i++)
                             result &= this->proof_g_vki_precomp[i] == other.proof_g_vki_precomp[i];
                     }
                     return result;
@@ -948,7 +948,7 @@ namespace nil {
 
                 template<typename ppT>
                 r1cs_ppzkadsnark_verification_key<ppT>
-                    r1cs_ppzkadsnark_verification_key<ppT>::dummy_verification_key(const size_t input_size) {
+                    r1cs_ppzkadsnark_verification_key<ppT>::dummy_verification_key(const std::size_t input_size) {
                     r1cs_ppzkadsnark_verification_key<ppT> result;
                     result.alphaA_g2 = algebra::Fr<snark_pp<ppT>>::random_element() * algebra::G2<snark_pp<ppT>>::one();
                     result.alphaB_g1 = algebra::Fr<snark_pp<ppT>>::random_element() * algebra::G1<snark_pp<ppT>>::one();
@@ -961,7 +961,7 @@ namespace nil {
                     result.rC_Z_g2 = algebra::Fr<snark_pp<ppT>>::random_element() * algebra::G2<snark_pp<ppT>>::one();
 
                     result.A0 = algebra::Fr<snark_pp<ppT>>::random_element() * algebra::G1<snark_pp<ppT>>::one();
-                    for (size_t i = 0; i < input_size; ++i) {
+                    for (std::size_t i = 0; i < input_size; ++i) {
                         result.Ain.emplace_back(algebra::Fr<snark_pp<ppT>>::random_element() *
                                                 algebra::G1<snark_pp<ppT>>::one());
                     }
@@ -993,7 +993,7 @@ namespace nil {
                     assert(labels.size() == ins.size());
                     std::vector<r1cs_ppzkadsnark_auth_data<ppT>> res;
                     res.reserve(ins.size());
-                    for (size_t i = 0; i < ins.size(); i++) {
+                    for (std::size_t i = 0; i < ins.size(); i++) {
                         algebra::Fr<snark_pp<ppT>> lambda = prfCompute<ppT>(sk.S, labels[i]);
                         algebra::G2<snark_pp<ppT>> Lambda = lambda * algebra::G2<snark_pp<ppT>>::one();
                         r1cs_ppzkadsnark_sigT<ppT> sig = sigSign<ppT>(sk.skp, labels[i], Lambda);
@@ -1014,7 +1014,7 @@ namespace nil {
                     algebra::enter_block("Call to r1cs_ppzkadsnark_auth_verify");
                     assert((data.size() == labels.size()) && (auth_data.size() == labels.size()));
                     bool res = true;
-                    for (size_t i = 0; i < data.size(); i++) {
+                    for (std::size_t i = 0; i < data.size(); i++) {
                         algebra::Fr<snark_pp<ppT>> lambda = prfCompute<ppT>(sak.S, labels[i]);
                         algebra::Fr<snark_pp<ppT>> mup = lambda + sak.i * data[i];
                         res = res && (auth_data[i].mu == mup);
@@ -1032,7 +1032,7 @@ namespace nil {
                     algebra::enter_block("Call to r1cs_ppzkadsnark_auth_verify");
                     assert((data.size() == labels.size()) && (data.size() == auth_data.size()));
                     bool res = true;
-                    for (size_t i = 0; i < auth_data.size(); i++) {
+                    for (std::size_t i = 0; i < auth_data.size(); i++) {
                         algebra::G2<snark_pp<ppT>> Mup = auth_data[i].Lambda - data[i] * pak.minusI2;
                         res = res && (auth_data[i].mu * algebra::G2<snark_pp<ppT>>::one() == Mup);
                         res = res && sigVerif<ppT>(pak.vkp, labels[i], auth_data[i].Lambda, auth_data[i].sigma);
@@ -1067,8 +1067,8 @@ namespace nil {
                     printf("* QAP number of input variables: %zu\n", qap_inst.num_inputs());
 
                     algebra::enter_block("Compute query densities");
-                    size_t non_zero_At = 0, non_zero_Bt = 0, non_zero_Ct = 0, non_zero_Ht = 0;
-                    for (size_t i = 0; i < qap_inst.num_variables() + 1; ++i) {
+                    std::size_t non_zero_At = 0, non_zero_Bt = 0, non_zero_Ct = 0, non_zero_Ht = 0;
+                    for (std::size_t i = 0; i < qap_inst.num_variables() + 1; ++i) {
                         if (!qap_inst.At[i].is_zero()) {
                             ++non_zero_At;
                         }
@@ -1079,7 +1079,7 @@ namespace nil {
                             ++non_zero_Ct;
                         }
                     }
-                    for (size_t i = 0; i < qap_inst.degree() + 1; ++i) {
+                    for (std::size_t i = 0; i < qap_inst.degree() + 1; ++i) {
                         if (!qap_inst.Ht[i].is_zero()) {
                             ++non_zero_Ht;
                         }
@@ -1112,29 +1112,29 @@ namespace nil {
                     // construct the same-coefficient-check query (must happen before zeroing out the prefix of At)
                     algebra::Fr_vector<snark_pp<ppT>> Kt;
                     Kt.reserve(qap_inst.num_variables() + 4);
-                    for (size_t i = 0; i < qap_inst.num_variables() + 1; ++i) {
+                    for (std::size_t i = 0; i < qap_inst.num_variables() + 1; ++i) {
                         Kt.emplace_back(beta * (rA * At[i] + rB * Bt[i] + rC * Ct[i]));
                     }
                     Kt.emplace_back(beta * rA * qap_inst.Zt);
                     Kt.emplace_back(beta * rB * qap_inst.Zt);
                     Kt.emplace_back(beta * rC * qap_inst.Zt);
 
-                    const size_t g1_exp_count =
+                    const std::size_t g1_exp_count =
                         2 * (non_zero_At - qap_inst.num_inputs() + non_zero_Ct) + non_zero_Bt + non_zero_Ht + Kt.size();
-                    const size_t g2_exp_count = non_zero_Bt;
+                    const std::size_t g2_exp_count = non_zero_Bt;
 
-                    size_t g1_window = algebra::get_exp_window_size<algebra::G1<snark_pp<ppT>>>(g1_exp_count);
-                    size_t g2_window = algebra::get_exp_window_size<algebra::G2<snark_pp<ppT>>>(g2_exp_count);
+                    std::size_t g1_window = algebra::get_exp_window_size<algebra::G1<snark_pp<ppT>>>(g1_exp_count);
+                    std::size_t g2_window = algebra::get_exp_window_size<algebra::G2<snark_pp<ppT>>>(g2_exp_count);
                     algebra::print_indent();
                     printf("* G1 window: %zu\n", g1_window);
                     algebra::print_indent();
                     printf("* G2 window: %zu\n", g2_window);
 
 #ifdef MULTICORE
-                    const size_t chunks = omp_get_max_threads();    // to override, set OMP_NUM_THREADS env var or call
+                    const std::size_t chunks = omp_get_max_threads();    // to override, set OMP_NUM_THREADS env var or call
                                                                     // omp_set_num_threads()
 #else
-                    const size_t chunks = 1;
+                    const std::size_t chunks = 1;
 #endif
 
                     algebra::enter_block("Generating G1 multiexp table");
@@ -1205,7 +1205,7 @@ namespace nil {
                     algebra::G1<snark_pp<ppT>> A0 = A_query[0].g;
                     algebra::G1_vector<snark_pp<ppT>> Ain;
                     Ain.reserve(qap_inst.num_inputs());
-                    for (size_t i = 0; i < qap_inst.num_inputs(); ++i) {
+                    for (std::size_t i = 0; i < qap_inst.num_inputs(); ++i) {
                         Ain.emplace_back(A_query[1 + i].g);
                     }
 
@@ -1277,7 +1277,7 @@ namespace nil {
                          qap_wit.d3 * pk.K_query[qap_wit.num_variables() + 3]);
 
 #ifdef DEBUG
-                    for (size_t i = 0; i < qap_wit.num_inputs() + 1; ++i) {
+                    for (std::size_t i = 0; i < qap_wit.num_inputs() + 1; ++i) {
                         assert(pk.A_query[i].g == algebra::G1<snark_pp<ppT>>::zero());
                     }
                     assert(pk.A_query.domain_size() == qap_wit.num_variables() + 2);
@@ -1288,10 +1288,10 @@ namespace nil {
 #endif
 
 #ifdef MULTICORE
-                    const size_t chunks = omp_get_max_threads();    // to override, set OMP_NUM_THREADS env var or call
+                    const std::size_t chunks = omp_get_max_threads();    // to override, set OMP_NUM_THREADS env var or call
                                                                     // omp_set_num_threads()
 #else
-                    const size_t chunks = 1;
+                    const std::size_t chunks = 1;
 #endif
 
                     algebra::enter_block("Compute the proof");
@@ -1357,7 +1357,7 @@ namespace nil {
                     std::vector<algebra::G1<snark_pp<ppT>>> Ains;
                     mus.reserve(qap_wit.num_inputs());
                     Ains.reserve(qap_wit.num_inputs());
-                    for (size_t i = 0; i < qap_wit.num_inputs(); i++) {
+                    for (std::size_t i = 0; i < qap_wit.num_inputs(); i++) {
                         mus.emplace_back(auth_data[i].mu);
                         Ains.emplace_back(pk.A_query[i + 1].g);
                     }
@@ -1408,7 +1408,7 @@ namespace nil {
                     pvk.Ain = algebra::G1_vector<snark_pp<ppT>>(vk.Ain);
 
                     pvk.proof_g_vki_precomp.reserve(pvk.Ain.size());
-                    for (size_t i = 0; i < pvk.Ain.size(); i++) {
+                    for (std::size_t i = 0; i < pvk.Ain.size(); i++) {
                         pvk.proof_g_vki_precomp.emplace_back(snark_pp<ppT>::precompute_G1(pvk.Ain[i]));
                     }
 
@@ -1445,7 +1445,7 @@ namespace nil {
                     algebra::enter_block("Compute PRFs");
                     std::vector<algebra::Fr<snark_pp<ppT>>> lambdas;
                     lambdas.reserve(labels.size());
-                    for (size_t i = 0; i < labels.size(); i++) {
+                    for (std::size_t i = 0; i < labels.size(); i++) {
                         lambdas.emplace_back(prfCompute<ppT>(sak.S, labels[i]));
                     }
                     algebra::leave_block("Compute PRFs");
@@ -1633,7 +1633,7 @@ namespace nil {
                     std::vector<r1cs_ppzkadsnark_sigT<ppT>> sigs;
                     Lambdas.reserve(labels.size());
                     sigs.reserve(labels.size());
-                    for (size_t i = 0; i < labels.size(); i++) {
+                    for (std::size_t i = 0; i < labels.size(); i++) {
                         Lambdas.emplace_back(auth_data[i].Lambda);
                         sigs.emplace_back(auth_data[i].sigma);
                     }
@@ -1651,7 +1651,7 @@ namespace nil {
                     // To Do: Decide whether to move pak and lambda preprocessing to offline
                     std::vector<algebra::G2_precomp<snark_pp<ppT>>> g_Lambdas_precomp;
                     g_Lambdas_precomp.reserve(auth_data.size());
-                    for (size_t i = 0; i < auth_data.size(); i++)
+                    for (std::size_t i = 0; i < auth_data.size(); i++)
                         g_Lambdas_precomp.emplace_back(snark_pp<ppT>::precompute_G2(auth_data[i].Lambda));
                     algebra::G2_precomp<snark_pp<ppT>> g_minusi_precomp = snark_pp<ppT>::precompute_G2(pak.minusI2);
 
@@ -1662,7 +1662,7 @@ namespace nil {
                     } else {
                         accum = algebra::Fqk<snark_pp<ppT>>::one();
                     }
-                    for (size_t i = auth_data.size() % 2; i < labels.size(); i = i + 2) {
+                    for (std::size_t i = auth_data.size() % 2; i < labels.size(); i = i + 2) {
                         accum = accum * snark_pp<ppT>::double_miller_loop(
                                             pvk.proof_g_vki_precomp[i], g_Lambdas_precomp[i],
                                             pvk.proof_g_vki_precomp[i + 1], g_Lambdas_precomp[i + 1]);

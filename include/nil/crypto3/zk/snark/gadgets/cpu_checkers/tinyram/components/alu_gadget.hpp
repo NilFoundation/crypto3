@@ -126,7 +126,7 @@ namespace nil {
                     }
 
                     void generate_r1cs_constraints() {
-                        for (size_t i = 0; i < 1ul << this->pb.ap.opcode_width(); ++i) {
+                        for (std::size_t i = 0; i < 1ul << this->pb.ap.opcode_width(); ++i) {
                             if (components[i]) {
                                 components[i]->generate_r1cs_constraints();
                             }
@@ -134,7 +134,7 @@ namespace nil {
                     }
 
                     void generate_r1cs_witness() {
-                        for (size_t i = 0; i < 1ul << this->pb.ap.opcode_width(); ++i) {
+                        for (std::size_t i = 0; i < 1ul << this->pb.ap.opcode_width(); ++i) {
                             if (components[i]) {
                                 components[i]->generate_r1cs_witness();
                             }

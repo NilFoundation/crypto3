@@ -21,20 +21,20 @@ namespace nil {
         namespace zk {
             namespace snark {
 
-                typedef std::vector<size_t> fooram_program;
-                typedef std::vector<size_t> fooram_input_tape;
-                typedef typename std::vector<size_t>::const_iterator fooram_input_tape_iterator;
+                typedef std::vector<std::size_t> fooram_program;
+                typedef std::vector<std::size_t> fooram_input_tape;
+                typedef typename std::vector<std::size_t>::const_iterator fooram_input_tape_iterator;
 
                 class fooram_architecture_params {
                 public:
-                    size_t w;
-                    fooram_architecture_params(const size_t w = 16);
+                    std::size_t w;
+                    fooram_architecture_params(const std::size_t w = 16);
 
-                    size_t num_addresses() const;
-                    size_t address_size() const;
-                    size_t value_size() const;
-                    size_t cpu_state_size() const;
-                    size_t initial_pc_addr() const;
+                    std::size_t num_addresses() const;
+                    std::size_t address_size() const;
+                    std::size_t value_size() const;
+                    std::size_t cpu_state_size() const;
+                    std::size_t initial_pc_addr() const;
 
                     memory_contents initial_memory_contents(const fooram_program &program,
                                                             const fooram_input_tape &primary_input) const;
@@ -47,26 +47,26 @@ namespace nil {
                     friend std::istream &operator>>(std::istream &in, fooram_architecture_params &ap);
                 };
 
-                fooram_architecture_params::fooram_architecture_params(const size_t w) : w(w) {
+                fooram_architecture_params::fooram_architecture_params(const std::size_t w) : w(w) {
                 }
 
-                size_t fooram_architecture_params::num_addresses() const {
+                std::size_t fooram_architecture_params::num_addresses() const {
                     return 1ul << w;
                 }
 
-                size_t fooram_architecture_params::address_size() const {
+                std::size_t fooram_architecture_params::address_size() const {
                     return w;
                 }
 
-                size_t fooram_architecture_params::value_size() const {
+                std::size_t fooram_architecture_params::value_size() const {
                     return w;
                 }
 
-                size_t fooram_architecture_params::cpu_state_size() const {
+                std::size_t fooram_architecture_params::cpu_state_size() const {
                     return w;
                 }
 
-                size_t fooram_architecture_params::initial_pc_addr() const {
+                std::size_t fooram_architecture_params::initial_pc_addr() const {
                     return 0;
                 }
 

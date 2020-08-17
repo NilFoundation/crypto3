@@ -116,17 +116,17 @@ namespace nil {
                 template<typename FieldType>
                 class r1cs_constraint_system {
                 public:
-                    size_t primary_input_size;
-                    size_t auxiliary_input_size;
+                    std::size_t primary_input_size;
+                    std::size_t auxiliary_input_size;
 
                     std::vector<r1cs_constraint<FieldType>> constraints;
 
                     r1cs_constraint_system() : primary_input_size(0), auxiliary_input_size(0) {
                     }
 
-                    size_t num_inputs() const;
-                    size_t num_variables() const;
-                    size_t num_constraints() const;
+                    std::size_t num_inputs() const;
+                    std::size_t num_variables() const;
+                    std::size_t num_constraints() const;
 
                     bool is_valid() const;
                     bool is_satisfied(const r1cs_primary_input<FieldType> &primary_input,
@@ -191,17 +191,17 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                size_t r1cs_constraint_system<FieldType>::num_inputs() const {
+                std::size_t r1cs_constraint_system<FieldType>::num_inputs() const {
                     return primary_input_size;
                 }
 
                 template<typename FieldType>
-                size_t r1cs_constraint_system<FieldType>::num_variables() const {
+                std::size_t r1cs_constraint_system<FieldType>::num_variables() const {
                     return primary_input_size + auxiliary_input_size;
                 }
 
                 template<typename FieldType>
-                size_t r1cs_constraint_system<FieldType>::num_constraints() const {
+                std::size_t r1cs_constraint_system<FieldType>::num_constraints() const {
                     return constraints.size();
                 }
 
@@ -210,7 +210,7 @@ namespace nil {
                     if (this->num_inputs() > this->num_variables())
                         return false;
 
-                    for (size_t c = 0; c < constraints.size(); ++c) {
+                    for (std::size_t c = 0; c < constraints.size(); ++c) {
                         if (!(constraints[c].a.is_valid(this->num_variables()) &&
                               constraints[c].b.is_valid(this->num_variables()) &&
                               constraints[c].c.is_valid(this->num_variables()))) {
@@ -232,7 +232,7 @@ namespace nil {
                     full_variable_assignment.insert(
                         full_variable_assignment.end(), auxiliary_input.begin(), auxiliary_input.end());
 
-                    for (size_t c = 0; c < constraints.size(); ++c) {
+                    for (std::size_t c = 0; c < constraints.size(); ++c) {
                         const FieldType ares = constraints[c].a.evaluate(full_variable_assignment);
                         const FieldType bres = constraints[c].b.evaluate(full_variable_assignment);
                         const FieldType cres = constraints[c].c.evaluate(full_variable_assignment);
@@ -255,24 +255,24 @@ namespace nil {
                     std::vector<bool> touched_by_A(this->num_variables() + 1, false),
                         touched_by_B(this->num_variables() + 1, false);
 
-                    for (size_t i = 0; i < this->constraints.size(); ++i) {
-                        for (size_t j = 0; j < this->constraints[i].a.terms.size(); ++j) {
+                    for (std::size_t i = 0; i < this->constraints.size(); ++i) {
+                        for (std::size_t j = 0; j < this->constraints[i].a.terms.size(); ++j) {
                             touched_by_A[this->constraints[i].a.terms[j].index] = true;
                         }
 
-                        for (size_t j = 0; j < this->constraints[i].b.terms.size(); ++j) {
+                        for (std::size_t j = 0; j < this->constraints[i].b.terms.size(); ++j) {
                             touched_by_B[this->constraints[i].b.terms[j].index] = true;
                         }
                     }
 
-                    size_t non_zero_A_count = 0, non_zero_B_count = 0;
-                    for (size_t i = 0; i < this->num_variables() + 1; ++i) {
+                    std::size_t non_zero_A_count = 0, non_zero_B_count = 0;
+                    for (std::size_t i = 0; i < this->num_variables() + 1; ++i) {
                         non_zero_A_count += touched_by_A[i] ? 1 : 0;
                         non_zero_B_count += touched_by_B[i] ? 1 : 0;
                     }
 
                     if (non_zero_B_count > non_zero_A_count) {
-                        for (size_t i = 0; i < this->constraints.size(); ++i) {
+                        for (std::size_t i = 0; i < this->constraints.size(); ++i) {
                             std::swap(this->constraints[i].a, this->constraints[i].b);
                         }
                     }
@@ -306,7 +306,7 @@ namespace nil {
 
                     cs.constraints.clear();
 
-                    size_t s;
+                    std::size_t s;
                     in >> s;
 
                     char b;
@@ -314,7 +314,7 @@ namespace nil {
 
                     cs.constraints.reserve(s);
 
-                    for (size_t i = 0; i < s; ++i) {
+                    for (std::size_t i = 0; i < s; ++i) {
                         r1cs_constraint<FieldType> c;
                         in >> c;
                         cs.constraints.emplace_back(c);

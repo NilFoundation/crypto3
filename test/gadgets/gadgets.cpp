@@ -13,6 +13,7 @@
 #include <boost/test/data/monomorphic.hpp>
 
 #include "simple_example.hpp"
+
 #include <nil/crypto3/zk/snark/examples/proof_systems/ppzksnark/r1cs_ppzksnark/run_r1cs_ppzksnark.hpp>
 
 using namespace nil::algebra;

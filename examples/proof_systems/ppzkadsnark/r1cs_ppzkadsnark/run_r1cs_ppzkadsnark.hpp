@@ -73,7 +73,7 @@ namespace nil {
                     data.reserve(example.constraint_system.num_inputs());
                     std::vector<labelT> labels;
                     labels.reserve(example.constraint_system.num_inputs());
-                    for (size_t i = 0; i < example.constraint_system.num_inputs(); i++) {
+                    for (std::size_t i = 0; i < example.constraint_system.num_inputs(); i++) {
                         labels.emplace_back(labelT());
                         data.emplace_back(example.primary_input[i]);
                     }

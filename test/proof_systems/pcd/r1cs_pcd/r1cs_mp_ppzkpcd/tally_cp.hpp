@@ -36,12 +36,13 @@ namespace nil {
                 template<typename FieldType>
                 class tally_pcd_message : public r1cs_pcd_message<FieldType> {
                 public:
-                    size_t wordsize;
+                    std::size_t wordsize;
 
-                    size_t sum;
-                    size_t count;
+                    std::size_t sum;
+                    std::size_t count;
 
-                    tally_pcd_message(const size_t type, const size_t wordsize, const size_t sum, const size_t count);
+                    tally_pcd_message(const std::size_t type, const std::size_t wordsize, const std::size_t sum,
+                                      const std::size_t count);
                     r1cs_variable_assignment<FieldType> payload_as_r1cs_variable_assignment() const;
                     void print() const;
 
@@ -51,9 +52,9 @@ namespace nil {
                 template<typename FieldType>
                 class tally_pcd_local_data : public r1cs_pcd_local_data<FieldType> {
                 public:
-                    size_t summand;
+                    std::size_t summand;
 
-                    tally_pcd_local_data(const size_t summand);
+                    tally_pcd_local_data(const std::size_t summand);
                     r1cs_variable_assignment<FieldType> as_r1cs_variable_assignment() const;
                     void print() const;
 
@@ -87,14 +88,14 @@ namespace nil {
 
                     pb_variable_array<FieldType> arity_indicators;
 
-                    size_t wordsize;
-                    size_t message_length;
+                    std::size_t wordsize;
+                    std::size_t message_length;
 
-                    tally_cp_handler(size_t type,
-                                     size_t max_arity,
-                                     size_t wordsize,
+                    tally_cp_handler(std::size_t type,
+                                     std::size_t max_arity,
+                                     std::size_t wordsize,
                                      bool relies_on_same_type_inputs = false,
-                                     const std::set<size_t> &accepted_input_types = std::set<size_t>());
+                                     const std::set<std::size_t> &accepted_input_types = std::set<std::size_t>());
 
                     void generate_r1cs_constraints();
                     void generate_r1cs_witness(
@@ -105,10 +106,10 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                tally_pcd_message<FieldType>::tally_pcd_message(const size_t type,
-                                                             const size_t wordsize,
-                                                             const size_t sum,
-                                                             const size_t count) :
+                tally_pcd_message<FieldType>::tally_pcd_message(const std::size_t type,
+                                                                const std::size_t wordsize,
+                                                                const std::size_t sum,
+                                                                const std::size_t count) :
                     r1cs_pcd_message<FieldType>(type),
                     wordsize(wordsize), sum(sum), count(count) {
                 }
@@ -141,11 +142,12 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                tally_pcd_local_data<FieldType>::tally_pcd_local_data(const size_t summand) : summand(summand) {
+                tally_pcd_local_data<FieldType>::tally_pcd_local_data(const std::size_t summand) : summand(summand) {
                 }
 
                 template<typename FieldType>
-                r1cs_variable_assignment<FieldType> tally_pcd_local_data<FieldType>::as_r1cs_variable_assignment() const {
+                r1cs_variable_assignment<FieldType>
+                    tally_pcd_local_data<FieldType>::as_r1cs_variable_assignment() const {
                     return {FieldType(summand)};
                 }
 
@@ -160,12 +162,10 @@ namespace nil {
                 public:
                     pb_variable_array<FieldType> sum_bits;
                     pb_variable_array<FieldType> count_bits;
-                    size_t wordsize;
+                    std::size_t wordsize;
 
-                    tally_pcd_message_variable(protoboard<FieldType> &pb,
-                                               const size_t wordsize) :
-                        r1cs_pcd_message_variable<FieldType>(pb),
-                        wordsize(wordsize) {
+                    tally_pcd_message_variable(protoboard<FieldType> &pb, const std::size_t wordsize) :
+                        r1cs_pcd_message_variable<FieldType>(pb), wordsize(wordsize) {
                         sum_bits.allocate(pb, wordsize);
                         count_bits.allocate(pb, wordsize);
 
@@ -173,9 +173,9 @@ namespace nil {
                     }
 
                     std::shared_ptr<r1cs_pcd_message<FieldType>> get_message() const {
-                        const size_t type_val = this->pb.val(this->type).as_ulong();
-                        const size_t sum_val = sum_bits.get_field_element_from_bits(this->pb).as_ulong();
-                        const size_t count_val = count_bits.get_field_element_from_bits(this->pb).as_ulong();
+                        const std::size_t type_val = this->pb.val(this->type).as_ulong();
+                        const std::size_t sum_val = sum_bits.get_field_element_from_bits(this->pb).as_ulong();
+                        const std::size_t count_val = count_bits.get_field_element_from_bits(this->pb).as_ulong();
 
                         std::shared_ptr<r1cs_pcd_message<FieldType>> result;
                         result.reset(new tally_pcd_message<FieldType>(type_val, wordsize, sum_val, count_val));
@@ -198,7 +198,7 @@ namespace nil {
                     }
 
                     std::shared_ptr<r1cs_pcd_local_data<FieldType>> get_local_data() const {
-                        const size_t summand_val = this->pb.val(summand).as_ulong();
+                        const std::size_t summand_val = this->pb.val(summand).as_ulong();
 
                         std::shared_ptr<r1cs_pcd_local_data<FieldType>> result;
                         result.reset(new tally_pcd_local_data<FieldType>(summand_val));
@@ -209,20 +209,20 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                tally_cp_handler<FieldType>::tally_cp_handler(size_t type, size_t max_arity, size_t wordsize, bool relies_on_same_type_inputs,
-                                                           const std::set<size_t> &accepted_input_types) :
+                tally_cp_handler<FieldType>::tally_cp_handler(std::size_t type, std::size_t max_arity,
+                                                              std::size_t wordsize, bool relies_on_same_type_inputs,
+                                                              const std::set<std::size_t> &accepted_input_types) :
                     compliance_predicate_handler<FieldType, protoboard<FieldType>>(protoboard<FieldType>(),
-                                                                             type * 100,
-                                                                             type,
-                                                                             max_arity,
-                                                                             relies_on_same_type_inputs,
-                                                                             accepted_input_types),
+                                                                                   type * 100,
+                                                                                   type,
+                                                                                   max_arity,
+                                                                                   relies_on_same_type_inputs,
+                                                                                   accepted_input_types),
                     wordsize(wordsize) {
-                    this->outgoing_message.reset(
-                        new tally_pcd_message_variable<FieldType>(this->pb, wordsize));
+                    this->outgoing_message.reset(new tally_pcd_message_variable<FieldType>(this->pb, wordsize));
                     this->arity.allocate(this->pb);
 
-                    for (size_t i = 0; i < max_arity; ++i) {
+                    for (std::size_t i = 0; i < max_arity; ++i) {
                         this->incoming_messages[i].reset(new tally_pcd_message_variable<FieldType>(this->pb, wordsize));
                     }
 
@@ -242,13 +242,13 @@ namespace nil {
                         incoming_types.emplace_back(msg->type);
                     }
 
-                    compute_type_val_inner_product.reset(
-                        new inner_product_gadget<FieldType>(this->pb, incoming_types, sum_in_packed,
-                                                         type_val_inner_product));
+                    compute_type_val_inner_product.reset(new inner_product_gadget<FieldType>(
+                        this->pb, incoming_types, sum_in_packed, type_val_inner_product));
 
                     unpack_sum_out.reset(new packing_gadget<FieldType>(
                         this->pb,
-                        std::dynamic_pointer_cast<tally_pcd_message_variable<FieldType>>(this->outgoing_message)->sum_bits,
+                        std::dynamic_pointer_cast<tally_pcd_message_variable<FieldType>>(this->outgoing_message)
+                            ->sum_bits,
                         sum_out_packed));
                     unpack_count_out.reset(new packing_gadget<FieldType>(
                         this->pb,
@@ -256,7 +256,7 @@ namespace nil {
                             ->count_bits,
                         count_out_packed));
 
-                    for (size_t i = 0; i < max_arity; ++i) {
+                    for (std::size_t i = 0; i < max_arity; ++i) {
                         pack_sum_in.emplace_back(packing_gadget<FieldType>(
                             this->pb,
                             std::dynamic_pointer_cast<tally_pcd_message_variable<FieldType>>(this->incoming_messages[i])
@@ -277,12 +277,12 @@ namespace nil {
                     unpack_sum_out->generate_r1cs_constraints(true);
                     unpack_count_out->generate_r1cs_constraints(true);
 
-                    for (size_t i = 0; i < this->max_arity; ++i) {
+                    for (std::size_t i = 0; i < this->max_arity; ++i) {
                         pack_sum_in[i].generate_r1cs_constraints(true);
                         pack_count_in[i].generate_r1cs_constraints(true);
                     }
 
-                    for (size_t i = 0; i < this->max_arity; ++i) {
+                    for (std::size_t i = 0; i < this->max_arity; ++i) {
                         this->pb.add_r1cs_constraint(
                             r1cs_constraint<FieldType>(incoming_types[i], sum_in_packed_aux[i], sum_in_packed[i]));
                         this->pb.add_r1cs_constraint(
@@ -291,7 +291,7 @@ namespace nil {
 
                     /* constrain arity indicator variables so that arity_indicators[arity] = 1 and arity_indicators[i] =
                      * 0 for any other i */
-                    for (size_t i = 0; i < this->max_arity; ++i) {
+                    for (std::size_t i = 0; i < this->max_arity; ++i) {
                         this->pb.add_r1cs_constraint(
                             r1cs_constraint<FieldType>(this->arity - FieldType(i), arity_indicators[i], 0));
                     }
@@ -299,11 +299,11 @@ namespace nil {
                     this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(1, pb_sum<FieldType>(arity_indicators), 1));
 
                     /* require that types of messages that are past arity (i.e. unbound wires) carry 0 */
-                    for (size_t i = 0; i < this->max_arity; ++i) {
+                    for (std::size_t i = 0; i < this->max_arity; ++i) {
                         this->pb.add_r1cs_constraint(
                             r1cs_constraint<FieldType>(0 + pb_sum<FieldType>(pb_variable_array<FieldType>(
-                                                            arity_indicators.begin(), arity_indicators.begin() + i)),
-                                                    incoming_types[i], 0));
+                                                               arity_indicators.begin(), arity_indicators.begin() + i)),
+                                                       incoming_types[i], 0));
                     }
 
                     /* sum_out = local_data + \sum_i type[i] * sum_in[i] */
@@ -329,7 +329,7 @@ namespace nil {
                     const std::shared_ptr<r1cs_pcd_local_data<FieldType>> &local_data) {
                     base_handler::generate_r1cs_witness(incoming_messages, local_data);
 
-                    for (size_t i = 0; i < this->max_arity; ++i) {
+                    for (std::size_t i = 0; i < this->max_arity; ++i) {
                         pack_sum_in[i].generate_r1cs_witness_from_bits();
                         pack_count_in[i].generate_r1cs_witness_from_bits();
 
@@ -341,19 +341,20 @@ namespace nil {
                         }
                     }
 
-                    for (size_t i = 0; i < this->max_arity + 1; ++i) {
+                    for (std::size_t i = 0; i < this->max_arity + 1; ++i) {
                         this->pb.val(arity_indicators[i]) =
                             (incoming_messages.size() == i ? FieldType::one() : FieldType::zero());
                     }
 
                     compute_type_val_inner_product->generate_r1cs_witness();
                     this->pb.val(sum_out_packed) =
-                        this->pb.val(std::dynamic_pointer_cast<tally_pcd_local_data_variable<FieldType>>(this->local_data)
-                                         ->summand) +
+                        this->pb.val(
+                            std::dynamic_pointer_cast<tally_pcd_local_data_variable<FieldType>>(this->local_data)
+                                ->summand) +
                         this->pb.val(type_val_inner_product);
 
                     this->pb.val(count_out_packed) = FieldType::one();
-                    for (size_t i = 0; i < this->max_arity; ++i) {
+                    for (std::size_t i = 0; i < this->max_arity; ++i) {
                         this->pb.val(count_out_packed) += this->pb.val(count_in_packed[i]);
                     }
 
@@ -362,10 +363,11 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                std::shared_ptr<r1cs_pcd_message<FieldType>> tally_cp_handler<FieldType>::get_base_case_message() const {
-                    const size_t type = 0;
-                    const size_t sum = 0;
-                    const size_t count = 0;
+                std::shared_ptr<r1cs_pcd_message<FieldType>>
+                    tally_cp_handler<FieldType>::get_base_case_message() const {
+                    const std::size_t type = 0;
+                    const std::size_t sum = 0;
+                    const std::size_t count = 0;
 
                     std::shared_ptr<r1cs_pcd_message<FieldType>> result;
                     result.reset(new tally_pcd_message<FieldType>(type, wordsize, sum, count));

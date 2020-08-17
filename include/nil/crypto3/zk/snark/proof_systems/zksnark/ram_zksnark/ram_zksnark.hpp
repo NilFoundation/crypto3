@@ -177,7 +177,7 @@ namespace nil {
                     ram_zksnark_proof(const r1cs_sp_ppzkpcd_proof<ram_zksnark_PCD_pp<ram_zksnark_ppT>> &PCD_proof) :
                         PCD_proof(PCD_proof) {};
 
-                    size_t size_in_bits() const {
+                    std::size_t size_in_bits() const {
                         return PCD_proof.size_in_bits();
                     }
 
@@ -211,7 +211,7 @@ namespace nil {
                 ram_zksnark_proof<ram_zksnark_ppT>
                     ram_zksnark_prover(const ram_zksnark_proving_key<ram_zksnark_ppT> &pk,
                                        const ram_zksnark_primary_input<ram_zksnark_ppT> &primary_input,
-                                       const size_t time_bound,
+                                       const std::size_t time_bound,
                                        const ram_zksnark_auxiliary_input<ram_zksnark_ppT> &auxiliary_input);
 
                 /**
@@ -223,7 +223,7 @@ namespace nil {
                 template<typename ram_zksnark_ppT>
                 bool ram_zksnark_verifier(const ram_zksnark_verification_key<ram_zksnark_ppT> &vk,
                                           const ram_zksnark_primary_input<ram_zksnark_ppT> &primary_input,
-                                          const size_t time_bound,
+                                          const std::size_t time_bound,
                                           const ram_zksnark_proof<ram_zksnark_ppT> &proof);
 
                 template<typename ram_zksnark_ppT>
@@ -323,7 +323,7 @@ namespace nil {
                 ram_zksnark_proof<ram_zksnark_ppT>
                     ram_zksnark_prover(const ram_zksnark_proving_key<ram_zksnark_ppT> &pk,
                                        const ram_zksnark_primary_input<ram_zksnark_ppT> &primary_input,
-                                       const size_t time_bound,
+                                       const std::size_t time_bound,
                                        const ram_zksnark_auxiliary_input<ram_zksnark_ppT> &auxiliary_input) {
                     typedef ram_zksnark_machine_pp<ram_zksnark_ppT> ramT;
                     typedef ram_zksnark_PCD_pp<ram_zksnark_ppT> pcdT;
@@ -336,8 +336,8 @@ namespace nil {
                     r1cs_sp_ppzkpcd_proof<pcdT> cur_proof;    // start out with an empty proof
 
                     /* initialize memory with the correct values */
-                    const size_t num_addresses = 1ul << pk.ap.address_size();
-                    const size_t value_size = pk.ap.value_size();
+                    const std::size_t num_addresses = 1ul << pk.ap.address_size();
+                    const std::size_t value_size = pk.ap.value_size();
 
                     delegated_ra_memory<CRH_with_bit_out_gadget<FieldType>> mem(
                         num_addresses, value_size, primary_input.as_memory_contents());
@@ -347,7 +347,7 @@ namespace nil {
                     typename ram_input_tape<ramT>::const_iterator aux_it = auxiliary_input.begin();
 
                     bool want_halt = false;
-                    for (size_t step = 1; step <= time_bound; ++step) {
+                    for (std::size_t step = 1; step <= time_bound; ++step) {
 
                         std::shared_ptr<r1cs_pcd_local_data<FieldType>> local_data;
                         local_data.reset(new ram_pcd_local_data<ramT>(want_halt, mem, aux_it, auxiliary_input.end()));
@@ -386,7 +386,7 @@ namespace nil {
                 template<typename ram_zksnark_ppT>
                 bool ram_zksnark_verifier(const ram_zksnark_verification_key<ram_zksnark_ppT> &vk,
                                           const ram_zksnark_primary_input<ram_zksnark_ppT> &primary_input,
-                                          const size_t time_bound,
+                                          const std::size_t time_bound,
                                           const ram_zksnark_proof<ram_zksnark_ppT> &proof) {
                     typedef ram_zksnark_machine_pp<ram_zksnark_ppT> ramT;
                     typedef ram_zksnark_PCD_pp<ram_zksnark_ppT> pcdT;

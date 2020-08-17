@@ -28,10 +28,10 @@ namespace nil {
                     pb_variable_array<FieldType> address_bits;
                     std::shared_ptr<merkle_authentication_path_variable<FieldType, HashT>> merkle_path;
 
-                    const size_t max_entries;
-                    const size_t tree_depth;
+                    const std::size_t max_entries;
+                    const std::size_t tree_depth;
 
-                    set_membership_proof_variable(protoboard<FieldType> &pb, const size_t max_entries);
+                    set_membership_proof_variable(protoboard<FieldType> &pb, const std::size_t max_entries);
 
                     void generate_r1cs_constraints();
                     void generate_r1cs_witness(const set_membership_proof &proof);
@@ -45,7 +45,7 @@ namespace nil {
                 template<typename FieldType, typename HashT>
                 set_membership_proof_variable<FieldType, HashT>::set_membership_proof_variable(
                     protoboard<FieldType> &pb,
-                    const size_t max_entries) :
+                    const std::size_t max_entries) :
                     gadget<FieldType>(pb),
                     max_entries(max_entries), tree_depth(static_cast<std::size_t>(std::ceil(std::log2(max_entries)))) {
                     if (tree_depth > 0) {
@@ -57,7 +57,7 @@ namespace nil {
                 template<typename FieldType, typename HashT>
                 void set_membership_proof_variable<FieldType, HashT>::generate_r1cs_constraints() {
                     if (tree_depth > 0) {
-                        for (size_t i = 0; i < tree_depth; ++i) {
+                        for (std::size_t i = 0; i < tree_depth; ++i) {
                             generate_boolean_r1cs_constraint<FieldType>(this->pb, address_bits[i]);
                         }
                         merkle_path->generate_r1cs_constraints();
@@ -92,7 +92,7 @@ namespace nil {
                     set_membership_proof_variable<FieldType, HashT>::as_r1cs_variable_assignment(
                         const set_membership_proof &proof) {
                     protoboard<FieldType> pb;
-                    const size_t max_entries = (1ul << (proof.merkle_path.size()));
+                    const std::size_t max_entries = (1ul << (proof.merkle_path.size()));
                     set_membership_proof_variable<FieldType, HashT> proof_variable(pb, max_entries, "proof_variable");
                     proof_variable.generate_r1cs_witness(proof);
 

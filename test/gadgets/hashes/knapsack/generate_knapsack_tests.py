@@ -55,7 +55,7 @@ def generate_knapsack_test(p_name, dimension, bits):
     "// tests for knapsack_CRH_with_bit_output<%s> and dimension %d" % (p_name, dimension)
     p = globals()[p_name]
     print
-    'const size_t dimension = %d;' % dimension
+    'const std::size_t dimension = %d;' % dimension
     print
     'const std::vector<bool> input_bits = %s;' % bool_arr(bits)
     h = knapsack_hash(bits, p, dimension)

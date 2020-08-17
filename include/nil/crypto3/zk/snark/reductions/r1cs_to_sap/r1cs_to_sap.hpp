@@ -112,10 +112,10 @@ namespace nil {
                     const std::shared_ptr<algebra::fft::evaluation_domain<FieldType>> domain =
                         r1cs_to_sap_get_domain(cs);
 
-                    size_t sap_num_variables = cs.num_variables() + cs.num_constraints() + cs.num_inputs();
+                    std::size_t sap_num_variables = cs.num_variables() + cs.num_constraints() + cs.num_inputs();
 
-                    std::vector<std::map<size_t, FieldType>> A_in_Lagrange_basis(sap_num_variables + 1);
-                    std::vector<std::map<size_t, FieldType>> C_in_Lagrange_basis(sap_num_variables + 1);
+                    std::vector<std::map<std::size_t, FieldType>> A_in_Lagrange_basis(sap_num_variables + 1);
+                    std::vector<std::map<std::size_t, FieldType>> C_in_Lagrange_basis(sap_num_variables + 1);
 
                     /**
                      * process R1CS constraints, converting a constraint of the form
@@ -131,23 +131,23 @@ namespace nil {
                      * and cs.num_constraints() extra variables
                      *   (numbered cs.num_variables() + 1 .. cs.num_variables() + cs.num_constraints())
                      */
-                    size_t extra_var_offset = cs.num_variables() + 1;
-                    for (size_t i = 0; i < cs.num_constraints(); ++i) {
-                        for (size_t j = 0; j < cs.constraints[i].a.terms.size(); ++j) {
+                    std::size_t extra_var_offset = cs.num_variables() + 1;
+                    for (std::size_t i = 0; i < cs.num_constraints(); ++i) {
+                        for (std::size_t j = 0; j < cs.constraints[i].a.terms.size(); ++j) {
                             A_in_Lagrange_basis[cs.constraints[i].a.terms[j].index][2 * i] +=
                                 cs.constraints[i].a.terms[j].coeff;
                             A_in_Lagrange_basis[cs.constraints[i].a.terms[j].index][2 * i + 1] +=
                                 cs.constraints[i].a.terms[j].coeff;
                         }
 
-                        for (size_t j = 0; j < cs.constraints[i].b.terms.size(); ++j) {
+                        for (std::size_t j = 0; j < cs.constraints[i].b.terms.size(); ++j) {
                             A_in_Lagrange_basis[cs.constraints[i].b.terms[j].index][2 * i] +=
                                 cs.constraints[i].b.terms[j].coeff;
                             A_in_Lagrange_basis[cs.constraints[i].b.terms[j].index][2 * i + 1] -=
                                 cs.constraints[i].b.terms[j].coeff;
                         }
 
-                        for (size_t j = 0; j < cs.constraints[i].c.terms.size(); ++j) {
+                        for (std::size_t j = 0; j < cs.constraints[i].c.terms.size(); ++j) {
                             C_in_Lagrange_basis[cs.constraints[i].c.terms[j].index][2 * i] +=
                                 times_four(cs.constraints[i].c.terms[j].coeff);
                         }
@@ -177,8 +177,8 @@ namespace nil {
                      *             cs.num_variables() + cs.num_constraints() + cs.num_inputs())
                      */
 
-                    size_t extra_constr_offset = 2 * cs.num_constraints();
-                    size_t extra_var_offset2 = cs.num_variables() + cs.num_constraints();
+                    std::size_t extra_constr_offset = 2 * cs.num_constraints();
+                    std::size_t extra_var_offset2 = cs.num_variables() + cs.num_constraints();
                     /**
                      * NB: extra variables start at (extra_var_offset2 + 1), because i starts at
                      *     1 below
@@ -187,7 +187,7 @@ namespace nil {
                     A_in_Lagrange_basis[0][extra_constr_offset] = FieldType::one();
                     C_in_Lagrange_basis[0][extra_constr_offset] = FieldType::one();
 
-                    for (size_t i = 1; i <= cs.num_inputs(); ++i) {
+                    for (std::size_t i = 1; i <= cs.num_inputs(); ++i) {
                         A_in_Lagrange_basis[i][extra_constr_offset + 2 * i - 1] += FieldType::one();
                         A_in_Lagrange_basis[0][extra_constr_offset + 2 * i - 1] += FieldType::one();
                         C_in_Lagrange_basis[i][extra_constr_offset + 2 * i - 1] += times_four(FieldType::one());
@@ -219,7 +219,7 @@ namespace nil {
                     const std::shared_ptr<algebra::fft::evaluation_domain<FieldType>> domain =
                         r1cs_to_sap_get_domain(cs);
 
-                    size_t sap_num_variables = cs.num_variables() + cs.num_constraints() + cs.num_inputs();
+                    std::size_t sap_num_variables = cs.num_variables() + cs.num_constraints() + cs.num_inputs();
 
                     std::vector<FieldType> At, Ct, Ht;
 
@@ -233,19 +233,19 @@ namespace nil {
                     /**
                      * add and process all constraints as in r1cs_to_sap_instance_map
                      */
-                    size_t extra_var_offset = cs.num_variables() + 1;
-                    for (size_t i = 0; i < cs.num_constraints(); ++i) {
-                        for (size_t j = 0; j < cs.constraints[i].a.terms.size(); ++j) {
+                    std::size_t extra_var_offset = cs.num_variables() + 1;
+                    for (std::size_t i = 0; i < cs.num_constraints(); ++i) {
+                        for (std::size_t j = 0; j < cs.constraints[i].a.terms.size(); ++j) {
                             At[cs.constraints[i].a.terms[j].index] += u[2 * i] * cs.constraints[i].a.terms[j].coeff;
                             At[cs.constraints[i].a.terms[j].index] += u[2 * i + 1] * cs.constraints[i].a.terms[j].coeff;
                         }
 
-                        for (size_t j = 0; j < cs.constraints[i].b.terms.size(); ++j) {
+                        for (std::size_t j = 0; j < cs.constraints[i].b.terms.size(); ++j) {
                             At[cs.constraints[i].b.terms[j].index] += u[2 * i] * cs.constraints[i].b.terms[j].coeff;
                             At[cs.constraints[i].b.terms[j].index] -= u[2 * i + 1] * cs.constraints[i].b.terms[j].coeff;
                         }
 
-                        for (size_t j = 0; j < cs.constraints[i].c.terms.size(); ++j) {
+                        for (std::size_t j = 0; j < cs.constraints[i].c.terms.size(); ++j) {
                             Ct[cs.constraints[i].c.terms[j].index] +=
                                 times_four(u[2 * i] * cs.constraints[i].c.terms[j].coeff);
                         }
@@ -254,13 +254,13 @@ namespace nil {
                         Ct[extra_var_offset + i] += u[2 * i + 1];
                     }
 
-                    size_t extra_constr_offset = 2 * cs.num_constraints();
-                    size_t extra_var_offset2 = cs.num_variables() + cs.num_constraints();
+                    std::size_t extra_constr_offset = 2 * cs.num_constraints();
+                    std::size_t extra_var_offset2 = cs.num_variables() + cs.num_constraints();
 
                     At[0] += u[extra_constr_offset];
                     Ct[0] += u[extra_constr_offset];
 
-                    for (size_t i = 1; i <= cs.num_inputs(); ++i) {
+                    for (std::size_t i = 1; i <= cs.num_inputs(); ++i) {
                         At[i] += u[extra_constr_offset + 2 * i - 1];
                         At[0] += u[extra_constr_offset + 2 * i - 1];
                         Ct[i] += times_four(u[extra_constr_offset + 2 * i - 1]);
@@ -272,7 +272,7 @@ namespace nil {
                     }
 
                     FieldType ti = FieldType::one();
-                    for (size_t i = 0; i < domain->m + 1; ++i) {
+                    for (std::size_t i = 0; i < domain->m + 1; ++i) {
                         Ht.emplace_back(ti);
                         ti *= t;
                     }
@@ -329,7 +329,7 @@ namespace nil {
                     const std::shared_ptr<algebra::fft::evaluation_domain<FieldType>> domain =
                         r1cs_to_sap_get_domain(cs);
 
-                    size_t sap_num_variables = cs.num_variables() + cs.num_constraints() + cs.num_inputs();
+                    std::size_t sap_num_variables = cs.num_variables() + cs.num_constraints() + cs.num_inputs();
 
                     r1cs_variable_assignment<FieldType> full_variable_assignment = primary_input;
                     full_variable_assignment.insert(
@@ -343,7 +343,7 @@ namespace nil {
                      * be a problem, because .evaluate() only accesses the variables that are
                      * actually used in the constraint.
                      */
-                    for (size_t i = 0; i < cs.num_constraints(); ++i) {
+                    for (std::size_t i = 0; i < cs.num_constraints(); ++i) {
                         /**
                          * this is variable (extra_var_offset + i), an extra variable
                          * we introduced that is not present in the input.
@@ -354,7 +354,7 @@ namespace nil {
                         extra_var = extra_var * extra_var;
                         full_variable_assignment.push_back(extra_var);
                     }
-                    for (size_t i = 1; i <= cs.num_inputs(); ++i) {
+                    for (std::size_t i = 1; i <= cs.num_inputs(); ++i) {
                         /**
                          * this is variable (extra_var_offset2 + i), an extra variable
                          * we introduced that is not present in the input.
@@ -368,7 +368,7 @@ namespace nil {
                     std::vector<FieldType> aA(domain->m, FieldType::zero());
 
                     /* account for all constraints, as in r1cs_to_sap_instance_map */
-                    for (size_t i = 0; i < cs.num_constraints(); ++i) {
+                    for (std::size_t i = 0; i < cs.num_constraints(); ++i) {
                         aA[2 * i] += cs.constraints[i].a.evaluate(full_variable_assignment);
                         aA[2 * i] += cs.constraints[i].b.evaluate(full_variable_assignment);
 
@@ -376,11 +376,11 @@ namespace nil {
                         aA[2 * i + 1] -= cs.constraints[i].b.evaluate(full_variable_assignment);
                     }
 
-                    size_t extra_constr_offset = 2 * cs.num_constraints();
+                    std::size_t extra_constr_offset = 2 * cs.num_constraints();
 
                     aA[extra_constr_offset] += FieldType::one();
 
-                    for (size_t i = 1; i <= cs.num_inputs(); ++i) {
+                    for (std::size_t i = 1; i <= cs.num_inputs(); ++i) {
                         aA[extra_constr_offset + 2 * i - 1] += full_variable_assignment[i - 1];
                         aA[extra_constr_offset + 2 * i - 1] += FieldType::one();
 
@@ -395,7 +395,7 @@ namespace nil {
 #pragma omp parallel for
 #endif
                     /* add coefficients of the polynomial (2*d1*A - d2) + d1*d1*Z */
-                    for (size_t i = 0; i < domain->m; ++i) {
+                    for (std::size_t i = 0; i < domain->m; ++i) {
                         coefficients_for_H[i] = (d1 * aA[i]) + (d1 * aA[i]);
                     }
                     coefficients_for_H[0] -= d2;
@@ -408,24 +408,24 @@ namespace nil {
 #ifdef MULTICORE
 #pragma omp parallel for
 #endif
-                    for (size_t i = 0; i < domain->m; ++i) {
+                    for (std::size_t i = 0; i < domain->m; ++i) {
                         H_tmp[i] = aA[i] * aA[i];
                     }
 
                     std::vector<FieldType> aC(domain->m, FieldType::zero());
                     /* again, accounting for all constraints */
-                    size_t extra_var_offset = cs.num_variables() + 1;
-                    for (size_t i = 0; i < cs.num_constraints(); ++i) {
+                    std::size_t extra_var_offset = cs.num_variables() + 1;
+                    for (std::size_t i = 0; i < cs.num_constraints(); ++i) {
                         aC[2 * i] += times_four(cs.constraints[i].c.evaluate(full_variable_assignment));
 
                         aC[2 * i] += full_variable_assignment[extra_var_offset + i - 1];
                         aC[2 * i + 1] += full_variable_assignment[extra_var_offset + i - 1];
                     }
 
-                    size_t extra_var_offset2 = cs.num_variables() + cs.num_constraints();
+                    std::size_t extra_var_offset2 = cs.num_variables() + cs.num_constraints();
                     aC[extra_constr_offset] += FieldType::one();
 
-                    for (size_t i = 1; i <= cs.num_inputs(); ++i) {
+                    for (std::size_t i = 1; i <= cs.num_inputs(); ++i) {
                         aC[extra_constr_offset + 2 * i - 1] += times_four(full_variable_assignment[i - 1]);
 
                         aC[extra_constr_offset + 2 * i - 1] += full_variable_assignment[extra_var_offset2 + i - 1];
@@ -440,7 +440,7 @@ namespace nil {
 #ifdef MULTICORE
 #pragma omp parallel for
 #endif
-                    for (size_t i = 0; i < domain->m; ++i) {
+                    for (std::size_t i = 0; i < domain->m; ++i) {
                         H_tmp[i] = (H_tmp[i] - aC[i]);
                     }
 
@@ -452,7 +452,7 @@ namespace nil {
 #ifdef MULTICORE
 #pragma omp parallel for
 #endif
-                    for (size_t i = 0; i < domain->m; ++i) {
+                    for (std::size_t i = 0; i < domain->m; ++i) {
                         coefficients_for_H[i] += H_tmp[i];
                     }
 

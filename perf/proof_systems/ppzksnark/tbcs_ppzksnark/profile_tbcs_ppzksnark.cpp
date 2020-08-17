@@ -33,8 +33,8 @@ int main(int argc, const char *argv[]) {
     const int num_gates = atoi(argv[1]);
     int primary_input_size = atoi(argv[2]);
 
-    const size_t auxiliary_input_size = 0;
-    const size_t num_outputs = num_gates / 2;
+    const std::size_t auxiliary_input_size = 0;
+    const std::size_t num_outputs = num_gates / 2;
 
     algebra::enter_block("Generate TBCS example");
     tbcs_example example = generate_tbcs_example(primary_input_size, auxiliary_input_size, num_gates, num_outputs);

@@ -42,7 +42,7 @@ namespace nil {
 
                 public:
                     memory_line_variable_gadget(ram_protoboard<ramT> &pb,
-                                                const size_t timestamp_size,
+                                                const std::size_t timestamp_size,
                                                 const ram_architecture_params<ramT> &ap);
 
                     void generate_r1cs_constraints(const bool enforce_bitness = false);
@@ -67,18 +67,18 @@ namespace nil {
                     pb_variable<FieldType> has_accepted;
 
                     execution_line_variable_gadget(ram_protoboard<ramT> &pb,
-                                                   const size_t timestamp_size,
+                                                   const std::size_t timestamp_size,
                                                    const ram_architecture_params<ramT> &ap);
                 };
 
                 template<typename ramT>
                 memory_line_variable_gadget<ramT>::memory_line_variable_gadget(
                     ram_protoboard<ramT> &pb,
-                    const size_t timestamp_size,
+                    const std::size_t timestamp_size,
                     const ram_architecture_params<ramT> &ap) :
                     ram_gadget_base<ramT>(pb) {
-                    const size_t address_size = ap.address_size();
-                    const size_t value_size = ap.value_size();
+                    const std::size_t address_size = ap.address_size();
+                    const std::size_t value_size = ap.value_size();
 
                     timestamp.reset(new dual_variable_gadget<FieldType>(pb, timestamp_size));
                     address.reset(new dual_variable_gadget<FieldType>(pb, address_size));
@@ -124,10 +124,10 @@ namespace nil {
                 template<typename ramT>
                 execution_line_variable_gadget<ramT>::execution_line_variable_gadget(
                     ram_protoboard<ramT> &pb,
-                    const size_t timestamp_size,
+                    const std::size_t timestamp_size,
                     const ram_architecture_params<ramT> &ap) :
                     memory_line_variable_gadget<ramT>(pb, timestamp_size, ap) {
-                    const size_t cpu_state_size = ap.cpu_state_size();
+                    const std::size_t cpu_state_size = ap.cpu_state_size();
 
                     cpu_state.allocate(pb, cpu_state_size);
                     has_accepted.allocate(pb);

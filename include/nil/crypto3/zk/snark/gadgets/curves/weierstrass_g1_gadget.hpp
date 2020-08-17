@@ -42,8 +42,8 @@ namespace nil {
 
                     // (See a comment in r1cs_ppzksnark_verifier_gadget.hpp about why
                     // we mark this function noinline.) TODO: remove later
-                    static size_t __attribute__((noinline)) size_in_bits();
-                    static size_t num_variables();
+                    static std::size_t __attribute__((noinline)) size_in_bits();
+                    static std::size_t num_variables();
                 };
 
                 /**
@@ -124,14 +124,14 @@ namespace nil {
                     std::vector<G1_variable<ppT>> points_and_powers;
                     G1_variable<ppT> result;
 
-                    const size_t elt_size;
-                    const size_t num_points;
-                    const size_t scalar_size;
+                    const std::size_t elt_size;
+                    const std::size_t num_points;
+                    const std::size_t scalar_size;
 
                     G1_multiscalar_mul_gadget(protoboard<FieldType> &pb,
                                               const G1_variable<ppT> &base,
                                               const pb_variable_array<FieldType> &scalars,
-                                              const size_t elt_size,
+                                              const std::size_t elt_size,
                                               const std::vector<G1_variable<ppT>> &points,
                                               const G1_variable<ppT> &result);
                     void generate_r1cs_constraints();
@@ -176,12 +176,12 @@ namespace nil {
                 }
 
                 template<typename ppT>
-                size_t G1_variable<ppT>::size_in_bits() {
+                std::size_t G1_variable<ppT>::size_in_bits() {
                     return 2 * FieldType::size_in_bits();
                 }
 
                 template<typename ppT>
-                size_t G1_variable<ppT>::num_variables() {
+                std::size_t G1_variable<ppT>::num_variables() {
                     return 2;
                 }
 
@@ -294,7 +294,7 @@ namespace nil {
                 G1_multiscalar_mul_gadget<ppT>::G1_multiscalar_mul_gadget(protoboard<FieldType> &pb,
                                                                           const G1_variable<ppT> &base,
                                                                           const pb_variable_array<FieldType> &scalars,
-                                                                          const size_t elt_size,
+                                                                          const std::size_t elt_size,
                                                                           const std::vector<G1_variable<ppT>> &points,
                                                                           const G1_variable<ppT> &result) :
                     gadget<FieldType>(pb),
@@ -303,9 +303,9 @@ namespace nil {
                     assert(num_points >= 1);
                     assert(num_points * elt_size == scalar_size);
 
-                    for (size_t i = 0; i < num_points; ++i) {
+                    for (std::size_t i = 0; i < num_points; ++i) {
                         points_and_powers.emplace_back(points[i]);
-                        for (size_t j = 0; j < elt_size - 1; ++j) {
+                        for (std::size_t j = 0; j < elt_size - 1; ++j) {
                             points_and_powers.emplace_back(G1_variable<ppT>(pb));
                             doublers.emplace_back(G1_dbl_gadget<ppT>(
                                 pb, points_and_powers[i * elt_size + j], points_and_powers[i * elt_size + j + 1]));
@@ -313,7 +313,7 @@ namespace nil {
                     }
 
                     chosen_results.emplace_back(base);
-                    for (size_t i = 0; i < scalar_size; ++i) {
+                    for (std::size_t i = 0; i < scalar_size; ++i) {
                         computed_results.emplace_back(G1_variable<ppT>(pb));
                         if (i < scalar_size - 1) {
                             chosen_results.emplace_back(G1_variable<ppT>(pb));
@@ -328,13 +328,13 @@ namespace nil {
 
                 template<typename ppT>
                 void G1_multiscalar_mul_gadget<ppT>::generate_r1cs_constraints() {
-                    const size_t num_constraints_before = this->pb.num_constraints();
+                    const std::size_t num_constraints_before = this->pb.num_constraints();
 
-                    for (size_t i = 0; i < scalar_size - num_points; ++i) {
+                    for (std::size_t i = 0; i < scalar_size - num_points; ++i) {
                         doublers[i].generate_r1cs_constraints();
                     }
 
-                    for (size_t i = 0; i < scalar_size; ++i) {
+                    for (std::size_t i = 0; i < scalar_size; ++i) {
                         adders[i].generate_r1cs_constraints();
 
                         /*
@@ -352,18 +352,18 @@ namespace nil {
                                                        chosen_results[i + 1].Y - chosen_results[i].Y));
                     }
 
-                    const size_t num_constraints_after = this->pb.num_constraints();
+                    const std::size_t num_constraints_after = this->pb.num_constraints();
                     assert(num_constraints_after - num_constraints_before ==
                            4 * (scalar_size - num_points) + (4 + 2) * scalar_size);
                 }
 
                 template<typename ppT>
                 void G1_multiscalar_mul_gadget<ppT>::generate_r1cs_witness() {
-                    for (size_t i = 0; i < scalar_size - num_points; ++i) {
+                    for (std::size_t i = 0; i < scalar_size - num_points; ++i) {
                         doublers[i].generate_r1cs_witness();
                     }
 
-                    for (size_t i = 0; i < scalar_size; ++i) {
+                    for (std::size_t i = 0; i < scalar_size; ++i) {
                         adders[i].generate_r1cs_witness();
                         this->pb.lc_val(chosen_results[i + 1].X) =
                             (this->pb.val(scalars[i]) == algebra::Fr<ppT>::zero() ?

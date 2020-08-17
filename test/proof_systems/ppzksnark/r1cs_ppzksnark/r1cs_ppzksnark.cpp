@@ -22,7 +22,7 @@
 using namespace nil::crypto3::zk::snark;
 
 template<typename ppT>
-void test_r1cs_ppzksnark(size_t num_constraints, size_t input_size) {
+void test_r1cs_ppzksnark(std::size_t num_constraints, std::size_t input_size) {
     const bool test_serialization = true;
     r1cs_example<algebra::Fr<ppT>> example =
         generate_r1cs_example_with_binary_input<algebra::Fr<ppT>>(num_constraints, input_size);

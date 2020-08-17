@@ -24,7 +24,7 @@ namespace nil {
         namespace zk {
             namespace snark {
 
-                typedef size_t lc_index_t;
+                typedef std::size_t lc_index_t;
 
                 template<typename FieldType>
                 class protoboard;
@@ -62,7 +62,7 @@ namespace nil {
                     using contents::resize;
 
                     pb_variable_array() : contents() {};
-                    pb_variable_array(size_t count, const pb_variable<FieldType> &value) : contents(count, value) {};
+                    pb_variable_array(std::size_t count, const pb_variable<FieldType> &value) : contents(count, value) {};
                     pb_variable_array(typename contents::const_iterator first, typename contents::const_iterator last) :
                         contents(first, last) {};
                     pb_variable_array(typename contents::const_reverse_iterator first,
@@ -70,24 +70,24 @@ namespace nil {
                         contents(first, last) {};
 
                     /* allocates pb_variable<FieldType> array in MSB->LSB order */
-                    void allocate(protoboard<FieldType> &pb, const size_t n) {
+                    void allocate(protoboard<FieldType> &pb, const std::size_t n) {
                         (*this).resize(n);
 
-                        for (size_t i = 0; i < n; ++i) {
+                        for (std::size_t i = 0; i < n; ++i) {
                             (*this)[i].allocate(pb);
                         }
                     }
 
                     void fill_with_field_elements(protoboard<FieldType> &pb, const std::vector<FieldType> &vals) const {
                         assert(this->size() == vals.size());
-                        for (size_t i = 0; i < vals.size(); ++i) {
+                        for (std::size_t i = 0; i < vals.size(); ++i) {
                             pb.val((*this)[i]) = vals[i];
                         }
                     }
 
                     void fill_with_bits(protoboard<FieldType> &pb, const std::vector<bool> &bits) const {
                         assert(this->size() == bits.size());
-                        for (size_t i = 0; i < bits.size(); ++i) {
+                        for (std::size_t i = 0; i < bits.size(); ++i) {
                             pb.val((*this)[i]) = (bits[i] ? FieldType::one() : FieldType::zero());
                         }
                     }
@@ -98,7 +98,7 @@ namespace nil {
 
                     void fill_with_bits_of_field_element(protoboard<FieldType> &pb,
                                                          const typename FieldType::value_type &r) const {
-                        for (size_t i = 0; i < this->size(); ++i) {
+                        for (std::size_t i = 0; i < this->size(); ++i) {
                             pb.val((*this)[i]) =
                                 boost::multiprecision::bit_test(r, i) ? FieldType::one() : FieldType::zero();
                         }
@@ -106,7 +106,7 @@ namespace nil {
 
                     std::vector<FieldType> get_vals(const protoboard<FieldType> &pb) const {
                         std::vector<FieldType> result(this->size());
-                        for (size_t i = 0; i < this->size(); ++i) {
+                        for (std::size_t i = 0; i < this->size(); ++i) {
                             result[i] = pb.val((*this)[i]);
                         }
                         return result;
@@ -114,7 +114,7 @@ namespace nil {
 
                     std::vector<bool> get_bits(const protoboard<FieldType> &pb) const {
                         std::vector<bool> result;
-                        for (size_t i = 0; i < this->size(); ++i) {
+                        for (std::size_t i = 0; i < this->size(); ++i) {
                             const FieldType v = pb.val((*this)[i]);
                             assert(v == FieldType::zero() || v == FieldType::one());
                             result.push_back(v == FieldType::one());
@@ -125,7 +125,7 @@ namespace nil {
                     FieldType get_field_element_from_bits(const protoboard<FieldType> &pb) const {
                         FieldType result = FieldType::zero();
 
-                        for (size_t i = 0; i < this->size(); ++i) {
+                        for (std::size_t i = 0; i < this->size(); ++i) {
                             /* push in the new bit */
                             const FieldType v = pb.val((*this)[this->size() - 1 - i]);
                             assert(v == FieldType::zero() || v == FieldType::one());
@@ -227,8 +227,8 @@ namespace nil {
                         for (auto &v : arr)
                             this->emplace_back(pb_linear_combination<FieldType>(v));
                     };
-                    pb_linear_combination_array(size_t count) : contents(count) {};
-                    pb_linear_combination_array(size_t count, const pb_linear_combination<FieldType> &value) :
+                    pb_linear_combination_array(std::size_t count) : contents(count) {};
+                    pb_linear_combination_array(std::size_t count, const pb_linear_combination<FieldType> &value) :
                         contents(count, value) {};
                     pb_linear_combination_array(typename contents::const_iterator first,
                                                 typename contents::const_iterator last) :
@@ -238,21 +238,21 @@ namespace nil {
                         contents(first, last) {};
 
                     void evaluate(protoboard<FieldType> &pb) const {
-                        for (size_t i = 0; i < this->size(); ++i) {
+                        for (std::size_t i = 0; i < this->size(); ++i) {
                             (*this)[i].evaluate(pb);
                         }
                     }
 
                     void fill_with_field_elements(protoboard<FieldType> &pb, const std::vector<FieldType> &vals) const {
                         assert(this->size() == vals.size());
-                        for (size_t i = 0; i < vals.size(); ++i) {
+                        for (std::size_t i = 0; i < vals.size(); ++i) {
                             pb.lc_val((*this)[i]) = vals[i];
                         }
                     }
 
                     void fill_with_bits(protoboard<FieldType> &pb, const std::vector<bool> &bits) const {
                         assert(this->size() == bits.size());
-                        for (size_t i = 0; i < bits.size(); ++i) {
+                        for (std::size_t i = 0; i < bits.size(); ++i) {
                             pb.lc_val((*this)[i]) = (bits[i] ? FieldType::one() : FieldType::zero());
                         }
                     }
@@ -264,7 +264,7 @@ namespace nil {
                     void fill_with_bits_of_field_element(protoboard<FieldType> &pb,
                                                          const typename FieldType::value_type &r) const {
 
-                        for (size_t i = 0; i < this->size(); ++i) {
+                        for (std::size_t i = 0; i < this->size(); ++i) {
                             pb.lc_val((*this)[i]) =
                                 boost::multiprecision::bit_test(r, i) ? FieldType::one() : FieldType::zero();
                         }
@@ -272,7 +272,7 @@ namespace nil {
 
                     std::vector<FieldType> get_vals(const protoboard<FieldType> &pb) const {
                         std::vector<FieldType> result(this->size());
-                        for (size_t i = 0; i < this->size(); ++i) {
+                        for (std::size_t i = 0; i < this->size(); ++i) {
                             result[i] = pb.lc_val((*this)[i]);
                         }
                         return result;
@@ -280,7 +280,7 @@ namespace nil {
 
                     std::vector<bool> get_bits(const protoboard<FieldType> &pb) const {
                         std::vector<bool> result;
-                        for (size_t i = 0; i < this->size(); ++i) {
+                        for (std::size_t i = 0; i < this->size(); ++i) {
                             const FieldType v = pb.lc_val((*this)[i]);
                             assert(v == FieldType::zero() || v == FieldType::one());
                             result.push_back(v == FieldType::one());
@@ -291,7 +291,7 @@ namespace nil {
                     FieldType get_field_element_from_bits(const protoboard<FieldType> &pb) const {
                         FieldType result = FieldType::zero();
 
-                        for (size_t i = 0; i < this->size(); ++i) {
+                        for (std::size_t i = 0; i < this->size(); ++i) {
                             /* push in the new bit */
                             const FieldType v = pb.lc_val((*this)[this->size() - 1 - i]);
                             assert(v == FieldType::zero() || v == FieldType::one());

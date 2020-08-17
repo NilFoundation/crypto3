@@ -134,7 +134,7 @@ namespace nil {
 
                     /* parse state as registers + flags */
                     pb_variable_array<FieldType> packed_prev_registers, packed_next_registers;
-                    for (size_t i = 0; i < pb.ap.k; ++i) {
+                    for (std::size_t i = 0; i < pb.ap.k; ++i) {
                         prev_registers.emplace_back(word_variable_gadget<FieldType>(
                             pb,
                             pb_variable_array<FieldType>(prev_state.begin() + i * pb.ap.w,
@@ -214,7 +214,7 @@ namespace nil {
                     decode_arguments->generate_r1cs_constraints();
 
                     /* generate indicator variables for opcode */
-                    for (size_t i = 0; i < 1ul << this->pb.ap.opcode_width(); ++i) {
+                    for (std::size_t i = 0; i < 1ul << this->pb.ap.opcode_width(); ++i) {
                         this->pb.add_r1cs_constraint(
                             r1cs_constraint<FieldType>(opcode_indicators[i], pb_packing_sum<FieldType>(opcode) - i, 0));
                     }
@@ -222,7 +222,7 @@ namespace nil {
                         r1cs_constraint<FieldType>(1, pb_sum<FieldType>(opcode_indicators), 1));
 
                     /* consistency checks for repacked variables */
-                    for (size_t i = 0; i < this->pb.ap.k; ++i) {
+                    for (std::size_t i = 0; i < this->pb.ap.k; ++i) {
                         prev_registers[i].generate_r1cs_constraints(true);
                         next_registers[i].generate_r1cs_constraints(true);
                     }
@@ -307,7 +307,7 @@ namespace nil {
                 void tinyram_cpu_checker<FieldType>::generate_r1cs_witness_address() {
                     /* decode instruction and arguments */
                     prev_pc_addr_as_word_variable->generate_r1cs_witness_from_bits();
-                    for (size_t i = 0; i < this->pb.ap.k; ++i) {
+                    for (std::size_t i = 0; i < this->pb.ap.k; ++i) {
                         prev_registers[i].generate_r1cs_witness_from_bits();
                     }
 
@@ -331,8 +331,8 @@ namespace nil {
                     ls_prev_val_as_doubleword_variable->generate_r1cs_witness_from_bits();
 
                     /* fill in the opcode indicators */
-                    const size_t opcode_val = opcode.get_field_element_from_bits(this->pb).as_ulong();
-                    for (size_t i = 0; i < 1ul << this->pb.ap.opcode_width(); ++i) {
+                    const std::size_t opcode_val = opcode.get_field_element_from_bits(this->pb).as_ulong();
+                    for (std::size_t i = 0; i < 1ul << this->pb.ap.opcode_width(); ++i) {
                         this->pb.val(opcode_indicators[i]) = (i == opcode_val ? FieldType::one() : FieldType::zero());
                     }
 
@@ -352,23 +352,23 @@ namespace nil {
                        b) store.b
                        c) store.w
                        d) load.w or any non-memory instruction */
-                    const size_t prev_doubleword = this->pb.val(ls_prev_val_as_doubleword_variable->packed).as_ulong();
-                    const size_t subaddress = this->pb.val(memory_subaddress->packed).as_ulong();
+                    const std::size_t prev_doubleword = this->pb.val(ls_prev_val_as_doubleword_variable->packed).as_ulong();
+                    const std::size_t subaddress = this->pb.val(memory_subaddress->packed).as_ulong();
 
                     if (this->pb.val(opcode_indicators[tinyram_opcode_LOADB]) == FieldType::one()) {
-                        const size_t loaded_byte = (prev_doubleword >> (8u * subaddress)) & 0xFF;
+                        const std::size_t loaded_byte = (prev_doubleword >> (8u * subaddress)) & 0xFF;
                         this->pb.val(instruction_results[tinyram_opcode_LOADB]) = FieldType(loaded_byte);
                         this->pb.val(memory_subcontents) = FieldType(loaded_byte);
                     } else if (this->pb.val(opcode_indicators[tinyram_opcode_STOREB]) == FieldType::one()) {
-                        const size_t stored_byte = (this->pb.val(desval->packed).as_ulong()) & 0xFF;
+                        const std::size_t stored_byte = (this->pb.val(desval->packed).as_ulong()) & 0xFF;
                         this->pb.val(memory_subcontents) = FieldType(stored_byte);
                     } else if (this->pb.val(opcode_indicators[tinyram_opcode_STOREW]) == FieldType::one()) {
-                        const size_t stored_word = (this->pb.val(desval->packed).as_ulong());
+                        const std::size_t stored_word = (this->pb.val(desval->packed).as_ulong());
                         this->pb.val(memory_subcontents) = FieldType(stored_word);
                     } else {
                         const bool access_is_word0 =
                             (this->pb.val(*memory_subaddress->bits.rbegin()) == FieldType::zero());
-                        const size_t loaded_word =
+                        const std::size_t loaded_word =
                             (prev_doubleword >> (access_is_word0 ? 0 : this->pb.ap.w)) & ((1ul << this->pb.ap.w) - 1);
                         this->pb.val(instruction_results[tinyram_opcode_LOADW]) =
                             FieldType(loaded_word); /* does not hurt even for non-memory instructions */
@@ -416,7 +416,7 @@ namespace nil {
                     consistency_enforcer->generate_r1cs_witness();
                     next_pc_addr_as_word_variable->generate_r1cs_witness_from_packed();
 
-                    for (size_t i = 0; i < this->pb.ap.k; ++i) {
+                    for (std::size_t i = 0; i < this->pb.ap.k; ++i) {
                         next_registers[i].generate_r1cs_witness_from_packed();
                     }
 
@@ -435,12 +435,12 @@ namespace nil {
                            this->pb.val(prev_flag).as_ulong());
                     printf("   ");
 
-                    for (size_t j = 0; j < this->pb.ap.k; ++j) {
+                    for (std::size_t j = 0; j < this->pb.ap.k; ++j) {
                         printf("r%zu = %2lu ", j, this->pb.val(prev_registers[j].packed).as_ulong());
                     }
                     printf("\n");
 
-                    const size_t opcode_val = opcode.get_field_element_from_bits(this->pb).as_ulong();
+                    const std::size_t opcode_val = opcode.get_field_element_from_bits(this->pb).as_ulong();
                     printf("   %s r%lu, r%lu, %s%lu\n",
                            tinyram_opcode_names[static_cast<tinyram_opcode>(opcode_val)].c_str(),
                            desidx.get_field_element_from_bits(this->pb).as_ulong(),

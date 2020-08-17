@@ -18,10 +18,10 @@
 using namespace nil::crypto3::zk::snark;
 
 template<typename FieldType>
-void simulate_random_memory_contents(const tinyram_architecture_params &ap, const size_t input_size,
-                                     const size_t program_size) {
-    const size_t num_addresses = 1ul << ap.dwaddr_len();
-    const size_t value_size = 2 * ap.w;
+void simulate_random_memory_contents(const tinyram_architecture_params &ap, const std::size_t input_size,
+                                     const std::size_t program_size) {
+    const std::size_t num_addresses = 1ul << ap.dwaddr_len();
+    const std::size_t value_size = 2 * ap.w;
     memory_contents init_random =
         random_memory_contents(num_addresses, value_size, program_size + (input_size + 1) / 2);
 
@@ -31,12 +31,12 @@ void simulate_random_memory_contents(const tinyram_architecture_params &ap, cons
 }
 
 template<typename ppT>
-void profile_ram_zksnark_verifier(const tinyram_architecture_params &ap, const size_t input_size,
-                                  const size_t program_size) {
+void profile_ram_zksnark_verifier(const tinyram_architecture_params &ap, const std::size_t input_size,
+                                  const std::size_t program_size) {
     typedef ram_zksnark_machine_pp<ppT> ramT;
-    const size_t time_bound = 10;
+    const std::size_t time_bound = 10;
 
-    const size_t boot_trace_size_bound = program_size + input_size;
+    const std::size_t boot_trace_size_bound = program_size + input_size;
     const ram_example<ramT> example = gen_ram_example_complex<ramT>(ap, boot_trace_size_bound, time_bound, true);
 
     ram_zksnark_proof<ppT> pi;
@@ -50,11 +50,11 @@ void profile_ram_zksnark_verifier(const tinyram_architecture_params &ap, const s
 template<typename ppT>
 void print_ram_zksnark_verifier_profiling() {
     algebra::inhibit_profiling_info = true;
-    for (size_t w : {16, 32}) {
-        const size_t k = 16;
+    for (std::size_t w : {16, 32}) {
+        const std::size_t k = 16;
 
-        for (size_t input_size : {0, 10, 100}) {
-            for (size_t program_size = 10; program_size <= 10000; program_size *= 10) {
+        for (std::size_t input_size : {0, 10, 100}) {
+            for (std::size_t program_size = 10; program_size <= 10000; program_size *= 10) {
                 const tinyram_architecture_params ap(w, k);
 
                 profile_ram_zksnark_verifier<ppT>(ap, input_size, program_size);
@@ -84,11 +84,11 @@ void print_ram_zksnark_verifier_profiling() {
 }
 
 template<typename ppT>
-void profile_ram_zksnark(const tinyram_architecture_params &ap, const size_t program_size, const size_t input_size,
-                         const size_t time_bound) {
+void profile_ram_zksnark(const tinyram_architecture_params &ap, const std::size_t program_size, const std::size_t input_size,
+                         const std::size_t time_bound) {
     typedef ram_zksnark_machine_pp<ppT> ramT;
 
-    const size_t boot_trace_size_bound = program_size + input_size;
+    const std::size_t boot_trace_size_bound = program_size + input_size;
     const ram_example<ramT> example = gen_ram_example_complex<ramT>(ap, boot_trace_size_bound, time_bound, true);
     const bool test_serialization = true;
     const bool bit = run_ram_zksnark<ppT>(example, test_serialization);
@@ -97,14 +97,14 @@ void profile_ram_zksnark(const tinyram_architecture_params &ap, const size_t pro
 
 namespace po = boost::program_options;
 
-bool process_command_line(const int argc, const char **argv, bool &profile_gp, size_t &w, size_t &k, bool &profile_v,
-                          size_t &l) {
+bool process_command_line(const int argc, const char **argv, bool &profile_gp, std::size_t &w, std::size_t &k, bool &profile_v,
+                          std::size_t &l) {
     try {
         po::options_description desc("Usage");
         desc.add_options()("help", "print this help message")("profile_gp", "profile generator and prover")(
-            "w", po::value<size_t>(&w)->default_value(16), "word size")(
-            "k", po::value<size_t>(&k)->default_value(16), "register count")("profile_v", "profile verifier")(
-            "v", "print version info")("l", po::value<size_t>(&l)->default_value(10), "program length");
+            "w", po::value<std::size_t>(&w)->default_value(16), "word size")(
+            "k", po::value<std::size_t>(&k)->default_value(16), "register count")("profile_v", "profile verifier")(
+            "v", "print version info")("l", po::value<std::size_t>(&l)->default_value(10), "program length");
 
         po::variables_map vm;
         po::store(po::parse_command_line(argc, argv, desc), vm);
@@ -141,10 +141,10 @@ int main(int argc, const char *argv[]) {
     ram_zksnark_PCD_pp<default_ram_zksnark_pp>::init_public_params();
 
     bool profile_gp;
-    size_t w;
-    size_t k;
+    std::size_t w;
+    std::size_t k;
     bool profile_v;
-    size_t l;
+    std::size_t l;
 
     if (!process_command_line(argc, argv, profile_gp, w, k, profile_v, l)) {
         return 1;

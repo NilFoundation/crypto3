@@ -22,20 +22,20 @@ namespace nil {
                  * A pair consisting of an address and a value.
                  * It represents a memory store.
                  */
-                typedef std::pair<size_t, size_t> address_and_value;
+                typedef std::pair<std::size_t, std::size_t> address_and_value;
 
                 /**
                  * A list in which each component consists of a timestamp and a memory store.
                  */
                 class memory_store_trace {
                 private:
-                    std::map<size_t, address_and_value> entries;
+                    std::map<std::size_t, address_and_value> entries;
 
                 public:
                     memory_store_trace();
-                    address_and_value get_trace_entry(size_t timestamp) const;
-                    std::map<size_t, address_and_value> get_all_trace_entries() const;
-                    void set_trace_entry(size_t timestamp, const address_and_value &av);
+                    address_and_value get_trace_entry(std::size_t timestamp) const;
+                    std::map<std::size_t, address_and_value> get_all_trace_entries() const;
+                    void set_trace_entry(std::size_t timestamp, const address_and_value &av);
 
                     memory_contents as_memory_contents() const;
                 };
@@ -43,16 +43,16 @@ namespace nil {
                 memory_store_trace::memory_store_trace() {
                 }
 
-                address_and_value memory_store_trace::get_trace_entry(size_t timestamp) const {
+                address_and_value memory_store_trace::get_trace_entry(std::size_t timestamp) const {
                     auto it = entries.find(timestamp);
-                    return (it != entries.end() ? it->second : std::make_pair<size_t, size_t>(0, 0));
+                    return (it != entries.end() ? it->second : std::make_pair<std::size_t, std::size_t>(0, 0));
                 }
 
-                std::map<size_t, address_and_value> memory_store_trace::get_all_trace_entries() const {
+                std::map<std::size_t, address_and_value> memory_store_trace::get_all_trace_entries() const {
                     return entries;
                 }
 
-                void memory_store_trace::set_trace_entry(size_t timestamp, const address_and_value &av) {
+                void memory_store_trace::set_trace_entry(std::size_t timestamp, const address_and_value &av) {
                     entries[timestamp] = av;
                 }
 

@@ -34,9 +34,9 @@ namespace nil {
                  * Optionally, also test the case of compliance predicates with different types.
                  */
                 template<typename PCD_ppT>
-                bool run_r1cs_mp_ppzkpcd_tally_example(size_t wordsize,
-                                                       size_t max_arity,
-                                                       size_t depth,
+                bool run_r1cs_mp_ppzkpcd_tally_example(std::size_t wordsize,
+                                                       std::size_t max_arity,
+                                                       std::size_t depth,
                                                        bool test_serialization,
                                                        bool test_multi_type,
                                                        bool test_same_type_optimization) {
@@ -44,21 +44,21 @@ namespace nil {
 
                     bool all_accept = true;
 
-                    size_t tree_size = 0;
-                    size_t nodes_in_layer = 1;
-                    for (size_t layer = 0; layer <= depth; ++layer) {
+                    std::size_t tree_size = 0;
+                    std::size_t nodes_in_layer = 1;
+                    for (std::size_t layer = 0; layer <= depth; ++layer) {
                         tree_size += nodes_in_layer;
                         nodes_in_layer *= max_arity;
                     }
 
-                    std::vector<size_t> tree_types(tree_size);
-                    std::vector<size_t> tree_elems(tree_size);
-                    std::vector<size_t> tree_arity(tree_size);
+                    std::vector<std::size_t> tree_types(tree_size);
+                    std::vector<std::size_t> tree_elems(tree_size);
+                    std::vector<std::size_t> tree_arity(tree_size);
 
                     nodes_in_layer = 1;
-                    size_t node_idx = 0;
-                    for (size_t layer = 0; layer <= depth; ++layer) {
-                        for (size_t id_in_layer = 0; id_in_layer < nodes_in_layer; ++id_in_layer, ++node_idx) {
+                    std::size_t node_idx = 0;
+                    for (std::size_t layer = 0; layer <= depth; ++layer) {
+                        for (std::size_t id_in_layer = 0; id_in_layer < nodes_in_layer; ++id_in_layer, ++node_idx) {
                             if (!test_multi_type) {
                                 tree_types[node_idx] = 1;
                             } else {
@@ -82,7 +82,7 @@ namespace nil {
                     std::vector<r1cs_mp_ppzkpcd_proof<PCD_ppT>> tree_proofs(tree_size);
                     std::vector<std::shared_ptr<r1cs_pcd_message<FieldType>>> tree_messages(tree_size);
 
-                    std::set<size_t> tally_1_accepted_types, tally_2_accepted_types;
+                    std::set<std::size_t> tally_1_accepted_types, tally_2_accepted_types;
                     if (test_same_type_optimization) {
                         if (!test_multi_type) {
                             /* only tally 1 is going to be used */
@@ -117,8 +117,8 @@ namespace nil {
                         tally_1.get_base_case_message(); /* we choose the base to always be tally_1 */
                     nodes_in_layer /= max_arity;
                     for (long layer = depth; layer >= 0; --layer, nodes_in_layer /= max_arity) {
-                        for (size_t i = 0; i < nodes_in_layer; ++i) {
-                            const size_t cur_idx = (nodes_in_layer - 1) / (max_arity - 1) + i;
+                        for (std::size_t i = 0; i < nodes_in_layer; ++i) {
+                            const std::size_t cur_idx = (nodes_in_layer - 1) / (max_arity - 1) + i;
 
                             tally_cp_handler<FieldType> &cur_tally = (tree_types[cur_idx] == 1 ? tally_1 : tally_2);
                             r1cs_pcd_compliance_predicate<FieldType> &cur_cp = (tree_types[cur_idx] == 1 ? cp_1 : cp_2);
@@ -129,7 +129,7 @@ namespace nil {
                             std::vector<r1cs_mp_ppzkpcd_proof<PCD_ppT>> proofs(max_arity);
 
                             if (!base_case) {
-                                for (size_t i = 0; i < max_arity; ++i) {
+                                for (std::size_t i = 0; i < max_arity; ++i) {
                                     msgs[i] = tree_messages[max_arity * cur_idx + i + 1];
                                     proofs[i] = tree_proofs[max_arity * cur_idx + i + 1];
                                 }
@@ -167,7 +167,7 @@ namespace nil {
                             all_accept = all_accept && ans;
 
                             printf("\n");
-                            for (size_t i = 0; i < msgs.size(); ++i) {
+                            for (std::size_t i = 0; i < msgs.size(); ++i) {
                                 printf("Message %zu was:\n", i);
                                 msgs[i]->print();
                             }

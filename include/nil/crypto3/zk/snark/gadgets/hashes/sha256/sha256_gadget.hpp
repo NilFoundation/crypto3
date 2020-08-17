@@ -77,19 +77,18 @@ namespace nil {
                                                   const digest_variable<FieldType> &right,
                                                   const digest_variable<FieldType> &output);
                     sha256_two_to_one_hash_gadget(protoboard<FieldType> &pb,
-                                                  const size_t block_length,
+                                                  const std::size_t block_length,
                                                   const block_variable<FieldType> &input_block,
                                                   const digest_variable<FieldType> &output);
 
                     void generate_r1cs_constraints(bool ensure_output_bitness = true);    // TODO: ignored for now
                     void generate_r1cs_witness();
 
-                    static size_t get_block_len();
-                    static size_t get_digest_len();
+                    static std::size_t get_block_len();
+                    static std::size_t get_digest_len();
                     static std::vector<bool> get_hash(const std::vector<bool> &input);
 
-                    static size_t
-                        expected_constraints(const bool ensure_output_bitness = true);    // TODO: ignored for now
+                    static std::size_t expected_constraints(bool ensure_output_bitness = true);    // TODO: ignored for now
                 };
 
                 template<typename FieldType>
@@ -123,7 +122,7 @@ namespace nil {
                                                                              prev_output.rbegin() + 1 * 32));
 
                     /* do the rounds */
-                    for (size_t i = 0; i < 64; ++i) {
+                    for (std::size_t i = 0; i < 64; ++i) {
                         round_h.push_back(round_g[i]);
                         round_g.push_back(round_f[i]);
                         round_f.push_back(round_e[i]);
@@ -147,7 +146,7 @@ namespace nil {
                     /* finalize */
                     unreduced_output.allocate(pb, 8);
                     reduced_output.allocate(pb, 8);
-                    for (size_t i = 0; i < 8; ++i) {
+                    for (std::size_t i = 0; i < 8; ++i) {
                         reduce_output.push_back(lastbits_gadget<FieldType>(
                             pb,
                             unreduced_output[i],
@@ -161,11 +160,11 @@ namespace nil {
                 template<typename FieldType>
                 void sha256_compression_function_gadget<FieldType>::generate_r1cs_constraints() {
                     message_schedule->generate_r1cs_constraints();
-                    for (size_t i = 0; i < 64; ++i) {
+                    for (std::size_t i = 0; i < 64; ++i) {
                         round_functions[i].generate_r1cs_constraints();
                     }
 
-                    for (size_t i = 0; i < 4; ++i) {
+                    for (std::size_t i = 0; i < 4; ++i) {
                         this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(
                             1,
                             round_functions[3 - i].packed_d + round_functions[63 - i].packed_new_a,
@@ -177,7 +176,7 @@ namespace nil {
                             unreduced_output[4 + i]));
                     }
 
-                    for (size_t i = 0; i < 8; ++i) {
+                    for (std::size_t i = 0; i < 8; ++i) {
                         reduce_output[i].generate_r1cs_constraints();
                     }
                 }
@@ -186,18 +185,18 @@ namespace nil {
                 void sha256_compression_function_gadget<FieldType>::generate_r1cs_witness() {
                     message_schedule->generate_r1cs_witness();
 
-                    for (size_t i = 0; i < 64; ++i) {
+                    for (std::size_t i = 0; i < 64; ++i) {
                         round_functions[i].generate_r1cs_witness();
                     }
 
-                    for (size_t i = 0; i < 4; ++i) {
+                    for (std::size_t i = 0; i < 4; ++i) {
                         this->pb.val(unreduced_output[i]) = this->pb.val(round_functions[3 - i].packed_d) +
                                                             this->pb.val(round_functions[63 - i].packed_new_a);
                         this->pb.val(unreduced_output[4 + i]) = this->pb.val(round_functions[3 - i].packed_h) +
                                                                 this->pb.val(round_functions[63 - i].packed_new_e);
                     }
 
-                    for (size_t i = 0; i < 8; ++i) {
+                    for (std::size_t i = 0; i < 8; ++i) {
                         reduce_output[i].generate_r1cs_witness();
                     }
                 }
@@ -222,7 +221,7 @@ namespace nil {
                 template<typename FieldType>
                 sha256_two_to_one_hash_gadget<FieldType>::sha256_two_to_one_hash_gadget(
                     protoboard<FieldType> &pb,
-                    const size_t block_length,
+                    const std::size_t block_length,
                     const block_variable<FieldType> &input_block,
                     const digest_variable<FieldType> &output) :
                     gadget<FieldType>(pb) {
@@ -233,8 +232,8 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                void sha256_two_to_one_hash_gadget<FieldType>::generate_r1cs_constraints(bool ensure_output_bitness) {
-                    BOOST_ATTRIBUTE_UNUSED(ensure_output_bitness);
+                void sha256_two_to_one_hash_gadget<FieldType>::generate_r1cs_constraints(
+                    BOOST_ATTRIBUTE_UNUSED bool ensure_output_bitness) {
                     f->generate_r1cs_constraints();
                 }
 
@@ -244,12 +243,12 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                size_t sha256_two_to_one_hash_gadget<FieldType>::get_block_len() {
+                std::size_t sha256_two_to_one_hash_gadget<FieldType>::get_block_len() {
                     return SHA256_block_size;
                 }
 
                 template<typename FieldType>
-                size_t sha256_two_to_one_hash_gadget<FieldType>::get_digest_len() {
+                std::size_t sha256_two_to_one_hash_gadget<FieldType>::get_digest_len() {
                     return SHA256_digest_size;
                 }
 
@@ -268,9 +267,8 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                size_t
-                    sha256_two_to_one_hash_gadget<FieldType>::expected_constraints(const bool ensure_output_bitness) {
-                    BOOST_ATTRIBUTE_UNUSED(ensure_output_bitness);
+                std::size_t sha256_two_to_one_hash_gadget<FieldType>::expected_constraints(
+                    BOOST_ATTRIBUTE_UNUSED bool ensure_output_bitness) {
                     return 27280; /* hardcoded for now */
                 }
 

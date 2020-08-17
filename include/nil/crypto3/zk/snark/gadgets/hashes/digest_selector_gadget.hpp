@@ -22,14 +22,14 @@ namespace nil {
                 template<typename FieldType>
                 class digest_selector_gadget : public gadget<FieldType> {
                 public:
-                    size_t digest_size;
+                    std::size_t digest_size;
                     digest_variable<FieldType> input;
                     pb_linear_combination<FieldType> is_right;
                     digest_variable<FieldType> left;
                     digest_variable<FieldType> right;
 
                     digest_selector_gadget(protoboard<FieldType> &pb,
-                                           const size_t digest_size,
+                                           const std::size_t digest_size,
                                            const digest_variable<FieldType> &input,
                                            const pb_linear_combination<FieldType> &is_right,
                                            const digest_variable<FieldType> &left,
@@ -42,7 +42,7 @@ namespace nil {
                 template<typename FieldType>
                 digest_selector_gadget<FieldType>::digest_selector_gadget(
                     protoboard<FieldType> &pb,
-                    const size_t digest_size,
+                    const std::size_t digest_size,
                     const digest_variable<FieldType> &input,
                     const pb_linear_combination<FieldType> &is_right,
                     const digest_variable<FieldType> &left,
@@ -53,7 +53,7 @@ namespace nil {
 
                 template<typename FieldType>
                 void digest_selector_gadget<FieldType>::generate_r1cs_constraints() {
-                    for (size_t i = 0; i < digest_size; ++i) {
+                    for (std::size_t i = 0; i < digest_size; ++i) {
                         /*
                           input = is_right * right + (1-is_right) * left
                           input - left = is_right(right - left)
@@ -70,11 +70,11 @@ namespace nil {
                     assert(this->pb.lc_val(is_right) == FieldType::one() ||
                            this->pb.lc_val(is_right) == FieldType::zero());
                     if (this->pb.lc_val(is_right) == FieldType::one()) {
-                        for (size_t i = 0; i < digest_size; ++i) {
+                        for (std::size_t i = 0; i < digest_size; ++i) {
                             this->pb.val(right.bits[i]) = this->pb.val(input.bits[i]);
                         }
                     } else {
-                        for (size_t i = 0; i < digest_size; ++i) {
+                        for (std::size_t i = 0; i < digest_size; ++i) {
                             this->pb.val(left.bits[i]) = this->pb.val(input.bits[i]);
                         }
                     }

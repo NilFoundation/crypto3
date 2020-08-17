@@ -26,7 +26,7 @@ namespace nil {
                 template<>
                 void test_knapsack_CRH_with_bit_out_gadget<algebra::Fr<algebra::bn128_pp>>() {
                     typedef algebra::Fr<algebra::bn128_pp> FieldType;
-                    const size_t dimension = knapsack_dimension<FieldType>::dimension;
+                    const std::size_t dimension = knapsack_dimension<FieldType>::dimension;
                     const std::vector<bool> input_bits = {1, 1, 0, 0, 1, 0, 1, 0, 0, 1};
                     std::vector<bool> digest_bits;
 
@@ -86,7 +86,7 @@ namespace nil {
                 template<>
                 void test_knapsack_CRH_with_bit_out_gadget<algebra::Fr<algebra::edwards_pp>>() {
                     typedef algebra::Fr<algebra::edwards_pp> FieldType;
-                    const size_t dimension = knapsack_dimension<FieldType>::dimension;
+                    const std::size_t dimension = knapsack_dimension<FieldType>::dimension;
                     const std::vector<bool> input_bits = {1, 1, 0, 0, 1, 0, 1, 0, 0, 1};
                     std::vector<bool> digest_bits;
 
@@ -133,7 +133,7 @@ namespace nil {
                 template<>
                 void test_knapsack_CRH_with_bit_out_gadget<algebra::Fr<algebra::mnt4_pp>>() {
                     typedef algebra::Fr<algebra::mnt4_pp> FieldType;
-                    const size_t dimension = knapsack_dimension<FieldType>::dimension;
+                    const std::size_t dimension = knapsack_dimension<FieldType>::dimension;
                     const std::vector<bool> input_bits = {1, 1, 0, 0, 1, 0, 1, 0, 0, 1};
                     std::vector<bool> digest_bits;
 
@@ -199,7 +199,7 @@ namespace nil {
                 template<>
                 void test_knapsack_CRH_with_bit_out_gadget<algebra::Fr<algebra::mnt6_pp>>() {
                     typedef algebra::Fr<algebra::mnt6_pp> FieldType;
-                    const size_t dimension = knapsack_dimension<FieldType>::dimension;
+                    const std::size_t dimension = knapsack_dimension<FieldType>::dimension;
                     const std::vector<bool> input_bits = {1, 1, 0, 0, 1, 0, 1, 0, 0, 1};
                     std::vector<bool> digest_bits;
 

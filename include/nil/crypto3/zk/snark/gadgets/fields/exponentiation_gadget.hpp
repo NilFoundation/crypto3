@@ -51,10 +51,10 @@ namespace nil {
                     number_type power;
                     Fpk_variableT<FpkT> result;
 
-                    size_t intermed_count;
-                    size_t add_count;
-                    size_t sub_count;
-                    size_t dbl_count;
+                    std::size_t intermed_count;
+                    std::size_t add_count;
+                    std::size_t sub_count;
+                    std::size_t dbl_count;
 
                     template<typename Backend,
                              typename boost::multiprecision::expression_template_option ExpressionTemplates>
@@ -93,7 +93,7 @@ namespace nil {
 
                         intermediate.resize(intermed_count);
                         intermediate[0].reset(new Fpk_variableT<FpkT>(pb, FpkT::one()));
-                        for (size_t i = 1; i < intermed_count; ++i) {
+                        for (std::size_t i = 1; i < intermed_count; ++i) {
                             intermediate[i].reset(new Fpk_variableT<FpkT>(pb));
                         }
                         addition_steps.resize(add_count);
@@ -102,7 +102,7 @@ namespace nil {
 
                         found_nonzero = false;
 
-                        size_t dbl_id = 0, add_id = 0, sub_id = 0, intermed_id = 0;
+                        std::size_t dbl_id = 0, add_id = 0, sub_id = 0, intermed_id = 0;
 
                         for (long i = NAF.size() - 1; i >= 0; --i) {
                             if (found_nonzero) {
@@ -140,15 +140,15 @@ namespace nil {
                         }
                     }
                     void generate_r1cs_constraints() {
-                        for (size_t i = 0; i < add_count; ++i) {
+                        for (std::size_t i = 0; i < add_count; ++i) {
                             addition_steps[i]->generate_r1cs_constraints();
                         }
 
-                        for (size_t i = 0; i < sub_count; ++i) {
+                        for (std::size_t i = 0; i < sub_count; ++i) {
                             subtraction_steps[i]->generate_r1cs_constraints();
                         }
 
-                        for (size_t i = 0; i < dbl_count; ++i) {
+                        for (std::size_t i = 0; i < dbl_count; ++i) {
                             doubling_steps[i]->generate_r1cs_constraints();
                         }
                     }
@@ -156,7 +156,7 @@ namespace nil {
                         intermediate[0]->generate_r1cs_witness(FpkT::one());
 
                         bool found_nonzero = false;
-                        size_t dbl_id = 0, add_id = 0, sub_id = 0, intermed_id = 0;
+                        std::size_t dbl_id = 0, add_id = 0, sub_id = 0, intermed_id = 0;
 
                         for (long i = NAF.size() - 1; i >= 0; --i) {
                             if (found_nonzero) {
@@ -214,7 +214,7 @@ namespace nil {
                         exp_gadget(pb, x, power, x_to_power);
                     exp_gadget.generate_r1cs_constraints();
 
-                    for (size_t i = 0; i < 10; ++i) {
+                    for (std::size_t i = 0; i < 10; ++i) {
                         const FpkT x_val = FpkT::random_element();
                         x.generate_r1cs_witness(x_val);
                         exp_gadget.generate_r1cs_witness();

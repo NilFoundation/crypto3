@@ -21,27 +21,27 @@ namespace nil {
             namespace snark {
                 class integer_permutation {
                 private:
-                    std::vector<size_t> contents; /* offset by min_element */
+                    std::vector<std::size_t> contents; /* offset by min_element */
 
                 public:
-                    size_t min_element;
-                    size_t max_element;
+                    std::size_t min_element;
+                    std::size_t max_element;
 
-                    integer_permutation(const size_t size = 0) : min_element(0), max_element(size - 1) {
+                    integer_permutation(const std::size_t size = 0) : min_element(0), max_element(size - 1) {
                         contents.resize(size);
                         std::iota(contents.begin(), contents.end(), 0);
                     }
-                    integer_permutation(const size_t min_element, const size_t max_element) :
+                    integer_permutation(const std::size_t min_element, const std::size_t max_element) :
                         min_element(min_element), max_element(max_element) {
                         assert(min_element <= max_element);
-                        const size_t size = max_element - min_element + 1;
+                        const std::size_t size = max_element - min_element + 1;
                         contents.resize(size);
                         std::iota(contents.begin(), contents.end(), min_element);
                     }
 
                     integer_permutation &operator=(const integer_permutation &other) = default;
 
-                    size_t size() const {
+                    std::size_t size() const {
                         return max_element - min_element + 1;
                     }
 
@@ -58,17 +58,17 @@ namespace nil {
                                 this->contents == other.contents);
                     }
 
-                    void set(const size_t position, const size_t value) {
+                    void set(const std::size_t position, const std::size_t value) {
                         assert(min_element <= position && position <= max_element);
                         contents[position - min_element] = value;
                     }
-                    size_t get(const size_t position) const {
+                    std::size_t get(const std::size_t position) const {
                         assert(min_element <= position && position <= max_element);
                         return contents[position - min_element];
                     }
 
                     bool is_valid() const {
-                        std::unordered_set<size_t> elems;
+                        std::unordered_set<std::size_t> elems;
 
                         for (auto &el : contents) {
                             if (el < min_element || el > max_element || elems.find(el) != elems.end()) {
@@ -84,7 +84,7 @@ namespace nil {
                     integer_permutation inverse() const {
                         integer_permutation result(min_element, max_element);
 
-                        for (size_t position = min_element; position <= max_element; ++position) {
+                        for (std::size_t position = min_element; position <= max_element; ++position) {
                             result.contents[this->contents[position - min_element] - min_element] = position;
                         }
 
@@ -95,7 +95,7 @@ namespace nil {
                         return result;
                     }
 
-                    integer_permutation slice(const size_t slice_min_element, const size_t slice_max_element) const {
+                    integer_permutation slice(const std::size_t slice_min_element, const std::size_t slice_max_element) const {
                         assert(min_element <= slice_min_element && slice_min_element <= slice_max_element &&
                                slice_max_element <= max_element);
                         integer_permutation result(slice_min_element, slice_max_element);

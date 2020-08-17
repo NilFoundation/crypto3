@@ -59,14 +59,14 @@ namespace nil {
                     const pb_linear_combination_array<FieldType> bits;
                     const pb_linear_combination_array<FieldType> packed_vars;
 
-                    const size_t chunk_size;
-                    const size_t num_chunks;
-                    // const size_t last_chunk_size;
+                    const std::size_t chunk_size;
+                    const std::size_t num_chunks;
+                    // const std::size_t last_chunk_size;
 
                     multipacking_gadget(protoboard<FieldType> &pb,
                                         const pb_linear_combination_array<FieldType> &bits,
                                         const pb_linear_combination_array<FieldType> &packed_vars,
-                                        const size_t chunk_size);
+                                        const std::size_t chunk_size);
                     void generate_r1cs_constraints(bool enforce_bitness);
                     void generate_r1cs_witness_from_packed();
                     void generate_r1cs_witness_from_bits();
@@ -101,14 +101,14 @@ namespace nil {
                     std::shared_ptr<multipacking_gadget<FieldType>> pack_target;
                     std::shared_ptr<field_vector_copy_gadget<FieldType>> copier;
 
-                    const size_t chunk_size;
-                    const size_t num_chunks;
+                    const std::size_t chunk_size;
+                    const std::size_t num_chunks;
 
                     bit_vector_copy_gadget(protoboard<FieldType> &pb,
                                            const pb_variable_array<FieldType> &source_bits,
                                            const pb_variable_array<FieldType> &target_bits,
                                            const pb_linear_combination<FieldType> &do_copy,
-                                           const size_t chunk_size);
+                                           const std::size_t chunk_size);
                     void generate_r1cs_constraints(bool enforce_source_bitness, bool enforce_target_bitness);
                     void generate_r1cs_witness();
                 };
@@ -122,7 +122,7 @@ namespace nil {
                     pb_variable<FieldType> packed;
                     pb_variable_array<FieldType> bits;
 
-                    dual_variable_gadget(protoboard<FieldType> &pb, const size_t width) : gadget<FieldType>(pb) {
+                    dual_variable_gadget(protoboard<FieldType> &pb, const std::size_t width) : gadget<FieldType>(pb) {
                         packed.allocate(pb);
                         bits.allocate(pb, width);
                         consistency_check.reset(new packing_gadget<FieldType>(pb, bits, packed));
@@ -136,7 +136,7 @@ namespace nil {
 
                     dual_variable_gadget(protoboard<FieldType> &pb,
                                          const pb_variable<FieldType> &packed,
-                                         const size_t width) :
+                                         const std::size_t width) :
                         gadget<FieldType>(pb),
                         packed(packed) {
                         bits.allocate(pb, width);
@@ -180,7 +180,7 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                void test_disjunction_gadget(const size_t n);
+                void test_disjunction_gadget(const std::size_t n);
 
                 template<typename FieldType>
                 class conjunction_gadget : public gadget<FieldType> {
@@ -205,7 +205,7 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                void test_conjunction_gadget(const size_t n);
+                void test_conjunction_gadget(const std::size_t n);
 
                 template<typename FieldType>
                 class comparison_gadget : public gadget<FieldType> {
@@ -218,14 +218,14 @@ namespace nil {
                     pb_variable<FieldType> not_all_zeros;
 
                 public:
-                    const size_t n;
+                    const std::size_t n;
                     const pb_linear_combination<FieldType> A;
                     const pb_linear_combination<FieldType> B;
                     const pb_variable<FieldType> less;
                     const pb_variable<FieldType> less_or_eq;
 
                     comparison_gadget(protoboard<FieldType> &pb,
-                                      const size_t n,
+                                      const std::size_t n,
                                       const pb_linear_combination<FieldType> &A,
                                       const pb_linear_combination<FieldType> &B,
                                       const pb_variable<FieldType> &less,
@@ -249,7 +249,7 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                void test_comparison_gadget(const size_t n);
+                void test_comparison_gadget(const std::size_t n);
 
                 template<typename FieldType>
                 class inner_product_gadget : public gadget<FieldType> {
@@ -279,7 +279,7 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                void test_inner_product_gadget(const size_t n);
+                void test_inner_product_gadget(const std::size_t n);
 
                 template<typename FieldType>
                 class loose_multiplexing_gadget : public gadget<FieldType> {
@@ -318,7 +318,7 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                void test_loose_multiplexing_gadget(const size_t n);
+                void test_loose_multiplexing_gadget(const std::size_t n);
 
                 template<typename FieldType, typename VarT>
                 void create_linear_combination_constraints(protoboard<FieldType> &pb,
@@ -355,7 +355,7 @@ namespace nil {
                         r1cs_constraint<FieldType>(1, pb_packing_sum<FieldType>(bits), packed));
 
                     if (enforce_bitness) {
-                        for (size_t i = 0; i < bits.size(); ++i) {
+                        for (std::size_t i = 0; i < bits.size(); ++i) {
                             generate_boolean_r1cs_constraint<FieldType>(this->pb, bits[i]);
                         }
                     }
@@ -380,14 +380,14 @@ namespace nil {
                     protoboard<FieldType> &pb,
                     const pb_linear_combination_array<FieldType> &bits,
                     const pb_linear_combination_array<FieldType> &packed_vars,
-                    const size_t chunk_size) :
+                    const std::size_t chunk_size) :
                     gadget<FieldType>(pb),
                     bits(bits), packed_vars(packed_vars), chunk_size(chunk_size),
                     num_chunks((bits.size() + (chunk_size - 1)) / chunk_size)
                 // last_chunk_size(bits.size() - (num_chunks-1) * chunk_size)
                 {
                     assert(packed_vars.size() == num_chunks);
-                    for (size_t i = 0; i < num_chunks; ++i) {
+                    for (std::size_t i = 0; i < num_chunks; ++i) {
                         packers.emplace_back(
                             packing_gadget<FieldType>(this->pb,
                                                       pb_linear_combination_array<FieldType>(
@@ -399,27 +399,27 @@ namespace nil {
 
                 template<typename FieldType>
                 void multipacking_gadget<FieldType>::generate_r1cs_constraints(bool enforce_bitness) {
-                    for (size_t i = 0; i < num_chunks; ++i) {
+                    for (std::size_t i = 0; i < num_chunks; ++i) {
                         packers[i].generate_r1cs_constraints(enforce_bitness);
                     }
                 }
 
                 template<typename FieldType>
                 void multipacking_gadget<FieldType>::generate_r1cs_witness_from_packed() {
-                    for (size_t i = 0; i < num_chunks; ++i) {
+                    for (std::size_t i = 0; i < num_chunks; ++i) {
                         packers[i].generate_r1cs_witness_from_packed();
                     }
                 }
 
                 template<typename FieldType>
                 void multipacking_gadget<FieldType>::generate_r1cs_witness_from_bits() {
-                    for (size_t i = 0; i < num_chunks; ++i) {
+                    for (std::size_t i = 0; i < num_chunks; ++i) {
                         packers[i].generate_r1cs_witness_from_bits();
                     }
                 }
 
                 template<typename FieldType>
-                size_t multipacking_num_chunks(const size_t num_bits) {
+                std::size_t multipacking_num_chunks(const std::size_t num_bits) {
                     return (num_bits + (FieldType::capacity()) - 1) / FieldType::capacity();
                 }
 
@@ -436,7 +436,7 @@ namespace nil {
 
                 template<typename FieldType>
                 void field_vector_copy_gadget<FieldType>::generate_r1cs_constraints() {
-                    for (size_t i = 0; i < source.size(); ++i) {
+                    for (std::size_t i = 0; i < source.size(); ++i) {
                         this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(do_copy, source[i] - target[i], 0));
                     }
                 }
@@ -447,7 +447,7 @@ namespace nil {
                     assert(this->pb.lc_val(do_copy) == FieldType::one() ||
                            this->pb.lc_val(do_copy) == FieldType::zero());
                     if (this->pb.lc_val(do_copy) != FieldType::zero()) {
-                        for (size_t i = 0; i < source.size(); ++i) {
+                        for (std::size_t i = 0; i < source.size(); ++i) {
                             this->pb.val(target[i]) = this->pb.val(source[i]);
                         }
                     }
@@ -459,7 +459,7 @@ namespace nil {
                     const pb_variable_array<FieldType> &source_bits,
                     const pb_variable_array<FieldType> &target_bits,
                     const pb_linear_combination<FieldType> &do_copy,
-                    const size_t chunk_size) :
+                    const std::size_t chunk_size) :
                     gadget<FieldType>(pb),
                     source_bits(source_bits), target_bits(target_bits), do_copy(do_copy), chunk_size(chunk_size),
                     num_chunks((source_bits.size() + (chunk_size - 1)) / chunk_size) {
@@ -489,7 +489,7 @@ namespace nil {
                     assert(this->pb.lc_val(do_copy) == FieldType::zero() ||
                            this->pb.lc_val(do_copy) == FieldType::one());
                     if (this->pb.lc_val(do_copy) == FieldType::one()) {
-                        for (size_t i = 0; i < source_bits.size(); ++i) {
+                        for (std::size_t i = 0; i < source_bits.size(); ++i) {
                             this->pb.val(target_bits[i]) = this->pb.val(source_bits[i]);
                         }
                     }
@@ -518,7 +518,7 @@ namespace nil {
                     /* inv * sum = output */
                     linear_combination<FieldType> a1, b1, c1;
                     a1.add_term(inv);
-                    for (size_t i = 0; i < inputs.size(); ++i) {
+                    for (std::size_t i = 0; i < inputs.size(); ++i) {
                         b1.add_term(inputs[i]);
                     }
                     c1.add_term(output);
@@ -529,7 +529,7 @@ namespace nil {
                     linear_combination<FieldType> a2, b2, c2;
                     a2.add_term(pb_variable<FieldType>(0));
                     a2.add_term(output, -1);
-                    for (size_t i = 0; i < inputs.size(); ++i) {
+                    for (std::size_t i = 0; i < inputs.size(); ++i) {
                         b2.add_term(inputs[i]);
                     }
                     c2.add_term(pb_variable<FieldType>(0), 0);
@@ -541,7 +541,7 @@ namespace nil {
                 void disjunction_gadget<FieldType>::generate_r1cs_witness() {
                     FieldType sum = FieldType::zero();
 
-                    for (size_t i = 0; i < inputs.size(); ++i) {
+                    for (std::size_t i = 0; i < inputs.size(); ++i) {
                         sum += this->pb.val(inputs[i]);
                     }
 
@@ -555,7 +555,7 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                void test_disjunction_gadget(const size_t n) {
+                void test_disjunction_gadget(const std::size_t n) {
                     printf("testing disjunction_gadget on all %zu bit strings\n", n);
 
                     protoboard<FieldType> pb;
@@ -568,8 +568,8 @@ namespace nil {
                     disjunction_gadget<FieldType> d(pb, inputs, output, "d");
                     d.generate_r1cs_constraints();
 
-                    for (size_t w = 0; w < 1ul << n; ++w) {
-                        for (size_t j = 0; j < n; ++j) {
+                    for (std::size_t w = 0; w < 1ul << n; ++w) {
+                        for (std::size_t j = 0; j < n; ++j) {
                             pb.val(inputs[j]) = FieldType((w & (1ul << j)) ? 1 : 0);
                         }
 
@@ -591,7 +591,7 @@ namespace nil {
                     linear_combination<FieldType> a1, b1, c1;
                     a1.add_term(inv);
                     b1.add_term(pb_variable<FieldType>(0), inputs.size());
-                    for (size_t i = 0; i < inputs.size(); ++i) {
+                    for (std::size_t i = 0; i < inputs.size(); ++i) {
                         b1.add_term(inputs[i], -1);
                     }
                     c1.add_term(pb_variable<FieldType>(0));
@@ -603,7 +603,7 @@ namespace nil {
                     linear_combination<FieldType> a2, b2, c2;
                     a2.add_term(output);
                     b2.add_term(pb_variable<FieldType>(0), inputs.size());
-                    for (size_t i = 0; i < inputs.size(); ++i) {
+                    for (std::size_t i = 0; i < inputs.size(); ++i) {
                         b2.add_term(inputs[i], -1);
                     }
                     c2.add_term(pb_variable<FieldType>(0), 0);
@@ -615,7 +615,7 @@ namespace nil {
                 void conjunction_gadget<FieldType>::generate_r1cs_witness() {
                     FieldType sum = FieldType(inputs.size());
 
-                    for (size_t i = 0; i < inputs.size(); ++i) {
+                    for (std::size_t i = 0; i < inputs.size(); ++i) {
                         sum -= this->pb.val(inputs[i]);
                     }
 
@@ -629,7 +629,7 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                void test_conjunction_gadget(const size_t n) {
+                void test_conjunction_gadget(const std::size_t n) {
                     printf("testing conjunction_gadget on all %zu bit strings\n", n);
 
                     protoboard<FieldType> pb;
@@ -642,8 +642,8 @@ namespace nil {
                     conjunction_gadget<FieldType> c(pb, inputs, output, "c");
                     c.generate_r1cs_constraints();
 
-                    for (size_t w = 0; w < 1ul << n; ++w) {
-                        for (size_t j = 0; j < n; ++j) {
+                    for (std::size_t w = 0; w < 1ul << n; ++w) {
+                        for (std::size_t j = 0; j < n; ++j) {
                             pb.val(inputs[j]) = (w & (1ul << j)) ? FieldType::one() : FieldType::zero();
                         }
 
@@ -704,7 +704,7 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                void test_comparison_gadget(const size_t n) {
+                void test_comparison_gadget(const std::size_t n) {
                     printf("testing comparison_gadget on all %zu bit inputs\n", n);
 
                     protoboard<FieldType> pb;
@@ -718,8 +718,8 @@ namespace nil {
                     comparison_gadget<FieldType> cmp(pb, n, A, B, less, less_or_eq, "cmp");
                     cmp.generate_r1cs_constraints();
 
-                    for (size_t a = 0; a < 1ul << n; ++a) {
-                        for (size_t b = 0; b < 1ul << n; ++b) {
+                    for (std::size_t a = 0; a < 1ul << n; ++a) {
+                        for (std::size_t b = 0; b < 1ul << n; ++b) {
                             pb.val(A) = FieldType(a);
                             pb.val(B) = FieldType(b);
 
@@ -744,7 +744,7 @@ namespace nil {
                       S[0] = A[0] * B[0]
                       S[i+1] - S[i] = A[i] * B[i]
                     */
-                    for (size_t i = 0; i < A.size(); ++i) {
+                    for (std::size_t i = 0; i < A.size(); ++i) {
                         this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(
                             A[i], B[i], (i == A.size() - 1 ? result : S[i]) + (i == 0 ? 0 * pb_variable<FieldType>(0) : -S[i - 1])));
                     }
@@ -753,7 +753,7 @@ namespace nil {
                 template<typename FieldType>
                 void inner_product_gadget<FieldType>::generate_r1cs_witness() {
                     FieldType total = FieldType::zero();
-                    for (size_t i = 0; i < A.size(); ++i) {
+                    for (std::size_t i = 0; i < A.size(); ++i) {
                         A[i].evaluate(this->pb);
                         B[i].evaluate(this->pb);
 
@@ -763,7 +763,7 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                void test_inner_product_gadget(const size_t n) {
+                void test_inner_product_gadget(const std::size_t n) {
                     printf("testing inner_product_gadget on all %zu bit strings\n", n);
 
                     protoboard<FieldType> pb;
@@ -778,10 +778,10 @@ namespace nil {
                     inner_product_gadget<FieldType> g(pb, A, B, result, "g");
                     g.generate_r1cs_constraints();
 
-                    for (size_t i = 0; i < 1ul << n; ++i) {
-                        for (size_t j = 0; j < 1ul << n; ++j) {
-                            size_t correct = 0;
-                            for (size_t k = 0; k < n; ++k) {
+                    for (std::size_t i = 0; i < 1ul << n; ++i) {
+                        for (std::size_t j = 0; j < 1ul << n; ++j) {
+                            std::size_t correct = 0;
+                            for (std::size_t k = 0; k < n; ++k) {
                                 pb.val(A[k]) = (i & (1ul << k) ? FieldType::one() : FieldType::zero());
                                 pb.val(B[k]) = (j & (1ul << k) ? FieldType::one() : FieldType::zero());
                                 correct += ((i & (1ul << k)) && (j & (1ul << k)) ? 1 : 0);
@@ -808,14 +808,14 @@ namespace nil {
                 template<typename FieldType>
                 void loose_multiplexing_gadget<FieldType>::generate_r1cs_constraints() {
                     /* \alpha_i (index - i) = 0 */
-                    for (size_t i = 0; i < arr.size(); ++i) {
+                    for (std::size_t i = 0; i < arr.size(); ++i) {
                         this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(alpha[i], index - i, 0));
                     }
 
                     /* 1 * (\sum \alpha_i) = success_flag */
                     linear_combination<FieldType> a, b, c;
                     a.add_term(pb_variable<FieldType>(0));
-                    for (size_t i = 0; i < arr.size(); ++i) {
+                    for (std::size_t i = 0; i < arr.size(); ++i) {
                         b.add_term(alpha[i]);
                     }
                     c.add_term(success_flag);
@@ -837,13 +837,13 @@ namespace nil {
                     const algebra::bigint<FieldType::num_limbs> arrsize(arr.size());
 
                     if (idx >= arr.size() || mpn_cmp(valint.data, arrsize.data, FieldType::num_limbs) >= 0) {
-                        for (size_t i = 0; i < arr.size(); ++i) {
+                        for (std::size_t i = 0; i < arr.size(); ++i) {
                             this->pb.val(alpha[i]) = FieldType::zero();
                         }
 
                         this->pb.val(success_flag) = FieldType::zero();
                     } else {
-                        for (size_t i = 0; i < arr.size(); ++i) {
+                        for (std::size_t i = 0; i < arr.size(); ++i) {
                             this->pb.val(alpha[i]) = (i == idx ? FieldType::one() : FieldType::zero());
                         }
 
@@ -854,7 +854,7 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                void test_loose_multiplexing_gadget(const size_t n) {
+                void test_loose_multiplexing_gadget(const std::size_t n) {
                     printf("testing loose_multiplexing_gadget on 2**%zu pb_variable<FieldType> array inputs\n", n);
                     protoboard<FieldType> pb;
 
@@ -868,7 +868,7 @@ namespace nil {
                     loose_multiplexing_gadget<FieldType> g(pb, arr, index, result, success_flag, "g");
                     g.generate_r1cs_constraints();
 
-                    for (size_t i = 0; i < 1ul << n; ++i) {
+                    for (std::size_t i = 0; i < 1ul << n; ++i) {
                         pb.val(arr[i]) = FieldType((19 * i) % (1ul << n));
                     }
 
@@ -899,7 +899,7 @@ namespace nil {
                                                            const std::vector<FieldType> &base,
                                                            const std::vector<std::pair<VarT, FieldType>> &v,
                                                            const VarT &target) {
-                    for (size_t i = 0; i < base.size(); ++i) {
+                    for (std::size_t i = 0; i < base.size(); ++i) {
                         linear_combination<FieldType> a, b, c;
 
                         a.add_term(pb_variable<FieldType>(0));
@@ -920,7 +920,7 @@ namespace nil {
                                                        const std::vector<FieldType> &base,
                                                        const std::vector<std::pair<VarT, FieldType>> &v,
                                                        const VarT &target) {
-                    for (size_t i = 0; i < base.size(); ++i) {
+                    for (std::size_t i = 0; i < base.size(); ++i) {
                         pb.val(target.all_vars[i]) = base[i];
 
                         for (auto &p : v) {
