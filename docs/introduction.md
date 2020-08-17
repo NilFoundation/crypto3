@@ -1,4 +1,4 @@
-# Public Key Cryptography Introduction # {#pubkey_introduction}
+# Introduction # {#pubkey_introduction}
 
 The Crypto3.Pubkey library extends the =nil; Foundation's cryptography suite and provides a set of publib key
  schemes implemented in way C++ standard library implies: concepts, algorithms, predictable behavior, latest standard features support and clean architecture without compromising security and performance.

@@ -1,1 +1,1 @@
-# Public Key Cryptography Implementation {#pubkey_impl}
+# Implementation {#pubkey_impl}

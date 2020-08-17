@@ -1,1 +1,1 @@
-# Public Key Cryptography Manual # {#pubkey_manual}
+# Manual # {#pubkey_manual}

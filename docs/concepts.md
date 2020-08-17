@@ -1,1 +1,1 @@
-# Public Key Cryptography Concepts {#pubkey_concepts}
+# Concepts {#pubkey_concepts}
