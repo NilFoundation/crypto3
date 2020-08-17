@@ -23,9 +23,6 @@ void test_bacs_ppzksnark(std::size_t primary_input_size, std::size_t auxiliary_i
     const bool test_serialization = true;
     const bacs_example<algebra::Fr<ppT>> example =
         generate_bacs_example<algebra::Fr<ppT>>(primary_input_size, auxiliary_input_size, num_gates, num_outputs);
-#ifdef DEBUG
-    example.circuit.print();
-#endif
     const bool bit = run_bacs_ppzksnark<ppT>(example, test_serialization);
     BOOST_CHECK(bit);
 }
