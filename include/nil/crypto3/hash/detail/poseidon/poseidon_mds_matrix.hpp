@@ -55,19 +55,19 @@ namespace nil {
 
 
                     inline void product_with_equivalent_mds_matrix(state_vector_type const &A_vector_in, state_vector_type &A_vector_out, std::size_t round_number) const {
-                        BOOST_ASSERT_MSG(round_number >= half_full_rounds && round_number < half_full_rounds + part_rounds, "wrong using: product_with_equivalent_mds_matrix");
-                        equivalent_mds_matrix_type const equivalent_mds_matrix = get_equivalent_mds_matrix();
+                        BOOST_ASSERT_MSG(round_number >= half_full_rounds
+                            && round_number < half_full_rounds + part_rounds, "wrong using: product_with_equivalent_mds_matrix");
                         std::size_t const matrix_number_base = part_rounds - (round_number - half_full_rounds) - 1;
+                        state_vector_type const &w_hat = get_w_hat(matrix_number_base);
+                        state_vector_type const &v = get_v(matrix_number_base);
                         state_vector_type temp_vector(state_words);
                         ElementType A_0 = A_vector_in[0];
-                        temp_vector[0] = std::get<M_0_0>(equivalent_mds_matrix);
-                        boost::numeric::ublas::subrange(temp_vector, 1, temp_vector.size()) =
-                            std::get<w_hat_list>(equivalent_mds_matrix)[matrix_number_base];
-                        // if (round_number == half_full_rounds)
-                        //     cout << temp_vector << '\n' << '\n' << '\n' ;
+                        temp_vector[0] = get_M_0_0();
+                        boost::numeric::ublas::subrange(temp_vector, 1, temp_vector.size()) = w_hat;
                         A_vector_out[0] = boost::numeric::ublas::inner_prod(A_vector_in, temp_vector);
-                        for (std::size_t i = 1; i < state_words; i++)
-                            A_vector_out[i] = A_0 * std::get<v_list>(equivalent_mds_matrix)[matrix_number_base][i - 1] + A_vector_in[i];
+                        for (std::size_t i = 1; i < state_words; i++) {
+                            A_vector_out[i] = A_0 * v[i - 1] + A_vector_in[i];
+                        }
                     }
 
                 // private:
@@ -149,6 +149,16 @@ namespace nil {
                             return equivalent_mds_matrix_type{M_i, mds_matrix(0, 0), w_hat_list, v_list};
                         }();
                         return equivalent_mds_matrix;
+                    }
+
+                    inline state_vector_type const &get_w_hat(std::size_t w_hat_number) const {
+                        return std::get<w_hat_list>(get_equivalent_mds_matrix())[w_hat_number];
+                    }
+                    inline state_vector_type const &get_v(std::size_t v_number) const {
+                        return std::get<v_list>(get_equivalent_mds_matrix())[v_number];
+                    }
+                    inline ElementType const &get_M_0_0() const {
+                        return std::get<M_0_0>(get_equivalent_mds_matrix());
                     }
                 };
             }    // namespace detail
