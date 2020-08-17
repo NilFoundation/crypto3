@@ -1,0 +1,39 @@
+//---------------------------------------------------------------------------//
+// Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
+//
+// Distributed under the Boost Software License, Version 1.0
+// See accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt
+//---------------------------------------------------------------------------//
+
+#define BOOST_TEST_MODULE bacs_ppzksnark_test
+
+#include <boost/test/unit_test.hpp>
+
+#include <cassert>
+#include <cstdio>
+
+#include "bacs_examples.hpp"
+#include "run_bacs_ppzksnark.hpp"
+
+using namespace nil::crypto3::zk::snark;
+
+template<typename ppT>
+void test_bacs_ppzksnark(size_t primary_input_size, size_t auxiliary_input_size, size_t num_gates, size_t num_outputs) {
+    const bool test_serialization = true;
+    const bacs_example<algebra::Fr<ppT>> example =
+        generate_bacs_example<algebra::Fr<ppT>>(primary_input_size, auxiliary_input_size, num_gates, num_outputs);
+#ifdef DEBUG
+    example.circuit.print();
+#endif
+    const bool bit = run_bacs_ppzksnark<ppT>(example, test_serialization);
+    BOOST_CHECK(bit);
+}
+
+BOOST_AUTO_TEST_SUITE(bacs_ppzksnark_test_suite)
+
+BOOST_AUTO_TEST_CASE(bacs_ppzksnark_test) {
+    test_bacs_ppzksnark<default_bacs_ppzksnark_pp>(10, 10, 20, 5);
+}
+
+BOOST_AUTO_TEST_SUITE_END()

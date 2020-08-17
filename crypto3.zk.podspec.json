@@ -1,0 +1,87 @@
+{
+  "name": "crypto3.zk",
+  "version": "0.1.0",
+  "summary": "=nil; Crypto3 C++ Cryptography Suite Cipher VDF",
+  "description": "Crypto3.VDF library extends the =nil; Foundation's cryptography suite and provides a set of verifiable delay functions implemented in way C++ standard library implies: concepts, algorithms, predictable behavior, latest standard features support and clean architecture without compromising security and performance.",
+  "homepage": "http://crypto3.nil.foundation/projects/crypto3",
+  "license": "Boost Software License",
+  "authors": {
+    "Mikhail Komarov": "nemo@nil.foundation"
+  },
+  "platforms": {
+    "ios": "5.0",
+    "osx": "10.7"
+  },
+  "source": {
+    "git": "https://github.com/nilfoundation/vdf.git",
+    "branch": "master"
+  },
+  "xcconfig": {
+    "CLANG_CXX_LANGUAGE_STANDARD": "c++14",
+    "CLANG_CXX_LIBRARY": "libc++",
+    "HEADER_SEARCH_PATHS": "\"${PODS_ROOT}/include/\""
+  },
+  "subspecs": [
+    {
+      "name": "include",
+      "subspecs": [
+        {
+          "name": "nil",
+          "subspecs": [
+            {
+              "name": "crypto3",
+              "subspecs": [
+                {
+                  "name": "detail",
+                  "source_files": [
+                    "include/nil/crypto3/detail/*.{hpp}"
+                  ]
+                },
+                {
+                  "name": "vdf",
+                  "source_files": [
+                    "include/nil/crypto3/vdf/*.{hpp}"
+                  ],
+                  "subspecs": [
+                    {
+                      "name": "algorithm",
+                      "source_files": [
+                        "include/nil/crypto3/vdf/algorithm/*.{hpp}"
+                      ]
+                    },
+                    {
+                      "name": "adaptor",
+                      "source_files": [
+                        "include/nil/crypto3/vdf/adaptor/*.{hpp}"
+                      ]
+                    },
+                    {
+                      "name": "accumulators",
+                      "source_files": [
+                        "include/nil/crypto3/vdf/accumulators/*.{hpp}"
+                      ],
+                      "subspecs": [
+                        {
+                          "name": "parameters",
+                          "source_files": [
+                            "include/nil/crypto3/vdf/accumulators/parameters/*.{hpp}"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "name": "detail",
+                      "source_files": [
+                        "include/nil/crypto3/vdf/detail/*.{hpp}"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
