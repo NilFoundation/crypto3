@@ -77,7 +77,7 @@ namespace nil {
                                                   const digest_variable<FieldType> &right,
                                                   const digest_variable<FieldType> &output);
                     sha256_two_to_one_hash_gadget(protoboard<FieldType> &pb,
-                                                  const std::size_t block_length,
+                                                  size_t block_length,
                                                   const block_variable<FieldType> &input_block,
                                                   const digest_variable<FieldType> &output);
 
@@ -221,7 +221,7 @@ namespace nil {
                 template<typename FieldType>
                 sha256_two_to_one_hash_gadget<FieldType>::sha256_two_to_one_hash_gadget(
                     protoboard<FieldType> &pb,
-                    const std::size_t block_length,
+                    size_t block_length,
                     const block_variable<FieldType> &input_block,
                     const digest_variable<FieldType> &output) :
                     gadget<FieldType>(pb) {
