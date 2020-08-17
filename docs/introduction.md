@@ -1,23 +1,24 @@
-# Introduction # {#modes_introduction}
+# Introduction # {#pkmodes_introduction}
 
 @tableofcontents
 
-The Crypto3.Modes library extends the =nil; Foundation's cryptography suite and provides a set of block and
- stream cipher modes implemented in way C++ standard library implies: concepts, algorithms, predictable
+The Crypto3.PkModes library extends the =nil; Foundation's cryptography suite and provides a set of modes for
+ public key cryptography schemes defined in pubkey library (e.g. threshold) implemented in way C++ standard library
+  implies: concepts
+ , algorithms, predictable
   behavior, latest standard features support and clean architecture without compromising security and performance.
  
 Crypto3.Modes consists of several parts to review:
-* [Manual](@ref modes_manual).
-* [Implementation](@ref modes_impl).
-* [Concepts](@ref modes_concepts).
+* [Manual](@ref pkmodes_manual).
+* [Implementation](@ref pkmodes_impl).
+* [Concepts](@ref pkmodes_concepts).
 
-## Dependencies ## {#modes_dependencies}
+## Dependencies ## {#pkmodes_dependencies}
 
 Internal dependencies:
 
-1. [Crypto3.Block](https://github.com/nilfoundation/block.git)
-2. [Crypto3.Stream](https://github.com/nilfoundation/stream.git)
-3. [Crypto3.Codec](https://github.com/nilfoundation/codec.git)
+1. [Crypto3.Pubkey](https://github.com/nilfoundation/pubkey.git)
+2. [Crypto3.Pkpad](https://github.com/nilfoundation/pkpad.git)
 
 Outer dependencies:
 1. [Boost](https://boost.org) (>= 1.58)

@@ -1,5 +1,5 @@
-# Cipher Modes {#modes_index}
-@subpage modes_introduction
-@subpage modes_manual
-@subpage modes_concepts
-@subpage modes_impl
+# Cipher Modes {#pkmodes_index}
+@subpage pkmodes_introduction
+@subpage pkmodes_manual
+@subpage pkmodes_concepts
+@subpage pkmodes_impl
