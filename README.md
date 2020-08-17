@@ -1,4 +1,4 @@
-# Public Key Cryptography Modes for =nil; Foundation's Cryptography Suite 
+# Public Key Cryptography Schemes Modes for =nil; Foundation's Cryptography Suite 
 
 Public key cryptography modes library for =nil; Foundation's cryptography suite. Includes threshold, aggregatable modes for schemes defined within pubkey library.
 
