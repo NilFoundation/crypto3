@@ -140,7 +140,8 @@ namespace nil {
 
                         round_functions.push_back(sha256_round_function_gadget<FieldType>(
                             pb, round_a[i], round_b[i], round_c[i], round_d[i], round_e[i], round_f[i], round_g[i],
-                            round_h[i], packed_W[i], SHA256_K[i], round_a[i + 1], round_e[i + 1]));
+                            round_h[i], packed_W[i], block::detail::shacal2_policy<256>::constants[i], round_a[i + 1],
+                            round_e[i + 1]));
                     }
 
                     /* finalize */
