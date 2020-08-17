@@ -40,7 +40,7 @@
 #include <memory>
 #include <vector>
 
-#include <nil/crypto3/zk/snark/set_commitment.hpp>
+#include <nil/crypto3/zk/snark/detail/set_commitment.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/pcd/r1cs_pcd/ppzkpcd_compliance_predicate.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/pcd/r1cs_pcd/r1cs_mp_ppzkpcd/r1cs_mp_ppzkpcd_params.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_ppzksnark/r1cs_ppzksnark.hpp>
