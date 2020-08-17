@@ -420,18 +420,8 @@ namespace nil {
                     printf("All gates:\n");
                     for (std::size_t i = 0; i < gates.size(); ++i) {
                         std::string annotation = "no annotation";
-#ifdef DEBUG
-                        auto it = gate_annotations.find(i);
-                        if (it != gate_annotations.end()) {
-                            annotation = it->second;
-                        }
-#endif
                         printf("Gate %zu (%s):\n", i, annotation.c_str());
-#ifdef DEBUG
-                        gates[i].print(variable_annotations);
-#else
                         gates[i].print();
-#endif
                     }
                 }
 
