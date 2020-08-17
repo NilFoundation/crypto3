@@ -1,5 +1,3 @@
-# Concepts # {#vdf_concepts}
+# Concepts # {#fft_concepts}
 
 @tableofcontents
-
-## Verifiable Delay Function Concept ## {#vdf_concept}

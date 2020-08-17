@@ -1,3 +1,3 @@
-# Manual # {#vdf_manual}
+# Manual # {#fft_manual}
 
 @tableofcontents
