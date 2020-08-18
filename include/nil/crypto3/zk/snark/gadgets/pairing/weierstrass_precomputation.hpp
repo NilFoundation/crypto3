@@ -65,7 +65,7 @@ namespace nil {
                         G1_precomputation<ppT> &precomp,    // will allocate this inside
 
                         const typename std::enable_if<algebra::Fqk<other_curve<ppT>>::extension_degree() == 4,
-                                                      FieldType>::type & = FieldType()) :
+                                                      FieldType>::type & = typename FieldType::value_type()) :
                         gadget<FieldType>(pb),
                         precomp(precomp) {
                         pb_linear_combination<FieldType> c0, c1;
@@ -82,7 +82,7 @@ namespace nil {
                         const G1_variable<ppT> &P,
                         G1_precomputation<ppT> &precomp,    // will allocate this inside
                         const typename std::enable_if<algebra::Fqk<other_curve<ppT>>::extension_degree() == 6,
-                                                      FieldType>::type & = FieldType()) :
+                                                      FieldType>::type & = typename FieldType::value_type()) :
                         gadget<FieldType>(pb),
                         precomp(precomp) {
                         pb_linear_combination<FieldType> c0, c1, c2;
@@ -389,13 +389,13 @@ namespace nil {
                     RXsquared.reset(new Fqe_variable<ppT>(pb));
                     compute_RXsquared.reset(new Fqe_sqr_gadget<ppT>(pb, *(cur.RX), *RXsquared));
                     three_RXsquared_plus_a.reset(
-                        new Fqe_variable<ppT>((*RXsquared) * FieldType(3) + algebra::G2<other_curve<ppT>>::coeff_a));
-                    two_RY.reset(new Fqe_variable<ppT>(*(cur.RY) * FieldType(2)));
+                        new Fqe_variable<ppT>((*RXsquared) * typename FieldType::value_type(3) + algebra::G2<other_curve<ppT>>::coeff_a));
+                    two_RY.reset(new Fqe_variable<ppT>(*(cur.RY) * typename FieldType::value_type(2)));
 
                     compute_gamma.reset(new Fqe_mul_gadget<ppT>(pb, *(cur.gamma), *two_RY, *three_RXsquared_plus_a));
                     compute_gamma_X.reset(new Fqe_mul_gadget<ppT>(pb, *(cur.gamma), *(cur.RX), *(cur.gamma_X)));
 
-                    next_RX_plus_two_RX.reset(new Fqe_variable<ppT>(*(next.RX) + *(cur.RX) * FieldType(2)));
+                    next_RX_plus_two_RX.reset(new Fqe_variable<ppT>(*(next.RX) + *(cur.RX) * typename FieldType::value_type(2)));
                     compute_next_RX.reset(new Fqe_sqr_gadget<ppT>(pb, *(cur.gamma), *next_RX_plus_two_RX));
 
                     RX_minus_next_RX.reset(new Fqe_variable<ppT>(*(cur.RX) + *(next.RX) * (-FieldType::one())));

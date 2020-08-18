@@ -396,8 +396,8 @@ namespace nil {
 
                 template<typename Fp4T>
                 void Fp4_direct_mul_gadget<Fp4T>::generate_r1cs_constraints() {
-                    const FieldType beta = Fp4T::non_residue;
-                    const FieldType u = (FieldType::one() - beta).inverse();
+                    const typename FieldType::value_type beta = Fp4T::non_residue;
+                    const typename FieldType::value_type u = (FieldType::one() - beta).inverse();
 
                     const pb_linear_combination<FieldType> &a0 = A.c0.c0, &a1 = A.c1.c0, &a2 = A.c0.c1, &a3 = A.c1.c1,
                                                            &b0 = B.c0.c0, &b1 = B.c1.c0, &b2 = B.c0.c1, &b3 = B.c1.c1,
@@ -408,37 +408,50 @@ namespace nil {
                     this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(a0 - a1 + a2 - a3, b0 - b1 + b2 - b3, v2));
                     this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(a3, b3, v6));
 
-                    this->pb.add_r1cs_constraint(
-                        r1cs_constraint<FieldType>(a0,
-                                                   b0,
-                                                   u * c0 + beta * u * c2 - beta * u * FieldType(2).inverse() * v1 -
-                                                       beta * u * FieldType(2).inverse() * v2 + beta * v6));
                     this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(
-                        a0 + FieldType(2) * a1 + FieldType(4) * a2 + FieldType(8) * a3,
-                        b0 + FieldType(2) * b1 + FieldType(4) * b2 + FieldType(8) * b3,
-                        -FieldType(15) * u * c0 - FieldType(30) * u * c1 -
-                            FieldType(3) * (FieldType(4) + beta) * u * c2 -
-                            FieldType(6) * (FieldType(4) + beta) * u * c3 +
-                            (FieldType(24) - FieldType(3) * beta * FieldType(2).inverse()) * u * v1 +
-                            (-FieldType(8) + beta * FieldType(2).inverse()) * u * v2 -
-                            FieldType(3) * (-FieldType(16) + beta) * v6));
+                        a0,
+                        b0,
+                        u * c0 + beta * u * c2 - beta * u * typename FieldType::value_type(2).inverse() * v1 -
+                            beta * u * typename FieldType::value_type(2).inverse() * v2 + beta * v6));
                     this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(
-                        a0 - FieldType(2) * a1 + FieldType(4) * a2 - FieldType(8) * a3,
-                        b0 - FieldType(2) * b1 + FieldType(4) * b2 - FieldType(8) * b3,
-                        -FieldType(15) * u * c0 + FieldType(30) * u * c1 -
-                            FieldType(3) * (FieldType(4) + beta) * u * c2 +
-                            FieldType(6) * (FieldType(4) + beta) * u * c3 +
-                            (FieldType(24) - FieldType(3) * beta * FieldType(2).inverse()) * u * v2 +
-                            (-FieldType(8) + beta * FieldType(2).inverse()) * u * v1 -
-                            FieldType(3) * (-FieldType(16) + beta) * v6));
+                        a0 + typename FieldType::value_type(2) * a1 + typename FieldType::value_type(4) * a2 +
+                            typename FieldType::value_type(8) * a3,
+                        b0 + typename FieldType::value_type(2) * b1 + typename FieldType::value_type(4) * b2 +
+                            typename FieldType::value_type(8) * b3,
+                        -typename FieldType::value_type(15) * u * c0 - typename FieldType::value_type(30) * u * c1 -
+                            typename FieldType::value_type(3) * (typename FieldType::value_type(4) + beta) * u * c2 -
+                            typename FieldType::value_type(6) * (typename FieldType::value_type(4) + beta) * u * c3 +
+                            (typename FieldType::value_type(24) -
+                             typename FieldType::value_type(3) * beta * typename FieldType::value_type(2).inverse()) *
+                                u * v1 +
+                            (-typename FieldType::value_type(8) + beta * typename FieldType::value_type(2).inverse()) *
+                                u * v2 -
+                            typename FieldType::value_type(3) * (-typename FieldType::value_type(16) + beta) * v6));
                     this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(
-                        a0 + FieldType(3) * a1 + FieldType(9) * a2 + FieldType(27) * a3,
-                        b0 + FieldType(3) * b1 + FieldType(9) * b2 + FieldType(27) * b3,
-                        -FieldType(80) * u * c0 - FieldType(240) * u * c1 -
-                            FieldType(8) * (FieldType(9) + beta) * u * c2 -
-                            FieldType(24) * (FieldType(9) + beta) * u * c3 -
-                            FieldType(2) * (-FieldType(81) + beta) * u * v1 + (-FieldType(81) + beta) * u * v2 -
-                            FieldType(8) * (-FieldType(81) + beta) * v6));
+                        a0 - typename FieldType::value_type(2) * a1 + typename FieldType::value_type(4) * a2 -
+                            typename FieldType::value_type(8) * a3,
+                        b0 - typename FieldType::value_type(2) * b1 + typename FieldType::value_type(4) * b2 -
+                            typename FieldType::value_type(8) * b3,
+                        -typename FieldType::value_type(15) * u * c0 + typename FieldType::value_type(30) * u * c1 -
+                            typename FieldType::value_type(3) * (typename FieldType::value_type(4) + beta) * u * c2 +
+                            typename FieldType::value_type(6) * (typename FieldType::value_type(4) + beta) * u * c3 +
+                            (typename FieldType::value_type(24) -
+                             typename FieldType::value_type(3) * beta * typename FieldType::value_type(2).inverse()) *
+                                u * v2 +
+                            (-typename FieldType::value_type(8) + beta * typename FieldType::value_type(2).inverse()) *
+                                u * v1 -
+                            typename FieldType::value_type(3) * (-typename FieldType::value_type(16) + beta) * v6));
+                    this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(
+                        a0 + typename FieldType::value_type(3) * a1 + typename FieldType::value_type(9) * a2 +
+                            typename FieldType::value_type(27) * a3,
+                        b0 + typename FieldType::value_type(3) * b1 + typename FieldType::value_type(9) * b2 +
+                            typename FieldType::value_type(27) * b3,
+                        -typename FieldType::value_type(80) * u * c0 - typename FieldType::value_type(240) * u * c1 -
+                            typename FieldType::value_type(8) * (typename FieldType::value_type(9) + beta) * u * c2 -
+                            typename FieldType::value_type(24) * (typename FieldType::value_type(9) + beta) * u * c3 -
+                            typename FieldType::value_type(2) * (-typename FieldType::value_type(81) + beta) * u * v1 +
+                            (-typename FieldType::value_type(81) + beta) * u * v2 -
+                            typename FieldType::value_type(8) * (-typename FieldType::value_type(81) + beta) * v6));
                 }
 
                 template<typename Fp4T>
@@ -561,8 +574,10 @@ namespace nil {
                         assert(this->c1.squared().c0 == F.c1 * my_Fp(2).inverse());
                         assert(this->c1.squared().c1 == (F.c0 - my_Fp(1)) * (my_Fp(2) * non_residue).inverse());
                     */
-                    c0_expr_c0.assign(pb, result.c0.c1 * FieldType(2).inverse());
-                    c0_expr_c1.assign(pb, (result.c0.c0 - FieldType(1)) * (FieldType(2) * Fp4T::non_residue).inverse());
+                    c0_expr_c0.assign(pb, result.c0.c1 * typename FieldType::value_type(2).inverse());
+                    c0_expr_c1.assign(pb,
+                                      (result.c0.c0 - typename FieldType::value_type(1)) *
+                                          (typename FieldType::value_type(2) * Fp4T::non_residue).inverse());
                     c0_expr.reset(new Fp2_variable<Fp2T>(pb, c0_expr_c0, c0_expr_c1));
                     compute_c0_expr.reset(new Fp2_sqr_gadget<Fp2T>(pb, A.c1, *c0_expr));
 
@@ -571,11 +586,13 @@ namespace nil {
                     A_c0_plus_A_c1.reset(new Fp2_variable<Fp2T>(pb, A_c0_plus_A_c1_c0, A_c0_plus_A_c1_c1));
 
                     c1_expr_c0.assign(pb,
-                                      (result.c0.c1 + result.c0.c0 - FieldType(1)) * FieldType(2).inverse() +
-                                          result.c1.c0 + FieldType(1));
+                                      (result.c0.c1 + result.c0.c0 - typename FieldType::value_type(1)) *
+                                              typename FieldType::value_type(2).inverse() +
+                                          result.c1.c0 + typename FieldType::value_type(1));
                     c1_expr_c1.assign(pb,
-                                      (result.c0.c0 - FieldType(1)) * (FieldType(2) * Fp4T::non_residue).inverse() +
-                                          result.c1.c1 + result.c0.c1 * FieldType(2).inverse());
+                                      (result.c0.c0 - typename FieldType::value_type(1)) *
+                                              (typename FieldType::value_type(2) * Fp4T::non_residue).inverse() +
+                                          result.c1.c1 + result.c0.c1 * typename FieldType::value_type(2).inverse());
                     c1_expr.reset(new Fp2_variable<Fp2T>(pb, c1_expr_c0, c1_expr_c1));
 
                     compute_c1_expr.reset(new Fp2_sqr_gadget<Fp2T>(pb, *A_c0_plus_A_c1, *c1_expr));

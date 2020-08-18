@@ -27,10 +27,10 @@ namespace nil {
         namespace zk {
             namespace snark {
 
-                template<typename FieldType, typename HashT>
+                template<typename FieldType, typename Hash>
                 class merkle_tree_check_read_gadget : public gadget<FieldType> {
                 private:
-                    std::vector<HashT> hashers;
+                    std::vector<Hash> hashers;
                     std::vector<block_variable<FieldType>> hasher_inputs;
                     std::vector<digest_selector_gadget<FieldType>> propagators;
                     std::vector<digest_variable<FieldType>> internal_output;
@@ -44,7 +44,7 @@ namespace nil {
                     pb_linear_combination_array<FieldType> address_bits;
                     digest_variable<FieldType> leaf;
                     digest_variable<FieldType> root;
-                    merkle_authentication_path_variable<FieldType, HashT> path;
+                    merkle_authentication_path_variable<FieldType, Hash> path;
                     pb_linear_combination<FieldType> read_successful;
 
                     merkle_tree_check_read_gadget(protoboard<FieldType> &pb,
@@ -52,7 +52,7 @@ namespace nil {
                                                   const pb_linear_combination_array<FieldType> &address_bits,
                                                   const digest_variable<FieldType> &leaf_digest,
                                                   const digest_variable<FieldType> &root_digest,
-                                                  const merkle_authentication_path_variable<FieldType, HashT> &path,
+                                                  const merkle_authentication_path_variable<FieldType, Hash> &path,
                                                   const pb_linear_combination<FieldType> &read_successful);
 
                     void generate_r1cs_constraints();
@@ -63,20 +63,20 @@ namespace nil {
                     static std::size_t expected_constraints(const std::size_t tree_depth);
                 };
 
-                template<typename FieldType, typename HashT>
+                template<typename FieldType, typename Hash>
                 void test_merkle_tree_check_read_gadget();
 
-                template<typename FieldType, typename HashT>
-                merkle_tree_check_read_gadget<FieldType, HashT>::merkle_tree_check_read_gadget(
+                template<typename FieldType, typename Hash>
+                merkle_tree_check_read_gadget<FieldType, Hash>::merkle_tree_check_read_gadget(
                     protoboard<FieldType> &pb,
                     const std::size_t tree_depth,
                     const pb_linear_combination_array<FieldType> &address_bits,
                     const digest_variable<FieldType> &leaf,
                     const digest_variable<FieldType> &root,
-                    const merkle_authentication_path_variable<FieldType, HashT> &path,
+                    const merkle_authentication_path_variable<FieldType, Hash> &path,
                     const pb_linear_combination<FieldType> &read_successful) :
                     gadget<FieldType>(pb),
-                    digest_size(HashT::get_digest_len()), tree_depth(tree_depth), address_bits(address_bits),
+                    digest_size(Hash::get_digest_len()), tree_depth(tree_depth), address_bits(address_bits),
                     leaf(leaf), root(root), path(path), read_successful(read_successful) {
                     /*
                        The tricky part here is ordering. For Merkle tree
@@ -100,7 +100,7 @@ namespace nil {
                         block_variable<FieldType> inp(pb, path.left_digests[i], path.right_digests[i]);
                         hasher_inputs.emplace_back(inp);
                         hashers.emplace_back(
-                            HashT(pb, 2 * digest_size, inp, (i == 0 ? *computed_root : internal_output[i - 1])));
+                            Hash(pb, 2 * digest_size, inp, (i == 0 ? *computed_root : internal_output[i - 1])));
                     }
 
                     for (std::size_t i = 0; i < tree_depth; ++i) {
@@ -118,8 +118,8 @@ namespace nil {
                                                                            read_successful, FieldType::capacity()));
                 }
 
-                template<typename FieldType, typename HashT>
-                void merkle_tree_check_read_gadget<FieldType, HashT>::generate_r1cs_constraints() {
+                template<typename FieldType, typename Hash>
+                void merkle_tree_check_read_gadget<FieldType, Hash>::generate_r1cs_constraints() {
                     /* ensure correct hash computations */
                     for (std::size_t i = 0; i < tree_depth; ++i) {
                         // Note that we check root outside and have enforced booleanity of
@@ -135,8 +135,8 @@ namespace nil {
                     check_root->generate_r1cs_constraints(false, false);
                 }
 
-                template<typename FieldType, typename HashT>
-                void merkle_tree_check_read_gadget<FieldType, HashT>::generate_r1cs_witness() {
+                template<typename FieldType, typename Hash>
+                void merkle_tree_check_read_gadget<FieldType, Hash>::generate_r1cs_witness() {
                     /* do the hash computations bottom-up */
                     for (int i = tree_depth - 1; i >= 0; --i) {
                         /* propagate previous input */
@@ -149,28 +149,28 @@ namespace nil {
                     check_root->generate_r1cs_witness();
                 }
 
-                template<typename FieldType, typename HashT>
-                std::size_t merkle_tree_check_read_gadget<FieldType, HashT>::root_size_in_bits() {
-                    return HashT::get_digest_len();
+                template<typename FieldType, typename Hash>
+                std::size_t merkle_tree_check_read_gadget<FieldType, Hash>::root_size_in_bits() {
+                    return Hash::get_digest_len();
                 }
 
-                template<typename FieldType, typename HashT>
-                std::size_t merkle_tree_check_read_gadget<FieldType, HashT>::expected_constraints(const std::size_t tree_depth) {
+                template<typename FieldType, typename Hash>
+                std::size_t merkle_tree_check_read_gadget<FieldType, Hash>::expected_constraints(const std::size_t tree_depth) {
                     /* NB: this includes path constraints */
-                    const std::size_t hasher_constraints = tree_depth * HashT::expected_constraints(false);
-                    const std::size_t propagator_constraints = tree_depth * HashT::get_digest_len();
-                    const std::size_t authentication_path_constraints = 2 * tree_depth * HashT::get_digest_len();
+                    const std::size_t hasher_constraints = tree_depth * Hash::expected_constraints(false);
+                    const std::size_t propagator_constraints = tree_depth * Hash::get_digest_len();
+                    const std::size_t authentication_path_constraints = 2 * tree_depth * Hash::get_digest_len();
                     const std::size_t check_root_constraints =
-                        3 * (HashT::get_digest_len() + (FieldType::capacity()) - 1) / FieldType::capacity();
+                        3 * (Hash::get_digest_len() + (FieldType::capacity()) - 1) / FieldType::capacity();
 
                     return hasher_constraints + propagator_constraints + authentication_path_constraints +
                            check_root_constraints;
                 }
 
-                template<typename FieldType, typename HashT>
+                template<typename FieldType, typename Hash>
                 void test_merkle_tree_check_read_gadget() {
                     /* prepare test */
-                    const std::size_t digest_len = HashT::get_digest_len();
+                    const std::size_t digest_len = Hash::get_digest_len();
                     const std::size_t tree_depth = 16;
                     std::vector<merkle_authentication_node> path(tree_depth);
 
@@ -190,7 +190,7 @@ namespace nil {
 
                         std::vector<bool> block = prev_hash;
                         block.insert(computed_is_right ? block.begin() : block.end(), other.begin(), other.end());
-                        std::vector<bool> h = HashT::get_hash(block);
+                        std::vector<bool> h = Hash::get_hash(block);
 
                         path[level] = other;
 
@@ -204,8 +204,8 @@ namespace nil {
                     address_bits_va.allocate(pb, tree_depth);
                     digest_variable<FieldType> leaf_digest(pb, digest_len);
                     digest_variable<FieldType> root_digest(pb, digest_len);
-                    merkle_authentication_path_variable<FieldType, HashT> path_var(pb, tree_depth);
-                    merkle_tree_check_read_gadget<FieldType, HashT> ml(pb, tree_depth, address_bits_va, leaf_digest,
+                    merkle_authentication_path_variable<FieldType, Hash> path_var(pb, tree_depth);
+                    merkle_tree_check_read_gadget<FieldType, Hash> ml(pb, tree_depth, address_bits_va, leaf_digest,
                                                                        root_digest, path_var, pb_variable<FieldType>(0));
 
                     path_var.generate_r1cs_constraints();
@@ -225,7 +225,7 @@ namespace nil {
 
                     const std::size_t num_constraints = pb.num_constraints();
                     const std::size_t expected_constraints =
-                        merkle_tree_check_read_gadget<FieldType, HashT>::expected_constraints(tree_depth);
+                        merkle_tree_check_read_gadget<FieldType, Hash>::expected_constraints(tree_depth);
                     assert(num_constraints == expected_constraints);
                 }
 

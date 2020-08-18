@@ -24,13 +24,13 @@ namespace nil {
         namespace zk {
             namespace snark {
 
-                template<typename HashT>
+                template<typename Hash>
                 class delegated_ra_memory : public memory_interface {
                 private:
                     std::vector<bool> int_to_tree_elem(const std::size_t i) const;
                     std::size_t int_from_tree_elem(const std::vector<bool> &v) const;
 
-                    std::unique_ptr<merkle_tree<HashT>> contents;
+                    std::unique_ptr<merkle_tree<Hash>> contents;
 
                 public:
                     delegated_ra_memory(const std::size_t num_addresses, const std::size_t value_size);
@@ -42,14 +42,14 @@ namespace nil {
                     std::size_t get_value(std::size_t address) const;
                     void set_value(std::size_t address, std::size_t value);
 
-                    typename HashT::hash_value_type get_root() const;
-                    typename HashT::merkle_authentication_path_type get_path(const std::size_t address) const;
+                    typename Hash::hash_value_type get_root() const;
+                    typename Hash::merkle_authentication_path_type get_path(const std::size_t address) const;
 
                     void dump() const;
                 };
 
-                template<typename HashT>
-                std::vector<bool> delegated_ra_memory<HashT>::int_to_tree_elem(const std::size_t i) const {
+                template<typename Hash>
+                std::vector<bool> delegated_ra_memory<Hash>::int_to_tree_elem(const std::size_t i) const {
                     std::vector<bool> v(value_size, false);
                     for (std::size_t k = 0; k < value_size; ++k) {
                         v[k] = ((i & (1ul << k)) != 0);
@@ -57,8 +57,8 @@ namespace nil {
                     return v;
                 }
 
-                template<typename HashT>
-                std::size_t delegated_ra_memory<HashT>::int_from_tree_elem(const std::vector<bool> &v) const {
+                template<typename Hash>
+                std::size_t delegated_ra_memory<Hash>::int_from_tree_elem(const std::vector<bool> &v) const {
                     std::size_t result = 0;
                     for (std::size_t i = 0; i < value_size; ++i) {
                         result |= (v[i] ? 1ul : 0ul) << i;
@@ -67,15 +67,15 @@ namespace nil {
                     return result;
                 }
 
-                template<typename HashT>
-                delegated_ra_memory<HashT>::delegated_ra_memory(const std::size_t num_addresses, const std::size_t value_size) :
+                template<typename Hash>
+                delegated_ra_memory<Hash>::delegated_ra_memory(const std::size_t num_addresses, const std::size_t value_size) :
                     memory_interface(num_addresses, value_size) {
-                    contents.reset(new merkle_tree<HashT>(static_cast<std::size_t>(std::ceil(std::log2(num_addresses))),
+                    contents.reset(new merkle_tree<Hash>(static_cast<std::size_t>(std::ceil(std::log2(num_addresses))),
                                                           value_size));
                 }
 
-                template<typename HashT>
-                delegated_ra_memory<HashT>::delegated_ra_memory(const std::size_t num_addresses,
+                template<typename Hash>
+                delegated_ra_memory<Hash>::delegated_ra_memory(const std::size_t num_addresses,
                                                                 const std::size_t value_size,
                                                                 const std::vector<std::size_t> &contents_as_vector) :
                     memory_interface(num_addresses, value_size) {
@@ -84,12 +84,12 @@ namespace nil {
                                    contents_as_vector.end(),
                                    contents_as_bit_vector_vector,
                                    [this](std::size_t value) { return int_to_tree_elem(value); });
-                    contents.reset(new merkle_tree<HashT>(static_cast<std::size_t>(std::ceil(std::log2(num_addresses))),
+                    contents.reset(new merkle_tree<Hash>(static_cast<std::size_t>(std::ceil(std::log2(num_addresses))),
                                                           value_size, contents_as_bit_vector_vector));
                 }
 
-                template<typename HashT>
-                delegated_ra_memory<HashT>::delegated_ra_memory(const std::size_t num_addresses,
+                template<typename Hash>
+                delegated_ra_memory<Hash>::delegated_ra_memory(const std::size_t num_addresses,
                                                                 const std::size_t value_size,
                                                                 const std::map<std::size_t, std::size_t> &contents_as_map) :
                     memory_interface(num_addresses, value_size) {
@@ -98,33 +98,33 @@ namespace nil {
                         contents_as_bit_vector_map[it.first] = int_to_tree_elem(it.second);
                     }
 
-                    contents.reset(new merkle_tree<HashT>(static_cast<std::size_t>(std::ceil(std::log2(num_addresses))),
+                    contents.reset(new merkle_tree<Hash>(static_cast<std::size_t>(std::ceil(std::log2(num_addresses))),
                                                           value_size, contents_as_bit_vector_map));
                 }
 
-                template<typename HashT>
-                std::size_t delegated_ra_memory<HashT>::get_value(std::size_t address) const {
+                template<typename Hash>
+                std::size_t delegated_ra_memory<Hash>::get_value(std::size_t address) const {
                     return int_from_tree_elem(contents->get_value(address));
                 }
 
-                template<typename HashT>
-                void delegated_ra_memory<HashT>::set_value(std::size_t address, std::size_t value) {
+                template<typename Hash>
+                void delegated_ra_memory<Hash>::set_value(std::size_t address, std::size_t value) {
                     contents->set_value(address, int_to_tree_elem(value));
                 }
 
-                template<typename HashT>
-                typename HashT::hash_value_type delegated_ra_memory<HashT>::get_root() const {
+                template<typename Hash>
+                typename Hash::hash_value_type delegated_ra_memory<Hash>::get_root() const {
                     return contents->get_root();
                 }
 
-                template<typename HashT>
-                typename HashT::merkle_authentication_path_type
-                    delegated_ra_memory<HashT>::get_path(const std::size_t address) const {
+                template<typename Hash>
+                typename Hash::merkle_authentication_path_type
+                    delegated_ra_memory<Hash>::get_path(const std::size_t address) const {
                     return contents->get_path(address);
                 }
 
-                template<typename HashT>
-                void delegated_ra_memory<HashT>::dump() const {
+                template<typename Hash>
+                void delegated_ra_memory<Hash>::dump() const {
                     contents->dump();
                 }
             }    // namespace snark

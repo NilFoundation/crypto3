@@ -326,16 +326,16 @@ void test_arithmetic_consistency_enforcer_gadget()
 
     for (std::size_t i = 0; i < 1ul<<ap.opcode_width(); ++i)
     {
-        this->pb.val(instruction_results[i]) = FieldType(std::rand());
-        this->pb.val(instruction_flags[i]) = FieldType(std::rand() % 2);
+        this->pb.val(instruction_results[i]) = typename FieldType::value_type(std::rand());
+        this->pb.val(instruction_flags[i]) = typename FieldType::value_type(std::rand() % 2);
     }
 
-    this->pb.val(incoming_pc) = FieldType(12345);
+    this->pb.val(incoming_pc) = typename FieldType::value_type(12345);
     this->pb.val(incoming_load_flag) = FieldType::zero();
 
     for (std::size_t i = 0; i < ap.k; ++i)
     {
-        this->pb.val(packed_incoming_registers[i]) = FieldType(1000+i);
+        this->pb.val(packed_incoming_registers[i]) = typename FieldType::value_type(1000+i);
     }
 
     for (std::size_t t = 0; t < 1ul<<ap.opcode_width(); ++t)
@@ -347,12 +347,12 @@ void test_arithmetic_consistency_enforcer_gadget()
 
     for (std::size_t i = 0; i < ap.k; ++i)
     {
-        this->pb.val(desidx.packed) = FieldType(i);
+        this->pb.val(desidx.packed) = typename FieldType::value_type(i);
         desidx.generate_r1cs_witness_from_packed();
 
         g.generate_r1cs_witness();
 
-        assert(this->pb.val(outgoing_pc) == FieldType(12346));
+        assert(this->pb.val(outgoing_pc) == typename FieldType::value_type(12346));
 
         for (std::size_t j = 0; j < ap.k; ++j)
         {
@@ -376,7 +376,7 @@ void test_arithmetic_consistency_enforcer_gadget()
 
     g.generate_r1cs_witness();
 
-    this->pb.val(outgoing_pc) == FieldType(12345);
+    this->pb.val(outgoing_pc) == typename FieldType::value_type(12345);
     assert(pb.is_satisfied());
 
     this->pb.val(incoming_load_flag) = FieldType::zero();
@@ -391,7 +391,7 @@ void test_arithmetic_consistency_enforcer_gadget()
 
     for (std::size_t i = 0; i < ap.k; ++i)
     {
-        this->pb.val(desidx.packed) = FieldType(i);
+        this->pb.val(desidx.packed) = typename FieldType::value_type(i);
         desidx.generate_r1cs_witness_from_packed();
 
         g.generate_r1cs_witness();
@@ -442,14 +442,14 @@ void test_control_flow_consistency_enforcer_gadget()
 
     for (std::size_t i = 0; i < 1ul<<ap.opcode_width(); ++i)
     {
-        this->pb.val(instruction_results[i]) = FieldType(std::rand());
+        this->pb.val(instruction_results[i]) = typename FieldType::value_type(std::rand());
     }
 
-    this->pb.val(incoming_pc) = FieldType(12345);
+    this->pb.val(incoming_pc) = typename FieldType::value_type(12345);
 
     for (std::size_t i = 0; i < ap.k; ++i)
     {
-        this->pb.val(packed_incoming_registers[i]) = FieldType(1000+i);
+        this->pb.val(packed_incoming_registers[i]) = typename FieldType::value_type(1000+i);
     }
 
     for (std::size_t t = 0; t < 1ul<<ap.opcode_width(); ++t)
@@ -460,7 +460,7 @@ void test_control_flow_consistency_enforcer_gadget()
 
     for (int flag = 0; flag <= 1; ++flag)
     {
-        this->pb.val(incoming_flag) = FieldType(flag);
+        this->pb.val(incoming_flag) = typename FieldType::value_type(flag);
 
         g.generate_r1cs_witness();
 
@@ -509,10 +509,10 @@ void test_special_consistency_enforcer_gadget()
                                           outgoing_pc, packed_outgoing_registers, outgoing_flag, outgoing_load_flag, "g");
     g.generate_r1cs_constraints();
 
-    this->pb.val(incoming_pc) = FieldType(12345);
+    this->pb.val(incoming_pc) = typename FieldType::value_type(12345);
     for (std::size_t i = 0; i < ap.k; ++i)
     {
-        this->pb.val(packed_incoming_registers[i]) = FieldType(1000+i);
+        this->pb.val(packed_incoming_registers[i]) = typename FieldType::value_type(1000+i);
     }
     this->pb.val(incoming_flag) = FieldType::zero();
     this->pb.val(incoming_load_flag) = FieldType::zero();

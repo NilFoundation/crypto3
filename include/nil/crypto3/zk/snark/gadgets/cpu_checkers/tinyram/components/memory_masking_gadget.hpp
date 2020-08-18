@@ -124,7 +124,7 @@ namespace nil {
                     */
                     masked_out_word0.assign(
                         pb,
-                        (FieldType(2) ^ pb.ap.w) *
+                        (typename FieldType::value_type(2) ^ pb.ap.w) *
                             pb_packing_sum<FieldType>(pb_variable_array<FieldType>(
                                 dw_contents_prev.bits.begin() + pb.ap.w, dw_contents_prev.bits.begin() + 2 * pb.ap.w)));
                     masked_out_word1.assign(
@@ -136,7 +136,7 @@ namespace nil {
                         /* just subtract out the byte to be masked */
                         masked_out_bytes[i].assign(
                             pb, (dw_contents_prev.packed -
-                                 (FieldType(2) ^ (8 * i)) * pb_packing_sum<FieldType>(pb_variable_array<FieldType>(
+                                 (typename FieldType::value_type(2) ^ (8 * i)) * pb_packing_sum<FieldType>(pb_variable_array<FieldType>(
                                                                 dw_contents_prev.bits.begin() + 8 * i,
                                                                 dw_contents_prev.bits.begin() + 8 * (i + 1)))));
                     }
@@ -164,9 +164,9 @@ namespace nil {
                     /*
                       Define shift so that masked_out_dw_contents_prev + shift * subcontents = dw_contents_next
                      */
-                    linear_combination<FieldType> shift_lc = is_word0 * 1 + is_word1 * (FieldType(2) ^ this->pb.ap.w);
+                    linear_combination<FieldType> shift_lc = is_word0 * 1 + is_word1 * (typename FieldType::value_type(2) ^ this->pb.ap.w);
                     for (std::size_t i = 0; i < 2 * this->pb.ap.bytes_in_word(); ++i) {
-                        shift_lc = shift_lc + is_byte[i] * (FieldType(2) ^ (8 * i));
+                        shift_lc = shift_lc + is_byte[i] * (typename FieldType::value_type(2) ^ (8 * i));
                     }
                     shift.assign(pb, shift_lc);
                 }
@@ -208,7 +208,7 @@ namespace nil {
                     /* get indicator variables is_subaddress */
                     for (std::size_t i = 0; i < 2 * this->pb.ap.bytes_in_word(); ++i) {
                         this->pb.val(is_subaddress[i]) =
-                            (this->pb.val(subaddress.packed) == FieldType(i)) ? FieldType::one() : FieldType::zero();
+                            (this->pb.val(subaddress.packed) == typename FieldType::value_type(i)) ? FieldType::one() : FieldType::zero();
                     }
 
                     /* get indicator variables is_byte_X */

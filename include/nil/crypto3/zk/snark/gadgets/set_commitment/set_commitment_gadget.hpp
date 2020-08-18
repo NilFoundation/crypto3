@@ -20,29 +20,29 @@ namespace nil {
         namespace zk {
             namespace snark {
 
-                template<typename FieldType, typename HashT>
+                template<typename FieldType, typename Hash>
                 using set_commitment_variable = digest_variable<FieldType>;
 
-                template<typename FieldType, typename HashT>
+                template<typename FieldType, typename Hash>
                 class set_commitment_gadget : public gadget<FieldType> {
                 private:
                     std::shared_ptr<block_variable<FieldType>> element_block;
                     std::shared_ptr<digest_variable<FieldType>> element_digest;
-                    std::shared_ptr<HashT> hash_element;
-                    std::shared_ptr<merkle_tree_check_read_gadget<FieldType, HashT>> check_membership;
+                    std::shared_ptr<Hash> hash_element;
+                    std::shared_ptr<merkle_tree_check_read_gadget<FieldType, Hash>> check_membership;
 
                 public:
                     std::size_t tree_depth;
                     pb_variable_array<FieldType> element_bits;
-                    set_commitment_variable<FieldType, HashT> root_digest;
-                    set_membership_proof_variable<FieldType, HashT> proof;
+                    set_commitment_variable<FieldType, Hash> root_digest;
+                    set_membership_proof_variable<FieldType, Hash> proof;
                     pb_linear_combination<FieldType> check_successful;
 
                     set_commitment_gadget(protoboard<FieldType> &pb,
                                           const std::size_t max_entries,
                                           const pb_variable_array<FieldType> &element_bits,
-                                          const set_commitment_variable<FieldType, HashT> &root_digest,
-                                          const set_membership_proof_variable<FieldType, HashT> &proof,
+                                          const set_commitment_variable<FieldType, Hash> &root_digest,
+                                          const set_membership_proof_variable<FieldType, Hash> &proof,
                                           const pb_linear_combination<FieldType> &check_successful);
 
                     void generate_r1cs_constraints();
@@ -51,16 +51,16 @@ namespace nil {
                     static std::size_t root_size_in_bits();
                 };
 
-                template<typename FieldType, typename HashT>
+                template<typename FieldType, typename Hash>
                 void test_set_commitment_gadget();
 
-                template<typename FieldType, typename HashT>
-                set_commitment_gadget<FieldType, HashT>::set_commitment_gadget(
+                template<typename FieldType, typename Hash>
+                set_commitment_gadget<FieldType, Hash>::set_commitment_gadget(
                     protoboard<FieldType> &pb,
                     const std::size_t max_entries,
                     const pb_variable_array<FieldType> &element_bits,
-                    const set_commitment_variable<FieldType, HashT> &root_digest,
-                    const set_membership_proof_variable<FieldType, HashT> &proof,
+                    const set_commitment_variable<FieldType, Hash> &root_digest,
+                    const set_membership_proof_variable<FieldType, Hash> &proof,
                     const pb_linear_combination<FieldType> &check_successful) :
                     gadget<FieldType>(pb),
                     tree_depth(static_cast<std::size_t>(std::ceil(std::log2(max_entries)))), element_bits(element_bits),
@@ -68,11 +68,11 @@ namespace nil {
                     element_block.reset(new block_variable<FieldType>(pb, {element_bits}));
 
                     if (tree_depth == 0) {
-                        hash_element.reset(new HashT(pb, element_bits.size(), *element_block, root_digest));
+                        hash_element.reset(new Hash(pb, element_bits.size(), *element_block, root_digest));
                     } else {
-                        element_digest.reset(new digest_variable<FieldType>(pb, HashT::get_digest_len()));
-                        hash_element.reset(new HashT(pb, element_bits.size(), *element_block, *element_digest));
-                        check_membership.reset(new merkle_tree_check_read_gadget<FieldType, HashT>(pb,
+                        element_digest.reset(new digest_variable<FieldType>(pb, Hash::get_digest_len()));
+                        hash_element.reset(new Hash(pb, element_bits.size(), *element_block, *element_digest));
+                        check_membership.reset(new merkle_tree_check_read_gadget<FieldType, Hash>(pb,
                                                                                                    tree_depth,
                                                                                                    proof.address_bits,
                                                                                                    *element_digest,
@@ -82,8 +82,8 @@ namespace nil {
                     }
                 }
 
-                template<typename FieldType, typename HashT>
-                void set_commitment_gadget<FieldType, HashT>::generate_r1cs_constraints() {
+                template<typename FieldType, typename Hash>
+                void set_commitment_gadget<FieldType, Hash>::generate_r1cs_constraints() {
                     hash_element->generate_r1cs_constraints();
 
                     if (tree_depth > 0) {
@@ -91,8 +91,8 @@ namespace nil {
                     }
                 }
 
-                template<typename FieldType, typename HashT>
-                void set_commitment_gadget<FieldType, HashT>::generate_r1cs_witness() {
+                template<typename FieldType, typename Hash>
+                void set_commitment_gadget<FieldType, Hash>::generate_r1cs_witness() {
                     hash_element->generate_r1cs_witness();
 
                     if (tree_depth > 0) {
@@ -100,18 +100,18 @@ namespace nil {
                     }
                 }
 
-                template<typename FieldType, typename HashT>
-                std::size_t set_commitment_gadget<FieldType, HashT>::root_size_in_bits() {
-                    return merkle_tree_check_read_gadget<FieldType, HashT>::root_size_in_bits();
+                template<typename FieldType, typename Hash>
+                std::size_t set_commitment_gadget<FieldType, Hash>::root_size_in_bits() {
+                    return merkle_tree_check_read_gadget<FieldType, Hash>::root_size_in_bits();
                 }
 
-                template<typename FieldType, typename HashT>
+                template<typename FieldType, typename Hash>
                 void test_set_commitment_gadget() {
-                    const std::size_t digest_len = HashT::get_digest_len();
+                    const std::size_t digest_len = Hash::get_digest_len();
                     const std::size_t max_set_size = 16;
-                    const std::size_t value_size = (HashT::get_block_len() > 0 ? HashT::get_block_len() : 10);
+                    const std::size_t value_size = (Hash::get_block_len() > 0 ? Hash::get_block_len() : 10);
 
-                    set_commitment_accumulator<HashT> accumulator(max_set_size, value_size);
+                    set_commitment_accumulator<Hash> accumulator(max_set_size, value_size);
 
                     std::vector<std::vector<bool>> set_elems;
                     for (std::size_t i = 0; i < max_set_size; ++i) {
@@ -125,14 +125,14 @@ namespace nil {
                     protoboard<FieldType> pb;
                     pb_variable_array<FieldType> element_bits;
                     element_bits.allocate(pb, value_size);
-                    set_commitment_variable<FieldType, HashT> root_digest(pb, digest_len);
+                    set_commitment_variable<FieldType, Hash> root_digest(pb, digest_len);
 
                     pb_variable<FieldType> check_succesful;
                     check_succesful.allocate(pb);
 
-                    set_membership_proof_variable<FieldType, HashT> proof(pb, max_set_size);
+                    set_membership_proof_variable<FieldType, Hash> proof(pb, max_set_size);
 
-                    set_commitment_gadget<FieldType, HashT> sc(pb, max_set_size, element_bits, root_digest, proof,
+                    set_commitment_gadget<FieldType, Hash> sc(pb, max_set_size, element_bits, root_digest, proof,
                                                                check_succesful);
                     sc.generate_r1cs_constraints();
 
@@ -149,7 +149,7 @@ namespace nil {
 
                     /* test an element not in set */
                     for (std::size_t i = 0; i < value_size; ++i) {
-                        pb.val(element_bits[i]) = FieldType(std::rand() % 2);
+                        pb.val(element_bits[i]) = typename FieldType::value_type(std::rand() % 2);
                     }
 
                     pb.val(check_succesful) = FieldType::zero(); /* do not require the check result to be successful */

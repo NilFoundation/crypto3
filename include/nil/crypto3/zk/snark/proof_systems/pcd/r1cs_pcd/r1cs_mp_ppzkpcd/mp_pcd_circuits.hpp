@@ -460,7 +460,7 @@ namespace nil {
                         for (std::size_t i = 0; i < compliance_predicate.accepted_input_types.size(); ++i, ++it) {
                             pb.add_r1cs_constraint(
                                 r1cs_constraint<FieldType>((i == 0 ? common_type : common_type_check_aux[i - 1]),
-                                                           common_type - FieldType(*it),
+                                                           common_type - typename FieldType::value_type(*it),
                                                            (i == compliance_predicate.accepted_input_types.size() - 1 ?
                                                                 0 * pb_variable<FieldType>(0) :
                                                                 common_type_check_aux[i])));
@@ -472,7 +472,7 @@ namespace nil {
                         }
                     }
                     pb.add_r1cs_constraint(
-                        r1cs_constraint<FieldType>(1, outgoing_message_type, FieldType(compliance_predicate.type)));
+                        r1cs_constraint<FieldType>(1, outgoing_message_type, typename FieldType::value_type(compliance_predicate.type)));
                 }
 
                 template<typename ppT>
@@ -548,7 +548,7 @@ namespace nil {
                         for (std::size_t i = 0; i < compliance_predicate.accepted_input_types.size(); ++i, ++it) {
                             pb.val(common_type_check_aux[i]) =
                                 ((i == 0 ? pb.val(common_type) : pb.val(common_type_check_aux[i - 1])) *
-                                 (pb.val(common_type) - FieldType(*it)));
+                                 (pb.val(common_type) - typename FieldType::value_type(*it)));
                         }
                     } else {
                         for (std::size_t i = 0; i < membership_checkers.size(); ++i) {

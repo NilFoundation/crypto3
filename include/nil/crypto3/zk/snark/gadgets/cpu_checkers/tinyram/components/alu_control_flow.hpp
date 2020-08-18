@@ -108,14 +108,12 @@ namespace nil {
 
                 template<typename FieldType>
                 void test_ALU_jmp_gadget() {
-                    algebra::print_time("starting jmp test");
-
                     tinyram_architecture_params ap(16, 16);
                     tinyram_program P;
                     P.instructions = generate_tinyram_prelude(ap);
                     tinyram_protoboard<FieldType> pb(ap, P.size(), 0, 10);
 
-                    word_variable_gadget<FieldType> pc(pb, "pc"), argval2(pb, "argval2");
+                    word_variable_gadget<FieldType> pc(pb), argval2(pb);
                     pb_variable<FieldType> flag, result;
 
                     pc.generate_r1cs_constraints(true);
@@ -123,21 +121,19 @@ namespace nil {
                     flag.allocate(pb);
                     result.allocate(pb);
 
-                    ALU_jmp_gadget<FieldType> jmp(pb, pc, argval2, flag, result, "jmp");
+                    ALU_jmp_gadget<FieldType> jmp(pb, pc, argval2, flag, result);
                     jmp.generate_r1cs_constraints();
 
-                    pb.val(argval2.packed) = FieldType(123);
+                    pb.val(argval2.packed) = typename FieldType::value_type(123);
                     argval2.generate_r1cs_witness_from_packed();
 
                     jmp.generate_r1cs_witness();
 
-                    assert(pb.val(result) == FieldType(123));
+                    assert(pb.val(result) == typename FieldType::value_type(123));
                     assert(pb.is_satisfied());
-                    algebra::print_time("positive jmp test successful");
 
-                    pb.val(result) = FieldType(1);
+                    pb.val(result) = typename FieldType::value_type(1);
                     assert(!pb.is_satisfied());
-                    algebra::print_time("negative jmp test successful");
                 }
 
                 /* cjmp */
@@ -165,21 +161,19 @@ namespace nil {
                 void ALU_cjmp_gadget<FieldType>::generate_r1cs_witness() {
                     this->pb.val(this->result) =
                         ((this->pb.val(this->flag) == FieldType::one()) ?
-                             FieldType(this->pb.val(this->argval2.packed).as_ulong() >> this->pb.ap.subaddr_len()) :
+                             typename FieldType::value_type(this->pb.val(this->argval2.packed).as_ulong() >> this->pb.ap.subaddr_len()) :
                              this->pb.val(this->pc.packed) + FieldType::one());
                 }
 
                 template<typename FieldType>
                 void test_ALU_cjmp_gadget() {
                     // TODO: update
-                    algebra::print_time("starting cjmp test");
-
                     tinyram_architecture_params ap(16, 16);
                     tinyram_program P;
                     P.instructions = generate_tinyram_prelude(ap);
                     tinyram_protoboard<FieldType> pb(ap, P.size(), 0, 10);
 
-                    word_variable_gadget<FieldType> pc(pb, "pc"), argval2(pb, "argval2");
+                    word_variable_gadget<FieldType> pc(pb), argval2(pb);
                     pb_variable<FieldType> flag, result;
 
                     pc.generate_r1cs_constraints(true);
@@ -187,35 +181,31 @@ namespace nil {
                     flag.allocate(pb);
                     result.allocate(pb);
 
-                    ALU_cjmp_gadget<FieldType> cjmp(pb, pc, argval2, flag, result, "cjmp");
+                    ALU_cjmp_gadget<FieldType> cjmp(pb, pc, argval2, flag, result);
                     cjmp.generate_r1cs_constraints();
 
-                    pb.val(argval2.packed) = FieldType(123);
+                    pb.val(argval2.packed) = typename FieldType::value_type(123);
                     argval2.generate_r1cs_witness_from_packed();
-                    pb.val(pc.packed) = FieldType(456);
+                    pb.val(pc.packed) = typename FieldType::value_type(456);
                     pc.generate_r1cs_witness_from_packed();
 
-                    pb.val(flag) = FieldType(1);
+                    pb.val(flag) = typename FieldType::value_type(1);
                     cjmp.generate_r1cs_witness();
 
-                    assert(pb.val(result) == FieldType(123));
+                    assert(pb.val(result) == typename FieldType::value_type(123));
                     assert(pb.is_satisfied());
-                    algebra::print_time("positive cjmp test successful");
 
-                    pb.val(flag) = FieldType(0);
+                    pb.val(flag) = typename FieldType::value_type(0);
                     assert(!pb.is_satisfied());
-                    algebra::print_time("negative cjmp test successful");
 
-                    pb.val(flag) = FieldType(0);
+                    pb.val(flag) = typename FieldType::value_type(0);
                     cjmp.generate_r1cs_witness();
 
-                    assert(pb.val(result) == FieldType(456 + 2 * ap.w / 8));
+                    assert(pb.val(result) == typename FieldType::value_type(456 + 2 * ap.w / 8));
                     assert(pb.is_satisfied());
-                    algebra::print_time("positive cjmp test successful");
 
-                    pb.val(flag) = FieldType(1);
+                    pb.val(flag) = typename FieldType::value_type(1);
                     assert(!pb.is_satisfied());
-                    algebra::print_time("negative cjmp test successful");
                 }
 
                 /* cnjmp */
@@ -246,20 +236,19 @@ namespace nil {
                     this->pb.val(this->result) =
                         ((this->pb.val(this->flag) == FieldType::one()) ?
                              this->pb.val(this->pc.packed) + FieldType::one() :
-                             FieldType(this->pb.val(this->argval2.packed).as_ulong() >> this->pb.ap.subaddr_len()));
+                             typename FieldType::value_type(this->pb.val(this->argval2.packed).as_ulong() >> this->pb.ap.subaddr_len()));
                 }
 
                 template<typename FieldType>
                 void test_ALU_cnjmp_gadget() {
                     // TODO: update
-                    algebra::print_time("starting cnjmp test");
 
                     tinyram_architecture_params ap(16, 16);
                     tinyram_program P;
                     P.instructions = generate_tinyram_prelude(ap);
                     tinyram_protoboard<FieldType> pb(ap, P.size(), 0, 10);
 
-                    word_variable_gadget<FieldType> pc(pb, "pc"), argval2(pb, "argval2");
+                    word_variable_gadget<FieldType> pc(pb), argval2(pb);
                     pb_variable<FieldType> flag, result;
 
                     pc.generate_r1cs_constraints(true);
@@ -267,35 +256,31 @@ namespace nil {
                     flag.allocate(pb);
                     result.allocate(pb);
 
-                    ALU_cnjmp_gadget<FieldType> cnjmp(pb, pc, argval2, flag, result, "cjmp");
+                    ALU_cnjmp_gadget<FieldType> cnjmp(pb, pc, argval2, flag, result);
                     cnjmp.generate_r1cs_constraints();
 
-                    pb.val(argval2.packed) = FieldType(123);
+                    pb.val(argval2.packed) = typename FieldType::value_type(123);
                     argval2.generate_r1cs_witness_from_packed();
-                    pb.val(pc.packed) = FieldType(456);
+                    pb.val(pc.packed) = typename FieldType::value_type(456);
                     pc.generate_r1cs_witness_from_packed();
 
-                    pb.val(flag) = FieldType(0);
+                    pb.val(flag) = typename FieldType::value_type(0);
                     cnjmp.generate_r1cs_witness();
 
-                    assert(pb.val(result) == FieldType(123));
+                    assert(pb.val(result) == typename FieldType::value_type(123));
                     assert(pb.is_satisfied());
-                    algebra::print_time("positive cnjmp test successful");
 
-                    pb.val(flag) = FieldType(1);
+                    pb.val(flag) = typename FieldType::value_type(1);
                     assert(!pb.is_satisfied());
-                    algebra::print_time("negative cnjmp test successful");
 
-                    pb.val(flag) = FieldType(1);
+                    pb.val(flag) = typename FieldType::value_type(1);
                     cnjmp.generate_r1cs_witness();
 
-                    assert(pb.val(result) == FieldType(456 + (2 * pb.ap.w / 8)));
+                    assert(pb.val(result) == typename FieldType::value_type(456 + (2 * pb.ap.w / 8)));
                     assert(pb.is_satisfied());
-                    algebra::print_time("positive cnjmp test successful");
 
-                    pb.val(flag) = FieldType(0);
+                    pb.val(flag) = typename FieldType::value_type(0);
                     assert(!pb.is_satisfied());
-                    algebra::print_time("negative cnjmp test successful");
                 }
             }    // namespace snark
         }        // namespace zk

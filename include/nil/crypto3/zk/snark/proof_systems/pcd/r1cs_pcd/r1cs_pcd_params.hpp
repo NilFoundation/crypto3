@@ -63,7 +63,7 @@ namespace nil {
                     const std::size_t arity = incoming_messages.size();
 
                     r1cs_auxiliary_input<FieldType> result;
-                    result.emplace_back(FieldType(arity));
+                    result.emplace_back(typename FieldType::value_type(arity));
 
                     const std::size_t max_arity = incoming_message_payload_lengths.size();
                     assert(arity <= max_arity);

@@ -237,7 +237,7 @@ namespace nil {
                                 if (num_subpackets > 1) {
                                     /* update the switch bit */
                                     this->pb.val(asw_switch_bits[column_idx][row_idx]) =
-                                        FieldType(routing[column_idx][row_idx] ? 1 : 0);
+                                        typename FieldType::value_type(routing[column_idx][row_idx] ? 1 : 0);
                                 }
 
                                 /* route according to the switch bit */
@@ -295,7 +295,7 @@ namespace nil {
                         }
                     }
 
-                    pb.val(pb_variable<FieldType>(10)) = FieldType(12345);
+                    pb.val(pb_variable<FieldType>(10)) = typename FieldType::value_type(12345);
                     assert(!pb.is_satisfied());
                 }
             }    // namespace snark

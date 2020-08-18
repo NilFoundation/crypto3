@@ -168,7 +168,7 @@ namespace nil {
                 template<typename FieldType>
                 r1cs_variable_assignment<FieldType> r1cs_pcd_message<FieldType>::as_r1cs_variable_assignment() const {
                     r1cs_variable_assignment<FieldType> result = this->payload_as_r1cs_variable_assignment();
-                    result.insert(result.begin(), FieldType(this->type));
+                    result.insert(result.begin(), typename FieldType::value_type(this->type));
                     return result;
                 }
 

@@ -23,6 +23,20 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
+                namespace detail {
+                    size_t to_twos_complement(int i, size_t w)
+                    {
+                        assert(i >= -(1l<<(w-1)));
+                        assert(i < (1l<<(w-1)));
+                        return (i >= 0) ? i : i + (1l<<w);
+                    }
+
+                    int from_twos_complement(size_t i, size_t w)
+                    {
+                        assert(i < (1ul<<w));
+                        return (i < (1ul<<(w-1))) ? i : i - (1ul<<w);
+                    }
+                }
 
                 /* arithmetic gadgets */
                 template<typename FieldType>
@@ -613,7 +627,7 @@ namespace nil {
                         ALU_arithmetic_gadget<FieldType>(pb, opcode_indicators, desval, arg1val, arg2val, flag,
                                                          shr_result, shr_flag),
                         shr_result(shr_result), shr_flag(shr_flag), shl_result(shl_result), shl_flag(shl_flag) {
-                        logw = algebra::log2(pb.ap.w);
+                        logw = static_cast<std::size_t>(std::ceil(std::log2(pb.ap.w)));
 
                         reversed_input.allocate(pb);
                         pack_reversed_input.reset(new packing_gadget<FieldType>(
@@ -679,8 +693,6 @@ namespace nil {
                                                        flag_function)
                 /* parameters for res_function and flag_function are both desval, flag, arg1val, arg2val */
                 {
-                    printf("testing on all %zu bit inputs\n", w);
-
                     tinyram_architecture_params ap(w, 16);
                     tinyram_program P;
                     P.instructions = generate_tinyram_prelude(ap);
@@ -692,11 +704,11 @@ namespace nil {
                         pb.val(opcode_indicators[i]) = (i == opcode ? FieldType::one() : FieldType::zero());
                     }
 
-                    word_variable_gadget<FieldType> desval(pb, "desval");
+                    word_variable_gadget<FieldType> desval(pb);
                     desval.generate_r1cs_constraints(true);
-                    word_variable_gadget<FieldType> arg1val(pb, "arg1val");
+                    word_variable_gadget<FieldType> arg1val(pb);
                     arg1val.generate_r1cs_constraints(true);
-                    word_variable_gadget<FieldType> arg2val(pb, "arg2val");
+                    word_variable_gadget<FieldType> arg2val(pb);
                     arg2val.generate_r1cs_constraints(true);
                     pb_variable<FieldType> flag;
                     flag.allocate(pb);
@@ -710,43 +722,27 @@ namespace nil {
                     g->generate_r1cs_constraints();
 
                     for (std::size_t des = 0; des < (1u << w); ++des) {
-                        pb.val(desval.packed) = FieldType(des);
+                        pb.val(desval.packed) = typename FieldType::value_type(des);
                         desval.generate_r1cs_witness_from_packed();
 
                         for (char f = 0; f <= 1; ++f) {
                             pb.val(flag) = (f ? FieldType::one() : FieldType::zero());
 
                             for (std::size_t arg1 = 0; arg1 < (1u << w); ++arg1) {
-                                pb.val(arg1val.packed) = FieldType(arg1);
+                                pb.val(arg1val.packed) = typename FieldType::value_type(arg1);
                                 arg1val.generate_r1cs_witness_from_packed();
 
                                 for (std::size_t arg2 = 0; arg2 < (1u << w); ++arg2) {
-                                    pb.val(arg2val.packed) = FieldType(arg2);
+                                    pb.val(arg2val.packed) = typename FieldType::value_type(arg2);
                                     arg2val.generate_r1cs_witness_from_packed();
 
                                     std::size_t res = res_function(des, f, arg1, arg2);
                                     bool res_f = flag_function(des, f, arg1, arg2);
-#ifdef DEBUG
-                                    printf(
-                                        "with the following parameters: flag = %d"
-                                        ", desval = %zu (%d)"
-                                        ", arg1val = %zu (%d)"
-                                        ", arg2val = %zu (%d)"
-                                        ". expected result: %zu (%d), expected flag: %d\n",
-                                        f, des, algebra::from_twos_complement(des, w), arg1,
-                                        algebra::from_twos_complement(arg1, w), arg2,
-                                        algebra::from_twos_complement(arg2, w), res,
-                                        algebra::from_twos_complement(res, w), res_f);
-#endif
+
                                     g->generate_r1cs_witness();
-#ifdef DEBUG
-                                    printf("result: ");
-                                    pb.val(result).print();
-                                    printf("flag: ");
-                                    pb.val(result_flag).print();
-#endif
+
                                     assert(pb.is_satisfied());
-                                    assert(pb.val(result) == FieldType(res));
+                                    assert(pb.val(result) == typename FieldType::value_type(res));
                                     assert(pb.val(result_flag) == (res_f ? FieldType::one() : FieldType::zero()));
                                 }
                             }
@@ -787,7 +783,6 @@ namespace nil {
 
                 template<typename FieldType>
                 void test_ALU_and_gadget(const std::size_t w) {
-                    algebra::print_time("starting and test");
                     brute_force_arithmetic_gadget<ALU_and_gadget<FieldType>, FieldType>(
                         w,
                         tinyram_opcode_AND,
@@ -800,11 +795,10 @@ namespace nil {
                            pb_variable<FieldType> &result,
                            pb_variable<FieldType> &result_flag) -> ALU_and_gadget<FieldType> * {
                             return new ALU_and_gadget<FieldType>(pb, opcode_indicators, desval, arg1val, arg2val, flag,
-                                                                 result, result_flag, "ALU_and_gadget");
+                                                                 result, result_flag);
                         },
                         [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> std::size_t { return x & y; },
                         [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> bool { return (x & y) == 0; });
-                    algebra::print_time("and tests successful");
                 }
 
                 /* or */
@@ -841,7 +835,6 @@ namespace nil {
 
                 template<typename FieldType>
                 void test_ALU_or_gadget(const std::size_t w) {
-                    algebra::print_time("starting or test");
                     brute_force_arithmetic_gadget<ALU_or_gadget<FieldType>, FieldType>(
                         w,
                         tinyram_opcode_OR,
@@ -854,11 +847,10 @@ namespace nil {
                            pb_variable<FieldType> &result,
                            pb_variable<FieldType> &result_flag) -> ALU_or_gadget<FieldType> * {
                             return new ALU_or_gadget<FieldType>(pb, opcode_indicators, desval, arg1val, arg2val, flag,
-                                                                result, result_flag, "ALU_or_gadget");
+                                                                result, result_flag);
                         },
                         [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> std::size_t { return x | y; },
                         [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> bool { return (x | y) == 0; });
-                    algebra::print_time("or tests successful");
                 }
 
                 /* xor */
@@ -897,7 +889,6 @@ namespace nil {
 
                 template<typename FieldType>
                 void test_ALU_xor_gadget(const std::size_t w) {
-                    algebra::print_time("starting xor test");
                     brute_force_arithmetic_gadget<ALU_xor_gadget<FieldType>, FieldType>(
                         w,
                         tinyram_opcode_XOR,
@@ -910,11 +901,10 @@ namespace nil {
                            pb_variable<FieldType> &result,
                            pb_variable<FieldType> &result_flag) -> ALU_xor_gadget<FieldType> * {
                             return new ALU_xor_gadget<FieldType>(pb, opcode_indicators, desval, arg1val, arg2val, flag,
-                                                                 result, result_flag, "ALU_xor_gadget");
+                                                                 result, result_flag);
                         },
                         [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> std::size_t { return x ^ y; },
                         [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> bool { return (x ^ y) == 0; });
-                    algebra::print_time("xor tests successful");
                 }
 
                 /* not */
@@ -949,7 +939,6 @@ namespace nil {
 
                 template<typename FieldType>
                 void test_ALU_not_gadget(const std::size_t w) {
-                    algebra::print_time("starting not test");
                     brute_force_arithmetic_gadget<ALU_not_gadget<FieldType>, FieldType>(
                         w,
                         tinyram_opcode_NOT,
@@ -962,11 +951,10 @@ namespace nil {
                            pb_variable<FieldType> &result,
                            pb_variable<FieldType> &result_flag) -> ALU_not_gadget<FieldType> * {
                             return new ALU_not_gadget<FieldType>(pb, opcode_indicators, desval, arg1val, arg2val, flag,
-                                                                 result, result_flag, "ALU_not_gadget");
+                                                                 result, result_flag);
                         },
                         [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> std::size_t { return (1ul << w) - 1 - y; },
                         [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> bool { return ((1ul << w) - 1 - y) == 0; });
-                    algebra::print_time("not tests successful");
                 }
 
                 /* add */
@@ -993,7 +981,6 @@ namespace nil {
 
                 template<typename FieldType>
                 void test_ALU_add_gadget(const std::size_t w) {
-                    algebra::print_time("starting add test");
                     brute_force_arithmetic_gadget<ALU_add_gadget<FieldType>, FieldType>(
                         w,
                         tinyram_opcode_ADD,
@@ -1006,11 +993,10 @@ namespace nil {
                            pb_variable<FieldType> &result,
                            pb_variable<FieldType> &result_flag) -> ALU_add_gadget<FieldType> * {
                             return new ALU_add_gadget<FieldType>(pb, opcode_indicators, desval, arg1val, arg2val, flag,
-                                                                 result, result_flag, "ALU_add_gadget");
+                                                                 result, result_flag);
                         },
                         [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> std::size_t { return (x + y) % (1ul << w); },
                         [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> bool { return (x + y) >= (1ul << w); });
-                    algebra::print_time("add tests successful");
                 }
 
                 /* sub */
@@ -1057,7 +1043,6 @@ namespace nil {
 
                 template<typename FieldType>
                 void test_ALU_sub_gadget(const std::size_t w) {
-                    algebra::print_time("starting sub test");
                     brute_force_arithmetic_gadget<ALU_sub_gadget<FieldType>, FieldType>(
                         w,
                         tinyram_opcode_SUB,
@@ -1070,7 +1055,7 @@ namespace nil {
                            pb_variable<FieldType> &result,
                            pb_variable<FieldType> &result_flag) -> ALU_sub_gadget<FieldType> * {
                             return new ALU_sub_gadget<FieldType>(pb, opcode_indicators, desval, arg1val, arg2val, flag,
-                                                                 result, result_flag, "ALU_sub_gadget");
+                                                                 result, result_flag);
                         },
                         [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> std::size_t {
                             const std::size_t unsigned_result = ((1ul << w) + x - y) % (1ul << w);
@@ -1080,7 +1065,6 @@ namespace nil {
                             const std::size_t msb = ((1ul << w) + x - y) >> w;
                             return (msb == 0);
                         });
-                    algebra::print_time("sub tests successful");
                 }
 
                 /* mov */
@@ -1100,7 +1084,6 @@ namespace nil {
 
                 template<typename FieldType>
                 void test_ALU_mov_gadget(const std::size_t w) {
-                    algebra::print_time("starting mov test");
                     brute_force_arithmetic_gadget<ALU_mov_gadget<FieldType>, FieldType>(
                         w,
                         tinyram_opcode_MOV,
@@ -1113,11 +1096,10 @@ namespace nil {
                            pb_variable<FieldType> &result,
                            pb_variable<FieldType> &result_flag) -> ALU_mov_gadget<FieldType> * {
                             return new ALU_mov_gadget<FieldType>(pb, opcode_indicators, desval, arg1val, arg2val, flag,
-                                                                 result, result_flag, "ALU_mov_gadget");
+                                                                 result, result_flag);
                         },
                         [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> std::size_t { return y; },
                         [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> bool { return f; });
-                    algebra::print_time("mov tests successful");
                 }
 
                 /* cmov */
@@ -1145,7 +1127,6 @@ namespace nil {
 
                 template<typename FieldType>
                 void test_ALU_cmov_gadget(const std::size_t w) {
-                    algebra::print_time("starting cmov test");
                     brute_force_arithmetic_gadget<ALU_cmov_gadget<FieldType>, FieldType>(
                         w,
                         tinyram_opcode_CMOV,
@@ -1158,11 +1139,10 @@ namespace nil {
                            pb_variable<FieldType> &result,
                            pb_variable<FieldType> &result_flag) -> ALU_cmov_gadget<FieldType> * {
                             return new ALU_cmov_gadget<FieldType>(pb, opcode_indicators, desval, arg1val, arg2val, flag,
-                                                                  result, result_flag, "ALU_cmov_gadget");
+                                                                  result, result_flag);
                         },
                         [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> std::size_t { return f ? y : des; },
                         [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> bool { return f; });
-                    algebra::print_time("cmov tests successful");
                 }
 
                 /* unsigned comparison */
@@ -1202,7 +1182,6 @@ namespace nil {
 
                 template<typename FieldType>
                 void test_ALU_cmpe_gadget(const std::size_t w) {
-                    algebra::print_time("starting cmpe test");
                     brute_force_arithmetic_gadget<ALU_cmp_gadget<FieldType>, FieldType>(
                         w,
                         tinyram_opcode_CMPE,
@@ -1224,16 +1203,14 @@ namespace nil {
                             cmpae_result_flag.allocate(pb);
                             return new ALU_cmp_gadget<FieldType>(pb, opcode_indicators, desval, arg1val, arg2val, flag,
                                                                  result, result_flag, cmpa_result, cmpa_result_flag,
-                                                                 cmpae_result, cmpae_result_flag, "ALU_cmp_gadget");
+                                                                 cmpae_result, cmpae_result_flag);
                         },
                         [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> std::size_t { return des; },
                         [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> bool { return x == y; });
-                    algebra::print_time("cmpe tests successful");
                 }
 
                 template<typename FieldType>
                 void test_ALU_cmpa_gadget(const std::size_t w) {
-                    algebra::print_time("starting cmpa test");
                     brute_force_arithmetic_gadget<ALU_cmp_gadget<FieldType>, FieldType>(
                         w,
                         tinyram_opcode_CMPA,
@@ -1255,16 +1232,14 @@ namespace nil {
                             cmpae_result_flag.allocate(pb);
                             return new ALU_cmp_gadget<FieldType>(pb, opcode_indicators, desval, arg1val, arg2val, flag,
                                                                  cmpe_result, cmpe_result_flag, result, result_flag,
-                                                                 cmpae_result, cmpae_result_flag, "ALU_cmp_gadget");
+                                                                 cmpae_result, cmpae_result_flag);
                         },
                         [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> std::size_t { return des; },
                         [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> bool { return x > y; });
-                    algebra::print_time("cmpa tests successful");
                 }
 
                 template<typename FieldType>
                 void test_ALU_cmpae_gadget(const std::size_t w) {
-                    algebra::print_time("starting cmpae test");
                     brute_force_arithmetic_gadget<ALU_cmp_gadget<FieldType>, FieldType>(
                         w,
                         tinyram_opcode_CMPAE,
@@ -1286,11 +1261,10 @@ namespace nil {
                             cmpa_result_flag.allocate(pb);
                             return new ALU_cmp_gadget<FieldType>(
                                 pb, opcode_indicators, desval, arg1val, arg2val, flag, cmpe_result, cmpe_result_flag,
-                                cmpa_result, cmpa_result_flag, result, result_flag, "ALU_cmp_gadget");
+                                cmpa_result, cmpa_result_flag, result, result_flag);
                         },
                         [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> std::size_t { return des; },
                         [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> bool { return x >= y; });
-                    algebra::print_time("cmpae tests successful");
                 }
 
                 /* signed comparison */
@@ -1338,7 +1312,6 @@ namespace nil {
 
                 template<typename FieldType>
                 void test_ALU_cmpg_gadget(const std::size_t w) {
-                    algebra::print_time("starting cmpg test");
                     brute_force_arithmetic_gadget<ALU_cmps_gadget<FieldType>, FieldType>(
                         w,
                         tinyram_opcode_CMPG,
@@ -1355,19 +1328,16 @@ namespace nil {
                             pb_variable<FieldType> cmpge_result_flag;
                             cmpge_result_flag.allocate(pb);
                             return new ALU_cmps_gadget<FieldType>(pb, opcode_indicators, desval, arg1val, arg2val, flag,
-                                                                  result, result_flag, cmpge_result, cmpge_result_flag,
-                                                                  "ALU_cmps_gadget");
+                                                                  result, result_flag, cmpge_result, cmpge_result_flag);
                         },
                         [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> std::size_t { return des; },
                         [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> bool {
-                            return (algebra::from_twos_complement(x, w) > algebra::from_twos_complement(y, w));
+                            return (detail::from_twos_complement(x, w) > detail::from_twos_complement(y, w));
                         });
-                    algebra::print_time("cmpg tests successful");
                 }
 
                 template<typename FieldType>
                 void test_ALU_cmpge_gadget(const std::size_t w) {
-                    algebra::print_time("starting cmpge test");
                     brute_force_arithmetic_gadget<ALU_cmps_gadget<FieldType>, FieldType>(
                         w,
                         tinyram_opcode_CMPGE,
@@ -1384,14 +1354,12 @@ namespace nil {
                             pb_variable<FieldType> cmpg_result_flag;
                             cmpg_result_flag.allocate(pb);
                             return new ALU_cmps_gadget<FieldType>(pb, opcode_indicators, desval, arg1val, arg2val, flag,
-                                                                  cmpg_result, cmpg_result_flag, result, result_flag,
-                                                                  "ALU_cmps_gadget");
+                                                                  cmpg_result, cmpg_result_flag, result, result_flag);
                         },
                         [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> std::size_t { return des; },
                         [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> bool {
-                            return (algebra::from_twos_complement(x, w) >= algebra::from_twos_complement(y, w));
+                            return (detail::from_twos_complement(x, w) >= detail::from_twos_complement(y, w));
                         });
-                    algebra::print_time("cmpge tests successful");
                 }
 
                 template<typename FieldType>
@@ -1433,7 +1401,6 @@ namespace nil {
 
                 template<typename FieldType>
                 void test_ALU_mull_gadget(const std::size_t w) {
-                    algebra::print_time("starting mull test");
                     brute_force_arithmetic_gadget<ALU_umul_gadget<FieldType>, FieldType>(
                         w,
                         tinyram_opcode_MULL,
@@ -1450,17 +1417,14 @@ namespace nil {
                             pb_variable<FieldType> umulh_flag;
                             umulh_flag.allocate(pb);
                             return new ALU_umul_gadget<FieldType>(pb, opcode_indicators, desval, arg1val, arg2val, flag,
-                                                                  result, result_flag, umulh_result, umulh_flag,
-                                                                  "ALU_umul_gadget");
+                                                                  result, result_flag, umulh_result, umulh_flag);
                         },
                         [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> std::size_t { return (x * y) % (1ul << w); },
                         [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> bool { return ((x * y) >> w) != 0; });
-                    algebra::print_time("mull tests successful");
                 }
 
                 template<typename FieldType>
                 void test_ALU_umulh_gadget(const std::size_t w) {
-                    algebra::print_time("starting umulh test");
                     brute_force_arithmetic_gadget<ALU_umul_gadget<FieldType>, FieldType>(
                         w,
                         tinyram_opcode_UMULH,
@@ -1477,12 +1441,10 @@ namespace nil {
                             pb_variable<FieldType> mull_flag;
                             mull_flag.allocate(pb);
                             return new ALU_umul_gadget<FieldType>(pb, opcode_indicators, desval, arg1val, arg2val, flag,
-                                                                  mull_result, mull_flag, result, result_flag,
-                                                                  "ALU_umul_gadget");
+                                                                  mull_result, mull_flag, result, result_flag);
                         },
                         [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> std::size_t { return (x * y) >> w; },
                         [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> bool { return ((x * y) >> w) != 0; });
-                    algebra::print_time("umulh tests successful");
                 }
 
                 template<typename FieldType>
@@ -1495,11 +1457,11 @@ namespace nil {
 
                     linear_combination<FieldType> a, b, c;
                     a.add_term(this->arg1val.packed, 1);
-                    a.add_term(this->arg1val.bits[this->pb.ap.w - 1], -(FieldType(2) ^ this->pb.ap.w));
+                    a.add_term(this->arg1val.bits[this->pb.ap.w - 1], -(typename FieldType::value_type(2) ^ this->pb.ap.w));
                     b.add_term(this->arg2val.packed, 1);
-                    b.add_term(this->arg2val.bits[this->pb.ap.w - 1], -(FieldType(2) ^ this->pb.ap.w));
+                    b.add_term(this->arg2val.bits[this->pb.ap.w - 1], -(typename FieldType::value_type(2) ^ this->pb.ap.w));
                     c.add_term(mul_result.packed, 1);
-                    c.add_term(pb_variable<FieldType>(0), -(FieldType(2) ^ (2 * this->pb.ap.w)));
+                    c.add_term(pb_variable<FieldType>(0), -(typename FieldType::value_type(2) ^ (2 * this->pb.ap.w)));
                     this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(a, b, c));
 
                     mul_result.generate_r1cs_constraints(true);
@@ -1543,10 +1505,10 @@ namespace nil {
                     */
                     this->pb.val(mul_result.packed) =
                         (this->pb.val(this->arg1val.packed) -
-                         (this->pb.val(this->arg1val.bits[this->pb.ap.w - 1]) * (FieldType(2) ^ this->pb.ap.w))) *
+                         (this->pb.val(this->arg1val.bits[this->pb.ap.w - 1]) * (typename FieldType::value_type(2) ^ this->pb.ap.w))) *
                             (this->pb.val(this->arg2val.packed) -
-                             (this->pb.val(this->arg2val.bits[this->pb.ap.w - 1]) * (FieldType(2) ^ this->pb.ap.w))) +
-                        (FieldType(2) ^ (2 * this->pb.ap.w));
+                             (this->pb.val(this->arg2val.bits[this->pb.ap.w - 1]) * (typename FieldType::value_type(2) ^ this->pb.ap.w))) +
+                        (typename FieldType::value_type(2) ^ (2 * this->pb.ap.w));
 
                     mul_result.generate_r1cs_witness_from_packed();
 
@@ -1555,7 +1517,7 @@ namespace nil {
 
                     /* compute flag */
                     pack_top->generate_r1cs_witness_from_bits();
-                    std::size_t topval = this->pb.val(top).as_ulong();
+                    std::size_t topval = static_cast<unsigned long>(this->pb.val(top));
 
                     if (topval == 0) {
                         this->pb.val(is_top_empty) = FieldType::one();
@@ -1571,7 +1533,7 @@ namespace nil {
                     } else {
                         this->pb.val(is_top_full) = FieldType::zero();
                         this->pb.val(is_top_full_aux) =
-                            (this->pb.val(top) - FieldType((1ul << (this->pb.ap.w + 1)) - 1)).inverse();
+                            (this->pb.val(top) - typename FieldType::value_type((1ul << (this->pb.ap.w + 1)) - 1)).inverse();
                     }
 
                     /* smulh_flag = 1 - (is_top_full + is_top_empty) */
@@ -1581,7 +1543,6 @@ namespace nil {
 
                 template<typename FieldType>
                 void test_ALU_smulh_gadget(const std::size_t w) {
-                    algebra::print_time("starting smulh test");
                     brute_force_arithmetic_gadget<ALU_smul_gadget<FieldType>, FieldType>(
                         w,
                         tinyram_opcode_SMULH,
@@ -1594,20 +1555,19 @@ namespace nil {
                            pb_variable<FieldType> &result,
                            pb_variable<FieldType> &result_flag) -> ALU_smul_gadget<FieldType> * {
                             return new ALU_smul_gadget<FieldType>(pb, opcode_indicators, desval, arg1val, arg2val, flag,
-                                                                  result, result_flag, "ALU_smul_gadget");
+                                                                  result, result_flag);
                         },
                         [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> std::size_t {
-                            const std::size_t res = algebra::to_twos_complement(
-                                (algebra::from_twos_complement(x, w) * algebra::from_twos_complement(y, w)), 2 * w);
+                            const std::size_t res = detail::to_twos_complement(
+                                (detail::from_twos_complement(x, w) * detail::from_twos_complement(y, w)), 2 * w);
                             return res >> w;
                         },
                         [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> bool {
-                            const int res = algebra::from_twos_complement(x, w) * algebra::from_twos_complement(y, w);
-                            const int truncated_res = algebra::from_twos_complement(
-                                algebra::to_twos_complement(res, 2 * w) & ((1ul << w) - 1), w);
+                            const int res = detail::from_twos_complement(x, w) * detail::from_twos_complement(y, w);
+                            const int truncated_res = detail::from_twos_complement(
+                                detail::to_twos_complement(res, 2 * w) & ((1ul << w) - 1), w);
                             return (res != truncated_res);
                         });
-                    algebra::print_time("smulh tests successful");
                 }
 
                 template<typename FieldType>
@@ -1675,13 +1635,13 @@ namespace nil {
                         this->pb.val(B_inv) = this->pb.val(this->arg2val.packed).inverse();
                         this->pb.val(B_nonzero) = FieldType::one();
 
-                        const std::size_t A = this->pb.val(this->arg1val.packed).as_ulong();
-                        const std::size_t B = this->pb.val(this->arg2val.packed).as_ulong();
+                        std::size_t A = static_cast<unsigned long>(this->pb.val(this->arg1val.packed));
+                        std::size_t B = static_cast<unsigned long>(this->pb.val(this->arg2val.packed));
 
                         this->pb.val(A_aux) = this->pb.val(this->arg1val.packed);
 
-                        this->pb.val(udiv_result) = FieldType(A / B);
-                        this->pb.val(umod_result) = FieldType(A % B);
+                        this->pb.val(udiv_result) = typename FieldType::value_type(A / B);
+                        this->pb.val(umod_result) = typename FieldType::value_type(A % B);
 
                         this->pb.val(udiv_flag) = FieldType::zero();
                         this->pb.val(umod_flag) = FieldType::zero();
@@ -1692,7 +1652,6 @@ namespace nil {
 
                 template<typename FieldType>
                 void test_ALU_udiv_gadget(const std::size_t w) {
-                    algebra::print_time("starting udiv test");
                     brute_force_arithmetic_gadget<ALU_divmod_gadget<FieldType>, FieldType>(
                         w,
                         tinyram_opcode_UDIV,
@@ -1709,17 +1668,14 @@ namespace nil {
                             pb_variable<FieldType> umod_flag;
                             umod_flag.allocate(pb);
                             return new ALU_divmod_gadget<FieldType>(pb, opcode_indicators, desval, arg1val, arg2val,
-                                                                    flag, result, result_flag, umod_result, umod_flag,
-                                                                    "ALU_divmod_gadget");
+                                                                    flag, result, result_flag, umod_result, umod_flag);
                         },
                         [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> std::size_t { return (y == 0 ? 0 : x / y); },
                         [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> bool { return (y == 0); });
-                    algebra::print_time("udiv tests successful");
                 }
 
                 template<typename FieldType>
                 void test_ALU_umod_gadget(const std::size_t w) {
-                    algebra::print_time("starting umod test");
                     brute_force_arithmetic_gadget<ALU_divmod_gadget<FieldType>, FieldType>(
                         w,
                         tinyram_opcode_UMOD,
@@ -1736,12 +1692,10 @@ namespace nil {
                             pb_variable<FieldType> udiv_flag;
                             udiv_flag.allocate(pb);
                             return new ALU_divmod_gadget<FieldType>(pb, opcode_indicators, desval, arg1val, arg2val,
-                                                                    flag, udiv_result, udiv_flag, result, result_flag,
-                                                                    "ALU_divmod_gadget");
+                                                                    flag, udiv_result, udiv_flag, result, result_flag);
                         },
                         [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> std::size_t { return (y == 0 ? 0 : x % y); },
                         [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> bool { return (y == 0); });
-                    algebra::print_time("umod tests successful");
                 }
 
                 template<typename FieldType>
@@ -1781,9 +1735,9 @@ namespace nil {
                         */
                         linear_combination<FieldType> a, b, c;
 
-                        a.add_term(barrel_right_internal[i + 1], (FieldType(2) ^ (i + 1)) - FieldType::one());
+                        a.add_term(barrel_right_internal[i + 1], (typename FieldType::value_type(2) ^ (i + 1)) - FieldType::one());
                         for (std::size_t j = 0; j < 1ul << i; ++j) {
-                            a.add_term(shifted_out_bits[i][j], (FieldType(2) ^ j));
+                            a.add_term(shifted_out_bits[i][j], (typename FieldType::value_type(2) ^ j));
                         }
 
                         b.add_term(this->arg2val.bits[i], 1);
@@ -1853,7 +1807,7 @@ namespace nil {
                         this->pb.val(barrel_right_internal[i + 1]) =
                             (this->pb.val(this->arg2val.bits[i]) == FieldType::zero()) ?
                                 this->pb.val(barrel_right_internal[i]) :
-                                FieldType(this->pb.val(barrel_right_internal[i]).as_ulong() >> (i + 1));
+                                typename FieldType::value_type(this->pb.val(barrel_right_internal[i]).as_ulong() >> (i + 1));
 
                         shifted_out_bits[i].fill_with_bits_of_ulong(
                             this->pb, this->pb.val(barrel_right_internal[i]).as_ulong() % (2u << i));
@@ -1891,7 +1845,6 @@ namespace nil {
 
                 template<typename FieldType>
                 void test_ALU_shr_gadget(const std::size_t w) {
-                    algebra::print_time("starting shr test");
                     brute_force_arithmetic_gadget<ALU_shr_shl_gadget<FieldType>, FieldType>(
                         w,
                         tinyram_opcode_SHR,
@@ -1908,17 +1861,14 @@ namespace nil {
                             pb_variable<FieldType> shl_flag;
                             shl_flag.allocate(pb);
                             return new ALU_shr_shl_gadget<FieldType>(pb, opcode_indicators, desval, arg1val, arg2val,
-                                                                     flag, result, result_flag, shl_result, shl_flag,
-                                                                     "ALU_shr_shl_gadget");
+                                                                     flag, result, result_flag, shl_result, shl_flag);
                         },
                         [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> std::size_t { return (x >> y); },
                         [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> bool { return (x & 1); });
-                    algebra::print_time("shr tests successful");
                 }
 
                 template<typename FieldType>
                 void test_ALU_shl_gadget(const std::size_t w) {
-                    algebra::print_time("starting shl test");
                     brute_force_arithmetic_gadget<ALU_shr_shl_gadget<FieldType>, FieldType>(
                         w,
                         tinyram_opcode_SHL,
@@ -1935,14 +1885,11 @@ namespace nil {
                             pb_variable<FieldType> shr_flag;
                             shr_flag.allocate(pb);
                             return new ALU_shr_shl_gadget<FieldType>(pb, opcode_indicators, desval, arg1val, arg2val,
-                                                                     flag, shr_result, shr_flag, result, result_flag,
-                                                                     "ALU_shr_shl_gadget");
+                                                                     flag, shr_result, shr_flag, result, result_flag);
                         },
                         [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> std::size_t { return (x << y) & ((1ul << w) - 1); },
                         [w](std::size_t des, bool f, std::size_t x, std::size_t y) -> bool { return (x >> (w - 1)); });
-                    algebra::print_time("shl tests successful");
                 }
-
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3

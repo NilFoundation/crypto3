@@ -371,7 +371,7 @@ namespace nil {
 
                     pb.add_r1cs_constraint(r1cs_constraint<FieldType>(1, arity, compliance_predicate_arity));
                     pb.add_r1cs_constraint(
-                        r1cs_constraint<FieldType>(1, outgoing_message_type, FieldType(compliance_predicate.type)));
+                        r1cs_constraint<FieldType>(1, outgoing_message_type, typename FieldType::value_type(compliance_predicate.type)));
                 }
 
                 template<typename ppT>
@@ -407,7 +407,7 @@ namespace nil {
                         compliance_predicate_primary_input.as_r1cs_primary_input(),
                         compliance_predicate_auxiliary_input.as_r1cs_auxiliary_input(
                             compliance_predicate.incoming_message_payload_lengths));
-                    this->pb.val(arity) = FieldType(compliance_predicate_arity);
+                    this->pb.val(arity) = typename FieldType::value_type(compliance_predicate_arity);
                     unpack_outgoing_message->generate_r1cs_witness_from_packed();
                     for (std::size_t i = 0; i < compliance_predicate_arity; ++i) {
                         unpack_incoming_messages[i].generate_r1cs_witness_from_packed();

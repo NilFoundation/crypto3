@@ -139,7 +139,7 @@ namespace nil {
                     /* packed_load_addr = 2 * x + next_pc_addr */
                     packed_load_addr.allocate(pb);
                     compute_packed_load_addr.reset(new bar_gadget<FieldType>(
-                        pb, prev_pc_val, FieldType(2), next_pc_addr, FieldType::one(), packed_load_addr));
+                        pb, prev_pc_val, typename FieldType::value_type(2), next_pc_addr, FieldType::one(), packed_load_addr));
 
                     /*
                       packed_ls_addr = x0 * packed_load_addr + (1-x0) * packed_store_addr
@@ -252,10 +252,10 @@ namespace nil {
 
                 template<typename FieldType>
                 void fooram_cpu_checker<FieldType>::generate_r1cs_witness_other(
-                    fooram_input_tape_iterator &aux_it,
-                    const fooram_input_tape_iterator &aux_end) {
+                    BOOST_ATTRIBUTE_UNUSED fooram_input_tape_iterator &aux_it,
+                    BOOST_ATTRIBUTE_UNUSED const fooram_input_tape_iterator &aux_end) {
                     /* fooram memory contents do not depend on program/input. */
-                    BOOST_ATTRIBUTE_UNUSED(aux_it, aux_end);
+
                     /* packed_store_val = prev_state_bits + prev_pc_addr */
                     compute_packed_store_val->generate_r1cs_witness();
 

@@ -78,7 +78,7 @@ namespace nil {
                         }
                     }
 
-                    void fill_with_field_elements(protoboard<FieldType> &pb, const std::vector<FieldType> &vals) const {
+                    void fill_with_field_elements(protoboard<FieldType> &pb, const std::vector<typename FieldType::value_type> &vals) const {
                         assert(this->size() == vals.size());
                         for (std::size_t i = 0; i < vals.size(); ++i) {
                             pb.val((*this)[i]) = vals[i];
@@ -93,7 +93,7 @@ namespace nil {
                     }
 
                     void fill_with_bits_of_ulong(protoboard<FieldType> &pb, const unsigned long i) const {
-                        this->fill_with_bits_of_field_element(pb, FieldType(i, true));
+                        this->fill_with_bits_of_field_element(pb, typename FieldType::value_type(i, true));
                     }
 
                     void fill_with_bits_of_field_element(protoboard<FieldType> &pb,
@@ -243,7 +243,7 @@ namespace nil {
                         }
                     }
 
-                    void fill_with_field_elements(protoboard<FieldType> &pb, const std::vector<FieldType> &vals) const {
+                    void fill_with_field_elements(protoboard<FieldType> &pb, const std::vector<typename FieldType::value_type> &vals) const {
                         assert(this->size() == vals.size());
                         for (std::size_t i = 0; i < vals.size(); ++i) {
                             pb.lc_val((*this)[i]) = vals[i];
@@ -258,7 +258,7 @@ namespace nil {
                     }
 
                     void fill_with_bits_of_ulong(protoboard<FieldType> &pb, const unsigned long i) const {
-                        this->fill_with_bits_of_field_element(pb, FieldType(i));
+                        this->fill_with_bits_of_field_element(pb, typename FieldType::value_type(i));
                     }
 
                     void fill_with_bits_of_field_element(protoboard<FieldType> &pb,
@@ -328,7 +328,7 @@ namespace nil {
 
                 template<typename FieldType>
                 linear_combination<FieldType> pb_coeff_sum(const pb_linear_combination_array<FieldType> &v,
-                                                           const std::vector<FieldType> &coeffs) {
+                                                           const std::vector<typename FieldType::value_type> &coeffs) {
                     assert(v.size() == coeffs.size());
                     std::vector<linear_term<FieldType>> all_terms;
 

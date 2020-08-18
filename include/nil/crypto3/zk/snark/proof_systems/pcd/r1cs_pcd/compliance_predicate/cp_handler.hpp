@@ -180,8 +180,8 @@ namespace nil {
                     const std::vector<std::shared_ptr<r1cs_pcd_message<FieldType>>> &incoming_message_values,
                     const std::shared_ptr<r1cs_pcd_local_data<FieldType>> &local_data_value) {
                     pb.clear_values();
-                    pb.val(outgoing_message->type) = FieldType(type);
-                    pb.val(arity) = FieldType(incoming_message_values.size());
+                    pb.val(outgoing_message->type) = typename FieldType::value_type(type);
+                    pb.val(arity) = typename FieldType::value_type(incoming_message_values.size());
 
                     for (std::size_t i = 0; i < incoming_message_values.size(); ++i) {
                         incoming_messages[i]->generate_r1cs_witness(incoming_message_values[i]);

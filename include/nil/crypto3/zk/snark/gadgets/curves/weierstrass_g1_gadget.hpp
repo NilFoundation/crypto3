@@ -177,7 +177,7 @@ namespace nil {
 
                 template<typename ppT>
                 std::size_t G1_variable<ppT>::size_in_bits() {
-                    return 2 * FieldType::size_in_bits();
+                    return 2 * FieldType::modulus_bits;
                 }
 
                 template<typename ppT>
@@ -283,9 +283,9 @@ namespace nil {
                 void G1_dbl_gadget<ppT>::generate_r1cs_witness() {
                     this->pb.val(Xsquared) = this->pb.lc_val(A.X).squared();
                     this->pb.val(lambda) =
-                        (FieldType(3) * this->pb.val(Xsquared) + algebra::G1<other_curve<ppT>>::coeff_a) *
-                        (FieldType(2) * this->pb.lc_val(A.Y)).inverse();
-                    this->pb.lc_val(B.X) = this->pb.val(lambda).squared() - FieldType(2) * this->pb.lc_val(A.X);
+                        (typename FieldType::value_type(3) * this->pb.val(Xsquared) + algebra::G1<other_curve<ppT>>::coeff_a) *
+                        (typename FieldType::value_type(2) * this->pb.lc_val(A.Y)).inverse();
+                    this->pb.lc_val(B.X) = this->pb.val(lambda).squared() - typename FieldType::value_type(2) * this->pb.lc_val(A.X);
                     this->pb.lc_val(B.Y) =
                         this->pb.val(lambda) * (this->pb.lc_val(A.X) - this->pb.lc_val(B.X)) - this->pb.lc_val(A.Y);
                 }

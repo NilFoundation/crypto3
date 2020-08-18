@@ -249,7 +249,7 @@ namespace nil {
                     /* ensure increasing timestamps */
                     for (std::size_t i = 0; i < num_memory_lines; ++i) {
                         generate_r1cs_equals_const_constraint<FieldType>(
-                            this->pb, unrouted_memory_lines[i]->timestamp->packed, FieldType(i));
+                            this->pb, unrouted_memory_lines[i]->timestamp->packed, typename FieldType::value_type(i));
                     }
 
                     /* ensure bitness of trace lines on the time side */
@@ -289,7 +289,7 @@ namespace nil {
 
                     /* ensure that PC started at the prescribed value */
                     generate_r1cs_equals_const_constraint<FieldType>(
-                        this->pb, load_instruction_lines[0].address->packed, FieldType(this->pb.ap.initial_pc_addr()));
+                        this->pb, load_instruction_lines[0].address->packed, typename FieldType::value_type(this->pb.ap.initial_pc_addr()));
 
                     /* ensure that the last state was an accepting one */
                     generate_r1cs_equals_const_constraint<FieldType>(this->pb, execution_lines[time_bound].has_accepted,
@@ -305,7 +305,7 @@ namespace nil {
                                                                        const ram_input_tape<ramT> &auxiliary_input) {
                     /* assign correct timestamps to all lines */
                     for (std::size_t i = 0; i < num_memory_lines; ++i) {
-                        this->pb.val(unrouted_memory_lines[i]->timestamp->packed) = FieldType(i);
+                        this->pb.val(unrouted_memory_lines[i]->timestamp->packed) = typename FieldType::value_type(i);
                         unrouted_memory_lines[i]->timestamp->generate_r1cs_witness_from_packed();
                     }
 
@@ -322,8 +322,8 @@ namespace nil {
                         const std::size_t address = it.second.first;
                         const std::size_t contents = it.second.second;
 
-                        this->pb.val(boot_lines[boot_pos].address->packed) = FieldType(address, true);
-                        this->pb.val(boot_lines[boot_pos].contents_after->packed) = FieldType(contents, true);
+                        this->pb.val(boot_lines[boot_pos].address->packed) = typename FieldType::value_type(address, true);
+                        this->pb.val(boot_lines[boot_pos].contents_after->packed) = typename FieldType::value_type(contents, true);
                         boot_lines[boot_pos].generate_r1cs_witness_from_packed();
 
                         memory_after_boot[address] = contents;
@@ -335,7 +335,7 @@ namespace nil {
                     typename ram_input_tape<ramT>::const_iterator auxiliary_input_it = auxiliary_input.begin();
 
                     this->pb.val(load_instruction_lines[0].address->packed) =
-                        FieldType(this->pb.ap.initial_pc_addr(), true);
+                        typename FieldType::value_type(this->pb.ap.initial_pc_addr(), true);
                     load_instruction_lines[0].address->generate_r1cs_witness_from_packed();
 
                     for (std::size_t i = 0; i < time_bound; ++i) {
@@ -343,8 +343,8 @@ namespace nil {
                         const std::size_t pc_addr = this->pb.val(load_instruction_lines[i].address->packed).as_ulong();
                         const std::size_t pc_val = mem_backend.get_value(pc_addr);
 
-                        this->pb.val(load_instruction_lines[i].contents_before->packed) = FieldType(pc_val, true);
-                        this->pb.val(load_instruction_lines[i].contents_after->packed) = FieldType(pc_val, true);
+                        this->pb.val(load_instruction_lines[i].contents_before->packed) = typename FieldType::value_type(pc_val, true);
+                        this->pb.val(load_instruction_lines[i].contents_after->packed) = typename FieldType::value_type(pc_val, true);
                         load_instruction_lines[i].generate_r1cs_witness_from_packed();
 
                         /* first fetch the address part of the memory */
@@ -356,7 +356,7 @@ namespace nil {
                         const std::size_t load_store_prev_val = mem_backend.get_value(load_store_addr);
 
                         this->pb.val(execution_lines[i + 1].contents_before->packed) =
-                            FieldType(load_store_prev_val, true);
+                            typename FieldType::value_type(load_store_prev_val, true);
                         execution_lines[i + 1].contents_before->generate_r1cs_witness_from_packed();
 
                         /* then execute the rest of the instruction */

@@ -62,11 +62,9 @@ namespace nil {
 
                     /* return a pair consisting of the accumulated value and the sparse vector of non-accumulated values
                      */
-                    template<typename FieldType>
+                    template<typename InputIterator>
                     std::pair<T, sparse_vector<T>>
-                        accumulate(const typename std::vector<FieldType>::const_iterator &it_begin,
-                                   const typename std::vector<FieldType>::const_iterator &it_end,
-                                   const std::size_t offset) const;
+                        accumulate(InputIterator it_begin, InputIterator it_end, std::size_t offset) const;
 
                     friend std::ostream &operator<<<T>(std::ostream &out, const sparse_vector<T> &v);
                     friend std::istream &operator>><T>(std::istream &in, sparse_vector<T> &v);
@@ -199,14 +197,13 @@ namespace nil {
                 }
 
                 template<typename T>
-                template<typename FieldType>
-                std::pair<T, sparse_vector<T>>
-                    sparse_vector<T>::accumulate(const typename std::vector<FieldType>::const_iterator &it_begin,
-                                                 const typename std::vector<FieldType>::const_iterator &it_end,
-                                                 const std::size_t offset) const {
+                template<typename InputIterator>
+                std::pair<T, sparse_vector<T>> sparse_vector<T>::accumulate(InputIterator it_begin,
+                                                                            InputIterator it_end,
+                                                                            std::size_t offset) const {
 #ifdef MULTICORE
-                    const std::size_t chunks = omp_get_max_threads();    // to override, set OMP_NUM_THREADS env var or call
-                                                                    // omp_set_num_threads()
+                    const std::size_t chunks = omp_get_max_threads();    // to override, set OMP_NUM_THREADS env var or
+                                                                         // call omp_set_num_threads()
 #else
                     const std::size_t chunks = 1;
 #endif
@@ -237,13 +234,11 @@ namespace nil {
                                 in_block = false;
                                 copy_over = true;
 
-#ifdef DEBUG
-                                algebra::print_indent();
-                                printf("doing multiexp for w_%zu ... w_%zu\n", indices[first_pos], indices[last_pos]);
-#endif
                                 accumulated_value =
                                     accumulated_value +
-                                    algebra::multi_exp<T, FieldType, algebra::multi_exp_method_bos_coster>(
+                                    algebra::multi_exp<T, typename
+                                    std::iterator_traits<InputIterator>::value_type::field_type,
+                                                       algebra::multi_exp_method_bos_coster>(
                                         values.begin() + first_pos,
                                         values.begin() + last_pos + 1,
                                         it_begin + (indices[first_pos] - offset),
@@ -269,12 +264,9 @@ namespace nil {
                     }
 
                     if (in_block) {
-#ifdef DEBUG
-                        algebra::print_indent();
-                        printf("doing multiexp for w_%zu ... w_%zu\n", indices[first_pos], indices[last_pos]);
-#endif
                         accumulated_value =
-                            accumulated_value + algebra::multi_exp<T, FieldType, algebra::multi_exp_method_bos_coster>(
+                            accumulated_value + algebra::multi_exp<T, typename
+                            std::iterator_traits<InputIterator>::value_type::field_type, algebra::multi_exp_method_bos_coster>(
                                                     values.begin() + first_pos,
                                                     values.begin() + last_pos + 1,
                                                     it_begin + (indices[first_pos] - offset),

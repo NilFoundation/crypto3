@@ -21,8 +21,8 @@ namespace nil {
         namespace zk {
             namespace snark {
 
-                template<typename FieldType, typename HashT>
-                using memory_load_store_gadget = merkle_tree_check_update_gadget<FieldType, HashT>;
+                template<typename FieldType, typename Hash>
+                using memory_load_store_gadget = merkle_tree_check_update_gadget<FieldType, Hash>;
 
             }
         }    // namespace zk

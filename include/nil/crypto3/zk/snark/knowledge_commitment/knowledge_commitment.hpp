@@ -11,7 +11,7 @@
 
 #include <nil/algebra/fields/fp.hpp>
 
-#include <nil/crypto3/zk/snark/data_structures/sparse_vector.hpp>
+#include <nil/crypto3/zk/snark/detail/sparse_vector.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -41,7 +41,7 @@ namespace nil {
                     knowledge_commitment<T1, T2>(const T1 &g, const T2 &h);
 
                     knowledge_commitment<T1, T2> &operator=(const knowledge_commitment<T1, T2> &other) = default;
-                    knowledge_commitment<T1, T2> &operator=(knowledge_commitment<T1, T2> &&other) = default;
+                    knowledge_commitment<T1, T2> &operator=(knowledge_commitment<T1, T2> &&other) noexcept = default;
                     knowledge_commitment<T1, T2> operator+(const knowledge_commitment<T1, T2> &other) const;
                     knowledge_commitment<T1, T2> mixed_add(const knowledge_commitment<T1, T2> &other) const;
                     knowledge_commitment<T1, T2> dbl() const;
@@ -64,15 +64,18 @@ namespace nil {
                 };
 
                 template<typename T1, typename T2, typename Backend,
-                    boost::multiprecision::expression_template_option ExpressionTemplates>
-                knowledge_commitment<T1, T2> operator*(const boost::multiprecision::number<Backend,
-                                                       ExpressionTemplates>
-                    &lhs,
-                                                       const knowledge_commitment<T1, T2> &rhs);
+                         boost::multiprecision::expression_template_option ExpressionTemplates>
+                knowledge_commitment<T1, T2>
+                    operator*(const boost::multiprecision::number<Backend, ExpressionTemplates> &lhs,
+                              const knowledge_commitment<T1, T2> &rhs) {
+                    return knowledge_commitment<T1, T2>(lhs * rhs.g, lhs * rhs.h);
+                }
 
-                template<typename T1, typename T2, mp_std::size_t m, const algebra::bigint<m> &modulus_p>
-                knowledge_commitment<T1, T2> operator*(const algebra::Fp_model<m, modulus_p> &lhs,
-                                                       const knowledge_commitment<T1, T2> &rhs);
+                template<typename T1, typename T2, typename FieldType>
+                knowledge_commitment<T1, T2> operator*(const typename FieldType::value_type &lhs,
+                                                       const knowledge_commitment<T1, T2> &rhs) {
+                    return lhs * rhs;
+                }
 
                 template<typename T1, typename T2>
                 std::ostream &operator<<(std::ostream &out, const knowledge_commitment<T1, T2> &kc);
@@ -143,21 +146,6 @@ namespace nil {
                 template<typename T1, typename T2>
                 bool knowledge_commitment<T1, T2>::operator!=(const knowledge_commitment<T1, T2> &other) const {
                     return !((*this) == other);
-                }
-
-                template<typename T1, typename T2, typename Backend,
-                    boost::multiprecision::expression_template_option ExpressionTemplates>
-                knowledge_commitment<T1, T2> operator*(const boost::multiprecision::number<Backend,
-                                                       ExpressionTemplates>
-                    &lhs,
-                                                       const knowledge_commitment<T1, T2> &rhs) {
-                    return knowledge_commitment<T1, T2>(lhs * rhs.g, lhs * rhs.h);
-                }
-
-                template<typename T1, typename T2, mp_std::size_t m, const algebra::bigint<m> &modulus_p>
-                knowledge_commitment<T1, T2> operator*(const algebra::Fp_model<m, modulus_p> &lhs,
-                                                       const knowledge_commitment<T1, T2> &rhs) {
-                    return (lhs.as_bigint()) * rhs;
                 }
 
                 template<typename T1, typename T2>

@@ -352,27 +352,30 @@ namespace nil {
                        b) store.b
                        c) store.w
                        d) load.w or any non-memory instruction */
-                    const std::size_t prev_doubleword = this->pb.val(ls_prev_val_as_doubleword_variable->packed).as_ulong();
+                    const std::size_t prev_doubleword =
+                        this->pb.val(ls_prev_val_as_doubleword_variable->packed).as_ulong();
                     const std::size_t subaddress = this->pb.val(memory_subaddress->packed).as_ulong();
 
                     if (this->pb.val(opcode_indicators[tinyram_opcode_LOADB]) == FieldType::one()) {
                         const std::size_t loaded_byte = (prev_doubleword >> (8u * subaddress)) & 0xFF;
-                        this->pb.val(instruction_results[tinyram_opcode_LOADB]) = FieldType(loaded_byte);
-                        this->pb.val(memory_subcontents) = FieldType(loaded_byte);
+                        this->pb.val(instruction_results[tinyram_opcode_LOADB]) =
+                            typename FieldType::value_type(loaded_byte);
+                        this->pb.val(memory_subcontents) = typename FieldType::value_type(loaded_byte);
                     } else if (this->pb.val(opcode_indicators[tinyram_opcode_STOREB]) == FieldType::one()) {
-                        const std::size_t stored_byte = (this->pb.val(desval->packed).as_ulong()) & 0xFF;
-                        this->pb.val(memory_subcontents) = FieldType(stored_byte);
+                        const std::size_t stored_byte = (static_cast<unsigned long>(this->pb.val(desval->packed))
+                                                                           ) & 0xFF;
+                        this->pb.val(memory_subcontents) = typename FieldType::value_type(stored_byte);
                     } else if (this->pb.val(opcode_indicators[tinyram_opcode_STOREW]) == FieldType::one()) {
-                        const std::size_t stored_word = (this->pb.val(desval->packed).as_ulong());
-                        this->pb.val(memory_subcontents) = FieldType(stored_word);
+                        const std::size_t stored_word = (static_cast<unsigned long>(this->pb.val(desval->packed)));
+                        this->pb.val(memory_subcontents) = typename FieldType::value_type(stored_word);
                     } else {
                         const bool access_is_word0 =
                             (this->pb.val(*memory_subaddress->bits.rbegin()) == FieldType::zero());
                         const std::size_t loaded_word =
                             (prev_doubleword >> (access_is_word0 ? 0 : this->pb.ap.w)) & ((1ul << this->pb.ap.w) - 1);
-                        this->pb.val(instruction_results[tinyram_opcode_LOADW]) =
-                            FieldType(loaded_word); /* does not hurt even for non-memory instructions */
-                        this->pb.val(memory_subcontents) = FieldType(loaded_word);
+                        this->pb.val(instruction_results[tinyram_opcode_LOADW]) = typename FieldType::value_type(
+                            loaded_word); /* does not hurt even for non-memory instructions */
+                        this->pb.val(memory_subcontents) = typename FieldType::value_type(loaded_word);
                     }
 
                     memory_access_is_word.evaluate(this->pb);
@@ -397,7 +400,7 @@ namespace nil {
                     } else {
                         /* otherwise perform the actual read */
                         if (aux_it != aux_end) {
-                            this->pb.val(instruction_results[tinyram_opcode_READ]) = FieldType(*aux_it);
+                            this->pb.val(instruction_results[tinyram_opcode_READ]) = typename FieldType::value_type(*aux_it);
                             if (++aux_it == aux_end) {
                                 /* tape has ended! */
                                 this->pb.val(next_tape1_exhausted) = FieldType::one();
@@ -431,16 +434,16 @@ namespace nil {
                 template<typename FieldType>
                 void tinyram_cpu_checker<FieldType>::dump() const {
                     printf("   pc = %lu, flag = %lu\n",
-                           this->pb.val(prev_pc_addr_as_word_variable->packed).as_ulong(),
-                           this->pb.val(prev_flag).as_ulong());
+                        static_cast<unsigned long>(this->pb.val(prev_pc_addr_as_word_variable->packed)),
+                        static_cast<unsigned long>(this->pb.val(prev_flag)));
                     printf("   ");
 
                     for (std::size_t j = 0; j < this->pb.ap.k; ++j) {
-                        printf("r%zu = %2lu ", j, this->pb.val(prev_registers[j].packed).as_ulong());
+                        printf("r%zu = %2lu ", j, static_cast<unsigned long>(this->pb.val(prev_registers[j].packed)));
                     }
                     printf("\n");
 
-                    const std::size_t opcode_val = opcode.get_field_element_from_bits(this->pb).as_ulong();
+                    std::size_t opcode_val = static_cast<unsigned long>(opcode.get_field_element_from_bits(this->pb));
                     printf("   %s r%lu, r%lu, %s%lu\n",
                            tinyram_opcode_names[static_cast<tinyram_opcode>(opcode_val)].c_str(),
                            desidx.get_field_element_from_bits(this->pb).as_ulong(),

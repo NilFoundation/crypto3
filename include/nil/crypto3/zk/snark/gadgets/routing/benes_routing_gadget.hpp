@@ -200,7 +200,7 @@ namespace nil {
 
                             if (num_subpackets > 1) {
                                 this->pb.val(benes_switch_bits[column_idx][packet_idx]) =
-                                    FieldType(routing[column_idx][packet_idx] ? 1 : 0);
+                                    typename FieldType::value_type(routing[column_idx][packet_idx] ? 1 : 0);
                             }
 
                             for (std::size_t subpacket_idx = 0; subpacket_idx < num_subpackets; ++subpacket_idx) {
@@ -249,7 +249,7 @@ namespace nil {
                         }
                     }
 
-                    pb.val(pb_variable<FieldType>(10)) = FieldType(12345);
+                    pb.val(pb_variable<FieldType>(10)) = typename FieldType::value_type(12345);
                     assert(!pb.is_satisfied());
                 }
             }    // namespace snark

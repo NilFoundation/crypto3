@@ -107,9 +107,9 @@ namespace nil {
                     const std::size_t contents = av.second;
 
                     const std::vector<bool> address_bits = algebra::convert_field_element_to_bit_vector<FieldType>(
-                        FieldType(address, true), ap.address_size());
+                        typename FieldType::value_type(address, true), ap.address_size());
                     const std::vector<bool> contents_bits = algebra::convert_field_element_to_bit_vector<FieldType>(
-                        FieldType(contents, true), ap.value_size());
+                        typename FieldType::value_type(contents, true), ap.value_size());
 
                     std::vector<bool> trace_element_bits;
                     trace_element_bits.insert(trace_element_bits.end(), address_bits.begin(), address_bits.end());

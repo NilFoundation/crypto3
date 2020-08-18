@@ -28,15 +28,15 @@ namespace nil {
         namespace zk {
             namespace snark {
 
-                template<typename FieldType, typename HashT>
+                template<typename FieldType, typename Hash>
                 class merkle_tree_check_update_gadget : public gadget<FieldType> {
                 private:
-                    std::vector<HashT> prev_hashers;
+                    std::vector<Hash> prev_hashers;
                     std::vector<block_variable<FieldType>> prev_hasher_inputs;
                     std::vector<digest_selector_gadget<FieldType>> prev_propagators;
                     std::vector<digest_variable<FieldType>> prev_internal_output;
 
-                    std::vector<HashT> next_hashers;
+                    std::vector<Hash> next_hashers;
                     std::vector<block_variable<FieldType>> next_hasher_inputs;
                     std::vector<digest_selector_gadget<FieldType>> next_propagators;
                     std::vector<digest_variable<FieldType>> next_internal_output;
@@ -51,10 +51,10 @@ namespace nil {
                     pb_variable_array<FieldType> address_bits;
                     digest_variable<FieldType> prev_leaf_digest;
                     digest_variable<FieldType> prev_root_digest;
-                    merkle_authentication_path_variable<FieldType, HashT> prev_path;
+                    merkle_authentication_path_variable<FieldType, Hash> prev_path;
                     digest_variable<FieldType> next_leaf_digest;
                     digest_variable<FieldType> next_root_digest;
-                    merkle_authentication_path_variable<FieldType, HashT> next_path;
+                    merkle_authentication_path_variable<FieldType, Hash> next_path;
                     pb_linear_combination<FieldType> update_successful;
 
                     /* Note that while it is necessary to generate R1CS constraints
@@ -67,10 +67,10 @@ namespace nil {
                         const pb_variable_array<FieldType> &address_bits,
                         const digest_variable<FieldType> &prev_leaf_digest,
                         const digest_variable<FieldType> &prev_root_digest,
-                        const merkle_authentication_path_variable<FieldType, HashT> &prev_path,
+                        const merkle_authentication_path_variable<FieldType, Hash> &prev_path,
                         const digest_variable<FieldType> &next_leaf_digest,
                         const digest_variable<FieldType> &next_root_digest,
-                        const merkle_authentication_path_variable<FieldType, HashT> &next_path,
+                        const merkle_authentication_path_variable<FieldType, Hash> &next_path,
                         const pb_linear_combination<FieldType> &update_successful);
 
                     void generate_r1cs_constraints();
@@ -81,23 +81,23 @@ namespace nil {
                     static std::size_t expected_constraints(const std::size_t tree_depth);
                 };
 
-                template<typename FieldType, typename HashT>
+                template<typename FieldType, typename Hash>
                 void test_merkle_tree_check_update_gadget();
 
-                template<typename FieldType, typename HashT>
-                merkle_tree_check_update_gadget<FieldType, HashT>::merkle_tree_check_update_gadget(
+                template<typename FieldType, typename Hash>
+                merkle_tree_check_update_gadget<FieldType, Hash>::merkle_tree_check_update_gadget(
                     protoboard<FieldType> &pb,
                     const std::size_t tree_depth,
                     const pb_variable_array<FieldType> &address_bits,
                     const digest_variable<FieldType> &prev_leaf_digest,
                     const digest_variable<FieldType> &prev_root_digest,
-                    const merkle_authentication_path_variable<FieldType, HashT> &prev_path,
+                    const merkle_authentication_path_variable<FieldType, Hash> &prev_path,
                     const digest_variable<FieldType> &next_leaf_digest,
                     const digest_variable<FieldType> &next_root_digest,
-                    const merkle_authentication_path_variable<FieldType, HashT> &next_path,
+                    const merkle_authentication_path_variable<FieldType, Hash> &next_path,
                     const pb_linear_combination<FieldType> &update_successful) :
                     gadget<FieldType>(pb),
-                    digest_size(HashT::get_digest_len()), tree_depth(tree_depth), address_bits(address_bits),
+                    digest_size(Hash::get_digest_len()), tree_depth(tree_depth), address_bits(address_bits),
                     prev_leaf_digest(prev_leaf_digest), prev_root_digest(prev_root_digest), prev_path(prev_path),
                     next_leaf_digest(next_leaf_digest), next_root_digest(next_root_digest), next_path(next_path),
                     update_successful(update_successful) {
@@ -114,12 +114,12 @@ namespace nil {
                     for (std::size_t i = 0; i < tree_depth; ++i) {
                         block_variable<FieldType> prev_inp(pb, prev_path.left_digests[i], prev_path.right_digests[i]);
                         prev_hasher_inputs.emplace_back(prev_inp);
-                        prev_hashers.emplace_back(HashT(pb, 2 * digest_size, prev_inp,
+                        prev_hashers.emplace_back(Hash(pb, 2 * digest_size, prev_inp,
                                                         (i == 0 ? prev_root_digest : prev_internal_output[i - 1])));
 
                         block_variable<FieldType> next_inp(pb, next_path.left_digests[i], next_path.right_digests[i]);
                         next_hasher_inputs.emplace_back(next_inp);
-                        next_hashers.emplace_back(HashT(pb, 2 * digest_size, next_inp,
+                        next_hashers.emplace_back(Hash(pb, 2 * digest_size, next_inp,
                                                         (i == 0 ? *computed_next_root : next_internal_output[i - 1])));
                     }
 
@@ -136,8 +136,8 @@ namespace nil {
                         pb, computed_next_root->bits, next_root_digest.bits, update_successful, FieldType::capacity()));
                 }
 
-                template<typename FieldType, typename HashT>
-                void merkle_tree_check_update_gadget<FieldType, HashT>::generate_r1cs_constraints() {
+                template<typename FieldType, typename Hash>
+                void merkle_tree_check_update_gadget<FieldType, Hash>::generate_r1cs_constraints() {
                     /* ensure correct hash computations */
                     for (std::size_t i = 0; i < tree_depth; ++i) {
                         prev_hashers[i].generate_r1cs_constraints(
@@ -182,8 +182,8 @@ namespace nil {
                     check_next_root->generate_r1cs_constraints(false, false);
                 }
 
-                template<typename FieldType, typename HashT>
-                void merkle_tree_check_update_gadget<FieldType, HashT>::generate_r1cs_witness() {
+                template<typename FieldType, typename Hash>
+                void merkle_tree_check_update_gadget<FieldType, Hash>::generate_r1cs_witness() {
                     /* do the hash computations bottom-up */
                     for (int i = tree_depth - 1; i >= 0; --i) {
                         /* ensure consistency of prev_path and next_path */
@@ -205,33 +205,33 @@ namespace nil {
                     check_next_root->generate_r1cs_witness();
                 }
 
-                template<typename FieldType, typename HashT>
-                std::size_t merkle_tree_check_update_gadget<FieldType, HashT>::root_size_in_bits() {
-                    return HashT::get_digest_len();
+                template<typename FieldType, typename Hash>
+                std::size_t merkle_tree_check_update_gadget<FieldType, Hash>::root_size_in_bits() {
+                    return Hash::get_digest_len();
                 }
 
-                template<typename FieldType, typename HashT>
+                template<typename FieldType, typename Hash>
                 std::size_t
-                    merkle_tree_check_update_gadget<FieldType, HashT>::expected_constraints(const std::size_t tree_depth) {
+                    merkle_tree_check_update_gadget<FieldType, Hash>::expected_constraints(const std::size_t tree_depth) {
                     /* NB: this includes path constraints */
-                    const std::size_t prev_hasher_constraints = tree_depth * HashT::expected_constraints(false);
-                    const std::size_t next_hasher_constraints = tree_depth * HashT::expected_constraints(true);
-                    const std::size_t prev_authentication_path_constraints = 2 * tree_depth * HashT::get_digest_len();
-                    const std::size_t prev_propagator_constraints = tree_depth * HashT::get_digest_len();
-                    const std::size_t next_propagator_constraints = tree_depth * HashT::get_digest_len();
+                    const std::size_t prev_hasher_constraints = tree_depth * Hash::expected_constraints(false);
+                    const std::size_t next_hasher_constraints = tree_depth * Hash::expected_constraints(true);
+                    const std::size_t prev_authentication_path_constraints = 2 * tree_depth * Hash::get_digest_len();
+                    const std::size_t prev_propagator_constraints = tree_depth * Hash::get_digest_len();
+                    const std::size_t next_propagator_constraints = tree_depth * Hash::get_digest_len();
                     const std::size_t check_next_root_constraints =
-                        3 * (HashT::get_digest_len() + (FieldType::capacity()) - 1) / FieldType::capacity();
-                    const std::size_t aux_equality_constraints = tree_depth * HashT::get_digest_len();
+                        3 * (Hash::get_digest_len() + (FieldType::capacity()) - 1) / FieldType::capacity();
+                    const std::size_t aux_equality_constraints = tree_depth * Hash::get_digest_len();
 
                     return (prev_hasher_constraints + next_hasher_constraints + prev_authentication_path_constraints +
                             prev_propagator_constraints + next_propagator_constraints + check_next_root_constraints +
                             aux_equality_constraints);
                 }
 
-                template<typename FieldType, typename HashT>
+                template<typename FieldType, typename Hash>
                 void test_merkle_tree_check_update_gadget() {
                     /* prepare test */
-                    const std::size_t digest_len = HashT::get_digest_len();
+                    const std::size_t digest_len = Hash::get_digest_len();
 
                     const std::size_t tree_depth = 16;
                     std::vector<merkle_authentication_node> prev_path(tree_depth);
@@ -261,8 +261,8 @@ namespace nil {
                         store_block.insert(computed_is_right ? store_block.begin() : store_block.end(), other.begin(),
                                            other.end());
 
-                        std::vector<bool> load_h = HashT::get_hash(load_block);
-                        std::vector<bool> store_h = HashT::get_hash(store_block);
+                        std::vector<bool> load_h = Hash::get_hash(load_block);
+                        std::vector<bool> store_h = Hash::get_hash(store_block);
 
                         prev_path[level] = other;
 
@@ -279,11 +279,11 @@ namespace nil {
                     address_bits_va.allocate(pb, tree_depth);
                     digest_variable<FieldType> prev_leaf_digest(pb, digest_len);
                     digest_variable<FieldType> prev_root_digest(pb, digest_len);
-                    merkle_authentication_path_variable<FieldType, HashT> prev_path_var(pb, tree_depth);
+                    merkle_authentication_path_variable<FieldType, Hash> prev_path_var(pb, tree_depth);
                     digest_variable<FieldType> next_leaf_digest(pb, digest_len);
                     digest_variable<FieldType> next_root_digest(pb, digest_len);
-                    merkle_authentication_path_variable<FieldType, HashT> next_path_var(pb, tree_depth);
-                    merkle_tree_check_update_gadget<FieldType, HashT> mls(
+                    merkle_authentication_path_variable<FieldType, Hash> next_path_var(pb, tree_depth);
+                    merkle_tree_check_update_gadget<FieldType, Hash> mls(
                         pb, tree_depth, address_bits_va, prev_leaf_digest, prev_root_digest, prev_path_var,
                         next_leaf_digest, next_root_digest, next_path_var, pb_variable<FieldType>(0));
 
@@ -308,7 +308,7 @@ namespace nil {
 
                     const std::size_t num_constraints = pb.num_constraints();
                     const std::size_t expected_constraints =
-                        merkle_tree_check_update_gadget<FieldType, HashT>::expected_constraints(tree_depth);
+                        merkle_tree_check_update_gadget<FieldType, Hash>::expected_constraints(tree_depth);
                     assert(num_constraints == expected_constraints);
                 }
 

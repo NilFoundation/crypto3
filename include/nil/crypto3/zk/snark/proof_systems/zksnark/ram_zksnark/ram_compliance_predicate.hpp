@@ -167,7 +167,7 @@ namespace nil {
 
                 public:
                     typedef ram_base_field<ramT> FieldType;
-                    typedef CRH_with_bit_out_gadget<FieldType> HashT;
+                    typedef CRH_with_bit_out_gadget<FieldType> Hash;
                     typedef compliance_predicate_handler<ram_base_field<ramT>, ram_protoboard<ramT>> base_handler;
 
                     std::shared_ptr<ram_pcd_message_variable<ramT>> next;
@@ -199,9 +199,9 @@ namespace nil {
                     pb_variable_array<FieldType> prev_pc_val;
                     std::shared_ptr<digest_variable<FieldType>> prev_pc_val_digest;
                     std::shared_ptr<digest_variable<FieldType>> cur_root_digest;
-                    std::shared_ptr<merkle_authentication_path_variable<FieldType, HashT>>
+                    std::shared_ptr<merkle_authentication_path_variable<FieldType, Hash>>
                         instruction_fetch_merkle_proof;
-                    std::shared_ptr<memory_load_gadget<FieldType, HashT>> instruction_fetch;
+                    std::shared_ptr<memory_load_gadget<FieldType, Hash>> instruction_fetch;
 
                     std::shared_ptr<digest_variable<FieldType>> next_root_digest;
 
@@ -210,9 +210,9 @@ namespace nil {
                     pb_variable_array<FieldType> ls_next_val;
                     std::shared_ptr<digest_variable<FieldType>> ls_prev_val_digest;
                     std::shared_ptr<digest_variable<FieldType>> ls_next_val_digest;
-                    std::shared_ptr<merkle_authentication_path_variable<FieldType, HashT>> load_merkle_proof;
-                    std::shared_ptr<merkle_authentication_path_variable<FieldType, HashT>> store_merkle_proof;
-                    std::shared_ptr<memory_load_store_gadget<FieldType, HashT>> load_store_checker;
+                    std::shared_ptr<merkle_authentication_path_variable<FieldType, Hash>> load_merkle_proof;
+                    std::shared_ptr<merkle_authentication_path_variable<FieldType, Hash>> store_merkle_proof;
+                    std::shared_ptr<memory_load_store_gadget<FieldType, Hash>> load_store_checker;
 
                     pb_variable_array<FieldType> temp_next_pc_addr;
                     pb_variable_array<FieldType> temp_next_cpu_state;
@@ -283,11 +283,11 @@ namespace nil {
                     std::vector<bool> result;
 
                     const std::vector<bool> timestamp_bits = algebra::convert_field_element_to_bit_vector<FieldType>(
-                        FieldType(timestamp), ramT::timestamp_length);
+                        typename FieldType::value_type(timestamp), ramT::timestamp_length);
                     const std::vector<bool> pc_addr_bits =
-                        algebra::convert_field_element_to_bit_vector<FieldType>(FieldType(pc_addr), ap.address_size());
+                        algebra::convert_field_element_to_bit_vector<FieldType>(typename FieldType::value_type(pc_addr), ap.address_size());
                     const std::vector<bool> pc_addr_initial_bits =
-                        algebra::convert_field_element_to_bit_vector<FieldType>(FieldType(pc_addr_initial),
+                        algebra::convert_field_element_to_bit_vector<FieldType>(typename FieldType::value_type(pc_addr_initial),
                                                                                 ap.address_size());
 
                     result.insert(result.end(), timestamp_bits.begin(), timestamp_bits.end());
@@ -568,8 +568,8 @@ namespace nil {
                     prev_pc_val_digest.reset(new digest_variable<FieldType>(this->pb, digest_size, prev_pc_val, zero));
                     cur_root_digest.reset(new digest_variable<FieldType>(this->pb, digest_size, cur->root, zero));
                     instruction_fetch_merkle_proof.reset(
-                        new merkle_authentication_path_variable<FieldType, HashT>(this->pb, addr_size));
-                    instruction_fetch.reset(new memory_load_gadget<FieldType, HashT>(
+                        new merkle_authentication_path_variable<FieldType, Hash>(this->pb, addr_size));
+                    instruction_fetch.reset(new memory_load_gadget<FieldType, Hash>(
                         this->pb, addr_size, cur->pc_addr, *prev_pc_val_digest, *cur_root_digest,
                         *instruction_fetch_merkle_proof, pb_variable<FieldType>(0)));
 
@@ -591,10 +591,10 @@ namespace nil {
                     ls_next_val_digest.reset(new digest_variable<FieldType>(this->pb, digest_size, ls_next_val, zero));
                     next_root_digest.reset(new digest_variable<FieldType>(this->pb, digest_size, next->root, zero));
                     load_merkle_proof.reset(
-                        new merkle_authentication_path_variable<FieldType, HashT>(this->pb, addr_size));
+                        new merkle_authentication_path_variable<FieldType, Hash>(this->pb, addr_size));
                     store_merkle_proof.reset(
-                        new merkle_authentication_path_variable<FieldType, HashT>(this->pb, addr_size));
-                    load_store_checker.reset(new memory_load_store_gadget<FieldType, HashT>(
+                        new merkle_authentication_path_variable<FieldType, Hash>(this->pb, addr_size));
+                    load_store_checker.reset(new memory_load_store_gadget<FieldType, Hash>(
                         this->pb, addr_size, ls_addr, *ls_prev_val_digest, *cur_root_digest, *load_merkle_proof,
                         *ls_next_val_digest, *next_root_digest, *store_merkle_proof, is_not_halt_case));
                     /*
@@ -789,7 +789,7 @@ namespace nil {
                     const std::size_t int_ls_prev_val = ram_local_data_value->mem.get_value(int_ls_addr);
                     const merkle_authentication_path prev_path = ram_local_data_value->mem.get_path(int_ls_addr);
                     ls_prev_val.fill_with_bits_of_ulong(this->pb, int_ls_prev_val);
-                    assert(ls_prev_val.get_field_element_from_bits(this->pb) == FieldType(int_ls_prev_val, true));
+                    assert(ls_prev_val.get_field_element_from_bits(this->pb) == typename FieldType::value_type(int_ls_prev_val, true));
                     // Step 2: Execute CPU checker and delegated memory
                     cpu_checker->generate_r1cs_witness_other(ram_local_data_value->aux_it,
                                                              ram_local_data_value->aux_end);

@@ -29,10 +29,10 @@ namespace nil {
                     friend std::istream &operator>>(std::istream &in, set_membership_proof &other);
                 };
 
-                template<typename HashT>
+                template<typename Hash>
                 class set_commitment_accumulator {
                 private:
-                    std::shared_ptr<merkle_tree<HashT>> tree;
+                    std::shared_ptr<merkle_tree<Hash>> tree;
                     std::map<std::vector<bool>, std::size_t> hash_to_pos;
 
                 public:
@@ -49,20 +49,20 @@ namespace nil {
                     set_membership_proof get_membership_proof(const std::vector<bool> &value) const;
                 };
 
-                template<typename HashT>
-                set_commitment_accumulator<HashT>::set_commitment_accumulator(const std::size_t max_entries,
+                template<typename Hash>
+                set_commitment_accumulator<Hash>::set_commitment_accumulator(const std::size_t max_entries,
                                                                               const std::size_t value_size) :
                     value_size(value_size) {
                     depth = static_cast<std::size_t>(std::ceil(std::log2(max_entries)));
-                    digest_size = HashT::get_digest_len();
+                    digest_size = Hash::get_digest_len();
 
-                    tree.reset(new merkle_tree<HashT>(depth, digest_size));
+                    tree.reset(new merkle_tree<Hash>(depth, digest_size));
                 }
 
-                template<typename HashT>
-                void set_commitment_accumulator<HashT>::add(const std::vector<bool> &value) {
+                template<typename Hash>
+                void set_commitment_accumulator<Hash>::add(const std::vector<bool> &value) {
                     assert(value_size == 0 || value.size() == value_size);
-                    const std::vector<bool> hash = HashT::get_hash(value);
+                    const std::vector<bool> hash = Hash::get_hash(value);
                     if (hash_to_pos.find(hash) == hash_to_pos.end()) {
                         const std::size_t pos = hash_to_pos.size();
                         tree->set_value(pos, hash);
@@ -70,22 +70,22 @@ namespace nil {
                     }
                 }
 
-                template<typename HashT>
-                bool set_commitment_accumulator<HashT>::is_in_set(const std::vector<bool> &value) const {
+                template<typename Hash>
+                bool set_commitment_accumulator<Hash>::is_in_set(const std::vector<bool> &value) const {
                     assert(value_size == 0 || value.size() == value_size);
-                    const std::vector<bool> hash = HashT::get_hash(value);
+                    const std::vector<bool> hash = Hash::get_hash(value);
                     return (hash_to_pos.find(hash) != hash_to_pos.end());
                 }
 
-                template<typename HashT>
-                set_commitment set_commitment_accumulator<HashT>::get_commitment() const {
+                template<typename Hash>
+                set_commitment set_commitment_accumulator<Hash>::get_commitment() const {
                     return tree->get_root();
                 }
 
-                template<typename HashT>
+                template<typename Hash>
                 set_membership_proof
-                    set_commitment_accumulator<HashT>::get_membership_proof(const std::vector<bool> &value) const {
-                    const std::vector<bool> hash = HashT::get_hash(value);
+                    set_commitment_accumulator<Hash>::get_membership_proof(const std::vector<bool> &value) const {
+                    const std::vector<bool> hash = Hash::get_hash(value);
                     auto it = hash_to_pos.find(hash);
                     assert(it != hash_to_pos.end());
 

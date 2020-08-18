@@ -153,8 +153,6 @@ namespace nil {
 
                 template<typename FieldType>
                 void test_argument_decoder_gadget() {
-                    algebra::print_time("starting argument_decoder_gadget test");
-
                     tinyram_architecture_params ap(16, 16);
                     tinyram_program P;
                     P.instructions = generate_tinyram_prelude(ap);
@@ -166,9 +164,9 @@ namespace nil {
                     pb_variable<FieldType> arg2_is_imm;
                     arg2_is_imm.allocate(pb);
 
-                    dual_variable_gadget<FieldType> desidx(pb, ap.reg_arg_width(), "desidx");
-                    dual_variable_gadget<FieldType> arg1idx(pb, ap.reg_arg_width(), "arg1idx");
-                    dual_variable_gadget<FieldType> arg2idx(pb, ap.reg_arg_or_imm_width(), "arg2idx");
+                    dual_variable_gadget<FieldType> desidx(pb, ap.reg_arg_width());
+                    dual_variable_gadget<FieldType> arg1idx(pb, ap.reg_arg_width());
+                    dual_variable_gadget<FieldType> arg2idx(pb, ap.reg_arg_or_imm_width());
 
                     pb_variable<FieldType> packed_desval, packed_arg1val, packed_arg2val;
                     packed_desval.allocate(pb);
@@ -176,17 +174,16 @@ namespace nil {
                     packed_arg2val.allocate(pb);
 
                     argument_decoder_gadget<FieldType> g(pb, packed_registers, arg2_is_imm, desidx.bits, arg1idx.bits,
-                                                         arg2idx.bits, packed_desval, packed_arg1val, packed_arg2val,
-                                                         "g");
+                                                         arg2idx.bits, packed_desval, packed_arg1val, packed_arg2val);
 
                     g.generate_r1cs_constraints();
                     for (std::size_t i = 0; i < ap.k; ++i) {
-                        pb.val(packed_registers[i]) = FieldType(1000 + i);
+                        pb.val(packed_registers[i]) = typename FieldType::value_type(1000 + i);
                     }
 
-                    pb.val(desidx.packed) = FieldType(2);
-                    pb.val(arg1idx.packed) = FieldType(5);
-                    pb.val(arg2idx.packed) = FieldType(7);
+                    pb.val(desidx.packed) = typename FieldType::value_type(2);
+                    pb.val(arg1idx.packed) = typename FieldType::value_type(5);
+                    pb.val(arg2idx.packed) = typename FieldType::value_type(7);
                     pb.val(arg2_is_imm) = FieldType::zero();
 
                     desidx.generate_r1cs_witness_from_packed();
@@ -195,22 +192,20 @@ namespace nil {
 
                     g.generate_r1cs_witness();
 
-                    assert(pb.val(packed_desval) == FieldType(1002));
-                    assert(pb.val(packed_arg1val) == FieldType(1005));
-                    assert(pb.val(packed_arg2val) == FieldType(1007));
+                    assert(pb.val(packed_desval) == typename FieldType::value_type(1002));
+                    assert(pb.val(packed_arg1val) == typename FieldType::value_type(1005));
+                    assert(pb.val(packed_arg2val) == typename FieldType::value_type(1007));
                     assert(pb.is_satisfied());
                     printf("positive test (get reg) successful\n");
 
                     pb.val(arg2_is_imm) = FieldType::one();
                     g.generate_r1cs_witness();
 
-                    assert(pb.val(packed_desval) == FieldType(1002));
-                    assert(pb.val(packed_arg1val) == FieldType(1005));
-                    assert(pb.val(packed_arg2val) == FieldType(7));
+                    assert(pb.val(packed_desval) == typename FieldType::value_type(1002));
+                    assert(pb.val(packed_arg1val) == typename FieldType::value_type(1005));
+                    assert(pb.val(packed_arg2val) == typename FieldType::value_type(7));
                     assert(pb.is_satisfied());
                     printf("positive test (get imm) successful\n");
-
-                    algebra::print_time("argument_decoder_gadget tests successful");
                 }
 
             }    // namespace snark

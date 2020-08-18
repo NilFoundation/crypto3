@@ -151,8 +151,8 @@ namespace nil {
                 template<typename ppT>
                 void test_G2_checker_gadget(const std::string &annotation) {
                     protoboard<algebra::Fr<ppT>> pb;
-                    G2_variable<ppT> g(pb, "g");
-                    G2_checker_gadget<ppT> g_check(pb, g, "g_check");
+                    G2_variable<ppT> g(pb);
+                    G2_checker_gadget<ppT> g_check(pb, g);
                     g_check.generate_r1cs_constraints();
 
                     printf("positive test\n");

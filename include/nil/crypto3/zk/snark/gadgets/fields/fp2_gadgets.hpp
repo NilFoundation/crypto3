@@ -334,14 +334,14 @@ namespace nil {
                     this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(
                         A.c0 + A.c1,
                         A.c0 + Fp2T::non_residue * A.c1,
-                        result.c0 + result.c1 * (FieldType::one() + Fp2T::non_residue) * FieldType(2).inverse()));
+                        result.c0 + result.c1 * (FieldType::one() + Fp2T::non_residue) * typename FieldType::value_type(2).inverse()));
                 }
 
                 template<typename Fp2T>
                 void Fp2_sqr_gadget<Fp2T>::generate_r1cs_witness() {
-                    const FieldType a = this->pb.lc_val(A.c0);
-                    const FieldType b = this->pb.lc_val(A.c1);
-                    this->pb.lc_val(result.c1) = FieldType(2) * a * b;
+                    const typename FieldType::value_type a = this->pb.lc_val(A.c0);
+                    const typename FieldType::value_type b = this->pb.lc_val(A.c1);
+                    this->pb.lc_val(result.c1) = typename FieldType::value_type(2) * a * b;
                     this->pb.lc_val(result.c0) =
                         (a + b) * (a + Fp2T::non_residue * b) - a * b - Fp2T::non_residue * a * b;
                 }

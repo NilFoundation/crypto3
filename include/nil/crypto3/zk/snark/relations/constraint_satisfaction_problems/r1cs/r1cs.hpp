@@ -87,7 +87,8 @@ namespace nil {
 
                 template<typename FieldType>
                 using r1cs_variable_assignment =
-                    std::vector<FieldType>; /* note the changed name! (TODO: remove this comment after
+                    std::vector<typename FieldType::value_type>; /* note the changed name! (TODO: remove this comment
+ * after
                                             primary_input transition is complete) */
 
                 /************************* R1CS constraint system ****************************/

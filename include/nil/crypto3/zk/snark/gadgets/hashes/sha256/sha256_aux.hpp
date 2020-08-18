@@ -217,12 +217,12 @@ namespace nil {
                 void XOR3_gadget<FieldType>::generate_r1cs_witness() {
                     if (assume_C_is_zero) {
                         this->pb.lc_val(out) = this->pb.lc_val(A) + this->pb.lc_val(B) -
-                                               FieldType(2) * this->pb.lc_val(A) * this->pb.lc_val(B);
+                                               typename FieldType::value_type(2) * this->pb.lc_val(A) * this->pb.lc_val(B);
                     } else {
                         this->pb.val(tmp) = this->pb.lc_val(A) + this->pb.lc_val(B) -
-                                            FieldType(2) * this->pb.lc_val(A) * this->pb.lc_val(B);
+                                            typename FieldType::value_type(2) * this->pb.lc_val(A) * this->pb.lc_val(B);
                         this->pb.lc_val(out) = this->pb.val(tmp) + this->pb.lc_val(C) -
-                                               FieldType(2) * this->pb.val(tmp) * this->pb.lc_val(C);
+                                               typename FieldType::value_type(2) * this->pb.val(tmp) * this->pb.lc_val(C);
                     }
                 }
 
@@ -373,7 +373,7 @@ namespace nil {
                     for (std::size_t i = 0; i < 32; ++i) {
                         const long v =
                             (this->pb.lc_val(X[i]) + this->pb.lc_val(Y[i]) + this->pb.lc_val(Z[i])).as_ulong();
-                        this->pb.val(result_bits[i]) = FieldType(v / 2);
+                        this->pb.val(result_bits[i]) = typename FieldType::value_type(v / 2);
                     }
 
                     pack_result->generate_r1cs_witness_from_bits();

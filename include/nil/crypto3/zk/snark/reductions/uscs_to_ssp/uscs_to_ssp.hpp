@@ -198,7 +198,7 @@ namespace nil {
 #endif
                     /* add coefficients of the polynomial 2*d*V(z) + d*d*Z(z) */
                     for (std::size_t i = 0; i < domain->m; ++i) {
-                        coefficients_for_H[i] = FieldType(2) * d * aA[i];
+                        coefficients_for_H[i] = typename FieldType::value_type(2) * d * aA[i];
                     }
                     domain->add_poly_Z(d.squared(), coefficients_for_H);
 

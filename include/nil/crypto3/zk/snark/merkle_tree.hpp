@@ -66,7 +66,8 @@ namespace nil {
                     std::size_t value_size;
                     std::size_t digest_size;
 
-                    merkle_tree(const std::size_t depth, const std::size_t value_size) : depth(depth), value_size(value_size) {
+                    merkle_tree(const std::size_t depth, const std::size_t value_size) :
+                        depth(depth), value_size(value_size) {
                         assert(depth < sizeof(std::size_t) * 8);
 
                         digest_size = Hash::digest_bits;
@@ -111,16 +112,16 @@ namespace nil {
                         }
                     }
 
-                    merkle_tree(const std::size_t depth, const std::size_t value_size,
+                    merkle_tree(size_t depth, size_t value_size,
                                 const std::map<std::size_t, std::vector<bool>> &contents) :
                         merkle_tree<Hash>(depth, value_size) {
 
                         if (!contents.empty()) {
                             assert(contents.rbegin()->first < 1ul << depth);
 
-                            for (auto it = contents.begin(); it != contents.end(); ++it) {
-                                const std::size_t address = it->first;
-                                const std::vector<bool> value = it->second;
+                            for (const auto &content : contents) {
+                                const std::size_t address = content.first;
+                                const std::vector<bool> value = content.second;
                                 const std::size_t idx = address + (1ul << depth) - 1;
 
                                 values[address] = value;

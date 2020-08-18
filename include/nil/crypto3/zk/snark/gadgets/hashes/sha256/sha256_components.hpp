@@ -289,10 +289,10 @@ namespace nil {
                     pack_h->generate_r1cs_witness_from_bits();
 
                     this->pb.val(unreduced_new_a) = this->pb.val(packed_h) + this->pb.val(sigma1) +
-                                                    this->pb.val(choice) + FieldType(K) + this->pb.val(W) +
+                                                    this->pb.val(choice) + typename FieldType::value_type(K) + this->pb.val(W) +
                                                     this->pb.val(sigma0) + this->pb.val(majority);
                     this->pb.val(unreduced_new_e) = this->pb.val(packed_d) + this->pb.val(packed_h) +
-                                                    this->pb.val(sigma1) + this->pb.val(choice) + FieldType(K) +
+                                                    this->pb.val(sigma1) + this->pb.val(choice) + typename FieldType::value_type(K) +
                                                     this->pb.val(W);
 
                     mod_reduce_new_a->generate_r1cs_witness();

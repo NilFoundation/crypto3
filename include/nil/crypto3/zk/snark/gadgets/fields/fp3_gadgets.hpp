@@ -315,24 +315,24 @@ namespace nil {
                     this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(A.c0, B.c0, v0));
                     this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(A.c2, B.c2, v4));
 
-                    const FieldType beta = Fp3T::non_residue;
+                    const typename FieldType::value_type beta = Fp3T::non_residue;
 
                     this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(
                         A.c0 + A.c1 + A.c2,
                         B.c0 + B.c1 + B.c2,
-                        result.c1 + result.c2 + result.c0 * beta.inverse() + v0 * (FieldType(1) - beta.inverse()) +
-                            v4 * (FieldType(1) - beta)));
+                        result.c1 + result.c2 + result.c0 * beta.inverse() + v0 * (typename FieldType::value_type(1) - beta.inverse()) +
+                            v4 * (typename FieldType::value_type(1) - beta)));
                     this->pb.add_r1cs_constraint(
                         r1cs_constraint<FieldType>(A.c0 - A.c1 + A.c2,
                                                    B.c0 - B.c1 + B.c2,
-                                                   -result.c1 + result.c2 + v0 * (FieldType(1) + beta.inverse()) -
-                                                       result.c0 * beta.inverse() + v4 * (FieldType(1) + beta)));
+                                                   -result.c1 + result.c2 + v0 * (typename FieldType::value_type(1) + beta.inverse()) -
+                                                       result.c0 * beta.inverse() + v4 * (typename FieldType::value_type(1) + beta)));
                     this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(
                         A.c0 + 2 * A.c1 + 4 * A.c2,
                         B.c0 + 2 * B.c1 + 4 * B.c2,
-                        2 * result.c1 + 4 * result.c2 + result.c0 * (FieldType(8) * beta.inverse()) +
-                            v0 * (FieldType(1) - FieldType(8) * beta.inverse()) +
-                            v4 * (FieldType(16) - FieldType(2) * beta)));
+                        2 * result.c1 + 4 * result.c2 + result.c0 * (typename FieldType::value_type(8) * beta.inverse()) +
+                            v0 * (typename FieldType::value_type(1) - typename FieldType::value_type(8) * beta.inverse()) +
+                            v4 * (typename FieldType::value_type(16) - typename FieldType::value_type(2) * beta)));
                 }
 
                 template<typename Fp3T>

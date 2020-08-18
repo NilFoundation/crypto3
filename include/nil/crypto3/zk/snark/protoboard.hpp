@@ -31,12 +31,11 @@ namespace nil {
 
                 template<typename FieldType>
                 class protoboard {
-                private:
                     r1cs_variable_assignment<FieldType> values; /* values[0] will hold the value of the first allocated
                                                                 variable of the protoboard, *NOT* constant 1 */
                     var_index_t next_free_var;
                     lc_index_t next_free_lc;
-                    std::vector<FieldType> lc_values;
+                    std::vector<typename FieldType::value_type> lc_values;
                     r1cs_constraint_system<FieldType> constraint_system;
 
                 public:
