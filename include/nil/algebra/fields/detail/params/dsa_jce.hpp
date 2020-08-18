@@ -28,7 +28,7 @@ namespace nil {
                 public:
                     typedef typename policy_type::number_type number_type;
 
-                    constexpr static const number_type q = 0x9760508F15230BCCB292B982A2EB840BF0581CF5_cppui160;
+                    constexpr static const modulus_type q = 0x9760508F15230BCCB292B982A2EB840BF0581CF5_cppui160;
 	            };
 
 	        }    // namespace detail

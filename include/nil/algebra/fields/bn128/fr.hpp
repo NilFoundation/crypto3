@@ -47,6 +47,12 @@ namespace nil {
                 constexpr static const std::size_t arity = 1;
             };
 
+            template<std::size_t ModulusBits, std::size_t GeneratorBits>
+            constexpr typename bn128_fr<ModulusBits, GeneratorBits>::modulus_type const bn128_fr<ModulusBits, GeneratorBits>::modulus;
+
+            template<std::size_t ModulusBits, std::size_t GeneratorBits>
+            constexpr typename bn128_fr<ModulusBits, GeneratorBits>::generator_type const bn128_fr<ModulusBits, GeneratorBits>::mul_generator;
+
         }   // namespace fields
     }    // namespace algebra
 }    // namespace nil

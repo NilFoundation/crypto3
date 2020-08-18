@@ -24,7 +24,7 @@
 //#include <nil/algebra/fields/detail/params/dsa_jce.hpp>
 //#include <nil/algebra/fields/detail/params/modp_srp.hpp>
 //#include <nil/algebra/fields/detail/params/params.hpp>
-#include <nil/algebra/fields/bn128/fq2.hpp>
+#include <nil/algebra/fields/bn128/fq.hpp>
 //#include <nil/algebra/fields/bn128/fr.hpp>
 #include <nil/algebra/fields/dsa_botan.hpp>
 //#include <nil/algebra/fields/dsa_jce.hpp>
@@ -59,11 +59,21 @@ BOOST_AUTO_TEST_SUITE(fields_manual_tests)
 
 BOOST_AUTO_TEST_CASE(fields_manual_test1) {
     
-    using value_type = fields::bn128_fq2<254>::value_type;
+    using value_type = fields::bn128_fq<254>::value_type;
 
-    value_type e1 = value_type::one(), e2 = value_type::zero();
+    value_type e1 = value_type::one(), e2(3);
 
-    std::cout << (value_type::one() == e1 + e2);
+    std::cout << e1.is_one() << e2.is_one();
+
+    value_type e3 = (e1 + e1) * e2 * e2;
+
+    //value_type e4 = e1 * e2 * e2 + e1 * e2 * e2;
+
+    //std::cout << (value_type(4) == e1 + e2);
+
+    //std::cout << (value_type(4) == e3);
+
+    //std::cout << (e4 == e3);
 
     BOOST_CHECK_EQUAL("1", "");
 }

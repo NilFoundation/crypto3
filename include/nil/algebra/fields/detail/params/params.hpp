@@ -15,10 +15,10 @@ namespace nil {
         namespace fields {
             namespace detail {
 
-                template<typename FieldTypeype>
+                template<typename FieldType>
                 struct params {
-                    typedef FieldTypeype field_type;
-                    typedef typename field_type::modulus_type number_type;
+                    typedef FieldType field_type;
+                    typedef typename field_type::number_type number_type;
 
                     constexpr static const std::size_t modulus_bits = field_type::modulus_bits;
                     typedef typename field_type::modulus_type modulus_type;
@@ -32,16 +32,27 @@ namespace nil {
 
                 };
 
-                template<typename FieldTypeype>
-                struct arithmetic_params : public params<FieldTypeype> {
+                template<typename FieldType>
+                constexpr typename params<FieldType>::modulus_type const params<FieldType>::modulus;
+
+                template<typename FieldType>
+                struct arithmetic_params : public params<FieldType> {
                 private:
-                    typedef params<FieldTypeype> policy_type;
-                    typedef arithmetic_params<FieldTypeype> element_policy_type;
+                    typedef params<FieldType> policy_type;
+                    typedef arithmetic_params<FieldType> element_policy_type;
                 public:
                     typedef typename policy_type::number_type number_type;
+                    typedef typename policy_type::modulus_type modulus_type;
 
-                    constexpr static const number_type q = (policy_type::modulus - 1) / 2;
+                    constexpr static const modulus_type modulus = policy_type::modulus;
+                    constexpr static const modulus_type q = (policy_type::modulus - 1) / 2;
                 };
+
+                template<typename FieldType>
+                constexpr typename arithmetic_params<FieldType>::modulus_type const arithmetic_params<FieldType>::modulus;
+
+                template<typename FieldType>
+                constexpr typename arithmetic_params<FieldType>::modulus_type const arithmetic_params<FieldType>::q;
 
             }    // namespace detail
         }    // namespace fields

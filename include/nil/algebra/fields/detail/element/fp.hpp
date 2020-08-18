@@ -24,30 +24,36 @@ namespace nil {
                 public:
 
                     typedef typename policy_type::number_type number_type;
+                    typedef typename policy_type::modulus_type modulus_type;
+
+                    constexpr static const modulus_type modulus = policy_type::modulus;
+
 
                     using value_type = number_type;
 
                     value_type data;
 
-                    element_fp() : data(value_type(0)){};
-                    
+                    element_fp() : data(value_type(0, modulus)){};
+
+                    element_fp(value_type data) : data(data){};
+
                     template <typename NumberType>
-                    element_fp(NumberType data) : data(data){};
+                    element_fp(NumberType data) : data(data, modulus){};
 
                     inline static element_fp zero() {
-                        return element_fp(value_type(0));
+                        return element_fp(0);
                     }
 
                     inline static element_fp one() {
-                        return element_fp(value_type(1));
+                        return element_fp(1);
                     }
 
                     bool is_zero() const {
-                        return data == value_type(0);
+                        return data == value_type(0, modulus);
                     }
 
                     bool is_one() const {
-                        return data == value_type(1);
+                        return data == value_type(1, modulus);
                     }
 
                     bool operator==(const element_fp &B) const {
@@ -99,6 +105,9 @@ namespace nil {
                         return invert(data);
                     }
                 };
+
+                template<typename FieldParams>
+                constexpr typename element_fp<FieldParams>::modulus_type const element_fp<FieldParams>::modulus;
 
             }   // namespace detail
         }   // namespace fields

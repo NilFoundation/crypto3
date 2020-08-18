@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef ALGEBRA_FIELDS_BN128_FQ_HPP
-#define ALGEBRA_FIELDS_BN128_FQ_HPP
+#ifndef ALGEBRA_FIELDS_BLS12_FQ_HPP
+#define ALGEBRA_FIELDS_BLS12_FQ_HPP
 
 #include <nil/algebra/fields/detail/element/bn128/fq.hpp>
 #include <nil/algebra/fields/fp.hpp>
@@ -48,8 +48,14 @@ namespace nil {
 
             };
 
+            template<std::size_t ModulusBits, std::size_t GeneratorBits>
+            constexpr typename bls12_fq<ModulusBits, GeneratorBits>::modulus_type const bls12_fq<ModulusBits, GeneratorBits>::modulus;
+
+            template<std::size_t ModulusBits, std::size_t GeneratorBits>
+            constexpr typename bls12_fq<ModulusBits, GeneratorBits>::generator_type const bls12_fq<ModulusBits, GeneratorBits>::mul_generator;
+
         }   // namespace fields
     }    // namespace algebra
 }    // namespace nil
 
-#endif    // ALGEBRA_FIELDS_BN128_FQ_HPP
+#endif    // ALGEBRA_FIELDS_BLS12_FQ_HPP

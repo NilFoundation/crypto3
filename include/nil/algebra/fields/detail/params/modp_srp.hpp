@@ -28,7 +28,7 @@ namespace nil {
                 public:
                     typedef typename policy_type::number_type number_type;
 
-                    constexpr static const number_type q = 0;
+                    constexpr static const modulus_type q = 0;
                 };
             
             }    // namespace detail
