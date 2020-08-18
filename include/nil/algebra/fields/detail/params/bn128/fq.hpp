@@ -40,6 +40,15 @@ namespace nil {
                     constexpr static const std::array<number_type, 2> fp6_3over2_non_residue = {9, 1};
                     constexpr static const std::array<number_type, 2> fp12_2over3over2_non_residue = {9, 1};
                 };
+
+                template<std::size_t ModulusBits, std::size_t GeneratorBits>
+                constexpr typename params<bn128_fq<ModulusBits, GeneratorBits>>::number_type const arithmetic_params<bn128_fq<ModulusBits, GeneratorBits>>::fp2_non_residue;
+
+                template<std::size_t ModulusBits, std::size_t GeneratorBits>
+                constexpr std::array<typename params<bn128_fq<ModulusBits, GeneratorBits>>::number_type, 2> const arithmetic_params<bn128_fq<ModulusBits, GeneratorBits>>::fp6_3over2_non_residue;
+
+                template<std::size_t ModulusBits, std::size_t GeneratorBits>
+                constexpr std::array<typename params<bn128_fq<ModulusBits, GeneratorBits>>::number_type, 2> const arithmetic_params<bn128_fq<ModulusBits, GeneratorBits>>::fp12_2over3over2_non_residue;
             
             }    // namespace detail
         }    // namespace fields
