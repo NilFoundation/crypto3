@@ -69,11 +69,11 @@ namespace nil {
                 constexpr static const std::size_t arity = 1;
             };
 
-            template<std::size_t ModulusBits, std::size_t GeneratorBits>
-            constexpr typename dsa_botan<ModulusBits, GeneratorBits>::modulus_type const dsa_botan<ModulusBits, GeneratorBits>::modulus;
+            constexpr typename dsa_botan<2048, 2048>::modulus_type const dsa_botan<2048, 2048>::modulus;
+            constexpr typename dsa_botan<3072, 3072>::modulus_type const dsa_botan<3072, 3072>::modulus;
 
-            template<std::size_t ModulusBits, std::size_t GeneratorBits>
-            constexpr typename dsa_botan<ModulusBits, GeneratorBits>::generator_type const dsa_botan<ModulusBits, GeneratorBits>::mul_generator;
+            constexpr typename dsa_botan<2048, 2048>::generator_type const dsa_botan<2048, 2048>::mul_generator;
+            constexpr typename dsa_botan<3072, 3072>::generator_type const dsa_botan<3072, 3072>::mul_generator;
         }   // namespace fields
     }    // namespace algebra
 }    // namespace nil

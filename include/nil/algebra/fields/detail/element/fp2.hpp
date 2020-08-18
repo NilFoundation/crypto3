@@ -25,7 +25,10 @@ namespace nil {
                 private:
                     typedef FieldParams policy_type;
 
-                    using number_type = typename policy_type::number_type;
+                    typedef typename policy_type::number_type number_type;
+                    typedef typename policy_type::modulus_type modulus_type;
+
+                    constexpr static const modulus_type modulus = policy_type::modulus;
                 public:
                     const typename policy_type::fp2_non_residue_type 
                         non_residue = typename policy_type::fp2_non_residue_type(policy_type::fp2_non_residue);
@@ -70,6 +73,13 @@ namespace nil {
 
                     bool operator!=(const element_fp2 &B) const {
                         return (data[0] != B.data[0]) || (data[1] != B.data[1]);
+                    }
+
+                    element_fp2& operator=(const element_fp2 &B) const {
+                        data[0] = B.data[0];
+                        data[1] = B.data[1];
+
+                        return *this;
                     }
 
                     element_fp2 operator+(const element_fp2 &B) const {

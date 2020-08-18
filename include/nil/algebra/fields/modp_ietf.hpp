@@ -173,7 +173,21 @@ namespace nil {
             template<std::size_t ModulusBits, std::size_t GeneratorBits>
             constexpr typename modp_ietf<ModulusBits, GeneratorBits>::generator_type const modp_ietf<ModulusBits, GeneratorBits>::mul_generator;
 
-        }   // namespace fields
+            constexpr typename modp_ietf<1024, CHAR_BIT>::modulus_type const modp_ietf<1024, CHAR_BIT>::modulus;
+            constexpr typename modp_ietf<1536, CHAR_BIT>::modulus_type const modp_ietf<1536, CHAR_BIT>::modulus;
+            constexpr typename modp_ietf<2048, CHAR_BIT>::modulus_type const modp_ietf<2048, CHAR_BIT>::modulus;
+            constexpr typename modp_ietf<3072, CHAR_BIT>::modulus_type const modp_ietf<3072, CHAR_BIT>::modulus;
+            constexpr typename modp_ietf<4096, CHAR_BIT>::modulus_type const modp_ietf<4096, CHAR_BIT>::modulus;
+            constexpr typename modp_ietf<6144, CHAR_BIT>::modulus_type const modp_ietf<6144, CHAR_BIT>::modulus;
+            constexpr typename modp_ietf<8192, CHAR_BIT>::modulus_type const modp_ietf<8192, CHAR_BIT>::modulus;
+
+            constexpr typename modp_ietf<1024, CHAR_BIT>::generator_type const modp_ietf<1024, CHAR_BIT>::mul_generator;
+            constexpr typename modp_ietf<1536, CHAR_BIT>::generator_type const modp_ietf<1536, CHAR_BIT>::mul_generator;
+            constexpr typename modp_ietf<2048, CHAR_BIT>::generator_type const modp_ietf<2048, CHAR_BIT>::mul_generator;
+            constexpr typename modp_ietf<3072, CHAR_BIT>::generator_type const modp_ietf<3072, CHAR_BIT>::mul_generator;
+            constexpr typename modp_ietf<4096, CHAR_BIT>::generator_type const modp_ietf<4096, CHAR_BIT>::mul_generator;
+            constexpr typename modp_ietf<6144, CHAR_BIT>::generator_type const modp_ietf<6144, CHAR_BIT>::mul_generator;
+            constexpr typename modp_ietf<8192, CHAR_BIT>::generator_type const modp_ietf<8192, CHAR_BIT>::mul_generator;
     }    // namespace algebra
 }    // namespace nil
 

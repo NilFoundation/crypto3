@@ -48,11 +48,9 @@ namespace nil {
                 constexpr static const std::size_t arity = 1;
             };
 
-            template<std::size_t ModulusBits, std::size_t GeneratorBits>
-            constexpr typename dsa_jce<ModulusBits, GeneratorBits>::modulus_type const dsa_jce<ModulusBits, GeneratorBits>::modulus;
+            constexpr typename dsa_jce<1024, 1024>::modulus_type const dsa_jce<1024, 1024>::modulus;
 
-            template<std::size_t ModulusBits, std::size_t GeneratorBits>
-            constexpr typename dsa_jce<ModulusBits, GeneratorBits>::generator_type const dsa_jce<ModulusBits, GeneratorBits>::mul_generator;
+            constexpr typename dsa_jce<1024, 1024>::generator_type const dsa_jce<1024, 1024>::mul_generator;
         }   // namespace fields
     }    // namespace algebra
 }    // namespace nil

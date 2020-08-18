@@ -25,7 +25,7 @@ namespace nil {
              * @tparam GeneratorBits
              */
             template<std::size_t ModulusBits, std::size_t GeneratorBits = CHAR_BIT>
-            struct bn128_fq : public fp<ModulusBits, GeneratorBits> { };
+            struct bn128_fq : public fp<ModulusBits, GeneratorBits> {};
 
             template <>
             struct bn128_fq<254, CHAR_BIT> : public fp<254, CHAR_BIT> {
@@ -51,11 +51,9 @@ namespace nil {
 
             };
 
-            template<std::size_t ModulusBits, std::size_t GeneratorBits>
-            constexpr typename bn128_fq<ModulusBits, GeneratorBits>::modulus_type const bn128_fq<ModulusBits, GeneratorBits>::modulus;
+            constexpr typename bn128_fq<254, CHAR_BIT>::modulus_type const bn128_fq<254, CHAR_BIT>::modulus;
 
-            template<std::size_t ModulusBits, std::size_t GeneratorBits>
-            constexpr typename bn128_fq<ModulusBits, GeneratorBits>::generator_type const bn128_fq<ModulusBits, GeneratorBits>::mul_generator;
+            constexpr typename bn128_fq<254, CHAR_BIT>::generator_type const bn128_fq<254, CHAR_BIT>::mul_generator;
 
 
         }   // namespace fields

@@ -28,7 +28,6 @@ namespace nil {
 
                     constexpr static const modulus_type modulus = policy_type::modulus;
 
-
                     using value_type = number_type;
 
                     value_type data;
@@ -62,6 +61,12 @@ namespace nil {
 
                     bool operator!=(const element_fp &B) const {
                         return data != B.data;
+                    }
+
+                    element_fp& operator=(const element_fp &B) const {
+                        data = B.data;
+
+                        return *this;
                     }
 
                     element_fp operator+(const element_fp &B) const {

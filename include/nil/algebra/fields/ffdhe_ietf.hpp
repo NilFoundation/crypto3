@@ -24,7 +24,7 @@ namespace nil {
              * @tparam ModulusBits
              * @tparam GeneratorBits
              */
-            template<std::size_t ModulusBits, std::size_t GeneratorBits>
+            template<std::size_t ModulusBits, std::size_t GeneratorBits = CHAR_BIT>
             struct ffdhe_ietf : public fp<ModulusBits, GeneratorBits> { };
 
             template <>
@@ -47,7 +47,7 @@ namespace nil {
                 constexpr static const std::size_t arity = 1;
             };
 
-            struct ffdhe_ietf<3072> : public fp<3072, CHAR_BIT> {
+            struct ffdhe_ietf<3072, CHAR_BIT> : public fp<3072, CHAR_BIT> {
                 typedef fp<3072, CHAR_BIT> policy_type;
 
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
@@ -66,8 +66,8 @@ namespace nil {
                 constexpr static const std::size_t arity = 1;
             };
 
-            struct ffdhe_ietf<4096> : public fp<4096, 8> {
-                typedef fp<4096, 8> policy_type;
+            struct ffdhe_ietf<4096, CHAR_BIT> : public fp<4096, CHAR_BIT> {
+                typedef fp<4096, CHAR_BIT> policy_type;
 
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                 typedef typename policy_type::modulus_type modulus_type;
@@ -85,8 +85,8 @@ namespace nil {
                 constexpr static const std::size_t arity = 1;
             };
 
-            struct ffdhe_ietf<6144> : public fp<6144, 8> {
-                typedef fp<6144, 8> policy_type;
+            struct ffdhe_ietf<6144, CHAR_BIT> : public fp<6144, CHAR_BIT> {
+                typedef fp<6144, CHAR_BIT> policy_type;
 
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                 typedef typename policy_type::modulus_type modulus_type;
@@ -104,8 +104,8 @@ namespace nil {
                 constexpr static const std::size_t arity = 1;
             };
 
-            struct ffdhe_ietf<8192> : public fp<8192, 8> {
-                typedef fp<8192, 8> policy_type;
+            struct ffdhe_ietf<8192, CHAR_BIT> : public fp<8192, CHAR_BIT> {
+                typedef fp<8192, CHAR_BIT> policy_type;
 
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                 typedef typename policy_type::modulus_type modulus_type;
@@ -123,11 +123,17 @@ namespace nil {
                 constexpr static const std::size_t arity = 1;
             };
 
-            template<std::size_t ModulusBits, std::size_t GeneratorBits>
-            constexpr typename ffdhe_ietf<ModulusBits, GeneratorBits>::modulus_type const ffdhe_ietf<ModulusBits, GeneratorBits>::modulus;
+            constexpr typename ffdhe_ietf<2048, CHAR_BIT>::modulus_type const ffdhe_ietf<2048, CHAR_BIT>::modulus;
+            constexpr typename ffdhe_ietf<3072, CHAR_BIT>::modulus_type const ffdhe_ietf<3072, CHAR_BIT>::modulus;
+            constexpr typename ffdhe_ietf<4096, CHAR_BIT>::modulus_type const ffdhe_ietf<4096, CHAR_BIT>::modulus;
+            constexpr typename ffdhe_ietf<6144, CHAR_BIT>::modulus_type const ffdhe_ietf<6144, CHAR_BIT>::modulus;
+            constexpr typename ffdhe_ietf<8192, CHAR_BIT>::modulus_type const ffdhe_ietf<8192, CHAR_BIT>::modulus;
 
-            template<std::size_t ModulusBits, std::size_t GeneratorBits>
-            constexpr typename ffdhe_ietf<ModulusBits, GeneratorBits>::generator_type const ffdhe_ietf<ModulusBits, GeneratorBits>::mul_generator;
+            constexpr typename ffdhe_ietf<2048, CHAR_BIT>::generator_type const ffdhe_ietf<2048, CHAR_BIT>::mul_generator;
+            constexpr typename ffdhe_ietf<3072, CHAR_BIT>::generator_type const ffdhe_ietf<3072, CHAR_BIT>::mul_generator;
+            constexpr typename ffdhe_ietf<4096, CHAR_BIT>::generator_type const ffdhe_ietf<4096, CHAR_BIT>::mul_generator;
+            constexpr typename ffdhe_ietf<6144, CHAR_BIT>::generator_type const ffdhe_ietf<6144, CHAR_BIT>::mul_generator;
+            constexpr typename ffdhe_ietf<8192, CHAR_BIT>::generator_type const ffdhe_ietf<8192, CHAR_BIT>::mul_generator;
 
         }   // namespace fields
     }    // namespace algebra

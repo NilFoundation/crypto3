@@ -173,11 +173,21 @@ namespace nil {
                 constexpr static const std::size_t arity = 1;
             };
 
-            template<std::size_t ModulusBits, std::size_t GeneratorBits>
-            constexpr typename modp_srp<ModulusBits, GeneratorBits>::modulus_type const modp_srp<ModulusBits, GeneratorBits>::modulus;
+            constexpr typename modp_srp<1024, CHAR_BIT>::modulus_type const modp_srp<1024, CHAR_BIT>::modulus;
+            constexpr typename modp_srp<1536, CHAR_BIT>::modulus_type const modp_srp<1536, CHAR_BIT>::modulus;
+            constexpr typename modp_srp<2048, CHAR_BIT>::modulus_type const modp_srp<2048, CHAR_BIT>::modulus;
+            constexpr typename modp_srp<3072, CHAR_BIT>::modulus_type const modp_srp<3072, CHAR_BIT>::modulus;
+            constexpr typename modp_srp<4096, CHAR_BIT>::modulus_type const modp_srp<4096, CHAR_BIT>::modulus;
+            constexpr typename modp_srp<6144, CHAR_BIT>::modulus_type const modp_srp<6144, CHAR_BIT>::modulus;
+            constexpr typename modp_srp<8192, CHAR_BIT>::modulus_type const modp_srp<8192, CHAR_BIT>::modulus;
 
-            template<std::size_t ModulusBits, std::size_t GeneratorBits>
-            constexpr typename modp_srp<ModulusBits, GeneratorBits>::generator_type const modp_srp<ModulusBits, GeneratorBits>::mul_generator;
+            constexpr typename modp_srp<1024, CHAR_BIT>::generator_type const modp_srp<1024, CHAR_BIT>::mul_generator;
+            constexpr typename modp_srp<1536, CHAR_BIT>::generator_type const modp_srp<1536, CHAR_BIT>::mul_generator;
+            constexpr typename modp_srp<2048, CHAR_BIT>::generator_type const modp_srp<2048, CHAR_BIT>::mul_generator;
+            constexpr typename modp_srp<3072, CHAR_BIT>::generator_type const modp_srp<3072, CHAR_BIT>::mul_generator;
+            constexpr typename modp_srp<4096, CHAR_BIT>::generator_type const modp_srp<4096, CHAR_BIT>::mul_generator;
+            constexpr typename modp_srp<6144, CHAR_BIT>::generator_type const modp_srp<6144, CHAR_BIT>::mul_generator;
+            constexpr typename modp_srp<8192, CHAR_BIT>::generator_type const modp_srp<8192, CHAR_BIT>::mul_generator;
 
         }   // namespace fields
     }    // namespace algebra

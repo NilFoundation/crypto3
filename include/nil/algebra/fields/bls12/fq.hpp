@@ -48,11 +48,9 @@ namespace nil {
 
             };
 
-            template<std::size_t ModulusBits, std::size_t GeneratorBits>
-            constexpr typename bls12_fq<ModulusBits, GeneratorBits>::modulus_type const bls12_fq<ModulusBits, GeneratorBits>::modulus;
+            constexpr typename bls12_fq<381, CHAR_BIT>::modulus_type const bls12_fq<381, CHAR_BIT>::modulus;
 
-            template<std::size_t ModulusBits, std::size_t GeneratorBits>
-            constexpr typename bls12_fq<ModulusBits, GeneratorBits>::generator_type const bls12_fq<ModulusBits, GeneratorBits>::mul_generator;
+            constexpr typename bls12_fq<381, CHAR_BIT>::generator_type const bls12_fq<381, CHAR_BIT>::mul_generator;
 
         }   // namespace fields
     }    // namespace algebra
