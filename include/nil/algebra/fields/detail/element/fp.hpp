@@ -29,6 +29,8 @@ namespace nil {
 
                     value_type data;
 
+                    element_fp() : data(value_type(0)){};
+                    
                     template <typename NumberType>
                     element_fp(NumberType data) : data(data){};
 

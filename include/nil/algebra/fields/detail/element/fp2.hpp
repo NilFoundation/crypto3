@@ -36,11 +36,17 @@ namespace nil {
 
                     value_type data;
 
-                    element_fp2(value_type data) : data(data) {};
+                    element_fp2() {
+                        data = {underlying_type::zero(), underlying_type::zero()};
+                    }
+
+                    element_fp2(value_type in_data) {
+                        data = value_type(in_data);
+                    }
 
                     element_fp2(std::initializer_list<number_type> in_data) {
                         data = {underlying_type(in_data[0]), underlying_type(in_data[1])};
-                    };
+                    }
 
                     inline static element_fp2 zero() {
                         return element_fp2({underlying_type::zero(), underlying_type::zero()});
