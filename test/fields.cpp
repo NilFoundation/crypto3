@@ -63,17 +63,17 @@ BOOST_AUTO_TEST_CASE(fields_manual_test1) {
 
     value_type e1 = value_type::one(), e2(3);
 
-    std::cout << e1.is_one() << e2.is_one();
+    std::cout << e1.is_one() << e2.is_one() << e2.is_zero();
 
-    value_type e3 = (e1 + e1) * e2 * e2;
+    value_type e3 = e1.dbl() * e2.square();
 
-    //value_type e4 = e1 * e2 * e2 + e1 * e2 * e2;
+    value_type e4 = e1 * e2 * e2 + e1 * e2 * e2;
 
     //std::cout << (value_type(4) == e1 + e2);
 
-    //std::cout << (value_type(4) == e3);
+    std::cout << (value_type(0) == e3);
 
-    //std::cout << (e4 == e3);
+    std::cout << (e4 == e3);
 
     BOOST_CHECK_EQUAL("1", "");
 }

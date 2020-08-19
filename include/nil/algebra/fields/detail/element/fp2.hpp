@@ -47,8 +47,8 @@ namespace nil {
                         data = value_type(in_data);
                     }
 
-                    element_fp2(std::initializer_list<number_type> in_data) {
-                        data = {underlying_type(in_data[0]), underlying_type(in_data[1])};
+                    element_fp2(std::initializer_list<modulus_type> in_data) {
+                        data = {underlying_type(in_data[0], modulus), underlying_type(in_data[1], modulus)};
                     }
 
                     inline static element_fp2 zero() {
@@ -164,7 +164,7 @@ namespace nil {
 
                     template<typename PowerType>
                     element_fp2 pow(const PowerType &power) const {
-                        return power(data, power);
+                        return element_fp2(power(data, power));
                     }
 
                     element_fp2 inverse() const {

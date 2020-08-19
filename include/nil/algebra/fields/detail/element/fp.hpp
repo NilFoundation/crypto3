@@ -36,8 +36,7 @@ namespace nil {
 
                     element_fp(value_type data) : data(data){};
 
-                    template <typename NumberType>
-                    element_fp(NumberType data) : data(data, modulus){};
+                    element_fp(modulus_type data) : data(data, modulus){};
 
                     inline static element_fp zero() {
                         return element_fp(0);
@@ -70,27 +69,27 @@ namespace nil {
                     }
 
                     element_fp operator+(const element_fp &B) const {
-                        return data + B.data;
+                        return element_fp(data + B.data);
                     }
 
                     element_fp operator-(const element_fp &B) const {
-                        return data - B.data;
+                        return element_fp(data - B.data);
                     }
 
                     element_fp operator-() const {
-                        return -data;
+                        return element_fp(-data);
                     }
 
                     element_fp operator*(const element_fp &B) const {
-                        return data * B.data;
+                        return element_fp(data * B.data);
                     }
 
                     element_fp dbl() const {
-                        return data + data;
+                        return element_fp(data + data);
                     }
 
                     element_fp sqrt() const {
-                        return sqrt(data);
+                        return element_fp(sqrt(data));
                     }
 
                     element_fp _2z_add_3x() {
@@ -98,16 +97,16 @@ namespace nil {
                     }
 
                     element_fp square() const {
-                        return data * data;    // maybe can be done more effective
+                        return element_fp(data * data);    // maybe can be done more effective
                     }
 
                     template<typename PowerType>
                     element_fp pow(const PowerType &power) const {
-                        return power(data, power);
+                        return element_fp(power(data, power));
                     }
 
                     element_fp inverse() const {
-                        return invert(data);
+                        return element_fp(invert(data));
                     }
                 };
 
