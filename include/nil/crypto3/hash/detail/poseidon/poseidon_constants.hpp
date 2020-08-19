@@ -222,7 +222,7 @@ namespace nil {
                         return (var << 1) | (new_bit ? 1 : 0);
                     }
 
-                    constexpr poseidon_lfsr_constexpr() : constants() {
+                    constexpr poseidon_lfsr_constexpr_bls12_381() : constants() {
                         // generate_round_constants();
                         generate_round_constants_unfolded();
                     }
