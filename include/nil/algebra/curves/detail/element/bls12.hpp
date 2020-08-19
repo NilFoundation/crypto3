@@ -11,6 +11,7 @@
 #define ALGEBRA_CURVES_ELEMENT_BLS12_381_HPP
 
 #include <nil/crypto3/algebra/multiexp/bls12_381.hpp>
+
 #include <vector>
 
 namespace nil {

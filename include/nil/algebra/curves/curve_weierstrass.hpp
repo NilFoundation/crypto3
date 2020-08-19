@@ -10,15 +10,14 @@
 #ifndef ALGEBRA_CURVES_WEIERSTRASS_HPP
 #define ALGEBRA_CURVES_WEIERSTRASS_HPP
 
-#include <nil/crypto3/algebra/curves/curve.hpp>
+#include <nil/crypto3/algebra/curve.hpp>
 
 namespace nil {
     namespace algebra {
         namespace curves {
 
             template<typename FieldType>
-            struct curve_weierstrass : public curve<FieldType> {
-            private:
+            class curve_weierstrass : public curve<FieldType> {
             	typedef curve<FieldType> policy_type;
             public:
             	typedef policy_type::field_type field_type;

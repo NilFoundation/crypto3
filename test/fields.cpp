@@ -16,16 +16,16 @@
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
 
-//#include <nil/algebra/fields/bn128/fq.hpp>
-//#include <nil/algebra/fields/bn128/fr.hpp>
+#include <nil/algebra/fields/bn128/fq.hpp>
+#include <nil/algebra/fields/bn128/fr.hpp>
 #include <nil/algebra/fields/detail/params/bn128/fq.hpp>
 //#include <nil/algebra/fields/detail/params/bn128/fr.hpp>
+#include <nil/algebra/fields/bls12/fq.hpp>
+#include <nil/algebra/fields/bls12/fr.hpp>
 #include <nil/algebra/fields/detail/params/dsa_botan.hpp>
 //#include <nil/algebra/fields/detail/params/dsa_jce.hpp>
 //#include <nil/algebra/fields/detail/params/modp_srp.hpp>
 //#include <nil/algebra/fields/detail/params/params.hpp>
-#include <nil/algebra/fields/bn128/fq.hpp>
-//#include <nil/algebra/fields/bn128/fr.hpp>
 #include <nil/algebra/fields/dsa_botan.hpp>
 //#include <nil/algebra/fields/dsa_jce.hpp>
 //#include <nil/algebra/fields/ed25519_fe.hpp>
@@ -39,6 +39,8 @@
 //#include <nil/algebra/fields/fp12_2over3over2.hpp>
 //#include <nil/algebra/fields/modp_ietf.hpp>
 //#include <nil/algebra/fields/modp_srp.hpp>
+
+//#include <nil/algebra/curves/bls12.hpp>
 
 using namespace nil::algebra;
 

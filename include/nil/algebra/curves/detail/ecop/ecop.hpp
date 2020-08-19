@@ -58,7 +58,7 @@ namespace nil {
 
                 }
 
-            }   // namespace detail 
+            }   // namespace detail
         }   //  namespace curve
     }   //  namespace algebra
 }   //  namespace nil
