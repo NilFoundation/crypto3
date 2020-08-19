@@ -27,7 +27,7 @@ namespace nil {
             template<std::size_t ModulusBits, std::size_t GeneratorBits = CHAR_BIT>
             struct bls12_fq : public fp<ModulusBits, GeneratorBits> { };
 
-            template <>
+            template<>
             struct bls12_fq<381, CHAR_BIT> : public fp<381, CHAR_BIT> {
                 typedef fp<381, CHAR_BIT> policy_type;
 
@@ -45,15 +45,14 @@ namespace nil {
                 typedef typename detail::element_fp<detail::arithmetic_params<bls12_fq<381, CHAR_BIT>>> value_type;
 
                 constexpr static const std::size_t arity = 1;
-
             };
 
             constexpr typename bls12_fq<381, CHAR_BIT>::modulus_type const bls12_fq<381, CHAR_BIT>::modulus;
 
             constexpr typename bls12_fq<381, CHAR_BIT>::generator_type const bls12_fq<381, CHAR_BIT>::mul_generator;
 
-        }   // namespace fields
-    }    // namespace algebra
+        }    // namespace fields
+    }        // namespace algebra
 }    // namespace nil
 
 #endif    // ALGEBRA_FIELDS_BLS12_FQ_HPP
