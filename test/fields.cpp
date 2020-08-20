@@ -16,10 +16,8 @@
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
 
-//#include <nil/algebra/fields/bn128/fq.hpp>
+#include <nil/algebra/fields/bn128/fq.hpp>
 //#include <nil/algebra/fields/bn128/fr.hpp>
-#include <nil/algebra/fields/detail/params/bn128/fq.hpp>
-//#include <nil/algebra/fields/detail/params/bn128/fr.hpp>
 #include <nil/algebra/fields/detail/params/dsa_botan.hpp>
 //#include <nil/algebra/fields/detail/params/dsa_jce.hpp>
 //#include <nil/algebra/fields/detail/params/modp_srp.hpp>

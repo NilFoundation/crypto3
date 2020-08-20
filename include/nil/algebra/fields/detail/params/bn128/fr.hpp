@@ -30,7 +30,7 @@ namespace nil {
                     typedef typename policy_type::number_type number_type;
 
                     constexpr static const number_type q =
-                        183227397098D014DC2822DB40C0AC2E9419F4243CDCB848A1F0FAC9F8000000_cppui254;
+                        0x183227397098D014DC2822DB40C0AC2E9419F4243CDCB848A1F0FAC9F8000000_cppui254;
 
                     typedef element_fp<element_policy_type> fp2_non_residue_type;
                     typedef element_fp2<element_policy_type> fp6_3over2_non_residue_type;

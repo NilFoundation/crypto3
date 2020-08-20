@@ -10,6 +10,8 @@
 #ifndef ALGEBRA_FIELDS_ELEMENT_FP_HPP
 #define ALGEBRA_FIELDS_ELEMENT_FP_HPP
 
+#include <nil/algebra/fields/detail/exponentiation.hpp>
+
 namespace nil {
     namespace algebra {
         namespace fields {

@@ -10,6 +10,7 @@
 #ifndef ALGEBRA_FIELDS_BN128_FQ2_HPP
 #define ALGEBRA_FIELDS_BN128_FQ2_HPP
 
+#include <nil/algebra/fields/detail/element/fp2.hpp>
 #include <nil/algebra/fields/detail/params/bn128/fq.hpp>
 #include <nil/algebra/fields/field.hpp>
 
