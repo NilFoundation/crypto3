@@ -10,8 +10,6 @@
 #ifndef ALGEBRA_FIELDS_ELEMENT_FP_HPP
 #define ALGEBRA_FIELDS_ELEMENT_FP_HPP
 
-#include <nil/algebra/fields/fp.hpp>
-
 namespace nil {
     namespace algebra {
         namespace fields {

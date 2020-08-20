@@ -14,8 +14,6 @@
 #include <nil/algebra/fields/detail/element/fp3.hpp>
 #include <nil/algebra/fields/detail/exponentiation.hpp>
 
-#include <nil/algebra/fields/fp6_2over3.hpp>
-
 namespace nil {
     namespace algebra {
         namespace fields {
