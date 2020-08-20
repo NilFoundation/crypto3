@@ -11,7 +11,7 @@
 #define ALGEBRA_FIELDS_BN128_FR_HPP
 
 #include <nil/algebra/fields/detail/element/fp.hpp>
-#include <nil/algebra/fields/detail/params/bn128/fr.hpp>
+#include <nil/algebra/fields/detail/params/params.hpp>
 #include <nil/algebra/fields/field.hpp>
 
 #include <nil/algebra/detail/mp_def.hpp>
@@ -41,7 +41,7 @@ namespace nil {
                 constexpr static const std::size_t generator_bits = policy_type::generator_bits;
                 typedef typename policy_type::generator_type generator_type;
 
-                constexpr static const generator_type generator = 0x05;
+                constexpr static const generator_type mul_generator = 0x05;
 
                 typedef typename detail::element_fp<detail::arithmetic_params<bn128_fr<254, CHAR_BIT>>> value_type;
 

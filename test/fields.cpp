@@ -17,7 +17,10 @@
 #include <boost/test/data/monomorphic.hpp>
 
 #include <nil/algebra/fields/bn128/fq.hpp>
-//#include <nil/algebra/fields/bn128/fr.hpp>
+#include <nil/algebra/fields/bn128/fr.hpp>
+
+#include <nil/algebra/fields/bls12/fq.hpp>
+#include <nil/algebra/fields/bls12/fr.hpp>
 #include <nil/algebra/fields/detail/params/dsa_botan.hpp>
 //#include <nil/algebra/fields/detail/params/dsa_jce.hpp>
 //#include <nil/algebra/fields/detail/params/modp_srp.hpp>
@@ -57,9 +60,9 @@ BOOST_AUTO_TEST_SUITE(fields_manual_tests)
 
 BOOST_AUTO_TEST_CASE(fields_manual_test1) {
     
-    using value_type = fields::bn128_fq<254>::value_type;
+    using value_type = fields::bls12_fq<381>::value_type;
 
-    const fields::bn128_fq<254>::modulus_type m = fields::bn128_fq<254>::modulus;
+    const fields::bls12_fq<381>::modulus_type m = fields::bls12_fq<381>::modulus;
 
     value_type e1 = value_type::one(), e2(3);
 
