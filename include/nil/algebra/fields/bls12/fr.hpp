@@ -10,7 +10,7 @@
 #ifndef ALGEBRA_FIELDS_BLS12_FR_HPP
 #define ALGEBRA_FIELDS_BLS12_FR_HPP
 
-#include <nil/algebra/fields/fp.hpp>
+#include <nil/algebra/fields/field.hpp>
 
 #include <nil/algebra/detail/mp_def.hpp>
 
@@ -24,11 +24,11 @@ namespace nil {
              * @tparam GeneratorBits
              */
             template<std::size_t ModulusBits, std::size_t GeneratorBits = CHAR_BIT>
-            struct bls12_fr : public fp<ModulusBits, GeneratorBits> { };
+            struct bls12_fr : public field<ModulusBits, GeneratorBits> { };
 
             template<>
-            struct bls12_fr<255, CHAR_BIT> : public fp<255, CHAR_BIT> {
-                typedef fp<255, CHAR_BIT> policy_type;
+            struct bls12_fr<255, CHAR_BIT> : public field<255, CHAR_BIT> {
+                typedef field<255, CHAR_BIT> policy_type;
 
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                 typedef typename policy_type::modulus_type modulus_type;

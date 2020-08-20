@@ -7,27 +7,27 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef ALGEBRA_FIELDS_FP6_3OVER2_HPP
-#define ALGEBRA_FIELDS_FP6_3OVER2_HPP
+#ifndef ALGEBRA_FIELDS_FIELD_HPP
+#define ALGEBRA_FIELDS_FIELD_HPP
 
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/cpp_int.hpp>
+#include <boost/multiprecision/modular/modular_adaptor.hpp>
 
 namespace nil {
     namespace algebra {
         namespace fields {
-                    
+
             /**
-             * Arithmetic in the finite field F[(p^2)^3].
+             * Arithmetic in the finite field F[p], for prime p of fixed length.
              *
-             * Let p := modulus. This interface provides arithmetic for the extension field
-             * Fp6 = Fp2[V]/(V^3-non_residue) where non_residue is in Fp2.
-             *
-             * ASSUMPTION: p = 1 (mod 6)
+             * This class implements Fp-arithmetic, for a large prime p, using a fixed number
+             * of words. It is optimized for tight memory consumption, so the modulus p is
+             * passed as a template parameter, to avoid per-element overheads.
              */
             template<std::size_t ModulusBits, std::size_t GeneratorBits>
-            struct fp6_3over2 {
-
+            struct field {
+                
                 constexpr static const std::size_t modulus_bits = ModulusBits;
                 typedef boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<
                     modulus_bits, modulus_bits, boost::multiprecision::unsigned_magnitude, boost::multiprecision::unchecked,
@@ -46,11 +46,10 @@ namespace nil {
                     generator_bits, generator_bits, boost::multiprecision::unsigned_magnitude,
                     boost::multiprecision::unchecked, void>>
                     generator_type;
-                    
             };
-
+            
         }   // namespace fields
     }    // namespace algebra
 }    // namespace nil
 
-#endif    // ALGEBRA_FIELDS_FP6_3OVER2_HPP
+#endif    // ALGEBRA_FIELDS_FIELD_HPP

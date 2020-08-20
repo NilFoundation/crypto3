@@ -11,7 +11,7 @@
 #define ALGEBRA_FIELDS_BN128_FQ2_HPP
 
 #include <nil/algebra/fields/detail/params/bn128/fq.hpp>
-#include <nil/algebra/fields/fp2.hpp>
+#include <nil/algebra/fields/field.hpp>
 
 #include <nil/algebra/detail/mp_def.hpp>
 
@@ -25,11 +25,11 @@ namespace nil {
              * @tparam GeneratorBits
              */
             template<std::size_t ModulusBits, std::size_t GeneratorBits = CHAR_BIT>
-            struct bn128_fq2 : public fp2<ModulusBits, GeneratorBits> { };
+            struct bn128_fq2 : public field<ModulusBits, GeneratorBits> { };
 
             template <>
-            struct bn128_fq2<254, CHAR_BIT> : public fp2<254, CHAR_BIT> {
-                typedef fp2<254, CHAR_BIT> policy_type;
+            struct bn128_fq2<254, CHAR_BIT> : public field<254, CHAR_BIT> {
+                typedef field<254, CHAR_BIT> policy_type;
 
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                 typedef typename policy_type::modulus_type modulus_type;
@@ -42,7 +42,7 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x03;
 
-                typedef typename detail::element_fp2<detail::arithmetic_params<bn128_fq<254, CHAR_BIT>>> value_type;
+                typedef typename detail::element_fp<detail::arithmetic_params<bn128_fq<254, CHAR_BIT>>> value_type;
 
                 constexpr static const std::size_t arity = 1;
 

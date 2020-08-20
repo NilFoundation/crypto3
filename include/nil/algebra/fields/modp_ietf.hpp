@@ -11,7 +11,7 @@
 #define ALGEBRA_FIELDS_MODP_IETF_HPP
 
 #include <nil/algebra/fields/detail/element/modp_ietf.hpp>
-#include <nil/algebra/fields/fp.hpp>
+#include <nil/algebra/fields/field.hpp>
 
 #include <nil/algebra/detail/mp_def.hpp>
 
@@ -25,11 +25,11 @@ namespace nil {
              * @tparam GeneratorBits
              */
             template<std::size_t ModulusBits, std::size_t GeneratorBits>
-            struct modp_ietf : public fp<ModulusBits, GeneratorBits> { };
+            struct modp_ietf : public field<ModulusBits, GeneratorBits> { };
 
             template <>
-            struct modp_ietf<1024, CHAR_BIT> : public fp<1024, CHAR_BIT> {
-                typedef fp<1024, CHAR_BIT> policy_type;
+            struct modp_ietf<1024, CHAR_BIT> : public field<1024, CHAR_BIT> {
+                typedef field<1024, CHAR_BIT> policy_type;
 
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                 typedef typename policy_type::modulus_type modulus_type;
@@ -48,8 +48,8 @@ namespace nil {
             };
 
             template <>
-            struct modp_ietf<1536, CHAR_BIT> : public fp<1536, CHAR_BIT> {
-                typedef fp<1536, CHAR_BIT> policy_type;
+            struct modp_ietf<1536, CHAR_BIT> : public field<1536, CHAR_BIT> {
+                typedef field<1536, CHAR_BIT> policy_type;
 
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                 typedef typename policy_type::modulus_type modulus_type;
@@ -68,8 +68,8 @@ namespace nil {
             };
 
             template <>
-            struct modp_ietf<2048, CHAR_BIT> : public fp<2048, CHAR_BIT> {
-                typedef fp<2048, CHAR_BIT> policy_type;
+            struct modp_ietf<2048, CHAR_BIT> : public field<2048, CHAR_BIT> {
+                typedef field<2048, CHAR_BIT> policy_type;
 
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                 typedef typename policy_type::modulus_type modulus_type;
@@ -88,8 +88,8 @@ namespace nil {
             };
 
             template <>
-            struct modp_ietf<3072, CHAR_BIT> : public fp<3072, CHAR_BIT> {
-                typedef fp<3072, CHAR_BIT> policy_type;
+            struct modp_ietf<3072, CHAR_BIT> : public field<3072, CHAR_BIT> {
+                typedef field<3072, CHAR_BIT> policy_type;
 
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                 typedef typename policy_type::modulus_type modulus_type;
@@ -108,8 +108,8 @@ namespace nil {
             };
 
             template <>
-            struct modp_ietf<4096, CHAR_BIT> : public fp<4096, CHAR_BIT> {
-                typedef fp<4096, CHAR_BIT> policy_type;
+            struct modp_ietf<4096, CHAR_BIT> : public field<4096, CHAR_BIT> {
+                typedef field<4096, CHAR_BIT> policy_type;
 
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                 typedef typename policy_type::modulus_type modulus_type;
@@ -128,8 +128,8 @@ namespace nil {
             };
 
             template <>
-            struct modp_ietf<6144, CHAR_BIT> : public fp<6144, CHAR_BIT> {
-                typedef fp<6144, CHAR_BIT> policy_type;
+            struct modp_ietf<6144, CHAR_BIT> : public field<6144, CHAR_BIT> {
+                typedef field<6144, CHAR_BIT> policy_type;
 
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                 typedef typename policy_type::modulus_type modulus_type;
@@ -148,8 +148,8 @@ namespace nil {
             };
 
             template <>
-            struct modp_ietf<8192, CHAR_BIT> : public fp<8192, CHAR_BIT> {
-                typedef fp<8192, CHAR_BIT> policy_type;
+            struct modp_ietf<8192, CHAR_BIT> : public field<8192, CHAR_BIT> {
+                typedef field<8192, CHAR_BIT> policy_type;
 
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                 typedef typename policy_type::modulus_type modulus_type;

@@ -11,7 +11,7 @@
 #define ALGEBRA_FIELDS_DSA_BOTAN_HPP
 
 #include <nil/algebra/fields/detail/params/dsa_botan.hpp>
-#include <nil/algebra/fields/fp.hpp>
+#include <nil/algebra/fields/field.hpp>
 
 #include <nil/algebra/detail/mp_def.hpp>
 
@@ -25,11 +25,11 @@ namespace nil {
              * @tparam GeneratorBits
              */
             template<std::size_t ModulusBits, std::size_t GeneratorBits>
-            struct dsa_botan : public fp<ModulusBits, GeneratorBits> { };
+            struct dsa_botan : public field<ModulusBits, GeneratorBits> { };
 
             template <>
-            struct dsa_botan<2048, 2048> : public fp<2048, 2048> {
-                typedef fp<2048, 2048> policy_type;
+            struct dsa_botan<2048, 2048> : public field<2048, 2048> {
+                typedef field<2048, 2048> policy_type;
 
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                 typedef typename policy_type::modulus_type modulus_type;
@@ -49,8 +49,8 @@ namespace nil {
             };
 
             template <>
-            struct dsa_botan<3072, 3072> : public fp<3072, 3072> {
-                typedef fp<3072, 3072> policy_type;
+            struct dsa_botan<3072, 3072> : public field<3072, 3072> {
+                typedef field<3072, 3072> policy_type;
 
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                 typedef typename policy_type::modulus_type modulus_type;

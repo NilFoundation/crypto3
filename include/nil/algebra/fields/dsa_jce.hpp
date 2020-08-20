@@ -11,7 +11,7 @@
 #define ALGEBRA_FIELDS_DSA_JCE_HPP
 
 #include <nil/algebra/fields/detail/params/dsa_jce.hpp>
-#include <nil/algebra/fields/fp.hpp>
+#include <nil/algebra/fields/field.hpp>
 
 #include <nil/algebra/detail/mp_def.hpp>
 
@@ -25,11 +25,11 @@ namespace nil {
              * @tparam GeneratorBits
              */
             template<std::size_t ModulusBits, std::size_t GeneratorBits>
-            struct dsa_jce : public fp<ModulusBits, GeneratorBits> { };
+            struct dsa_jce : public field<ModulusBits, GeneratorBits> { };
 
             template <>
-            struct dsa_jce<1024, 1024> : public fp<1024, 1024> {
-                typedef fp<1024, 1024> policy_type;
+            struct dsa_jce<1024, 1024> : public field<1024, 1024> {
+                typedef field<1024, 1024> policy_type;
 
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                 typedef typename policy_type::modulus_type modulus_type;
