@@ -17,8 +17,6 @@
 
 #include <nil/crypto3/zk/snark/relations/variable.hpp>
 
-#include <nil/crypto3/zk/snark/protoboard.hpp>
-
 namespace nil {
     namespace crypto3 {
         namespace zk {
