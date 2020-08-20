@@ -35,7 +35,7 @@ namespace nil {
                 typedef typename policy_type::modulus_type modulus_type;
 
                 constexpr static const modulus_type modulus =
-                    21888242871839275222246405745257275088548364400416034343698204186575808495617_cppui254;
+                    0x30644E72E131A029B85045B68181585D2833E84879B9709143E1F593F0000001_cppui254;
 
                 constexpr static const std::size_t generator_bits = policy_type::generator_bits;
                 typedef typename policy_type::generator_type generator_type;

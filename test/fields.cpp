@@ -16,16 +16,16 @@
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
 
-#include <nil/algebra/fields/bn128/fq.hpp>
-#include <nil/algebra/fields/bn128/fr.hpp>
+//#include <nil/algebra/fields/bn128/fq.hpp>
+//#include <nil/algebra/fields/bn128/fr.hpp>
 #include <nil/algebra/fields/detail/params/bn128/fq.hpp>
 //#include <nil/algebra/fields/detail/params/bn128/fr.hpp>
-#include <nil/algebra/fields/bls12/fq.hpp>
-#include <nil/algebra/fields/bls12/fr.hpp>
 #include <nil/algebra/fields/detail/params/dsa_botan.hpp>
 //#include <nil/algebra/fields/detail/params/dsa_jce.hpp>
 //#include <nil/algebra/fields/detail/params/modp_srp.hpp>
 //#include <nil/algebra/fields/detail/params/params.hpp>
+#include <nil/algebra/fields/bn128/fq.hpp>
+//#include <nil/algebra/fields/bn128/fr.hpp>
 #include <nil/algebra/fields/dsa_botan.hpp>
 //#include <nil/algebra/fields/dsa_jce.hpp>
 //#include <nil/algebra/fields/ed25519_fe.hpp>
@@ -39,8 +39,6 @@
 //#include <nil/algebra/fields/fp12_2over3over2.hpp>
 //#include <nil/algebra/fields/modp_ietf.hpp>
 //#include <nil/algebra/fields/modp_srp.hpp>
-
-//#include <nil/algebra/curves/bls12.hpp>
 
 using namespace nil::algebra;
 
@@ -63,17 +61,23 @@ BOOST_AUTO_TEST_CASE(fields_manual_test1) {
     
     using value_type = fields::bn128_fq<254>::value_type;
 
+    const fields::bn128_fq<254>::modulus_type m = fields::bn128_fq<254>::modulus;
+
     value_type e1 = value_type::one(), e2(3);
 
-    std::cout << e1.is_one() << e2.is_one() << e2.is_zero();
+    std::cout << e1.is_one() << e2.is_one() << e2.is_zero() << std::endl;
 
     value_type e3 = e1.dbl() * e2.square();
 
     value_type e4 = e1 * e2 * e2 + e1 * e2 * e2;
 
-    //std::cout << (value_type(4) == e1 + e2);
+    std::cout << "4 == e1 + e2 ? : " << (value_type(4) == e1 + e2) << std::endl;
 
-    std::cout << (value_type(0) == e3);
+    std::cout << "4 == e3 ? : " << (value_type(4) == e3) << std::endl;
+
+    std::cout << "E2 value: " << e2.data << std::endl;
+
+    std::cout << "Modulus value: " << m << std::endl;
 
     std::cout << (e4 == e3);
 
