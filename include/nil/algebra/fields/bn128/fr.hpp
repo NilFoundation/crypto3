@@ -11,7 +11,8 @@
 #define ALGEBRA_FIELDS_BN128_FR_HPP
 
 #include <nil/algebra/fields/detail/element/fp.hpp>
-#include <nil/algebra/fields/detail/params/params.hpp>
+#include <nil/algebra/fields/detail/params/bn128/fr.hpp>
+
 #include <nil/algebra/fields/field.hpp>
 
 #include <nil/algebra/detail/mp_def.hpp>
@@ -25,8 +26,8 @@ namespace nil {
              * @tparam ModulusBits
              * @tparam GeneratorBits
              */
-            template<std::size_t ModulusBits, std::size_t GeneratorBits = CHAR_BIT>
-            struct bn128_fr : public field<ModulusBits, GeneratorBits> { };
+            template<std::size_t ModulusBits, std::size_t GeneratorBits>
+            struct bn128_fr : public field<ModulusBits, GeneratorBits> {};
 
             template <>
             struct bn128_fr<254, CHAR_BIT> : public field<254, CHAR_BIT> {

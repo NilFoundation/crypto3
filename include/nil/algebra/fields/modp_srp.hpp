@@ -10,7 +10,9 @@
 #ifndef ALGEBRA_FIELDS_MODP_SRP_HPP
 #define ALGEBRA_FIELDS_MODP_SRP_HPP
 
+#include <nil/algebra/fields/detail/element/fp.hpp>
 #include <nil/algebra/fields/detail/element/modp_srp.hpp>
+
 #include <nil/algebra/fields/field.hpp>
 
 #include <nil/algebra/detail/mp_def.hpp>

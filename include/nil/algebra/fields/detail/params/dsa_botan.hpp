@@ -10,18 +10,18 @@
 #ifndef ALGEBRA_FIELDS_DSA_BOTAN_PARAMS_HPP
 #define ALGEBRA_FIELDS_DSA_BOTAN_PARAMS_HPP
 
-#include <nil/algebra/fields/detail/element/fp.hpp>
-#include <nil/algebra/fields/detail/element/fp2.hpp>
 #include <nil/algebra/fields/detail/params/params.hpp>
 
-#include <nil/algebra/fields/dsa_botan.hpp>
-
+#include <nil/algebra/detail/mp_def.hpp>
 
 namespace nil {
     namespace algebra {
         namespace fields {
+
+            template<std::size_t ModulusBits, std::size_t GeneratorBits>
+            struct dsa_botan;
+
             namespace detail {
-                BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(256)
 
                 template <>
                 struct arithmetic_params<dsa_botan<2048, 2048>> : public params<dsa_botan<2048, 2048>> {

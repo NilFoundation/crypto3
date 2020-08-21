@@ -18,16 +18,14 @@
 
 #include <nil/algebra/fields/bn128/fq.hpp>
 #include <nil/algebra/fields/bn128/fr.hpp>
+//#include <nil/algebra/fields/dsa_botan.hpp>
 
 #include <nil/algebra/fields/bls12/fq.hpp>
 #include <nil/algebra/fields/bls12/fr.hpp>
-#include <nil/algebra/fields/detail/params/dsa_botan.hpp>
 //#include <nil/algebra/fields/detail/params/dsa_jce.hpp>
 //#include <nil/algebra/fields/detail/params/modp_srp.hpp>
 //#include <nil/algebra/fields/detail/params/params.hpp>
-#include <nil/algebra/fields/bn128/fq.hpp>
 //#include <nil/algebra/fields/bn128/fr.hpp>
-#include <nil/algebra/fields/dsa_botan.hpp>
 //#include <nil/algebra/fields/dsa_jce.hpp>
 //#include <nil/algebra/fields/ed25519_fe.hpp>
 //#include <nil/algebra/fields/ffdhe_ietf.hpp>

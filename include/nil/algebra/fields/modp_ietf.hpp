@@ -10,7 +10,9 @@
 #ifndef ALGEBRA_FIELDS_MODP_IETF_HPP
 #define ALGEBRA_FIELDS_MODP_IETF_HPP
 
+#include <nil/algebra/fields/detail/element/fp.hpp>
 #include <nil/algebra/fields/detail/element/modp_ietf.hpp>
+
 #include <nil/algebra/fields/field.hpp>
 
 #include <nil/algebra/detail/mp_def.hpp>

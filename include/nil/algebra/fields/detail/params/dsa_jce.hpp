@@ -11,14 +11,20 @@
 #define ALGEBRA_FIELDS_DSA_JCE_PARAMS_HPP
 
 #include <nil/algebra/fields/detail/params/params.hpp>
-#include <nil/algebra/fields/dsa_jce.hpp>
+
+#include <nil/algebra/detail/mp_def.hpp>
 
 namespace nil {
     namespace algebra {
     	namespace fields {
-	        namespace detail {
 
-	        	BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(160)
+            template<std::size_t ModulusBits, std::size_t GeneratorBits>
+            struct dsa_jce;
+
+            template<>
+            struct dsa_jce<1024,1024>;
+
+	        namespace detail {
 	        	
 	        	template <>
 	            struct arithmetic_params<dsa_jce<1024, 1024>> : public params<dsa_jce<1024, 1024>> {

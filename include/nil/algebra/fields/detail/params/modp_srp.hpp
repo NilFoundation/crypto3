@@ -11,14 +11,17 @@
 #define ALGEBRA_FIELDS_MODP_SRP_PARAMS_HPP
 
 #include <nil/algebra/fields/detail/params/params.hpp>
-#include <nil/algebra/fields/modp_srp.hpp>
+
+#include <nil/algebra/detail/mp_def.hpp>
 
 namespace nil {
     namespace algebra {
         namespace fields {
-            namespace detail {
 
-            	BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(256)
+            template<std::size_t ModulusBits, std::size_t GeneratorBits>
+            struct modp_srp;
+
+            namespace detail {
             	
                 template<std::size_t ModulusBits, std::size_t GeneratorBits = CHAR_BIT>
                 struct arithmetic_params<modp_srp<ModulusBits, GeneratorBits>> : public params<modp_srp<ModulusBits, GeneratorBits>> {

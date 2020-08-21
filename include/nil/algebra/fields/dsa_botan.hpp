@@ -10,7 +10,9 @@
 #ifndef ALGEBRA_FIELDS_DSA_BOTAN_HPP
 #define ALGEBRA_FIELDS_DSA_BOTAN_HPP
 
+#include <nil/algebra/fields/detail/element/fp.hpp>
 #include <nil/algebra/fields/detail/params/dsa_botan.hpp>
+
 #include <nil/algebra/fields/field.hpp>
 
 #include <nil/algebra/detail/mp_def.hpp>

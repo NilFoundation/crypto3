@@ -14,6 +14,7 @@
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/multiprecision/cpp_modular.hpp>
 
+BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(160)
 BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(254)
 BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(255)
 BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(381)

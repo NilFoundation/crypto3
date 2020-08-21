@@ -11,7 +11,7 @@
 #define ALGEBRA_FIELDS_BLS12_FR_HPP
 
 #include <nil/algebra/fields/detail/element/fp.hpp>
-#include <nil/algebra/fields/detail/params/params.hpp>
+#include <nil/algebra/fields/detail/params/bls12/fr.hpp>
 
 #include <nil/algebra/fields/field.hpp>
 
@@ -26,8 +26,8 @@ namespace nil {
              * @tparam ModulusBits
              * @tparam GeneratorBits
              */
-            template<std::size_t ModulusBits, std::size_t GeneratorBits = CHAR_BIT>
-            struct bls12_fr : public field<ModulusBits, GeneratorBits> { };
+            template<std::size_t ModulusBits, std::size_t GeneratorBits>
+            struct bls12_fr : public field<ModulusBits, GeneratorBits> {};
 
             template<>
             struct bls12_fr<381, CHAR_BIT> : public field<381, CHAR_BIT> {
