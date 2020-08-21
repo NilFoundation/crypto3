@@ -22,7 +22,7 @@ namespace nil {
         namespace fields {
 
             /*!
-             * @brief IETF IPsec groups
+             * @brief
              * @tparam ModulusBits
              * @tparam GeneratorBits
              */
