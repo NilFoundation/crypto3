@@ -49,6 +49,7 @@ namespace nil {
                 constexpr static const std::size_t arity = 1;
             };
 
+            template<>
             struct ffdhe_ietf<3072, CHAR_BIT> : public field<3072, CHAR_BIT> {
                 typedef field<3072, CHAR_BIT> policy_type;
 
@@ -68,6 +69,7 @@ namespace nil {
                 constexpr static const std::size_t arity = 1;
             };
 
+            template <>
             struct ffdhe_ietf<4096, CHAR_BIT> : public field<4096, CHAR_BIT> {
                 typedef field<4096, CHAR_BIT> policy_type;
 
@@ -87,6 +89,7 @@ namespace nil {
                 constexpr static const std::size_t arity = 1;
             };
 
+            template <>
             struct ffdhe_ietf<6144, CHAR_BIT> : public field<6144, CHAR_BIT> {
                 typedef field<6144, CHAR_BIT> policy_type;
 
@@ -106,6 +109,7 @@ namespace nil {
                 constexpr static const std::size_t arity = 1;
             };
 
+            template <>
             struct ffdhe_ietf<8192, CHAR_BIT> : public field<8192, CHAR_BIT> {
                 typedef field<8192, CHAR_BIT> policy_type;
 

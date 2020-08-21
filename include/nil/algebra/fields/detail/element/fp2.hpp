@@ -175,7 +175,7 @@ namespace nil {
                     }
 
                     template<typename PowerType>
-                    element_fp2 pow(const PowerType &power) const {
+                    element_fp2 pow(const PowerType &pwr) const {
                         return element_fp2(power(*this, pwr));
                     }
 

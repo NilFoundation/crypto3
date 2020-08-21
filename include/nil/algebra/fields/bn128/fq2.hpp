@@ -27,7 +27,7 @@ namespace nil {
              * @tparam ModulusBits
              * @tparam GeneratorBits
              */
-            template<std::size_t ModulusBits, std::size_t GeneratorBits>
+            template<std::size_t ModulusBits, std::size_t GeneratorBits = CHAR_BIT>
             struct bn128_fq2 : public field<ModulusBits, GeneratorBits> {};
 
             template <>
@@ -45,7 +45,7 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x03;
 
-                typedef typename detail::element_fp<detail::arithmetic_params<bn128_fq<254, CHAR_BIT>>> value_type;
+                typedef typename detail::element_fp2<detail::arithmetic_params<bn128_fq<254, CHAR_BIT>>> value_type;
 
                 constexpr static const std::size_t arity = 1;
 

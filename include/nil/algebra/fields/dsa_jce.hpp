@@ -26,7 +26,7 @@ namespace nil {
              * @tparam ModulusBits
              * @tparam GeneratorBits
              */
-            template<std::size_t ModulusBits, std::size_t GeneratorBits>
+            template<std::size_t ModulusBits, std::size_t GeneratorBits = ModulusBits>
             struct dsa_jce : public field<ModulusBits, GeneratorBits> { };
 
             template <>

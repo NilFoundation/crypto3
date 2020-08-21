@@ -99,7 +99,7 @@ namespace nil {
                     }
 
                     template <typename PowerType>
-                    element_fp6_2over3 pow(const PowerType &power) const {
+                    element_fp6_2over3 pow(const PowerType &pwr) const {
                         return element_fp6_2over3(power(*this, pwr));
                     }
 
