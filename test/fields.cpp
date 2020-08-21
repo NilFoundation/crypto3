@@ -10,7 +10,11 @@
 #define BOOST_TEST_MODULE fields_algebra_test
 
 #include <iostream>
-#include <unordered_map>
+
+#include <boost/multiprecision/cpp_modular.hpp>
+#include <boost/multiprecision/number.hpp>
+#include <boost/multiprecision/cpp_int.hpp>
+#include <boost/multiprecision/modular/modular_adaptor.hpp>
 
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
@@ -41,19 +45,6 @@
 
 using namespace nil::algebra;
 
-namespace boost {
-    namespace test_tools {
-        namespace tt_detail {
-            template<template<typename, typename> class P, typename K, typename V>
-            struct print_log_value<P<K, V>> {
-                void operator()(std::ostream &, P<K, V> const &) {
-                }
-            };
-        }    // namespace tt_detail
-    }        // namespace test_tools
-}    // namespace boost
-
-
 BOOST_AUTO_TEST_SUITE(fields_manual_tests)
 
 BOOST_AUTO_TEST_CASE(fields_manual_test1) {
@@ -80,10 +71,40 @@ BOOST_AUTO_TEST_CASE(fields_manual_test1) {
 
     std::cout << (e4 == e3);
 
-    BOOST_CHECK_EQUAL("1", "");
+    //assert(e4 == e3);
+    BOOST_CHECK_EQUAL(e4.data, e3.data);
 }
-
 BOOST_AUTO_TEST_SUITE_END()
+/*
+BOOST_AUTO_TEST_SUITE(fields_dsa_botan_tests)
+BOOST_AUTO_TEST_CASE(fields_dsa_botan_test1) {
+    
+    using value_type = fields::dsa_botan<2048, 2048>::value_type;
+
+    const fields::dsa_botan<2048, 2048>::modulus_type m = fields::dsa_botan<2048, 2048>::modulus;
+
+    value_type e1 = value_type::one(), e2(3);
+
+    std::cout << e1.is_one() << e2.is_one() << e2.is_zero() << std::endl;
+
+    value_type e3 = e1.dbl() * e2.square();
+
+    value_type e4 = e1 * e2 * e2 + e1 * e2 * e2;
+
+    std::cout << "4 == e1 + e2 ? : " << (value_type(4) == e1 + e2) << std::endl;
+
+    std::cout << "4 == e3 ? : " << (value_type(4) == e3) << std::endl;
+
+    std::cout << "E2 value: " << e2.data << std::endl;
+
+    std::cout << "Modulus value: " << m << std::endl;
+
+    std::cout << (e4 == e3);
+
+    //assert(value_type(4) == e3);
+    BOOST_CHECK_EQUAL(value_type(4).data, e3.data);
+}
+BOOST_AUTO_TEST_SUITE_END()*/
 
 
 /*

@@ -26,7 +26,7 @@ namespace nil {
              * @tparam ModulusBits
              * @tparam GeneratorBits
              */
-            template<std::size_t ModulusBits, std::size_t GeneratorBits>
+            template<std::size_t ModulusBits = 254, std::size_t GeneratorBits = CHAR_BIT>
             struct bn128_fq : public field<ModulusBits, GeneratorBits> {};
 
             template <>

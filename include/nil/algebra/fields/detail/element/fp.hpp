@@ -62,7 +62,7 @@ namespace nil {
                         return data != B.data;
                     }
 
-                    element_fp& operator=(const element_fp &B) const {
+                    element_fp& operator=(const element_fp &B) {
                         data = B.data;
 
                         return *this;
@@ -101,8 +101,8 @@ namespace nil {
                     }
 
                     template<typename PowerType>
-                    element_fp pow(const PowerType &power) const {
-                        return element_fp(power(data, power));
+                    element_fp pow(const PowerType &pwr) const {
+                        return element_fp(power(*this, pwr));
                     }
 
                     element_fp inverse() const {

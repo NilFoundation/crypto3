@@ -18,6 +18,7 @@ cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
 
                        ${Boost_LIBRARIES})
 
+
 macro(define_algebra_test name)
     cm_test(NAME algebra_${name}_test SOURCES ${name}.cpp)
 
@@ -35,6 +36,10 @@ macro(define_algebra_test name)
     elseif(target_type STREQUAL "STATIC_LIB")
 
     endif()
+
+    cm_test(NAME algebra_${name}_examples_test SOURCES ../example/${name}.cpp)
+    target_link_libraries(algebra_${name}_examples_test no_eh_support)
+
 endmacro()
 
 set(TESTS_NAMES 

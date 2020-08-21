@@ -20,18 +20,18 @@ namespace nil {
     namespace algebra {
         namespace fields {
             namespace detail {
-                template<typename FieldTypeype, typename PowerType>
-                FieldTypeype power(const FieldTypeype &base, const PowerType &exponent) {
-                    FieldTypeype result = FieldTypeype::one();
+                template<typename FieldTypeValue, typename PowerType>
+                FieldTypeValue power(const FieldTypeValue &base, const PowerType &exponent) {
+                    FieldTypeValue result = FieldTypeValue::one();
 
                     bool found_one = false;
 
-                    for (long i = msb(exponent); i >= 0; --i) {
+                    for (long i = boost::multiprecision::msb(exponent); i >= 0; --i) {
                         if (found_one) {
                             result = result.square();
                         }
 
-                        if (bit_test(exponent, i)) {
+                        if (boost::multiprecision::bit_test(exponent, i)) {
                             found_one = true;
                             result = result * base;
                         }
