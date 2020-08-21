@@ -12,15 +12,13 @@
 
 #include <nil/algebra/fields/detail/params/params.hpp>
 
+#include <nil/algebra/fields/ffdhe_ietf.hpp>
+
 #include <nil/algebra/detail/mp_def.hpp>
 
 namespace nil {
     namespace algebra {
         namespace fields {
-
-            template<std::size_t ModulusBits, std::size_t GeneratorBits>
-            struct ffdhe_ietf;
-
             namespace detail {
             	
                 template<std::size_t ModulusBits, std::size_t GeneratorBits = CHAR_BIT>

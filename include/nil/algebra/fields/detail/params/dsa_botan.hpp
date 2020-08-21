@@ -12,15 +12,13 @@
 
 #include <nil/algebra/fields/detail/params/params.hpp>
 
+#include <nil/algebra/fields/dsa_botan.hpp>
+
 #include <nil/algebra/detail/mp_def.hpp>
 
 namespace nil {
     namespace algebra {
         namespace fields {
-
-            template<std::size_t ModulusBits, std::size_t GeneratorBits>
-            struct dsa_botan;
-
             namespace detail {
 
                 template <>

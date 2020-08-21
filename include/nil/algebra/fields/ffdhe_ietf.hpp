@@ -11,7 +11,7 @@
 #define ALGEBRA_FIELDS_FFDHE_IETF_HPP
 
 #include <nil/algebra/fields/detail/element/fp.hpp>
-#include <nil/algebra/fields/detail/element/ffdhe_ietf.hpp>
+#include <nil/algebra/fields/detail/params/params.hpp>
 
 #include <nil/algebra/fields/field.hpp>
 

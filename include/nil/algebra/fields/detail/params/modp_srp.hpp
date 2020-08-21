@@ -12,15 +12,13 @@
 
 #include <nil/algebra/fields/detail/params/params.hpp>
 
+#include <nil/algebra/fields/modp_srp.hpp>
+
 #include <nil/algebra/detail/mp_def.hpp>
 
 namespace nil {
     namespace algebra {
         namespace fields {
-
-            template<std::size_t ModulusBits, std::size_t GeneratorBits>
-            struct modp_srp;
-
             namespace detail {
             	
                 template<std::size_t ModulusBits, std::size_t GeneratorBits = CHAR_BIT>

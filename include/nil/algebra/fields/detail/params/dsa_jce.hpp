@@ -12,18 +12,13 @@
 
 #include <nil/algebra/fields/detail/params/params.hpp>
 
+#include <nil/algebra/fields/dsa_jce.hpp>
+
 #include <nil/algebra/detail/mp_def.hpp>
 
 namespace nil {
     namespace algebra {
     	namespace fields {
-
-            template<std::size_t ModulusBits, std::size_t GeneratorBits>
-            struct dsa_jce;
-
-            template<>
-            struct dsa_jce<1024,1024>;
-
 	        namespace detail {
 	        	
 	        	template <>

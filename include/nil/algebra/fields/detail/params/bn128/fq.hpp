@@ -14,15 +14,13 @@
 #include <nil/algebra/fields/detail/element/fp2.hpp>
 #include <nil/algebra/fields/detail/params/params.hpp>
 
+#include <nil/algebra/fields/bn128/fq.hpp>
+
 #include <nil/algebra/detail/mp_def.hpp>
 
 namespace nil {
     namespace algebra {
         namespace fields {
-
-            template<std::size_t ModulusBits, std::size_t GeneratorBits = CHAR_BIT>
-            struct bn128_fq;
-
             namespace detail {
 
                 template<std::size_t ModulusBits, std::size_t GeneratorBits>

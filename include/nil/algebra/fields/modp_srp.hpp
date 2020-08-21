@@ -11,7 +11,7 @@
 #define ALGEBRA_FIELDS_MODP_SRP_HPP
 
 #include <nil/algebra/fields/detail/element/fp.hpp>
-#include <nil/algebra/fields/detail/element/modp_srp.hpp>
+#include <nil/algebra/fields/detail/params/params.hpp>
 
 #include <nil/algebra/fields/field.hpp>
 

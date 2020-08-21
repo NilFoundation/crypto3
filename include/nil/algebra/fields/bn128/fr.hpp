@@ -11,7 +11,7 @@
 #define ALGEBRA_FIELDS_BN128_FR_HPP
 
 #include <nil/algebra/fields/detail/element/fp.hpp>
-#include <nil/algebra/fields/detail/params/bn128/fr.hpp>
+#include <nil/algebra/fields/detail/params/params.hpp>
 
 #include <nil/algebra/fields/field.hpp>
 

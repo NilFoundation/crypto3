@@ -18,7 +18,7 @@
 
 #include <nil/algebra/fields/bn128/fq.hpp>
 #include <nil/algebra/fields/bn128/fr.hpp>
-//#include <nil/algebra/fields/dsa_botan.hpp>
+#include <nil/algebra/fields/dsa_botan.hpp>
 
 #include <nil/algebra/fields/bls12/fq.hpp>
 #include <nil/algebra/fields/bls12/fr.hpp>
@@ -58,9 +58,9 @@ BOOST_AUTO_TEST_SUITE(fields_manual_tests)
 
 BOOST_AUTO_TEST_CASE(fields_manual_test1) {
     
-    using value_type = fields::bls12_fq<381>::value_type;
+    using value_type = fields::dsa_botan<2048, 2048>::value_type;
 
-    const fields::bls12_fq<381>::modulus_type m = fields::bls12_fq<381>::modulus;
+    const fields::dsa_botan<2048, 2048>::modulus_type m = fields::dsa_botan<2048, 2048>::modulus;
 
     value_type e1 = value_type::one(), e2(3);
 
