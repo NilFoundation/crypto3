@@ -13,6 +13,8 @@
 #include <nil/crypto3/algebra/curves/curve_weierstrass.hpp>
 #include <nil/crypto3/algebra/curves/detail/element/bls12.hpp>
 
+#include <nil/algebra/detail/mp_def.hpp>
+
 namespace nil {
     namespace algebra {
         namespace curves {

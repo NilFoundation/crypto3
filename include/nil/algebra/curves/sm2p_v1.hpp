@@ -13,12 +13,11 @@
 #include <nil/crypto3/pubkey/ec_group/curve_weierstrass.hpp>
 #include <nil/crypto3/algebra/curves/detail/element/sm2p_v1.hpp>
 
+#include <nil/algebra/detail/mp_def.hpp>
+
 namespace nil {
     namespace algebra {
-        namespace curves {
-
-            BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(256)
-            
+        namespace curves {            
 
             template<std::size_t PBits>
             struct sm2p_v1 : public curve_weierstrass<PBits> {};

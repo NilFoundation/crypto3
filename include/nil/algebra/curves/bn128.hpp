@@ -13,6 +13,8 @@
 #include <nil/crypto3/algebra/curves/curve_weierstrass.hpp>
 #include <nil/crypto3/algebra/curves/detail/element/bn128.hpp>
 
+#include <nil/algebra/detail/mp_def.hpp>
+
 namespace nil {
     namespace algebra {
     	namespace curves {
@@ -22,7 +24,6 @@ namespace nil {
 				E/Fp: y^2 = x^3 + b.
 			*/
 
-	        BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(254)
 	        /*
 	        	Over Fp12_2over3over2
 				y^2 = x^3 + b
@@ -39,12 +40,12 @@ namespace nil {
 		        typedef typename policy_type::field_type field_type;
 
 		        constexpr static const number_type p = 
-		        	21888242871839275222246405745257275088696311157297823662689037894645226208583_cppui254;
+		        	0x30644E72E131A029B85045B68181585D97816A916871CA8D3C208C16D87CFD47_cppui254;
 		        constexpr static const number_type a = 0;
 		        constexpr static const number_type b = 0x03;
 		        constexpr static const number_type x = 0x09;
 		        constexpr static const number_type y = 0x01;
-		        constexpr static const number_type order = 21888242871839275222246405745257275088548364400416034343698204186575808495617_cppui254;
+		        constexpr static const number_type order = 0x30644E72E131A029B85045B68181585D2833E84879B9709143E1F593F0000001_cppui254;
 
 		        typedef typename detail::element_bn128<field_type::value_type> value_type;
 	    	};

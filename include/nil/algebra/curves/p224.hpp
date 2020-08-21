@@ -12,11 +12,11 @@
 #include <nil/crypto3/algebra/curves/curve_nist.hpp>
 #include <nil/crypto3/algebra/curves/detail/element/p224.hpp>
 
+#include <nil/algebra/detail/mp_def.hpp>
+
 namespace nil {
     namespace algebra {
         namespace curves {
-
-            BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(224)
 
             /**
              * The NIST P-224 curve

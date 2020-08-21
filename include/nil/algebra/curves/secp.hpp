@@ -13,15 +13,11 @@
 #include <nil/crypto3/pubkey/ec_group/curve_weierstrass.hpp>
 #include <nil/crypto3/algebra/curves/detail/element/secp_k1.hpp>
 
+#include <nil/algebra/detail/mp_def.hpp>
+
 namespace nil {
     namespace algebra {
         namespace curves {
-
-            BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(160)
-            BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(192)
-            BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(224)
-            BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(256)
-        
         
             template<std::size_t PBits>
             struct secp_k1 : public curve_weierstrass<PBits> {};

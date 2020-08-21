@@ -13,11 +13,11 @@
 #include <nil/crypto3/pubkey/ec_group/curve_nist.hpp>
 #include <nil/crypto3/algebra/curves/detail/element/p521.hpp>
 
+#include <nil/algebra/detail/mp_def.hpp>
+
 namespace nil {
     namespace algebra {
         namespace curves {
-
-            BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(521)
 
             /**
              * The NIST P-521 curve
