@@ -50,6 +50,14 @@ namespace nil {
                         return (data[0] != B.data[0]) || (data[1] != B.data[1]) || (data[2] != B.data[2]);
                     }
 
+                    element_fp6_3over2& operator=(const element_fp6_3over2 &B) {
+                        data[0] = B.data[0];
+                        data[1] = B.data[1];
+                        data[2] = B.data[2];
+
+                        return *this;
+                    }
+
                     element_fp6_3over2 operator+(const element_fp6_3over2 &B) const {
                         return {data[0] + B.data[0], data[1] + B.data[1], data[2] + B.data[2]};
                     }

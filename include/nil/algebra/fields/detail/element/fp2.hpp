@@ -73,7 +73,7 @@ namespace nil {
                         return (data[0] != B.data[0]) || (data[1] != B.data[1]);
                     }
 
-                    element_fp2& operator=(const element_fp2 &B) const {
+                    element_fp2& operator=(const element_fp2 &B) {
                         data[0] = B.data[0];
                         data[1] = B.data[1];
 
