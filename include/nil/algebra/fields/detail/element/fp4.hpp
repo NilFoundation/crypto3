@@ -65,8 +65,22 @@ namespace nil {
                         return element_fp4({data[0] - B.data[0], data[1] - B.data[1]});
                     }
 
+                    element_fp4& operator-=(const element_fp4 &B) {
+                        data[0] -= B.data[0];
+                        data[1] -= B.data[1];
+
+                        return *this;
+                    }
+
+                    element_fp4& operator+=(const element_fp4 &B) {
+                        data[0] += B.data[0];
+                        data[1] += B.data[1];
+
+                        return *this;
+                    }
+
                     element_fp4 operator-() const {
-                        return zero()-data;
+                        return zero() - *this;
                     }
                     
                     element_fp4 operator*(const element_fp4 &B) const {
@@ -81,12 +95,12 @@ namespace nil {
                     }
 
                     element_fp4 square() const {
-                        return data*data;    // maybe can be done more effective
+                        return (*this) * (*this);    // maybe can be done more effective
                     }
 
                     template <typename PowerType>
                     element_fp4 pow(const PowerType &power) const {
-                        return power(data, power);
+                        return element_fp4(power(*this, pwr));
                     }
 
                     element_fp4 inverse() const {

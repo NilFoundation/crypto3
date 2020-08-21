@@ -76,6 +76,18 @@ namespace nil {
                         return element_fp(data - B.data);
                     }
 
+                    element_fp& operator-=(const element_fp &B) {
+                        data -= B.data;
+
+                        return *this;
+                    }
+
+                    element_fp& operator+=(const element_fp &B) {
+                        data += B.data;
+
+                        return *this;
+                    }
+
                     element_fp operator-() const {
                         return element_fp(-data);
                     }

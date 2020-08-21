@@ -32,21 +32,21 @@ namespace nil {
 
                     value_type data;
 
-                    element_fp6_3over2(value_type data) : data(data) {};
+                    element_fp12_2over3over2(value_type data) : data(data) {};
 
-                    inline static element_fp6_3over2 zero() {
-                        return {underlying_type::zero(), underlying_type::zero()};
+                    inline static element_fp12_2over3over2 zero() {
+                        return element_fp12_2over3over2({underlying_type::zero(), underlying_type::zero()});
                     }
 
-                    inline static element_fp6_3over2 one() {
-                        return {underlying_type::one(), underlying_type::zero()};
+                    inline static element_fp12_2over3over2 one() {
+                        return element_fp12_2over3over2({underlying_type::one(), underlying_type::zero()});
                     }
 
-                    bool operator==(const element_fp6_3over2 &B) const {
+                    bool operator==(const element_fp12_2over3over2 &B) const {
                         return (data[0] == B.data[0]) && (data[1] == B.data[1]);
                     }
 
-                    bool operator!=(const element_fp6_3over2 &B) const {
+                    bool operator!=(const element_fp12_2over3over2 &B) const {
                         return (data[0] != B.data[0]) || (data[1] != B.data[1]);
                     }
 
@@ -57,39 +57,53 @@ namespace nil {
                         return *this;
                     }
 
-                    element_fp6_3over2 operator+(const element_fp6_3over2 &B) const {
-                        return {data[0] + B.data[0], data[1] + B.data[1]};
+                    element_fp12_2over3over2 operator+(const element_fp12_2over3over2 &B) const {
+                        return element_fp12_2over3over2({data[0] + B.data[0], data[1] + B.data[1]});
                     }
 
-                    element_fp6_3over2 operator-(const element_fp6_3over2 &B) const {
-                        return {data[0] - B.data[0], data[1] - B.data[1]};
+                    element_fp12_2over3over2 operator-(const element_fp12_2over3over2 &B) const {
+                        return element_fp12_2over3over2({data[0] - B.data[0], data[1] - B.data[1]});
                     }
 
-                    element_fp6_3over2 operator-() const {
-                        return zero()-data;
+                    element_fp12_2over3over2& operator-=(const element_fp12_2over3over2 &B) {
+                        data[0] -= B.data[0];
+                        data[1] -= B.data[1];
+
+                        return *this;
+                    }
+
+                    element_fp12_2over3over2& operator+=(const element_fp12_2over3over2 &B) {
+                        data[0] += B.data[0];
+                        data[1] += B.data[1];
+
+                        return *this;
+                    }
+
+                    element_fp12_2over3over2 operator-() const {
+                        return zero() - *this;
                     }
                     
-                    element_fp6_3over2 operator*(const element_fp6_3over2 &B) const {
+                    element_fp12_2over3over2 operator*(const element_fp12_2over3over2 &B) const {
                         const underlying_type A0B0 = data[0] * B.data[0], A1B1 = data[1] * B.data[1];
 
-                        return {A0B0 + mul_by_non_residue(A1B1), (data[0] + data[1]) * (B.data[0] + B.data[1]) - A0B0 - A1B1};
+                        return element_fp12_2over3over2({A0B0 + mul_by_non_residue(A1B1), (data[0] + data[1]) * (B.data[0] + B.data[1]) - A0B0 - A1B1});
                     }
 
-                    element_fp6_3over2 sqrt() const {
+                    element_fp12_2over3over2 sqrt() const {
 
                         // compute square root with Tonelli--Shanks
                     }
 
-                    element_fp6_3over2 square() const {
-                        return data*data;    // maybe can be done more effective
+                    element_fp12_2over3over2 square() const {
+                        return (*this) * (*this);    // maybe can be done more effective
                     }
 
                     template <typename PowerType>
-                    element_fp6_3over2 pow(const PowerType &power) const {
-                        return power(data, power);
+                    element_fp12_2over3over2 pow(const PowerType &pwr) const {
+                        return element_fp12_2over3over2(power(*this, pwr));
                     }
 
-                    element_fp6_3over2 inverse() const {
+                    element_fp12_2over3over2 inverse() const {
 
                         /* From "High-Speed Software Implementation of the Optimal Ate Pairing over Barreto-Naehrig Curves";
                          * Algorithm 8 */
@@ -103,20 +117,19 @@ namespace nil {
                         const underlying_type c0 = A0 * t3;
                         const underlying_type c1 = -(A1 * t3);
 
-                        return {c0, c1};
+                        return element_fp12_2over3over2({c0, c1});
 
                     }
 
-
-                    element_fp6_3over2 sqru() {
-                        element<fp2> &z0(a_.a_);
-                        element<fp2> &z4(a_.b_);
-                        element<fp2> &z3(a_.c_);
-                        element<fp2> &z2(b_.a_);
-                        element<fp2> &z1(b_.b_);
-                        element<fp2> &z5(b_.c_);
-                        element<fp4> t0t1;
-                        element<fp2> t0 = t0t1.data[0], t1 = t0t1.data[1];
+                    element_fp12_2over3over2 sqru() {
+                        element_fp2 &z0(a_.a_);
+                        element_fp2 &z4(a_.b_);
+                        element_fp2 &z3(a_.c_);
+                        element_fp2 &z2(b_.a_);
+                        element_fp2 &z1(b_.b_);
+                        element_fp2 &z5(b_.c_);
+                        element_fp4 t0t1;
+                        element_fp2 t0 = t0t1.data[0], t1 = t0t1.data[1];
 
                         t0t1 = sq_Fp4UseDbl({z0, z1});    // a^2 = t0 + t1*y
                         // For A
@@ -127,7 +140,7 @@ namespace nil {
                         z1 = (t1 + z1).dbl() + t1;
 
                         // t0 and t1 are unnecessary from here.
-                        Fp2 t2, t3;
+                        element_fp2 t2, t3;
                         t0t1 = sq_Fp4UseDbl({z2, z3});    // b^2 = t0 + t1*y
                         t0t1 = sq_Fp4UseDbl({z4, z5});    // c^2 = t2 + t3*y
                         // For C
@@ -145,14 +158,14 @@ namespace nil {
 
                 private:
                     inline static underlying_type mul_by_non_residue(const underlying_type &A){
-                        return {non_residue * A.data[2], A.data[1], A.data[0]};
+                        return element_fp12_2over3over2({non_residue * A.data[2], A.data[1], A.data[0]});
                     }
                 };
 
                 /*
                     (a + bw) -> (a - bw) gammar
                 */
-                element<fp12_2over3over2> Frobenius(element<fp12_2over3over2> A) {
+                element_fp12_2over3over2 Frobenius(element_fp12_2over3over2 A) {
                     /* this assumes (q-1)/6 is odd */
                 
                     z.a_.a_.a_ = A.a_.a_.a_;
@@ -184,7 +197,7 @@ namespace nil {
                     ~t * (c + dw) = (a + bw) * ((c + dw)(c - dw))
                     gammar2 = (c + dw)(c - dw) in Fp6
                 */
-                element<fp12_2over3over2> Frobenius2(element<fp12_2over3over2> A) {
+                element_fp12_2over3over2 Frobenius2(element_fp12_2over3over2 A) {
 
                     
                     z.a_.a_ = A.a_.a_;
@@ -197,7 +210,7 @@ namespace nil {
                     z.b_.c_ = A.b_.c_.mul_Fp_0(Param::gammar2[4].a_);
                 }
 
-                element<fp12_2over3over2> Frobenius3(element<fp12_2over3over2> A) {
+                element_fp12_2over3over2 Frobenius3(element_fp12_2over3over2 A) {
                     z.a_.a_.a_ =  A.a_.a_.a_;
                     z.a_.b_.a_ =  A.a_.b_.a_;
                     z.a_.c_.a_ =  A.a_.c_.a_;

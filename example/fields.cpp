@@ -60,7 +60,9 @@ void bn128_fq_number_examples()
 
     std::cout << "e1 square square value: " <<  e1.square().square().data << std::endl;
 
-    std::cout << "e1 pow 4 value: " <<  e1.pow(4).data << std::endl;    
+    std::cout << "e1 pow 4 value: " <<  e1.pow(4).data << std::endl;
+
+    std::cout << "e1 pow 11 value: " <<  e1.pow(11).data << std::endl;
 
 }
 
