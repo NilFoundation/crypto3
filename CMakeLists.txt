@@ -184,7 +184,7 @@ endif()
 if(CRYPTO3_HASH_POSEIDON)
     list(APPEND ${CURRENT_PROJECT_NAME}_POSEIDON_HEADERS
          include/nil/crypto3/hash/poseidon.hpp)
-    
+
     add_definitions(-D${CMAKE_UPPER_WORKSPACE_NAME}_HAS_POSEIDON)
     list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
          ${${CURRENT_PROJECT_NAME}_POSEIDON_HEADERS})

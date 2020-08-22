@@ -10,7 +10,6 @@
 #define CRYPTO3_HASH_POSEIDON_MDS_MATRIX_HPP
 
 #include <nil/crypto3/hash/detail/poseidon/poseidon_policy.hpp>
-#include <nil/algebra/fields/operations.hpp>
 
 #include <boost/assert.hpp>
 #include <boost/multiprecision/cpp_int.hpp>
@@ -106,8 +105,8 @@ namespace nil {
                                 for (std::size_t j = 0; j < state_words; j++) {
                                     // TODO: change according to algebra interface
                                     mds_matrix.insert_element(i, j, ElementType(
-                                        cpp_int(i + (j + state_words))
-                                    ).get_inverse());
+                                        i + (j + state_words)
+                                    ).inverse());
                                 }
                             }
                             return mds_matrix;

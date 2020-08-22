@@ -9,18 +9,12 @@
 #ifndef CRYPTO3_HASH_POSEIDON_POLICY_HPP
 #define CRYPTO3_HASH_POSEIDON_POLICY_HPP
 
-#include <nil/crypto3/detail/static_digest.hpp>
-
-// #include <boost/static_assert.hpp>
-// #include <boost/assert.hpp>
-
 #include <array>
 
 namespace nil {
     namespace crypto3 {
         namespace hashes {
             namespace detail {
-
                 // at this moment only for bls12-381 - filecoin oriented im
 
                 /*!

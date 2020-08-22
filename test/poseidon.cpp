@@ -14,16 +14,18 @@
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
 
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/json_parser.hpp>
+// #include <boost/property_tree/ptree.hpp>
+// #include <boost/property_tree/json_parser.hpp>
 
-#include <nil/crypto3/hash/algorithm/hash.hpp>
-#include <nil/crypto3/hash/adaptor/hashed.hpp>
+// #include <nil/crypto3/hash/algorithm/hash.hpp>
+// #include <nil/crypto3/hash/adaptor/hashed.hpp>
 
 #include <nil/crypto3/hash/poseidon.hpp>
+#include <nil/algebra/fields/bls12/fr.hpp>
 
 using namespace nil::crypto3;
-using namespace nil::crypto3::accumulators;
+using namespace nil::algebra;
+// using namespace nil::crypto3::accumulators;
 
 namespace boost {
     namespace test_tools {
@@ -37,48 +39,71 @@ namespace boost {
     }        // namespace test_tools
 }    // namespace boost
 
-BOOST_TEST_DONT_PRINT_LOG_VALUE(hashes::poseidon::digest_type)
+BOOST_AUTO_TEST_SUITE(poseidon_manual_tests)
 
-class fixture {
-public:
-    accumulator_set<hashes::poseidon> acc;
-    typedef hashes::poseidon hash_t;
+BOOST_AUTO_TEST_CASE(poseidon_manual_test1) {
+    constexpr std::size_t Arity = 3;
+    typedef fields::bls12_fr<255> BLS12_255;
+    typedef hashes::detail::poseidon_policy<BLS12_255, Arity, false> poseidon_policy_type;
+    typedef hashes::detail::poseidon_functions<BLS12_255, Arity, false> poseidon_functions_type;
 
-    virtual ~fixture() {
+    using value_type = fields::bls12_fr<255>::value_type;
+
+    poseidon_policy_type::state_type st;
+
+    for (std::size_t i = 1; i < poseidon_policy_type::state_words; i++) {
+        st[i] = value_type(i - 1);
     }
-};
+    st[0] = value_type((1 << poseidon_policy_type::block_words) - 1);
 
-const char *test_data = "data/poseidon.json";
+    poseidon_functions_type::permute(st);
 
-boost::property_tree::ptree string_data() {
-    boost::property_tree::ptree string_data;
-    boost::property_tree::read_json(test_data, string_data);
-
-    return string_data;
-}
-
-BOOST_AUTO_TEST_SUITE(poseidon_stream_processor_data_driven_algorithm_test_suite)
-
-BOOST_DATA_TEST_CASE(poseidon_string_various_range_value_hash, string_data(), array_element) {
-    std::string out = hash<hashes::poseidon>(array_element.first);
-
-    BOOST_CHECK_EQUAL(out, array_element.second.data());
-}
-
-BOOST_DATA_TEST_CASE(poseidon_string_various_itr_value_hash, string_data(), array_element) {
-    std::string out = hash<hashes::poseidon>(array_element.first.begin(), array_element.first.end());
-
-    BOOST_CHECK_EQUAL(out, array_element.second.data());
 }
 
 BOOST_AUTO_TEST_SUITE_END()
 
-BOOST_AUTO_TEST_SUITE(poseidon_stream_processor_data_driven_adaptor_test_suite)
+// BOOST_TEST_DONT_PRINT_LOG_VALUE(hashes::poseidon::digest_type)
 
-BOOST_DATA_TEST_CASE(poseidon_string_various_range_value_hash, string_data(), array_element) {
-    std::string out = array_element.first | adaptors::hashed<hashes::poseidon>;
+// class fixture {
+// public:
+//     accumulator_set<hashes::poseidon> acc;
+//     typedef hashes::poseidon hash_t;
 
-    BOOST_CHECK_EQUAL(out, array_element.second.data());
-}
+//     virtual ~fixture() {
+//     }
+// };
 
-BOOST_AUTO_TEST_SUITE_END()
+// const char *test_data = "data/poseidon.json";
+
+// boost::property_tree::ptree string_data() {
+//     boost::property_tree::ptree string_data;
+//     boost::property_tree::read_json(test_data, string_data);
+
+//     return string_data;
+// }
+
+// BOOST_AUTO_TEST_SUITE(poseidon_stream_processor_data_driven_algorithm_test_suite)
+
+// BOOST_DATA_TEST_CASE(poseidon_string_various_range_value_hash, string_data(), array_element) {
+//     std::string out = hash<hashes::poseidon>(array_element.first);
+
+//     BOOST_CHECK_EQUAL(out, array_element.second.data());
+// }
+
+// BOOST_DATA_TEST_CASE(poseidon_string_various_itr_value_hash, string_data(), array_element) {
+//     std::string out = hash<hashes::poseidon>(array_element.first.begin(), array_element.first.end());
+
+//     BOOST_CHECK_EQUAL(out, array_element.second.data());
+// }
+
+// BOOST_AUTO_TEST_SUITE_END()
+
+// BOOST_AUTO_TEST_SUITE(poseidon_stream_processor_data_driven_adaptor_test_suite)
+
+// BOOST_DATA_TEST_CASE(poseidon_string_various_range_value_hash, string_data(), array_element) {
+//     std::string out = array_element.first | adaptors::hashed<hashes::poseidon>;
+
+//     BOOST_CHECK_EQUAL(out, array_element.second.data());
+// }
+
+// BOOST_AUTO_TEST_SUITE_END()
