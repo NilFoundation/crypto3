@@ -42,10 +42,14 @@ namespace nil {
                     constexpr static const std::size_t key_bits = policy_type::key_bits;
                     typedef typename policy_type::key_type key_type;
 
+                    constexpr static const std::size_t block_bits = policy_type::block_bits;
+                    constexpr static const std::size_t block_size = policy_type::block_size;
+                    typedef typename policy_type::block_type block_type;
+
                     constexpr static const std::size_t iv_bits = policy_type::iv_bits;
                     typedef typename policy_type::iv_type iv_type;
 
-                    void schedule_iv(key_schedule_type &schedule, const iv_type &iv) {
+                    void schedule_iv(block_type &block, key_schedule_type &schedule, const iv_type &iv) {
                         // XSalsa20
 #pragma clang loop unroll(full)
                         for (std::uint8_t itr = 0; itr < 4; itr++) {
@@ -75,11 +79,9 @@ namespace nil {
                         schedule[8] = 0;
                         schedule[9] = 0;
 
-                        policy_type::salsa_core(m_buffer.data(), schedule);
+                        policy_type::salsa_core(block, schedule);
                         ++schedule[8];
                         schedule[9] += (schedule[8] == 0);
-
-                        m_position = 0;
                     }
                 };
 
@@ -100,12 +102,14 @@ namespace nil {
                     constexpr static const std::size_t key_bits = policy_type::key_bits;
                     typedef typename policy_type::key_type key_type;
 
+                    constexpr static const std::size_t block_bits = policy_type::block_bits;
+                    constexpr static const std::size_t block_size = policy_type::block_size;
+                    typedef typename policy_type::block_type block_type;
+
                     constexpr static const std::size_t iv_bits = policy_type::iv_bits;
                     typedef typename policy_type::iv_type iv_type;
 
                     void schedule_key(key_schedule_type &schedule, const key_type &key) {
-                        m_buffer.resize(64);
-
                         schedule[0] = policy_type::tau()[0];
                         schedule[5] = policy_type::tau()[1];
                         schedule[10] = policy_type::tau()[2];
@@ -118,22 +122,18 @@ namespace nil {
                             schedule[itr + 11] = boost::endian::native_to_little(
                                 make_uint_t(key[4 * itr], key[4 * itr + 1], key[4 * itr + 2], key[4 * itr + 3]));
                         }
-
-                        m_position = 0;
                     }
 
-                    void schedule_iv(key_schedule_type &schedule, const iv_type &iv) {
+                    void schedule_iv(block_type &block, key_schedule_type &schedule, const iv_type &iv) {
                         // Salsa20
                         schedule[6] = boost::endian::native_to_little(make_uint_t(iv[0], iv[1], iv[2], iv[3]));
                         schedule[7] = boost::endian::native_to_little(make_uint_t(iv[4], iv[5], iv[6], iv[7]));
                         schedule[8] = 0;
                         schedule[9] = 0;
 
-                        policy_type::salsa_core(m_buffer.data(), schedule);
+                        policy_type::salsa_core(block, schedule);
                         ++schedule[8];
                         schedule[9] += (schedule[8] == 0);
-
-                        m_position = 0;
                     }
                 };
 
@@ -154,12 +154,14 @@ namespace nil {
                     constexpr static const std::size_t key_bits = policy_type::key_bits;
                     typedef typename policy_type::key_type key_type;
 
+                    constexpr static const std::size_t block_bits = policy_type::block_bits;
+                    constexpr static const std::size_t block_size = policy_type::block_size;
+                    typedef typename policy_type::block_type block_type;
+
                     constexpr static const std::size_t iv_bits = policy_type::iv_bits;
                     typedef typename policy_type::iv_type iv_type;
 
                     void schedule_key(key_schedule_type &schedule, const key_type &key) {
-                        m_buffer.resize(64);
-
                         schedule[0] = policy_type::tau()[0];
                         schedule[5] = policy_type::tau()[1];
                         schedule[10] = policy_type::tau()[2];
@@ -172,11 +174,9 @@ namespace nil {
                             schedule[itr + 11] = boost::endian::native_to_little(
                                 make_uint_t(key[4 * itr], key[4 * itr + 1], key[4 * itr + 2], key[4 * itr + 3]));
                         }
-
-                        m_position = 0;
                     }
 
-                    void schedule_iv(key_schedule_type &state, const iv_type &iv) {
+                    void schedule_iv(block_type &block, key_schedule_type &state, const iv_type &iv) {
                         // XSalsa20
 #pragma clang loop unroll(full)
                         for (std::uint8_t itr = 0; itr < 4; itr++) {
@@ -207,11 +207,9 @@ namespace nil {
                         state[8] = 0;
                         state[9] = 0;
 
-                        policy_type::salsa_core(m_buffer.data(), state);
+                        policy_type::salsa_core(block, state);
                         ++state[8];
                         state[9] += (state[8] == 0);
-
-                        m_position = 0;
                     }
                 };
 
@@ -232,12 +230,14 @@ namespace nil {
                     constexpr static const std::size_t key_bits = policy_type::key_bits;
                     typedef typename policy_type::key_type key_type;
 
+                    constexpr static const std::size_t block_bits = policy_type::block_bits;
+                    constexpr static const std::size_t block_size = policy_type::block_size;
+                    typedef typename policy_type::block_type block_type;
+
                     constexpr static const std::size_t iv_bits = policy_type::iv_bits;
                     typedef typename policy_type::iv_type iv_type;
 
                     void schedule_key(key_schedule_type &state, const key_type &key) {
-                        m_buffer.resize(64);
-
                         state[0] = policy_type::sigma()[0];
                         state[5] = policy_type::sigma()[1];
                         state[10] = policy_type::sigma()[2];
@@ -251,22 +251,18 @@ namespace nil {
                                 make_uint_t(key[4 * itr + 16], key[4 * itr + 1 + 16], key[4 * itr + 2 + 16],
                                             key[4 * itr + 3 + 16]));
                         }
-
-                        m_position = 0;
                     }
 
-                    void schedule_iv(key_schedule_type &schedule, const iv_type &iv) {
+                    void schedule_iv(block_type &block, key_schedule_type &schedule, const iv_type &iv) {
                         // Salsa20
                         schedule[6] = boost::endian::native_to_little(make_uint_t(iv[0], iv[1], iv[2], iv[3]));
                         schedule[7] = boost::endian::native_to_little(make_uint_t(iv[4], iv[5], iv[6], iv[7]));
                         schedule[8] = 0;
                         schedule[9] = 0;
 
-                        policy_type::salsa_core(m_buffer.data(), schedule);
+                        policy_type::salsa_core(block, schedule);
                         ++schedule[8];
                         schedule[9] += (schedule[8] == 0);
-
-                        m_position = 0;
                     }
                 };
 
@@ -287,12 +283,14 @@ namespace nil {
                     constexpr static const std::size_t key_bits = policy_type::key_bits;
                     typedef typename policy_type::key_type key_type;
 
+                    constexpr static const std::size_t block_bits = policy_type::block_bits;
+                    constexpr static const std::size_t block_size = policy_type::block_size;
+                    typedef typename policy_type::block_type block_type;
+
                     constexpr static const std::size_t iv_bits = policy_type::iv_bits;
                     typedef typename policy_type::iv_type iv_type;
 
                     void schedule_key(key_schedule_type &state, const key_type &key) {
-                        m_buffer.resize(64);
-
                         state[0] = policy_type::sigma()[0];
                         state[5] = policy_type::sigma()[1];
                         state[10] = policy_type::sigma()[2];
@@ -306,11 +304,9 @@ namespace nil {
                                 make_uint_t(key[4 * itr + 16], key[4 * itr + 1 + 16], key[4 * itr + 2 + 16],
                                             key[4 * itr + 3 + 16]));
                         }
-
-                        m_position = 0;
                     }
 
-                    void schedule_iv(key_schedule_type &state, const iv_type &iv) {
+                    void schedule_iv(block_type &block, key_schedule_type &state, const iv_type &iv) {
                         // XSalsa20
 #pragma clang loop unroll(full)
                         for (std::uint8_t itr = 0; itr < 4; itr++) {
@@ -339,11 +335,9 @@ namespace nil {
                         state[8] = 0;
                         state[9] = 0;
 
-                        policy_type::salsa_core(m_buffer.data(), state);
+                        policy_type::salsa_core(block, state);
                         ++state[8];
                         state[9] += (state[8] == 0);
-
-                        m_position = 0;
                     }
                 };
             }    // namespace detail

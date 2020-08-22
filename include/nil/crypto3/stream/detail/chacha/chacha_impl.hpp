@@ -44,7 +44,26 @@ namespace nil {
                     constexpr static const std::size_t min_key_schedule_size = policy_type::min_key_schedule_size;
                     typedef typename policy_type::key_schedule_type key_schedule_type;
 
-                    static void chacha_x4(uint8_t output[64 * 4], key_schedule_type &input) {
+                    constexpr static const std::size_t block_bits = policy_type::block_bits;
+                    constexpr static const std::size_t block_size = policy_type::block_size;
+                    typedef typename policy_type::block_type block_type;
+
+                    template<std::size_t Parallel>
+                    static void chacha_x(const std::array<std::uint8_t, block_size * Parallel> &block,
+                                         key_schedule_type &schedule) {
+                    }
+
+                    template<>
+                    inline static void chacha_x<8>(const std::array<std::uint8_t, block_size * 8> &block,
+                                                   key_schedule_type &schedule) {
+                        chacha_x<4>(block, schedule);
+                        chacha_x<4>(std::array<std::uint8_t, block_size * 4>(block.begin() + block_size * 4, block.end()),
+                            schedule);
+                    }
+
+                    template<>
+                    static void chacha_x<4>(const std::array<std::uint8_t, block_size * 4> &block,
+                                            key_schedule_type &input) {
                         // TODO interleave rounds
                         for (size_t i = 0; i != 4; ++i) {
                             word_type x00 = input[0], x01 = input[1], x02 = input[2], x03 = input[3], x04 = input[4],
@@ -81,22 +100,22 @@ namespace nil {
                             x14 += input[14];
                             x15 += input[15];
 
-                            store_le(x00, output + 64 * i + 4 * 0);
-                            store_le(x01, output + 64 * i + 4 * 1);
-                            store_le(x02, output + 64 * i + 4 * 2);
-                            store_le(x03, output + 64 * i + 4 * 3);
-                            store_le(x04, output + 64 * i + 4 * 4);
-                            store_le(x05, output + 64 * i + 4 * 5);
-                            store_le(x06, output + 64 * i + 4 * 6);
-                            store_le(x07, output + 64 * i + 4 * 7);
-                            store_le(x08, output + 64 * i + 4 * 8);
-                            store_le(x09, output + 64 * i + 4 * 9);
-                            store_le(x10, output + 64 * i + 4 * 10);
-                            store_le(x11, output + 64 * i + 4 * 11);
-                            store_le(x12, output + 64 * i + 4 * 12);
-                            store_le(x13, output + 64 * i + 4 * 13);
-                            store_le(x14, output + 64 * i + 4 * 14);
-                            store_le(x15, output + 64 * i + 4 * 15);
+                            boost::endian::store_little_u32(x00, block + 64 * i + 4 * 0);
+                            boost::endian::store_little_u32(x01, block + 64 * i + 4 * 1);
+                            boost::endian::store_little_u32(x02, block + 64 * i + 4 * 2);
+                            boost::endian::store_little_u32(x03, block + 64 * i + 4 * 3);
+                            boost::endian::store_little_u32(x04, block + 64 * i + 4 * 4);
+                            boost::endian::store_little_u32(x05, block + 64 * i + 4 * 5);
+                            boost::endian::store_little_u32(x06, block + 64 * i + 4 * 6);
+                            boost::endian::store_little_u32(x07, block + 64 * i + 4 * 7);
+                            boost::endian::store_little_u32(x08, block + 64 * i + 4 * 8);
+                            boost::endian::store_little_u32(x09, block + 64 * i + 4 * 9);
+                            boost::endian::store_little_u32(x10, block + 64 * i + 4 * 10);
+                            boost::endian::store_little_u32(x11, block + 64 * i + 4 * 11);
+                            boost::endian::store_little_u32(x12, block + 64 * i + 4 * 12);
+                            boost::endian::store_little_u32(x13, block + 64 * i + 4 * 13);
+                            boost::endian::store_little_u32(x14, block + 64 * i + 4 * 14);
+                            boost::endian::store_little_u32(x15, block + 64 * i + 4 * 15);
 
                             input[12]++;
                             input[13] += input[12] < i;    // carry?

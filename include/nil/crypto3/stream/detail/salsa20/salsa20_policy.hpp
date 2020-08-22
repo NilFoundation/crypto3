@@ -9,8 +9,6 @@
 #ifndef CRYPTO3_STREAM_SALSA20_POLICY_HPP
 #define CRYPTO3_STREAM_SALSA20_POLICY_HPP
 
-#include <boost/container/small_vector.hpp>
-
 #include <boost/endian/conversion.hpp>
 
 #include <nil/crypto3/detail/inline_variable.hpp>
@@ -29,16 +27,12 @@ namespace nil {
     namespace crypto3 {
         namespace stream {
             namespace detail {
-                template<std::size_t IVBits, std::size_t KeyBits, std::size_t Rounds,
-                         template<typename> class Allocator = std::allocator>
+                template<std::size_t IVBits, std::size_t KeyBits, std::size_t Rounds>
                 struct salsa20_policy : public basic_functions<32> {
                     typedef basic_functions<32> policy_type;
 
                     typedef typename policy_type::byte_type byte_type;
                     typedef typename policy_type::word_type word_type;
-
-                    template<typename T>
-                    using allocator_type = Allocator<T>;
 
                     constexpr static const std::size_t rounds = Rounds;
                     BOOST_STATIC_ASSERT(Rounds % 2 == 0);
@@ -46,9 +40,9 @@ namespace nil {
                     constexpr static const std::size_t value_bits = CHAR_BIT;
                     typedef byte_type value_type;
 
-                    constexpr static const std::size_t block_values = 1;
-                    constexpr static const std::size_t block_bits = block_values * value_bits;
-                    typedef boost::container::small_vector<byte_type, block_values, Allocator<byte_type>> block_type;
+                    constexpr static const std::size_t block_size = 64;
+                    constexpr static const std::size_t block_bits = block_size * value_bits;
+                    typedef std::array<byte_type, block_size> block_type;
 
                     constexpr static const std::size_t min_key_bits = 16 * CHAR_BIT;
                     constexpr static const std::size_t max_key_bits = 32 * CHAR_BIT;
@@ -102,7 +96,7 @@ namespace nil {
                         output[7] = x09;
                     }
 
-                    static void salsa_core(uint8_t output[64], const key_schedule_type &input) {
+                    static void salsa_core(block_type &block, const key_schedule_type &input) {
                         word_type x00 = input[0], x01 = input[1], x02 = input[2], x03 = input[3], x04 = input[4],
                                   x05 = input[5], x06 = input[6], x07 = input[7], x08 = input[8], x09 = input[9],
                                   x10 = input[10], x11 = input[11], x12 = input[12], x13 = input[13], x14 = input[14],
@@ -120,22 +114,22 @@ namespace nil {
                             SALSA20_QUARTER_ROUND(x15, x12, x13, x14);
                         }
 
-                        store_le(x00 + input[0], output + 4 * 0);
-                        store_le(x01 + input[1], output + 4 * 1);
-                        store_le(x02 + input[2], output + 4 * 2);
-                        store_le(x03 + input[3], output + 4 * 3);
-                        store_le(x04 + input[4], output + 4 * 4);
-                        store_le(x05 + input[5], output + 4 * 5);
-                        store_le(x06 + input[6], output + 4 * 6);
-                        store_le(x07 + input[7], output + 4 * 7);
-                        store_le(x08 + input[8], output + 4 * 8);
-                        store_le(x09 + input[9], output + 4 * 9);
-                        store_le(x10 + input[10], output + 4 * 10);
-                        store_le(x11 + input[11], output + 4 * 11);
-                        store_le(x12 + input[12], output + 4 * 12);
-                        store_le(x13 + input[13], output + 4 * 13);
-                        store_le(x14 + input[14], output + 4 * 14);
-                        store_le(x15 + input[15], output + 4 * 15);
+                        boost::endian::store_little_u32(x00 + input[0], block[4 * 0]);
+                        boost::endian::store_little_u32(x01 + input[1], block[4 * 1]);
+                        boost::endian::store_little_u32(x02 + input[2], block[4 * 2]);
+                        boost::endian::store_little_u32(x03 + input[3], block[4 * 3]);
+                        boost::endian::store_little_u32(x04 + input[4], block[4 * 4]);
+                        boost::endian::store_little_u32(x05 + input[5], block[4 * 5]);
+                        boost::endian::store_little_u32(x06 + input[6], block[4 * 6]);
+                        boost::endian::store_little_u32(x07 + input[7], block[4 * 7]);
+                        boost::endian::store_little_u32(x08 + input[8], block[4 * 8]);
+                        boost::endian::store_little_u32(x09 + input[9], block[4 * 9]);
+                        boost::endian::store_little_u32(x10 + input[10], block[4 * 10]);
+                        boost::endian::store_little_u32(x11 + input[11], block[4 * 11]);
+                        boost::endian::store_little_u32(x12 + input[12], block[4 * 12]);
+                        boost::endian::store_little_u32(x13 + input[13], block[4 * 13]);
+                        boost::endian::store_little_u32(x14 + input[14], block[4 * 14]);
+                        boost::endian::store_little_u32(x15 + input[15], block[4 * 15]);
                     }
                 };
             }    // namespace detail

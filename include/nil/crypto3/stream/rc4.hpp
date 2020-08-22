@@ -14,13 +14,41 @@
 namespace nil {
     namespace crypto3 {
         namespace stream {
+            template<std::size_t IVBits, std::size_t KeyBits>
+            class rc4_finalizer {
+                typedef detail::rc4_functions<IVBits, KeyBits> policy_type;
+
+            public:
+                typedef typename policy_type::block_type block_type;
+
+                constexpr static const std::size_t key_schedule_size = policy_type::key_schedule_size;
+                constexpr static const std::size_t key_schedule_bits = policy_type::key_schedule_bits;
+                typedef typename policy_type::key_schedule_type key_schedule_type;
+
+                constexpr static const std::size_t state_size = policy_type::state_size;
+                constexpr static const std::size_t state_bits = policy_type::state_bits;
+                typedef typename policy_type::state_type state_type;
+
+                constexpr static const std::size_t iv_bits = policy_type::iv_bits;
+                typedef typename policy_type::iv_type iv_type;
+
+                constexpr static const std::size_t key_bits = policy_type::key_bits;
+                constexpr static const std::size_t key_size = policy_type::key_size;
+                typedef typename policy_type::key_type key_type;
+
+                template<typename OutputRange, typename InputRange>
+                void process(OutputRange &out, InputRange &in, key_schedule_type &schedule, state_type &state,
+                             const block_type &block) {
+                    xor_buf(out, in, state.data, state.size());
+                }
+            };
             /*!
              * @brief
              * @tparam IVBits
              * @tparam KeyBits
              * @ingroup stream
              */
-            template<std::size_t IVBits, std::size_t KeyBits>
+            template<std::size_t IVBits, std::size_t KeyBits, std::size_t SkipSize>
             class rc4 {
                 typedef detail::rc4_functions<IVBits, KeyBits> policy_type;
 
@@ -42,25 +70,23 @@ namespace nil {
                 constexpr static const std::size_t key_size = policy_type::key_size;
                 typedef typename policy_type::key_type key_type;
 
+                constexpr static const std::size_t skip_size = SkipSize;
+
                 rc4(key_schedule_type &schedule, state_type &state, const key_type &key,
                     const iv_type &iv = iv_type()) {
                     schedule_key(schedule, key);
                 }
 
-                void process(key_schedule_type &schedule, state_type &state, const block_type &block) {
-                    while (length >= state.data.size() - m_position) {
-                        xor_buf(out, in, &state.data[m_position], state.data.size() - m_position);
-                        length -= (state.data.size() - m_position);
-                        in += (state.data.size() - m_position);
-                        out += (state.data.size() - m_position);
-                        policy_type::generate(schedule, state);
-                    }
-                    xor_buf(out, in, &state.data[m_position], length);
-                    m_position += length;
+                template<typename OutputRange, typename InputRange>
+                void process(OutputRange &out, InputRange &in, key_schedule_type &schedule, state_type &state,
+                             const block_type &block) {
+                    xor_buf(out, in, state.data, state.size());
+                    policy_type::generate(schedule, state);
                 }
 
             protected:
-                void schedule_key(key_schedule_type &schedule, state_type &state, const key_type &key) {
+                void schedule_key(block_type &block, key_schedule_type &schedule, state_type &state, const key_type
+                                                                                                       &key) {
                     for (std::size_t i = 0; i != key_schedule_size; ++i) {
                         schedule[i] = i;
                     }
@@ -70,11 +96,9 @@ namespace nil {
                         std::swap(schedule[i], schedule[state_index]);
                     }
 
-                    for (size_t i = 0; i <= m_SKIP; i += m_buffer.size()) {
+                    for (size_t i = 0; i <= SkipSize; i += block.size()) {
                         policy_type::generate(schedule, state);
                     }
-
-                    m_position += (m_SKIP % m_buffer.size());
                 }
             };
         }    // namespace stream

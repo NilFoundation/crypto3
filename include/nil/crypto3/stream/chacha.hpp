@@ -14,6 +14,34 @@
 namespace nil {
     namespace crypto3 {
         namespace stream {
+            template<std::size_t IVBits, std::size_t KeyBits, std::size_t Rounds>
+            struct chacha_finalizer {
+                typedef detail::chacha_functions<Rounds, IVBits, KeyBits> policy_type;
+
+            public:
+                constexpr static const std::size_t rounds = policy_type::rounds;
+
+                constexpr static const std::size_t block_bits = policy_type::block_bits;
+                constexpr static const std::size_t block_size = policy_type::block_size;
+                typedef typename policy_type::block_type block_type;
+
+                constexpr static const std::size_t min_key_schedule_bits = policy_type::min_key_schedule_bits;
+                constexpr static const std::size_t min_key_schedule_size = policy_type::min_key_schedule_size;
+                typedef typename policy_type::key_schedule_type key_schedule_type;
+
+                constexpr static const std::size_t iv_bits = policy_type::iv_bits;
+                typedef typename policy_type::iv_type iv_type;
+
+                constexpr static const std::size_t min_key_bits = policy_type::min_key_bits;
+                constexpr static const std::size_t max_key_bits = policy_type::max_key_bits;
+                constexpr static const std::size_t key_bits = policy_type::key_bits;
+                typedef typename policy_type::key_type key_type;
+
+                template<typename InputRange, typename OutputRange>
+                void process(InputRange &in, OutputRange &out, key_schedule_type &schedule, block_type &block) {
+                    xor_buf(out, in, block, block_size);
+                }
+            };
             /*!
              * @brief DJB's ChaCha (https://cr.yp.to/chacha.html)
              * @tparam Rounds Amount of rounds
@@ -28,6 +56,8 @@ namespace nil {
             public:
                 constexpr static const std::size_t rounds = policy_type::rounds;
 
+                constexpr static const std::size_t block_bits = policy_type::block_bits;
+                constexpr static const std::size_t block_size = policy_type::block_size;
                 typedef typename policy_type::block_type block_type;
 
                 constexpr static const std::size_t min_key_schedule_bits = policy_type::min_key_schedule_bits;
@@ -47,34 +77,24 @@ namespace nil {
                     policy_type::schedule_iv(schedule, iv);
                 }
 
-                void process(key_schedule_type &schedule, const block_type &block) {
-                    while (length >= m_buffer.size() - m_position) {
-                        xor_buf(out, in, &m_buffer[m_position], m_buffer.size() - m_position);
-                        length -= (m_buffer.size() - m_position);
-                        in += (m_buffer.size() - m_position);
-                        out += (m_buffer.size() - m_position);
-                        policy_type::chacha_x4(m_buffer.data(), schedule);
-                        m_position = 0;
-                    }
-
-                    xor_buf(out, in, &m_buffer[m_position], length);
-
-                    m_position += length;
+                template<typename InputRange, typename OutputRange>
+                void process(InputRange &in, OutputRange &out, key_schedule_type &schedule, block_type &block) {
+                    xor_buf(out, in, block, block_size);
+                    policy_type::chacha_x<4>(block, schedule);
                 }
 
-                void seek(key_schedule_type &schedule, uint64_t offset) {
+                void seek(block_type &block, key_schedule_type &schedule, uint64_t offset) {
                     // Find the block offset
                     uint64_t counter = offset / 64;
 
                     uint8_t out[8];
 
-                    store_le(counter, out);
+                    boost::endian::store_little_u64(out, counter);
 
-                    schedule[12] = load_le<uint32_t>(out, 0);
-                    schedule[13] += load_le<uint32_t>(out, 1);
+                    schedule[12] = boost::endian::store_little_u32(out, 0);
+                    schedule[13] += boost::endian::store_little_u32(out, 1);
 
-                    policy_type::chacha_x4(m_buffer.data(), schedule);
-                    m_position = offset % 64;
+                    policy_type::chacha_x<4>(block, schedule);
                 }
             };
         }    // namespace stream

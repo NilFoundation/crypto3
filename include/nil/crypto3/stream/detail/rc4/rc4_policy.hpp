@@ -38,6 +38,22 @@ namespace nil {
                     struct state_type {
                         std::size_t x = 0, y = 0;
                         std::array<byte_type, state_size> data = {0};
+
+                        BOOST_FORCEINLINE void fill(const byte_type &v) {
+                            data.fill(v);
+                        }
+
+                        BOOST_FORCEINLINE byte_type &operator[](std::size_t i) {
+                            return data[i];
+                        }
+
+                        BOOST_FORCEINLINE byte_type &operator[](std::size_t i) const {
+                            return data[i];
+                        }
+
+                        BOOST_FORCEINLINE std::size_t size() const {
+                            return data.size();
+                        }
                     };
 
                     constexpr static const std::size_t iv_bits = IVBits;

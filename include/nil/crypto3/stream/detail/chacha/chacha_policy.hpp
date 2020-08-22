@@ -21,8 +21,7 @@ namespace nil {
     namespace crypto3 {
         namespace stream {
             namespace detail {
-                template<std::size_t Rounds, std::size_t IVBits, std::size_t KeyBits,
-                         template<typename> class Allocator = std::allocator>
+                template<std::size_t Rounds, std::size_t IVBits, std::size_t KeyBits>
                 struct chacha_policy : public basic_functions<32> {
                     typedef typename basic_functions<32>::byte_type byte_type;
 
@@ -35,9 +34,9 @@ namespace nil {
                     constexpr static const std::size_t value_bits = CHAR_BIT;
                     typedef byte_type value_type;
 
-                    constexpr static const std::size_t block_values = 1;
-                    constexpr static const std::size_t block_bits = block_values * value_bits;
-                    typedef boost::container::small_vector<byte_type, block_values> block_type;
+                    constexpr static const std::size_t block_size = 64;
+                    constexpr static const std::size_t block_bits = block_size * value_bits;
+                    typedef std::array<byte_type, block_size> block_type;
 
                     constexpr static const std::size_t min_key_bits = 16 * CHAR_BIT;
                     constexpr static const std::size_t max_key_bits = 32 * CHAR_BIT;

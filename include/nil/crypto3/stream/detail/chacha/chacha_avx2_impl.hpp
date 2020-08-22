@@ -32,8 +32,19 @@ namespace nil {
                     constexpr static const std::size_t min_key_schedule_size = policy_type::key_schedule_size;
                     typedef typename policy_type::key_schedule_type key_schedule_type;
 
+                    constexpr static const std::size_t block_bits = policy_type::block_bits;
+                    constexpr static const std::size_t block_size = policy_type::block_size;
+                    typedef typename policy_type::block_type block_type;
+
+                    template<std::size_t Parallel>
+                    static void chacha_x(const std::array<std::uint8_t, block_size * Parallel> &block,
+                                         key_schedule_type &schedule) {
+                    }
+
+                    template<>
                     BOOST_ATTRIBUTE_TARGET("avx2")
-                    static void chacha_x8(uint8_t output[64 * 8], key_schedule_type& schedule) {
+                    static void chacha_x<8>(const std::array<std::uint8_t, block_size * 8> &block,
+                                            key_schedule_type &schedule) {
                         _mm256_zeroupper();
 
                         const __m256i CTR0 = _mm256_set_epi32(7, 6, 5, 4, 3, 2, 1, 0);
@@ -245,7 +256,7 @@ namespace nil {
                         R14 = _mm256_unpacklo_epi64(T2, T3);
                         R15 = _mm256_unpackhi_epi64(T2, T3);
 
-                        __m256i* output_mm = reinterpret_cast<__m256i*>(output);
+                        __m256i *output_mm = reinterpret_cast<__m256i *>(block.data());
 
                         _mm256_storeu_si256(output_mm, _mm256_permute2x128_si256(R00, R04, 0 + (2 << 4)));
                         _mm256_storeu_si256(output_mm + 1, _mm256_permute2x128_si256(R08, R12, 0 + (2 << 4)));

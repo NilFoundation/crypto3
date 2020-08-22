@@ -32,15 +32,29 @@ namespace nil {
                     constexpr static const std::size_t min_key_schedule_size = policy_type::key_schedule_size;
                     typedef typename policy_type::key_schedule_type key_schedule_type;
 
-                    inline static void chacha_x8(uint8_t output[64 * 8], key_schedule_type &schedule) {
-                        chacha_x4(output, schedule);
-                        chacha_x4(&output[64 * 4], schedule);
+                    constexpr static const std::size_t block_bits = policy_type::block_bits;
+                    constexpr static const std::size_t block_size = policy_type::block_size;
+                    typedef typename policy_type::block_type block_type;
+
+                    template<std::size_t Parallel>
+                    static void chacha_x(const std::array<std::uint8_t, block_size * Parallel> &block,
+                                         key_schedule_type &schedule) {
                     }
 
+                    template<>
+                    inline static void chacha_x<8>(const std::array<std::uint8_t, block_size * 8> &block,
+                                                   key_schedule_type &schedule) {
+                        chacha_x<4>(block, schedule);
+                        chacha_x<4>(std::array<std::uint8_t, block_size * 4>(block.begin() + block_size * 4, block.end()),
+                                  schedule);
+                    }
+
+                    template<>
                     BOOST_ATTRIBUTE_TARGET("sse2")
-                    static void chacha_x4(uint8_t output[64 * 4], key_schedule_type &schedule) {
-                        const __m128i *input_mm = reinterpret_cast<const __m128i *>(input);
-                        __m128i *output_mm = reinterpret_cast<__m128i *>(output);
+                    static void chacha_x<4>(const std::array<std::uint8_t, block_size * 4> &block,
+                                            key_schedule_type &schedule) {
+                        const __m128i *input_mm = reinterpret_cast<const __m128i *>(schedule);
+                        __m128i *output_mm = reinterpret_cast<__m128i *>(block);
 
                         __m128i input0 = _mm_loadu_si128(input_mm);
                         __m128i input1 = _mm_loadu_si128(input_mm + 1);
@@ -270,9 +284,9 @@ namespace nil {
 
 #undef mm_rotl
 
-                        input[12] += 4;
-                        if (input[12] < 4) {
-                            input[13]++;
+                        schedule[12] += 4;
+                        if (schedule[12] < 4) {
+                            schedule[13]++;
                         }
                     }
                 };

@@ -47,6 +47,9 @@ namespace nil {
                     constexpr static const std::size_t iv_bits = policy_type::iv_bits;
                     typedef typename policy_type::iv_type iv_type;
 
+                    constexpr static const std::size_t block_bits = policy_type::block_bits;
+                    typedef typename policy_type::block_type block_type;
+
                     static void schedule_key(key_schedule_type &schedule, const key_type &key) {
                         schedule[0] = policy_type::sigma()[0];
                         schedule[1] = policy_type::sigma()[1];
@@ -85,6 +88,9 @@ namespace nil {
                     constexpr static const std::size_t max_key_bits = policy_type::max_key_bits;
                     constexpr static const std::size_t key_bits = policy_type::key_bits;
                     typedef typename policy_type::key_type key_type;
+
+                    constexpr static const std::size_t block_bits = policy_type::block_bits;
+                    typedef typename policy_type::block_type block_type;
 
                     constexpr static const std::size_t iv_bits = policy_type::iv_bits;
                     typedef typename policy_type::iv_type iv_type;
@@ -128,17 +134,19 @@ namespace nil {
                     constexpr static const std::size_t key_bits = policy_type::key_bits;
                     typedef typename policy_type::key_type key_type;
 
+                    constexpr static const std::size_t block_bits = policy_type::block_bits;
+                    typedef typename policy_type::block_type block_type;
+
                     constexpr static const std::size_t iv_bits = policy_type::iv_bits;
                     typedef typename policy_type::iv_type iv_type;
 
-                    static void schedule_iv(key_schedule_type &schedule, const iv_type &iv) {
+                    static void schedule_iv(block_type &block, key_schedule_type &schedule, const iv_type &iv) {
                         schedule[12] = 0;
                         schedule[13] = 0;
                         schedule[14] = boost::endian::native_to_little(make_uint_t(iv[0], iv[1], iv[2], iv[3]));
                         schedule[15] = boost::endian::native_to_little(make_uint_t(iv[4], iv[5], iv[6], iv[7]));
 
-                        impl_type::chacha_x4(m_buffer.data(), schedule);
-                        m_position = 0;
+                        impl_type::chacha_x<4>(block, schedule);
                     }
 
                     static void schedule_key(key_schedule_type &schedule, const key_type &key) {
@@ -180,17 +188,19 @@ namespace nil {
                     constexpr static const std::size_t key_bits = policy_type::key_bits;
                     typedef typename policy_type::key_type key_type;
 
+                    constexpr static const std::size_t block_bits = policy_type::block_bits;
+                    typedef typename policy_type::block_type block_type;
+
                     constexpr static const std::size_t iv_bits = policy_type::iv_bits;
                     typedef typename policy_type::iv_type iv_type;
 
-                    static void schedule_iv(key_schedule_type &schedule, const iv_type &iv) {
+                    static void schedule_iv(block_type &block, key_schedule_type &schedule, const iv_type &iv) {
                         schedule[12] = 0;
                         schedule[13] = boost::endian::native_to_little(make_uint_t(iv[0], iv[1], iv[2], iv[3]));
                         schedule[14] = boost::endian::native_to_little(make_uint_t(iv[4], iv[5], iv[6], iv[7]));
                         schedule[15] = boost::endian::native_to_little(make_uint_t(iv[8], iv[9], iv[10], iv[11]));
 
-                        impl_type::chacha_x4(m_buffer.data(), schedule);
-                        m_position = 0;
+                        impl_type::chacha_x<4>(block, schedule);
                     }
 
                     static void schedule_key(key_schedule_type &schedule, const key_type &key) {
@@ -233,6 +243,9 @@ namespace nil {
                     constexpr static const std::size_t key_bits = policy_type::key_bits;
                     typedef typename policy_type::key_type key_type;
 
+                    constexpr static const std::size_t block_bits = policy_type::block_bits;
+                    typedef typename policy_type::block_type block_type;
+
                     constexpr static const std::size_t iv_bits = policy_type::iv_bits;
                     typedef typename policy_type::iv_type iv_type;
 
@@ -274,17 +287,20 @@ namespace nil {
                     constexpr static const std::size_t key_bits = policy_type::key_bits;
                     typedef typename policy_type::key_type key_type;
 
+                    constexpr static const std::size_t block_bits = policy_type::block_bits;
+                    constexpr static const std::size_t block_size = policy_type::block_size;
+                    typedef typename policy_type::block_type block_type;
+
                     constexpr static const std::size_t iv_bits = policy_type::iv_bits;
                     typedef typename policy_type::iv_type iv_type;
 
-                    static void schedule_iv(key_schedule_type &schedule, const iv_type &iv) {
+                    static void schedule_iv(block_type &block, key_schedule_type &schedule, const iv_type &iv) {
                         schedule[12] = 0;
                         schedule[13] = 0;
                         schedule[14] = boost::endian::native_to_little(make_uint_t(iv[0], iv[1], iv[2], iv[3]));
                         schedule[15] = boost::endian::native_to_little(make_uint_t(iv[4], iv[5], iv[6], iv[7]));
 
-                        impl_type::chacha_x4(m_buffer.data(), schedule);
-                        m_position = 0;
+                        impl_type::chacha_x<4>(block, schedule);
                     }
 
                     static void schedule_key(key_schedule_type &schedule, const key_type &key) {
@@ -325,17 +341,19 @@ namespace nil {
                     constexpr static const std::size_t key_bits = policy_type::key_bits;
                     typedef typename policy_type::key_type key_type;
 
+                    constexpr static const std::size_t block_bits = policy_type::block_bits;
+                    typedef typename policy_type::block_type block_type;
+
                     constexpr static const std::size_t iv_bits = policy_type::iv_bits;
                     typedef typename policy_type::iv_type iv_type;
 
-                    static void schedule_iv(key_schedule_type &schedule, const iv_type &iv) {
+                    static void schedule_iv(block_type &block, key_schedule_type &schedule, const iv_type &iv) {
                         schedule[12] = 0;
                         schedule[13] = boost::endian::native_to_little(make_uint_t(iv[0], iv[1], iv[2], iv[3]));
                         schedule[14] = boost::endian::native_to_little(make_uint_t(iv[4], iv[5], iv[6], iv[7]));
                         schedule[15] = boost::endian::native_to_little(make_uint_t(iv[8], iv[9], iv[10], iv[11]));
 
-                        impl_type::chacha_x4(m_buffer.data(), schedule);
-                        m_position = 0;
+                        impl_type::chacha_x<4>(block, schedule);
                     }
 
                     static void schedule_key(key_schedule_type &schedule, const key_type &key) {
