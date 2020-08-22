@@ -27,7 +27,20 @@
 //#include <nil/algebra/fields/modp_ietf.hpp>
 //#include <nil/algebra/fields/modp_srp.hpp>
 
+#include <nil/algebra/fields/detail/element/fp.hpp>
+#include <nil/algebra/fields/detail/element/fp2.hpp>
+
 using namespace nil::algebra;
+
+template <typename FieldParams>
+void print_field_element (typename fields::detail::element_fp<FieldParams> e){
+    std::cout << e.data << std::endl;
+}
+
+template <typename FieldParams>
+void print_field_element (typename fields::detail::element_fp2<FieldParams> e){
+    std::cout << e.data[0].data << " " << e.data[1].data << std::endl;
+}
 
 template <typename FpField>
 void fields_fp_basic_math_examples()
@@ -38,36 +51,61 @@ void fields_fp_basic_math_examples()
     std::cout << "Field module value: " <<  policy_type::modulus << std::endl;
 
     value_type e1 = value_type(76749407), e2(44410867), e3 = value_type::one(), e4(121160274);
-
+    
     std::cout << "Field element values: " << std::endl;
-    std::cout << "e1 value: " <<  e1.data << std::endl;
-    std::cout << "e2 value: " <<  e2.data << std::endl;
-    std::cout << "e3 value: " <<  e3.data << std::endl;
+    std::cout << "e1 value: ";
+    print_field_element(e1);
 
-    value_type e1e3 = e1 * e3, e1sqr = e1.square();
+    std::cout << "e2 value: ";
+    print_field_element(e2);
 
-    std::cout << "e1 * e3 value: " <<  e1e3.data << std::endl;
-    std::cout << "e1 square value: " <<  e1sqr.data << std::endl;
+    std::cout << "e3 value: ";
+    print_field_element(e3);
 
-    std::cout << "e1 square square value: " <<  e1.square().square().data << std::endl;
+    value_type e1e2 = e1 * e2, e1sqr = e1.square();
 
-    std::cout << "e1 pow 4 value: " <<  e1.pow(4).data << std::endl;
+    std::cout << "e1 * e2 value: ";
+    print_field_element(e1e2);
 
-    std::cout << "e1 pow 11 value: " <<  e1.pow(11).data << std::endl;
+    std::cout << "e1 square value: ";
+    print_field_element(e1sqr);
 
-    std::cout << "e1 pow 44410867 value: " <<  e1.pow(44410867).data << std::endl;
+    std::cout << "e1 square square value: " ;
+
+    print_field_element(e1.square().square());
+
+    std::cout << "e1 pow 4 value: " ;
+
+    print_field_element(e1.pow(4));
+
+    std::cout << "e1 pow 11 value: " ;
+
+    print_field_element(e1.pow(11));
+
+    std::cout << "e1 pow 44410867 value: " ;
+
+    print_field_element(e1.pow(44410867));
 
     value_type complex_eq = e1 * e3 + e1 * e4 + e2 * e3 + e2 * e4;
     value_type complex_eq1 = (e1 + e2) * (e3 + e4);
 
-    std::cout << "e1 * e3 + e1 * e4 + e2 * e3 + e2 * e4 value: " <<  complex_eq.data << std::endl;
-    std::cout << "(e1 + e2) * (e3 + e4) value: " <<  complex_eq1.data << std::endl;
+    std::cout << "e1 * e3 + e1 * e4 + e2 * e3 + e2 * e4 value: " ;
 
-    std::cout << "Double e1 value: " << e1.dbl().data << std::endl;
+    print_field_element(complex_eq);
+
+    std::cout << "(e1 + e2) * (e3 + e4) value: " ;
+
+    print_field_element(complex_eq1);
+
+    std::cout << "Double e1 value: " ;
+
+    print_field_element(e1.dbl());
 
     e1 += e2;
 
-    std::cout << "e1 += e2 value: " << e1.data << std::endl;
+    std::cout << "e1 += e2 value: " ;
+
+    print_field_element(e1);
 }
 
 template <typename Fp2Field>
@@ -80,35 +118,62 @@ void fields_fp2_basic_math_examples()
 
     value_type e1 = value_type({76749407, 44410867}), e2({44410867, 1}), e3 = value_type::one(), e4({121160274, 7});
 
+    std::cout << "Non residue: " << e1.non_residue.data << std::endl;
+
     std::cout << "Field element values: " << std::endl;
-    std::cout << "e1 value: " <<  e1.data[0].data << " " << e1.data[1].data << std::endl;
-    std::cout << "e2 value: " <<  e2.data[0].data << " " << e2.data[1].data << std::endl;
-    std::cout << "e3 value: " <<  e3.data[0].data << " " << e3.data[1].data << std::endl;
+    std::cout << "e1 value: ";
+    print_field_element(e1);
 
-    value_type e1e3 = e1 * e3, e1sqr = e1.square();
+    std::cout << "e2 value: ";
+    print_field_element(e2);
 
-    std::cout << "e1 * e3 value: " <<  e1e3.data[0].data << " " << e1e3.data[1].data << std::endl;
-    std::cout << "e1 square value: " <<  e1sqr.data[0].data << " " << e1sqr.data[1].data << std::endl;
-/*
-    std::cout << "e1 square square value: " <<  e1.square().square().data << std::endl;
+    std::cout << "e3 value: ";
+    print_field_element(e3);
 
-    std::cout << "e1 pow 4 value: " <<  e1.pow(4).data << std::endl;
+    value_type e1e2 = e1 * e2, e1sqr = e1.square();
 
-    std::cout << "e1 pow 11 value: " <<  e1.pow(11).data << std::endl;
+    std::cout << "e1 * e2 value: ";
+    print_field_element(e1e2);
 
-    std::cout << "e1 pow 44410867 value: " <<  e1.pow(44410867).data << std::endl;
+    std::cout << "e1 square value: ";
+    print_field_element(e1sqr);
+
+    std::cout << "e1 square square value: " ;
+
+    print_field_element(e1.square().square());
+
+    std::cout << "e1 pow 4 value: " ;
+
+    print_field_element(e1.pow(4));
+
+    std::cout << "e1 pow 11 value: " ;
+
+    print_field_element(e1.pow(11));
+
+    std::cout << "e1 pow 44410867 value: " ;
+
+    print_field_element(e1.pow(44410867));
 
     value_type complex_eq = e1 * e3 + e1 * e4 + e2 * e3 + e2 * e4;
     value_type complex_eq1 = (e1 + e2) * (e3 + e4);
 
-    std::cout << "e1 * e3 + e1 * e4 + e2 * e3 + e2 * e4 value: " <<  complex_eq.data << std::endl;
-    std::cout << "(e1 + e2) * (e3 + e4) value: " <<  complex_eq1.data << std::endl;
+    std::cout << "e1 * e3 + e1 * e4 + e2 * e3 + e2 * e4 value: " ;
 
-    std::cout << "Double e1 value: " << e1.dbl().data << std::endl;
+    print_field_element(complex_eq);
+
+    std::cout << "(e1 + e2) * (e3 + e4) value: " ;
+
+    print_field_element(complex_eq1);
+
+    std::cout << "Double e1 value: " ;
+
+    print_field_element(e1.dbl());
 
     e1 += e2;
 
-    std::cout << "e1 += e2 value: " << e1.data << std::endl;*/
+    std::cout << "e1 += e2 value: " ;
+
+    print_field_element(e1);
 }
 
 int main()
