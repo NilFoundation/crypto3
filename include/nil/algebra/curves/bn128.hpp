@@ -10,8 +10,10 @@
 #ifndef ALGEBRA_CURVES_BN128_HPP
 #define ALGEBRA_CURVES_BN128_HPP
 
-#include <nil/crypto3/algebra/curves/curve_weierstrass.hpp>
-#include <nil/crypto3/algebra/curves/detail/element/curve_weierstrass.hpp>
+#include <nil/algebra/curves/detail/element/curve_weierstrass.hpp>
+
+#include <nil/algebra/fields/bn128/fq.hpp>
+#include <nil/algebra/fields/bn128/fr.hpp>
 
 #include <nil/algebra/detail/mp_def.hpp>
 
@@ -32,14 +34,18 @@ namespace nil {
 				v^3 = xi
 				w^2 = v
 			*/
-	        struct bn128_snark1 {
+			template<std::size_t ModulusBits>
+    		struct bn128 {};
+
+    		template <>
+	        struct bn128<254> {
                 constexpr static const std::size_t base_field_bits = 254;
-                typedef fields::bn128_fq<base_field_bits, CHAR_BIT> base_field_type;
+                typedef nil::algebra::fields::bn128_fq<base_field_bits, CHAR_BIT> base_field_type;
                 typedef typename base_field_type::modulus_type number_type;
                 constexpr static const number_type base_field_modulus = base_field_type::modulus;
 
                 constexpr static const std::size_t scalar_field_bits = 254;
-                typedef fields::bn128_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
+                typedef nil::algebra::fields::bn128_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
                 constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
 
 		        typedef typename detail::element_curve_weierstrass<base_field_type::value_type> value_type;
@@ -49,28 +55,6 @@ namespace nil {
 
 		        constexpr static const number_type a = 0;
 		        constexpr static const number_type b = 0x03;
-		        constexpr static const number_type x = 0x09;
-		        constexpr static const number_type y = 0x01;
-	    	};
-
-	    	// b/xi = 82 / (9 + u) = 9 - u
-	        struct bn128_snark2 {
-	        	constexpr static const std::size_t base_field_bits = 254;
-                typedef fields::bn128_fq<base_field_bits, CHAR_BIT> base_field_type;
-                typedef typename base_field_type::modulus_type number_type;
-                constexpr static const number_type base_field_modulus = base_field_type::modulus;
-
-                constexpr static const std::size_t scalar_field_bits = 254;
-                typedef fields::bn128_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
-                constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
-
-		        typedef typename detail::element_curve_weierstrass<base_field_type::value_type> value_type;
-
-		        constexpr static const number_type p = base_field_modulus;
-                constexpr static const number_type q = scalar_field_modulus;
-
-		        constexpr static const number_type a = 0;
-		        constexpr static const number_type b = 82;
 		        constexpr static const number_type x = 0x09;
 		        constexpr static const number_type y = 0x01;
 	    	};

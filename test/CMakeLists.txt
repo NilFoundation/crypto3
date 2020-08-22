@@ -43,6 +43,7 @@ macro(define_algebra_test name)
 endmacro()
 
 set(TESTS_NAMES 
+"curves"
 "fields"
 #"groups"
 #"bilinearity"

@@ -10,8 +10,7 @@
 #ifndef ALGEBRA_CURVES_BLS12_HPP
 #define ALGEBRA_CURVES_BLS12_HPP
 
-#include <nil/crypto3/algebra/curves/curve_weierstrass.hpp>
-#include <nil/crypto3/algebra/curves/detail/element/bls12.hpp>
+#include <nil/algebra/curves/detail/element/curve_weierstrass.hpp>
 
 #include <nil/algebra/detail/mp_def.hpp>
 

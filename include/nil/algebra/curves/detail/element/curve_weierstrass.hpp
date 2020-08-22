@@ -14,29 +14,29 @@
 
 namespace nil {
     namespace algebra {
-        namespace curve {
+        namespace curves {
             namespace detail {
 
-                template<typename FieldType>
+                template<typename FieldElementType>
                 struct element_curve_weierstrass {
                     
-                    FieldType p[3];
+                    FieldElementType p[3];
 
                     element_curve_weierstrass() {
                     }
 
-                    element_curve_weierstrass(const FieldType &x, const FieldType &y, const FieldType &z) {
+                    element_curve_weierstrass(const FieldElementType &x, const FieldElementType &y, const FieldElementType &z) {
                         p[0] = x;
                         p[1] = y;
                         p[2] = z;   
                     }
                     
                     element_curve_weierstrass normalize() const {
-                        FieldType p_out[3];
+                        FieldElementType p_out[3];
 
                         if (is_zero() || p[2] == 1)
                             return *this;
-                        FieldType r, r2;
+                        FieldElementType r, r2;
                         r = p[2].inverse();
                         r2 = r.square();
                         p_out[0] = p[0] * r2; //r2
@@ -51,7 +51,9 @@ namespace nil {
                         (p_out[0], p_out[1], p_out[2]) = 2(p[0], p[1], p[2])
                     */
                     element_curve_weierstrass dbl() const{
-                        FieldType A, B, C, D, E;
+                        FieldElementType p_out[3];
+
+                        FieldElementType A, B, C, D, E;
                         A = p[0].square();
                         B = p[1].square();
                         C = B.square();
@@ -70,7 +72,7 @@ namespace nil {
                         (p_out[0], p_out[1], p_out[2]) = (p[0], p[1], p[2]) + (B.p[0], B.p[1], B.p[2])
                     */
                     element_curve_weierstrass operator+(const element_curve_weierstrass &B) const {
-                        FieldType p_out[3];
+                        FieldElementType p_out[3];
 
                         if (p[2].is_zero()) {
                             return element_curve_weierstrass(B);
@@ -78,7 +80,7 @@ namespace nil {
                         if (B.p[2].is_zero()) {
                             return element_curve_weierstrass(*this);
                         }
-                        FieldType Z1Z1, Z2Z2, U1, S1, H, I, J, t3, r, V;
+                        FieldElementType Z1Z1, Z2Z2, U1, S1, H, I, J, t3, r, V;
 
                         Z1Z1 = p[2].square();
                         Z2Z2 = B.p[2].square();
@@ -91,9 +93,9 @@ namespace nil {
                             if (t3.is_zero()) {
                                 return dbl();
                             } else {
-                                p_out[2].clear();
+                                p_out[2] = FieldElementType::zero();
                             }
-                            return;
+                            return *this;
                         }
 
                         I = H.dbl().square();
@@ -168,7 +170,7 @@ namespace nil {
                 };
 
             }   //  namespace detail
-        }   //  namespace curve
+        }   //  namespace curves
     }   //  namespace algebra
 }   //  namespace nil
 

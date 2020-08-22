@@ -106,10 +106,10 @@ void fields_fp_basic_math_examples()
     std::cout << "e1 += e2 value: " ;
 
     print_field_element(e1);
-    
-    std::cout << "e1 inversed value: " ;
 
-    print_field_element(e1.inverse());
+    //std::cout << "e1 inversed value: " ;
+
+    //print_field_element(e1.inverse());
 }
 
 template <typename Fp2Field>
@@ -179,9 +179,9 @@ void fields_fp2_basic_math_examples()
 
     print_field_element(e1);
 
-    std::cout << "e1 inversed value: " ;
+    //std::cout << "e1 inversed value: " ;
 
-    print_field_element(e1.inverse());
+    //print_field_element(e1.inverse());
 }
 
 int main()
@@ -191,7 +191,7 @@ int main()
 
     std::cout << "----------------------------" << std::endl;
 
-    /*std::cout << "BN128-254 Fr basic math:" << std::endl;
+    std::cout << "BN128-254 Fr basic math:" << std::endl;
     fields_fp_basic_math_examples<fields::bn128_fr<254>>();
 
     std::cout << "----------------------------" << std::endl;
@@ -212,7 +212,7 @@ int main()
     std::cout << "----------------------------" << std::endl;
 
     std::cout << "DSA JCE 1024 basic math:" << std::endl;
-    fields_fp_basic_math_examples<fields::dsa_jce<1024>>();*/
+    fields_fp_basic_math_examples<fields::dsa_jce<1024>>();
 
 /*    std::cout << "----------------------------" << std::endl;
 
@@ -229,10 +229,10 @@ int main()
     std::cout << "MODP SRP 1024 basic math:" << std::endl;
     fields_fp_basic_math_examples<fields::modp_srp<1024>>();*/
 
-    /*std::cout << "----------------------------" << std::endl;
+    std::cout << "----------------------------" << std::endl;
 
     std::cout << "BN128-254 Fq2 basic math:" << std::endl;
-    fields_fp2_basic_math_examples<fields::bn128_fq2<254>>();*/
+    fields_fp2_basic_math_examples<fields::bn128_fq2<254>>();
 
     return 0;
 }
