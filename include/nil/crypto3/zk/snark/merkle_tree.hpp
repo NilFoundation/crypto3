@@ -86,7 +86,7 @@ namespace nil {
                     merkle_tree(const std::size_t depth, const std::size_t value_size,
                                 const std::vector<std::vector<bool>> &contents_as_vector) :
                         merkle_tree<Hash>(depth, value_size) {
-                        assert(algebra::log2(contents_as_vector.size()) <= depth);
+                        assert(static_cast<std::size_t>(std::ceil(std::log2(contents_as_vector.size()))) <= depth);
                         for (std::size_t address = 0; address < contents_as_vector.size(); ++address) {
                             const std::size_t idx = address + (1ul << depth) - 1;
                             values[idx] = contents_as_vector[address];
