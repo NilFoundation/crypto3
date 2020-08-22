@@ -37,7 +37,7 @@ void curve_weierstrass_basic_math_examples()
 
     std::cout << "Field module value: " <<  policy_type::base_field_type::modulus << std::endl;
 
-    field_value_type e1 = field_value_type(76749407), e2(44410867), e3 = field_value_type::one(), e4(121160274), e5(5), e6 = field_value_type::zero();
+    field_value_type e1 = field_value_type(2), e2(3), e3(5), e4(3), e5(5), e6(7);
     value_type c1(e1, e2, e3), c2(e4, e5, e6);
 
     std::cout << "Curve element values: " << std::endl;

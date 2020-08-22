@@ -43,7 +43,7 @@ namespace nil {
                         p_out[1] = p[1] * r * r2;  //r3
                         p[2] = 1;
 
-                        element_curve_weierstrass (p_out[0], p_out[1], p_out[2]);
+                        return element_curve_weierstrass (p_out[0], p_out[1], p_out[2]);
                     }
 
                     /*
@@ -64,7 +64,7 @@ namespace nil {
                         p_out[1] = E * (D - p_out[0]) - C.dbl().dbl().dbl();
                         p_out[2] = (p[1] * p[2]).dbl();
 
-                        element_curve_weierstrass (p_out[0], p_out[1], p_out[2]);
+                        return element_curve_weierstrass (p_out[0], p_out[1], p_out[2]);
                     }
 
                     /*
@@ -106,7 +106,7 @@ namespace nil {
                         p_out[1] = r * (V - p_out[0]) - (S1 * J).dbl();
                         p_out[2] = ((p[2] + B.p[2]).square() - Z1Z1 - Z2Z2) * H;
 
-                        element_curve_weierstrass (p_out[0], p_out[1], p_out[2]);
+                        return element_curve_weierstrass (p_out[0], p_out[1], p_out[2]);
                     }
 
                     element_curve_weierstrass operator-(const element_curve_weierstrass &B) const {
