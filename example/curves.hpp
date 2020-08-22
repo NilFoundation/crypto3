@@ -14,21 +14,12 @@
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/multiprecision/modular/modular_adaptor.hpp>
 
-#include <nil/algebra/fields/bls12/fq.hpp>
-#include <nil/algebra/fields/bls12/fr.hpp>
+
+#include <nil/algebra/curves/bn128.hpp>
+
 #include <nil/algebra/fields/bn128/fq.hpp>
 #include <nil/algebra/fields/bn128/fq2.hpp>
 #include <nil/algebra/fields/bn128/fr.hpp>
-#include <nil/algebra/fields/dsa_botan.hpp>
-#include <nil/algebra/fields/dsa_jce.hpp>
-#include <nil/algebra/fields/detail/params/bn128/fq.hpp>
-//#include <nil/algebra/fields/ed25519_fe.hpp>
-//#include <nil/algebra/fields/ffdhe_ietf.hpp>
-//#include <nil/algebra/fields/modp_ietf.hpp>
-//#include <nil/algebra/fields/modp_srp.hpp>
-
-#include <nil/algebra/fields/detail/element/fp.hpp>
-#include <nil/algebra/fields/detail/element/fp2.hpp>
 
 using namespace nil::algebra;
 

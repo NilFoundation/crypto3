@@ -118,7 +118,8 @@ namespace nil {
                     }
 
                     element_fp inverse() const {
-                        return element_fp(invert(data));
+                        //return element_fp(boost::multiprecision::inverse(data));
+                        return *this;
                     }
                 };
 

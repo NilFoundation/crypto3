@@ -26,23 +26,18 @@ namespace nil {
             struct bls12 { };
 
             template<>
-            struct bls12<381> : public curve_weierstrass<fields::bls12_381_fq<381>> {
-            private:
-                typedef typename curve_weierstrass<fields::bls12_381_fq<381>> policy_type;
-
-            public:
-                typedef typename policy_type::number_type number_type;
-                typedef typename policy_type::field_type field_type;
-
+            struct bls12<381> {
+            
                 constexpr static const std::size_t base_field_bits = 381;
                 typedef fields::bls12_fq<base_field_bits, CHAR_BIT> base_field_type;
+                typedef typename base_field_type::modulus_type number_type;
                 constexpr static const number_type base_field_modulus = base_field_type::modulus;
 
                 constexpr static const std::size_t scalar_field_bits = 255;
                 typedef fields::bls12_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
                 constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
 
-                typedef typename detail::element_bls12<field_type::value_type, base_field_bits> value_type;
+                typedef typename detail::element_curve_weierstrass<base_field_type::value_type> value_type;
 
                 constexpr static const number_type p = base_field_modulus;
                 constexpr static const number_type q = scalar_field_modulus;

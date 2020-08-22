@@ -7,53 +7,50 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef ALGEBRA_CURVES_ELEMENT_BLS12_381_HPP
-#define ALGEBRA_CURVES_ELEMENT_BLS12_381_HPP
+#ifndef ALGEBRA_CURVES_ELEMENT_CURVE_WEIERSTRASS_HPP
+#define ALGEBRA_CURVES_ELEMENT_CURVE_WEIERSTRASS_HPP
 
-#include <nil/crypto3/algebra/multiexp/bls12_381.hpp>
-
-#include <vector>
+//#include <nil/crypto3/algebra/multiexp/curves.hpp>
 
 namespace nil {
     namespace algebra {
         namespace curve {
             namespace detail {
-                template<typename FieldType, std::size_t ModulusBits = FieldType::modulus_bits>
-                struct element_bls12 { };
 
                 template<typename FieldType>
-                struct element_bls12<FieldType, 381> {
-
+                struct element_curve_weierstrass {
+                    
                     FieldType p[3];
 
-                    element_bls12() {
+                    element_curve_weierstrass() {
                     }
 
-                    element_bls12(const FieldType &x, const FieldType &y, const FieldType &z) {
+                    element_curve_weierstrass(const FieldType &x, const FieldType &y, const FieldType &z) {
                         p[0] = x;
                         p[1] = y;
-                        p[2] = z;
+                        p[2] = z;   
                     }
-
-                    element_bls12 normalize() const {
+                    
+                    element_curve_weierstrass normalize() const {
                         FieldType p_out[3];
 
                         if (is_zero() || p[2] == 1)
-                            return;
-                        FieldType r;
+                            return *this;
+                        FieldType r, r2;
                         r = p[2].inverse();
-                        p[2] = r.square();
-                        p[0] *= p[2];
-                        r *= p[2];
-                        p[1] *= r;
+                        r2 = r.square();
+                        p_out[0] = p[0] * r2; //r2
+                        p_out[1] = p[1] * r * r2;  //r3
                         p[2] = 1;
+
+                        element_curve_weierstrass (p_out[0], p_out[1], p_out[2]);
                     }
 
                     /*
                         Jacobi coordinate
                         (p_out[0], p_out[1], p_out[2]) = 2(p[0], p[1], p[2])
                     */
-                    element_bls12 dbl() const {
+                    element_curve_weierstrass dbl() const{
                         FieldType A, B, C, D, E;
                         A = p[0].square();
                         B = p[1].square();
@@ -61,23 +58,25 @@ namespace nil {
                         D = ((p[0] + B).square() - A - C).dbl();
                         E = A.dbl() + A;
 
-                        out[0] = E.square() - D.dbl();
-                        out[1] = E * (D - out[0]) - C.dbl().dbl().dbl();
-                        out[2] = (p[1] * p[2]).dbl();
+                        p_out[0] = E.square() - D.dbl();
+                        p_out[1] = E * (D - p_out[0]) - C.dbl().dbl().dbl();
+                        p_out[2] = (p[1] * p[2]).dbl();
+
+                        element_curve_weierstrass (p_out[0], p_out[1], p_out[2]);
                     }
 
                     /*
                         Jacobi coordinate
                         (p_out[0], p_out[1], p_out[2]) = (p[0], p[1], p[2]) + (B.p[0], B.p[1], B.p[2])
                     */
-                    element_bls12 operator+(const element_bls12 &B) const {
+                    element_curve_weierstrass operator+(const element_curve_weierstrass &B) const {
                         FieldType p_out[3];
 
                         if (p[2].is_zero()) {
-                            return element_bls12(B);
+                            return element_curve_weierstrass(B);
                         }
                         if (B.p[2].is_zero()) {
-                            return element_bls12(*this);
+                            return element_curve_weierstrass(*this);
                         }
                         FieldType Z1Z1, Z2Z2, U1, S1, H, I, J, t3, r, V;
 
@@ -104,14 +103,16 @@ namespace nil {
                         p_out[0] = r.square() - J - (V + V);
                         p_out[1] = r * (V - p_out[0]) - (S1 * J).dbl();
                         p_out[2] = ((p[2] + B.p[2]).square() - Z1Z1 - Z2Z2) * H;
+
+                        element_curve_weierstrass (p_out[0], p_out[1], p_out[2]);
                     }
 
-                    element_bls12 operator-(const element_bls12 &B) const {
+                    element_curve_weierstrass operator-(const element_curve_weierstrass &B) const {
                         return *this + (-B);
                     }
 
-                    element_bls12 operator-() const {
-                        return element_bls12({p[0], -p[1], p[2]});
+                    element_curve_weierstrass operator-() const {
+                        return element_curve_weierstrass({p[0], -p[1], p[2]});
                     }
 
                     /*
@@ -125,29 +126,31 @@ namespace nil {
                         the inner format of Fp is not compatible with mie::Vuint
                     */
                     template<typename NumberType>
-                    element_bls12 operator*(const NumberType N) const {
-                        return multi_exp(*this, N);
+                    element_curve_weierstrass operator*(const NumberType N) const {
+                        //return multi_exp(*this, N);
+                        return *this;
                     }
 
                     template<class N>
-                    element_bls12 &operator*=(const N &y) {
+                    element_curve_weierstrass &operator*=(const N &y) {
                         return *this * y;
                     }
 
-                    bool operator==(const element_bls12 &rhs) const {
-                        normalize();
-                        rhs.normalize();
-                        if (is_zero()) {
-                            if (rhs.is_zero())
+                    bool operator==(const element_curve_weierstrass &rhs) const {
+                        element_curve_weierstrass t0 = normalize();
+                        element_curve_weierstrass t1 = rhs.normalize();
+                        if (t0.is_zero()) {
+                            if (t1.is_zero())
                                 return true;
                             return false;
                         }
-                        if (rhs.is_zero())
+                        if (t1.is_zero())
                             return false;
-                        return p[0] == rhs.p[0] && p[1] == rhs.p[1];
+
+                        return t0.p[0] == t1.p[0] && t0.p[1] == t1.p[1];
                     }
 
-                    bool operator!=(const element_bls12 &rhs) const {
+                    bool operator!=(const element_curve_weierstrass &rhs) const {
                         return !operator==(rhs);
                     }
 
@@ -155,21 +158,18 @@ namespace nil {
                         return p[2].is_zero();
                     }
 
-                    element_bls12 &operator+=(const element_bls12 &rhs) {
+                    element_curve_weierstrass &operator+=(const element_curve_weierstrass &rhs) {
                         return *this + rhs;
                     }
 
-                    element_bls12 &operator-=(const element_bls12 &rhs) {
+                    element_curve_weierstrass &operator-=(const element_curve_weierstrass &rhs) {
                         return *this - rhs;
                     }
                 };
 
-                typedef element_bls12<element_fp2> Ec2;
-                typedef element_bls12<element_fp> Ec1;
+            }   //  namespace detail
+        }   //  namespace curve
+    }   //  namespace algebra
+}   //  namespace nil
 
-            }    //  namespace detail
-        }        //  namespace curve
-    }            //  namespace algebra
-}    //  namespace nil
-
-#endif    // ALGEBRA_CURVES_ELEMENT_BLS12_381_HPP
+#endif    // ALGEBRA_CURVES_ELEMENT_CURVE_WEIERSTRASS_HPP

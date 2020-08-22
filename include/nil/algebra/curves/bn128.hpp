@@ -11,7 +11,7 @@
 #define ALGEBRA_CURVES_BN128_HPP
 
 #include <nil/crypto3/algebra/curves/curve_weierstrass.hpp>
-#include <nil/crypto3/algebra/curves/detail/element/bn128.hpp>
+#include <nil/crypto3/algebra/curves/detail/element/curve_weierstrass.hpp>
 
 #include <nil/algebra/detail/mp_def.hpp>
 
@@ -32,59 +32,49 @@ namespace nil {
 				v^3 = xi
 				w^2 = v
 			*/
-	        struct bn128_snark1 : public curve_weierstrass<nil::algebra::fields::bn128_fq<254>> {
-	        private:
-	        	typedef typename curve_weierstrass<nil::algebra::fields::bn128_fq<254>> policy_type;
-	        public:
-		        typedef typename policy_type::number_type number_type;
-		        typedef typename policy_type::field_type field_type;
+	        struct bn128_snark1 {
+                constexpr static const std::size_t base_field_bits = 254;
+                typedef fields::bn128_fq<base_field_bits, CHAR_BIT> base_field_type;
+                typedef typename base_field_type::modulus_type number_type;
+                constexpr static const number_type base_field_modulus = base_field_type::modulus;
 
-		        constexpr static const number_type p = 
-		        	0x30644E72E131A029B85045B68181585D97816A916871CA8D3C208C16D87CFD47_cppui254;
+                constexpr static const std::size_t scalar_field_bits = 254;
+                typedef fields::bn128_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
+                constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
+
+		        typedef typename detail::element_curve_weierstrass<base_field_type::value_type> value_type;
+
+		        constexpr static const number_type p = base_field_modulus;
+                constexpr static const number_type q = scalar_field_modulus;
+
 		        constexpr static const number_type a = 0;
 		        constexpr static const number_type b = 0x03;
 		        constexpr static const number_type x = 0x09;
 		        constexpr static const number_type y = 0x01;
-		        constexpr static const number_type order = 0x30644E72E131A029B85045B68181585D2833E84879B9709143E1F593F0000001_cppui254;
-
-		        typedef typename detail::element_bn128<field_type::value_type> value_type;
 	    	};
 
 	    	// b/xi = 82 / (9 + u) = 9 - u
-	        struct bn128_snark2 : public curve_weierstrass<<nil::algebra::fields::bn128_fq<254>>> {
-	        private:
-	        	typedef typename curve_weierstrass<nil::algebra::fields::bn128_fq<254>> policy_type;
-	        public:
-		        typedef typename policy_type::number_type number_type;
-		        typedef typename policy_type::field_type field_type;
+	        struct bn128_snark2 {
+	        	constexpr static const std::size_t base_field_bits = 254;
+                typedef fields::bn128_fq<base_field_bits, CHAR_BIT> base_field_type;
+                typedef typename base_field_type::modulus_type number_type;
+                constexpr static const number_type base_field_modulus = base_field_type::modulus;
 
-		        constexpr static const number_type p = 21888242871839275222246405745257275088696311157297823662689037894645226208583_cppui254;
+                constexpr static const std::size_t scalar_field_bits = 254;
+                typedef fields::bn128_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
+                constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
+
+		        typedef typename detail::element_curve_weierstrass<base_field_type::value_type> value_type;
+
+		        constexpr static const number_type p = base_field_modulus;
+                constexpr static const number_type q = scalar_field_modulus;
+
 		        constexpr static const number_type a = 0;
 		        constexpr static const number_type b = 82;
 		        constexpr static const number_type x = 0x09;
 		        constexpr static const number_type y = 0x01;
-		        constexpr static const number_type order = 21888242871839275222246405745257275088548364400416034343698204186575808495617_cppui254;
-
-		        typedef typename detail::element_bn128<field_type::value_type> value_type;
 	    	};
 
-	    	// herumi curve
-	        struct bn128_Fp254BNb : public curve_weierstrass<<nil::algebra::fields::bn128_fq<254>>> {
-	        private:
-	        	typedef typename curve_weierstrass<nil::algebra::fields::bn128_fq<254>> policy_type;
-	        public:
-		        typedef typename policy_type::number_type number_type;
-		        typedef typename policy_type::field_type field_type;
-
-		        constexpr static const number_type p = 16798108731015832284940804142231733909889187121439069848933715426072753864723_cppui254;
-		        constexpr static const number_type a = 0;
-		        constexpr static const number_type b = 0x2;
-		        constexpr static const number_type x = 0x01;
-		        constexpr static const number_type y = 0x01;
-		        constexpr static const number_type order = ?;
-
-		        typedef typename detail::element_bn128<field_type::value_type> value_type;
-	    	};
 	    }    // namespace curves
     }    // namespace algebra
 }    // namespace nil
