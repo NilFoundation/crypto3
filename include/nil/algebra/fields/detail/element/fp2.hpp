@@ -45,8 +45,8 @@ namespace nil {
                         data = value_type(in_data);
                     }
 
-                    element_fp2(std::initializer_list<modulus_type> in_data) {
-                        data = {underlying_type(in_data[0], modulus), underlying_type(in_data[1], modulus)};
+                    element_fp2(modulus_type in_data0, modulus_type in_data1) {
+                        data = value_type({underlying_type(in_data0), underlying_type(in_data1)});
                     }
 
                     inline static element_fp2 zero() {

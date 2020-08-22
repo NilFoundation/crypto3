@@ -10,7 +10,6 @@
 #ifndef ALGEBRA_FIELDS_BN128_FQ2_HPP
 #define ALGEBRA_FIELDS_BN128_FQ2_HPP
 
-#include <nil/algebra/fields/detail/element/fp.hpp>
 #include <nil/algebra/fields/detail/element/fp2.hpp>
 #include <nil/algebra/fields/detail/params/params.hpp>
 
@@ -27,7 +26,7 @@ namespace nil {
              * @tparam ModulusBits
              * @tparam GeneratorBits
              */
-            template<std::size_t ModulusBits, std::size_t GeneratorBits = CHAR_BIT>
+            template<std::size_t ModulusBits = 254, std::size_t GeneratorBits = CHAR_BIT>
             struct bn128_fq2 : public field<ModulusBits, GeneratorBits> {};
 
             template <>
@@ -36,6 +35,9 @@ namespace nil {
 
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                 typedef typename policy_type::modulus_type modulus_type;
+
+                constexpr static const std::size_t number_bits = policy_type::number_bits;
+                typedef typename policy_type::number_type number_type;
 
                 constexpr static const modulus_type modulus =
                     0x30644E72E131A029B85045B68181585D97816A916871CA8D3C208C16D87CFD47_cppui254;
