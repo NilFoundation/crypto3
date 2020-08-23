@@ -9,9 +9,11 @@
 #ifndef CRYPTO3_STREAM_CHACHA_FUNCTIONS_HPP
 #define CRYPTO3_STREAM_CHACHA_FUNCTIONS_HPP
 
-#if defined(CRYPTO3_HAS_CHACHA_AVX2)
+#include <boost/predef/architecture.h>
+
+#if defined(CRYPTO3_HAS_CHACHA_AVX2) || BOOST_HW_SIMD_X86 >= BOOST_HW_SIMD_X86_AVX2_VERSION
 #include <nil/crypto3/stream/detail/chacha/chacha_avx2_impl.hpp>
-#elif defined(CRYPTO3_HAS_CHACHA_SSE2)
+#elif defined(CRYPTO3_HAS_CHACHA_SSE2) || BOOST_HW_SIMD_X86 >= BOOST_HW_SIMD_X86_SSE2_VERSION
 #include <nil/crypto3/stream/detail/chacha/chacha_sse2_impl.hpp>
 #else
 #include <nil/crypto3/stream/detail/chacha/chacha_impl.hpp>
@@ -25,9 +27,9 @@ namespace nil {
                 struct chacha_functions : public chacha_policy<Round, IVSize, KeyBits> {
                     typedef chacha_policy<Round, IVSize, KeyBits> policy_type;
 
-#if defined(CRYPTO3_HAS_CHACHA_AVX2)
+#if defined(CRYPTO3_HAS_CHACHA_AVX2) || BOOST_HW_SIMD_X86 >= BOOST_HW_SIMD_X86_AVX2_VERSION
                     typedef detail::chacha_avx2_impl<Round, IVSize, KeyBits> impl_type;
-#elif defined(CRYPTO3_HAS_CHACHA_SSE2)
+#elif defined(CRYPTO3_HAS_CHACHA_SSE2) || BOOST_HW_SIMD_X86 >= BOOST_HW_SIMD_X86_SSE2_VERSION
                     typedef detail::chacha_sse2_impl<Round, IVSize, KeyBits> impl_type;
 #else
                     typedef detail::chacha_impl<Round, IVSize, KeyBits> impl_type;
@@ -70,9 +72,9 @@ namespace nil {
                 struct chacha_functions<Round, IVSize, 128> : public chacha_policy<Round, IVSize, 128> {
                     typedef chacha_policy<Round, IVSize, 128> policy_type;
 
-#if defined(CRYPTO3_HAS_CHACHA_AVX2)
+#if defined(CRYPTO3_HAS_CHACHA_AVX2) || BOOST_HW_SIMD_X86 >= BOOST_HW_SIMD_X86_AVX2_VERSION
                     typedef detail::chacha_avx2_impl<Round, IVSize, 128> impl_type;
-#elif defined(CRYPTO3_HAS_CHACHA_SSE2)
+#elif defined(CRYPTO3_HAS_CHACHA_SSE2) || BOOST_HW_SIMD_X86 >= BOOST_HW_SIMD_X86_SSE2_VERSION
                     typedef detail::chacha_sse2_impl<Round, IVSize, 128> impl_type;
 #else
                     typedef detail::chacha_impl<Round, IVSize, 128> impl_type;
@@ -115,9 +117,9 @@ namespace nil {
                 struct chacha_functions<Round, 64, 128> : public chacha_policy<Round, 64, 128> {
                     typedef chacha_policy<Round, 64, 128> policy_type;
 
-#if defined(CRYPTO3_HAS_CHACHA_AVX2)
+#if defined(CRYPTO3_HAS_CHACHA_AVX2) || BOOST_HW_SIMD_X86 >= BOOST_HW_SIMD_X86_AVX2_VERSION
                     typedef detail::chacha_avx2_impl<Round, 64, 128> impl_type;
-#elif defined(CRYPTO3_HAS_CHACHA_SSE2)
+#elif defined(CRYPTO3_HAS_CHACHA_SSE2) || BOOST_HW_SIMD_X86 >= BOOST_HW_SIMD_X86_SSE2_VERSION
                     typedef detail::chacha_sse2_impl<Round, 64, 128> impl_type;
 #else
                     typedef detail::chacha_impl<Round, 64, 128> impl_type;
@@ -169,9 +171,9 @@ namespace nil {
                 struct chacha_functions<Round, 96, 128> : public chacha_policy<Round, 96, 128> {
                     typedef chacha_policy<Round, 96, 128> policy_type;
 
-#if defined(CRYPTO3_HAS_CHACHA_AVX2)
+#if defined(CRYPTO3_HAS_CHACHA_AVX2) || BOOST_HW_SIMD_X86 >= BOOST_HW_SIMD_X86_AVX2_VERSION
                     typedef detail::chacha_avx2_impl<Round, 96, 128> impl_type;
-#elif defined(CRYPTO3_HAS_CHACHA_SSE2)
+#elif defined(CRYPTO3_HAS_CHACHA_SSE2) || BOOST_HW_SIMD_X86 >= BOOST_HW_SIMD_X86_SSE2_VERSION
                     typedef detail::chacha_sse2_impl<Round, 96, 128> impl_type;
 #else
                     typedef detail::chacha_impl<Round, 96, 128> impl_type;
@@ -224,9 +226,9 @@ namespace nil {
 
                     typedef chacha_policy<Round, IVSize, 256> policy_type;
 
-#if defined(CRYPTO3_HAS_CHACHA_AVX2)
+#if defined(CRYPTO3_HAS_CHACHA_AVX2) || BOOST_HW_SIMD_X86 >= BOOST_HW_SIMD_X86_AVX2_VERSION
                     typedef detail::chacha_avx2_impl<Round, IVSize, 256> impl_type;
-#elif defined(CRYPTO3_HAS_CHACHA_SSE2)
+#elif defined(CRYPTO3_HAS_CHACHA_SSE2) || BOOST_HW_SIMD_X86 >= BOOST_HW_SIMD_X86_SSE2_VERSION
                     typedef detail::chacha_sse2_impl<Round, IVSize, 256> impl_type;
 #else
                     typedef detail::chacha_impl<Round, IVSize, 256> impl_type;
@@ -268,9 +270,9 @@ namespace nil {
 
                     typedef chacha_policy<Round, 64, 256> policy_type;
 
-#if defined(CRYPTO3_HAS_CHACHA_AVX2)
+#if defined(CRYPTO3_HAS_CHACHA_AVX2) || BOOST_HW_SIMD_X86 >= BOOST_HW_SIMD_X86_AVX2_VERSION
                     typedef detail::chacha_avx2_impl<Round, 64, 256> impl_type;
-#elif defined(CRYPTO3_HAS_CHACHA_SSE2)
+#elif defined(CRYPTO3_HAS_CHACHA_SSE2) || BOOST_HW_SIMD_X86 >= BOOST_HW_SIMD_X86_SSE2_VERSION
                     typedef detail::chacha_sse2_impl<Round, 64, 256> impl_type;
 #else
                     typedef detail::chacha_impl<Round, 64, 256> impl_type;
@@ -322,9 +324,9 @@ namespace nil {
 
                     typedef chacha_policy<Round, 96, 256> policy_type;
 
-#if defined(CRYPTO3_HAS_CHACHA_AVX2)
+#if defined(CRYPTO3_HAS_CHACHA_AVX2) || BOOST_HW_SIMD_X86 >= BOOST_HW_SIMD_X86_AVX2_VERSION
                     typedef detail::chacha_avx2_impl<Round, 96, 256> impl_type;
-#elif defined(CRYPTO3_HAS_CHACHA_SSE2)
+#elif defined(CRYPTO3_HAS_CHACHA_SSE2) || BOOST_HW_SIMD_X86 >= BOOST_HW_SIMD_X86_SSE2_VERSION
                     typedef detail::chacha_sse2_impl<Round, 96, 256> impl_type;
 #else
                     typedef detail::chacha_impl<Round, 96, 256> impl_type;
