@@ -17,15 +17,15 @@
 
 using namespace nil::algebra;
 
-template<typename ppT>
+template<typename CurveType>
 void pairing_test() {
-    GT<ppT> GT_one = GT<ppT>::one();
+    GT<CurveType> GT_one = GT<CurveType>::one();
 
     printf("Running bilinearity tests:\n");
-    G1<ppT> P = (Fr<ppT>::random_element()) * G1<ppT>::one();
-    // G1<ppT> P = Fr<ppT>("2") * G1<ppT>::one();
-    G2<ppT> Q = (Fr<ppT>::random_element()) * G2<ppT>::one();
-    // G2<ppT> Q = Fr<ppT>("3") * G2<ppT>::one();
+    G1<CurveType> P = (Fr<CurveType>::random_element()) * G1<CurveType>::one();
+    // G1<CurveType> P = Fr<CurveType>("2") * G1<CurveType>::one();
+    G2<CurveType> Q = (Fr<CurveType>::random_element()) * G2<CurveType>::one();
+    // G2<CurveType> Q = Fr<CurveType>("3") * G2<CurveType>::one();
 
     printf("P:\n");
     P.print();
@@ -35,15 +35,15 @@ void pairing_test() {
     Q.print_coordinates();
     printf("\n\n");
 
-    Fr<ppT> s = Fr<ppT>::random_element();
-    // Fr<ppT> s = Fr<ppT>("2");
-    G1<ppT> sP = s * P;
-    G2<ppT> sQ = s * Q;
+    Fr<CurveType> s = Fr<CurveType>::random_element();
+    // Fr<CurveType> s = Fr<CurveType>("2");
+    G1<CurveType> sP = s * P;
+    G2<CurveType> sQ = s * Q;
 
     printf("Pairing bilinearity tests (three must match):\n");
-    GT<ppT> ans1 = ppT::reduced_pairing(sP, Q);
-    GT<ppT> ans2 = ppT::reduced_pairing(P, sQ);
-    GT<ppT> ans3 = ppT::reduced_pairing(P, Q) ^ s;
+    GT<CurveType> ans1 = CurveType::reduced_pairing(sP, Q);
+    GT<CurveType> ans2 = CurveType::reduced_pairing(P, sQ);
+    GT<CurveType> ans3 = CurveType::reduced_pairing(P, Q) ^ s;
     ans1.print();
     ans2.print();
     ans3.print();
@@ -51,35 +51,35 @@ void pairing_test() {
     assert(ans2 == ans3);
 
     assert(ans1 != GT_one);
-    assert((ans1 ^ Fr<ppT>::field_char()) == GT_one);
+    assert((ans1 ^ Fr<CurveType>::field_char()) == GT_one);
     printf("\n\n");
 }
 
-template<typename ppT>
+template<typename CurveType>
 void double_miller_loop_test() {
-    const G1<ppT> P1 = (Fr<ppT>::random_element()) * G1<ppT>::one();
-    const G1<ppT> P2 = (Fr<ppT>::random_element()) * G1<ppT>::one();
-    const G2<ppT> Q1 = (Fr<ppT>::random_element()) * G2<ppT>::one();
-    const G2<ppT> Q2 = (Fr<ppT>::random_element()) * G2<ppT>::one();
+    const G1<CurveType> P1 = (Fr<CurveType>::random_element()) * G1<CurveType>::one();
+    const G1<CurveType> P2 = (Fr<CurveType>::random_element()) * G1<CurveType>::one();
+    const G2<CurveType> Q1 = (Fr<CurveType>::random_element()) * G2<CurveType>::one();
+    const G2<CurveType> Q2 = (Fr<CurveType>::random_element()) * G2<CurveType>::one();
 
-    const G1_precomp<ppT> prec_P1 = ppT::precompute_G1(P1);
-    const G1_precomp<ppT> prec_P2 = ppT::precompute_G1(P2);
-    const G2_precomp<ppT> prec_Q1 = ppT::precompute_G2(Q1);
-    const G2_precomp<ppT> prec_Q2 = ppT::precompute_G2(Q2);
+    const G1_precomp<CurveType> prec_P1 = CurveType::precompute_G1(P1);
+    const G1_precomp<CurveType> prec_P2 = CurveType::precompute_G1(P2);
+    const G2_precomp<CurveType> prec_Q1 = CurveType::precompute_G2(Q1);
+    const G2_precomp<CurveType> prec_Q2 = CurveType::precompute_G2(Q2);
 
-    const Fqk<ppT> ans_1 = ppT::miller_loop(prec_P1, prec_Q1);
-    const Fqk<ppT> ans_2 = ppT::miller_loop(prec_P2, prec_Q2);
-    const Fqk<ppT> ans_12 = ppT::double_miller_loop(prec_P1, prec_Q1, prec_P2, prec_Q2);
+    const Fqk<CurveType> ans_1 = CurveType::miller_loop(prec_P1, prec_Q1);
+    const Fqk<CurveType> ans_2 = CurveType::miller_loop(prec_P2, prec_Q2);
+    const Fqk<CurveType> ans_12 = CurveType::double_miller_loop(prec_P1, prec_Q1, prec_P2, prec_Q2);
     assert(ans_1 * ans_2 == ans_12);
 }
 
-template<typename ppT>
+template<typename CurveType>
 void affine_pairing_test() {
-    GT<ppT> GT_one = GT<ppT>::one();
+    GT<CurveType> GT_one = GT<CurveType>::one();
 
     printf("Running bilinearity tests:\n");
-    G1<ppT> P = (Fr<ppT>::random_element()) * G1<ppT>::one();
-    G2<ppT> Q = (Fr<ppT>::random_element()) * G2<ppT>::one();
+    G1<CurveType> P = (Fr<CurveType>::random_element()) * G1<CurveType>::one();
+    G2<CurveType> Q = (Fr<CurveType>::random_element()) * G2<CurveType>::one();
 
     printf("P:\n");
     P.print();
@@ -87,14 +87,14 @@ void affine_pairing_test() {
     Q.print();
     printf("\n\n");
 
-    Fr<ppT> s = Fr<ppT>::random_element();
-    G1<ppT> sP = s * P;
-    G2<ppT> sQ = s * Q;
+    Fr<CurveType> s = Fr<CurveType>::random_element();
+    G1<CurveType> sP = s * P;
+    G2<CurveType> sQ = s * Q;
 
     printf("Pairing bilinearity tests (three must match):\n");
-    GT<ppT> ans1 = ppT::affine_reduced_pairing(sP, Q);
-    GT<ppT> ans2 = ppT::affine_reduced_pairing(P, sQ);
-    GT<ppT> ans3 = ppT::affine_reduced_pairing(P, Q) ^ s;
+    GT<CurveType> ans1 = CurveType::affine_reduced_pairing(sP, Q);
+    GT<CurveType> ans2 = CurveType::affine_reduced_pairing(P, sQ);
+    GT<CurveType> ans3 = CurveType::affine_reduced_pairing(P, Q) ^ s;
     ans1.print();
     ans2.print();
     ans3.print();
@@ -102,7 +102,7 @@ void affine_pairing_test() {
     assert(ans2 == ans3);
 
     assert(ans1 != GT_one);
-    assert((ans1 ^ Fr<ppT>::field_char()) == GT_one);
+    assert((ans1 ^ Fr<CurveType>::field_char()) == GT_one);
     printf("\n\n");
 }
 

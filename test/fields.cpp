@@ -214,21 +214,21 @@ void test_cyclotomic_squaring<Fqk<mnt6_pp>>() {
     assert(beta.cyclotomic_squared() == beta.squared());
 }
 
-template<typename ppT>
+template<typename CurveType>
 void test_all_fields() {
-    test_field<Fr<ppT>>();
-    test_field<Fq<ppT>>();
-    test_field<Fqe<ppT>>();
-    test_field<Fqk<ppT>>();
+    test_field<Fr<CurveType>>();
+    test_field<Fq<CurveType>>();
+    test_field<Fqe<CurveType>>();
+    test_field<Fqk<CurveType>>();
 
-    test_sqrt<Fr<ppT>>();
-    test_sqrt<Fq<ppT>>();
-    test_sqrt<Fqe<ppT>>();
+    test_sqrt<Fr<CurveType>>();
+    test_sqrt<Fq<CurveType>>();
+    test_sqrt<Fqe<CurveType>>();
 
-    test_Frobenius<Fqe<ppT>>();
-    test_Frobenius<Fqk<ppT>>();
+    test_Frobenius<Fqe<CurveType>>();
+    test_Frobenius<Fqk<CurveType>>();
 
-    test_unitary_inverse<Fqk<ppT>>();
+    test_unitary_inverse<Fqk<CurveType>>();
 }
 
 template<typename Fp4T>
