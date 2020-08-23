@@ -21,12 +21,16 @@ if(BOOST_CMAKE)
                            ${CMAKE_WORKSPACE_NAME}::math
                            ${CMAKE_WORKSPACE_NAME}::multiprecision
 
+                           crypto3::hash
+                           crypto3::mac
                            crypto3::stream)
 else()
     find_package(Boost REQUIRED COMPONENTS filesystem unit_test_framework)
 
     cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
 
+                           crypto3::hash
+                           crypto3::mac
                            crypto3::stream
 
                            $<TARGET_NAME_IF_EXISTS:boost_multiprecision>
