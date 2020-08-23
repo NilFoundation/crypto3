@@ -68,37 +68,37 @@ namespace nil {
 
                 /******************************** Proving key ********************************/
 
-                template<typename ppT>
+                template<typename CurveType>
                 class uscs_ppzksnark_proving_key;
 
-                template<typename ppT>
-                std::ostream &operator<<(std::ostream &out, const uscs_ppzksnark_proving_key<ppT> &pk);
+                template<typename CurveType>
+                std::ostream &operator<<(std::ostream &out, const uscs_ppzksnark_proving_key<CurveType> &pk);
 
-                template<typename ppT>
-                std::istream &operator>>(std::istream &in, uscs_ppzksnark_proving_key<ppT> &pk);
+                template<typename CurveType>
+                std::istream &operator>>(std::istream &in, uscs_ppzksnark_proving_key<CurveType> &pk);
 
                 /**
                  * A proving key for the USCS ppzkSNARK.
                  */
-                template<typename ppT>
+                template<typename CurveType>
                 class uscs_ppzksnark_proving_key {
                 public:
-                    algebra::G1_vector<ppT> V_g1_query;
-                    algebra::G1_vector<ppT> alpha_V_g1_query;
-                    algebra::G1_vector<ppT> H_g1_query;
-                    algebra::G2_vector<ppT> V_g2_query;
+                    algebra::G1_vector<CurveType> V_g1_query;
+                    algebra::G1_vector<CurveType> alpha_V_g1_query;
+                    algebra::G1_vector<CurveType> H_g1_query;
+                    algebra::G2_vector<CurveType> V_g2_query;
 
-                    uscs_ppzksnark_constraint_system<ppT> constraint_system;
+                    uscs_ppzksnark_constraint_system<CurveType> constraint_system;
 
                     uscs_ppzksnark_proving_key() {};
-                    uscs_ppzksnark_proving_key<ppT> &operator=(const uscs_ppzksnark_proving_key<ppT> &other) = default;
-                    uscs_ppzksnark_proving_key(const uscs_ppzksnark_proving_key<ppT> &other) = default;
-                    uscs_ppzksnark_proving_key(uscs_ppzksnark_proving_key<ppT> &&other) = default;
-                    uscs_ppzksnark_proving_key(algebra::G1_vector<ppT> &&V_g1_query,
-                                               algebra::G1_vector<ppT> &&alpha_V_g1_query,
-                                               algebra::G1_vector<ppT> &&H_g1_query,
-                                               algebra::G2_vector<ppT> &&V_g2_query,
-                                               uscs_ppzksnark_constraint_system<ppT> &&constraint_system) :
+                    uscs_ppzksnark_proving_key<CurveType> &operator=(const uscs_ppzksnark_proving_key<CurveType> &other) = default;
+                    uscs_ppzksnark_proving_key(const uscs_ppzksnark_proving_key<CurveType> &other) = default;
+                    uscs_ppzksnark_proving_key(uscs_ppzksnark_proving_key<CurveType> &&other) = default;
+                    uscs_ppzksnark_proving_key(algebra::G1_vector<CurveType> &&V_g1_query,
+                                               algebra::G1_vector<CurveType> &&alpha_V_g1_query,
+                                               algebra::G1_vector<CurveType> &&H_g1_query,
+                                               algebra::G2_vector<CurveType> &&V_g2_query,
+                                               uscs_ppzksnark_constraint_system<CurveType> &&constraint_system) :
                         V_g1_query(std::move(V_g1_query)),
                         alpha_V_g1_query(std::move(alpha_V_g1_query)), H_g1_query(std::move(H_g1_query)),
                         V_g2_query(std::move(V_g2_query)), constraint_system(std::move(constraint_system)) {};
@@ -120,8 +120,8 @@ namespace nil {
                     }
 
                     std::size_t size_in_bits() const {
-                        return algebra::G1<ppT>::size_in_bits() * G1_size() +
-                               algebra::G2<ppT>::size_in_bits() * G2_size();
+                        return algebra::G1<CurveType>::size_in_bits() * G1_size() +
+                               algebra::G2<CurveType>::size_in_bits() * G2_size();
                     }
 
                     void print_size() const {
@@ -137,39 +137,39 @@ namespace nil {
                         printf("* PK size in bits: %zu\n", this->size_in_bits());
                     }
 
-                    bool operator==(const uscs_ppzksnark_proving_key<ppT> &other) const;
-                    friend std::ostream &operator<<<ppT>(std::ostream &out, const uscs_ppzksnark_proving_key<ppT> &pk);
-                    friend std::istream &operator>><ppT>(std::istream &in, uscs_ppzksnark_proving_key<ppT> &pk);
+                    bool operator==(const uscs_ppzksnark_proving_key<CurveType> &other) const;
+                    friend std::ostream &operator<<<CurveType>(std::ostream &out, const uscs_ppzksnark_proving_key<CurveType> &pk);
+                    friend std::istream &operator>><CurveType>(std::istream &in, uscs_ppzksnark_proving_key<CurveType> &pk);
                 };
 
                 /******************************* Verification key ****************************/
 
-                template<typename ppT>
+                template<typename CurveType>
                 class uscs_ppzksnark_verification_key;
 
-                template<typename ppT>
-                std::ostream &operator<<(std::ostream &out, const uscs_ppzksnark_verification_key<ppT> &vk);
+                template<typename CurveType>
+                std::ostream &operator<<(std::ostream &out, const uscs_ppzksnark_verification_key<CurveType> &vk);
 
-                template<typename ppT>
-                std::istream &operator>>(std::istream &in, uscs_ppzksnark_verification_key<ppT> &vk);
+                template<typename CurveType>
+                std::istream &operator>>(std::istream &in, uscs_ppzksnark_verification_key<CurveType> &vk);
 
                 /**
                  * A verification key for the USCS ppzkSNARK.
                  */
-                template<typename ppT>
+                template<typename CurveType>
                 class uscs_ppzksnark_verification_key {
                 public:
-                    algebra::G2<ppT> tilde_g2;
-                    algebra::G2<ppT> alpha_tilde_g2;
-                    algebra::G2<ppT> Z_g2;
+                    algebra::G2<CurveType> tilde_g2;
+                    algebra::G2<CurveType> alpha_tilde_g2;
+                    algebra::G2<CurveType> Z_g2;
 
-                    accumulation_vector<algebra::G1<ppT>> encoded_IC_query;
+                    accumulation_vector<algebra::G1<CurveType>> encoded_IC_query;
 
                     uscs_ppzksnark_verification_key() = default;
-                    uscs_ppzksnark_verification_key(const algebra::G2<ppT> &tilde_g2,
-                                                    const algebra::G2<ppT> &alpha_tilde_g2,
-                                                    const algebra::G2<ppT> &Z_g2,
-                                                    const accumulation_vector<algebra::G1<ppT>> &eIC) :
+                    uscs_ppzksnark_verification_key(const algebra::G2<CurveType> &tilde_g2,
+                                                    const algebra::G2<CurveType> &alpha_tilde_g2,
+                                                    const algebra::G2<CurveType> &Z_g2,
+                                                    const accumulation_vector<algebra::G1<CurveType>> &eIC) :
                         tilde_g2(tilde_g2),
                         alpha_tilde_g2(alpha_tilde_g2), Z_g2(Z_g2), encoded_IC_query(eIC) {};
 
@@ -182,7 +182,7 @@ namespace nil {
                     }
 
                     std::size_t size_in_bits() const {
-                        return encoded_IC_query.size_in_bits() + 3 * algebra::G2<ppT>::size_in_bits();
+                        return encoded_IC_query.size_in_bits() + 3 * algebra::G2<CurveType>::size_in_bits();
                     }
 
                     void print_size() const {
@@ -194,24 +194,24 @@ namespace nil {
                         printf("* VK size in bits: %zu\n", this->size_in_bits());
                     }
 
-                    bool operator==(const uscs_ppzksnark_verification_key<ppT> &other) const;
-                    friend std::ostream &operator<<<ppT>(std::ostream &out,
-                                                         const uscs_ppzksnark_verification_key<ppT> &vk);
-                    friend std::istream &operator>><ppT>(std::istream &in, uscs_ppzksnark_verification_key<ppT> &vk);
+                    bool operator==(const uscs_ppzksnark_verification_key<CurveType> &other) const;
+                    friend std::ostream &operator<<<CurveType>(std::ostream &out,
+                                                         const uscs_ppzksnark_verification_key<CurveType> &vk);
+                    friend std::istream &operator>><CurveType>(std::istream &in, uscs_ppzksnark_verification_key<CurveType> &vk);
 
-                    static uscs_ppzksnark_verification_key<ppT> dummy_verification_key(const std::size_t input_size);
+                    static uscs_ppzksnark_verification_key<CurveType> dummy_verification_key(const std::size_t input_size);
                 };
 
                 /************************ Processed verification key *************************/
 
-                template<typename ppT>
+                template<typename CurveType>
                 class uscs_ppzksnark_processed_verification_key;
 
-                template<typename ppT>
-                std::ostream &operator<<(std::ostream &out, const uscs_ppzksnark_processed_verification_key<ppT> &pvk);
+                template<typename CurveType>
+                std::ostream &operator<<(std::ostream &out, const uscs_ppzksnark_processed_verification_key<CurveType> &pvk);
 
-                template<typename ppT>
-                std::istream &operator>>(std::istream &in, uscs_ppzksnark_processed_verification_key<ppT> &pvk);
+                template<typename CurveType>
+                std::istream &operator>>(std::istream &in, uscs_ppzksnark_processed_verification_key<CurveType> &pvk);
 
                 /**
                  * A processed verification key for the USCS ppzkSNARK.
@@ -220,23 +220,23 @@ namespace nil {
                  * contains a small constant amount of additional pre-computed information that
                  * enables a faster verification time.
                  */
-                template<typename ppT>
+                template<typename CurveType>
                 class uscs_ppzksnark_processed_verification_key {
                 public:
-                    algebra::G1_precomp<ppT> pp_G1_one_precomp;
-                    algebra::G2_precomp<ppT> pp_G2_one_precomp;
-                    algebra::G2_precomp<ppT> vk_tilde_g2_precomp;
-                    algebra::G2_precomp<ppT> vk_alpha_tilde_g2_precomp;
-                    algebra::G2_precomp<ppT> vk_Z_g2_precomp;
-                    algebra::GT<ppT> pairing_of_g1_and_g2;
+                    algebra::G1_precomp<CurveType> pp_G1_one_precomp;
+                    algebra::G2_precomp<CurveType> pp_G2_one_precomp;
+                    algebra::G2_precomp<CurveType> vk_tilde_g2_precomp;
+                    algebra::G2_precomp<CurveType> vk_alpha_tilde_g2_precomp;
+                    algebra::G2_precomp<CurveType> vk_Z_g2_precomp;
+                    algebra::GT<CurveType> pairing_of_g1_and_g2;
 
-                    accumulation_vector<algebra::G1<ppT>> encoded_IC_query;
+                    accumulation_vector<algebra::G1<CurveType>> encoded_IC_query;
 
                     bool operator==(const uscs_ppzksnark_processed_verification_key &other) const;
-                    friend std::ostream &operator<<<ppT>(std::ostream &out,
-                                                         const uscs_ppzksnark_processed_verification_key<ppT> &pvk);
+                    friend std::ostream &operator<<<CurveType>(std::ostream &out,
+                                                         const uscs_ppzksnark_processed_verification_key<CurveType> &pvk);
                     friend std::istream &operator>>
-                        <ppT>(std::istream &in, uscs_ppzksnark_processed_verification_key<ppT> &pvk);
+                        <CurveType>(std::istream &in, uscs_ppzksnark_processed_verification_key<CurveType> &pvk);
                 };
 
                 /********************************** Key pair *********************************/
@@ -244,32 +244,32 @@ namespace nil {
                 /**
                  * A key pair for the USCS ppzkSNARK, which consists of a proving key and a verification key.
                  */
-                template<typename ppT>
+                template<typename CurveType>
                 class uscs_ppzksnark_keypair {
                 public:
-                    uscs_ppzksnark_proving_key<ppT> pk;
-                    uscs_ppzksnark_verification_key<ppT> vk;
+                    uscs_ppzksnark_proving_key<CurveType> pk;
+                    uscs_ppzksnark_verification_key<CurveType> vk;
 
                     uscs_ppzksnark_keypair() {};
-                    uscs_ppzksnark_keypair(uscs_ppzksnark_proving_key<ppT> &&pk,
-                                           uscs_ppzksnark_verification_key<ppT> &&vk) :
+                    uscs_ppzksnark_keypair(uscs_ppzksnark_proving_key<CurveType> &&pk,
+                                           uscs_ppzksnark_verification_key<CurveType> &&vk) :
                         pk(std::move(pk)),
                         vk(std::move(vk)) {
                     }
 
-                    uscs_ppzksnark_keypair(uscs_ppzksnark_keypair<ppT> &&other) = default;
+                    uscs_ppzksnark_keypair(uscs_ppzksnark_keypair<CurveType> &&other) = default;
                 };
 
                 /*********************************** Proof ***********************************/
 
-                template<typename ppT>
+                template<typename CurveType>
                 class uscs_ppzksnark_proof;
 
-                template<typename ppT>
-                std::ostream &operator<<(std::ostream &out, const uscs_ppzksnark_proof<ppT> &proof);
+                template<typename CurveType>
+                std::ostream &operator<<(std::ostream &out, const uscs_ppzksnark_proof<CurveType> &proof);
 
-                template<typename ppT>
-                std::istream &operator>>(std::istream &in, uscs_ppzksnark_proof<ppT> &proof);
+                template<typename CurveType>
+                std::istream &operator>>(std::istream &in, uscs_ppzksnark_proof<CurveType> &proof);
 
                 /**
                  * A proof for the USCS ppzkSNARK.
@@ -278,25 +278,25 @@ namespace nil {
                  * serializes/deserializes, and verifies proofs. We only expose some information
                  * about the structure for statistics purposes.
                  */
-                template<typename ppT>
+                template<typename CurveType>
                 class uscs_ppzksnark_proof {
                 public:
-                    algebra::G1<ppT> V_g1;
-                    algebra::G1<ppT> alpha_V_g1;
-                    algebra::G1<ppT> H_g1;
-                    algebra::G2<ppT> V_g2;
+                    algebra::G1<CurveType> V_g1;
+                    algebra::G1<CurveType> alpha_V_g1;
+                    algebra::G1<CurveType> H_g1;
+                    algebra::G2<CurveType> V_g2;
 
                     uscs_ppzksnark_proof() {
                         // invalid proof with valid curve points
-                        this->V_g1 = algebra::G1<ppT>::one();
-                        this->alpha_V_g1 = algebra::G1<ppT>::one();
-                        this->H_g1 = algebra::G1<ppT>::one();
-                        this->V_g2 = algebra::G2<ppT>::one();
+                        this->V_g1 = algebra::G1<CurveType>::one();
+                        this->alpha_V_g1 = algebra::G1<CurveType>::one();
+                        this->H_g1 = algebra::G1<CurveType>::one();
+                        this->V_g2 = algebra::G2<CurveType>::one();
                     }
-                    uscs_ppzksnark_proof(algebra::G1<ppT> &&V_g1,
-                                         algebra::G1<ppT> &&alpha_V_g1,
-                                         algebra::G1<ppT> &&H_g1,
-                                         algebra::G2<ppT> &&V_g2) :
+                    uscs_ppzksnark_proof(algebra::G1<CurveType> &&V_g1,
+                                         algebra::G1<CurveType> &&alpha_V_g1,
+                                         algebra::G1<CurveType> &&H_g1,
+                                         algebra::G2<CurveType> &&V_g2) :
                         V_g1(std::move(V_g1)),
                         alpha_V_g1(std::move(alpha_V_g1)), H_g1(std::move(H_g1)), V_g2(std::move(V_g2)) {};
 
@@ -309,8 +309,8 @@ namespace nil {
                     }
 
                     std::size_t size_in_bits() const {
-                        return G1_size() * algebra::G1<ppT>::size_in_bits() +
-                               G2_size() * algebra::G2<ppT>::size_in_bits();
+                        return G1_size() * algebra::G1<CurveType>::size_in_bits() +
+                               G2_size() * algebra::G2<CurveType>::size_in_bits();
                     }
 
                     void print_size() const {
@@ -327,9 +327,9 @@ namespace nil {
                                 V_g2.is_well_formed());
                     }
 
-                    bool operator==(const uscs_ppzksnark_proof<ppT> &other) const;
-                    friend std::ostream &operator<<<ppT>(std::ostream &out, const uscs_ppzksnark_proof<ppT> &proof);
-                    friend std::istream &operator>><ppT>(std::istream &in, uscs_ppzksnark_proof<ppT> &proof);
+                    bool operator==(const uscs_ppzksnark_proof<CurveType> &other) const;
+                    friend std::ostream &operator<<<CurveType>(std::ostream &out, const uscs_ppzksnark_proof<CurveType> &proof);
+                    friend std::istream &operator>><CurveType>(std::istream &in, uscs_ppzksnark_proof<CurveType> &proof);
                 };
 
                 /***************************** Main algorithms *******************************/
@@ -339,8 +339,8 @@ namespace nil {
                  *
                  * Given a USCS constraint system CS, this algorithm produces proving and verification keys for CS.
                  */
-                template<typename ppT>
-                uscs_ppzksnark_keypair<ppT> uscs_ppzksnark_generator(const uscs_ppzksnark_constraint_system<ppT> &cs);
+                template<typename CurveType>
+                uscs_ppzksnark_keypair<CurveType> uscs_ppzksnark_generator(const uscs_ppzksnark_constraint_system<CurveType> &cs);
 
                 /**
                  * A prover algorithm for the USCS ppzkSNARK.
@@ -350,11 +350,11 @@ namespace nil {
                  *               ``there exists Y such that CS(X,Y)=0''.
                  * Above, CS is the USCS constraint system that was given as input to the generator algorithm.
                  */
-                template<typename ppT>
-                uscs_ppzksnark_proof<ppT>
-                    uscs_ppzksnark_prover(const uscs_ppzksnark_proving_key<ppT> &pk,
-                                          const uscs_ppzksnark_primary_input<ppT> &primary_input,
-                                          const uscs_ppzksnark_auxiliary_input<ppT> &auxiliary_input);
+                template<typename CurveType>
+                uscs_ppzksnark_proof<CurveType>
+                    uscs_ppzksnark_prover(const uscs_ppzksnark_proving_key<CurveType> &pk,
+                                          const uscs_ppzksnark_primary_input<CurveType> &primary_input,
+                                          const uscs_ppzksnark_auxiliary_input<CurveType> &auxiliary_input);
 
                 /*
                  Below are four variants of verifier algorithm for the USCS ppzkSNARK.
@@ -375,57 +375,57 @@ namespace nil {
                  * (1) accepts a non-processed verification key, and
                  * (2) has weak input consistency.
                  */
-                template<typename ppT>
-                bool uscs_ppzksnark_verifier_weak_IC(const uscs_ppzksnark_verification_key<ppT> &vk,
-                                                     const uscs_ppzksnark_primary_input<ppT> &primary_input,
-                                                     const uscs_ppzksnark_proof<ppT> &proof);
+                template<typename CurveType>
+                bool uscs_ppzksnark_verifier_weak_IC(const uscs_ppzksnark_verification_key<CurveType> &vk,
+                                                     const uscs_ppzksnark_primary_input<CurveType> &primary_input,
+                                                     const uscs_ppzksnark_proof<CurveType> &proof);
 
                 /**
                  * A verifier algorithm for the USCS ppzkSNARK that:
                  * (1) accepts a non-processed verification key, and
                  * (2) has strong input consistency.
                  */
-                template<typename ppT>
-                bool uscs_ppzksnark_verifier_strong_IC(const uscs_ppzksnark_verification_key<ppT> &vk,
-                                                       const uscs_ppzksnark_primary_input<ppT> &primary_input,
-                                                       const uscs_ppzksnark_proof<ppT> &proof);
+                template<typename CurveType>
+                bool uscs_ppzksnark_verifier_strong_IC(const uscs_ppzksnark_verification_key<CurveType> &vk,
+                                                       const uscs_ppzksnark_primary_input<CurveType> &primary_input,
+                                                       const uscs_ppzksnark_proof<CurveType> &proof);
 
                 /**
                  * Convert a (non-processed) verification key into a processed verification key.
                  */
-                template<typename ppT>
-                uscs_ppzksnark_processed_verification_key<ppT>
-                    uscs_ppzksnark_verifier_process_vk(const uscs_ppzksnark_verification_key<ppT> &vk);
+                template<typename CurveType>
+                uscs_ppzksnark_processed_verification_key<CurveType>
+                    uscs_ppzksnark_verifier_process_vk(const uscs_ppzksnark_verification_key<CurveType> &vk);
 
                 /**
                  * A verifier algorithm for the USCS ppzkSNARK that:
                  * (1) accepts a processed verification key, and
                  * (2) has weak input consistency.
                  */
-                template<typename ppT>
-                bool uscs_ppzksnark_online_verifier_weak_IC(const uscs_ppzksnark_processed_verification_key<ppT> &pvk,
-                                                            const uscs_ppzksnark_primary_input<ppT> &primary_input,
-                                                            const uscs_ppzksnark_proof<ppT> &proof);
+                template<typename CurveType>
+                bool uscs_ppzksnark_online_verifier_weak_IC(const uscs_ppzksnark_processed_verification_key<CurveType> &pvk,
+                                                            const uscs_ppzksnark_primary_input<CurveType> &primary_input,
+                                                            const uscs_ppzksnark_proof<CurveType> &proof);
 
                 /**
                  * A verifier algorithm for the USCS ppzkSNARK that:
                  * (1) accepts a processed verification key, and
                  * (2) has strong input consistency.
                  */
-                template<typename ppT>
-                bool uscs_ppzksnark_online_verifier_strong_IC(const uscs_ppzksnark_processed_verification_key<ppT> &pvk,
-                                                              const uscs_ppzksnark_primary_input<ppT> &primary_input,
-                                                              const uscs_ppzksnark_proof<ppT> &proof);
+                template<typename CurveType>
+                bool uscs_ppzksnark_online_verifier_strong_IC(const uscs_ppzksnark_processed_verification_key<CurveType> &pvk,
+                                                              const uscs_ppzksnark_primary_input<CurveType> &primary_input,
+                                                              const uscs_ppzksnark_proof<CurveType> &proof);
 
-                template<typename ppT>
-                bool uscs_ppzksnark_proving_key<ppT>::operator==(const uscs_ppzksnark_proving_key<ppT> &other) const {
+                template<typename CurveType>
+                bool uscs_ppzksnark_proving_key<CurveType>::operator==(const uscs_ppzksnark_proving_key<CurveType> &other) const {
                     return (this->V_g1_query == other.V_g1_query && this->alpha_V_g1_query == other.alpha_V_g1_query &&
                             this->H_g1_query == other.H_g1_query && this->V_g2_query == other.V_g2_query &&
                             this->constraint_system == other.constraint_system);
                 }
 
-                template<typename ppT>
-                std::ostream &operator<<(std::ostream &out, const uscs_ppzksnark_proving_key<ppT> &pk) {
+                template<typename CurveType>
+                std::ostream &operator<<(std::ostream &out, const uscs_ppzksnark_proving_key<CurveType> &pk) {
                     out << pk.V_g1_query;
                     out << pk.alpha_V_g1_query;
                     out << pk.H_g1_query;
@@ -435,8 +435,8 @@ namespace nil {
                     return out;
                 }
 
-                template<typename ppT>
-                std::istream &operator>>(std::istream &in, uscs_ppzksnark_proving_key<ppT> &pk) {
+                template<typename CurveType>
+                std::istream &operator>>(std::istream &in, uscs_ppzksnark_proving_key<CurveType> &pk) {
                     in >> pk.V_g1_query;
                     in >> pk.alpha_V_g1_query;
                     in >> pk.H_g1_query;
@@ -446,15 +446,15 @@ namespace nil {
                     return in;
                 }
 
-                template<typename ppT>
-                bool uscs_ppzksnark_verification_key<ppT>::operator==(
-                    const uscs_ppzksnark_verification_key<ppT> &other) const {
+                template<typename CurveType>
+                bool uscs_ppzksnark_verification_key<CurveType>::operator==(
+                    const uscs_ppzksnark_verification_key<CurveType> &other) const {
                     return (this->tilde_g2 == other.tilde_g2 && this->alpha_tilde_g2 == other.alpha_tilde_g2 &&
                             this->Z_g2 == other.Z_g2 && this->encoded_IC_query == other.encoded_IC_query);
                 }
 
-                template<typename ppT>
-                std::ostream &operator<<(std::ostream &out, const uscs_ppzksnark_verification_key<ppT> &vk) {
+                template<typename CurveType>
+                std::ostream &operator<<(std::ostream &out, const uscs_ppzksnark_verification_key<CurveType> &vk) {
                     out << vk.tilde_g2 << OUTPUT_NEWLINE;
                     out << vk.alpha_tilde_g2 << OUTPUT_NEWLINE;
                     out << vk.Z_g2 << OUTPUT_NEWLINE;
@@ -463,8 +463,8 @@ namespace nil {
                     return out;
                 }
 
-                template<typename ppT>
-                std::istream &operator>>(std::istream &in, uscs_ppzksnark_verification_key<ppT> &vk) {
+                template<typename CurveType>
+                std::istream &operator>>(std::istream &in, uscs_ppzksnark_verification_key<CurveType> &vk) {
                     in >> vk.tilde_g2;
                     algebra::consume_OUTPUT_NEWLINE(in);
                     in >> vk.alpha_tilde_g2;
@@ -477,9 +477,9 @@ namespace nil {
                     return in;
                 }
 
-                template<typename ppT>
-                bool uscs_ppzksnark_processed_verification_key<ppT>::operator==(
-                    const uscs_ppzksnark_processed_verification_key<ppT> &other) const {
+                template<typename CurveType>
+                bool uscs_ppzksnark_processed_verification_key<CurveType>::operator==(
+                    const uscs_ppzksnark_processed_verification_key<CurveType> &other) const {
                     return (this->pp_G1_one_precomp == other.pp_G1_one_precomp &&
                             this->pp_G2_one_precomp == other.pp_G2_one_precomp &&
                             this->vk_tilde_g2_precomp == other.vk_tilde_g2_precomp &&
@@ -489,8 +489,8 @@ namespace nil {
                             this->encoded_IC_query == other.encoded_IC_query);
                 }
 
-                template<typename ppT>
-                std::ostream &operator<<(std::ostream &out, const uscs_ppzksnark_processed_verification_key<ppT> &pvk) {
+                template<typename CurveType>
+                std::ostream &operator<<(std::ostream &out, const uscs_ppzksnark_processed_verification_key<CurveType> &pvk) {
                     out << pvk.pp_G1_one_precomp << OUTPUT_NEWLINE;
                     out << pvk.pp_G2_one_precomp << OUTPUT_NEWLINE;
                     out << pvk.vk_tilde_g2_precomp << OUTPUT_NEWLINE;
@@ -502,8 +502,8 @@ namespace nil {
                     return out;
                 }
 
-                template<typename ppT>
-                std::istream &operator>>(std::istream &in, uscs_ppzksnark_processed_verification_key<ppT> &pvk) {
+                template<typename CurveType>
+                std::istream &operator>>(std::istream &in, uscs_ppzksnark_processed_verification_key<CurveType> &pvk) {
                     in >> pvk.pp_G1_one_precomp;
                     algebra::consume_OUTPUT_NEWLINE(in);
                     in >> pvk.pp_G2_one_precomp;
@@ -522,14 +522,14 @@ namespace nil {
                     return in;
                 }
 
-                template<typename ppT>
-                bool uscs_ppzksnark_proof<ppT>::operator==(const uscs_ppzksnark_proof<ppT> &other) const {
+                template<typename CurveType>
+                bool uscs_ppzksnark_proof<CurveType>::operator==(const uscs_ppzksnark_proof<CurveType> &other) const {
                     return (this->V_g1 == other.V_g1 && this->alpha_V_g1 == other.alpha_V_g1 &&
                             this->H_g1 == other.H_g1 && this->V_g2 == other.V_g2);
                 }
 
-                template<typename ppT>
-                std::ostream &operator<<(std::ostream &out, const uscs_ppzksnark_proof<ppT> &proof) {
+                template<typename CurveType>
+                std::ostream &operator<<(std::ostream &out, const uscs_ppzksnark_proof<CurveType> &proof) {
                     out << proof.V_g1 << OUTPUT_NEWLINE;
                     out << proof.alpha_V_g1 << OUTPUT_NEWLINE;
                     out << proof.H_g1 << OUTPUT_NEWLINE;
@@ -538,8 +538,8 @@ namespace nil {
                     return out;
                 }
 
-                template<typename ppT>
-                std::istream &operator>>(std::istream &in, uscs_ppzksnark_proof<ppT> &proof) {
+                template<typename CurveType>
+                std::istream &operator>>(std::istream &in, uscs_ppzksnark_proof<CurveType> &proof) {
                     in >> proof.V_g1;
                     algebra::consume_OUTPUT_NEWLINE(in);
                     in >> proof.alpha_V_g1;
@@ -552,50 +552,50 @@ namespace nil {
                     return in;
                 }
 
-                template<typename ppT>
-                uscs_ppzksnark_verification_key<ppT>
-                    uscs_ppzksnark_verification_key<ppT>::dummy_verification_key(const std::size_t input_size) {
-                    uscs_ppzksnark_verification_key<ppT> result;
-                    result.tilde_g2 = algebra::Fr<ppT>::random_element() * algebra::G2<ppT>::one();
-                    result.alpha_tilde_g2 = algebra::Fr<ppT>::random_element() * algebra::G2<ppT>::one();
-                    result.Z_g2 = algebra::Fr<ppT>::random_element() * algebra::G2<ppT>::one();
+                template<typename CurveType>
+                uscs_ppzksnark_verification_key<CurveType>
+                    uscs_ppzksnark_verification_key<CurveType>::dummy_verification_key(const std::size_t input_size) {
+                    uscs_ppzksnark_verification_key<CurveType> result;
+                    result.tilde_g2 = typename CurveType::scalar_field_type::random_element() * algebra::G2<CurveType>::one();
+                    result.alpha_tilde_g2 = typename CurveType::scalar_field_type::random_element() * algebra::G2<CurveType>::one();
+                    result.Z_g2 = typename CurveType::scalar_field_type::random_element() * algebra::G2<CurveType>::one();
 
-                    algebra::G1<ppT> base = algebra::Fr<ppT>::random_element() * algebra::G1<ppT>::one();
-                    algebra::G1_vector<ppT> v;
+                    algebra::G1<CurveType> base = typename CurveType::scalar_field_type::random_element() * algebra::G1<CurveType>::one();
+                    algebra::G1_vector<CurveType> v;
                     for (std::size_t i = 0; i < input_size; ++i) {
-                        v.emplace_back(algebra::Fr<ppT>::random_element() * algebra::G1<ppT>::one());
+                        v.emplace_back(typename CurveType::scalar_field_type::random_element() * algebra::G1<CurveType>::one());
                     }
 
-                    result.encoded_IC_query = accumulation_vector<algebra::G1<ppT>>(v);
+                    result.encoded_IC_query = accumulation_vector<algebra::G1<CurveType>>(v);
 
                     return result;
                 }
 
-                template<typename ppT>
-                uscs_ppzksnark_keypair<ppT> uscs_ppzksnark_generator(const uscs_ppzksnark_constraint_system<ppT> &cs) {
+                template<typename CurveType>
+                uscs_ppzksnark_keypair<CurveType> uscs_ppzksnark_generator(const uscs_ppzksnark_constraint_system<CurveType> &cs) {
 
                     /* draw random element at which the SSP is evaluated */
 
-                    const algebra::Fr<ppT> t = algebra::Fr<ppT>::random_element();
+                    const typename CurveType::scalar_field_type t = typename CurveType::scalar_field_type::random_element();
 
                     /* perform USCS-to-SSP reduction */
 
-                    ssp_instance_evaluation<algebra::Fr<ppT>> ssp_inst =
+                    ssp_instance_evaluation<typename CurveType::scalar_field_type> ssp_inst =
                         uscs_to_ssp_instance_map_with_evaluation(cs, t);
 
                     /* construct various tables of FieldType elements */
 
-                    algebra::Fr_vector<ppT> Vt_table = std::move(
+                    algebra::Fr_vector<CurveType> Vt_table = std::move(
                         ssp_inst.Vt);    // ssp_inst.Vt is now in unspecified state, but we do not use it later
-                    algebra::Fr_vector<ppT> Ht_table = std::move(
+                    algebra::Fr_vector<CurveType> Ht_table = std::move(
                         ssp_inst.Ht);    // ssp_inst.Ht is now in unspecified state, but we do not use it later
 
                     Vt_table.emplace_back(ssp_inst.Zt);
 
-                    algebra::Fr_vector<ppT> Xt_table =
-                        algebra::Fr_vector<ppT>(Vt_table.begin(), Vt_table.begin() + ssp_inst.num_inputs() + 1);
-                    algebra::Fr_vector<ppT> Vt_table_minus_Xt_table =
-                        algebra::Fr_vector<ppT>(Vt_table.begin() + ssp_inst.num_inputs() + 1, Vt_table.end());
+                    algebra::Fr_vector<CurveType> Xt_table =
+                        algebra::Fr_vector<CurveType>(Vt_table.begin(), Vt_table.begin() + ssp_inst.num_inputs() + 1);
+                    algebra::Fr_vector<CurveType> Vt_table_minus_Xt_table =
+                        algebra::Fr_vector<CurveType>(Vt_table.begin() + ssp_inst.num_inputs() + 1, Vt_table.end());
 
                     /* sanity checks */
 
@@ -607,61 +607,61 @@ namespace nil {
                         assert(!Xt_table[i].is_zero());
                     }
 
-                    const algebra::Fr<ppT> alpha = algebra::Fr<ppT>::random_element();
+                    const typename CurveType::scalar_field_type alpha = typename CurveType::scalar_field_type::random_element();
 
                     const std::size_t g1_exp_count = Vt_table.size() + Vt_table_minus_Xt_table.size() + Ht_table.size();
                     const std::size_t g2_exp_count = Vt_table_minus_Xt_table.size();
 
-                    std::size_t g1_window = algebra::get_exp_window_size<algebra::G1<ppT>>(g1_exp_count);
-                    std::size_t g2_window = algebra::get_exp_window_size<algebra::G2<ppT>>(g2_exp_count);
+                    std::size_t g1_window = algebra::get_exp_window_size<algebra::G1<CurveType>>(g1_exp_count);
+                    std::size_t g2_window = algebra::get_exp_window_size<algebra::G2<CurveType>>(g2_exp_count);
 
-                    algebra::window_table<algebra::G1<ppT>> g1_table =
-                        get_window_table(algebra::Fr<ppT>::size_in_bits(), g1_window, algebra::G1<ppT>::one());
+                    algebra::window_table<algebra::G1<CurveType>> g1_table =
+                        get_window_table(typename CurveType::scalar_field_type::size_in_bits(), g1_window, algebra::G1<CurveType>::one());
 
-                    algebra::window_table<algebra::G2<ppT>> g2_table =
-                        get_window_table(algebra::Fr<ppT>::size_in_bits(), g2_window, algebra::G2<ppT>::one());
+                    algebra::window_table<algebra::G2<CurveType>> g2_table =
+                        get_window_table(typename CurveType::scalar_field_type::size_in_bits(), g2_window, algebra::G2<CurveType>::one());
 
-                    algebra::G1_vector<ppT> V_g1_query =
-                        batch_exp(algebra::Fr<ppT>::size_in_bits(), g1_window, g1_table, Vt_table_minus_Xt_table);
+                    algebra::G1_vector<CurveType> V_g1_query =
+                        batch_exp(typename CurveType::scalar_field_type::size_in_bits(), g1_window, g1_table, Vt_table_minus_Xt_table);
 #ifdef USE_MIXED_ADDITION
-                    algebra::batch_to_special<algebra::G1<ppT>>(V_g1_query);
+                    algebra::batch_to_special<algebra::G1<CurveType>>(V_g1_query);
 #endif
 
-                    algebra::G1_vector<ppT> alpha_V_g1_query = batch_exp_with_coeff(
-                        algebra::Fr<ppT>::size_in_bits(), g1_window, g1_table, alpha, Vt_table_minus_Xt_table);
+                    algebra::G1_vector<CurveType> alpha_V_g1_query = batch_exp_with_coeff(
+                        typename CurveType::scalar_field_type::size_in_bits(), g1_window, g1_table, alpha, Vt_table_minus_Xt_table);
 #ifdef USE_MIXED_ADDITION
-                    algebra::batch_to_special<algebra::G1<ppT>>(alpha_V_g1_query);
+                    algebra::batch_to_special<algebra::G1<CurveType>>(alpha_V_g1_query);
 #endif
 
-                    algebra::G1_vector<ppT> H_g1_query =
-                        batch_exp(algebra::Fr<ppT>::size_in_bits(), g1_window, g1_table, Ht_table);
+                    algebra::G1_vector<CurveType> H_g1_query =
+                        batch_exp(typename CurveType::scalar_field_type::size_in_bits(), g1_window, g1_table, Ht_table);
 #ifdef USE_MIXED_ADDITION
-                    algebra::batch_to_special<algebra::G1<ppT>>(H_g1_query);
+                    algebra::batch_to_special<algebra::G1<CurveType>>(H_g1_query);
 #endif
 
-                    algebra::G2_vector<ppT> V_g2_query =
-                        batch_exp(algebra::Fr<ppT>::size_in_bits(), g2_window, g2_table, Vt_table);
+                    algebra::G2_vector<CurveType> V_g2_query =
+                        batch_exp(typename CurveType::scalar_field_type::size_in_bits(), g2_window, g2_table, Vt_table);
 #ifdef USE_MIXED_ADDITION
-                    algebra::batch_to_special<algebra::G2<ppT>>(V_g2_query);
+                    algebra::batch_to_special<algebra::G2<CurveType>>(V_g2_query);
 #endif
-                    const algebra::Fr<ppT> tilde = algebra::Fr<ppT>::random_element();
-                    algebra::G2<ppT> tilde_g2 = tilde * algebra::G2<ppT>::one();
-                    algebra::G2<ppT> alpha_tilde_g2 = (alpha * tilde) * algebra::G2<ppT>::one();
-                    algebra::G2<ppT> Z_g2 = ssp_inst.Zt * algebra::G2<ppT>::one();
+                    const typename CurveType::scalar_field_type tilde = typename CurveType::scalar_field_type::random_element();
+                    algebra::G2<CurveType> tilde_g2 = tilde * algebra::G2<CurveType>::one();
+                    algebra::G2<CurveType> alpha_tilde_g2 = (alpha * tilde) * algebra::G2<CurveType>::one();
+                    algebra::G2<CurveType> Z_g2 = ssp_inst.Zt * algebra::G2<CurveType>::one();
 
-                    algebra::G1<ppT> encoded_IC_base = Xt_table[0] * algebra::G1<ppT>::one();
-                    algebra::G1_vector<ppT> encoded_IC_values =
-                        batch_exp(algebra::Fr<ppT>::size_in_bits(), g1_window, g1_table,
-                                  algebra::Fr_vector<ppT>(Xt_table.begin() + 1, Xt_table.end()));
+                    algebra::G1<CurveType> encoded_IC_base = Xt_table[0] * algebra::G1<CurveType>::one();
+                    algebra::G1_vector<CurveType> encoded_IC_values =
+                        batch_exp(typename CurveType::scalar_field_type::size_in_bits(), g1_window, g1_table,
+                                  algebra::Fr_vector<CurveType>(Xt_table.begin() + 1, Xt_table.end()));
 
-                    accumulation_vector<algebra::G1<ppT>> encoded_IC_query(std::move(encoded_IC_base),
+                    accumulation_vector<algebra::G1<CurveType>> encoded_IC_query(std::move(encoded_IC_base),
                                                                            std::move(encoded_IC_values));
 
-                    uscs_ppzksnark_verification_key<ppT> vk =
-                        uscs_ppzksnark_verification_key<ppT>(tilde_g2, alpha_tilde_g2, Z_g2, encoded_IC_query);
+                    uscs_ppzksnark_verification_key<CurveType> vk =
+                        uscs_ppzksnark_verification_key<CurveType>(tilde_g2, alpha_tilde_g2, Z_g2, encoded_IC_query);
 
-                    uscs_ppzksnark_constraint_system<ppT> cs_copy = cs;
-                    uscs_ppzksnark_proving_key<ppT> pk = uscs_ppzksnark_proving_key<ppT>(std::move(V_g1_query),
+                    uscs_ppzksnark_constraint_system<CurveType> cs_copy = cs;
+                    uscs_ppzksnark_proving_key<CurveType> pk = uscs_ppzksnark_proving_key<CurveType>(std::move(V_g1_query),
                                                                                          std::move(alpha_V_g1_query),
                                                                                          std::move(H_g1_query),
                                                                                          std::move(V_g2_query),
@@ -670,18 +670,18 @@ namespace nil {
                     pk.print_size();
                     vk.print_size();
 
-                    return uscs_ppzksnark_keypair<ppT>(std::move(pk), std::move(vk));
+                    return uscs_ppzksnark_keypair<CurveType>(std::move(pk), std::move(vk));
                 }
 
-                template<typename ppT>
-                uscs_ppzksnark_proof<ppT>
-                    uscs_ppzksnark_prover(const uscs_ppzksnark_proving_key<ppT> &pk,
-                                          const uscs_ppzksnark_primary_input<ppT> &primary_input,
-                                          const uscs_ppzksnark_auxiliary_input<ppT> &auxiliary_input) {
+                template<typename CurveType>
+                uscs_ppzksnark_proof<CurveType>
+                    uscs_ppzksnark_prover(const uscs_ppzksnark_proving_key<CurveType> &pk,
+                                          const uscs_ppzksnark_primary_input<CurveType> &primary_input,
+                                          const uscs_ppzksnark_auxiliary_input<CurveType> &auxiliary_input) {
 
-                    const algebra::Fr<ppT> d = algebra::Fr<ppT>::random_element();
+                    const typename CurveType::scalar_field_type d = typename CurveType::scalar_field_type::random_element();
 
-                    const ssp_witness<algebra::Fr<ppT>> ssp_wit =
+                    const ssp_witness<typename CurveType::scalar_field_type> ssp_wit =
                         uscs_to_ssp_witness_map(pk.constraint_system, primary_input, auxiliary_input, d);
 
                     /* sanity checks */
@@ -691,10 +691,10 @@ namespace nil {
                     assert(pk.H_g1_query.size() == ssp_wit.degree() + 1);
                     assert(pk.V_g2_query.size() == ssp_wit.num_variables() + 2);
 
-                    algebra::G1<ppT> V_g1 = ssp_wit.d * pk.V_g1_query[pk.V_g1_query.size() - 1];
-                    algebra::G1<ppT> alpha_V_g1 = ssp_wit.d * pk.alpha_V_g1_query[pk.alpha_V_g1_query.size() - 1];
-                    algebra::G1<ppT> H_g1 = algebra::G1<ppT>::zero();
-                    algebra::G2<ppT> V_g2 = pk.V_g2_query[0] + ssp_wit.d * pk.V_g2_query[pk.V_g2_query.size() - 1];
+                    algebra::G1<CurveType> V_g1 = ssp_wit.d * pk.V_g1_query[pk.V_g1_query.size() - 1];
+                    algebra::G1<CurveType> alpha_V_g1 = ssp_wit.d * pk.alpha_V_g1_query[pk.alpha_V_g1_query.size() - 1];
+                    algebra::G1<CurveType> H_g1 = algebra::G1<CurveType>::zero();
+                    algebra::G2<CurveType> V_g2 = pk.V_g2_query[0] + ssp_wit.d * pk.V_g2_query[pk.V_g2_query.size() - 1];
 
 #ifdef MULTICORE
                     const std::size_t chunks = omp_get_max_threads();    // to override, set OMP_NUM_THREADS env var or call
@@ -705,7 +705,7 @@ namespace nil {
 
                     // MAYBE LATER: do queries 1,2,4 at once for slightly better speed
 
-                    V_g1 = V_g1 + algebra::multi_exp_with_mixed_addition<algebra::G1<ppT>, algebra::Fr<ppT>,
+                    V_g1 = V_g1 + algebra::multi_exp_with_mixed_addition<algebra::G1<CurveType>, typename CurveType::scalar_field_type,
                                                                          algebra::multi_exp_method_BDLO12>(
                                       pk.V_g1_query.begin(),
                                       pk.V_g1_query.begin() + (ssp_wit.num_variables() - ssp_wit.num_inputs()),
@@ -713,7 +713,7 @@ namespace nil {
                                       ssp_wit.coefficients_for_Vs.begin() + ssp_wit.num_variables(), chunks);
 
                     alpha_V_g1 =
-                        alpha_V_g1 + algebra::multi_exp_with_mixed_addition<algebra::G1<ppT>, algebra::Fr<ppT>,
+                        alpha_V_g1 + algebra::multi_exp_with_mixed_addition<algebra::G1<CurveType>, typename CurveType::scalar_field_type,
                                                                             algebra::multi_exp_method_BDLO12>(
                                          pk.alpha_V_g1_query.begin(),
                                          pk.alpha_V_g1_query.begin() + (ssp_wit.num_variables() - ssp_wit.num_inputs()),
@@ -721,53 +721,53 @@ namespace nil {
                                          ssp_wit.coefficients_for_Vs.begin() + ssp_wit.num_variables(), chunks);
 
                     H_g1 =
-                        H_g1 + algebra::multi_exp<algebra::G1<ppT>, algebra::Fr<ppT>, algebra::multi_exp_method_BDLO12>(
+                        H_g1 + algebra::multi_exp<algebra::G1<CurveType>, typename CurveType::scalar_field_type, algebra::multi_exp_method_BDLO12>(
                                    pk.H_g1_query.begin(), pk.H_g1_query.begin() + ssp_wit.degree() + 1,
                                    ssp_wit.coefficients_for_H.begin(),
                                    ssp_wit.coefficients_for_H.begin() + ssp_wit.degree() + 1, chunks);
 
                     V_g2 =
-                        V_g2 + algebra::multi_exp<algebra::G2<ppT>, algebra::Fr<ppT>, algebra::multi_exp_method_BDLO12>(
+                        V_g2 + algebra::multi_exp<algebra::G2<CurveType>, typename CurveType::scalar_field_type, algebra::multi_exp_method_BDLO12>(
                                    pk.V_g2_query.begin() + 1, pk.V_g2_query.begin() + ssp_wit.num_variables() + 1,
                                    ssp_wit.coefficients_for_Vs.begin(),
                                    ssp_wit.coefficients_for_Vs.begin() + ssp_wit.num_variables(), chunks);
 
-                    uscs_ppzksnark_proof<ppT> proof = uscs_ppzksnark_proof<ppT>(std::move(V_g1), std::move(alpha_V_g1),
+                    uscs_ppzksnark_proof<CurveType> proof = uscs_ppzksnark_proof<CurveType>(std::move(V_g1), std::move(alpha_V_g1),
                                                                                 std::move(H_g1), std::move(V_g2));
 
                     return proof;
                 }
 
-                template<typename ppT>
-                uscs_ppzksnark_processed_verification_key<ppT>
-                    uscs_ppzksnark_verifier_process_vk(const uscs_ppzksnark_verification_key<ppT> &vk) {
-                    uscs_ppzksnark_processed_verification_key<ppT> pvk;
+                template<typename CurveType>
+                uscs_ppzksnark_processed_verification_key<CurveType>
+                    uscs_ppzksnark_verifier_process_vk(const uscs_ppzksnark_verification_key<CurveType> &vk) {
+                    uscs_ppzksnark_processed_verification_key<CurveType> pvk;
 
-                    pvk.pp_G1_one_precomp = ppT::precompute_G1(algebra::G1<ppT>::one());
-                    pvk.pp_G2_one_precomp = ppT::precompute_G2(algebra::G2<ppT>::one());
+                    pvk.pp_G1_one_precomp = CurveType::precompute_G1(algebra::G1<CurveType>::one());
+                    pvk.pp_G2_one_precomp = CurveType::precompute_G2(algebra::G2<CurveType>::one());
 
-                    pvk.vk_tilde_g2_precomp = ppT::precompute_G2(vk.tilde_g2);
-                    pvk.vk_alpha_tilde_g2_precomp = ppT::precompute_G2(vk.alpha_tilde_g2);
-                    pvk.vk_Z_g2_precomp = ppT::precompute_G2(vk.Z_g2);
+                    pvk.vk_tilde_g2_precomp = CurveType::precompute_G2(vk.tilde_g2);
+                    pvk.vk_alpha_tilde_g2_precomp = CurveType::precompute_G2(vk.alpha_tilde_g2);
+                    pvk.vk_Z_g2_precomp = CurveType::precompute_G2(vk.Z_g2);
 
-                    pvk.pairing_of_g1_and_g2 = ppT::miller_loop(pvk.pp_G1_one_precomp, pvk.pp_G2_one_precomp);
+                    pvk.pairing_of_g1_and_g2 = CurveType::miller_loop(pvk.pp_G1_one_precomp, pvk.pp_G2_one_precomp);
 
                     pvk.encoded_IC_query = vk.encoded_IC_query;
 
                     return pvk;
                 }
 
-                template<typename ppT>
-                bool uscs_ppzksnark_online_verifier_weak_IC(const uscs_ppzksnark_processed_verification_key<ppT> &pvk,
-                                                            const uscs_ppzksnark_primary_input<ppT> &primary_input,
-                                                            const uscs_ppzksnark_proof<ppT> &proof) {
+                template<typename CurveType>
+                bool uscs_ppzksnark_online_verifier_weak_IC(const uscs_ppzksnark_processed_verification_key<CurveType> &pvk,
+                                                            const uscs_ppzksnark_primary_input<CurveType> &primary_input,
+                                                            const uscs_ppzksnark_proof<CurveType> &proof) {
                     assert(pvk.encoded_IC_query.domain_size() >= primary_input.size());
 
-                    const accumulation_vector<algebra::G1<ppT>> accumulated_IC =
-                        pvk.encoded_IC_query.template accumulate_chunk<algebra::Fr<ppT>>(primary_input.begin(),
+                    const accumulation_vector<algebra::G1<CurveType>> accumulated_IC =
+                        pvk.encoded_IC_query.template accumulate_chunk<typename CurveType::scalar_field_type>(primary_input.begin(),
                                                                                          primary_input.end(), 0);
                     assert(accumulated_IC.is_fully_accumulated());
-                    const algebra::G1<ppT> &acc = accumulated_IC.first;
+                    const algebra::G1<CurveType> &acc = accumulated_IC.first;
 
                     bool result = true;
 
@@ -775,49 +775,49 @@ namespace nil {
                         result = false;
                     }
 
-                    algebra::G1_precomp<ppT> proof_V_g1_with_acc_precomp = ppT::precompute_G1(proof.V_g1 + acc);
-                    algebra::G2_precomp<ppT> proof_V_g2_precomp = ppT::precompute_G2(proof.V_g2);
-                    algebra::Fqk<ppT> V_1 = ppT::miller_loop(proof_V_g1_with_acc_precomp, pvk.pp_G2_one_precomp);
-                    algebra::Fqk<ppT> V_2 = ppT::miller_loop(pvk.pp_G1_one_precomp, proof_V_g2_precomp);
-                    algebra::GT<ppT> V = ppT::final_exponentiation(V_1 * V_2.unitary_inverse());
-                    if (V != algebra::GT<ppT>::one()) {
+                    algebra::G1_precomp<CurveType> proof_V_g1_with_acc_precomp = CurveType::precompute_G1(proof.V_g1 + acc);
+                    algebra::G2_precomp<CurveType> proof_V_g2_precomp = CurveType::precompute_G2(proof.V_g2);
+                    algebra::Fqk<CurveType> V_1 = CurveType::miller_loop(proof_V_g1_with_acc_precomp, pvk.pp_G2_one_precomp);
+                    algebra::Fqk<CurveType> V_2 = CurveType::miller_loop(pvk.pp_G1_one_precomp, proof_V_g2_precomp);
+                    algebra::GT<CurveType> V = CurveType::final_exponentiation(V_1 * V_2.unitary_inverse());
+                    if (V != algebra::GT<CurveType>::one()) {
                         result = false;
                     }
 
-                    algebra::G1_precomp<ppT> proof_H_g1_precomp = ppT::precompute_G1(proof.H_g1);
-                    algebra::Fqk<ppT> SSP_1 = ppT::miller_loop(proof_V_g1_with_acc_precomp, proof_V_g2_precomp);
-                    algebra::Fqk<ppT> SSP_2 = ppT::miller_loop(proof_H_g1_precomp, pvk.vk_Z_g2_precomp);
-                    algebra::GT<ppT> SSP =
-                        ppT::final_exponentiation(SSP_1.unitary_inverse() * SSP_2 * pvk.pairing_of_g1_and_g2);
-                    if (SSP != algebra::GT<ppT>::one()) {
+                    algebra::G1_precomp<CurveType> proof_H_g1_precomp = CurveType::precompute_G1(proof.H_g1);
+                    algebra::Fqk<CurveType> SSP_1 = CurveType::miller_loop(proof_V_g1_with_acc_precomp, proof_V_g2_precomp);
+                    algebra::Fqk<CurveType> SSP_2 = CurveType::miller_loop(proof_H_g1_precomp, pvk.vk_Z_g2_precomp);
+                    algebra::GT<CurveType> SSP =
+                        CurveType::final_exponentiation(SSP_1.unitary_inverse() * SSP_2 * pvk.pairing_of_g1_and_g2);
+                    if (SSP != algebra::GT<CurveType>::one()) {
                         result = false;
                     }
 
-                    algebra::G1_precomp<ppT> proof_V_g1_precomp = ppT::precompute_G1(proof.V_g1);
-                    algebra::G1_precomp<ppT> proof_alpha_V_g1_precomp = ppT::precompute_G1(proof.alpha_V_g1);
-                    algebra::Fqk<ppT> alpha_V_1 = ppT::miller_loop(proof_V_g1_precomp, pvk.vk_alpha_tilde_g2_precomp);
-                    algebra::Fqk<ppT> alpha_V_2 = ppT::miller_loop(proof_alpha_V_g1_precomp, pvk.vk_tilde_g2_precomp);
-                    algebra::GT<ppT> alpha_V = ppT::final_exponentiation(alpha_V_1 * alpha_V_2.unitary_inverse());
-                    if (alpha_V != algebra::GT<ppT>::one()) {
+                    algebra::G1_precomp<CurveType> proof_V_g1_precomp = CurveType::precompute_G1(proof.V_g1);
+                    algebra::G1_precomp<CurveType> proof_alpha_V_g1_precomp = CurveType::precompute_G1(proof.alpha_V_g1);
+                    algebra::Fqk<CurveType> alpha_V_1 = CurveType::miller_loop(proof_V_g1_precomp, pvk.vk_alpha_tilde_g2_precomp);
+                    algebra::Fqk<CurveType> alpha_V_2 = CurveType::miller_loop(proof_alpha_V_g1_precomp, pvk.vk_tilde_g2_precomp);
+                    algebra::GT<CurveType> alpha_V = CurveType::final_exponentiation(alpha_V_1 * alpha_V_2.unitary_inverse());
+                    if (alpha_V != algebra::GT<CurveType>::one()) {
                         result = false;
                     }
 
                     return result;
                 }
 
-                template<typename ppT>
-                bool uscs_ppzksnark_verifier_weak_IC(const uscs_ppzksnark_verification_key<ppT> &vk,
-                                                     const uscs_ppzksnark_primary_input<ppT> &primary_input,
-                                                     const uscs_ppzksnark_proof<ppT> &proof) {
-                    uscs_ppzksnark_processed_verification_key<ppT> pvk = uscs_ppzksnark_verifier_process_vk<ppT>(vk);
-                    bool result = uscs_ppzksnark_online_verifier_weak_IC<ppT>(pvk, primary_input, proof);
+                template<typename CurveType>
+                bool uscs_ppzksnark_verifier_weak_IC(const uscs_ppzksnark_verification_key<CurveType> &vk,
+                                                     const uscs_ppzksnark_primary_input<CurveType> &primary_input,
+                                                     const uscs_ppzksnark_proof<CurveType> &proof) {
+                    uscs_ppzksnark_processed_verification_key<CurveType> pvk = uscs_ppzksnark_verifier_process_vk<CurveType>(vk);
+                    bool result = uscs_ppzksnark_online_verifier_weak_IC<CurveType>(pvk, primary_input, proof);
                     return result;
                 }
 
-                template<typename ppT>
-                bool uscs_ppzksnark_online_verifier_strong_IC(const uscs_ppzksnark_processed_verification_key<ppT> &pvk,
-                                                              const uscs_ppzksnark_primary_input<ppT> &primary_input,
-                                                              const uscs_ppzksnark_proof<ppT> &proof) {
+                template<typename CurveType>
+                bool uscs_ppzksnark_online_verifier_strong_IC(const uscs_ppzksnark_processed_verification_key<CurveType> &pvk,
+                                                              const uscs_ppzksnark_primary_input<CurveType> &primary_input,
+                                                              const uscs_ppzksnark_proof<CurveType> &proof) {
                     bool result = true;
 
                     if (pvk.encoded_IC_query.domain_size() != primary_input.size()) {
@@ -829,12 +829,12 @@ namespace nil {
                     return result;
                 }
 
-                template<typename ppT>
-                bool uscs_ppzksnark_verifier_strong_IC(const uscs_ppzksnark_verification_key<ppT> &vk,
-                                                       const uscs_ppzksnark_primary_input<ppT> &primary_input,
-                                                       const uscs_ppzksnark_proof<ppT> &proof) {
-                    uscs_ppzksnark_processed_verification_key<ppT> pvk = uscs_ppzksnark_verifier_process_vk<ppT>(vk);
-                    bool result = uscs_ppzksnark_online_verifier_strong_IC<ppT>(pvk, primary_input, proof);
+                template<typename CurveType>
+                bool uscs_ppzksnark_verifier_strong_IC(const uscs_ppzksnark_verification_key<CurveType> &vk,
+                                                       const uscs_ppzksnark_primary_input<CurveType> &primary_input,
+                                                       const uscs_ppzksnark_proof<CurveType> &proof) {
+                    uscs_ppzksnark_processed_verification_key<CurveType> pvk = uscs_ppzksnark_verifier_process_vk<CurveType>(vk);
+                    bool result = uscs_ppzksnark_online_verifier_strong_IC<CurveType>(pvk, primary_input, proof);
                     return result;
                 }
             }    // namespace snark

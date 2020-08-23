@@ -25,8 +25,8 @@ namespace nil {
                  * Optionally, also test the serialization routines for keys and proofs.
                  * (This takes additional time.)
                  */
-                template<typename ppT>
-                bool run_bacs_ppzksnark(const bacs_example<algebra::Fr<ppT>> &example, const bool test_serialization);
+                template<typename CurveType>
+                bool run_bacs_ppzksnark(const bacs_example<typename CurveType::scalar_field_type> &example, const bool test_serialization);
 
                 /**
                  * The code below provides an example of all stages of running a BACS ppzkSNARK.
@@ -40,50 +40,50 @@ namespace nil {
                  * (3) The "verifier", which runs the ppzkSNARK verifier on input the verification key,
                  *     a primary input for C, and a proof.
                  */
-                template<typename ppT>
-                bool run_bacs_ppzksnark(const bacs_example<algebra::Fr<ppT>> &example, const bool test_serialization) {
+                template<typename CurveType>
+                bool run_bacs_ppzksnark(const bacs_example<typename CurveType::scalar_field_type> &example, const bool test_serialization) {
                     algebra::enter_block("Call to run_bacs_ppzksnark");
 
                     algebra::print_header("BACS ppzkSNARK Generator");
-                    bacs_ppzksnark_keypair<ppT> keypair = bacs_ppzksnark_generator<ppT>(example.circuit);
+                    bacs_ppzksnark_keypair<CurveType> keypair = bacs_ppzksnark_generator<CurveType>(example.circuit);
                     printf("\n");
                     algebra::print_indent();
                     algebra::print_mem("after generator");
 
                     algebra::print_header("Preprocess verification key");
-                    bacs_ppzksnark_processed_verification_key<ppT> pvk =
-                        bacs_ppzksnark_verifier_process_vk<ppT>(keypair.vk);
+                    bacs_ppzksnark_processed_verification_key<CurveType> pvk =
+                        bacs_ppzksnark_verifier_process_vk<CurveType>(keypair.vk);
 
                     if (test_serialization) {
                         algebra::enter_block("Test serialization of keys");
-                        keypair.pk = algebra::reserialize<bacs_ppzksnark_proving_key<ppT>>(keypair.pk);
-                        keypair.vk = algebra::reserialize<bacs_ppzksnark_verification_key<ppT>>(keypair.vk);
-                        pvk = algebra::reserialize<bacs_ppzksnark_processed_verification_key<ppT>>(pvk);
+                        keypair.pk = algebra::reserialize<bacs_ppzksnark_proving_key<CurveType>>(keypair.pk);
+                        keypair.vk = algebra::reserialize<bacs_ppzksnark_verification_key<CurveType>>(keypair.vk);
+                        pvk = algebra::reserialize<bacs_ppzksnark_processed_verification_key<CurveType>>(pvk);
                         algebra::leave_block("Test serialization of keys");
                     }
 
                     algebra::print_header("BACS ppzkSNARK Prover");
-                    bacs_ppzksnark_proof<ppT> proof =
-                        bacs_ppzksnark_prover<ppT>(keypair.pk, example.primary_input, example.auxiliary_input);
+                    bacs_ppzksnark_proof<CurveType> proof =
+                        bacs_ppzksnark_prover<CurveType>(keypair.pk, example.primary_input, example.auxiliary_input);
                     printf("\n");
                     algebra::print_indent();
                     algebra::print_mem("after prover");
 
                     if (test_serialization) {
                         algebra::enter_block("Test serialization of proof");
-                        proof = algebra::reserialize<bacs_ppzksnark_proof<ppT>>(proof);
+                        proof = algebra::reserialize<bacs_ppzksnark_proof<CurveType>>(proof);
                         algebra::leave_block("Test serialization of proof");
                     }
 
                     algebra::print_header("BACS ppzkSNARK Verifier");
-                    bool ans = bacs_ppzksnark_verifier_strong_IC<ppT>(keypair.vk, example.primary_input, proof);
+                    bool ans = bacs_ppzksnark_verifier_strong_IC<CurveType>(keypair.vk, example.primary_input, proof);
                     printf("\n");
                     algebra::print_indent();
                     algebra::print_mem("after verifier");
                     printf("* The verification result is: %s\n", (ans ? "PASS" : "FAIL"));
 
                     algebra::print_header("BACS ppzkSNARK Online Verifier");
-                    bool ans2 = bacs_ppzksnark_online_verifier_strong_IC<ppT>(pvk, example.primary_input, proof);
+                    bool ans2 = bacs_ppzksnark_online_verifier_strong_IC<CurveType>(pvk, example.primary_input, proof);
                     assert(ans == ans2);
 
                     algebra::leave_block("Call to run_bacs_ppzksnark");

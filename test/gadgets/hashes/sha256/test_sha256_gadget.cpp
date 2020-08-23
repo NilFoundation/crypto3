@@ -41,6 +41,6 @@ void test_two_to_one() {
 
 int main(void) {
     algebra::start_profiling();
-    algebra::default_ec_pp::init_public_params();
+
     test_two_to_one<algebra::Fr<algebra::default_ec_pp>>();
 }

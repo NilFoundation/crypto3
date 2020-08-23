@@ -21,12 +21,12 @@
 
 using namespace nil::crypto3::zk::snark;
 
-template<typename ppT>
+template<typename CurveType>
 void test_uscs_ppzksnark(std::size_t num_constraints, std::size_t input_size) {
     const bool test_serialization = true;
-    uscs_example<algebra::Fr<ppT>> example =
-        generate_uscs_example_with_binary_input<algebra::Fr<ppT>>(num_constraints, input_size);
-    const bool bit = run_uscs_ppzksnark<ppT>(example, test_serialization);
+    uscs_example<typename CurveType::scalar_field_type> example =
+        generate_uscs_example_with_binary_input<typename CurveType::scalar_field_type>(num_constraints, input_size);
+    const bool bit = run_uscs_ppzksnark<CurveType>(example, test_serialization);
     BOOST_CHECK(bit);
 }
 

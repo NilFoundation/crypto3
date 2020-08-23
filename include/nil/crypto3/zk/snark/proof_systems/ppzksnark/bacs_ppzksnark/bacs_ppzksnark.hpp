@@ -44,39 +44,39 @@ namespace nil {
 
                 /******************************** Proving key ********************************/
 
-                template<typename ppT>
+                template<typename CurveType>
                 class bacs_ppzksnark_proving_key;
 
-                template<typename ppT>
-                std::ostream &operator<<(std::ostream &out, const bacs_ppzksnark_proving_key<ppT> &pk);
+                template<typename CurveType>
+                std::ostream &operator<<(std::ostream &out, const bacs_ppzksnark_proving_key<CurveType> &pk);
 
-                template<typename ppT>
-                std::istream &operator>>(std::istream &in, bacs_ppzksnark_proving_key<ppT> &pk);
+                template<typename CurveType>
+                std::istream &operator>>(std::istream &in, bacs_ppzksnark_proving_key<CurveType> &pk);
 
                 /**
                  * A proving key for the BACS ppzkSNARK.
                  */
-                template<typename ppT>
+                template<typename CurveType>
                 class bacs_ppzksnark_proving_key {
                 public:
-                    bacs_ppzksnark_circuit<ppT> circuit;
-                    r1cs_ppzksnark_proving_key<ppT> r1cs_pk;
+                    bacs_ppzksnark_circuit<CurveType> circuit;
+                    r1cs_ppzksnark_proving_key<CurveType> r1cs_pk;
 
                     bacs_ppzksnark_proving_key() {};
-                    bacs_ppzksnark_proving_key(const bacs_ppzksnark_proving_key<ppT> &other) = default;
-                    bacs_ppzksnark_proving_key(bacs_ppzksnark_proving_key<ppT> &&other) = default;
-                    bacs_ppzksnark_proving_key(const bacs_ppzksnark_circuit<ppT> &circuit,
-                                               const r1cs_ppzksnark_proving_key<ppT> &r1cs_pk) :
+                    bacs_ppzksnark_proving_key(const bacs_ppzksnark_proving_key<CurveType> &other) = default;
+                    bacs_ppzksnark_proving_key(bacs_ppzksnark_proving_key<CurveType> &&other) = default;
+                    bacs_ppzksnark_proving_key(const bacs_ppzksnark_circuit<CurveType> &circuit,
+                                               const r1cs_ppzksnark_proving_key<CurveType> &r1cs_pk) :
                         circuit(circuit),
                         r1cs_pk(r1cs_pk) {
                     }
-                    bacs_ppzksnark_proving_key(bacs_ppzksnark_circuit<ppT> &&circuit,
-                                               r1cs_ppzksnark_proving_key<ppT> &&r1cs_pk) :
+                    bacs_ppzksnark_proving_key(bacs_ppzksnark_circuit<CurveType> &&circuit,
+                                               r1cs_ppzksnark_proving_key<CurveType> &&r1cs_pk) :
                         circuit(std::move(circuit)),
                         r1cs_pk(std::move(r1cs_pk)) {
                     }
 
-                    bacs_ppzksnark_proving_key<ppT> &operator=(const bacs_ppzksnark_proving_key<ppT> &other) = default;
+                    bacs_ppzksnark_proving_key<CurveType> &operator=(const bacs_ppzksnark_proving_key<CurveType> &other) = default;
 
                     std::size_t G1_size() const {
                         return r1cs_pk.G1_size();
@@ -102,9 +102,9 @@ namespace nil {
                         r1cs_pk.print_size();
                     }
 
-                    bool operator==(const bacs_ppzksnark_proving_key<ppT> &other) const;
-                    friend std::ostream &operator<<<ppT>(std::ostream &out, const bacs_ppzksnark_proving_key<ppT> &pk);
-                    friend std::istream &operator>><ppT>(std::istream &in, bacs_ppzksnark_proving_key<ppT> &pk);
+                    bool operator==(const bacs_ppzksnark_proving_key<CurveType> &other) const;
+                    friend std::ostream &operator<<<CurveType>(std::ostream &out, const bacs_ppzksnark_proving_key<CurveType> &pk);
+                    friend std::istream &operator>><CurveType>(std::istream &in, bacs_ppzksnark_proving_key<CurveType> &pk);
                 };
 
                 /******************************* Verification key ****************************/
@@ -112,8 +112,8 @@ namespace nil {
                 /**
                  * A verification key for the BACS ppzkSNARK.
                  */
-                template<typename ppT>
-                using bacs_ppzksnark_verification_key = r1cs_ppzksnark_verification_key<ppT>;
+                template<typename CurveType>
+                using bacs_ppzksnark_verification_key = r1cs_ppzksnark_verification_key<CurveType>;
 
                 /************************ Processed verification key *************************/
 
@@ -124,30 +124,30 @@ namespace nil {
                  * contains a small constant amount of additional pre-computed information that
                  * enables a faster verification time.
                  */
-                template<typename ppT>
-                using bacs_ppzksnark_processed_verification_key = r1cs_ppzksnark_processed_verification_key<ppT>;
+                template<typename CurveType>
+                using bacs_ppzksnark_processed_verification_key = r1cs_ppzksnark_processed_verification_key<CurveType>;
 
                 /********************************** Key pair *********************************/
 
                 /**
                  * A key pair for the BACS ppzkSNARK, which consists of a proving key and a verification key.
                  */
-                template<typename ppT>
+                template<typename CurveType>
                 class bacs_ppzksnark_keypair {
                 public:
-                    bacs_ppzksnark_proving_key<ppT> pk;
-                    bacs_ppzksnark_verification_key<ppT> vk;
+                    bacs_ppzksnark_proving_key<CurveType> pk;
+                    bacs_ppzksnark_verification_key<CurveType> vk;
 
                     bacs_ppzksnark_keypair() {};
-                    bacs_ppzksnark_keypair(bacs_ppzksnark_keypair<ppT> &&other) = default;
-                    bacs_ppzksnark_keypair(const bacs_ppzksnark_proving_key<ppT> &pk,
-                                           const bacs_ppzksnark_verification_key<ppT> &vk) :
+                    bacs_ppzksnark_keypair(bacs_ppzksnark_keypair<CurveType> &&other) = default;
+                    bacs_ppzksnark_keypair(const bacs_ppzksnark_proving_key<CurveType> &pk,
+                                           const bacs_ppzksnark_verification_key<CurveType> &vk) :
                         pk(pk),
                         vk(vk) {
                     }
 
-                    bacs_ppzksnark_keypair(bacs_ppzksnark_proving_key<ppT> &&pk,
-                                           bacs_ppzksnark_verification_key<ppT> &&vk) :
+                    bacs_ppzksnark_keypair(bacs_ppzksnark_proving_key<CurveType> &&pk,
+                                           bacs_ppzksnark_verification_key<CurveType> &&vk) :
                         pk(std::move(pk)),
                         vk(std::move(vk)) {
                     }
@@ -158,8 +158,8 @@ namespace nil {
                 /**
                  * A proof for the BACS ppzkSNARK.
                  */
-                template<typename ppT>
-                using bacs_ppzksnark_proof = r1cs_ppzksnark_proof<ppT>;
+                template<typename CurveType>
+                using bacs_ppzksnark_proof = r1cs_ppzksnark_proof<CurveType>;
 
                 /***************************** Main algorithms *******************************/
 
@@ -168,8 +168,8 @@ namespace nil {
                  *
                  * Given a BACS circuit C, this algorithm produces proving and verification keys for C.
                  */
-                template<typename ppT>
-                bacs_ppzksnark_keypair<ppT> bacs_ppzksnark_generator(const bacs_ppzksnark_circuit<ppT> &circuit);
+                template<typename CurveType>
+                bacs_ppzksnark_keypair<CurveType> bacs_ppzksnark_generator(const bacs_ppzksnark_circuit<CurveType> &circuit);
 
                 /**
                  * A prover algorithm for the BACS ppzkSNARK.
@@ -179,11 +179,11 @@ namespace nil {
                  *               ``there exists Y such that C(X,Y)=0''.
                  * Above, C is the BACS circuit that was given as input to the generator algorithm.
                  */
-                template<typename ppT>
-                bacs_ppzksnark_proof<ppT>
-                    bacs_ppzksnark_prover(const bacs_ppzksnark_proving_key<ppT> &pk,
-                                          const bacs_ppzksnark_primary_input<ppT> &primary_input,
-                                          const bacs_ppzksnark_auxiliary_input<ppT> &auxiliary_input);
+                template<typename CurveType>
+                bacs_ppzksnark_proof<CurveType>
+                    bacs_ppzksnark_prover(const bacs_ppzksnark_proving_key<CurveType> &pk,
+                                          const bacs_ppzksnark_primary_input<CurveType> &primary_input,
+                                          const bacs_ppzksnark_auxiliary_input<CurveType> &auxiliary_input);
 
                 /*
                  Below are four variants of verifier algorithm for the BACS ppzkSNARK.
@@ -204,63 +204,63 @@ namespace nil {
                  * (1) accepts a non-processed verification key, and
                  * (2) has weak input consistency.
                  */
-                template<typename ppT>
-                bool bacs_ppzksnark_verifier_weak_IC(const bacs_ppzksnark_verification_key<ppT> &vk,
-                                                     const bacs_ppzksnark_primary_input<ppT> &primary_input,
-                                                     const bacs_ppzksnark_proof<ppT> &proof);
+                template<typename CurveType>
+                bool bacs_ppzksnark_verifier_weak_IC(const bacs_ppzksnark_verification_key<CurveType> &vk,
+                                                     const bacs_ppzksnark_primary_input<CurveType> &primary_input,
+                                                     const bacs_ppzksnark_proof<CurveType> &proof);
 
                 /**
                  * A verifier algorithm for the BACS ppzkSNARK that:
                  * (1) accepts a non-processed verification key, and
                  * (2) has strong input consistency.
                  */
-                template<typename ppT>
-                bool bacs_ppzksnark_verifier_strong_IC(const bacs_ppzksnark_verification_key<ppT> &vk,
-                                                       const bacs_ppzksnark_primary_input<ppT> &primary_input,
-                                                       const bacs_ppzksnark_proof<ppT> &proof);
+                template<typename CurveType>
+                bool bacs_ppzksnark_verifier_strong_IC(const bacs_ppzksnark_verification_key<CurveType> &vk,
+                                                       const bacs_ppzksnark_primary_input<CurveType> &primary_input,
+                                                       const bacs_ppzksnark_proof<CurveType> &proof);
 
                 /**
                  * Convert a (non-processed) verification key into a processed verification key.
                  */
-                template<typename ppT>
-                bacs_ppzksnark_processed_verification_key<ppT>
-                    bacs_ppzksnark_verifier_process_vk(const bacs_ppzksnark_verification_key<ppT> &vk);
+                template<typename CurveType>
+                bacs_ppzksnark_processed_verification_key<CurveType>
+                    bacs_ppzksnark_verifier_process_vk(const bacs_ppzksnark_verification_key<CurveType> &vk);
 
                 /**
                  * A verifier algorithm for the BACS ppzkSNARK that:
                  * (1) accepts a processed verification key, and
                  * (2) has weak input consistency.
                  */
-                template<typename ppT>
-                bool bacs_ppzksnark_online_verifier_weak_IC(const bacs_ppzksnark_processed_verification_key<ppT> &pvk,
-                                                            const bacs_ppzksnark_primary_input<ppT> &primary_input,
-                                                            const bacs_ppzksnark_proof<ppT> &proof);
+                template<typename CurveType>
+                bool bacs_ppzksnark_online_verifier_weak_IC(const bacs_ppzksnark_processed_verification_key<CurveType> &pvk,
+                                                            const bacs_ppzksnark_primary_input<CurveType> &primary_input,
+                                                            const bacs_ppzksnark_proof<CurveType> &proof);
 
                 /**
                  * A verifier algorithm for the BACS ppzkSNARK that:
                  * (1) accepts a processed verification key, and
                  * (2) has strong input consistency.
                  */
-                template<typename ppT>
-                bool bacs_ppzksnark_online_verifier_strong_IC(const bacs_ppzksnark_processed_verification_key<ppT> &pvk,
-                                                              const bacs_ppzksnark_primary_input<ppT> &primary_input,
-                                                              const bacs_ppzksnark_proof<ppT> &proof);
+                template<typename CurveType>
+                bool bacs_ppzksnark_online_verifier_strong_IC(const bacs_ppzksnark_processed_verification_key<CurveType> &pvk,
+                                                              const bacs_ppzksnark_primary_input<CurveType> &primary_input,
+                                                              const bacs_ppzksnark_proof<CurveType> &proof);
 
-                template<typename ppT>
-                bool bacs_ppzksnark_proving_key<ppT>::operator==(const bacs_ppzksnark_proving_key<ppT> &other) const {
+                template<typename CurveType>
+                bool bacs_ppzksnark_proving_key<CurveType>::operator==(const bacs_ppzksnark_proving_key<CurveType> &other) const {
                     return (this->circuit == other.circuit && this->r1cs_pk == other.r1cs_pk);
                 }
 
-                template<typename ppT>
-                std::ostream &operator<<(std::ostream &out, const bacs_ppzksnark_proving_key<ppT> &pk) {
+                template<typename CurveType>
+                std::ostream &operator<<(std::ostream &out, const bacs_ppzksnark_proving_key<CurveType> &pk) {
                     out << pk.circuit << OUTPUT_NEWLINE;
                     out << pk.r1cs_pk << OUTPUT_NEWLINE;
 
                     return out;
                 }
 
-                template<typename ppT>
-                std::istream &operator>>(std::istream &in, bacs_ppzksnark_proving_key<ppT> &pk) {
+                template<typename CurveType>
+                std::istream &operator>>(std::istream &in, bacs_ppzksnark_proving_key<CurveType> &pk) {
                     in >> pk.circuit;
                     algebra::consume_OUTPUT_NEWLINE(in);
                     in >> pk.r1cs_pk;
@@ -269,80 +269,80 @@ namespace nil {
                     return in;
                 }
 
-                template<typename ppT>
-                bacs_ppzksnark_keypair<ppT> bacs_ppzksnark_generator(const bacs_ppzksnark_circuit<ppT> &circuit) {
-                    typedef algebra::Fr<ppT> FieldType;
+                template<typename CurveType>
+                bacs_ppzksnark_keypair<CurveType> bacs_ppzksnark_generator(const bacs_ppzksnark_circuit<CurveType> &circuit) {
+                    typedef typename CurveType::scalar_field_type FieldType;
 
                     const r1cs_constraint_system<FieldType> r1cs_cs = bacs_to_r1cs_instance_map<FieldType>(circuit);
-                    const r1cs_ppzksnark_keypair<ppT> r1cs_keypair = r1cs_ppzksnark_generator<ppT>(r1cs_cs);
+                    const r1cs_ppzksnark_keypair<CurveType> r1cs_keypair = r1cs_ppzksnark_generator<CurveType>(r1cs_cs);
 
-                    return bacs_ppzksnark_keypair<ppT>(bacs_ppzksnark_proving_key<ppT>(circuit, r1cs_keypair.pk),
+                    return bacs_ppzksnark_keypair<CurveType>(bacs_ppzksnark_proving_key<CurveType>(circuit, r1cs_keypair.pk),
                                                        r1cs_keypair.vk);
                 }
 
-                template<typename ppT>
-                bacs_ppzksnark_proof<ppT>
-                    bacs_ppzksnark_prover(const bacs_ppzksnark_proving_key<ppT> &pk,
-                                          const bacs_ppzksnark_primary_input<ppT> &primary_input,
-                                          const bacs_ppzksnark_auxiliary_input<ppT> &auxiliary_input) {
-                    typedef algebra::Fr<ppT> FieldType;
+                template<typename CurveType>
+                bacs_ppzksnark_proof<CurveType>
+                    bacs_ppzksnark_prover(const bacs_ppzksnark_proving_key<CurveType> &pk,
+                                          const bacs_ppzksnark_primary_input<CurveType> &primary_input,
+                                          const bacs_ppzksnark_auxiliary_input<CurveType> &auxiliary_input) {
+                    typedef typename CurveType::scalar_field_type FieldType;
 
                     const r1cs_variable_assignment<FieldType> r1cs_va =
                         bacs_to_r1cs_witness_map<FieldType>(pk.circuit, primary_input, auxiliary_input);
                     const r1cs_auxiliary_input<FieldType> r1cs_ai(
                         r1cs_va.begin() + primary_input.size(),
                         r1cs_va.end());    // TODO: faster to just change bacs_to_r1cs_witness_map into two :(
-                    const r1cs_ppzksnark_proof<ppT> r1cs_proof =
-                        r1cs_ppzksnark_prover<ppT>(pk.r1cs_pk, primary_input, r1cs_ai);
+                    const r1cs_ppzksnark_proof<CurveType> r1cs_proof =
+                        r1cs_ppzksnark_prover<CurveType>(pk.r1cs_pk, primary_input, r1cs_ai);
 
                     return r1cs_proof;
                 }
 
-                template<typename ppT>
-                bacs_ppzksnark_processed_verification_key<ppT>
-                    bacs_ppzksnark_verifier_process_vk(const bacs_ppzksnark_verification_key<ppT> &vk) {
-                    const bacs_ppzksnark_processed_verification_key<ppT> pvk =
-                        r1cs_ppzksnark_verifier_process_vk<ppT>(vk);
+                template<typename CurveType>
+                bacs_ppzksnark_processed_verification_key<CurveType>
+                    bacs_ppzksnark_verifier_process_vk(const bacs_ppzksnark_verification_key<CurveType> &vk) {
+                    const bacs_ppzksnark_processed_verification_key<CurveType> pvk =
+                        r1cs_ppzksnark_verifier_process_vk<CurveType>(vk);
 
                     return pvk;
                 }
 
-                template<typename ppT>
-                bool bacs_ppzksnark_verifier_weak_IC(const bacs_ppzksnark_verification_key<ppT> &vk,
-                                                     const bacs_ppzksnark_primary_input<ppT> &primary_input,
-                                                     const bacs_ppzksnark_proof<ppT> &proof) {
-                    const bacs_ppzksnark_processed_verification_key<ppT> pvk =
-                        bacs_ppzksnark_verifier_process_vk<ppT>(vk);
-                    const bool bit = r1cs_ppzksnark_online_verifier_weak_IC<ppT>(pvk, primary_input, proof);
+                template<typename CurveType>
+                bool bacs_ppzksnark_verifier_weak_IC(const bacs_ppzksnark_verification_key<CurveType> &vk,
+                                                     const bacs_ppzksnark_primary_input<CurveType> &primary_input,
+                                                     const bacs_ppzksnark_proof<CurveType> &proof) {
+                    const bacs_ppzksnark_processed_verification_key<CurveType> pvk =
+                        bacs_ppzksnark_verifier_process_vk<CurveType>(vk);
+                    const bool bit = r1cs_ppzksnark_online_verifier_weak_IC<CurveType>(pvk, primary_input, proof);
 
                     return bit;
                 }
 
-                template<typename ppT>
-                bool bacs_ppzksnark_verifier_strong_IC(const bacs_ppzksnark_verification_key<ppT> &vk,
-                                                       const bacs_ppzksnark_primary_input<ppT> &primary_input,
-                                                       const bacs_ppzksnark_proof<ppT> &proof) {
-                    const bacs_ppzksnark_processed_verification_key<ppT> pvk =
-                        bacs_ppzksnark_verifier_process_vk<ppT>(vk);
-                    const bool bit = r1cs_ppzksnark_online_verifier_strong_IC<ppT>(pvk, primary_input, proof);
+                template<typename CurveType>
+                bool bacs_ppzksnark_verifier_strong_IC(const bacs_ppzksnark_verification_key<CurveType> &vk,
+                                                       const bacs_ppzksnark_primary_input<CurveType> &primary_input,
+                                                       const bacs_ppzksnark_proof<CurveType> &proof) {
+                    const bacs_ppzksnark_processed_verification_key<CurveType> pvk =
+                        bacs_ppzksnark_verifier_process_vk<CurveType>(vk);
+                    const bool bit = r1cs_ppzksnark_online_verifier_strong_IC<CurveType>(pvk, primary_input, proof);
 
                     return bit;
                 }
 
-                template<typename ppT>
-                bool bacs_ppzksnark_online_verifier_weak_IC(const bacs_ppzksnark_processed_verification_key<ppT> &pvk,
-                                                            const bacs_ppzksnark_primary_input<ppT> &primary_input,
-                                                            const bacs_ppzksnark_proof<ppT> &proof) {
-                    const bool bit = r1cs_ppzksnark_online_verifier_weak_IC<ppT>(pvk, primary_input, proof);
+                template<typename CurveType>
+                bool bacs_ppzksnark_online_verifier_weak_IC(const bacs_ppzksnark_processed_verification_key<CurveType> &pvk,
+                                                            const bacs_ppzksnark_primary_input<CurveType> &primary_input,
+                                                            const bacs_ppzksnark_proof<CurveType> &proof) {
+                    const bool bit = r1cs_ppzksnark_online_verifier_weak_IC<CurveType>(pvk, primary_input, proof);
 
                     return bit;
                 }
 
-                template<typename ppT>
-                bool bacs_ppzksnark_online_verifier_strong_IC(const bacs_ppzksnark_processed_verification_key<ppT> &pvk,
-                                                              const bacs_ppzksnark_primary_input<ppT> &primary_input,
-                                                              const bacs_ppzksnark_proof<ppT> &proof) {
-                    const bool bit = r1cs_ppzksnark_online_verifier_strong_IC<ppT>(pvk, primary_input, proof);
+                template<typename CurveType>
+                bool bacs_ppzksnark_online_verifier_strong_IC(const bacs_ppzksnark_processed_verification_key<CurveType> &pvk,
+                                                              const bacs_ppzksnark_primary_input<CurveType> &primary_input,
+                                                              const bacs_ppzksnark_proof<CurveType> &proof) {
+                    const bool bit = r1cs_ppzksnark_online_verifier_strong_IC<CurveType>(pvk, primary_input, proof);
 
                     return bit;
                 }

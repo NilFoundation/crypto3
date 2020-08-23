@@ -26,27 +26,27 @@ namespace nil {
         namespace zk {
             namespace snark {
 
-                template<typename ppT>
-                class check_e_equals_e_gadget : public gadget<algebra::Fr<ppT>> {
+                template<typename CurveType>
+                class check_e_equals_e_gadget : public gadget<typename CurveType::scalar_field_type> {
                 public:
-                    typedef algebra::Fr<ppT> FieldType;
+                    typedef typename CurveType::scalar_field_type FieldType;
 
-                    std::shared_ptr<Fqk_variable<ppT>> ratio;
-                    std::shared_ptr<e_over_e_miller_loop_gadget<ppT>> compute_ratio;
-                    std::shared_ptr<final_exp_gadget<ppT>> check_finexp;
+                    std::shared_ptr<Fqk_variable<CurveType>> ratio;
+                    std::shared_ptr<e_over_e_miller_loop_gadget<CurveType>> compute_ratio;
+                    std::shared_ptr<final_exp_gadget<CurveType>> check_finexp;
 
-                    G1_precomputation<ppT> lhs_G1;
-                    G2_precomputation<ppT> lhs_G2;
-                    G1_precomputation<ppT> rhs_G1;
-                    G2_precomputation<ppT> rhs_G2;
+                    G1_precomputation<CurveType> lhs_G1;
+                    G2_precomputation<CurveType> lhs_G2;
+                    G1_precomputation<CurveType> rhs_G1;
+                    G2_precomputation<CurveType> rhs_G2;
 
                     pb_variable<FieldType> result;
 
                     check_e_equals_e_gadget(protoboard<FieldType> &pb,
-                                            const G1_precomputation<ppT> &lhs_G1,
-                                            const G2_precomputation<ppT> &lhs_G2,
-                                            const G1_precomputation<ppT> &rhs_G1,
-                                            const G2_precomputation<ppT> &rhs_G2,
+                                            const G1_precomputation<CurveType> &lhs_G1,
+                                            const G2_precomputation<CurveType> &lhs_G2,
+                                            const G1_precomputation<CurveType> &rhs_G1,
+                                            const G2_precomputation<CurveType> &rhs_G2,
                                             const pb_variable<FieldType> &result);
 
                     void generate_r1cs_constraints();
@@ -54,90 +54,90 @@ namespace nil {
                     void generate_r1cs_witness();
                 };
 
-                template<typename ppT>
-                class check_e_equals_ee_gadget : public gadget<algebra::Fr<ppT>> {
+                template<typename CurveType>
+                class check_e_equals_ee_gadget : public gadget<typename CurveType::scalar_field_type> {
                 public:
-                    typedef algebra::Fr<ppT> FieldType;
+                    typedef typename CurveType::scalar_field_type FieldType;
 
-                    std::shared_ptr<Fqk_variable<ppT>> ratio;
-                    std::shared_ptr<e_times_e_over_e_miller_loop_gadget<ppT>> compute_ratio;
-                    std::shared_ptr<final_exp_gadget<ppT>> check_finexp;
+                    std::shared_ptr<Fqk_variable<CurveType>> ratio;
+                    std::shared_ptr<e_times_e_over_e_miller_loop_gadget<CurveType>> compute_ratio;
+                    std::shared_ptr<final_exp_gadget<CurveType>> check_finexp;
 
-                    G1_precomputation<ppT> lhs_G1;
-                    G2_precomputation<ppT> lhs_G2;
-                    G1_precomputation<ppT> rhs1_G1;
-                    G2_precomputation<ppT> rhs1_G2;
-                    G1_precomputation<ppT> rhs2_G1;
-                    G2_precomputation<ppT> rhs2_G2;
+                    G1_precomputation<CurveType> lhs_G1;
+                    G2_precomputation<CurveType> lhs_G2;
+                    G1_precomputation<CurveType> rhs1_G1;
+                    G2_precomputation<CurveType> rhs1_G2;
+                    G1_precomputation<CurveType> rhs2_G1;
+                    G2_precomputation<CurveType> rhs2_G2;
 
                     pb_variable<FieldType> result;
 
                     check_e_equals_ee_gadget(protoboard<FieldType> &pb,
-                                             const G1_precomputation<ppT> &lhs_G1,
-                                             const G2_precomputation<ppT> &lhs_G2,
-                                             const G1_precomputation<ppT> &rhs1_G1,
-                                             const G2_precomputation<ppT> &rhs1_G2,
-                                             const G1_precomputation<ppT> &rhs2_G1,
-                                             const G2_precomputation<ppT> &rhs2_G2,
+                                             const G1_precomputation<CurveType> &lhs_G1,
+                                             const G2_precomputation<CurveType> &lhs_G2,
+                                             const G1_precomputation<CurveType> &rhs1_G1,
+                                             const G2_precomputation<CurveType> &rhs1_G2,
+                                             const G1_precomputation<CurveType> &rhs2_G1,
+                                             const G2_precomputation<CurveType> &rhs2_G2,
                                              const pb_variable<FieldType> &result);
 
                     void generate_r1cs_constraints();
 
                     void generate_r1cs_witness();
                 };
-                template<typename ppT>
-                check_e_equals_e_gadget<ppT>::check_e_equals_e_gadget(protoboard<FieldType> &pb,
-                                                                      const G1_precomputation<ppT> &lhs_G1,
-                                                                      const G2_precomputation<ppT> &lhs_G2,
-                                                                      const G1_precomputation<ppT> &rhs_G1,
-                                                                      const G2_precomputation<ppT> &rhs_G2,
+                template<typename CurveType>
+                check_e_equals_e_gadget<CurveType>::check_e_equals_e_gadget(protoboard<FieldType> &pb,
+                                                                      const G1_precomputation<CurveType> &lhs_G1,
+                                                                      const G2_precomputation<CurveType> &lhs_G2,
+                                                                      const G1_precomputation<CurveType> &rhs_G1,
+                                                                      const G2_precomputation<CurveType> &rhs_G2,
                                                                       const pb_variable<FieldType> &result) :
                     gadget<FieldType>(pb),
                     lhs_G1(lhs_G1), lhs_G2(lhs_G2), rhs_G1(rhs_G1), rhs_G2(rhs_G2), result(result) {
-                    ratio.reset(new Fqk_variable<ppT>(pb));
+                    ratio.reset(new Fqk_variable<CurveType>(pb));
                     compute_ratio.reset(
-                        new e_over_e_miller_loop_gadget<ppT>(pb, lhs_G1, lhs_G2, rhs_G1, rhs_G2, *ratio));
-                    check_finexp.reset(new final_exp_gadget<ppT>(pb, *ratio, result));
+                        new e_over_e_miller_loop_gadget<CurveType>(pb, lhs_G1, lhs_G2, rhs_G1, rhs_G2, *ratio));
+                    check_finexp.reset(new final_exp_gadget<CurveType>(pb, *ratio, result));
                 }
 
-                template<typename ppT>
-                void check_e_equals_e_gadget<ppT>::generate_r1cs_constraints() {
+                template<typename CurveType>
+                void check_e_equals_e_gadget<CurveType>::generate_r1cs_constraints() {
                     compute_ratio->generate_r1cs_constraints();
                     check_finexp->generate_r1cs_constraints();
                 }
 
-                template<typename ppT>
-                void check_e_equals_e_gadget<ppT>::generate_r1cs_witness() {
+                template<typename CurveType>
+                void check_e_equals_e_gadget<CurveType>::generate_r1cs_witness() {
                     compute_ratio->generate_r1cs_witness();
                     check_finexp->generate_r1cs_witness();
                 }
 
-                template<typename ppT>
-                check_e_equals_ee_gadget<ppT>::check_e_equals_ee_gadget(protoboard<FieldType> &pb,
-                                                                        const G1_precomputation<ppT> &lhs_G1,
-                                                                        const G2_precomputation<ppT> &lhs_G2,
-                                                                        const G1_precomputation<ppT> &rhs1_G1,
-                                                                        const G2_precomputation<ppT> &rhs1_G2,
-                                                                        const G1_precomputation<ppT> &rhs2_G1,
-                                                                        const G2_precomputation<ppT> &rhs2_G2,
+                template<typename CurveType>
+                check_e_equals_ee_gadget<CurveType>::check_e_equals_ee_gadget(protoboard<FieldType> &pb,
+                                                                        const G1_precomputation<CurveType> &lhs_G1,
+                                                                        const G2_precomputation<CurveType> &lhs_G2,
+                                                                        const G1_precomputation<CurveType> &rhs1_G1,
+                                                                        const G2_precomputation<CurveType> &rhs1_G2,
+                                                                        const G1_precomputation<CurveType> &rhs2_G1,
+                                                                        const G2_precomputation<CurveType> &rhs2_G2,
                                                                         const pb_variable<FieldType> &result) :
                     gadget<FieldType>(pb),
                     lhs_G1(lhs_G1), lhs_G2(lhs_G2), rhs1_G1(rhs1_G1), rhs1_G2(rhs1_G2), rhs2_G1(rhs2_G1),
                     rhs2_G2(rhs2_G2), result(result) {
-                    ratio.reset(new Fqk_variable<ppT>(pb));
-                    compute_ratio.reset(new e_times_e_over_e_miller_loop_gadget<ppT>(
+                    ratio.reset(new Fqk_variable<CurveType>(pb));
+                    compute_ratio.reset(new e_times_e_over_e_miller_loop_gadget<CurveType>(
                         pb, rhs1_G1, rhs1_G2, rhs2_G1, rhs2_G2, lhs_G1, lhs_G2, *ratio));
-                    check_finexp.reset(new final_exp_gadget<ppT>(pb, *ratio, result));
+                    check_finexp.reset(new final_exp_gadget<CurveType>(pb, *ratio, result));
                 }
 
-                template<typename ppT>
-                void check_e_equals_ee_gadget<ppT>::generate_r1cs_constraints() {
+                template<typename CurveType>
+                void check_e_equals_ee_gadget<CurveType>::generate_r1cs_constraints() {
                     compute_ratio->generate_r1cs_constraints();
                     check_finexp->generate_r1cs_constraints();
                 }
 
-                template<typename ppT>
-                void check_e_equals_ee_gadget<ppT>::generate_r1cs_witness() {
+                template<typename CurveType>
+                void check_e_equals_ee_gadget<CurveType>::generate_r1cs_witness() {
                     compute_ratio->generate_r1cs_witness();
                     check_finexp->generate_r1cs_witness();
                 }

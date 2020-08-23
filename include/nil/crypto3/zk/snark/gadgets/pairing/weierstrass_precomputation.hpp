@@ -32,39 +32,39 @@ namespace nil {
                 /**
                  * Not a gadget. It only holds values.
                  */
-                template<typename ppT>
+                template<typename CurveType>
                 class G1_precomputation {
                 public:
-                    typedef algebra::Fr<ppT> FieldType;
-                    typedef algebra::Fqe<other_curve<ppT>> FqeT;
-                    typedef algebra::Fqk<other_curve<ppT>> FqkT;
+                    typedef typename CurveType::scalar_field_type FieldType;
+                    typedef algebra::Fqe<other_curve<CurveType>> FqeT;
+                    typedef algebra::Fqk<other_curve<CurveType>> FqkT;
 
-                    std::shared_ptr<G1_variable<ppT>> P;
-                    std::shared_ptr<Fqe_variable<ppT>> PY_twist_squared;
+                    std::shared_ptr<G1_variable<CurveType>> P;
+                    std::shared_ptr<Fqe_variable<CurveType>> PY_twist_squared;
 
                     G1_precomputation();
-                    G1_precomputation(protoboard<FieldType> &pb, const algebra::G1<other_curve<ppT>> &P);
+                    G1_precomputation(protoboard<FieldType> &pb, const algebra::G1<other_curve<CurveType>> &P);
                 };
 
                 /**
                  * Gadget that verifies correct precomputation of the G1 variable.
                  */
-                template<typename ppT>
-                class precompute_G1_gadget : public gadget<algebra::Fr<ppT>> {
+                template<typename CurveType>
+                class precompute_G1_gadget : public gadget<typename CurveType::scalar_field_type> {
                 public:
-                    typedef algebra::Fqe<other_curve<ppT>> FqeT;
-                    typedef algebra::Fqk<other_curve<ppT>> FqkT;
+                    typedef algebra::Fqe<other_curve<CurveType>> FqeT;
+                    typedef algebra::Fqk<other_curve<CurveType>> FqkT;
 
-                    G1_precomputation<ppT> &precomp;    // must be a reference.
+                    G1_precomputation<CurveType> &precomp;    // must be a reference.
 
                     /* two possible pre-computations one for mnt4 and one for mnt6 */
                     template<typename FieldType>
                     precompute_G1_gadget(
                         protoboard<FieldType> &pb,
-                        const G1_variable<ppT> &P,
-                        G1_precomputation<ppT> &precomp,    // will allocate this inside
+                        const G1_variable<CurveType> &P,
+                        G1_precomputation<CurveType> &precomp,    // will allocate this inside
 
-                        const typename std::enable_if<algebra::Fqk<other_curve<ppT>>::extension_degree() == 4,
+                        const typename std::enable_if<algebra::Fqk<other_curve<CurveType>>::extension_degree() == 4,
                                                       FieldType>::type & = typename FieldType::value_type()) :
                         gadget<FieldType>(pb),
                         precomp(precomp) {
@@ -72,16 +72,16 @@ namespace nil {
                         c0.assign(pb, P.Y * ((algebra::mnt4_twist).squared().c0));
                         c1.assign(pb, P.Y * ((algebra::mnt4_twist).squared().c1));
 
-                        precomp.P.reset(new G1_variable<ppT>(P));
-                        precomp.PY_twist_squared.reset(new Fqe_variable<ppT>(pb, c0, c1));
+                        precomp.P.reset(new G1_variable<CurveType>(P));
+                        precomp.PY_twist_squared.reset(new Fqe_variable<CurveType>(pb, c0, c1));
                     }
 
                     template<typename FieldType>
                     precompute_G1_gadget(
                         protoboard<FieldType> &pb,
-                        const G1_variable<ppT> &P,
-                        G1_precomputation<ppT> &precomp,    // will allocate this inside
-                        const typename std::enable_if<algebra::Fqk<other_curve<ppT>>::extension_degree() == 6,
+                        const G1_variable<CurveType> &P,
+                        G1_precomputation<CurveType> &precomp,    // will allocate this inside
+                        const typename std::enable_if<algebra::Fqk<other_curve<CurveType>>::extension_degree() == 6,
                                                       FieldType>::type & = typename FieldType::value_type()) :
                         gadget<FieldType>(pb),
                         precomp(precomp) {
@@ -90,15 +90,15 @@ namespace nil {
                         c1.assign(pb, P.Y * ((algebra::mnt6_twist).squared().c1));
                         c2.assign(pb, P.Y * ((algebra::mnt6_twist).squared().c2));
 
-                        precomp.P.reset(new G1_variable<ppT>(P));
-                        precomp.PY_twist_squared.reset(new Fqe_variable<ppT>(pb, c0, c1, c2));
+                        precomp.P.reset(new G1_variable<CurveType>(P));
+                        precomp.PY_twist_squared.reset(new Fqe_variable<CurveType>(pb, c0, c1, c2));
                     }
 
                     void generate_r1cs_constraints();
                     void generate_r1cs_witness();
                 };
 
-                template<typename ppT>
+                template<typename CurveType>
                 void test_G1_variable_precomp(const std::string &annotation);
 
                 /**************************** G2 Precomputation ******************************/
@@ -106,39 +106,39 @@ namespace nil {
                 /**
                  * Not a gadget. It only holds values.
                  */
-                template<typename ppT>
+                template<typename CurveType>
                 class precompute_G2_gadget_coeffs {
                 public:
-                    typedef algebra::Fr<ppT> FieldType;
-                    typedef algebra::Fqe<other_curve<ppT>> FqeT;
-                    typedef algebra::Fqk<other_curve<ppT>> FqkT;
+                    typedef typename CurveType::scalar_field_type FieldType;
+                    typedef algebra::Fqe<other_curve<CurveType>> FqeT;
+                    typedef algebra::Fqk<other_curve<CurveType>> FqkT;
 
-                    std::shared_ptr<Fqe_variable<ppT>> RX;
-                    std::shared_ptr<Fqe_variable<ppT>> RY;
-                    std::shared_ptr<Fqe_variable<ppT>> gamma;
-                    std::shared_ptr<Fqe_variable<ppT>> gamma_X;
+                    std::shared_ptr<Fqe_variable<CurveType>> RX;
+                    std::shared_ptr<Fqe_variable<CurveType>> RY;
+                    std::shared_ptr<Fqe_variable<CurveType>> gamma;
+                    std::shared_ptr<Fqe_variable<CurveType>> gamma_X;
 
                     precompute_G2_gadget_coeffs();
                     precompute_G2_gadget_coeffs(protoboard<FieldType> &pb);
-                    precompute_G2_gadget_coeffs(protoboard<FieldType> &pb, const G2_variable<ppT> &Q);
+                    precompute_G2_gadget_coeffs(protoboard<FieldType> &pb, const G2_variable<CurveType> &Q);
                 };
 
                 /**
                  * Not a gadget. It only holds values.
                  */
-                template<typename ppT>
+                template<typename CurveType>
                 class G2_precomputation {
                 public:
-                    typedef algebra::Fr<ppT> FieldType;
-                    typedef algebra::Fqe<other_curve<ppT>> FqeT;
-                    typedef algebra::Fqk<other_curve<ppT>> FqkT;
+                    typedef typename CurveType::scalar_field_type FieldType;
+                    typedef algebra::Fqe<other_curve<CurveType>> FqeT;
+                    typedef algebra::Fqk<other_curve<CurveType>> FqkT;
 
-                    std::shared_ptr<G2_variable<ppT>> Q;
+                    std::shared_ptr<G2_variable<CurveType>> Q;
 
-                    std::vector<std::shared_ptr<precompute_G2_gadget_coeffs<ppT>>> coeffs;
+                    std::vector<std::shared_ptr<precompute_G2_gadget_coeffs<CurveType>>> coeffs;
 
                     G2_precomputation();
-                    G2_precomputation(protoboard<FieldType> &pb, const algebra::G2<other_curve<ppT>> &Q_val);
+                    G2_precomputation(protoboard<FieldType> &pb, const algebra::G2<other_curve<CurveType>> &Q_val);
                 };
 
                 /**
@@ -160,33 +160,33 @@ namespace nil {
                  * RX = prev_gamma^2 - (2*prev_RX)
                  * RY = prev_gamma * (prev_RX - RX) - prev_RY
                  */
-                template<typename ppT>
-                class precompute_G2_gadget_doubling_step : public gadget<algebra::Fr<ppT>> {
+                template<typename CurveType>
+                class precompute_G2_gadget_doubling_step : public gadget<typename CurveType::scalar_field_type> {
                 public:
-                    typedef algebra::Fr<ppT> FieldType;
-                    typedef algebra::Fqe<other_curve<ppT>> FqeT;
-                    typedef algebra::Fqk<other_curve<ppT>> FqkT;
+                    typedef typename CurveType::scalar_field_type FieldType;
+                    typedef algebra::Fqe<other_curve<CurveType>> FqeT;
+                    typedef algebra::Fqk<other_curve<CurveType>> FqkT;
 
-                    precompute_G2_gadget_coeffs<ppT> cur;
-                    precompute_G2_gadget_coeffs<ppT> next;
+                    precompute_G2_gadget_coeffs<CurveType> cur;
+                    precompute_G2_gadget_coeffs<CurveType> next;
 
-                    std::shared_ptr<Fqe_variable<ppT>> RXsquared;
-                    std::shared_ptr<Fqe_sqr_gadget<ppT>> compute_RXsquared;
-                    std::shared_ptr<Fqe_variable<ppT>> three_RXsquared_plus_a;
-                    std::shared_ptr<Fqe_variable<ppT>> two_RY;
-                    std::shared_ptr<Fqe_mul_gadget<ppT>> compute_gamma;
-                    std::shared_ptr<Fqe_mul_gadget<ppT>> compute_gamma_X;
+                    std::shared_ptr<Fqe_variable<CurveType>> RXsquared;
+                    std::shared_ptr<Fqe_sqr_gadget<CurveType>> compute_RXsquared;
+                    std::shared_ptr<Fqe_variable<CurveType>> three_RXsquared_plus_a;
+                    std::shared_ptr<Fqe_variable<CurveType>> two_RY;
+                    std::shared_ptr<Fqe_mul_gadget<CurveType>> compute_gamma;
+                    std::shared_ptr<Fqe_mul_gadget<CurveType>> compute_gamma_X;
 
-                    std::shared_ptr<Fqe_variable<ppT>> next_RX_plus_two_RX;
-                    std::shared_ptr<Fqe_sqr_gadget<ppT>> compute_next_RX;
+                    std::shared_ptr<Fqe_variable<CurveType>> next_RX_plus_two_RX;
+                    std::shared_ptr<Fqe_sqr_gadget<CurveType>> compute_next_RX;
 
-                    std::shared_ptr<Fqe_variable<ppT>> RX_minus_next_RX;
-                    std::shared_ptr<Fqe_variable<ppT>> RY_plus_next_RY;
-                    std::shared_ptr<Fqe_mul_gadget<ppT>> compute_next_RY;
+                    std::shared_ptr<Fqe_variable<CurveType>> RX_minus_next_RX;
+                    std::shared_ptr<Fqe_variable<CurveType>> RY_plus_next_RY;
+                    std::shared_ptr<Fqe_mul_gadget<CurveType>> compute_next_RY;
 
                     precompute_G2_gadget_doubling_step(protoboard<FieldType> &pb,
-                                                       const precompute_G2_gadget_coeffs<ppT> &cur,
-                                                       const precompute_G2_gadget_coeffs<ppT> &next);
+                                                       const precompute_G2_gadget_coeffs<CurveType> &cur,
+                                                       const precompute_G2_gadget_coeffs<CurveType> &next);
                     void generate_r1cs_constraints();
                     void generate_r1cs_witness();
                 };
@@ -208,35 +208,35 @@ namespace nil {
                  *
                  * If invert_Q is set to true: use -QY in place of QY everywhere above.
                  */
-                template<typename ppT>
-                class precompute_G2_gadget_addition_step : public gadget<algebra::Fr<ppT>> {
+                template<typename CurveType>
+                class precompute_G2_gadget_addition_step : public gadget<typename CurveType::scalar_field_type> {
                 public:
-                    typedef algebra::Fr<ppT> FieldType;
-                    typedef algebra::Fqe<other_curve<ppT>> FqeT;
-                    typedef algebra::Fqk<other_curve<ppT>> FqkT;
+                    typedef typename CurveType::scalar_field_type FieldType;
+                    typedef algebra::Fqe<other_curve<CurveType>> FqeT;
+                    typedef algebra::Fqk<other_curve<CurveType>> FqkT;
 
                     bool invert_Q;
-                    precompute_G2_gadget_coeffs<ppT> cur;
-                    precompute_G2_gadget_coeffs<ppT> next;
-                    G2_variable<ppT> Q;
+                    precompute_G2_gadget_coeffs<CurveType> cur;
+                    precompute_G2_gadget_coeffs<CurveType> next;
+                    G2_variable<CurveType> Q;
 
-                    std::shared_ptr<Fqe_variable<ppT>> RY_minus_QY;
-                    std::shared_ptr<Fqe_variable<ppT>> RX_minus_QX;
-                    std::shared_ptr<Fqe_mul_gadget<ppT>> compute_gamma;
-                    std::shared_ptr<Fqe_mul_gadget<ppT>> compute_gamma_X;
+                    std::shared_ptr<Fqe_variable<CurveType>> RY_minus_QY;
+                    std::shared_ptr<Fqe_variable<CurveType>> RX_minus_QX;
+                    std::shared_ptr<Fqe_mul_gadget<CurveType>> compute_gamma;
+                    std::shared_ptr<Fqe_mul_gadget<CurveType>> compute_gamma_X;
 
-                    std::shared_ptr<Fqe_variable<ppT>> next_RX_plus_RX_plus_QX;
-                    std::shared_ptr<Fqe_sqr_gadget<ppT>> compute_next_RX;
+                    std::shared_ptr<Fqe_variable<CurveType>> next_RX_plus_RX_plus_QX;
+                    std::shared_ptr<Fqe_sqr_gadget<CurveType>> compute_next_RX;
 
-                    std::shared_ptr<Fqe_variable<ppT>> RX_minus_next_RX;
-                    std::shared_ptr<Fqe_variable<ppT>> RY_plus_next_RY;
-                    std::shared_ptr<Fqe_mul_gadget<ppT>> compute_next_RY;
+                    std::shared_ptr<Fqe_variable<CurveType>> RX_minus_next_RX;
+                    std::shared_ptr<Fqe_variable<CurveType>> RY_plus_next_RY;
+                    std::shared_ptr<Fqe_mul_gadget<CurveType>> compute_next_RY;
 
                     precompute_G2_gadget_addition_step(protoboard<FieldType> &pb,
                                                        const bool invert_Q,
-                                                       const precompute_G2_gadget_coeffs<ppT> &cur,
-                                                       const precompute_G2_gadget_coeffs<ppT> &next,
-                                                       const G2_variable<ppT> &Q);
+                                                       const precompute_G2_gadget_coeffs<CurveType> &cur,
+                                                       const precompute_G2_gadget_coeffs<CurveType> &next,
+                                                       const G2_variable<CurveType> &Q);
                     void generate_r1cs_constraints();
                     void generate_r1cs_witness();
                 };
@@ -244,121 +244,121 @@ namespace nil {
                 /**
                  * Gadget that verifies correct precomputation of the G2 variable.
                  */
-                template<typename ppT>
-                class precompute_G2_gadget : public gadget<algebra::Fr<ppT>> {
+                template<typename CurveType>
+                class precompute_G2_gadget : public gadget<typename CurveType::scalar_field_type> {
                 public:
-                    typedef algebra::Fr<ppT> FieldType;
-                    typedef algebra::Fqe<other_curve<ppT>> FqeT;
-                    typedef algebra::Fqk<other_curve<ppT>> FqkT;
+                    typedef typename CurveType::scalar_field_type FieldType;
+                    typedef algebra::Fqe<other_curve<CurveType>> FqeT;
+                    typedef algebra::Fqk<other_curve<CurveType>> FqkT;
 
-                    std::vector<std::shared_ptr<precompute_G2_gadget_addition_step<ppT>>> addition_steps;
-                    std::vector<std::shared_ptr<precompute_G2_gadget_doubling_step<ppT>>> doubling_steps;
+                    std::vector<std::shared_ptr<precompute_G2_gadget_addition_step<CurveType>>> addition_steps;
+                    std::vector<std::shared_ptr<precompute_G2_gadget_doubling_step<CurveType>>> doubling_steps;
 
                     std::size_t add_count;
                     std::size_t dbl_count;
 
-                    G2_precomputation<ppT> &precomp;    // important to have a reference here
+                    G2_precomputation<CurveType> &precomp;    // important to have a reference here
 
                     precompute_G2_gadget(protoboard<FieldType> &pb,
-                                         const G2_variable<ppT> &Q,
-                                         G2_precomputation<ppT> &precomp);
+                                         const G2_variable<CurveType> &Q,
+                                         G2_precomputation<CurveType> &precomp);
                     void generate_r1cs_constraints();
                     void generate_r1cs_witness();
                 };
 
-                template<typename ppT>
+                template<typename CurveType>
                 void test_G2_variable_precomp(const std::string &annotation);
 
-                template<typename ppT>
-                G1_precomputation<ppT>::G1_precomputation() {
+                template<typename CurveType>
+                G1_precomputation<CurveType>::G1_precomputation() {
                     // will be filled in precompute_G1_gadget, so do nothing here
                 }
 
-                template<typename ppT>
-                G1_precomputation<ppT>::G1_precomputation(protoboard<FieldType> &pb,
-                                                          const algebra::G1<other_curve<ppT>> &P_val) {
-                    algebra::G1<other_curve<ppT>> P_val_copy = P_val;
+                template<typename CurveType>
+                G1_precomputation<CurveType>::G1_precomputation(protoboard<FieldType> &pb,
+                                                          const algebra::G1<other_curve<CurveType>> &P_val) {
+                    algebra::G1<other_curve<CurveType>> P_val_copy = P_val;
                     P_val_copy.to_affine_coordinates();
-                    P.reset(new G1_variable<ppT>(pb, P_val_copy));
+                    P.reset(new G1_variable<CurveType>(pb, P_val_copy));
                     PY_twist_squared.reset(
-                        new Fqe_variable<ppT>(pb, P_val_copy.Y() * algebra::G2<other_curve<ppT>>::twist.squared()));
+                        new Fqe_variable<CurveType>(pb, P_val_copy.Y() * algebra::G2<other_curve<CurveType>>::twist.squared()));
                 }
 
-                template<typename ppT>
-                void precompute_G1_gadget<ppT>::generate_r1cs_constraints() {
-                    /* the same for neither ppT = mnt4 nor ppT = mnt6 */
+                template<typename CurveType>
+                void precompute_G1_gadget<CurveType>::generate_r1cs_constraints() {
+                    /* the same for neither CurveType = mnt4 nor CurveType = mnt6 */
                 }
 
-                template<typename ppT>
-                void precompute_G1_gadget<ppT>::generate_r1cs_witness() {
-                    precomp.PY_twist_squared->evaluate(); /* the same for both ppT = mnt4 and ppT = mnt6 */
+                template<typename CurveType>
+                void precompute_G1_gadget<CurveType>::generate_r1cs_witness() {
+                    precomp.PY_twist_squared->evaluate(); /* the same for both CurveType = mnt4 and CurveType = mnt6 */
                 }
 
-                template<typename ppT>
+                template<typename CurveType>
                 void test_G1_variable_precomp(const std::string &annotation) {
-                    protoboard<algebra::Fr<ppT>> pb;
-                    algebra::G1<other_curve<ppT>> g_val =
-                        algebra::Fr<other_curve<ppT>>::random_element() * algebra::G1<other_curve<ppT>>::one();
+                    protoboard<typename CurveType::scalar_field_type> pb;
+                    algebra::G1<other_curve<CurveType>> g_val =
+                        algebra::Fr<other_curve<CurveType>>::random_element() * algebra::G1<other_curve<CurveType>>::one();
 
-                    G1_variable<ppT> g(pb);
-                    G1_precomputation<ppT> precomp;
-                    precompute_G1_gadget<ppT> do_precomp(pb, g, precomp);
+                    G1_variable<CurveType> g(pb);
+                    G1_precomputation<CurveType> precomp;
+                    precompute_G1_gadget<CurveType> do_precomp(pb, g, precomp);
                     do_precomp.generate_r1cs_constraints();
 
                     g.generate_r1cs_witness(g_val);
                     do_precomp.generate_r1cs_witness();
                     assert(pb.is_satisfied());
 
-                    G1_precomputation<ppT> const_precomp(pb, g_val);
+                    G1_precomputation<CurveType> const_precomp(pb, g_val);
 
-                    algebra::affine_ate_G1_precomp<other_curve<ppT>> native_precomp =
-                        other_curve<ppT>::affine_ate_precompute_G1(g_val);
+                    algebra::affine_ate_G1_precomp<other_curve<CurveType>> native_precomp =
+                        other_curve<CurveType>::affine_ate_precompute_G1(g_val);
                     assert(precomp.PY_twist_squared->get_element() == native_precomp.PY_twist_squared);
                     assert(const_precomp.PY_twist_squared->get_element() == native_precomp.PY_twist_squared);
                 }
 
-                template<typename ppT>
-                G2_precomputation<ppT>::G2_precomputation() {
+                template<typename CurveType>
+                G2_precomputation<CurveType>::G2_precomputation() {
                 }
 
-                template<typename ppT>
-                G2_precomputation<ppT>::G2_precomputation(protoboard<FieldType> &pb,
-                                                          const algebra::G2<other_curve<ppT>> &Q_val) {
-                    Q.reset(new G2_variable<ppT>(pb, Q_val));
-                    const algebra::affine_ate_G2_precomp<other_curve<ppT>> native_precomp =
-                        other_curve<ppT>::affine_ate_precompute_G2(Q_val);
+                template<typename CurveType>
+                G2_precomputation<CurveType>::G2_precomputation(protoboard<FieldType> &pb,
+                                                          const algebra::G2<other_curve<CurveType>> &Q_val) {
+                    Q.reset(new G2_variable<CurveType>(pb, Q_val));
+                    const algebra::affine_ate_G2_precomp<other_curve<CurveType>> native_precomp =
+                        other_curve<CurveType>::affine_ate_precompute_G2(Q_val);
 
                     coeffs.resize(native_precomp.coeffs.size() +
                                   1);    // the last precomp remains for convenient programming
                     for (std::size_t i = 0; i < native_precomp.coeffs.size(); ++i) {
-                        coeffs[i].reset(new precompute_G2_gadget_coeffs<ppT>());
-                        coeffs[i]->RX.reset(new Fqe_variable<ppT>(pb, native_precomp.coeffs[i].old_RX));
-                        coeffs[i]->RY.reset(new Fqe_variable<ppT>(pb, native_precomp.coeffs[i].old_RY));
-                        coeffs[i]->gamma.reset(new Fqe_variable<ppT>(pb, native_precomp.coeffs[i].gamma));
-                        coeffs[i]->gamma_X.reset(new Fqe_variable<ppT>(pb, native_precomp.coeffs[i].gamma_X));
+                        coeffs[i].reset(new precompute_G2_gadget_coeffs<CurveType>());
+                        coeffs[i]->RX.reset(new Fqe_variable<CurveType>(pb, native_precomp.coeffs[i].old_RX));
+                        coeffs[i]->RY.reset(new Fqe_variable<CurveType>(pb, native_precomp.coeffs[i].old_RY));
+                        coeffs[i]->gamma.reset(new Fqe_variable<CurveType>(pb, native_precomp.coeffs[i].gamma));
+                        coeffs[i]->gamma_X.reset(new Fqe_variable<CurveType>(pb, native_precomp.coeffs[i].gamma_X));
                     }
                 }
 
-                template<typename ppT>
-                precompute_G2_gadget_coeffs<ppT>::precompute_G2_gadget_coeffs() {
+                template<typename CurveType>
+                precompute_G2_gadget_coeffs<CurveType>::precompute_G2_gadget_coeffs() {
                     // we will be filled in precomputed case of precompute_G2_gadget, so do nothing here
                 }
 
-                template<typename ppT>
-                precompute_G2_gadget_coeffs<ppT>::precompute_G2_gadget_coeffs(protoboard<FieldType> &pb) {
-                    RX.reset(new Fqe_variable<ppT>(pb));
-                    RY.reset(new Fqe_variable<ppT>(pb));
-                    gamma.reset(new Fqe_variable<ppT>(pb));
-                    gamma_X.reset(new Fqe_variable<ppT>(pb));
+                template<typename CurveType>
+                precompute_G2_gadget_coeffs<CurveType>::precompute_G2_gadget_coeffs(protoboard<FieldType> &pb) {
+                    RX.reset(new Fqe_variable<CurveType>(pb));
+                    RY.reset(new Fqe_variable<CurveType>(pb));
+                    gamma.reset(new Fqe_variable<CurveType>(pb));
+                    gamma_X.reset(new Fqe_variable<CurveType>(pb));
                 }
 
-                template<typename ppT>
-                precompute_G2_gadget_coeffs<ppT>::precompute_G2_gadget_coeffs(protoboard<FieldType> &pb,
-                                                                              const G2_variable<ppT> &Q) {
-                    RX.reset(new Fqe_variable<ppT>(*(Q.X)));
-                    RY.reset(new Fqe_variable<ppT>(*(Q.Y)));
-                    gamma.reset(new Fqe_variable<ppT>(pb));
-                    gamma_X.reset(new Fqe_variable<ppT>(pb));
+                template<typename CurveType>
+                precompute_G2_gadget_coeffs<CurveType>::precompute_G2_gadget_coeffs(protoboard<FieldType> &pb,
+                                                                              const G2_variable<CurveType> &Q) {
+                    RX.reset(new Fqe_variable<CurveType>(*(Q.X)));
+                    RY.reset(new Fqe_variable<CurveType>(*(Q.Y)));
+                    gamma.reset(new Fqe_variable<CurveType>(pb));
+                    gamma_X.reset(new Fqe_variable<CurveType>(pb));
                 }
 
                 /*
@@ -379,33 +379,33 @@ namespace nil {
                  RY = prev_gamma * (prev_RX - RX) - prev_RY
                  */
 
-                template<typename ppT>
-                precompute_G2_gadget_doubling_step<ppT>::precompute_G2_gadget_doubling_step(
+                template<typename CurveType>
+                precompute_G2_gadget_doubling_step<CurveType>::precompute_G2_gadget_doubling_step(
                     protoboard<FieldType> &pb,
-                    const precompute_G2_gadget_coeffs<ppT> &cur,
-                    const precompute_G2_gadget_coeffs<ppT> &next) :
+                    const precompute_G2_gadget_coeffs<CurveType> &cur,
+                    const precompute_G2_gadget_coeffs<CurveType> &next) :
                     gadget<FieldType>(pb),
                     cur(cur), next(next) {
-                    RXsquared.reset(new Fqe_variable<ppT>(pb));
-                    compute_RXsquared.reset(new Fqe_sqr_gadget<ppT>(pb, *(cur.RX), *RXsquared));
+                    RXsquared.reset(new Fqe_variable<CurveType>(pb));
+                    compute_RXsquared.reset(new Fqe_sqr_gadget<CurveType>(pb, *(cur.RX), *RXsquared));
                     three_RXsquared_plus_a.reset(
-                        new Fqe_variable<ppT>((*RXsquared) * typename FieldType::value_type(3) + algebra::G2<other_curve<ppT>>::coeff_a));
-                    two_RY.reset(new Fqe_variable<ppT>(*(cur.RY) * typename FieldType::value_type(2)));
+                        new Fqe_variable<CurveType>((*RXsquared) * typename FieldType::value_type(3) + algebra::G2<other_curve<CurveType>>::a));
+                    two_RY.reset(new Fqe_variable<CurveType>(*(cur.RY) * typename FieldType::value_type(2)));
 
-                    compute_gamma.reset(new Fqe_mul_gadget<ppT>(pb, *(cur.gamma), *two_RY, *three_RXsquared_plus_a));
-                    compute_gamma_X.reset(new Fqe_mul_gadget<ppT>(pb, *(cur.gamma), *(cur.RX), *(cur.gamma_X)));
+                    compute_gamma.reset(new Fqe_mul_gadget<CurveType>(pb, *(cur.gamma), *two_RY, *three_RXsquared_plus_a));
+                    compute_gamma_X.reset(new Fqe_mul_gadget<CurveType>(pb, *(cur.gamma), *(cur.RX), *(cur.gamma_X)));
 
-                    next_RX_plus_two_RX.reset(new Fqe_variable<ppT>(*(next.RX) + *(cur.RX) * typename FieldType::value_type(2)));
-                    compute_next_RX.reset(new Fqe_sqr_gadget<ppT>(pb, *(cur.gamma), *next_RX_plus_two_RX));
+                    next_RX_plus_two_RX.reset(new Fqe_variable<CurveType>(*(next.RX) + *(cur.RX) * typename FieldType::value_type(2)));
+                    compute_next_RX.reset(new Fqe_sqr_gadget<CurveType>(pb, *(cur.gamma), *next_RX_plus_two_RX));
 
-                    RX_minus_next_RX.reset(new Fqe_variable<ppT>(*(cur.RX) + *(next.RX) * (-FieldType::one())));
-                    RY_plus_next_RY.reset(new Fqe_variable<ppT>(*(cur.RY) + *(next.RY)));
+                    RX_minus_next_RX.reset(new Fqe_variable<CurveType>(*(cur.RX) + *(next.RX) * (-FieldType::one())));
+                    RY_plus_next_RY.reset(new Fqe_variable<CurveType>(*(cur.RY) + *(next.RY)));
                     compute_next_RY.reset(
-                        new Fqe_mul_gadget<ppT>(pb, *(cur.gamma), *RX_minus_next_RX, *RY_plus_next_RY));
+                        new Fqe_mul_gadget<CurveType>(pb, *(cur.gamma), *RX_minus_next_RX, *RY_plus_next_RY));
                 }
 
-                template<typename ppT>
-                void precompute_G2_gadget_doubling_step<ppT>::generate_r1cs_constraints() {
+                template<typename CurveType>
+                void precompute_G2_gadget_doubling_step<CurveType>::generate_r1cs_constraints() {
                     compute_RXsquared->generate_r1cs_constraints();
                     compute_gamma->generate_r1cs_constraints();
                     compute_gamma_X->generate_r1cs_constraints();
@@ -413,8 +413,8 @@ namespace nil {
                     compute_next_RY->generate_r1cs_constraints();
                 }
 
-                template<typename ppT>
-                void precompute_G2_gadget_doubling_step<ppT>::generate_r1cs_witness() {
+                template<typename CurveType>
+                void precompute_G2_gadget_doubling_step<CurveType>::generate_r1cs_witness() {
                     compute_RXsquared->generate_r1cs_witness();
                     two_RY->evaluate();
                     three_RXsquared_plus_a->evaluate();
@@ -457,41 +457,41 @@ namespace nil {
 
                  If invert_Q is set to true: use -QY in place of QY everywhere above.
                  */
-                template<typename ppT>
-                precompute_G2_gadget_addition_step<ppT>::precompute_G2_gadget_addition_step(
+                template<typename CurveType>
+                precompute_G2_gadget_addition_step<CurveType>::precompute_G2_gadget_addition_step(
                     protoboard<FieldType> &pb,
                     const bool invert_Q,
-                    const precompute_G2_gadget_coeffs<ppT> &cur,
-                    const precompute_G2_gadget_coeffs<ppT> &next,
-                    const G2_variable<ppT> &Q) :
+                    const precompute_G2_gadget_coeffs<CurveType> &cur,
+                    const precompute_G2_gadget_coeffs<CurveType> &next,
+                    const G2_variable<CurveType> &Q) :
                     gadget<FieldType>(pb),
                     invert_Q(invert_Q), cur(cur), next(next), Q(Q) {
                     RY_minus_QY.reset(
-                        new Fqe_variable<ppT>(*(cur.RY) + *(Q.Y) * (!invert_Q ? -FieldType::one() : FieldType::one())));
+                        new Fqe_variable<CurveType>(*(cur.RY) + *(Q.Y) * (!invert_Q ? -FieldType::one() : FieldType::one())));
 
-                    RX_minus_QX.reset(new Fqe_variable<ppT>(*(cur.RX) + *(Q.X) * (-FieldType::one())));
-                    compute_gamma.reset(new Fqe_mul_gadget<ppT>(pb, *(cur.gamma), *RX_minus_QX, *RY_minus_QY));
-                    compute_gamma_X.reset(new Fqe_mul_gadget<ppT>(pb, *(cur.gamma), *(Q.X), *(cur.gamma_X)));
+                    RX_minus_QX.reset(new Fqe_variable<CurveType>(*(cur.RX) + *(Q.X) * (-FieldType::one())));
+                    compute_gamma.reset(new Fqe_mul_gadget<CurveType>(pb, *(cur.gamma), *RX_minus_QX, *RY_minus_QY));
+                    compute_gamma_X.reset(new Fqe_mul_gadget<CurveType>(pb, *(cur.gamma), *(Q.X), *(cur.gamma_X)));
 
-                    next_RX_plus_RX_plus_QX.reset(new Fqe_variable<ppT>(*(next.RX) + *(cur.RX) + *(Q.X)));
-                    compute_next_RX.reset(new Fqe_sqr_gadget<ppT>(pb, *(cur.gamma), *next_RX_plus_RX_plus_QX));
+                    next_RX_plus_RX_plus_QX.reset(new Fqe_variable<CurveType>(*(next.RX) + *(cur.RX) + *(Q.X)));
+                    compute_next_RX.reset(new Fqe_sqr_gadget<CurveType>(pb, *(cur.gamma), *next_RX_plus_RX_plus_QX));
 
-                    RX_minus_next_RX.reset(new Fqe_variable<ppT>(*(cur.RX) + *(next.RX) * (-FieldType::one())));
-                    RY_plus_next_RY.reset(new Fqe_variable<ppT>(*(cur.RY) + *(next.RY)));
+                    RX_minus_next_RX.reset(new Fqe_variable<CurveType>(*(cur.RX) + *(next.RX) * (-FieldType::one())));
+                    RY_plus_next_RY.reset(new Fqe_variable<CurveType>(*(cur.RY) + *(next.RY)));
                     compute_next_RY.reset(
-                        new Fqe_mul_gadget<ppT>(pb, *(cur.gamma), *RX_minus_next_RX, *RY_plus_next_RY));
+                        new Fqe_mul_gadget<CurveType>(pb, *(cur.gamma), *RX_minus_next_RX, *RY_plus_next_RY));
                 }
 
-                template<typename ppT>
-                void precompute_G2_gadget_addition_step<ppT>::generate_r1cs_constraints() {
+                template<typename CurveType>
+                void precompute_G2_gadget_addition_step<CurveType>::generate_r1cs_constraints() {
                     compute_gamma->generate_r1cs_constraints();
                     compute_gamma_X->generate_r1cs_constraints();
                     compute_next_RX->generate_r1cs_constraints();
                     compute_next_RY->generate_r1cs_constraints();
                 }
 
-                template<typename ppT>
-                void precompute_G2_gadget_addition_step<ppT>::generate_r1cs_witness() {
+                template<typename CurveType>
+                void precompute_G2_gadget_addition_step<CurveType>::generate_r1cs_witness() {
                     RY_minus_QY->evaluate();
                     RX_minus_QX->evaluate();
 
@@ -520,15 +520,15 @@ namespace nil {
                     compute_next_RY->generate_r1cs_witness();
                 }
 
-                template<typename ppT>
-                precompute_G2_gadget<ppT>::precompute_G2_gadget(protoboard<FieldType> &pb,
-                                                                const G2_variable<ppT> &Q,
-                                                                G2_precomputation<ppT> &precomp) :
+                template<typename CurveType>
+                precompute_G2_gadget<CurveType>::precompute_G2_gadget(protoboard<FieldType> &pb,
+                                                                const G2_variable<CurveType> &Q,
+                                                                G2_precomputation<CurveType> &precomp) :
                     gadget<FieldType>(pb),
                     precomp(precomp) {
-                    precomp.Q.reset(new G2_variable<ppT>(Q));
+                    precomp.Q.reset(new G2_variable<CurveType>(Q));
 
-                    const auto &loop_count = pairing_selector<ppT>::pairing_loop_count;
+                    const auto &loop_count = pairing_selector<CurveType>::pairing_loop_count;
                     std::size_t coeff_count =
                         1;    // the last RX/RY are unused in Miller loop, but will need to get allocated somehow
                     this->add_count = 0;
@@ -556,9 +556,9 @@ namespace nil {
                     addition_steps.resize(add_count);
                     doubling_steps.resize(dbl_count);
 
-                    precomp.coeffs[0].reset(new precompute_G2_gadget_coeffs<ppT>(pb, Q));
+                    precomp.coeffs[0].reset(new precompute_G2_gadget_coeffs<CurveType>(pb, Q));
                     for (std::size_t i = 1; i < coeff_count; ++i) {
-                        precomp.coeffs[i].reset(new precompute_G2_gadget_coeffs<ppT>(pb));
+                        precomp.coeffs[i].reset(new precompute_G2_gadget_coeffs<CurveType>(pb));
                     }
 
                     std::size_t add_id = 0;
@@ -573,13 +573,13 @@ namespace nil {
                             continue;
                         }
 
-                        doubling_steps[dbl_id].reset(new precompute_G2_gadget_doubling_step<ppT>(
+                        doubling_steps[dbl_id].reset(new precompute_G2_gadget_doubling_step<CurveType>(
                             pb, *(precomp.coeffs[coeff_id]), *(precomp.coeffs[coeff_id + 1])));
                         ++dbl_id;
                         ++coeff_id;
 
                         if (NAF[i] != 0) {
-                            addition_steps[add_id].reset(new precompute_G2_gadget_addition_step<ppT>(
+                            addition_steps[add_id].reset(new precompute_G2_gadget_addition_step<CurveType>(
                                 pb, NAF[i] < 0, *(precomp.coeffs[coeff_id]), *(precomp.coeffs[coeff_id + 1]), Q));
                             ++add_id;
                             ++coeff_id;
@@ -587,8 +587,8 @@ namespace nil {
                     }
                 }
 
-                template<typename ppT>
-                void precompute_G2_gadget<ppT>::generate_r1cs_constraints() {
+                template<typename CurveType>
+                void precompute_G2_gadget<CurveType>::generate_r1cs_constraints() {
                     for (std::size_t i = 0; i < dbl_count; ++i) {
                         doubling_steps[i]->generate_r1cs_constraints();
                     }
@@ -598,12 +598,12 @@ namespace nil {
                     }
                 }
 
-                template<typename ppT>
-                void precompute_G2_gadget<ppT>::generate_r1cs_witness() {
+                template<typename CurveType>
+                void precompute_G2_gadget<CurveType>::generate_r1cs_witness() {
                     precomp.coeffs[0]->RX->generate_r1cs_witness(precomp.Q->X->get_element());
                     precomp.coeffs[0]->RY->generate_r1cs_witness(precomp.Q->Y->get_element());
 
-                    const auto &loop_count = pairing_selector<ppT>::pairing_loop_count;
+                    const auto &loop_count = pairing_selector<CurveType>::pairing_loop_count;
 
                     std::size_t add_id = 0;
                     std::size_t dbl_id = 0;
@@ -627,23 +627,23 @@ namespace nil {
                     }
                 }
 
-                template<typename ppT>
+                template<typename CurveType>
                 void test_G2_variable_precomp(const std::string &annotation) {
-                    protoboard<algebra::Fr<ppT>> pb;
-                    algebra::G2<other_curve<ppT>> g_val =
-                        algebra::Fr<other_curve<ppT>>::random_element() * algebra::G2<other_curve<ppT>>::one();
+                    protoboard<typename CurveType::scalar_field_type> pb;
+                    algebra::G2<other_curve<CurveType>> g_val =
+                        algebra::Fr<other_curve<CurveType>>::random_element() * algebra::G2<other_curve<CurveType>>::one();
 
-                    G2_variable<ppT> g(pb, "g");
-                    G2_precomputation<ppT> precomp;
-                    precompute_G2_gadget<ppT> do_precomp(pb, g, precomp);
+                    G2_variable<CurveType> g(pb, "g");
+                    G2_precomputation<CurveType> precomp;
+                    precompute_G2_gadget<CurveType> do_precomp(pb, g, precomp);
                     do_precomp.generate_r1cs_constraints();
 
                     g.generate_r1cs_witness(g_val);
                     do_precomp.generate_r1cs_witness();
                     assert(pb.is_satisfied());
 
-                    algebra::affine_ate_G2_precomp<other_curve<ppT>> native_precomp =
-                        other_curve<ppT>::affine_ate_precompute_G2(g_val);
+                    algebra::affine_ate_G2_precomp<other_curve<CurveType>> native_precomp =
+                        other_curve<CurveType>::affine_ate_precompute_G2(g_val);
 
                     assert(precomp.coeffs.size() - 1 ==
                            native_precomp.coeffs

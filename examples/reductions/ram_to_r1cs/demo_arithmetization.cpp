@@ -64,7 +64,7 @@ int main(int argc, const char *argv[]) {
     typedef algebra::Fr<algebra::default_ec_pp> FieldType;
     typedef ram_tinyram<FieldType> default_ram;
 
-    algebra::default_ec_pp::init_public_params();
+
 
 #ifdef MINDEPS
     std::string assembly_fn = "assembly.s";

@@ -25,82 +25,171 @@ namespace nil {
                 /**
                  * Gadget that represents a G1 variable.
                  */
-                template<typename ppT>
-                class G1_variable : public gadget<algebra::Fr<ppT>> {
-                public:
-                    typedef algebra::Fr<ppT> FieldType;
+                template<typename CurveType>
+                struct G1_variable : public gadget<typename CurveType::scalar_field_type> {
+                    typedef typename CurveType::scalar_field_type FieldType;
 
                     pb_linear_combination<FieldType> X;
                     pb_linear_combination<FieldType> Y;
 
                     pb_linear_combination_array<FieldType> all_vars;
 
-                    G1_variable(protoboard<FieldType> &pb);
-                    G1_variable(protoboard<FieldType> &pb, const algebra::G1<other_curve<ppT>> &P);
+                    G1_variable(protoboard<FieldType> &pb) : gadget<FieldType>(pb) {
+                        pb_variable<FieldType> X_var, Y_var;
 
-                    void generate_r1cs_witness(const algebra::G1<other_curve<ppT>> &elt);
+                        X_var.allocate(pb);
+                        Y_var.allocate(pb);
+
+                        X = pb_linear_combination<FieldType>(X_var);
+                        Y = pb_linear_combination<FieldType>(Y_var);
+
+                        all_vars.emplace_back(X);
+                        all_vars.emplace_back(Y);
+                    }
+
+                    G1_variable(protoboard<FieldType> &pb, const algebra::G1<other_curve<CurveType>> &P) :
+                        gadget<FieldType>(pb) {
+                        algebra::G1<other_curve<CurveType>> Pcopy = P;
+                        Pcopy.to_affine_coordinates();
+
+                        X.assign(pb, Pcopy.X());
+                        Y.assign(pb, Pcopy.Y());
+                        X.evaluate(pb);
+                        Y.evaluate(pb);
+                        all_vars.emplace_back(X);
+                        all_vars.emplace_back(Y);
+                    }
+
+                    template<typename CurveType1>
+                    void generate_r1cs_witness(const algebra::G1<CurveType1> &elt) {
+                        algebra::G1<other_curve<CurveType>> el_normalized = el;
+                        el_normalized.to_affine_coordinates();
+
+                        this->pb.lc_val(X) = el_normalized.X();
+                        this->pb.lc_val(Y) = el_normalized.Y();
+                    }
 
                     // (See a comment in r1cs_ppzksnark_verifier_gadget.hpp about why
                     // we mark this function noinline.) TODO: remove later
-                    static std::size_t __attribute__((noinline)) size_in_bits();
-                    static std::size_t num_variables();
+                    static std::size_t __attribute__((noinline)) size_in_bits() {
+                        return 2 * FieldType::modulus_bits;
+                    }
+                    static std::size_t num_variables() {
+                        return 2;
+                    }
                 };
 
                 /**
                  * Gadget that creates constraints for the validity of a G1 variable.
                  */
-                template<typename ppT>
-                class G1_checker_gadget : public gadget<algebra::Fr<ppT>> {
+                template<typename CurveType>
+                class G1_checker_gadget : public gadget<typename CurveType::scalar_field_type> {
                 public:
-                    typedef algebra::Fr<ppT> FieldType;
+                    typedef typename CurveType::scalar_field_type FieldType;
 
-                    G1_variable<ppT> P;
+                    G1_variable<CurveType> P;
                     pb_variable<FieldType> P_X_squared;
                     pb_variable<FieldType> P_Y_squared;
 
-                    G1_checker_gadget(protoboard<FieldType> &pb, const G1_variable<ppT> &P);
-                    void generate_r1cs_constraints();
-                    void generate_r1cs_witness();
+                    G1_checker_gadget(protoboard<FieldType> &pb, const G1_variable<CurveType> &P) :
+                        gadget<FieldType>(pb), P(P) {
+                        P_X_squared.allocate(pb);
+                        P_Y_squared.allocate(pb);
+                    }
+                    void generate_r1cs_constraints() {
+                        this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>({P.X}, {P.X}, {P_X_squared}));
+                        this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>({P.Y}, {P.Y}, {P_Y_squared}));
+                        this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(
+                            {P.X},
+                            {P_X_squared, pb_variable<FieldType>(0) * algebra::G1<other_curve<CurveType>>::a},
+                            {P_Y_squared, pb_variable<FieldType>(0) * (-algebra::G1<other_curve<CurveType>>::b)}));
+                    }
+                    void generate_r1cs_witness() {
+                        this->pb.val(P_X_squared) = this->pb.lc_val(P.X).squared();
+                        this->pb.val(P_Y_squared) = this->pb.lc_val(P.Y).squared();
+                    }
                 };
 
                 /**
                  * Gadget that creates constraints for G1 addition.
                  */
-                template<typename ppT>
-                class G1_add_gadget : public gadget<algebra::Fr<ppT>> {
+                template<typename CurveType>
+                class G1_add_gadget : public gadget<typename CurveType::scalar_field_type> {
                 public:
-                    typedef algebra::Fr<ppT> FieldType;
+                    typedef typename CurveType::scalar_field_type FieldType;
 
                     pb_variable<FieldType> lambda;
                     pb_variable<FieldType> inv;
 
-                    G1_variable<ppT> A;
-                    G1_variable<ppT> B;
-                    G1_variable<ppT> C;
+                    G1_variable<CurveType> A;
+                    G1_variable<CurveType> B;
+                    G1_variable<CurveType> C;
 
                     G1_add_gadget(protoboard<FieldType> &pb,
-                                  const G1_variable<ppT> &A,
-                                  const G1_variable<ppT> &B,
-                                  const G1_variable<ppT> &C);
-                    void generate_r1cs_constraints();
-                    void generate_r1cs_witness();
+                                  const G1_variable<CurveType> &A,
+                                  const G1_variable<CurveType> &B,
+                                  const G1_variable<CurveType> &C) :
+                        gadget<FieldType>(pb),
+                        A(A), B(B), C(C) {
+                        /*
+                          lambda = (B.y - A.y)/(B.x - A.x)
+                          C.x = lambda^2 - A.x - B.x
+                          C.y = lambda(A.x - C.x) - A.y
+
+                          Special cases:
+
+                          doubling: if B.y = A.y and B.x = A.x then lambda is unbound and
+                          C = (lambda^2, lambda^3)
+
+                          addition of negative point: if B.y = -A.y and B.x = A.x then no
+                          lambda can satisfy the first equation unless B.y - A.y = 0. But
+                          then this reduces to doubling.
+
+                          So we need to check that A.x - B.x != 0, which can be done by
+                          enforcing I * (B.x - A.x) = 1
+                        */
+                        lambda.allocate(pb);
+                        inv.allocate(pb);
+                    }
+                    void generate_r1cs_constraints() {
+                        this->pb.add_r1cs_constraint(
+                            r1cs_constraint<FieldType>({lambda}, {B.X, A.X * (-1)}, {B.Y, A.Y * (-1)}));
+
+                        this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>({lambda}, {lambda}, {C.X, A.X, B.X}));
+
+                        this->pb.add_r1cs_constraint(
+                            r1cs_constraint<FieldType>({lambda}, {A.X, C.X * (-1)}, {C.Y, A.Y}));
+
+                        this->pb.add_r1cs_constraint(
+                            r1cs_constraint<FieldType>({inv}, {B.X, A.X * (-1)}, {pb_variable<FieldType>(0)}));
+                    }
+                    void generate_r1cs_witness() {
+                        this->pb.val(inv) = (this->pb.lc_val(B.X) - this->pb.lc_val(A.X)).inverse();
+                        this->pb.val(lambda) = (this->pb.lc_val(B.Y) - this->pb.lc_val(A.Y)) * this->pb.val(inv);
+                        this->pb.lc_val(C.X) =
+                            this->pb.val(lambda).squared() - this->pb.lc_val(A.X) - this->pb.lc_val(B.X);
+                        this->pb.lc_val(C.Y) =
+                            this->pb.val(lambda) * (this->pb.lc_val(A.X) - this->pb.lc_val(C.X)) - this->pb.lc_val(A.Y);
+                    }
                 };
 
                 /**
                  * Gadget that creates constraints for G1 doubling.
                  */
-                template<typename ppT>
-                class G1_dbl_gadget : public gadget<algebra::Fr<ppT>> {
+                template<typename CurveType>
+                class G1_dbl_gadget : public gadget<typename CurveType::scalar_field_type> {
                 public:
-                    typedef algebra::Fr<ppT> FieldType;
+                    typedef typename CurveType::scalar_field_type FieldType;
 
                     pb_variable<FieldType> Xsquared;
                     pb_variable<FieldType> lambda;
 
-                    G1_variable<ppT> A;
-                    G1_variable<ppT> B;
+                    G1_variable<CurveType> A;
+                    G1_variable<CurveType> B;
 
-                    G1_dbl_gadget(protoboard<FieldType> &pb, const G1_variable<ppT> &A, const G1_variable<ppT> &B);
+                    G1_dbl_gadget(protoboard<FieldType> &pb,
+                                  const G1_variable<CurveType> &A,
+                                  const G1_variable<CurveType> &B);
                     void generate_r1cs_constraints();
                     void generate_r1cs_witness();
                 };
@@ -108,195 +197,80 @@ namespace nil {
                 /**
                  * Gadget that creates constraints for G1 multi-scalar multiplication.
                  */
-                template<typename ppT>
-                class G1_multiscalar_mul_gadget : public gadget<algebra::Fr<ppT>> {
+                template<typename CurveType>
+                class G1_multiscalar_mul_gadget : public gadget<typename CurveType::scalar_field_type> {
                 public:
-                    typedef algebra::Fr<ppT> FieldType;
+                    typedef typename CurveType::scalar_field_type FieldType;
 
-                    std::vector<G1_variable<ppT>> computed_results;
-                    std::vector<G1_variable<ppT>> chosen_results;
-                    std::vector<G1_add_gadget<ppT>> adders;
-                    std::vector<G1_dbl_gadget<ppT>> doublers;
+                    std::vector<G1_variable<CurveType>> computed_results;
+                    std::vector<G1_variable<CurveType>> chosen_results;
+                    std::vector<G1_add_gadget<CurveType>> adders;
+                    std::vector<G1_dbl_gadget<CurveType>> doublers;
 
-                    G1_variable<ppT> base;
+                    G1_variable<CurveType> base;
                     pb_variable_array<FieldType> scalars;
-                    std::vector<G1_variable<ppT>> points;
-                    std::vector<G1_variable<ppT>> points_and_powers;
-                    G1_variable<ppT> result;
+                    std::vector<G1_variable<CurveType>> points;
+                    std::vector<G1_variable<CurveType>> points_and_powers;
+                    G1_variable<CurveType> result;
 
                     const std::size_t elt_size;
                     const std::size_t num_points;
                     const std::size_t scalar_size;
 
                     G1_multiscalar_mul_gadget(protoboard<FieldType> &pb,
-                                              const G1_variable<ppT> &base,
+                                              const G1_variable<CurveType> &base,
                                               const pb_variable_array<FieldType> &scalars,
                                               const std::size_t elt_size,
-                                              const std::vector<G1_variable<ppT>> &points,
-                                              const G1_variable<ppT> &result);
+                                              const std::vector<G1_variable<CurveType>> &points,
+                                              const G1_variable<CurveType> &result);
                     void generate_r1cs_constraints();
                     void generate_r1cs_witness();
                 };
 
-                template<typename ppT>
-                G1_variable<ppT>::G1_variable(protoboard<FieldType> &pb) : gadget<FieldType>(pb) {
-                    pb_variable<FieldType> X_var, Y_var;
-
-                    X_var.allocate(pb);
-                    Y_var.allocate(pb);
-
-                    X = pb_linear_combination<FieldType>(X_var);
-                    Y = pb_linear_combination<FieldType>(Y_var);
-
-                    all_vars.emplace_back(X);
-                    all_vars.emplace_back(Y);
-                }
-
-                template<typename ppT>
-                G1_variable<ppT>::G1_variable(protoboard<FieldType> &pb, const algebra::G1<other_curve<ppT>> &P) :
-                    gadget<FieldType>(pb) {
-                    algebra::G1<other_curve<ppT>> Pcopy = P;
-                    Pcopy.to_affine_coordinates();
-
-                    X.assign(pb, Pcopy.X());
-                    Y.assign(pb, Pcopy.Y());
-                    X.evaluate(pb);
-                    Y.evaluate(pb);
-                    all_vars.emplace_back(X);
-                    all_vars.emplace_back(Y);
-                }
-
-                template<typename ppT>
-                void G1_variable<ppT>::generate_r1cs_witness(const algebra::G1<other_curve<ppT>> &el) {
-                    algebra::G1<other_curve<ppT>> el_normalized = el;
-                    el_normalized.to_affine_coordinates();
-
-                    this->pb.lc_val(X) = el_normalized.X();
-                    this->pb.lc_val(Y) = el_normalized.Y();
-                }
-
-                template<typename ppT>
-                std::size_t G1_variable<ppT>::size_in_bits() {
-                    return 2 * FieldType::modulus_bits;
-                }
-
-                template<typename ppT>
-                std::size_t G1_variable<ppT>::num_variables() {
-                    return 2;
-                }
-
-                template<typename ppT>
-                G1_checker_gadget<ppT>::G1_checker_gadget(protoboard<FieldType> &pb, const G1_variable<ppT> &P) :
-                    gadget<FieldType>(pb), P(P) {
-                    P_X_squared.allocate(pb);
-                    P_Y_squared.allocate(pb);
-                }
-
-                template<typename ppT>
-                void G1_checker_gadget<ppT>::generate_r1cs_constraints() {
-                    this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>({P.X}, {P.X}, {P_X_squared}));
-                    this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>({P.Y}, {P.Y}, {P_Y_squared}));
-                    this->pb.add_r1cs_constraint(
-                        r1cs_constraint<FieldType>({P.X},
-                                                   {P_X_squared, pb_variable<FieldType>(0) * algebra::G1<other_curve<ppT>>::coeff_a},
-                                                   {P_Y_squared, pb_variable<FieldType>(0) * (-algebra::G1<other_curve<ppT>>::coeff_b)}));
-                }
-
-                template<typename ppT>
-                void G1_checker_gadget<ppT>::generate_r1cs_witness() {
-                    this->pb.val(P_X_squared) = this->pb.lc_val(P.X).squared();
-                    this->pb.val(P_Y_squared) = this->pb.lc_val(P.Y).squared();
-                }
-
-                template<typename ppT>
-                G1_add_gadget<ppT>::G1_add_gadget(protoboard<FieldType> &pb,
-                                                  const G1_variable<ppT> &A,
-                                                  const G1_variable<ppT> &B,
-                                                  const G1_variable<ppT> &C) :
-                    gadget<FieldType>(pb),
-                    A(A), B(B), C(C) {
-                    /*
-                      lambda = (B.y - A.y)/(B.x - A.x)
-                      C.x = lambda^2 - A.x - B.x
-                      C.y = lambda(A.x - C.x) - A.y
-
-                      Special cases:
-
-                      doubling: if B.y = A.y and B.x = A.x then lambda is unbound and
-                      C = (lambda^2, lambda^3)
-
-                      addition of negative point: if B.y = -A.y and B.x = A.x then no
-                      lambda can satisfy the first equation unless B.y - A.y = 0. But
-                      then this reduces to doubling.
-
-                      So we need to check that A.x - B.x != 0, which can be done by
-                      enforcing I * (B.x - A.x) = 1
-                    */
-                    lambda.allocate(pb);
-                    inv.allocate(pb);
-                }
-
-                template<typename ppT>
-                void G1_add_gadget<ppT>::generate_r1cs_constraints() {
-                    this->pb.add_r1cs_constraint(
-                        r1cs_constraint<FieldType>({lambda}, {B.X, A.X * (-1)}, {B.Y, A.Y * (-1)}));
-
-                    this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>({lambda}, {lambda}, {C.X, A.X, B.X}));
-
-                    this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>({lambda}, {A.X, C.X * (-1)}, {C.Y, A.Y}));
-
-                    this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>({inv}, {B.X, A.X * (-1)}, {pb_variable<FieldType>(0)}));
-                }
-
-                template<typename ppT>
-                void G1_add_gadget<ppT>::generate_r1cs_witness() {
-                    this->pb.val(inv) = (this->pb.lc_val(B.X) - this->pb.lc_val(A.X)).inverse();
-                    this->pb.val(lambda) = (this->pb.lc_val(B.Y) - this->pb.lc_val(A.Y)) * this->pb.val(inv);
-                    this->pb.lc_val(C.X) = this->pb.val(lambda).squared() - this->pb.lc_val(A.X) - this->pb.lc_val(B.X);
-                    this->pb.lc_val(C.Y) =
-                        this->pb.val(lambda) * (this->pb.lc_val(A.X) - this->pb.lc_val(C.X)) - this->pb.lc_val(A.Y);
-                }
-
-                template<typename ppT>
-                G1_dbl_gadget<ppT>::G1_dbl_gadget(protoboard<FieldType> &pb,
-                                                  const G1_variable<ppT> &A,
-                                                  const G1_variable<ppT> &B) :
+                template<typename CurveType>
+                G1_dbl_gadget<CurveType>::G1_dbl_gadget(protoboard<FieldType> &pb,
+                                                        const G1_variable<CurveType> &A,
+                                                        const G1_variable<CurveType> &B) :
                     gadget<FieldType>(pb),
                     A(A), B(B) {
                     Xsquared.allocate(pb);
                     lambda.allocate(pb);
                 }
 
-                template<typename ppT>
-                void G1_dbl_gadget<ppT>::generate_r1cs_constraints() {
+                template<typename CurveType>
+                void G1_dbl_gadget<CurveType>::generate_r1cs_constraints() {
                     this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>({A.X}, {A.X}, {Xsquared}));
 
                     this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(
-                        {lambda * 2}, {A.Y}, {Xsquared * 3, pb_variable<FieldType>(0) * algebra::G1<other_curve<ppT>>::coeff_a}));
+                        {lambda * 2},
+                        {A.Y},
+                        {Xsquared * 3, pb_variable<FieldType>(0) * algebra::G1<other_curve<CurveType>>::a}));
 
                     this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>({lambda}, {lambda}, {B.X, A.X * 2}));
 
                     this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>({lambda}, {A.X, B.X * (-1)}, {B.Y, A.Y}));
                 }
 
-                template<typename ppT>
-                void G1_dbl_gadget<ppT>::generate_r1cs_witness() {
+                template<typename CurveType>
+                void G1_dbl_gadget<CurveType>::generate_r1cs_witness() {
                     this->pb.val(Xsquared) = this->pb.lc_val(A.X).squared();
-                    this->pb.val(lambda) =
-                        (typename FieldType::value_type(3) * this->pb.val(Xsquared) + algebra::G1<other_curve<ppT>>::coeff_a) *
-                        (typename FieldType::value_type(2) * this->pb.lc_val(A.Y)).inverse();
-                    this->pb.lc_val(B.X) = this->pb.val(lambda).squared() - typename FieldType::value_type(2) * this->pb.lc_val(A.X);
+                    this->pb.val(lambda) = (typename FieldType::value_type(3) * this->pb.val(Xsquared) +
+                                            algebra::G1<other_curve<CurveType>>::a) *
+                                           (typename FieldType::value_type(2) * this->pb.lc_val(A.Y)).inverse();
+                    this->pb.lc_val(B.X) =
+                        this->pb.val(lambda).squared() - typename FieldType::value_type(2) * this->pb.lc_val(A.X);
                     this->pb.lc_val(B.Y) =
                         this->pb.val(lambda) * (this->pb.lc_val(A.X) - this->pb.lc_val(B.X)) - this->pb.lc_val(A.Y);
                 }
 
-                template<typename ppT>
-                G1_multiscalar_mul_gadget<ppT>::G1_multiscalar_mul_gadget(protoboard<FieldType> &pb,
-                                                                          const G1_variable<ppT> &base,
-                                                                          const pb_variable_array<FieldType> &scalars,
-                                                                          const std::size_t elt_size,
-                                                                          const std::vector<G1_variable<ppT>> &points,
-                                                                          const G1_variable<ppT> &result) :
+                template<typename CurveType>
+                G1_multiscalar_mul_gadget<CurveType>::G1_multiscalar_mul_gadget(
+                    protoboard<FieldType> &pb,
+                    const G1_variable<CurveType> &base,
+                    const pb_variable_array<FieldType> &scalars,
+                    const std::size_t elt_size,
+                    const std::vector<G1_variable<CurveType>> &points,
+                    const G1_variable<CurveType> &result) :
                     gadget<FieldType>(pb),
                     base(base), scalars(scalars), points(points), result(result), elt_size(elt_size),
                     num_points(points.size()), scalar_size(scalars.size()) {
@@ -306,28 +280,28 @@ namespace nil {
                     for (std::size_t i = 0; i < num_points; ++i) {
                         points_and_powers.emplace_back(points[i]);
                         for (std::size_t j = 0; j < elt_size - 1; ++j) {
-                            points_and_powers.emplace_back(G1_variable<ppT>(pb));
-                            doublers.emplace_back(G1_dbl_gadget<ppT>(
+                            points_and_powers.emplace_back(G1_variable<CurveType>(pb));
+                            doublers.emplace_back(G1_dbl_gadget<CurveType>(
                                 pb, points_and_powers[i * elt_size + j], points_and_powers[i * elt_size + j + 1]));
                         }
                     }
 
                     chosen_results.emplace_back(base);
                     for (std::size_t i = 0; i < scalar_size; ++i) {
-                        computed_results.emplace_back(G1_variable<ppT>(pb));
+                        computed_results.emplace_back(G1_variable<CurveType>(pb));
                         if (i < scalar_size - 1) {
-                            chosen_results.emplace_back(G1_variable<ppT>(pb));
+                            chosen_results.emplace_back(G1_variable<CurveType>(pb));
                         } else {
                             chosen_results.emplace_back(result);
                         }
 
                         adders.emplace_back(
-                            G1_add_gadget<ppT>(pb, chosen_results[i], points_and_powers[i], computed_results[i]));
+                            G1_add_gadget<CurveType>(pb, chosen_results[i], points_and_powers[i], computed_results[i]));
                     }
                 }
 
-                template<typename ppT>
-                void G1_multiscalar_mul_gadget<ppT>::generate_r1cs_constraints() {
+                template<typename CurveType>
+                void G1_multiscalar_mul_gadget<CurveType>::generate_r1cs_constraints() {
                     const std::size_t num_constraints_before = this->pb.num_constraints();
 
                     for (std::size_t i = 0; i < scalar_size - num_points; ++i) {
@@ -357,8 +331,8 @@ namespace nil {
                            4 * (scalar_size - num_points) + (4 + 2) * scalar_size);
                 }
 
-                template<typename ppT>
-                void G1_multiscalar_mul_gadget<ppT>::generate_r1cs_witness() {
+                template<typename CurveType>
+                void G1_multiscalar_mul_gadget<CurveType>::generate_r1cs_witness() {
                     for (std::size_t i = 0; i < scalar_size - num_points; ++i) {
                         doublers[i].generate_r1cs_witness();
                     }
@@ -366,11 +340,11 @@ namespace nil {
                     for (std::size_t i = 0; i < scalar_size; ++i) {
                         adders[i].generate_r1cs_witness();
                         this->pb.lc_val(chosen_results[i + 1].X) =
-                            (this->pb.val(scalars[i]) == algebra::Fr<ppT>::zero() ?
+                            (this->pb.val(scalars[i]) == typename CurveType::scalar_field_type::zero() ?
                                  this->pb.lc_val(chosen_results[i].X) :
                                  this->pb.lc_val(computed_results[i].X));
                         this->pb.lc_val(chosen_results[i + 1].Y) =
-                            (this->pb.val(scalars[i]) == algebra::Fr<ppT>::zero() ?
+                            (this->pb.val(scalars[i]) == typename CurveType::scalar_field_type::zero() ?
                                  this->pb.lc_val(chosen_results[i].Y) :
                                  this->pb.lc_val(computed_results[i].Y));
                     }

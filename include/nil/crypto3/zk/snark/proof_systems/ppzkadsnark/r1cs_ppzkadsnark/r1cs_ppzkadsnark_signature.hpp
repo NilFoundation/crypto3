@@ -18,28 +18,28 @@ namespace nil {
         namespace zk {
             namespace snark {
 
-                template<typename ppT>
+                template<typename CurveType>
                 class kpT {
                 public:
-                    r1cs_ppzkadsnark_skT<ppT> sk;
-                    r1cs_ppzkadsnark_vkT<ppT> vk;
+                    r1cs_ppzkadsnark_skT<CurveType> sk;
+                    r1cs_ppzkadsnark_vkT<CurveType> vk;
                 };
 
-                template<typename ppT>
-                kpT<ppT> sigGen(void);
+                template<typename CurveType>
+                kpT<CurveType> sigGen(void);
 
-                template<typename ppT>
-                r1cs_ppzkadsnark_sigT<ppT> sigSign(const r1cs_ppzkadsnark_skT<ppT> &sk, const labelT &label,
-                                                   const algebra::G2<snark_pp<ppT>> &Lambda);
+                template<typename CurveType>
+                r1cs_ppzkadsnark_sigT<CurveType> sigSign(const r1cs_ppzkadsnark_skT<CurveType> &sk, const labelT &label,
+                                                   const algebra::G2<snark_pp<CurveType>> &Lambda);
 
-                template<typename ppT>
-                bool sigVerif(const r1cs_ppzkadsnark_vkT<ppT> &vk, const labelT &label,
-                              const algebra::G2<snark_pp<ppT>> &Lambda, const r1cs_ppzkadsnark_sigT<ppT> &sig);
+                template<typename CurveType>
+                bool sigVerif(const r1cs_ppzkadsnark_vkT<CurveType> &vk, const labelT &label,
+                              const algebra::G2<snark_pp<CurveType>> &Lambda, const r1cs_ppzkadsnark_sigT<CurveType> &sig);
 
-                template<typename ppT>
-                bool sigBatchVerif(const r1cs_ppzkadsnark_vkT<ppT> &vk, const std::vector<labelT> &labels,
-                                   const std::vector<algebra::G2<snark_pp<ppT>>> &Lambdas,
-                                   const std::vector<r1cs_ppzkadsnark_sigT<ppT>> &sigs);
+                template<typename CurveType>
+                bool sigBatchVerif(const r1cs_ppzkadsnark_vkT<CurveType> &vk, const std::vector<labelT> &labels,
+                                   const std::vector<algebra::G2<snark_pp<CurveType>>> &Lambdas,
+                                   const std::vector<r1cs_ppzkadsnark_sigT<CurveType>> &sigs);
 
             }    // namespace snark
         }        // namespace zk

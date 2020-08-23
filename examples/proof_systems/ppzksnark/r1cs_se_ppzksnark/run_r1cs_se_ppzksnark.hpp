@@ -23,8 +23,8 @@ namespace nil {
                  * Optionally, also test the serialization routines for keys and proofs.
                  * (This takes additional time.)
                  */
-                template<typename ppT>
-                bool run_r1cs_se_ppzksnark(const r1cs_example<algebra::Fr<ppT>> &example, const bool test_serialization);
+                template<typename CurveType>
+                bool run_r1cs_se_ppzksnark(const r1cs_example<typename CurveType::scalar_field_type> &example, const bool test_serialization);
 
                 /**
                  * The code below provides an example of all stages of running a R1CS SEppzkSNARK.
@@ -38,45 +38,45 @@ namespace nil {
                  * (3) The "verifier", which runs the SEppzkSNARK verifier on input the verification key,
                  *     a primary input for CS, and a proof.
                  */
-                template<typename ppT>
-                bool run_r1cs_se_ppzksnark(const r1cs_example<algebra::Fr<ppT>> &example, const bool test_serialization) {
+                template<typename CurveType>
+                bool run_r1cs_se_ppzksnark(const r1cs_example<typename CurveType::scalar_field_type> &example, const bool test_serialization) {
                     algebra::enter_block("Call to run_r1cs_se_ppzksnark");
 
                     algebra::print_header("R1CS SEppzkSNARK Generator");
-                    r1cs_se_ppzksnark_keypair<ppT> keypair =
-                        r1cs_se_ppzksnark_generator<ppT>(example.constraint_system);
+                    r1cs_se_ppzksnark_keypair<CurveType> keypair =
+                        r1cs_se_ppzksnark_generator<CurveType>(example.constraint_system);
                     printf("\n");
                     algebra::print_indent();
                     algebra::print_mem("after generator");
 
                     algebra::print_header("Preprocess verification key");
-                    r1cs_se_ppzksnark_processed_verification_key<ppT> pvk =
-                        r1cs_se_ppzksnark_verifier_process_vk<ppT>(keypair.vk);
+                    r1cs_se_ppzksnark_processed_verification_key<CurveType> pvk =
+                        r1cs_se_ppzksnark_verifier_process_vk<CurveType>(keypair.vk);
 
                     if (test_serialization) {
                         algebra::enter_block("Test serialization of keys");
-                        keypair.pk = algebra::reserialize<r1cs_se_ppzksnark_proving_key<ppT>>(keypair.pk);
-                        keypair.vk = algebra::reserialize<r1cs_se_ppzksnark_verification_key<ppT>>(keypair.vk);
-                        pvk = algebra::reserialize<r1cs_se_ppzksnark_processed_verification_key<ppT>>(pvk);
+                        keypair.pk = algebra::reserialize<r1cs_se_ppzksnark_proving_key<CurveType>>(keypair.pk);
+                        keypair.vk = algebra::reserialize<r1cs_se_ppzksnark_verification_key<CurveType>>(keypair.vk);
+                        pvk = algebra::reserialize<r1cs_se_ppzksnark_processed_verification_key<CurveType>>(pvk);
                         algebra::leave_block("Test serialization of keys");
                     }
 
                     algebra::print_header("R1CS SEppzkSNARK Prover");
-                    r1cs_se_ppzksnark_proof<ppT> proof =
-                        r1cs_se_ppzksnark_prover<ppT>(keypair.pk, example.primary_input, example.auxiliary_input);
+                    r1cs_se_ppzksnark_proof<CurveType> proof =
+                        r1cs_se_ppzksnark_prover<CurveType>(keypair.pk, example.primary_input, example.auxiliary_input);
                     printf("\n");
                     algebra::print_indent();
                     algebra::print_mem("after prover");
 
                     if (test_serialization) {
                         algebra::enter_block("Test serialization of proof");
-                        proof = algebra::reserialize<r1cs_se_ppzksnark_proof<ppT>>(proof);
+                        proof = algebra::reserialize<r1cs_se_ppzksnark_proof<CurveType>>(proof);
                         algebra::leave_block("Test serialization of proof");
                     }
 
                     algebra::print_header("R1CS SEppzkSNARK Verifier");
                     const bool ans =
-                        r1cs_se_ppzksnark_verifier_strong_IC<ppT>(keypair.vk, example.primary_input, proof);
+                        r1cs_se_ppzksnark_verifier_strong_IC<CurveType>(keypair.vk, example.primary_input, proof);
                     printf("\n");
                     algebra::print_indent();
                     algebra::print_mem("after verifier");
@@ -84,7 +84,7 @@ namespace nil {
 
                     algebra::print_header("R1CS SEppzkSNARK Online Verifier");
                     const bool ans2 =
-                        r1cs_se_ppzksnark_online_verifier_strong_IC<ppT>(pvk, example.primary_input, proof);
+                        r1cs_se_ppzksnark_online_verifier_strong_IC<CurveType>(pvk, example.primary_input, proof);
                     assert(ans == ans2);
 
                     algebra::leave_block("Call to run_r1cs_se_ppzksnark");

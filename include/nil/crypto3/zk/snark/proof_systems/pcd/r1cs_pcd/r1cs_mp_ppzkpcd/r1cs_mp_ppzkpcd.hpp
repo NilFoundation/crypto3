@@ -244,14 +244,14 @@ namespace nil {
 
                 /*********************************** Proof ***********************************/
 
-                template<typename ppT>
+                template<typename CurveType>
                 class r1cs_mp_ppzkpcd_proof;
 
-                template<typename ppT>
-                std::ostream &operator<<(std::ostream &out, const r1cs_mp_ppzkpcd_proof<ppT> &proof);
+                template<typename CurveType>
+                std::ostream &operator<<(std::ostream &out, const r1cs_mp_ppzkpcd_proof<CurveType> &proof);
 
-                template<typename ppT>
-                std::istream &operator>>(std::istream &in, r1cs_mp_ppzkpcd_proof<ppT> &proof);
+                template<typename CurveType>
+                std::istream &operator>>(std::istream &in, r1cs_mp_ppzkpcd_proof<CurveType> &proof);
 
                 /**
                  * A proof for the R1CS (multi-predicate) ppzkPCD.

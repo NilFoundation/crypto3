@@ -18,11 +18,11 @@ namespace nil {
         namespace zk {
             namespace snark {
 
-                template<typename ppT>
-                r1cs_ppzkadsnark_prfKeyT<ppT> prfGen();
+                template<typename CurveType>
+                r1cs_ppzkadsnark_prfKeyT<CurveType> prfGen();
 
-                template<typename ppT>
-                algebra::Fr<snark_pp<ppT>> prfCompute(const r1cs_ppzkadsnark_prfKeyT<ppT> &key, const labelT &label);
+                template<typename CurveType>
+                algebra::Fr<snark_pp<CurveType>> prfCompute(const r1cs_ppzkadsnark_prfKeyT<CurveType> &key, const labelT &label);
 
             }    // namespace snark
         }        // namespace zk

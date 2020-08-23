@@ -30,24 +30,24 @@ void simulate_random_memory_contents(const tinyram_architecture_params &ap, cons
     algebra::leave_block("Initialize random delegated memory");
 }
 
-template<typename ppT>
+template<typename CurveType>
 void profile_ram_zksnark_verifier(const tinyram_architecture_params &ap, const std::size_t input_size,
                                   const std::size_t program_size) {
-    typedef ram_zksnark_machine_pp<ppT> ramT;
+    typedef ram_zksnark_machine_pp<CurveType> ramT;
     const std::size_t time_bound = 10;
 
     const std::size_t boot_trace_size_bound = program_size + input_size;
     const ram_example<ramT> example = gen_ram_example_complex<ramT>(ap, boot_trace_size_bound, time_bound, true);
 
-    ram_zksnark_proof<ppT> pi;
-    ram_zksnark_verification_key<ppT> vk = ram_zksnark_verification_key<ppT>::dummy_verification_key(ap);
+    ram_zksnark_proof<CurveType> pi;
+    ram_zksnark_verification_key<CurveType> vk = ram_zksnark_verification_key<CurveType>::dummy_verification_key(ap);
 
     algebra::enter_block("Verify fake proof");
-    ram_zksnark_verifier<ppT>(vk, example.boot_trace, time_bound, pi);
+    ram_zksnark_verifier<CurveType>(vk, example.boot_trace, time_bound, pi);
     algebra::leave_block("Verify fake proof");
 }
 
-template<typename ppT>
+template<typename CurveType>
 void print_ram_zksnark_verifier_profiling() {
     algebra::inhibit_profiling_info = true;
     for (std::size_t w : {16, 32}) {
@@ -57,7 +57,7 @@ void print_ram_zksnark_verifier_profiling() {
             for (std::size_t program_size = 10; program_size <= 10000; program_size *= 10) {
                 const tinyram_architecture_params ap(w, k);
 
-                profile_ram_zksnark_verifier<ppT>(ap, input_size, program_size);
+                profile_ram_zksnark_verifier<CurveType>(ap, input_size, program_size);
 
                 const double input_map = algebra::last_times["Call to ram_zksnark_verifier_input_map"];
                 const double preprocessing = algebra::last_times["Call to r1cs_ppzksnark_verifier_process_vk"];
@@ -67,7 +67,7 @@ void print_ram_zksnark_verifier_profiling() {
                 const double rest = total - (input_map + preprocessing + accumulate + pairings);
 
                 const double delegated_ra_memory_init = algebra::last_times["Construct delegated_ra_memory from memory map"];
-                simulate_random_memory_contents<algebra::Fr<typename ppT::curve_A_pp>>(ap, input_size, program_size);
+                simulate_random_memory_contents<algebra::Fr<typename CurveType::curve_A_pp>>(ap, input_size, program_size);
                 const double delegated_ra_memory_init_random = algebra::last_times["Initialize random delegated memory"];
                 const double input_map_random = input_map - delegated_ra_memory_init + delegated_ra_memory_init_random;
                 const double total_random = total - delegated_ra_memory_init + delegated_ra_memory_init_random;
@@ -83,15 +83,15 @@ void print_ram_zksnark_verifier_profiling() {
     }
 }
 
-template<typename ppT>
+template<typename CurveType>
 void profile_ram_zksnark(const tinyram_architecture_params &ap, const std::size_t program_size, const std::size_t input_size,
                          const std::size_t time_bound) {
-    typedef ram_zksnark_machine_pp<ppT> ramT;
+    typedef ram_zksnark_machine_pp<CurveType> ramT;
 
     const std::size_t boot_trace_size_bound = program_size + input_size;
     const ram_example<ramT> example = gen_ram_example_complex<ramT>(ap, boot_trace_size_bound, time_bound, true);
     const bool test_serialization = true;
-    const bool bit = run_ram_zksnark<ppT>(example, test_serialization);
+    const bool bit = run_ram_zksnark<CurveType>(example, test_serialization);
     assert(bit);
 }
 

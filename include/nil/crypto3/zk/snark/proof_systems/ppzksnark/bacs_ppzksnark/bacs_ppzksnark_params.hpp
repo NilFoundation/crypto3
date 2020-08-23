@@ -22,14 +22,14 @@ namespace nil {
                  * Below are various template aliases (used for convenience).
                  */
 
-                template<typename ppT>
-                using bacs_ppzksnark_circuit = bacs_circuit<algebra::Fr<ppT>>;
+                template<typename CurveType>
+                using bacs_ppzksnark_circuit = bacs_circuit<typename CurveType::scalar_field_type>;
 
-                template<typename ppT>
-                using bacs_ppzksnark_primary_input = bacs_primary_input<algebra::Fr<ppT>>;
+                template<typename CurveType>
+                using bacs_ppzksnark_primary_input = bacs_primary_input<typename CurveType::scalar_field_type>;
 
-                template<typename ppT>
-                using bacs_ppzksnark_auxiliary_input = bacs_auxiliary_input<algebra::Fr<ppT>>;
+                template<typename CurveType>
+                using bacs_ppzksnark_auxiliary_input = bacs_auxiliary_input<typename CurveType::scalar_field_type>;
 
             }    // namespace snark
         }        // namespace zk

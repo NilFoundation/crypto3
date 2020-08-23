@@ -5,7 +5,7 @@
 // See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
-// @file Declaration of specializations of pairing_selector<ppT> to
+// @file Declaration of specializations of pairing_selector<CurveType> to
 // - pairing_selector<algebra::algebra::mnt4_pp>, and
 // - pairing_selector<algebra::algebra::mnt6_pp>.
 //
@@ -26,16 +26,16 @@ namespace nil {
         namespace zk {
             namespace snark {
 
-                template<typename ppT>
+                template<typename CurveType>
                 class mnt_e_over_e_miller_loop_gadget;
 
-                template<typename ppT>
+                template<typename CurveType>
                 class mnt_e_times_e_over_e_miller_loop_gadget;
 
-                template<typename ppT>
+                template<typename CurveType>
                 class mnt4_final_exp_gadget;
 
-                template<typename ppT>
+                template<typename CurveType>
                 class mnt6_final_exp_gadget;
 
                 /**

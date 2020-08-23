@@ -21,22 +21,22 @@
 
 using namespace nil::crypto3::zk::snark;
 
-template<typename ppT>
+template<typename CurveType>
 void test_ram_ppzksnark(const std::size_t w,
                         const std::size_t k,
                         const std::size_t program_size,
                         const std::size_t input_size,
                         const std::size_t time_bound) {
-    typedef ram_ppzksnark_machine_pp<ppT> machine_ppT;
+    typedef ram_ppzksnark_machine_pp<CurveType> machine_ppT;
     const std::size_t boot_trace_size_bound = program_size + input_size;
     const bool satisfiable = true;
 
-    const ram_ppzksnark_architecture_params<ppT> ap(w, k);
+    const ram_ppzksnark_architecture_params<CurveType> ap(w, k);
     const ram_example<machine_ppT> example =
         gen_ram_example_complex<machine_ppT>(ap, boot_trace_size_bound, time_bound, satisfiable);
 
     const bool test_serialization = true;
-    const bool bit = run_ram_ppzksnark<ppT>(example, test_serialization);
+    const bool bit = run_ram_ppzksnark<CurveType>(example, test_serialization);
     BOOST_CHECK(bit);
 }
 

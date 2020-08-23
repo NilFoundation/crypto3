@@ -22,14 +22,14 @@ namespace nil {
                  * Below are various template aliases (used for convenience).
                  */
 
-                template<typename ppT>
-                using r1cs_ppzksnark_constraint_system = r1cs_constraint_system<algebra::Fr<ppT>>;
+                template<typename CurveType>
+                using r1cs_ppzksnark_constraint_system = r1cs_constraint_system<typename CurveType::scalar_field_type>;
 
-                template<typename ppT>
-                using r1cs_ppzksnark_primary_input = r1cs_primary_input<algebra::Fr<ppT>>;
+                template<typename CurveType>
+                using r1cs_ppzksnark_primary_input = r1cs_primary_input<typename CurveType::scalar_field_type>;
 
-                template<typename ppT>
-                using r1cs_ppzksnark_auxiliary_input = r1cs_auxiliary_input<algebra::Fr<ppT>>;
+                template<typename CurveType>
+                using r1cs_ppzksnark_auxiliary_input = r1cs_auxiliary_input<typename CurveType::scalar_field_type>;
 
             }    // namespace snark
         }        // namespace zk
