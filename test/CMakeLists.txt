@@ -13,15 +13,20 @@ if(BOOST_CMAKE)
     find_package(${CMAKE_WORKSPACE_NAME}_filesystem)
     find_package(${CMAKE_WORKSPACE_NAME}_test)
     find_package(${CMAKE_WORKSPACE_NAME}_math)
+    find_package(${CMAKE_WORKSPACE_NAME}_multiprecision)
 
     cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
                            ${CMAKE_WORKSPACE_NAME}::filesystem
                            ${CMAKE_WORKSPACE_NAME}::test
-                           ${CMAKE_WORKSPACE_NAME}::math)
+                           ${CMAKE_WORKSPACE_NAME}::math
+                           ${CMAKE_WORKSPACE_NAME}::multiprecision)
 else()
     find_package(Boost REQUIRED COMPONENTS filesystem unit_test_framework)
 
     cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
+
+                           $<TARGET_NAME_IF_EXISTS:boost_multiprecision>
+
                            ${Boost_LIBRARIES})
 
     include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../include"
@@ -140,5 +145,10 @@ cm_test(NAME ${CURRENT_PROJECT_NAME}_test_test_non_central_chi_squared_distribut
 cm_test(NAME ${CURRENT_PROJECT_NAME}_test_test_hyperexponential SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_hyperexponential.cpp)
 cm_test(NAME ${CURRENT_PROJECT_NAME}_test_test_hyperexponential_distribution SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_hyperexponential_distribution.cpp)
 
-include_directories(${CMAKE_WORKSPACE_SOURCES_DIR})
+if(Boost_MULTIPRECISION_FOUND OR TARGET boost_multiprecision)
+    cm_test(NAME ${CURRENT_PROJECT_NAME}_test_multiprecision_int_test SOURCES ${CURRENT_TEST_SOURCES_DIR}/multiprecision_int_test.cpp)
+    cm_test(NAME ${CURRENT_PROJECT_NAME}_test_multiprecision_float_test SOURCES
+            ${CURRENT_TEST_SOURCES_DIR}/multiprecision_float_test.cpp)
+endif()
 
+include_directories(${CMAKE_WORKSPACE_SOURCES_DIR})
