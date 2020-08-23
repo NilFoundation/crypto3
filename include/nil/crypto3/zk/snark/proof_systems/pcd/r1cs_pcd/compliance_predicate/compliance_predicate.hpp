@@ -63,7 +63,7 @@ namespace nil {
                 /******************************** Witness ************************************/
 
                 template<typename FieldType>
-                using r1cs_pcd_witness = std::vector<FieldType>;
+                using r1cs_pcd_witness = std::vector<typename FieldType::value_type>;
 
                 /*************************** Compliance predicate ****************************/
 

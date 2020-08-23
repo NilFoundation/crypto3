@@ -146,7 +146,7 @@ namespace nil {
                     const std::shared_ptr<algebra::fft::evaluation_domain<FieldType>> domain =
                         algebra::fft::make_evaluation_domain<FieldType>(cs.num_constraints() + cs.num_inputs() + 1);
 
-                    std::vector<FieldType> At, Bt, Ct, Ht;
+                    std::vector<typename FieldType::value_type> At, Bt, Ct, Ht;
 
                     At.resize(cs.num_variables() + 1, FieldType::zero());
                     Bt.resize(cs.num_variables() + 1, FieldType::zero());
@@ -155,7 +155,7 @@ namespace nil {
 
                     const FieldType Zt = domain->compute_vanishing_polynomial(t);
 
-                    const std::vector<FieldType> u = domain->evaluate_all_lagrange_polynomials(t);
+                    const std::vector<typename FieldType::value_type> u = domain->evaluate_all_lagrange_polynomials(t);
                     /**
                      * add and process the constraints
                      *     input_i * 0 = 0
@@ -244,7 +244,7 @@ namespace nil {
                     full_variable_assignment.insert(
                         full_variable_assignment.end(), auxiliary_input.begin(), auxiliary_input.end());
 
-                    std::vector<FieldType> aA(domain->m, FieldType::zero()), aB(domain->m, FieldType::zero());
+                    std::vector<typename FieldType::value_type> aA(domain->m, FieldType::zero()), aB(domain->m, FieldType::zero());
 
                     /* account for the additional constraints input_i * 0 = 0 */
                     for (std::size_t i = 0; i <= cs.num_inputs(); ++i) {
@@ -260,7 +260,7 @@ namespace nil {
 
                     domain->iFFT(aB);
 
-                    std::vector<FieldType> coefficients_for_H(domain->m + 1, FieldType::zero());
+                    std::vector<typename FieldType::value_type> coefficients_for_H(domain->m + 1, FieldType::zero());
 #ifdef MULTICORE
 #pragma omp parallel for
 #endif
@@ -277,16 +277,16 @@ namespace nil {
                     algebra::multiply_by_coset(aB, FieldType::multiplicative_generator);
                     domain->FFT(aB, FieldType::multiplicative_generator);
 
-                    std::vector<FieldType> &H_tmp = aA;    // can overwrite aA because it is not used later
+                    std::vector<typename FieldType::value_type> &H_tmp = aA;    // can overwrite aA because it is not used later
 #ifdef MULTICORE
 #pragma omp parallel for
 #endif
                     for (std::size_t i = 0; i < domain->m; ++i) {
                         H_tmp[i] = aA[i] * aB[i];
                     }
-                    std::vector<FieldType>().swap(aB);    // destroy aB
+                    std::vector<typename FieldType::value_type>().swap(aB);    // destroy aB
 
-                    std::vector<FieldType> aC(domain->m, FieldType::zero());
+                    std::vector<typename FieldType::value_type> aC(domain->m, FieldType::zero());
                     for (std::size_t i = 0; i < cs.num_constraints(); ++i) {
                         aC[i] += cs.constraints[i].c.evaluate(full_variable_assignment);
                     }

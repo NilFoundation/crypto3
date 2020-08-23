@@ -278,7 +278,7 @@ namespace nil {
                         assert(result.bound_primary_input_locations.find(input_pos) ==
                                result.bound_primary_input_locations.end());
 
-                        const std::vector<FieldType> packed_input_element =
+                        const std::vector<typename FieldType::value_type> packed_input_element =
                             ram_to_r1cs<ram_ppT>::pack_primary_input_address_and_value(ap, av);
                         result.r1cs_vk.encoded_IC_query =
                             result.r1cs_vk.encoded_IC_query.template accumulate_chunk<FieldType>(

@@ -52,8 +52,6 @@ bool process_verifier_command_line(const int argc, const char **argv, std::strin
 using namespace nil::crypto3::zk::snark;
 
 int main(int argc, const char *argv[]) {
-    default_tinyram_ppzksnark_pp::init_public_params();
-
 #ifdef MINDEPS
     std::string processed_assembly_fn = "processed.txt";
     std::string verification_key_fn = "verification_key.txt";
@@ -72,7 +70,7 @@ int main(int argc, const char *argv[]) {
         return 1;
     }
 #endif
-    algebra::start_profiling();
+
 
     ram_ppzksnark_verification_key<default_tinyram_ppzksnark_pp> vk;
     std::ifstream vk_file(verification_key_fn);

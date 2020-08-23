@@ -80,10 +80,10 @@ namespace nil {
 
                 /* TODO: specify that it does *NOT* include the constant 1 */
                 template<typename FieldType>
-                using r1cs_primary_input = std::vector<FieldType>;
+                using r1cs_primary_input = std::vector<typename FieldType::value_type>;
 
                 template<typename FieldType>
-                using r1cs_auxiliary_input = std::vector<FieldType>;
+                using r1cs_auxiliary_input = std::vector<typename FieldType::value_type>;
 
                 template<typename FieldType>
                 using r1cs_variable_assignment =

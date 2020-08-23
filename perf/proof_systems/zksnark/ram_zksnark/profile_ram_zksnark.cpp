@@ -137,9 +137,6 @@ bool process_command_line(const int argc, const char **argv, bool &profile_gp, s
 }
 
 int main(int argc, const char *argv[]) {
-    algebra::start_profiling();
-    ram_zksnark_PCD_pp<default_ram_zksnark_pp>::init_public_params();
-
     bool profile_gp;
     std::size_t w;
     std::size_t k;

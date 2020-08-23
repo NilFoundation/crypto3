@@ -26,8 +26,6 @@ namespace nil {
                  * my_ram_ppzksnark_pp needs to contain typedefs for the typenames
                  * - snark_pp, and
                  * - machine_pp.
-                 * as well as a method with the following signature:
-                 * - static void init_public_params();
                  *
                  * For example, if you want to use the types my_snark_pp and my_machine_pp,
                  * then you could declare my_ram_ppzksnark_pp as follows:
@@ -36,10 +34,6 @@ namespace nil {
                  *   public:
                  *       typedef my_snark_pp snark_pp;
                  *       typedef my_machine_pp machine_pp;
-                 *       static void init_public params()
-                 *       {
-                 *           snark_pp::init_public_params(); // and additional initialization if needed
-                 *       }
                  *   };
                  *
                  * Having done the above, my_ram_ppzksnark_pp can be used as a template parameter.

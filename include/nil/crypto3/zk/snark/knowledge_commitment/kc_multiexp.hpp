@@ -41,8 +41,8 @@ namespace nil {
                     kc_multi_exp_with_mixed_addition(const knowledge_commitment_vector<T1, T2> &vec,
                                                      const std::size_t min_idx,
                                                      const std::size_t max_idx,
-                                                     typename std::vector<FieldType>::const_iterator scalar_start,
-                                                     typename std::vector<FieldType>::const_iterator scalar_end,
+                                                     typename std::vector<typename FieldType::value_type>::const_iterator scalar_start,
+                                                     typename std::vector<typename FieldType::value_type>::const_iterator scalar_end,
                                                      const std::size_t chunks) {
                     auto index_it = std::lower_bound(vec.indices.begin(), vec.indices.end(), min_idx);
                     const std::size_t offset = index_it - vec.indices.begin();
@@ -52,7 +52,7 @@ namespace nil {
                     const FieldType zero = FieldType::zero();
                     const FieldType one = FieldType::one();
 
-                    std::vector<FieldType> p;
+                    std::vector<typename FieldType::value_type> p;
                     std::vector<knowledge_commitment<T1, T2>> g;
 
                     knowledge_commitment<T1, T2> acc = knowledge_commitment<T1, T2>::zero();
@@ -103,7 +103,7 @@ namespace nil {
                                                                           const algebra::window_table<T2> &T2_table,
                                                                           const FieldType &T1_coeff,
                                                                           const FieldType &T2_coeff,
-                                                                          const std::vector<FieldType> &v,
+                                                                          const std::vector<typename FieldType::value_type> &v,
                                                                           const std::size_t start_pos,
                                                                           const std::size_t end_pos,
                                                                           const std::size_t expected_size) {
@@ -132,7 +132,7 @@ namespace nil {
                                                                  const algebra::window_table<T2> &T2_table,
                                                                  const FieldType &T1_coeff,
                                                                  const FieldType &T2_coeff,
-                                                                 const std::vector<FieldType> &v,
+                                                                 const std::vector<typename FieldType::value_type> &v,
                                                                  const std::size_t suggested_num_chunks) {
                     knowledge_commitment_vector<T1, T2> res;
                     res.domain_size_ = v.size();

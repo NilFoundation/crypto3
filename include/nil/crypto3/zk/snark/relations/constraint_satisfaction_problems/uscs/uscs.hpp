@@ -50,13 +50,13 @@ namespace nil {
                  * a candidate solution to a USCS constraint system (see below).
                  */
                 template<typename FieldType>
-                using uscs_primary_input = std::vector<FieldType>;
+                using uscs_primary_input = std::vector<typename FieldType::value_type>;
 
                 template<typename FieldType>
-                using uscs_auxiliary_input = std::vector<FieldType>;
+                using uscs_auxiliary_input = std::vector<typename FieldType::value_type>;
 
                 template<typename FieldType>
-                using uscs_variable_assignment = std::vector<FieldType>;
+                using uscs_variable_assignment = std::vector<typename FieldType::value_type>;
 
                 /************************* USCS constraint system ****************************/
 

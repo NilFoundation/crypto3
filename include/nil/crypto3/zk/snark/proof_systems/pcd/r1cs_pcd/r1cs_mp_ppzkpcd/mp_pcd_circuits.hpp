@@ -716,7 +716,7 @@ namespace nil {
 
                     CRH_with_field_out_gadget<FieldType>::sample_randomness(block.size());
 
-                    const std::vector<FieldType> digest = CRH_with_field_out_gadget<FieldType>::get_hash(block);
+                    const std::vector<typename FieldType::value_type> digest = CRH_with_field_out_gadget<FieldType>::get_hash(block);
 
                     return digest;
                 }

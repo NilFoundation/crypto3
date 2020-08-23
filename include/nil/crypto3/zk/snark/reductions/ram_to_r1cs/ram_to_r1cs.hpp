@@ -115,7 +115,7 @@ namespace nil {
                     trace_element_bits.insert(trace_element_bits.end(), address_bits.begin(), address_bits.end());
                     trace_element_bits.insert(trace_element_bits.end(), contents_bits.begin(), contents_bits.end());
 
-                    const std::vector<FieldType> trace_element =
+                    const std::vector<typename FieldType::value_type> trace_element =
                         algebra::pack_bit_vector_into_field_element_vector<FieldType>(trace_element_bits);
 
                     return trace_element;
@@ -141,7 +141,7 @@ namespace nil {
                         assert(input_pos < boot_trace_size_bound);
                         assert(bound_input_locations.find(input_pos) == bound_input_locations.end());
 
-                        const std::vector<FieldType> packed_input_element =
+                        const std::vector<typename FieldType::value_type> packed_input_element =
                             ram_to_r1cs<ramT>::pack_primary_input_address_and_value(ap, av);
                         std::copy(packed_input_element.begin(),
                                   packed_input_element.end(),

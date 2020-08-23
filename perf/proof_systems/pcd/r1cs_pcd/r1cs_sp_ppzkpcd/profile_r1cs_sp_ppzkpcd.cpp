@@ -21,11 +21,6 @@ void profile_tally(const std::size_t arity, const std::size_t max_layer) {
 }
 
 int main(void) {
-    typedef default_r1cs_ppzkpcd_pp PCD_pp;
-
-    algebra::start_profiling();
-    PCD_pp::init_public_params();
-
     const std::size_t arity = 2;
     const std::size_t max_layer = 2;
 

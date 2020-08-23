@@ -58,7 +58,6 @@ bool process_demo_command_line(const int argc, const char **argv, std::string &a
 using namespace nil::crypto3::zk::snark;
 
 int main(int argc, const char *argv[]) {
-    default_tinyram_ppzksnark_pp::init_public_params();
 #ifdef MINDEPS
     std::string assembly_fn = "assembly.s";
     std::string processed_assembly_fn = "processed.txt";
@@ -79,7 +78,7 @@ int main(int argc, const char *argv[]) {
         return 1;
     }
 #endif
-    algebra::start_profiling();
+
 
     printf("================================================================================\n");
     printf("TinyRAM example loader\n");

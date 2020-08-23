@@ -221,7 +221,7 @@ namespace nil {
 
                     std::size_t sap_num_variables = cs.num_variables() + cs.num_constraints() + cs.num_inputs();
 
-                    std::vector<FieldType> At, Ct, Ht;
+                    std::vector<typename FieldType::value_type> At, Ct, Ht;
 
                     At.resize(sap_num_variables + 1, FieldType::zero());
                     Ct.resize(sap_num_variables + 1, FieldType::zero());
@@ -229,7 +229,7 @@ namespace nil {
 
                     const FieldType Zt = domain->compute_vanishing_polynomial(t);
 
-                    const std::vector<FieldType> u = domain->evaluate_all_lagrange_polynomials(t);
+                    const std::vector<typename FieldType::value_type> u = domain->evaluate_all_lagrange_polynomials(t);
                     /**
                      * add and process all constraints as in r1cs_to_sap_instance_map
                      */
@@ -365,7 +365,7 @@ namespace nil {
                         full_variable_assignment.push_back(extra_var);
                     }
 
-                    std::vector<FieldType> aA(domain->m, FieldType::zero());
+                    std::vector<typename FieldType::value_type> aA(domain->m, FieldType::zero());
 
                     /* account for all constraints, as in r1cs_to_sap_instance_map */
                     for (std::size_t i = 0; i < cs.num_constraints(); ++i) {
@@ -390,7 +390,7 @@ namespace nil {
 
                     domain->iFFT(aA);
 
-                    std::vector<FieldType> coefficients_for_H(domain->m + 1, FieldType::zero());
+                    std::vector<typename FieldType::value_type> coefficients_for_H(domain->m + 1, FieldType::zero());
 #ifdef MULTICORE
 #pragma omp parallel for
 #endif
@@ -404,7 +404,7 @@ namespace nil {
                     multiply_by_coset(aA, FieldType::multiplicative_generator);
                     domain->FFT(aA, FieldType::multiplicative_generator);
 
-                    std::vector<FieldType> &H_tmp = aA;    // can overwrite aA because it is not used later
+                    std::vector<typename FieldType::value_type> &H_tmp = aA;    // can overwrite aA because it is not used later
 #ifdef MULTICORE
 #pragma omp parallel for
 #endif
@@ -412,7 +412,7 @@ namespace nil {
                         H_tmp[i] = aA[i] * aA[i];
                     }
 
-                    std::vector<FieldType> aC(domain->m, FieldType::zero());
+                    std::vector<typename FieldType::value_type> aC(domain->m, FieldType::zero());
                     /* again, accounting for all constraints */
                     std::size_t extra_var_offset = cs.num_variables() + 1;
                     for (std::size_t i = 0; i < cs.num_constraints(); ++i) {

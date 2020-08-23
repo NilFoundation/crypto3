@@ -102,8 +102,8 @@ namespace nil {
                         }
                     }
 
-                    std::vector<FieldType> get_vals(const protoboard<FieldType> &pb) const {
-                        std::vector<FieldType> result(this->size());
+                    std::vector<typename FieldType::value_type> get_vals(const protoboard<FieldType> &pb) const {
+                        std::vector<typename FieldType::value_type> result(this->size());
                         for (std::size_t i = 0; i < this->size(); ++i) {
                             result[i] = pb.val((*this)[i]);
                         }
@@ -268,8 +268,8 @@ namespace nil {
                         }
                     }
 
-                    std::vector<FieldType> get_vals(const protoboard<FieldType> &pb) const {
-                        std::vector<FieldType> result(this->size());
+                    std::vector<typename FieldType::value_type> get_vals(const protoboard<FieldType> &pb) const {
+                        std::vector<typename FieldType::value_type> result(this->size());
                         for (std::size_t i = 0; i < this->size(); ++i) {
                             result[i] = pb.lc_val((*this)[i]);
                         }

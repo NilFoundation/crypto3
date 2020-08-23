@@ -239,7 +239,7 @@ namespace nil {
 
                     void add_term(const linear_term<FieldType> &lt);
 
-                    FieldType evaluate(const std::vector<FieldType> &assignment) const;
+                    FieldType evaluate(const std::vector<typename FieldType::value_type> &assignment) const;
 
                     linear_combination<FieldType> operator*(integer_coeff_t int_coeff) const;
                     linear_combination<FieldType> operator*(const value_type &field_coeff) const;
@@ -255,7 +255,7 @@ namespace nil {
 
                     void print(const std::map<std::size_t, std::string> &variable_annotations =
                                    std::map<std::size_t, std::string>()) const;
-                    void print_with_assignment(const std::vector<FieldType> &full_assignment,
+                    void print_with_assignment(const std::vector<typename FieldType::value_type> &full_assignment,
                                                const std::map<std::size_t, std::string> &variable_annotations =
                                                    std::map<std::size_t, std::string>()) const;
 
@@ -358,7 +358,7 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                FieldType linear_combination<FieldType>::evaluate(const std::vector<FieldType> &assignment) const {
+                FieldType linear_combination<FieldType>::evaluate(const std::vector<typename FieldType::value_type> &assignment) const {
                     FieldType acc = FieldType::zero();
                     for (auto &lt : terms) {
                         acc += (lt.index == 0 ? FieldType::one() : assignment[lt.index - 1]) * lt.coeff;
@@ -464,7 +464,7 @@ namespace nil {
 
                 template<typename FieldType>
                 void linear_combination<FieldType>::print_with_assignment(
-                    const std::vector<FieldType> &full_assignment,
+                    const std::vector<typename FieldType::value_type> &full_assignment,
                     const std::map<std::size_t, std::string> &variable_annotations) const {
                     for (auto &lt : terms) {
                         if (lt.index == 0) {

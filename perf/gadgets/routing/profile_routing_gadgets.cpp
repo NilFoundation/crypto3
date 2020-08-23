@@ -84,7 +84,7 @@ void profile_num_switches(const std::size_t l) {
 }
 
 int main() {
-    algebra::start_profiling();
+
 
     profile_routing_gadgets<algebra::Fr<algebra::default_ec_pp>>(32 + 16 + 3 + 2);
     profile_num_switches<algebra::Fr<algebra::default_ec_pp>>(1);

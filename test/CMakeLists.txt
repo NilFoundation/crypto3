@@ -44,14 +44,19 @@ endmacro()
 
 set(TESTS_NAMES
     "routing_algorithms/test_routing_algorithms"
+
     "gadgets/hashes/knapsack/test_knapsack_gadget"
     "gadgets/hashes/sha256/test_sha256_gadget"
-    "gadgets/gadgets"
+
+    "gadgets/verifiers/r1cs_ppzksnark_verifier_gadget"
+
     "relations/numeric/qap/qap"
     "relations/numeric/sap/sap"
     "relations/numeric/ssp/ssp"
+
     "proof_systems/pcd/r1cs_pcd/r1cs_mp_ppzkpcd/r1cs_mp_ppzkpcd"
     "proof_systems/pcd/r1cs_pcd/r1cs_sp_ppzkpcd/r1cs_sp_ppzkpcd"
+
     "proof_systems/ppzksnark/bacs_ppzksnark/bacs_ppzksnark"
     "proof_systems/ppzksnark/r1cs_gg_ppzksnark/r1cs_gg_ppzksnark"
     "proof_systems/ppzksnark/r1cs_ppzksnark/r1cs_ppzksnark"
@@ -59,6 +64,7 @@ set(TESTS_NAMES
     "proof_systems/ppzksnark/ram_ppzksnark/ram_ppzksnark"
     "proof_systems/ppzksnark/tbcs_ppzksnark/tbcs_ppzksnark"
     "proof_systems/ppzksnark/uscs_ppzksnark/uscs_ppzksnark"
+
     "proof_systems/zksnark/ram_zksnark/ram_zksnark")
 
 foreach(TEST_NAME ${TESTS_NAMES})

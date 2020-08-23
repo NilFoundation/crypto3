@@ -104,7 +104,7 @@ namespace nil {
 
                     FieldType t;
 
-                    std::vector<FieldType> Vt, Ht;
+                    std::vector<typename FieldType::value_type> Vt, Ht;
 
                     FieldType Zt;
 
@@ -113,16 +113,16 @@ namespace nil {
                                             const std::size_t degree,
                                             const std::size_t num_inputs,
                                             const FieldType &t,
-                                            const std::vector<FieldType> &Vt,
-                                            const std::vector<FieldType> &Ht,
+                                            const std::vector<typename FieldType::value_type> &Vt,
+                                            const std::vector<typename FieldType::value_type> &Ht,
                                             const FieldType &Zt);
                     ssp_instance_evaluation(const std::shared_ptr<algebra::fft::evaluation_domain<FieldType>> &domain,
                                             const std::size_t num_variables,
                                             const std::size_t degree,
                                             const std::size_t num_inputs,
                                             const FieldType &t,
-                                            std::vector<FieldType> &&Vt,
-                                            std::vector<FieldType> &&Ht,
+                                            std::vector<typename FieldType::value_type> &&Vt,
+                                            std::vector<typename FieldType::value_type> &&Ht,
                                             const FieldType &Zt);
 
                     ssp_instance_evaluation(const ssp_instance_evaluation<FieldType> &other) = default;
@@ -150,21 +150,21 @@ namespace nil {
                 public:
                     FieldType d;
 
-                    std::vector<FieldType> coefficients_for_Vs;
-                    std::vector<FieldType> coefficients_for_H;
+                    std::vector<typename FieldType::value_type> coefficients_for_Vs;
+                    std::vector<typename FieldType::value_type> coefficients_for_H;
 
                     ssp_witness(const std::size_t num_variables,
                                 const std::size_t degree,
                                 const std::size_t num_inputs,
                                 const FieldType &d,
-                                const std::vector<FieldType> &coefficients_for_Vs,
-                                const std::vector<FieldType> &coefficients_for_H);
+                                const std::vector<typename FieldType::value_type> &coefficients_for_Vs,
+                                const std::vector<typename FieldType::value_type> &coefficients_for_H);
                     ssp_witness(const std::size_t num_variables,
                                 const std::size_t degree,
                                 const std::size_t num_inputs,
                                 const FieldType &d,
-                                const std::vector<FieldType> &coefficients_for_Vs,
-                                std::vector<FieldType> &&coefficients_for_H);
+                                const std::vector<typename FieldType::value_type> &coefficients_for_Vs,
+                                std::vector<typename FieldType::value_type> &&coefficients_for_H);
 
                     ssp_witness(const ssp_witness<FieldType> &other) = default;
                     ssp_witness(ssp_witness<FieldType> &&other) = default;
@@ -218,12 +218,12 @@ namespace nil {
                 bool ssp_instance<FieldType>::is_satisfied(const ssp_witness<FieldType> &witness) const {
                     const FieldType t = FieldType::random_element();
                     ;
-                    std::vector<FieldType> Vt(this->num_variables() + 1, FieldType::zero());
-                    std::vector<FieldType> Ht(this->degree() + 1);
+                    std::vector<typename FieldType::value_type> Vt(this->num_variables() + 1, FieldType::zero());
+                    std::vector<typename FieldType::value_type> Ht(this->degree() + 1);
 
                     const FieldType Zt = this->domain->compute_vanishing_polynomial(t);
 
-                    const std::vector<FieldType> u = this->domain->evaluate_all_lagrange_polynomials(t);
+                    const std::vector<typename FieldType::value_type> u = this->domain->evaluate_all_lagrange_polynomials(t);
 
                     for (std::size_t i = 0; i < this->num_variables() + 1; ++i) {
                         for (auto &el : V_in_Lagrange_basis[i]) {
@@ -255,8 +255,8 @@ namespace nil {
                     const std::size_t degree,
                     const std::size_t num_inputs,
                     const FieldType &t,
-                    const std::vector<FieldType> &Vt,
-                    const std::vector<FieldType> &Ht,
+                    const std::vector<typename FieldType::value_type> &Vt,
+                    const std::vector<typename FieldType::value_type> &Ht,
                     const FieldType &Zt) :
                     num_variables_(num_variables),
                     degree_(degree), num_inputs_(num_inputs), domain(domain), t(t), Vt(Vt), Ht(Ht), Zt(Zt) {
@@ -269,8 +269,8 @@ namespace nil {
                     const std::size_t degree,
                     const std::size_t num_inputs,
                     const FieldType &t,
-                    std::vector<FieldType> &&Vt,
-                    std::vector<FieldType> &&Ht,
+                    std::vector<typename FieldType::value_type> &&Vt,
+                    std::vector<typename FieldType::value_type> &&Ht,
                     const FieldType &Zt) :
                     num_variables_(num_variables),
                     degree_(degree), num_inputs_(num_inputs), domain(domain), t(t), Vt(std::move(Vt)),
@@ -353,8 +353,8 @@ namespace nil {
                                                     const std::size_t degree,
                                                     const std::size_t num_inputs,
                                                     const FieldType &d,
-                                                    const std::vector<FieldType> &coefficients_for_Vs,
-                                                    const std::vector<FieldType> &coefficients_for_H) :
+                                                    const std::vector<typename FieldType::value_type> &coefficients_for_Vs,
+                                                    const std::vector<typename FieldType::value_type> &coefficients_for_H) :
                     num_variables_(num_variables),
                     degree_(degree), num_inputs_(num_inputs), d(d), coefficients_for_Vs(coefficients_for_Vs),
                     coefficients_for_H(coefficients_for_H) {
@@ -365,8 +365,8 @@ namespace nil {
                                                     const std::size_t degree,
                                                     const std::size_t num_inputs,
                                                     const FieldType &d,
-                                                    const std::vector<FieldType> &coefficients_for_Vs,
-                                                    std::vector<FieldType> &&coefficients_for_H) :
+                                                    const std::vector<typename FieldType::value_type> &coefficients_for_Vs,
+                                                    std::vector<typename FieldType::value_type> &&coefficients_for_H) :
                     num_variables_(num_variables),
                     degree_(degree), num_inputs_(num_inputs), d(d), coefficients_for_Vs(coefficients_for_Vs),
                     coefficients_for_H(std::move(coefficients_for_H)) {

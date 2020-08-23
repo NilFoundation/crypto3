@@ -33,7 +33,7 @@ namespace nil {
                  * A BACS variable assignment is a vector of field elements.
                  */
                 template<typename FieldType>
-                using bacs_variable_assignment = std::vector<FieldType>;
+                using bacs_variable_assignment = std::vector<typename FieldType::value_type>;
 
                 /**************************** BACS gate **************************************/
 

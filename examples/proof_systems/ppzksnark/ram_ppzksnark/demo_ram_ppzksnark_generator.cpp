@@ -50,7 +50,6 @@ bool process_generator_command_line(const int argc, const char **argv, std::stri
 using namespace nil::crypto3::zk::snark;
 
 int main(int argc, const char *argv[]) {
-    ram_ppzksnark_snark_pp<default_ram_ppzksnark_pp>::init_public_params();
 #ifdef MINDEPS
     std::string architecture_params_fn = "architecture_params.txt";
     std::string computation_bounds_fn = "computation_bounds.txt";
@@ -67,7 +66,7 @@ int main(int argc, const char *argv[]) {
         return 1;
     }
 #endif
-    algebra::start_profiling();
+
 
     /* load everything */
     ram_ppzksnark_architecture_params<default_ram_ppzksnark_pp> ap;

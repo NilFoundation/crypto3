@@ -20,9 +20,6 @@
 using namespace nil::crypto3::zk::snark;
 
 int main(int argc, const char *argv[]) {
-    default_r1cs_ppzkadsnark_pp::init_public_params();
-    algebra::start_profiling();
-
     if (argc == 2 && strcmp(argv[1], "-v") == 0) {
         algebra::print_compilation_info();
         return 0;

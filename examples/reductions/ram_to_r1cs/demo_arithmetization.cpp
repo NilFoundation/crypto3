@@ -86,7 +86,7 @@ int main(int argc, const char *argv[]) {
         return 1;
     }
 #endif
-    algebra::start_profiling();
+
 
     printf("================================================================================\n");
     printf("TinyRAM example loader\n");

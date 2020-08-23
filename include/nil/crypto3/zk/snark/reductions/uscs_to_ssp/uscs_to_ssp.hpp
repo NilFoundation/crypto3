@@ -114,12 +114,12 @@ namespace nil {
                     const std::shared_ptr<algebra::fft::evaluation_domain<FieldType>> domain =
                         algebra::fft::make_evaluation_domain<FieldType>(cs.num_constraints());
 
-                    std::vector<FieldType> Vt(cs.num_variables() + 1, FieldType::zero());
-                    std::vector<FieldType> Ht(domain->m + 1);
+                    std::vector<typename FieldType::value_type> Vt(cs.num_variables() + 1, FieldType::zero());
+                    std::vector<typename FieldType::value_type> Ht(domain->m + 1);
 
                     const FieldType Zt = domain->compute_vanishing_polynomial(t);
 
-                    const std::vector<FieldType> u = domain->evaluate_all_lagrange_polynomials(t);
+                    const std::vector<typename FieldType::value_type> u = domain->evaluate_all_lagrange_polynomials(t);
                     for (std::size_t i = 0; i < cs.num_constraints(); ++i) {
                         for (std::size_t j = 0; j < cs.constraints[i].terms.size(); ++j) {
                             Vt[cs.constraints[i].terms[j].index] += u[i] * cs.constraints[i].terms[j].coeff;
@@ -181,7 +181,7 @@ namespace nil {
                     const std::shared_ptr<algebra::fft::evaluation_domain<FieldType>> domain =
                         algebra::fft::make_evaluation_domain<FieldType>(cs.num_constraints());
 
-                    std::vector<FieldType> aA(domain->m, FieldType::zero());
+                    std::vector<typename FieldType::value_type> aA(domain->m, FieldType::zero());
                     assert(domain->m >= cs.num_constraints());
                     for (std::size_t i = 0; i < cs.num_constraints(); ++i) {
                         aA[i] += cs.constraints[i].evaluate(full_variable_assignment);
@@ -192,7 +192,7 @@ namespace nil {
 
                     domain->iFFT(aA);
 
-                    std::vector<FieldType> coefficients_for_H(domain->m + 1, FieldType::zero());
+                    std::vector<typename FieldType::value_type> coefficients_for_H(domain->m + 1, FieldType::zero());
 #ifdef MULTICORE
 #pragma omp parallel for
 #endif
@@ -205,7 +205,7 @@ namespace nil {
                     multiply_by_coset(aA, FieldType::multiplicative_generator);
                     domain->FFT(aA, FieldType::multiplicative_generator);
 
-                    std::vector<FieldType> &H_tmp = aA;    // can overwrite aA because it is not used later
+                    std::vector<typename FieldType::value_type> &H_tmp = aA;    // can overwrite aA because it is not used later
 #ifdef MULTICORE
 #pragma omp parallel for
 #endif

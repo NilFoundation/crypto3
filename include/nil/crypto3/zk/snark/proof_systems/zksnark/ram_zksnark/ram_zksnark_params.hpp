@@ -27,9 +27,6 @@ namespace nil {
                  * - PCD_pp, and
                  * - machine_pp.
                  *
-                 * As well as a method with type signature:
-                 *  static void init_public_params()
-                 *
                  * For example, if you want to use the types my_PCD_pp and my_machine_pp,
                  * then you would declare my_ram_zksnark_pp as follows:
                  *
@@ -37,10 +34,6 @@ namespace nil {
                  *   public:
                  *       typedef my_PCD_pp PCD_pp;
                  *       typedef my_machine_pp machine_pp;
-                 *       static void init_public_params()
-                 *       {
-                 *           PCD_pp::init_public_params(); // plus other necessary initialization
-                 *       }
                  *   };
                  *
                  * Having done the above, my_ram_zksnark_pp can be used as a template parameter.

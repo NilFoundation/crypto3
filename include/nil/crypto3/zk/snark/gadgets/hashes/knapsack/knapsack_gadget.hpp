@@ -64,7 +64,7 @@ namespace nil {
                 template<typename FieldType>
                 class knapsack_CRH_with_field_out_gadget : public gadget<FieldType> {
                 private:
-                    static std::vector<FieldType> knapsack_coefficients;
+                    static std::vector<typename FieldType::value_type> knapsack_coefficients;
                     static std::size_t num_cached_coefficients;
 
                 public:
@@ -84,7 +84,7 @@ namespace nil {
                     static std::size_t get_digest_len();
                     static std::size_t
                         get_block_len(); /* return 0 as block length, as the hash function is variable-input */
-                    static std::vector<FieldType> get_hash(const std::vector<bool> &input);
+                    static std::vector<typename FieldType::value_type> get_hash(const std::vector<bool> &input);
                     static void sample_randomness(std::size_t input_len);
 
                     /* for debugging */
@@ -130,7 +130,7 @@ namespace nil {
                 void test_knapsack_CRH_with_bit_out_gadget();
 
                 template<typename FieldType>
-                std::vector<FieldType> knapsack_CRH_with_field_out_gadget<FieldType>::knapsack_coefficients;
+                std::vector<typename FieldType::value_type> knapsack_CRH_with_field_out_gadget<FieldType>::knapsack_coefficients;
                 template<typename FieldType>
                 std::size_t knapsack_CRH_with_field_out_gadget<FieldType>::num_cached_coefficients;
 
@@ -157,7 +157,7 @@ namespace nil {
                             1,
                             pb_coeff_sum<FieldType>(
                                 input_block.bits,
-                                std::vector<FieldType>(knapsack_coefficients.begin() + input_len * i,
+                                std::vector<typename FieldType::value_type>(knapsack_coefficients.begin() + input_len * i,
                                                        knapsack_coefficients.begin() + input_len * (i + 1))),
                             output[i]));
                     }
@@ -190,14 +190,14 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                std::vector<FieldType>
+                std::vector<typename FieldType::value_type>
                     knapsack_CRH_with_field_out_gadget<FieldType>::get_hash(const std::vector<bool> &input) {
                     const std::size_t dimension = knapsack_dimension<FieldType>::dimension;
                     if (num_cached_coefficients < dimension * input.size()) {
                         sample_randomness(input.size());
                     }
 
-                    std::vector<FieldType> result(dimension, FieldType::zero());
+                    std::vector<typename FieldType::value_type> result(dimension, FieldType::zero());
 
                     for (std::size_t i = 0; i < dimension; ++i) {
                         for (std::size_t k = 0; k < input.size(); ++k) {
@@ -289,7 +289,7 @@ namespace nil {
                 template<typename FieldType>
                 std::vector<bool>
                     knapsack_CRH_with_bit_out_gadget<FieldType>::get_hash(const std::vector<bool> &input) {
-                    const std::vector<FieldType> hash_elems =
+                    const std::vector<typename FieldType::value_type> hash_elems =
                         knapsack_CRH_with_field_out_gadget<FieldType>::get_hash(input);
                     hash_value_type result;
 

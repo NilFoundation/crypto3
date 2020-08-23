@@ -272,13 +272,9 @@ using namespace nil::crypto3::zk::snark;
 
 int main(void) {
 #ifdef CURVE_BN128    // BN128 has fancy dependencies so it may be disabled
-    algebra::bn128_pp::init_public_params();
     test_knapsack_CRH_with_bit_out_gadget<algebra::Fr<algebra::bn128_pp>>();
 #endif
-    algebra::edwards_pp::init_public_params();
     test_knapsack_CRH_with_bit_out_gadget<algebra::Fr<algebra::edwards_pp>>();
-    algebra::mnt4_pp::init_public_params();
     test_knapsack_CRH_with_bit_out_gadget<algebra::Fr<algebra::mnt4_pp>>();
-    algebra::mnt6_pp::init_public_params();
     test_knapsack_CRH_with_bit_out_gadget<algebra::Fr<algebra::mnt6_pp>>();
 }
