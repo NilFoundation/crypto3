@@ -19,9 +19,9 @@ namespace nil {
     namespace algebra {
         namespace curves {
             namespace detail {
-                
-                template <typename ModulusBits = 254, typename GeneratorBits = CHAR_BIT>
-                struct bn128_G2 : public element_bn128<bn128_fq2<ModulusBits, GeneratorBits>::value_type>{
+
+                template<std::size_t ModulusBits = 254, std::size_t GeneratorBits = CHAR_BIT>
+                struct bn128_G2 : public element_bn128<bn128_fq2<ModulusBits, GeneratorBits>::value_type> {
                     using base_field_type = bn128_fq2<ModulusBits, GeneratorBits>;
                     using scalar_field_type = bn128_fr<ModulusBits, GeneratorBits>;
 

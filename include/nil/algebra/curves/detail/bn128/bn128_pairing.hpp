@@ -22,10 +22,10 @@ namespace nil {
         namespace curves {
             namespace detail {
 
-                template<typename ModulusBits, typename GeneratorBits>
+                template<std::size_t ModulusBits, std::size_t GeneratorBits>
                 using fp_value_type = element_fp<ModulusBits, GeneratorBits>;
 
-                template<typename ModulusBits, typename GeneratorBits>
+                template<std::size_t ModulusBits, std::size_t GeneratorBits>
                 using fp2_value_type = element_fp2<ModulusBits, GeneratorBits>;
 
                 struct bn128_ate_G1_precomp {

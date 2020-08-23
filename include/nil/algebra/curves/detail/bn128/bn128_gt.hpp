@@ -20,16 +20,16 @@ namespace nil {
         namespace curves {
             namespace detail {
 
-                template<typename ModulusBits, typename GeneratorBits>
+                template<std::size_t ModulusBits, std::size_t GeneratorBits>
                 using params_type = arithmetic_params<fp<ModulusBits, GeneratorBits>>;
 
-                template<typename ModulusBits, typename GeneratorBits>
+                template<std::size_t ModulusBits, std::size_t GeneratorBits>
                 using modulus_type = params_type<ModulusBits, GeneratorBits>::modulus_type;
 
-                template<typename ModulusBits, typename GeneratorBits>
+                template<std::size_t ModulusBits, std::size_t GeneratorBits>
                 using fp12_type = fp12<ModulusBits, GeneratorBits>;
 
-                template<typename ModulusBits, typename GeneratorBits>
+                template<std::size_t ModulusBits, std::size_t GeneratorBits>
                 using value_type = element<fp12_type<ModulusBits, GeneratorBits>>;
 
                 struct bn128_GT {

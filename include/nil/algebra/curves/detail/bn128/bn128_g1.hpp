@@ -20,14 +20,16 @@ namespace nil {
         namespace curves {
             namespace detail {
 
-                template <typename ModulusBits = 254, typename GeneratorBits = CHAR_BIT>
-                struct bn128_G1 : public bn128<ModulusBits>::value_type>{
-                    using base_field_type = bn128<ModulusBits> :: base_field_type;
-                    using scalar_field_type = bn128<ModulusBits> :: scalar_field_type;
-                    
+                template<std::size_t ModulusBits = 254, std::size_t GeneratorBits = CHAR_BIT>
+                struct bn128_G1 : public bn128<ModulusBits>::value_type {
+                    using base_field_type = bn128<ModulusBits>::base_field_type;
+                    using scalar_field_type = bn128<ModulusBits>::scalar_field_type;
+
                     using value_type = base_field_type::value_type;
+
                 private:
                     using policy_type = bn128<ModulusBits>::value_type;
+
                 public:
                     bn128_G1() : policy_type(value_type::one(), value_type::one(), value_type::zero()) {};
 
