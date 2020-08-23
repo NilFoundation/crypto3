@@ -79,45 +79,21 @@ namespace nil {
                         (p_out[0], p_out[1], p_out[2]) = (p[0], p[1], p[2]) + (B.p[0], B.p[1], B.p[2])
                     */
                     element_curve_weierstrass operator+(const element_curve_weierstrass &B) const {
-                        FieldElementType p_out[3];
 
-                        if (p[2].is_zero()) {
-                            return element_curve_weierstrass(B);
-                        }
-                        if (B.p[2].is_zero()) {
-                            return element_curve_weierstrass(*this);
-                        }
-                        FieldElementType Z1Z1, Z2Z2, U1, S1, H, I, J, t3, r, V;
+                        element_curve_weierstrass res = *this;
 
-                        Z1Z1 = p[2].square();
-                        Z2Z2 = B.p[2].square();
-                        U1 = p[0] * Z2Z2;
-                        S1 = p[1] * B.p[2] * Z2Z2;
-                        H = B.p[0] * Z1Z1 - U1;
-                        t3 = B.p[1] * p[2] * Z1Z1 - S1;
+                        res += B;
 
-                        if (H.is_zero()) {
-                            if (t3.is_zero()) {
-                                return dbl();
-                            } else {
-                                p_out[2] = FieldElementType::zero();
-                            }
-                            return *this;
-                        }
-
-                        I = H.dbl().square();
-                        J = H * I;
-                        r = t3.dbl();
-                        V = U1 * I;
-                        p_out[0] = r.square() - J - (V + V);
-                        p_out[1] = r * (V - p_out[0]) - (S1 * J).dbl();
-                        p_out[2] = ((p[2] + B.p[2]).square() - Z1Z1 - Z2Z2) * H;
-
-                        return element_curve_weierstrass(p_out[0], p_out[1], p_out[2]);
+                        return res;
                     }
 
                     element_curve_weierstrass operator-(const element_curve_weierstrass &B) const {
-                        return *this + (-B);
+
+                        element_curve_weierstrass res = *this;
+
+                        res -= B;
+
+                        return res;
                     }
 
                     element_curve_weierstrass operator-() const {
@@ -151,9 +127,9 @@ namespace nil {
                         return *this;
                     }
 
-                    bool operator==(const element_curve_weierstrass &rhs) const {
+                    bool operator==(const element_curve_weierstrass &B) const {
                         element_curve_weierstrass t0 = normalize();
-                        element_curve_weierstrass t1 = rhs.normalize();
+                        element_curve_weierstrass t1 = B.normalize();
                         if (t0.is_zero()) {
                             if (t1.is_zero())
                                 return true;
@@ -165,30 +141,59 @@ namespace nil {
                         return t0.p[0] == t1.p[0] && t0.p[1] == t1.p[1];
                     }
 
-                    bool operator!=(const element_curve_weierstrass &rhs) const {
-                        return !operator==(rhs);
+                    bool operator!=(const element_curve_weierstrass &B) const {
+                        return !operator==(B);
                     }
 
                     bool is_zero() const {
                         return p[2].is_zero();
                     }
 
-                    element_curve_weierstrass &operator+=(const element_curve_weierstrass &rhs) {
-                        element_curve_weierstrass t = *this + rhs;
+                    element_curve_weierstrass operator+=(const element_curve_weierstrass &B) {
+                        
+                        if (p[2].is_zero()) {
+                            return B;
+                        }
+                        if (B.p[2].is_zero()) {
+                            return *this;
+                        }
+                        FieldElementType Z1Z1, Z2Z2, U1, U2, S1, S2, H, I, J, t3, r, V;
 
-                        p[0] = t.p[0];
-                        p[1] = t.p[1];
-                        p[2] = t.p[2];
+                        Z1Z1 = p[2].square();
+                        Z2Z2 = B.p[2].square();
+                        U1 = p[0] * Z2Z2;
+                        U2 = B.p[0] * Z2Z2;
+
+                        S1 = p[1] * B.p[2] * Z2Z2;
+                        S2 = B.p[1] * p[2] * Z1Z1;
+
+                        H = U2 - U1;
+                        t3 = S2 - S1;
+
+                        if (H.is_zero()) {
+                            if (t3.is_zero()) {
+                                return dbl();
+                            } else {
+                                p[2] = FieldElementType::zero();    //not sure
+                            }
+                            return *this;
+                        }
+
+                        I = H.dbl().square();
+                        J = H * I;
+                        r = t3.dbl();
+                        V = U1 * I;
+                        p[0] = r.square() - J - V.dbl();
+                        p[1] = r * (V - p[0]) - (S1 * J).dbl();
+                        p[2] = ((p[2] + B.p[2]).square() - Z1Z1 - Z2Z2) * H;
 
                         return *this;
+
                     }
 
-                    element_curve_weierstrass &operator-=(const element_curve_weierstrass &rhs) {
-                        element_curve_weierstrass t = *this - rhs;
+                    element_curve_weierstrass &operator-=(const element_curve_weierstrass &B) {
 
-                        p[0] = t.p[0];
-                        p[1] = t.p[1];
-                        p[2] = t.p[2];
+                        *this += (-B);
 
                         return *this;
                     }
