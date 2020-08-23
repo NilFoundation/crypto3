@@ -189,9 +189,35 @@ namespace nil {
 
                     G1_dbl_gadget(protoboard<FieldType> &pb,
                                   const G1_variable<CurveType> &A,
-                                  const G1_variable<CurveType> &B);
-                    void generate_r1cs_constraints();
-                    void generate_r1cs_witness();
+                                  const G1_variable<CurveType> &B) :
+                        gadget<FieldType>(pb),
+                        A(A), B(B) {
+                        Xsquared.allocate(pb);
+                        lambda.allocate(pb);
+                    }
+                    void generate_r1cs_constraints() {
+                        this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>({A.X}, {A.X}, {Xsquared}));
+
+                        this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(
+                            {lambda * 2},
+                            {A.Y},
+                            {Xsquared * 3, pb_variable<FieldType>(0) * algebra::G1<other_curve<CurveType>>::a}));
+
+                        this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>({lambda}, {lambda}, {B.X, A.X * 2}));
+
+                        this->pb.add_r1cs_constraint(
+                            r1cs_constraint<FieldType>({lambda}, {A.X, B.X * (-1)}, {B.Y, A.Y}));
+                    }
+                    void generate_r1cs_witness() {
+                        this->pb.val(Xsquared) = this->pb.lc_val(A.X).squared();
+                        this->pb.val(lambda) = (typename FieldType::value_type(3) * this->pb.val(Xsquared) +
+                                                algebra::G1<other_curve<CurveType>>::a) *
+                                               (typename FieldType::value_type(2) * this->pb.lc_val(A.Y)).inverse();
+                        this->pb.lc_val(B.X) =
+                            this->pb.val(lambda).squared() - typename FieldType::value_type(2) * this->pb.lc_val(A.X);
+                        this->pb.lc_val(B.Y) =
+                            this->pb.val(lambda) * (this->pb.lc_val(A.X) - this->pb.lc_val(B.X)) - this->pb.lc_val(A.Y);
+                    }
                 };
 
                 /**
@@ -222,134 +248,84 @@ namespace nil {
                                               const pb_variable_array<FieldType> &scalars,
                                               const std::size_t elt_size,
                                               const std::vector<G1_variable<CurveType>> &points,
-                                              const G1_variable<CurveType> &result);
-                    void generate_r1cs_constraints();
-                    void generate_r1cs_witness();
+                                              const G1_variable<CurveType> &result) :
+                        gadget<FieldType>(pb),
+                        base(base), scalars(scalars), points(points), result(result), elt_size(elt_size),
+                        num_points(points.size()), scalar_size(scalars.size()) {
+                        assert(num_points >= 1);
+                        assert(num_points * elt_size == scalar_size);
+
+                        for (std::size_t i = 0; i < num_points; ++i) {
+                            points_and_powers.emplace_back(points[i]);
+                            for (std::size_t j = 0; j < elt_size - 1; ++j) {
+                                points_and_powers.emplace_back(G1_variable<CurveType>(pb));
+                                doublers.emplace_back(G1_dbl_gadget<CurveType>(
+                                    pb, points_and_powers[i * elt_size + j], points_and_powers[i * elt_size + j + 1]));
+                            }
+                        }
+
+                        chosen_results.emplace_back(base);
+                        for (std::size_t i = 0; i < scalar_size; ++i) {
+                            computed_results.emplace_back(G1_variable<CurveType>(pb));
+                            if (i < scalar_size - 1) {
+                                chosen_results.emplace_back(G1_variable<CurveType>(pb));
+                            } else {
+                                chosen_results.emplace_back(result);
+                            }
+
+                            adders.emplace_back(G1_add_gadget<CurveType>(
+                                pb, chosen_results[i], points_and_powers[i], computed_results[i]));
+                        }
+                    }
+
+                    void generate_r1cs_constraints() {
+                        const std::size_t num_constraints_before = this->pb.num_constraints();
+
+                        for (std::size_t i = 0; i < scalar_size - num_points; ++i) {
+                            doublers[i].generate_r1cs_constraints();
+                        }
+
+                        for (std::size_t i = 0; i < scalar_size; ++i) {
+                            adders[i].generate_r1cs_constraints();
+
+                            /*
+                              chosen_results[i+1].X = scalars[i] * computed_results[i].X + (1-scalars[i]) *
+                              chosen_results[i].X chosen_results[i+1].X - chosen_results[i].X = scalars[i] *
+                              (computed_results[i].X - chosen_results[i].X)
+                            */
+                            this->pb.add_r1cs_constraint(
+                                r1cs_constraint<FieldType>(scalars[i],
+                                                           computed_results[i].X - chosen_results[i].X,
+                                                           chosen_results[i + 1].X - chosen_results[i].X));
+                            this->pb.add_r1cs_constraint(
+                                r1cs_constraint<FieldType>(scalars[i],
+                                                           computed_results[i].Y - chosen_results[i].Y,
+                                                           chosen_results[i + 1].Y - chosen_results[i].Y));
+                        }
+
+                        const std::size_t num_constraints_after = this->pb.num_constraints();
+                        assert(num_constraints_after - num_constraints_before ==
+                               4 * (scalar_size - num_points) + (4 + 2) * scalar_size);
+                    }
+
+                    void generate_r1cs_witness() {
+                        for (std::size_t i = 0; i < scalar_size - num_points; ++i) {
+                            doublers[i].generate_r1cs_witness();
+                        }
+
+                        for (std::size_t i = 0; i < scalar_size; ++i) {
+                            adders[i].generate_r1cs_witness();
+                            this->pb.lc_val(chosen_results[i + 1].X) =
+                                (this->pb.val(scalars[i]) == typename CurveType::scalar_field_type::zero() ?
+                                     this->pb.lc_val(chosen_results[i].X) :
+                                     this->pb.lc_val(computed_results[i].X));
+                            this->pb.lc_val(chosen_results[i + 1].Y) =
+                                (this->pb.val(scalars[i]) == typename CurveType::scalar_field_type::zero() ?
+                                     this->pb.lc_val(chosen_results[i].Y) :
+                                     this->pb.lc_val(computed_results[i].Y));
+                        }
+                    }
                 };
-
-                template<typename CurveType>
-                G1_dbl_gadget<CurveType>::G1_dbl_gadget(protoboard<FieldType> &pb,
-                                                        const G1_variable<CurveType> &A,
-                                                        const G1_variable<CurveType> &B) :
-                    gadget<FieldType>(pb),
-                    A(A), B(B) {
-                    Xsquared.allocate(pb);
-                    lambda.allocate(pb);
-                }
-
-                template<typename CurveType>
-                void G1_dbl_gadget<CurveType>::generate_r1cs_constraints() {
-                    this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>({A.X}, {A.X}, {Xsquared}));
-
-                    this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(
-                        {lambda * 2},
-                        {A.Y},
-                        {Xsquared * 3, pb_variable<FieldType>(0) * algebra::G1<other_curve<CurveType>>::a}));
-
-                    this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>({lambda}, {lambda}, {B.X, A.X * 2}));
-
-                    this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>({lambda}, {A.X, B.X * (-1)}, {B.Y, A.Y}));
-                }
-
-                template<typename CurveType>
-                void G1_dbl_gadget<CurveType>::generate_r1cs_witness() {
-                    this->pb.val(Xsquared) = this->pb.lc_val(A.X).squared();
-                    this->pb.val(lambda) = (typename FieldType::value_type(3) * this->pb.val(Xsquared) +
-                                            algebra::G1<other_curve<CurveType>>::a) *
-                                           (typename FieldType::value_type(2) * this->pb.lc_val(A.Y)).inverse();
-                    this->pb.lc_val(B.X) =
-                        this->pb.val(lambda).squared() - typename FieldType::value_type(2) * this->pb.lc_val(A.X);
-                    this->pb.lc_val(B.Y) =
-                        this->pb.val(lambda) * (this->pb.lc_val(A.X) - this->pb.lc_val(B.X)) - this->pb.lc_val(A.Y);
-                }
-
-                template<typename CurveType>
-                G1_multiscalar_mul_gadget<CurveType>::G1_multiscalar_mul_gadget(
-                    protoboard<FieldType> &pb,
-                    const G1_variable<CurveType> &base,
-                    const pb_variable_array<FieldType> &scalars,
-                    const std::size_t elt_size,
-                    const std::vector<G1_variable<CurveType>> &points,
-                    const G1_variable<CurveType> &result) :
-                    gadget<FieldType>(pb),
-                    base(base), scalars(scalars), points(points), result(result), elt_size(elt_size),
-                    num_points(points.size()), scalar_size(scalars.size()) {
-                    assert(num_points >= 1);
-                    assert(num_points * elt_size == scalar_size);
-
-                    for (std::size_t i = 0; i < num_points; ++i) {
-                        points_and_powers.emplace_back(points[i]);
-                        for (std::size_t j = 0; j < elt_size - 1; ++j) {
-                            points_and_powers.emplace_back(G1_variable<CurveType>(pb));
-                            doublers.emplace_back(G1_dbl_gadget<CurveType>(
-                                pb, points_and_powers[i * elt_size + j], points_and_powers[i * elt_size + j + 1]));
-                        }
-                    }
-
-                    chosen_results.emplace_back(base);
-                    for (std::size_t i = 0; i < scalar_size; ++i) {
-                        computed_results.emplace_back(G1_variable<CurveType>(pb));
-                        if (i < scalar_size - 1) {
-                            chosen_results.emplace_back(G1_variable<CurveType>(pb));
-                        } else {
-                            chosen_results.emplace_back(result);
-                        }
-
-                        adders.emplace_back(
-                            G1_add_gadget<CurveType>(pb, chosen_results[i], points_and_powers[i], computed_results[i]));
-                    }
-                }
-
-                template<typename CurveType>
-                void G1_multiscalar_mul_gadget<CurveType>::generate_r1cs_constraints() {
-                    const std::size_t num_constraints_before = this->pb.num_constraints();
-
-                    for (std::size_t i = 0; i < scalar_size - num_points; ++i) {
-                        doublers[i].generate_r1cs_constraints();
-                    }
-
-                    for (std::size_t i = 0; i < scalar_size; ++i) {
-                        adders[i].generate_r1cs_constraints();
-
-                        /*
-                          chosen_results[i+1].X = scalars[i] * computed_results[i].X + (1-scalars[i]) *
-                          chosen_results[i].X chosen_results[i+1].X - chosen_results[i].X = scalars[i] *
-                          (computed_results[i].X - chosen_results[i].X)
-                        */
-                        this->pb.add_r1cs_constraint(
-                            r1cs_constraint<FieldType>(scalars[i],
-                                                       computed_results[i].X - chosen_results[i].X,
-                                                       chosen_results[i + 1].X - chosen_results[i].X));
-                        this->pb.add_r1cs_constraint(
-                            r1cs_constraint<FieldType>(scalars[i],
-                                                       computed_results[i].Y - chosen_results[i].Y,
-                                                       chosen_results[i + 1].Y - chosen_results[i].Y));
-                    }
-
-                    const std::size_t num_constraints_after = this->pb.num_constraints();
-                    assert(num_constraints_after - num_constraints_before ==
-                           4 * (scalar_size - num_points) + (4 + 2) * scalar_size);
-                }
-
-                template<typename CurveType>
-                void G1_multiscalar_mul_gadget<CurveType>::generate_r1cs_witness() {
-                    for (std::size_t i = 0; i < scalar_size - num_points; ++i) {
-                        doublers[i].generate_r1cs_witness();
-                    }
-
-                    for (std::size_t i = 0; i < scalar_size; ++i) {
-                        adders[i].generate_r1cs_witness();
-                        this->pb.lc_val(chosen_results[i + 1].X) =
-                            (this->pb.val(scalars[i]) == typename CurveType::scalar_field_type::zero() ?
-                                 this->pb.lc_val(chosen_results[i].X) :
-                                 this->pb.lc_val(computed_results[i].X));
-                        this->pb.lc_val(chosen_results[i + 1].Y) =
-                            (this->pb.val(scalars[i]) == typename CurveType::scalar_field_type::zero() ?
-                                 this->pb.lc_val(chosen_results[i].Y) :
-                                 this->pb.lc_val(computed_results[i].Y));
-                    }
-                }
-
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3
