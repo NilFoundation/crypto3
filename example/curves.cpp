@@ -50,6 +50,16 @@ void curve_weierstrass_basic_math_examples()
     std::cout << "c1 + c2 value: ";
     print_curve_element(c1 + c2);
 
+    std::cout << "c1 - c2 value: ";
+    print_curve_element(c1 - c2);
+
+    std::cout << "Double c1 value: ";
+    print_curve_element(c1.dbl());
+
+    value_type cn = c1.normalize();
+    
+    std::cout << "c1 normalized value: ";
+    print_curve_element(cn);
 
 }
 

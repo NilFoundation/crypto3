@@ -120,7 +120,7 @@ void fields_fp2_basic_math_examples()
 
     std::cout << "Field module value: " <<  policy_type::modulus << std::endl;
 
-    value_type e1 = value_type({76749407, 44410867}), e2({44410867, 1}), e3 = value_type::one(), e4({121160274, 7});
+    value_type e1 = value_type(76749407, 44410867), e2(44410867, 1), e3 = value_type::one(), e4(121160274, 7);
 
     value_type ee(e1);
 

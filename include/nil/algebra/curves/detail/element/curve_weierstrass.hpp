@@ -32,6 +32,12 @@ namespace nil {
                         p[2] = z;
                     }
 
+                    element_curve_weierstrass(const element_curve_weierstrass &B) {
+                        p[0] = B.p[0];
+                        p[1] = B.p[1];
+                        p[2] = B.p[2];
+                    }
+
                     element_curve_weierstrass normalize() const {
                         FieldElementType p_out[3];
 
@@ -42,7 +48,7 @@ namespace nil {
                         r2 = r.square();
                         p_out[0] = p[0] * r2;        // r2
                         p_out[1] = p[1] * r * r2;    // r3
-                        p[2] = 1;
+                        p_out[2] = 1;
 
                         return element_curve_weierstrass(p_out[0], p_out[1], p_out[2]);
                     }
@@ -136,7 +142,13 @@ namespace nil {
 
                     template<class N>
                     element_curve_weierstrass &operator*=(const N &y) {
-                        return *this * y;
+                        element_curve_weierstrass t = *this * y;
+
+                        p[0] = t.p[0];
+                        p[1] = t.p[1];
+                        p[2] = t.p[2];
+
+                        return *this;
                     }
 
                     bool operator==(const element_curve_weierstrass &rhs) const {
@@ -162,11 +174,23 @@ namespace nil {
                     }
 
                     element_curve_weierstrass &operator+=(const element_curve_weierstrass &rhs) {
-                        return *this + rhs;
+                        element_curve_weierstrass t = *this + rhs;
+
+                        p[0] = t.p[0];
+                        p[1] = t.p[1];
+                        p[2] = t.p[2];
+
+                        return *this;
                     }
 
                     element_curve_weierstrass &operator-=(const element_curve_weierstrass &rhs) {
-                        return *this - rhs;
+                        element_curve_weierstrass t = *this - rhs;
+
+                        p[0] = t.p[0];
+                        p[1] = t.p[1];
+                        p[2] = t.p[2];
+
+                        return *this;
                     }
                 };
 
