@@ -19,11 +19,15 @@ if(BOOST_CMAKE)
                            ${CMAKE_WORKSPACE_NAME}::filesystem
                            ${CMAKE_WORKSPACE_NAME}::test
                            ${CMAKE_WORKSPACE_NAME}::math
-                           ${CMAKE_WORKSPACE_NAME}::multiprecision)
+                           ${CMAKE_WORKSPACE_NAME}::multiprecision
+
+                           crypto3::stream)
 else()
     find_package(Boost REQUIRED COMPONENTS filesystem unit_test_framework)
 
     cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
+
+                           crypto3::stream
 
                            $<TARGET_NAME_IF_EXISTS:boost_multiprecision>
 
@@ -150,5 +154,7 @@ if(Boost_MULTIPRECISION_FOUND OR TARGET boost_multiprecision)
     cm_test(NAME ${CURRENT_PROJECT_NAME}_test_multiprecision_float_test SOURCES
             ${CURRENT_TEST_SOURCES_DIR}/multiprecision_float_test.cpp)
 endif()
+
+cm_test(NAME ${CURRENT_PROJECT_NAME}_test_test_chacha SOURCES ${CURRENT_TEST_SOURCES_DIR}/test_chacha.cpp)
 
 include_directories(${CMAKE_WORKSPACE_SOURCES_DIR})
