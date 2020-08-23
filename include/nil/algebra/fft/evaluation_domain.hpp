@@ -91,12 +91,12 @@ namespace nil {
                 /**
                  * Compute the FFT, over the domain S, of the vector a.
                  */
-                virtual void FFT(std::vector<FieldType> &a) = 0;
+                virtual void FFT(std::vector<typename FieldType::value_type> &a) = 0;
 
                 /**
                  * Compute the inverse FFT, over the domain S, of the vector a.
                  */
-                virtual void iFFT(std::vector<FieldType> &a) = 0;
+                virtual void iFFT(std::vector<typename FieldType::value_type> &a) = 0;
 
                 /**
                  * Evaluate all Lagrange polynomials.
@@ -107,7 +107,7 @@ namespace nil {
                  * The output is a vector (b_{0},...,b_{m-1})
                  * where b_{i} is the evaluation of L_{i,S}(z) at z = t.
                  */
-                virtual std::vector<FieldType> evaluate_all_lagrange_polynomials(const FieldType &t) = 0;
+                virtual std::vector<typename FieldType::value_type> evaluate_all_lagrange_polynomials(const FieldType &t) = 0;
 
                 /**
                  * Evaluate the vanishing polynomial of S at the field element t.
@@ -117,12 +117,12 @@ namespace nil {
                 /**
                  * Add the coefficients of the vanishing polynomial of S to the coefficients of the polynomial H.
                  */
-                virtual void add_poly_Z(const FieldType &coeff, std::vector<FieldType> &H) = 0;
+                virtual void add_poly_Z(const FieldType &coeff, std::vector<typename FieldType::value_type> &H) = 0;
 
                 /**
                  * Multiply by the evaluation, on a coset of S, of the inverse of the vanishing polynomial of S.
                  */
-                virtual void divide_by_Z_on_coset(std::vector<FieldType> &P) = 0;
+                virtual void divide_by_Z_on_coset(std::vector<typename FieldType::value_type> &P) = 0;
             };
 
             /*!

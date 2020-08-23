@@ -47,12 +47,12 @@ namespace nil {
                     shift = coset_shift<FieldType>();
                 }
 
-                void FFT(std::vector<FieldType> &a) {
+                void FFT(std::vector<typename FieldType::value_type> &a) {
                     if (a.size() != this->m)
                         throw std::invalid_argument("extended_radix2: expected a.size() == this->m");
 
-                    std::vector<FieldType> a0(small_m, FieldType::zero());
-                    std::vector<FieldType> a1(small_m, FieldType::zero());
+                    std::vector<typename FieldType::value_type> a0(small_m, FieldType::zero());
+                    std::vector<typename FieldType::value_type> a1(small_m, FieldType::zero());
 
                     const FieldType shift_to_small_m = shift ^ small_m;
 
@@ -72,13 +72,13 @@ namespace nil {
                         a[i + small_m] = a1[i];
                     }
                 }
-                void iFFT(std::vector<FieldType> &a) {
+                void iFFT(std::vector<typename FieldType::value_type> &a) {
                     if (a.size() != this->m)
                         throw std::invalid_argument("extended_radix2: expected a.size() == this->m");
 
                     // note: this is not in-place
-                    std::vector<FieldType> a0(a.begin(), a.begin() + small_m);
-                    std::vector<FieldType> a1(a.begin() + small_m, a.end());
+                    std::vector<typename FieldType::value_type> a0(a.begin(), a.begin() + small_m);
+                    std::vector<typename FieldType::value_type> a1(a.begin() + small_m, a.end());
 
                     const FieldType omega_inverse = omega.inverse();
                     _basic_radix2_FFT(a0, omega_inverse);
@@ -97,12 +97,12 @@ namespace nil {
                         shift_inverse_i *= shift_inverse;
                     }
                 }
-                std::vector<FieldType> evaluate_all_lagrange_polynomials(const FieldType &t) {
-                    const std::vector<FieldType> T0 = basic_radix2_evaluate_all_lagrange_polynomials(small_m, t);
-                    const std::vector<FieldType> T1 =
+                std::vector<typename FieldType::value_type> evaluate_all_lagrange_polynomials(const FieldType &t) {
+                    const std::vector<typename FieldType::value_type> T0 = basic_radix2_evaluate_all_lagrange_polynomials(small_m, t);
+                    const std::vector<typename FieldType::value_type> T1 =
                         basic_radix2_evaluate_all_lagrange_polynomials(small_m, t * shift.inverse());
 
-                    std::vector<FieldType> result(this->m, FieldType::zero());
+                    std::vector<typename FieldType::value_type> result(this->m, FieldType::zero());
 
                     const FieldType t_to_small_m = t ^ small_m;
                     const FieldType shift_to_small_m = shift ^ small_m;
@@ -129,7 +129,7 @@ namespace nil {
                     return ((t ^ small_m) - FieldType::one()) * ((t ^ small_m) - (shift ^ small_m));
                 }
 
-                void add_poly_Z(const FieldType &coeff, std::vector<FieldType> &H) {
+                void add_poly_Z(const FieldType &coeff, std::vector<typename FieldType::value_type> &H) {
                     if (H.size() != this->m + 1)
                         throw std::invalid_argument("extended_radix2: expected H.size() == this->m+1");
 
@@ -140,7 +140,7 @@ namespace nil {
                     H[0] += coeff * shift_to_small_m;
                 }
 
-                void divide_by_Z_on_coset(std::vector<FieldType> &P) {
+                void divide_by_Z_on_coset(std::vector<typename FieldType::value_type> &P) {
                     const FieldType coset = FieldType::multiplicative_generator;
 
                     const FieldType coset_to_small_m = coset ^ small_m;

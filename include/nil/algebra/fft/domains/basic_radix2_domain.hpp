@@ -42,14 +42,14 @@ namespace nil {
                     }
                 }
 
-                void FFT(std::vector<FieldType> &a) {
+                void FFT(std::vector<typename FieldType::value_type> &a) {
                     if (a.size() != this->m)
                         throw std::invalid_argument("basic_radix2: expected a.size() == this->m");
 
                     _basic_radix2_FFT(a, omega);
                 }
 
-                void iFFT(std::vector<FieldType> &a) {
+                void iFFT(std::vector<typename FieldType::value_type> &a) {
                     if (a.size() != this->m)
                         throw std::invalid_argument("basic_radix2: expected a.size() == this->m");
 
@@ -61,7 +61,7 @@ namespace nil {
                     }
                 }
 
-                std::vector<FieldType> evaluate_all_lagrange_polynomials(const FieldType &t) {
+                std::vector<typename FieldType::value_type> evaluate_all_lagrange_polynomials(const FieldType &t) {
                     return basic_radix2_evaluate_all_lagrange_polynomials(this->m, t);
                 }
 
@@ -73,7 +73,7 @@ namespace nil {
                     return (t ^ this->m) - FieldType::one();
                 }
 
-                void add_poly_Z(const FieldType &coeff, std::vector<FieldType> &H) {
+                void add_poly_Z(const FieldType &coeff, std::vector<typename FieldType::value_type> &H) {
                     if (H.size() != this->m + 1)
                         throw std::invalid_argument("basic_radix2: expected H.size() == this->m+1");
 
@@ -81,7 +81,7 @@ namespace nil {
                     H[0] -= coeff;
                 }
 
-                void divide_by_Z_on_coset(std::vector<FieldType> &P) {
+                void divide_by_Z_on_coset(std::vector<typename FieldType::value_type> &P) {
                     const FieldType coset = FieldType::multiplicative_generator;
                     const FieldType Z_inverse_at_coset = this->compute_vanishing_polynomial(coset).inverse();
                     for (size_t i = 0; i < this->m; ++i) {

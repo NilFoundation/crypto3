@@ -27,23 +27,23 @@ namespace nil {
              */
 
             template<typename FieldType>
-            void _polynomial_xgcd(const std::vector<FieldType> &a, const std::vector<FieldType> &b, std::vector<FieldType> &g,
-                                  std::vector<FieldType> &u, std::vector<FieldType> &v) {
+            void _polynomial_xgcd(const std::vector<typename FieldType::value_type> &a, const std::vector<typename FieldType::value_type> &b, std::vector<typename FieldType::value_type> &g,
+                                  std::vector<typename FieldType::value_type> &u, std::vector<typename FieldType::value_type> &v) {
                 if (_is_zero(b)) {
                     g = a;
-                    u = std::vector<FieldType>(1, FieldType::one());
-                    v = std::vector<FieldType>(1, FieldType::zero());
+                    u = std::vector<typename FieldType::value_type>(1, FieldType::one());
+                    v = std::vector<typename FieldType::value_type>(1, FieldType::zero());
                     return;
                 }
 
-                std::vector<FieldType> U(1, FieldType::one());
-                std::vector<FieldType> V1(1, FieldType::zero());
-                std::vector<FieldType> G(a);
-                std::vector<FieldType> V3(b);
+                std::vector<typename FieldType::value_type> U(1, FieldType::one());
+                std::vector<typename FieldType::value_type> V1(1, FieldType::zero());
+                std::vector<typename FieldType::value_type> G(a);
+                std::vector<typename FieldType::value_type> V3(b);
 
-                std::vector<FieldType> Q(1, FieldType::zero());
-                std::vector<FieldType> R(1, FieldType::zero());
-                std::vector<FieldType> T(1, FieldType::zero());
+                std::vector<typename FieldType::value_type> Q(1, FieldType::zero());
+                std::vector<typename FieldType::value_type> R(1, FieldType::zero());
+                std::vector<typename FieldType::value_type> T(1, FieldType::zero());
 
                 while (!_is_zero(V3)) {
                     _polynomial_division(Q, R, G, V3);

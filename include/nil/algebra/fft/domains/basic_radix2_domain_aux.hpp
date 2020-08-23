@@ -39,7 +39,7 @@ namespace nil {
                  * Also, note that it's the caller's responsibility to multiply by 1/N.
                  */
                 template<typename FieldType>
-                void basic_serial_radix2_FFT(std::vector<FieldType> &a, const FieldType &omega) {
+                void basic_serial_radix2_FFT(std::vector<typename FieldType::value_type> &a, const FieldType &omega) {
                     const size_t n = a.size(), logn = log2(n);
                     if (n != (1u << logn))
                         throw std::invalid_argument("expected n == (1u << logn)");
@@ -72,7 +72,7 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                void basic_parallel_radix2_FFT_inner(std::vector<FieldType> &a, const FieldType &omega,
+                void basic_parallel_radix2_FFT_inner(std::vector<typename FieldType::value_type> &a, const FieldType &omega,
                                                       const size_t log_cpus) {
                     const size_t num_cpus = 1ul << log_cpus;
 
@@ -86,7 +86,7 @@ namespace nil {
                         return;
                     }
 
-                    std::vector<std::vector<FieldType>> tmp(num_cpus);
+                    std::vector<std::vector<typename FieldType::value_type>> tmp(num_cpus);
                     for (size_t j = 0; j < num_cpus; ++j) {
                         tmp[j].resize(1ul << (log_m - log_cpus), FieldType::zero());
                     }
@@ -132,7 +132,7 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                void basic_parallel_radix2_FFT(std::vector<FieldType> &a, const FieldType &omega) {
+                void basic_parallel_radix2_FFT(std::vector<typename FieldType::value_type> &a, const FieldType &omega) {
 #ifdef MULTICORE
                     const size_t num_cpus = omp_get_max_threads();
 #else
@@ -157,9 +157,9 @@ namespace nil {
                  * element t.
                  */
                 template<typename FieldType>
-                std::vector<FieldType> basic_radix2_evaluate_all_lagrange_polynomials(const size_t m, const FieldType &t) {
+                std::vector<typename FieldType::value_type> basic_radix2_evaluate_all_lagrange_polynomials(const size_t m, const FieldType &t) {
                     if (m == 1) {
-                        return std::vector<FieldType>(1, FieldType::one());
+                        return std::vector<typename FieldType::value_type>(1, FieldType::one());
                     }
 
                     if (m != (1u << static_cast<std::size_t>(std::ceil(std::log2(m)))))
@@ -167,7 +167,7 @@ namespace nil {
 
                     const FieldType omega = unity_root<FieldType>(m);
 
-                    std::vector<FieldType> u(m, FieldType::zero());
+                    std::vector<typename FieldType::value_type> u(m, FieldType::zero());
 
                     /*
                      If t equals one of the roots of unity in S={omega^{0},...,omega^{m-1}}

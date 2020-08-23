@@ -33,7 +33,7 @@ using namespace nil::algebra::fft;
 template<typename FieldType>
 void test_fft() {
     const size_t m = 4;
-    std::vector<FieldType> f = {2, 5, 3, 8};
+    std::vector<typename FieldType::value_type> f = {2, 5, 3, 8};
 
     std::shared_ptr<evaluation_domain<FieldType>> domain;
     for (int key = 0; key < 5; key++) {
@@ -49,10 +49,10 @@ void test_fft() {
             else if (key == 4)
                 domain.reset(new arithmetic_sequence_domain<FieldType>(m));
 
-            std::vector<FieldType> a(f);
+            std::vector<typename FieldType::value_type> a(f);
             domain->FFT(a);
 
-            std::vector<FieldType> idx(m);
+            std::vector<typename FieldType::value_type> idx(m);
             for (size_t i = 0; i < m; i++) {
                 idx[i] = domain->get_domain_element(i);
             }
@@ -72,7 +72,7 @@ void test_fft() {
 template<typename FieldType>
 void test_inverse_fft_to_fft() {
     const size_t m = 4;
-    std::vector<FieldType> f = {2, 5, 3, 8};
+    std::vector<typename FieldType::value_type> f = {2, 5, 3, 8};
 
     std::shared_ptr<evaluation_domain<FieldType>> domain;
     for (int key = 0; key < 5; key++) {
@@ -88,7 +88,7 @@ void test_inverse_fft_to_fft() {
             else if (key == 4)
                 domain.reset(new arithmetic_sequence_domain<FieldType>(m));
 
-            std::vector<FieldType> a(f);
+            std::vector<typename FieldType::value_type> a(f);
             domain->FFT(a);
             domain->iFFT(a);
 
@@ -106,7 +106,7 @@ void test_inverse_fft_to_fft() {
 template<typename FieldType>
 void test_inverse_coset_ftt_to_coset_fft() {
     const size_t m = 4;
-    std::vector<FieldType> f = {2, 5, 3, 8};
+    std::vector<typename FieldType::value_type> f = {2, 5, 3, 8};
 
     FieldType coset = FieldType::multiplicative_generator;
 
@@ -124,7 +124,7 @@ void test_inverse_coset_ftt_to_coset_fft() {
             else if (key == 4)
                 domain.reset(new arithmetic_sequence_domain<FieldType>(m));
 
-            std::vector<FieldType> a(f);
+            std::vector<typename FieldType::value_type> a(f);
             multiply_by_coset(a, coset);
             domain->FFT(a, coset);
             domain->iFFT(a, coset);
@@ -161,10 +161,10 @@ void test_lagrange_coefficients() {
             else if (key == 4)
                 domain.reset(new arithmetic_sequence_domain<FieldType>(m));
 
-            std::vector<FieldType> a;
+            std::vector<typename FieldType::value_type> a;
             a = domain->evaluate_all_lagrange_polynomials(t);
 
-            std::vector<FieldType> d(m);
+            std::vector<typename FieldType::value_type> d(m);
             for (size_t i = 0; i < m; i++) {
                 d[i] = domain->get_domain_element(i);
             }

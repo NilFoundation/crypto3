@@ -28,7 +28,7 @@ namespace nil {
              * The output is the polynomial P(x) evaluated at x = t.
              */    
             template<typename FieldType>
-            FieldType evaluate_polynomial(const size_t &m, const std::vector<FieldType> &coeff, const FieldType &t) {
+            FieldType evaluate_polynomial(const size_t &m, const std::vector<typename FieldType::value_type> &coeff, const FieldType &t) {
                 if (m != coeff.size())
                     throw DomainSizeException("expected m == coeff.size()");
 
@@ -55,7 +55,7 @@ namespace nil {
              * The output is the polynomial L_{idx,S}(z) evaluated at z = t.
              */
             template<typename FieldType>
-            FieldType evaluate_lagrange_polynomial(const size_t &m, const std::vector<FieldType> &domain, const FieldType &t,
+            FieldType evaluate_lagrange_polynomial(const size_t &m, const std::vector<typename FieldType::value_type> &domain, const FieldType &t,
                                                 const size_t &idx) {
                 if (m != domain.size())
                     throw DomainSizeException("expected m == domain.size()");

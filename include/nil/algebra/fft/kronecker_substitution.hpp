@@ -175,8 +175,8 @@ namespace nil {
              * and stores result in polynomial C.
              */
             template<typename FieldType>
-            void _polynomial_multiplication_on_kronecker(std::vector<FieldType>& c, const std::vector<FieldType>& a,
-                                                         const std::vector<FieldType>& b) {
+            void _polynomial_multiplication_on_kronecker(std::vector<typename FieldType::value_type>& c, const std::vector<typename FieldType::value_type>& a,
+                                                         const std::vector<typename FieldType::value_type>& b) {
                 kronecker_substitution(c, a, b);
             }
 
