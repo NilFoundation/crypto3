@@ -23,14 +23,14 @@ namespace nil {
         namespace curves {
             namespace detail {
 
-                <typename ModulusBits = 254, typename GeneratorBits = CHAR_BIT>
-                struct bn128_G1 : public element_bn128<bn128_fq<ModulusBits, GeneratorBits>::value_type>{
-                    using base_field = bn128_fq<ModulusBits, GeneratorBits>;
-                    using scalar_field = bn128_fr<ModulusBits, GeneratorBits>;
+                template <typename ModulusBits = 254, typename GeneratorBits = CHAR_BIT>
+                struct bn128_G1 : public bn128<ModulusBits>::value_type>{
+                    using base_field_type = bn128<ModulusBits> :: base_field_type;
+                    using scalar_field_type = bn128<ModulusBits> :: scalar_field_type;
                     
-                    using value_type = base_field::value_type;
+                    using value_type = base_field_type::value_type;
                 private:
-                    using policy_type = element_bn128<value_type>;
+                    using policy_type = bn128<ModulusBits>::value_type;
                 public:
 
                     bn128_G1():policy_type(value_type::one(),value_type::one(),value_type::zero()){};
@@ -125,33 +125,6 @@ namespace nil {
                         return result;
                     }
 
-                    bool is_well_formed() const {
-                        if (is_zero()) {
-                            return true;
-                        } else {
-                            /*
-                              y^2 = x^3 + b
-
-                              We are using Jacobian coordinates, so equation we need to check is actually
-
-                              (y/z^3)^2 = (x/z^2)^3 + b
-                              y^2 / z^6 = x^3 / z^6 + b
-                              y^2 = x^3 + b z^6
-                            */
-                            value_type X2, Y2, Z2;
-                            X2 = coord[0].square();
-                            Y2 = coord[1].square();
-                            Z2 = coord[2].square();
-
-                            value_type X3, Z3, Z6;
-                            X3 = X2 * coord[0];
-                            Z3 = Z2 * coord[2];
-                            Z6 = Z3.square();
-
-                            return (Y2 == X3 + bn128_coeff_b * Z6);
-                        }
-                    }
-
                     static bn128_G1 zero() {
                         return bn128_G1();
                     }
@@ -168,26 +141,6 @@ namespace nil {
                     template<typename NumberType>
                     static NumberType order() {
                         return arithmetic_params<scalar_field>::q;
-                    }
-
-                    static void batch_to_special_all_non_zeros(std::vector<bn128_G1> &vec) {
-                        std::vector<value_type> Z_vec;
-                        Z_vec.reserve(vec.size());
-
-                        for (auto &el : vec) {
-                            Z_vec.emplace_back(el.coord[2]);
-                        }
-                        bn_batch_invert<value_type>(Z_vec);
-
-                        for (size_t i = 0; i < vec.size(); ++i) {
-                            value_type Z2, Z3;
-                            Z2 = Z_vec[i].square();
-                            Z3 = Z2 * Z_vec[i];
-
-                            vec[i].coord[0] *=  Z2;
-                            vec[i].coord[1] *= Z3;
-                            vec[i].coord[2] = value_type::one();
-                        }
                     }
 
                 private:
