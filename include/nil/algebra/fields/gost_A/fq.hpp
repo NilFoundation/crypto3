@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef ALGEBRA_FIELDS_GIST_A_FQ_HPP
-#define ALGEBRA_FIELDS_GIST_A_FQ_HPP
+#ifndef ALGEBRA_FIELDS_GOST_A_FQ_HPP
+#define ALGEBRA_FIELDS_GOST_A_FQ_HPP
 
 #include <nil/algebra/fields/detail/element/fp.hpp>
 #include <nil/algebra/fields/detail/params/params.hpp>
@@ -57,4 +57,4 @@ namespace nil {
     }        // namespace algebra
 }    // namespace nil
 
-#endif    // ALGEBRA_FIELDS_GIST_A_FQ_HPP
+#endif    // ALGEBRA_FIELDS_GOST_A_FQ_HPP
