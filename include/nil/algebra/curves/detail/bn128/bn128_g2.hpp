@@ -12,9 +12,6 @@
 
 #include <vector>
 
-#include <nil/algebra/curves/detail/bn128/bn128_init.hpp>
-#include <nil/algebra/curves/detail/bn128/bn_utils.hpp>
-
 #include <boost/multiprecision/cpp_int/multiply.hpp>
 #include <boost/multiprecision/modular/base_params.hpp>
 
@@ -22,19 +19,21 @@ namespace nil {
     namespace algebra {
         namespace curves {
             namespace detail {
-                
-                struct bn128_G2 : public element_bn128<bn128_fq2<ModulusBits, GeneratorBits>::value_type>{
+
+                template<std::size_t ModulusBits, std::size_t GeneratorBits>
+                struct bn128_G2 : public element_bn128<bn128_fq2<ModulusBits, GeneratorBits>::value_type> {
                     using base_field = bn128_fq2<ModulusBits, GeneratorBits>;
                     using scalar_field = bn128_fr<ModulusBits, GeneratorBits>;
-                    
+
                     using value_type = base_field::value_type;
+
                 private:
                     using policy_type = element_bn128<value_type>;
-                public:
-                    
-                    bn128_G2():policy_type(value_type::one(),value_type::one(),value_type::zero()){};
 
-                    bn128_G2(value_type X, value_type Y, value_type Z) : policy_type(X, Y, Z){};
+                public:
+                    bn128_G2() : policy_type(value_type::one(), value_type::one(), value_type::zero()) {};
+
+                    bn128_G2(value_type X, value_type Y, value_type Z) : policy_type(X, Y, Z) {};
 
                     bool is_zero() const {
                         return coord[2].is_zero();
@@ -54,8 +53,8 @@ namespace nil {
                         value_type Z1sq = coord[2].square();
                         value_type Z2sq = other.coord[2].square();
 
-                        return (Z2sq * coord[0] == Z1sq * other.coord[0]) && 
-                                    (Z2sq * other.coord[2] * coord[1] == Z1sq * coord[2] * other.coord[1]);
+                        return (Z2sq * coord[0] == Z1sq * other.coord[0]) &&
+                               (Z2sq * other.coord[2] * coord[1] == Z1sq * coord[2] * other.coord[1]);
                     }
 
                     bool operator!=(const bn128_G2 &other) const {
@@ -117,8 +116,8 @@ namespace nil {
                         // Y3 = r*(V-X3)-2*Y1*J
                         result.coord[1] = r * (V - result.coord[0]);
                         tmp = coord[1] * J;
-                        result.coord[1] -=  (tmp + tmp);
-                        // Z3 = (Z1+H)^2-Z1Z1-HH                
+                        result.coord[1] -= (tmp + tmp);
+                        // Z3 = (Z1+H)^2-Z1Z1-HH
                         result.coord[2] = (coord[2] + H).square() - Z1Z1 - HH;
 
                         return result;
@@ -156,12 +155,11 @@ namespace nil {
                     }
 
                     static bn128_G2 one() {
-                        return bn128_G2(
-                            {15267802884793550383558706039165621050290089775961208824303765753922461897946, 
-                                9034493566019742339402378670461897774509967669562610788113215988055021632533},
-                            {644888581738283025171396578091639672120333224302184904896215738366765861164,
-                                20532875081203448695448744255224543661959516361327385779878476709582931298750},
-                            {1,0});
+                        return bn128_G2({15267802884793550383558706039165621050290089775961208824303765753922461897946,
+                                         9034493566019742339402378670461897774509967669562610788113215988055021632533},
+                                        {644888581738283025171396578091639672120333224302184904896215738366765861164,
+                                         20532875081203448695448744255224543661959516361327385779878476709582931298750},
+                                        {1, 0});
                     }
 
                     template<typename NumberType>
@@ -188,22 +186,21 @@ namespace nil {
                             Z2 = Z_vec[i].square();
                             Z3 = Z2 * Z_vec[i];
 
-                            vec[i].coord[0] *=  Z2;
+                            vec[i].coord[0] *= Z2;
                             vec[i].coord[1] *= Z3;
                             vec[i].coord[2] = value_type::one();
                         }
                     }
 
                 private:
-
                     /* additional parameters for square roots in Fq2 */
-                    value_type bn128_twist_coeff_b = value_type({
-                        19485874751759354771024239261021720505790618469301721065564631296452457478373,
-                            266929791119991161246907387137283842545076965332900288569378510910307636690});
+                    value_type bn128_twist_coeff_b =
+                        value_type({19485874751759354771024239261021720505790618469301721065564631296452457478373,
+                                    266929791119991161246907387137283842545076965332900288569378510910307636690});
                 };
 
             }    // namespace detail
-        }    // namespace curves
-    }    // namespace algebra
+        }        // namespace curves
+    }            // namespace algebra
 }    // namespace nil
 #endif    // ALGEBRA_CURVES_BN128_G2_HPP

@@ -19,18 +19,19 @@ namespace nil {
 
                 template<typename FieldElementType>
                 struct element_curve_weierstrass {
-                    
+
                     FieldElementType p[3];
 
                     element_curve_weierstrass() {
                     }
 
-                    element_curve_weierstrass(const FieldElementType &x, const FieldElementType &y, const FieldElementType &z) {
+                    element_curve_weierstrass(const FieldElementType &x, const FieldElementType &y,
+                                              const FieldElementType &z) {
                         p[0] = x;
                         p[1] = y;
-                        p[2] = z;   
+                        p[2] = z;
                     }
-                    
+
                     element_curve_weierstrass normalize() const {
                         FieldElementType p_out[3];
 
@@ -39,18 +40,18 @@ namespace nil {
                         FieldElementType r, r2;
                         r = p[2].inverse();
                         r2 = r.square();
-                        p_out[0] = p[0] * r2; //r2
-                        p_out[1] = p[1] * r * r2;  //r3
+                        p_out[0] = p[0] * r2;        // r2
+                        p_out[1] = p[1] * r * r2;    // r3
                         p[2] = 1;
 
-                        return element_curve_weierstrass (p_out[0], p_out[1], p_out[2]);
+                        return element_curve_weierstrass(p_out[0], p_out[1], p_out[2]);
                     }
 
                     /*
                         Jacobi coordinate
                         (p_out[0], p_out[1], p_out[2]) = 2(p[0], p[1], p[2])
                     */
-                    element_curve_weierstrass dbl() const{
+                    element_curve_weierstrass dbl() const {
                         FieldElementType p_out[3];
 
                         FieldElementType A, B, C, D, E;
@@ -64,7 +65,7 @@ namespace nil {
                         p_out[1] = E * (D - p_out[0]) - C.dbl().dbl().dbl();
                         p_out[2] = (p[1] * p[2]).dbl();
 
-                        return element_curve_weierstrass (p_out[0], p_out[1], p_out[2]);
+                        return element_curve_weierstrass(p_out[0], p_out[1], p_out[2]);
                     }
 
                     /*
@@ -106,7 +107,7 @@ namespace nil {
                         p_out[1] = r * (V - p_out[0]) - (S1 * J).dbl();
                         p_out[2] = ((p[2] + B.p[2]).square() - Z1Z1 - Z2Z2) * H;
 
-                        return element_curve_weierstrass (p_out[0], p_out[1], p_out[2]);
+                        return element_curve_weierstrass(p_out[0], p_out[1], p_out[2]);
                     }
 
                     element_curve_weierstrass operator-(const element_curve_weierstrass &B) const {
@@ -129,7 +130,7 @@ namespace nil {
                     */
                     template<typename NumberType>
                     element_curve_weierstrass operator*(const NumberType N) const {
-                        //return multi_exp(*this, N);
+                        // return multi_exp(*this, N);
                         return *this;
                     }
 
@@ -169,9 +170,9 @@ namespace nil {
                     }
                 };
 
-            }   //  namespace detail
-        }   //  namespace curves
-    }   //  namespace algebra
-}   //  namespace nil
+            }    //  namespace detail
+        }        //  namespace curves
+    }            //  namespace algebra
+}    //  namespace nil
 
 #endif    // ALGEBRA_CURVES_ELEMENT_CURVE_WEIERSTRASS_HPP

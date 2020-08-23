@@ -22,10 +22,10 @@ namespace nil {
         namespace curves {
             namespace detail {
 
-                template <typename ModulusBits, typename GeneratorBits>
+                template<typename ModulusBits, typename GeneratorBits>
                 using fp_value_type = element_fp<ModulusBits, GeneratorBits>;
 
-                template <typename ModulusBits, typename GeneratorBits>
+                template<typename ModulusBits, typename GeneratorBits>
                 using fp2_value_type = element_fp2<ModulusBits, GeneratorBits>;
 
                 struct bn128_ate_G1_precomp {
@@ -82,12 +82,13 @@ namespace nil {
                                                         const bn128_ate_G1_precomp &prec_P2,
                                                         const bn128_ate_G2_precomp &prec_Q2) {
                     bn128_Fq12 f;
-                    
+
                     nil::algebra::pairing::millerLoop2(f.elem, prec_Q1.coeffs, prec_P1.P, prec_Q2.coeffs, prec_P2.P);
                     return f;
                 }
 
-                bn128_Fq12 bn128_ate_miller_loop(const bn128_ate_G1_precomp &prec_P, const bn128_ate_G2_precomp &prec_Q) {
+                bn128_Fq12 bn128_ate_miller_loop(const bn128_ate_G1_precomp &prec_P,
+                                                 const bn128_ate_G2_precomp &prec_Q) {
                     bn128_Fq12 f;
                     nil::algebra::pairing::millerLoop(f.elem, prec_Q.coeffs, prec_P.P);
                     return f;
@@ -100,7 +101,7 @@ namespace nil {
                 }
 
             }    // namespace detail
-        }    // namespace curves
-    }    // namespace algebra
+        }        // namespace curves
+    }            // namespace algebra
 }    // namespace nil
 #endif    // ALGEBRA_CURVES_BN128_PAIRING_HPP

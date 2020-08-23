@@ -20,16 +20,16 @@ namespace nil {
         namespace curves {
             namespace detail {
 
-                template <typename ModulusBits, typename GeneratorBits>
+                template<typename ModulusBits, typename GeneratorBits>
                 using params_type = arithmetic_params<fp<ModulusBits, GeneratorBits>>;
 
-                template <typename ModulusBits, typename GeneratorBits>
+                template<typename ModulusBits, typename GeneratorBits>
                 using modulus_type = params_type<ModulusBits, GeneratorBits>::modulus_type;
 
-                template <typename ModulusBits, typename GeneratorBits>
+                template<typename ModulusBits, typename GeneratorBits>
                 using fp12_type = fp12<ModulusBits, GeneratorBits>;
 
-                template <typename ModulusBits, typename GeneratorBits>
+                template<typename ModulusBits, typename GeneratorBits>
                 using value_type = element<fp12_type<ModulusBits, GeneratorBits>>;
 
                 struct bn128_GT {
@@ -39,7 +39,7 @@ namespace nil {
                         elem = value_type::zero();
                     }
 
-                    bn128_GT(value_type X){
+                    bn128_GT(value_type X) {
                         elem = X;
                     }
 
@@ -65,7 +65,6 @@ namespace nil {
                     static bn128_GT one() {
                         return value_type::one();
                     }
-
                 };
 
                 template<typename NumberType>
@@ -77,9 +76,9 @@ namespace nil {
                 bn128_GT operator^(const bn128_GT &rhs, const Fp_model<m, modulus_p> &lhs) {
                     return scalar_mul<bn128_GT, m>(rhs, lhs.as_bigint());
                 }
-                
+
             }    // namespace detail
-        }    // namespace curves
-    }    // namespace algebra
+        }        // namespace curves
+    }            // namespace algebra
 }    // namespace nil
 #endif    // ALGEBRA_CURVES_BN128_GT_HPP

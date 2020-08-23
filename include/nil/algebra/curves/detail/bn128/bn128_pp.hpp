@@ -27,10 +27,11 @@ namespace nil {
                         return bn128_final_exponentiation(elt);
                     }
 
-                    static bn128_Fq12 miller_loop(const bn128_ate_G1_precomp &prec_P, const bn128_ate_G2_precomp &prec_Q) {
-                        
+                    static bn128_Fq12 miller_loop(const bn128_ate_G1_precomp &prec_P,
+                                                  const bn128_ate_G2_precomp &prec_Q) {
+
                         bn128_Fq12 result = bn128_ate_miller_loop(prec_P, prec_Q);
-                        
+
                         return result;
                     }
 
@@ -38,15 +39,15 @@ namespace nil {
                                                          const bn128_ate_G2_precomp &prec_Q1,
                                                          const bn128_ate_G1_precomp &prec_P2,
                                                          const bn128_ate_G2_precomp &prec_Q2) {
-                        
+
                         bn128_Fq12 result = bn128_double_ate_miller_loop(prec_P1, prec_Q1, prec_P2, prec_Q2);
-                        
+
                         return result;
                     }
                 };
-                
+
             }    // namespace detail
-        }    // namespace curves
-    }    // namespace algebra
+        }        // namespace curves
+    }            // namespace algebra
 }    // namespace nil
 #endif    // ALGEBRA_CURVES_BN128_PP_HPP

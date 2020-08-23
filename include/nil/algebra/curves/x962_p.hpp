@@ -10,7 +10,6 @@
 #ifndef ALGEBRA_CURVES_X962_P_HPP
 #define ALGEBRA_CURVES_X962_P_HPP
 
-
 #include <nil/crypto3/algebra/curves/detail/element/curve_weierstrass.hpp>
 
 #include <nil/algebra/fields/x962_p/fq.hpp>
@@ -21,15 +20,15 @@
 namespace nil {
     namespace algebra {
         namespace curves {
-            
-            template<std::size_t PBits>
-            struct x962_p_v1 {};
 
             template<std::size_t PBits>
-            struct x962_p_v2 {};
+            struct x962_p_v1 { };
 
             template<std::size_t PBits>
-            struct x962_p_v3 {};
+            struct x962_p_v2 { };
+
+            template<std::size_t PBits>
+            struct x962_p_v3 { };
 
             template<>
             struct x962_p_v2<192> {

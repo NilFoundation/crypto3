@@ -35,7 +35,6 @@ namespace nil {
 
                     // Q[1] *= xi^((p-1)/2)
                     Q[1] *= Param::gammar[2];
-
                 }
 
                 template<class Fp>
@@ -44,7 +43,6 @@ namespace nil {
                     Fp2T<Fp> scratch[2];
                     FrobEndOnTwist_1(scratch, P);
                     FrobEndOnTwist_1(Q, scratch);
-
                 }
 
                 template<class Fp>
@@ -55,12 +53,11 @@ namespace nil {
                     FrobEndOnTwist_2(scratch4, scratch2);
                     FrobEndOnTwist_2(scratch6, scratch4);
                     FrobEndOnTwist_2(Q, scratch6);
-
                 }
 
-            }   // namespace detail
-        }   //  namespace curve
-    }   //  namespace algebra
-}   //  namespace nil
+            }    // namespace detail
+        }        //  namespace curve
+    }            //  namespace algebra
+}    //  namespace nil
 
 #endif    // ALGEBRA_CURVES_ECOP_HPP

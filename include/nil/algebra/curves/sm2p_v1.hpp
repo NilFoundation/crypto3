@@ -19,10 +19,10 @@
 
 namespace nil {
     namespace algebra {
-        namespace curves {            
+        namespace curves {
 
             template<std::size_t PBits>
-            struct sm2p_v1 {};
+            struct sm2p_v1 { };
 
             template<>
             struct sm2p_v1<256> {

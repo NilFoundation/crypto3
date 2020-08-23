@@ -20,9 +20,9 @@
 namespace nil {
     namespace algebra {
         namespace curves {
-        
+
             template<std::size_t PBits>
-            struct gost_A {};
+            struct gost_A { };
 
             template<>
             struct gost_A<256> {

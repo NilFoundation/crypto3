@@ -39,10 +39,10 @@ namespace nil {
                         FieldType::mul(acc_inverse, acc_inverse, old_el);
                     }
                 }
-                
+
             }    // namespace detail
-        }    // namespace curves
-    }    // namespace algebra
+        }        // namespace curves
+    }            // namespace algebra
 }    // namespace nil
 
 #endif    // ALGEBRA_FF_BN_UTILS_HPP
