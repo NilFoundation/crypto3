@@ -574,8 +574,8 @@ namespace nil {
                                InputType, OutputType>
                     packer_type;
 #elif defined(BOOST_ENDIAN_BIG_WORD_AVAILABLE)
-                typedef packer<stream_endian::big_unit_big_bit<BOOST_ARCH_CURRENT_WORD_BITS>, OutputEndianness, InputValueBits,
-                               OutputValueBits, InputType, OutputType>
+                typedef packer<stream_endian::big_unit_big_bit<BOOST_ARCH_CURRENT_WORD_BITS>, OutputEndianness,
+                               InputValueBits, OutputValueBits, InputType, OutputType>
                     packer_type;
 #elif defined(BOOST_ENDIAN_LITTLE_WORD_AVAILABLE)
                 typedef packer<stream_endian::little_unit_big_bit<BOOST_ARCH_CURRENT_WORD_BITS>, OutputEndianness,
@@ -622,8 +622,8 @@ namespace nil {
                                InputType, OutputType>
                     packer_type;
 #elif defined(BOOST_ENDIAN_BIG_WORD_AVAILABLE)
-                typedef packer<InputEndianness, stream_endian::big_unit_big_bit<BOOST_ARCH_CURRENT_WORD_BITS>, InputValueBits,
-                               OutputValueBits, InputType, OutputType>
+                typedef packer<InputEndianness, stream_endian::big_unit_big_bit<BOOST_ARCH_CURRENT_WORD_BITS>,
+                               InputValueBits, OutputValueBits, InputType, OutputType>
                     packer_type;
 #elif defined(BOOST_ENDIAN_LITTLE_WORD_AVAILABLE)
                 typedef packer<InputEndianness, stream_endian::little_unit_big_bit<BOOST_ARCH_CURRENT_WORD_BITS>,
@@ -634,6 +634,102 @@ namespace nil {
 #endif
 
                 packer_type::pack(first, last, out);
+            }
+
+            /*!
+             * @brief Packs elements from range [first, last) represented in machine-dependent endianness
+             * into elements starting from out represented in OutputEndianness endianness.
+             *
+             * @ingroup pack
+             *
+             * @tparam OutputEndianness
+             * @tparam InputValueBits
+             * @tparam OutputValueBits
+             * @tparam InputIterator
+             * @tparam OutputIterator
+             *
+             * @param first
+             * @param last
+             * @param out
+             *
+             * @return
+             */
+            template<typename OutputEndianness, std::size_t InputValueBits, std::size_t OutputValueBits,
+                     typename InputRange, typename OutputIterator>
+            inline void pack_to(const InputRange &r, OutputIterator out) {
+
+                typedef typename std::iterator_traits<typename InputRange::iterator>::value_type InputType;
+                typedef typename std::iterator_traits<OutputIterator>::value_type OutputType;
+
+#ifdef BOOST_ENDIAN_BIG_BYTE_AVAILABLE
+                typedef packer<stream_endian::big_octet_big_bit, OutputEndianness, InputValueBits, OutputValueBits,
+                               InputType, OutputType>
+                    packer_type;
+#elif defined(BOOST_ENDIAN_LITTLE_BYTE_AVAILABLE)
+                typedef packer<stream_endian::little_octet_big_bit, OutputEndianness, InputValueBits, OutputValueBits,
+                               InputType, OutputType>
+                    packer_type;
+#elif defined(BOOST_ENDIAN_BIG_WORD_AVAILABLE)
+                typedef packer<stream_endian::big_unit_big_bit<BOOST_ARCH_CURRENT_WORD_BITS>, OutputEndianness,
+                               InputValueBits, OutputValueBits, InputType, OutputType>
+                    packer_type;
+#elif defined(BOOST_ENDIAN_LITTLE_WORD_AVAILABLE)
+                typedef packer<stream_endian::little_unit_big_bit<BOOST_ARCH_CURRENT_WORD_BITS>, OutputEndianness,
+                               InputValueBits, OutputValueBits, InputType, OutputType>
+                    packer_type;
+#else
+#error "Unknown endianness"
+#endif
+
+                packer_type::pack(std::begin(r), std::end(r), out);
+            }
+
+            /*!
+             * @brief Packs elements from range [first, last) represented in InputEndianness endianness
+             * into elements starting from out represented in machine-dependent endianness.
+             *
+             * @ingroup pack
+             *
+             * @tparam InputEndianness
+             * @tparam InputValueBits
+             * @tparam OutputValueBits
+             * @tparam InputIterator
+             * @tparam OutputIterator
+             *
+             * @param first
+             * @param last
+             * @param out
+             *
+             * @return
+             */
+            template<typename InputEndianness, std::size_t InputValueBits, std::size_t OutputValueBits,
+                     typename InputRange, typename OutputIterator>
+            inline void pack_from(const InputRange &r, OutputIterator out) {
+
+                typedef typename std::iterator_traits<typename InputRange::iterator>::value_type InputType;
+                typedef typename std::iterator_traits<OutputIterator>::value_type OutputType;
+
+#ifdef BOOST_ENDIAN_BIG_BYTE_AVAILABLE
+                typedef packer<InputEndianness, stream_endian::big_octet_big_bit, InputValueBits, OutputValueBits,
+                               InputType, OutputType>
+                    packer_type;
+#elif defined(BOOST_ENDIAN_LITTLE_BYTE_AVAILABLE)
+                typedef packer<InputEndianness, stream_endian::little_octet_big_bit, InputValueBits, OutputValueBits,
+                               InputType, OutputType>
+                    packer_type;
+#elif defined(BOOST_ENDIAN_BIG_WORD_AVAILABLE)
+                typedef packer<InputEndianness, stream_endian::big_unit_big_bit<BOOST_ARCH_CURRENT_WORD_BITS>,
+                               InputValueBits, OutputValueBits, InputType, OutputType>
+                    packer_type;
+#elif defined(BOOST_ENDIAN_LITTLE_WORD_AVAILABLE)
+                typedef packer<InputEndianness, stream_endian::little_unit_big_bit<BOOST_ARCH_CURRENT_WORD_BITS>,
+                               InputValueBits, OutputValueBits, InputType, OutputType>
+                    packer_type;
+#else
+#error "Unknown endianness"
+#endif
+
+                packer_type::pack(std::begin(r), std::end(r), out);
             }
 
             /*!
