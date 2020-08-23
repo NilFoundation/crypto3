@@ -20,15 +20,15 @@
 namespace nil {
     namespace algebra {
         namespace curves {
-        
-            template<std::size_t PBits>
-            struct secp_k1 {};
 
             template<std::size_t PBits>
-            struct secp_r1 {};
+            struct secp_k1 { };
 
             template<std::size_t PBits>
-            struct secp_r2 {};
+            struct secp_r1 { };
+
+            template<std::size_t PBits>
+            struct secp_r2 { };
 
             template<>
             struct secp_k1<160> {
@@ -94,7 +94,6 @@ namespace nil {
                 constexpr static const number_type b = 0xB4E134D3FB59EB8BAB57274904664D5AF50388BA_cppui160;
                 constexpr static const number_type x = 0x52DCB034293A117E1F4FF11B30F7199D3144CE6D_cppui160;
                 constexpr static const number_type y = 0xFEAFFEF2E331F296E071FA0DF9982CFEA7D43F2E_cppui160;
-
             };
 
             template<>

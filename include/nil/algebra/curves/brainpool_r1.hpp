@@ -22,7 +22,7 @@ namespace nil {
         namespace curves {
 
             template<std::size_t PBits>
-            struct brainpool_r1 {};
+            struct brainpool_r1 { };
 
             template<>
             struct brainpool_r1<160> {
@@ -49,7 +49,7 @@ namespace nil {
 
             template<>
             struct brainpool_r1<192> {
-                
+
                 constexpr static const std::size_t base_field_bits = 192;
                 typedef fields::brainpool_r1_fq<base_field_bits, CHAR_BIT> base_field_type;
                 typedef typename base_field_type::modulus_type number_type;
@@ -72,7 +72,7 @@ namespace nil {
 
             template<>
             struct brainpool_r1<224> {
-                
+
                 constexpr static const std::size_t base_field_bits = 224;
                 typedef fields::brainpool_r1_fq<base_field_bits, CHAR_BIT> base_field_type;
                 typedef typename base_field_type::modulus_type number_type;
@@ -99,7 +99,7 @@ namespace nil {
 
             template<>
             struct brainpool_r1<256> {
-                
+
                 constexpr static const std::size_t base_field_bits = 256;
                 typedef fields::brainpool_r1_fq<base_field_bits, CHAR_BIT> base_field_type;
                 typedef typename base_field_type::modulus_type number_type;
@@ -209,7 +209,7 @@ namespace nil {
             typedef brainpool_r1<320> brainpool320r1;
             typedef brainpool_r1<384> brainpool384r1;
             typedef brainpool_r1<512> brainpool512r1;
-            
+
         }    // namespace curves
     }        // namespace algebra
 }    // namespace nil

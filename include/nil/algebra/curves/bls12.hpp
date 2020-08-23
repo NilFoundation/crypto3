@@ -12,6 +12,9 @@
 
 #include <nil/algebra/curves/detail/element/curve_weierstrass.hpp>
 
+#include <nil/algebra/fields/bls12/fq.hpp>
+#include <nil/algebra/fields/bls12/fr.hpp>
+
 #include <nil/algebra/detail/mp_def.hpp>
 
 namespace nil {
@@ -26,7 +29,7 @@ namespace nil {
 
             template<>
             struct bls12<381> {
-            
+
                 constexpr static const std::size_t base_field_bits = 381;
                 typedef fields::bls12_fq<base_field_bits, CHAR_BIT> base_field_type;
                 typedef typename base_field_type::modulus_type number_type;

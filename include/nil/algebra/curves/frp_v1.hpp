@@ -22,7 +22,7 @@ namespace nil {
         namespace curves {
 
             template<std::size_t PBits>
-            struct frp_v1 {};
+            struct frp_v1 { };
 
             template<>
             struct frp_v1<256> {

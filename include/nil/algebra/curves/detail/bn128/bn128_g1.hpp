@@ -12,9 +12,6 @@
 
 #include <vector>
 
-#include <nil/algebra/curves/detail/bn128/bn_utils.hpp>
-#include <nil/algebra/curves/detail/bn128/bn128_init.hpp>
-
 #include <boost/multiprecision/cpp_int/multiply.hpp>
 #include <boost/multiprecision/modular/base_params.hpp>
 
@@ -32,10 +29,9 @@ namespace nil {
                 private:
                     using policy_type = bn128<ModulusBits>::value_type;
                 public:
+                    bn128_G1() : policy_type(value_type::one(), value_type::one(), value_type::zero()) {};
 
-                    bn128_G1():policy_type(value_type::one(),value_type::one(),value_type::zero()){};
-
-                    bn128_G1(value_type X, value_type Y, value_type Z) : policy_type(X, Y, Z){};
+                    bn128_G1(value_type X, value_type Y, value_type Z) : policy_type(X, Y, Z) {};
 
                     bool is_zero() const {
                         return coord[2].is_zero();
@@ -55,8 +51,8 @@ namespace nil {
                         value_type Z1sq = coord[2].square();
                         value_type Z2sq = other.coord[2].square();
 
-                        return (Z2sq * coord[0] == Z1sq * other.coord[0]) && 
-                                    (Z2sq * other.coord[2] * coord[1] == Z1sq * coord[2] * other.coord[1]);
+                        return (Z2sq * coord[0] == Z1sq * other.coord[0]) &&
+                               (Z2sq * other.coord[2] * coord[1] == Z1sq * coord[2] * other.coord[1]);
                     }
 
                     bool operator!=(const bn128_G1 &other) const {
@@ -87,10 +83,11 @@ namespace nil {
                         // we know that Z2 = 1
 
                         value_type Z1Z1 = coord[2].square();
-                        
+
                         value_type U2 = other.coord[0] * Z1Z1;
 
-                        value_type S2 = other.coord[1] * coord[2] * Z1Z1;;    // S2 = Y2*Z1*Z1Z1
+                        value_type S2 = other.coord[1] * coord[2] * Z1Z1;
+                        ;    // S2 = Y2*Z1*Z1Z1
 
                         if (coord[0] == U2 && coord[1] == S2) {
                             // dbl case; nothing of above can be reused
@@ -118,7 +115,7 @@ namespace nil {
                         // Y3 = r*(V-X3)-2*Y1*J
                         result.coord[1] = r * (V - result.coord[0]);
                         tmp = coord[1] * J;
-                        result.coord[1] -=  (tmp + tmp);
+                        result.coord[1] -= (tmp + tmp);
                         // Z3 = (Z1+H)^2-Z1Z1-HH
                         result.coord[2] = (coord[2] + H).square() - Z1Z1 - HH;
 
@@ -130,9 +127,9 @@ namespace nil {
                     }
 
                     static bn128_G1 one() {
-                        return bn128_G1(1,2,1);
+                        return bn128_G1(1, 2, 1);
                     }
-                    
+
                     template<typename NumberType>
                     static NumberType base_field_char() {
                         return arithmetic_params<base_field>::q;
@@ -149,7 +146,7 @@ namespace nil {
                 };
 
             }    // namespace detail
-        }    // namespace curves
-    }    // namespace algebra
+        }        // namespace curves
+    }            // namespace algebra
 }    // namespace nil
 #endif    // ALGEBRA_CURVES_BN128_G1_HPP

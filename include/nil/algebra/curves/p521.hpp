@@ -28,10 +28,9 @@ namespace nil {
 
                 constexpr static const number_type p =
                     0x1FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF_cppui521;
-
             };
         }    // namespace curves
-    }        // namespace crypto3
+    }        // namespace algebra
 }    // namespace nil
 
 #endif    // ALGEBRA_CURVES_NIST_P521_HPP

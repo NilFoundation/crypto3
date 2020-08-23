@@ -25,8 +25,8 @@ namespace nil {
             struct p224 : public curve_nist<224, WordBits> {
                 typedef typename curve_nist<224>::number_type number_type;
 
-                constexpr static const number_type p = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF000000000000000000000001_cppui224;
-
+                constexpr static const number_type p =
+                    0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF000000000000000000000001_cppui224;
             };
         }    // namespace curves
     }        // namespace algebra
