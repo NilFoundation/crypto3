@@ -10,8 +10,10 @@
 #ifndef ALGEBRA_CURVES_BRAINPOOL_R1_HPP
 #define ALGEBRA_CURVES_BRAINPOOL_R1_HPP
 
-#include <nil/crypto3/pubkey/ec_group/curve_weierstrass.hpp>
-#include <nil/crypto3/algebra/curves/detail/element/brainpool_r1.hpp>
+#include <nil/crypto3/algebra/curves/detail/element/curve_weierstrass.hpp>
+
+#include <nil/algebra/fields/brainpool_r1/fq.hpp>
+#include <nil/algebra/fields/brainpool_r1/fr.hpp>
 
 #include <nil/algebra/detail/mp_def.hpp>
 
@@ -20,7 +22,7 @@ namespace nil {
         namespace curves {
 
             template<std::size_t PBits>
-            struct brainpool_r1{};
+            struct brainpool_r1 {};
 
             template<>
             struct brainpool_r1<160> {
@@ -43,8 +45,6 @@ namespace nil {
                 constexpr static const number_type b = 0x1E589A8595423412134FAA2DBDEC95C8D8675E58_cppui160;
                 constexpr static const number_type x = 0xBED5AF16EA3F6A4F62938C4631EB5AF7BDBCDBC3_cppui160;
                 constexpr static const number_type y = 0x1667CB477A1A8EC338F94741669C976316DA6321_cppui160;
-
-                typedef typename detail::element_brainpool_r1<160, field_type::value_type> value_type;
             };
 
             template<>
@@ -68,8 +68,6 @@ namespace nil {
                 constexpr static const number_type b = 0x469A28EF7C28CCA3DC721D044F4496BCCA7EF4146FBF25C9_cppui192;
                 constexpr static const number_type x = 0xC0A0647EAAB6A48753B033C56CB0F0900A2F5C4853375FD6_cppui192;
                 constexpr static const number_type y = 0x14B690866ABD5BB88B5F4828C1490002E6773FA2FA299B8F_cppui192;
-
-                typedef typename detail::element_brainpool_r1<192, field_type::value_type> value_type;
             };
 
             template<>
@@ -97,8 +95,6 @@ namespace nil {
                     0xD9029AD2C7E5CF4340823B2A87DC68C9E4CE3174C1E6EFDEE12C07D_cppui224;
                 constexpr static const number_type y =
                     0x58AA56F772C0726F24C6B89E4ECDAC24354B9E99CAA3F6D3761402CD_cppui224;
-
-                typedef typename detail::element_brainpool_r1<224, field_type::value_type> value_type;
             };
 
             template<>
@@ -126,8 +122,6 @@ namespace nil {
                     0x8BD2AEB9CB7E57CB2C4B482FFC81B7AFB9DE27E1E3BD23C23A4453BD9ACE3262_cppui256;
                 constexpr static const number_type y =
                     0x547EF835C3DAC4FD97F8461A14611DC9C27745132DED8E545C1D54C72F046997_cppui256;
-
-                typedef typename detail::element_brainpool_r1<256, field_type::value_type> value_type;
             };
 
             template<>
@@ -154,8 +148,6 @@ namespace nil {
                     0x43BD7E9AFB53D8B85289BCC48EE5BFE6F20137D10A087EB6E7871E2A10A599C710AF8D0D39E20611_cppui320;
                 constexpr static const number_type y =
                     0x14FDD05545EC1CC8AB4093247F77275E0743FFED117182EAA9C77877AAAC6AC7D35245D1692E8EE1_cppui320;
-
-                typedef typename detail::element_brainpool_r1<320, field_type::value_type> value_type;
             };
 
             template<>
@@ -182,8 +174,6 @@ namespace nil {
                     0x1D1C64F068CF45FFA2A63A81B7C13F6B8847A3E77EF14FE3DB7FCAFE0CBD10E8E826E03436D646AAEF87B2E247D4AF1E_cppui384;
                 constexpr static const number_type y =
                     0x8ABE1D7520F9C2A45CB1EB8E95CFD55262B70B29FEEC5864E19C054FF99129280E4646217791811142820341263C5315_cppui384;
-
-                typedef typename detail::element_brainpool_r1<384, field_type::value_type> value_type;
             };
 
             template<>
@@ -210,8 +200,6 @@ namespace nil {
                     0x81AEE4BDD82ED9645A21322E9C4C6A9385ED9F70B5D916C1B43B62EEF4D0098EFF3B1F78E2D0D48D50D1687B93B97D5F7C6D5047406A5E688B352209BCB9F822_cppui512;
                 constexpr static const number_type y =
                     0x7DDE385D566332ECC0EABFA9CF7822FDF209F70024A57B1AA000C55B881F8111B2DCDE494A5F485E5BCA4BD88A2763AED1CA2B2FA8F0540678CD1E0F3AD80892_cppui512;
-
-                typedef typename detail::element_brainpool_r1<512, field_type::value_type> value_type;
             };
 
             typedef brainpool_r1<160> brainpool160r1;

@@ -10,7 +10,10 @@
 #ifndef ALGEBRA_CURVES_FRP_V1_HPP
 #define ALGEBRA_CURVES_FRP_V1_HPP
 
-#include <nil/crypto3/algebra/curves/curve_weierstrass.hpp>
+#include <nil/crypto3/algebra/curves/detail/element/curve_weierstrass.hpp>
+
+#include <nil/algebra/fields/frp_v1/fq.hpp>
+#include <nil/algebra/fields/frp_v1/fr.hpp>
 
 #include <nil/algebra/detail/mp_def.hpp>
 
@@ -19,14 +22,24 @@ namespace nil {
         namespace curves {
 
             template<std::size_t PBits>
-            struct frp_v1 : public curve_weierstrass<PBits> {};
+            struct frp_v1 {};
 
             template<>
-            struct frp_v1<256> : public curve_weierstrass<256> {
-                typedef typename curve_weierstrass<256>::number_type number_type;
+            struct frp_v1<256> {
+                constexpr static const std::size_t base_field_bits = 256;
+                typedef fields::frp_v1_fq<base_field_bits, CHAR_BIT> base_field_type;
+                typedef typename base_field_type::modulus_type number_type;
+                constexpr static const number_type base_field_modulus = base_field_type::modulus;
 
-                constexpr static const number_type p =
-                    0xF1FD178C0B3AD58F10126DE8CE42435B3961ADBCABC8CA6DE8FCF353D86E9C03_cppui256;
+                constexpr static const std::size_t scalar_field_bits = 256;
+                typedef fields::frp_v1_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
+                constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
+
+                typedef typename detail::element_curve_weierstrass<base_field_type::value_type> value_type;
+
+                constexpr static const number_type p = base_field_modulus;
+                constexpr static const number_type q = scalar_field_modulus;
+
                 constexpr static const number_type a =
                     0xF1FD178C0B3AD58F10126DE8CE42435B3961ADBCABC8CA6DE8FCF353D86E9C00_cppui256;
                 constexpr static const number_type b =
@@ -35,8 +48,6 @@ namespace nil {
                     0xB6B3D4C356C139EB31183D4749D423958C27D2DCAF98B70164C97A2DD98F5CFF_cppui256;
                 constexpr static const number_type y =
                     0x6142E0F7C8B204911F9271F0F3ECEF8C2701C307E8E4C9E183115A1554062CFB_cppui256;
-                constexpr static const number_type order =
-                    0xF1FD178C0B3AD58F10126DE8CE42435B53DC67E140D2BF941FFDD459C6D655E1_cppui256;
             };
         }    // namespace curves
     }        // namespace algebra
