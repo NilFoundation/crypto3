@@ -50,6 +50,11 @@ namespace nil {
                         data = value_type({underlying_type(in_data0), underlying_type(in_data1)});
                     }
 
+                    element_fp2(const element_fp2 &B) {
+                        data[0] = underlying_type(B.data[0]);
+                        data[1] = underlying_type(B.data[1]);
+                    };
+
                     inline static element_fp2 zero() {
                         return element_fp2({underlying_type::zero(), underlying_type::zero()});
                     }

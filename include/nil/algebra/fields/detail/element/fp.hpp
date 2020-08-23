@@ -38,6 +38,10 @@ namespace nil {
 
                     element_fp(modulus_type data) : data(data, modulus){};
 
+                    element_fp(const element_fp &B) {
+                        data = B.data;
+                    };
+
                     inline static element_fp zero() {
                         return element_fp(0);
                     }

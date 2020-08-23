@@ -34,6 +34,12 @@ namespace nil {
 
                     element_fp3(value_type data) : data(data) {};
 
+                    element_fp3(const element_fp3 &B) {
+                        data[0] = underlying_type(B.data[0]);
+                        data[1] = underlying_type(B.data[1]);
+                        data[2] = underlying_type(B.data[2]);
+                    };
+
                     inline static element_fp3 zero() {
                         return element_fp3({underlying_type::zero(), underlying_type::zero(), underlying_type::zero()});
                     }

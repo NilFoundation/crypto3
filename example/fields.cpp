@@ -122,11 +122,23 @@ void fields_fp2_basic_math_examples()
 
     value_type e1 = value_type({76749407, 44410867}), e2({44410867, 1}), e3 = value_type::one(), e4({121160274, 7});
 
+    value_type ee(e1);
+
+    std::cout << "ee value: ";
+    print_field_element(ee);
+
     std::cout << "Non residue: " << e1.non_residue.data << std::endl;
 
     std::cout << "Field element values: " << std::endl;
     std::cout << "e1 value: ";
     print_field_element(e1);
+
+    e1 += e2;
+
+    std::cout << "e1 value: ";
+    print_field_element(e1);
+    std::cout << "ee value: ";
+    print_field_element(ee);
 
     std::cout << "e2 value: ";
     print_field_element(e2);
