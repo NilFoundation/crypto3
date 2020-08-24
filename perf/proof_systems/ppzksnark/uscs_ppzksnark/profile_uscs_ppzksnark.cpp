@@ -33,8 +33,8 @@ int main(int argc, const char *argv[]) {
     const int input_size = atoi(argv[2]);
 
     algebra::enter_block("Generate USCS example");
-    uscs_example<algebra::Fr<default_uscs_ppzksnark_pp>> example =
-        generate_uscs_example_with_field_input<algebra::Fr<default_uscs_ppzksnark_pp>>(num_constraints, input_size);
+    uscs_example<typename default_uscs_ppzksnark_pp::scalar_field_type> example =
+        generate_uscs_example_with_field_input<typename default_uscs_ppzksnark_pp::scalar_field_type>(num_constraints, input_size);
     algebra::leave_block("Generate USCS example");
 
     algebra::print_header("(enter) Profile USCS ppzkSNARK");

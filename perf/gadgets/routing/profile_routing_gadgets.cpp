@@ -86,6 +86,6 @@ void profile_num_switches(const std::size_t l) {
 int main() {
 
 
-    profile_routing_gadgets<algebra::Fr<algebra::default_ec_pp>>(32 + 16 + 3 + 2);
-    profile_num_switches<algebra::Fr<algebra::default_ec_pp>>(1);
+    profile_routing_gadgets<typename algebra::default_ec_pp::scalar_field_type>(32 + 16 + 3 + 2);
+    profile_num_switches<typename algebra::default_ec_pp::scalar_field_type>(1);
 }

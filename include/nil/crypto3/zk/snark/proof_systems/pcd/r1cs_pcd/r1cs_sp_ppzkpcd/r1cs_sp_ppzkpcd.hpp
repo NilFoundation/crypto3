@@ -504,7 +504,7 @@ namespace nil {
                 {
                     typedef typename PCD_ppT::curve_B_pp curve_B_pp;
 
-                    const r1cs_primary_input<algebra::Fr<curve_B_pp>> r1cs_input =
+                    const r1cs_primary_input<typename curve_B_pp::scalar_field_type> r1cs_input =
                         get_sp_translation_step_pcd_circuit_input<curve_B_pp>(pvk.translation_step_r1cs_vk_bits,
                                                                               primary_input);
                     const bool result =

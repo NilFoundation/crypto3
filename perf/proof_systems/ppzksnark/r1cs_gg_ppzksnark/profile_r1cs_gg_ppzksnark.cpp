@@ -33,14 +33,14 @@ int main(int argc, const char *argv[]) {
     if (argc == 4) {
         assert(strcmp(argv[3], "Fr") == 0 || strcmp(argv[3], "bytes") == 0);
         if (strcmp(argv[3], "bytes") == 0) {
-            input_size = (8 * input_size + (algebra::Fr<algebra::default_ec_pp>::capacity()) - 1) /
-                         algebra::Fr<algebra::default_ec_pp>::capacity();
+            input_size = (8 * input_size + (typename algebra::default_ec_pp::scalar_field_type::capacity()) - 1) /
+                         typename algebra::default_ec_pp::scalar_field_type::capacity();
         }
     }
 
     algebra::enter_block("Generate R1CS example");
-    r1cs_example<algebra::Fr<default_r1cs_gg_ppzksnark_pp>> example =
-        generate_r1cs_example_with_field_input<algebra::Fr<default_r1cs_gg_ppzksnark_pp>>(num_constraints, input_size);
+    r1cs_example<typename default_r1cs_gg_ppzksnark_pp::scalar_field_type> example =
+        generate_r1cs_example_with_field_input<typename default_r1cs_gg_ppzksnark_pp::scalar_field_type>(num_constraints, input_size);
     algebra::leave_block("Generate R1CS example");
 
     algebra::print_header("(enter) Profile R1CS GG-ppzkSNARK");

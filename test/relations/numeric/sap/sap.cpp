@@ -68,13 +68,13 @@ BOOST_AUTO_TEST_CASE(sap_test) {
     const std::size_t step_domain_size_special = (1ul << 10) + (1ul << 8) - 1ul;
     const std::size_t extended_domain_size_special = (1ul << (algebra::mnt6_Fr::s + 1)) - 1ul;
 
-    test_sap<algebra::Fr<algebra::mnt6_pp>>(basic_domain_size_special, num_inputs, true);
-    test_sap<algebra::Fr<algebra::mnt6_pp>>(step_domain_size_special, num_inputs, true);
-    test_sap<algebra::Fr<algebra::mnt6_pp>>(extended_domain_size_special, num_inputs, true);
+    test_sap<typename algebra::curves::mnt6::scalar_field_type>(basic_domain_size_special, num_inputs, true);
+    test_sap<typename algebra::curves::mnt6::scalar_field_type>(step_domain_size_special, num_inputs, true);
+    test_sap<typename algebra::curves::mnt6::scalar_field_type>(extended_domain_size_special, num_inputs, true);
 
-    test_sap<algebra::Fr<algebra::mnt6_pp>>(basic_domain_size_special, num_inputs, false);
-    test_sap<algebra::Fr<algebra::mnt6_pp>>(step_domain_size_special, num_inputs, false);
-    test_sap<algebra::Fr<algebra::mnt6_pp>>(extended_domain_size_special, num_inputs, false);
+    test_sap<typename algebra::curves::mnt6::scalar_field_type>(basic_domain_size_special, num_inputs, false);
+    test_sap<typename algebra::curves::mnt6::scalar_field_type>(step_domain_size_special, num_inputs, false);
+    test_sap<typename algebra::curves::mnt6::scalar_field_type>(extended_domain_size_special, num_inputs, false);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

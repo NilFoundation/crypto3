@@ -31,7 +31,7 @@ int main(int argc, const char *argv[]) {
     const std::size_t num_outputs = num_gates / 2;
 
     algebra::enter_block("Generate BACS example");
-    bacs_example<algebra::Fr<default_bacs_ppzksnark_pp>> example = generate_bacs_example<algebra::Fr<default_bacs_ppzksnark_pp>>(
+    bacs_example<typename default_bacs_ppzksnark_pp::scalar_field_type> example = generate_bacs_example<typename default_bacs_ppzksnark_pp::scalar_field_type>(
         primary_input_size, auxiliary_input_size, num_gates, num_outputs);
     algebra::leave_block("Generate BACS example");
 

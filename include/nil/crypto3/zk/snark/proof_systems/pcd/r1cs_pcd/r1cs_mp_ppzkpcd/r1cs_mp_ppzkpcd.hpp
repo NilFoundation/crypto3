@@ -531,8 +531,8 @@ namespace nil {
                     typedef typename PCD_ppT::curve_A_pp curve_A_pp;
                     typedef typename PCD_ppT::curve_B_pp curve_B_pp;
 
-                    typedef algebra::Fr<curve_A_pp> FieldT_A;
-                    typedef algebra::Fr<curve_B_pp> FieldT_B;
+                    typedef typename curve_A_pp::scalar_field_type FieldT_A;
+                    typedef typename curve_B_pp::scalar_field_type FieldT_B;
 
                     algebra::enter_block("Call to r1cs_mp_ppzkpcd_generator");
 
@@ -658,8 +658,8 @@ namespace nil {
                     typedef typename PCD_ppT::curve_A_pp curve_A_pp;
                     typedef typename PCD_ppT::curve_B_pp curve_B_pp;
 
-                    typedef algebra::Fr<curve_A_pp> FieldT_A;
-                    typedef algebra::Fr<curve_B_pp> FieldT_B;
+                    typedef typename curve_A_pp::scalar_field_type FieldT_A;
+                    typedef typename curve_B_pp::scalar_field_type FieldT_B;
 
                     algebra::enter_block("Call to r1cs_mp_ppzkpcd_prover");
 
@@ -800,7 +800,7 @@ namespace nil {
                     typedef typename PCD_ppT::curve_B_pp curve_B_pp;
 
                     algebra::enter_block("Call to r1cs_mp_ppzkpcd_online_verifier");
-                    const r1cs_primary_input<algebra::Fr<curve_B_pp>> r1cs_input =
+                    const r1cs_primary_input<typename curve_B_pp::scalar_field_type> r1cs_input =
                         get_mp_translation_step_pcd_circuit_input<curve_B_pp>(
                             pvk.commitment_to_translation_step_r1cs_vks, primary_input);
                     const bool result = r1cs_ppzksnark_online_verifier_strong_IC(

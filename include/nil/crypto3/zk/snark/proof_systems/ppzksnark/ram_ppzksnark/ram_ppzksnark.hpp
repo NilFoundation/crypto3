@@ -352,7 +352,7 @@ namespace nil {
                                          const ram_ppzksnark_auxiliary_input<ram_ppzksnark_ppT> &auxiliary_input) {
                     typedef ram_ppzksnark_machine_pp<ram_ppzksnark_ppT> ram_ppT;
                     typedef ram_ppzksnark_snark_pp<ram_ppzksnark_ppT> snark_ppT;
-                    typedef algebra::Fr<snark_ppT> FieldType;
+                    typedef typename snark_ppT::scalar_field_type FieldType;
 
                     ram_to_r1cs<ram_ppT> universal_r1cs(pk.ap, pk.primary_input_size_bound, pk.time_bound);
                     const r1cs_primary_input<FieldType> r1cs_primary_input =
@@ -375,7 +375,7 @@ namespace nil {
                     const ram_ppzksnark_verification_key<ram_ppzksnark_ppT> input_specific_vk =
                         vk.bind_primary_input(primary_input);
                     const bool ans = r1cs_ppzksnark_verifier_weak_IC<snark_ppT>(
-                        input_specific_vk.r1cs_vk, r1cs_primary_input<algebra::Fr<snark_ppT>>(), proof);
+                        input_specific_vk.r1cs_vk, r1cs_primary_input<typename snark_ppT::scalar_field_type>(), proof);
 
                     return ans;
                 }

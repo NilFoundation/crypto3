@@ -61,7 +61,7 @@ bool process_arithm_command_line(const int argc, const char **argv, std::string 
 using namespace nil::crypto3::zk::snark;
 
 int main(int argc, const char *argv[]) {
-    typedef algebra::Fr<algebra::default_ec_pp> FieldType;
+    typedef typename algebra::default_ec_pp::scalar_field_type FieldType;
     typedef ram_tinyram<FieldType> default_ram;
 
 

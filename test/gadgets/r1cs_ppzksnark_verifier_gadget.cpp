@@ -6,6 +6,10 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
+#define BOOST_TEST_MODULE r1cs_ppzksnark_verifier_gadget_test
+
+#include <boost/test/unit_test.hpp>
+
 #include <nil/algebra/curves/mnt4.hpp>
 #include <nil/algebra/curves/mnt6.hpp>
 
@@ -17,8 +21,6 @@
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_ppzksnark/r1cs_ppzksnark.hpp>
 
 using namespace nil::crypto3::zk::snark;
-
-#ifndef NDEBUG
 
 template<typename FieldType>
 void dump_constraints(const protoboard<FieldType> &pb) {
@@ -54,23 +56,21 @@ void test_verifier(const std::string &annotation_A, const std::string &annotatio
 
     protoboard<FieldT_B> pb;
     pb_variable_array<FieldT_B> vk_bits;
-    vk_bits.allocate(pb, vk_size_in_bits, "vk_bits");
+    vk_bits.allocate(pb, vk_size_in_bits);
 
     pb_variable_array<FieldT_B> primary_input_bits;
-    primary_input_bits.allocate(pb, primary_input_size_in_bits, "primary_input_bits");
+    primary_input_bits.allocate(pb, primary_input_size_in_bits);
 
-    r1cs_ppzksnark_proof_variable<ppT_B> proof(pb, "proof");
+    r1cs_ppzksnark_proof_variable<ppT_B> proof(pb);
 
-    r1cs_ppzksnark_verification_key_variable<ppT_B> vk(pb, vk_bits, primary_input_size, "vk");
+    r1cs_ppzksnark_verification_key_variable<ppT_B> vk(pb, vk_bits, primary_input_size);
 
     pb_variable<FieldT_B> result;
-    result.allocate(pb, "result");
+    result.allocate(pb);
 
-    r1cs_ppzksnark_verifier_gadget<ppT_B> verifier(pb, vk, primary_input_bits, elt_size, proof, result, "verifier");
+    r1cs_ppzksnark_verifier_gadget<ppT_B> verifier(pb, vk, primary_input_bits, elt_size, proof, result);
 
-    PROFILE_CONSTRAINTS(pb, "check that proofs lies on the curve") {
         proof.generate_r1cs_constraints();
-    }
     verifier.generate_r1cs_constraints();
 
     std::vector<bool> input_as_bits;
@@ -95,7 +95,6 @@ void test_verifier(const std::string &annotation_A, const std::string &annotatio
 
     printf("negative test:\n");
     assert(!pb.is_satisfied());
-    PRINT_CONSTRAINT_PROFILING();
     printf(
         "number of constraints for verifier: %zu (verifier is implemented in %s constraints and verifies %s proofs))\n",
         pb.num_constraints(), annotation_B.c_str(), annotation_A.c_str());
@@ -124,22 +123,19 @@ void test_hardcoded_verifier(const std::string &annotation_A, const std::string 
     const size_t primary_input_size_in_bits = elt_size * primary_input_size;
 
     protoboard<FieldT_B> pb;
-    r1cs_ppzksnark_preprocessed_r1cs_ppzksnark_verification_key_variable<ppT_B> hardcoded_vk(pb, keypair.vk,
-                                                                                             "hardcoded_vk");
+    r1cs_ppzksnark_preprocessed_r1cs_ppzksnark_verification_key_variable<ppT_B> hardcoded_vk(pb, keypair.vk);
     pb_variable_array<FieldT_B> primary_input_bits;
-    primary_input_bits.allocate(pb, primary_input_size_in_bits, "primary_input_bits");
+    primary_input_bits.allocate(pb, primary_input_size_in_bits);
 
-    r1cs_ppzksnark_proof_variable<ppT_B> proof(pb, "proof");
+    r1cs_ppzksnark_proof_variable<ppT_B> proof(pb);
 
     pb_variable<FieldT_B> result;
-    result.allocate(pb, "result");
+    result.allocate(pb);
 
     r1cs_ppzksnark_online_verifier_gadget<ppT_B> online_verifier(pb, hardcoded_vk, primary_input_bits, elt_size, proof,
-                                                                 result, "online_verifier");
+                                                                 result);
 
-    PROFILE_CONSTRAINTS(pb, "check that proofs lies on the curve") {
         proof.generate_r1cs_constraints();
-    }
     online_verifier.generate_r1cs_constraints();
 
     std::vector<bool> input_as_bits;
@@ -163,7 +159,6 @@ void test_hardcoded_verifier(const std::string &annotation_A, const std::string 
 
     printf("negative test:\n");
     assert(!pb.is_satisfied());
-    PRINT_CONSTRAINT_PROFILING();
     printf(
         "number of constraints for verifier: %zu (verifier is implemented in %s constraints and verifies %s proofs))\n",
         pb.num_constraints(), annotation_B.c_str(), annotation_A.c_str());
@@ -174,10 +169,10 @@ void test_mul(const std::string &annotation) {
     typedef typename FpExtT::my_Fp FieldType;
 
     protoboard<FieldType> pb;
-    VarT<FpExtT> x(pb, "x");
-    VarT<FpExtT> y(pb, "y");
-    VarT<FpExtT> xy(pb, "xy");
-    MulT<FpExtT> mul(pb, x, y, xy, "mul");
+    VarT<FpExtT> x(pb);
+    VarT<FpExtT> y(pb);
+    VarT<FpExtT> xy(pb);
+    MulT<FpExtT> mul(pb, x, y, xy);
     mul.generate_r1cs_constraints();
 
     for (size_t i = 0; i < 10; ++i) {
@@ -198,9 +193,9 @@ void test_sqr(const std::string &annotation) {
     typedef typename FpExtT::my_Fp FieldType;
 
     protoboard<FieldType> pb;
-    VarT<FpExtT> x(pb, "x");
-    VarT<FpExtT> xsq(pb, "xsq");
-    SqrT<FpExtT> sqr(pb, x, xsq, "sqr");
+    VarT<FpExtT> x(pb);
+    VarT<FpExtT> xsq(pb);
+    SqrT<FpExtT> sqr(pb, x, xsq);
     sqr.generate_r1cs_constraints();
 
     for (size_t i = 0; i < 10; ++i) {
@@ -220,9 +215,9 @@ void test_cyclotomic_sqr(const std::string &annotation) {
     typedef typename FpExtT::my_Fp FieldType;
 
     protoboard<FieldType> pb;
-    VarT<FpExtT> x(pb, "x");
-    VarT<FpExtT> xsq(pb, "xsq");
-    CycloSqrT<FpExtT> sqr(pb, x, xsq, "sqr");
+    VarT<FpExtT> x(pb);
+    VarT<FpExtT> xsq(pb);
+    CycloSqrT<FpExtT> sqr(pb, x, xsq);
     sqr.generate_r1cs_constraints();
 
     for (size_t i = 0; i < 10; ++i) {
@@ -244,15 +239,15 @@ void test_Frobenius(const std::string &annotation) {
 
     for (size_t i = 0; i < 100; ++i) {
         protoboard<FieldType> pb;
-        VarT<FpExtT> x(pb, "x");
+        VarT<FpExtT> x(pb);
         VarT<FpExtT> x_frob = x.Frobenius_map(i);
 
         const FpExtT x_val = FpExtT::random_element();
         x.generate_r1cs_witness(x_val);
         x_frob.evaluate();
         const FpExtT res = x_frob.get_element();
-        assert(res == x_val.Frobenius_map(i));
-        assert(pb.is_satisfied());
+        BOOST_CHECK(res == x_val.Frobenius_map(i));
+        BOOST_CHECK(pb.is_satisfied());
     }
 
     printf("Frobenius map for %s correct\n", annotation.c_str());
@@ -268,33 +263,24 @@ void test_full_pairing(const std::string &annotation) {
     algebra::G2<other_curve<CurveType>> Q_val =
         algebra::Fr<other_curve<CurveType>>::random_element() * algebra::G2<other_curve<CurveType>>::one();
 
-    G1_variable<CurveType> P(pb, "P");
-    G2_variable<CurveType> Q(pb, "Q");
+    G1_variable<CurveType> P(pb);
+    G2_variable<CurveType> Q(pb);
     G1_precomputation<CurveType> prec_P;
     G2_precomputation<CurveType> prec_Q;
 
-    precompute_G1_gadget<CurveType> compute_prec_P(pb, P, prec_P, "compute_prec_P");
-    precompute_G2_gadget<CurveType> compute_prec_Q(pb, Q, prec_Q, "compute_prec_Q");
+    precompute_G1_gadget<CurveType> compute_prec_P(pb, P, prec_P);
+    precompute_G2_gadget<CurveType> compute_prec_Q(pb, Q, prec_Q);
 
-    Fqk_variable<CurveType> miller_result(pb, "miller_result");
-    mnt_miller_loop_gadget<CurveType> miller(pb, prec_P, prec_Q, miller_result, "miller");
+    Fqk_variable<CurveType> miller_result(pb);
+    mnt_miller_loop_gadget<CurveType> miller(pb, prec_P, prec_Q, miller_result);
     pb_variable<FieldType> result_is_one;
-    result_is_one.allocate(pb, "result_is_one");
-    final_exp_gadget<CurveType> finexp(pb, miller_result, result_is_one, "finexp");
+    result_is_one.allocate(pb);
+    final_exp_gadget<CurveType> finexp(pb, miller_result, result_is_one);
 
-    PROFILE_CONSTRAINTS(pb, "precompute P") {
         compute_prec_P.generate_r1cs_constraints();
-    }
-    PROFILE_CONSTRAINTS(pb, "precompute Q") {
         compute_prec_Q.generate_r1cs_constraints();
-    }
-    PROFILE_CONSTRAINTS(pb, "Miller loop") {
         miller.generate_r1cs_constraints();
-    }
-    PROFILE_CONSTRAINTS(pb, "final exp") {
         finexp.generate_r1cs_constraints();
-    }
-    PRINT_CONSTRAINT_PROFILING();
 
     P.generate_r1cs_witness(P_val);
     compute_prec_P.generate_r1cs_witness();
@@ -302,7 +288,7 @@ void test_full_pairing(const std::string &annotation) {
     compute_prec_Q.generate_r1cs_witness();
     miller.generate_r1cs_witness();
     finexp.generate_r1cs_witness();
-    assert(pb.is_satisfied());
+    BOOST_CHECK(pb.is_satisfied());
 
     algebra::affine_ate_G1_precomp<other_curve<CurveType>> native_prec_P = other_curve<CurveType>::affine_ate_precompute_G1(P_val);
     algebra::affine_ate_G2_precomp<other_curve<CurveType>> native_prec_Q = other_curve<CurveType>::affine_ate_precompute_G2(Q_val);
@@ -314,7 +300,7 @@ void test_full_pairing(const std::string &annotation) {
     finexp.result->get_element().print();
     native_finexp_result.print();
 
-    assert(finexp.result->get_element() == native_finexp_result);
+    BOOST_CHECK(finexp.result->get_element() == native_finexp_result);
 
     printf("number of constraints for full pairing (Fr is %s)  = %zu\n", annotation.c_str(), pb.num_constraints());
 }
@@ -329,26 +315,21 @@ void test_full_precomputed_pairing(const std::string &annotation) {
     algebra::G2<other_curve<CurveType>> Q_val =
         algebra::Fr<other_curve<CurveType>>::random_element() * algebra::G2<other_curve<CurveType>>::one();
 
-    G1_precomputation<CurveType> prec_P(pb, P_val, "prec_P");
-    G2_precomputation<CurveType> prec_Q(pb, Q_val, "prec_Q");
+    G1_precomputation<CurveType> prec_P(pb, P_val);
+    G2_precomputation<CurveType> prec_Q(pb, Q_val);
 
-    Fqk_variable<CurveType> miller_result(pb, "miller_result");
-    mnt_miller_loop_gadget<CurveType> miller(pb, prec_P, prec_Q, miller_result, "miller");
+    Fqk_variable<CurveType> miller_result(pb);
+    mnt_miller_loop_gadget<CurveType> miller(pb, prec_P, prec_Q, miller_result);
     pb_variable<FieldType> result_is_one;
-    result_is_one.allocate(pb, "result_is_one");
-    final_exp_gadget<CurveType> finexp(pb, miller_result, result_is_one, "finexp");
+    result_is_one.allocate(pb);
+    final_exp_gadget<CurveType> finexp(pb, miller_result, result_is_one);
 
-    PROFILE_CONSTRAINTS(pb, "Miller loop") {
         miller.generate_r1cs_constraints();
-    }
-    PROFILE_CONSTRAINTS(pb, "final exp") {
         finexp.generate_r1cs_constraints();
-    }
-    PRINT_CONSTRAINT_PROFILING();
 
     miller.generate_r1cs_witness();
     finexp.generate_r1cs_witness();
-    assert(pb.is_satisfied());
+    BOOST_CHECK(pb.is_satisfied());
 
     algebra::affine_ate_G1_precomp<other_curve<CurveType>> native_prec_P = other_curve<CurveType>::affine_ate_precompute_G1(P_val);
     algebra::affine_ate_G2_precomp<other_curve<CurveType>> native_prec_Q = other_curve<CurveType>::affine_ate_precompute_G2(Q_val);
@@ -360,7 +341,7 @@ void test_full_precomputed_pairing(const std::string &annotation) {
     finexp.result->get_element().print();
     native_finexp_result.print();
 
-    assert(finexp.result->get_element() == native_finexp_result);
+    BOOST_CHECK(finexp.result->get_element() == native_finexp_result);
 
     printf("number of constraints for full precomputed pairing (Fr is %s)  = %zu\n", annotation.c_str(),
            pb.num_constraints());
@@ -417,10 +398,3 @@ int main() {
     test_hardcoded_verifier<algebra::curves::mnt4, algebra::curves::mnt6>("mnt4", "mnt6");
     test_hardcoded_verifier<algebra::curves::mnt6, algebra::curves::mnt4>("mnt6", "mnt4");
 }
-
-#else    // NDEBUG
-
-int main() {
-    printf("All tests here depend on assert() which is disabled by -DNDEBUG. Please recompile and run again.\n");
-}
-#endif    // NDEBUG

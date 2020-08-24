@@ -67,15 +67,15 @@ BOOST_AUTO_TEST_CASE(qap_test_case) {
     const std::size_t extended_domain_size = 1ul << (algebra::mnt6_Fr::s + 1);
     const std::size_t extended_domain_size_special = extended_domain_size - 1;
 
-    test_qap<algebra::Fr<algebra::mnt6_pp>>(basic_domain_size, num_inputs, true);
-    test_qap<algebra::Fr<algebra::mnt6_pp>>(step_domain_size, num_inputs, true);
-    test_qap<algebra::Fr<algebra::mnt6_pp>>(extended_domain_size, num_inputs, true);
-    test_qap<algebra::Fr<algebra::mnt6_pp>>(extended_domain_size_special, num_inputs, true);
+    test_qap<typename algebra::curves::mnt6::scalar_field_type>(basic_domain_size, num_inputs, true);
+    test_qap<typename algebra::curves::mnt6::scalar_field_type>(step_domain_size, num_inputs, true);
+    test_qap<typename algebra::curves::mnt6::scalar_field_type>(extended_domain_size, num_inputs, true);
+    test_qap<typename algebra::curves::mnt6::scalar_field_type>(extended_domain_size_special, num_inputs, true);
 
-    test_qap<algebra::Fr<algebra::mnt6_pp>>(basic_domain_size, num_inputs, false);
-    test_qap<algebra::Fr<algebra::mnt6_pp>>(step_domain_size, num_inputs, false);
-    test_qap<algebra::Fr<algebra::mnt6_pp>>(extended_domain_size, num_inputs, false);
-    test_qap<algebra::Fr<algebra::mnt6_pp>>(extended_domain_size_special, num_inputs, false);
+    test_qap<typename algebra::curves::mnt6::scalar_field_type>(basic_domain_size, num_inputs, false);
+    test_qap<typename algebra::curves::mnt6::scalar_field_type>(step_domain_size, num_inputs, false);
+    test_qap<typename algebra::curves::mnt6::scalar_field_type>(extended_domain_size, num_inputs, false);
+    test_qap<typename algebra::curves::mnt6::scalar_field_type>(extended_domain_size_special, num_inputs, false);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
