@@ -27,8 +27,7 @@ void test_ram_zksnark(const std::size_t w, const std::size_t k, const std::size_
     typedef ram_zksnark_machine_pp<CurveType> ramT;
     const ram_architecture_params<ramT> ap(w, k);
     const ram_example<ramT> example = gen_ram_example_complex<ramT>(ap, boot_trace_size_bound, time_bound, true);
-    const bool test_serialization = true;
-    const bool ans = run_ram_zksnark<CurveType>(example, test_serialization);
+    const bool ans = run_ram_zksnark<CurveType>(example);
     BOOST_CHECK(ans);
 }
 

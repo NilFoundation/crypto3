@@ -23,10 +23,9 @@ using namespace nil::crypto3::zk::snark;
 
 template<typename CurveType>
 void test_r1cs_se_ppzksnark(std::size_t num_constraints, std::size_t input_size) {
-    const bool test_serialization = true;
     r1cs_example<typename CurveType::scalar_field_type> example =
         generate_r1cs_example_with_binary_input<typename CurveType::scalar_field_type>(num_constraints, input_size);
-    const bool bit = run_r1cs_se_ppzksnark<CurveType>(example, test_serialization);
+    const bool bit = run_r1cs_se_ppzksnark<CurveType>(example);
     BOOST_CHECK(bit);
 }
 

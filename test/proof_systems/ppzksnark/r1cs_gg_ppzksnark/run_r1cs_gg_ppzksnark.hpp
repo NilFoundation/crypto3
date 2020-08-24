@@ -9,8 +9,8 @@
 // a given R1CS example.
 //---------------------------------------------------------------------------//
 
-#ifndef RUN_R1CS_GG_PPZKSNARK_HPP_
-#define RUN_R1CS_GG_PPZKSNARK_HPP_
+#ifndef CRYPTO3_RUN_R1CS_GG_PPZKSNARK_HPP
+#define CRYPTO3_RUN_R1CS_GG_PPZKSNARK_HPP
 
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_gg_ppzksnark/r1cs_gg_ppzksnark.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_gg_ppzksnark/r1cs_gg_ppzksnark_params.hpp>
@@ -25,12 +25,9 @@ namespace nil {
                 /**
                  * Runs the ppzkSNARK (generator, prover, and verifier) for a given
                  * R1CS example (specified by a constraint system, input, and witness).
-                 *
-                 * Optionally, also test the serialization routines for keys and proofs.
-                 * (This takes additional time.)
                  */
                 template<typename CurveType>
-                bool run_r1cs_gg_ppzksnark(const r1cs_example<typename CurveType::scalar_field_type> &example, bool test_serialization);
+                bool run_r1cs_gg_ppzksnark(const r1cs_example<typename CurveType::scalar_field_type> &example);
 
                 template<typename CurveType>
                 typename std::enable_if<CurveType::has_affine_pairing, void>::type
@@ -64,25 +61,15 @@ namespace nil {
                  *     a primary input for CS, and a proof.
                  */
                 template<typename CurveType>
-                bool run_r1cs_gg_ppzksnark(const r1cs_example<typename CurveType::scalar_field_type> &example, bool test_serialization) {
+                bool run_r1cs_gg_ppzksnark(const r1cs_example<typename CurveType::scalar_field_type> &example) {
                     r1cs_gg_ppzksnark_keypair<CurveType> keypair =
                         r1cs_gg_ppzksnark_generator<CurveType>(example.constraint_system);
 
                     r1cs_gg_ppzksnark_processed_verification_key<CurveType> pvk =
                         r1cs_gg_ppzksnark_verifier_process_vk<CurveType>(keypair.vk);
 
-                    if (test_serialization) {
-                        keypair.pk = algebra::reserialize<r1cs_gg_ppzksnark_proving_key<CurveType>>(keypair.pk);
-                        keypair.vk = algebra::reserialize<r1cs_gg_ppzksnark_verification_key<CurveType>>(keypair.vk);
-                        pvk = algebra::reserialize<r1cs_gg_ppzksnark_processed_verification_key<CurveType>>(pvk);
-                    }
-
                     r1cs_gg_ppzksnark_proof<CurveType> proof =
                         r1cs_gg_ppzksnark_prover<CurveType>(keypair.pk, example.primary_input, example.auxiliary_input);
-
-                    if (test_serialization) {
-                        proof = algebra::reserialize<r1cs_gg_ppzksnark_proof<CurveType>>(proof);
-                    }
 
                     const bool ans =
                         r1cs_gg_ppzksnark_verifier_strong_IC<CurveType>(keypair.vk, example.primary_input, proof);
@@ -100,4 +87,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // RUN_R1CS_GG_PPZKSNARK_HPP_
+#endif    // CRYPTO3_RUN_R1CS_GG_PPZKSNARK_HPP

@@ -9,9 +9,6 @@
 #include <cassert>
 #include <cstdio>
 
-#include <nil/algebra/common/profiling.hpp>
-#include <nil/algebra/common/utils.hpp>
-
 #include <nil/crypto3/zk/snark/default_types/uscs_ppzksnark_pp.hpp>
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/uscs/examples/uscs_examples.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/uscs_ppzksnark/examples/run_uscs_ppzksnark.hpp>
@@ -32,13 +29,10 @@ int main(int argc, const char *argv[]) {
     const int num_constraints = atoi(argv[1]);
     const int input_size = atoi(argv[2]);
 
-    algebra::enter_block("Generate USCS example");
+    std::cout << "Generate USCS example" << std::endl;
     uscs_example<typename default_uscs_ppzksnark_pp::scalar_field_type> example =
         generate_uscs_example_with_field_input<typename default_uscs_ppzksnark_pp::scalar_field_type>(num_constraints, input_size);
-    algebra::leave_block("Generate USCS example");
 
-    algebra::print_header("(enter) Profile USCS ppzkSNARK");
-    const bool test_serialization = true;
-    run_uscs_ppzksnark<default_uscs_ppzksnark_pp>(example, test_serialization);
-    algebra::print_header("(leave) Profile USCS ppzkSNARK");
+    std::cout << "Profile USCS ppzkSNARK" << std::endl;
+    run_uscs_ppzksnark<default_uscs_ppzksnark_pp>(example);
 }

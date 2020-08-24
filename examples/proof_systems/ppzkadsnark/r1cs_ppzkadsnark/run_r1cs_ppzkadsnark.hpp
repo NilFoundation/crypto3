@@ -22,13 +22,9 @@ namespace nil {
                 /**
                  * Runs the ppzkADSNARK (generator, prover, and verifier) for a given
                  * R1CS example (specified by a constraint system, input, and witness).
-                 *
-                 * Optionally, also test the serialization routines for keys and proofs.
-                 * (This takes additional time.)
                  */
                 template<typename CurveType>
-                bool run_r1cs_ppzkadsnark(const r1cs_example<curves::CurveType::scalar_field_type> &example,
-                                          const bool test_serialization);
+                bool run_r1cs_ppzkadsnark(const r1cs_example<curves::CurveType::scalar_field_type> &example);
 
                 /**
                  * The code below provides an example of all stages of running a R1CS ppzkADSNARK.
@@ -43,8 +39,7 @@ namespace nil {
                  *     a primary input for CS, and a proof.
                  */
                 template<typename CurveType>
-                bool run_r1cs_ppzkadsnark(const r1cs_example<curves::CurveType::scalar_field_type> &example,
-                                          const bool test_serialization) {
+                bool run_r1cs_ppzkadsnark(const r1cs_example<curves::CurveType::scalar_field_type> &example) {
 
                     r1cs_ppzkadsnark_auth_keys<CurveType> auth_keys = r1cs_ppzkadsnark_auth_generator<CurveType>();
 
@@ -53,12 +48,6 @@ namespace nil {
                     
                     r1cs_ppzkadsnark_processed_verification_key<CurveType> pvk =
                         r1cs_ppzkadsnark_verifier_process_vk<CurveType>(keypair.vk);
-
-                    if (test_serialization) {;
-                        keypair.pk = algebra::reserialize<r1cs_ppzkadsnark_proving_key<CurveType>>(keypair.pk);
-                        keypair.vk = algebra::reserialize<r1cs_ppzkadsnark_verification_key<CurveType>>(keypair.vk);
-                        pvk = algebra::reserialize<r1cs_ppzkadsnark_processed_verification_key<CurveType>>(pvk);
-                    }
 
                     std::vector<algebra::Fr<snark_pp<CurveType>>> data;
                     data.reserve(example.constraint_system.num_inputs());
@@ -79,11 +68,6 @@ namespace nil {
 
                     r1cs_ppzkadsnark_proof<CurveType> proof = r1cs_ppzkadsnark_prover<CurveType>(
                         keypair.pk, example.primary_input, example.auxiliary_input, auth_data);
-                    
-
-                    if (test_serialization) {
-                        proof = algebra::reserialize<r1cs_ppzkadsnark_proof<CurveType>>(proof);
-                    }
 
                     bool ans = r1cs_ppzkadsnark_verifier<CurveType>(keypair.vk, proof, auth_keys.sak, labels);
                     

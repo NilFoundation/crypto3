@@ -6,8 +6,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef RUN_BACS_PPZKSNARK_HPP_
-#define RUN_BACS_PPZKSNARK_HPP_
+#ifndef CRYPTO3_RUN_BACS_PPZKSNARK_HPP
+#define CRYPTO3_RUN_BACS_PPZKSNARK_HPP
 
 #include "bacs_examples.hpp"
 
@@ -19,12 +19,9 @@ namespace nil {
                 /**
                  * Runs the ppzkSNARK (generator, prover, and verifier) for a given
                  * BACS example (specified by a circuit, primary input, and auxiliary input).
-                 *
-                 * Optionally, also test the serialization routines for keys and proofs.
-                 * (This takes additional time.)
                  */
                 template<typename CurveType>
-                bool run_bacs_ppzksnark(const bacs_example<typename CurveType::scalar_field_type> &example, bool test_serialization);
+                bool run_bacs_ppzksnark(const bacs_example<typename CurveType::scalar_field_type> &example);
 
                 /**
                  * The code below provides an example of all stages of running a BACS ppzkSNARK.
@@ -39,52 +36,27 @@ namespace nil {
                  *     a primary input for C, and a proof.
                  */
                 template<typename CurveType>
-                bool run_bacs_ppzksnark(const bacs_example<typename CurveType::scalar_field_type> &example, bool test_serialization) {
-                    algebra::enter_block("Call to run_bacs_ppzksnark");
+                bool run_bacs_ppzksnark(const bacs_example<typename CurveType::scalar_field_type> &example) {
+                    std::cout << "Call to run_bacs_ppzksnark" std::endl;
 
-                    algebra::print_header("BACS ppzkSNARK Generator");
+                    std::cout << "BACS ppzkSNARK Generator" << std::endl;
                     bacs_ppzksnark_keypair<CurveType> keypair = bacs_ppzksnark_generator<CurveType>(example.circuit);
-                    printf("\n");
-                    algebra::print_indent();
-                    algebra::print_mem("after generator");
 
-                    algebra::print_header("Preprocess verification key");
+                    std::cout << "Preprocess verification key" << std::endl;
                     bacs_ppzksnark_processed_verification_key<CurveType> pvk =
                         bacs_ppzksnark_verifier_process_vk<CurveType>(keypair.vk);
 
-                    if (test_serialization) {
-                        algebra::enter_block("Test serialization of keys");
-                        keypair.pk = algebra::reserialize<bacs_ppzksnark_proving_key<CurveType>>(keypair.pk);
-                        keypair.vk = algebra::reserialize<bacs_ppzksnark_verification_key<CurveType>>(keypair.vk);
-                        pvk = algebra::reserialize<bacs_ppzksnark_processed_verification_key<CurveType>>(pvk);
-                        algebra::leave_block("Test serialization of keys");
-                    }
-
-                    algebra::print_header("BACS ppzkSNARK Prover");
+                    std::cout << "BACS ppzkSNARK Prover" << std::endl;
                     bacs_ppzksnark_proof<CurveType> proof =
                         bacs_ppzksnark_prover<CurveType>(keypair.pk, example.primary_input, example.auxiliary_input);
-                    printf("\n");
-                    algebra::print_indent();
-                    algebra::print_mem("after prover");
 
-                    if (test_serialization) {
-                        algebra::enter_block("Test serialization of proof");
-                        proof = algebra::reserialize<bacs_ppzksnark_proof<CurveType>>(proof);
-                        algebra::leave_block("Test serialization of proof");
-                    }
-
-                    algebra::print_header("BACS ppzkSNARK Verifier");
+                    std::cout << "BACS ppzkSNARK Verifier" << std::endl;
                     bool ans = bacs_ppzksnark_verifier_strong_IC<CurveType>(keypair.vk, example.primary_input, proof);
-                    printf("\n");
-                    algebra::print_indent();
-                    algebra::print_mem("after verifier");
                     printf("* The verification result is: %s\n", (ans ? "PASS" : "FAIL"));
 
-                    algebra::print_header("BACS ppzkSNARK Online Verifier");
+                    std::cout << "BACS ppzkSNARK Online Verifier" <<std::endl;
                     bool ans2 = bacs_ppzksnark_online_verifier_strong_IC<CurveType>(pvk, example.primary_input, proof);
                     BOOST_CHECK(ans == ans2);
-
-                    algebra::leave_block("Call to run_bacs_ppzksnark");
 
                     return ans;
                 }
@@ -94,4 +66,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // RUN_BACS_PPZKSNARK_HPP_
+#endif    // CRYPTO3_RUN_BACS_PPZKSNARK_HPP

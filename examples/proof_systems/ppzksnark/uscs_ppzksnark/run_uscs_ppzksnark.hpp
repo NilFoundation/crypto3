@@ -6,8 +6,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef RUN_USCS_PPZKSNARK_HPP_
-#define RUN_USCS_PPZKSNARK_HPP_
+#ifndef CRYPTO3_RUN_USCS_PPZKSNARK_HPP
+#define CRYPTO3_RUN_USCS_PPZKSNARK_HPP
 
 #include <nil/algebra/curves/public_params.hpp>
 
@@ -21,12 +21,9 @@ namespace nil {
                 /**
                  * Runs the ppzkSNARK (generator, prover, and verifier) for a given
                  * USCS example (specified by a constraint system, input, and witness).
-                 *
-                 * Optionally, also test the serialization routines for keys and proofs.
-                 * (This takes additional time.)
                  */
                 template<typename CurveType>
-                bool run_uscs_ppzksnark(const uscs_example<typename CurveType::scalar_field_type> &example, const bool test_serialization);
+                bool run_uscs_ppzksnark(const uscs_example<typename CurveType::scalar_field_type> &example);
 
                 /**
                  * The code below provides an example of all stages of running a USCS ppzkSNARK.
@@ -41,52 +38,27 @@ namespace nil {
                  *     a primary input for CS, and a proof.
                  */
                 template<typename CurveType>
-                bool run_uscs_ppzksnark(const uscs_example<typename CurveType::scalar_field_type> &example, const bool test_serialization) {
-                    algebra::enter_block("Call to run_uscs_ppzksnark");
+                bool run_uscs_ppzksnark(const uscs_example<typename CurveType::scalar_field_type> &example) {
+                    std::cout << "Call to run_uscs_ppzksnark" << std::endl;
 
-                    algebra::print_header("USCS ppzkSNARK Generator");
+                    std::cout << "USCS ppzkSNARK Generator" << std::endl;
                     uscs_ppzksnark_keypair<CurveType> keypair = uscs_ppzksnark_generator<CurveType>(example.constraint_system);
-                    printf("\n");
-                    algebra::print_indent();
-                    algebra::print_mem("after generator");
 
-                    algebra::print_header("Preprocess verification key");
+                    std::cout << "Preprocess verification key" << std::endl;
                     uscs_ppzksnark_processed_verification_key<CurveType> pvk =
                         uscs_ppzksnark_verifier_process_vk<CurveType>(keypair.vk);
 
-                    if (test_serialization) {
-                        algebra::enter_block("Test serialization of keys");
-                        keypair.pk = algebra::reserialize<uscs_ppzksnark_proving_key<CurveType>>(keypair.pk);
-                        keypair.vk = algebra::reserialize<uscs_ppzksnark_verification_key<CurveType>>(keypair.vk);
-                        pvk = algebra::reserialize<uscs_ppzksnark_processed_verification_key<CurveType>>(pvk);
-                        algebra::leave_block("Test serialization of keys");
-                    }
-
-                    algebra::print_header("USCS ppzkSNARK Prover");
+                    std::cout << "USCS ppzkSNARK Prover" << std::endl;
                     uscs_ppzksnark_proof<CurveType> proof =
                         uscs_ppzksnark_prover<CurveType>(keypair.pk, example.primary_input, example.auxiliary_input);
-                    printf("\n");
-                    algebra::print_indent();
-                    algebra::print_mem("after prover");
 
-                    if (test_serialization) {
-                        algebra::enter_block("Test serialization of proof");
-                        proof = algebra::reserialize<uscs_ppzksnark_proof<CurveType>>(proof);
-                        algebra::leave_block("Test serialization of proof");
-                    }
-
-                    algebra::print_header("USCS ppzkSNARK Verifier");
+                    std::cout << "USCS ppzkSNARK Verifier" << std::endl;
                     bool ans = uscs_ppzksnark_verifier_strong_IC<CurveType>(keypair.vk, example.primary_input, proof);
-                    printf("\n");
-                    algebra::print_indent();
-                    algebra::print_mem("after verifier");
                     printf("* The verification result is: %s\n", (ans ? "PASS" : "FAIL"));
 
-                    algebra::print_header("USCS ppzkSNARK Online Verifier");
+                    std::cout << "USCS ppzkSNARK Online Verifier" << std::endl;
                     bool ans2 = uscs_ppzksnark_online_verifier_strong_IC<CurveType>(pvk, example.primary_input, proof);
                     assert(ans == ans2);
-
-                    algebra::leave_block("Call to run_uscs_ppzksnark");
 
                     return ans;
                 }
@@ -96,4 +68,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // RUN_USCS_PPZKSNARK_HPP_
+#endif    // CRYPTO3_RUN_USCS_PPZKSNARK_HPP

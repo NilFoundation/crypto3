@@ -35,8 +35,7 @@ void test_ram_ppzksnark(const std::size_t w,
     const ram_example<machine_ppT> example =
         gen_ram_example_complex<machine_ppT>(ap, boot_trace_size_bound, time_bound, satisfiable);
 
-    const bool test_serialization = true;
-    const bool bit = run_ram_ppzksnark<CurveType>(example, test_serialization);
+    const bool bit = run_ram_ppzksnark<CurveType>(example);
     BOOST_CHECK(bit);
 }
 

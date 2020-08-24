@@ -20,10 +20,9 @@ using namespace nil::crypto3::zk::snark;
 
 template<typename CurveType>
 void test_bacs_ppzksnark(std::size_t primary_input_size, std::size_t auxiliary_input_size, std::size_t num_gates, std::size_t num_outputs) {
-    const bool test_serialization = true;
     const bacs_example<typename CurveType::scalar_field_type> example =
         generate_bacs_example<typename CurveType::scalar_field_type>(primary_input_size, auxiliary_input_size, num_gates, num_outputs);
-    const bool bit = run_bacs_ppzksnark<CurveType>(example, test_serialization);
+    const bool bit = run_bacs_ppzksnark<CurveType>(example);
     BOOST_CHECK(bit);
 }
 

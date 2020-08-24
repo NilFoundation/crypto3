@@ -17,8 +17,7 @@ using namespace nil::crypto3::zk::snark;
 template<typename PCD_ppT>
 void test_tally(std::size_t arity, std::size_t max_layer, bool test_multi_type, bool test_same_type_optimization) {
     const std::size_t wordsize = 32;
-    const bool test_serialization = true;
-    const bool bit = run_r1cs_mp_ppzkpcd_tally_example<PCD_ppT>(wordsize, arity, max_layer, test_serialization,
+    const bool bit = run_r1cs_mp_ppzkpcd_tally_example<PCD_ppT>(wordsize, arity, max_layer,
                                                                 test_multi_type, test_same_type_optimization);
     BOOST_CHECK(bit);
 }

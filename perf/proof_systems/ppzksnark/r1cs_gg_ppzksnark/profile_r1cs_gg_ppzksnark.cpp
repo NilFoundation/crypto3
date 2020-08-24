@@ -9,9 +9,6 @@
 #include <cassert>
 #include <cstdio>
 
-#include <nil/algebra/common/profiling.hpp>
-#include <nil/algebra/common/utils.hpp>
-
 #include <nil/crypto3/zk/snark/default_types/r1cs_gg_ppzksnark_pp.hpp>
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs/examples/r1cs_examples.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_gg_ppzksnark/examples/run_r1cs_gg_ppzksnark.hpp>
@@ -38,13 +35,10 @@ int main(int argc, const char *argv[]) {
         }
     }
 
-    algebra::enter_block("Generate R1CS example");
+    std::cout << "Generate R1CS example" << std::endl;
     r1cs_example<typename default_r1cs_gg_ppzksnark_pp::scalar_field_type> example =
         generate_r1cs_example_with_field_input<typename default_r1cs_gg_ppzksnark_pp::scalar_field_type>(num_constraints, input_size);
-    algebra::leave_block("Generate R1CS example");
 
-    algebra::print_header("(enter) Profile R1CS GG-ppzkSNARK");
-    const bool test_serialization = true;
-    run_r1cs_gg_ppzksnark<default_r1cs_gg_ppzksnark_pp>(example, test_serialization);
-    algebra::print_header("(leave) Profile R1CS GG-ppzkSNARK");
+    std::cout << "Profile R1CS GG-ppzkSNARK" << std::endl;
+    run_r1cs_gg_ppzksnark<default_r1cs_gg_ppzksnark_pp>(example);
 }

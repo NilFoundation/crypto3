@@ -6,8 +6,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef RUN_R1CS_SP_PPZKPCD_HPP_
-#define RUN_R1CS_SP_PPZKPCD_HPP_
+#ifndef CRYPTO3_RUN_R1CS_SP_PPZKPCD_HPP
+#define CRYPTO3_RUN_R1CS_SP_PPZKPCD_HPP
 
 #include <cstddef>
 
@@ -19,28 +19,23 @@ namespace nil {
                 /**
                  * Runs the single-predicate ppzkPCD (generator, prover, and verifier) for the
                  * "tally compliance predicate", of a given wordsize, arity, and depth.
-                 *
-                 * Optionally, also test the serialization routines for keys and proofs.
-                 * (This takes additional time.)
                  */
                 template<typename PCD_ppT>
                 bool run_r1cs_sp_ppzkpcd_tally_example(const std::size_t wordsize,
                                                        const std::size_t arity,
-                                                       const std::size_t depth,
-                                                       const bool test_serialization);
+                                                       const std::size_t depth);
 
                 template<typename PCD_ppT>
                 bool run_r1cs_sp_ppzkpcd_tally_example(const std::size_t wordsize,
                                                        const std::size_t arity,
-                                                       const std::size_t depth,
-                                                       const bool test_serialization) {
-                    algebra::enter_block("Call to run_r1cs_sp_ppzkpcd_tally_example");
+                                                       const std::size_t depth) {
+                    std::cout << "Call to run_r1cs_sp_ppzkpcd_tally_example" << std::endl;
 
                     typedef algebra::Fr<typename PCD_ppT::curve_A_pp> FieldType;
 
                     bool all_accept = true;
 
-                    algebra::enter_block("Generate all messages");
+                    std::cout << "Generate all messages" << std::endl;
                     std::size_t tree_size = 0;
                     std::size_t nodes_in_layer = 1;
                     for (std::size_t layer = 0; layer <= depth; ++layer) {
@@ -51,33 +46,23 @@ namespace nil {
                     for (std::size_t i = 0; i < tree_size; ++i) {
                         tree_elems[i] = std::rand() % 10;
                         printf("tree_elems[%zu] = %zu\n", i, tree_elems[i]);
-                    }
-                    algebra::leave_block("Generate all messages");
+                   
 
                     std::vector<r1cs_sp_ppzkpcd_proof<PCD_ppT>> tree_proofs(tree_size);
                     std::vector<std::shared_ptr<r1cs_pcd_message<FieldType>>> tree_messages(tree_size);
 
-                    algebra::enter_block("Generate compliance predicate");
+                    std::cout << "Generate compliance predicate" << std::endl;
                     const std::size_t type = 1;
                     tally_cp_handler<FieldType> tally(type, arity, wordsize);
                     tally.generate_r1cs_constraints();
-                    r1cs_pcd_compliance_predicate<FieldType> tally_cp = tally.get_compliance_predicate();
-                    algebra::leave_block("Generate compliance predicate");
+                    r1cs_pcd_compliance_predicate<FieldType> tally_cp = tally.get_compliance_predicate()
 
-                    algebra::print_header("R1CS ppzkPCD Generator");
+                    std::cout << "R1CS ppzkPCD Generator" << std::endl;
                     r1cs_sp_ppzkpcd_keypair<PCD_ppT> keypair = r1cs_sp_ppzkpcd_generator<PCD_ppT>(tally_cp);
 
-                    algebra::print_header("Process verification key");
+                    std::cout << "Process verification key" << std::endl;
                     r1cs_sp_ppzkpcd_processed_verification_key<PCD_ppT> pvk =
                         r1cs_sp_ppzkpcd_process_vk<PCD_ppT>(keypair.vk);
-
-                    if (test_serialization) {
-                        algebra::enter_block("Test serialization of keys");
-                        keypair.pk = algebra::reserialize<r1cs_sp_ppzkpcd_proving_key<PCD_ppT>>(keypair.pk);
-                        keypair.vk = algebra::reserialize<r1cs_sp_ppzkpcd_verification_key<PCD_ppT>>(keypair.vk);
-                        pvk = algebra::reserialize<r1cs_sp_ppzkpcd_processed_verification_key<PCD_ppT>>(pvk);
-                        algebra::leave_block("Test serialization of keys");
-                    }
 
                     std::shared_ptr<r1cs_pcd_message<FieldType>> base_msg = tally.get_base_case_message();
                     nodes_in_layer /= arity;
@@ -106,25 +91,19 @@ namespace nil {
                             const r1cs_pcd_compliance_predicate_auxiliary_input<FieldType> tally_auxiliary_input(
                                 msgs, ld, tally.get_witness());
 
-                            algebra::print_header("R1CS ppzkPCD Prover");
+                            std::cout << "R1CS ppzkPCD Prover" << std::endl;
                             r1cs_sp_ppzkpcd_proof<PCD_ppT> proof = r1cs_sp_ppzkpcd_prover<PCD_ppT>(
                                 keypair.pk, tally_primary_input, tally_auxiliary_input, proofs);
-
-                            if (test_serialization) {
-                                algebra::enter_block("Test serialization of proof");
-                                proof = algebra::reserialize<r1cs_sp_ppzkpcd_proof<PCD_ppT>>(proof);
-                                algebra::leave_block("Test serialization of proof");
-                            }
 
                             tree_proofs[cur_idx] = proof;
                             tree_messages[cur_idx] = tally.get_outgoing_message();
 
-                            algebra::print_header("R1CS ppzkPCD Verifier");
+                            std::cout << "R1CS ppzkPCD Verifier" << std::endl;
                             const r1cs_sp_ppzkpcd_primary_input<PCD_ppT> pcd_verifier_input(tree_messages[cur_idx]);
                             const bool ans =
                                 r1cs_sp_ppzkpcd_verifier<PCD_ppT>(keypair.vk, pcd_verifier_input, tree_proofs[cur_idx]);
 
-                            algebra::print_header("R1CS ppzkPCD Online Verifier");
+                            std::cout << "R1CS ppzkPCD Online Verifier" << std::endl;
                             const bool ans2 =
                                 r1cs_sp_ppzkpcd_online_verifier<PCD_ppT>(pvk, pcd_verifier_input, tree_proofs[cur_idx]);
                             assert(ans == ans2);
@@ -148,8 +127,6 @@ namespace nil {
                         }
                     }
 
-                    algebra::leave_block("Call to run_r1cs_sp_ppzkpcd_tally_example");
-
                     return all_accept;
                 }
 
@@ -158,4 +135,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // RUN_R1CS_SP_PPZKPCD_HPP_
+#endif    // CRYPTO3_RUN_R1CS_SP_PPZKPCD_HPP

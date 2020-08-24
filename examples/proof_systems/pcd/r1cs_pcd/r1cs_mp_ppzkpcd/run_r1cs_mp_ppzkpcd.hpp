@@ -25,16 +25,12 @@ namespace nil {
                  * Runs the multi-predicate ppzkPCD (generator, prover, and verifier) for the
                  * "tally compliance predicate", of a given wordsize, arity, and depth.
                  *
-                 * Optionally, also test the serialization routines for keys and proofs.
-                 * (This takes additional time.)
-                 *
                  * Optionally, also test the case of compliance predicates with different types.
                  */
                 template<typename PCD_ppT>
                 bool run_r1cs_mp_ppzkpcd_tally_example(std::size_t wordsize,
                                                        std::size_t max_arity,
                                                        std::size_t depth,
-                                                       bool test_serialization,
                                                        bool test_multi_type,
                                                        bool test_same_type_optimization) {
                     typedef algebra::Fr<typename PCD_ppT::curve_A_pp> FieldType;
@@ -103,12 +99,6 @@ namespace nil {
                     r1cs_mp_ppzkpcd_processed_verification_key<PCD_ppT> pvk =
                         r1cs_mp_ppzkpcd_process_vk<PCD_ppT>(keypair.vk);
 
-                    if (test_serialization) {
-                        keypair.pk = algebra::reserialize<r1cs_mp_ppzkpcd_proving_key<PCD_ppT>>(keypair.pk);
-                        keypair.vk = algebra::reserialize<r1cs_mp_ppzkpcd_verification_key<PCD_ppT>>(keypair.vk);
-                        pvk = algebra::reserialize<r1cs_mp_ppzkpcd_processed_verification_key<PCD_ppT>>(pvk);
-                    }
-
                     std::shared_ptr<r1cs_pcd_message<FieldType>> base_msg =
                         tally_1.get_base_case_message(); /* we choose the base to always be tally_1 */
                     nodes_in_layer /= max_arity;
@@ -144,10 +134,6 @@ namespace nil {
 
                             r1cs_mp_ppzkpcd_proof<PCD_ppT> proof = r1cs_mp_ppzkpcd_prover<PCD_ppT>(
                                 keypair.pk, cur_cp.name, tally_primary_input, tally_auxiliary_input, proofs);
-
-                            if (test_serialization) {
-                                proof = algebra::reserialize<r1cs_mp_ppzkpcd_proof<PCD_ppT>>(proof);
-                            }
 
                             tree_proofs[cur_idx] = proof;
                             tree_messages[cur_idx] = cur_tally.get_outgoing_message();

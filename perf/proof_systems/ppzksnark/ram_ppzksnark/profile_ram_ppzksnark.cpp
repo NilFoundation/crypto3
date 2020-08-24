@@ -13,8 +13,6 @@
 #include <sstream>
 #include <string>
 
-#include <nil/algebra/common/profiling.hpp>
-
 #include <nil/crypto3/zk/snark/default_types/ram_ppzksnark_pp.hpp>
 #include <nil/crypto3/zk/snark/relations/ram_computations/rams/examples/ram_examples.hpp>
 #include <nil/crypto3/zk/snark/relations/ram_computations/rams/tinyram/tinyram_params.hpp>
@@ -40,15 +38,12 @@ int main(int argc, const char *argv[]) {
 
     const ram_ppzksnark_architecture_params<default_ram_ppzksnark_pp> ap(w, k);
 
-    algebra::enter_block("Generate RAM example");
+    std::cout << "Generate RAM example" << std::endl;
     const std::size_t boot_trace_size_bound = program_size + input_size;
     const bool satisfiable = true;
     ram_example<machine_ppT> example =
         gen_ram_example_complex<machine_ppT>(ap, boot_trace_size_bound, time_bound, satisfiable);
-    algebra::leave_block("Generate RAM example");
 
-    algebra::print_header("(enter) Profile RAM ppzkSNARK");
-    const bool test_serialization = true;
-    run_ram_ppzksnark<default_ram_ppzksnark_pp>(example, test_serialization);
-    algebra::print_header("(leave) Profile RAM ppzkSNARK");
+    std::cout << "Profile RAM ppzkSNARK" << std::endl;
+    run_ram_ppzksnark<default_ram_ppzksnark_pp>(example);
 }

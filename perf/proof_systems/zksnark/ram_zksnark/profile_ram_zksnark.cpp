@@ -25,9 +25,8 @@ void simulate_random_memory_contents(const tinyram_architecture_params &ap, cons
     memory_contents init_random =
         random_memory_contents(num_addresses, value_size, program_size + (input_size + 1) / 2);
 
-    algebra::enter_block("Initialize random delegated memory");
+    std::cout << "Initialize random delegated memory" <<std::endl;
     delegated_ra_memory<FieldType> dm_random(num_addresses, value_size, init_random);
-    algebra::leave_block("Initialize random delegated memory");
 }
 
 template<typename CurveType>
@@ -42,9 +41,8 @@ void profile_ram_zksnark_verifier(const tinyram_architecture_params &ap, const s
     ram_zksnark_proof<CurveType> pi;
     ram_zksnark_verification_key<CurveType> vk = ram_zksnark_verification_key<CurveType>::dummy_verification_key(ap);
 
-    algebra::enter_block("Verify fake proof");
+    std::cout << "Verify fake proof" <<std::endl;
     ram_zksnark_verifier<CurveType>(vk, example.boot_trace, time_bound, pi);
-    algebra::leave_block("Verify fake proof");
 }
 
 template<typename CurveType>
@@ -90,8 +88,7 @@ void profile_ram_zksnark(const tinyram_architecture_params &ap, const std::size_
 
     const std::size_t boot_trace_size_bound = program_size + input_size;
     const ram_example<ramT> example = gen_ram_example_complex<ramT>(ap, boot_trace_size_bound, time_bound, true);
-    const bool test_serialization = true;
-    const bool bit = run_ram_zksnark<CurveType>(example, test_serialization);
+    const bool bit = run_ram_zksnark<CurveType>(example);
     assert(bit);
 }
 

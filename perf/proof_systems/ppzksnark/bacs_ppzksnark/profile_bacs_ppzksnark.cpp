@@ -30,13 +30,10 @@ int main(int argc, const char *argv[]) {
     const std::size_t auxiliary_input_size = 0;
     const std::size_t num_outputs = num_gates / 2;
 
-    algebra::enter_block("Generate BACS example");
+    std::cout << "Generate BACS example" << std::endl;
     bacs_example<typename default_bacs_ppzksnark_pp::scalar_field_type> example = generate_bacs_example<typename default_bacs_ppzksnark_pp::scalar_field_type>(
         primary_input_size, auxiliary_input_size, num_gates, num_outputs);
-    algebra::leave_block("Generate BACS example");
 
-    algebra::print_header("(enter) Profile BACS ppzkSNARK");
-    const bool test_serialization = true;
-    run_bacs_ppzksnark<default_bacs_ppzksnark_pp>(example, test_serialization);
-    algebra::print_header("(leave) Profile BACS ppzkSNARK");
+    std::cout << "(enter) Profile BACS ppzkSNARK" << std::endl;
+    run_bacs_ppzksnark<default_bacs_ppzksnark_pp>(example);
 }

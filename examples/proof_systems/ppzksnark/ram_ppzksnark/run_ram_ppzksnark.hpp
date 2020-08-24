@@ -20,13 +20,9 @@ namespace nil {
                 /**
                  * Runs the ppzkSNARK (generator, prover, and verifier) for a given
                  * RAM example (specified by an architecture, boot trace, auxiliary input, and time bound).
-                 *
-                 * Optionally, also test the serialization routines for keys and proofs.
-                 * (This takes additional time.)
                  */
                 template<typename ram_ppzksnark_ppT>
-                bool run_ram_ppzksnark(const ram_example<ram_ppzksnark_machine_pp<ram_ppzksnark_ppT>> &example,
-                                       const bool test_serialization);
+                bool run_ram_ppzksnark(const ram_example<ram_ppzksnark_machine_pp<ram_ppzksnark_ppT>> &example);
 
                 /**
                  * The code below provides an example of all stages of running a RAM ppzkSNARK.
@@ -41,8 +37,7 @@ namespace nil {
                  *     a boot trace, and a proof.
                  */
                 template<typename ram_ppzksnark_ppT>
-                bool run_ram_ppzksnark(const ram_example<ram_ppzksnark_machine_pp<ram_ppzksnark_ppT>> &example,
-                                       const bool test_serialization) {
+                bool run_ram_ppzksnark(const ram_example<ram_ppzksnark_machine_pp<ram_ppzksnark_ppT>> &example) {
 
                     printf("This run uses an example with the following parameters:\n");
                     example.ap.print();
@@ -54,18 +49,9 @@ namespace nil {
                     ram_ppzksnark_keypair<ram_ppzksnark_ppT> keypair = ram_ppzksnark_generator<ram_ppzksnark_ppT>(
                         example.ap, example.boot_trace_size_bound, example.time_bound);
 
-                    if (test_serialization) {
-                        keypair.pk = algebra::reserialize<ram_ppzksnark_proving_key<ram_ppzksnark_ppT>>(keypair.pk);
-                        keypair.vk = algebra::reserialize<ram_ppzksnark_verification_key<ram_ppzksnark_ppT>>(keypair.vk);
-                    }
-
                     std::cout << "RAM ppzkSNARK Prover" << std::endl;
                     ram_ppzksnark_proof<ram_ppzksnark_ppT> proof = ram_ppzksnark_prover<ram_ppzksnark_ppT>(
                         keypair.pk, example.boot_trace, example.auxiliary_input);
-
-                    if (test_serialization) {
-                        proof = algebra::reserialize<ram_ppzksnark_proof<ram_ppzksnark_ppT>>(proof);
-                    }
 
                     std::cout << "RAM ppzkSNARK Verifier" << std::endl;
                     bool ans = ram_ppzksnark_verifier<ram_ppzksnark_ppT>(keypair.vk, example.boot_trace, proof);

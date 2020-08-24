@@ -41,6 +41,5 @@ int main(int argc, const char *argv[]) {
         generate_r1cs_example_with_field_input<algebra::Fr<snark_pp<default_r1cs_ppzkadsnark_pp>>>(num_constraints,
                                                                                                    input_size);
 
-    const bool test_serialization = true;
-    run_r1cs_ppzkadsnark<default_r1cs_ppzkadsnark_pp>(example, test_serialization);
+    run_r1cs_ppzkadsnark<default_r1cs_ppzkadsnark_pp>(example);
 }

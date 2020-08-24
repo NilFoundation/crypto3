@@ -8,9 +8,6 @@
 
 #include <cstdio>
 
-#include <nil/algebra/common/profiling.hpp>
-#include <nil/algebra/common/utils.hpp>
-
 #include <nil/crypto3/zk/snark/default_types/tbcs_ppzksnark_pp.hpp>
 #include <nil/crypto3/zk/snark/relations/circuit_satisfaction_problems/tbcs/examples/tbcs_examples.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/tbcs_ppzksnark/examples/run_tbcs_ppzksnark.hpp>
@@ -33,12 +30,9 @@ int main(int argc, const char *argv[]) {
     const std::size_t auxiliary_input_size = 0;
     const std::size_t num_outputs = num_gates / 2;
 
-    algebra::enter_block("Generate TBCS example");
+    std::cout << "Generate TBCS example" << std::endl;
     tbcs_example example = generate_tbcs_example(primary_input_size, auxiliary_input_size, num_gates, num_outputs);
-    algebra::leave_block("Generate TBCS example");
 
-    algebra::print_header("(enter) Profile TBCS ppzkSNARK");
-    const bool test_serialization = true;
-    run_tbcs_ppzksnark<default_tbcs_ppzksnark_pp>(example, test_serialization);
-    algebra::print_header("(leave) Profile TBCS ppzkSNARK");
+    std::cout << "Profile TBCS ppzkSNARK" <<std::endl;
+    run_tbcs_ppzksnark<default_tbcs_ppzksnark_pp>(example);
 }
