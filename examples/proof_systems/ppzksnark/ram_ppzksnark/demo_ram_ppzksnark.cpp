@@ -105,13 +105,12 @@ int main(int argc, const char *argv[]) {
     std::ifstream f_primary_input(primary_input_fn);
     std::ifstream f_auxiliary_input(auxiliary_input_fn);
 
-    algebra::enter_block("Loading primary input");
+    std::cout << "Loading primary input" << std::endl;
     tinyram_input_tape primary_input = load_tape(f_primary_input);
-    algebra::leave_block("Loading primary input");
+    
 
-    algebra::enter_block("Loading auxiliary input");
+    std::cout << "Loading auxiliary input" << std::endl;
     tinyram_input_tape auxiliary_input = load_tape(f_auxiliary_input);
-    algebra::leave_block("Loading auxiliary input");
 
     printf("\nPress enter to continue.\n");
     std::cin.get();
@@ -167,6 +166,6 @@ int main(int argc, const char *argv[]) {
     printf("================================================================================\n");
     printf("The verification result is: %s\n", (bit ? "PASS" : "FAIL"));
     printf("================================================================================\n");
-    algebra::print_mem();
+    
     printf("================================================================================\n");
 }

@@ -6,8 +6,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef RUN_RAM_PPZKSNARK_HPP_
-#define RUN_RAM_PPZKSNARK_HPP_
+#ifndef CRYPTO3_RUN_RAM_PPZKSNARK_HPP
+#define CRYPTO3_RUN_RAM_PPZKSNARK_HPP
 
 #include <nil/crypto3/zk/snark/relations/ram_computations/rams/examples/ram_examples.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/ram_ppzksnark/ram_ppzksnark_params.hpp>
@@ -43,50 +43,34 @@ namespace nil {
                 template<typename ram_ppzksnark_ppT>
                 bool run_ram_ppzksnark(const ram_example<ram_ppzksnark_machine_pp<ram_ppzksnark_ppT>> &example,
                                        const bool test_serialization) {
-                    algebra::enter_block("Call to run_ram_ppzksnark");
 
                     printf("This run uses an example with the following parameters:\n");
                     example.ap.print();
                     printf("* Primary input size bound (L): %zu\n", example.boot_trace_size_bound);
                     printf("* Time bound (T): %zu\n", example.time_bound);
                     printf("Hence, algebra::algebra::log2(L+2*T) equals %zu\n",
-                        algebra::log2(example.boot_trace_size_bound + 2 * example.time_bound));
+                        example.boot_trace_size_bound + 2 * example.time_bound);
 
-                    algebra::print_header("RAM ppzkSNARK Generator");
                     ram_ppzksnark_keypair<ram_ppzksnark_ppT> keypair = ram_ppzksnark_generator<ram_ppzksnark_ppT>(
                         example.ap, example.boot_trace_size_bound, example.time_bound);
-                    printf("\n");
-                    algebra::print_indent();
-                    algebra::print_mem("after generator");
 
                     if (test_serialization) {
-                        algebra::enter_block("Test serialization of keys");
                         keypair.pk = algebra::reserialize<ram_ppzksnark_proving_key<ram_ppzksnark_ppT>>(keypair.pk);
                         keypair.vk = algebra::reserialize<ram_ppzksnark_verification_key<ram_ppzksnark_ppT>>(keypair.vk);
-                        algebra::leave_block("Test serialization of keys");
                     }
 
-                    algebra::print_header("RAM ppzkSNARK Prover");
+                    std::cout << "RAM ppzkSNARK Prover" << std::endl;
                     ram_ppzksnark_proof<ram_ppzksnark_ppT> proof = ram_ppzksnark_prover<ram_ppzksnark_ppT>(
                         keypair.pk, example.boot_trace, example.auxiliary_input);
-                    printf("\n");
-                    algebra::print_indent();
-                    algebra::print_mem("after prover");
 
                     if (test_serialization) {
-                        algebra::enter_block("Test serialization of proof");
                         proof = algebra::reserialize<ram_ppzksnark_proof<ram_ppzksnark_ppT>>(proof);
-                        algebra::leave_block("Test serialization of proof");
                     }
 
-                    algebra::print_header("RAM ppzkSNARK Verifier");
+                    std::cout << "RAM ppzkSNARK Verifier" << std::endl;
                     bool ans = ram_ppzksnark_verifier<ram_ppzksnark_ppT>(keypair.vk, example.boot_trace, proof);
-                    printf("\n");
-                    algebra::print_indent();
-                    algebra::print_mem("after verifier");
-                    printf("* The verification result is: %s\n", (ans ? "PASS" : "FAIL"));
-
-                    algebra::leave_block("Call to run_ram_ppzksnark");
+                    
+                    std::cout << "* The verification result is: %s\n", (ans ? "PASS" : "FAIL") << std::endl;
 
                     return ans;
                 }
@@ -96,4 +80,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // RUN_RAM_PPZKSNARK_HPP_
+#endif    // CRYPTO3_RUN_RAM_PPZKSNARK_HPP

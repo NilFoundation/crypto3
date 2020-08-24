@@ -70,7 +70,7 @@ namespace nil {
                     using policy_type = FieldType;
                     using field_value_type = policy_type::value_type;
 
-                    algebra::enter_block("Call to generate_uscs_example_with_field_input");
+                    std::cout << "Call to generate_uscs_example_with_field_input" << std::endl;
 
                     assert(num_inputs >= 1);
                     assert(num_constraints >= num_inputs);
@@ -121,15 +121,13 @@ namespace nil {
                     assert(cs.num_constraints() == num_constraints);
                     assert(cs.is_satisfied(primary_input, auxiliary_input));
 
-                    algebra::leave_block("Call to generate_uscs_example_with_field_input");
-
                     return uscs_example<FieldType>(std::move(cs), std::move(primary_input), std::move(auxiliary_input));
                 }
 
                 template<typename FieldType>
                 uscs_example<FieldType> generate_uscs_example_with_binary_input(const std::size_t num_constraints,
                                                                              const std::size_t num_inputs) {
-                    algebra::enter_block("Call to generate_uscs_example_with_binary_input");
+                    std::cout << "Call to generate_uscs_example_with_binary_input" << std::endl;
 
                     assert(num_inputs >= 1);
 
@@ -174,8 +172,6 @@ namespace nil {
                     assert(cs.num_inputs() == num_inputs);
                     assert(cs.num_constraints() == num_constraints);
                     assert(cs.is_satisfied(primary_input, auxiliary_input));
-
-                    algebra::leave_block("Call to generate_uscs_example_with_binary_input");
 
                     return uscs_example<FieldType>(std::move(cs), std::move(primary_input), std::move(auxiliary_input));
                 }

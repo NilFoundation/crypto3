@@ -12,8 +12,8 @@
 // See pairing_params.hpp .
 //---------------------------------------------------------------------------//
 
-#ifndef MNT_PAIRING_PARAMS_HPP_
-#define MNT_PAIRING_PARAMS_HPP_
+#ifndef CRYPTO3_MNT_PAIRING_PARAMS_HPP
+#define CRYPTO3_MNT_PAIRING_PARAMS_HPP
 
 #include <nil/crypto3/zk/snark/gadgets/fields/fp2_gadgets.hpp>
 #include <nil/crypto3/zk/snark/gadgets/fields/fp3_gadgets.hpp>
@@ -106,4 +106,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // MNT_PAIRING_PARAMS_HPP_
+#endif    // CRYPTO3_MNT_PAIRING_PARAMS_HPP

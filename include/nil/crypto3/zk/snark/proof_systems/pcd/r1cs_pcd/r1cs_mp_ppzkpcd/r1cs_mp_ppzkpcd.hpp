@@ -34,8 +34,8 @@
 // Alessandro Chiesa, Eran Tromer, Madars Virza,
 //---------------------------------------------------------------------------//
 
-#ifndef R1CS_MP_PPZKPCD_HPP_
-#define R1CS_MP_PPZKPCD_HPP_
+#ifndef CRYPTO3_R1CS_MP_PPZKPCD_HPP
+#define CRYPTO3_R1CS_MP_PPZKPCD_HPP
 
 #include <memory>
 #include <vector>
@@ -534,7 +534,7 @@ namespace nil {
                     typedef typename curve_A_pp::scalar_field_type FieldT_A;
                     typedef typename curve_B_pp::scalar_field_type FieldT_B;
 
-                    algebra::enter_block("Call to r1cs_mp_ppzkpcd_generator");
+                    std::cout << "Call to r1cs_mp_ppzkpcd_generator" << std::endl;
 
                     r1cs_mp_ppzkpcd_keypair<PCD_ppT> keypair;
                     const std::size_t translation_input_size =
@@ -546,7 +546,7 @@ namespace nil {
                     set_commitment_accumulator<CRH_with_bit_out_gadget<FieldT_A>> all_translation_vks(
                         compliance_predicates.size(), vk_size_in_bits);
 
-                    algebra::enter_block("Perform type checks");
+                    std::cout << "Perform type checks" << std::endl;
                     std::map<std::size_t, std::size_t> type_counts;
 
                     for (auto &cp : compliance_predicates) {
@@ -562,50 +562,44 @@ namespace nil {
                             assert(cp.accepted_input_types.empty());
                         }
                     }
-                    algebra::leave_block("Perform type checks");
 
                     for (std::size_t i = 0; i < compliance_predicates.size(); ++i) {
-                        algebra::enter_block(FMT("",
+                        std::cout << FMT("",
                                                  "Process predicate %zu (with name %zu and type %zu)",
                                                  i,
                                                  compliance_predicates[i].name,
-                                                 compliance_predicates[i].type));
+                                                 compliance_predicates[i].type) << std::endl;
                         assert(compliance_predicates[i].is_well_formed());
 
-                        algebra::enter_block("Construct compliance step PCD circuit");
+                        std::cout << "Construct compliance step PCD circuit" << std::endl;
                         mp_compliance_step_pcd_circuit_maker<curve_A_pp> mp_compliance_step_pcd_circuit(
                             compliance_predicates[i], compliance_predicates.size());
                         mp_compliance_step_pcd_circuit.generate_r1cs_constraints();
                         r1cs_constraint_system<FieldT_A> mp_compliance_step_pcd_circuit_cs =
                             mp_compliance_step_pcd_circuit.get_circuit();
-                        algebra::leave_block("Construct compliance step PCD circuit");
 
-                        algebra::enter_block("Generate key pair for compliance step PCD circuit");
+                        std::cout << "Generate key pair for compliance step PCD circuit" << std::endl;
                         r1cs_ppzksnark_keypair<curve_A_pp> mp_compliance_step_keypair =
                             r1cs_ppzksnark_generator<curve_A_pp>(mp_compliance_step_pcd_circuit_cs);
-                        algebra::leave_block("Generate key pair for compliance step PCD circuit");
 
-                        algebra::enter_block("Construct translation step PCD circuit");
+                        std::cout << "Construct translation step PCD circuit" << std::endl;
                         mp_translation_step_pcd_circuit_maker<curve_B_pp> mp_translation_step_pcd_circuit(
                             mp_compliance_step_keypair.vk);
                         mp_translation_step_pcd_circuit.generate_r1cs_constraints();
                         r1cs_constraint_system<FieldT_B> mp_translation_step_pcd_circuit_cs =
                             mp_translation_step_pcd_circuit.get_circuit();
-                        algebra::leave_block("Construct translation step PCD circuit");
 
-                        algebra::enter_block("Generate key pair for translation step PCD circuit");
+                        std::cout << "Generate key pair for translation step PCD circuit" << std::endl;
                         r1cs_ppzksnark_keypair<curve_B_pp> mp_translation_step_keypair =
                             r1cs_ppzksnark_generator<curve_B_pp>(mp_translation_step_pcd_circuit_cs);
-                        algebra::leave_block("Generate key pair for translation step PCD circuit");
 
-                        algebra::enter_block("Augment set of translation step verification keys");
+                        std::cout << "Augment set of translation step verification keys" << std::endl;
                         const std::vector<bool> vk_bits =
                             r1cs_ppzksnark_verification_key_variable<curve_A_pp>::get_verification_key_bits(
                                 mp_translation_step_keypair.vk);
                         all_translation_vks.add(vk_bits);
-                        algebra::leave_block("Augment set of translation step verification keys");
 
-                        algebra::enter_block("Update r1cs_mp_ppzkpcd keypair");
+                        std::cout << "Update r1cs_mp_ppzkpcd keypair" << std::endl;
                         keypair.pk.compliance_predicates.emplace_back(compliance_predicates[i]);
                         keypair.pk.compliance_step_r1cs_pks.emplace_back(mp_compliance_step_keypair.pk);
                         keypair.pk.translation_step_r1cs_pks.emplace_back(mp_translation_step_keypair.pk);
@@ -618,16 +612,10 @@ namespace nil {
 
                         keypair.vk.compliance_step_r1cs_vks.emplace_back(mp_compliance_step_keypair.vk);
                         keypair.vk.translation_step_r1cs_vks.emplace_back(mp_translation_step_keypair.vk);
-                        algebra::leave_block("Update r1cs_mp_ppzkpcd keypair");
 
-                        algebra::leave_block(FMT("",
-                                                 "Process predicate %zu (with name %zu and type %zu)",
-                                                 i,
-                                                 compliance_predicates[i].name,
-                                                 compliance_predicates[i].type));
                     }
 
-                    algebra::enter_block("Compute set commitment and corresponding membership proofs");
+                    std::cout << "Compute set commitment and corresponding membership proofs" << std::endl;
                     const set_commitment cm = all_translation_vks.get_commitment();
                     keypair.pk.commitment_to_translation_step_r1cs_vks = cm;
                     keypair.vk.commitment_to_translation_step_r1cs_vks = cm;
@@ -639,11 +627,6 @@ namespace nil {
 
                         keypair.pk.compliance_step_r1cs_vk_membership_proofs.emplace_back(proof);
                     }
-                    algebra::leave_block("Compute set commitment and corresponding membership proofs");
-
-                    algebra::print_indent();
-                    algebra::print_mem("in generator");
-                    algebra::leave_block("Call to r1cs_mp_ppzkpcd_generator");
 
                     return keypair;
                 }
@@ -661,7 +644,7 @@ namespace nil {
                     typedef typename curve_A_pp::scalar_field_type FieldT_A;
                     typedef typename curve_B_pp::scalar_field_type FieldT_B;
 
-                    algebra::enter_block("Call to r1cs_mp_ppzkpcd_prover");
+                    std::cout << "Call to r1cs_mp_ppzkpcd_prover" << std::endl;
 
 #ifdef DEBUG
                     printf("Compliance predicate name: %zu\n", compliance_predicate_name);
@@ -675,7 +658,7 @@ namespace nil {
                     primary_input.outgoing_message->print();
 #endif
 
-                    algebra::enter_block("Prove compliance step");
+                    std::cout << "Prove compliance step" << std::endl;
                     assert(compliance_predicate_idx < pk.compliance_predicates.size());
                     assert(prev_proofs.size() <= pk.compliance_predicates[compliance_predicate_idx].max_arity);
 
@@ -743,7 +726,6 @@ namespace nil {
                         r1cs_ppzksnark_prover<curve_A_pp>(pk.compliance_step_r1cs_pks[compliance_predicate_idx],
                                                           compliance_step_primary_input,
                                                           compliance_step_auxiliary_input);
-                    algebra::leave_block("Prove compliance step");
 
 #ifdef DEBUG
                     const r1cs_primary_input<FieldT_A> compliance_step_input =
@@ -756,7 +738,7 @@ namespace nil {
                     assert(compliance_step_ok);
 #endif
 
-                    algebra::enter_block("Prove translation step");
+                    std::cout << "Prove translation step" << std::endl;
                     mp_translation_step_pcd_circuit_maker<curve_B_pp> mp_translation_step_pcd_circuit(
                         pk.compliance_step_r1cs_vks[compliance_predicate_idx]);
 
@@ -773,7 +755,6 @@ namespace nil {
                                                           translation_step_primary_input,
                                                           translation_step_auxiliary_input);
 
-                    algebra::leave_block("Prove translation step");
 
 #ifdef DEBUG
                     const bool translation_step_ok = r1cs_ppzksnark_verifier_strong_IC<curve_B_pp>(
@@ -782,10 +763,6 @@ namespace nil {
                         translation_step_proof);
                     assert(translation_step_ok);
 #endif
-
-                    algebra::print_indent();
-                    algebra::print_mem("in prover");
-                    algebra::leave_block("Call to r1cs_mp_ppzkpcd_prover");
 
                     r1cs_mp_ppzkpcd_proof<PCD_ppT> result;
                     result.compliance_predicate_idx = compliance_predicate_idx;
@@ -799,16 +776,13 @@ namespace nil {
                                                      const r1cs_mp_ppzkpcd_proof<PCD_ppT> &proof) {
                     typedef typename PCD_ppT::curve_B_pp curve_B_pp;
 
-                    algebra::enter_block("Call to r1cs_mp_ppzkpcd_online_verifier");
+                    std::cout << "Call to r1cs_mp_ppzkpcd_online_verifier" << std::endl;
                     const r1cs_primary_input<typename curve_B_pp::scalar_field_type> r1cs_input =
                         get_mp_translation_step_pcd_circuit_input<curve_B_pp>(
                             pvk.commitment_to_translation_step_r1cs_vks, primary_input);
                     const bool result = r1cs_ppzksnark_online_verifier_strong_IC(
                         pvk.translation_step_r1cs_pvks[proof.compliance_predicate_idx], r1cs_input, proof.r1cs_proof);
 
-                    algebra::print_indent();
-                    algebra::print_mem("in online verifier");
-                    algebra::leave_block("Call to r1cs_mp_ppzkpcd_online_verifier");
                     return result;
                 }
 
@@ -818,7 +792,7 @@ namespace nil {
                     typedef typename PCD_ppT::curve_A_pp curve_A_pp;
                     typedef typename PCD_ppT::curve_B_pp curve_B_pp;
 
-                    algebra::enter_block("Call to r1cs_mp_ppzkpcd_processed_verification_key");
+                    std::cout << "Call to r1cs_mp_ppzkpcd_processed_verification_key" << std::endl;
 
                     r1cs_mp_ppzkpcd_processed_verification_key<PCD_ppT> result;
                     result.commitment_to_translation_step_r1cs_vks = vk.commitment_to_translation_step_r1cs_vks;
@@ -832,7 +806,6 @@ namespace nil {
                         result.compliance_step_r1cs_pvks.emplace_back(compliance_step_r1cs_pvk);
                         result.translation_step_r1cs_pvks.emplace_back(translation_step_r1cs_pvk);
                     }
-                    algebra::leave_block("Call to r1cs_mp_ppzkpcd_processed_verification_key");
 
                     return result;
                 }
@@ -841,13 +814,10 @@ namespace nil {
                 bool r1cs_mp_ppzkpcd_verifier(const r1cs_mp_ppzkpcd_verification_key<PCD_ppT> &vk,
                                               const r1cs_mp_ppzkpcd_primary_input<PCD_ppT> &primary_input,
                                               const r1cs_mp_ppzkpcd_proof<PCD_ppT> &proof) {
-                    algebra::enter_block("Call to r1cs_mp_ppzkpcd_verifier");
+                    std::cout << "Call to r1cs_mp_ppzkpcd_verifier" << std::endl;
                     r1cs_mp_ppzkpcd_processed_verification_key<PCD_ppT> pvk = r1cs_mp_ppzkpcd_process_vk(vk);
                     const bool result = r1cs_mp_ppzkpcd_online_verifier(pvk, primary_input, proof);
 
-                    algebra::print_indent();
-                    algebra::print_mem("in verifier");
-                    algebra::leave_block("Call to r1cs_mp_ppzkpcd_verifier");
                     return result;
                 }
 
@@ -856,4 +826,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // R1CS_MP_PPZKPCD_HPP_
+#endif    // CRYPTO3_R1CS_MP_PPZKPCD_HPP

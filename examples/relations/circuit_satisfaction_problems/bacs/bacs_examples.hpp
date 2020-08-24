@@ -6,8 +6,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef BACS_EXAMPLES_HPP_
-#define BACS_EXAMPLES_HPP_
+#ifndef CRYPTO3_BACS_EXAMPLES_HPP
+#define CRYPTO3_BACS_EXAMPLES_HPP
 
 #include <nil/crypto3/zk/snark/relations/circuit_satisfaction_problems/bacs/bacs.hpp>
 
@@ -90,7 +90,7 @@ namespace nil {
 
                     using policy_type = FieldType;
                     using field_value_type = policy_type::value_type;
-                    
+
                     bacs_example<FieldType> example;
                     for (std::size_t i = 0; i < primary_input_size; ++i) {
                         example.primary_input.emplace_back(FieldType::random_element());
@@ -150,4 +150,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // BACS_EXAMPLES_HPP_
+#endif    // CRYPTO3_BACS_EXAMPLES_HPP
