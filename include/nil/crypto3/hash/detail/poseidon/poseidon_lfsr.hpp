@@ -60,13 +60,13 @@ namespace nil {
 
                     // get next element
                     inline ElementType get_next_element() {
-                        typename ElementType::number_type round_const;
+                        typename ElementType::modulus_type round_const;
                         while (true) {
-                            round_const = 0;
-                            round_const |= get_next_bit();
+                            round_const = 0;// typename ElementType::modulus_type(0);
+                            round_const |= get_next_bit();// ? typename ElementType::modulus_type(1) : typename ElementType::modulus_type(0);
                             for (std::size_t i = 1; i < word_bits; i++) {
                                 round_const <<= 1;
-                                round_const |= get_next_bit();
+                                round_const |= get_next_bit() ? typename ElementType::modulus_type(1) : typename ElementType::modulus_type(0);
                             }
                             if (round_const < ElementType::modulus) // filecoin oriented - remake when integrate in the project
                                 break;

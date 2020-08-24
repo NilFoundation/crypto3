@@ -12,7 +12,7 @@
 #include <nil/crypto3/hash/detail/poseidon/poseidon_policy.hpp>
 
 #include <boost/assert.hpp>
-#include <boost/multiprecision/cpp_int.hpp>
+// #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/lu.hpp>
