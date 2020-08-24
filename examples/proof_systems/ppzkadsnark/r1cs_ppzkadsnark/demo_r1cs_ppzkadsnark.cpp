@@ -12,8 +12,6 @@
 #include <cstring>
 #include <vector>
 
-#include <nil/algebra/common/profiling.hpp>
-
 #include <nil/crypto3/zk/snark/default_types/r1cs_ppzkadsnark_pp.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/ppzkadsnark/r1cs_ppzkadsnark/examples/run_r1cs_ppzkadsnark.hpp>
 
@@ -39,14 +37,10 @@ int main(int argc, const char *argv[]) {
         }
     }
 
-    algebra::enter_block("Generate R1CS example");
     r1cs_example<algebra::Fr<snark_pp<default_r1cs_ppzkadsnark_pp>>> example =
         generate_r1cs_example_with_field_input<algebra::Fr<snark_pp<default_r1cs_ppzkadsnark_pp>>>(num_constraints,
                                                                                                    input_size);
-    algebra::leave_block("Generate R1CS example");
 
-    algebra::print_header("(enter) Profile R1CS ppzkADSNARK");
     const bool test_serialization = true;
     run_r1cs_ppzkadsnark<default_r1cs_ppzkadsnark_pp>(example, test_serialization);
-    algebra::print_header("(leave) Profile R1CS ppzkADSNARK");
 }

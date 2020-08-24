@@ -6,8 +6,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef USCS_EXAMPLES_HPP_
-#define USCS_EXAMPLES_HPP_
+#ifndef CRYPTO3_USCS_EXAMPLES_HPP
+#define CRYPTO3_USCS_EXAMPLES_HPP
 
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/uscs/uscs.hpp>
 
@@ -65,6 +65,11 @@ namespace nil {
                 template<typename FieldType>
                 uscs_example<FieldType> generate_uscs_example_with_field_input(const std::size_t num_constraints,
                                                                             const std::size_t num_inputs) {
+
+
+                    using policy_type = FieldType;
+                    using field_value_type = policy_type::value_type;
+
                     algebra::enter_block("Call to generate_uscs_example_with_field_input");
 
                     assert(num_inputs >= 1);
@@ -88,10 +93,10 @@ namespace nil {
                             z = std::rand() % num_constraints;
                         } while (x == z || y == z);
 
-                        const FieldType x_coeff = FieldType(std::rand());
-                        const FieldType y_coeff = FieldType(std::rand());
-                        const FieldType val = (std::rand() % 2 == 0 ? FieldType::one() : -FieldType::one());
-                        const FieldType z_coeff =
+                        const field_value_type x_coeff = random_element <FieldType> ();
+                        const field_value_type y_coeff = random_element <FieldType> ();
+                        const field_value_type val = (std::rand() % 2 == 0 ? field_value_type::one() : -field_value_type::one());
+                        const field_value_type z_coeff =
                             (val - x_coeff * full_variable_assignment[x] - y_coeff * full_variable_assignment[y]) *
                             full_variable_assignment[z].inverse();
 
@@ -180,4 +185,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // USCS_EXAMPLES_HPP_
+#endif    // CRYPTO3_USCS_EXAMPLES_HPP

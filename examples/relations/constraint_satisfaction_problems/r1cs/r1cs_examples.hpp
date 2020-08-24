@@ -6,8 +6,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef R1CS_EXAMPLES_HPP_
-#define R1CS_EXAMPLES_HPP_
+#ifndef CRYPTO3_R1CS_EXAMPLES_HPP
+#define CRYPTO3_R1CS_EXAMPLES_HPP
 
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs/r1cs.hpp>
 
@@ -15,6 +15,9 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
+
+                using nil::algebra::fields;
+                using nil::algebra;
 
                 /**
                  * A R1CS example comprises a R1CS constraint system, R1CS input, and R1CS witness.
@@ -65,7 +68,6 @@ namespace nil {
                 template<typename FieldType>
                 r1cs_example<FieldType> generate_r1cs_example_with_field_input(const std::size_t num_constraints,
                                                                             const std::size_t num_inputs) {
-                    algebra::enter_block("Call to generate_r1cs_example_with_field_input");
 
                     assert(num_inputs <= num_constraints + 2);
 
@@ -74,8 +76,8 @@ namespace nil {
                     cs.auxiliary_input_size = 2 + num_constraints - num_inputs;    // TODO: explain this
 
                     r1cs_variable_assignment<FieldType> full_variable_assignment;
-                    FieldType a = FieldType::random_element();
-                    FieldType b = FieldType::random_element();
+                    field_value_type a = random_element <FieldType> ();
+                    field_value_type b = random_element <FieldType> ();
                     full_variable_assignment.push_back(a);
                     full_variable_assignment.push_back(b);
 
@@ -87,7 +89,7 @@ namespace nil {
                             A.add_term(i + 1, 1);
                             B.add_term(i + 2, 1);
                             C.add_term(i + 3, 1);
-                            FieldType tmp = a * b;
+                            field_value_type tmp = a * b;
                             full_variable_assignment.push_back(tmp);
                             a = b;
                             b = tmp;
@@ -97,7 +99,7 @@ namespace nil {
                             A.add_term(i + 1, 1);
                             A.add_term(i + 2, 1);
                             C.add_term(i + 3, 1);
-                            FieldType tmp = a + b;
+                            field_value_type tmp = a + b;
                             full_variable_assignment.push_back(tmp);
                             a = b;
                             b = tmp;
@@ -107,7 +109,7 @@ namespace nil {
                     }
 
                     linear_combination<FieldType> A, B, C;
-                    FieldType fin = FieldType::zero();
+                    field_value_type fin = field_value_type::zero();
                     for (std::size_t i = 1; i < cs.num_variables(); ++i) {
                         A.add_term(i, 1);
                         B.add_term(i, 1);
@@ -130,15 +132,17 @@ namespace nil {
                     assert(cs.num_constraints() == num_constraints);
                     assert(cs.is_satisfied(primary_input, auxiliary_input));
 
-                    algebra::leave_block("Call to generate_r1cs_example_with_field_input");
-
                     return r1cs_example<FieldType>(std::move(cs), std::move(primary_input), std::move(auxiliary_input));
                 }
 
                 template<typename FieldType>
                 r1cs_example<FieldType> generate_r1cs_example_with_binary_input(const std::size_t num_constraints,
                                                                              const std::size_t num_inputs) {
-                    algebra::enter_block("Call to generate_r1cs_example_with_binary_input");
+
+                    using policy_type = FieldType;
+                    using field_value_type = policy_type::value_type;
+
+                    algebra:
 
                     assert(num_inputs >= 1);
 
@@ -148,7 +152,7 @@ namespace nil {
 
                     r1cs_variable_assignment<FieldType> full_variable_assignment;
                     for (std::size_t i = 0; i < num_inputs; ++i) {
-                        full_variable_assignment.push_back(FieldType(std::rand() % 2));
+                        full_variable_assignment.push_back(field_value_type(std::rand() % 2));
                     }
 
                     std::size_t lastvar = num_inputs - 1;
@@ -170,7 +174,7 @@ namespace nil {
                             C.add_term(u + 1, 1);
                             C.add_term(v + 1, 1);
                         }
-                        C.add_term(lastvar + 1, -FieldType::one());
+                        C.add_term(lastvar + 1, - field_value_type::one());
 
                         cs.add_constraint(r1cs_constraint<FieldType>(A, B, C));
                         full_variable_assignment.push_back(full_variable_assignment[u] + full_variable_assignment[v] -
@@ -191,7 +195,7 @@ namespace nil {
                     assert(cs.num_constraints() == num_constraints);
                     assert(cs.is_satisfied(primary_input, auxiliary_input));
 
-                    algebra::leave_block("Call to generate_r1cs_example_with_binary_input");
+            
 
                     return r1cs_example<FieldType>(std::move(cs), std::move(primary_input), std::move(auxiliary_input));
                 }
@@ -201,4 +205,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // R1CS_EXAMPLES_HPP_
+#endif    // CRYPTO3_R1CS_EXAMPLES_HPP

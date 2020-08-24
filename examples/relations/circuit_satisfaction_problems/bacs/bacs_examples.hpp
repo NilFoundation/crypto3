@@ -67,12 +67,15 @@ namespace nil {
 
                 template<typename FieldType>
                 linear_combination<FieldType> random_linear_combination(const std::size_t num_variables) {
+
+                    using policy_type = FieldType;
+                    using field_value_type = policy_type::value_type;
+
                     const std::size_t terms = 1 + (std::rand() % 3);
                     linear_combination<FieldType> result;
 
                     for (std::size_t i = 0; i < terms; ++i) {
-                        const FieldType coeff = FieldType(
-                            std::rand());    // TODO: replace with FieldType::random_element(), when it becomes faster...
+                        const field_value_type coeff = random_element <FieldType>();
                         result = result + coeff * variable<FieldType>(std::rand() % (num_variables + 1));
                     }
 
@@ -84,6 +87,10 @@ namespace nil {
                                                            std::size_t auxiliary_input_size,
                                                            std::size_t num_gates,
                                                            std::size_t num_outputs) {
+
+                    using policy_type = FieldType;
+                    using field_value_type = policy_type::value_type;
+                    
                     bacs_example<FieldType> example;
                     for (std::size_t i = 0; i < primary_input_size; ++i) {
                         example.primary_input.emplace_back(FieldType::random_element());
@@ -112,15 +119,15 @@ namespace nil {
                             gate.is_circuit_output = true;
                             const var_index_t var_idx =
                                 std::rand() % (1 + primary_input_size + std::min(num_gates - num_outputs, i));
-                            const FieldType var_val = (var_idx == 0 ? FieldType::one() : all_vals[var_idx - 1]);
+                            const field_value_type var_val = (var_idx == 0 ? field_value_type::one() : all_vals[var_idx - 1]);
 
                             if (std::rand() % 2 == 0) {
-                                const FieldType lhs_val = gate.lhs.evaluate(all_vals);
-                                const FieldType coeff = -(lhs_val * var_val.inverse());
+                                const field_value_type lhs_val = gate.lhs.evaluate(all_vals);
+                                const field_value_type coeff = -(lhs_val * var_val.inverse());
                                 gate.lhs = gate.lhs + coeff * variable<FieldType>(var_idx);
                             } else {
-                                const FieldType rhs_val = gate.rhs.evaluate(all_vals);
-                                const FieldType coeff = -(rhs_val * var_val.inverse());
+                                const field_value_type rhs_val = gate.rhs.evaluate(all_vals);
+                                const field_value_type coeff = -(rhs_val * var_val.inverse());
                                 gate.rhs = gate.rhs + coeff * variable<FieldType>(var_idx);
                             }
 
