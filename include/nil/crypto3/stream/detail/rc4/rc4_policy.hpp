@@ -47,7 +47,7 @@ namespace nil {
                             return data[i];
                         }
 
-                        BOOST_FORCEINLINE byte_type &operator[](std::size_t i) const {
+                        BOOST_FORCEINLINE const byte_type &operator[](std::size_t i) const {
                             return data[i];
                         }
 
