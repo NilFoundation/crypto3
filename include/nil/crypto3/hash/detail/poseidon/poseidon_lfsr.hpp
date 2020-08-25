@@ -13,9 +13,9 @@
 
 using namespace boost::multiprecision::literals;
 
-#define GRAIN_LFSR_STATE_LEN 80
+#define POSEIDON_LFSR_GENERATOR_LEN 80
 
-BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(GRAIN_LFSR_STATE_LEN);
+BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(POSEIDON_LFSR_GENERATOR_LEN);
 
 
 namespace nil {
@@ -26,6 +26,7 @@ namespace nil {
                 struct poseidon_lfsr {
                     typedef poseidon_policy<FieldType, Arity, strength> policy_type;
                     typedef typename FieldType::value_type ElementType;
+                    typedef typename FieldType::modulus_type modulus_type;
 
                     constexpr static const std::size_t word_bits = policy_type::word_bits;
                     constexpr static const std::size_t full_rounds = policy_type::full_rounds;
@@ -60,15 +61,15 @@ namespace nil {
 
                     // get next element
                     inline ElementType get_next_element() {
-                        typename ElementType::modulus_type round_const;
+                        modulus_type round_const;
                         while (true) {
-                            round_const = 0;// typename ElementType::modulus_type(0);
-                            round_const |= get_next_bit();// ? typename ElementType::modulus_type(1) : typename ElementType::modulus_type(0);
+                            round_const = 0;
+                            round_const |= get_next_bit();
                             for (std::size_t i = 1; i < word_bits; i++) {
                                 round_const <<= 1;
-                                round_const |= get_next_bit() ? typename ElementType::modulus_type(1) : typename ElementType::modulus_type(0);
+                                round_const |= get_next_bit() ? 1 : 0;
                             }
-                            if (round_const < ElementType::modulus) // filecoin oriented - remake when integrate in the project
+                            if (round_const < FieldType::modulus) // filecoin oriented - remake when integrate in the project
                                 break;
                         }
                         return ElementType(round_const);
@@ -101,9 +102,8 @@ namespace nil {
                 struct poseidon_lfsr_constexpr {
                     typedef typename FieldType::modulus_type modulus_type;
                     constexpr static const modulus_type modulus = FieldType::modulus;
-                    // constexpr static const modulus_type modulus = 0x73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000001_cppui255;
 
-                    constexpr static const std::size_t state_bits = GRAIN_LFSR_STATE_LEN;
+                    constexpr static const std::size_t state_bits = POSEIDON_LFSR_GENERATOR_LEN;
                     typedef boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<state_bits, state_bits,
                         boost::multiprecision::cpp_integer_type::unsigned_magnitude, boost::multiprecision::cpp_int_check_type::unchecked, void>>
                         state_type;
