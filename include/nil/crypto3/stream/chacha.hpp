@@ -80,7 +80,7 @@ namespace nil {
                 template<typename InputRange, typename OutputRange>
                 void process(InputRange &in, OutputRange &out, key_schedule_type &schedule, block_type &block) {
                     xor_buf(out, in, block, block_size);
-                    policy_type::chacha_x<4>(block, schedule);
+                    policy_type::chacha_x4(block, schedule);
                 }
 
                 void seek(block_type &block, key_schedule_type &schedule, uint64_t offset) {
@@ -94,7 +94,7 @@ namespace nil {
                     schedule[12] = boost::endian::store_little_u32(out, 0);
                     schedule[13] += boost::endian::store_little_u32(out, 1);
 
-                    policy_type::chacha_x<4>(block, schedule);
+                    policy_type::chacha_x4(block, schedule);
                 }
             };
         }    // namespace stream

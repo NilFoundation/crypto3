@@ -48,22 +48,15 @@ namespace nil {
                     constexpr static const std::size_t block_size = policy_type::block_size;
                     typedef typename policy_type::block_type block_type;
 
-                    template<std::size_t Parallel>
-                    static void chacha_x(const std::array<std::uint8_t, block_size * Parallel> &block,
-                                         key_schedule_type &schedule) {
+                    inline static void chacha_x8(const std::array<std::uint8_t, block_size * 8> &block,
+                                                 key_schedule_type &schedule) {
+                        chacha_x4(block, schedule);
+                        chacha_x4(std::array<std::uint8_t, block_size * 4>(block.begin() + block_size * 4, block.end()),
+                                  schedule);
                     }
 
-                    template<>
-                    inline static void chacha_x<8>(const std::array<std::uint8_t, block_size * 8> &block,
-                                                   key_schedule_type &schedule) {
-                        chacha_x<4>(block, schedule);
-                        chacha_x<4>(std::array<std::uint8_t, block_size * 4>(block.begin() + block_size * 4, block.end()),
-                            schedule);
-                    }
-
-                    template<>
-                    static void chacha_x<4>(const std::array<std::uint8_t, block_size * 4> &block,
-                                            key_schedule_type &input) {
+                    static void chacha_x4(const std::array<std::uint8_t, block_size * 4> &block,
+                                          key_schedule_type &input) {
                         // TODO interleave rounds
                         for (size_t i = 0; i != 4; ++i) {
                             word_type x00 = input[0], x01 = input[1], x02 = input[2], x03 = input[3], x04 = input[4],
