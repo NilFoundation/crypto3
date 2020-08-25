@@ -37,8 +37,8 @@ namespace nil {
 
                 template<typename InputRange, typename OutputRange>
                 void process(OutputRange &out, InputRange &in, key_schedule_type &schedule, block_type &block) {
-                xor_buf(out, in, block, block.size());
-            }
+                    xor_buf(out, in, block, block.size());
+                }
             };
             /*!
              * @brief
@@ -75,11 +75,11 @@ namespace nil {
 
                 template<typename InputRange, typename OutputRange>
                 void process(OutputRange &out, InputRange &in, key_schedule_type &schedule, block_type &block) {
-                        xor_buf(out, in, block, block.size());
-                        policy_type::salsa_core(block, schedule);
+                    xor_buf(out, in, block, block.size());
+                    policy_type::salsa_core(block, schedule);
 
-                        ++schedule[8];
-                        schedule[9] += (schedule[8] == 0);
+                    ++schedule[8];
+                    schedule[9] += (schedule[8] == 0);
                 }
 
                 void seek(key_schedule_type &schedule, block_type &block, std::size_t offset) {

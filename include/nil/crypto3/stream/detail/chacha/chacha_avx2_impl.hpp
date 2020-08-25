@@ -42,9 +42,9 @@ namespace nil {
                     }
 
                     template<>
-                    BOOST_ATTRIBUTE_TARGET("avx2")
-                    static void chacha_x<8>(const std::array<std::uint8_t, block_size * 8> &block,
-                                            key_schedule_type &schedule) {
+                    static BOOST_ATTRIBUTE_TARGET("avx2") void chacha_x<8>(
+                        const std::array<std::uint8_t, block_size * 8> &block,
+                        key_schedule_type &schedule) {
                         _mm256_zeroupper();
 
                         const __m256i CTR0 = _mm256_set_epi32(7, 6, 5, 4, 3, 2, 1, 0);

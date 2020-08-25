@@ -45,14 +45,15 @@ namespace nil {
                     inline static void chacha_x<8>(const std::array<std::uint8_t, block_size * 8> &block,
                                                    key_schedule_type &schedule) {
                         chacha_x<4>(block, schedule);
-                        chacha_x<4>(std::array<std::uint8_t, block_size * 4>(block.begin() + block_size * 4, block.end()),
-                                  schedule);
+                        chacha_x<4>(
+                            std::array<std::uint8_t, block_size * 4>(block.begin() + block_size * 4, block.end()),
+                            schedule);
                     }
 
                     template<>
-                    BOOST_ATTRIBUTE_TARGET("sse2")
-                    static void chacha_x<4>(const std::array<std::uint8_t, block_size * 4> &block,
-                                            key_schedule_type &schedule) {
+                    static BOOST_ATTRIBUTE_TARGET("sse2") void chacha_x<4>(
+                        const std::array<std::uint8_t, block_size * 4> &block,
+                        key_schedule_type &schedule) {
                         const __m128i *input_mm = reinterpret_cast<const __m128i *>(schedule);
                         __m128i *output_mm = reinterpret_cast<__m128i *>(block);
 
