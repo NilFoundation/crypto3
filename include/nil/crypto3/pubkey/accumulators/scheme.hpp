@@ -88,10 +88,6 @@ namespace nil {
                         process(value, bits == 0 ? word_bits : bits);
                     }
 
-                    inline void process_pubkey() {
-                        using namespace ::nil::crypto3::detail;
-                    }
-
                     inline void process(const pubkey_type &value, std::size_t value_seen) {
                         using namespace ::nil::crypto3::detail;
                     }
