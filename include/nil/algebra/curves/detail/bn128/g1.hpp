@@ -22,9 +22,9 @@ namespace nil {
             namespace detail {
 
                 template<std::size_t ModulusBits = 254, std::size_t GeneratorBits = CHAR_BIT>
-                struct bn128_g1 : public element_curve_weierstrass<typename pairing_params<bn128<ModulusBits>>::g1_field_type_value> {
+                struct bn128_g1 : public element_curve_weierstrass<typename pairing_params<bn128<ModulusBits>>::g1_type> {
 
-                    using policy_type = element_curve_weierstrass<typename pairing_params<bn128<ModulusBits>>::g1_field_type_value>;
+                    using policy_type = element_curve_weierstrass<typename pairing_params<bn128<ModulusBits>>::g1_type>;
                     using underlying_field_type = typename policy_type::underlying_field_type;
 
                     bn128_g1() : policy_type(underlying_field_type::one(), underlying_field_type::one(), underlying_field_type::zero()) {};
