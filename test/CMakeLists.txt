@@ -14,7 +14,7 @@ endif()
 
 cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
 
-                       boost::multiprecision
+                       $<TARGET_NAME_IF_EXISTS:boost_multiprecision>
 
                        ${Boost_LIBRARIES})
 
@@ -42,12 +42,12 @@ macro(define_algebra_test name)
 
 endmacro()
 
-set(TESTS_NAMES 
-"curves"
-"fields"
-#"groups"
-#"bilinearity"
-)
+set(TESTS_NAMES
+    "curves"
+    "fields"
+    #"groups"
+    #"bilinearity"
+    )
 
 foreach(TEST_NAME ${TESTS_NAMES})
     define_algebra_test(${TEST_NAME})
