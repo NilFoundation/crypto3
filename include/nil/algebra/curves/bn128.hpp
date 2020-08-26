@@ -11,6 +11,9 @@
 #define ALGEBRA_CURVES_BN128_HPP
 
 #include <nil/algebra/curves/detail/element/curve_weierstrass.hpp>
+#include <nil/algebra/curves/detail/params/params.hpp>
+#include <nil/algebra/curves/detail/bn128/g1.hpp>
+//#include <nil/algebra/curves/detail/bn128/g2.hpp>
 
 #include <nil/algebra/fields/bn128/fq.hpp>
 #include <nil/algebra/fields/bn128/fr.hpp>
@@ -20,6 +23,9 @@
 namespace nil {
     namespace algebra {
         namespace curves {
+
+            using namespace algebra;
+
             /*
                 The curve equation for a BN curve is:
 
@@ -49,6 +55,9 @@ namespace nil {
                 constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
 
                 typedef typename detail::element_curve_weierstrass<base_field_type::value_type> value_type;
+
+                typedef typename detail::bn128_g1<detail::pairing_params<bn128<254>>> g1_type;
+                //typedef typename detail::bn128_g2<typename pairing_params<bn128<ModulusBits>>> g2_type;
 
                 constexpr static const number_type p = base_field_modulus;
                 constexpr static const number_type q = scalar_field_modulus;

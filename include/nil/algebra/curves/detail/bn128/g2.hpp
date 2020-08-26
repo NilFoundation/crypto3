@@ -21,10 +21,10 @@ namespace nil {
         namespace curves {
             namespace detail {
 
-                template<std::size_t ModulusBits = 254, std::size_t GeneratorBits = CHAR_BIT>
-                struct bn128_g2 : public element_curve_weierstrass<typename pairing_params<bn128<ModulusBits>>::g1_field_type_value> {
+                template<typename PairingParams>
+                struct bn128_g2 : public element_curve_weierstrass<typename PairingParams::g1_field_type_value> {
                     
-                    using policy_type = pairing_params<bn128<ModulusBits>>;
+                    using policy_type = PairingParams;
                     using element_type = element_curve_weierstrass<typename policy_type::g2_field_type_value>;
                     using underlying_field_type = typename element_type::underlying_field_type;
 

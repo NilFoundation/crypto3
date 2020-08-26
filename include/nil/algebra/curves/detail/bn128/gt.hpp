@@ -32,49 +32,49 @@ namespace nil {
                 template<std::size_t ModulusBits, std::size_t GeneratorBits>
                 using value_type = element<fp12_type<ModulusBits, GeneratorBits>>;
 
-                struct bn128_GT {
+                struct bn128_gt {
                     value_type elem;
 
-                    bn128_GT() {
+                    bn128_gt() {
                         elem = value_type::zero();
                     }
 
-                    bn128_GT(value_type X) {
+                    bn128_gt(value_type X) {
                         elem = X;
                     }
 
-                    bool operator==(const bn128_GT &other) const {
+                    bool operator==(const bn128_gt &other) const {
                         return (elem == other.elem);
                     }
-                    bool operator!=(const bn128_GT &other) const {
+                    bool operator!=(const bn128_gt &other) const {
                         return !(operator==(other));
                     }
 
-                    bn128_GT operator*(const bn128_GT &other) const {
-                        bn128_GT result;
+                    bn128_gt operator*(const bn128_gt &other) const {
+                        bn128_gt result;
                         result.elem = elem * other.elem;
                         return result;
                     }
 
-                    bn128_GT unitary_inverse() const {
-                        bn128_GT result(*this);
+                    bn128_gt unitary_inverse() const {
+                        bn128_gt result(*this);
                         bn::Fp6::neg(result.elem.b_, result.elem.b_);
                         return result;
                     }
 
-                    static bn128_GT one() {
+                    static bn128_gt one() {
                         return value_type::one();
                     }
                 };
 
                 template<typename NumberType>
-                bn128_GT operator^(const bn128_GT &rhs, const NumberType &lhs) {
-                    return scalar_mul<bn128_GT, m>(rhs, lhs);
+                bn128_gt operator^(const bn128_gt &rhs, const NumberType &lhs) {
+                    return scalar_mul<bn128_gt, m>(rhs, lhs);
                 }
 
                 template<typename NumberType, const NumberType &modulus_p>
-                bn128_GT operator^(const bn128_GT &rhs, const Fp_model<m, modulus_p> &lhs) {
-                    return scalar_mul<bn128_GT, m>(rhs, lhs.as_bigint());
+                bn128_gt operator^(const bn128_gt &rhs, const Fp_model<m, modulus_p> &lhs) {
+                    return scalar_mul<bn128_gt, m>(rhs, lhs.as_bigint());
                 }
 
             }    // namespace detail

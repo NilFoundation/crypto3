@@ -16,6 +16,7 @@
 
 
 #include <nil/algebra/curves/bn128.hpp>
+#include <nil/algebra/curves/detail/params/bn128.hpp>
 
 #include <nil/algebra/fields/bn128/fq.hpp>
 #include <nil/algebra/fields/bn128/fq2.hpp>
@@ -33,7 +34,7 @@ void print_curve_element (typename curves::detail::element_curve_weierstrass<Fie
 template <typename CurveWeierstrass>
 void curve_weierstrass_pairing_math_examples()
 {  
-    using value_type = typename curves::detail::bn128_g1<254>;
+    using value_type = typename curves::bn128<254>::g1_type;
     using field_value_type = typename value_type::underlying_field_type;
 
     //std::cout << "Field module value: " <<  policy_type::base_field_type::modulus << std::endl;

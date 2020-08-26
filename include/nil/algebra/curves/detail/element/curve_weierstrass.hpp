@@ -201,7 +201,7 @@ namespace nil {
                         return *this;
                     }
 
-                    bn128_g1 mixed_add(const bn128_g1 &other) const {
+                    element_curve_weierstrass mixed_add(const element_curve_weierstrass &other) const {
                         if (this->is_zero()) {
                             return other;
                         }
@@ -236,7 +236,7 @@ namespace nil {
                             return this->dbl();
                         }
 
-                        bn128_g1 result;
+                        element_curve_weierstrass result;
                         underlying_field_type H, HH, I, J, r, V;
                         // H = U2-X1
                         H = U2 - this->p[0];
