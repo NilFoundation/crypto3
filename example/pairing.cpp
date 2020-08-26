@@ -39,7 +39,7 @@ void curve_weierstrass_pairing_math_examples()
     //std::cout << "Field module value: " <<  policy_type::base_field_type::modulus << std::endl;
 
     field_value_type e1 = field_value_type(2), e2(3), e3(5), e4(3), e5(5), e6(7);
-    value_type c1(e1, e2, e3), c2(e4, e5, e6);
+    value_type c1(e1, e2, e3), c2(e4, e5, e6), c3(c1);
 
     std::cout << "Curve element values: " << std::endl;
     std::cout << "c1 value: ";
@@ -56,6 +56,17 @@ void curve_weierstrass_pairing_math_examples()
 
     std::cout << "Double c1 value: ";
     print_curve_element(c1.dbl());
+    
+    std::cout << "c1 == c2 value: ";
+    std::cout << (c1 == c2) << std::endl;
+
+    std::cout << "c1 == c3 value: ";
+    std::cout << (c1 == c3) << std::endl;
+
+    c1 = c2;
+
+    std::cout << "c1 == c3 after c1 = c2 value: ";
+    std::cout << (c1 == c3) << std::endl;
 
     /*value_type cn = c1.normalize();
     

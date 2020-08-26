@@ -31,6 +31,8 @@ namespace nil {
 
                     constexpr static const std::size_t g2_field_bits = ModulusBits;
                     typedef typename fields::detail::element_fp2<fields::detail::arithmetic_params<fields::bn128_fq<g2_field_bits, CHAR_BIT>>> g2_field_type_value;
+
+                    
                 };
 
             }    // namespace detail
