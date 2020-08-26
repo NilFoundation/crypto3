@@ -178,7 +178,7 @@ namespace nil {
                             for (std::size_t i = 0; i < round_constants_size; i++) {
                                 round_constants[i] = constants_generator.get_next_element();
                                 // round_constants[i] = std::move(constants_generator_constexpr.constants[i]);
-                                // std::cout << round_constants[i] << '\n';
+                                // std::cout << std::hex << round_constants[i].data << '\n';
                                 // std::cout << std::hex << constants_generator_constexpr.constants[i] << '\n';
                             }
                             return round_constants;
