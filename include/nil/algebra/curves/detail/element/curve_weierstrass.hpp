@@ -143,6 +143,7 @@ namespace nil {
                         return t0.p[0] == t1.p[0] && t0.p[1] == t1.p[1];
                     }
 
+
                     bool operator!=(const element_curve_weierstrass &B) const {
                         return !operator==(B);
                     }
@@ -199,6 +200,66 @@ namespace nil {
 
                         return *this;
                     }
+
+                    element_curve_weierstrass mixed_add(const element_curve_weierstrass &other) const {
+                        if (this->is_zero()) {
+                            return other;
+                        }
+
+                        if (other.is_zero()) {
+                            return *this;
+                        }
+
+                        // no need to handle points of order 2,4
+                        // (they cannot exist in a prime-order subgroup)
+
+                        // check for doubling case
+
+                        // using Jacobian pinates so:
+                        // (X1:Y1:Z1) = (X2:Y2:Z2)
+                        // iff
+                        // X1/Z1^2 == X2/Z2^2 and Y1/Z1^3 == Y2/Z2^3
+                        // iff
+                        // X1 * Z2^2 == X2 * Z1^2 and Y1 * Z2^3 == Y2 * Z1^3
+
+                        // we know that Z2 = 1
+
+                        underlying_field_type Z1Z1 = this->p[2].square();
+
+                        underlying_field_type U2 = other.p[0] * Z1Z1;
+
+                        underlying_field_type S2 = other.p[1] * this->p[2] * Z1Z1;
+                        ;    // S2 = Y2*Z1*Z1Z1
+
+                        if (this->p[0] == U2 && this->p[1] == S2) {
+                            // dbl case; nothing of above can be reused
+                            return this->dbl();
+                        }
+
+                        element_curve_weierstrass result;
+                        underlying_field_type H, HH, I, J, r, V;
+                        // H = U2-X1
+                        H = U2 - this->p[0];
+                        // HH = H^2
+                        HH = H.square();
+                        // I = 4*HH
+                        I = HH.dbl().dbl();
+                        // J = H*I
+                        J = H * I;
+                        // r = 2*(S2-Y1)
+                        r = (S2 - this->p[1]).dbl();
+                        // V = X1*I
+                        V = this->p[0] * I;
+                        // X3 = r^2-J-2*V
+                        result.p[0] = r.square() - J - V.dbl();
+                        // Y3 = r*(V-X3)-2*Y1*J
+                        result.p[1] = r * (V - result.p[0]) - (this->p[1] * J).dbl();
+                        // Z3 = (Z1+H)^2-Z1Z1-HH
+                        result.p[2] = (this->p[2] + H).square() - Z1Z1 - HH;
+
+                        return result;
+                    }
+                    
                 };
 
             }    //  namespace detail

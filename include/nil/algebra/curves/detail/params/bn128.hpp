@@ -20,18 +20,18 @@
 namespace nil {
     namespace algebra {
         namespace curves {
-            template<std::size_t ModulusBits>
-            struct pairing_params<bn128<ModulusBits>> {
+            template <std::size_t ModulusBits>
+                struct pairing_params<bn128<ModulusBits>> {
 
-                constexpr static const std::size_t g1_field_bits = ModulusBits;
-                typedef typename fields::bn128_fq<g1_field_bits, CHAR_BIT>::value_type g1_type;
+                    constexpr static const std::size_t g1_modulus_bits = ModulusBits;
+                    typedef typename fields::bn128_fq<g1_modulus_bits, CHAR_BIT>::value_type g1_type;
 
-                constexpr static const std::size_t g2_field_bits = ModulusBits;
-                typedef typename fields::detail::element_fp2<
-                    fields::detail::arithmetic_params<fields::bn128_fq<g2_field_bits, CHAR_BIT>>>
-                    g2_type;
-            };
-        }    // namespace curves
+                    constexpr static const std::size_t g2_modulus_bits = ModulusBits;
+                    typedef typename fields::detail::element_fp2<fields::detail::arithmetic_params<fields::bn128_fq<g2_modulus_bits, CHAR_BIT>>> g2_type;
+
+
+                };
+        }    // namespace fields
     }        // namespace algebra
 }    // namespace nil
 
