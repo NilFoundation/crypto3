@@ -10,24 +10,27 @@
 #ifndef ALGEBRA_CURVES_BN128_PARAMS_HPP
 #define ALGEBRA_CURVES_BN128_PARAMS_HPP
 
+#include <nil/algebra/curves/bn128.hpp>
+
 #include <nil/algebra/curves/detail/params/params.hpp>
+
+#include <nil/algebra/fields/bn128/fq.hpp>
+
+#include <nil/algebra/fields/detail/element/fp2.hpp>
 
 namespace nil {
     namespace algebra {
         namespace curves {
             namespace detail {
 
-                template <typename ModulusBits>
+                template <std::size_t ModulusBits>
                 struct pairing_params<bn128<ModulusBits>> {
-                private:
-                    typedef bn128<ModulusBits> policy_type;
 
-                public:
                     constexpr static const std::size_t g1_field_bits = ModulusBits;
-                    typedef fields::bn128_fq<g1_field_bits, CHAR_BIT>::value_type g1_field_type_value;
+                    typedef typename fields::bn128_fq<g1_field_bits, CHAR_BIT>::value_type g1_field_type_value;
 
                     constexpr static const std::size_t g2_field_bits = ModulusBits;
-                    typedef fields::detail::element_fp2<fields::detail::arithmetic_params<bn128_fq<g2_field_bits, CHAR_BIT>>> g2_field_type_value;
+                    typedef typename fields::detail::element_fp2<fields::detail::arithmetic_params<fields::bn128_fq<g2_field_bits, CHAR_BIT>>> g2_field_type_value;
                 };
 
             }    // namespace detail

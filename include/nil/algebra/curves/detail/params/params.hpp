@@ -12,14 +12,14 @@
 
 namespace nil {
     namespace algebra {
-        namespace fields {
+        namespace curves {
             namespace detail {
 
                 template<typename CurveType>
                 struct pairing_params {};
 
             }    // namespace detail
-        }    // namespace fields
+        }    // namespace curves
     }    // namespace algebra
 }    // namespace nil
 

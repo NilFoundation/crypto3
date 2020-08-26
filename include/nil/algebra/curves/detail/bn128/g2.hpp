@@ -21,12 +21,12 @@ namespace nil {
             namespace detail {
 
                 template<std::size_t ModulusBits = 254, std::size_t GeneratorBits = CHAR_BIT>
-                struct bn128_G2 : public element_bn128<pairing_params<bn128<ModulusBits>>::g2_value_type> {
-                    using policy_type = element_bn128<pairing_params<bn128<ModulusBits>>::g2_value_type>;
+                struct bn128_g2 : public element_bn128<pairing_params<bn128<ModulusBits>>::g2_field_value_type> {
+                    using policy_type = element_bn128<pairing_params<bn128<ModulusBits>>::g2_field_value_type>;
 
-                    bn128_G2() : policy_type(value_type::one(), value_type::one(), value_type::zero()) {};
+                    bn128_g2() : policy_type(value_type::one(), value_type::one(), value_type::zero()) {};
 
-                    bn128_G2(value_type X, value_type Y, value_type Z) : policy_type(X, Y, Z) {};
+                    bn128_g2(value_type X, value_type Y, value_type Z) : policy_type(X, Y, Z) {};
 
                     bool is_zero() const {
                         return coord[2].is_zero();
@@ -50,11 +50,11 @@ namespace nil {
                                (Z2sq * other.coord[2] * coord[1] == Z1sq * coord[2] * other.coord[1]);
                     }
 
-                    bool operator!=(const bn128_G2 &other) const {
+                    bool operator!=(const bn128_g2 &other) const {
                         return !(operator==(other));
                     }
 
-                    bn128_G2 mixed_add(const bn128_G2 &other) const {
+                    bn128_g2 mixed_add(const bn128_g2 &other) const {
                         if (is_zero()) {
                             return other;
                         }
@@ -90,7 +90,7 @@ namespace nil {
                             return dbl();
                         }
 
-                        bn128_G2 result;
+                        bn128_g2 result;
                         value_type H, HH, I, J, r, V, tmp;
                         // H = U2-X1
                         H = U2 - coord[0];
@@ -116,12 +116,12 @@ namespace nil {
                         return result;
                     }
 
-                    static bn128_G2 zero() {
-                        return bn128_G2();
+                    static bn128_g2 zero() {
+                        return bn128_g2();
                     }
 
-                    static bn128_G2 one() {
-                        return bn128_G2({15267802884793550383558706039165621050290089775961208824303765753922461897946,
+                    static bn128_g2 one() {
+                        return bn128_g2({15267802884793550383558706039165621050290089775961208824303765753922461897946,
                                          9034493566019742339402378670461897774509967669562610788113215988055021632533},
                                         {644888581738283025171396578091639672120333224302184904896215738366765861164,
                                          20532875081203448695448744255224543661959516361327385779878476709582931298750},

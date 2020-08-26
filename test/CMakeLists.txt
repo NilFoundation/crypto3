@@ -45,8 +45,7 @@ endmacro()
 set(TESTS_NAMES 
 "curves"
 "fields"
-#"groups"
-#"bilinearity"
+"pairing"
 )
 
 foreach(TEST_NAME ${TESTS_NAMES})

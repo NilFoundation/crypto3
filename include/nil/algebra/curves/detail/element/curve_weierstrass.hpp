@@ -20,13 +20,15 @@ namespace nil {
                 template<typename FieldElementType>
                 struct element_curve_weierstrass {
 
-                    FieldElementType p[3];
+                    using underlying_field_type = FieldElementType;
+
+                    underlying_field_type p[3];
 
                     element_curve_weierstrass() {
                     }
 
-                    element_curve_weierstrass(const FieldElementType &x, const FieldElementType &y,
-                                              const FieldElementType &z) {
+                    element_curve_weierstrass(const underlying_field_type &x, const underlying_field_type &y,
+                                              const underlying_field_type &z) {
                         p[0] = x;
                         p[1] = y;
                         p[2] = z;
@@ -39,11 +41,11 @@ namespace nil {
                     }
 
                     element_curve_weierstrass normalize() const {
-                        FieldElementType p_out[3];
+                        underlying_field_type p_out[3];
 
                         if (is_zero() || p[2] == 1)
                             return *this;
-                        FieldElementType r, r2;
+                        underlying_field_type r, r2;
                         r = p[2].inverse();
                         r2 = r.square();
                         p_out[0] = p[0] * r2;        // r2
@@ -58,9 +60,9 @@ namespace nil {
                         (p_out[0], p_out[1], p_out[2]) = 2(p[0], p[1], p[2])
                     */
                     element_curve_weierstrass dbl() const {
-                        FieldElementType p_out[3];
+                        underlying_field_type p_out[3];
 
-                        FieldElementType A, B, C, D, E;
+                        underlying_field_type A, B, C, D, E;
                         A = p[0].square();
                         B = p[1].square();
                         C = B.square();
@@ -157,7 +159,7 @@ namespace nil {
                         if (B.p[2].is_zero()) {
                             return *this;
                         }
-                        FieldElementType Z1Z1, Z2Z2, U1, U2, S1, S2, H, I, J, t3, r, V;
+                        underlying_field_type Z1Z1, Z2Z2, U1, U2, S1, S2, H, I, J, t3, r, V;
 
                         Z1Z1 = p[2].square();
                         Z2Z2 = B.p[2].square();
@@ -174,7 +176,7 @@ namespace nil {
                             if (t3.is_zero()) {
                                 return dbl();
                             } else {
-                                p[2] = FieldElementType::zero();    //not sure
+                                p[2] = underlying_field_type::zero();    //not sure
                             }
                             return *this;
                         }
