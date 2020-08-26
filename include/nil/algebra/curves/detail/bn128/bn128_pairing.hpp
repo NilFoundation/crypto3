@@ -100,6 +100,31 @@ namespace nil {
                     return eltcopy;
                 }
 
+                template <std::size_t ModulusBits, std::size_t GeneratorBits>
+                static bn128_GT final_exponentiation<bn128<ModulusBits, GeneratorBits>>(const bn128_Fq12 &elt) {
+                    return bn128_final_exponentiation(elt);
+                }
+
+                template <std::size_t ModulusBits, std::size_t GeneratorBits>
+                static bn128_Fq12 miller_loop<bn128<ModulusBits, GeneratorBits>>(const bn128_ate_G1_precomp &prec_P,
+                                              const bn128_ate_G2_precomp &prec_Q) {
+
+                    bn128_Fq12 result = bn128_ate_miller_loop(prec_P, prec_Q);
+
+                    return result;
+                }
+
+                template <std::size_t ModulusBits, std::size_t GeneratorBits>
+                static bn128_Fq12 double_miller_loop<bn128<ModulusBits, GeneratorBits>>(const bn128_ate_G1_precomp &prec_P1,
+                                                     const bn128_ate_G2_precomp &prec_Q1,
+                                                     const bn128_ate_G1_precomp &prec_P2,
+                                                     const bn128_ate_G2_precomp &prec_Q2) {
+
+                    bn128_Fq12 result = bn128_double_ate_miller_loop(prec_P1, prec_Q1, prec_P2, prec_Q2);
+
+                    return result;
+                }
+                
             }    // namespace detail
         }        // namespace curves
     }            // namespace algebra

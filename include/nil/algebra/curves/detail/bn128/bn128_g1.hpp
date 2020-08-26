@@ -21,16 +21,9 @@ namespace nil {
             namespace detail {
 
                 template<std::size_t ModulusBits = 254, std::size_t GeneratorBits = CHAR_BIT>
-                struct bn128_G1 : public bn128<ModulusBits>::value_type {
-                    using base_field_type = bn128<ModulusBits>::base_field_type;
-                    using scalar_field_type = bn128<ModulusBits>::scalar_field_type;
+                struct bn128_G1 : public element_bn128<pairing_params<bn128<ModulusBits>>::g1_value_type> {
+                    using policy_type = element_bn128<pairing_params<bn128<ModulusBits>>::g1_value_type>;
 
-                    using value_type = base_field_type::value_type;
-
-                private:
-                    using policy_type = bn128<ModulusBits>::value_type;
-
-                public:
                     bn128_G1() : policy_type(value_type::one(), value_type::one(), value_type::zero()) {};
 
                     bn128_G1(value_type X, value_type Y, value_type Z) : policy_type(X, Y, Z) {};

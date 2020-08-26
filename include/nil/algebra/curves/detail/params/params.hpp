@@ -7,24 +7,20 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef ALGEBRA_CURVES_BN128_PP_HPP
-#define ALGEBRA_CURVES_BN128_PP_HPP
-
-#include <nil/algebra/curves/detail/bn128/bn128_g1.hpp>
-#include <nil/algebra/curves/detail/bn128/bn128_g2.hpp>
-#include <nil/algebra/curves/detail/bn128/bn128_gt.hpp>
-#include <nil/algebra/curves/detail/bn128/bn128_init.hpp>
-#include <nil/algebra/curves/detail/bn128/bn128_pairing.hpp>
+#ifndef ALGEBRA_CURVES_PARAMS_HPP
+#define ALGEBRA_CURVES_PARAMS_HPP
 
 namespace nil {
     namespace algebra {
-        namespace curves {
+        namespace fields {
             namespace detail {
 
-                
+                template<typename CurveType>
+                struct pairing_params {};
 
             }    // namespace detail
-        }        // namespace curves
-    }            // namespace algebra
+        }    // namespace fields
+    }    // namespace algebra
 }    // namespace nil
-#endif    // ALGEBRA_CURVES_BN128_PP_HPP
+
+#endif    // ALGEBRA_CURVES_PARAMS_HPP
