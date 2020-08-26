@@ -26,8 +26,6 @@
 
 #include <nil/crypto3/pubkey/accumulators/parameters/scheme.hpp>
 #include <nil/crypto3/pubkey/accumulators/parameters/bits.hpp>
-#include <boost/accumulators/framework/parameters/sample.hpp>
-#include <nil/crypto3/pubkey/detail/scheme_modes.hpp>
 
 #include <nil/crypto3/pubkey/scheme.hpp>
 
