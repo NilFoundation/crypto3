@@ -1,5 +1,9 @@
 include(CMTest)
 
+if(NOT Boost_UNIT_TEST_FRAMEWORK_FOUND)
+    cm_find_package(Boost REQUIRED COMPONENTS unit_test_framework)
+endif()
+
 if(Boost_FOUND AND BUILD_SHARED_LIBS)
     set(Boost_USE_STATIC_LIBS FALSE)
 else()

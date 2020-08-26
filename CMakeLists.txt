@@ -15,7 +15,7 @@ cm_find_package(CM)
 include(CMDeploy)
 include(CMSetupVersion)
 
-if(NOT Boost_FOUND)
+if(NOT Boost_FOUND OR NOT Boost_RANDOM_FOUND)
     cm_find_package(Boost COMPONENTS random REQUIRED)
 endif()
 
