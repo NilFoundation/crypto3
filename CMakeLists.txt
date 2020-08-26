@@ -22,6 +22,8 @@ include(CMSetupVersion)
 cm_find_package(${CMAKE_WORKSPACE_NAME}_hash)
 cm_find_package(${CMAKE_WORKSPACE_NAME}_mac)
 
+cm_find_package(Boost REQUIRED)
+
 list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
      include/nil/crypto3/pbkdf/pbkdf.hpp)
 
