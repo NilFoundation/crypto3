@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -750,7 +751,7 @@ namespace nil {
                     pvk.vk_alpha_tilde_g2_precomp = CurveType::precompute_G2(vk.alpha_tilde_g2);
                     pvk.vk_Z_g2_precomp = CurveType::precompute_G2(vk.Z_g2);
 
-                    pvk.pairing_of_g1_and_g2 = CurveType::miller_loop(pvk.pp_G1_one_precomp, pvk.pp_G2_one_precomp);
+                    pvk.pairing_of_g1_and_g2 = miller_loop<CurveType>(pvk.pp_G1_one_precomp, pvk.pp_G2_one_precomp);
 
                     pvk.encoded_IC_query = vk.encoded_IC_query;
 
@@ -777,27 +778,27 @@ namespace nil {
 
                     algebra::G1_precomp<CurveType> proof_V_g1_with_acc_precomp = CurveType::precompute_G1(proof.V_g1 + acc);
                     algebra::G2_precomp<CurveType> proof_V_g2_precomp = CurveType::precompute_G2(proof.V_g2);
-                    algebra::Fqk<CurveType> V_1 = CurveType::miller_loop(proof_V_g1_with_acc_precomp, pvk.pp_G2_one_precomp);
-                    algebra::Fqk<CurveType> V_2 = CurveType::miller_loop(pvk.pp_G1_one_precomp, proof_V_g2_precomp);
-                    algebra::GT<CurveType> V = CurveType::final_exponentiation(V_1 * V_2.unitary_inverse());
+                    algebra::Fqk<CurveType> V_1 = miller_loop<CurveType>(proof_V_g1_with_acc_precomp, pvk.pp_G2_one_precomp);
+                    algebra::Fqk<CurveType> V_2 = miller_loop<CurveType>(pvk.pp_G1_one_precomp, proof_V_g2_precomp);
+                    algebra::GT<CurveType> V = final_exponentiation<CurveType>(V_1 * V_2.unitary_inverse());
                     if (V != algebra::GT<CurveType>::one()) {
                         result = false;
                     }
 
                     algebra::G1_precomp<CurveType> proof_H_g1_precomp = CurveType::precompute_G1(proof.H_g1);
-                    algebra::Fqk<CurveType> SSP_1 = CurveType::miller_loop(proof_V_g1_with_acc_precomp, proof_V_g2_precomp);
-                    algebra::Fqk<CurveType> SSP_2 = CurveType::miller_loop(proof_H_g1_precomp, pvk.vk_Z_g2_precomp);
+                    algebra::Fqk<CurveType> SSP_1 = miller_loop<CurveType>(proof_V_g1_with_acc_precomp, proof_V_g2_precomp);
+                    algebra::Fqk<CurveType> SSP_2 = miller_loop<CurveType>(proof_H_g1_precomp, pvk.vk_Z_g2_precomp);
                     algebra::GT<CurveType> SSP =
-                        CurveType::final_exponentiation(SSP_1.unitary_inverse() * SSP_2 * pvk.pairing_of_g1_and_g2);
+                        final_exponentiation<CurveType>(SSP_1.unitary_inverse() * SSP_2 * pvk.pairing_of_g1_and_g2);
                     if (SSP != algebra::GT<CurveType>::one()) {
                         result = false;
                     }
 
                     algebra::G1_precomp<CurveType> proof_V_g1_precomp = CurveType::precompute_G1(proof.V_g1);
                     algebra::G1_precomp<CurveType> proof_alpha_V_g1_precomp = CurveType::precompute_G1(proof.alpha_V_g1);
-                    algebra::Fqk<CurveType> alpha_V_1 = CurveType::miller_loop(proof_V_g1_precomp, pvk.vk_alpha_tilde_g2_precomp);
-                    algebra::Fqk<CurveType> alpha_V_2 = CurveType::miller_loop(proof_alpha_V_g1_precomp, pvk.vk_tilde_g2_precomp);
-                    algebra::GT<CurveType> alpha_V = CurveType::final_exponentiation(alpha_V_1 * alpha_V_2.unitary_inverse());
+                    algebra::Fqk<CurveType> alpha_V_1 = miller_loop<CurveType>(proof_V_g1_precomp, pvk.vk_alpha_tilde_g2_precomp);
+                    algebra::Fqk<CurveType> alpha_V_2 = miller_loop<CurveType>(proof_alpha_V_g1_precomp, pvk.vk_tilde_g2_precomp);
+                    algebra::GT<CurveType> alpha_V = final_exponentiation<CurveType>(alpha_V_1 * alpha_V_2.unitary_inverse());
                     if (alpha_V != algebra::GT<CurveType>::one()) {
                         result = false;
                     }

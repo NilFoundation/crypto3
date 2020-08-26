@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -227,7 +228,7 @@ void test_cyclotomic_sqr(const std::string &annotation) {
 
     for (size_t i = 0; i < 10; ++i) {
         FpExtT x_val = FpExtT::random_element();
-        x_val = CurveType::final_exponentiation(x_val);
+        x_val = final_exponentiation<CurveType>(x_val);
 
         x.generate_r1cs_witness(x_val);
         sqr.generate_r1cs_witness();

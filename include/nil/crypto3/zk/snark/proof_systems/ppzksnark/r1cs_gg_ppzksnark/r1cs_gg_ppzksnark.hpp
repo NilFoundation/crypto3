@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -870,10 +871,10 @@ namespace nil {
                     const algebra::G1_precomp<CurveType> proof_g_C_precomp = CurveType::precompute_G1(proof.g_C);
                     const algebra::G1_precomp<CurveType> acc_precomp = CurveType::precompute_G1(acc);
 
-                    const algebra::Fqk<CurveType> QAP1 = CurveType::miller_loop(proof_g_A_precomp, proof_g_B_precomp);
-                    const algebra::Fqk<CurveType> QAP2 = CurveType::double_miller_loop(acc_precomp, pvk.vk_gamma_g2_precomp,
+                    const algebra::Fqk<CurveType> QAP1 = miller_loop<CurveType>(proof_g_A_precomp, proof_g_B_precomp);
+                    const algebra::Fqk<CurveType> QAP2 = double_miller_loop<CurveType>(acc_precomp, pvk.vk_gamma_g2_precomp,
                                                                            proof_g_C_precomp, pvk.vk_delta_g2_precomp);
-                    const algebra::GT<CurveType> QAP = CurveType::final_exponentiation(QAP1 * QAP2.unitary_inverse());
+                    const algebra::GT<CurveType> QAP = final_exponentiation<CurveType>(QAP1 * QAP2.unitary_inverse());
 
                     if (QAP != pvk.vk_alpha_g1_beta_g2) {
                         result = false;
@@ -952,7 +953,7 @@ namespace nil {
                     const algebra::Fqk<CurveType> QAP_miller = CurveType::affine_ate_e_times_e_over_e_miller_loop(
                         acc_precomp, pvk_vk_gamma_g2_precomp, proof_g_C_precomp, pvk_vk_delta_g2_precomp,
                         proof_g_A_precomp, proof_g_B_precomp);
-                    const algebra::GT<CurveType> QAP = CurveType::final_exponentiation(QAP_miller.unitary_inverse());
+                    const algebra::GT<CurveType> QAP = final_exponentiation<CurveType>(QAP_miller.unitary_inverse());
 
                     if (QAP != vk.alpha_g1_beta_g2) {
                         result = false;

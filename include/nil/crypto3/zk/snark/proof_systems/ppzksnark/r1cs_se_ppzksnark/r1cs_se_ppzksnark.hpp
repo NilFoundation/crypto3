@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -863,7 +864,7 @@ namespace nil {
                     r1cs_se_ppzksnark_processed_verification_key<CurveType> pvk;
                     pvk.G_alpha = vk.G_alpha;
                     pvk.H_beta = vk.H_beta;
-                    pvk.G_alpha_H_beta_ml = CurveType::miller_loop(G_alpha_pc, H_beta_pc);
+                    pvk.G_alpha_H_beta_ml = miller_loop<CurveType>(G_alpha_pc, H_beta_pc);
                     pvk.G_gamma_pc = CurveType::precompute_G1(vk.G_gamma);
                     pvk.H_gamma_pc = CurveType::precompute_G2(vk.H_gamma);
                     pvk.H_pc = CurveType::precompute_G2(vk.H);
@@ -902,13 +903,13 @@ namespace nil {
                         algebra::multi_exp<algebra::G1<CurveType>, typename CurveType::scalar_field_type, algebra::multi_exp_method_bos_coster>(
                             pvk.query.begin() + 1, pvk.query.end(), primary_input.begin(), primary_input.end(), chunks);
 
-                    algebra::Fqk<CurveType> test1_l = CurveType::miller_loop(CurveType::precompute_G1(proof.A + pvk.G_alpha),
+                    algebra::Fqk<CurveType> test1_l = miller_loop<CurveType>(CurveType::precompute_G1(proof.A + pvk.G_alpha),
                                                                  CurveType::precompute_G2(proof.B + pvk.H_beta)),
                                       test1_r1 = pvk.G_alpha_H_beta_ml,
-                                      test1_r2 = CurveType::miller_loop(CurveType::precompute_G1(G_psi), pvk.H_gamma_pc),
-                                      test1_r3 = CurveType::miller_loop(CurveType::precompute_G1(proof.C), pvk.H_pc);
+                                      test1_r2 = miller_loop<CurveType>(CurveType::precompute_G1(G_psi), pvk.H_gamma_pc),
+                                      test1_r3 = miller_loop<CurveType>(CurveType::precompute_G1(proof.C), pvk.H_pc);
                     algebra::GT<CurveType> test1 =
-                        CurveType::final_exponentiation(test1_l.unitary_inverse() * test1_r1 * test1_r2 * test1_r3);
+                        final_exponentiation<CurveType>(test1_l.unitary_inverse() * test1_r1 * test1_r2 * test1_r3);
 
                     if (test1 != algebra::GT<CurveType>::one()) {
                         result = false;
@@ -917,9 +918,9 @@ namespace nil {
                     /**
                      * e(A, H^{gamma}) = e(G^{gamma}, B)
                      */
-                    algebra::Fqk<CurveType> test2_l = CurveType::miller_loop(CurveType::precompute_G1(proof.A), pvk.H_gamma_pc),
-                                      test2_r = CurveType::miller_loop(pvk.G_gamma_pc, CurveType::precompute_G2(proof.B));
-                    algebra::GT<CurveType> test2 = CurveType::final_exponentiation(test2_l * test2_r.unitary_inverse());
+                    algebra::Fqk<CurveType> test2_l = miller_loop<CurveType>(CurveType::precompute_G1(proof.A), pvk.H_gamma_pc),
+                                      test2_r = miller_loop<CurveType>(pvk.G_gamma_pc, CurveType::precompute_G2(proof.B));
+                    algebra::GT<CurveType> test2 = final_exponentiation<CurveType>(test2_l * test2_r.unitary_inverse());
 
                     if (test2 != algebra::GT<CurveType>::one()) {
                         result = false;

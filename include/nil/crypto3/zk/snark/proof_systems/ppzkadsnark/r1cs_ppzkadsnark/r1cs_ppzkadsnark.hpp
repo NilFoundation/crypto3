@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2018-2020 Mikhail Komarov <nemo@nil.foundation>
+// Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -1553,7 +1554,7 @@ namespace nil {
                     algebra::G1_precomp<snark_pp<CurveType>> proof_g_H_precomp = snark_pp<CurveType>::precompute_G1(proof.g_H);
                     algebra::Fqk<snark_pp<CurveType>> QAP_1 =
                         snark_pp<CurveType>::miller_loop(proof_g_Aacc_precomp, proof_g_B_g_precomp);
-                    algebra::Fqk<snark_pp<CurveType>> QAP_23 = snark_pp<CurveType>::double_miller_loop(
+                    algebra::Fqk<snark_pp<CurveType>> QAP_23 = double_miller_loop<snark_pp<CurveType>>(
                         proof_g_H_precomp, pvk.vk_rC_Z_g2_precomp, proof_g_C_g_precomp, pvk.pp_G2_one_precomp);
                     algebra::GT<snark_pp<CurveType>> QAP =
                         snark_pp<CurveType>::final_exponentiation(QAP_1 * QAP_23.unitary_inverse());
@@ -1573,7 +1574,7 @@ namespace nil {
                     algebra::Fqk<snark_pp<CurveType>> K_1 =
                         snark_pp<CurveType>::miller_loop(proof_g_K_precomp, pvk.vk_gamma_g2_precomp);
                     algebra::Fqk<snark_pp<CurveType>> K_23 =
-                        snark_pp<CurveType>::double_miller_loop(proof_g_Aacc_C_precomp, pvk.vk_gamma_beta_g2_precomp,
+                        double_miller_loop<snark_pp<CurveType>>(proof_g_Aacc_C_precomp, pvk.vk_gamma_beta_g2_precomp,
                                                           pvk.vk_gamma_beta_g1_precomp, proof_g_B_g_precomp);
                     algebra::GT<snark_pp<CurveType>> K = snark_pp<CurveType>::final_exponentiation(K_1 * K_23.unitary_inverse());
                     if (K != algebra::GT<snark_pp<CurveType>>::one()) {
@@ -1663,14 +1664,14 @@ namespace nil {
                         accum = algebra::Fqk<snark_pp<CurveType>>::one();
                     }
                     for (std::size_t i = auth_data.size() % 2; i < labels.size(); i = i + 2) {
-                        accum = accum * snark_pp<CurveType>::double_miller_loop(
+                        accum = accum * double_miller_loop<snark_pp<CurveType>>(
                                             pvk.proof_g_vki_precomp[i], g_Lambdas_precomp[i],
                                             pvk.proof_g_vki_precomp[i + 1], g_Lambdas_precomp[i + 1]);
                     }
                     algebra::G1_precomp<snark_pp<CurveType>> proof_g_muA_precomp = snark_pp<CurveType>::precompute_G1(proof.muA);
                     algebra::G1_precomp<snark_pp<CurveType>> proof_g_Aau_precomp =
                         snark_pp<CurveType>::precompute_G1(proof.g_Aau.g);
-                    algebra::Fqk<snark_pp<CurveType>> accum2 = snark_pp<CurveType>::double_miller_loop(
+                    algebra::Fqk<snark_pp<CurveType>> accum2 = double_miller_loop<snark_pp<CurveType>>(
                         proof_g_muA_precomp, pvk.pp_G2_one_precomp, proof_g_Aau_precomp, g_minusi_precomp);
                     algebra::GT<snark_pp<CurveType>> authPair =
                         snark_pp<CurveType>::final_exponentiation(accum * accum2.unitary_inverse());
@@ -1779,7 +1780,7 @@ namespace nil {
                     algebra::G1_precomp<snark_pp<CurveType>> proof_g_H_precomp = snark_pp<CurveType>::precompute_G1(proof.g_H);
                     algebra::Fqk<snark_pp<CurveType>> QAP_1 =
                         snark_pp<CurveType>::miller_loop(proof_g_Aacc_precomp, proof_g_B_g_precomp);
-                    algebra::Fqk<snark_pp<CurveType>> QAP_23 = snark_pp<CurveType>::double_miller_loop(
+                    algebra::Fqk<snark_pp<CurveType>> QAP_23 = double_miller_loop<snark_pp<CurveType>>(
                         proof_g_H_precomp, pvk.vk_rC_Z_g2_precomp, proof_g_C_g_precomp, pvk.pp_G2_one_precomp);
                     algebra::GT<snark_pp<CurveType>> QAP =
                         snark_pp<CurveType>::final_exponentiation(QAP_1 * QAP_23.unitary_inverse());
@@ -1799,7 +1800,7 @@ namespace nil {
                     algebra::Fqk<snark_pp<CurveType>> K_1 =
                         snark_pp<CurveType>::miller_loop(proof_g_K_precomp, pvk.vk_gamma_g2_precomp);
                     algebra::Fqk<snark_pp<CurveType>> K_23 =
-                        snark_pp<CurveType>::double_miller_loop(proof_g_Aacc_C_precomp, pvk.vk_gamma_beta_g2_precomp,
+                        double_miller_loop<snark_pp<CurveType>>(proof_g_Aacc_C_precomp, pvk.vk_gamma_beta_g2_precomp,
                                                           pvk.vk_gamma_beta_g1_precomp, proof_g_B_g_precomp);
                     algebra::GT<snark_pp<CurveType>> K = snark_pp<CurveType>::final_exponentiation(K_1 * K_23.unitary_inverse());
                     if (K != algebra::GT<snark_pp<CurveType>>::one()) {
