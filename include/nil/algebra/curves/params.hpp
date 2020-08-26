@@ -13,14 +13,12 @@
 namespace nil {
     namespace algebra {
         namespace curves {
-            namespace detail {
-
-                template<typename CurveType>
-                struct pairing_params {};
-
-            }    // namespace detail
+            template<typename CurveType>
+            struct pairing_params {
+                typedef CurveType curve_type;
+            };
         }    // namespace curves
-    }    // namespace algebra
+    }        // namespace algebra
 }    // namespace nil
 
 #endif    // ALGEBRA_CURVES_PARAMS_HPP
