@@ -34,7 +34,7 @@ struct niederreiter_base2
   //   Do[If[IrreduciblePolynomialQ[
   //       IntegerDigits[n, 2].x^Reverse[Range[0, Floor[Log[2, n]]]],
   //       Modulus -> 2], Sow[n]], {n, 2, 65535}]][[2, 1]]
-  static value_type polynomial(std::size_t n)
+  static value_type polynomial(size_t n)
   {
     static const value_type nb2_a[max_dimension] = {
       2, 3, 7, 11, 13, 19, 25, 31, 37, 41, 47, 55, 59, 61, 67, 73, 87, 91,

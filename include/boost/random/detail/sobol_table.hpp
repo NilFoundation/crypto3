@@ -42,7 +42,7 @@ struct sobol
 
   typedef unsigned short value_type;
 
-  static value_type polynomial(std::size_t n)
+  static value_type polynomial(size_t n)
   {
     // successive primitive binary-coefficient polynomials p(z)
     //   = a_0 + a_1 z + a_2 z^2 + ... a_31 z^31, where a_i is the
@@ -419,7 +419,7 @@ struct sobol
     return sobol_a[n];
   }
 
-  static value_type minit(std::size_t dim, std::size_t degree)
+  static value_type minit(size_t dim, size_t degree)
   {
     // starting direction #'s m[i] = sobol_minit[i][j] for i=0..d of the
     // degree-d primitive polynomial sobol_a[j].
