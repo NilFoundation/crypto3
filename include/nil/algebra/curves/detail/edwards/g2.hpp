@@ -49,7 +49,7 @@ namespace nil {
                         // http://www.hyperelliptic.org/EFD/g1p/auto-twisted-inverted.html#addition-add-2008-bbjlp
 
                         const underlying_field_type A = (this->p[2]) * (B.p[2]);                   // A = Z1*Z2
-                        const underlying_field_type B = this->mul_by_d(this->p[0].squared());           // B = d*A^2
+                        const underlying_field_type B = this->mul_by_d(this->p[0].square());           // B = d*A^2
                         const underlying_field_type C = (this->p[0]) * (B.p[0]);                       // C = X1*X2
                         const underlying_field_type D = (this->p[1]) * (B.p[1]);                       // D = Y1*Y2
                         const underlying_field_type E = C*D;                                         // E = C*D
@@ -60,6 +60,32 @@ namespace nil {
                         const underlying_field_type Z3 = A*H*I;                                      // Z3 = A*H*I
 
                         return edwards_g2(X3, Y3, Z3);
+                    }
+
+                    edwards_G2 dbl() const{
+                    
+                        if (this->is_zero())
+                        {
+                            return (*this);
+                        }
+                        else
+                        {
+                            // NOTE: does not handle O and pts of order 2,4
+                            // http://www.hyperelliptic.org/EFD/g1p/auto-twisted-inverted.html#doubling-dbl-2008-bbjlp
+
+                            const underlying_field_type A = (this->p[0]).square();                      // A = X1^2
+                            const underlying_field_type B = (this->p[1]).square();                      // B = Y1^2
+                            const underlying_field_type U = this->mul_by_a(B);                  // U = a*B
+                            const underlying_field_type C = A+U;                                      // C = A+U
+                            const underlying_field_type D = A-U;                                      // D = A-U
+                            const underlying_field_type E = (this->p[0] + this->p[1]).square()-A-B;          // E = (X1+Y1)^2-A-B
+                            const underlying_field_type X3 = C*D;                                     // X3 = C*D
+                            const underlying_field_type dZZ = this->mul_by_d(this->p[2].square());
+                            const underlying_field_type Y3 = E*(C-dZZ-dZZ);                           // Y3 = E*(C-2*d*Z1^2)
+                            const underlying_field_type Z3 = D*E;                                     // Z3 = D*E
+
+                            return edwards_g2(X3, Y3, Z3);
+                        }
                     }
 
                 private:

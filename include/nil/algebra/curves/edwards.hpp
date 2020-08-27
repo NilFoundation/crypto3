@@ -40,24 +40,24 @@ namespace nil {
                 v^3 = xi
                 w^2 = v
             */
-            template<std::size_t ModulusBits>
+            template<std::size_t ModulusBits = 183>
             struct edwards { };
 
             template<>
-            struct edwards<254> {
-                constexpr static const std::size_t base_field_bits = 254;
+            struct edwards<183> {
+                constexpr static const std::size_t base_field_bits = 183;
                 typedef fields::edwards_fq<base_field_bits, CHAR_BIT> base_field_type;
                 typedef typename base_field_type::modulus_type number_type;
                 constexpr static const number_type base_field_modulus = base_field_type::modulus;
 
-                constexpr static const std::size_t scalar_field_bits = 254;
+                constexpr static const std::size_t scalar_field_bits = 181;
                 typedef fields::edwards_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
                 constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
 
                 typedef typename detail::element_curve_weierstrass<base_field_type::value_type> value_type;
 
-                typedef typename detail::edwards_g1<detail::pairing_params<edwards<254>>> g1_type;
-                typedef typename detail::edwards_g2<detail::pairing_params<edwards<254>>> g2_type;
+                typedef typename detail::edwards_g1<detail::pairing_params<edwards<183>>> g1_type;
+                typedef typename detail::edwards_g2<detail::pairing_params<edwards<183>>> g2_type;
 
                 constexpr static const number_type p = base_field_modulus;
                 constexpr static const number_type q = scalar_field_modulus;
