@@ -62,10 +62,10 @@ namespace nil {
                 constexpr static const number_type p = base_field_modulus;
                 constexpr static const number_type q = scalar_field_modulus;
 
-                constexpr static const number_type a = 0;
-                constexpr static const number_type b = 0x03;
-                constexpr static const number_type x = 0x09;
-                constexpr static const number_type y = 0x01;
+                constexpr static const number_type a = 0x01;
+                constexpr static const number_type d = 0x64536D55979879327CF1306BB5A6277D254EF9776CE70;
+                constexpr static const number_type x = 0x00;    //?
+                constexpr static const number_type y = 0x00;    //?
             };
 
         }    // namespace curves

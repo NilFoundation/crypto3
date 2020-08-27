@@ -31,12 +31,15 @@ namespace nil {
 
                     edwards_g1(underlying_field_type X, underlying_field_type Y, underlying_field_type Z) : element_type(X, Y, Z) {};
 
+                    edwards_g1(underlying_field_type X, underlying_field_type Y, underlying_field_type Z) : element_type(X, Y, X*Y) {};
+
                     static edwards_g1 zero() {
-                        return edwards_g1();
+                        return edwards_g1(underlying_field_type::zero(), underlying_field_type::one());
                     }
 
                     static edwards_g1 one() {
-                        return edwards_g1(1, 2, 1);
+                        return edwards_g1(0x26C5DF4587AA6A5D345EFC9F2D47F8B1656517EF618F7A_cppui182,
+                                            0x32D83D8AAA0C500F57B15FDA90B1AD111067F812C7DD27_cppui182);
                     }
 
                     bool edwards_g1::operator==(const edwards_g1 &B) const{
