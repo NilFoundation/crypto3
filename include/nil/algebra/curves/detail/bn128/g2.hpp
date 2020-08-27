@@ -14,7 +14,6 @@
 #include <boost/multiprecision/modular/base_params.hpp>
 
 #include <nil/algebra/curves/detail/element/curve_weierstrass.hpp>
-#include <nil/algebra/curves/detail/params/bn128.hpp>
 
 namespace nil {
     namespace algebra {

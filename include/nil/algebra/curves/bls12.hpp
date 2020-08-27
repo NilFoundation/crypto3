@@ -11,6 +11,8 @@
 #define ALGEBRA_CURVES_BLS12_HPP
 
 #include <nil/algebra/curves/detail/element/curve_weierstrass.hpp>
+#include <nil/algebra/curves/detail/bls12/g1.hpp>
+#include <nil/algebra/curves/detail/bls12/g2.hpp>
 
 #include <nil/algebra/fields/bls12/fq.hpp>
 #include <nil/algebra/fields/bls12/fr.hpp>
@@ -40,6 +42,9 @@ namespace nil {
                 constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
 
                 typedef typename detail::element_curve_weierstrass<base_field_type::value_type> value_type;
+
+                typedef typename detail::bls12_g1<detail::pairing_params<bls12<254>>> g1_type;
+                typedef typename detail::bls12_g2<detail::pairing_params<bls12<254>>> g2_type;
 
                 constexpr static const number_type p = base_field_modulus;
                 constexpr static const number_type q = scalar_field_modulus;
