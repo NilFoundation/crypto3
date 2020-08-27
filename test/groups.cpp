@@ -7,6 +7,12 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
+#define BOOST_TEST_MODULE groups_algebra_test
+
+#include <boost/test/unit_test.hpp>
+#include <boost/test/data/test_case.hpp>
+#include <boost/test/data/monomorphic.hpp>
+
 #include <nil/algebra/curves/edwards/edwards_pp.hpp>
 #include <nil/algebra/curves/mnt/mnt4/mnt4_pp.hpp>
 #include <nil/algebra/curves/mnt/mnt6/mnt6_pp.hpp>

@@ -14,7 +14,6 @@
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/multiprecision/modular/modular_adaptor.hpp>
 
-
 #include <nil/algebra/curves/bn128.hpp>
 
 #include <nil/algebra/fields/bn128/fq.hpp>
@@ -23,19 +22,18 @@
 
 using namespace nil::algebra;
 
-template <typename FieldValueType>
-void print_curve_element (typename curves::detail::element_curve_weierstrass<FieldValueType> e){
+template<typename FieldValueType>
+void print_curve_element(typename curves::detail::element_curve_weierstrass<FieldValueType> e) {
     std::cout << e.p[0].data << " " << e.p[1].data << " " << e.p[2].data << std::endl;
 }
 
-template <typename CurveWeierstrass>
-void curve_weierstrass_basic_math_examples()
-{  
+template<typename CurveWeierstrass>
+void curve_weierstrass_basic_math_examples() {
     using policy_type = CurveWeierstrass;
     using value_type = typename policy_type::value_type;
     using field_value_type = typename policy_type::base_field_type::value_type;
 
-    std::cout << "Field module value: " <<  policy_type::base_field_type::modulus << std::endl;
+    std::cout << "Field module value: " << policy_type::base_field_type::modulus << std::endl;
 
     field_value_type e1 = field_value_type(2), e2(3), e3(5), e4(3), e5(5), e6(7);
     value_type c1(e1, e2, e3), c2(e4, e5, e6);
@@ -57,14 +55,12 @@ void curve_weierstrass_basic_math_examples()
     print_curve_element(c1.dbl());
 
     value_type cn = c1.normalize();
-    
+
     std::cout << "c1 normalized value: ";
     print_curve_element(cn);
-
 }
 
-int main()
-{
+int main() {
     std::cout << "BN128-254 curve basic math:" << std::endl;
     curve_weierstrass_basic_math_examples<curves::bn128<254>>();
 

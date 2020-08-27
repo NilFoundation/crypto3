@@ -11,9 +11,10 @@
 #ifndef ALGEBRA_VECTOR_MATH_HPP
 #define ALGEBRA_VECTOR_MATH_HPP
 
-#include <nil/algebra/detail/type_traits.h>
-#include <nil/algebra/vector/utility.h>
-#include <nil/algebra/vector/vector.h>
+#include <nil/algebra/detail/type_traits.hpp>
+
+#include <nil/algebra/vector/utility.hpp>
+#include <nil/algebra/vector/vector.hpp>
 
 namespace nil {
     namespace algebra {

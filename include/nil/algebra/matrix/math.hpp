@@ -11,13 +11,15 @@
 #ifndef ALGEBRA_MATRIX_MATH_HPP
 #define ALGEBRA_MATRIX_MATH_HPP
 
-#include<algorithm>
+#include <algorithm>
 
-#include <nil/algebra/vector/vector.h>
-#include <nil/algebra/vector/math.h>
-#include <nil/algebra/matrix/matrix.h>
-#include <nil/algebra/matrix/utility.h>
-#include <nil/algebra/detail/assert.h>
+#include <nil/algebra/vector/vector.hpp>
+#include <nil/algebra/vector/math.hpp>
+
+#include <nil/algebra/matrix/matrix.hpp>
+#include <nil/algebra/matrix/utility.hpp>
+
+#include <nil/algebra/detail/assert.hpp>
 
 namespace nil {
     namespace algebra {

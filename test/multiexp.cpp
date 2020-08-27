@@ -7,10 +7,16 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
+#define BOOST_TEST_MODULE multiexpr_test
+
+#include <boost/test/unit_test.hpp>
+#include <boost/test/data/test_case.hpp>
+#include <boost/test/data/monomorphic.hpp>
+
 #include <cstdio>
 #include <vector>
 
-#include <nil/algebra/curves/bn128/bn128_pp.hpp>
+#include <nil/algebra/curves/bn128.hpp>
 #include <nil/algebra/scalar_multiplication/multiexp.hpp>
 
 using namespace nil::algebra;

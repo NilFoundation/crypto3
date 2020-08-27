@@ -11,7 +11,7 @@
 #ifndef ALGEBRA_VECTOR_UTILITY_HPP
 #define ALGEBRA_VECTOR_UTILITY_HPP
 
-#include <nil/algebra/vector/vector.h>
+#include <nil/algebra/vector/vector.hpp>
 #include <tuple>
 
 namespace nil {

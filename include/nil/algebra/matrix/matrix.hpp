@@ -12,10 +12,12 @@
 #define ALGEBRA_MATRIX_CLASS_HPP
 
 #include <array>
-#include <nil/algebra/vector/utility.h>
-#include <nil/algebra/vector/vector.h>
-#include <nil/algebra/detail/assert.h>
 #include <tuple>
+
+#include <nil/algebra/vector/utility.hpp>
+#include <nil/algebra/vector/vector.hpp>
+
+#include <nil/algebra/detail/assert.hpp>
 
 namespace nil {
     namespace algebra {

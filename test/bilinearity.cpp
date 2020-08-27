@@ -7,13 +7,17 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#include <nil/algebra/curves/edwards/edwards_pp.hpp>
-#ifdef CURVE_BN128
-#include <nil/algebra/curves/bn128/bn128_pp.hpp>
-#endif
-#include <nil/algebra/curves/alt_bn128/alt_bn128_pp.hpp>
-#include <nil/algebra/curves/mnt/mnt4/mnt4_pp.hpp>
-#include <nil/algebra/curves/mnt/mnt6/mnt6_pp.hpp>
+#define BOOST_TEST_MODULE bilinearity_algebra_test
+
+#include <boost/test/unit_test.hpp>
+#include <boost/test/data/test_case.hpp>
+#include <boost/test/data/monomorphic.hpp>
+
+#include <nil/algebra/curves/edwards.hpp>
+#include <nil/algebra/curves/bn128.hpp>
+#include <nil/algebra/curves/alt_bn128.hpp>
+#include <nil/algebra/curves/mnt4.hpp>
+#include <nil/algebra/curves/mnt6.hpp>
 
 using namespace nil::algebra;
 
@@ -107,28 +111,20 @@ void affine_pairing_test() {
 }
 
 int main(void) {
-    start_profiling();
-    edwards_pp::init_public_params();
     pairing_test<edwards_pp>();
     double_miller_loop_test<edwards_pp>();
 
-    mnt6_pp::init_public_params();
     pairing_test<mnt6_pp>();
     double_miller_loop_test<mnt6_pp>();
     affine_pairing_test<mnt6_pp>();
 
-    mnt4_pp::init_public_params();
     pairing_test<mnt4_pp>();
     double_miller_loop_test<mnt4_pp>();
     affine_pairing_test<mnt4_pp>();
 
-    alt_bn128_pp::init_public_params();
     pairing_test<alt_bn128_pp>();
     double_miller_loop_test<alt_bn128_pp>();
 
-#ifdef CURVE_BN128    // BN128 has fancy dependencies so it may be disabled
-    bn128_pp::init_public_params();
     pairing_test<bn128_pp>();
     double_miller_loop_test<bn128_pp>();
-#endif
 }
