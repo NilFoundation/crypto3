@@ -42,7 +42,7 @@ namespace nil {
                 constexpr static const std::size_t generator_bits = policy_type::generator_bits;
                 typedef typename policy_type::generator_type generator_type;
 
-                constexpr static const generator_type mul_generator = 0x05;
+                constexpr static const generator_type mul_generator = 0x0A;
 
                 typedef typename detail::element_fp<detail::arithmetic_params<mnt4_fr<298, CHAR_BIT>>> value_type;
 
