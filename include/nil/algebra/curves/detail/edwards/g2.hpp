@@ -46,7 +46,7 @@ namespace nil {
                                                                 0x249774AB0EDC7FE2E665DDBFE08594F3071E0B3AC994C3_cppui182));
                     }
 
-                    edwards_g2 add(const edwards_g2 &B) const{
+                    edwards_g2 add(const edwards_g2 &B) const {
 
                         // NOTE: does not handle O and pts of order 2,4
                         // http://www.hyperelliptic.org/EFD/g1p/auto-twisted-inverted.html#addition-add-2008-bbjlp
@@ -65,14 +65,20 @@ namespace nil {
                         return edwards_g2(X3, Y3, Z3);
                     }
 
-                    edwards_G2 dbl() const{
+                    edwards_g2 operator- () const {
+                        return edwards_g2(-(this->p[0]), this->p[1], this->p[2]);
+                    }
+
+                    edwards_g2 operator- (const edwards_g2 &B) const {
+                        return (*this) + (-B);
+                    }
+
+                    edwards_g2 dbl() const {
                     
-                        if (this->is_zero())
-                        {
+                        if (this->is_zero()) {
                             return (*this);
                         }
-                        else
-                        {
+                        else {
                             // NOTE: does not handle O and pts of order 2,4
                             // http://www.hyperelliptic.org/EFD/g1p/auto-twisted-inverted.html#doubling-dbl-2008-bbjlp
 
@@ -89,6 +95,36 @@ namespace nil {
 
                             return edwards_g2(X3, Y3, Z3);
                         }
+                    }
+
+                    edwards_g2 mixed_add(const edwards_g2 &B) const {
+                    
+                        // handle special cases having to do with O
+                        if (this->is_zero())
+                        {
+                            return B;
+                        }
+
+                        if (B.is_zero())
+                        {
+                            return *this;
+                        }
+
+                        // NOTE: does not handle O and pts of order 2,4
+                        // http://www.hyperelliptic.org/EFD/g1p/auto-edwards-inverted.html#addition-madd-2007-lb
+
+                        const underlying_field_type A = this->p[2];                                     // A = Z1*Z2
+                        const underlying_field_type B = mul_by_d(A.squared());           // B = d*A^2
+                        const underlying_field_type C = (this->p[0]) * (B.p[0]);                       // C = X1*X2
+                        const underlying_field_type D = (this->p[1]) * (B.p[1]);                       // D = Y1*Y2
+                        const underlying_field_type E = C * D;                                         // E = C*D
+                        const underlying_field_type H = C - mul_by_a(D);                 // H = C-a*D
+                        const underlying_field_type I = (this->p[0] + this->p[1]) * (B.p[0] + B.p[1]) - C - D;     // I = (X1+Y1)*(X2+Y2)-C-D
+                        const underlying_field_type X3 = (E + B) * H;                                    // X3 = (E+B)*H
+                        const underlying_field_type Y3 = (E - B) * I;                                    // Y3 = (E-B)*I
+                        const underlying_field_type Z3 = A * H * I;                                      // Z3 = A*H*I
+
+                        return edwards_g2(X3, Y3, Z3);
                     }
 
                 };

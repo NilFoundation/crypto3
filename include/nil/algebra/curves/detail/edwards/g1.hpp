@@ -71,13 +71,13 @@ namespace nil {
                         // NOTE: does not handle O and pts of order 2,4
                         // http://www.hyperelliptic.org/EFD/g1p/auto-edwards-inverted.html#addition-add-2007-bl
 
-                        underlying_field_type A = (this->p[2]) * (other.p[2]);                   // A = Z1*Z2
+                        underlying_field_type A = (this->p[2]) * (B.p[2]);                   // A = Z1*Z2
                         underlying_field_type B = edwards_coeff_d * A.square();           // B = d*A^2
-                        underlying_field_type C = (this->p[0]) * (other.p[0]);                   // C = X1*X2
-                        underlying_field_type D = (this->p[1]) * (other.p[1]);                   // D = Y1*Y2
+                        underlying_field_type C = (this->p[0]) * (B.p[0]);                   // C = X1*X2
+                        underlying_field_type D = (this->p[1]) * (B.p[1]);                   // D = Y1*Y2
                         underlying_field_type E = C * D;                                   // E = C*D
                         underlying_field_type H = C - D;                                   // H = C-D
-                        underlying_field_type I = (this->p[0]+this->p[1]) * (other.p[0] + other.p[1])-C-D; // I = (X1+Y1)*(X2+Y2)-C-D
+                        underlying_field_type I = (this->p[0]+this->p[1]) * (B.p[0] + B.p[1])-C-D; // I = (X1+Y1)*(X2+Y2)-C-D
                         underlying_field_type X3 = (E+B)*H;                                // X3 = c*(E+B)*H
                         underlying_field_type Y3 = (E-B)*I;                                // Y3 = c*(E-B)*I
                         underlying_field_type Z3 = A*H*I;                                  // Z3 = A*H*I
@@ -85,7 +85,15 @@ namespace nil {
                         return edwards_g1(X3, Y3, Z3);
                     }
 
-                    edwards_G1 dbl() const{
+                    edwards_g1 operator- () const {
+                        return edwards_g1(-(this->p[0]), this->p[1], this->p[2]);
+                    }
+
+                    edwards_g1 operator- (const edwards_g1 &B) const {
+                        return (*this) + (-B);
+                    }
+
+                    edwards_g1 dbl() const{
                     
                         if (this->is_zero())
                         {
@@ -108,6 +116,34 @@ namespace nil {
 
                             return edwards_g1(X3, Y3, Z3);
                         }
+                    }
+
+                    edwards_g1 mixed_add(const edwards_g1 &B) const {
+                    
+                        // handle special cases having to do with O
+                        if (this->is_zero()){
+                            return B;
+                        }
+
+                        if (B.is_zero()){
+                            return *this;
+                        }
+
+                        // NOTE: does not handle O and pts of order 2,4
+                        // http://www.hyperelliptic.org/EFD/g1p/auto-edwards-inverted.html#addition-madd-2007-lb
+
+                        underlying_field_type A = this->p[2];                                            // A = Z1
+                        underlying_field_type B = policy_type::edwards_coeff_d * A.squared();            // B = d*A^2
+                        underlying_field_type C = (this->p[0]) * (B.p[0]);                               // C = X1*X2
+                        underlying_field_type D = (this->p[1]) * (B.p[1]);                               // D = Y1*Y2
+                        underlying_field_type E = C * D;                                                 // E = C*D
+                        underlying_field_type H = C - D;                                                 // H = C-D
+                        underlying_field_type I = (this->p[0] + this->p[1]) * (B.p[0] + B.p[1]) - C - D; // I = (X1+Y1)*(X2+Y2)-C-D
+                        underlying_field_type X3 = (E + B) * H;                                          // X3 = c*(E+B)*H
+                        underlying_field_type Y3 = (E - B) * I;                                          // Y3 = c*(E-B)*I
+                        underlying_field_type Z3 = A * H * I;                                            // Z3 = A*H*I
+
+                        return edwards_g1(X3, Y3, Z3);
                     }
 
                 private:
