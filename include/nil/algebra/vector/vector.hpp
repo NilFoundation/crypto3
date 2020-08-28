@@ -29,7 +29,7 @@ namespace nil {
          */
         template <typename T, std::size_t N> struct vector {
             static_assert(N != 0, "vector must contain at least one element");
-            COTILA_DETAIL_ASSERT_ARITHMETIC(T)
+            CRYPTO3_DETAIL_ASSERT_ARITHMETIC(T)
 
             using value_type = T;
             using size_type = std::size_t;
