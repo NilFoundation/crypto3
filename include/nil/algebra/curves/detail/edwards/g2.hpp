@@ -21,11 +21,16 @@ namespace nil {
             namespace detail {
 
                 template<typename PairingParams>
-                struct edwards_g2 : public element_curve_weierstrass<typename PairingParams::g1_type> {
+                struct edwards_g2 {
                     
-                    using policy_type = PairingParams;
-                    using element_type = element_curve_weierstrass<typename policy_type::g2_type>;
-                    using underlying_field_type = typename element_type::underlying_field_type;
+                    using policy_type = edwards<ModulusBits>;
+                    constexpr static const std::size_t g1_field_bits = ModulusBits;
+                    typedef typename fields::detail::element_fp<fields::detail::arithmetic_params<fields::edwards_fq<g1_field_bits, CHAR_BIT>>> g1_field_type_value;
+
+                    constexpr static const std::size_t g2_field_bits = ModulusBits;
+                    typedef typename fields::detail::element_fp3<fields::detail::arithmetic_params<fields::edwards_fq<g2_field_bits, CHAR_BIT>>> g2_field_type_value;
+
+                    using underlying_field_type = g2_field_type_value;
 
                     edwards_g2() : element_type(underlying_field_type::one(), underlying_field_type::one(), underlying_field_type::zero()) {};
 
@@ -34,16 +39,11 @@ namespace nil {
                     edwards_g2(underlying_field_type X, underlying_field_type Y, underlying_field_type Z) : element_type(X, Y, X*Y) {};
 
                     static edwards_g2 zero() {
-                        return edwards_g2(underlying_field_type::zero(), underlying_field_type::one());
+                        return edwards_g2(zero_fill[0], zero_fill[1], zero_fill[2]);
                     }
 
                     static edwards_g2 one() {
-                        return edwards_g2(underlying_field_type(0x2F501F9482C0D0D6E80AC55A79FD4D4594CAF187952660_cppui182,
-                                                                0x37BF8F1B1CDA11A81E8BB8F41B5FF462C9A13DC7DE1578_cppui182,
-                                                                0x2962F0DA0C7928B2CFBBACE3D0354652B6922A764C12D8_cppui182),
-                                        underlying_field_type(0x3CE954C85AD30F53B1BB4C4F87029780F4141927FEB19_cppui178,
-                                                                0x2214EB976DE3A4D9DF9C8D5F7AEDFEC337E03A20B32FFF_cppui182,
-                                                                0x249774AB0EDC7FE2E665DDBFE08594F3071E0B3AC994C3_cppui182));
+                        return edwards_g2(one_fill[0], one_fill[1]);    // it's better to precompute also one_fill[2]
                     }
 
                     edwards_g2 add(const edwards_g2 &B) const {
@@ -126,20 +126,35 @@ namespace nil {
 
                         return edwards_g2(X3, Y3, Z3);
                     }
+                    
+                    constexpr static const policy_type::number_type curve_coeff_a = policy_type::a;
+                    constexpr static const policy_type::number_type curve_coeff_d = policy_type::d;
 
                     constexpr static const g2_field_type_value edwards_twist (g2_field_type_value::underlying_type::zero(), 
                             g2_field_type_value::underlying_type::one(), g2_field_type_value::underlying_type::zero());
-                    constexpr static const g2_field_type_value edwards_twist_coeff_a = edwards_twist.mul_by_Fp(edwards_coeff_a);
-                    constexpr static const g2_field_type_value edwards_twist_coeff_d = edwards_twist.mul_by_Fp(edwards_coeff_d);
+                    constexpr static const g2_field_type_value edwards_twist_coeff_a = edwards_twist.mul_by_Fp(curve_coeff_a);
+                    constexpr static const g2_field_type_value edwards_twist_coeff_d = edwards_twist.mul_by_Fp(curve_coeff_d);
 
-                    constexpr static const g1_field_type_value edwards_twist_mul_by_a_c0 = edwards_coeff_a * g2_field_type_value::non_residue;
-                    constexpr static const g1_field_type_value edwards_twist_mul_by_a_c1 = edwards_coeff_a;
-                    constexpr static const g1_field_type_value edwards_twist_mul_by_a_c2 = edwards_coeff_a;
-                    constexpr static const g1_field_type_value edwards_twist_mul_by_d_c0 = edwards_coeff_d * g2_field_type_value::non_residue;
-                    constexpr static const g1_field_type_value edwards_twist_mul_by_d_c1 = edwards_coeff_d;
-                    constexpr static const g1_field_type_value edwards_twist_mul_by_d_c2 = edwards_coeff_d;
+                    constexpr static const g1_field_type_value edwards_twist_mul_by_a_c0 = curve_coeff_a * g2_field_type_value::non_residue;
+                    constexpr static const g1_field_type_value edwards_twist_mul_by_a_c1 = curve_coeff_a;
+                    constexpr static const g1_field_type_value edwards_twist_mul_by_a_c2 = curve_coeff_a;
+                    constexpr static const g1_field_type_value edwards_twist_mul_by_d_c0 = curve_coeff_d * g2_field_type_value::non_residue;
+                    constexpr static const g1_field_type_value edwards_twist_mul_by_d_c1 = curve_coeff_d;
+                    constexpr static const g1_field_type_value edwards_twist_mul_by_d_c2 = curve_coeff_d;
                     constexpr static const g1_field_type_value edwards_twist_mul_by_q_Y (0xB35E3665A18365954D018902935D4419423F84321BC3E_cppui180);
                     constexpr static const g1_field_type_value edwards_twist_mul_by_q_Z (0xB35E3665A18365954D018902935D4419423F84321BC3E_cppui180);
+
+                private:
+
+                    constexpr static const underlying_field_type zero_fill = {underlying_field_type::zero(), underlying_field_type::one(), underlying_field_type::zero()};
+
+                    constexpr static const underlying_field_type one_fill = {
+                        underlying_field_type(0x2F501F9482C0D0D6E80AC55A79FD4D4594CAF187952660_cppui182,
+                                                0x37BF8F1B1CDA11A81E8BB8F41B5FF462C9A13DC7DE1578_cppui182,
+                                                0x2962F0DA0C7928B2CFBBACE3D0354652B6922A764C12D8_cppui182),
+                        underlying_field_type(0x3CE954C85AD30F53B1BB4C4F87029780F4141927FEB19_cppui178,
+                                                0x2214EB976DE3A4D9DF9C8D5F7AEDFEC337E03A20B32FFF_cppui182,
+                                                0x249774AB0EDC7FE2E665DDBFE08594F3071E0B3AC994C3_cppui182)};
 
                 };
 
