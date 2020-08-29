@@ -23,7 +23,7 @@ namespace nil {
                 r1cs_ppzkadsnark_prfKeyT<CurveType> prfGen();
 
                 template<typename CurveType>
-                algebra::Fr<snark_pp<CurveType>> prfCompute(const r1cs_ppzkadsnark_prfKeyT<CurveType> &key, const labelT &label);
+                CurveType::scalar_field_type::value_type prfCompute(const r1cs_ppzkadsnark_prfKeyT<CurveType> &key, const labelT &label);
 
             }    // namespace snark
         }        // namespace zk

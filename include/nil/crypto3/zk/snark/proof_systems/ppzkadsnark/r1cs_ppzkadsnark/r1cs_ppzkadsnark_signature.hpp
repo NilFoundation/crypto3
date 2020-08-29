@@ -31,15 +31,15 @@ namespace nil {
 
                 template<typename CurveType>
                 r1cs_ppzkadsnark_sigT<CurveType> sigSign(const r1cs_ppzkadsnark_skT<CurveType> &sk, const labelT &label,
-                                                   const algebra::G2<snark_pp<CurveType>> &Lambda);
+                                                   const CurveType::g2_type &Lambda);
 
                 template<typename CurveType>
                 bool sigVerif(const r1cs_ppzkadsnark_vkT<CurveType> &vk, const labelT &label,
-                              const algebra::G2<snark_pp<CurveType>> &Lambda, const r1cs_ppzkadsnark_sigT<CurveType> &sig);
+                              const CurveType::g2_type &Lambda, const r1cs_ppzkadsnark_sigT<CurveType> &sig);
 
                 template<typename CurveType>
                 bool sigBatchVerif(const r1cs_ppzkadsnark_vkT<CurveType> &vk, const std::vector<labelT> &labels,
-                                   const std::vector<algebra::G2<snark_pp<CurveType>>> &Lambdas,
+                                   const std::vector<CurveType::g2_type> &Lambdas,
                                    const std::vector<r1cs_ppzkadsnark_sigT<CurveType>> &sigs);
 
             }    // namespace snark

@@ -85,14 +85,14 @@ namespace nil {
                 template<typename CurveType>
                 class r1cs_ppzkadsnark_pub_auth_prms {
                 public:
-                    algebra::G1<snark_pp<CurveType>> I1;
+                    CurveType::g1_type I1;
 
                     r1cs_ppzkadsnark_pub_auth_prms() {};
                     r1cs_ppzkadsnark_pub_auth_prms<CurveType> &
                         operator=(const r1cs_ppzkadsnark_pub_auth_prms<CurveType> &other) = default;
                     r1cs_ppzkadsnark_pub_auth_prms(const r1cs_ppzkadsnark_pub_auth_prms<CurveType> &other) = default;
                     r1cs_ppzkadsnark_pub_auth_prms(r1cs_ppzkadsnark_pub_auth_prms<CurveType> &&other) = default;
-                    r1cs_ppzkadsnark_pub_auth_prms(algebra::G1<snark_pp<CurveType>> &&I1) : I1(std::move(I1)) {};
+                    r1cs_ppzkadsnark_pub_auth_prms(CurveType::g1_type &&I1) : I1(std::move(I1)) {};
 
                     bool operator==(const r1cs_ppzkadsnark_pub_auth_prms<CurveType> &other) const;
                     friend std::ostream &operator<<<CurveType>(std::ostream &out,
@@ -117,7 +117,7 @@ namespace nil {
                 template<typename CurveType>
                 class r1cs_ppzkadsnark_sec_auth_key {
                 public:
-                    algebra::Fr<snark_pp<CurveType>> i;
+                    CurveType i::scalar_field_type;
                     r1cs_ppzkadsnark_skT<CurveType> skp;
                     r1cs_ppzkadsnark_prfKeyT<CurveType> S;
 
@@ -126,7 +126,7 @@ namespace nil {
                         operator=(const r1cs_ppzkadsnark_sec_auth_key<CurveType> &other) = default;
                     r1cs_ppzkadsnark_sec_auth_key(const r1cs_ppzkadsnark_sec_auth_key<CurveType> &other) = default;
                     r1cs_ppzkadsnark_sec_auth_key(r1cs_ppzkadsnark_sec_auth_key<CurveType> &&other) = default;
-                    r1cs_ppzkadsnark_sec_auth_key(algebra::Fr<snark_pp<CurveType>> &&i, r1cs_ppzkadsnark_skT<CurveType> &&skp,
+                    r1cs_ppzkadsnark_sec_auth_key(CurveType &&i, r1cs_ppzkadsnark_skT<CurveType> &&skp::scalar_field_type,
                                                   r1cs_ppzkadsnark_prfKeyT<CurveType> &&S) :
                         i(std::move(i)),
                         skp(std::move(skp)), S(std::move(S)) {};
@@ -154,7 +154,7 @@ namespace nil {
                 template<typename CurveType>
                 class r1cs_ppzkadsnark_pub_auth_key {
                 public:
-                    algebra::G2<snark_pp<CurveType>> minusI2;
+                    CurveType::g2_type minusI2;
                     r1cs_ppzkadsnark_vkT<CurveType> vkp;
 
                     r1cs_ppzkadsnark_pub_auth_key() {};
@@ -162,7 +162,7 @@ namespace nil {
                         operator=(const r1cs_ppzkadsnark_pub_auth_key<CurveType> &other) = default;
                     r1cs_ppzkadsnark_pub_auth_key(const r1cs_ppzkadsnark_pub_auth_key<CurveType> &other) = default;
                     r1cs_ppzkadsnark_pub_auth_key(r1cs_ppzkadsnark_pub_auth_key<CurveType> &&other) = default;
-                    r1cs_ppzkadsnark_pub_auth_key(algebra::G2<snark_pp<CurveType>> &&minusI2,
+                    r1cs_ppzkadsnark_pub_auth_key(CurveType::g2_type &&minusI2,
                                                   r1cs_ppzkadsnark_vkT<CurveType> &&vkp) :
                         minusI2(std::move(minusI2)),
                         vkp(std::move(vkp)) {};
@@ -209,16 +209,16 @@ namespace nil {
                 template<typename CurveType>
                 class r1cs_ppzkadsnark_auth_data {
                 public:
-                    algebra::Fr<snark_pp<CurveType>> mu;
-                    algebra::G2<snark_pp<CurveType>> Lambda;
+                    CurveType mu::scalar_field_type;
+                    CurveType::g2_type Lambda;
                     r1cs_ppzkadsnark_sigT<CurveType> sigma;
 
                     r1cs_ppzkadsnark_auth_data() {};
                     r1cs_ppzkadsnark_auth_data<CurveType> &operator=(const r1cs_ppzkadsnark_auth_data<CurveType> &other) = default;
                     r1cs_ppzkadsnark_auth_data(const r1cs_ppzkadsnark_auth_data<CurveType> &other) = default;
                     r1cs_ppzkadsnark_auth_data(r1cs_ppzkadsnark_auth_data<CurveType> &&other) = default;
-                    r1cs_ppzkadsnark_auth_data(algebra::Fr<snark_pp<CurveType>> &&mu,
-                                               algebra::G2<snark_pp<CurveType>> &&Lambda,
+                    r1cs_ppzkadsnark_auth_data(CurveType &&mu::scalar_field_type,
+                                               CurveType::g2_type &&Lambda,
                                                r1cs_ppzkadsnark_sigT<CurveType> &&sigma) :
                         mu(std::move(mu)),
                         Lambda(std::move(Lambda)), sigma(std::move(sigma)) {};
@@ -245,13 +245,13 @@ namespace nil {
                 template<typename CurveType>
                 class r1cs_ppzkadsnark_proving_key {
                 public:
-                    knowledge_commitment_vector<algebra::G1<snark_pp<CurveType>>, algebra::G1<snark_pp<CurveType>>> A_query;
-                    knowledge_commitment_vector<algebra::G2<snark_pp<CurveType>>, algebra::G1<snark_pp<CurveType>>> B_query;
-                    knowledge_commitment_vector<algebra::G1<snark_pp<CurveType>>, algebra::G1<snark_pp<CurveType>>> C_query;
+                    knowledge_commitment_vector<CurveType::g1_type, CurveType::g1_type> A_query;
+                    knowledge_commitment_vector<CurveType::g2_type, CurveType::g1_type> B_query;
+                    knowledge_commitment_vector<CurveType::g1_type, CurveType::g1_type> C_query;
                     algebra::G1_vector<snark_pp<CurveType>> H_query;    // t powers
                     algebra::G1_vector<snark_pp<CurveType>> K_query;
                     /* Now come the additional elements for ad */
-                    algebra::G1<snark_pp<CurveType>> rA_i_Z_g1;
+                    CurveType::g1_type rA_i_Z_g1;
 
                     r1cs_ppzkadsnark_constraint_system<CurveType> constraint_system;
 
@@ -261,12 +261,12 @@ namespace nil {
                     r1cs_ppzkadsnark_proving_key(const r1cs_ppzkadsnark_proving_key<CurveType> &other) = default;
                     r1cs_ppzkadsnark_proving_key(r1cs_ppzkadsnark_proving_key<CurveType> &&other) = default;
                     r1cs_ppzkadsnark_proving_key(
-                        knowledge_commitment_vector<algebra::G1<snark_pp<CurveType>>, algebra::G1<snark_pp<CurveType>>> &&A_query,
-                        knowledge_commitment_vector<algebra::G2<snark_pp<CurveType>>, algebra::G1<snark_pp<CurveType>>> &&B_query,
-                        knowledge_commitment_vector<algebra::G1<snark_pp<CurveType>>, algebra::G1<snark_pp<CurveType>>> &&C_query,
+                        knowledge_commitment_vector<CurveType::g1_type, CurveType::g1_type> &&A_query,
+                        knowledge_commitment_vector<CurveType::g2_type, CurveType::g1_type> &&B_query,
+                        knowledge_commitment_vector<CurveType::g1_type, CurveType::g1_type> &&C_query,
                         algebra::G1_vector<snark_pp<CurveType>> &&H_query,
                         algebra::G1_vector<snark_pp<CurveType>> &&K_query,
-                        algebra::G1<snark_pp<CurveType>> &&rA_i_Z_g1,
+                        CurveType::g1_type &&rA_i_Z_g1,
                         r1cs_ppzkadsnark_constraint_system<CurveType> &&constraint_system) :
                         A_query(std::move(A_query)),
                         B_query(std::move(B_query)), C_query(std::move(C_query)), H_query(std::move(H_query)),
@@ -294,19 +294,14 @@ namespace nil {
                     std::size_t size_in_bits() const {
                         return A_query.size_in_bits() + B_query.size_in_bits() + C_query.size_in_bits() +
                                algebra::size_in_bits(H_query) + algebra::size_in_bits(K_query) +
-                               algebra::G1<snark_pp<CurveType>>::size_in_bits();
+                               CurveType::g1_type::size_in_bits();
                     }
 
                     void print_size() const {
-                        algebra::print_indent();
                         printf("* G1 elements in PK: %zu\n", this->G1_size());
-                        algebra::print_indent();
                         printf("* Non-zero G1 elements in PK: %zu\n", this->G1_sparse_size());
-                        algebra::print_indent();
                         printf("* G2 elements in PK: %zu\n", this->G2_size());
-                        algebra::print_indent();
                         printf("* Non-zero G2 elements in PK: %zu\n", this->G2_sparse_size());
-                        algebra::print_indent();
                         printf("* PK size in bits: %zu\n", this->size_in_bits());
                     }
 
@@ -333,26 +328,26 @@ namespace nil {
                 template<typename CurveType>
                 class r1cs_ppzkadsnark_verification_key {
                 public:
-                    algebra::G2<snark_pp<CurveType>> alphaA_g2;
-                    algebra::G1<snark_pp<CurveType>> alphaB_g1;
-                    algebra::G2<snark_pp<CurveType>> alphaC_g2;
-                    algebra::G2<snark_pp<CurveType>> gamma_g2;
-                    algebra::G1<snark_pp<CurveType>> gamma_beta_g1;
-                    algebra::G2<snark_pp<CurveType>> gamma_beta_g2;
-                    algebra::G2<snark_pp<CurveType>> rC_Z_g2;
+                    CurveType::g2_type alphaA_g2;
+                    CurveType::g1_type alphaB_g1;
+                    CurveType::g2_type alphaC_g2;
+                    CurveType::g2_type gamma_g2;
+                    CurveType::g1_type gamma_beta_g1;
+                    CurveType::g2_type gamma_beta_g2;
+                    CurveType::g2_type rC_Z_g2;
 
-                    algebra::G1<snark_pp<CurveType>> A0;
+                    CurveType::g1_type A0;
                     algebra::G1_vector<snark_pp<CurveType>> Ain;
 
                     r1cs_ppzkadsnark_verification_key() = default;
-                    r1cs_ppzkadsnark_verification_key(const algebra::G2<snark_pp<CurveType>> &alphaA_g2,
-                                                      const algebra::G1<snark_pp<CurveType>> &alphaB_g1,
-                                                      const algebra::G2<snark_pp<CurveType>> &alphaC_g2,
-                                                      const algebra::G2<snark_pp<CurveType>> &gamma_g2,
-                                                      const algebra::G1<snark_pp<CurveType>> &gamma_beta_g1,
-                                                      const algebra::G2<snark_pp<CurveType>> &gamma_beta_g2,
-                                                      const algebra::G2<snark_pp<CurveType>> &rC_Z_g2,
-                                                      const algebra::G1<snark_pp<CurveType>>
+                    r1cs_ppzkadsnark_verification_key(const CurveType::g2_type &alphaA_g2,
+                                                      const CurveType::g1_type &alphaB_g1,
+                                                      const CurveType::g2_type &alphaC_g2,
+                                                      const CurveType::g2_type &gamma_g2,
+                                                      const CurveType::g1_type &gamma_beta_g1,
+                                                      const CurveType::g2_type &gamma_beta_g2,
+                                                      const CurveType::g2_type &rC_Z_g2,
+                                                      const CurveType::g1_type
                                                           A0,
                                                       const algebra::G1_vector<snark_pp<CurveType>>
                                                           Ain) :
@@ -369,16 +364,13 @@ namespace nil {
                     }
 
                     std::size_t size_in_bits() const {
-                        return G1_size() * algebra::G1<snark_pp<CurveType>>::size_in_bits() +
-                               G2_size() * algebra::G2<snark_pp<CurveType>>::size_in_bits();    // possible zksnark bug
+                        return G1_size() * CurveType::g1_type::size_in_bits() +
+                               G2_size() * CurveType::g2_type::size_in_bits();    // possible zksnark bug
                     }
 
                     void print_size() const {
-                        algebra::print_indent();
                         printf("* G1 elements in VK: %zu\n", this->G1_size());
-                        algebra::print_indent();
                         printf("* G2 elements in VK: %zu\n", this->G2_size());
-                        algebra::print_indent();
                         printf("* VK size in bits: %zu\n", this->size_in_bits());
                     }
 
@@ -422,7 +414,7 @@ namespace nil {
                     algebra::G2_precomp<snark_pp<CurveType>> vk_gamma_beta_g2_precomp;
                     algebra::G2_precomp<snark_pp<CurveType>> vk_rC_i_g2_precomp;
 
-                    algebra::G1<snark_pp<CurveType>> A0;
+                    CurveType::g1_type A0;
                     algebra::G1_vector<snark_pp<CurveType>> Ain;
 
                     std::vector<algebra::G1_precomp<snark_pp<CurveType>>> proof_g_vki_precomp;
@@ -477,36 +469,36 @@ namespace nil {
                 template<typename CurveType>
                 class r1cs_ppzkadsnark_proof {
                 public:
-                    knowledge_commitment<algebra::G1<snark_pp<CurveType>>, algebra::G1<snark_pp<CurveType>>> g_A;
-                    knowledge_commitment<algebra::G2<snark_pp<CurveType>>, algebra::G1<snark_pp<CurveType>>> g_B;
-                    knowledge_commitment<algebra::G1<snark_pp<CurveType>>, algebra::G1<snark_pp<CurveType>>> g_C;
-                    algebra::G1<snark_pp<CurveType>> g_H;
-                    algebra::G1<snark_pp<CurveType>> g_K;
-                    knowledge_commitment<algebra::G1<snark_pp<CurveType>>, algebra::G1<snark_pp<CurveType>>> g_Aau;
-                    algebra::G1<snark_pp<CurveType>> muA;
+                    knowledge_commitment<CurveType::g1_type, CurveType::g1_type> g_A;
+                    knowledge_commitment<CurveType::g2_type, CurveType::g1_type> g_B;
+                    knowledge_commitment<CurveType::g1_type, CurveType::g1_type> g_C;
+                    CurveType::g1_type g_H;
+                    CurveType::g1_type g_K;
+                    knowledge_commitment<CurveType::g1_type, CurveType::g1_type> g_Aau;
+                    CurveType::g1_type muA;
 
                     r1cs_ppzkadsnark_proof() {
                         // invalid proof with valid curve points
-                        this->g_A.g = algebra::G1<snark_pp<CurveType>>::one();
-                        this->g_A.h = algebra::G1<snark_pp<CurveType>>::one();
-                        this->g_B.g = algebra::G2<snark_pp<CurveType>>::one();
-                        this->g_B.h = algebra::G1<snark_pp<CurveType>>::one();
-                        this->g_C.g = algebra::G1<snark_pp<CurveType>>::one();
-                        this->g_C.h = algebra::G1<snark_pp<CurveType>>::one();
-                        this->g_H = algebra::G1<snark_pp<CurveType>>::one();
-                        this->g_K = algebra::G1<snark_pp<CurveType>>::one();
-                        g_Aau = knowledge_commitment<algebra::G1<snark_pp<CurveType>>, algebra::G1<snark_pp<CurveType>>>(
-                            algebra::G1<snark_pp<CurveType>>::one(), algebra::G1<snark_pp<CurveType>>::one());
-                        this->muA = algebra::G1<snark_pp<CurveType>>::one();
+                        this->g_A.g = CurveType::g1_type::one();
+                        this->g_A.h = CurveType::g1_type::one();
+                        this->g_B.g = CurveType::g2_type::one();
+                        this->g_B.h = CurveType::g1_type::one();
+                        this->g_C.g = CurveType::g1_type::one();
+                        this->g_C.h = CurveType::g1_type::one();
+                        this->g_H = CurveType::g1_type::one();
+                        this->g_K = CurveType::g1_type::one();
+                        g_Aau = knowledge_commitment<CurveType::g1_type, CurveType::g1_type>(
+                            CurveType::g1_type::one(), CurveType::g1_type::one());
+                        this->muA = CurveType::g1_type::one();
                     }
                     r1cs_ppzkadsnark_proof(
-                        knowledge_commitment<algebra::G1<snark_pp<CurveType>>, algebra::G1<snark_pp<CurveType>>> &&g_A,
-                        knowledge_commitment<algebra::G2<snark_pp<CurveType>>, algebra::G1<snark_pp<CurveType>>> &&g_B,
-                        knowledge_commitment<algebra::G1<snark_pp<CurveType>>, algebra::G1<snark_pp<CurveType>>> &&g_C,
-                        algebra::G1<snark_pp<CurveType>> &&g_H,
-                        algebra::G1<snark_pp<CurveType>> &&g_K,
-                        knowledge_commitment<algebra::G1<snark_pp<CurveType>>, algebra::G1<snark_pp<CurveType>>> &&g_Aau,
-                        algebra::G1<snark_pp<CurveType>> &&muA) :
+                        knowledge_commitment<CurveType::g1_type, CurveType::g1_type> &&g_A,
+                        knowledge_commitment<CurveType::g2_type, CurveType::g1_type> &&g_B,
+                        knowledge_commitment<CurveType::g1_type, CurveType::g1_type> &&g_C,
+                        CurveType::g1_type &&g_H,
+                        CurveType::g1_type &&g_K,
+                        knowledge_commitment<CurveType::g1_type, CurveType::g1_type> &&g_Aau,
+                        CurveType::g1_type &&muA) :
                         g_A(std::move(g_A)),
                         g_B(std::move(g_B)), g_C(std::move(g_C)), g_H(std::move(g_H)), g_K(std::move(g_K)),
                         g_Aau(std::move(g_Aau)), muA(std::move(muA)) {};
@@ -520,16 +512,13 @@ namespace nil {
                     }
 
                     std::size_t size_in_bits() const {
-                        return G1_size() * algebra::G1<snark_pp<CurveType>>::size_in_bits() +
-                               G2_size() * algebra::G2<snark_pp<CurveType>>::size_in_bits();
+                        return G1_size() * CurveType::g1_type::size_in_bits() +
+                               G2_size() * CurveType::g2_type::size_in_bits();
                     }
 
                     void print_size() const {
-                        algebra::print_indent();
                         printf("* G1 elements in proof: %zu\n", this->G1_size());
-                        algebra::print_indent();
                         printf("* G2 elements in proof: %zu\n", this->G2_size());
-                        algebra::print_indent();
                         printf("* Proof size in bits: %zu\n", this->size_in_bits());
                     }
 
@@ -558,7 +547,7 @@ namespace nil {
                  */
                 template<typename CurveType>
                 std::vector<r1cs_ppzkadsnark_auth_data<CurveType>>
-                    r1cs_ppzkadsnark_auth_sign(const std::vector<algebra::Fr<snark_pp<CurveType>>> &ins,
+                    r1cs_ppzkadsnark_auth_sign(const std::vector<CurveType> &ins::scalar_field_type,
                                                const r1cs_ppzkadsnark_sec_auth_key<CurveType> &sk,
                                                const std::vector<labelT>
                                                    labels);
@@ -567,13 +556,13 @@ namespace nil {
                  * R1CS ppZKADSNARK authentication verification algorithms.
                  */
                 template<typename CurveType>
-                bool r1cs_ppzkadsnark_auth_verify(const std::vector<algebra::Fr<snark_pp<CurveType>>> &data,
+                bool r1cs_ppzkadsnark_auth_verify(const std::vector<CurveType> &data::scalar_field_type,
                                                   const std::vector<r1cs_ppzkadsnark_auth_data<CurveType>> &auth_data,
                                                   const r1cs_ppzkadsnark_sec_auth_key<CurveType> &sak,
                                                   const std::vector<labelT> &labels);
 
                 template<typename CurveType>
-                bool r1cs_ppzkadsnark_auth_verify(const std::vector<algebra::Fr<snark_pp<CurveType>>> &data,
+                bool r1cs_ppzkadsnark_auth_verify(const std::vector<CurveType> &data::scalar_field_type,
                                                   const std::vector<r1cs_ppzkadsnark_auth_data<CurveType>> &auth_data,
                                                   const r1cs_ppzkadsnark_pub_auth_key<CurveType> &pak,
                                                   const std::vector<labelT> &labels);
@@ -951,20 +940,20 @@ namespace nil {
                 r1cs_ppzkadsnark_verification_key<CurveType>
                     r1cs_ppzkadsnark_verification_key<CurveType>::dummy_verification_key(const std::size_t input_size) {
                     r1cs_ppzkadsnark_verification_key<CurveType> result;
-                    result.alphaA_g2 = algebra::Fr<snark_pp<CurveType>>::random_element() * algebra::G2<snark_pp<CurveType>>::one();
-                    result.alphaB_g1 = algebra::Fr<snark_pp<CurveType>>::random_element() * algebra::G1<snark_pp<CurveType>>::one();
-                    result.alphaC_g2 = algebra::Fr<snark_pp<CurveType>>::random_element() * algebra::G2<snark_pp<CurveType>>::one();
-                    result.gamma_g2 = algebra::Fr<snark_pp<CurveType>>::random_element() * algebra::G2<snark_pp<CurveType>>::one();
+                    result.alphaA_g2 = CurveType::random_element() * CurveType::g2_type::one()::scalar_field_type;
+                    result.alphaB_g1 = CurveType::random_element() * CurveType::g1_type::one()::scalar_field_type;
+                    result.alphaC_g2 = CurveType::random_element() * CurveType::g2_type::one()::scalar_field_type;
+                    result.gamma_g2 = CurveType::random_element() * CurveType::g2_type::one()::scalar_field_type;
                     result.gamma_beta_g1 =
-                        algebra::Fr<snark_pp<CurveType>>::random_element() * algebra::G1<snark_pp<CurveType>>::one();
+                        CurveType::random_element() * CurveType::g1_type::one()::scalar_field_type;
                     result.gamma_beta_g2 =
-                        algebra::Fr<snark_pp<CurveType>>::random_element() * algebra::G2<snark_pp<CurveType>>::one();
-                    result.rC_Z_g2 = algebra::Fr<snark_pp<CurveType>>::random_element() * algebra::G2<snark_pp<CurveType>>::one();
+                        CurveType::random_element() * CurveType::g2_type::one()::scalar_field_type;
+                    result.rC_Z_g2 = CurveType::random_element() * CurveType::g2_type::one()::scalar_field_type;
 
-                    result.A0 = algebra::Fr<snark_pp<CurveType>>::random_element() * algebra::G1<snark_pp<CurveType>>::one();
+                    result.A0 = CurveType::random_element() * CurveType::g1_type::one()::scalar_field_type;
                     for (std::size_t i = 0; i < input_size; ++i) {
-                        result.Ain.emplace_back(algebra::Fr<snark_pp<CurveType>>::random_element() *
-                                                algebra::G1<snark_pp<CurveType>>::one());
+                        result.Ain.emplace_back(CurveType::random_element() ::scalar_field_type*
+                                                CurveType::g1_type::one());
                     }
 
                     return result;
@@ -974,10 +963,10 @@ namespace nil {
                 r1cs_ppzkadsnark_auth_keys<CurveType> r1cs_ppzkadsnark_auth_generator(void) {
                     kpT<CurveType> sigkp = sigGen<CurveType>();
                     r1cs_ppzkadsnark_prfKeyT<CurveType> prfseed = prfGen<CurveType>();
-                    algebra::Fr<snark_pp<CurveType>> i = algebra::Fr<snark_pp<CurveType>>::random_element();
-                    algebra::G1<snark_pp<CurveType>> I1 = i * algebra::G1<snark_pp<CurveType>>::one();
-                    algebra::G2<snark_pp<CurveType>> minusI2 =
-                        algebra::G2<snark_pp<CurveType>>::zero() - i * algebra::G2<snark_pp<CurveType>>::one();
+                    CurveType i = CurveType::random_element()::scalar_field_type;
+                    CurveType::g1_type I1 = i * CurveType::g1_type::one();
+                    CurveType::g2_type minusI2 =
+                        CurveType::g2_type::zero() - i * CurveType::g2_type::one();
                     return r1cs_ppzkadsnark_auth_keys<CurveType>(
                         r1cs_ppzkadsnark_pub_auth_prms<CurveType>(std::move(I1)),
                         r1cs_ppzkadsnark_pub_auth_key<CurveType>(std::move(minusI2), std::move(sigkp.vk)),
@@ -986,59 +975,53 @@ namespace nil {
 
                 template<typename CurveType>
                 std::vector<r1cs_ppzkadsnark_auth_data<CurveType>>
-                    r1cs_ppzkadsnark_auth_sign(const std::vector<algebra::Fr<snark_pp<CurveType>>> &ins,
+                    r1cs_ppzkadsnark_auth_sign(const std::vector<CurveType> &ins::scalar_field_type,
                                                const r1cs_ppzkadsnark_sec_auth_key<CurveType> &sk,
                                                const std::vector<labelT>
                                                    labels) {
-                    algebra::enter_block("Call to r1cs_ppzkadsnark_auth_sign");
                     assert(labels.size() == ins.size());
                     std::vector<r1cs_ppzkadsnark_auth_data<CurveType>> res;
                     res.reserve(ins.size());
                     for (std::size_t i = 0; i < ins.size(); i++) {
-                        algebra::Fr<snark_pp<CurveType>> lambda = prfCompute<CurveType>(sk.S, labels[i]);
-                        algebra::G2<snark_pp<CurveType>> Lambda = lambda * algebra::G2<snark_pp<CurveType>>::one();
+                        CurveType lambda = prfCompute<CurveType>(sk.S, labels[i])::scalar_field_type;
+                        CurveType::g2_type Lambda = lambda * CurveType::g2_type::one();
                         r1cs_ppzkadsnark_sigT<CurveType> sig = sigSign<CurveType>(sk.skp, labels[i], Lambda);
                         r1cs_ppzkadsnark_auth_data<CurveType> val(std::move(lambda + sk.i * ins[i]), std::move(Lambda),
                                                             std::move(sig));
                         res.emplace_back(val);
                     }
-                    algebra::leave_block("Call to r1cs_ppzkadsnark_auth_sign");
                     return std::move(res);
                 }
 
                 // symmetric
                 template<typename CurveType>
-                bool r1cs_ppzkadsnark_auth_verify(const std::vector<algebra::Fr<snark_pp<CurveType>>> &data,
+                bool r1cs_ppzkadsnark_auth_verify(const std::vector<CurveType> &data::scalar_field_type,
                                                   const std::vector<r1cs_ppzkadsnark_auth_data<CurveType>> &auth_data,
                                                   const r1cs_ppzkadsnark_sec_auth_key<CurveType> &sak,
                                                   const std::vector<labelT> &labels) {
-                    algebra::enter_block("Call to r1cs_ppzkadsnark_auth_verify");
                     assert((data.size() == labels.size()) && (auth_data.size() == labels.size()));
                     bool res = true;
                     for (std::size_t i = 0; i < data.size(); i++) {
-                        algebra::Fr<snark_pp<CurveType>> lambda = prfCompute<CurveType>(sak.S, labels[i]);
-                        algebra::Fr<snark_pp<CurveType>> mup = lambda + sak.i * data[i];
+                        CurveType lambda = prfCompute<CurveType>(sak.S, labels[i])::scalar_field_type;
+                        CurveType mup = lambda + sak.i * data[i]::scalar_field_type;
                         res = res && (auth_data[i].mu == mup);
                     }
-                    algebra::leave_block("Call to r1cs_ppzkadsnark_auth_verify");
                     return res;
                 }
 
                 // public
                 template<typename CurveType>
-                bool r1cs_ppzkadsnark_auth_verify(const std::vector<algebra::Fr<snark_pp<CurveType>>> &data,
+                bool r1cs_ppzkadsnark_auth_verify(const std::vector<CurveType> &data::scalar_field_type,
                                                   const std::vector<r1cs_ppzkadsnark_auth_data<CurveType>> &auth_data,
                                                   const r1cs_ppzkadsnark_pub_auth_key<CurveType> &pak,
                                                   const std::vector<labelT> &labels) {
-                    algebra::enter_block("Call to r1cs_ppzkadsnark_auth_verify");
                     assert((data.size() == labels.size()) && (data.size() == auth_data.size()));
                     bool res = true;
                     for (std::size_t i = 0; i < auth_data.size(); i++) {
-                        algebra::G2<snark_pp<CurveType>> Mup = auth_data[i].Lambda - data[i] * pak.minusI2;
-                        res = res && (auth_data[i].mu * algebra::G2<snark_pp<CurveType>>::one() == Mup);
+                        CurveType::g2_type Mup = auth_data[i].Lambda - data[i] * pak.minusI2;
+                        res = res && (auth_data[i].mu * CurveType::g2_type::one() == Mup);
                         res = res && sigVerif<CurveType>(pak.vkp, labels[i], auth_data[i].Lambda, auth_data[i].sigma);
                     }
-                    algebra::leave_block("Call to r1cs_ppzkadsnark_auth_verify");
                     return res;
                 }
 
@@ -1046,28 +1029,22 @@ namespace nil {
                 r1cs_ppzkadsnark_keypair<CurveType>
                     r1cs_ppzkadsnark_generator(const r1cs_ppzkadsnark_constraint_system<CurveType> &cs,
                                                const r1cs_ppzkadsnark_pub_auth_prms<CurveType> &prms) {
-                    algebra::enter_block("Call to r1cs_ppzkadsnark_generator");
 
                     /* make the B_query "lighter" if possible */
                     r1cs_ppzkadsnark_constraint_system<CurveType> cs_copy(cs);
                     cs_copy.swap_AB_if_beneficial();
 
                     /* draw random element at which the QAP is evaluated */
-                    const algebra::Fr<snark_pp<CurveType>> t = algebra::Fr<snark_pp<CurveType>>::random_element();
+                    const CurveType t = CurveType::random_element()::scalar_field_type;
 
-                    qap_instance_evaluation<algebra::Fr<snark_pp<CurveType>>> qap_inst =
+                    qap_instance_evaluation<CurveType> qap_inst ::scalar_field_type=
                         r1cs_to_qap_instance_map_with_evaluation(cs_copy, t);
 
-                    algebra::print_indent();
                     printf("* QAP number of variables: %zu\n", qap_inst.num_variables());
-                    algebra::print_indent();
                     printf("* QAP pre degree: %zu\n", cs_copy.constraints.size());
-                    algebra::print_indent();
                     printf("* QAP degree: %zu\n", qap_inst.degree());
-                    algebra::print_indent();
                     printf("* QAP number of input variables: %zu\n", qap_inst.num_inputs());
 
-                    algebra::enter_block("Compute query densities");
                     std::size_t non_zero_At = 0, non_zero_Bt = 0, non_zero_Ct = 0, non_zero_Ht = 0;
                     for (std::size_t i = 0; i < qap_inst.num_variables() + 1; ++i) {
                         if (!qap_inst.At[i].is_zero()) {
@@ -1085,7 +1062,6 @@ namespace nil {
                             ++non_zero_Ht;
                         }
                     }
-                    algebra::leave_block("Compute query densities");
 
                     algebra::Fr_vector<snark_pp<CurveType>> At = std::move(
                         qap_inst.At);    // qap_inst.At is now in unspecified state, but we do not use it later
@@ -1101,14 +1077,14 @@ namespace nil {
                     Bt.emplace_back(qap_inst.Zt);
                     Ct.emplace_back(qap_inst.Zt);
 
-                    const algebra::Fr<snark_pp<CurveType>> alphaA = algebra::Fr<snark_pp<CurveType>>::random_element(),
-                                                     alphaB = algebra::Fr<snark_pp<CurveType>>::random_element(),
-                                                     alphaC = algebra::Fr<snark_pp<CurveType>>::random_element(),
-                                                     rA = algebra::Fr<snark_pp<CurveType>>::random_element(),
-                                                     rB = algebra::Fr<snark_pp<CurveType>>::random_element(),
-                                                     beta = algebra::Fr<snark_pp<CurveType>>::random_element(),
-                                                     gamma = algebra::Fr<snark_pp<CurveType>>::random_element();
-                    const algebra::Fr<snark_pp<CurveType>> rC = rA * rB;
+                    const CurveType alphaA = CurveType::random_element()::scalar_field_type,
+                                                     alphaB = CurveType::random_element()::scalar_field_type,
+                                                     alphaC = CurveType::random_element()::scalar_field_type,
+                                                     rA = CurveType::random_element()::scalar_field_type,
+                                                     rB = CurveType::random_element()::scalar_field_type,
+                                                     beta = CurveType::random_element()::scalar_field_type,
+                                                     gamma = CurveType::random_element()::scalar_field_type;
+                    const CurveType rC = rA * rB::scalar_field_type;
 
                     // construct the same-coefficient-check query (must happen before zeroing out the prefix of At)
                     algebra::Fr_vector<snark_pp<CurveType>> Kt;
@@ -1124,11 +1100,9 @@ namespace nil {
                         2 * (non_zero_At - qap_inst.num_inputs() + non_zero_Ct) + non_zero_Bt + non_zero_Ht + Kt.size();
                     const std::size_t g2_exp_count = non_zero_Bt;
 
-                    std::size_t g1_window = algebra::get_exp_window_size<algebra::G1<snark_pp<CurveType>>>(g1_exp_count);
-                    std::size_t g2_window = algebra::get_exp_window_size<algebra::G2<snark_pp<CurveType>>>(g2_exp_count);
-                    algebra::print_indent();
+                    std::size_t g1_window = algebra::get_exp_window_size<CurveType::g1_type>(g1_exp_count);
+                    std::size_t g2_window = algebra::get_exp_window_size<CurveType::g2_type>(g2_exp_count);
                     printf("* G1 window: %zu\n", g1_window);
-                    algebra::print_indent();
                     printf("* G2 window: %zu\n", g2_window);
 
 #ifdef MULTICORE
@@ -1138,83 +1112,58 @@ namespace nil {
                     const std::size_t chunks = 1;
 #endif
 
-                    algebra::enter_block("Generating G1 multiexp table");
-                    algebra::window_table<algebra::G1<snark_pp<CurveType>>> g1_table = get_window_table(
-                        algebra::Fr<snark_pp<CurveType>>::size_in_bits(), g1_window, algebra::G1<snark_pp<CurveType>>::one());
-                    algebra::leave_block("Generating G1 multiexp table");
+                    algebra::window_table<CurveType::g1_type> g1_table = get_window_table(
+                        CurveType::size_in_bits(), g1_window, CurveType::g1_type::one())::scalar_field_type;
 
-                    algebra::enter_block("Generating G2 multiexp table");
-                    algebra::window_table<algebra::G2<snark_pp<CurveType>>> g2_table = get_window_table(
-                        algebra::Fr<snark_pp<CurveType>>::size_in_bits(), g2_window, algebra::G2<snark_pp<CurveType>>::one());
-                    algebra::leave_block("Generating G2 multiexp table");
+                    algebra::window_table<CurveType::g2_type> g2_table = get_window_table(
+                        CurveType::size_in_bits(), g2_window, CurveType::g2_type::one())::scalar_field_type;
 
-                    algebra::enter_block("Generate R1CS proving key");
 
-                    algebra::enter_block("Generate knowledge commitments");
-                    algebra::enter_block("Compute the A-query", false);
-                    knowledge_commitment_vector<algebra::G1<snark_pp<CurveType>>, algebra::G1<snark_pp<CurveType>>> A_query =
-                        kc_batch_exp(algebra::Fr<snark_pp<CurveType>>::size_in_bits(), g1_window, g1_window, g1_table,
+                    knowledge_commitment_vector<CurveType::g1_type, CurveType::g1_type> A_query =
+                        kc_batch_exp(CurveType::size_in_bits(), g1_window, g1_window, g1_table::scalar_field_type,
                                      g1_table, rA, rA * alphaA, At, chunks);
-                    algebra::leave_block("Compute the A-query", false);
 
-                    algebra::enter_block("Compute the B-query", false);
-                    knowledge_commitment_vector<algebra::G2<snark_pp<CurveType>>, algebra::G1<snark_pp<CurveType>>> B_query =
-                        kc_batch_exp(algebra::Fr<snark_pp<CurveType>>::size_in_bits(), g2_window, g1_window, g2_table,
+                    knowledge_commitment_vector<CurveType::g2_type, CurveType::g1_type> B_query =
+                        kc_batch_exp(CurveType::size_in_bits(), g2_window, g1_window, g2_table::scalar_field_type,
                                      g1_table, rB, rB * alphaB, Bt, chunks);
-                    algebra::leave_block("Compute the B-query", false);
 
-                    algebra::enter_block("Compute the C-query", false);
-                    knowledge_commitment_vector<algebra::G1<snark_pp<CurveType>>, algebra::G1<snark_pp<CurveType>>> C_query =
-                        kc_batch_exp(algebra::Fr<snark_pp<CurveType>>::size_in_bits(), g1_window, g1_window, g1_table,
+                    knowledge_commitment_vector<CurveType::g1_type, CurveType::g1_type> C_query =
+                        kc_batch_exp(CurveType::size_in_bits(), g1_window, g1_window, g1_table::scalar_field_type,
                                      g1_table, rC, rC * alphaC, Ct, chunks);
-                    algebra::leave_block("Compute the C-query", false);
 
-                    algebra::enter_block("Compute the H-query", false);
                     algebra::G1_vector<snark_pp<CurveType>> H_query =
-                        batch_exp(algebra::Fr<snark_pp<CurveType>>::size_in_bits(), g1_window, g1_table, Ht);
+                        batch_exp(CurveType::size_in_bits(), g1_window, g1_table, Ht)::scalar_field_type;
 #ifdef USE_MIXED_ADDITION
-                    algebra::batch_to_special<algebra::G1<snark_pp<CurveType>>>(H_query);
+                    algebra::batch_to_special<CurveType::g1_type>(H_query);
 #endif
-                    algebra::leave_block("Compute the H-query", false);
 
-                    algebra::enter_block("Compute the K-query", false);
                     algebra::G1_vector<snark_pp<CurveType>> K_query =
-                        batch_exp(algebra::Fr<snark_pp<CurveType>>::size_in_bits(), g1_window, g1_table, Kt);
+                        batch_exp(CurveType::size_in_bits(), g1_window, g1_table, Kt)::scalar_field_type;
 #ifdef USE_MIXED_ADDITION
-                    algebra::batch_to_special<algebra::G1<snark_pp<CurveType>>>(K_query);
+                    algebra::batch_to_special<CurveType::g1_type>(K_query);
 #endif
-                    algebra::leave_block("Compute the K-query", false);
 
-                    algebra::leave_block("Generate knowledge commitments");
 
-                    algebra::leave_block("Generate R1CS proving key");
 
-                    algebra::enter_block("Generate R1CS verification key");
-                    algebra::G2<snark_pp<CurveType>> alphaA_g2 = alphaA * algebra::G2<snark_pp<CurveType>>::one();
-                    algebra::G1<snark_pp<CurveType>> alphaB_g1 = alphaB * algebra::G1<snark_pp<CurveType>>::one();
-                    algebra::G2<snark_pp<CurveType>> alphaC_g2 = alphaC * algebra::G2<snark_pp<CurveType>>::one();
-                    algebra::G2<snark_pp<CurveType>> gamma_g2 = gamma * algebra::G2<snark_pp<CurveType>>::one();
-                    algebra::G1<snark_pp<CurveType>> gamma_beta_g1 = (gamma * beta) * algebra::G1<snark_pp<CurveType>>::one();
-                    algebra::G2<snark_pp<CurveType>> gamma_beta_g2 = (gamma * beta) * algebra::G2<snark_pp<CurveType>>::one();
-                    algebra::G2<snark_pp<CurveType>> rC_Z_g2 = (rC * qap_inst.Zt) * algebra::G2<snark_pp<CurveType>>::one();
+                    CurveType::g2_type alphaA_g2 = alphaA * CurveType::g2_type::one();
+                    CurveType::g1_type alphaB_g1 = alphaB * CurveType::g1_type::one();
+                    CurveType::g2_type alphaC_g2 = alphaC * CurveType::g2_type::one();
+                    CurveType::g2_type gamma_g2 = gamma * CurveType::g2_type::one();
+                    CurveType::g1_type gamma_beta_g1 = (gamma * beta) * CurveType::g1_type::one();
+                    CurveType::g2_type gamma_beta_g2 = (gamma * beta) * CurveType::g2_type::one();
+                    CurveType::g2_type rC_Z_g2 = (rC * qap_inst.Zt) * CurveType::g2_type::one();
 
-                    algebra::enter_block("Generate extra authentication elements");
-                    algebra::G1<snark_pp<CurveType>> rA_i_Z_g1 = (rA * qap_inst.Zt) * prms.I1;
-                    algebra::leave_block("Generate extra authentication elements");
+                    CurveType::g1_type rA_i_Z_g1 = (rA * qap_inst.Zt) * prms.I1;
 
-                    algebra::enter_block("Copy encoded input coefficients for R1CS verification key");
-                    algebra::G1<snark_pp<CurveType>> A0 = A_query[0].g;
+                    CurveType::g1_type A0 = A_query[0].g;
                     algebra::G1_vector<snark_pp<CurveType>> Ain;
                     Ain.reserve(qap_inst.num_inputs());
                     for (std::size_t i = 0; i < qap_inst.num_inputs(); ++i) {
                         Ain.emplace_back(A_query[1 + i].g);
                     }
 
-                    algebra::leave_block("Copy encoded input coefficients for R1CS verification key");
 
-                    algebra::leave_block("Generate R1CS verification key");
 
-                    algebra::leave_block("Call to r1cs_ppzkadsnark_generator");
 
                     r1cs_ppzkadsnark_verification_key<CurveType> vk = r1cs_ppzkadsnark_verification_key<CurveType>(
                         alphaA_g2, alphaB_g1, alphaC_g2, gamma_g2, gamma_beta_g1, gamma_beta_g2, rC_Z_g2, A0, Ain);
@@ -1238,48 +1187,45 @@ namespace nil {
                                             const r1cs_ppzkadsnark_primary_input<CurveType> &primary_input,
                                             const r1cs_ppzkadsnark_auxiliary_input<CurveType> &auxiliary_input,
                                             const std::vector<r1cs_ppzkadsnark_auth_data<CurveType>> &auth_data) {
-                    algebra::enter_block("Call to r1cs_ppzkadsnark_prover");
 
 #ifdef DEBUG
                     assert(pk.constraint_system.is_satisfied(primary_input, auxiliary_input));
 #endif
 
-                    const algebra::Fr<snark_pp<CurveType>> d1 = algebra::Fr<snark_pp<CurveType>>::random_element(),
-                                                     d2 = algebra::Fr<snark_pp<CurveType>>::random_element(),
-                                                     d3 = algebra::Fr<snark_pp<CurveType>>::random_element(),
-                                                     dauth = algebra::Fr<snark_pp<CurveType>>::random_element();
+                    const CurveType d1 = CurveType::random_element()::scalar_field_type,
+                                                     d2 = CurveType::random_element()::scalar_field_type,
+                                                     d3 = CurveType::random_element()::scalar_field_type,
+                                                     dauth = CurveType::random_element()::scalar_field_type;
 
-                    algebra::enter_block("Compute the polynomial H");
-                    const qap_witness<algebra::Fr<snark_pp<CurveType>>> qap_wit = r1cs_to_qap_witness_map(
+                    const qap_witness<CurveType> qap_wit = r1cs_to_qap_witness_map::scalar_field_type(
                         pk.constraint_system, primary_input, auxiliary_input, d1 + dauth, d2, d3);
-                    algebra::leave_block("Compute the polynomial H");
 
 #ifdef DEBUG
-                    const algebra::Fr<snark_pp<CurveType>> t = algebra::Fr<snark_pp<CurveType>>::random_element();
-                    qap_instance_evaluation<algebra::Fr<snark_pp<CurveType>>> qap_inst =
+                    const CurveType t = CurveType::random_element()::scalar_field_type;
+                    qap_instance_evaluation<CurveType> qap_inst ::scalar_field_type=
                         r1cs_to_qap_instance_map_with_evaluation(pk.constraint_system, t);
                     assert(qap_inst.is_satisfied(qap_wit));
 #endif
 
-                    knowledge_commitment<algebra::G1<snark_pp<CurveType>>, algebra::G1<snark_pp<CurveType>>> g_A =
+                    knowledge_commitment<CurveType::g1_type, CurveType::g1_type> g_A =
                         /* pk.A_query[0] + */ d1 * pk.A_query[qap_wit.num_variables() + 1];
-                    knowledge_commitment<algebra::G2<snark_pp<CurveType>>, algebra::G1<snark_pp<CurveType>>> g_B =
+                    knowledge_commitment<CurveType::g2_type, CurveType::g1_type> g_B =
                         pk.B_query[0] + qap_wit.d2 * pk.B_query[qap_wit.num_variables() + 1];
-                    knowledge_commitment<algebra::G1<snark_pp<CurveType>>, algebra::G1<snark_pp<CurveType>>> g_C =
+                    knowledge_commitment<CurveType::g1_type, CurveType::g1_type> g_C =
                         pk.C_query[0] + qap_wit.d3 * pk.C_query[qap_wit.num_variables() + 1];
 
-                    knowledge_commitment<algebra::G1<snark_pp<CurveType>>, algebra::G1<snark_pp<CurveType>>> g_Ain =
+                    knowledge_commitment<CurveType::g1_type, CurveType::g1_type> g_Ain =
                         dauth * pk.A_query[qap_wit.num_variables() + 1];
 
-                    algebra::G1<snark_pp<CurveType>> g_H = algebra::G1<snark_pp<CurveType>>::zero();
-                    algebra::G1<snark_pp<CurveType>> g_K =
+                    CurveType::g1_type g_H = CurveType::g1_type::zero();
+                    CurveType::g1_type g_K =
                         (pk.K_query[0] + qap_wit.d1 * pk.K_query[qap_wit.num_variables() + 1] +
                          qap_wit.d2 * pk.K_query[qap_wit.num_variables() + 2] +
                          qap_wit.d3 * pk.K_query[qap_wit.num_variables() + 3]);
 
 #ifdef DEBUG
                     for (std::size_t i = 0; i < qap_wit.num_inputs() + 1; ++i) {
-                        assert(pk.A_query[i].g == algebra::G1<snark_pp<CurveType>>::zero());
+                        assert(pk.A_query[i].g == CurveType::g1_type::zero());
                     }
                     assert(pk.A_query.domain_size() == qap_wit.num_variables() + 2);
                     assert(pk.B_query.domain_size() == qap_wit.num_variables() + 2);
@@ -1295,85 +1241,68 @@ namespace nil {
                     const std::size_t chunks = 1;
 #endif
 
-                    algebra::enter_block("Compute the proof");
 
-                    algebra::enter_block("Compute answer to A-query", false);
-                    g_A = g_A + kc_multi_exp_with_mixed_addition<algebra::G1<snark_pp<CurveType>>, algebra::G1<snark_pp<CurveType>>,
-                                                                 algebra::Fr<snark_pp<CurveType>>,
+                    g_A = g_A + kc_multi_exp_with_mixed_addition<CurveType::g1_type, CurveType::g1_type,
+                                                                 CurveType::scalar_field_type,
                                                                  algebra::multi_exp_method_bos_coster>(
                                     pk.A_query, 1 + qap_wit.num_inputs(), 1 + qap_wit.num_variables(),
                                     qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_inputs(),
                                     qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_variables(), chunks);
-                    algebra::leave_block("Compute answer to A-query", false);
 
-                    algebra::enter_block("Compute answer to Ain-query", false);
                     g_Ain =
-                        g_Ain + kc_multi_exp_with_mixed_addition<algebra::G1<snark_pp<CurveType>>, algebra::G1<snark_pp<CurveType>>,
-                                                                 algebra::Fr<snark_pp<CurveType>>,
+                        g_Ain + kc_multi_exp_with_mixed_addition<CurveType::g1_type, CurveType::g1_type,
+                                                                 CurveType::scalar_field_type,
                                                                  algebra::multi_exp_method_bos_coster>(
                                     pk.A_query, 1, 1 + qap_wit.num_inputs(), qap_wit.coefficients_for_ABCs.begin(),
                                     qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_inputs(), chunks);
                     // std :: cout << "The input proof term: " << g_Ain << "\n";
-                    algebra::leave_block("Compute answer to Ain-query", false);
 
-                    algebra::enter_block("Compute answer to B-query", false);
-                    g_B = g_B + kc_multi_exp_with_mixed_addition<algebra::G2<snark_pp<CurveType>>, algebra::G1<snark_pp<CurveType>>,
-                                                                 algebra::Fr<snark_pp<CurveType>>,
+                    g_B = g_B + kc_multi_exp_with_mixed_addition<CurveType::g2_type, CurveType::g1_type,
+                                                                 CurveType::scalar_field_type,
                                                                  algebra::multi_exp_method_bos_coster>(
                                     pk.B_query, 1, 1 + qap_wit.num_variables(), qap_wit.coefficients_for_ABCs.begin(),
                                     qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_variables(), chunks);
-                    algebra::leave_block("Compute answer to B-query", false);
 
-                    algebra::enter_block("Compute answer to C-query", false);
-                    g_C = g_C + kc_multi_exp_with_mixed_addition<algebra::G1<snark_pp<CurveType>>, algebra::G1<snark_pp<CurveType>>,
-                                                                 algebra::Fr<snark_pp<CurveType>>,
+                    g_C = g_C + kc_multi_exp_with_mixed_addition<CurveType::g1_type, CurveType::g1_type,
+                                                                 CurveType::scalar_field_type,
                                                                  algebra::multi_exp_method_bos_coster>(
                                     pk.C_query, 1, 1 + qap_wit.num_variables(), qap_wit.coefficients_for_ABCs.begin(),
                                     qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_variables(), chunks);
-                    algebra::leave_block("Compute answer to C-query", false);
 
-                    algebra::enter_block("Compute answer to H-query", false);
-                    g_H = g_H + algebra::multi_exp<algebra::G1<snark_pp<CurveType>>, algebra::Fr<snark_pp<CurveType>>,
+                    g_H = g_H + algebra::multi_exp<CurveType::g1_type, CurveType::scalar_field_type,
                                                    algebra::multi_exp_method_BDLO12>(
                                     pk.H_query.begin(),
                                     pk.H_query.begin() + qap_wit.degree() + 1,
                                     qap_wit.coefficients_for_H.begin(),
                                     qap_wit.coefficients_for_H.begin() + qap_wit.degree() + 1,
                                     chunks);
-                    algebra::leave_block("Compute answer to H-query", false);
 
-                    algebra::enter_block("Compute answer to K-query", false);
                     g_K = g_K +
-                          algebra::multi_exp_with_mixed_addition<algebra::G1<snark_pp<CurveType>>, algebra::Fr<snark_pp<CurveType>>,
+                          algebra::multi_exp_with_mixed_addition<CurveType::g1_type, CurveType::scalar_field_type,
                                                                  algebra::multi_exp_method_bos_coster>(
                               pk.K_query.begin() + 1,
                               pk.K_query.begin() + 1 + qap_wit.num_variables(),
                               qap_wit.coefficients_for_ABCs.begin(),
                               qap_wit.coefficients_for_ABCs.begin() + qap_wit.num_variables(),
                               chunks);
-                    algebra::leave_block("Compute answer to K-query", false);
 
-                    algebra::enter_block("Compute extra auth terms", false);
-                    std::vector<algebra::Fr<snark_pp<CurveType>>> mus;
-                    std::vector<algebra::G1<snark_pp<CurveType>>> Ains;
+                    std::vector<CurveType> mus::scalar_field_type;
+                    std::vector<CurveType::g1_type> Ains;
                     mus.reserve(qap_wit.num_inputs());
                     Ains.reserve(qap_wit.num_inputs());
                     for (std::size_t i = 0; i < qap_wit.num_inputs(); i++) {
                         mus.emplace_back(auth_data[i].mu);
                         Ains.emplace_back(pk.A_query[i + 1].g);
                     }
-                    algebra::G1<snark_pp<CurveType>> muA = dauth * pk.rA_i_Z_g1;
-                    muA = muA + algebra::multi_exp<algebra::G1<snark_pp<CurveType>>, algebra::Fr<snark_pp<CurveType>>,
+                    CurveType::g1_type muA = dauth * pk.rA_i_Z_g1;
+                    muA = muA + algebra::multi_exp<CurveType::g1_type, CurveType::scalar_field_type,
                                                    algebra::multi_exp_method_bos_coster>(
                                     Ains.begin(), Ains.begin() + qap_wit.num_inputs(), mus.begin(),
                                     mus.begin() + qap_wit.num_inputs(), chunks);
 
                     // To Do: Decide whether to include relevant parts of auth_data in proof
-                    algebra::leave_block("Compute extra auth terms", false);
 
-                    algebra::leave_block("Compute the proof");
 
-                    algebra::leave_block("Call to r1cs_ppzkadsnark_prover");
 
                     r1cs_ppzkadsnark_proof<CurveType> proof = r1cs_ppzkadsnark_proof<CurveType>(std::move(g_A),
                                                                                     std::move(g_B),
@@ -1390,10 +1319,9 @@ namespace nil {
                 template<typename CurveType>
                 r1cs_ppzkadsnark_processed_verification_key<CurveType>
                     r1cs_ppzkadsnark_verifier_process_vk(const r1cs_ppzkadsnark_verification_key<CurveType> &vk) {
-                    algebra::enter_block("Call to r1cs_ppzkadsnark_verifier_process_vk");
 
                     r1cs_ppzkadsnark_processed_verification_key<CurveType> pvk;
-                    pvk.pp_G2_one_precomp = snark_pp<CurveType>::precompute_G2(algebra::G2<snark_pp<CurveType>>::one());
+                    pvk.pp_G2_one_precomp = snark_pp<CurveType>::precompute_G2(CurveType::g2_type::one());
                     pvk.vk_alphaA_g2_precomp = snark_pp<CurveType>::precompute_G2(vk.alphaA_g2);
                     pvk.vk_alphaB_g1_precomp = snark_pp<CurveType>::precompute_G1(vk.alphaB_g1);
                     pvk.vk_alphaC_g2_precomp = snark_pp<CurveType>::precompute_G2(vk.alphaC_g2);
@@ -1402,10 +1330,9 @@ namespace nil {
                     pvk.vk_gamma_beta_g1_precomp = snark_pp<CurveType>::precompute_G1(vk.gamma_beta_g1);
                     pvk.vk_gamma_beta_g2_precomp = snark_pp<CurveType>::precompute_G2(vk.gamma_beta_g2);
 
-                    algebra::enter_block("Pre-processing for additional auth elements");
                     algebra::G2_precomp<snark_pp<CurveType>> vk_rC_z_g2_precomp = snark_pp<CurveType>::precompute_G2(vk.rC_Z_g2);
 
-                    pvk.A0 = algebra::G1<snark_pp<CurveType>>(vk.A0);
+                    pvk.A0 = CurveType::g1_type(vk.A0);
                     pvk.Ain = algebra::G1_vector<snark_pp<CurveType>>(vk.Ain);
 
                     pvk.proof_g_vki_precomp.reserve(pvk.Ain.size());
@@ -1413,9 +1340,7 @@ namespace nil {
                         pvk.proof_g_vki_precomp.emplace_back(snark_pp<CurveType>::precompute_G1(pvk.Ain[i]));
                     }
 
-                    algebra::leave_block("Pre-processing for additional auth elements");
 
-                    algebra::leave_block("Call to r1cs_ppzkadsnark_verifier_process_vk");
 
                     return pvk;
                 }
@@ -1427,31 +1352,20 @@ namespace nil {
                                                       const r1cs_ppzkadsnark_sec_auth_key<CurveType> &sak,
                                                       const std::vector<labelT> &labels) {
                     bool result = true;
-                    algebra::enter_block("Call to r1cs_ppzkadsnark_online_verifier");
 
-                    algebra::enter_block("Check if the proof is well-formed");
                     if (!proof.is_well_formed()) {
-                        if (!algebra::inhibit_profiling_info) {
-                            algebra::print_indent();
-                            printf("At least one of the proof elements does not lie on the curve.\n");
-                        }
                         result = false;
                     }
-                    algebra::leave_block("Check if the proof is well-formed");
 
-                    algebra::enter_block("Checking auth-specific elements");
 
-                    algebra::enter_block("Checking A1");
 
-                    algebra::enter_block("Compute PRFs");
-                    std::vector<algebra::Fr<snark_pp<CurveType>>> lambdas;
+                    std::vector<CurveType> lambdas::scalar_field_type;
                     lambdas.reserve(labels.size());
                     for (std::size_t i = 0; i < labels.size(); i++) {
                         lambdas.emplace_back(prfCompute<CurveType>(sak.S, labels[i]));
                     }
-                    algebra::leave_block("Compute PRFs");
-                    algebra::G1<snark_pp<CurveType>> prodA = sak.i * proof.g_Aau.g;
-                    prodA = prodA + algebra::multi_exp<algebra::G1<snark_pp<CurveType>>, algebra::Fr<snark_pp<CurveType>>,
+                    CurveType::g1_type prodA = sak.i * proof.g_Aau.g;
+                    prodA = prodA + algebra::multi_exp<CurveType::g1_type, CurveType::scalar_field_type,
                                                        algebra::multi_exp_method_bos_coster>(
                                         pvk.Ain.begin(), pvk.Ain.begin() + labels.size(), lambdas.begin(),
                                         lambdas.begin() + labels.size(), 1);
@@ -1459,16 +1373,9 @@ namespace nil {
                     bool result_auth = true;
 
                     if (!(prodA == proof.muA)) {
-                        if (!algebra::inhibit_profiling_info) {
-                            algebra::print_indent();
-                            printf("Authentication check failed.\n");
-                        }
                         result_auth = false;
                     }
 
-                    algebra::leave_block("Checking A1");
-
-                    algebra::enter_block("Checking A2");
                     algebra::G1_precomp<snark_pp<CurveType>> proof_g_Aau_g_precomp =
                         snark_pp<CurveType>::precompute_G1(proof.g_Aau.g);
                     algebra::G1_precomp<snark_pp<CurveType>> proof_g_Aau_h_precomp =
@@ -1480,20 +1387,11 @@ namespace nil {
                     algebra::GT<snark_pp<CurveType>> kc_Aau =
                         snark_pp<CurveType>::final_exponentiation(kc_Aau_1 * kc_Aau_2.unitary_inverse());
                     if (kc_Aau != algebra::GT<snark_pp<CurveType>>::one()) {
-                        if (!algebra::inhibit_profiling_info) {
-                            algebra::print_indent();
-                            printf("Knowledge commitment for Aau query incorrect.\n");
-                        }
                         result_auth = false;
                     }
-                    algebra::leave_block("Checking A2");
-
-                    algebra::leave_block("Checking auth-specific elements");
 
                     result &= result_auth;
 
-                    algebra::enter_block("Online pairing computations");
-                    algebra::enter_block("Check knowledge commitment for A is valid");
                     algebra::G1_precomp<snark_pp<CurveType>> proof_g_A_g_precomp = snark_pp<CurveType>::precompute_G1(proof.g_A.g);
                     algebra::G1_precomp<snark_pp<CurveType>> proof_g_A_h_precomp = snark_pp<CurveType>::precompute_G1(proof.g_A.h);
                     algebra::Fqk<snark_pp<CurveType>> kc_A_1 =
@@ -1503,15 +1401,9 @@ namespace nil {
                     algebra::GT<snark_pp<CurveType>> kc_A =
                         snark_pp<CurveType>::final_exponentiation(kc_A_1 * kc_A_2.unitary_inverse());
                     if (kc_A != algebra::GT<snark_pp<CurveType>>::one()) {
-                        if (!algebra::inhibit_profiling_info) {
-                            algebra::print_indent();
-                            printf("Knowledge commitment for A query incorrect.\n");
-                        }
                         result = false;
                     }
-                    algebra::leave_block("Check knowledge commitment for A is valid");
 
-                    algebra::enter_block("Check knowledge commitment for B is valid");
                     algebra::G2_precomp<snark_pp<CurveType>> proof_g_B_g_precomp = snark_pp<CurveType>::precompute_G2(proof.g_B.g);
                     algebra::G1_precomp<snark_pp<CurveType>> proof_g_B_h_precomp = snark_pp<CurveType>::precompute_G1(proof.g_B.h);
                     algebra::Fqk<snark_pp<CurveType>> kc_B_1 =
@@ -1521,15 +1413,9 @@ namespace nil {
                     algebra::GT<snark_pp<CurveType>> kc_B =
                         snark_pp<CurveType>::final_exponentiation(kc_B_1 * kc_B_2.unitary_inverse());
                     if (kc_B != algebra::GT<snark_pp<CurveType>>::one()) {
-                        if (!algebra::inhibit_profiling_info) {
-                            algebra::print_indent();
-                            printf("Knowledge commitment for B query incorrect.\n");
-                        }
                         result = false;
                     }
-                    algebra::leave_block("Check knowledge commitment for B is valid");
 
-                    algebra::enter_block("Check knowledge commitment for C is valid");
                     algebra::G1_precomp<snark_pp<CurveType>> proof_g_C_g_precomp = snark_pp<CurveType>::precompute_G1(proof.g_C.g);
                     algebra::G1_precomp<snark_pp<CurveType>> proof_g_C_h_precomp = snark_pp<CurveType>::precompute_G1(proof.g_C.h);
                     algebra::Fqk<snark_pp<CurveType>> kc_C_1 =
@@ -1539,17 +1425,11 @@ namespace nil {
                     algebra::GT<snark_pp<CurveType>> kc_C =
                         snark_pp<CurveType>::final_exponentiation(kc_C_1 * kc_C_2.unitary_inverse());
                     if (kc_C != algebra::GT<snark_pp<CurveType>>::one()) {
-                        if (!algebra::inhibit_profiling_info) {
-                            algebra::print_indent();
-                            printf("Knowledge commitment for C query incorrect.\n");
-                        }
                         result = false;
                     }
-                    algebra::leave_block("Check knowledge commitment for C is valid");
 
-                    algebra::G1<snark_pp<CurveType>> Aacc = pvk.A0 + proof.g_Aau.g + proof.g_A.g;
+                    CurveType::g1_type Aacc = pvk.A0 + proof.g_Aau.g + proof.g_A.g;
 
-                    algebra::enter_block("Check QAP divisibility");
                     algebra::G1_precomp<snark_pp<CurveType>> proof_g_Aacc_precomp = snark_pp<CurveType>::precompute_G1(Aacc);
                     algebra::G1_precomp<snark_pp<CurveType>> proof_g_H_precomp = snark_pp<CurveType>::precompute_G1(proof.g_H);
                     algebra::Fqk<snark_pp<CurveType>> QAP_1 =
@@ -1559,15 +1439,9 @@ namespace nil {
                     algebra::GT<snark_pp<CurveType>> QAP =
                         snark_pp<CurveType>::final_exponentiation(QAP_1 * QAP_23.unitary_inverse());
                     if (QAP != algebra::GT<snark_pp<CurveType>>::one()) {
-                        if (!algebra::inhibit_profiling_info) {
-                            algebra::print_indent();
-                            printf("QAP divisibility check failed.\n");
-                        }
                         result = false;
                     }
-                    algebra::leave_block("Check QAP divisibility");
 
-                    algebra::enter_block("Check same coefficients were used");
                     algebra::G1_precomp<snark_pp<CurveType>> proof_g_K_precomp = snark_pp<CurveType>::precompute_G1(proof.g_K);
                     algebra::G1_precomp<snark_pp<CurveType>> proof_g_Aacc_C_precomp =
                         snark_pp<CurveType>::precompute_G1(Aacc + proof.g_C.g);
@@ -1578,15 +1452,8 @@ namespace nil {
                                                           pvk.vk_gamma_beta_g1_precomp, proof_g_B_g_precomp);
                     algebra::GT<snark_pp<CurveType>> K = snark_pp<CurveType>::final_exponentiation(K_1 * K_23.unitary_inverse());
                     if (K != algebra::GT<snark_pp<CurveType>>::one()) {
-                        if (!algebra::inhibit_profiling_info) {
-                            algebra::print_indent();
-                            printf("Same-coefficient check failed.\n");
-                        }
                         result = false;
                     }
-                    algebra::leave_block("Check same coefficients were used");
-                    algebra::leave_block("Online pairing computations");
-                    algebra::leave_block("Call to r1cs_ppzkadsnark_online_verifier");
 
                     return result;
                 }
@@ -1596,11 +1463,9 @@ namespace nil {
                                                const r1cs_ppzkadsnark_proof<CurveType> &proof,
                                                const r1cs_ppzkadsnark_sec_auth_key<CurveType> &sak,
                                                const std::vector<labelT> &labels) {
-                    algebra::enter_block("Call to r1cs_ppzkadsnark_verifier");
                     r1cs_ppzkadsnark_processed_verification_key<CurveType> pvk =
                         r1cs_ppzkadsnark_verifier_process_vk<CurveType>(vk);
                     bool result = r1cs_ppzkadsnark_online_verifier<CurveType>(pvk, proof, sak, labels);
-                    algebra::leave_block("Call to r1cs_ppzkadsnark_verifier");
                     return result;
                 }
 
@@ -1612,25 +1477,15 @@ namespace nil {
                                                       const r1cs_ppzkadsnark_pub_auth_key<CurveType> &pak,
                                                       const std::vector<labelT> &labels) {
                     bool result = true;
-                    algebra::enter_block("Call to r1cs_ppzkadsnark_online_verifier");
 
-                    algebra::enter_block("Check if the proof is well-formed");
                     if (!proof.is_well_formed()) {
-                        if (!algebra::inhibit_profiling_info) {
-                            algebra::print_indent();
-                            printf("At least one of the proof elements does not lie on the curve.\n");
-                        }
                         result = false;
                     }
-                    algebra::leave_block("Check if the proof is well-formed");
 
-                    algebra::enter_block("Checking auth-specific elements");
                     assert(labels.size() == auth_data.size());
 
-                    algebra::enter_block("Checking A1");
 
-                    algebra::enter_block("Checking signatures");
-                    std::vector<algebra::G2<snark_pp<CurveType>>> Lambdas;
+                    std::vector<CurveType::g2_type> Lambdas;
                     std::vector<r1cs_ppzkadsnark_sigT<CurveType>> sigs;
                     Lambdas.reserve(labels.size());
                     sigs.reserve(labels.size());
@@ -1640,15 +1495,10 @@ namespace nil {
                     }
                     bool result_auth = sigBatchVerif<CurveType>(pak.vkp, labels, Lambdas, sigs);
                     if (!result_auth) {
-                        if (!algebra::inhibit_profiling_info) {
-                            algebra::print_indent();
-                            printf("Auth sig check failed.\n");
-                        }
+
                     }
 
-                    algebra::leave_block("Checking signatures");
 
-                    algebra::enter_block("Checking pairings");
                     // To Do: Decide whether to move pak and lambda preprocessing to offline
                     std::vector<algebra::G2_precomp<snark_pp<CurveType>>> g_Lambdas_precomp;
                     g_Lambdas_precomp.reserve(auth_data.size());
@@ -1656,7 +1506,6 @@ namespace nil {
                         g_Lambdas_precomp.emplace_back(snark_pp<CurveType>::precompute_G2(auth_data[i].Lambda));
                     algebra::G2_precomp<snark_pp<CurveType>> g_minusi_precomp = snark_pp<CurveType>::precompute_G2(pak.minusI2);
 
-                    algebra::enter_block("Computation");
                     algebra::Fqk<snark_pp<CurveType>> accum;
                     if (auth_data.size() % 2 == 1) {
                         accum = snark_pp<CurveType>::miller_loop(pvk.proof_g_vki_precomp[0], g_Lambdas_precomp[0]);
@@ -1676,25 +1525,14 @@ namespace nil {
                     algebra::GT<snark_pp<CurveType>> authPair =
                         snark_pp<CurveType>::final_exponentiation(accum * accum2.unitary_inverse());
                     if (authPair != algebra::GT<snark_pp<CurveType>>::one()) {
-                        if (!algebra::inhibit_profiling_info) {
-                            algebra::print_indent();
-                            printf("Auth pairing check failed.\n");
-                        }
                         result_auth = false;
                     }
-                    algebra::leave_block("Computation");
-                    algebra::leave_block("Checking pairings");
 
                     if (!(result_auth)) {
-                        if (!algebra::inhibit_profiling_info) {
-                            algebra::print_indent();
-                            printf("Authentication check failed.\n");
-                        }
+
                     }
 
-                    algebra::leave_block("Checking A1");
 
-                    algebra::enter_block("Checking A2");
                     algebra::G1_precomp<snark_pp<CurveType>> proof_g_Aau_g_precomp =
                         snark_pp<CurveType>::precompute_G1(proof.g_Aau.g);
                     algebra::G1_precomp<snark_pp<CurveType>> proof_g_Aau_h_precomp =
@@ -1706,20 +1544,12 @@ namespace nil {
                     algebra::GT<snark_pp<CurveType>> kc_Aau =
                         snark_pp<CurveType>::final_exponentiation(kc_Aau_1 * kc_Aau_2.unitary_inverse());
                     if (kc_Aau != algebra::GT<snark_pp<CurveType>>::one()) {
-                        if (!algebra::inhibit_profiling_info) {
-                            algebra::print_indent();
-                            printf("Knowledge commitment for Aau query incorrect.\n");
-                        }
                         result_auth = false;
                     }
-                    algebra::leave_block("Checking A2");
 
-                    algebra::leave_block("Checking auth-specific elements");
 
                     result &= result_auth;
 
-                    algebra::enter_block("Online pairing computations");
-                    algebra::enter_block("Check knowledge commitment for A is valid");
                     algebra::G1_precomp<snark_pp<CurveType>> proof_g_A_g_precomp = snark_pp<CurveType>::precompute_G1(proof.g_A.g);
                     algebra::G1_precomp<snark_pp<CurveType>> proof_g_A_h_precomp = snark_pp<CurveType>::precompute_G1(proof.g_A.h);
                     algebra::Fqk<snark_pp<CurveType>> kc_A_1 =
@@ -1729,15 +1559,9 @@ namespace nil {
                     algebra::GT<snark_pp<CurveType>> kc_A =
                         snark_pp<CurveType>::final_exponentiation(kc_A_1 * kc_A_2.unitary_inverse());
                     if (kc_A != algebra::GT<snark_pp<CurveType>>::one()) {
-                        if (!algebra::inhibit_profiling_info) {
-                            algebra::print_indent();
-                            printf("Knowledge commitment for A query incorrect.\n");
-                        }
                         result = false;
                     }
-                    algebra::leave_block("Check knowledge commitment for A is valid");
 
-                    algebra::enter_block("Check knowledge commitment for B is valid");
                     algebra::G2_precomp<snark_pp<CurveType>> proof_g_B_g_precomp = snark_pp<CurveType>::precompute_G2(proof.g_B.g);
                     algebra::G1_precomp<snark_pp<CurveType>> proof_g_B_h_precomp = snark_pp<CurveType>::precompute_G1(proof.g_B.h);
                     algebra::Fqk<snark_pp<CurveType>> kc_B_1 =
@@ -1747,15 +1571,9 @@ namespace nil {
                     algebra::GT<snark_pp<CurveType>> kc_B =
                         snark_pp<CurveType>::final_exponentiation(kc_B_1 * kc_B_2.unitary_inverse());
                     if (kc_B != algebra::GT<snark_pp<CurveType>>::one()) {
-                        if (!algebra::inhibit_profiling_info) {
-                            algebra::print_indent();
-                            printf("Knowledge commitment for B query incorrect.\n");
-                        }
                         result = false;
                     }
-                    algebra::leave_block("Check knowledge commitment for B is valid");
 
-                    algebra::enter_block("Check knowledge commitment for C is valid");
                     algebra::G1_precomp<snark_pp<CurveType>> proof_g_C_g_precomp = snark_pp<CurveType>::precompute_G1(proof.g_C.g);
                     algebra::G1_precomp<snark_pp<CurveType>> proof_g_C_h_precomp = snark_pp<CurveType>::precompute_G1(proof.g_C.h);
                     algebra::Fqk<snark_pp<CurveType>> kc_C_1 =
@@ -1765,17 +1583,11 @@ namespace nil {
                     algebra::GT<snark_pp<CurveType>> kc_C =
                         snark_pp<CurveType>::final_exponentiation(kc_C_1 * kc_C_2.unitary_inverse());
                     if (kc_C != algebra::GT<snark_pp<CurveType>>::one()) {
-                        if (!algebra::inhibit_profiling_info) {
-                            algebra::print_indent();
-                            printf("Knowledge commitment for C query incorrect.\n");
-                        }
                         result = false;
                     }
-                    algebra::leave_block("Check knowledge commitment for C is valid");
 
-                    algebra::G1<snark_pp<CurveType>> Aacc = pvk.A0 + proof.g_Aau.g + proof.g_A.g;
+                    CurveType::g1_type Aacc = pvk.A0 + proof.g_Aau.g + proof.g_A.g;
 
-                    algebra::enter_block("Check QAP divisibility");
                     algebra::G1_precomp<snark_pp<CurveType>> proof_g_Aacc_precomp = snark_pp<CurveType>::precompute_G1(Aacc);
                     algebra::G1_precomp<snark_pp<CurveType>> proof_g_H_precomp = snark_pp<CurveType>::precompute_G1(proof.g_H);
                     algebra::Fqk<snark_pp<CurveType>> QAP_1 =
@@ -1785,15 +1597,9 @@ namespace nil {
                     algebra::GT<snark_pp<CurveType>> QAP =
                         snark_pp<CurveType>::final_exponentiation(QAP_1 * QAP_23.unitary_inverse());
                     if (QAP != algebra::GT<snark_pp<CurveType>>::one()) {
-                        if (!algebra::inhibit_profiling_info) {
-                            algebra::print_indent();
-                            printf("QAP divisibility check failed.\n");
-                        }
                         result = false;
                     }
-                    algebra::leave_block("Check QAP divisibility");
 
-                    algebra::enter_block("Check same coefficients were used");
                     algebra::G1_precomp<snark_pp<CurveType>> proof_g_K_precomp = snark_pp<CurveType>::precompute_G1(proof.g_K);
                     algebra::G1_precomp<snark_pp<CurveType>> proof_g_Aacc_C_precomp =
                         snark_pp<CurveType>::precompute_G1(Aacc + proof.g_C.g);
@@ -1804,15 +1610,8 @@ namespace nil {
                                                           pvk.vk_gamma_beta_g1_precomp, proof_g_B_g_precomp);
                     algebra::GT<snark_pp<CurveType>> K = snark_pp<CurveType>::final_exponentiation(K_1 * K_23.unitary_inverse());
                     if (K != algebra::GT<snark_pp<CurveType>>::one()) {
-                        if (!algebra::inhibit_profiling_info) {
-                            algebra::print_indent();
-                            printf("Same-coefficient check failed.\n");
-                        }
                         result = false;
                     }
-                    algebra::leave_block("Check same coefficients were used");
-                    algebra::leave_block("Online pairing computations");
-                    algebra::leave_block("Call to r1cs_ppzkadsnark_online_verifier");
 
                     return result;
                 }
@@ -1825,11 +1624,9 @@ namespace nil {
                                                const r1cs_ppzkadsnark_pub_auth_key<CurveType> &pak,
                                                const std::vector<labelT> &labels) {
                     assert(labels.size() == auth_data.size());
-                    algebra::enter_block("Call to r1cs_ppzkadsnark_verifier");
                     r1cs_ppzkadsnark_processed_verification_key<CurveType> pvk =
                         r1cs_ppzkadsnark_verifier_process_vk<CurveType>(vk);
                     bool result = r1cs_ppzkadsnark_online_verifier<CurveType>(pvk, auth_data, proof, pak, labels);
-                    algebra::leave_block("Call to r1cs_ppzkadsnark_verifier");
                     return result;
                 }
 
