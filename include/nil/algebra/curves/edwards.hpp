@@ -56,8 +56,8 @@ namespace nil {
 
                 typedef typename detail::element_curve_weierstrass<base_field_type::value_type> value_type;
 
-                typedef typename detail::edwards_g1<detail::pairing_params<edwards<183>>> g1_type;
-                typedef typename detail::edwards_g2<detail::pairing_params<edwards<183>>> g2_type;
+                typedef typename detail::edwards_g1<183> g1_type;
+                typedef typename detail::edwards_g2<183> g2_type;
 
                 constexpr static const number_type p = base_field_modulus;
                 constexpr static const number_type q = scalar_field_modulus;

@@ -22,7 +22,7 @@ namespace nil {
         namespace curves {
             namespace detail {
 
-                template<typename PairingParams>
+                template<std::size_t ModulusBits>
                 struct mnt4_g1 {
 
                     using policy_type = mnt4<ModulusBits>;

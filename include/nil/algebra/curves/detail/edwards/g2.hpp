@@ -20,7 +20,7 @@ namespace nil {
         namespace curves {
             namespace detail {
 
-                template<typename PairingParams>
+                template<std::size_t ModulusBits>
                 struct edwards_g2 {
                     
                     using policy_type = edwards<ModulusBits>;
