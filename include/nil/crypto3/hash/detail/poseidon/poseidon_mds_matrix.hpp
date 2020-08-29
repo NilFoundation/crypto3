@@ -117,7 +117,7 @@ namespace nil {
                     static inline const equivalent_mds_matrix_type &get_equivalent_mds_matrix() {
                         static const equivalent_mds_matrix_type equivalent_mds_matrix = [](){
                             using namespace boost::numeric::ublas;
-                            const mds_matrix_type mds_matrix = get_mds_matrix();
+                            const mds_matrix_type &mds_matrix = get_mds_matrix();
                             mds_matrix_type M_mul(mds_matrix);
                             mds_matrix_type M_i(identity_matrix<ElementType>(M_mul.size1()));
                             mds_matrix_type M_hat_inverse(state_words - 1, state_words - 1);
