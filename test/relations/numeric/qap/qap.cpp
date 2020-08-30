@@ -20,6 +20,8 @@
 #include <nil/crypto3/zk/snark/reductions/r1cs_to_qap/r1cs_to_qap.hpp>
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs/r1cs.hpp>
 
+#include <nil/algebra/utils/random_element.hpp>
+
 using namespace nil::crypto3::zk::snark;
 
 template<typename FieldType>

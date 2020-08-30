@@ -7,10 +7,12 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef SIMPLE_EXAMPLE_HPP_
-#define SIMPLE_EXAMPLE_HPP_
+#ifndef CRYPTO3_SIMPLE_EXAMPLE_HPP
+#define CRYPTO3_SIMPLE_EXAMPLE_HPP
 
 #include "relations/constraint_satisfaction_problems/r1cs/examples/r1cs_examples.hpp"
+
+#include <nil/algebra/utils/random_element.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -58,4 +60,4 @@ namespace nil {
     }        // namespace crypto3
 }    // namespace nil
 
-#endif    // SIMPLE_EXAMPLE_HPP_
+#endif    // CRYPTO3_SIMPLE_EXAMPLE_HPP

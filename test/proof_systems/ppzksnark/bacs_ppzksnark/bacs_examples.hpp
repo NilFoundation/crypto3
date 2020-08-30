@@ -10,10 +10,12 @@
 // BACS examples with prescribed parameters (according to some distribution).
 //---------------------------------------------------------------------------//
 
-#ifndef BACS_EXAMPLES_HPP_
-#define BACS_EXAMPLES_HPP_
+#ifndef CRYPTO3_BACS_EXAMPLES_HPP
+#define CRYPTO3_BACS_EXAMPLES_HPP
 
 #include <nil/crypto3/zk/snark/relations/circuit_satisfaction_problems/bacs/bacs.hpp>
+
+#include <nil/algebra/utils/random_element.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -139,4 +141,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // BACS_EXAMPLES_HPP_
+#endif    // CRYPTO3_BACS_EXAMPLES_HPP

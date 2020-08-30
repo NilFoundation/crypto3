@@ -20,14 +20,16 @@
 // <https://eprint.iacr.org/2017/540>
 //---------------------------------------------------------------------------//
 
-#ifndef SAP_HPP_
-#define SAP_HPP_
+#ifndef CRYPTO3_SAP_HPP
+#define CRYPTO3_SAP_HPP
 
 #include <map>
 #include <memory>
 
-#include <nil/algebra/scalar_multiplication/multiexp.hpp>
+#include <nil/algebra/multiexp/multiexp.hpp>
 #include <nil/algebra/fft/evaluation_domain.hpp>
+
+#include <nil/algebra/utils/random_element.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -422,4 +424,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // SAP_HPP_
+#endif    // CRYPTO3_SAP_HPP

@@ -20,6 +20,8 @@
 #include <nil/crypto3/zk/snark/reductions/uscs_to_ssp/uscs_to_ssp.hpp>
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/uscs/uscs.hpp>
 
+#include <nil/algebra/utils/random_element.hpp>
+
 #include "uscs_examples.hpp"
 
 using namespace nil::crypto3::zk::snark;

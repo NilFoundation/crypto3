@@ -40,8 +40,8 @@
 // <http://eprint.iacr.org/2014/617>
 //---------------------------------------------------------------------------//
 
-#ifndef R1CS_PPZKADSNARK_HPP_
-#define R1CS_PPZKADSNARK_HPP_
+#ifndef CRYPTO3_R1CS_PPZKADSNARK_HPP
+#define CRYPTO3_R1CS_PPZKADSNARK_HPP
 
 #include <memory>
 
@@ -52,9 +52,9 @@
 #include <nil/crypto3/zk/snark/proof_systems/ppzkadsnark/r1cs_ppzkadsnark/r1cs_ppzkadsnark_prf.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/ppzkadsnark/r1cs_ppzkadsnark/r1cs_ppzkadsnark_signature.hpp>
 
-#include <nil/algebra/scalar_multiplication/multiexp.hpp>
-#include <nil/algebra/common/profiling.hpp>
-#include <nil/algebra/common/utils.hpp>
+#include <nil/algebra/multiexp/multiexp.hpp>
+
+#include <nil/algebra/utils/random_element.hpp>
 
 #ifdef MULTICORE
 #include <omp.h>
@@ -1041,7 +1041,7 @@ namespace nil {
                     cs_copy.swap_AB_if_beneficial();
 
                     /* draw random element at which the QAP is evaluated */
-                    const CurveType t = random_element<CurveType>()::scalar_field_type;
+                    const CurveType t = random_element<CurveType::scalar_field_type>();
 
                     qap_instance_evaluation<CurveType::scalar_field_type::value_type> qap_inst =
                         r1cs_to_qap_instance_map_with_evaluation(cs_copy, t);
@@ -1641,4 +1641,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // R1CS_PPZKSNARK_HPP_
+#endif    // CRYPTO3_R1CS_PPZKADSNARK_HPP

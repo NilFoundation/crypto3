@@ -19,13 +19,16 @@
 // <http://eprint.iacr.org/2012/215>
 //---------------------------------------------------------------------------//
 
-#ifndef QAP_HPP_
-#define QAP_HPP_
+#ifndef CRYPTO3_QAP_HPP
+#define CRYPTO3_QAP_HPP
 
 #include <map>
 #include <memory>
 
-#include <nil/algebra/scalar_multiplication/multiexp.hpp>
+#include <nil/algebra/multiexp/multiexp.hpp>
+
+#include <nil/algebra/utils/random_element.hpp>
+
 #include <nil/algebra/fft/evaluation_domain.hpp>
 
 namespace nil {
@@ -702,4 +705,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // QAP_HPP_
+#endif    // CRYPTO3_QAP_HPP

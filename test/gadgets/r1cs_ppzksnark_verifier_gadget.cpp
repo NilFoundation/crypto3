@@ -14,6 +14,8 @@
 #include <nil/algebra/curves/mnt4.hpp>
 #include <nil/algebra/curves/mnt6.hpp>
 
+#include <nil/algebra/utils/random_element.hpp>
+
 #include <nil/crypto3/zk/snark/gadgets/fields/fp2_gadgets.hpp>
 #include <nil/crypto3/zk/snark/gadgets/fields/fp3_gadgets.hpp>
 #include <nil/crypto3/zk/snark/gadgets/fields/fp4_gadgets.hpp>

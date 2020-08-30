@@ -43,8 +43,8 @@
 // <http://eprint.iacr.org/2014/718>
 //---------------------------------------------------------------------------//
 
-#ifndef USCS_PPZKSNARK_HPP_
-#define USCS_PPZKSNARK_HPP_
+#ifndef CRYPTO3_USCS_PPZKSNARK_HPP
+#define CRYPTO3_USCS_PPZKSNARK_HPP
 
 #include <memory>
 
@@ -53,7 +53,9 @@
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/uscs/uscs.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/uscs_ppzksnark/uscs_ppzksnark_params.hpp>
 
-#include <nil/algebra/scalar_multiplication/multiexp.hpp>
+#include <nil/algebra/multiexp/multiexp.hpp>
+
+#include <nil/algebra/utils/random_element.hpp>
 
 #ifdef MULTICORE
 #include <omp.h>
@@ -843,4 +845,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // USCS_PPZKSNARK_HPP_
+#endif    // CRYPTO3_USCS_PPZKSNARK_HPP

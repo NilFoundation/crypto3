@@ -37,8 +37,8 @@
 // <https://eprint.iacr.org/2016/260>
 //---------------------------------------------------------------------------//
 
-#ifndef R1CS_GG_PPZKSNARK_HPP_
-#define R1CS_GG_PPZKSNARK_HPP_
+#ifndef CRYPTO3_R1CS_GG_PPZKSNARK_HPP
+#define CRYPTO3_R1CS_GG_PPZKSNARK_HPP
 
 #include <memory>
 
@@ -48,6 +48,8 @@
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_gg_ppzksnark/r1cs_gg_ppzksnark_params.hpp>
 
 #include <nil/algebra/multiexp/default.hpp>
+
+#include <nil/algebra/utils/random_element.hpp>
 
 #ifdef MULTICORE
 #include <omp.h>
@@ -965,4 +967,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // R1CS_GG_PPZKSNARK_HPP_
+#endif    // CRYPTO3_R1CS_GG_PPZKSNARK_HPP

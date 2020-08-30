@@ -10,10 +10,12 @@
 // R1CS examples with prescribed parameters (according to some distribution).
 //---------------------------------------------------------------------------//
 
-#ifndef R1CS_EXAMPLES_HPP_
-#define R1CS_EXAMPLES_HPP_
+#ifndef CRYPTO3_R1CS_EXAMPLES_HPP
+#define CRYPTO3_R1CS_EXAMPLES_HPP
 
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs/r1cs.hpp>
+
+#include <nil/algebra/utils/random_element.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -188,4 +190,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // R1CS_EXAMPLES_HPP_
+#endif    // CRYPTO3_R1CS_EXAMPLES_HPP

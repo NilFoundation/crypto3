@@ -11,13 +11,15 @@
 // The gadgets verify correct precomputation of values for the G1 and G2 variables.
 //---------------------------------------------------------------------------//
 
-#ifndef WEIERSTRASS_PRECOMPUTATION_HPP_
-#define WEIERSTRASS_PRECOMPUTATION_HPP_
+#ifndef CRYPTO3_WEIERSTRASS_PRECOMPUTATION_HPP
+#define CRYPTO3_WEIERSTRASS_PRECOMPUTATION_HPP
 
 #include <memory>
 
 #include <nil/algebra/curves/mnt/mnt4/mnt4_init.hpp>
 #include <nil/algebra/curves/mnt/mnt6/mnt6_init.hpp>
+
+#include <nil/algebra/utils/random_element.hpp>
 
 #include <nil/crypto3/zk/snark/gadgets/curves/weierstrass_g1_gadget.hpp>
 #include <nil/crypto3/zk/snark/gadgets/curves/weierstrass_g2_gadget.hpp>
@@ -665,4 +667,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // WEIERSTRASS_PRECOMPUTATION_HPP_
+#endif    // CRYPTO3_WEIERSTRASS_PRECOMPUTATION_HPP

@@ -12,6 +12,8 @@
 
 #include <nil/crypto3/zk/snark/relations/circuit_satisfaction_problems/bacs/bacs.hpp>
 
+#include <nil/algebra/utils/random_element.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace zk {
