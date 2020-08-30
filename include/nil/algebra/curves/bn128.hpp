@@ -56,6 +56,7 @@ namespace nil {
 
                 typedef typename detail::bn128_g1<254> g1_type;
                 typedef typename detail::bn128_g2<254> g2_type;
+                typedef typename nil::algebra::fields::detail::element_fp12_2over3over2<nil::algebra::fields::detail::arithmetic_params<bn128_fq<254, CHAR_BIT>>> gt_type;
 
                 typedef std::vector<typename g1_type> g1_vector;
                 typedef std::vector<typename g2_type> g2_vector;
