@@ -254,8 +254,8 @@ namespace nil {
                     knowledge_commitment_vector<CurveType::g1_type, CurveType::g1_type> A_query;
                     knowledge_commitment_vector<CurveType::g2_type, CurveType::g1_type> B_query;
                     knowledge_commitment_vector<CurveType::g1_type, CurveType::g1_type> C_query;
-                    algebra::G1_vector<snark_pp<CurveType>> H_query;    // t powers
-                    algebra::G1_vector<snark_pp<CurveType>> K_query;
+                    CurveType::g1_vector H_query;    // t powers
+                    CurveType::g1_vector K_query;
                     /* Now come the additional elements for ad */
                     typename CurveType::g1_type rA_i_Z_g1;
 
@@ -270,8 +270,8 @@ namespace nil {
                         knowledge_commitment_vector<CurveType::g1_type, CurveType::g1_type> &&A_query,
                         knowledge_commitment_vector<CurveType::g2_type, CurveType::g1_type> &&B_query,
                         knowledge_commitment_vector<CurveType::g1_type, CurveType::g1_type> &&C_query,
-                        algebra::G1_vector<snark_pp<CurveType>> &&H_query,
-                        algebra::G1_vector<snark_pp<CurveType>> &&K_query,
+                        CurveType::g1_vector &&H_query,
+                        CurveType::g1_vector &&K_query,
                         CurveType::g1_type &&rA_i_Z_g1,
                         r1cs_ppzkadsnark_constraint_system<CurveType> &&constraint_system) :
                         A_query(std::move(A_query)),
@@ -343,7 +343,7 @@ namespace nil {
                     typename CurveType::g2_type rC_Z_g2;
 
                     typename CurveType::g1_type A0;
-                    algebra::G1_vector<snark_pp<CurveType>> Ain;
+                    CurveType::g1_vector Ain;
 
                     r1cs_ppzkadsnark_verification_key() = default;
                     r1cs_ppzkadsnark_verification_key(const typename CurveType::g2_type &alphaA_g2,
@@ -355,7 +355,7 @@ namespace nil {
                                                       const typename CurveType::g2_type &rC_Z_g2,
                                                       const typename CurveType::g1_type
                                                           A0,
-                                                      const algebra::G1_vector<snark_pp<CurveType>>
+                                                      const CurveType::g1_vector
                                                           Ain) :
                         alphaA_g2(alphaA_g2),
                         alphaB_g1(alphaB_g1), alphaC_g2(alphaC_g2), gamma_g2(gamma_g2), gamma_beta_g1(gamma_beta_g1),
@@ -421,7 +421,7 @@ namespace nil {
                     algebra::G2_precomp<snark_pp<CurveType>> vk_rC_i_g2_precomp;
 
                     CurveType::g1_type A0;
-                    algebra::G1_vector<snark_pp<CurveType>> Ain;
+                    CurveType::g1_vector Ain;
 
                     std::vector<algebra::G1_precomp<snark_pp<CurveType>>> proof_g_vki_precomp;
 
@@ -1137,13 +1137,13 @@ namespace nil {
                         kc_batch_exp(CurveType::scalar_field_type::value_type::size_in_bits(), g1_window, g1_window, g1_table,
                                      g1_table, rC, rC * alphaC, Ct, chunks);
 
-                    algebra::G1_vector<snark_pp<CurveType>> H_query =
+                    CurveType::g1_vector H_query =
                         batch_exp(CurveType::scalar_field_type::value_type::size_in_bits(), g1_window, g1_table, Ht);
 #ifdef USE_MIXED_ADDITION
                     algebra::batch_to_special<CurveType::g1_type>(H_query);
 #endif
 
-                    algebra::G1_vector<snark_pp<CurveType>> K_query =
+                    CurveType::g1_vector K_query =
                         batch_exp(CurveType::scalar_field_type::value_type::size_in_bits(), g1_window, g1_table, Kt);
 #ifdef USE_MIXED_ADDITION
                     algebra::batch_to_special<CurveType::g1_type>(K_query);
@@ -1162,7 +1162,7 @@ namespace nil {
                     CurveType::g1_type rA_i_Z_g1 = (rA * qap_inst.Zt) * prms.I1;
 
                     CurveType::g1_type A0 = A_query[0].g;
-                    algebra::G1_vector<snark_pp<CurveType>> Ain;
+                    CurveType::g1_vector Ain;
                     Ain.reserve(qap_inst.num_inputs());
                     for (std::size_t i = 0; i < qap_inst.num_inputs(); ++i) {
                         Ain.emplace_back(A_query[1 + i].g);
@@ -1339,7 +1339,7 @@ namespace nil {
                     algebra::G2_precomp<snark_pp<CurveType>> vk_rC_z_g2_precomp = snark_pp<CurveType>::precompute_G2(vk.rC_Z_g2);
 
                     pvk.A0 = CurveType::g1_type(vk.A0);
-                    pvk.Ain = algebra::G1_vector<snark_pp<CurveType>>(vk.Ain);
+                    pvk.Ain = CurveType::g1_vector(vk.Ain);
 
                     pvk.proof_g_vki_precomp.reserve(pvk.Ain.size());
                     for (std::size_t i = 0; i < pvk.Ain.size(); i++) {

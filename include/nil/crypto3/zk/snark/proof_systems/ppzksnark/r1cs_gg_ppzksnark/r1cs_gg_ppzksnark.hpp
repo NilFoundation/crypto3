@@ -78,16 +78,16 @@ namespace nil {
                 template<typename CurveType>
                 class r1cs_gg_ppzksnark_proving_key {
                 public:
-                    algebra::G1<CurveType> alpha_g1;
-                    algebra::G1<CurveType> beta_g1;
-                    algebra::G2<CurveType> beta_g2;
-                    algebra::G1<CurveType> delta_g1;
-                    algebra::G2<CurveType> delta_g2;
+                    CurveType::g1_type alpha_g1;
+                    CurveType::g1_type beta_g1;
+                    CurveType::g2_type beta_g2;
+                    CurveType::g1_type delta_g1;
+                    CurveType::g2_type delta_g2;
 
-                    algebra::G1_vector<CurveType> A_query;    // this could be a sparse vector if we had multiexp for those
-                    knowledge_commitment_vector<algebra::G2<CurveType>, algebra::G1<CurveType>> B_query;
-                    algebra::G1_vector<CurveType> H_query;
-                    algebra::G1_vector<CurveType> L_query;
+                    CurveType::g1_vector A_query;    // this could be a sparse vector if we had multiexp for those
+                    knowledge_commitment_vector<CurveType::g2_type, CurveType::g1_type> B_query;
+                    CurveType::g1_vector H_query;
+                    CurveType::g1_vector L_query;
 
                     r1cs_gg_ppzksnark_constraint_system<CurveType> constraint_system;
 
@@ -97,15 +97,15 @@ namespace nil {
                     r1cs_gg_ppzksnark_proving_key(const r1cs_gg_ppzksnark_proving_key<CurveType> &other) = default;
                     r1cs_gg_ppzksnark_proving_key(r1cs_gg_ppzksnark_proving_key<CurveType> &&other) = default;
                     r1cs_gg_ppzksnark_proving_key(
-                        algebra::G1<CurveType> &&alpha_g1,
-                        algebra::G1<CurveType> &&beta_g1,
-                        algebra::G2<CurveType> &&beta_g2,
-                        algebra::G1<CurveType> &&delta_g1,
-                        algebra::G2<CurveType> &&delta_g2,
-                        algebra::G1_vector<CurveType> &&A_query,
-                        knowledge_commitment_vector<algebra::G2<CurveType>, algebra::G1<CurveType>> &&B_query,
-                        algebra::G1_vector<CurveType> &&H_query,
-                        algebra::G1_vector<CurveType> &&L_query,
+                        CurveType::g1_type &&alpha_g1,
+                        CurveType::g1_type &&beta_g1,
+                        CurveType::g2_type &&beta_g2,
+                        CurveType::g1_type &&delta_g1,
+                        CurveType::g2_type &&delta_g2,
+                        CurveType::g1_vector &&A_query,
+                        knowledge_commitment_vector<CurveType::g2_type, CurveType::g1_type> &&B_query,
+                        CurveType::g1_vector &&H_query,
+                        CurveType::g1_vector &&L_query,
                         r1cs_gg_ppzksnark_constraint_system<CurveType> &&constraint_system) :
                         alpha_g1(std::move(alpha_g1)),
                         beta_g1(std::move(beta_g1)), beta_g2(std::move(beta_g2)), delta_g1(std::move(delta_g1)),
@@ -132,7 +132,7 @@ namespace nil {
                     std::size_t size_in_bits() const {
                         return (algebra::size_in_bits(A_query) + B_query.size_in_bits() +
                                 algebra::size_in_bits(H_query) + algebra::size_in_bits(L_query) +
-                                1 * algebra::G1<CurveType>::size_in_bits() + 1 * algebra::G2<CurveType>::size_in_bits());
+                                1 * CurveType::g1_type::size_in_bits() + 1 * CurveType::g2_type::size_in_bits());
                     }
 
                     void print_size() const {
@@ -172,16 +172,16 @@ namespace nil {
                 class r1cs_gg_ppzksnark_verification_key {
                 public:
                     algebra::GT<CurveType> alpha_g1_beta_g2;
-                    algebra::G2<CurveType> gamma_g2;
-                    algebra::G2<CurveType> delta_g2;
+                    CurveType::g2_type gamma_g2;
+                    CurveType::g2_type delta_g2;
 
-                    accumulation_vector<algebra::G1<CurveType>> gamma_ABC_g1;
+                    accumulation_vector<CurveType::g1_type> gamma_ABC_g1;
 
                     r1cs_gg_ppzksnark_verification_key() = default;
                     r1cs_gg_ppzksnark_verification_key(const algebra::GT<CurveType> &alpha_g1_beta_g2,
-                                                       const algebra::G2<CurveType> &gamma_g2,
-                                                       const algebra::G2<CurveType> &delta_g2,
-                                                       const accumulation_vector<algebra::G1<CurveType>> &gamma_ABC_g1) :
+                                                       const CurveType::g2_type &gamma_g2,
+                                                       const CurveType::g2_type &delta_g2,
+                                                       const accumulation_vector<CurveType::g1_type> &gamma_ABC_g1) :
                         alpha_g1_beta_g2(alpha_g1_beta_g2),
                         gamma_g2(gamma_g2), delta_g2(delta_g2), gamma_ABC_g1(gamma_ABC_g1) {};
 
@@ -199,7 +199,7 @@ namespace nil {
 
                     std::size_t size_in_bits() const {
                         // TODO: include GT size
-                        return (gamma_ABC_g1.size_in_bits() + 2 * algebra::G2<CurveType>::size_in_bits());
+                        return (gamma_ABC_g1.size_in_bits() + 2 * CurveType::g2_type::size_in_bits());
                     }
 
                     void print_size() const {
@@ -247,7 +247,7 @@ namespace nil {
                     algebra::G2_precomp<CurveType> vk_gamma_g2_precomp;
                     algebra::G2_precomp<CurveType> vk_delta_g2_precomp;
 
-                    accumulation_vector<algebra::G1<CurveType>> gamma_ABC_g1;
+                    accumulation_vector<CurveType::g1_type> gamma_ABC_g1;
 
                     bool operator==(const r1cs_gg_ppzksnark_processed_verification_key &other) const;
                     friend std::ostream &operator<<<CurveType>(std::ostream &out,
@@ -299,17 +299,17 @@ namespace nil {
                 template<typename CurveType>
                 class r1cs_gg_ppzksnark_proof {
                 public:
-                    algebra::G1<CurveType> g_A;
-                    algebra::G2<CurveType> g_B;
-                    algebra::G1<CurveType> g_C;
+                    CurveType::g1_type g_A;
+                    CurveType::g2_type g_B;
+                    CurveType::g1_type g_C;
 
                     r1cs_gg_ppzksnark_proof() {
                         // invalid proof with valid curve points
-                        this->g_A = algebra::G1<CurveType>::one();
-                        this->g_B = algebra::G2<CurveType>::one();
-                        this->g_C = algebra::G1<CurveType>::one();
+                        this->g_A = CurveType::g1_type::one();
+                        this->g_B = CurveType::g2_type::one();
+                        this->g_C = CurveType::g1_type::one();
                     }
-                    r1cs_gg_ppzksnark_proof(algebra::G1<CurveType> &&g_A, algebra::G2<CurveType> &&g_B, algebra::G1<CurveType> &&g_C) :
+                    r1cs_gg_ppzksnark_proof(CurveType::g1_type &&g_A, CurveType::g2_type &&g_B, CurveType::g1_type &&g_C) :
                         g_A(std::move(g_A)), g_B(std::move(g_B)), g_C(std::move(g_C)) {};
 
                     std::size_t G1_size() const {
@@ -321,8 +321,8 @@ namespace nil {
                     }
 
                     std::size_t size_in_bits() const {
-                        return G1_size() * algebra::G1<CurveType>::size_in_bits() +
-                               G2_size() * algebra::G2<CurveType>::size_in_bits();
+                        return G1_size() * CurveType::g1_type::size_in_bits() +
+                               G2_size() * CurveType::g2_type::size_in_bits();
                     }
 
                     void print_size() const {
@@ -590,16 +590,16 @@ namespace nil {
                     r1cs_gg_ppzksnark_verification_key<CurveType>::dummy_verification_key(const std::size_t input_size) {
                     r1cs_gg_ppzksnark_verification_key<CurveType> result;
                     result.alpha_g1_beta_g2 = typename CurveType::scalar_field_type::random_element() * algebra::GT<CurveType>::random_element();
-                    result.gamma_g2 = algebra::G2<CurveType>::random_element();
-                    result.delta_g2 = algebra::G2<CurveType>::random_element();
+                    result.gamma_g2 = CurveType::g2_type::random_element();
+                    result.delta_g2 = CurveType::g2_type::random_element();
 
-                    algebra::G1<CurveType> base = algebra::G1<CurveType>::random_element();
-                    algebra::G1_vector<CurveType> v;
+                    CurveType::g1_type base = CurveType::g1_type::random_element();
+                    CurveType::g1_vector v;
                     for (std::size_t i = 0; i < input_size; ++i) {
-                        v.emplace_back(algebra::G1<CurveType>::random_element());
+                        v.emplace_back(CurveType::g1_type::random_element());
                     }
 
-                    result.gamma_ABC_g1 = accumulation_vector<algebra::G1<CurveType>>(std::move(base), std::move(v));
+                    result.gamma_ABC_g1 = accumulation_vector<CurveType::g1_type>(std::move(base), std::move(v));
 
                     return result;
                 }
@@ -675,58 +675,58 @@ namespace nil {
                     const std::size_t chunks = 1;
 #endif
 
-                    const algebra::G1<CurveType> g1_generator = algebra::G1<CurveType>::random_element();
+                    const CurveType::g1_type g1_generator = CurveType::g1_type::random_element();
                     const std::size_t g1_scalar_count = non_zero_At + non_zero_Bt + qap.num_variables();
                     const std::size_t g1_scalar_size = typename CurveType::scalar_field_type::size_in_bits();
-                    const std::size_t g1_window_size = algebra::get_exp_window_size<algebra::G1<CurveType>>(g1_scalar_count);
+                    const std::size_t g1_window_size = algebra::get_exp_window_size<CurveType::g1_type>(g1_scalar_count);
 
-                    algebra::window_table<algebra::G1<CurveType>> g1_table =
+                    algebra::window_table<CurveType::g1_type> g1_table =
                         algebra::get_window_table(g1_scalar_size, g1_window_size, g1_generator);
 
-                    const algebra::G2<CurveType> G2_gen = algebra::G2<CurveType>::random_element();
+                    const CurveType::g2_type G2_gen = CurveType::g2_type::random_element();
                     const std::size_t g2_scalar_count = non_zero_Bt;
                     const std::size_t g2_scalar_size = typename CurveType::scalar_field_type::size_in_bits();
-                    std::size_t g2_window_size = algebra::get_exp_window_size<algebra::G2<CurveType>>(g2_scalar_count);
+                    std::size_t g2_window_size = algebra::get_exp_window_size<CurveType::g2_type>(g2_scalar_count);
 
-                    algebra::window_table<algebra::G2<CurveType>> g2_table =
+                    algebra::window_table<CurveType::g2_type> g2_table =
                         algebra::get_window_table(g2_scalar_size, g2_window_size, G2_gen);
 
-                    algebra::G1<CurveType> alpha_g1 = alpha * g1_generator;
-                    algebra::G1<CurveType> beta_g1 = beta * g1_generator;
-                    algebra::G2<CurveType> beta_g2 = beta * G2_gen;
-                    algebra::G1<CurveType> delta_g1 = delta * g1_generator;
-                    algebra::G2<CurveType> delta_g2 = delta * G2_gen;
+                    CurveType::g1_type alpha_g1 = alpha * g1_generator;
+                    CurveType::g1_type beta_g1 = beta * g1_generator;
+                    CurveType::g2_type beta_g2 = beta * G2_gen;
+                    CurveType::g1_type delta_g1 = delta * g1_generator;
+                    CurveType::g2_type delta_g2 = delta * G2_gen;
 
-                    algebra::G1_vector<CurveType> A_query = batch_exp(g1_scalar_size, g1_window_size, g1_table, At);
+                    CurveType::g1_vector A_query = batch_exp(g1_scalar_size, g1_window_size, g1_table, At);
 #ifdef USE_MIXED_ADDITION
-                    algebra::batch_to_special<algebra::G1<CurveType>>(A_query);
+                    algebra::batch_to_special<CurveType::g1_type>(A_query);
 #endif
 
-                    knowledge_commitment_vector<algebra::G2<CurveType>, algebra::G1<CurveType>> B_query =
+                    knowledge_commitment_vector<CurveType::g2_type, CurveType::g1_type> B_query =
                         kc_batch_exp(typename CurveType::scalar_field_type::size_in_bits(), g2_window_size, g1_window_size, g2_table,
                                      g1_table, typename CurveType::scalar_field_type::one(), typename CurveType::scalar_field_type::one(), Bt, chunks);
                     // NOTE: if USE_MIXED_ADDITION is defined,
                     // kc_batch_exp will convert its output to special form internally
 
-                    algebra::G1_vector<CurveType> H_query =
+                    CurveType::g1_vector H_query =
                         batch_exp_with_coeff(g1_scalar_size, g1_window_size, g1_table, qap.Zt * delta_inverse, Ht);
 #ifdef USE_MIXED_ADDITION
-                    algebra::batch_to_special<algebra::G1<CurveType>>(H_query);
+                    algebra::batch_to_special<CurveType::g1_type>(H_query);
 #endif
 
-                    algebra::G1_vector<CurveType> L_query = batch_exp(g1_scalar_size, g1_window_size, g1_table, Lt);
+                    CurveType::g1_vector L_query = batch_exp(g1_scalar_size, g1_window_size, g1_table, Lt);
 #ifdef USE_MIXED_ADDITION
-                    algebra::batch_to_special<algebra::G1<CurveType>>(L_query);
+                    algebra::batch_to_special<CurveType::g1_type>(L_query);
 #endif
 
                     algebra::GT<CurveType> alpha_g1_beta_g2 = CurveType::reduced_pairing(alpha_g1, beta_g2);
-                    algebra::G2<CurveType> gamma_g2 = gamma * G2_gen;
+                    CurveType::g2_type gamma_g2 = gamma * G2_gen;
 
-                    algebra::G1<CurveType> gamma_ABC_g1_0 = gamma_ABC_0 * g1_generator;
-                    algebra::G1_vector<CurveType> gamma_ABC_g1_values =
+                    CurveType::g1_type gamma_ABC_g1_0 = gamma_ABC_0 * g1_generator;
+                    CurveType::g1_vector gamma_ABC_g1_values =
                         batch_exp(g1_scalar_size, g1_window_size, g1_table, gamma_ABC);
 
-                    accumulation_vector<algebra::G1<CurveType>> gamma_ABC_g1(std::move(gamma_ABC_g1_0),
+                    accumulation_vector<CurveType::g1_type> gamma_ABC_g1(std::move(gamma_ABC_g1_0),
                                                                        std::move(gamma_ABC_g1_values));
 
                     r1cs_gg_ppzksnark_verification_key<CurveType> vk =
@@ -784,16 +784,16 @@ namespace nil {
                     const_padded_assignment.insert(const_padded_assignment.end(), qap_wit.coefficients_for_ABCs.begin(),
                                                    qap_wit.coefficients_for_ABCs.end());
 
-                    algebra::G1<CurveType> evaluation_At =
-                        algebra::multi_exp_with_mixed_addition<algebra::G1<CurveType>, typename CurveType::scalar_field_type,
+                    CurveType::g1_type evaluation_At =
+                        algebra::multi_exp_with_mixed_addition<CurveType::g1_type, typename CurveType::scalar_field_type,
                                                                algebra::multi_exp_method_BDLO12>(
                             pk.A_query.begin(),
                             pk.A_query.begin() + qap_wit.num_variables() + 1,
                             const_padded_assignment.begin(),
                             const_padded_assignment.begin() + qap_wit.num_variables() + 1,
                             chunks);
-                    knowledge_commitment<algebra::G2<CurveType>, algebra::G1<CurveType>> evaluation_Bt =
-                        kc_multi_exp_with_mixed_addition<algebra::G2<CurveType>, algebra::G1<CurveType>, typename CurveType::scalar_field_type,
+                    knowledge_commitment<CurveType::g2_type, CurveType::g1_type> evaluation_Bt =
+                        kc_multi_exp_with_mixed_addition<CurveType::g2_type, CurveType::g1_type, typename CurveType::scalar_field_type,
                                                          algebra::multi_exp_method_BDLO12>(
                             pk.B_query,
                             0,
@@ -801,15 +801,15 @@ namespace nil {
                             const_padded_assignment.begin(),
                             const_padded_assignment.begin() + qap_wit.num_variables() + 1,
                             chunks);
-                    algebra::G1<CurveType> evaluation_Ht =
-                        algebra::multi_exp<algebra::G1<CurveType>, typename CurveType::scalar_field_type, algebra::multi_exp_method_BDLO12>(
+                    CurveType::g1_type evaluation_Ht =
+                        algebra::multi_exp<CurveType::g1_type, typename CurveType::scalar_field_type, algebra::multi_exp_method_BDLO12>(
                             pk.H_query.begin(),
                             pk.H_query.begin() + (qap_wit.degree() - 1),
                             qap_wit.coefficients_for_H.begin(),
                             qap_wit.coefficients_for_H.begin() + (qap_wit.degree() - 1),
                             chunks);
-                    algebra::G1<CurveType> evaluation_Lt =
-                        algebra::multi_exp_with_mixed_addition<algebra::G1<CurveType>, typename CurveType::scalar_field_type,
+                    CurveType::g1_type evaluation_Lt =
+                        algebra::multi_exp_with_mixed_addition<CurveType::g1_type, typename CurveType::scalar_field_type,
                                                                algebra::multi_exp_method_BDLO12>(
                             pk.L_query.begin(),
                             pk.L_query.end(),
@@ -818,15 +818,15 @@ namespace nil {
                             chunks);
 
                     /* A = alpha + sum_i(a_i*A_i(t)) + r*delta */
-                    algebra::G1<CurveType> g1_A = pk.alpha_g1 + evaluation_At + r * pk.delta_g1;
+                    CurveType::g1_type g1_A = pk.alpha_g1 + evaluation_At + r * pk.delta_g1;
 
                     /* B = beta + sum_i(a_i*B_i(t)) + s*delta */
-                    algebra::G1<CurveType> g1_B = pk.beta_g1 + evaluation_Bt.h + s * pk.delta_g1;
-                    algebra::G2<CurveType> g2_B = pk.beta_g2 + evaluation_Bt.g + s * pk.delta_g2;
+                    CurveType::g1_type g1_B = pk.beta_g1 + evaluation_Bt.h + s * pk.delta_g1;
+                    CurveType::g2_type g2_B = pk.beta_g2 + evaluation_Bt.g + s * pk.delta_g2;
 
                     /* C = sum_i(a_i*((beta*A_i(t) + alpha*B_i(t) + C_i(t)) + H(t)*Z(t))/delta) + A*s + r*b - r*s*delta
                      */
-                    algebra::G1<CurveType> g1_C = evaluation_Ht + evaluation_Lt + s * g1_A + r * g1_B - (r * s) * pk.delta_g1;
+                    CurveType::g1_type g1_C = evaluation_Ht + evaluation_Lt + s * g1_A + r * g1_B - (r * s) * pk.delta_g1;
 
 
                     r1cs_gg_ppzksnark_proof<CurveType> proof =
@@ -856,10 +856,10 @@ namespace nil {
                     const r1cs_gg_ppzksnark_proof<CurveType> &proof) {
                     assert(pvk.gamma_ABC_g1.domain_size() >= primary_input.size());
 
-                    const accumulation_vector<algebra::G1<CurveType>> accumulated_IC =
+                    const accumulation_vector<CurveType::g1_type> accumulated_IC =
                         pvk.gamma_ABC_g1.template accumulate_chunk<typename CurveType::scalar_field_type>(primary_input.begin(),
                                                                                      primary_input.end(), 0);
-                    const algebra::G1<CurveType> &acc = accumulated_IC.first;
+                    const CurveType::g1_type &acc = accumulated_IC.first;
 
                     bool result = true;
 
@@ -931,10 +931,10 @@ namespace nil {
                     algebra::affine_ate_G2_precomp<CurveType> pvk_vk_delta_g2_precomp =
                         CurveType::affine_ate_precompute_G2(vk.delta_g2);
 
-                    const accumulation_vector<algebra::G1<CurveType>> accumulated_IC =
+                    const accumulation_vector<CurveType::g1_type> accumulated_IC =
                         vk.gamma_ABC_g1.template accumulate_chunk<typename CurveType::scalar_field_type>(primary_input.begin(),
                                                                                     primary_input.end(), 0);
-                    const algebra::G1<CurveType> &acc = accumulated_IC.first;
+                    const CurveType::g1_type &acc = accumulated_IC.first;
 
                     bool result = true;
 
