@@ -288,8 +288,8 @@ namespace nil {
                 template<typename CurveType>
                 void r1cs_ppzksnark_proof_variable<CurveType>::generate_r1cs_witness(
                     const r1cs_ppzksnark_proof<other_curve<CurveType>> &proof) {
-                    std::vector<algebra::G1<other_curve<CurveType>>> G1_elems;
-                    std::vector<algebra::G2<other_curve<CurveType>>> G2_elems;
+                    std::vector<other_curve<CurveType>::g1_type> G1_elems;
+                    std::vector<other_curve<CurveType>::g2_type> G2_elems;
 
                     G1_elems = {proof.g_A.g, proof.g_A.h, proof.g_B.h, proof.g_C.g, proof.g_C.h, proof.g_H, proof.g_K};
                     G2_elems = {proof.g_B.g};
@@ -378,8 +378,8 @@ namespace nil {
                 template<typename CurveType>
                 void r1cs_ppzksnark_verification_key_variable<CurveType>::generate_r1cs_witness(
                     const r1cs_ppzksnark_verification_key<other_curve<CurveType>> &vk) {
-                    std::vector<algebra::G1<other_curve<CurveType>>> G1_elems;
-                    std::vector<algebra::G2<other_curve<CurveType>>> G2_elems;
+                    std::vector<other_curve<CurveType>::g1_type> G1_elems;
+                    std::vector<other_curve<CurveType>::g2_type> G2_elems;
 
                     G1_elems = {vk.alphaB_g1, vk.gamma_beta_g1};
                     G2_elems = {vk.alphaA_g2, vk.alphaC_g2, vk.gamma_g2, vk.gamma_beta_g2, vk.rC_Z_g2};
@@ -468,7 +468,7 @@ namespace nil {
                     vk_alphaB_g1_precomp.reset(new G1_precomputation<CurveType>(pb, r1cs_vk.alphaB_g1));
                     vk_gamma_beta_g1_precomp.reset(new G1_precomputation<CurveType>(pb, r1cs_vk.gamma_beta_g1));
 
-                    pp_G2_one_precomp.reset(new G2_precomputation<CurveType>(pb, algebra::G2<other_curve<CurveType>>::one()));
+                    pp_G2_one_precomp.reset(new G2_precomputation<CurveType>(pb, other_curve<CurveType>::g2_type::one()));
                     vk_alphaA_g2_precomp.reset(new G2_precomputation<CurveType>(pb, r1cs_vk.alphaA_g2));
                     vk_alphaC_g2_precomp.reset(new G2_precomputation<CurveType>(pb, r1cs_vk.alphaC_g2));
                     vk_gamma_beta_g2_precomp.reset(new G2_precomputation<CurveType>(pb, r1cs_vk.gamma_beta_g2));
@@ -501,7 +501,7 @@ namespace nil {
                     compute_vk_gamma_beta_g1_precomp.reset(
                         new precompute_G1_gadget<CurveType>(pb, *vk.gamma_beta_g1, *pvk.vk_gamma_beta_g1_precomp));
 
-                    pvk.pp_G2_one_precomp.reset(new G2_precomputation<CurveType>(pb, algebra::G2<other_curve<CurveType>>::one()));
+                    pvk.pp_G2_one_precomp.reset(new G2_precomputation<CurveType>(pb, other_curve<CurveType>::g2_type::one()));
                     compute_vk_alphaA_g2_precomp.reset(
                         new precompute_G2_gadget<CurveType>(pb, *vk.alphaA_g2, *pvk.vk_alphaA_g2_precomp));
                     compute_vk_alphaC_g2_precomp.reset(

@@ -229,7 +229,7 @@ namespace nil {
                     algebra::G2_precomp<CurveType> vk_tilde_g2_precomp;
                     algebra::G2_precomp<CurveType> vk_alpha_tilde_g2_precomp;
                     algebra::G2_precomp<CurveType> vk_Z_g2_precomp;
-                    algebra::GT<CurveType> pairing_of_g1_and_g2;
+                    CurveType::gt_type pairing_of_g1_and_g2;
 
                     accumulation_vector<CurveType::g1_type> encoded_IC_query;
 
@@ -780,17 +780,17 @@ namespace nil {
                     algebra::G2_precomp<CurveType> proof_V_g2_precomp = CurveType::precompute_G2(proof.V_g2);
                     algebra::Fqk<CurveType> V_1 = miller_loop<CurveType>(proof_V_g1_with_acc_precomp, pvk.pp_G2_one_precomp);
                     algebra::Fqk<CurveType> V_2 = miller_loop<CurveType>(pvk.pp_G1_one_precomp, proof_V_g2_precomp);
-                    algebra::GT<CurveType> V = final_exponentiation<CurveType>(V_1 * V_2.unitary_inverse());
-                    if (V != algebra::GT<CurveType>::one()) {
+                    CurveType::gt_type V = final_exponentiation<CurveType>(V_1 * V_2.unitary_inverse());
+                    if (V != CurveType::gt_type::one()) {
                         result = false;
                     }
 
                     algebra::G1_precomp<CurveType> proof_H_g1_precomp = CurveType::precompute_G1(proof.H_g1);
                     algebra::Fqk<CurveType> SSP_1 = miller_loop<CurveType>(proof_V_g1_with_acc_precomp, proof_V_g2_precomp);
                     algebra::Fqk<CurveType> SSP_2 = miller_loop<CurveType>(proof_H_g1_precomp, pvk.vk_Z_g2_precomp);
-                    algebra::GT<CurveType> SSP =
+                    CurveType::gt_type SSP =
                         final_exponentiation<CurveType>(SSP_1.unitary_inverse() * SSP_2 * pvk.pairing_of_g1_and_g2);
-                    if (SSP != algebra::GT<CurveType>::one()) {
+                    if (SSP != CurveType::gt_type::one()) {
                         result = false;
                     }
 
@@ -798,8 +798,8 @@ namespace nil {
                     algebra::G1_precomp<CurveType> proof_alpha_V_g1_precomp = CurveType::precompute_G1(proof.alpha_V_g1);
                     algebra::Fqk<CurveType> alpha_V_1 = miller_loop<CurveType>(proof_V_g1_precomp, pvk.vk_alpha_tilde_g2_precomp);
                     algebra::Fqk<CurveType> alpha_V_2 = miller_loop<CurveType>(proof_alpha_V_g1_precomp, pvk.vk_tilde_g2_precomp);
-                    algebra::GT<CurveType> alpha_V = final_exponentiation<CurveType>(alpha_V_1 * alpha_V_2.unitary_inverse());
-                    if (alpha_V != algebra::GT<CurveType>::one()) {
+                    CurveType::gt_type alpha_V = final_exponentiation<CurveType>(alpha_V_1 * alpha_V_2.unitary_inverse());
+                    if (alpha_V != CurveType::gt_type::one()) {
                         result = false;
                     }
 

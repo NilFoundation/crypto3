@@ -171,14 +171,14 @@ namespace nil {
                 template<typename CurveType>
                 class r1cs_gg_ppzksnark_verification_key {
                 public:
-                    algebra::GT<CurveType> alpha_g1_beta_g2;
+                    CurveType::gt_type alpha_g1_beta_g2;
                     CurveType::g2_type gamma_g2;
                     CurveType::g2_type delta_g2;
 
                     accumulation_vector<CurveType::g1_type> gamma_ABC_g1;
 
                     r1cs_gg_ppzksnark_verification_key() = default;
-                    r1cs_gg_ppzksnark_verification_key(const algebra::GT<CurveType> &alpha_g1_beta_g2,
+                    r1cs_gg_ppzksnark_verification_key(const CurveType::gt_type &alpha_g1_beta_g2,
                                                        const CurveType::g2_type &gamma_g2,
                                                        const CurveType::g2_type &delta_g2,
                                                        const accumulation_vector<CurveType::g1_type> &gamma_ABC_g1) :
@@ -243,7 +243,7 @@ namespace nil {
                 template<typename CurveType>
                 class r1cs_gg_ppzksnark_processed_verification_key {
                 public:
-                    algebra::GT<CurveType> vk_alpha_g1_beta_g2;
+                    CurveType::gt_type vk_alpha_g1_beta_g2;
                     algebra::G2_precomp<CurveType> vk_gamma_g2_precomp;
                     algebra::G2_precomp<CurveType> vk_delta_g2_precomp;
 
@@ -719,7 +719,7 @@ namespace nil {
                     algebra::batch_to_special<CurveType::g1_type>(L_query);
 #endif
 
-                    algebra::GT<CurveType> alpha_g1_beta_g2 = CurveType::reduced_pairing(alpha_g1, beta_g2);
+                    CurveType::gt_type alpha_g1_beta_g2 = CurveType::reduced_pairing(alpha_g1, beta_g2);
                     CurveType::g2_type gamma_g2 = gamma * G2_gen;
 
                     CurveType::g1_type gamma_ABC_g1_0 = gamma_ABC_0 * g1_generator;
@@ -874,7 +874,7 @@ namespace nil {
                     const algebra::Fqk<CurveType> QAP1 = miller_loop<CurveType>(proof_g_A_precomp, proof_g_B_precomp);
                     const algebra::Fqk<CurveType> QAP2 = double_miller_loop<CurveType>(acc_precomp, pvk.vk_gamma_g2_precomp,
                                                                            proof_g_C_precomp, pvk.vk_delta_g2_precomp);
-                    const algebra::GT<CurveType> QAP = final_exponentiation<CurveType>(QAP1 * QAP2.unitary_inverse());
+                    const CurveType::gt_type QAP = final_exponentiation<CurveType>(QAP1 * QAP2.unitary_inverse());
 
                     if (QAP != pvk.vk_alpha_g1_beta_g2) {
                         result = false;
@@ -953,7 +953,7 @@ namespace nil {
                     const algebra::Fqk<CurveType> QAP_miller = CurveType::affine_ate_e_times_e_over_e_miller_loop(
                         acc_precomp, pvk_vk_gamma_g2_precomp, proof_g_C_precomp, pvk_vk_delta_g2_precomp,
                         proof_g_A_precomp, proof_g_B_precomp);
-                    const algebra::GT<CurveType> QAP = final_exponentiation<CurveType>(QAP_miller.unitary_inverse());
+                    const CurveType::gt_type QAP = final_exponentiation<CurveType>(QAP_miller.unitary_inverse());
 
                     if (QAP != vk.alpha_g1_beta_g2) {
                         result = false;

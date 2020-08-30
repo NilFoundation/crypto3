@@ -188,7 +188,7 @@ namespace nil {
                 template<typename CurveType>
                 r1cs_primary_input<typename CurveType::scalar_field_type> get_mp_translation_step_pcd_circuit_input(
                     const set_commitment &commitment_to_translation_step_r1cs_vks,
-                    const r1cs_pcd_compliance_predicate_primary_input<algebra::Fr<other_curve<CurveType>>> &primary_input);
+                    const r1cs_pcd_compliance_predicate_primary_input<other_curve<CurveType>::scalar_field_type::value_type &primary_input);
 
                 template<typename CurveType>
                 mp_compliance_step_pcd_circuit_maker<CurveType>::mp_compliance_step_pcd_circuit_maker(
@@ -725,16 +725,16 @@ namespace nil {
                 template<typename CurveType>
                 r1cs_primary_input<typename CurveType::scalar_field_type> get_mp_translation_step_pcd_circuit_input(
                     const set_commitment &commitment_to_translation_step_r1cs_vks,
-                    const r1cs_pcd_compliance_predicate_primary_input<algebra::Fr<other_curve<CurveType>>> &primary_input) {
+                    const r1cs_pcd_compliance_predicate_primary_input<other_curve<CurveType>::scalar_field_type::value_type &primary_input) {
                     typedef typename CurveType::scalar_field_type FieldType;
 
-                    const std::vector<algebra::Fr<other_curve<CurveType>>> mp_compliance_step_pcd_circuit_input =
+                    const std::vector<other_curve<CurveType>::scalar_field_type::value_type mp_compliance_step_pcd_circuit_input =
                         get_mp_compliance_step_pcd_circuit_input<other_curve<CurveType>>(
                             commitment_to_translation_step_r1cs_vks, primary_input);
                     std::vector<bool> mp_compliance_step_pcd_circuit_input_bits;
-                    for (const algebra::Fr<other_curve<CurveType>> &elt : mp_compliance_step_pcd_circuit_input) {
+                    for (const other_curve<CurveType>::scalar_field_type::value_type &elt : mp_compliance_step_pcd_circuit_input) {
                         const std::vector<bool> elt_bits =
-                            algebra::convert_field_element_to_bit_vector<algebra::Fr<other_curve<CurveType>>>(elt);
+                            algebra::convert_field_element_to_bit_vector<other_curve<CurveType>::scalar_field_type::value_type(elt);
                         mp_compliance_step_pcd_circuit_input_bits.insert(
                             mp_compliance_step_pcd_circuit_input_bits.end(), elt_bits.begin(), elt_bits.end());
                     }

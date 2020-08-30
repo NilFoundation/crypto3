@@ -48,9 +48,9 @@ namespace nil {
                         all_vars.emplace_back(Y);
                     }
 
-                    G1_variable(protoboard<FieldType> &pb, const algebra::G1<other_curve<CurveType>> &P) :
+                    G1_variable(protoboard<FieldType> &pb, const other_curve<CurveType>::g1_type &P) :
                         gadget<FieldType>(pb) {
-                        algebra::G1<other_curve<CurveType>> Pcopy = P;
+                        other_curve<CurveType>::g1_type Pcopy = P;
                         Pcopy.to_affine_coordinates();
 
                         X.assign(pb, Pcopy.X());
@@ -62,8 +62,8 @@ namespace nil {
                     }
 
                     template<typename CurveType1>
-                    void generate_r1cs_witness(const algebra::G1<CurveType1> &elt) {
-                        algebra::G1<other_curve<CurveType>> el_normalized = el;
+                    void generate_r1cs_witness(const CurveType1::g1_type &elt) {
+                        other_curve<CurveType>::g1_type el_normalized = el;
                         el_normalized.to_affine_coordinates();
 
                         this->pb.lc_val(X) = el_normalized.X();
@@ -102,8 +102,8 @@ namespace nil {
                         this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>({P.Y}, {P.Y}, {P_Y_squared}));
                         this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(
                             {P.X},
-                            {P_X_squared, pb_variable<FieldType>(0) * algebra::G1<other_curve<CurveType>>::a},
-                            {P_Y_squared, pb_variable<FieldType>(0) * (-algebra::G1<other_curve<CurveType>>::b)}));
+                            {P_X_squared, pb_variable<FieldType>(0) * other_curve<CurveType>::g1_type::a},
+                            {P_Y_squared, pb_variable<FieldType>(0) * (-other_curve<CurveType>::g1_type::b)}));
                     }
                     void generate_r1cs_witness() {
                         this->pb.val(P_X_squared) = this->pb.lc_val(P.X).squared();
@@ -202,7 +202,7 @@ namespace nil {
                         this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(
                             {lambda * 2},
                             {A.Y},
-                            {Xsquared * 3, pb_variable<FieldType>(0) * algebra::G1<other_curve<CurveType>>::a}));
+                            {Xsquared * 3, pb_variable<FieldType>(0) * other_curve<CurveType>::g1_type::a}));
 
                         this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>({lambda}, {lambda}, {B.X, A.X * 2}));
 
@@ -212,7 +212,7 @@ namespace nil {
                     void generate_r1cs_witness() {
                         this->pb.val(Xsquared) = this->pb.lc_val(A.X).squared();
                         this->pb.val(lambda) = (typename FieldType::value_type(3) * this->pb.val(Xsquared) +
-                                                algebra::G1<other_curve<CurveType>>::a) *
+                                                other_curve<CurveType>::g1_type::a) *
                                                (typename FieldType::value_type(2) * this->pb.lc_val(A.Y)).inverse();
                         this->pb.lc_val(B.X) =
                             this->pb.val(lambda).squared() - typename FieldType::value_type(2) * this->pb.lc_val(A.X);

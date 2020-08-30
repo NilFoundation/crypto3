@@ -41,9 +41,9 @@ namespace nil {
                     pb_linear_combination_array<FieldType> all_vars;
 
                     G2_variable(protoboard<FieldType> &pb);
-                    G2_variable(protoboard<FieldType> &pb, const algebra::G2<other_curve<CurveType>> &Q);
+                    G2_variable(protoboard<FieldType> &pb, const other_curve<CurveType>::g2_type &Q);
 
-                    void generate_r1cs_witness(const algebra::G2<other_curve<CurveType>> &Q);
+                    void generate_r1cs_witness(const other_curve<CurveType>::g2_type &Q);
 
                     // (See a comment in r1cs_ppzksnark_verifier_gadget.hpp about why
                     // we mark this function noinline.) TODO: remove later
@@ -87,9 +87,9 @@ namespace nil {
                 }
 
                 template<typename CurveType>
-                G2_variable<CurveType>::G2_variable(protoboard<FieldType> &pb, const algebra::G2<other_curve<CurveType>> &Q) :
+                G2_variable<CurveType>::G2_variable(protoboard<FieldType> &pb, const other_curve<CurveType>::g2_type &Q) :
                     gadget<FieldType>(pb) {
-                    algebra::G2<other_curve<CurveType>> Q_copy = Q;
+                    other_curve<CurveType>::g2_type Q_copy = Q;
                     Q_copy.to_affine_coordinates();
 
                     X.reset(new Fqe_variable<CurveType>(pb, Q_copy.X()));
@@ -100,8 +100,8 @@ namespace nil {
                 }
 
                 template<typename CurveType>
-                void G2_variable<CurveType>::generate_r1cs_witness(const algebra::G2<other_curve<CurveType>> &Q) {
-                    algebra::G2<other_curve<CurveType>> Qcopy = Q;
+                void G2_variable<CurveType>::generate_r1cs_witness(const other_curve<CurveType>::g2_type &Q) {
+                    other_curve<CurveType>::g2_type Qcopy = Q;
                     Qcopy.to_affine_coordinates();
 
                     X->generate_r1cs_witness(Qcopy.X());
@@ -127,9 +127,9 @@ namespace nil {
                     compute_Xsquared.reset(new Fqe_sqr_gadget<CurveType>(pb, *(Q.X), *Xsquared));
                     compute_Ysquared.reset(new Fqe_sqr_gadget<CurveType>(pb, *(Q.Y), *Ysquared));
 
-                    Xsquared_plus_a.reset(new Fqe_variable<CurveType>((*Xsquared) + algebra::G2<other_curve<CurveType>>::a));
+                    Xsquared_plus_a.reset(new Fqe_variable<CurveType>((*Xsquared) + other_curve<CurveType>::g2_type::a));
                     Ysquared_minus_b.reset(
-                        new Fqe_variable<CurveType>((*Ysquared) + (-algebra::G2<other_curve<CurveType>>::b)));
+                        new Fqe_variable<CurveType>((*Ysquared) + (-other_curve<CurveType>::g2_type::b)));
 
                     curve_equation.reset(new Fqe_mul_gadget<CurveType>(pb, *(Q.X), *Xsquared_plus_a, *Ysquared_minus_b));
                 }
@@ -157,12 +157,12 @@ namespace nil {
                     g_check.generate_r1cs_constraints();
 
                     printf("positive test\n");
-                    g.generate_r1cs_witness(algebra::G2<other_curve<CurveType>>::one());
+                    g.generate_r1cs_witness(other_curve<CurveType>::g2_type::one());
                     g_check.generate_r1cs_witness();
                     assert(pb.is_satisfied());
 
                     printf("negative test\n");
-                    g.generate_r1cs_witness(algebra::G2<other_curve<CurveType>>::zero());
+                    g.generate_r1cs_witness(other_curve<CurveType>::g2_type::zero());
                     g_check.generate_r1cs_witness();
                     assert(!pb.is_satisfied());
 

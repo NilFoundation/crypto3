@@ -42,13 +42,13 @@ namespace nil {
                 template<>
                 ed25519_sigT sigSign<default_r1cs_ppzkadsnark_pp>(
                     const ed25519_skT &sk, const labelT &label,
-                    const algebra::G2<snark_pp<default_r1cs_ppzkadsnark_pp>> &Lambda) {
+                    const snark_pp<default_r1cs_ppzkadsnark_pp>::g2_type &Lambda) {
                     ed25519_sigT sigma;
                     unsigned long long sigmalen;
                     unsigned char signature[64 + 16 + 320];
                     unsigned char message[16 + 320];
 
-                    algebra::G2<snark_pp<default_r1cs_ppzkadsnark_pp>> Lambda_copy(Lambda);
+                    snark_pp<default_r1cs_ppzkadsnark_pp>::g2_type Lambda_copy(Lambda);
                     Lambda_copy.to_affine_coordinates();
 
                     for (std::size_t i = 0; i < 16; i++)
@@ -75,12 +75,12 @@ namespace nil {
                 template<>
                 bool sigVerif<default_r1cs_ppzkadsnark_pp>(
                     const ed25519_vkT &vk, const labelT &label,
-                    const algebra::G2<snark_pp<default_r1cs_ppzkadsnark_pp>> &Lambda, const ed25519_sigT &sig) {
+                    const snark_pp<default_r1cs_ppzkadsnark_pp>::g2_type &Lambda, const ed25519_sigT &sig) {
                     unsigned long long msglen;
                     unsigned char message[64 + 16 + 320];
                     unsigned char signature[64 + 16 + 320];
 
-                    algebra::G2<snark_pp<default_r1cs_ppzkadsnark_pp>> Lambda_copy(Lambda);
+                    snark_pp<default_r1cs_ppzkadsnark_pp>::g2_type Lambda_copy(Lambda);
                     Lambda_copy.to_affine_coordinates();
 
                     for (std::size_t i = 0; i < 64; i++)
@@ -105,7 +105,7 @@ namespace nil {
                 template<>
                 bool sigBatchVerif<default_r1cs_ppzkadsnark_pp>(
                     const ed25519_vkT &vk, const std::vector<labelT> &labels,
-                    const std::vector<algebra::G2<snark_pp<default_r1cs_ppzkadsnark_pp>>> &Lambdas,
+                    const std::vector<snark_pp<default_r1cs_ppzkadsnark_pp>::g2_type> &Lambdas,
                     const std::vector<ed25519_sigT> &sigs) {
                     std::stringstream stream;
 
@@ -141,7 +141,7 @@ namespace nil {
                             signaturemem[i * (64 + 16 + 320) + 64 + j] = labels[i].label_bytes[j];
 
                         // More efficient way to get canonical point rep?
-                        algebra::G2<snark_pp<default_r1cs_ppzkadsnark_pp>> Lambda_copy(Lambdas[i]);
+                        snark_pp<default_r1cs_ppzkadsnark_pp>::g2_type Lambda_copy(Lambdas[i]);
                         Lambda_copy.to_affine_coordinates();
                         stream.clear();
                         stream.rdbuf()->pubsetbuf((char *)(signaturemem + i * (64 + 16 + 320) + 64 + 16), 320);

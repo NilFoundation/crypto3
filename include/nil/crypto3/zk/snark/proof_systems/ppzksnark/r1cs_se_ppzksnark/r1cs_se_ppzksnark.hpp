@@ -908,10 +908,10 @@ namespace nil {
                                       test1_r1 = pvk.G_alpha_H_beta_ml,
                                       test1_r2 = miller_loop<CurveType>(CurveType::precompute_G1(G_psi), pvk.H_gamma_pc),
                                       test1_r3 = miller_loop<CurveType>(CurveType::precompute_G1(proof.C), pvk.H_pc);
-                    algebra::GT<CurveType> test1 =
+                    CurveType::gt_type test1 =
                         final_exponentiation<CurveType>(test1_l.unitary_inverse() * test1_r1 * test1_r2 * test1_r3);
 
-                    if (test1 != algebra::GT<CurveType>::one()) {
+                    if (test1 != CurveType::gt_type::one()) {
                         result = false;
                     }
 
@@ -920,9 +920,9 @@ namespace nil {
                      */
                     algebra::Fqk<CurveType> test2_l = miller_loop<CurveType>(CurveType::precompute_G1(proof.A), pvk.H_gamma_pc),
                                       test2_r = miller_loop<CurveType>(pvk.G_gamma_pc, CurveType::precompute_G2(proof.B));
-                    algebra::GT<CurveType> test2 = final_exponentiation<CurveType>(test2_l * test2_r.unitary_inverse());
+                    CurveType::gt_type test2 = final_exponentiation<CurveType>(test2_l * test2_r.unitary_inverse());
 
-                    if (test2 != algebra::GT<CurveType>::one()) {
+                    if (test2 != CurveType::gt_type::one()) {
                         result = false;
                     }
 
