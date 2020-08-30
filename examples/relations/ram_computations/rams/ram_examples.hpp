@@ -46,7 +46,7 @@ namespace nil {
                 ram_example<ramT> gen_ram_example_simple(const ram_architecture_params<ramT> &ap,
                                                          const std::size_t boot_trace_size_bound, const std::size_t time_bound,
                                                          const bool satisfiable) {
-                    algebra::enter_block("Call to gen_ram_example_simple");
+                    std::cout << "Call to gen_ram_example_simple" << std::endl;
 
                     const std::size_t program_size = boot_trace_size_bound / 2;
                     const std::size_t input_size = boot_trace_size_bound - program_size;
@@ -82,7 +82,6 @@ namespace nil {
 
                     assert(boot_pos == boot_trace_size_bound);
 
-                    algebra::leave_block("Call to gen_ram_example_simple");
                     return result;
                 }
 
@@ -90,7 +89,7 @@ namespace nil {
                 ram_example<ramT> gen_ram_example_complex(const ram_architecture_params<ramT> &ap,
                                                           const std::size_t boot_trace_size_bound, const std::size_t time_bound,
                                                           const bool satisfiable) {
-                    algebra::enter_block("Call to gen_ram_example_complex");
+                    std::cout << "Call to gen_ram_example_complex" <<std::endl;
 
                     const std::size_t program_size = boot_trace_size_bound / 2;
                     const std::size_t input_size = boot_trace_size_bound - program_size;
@@ -158,7 +157,6 @@ namespace nil {
                             std::make_pair((1ul << (ap.dwaddr_len() - 1)) + i + 1, std::rand() % (1ul << (2 * ap.w))));
                     }
 
-                    algebra::leave_block("Call to gen_ram_example_complex");
                     return result;
                 }
 

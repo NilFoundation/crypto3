@@ -241,7 +241,7 @@ namespace nil {
 
                 template<typename FieldType>
                 bool qap_instance<FieldType>::is_satisfied(const qap_witness<FieldType> &witness) const {
-                    const FieldType t = FieldType::random_element();
+                    const typename FieldType::value_type t = random_element<FieldType>();
 
                     std::vector<typename FieldType::value_type> At(this->num_variables() + 1, FieldType::zero());
                     std::vector<typename FieldType::value_type> Bt(this->num_variables() + 1, FieldType::zero());
@@ -493,7 +493,7 @@ namespace nil {
 
                 template<typename FieldType>
                 bool qap_instance<FieldType>::is_satisfied(const qap_witness<FieldType> &witness) const {
-                    const FieldType t = FieldType::random_element();
+                    const FieldType::value_type t = random_element<FieldType>();
 
                     std::vector<typename FieldType::value_type> At(this->num_variables() + 1, FieldType::zero());
                     std::vector<typename FieldType::value_type> Bt(this->num_variables() + 1, FieldType::zero());

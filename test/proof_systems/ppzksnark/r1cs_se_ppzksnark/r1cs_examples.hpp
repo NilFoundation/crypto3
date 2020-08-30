@@ -66,7 +66,7 @@ namespace nil {
 
                 template<typename FieldType>
                 r1cs_example<FieldType> generate_r1cs_example_with_field_input(std::size_t num_constraints, std::size_t num_inputs) {
-                    algebra::enter_block("Call to generate_r1cs_example_with_field_input");
+                    std::cout << "Call to generate_r1cs_example_with_field_input" << std::endl;
 
                     assert(num_inputs <= num_constraints + 2);
 
@@ -75,8 +75,8 @@ namespace nil {
                     cs.auxiliary_input_size = 2 + num_constraints - num_inputs;    // TODO: explain this
 
                     r1cs_variable_assignment<FieldType> full_variable_assignment;
-                    FieldType a = FieldType::random_element();
-                    FieldType b = FieldType::random_element();
+                    FieldType a = random_element<FieldType>();
+                    FieldType b = random_element<FieldType>();
                     full_variable_assignment.push_back(a);
                     full_variable_assignment.push_back(b);
 
@@ -131,15 +131,13 @@ namespace nil {
                     assert(cs.num_constraints() == num_constraints);
                     assert(cs.is_satisfied(primary_input, auxiliary_input));
 
-                    algebra::leave_block("Call to generate_r1cs_example_with_field_input");
-
                     return r1cs_example<FieldType>(std::move(cs), std::move(primary_input), std::move(auxiliary_input));
                 }
 
                 template<typename FieldType>
                 r1cs_example<FieldType> generate_r1cs_example_with_binary_input(std::size_t num_constraints,
                                                                              std::size_t num_inputs) {
-                    algebra::enter_block("Call to generate_r1cs_example_with_binary_input");
+                    std::cout << "Call to generate_r1cs_example_with_binary_input" << std::endl;
 
                     assert(num_inputs >= 1);
 
@@ -191,8 +189,6 @@ namespace nil {
                     assert(cs.num_inputs() == num_inputs);
                     assert(cs.num_constraints() == num_constraints);
                     assert(cs.is_satisfied(primary_input, auxiliary_input));
-
-                    algebra::leave_block("Call to generate_r1cs_example_with_binary_input");
 
                     return r1cs_example<FieldType>(std::move(cs), std::move(primary_input), std::move(auxiliary_input));
                 }

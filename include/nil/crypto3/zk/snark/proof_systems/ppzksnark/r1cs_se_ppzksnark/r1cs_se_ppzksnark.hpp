@@ -605,15 +605,15 @@ namespace nil {
                 r1cs_se_ppzksnark_verification_key<CurveType>
                     r1cs_se_ppzksnark_verification_key<CurveType>::dummy_verification_key(const std::size_t input_size) {
                     r1cs_se_ppzksnark_verification_key<CurveType> result;
-                    result.H = typename CurveType::scalar_field_type::random_element() * CurveType::g2_type::one();
-                    result.G_alpha = typename CurveType::scalar_field_type::random_element() * CurveType::g1_type::one();
-                    result.H_beta = typename CurveType::scalar_field_type::random_element() * CurveType::g2_type::one();
-                    result.G_gamma = typename CurveType::scalar_field_type::random_element() * CurveType::g1_type::one();
-                    result.H_gamma = typename CurveType::scalar_field_type::random_element() * CurveType::g2_type::one();
+                    result.H = random_element<typename CurveType::scalar_field_type>() * CurveType::g2_type::one();
+                    result.G_alpha = random_element<typename CurveType::scalar_field_type>() * CurveType::g1_type::one();
+                    result.H_beta = random_element<typename CurveType::scalar_field_type>() * CurveType::g2_type::one();
+                    result.G_gamma = random_element<typename CurveType::scalar_field_type>() * CurveType::g1_type::one();
+                    result.H_gamma = random_element<typename CurveType::scalar_field_type>() * CurveType::g2_type::one();
 
                     CurveType::g1_vector v;
                     for (std::size_t i = 0; i < input_size + 1; ++i) {
-                        v.emplace_back(typename CurveType::scalar_field_type::random_element() * CurveType::g1_type::one());
+                        v.emplace_back(random_element<typename CurveType::scalar_field_type>() * CurveType::g1_type::one());
                     }
                     result.query = std::move(v);
 
@@ -632,7 +632,7 @@ namespace nil {
                         r1cs_to_sap_get_domain(cs);
                     typename CurveType::scalar_field_type t;
                     do {
-                        t = typename CurveType::scalar_field_type::random_element();
+                        t = random_element<typename CurveType::scalar_field_type>();
                     } while (domain->compute_vanishing_polynomial(t).is_zero());
 
                     sap_instance_evaluation<typename CurveType::scalar_field_type> sap_inst =
@@ -653,11 +653,11 @@ namespace nil {
                      * but we do not use them below
                      */
 
-                    const typename CurveType::scalar_field_type alpha = typename CurveType::scalar_field_type::random_element(),
-                                           beta = typename CurveType::scalar_field_type::random_element(),
-                                           gamma = typename CurveType::scalar_field_type::random_element();
-                    const CurveType::g1_type G = CurveType::g1_type::random_element();
-                    const CurveType::g2_type H = CurveType::g2_type::random_element();
+                    const typename CurveType::scalar_field_type alpha = random_element<typename CurveType::scalar_field_type>(),
+                                           beta = random_element<typename CurveType::scalar_field_type>(),
+                                           gamma = random_element<typename CurveType::scalar_field_type>();
+                    const CurveType::g1_type G = random_element<CurveType::g1_type>();
+                    const CurveType::g2_type H = random_element<CurveType::g2_type>();
 
                     std::size_t G_exp_count = sap_inst.num_inputs() + 1    // verifier_query
                                          + non_zero_At                // A_query
@@ -770,8 +770,8 @@ namespace nil {
                                              const r1cs_se_ppzksnark_primary_input<CurveType> &primary_input,
                                              const r1cs_se_ppzksnark_auxiliary_input<CurveType> &auxiliary_input) {
 
-                    const typename CurveType::scalar_field_type d1 = typename CurveType::scalar_field_type::random_element(),
-                                           d2 = typename CurveType::scalar_field_type::random_element();
+                    const typename CurveType::scalar_field_type d1 = random_element<typename CurveType::scalar_field_type>(),
+                                           d2 = random_element<typename CurveType::scalar_field_type>();
 
                     const sap_witness<typename CurveType::scalar_field_type> sap_wit =
                         r1cs_to_sap_witness_map(pk.constraint_system, primary_input, auxiliary_input, d1, d2);
@@ -783,7 +783,7 @@ namespace nil {
                     const std::size_t chunks = 1;
 #endif
 
-                    const typename CurveType::scalar_field_type r = typename CurveType::scalar_field_type::random_element();
+                    const typename CurveType::scalar_field_type r = random_element<typename CurveType::scalar_field_type>();
 
                     /**
                      * compute A = G^{gamma * (\sum_{i=0}^m input_i * A_i(t) + r * Z(t))}

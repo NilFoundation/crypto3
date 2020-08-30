@@ -44,7 +44,7 @@ namespace nil {
                     std::shared_ptr<Fqe_variable<CurveType>> PY_twist_squared;
 
                     G1_precomputation();
-                    G1_precomputation(protoboard<FieldType> &pb, const algebra::G1<other_curve<CurveType>> &P);
+                    G1_precomputation(protoboard<FieldType> &pb, const other_curve<CurveType>::g1_type &P);
                 };
 
                 /**
@@ -139,7 +139,7 @@ namespace nil {
                     std::vector<std::shared_ptr<precompute_G2_gadget_coeffs<CurveType>>> coeffs;
 
                     G2_precomputation();
-                    G2_precomputation(protoboard<FieldType> &pb, const algebra::G2<other_curve<CurveType>> &Q_val);
+                    G2_precomputation(protoboard<FieldType> &pb, const other_curve<CurveType>::g2_type &Q_val);
                 };
 
                 /**
@@ -277,12 +277,12 @@ namespace nil {
 
                 template<typename CurveType>
                 G1_precomputation<CurveType>::G1_precomputation(protoboard<FieldType> &pb,
-                                                          const algebra::G1<other_curve<CurveType>> &P_val) {
-                    algebra::G1<other_curve<CurveType>> P_val_copy = P_val;
+                                                          const other_curve<CurveType>::g1_type &P_val) {
+                    other_curve<CurveType>::g1_type P_val_copy = P_val;
                     P_val_copy.to_affine_coordinates();
                     P.reset(new G1_variable<CurveType>(pb, P_val_copy));
                     PY_twist_squared.reset(
-                        new Fqe_variable<CurveType>(pb, P_val_copy.Y() * algebra::G2<other_curve<CurveType>>::twist.squared()));
+                        new Fqe_variable<CurveType>(pb, P_val_copy.Y() * other_curve<CurveType>::g2_type::twist.squared()));
                 }
 
                 template<typename CurveType>
@@ -298,8 +298,8 @@ namespace nil {
                 template<typename CurveType>
                 void test_G1_variable_precomp(const std::string &annotation) {
                     protoboard<typename CurveType::scalar_field_type> pb;
-                    algebra::G1<other_curve<CurveType>> g_val =
-                        algebra::Fr<other_curve<CurveType>>::random_element() * algebra::G1<other_curve<CurveType>>::one();
+                    other_curve<CurveType>::g1_type g_val =
+                        random_element<other_curve<CurveType>::scalar_field_type>() * other_curve<CurveType>::g1_type::one();
 
                     G1_variable<CurveType> g(pb);
                     G1_precomputation<CurveType> precomp;
@@ -324,7 +324,7 @@ namespace nil {
 
                 template<typename CurveType>
                 G2_precomputation<CurveType>::G2_precomputation(protoboard<FieldType> &pb,
-                                                          const algebra::G2<other_curve<CurveType>> &Q_val) {
+                                                          const other_curve<CurveType>::g2_type &Q_val) {
                     Q.reset(new G2_variable<CurveType>(pb, Q_val));
                     const algebra::affine_ate_G2_precomp<other_curve<CurveType>> native_precomp =
                         other_curve<CurveType>::affine_ate_precompute_G2(Q_val);
@@ -390,7 +390,7 @@ namespace nil {
                     RXsquared.reset(new Fqe_variable<CurveType>(pb));
                     compute_RXsquared.reset(new Fqe_sqr_gadget<CurveType>(pb, *(cur.RX), *RXsquared));
                     three_RXsquared_plus_a.reset(
-                        new Fqe_variable<CurveType>((*RXsquared) * typename FieldType::value_type(3) + algebra::G2<other_curve<CurveType>>::a));
+                        new Fqe_variable<CurveType>((*RXsquared) * typename FieldType::value_type(3) + other_curve<CurveType>::g2_type::a));
                     two_RY.reset(new Fqe_variable<CurveType>(*(cur.RY) * typename FieldType::value_type(2)));
 
                     compute_gamma.reset(new Fqe_mul_gadget<CurveType>(pb, *(cur.gamma), *two_RY, *three_RXsquared_plus_a));
@@ -631,8 +631,8 @@ namespace nil {
                 template<typename CurveType>
                 void test_G2_variable_precomp(const std::string &annotation) {
                     protoboard<typename CurveType::scalar_field_type> pb;
-                    algebra::G2<other_curve<CurveType>> g_val =
-                        algebra::Fr<other_curve<CurveType>>::random_element() * algebra::G2<other_curve<CurveType>>::one();
+                    other_curve<CurveType>::g2_type g_val =
+                        random_element<other_curve<CurveType>::scalar_field_type>() * other_curve<CurveType>::g2_type::one();
 
                     G2_variable<CurveType> g(pb, "g");
                     G2_precomputation<CurveType> precomp;

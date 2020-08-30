@@ -623,18 +623,18 @@ namespace nil {
                 r1cs_ppzksnark_verification_key<CurveType>
                     r1cs_ppzksnark_verification_key<CurveType>::dummy_verification_key(const std::size_t input_size) {
                     r1cs_ppzksnark_verification_key<CurveType> result;
-                    result.alphaA_g2 = typename CurveType::scalar_field_type::random_element() * CurveType::g2_type::one();
-                    result.alphaB_g1 = typename CurveType::scalar_field_type::random_element() * CurveType::g1_type::one();
-                    result.alphaC_g2 = typename CurveType::scalar_field_type::random_element() * CurveType::g2_type::one();
-                    result.gamma_g2 = typename CurveType::scalar_field_type::random_element() * CurveType::g2_type::one();
-                    result.gamma_beta_g1 = typename CurveType::scalar_field_type::random_element() * CurveType::g1_type::one();
-                    result.gamma_beta_g2 = typename CurveType::scalar_field_type::random_element() * CurveType::g2_type::one();
-                    result.rC_Z_g2 = typename CurveType::scalar_field_type::random_element() * CurveType::g2_type::one();
+                    result.alphaA_g2 = random_element<typename CurveType::scalar_field_type>() * CurveType::g2_type::one();
+                    result.alphaB_g1 = random_element<typename CurveType::scalar_field_type>() * CurveType::g1_type::one();
+                    result.alphaC_g2 = random_element<typename CurveType::scalar_field_type>() * CurveType::g2_type::one();
+                    result.gamma_g2 = random_element<typename CurveType::scalar_field_type>() * CurveType::g2_type::one();
+                    result.gamma_beta_g1 = random_element<typename CurveType::scalar_field_type>() * CurveType::g1_type::one();
+                    result.gamma_beta_g2 = random_element<typename CurveType::scalar_field_type>() * CurveType::g2_type::one();
+                    result.rC_Z_g2 = random_element<typename CurveType::scalar_field_type>() * CurveType::g2_type::one();
 
-                    CurveType::g1_type base = typename CurveType::scalar_field_type::random_element() * CurveType::g1_type::one();
+                    CurveType::g1_type base = random_element<typename CurveType::scalar_field_type>() * CurveType::g1_type::one();
                     CurveType::g1_vector v;
                     for (std::size_t i = 0; i < input_size; ++i) {
-                        v.emplace_back(typename CurveType::scalar_field_type::random_element() * CurveType::g1_type::one());
+                        v.emplace_back(random_element<typename CurveType::scalar_field_type>() * CurveType::g1_type::one());
                     }
 
                     result.encoded_IC_query = accumulation_vector<CurveType::g1_type>(std::move(base), std::move(v));
@@ -650,7 +650,7 @@ namespace nil {
                     cs_copy.swap_AB_if_beneficial();
 
                     /* draw random element at which the QAP is evaluated */
-                    const typename CurveType::scalar_field_type t = typename CurveType::scalar_field_type::random_element();
+                    const typename CurveType::scalar_field_type t = random_element<typename CurveType::scalar_field_type>();
 
                     qap_instance_evaluation<typename CurveType::scalar_field_type> qap_inst =
                         r1cs_to_qap_instance_map_with_evaluation(cs_copy, t);
@@ -687,13 +687,13 @@ namespace nil {
                     Bt.emplace_back(qap_inst.Zt);
                     Ct.emplace_back(qap_inst.Zt);
 
-                    const typename CurveType::scalar_field_type alphaA = typename CurveType::scalar_field_type::random_element(),
-                                           alphaB = typename CurveType::scalar_field_type::random_element(),
-                                           alphaC = typename CurveType::scalar_field_type::random_element(),
-                                           rA = typename CurveType::scalar_field_type::random_element(),
-                                           rB = typename CurveType::scalar_field_type::random_element(),
-                                           beta = typename CurveType::scalar_field_type::random_element(),
-                                           gamma = typename CurveType::scalar_field_type::random_element();
+                    const typename CurveType::scalar_field_type alphaA = random_element<typename CurveType::scalar_field_type>(),
+                                           alphaB = random_element<typename CurveType::scalar_field_type>(),
+                                           alphaC = random_element<typename CurveType::scalar_field_type>(),
+                                           rA = random_element<typename CurveType::scalar_field_type>(),
+                                           rB = random_element<typename CurveType::scalar_field_type>(),
+                                           beta = random_element<typename CurveType::scalar_field_type>(),
+                                           gamma = random_element<typename CurveType::scalar_field_type>();
                     const typename CurveType::scalar_field_type rC = rA * rB;
 
                     // consrtuct the same-coefficient-check query (must happen before zeroing out the prefix of At)
@@ -801,9 +801,9 @@ namespace nil {
                                           const r1cs_ppzksnark_primary_input<CurveType> &primary_input,
                                           const r1cs_ppzksnark_auxiliary_input<CurveType> &auxiliary_input) {
 
-                    const typename CurveType::scalar_field_type d1 = typename CurveType::scalar_field_type::random_element(),
-                                           d2 = typename CurveType::scalar_field_type::random_element(),
-                                           d3 = typename CurveType::scalar_field_type::random_element();
+                    const typename CurveType::scalar_field_type d1 = random_element<typename CurveType::scalar_field_type>(),
+                                           d2 = random_element<typename CurveType::scalar_field_type>(),
+                                           d3 = random_element<typename CurveType::scalar_field_type>();
 
                     const qap_witness<typename CurveType::scalar_field_type> qap_wit =
                         r1cs_to_qap_witness_map(pk.constraint_system, primary_input, auxiliary_input, d1, d2, d3);

@@ -216,7 +216,7 @@ namespace nil {
                     exp_gadget.generate_r1cs_constraints();
 
                     for (std::size_t i = 0; i < 10; ++i) {
-                        const FpkT x_val = FpkT::random_element();
+                        const FpkT x_val = random_element<FpkT>();
                         x.generate_r1cs_witness(x_val);
                         exp_gadget.generate_r1cs_witness();
                         const FpkT res = x_to_power.get_element();

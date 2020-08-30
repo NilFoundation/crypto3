@@ -73,8 +73,8 @@ namespace nil {
                     cs.auxiliary_input_size = 2 + num_constraints - num_inputs;    // TODO: explain this
 
                     r1cs_variable_assignment<FieldType> full_variable_assignment;
-                    FieldType a = FieldType::random_element();
-                    FieldType b = FieldType::random_element();
+                    typename FieldType::value_type a = random_element<FieldType>();
+                    typename FieldType::value_type b = random_element<FieldType>();
                     full_variable_assignment.push_back(a);
                     full_variable_assignment.push_back(b);
 

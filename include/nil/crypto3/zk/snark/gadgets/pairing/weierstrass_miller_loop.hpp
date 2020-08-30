@@ -510,10 +510,10 @@ namespace nil {
                 template<typename CurveType>
                 void test_mnt_miller_loop(const std::string &annotation) {
                     protoboard<typename CurveType::scalar_field_type> pb;
-                    algebra::G1<other_curve<CurveType>> P_val =
-                        algebra::Fr<other_curve<CurveType>>::random_element() * algebra::G1<other_curve<CurveType>>::one();
-                    algebra::G2<other_curve<CurveType>> Q_val =
-                        algebra::Fr<other_curve<CurveType>>::random_element() * algebra::G2<other_curve<CurveType>>::one();
+                    other_curve<CurveType>::g1_type P_val =
+                        random_element<other_curve<CurveType>::scalar_field_type :: scalar_field_type>() * other_curve<CurveType>::g1_type::one();
+                    other_curve<CurveType>::g2_type Q_val =
+                        random_element<other_curve<CurveType>::scalar_field_type>() * other_curve<CurveType>::g2_type::one();
 
                     G1_variable<CurveType> P(pb);
                     G2_variable<CurveType> Q(pb);
@@ -725,15 +725,15 @@ namespace nil {
                 template<typename CurveType>
                 void test_mnt_e_over_e_miller_loop(const std::string &annotation) {
                     protoboard<typename CurveType::scalar_field_type> pb;
-                    algebra::G1<other_curve<CurveType>> P1_val =
-                        algebra::Fr<other_curve<CurveType>>::random_element() * algebra::G1<other_curve<CurveType>>::one();
-                    algebra::G2<other_curve<CurveType>> Q1_val =
-                        algebra::Fr<other_curve<CurveType>>::random_element() * algebra::G2<other_curve<CurveType>>::one();
+                    other_curve<CurveType>::g1_type P1_val =
+                        random_element<other_curve<CurveType>::scalar_field_type>() * other_curve<CurveType>::g1_type::one();
+                    other_curve<CurveType>::g2_type Q1_val =
+                        random_element<other_curve<CurveType>::scalar_field_type>() * other_curve<CurveType>::g2_type::one();
 
-                    algebra::G1<other_curve<CurveType>> P2_val =
-                        algebra::Fr<other_curve<CurveType>>::random_element() * algebra::G1<other_curve<CurveType>>::one();
-                    algebra::G2<other_curve<CurveType>> Q2_val =
-                        algebra::Fr<other_curve<CurveType>>::random_element() * algebra::G2<other_curve<CurveType>>::one();
+                    other_curve<CurveType>::g1_type P2_val =
+                        random_element<other_curve<CurveType>::scalar_field_type>() * other_curve<CurveType>::g1_type::one();
+                    other_curve<CurveType>::g2_type Q2_val =
+                        random_element<other_curve<CurveType>::scalar_field_type>() * other_curve<CurveType>::g2_type::one();
 
                     G1_variable<CurveType> P1(pb, "P1");
                     G2_variable<CurveType> Q1(pb, "Q1");
@@ -991,20 +991,20 @@ namespace nil {
                 template<typename CurveType>
                 void test_mnt_e_times_e_over_e_miller_loop(const std::string &annotation) {
                     protoboard<typename CurveType::scalar_field_type> pb;
-                    algebra::G1<other_curve<CurveType>> P1_val =
-                        algebra::Fr<other_curve<CurveType>>::random_element() * algebra::G1<other_curve<CurveType>>::one();
-                    algebra::G2<other_curve<CurveType>> Q1_val =
-                        algebra::Fr<other_curve<CurveType>>::random_element() * algebra::G2<other_curve<CurveType>>::one();
+                    other_curve<CurveType>::g1_type P1_val =
+                        random_element<other_curve<CurveType>::scalar_field_type>() * other_curve<CurveType>::g1_type::one();
+                    other_curve<CurveType>::g2_type Q1_val =
+                        random_element<other_curve<CurveType>::scalar_field_type>() * other_curve<CurveType>::g2_type::one();
 
-                    algebra::G1<other_curve<CurveType>> P2_val =
-                        algebra::Fr<other_curve<CurveType>>::random_element() * algebra::G1<other_curve<CurveType>>::one();
-                    algebra::G2<other_curve<CurveType>> Q2_val =
-                        algebra::Fr<other_curve<CurveType>>::random_element() * algebra::G2<other_curve<CurveType>>::one();
+                    other_curve<CurveType>::g1_type P2_val =
+                        random_element<other_curve<CurveType>::scalar_field_type>() * other_curve<CurveType>::g1_type::one();
+                    other_curve<CurveType>::g2_type Q2_val =
+                        random_element<other_curve<CurveType>::scalar_field_type>() * other_curve<CurveType>::g2_type::one();
 
-                    algebra::G1<other_curve<CurveType>> P3_val =
-                        algebra::Fr<other_curve<CurveType>>::random_element() * algebra::G1<other_curve<CurveType>>::one();
-                    algebra::G2<other_curve<CurveType>> Q3_val =
-                        algebra::Fr<other_curve<CurveType>>::random_element() * algebra::G2<other_curve<CurveType>>::one();
+                    other_curve<CurveType>::g1_type P3_val =
+                        random_element<other_curve<CurveType>::scalar_field_type>() * other_curve<CurveType>::g1_type::one();
+                    other_curve<CurveType>::g2_type Q3_val =
+                        random_element<other_curve<CurveType>::scalar_field_type>() * other_curve<CurveType>::g2_type::one();
 
                     G1_variable<CurveType> P1(pb);
                     G2_variable<CurveType> Q1(pb);

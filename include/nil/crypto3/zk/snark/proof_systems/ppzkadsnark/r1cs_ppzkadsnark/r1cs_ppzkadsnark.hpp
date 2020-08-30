@@ -1041,7 +1041,7 @@ namespace nil {
                     cs_copy.swap_AB_if_beneficial();
 
                     /* draw random element at which the QAP is evaluated */
-                    const CurveType t = CurveType::random_element()::scalar_field_type;
+                    const CurveType t = random_element<CurveType>()::scalar_field_type;
 
                     qap_instance_evaluation<CurveType::scalar_field_type::value_type> qap_inst =
                         r1cs_to_qap_instance_map_with_evaluation(cs_copy, t);

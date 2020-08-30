@@ -217,9 +217,9 @@ namespace nil {
 
                 template<typename FieldType>
                 bool ssp_instance<FieldType>::is_satisfied(const ssp_witness<FieldType> &witness) const {
-                    const FieldType t = FieldType::random_element();
+                    const typename FieldType t = random_element<FieldType>();
                     ;
-                    std::vector<typename FieldType::value_type> Vt(this->num_variables() + 1, FieldType::zero());
+                    std::vector<typename FieldType::value_type> Vt(this->num_variables() + 1, FieldType::value_type::zero());
                     std::vector<typename FieldType::value_type> Ht(this->degree() + 1);
 
                     const FieldType Zt = this->domain->compute_vanishing_polynomial(t);
@@ -329,7 +329,7 @@ namespace nil {
                     }
 
                     FieldType ans_V = this->Vt[0] + witness.d * this->Zt;
-                    FieldType ans_H = FieldType::zero();
+                    FieldType ans_H = FieldType::value_type::zero();
 
                     ans_V = ans_V + algebra::inner_product<FieldType>(this->Vt.begin() + 1,
                                                                       this->Vt.begin() + 1 + this->num_variables(),

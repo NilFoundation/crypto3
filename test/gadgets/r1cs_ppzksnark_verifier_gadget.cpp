@@ -177,12 +177,12 @@ void test_mul(const std::string &annotation) {
     mul.generate_r1cs_constraints();
 
     for (size_t i = 0; i < 10; ++i) {
-        const FpExtT x_val = FpExtT::random_element();
-        const FpExtT y_val = FpExtT::random_element();
+        const typename FpExtT::value_type x_val = random_element<FpExtT>();
+        const typename FpExtT::value_type y_val = random_element<FpExtT>();
         x.generate_r1cs_witness(x_val);
         y.generate_r1cs_witness(y_val);
         mul.generate_r1cs_witness();
-        const FpExtT res = xy.get_element();
+        const typename FpExtT::value_type res = xy.get_element();
         assert(res == x_val * y_val);
         assert(pb.is_satisfied());
     }
@@ -200,10 +200,10 @@ void test_sqr(const std::string &annotation) {
     sqr.generate_r1cs_constraints();
 
     for (size_t i = 0; i < 10; ++i) {
-        const FpExtT x_val = FpExtT::random_element();
+        const typename FpExtT::value_type x_val = random_element<FpExtT>();
         x.generate_r1cs_witness(x_val);
         sqr.generate_r1cs_witness();
-        const FpExtT res = xsq.get_element();
+        const typename FpExtT::value_type res = xsq.get_element();
         assert(res == x_val.squared());
         assert(pb.is_satisfied());
     }
@@ -222,12 +222,12 @@ void test_cyclotomic_sqr(const std::string &annotation) {
     sqr.generate_r1cs_constraints();
 
     for (size_t i = 0; i < 10; ++i) {
-        FpExtT x_val = FpExtT::random_element();
+        FpExtT x_val = random_element<FpExtT>();
         x_val = final_exponentiation<CurveType>(x_val);
 
         x.generate_r1cs_witness(x_val);
         sqr.generate_r1cs_witness();
-        const FpExtT res = xsq.get_element();
+        const typename FpExtT::value_type res = xsq.get_element();
         assert(res == x_val.squared());
         assert(pb.is_satisfied());
     }
@@ -243,10 +243,10 @@ void test_Frobenius(const std::string &annotation) {
         VarT<FpExtT> x(pb);
         VarT<FpExtT> x_frob = x.Frobenius_map(i);
 
-        const FpExtT x_val = FpExtT::random_element();
+        const typename FpExtT::value_type x_val = random_element<FpExtT>();
         x.generate_r1cs_witness(x_val);
         x_frob.evaluate();
-        const FpExtT res = x_frob.get_element();
+        const typename FpExtT::value_type res = x_frob.get_element();
         BOOST_CHECK(res == x_val.Frobenius_map(i));
         BOOST_CHECK(pb.is_satisfied());
     }
@@ -259,10 +259,10 @@ void test_full_pairing(const std::string &annotation) {
     typedef typename CurveType::scalar_field_type FieldType;
 
     protoboard<FieldType> pb;
-    algebra::G1<other_curve<CurveType>> P_val =
-        algebra::Fr<other_curve<CurveType>>::random_element() * algebra::G1<other_curve<CurveType>>::one();
-    algebra::G2<other_curve<CurveType>> Q_val =
-        algebra::Fr<other_curve<CurveType>>::random_element() * algebra::G2<other_curve<CurveType>>::one();
+    other_curve<CurveType>::g1_type P_val =
+        random_element<other_curve<CurveType>::scalar_field_type>() * other_curve<CurveType>::g1_type::one();
+    other_curve<CurveType>::g2_type Q_val =
+        random_element<other_curve<CurveType>::scalar_field_type>() * other_curve<CurveType>::g2_type::one();
 
     G1_variable<CurveType> P(pb);
     G2_variable<CurveType> Q(pb);
@@ -311,10 +311,10 @@ void test_full_precomputed_pairing(const std::string &annotation) {
     typedef typename CurveType::scalar_field_type FieldType;
 
     protoboard<FieldType> pb;
-    algebra::G1<other_curve<CurveType>> P_val =
-        algebra::Fr<other_curve<CurveType>>::random_element() * algebra::G1<other_curve<CurveType>>::one();
-    algebra::G2<other_curve<CurveType>> Q_val =
-        algebra::Fr<other_curve<CurveType>>::random_element() * algebra::G2<other_curve<CurveType>>::one();
+    other_curve<CurveType>::g1_type P_val =
+        random_element<other_curve<CurveType>::scalar_field_type>() * other_curve<CurveType>::g1_type::one();
+    other_curve<CurveType>::g2_type Q_val =
+        random_element<other_curve<CurveType>::scalar_field_type>() * other_curve<CurveType>::g2_type::one();
 
     G1_precomputation<CurveType> prec_P(pb, P_val);
     G2_precomputation<CurveType> prec_Q(pb, Q_val);

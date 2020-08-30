@@ -232,10 +232,10 @@ namespace nil {
 
                 template<typename FieldType>
                 bool sap_instance<FieldType>::is_satisfied(const sap_witness<FieldType> &witness) const {
-                    const FieldType t = FieldType::random_element();
+                    const typename FieldType t = random_element<FieldType>();
 
-                    std::vector<typename FieldType::value_type> At(this->num_variables() + 1, FieldType::zero());
-                    std::vector<typename FieldType::value_type> Ct(this->num_variables() + 1, FieldType::zero());
+                    std::vector<typename FieldType::value_type> At(this->num_variables() + 1, FieldType::value_type::zero());
+                    std::vector<typename FieldType::value_type> Ct(this->num_variables() + 1, FieldType::value_type::zero());
                     std::vector<typename FieldType::value_type> Ht(this->degree() + 1);
 
                     const FieldType Zt = this->domain->compute_vanishing_polynomial(t);
@@ -352,7 +352,7 @@ namespace nil {
 
                     FieldType ans_A = this->At[0] + witness.d1 * this->Zt;
                     FieldType ans_C = this->Ct[0] + witness.d2 * this->Zt;
-                    FieldType ans_H = FieldType::zero();
+                    FieldType ans_H = FieldType::value_type::zero();
 
                     ans_A = ans_A + algebra::inner_product<FieldType>(this->At.begin() + 1,
                                                                       this->At.begin() + 1 + this->num_variables(),

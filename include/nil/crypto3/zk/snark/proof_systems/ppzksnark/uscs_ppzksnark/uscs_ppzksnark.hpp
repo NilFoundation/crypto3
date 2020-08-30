@@ -557,14 +557,14 @@ namespace nil {
                 uscs_ppzksnark_verification_key<CurveType>
                     uscs_ppzksnark_verification_key<CurveType>::dummy_verification_key(const std::size_t input_size) {
                     uscs_ppzksnark_verification_key<CurveType> result;
-                    result.tilde_g2 = typename CurveType::scalar_field_type::random_element() * CurveType::g2_type::one();
-                    result.alpha_tilde_g2 = typename CurveType::scalar_field_type::random_element() * CurveType::g2_type::one();
-                    result.Z_g2 = typename CurveType::scalar_field_type::random_element() * CurveType::g2_type::one();
+                    result.tilde_g2 = random_element<typename CurveType::scalar_field_type>() * CurveType::g2_type::one();
+                    result.alpha_tilde_g2 = random_element<typename CurveType::scalar_field_type>() * CurveType::g2_type::one();
+                    result.Z_g2 = random_element<typename CurveType::scalar_field_type>() * CurveType::g2_type::one();
 
-                    CurveType::g1_type base = typename CurveType::scalar_field_type::random_element() * CurveType::g1_type::one();
+                    CurveType::g1_type base = random_element<typename CurveType::scalar_field_type>() * CurveType::g1_type::one();
                     CurveType::g1_vector v;
                     for (std::size_t i = 0; i < input_size; ++i) {
-                        v.emplace_back(typename CurveType::scalar_field_type::random_element() * CurveType::g1_type::one());
+                        v.emplace_back(random_element<typename CurveType::scalar_field_type>() * CurveType::g1_type::one());
                     }
 
                     result.encoded_IC_query = accumulation_vector<CurveType::g1_type>(v);
@@ -577,7 +577,7 @@ namespace nil {
 
                     /* draw random element at which the SSP is evaluated */
 
-                    const typename CurveType::scalar_field_type t = typename CurveType::scalar_field_type::random_element();
+                    const typename CurveType::scalar_field_type t = random_element<typename CurveType::scalar_field_type>();
 
                     /* perform USCS-to-SSP reduction */
 
@@ -608,7 +608,7 @@ namespace nil {
                         assert(!Xt_table[i].is_zero());
                     }
 
-                    const typename CurveType::scalar_field_type alpha = typename CurveType::scalar_field_type::random_element();
+                    const typename CurveType::scalar_field_type alpha = random_element<typename CurveType::scalar_field_type>();
 
                     const std::size_t g1_exp_count = Vt_table.size() + Vt_table_minus_Xt_table.size() + Ht_table.size();
                     const std::size_t g2_exp_count = Vt_table_minus_Xt_table.size();
@@ -645,7 +645,7 @@ namespace nil {
 #ifdef USE_MIXED_ADDITION
                     algebra::batch_to_special<CurveType::g2_type>(V_g2_query);
 #endif
-                    const typename CurveType::scalar_field_type tilde = typename CurveType::scalar_field_type::random_element();
+                    const typename CurveType::scalar_field_type tilde = random_element<typename CurveType::scalar_field_type>();
                     CurveType::g2_type tilde_g2 = tilde * CurveType::g2_type::one();
                     CurveType::g2_type alpha_tilde_g2 = (alpha * tilde) * CurveType::g2_type::one();
                     CurveType::g2_type Z_g2 = ssp_inst.Zt * CurveType::g2_type::one();
@@ -680,7 +680,7 @@ namespace nil {
                                           const uscs_ppzksnark_primary_input<CurveType> &primary_input,
                                           const uscs_ppzksnark_auxiliary_input<CurveType> &auxiliary_input) {
 
-                    const typename CurveType::scalar_field_type d = typename CurveType::scalar_field_type::random_element();
+                    const typename CurveType::scalar_field_type d = random_element<typename CurveType::scalar_field_type>();
 
                     const ssp_witness<typename CurveType::scalar_field_type> ssp_wit =
                         uscs_to_ssp_witness_map(pk.constraint_system, primary_input, auxiliary_input, d);

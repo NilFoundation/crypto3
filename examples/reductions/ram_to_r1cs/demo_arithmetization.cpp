@@ -113,13 +113,11 @@ int main(int argc, const char *argv[]) {
     std::ifstream f_primary_input(primary_input_fn);
     std::ifstream f_auxiliary_input(auxiliary_input_fn);
 
-    algebra::enter_block("Loading primary input");
+    std::cout << "Loading primary input" << std::endl;
     tinyram_input_tape primary_input(load_tape(f_primary_input));
-    algebra::leave_block("Loading primary input");
 
-    algebra::enter_block("Loading auxiliary input");
+    std::cout << "Loading auxiliary input" << std::endl;
     tinyram_input_tape auxiliary_input = load_tape(f_auxiliary_input);
-    algebra::leave_block("Loading auxiliary input");
 
     const std::size_t boot_trace_size_bound = tinyram_input_size_bound + tinyram_program_size_bound;
     const ram_boot_trace<default_ram> boot_trace =

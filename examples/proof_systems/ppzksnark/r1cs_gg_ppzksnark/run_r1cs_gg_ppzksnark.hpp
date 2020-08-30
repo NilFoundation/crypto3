@@ -60,7 +60,7 @@ namespace nil {
                  */
                 template<typename CurveType>
                 bool run_r1cs_gg_ppzksnark(const r1cs_example<typename CurveType::scalar_field_type> &example) {
-                    algebra::enter_block("Call to run_r1cs_gg_ppzksnark");
+                    std::cout << "Call to run_r1cs_gg_ppzksnark" << std::endl;
 
                     std::cout << "R1CS GG-ppzkSNARK Generator" << std::endl;
                     r1cs_gg_ppzksnark_keypair<CurveType> keypair =
