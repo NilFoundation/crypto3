@@ -92,7 +92,7 @@ namespace nil {
                         operator=(const r1cs_ppzkadsnark_pub_auth_prms<CurveType> &other) = default;
                     r1cs_ppzkadsnark_pub_auth_prms(const r1cs_ppzkadsnark_pub_auth_prms<CurveType> &other) = default;
                     r1cs_ppzkadsnark_pub_auth_prms(r1cs_ppzkadsnark_pub_auth_prms<CurveType> &&other) = default;
-                    r1cs_ppzkadsnark_pub_auth_prms(CurveType::g1_type &&I1) : I1(std::move(I1)) {};
+                    r1cs_ppzkadsnark_pub_auth_prms(typename CurveType::g1_type &&I1) : I1(std::move(I1)) {};
 
                     bool operator==(const r1cs_ppzkadsnark_pub_auth_prms<CurveType> &other) const;
                     friend std::ostream &operator<<<CurveType>(std::ostream &out,
@@ -117,7 +117,7 @@ namespace nil {
                 template<typename CurveType>
                 class r1cs_ppzkadsnark_sec_auth_key {
                 public:
-                    CurveType i::scalar_field_type;
+                    typename CurveType::scalar_field_type i;
                     r1cs_ppzkadsnark_skT<CurveType> skp;
                     r1cs_ppzkadsnark_prfKeyT<CurveType> S;
 
@@ -162,7 +162,7 @@ namespace nil {
                         operator=(const r1cs_ppzkadsnark_pub_auth_key<CurveType> &other) = default;
                     r1cs_ppzkadsnark_pub_auth_key(const r1cs_ppzkadsnark_pub_auth_key<CurveType> &other) = default;
                     r1cs_ppzkadsnark_pub_auth_key(r1cs_ppzkadsnark_pub_auth_key<CurveType> &&other) = default;
-                    r1cs_ppzkadsnark_pub_auth_key(CurveType::g2_type &&minusI2,
+                    r1cs_ppzkadsnark_pub_auth_key(typename CurveType::g2_type &&minusI2,
                                                   r1cs_ppzkadsnark_vkT<CurveType> &&vkp) :
                         minusI2(std::move(minusI2)),
                         vkp(std::move(vkp)) {};
@@ -209,16 +209,16 @@ namespace nil {
                 template<typename CurveType>
                 class r1cs_ppzkadsnark_auth_data {
                 public:
-                    CurveType mu::scalar_field_type;
-                    CurveType::g2_type Lambda;
+                    typename CurveType::scalar_field_type mu;
+                    typename CurveType::g2_type Lambda;
                     r1cs_ppzkadsnark_sigT<CurveType> sigma;
 
                     r1cs_ppzkadsnark_auth_data() {};
                     r1cs_ppzkadsnark_auth_data<CurveType> &operator=(const r1cs_ppzkadsnark_auth_data<CurveType> &other) = default;
                     r1cs_ppzkadsnark_auth_data(const r1cs_ppzkadsnark_auth_data<CurveType> &other) = default;
                     r1cs_ppzkadsnark_auth_data(r1cs_ppzkadsnark_auth_data<CurveType> &&other) = default;
-                    r1cs_ppzkadsnark_auth_data(CurveType &&mu::scalar_field_type,
-                                               CurveType::g2_type &&Lambda,
+                    r1cs_ppzkadsnark_auth_data(typename CurveType::scalar_field_type &&mu,
+                                               typename CurveType::g2_type &&Lambda,
                                                r1cs_ppzkadsnark_sigT<CurveType> &&sigma) :
                         mu(std::move(mu)),
                         Lambda(std::move(Lambda)), sigma(std::move(sigma)) {};
@@ -251,7 +251,7 @@ namespace nil {
                     algebra::G1_vector<snark_pp<CurveType>> H_query;    // t powers
                     algebra::G1_vector<snark_pp<CurveType>> K_query;
                     /* Now come the additional elements for ad */
-                    CurveType::g1_type rA_i_Z_g1;
+                    typename CurveType::g1_type rA_i_Z_g1;
 
                     r1cs_ppzkadsnark_constraint_system<CurveType> constraint_system;
 
@@ -328,26 +328,26 @@ namespace nil {
                 template<typename CurveType>
                 class r1cs_ppzkadsnark_verification_key {
                 public:
-                    CurveType::g2_type alphaA_g2;
-                    CurveType::g1_type alphaB_g1;
-                    CurveType::g2_type alphaC_g2;
-                    CurveType::g2_type gamma_g2;
-                    CurveType::g1_type gamma_beta_g1;
-                    CurveType::g2_type gamma_beta_g2;
-                    CurveType::g2_type rC_Z_g2;
+                    typename CurveType::g2_type alphaA_g2;
+                    typename CurveType::g1_type alphaB_g1;
+                    typename CurveType::g2_type alphaC_g2;
+                    typename CurveType::g2_type gamma_g2;
+                    typename CurveType::g1_type gamma_beta_g1;
+                    typename CurveType::g2_type gamma_beta_g2;
+                    typename CurveType::g2_type rC_Z_g2;
 
-                    CurveType::g1_type A0;
+                    typename CurveType::g1_type A0;
                     algebra::G1_vector<snark_pp<CurveType>> Ain;
 
                     r1cs_ppzkadsnark_verification_key() = default;
-                    r1cs_ppzkadsnark_verification_key(const CurveType::g2_type &alphaA_g2,
-                                                      const CurveType::g1_type &alphaB_g1,
-                                                      const CurveType::g2_type &alphaC_g2,
-                                                      const CurveType::g2_type &gamma_g2,
-                                                      const CurveType::g1_type &gamma_beta_g1,
-                                                      const CurveType::g2_type &gamma_beta_g2,
-                                                      const CurveType::g2_type &rC_Z_g2,
-                                                      const CurveType::g1_type
+                    r1cs_ppzkadsnark_verification_key(const typename CurveType::g2_type &alphaA_g2,
+                                                      const typename CurveType::g1_type &alphaB_g1,
+                                                      const typename CurveType::g2_type &alphaC_g2,
+                                                      const typename CurveType::g2_type &gamma_g2,
+                                                      const typename CurveType::g1_type &gamma_beta_g1,
+                                                      const typename CurveType::g2_type &gamma_beta_g2,
+                                                      const typename CurveType::g2_type &rC_Z_g2,
+                                                      const typename CurveType::g1_type
                                                           A0,
                                                       const algebra::G1_vector<snark_pp<CurveType>>
                                                           Ain) :
@@ -472,10 +472,10 @@ namespace nil {
                     knowledge_commitment<CurveType::g1_type, CurveType::g1_type> g_A;
                     knowledge_commitment<CurveType::g2_type, CurveType::g1_type> g_B;
                     knowledge_commitment<CurveType::g1_type, CurveType::g1_type> g_C;
-                    CurveType::g1_type g_H;
-                    CurveType::g1_type g_K;
+                    typename CurveType::g1_type g_H;
+                    typename CurveType::g1_type g_K;
                     knowledge_commitment<CurveType::g1_type, CurveType::g1_type> g_Aau;
-                    CurveType::g1_type muA;
+                    typename CurveType::g1_type muA;
 
                     r1cs_ppzkadsnark_proof() {
                         // invalid proof with valid curve points
