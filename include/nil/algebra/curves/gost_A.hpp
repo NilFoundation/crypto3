@@ -35,7 +35,11 @@ namespace nil {
                 typedef fields::frp_v1_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
                 constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
 
-                typedef typename detail::element_curve_weierstrass<base_field_type::value_type> value_type;
+                //typedef typename detail::element_curve_weierstrass<base_field_type::value_type> value_type;
+
+                typedef typename detail::gost_A_g1<256> g1_type;
+                typedef typename detail::gost_A_g2<256> g2_type;
+                typedef typename nil::algebra::fields::detail::element_fp??<nil::algebra::fields::detail::arithmetic_params<gost_A_fq<256, CHAR_BIT>>> gt_type;
 
                 constexpr static const number_type p = base_field_modulus;
                 constexpr static const number_type q = scalar_field_modulus;

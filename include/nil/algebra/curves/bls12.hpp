@@ -41,10 +41,11 @@ namespace nil {
                 typedef fields::bls12_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
                 constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
 
-                typedef typename detail::element_curve_weierstrass<base_field_type::value_type> value_type;
+                //typedef typename detail::element_curve_weierstrass<base_field_type::value_type> value_type;
 
-                typedef typename detail::bls12_g1<detail::pairing_params<bls12<254>>> g1_type;
-                typedef typename detail::bls12_g2<detail::pairing_params<bls12<254>>> g2_type;
+                typedef typename detail::bls12_g1<254> g1_type;
+                typedef typename detail::bls12_g2<254> g2_type;
+                typedef typename nil::algebra::fields::detail::element_fp12_2over3over2<nil::algebra::fields::detail::arithmetic_params<bls_fq<381, CHAR_BIT>>> gt_type;
 
                 constexpr static const number_type p = base_field_modulus;
                 constexpr static const number_type q = scalar_field_modulus;

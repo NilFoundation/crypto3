@@ -52,7 +52,7 @@ namespace nil {
                 typedef fields::bn128_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
                 constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
 
-                typedef typename detail::element_curve_weierstrass<base_field_type::value_type> value_type;
+                //typedef typename detail::element_curve_weierstrass<base_field_type::value_type> value_type;
 
                 typedef typename detail::bn128_g1<254> g1_type;
                 typedef typename detail::bn128_g2<254> g2_type;

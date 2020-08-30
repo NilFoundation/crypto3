@@ -42,20 +42,21 @@ namespace nil {
             struct mnt4 { };
 
             template<>
-            struct mnt4<254> {
-                constexpr static const std::size_t base_field_bits = 254;
+            struct mnt4<298> {
+                constexpr static const std::size_t base_field_bits = 298;
                 typedef fields::mnt4_fq<base_field_bits, CHAR_BIT> base_field_type;
                 typedef typename base_field_type::modulus_type number_type;
                 constexpr static const number_type base_field_modulus = base_field_type::modulus;
 
-                constexpr static const std::size_t scalar_field_bits = 254;
+                constexpr static const std::size_t scalar_field_bits = 298;
                 typedef fields::mnt4_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
                 constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
 
-                typedef typename detail::element_curve_weierstrass<base_field_type::value_type> value_type;
+                //typedef typename detail::element_curve_weierstrass<base_field_type::value_type> value_type;
 
-                typedef typename detail::mnt4_g1<254> g1_type;
-                typedef typename detail::mnt4_g2<254> g2_type;
+                typedef typename detail::mnt4_g1<298> g1_type;
+                typedef typename detail::mnt4_g2<298> g2_type;
+                typedef typename nil::algebra::fields::detail::element_fp4<nil::algebra::fields::detail::arithmetic_params<mnt4<298, CHAR_BIT>>> gt_type;
 
                 typedef std::vector<typename g1_type> g1_vector;
                 typedef std::vector<typename g2_type> g2_vector;
