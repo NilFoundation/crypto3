@@ -34,9 +34,10 @@ namespace nil{
                     2 * Fp2Dbl::mod
                     9 * Fp2::add/sub
                  */
-                element_fp4 sq_Fp4UseDbl(const element_fp4 &B) {
-                    double_element_fp2 T0, T1, T2;
-                    element_fp2 z0, z1;
+                template <std::size_t ModulusBits, std::size_t GeneratorBits>
+                element_fp4<ModulusBits, GeneratorBits> sq_Fp4UseDbl(const element_fp4<ModulusBits, GeneratorBits> &B) {
+                    double_element_fp2<ModulusBits, GeneratorBits> T0, T1, T2;
+                    element_fp2<ModulusBits, GeneratorBits> z0, z1;
                     T0 = x0.square();
                     T1 = x1.square();
                     T2 = T1.mul_xi();
@@ -52,8 +53,6 @@ namespace nil{
                 }
 
 
-
-
                 /*
                     Final exponentiation based on:
                     - Laura Fuentes-Casta{\~n}eda, Edward Knapp, and Francisco
@@ -63,10 +62,10 @@ namespace nil{
 
                     *this = final_exp(*this)
                 */
-
-                element<fp12_2over3over2> pow_neg_t(const element<fp12_2over3over2> &A) {
-                    element_fp12_2over3over2 out = A;
-                    element_fp12_2over3over2 inConj;
+                template <std::size_t ModulusBits, std::size_t GeneratorBits>
+                element_fp12_2over3over2<ModulusBits, GeneratorBits> pow_neg_t(const element_fp12_2over3over2<ModulusBits, GeneratorBits> &A) {
+                    element_fp12_2over3over2<ModulusBits, GeneratorBits> out = A;
+                    element_fp12_2over3over2<ModulusBits, GeneratorBits> inConj;
                     inConj.a_ = A.a_;
                     inConj.b_ = -A.b_;    // in^-1 == in^(p^6)
 
@@ -86,7 +85,8 @@ namespace nil{
                 /*
                     @note destory *this
                 */
-                element<fp12_2over3over2> mapToCyclo(element<fp12_2over3over2> A){
+                template <std::size_t ModulusBits, std::size_t GeneratorBits>
+                element_fp12_2over3over2<ModulusBits, GeneratorBits> mapToCyclo(element_fp12_2over3over2<ModulusBits, GeneratorBits> A){
                     // (a + b*i) -> ((a - b*i) * (a + b*i)^(-1))^(q^2+1)
                     //
                     // See Beuchat page 9: raising to 6-th power is the same as
@@ -100,10 +100,11 @@ namespace nil{
                     z *= A;
                 }
 
-                element<fp12_2over3over2> final_exp(element<fp12_2over3over2> A) {
-                    element_fp12_2over3over2 f, f2z, f6z, f6z2, f12z3;
-                    element_fp12_2over3over2 a, b;
-                    element_fp12_2over3over2 &z = A;
+                template <std::size_t ModulusBits, std::size_t GeneratorBits>
+                element_fp12_2over3over2<ModulusBits, GeneratorBits> final_exp(element_fp12_2over3over2<ModulusBits, GeneratorBits> A) {
+                    element_fp12_2over3over2<ModulusBits, GeneratorBits> f, f2z, f6z, f6z2, f12z3;
+                    element_fp12_2over3over2<ModulusBits, GeneratorBits> a, b;
+                    element_fp12_2over3over2<ModulusBits, GeneratorBits> &z = A;
                     f = mapToCyclo(f);
 
                     f2z = pow_neg_t(f);
@@ -142,19 +143,16 @@ namespace nil{
 
                 }
 
-
-
                 /*
                     @memo Jacobian coordinates: Y^2 = X^3 + b*Z^6
                 */
                 template<class Fp>
                 inline bool isOnECJac3(const Fp *P) {
-                    typedef Fp2T<Fp> Fp2;
                     typedef ParamT<Fp2> Param;
                     if (P[2] == 0)
                         return true;
 
-                    Fp Z6p_2;
+                    element_fp<ModulusBits, GeneratorBits> Z6p_2;
                     Z6p_2 = P[2].square();
                     Z6p_2 *= P[2];
                     Z6p_2 = Z6p_2.square();
@@ -168,7 +166,6 @@ namespace nil{
                 */
                 template<class Fp>
                 inline bool isOnECHom2(const Fp *P) {
-                    typedef Fp2T<Fp> Fp2;
                     typedef ParamT<Fp2> Param;
                     return P[1] * P[1] == P[0] * P[0] * P[0] + Param::b;
                 }
@@ -179,7 +176,6 @@ namespace nil{
                 */
                 template<class Fp>
                 inline bool isOnECHom3(const Fp *P) {
-                    typedef Fp2T<Fp> Fp2;
                     typedef ParamT<Fp2> Param;
                     if (P[2] == 0)
                         return true;
