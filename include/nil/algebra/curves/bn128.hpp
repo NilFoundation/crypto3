@@ -71,6 +71,15 @@ namespace nil {
                 constexpr static const number_type y = 0x01;
             };
 
+            template<std::size_t ModulusBits = 254, std::size_t GeneratorBits = CHAR_BIT>
+            using bn128_g1 = bn128<ModulusBits, GeneratorBits>::g1_type;
+
+            template<std::size_t ModulusBits = 254, std::size_t GeneratorBits = CHAR_BIT>
+            using bn128_g2 = bn128<ModulusBits, GeneratorBits>::g2_type;
+
+            template<std::size_t ModulusBits = 254, std::size_t GeneratorBits = CHAR_BIT>
+            using bn128_gt = bn128<ModulusBits, GeneratorBits>::gt_type;
+
         }    // namespace curves
     }        // namespace algebra
 }    // namespace nil
