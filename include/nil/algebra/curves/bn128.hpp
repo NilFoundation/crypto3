@@ -12,6 +12,7 @@
 
 #include <nil/algebra/curves/detail/element/curve_weierstrass.hpp>
 #include <nil/algebra/curves/detail/params/params.hpp>
+
 #include <nil/algebra/curves/detail/bn128/g1.hpp>
 #include <nil/algebra/curves/detail/bn128/g2.hpp>
 
@@ -38,11 +39,11 @@ namespace nil {
                 v^3 = xi
                 w^2 = v
             */
-            template<std::size_t ModulusBits>
+            template<std::size_t ModulusBits = 254, std::size_t GeneratorBits = CHAR_BIT>
             struct bn128 { };
 
             template<>
-            struct bn128<254> {
+            struct bn128<254, CHAR_BIT> {
                 constexpr static const std::size_t base_field_bits = 254;
                 typedef fields::bn128_fq<base_field_bits, CHAR_BIT> base_field_type;
                 typedef typename base_field_type::modulus_type number_type;
@@ -54,8 +55,8 @@ namespace nil {
 
                 //typedef typename detail::element_curve_weierstrass<base_field_type::value_type> value_type;
 
-                typedef typename detail::bn128_g1<254> g1_type;
-                typedef typename detail::bn128_g2<254> g2_type;
+                typedef typename detail::bn128_g1<254, CHAR_BIT> g1_type;
+                typedef typename detail::bn128_g2<254, CHAR_BIT> g2_type;
                 typedef typename nil::algebra::fields::detail::element_fp12_2over3over2<nil::algebra::fields::detail::arithmetic_params<bn128_fq<254, CHAR_BIT>>> gt_type;
 
                 typedef std::vector<typename g1_type> g1_vector;

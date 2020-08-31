@@ -13,14 +13,12 @@
 #include <boost/multiprecision/cpp_int/multiply.hpp>
 #include <boost/multiprecision/modular/base_params.hpp>
 
-#include <nil/algebra/curves/detail/element/curve_weierstrass.hpp>
-
 namespace nil {
     namespace algebra {
         namespace curves {
             namespace detail {
 
-                template<std::size_t ModulusBits>
+                template<std::size_t ModulusBits, std::size_t GeneratorBits>
                 struct alt_bn128_g1 {
 
                     using policy_type = edwards<ModulusBits>;

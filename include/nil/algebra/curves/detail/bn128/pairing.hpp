@@ -22,24 +22,24 @@ namespace nil {
         namespace curves {
             namespace detail {
 
-                template<std::size_t ModulusBits, std::size_t GeneratorBits>
-                using fp_value_type = element_fp<ModulusBits, GeneratorBits>;
+                using nil::algebra;
 
-                template<std::size_t ModulusBits, std::size_t GeneratorBits>
-                using fp2_value_type = element_fp2<ModulusBits, GeneratorBits>;
-
+                template<std::size_t ModulusBits = 254, std::size_t GeneratorBits = CHAR_BIT>
                 struct bn128_ate_g1_precomp {
-                    fp_value_type P[3];
+                    typename curves::bn128<ModulusBits, GeneratorBits>::g1_type::underlying_field_type p[3];
 
                     bool operator==(const bn128_ate_g1_precomp &other) const {
-                        return (P[0] == other.P[0] && P[1] == other.P[1] && P[2] == other.P[2]);
+                        return (p[0] == other.p[0] && p[1] == other.p[1] && p[2] == other.p[2]);
                     }
                 };
 
-                typedef element_fp6_3over2 bn128_ate_ell_coeffs;
+                template<std::size_t ModulusBits = 254, std::size_t GeneratorBits = CHAR_BIT>
+                typedef element_fp6_3over2<detail::arithmetic_params<bn128_fq<ModulusBits, GeneratorBits>>> bn128_ate_ell_coeffs;
 
+                template<std::size_t ModulusBits = 254, std::size_t GeneratorBits = CHAR_BIT>
                 struct bn128_ate_g2_precomp {
-                    fp2_value_type Q[3];
+                    typename curves::bn128<ModulusBits, GeneratorBits>::g2_type::underlying_field_type q[3];
+
                     std::vector<bn128_ate_ell_coeffs> coeffs;
 
                     bool operator==(const bn128_ate_g2_precomp &other) const {

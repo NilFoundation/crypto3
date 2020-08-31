@@ -22,7 +22,7 @@ namespace nil {
         namespace curves {
             namespace detail {
 
-                template<std::size_t ModulusBits>
+                template<std::size_t ModulusBits = 183>
                 struct edwards_g1 {
                     
                     using policy_type = edwards<ModulusBits>;
