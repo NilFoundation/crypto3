@@ -34,10 +34,10 @@ namespace nil {
                         p[2] = z;
                     }
 
-                    element_curve_weierstrass(const element_curve_weierstrass &B) {
-                        p[0] = B.p[0];
-                        p[1] = B.p[1];
-                        p[2] = B.p[2];
+                    element_curve_weierstrass(const element_curve_weierstrass &other) {
+                        p[0] = other.p[0];
+                        p[1] = other.p[1];
+                        p[2] = other.p[2];
                     }
 
                     element_curve_weierstrass normalize() const {
@@ -78,22 +78,22 @@ namespace nil {
 
                     /*
                         Jacobi coordinate
-                        (p_out[0], p_out[1], p_out[2]) = (p[0], p[1], p[2]) + (B.p[0], B.p[1], B.p[2])
+                        (p_out[0], p_out[1], p_out[2]) = (p[0], p[1], p[2]) + (other.p[0], other.p[1], other.p[2])
                     */
-                    element_curve_weierstrass operator+(const element_curve_weierstrass &B) const {
+                    element_curve_weierstrass operator+(const element_curve_weierstrass &other) const {
 
                         element_curve_weierstrass res = *this;
 
-                        res += B;
+                        res += other;
 
                         return res;
                     }
 
-                    element_curve_weierstrass operator-(const element_curve_weierstrass &B) const {
+                    element_curve_weierstrass operator-(const element_curve_weierstrass &other) const {
 
                         element_curve_weierstrass res = *this;
 
-                        res -= B;
+                        res -= other;
 
                         return res;
                     }
@@ -129,9 +129,9 @@ namespace nil {
                         return *this;
                     }
 
-                    bool operator==(const element_curve_weierstrass &B) const {
+                    bool operator==(const element_curve_weierstrass &other) const {
                         element_curve_weierstrass t0 = normalize();
-                        element_curve_weierstrass t1 = B.normalize();
+                        element_curve_weierstrass t1 = other.normalize();
                         if (t0.is_zero()) {
                             if (t1.is_zero())
                                 return true;
@@ -144,31 +144,31 @@ namespace nil {
                     }
 
 
-                    bool operator!=(const element_curve_weierstrass &B) const {
-                        return !operator==(B);
+                    bool operator!=(const element_curve_weierstrass &other) const {
+                        return !operator==(other);
                     }
 
                     bool is_zero() const {
                         return p[2].is_zero();
                     }
 
-                    element_curve_weierstrass operator+=(const element_curve_weierstrass &B) {
+                    element_curve_weierstrass operator+=(const element_curve_weierstrass &other) {
                         
                         if (p[2].is_zero()) {
-                            return B;
+                            return other;
                         }
-                        if (B.p[2].is_zero()) {
+                        if (other.p[2].is_zero()) {
                             return *this;
                         }
                         underlying_field_type Z1Z1, Z2Z2, U1, U2, S1, S2, H, I, J, t3, r, V;
 
                         Z1Z1 = p[2].square();
-                        Z2Z2 = B.p[2].square();
+                        Z2Z2 = other.p[2].square();
                         U1 = p[0] * Z2Z2;
-                        U2 = B.p[0] * Z2Z2;
+                        U2 = other.p[0] * Z2Z2;
 
-                        S1 = p[1] * B.p[2] * Z2Z2;
-                        S2 = B.p[1] * p[2] * Z1Z1;
+                        S1 = p[1] * other.p[2] * Z2Z2;
+                        S2 = other.p[1] * p[2] * Z1Z1;
 
                         H = U2 - U1;
                         t3 = S2 - S1;
@@ -188,15 +188,15 @@ namespace nil {
                         V = U1 * I;
                         p[0] = r.square() - J - V.dbl();
                         p[1] = r * (V - p[0]) - (S1 * J).dbl();
-                        p[2] = ((p[2] + B.p[2]).square() - Z1Z1 - Z2Z2) * H;
+                        p[2] = ((p[2] + other.p[2]).square() - Z1Z1 - Z2Z2) * H;
 
                         return *this;
 
                     }
 
-                    element_curve_weierstrass &operator-=(const element_curve_weierstrass &B) {
+                    element_curve_weierstrass &operator-=(const element_curve_weierstrass &other) {
 
-                        *this += (-B);
+                        *this += (-other);
 
                         return *this;
                     }

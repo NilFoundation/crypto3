@@ -34,9 +34,13 @@ namespace nil {
 
                     using underlying_field_type = g1_field_type_value;
 
-                    mnt4_g1() : element_type(underlying_field_type::one(), underlying_field_type::one(), underlying_field_type::zero()) {};
+                    mnt4_g1() : mnt_g1(underlying_field_type::one(), underlying_field_type::one(), underlying_field_type::zero()) {};
 
-                    mnt4_g1(underlying_field_type X, underlying_field_type Y, underlying_field_type Z) : element_type(X, Y, Z) {};
+                    mnt4_g1(underlying_field_type X, underlying_field_type Y, underlying_field_type Z) {
+                        p[0] = X;
+                        p[1] = Y;
+                        p[2] = Z;
+                    };
 
                     static mnt4_g1 zero() {
                         return mnt4_g1(zero_fill[0], zero_fill[1], zero_fill[2]);
@@ -46,38 +50,38 @@ namespace nil {
                         return mnt4_g1(one_fill[0], one_fill[1], one_fill[2]);
                     }
 
-                    bool mnt4_g1::operator==(const mnt4_g1 &B) const{
+                    bool mnt4_g1::operator==(const mnt4_g1 &other) const{
                         if (this->is_zero()){
-                            return B.is_zero();
+                            return other.is_zero();
                         }
 
-                        if (B.is_zero()){
+                        if (other.is_zero()){
                             return false;
                         }
 
                         /* now neither is O */
 
                         // X1/Z1 = X2/Z2 <=> X1*Z2 = X2*Z1
-                        if ((this->p[0] * B.p[2]) != (B.p[0] * this->p[2])){
+                        if ((this->p[0] * other.p[2]) != (other.p[0] * this->p[2])){
                             return false;
                         }
 
                         // Y1/Z1 = Y2/Z2 <=> Y1*Z2 = Y2*Z1
-                        if ((this->p[1] * B.p[2]) != (B.p[1] * this->p[2])){
+                        if ((this->p[1] * other.p[2]) != (other.p[1] * this->p[2])){
                             return false;
                         }
 
                         return true;
                     }
 
-                    mnt4_G1 operator+(const mnt4_G1 &B) const{
+                    mnt4_G1 operator+(const mnt4_G1 &other) const{
 
                         // handle special cases having to do with O
                         if (this->is_zero()){
-                            return B;
+                            return other;
                         }
 
-                        if (B.is_zero()){
+                        if (other.is_zero()){
                             return (*this);
                         }
 
@@ -85,19 +89,19 @@ namespace nil {
                         // (they cannot exist in a prime-order subgroup)
 
                         // handle double case
-                        if (*this == B){
+                        if (*this == other){
                             return this->dbl();
                         }
 
                         // NOTE: does not handle O and pts of order 2,4
                         // http://www.hyperelliptic.org/EFD/g1p/auto-shortw-projective.html#addition-add-1998-cmo-2
 
-                        const underlying_field_type Y1Z2 = (this->p[1]) * (B.p[2]);        // Y1Z2 = Y1*Z2
-                        const underlying_field_type X1Z2 = (this->p[0]) * (B.p[2]);        // X1Z2 = X1*Z2
-                        const underlying_field_type Z1Z2 = (this->p[2]) * (B.p[2]);        // Z1Z2 = Z1*Z2
-                        const underlying_field_type u    = (B.p[1]) * (this->p[2]) - Y1Z2; // u    = Y2*Z1-Y1Z2
+                        const underlying_field_type Y1Z2 = (this->p[1]) * (other.p[2]);        // Y1Z2 = Y1*Z2
+                        const underlying_field_type X1Z2 = (this->p[0]) * (other.p[2]);        // X1Z2 = X1*Z2
+                        const underlying_field_type Z1Z2 = (this->p[2]) * (other.p[2]);        // Z1Z2 = Z1*Z2
+                        const underlying_field_type u    = (other.p[1]) * (this->p[2]) - Y1Z2; // u    = Y2*Z1-Y1Z2
                         const underlying_field_type uu   = u.square();                    // uu   = u^2
-                        const underlying_field_type v    = (B.p[0]) * (this->p[2]) - X1Z2; // v    = X2*Z1-X1Z2
+                        const underlying_field_type v    = (other.p[0]) * (this->p[2]) - X1Z2; // v    = X2*Z1-X1Z2
                         const underlying_field_type vv   = v.square();                    // vv   = v^2
                         const underlying_field_type vvv  = v * vv;                         // vvv  = v*vv
                         const underlying_field_type R    = vv * X1Z2;                      // R    = vv*X1Z2
@@ -113,8 +117,8 @@ namespace nil {
                         return mnt4_g1(this->p[0], -this->p[1], this->p[2]);
                     }
 
-                    mnt4_g1 operator- (const mnt4_g1 &B) const {
-                        return (*this) + (-B);
+                    mnt4_g1 operator- (const mnt4_g1 &other) const {
+                        return (*this) + (-other);
                     }
 
                     mnt4_g1 dbl() const {
@@ -136,35 +140,35 @@ namespace nil {
                             const underlying_field_type R    = (this->p[1]) * s;                         // R   = Y1*s
                             const underlying_field_type RR   = R.square();                            // RR  = R^2
                             const underlying_field_type B    = ((this->p[0])+R).square()-XX-RR;         // B   = (X1+R)^2 - XX - RR
-                            const underlying_field_type h    = w.square() - (B+B);                    // h   = w^2 - 2*B
+                            const underlying_field_type h    = w.square() - B.dbl();                    // h   = w^2 - 2*B
                             const underlying_field_type X3   = h * s;                                  // X3  = h*s
-                            const underlying_field_type Y3   = w * (B-h)-(RR+RR);                      // Y3  = w*(B-h) - 2*RR
+                            const underlying_field_type Y3   = w * (B-h)-RR.dbl();                      // Y3  = w*(B-h) - 2*RR
                             const underlying_field_type Z3   = sss;                                    // Z3  = sss
 
                             return mnt4_G1(X3, Y3, Z3);
                         }
                     }
 
-                    mnt4_G1 mixed_add(const mnt4_G1 &B) const{
+                    mnt4_G1 mixed_add(const mnt4_G1 &other) const{
                     
                         // NOTE: does not handle O and pts of order 2,4
                         // http://www.hyperelliptic.org/EFD/g1p/auto-shortw-projective.html#addition-add-1998-cmo-2
 
                         if (this->is_zero()) {
-                            return B;
+                            return other;
                         }
 
-                        if (B.is_zero()) {
+                        if (other.is_zero()) {
                             return (*this);
                         }
 
-                        const underlying_field_type &X1Z2 = (this->p[0]);                    // X1Z2 = X1*Z2 (but B is special and not zero)
-                        const underlying_field_type X2Z1 = (this->p[2]) * (B.p[0]);          // X2Z1 = X2*Z1
+                        const underlying_field_type &X1Z2 = (this->p[0]);                    // X1Z2 = X1*Z2 (but other is special and not zero)
+                        const underlying_field_type X2Z1 = (this->p[2]) * (other.p[0]);          // X2Z1 = X2*Z1
 
                         // (used both in add and double checks)
 
-                        const underlying_field_type &Y1Z2 = (this->p[1]);                    // Y1Z2 = Y1*Z2 (but B is special and not zero)
-                        const underlying_field_type Y2Z1 = (this->p[2]) * (B.p[1]);          // Y2Z1 = Y2*Z1
+                        const underlying_field_type &Y1Z2 = (this->p[1]);                    // Y1Z2 = Y1*Z2 (but other is special and not zero)
+                        const underlying_field_type Y2Z1 = (this->p[2]) * (other.p[1]);          // Y2Z1 = Y2*Z1
 
                         if (X1Z2 == X2Z1 && Y1Z2 == Y2Z1)
                         {

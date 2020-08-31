@@ -32,11 +32,15 @@ namespace nil {
 
                     using underlying_field_type = g2_field_type_value;
 
-                    edwards_g2() : element_type(underlying_field_type::one(), underlying_field_type::one(), underlying_field_type::zero()) {};
+                    edwards_g2() : edwards_g2(one_fill[0], one_fill[1]){};
 
-                    edwards_g2(underlying_field_type X, underlying_field_type Y, underlying_field_type Z) : element_type(X, Y, Z) {};
+                    edwards_g2(underlying_field_type X, underlying_field_type Y, underlying_field_type Z) {
+                        p[0] = X;
+                        p[1] = Y;
+                        p[2] = Z;
+                    };
 
-                    edwards_g2(underlying_field_type X, underlying_field_type Y, underlying_field_type Z) : element_type(X, Y, X*Y) {};
+                    edwards_g2(underlying_field_type X, underlying_field_type Y, underlying_field_type Z) : edwards_g2(X, Y, X*Y) {};
 
                     static edwards_g2 zero() {
                         return edwards_g2(zero_fill[0], zero_fill[1], zero_fill[2]);
@@ -46,21 +50,21 @@ namespace nil {
                         return edwards_g2(one_fill[0], one_fill[1]);    // it's better to precompute also one_fill[2]
                     }
 
-                    edwards_g2 add(const edwards_g2 &B) const {
+                    edwards_g2 add(const edwards_g2 &other) const {
 
                         // NOTE: does not handle O and pts of order 2,4
                         // http://www.hyperelliptic.org/EFD/g1p/auto-twisted-inverted.html#addition-add-2008-bbjlp
 
-                        const underlying_field_type A = (this->p[2]) * (B.p[2]);                   // A = Z1*Z2
-                        const underlying_field_type B = this->mul_by_d(this->p[0].square());           // B = d*A^2
-                        const underlying_field_type C = (this->p[0]) * (B.p[0]);                       // C = X1*X2
-                        const underlying_field_type D = (this->p[1]) * (B.p[1]);                       // D = Y1*Y2
-                        const underlying_field_type E = C*D;                                         // E = C*D
-                        const underlying_field_type H = C - this->mul_by_a(D);                 // H = C-a*D
-                        const underlying_field_type I = (this->p[0]+this->p[1])*(B.p[0]+B.p[1])-C-D;     // I = (X1+Y1)*(X2+Y2)-C-D
-                        const underlying_field_type X3 = (E+B)*H;                                    // X3 = (E+B)*H
-                        const underlying_field_type Y3 = (E-B)*I;                                    // Y3 = (E-B)*I
-                        const underlying_field_type Z3 = A*H*I;                                      // Z3 = A*H*I
+                        const underlying_field_type A = (this->p[2]) * (other.p[2]);                        // A = Z1*Z2
+                        const underlying_field_type B = this->mul_by_d(this->p[0].square());                // B = d*A^2
+                        const underlying_field_type C = (this->p[0]) * (other.p[0]);                        // C = X1*X2
+                        const underlying_field_type D = (this->p[1]) * (other.p[1]);                        // D = Y1*Y2
+                        const underlying_field_type E = C*D;                                                // E = C*D
+                        const underlying_field_type H = C - this->mul_by_a(D);                              // H = C-a*D
+                        const underlying_field_type I = (this->p[0] + this->p[1]) * (other.p[0] + other.p[1]) - C - D;     // I = (X1+Y1)*(X2+Y2)-C-D
+                        const underlying_field_type X3 = (E + B) * H;                                       // X3 = (E+B)*H
+                        const underlying_field_type Y3 = (E - B) * I;                                       // Y3 = (E-B)*I
+                        const underlying_field_type Z3 = A*H*I;                                             // Z3 = A*H*I
 
                         return edwards_g2(X3, Y3, Z3);
                     }
@@ -69,7 +73,7 @@ namespace nil {
                         return edwards_g2(-(this->p[0]), this->p[1], this->p[2]);
                     }
 
-                    edwards_g2 operator- (const edwards_g2 &B) const {
+                    edwards_g2 operator- (const edwards_g2 &other) const {
                         return (*this) + (-B);
                     }
 
@@ -97,15 +101,15 @@ namespace nil {
                         }
                     }
 
-                    edwards_g2 mixed_add(const edwards_g2 &B) const {
+                    edwards_g2 mixed_add(const edwards_g2 &other) const {
                     
                         // handle special cases having to do with O
                         if (this->is_zero())
                         {
-                            return B;
+                            return other;
                         }
 
-                        if (B.is_zero())
+                        if (other.is_zero())
                         {
                             return *this;
                         }
@@ -115,18 +119,22 @@ namespace nil {
 
                         const underlying_field_type A = this->p[2];                                     // A = Z1*Z2
                         const underlying_field_type B = mul_by_d(A.squared());           // B = d*A^2
-                        const underlying_field_type C = (this->p[0]) * (B.p[0]);                       // C = X1*X2
-                        const underlying_field_type D = (this->p[1]) * (B.p[1]);                       // D = Y1*Y2
+                        const underlying_field_type C = (this->p[0]) * (other.p[0]);                       // C = X1*X2
+                        const underlying_field_type D = (this->p[1]) * (other.p[1]);                       // D = Y1*Y2
                         const underlying_field_type E = C * D;                                         // E = C*D
                         const underlying_field_type H = C - mul_by_a(D);                 // H = C-a*D
-                        const underlying_field_type I = (this->p[0] + this->p[1]) * (B.p[0] + B.p[1]) - C - D;     // I = (X1+Y1)*(X2+Y2)-C-D
+                        const underlying_field_type I = (this->p[0] + this->p[1]) * (other.p[0] + other.p[1]) - C - D;     // I = (X1+Y1)*(X2+Y2)-C-D
                         const underlying_field_type X3 = (E + B) * H;                                    // X3 = (E+B)*H
                         const underlying_field_type Y3 = (E - B) * I;                                    // Y3 = (E-B)*I
                         const underlying_field_type Z3 = A * H * I;                                      // Z3 = A*H*I
 
                         return edwards_g2(X3, Y3, Z3);
                     }
-                    
+
+                private:
+
+                    underlying_field_type p[3];
+
                     constexpr static const policy_type::number_type curve_coeff_a = policy_type::a;
                     constexpr static const policy_type::number_type curve_coeff_d = policy_type::d;
 
@@ -143,8 +151,6 @@ namespace nil {
                     constexpr static const g1_field_type_value edwards_twist_mul_by_d_c2 = curve_coeff_d;
                     constexpr static const g1_field_type_value edwards_twist_mul_by_q_Y (0xB35E3665A18365954D018902935D4419423F84321BC3E_cppui180);
                     constexpr static const g1_field_type_value edwards_twist_mul_by_q_Z (0xB35E3665A18365954D018902935D4419423F84321BC3E_cppui180);
-
-                private:
 
                     constexpr static const underlying_field_type zero_fill = {underlying_field_type::zero(), underlying_field_type::one(), underlying_field_type::zero()};
 

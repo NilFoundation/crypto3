@@ -39,16 +39,6 @@ namespace nil {
                         return bn128_g1(1, 2, 1);
                     }
 
-                    /*template<typename NumberType>
-                    static NumberType base_field_char() {
-                        return arithmetic_params<base_field>::q;
-                    }
-
-                    template<typename NumberType>
-                    static NumberType order() {
-                        return arithmetic_params<scalar_field>::q;
-                    }*/
-
                 private:
                     /* additional parameters for square roots in Fq */
                     underlying_field_type bn128_coeff_b = underlying_field_type(3);
