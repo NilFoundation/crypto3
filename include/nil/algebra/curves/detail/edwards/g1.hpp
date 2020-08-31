@@ -32,17 +32,17 @@ namespace nil {
                     constexpr static const std::size_t g2_field_bits = ModulusBits;
                     typedef typename fields::detail::element_fp3<fields::detail::arithmetic_params<fields::edwards_fq<g2_field_bits, CHAR_BIT>>> g2_field_type_value;
 
-                    using underlying_field_type = g1_field_type_value;
+                    using underlying_field_type_value = g1_field_type_value;
 
                     edwards_g1() :  edwards_g1(zero_fill[0], zero_fill[1], zero_fill[2]){};
 
-                    edwards_g1(underlying_field_type X, underlying_field_type Y, underlying_field_type Z) {
+                    edwards_g1(underlying_field_type_value X, underlying_field_type_value Y, underlying_field_type_value Z) {
                         p[0] = X;
                         p[1] = Y;
                         p[2] = Z;
                     };
 
-                    edwards_g1(underlying_field_type X, underlying_field_type Y, underlying_field_type Z) : edwards_g1(X, Y, X*Y) {};
+                    edwards_g1(underlying_field_type_value X, underlying_field_type_value Y, underlying_field_type_value Z) : edwards_g1(X, Y, X*Y) {};
 
                     static edwards_g1 zero() {
                         return edwards_g1(zero_fill[0], zero_fill[1], zero_fill[2]);
@@ -81,16 +81,16 @@ namespace nil {
                         // NOTE: does not handle O and pts of order 2,4
                         // http://www.hyperelliptic.org/EFD/g1p/auto-edwards-inverted.html#addition-add-2007-bl
 
-                        underlying_field_type A = (this->p[2]) * (other.p[2]);                   // A = Z1*Z2
-                        underlying_field_type B = curve_coeff_d * A.square();           // B = d*A^2
-                        underlying_field_type C = (this->p[0]) * (other.p[0]);                   // C = X1*X2
-                        underlying_field_type D = (this->p[1]) * (other.p[1]);                   // D = Y1*Y2
-                        underlying_field_type E = C * D;                                   // E = C*D
-                        underlying_field_type H = C - D;                                   // H = C-D
-                        underlying_field_type I = (this->p[0]+this->p[1]) * (other.p[0] + other.p[1])-C-D; // I = (X1+Y1)*(X2+Y2)-C-D
-                        underlying_field_type X3 = (E+B)*H;                                // X3 = c*(E+B)*H
-                        underlying_field_type Y3 = (E-B)*I;                                // Y3 = c*(E-B)*I
-                        underlying_field_type Z3 = A*H*I;                                  // Z3 = A*H*I
+                        underlying_field_type_value A = (this->p[2]) * (other.p[2]);                   // A = Z1*Z2
+                        underlying_field_type_value B = curve_coeff_d * A.square();           // B = d*A^2
+                        underlying_field_type_value C = (this->p[0]) * (other.p[0]);                   // C = X1*X2
+                        underlying_field_type_value D = (this->p[1]) * (other.p[1]);                   // D = Y1*Y2
+                        underlying_field_type_value E = C * D;                                   // E = C*D
+                        underlying_field_type_value H = C - D;                                   // H = C-D
+                        underlying_field_type_value I = (this->p[0]+this->p[1]) * (other.p[0] + other.p[1])-C-D; // I = (X1+Y1)*(X2+Y2)-C-D
+                        underlying_field_type_value X3 = (E+B)*H;                                // X3 = c*(E+B)*H
+                        underlying_field_type_value Y3 = (E-B)*I;                                // Y3 = c*(E-B)*I
+                        underlying_field_type_value Z3 = A*H*I;                                  // Z3 = A*H*I
 
                         return edwards_g1(X3, Y3, Z3);
                     }
@@ -114,15 +114,15 @@ namespace nil {
                             // NOTE: does not handle O and pts of order 2,4
                             // http://www.hyperelliptic.org/EFD/g1p/auto-edwards-inverted.html#doubling-dbl-2007-bl
 
-                            underlying_field_type A = (this->p[0]).square();                      // A = X1^2
-                            underlying_field_type B = (this->p[1]).square();                      // B = Y1^2
-                            underlying_field_type C = A+B;                                      // C = A+B
-                            underlying_field_type D = A-B;                                      // D = A-B
-                            underlying_field_type E = (this->p[0]+this->p[1]).square()-C;            // E = (X1+Y1)^2-C
-                            underlying_field_type X3 = C*D;                                     // X3 = C*D
-                            underlying_field_type dZZ = curve_coeff_d * this->p[2].square();
-                            underlying_field_type Y3 = E*(C-dZZ-dZZ);                           // Y3 = E*(C-2*d*Z1^2)
-                            underlying_field_type Z3 = D*E;                                     // Z3 = D*E
+                            underlying_field_type_value A = (this->p[0]).square();                      // A = X1^2
+                            underlying_field_type_value B = (this->p[1]).square();                      // B = Y1^2
+                            underlying_field_type_value C = A+B;                                      // C = A+B
+                            underlying_field_type_value D = A-B;                                      // D = A-B
+                            underlying_field_type_value E = (this->p[0]+this->p[1]).square()-C;            // E = (X1+Y1)^2-C
+                            underlying_field_type_value X3 = C*D;                                     // X3 = C*D
+                            underlying_field_type_value dZZ = curve_coeff_d * this->p[2].square();
+                            underlying_field_type_value Y3 = E*(C-dZZ-dZZ);                           // Y3 = E*(C-2*d*Z1^2)
+                            underlying_field_type_value Z3 = D*E;                                     // Z3 = D*E
 
                             return edwards_g1(X3, Y3, Z3);
                         }
@@ -142,23 +142,23 @@ namespace nil {
                         // NOTE: does not handle O and pts of order 2,4
                         // http://www.hyperelliptic.org/EFD/g1p/auto-edwards-inverted.html#addition-madd-2007-lb
 
-                        underlying_field_type A = this->p[2];                                            // A = Z1
-                        underlying_field_type B = policy_type::curve_coeff_d * A.squared();            // B = d*A^2
-                        underlying_field_type C = (this->p[0]) * (other.p[0]);                               // C = X1*X2
-                        underlying_field_type D = (this->p[1]) * (other.p[1]);                               // D = Y1*Y2
-                        underlying_field_type E = C * D;                                                 // E = C*D
-                        underlying_field_type H = C - D;                                                 // H = C-D
-                        underlying_field_type I = (this->p[0] + this->p[1]) * (other.p[0] + other.p[1]) - C - D; // I = (X1+Y1)*(X2+Y2)-C-D
-                        underlying_field_type X3 = (E + B) * H;                                          // X3 = c*(E+B)*H
-                        underlying_field_type Y3 = (E - B) * I;                                          // Y3 = c*(E-B)*I
-                        underlying_field_type Z3 = A * H * I;                                            // Z3 = A*H*I
+                        underlying_field_type_value A = this->p[2];                                            // A = Z1
+                        underlying_field_type_value B = policy_type::curve_coeff_d * A.squared();            // B = d*A^2
+                        underlying_field_type_value C = (this->p[0]) * (other.p[0]);                               // C = X1*X2
+                        underlying_field_type_value D = (this->p[1]) * (other.p[1]);                               // D = Y1*Y2
+                        underlying_field_type_value E = C * D;                                                 // E = C*D
+                        underlying_field_type_value H = C - D;                                                 // H = C-D
+                        underlying_field_type_value I = (this->p[0] + this->p[1]) * (other.p[0] + other.p[1]) - C - D; // I = (X1+Y1)*(X2+Y2)-C-D
+                        underlying_field_type_value X3 = (E + B) * H;                                          // X3 = c*(E+B)*H
+                        underlying_field_type_value Y3 = (E - B) * I;                                          // Y3 = c*(E-B)*I
+                        underlying_field_type_value Z3 = A * H * I;                                            // Z3 = A*H*I
 
                         return edwards_g1(X3, Y3, Z3);
                     }
 
                 private:
 
-                    underlying_field_type p[3];
+                    underlying_field_type_value p[3];
 
                     constexpr static const policy_type::number_type curve_coeff_a = policy_type::a;
                     constexpr static const policy_type::number_type curve_coeff_d = policy_type::d;
@@ -177,11 +177,11 @@ namespace nil {
                     constexpr static const g1_field_type_value edwards_twist_mul_by_q_Y (0xB35E3665A18365954D018902935D4419423F84321BC3E_cppui180);
                     constexpr static const g1_field_type_value edwards_twist_mul_by_q_Z (0xB35E3665A18365954D018902935D4419423F84321BC3E_cppui180);
                     
-                    constexpr static const underlying_field_type zero_fill = {underlying_field_type::zero(), underlying_field_type::one(), underlying_field_type::zero()};
+                    constexpr static const underlying_field_type_value zero_fill = {underlying_field_type_value::zero(), underlying_field_type_value::one(), underlying_field_type_value::zero()};
 
-                    constexpr static const underlying_field_type one_fill = {
-                        underlying_field_type(0x26C5DF4587AA6A5D345EFC9F2D47F8B1656517EF618F7A_cppui182),
-                        underlying_field_type(0x32D83D8AAA0C500F57B15FDA90B1AD111067F812C7DD27_cppui182)};
+                    constexpr static const underlying_field_type_value one_fill = {
+                        underlying_field_type_value(0x26C5DF4587AA6A5D345EFC9F2D47F8B1656517EF618F7A_cppui182),
+                        underlying_field_type_value(0x32D83D8AAA0C500F57B15FDA90B1AD111067F812C7DD27_cppui182)};
 
                 };
 

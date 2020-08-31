@@ -25,28 +25,28 @@ namespace nil {
                     
                     using policy_type = PairingParams;
                     using element_type = element_curve_weierstrass<typename policy_type::g2_type>;
-                    using underlying_field_type = typename element_type::underlying_field_type;
+                    using underlying_field_type_value = typename element_type::underlying_field_type_value;
 
-                    bn128_g2() : element_type(underlying_field_type::one(), underlying_field_type::one(), underlying_field_type::zero()) {};
+                    bn128_g2() : element_type(underlying_field_type_value::one(), underlying_field_type_value::one(), underlying_field_type_value::zero()) {};
 
-                    bn128_g2(underlying_field_type X, underlying_field_type Y, underlying_field_type Z) : element_type(X, Y, Z) {};
+                    bn128_g2(underlying_field_type_value X, underlying_field_type_value Y, underlying_field_type_value Z) : element_type(X, Y, Z) {};
 
                     static bn128_g2 zero() {
                         return bn128_g2();
                     }
 
                     static bn128_g2 one() {
-                        return bn128_g2(underlying_field_type(15267802884793550383558706039165621050290089775961208824303765753922461897946,
+                        return bn128_g2(underlying_field_type_value(15267802884793550383558706039165621050290089775961208824303765753922461897946,
                                          9034493566019742339402378670461897774509967669562610788113215988055021632533),
-                                        underlying_field_type(644888581738283025171396578091639672120333224302184904896215738366765861164,
+                                        underlying_field_type_value(644888581738283025171396578091639672120333224302184904896215738366765861164,
                                          20532875081203448695448744255224543661959516361327385779878476709582931298750),
-                                        underlying_field_type(1, 0));
+                                        underlying_field_type_value(1, 0));
                     }
 
                 private:
                     /* additional parameters for square roots in Fq2 */
-                    underlying_field_type bn128_twist_coeff_b =
-                        underlying_field_type({19485874751759354771024239261021720505790618469301721065564631296452457478373,
+                    underlying_field_type_value bn128_twist_coeff_b =
+                        underlying_field_type_value({19485874751759354771024239261021720505790618469301721065564631296452457478373,
                                     266929791119991161246907387137283842545076965332900288569378510910307636690});
                 };
 

@@ -33,7 +33,7 @@ namespace nil {
 
             template<std::size_t ModulusBits = 254, std::size_t GeneratorBits = CHAR_BIT>
             struct bn128_ate_g1_precomp {
-                typename curves::bn128_g1<ModulusBits, GeneratorBits>::underlying_field_type p[3];
+                typename curves::bn128_g1<ModulusBits, GeneratorBits>::underlying_field_type_value p[3];
 
                 bool operator==(const bn128_ate_g1_precomp &other) const {
                     return (p[0] == other.p[0] && p[1] == other.p[1] && p[2] == other.p[2]);
@@ -45,7 +45,7 @@ namespace nil {
 
             template<std::size_t ModulusBits = 254, std::size_t GeneratorBits = CHAR_BIT>
             struct bn128_ate_g2_precomp {
-                typename curves::bn128_g2<ModulusBits, GeneratorBits>::underlying_field_type q[3];
+                typename curves::bn128_g2<ModulusBits, GeneratorBits>::underlying_field_type_value q[3];
 
                 std::vector<bn128_ate_ell_coeffs<ModulusBits, GeneratorBits>> coeffs;
 

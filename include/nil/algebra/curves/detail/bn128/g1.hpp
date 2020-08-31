@@ -25,11 +25,11 @@ namespace nil {
 
                     using policy_type = PairingParams;
                     using element_type = element_curve_weierstrass<typename policy_type::g1_type>;
-                    using underlying_field_type = typename element_type::underlying_field_type;
+                    using underlying_field_type_value = typename element_type::underlying_field_type_value;
 
-                    bn128_g1() : element_type(underlying_field_type::one(), underlying_field_type::one(), underlying_field_type::zero()) {};
+                    bn128_g1() : element_type(underlying_field_type_value::one(), underlying_field_type_value::one(), underlying_field_type_value::zero()) {};
 
-                    bn128_g1(underlying_field_type X, underlying_field_type Y, underlying_field_type Z) : element_type(X, Y, Z) {};
+                    bn128_g1(underlying_field_type_value X, underlying_field_type_value Y, underlying_field_type_value Z) : element_type(X, Y, Z) {};
 
                     static bn128_g1 zero() {
                         return bn128_g1();
@@ -41,7 +41,7 @@ namespace nil {
 
                 private:
                     /* additional parameters for square roots in Fq */
-                    underlying_field_type bn128_coeff_b = underlying_field_type(3);
+                    underlying_field_type_value bn128_coeff_b = underlying_field_type_value(3);
                 };
 
             }    // namespace detail
