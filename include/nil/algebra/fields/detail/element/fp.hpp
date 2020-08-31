@@ -11,6 +11,7 @@
 #define ALGEBRA_FIELDS_ELEMENT_FP_HPP
 
 #include <nil/algebra/fields/detail/exponentiation.hpp>
+#icnlude <boost/multiprecision/ressol.hpp>
 
 namespace nil {
     namespace algebra {
@@ -107,7 +108,7 @@ namespace nil {
                     }
 
                     element_fp sqrt() const {
-                        return element_fp(sqrt(data));
+                        return element_fp(ressol(data, modulus), modulus);
                     }
 
                     element_fp _2z_add_3x() {
