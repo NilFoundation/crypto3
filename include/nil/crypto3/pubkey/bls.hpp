@@ -11,26 +11,47 @@
 
 #include <nil/algebra/curves/bls12.hpp>
 
+#include <nil/crypto3/hash/algorithm/hash.hpp>
+#include <nil/crypto3/hash/sha2.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace pubkey {
-            template<typename CurveType>
+            template<typename CurveType, typename SignatureHash = hashes::sha2<256>>
             struct bls_public_key {
                 typedef CurveType curve_type;
+                typedef SignatureHash signature_hash_type;
 
                 typedef typename curve_type::value_type value_type;
                 typedef typename curve_type::number_type number_type;
 
-                constexpr static const std::size_t key_bits = curve_type::field_type::modulus_bits;
-                typedef typename curve_type::value_type key_type;
+                constexpr static const std::size_t key_bits = curve_type::g2_type::modulus_bits;
+                typedef typename curve_type::g2_type::value_type key_type;
 
-                constexpr static const std::size_t key_schedule_bits = curve_type::field_type::modulus_bits;
-                typedef typename curve_type::value_type key_schedule_type;
+                constexpr static const std::size_t key_schedule_bits = key_bits;
+                typedef key_type key_schedule_type;
 
-                constexpr static const std::size_t signature_bits = curve_type::field_type::modulus_bits;
-                typedef number_type signature_type;
+                constexpr static const std::size_t signature_bits = curve_type::g1_type::modulus_bits;
+                typedef typename curve_type::g1_type::value_type signature_type;
 
-                inline static bool sign(signature_type &res, const number_type &val, const key_schedule_type &key) {
+                template<typename InputRange>
+                inline static bool verify(const InputRange &val, const signature_type &sign, const key_type &key) {
+                    if (!sign.is_well_formed()) {
+                        return false;
+                    }
+
+                    if (!key.is_well_formed()) {
+                        return false;
+                    }
+
+                    if (CurveType::modulus_r * sign != typename CurveType::g1_type::value_type::zero()) {
+                        return false;
+                    }
+
+                    signature_type hash = Hashing(val);
+
+                    return (algebra::alt_bn128_ate_reduced_pairing(sign, key_type::value_type::one()) ==
+                            algebra::alt_bn128_ate_reduced_pairing(hash, key));
                 }
             };
 
@@ -41,16 +62,17 @@ namespace nil {
                 typedef typename curve_type::value_type value_type;
                 typedef typename curve_type::number_type number_type;
 
-                constexpr static const std::size_t key_bits = curve_type::field_type::modulus_bits;
-                typedef typename curve_type::value_type key_type;
+                constexpr static const std::size_t key_bits = curve_type::scalar_field_type::modulus_bits;
+                typedef typename curve_type::scalar_field_type::value_type key_type;
 
-                constexpr static const std::size_t key_schedule_bits = curve_type::field_type::modulus_bits;
-                typedef typename curve_type::value_type key_schedule_type;
+                constexpr static const std::size_t key_schedule_bits = key_bits;
+                typedef key_type key_schedule_type;
 
-                constexpr static const std::size_t signature_bits = curve_type::field_type::modulus_bits * 2;
-                typedef std::tuple<value_type, value_type> signature_type;
+                constexpr static const std::size_t signature_bits = curve_type::g1_type::modulus_bits;
+                typedef typename curve_type::g1_type::value_type signature_type;
 
-                inline static bool verify(signature_type &res, const number_type &val, const key_schedule_type &key) {
+                inline static bool sign(signature_type &res, const signature_type &val, const key_type &key) {
+                    res = val * key;
                 }
             };
 
