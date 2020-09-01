@@ -89,11 +89,6 @@ namespace nil {
                         return element_fp6_2over3({A0B0 + mul_by_non_residue(A1B1), (data[0] + data[1]) * (B.data[0] + B.data[1]) - A0B0 - A1B1});
                     }
 
-                    element_fp6_2over3 sqrt() const {
-
-                        // compute square root with Tonelli--Shanks
-                    }
-
                     element_fp6_2over3 square() const {
                         return (*this) * (*this);    // maybe can be done more effective
                     }

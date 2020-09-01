@@ -94,11 +94,6 @@ namespace nil {
                                     ( data[0] + data[2] ) * ( B.data[0] + B.data[2] ) - A0B0 + A1B1 - A2B2});
                     }
 
-                    element_fp6_3over2 sqrt() const {
-
-                        // compute square root with Tonelli--Shanks
-                    }
-
                     element_fp6_3over2 mul_Fp_b(const element<fp> &B){
                         return element_fp6_3over2({data[0], data[1].mul_Fp_0(b), data[2]});
                     }
