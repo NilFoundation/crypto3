@@ -23,11 +23,10 @@ namespace nil {
             namespace detail {
                 // filecoin oriented implementation
                 template<typename FieldType, std::size_t Arity, bool strength>
-                struct poseidon_functions
-                {
+                struct poseidon_functions {
                     typedef poseidon_policy<FieldType, Arity, strength> policy_type;
                     typedef poseidon_constants<FieldType, Arity, strength> constants_type;
-                    typedef typename FieldType::value_type ElementType;
+                    typedef typename FieldType::value_type element_type;
                     typedef typename constants_type::state_vector_type state_vector_type;
 
                     constexpr static const std::size_t state_bits = policy_type::state_bits;
@@ -55,21 +54,20 @@ namespace nil {
                             A_vector[i] = A[i];
 
                         // first half of full rounds
-                        for(std::size_t i = 0; i < half_full_rounds; i++)
+                        for (std::size_t i = 0; i < half_full_rounds; i++)
                             constants_type::arc_sbox_mds_full_round(A_vector, round_number++);
 
                         // partial rounds
-                        for(std::size_t i = 0; i < part_rounds; i++)
+                        for (std::size_t i = 0; i < part_rounds; i++)
                             constants_type::arc_sbox_mds_part_round(A_vector, round_number++);
 
                         // second half of full rounds
-                        for(std::size_t i = 0; i < half_full_rounds; i++)
+                        for (std::size_t i = 0; i < half_full_rounds; i++)
                             constants_type::arc_sbox_mds_full_round(A_vector, round_number++);
 
                         for (std::size_t i = 0; i < state_words; i++)
                             A[i] = A_vector[i];
                     }
-
 
                     static inline void permute_optimized(state_type &A) {
                         std::size_t round_number = 0;
@@ -79,20 +77,20 @@ namespace nil {
                             A_vector[i] = A[i];
 
                         // first half of full rounds
-                        for(std::size_t i = 0; i < half_full_rounds; i++) {
+                        for (std::size_t i = 0; i < half_full_rounds; i++) {
                             constants_type::arc_sbox_mds_full_round_optimized_first(A_vector, round_number++);
                         }
 
                         // partial rounds
                         constants_type::arc_mds_part_round_optimized_init(A_vector, round_number);
-                        for(std::size_t i = 0; i < part_rounds - 1; i++) {
+                        for (std::size_t i = 0; i < part_rounds - 1; i++) {
                             constants_type::sbox_arc_mds_part_round_optimized(A_vector, round_number++);
                         }
                         // last partial round
                         constants_type::sbox_mds_part_round_optimized_last(A_vector, round_number++);
 
                         // second half of full rounds
-                        for(std::size_t i = 0; i < half_full_rounds; i++) {
+                        for (std::size_t i = 0; i < half_full_rounds; i++) {
                             constants_type::arc_sbox_mds_full_round_optimized_last(A_vector, round_number++);
                         }
 
