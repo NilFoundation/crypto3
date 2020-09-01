@@ -23,11 +23,10 @@ namespace nil {
             namespace detail {
                 // filecoin oriented implementation
                 template<typename FieldType, std::size_t Arity, bool strength>
-                struct poseidon_functions
-                {
+                struct poseidon_functions {
                     typedef poseidon_policy<FieldType, Arity, strength> policy_type;
                     typedef poseidon_constants<FieldType, Arity, strength> policy_constants_type;
-                    typedef typename FieldType::value_type ElementType;
+                    typedef typename FieldType::value_type element_type;
                     typedef typename policy_constants_type::state_vector_type state_vector_type;
 
                     constexpr static const std::size_t state_bits = policy_type::state_bits;
@@ -51,32 +50,37 @@ namespace nil {
                         std::size_t round_number = 0;
 
                         state_vector_type A_vector;
-                        for (std::size_t i = 0; i < state_words; i++)
+                        for (std::size_t i = 0; i < state_words; i++) {
                             A_vector[i] = A[i];
+                        }
 
                         // first half of full rounds
-                        for(std::size_t i = 0; i < half_full_rounds; i++)
+                        for(std::size_t i = 0; i < half_full_rounds; i++) {
                             policy_constants_type::arc_sbox_mds_full_round(A_vector, round_number++);
+                        }
 
                         // partial rounds
-                        for(std::size_t i = 0; i < part_rounds; i++)
+                        for(std::size_t i = 0; i < part_rounds; i++) {
                             policy_constants_type::arc_sbox_mds_part_round(A_vector, round_number++);
+                        }
 
                         // second half of full rounds
-                        for(std::size_t i = 0; i < half_full_rounds; i++)
+                        for(std::size_t i = 0; i < half_full_rounds; i++) {
                             policy_constants_type::arc_sbox_mds_full_round(A_vector, round_number++);
+                        }
 
-                        for (std::size_t i = 0; i < state_words; i++)
+                        for (std::size_t i = 0; i < state_words; i++) {
                             A[i] = A_vector[i];
+                        }
                     }
-
 
                     static inline void permute_optimized(state_type &A) {
                         std::size_t round_number = 0;
 
                         state_vector_type A_vector;
-                        for (std::size_t i = 0; i < state_words; i++)
+                        for (std::size_t i = 0; i < state_words; i++) {
                             A_vector[i] = A[i];
+                        }
 
                         // first half of full rounds
                         for(std::size_t i = 0; i < half_full_rounds; i++) {
@@ -96,8 +100,9 @@ namespace nil {
                             policy_constants_type::arc_sbox_mds_full_round_optimized_last(A_vector, round_number++);
                         }
 
-                        for (std::size_t i = 0; i < state_words; i++)
+                        for (std::size_t i = 0; i < state_words; i++) {
                             A[i] = A_vector[i];
+                        }
                     }
                 };
             }    // namespace detail
@@ -106,3 +111,4 @@ namespace nil {
 }    // namespace nil
 
 #endif    // CRYPTO3_HASH_POSEIDON_FUNCTIONS_HPP
+

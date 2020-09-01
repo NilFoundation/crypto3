@@ -24,20 +24,20 @@ namespace nil {
                 template<typename FieldType, std::size_t Arity, bool strength>
                 struct poseidon_mds_matrix {
                     typedef poseidon_policy<FieldType, Arity, strength> policy_type;
-                    typedef typename FieldType::value_type ElementType;
+                    typedef typename FieldType::value_type element_type;
 
                     constexpr static const std::size_t state_words = policy_type::state_words;
                     constexpr static const std::size_t half_full_rounds = policy_type::half_full_rounds;
                     constexpr static const std::size_t part_rounds = policy_type::part_rounds;
 
-                    typedef cotila::matrix<ElementType, state_words, state_words> mds_matrix_type;
-                    typedef cotila::vector<ElementType, state_words> state_vector_type;
-                    typedef cotila::vector<ElementType, state_words - 1> substate_vector_type;
-                    typedef cotila::matrix<ElementType, state_words - 1, state_words - 1> mds_submatrix_type;
+                    typedef cotila::matrix<element_type, state_words, state_words> mds_matrix_type;
+                    typedef cotila::vector<element_type, state_words> state_vector_type;
+                    typedef cotila::vector<element_type, state_words - 1> substate_vector_type;
+                    typedef cotila::matrix<element_type, state_words - 1, state_words - 1> mds_submatrix_type;
                     typedef std::array<substate_vector_type, part_rounds> subvectors_collection;
 
                     static inline state_vector_type vect_matr_mul(const state_vector_type &A_vect, const mds_matrix_type &matr) {
-                        typedef cotila::matrix<ElementType, 1, state_words> state_vect_by_matr_type;
+                        typedef cotila::matrix<element_type, 1, state_words> state_vect_by_matr_type;
 
                         state_vect_by_matr_type state_vect_by_matr;
                         for (std::size_t i = 0; i < state_words; i++) {
@@ -50,8 +50,9 @@ namespace nil {
                         }
                         return A_out;
                     }
-                    static inline ElementType inner_prod(const state_vector_type &A_vect, const state_vector_type &B_vect) {
-                        ElementType res(0);
+                    static inline element_type inner_prod(const state_vector_type &A_vect,
+                                                          const state_vector_type &B_vect) {
+                        element_type res(0);
                         for (std::size_t i = 0; i < state_words; i++) {
                             res += A_vect[i] * B_vect[i];
                         }
@@ -62,22 +63,27 @@ namespace nil {
                         A_vector = vect_matr_mul(A_vector, mds_matrix);
                     }
 
-                    static inline void product_with_inverse_mds_matrix_noalias(const state_vector_type &A_vector_in, state_vector_type &A_vector_out) {
+                    static inline void product_with_inverse_mds_matrix_noalias(const state_vector_type &A_vector_in,
+                                                                               state_vector_type &A_vector_out) {
                         A_vector_out = vect_matr_mul(A_vector_in, mds_matrix_inverse);
                     }
 
-                    static inline void product_with_equivalent_mds_matrix_init(state_vector_type &A_vector, std::size_t round_number) {
-                        BOOST_ASSERT_MSG(round_number == half_full_rounds, "wrong using: product_with_equivalent_mds_matrix_init");
+                    static inline void product_with_equivalent_mds_matrix_init(state_vector_type &A_vector,
+                                                                               std::size_t round_number) {
+                        BOOST_ASSERT_MSG(round_number == half_full_rounds,
+                                         "wrong using: product_with_equivalent_mds_matrix_init");
                         A_vector = vect_matr_mul(A_vector, get_M_i());
                     }
 
-                    static inline void product_with_equivalent_mds_matrix(state_vector_type &A_vector, std::size_t round_number) {
-                        BOOST_ASSERT_MSG(round_number >= half_full_rounds
-                            && round_number < half_full_rounds + part_rounds, "wrong using: product_with_equivalent_mds_matrix");
+                    static inline void product_with_equivalent_mds_matrix(state_vector_type &A_vector,
+                                                                          std::size_t round_number) {
+                        BOOST_ASSERT_MSG(round_number >= half_full_rounds &&
+                                            round_number < half_full_rounds + part_rounds,
+                                         "wrong using: product_with_equivalent_mds_matrix");
                         const std::size_t matrix_number_base = part_rounds - (round_number - half_full_rounds) - 1;
                         const substate_vector_type &v = get_v(matrix_number_base);
                         state_vector_type temp_vector;
-                        ElementType A_0 = A_vector[0];
+                        element_type A_0 = A_vector[0];
                         temp_vector[0] = get_M_0_0();
                         for (std::size_t i = 1; i < state_words; i++) {
                             temp_vector[i] = get_w_hat(matrix_number_base)[i - 1];
@@ -93,12 +99,12 @@ namespace nil {
                         mds_matrix_type mds_matrix;
                         for (std::size_t i = 0; i < state_words; i++) {
                             for (std::size_t j = 0; j < state_words; j++) {
-                                mds_matrix[i][j] = ElementType(i + j + Arity).get_inverse();
+                                mds_matrix[i][j] = element_type(i + j + Arity).get_inverse();
                             }
                         }
                         return mds_matrix;
                     }
-                    // make constexpr
+                    // add constexpr
                     static inline const mds_matrix_type mds_matrix = generate_mds_matrix();
                     static inline const mds_matrix_type mds_matrix_inverse = cotila::inverse(mds_matrix);
 
@@ -106,16 +112,17 @@ namespace nil {
                         typedef std::array<substate_vector_type, part_rounds> subvectors_array;
 
                         constexpr equivalent_mds_matrix_type(const mds_matrix_type &mds_matrix)
-                            : M_i(cotila::identity<ElementType, state_words>), w_hat_list(), v_list(), M_0_0() {
+                            : M_i(cotila::identity<element_type, state_words>), w_hat_list(), v_list(), M_0_0() {
 
-                            typedef cotila::matrix<ElementType, state_words - 1, 1> M_mul_column_slice_matr_type;
+                            typedef cotila::matrix<element_type, state_words - 1, 1> M_mul_column_slice_matr_type;
                             mds_matrix_type M_mul(mds_matrix);
                             mds_submatrix_type M_hat_inverse;
                             substate_vector_type M_mul_column_slice;
                             M_mul_column_slice_matr_type M_mul_column_slice_matr;
 
                             for (std::size_t i = 0; i < part_rounds; i++) {
-                                M_hat_inverse = cotila::inverse(cotila::submat<state_words - 1, state_words - 1>(M_mul, 1, 1));
+                                M_hat_inverse =
+                                    cotila::inverse(cotila::submat<state_words - 1, state_words - 1>(M_mul, 1, 1));
                                 M_mul_column_slice = cotila::slice<state_words - 1>(M_mul.column(0), 1);
                                 for (std::size_t j = 0; j < state_words - 1; j++) {
                                     M_mul_column_slice_matr[j][0] = M_mul_column_slice[j];
@@ -135,12 +142,12 @@ namespace nil {
                         mds_matrix_type M_i;
                         subvectors_array w_hat_list;
                         subvectors_array v_list;
-                        ElementType M_0_0;
+                        element_type M_0_0;
                     };
                     constexpr static inline equivalent_mds_matrix_type generate_equivalent_mds_matrix() {
                         return equivalent_mds_matrix_type(mds_matrix);
                     }
-                    // make constexpr
+                    // add constexpr
                     static inline const equivalent_mds_matrix_type equivalent_mds_matrix = generate_equivalent_mds_matrix();
 
                     static inline const substate_vector_type &get_w_hat(std::size_t w_hat_number) {
@@ -149,7 +156,7 @@ namespace nil {
                     static inline const substate_vector_type &get_v(std::size_t v_number) {
                         return equivalent_mds_matrix.v_list[v_number];
                     }
-                    static inline const ElementType &get_M_0_0() {
+                    static inline const element_type &get_M_0_0() {
                         return equivalent_mds_matrix.M_0_0;
                     }
                     static inline const mds_matrix_type &get_M_i() {
@@ -162,3 +169,4 @@ namespace nil {
 }    // namespace nil
 
 #endif    // CRYPTO3_HASH_POSEIDON_MDS_MATRIX_HPP
+

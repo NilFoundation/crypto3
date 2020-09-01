@@ -17,7 +17,6 @@ using namespace boost::multiprecision::literals;
 
 BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(POSEIDON_LFSR_GENERATOR_LEN);
 
-
 namespace nil {
     namespace crypto3 {
         namespace hashes {
@@ -25,7 +24,7 @@ namespace nil {
                 template<typename FieldType, std::size_t Arity, bool strength>
                 struct poseidon_lfsr {
                     typedef poseidon_policy<FieldType, Arity, strength> policy_type;
-                    typedef typename FieldType::value_type ElementType;
+                    typedef typename FieldType::value_type element_type;
                     typedef typename FieldType::modulus_type modulus_type;
 
                     constexpr static const std::size_t word_bits = policy_type::word_bits;
@@ -41,9 +40,9 @@ namespace nil {
                         int i;
                         std::size_t offset = 0;
                         for (i = 1; i >= 0; i--)
-                            lfsr_state[offset++] = (1 >> i) & 1; // field - as in filecoin
+                            lfsr_state[offset++] = (1 >> i) & 1;    // field - as in filecoin
                         for (i = 3; i >= 0; i--)
-                            lfsr_state[offset++] = (1 >> i) & 1; // s-box - as in filecoin
+                            lfsr_state[offset++] = (1 >> i) & 1;    // s-box - as in filecoin
                         for (i = 11; i >= 0; i--)
                             lfsr_state[offset++] = (word_bits >> i) & 1;
                         for (i = 11; i >= 0; i--)
@@ -60,7 +59,7 @@ namespace nil {
                     }
 
                     // get next element
-                    inline ElementType get_next_element() {
+                    inline element_type get_next_element() {
                         modulus_type round_const;
                         while (true) {
                             round_const = 0;
@@ -69,10 +68,11 @@ namespace nil {
                                 round_const <<= 1;
                                 round_const |= get_next_bit() ? 1 : 0;
                             }
-                            if (round_const < FieldType::modulus) // filecoin oriented - remake when integrate in the project
+                            if (round_const <
+                                FieldType::modulus)    // filecoin oriented - remake when integrate in the project
                                 break;
                         }
-                        return ElementType(round_const);
+                        return element_type(round_const);
                     }
 
                     inline bool get_next_bit() {
@@ -86,7 +86,8 @@ namespace nil {
                     }
 
                     inline bool get_next_raw_bit() {
-                        bool next_v = lfsr_state[0] ^ lfsr_state[13] ^ lfsr_state[23] ^ lfsr_state[38] ^ lfsr_state[51] ^ lfsr_state[62];
+                        bool next_v = lfsr_state[0] ^ lfsr_state[13] ^ lfsr_state[23] ^ lfsr_state[38] ^
+                                      lfsr_state[51] ^ lfsr_state[62];
                         lfsr_state >>= 1;
                         lfsr_state[lfsr_state_len - 1] = next_v;
                         return next_v;
@@ -110,8 +111,9 @@ namespace nil {
                     constexpr static const std::size_t part_rounds = policy_type::part_rounds;
 
                     constexpr static const std::size_t state_bits = POSEIDON_LFSR_GENERATOR_LEN;
-                    typedef boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<state_bits, state_bits,
-                        boost::multiprecision::cpp_integer_type::unsigned_magnitude, boost::multiprecision::cpp_int_check_type::unchecked, void>>
+                    typedef boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<
+                        state_bits, state_bits, boost::multiprecision::cpp_integer_type::unsigned_magnitude,
+                        boost::multiprecision::cpp_int_check_type::unchecked, void>>
                         state_type;
 
                     constexpr static const std::size_t constants_number = (full_rounds + part_rounds) * state_words;
@@ -128,7 +130,8 @@ namespace nil {
                                 constant = 0;
                                 for (std::size_t i = 0; i < word_bits; i++) {
                                     lfsr_state = update_state(lfsr_state);
-                                    constant = set_new_bit<modulus_type>(constant, get_state_bit(lfsr_state, state_bits - 1));
+                                    constant =
+                                        set_new_bit<modulus_type>(constant, get_state_bit(lfsr_state, state_bits - 1));
                                 }
                                 if (constant < modulus) {
                                     round_constants[i] = ElementType(constant);
@@ -138,59 +141,13 @@ namespace nil {
                         }
                     }
 
-                    // constexpr void generate_round_constants_unfolded() {
-                    //     modulus_type constant = 0;
-                    //     bool new_bit = false;
-                    //     state_type lfsr_state = get_lfsr_init_state();
-
-                    //     for (std::size_t i = 0; i < (full_rounds + part_rounds) * Arity; i++) {
-                    //         while (true) {
-                    //             constant = 0;
-                    //             for (std::size_t i = 0; i < word_bits; i++) {
-                    //                 while (true) {
-                    //                     new_bit = ((lfsr_state & (0x1_cppui80 << (state_bits - 1))) != 0) !=
-                    //                             ((lfsr_state & (0x1_cppui80 << (state_bits - 1 - 13))) != 0) !=
-                    //                             ((lfsr_state & (0x1_cppui80 << (state_bits - 1 - 23))) != 0) !=
-                    //                             ((lfsr_state & (0x1_cppui80 << (state_bits - 1 - 38))) != 0) !=
-                    //                             ((lfsr_state & (0x1_cppui80 << (state_bits - 1 - 51))) != 0) !=
-                    //                             ((lfsr_state & (0x1_cppui80 << (state_bits - 1 - 62))) != 0);
-                    //                     lfsr_state = (lfsr_state << 1) | (new_bit ? 1 : 0);
-                    //                     if (new_bit)
-                    //                         break;
-                    //                     else {
-                    //                         new_bit = ((lfsr_state & (0x1_cppui80 << (state_bits - 1))) != 0) !=
-                    //                                 ((lfsr_state & (0x1_cppui80 << (state_bits - 1 - 13))) != 0) !=
-                    //                                 ((lfsr_state & (0x1_cppui80 << (state_bits - 1 - 23))) != 0) !=
-                    //                                 ((lfsr_state & (0x1_cppui80 << (state_bits - 1 - 38))) != 0) !=
-                    //                                 ((lfsr_state & (0x1_cppui80 << (state_bits - 1 - 51))) != 0) !=
-                    //                                 ((lfsr_state & (0x1_cppui80 << (state_bits - 1 - 62))) != 0);
-                    //                         lfsr_state = (lfsr_state << 1) | (new_bit ? 1 : 0);
-                    //                     }
-                    //                 }
-                    //                 new_bit = ((lfsr_state & (0x1_cppui80 << (state_bits - 1))) != 0) !=
-                    //                         ((lfsr_state & (0x1_cppui80 << (state_bits - 1 - 13))) != 0) !=
-                    //                         ((lfsr_state & (0x1_cppui80 << (state_bits - 1 - 23))) != 0) !=
-                    //                         ((lfsr_state & (0x1_cppui80 << (state_bits - 1 - 38))) != 0) !=
-                    //                         ((lfsr_state & (0x1_cppui80 << (state_bits - 1 - 51))) != 0) !=
-                    //                         ((lfsr_state & (0x1_cppui80 << (state_bits - 1 - 62))) != 0);
-                    //                 lfsr_state = (lfsr_state << 1) | (new_bit ? 1 : 0);
-                    //                 constant = (constant << 1) | (lfsr_state & 1);
-                    //             }
-                    //             if (constant < modulus) {
-                    //                 constants[i] = constant;
-                    //                 break;
-                    //             }
-                    //         }
-                    //     }
-                    // }
-
                     constexpr static state_type get_lfsr_init_state() {
                         state_type state = 0;
                         int i = 0;
                         for (i = 1; i >= 0; i--)
-                            state = set_new_bit(state, (1 >> i) & 1); // field - as in filecoin
+                            state = set_new_bit(state, (1 >> i) & 1);    // field - as in filecoin
                         for (i = 3; i >= 0; i--)
-                            state = set_new_bit(state, (1 >> i) & 1); // s-box - as in filecoin
+                            state = set_new_bit(state, (1 >> i) & 1);    // s-box - as in filecoin
                         for (i = 11; i >= 0; i--)
                             state = set_new_bit(state, (word_bits >> i) & 1);
                         for (i = 11; i >= 0; i--)
@@ -219,8 +176,9 @@ namespace nil {
                     }
 
                     constexpr static state_type update_state_raw(state_type state) {
-                        bool new_bit = get_state_bit(state, 0) != get_state_bit(state, 13) != get_state_bit(state, 23) !=
-                                    get_state_bit(state, 38) != get_state_bit(state, 51) != get_state_bit(state, 62);
+                        bool new_bit = get_state_bit(state, 0) != get_state_bit(state, 13) !=
+                                       get_state_bit(state, 23) != get_state_bit(state, 38) !=
+                                       get_state_bit(state, 51) != get_state_bit(state, 62);
                         return set_new_bit(state, new_bit);
                     }
 
@@ -237,19 +195,14 @@ namespace nil {
 
                     constexpr poseidon_lfsr_constexpr() : round_constants() {
                         generate_round_constants();
-                        // generate_round_constants_unfolded();
                     }
 
-                    // modulus_type constants[(full_rounds + part_rounds) * Arity];
                     round_constants_type round_constants;
                 };
-
-
             }    // namespace detail
         }        // namespace hashes
     }            // namespace crypto3
 }    // namespace nil
 
+#endif    // CRYPTO3_HASH_POSEIDON_LFSR_HPP
 
-
-#endif // CRYPTO3_HASH_POSEIDON_LFSR_HPP
