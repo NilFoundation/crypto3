@@ -26,9 +26,9 @@ namespace nil {
                 struct poseidon_functions
                 {
                     typedef poseidon_policy<FieldType, Arity, strength> policy_type;
-                    typedef poseidon_constants<FieldType, Arity, strength> constants_type;
+                    typedef poseidon_constants<FieldType, Arity, strength> policy_constants_type;
                     typedef typename FieldType::value_type ElementType;
-                    typedef typename constants_type::state_vector_type state_vector_type;
+                    typedef typename policy_constants_type::state_vector_type state_vector_type;
 
                     constexpr static const std::size_t state_bits = policy_type::state_bits;
                     constexpr static const std::size_t state_words = policy_type::state_words;
@@ -50,21 +50,21 @@ namespace nil {
                     static inline void permute(state_type &A) {
                         std::size_t round_number = 0;
 
-                        state_vector_type A_vector(state_words);
+                        state_vector_type A_vector;
                         for (std::size_t i = 0; i < state_words; i++)
                             A_vector[i] = A[i];
 
                         // first half of full rounds
                         for(std::size_t i = 0; i < half_full_rounds; i++)
-                            constants_type::arc_sbox_mds_full_round(A_vector, round_number++);
+                            policy_constants_type::arc_sbox_mds_full_round(A_vector, round_number++);
 
                         // partial rounds
                         for(std::size_t i = 0; i < part_rounds; i++)
-                            constants_type::arc_sbox_mds_part_round(A_vector, round_number++);
+                            policy_constants_type::arc_sbox_mds_part_round(A_vector, round_number++);
 
                         // second half of full rounds
                         for(std::size_t i = 0; i < half_full_rounds; i++)
-                            constants_type::arc_sbox_mds_full_round(A_vector, round_number++);
+                            policy_constants_type::arc_sbox_mds_full_round(A_vector, round_number++);
 
                         for (std::size_t i = 0; i < state_words; i++)
                             A[i] = A_vector[i];
@@ -74,26 +74,26 @@ namespace nil {
                     static inline void permute_optimized(state_type &A) {
                         std::size_t round_number = 0;
 
-                        state_vector_type A_vector(state_words);
+                        state_vector_type A_vector;
                         for (std::size_t i = 0; i < state_words; i++)
                             A_vector[i] = A[i];
 
                         // first half of full rounds
                         for(std::size_t i = 0; i < half_full_rounds; i++) {
-                            constants_type::arc_sbox_mds_full_round_optimized_first(A_vector, round_number++);
+                            policy_constants_type::arc_sbox_mds_full_round_optimized_first(A_vector, round_number++);
                         }
 
                         // partial rounds
-                        constants_type::arc_mds_part_round_optimized_init(A_vector, round_number);
+                        policy_constants_type::arc_mds_part_round_optimized_init(A_vector, round_number);
                         for(std::size_t i = 0; i < part_rounds - 1; i++) {
-                            constants_type::sbox_arc_mds_part_round_optimized(A_vector, round_number++);
+                            policy_constants_type::sbox_arc_mds_part_round_optimized(A_vector, round_number++);
                         }
                         // last partial round
-                        constants_type::sbox_mds_part_round_optimized_last(A_vector, round_number++);
+                        policy_constants_type::sbox_mds_part_round_optimized_last(A_vector, round_number++);
 
                         // second half of full rounds
                         for(std::size_t i = 0; i < half_full_rounds; i++) {
-                            constants_type::arc_sbox_mds_full_round_optimized_last(A_vector, round_number++);
+                            policy_constants_type::arc_sbox_mds_full_round_optimized_last(A_vector, round_number++);
                         }
 
                         for (std::size_t i = 0; i < state_words; i++)
