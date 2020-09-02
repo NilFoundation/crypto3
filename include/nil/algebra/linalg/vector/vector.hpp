@@ -11,9 +11,10 @@
 #ifndef ALGEBRA_VECTOR_CLASS_HPP
 #define ALGEBRA_VECTOR_CLASS_HPP
 
+#include <nil/algebra/linalg/detail/tmp.hpp>
+
 #include <array>
 #include <cstddef>
-#include <type_traits>
 
 namespace nil {
     namespace algebra {
@@ -29,7 +30,6 @@ namespace nil {
          */
         template <typename T, std::size_t N> struct vector {
             static_assert(N != 0, "vector must contain at least one element");
-            CRYPTO3_DETAIL_ASSERT_ARITHMETIC(T)
 
             using value_type = T;
             using size_type = std::size_t;

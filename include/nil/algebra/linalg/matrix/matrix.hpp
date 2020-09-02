@@ -14,8 +14,8 @@
 #include <array>
 #include <tuple>
 
-#include <nil/algebra/vector/utility.hpp>
-#include <nil/algebra/vector/vector.hpp>
+#include <nil/algebra/linalg/vector/utility.hpp>
+#include <nil/algebra/linalg/vector/vector.hpp>
 
 namespace nil {
     namespace algebra {
@@ -32,7 +32,6 @@ namespace nil {
         template <typename T, std::size_t N, std::size_t M> struct matrix {
             static_assert(N != 0 && M != 0,
                                         "matrix must have have positive dimensions");
-            CRYPTO3_DETAIL_ASSERT_ARITHMETIC(T)
 
             using value_type = T;
             using size_type = std::size_t;

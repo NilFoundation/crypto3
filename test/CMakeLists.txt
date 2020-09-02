@@ -70,7 +70,6 @@ set(RUNTIME_TESTS_NAMES
 
 set(COMPILE_TIME_TEST_NAMES
     "matrix"
-    "scalar"
     "vector")
 
 foreach(TEST_NAME ${RUNTIME_TESTS_NAMES})
