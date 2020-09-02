@@ -51,7 +51,7 @@ macro(define_compile_time_algebra_test name)
 
                                ${Boost_INCLUDE_DIRS})
 
-    set_target_properties(algebra_${name}_compile_test PROPERTIES CXX_STANDARD 14)
+    set_target_properties(algebra_${name}_compile_test PROPERTIES CXX_STANDARD 17)
 
     get_target_property(target_type Boost::unit_test_framework TYPE)
     if(target_type STREQUAL "SHARED_LIB")
@@ -68,7 +68,7 @@ set(RUNTIME_TESTS_NAMES
     #"bilinearity"
     )
 
-set(COMPILE_TIME_TEST_NAMES
+set(COMPILE_TIME_TESTS_NAMES
     "matrix"
     "vector")
 
