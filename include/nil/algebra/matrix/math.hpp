@@ -51,10 +51,10 @@ namespace nil {
         /// @private
         template <typename T, std::size_t M, std::size_t N>
         constexpr std::tuple<matrix<T, M, N>, std::size_t, T>
-        gauss_jordan_impl(matrix<T, M, N> m, T tolerance) {
+        gauss_jordan_impl(matrix<T, M, N> m) {
 
             // Define function for determining if an element is negligible
-            auto negligible = [&tolerance](const T &v) { return abs(v) <= tolerance; };
+            auto negligible = [](const T &v) { return abs(v) <= 0; };
 
             T det = 1;
             std::size_t rank = 0;
@@ -104,14 +104,6 @@ namespace nil {
             }
             det = (rank == M) ? det : 0;
             return {m, rank, det};
-        }
-
-        /// @private
-        template <typename T, std::size_t M, std::size_t N>
-        constexpr std::tuple<matrix<T, M, N>, std::size_t, T>
-        gauss_jordan_impl(const matrix<T, M, N> &m) {
-            T tol = 0;
-            return gauss_jordan_impl(m, tol);
         }
 
         /** @brief Compute the reduced row echelon form
