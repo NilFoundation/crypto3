@@ -11,7 +11,7 @@
 #ifndef ALGEBRA_VECTOR_CLASS_HPP
 #define ALGEBRA_VECTOR_CLASS_HPP
 
-#include <nil/algebra/linalg/detail/tmp.hpp>
+#include <nil/algebra/detail/same_value.hpp>
 
 #include <array>
 #include <cstddef>

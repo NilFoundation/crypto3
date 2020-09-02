@@ -13,13 +13,13 @@
 
 #include <algorithm>
 
-#include <nil/algebra/linalg/vector/vector.hpp>
-#include <nil/algebra/linalg/vector/math.hpp>
+#include <nil/algebra/vector/vector.hpp>
+#include <nil/algebra/vector/math.hpp>
 
-#include <nil/algebra/linalg/matrix/matrix.hpp>
-#include <nil/algebra/linalg/matrix/utility.hpp>
+#include <nil/algebra/matrix/matrix.hpp>
+#include <nil/algebra/matrix/utility.hpp>
 
-#include <nil/algebra/linalg/scalar/math.hpp>
+#include <nil/algebra/scalar/math.hpp>
 
 namespace nil {
     namespace algebra {

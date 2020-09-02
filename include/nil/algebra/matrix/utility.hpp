@@ -11,7 +11,7 @@
 #ifndef ALGEBRA_MATRIX_UTILITY_HPP
 #define ALGEBRA_MATRIX_UTILITY_HPP
 
-#include <nil/algebra/linalg/matrix/matrix.hpp>
+#include <nil/algebra/matrix/matrix.hpp>
 
 #include <tuple>
 

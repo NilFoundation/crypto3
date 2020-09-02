@@ -13,7 +13,10 @@
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
 
-#include <nil/algebra/linalg/linalg.hpp>
+#include <nil/algebra/vector/vector.hpp>
+#include <nil/algebra/vector/math.hpp>
+#include <nil/algebra/vector/operators.hpp>
+#include <nil/algebra/vector/utility.hpp>
 
 using namespace nil::algebra;
 

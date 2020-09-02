@@ -14,8 +14,8 @@
 #include <array>
 #include <tuple>
 
-#include <nil/algebra/linalg/vector/utility.hpp>
-#include <nil/algebra/linalg/vector/vector.hpp>
+#include <nil/algebra/vector/utility.hpp>
+#include <nil/algebra/vector/vector.hpp>
 
 namespace nil {
     namespace algebra {

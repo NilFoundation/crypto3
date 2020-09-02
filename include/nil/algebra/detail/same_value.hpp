@@ -1,5 +1,5 @@
-#ifndef ALGEBRA_DETAIL_TMP_HPP
-#define ALGEBRA_DETAIL_TMP_HPP
+#ifndef ALGEBRA_DETAIL_SAME_VALUE_HPP
+#define ALGEBRA_DETAIL_SAME_VALUE_HPP
 
 namespace nil {
     namespace algebra {
@@ -22,4 +22,4 @@ namespace nil {
     } // namespace algebra
 } // namespace nil
 
-#endif // ALGEBRA_DETAIL_TMP_HPP
+#endif // ALGEBRA_DETAIL_SAME_VALUE_HPP

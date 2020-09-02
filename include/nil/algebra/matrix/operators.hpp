@@ -11,7 +11,7 @@
 #ifndef ALGEBRA_MATRIX_OPERATORS_HPP
 #define ALGEBRA_MATRIX_OPERATORS_HPP
 
-#include <nil/algebra/linalg/matrix/matrix.hpp>
+#include <nil/algebra/matrix/matrix.hpp>
 
 namespace nil {
     namespace algebra {
