@@ -11,13 +11,13 @@
 #ifndef ALGEBRA_LINALG_HPP
 #define ALGEBRA_LINALG_HPP
 
-#include <nil/algebra/linalg/matrix/math.h>
-#include <nil/algebra/linalg/matrix/operators.h>
-#include <nil/algebra/linalg/matrix/matrix.h>
-#include <nil/algebra/linalg/matrix/utility.h>
-#include <nil/algebra/linalg/vector/math.h>
-#include <nil/algebra/linalg/vector/operators.h>
-#include <nil/algebra/linalg/vector/utility.h>
-#include <nil/algebra/linalg/vector/vector.h>
+#include <nil/algebra/linalg/matrix/math.hpp>
+#include <nil/algebra/linalg/matrix/operators.hpp>
+#include <nil/algebra/linalg/matrix/matrix.hpp>
+#include <nil/algebra/linalg/matrix/utility.hpp>
+#include <nil/algebra/linalg/vector/math.hpp>
+#include <nil/algebra/linalg/vector/operators.hpp>
+#include <nil/algebra/linalg/vector/utility.hpp>
+#include <nil/algebra/linalg/vector/vector.hpp>
 
 #endif // ALGEBRA_LINALG_HPP
