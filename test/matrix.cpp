@@ -25,9 +25,6 @@ constexpr matrix m2 = {{{1., 2.}}};
 
 constexpr matrix m22 = {{{1., 3.}, {2., 7.}}};
 
-constexpr matrix m1c = {
-    {{{1., 1.}, {2., 0.}, {3., 0.}}, {{4., 1.}, {5., 0.}, {6., 0.}}, {{7., 1.}, {8., 0.}, {9., 0.}}}};
-
 static_assert(m1[0][2] == 3, "matrix[]");
 
 static_assert(m1.row(2) == vector {7., 8., 9.}, "matrix row");

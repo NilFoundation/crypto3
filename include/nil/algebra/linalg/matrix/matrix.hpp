@@ -100,17 +100,6 @@ namespace nil {
         template <typename T, std::size_t M, std::size_t N>
         matrix(const T (&)[M][N])->matrix<T, M, N>;
 
-        /** @brief deduction guide for complex-valued aggregate initialization
-         *    @relatesalso matrix
-         *
-         *    This deduction guide allows matrix to be constructed like this:
-         *    \code{.cpp}
-         *    matrix m{{{{1., 0.}, {2., 1.}}, {{3., 2.}, {4., 3.}}}}; // deduces the type of m to be matrix<std::complex<double>, 2, 2>
-         *    \endcode
-         */
-        template <typename T, std::size_t M, std::size_t N>
-        matrix(const T (&)[M][N][2])->matrix<std::complex<T>, M, N>;
-
         ///@}
 
         /** @}*/

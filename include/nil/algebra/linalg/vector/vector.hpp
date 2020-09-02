@@ -117,16 +117,6 @@ namespace nil {
          */
         template <typename T, std::size_t N> vector(const T (&)[N])->vector<T, N>;
 
-        /** @brief deduction guide for complex-valued aggregate initialization
-         *    @relatesalso vector
-         *
-         *    This deduction guide allows vector to be constructed like this:
-         *    \code{.cpp}
-         *    vector v{{{1., 0}, {2., 1}}}; // deduces the type of v to be vector<std::complex<double>, 2>
-         *    \endcode
-         */
-        template <typename T, std::size_t N> vector(const T (&)[N][2])->vector<std::complex<T>, N>;
-
         ///@}
 
         /** @}*/
