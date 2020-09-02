@@ -19,6 +19,8 @@
 #include <nil/algebra/linalg/matrix/matrix.hpp>
 #include <nil/algebra/linalg/matrix/utility.hpp>
 
+#include <nil/algebra/linalg/scalar/math.hpp>
+
 namespace nil {
     namespace algebra {
 
@@ -52,7 +54,7 @@ namespace nil {
         gauss_jordan_impl(matrix<T, M, N> m, T tolerance) {
 
             // Define function for determining if an element is negligible
-            auto negligible = [&tolerance](const T &v) { return abs(v) < tolerance; };
+            auto negligible = [&tolerance](const T &v) { return abs(v) <= tolerance; };
 
             T det = 1;
             std::size_t rank = 0;

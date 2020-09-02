@@ -83,8 +83,8 @@ namespace nil {
          *  The matrix identity \f$ I_N \f$.
          */
         template <typename T, std::size_t N>
-        // constexpr matrix<T, N, N> identity
-        const matrix<T, N, N> identity
+        constexpr matrix<T, N, N> identity
+        // const matrix<T, N, N> identity
             = generate<N, N>([](std::size_t i, std::size_t j) { return T(i == j ? 1 : 0); });
 
         /** @brief horizontally concatenates two matrices

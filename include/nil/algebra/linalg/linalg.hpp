@@ -19,5 +19,6 @@
 #include <nil/algebra/linalg/vector/operators.hpp>
 #include <nil/algebra/linalg/vector/utility.hpp>
 #include <nil/algebra/linalg/vector/vector.hpp>
+#include <nil/algebra/linalg/scalar/math.hpp>
 
 #endif // ALGEBRA_LINALG_HPP
