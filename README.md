@@ -15,7 +15,7 @@ To actually include this library in a project it is required to:
 
 ### Internal
 
-* [Multiprecision](https://github.com/nilfoundation/crypto3-multiprecision.git)(branch `6-shanks-tonelli`).
+* [Multiprecision](https://github.com/nilfoundation/crypto3-multiprecision.git) (branch `6-shanks-tonelli`).
 
 ### External
 * [Boost](https://boost.org) (>= 1.58)
