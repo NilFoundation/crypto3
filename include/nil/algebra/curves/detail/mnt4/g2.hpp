@@ -34,7 +34,7 @@ namespace nil {
 
                     using underlying_field_type = g2_field_type_value;
 
-                    mnt4_g2() : mnt4_g2(underlying_field_type::one(), underlying_field_type::one(), underlying_field_type::zero()) {};
+                    mnt4_g2() : mnt4_g2(zero_fill[0], zero_fill[1], zero_fill[2]) {};
 
                     mnt4_g2(underlying_field_type X, underlying_field_type Y, underlying_field_type Z) {
                         p[0] = X;
@@ -43,7 +43,7 @@ namespace nil {
                     };
 
                     static mnt4_g2 zero() {
-                        return mnt4_g2(zero_fill[0], zero_fill[1], zero_fill[2]);
+                        return mnt4_g2();
                     }
 
                     static mnt4_g2 one() {

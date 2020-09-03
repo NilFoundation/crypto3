@@ -15,6 +15,8 @@
 
 #include <nil/algebra/curves/detail/element/curve_weierstrass.hpp>
 
+#include <nil/algebra/detail/mp_def.hpp>
+
 namespace nil {
     namespace algebra {
         namespace curves {
