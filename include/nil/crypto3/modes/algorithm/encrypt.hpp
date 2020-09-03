@@ -16,9 +16,9 @@
 
 #include <nil/crypto3/block/cipher_value.hpp>
 #include <nil/crypto3/block/cipher_state.hpp>
+#include <nil/crypto3/block/cipher_key.hpp>
 
 #include <nil/crypto3/block/detail/cipher_modes.hpp>
-#include <nil/crypto3/block/detail/key_value.hpp>
 
 namespace nil {
     namespace crypto3 {

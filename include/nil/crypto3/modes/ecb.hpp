@@ -64,7 +64,7 @@ namespace nil {
                                 unsigned char block[block_size];
                                 std::memcpy(block, in, rem);
                                 padding_type::pad(block, block_size, rem);
-                                c_.encrypt_block(block, out);
+                                c_.encrypt_block(block, <#initializer #>);
                             }
                         }
                     };
@@ -95,7 +95,7 @@ namespace nil {
                                 unsigned char block[block_size];
                                 std::memcpy(block, in, rem);
                                 padding_type::pad(block, block_size, rem);
-                                c_.encrypt_block(block, out);
+                                c_.encrypt_block(block, <#initializer #>);
                             }
                         }
                     };
@@ -126,7 +126,7 @@ namespace nil {
                                 unsigned char block[block_size];
                                 std::memcpy(block, in, rem);
                                 padding_type::pad(block, block_size, rem);
-                                c_.encrypt_block(block, out);
+                                c_.encrypt_block(block, <#initializer #>);
                             }
                         }
                     };
@@ -157,7 +157,7 @@ namespace nil {
                                 unsigned char block[block_size];
                                 std::memcpy(block, in, rem);
                                 padding_type::pad(block, block_size, rem);
-                                c_.encrypt_block(block, out);
+                                c_.encrypt_block(block, <#initializer #>);
                             }
                         }
                     };
@@ -188,7 +188,7 @@ namespace nil {
                         block_type end_message(const cipher_type &cipher, const block_type &plaintext) {
                             const size_type rem = len % block_size;
                             if (rem || padding_type::always_pad) {
-                                return cipher.decrypt_block(plaintext);
+                                return cipher.decrypt_block(plaintext, <#initializer #>);
                             }
                         }
                     };
@@ -216,7 +216,7 @@ namespace nil {
                         block_type end_message(const cipher_type &cipher, const block_type &plaintext) {
                             const size_type rem = len % block_size;
                             if (rem || padding_type::always_pad) {
-                                return cipher.decrypt_block(plaintext);
+                                return cipher.decrypt_block(plaintext, <#initializer #>);
                             }
                         }
                     };
@@ -244,7 +244,7 @@ namespace nil {
                         block_type end_message(const cipher_type &cipher, const block_type &plaintext) {
                             const size_type rem = len % block_size;
                             if (rem || padding_type::always_pad) {
-                                return cipher.decrypt_block(plaintext);
+                                return cipher.decrypt_block(plaintext, <#initializer #>);
                             }
                         }
                     };
@@ -272,7 +272,7 @@ namespace nil {
                         block_type end_message(const cipher_type &cipher, const block_type &plaintext) {
                             const size_type rem = len % block_size;
                             if (rem || padding_type::always_pad) {
-                                return cipher.decrypt_block(plaintext);
+                                return cipher.decrypt_block(plaintext, <#initializer #>);
                             }
                         }
                     };

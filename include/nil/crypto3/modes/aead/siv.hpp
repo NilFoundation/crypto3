@@ -137,7 +137,7 @@ namespace nil {
                                                                const block_type &plaintext) {
                             block_type block = {0};
 
-                            return cipher.encrypt_block(block);
+                            return cipher.encrypt(block);
                         }
 
                         inline static block_type end_message(const stream_cipher_type &cipher,
@@ -197,7 +197,7 @@ namespace nil {
                                                                const block_type &plaintext) {
                             block_type block = {0};
 
-                            return cipher.encrypt_block(block);
+                            return cipher.encrypt(block);
                         }
 
                         inline static block_type end_message(const stream_cipher_type &cipher,

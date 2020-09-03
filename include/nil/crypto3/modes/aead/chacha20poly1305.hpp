@@ -115,7 +115,7 @@ namespace nil {
                             m_poly1305->update(buf, sz); // poly1305 of ciphertext
                             m_ctext_len += sz;
 
-                            return cipher.encrypt_block(block);
+                            return cipher.encrypt(block);
                         }
 
                         inline static block_type end_message(const stream_cipher_type &cipher,
@@ -207,7 +207,7 @@ namespace nil {
                             m_chacha->cipher1(buf, sz);
                             m_ctext_len += sz;
 
-                            return cipher.encrypt_block(block);
+                            return cipher.encrypt(block);
                         }
 
                         inline static block_type end_message(const cipher_type &cipher, const block_type &plaintext) {

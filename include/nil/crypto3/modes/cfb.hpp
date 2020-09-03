@@ -154,7 +154,7 @@ namespace nil {
                         inline static block_type process_block(const cipher_type &cipher, const block_type &plaintext) {
                             block_type block = {0};
 
-                            return cipher.encrypt_block(block);
+                            return cipher.encrypt(block);
                         }
 
                         inline static block_type end_message(const cipher_type &cipher, const block_type &plaintext) {
@@ -185,7 +185,7 @@ namespace nil {
                         inline static block_type process_block(const cipher_type &cipher, const block_type &plaintext) {
                             block_type block = {0};
 
-                            return cipher.encrypt_block(block);
+                            return cipher.encrypt(block);
                         }
 
                         inline static block_type end_message(const cipher_type &cipher, const block_type &plaintext) {
@@ -216,7 +216,7 @@ namespace nil {
                         inline static block_type process_block(const cipher_type &cipher, const block_type &plaintext) {
                             block_type block = {0};
 
-                            return cipher.encrypt_block(block);
+                            return cipher.encrypt(block);
                         }
 
                         inline static block_type end_message(const cipher_type &cipher, const block_type &plaintext) {

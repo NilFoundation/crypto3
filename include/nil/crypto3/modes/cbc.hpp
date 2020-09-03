@@ -73,7 +73,7 @@ namespace nil {
                             //                        codec::encode<codec::encoder::logic_xor>(plaintext, previous,
                             //                        block.begin());
 
-                            return cipher.encrypt_block(block);
+                            return cipher.encrypt(block);
                         }
 
                         inline static block_type end_message(const cipher_type &cipher, const block_type &plaintext,
@@ -128,7 +128,7 @@ namespace nil {
                             //                        codec::encode<codec::encoder::logic_xor>(plaintext, previous,
                             //                        block.begin());
 
-                            return cipher.encrypt_block(block);
+                            return cipher.encrypt(block);
                         }
 
                         inline static block_type end_message(const cipher_type &cipher, const block_type &plaintext,
@@ -183,7 +183,7 @@ namespace nil {
                             //                        codec::encode<codec::encoder::logic_xor>(plaintext, previous,
                             //                        block.begin());
 
-                            return cipher.encrypt_block(block);
+                            return cipher.encrypt(block);
                         }
 
                         inline static block_type end_message(const cipher_type &cipher, const block_type &plaintext,
@@ -238,7 +238,7 @@ namespace nil {
                             //                        codec::encode<codec::encoder::logic_xor>(plaintext, previous,
                             //                        block.begin());
 
-                            return cipher.encrypt_block(block);
+                            return cipher.encrypt(block);
                         }
 
                         inline static block_type end_message(const cipher_type &cipher, const block_type &plaintext,

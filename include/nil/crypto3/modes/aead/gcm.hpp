@@ -108,7 +108,7 @@ namespace nil {
                             m_ctr->cipher(buf, buf, sz);
                             m_ghash->update(buf, sz);
 
-                            return cipher.encrypt_block(block);
+                            return cipher.encrypt(block);
                         }
 
                         inline static block_type end_message(const cipher_type &cipher, const block_type &plaintext) {
@@ -159,7 +159,7 @@ namespace nil {
                             m_ghash->update(buf, sz);
                             m_ctr->cipher(buf, buf, sz);
 
-                            return cipher.encrypt_block(block);
+                            return cipher.encrypt(block);
                         }
 
                         inline static block_type end_message(const cipher_type &cipher, const block_type &plaintext) {
