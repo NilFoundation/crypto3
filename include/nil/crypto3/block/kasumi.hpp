@@ -58,11 +58,11 @@ namespace nil {
 
                     typedef block_stream_processor<Mode, StateAccumulator, params_type> type;
                 };
-                
+
                 typedef typename stream_endian::little_octet_big_bit endian_type;
 
                 kasumi(const key_type &key) {
-                    schedule_key(key);
+                    schedule_key(key_schedule, key);
                 }
 
                 ~kasumi() {
@@ -70,15 +70,16 @@ namespace nil {
                 }
 
                 inline block_type encrypt(const block_type &plaintext) const {
-                    return encrypt_block(plaintext);
+                    return encrypt_block(plaintext, key_schedule);
                 }
 
                 inline block_type decrypt(const block_type &ciphertext) const {
-                    return decrypt_block(ciphertext);
+                    return decrypt_block(ciphertext, key_schedule);
                 }
 
             protected:
-                inline block_type encrypt_block(const block_type &plaintext) const {
+                inline block_type encrypt_block(const block_type &plaintext,
+                                                const key_schedule_type &key_schedule) const {
                     word_type B0 = boost::endian::native_to_big(plaintext[0]);
                     word_type B1 = boost::endian::native_to_big(plaintext[1]);
                     word_type B2 = boost::endian::native_to_big(plaintext[2]);
@@ -112,7 +113,8 @@ namespace nil {
                             boost::endian::big_to_native(B2), boost::endian::big_to_native(B3)};
                 }
 
-                inline block_type decrypt_block(const block_type &ciphertext) const {
+                inline block_type decrypt_block(const block_type &ciphertext,
+                                                const key_schedule_type &key_schedule) const {
                     word_type B0 = boost::endian::native_to_big(ciphertext[0]);
                     word_type B1 = boost::endian::native_to_big(ciphertext[1]);
                     word_type B2 = boost::endian::native_to_big(ciphertext[2]);
@@ -150,7 +152,7 @@ namespace nil {
 
                 key_schedule_type key_schedule;
 
-                void schedule_key(const key_type &key) {
+                void schedule_key(key_schedule_type &key_schedule, const key_type &key) {
                     std::array<word_type, 16> K = {0};
                     for (size_t i = 0; i != rounds; ++i) {
                         K[i] = boost::endian::native_to_big(key[i]);

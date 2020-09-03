@@ -53,13 +53,6 @@ namespace nil {
                 }
 
                 static void prepare_schedule(schedule_type &schedule) {
-#ifdef CRYPTO3_BLOCK_SHOW_PROGRESS
-                    for (unsigned t = 0; t < key_words; ++t) {
-                        std::printf(word_bits == 32 ? "WordBits[%2d] = %.8x\n" : "WordBits[%2d] = %.16lx\n", t,
-                                    round_constants_words[t]);
-                    }
-#endif
-
                     for (unsigned t = key_words; t < rounds; ++t) {
                         schedule[t] = schedule[t - 3] ^ schedule[t - 8] ^ schedule[t - 14] ^ schedule[t - 16];
                     }
