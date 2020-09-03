@@ -29,7 +29,6 @@ namespace nil {
                     typedef typename field_type::generator_type generator_type;
 
                     constexpr static const generator_type mul_generator = field_type::mul_generator;
-
                 };
 
                 template<typename FieldType>
@@ -40,6 +39,7 @@ namespace nil {
                 private:
                     typedef params<FieldType> policy_type;
                     typedef arithmetic_params<FieldType> element_policy_type;
+
                 public:
                     typedef typename policy_type::number_type number_type;
                     typedef typename policy_type::modulus_type modulus_type;
@@ -49,14 +49,15 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                constexpr typename arithmetic_params<FieldType>::modulus_type const arithmetic_params<FieldType>::modulus;
+                constexpr
+                    typename arithmetic_params<FieldType>::modulus_type const arithmetic_params<FieldType>::modulus;
 
                 template<typename FieldType>
                 constexpr typename arithmetic_params<FieldType>::modulus_type const arithmetic_params<FieldType>::q;
 
             }    // namespace detail
-        }    // namespace fields
-    }    // namespace algebra
+        }        // namespace fields
+    }            // namespace algebra
 }    // namespace nil
 
 #endif    // CRYPTO3_PARAMS_HPP

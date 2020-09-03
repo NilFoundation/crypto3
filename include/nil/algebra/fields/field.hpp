@@ -27,18 +27,19 @@ namespace nil {
              */
             template<std::size_t ModulusBits, std::size_t GeneratorBits>
             struct field {
-                
+
                 constexpr static const std::size_t modulus_bits = ModulusBits;
                 typedef boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<
-                    modulus_bits, modulus_bits, boost::multiprecision::unsigned_magnitude, boost::multiprecision::unchecked,
-                    void>>
+                    modulus_bits, modulus_bits, boost::multiprecision::unsigned_magnitude,
+                    boost::multiprecision::unchecked, void>>
                     modulus_type;
 
                 constexpr static const std::size_t number_bits = ModulusBits;
-                typedef boost::multiprecision::number<boost::multiprecision::backends::modular_adaptor <
-                    boost::multiprecision::backends::cpp_int_backend<
-                    //modulus_bits, modulus_bits, boost::multiprecision::unsigned_magnitude, boost::multiprecision::unchecked, void
-                    >>>
+                typedef boost::multiprecision::number<
+                    boost::multiprecision::backends::modular_adaptor<boost::multiprecision::backends::cpp_int_backend<
+                        // modulus_bits, modulus_bits, boost::multiprecision::unsigned_magnitude,
+                        // boost::multiprecision::unchecked, void
+                        >>>
                     number_type;
 
                 constexpr static const std::size_t generator_bits = GeneratorBits;
@@ -47,9 +48,9 @@ namespace nil {
                     boost::multiprecision::unchecked, void>>
                     generator_type;
             };
-            
-        }   // namespace fields
-    }    // namespace algebra
+
+        }    // namespace fields
+    }        // namespace algebra
 }    // namespace nil
 
 #endif    // ALGEBRA_FIELDS_FIELD_HPP

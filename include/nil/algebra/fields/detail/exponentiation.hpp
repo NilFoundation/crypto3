@@ -40,8 +40,8 @@ namespace nil {
                     return result;
                 }
             }    // namespace detail
-        }   // namespace fields
-    }    // namespace algebra
+        }        // namespace fields
+    }            // namespace algebra
 }    // namespace nil
 
 #endif    // ALGEBRA_FIELDS_POWER_HPP

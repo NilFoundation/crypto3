@@ -27,13 +27,13 @@ namespace nil {
              * @tparam GeneratorBits
              */
             template<std::size_t ModulusBits, std::size_t GeneratorBits = CHAR_BIT>
-            struct secp_k1_fq : public field<ModulusBits, GeneratorBits> {};
+            struct secp_k1_fq : public field<ModulusBits, GeneratorBits> { };
 
             template<std::size_t ModulusBits, std::size_t GeneratorBits = CHAR_BIT>
-            struct secp_r1_fq : public field<ModulusBits, GeneratorBits> {};
+            struct secp_r1_fq : public field<ModulusBits, GeneratorBits> { };
 
             template<std::size_t ModulusBits, std::size_t GeneratorBits = CHAR_BIT>
-            struct secp_r2_fq : public field<ModulusBits, GeneratorBits> {};
+            struct secp_r2_fq : public field<ModulusBits, GeneratorBits> { };
 
             template<>
             struct secp_k1_fq<160, CHAR_BIT> : public field<160, CHAR_BIT> {
@@ -42,8 +42,7 @@ namespace nil {
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                 typedef typename policy_type::modulus_type modulus_type;
 
-                constexpr static const modulus_type modulus =
-                    0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFAC73_cppui160;
+                constexpr static const modulus_type modulus = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFAC73_cppui160;
 
                 constexpr static const std::size_t generator_bits = policy_type::generator_bits;
                 typedef typename policy_type::generator_type generator_type;
@@ -62,8 +61,7 @@ namespace nil {
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                 typedef typename policy_type::modulus_type modulus_type;
 
-                constexpr static const modulus_type modulus =
-                    0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF7FFFFFFF_cppui160;
+                constexpr static const modulus_type modulus = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF7FFFFFFF_cppui160;
 
                 constexpr static const std::size_t generator_bits = policy_type::generator_bits;
                 typedef typename policy_type::generator_type generator_type;
@@ -82,8 +80,7 @@ namespace nil {
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                 typedef typename policy_type::modulus_type modulus_type;
 
-                constexpr static const modulus_type modulus =
-                    0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFAC73_cppui160;
+                constexpr static const modulus_type modulus = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFAC73_cppui160;
 
                 constexpr static const std::size_t generator_bits = policy_type::generator_bits;
                 typedef typename policy_type::generator_type generator_type;

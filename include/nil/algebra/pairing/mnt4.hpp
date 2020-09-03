@@ -24,7 +24,7 @@ namespace nil {
         namespace pairing {
 
             template<std::size_t ModulusBits = 254, std::size_t GeneratorBits = CHAR_BIT>
-            struct pairing_params <mnt4<ModulusBits, GeneratorBits>>{
+            struct pairing_params<mnt4<ModulusBits, GeneratorBits>> {
 
                 using other_curve = curves::mnt6<ModulusBits, GeneratorBits>;
 
@@ -44,9 +44,8 @@ namespace nil {
                 using miller_loop = detail::mnt4_miller_loop<ModulusBits, GeneratorBits>;
                 using double_miller_loop = detail::mnt4_double_miller_loop<ModulusBits, GeneratorBits>;
                 using final_exponentiation = detail::mnt4_final_exponentiation<ModulusBits, GeneratorBits>;
-
             };
-        }        // namespace pairing
-    }            // namespace algebra
+        }    // namespace pairing
+    }        // namespace algebra
 }    // namespace nil
 #endif    // ALGEBRA_PAIRING_MNT4_PARAMS_HPP

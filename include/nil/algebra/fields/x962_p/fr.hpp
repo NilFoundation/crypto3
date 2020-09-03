@@ -27,13 +27,13 @@ namespace nil {
              * @tparam GeneratorBits
              */
             template<std::size_t ModulusBits, std::size_t GeneratorBits = CHAR_BIT>
-            struct x962_p_v1_fr : public field<ModulusBits, GeneratorBits> {};
+            struct x962_p_v1_fr : public field<ModulusBits, GeneratorBits> { };
 
             template<std::size_t ModulusBits, std::size_t GeneratorBits = CHAR_BIT>
-            struct x962_p_v2_fr : public field<ModulusBits, GeneratorBits> {};
+            struct x962_p_v2_fr : public field<ModulusBits, GeneratorBits> { };
 
             template<std::size_t ModulusBits, std::size_t GeneratorBits = CHAR_BIT>
-            struct x962_p_v3_fr : public field<ModulusBits, GeneratorBits> {};
+            struct x962_p_v3_fr : public field<ModulusBits, GeneratorBits> { };
 
             template<>
             struct x962_p_v2_fr<192, CHAR_BIT> : public field<192, CHAR_BIT> {
@@ -141,11 +141,16 @@ namespace nil {
             constexpr typename x962_p_v2_fr<239, CHAR_BIT>::modulus_type const x962_p_v2_fr<239, CHAR_BIT>::modulus;
             constexpr typename x962_p_v3_fr<239, CHAR_BIT>::modulus_type const x962_p_v3_fr<239, CHAR_BIT>::modulus;
 
-            constexpr typename x962_p_v2_fr<192, CHAR_BIT>::generator_type const x962_p_v1_fr<192, CHAR_BIT>::mul_generator;
-            constexpr typename x962_p_v3_fr<192, CHAR_BIT>::generator_type const x962_p_v3_fr<192, CHAR_BIT>::mul_generator;
-            constexpr typename x962_p_v1_fr<239, CHAR_BIT>::generator_type const x962_p_v1_fr<239, CHAR_BIT>::mul_generator;
-            constexpr typename x962_p_v2_fr<239, CHAR_BIT>::generator_type const x962_p_v2_fr<239, CHAR_BIT>::mul_generator;
-            constexpr typename x962_p_v3_fr<239, CHAR_BIT>::generator_type const x962_p_v3_fr<239, CHAR_BIT>::mul_generator;
+            constexpr
+                typename x962_p_v2_fr<192, CHAR_BIT>::generator_type const x962_p_v1_fr<192, CHAR_BIT>::mul_generator;
+            constexpr
+                typename x962_p_v3_fr<192, CHAR_BIT>::generator_type const x962_p_v3_fr<192, CHAR_BIT>::mul_generator;
+            constexpr
+                typename x962_p_v1_fr<239, CHAR_BIT>::generator_type const x962_p_v1_fr<239, CHAR_BIT>::mul_generator;
+            constexpr
+                typename x962_p_v2_fr<239, CHAR_BIT>::generator_type const x962_p_v2_fr<239, CHAR_BIT>::mul_generator;
+            constexpr
+                typename x962_p_v3_fr<239, CHAR_BIT>::generator_type const x962_p_v3_fr<239, CHAR_BIT>::mul_generator;
         }    // namespace fields
     }        // namespace algebra
 }    // namespace nil

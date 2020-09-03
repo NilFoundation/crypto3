@@ -42,7 +42,7 @@ namespace nil {
                 typedef fields::x962_p_v2_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
                 constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
 
-                //typedef typename detail::element_curve_weierstrass<base_field_type::value_type> value_type;
+                // typedef typename detail::element_curve_weierstrass<base_field_type::value_type> value_type;
 
                 constexpr static const number_type p = base_field_modulus;
                 constexpr static const number_type q = scalar_field_modulus;
@@ -64,7 +64,7 @@ namespace nil {
                 typedef fields::x962_p_v2_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
                 constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
 
-                //typedef typename detail::element_curve_weierstrass<base_field_type::value_type> value_type;
+                // typedef typename detail::element_curve_weierstrass<base_field_type::value_type> value_type;
 
                 constexpr static const number_type p = base_field_modulus;
                 constexpr static const number_type q = scalar_field_modulus;
@@ -86,7 +86,7 @@ namespace nil {
                 typedef fields::x962_p_v1_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
                 constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
 
-                //typedef typename detail::element_curve_weierstrass<base_field_type::value_type> value_type;
+                // typedef typename detail::element_curve_weierstrass<base_field_type::value_type> value_type;
 
                 constexpr static const number_type p = base_field_modulus;
                 constexpr static const number_type q = scalar_field_modulus;
@@ -112,7 +112,7 @@ namespace nil {
                 typedef fields::x962_p_v2_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
                 constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
 
-                //typedef typename detail::element_curve_weierstrass<base_field_type::value_type> value_type;
+                // typedef typename detail::element_curve_weierstrass<base_field_type::value_type> value_type;
 
                 constexpr static const number_type p = base_field_modulus;
                 constexpr static const number_type q = scalar_field_modulus;
@@ -138,7 +138,7 @@ namespace nil {
                 typedef fields::x962_p_v3_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
                 constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
 
-                //typedef typename detail::element_curve_weierstrass<base_field_type::value_type> value_type;
+                // typedef typename detail::element_curve_weierstrass<base_field_type::value_type> value_type;
 
                 constexpr static const number_type p = base_field_modulus;
                 constexpr static const number_type q = scalar_field_modulus;

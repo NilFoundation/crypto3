@@ -19,12 +19,13 @@ namespace nil {
             namespace detail {
 
                 template<typename FieldParams>
-                struct element_fp3{
+                struct element_fp3 {
                 private:
                     typedef FieldParams policy_type;
+
                 public:
-                    static const typename policy_type::fp3_non_residue_type 
-                        non_residue = policy_type::fp3_non_residue_type(policy_type::fp3_non_residue);
+                    static const typename policy_type::fp3_non_residue_type non_residue =
+                        policy_type::fp3_non_residue_type(policy_type::fp3_non_residue);
 
                     using underlying_type = element_fp<FieldParams>;
 
@@ -61,7 +62,7 @@ namespace nil {
                         return (data[0] != B.data[0]) || (data[1] != B.data[1]) || (data[2] != B.data[2]);
                     }
 
-                    element_fp3& operator=(const element_fp3 &B) {
+                    element_fp3 &operator=(const element_fp3 &B) {
                         data[0] = B.data[0];
                         data[1] = B.data[1];
                         data[2] = B.data[2];
@@ -77,14 +78,14 @@ namespace nil {
                         return element_fp3({data[0] - B.data[0], data[1] - B.data[1], data[2] - B.data[2]});
                     }
 
-                    element_fp3& operator-=(const element_fp3 &B) {
+                    element_fp3 &operator-=(const element_fp3 &B) {
                         data[0] -= B.data[0];
                         data[1] -= B.data[1];
 
                         return *this;
                     }
 
-                    element_fp3& operator+=(const element_fp3 &B) {
+                    element_fp3 &operator+=(const element_fp3 &B) {
                         data[0] += B.data[0];
                         data[1] += B.data[1];
 
@@ -99,9 +100,10 @@ namespace nil {
                         const underlying_type A0B0 = data[0] * B.data[0], A1B1 = data[1] * B.data[1],
                                               A2B2 = data[2] * B.data[2];
 
-                        return element_fp3({A0B0 + non_residue * (data[1] + data[2]) * (B.data[1] + B.data[2]) - A1B1 - A2B2,
-                                (data[0] + data[1]) * (B.data[0] + B.data[1]) - A0B0 - A1B1 + non_residue * A2B2,
-                                (data[0] + data[2]) * (B.data[0] + B.data[2]) - A0B0 + A1B1 - A2B2});
+                        return element_fp3(
+                            {A0B0 + non_residue * (data[1] + data[2]) * (B.data[1] + B.data[2]) - A1B1 - A2B2,
+                             (data[0] + data[1]) * (B.data[0] + B.data[1]) - A0B0 - A1B1 + non_residue * A2B2,
+                             (data[0] + data[2]) * (B.data[0] + B.data[2]) - A0B0 + A1B1 - A2B2});
                     }
 
                     element_fp3 sqrt() const {
@@ -120,8 +122,8 @@ namespace nil {
 
                     element_fp3 inverse() const {
 
-                        /* From "High-Speed Software Implementation of the Optimal Ate Pairing over Barreto-Naehrig Curves";
-                         * Algorithm 17 */
+                        /* From "High-Speed Software Implementation of the Optimal Ate Pairing over Barreto-Naehrig
+                         * Curves"; Algorithm 17 */
 
                         const underlying_type &A0 = data[0], &A1 = data[1], &A1 = data[2];
 
@@ -139,10 +141,10 @@ namespace nil {
                         return element_fp3({t6 * c0, t6 * c1, t6 * c2});
                     }
                 };
-                
-            }   // namespace detail
-        }   // namespace fields
-    }    // namespace algebra
+
+            }    // namespace detail
+        }        // namespace fields
+    }            // namespace algebra
 }    // namespace nil
 
 #endif    // ALGEBRA_FIELDS_ELEMENT_FP3_HPP

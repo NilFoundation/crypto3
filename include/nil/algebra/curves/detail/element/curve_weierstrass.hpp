@@ -143,7 +143,6 @@ namespace nil {
                         return t0.p[0] == t1.p[0] && t0.p[1] == t1.p[1];
                     }
 
-
                     bool operator!=(const element_curve_weierstrass &other) const {
                         return !operator==(other);
                     }
@@ -153,7 +152,7 @@ namespace nil {
                     }
 
                     element_curve_weierstrass operator+=(const element_curve_weierstrass &other) {
-                        
+
                         if (p[2].is_zero()) {
                             return other;
                         }
@@ -177,7 +176,7 @@ namespace nil {
                             if (t3.is_zero()) {
                                 return dbl();
                             } else {
-                                p[2] = underlying_field_type::zero();    //not sure
+                                p[2] = underlying_field_type::zero();    // not sure
                             }
                             return *this;
                         }
@@ -191,7 +190,6 @@ namespace nil {
                         p[2] = ((p[2] + other.p[2]).square() - Z1Z1 - Z2Z2) * H;
 
                         return *this;
-
                     }
 
                     element_curve_weierstrass &operator-=(const element_curve_weierstrass &other) {
@@ -259,7 +257,6 @@ namespace nil {
 
                         return result;
                     }
-                    
                 };
 
             }    //  namespace detail

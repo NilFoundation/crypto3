@@ -27,9 +27,9 @@ namespace nil {
              * @tparam GeneratorBits
              */
             template<std::size_t ModulusBits, std::size_t GeneratorBits = CHAR_BIT>
-            struct mnt4_fr : public field<ModulusBits, GeneratorBits> {};
+            struct mnt4_fr : public field<ModulusBits, GeneratorBits> { };
 
-            template <>
+            template<>
             struct mnt4_fr<298, CHAR_BIT> : public field<298, CHAR_BIT> {
                 typedef field<298, CHAR_BIT> policy_type;
 
@@ -53,8 +53,8 @@ namespace nil {
 
             constexpr typename mnt4_fr<298, CHAR_BIT>::generator_type const mnt4_fr<298, CHAR_BIT>::mul_generator;
 
-        }   // namespace fields
-    }    // namespace algebra
+        }    // namespace fields
+    }        // namespace algebra
 }    // namespace nil
 
 #endif    // ALGEBRA_FIELDS_MNT4_FR_HPP

@@ -14,8 +14,8 @@
 #include <vector>
 
 namespace nil {
-    namespace algebra{
-        namespace pairing{
+    namespace algebra {
+        namespace pairing {
 
             using nil::algebra;
 
@@ -26,12 +26,13 @@ namespace nil {
                 @param P [in] affine coord. (P[0], P[1])
                 @note not defined for infinity point
             */
-            template <typename Params>
-            void opt_atePairing(element_fp12<Params> &f, const element_fp2<Params> Q[2], const element_fp<Params> P[2]) {
+            template<typename Params>
+            void opt_atePairing(element_fp12<Params> &f, const element_fp2<Params> Q[2],
+                                const element_fp<Params> P[2]) {
                 element_fp2<Params> T[3];
                 T[0] = Q[0];
                 T[1] = Q[1];
-                T[2] = element_fp2({1,0});
+                T[2] = element_fp2({1, 0});
                 element_fp2<Params> Qneg[2];
 
                 if (useNAF) {
@@ -76,10 +77,10 @@ namespace nil {
                 Q2[1] = -Q2[1];
 
                 element_fp12 ft;
-                d = pointAddLineEval(T, Q1, P);          // 5k
-                e = pointAddLineEval(T, Q2, P);          // 5k
+                d = pointAddLineEval(T, Q1, P);    // 5k
+                e = pointAddLineEval(T, Q2, P);    // 5k
                 ft = mul_Fp2_024_Fp2_024(d, e);    // 2.7k
-                f = f * ft;                         // 6.4k
+                f = f * ft;                        // 6.4k
                 // final exponentiation
                 f.final_exp();
             }
@@ -113,9 +114,9 @@ namespace nil {
                 }
                 opt_atePairing<Fp>(f, Q.p, P.p);
             }
-                /*
-                    inQ[3] : permit not-normalized
-                */
+            /*
+                inQ[3] : permit not-normalized
+            */
             inline void precomputeG2(std::vector<element_fp6> &coeff, element_fp2 Q[3], const element_fp2 inQ[3]) {
                 detail::NormalizeJac(Q, inQ);
 
@@ -158,7 +159,7 @@ namespace nil {
                 precP : normalized point
             */
             inline void millerLoop(Fp12 &f, const std::vector<element_fp6> &Qcoeff, const element_fp precP[2]) {
-                
+
                 size_t idx = 0;
 
                 element_fp6_3over2 d = Qcoeff[idx];
@@ -254,8 +255,8 @@ namespace nil {
                 f *= f2;
             }
 
-        }       // namespace pairing
-    }       // namespace algebra
+        }    // namespace pairing
+    }        // namespace algebra
 }    // namespace nil
 
 #endif    // ALGEBRA_PAIRING_ATE_HPP

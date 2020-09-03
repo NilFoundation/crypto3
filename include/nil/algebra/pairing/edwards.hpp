@@ -23,7 +23,7 @@ namespace nil {
         namespace pairing {
 
             template<std::size_t ModulusBits = 183, std::size_t GeneratorBits = CHAR_BIT>
-            struct pairing_params <edwards<ModulusBits, GeneratorBits>>{
+            struct pairing_params<edwards<ModulusBits, GeneratorBits>> {
 
                 using g1_precomp = detail::edwards_g1_precomp<ModulusBits, GeneratorBits>;
                 using g2_precomp = detail::edwards_g2_precomp<ModulusBits, GeneratorBits>;
@@ -40,9 +40,8 @@ namespace nil {
                 using miller_loop = detail::edwards_miller_loop<ModulusBits, GeneratorBits>;
                 using double_miller_loop = detail::edwards_double_miller_loop<ModulusBits, GeneratorBits>;
                 using final_exponentiation = detail::edwards_final_exponentiation<ModulusBits, GeneratorBits>;
-
             };
-        }        // namespace pairing
-    }            // namespace algebra
+        }    // namespace pairing
+    }        // namespace algebra
 }    // namespace nil
 #endif    // ALGEBRA_PAIRING_EDWARDS_PARAMS_HPP

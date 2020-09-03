@@ -56,10 +56,10 @@ namespace nil {
                     }
 
                     double_element_fp2 operator-() const {
-                        return zero()-data;
+                        return zero() - data;
                     }
 
-                    //data + data
+                    // data + data
                     double_element_fp2 dbl() const {
                         return {data[0].dbl(), data[1].dbl()};
                     }
@@ -75,20 +75,20 @@ namespace nil {
                         (a + bu)(9 + u) = (9a - b) + (a + 9b)u
                     */
                     double_element_fp2 mul_xi() {
-                        return {data[0].dbl().dbl().dbl() + data[0] - data[1], data[1].dbl().dbl().dbl() + data[1] + data[0]};
+                        return {data[0].dbl().dbl().dbl() + data[0] - data[1],
+                                data[1].dbl().dbl().dbl() + data[1] + data[0]};
                     }
 
-                    element_fp2 mod(){
+                    element_fp2 mod() {
                         return {data[0].mod(), data[1].mod()};
                     }
-
                 };
 
-                double_element_fp2 addNC(const double_element_fp2 &A, const double_element_fp2 &B){
+                double_element_fp2 addNC(const double_element_fp2 &A, const double_element_fp2 &B) {
                     return {addNC(data[0] + B.data[0]), addNC(data[1] + B.data[1])};
                 }
 
-                double_element_fp2 subNC(const double_element_fp2 &A, const double_element_fp2 &B){
+                double_element_fp2 subNC(const double_element_fp2 &A, const double_element_fp2 &B) {
                     return {subNC(data[0] + B.data[0]), subNC(data[1] + B.data[1])};
                 }
 
@@ -100,7 +100,7 @@ namespace nil {
                     s = addNC(A.data[0], A.data[1]);
                     t = addNC(B.data[0], B.data[1]);
                     d0 = mul(A.data[1], B.data[1]);
-                    
+
                     z.data[0] = mul(A.data[0], B.data[0]);
 
                     z.data[1] = mul(s, t);
@@ -111,7 +111,7 @@ namespace nil {
                         z.data[0] = subOpt1(z.data[0], d0);
 
                     } else {
-                        z.data[0] = z.data[0] -  d0;
+                        z.data[0] = z.data[0] - d0;
                     }
                 }
 
@@ -123,19 +123,19 @@ namespace nil {
                     return mulOpt(A, B, 2);
                 }
 
-                double_element_fp2 square(const element_fp2 &B){
-                    element_fp  t0, t1;
+                double_element_fp2 square(const element_fp2 &B) {
+                    element_fp t0, t1;
                     t0 = addNC(x.b_, x.b_);
                     z.b_ = mul(t0, x.a_);
-                    t1 = addNC(x.a_, Fp::getDirectP(1)); // RRR
+                    t1 = addNC(x.a_, Fp::getDirectP(1));    // RRR
                     t1 = subNC(t1, x.b_);
                     t0 = addNC(x.a_, x.b_);
                     z.a_ = mul(t0, t1);
                 }
-                
+
             }    // namespace detail
-        }   // namespace fields
-    }    // namespace algebra
+        }        // namespace fields
+    }            // namespace algebra
 }    // namespace nil
 
 #endif    // ALGEBRA_FILEDS_FP2_DOUBLE_HPP

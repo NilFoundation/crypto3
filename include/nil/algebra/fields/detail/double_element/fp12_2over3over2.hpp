@@ -21,7 +21,8 @@ namespace nil {
             namespace detail {
 
                 template<std::size_t ModulusBits, std::size_t GeneratorBits>
-                struct double_element_fp12_2over3over2 : public double_element<fp12_2over3over2<ModulusBits, GeneratorBits>> {
+                struct double_element_fp12_2over3over2
+                    : public double_element<fp12_2over3over2<ModulusBits, GeneratorBits>> {
 
                     using underlying_type = double_element_fp6_3over2<ModulusBits, GeneratorBits>;
 
@@ -30,7 +31,7 @@ namespace nil {
                     value_type data;
 
                     double_element_fp12_2over3over2(type data) : data(data);
-                        
+
                     inline static double_element_fp12_2over3over2 zero() const {
                         return {underlying_type::zero(), underlying_type::zero()};
                     }
@@ -52,28 +53,29 @@ namespace nil {
                     }
 
                     double_element_fp12_2over3over2 operator-() const {
-                        return zero()-data;
+                        return zero() - data;
                     }
-                    
-                    //data + data
+
+                    // data + data
                     double_element_fp12_2over3over2 dbl() const {
                         return {data[0].dbl(), data[1].dbl()};
                     }
 
-                    double_element_fp12_2over3over2 addNC(const double_element_fp12_2over3over2 &B){
+                    double_element_fp12_2over3over2 addNC(const double_element_fp12_2over3over2 &B) {
                         return {addNC(data[0] + B.data[0]), addNC(data[1] + B.data[1])};
                     }
 
-                    double_element_fp12_2over3over2 subNC(const double_element_fp12_2over3over2 &B){
+                    double_element_fp12_2over3over2 subNC(const double_element_fp12_2over3over2 &B) {
                         return {subNC(data[0] + B.data[0]), subNC(data[1] + B.data[1])};
                     }
 
-                    element<fp12_2over3over2> mod(){
+                    element<fp12_2over3over2> mod() {
                         return {data[0].mod(), data[1].mod()};
                     }
                 };
 
-                double_element_fp12_2over3over2 mul(const element<fp12_2over3over2> &A, const element<fp12_2over3over2> &B) {
+                double_element_fp12_2over3over2 mul(const element<fp12_2over3over2> &A,
+                                                    const element<fp12_2over3over2> &B) {
                 }
 
                 /*
@@ -186,7 +188,8 @@ namespace nil {
                     26 * Fp2::add/sub
                     call:2
                 */
-                double_element_fp12_2over3over2 mul_Fp2_024_Fp2_024(const element_fp6_3over2 &B1, const element_fp6_3over2 &B2) {
+                double_element_fp12_2over3over2 mul_Fp2_024_Fp2_024(const element_fp6_3over2 &B1,
+                                                                    const element_fp6_3over2 &B2) {
                     element<fp2> &z0 = z.a_.a_;
                     element<fp2> &z1 = z.a_.b_;
                     element<fp2> &z2 = z.a_.c_;
@@ -263,8 +266,8 @@ namespace nil {
                 }
 
             }    // namespace detail
-        }   // namespace fields
-    }    // namespace algebra
+        }        // namespace fields
+    }            // namespace algebra
 }    // namespace nil
 
 #endif    // ALGEBRA_FILEDS_FP12_2OVER3OVER2_DOUBLE_HPP
