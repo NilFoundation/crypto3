@@ -16,9 +16,9 @@
 
 #include <nil/crypto3/block/cipher_value.hpp>
 #include <nil/crypto3/block/cipher_state.hpp>
+#include <nil/crypto3/block/cipher_key.hpp>
 
 #include <nil/crypto3/block/detail/cipher_modes.hpp>
-#include <nil/crypto3/block/detail/key_value.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -58,7 +58,7 @@ namespace nil {
 
             return DecrypterImpl(first, last, std::move(out),
                                  CipherAccumulator(DecryptionMode(
-                                     BlockCipher(block::detail::key_value<BlockCipher>(key_first, key_last)))));
+                                     BlockCipher(block::cipher_key<BlockCipher>(key_first, key_last).key))));
         }
 
         /*!
@@ -91,7 +91,7 @@ namespace nil {
 
             return DecrypterImpl(
                 first, last, std::move(out),
-                CipherAccumulator(DecryptionMode(BlockCipher(block::detail::key_value<BlockCipher>(key)))));
+                CipherAccumulator(DecryptionMode(BlockCipher(block::cipher_key<BlockCipher>(key).key))));
         }
 
         /*!
@@ -182,7 +182,7 @@ namespace nil {
 
             return DecrypterImpl(first, last,
                                  CipherAccumulator(DecryptionMode(
-                                     BlockCipher(block::detail::key_value<BlockCipher>(key_first, key_last)))));
+                                     BlockCipher(block::cipher_key<BlockCipher>(key_first, key_last).key))));
         }
 
         /*!
@@ -212,8 +212,7 @@ namespace nil {
             typedef block::detail::range_cipher_impl<StreamDecrypterImpl> DecrypterImpl;
 
             return DecrypterImpl(
-                first, last,
-                CipherAccumulator(DecryptionMode(BlockCipher(block::detail::key_value<BlockCipher>(key)))));
+                first, last, CipherAccumulator(DecryptionMode(BlockCipher(block::cipher_key<BlockCipher>(key).key))));
         }
 
         /*!
@@ -244,7 +243,7 @@ namespace nil {
 
             return DecrypterImpl(
                 rng, std::move(out),
-                CipherAccumulator(DecryptionMode(BlockCipher(block::detail::key_value<BlockCipher>(key)))));
+                CipherAccumulator(DecryptionMode(BlockCipher(block::cipher_key<BlockCipher>(key).key))));
         }
 
         /*!
@@ -273,7 +272,7 @@ namespace nil {
 
             return DecrypterImpl(
                 rng, std::move(out),
-                CipherAccumulator(DecryptionMode(BlockCipher(block::detail::key_value<BlockCipher>(key)))));
+                CipherAccumulator(DecryptionMode(BlockCipher(block::cipher_key<BlockCipher>(key).key))));
         }
 
         /*!
@@ -305,7 +304,7 @@ namespace nil {
             typedef block::detail::range_cipher_impl<StreamDecrypterImpl> DecrypterImpl;
 
             return DecrypterImpl(
-                r, CipherAccumulator(DecryptionMode(BlockCipher(block::detail::key_value<BlockCipher>(key)))));
+                r, CipherAccumulator(DecryptionMode(BlockCipher(block::cipher_key<BlockCipher>(key).key))));
         }
     }    // namespace crypto3
 }    // namespace nil

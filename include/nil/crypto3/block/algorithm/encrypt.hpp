@@ -16,14 +16,13 @@
 
 #include <nil/crypto3/block/cipher_value.hpp>
 #include <nil/crypto3/block/cipher_state.hpp>
+#include <nil/crypto3/block/cipher_key.hpp>
 
 #include <nil/crypto3/block/detail/cipher_modes.hpp>
-#include <nil/crypto3/block/detail/key_value.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace block {
-
             template<typename BlockCipher>
             using encryption_policy = typename block::modes::isomorphic<BlockCipher, nop_padding>::encryption_policy;
         }
@@ -59,7 +58,7 @@ namespace nil {
 
             return EncrypterImpl(first, last, std::move(out),
                                  CipherAccumulator(EncryptionMode(
-                                     BlockCipher(block::detail::key_value<BlockCipher>(key_first, key_last)))));
+                                     BlockCipher(block::cipher_key<BlockCipher>(key_first, key_last).key))));
         }
 
         /*!
@@ -92,7 +91,7 @@ namespace nil {
 
             return EncrypterImpl(
                 first, last, std::move(out),
-                CipherAccumulator(EncryptionMode(BlockCipher(block::detail::key_value<BlockCipher>(key)))));
+                CipherAccumulator(EncryptionMode(BlockCipher(block::cipher_key<BlockCipher>(key).key))));
         }
 
         /*!
@@ -183,7 +182,7 @@ namespace nil {
 
             return EncrypterImpl(first, last,
                                  CipherAccumulator(EncryptionMode(
-                                     BlockCipher(block::detail::key_value<BlockCipher>(key_first, key_last)))));
+                                     BlockCipher(block::cipher_key<BlockCipher>(key_first, key_last).key))));
         }
 
         /*!
@@ -213,8 +212,7 @@ namespace nil {
             typedef block::detail::range_cipher_impl<StreamEncrypterImpl> EncrypterImpl;
 
             return EncrypterImpl(
-                first, last,
-                CipherAccumulator(EncryptionMode(BlockCipher(block::detail::key_value<BlockCipher>(key)))));
+                first, last, CipherAccumulator(EncryptionMode(BlockCipher(block::cipher_key<BlockCipher>(key).key))));
         }
 
         /*!
@@ -245,7 +243,7 @@ namespace nil {
 
             return EncrypterImpl(
                 rng, std::move(out),
-                CipherAccumulator(EncryptionMode(BlockCipher(block::detail::key_value<BlockCipher>(key)))));
+                CipherAccumulator(EncryptionMode(BlockCipher(block::cipher_key<BlockCipher>(key).key))));
         }
 
         /*!
@@ -274,7 +272,7 @@ namespace nil {
 
             return EncrypterImpl(
                 rng, std::move(out),
-                CipherAccumulator(EncryptionMode(BlockCipher(block::detail::key_value<BlockCipher>(key)))));
+                CipherAccumulator(EncryptionMode(BlockCipher(block::cipher_key<BlockCipher>(key).key))));
         }
 
         /*!
@@ -306,7 +304,7 @@ namespace nil {
             typedef block::detail::range_cipher_impl<StreamEncrypterImpl> EncrypterImpl;
 
             return EncrypterImpl(
-                r, CipherAccumulator(EncryptionMode(BlockCipher(block::detail::key_value<BlockCipher>(key)))));
+                r, CipherAccumulator(EncryptionMode(BlockCipher(block::cipher_key<BlockCipher>(key).key))));
         }
     }    // namespace crypto3
 }    // namespace nil

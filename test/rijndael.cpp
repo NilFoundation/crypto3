@@ -28,8 +28,6 @@
 #include <nil/crypto3/block/aes.hpp>
 #include <nil/crypto3/block/rijndael.hpp>
 
-#include <nil/crypto3/block/detail/key_value.hpp>
-
 using namespace nil::crypto3;
 using namespace nil::crypto3::block;
 using namespace nil::crypto3::detail;
