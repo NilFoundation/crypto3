@@ -47,8 +47,6 @@ namespace nil {
                     constexpr static const modulus_type fp2_non_residue = modulus_type(0x3D);
                     constexpr static const modulus_type fp3_non_residue = modulus_type(0x3D);
                     constexpr static const modulus_type fp6_2over3_non_residue = modulus_type(0x3D);
-                    constexpr static const std::array<modulus_type, 2> fp12_2over3over2_non_residue = {9, 1};
-
                 };
 
                 template<std::size_t ModulusBits, std::size_t GeneratorBits>
@@ -60,9 +58,6 @@ namespace nil {
                 template<std::size_t ModulusBits, std::size_t GeneratorBits>
                 constexpr typename params<edwards_fq<ModulusBits, GeneratorBits>>::modulus_type const arithmetic_params<edwards_fq<ModulusBits, GeneratorBits>>::fp6_2over3_non_residue;
 
-                template<std::size_t ModulusBits, std::size_t GeneratorBits>
-                constexpr std::array<typename params<edwards_fq<ModulusBits, GeneratorBits>>::modulus_type, 2> const arithmetic_params<edwards_fq<ModulusBits, GeneratorBits>>::fp12_2over3over2_non_residue;
-                
             }    // namespace detail
         }    // namespace fields
     }    // namespace algebra
