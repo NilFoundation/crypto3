@@ -12,7 +12,7 @@
 
 #include <sstream>
 
-#include <nil/algebra/pairing/detail/edwards/basic_policy.hpp>
+#include <nil/algebra/pairing/detail/edwards/functions.hpp>
 
 #include <nil/algebra/curves/edwards.hpp>
 

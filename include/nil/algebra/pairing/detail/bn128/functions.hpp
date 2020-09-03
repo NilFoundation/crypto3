@@ -14,6 +14,7 @@
 
 #include <nil/algebra/pairing/ate.hpp>
 #include <nil/algebra/pairing/basic_functions.hpp>
+#include <nil/algebra/pairing/basic_policy.hpp>
 
 #include <nil/algebra/curves/bn128.hpp>
 

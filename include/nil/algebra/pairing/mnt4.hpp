@@ -13,7 +13,7 @@
 #include <sstream>
 
 #include <nil/algebra/pairing/ate.hpp>
-#include <nil/algebra/pairing/detail/mnt4/basic_policy.hpp>
+#include <nil/algebra/pairing/detail/mnt4/functions.hpp>
 
 #include <nil/algebra/curves/mnt4.hpp>
 
