@@ -41,7 +41,8 @@ namespace nil {
                     constexpr static const std::size_t equivalent_round_constants_size =
                         (full_rounds + 1) * state_words + part_rounds - 1;
                     typedef cotila::vector<element_type, round_constants_size> round_constants_type;
-                    typedef cotila::vector<element_type, equivalent_round_constants_size> equivalent_round_constants_type;
+                    typedef cotila::vector<element_type, equivalent_round_constants_size>
+                        equivalent_round_constants_type;
 
                     /*
                      * =============================================================================================================
@@ -134,7 +135,7 @@ namespace nil {
                         policy_matrix_type::product_with_mds_matrix(A);
                     }
 
-                // private:
+                    // private:
                     constexpr static inline const policy_generator_constexpr_type generate_round_constants() {
                         return policy_generator_constexpr_type();
                     }
@@ -145,11 +146,14 @@ namespace nil {
                     constexpr static inline const element_type &get_round_constant(std::size_t constant_number) {
                         return round_constants_generator.round_constants[constant_number];
                     }
-                    constexpr static inline const state_vector_type get_round_constants_slice(std::size_t constants_number_base) {
-                        return cotila::slice<state_words>(round_constants_generator.round_constants, constants_number_base);
+                    constexpr static inline const state_vector_type
+                        get_round_constants_slice(std::size_t constants_number_base) {
+                        return cotila::slice<state_words>(round_constants_generator.round_constants,
+                                                          constants_number_base);
                     }
 
-                    constexpr static inline const equivalent_round_constants_type generate_equivalent_round_constants() {
+                    constexpr static inline const equivalent_round_constants_type
+                        generate_equivalent_round_constants() {
                         equivalent_round_constants_type equivalent_round_constants;
                         policy_matrix_type mds_matrix;
                         state_vector_type inv_cip1;
@@ -164,21 +168,21 @@ namespace nil {
                         }
 
                         for (std::size_t i = half_full_rounds * state_words;
-                             i < half_full_rounds * state_words + state_words; i++) {
+                             i < half_full_rounds * state_words + state_words;
+                             i++) {
                             equivalent_round_constants[i] = get_round_constant(i);
                         }
 
                         for (std::size_t r = half_full_rounds + part_rounds - 2; r >= half_full_rounds; r--) {
-                            agregated_round_constants = get_round_constants_slice((r + 1) * state_words)
-                                + inv_cip1;
-                            policy_matrix_type::product_with_inverse_mds_matrix_noalias(
-                                agregated_round_constants, inv_cip1);
+                            agregated_round_constants = get_round_constants_slice((r + 1) * state_words) + inv_cip1;
+                            policy_matrix_type::product_with_inverse_mds_matrix_noalias(agregated_round_constants,
+                                                                                        inv_cip1);
                             equivalent_round_constants[equivalent_constant_number_base + r] = inv_cip1[0];
                             inv_cip1[0] = 0;
                         }
 
-                        policy_matrix_type::product_with_inverse_mds_matrix_noalias(
-                            agregated_round_constants, inv_cip1);
+                        policy_matrix_type::product_with_inverse_mds_matrix_noalias(agregated_round_constants,
+                                                                                    inv_cip1);
                         inv_cip1[0] = 0;
                         for (std::size_t i = 0; i < state_words; i++) {
                             equivalent_round_constants[half_full_rounds * state_words + i] += inv_cip1[i];
@@ -199,4 +203,3 @@ namespace nil {
 }    // namespace nil
 
 #endif    // CRYPTO3_HASH_POSEIDON_CONSTANTS_HPP
-

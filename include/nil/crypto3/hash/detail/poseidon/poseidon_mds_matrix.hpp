@@ -36,7 +36,8 @@ namespace nil {
                     typedef cotila::matrix<element_type, state_words - 1, state_words - 1> mds_submatrix_type;
                     typedef std::array<substate_vector_type, part_rounds> subvectors_collection;
 
-                    static inline state_vector_type vect_matr_mul(const state_vector_type &A_vect, const mds_matrix_type &matr) {
+                    static inline state_vector_type vect_matr_mul(const state_vector_type &A_vect,
+                                                                  const mds_matrix_type &matr) {
                         typedef cotila::matrix<element_type, 1, state_words> state_vect_by_matr_type;
 
                         state_vect_by_matr_type state_vect_by_matr;
@@ -78,7 +79,7 @@ namespace nil {
                     static inline void product_with_equivalent_mds_matrix(state_vector_type &A_vector,
                                                                           std::size_t round_number) {
                         BOOST_ASSERT_MSG(round_number >= half_full_rounds &&
-                                            round_number < half_full_rounds + part_rounds,
+                                             round_number < half_full_rounds + part_rounds,
                                          "wrong using: product_with_equivalent_mds_matrix");
                         const std::size_t matrix_number_base = part_rounds - (round_number - half_full_rounds) - 1;
                         const substate_vector_type &v = get_v(matrix_number_base);
@@ -94,7 +95,7 @@ namespace nil {
                         }
                     }
 
-                // private:
+                    // private:
                     constexpr static inline mds_matrix_type generate_mds_matrix() {
                         mds_matrix_type mds_matrix;
                         for (std::size_t i = 0; i < state_words; i++) {
@@ -111,8 +112,8 @@ namespace nil {
                     struct equivalent_mds_matrix_type {
                         typedef std::array<substate_vector_type, part_rounds> subvectors_array;
 
-                        constexpr equivalent_mds_matrix_type(const mds_matrix_type &mds_matrix)
-                            : M_i(cotila::identity<element_type, state_words>), w_hat_list(), v_list(), M_0_0() {
+                        constexpr equivalent_mds_matrix_type(const mds_matrix_type &mds_matrix) :
+                            M_i(cotila::identity<element_type, state_words>), w_hat_list(), v_list(), M_0_0() {
 
                             typedef cotila::matrix<element_type, state_words - 1, 1> M_mul_column_slice_matr_type;
                             mds_matrix_type M_mul(mds_matrix);
@@ -148,7 +149,8 @@ namespace nil {
                         return equivalent_mds_matrix_type(mds_matrix);
                     }
                     // add constexpr
-                    static inline const equivalent_mds_matrix_type equivalent_mds_matrix = generate_equivalent_mds_matrix();
+                    static inline const equivalent_mds_matrix_type equivalent_mds_matrix =
+                        generate_equivalent_mds_matrix();
 
                     static inline const substate_vector_type &get_w_hat(std::size_t w_hat_number) {
                         return equivalent_mds_matrix.w_hat_list[w_hat_number];
@@ -169,4 +171,3 @@ namespace nil {
 }    // namespace nil
 
 #endif    // CRYPTO3_HASH_POSEIDON_MDS_MATRIX_HPP
-

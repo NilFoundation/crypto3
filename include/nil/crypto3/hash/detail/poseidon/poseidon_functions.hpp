@@ -55,17 +55,17 @@ namespace nil {
                         }
 
                         // first half of full rounds
-                        for(std::size_t i = 0; i < half_full_rounds; i++) {
+                        for (std::size_t i = 0; i < half_full_rounds; i++) {
                             policy_constants_type::arc_sbox_mds_full_round(A_vector, round_number++);
                         }
 
                         // partial rounds
-                        for(std::size_t i = 0; i < part_rounds; i++) {
+                        for (std::size_t i = 0; i < part_rounds; i++) {
                             policy_constants_type::arc_sbox_mds_part_round(A_vector, round_number++);
                         }
 
                         // second half of full rounds
-                        for(std::size_t i = 0; i < half_full_rounds; i++) {
+                        for (std::size_t i = 0; i < half_full_rounds; i++) {
                             policy_constants_type::arc_sbox_mds_full_round(A_vector, round_number++);
                         }
 
@@ -83,20 +83,20 @@ namespace nil {
                         }
 
                         // first half of full rounds
-                        for(std::size_t i = 0; i < half_full_rounds; i++) {
+                        for (std::size_t i = 0; i < half_full_rounds; i++) {
                             policy_constants_type::arc_sbox_mds_full_round_optimized_first(A_vector, round_number++);
                         }
 
                         // partial rounds
                         policy_constants_type::arc_mds_part_round_optimized_init(A_vector, round_number);
-                        for(std::size_t i = 0; i < part_rounds - 1; i++) {
+                        for (std::size_t i = 0; i < part_rounds - 1; i++) {
                             policy_constants_type::sbox_arc_mds_part_round_optimized(A_vector, round_number++);
                         }
                         // last partial round
                         policy_constants_type::sbox_mds_part_round_optimized_last(A_vector, round_number++);
 
                         // second half of full rounds
-                        for(std::size_t i = 0; i < half_full_rounds; i++) {
+                        for (std::size_t i = 0; i < half_full_rounds; i++) {
                             policy_constants_type::arc_sbox_mds_full_round_optimized_last(A_vector, round_number++);
                         }
 
@@ -111,4 +111,3 @@ namespace nil {
 }    // namespace nil
 
 #endif    // CRYPTO3_HASH_POSEIDON_FUNCTIONS_HPP
-

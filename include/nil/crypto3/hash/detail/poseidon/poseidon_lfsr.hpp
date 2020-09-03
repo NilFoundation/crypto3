@@ -97,7 +97,6 @@ namespace nil {
                     lfsr_state_type lfsr_state;
                 };
 
-
                 template<typename FieldType, std::size_t Arity, bool strength>
                 struct poseidon_lfsr_constexpr {
                     typedef typename FieldType::value_type ElementType;
@@ -112,14 +111,16 @@ namespace nil {
 
                     constexpr static const std::size_t state_bits = POSEIDON_LFSR_GENERATOR_LEN;
                     typedef boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<
-                        state_bits, state_bits, boost::multiprecision::cpp_integer_type::unsigned_magnitude,
-                        boost::multiprecision::cpp_int_check_type::unchecked, void>>
+                        state_bits,
+                        state_bits,
+                        boost::multiprecision::cpp_integer_type::unsigned_magnitude,
+                        boost::multiprecision::cpp_int_check_type::unchecked,
+                        void>>
                         state_type;
 
                     constexpr static const std::size_t constants_number = (full_rounds + part_rounds) * state_words;
                     typedef cotila::vector<ElementType, constants_number> round_constants_type;
                     typedef cotila::vector<ElementType, state_words> round_constants_arity_slice_type;
-
 
                     constexpr void generate_round_constants() {
                         modulus_type constant = 0;
@@ -205,4 +206,3 @@ namespace nil {
 }    // namespace nil
 
 #endif    // CRYPTO3_HASH_POSEIDON_LFSR_HPP
-
