@@ -111,6 +111,20 @@ namespace nil {
             }    // namespace detail
 
             namespace modes {
+                /*!
+                 * @defgroup scheme_modes Scheme Modes
+                 * @brief
+                 *
+                 * @defgroup pubkey_scheme_modes Public Key Cryptography Schemes Modes
+                 * @ingroup scheme_modes
+                 * @brief
+                 */
+
+                /*!
+                 * @brief
+                 * @tparam Scheme
+                 * @tparam Padding
+                 */
                 template<typename Scheme, template<typename> class Padding>
                 struct isomorphic {
                     typedef Scheme scheme_type;

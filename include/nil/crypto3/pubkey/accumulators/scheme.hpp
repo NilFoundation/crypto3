@@ -6,8 +6,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ACCUMULATORS_PUBKEY_HPP
-#define CRYPTO3_ACCUMULATORS_PUBKEY_HPP
+#ifndef CRYPTO3_ACCUMULATORS_PUBKEY_SCHEME_HPP
+#define CRYPTO3_ACCUMULATORS_PUBKEY_SCHEME_HPP
 
 #include <boost/container/static_vector.hpp>
 
@@ -22,12 +22,12 @@
 #include <nil/crypto3/detail/digest.hpp>
 #include <nil/crypto3/detail/inject.hpp>
 
-#include <nil/crypto3/pubkey/accumulators/bits_count.hpp>
+#include <nil/crypto3/scheme/accumulators/bits_count.hpp>
 
-#include <nil/crypto3/pubkey/accumulators/parameters/scheme.hpp>
-#include <nil/crypto3/pubkey/accumulators/parameters/bits.hpp>
+#include <nil/crypto3/scheme/accumulators/parameters/scheme.hpp>
+#include <nil/crypto3/scheme/accumulators/parameters/bits.hpp>
 
-#include <nil/crypto3/pubkey/scheme.hpp>
+#include <nil/crypto3/scheme/scheme.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -45,22 +45,21 @@ namespace nil {
                     constexpr static const std::size_t word_bits = mode_type::word_bits;
                     typedef typename mode_type::word_type word_type;
 
-                    constexpr static const std::size_t pubkey_bits = mode_type::pubkey_bits;
-                    constexpr static const std::size_t pubkey_words = mode_type::pubkey_words;
-                    typedef typename mode_type::pubkey_type pubkey_type;
+                    constexpr static const std::size_t scheme_bits = mode_type::scheme_bits;
+                    constexpr static const std::size_t scheme_words = mode_type::scheme_words;
+                    typedef typename mode_type::scheme_type scheme_type;
 
-                    constexpr static const std::size_t value_bits = sizeof(typename pubkey_type::value_type) * CHAR_BIT;
-                    constexpr static const std::size_t pubkey_values = pubkey_bits / value_bits;
+                    constexpr static const std::size_t value_bits = sizeof(typename scheme_type::value_type) * CHAR_BIT;
+                    constexpr static const std::size_t scheme_values = scheme_bits / value_bits;
 
-                    typedef ::nil::crypto3::detail::injector<endian_type, value_bits, pubkey_values, pubkey_bits>
+                    typedef ::nil::crypto3::detail::injector<endian_type, value_bits, scheme_values, scheme_bits>
                         injector_type;
 
                 public:
-                    typedef digest<pubkey_bits> result_type;
+                    typedef digest<scheme_bits> result_type;
 
                     template<typename Args>
-                    scheme_im(const Args &args) :
-                        total_seen(0), mode(args[boost::accumulators::sample]) {
+                    scheme_im(const Args &args) : total_seen(0), mode(args[boost::accumulators::sample]) {
                     }
 
                     template<typename ArgumentPack>
@@ -78,15 +77,15 @@ namespace nil {
                     }
 
                 protected:
-                    inline void resolve_type(const pubkey_type &value, std::size_t bits) {
-                        process(value, bits == 0 ? pubkey_bits : bits);
+                    inline void resolve_type(const scheme_type &value, std::size_t bits) {
+                        process(value, bits == 0 ? scheme_bits : bits);
                     }
 
                     inline void resolve_type(const word_type &value, std::size_t bits) {
                         process(value, bits == 0 ? word_bits : bits);
                     }
 
-                    inline void process(const pubkey_type &value, std::size_t value_seen) {
+                    inline void process(const scheme_type &value, std::size_t value_seen) {
                         using namespace ::nil::crypto3::detail;
                     }
 
@@ -97,7 +96,7 @@ namespace nil {
                     mode_type mode;
 
                     std::size_t total_seen;
-                    pubkey_type cache;
+                    scheme_type cache;
                     result_type dgst;
                 };
             }    // namespace impl
@@ -117,7 +116,7 @@ namespace nil {
             namespace extract {
                 template<typename Mode, typename AccumulatorSet>
                 typename boost::mpl::apply<AccumulatorSet, tag::scheme<Mode>>::type::result_type
-                    pubkey(const AccumulatorSet &acc) {
+                    scheme(const AccumulatorSet &acc) {
                     return boost::accumulators::extract_result<tag::scheme<Mode>>(acc);
                 }
             }    // namespace extract
