@@ -31,7 +31,7 @@ namespace nil {
 
                     using underlying_field_type = g2_field_type_value;
 
-                    alt_bn128_g2() : alt_bn128_g2(underlying_field_type::one(), underlying_field_type::one(), underlying_field_type::zero()) {};
+                    alt_bn128_g2() : alt_bn128_g2(zero_fill[0], zero_fill[1], zero_fill[2]) {};
 
                     alt_bn128_g2(underlying_field_type X, underlying_field_type Y, underlying_field_type Z) {
                         p[0] = X;
@@ -44,11 +44,7 @@ namespace nil {
                     }
 
                     static alt_bn128_g2 one() {
-                        return alt_bn128_g2(underlying_field_type(15267802884793550383558706039165621050290089775961208824303765753922461897946,
-                                         9034493566019742339402378670461897774509967669562610788113215988055021632533),
-                                        underlying_field_type(644888581738283025171396578091639672120333224302184904896215738366765861164,
-                                         20532875081203448695448744255224543661959516361327385779878476709582931298750),
-                                        underlying_field_type(1, 0));
+                        return alt_bn128_g2(one_fill[0], one_fill[1], one_fill[2]);
                     }
 
 
@@ -243,6 +239,14 @@ namespace nil {
                                           (this->p[2]).Frobenius_map(1));
                     }
 
+                    constexpr static const underlying_field_type_value zero_fill = {underlying_field_type_value::zero(), underlying_field_type_value::one(), underlying_field_type_value::zero()};
+
+                    constexpr static const underlying_field_type_value one_fill = {
+                        underlying_field_type_value(0x1800DEEF121F1E76426A00665E5C4479674322D4F75EDADD46DEBD5CD992F6ED_cppui254,
+                                                0x198E9393920D483A7260BFB731FB5D25F1AA493335A9E71297E485B7AEF312C2_cppui254),
+                        underlying_field_type_value(0x12C85EA5DB8C6DEB4AAB71808DCB408FE3D1E7690C43D37B4CE6CC0166FA7DAA_cppui254,
+                                                0x90689D0585FF075EC9E99AD690C3395BC4B313370B38EF355ACDADCD122975B_cppui254),
+                        underlying_field_type_value::one()};
                 };
 
             }    // namespace detail

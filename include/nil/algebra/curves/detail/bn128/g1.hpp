@@ -27,7 +27,7 @@ namespace nil {
                     using element_type = element_curve_weierstrass<typename policy_type::g1_type>;
                     using underlying_field_type_value = typename element_type::underlying_field_type_value;
 
-                    bn128_g1() : element_type(underlying_field_type_value::one(), underlying_field_type_value::one(), underlying_field_type_value::zero()) {};
+                    bn128_g1() : bn128_g1(zero_fill[0], zero_fill[1], zero_fill[2]) {};
 
                     bn128_g1(underlying_field_type_value X, underlying_field_type_value Y, underlying_field_type_value Z) : element_type(X, Y, Z) {};
 
@@ -36,12 +36,14 @@ namespace nil {
                     }
 
                     static bn128_g1 one() {
-                        return bn128_g1(1, 2, 1);
+                        return bn128_g1(one_fill[0], one_fill[1], one_fill[2]);
                     }
 
                 private:
-                    /* additional parameters for square roots in Fq */
-                    underlying_field_type_value bn128_coeff_b = underlying_field_type_value(3);
+
+                    constexpr static const underlying_field_type_value zero_fill = {underlying_field_type_value::one(), underlying_field_type_value::one(), underlying_field_type_value::zero()};
+
+                    constexpr static const underlying_field_type_value one_fill = {underlying_field_type_value(1), underlying_field_type_value(2), underlying_field_type_value(1)};
                 };
 
             }    // namespace detail

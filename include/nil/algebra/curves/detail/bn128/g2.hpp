@@ -27,7 +27,7 @@ namespace nil {
                     using element_type = element_curve_weierstrass<typename policy_type::g2_type>;
                     using underlying_field_type_value = typename element_type::underlying_field_type_value;
 
-                    bn128_g2() : element_type(underlying_field_type_value::one(), underlying_field_type_value::one(), underlying_field_type_value::zero()) {};
+                    bn128_g2() : bn128_g2(zero_fill[0], zero_fill[1], zero_fill[2]) {};
 
                     bn128_g2(underlying_field_type_value X, underlying_field_type_value Y, underlying_field_type_value Z) : element_type(X, Y, Z) {};
 
@@ -36,18 +36,19 @@ namespace nil {
                     }
 
                     static bn128_g2 one() {
-                        return bn128_g2(underlying_field_type_value(15267802884793550383558706039165621050290089775961208824303765753922461897946,
-                                         9034493566019742339402378670461897774509967669562610788113215988055021632533),
-                                        underlying_field_type_value(644888581738283025171396578091639672120333224302184904896215738366765861164,
-                                         20532875081203448695448744255224543661959516361327385779878476709582931298750),
-                                        underlying_field_type_value(1, 0));
+                        return bn128_g2(one_fill[0], one_fill[1], one_fill[2]);
                     }
 
                 private:
-                    /* additional parameters for square roots in Fq2 */
-                    underlying_field_type_value bn128_twist_coeff_b =
-                        underlying_field_type_value({19485874751759354771024239261021720505790618469301721065564631296452457478373,
-                                    266929791119991161246907387137283842545076965332900288569378510910307636690});
+
+                    constexpr static const underlying_field_type_value zero_fill = {underlying_field_type_value::one(), underlying_field_type_value::one(), underlying_field_type_value::zero()};
+
+                    constexpr static const underlying_field_type_value one_fill = {
+                        underlying_field_type_value(0x21C1452BAD76CBAFD56F91BF61C4C7A4764793ABC7E62D2EB2382A21D01014DA_cppui254,
+                                                0x13F9579708C580632ECD7DCD6EE2E6FC20F597815A2792CC5128240A38EEBC15_cppui254),
+                        underlying_field_type_value(0x16CFE76F05CE1E4C043A5A50EE37E9B0ADD1E47D95E5250BA20538A3680892C_cppui254,
+                                                0x2D6532096CCA63300C3BA564B9BD9949DCDFB32C84AC6E2A065FD2334A7D09BE_cppui254),
+                        underlying_field_type_value::one()};
                 };
 
             }    // namespace detail

@@ -30,7 +30,7 @@ namespace nil {
 
                     using underlying_field_type = g1_field_type_value;
 
-                    alt_bn128_g1() : alt_bn128_g1(underlying_field_type::one(), underlying_field_type::one(), underlying_field_type::zero()) {};
+                    alt_bn128_g1() : alt_bn128_g1(zero_fill[0], zero_fill[1], zero_fill[2]) {};
 
                     alt_bn128_g1(underlying_field_type X, underlying_field_type Y, underlying_field_type Z) {
                         p[0] = X;
@@ -38,12 +38,12 @@ namespace nil {
                         p[2] = Z;
                     };
 
-                    static alt_bn128_g1 zero() {
+                    static bn128_g1 zero() {
                         return alt_bn128_g1();
                     }
 
-                    static alt_bn128_g1 one() {
-                        return alt_bn128_g1(1, 2, 1);
+                    static bn128_g1 one() {
+                        return alt_bn128_g1(one_fill[0], one_fill[1], one_fill[2]);
                     }
 
                     bool operator==(const alt_bn128_g1 &other) const {
@@ -227,6 +227,10 @@ namespace nil {
                 private:
 
                     underlying_field_type p[3];
+
+                    constexpr static const underlying_field_type_value zero_fill = {underlying_field_type_value::zero(), underlying_field_type_value::one(), underlying_field_type_value::zero()};
+
+                    constexpr static const underlying_field_type_value one_fill = {underlying_field_type_value(1), underlying_field_type_value(2), underlying_field_type_value(1)};
 
                 };
 
