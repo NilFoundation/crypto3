@@ -21,7 +21,7 @@ namespace nil {
         namespace pairing {
             namespace detail{
 
-                using nil::algebra;
+                using namespace nil::algebra;
 
                 template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
                 using mnt6_Fq = curves::mnt6_g1<ModulusBits, GeneratorBits>::underlying_field_type_value;

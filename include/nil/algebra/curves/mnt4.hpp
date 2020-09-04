@@ -65,6 +65,15 @@ namespace nil {
 
             };
 
+            template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
+            using mnt4_g1 = typename mnt4<ModulusBits, GeneratorBits>::g1_type;
+
+            template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
+            using mnt4_g2 = typename mnt4<ModulusBits, GeneratorBits>::g2_type;
+
+            template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
+            using mnt4_gt = typename mnt4<ModulusBits, GeneratorBits>::gt_type;
+
         }    // namespace curves
     }        // namespace algebra
 }    // namespace nil

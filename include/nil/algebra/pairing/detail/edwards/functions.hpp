@@ -12,7 +12,6 @@
 
 #include <sstream>
 
-#include <nil/algebra/pairing/ate.hpp>
 #include <nil/algebra/pairing/detail/edwards/basic_policy.hpp>
 
 #include <nil/algebra/curves/edwards.hpp>
@@ -27,7 +26,7 @@ namespace nil {
         namespace pairing {
             namespace detail {
 
-                using nil::algebra;
+                using namespace nil::algebra;
 
                 template<std::size_t ModulusBits = 183, std::size_t GeneratorBits = CHAR_BIT>
                 using edwards_Fq = curves::edwards_g1<ModulusBits, GeneratorBits>::underlying_field_type_value;

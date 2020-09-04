@@ -62,6 +62,15 @@ namespace nil {
                 constexpr static const number_type q = scalar_field_modulus;
             };
 
+            template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
+            using mnt6_g1 = typename mnt6<ModulusBits, GeneratorBits>::g1_type;
+
+            template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
+            using mnt6_g2 = typename mnt6<ModulusBits, GeneratorBits>::g2_type;
+
+            template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
+            using mnt6_gt = typename mnt6<ModulusBits, GeneratorBits>::gt_type;
+
         }    // namespace curves
     }        // namespace algebra
 }    // namespace nil

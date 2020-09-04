@@ -71,13 +71,13 @@ namespace nil {
             };
 
             template<std::size_t ModulusBits = 254, std::size_t GeneratorBits = CHAR_BIT>
-            using alt_bn128_g1 = alt_bn128<ModulusBits, GeneratorBits>::g1_type;
+            using alt_bn128_g1 = typename alt_bn128<ModulusBits, GeneratorBits>::g1_type;
 
             template<std::size_t ModulusBits = 254, std::size_t GeneratorBits = CHAR_BIT>
-            using alt_bn128_g2 = alt_bn128<ModulusBits, GeneratorBits>::g2_type;
+            using alt_bn128_g2 = typename alt_bn128<ModulusBits, GeneratorBits>::g2_type;
 
             template<std::size_t ModulusBits = 254, std::size_t GeneratorBits = CHAR_BIT>
-            using alt_bn128_gt = alt_bn128<ModulusBits, GeneratorBits>::gt_type;
+            using alt_bn128_gt = typename alt_bn128<ModulusBits, GeneratorBits>::gt_type;
 
         }    // namespace curves
     }        // namespace algebra

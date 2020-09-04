@@ -13,6 +13,12 @@
 #include <boost/multiprecision/cpp_int/multiply.hpp>
 #include <boost/multiprecision/modular/base_params.hpp>
 
+#include <nil/algebra/curves/detail/edwards/basic_policy.hpp>
+
+#include <nil/algebra/fields/detail/element/fp.hpp>
+#include <nil/algebra/fields/detail/element/fp3.hpp>
+#include <nil/algebra/fields/detail/params/edwards/fq.hpp>
+
 #include <nil/algebra/detail/mp_def.hpp>
 
 namespace nil {
@@ -20,10 +26,12 @@ namespace nil {
         namespace curves {
             namespace detail {
 
+                using namespace nil::algebra;
+
                 template<std::size_t ModulusBits = 183, std::size_t GeneratorBits = CHAR_BIT>
                 struct edwards_g1 {
 
-                    using policy_type = edwards<ModulusBits>;
+                    using policy_type = edwards_basic_policy<ModulusBits, GeneratorBits>;
                     constexpr static const std::size_t g1_field_bits = ModulusBits;
                     typedef typename fields::detail::element_fp<
                         fields::detail::arithmetic_params<fields::edwards_fq<g1_field_bits, CHAR_BIT>>>
@@ -45,8 +53,7 @@ namespace nil {
                         p[2] = Z;
                     };
 
-                    edwards_g1(underlying_field_type_value X, underlying_field_type_value Y,
-                               underlying_field_type_value Z) :
+                    edwards_g1(underlying_field_type_value X, underlying_field_type_value Y) :
                         edwards_g1(X, Y, X * Y) {};
 
                     static edwards_g1 zero() {
@@ -87,7 +94,7 @@ namespace nil {
                         // http://www.hyperelliptic.org/EFD/g1p/auto-edwards-inverted.html#addition-add-2007-bl
 
                         underlying_field_type_value A = (this->p[2]) * (other.p[2]);    // A = Z1*Z2
-                        underlying_field_type_value B = curve_coeff_d * A.squared();     // B = d*A^2
+                        underlying_field_type_value B = d * A.squared();     // B = d*A^2
                         underlying_field_type_value C = (this->p[0]) * (other.p[0]);    // C = X1*X2
                         underlying_field_type_value D = (this->p[1]) * (other.p[1]);    // D = Y1*Y2
                         underlying_field_type_value E = C * D;                          // E = C*D
@@ -124,7 +131,7 @@ namespace nil {
                             underlying_field_type_value E =
                                 (this->p[0] + this->p[1]).squared() - C;    // E = (X1+Y1)^2-C
                             underlying_field_type_value X3 = C * D;        // X3 = C*D
-                            underlying_field_type_value dZZ = curve_coeff_d * this->p[2].squared();
+                            underlying_field_type_value dZZ = d * this->p[2].squared();
                             underlying_field_type_value Y3 = E * (C - dZZ - dZZ);    // Y3 = E*(C-2*d*Z1^2)
                             underlying_field_type_value Z3 = D * E;                  // Z3 = D*E
 
@@ -136,10 +143,10 @@ namespace nil {
 
                         // handle special cases having to do with O
                         if (this->is_zero()) {
-                            return B;
+                            return other;
                         }
 
-                        if (B.is_zero()) {
+                        if (other.is_zero()) {
                             return *this;
                         }
 
@@ -147,7 +154,7 @@ namespace nil {
                         // http://www.hyperelliptic.org/EFD/g1p/auto-edwards-inverted.html#addition-madd-2007-lb
 
                         underlying_field_type_value A = this->p[2];                                  // A = Z1
-                        underlying_field_type_value B = policy_type::curve_coeff_d * A.squared();    // B = d*A^2
+                        underlying_field_type_value B = d * A.squared();    // B = d*A^2
                         underlying_field_type_value C = (this->p[0]) * (other.p[0]);                 // C = X1*X2
                         underlying_field_type_value D = (this->p[1]) * (other.p[1]);                 // D = Y1*Y2
                         underlying_field_type_value E = C * D;                                       // E = C*D
@@ -164,33 +171,34 @@ namespace nil {
                 private:
                     underlying_field_type_value p[3];
 
-                    constexpr static const policy_type::number_type curve_coeff_a = policy_type::a;
-                    constexpr static const policy_type::number_type curve_coeff_d = policy_type::d;
+                    constexpr static const typename policy_type::number_type a = policy_type::a;
+                    constexpr static const typename policy_type::number_type d = policy_type::d;
 
                     constexpr static const g2_field_type_value
-                        edwards_twist(g2_field_type_value::underlying_type::zero(),
-                                      g2_field_type_value::underlying_type::one(),
-                                      g2_field_type_value::underlying_type::zero());
-                    constexpr static const g2_field_type_value edwards_twist_coeff_a =
-                        edwards_twist.mul_by_Fp(curve_coeff_a);
-                    constexpr static const g2_field_type_value edwards_twist_coeff_d =
-                        edwards_twist.mul_by_Fp(curve_coeff_d);
+                        twist(typename g2_field_type_value::underlying_type::zero(),
+                                      typename g2_field_type_value::underlying_type::one(),
+                                      typename g2_field_type_value::underlying_type::zero());
+                    constexpr static const g2_field_type_value twist_coeff_a =
+                        twist.mul_by_Fp(a);
+                    constexpr static const g2_field_type_value twist_coeff_d =
+                        twist.mul_by_Fp(d);
 
-                    constexpr static const g1_field_type_value edwards_twist_mul_by_a_c0 =
-                        curve_coeff_a * g2_field_type_value::non_residue;
-                    constexpr static const g1_field_type_value edwards_twist_mul_by_a_c1 = curve_coeff_a;
-                    constexpr static const g1_field_type_value edwards_twist_mul_by_a_c2 = curve_coeff_a;
-                    constexpr static const g1_field_type_value edwards_twist_mul_by_d_c0 =
-                        curve_coeff_d * g2_field_type_value::non_residue;
-                    constexpr static const g1_field_type_value edwards_twist_mul_by_d_c1 = curve_coeff_d;
-                    constexpr static const g1_field_type_value edwards_twist_mul_by_d_c2 = curve_coeff_d;
+                    constexpr static const g1_field_type_value twist_mul_by_a_c0 =
+                        a * g2_field_type_value::non_residue;
+                    constexpr static const g1_field_type_value twist_mul_by_a_c1 = a;
+                    constexpr static const g1_field_type_value twist_mul_by_a_c2 = a;
+                    constexpr static const g1_field_type_value twist_mul_by_d_c0 =
+                        d * g2_field_type_value::non_residue;
+                    constexpr static const g1_field_type_value twist_mul_by_d_c1 = d;
+                    constexpr static const g1_field_type_value twist_mul_by_d_c2 = d;
                     constexpr static const g1_field_type_value
-                        edwards_twist_mul_by_q_Y(0xB35E3665A18365954D018902935D4419423F84321BC3E_cppui180);
+                        twist_mul_by_q_Y(0xB35E3665A18365954D018902935D4419423F84321BC3E_cppui180);
                     constexpr static const g1_field_type_value
-                        edwards_twist_mul_by_q_Z(0xB35E3665A18365954D018902935D4419423F84321BC3E_cppui180);
+                        twist_mul_by_q_Z(0xB35E3665A18365954D018902935D4419423F84321BC3E_cppui180);
 
                     constexpr static const underlying_field_type_value zero_fill = {
-                        underlying_field_type_value::zero(), underlying_field_type_value::one(),
+                        underlying_field_type_value::zero(), 
+                        underlying_field_type_value::one(),
                         underlying_field_type_value::zero()};
 
                     constexpr static const underlying_field_type_value one_fill = {

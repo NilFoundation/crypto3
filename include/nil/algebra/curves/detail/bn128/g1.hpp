@@ -13,12 +13,11 @@
 #include <boost/multiprecision/cpp_int/multiply.hpp>
 #include <boost/multiprecision/modular/base_params.hpp>
 
-#include <nil/algebra/detail/mp_def.hpp>
-
 #include <nil/algebra/fields/detail/element/fp.hpp>
 #include <nil/algebra/fields/detail/element/fp2.hpp>
-
 #include <nil/algebra/fields/detail/params/bn128/fq.hpp>
+
+#include <nil/algebra/detail/mp_def.hpp>
 
 namespace nil {
     namespace algebra {

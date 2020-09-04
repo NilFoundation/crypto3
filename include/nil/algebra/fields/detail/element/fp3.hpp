@@ -129,7 +129,7 @@ namespace nil {
                         /* From "High-Speed Software Implementation of the Optimal Ate Pairing over Barreto-Naehrig
                          * Curves"; Algorithm 17 */
 
-                        const underlying_type &A0 = data[0], &A1 = data[1], &A1 = data[2];
+                        const underlying_type &A0 = data[0], &A1 = data[1], &A2 = data[2];
 
                         const underlying_type t0 = A0.squared();
                         const underlying_type t1 = A1.squared();
