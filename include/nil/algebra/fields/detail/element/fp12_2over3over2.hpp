@@ -172,7 +172,7 @@ namespace nil {
                 */
                 /*template <typename FieldParams>
                 element_fp12_2over3over2<FieldParams> Frobenius(element_fp12_2over3over2<FieldParams> A) {
-                    // this assumes (q-1)/6 is odd 
+                    // this assumes (q-1)/6 is odd
 
                     z.a_.a_.a_ = A.a_.a_.a_;
                     z.a_.b_.a_ = A.a_.b_.a_;

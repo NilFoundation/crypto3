@@ -21,7 +21,7 @@ namespace nil {
         namespace pairing {
 
             template<std::size_t ModulusBits = 183, std::size_t GeneratorBits = CHAR_BIT>
-            struct pairing_policy <edwards<ModulusBits, GeneratorBits>>{
+            struct pairing_policy<edwards<ModulusBits, GeneratorBits>> {
 
                 using g1_precomp = detail::edwards_g1_precomp<ModulusBits, GeneratorBits>;
                 using g2_precomp = detail::edwards_g2_precomp<ModulusBits, GeneratorBits>;

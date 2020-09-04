@@ -53,11 +53,13 @@ namespace nil {
 
                 typedef typename detail::mnt6_g1<298> g1_type;
                 typedef typename detail::mnt6_g2<298> g2_type;
-                typedef typename nil::algebra::fields::detail::element_fp4<nil::algebra::fields::detail::arithmetic_params<mnt6<298, CHAR_BIT>>> gt_type;
+                typedef typename nil::algebra::fields::detail::element_fp4<
+                    nil::algebra::fields::detail::arithmetic_params<mnt6<298, CHAR_BIT>>>
+                    gt_type;
 
                 typedef std::vector<typename g1_type> g1_vector;
                 typedef std::vector<typename g2_type> g2_vector;
-                
+
                 constexpr static const number_type p = base_field_modulus;
                 constexpr static const number_type q = scalar_field_modulus;
             };

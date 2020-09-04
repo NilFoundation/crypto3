@@ -24,10 +24,12 @@ namespace nil {
             namespace detail {
 
                 template<std::size_t ModulusBits, std::size_t GeneratorBits>
-                struct arithmetic_params<mnt6_fr<ModulusBits, GeneratorBits>> : public params<mnt6_fr<ModulusBits, GeneratorBits>> {
+                struct arithmetic_params<mnt6_fr<ModulusBits, GeneratorBits>>
+                    : public params<mnt6_fr<ModulusBits, GeneratorBits>> {
                 private:
                     typedef params<mnt6_fr<ModulusBits, GeneratorBits>> policy_type;
                     typedef arithmetic_params<mnt6_fr<ModulusBits, GeneratorBits>> element_policy_type;
+
                 public:
                     typedef typename policy_type::number_type number_type;
 
@@ -36,8 +38,8 @@ namespace nil {
                 };
 
             }    // namespace detail
-        }    // namespace fields
-    }    // namespace algebra
+        }        // namespace fields
+    }            // namespace algebra
 }    // namespace nil
 
 #endif    // ALGEBRA_FIELDS_MNT6_FR_PARAMS_HPP

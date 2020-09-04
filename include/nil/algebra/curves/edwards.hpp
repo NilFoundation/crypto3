@@ -30,8 +30,8 @@ namespace nil {
             struct edwards { };
 
             template<>
-            struct edwards<183, CHAR_BIT> : public edwards_basic_policy<183, CHAR_BIT>{
-                
+            struct edwards<183, CHAR_BIT> : public edwards_basic_policy<183, CHAR_BIT> {
+
                 using policy_type = edwards_basic_policy<183>;
 
                 typedef typename policy_type::base_field_type base_field_type;

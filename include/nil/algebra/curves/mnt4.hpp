@@ -62,7 +62,6 @@ namespace nil {
 
                 constexpr static const number_type p = base_field_modulus;
                 constexpr static const number_type q = scalar_field_modulus;
-
             };
 
             template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>

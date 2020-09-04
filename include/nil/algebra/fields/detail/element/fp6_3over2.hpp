@@ -116,7 +116,7 @@ namespace nil {
                         return element_fp6_3over2({data[0], data[1], data[2].mul_Fp_0(B)});
                     }
 
-                    element_fp6_3over2 mulFp6_24_Fp_01(const element_fp<FieldParams> * B) {
+                    element_fp6_3over2 mulFp6_24_Fp_01(const element_fp<FieldParams> *B) {
                         return element_fp6_3over2({data[0], data[1].mul_Fp_0(B[1]), data[2].mul_Fp_0(B[0])});
                     }
 

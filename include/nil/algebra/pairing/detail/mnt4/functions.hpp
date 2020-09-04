@@ -314,21 +314,21 @@ namespace nil {
                                                            mnt4_ate_dbl_coeffs &dc) {
                     const mnt4_Fq2 X = current.X, Y = current.Y, Z = current.Z, T = current.T;
 
-                    const mnt4_Fq2 A = T.squared();                              // A = T1^2
-                    const mnt4_Fq2 B = X.squared();                              // B = X1^2
-                    const mnt4_Fq2 C = Y.squared();                              // C = Y1^2
-                    const mnt4_Fq2 D = C.squared();                              // D = C^2
-                    const mnt4_Fq2 E = (X + C).squared() - B - D;                // E = (X1+C)^2-B-D
+                    const mnt4_Fq2 A = T.squared();                             // A = T1^2
+                    const mnt4_Fq2 B = X.squared();                             // B = X1^2
+                    const mnt4_Fq2 C = Y.squared();                             // C = Y1^2
+                    const mnt4_Fq2 D = C.squared();                             // D = C^2
+                    const mnt4_Fq2 E = (X + C).squared() - B - D;               // E = (X1+C)^2-B-D
                     const mnt4_Fq2 F = (B + B + B) + mnt4_twist_coeff_a * A;    // F = 3*B +  a  *A
-                    const mnt4_Fq2 G = F.squared();                              // G = F^2
+                    const mnt4_Fq2 G = F.squared();                             // G = F^2
 
-                    current.X = -E.doubled().doubled() + G;                             // X3 = -4*E+G
+                    current.X = -E.doubled().doubled() + G;                     // X3 = -4*E+G
                     current.Y = -mnt4_Fq(0x8) * D + F * (E + E - current.X);    // Y3 = -8*D+F*(2*E-X3)
-                    current.Z = (Y + Z).squared() - C - Z.squared();              // Z3 = (Y1+Z1)^2-C-Z1^2
-                    current.T = current.Z.squared();                             // T3 = Z3^2
+                    current.Z = (Y + Z).squared() - C - Z.squared();            // Z3 = (Y1+Z1)^2-C-Z1^2
+                    current.T = current.Z.squared();                            // T3 = Z3^2
 
                     dc.c_H = (current.Z + T).squared() - current.T - A;    // H = (Z3+T1)^2-T3-A
-                    dc.c_4C = C + C + C + C;                              // fourC = 4*C
+                    dc.c_4C = C + C + C + C;                               // fourC = 4*C
                     dc.c_J = (F + T).squared() - G - A;                    // J = (F+T1)^2-G-A
                     dc.c_L = (F + X).squared() - G - B;                    // L = (F+X1)^2-G-B
                 }
@@ -344,17 +344,17 @@ namespace nil {
                     const mnt4_Fq2 B = x2 * T1;    // B = x2 * T1
                     const mnt4_Fq2 D =
                         ((y2 + Z1).squared() - y2_squared - T1) * T1;    // D = ((y2 + Z1)^2 - y2squared - T1) * T1
-                    const mnt4_Fq2 H = B - X1;                          // H = B - X1
+                    const mnt4_Fq2 H = B - X1;                           // H = B - X1
                     const mnt4_Fq2 I = H.squared();                      // I = H^2
-                    const mnt4_Fq2 E = I + I + I + I;                   // E = 4*I
-                    const mnt4_Fq2 J = H * E;                           // J = H * E
-                    const mnt4_Fq2 V = X1 * E;                          // V = X1 * E
-                    const mnt4_Fq2 L1 = D - (Y1 + Y1);                  // L1 = D - 2 * Y1
+                    const mnt4_Fq2 E = I + I + I + I;                    // E = 4*I
+                    const mnt4_Fq2 J = H * E;                            // J = H * E
+                    const mnt4_Fq2 V = X1 * E;                           // V = X1 * E
+                    const mnt4_Fq2 L1 = D - (Y1 + Y1);                   // L1 = D - 2 * Y1
 
-                    current.X = L1.squared() - J - (V + V);               // X3 = L1^2 - J - 2*V
+                    current.X = L1.squared() - J - (V + V);              // X3 = L1^2 - J - 2*V
                     current.Y = L1 * (V - current.X) - (Y1 + Y1) * J;    // Y3 = L1 * (V-X3) - 2*Y1 * J
-                    current.Z = (Z1 + H).squared() - T1 - I;              // Z3 = (Z1 + H)^2 - T1 - I
-                    current.T = current.Z.squared();                      // T3 = Z3^2
+                    current.Z = (Z1 + H).squared() - T1 - I;             // Z3 = (Z1 + H)^2 - T1 - I
+                    current.T = current.Z.squared();                     // T3 = Z3^2
 
                     ac.c_L1 = L1;
                     ac.c_RZ = current.Z;

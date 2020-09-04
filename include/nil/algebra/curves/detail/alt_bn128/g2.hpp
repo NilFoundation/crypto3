@@ -121,8 +121,8 @@ namespace nil {
                         // NOTE: does not handle O and pts of order 2,4
                         // http://www.hyperelliptic.org/EFD/g1p/auto-shortw-projective.html#addition-add-1998-cmo-2
 
-                        underlying_field_type Z1Z1 = (this->p[2]).squared();               // Z1Z1 = Z1^2
-                        underlying_field_type Z2Z2 = (other.p[2]).squared();               // Z2Z2 = Z2^2
+                        underlying_field_type Z1Z1 = (this->p[2]).squared();              // Z1Z1 = Z1^2
+                        underlying_field_type Z2Z2 = (other.p[2]).squared();              // Z2Z2 = Z2^2
                         underlying_field_type U1 = (this->p[0]) * Z2Z2;                   // U1 = X1 * Z2Z2
                         underlying_field_type U2 = (other.p[0]) * Z1Z1;                   // U2 = X2 * Z1Z1
                         underlying_field_type S1 = (this->p[1]) * (other.p[2]) * Z2Z2;    // S1 = Y1 * Z2 * Z2Z2
@@ -130,14 +130,14 @@ namespace nil {
                         underlying_field_type H = U2 - U1;                                // H = U2-U1
                         underlying_field_type S2_minus_S1 = S2 - S1;
                         underlying_field_type I = H.doubled().squared();             // I = (2 * H)^2
-                        underlying_field_type J = H * I;                        // J = H * I
-                        underlying_field_type r = S2_minus_S1.doubled();            // r = 2 * (S2-S1)
-                        underlying_field_type V = U1 * I;                       // V = U1 * I
+                        underlying_field_type J = H * I;                             // J = H * I
+                        underlying_field_type r = S2_minus_S1.doubled();             // r = 2 * (S2-S1)
+                        underlying_field_type V = U1 * I;                            // V = U1 * I
                         underlying_field_type X3 = r.squared() - J - V.doubled();    // X3 = r^2 - J - 2 * V
                         underlying_field_type S1_J = S1 * J;
                         underlying_field_type Y3 = r * (V - X3) - S1_J.doubled();    // Y3 = r * (V-X3)-2 S1 J
-                        underlying_field_type Z3 =
-                            ((this->p[2] + other.p[2]).squared() - Z1Z1 - Z2Z2) * H;    // Z3 = ((Z1+Z2)^2-Z1Z1-Z2Z2) * H
+                        underlying_field_type Z3 = ((this->p[2] + other.p[2]).squared() - Z1Z1 - Z2Z2) *
+                                                   H;    // Z3 = ((Z1+Z2)^2-Z1Z1-Z2Z2) * H
 
                         return alt_bn128_g2(X3, Y3, Z3);
                     }
@@ -185,15 +185,15 @@ namespace nil {
                         // NOTE: does not handle O and pts of order 2,4
                         // http://www.hyperelliptic.org/EFD/g1p/auto-shortw-jacobian-0.html#addition-madd-2007-bl
                         underlying_field_type H = U2 - (this->p[0]);    // H = U2-X1
-                        underlying_field_type HH = H.squared();          // HH = H&2
+                        underlying_field_type HH = H.squared();         // HH = H&2
                         underlying_field_type I = HH + HH;              // I = 4*HH
                         I = I + I;
                         underlying_field_type J = H * I;                // J = H*I
                         underlying_field_type r = S2 - (this->p[1]);    // r = 2*(S2-Y1)
                         r = r + r;
-                        underlying_field_type V = (this->p[0]) * I;           // V = X1*I
+                        underlying_field_type V = (this->p[0]) * I;            // V = X1*I
                         underlying_field_type X3 = r.squared() - J - V - V;    // X3 = r^2-J-2*V
-                        underlying_field_type Y3 = (this->p[1]) * J;          // Y3 = r*(V-X3)-2*Y1*J
+                        underlying_field_type Y3 = (this->p[1]) * J;           // Y3 = r*(V-X3)-2*Y1*J
                         Y3 = r * (V - X3) - Y3 - Y3;
                         underlying_field_type Z3 = ((this->p[2]) + H).squared() - Z1Z1 - HH;    // Z3 = (Z1+H)^2-Z1Z1-HH
 
@@ -213,9 +213,9 @@ namespace nil {
                         underlying_field_type B = (this->p[1]).squared();    // B = Y1^2
                         underlying_field_type C = B.squared();               // C = B^2
                         underlying_field_type D = (this->p[0] + B).squared() - A - C;
-                        D = D + D;                                 // D = 2 * ((X1 + B)^2 - A - C)
+                        D = D + D;                                     // D = 2 * ((X1 + B)^2 - A - C)
                         underlying_field_type E = A.doubled() + A;     // E = 3 * A
-                        underlying_field_type F = E.squared();      // F = E^2
+                        underlying_field_type F = E.squared();         // F = E^2
                         underlying_field_type X3 = F - D.doubled();    // X3 = F - 2 D
                         underlying_field_type eightC = C.doubled().doubled().doubled();
                         underlying_field_type Y3 = E * (D - X3) - eightC;    // Y3 = E * (D - X3) - 8 * C

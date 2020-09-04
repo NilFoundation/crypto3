@@ -17,7 +17,7 @@ namespace nil {
         namespace pairing {
 
             template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
-            struct basic_policy <mnt4<ModulusBits, GeneratorBits>>{
+            struct basic_policy<mnt4<ModulusBits, GeneratorBits>> {
 
                 using number_type = mnt4<ModulusBits, GeneratorBits>::number_type;
 

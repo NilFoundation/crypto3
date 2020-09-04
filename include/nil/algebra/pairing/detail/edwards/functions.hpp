@@ -424,7 +424,6 @@ namespace nil {
                         current.Y = G * H;                              // Y3   = G*H
                         current.Z = F * G;                              // Z3   = F*G
                         current.T = E * H;                              // T3   = E*H
-
                     }
 
                     template<std::size_t ModulusBits = 183, std::size_t GeneratorBits = CHAR_BIT>
@@ -668,8 +667,8 @@ namespace nil {
                             return edwards_ate_reduced_pairing<ModulusBits, GeneratorBits>(P, Q);
                         }
 
-            }       // namespace detail
-        }        // namespace pairing
-    }            // namespace algebra
-}    // namespace nil
-#endif    // ALGEBRA_PAIRING_EDWARDS_FUNCTIONS_HPP
+                    }    // namespace detail
+                }        // namespace pairing
+            }            // namespace algebra
+        }                // namespace nil
+#endif                   // ALGEBRA_PAIRING_EDWARDS_FUNCTIONS_HPP

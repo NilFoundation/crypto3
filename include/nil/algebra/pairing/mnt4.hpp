@@ -22,7 +22,7 @@ namespace nil {
         namespace pairing {
 
             template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
-            struct pairing_policy <mnt4<ModulusBits, GeneratorBits>>{
+            struct pairing_policy<mnt4<ModulusBits, GeneratorBits>> {
 
                 using other_curve = curves::mnt6<ModulusBits, GeneratorBits>;
 

@@ -129,9 +129,9 @@ namespace nil {
                         underlying_field_type H = U2 - U1;                                // H = U2-U1
                         underlying_field_type S2_minus_S1 = S2 - S1;
                         underlying_field_type I = H.doubled().squared();             // I = (2 * H)^2
-                        underlying_field_type J = H * I;                         // J = H * I
+                        underlying_field_type J = H * I;                             // J = H * I
                         underlying_field_type r = S2_minus_S1.doubled();             // r = 2 * (S2-S1)
-                        underlying_field_type V = U1 * I;                        // V = U1 * I
+                        underlying_field_type V = U1 * I;                            // V = U1 * I
                         underlying_field_type X3 = r.squared() - J - V.doubled();    // X3 = r^2 - J - 2 * V
                         underlying_field_type S1_J = S1 * J;
                         underlying_field_type Y3 = r * (V - X3) - S1_J.doubled();    // Y3 = r * (V-X3)-2 S1 J
@@ -158,9 +158,9 @@ namespace nil {
                         underlying_field_type B = (this->p[1]).squared();    // B = Y1^2
                         underlying_field_type C = B.squared();               // C = B^2
                         underlying_field_type D = (this->p[0] + B).squared() - A - C;
-                        D = D + D;                                 // D = 2 * ((X1 + B)^2 - A - C)
+                        D = D + D;                                     // D = 2 * ((X1 + B)^2 - A - C)
                         underlying_field_type E = A.doubled() + A;     // E = 3 * A
-                        underlying_field_type F = E.squared();     // F = E^2
+                        underlying_field_type F = E.squared();         // F = E^2
                         underlying_field_type X3 = F - D.doubled();    // X3 = F - 2 D
                         underlying_field_type eightC = C.doubled().doubled().doubled();
                         underlying_field_type Y3 = E * (D - X3) - eightC;    // Y3 = E * (D - X3) - 8 * C

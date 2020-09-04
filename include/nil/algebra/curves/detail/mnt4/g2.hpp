@@ -21,7 +21,7 @@ namespace nil {
             namespace detail {
 
                 using namespace nil::algebra;
-                
+
                 template<std::size_t ModulusBits>
                 struct mnt4_g2 {
 
@@ -37,14 +37,18 @@ namespace nil {
 
                     using underlying_field_type_value = g2_field_type_value;
 
-                    constexpr static const underlying_field_type_value a = underlying_field_type_value(mnt4_g1::a * underlying_field_type_value::non_residue, 0);
-                    constexpr static const underlying_field_type_value b = underlying_field_type_value(0, mnt4_g1::b * underlying_field_type_value::non_residue);
-                    constexpr static const underlying_field_type_value x = 0x00; //?
-                    constexpr static const underlying_field_type_value y = 0x00; //?
+                    constexpr static const underlying_field_type_value a =
+                        underlying_field_type_value(mnt4_g1::a * underlying_field_type_value::non_residue, 0);
+                    constexpr static const underlying_field_type_value b =
+                        underlying_field_type_value(0, mnt4_g1::b *underlying_field_type_value::non_residue);
+                    constexpr static const underlying_field_type_value x = 0x00;    //?
+                    constexpr static const underlying_field_type_value y = 0x00;    //?
 
                     mnt4_g2() : mnt4_g2(zero_fill[0], zero_fill[1], zero_fill[2]) {};
 
-                    mnt4_g2(underlying_field_type_value X, underlying_field_type_value Y, underlying_field_type_value Z) {
+                    mnt4_g2(underlying_field_type_value X,
+                            underlying_field_type_value Y,
+                            underlying_field_type_value Z) {
                         p[0] = X;
                         p[1] = Y;
                         p[2] = Z;
@@ -103,17 +107,20 @@ namespace nil {
                         // NOTE: does not handle O and pts of order 2,4
                         // http://www.hyperelliptic.org/EFD/g1p/auto-shortw-projective.html#addition-add-1998-cmo-2
 
-                        const underlying_field_type_value Y1Z2 = (this->p[1]) * (other.p[2]);        // Y1Z2 = Y1*Z2
-                        const underlying_field_type_value X1Z2 = (this->p[0]) * (other.p[2]);        // X1Z2 = X1*Z2
-                        const underlying_field_type_value Z1Z2 = (this->p[2]) * (other.p[2]);        // Z1Z2 = Z1*Z2
-                        const underlying_field_type_value u = (other.p[1]) * (this->p[2]) - Y1Z2;    // u    = Y2*Z1-Y1Z2
-                        const underlying_field_type_value uu = u.squared();                          // uu   = u^2
-                        const underlying_field_type_value v = (other.p[0]) * (this->p[2]) - X1Z2;    // v    = X2*Z1-X1Z2
-                        const underlying_field_type_value vv = v.squared();                          // vv   = v^2
-                        const underlying_field_type_value vvv = v * vv;                              // vvv  = v*vv
-                        const underlying_field_type_value R = vv * X1Z2;                             // R    = vv*X1Z2
-                        const underlying_field_type_value A = uu * Z1Z2 - (vvv + R + R);    // A    = uu*Z1Z2 - vvv - 2*R
-                        const underlying_field_type_value X3 = v * A;                       // X3   = v*A
+                        const underlying_field_type_value Y1Z2 = (this->p[1]) * (other.p[2]);    // Y1Z2 = Y1*Z2
+                        const underlying_field_type_value X1Z2 = (this->p[0]) * (other.p[2]);    // X1Z2 = X1*Z2
+                        const underlying_field_type_value Z1Z2 = (this->p[2]) * (other.p[2]);    // Z1Z2 = Z1*Z2
+                        const underlying_field_type_value u =
+                            (other.p[1]) * (this->p[2]) - Y1Z2;                // u    = Y2*Z1-Y1Z2
+                        const underlying_field_type_value uu = u.squared();    // uu   = u^2
+                        const underlying_field_type_value v =
+                            (other.p[0]) * (this->p[2]) - X1Z2;                // v    = X2*Z1-X1Z2
+                        const underlying_field_type_value vv = v.squared();    // vv   = v^2
+                        const underlying_field_type_value vvv = v * vv;        // vvv  = v*vv
+                        const underlying_field_type_value R = vv * X1Z2;       // R    = vv*X1Z2
+                        const underlying_field_type_value A =
+                            uu * Z1Z2 - (vvv + R + R);                   // A    = uu*Z1Z2 - vvv - 2*R
+                        const underlying_field_type_value X3 = v * A;    // X3   = v*A
                         const underlying_field_type_value Y3 = u * (R - A) - vvv * Y1Z2;    // Y3   = u*(R-A) - vvv*Y1Z2
                         const underlying_field_type_value Z3 = vvv * Z1Z2;                  // Z3   = vvv*Z1Z2
 
@@ -146,11 +153,12 @@ namespace nil {
                             const underlying_field_type_value R = (this->p[1]) * s;    // R   = Y1*s
                             const underlying_field_type_value RR = R.squared();        // RR  = R^2
                             const underlying_field_type_value B =
-                                ((this->p[0]) + R).squared() - XX - RR;                 // B   = (X1+R)^2 - XX - RR
-                            const underlying_field_type_value h = w.squared() - B.doubled();      // h   = w^2 - 2*B
-                            const underlying_field_type_value X3 = h * s;                     // X3  = h*s
-                            const underlying_field_type_value Y3 = w * (B - h) - RR.doubled();    // Y3  = w*(B-h) - 2*RR
-                            const underlying_field_type_value Z3 = sss;                       // Z3  = sss
+                                ((this->p[0]) + R).squared() - XX - RR;    // B   = (X1+R)^2 - XX - RR
+                            const underlying_field_type_value h = w.squared() - B.doubled();    // h   = w^2 - 2*B
+                            const underlying_field_type_value X3 = h * s;                       // X3  = h*s
+                            const underlying_field_type_value Y3 =
+                                w * (B - h) - RR.doubled();                // Y3  = w*(B-h) - 2*RR
+                            const underlying_field_type_value Z3 = sss;    // Z3  = sss
 
                             return mnt4_g2(X3, Y3, Z3);
                         }
@@ -182,13 +190,14 @@ namespace nil {
                             return this->doubled();
                         }
 
-                        const underlying_field_type_value u = Y2Z1 - this->p[1];                  // u = Y2*Z1-Y1
-                        const underlying_field_type_value uu = u.squared();                       // uu = u2
-                        const underlying_field_type_value v = X2Z1 - this->p[0];                  // v = X2*Z1-X1
-                        const underlying_field_type_value vv = v.squared();                       // vv = v2
-                        const underlying_field_type_value vvv = v * vv;                           // vvv = v*vv
-                        const underlying_field_type_value R = vv * this->p[0];                    // R = vv*X1
-                        const underlying_field_type_value A = uu * this->p[2] - vvv - R.doubled();    // A = uu*Z1-vvv-2*R
+                        const underlying_field_type_value u = Y2Z1 - this->p[1];    // u = Y2*Z1-Y1
+                        const underlying_field_type_value uu = u.squared();         // uu = u2
+                        const underlying_field_type_value v = X2Z1 - this->p[0];    // v = X2*Z1-X1
+                        const underlying_field_type_value vv = v.squared();         // vv = v2
+                        const underlying_field_type_value vvv = v * vv;             // vvv = v*vv
+                        const underlying_field_type_value R = vv * this->p[0];      // R = vv*X1
+                        const underlying_field_type_value A =
+                            uu * this->p[2] - vvv - R.doubled();                                  // A = uu*Z1-vvv-2*R
                         const underlying_field_type_value X3 = v * A;                             // X3 = v*A
                         const underlying_field_type_value Y3 = u * (R - A) - vvv * this->p[1];    // Y3 = u*(R-A)-vvv*Y1
                         const underlying_field_type_value Z3 = vvv * this->p[2];                  // Z3 = vvv*Z1
@@ -197,30 +206,28 @@ namespace nil {
                     }
 
                 private:
-
-                    constexpr static const g2_field_type_value twist (
-                        typename g2_field_type_value::underlying_type::zero(), 
-                        typename g2_field_type_value::underlying_type::one());
+                    constexpr static const g2_field_type_value
+                        twist(typename g2_field_type_value::underlying_type::zero(),
+                              typename g2_field_type_value::underlying_type::one());
 
                     static const g2_field_type_value twist_coeff_a = mnt4_g2<ModulusBits, GeneratorBits>::a;
                     static const g2_field_type_value twist_coeff_b = mnt4_g2<ModulusBits, GeneratorBits>::b;
 
-                    static const g1_field_type_value twist_mul_by_a_c0 = 
+                    static const g1_field_type_value twist_mul_by_a_c0 =
                         mnt4_g1<ModulusBits, GeneratorBits>::a * g2_field_type_value::non_residue;
-                    static const g1_field_type_value twist_mul_by_a_c1 = 
+                    static const g1_field_type_value twist_mul_by_a_c1 =
                         mnt4_g1<ModulusBits, GeneratorBits>::a * g2_field_type_value::non_residue;
-                    static const g1_field_type_value twist_mul_by_b_c0 = 
+                    static const g1_field_type_value twist_mul_by_b_c0 =
                         mnt4_g1<ModulusBits, GeneratorBits>::b * g2_field_type_value::non_residue.squared();
-                    static const g1_field_type_value twist_mul_by_b_c1 = 
+                    static const g1_field_type_value twist_mul_by_b_c1 =
                         mnt4_g1<ModulusBits, GeneratorBits>::b * g2_field_type_value::non_residue;
-                    static const g1_field_type_value 
-                        twist_mul_by_q_X(0x3BCF7BCD473A266249DA7B0548ECAEEC9635D1330EA41A9E35E51200E12C90CD65A71660000_cppui298);
-                    static const g1_field_type_value 
-                        twist_mul_by_q_Y(0xF73779FE09916DFDCC2FD1F968D534BEB17DAF7518CD9FAE5C1F7BDCF94DD5D7DEF6980C4_cppui292);
+                    static const g1_field_type_value twist_mul_by_q_X(
+                        0x3BCF7BCD473A266249DA7B0548ECAEEC9635D1330EA41A9E35E51200E12C90CD65A71660000_cppui298);
+                    static const g1_field_type_value twist_mul_by_q_Y(
+                        0xF73779FE09916DFDCC2FD1F968D534BEB17DAF7518CD9FAE5C1F7BDCF94DD5D7DEF6980C4_cppui292);
 
                     constexpr static const underlying_field_type_value zero_fill = {
-                        underlying_field_type_value::zero(), 
-                        underlying_field_type_value::one(), 
+                        underlying_field_type_value::zero(), underlying_field_type_value::one(),
                         underlying_field_type_value::zero()};
 
                     constexpr static const underlying_field_type_value one_fill = {

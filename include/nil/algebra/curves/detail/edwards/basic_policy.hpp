@@ -47,8 +47,8 @@ namespace nil {
                 };
 
             }    // namespace detail
-        }    // namespace curves
-    }        // namespace algebra
+        }        // namespace curves
+    }            // namespace algebra
 }    // namespace nil
 
 #endif    // ALGEBRA_CURVES_EDWARDS_BASIC_POLICY_HPP

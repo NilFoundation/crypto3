@@ -42,14 +42,15 @@ namespace nil {
                     using underlying_field_type_value = g1_field_type_value;
 
                     underlying_field_type_value p[3];
-                    
-                    bn128_g1() : bn128_g1(underlying_field_type_value::one(), underlying_field_type_value::one(),
-                        underlying_field_type_value::zero()) {};
-                    //must be 
-                    //bn128_g1() : bn128_g1(zero_fill[0], zero_fill[1], zero_fill[2]) {};
-                    //when constexpr fields will be finished
 
-                    bn128_g1(underlying_field_type_value X, 
+                    bn128_g1() :
+                        bn128_g1(underlying_field_type_value::one(), underlying_field_type_value::one(),
+                                 underlying_field_type_value::zero()) {};
+                    // must be
+                    // bn128_g1() : bn128_g1(zero_fill[0], zero_fill[1], zero_fill[2]) {};
+                    // when constexpr fields will be finished
+
+                    bn128_g1(underlying_field_type_value X,
                              underlying_field_type_value Y,
                              underlying_field_type_value Z) {
                         p[0] = X;
@@ -62,10 +63,11 @@ namespace nil {
                     }
 
                     static bn128_g1 one() {
-                        return bn128_g1(underlying_field_type_value(1), underlying_field_type_value(2), underlying_field_type_value(1));
-                        //must be 
-                        //return bn128_g1(one_fill[0], one_fill[1], one_fill[2]);
-                        //when constexpr fields will be finished
+                        return bn128_g1(underlying_field_type_value(1), underlying_field_type_value(2),
+                                        underlying_field_type_value(1));
+                        // must be
+                        // return bn128_g1(one_fill[0], one_fill[1], one_fill[2]);
+                        // when constexpr fields will be finished
                     }
 
                     bool operator==(const bn128_g1 &other) const {
@@ -287,13 +289,13 @@ namespace nil {
                     }
 
                 private:
-
                     /*constexpr static const std::array<underlying_field_type_value, 3> zero_fill = {
                         underlying_field_type_value::one(), underlying_field_type_value::one(),
                         underlying_field_type_value::zero()};*/
 
                     /*constexpr static const std::array<underlying_field_type_value, 3> one_fill = {
-                        underlying_field_type_value(1), underlying_field_type_value(2), underlying_field_type_value(1)};*/
+                        underlying_field_type_value(1), underlying_field_type_value(2),
+                       underlying_field_type_value(1)};*/
                 };
 
             }    // namespace detail
