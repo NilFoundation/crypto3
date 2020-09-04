@@ -15,13 +15,14 @@
 
 #include <nil/algebra/fields/mnt4/fq.hpp>
 #include <nil/algebra/fields/mnt4/fr.hpp>
-#include <nil/algebra/curves/detail/params/mnt4/fq.hpp>
+#include <nil/algebra/fields/detail/element/fp4.hpp>
+#include <nil/algebra/fields/detail/params/mnt4/fq.hpp>
 
 namespace nil {
     namespace algebra {
         namespace curves {
 
-            using namespace algebra;
+            using namespace nil::algebra;
 
             /*
                 The curve equation for a BN curve is:

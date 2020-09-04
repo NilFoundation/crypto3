@@ -15,13 +15,14 @@
 
 #include <nil/algebra/fields/mnt6/fq.hpp>
 #include <nil/algebra/fields/mnt6/fr.hpp>
-#include <nil/algebra/curves/detail/params/mnt6/fq.hpp>
+#include <nil/algebra/fields/detail/element/fp6_3over2.hpp>
+#include <nil/algebra/fields/detail/params/mnt6/fq.hpp>
 
 namespace nil {
     namespace algebra {
         namespace curves {
 
-            using namespace algebra;
+            using namespace nil::algebra;
 
             /*
                 The curve equation for a BN curve is:

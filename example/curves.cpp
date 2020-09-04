@@ -16,12 +16,15 @@
 
 
 #include <nil/algebra/curves/bn128.hpp>
-#include <nil/algebra/curves/edwards.hpp>
+//#include <nil/algebra/curves/edwards.hpp>
+#include <nil/algebra/curves/mnt4.hpp>
 
 #include <nil/algebra/fields/bn128/fq.hpp>
 #include <nil/algebra/fields/bn128/fr.hpp>
 #include <nil/algebra/fields/edwards/fq.hpp>
 #include <nil/algebra/fields/edwards/fr.hpp>
+#include <nil/algebra/fields/mnt4/fq.hpp>
+#include <nil/algebra/fields/mnt4/fr.hpp>
 
 using namespace nil::algebra;
 
@@ -153,7 +156,7 @@ int main()
     fp2_curve_group_basic_math_examples<curves::bn128<254>::g2_type>();
 
     std::cout << "----------------------------" << std::endl;
-
+/*
     std::cout << "Edwards curve g1 group basic math:" << std::endl;
     fp_curve_group_basic_math_examples<curves::edwards<183>::g1_type>();
 
@@ -161,6 +164,16 @@ int main()
 
     std::cout << "Edwards curve g2 group basic math:" << std::endl;
     fp3_curve_group_basic_math_examples<curves::edwards<183>::g2_type>();
+
+    std::cout << "----------------------------" << std::endl;*/
+
+    std::cout << "Mnt4 curve g1 group basic math:" << std::endl;
+    fp_curve_group_basic_math_examples<curves::mnt4<298>::g1_type>();
+
+    std::cout << "----------------------------" << std::endl;
+
+    std::cout << "Mnt4 curve g2 group basic math:" << std::endl;
+    fp2_curve_group_basic_math_examples<curves::mnt4<298>::g2_type>();
 
     std::cout << "----------------------------" << std::endl;
 

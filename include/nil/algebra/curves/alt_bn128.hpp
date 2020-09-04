@@ -10,13 +10,13 @@
 #ifndef ALGEBRA_CURVES_BN128_HPP
 #define ALGEBRA_CURVES_BN128_HPP
 
-#include <nil/algebra/curves/detail/params/params.hpp>
-
 #include <nil/algebra/curves/detail/alt_bn128/g1.hpp>
 #include <nil/algebra/curves/detail/alt_bn128/g2.hpp>
 
 #include <nil/algebra/fields/alt_bn128/fq.hpp>
 #include <nil/algebra/fields/alt_bn128/fr.hpp>
+
+#include <nil/algebra/detail/mp_def.hpp>
 
 namespace nil {
     namespace algebra {

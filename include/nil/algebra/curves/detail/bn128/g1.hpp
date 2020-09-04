@@ -10,9 +10,10 @@
 #ifndef ALGEBRA_CURVES_BN128_G1_HPP
 #define ALGEBRA_CURVES_BN128_G1_HPP
 
-#include <boost/multiprecision/cpp_int/multiply.hpp>
-#include <boost/multiprecision/modular/base_params.hpp>
+#include <nil/algebra/curves/detail/bn128/g2.hpp>
 
+#include <nil/algebra/fields/bn128/fq.hpp>
+#include <nil/algebra/fields/bn128/fr.hpp>
 #include <nil/algebra/fields/detail/element/fp.hpp>
 #include <nil/algebra/fields/detail/element/fp2.hpp>
 #include <nil/algebra/fields/detail/params/bn128/fq.hpp>

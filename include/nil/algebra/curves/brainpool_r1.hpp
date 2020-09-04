@@ -10,6 +10,9 @@
 #ifndef ALGEBRA_CURVES_BRAINPOOL_R1_HPP
 #define ALGEBRA_CURVES_BRAINPOOL_R1_HPP
 
+#include <nil/algebra/curves/detail/brainpool_r1/g1.hpp>
+#include <nil/algebra/curves/detail/brainpool_r1/g2.hpp>
+
 #include <nil/algebra/fields/brainpool_r1/fq.hpp>
 #include <nil/algebra/fields/brainpool_r1/fr.hpp>
 

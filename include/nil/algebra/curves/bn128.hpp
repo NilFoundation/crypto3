@@ -18,11 +18,13 @@
 #include <nil/algebra/fields/detail/element/fp12_2over3over2.hpp>
 #include <nil/algebra/fields/detail/params/bn128/fq.hpp>
 
+#include <nil/algebra/detail/mp_def.hpp>
+
 namespace nil {
     namespace algebra {
         namespace curves {
 
-            using namespace ::nil::algebra;
+            using namespace nil::algebra;
 
             /*
                 The curve equation for a BN curve is:

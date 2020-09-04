@@ -10,8 +10,13 @@
 #ifndef ALGEBRA_CURVES_MNT6_G2_HPP
 #define ALGEBRA_CURVES_MNT6_G2_HPP
 
-#include <boost/multiprecision/cpp_int/multiply.hpp>
-#include <boost/multiprecision/modular/base_params.hpp>
+#include <nil/algebra/curves/detail/mnt6/g2.hpp>
+
+#include <nil/algebra/fields/mnt6/fq.hpp>
+#include <nil/algebra/fields/mnt6/fr.hpp>
+#include <nil/algebra/fields/detail/element/fp.hpp>
+#include <nil/algebra/fields/detail/element/fp3.hpp>
+#include <nil/algebra/fields/detail/params/mnt6/fq.hpp>
 
 #include <nil/algebra/detail/mp_def.hpp>
 
