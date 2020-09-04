@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef ALGEBRA_PAIRING_BLS12_PARAMS_HPP
-#define ALGEBRA_PAIRING_BLS12_PARAMS_HPP
+#ifndef ALGEBRA_PAIRING_BLS12_POLICY_HPP
+#define ALGEBRA_PAIRING_BLS12_POLICY_HPP
 
 #include <sstream>
 
@@ -24,7 +24,7 @@ namespace nil {
         namespace pairing {
 
             template<std::size_t ModulusBits = 384, std::size_t GeneratorBits = CHAR_BIT>
-            struct pairing_params <bls12<ModulusBits, GeneratorBits>>{
+            struct pairing_policy <bls12<ModulusBits, GeneratorBits>>{
 
                 using g1_precomp = detail::bls12_ate_g1_precomp<ModulusBits, GeneratorBits>;
                 using g2_precomp = detail::bls12_ate_g2_precomp<ModulusBits, GeneratorBits>;
@@ -43,4 +43,4 @@ namespace nil {
         }        // namespace pairing
     }            // namespace algebra
 }    // namespace nil
-#endif    // ALGEBRA_PAIRING_BLS12_PARAMS_HPP
+#endif    // ALGEBRA_PAIRING_BLS12_POLICY_HPP

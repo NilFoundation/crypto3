@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef ALGEBRA_PAIRING_MNT4_HPP
-#define ALGEBRA_PAIRING_MNT4_HPP
+#ifndef ALGEBRA_PAIRING_MNT4_FUNCTIONS_HPP
+#define ALGEBRA_PAIRING_MNT4_FUNCTIONS_HPP
 
 #include <sstream>
 
@@ -16,11 +16,6 @@
 #include <nil/algebra/pairing/basic_policy.hpp>
 
 #include <nil/algebra/curves/mnt4.hpp>
-
-#include <nil/algebra/fields/detail/params/mnt4/fq.hpp>
-#include <nil/algebra/fields/detail/element/fp.hpp>
-#include <nil/algebra/fields/detail/element/fp2.hpp>
-#include <nil/algebra/fields/detail/element/fp6_3over2.hpp>
 
 namespace nil {
     namespace algebra {
@@ -625,4 +620,4 @@ namespace nil {
         }        // namespace pairing
     }            // namespace algebra
 }    // namespace nil
-#endif    // ALGEBRA_PAIRING_MNT4_HPP
+#endif    // ALGEBRA_PAIRING_MNT4_FUNCTIONS_HPP

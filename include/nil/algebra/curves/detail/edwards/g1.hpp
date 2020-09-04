@@ -13,8 +13,6 @@
 #include <boost/multiprecision/cpp_int/multiply.hpp>
 #include <boost/multiprecision/modular/base_params.hpp>
 
-#include <nil/algebra/curves/detail/element/curve_weierstrass.hpp>
-
 #include <nil/algebra/detail/mp_def.hpp>
 
 namespace nil {
@@ -163,19 +161,19 @@ namespace nil {
                     constexpr static const policy_type::number_type curve_coeff_a = policy_type::a;
                     constexpr static const policy_type::number_type curve_coeff_d = policy_type::d;
 
-                    constexpr static const g2_field_type_value edwards_twist (g2_field_type_value::underlying_type::zero(), 
+                    constexpr static const g2_field_type_value twist (g2_field_type_value::underlying_type::zero(), 
                             g2_field_type_value::underlying_type::one(), g2_field_type_value::underlying_type::zero());
-                    constexpr static const g2_field_type_value edwards_twist_coeff_a = edwards_twist.mul_by_Fp(curve_coeff_a);
-                    constexpr static const g2_field_type_value edwards_twist_coeff_d = edwards_twist.mul_by_Fp(curve_coeff_d);
+                    constexpr static const g2_field_type_value twist_coeff_a = twist.mul_by_Fp(curve_coeff_a);
+                    constexpr static const g2_field_type_value twist_coeff_d = twist.mul_by_Fp(curve_coeff_d);
 
-                    constexpr static const g1_field_type_value edwards_twist_mul_by_a_c0 = curve_coeff_a * g2_field_type_value::non_residue;
-                    constexpr static const g1_field_type_value edwards_twist_mul_by_a_c1 = curve_coeff_a;
-                    constexpr static const g1_field_type_value edwards_twist_mul_by_a_c2 = curve_coeff_a;
-                    constexpr static const g1_field_type_value edwards_twist_mul_by_d_c0 = curve_coeff_d * g2_field_type_value::non_residue;
-                    constexpr static const g1_field_type_value edwards_twist_mul_by_d_c1 = curve_coeff_d;
-                    constexpr static const g1_field_type_value edwards_twist_mul_by_d_c2 = curve_coeff_d;
-                    constexpr static const g1_field_type_value edwards_twist_mul_by_q_Y (0xB35E3665A18365954D018902935D4419423F84321BC3E_cppui180);
-                    constexpr static const g1_field_type_value edwards_twist_mul_by_q_Z (0xB35E3665A18365954D018902935D4419423F84321BC3E_cppui180);
+                    constexpr static const g1_field_type_value twist_mul_by_a_c0 = curve_coeff_a * g2_field_type_value::non_residue;
+                    constexpr static const g1_field_type_value twist_mul_by_a_c1 = curve_coeff_a;
+                    constexpr static const g1_field_type_value twist_mul_by_a_c2 = curve_coeff_a;
+                    constexpr static const g1_field_type_value twist_mul_by_d_c0 = curve_coeff_d * g2_field_type_value::non_residue;
+                    constexpr static const g1_field_type_value twist_mul_by_d_c1 = curve_coeff_d;
+                    constexpr static const g1_field_type_value twist_mul_by_d_c2 = curve_coeff_d;
+                    constexpr static const g1_field_type_value twist_mul_by_q_Y (0xB35E3665A18365954D018902935D4419423F84321BC3E_cppui180);
+                    constexpr static const g1_field_type_value twist_mul_by_q_Z (0xB35E3665A18365954D018902935D4419423F84321BC3E_cppui180);
                     
                     constexpr static const underlying_field_type_value zero_fill = {underlying_field_type_value::zero(), underlying_field_type_value::one(), underlying_field_type_value::zero()};
 

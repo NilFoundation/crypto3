@@ -16,7 +16,7 @@ namespace nil {
     namespace algebra {
         namespace pairing {
 
-            template<std::size_t ModulusBits = 183, std::size_t GeneratorBits = CHAR_BIT>
+            template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
             struct basic_policy <mnt4<ModulusBits, GeneratorBits>>{
 
                 using number_type = mnt4<ModulusBits, GeneratorBits>::number_type;
@@ -35,4 +35,4 @@ namespace nil {
         }        // namespace pairing
     }            // namespace algebra
 }    // namespace nil
-#endif    // 
+#endif    // ALGEBRA_PAIRING_MNT4_BASIC_POLICY_HPP

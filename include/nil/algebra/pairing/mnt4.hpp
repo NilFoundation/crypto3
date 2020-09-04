@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef ALGEBRA_PAIRING_MNT4_PARAMS_HPP
-#define ALGEBRA_PAIRING_MNT4_PARAMS_HPP
+#ifndef ALGEBRA_PAIRING_MNT4_POLICY_HPP
+#define ALGEBRA_PAIRING_MNT4_POLICY_HPP
 
 #include <sstream>
 
@@ -23,8 +23,8 @@ namespace nil {
     namespace algebra {
         namespace pairing {
 
-            template<std::size_t ModulusBits = 254, std::size_t GeneratorBits = CHAR_BIT>
-            struct pairing_params <mnt4<ModulusBits, GeneratorBits>>{
+            template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
+            struct pairing_policy <mnt4<ModulusBits, GeneratorBits>>{
 
                 using other_curve = curves::mnt6<ModulusBits, GeneratorBits>;
 
@@ -49,4 +49,4 @@ namespace nil {
         }        // namespace pairing
     }            // namespace algebra
 }    // namespace nil
-#endif    // ALGEBRA_PAIRING_MNT4_PARAMS_HPP
+#endif    // ALGEBRA_PAIRING_MNT4_POLICY_HPP

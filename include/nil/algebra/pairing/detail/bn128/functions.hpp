@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef ALGEBRA_PAIRING_BN128_HPP
-#define ALGEBRA_PAIRING_BN128_HPP
+#ifndef ALGEBRA_PAIRING_BN128_FUNCTIONS_HPP
+#define ALGEBRA_PAIRING_BN128_FUNCTIONS_HPP
 
 #include <sstream>
 
@@ -144,4 +144,4 @@ namespace nil {
         }        // namespace pairing
     }            // namespace algebra
 }    // namespace nil
-#endif    // ALGEBRA_PAIRING_BN128_HPP
+#endif    // ALGEBRA_PAIRING_BN128_FUNCTIONS_HPP

@@ -13,8 +13,6 @@
 #include <boost/multiprecision/cpp_int/multiply.hpp>
 #include <boost/multiprecision/modular/base_params.hpp>
 
-#include <nil/algebra/curves/detail/element/curve_weierstrass.hpp>
-
 #include <nil/algebra/detail/mp_def.hpp>
 
 namespace nil {
@@ -25,7 +23,6 @@ namespace nil {
                 template<std::size_t ModulusBits>
                 struct mnt4_g2 {
 
-                    using policy_type = mnt4<ModulusBits>;
                     constexpr static const std::size_t g1_field_bits = ModulusBits;
                     typedef typename fields::detail::element_fp<fields::detail::arithmetic_params<fields::mnt4_fq<g1_field_bits, CHAR_BIT>>> g1_field_type_value;
 
@@ -33,6 +30,11 @@ namespace nil {
                     typedef typename fields::detail::element_fp2<fields::detail::arithmetic_params<fields::mnt4_fq<g2_field_bits, CHAR_BIT>>> g2_field_type_value;
 
                     using underlying_field_type = g2_field_type_value;
+
+                    constexpr static const underlying_field_type a = underlying_field_type(mnt4_g1::a * underlying_field_type::non_residue, 0);
+                    constexpr static const underlying_field_type b = underlying_field_type(0, mnt4_g1::b * underlying_field_type::non_residue);
+                    constexpr static const underlying_field_type x = 0x00; //?
+                    constexpr static const underlying_field_type y = 0x00; //?
 
                     mnt4_g2() : mnt4_g2(zero_fill[0], zero_fill[1], zero_fill[2]) {};
 
@@ -189,6 +191,20 @@ namespace nil {
                     }
 
                 private:
+
+                    constexpr static const g2_field_type_value twist (g2_field_type_value::underlying_type::zero(), 
+                            g2_field_type_value::underlying_type::one());
+
+                    static const g2_field_type_value twist_coeff_a = mnt4_g2<ModulusBits, GeneratorBits>::coeff_a;
+                    static const g2_field_type_value twist_coeff_b = mnt4_g2<ModulusBits, GeneratorBits>::coeff_b;
+
+                    static const g1_field_type_value twist_mul_by_a_c0 = mnt4_g1<ModulusBits, GeneratorBits>::coeff_a * g2_field_type_value::non_residue;
+                    static const g1_field_type_value twist_mul_by_a_c1 = mnt4_g1<ModulusBits, GeneratorBits>::coeff_a * g2_field_type_value::non_residue;
+                    static const g1_field_type_value twist_mul_by_b_c0 = mnt4_g1<ModulusBits, GeneratorBits>::coeff_b * g2_field_type_value::non_residue.square();
+                    static const g1_field_type_value twist_mul_by_b_c1 = mnt4_g1<ModulusBits, GeneratorBits>::coeff_b * g2_field_type_value::non_residue;
+                    static const g1_field_type_value twist_mul_by_q_X(0x3BCF7BCD473A266249DA7B0548ECAEEC9635D1330EA41A9E35E51200E12C90CD65A71660000_cppui298);
+                    static const g1_field_type_value twist_mul_by_q_Y(0xF73779FE09916DFDCC2FD1F968D534BEB17DAF7518CD9FAE5C1F7BDCF94DD5D7DEF6980C4_cppui292);
+
                     constexpr static const underlying_field_type zero_fill = {underlying_field_type::zero(), underlying_field_type::one(), underlying_field_type::zero()};
 
                     constexpr static const underlying_field_type one_fill = {

@@ -7,16 +7,16 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef ALGEBRA_CURVES_MNT4_HPP
-#define ALGEBRA_CURVES_MNT4_HPP
+#ifndef ALGEBRA_CURVES_MNT6_HPP
+#define ALGEBRA_CURVES_MNT6_HPP
 
 #include <nil/algebra/curves/detail/element/curve_weierstrass.hpp>
 #include <nil/algebra/curves/detail/params/params.hpp>
-#include <nil/algebra/curves/detail/mnt4/g1.hpp>
-#include <nil/algebra/curves/detail/mnt4/g2.hpp>
+#include <nil/algebra/curves/detail/mnt6/g1.hpp>
+#include <nil/algebra/curves/detail/mnt6/g2.hpp>
 
-#include <nil/algebra/fields/mnt4/fq.hpp>
-#include <nil/algebra/fields/mnt4/fr.hpp>
+#include <nil/algebra/fields/mnt6/fq.hpp>
+#include <nil/algebra/fields/mnt6/fr.hpp>
 
 namespace nil {
     namespace algebra {
@@ -39,24 +39,24 @@ namespace nil {
                 w^2 = v
             */
             template<std::size_t ModulusBits>
-            struct mnt4 { };
+            struct mnt6 { };
 
             template<>
-            struct mnt4<298> {
+            struct mnt6<298> {
                 constexpr static const std::size_t base_field_bits = 298;
-                typedef fields::mnt4_fq<base_field_bits, CHAR_BIT> base_field_type;
+                typedef fields::mnt6_fq<base_field_bits, CHAR_BIT> base_field_type;
                 typedef typename base_field_type::modulus_type number_type;
                 constexpr static const number_type base_field_modulus = base_field_type::modulus;
 
                 constexpr static const std::size_t scalar_field_bits = 298;
-                typedef fields::mnt4_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
+                typedef fields::mnt6_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
                 constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
 
                 //typedef typename detail::element_curve_weierstrass<base_field_type::value_type> value_type;
 
-                typedef typename detail::mnt4_g1<298> g1_type;
-                typedef typename detail::mnt4_g2<298> g2_type;
-                typedef typename nil::algebra::fields::detail::element_fp4<nil::algebra::fields::detail::arithmetic_params<mnt4<298, CHAR_BIT>>> gt_type;
+                typedef typename detail::mnt6_g1<298> g1_type;
+                typedef typename detail::mnt6_g2<298> g2_type;
+                typedef typename nil::algebra::fields::detail::element_fp4<nil::algebra::fields::detail::arithmetic_params<mnt6<298, CHAR_BIT>>> gt_type;
 
                 typedef std::vector<typename g1_type> g1_vector;
                 typedef std::vector<typename g2_type> g2_vector;
@@ -69,4 +69,4 @@ namespace nil {
     }        // namespace algebra
 }    // namespace nil
 
-#endif    // ALGEBRA_CURVES_MNT4_HPP
+#endif    // ALGEBRA_CURVES_MNT6_HPP
