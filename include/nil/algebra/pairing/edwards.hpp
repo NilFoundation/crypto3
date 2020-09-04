@@ -40,9 +40,8 @@ namespace nil {
                 using miller_loop = detail::edwards_miller_loop<ModulusBits, GeneratorBits>;
                 using double_miller_loop = detail::edwards_double_miller_loop<ModulusBits, GeneratorBits>;
                 using final_exponentiation = detail::edwards_final_exponentiation<ModulusBits, GeneratorBits>;
-
             };
-        }        // namespace pairing
-    }            // namespace algebra
+        }    // namespace pairing
+    }        // namespace algebra
 }    // namespace nil
 #endif    // ALGEBRA_PAIRING_EDWARDS_POLICY_HPP

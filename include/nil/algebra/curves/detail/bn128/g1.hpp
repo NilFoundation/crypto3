@@ -31,7 +31,9 @@ namespace nil {
 
                     bn128_g1() : bn128_g1(zero_fill[0], zero_fill[1], zero_fill[2]) {};
 
-                    bn128_g1(underlying_field_type_value X, underlying_field_type_value Y, underlying_field_type_value Z) : element_type(X, Y, Z) {};
+                    bn128_g1(underlying_field_type_value X, underlying_field_type_value Y,
+                             underlying_field_type_value Z) :
+                        element_type(X, Y, Z) {};
 
                     static bn128_g1 zero() {
                         return bn128_g1();
@@ -42,10 +44,12 @@ namespace nil {
                     }
 
                 private:
+                    constexpr static const underlying_field_type_value zero_fill = {
+                        underlying_field_type_value::one(), underlying_field_type_value::one(),
+                        underlying_field_type_value::zero()};
 
-                    constexpr static const underlying_field_type_value zero_fill = {underlying_field_type_value::one(), underlying_field_type_value::one(), underlying_field_type_value::zero()};
-
-                    constexpr static const underlying_field_type_value one_fill = {underlying_field_type_value(1), underlying_field_type_value(2), underlying_field_type_value(1)};
+                    constexpr static const underlying_field_type_value one_fill = {
+                        underlying_field_type_value(1), underlying_field_type_value(2), underlying_field_type_value(1)};
                 };
 
             }    // namespace detail

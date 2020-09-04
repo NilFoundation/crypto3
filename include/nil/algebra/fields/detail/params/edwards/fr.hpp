@@ -24,21 +24,21 @@ namespace nil {
             namespace detail {
 
                 template<std::size_t ModulusBits, std::size_t GeneratorBits>
-                struct arithmetic_params<edwards_fr<ModulusBits, GeneratorBits>> : public params<edwards_fr<ModulusBits, GeneratorBits>> {
+                struct arithmetic_params<edwards_fr<ModulusBits, GeneratorBits>>
+                    : public params<edwards_fr<ModulusBits, GeneratorBits>> {
                 private:
                     typedef params<edwards_fr<ModulusBits, GeneratorBits>> policy_type;
                     typedef arithmetic_params<edwards_fr<ModulusBits, GeneratorBits>> element_policy_type;
+
                 public:
                     typedef typename policy_type::number_type number_type;
 
-                    constexpr static const number_type q =
-                        0x81ABF93A5472B62717249DC9709660EF2A993C0000000_cppui181;
-
+                    constexpr static const number_type q = 0x81ABF93A5472B62717249DC9709660EF2A993C0000000_cppui181;
                 };
 
             }    // namespace detail
-        }    // namespace fields
-    }    // namespace algebra
+        }        // namespace fields
+    }            // namespace algebra
 }    // namespace nil
 
 #endif    // ALGEBRA_FIELDS_EDWARDS_FR_PARAMS_HPP

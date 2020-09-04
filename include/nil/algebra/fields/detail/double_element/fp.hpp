@@ -63,46 +63,43 @@ namespace nil {
                         return -data;
                     }
 
-                    //data + data
+                    // data + data
                     double_element_fp dbl() const {
                         return data + data;
                     }
 
                     double_element_fp subOpt1() const {
-                        
                     }
 
-                    element_fp mod(){
-                        
+                    element_fp mod() {
                     }
                 };
 
-                double_element_fp addNC(const double_element_fp &A, const double_element_fp &B){
+                double_element_fp addNC(const double_element_fp &A, const double_element_fp &B) {
                     return {addNC(data[0] + B.data[0]), addNC(data[1] + B.data[1])};
                 }
 
-                double_element_fp subNC(const double_element_fp &A, const double_element_fp &B){
+                double_element_fp subNC(const double_element_fp &A, const double_element_fp &B) {
                     return {subNC(data[0] + B.data[0]), subNC(data[1] + B.data[1])};
                 }
 
                 double_element_fp mul(const element_fp &A, const element_fp &B) {
-                    
                 }
 
-                double_element_fp square(const element_fp &B){
-                {
-                    element_fp t0, t1;
-                    t0 = addNC(x.b_, x.b_);
-                    z.b_ = mul(t0, x.a_);
-                    t1 = addNC(x.a_, Fp::getDirectP(1)); // RRR
-                    t1 = subNC(t1, x.b_);
-                    t0 = addNC(x.a_, x.b_);
-                    z.a_ = mul(t0, t1);
-                }
+                double_element_fp square(const element_fp &B) {
+                    {
+                        element_fp t0, t1;
+                        t0 = addNC(x.b_, x.b_);
+                        z.b_ = mul(t0, x.a_);
+                        t1 = addNC(x.a_, Fp::getDirectP(1));    // RRR
+                        t1 = subNC(t1, x.b_);
+                        t0 = addNC(x.a_, x.b_);
+                        z.a_ = mul(t0, t1);
+                    }
 
-            }    // namespace detail
-        }   // namespace fields
-    }    // namespace algebra
-}    // namespace nil
+                }    // namespace detail
+            }        // namespace fields
+        }            // namespace algebra
+    }                // namespace nil
 
 #endif    // ALGEBRA_FIELDS_FP_DOUBLE_HPP

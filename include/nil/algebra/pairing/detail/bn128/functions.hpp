@@ -26,7 +26,7 @@
 namespace nil {
     namespace algebra {
         namespace pairing {
-            namespace detail{
+            namespace detail {
 
                 using nil::algebra;
 
@@ -72,7 +72,8 @@ namespace nil {
                 };
 
                 template<std::size_t ModulusBits = 254, std::size_t GeneratorBits = CHAR_BIT>
-                bn128_ate_g1_precomp<ModulusBits, GeneratorBits> bn128_ate_precompute_g1(const curves::bn128_g1<ModulusBits, GeneratorBits> &P) {
+                bn128_ate_g1_precomp<ModulusBits, GeneratorBits>
+                    bn128_ate_precompute_g1(const curves::bn128_g1<ModulusBits, GeneratorBits> &P) {
 
                     bn128_ate_g1_precomp<ModulusBits, GeneratorBits> result;
                     detail::NormalizeJac(result.P, P.p);
@@ -81,7 +82,8 @@ namespace nil {
                 }
 
                 template<std::size_t ModulusBits = 254, std::size_t GeneratorBits = CHAR_BIT>
-                bn128_ate_g2_precomp<ModulusBits, GeneratorBits> bn128_ate_precompute_g2(const curves::bn128_g2<ModulusBits, GeneratorBits> &Q) {
+                bn128_ate_g2_precomp<ModulusBits, GeneratorBits>
+                    bn128_ate_precompute_g2(const curves::bn128_g2<ModulusBits, GeneratorBits> &Q) {
 
                     bn128_ate_g2_precomp<ModulusBits, GeneratorBits> result;
                     detail::precomputeg2(result.coeffs, result.Q, Q.coord);
@@ -90,10 +92,11 @@ namespace nil {
                 }
 
                 template<std::size_t ModulusBits = 254, std::size_t GeneratorBits = CHAR_BIT>
-                curves::bn128_gt<ModulusBits, GeneratorBits> bn128_double_ate_miller_loop(const bn128_ate_g1_precomp<ModulusBits, GeneratorBits> &prec_P1,
-                                                        const bn128_ate_g2_precomp<ModulusBits, GeneratorBits> &prec_Q1,
-                                                        const bn128_ate_g1_precomp<ModulusBits, GeneratorBits> &prec_P2,
-                                                        const bn128_ate_g2_precomp<ModulusBits, GeneratorBits> &prec_Q2) {
+                curves::bn128_gt<ModulusBits, GeneratorBits>
+                    bn128_double_ate_miller_loop(const bn128_ate_g1_precomp<ModulusBits, GeneratorBits> &prec_P1,
+                                                 const bn128_ate_g2_precomp<ModulusBits, GeneratorBits> &prec_Q1,
+                                                 const bn128_ate_g1_precomp<ModulusBits, GeneratorBits> &prec_P2,
+                                                 const bn128_ate_g2_precomp<ModulusBits, GeneratorBits> &prec_Q2) {
                     curves::bn128_gt<ModulusBits, GeneratorBits> f;
 
                     millerLoop2(f.elem, prec_Q1.coeffs, prec_P1.P, prec_Q2.coeffs, prec_P2.P);
@@ -101,28 +104,31 @@ namespace nil {
                 }
 
                 template<std::size_t ModulusBits = 254, std::size_t GeneratorBits = CHAR_BIT>
-                curves::bn128_gt<ModulusBits, GeneratorBits> bn128_ate_miller_loop(const bn128_ate_g1_precomp<ModulusBits, GeneratorBits> &prec_P,
-                                                 const bn128_ate_g2_precomp<ModulusBits, GeneratorBits> &prec_Q) {
+                curves::bn128_gt<ModulusBits, GeneratorBits>
+                    bn128_ate_miller_loop(const bn128_ate_g1_precomp<ModulusBits, GeneratorBits> &prec_P,
+                                          const bn128_ate_g2_precomp<ModulusBits, GeneratorBits> &prec_Q) {
                     curves::bn128_gt<ModulusBits, GeneratorBits> f;
                     millerLoop(f.elem, prec_Q.coeffs, prec_P.P);
                     return f;
                 }
 
                 template<std::size_t ModulusBits = 254, std::size_t GeneratorBits = CHAR_BIT>
-                curves::bn128_gt<ModulusBits, GeneratorBits> bn128_final_exponentiation(const curves::bn128_gt<ModulusBits, GeneratorBits> &elt) {
+                curves::bn128_gt<ModulusBits, GeneratorBits>
+                    bn128_final_exponentiation(const curves::bn128_gt<ModulusBits, GeneratorBits> &elt) {
                     curves::bn128_gt<ModulusBits, GeneratorBits> eltcopy = elt;
                     eltcopy.elem.final_exp();
                     return eltcopy;
                 }
 
                 /*template <std::size_t ModulusBits, std::size_t GeneratorBits>
-                static curves::bn128_gt<ModulusBits, GeneratorBits> bn128_final_exponentiation (const curves::bn128_gt<ModulusBits, GeneratorBits> &elt) {
-                    return bn128_final_exponentiation(elt);
+                static curves::bn128_gt<ModulusBits, GeneratorBits> bn128_final_exponentiation (const
+                curves::bn128_gt<ModulusBits, GeneratorBits> &elt) { return bn128_final_exponentiation(elt);
                 }
 
                 template <std::size_t ModulusBits, std::size_t GeneratorBits>
-                static curves::bn128_gt<ModulusBits, GeneratorBits> bn128_miller_loop (const bn128_ate_g1_precomp<ModulusBits, GeneratorBits> &prec_P,
-                                              const bn128_ate_g2_precomp<ModulusBits, GeneratorBits> &prec_Q) {
+                static curves::bn128_gt<ModulusBits, GeneratorBits> bn128_miller_loop (const
+                bn128_ate_g1_precomp<ModulusBits, GeneratorBits> &prec_P, const bn128_ate_g2_precomp<ModulusBits,
+                GeneratorBits> &prec_Q) {
 
                     curves::bn128_gt<ModulusBits, GeneratorBits> result = bn128_ate_miller_loop(prec_P, prec_Q);
 
@@ -130,17 +136,18 @@ namespace nil {
                 }
 
                 template <std::size_t ModulusBits, std::size_t GeneratorBits>
-                static curves::bn128_gt<ModulusBits, GeneratorBits> bn128_double_miller_loop (const bn128_ate_g1_precomp<ModulusBits, GeneratorBits> &prec_P1,
-                                                     const bn128_ate_g2_precomp<ModulusBits, GeneratorBits> &prec_Q1,
-                                                     const bn128_ate_g1_precomp<ModulusBits, GeneratorBits> &prec_P2,
-                                                     const bn128_ate_g2_precomp<ModulusBits, GeneratorBits> &prec_Q2) {
+                static curves::bn128_gt<ModulusBits, GeneratorBits> bn128_double_miller_loop (const
+                bn128_ate_g1_precomp<ModulusBits, GeneratorBits> &prec_P1, const bn128_ate_g2_precomp<ModulusBits,
+                GeneratorBits> &prec_Q1, const bn128_ate_g1_precomp<ModulusBits, GeneratorBits> &prec_P2, const
+                bn128_ate_g2_precomp<ModulusBits, GeneratorBits> &prec_Q2) {
 
-                    curves::bn128_gt<ModulusBits, GeneratorBits> result = bn128_double_ate_miller_loop(prec_P1, prec_Q1, prec_P2, prec_Q2);
+                    curves::bn128_gt<ModulusBits, GeneratorBits> result = bn128_double_ate_miller_loop(prec_P1, prec_Q1,
+                prec_P2, prec_Q2);
 
                     return result;
                 }*/
-                
-            }       // namespace detail                
+
+            }    // namespace detail
         }        // namespace pairing
     }            // namespace algebra
 }    // namespace nil

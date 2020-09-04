@@ -52,17 +52,20 @@ namespace nil {
                 typedef fields::mnt4_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
                 constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
 
-                //typedef typename detail::element_curve_weierstrass<base_field_type::value_type> value_type;
+                // typedef typename detail::element_curve_weierstrass<base_field_type::value_type> value_type;
 
                 typedef typename detail::mnt4_g1<298> g1_type;
                 typedef typename detail::mnt4_g2<298> g2_type;
-                typedef typename nil::algebra::fields::detail::element_fp4<nil::algebra::fields::detail::arithmetic_params<mnt4<298, CHAR_BIT>>> gt_type;
+                typedef typename nil::algebra::fields::detail::element_fp4<
+                    nil::algebra::fields::detail::arithmetic_params<mnt4<298, CHAR_BIT>>>
+                    gt_type;
 
                 typedef std::vector<typename g1_type> g1_vector;
                 typedef std::vector<typename g2_type> g2_vector;
-                
+
                 constexpr static const number_type p = base_field_modulus;
                 constexpr static const number_type q = scalar_field_modulus;
+
             };
 
         }    // namespace curves

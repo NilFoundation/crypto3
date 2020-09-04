@@ -20,21 +20,23 @@ namespace nil {
     namespace algebra {
         namespace fields {
             namespace detail {
-            	
+
                 template<std::size_t ModulusBits, std::size_t GeneratorBits = CHAR_BIT>
-                struct arithmetic_params<ed25519<ModulusBits, GeneratorBits>> : public params<modp_srp<ModulusBits, GeneratorBits>> {
+                struct arithmetic_params<ed25519<ModulusBits, GeneratorBits>>
+                    : public params<modp_srp<ModulusBits, GeneratorBits>> {
                 private:
                     typedef params<modp_srp<ModulusBits, GeneratorBits>> policy_type;
                     typedef arithmetic_params<modp_srp<ModulusBits, GeneratorBits>> element_policy_type;
+
                 public:
                     typedef typename policy_type::number_type number_type;
 
                     constexpr static const modulus_type q = 0;
                 };
-            
+
             }    // namespace detail
-        }    // namespace fields
-    }    // namespace algebra
+        }        // namespace fields
+    }            // namespace algebra
 }    // namespace nil
 
 #endif    // ALGEBRA_FIELDS_ED25519_PARAMS_HPP

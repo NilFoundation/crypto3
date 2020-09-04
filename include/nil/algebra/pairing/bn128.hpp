@@ -38,9 +38,8 @@ namespace nil {
                 using miller_loop = detail::bn128_ate_miller_loop<ModulusBits, GeneratorBits>;
                 using double_miller_loop = detail::bn128_double_ate_miller_loop<ModulusBits, GeneratorBits>;
                 using final_exponentiation = detail::bn128_final_exponentiation<ModulusBits, GeneratorBits>;
-
             };
-        }        // namespace pairing
-    }            // namespace algebra
+        }    // namespace pairing
+    }        // namespace algebra
 }    // namespace nil
 #endif    // ALGEBRA_PAIRING_BN128_POLICY_HPP

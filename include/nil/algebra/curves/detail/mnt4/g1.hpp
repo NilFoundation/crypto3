@@ -24,10 +24,14 @@ namespace nil {
                 struct mnt4_g1 {
 
                     constexpr static const std::size_t g1_field_bits = ModulusBits;
-                    typedef typename fields::detail::element_fp<fields::detail::arithmetic_params<fields::mnt4_fq<g1_field_bits, CHAR_BIT>>> g1_field_type_value;
+                    typedef typename fields::detail::element_fp<
+                        fields::detail::arithmetic_params<fields::mnt4_fq<g1_field_bits, CHAR_BIT>>>
+                        g1_field_type_value;
 
                     constexpr static const std::size_t g2_field_bits = ModulusBits;
-                    typedef typename fields::detail::element_fp2<fields::detail::arithmetic_params<fields::mnt4_fq<g2_field_bits, CHAR_BIT>>> g2_field_type_value;
+                    typedef typename fields::detail::element_fp2<
+                        fields::detail::arithmetic_params<fields::mnt4_fq<g2_field_bits, CHAR_BIT>>>
+                        g2_field_type_value;
 
                     using underlying_field_type_value = g1_field_type_value;
 
@@ -52,38 +56,38 @@ namespace nil {
                         return mnt4_g1(one_fill[0], one_fill[1], one_fill[2]);
                     }
 
-                    bool mnt4_g1::operator==(const mnt4_g1 &other) const{
-                        if (this->is_zero()){
+                    bool mnt4_g1::operator==(const mnt4_g1 &other) const {
+                        if (this->is_zero()) {
                             return other.is_zero();
                         }
 
-                        if (other.is_zero()){
+                        if (other.is_zero()) {
                             return false;
                         }
 
                         /* now neither is O */
 
                         // X1/Z1 = X2/Z2 <=> X1*Z2 = X2*Z1
-                        if ((this->p[0] * other.p[2]) != (other.p[0] * this->p[2])){
+                        if ((this->p[0] * other.p[2]) != (other.p[0] * this->p[2])) {
                             return false;
                         }
 
                         // Y1/Z1 = Y2/Z2 <=> Y1*Z2 = Y2*Z1
-                        if ((this->p[1] * other.p[2]) != (other.p[1] * this->p[2])){
+                        if ((this->p[1] * other.p[2]) != (other.p[1] * this->p[2])) {
                             return false;
                         }
 
                         return true;
                     }
 
-                    mnt4_g1 operator+(const mnt4_g1 &other) const{
+                    mnt4_g1 operator+(const mnt4_g1 &other) const {
 
                         // handle special cases having to do with O
-                        if (this->is_zero()){
+                        if (this->is_zero()) {
                             return other;
                         }
 
-                        if (other.is_zero()){
+                        if (other.is_zero()) {
                             return (*this);
                         }
 
@@ -91,7 +95,7 @@ namespace nil {
                         // (they cannot exist in a prime-order subgroup)
 
                         // handle double case
-                        if (*this == other){
+                        if (*this == other) {
                             return this->dbl();
                         }
 
@@ -115,11 +119,11 @@ namespace nil {
                         return mnt4_g1(X3, Y3, Z3);
                     }
 
-                    mnt4_g1 operator- () const {
+                    mnt4_g1 operator-() const {
                         return mnt4_g1(this->p[0], -this->p[1], this->p[2]);
                     }
 
-                    mnt4_g1 operator- (const mnt4_g1 &other) const {
+                    mnt4_g1 operator-(const mnt4_g1 &other) const {
                         return (*this) + (-other);
                     }
 
@@ -127,8 +131,7 @@ namespace nil {
 
                         if (this->is_zero()) {
                             return (*this);
-                        }
-                        else {
+                        } else {
                             // NOTE: does not handle O and pts of order 2,4
                             // http://www.hyperelliptic.org/EFD/g1p/auto-shortw-projective.html#doubling-dbl-2007-bl
 
@@ -172,8 +175,7 @@ namespace nil {
                         const underlying_field_type_value &Y1Z2 = (this->p[1]);                    // Y1Z2 = Y1*Z2 (but other is special and not zero)
                         const underlying_field_type_value Y2Z1 = (this->p[2]) * (other.p[1]);          // Y2Z1 = Y2*Z1
 
-                        if (X1Z2 == X2Z1 && Y1Z2 == Y2Z1)
-                        {
+                        if (X1Z2 == X2Z1 && Y1Z2 == Y2Z1) {
                             return this->dbl();
                         }
 

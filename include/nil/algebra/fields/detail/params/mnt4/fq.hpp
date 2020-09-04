@@ -24,10 +24,12 @@ namespace nil {
             namespace detail {
 
                 template<std::size_t ModulusBits, std::size_t GeneratorBits>
-                struct arithmetic_params<mnt4_fq<ModulusBits, GeneratorBits>> : public params<mnt4_fq<ModulusBits, GeneratorBits>> {
+                struct arithmetic_params<mnt4_fq<ModulusBits, GeneratorBits>>
+                    : public params<mnt4_fq<ModulusBits, GeneratorBits>> {
                 private:
                     typedef params<mnt4_fq<ModulusBits, GeneratorBits>> policy_type;
                     typedef arithmetic_params<mnt4_fq<ModulusBits, GeneratorBits>> element_policy_type;
+
                 public:
                     typedef typename policy_type::number_type number_type;
                     typedef typename policy_type::modulus_type modulus_type;
@@ -47,14 +49,16 @@ namespace nil {
                 };
 
                 template<std::size_t ModulusBits, std::size_t GeneratorBits>
-                constexpr typename params<mnt4_fq<ModulusBits, GeneratorBits>>::modulus_type const arithmetic_params<mnt4_fq<ModulusBits, GeneratorBits>>::fp2_non_residue;
+                constexpr typename params<mnt4_fq<ModulusBits, GeneratorBits>>::modulus_type const
+                    arithmetic_params<mnt4_fq<ModulusBits, GeneratorBits>>::fp2_non_residue;
 
                 template<std::size_t ModulusBits, std::size_t GeneratorBits>
-                constexpr typename params<mnt4_fq<ModulusBits, GeneratorBits>>::modulus_type const arithmetic_params<mnt4_fq<ModulusBits, GeneratorBits>>::fp4_non_residue;
-                
+                constexpr typename params<mnt4_fq<ModulusBits, GeneratorBits>>::modulus_type const
+                    arithmetic_params<mnt4_fq<ModulusBits, GeneratorBits>>::fp4_non_residue;
+
             }    // namespace detail
-        }    // namespace fields
-    }    // namespace algebra
+        }        // namespace fields
+    }            // namespace algebra
 }    // namespace nil
 
 #endif    // ALGEBRA_FIELDS_MNT4_FQ_PARAMS_HPP

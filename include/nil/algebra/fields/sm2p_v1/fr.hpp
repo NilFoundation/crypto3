@@ -27,7 +27,7 @@ namespace nil {
              * @tparam GeneratorBits
              */
             template<std::size_t ModulusBits, std::size_t GeneratorBits = CHAR_BIT>
-            struct sm2p_v1_fr : public field<ModulusBits, GeneratorBits> {};
+            struct sm2p_v1_fr : public field<ModulusBits, GeneratorBits> { };
 
             template<>
             struct sm2p_v1_fr<256, CHAR_BIT> : public field<256, CHAR_BIT> {

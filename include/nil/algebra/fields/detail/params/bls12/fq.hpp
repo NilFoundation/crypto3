@@ -24,21 +24,23 @@ namespace nil {
             namespace detail {
 
                 template<std::size_t ModulusBits, std::size_t GeneratorBits>
-                struct arithmetic_params<bls12_fq<ModulusBits, GeneratorBits>> : public params<bls12_fq<ModulusBits, GeneratorBits>> {
+                struct arithmetic_params<bls12_fq<ModulusBits, GeneratorBits>>
+                    : public params<bls12_fq<ModulusBits, GeneratorBits>> {
                 private:
                     typedef params<bls12_fq<ModulusBits, GeneratorBits>> policy_type;
                     typedef arithmetic_params<bls12_fq<ModulusBits, GeneratorBits>> element_policy_type;
+
                 public:
                     typedef typename policy_type::number_type number_type;
                     typedef typename policy_type::modulus_type modulus_type;
 
                     constexpr static const modulus_type modulus = policy_type::modulus;
-                    constexpr static const modulus_type q = 0; //?
+                    constexpr static const modulus_type q = 0;    //?
                 };
-                
+
             }    // namespace detail
-        }    // namespace fields
-    }    // namespace algebra
+        }        // namespace fields
+    }            // namespace algebra
 }    // namespace nil
 
 #endif    // ALGEBRA_FIELDS_BLS12_FQ_PARAMS_HPP

@@ -36,7 +36,8 @@ namespace nil {
                 for (size_t j = 0; j < num_groups; ++j) {
                     size_t start = j * chunk_len;
                     size_t end = std::min(start + chunk_len - 1, n - 1);
-                    part_res[j] = multi_exp_subgroup(vec_start, scalar_start, start, end, bucket_size, workers_in_subgroup);
+                    part_res[j] =
+                        multi_exp_subgroup(vec_start, scalar_start, start, end, bucket_size, workers_in_subgroup);
                 }
 
                 size_t L = std::ceil((std::log2(*scalar_start)) / bucket_size);
@@ -44,10 +45,11 @@ namespace nil {
             }
 
             template<typename NumberType>
-            NumberType multi_exp_subgroup(typename static std::array<fp12_2over3over2::value_type>::const_iterator vec_start,
-                                          typename static std::array<NumberType>::const_iterator scalar_start,
-                                          const size_t start, const size_t end, const size_t bucket_size,
-                                          const size_t workers_amount, const size_t n, const size_t one) {
+            NumberType
+                multi_exp_subgroup(typename static std::array<fp12_2over3over2::value_type>::const_iterator vec_start,
+                                   typename static std::array<NumberType>::const_iterator scalar_start,
+                                   const size_t start, const size_t end, const size_t bucket_size,
+                                   const size_t workers_amount, const size_t n, const size_t one) {
                 size_t L = std::log2(*(scalar_start + start).data);
                 size_t b = std::ceil(L / bucket_size);
                 size_t c = std::ceil(b / workers_amount);
@@ -81,8 +83,8 @@ namespace nil {
             }
 
             template<typename NumberType>
-            NumberType get_bits(typename std::vector<T>::const_iterator scalar_start, const size_t start, const size_t end,
-                                const size_t repr) {
+            NumberType get_bits(typename std::vector<T>::const_iterator scalar_start, const size_t start,
+                                const size_t end, const size_t repr) {
                 NumberType res = 0, e = *(scalar_start).data;
                 e >>= i;
                 for (size_t i = start; i <= end; ++i) {
@@ -150,8 +152,8 @@ namespace nil {
 
                 return part_res[0];
             }
-        }   // namespace fields
-    }    // namespace algebra
+        }    // namespace fields
+    }        // namespace algebra
 }    // namespace nil
 
 #endif    // BOOST_MULTIPRECISION_MULTIEXP_HPP
