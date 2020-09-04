@@ -10,13 +10,12 @@
 #ifndef ALGEBRA_CURVES_MNT6_HPP
 #define ALGEBRA_CURVES_MNT6_HPP
 
-#include <nil/algebra/curves/detail/element/curve_weierstrass.hpp>
-#include <nil/algebra/curves/detail/params/params.hpp>
 #include <nil/algebra/curves/detail/mnt6/g1.hpp>
 #include <nil/algebra/curves/detail/mnt6/g2.hpp>
 
 #include <nil/algebra/fields/mnt6/fq.hpp>
 #include <nil/algebra/fields/mnt6/fr.hpp>
+#include <nil/algebra/curves/detail/params/mnt6/fq.hpp>
 
 namespace nil {
     namespace algebra {
@@ -51,8 +50,6 @@ namespace nil {
                 constexpr static const std::size_t scalar_field_bits = 298;
                 typedef fields::mnt6_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
                 constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
-
-                //typedef typename detail::element_curve_weierstrass<base_field_type::value_type> value_type;
 
                 typedef typename detail::mnt6_g1<298> g1_type;
                 typedef typename detail::mnt6_g2<298> g2_type;

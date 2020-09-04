@@ -10,13 +10,12 @@
 #ifndef ALGEBRA_CURVES_EDWARDS_HPP
 #define ALGEBRA_CURVES_EDWARDS_HPP
 
-#include <nil/algebra/curves/detail/element/curve_weierstrass.hpp>
-#include <nil/algebra/curves/detail/params/params.hpp>
 #include <nil/algebra/curves/detail/edwards/g1.hpp>
 #include <nil/algebra/curves/detail/edwards/g2.hpp>
 
 #include <nil/algebra/fields/edwards/fq.hpp>
 #include <nil/algebra/fields/edwards/fr.hpp>
+#include <nil/algebra/fields/detail/params/edwards/fq.hpp>
 
 #include <nil/algebra/detail/mp_def.hpp>
 
@@ -53,8 +52,6 @@ namespace nil {
                 constexpr static const std::size_t scalar_field_bits = 181;
                 typedef fields::edwards_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
                 constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
-
-                // typedef typename detail::element_curve_weierstrass<base_field_type::value_type> value_type;
 
                 typedef typename detail::edwards_g1<183> g1_type;
                 typedef typename detail::edwards_g2<183> g2_type;

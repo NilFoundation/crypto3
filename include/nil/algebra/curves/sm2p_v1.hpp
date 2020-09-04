@@ -10,8 +10,6 @@
 #ifndef ALGEBRA_CURVES_SM2P_V1_HPP
 #define ALGEBRA_CURVES_SM2P_V1_HPP
 
-#include <nil/crypto3/algebra/curves/detail/element/curve_weierstrass.hpp>
-
 #include <nil/algebra/fields/sm2p_v1/fq.hpp>
 #include <nil/algebra/fields/sm2p_v1/fr.hpp>
 
@@ -34,8 +32,6 @@ namespace nil {
                 constexpr static const std::size_t scalar_field_bits = 256;
                 typedef fields::sm2p_v1_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
                 constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
-
-                // typedef typename detail::element_curve_weierstrass<base_field_type::value_type> value_type;
 
                 constexpr static const number_type p = base_field_modulus;
                 constexpr static const number_type q = scalar_field_modulus;

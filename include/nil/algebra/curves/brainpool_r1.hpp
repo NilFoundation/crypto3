@@ -10,8 +10,6 @@
 #ifndef ALGEBRA_CURVES_BRAINPOOL_R1_HPP
 #define ALGEBRA_CURVES_BRAINPOOL_R1_HPP
 
-#include <nil/crypto3/algebra/curves/detail/element/curve_weierstrass.hpp>
-
 #include <nil/algebra/fields/brainpool_r1/fq.hpp>
 #include <nil/algebra/fields/brainpool_r1/fr.hpp>
 
@@ -35,8 +33,6 @@ namespace nil {
                 constexpr static const std::size_t scalar_field_bits = 160;
                 typedef fields::brainpool_r1_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
                 constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
-
-                // typedef typename detail::element_curve_weierstrass<base_field_type::value_type> value_type;
 
                 typedef typename detail::brainpool_r1_g1<160> g1_type;
                 typedef typename detail::brainpool_r1_g2<160> g2_type;
@@ -66,8 +62,6 @@ namespace nil {
                 typedef fields::brainpool_r1_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
                 constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
 
-                // typedef typename detail::element_curve_weierstrass<base_field_type::value_type> value_type;
-
                 typedef typename detail::brainpool_r1_g1<192> g1_type;
                 typedef typename detail::brainpool_r1_g2<192> g2_type;
                 typedef typename nil::algebra::fields::detail::element_fp ? ? <nil::algebra::fields::detail::
@@ -95,8 +89,6 @@ namespace nil {
                 constexpr static const std::size_t scalar_field_bits = 224;
                 typedef fields::brainpool_r1_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
                 constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
-
-                // typedef typename detail::element_curve_weierstrass<base_field_type::value_type> value_type;
 
                 typedef typename detail::brainpool_r1_g1<224> g1_type;
                 typedef typename detail::brainpool_r1_g2<224> g2_type;
@@ -130,8 +122,6 @@ namespace nil {
                 typedef fields::brainpool_r1_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
                 constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
 
-                // typedef typename detail::element_curve_weierstrass<base_field_type::value_type> value_type;
-
                 typedef typename detail::brainpool_r1_g1<256> g1_type;
                 typedef typename detail::brainpool_r1_g2<256> g2_type;
                 typedef typename nil::algebra::fields::detail::element_fp ? ? <nil::algebra::fields::detail::
@@ -162,8 +152,6 @@ namespace nil {
                 constexpr static const std::size_t scalar_field_bits = 320;
                 typedef fields::brainpool_r1_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
                 constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
-
-                // typedef typename detail::element_curve_weierstrass<base_field_type::value_type> value_type;
 
                 typedef typename detail::brainpool_r1_g1<320> g1_type;
                 typedef typename detail::brainpool_r1_g2<320> g2_type;
@@ -196,8 +184,6 @@ namespace nil {
                 typedef fields::brainpool_r1_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
                 constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
 
-                // typedef typename detail::element_curve_weierstrass<base_field_type::value_type> value_type;
-
                 typedef typename detail::brainpool_r1_g1<384> g1_type;
                 typedef typename detail::brainpool_r1_g2<384> g2_type;
                 typedef typename nil::algebra::fields::detail::element_fp ? ? <nil::algebra::fields::detail::
@@ -228,8 +214,6 @@ namespace nil {
                 constexpr static const std::size_t scalar_field_bits = 512;
                 typedef fields::brainpool_r1_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
                 constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
-
-                // typedef typename detail::element_curve_weierstrass<base_field_type::value_type> value_type;
 
                 typedef typename detail::brainpool_r1_g1<512> g1_type;
                 typedef typename detail::brainpool_r1_g2<512> g2_type;

@@ -10,7 +10,6 @@
 #ifndef ALGEBRA_CURVES_BN128_HPP
 #define ALGEBRA_CURVES_BN128_HPP
 
-#include <nil/algebra/curves/detail/element/curve_weierstrass.hpp>
 #include <nil/algebra/curves/detail/params/params.hpp>
 
 #include <nil/algebra/curves/detail/alt_bn128/g1.hpp>
@@ -52,8 +51,6 @@ namespace nil {
                 constexpr static const std::size_t scalar_field_bits = 254;
                 typedef fields::alt_bn128_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
                 constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
-
-                // typedef typename detail::element_curve_weierstrass<base_field_type::value_type> value_type;
 
                 typedef typename detail::alt_bn128_g1<254, CHAR_BIT> g1_type;
                 typedef typename detail::alt_bn128_g2<254, CHAR_BIT> g2_type;
