@@ -29,7 +29,7 @@ namespace nil {
                     constexpr static const std::size_t g2_field_bits = ModulusBits;
                     typedef typename fields::detail::element_fp3<fields::detail::arithmetic_params<fields::mnt6_fq<g2_field_bits, CHAR_BIT>>> g2_field_type_value;
 
-                    using underlying_field_type_value = g1_field_type_value;
+                    using underlying_field_type_value = g2_field_type_value;
 
                     constexpr static const underlying_field_type_value a = underlying_field_type_value(g2_field_type_value::underlying_type::zero(), g2_field_type_value::underlying_type::zero(), mnt6_g1::a);
                     constexpr static const underlying_field_type_value b = underlying_field_type_value(mnt6_g1::b * underlying_field_type_value::non_residue, g2_field_type_value::underlying_type::zero(), g2_field_type_value::underlying_type::zero());

@@ -282,7 +282,7 @@ namespace nil {
                         r2 = r.squared();
                         p_out[0] = p[0] * r2;        // r2
                         p_out[1] = p[1] * r * r2;    // r3
-                        p_out[2] = 1;
+                        p_out[2] = underlying_field_type_value::one();
 
                         return bn128_g1(p_out[0], p_out[1], p_out[2]);
                     }

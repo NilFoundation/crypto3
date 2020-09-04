@@ -54,11 +54,11 @@ void fp_curve_group_basic_math_examples()
     std::cout << "c1 - c2 value: ";
     print_fp_curve_group_element(c1 - c2);
 
-    std::cout << "Double c1 value: ";
+    std::cout << "Doubled c1 value: ";
     print_fp_curve_group_element(c1.doubled());
 
     policy_type cd = c1.doubled();
-    
+
     policy_type cn = c1.normalize();
     
     std::cout << "c1 normalized value: ";
@@ -66,10 +66,48 @@ void fp_curve_group_basic_math_examples()
 
 }
 
+template <typename Fp2CurveGroup>
+void fp2_curve_group_basic_math_examples()
+{  
+    using policy_type = Fp2CurveGroup;
+    using field_value_type = typename policy_type::underlying_field_type_value;
+
+    policy_type c1 = policy_type::one(), c2 = policy_type::one().doubled();
+
+    std::cout << "Curve element values: " << std::endl;
+    std::cout << "c1 value: ";
+    print_fp2_curve_group_element(c1);
+
+    std::cout << "c2 value: ";
+    print_fp2_curve_group_element(c2);
+
+    std::cout << "c1 + c2 value: ";
+    print_fp2_curve_group_element(c1 + c2);
+
+    std::cout << "c1 - c2 value: ";
+    print_fp2_curve_group_element(c1 - c2);
+
+    std::cout << "Doubled c1 value: ";
+    print_fp2_curve_group_element(c1.doubled());
+
+    policy_type cd = c1.doubled();
+    
+    policy_type cn = c1.normalize();
+    
+    std::cout << "c1 normalized value: ";
+    print_fp2_curve_group_element(cn);
+
+}
+
 int main()
 {
-    std::cout << "BN128-254 curve basic math:" << std::endl;
+    std::cout << "BN128-254 curve g1 group basic math:" << std::endl;
     fp_curve_group_basic_math_examples<curves::bn128<254>::g1_type>();
+
+    std::cout << "----------------------------" << std::endl;
+
+    std::cout << "BN128-254 curve g2 group basic math:" << std::endl;
+    fp2_curve_group_basic_math_examples<curves::bn128<254>::g2_type>();
 
     std::cout << "----------------------------" << std::endl;
 

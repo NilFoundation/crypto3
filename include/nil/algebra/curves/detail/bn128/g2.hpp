@@ -40,11 +40,15 @@ namespace nil {
                         fields::detail::arithmetic_params<fields::bn128_fq<g2_field_bits, CHAR_BIT>>>
                         g2_field_type_value;
 
-                    using underlying_field_type_value = g1_field_type_value;
+                    using underlying_field_type_value = g2_field_type_value;
 
                     underlying_field_type_value p[3];
-                    
-                    bn128_g2() : bn128_g2(zero_fill[0], zero_fill[1], zero_fill[2]) {};
+
+                    bn128_g2() : bn128_g2(underlying_field_type_value::one(), underlying_field_type_value::one(),
+                        underlying_field_type_value::zero()) {};
+                    //must be 
+                    //bn128_g2() : bn128_g2(zero_fill[0], zero_fill[1], zero_fill[2]) {};
+                    //when constexpr fields will be finished
 
                     bn128_g2(underlying_field_type_value X,
                              underlying_field_type_value Y,
@@ -59,7 +63,16 @@ namespace nil {
                     }
 
                     static bn128_g2 one() {
-                        return bn128_g2(one_fill[0], one_fill[1], one_fill[2]);
+                        return bn128_g2(underlying_field_type_value(
+                            0x21C1452BAD76CBAFD56F91BF61C4C7A4764793ABC7E62D2EB2382A21D01014DA_cppui254,
+                            0x13F9579708C580632ECD7DCD6EE2E6FC20F597815A2792CC5128240A38EEBC15_cppui254),
+                        underlying_field_type_value(
+                            0x16CFE76F05CE1E4C043A5A50EE37E9B0ADD1E47D95E5250BA20538A3680892C_cppui254,
+                            0x2D6532096CCA63300C3BA564B9BD9949DCDFB32C84AC6E2A065FD2334A7D09BE_cppui254),
+                        underlying_field_type_value::one());
+                        //must be 
+                        //return bn128_g2(one_fill[0], one_fill[1], one_fill[2]);
+                        //when constexpr fields will be finished
                     }
 
                     bool operator==(const bn128_g2 &other) const {
@@ -267,31 +280,31 @@ namespace nil {
                     bn128_g2 normalize() const {
                         underlying_field_type_value p_out[3];
 
-                        if (is_zero() || p[2] == 1)
+                        if (is_zero() || p[2].is_one())
                             return *this;
                         underlying_field_type_value r, r2;
                         r = p[2].inversed();
                         r2 = r.squared();
                         p_out[0] = p[0] * r2;        // r2
                         p_out[1] = p[1] * r * r2;    // r3
-                        p_out[2] = 1;
+                        p_out[2] = underlying_field_type_value::one();
 
                         return bn128_g2(p_out[0], p_out[1], p_out[2]);
                     }
                 private:
 
-                    constexpr static const underlying_field_type_value zero_fill = {
+                    /*constexpr static const underlying_field_type_value zero_fill = {
                         underlying_field_type_value::one(), underlying_field_type_value::one(),
-                        underlying_field_type_value::zero()};
+                        underlying_field_type_value::zero()};*/
 
-                    constexpr static const underlying_field_type_value one_fill = {
+                    /*constexpr static const underlying_field_type_value one_fill = {
                         underlying_field_type_value(
                             0x21C1452BAD76CBAFD56F91BF61C4C7A4764793ABC7E62D2EB2382A21D01014DA_cppui254,
                             0x13F9579708C580632ECD7DCD6EE2E6FC20F597815A2792CC5128240A38EEBC15_cppui254),
                         underlying_field_type_value(
                             0x16CFE76F05CE1E4C043A5A50EE37E9B0ADD1E47D95E5250BA20538A3680892C_cppui254,
                             0x2D6532096CCA63300C3BA564B9BD9949DCDFB32C84AC6E2A065FD2334A7D09BE_cppui254),
-                        underlying_field_type_value::one()};
+                        underlying_field_type_value::one()};*/
                 };
 
             }    // namespace detail

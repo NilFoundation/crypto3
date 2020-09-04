@@ -97,7 +97,7 @@ void fields_fp_basic_math_examples()
 
     print_field_element(complex_eq1);
 
-    std::cout << "Double e1 value: " ;
+    std::cout << "Doubled e1 value: " ;
 
     print_field_element(e1.doubled());
 
@@ -181,7 +181,7 @@ void fields_fp2_basic_math_examples()
 
     print_field_element(complex_eq1);
 
-    std::cout << "Double e1 value: " ;
+    std::cout << "Doubled e1 value: " ;
 
     print_field_element(e1.doubled());
 
