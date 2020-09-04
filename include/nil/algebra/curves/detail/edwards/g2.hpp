@@ -10,11 +10,12 @@
 #ifndef ALGEBRA_CURVES_EDWARDS_G2_HPP
 #define ALGEBRA_CURVES_EDWARDS_G2_HPP
 
-#include <boost/multiprecision/cpp_int/multiply.hpp>
-#include <boost/multiprecision/modular/base_params.hpp>
-
 #include <nil/algebra/curves/detail/edwards/basic_policy.hpp>
 
+#include <nil/algebra/curves/detail/edwards/g1.hpp>
+
+#include <nil/algebra/fields/edwards/fq.hpp>
+#include <nil/algebra/fields/edwards/fr.hpp>
 #include <nil/algebra/fields/detail/element/fp.hpp>
 #include <nil/algebra/fields/detail/element/fp3.hpp>
 #include <nil/algebra/fields/detail/params/edwards/fq.hpp>

@@ -10,8 +10,13 @@
 #ifndef ALGEBRA_CURVES_MNT4_G1_HPP
 #define ALGEBRA_CURVES_MNT4_G1_HPP
 
-#include <boost/multiprecision/cpp_int/multiply.hpp>
-#include <boost/multiprecision/modular/base_params.hpp>
+#include <nil/algebra/curves/detail/mnt4/g1.hpp>
+
+#include <nil/algebra/fields/mnt4/fq.hpp>
+#include <nil/algebra/fields/mnt4/fr.hpp>
+#include <nil/algebra/fields/detail/element/fp.hpp>
+#include <nil/algebra/fields/detail/element/fp2.hpp>
+#include <nil/algebra/fields/detail/params/mnt4/fq.hpp>
 
 #include <nil/algebra/detail/mp_def.hpp>
 
@@ -62,7 +67,7 @@ namespace nil {
                         return mnt4_g2(one_fill[0], one_fill[1], one_fill[2]);
                     }
 
-                    bool mnt4_g2::operator==(const mnt4_g2 &other) const {
+                    bool operator==(const mnt4_g2 &other) const {
                         if (this->is_zero()) {
                             return other.is_zero();
                         }
@@ -145,7 +150,7 @@ namespace nil {
                             const underlying_field_type_value XX = (this->p[0]).squared();    // XX  = X1^2
                             const underlying_field_type_value ZZ = (this->p[2]).squared();    // ZZ  = Z1^2
                             const underlying_field_type_value w =
-                                mnt4_g2::coeff_a * ZZ + (XX + XX + XX);    // w   = a*ZZ + 3*XX
+                                a * ZZ + (XX + XX + XX);    // w   = a*ZZ + 3*XX
                             const underlying_field_type_value Y1Z1 = (this->p[1]) * (this->p[2]);
                             const underlying_field_type_value s = Y1Z1 + Y1Z1;         // s   = 2*Y1*Z1
                             const underlying_field_type_value ss = s.squared();        // ss  = s^2

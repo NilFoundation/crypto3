@@ -10,8 +10,13 @@
 #ifndef ALGEBRA_CURVES_MNT4_G1_HPP
 #define ALGEBRA_CURVES_MNT4_G1_HPP
 
-#include <boost/multiprecision/cpp_int/multiply.hpp>
-#include <boost/multiprecision/modular/base_params.hpp>
+#include <nil/algebra/curves/detail/mnt4/g2.hpp>
+
+#include <nil/algebra/fields/mnt4/fq.hpp>
+#include <nil/algebra/fields/mnt4/fr.hpp>
+#include <nil/algebra/fields/detail/element/fp.hpp>
+#include <nil/algebra/fields/detail/element/fp2.hpp>
+#include <nil/algebra/fields/detail/params/mnt4/fq.hpp>
 
 #include <nil/algebra/detail/mp_def.hpp>
 

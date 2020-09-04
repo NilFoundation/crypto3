@@ -10,9 +10,6 @@
 #ifndef ALGEBRA_FIELDS_FP_DOUBLE_HPP
 #define ALGEBRA_FIELDS_FP_DOUBLE_HPP
 
-#include <boost/multiprecision/number.hpp>
-#include <boost/multiprecision/cpp_int.hpp>
-
 namespace nil {
     namespace algebra {
         namespace fields {
