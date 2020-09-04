@@ -31,9 +31,9 @@ namespace nil {
              * @tparam LengthBits
              */
             template<typename ProcessingMode>
-            using accumulator_set = boost::accumulators::accumulator_set<
+            using keys_accumulator_set = boost::accumulators::accumulator_set<
                 digest<ProcessingMode::input_block_bits>,
-                boost::accumulators::features<accumulators::tag::scheme<ProcessingMode>>>;
+                boost::accumulators::features<accumulators::tag::scheme_keys<ProcessingMode>>>;
         }    // namespace pubkey
     }        // namespace crypto3
 }    // namespace nil

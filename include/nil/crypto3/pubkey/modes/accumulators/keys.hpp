@@ -7,7 +7,7 @@
 //---------------------------------------------------------------------------//
 
 #ifndef CRYPTO3_ACCUMULATORS_PUBKEY_SCHEME_KEYS_HPP
-#define CRYPTO3_ACCUMULATORS_PUBKEY_SCHEME_KEY_HPP
+#define CRYPTO3_ACCUMULATORS_PUBKEY_SCHEME_KEYS_HPP
 
 #include <boost/container/static_vector.hpp>
 
@@ -37,7 +37,7 @@ namespace nil {
                 struct scheme_keys_impl : boost::accumulators::accumulator_base {
                 protected:
                     typedef Mode mode_type;
-                    typedef typename Mode::cipher_type cipher_type;
+                    typedef typename Mode::scheme_type scheme_type;
                     typedef typename Mode::padding_type padding_type;
 
                     typedef typename mode_type::endian_type endian_type;
@@ -45,18 +45,18 @@ namespace nil {
                     constexpr static const std::size_t word_bits = mode_type::word_bits;
                     typedef typename mode_type::word_type word_type;
 
-                    constexpr static const std::size_t pubkey_bits = mode_type::pubkey_bits;
-                    constexpr static const std::size_t pubkey_words = mode_type::pubkey_words;
-                    typedef typename mode_type::pubkey_type pubkey_type;
+                    constexpr static const std::size_t block_bits = mode_type::block_bits;
+                    constexpr static const std::size_t block_words = mode_type::block_words;
+                    typedef typename mode_type::block_type block_type;
 
-                    constexpr static const std::size_t value_bits = sizeof(typename pubkey_type::value_type) * CHAR_BIT;
-                    constexpr static const std::size_t pubkey_values = pubkey_bits / value_bits;
+                    constexpr static const std::size_t value_bits = sizeof(typename block_type::value_type) * CHAR_BIT;
+                    constexpr static const std::size_t block_values = block_bits / value_bits;
 
-                    typedef ::nil::crypto3::detail::injector<endian_type, value_bits, pubkey_values, pubkey_bits>
+                    typedef ::nil::crypto3::detail::injector<endian_type, value_bits, block_values, block_bits>
                         injector_type;
 
                 public:
-                    typedef digest<pubkey_bits> result_type;
+                    typedef digest<block_bits> result_type;
 
                     template<typename Args>
                     scheme_keys_impl(const Args &args) : total_seen(0), mode(args[boost::accumulators::sample]) {
@@ -77,15 +77,15 @@ namespace nil {
                     }
 
                 protected:
-                    inline void resolve_type(const pubkey_type &value, std::size_t bits) {
-                        process(value, bits == 0 ? pubkey_bits : bits);
+                    inline void resolve_type(const block_type &value, std::size_t bits) {
+                        process(value, bits == 0 ? block_bits : bits);
                     }
 
                     inline void resolve_type(const word_type &value, std::size_t bits) {
                         process(value, bits == 0 ? word_bits : bits);
                     }
 
-                    inline void process(const pubkey_type &value, std::size_t value_seen) {
+                    inline void process(const block_type &value, std::size_t value_seen) {
                         using namespace ::nil::crypto3::detail;
                     }
 
@@ -96,14 +96,14 @@ namespace nil {
                     mode_type mode;
 
                     std::size_t total_seen;
-                    pubkey_type cache;
+                    block_type cache;
                     result_type dgst;
                 };
             }    // namespace impl
 
             namespace tag {
                 template<typename Mode>
-                struct scheme_key : boost::accumulators::depends_on<bits_count> {
+                struct scheme_keys : boost::accumulators::depends_on<bits_count> {
                     typedef Mode mode_type;
 
                     /// INTERNAL ONLY
@@ -116,7 +116,7 @@ namespace nil {
             namespace extract {
                 template<typename Mode, typename AccumulatorSet>
                 typename boost::mpl::apply<AccumulatorSet, tag::scheme<Mode>>::type::result_type
-                    scheme_key(const AccumulatorSet &acc) {
+                    scheme_keys(const AccumulatorSet &acc) {
                     return boost::accumulators::extract_result<tag::scheme<Mode>>(acc);
                 }
             }    // namespace extract
