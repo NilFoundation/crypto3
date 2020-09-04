@@ -56,7 +56,7 @@ void curve_weierstrass_pairing_math_examples()
     print_curve_element(c1 - c2);
 
     std::cout << "Double c1 value: ";
-    print_curve_element(c1.dbl());
+    print_curve_element(c1.doubled());
     
     std::cout << "c1 == c2 value: ";
     std::cout << (c1 == c2) << std::endl;

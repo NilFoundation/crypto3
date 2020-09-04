@@ -105,7 +105,7 @@ namespace nil {
 
                         // handle double case
                         if (this->operator==(other)) {
-                            return this->dbl();
+                            return this->doubled();
                         }
 
                         // NOTE: does not handle O and pts of order 2,4
@@ -128,7 +128,7 @@ namespace nil {
                         return mnt6_g1(X3, Y3, Z3);
                     }
                     
-                    mnt6_g1 dbl() const {
+                    mnt6_g1 doubled() const {
                         if (this->is_zero()) {
                             return (*this);
                         }
@@ -177,7 +177,7 @@ namespace nil {
                         const underlying_field_type_value Y2Z1 = (this->p[2]) * (other.p[1]);        // Y2Z1 = Y2*Z1
 
                         if (X1Z2 == X2Z1 && Y1Z2 == Y2Z1) {
-                            return this->dbl();
+                            return this->doubled();
                         }
 
                         underlying_field_type_value u = Y2Z1 - this->p[1];             // u = Y2*Z1-Y1

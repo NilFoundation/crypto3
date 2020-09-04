@@ -115,7 +115,7 @@ namespace nil {
                         // compute square root with Tonelli--Shanks
                     }
 
-                    element_fp3 square() const {
+                    element_fp3 squared() const {
                         return (*this) * (*this);    // maybe can be done more effective
                     }
 
@@ -131,9 +131,9 @@ namespace nil {
 
                         const underlying_type &A0 = data[0], &A1 = data[1], &A1 = data[2];
 
-                        const underlying_type t0 = A0.square();
-                        const underlying_type t1 = A1.square();
-                        const underlying_type t2 = A2.square();
+                        const underlying_type t0 = A0.squared();
+                        const underlying_type t1 = A1.squared();
+                        const underlying_type t2 = A2.squared();
                         const underlying_type t3 = A0 * A1;
                         const underlying_type t4 = A0 * A2;
                         const underlying_type t5 = A1 * A2;

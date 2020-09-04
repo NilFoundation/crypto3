@@ -57,7 +57,7 @@ BOOST_AUTO_TEST_CASE(fields_manual_test1) {
 
     std::cout << e1.is_one() << e2.is_one() << e2.is_zero() << std::endl;
 
-    value_type e3 = e1.dbl() * e2.square();
+    value_type e3 = e1.doubled() * e2.squared();
 
     value_type e4 = e1 * e2 * e2 + e1 * e2 * e2;
 
@@ -87,7 +87,7 @@ BOOST_AUTO_TEST_CASE(fields_dsa_botan_test1) {
 
     std::cout << e1.is_one() << e2.is_one() << e2.is_zero() << std::endl;
 
-    value_type e3 = e1.dbl() * e2.square();
+    value_type e3 = e1.doubled() * e2.squared();
 
     value_type e4 = e1 * e2 * e2 + e1 * e2 * e2;
 
@@ -136,8 +136,8 @@ void test_field() {
 
     assert((a ^ rand1) * (a ^ rand2) == (a ^ randsum));
 
-    assert(a * a.inverse() == one);
-    assert((a + b) * c.inverse() == a * c.inverse() + (b.inverse() * c).inverse());
+    assert(a * a.inversed() == one);
+    assert((a + b) * c.inversed() == a * c.inversed() + (b.inversed() * c).inversed());
 }
 
 template<typename FieldType>
@@ -174,8 +174,8 @@ template<typename FieldType>
 void test_unitary_inverse() {
     assert(FieldType::extension_degree() % 2 == 0);
     FieldType a = FieldType::random_element();
-    FieldType aqcubed_minus1 = a.Frobenius_map(FieldType::extension_degree() / 2) * a.inverse();
-    assert(aqcubed_minus1.inverse() == aqcubed_minus1.unitary_inverse());
+    FieldType aqcubed_minus1 = a.Frobenius_map(FieldType::extension_degree() / 2) * a.inversed();
+    assert(aqcubed_minus1.inversed() == aqcubed_minus1.unitary_inverse());
 }
 
 template<typename FieldType>
@@ -186,7 +186,7 @@ void test_cyclotomic_squaring<Fqk<edwards_pp>>() {
     typedef Fqk<edwards_pp> FieldType;
     assert(FieldType::extension_degree() % 2 == 0);
     FieldType a = FieldType::random_element();
-    FieldType a_unitary = a.Frobenius_map(FieldType::extension_degree() / 2) * a.inverse();
+    FieldType a_unitary = a.Frobenius_map(FieldType::extension_degree() / 2) * a.inversed();
     // beta = a^((q^(k/2)-1)*(q+1))
     FieldType beta = a_unitary.Frobenius_map(1) * a_unitary;
     assert(beta.cyclotomic_squared() == beta.squared());
@@ -197,7 +197,7 @@ void test_cyclotomic_squaring<Fqk<mnt4_pp>>() {
     typedef Fqk<mnt4_pp> FieldType;
     assert(FieldType::extension_degree() % 2 == 0);
     FieldType a = FieldType::random_element();
-    FieldType a_unitary = a.Frobenius_map(FieldType::extension_degree() / 2) * a.inverse();
+    FieldType a_unitary = a.Frobenius_map(FieldType::extension_degree() / 2) * a.inversed();
     // beta = a^(q^(k/2)-1)
     FieldType beta = a_unitary;
     assert(beta.cyclotomic_squared() == beta.squared());
@@ -208,7 +208,7 @@ void test_cyclotomic_squaring<Fqk<mnt6_pp>>() {
     typedef Fqk<mnt6_pp> FieldType;
     assert(FieldType::extension_degree() % 2 == 0);
     FieldType a = FieldType::random_element();
-    FieldType a_unitary = a.Frobenius_map(FieldType::extension_degree() / 2) * a.inverse();
+    FieldType a_unitary = a.Frobenius_map(FieldType::extension_degree() / 2) * a.inversed();
     // beta = a^((q^(k/2)-1)*(q+1))
     FieldType beta = a_unitary.Frobenius_map(1) * a_unitary;
     assert(beta.cyclotomic_squared() == beta.squared());
@@ -260,31 +260,31 @@ void test_Fp4_tom_cook() {
 
         const FieldType beta = Fp4T::non_residue;
 
-        c0 = v0 + beta * (FieldType(4).inverse() * v0 - FieldType(6).inverse() * (v1 + v2) +
-                          FieldType(24).inverse() * (v3 + v4) - FieldType(5) * v6);
-        c1 = -FieldType(3).inverse() * v0 + v1 - FieldType(2).inverse() * v2 - FieldType(4).inverse() * v3 +
-             FieldType(20).inverse() * v4 + FieldType(30).inverse() * v5 - FieldType(12) * v6 +
-             beta * (-FieldType(12).inverse() * (v0 - v1) + FieldType(24).inverse() * (v2 - v3) -
-                     FieldType(120).inverse() * (v4 - v5) - FieldType(3) * v6);
-        c2 = -(FieldType(5) * (FieldType(4).inverse())) * v0 + (FieldType(2) * (FieldType(3).inverse())) * (v1 + v2) -
-             FieldType(24).inverse() * (v3 + v4) + FieldType(4) * v6 + beta * v6;
-        c3 = FieldType(12).inverse() * (FieldType(5) * v0 - FieldType(7) * v1) -
-             FieldType(24).inverse() * (v2 - FieldType(7) * v3 + v4 + v5) + FieldType(15) * v6;
+        c0 = v0 + beta * (FieldType(4).inversed() * v0 - FieldType(6).inversed() * (v1 + v2) +
+                          FieldType(24).inversed() * (v3 + v4) - FieldType(5) * v6);
+        c1 = -FieldType(3).inversed() * v0 + v1 - FieldType(2).inversed() * v2 - FieldType(4).inversed() * v3 +
+             FieldType(20).inversed() * v4 + FieldType(30).inversed() * v5 - FieldType(12) * v6 +
+             beta * (-FieldType(12).inversed() * (v0 - v1) + FieldType(24).inversed() * (v2 - v3) -
+                     FieldType(120).inversed() * (v4 - v5) - FieldType(3) * v6);
+        c2 = -(FieldType(5) * (FieldType(4).inversed())) * v0 + (FieldType(2) * (FieldType(3).inversed())) * (v1 + v2) -
+             FieldType(24).inversed() * (v3 + v4) + FieldType(4) * v6 + beta * v6;
+        c3 = FieldType(12).inversed() * (FieldType(5) * v0 - FieldType(7) * v1) -
+             FieldType(24).inversed() * (v2 - FieldType(7) * v3 + v4 + v5) + FieldType(15) * v6;
 
         assert(res == correct_res);
 
         // {v0, v3, v4, v5}
-        const FieldType u = (FieldType::one() - beta).inverse();
-        assert(v0 == u * c0 + beta * u * c2 - beta * u * FieldType(2).inverse() * v1 -
-                         beta * u * FieldType(2).inverse() * v2 + beta * v6);
+        const FieldType u = (FieldType::one() - beta).inversed();
+        assert(v0 == u * c0 + beta * u * c2 - beta * u * FieldType(2).inversed() * v1 -
+                         beta * u * FieldType(2).inversed() * v2 + beta * v6);
         assert(v3 == -FieldType(15) * u * c0 - FieldType(30) * u * c1 - FieldType(3) * (FieldType(4) + beta) * u * c2 -
                          FieldType(6) * (FieldType(4) + beta) * u * c3 +
-                         (FieldType(24) - FieldType(3) * beta * FieldType(2).inverse()) * u * v1 +
-                         (-FieldType(8) + beta * FieldType(2).inverse()) * u * v2 - FieldType(3) * (-FieldType(16) + beta) * v6);
+                         (FieldType(24) - FieldType(3) * beta * FieldType(2).inversed()) * u * v1 +
+                         (-FieldType(8) + beta * FieldType(2).inversed()) * u * v2 - FieldType(3) * (-FieldType(16) + beta) * v6);
         assert(v4 == -FieldType(15) * u * c0 + FieldType(30) * u * c1 - FieldType(3) * (FieldType(4) + beta) * u * c2 +
                          FieldType(6) * (FieldType(4) + beta) * u * c3 +
-                         (FieldType(24) - FieldType(3) * beta * FieldType(2).inverse()) * u * v2 +
-                         (-FieldType(8) + beta * FieldType(2).inverse()) * u * v1 - FieldType(3) * (-FieldType(16) + beta) * v6);
+                         (FieldType(24) - FieldType(3) * beta * FieldType(2).inversed()) * u * v2 +
+                         (-FieldType(8) + beta * FieldType(2).inversed()) * u * v1 - FieldType(3) * (-FieldType(16) + beta) * v6);
         assert(v5 == -FieldType(80) * u * c0 - FieldType(240) * u * c1 - FieldType(8) * (FieldType(9) + beta) * u * c2 -
                          FieldType(24) * (FieldType(9) + beta) * u * c3 - FieldType(2) * (-FieldType(81) + beta) * u * v1 +
                          (-FieldType(81) + beta) * u * v2 - FieldType(8) * (-FieldType(81) + beta) * v6);

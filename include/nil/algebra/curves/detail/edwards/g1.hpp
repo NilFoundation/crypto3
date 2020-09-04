@@ -87,7 +87,7 @@ namespace nil {
                         // http://www.hyperelliptic.org/EFD/g1p/auto-edwards-inverted.html#addition-add-2007-bl
 
                         underlying_field_type_value A = (this->p[2]) * (other.p[2]);    // A = Z1*Z2
-                        underlying_field_type_value B = curve_coeff_d * A.square();     // B = d*A^2
+                        underlying_field_type_value B = curve_coeff_d * A.squared();     // B = d*A^2
                         underlying_field_type_value C = (this->p[0]) * (other.p[0]);    // C = X1*X2
                         underlying_field_type_value D = (this->p[1]) * (other.p[1]);    // D = Y1*Y2
                         underlying_field_type_value E = C * D;                          // E = C*D
@@ -109,7 +109,7 @@ namespace nil {
                         return (*this) + (-B);
                     }
 
-                    edwards_g1 dbl() const {
+                    edwards_g1 doubled() const {
 
                         if (this->is_zero()) {
                             return (*this);
@@ -117,14 +117,14 @@ namespace nil {
                             // NOTE: does not handle O and pts of order 2,4
                             // http://www.hyperelliptic.org/EFD/g1p/auto-edwards-inverted.html#doubling-dbl-2007-bl
 
-                            underlying_field_type_value A = (this->p[0]).square();    // A = X1^2
-                            underlying_field_type_value B = (this->p[1]).square();    // B = Y1^2
+                            underlying_field_type_value A = (this->p[0]).squared();    // A = X1^2
+                            underlying_field_type_value B = (this->p[1]).squared();    // B = Y1^2
                             underlying_field_type_value C = A + B;                    // C = A+B
                             underlying_field_type_value D = A - B;                    // D = A-B
                             underlying_field_type_value E =
-                                (this->p[0] + this->p[1]).square() - C;    // E = (X1+Y1)^2-C
+                                (this->p[0] + this->p[1]).squared() - C;    // E = (X1+Y1)^2-C
                             underlying_field_type_value X3 = C * D;        // X3 = C*D
-                            underlying_field_type_value dZZ = curve_coeff_d * this->p[2].square();
+                            underlying_field_type_value dZZ = curve_coeff_d * this->p[2].squared();
                             underlying_field_type_value Y3 = E * (C - dZZ - dZZ);    // Y3 = E*(C-2*d*Z1^2)
                             underlying_field_type_value Z3 = D * E;                  // Z3 = D*E
 

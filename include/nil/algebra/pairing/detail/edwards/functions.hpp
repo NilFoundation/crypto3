@@ -130,7 +130,7 @@ namespace nil {
                 template<std::size_t ModulusBits = 183, std::size_t GeneratorBits = CHAR_BIT>
                 curves::edwards_gt<ModulusBits, GeneratorBits>
                     edwards_final_exponentiation(const curves::edwards_gt<ModulusBits, GeneratorBits> &elt) {
-                    const curves::edwards_gt<ModulusBits, GeneratorBits> elt_inv = elt.inverse();
+                    const curves::edwards_gt<ModulusBits, GeneratorBits> elt_inv = elt.inversed();
                     const curves::edwards_gt<ModulusBits, GeneratorBits> elt_to_first_chunk =
                         edwards_final_exponentiation_first_chunk(elt, elt_inv);
                     const curves::edwards_gt<ModulusBits, GeneratorBits> elt_inv_to_first_chunk =
@@ -146,10 +146,10 @@ namespace nil {
                     edwards_g2 Qcopy = Q;
                     Qcopy.to_affine_coordinates();
                     edwards_tate_g2_precomp result;
-                    result.y0 = Qcopy.Y * Qcopy.Z.inverse();    // Y/Z
+                    result.y0 = Qcopy.Y * Qcopy.Z.inversed();    // Y/Z
                     result.eta = (Qcopy.Z + Qcopy.Y) *
                                  curves::edwards_gt<ModulusBits, GeneratorBits>::mul_by_non_residue(Qcopy.X)
-                                     .inverse();    // (Z+Y)/(nqr*X
+                                     .inversed();    // (Z+Y)/(nqr*X
 
                     return result;
                 }

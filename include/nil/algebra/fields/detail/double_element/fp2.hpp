@@ -60,8 +60,8 @@ namespace nil {
                     }
 
                     // data + data
-                    double_element_fp2 dbl() const {
-                        return {data[0].dbl(), data[1].dbl()};
+                    double_element_fp2 doubled() const {
+                        return {data[0].doubled(), data[1].doubled()};
                     }
 
                     double_element_fp2 subOpt1() const {
@@ -75,8 +75,8 @@ namespace nil {
                         (a + bu)(9 + u) = (9a - b) + (a + 9b)u
                     */
                     double_element_fp2 mul_xi() {
-                        return {data[0].dbl().dbl().dbl() + data[0] - data[1],
-                                data[1].dbl().dbl().dbl() + data[1] + data[0]};
+                        return {data[0].doubled().doubled().doubled() + data[0] - data[1],
+                                data[1].doubled().doubled().doubled() + data[1] + data[0]};
                     }
 
                     element_fp2 mod() {
@@ -123,7 +123,7 @@ namespace nil {
                     return mulOpt(A, B, 2);
                 }
 
-                double_element_fp2 square(const element_fp2 &B) {
+                double_element_fp2 squared(const element_fp2 &B) {
                     element_fp t0, t1;
                     t0 = addNC(x.b_, x.b_);
                     z.b_ = mul(t0, x.a_);

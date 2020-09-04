@@ -142,23 +142,23 @@ namespace nil {
                         z0 += z0;
                         z0 += t0;
 
-                        z1 = (t1 + z1).dbl() + t1;
+                        z1 = (t1 + z1).doubled() + t1;
 
                         // t0 and t1 are unnecessary from here.
                         element_fp2 t2, t3;
                         t0t1 = sq_Fp4UseDbl({z2, z3});    // b^2 = t0 + t1*y
                         t0t1 = sq_Fp4UseDbl({z4, z5});    // c^2 = t2 + t3*y
                         // For C
-                        z4 = (t0 - z4).dbl() + t0;
+                        z4 = (t0 - z4).doubled() + t0;
 
-                        z5 = (t1 + z5).dbl() + t1;
+                        z5 = (t1 + z5).doubled() + t1;
 
                         // For B
                         t0 = t3.mul_xi();
 
-                        z2 = (t0 + z2).dbl() + t0;
+                        z2 = (t0 + z2).doubled() + t0;
 
-                        z3 = (t2 - z3).dbl() + t2;
+                        z3 = (t2 - z3).doubled() + t2;
                     }*/
 
                 private:

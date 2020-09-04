@@ -29,7 +29,11 @@ namespace nil {
                     using element_type = element_curve_weierstrass<policy_type>;
                     using underlying_field_type_value = typename element_type::underlying_field_type_value;
 
-                    bn128_g1() : bn128_g1(zero_fill[0], zero_fill[1], zero_fill[2]) {};
+                    bn128_g1() : bn128_g1(underlying_field_type_value::one(), underlying_field_type_value::one(),
+                        underlying_field_type_value::zero()) {};
+                    //must be 
+                    //bn128_g1() : bn128_g1(zero_fill[0], zero_fill[1], zero_fill[2]) {};
+                    //when constexpr fields will be finished
 
                     bn128_g1(underlying_field_type_value X, 
                              underlying_field_type_value Y,
@@ -41,16 +45,19 @@ namespace nil {
                     }
 
                     static bn128_g1 one() {
-                        return bn128_g1(one_fill[0], one_fill[1], one_fill[2]);
+                        return bn128_g1(underlying_field_type_value(1), underlying_field_type_value(2), underlying_field_type_value(1));
+                        //must be 
+                        //return bn128_g1(one_fill[0], one_fill[1], one_fill[2]);
+                        //when constexpr fields will be finished
                     }
 
                 private:
-                    constexpr static const underlying_field_type_value zero_fill = {
+                    /*constexpr static const std::array<underlying_field_type_value, 3> zero_fill = {
                         underlying_field_type_value::one(), underlying_field_type_value::one(),
-                        underlying_field_type_value::zero()};
+                        underlying_field_type_value::zero()};*/
 
-                    constexpr static const underlying_field_type_value one_fill = {
-                        underlying_field_type_value(1), underlying_field_type_value(2), underlying_field_type_value(1)};
+                    /*constexpr static const std::array<underlying_field_type_value, 3> one_fill = {
+                        underlying_field_type_value(1), underlying_field_type_value(2), underlying_field_type_value(1)};*/
                 };
 
             }    // namespace detail

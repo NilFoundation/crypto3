@@ -46,8 +46,8 @@ namespace nil {
                         if (is_zero() || p[2] == 1)
                             return *this;
                         underlying_field_type_value r, r2;
-                        r = p[2].inverse();
-                        r2 = r.square();
+                        r = p[2].inversed();
+                        r2 = r.squared();
                         p_out[0] = p[0] * r2;        // r2
                         p_out[1] = p[1] * r * r2;    // r3
                         p_out[2] = 1;
@@ -59,19 +59,19 @@ namespace nil {
                         Jacobi coordinate
                         (p_out[0], p_out[1], p_out[2]) = 2(p[0], p[1], p[2])
                     */
-                    element_curve_weierstrass dbl() const {
+                    element_curve_weierstrass doubled() const {
                         underlying_field_type_value p_out[3];
 
                         underlying_field_type_value A, B, C, D, E;
-                        A = p[0].square();
-                        B = p[1].square();
-                        C = B.square();
-                        D = ((p[0] + B).square() - A - C).dbl();
-                        E = A.dbl() + A;
+                        A = p[0].squared();
+                        B = p[1].squared();
+                        C = B.squared();
+                        D = ((p[0] + B).squared() - A - C).doubled();
+                        E = A.doubled() + A;
 
-                        p_out[0] = E.square() - D.dbl();
-                        p_out[1] = E * (D - p_out[0]) - C.dbl().dbl().dbl();
-                        p_out[2] = (p[1] * p[2]).dbl();
+                        p_out[0] = E.squared() - D.doubled();
+                        p_out[1] = E * (D - p_out[0]) - C.doubled().doubled().doubled();
+                        p_out[2] = (p[1] * p[2]).doubled();
 
                         return element_curve_weierstrass(p_out[0], p_out[1], p_out[2]);
                     }
@@ -161,8 +161,8 @@ namespace nil {
                         }
                         underlying_field_type_value Z1Z1, Z2Z2, U1, U2, S1, S2, H, I, J, t3, r, V;
 
-                        Z1Z1 = p[2].square();
-                        Z2Z2 = other.p[2].square();
+                        Z1Z1 = p[2].squared();
+                        Z2Z2 = other.p[2].squared();
                         U1 = p[0] * Z2Z2;
                         U2 = other.p[0] * Z2Z2;
 
@@ -174,20 +174,20 @@ namespace nil {
 
                         if (H.is_zero()) {
                             if (t3.is_zero()) {
-                                return dbl();
+                                return doubled();
                             } else {
                                 p[2] = underlying_field_type_value::zero();    // not sure
                             }
                             return *this;
                         }
 
-                        I = H.dbl().square();
+                        I = H.doubled().squared();
                         J = H * I;
-                        r = t3.dbl();
+                        r = t3.doubled();
                         V = U1 * I;
-                        p[0] = r.square() - J - V.dbl();
-                        p[1] = r * (V - p[0]) - (S1 * J).dbl();
-                        p[2] = ((p[2] + other.p[2]).square() - Z1Z1 - Z2Z2) * H;
+                        p[0] = r.squared() - J - V.doubled();
+                        p[1] = r * (V - p[0]) - (S1 * J).doubled();
+                        p[2] = ((p[2] + other.p[2]).squared() - Z1Z1 - Z2Z2) * H;
 
                         return *this;
                     }
@@ -222,7 +222,7 @@ namespace nil {
 
                         // we know that Z2 = 1
 
-                        underlying_field_type_value Z1Z1 = this->p[2].square();
+                        underlying_field_type_value Z1Z1 = this->p[2].squared();
 
                         underlying_field_type_value U2 = other.p[0] * Z1Z1;
 
@@ -231,7 +231,7 @@ namespace nil {
 
                         if (this->p[0] == U2 && this->p[1] == S2) {
                             // dbl case; nothing of above can be reused
-                            return this->dbl();
+                            return this->doubled();
                         }
 
                         element_curve_weierstrass result;
@@ -239,21 +239,21 @@ namespace nil {
                         // H = U2-X1
                         H = U2 - this->p[0];
                         // HH = H^2
-                        HH = H.square();
+                        HH = H.squared();
                         // I = 4*HH
-                        I = HH.dbl().dbl();
+                        I = HH.doubled().doubled();
                         // J = H*I
                         J = H * I;
                         // r = 2*(S2-Y1)
-                        r = (S2 - this->p[1]).dbl();
+                        r = (S2 - this->p[1]).doubled();
                         // V = X1*I
                         V = this->p[0] * I;
                         // X3 = r^2-J-2*V
-                        result.p[0] = r.square() - J - V.dbl();
+                        result.p[0] = r.squared() - J - V.doubled();
                         // Y3 = r*(V-X3)-2*Y1*J
-                        result.p[1] = r * (V - result.p[0]) - (this->p[1] * J).dbl();
+                        result.p[1] = r * (V - result.p[0]) - (this->p[1] * J).doubled();
                         // Z3 = (Z1+H)^2-Z1Z1-HH
-                        result.p[2] = (this->p[2] + H).square() - Z1Z1 - HH;
+                        result.p[2] = (this->p[2] + H).squared() - Z1Z1 - HH;
 
                         return result;
                     }

@@ -23,12 +23,12 @@
 using namespace nil::algebra;
 
 template <typename FpCurveGroup>
-void print_fp_curve_group_element (<FpCurveGroup> e){
+void print_fp_curve_group_element (FpCurveGroup e){
     std::cout << e.p[0].data << " " << e.p[1].data << " " << e.p[2].data << std::endl;
 }
 
 template <typename Fp2CurveGroup>
-void print_fp2_curve_group_element (<Fp2CurveGroup> e){
+void print_fp2_curve_group_element (Fp2CurveGroup e){
     std::cout << "(" << e.p[0].data[0].data << " " << e.p[0].data[1].data << ") (" <<  e.p[1].data[0].data << " " << e.p[1].data[1].data << ") (" << e.p[2].data[0].data << " " << e.p[2].data[1].data << ")" << std::endl;
 }
 
@@ -55,7 +55,7 @@ void fp_curve_group_basic_math_examples()
     print_fp_curve_group_element(c1 - c2);
 
     std::cout << "Double c1 value: ";
-    print_fp_curve_group_element(c1.dbl());
+    print_fp_curve_group_element(c1.doubled());
 
     policy_type cn = c1.normalize();
     

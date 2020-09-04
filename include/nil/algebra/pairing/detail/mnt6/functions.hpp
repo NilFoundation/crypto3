@@ -151,7 +151,7 @@ namespace nil {
 
                 template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
                 curves::mnt6_gt<ModulusBits, GeneratorBits> mnt6_final_exponentiation(const curves::mnt6_gt<ModulusBits, GeneratorBits> &elt) {
-                    const curves::mnt6_gt<ModulusBits, GeneratorBits> elt_inv = elt.inverse();
+                    const curves::mnt6_gt<ModulusBits, GeneratorBits> elt_inv = elt.inversed();
                     const curves::mnt6_gt<ModulusBits, GeneratorBits> elt_to_first_chunk = mnt6_final_exponentiation_first_chunk(elt, elt_inv);
                     const curves::mnt6_gt<ModulusBits, GeneratorBits> elt_inv_to_first_chunk = mnt6_final_exponentiation_first_chunk(elt_inv, elt);
                     curves::mnt6_gt<ModulusBits, GeneratorBits> result = mnt6_final_exponentiation_last_chunk(elt_to_first_chunk, elt_inv_to_first_chunk);
@@ -202,7 +202,7 @@ namespace nil {
                         c.old_RX = RX;
                         c.old_RY = RY;
                         mnt6_Fq3<ModulusBits, GeneratorBits> old_RX_2 = c.old_RX.squared();
-                        c.gamma = (old_RX_2 + old_RX_2 + old_RX_2 + mnt6_twist_coeff_a) * (c.old_RY + c.old_RY).inverse();
+                        c.gamma = (old_RX_2 + old_RX_2 + old_RX_2 + mnt6_twist_coeff_a) * (c.old_RY + c.old_RY).inversed();
                         c.gamma_twist = c.gamma * mnt6_twist;
                         c.gamma_X = c.gamma * c.old_RX;
                         result.coeffs.push_back(c);
@@ -215,10 +215,10 @@ namespace nil {
                             c.old_RX = RX;
                             c.old_RY = RY;
                             if (NAF[i] > 0) {
-                                c.gamma = (c.old_RY - result.QY) * (c.old_RX - result.QX).inverse();
+                                c.gamma = (c.old_RY - result.QY) * (c.old_RX - result.QX).inversed();
                             }
                             else {
-                                c.gamma = (c.old_RY + result.QY) * (c.old_RX - result.QX).inverse();
+                                c.gamma = (c.old_RY + result.QY) * (c.old_RX - result.QX).inversed();
                             }
                             c.gamma_twist = c.gamma * mnt6_twist;
                             c.gamma_X = c.gamma * result.QX;
@@ -359,7 +359,7 @@ namespace nil {
                     mnt6_g2 Qcopy(Q);
                     Qcopy.to_affine_coordinates();
 
-                    mnt6_Fq3<ModulusBits, GeneratorBits> mnt6_twist_inv = mnt6_twist.inverse(); // could add to global params if needed
+                    mnt6_Fq3<ModulusBits, GeneratorBits> mnt6_twist_inv = mnt6_twist.inversed(); // could add to global params if needed
 
                     mnt6_ate_g2_precomp result;
                     result.QX = Qcopy.X;
@@ -397,7 +397,7 @@ namespace nil {
                     }
 
                     if (mnt6_ate_is_loop_count_neg) {
-                        mnt6_Fq3<ModulusBits, GeneratorBits> RZ_inv = R.Z.inverse();
+                        mnt6_Fq3<ModulusBits, GeneratorBits> RZ_inv = R.Z.inversed();
                         mnt6_Fq3<ModulusBits, GeneratorBits> RZ2_inv = RZ_inv.squared();
                         mnt6_Fq3<ModulusBits, GeneratorBits> RZ3_inv = RZ2_inv * RZ_inv;
                         mnt6_Fq3<ModulusBits, GeneratorBits> minus_R_affine_X = R.X * RZ2_inv;
@@ -456,7 +456,7 @@ namespace nil {
                         mnt6_ate_add_coeffs ac = prec_Q.add_coeffs[add_idx++];
                         curves::mnt6_gt<ModulusBits, GeneratorBits> g_RnegR_at_P = curves::mnt6_gt<ModulusBits, GeneratorBits>(ac.c_RZ * prec_P.PY_twist,
                                                          -(prec_Q.QY_over_twist * ac.c_RZ + L1_coeff * ac.c_L1));
-                        f = (f * g_RnegR_at_P).inverse();
+                        f = (f * g_RnegR_at_P).inversed();
                     }
 
 
@@ -527,7 +527,7 @@ namespace nil {
                         curves::mnt6_gt<ModulusBits, GeneratorBits> g_RnegR_at_P2 = curves::mnt6_gt<ModulusBits, GeneratorBits>(ac2.c_RZ * prec_P2.PY_twist,
                                                           -(prec_Q2.QY_over_twist * ac2.c_RZ + L1_coeff2 * ac2.c_L1));
 
-                        f = (f * g_RnegR_at_P1 * g_RnegR_at_P2).inverse();
+                        f = (f * g_RnegR_at_P1 * g_RnegR_at_P2).inversed();
                     }
 
 

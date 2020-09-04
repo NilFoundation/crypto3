@@ -56,8 +56,8 @@ namespace nil {
                     }
 
                     // data + data
-                    double_element_fp6_3over2 dbl() const {
-                        return {data[0].dbl(), data[1].dbl(), data[2].dbl()};
+                    double_element_fp6_3over2 doubled() const {
+                        return {data[0].doubled(), data[1].doubled(), data[2].doubled()};
                     }
 
                     double_element_fp6_3over2 addNC(const double_element_fp6_3over2 &B) {
@@ -148,11 +148,11 @@ namespace nil {
                     // xp, yp = P[0], P[1]
 
                     // # 1
-                    t0 = R[2].square();
+                    t0 = R[2].squared();
                     t4 = R[0] * R[1];
-                    t1 = R[1].square();
+                    t1 = R[1].squared();
                     // # 2
-                    t3 = t0.dbl();
+                    t3 = t0.doubled();
                     t4 = t4.divBy2();
                     t5 = t0 + t1;
                     // # 3
@@ -171,8 +171,8 @@ namespace nil {
                         t2 = t0 * ParamT<Fp2>::b_invxi;
                     }
                     // # 5
-                    t0 = R[0].square();
-                    t3 = t2.dbl();
+                    t0 = R[0].squared();
+                    t3 = t2.doubled();
                     // ## 6
                     t3 += t2;
                     l.c_ = addNC(t0, t0);
@@ -184,15 +184,15 @@ namespace nil {
                     R[0] *= t4;
                     t3 = t3.divBy2();
                     // ## 9
-                    T0 = t3.square();
-                    T1 = t2.square();
+                    T0 = t3.squared();
+                    T1 = t2.squared();
                     // # 10
                     T2 = addNC(T1, T1);
                     t3 = R[1] + R[2];
                     // # 11
                     T2 = T2 + T1;
 
-                    t3 = t3.square();
+                    t3 = t3.squared();
                     // # 12
                     t3 -= t5;
                     // # 13
@@ -229,10 +229,10 @@ namespace nil {
                     t1 = R[0] - t1;
                     t2 = R[1] - t2;
                     // # 3
-                    t3 = t1.square();
+                    t3 = t1.squared();
                     // # 4
                     R[0] = t3 * R[0];
-                    t4 = t2.square();
+                    t4 = t2.squared();
                     // # 5
                     t3 *= t1;
                     t4 *= R[2];

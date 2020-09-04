@@ -53,7 +53,7 @@ namespace nil {
                     // 3.6k x 63
                     l = fields::detail::pointDblLineEval(T, P);
                     // 4.7k x 63
-                    f = f.square();
+                    f = f.squared();
                     // 4.48k x 63
                     f = mul_Fp2_024(l);
 
@@ -175,7 +175,7 @@ namespace nil {
                 for (size_t i = 2; i < Param::siTbl.size(); i++) {
                     l = Qcoeff[idx].mulFp6_24_Fp_01(precP);
                     idx++;
-                    f = f.square();
+                    f = f.squared();
 
                     f = mul_Fp2_024(l);
 
@@ -222,7 +222,7 @@ namespace nil {
                     l1 = Q1coeff[idx];
                     l2 = Q2coeff[idx];
                     idx++;
-                    f = f.square();
+                    f = f.squared();
 
                     l1 = l1.mulFp6_24_Fp_01(precP1);
                     l2 = l2.mulFp6_24_Fp_01(precP2);

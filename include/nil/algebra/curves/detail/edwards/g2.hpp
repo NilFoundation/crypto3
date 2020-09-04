@@ -63,7 +63,7 @@ namespace nil {
                         // http://www.hyperelliptic.org/EFD/g1p/auto-twisted-inverted.html#addition-add-2008-bbjlp
 
                         const underlying_field_type_value A = (this->p[2]) * (other.p[2]);            // A = Z1*Z2
-                        const underlying_field_type_value B = this->mul_by_d(this->p[0].square());    // B = d*A^2
+                        const underlying_field_type_value B = this->mul_by_d(this->p[0].squared());    // B = d*A^2
                         const underlying_field_type_value C = (this->p[0]) * (other.p[0]);            // C = X1*X2
                         const underlying_field_type_value D = (this->p[1]) * (other.p[1]);            // D = Y1*Y2
                         const underlying_field_type_value E = C * D;                                  // E = C*D
@@ -85,7 +85,7 @@ namespace nil {
                         return (*this) + (-B);
                     }
 
-                    edwards_g2 dbl() const {
+                    edwards_g2 doubled() const {
 
                         if (this->is_zero()) {
                             return (*this);
@@ -93,15 +93,15 @@ namespace nil {
                             // NOTE: does not handle O and pts of order 2,4
                             // http://www.hyperelliptic.org/EFD/g1p/auto-twisted-inverted.html#doubling-dbl-2008-bbjlp
 
-                            const underlying_field_type_value A = (this->p[0]).square();    // A = X1^2
-                            const underlying_field_type_value B = (this->p[1]).square();    // B = Y1^2
+                            const underlying_field_type_value A = (this->p[0]).squared();    // A = X1^2
+                            const underlying_field_type_value B = (this->p[1]).squared();    // B = Y1^2
                             const underlying_field_type_value U = this->mul_by_a(B);        // U = a*B
                             const underlying_field_type_value C = A + U;                    // C = A+U
                             const underlying_field_type_value D = A - U;                    // D = A-U
                             const underlying_field_type_value E =
-                                (this->p[0] + this->p[1]).square() - A - B;    // E = (X1+Y1)^2-A-B
+                                (this->p[0] + this->p[1]).squared() - A - B;    // E = (X1+Y1)^2-A-B
                             const underlying_field_type_value X3 = C * D;      // X3 = C*D
-                            const underlying_field_type_value dZZ = this->mul_by_d(this->p[2].square());
+                            const underlying_field_type_value dZZ = this->mul_by_d(this->p[2].squared());
                             const underlying_field_type_value Y3 = E * (C - dZZ - dZZ);    // Y3 = E*(C-2*d*Z1^2)
                             const underlying_field_type_value Z3 = D * E;                  // Z3 = D*E
 

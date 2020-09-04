@@ -38,14 +38,14 @@ namespace nil {
                 element_fp4<ModulusBits, GeneratorBits> sq_Fp4UseDbl(const element_fp4<ModulusBits, GeneratorBits> &B) {
                     double_element_fp2<ModulusBits, GeneratorBits> T0, T1, T2;
                     element_fp2<ModulusBits, GeneratorBits> z0, z1;
-                    T0 = x0.square();
-                    T1 = x1.square();
+                    T0 = x0.squared();
+                    T1 = x1.squared();
                     T2 = T1.mul_xi();
                     T2 += T0;
                     z1 = x0 + x1;
                     z0 = T2.mod();
                     // overwrite z[0] (position 0).
-                    T2 = z1.square();
+                    T2 = z1.squared();
                     T2 -= T0;
                     T2 -= T1;
                     z1 = T2.mod();
@@ -94,7 +94,7 @@ namespace nil {
                     // z^((p^6-1) * (p^2+1))
                     z.a_ = A.a_;
                     z.b_ - A.b_;
-                    data = A.data.inverse();
+                    data = A.data.inversed();
                     z *= A;
                     z.Frobenius2(A);
                     z *= A;
@@ -153,9 +153,9 @@ namespace nil {
                         return true;
 
                     element_fp<ModulusBits, GeneratorBits> Z6p_2;
-                    Z6p_2 = P[2].square();
+                    Z6p_2 = P[2].squared();
                     Z6p_2 *= P[2];
-                    Z6p_2 = Z6p_2.square();
+                    Z6p_2 = Z6p_2.squared();
                     Z6p_2 *= Param::b;
                     return P[1] * P[1] == P[0] * P[0] * P[0] + Z6p_2;
                 }
@@ -180,7 +180,7 @@ namespace nil {
                     if (P[2] == 0)
                         return true;
 
-                    return P[1] * P[1] * P[2] == P[0] * P[0] * P[0] + P[2].square() * P[2] * Param::b;
+                    return P[1] * P[1] * P[2] == P[0] * P[0] * P[0] + P[2].squared() * P[2] * Param::b;
                 }
 
                 /*
@@ -193,7 +193,7 @@ namespace nil {
                     if (P[2] == 0)
                         return true;
 
-                    return P[1] * P[1] == P[0] * P[0] * P[0] + ((P[2].square() * P[2]).square()) * Param::b_invxi;
+                    return P[1] * P[1] == P[0] * P[0] * P[0] + ((P[2].squared() * P[2]).squared()) * Param::b_invxi;
                 }
 
                 /*
@@ -232,8 +232,8 @@ namespace nil {
                     } else {
                         FF A, AA;
 
-                        A = in[2].inverse();
-                        AA = A.square();
+                        A = in[2].inversed();
+                        AA = A.squared();
 
                         out[0] = in[0] * AA;
                         out[1] = in[1] * AA * A;
@@ -254,7 +254,7 @@ namespace nil {
                         copy(out, in);
                     } else {
                         FF A = in[2];
-                        A = A.inverse();
+                        A = A.inversed();
                         out[0] = in[0] * A;
                         out[1] = in[1] * A;
                         out[2] = 1;

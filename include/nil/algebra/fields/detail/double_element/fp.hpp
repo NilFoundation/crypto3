@@ -64,7 +64,7 @@ namespace nil {
                     }
 
                     // data + data
-                    double_element_fp dbl() const {
+                    double_element_fp doubled() const {
                         return data + data;
                     }
 
@@ -86,7 +86,7 @@ namespace nil {
                 double_element_fp mul(const element_fp &A, const element_fp &B) {
                 }
 
-                double_element_fp square(const element_fp &B) {
+                double_element_fp squared(const element_fp &B) {
                     {
                         element_fp t0, t1;
                         t0 = addNC(x.b_, x.b_);

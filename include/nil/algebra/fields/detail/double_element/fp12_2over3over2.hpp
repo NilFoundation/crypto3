@@ -57,8 +57,8 @@ namespace nil {
                     }
 
                     // data + data
-                    double_element_fp12_2over3over2 dbl() const {
-                        return {data[0].dbl(), data[1].dbl()};
+                    double_element_fp12_2over3over2 doubled() const {
+                        return {data[0].doubled(), data[1].doubled()};
                     }
 
                     double_element_fp12_2over3over2 addNC(const double_element_fp12_2over3over2 &B) {
@@ -252,14 +252,14 @@ namespace nil {
                  */
                 static inline void sq_Fp4UseDbl(Fp2 &z0, Fp2 &z1, const Fp2 &x0, const Fp2 &x1) {
                     Fp2Dbl T0, T1, T2;
-                    Fp2Dbl::square(T0, x0);
-                    Fp2Dbl::square(T1, x1);
+                    T0 = x0.squared();
+                    T1 = x1.squared();
                     Fp2Dbl::mul_xi(T2, T1);
                     T2 += T0;
                     z1 = x0 + x1;
                     Fp2Dbl::mod(z0, T2);
                     // overwrite z[0] (position 0).
-                    Fp2Dbl::square(T2, z1);
+                    T2 = z1.squared();
                     T2 -= T0;
                     T2 -= T1;
                     Fp2Dbl::mod(z1, T2);
