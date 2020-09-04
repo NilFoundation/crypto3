@@ -127,8 +127,8 @@ namespace nil {
                         (a + bu)(9 + u) = (9a - b) + (a + 9b)u
                     */
                     element_fp2 mul_xi() {
-                        return element_fp2({data[0].dbl().dbl().dbl() + data[0] - data[1],
-                                            data[1].dbl().dbl().dbl() + data[1] + data[0]});
+                        return element_fp2({data[0].doubled().doubled().doubled() + data[0] - data[1],
+                                            data[1].doubled().doubled().doubled() + data[1] + data[0]});
                     }
 
                     /*
@@ -169,8 +169,8 @@ namespace nil {
                         return element_fp2({divBy4(data[0]), divBy4(data[1])});
                     }
 
-                    element_fp2 dbl() const {
-                        return element_fp2({data[0].dbl(), data[1].dbl()});
+                    element_fp2 doubled() const {
+                        return element_fp2({data[0].doubled(), data[1].doubled()});
                     }
 
                     element_fp2 sqrt() const {
@@ -178,7 +178,7 @@ namespace nil {
                         // compute square root with Tonelli--Shanks
                     }
 
-                    element_fp2 square() const {
+                    element_fp2 squared() const {
                         return (*this) * (*this);    // maybe can be done more effective
                     }
 
@@ -187,17 +187,17 @@ namespace nil {
                         return element_fp2(power(*this, pwr));
                     }
 
-                    element_fp2 inverse() const {
+                    element_fp2 inversed() const {
 
                         /* From "High-Speed Software Implementation of the Optimal Ate Pairing over Barreto-Naehrig
                          * Curves"; Algorithm 8 */
 
                         const underlying_type &A0 = data[0], &A1 = data[1];
 
-                        const underlying_type t0 = A0.square();
-                        const underlying_type t1 = A1.square();
+                        const underlying_type t0 = A0.squared();
+                        const underlying_type t1 = A1.squared();
                         const underlying_type t2 = t0 - non_residue * t1;
-                        const underlying_type t3 = t2.inverse();
+                        const underlying_type t3 = t2.inversed();
                         const underlying_type c0 = A0 * t3;
                         const underlying_type c1 = -(A1 * t3);
 

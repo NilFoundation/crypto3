@@ -37,4 +37,3 @@ namespace nil {
 }    // namespace nil
 
 #endif    // ALGEBRA_PAIRING_MNT4_BASIC_POLICY_HPP
-

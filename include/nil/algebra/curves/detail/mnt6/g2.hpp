@@ -38,9 +38,11 @@ namespace nil {
 
                     mnt6_g2() : mnt6_g2(zero_fill[0], zero_fill[1], zero_fill[2]) {};
 
-                    mnt6_g2(underlying_field_type_value X, underlying_field_type_value Y, underlying_field_type_value Z) : element_type(X, Y, Z) {};
-
-                    mnt6_g2(underlying_field_type_value X, underlying_field_type_value Y, underlying_field_type_value Z) : element_type(X, Y, X*Y) {};
+                    mnt6_g2(underlying_field_type_value X, underlying_field_type_value Y, underlying_field_type_value Z){
+                        p[0] = X;
+                        p[1] = Y;
+                        p[2] = Z;
+                    };
 
                     static mnt6_g2 zero() {
                         return mnt6_g2();

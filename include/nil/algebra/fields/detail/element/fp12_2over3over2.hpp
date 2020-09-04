@@ -62,6 +62,10 @@ namespace nil {
                         return element_fp12_2over3over2({data[0] + B.data[0], data[1] + B.data[1]});
                     }
 
+                    element_fp12_2over3over2 doubled() const {
+                        return element_fp12_2over3over2({data[0].doubled(), data[1].doubled()});
+                    }
+
                     element_fp12_2over3over2 operator-(const element_fp12_2over3over2 &B) const {
                         return element_fp12_2over3over2({data[0] - B.data[0], data[1] - B.data[1]});
                     }
@@ -93,10 +97,10 @@ namespace nil {
 
                     element_fp12_2over3over2 sqrt() const {
 
-                        // compute square root with Tonelli--Shanks
+                        // compute squared root with Tonelli--Shanks
                     }
 
-                    element_fp12_2over3over2 square() const {
+                    element_fp12_2over3over2 squared() const {
                         return (*this) * (*this);    // maybe can be done more effective
                     }
 
@@ -105,32 +109,32 @@ namespace nil {
                         return element_fp12_2over3over2(power(*this, pwr));
                     }
 
-                    element_fp12_2over3over2 inverse() const {
+                    element_fp12_2over3over2 inversed() const {
 
                         /* From "High-Speed Software Implementation of the Optimal Ate Pairing over Barreto-Naehrig
                          * Curves"; Algorithm 8 */
 
                         const underlying_type &A0 = data[0], &A1 = data[1];
 
-                        const underlying_type t0 = A0.square();
-                        const underlying_type t1 = A1.square();
+                        const underlying_type t0 = A0.squared();
+                        const underlying_type t1 = A1.squared();
                         const underlying_type t2 = t0 - mul_by_non_residue(t1);
-                        const underlying_type t3 = t2.inverse();
+                        const underlying_type t3 = t2.inversed();
                         const underlying_type c0 = A0 * t3;
                         const underlying_type c1 = -(A1 * t3);
 
                         return element_fp12_2over3over2({c0, c1});
                     }
 
-                    element_fp12_2over3over2 sqru() {
-                        element_fp2 &z0(a_.a_);
-                        element_fp2 &z4(a_.b_);
-                        element_fp2 &z3(a_.c_);
-                        element_fp2 &z2(b_.a_);
-                        element_fp2 &z1(b_.b_);
-                        element_fp2 &z5(b_.c_);
-                        element_fp4 t0t1;
-                        element_fp2 t0 = t0t1.data[0], t1 = t0t1.data[1];
+                    /*element_fp12_2over3over2 sqru() {
+                        element_fp2<FieldParams> &z0(a_.a_);
+                        element_fp2<FieldParams> &z4(a_.b_);
+                        element_fp2<FieldParams> &z3(a_.c_);
+                        element_fp2<FieldParams> &z2(b_.a_);
+                        element_fp2<FieldParams> &z1(b_.b_);
+                        element_fp2<FieldParams> &z5(b_.c_);
+                        element_fp4<FieldParams> t0t1;
+                        element_fp2<FieldParams> t0 = t0t1.data[0], t1 = t0t1.data[1];
 
                         t0t1 = sq_Fp4UseDbl({z0, z1});    // a^2 = t0 + t1*y
                         // For A
@@ -155,7 +159,7 @@ namespace nil {
                         z2 = (t0 + z2).dbl() + t0;
 
                         z3 = (t2 - z3).dbl() + t2;
-                    }
+                    }*/
 
                 private:
                     inline static underlying_type mul_by_non_residue(const underlying_type &A) {
@@ -166,8 +170,9 @@ namespace nil {
                 /*
                     (a + bw) -> (a - bw) gammar
                 */
-                element_fp12_2over3over2 Frobenius(element_fp12_2over3over2 A) {
-                    /* this assumes (q-1)/6 is odd */
+                /*template <typename FieldParams>
+                element_fp12_2over3over2<FieldParams> Frobenius(element_fp12_2over3over2<FieldParams> A) {
+                    // this assumes (q-1)/6 is odd 
 
                     z.a_.a_.a_ = A.a_.a_.a_;
                     z.a_.b_.a_ = A.a_.b_.a_;
@@ -189,7 +194,7 @@ namespace nil {
                     z.b_.a_ *= Param::gammar[0];
                     z.b_.b_ *= Param::gammar[2];
                     z.b_.c_ *= Param::gammar[4];
-                }
+                }*/
 
                 /*
                     gammar = c + dw
@@ -198,7 +203,8 @@ namespace nil {
                     ~t * (c + dw) = (a + bw) * ((c + dw)(c - dw))
                     gammar2 = (c + dw)(c - dw) in Fp6
                 */
-                element_fp12_2over3over2 Frobenius2(element_fp12_2over3over2 A) {
+                /*template <typename FieldParams>
+                element_fp12_2over3over2<FieldParams> Frobenius2(element_fp12_2over3over2<FieldParams> A) {
 
                     z.a_.a_ = A.a_.a_;
 
@@ -210,7 +216,8 @@ namespace nil {
                     z.b_.c_ = A.b_.c_.mul_Fp_0(Param::gammar2[4].a_);
                 }
 
-                element_fp12_2over3over2 Frobenius3(element_fp12_2over3over2 A) {
+                template <typename FieldParams>
+                element_fp12_2over3over2<FieldParams> Frobenius3(element_fp12_2over3over2<FieldParams> A) {
                     z.a_.a_.a_ = A.a_.a_.a_;
                     z.a_.b_.a_ = A.a_.b_.a_;
                     z.a_.c_.a_ = A.a_.c_.a_;
@@ -231,7 +238,7 @@ namespace nil {
                     z.b_.a_ *= Param::gammar3[0];
                     z.b_.b_ *= Param::gammar3[2];
                     z.b_.c_ *= Param::gammar3[4];
-                }
+                }*/
 
             }    // namespace detail
         }        // namespace fields

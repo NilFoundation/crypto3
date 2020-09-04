@@ -62,6 +62,10 @@ namespace nil {
                         return element_fp6_2over3({data[0] + B.data[0], data[1] + B.data[1]});
                     }
 
+                    element_fp6_2over3 doubled() const {
+                        return element_fp6_2over3({data[0].doubled(), data[1].doubled()});
+                    }
+
                     element_fp6_2over3 operator-(const element_fp6_2over3 &B) const {
                         return element_fp6_2over3({data[0] - B.data[0], data[1] - B.data[1]});
                     }
@@ -93,10 +97,10 @@ namespace nil {
 
                     element_fp6_2over3 sqrt() const {
 
-                        // compute square root with Tonelli--Shanks
+                        // compute squared root with Tonelli--Shanks
                     }
 
-                    element_fp6_2over3 square() const {
+                    element_fp6_2over3 squared() const {
                         return (*this) * (*this);    // maybe can be done more effective
                     }
 
@@ -105,17 +109,17 @@ namespace nil {
                         return element_fp6_2over3(power(*this, pwr));
                     }
 
-                    element_fp6_2over3 inverse() const {
+                    element_fp6_2over3 inversed() const {
 
                         /* From "High-Speed Software Implementation of the Optimal Ate Pairing over Barreto-Naehrig
                          * Curves"; Algorithm 8 */
 
                         const underlying_type &A0 = data[0], &A1 = data[1];
 
-                        const underlying_type t0 = A0.square();
-                        const underlying_type t1 = A1.square();
+                        const underlying_type t0 = A0.squared();
+                        const underlying_type t1 = A1.squared();
                         const underlying_type t2 = t0 - mul_by_non_residue(t1);
-                        const underlying_type t3 = t2.inverse();
+                        const underlying_type t3 = t2.inversed();
                         const underlying_type c0 = A0 * t3;
                         const underlying_type c1 = -(A1 * t3);
 

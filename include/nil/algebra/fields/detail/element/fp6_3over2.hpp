@@ -65,6 +65,10 @@ namespace nil {
                         return element_fp6_3over2({data[0] + B.data[0], data[1] + B.data[1], data[2] + B.data[2]});
                     }
 
+                    element_fp6_3over2 doubled() const {
+                        return element_fp6_3over2({data[0].doubled(), data[1].doubled(), data[2].doubled()});
+                    }
+
                     element_fp6_3over2 operator-(const element_fp6_3over2 &B) const {
                         return element_fp6_3over2({data[0] - B.data[0], data[1] - B.data[1], data[2] - B.data[2]});
                     }
@@ -101,22 +105,22 @@ namespace nil {
 
                     element_fp6_3over2 sqrt() const {
 
-                        // compute square root with Tonelli--Shanks
+                        // compute squared root with Tonelli--Shanks
                     }
 
-                    element_fp6_3over2 mul_Fp_b(const element<fp> &B) {
-                        return element_fp6_3over2({data[0], data[1].mul_Fp_0(b), data[2]});
+                    element_fp6_3over2 mul_Fp_b(const element_fp<FieldParams> &B) {
+                        return element_fp6_3over2({data[0], data[1].mul_Fp_0(B), data[2]});
                     }
 
-                    element_fp6_3over2 mul_Fp_c(const element<fp> &B) {
-                        return element_fp6_3over2({data[0], data[1], data[2].mul_Fp_0(b)});
+                    element_fp6_3over2 mul_Fp_c(const element_fp<FieldParams> &B) {
+                        return element_fp6_3over2({data[0], data[1], data[2].mul_Fp_0(B)});
                     }
 
-                    element_fp6_3over2 mulFp6_24_Fp_01(const element<fp> B *) {
+                    element_fp6_3over2 mulFp6_24_Fp_01(const element_fp<FieldParams> * B) {
                         return element_fp6_3over2({data[0], data[1].mul_Fp_0(B[1]), data[2].mul_Fp_0(B[0])});
                     }
 
-                    element_fp6_3over2 square() const {
+                    element_fp6_3over2 squared() const {
                         return (*this) * (*this);    // maybe can be done more effective
                     }
 
@@ -125,16 +129,16 @@ namespace nil {
                         return element_fp6_3over2(power(*this, pwr));
                     }
 
-                    element_fp6_3over2 inverse() const {
+                    element_fp6_3over2 inversed() const {
 
                         /* From "High-Speed Software Implementation of the Optimal Ate Pairing over Barreto-Naehrig
                          * Curves"; Algorithm 17 */
 
-                        const underlying_type &A0 = data[0], &A1 = data[1], &A1 = data[2];
+                        const underlying_type &A0 = data[0], &A1 = data[1], &A2 = data[2];
 
-                        const underlying_type t0 = A0.square();
-                        const underlying_type t1 = A1.square();
-                        const underlying_type t2 = A2.square();
+                        const underlying_type t0 = A0.squared();
+                        const underlying_type t1 = A1.squared();
+                        const underlying_type t2 = A2.squared();
                         const underlying_type t3 = A0 * A1;
                         const underlying_type t4 = A0 * A2;
                         const underlying_type t5 = A1 * A2;
@@ -142,7 +146,7 @@ namespace nil {
                         const underlying_type c1 = mul_by_non_residue(t2) - t3;
                         const underlying_type c2 =
                             t1 - t4;    // typo in paper referenced above. should be "-" as per Scott, but is "*"
-                        const underlying_type t6 = (A0 * c0 + mul_by_non_residue(A2 * c1 + A1 * c2)).inverse();
+                        const underlying_type t6 = (A0 * c0 + mul_by_non_residue(A2 * c1 + A1 * c2)).inversed();
                         return element_fp6_3over2({t6 * c0, t6 * c1, t6 * c2});
                     }
 

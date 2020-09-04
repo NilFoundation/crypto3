@@ -22,16 +22,17 @@ namespace nil {
         namespace curves {
             namespace detail {
 
-                template<typename PairingParams>
-                struct bn128_g1 : public element_curve_weierstrass<typename PairingParams::g1_type> {
+                template<typename FieldElementTypeValue>
+                struct bn128_g1 : public element_curve_weierstrass<FieldElementTypeValue> {
 
-                    using policy_type = PairingParams;
-                    using element_type = element_curve_weierstrass<typename policy_type::g1_type>;
+                    using policy_type = FieldElementTypeValue;
+                    using element_type = element_curve_weierstrass<policy_type>;
                     using underlying_field_type_value = typename element_type::underlying_field_type_value;
 
                     bn128_g1() : bn128_g1(zero_fill[0], zero_fill[1], zero_fill[2]) {};
 
-                    bn128_g1(underlying_field_type_value X, underlying_field_type_value Y,
+                    bn128_g1(underlying_field_type_value X, 
+                             underlying_field_type_value Y,
                              underlying_field_type_value Z) :
                         element_type(X, Y, Z) {};
 

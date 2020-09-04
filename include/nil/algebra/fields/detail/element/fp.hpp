@@ -102,7 +102,7 @@ namespace nil {
                         return element_fp(data * B.data);
                     }
 
-                    element_fp dbl() const {
+                    element_fp doubled() const {
                         return element_fp(data + data);
                     }
 
@@ -113,7 +113,7 @@ namespace nil {
                     element_fp _2z_add_3x() {
                     }
 
-                    element_fp square() const {
+                    element_fp squared() const {
                         return element_fp(data * data);    // maybe can be done more effective
                     }
 
@@ -122,7 +122,7 @@ namespace nil {
                         return element_fp(power(*this, pwr));
                     }
 
-                    element_fp inverse() const {
+                    element_fp inversed() const {
                         // return element_fp(boost::multiprecision::inverse(data));
                         return *this;
                     }

@@ -10,20 +10,20 @@
 #ifndef ALGEBRA_CURVES_BN128_HPP
 #define ALGEBRA_CURVES_BN128_HPP
 
-#include <nil/algebra/curves/detail/element/curve_weierstrass.hpp>
-#include <nil/algebra/curves/detail/params/params.hpp>
-
 #include <nil/algebra/curves/detail/bn128/g1.hpp>
 #include <nil/algebra/curves/detail/bn128/g2.hpp>
 
 #include <nil/algebra/fields/bn128/fq.hpp>
 #include <nil/algebra/fields/bn128/fr.hpp>
+#include <nil/algebra/fields/detail/element/fp.hpp>
+#include <nil/algebra/fields/detail/element/fp2.hpp>
+#include <nil/algebra/fields/detail/element/fp12_2over3over2.hpp>
 
 namespace nil {
     namespace algebra {
         namespace curves {
 
-            using namespace algebra;
+            using namespace ::nil::algebra;
 
             /*
                 The curve equation for a BN curve is:
@@ -55,14 +55,16 @@ namespace nil {
 
                 // typedef typename detail::element_curve_weierstrass<base_field_type::value_type> value_type;
 
-                typedef typename detail::bn128_g1<254, CHAR_BIT> g1_type;
-                typedef typename detail::bn128_g2<254, CHAR_BIT> g2_type;
+                typedef typename detail::bn128_g1<fields::detail::element_fp<
+                    fields::detail::arithmetic_params<fields::bn128_fq<254, CHAR_BIT>>>> g1_type;
+                typedef typename detail::bn128_g2<fields::detail::element_fp2<
+                    fields::detail::arithmetic_params<fields::bn128_fq<254, CHAR_BIT>>>> g2_type;
                 typedef typename nil::algebra::fields::detail::element_fp12_2over3over2<
-                    nil::algebra::fields::detail::arithmetic_params<bn128_fq<254, CHAR_BIT>>>
+                    fields::detail::arithmetic_params<fields::bn128_fq<254, CHAR_BIT>>>
                     gt_type;
 
-                typedef std::vector<typename g1_type> g1_vector;
-                typedef std::vector<typename g2_type> g2_vector;
+                typedef std::vector<g1_type> g1_vector;
+                typedef std::vector<g2_type> g2_vector;
 
                 constexpr static const number_type p = base_field_modulus;
                 constexpr static const number_type q = scalar_field_modulus;
@@ -74,13 +76,13 @@ namespace nil {
             };
 
             template<std::size_t ModulusBits = 254, std::size_t GeneratorBits = CHAR_BIT>
-            using bn128_g1 = bn128<ModulusBits, GeneratorBits>::g1_type;
+            using bn128_g1 = typename bn128<ModulusBits, GeneratorBits>::g1_type;
 
             template<std::size_t ModulusBits = 254, std::size_t GeneratorBits = CHAR_BIT>
-            using bn128_g2 = bn128<ModulusBits, GeneratorBits>::g2_type;
+            using bn128_g2 = typename bn128<ModulusBits, GeneratorBits>::g2_type;
 
             template<std::size_t ModulusBits = 254, std::size_t GeneratorBits = CHAR_BIT>
-            using bn128_gt = bn128<ModulusBits, GeneratorBits>::gt_type;
+            using bn128_gt = typename bn128<ModulusBits, GeneratorBits>::gt_type;
 
         }    // namespace curves
     }        // namespace algebra

@@ -17,18 +17,18 @@ namespace nil {
         namespace curves {
             namespace detail {
 
-                template<typename FieldElementType>
+                template<typename FieldElementTypeValue>
                 struct element_curve_weierstrass {
 
-                    using underlying_field_type = FieldElementType;
+                    using underlying_field_type_value = FieldElementTypeValue;
 
-                    underlying_field_type p[3];
+                    underlying_field_type_value p[3];
 
                     element_curve_weierstrass() {
                     }
 
-                    element_curve_weierstrass(const underlying_field_type &x, const underlying_field_type &y,
-                                              const underlying_field_type &z) {
+                    element_curve_weierstrass(const underlying_field_type_value &x, const underlying_field_type_value &y,
+                                              const underlying_field_type_value &z) {
                         p[0] = x;
                         p[1] = y;
                         p[2] = z;
@@ -41,11 +41,11 @@ namespace nil {
                     }
 
                     element_curve_weierstrass normalize() const {
-                        underlying_field_type p_out[3];
+                        underlying_field_type_value p_out[3];
 
                         if (is_zero() || p[2] == 1)
                             return *this;
-                        underlying_field_type r, r2;
+                        underlying_field_type_value r, r2;
                         r = p[2].inverse();
                         r2 = r.square();
                         p_out[0] = p[0] * r2;        // r2
@@ -60,9 +60,9 @@ namespace nil {
                         (p_out[0], p_out[1], p_out[2]) = 2(p[0], p[1], p[2])
                     */
                     element_curve_weierstrass dbl() const {
-                        underlying_field_type p_out[3];
+                        underlying_field_type_value p_out[3];
 
-                        underlying_field_type A, B, C, D, E;
+                        underlying_field_type_value A, B, C, D, E;
                         A = p[0].square();
                         B = p[1].square();
                         C = B.square();
@@ -159,7 +159,7 @@ namespace nil {
                         if (other.p[2].is_zero()) {
                             return *this;
                         }
-                        underlying_field_type Z1Z1, Z2Z2, U1, U2, S1, S2, H, I, J, t3, r, V;
+                        underlying_field_type_value Z1Z1, Z2Z2, U1, U2, S1, S2, H, I, J, t3, r, V;
 
                         Z1Z1 = p[2].square();
                         Z2Z2 = other.p[2].square();
@@ -176,7 +176,7 @@ namespace nil {
                             if (t3.is_zero()) {
                                 return dbl();
                             } else {
-                                p[2] = underlying_field_type::zero();    // not sure
+                                p[2] = underlying_field_type_value::zero();    // not sure
                             }
                             return *this;
                         }
@@ -222,11 +222,11 @@ namespace nil {
 
                         // we know that Z2 = 1
 
-                        underlying_field_type Z1Z1 = this->p[2].square();
+                        underlying_field_type_value Z1Z1 = this->p[2].square();
 
-                        underlying_field_type U2 = other.p[0] * Z1Z1;
+                        underlying_field_type_value U2 = other.p[0] * Z1Z1;
 
-                        underlying_field_type S2 = other.p[1] * this->p[2] * Z1Z1;
+                        underlying_field_type_value S2 = other.p[1] * this->p[2] * Z1Z1;
                         ;    // S2 = Y2*Z1*Z1Z1
 
                         if (this->p[0] == U2 && this->p[1] == S2) {
@@ -235,7 +235,7 @@ namespace nil {
                         }
 
                         element_curve_weierstrass result;
-                        underlying_field_type H, HH, I, J, r, V;
+                        underlying_field_type_value H, HH, I, J, r, V;
                         // H = U2-X1
                         H = U2 - this->p[0];
                         // HH = H^2

@@ -74,6 +74,10 @@ namespace nil {
                         return element_fp3({data[0] + B.data[0], data[1] + B.data[1], data[2] + B.data[2]});
                     }
 
+                    element_fp3 doubled() const {
+                        return element_fp3({data[0].doubled(), data[1].doubled(), data[2].doubled()});
+                    }
+
                     element_fp3 operator-(const element_fp3 &B) const {
                         return element_fp3({data[0] - B.data[0], data[1] - B.data[1], data[2] - B.data[2]});
                     }
@@ -120,7 +124,7 @@ namespace nil {
                         return element_fp3(power(*this, pwr));
                     }
 
-                    element_fp3 inverse() const {
+                    element_fp3 inversed() const {
 
                         /* From "High-Speed Software Implementation of the Optimal Ate Pairing over Barreto-Naehrig
                          * Curves"; Algorithm 17 */
@@ -137,7 +141,7 @@ namespace nil {
                         const underlying_type c1 = non_residue * t2 - t3;
                         const underlying_type c2 =
                             t1 - t4;    // typo in paper referenced above. should be "-" as per Scott, but is "*"
-                        const underlying_type t6 = (A0 * c0 + non_residue * (A2 * c1 + A1 * c2)).inverse();
+                        const underlying_type t6 = (A0 * c0 + non_residue * (A2 * c1 + A1 * c2)).inversed();
                         return element_fp3({t6 * c0, t6 * c1, t6 * c2});
                     }
                 };
