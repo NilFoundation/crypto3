@@ -17,8 +17,6 @@
 
 #include <nil/algebra/curves/mnt6.hpp>
 
-#include <nil/algebra/fields/detail/params/mnt6/fq.hpp>
-
 namespace nil {
     namespace algebra {
         namespace pairing {

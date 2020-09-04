@@ -13,11 +13,9 @@
 #include <sstream>
 
 #include <nil/algebra/pairing/ate.hpp>
-#include <nil/algebra/pairing/detail/bls12/basic_policy.hpp>
+#include <nil/algebra/pairing/detail/bls12/functions.hpp>
 
 #include <nil/algebra/curves/bls12.hpp>
-
-#include <nil/algebra/fields/detail/params/bls12/fq.hpp>
 
 namespace nil {
     namespace algebra {

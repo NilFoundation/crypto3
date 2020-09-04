@@ -29,12 +29,14 @@ namespace nil {
                 template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
                 using mnt6_Fq3 = curves::mnt6_g2<ModulusBits, GeneratorBits>::underlying_field_type_value;
 
-                struct mnt6_affine_ate_G1_precomputation {
+                template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
+                struct mnt6_affine_ate_g1_precomputation {
                     mnt6_Fq<ModulusBits, GeneratorBits> PX;
                     mnt6_Fq<ModulusBits, GeneratorBits> PY;
                     mnt6_Fq3<ModulusBits, GeneratorBits> PY_twist_squared;
                 };
 
+                template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
                 struct mnt6_affine_ate_coeffs {
                     // TODO: trim (not all of them are needed)
                     mnt6_Fq3<ModulusBits, GeneratorBits> old_RX;
@@ -44,19 +46,21 @@ namespace nil {
                     mnt6_Fq3<ModulusBits, GeneratorBits> gamma_X;
                 };
 
-                struct mnt6_affine_ate_G2_precomputation {
+                template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
+                struct mnt6_affine_ate_g2_precomputation {
                     mnt6_Fq3<ModulusBits, GeneratorBits> QX;
                     mnt6_Fq3<ModulusBits, GeneratorBits> QY;
                     std::vector<mnt6_affine_ate_coeffs> coeffs;
                 };
 
-                struct mnt6_ate_G1_precomp {
+                template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
+                struct mnt6_ate_g1_precomp {
                     mnt6_Fq<ModulusBits, GeneratorBits> PX;
                     mnt6_Fq<ModulusBits, GeneratorBits> PY;
                     mnt6_Fq3<ModulusBits, GeneratorBits> PX_twist;
                     mnt6_Fq3<ModulusBits, GeneratorBits> PY_twist;
 
-                    bool operator==(const mnt6_ate_G1_precomp &other) const {
+                    bool operator==(const mnt6_ate_g1_precomp &other) const {
                         return (this->PX == other.PX &&
                                 this->PY == other.PY &&
                                 this->PX_twist == other.PX_twist &&
@@ -64,6 +68,7 @@ namespace nil {
                     }
                 };
 
+                template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
                 struct mnt6_ate_dbl_coeffs {
                     mnt6_Fq3<ModulusBits, GeneratorBits> c_H;
                     mnt6_Fq3<ModulusBits, GeneratorBits> c_4C;
@@ -78,6 +83,7 @@ namespace nil {
                     }
                 };
 
+                template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
                 struct mnt6_ate_add_coeffs {
                     mnt6_Fq3<ModulusBits, GeneratorBits> c_L1;
                     mnt6_Fq3<ModulusBits, GeneratorBits> c_RZ;
@@ -88,7 +94,8 @@ namespace nil {
                     }
                 };
 
-                struct mnt6_ate_G2_precomp {
+                template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
+                struct mnt6_ate_g2_precomp {
                     mnt6_Fq3<ModulusBits, GeneratorBits> QX;
                     mnt6_Fq3<ModulusBits, GeneratorBits> QY;
                     mnt6_Fq3<ModulusBits, GeneratorBits> QY2;
@@ -97,7 +104,7 @@ namespace nil {
                     std::vector<mnt6_ate_dbl_coeffs> dbl_coeffs;
                     std::vector<mnt6_ate_add_coeffs> add_coeffs;
 
-                    bool operator==(const mnt6_ate_G2_precomp &other) const {
+                    bool operator==(const mnt6_ate_g2_precomp &other) const {
                         return (this->QX == other.QX &&
                                 this->QY == other.QY &&
                                 this->QY2 == other.QY2 &&
@@ -111,7 +118,7 @@ namespace nil {
                 
 
                 /* final exponentiations */
-
+                template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
                 curves::mnt6_gt<ModulusBits, GeneratorBits> mnt6_final_exponentiation_last_chunk(const curves::mnt6_gt<ModulusBits, GeneratorBits> &elt, const curves::mnt6_gt<ModulusBits, GeneratorBits> &elt_inv) {
                     const curves::mnt6_gt<ModulusBits, GeneratorBits> elt_q = elt.Frobenius_map(1);
                     curves::mnt6_gt<ModulusBits, GeneratorBits> w1_part = elt_q.cyclotomic_exp(basic_policy<mnt4<ModulusBits, GeneratorBits>>::final_exponent_last_chunk_w1);
@@ -126,6 +133,7 @@ namespace nil {
                     return result;
                 }
 
+                template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
                 curves::mnt6_gt<ModulusBits, GeneratorBits> mnt6_final_exponentiation_first_chunk(const curves::mnt6_gt<ModulusBits, GeneratorBits> &elt, const curves::mnt6_gt<ModulusBits, GeneratorBits> &elt_inv) {
 
                     /* (q^3-1)*(q+1) */
@@ -141,6 +149,7 @@ namespace nil {
                     return beta;
                 }
 
+                template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
                 curves::mnt6_gt<ModulusBits, GeneratorBits> mnt6_final_exponentiation(const curves::mnt6_gt<ModulusBits, GeneratorBits> &elt) {
                     const curves::mnt6_gt<ModulusBits, GeneratorBits> elt_inv = elt.inverse();
                     const curves::mnt6_gt<ModulusBits, GeneratorBits> elt_to_first_chunk = mnt6_final_exponentiation_first_chunk(elt, elt_inv);
@@ -151,13 +160,13 @@ namespace nil {
                 }
 
                 /* affine ate miller loop */
+                template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
+                mnt6_affine_ate_g1_precomputation mnt6_affine_ate_precompute_g1(const mnt6_g1& P) {
 
-                mnt6_affine_ate_G1_precomputation mnt6_affine_ate_precompute_G1(const mnt6_G1& P) {
-
-                    mnt6_G1 Pcopy = P;
+                    mnt6_g1 Pcopy = P;
                     Pcopy.to_affine_coordinates();
 
-                    mnt6_affine_ate_G1_precomputation result;
+                    mnt6_affine_ate_g1_precomputation result;
                     result.PX = Pcopy.X;
                     result.PY = Pcopy.Y;
                     result.PY_twist_squared = Pcopy.Y * mnt6_twist.squared();
@@ -165,12 +174,13 @@ namespace nil {
                     return result;
                 }
 
-                mnt6_affine_ate_G2_precomputation mnt6_affine_ate_precompute_G2(const mnt6_G2& Q) {
+                template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
+                mnt6_affine_ate_g2_precomputation mnt6_affine_ate_precompute_g2(const mnt6_g2& Q) {
 
-                    mnt6_G2 Qcopy(Q);
+                    mnt6_g2 Qcopy(Q);
                     Qcopy.to_affine_coordinates();
 
-                    mnt6_affine_ate_G2_precomputation result;
+                    mnt6_affine_ate_g2_precomputation result;
                     result.QX = Qcopy.X;
                     result.QY = Qcopy.Y;
 
@@ -222,8 +232,9 @@ namespace nil {
                     return result;
                 }
 
-                curves::mnt6_gt<ModulusBits, GeneratorBits> mnt6_affine_ate_miller_loop(const mnt6_affine_ate_G1_precomputation &prec_P,
-                                                     const mnt6_affine_ate_G2_precomputation &prec_Q) {
+                template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
+                curves::mnt6_gt<ModulusBits, GeneratorBits> mnt6_affine_ate_miller_loop(const mnt6_affine_ate_g1_precomputation &prec_P,
+                                                     const mnt6_affine_ate_g2_precomputation &prec_Q) {
 
                     curves::mnt6_gt<ModulusBits, GeneratorBits> f = curves::mnt6_gt<ModulusBits, GeneratorBits>::one();
 
@@ -269,7 +280,8 @@ namespace nil {
 
                 /* ate pairing */
 
-                struct extended_mnt6_G2_projective {
+                template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
+                struct extended_mnt6_g2_projective {
                     mnt6_Fq3<ModulusBits, GeneratorBits> X;
                     mnt6_Fq3<ModulusBits, GeneratorBits> Y;
                     mnt6_Fq3<ModulusBits, GeneratorBits> Z;
@@ -277,7 +289,8 @@ namespace nil {
 
                 };
 
-                void doubling_step_for_flipped_miller_loop(extended_mnt6_G2_projective &current,
+                template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
+                void doubling_step_for_flipped_miller_loop(extended_mnt6_g2_projective &current,
                                                            mnt6_ate_dbl_coeffs &dc) {
                     const mnt6_Fq3<ModulusBits, GeneratorBits> X = current.X, Y = current.Y, Z = current.Z, T = current.T;
 
@@ -300,8 +313,9 @@ namespace nil {
                     dc.c_L = (F+X).squared() - G - B; // L = (F+X1)^2-G-B
                 }
 
+                template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
                 void mixed_addition_step_for_flipped_miller_loop(const mnt6_Fq3<ModulusBits, GeneratorBits> base_X, const mnt6_Fq3<ModulusBits, GeneratorBits> base_Y, const mnt6_Fq3<ModulusBits, GeneratorBits> base_Y_squared,
-                                                                 extended_mnt6_G2_projective &current,
+                                                                 extended_mnt6_g2_projective &current,
                                                                  mnt6_ate_add_coeffs &ac) {
                     const mnt6_Fq3<ModulusBits, GeneratorBits> X1 = current.X, Y1 = current.Y, Z1 = current.Z, T1 = current.T;
                     const mnt6_Fq3<ModulusBits, GeneratorBits> &x2 = base_X,    &y2 =  base_Y, &y2_squared = base_Y_squared;
@@ -324,12 +338,13 @@ namespace nil {
                     ac.c_RZ = current.Z;
                 }
 
-                mnt6_ate_G1_precomp mnt6_ate_precompute_G1(const mnt6_G1& P) {
+                template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
+                mnt6_ate_g1_precomp mnt6_ate_precompute_g1(const mnt6_g1& P) {
 
-                    mnt6_G1 Pcopy = P;
+                    mnt6_g1 Pcopy = P;
                     Pcopy.to_affine_coordinates();
 
-                    mnt6_ate_G1_precomp result;
+                    mnt6_ate_g1_precomp result;
                     result.PX = Pcopy.X;
                     result.PY = Pcopy.Y;
                     result.PX_twist = Pcopy.X * mnt6_twist;
@@ -338,21 +353,22 @@ namespace nil {
                     return result;
                 }
 
-                mnt6_ate_G2_precomp mnt6_ate_precompute_G2(const mnt6_G2& Q) {
+                template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
+                mnt6_ate_g2_precomp mnt6_ate_precompute_g2(const mnt6_g2& Q) {
 
-                    mnt6_G2 Qcopy(Q);
+                    mnt6_g2 Qcopy(Q);
                     Qcopy.to_affine_coordinates();
 
                     mnt6_Fq3<ModulusBits, GeneratorBits> mnt6_twist_inv = mnt6_twist.inverse(); // could add to global params if needed
 
-                    mnt6_ate_G2_precomp result;
+                    mnt6_ate_g2_precomp result;
                     result.QX = Qcopy.X;
                     result.QY = Qcopy.Y;
                     result.QY2 = Qcopy.Y.squared();
                     result.QX_over_twist = Qcopy.X * mnt6_twist_inv;
                     result.QY_over_twist = Qcopy.Y * mnt6_twist_inv;
 
-                    extended_mnt6_G2_projective R;
+                    extended_mnt6_g2_projective R;
                     R.X = Qcopy.X;
                     R.Y = Qcopy.Y;
                     R.Z = mnt6_Fq3::one();
@@ -375,7 +391,7 @@ namespace nil {
 
                         if (bit) {
                             mnt6_ate_add_coeffs ac;
-                            mixed_addition_step_for_flipped_miller_loop(result.QX, result.QY, result.QY2, R, ac);
+                            mixed_addition_step_for_flipped_miller_loop<ModulusBits, GeneratorBits>(result.QX, result.QY, result.QY2, R, ac);
                             result.add_coeffs.push_back(ac);
                         }
                     }
@@ -388,15 +404,16 @@ namespace nil {
                         mnt6_Fq3<ModulusBits, GeneratorBits> minus_R_affine_Y = - R.Y * RZ3_inv;
                         mnt6_Fq3<ModulusBits, GeneratorBits> minus_R_affine_Y2 = minus_R_affine_Y.squared();
                         mnt6_ate_add_coeffs ac;
-                        mixed_addition_step_for_flipped_miller_loop(minus_R_affine_X, minus_R_affine_Y, minus_R_affine_Y2, R, ac);
+                        mixed_addition_step_for_flipped_miller_loop<ModulusBits, GeneratorBits>(minus_R_affine_X, minus_R_affine_Y, minus_R_affine_Y2, R, ac);
                         result.add_coeffs.push_back(ac);
                     }
 
                     return result;
                 }
 
-                curves::mnt6_gt<ModulusBits, GeneratorBits> mnt6_ate_miller_loop(const mnt6_ate_G1_precomp &prec_P,
-                                              const mnt6_ate_G2_precomp &prec_Q) {
+                template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
+                curves::mnt6_gt<ModulusBits, GeneratorBits> mnt6_ate_miller_loop(const mnt6_ate_g1_precomp &prec_P,
+                                              const mnt6_ate_g2_precomp &prec_Q) {
 
                     mnt6_Fq3<ModulusBits, GeneratorBits> L1_coeff = mnt6_Fq3(prec_P.PX, mnt6_Fq::zero(), mnt6_Fq::zero()) - prec_Q.QX_over_twist;
 
@@ -446,10 +463,11 @@ namespace nil {
                     return f;
                 }
 
-                curves::mnt6_gt<ModulusBits, GeneratorBits> mnt6_ate_double_miller_loop(const mnt6_ate_G1_precomp &prec_P1,
-                                                     const mnt6_ate_G2_precomp &prec_Q1,
-                                                     const mnt6_ate_G1_precomp &prec_P2,
-                                                     const mnt6_ate_G2_precomp &prec_Q2) {
+                template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
+                curves::mnt6_gt<ModulusBits, GeneratorBits> mnt6_ate_double_miller_loop(const mnt6_ate_g1_precomp &prec_P1,
+                                                     const mnt6_ate_g2_precomp &prec_Q1,
+                                                     const mnt6_ate_g1_precomp &prec_P2,
+                                                     const mnt6_ate_g2_precomp &prec_Q2) {
 
                     mnt6_Fq3<ModulusBits, GeneratorBits> L1_coeff1 = mnt6_Fq3(prec_P1.PX, mnt6_Fq::zero(), mnt6_Fq::zero()) - prec_Q1.QX_over_twist;
                     mnt6_Fq3<ModulusBits, GeneratorBits> L1_coeff2 = mnt6_Fq3(prec_P2.PX, mnt6_Fq::zero(), mnt6_Fq::zero()) - prec_Q2.QX_over_twist;
@@ -516,58 +534,66 @@ namespace nil {
                     return f;
                 }
 
-                curves::mnt6_gt<ModulusBits, GeneratorBits> mnt6_ate_pairing(const mnt6_G1& P, const mnt6_G2 &Q) {
-                    mnt6_ate_G1_precomp prec_P = mnt6_ate_precompute_G1(P);
-                    mnt6_ate_G2_precomp prec_Q = mnt6_ate_precompute_G2(Q);
-                    curves::mnt6_gt<ModulusBits, GeneratorBits> result = mnt6_ate_miller_loop(prec_P, prec_Q);
+                template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
+                curves::mnt6_gt<ModulusBits, GeneratorBits> mnt6_ate_pairing(const mnt6_g1& P, const mnt6_g2 &Q) {
+                    mnt6_ate_g1_precomp prec_P = mnt6_ate_precompute_g1<ModulusBits, GeneratorBits>(P);
+                    mnt6_ate_g2_precomp prec_Q = mnt6_ate_precompute_g2<ModulusBits, GeneratorBits>(Q);
+                    curves::mnt6_gt<ModulusBits, GeneratorBits> result = mnt6_ate_miller_loop<ModulusBits, GeneratorBits>(prec_P, prec_Q);
                     return result;
                 }
 
-                curves::mnt6_gt<ModulusBits, GeneratorBits> mnt6_ate_reduced_pairing(const mnt6_G1 &P, const mnt6_G2 &Q) {
-                    const curves::mnt6_gt<ModulusBits, GeneratorBits> f = mnt6_ate_pairing(P, Q);
-                    const curves::mnt6_gt<ModulusBits, GeneratorBits> result = mnt6_final_exponentiation(f);
+                template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
+                curves::mnt6_gt<ModulusBits, GeneratorBits> mnt6_ate_reduced_pairing(const mnt6_g1 &P, const mnt6_g2 &Q) {
+                    const curves::mnt6_gt<ModulusBits, GeneratorBits> f = mnt6_ate_pairing<ModulusBits, GeneratorBits>(P, Q);
+                    const curves::mnt6_gt<ModulusBits, GeneratorBits> result = mnt6_final_exponentiation<ModulusBits, GeneratorBits>(f);
                     return result;
                 }
 
-                mnt6_G1_precomp mnt6_precompute_G1(const mnt6_G1& P) {
-                    return mnt6_ate_precompute_G1(P);
+                template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
+                mnt6_g1_precomp mnt6_precompute_g1(const mnt6_g1& P) {
+                    return mnt6_ate_precompute_g1<ModulusBits, GeneratorBits>(P);
                 }
 
-                mnt6_G2_precomp mnt6_precompute_G2(const mnt6_G2& Q) {
-                    return mnt6_ate_precompute_G2(Q);
+                template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
+                mnt6_g2_precomp mnt6_precompute_g2(const mnt6_g2& Q) {
+                    return mnt6_ate_precompute_g2<ModulusBits, GeneratorBits>(Q);
                 }
 
-                curves::mnt6_gt<ModulusBits, GeneratorBits> mnt6_miller_loop(const mnt6_G1_precomp &prec_P,
-                                          const mnt6_G2_precomp &prec_Q) {
-                    return mnt6_ate_miller_loop(prec_P, prec_Q);
+                template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
+                curves::mnt6_gt<ModulusBits, GeneratorBits> mnt6_miller_loop(const mnt6_g1_precomp &prec_P,
+                                          const mnt6_g2_precomp &prec_Q) {
+                    return mnt6_ate_miller_loop<ModulusBits, GeneratorBits>(prec_P, prec_Q);
                 }
 
-                curves::mnt6_gt<ModulusBits, GeneratorBits> mnt6_double_miller_loop(const mnt6_G1_precomp &prec_P1,
-                                                 const mnt6_G2_precomp &prec_Q1,
-                                                 const mnt6_G1_precomp &prec_P2,
-                                                 const mnt6_G2_precomp &prec_Q2) {
-                    return mnt6_ate_double_miller_loop(prec_P1, prec_Q1, prec_P2, prec_Q2);
+                template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
+                curves::mnt6_gt<ModulusBits, GeneratorBits> mnt6_double_miller_loop(const mnt6_g1_precomp &prec_P1,
+                                                 const mnt6_g2_precomp &prec_Q1,
+                                                 const mnt6_g1_precomp &prec_P2,
+                                                 const mnt6_g2_precomp &prec_Q2) {
+                    return mnt6_ate_double_miller_loop<ModulusBits, GeneratorBits>(prec_P1, prec_Q1, prec_P2, prec_Q2);
                 }
 
-                curves::mnt6_gt<ModulusBits, GeneratorBits> mnt6_pairing(const mnt6_G1& P,
-                                      const mnt6_G2 &Q) {
-                    return mnt6_ate_pairing(P, Q);
+                template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
+                curves::mnt6_gt<ModulusBits, GeneratorBits> mnt6_pairing(const mnt6_g1& P,
+                                      const mnt6_g2 &Q) {
+                    return mnt6_ate_pairing<ModulusBits, GeneratorBits>(P, Q);
                 }
 
-                curves::mnt6_gt<ModulusBits, GeneratorBits> mnt6_reduced_pairing(const mnt6_G1 &P,
-                                             const mnt6_G2 &Q) {
-                    return mnt6_ate_reduced_pairing(P, Q);
+                template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
+                curves::mnt6_gt<ModulusBits, GeneratorBits> mnt6_reduced_pairing(const mnt6_g1 &P,
+                                             const mnt6_g2 &Q) {
+                    return mnt6_ate_reduced_pairing<ModulusBits, GeneratorBits>(P, Q);
                 }
 
-                curves::mnt6_gt<ModulusBits, GeneratorBits> mnt6_affine_reduced_pairing(const mnt6_G1 &P,
-                                                    const mnt6_G2 &Q) {
-                    const mnt6_affine_ate_G1_precomputation prec_P = mnt6_affine_ate_precompute_G1(P);
-                    const mnt6_affine_ate_G2_precomputation prec_Q = mnt6_affine_ate_precompute_G2(Q);
-                    const curves::mnt6_gt<ModulusBits, GeneratorBits> f = mnt6_affine_ate_miller_loop(prec_P, prec_Q);
-                    const curves::mnt6_gt<ModulusBits, GeneratorBits> result = mnt6_final_exponentiation(f);
+                template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
+                curves::mnt6_gt<ModulusBits, GeneratorBits> mnt6_affine_reduced_pairing(const mnt6_g1 &P,
+                                                    const mnt6_g2 &Q) {
+                    const mnt6_affine_ate_g1_precomputation<ModulusBits, GeneratorBits> prec_P = mnt6_affine_ate_precompute_g1<ModulusBits, GeneratorBits>(P);
+                    const mnt6_affine_ate_g2_precomputation<ModulusBits, GeneratorBits> prec_Q = mnt6_affine_ate_precompute_g2<ModulusBits, GeneratorBits>(Q);
+                    const curves::mnt6_gt<ModulusBits, GeneratorBits> f = mnt6_affine_ate_miller_loop<ModulusBits, GeneratorBits>(prec_P, prec_Q);
+                    const curves::mnt6_gt<ModulusBits, GeneratorBits> result = mnt6_final_exponentiation<ModulusBits, GeneratorBits>(f);
                     return result;
                 }
-
 
             }       // namespace detail
         }        // namespace pairing

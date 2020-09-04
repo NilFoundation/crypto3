@@ -16,8 +16,6 @@
 
 #include <nil/algebra/curves/edwards.hpp>
 
-#include <nil/algebra/fields/detail/params/edwards/fq.hpp>
-
 namespace nil {
     namespace algebra {
         namespace pairing {
