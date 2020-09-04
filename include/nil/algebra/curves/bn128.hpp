@@ -55,10 +55,8 @@ namespace nil {
 
                 // typedef typename detail::element_curve_weierstrass<base_field_type::value_type> value_type;
 
-                typedef typename detail::bn128_g1<fields::detail::element_fp<
-                    fields::detail::arithmetic_params<fields::bn128_fq<254, CHAR_BIT>>>> g1_type;
-                typedef typename detail::bn128_g2<fields::detail::element_fp2<
-                    fields::detail::arithmetic_params<fields::bn128_fq<254, CHAR_BIT>>>> g2_type;
+                typedef typename detail::bn128_g1<254, CHAR_BIT> g1_type;
+                typedef typename detail::bn128_g2<254, CHAR_BIT> g2_type;
                 typedef typename nil::algebra::fields::detail::element_fp12_2over3over2<
                     fields::detail::arithmetic_params<fields::bn128_fq<254, CHAR_BIT>>>
                     gt_type;

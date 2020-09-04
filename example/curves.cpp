@@ -57,6 +57,8 @@ void fp_curve_group_basic_math_examples()
     std::cout << "Double c1 value: ";
     print_fp_curve_group_element(c1.doubled());
 
+    policy_type cd = c1.doubled();
+    
     policy_type cn = c1.normalize();
     
     std::cout << "c1 normalized value: ";

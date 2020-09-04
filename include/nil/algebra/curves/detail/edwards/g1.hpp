@@ -20,7 +20,7 @@ namespace nil {
         namespace curves {
             namespace detail {
 
-                template<std::size_t ModulusBits = 183>
+                template<std::size_t ModulusBits = 183, std::size_t GeneratorBits = CHAR_BIT>
                 struct edwards_g1 {
 
                     using policy_type = edwards<ModulusBits>;
