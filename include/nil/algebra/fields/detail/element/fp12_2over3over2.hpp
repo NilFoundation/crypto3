@@ -101,6 +101,7 @@ namespace nil {
                     }
 
                     element_fp12_2over3over2 squared() const {
+
                         return (*this) * (*this);    // maybe can be done more effective
                     }
 

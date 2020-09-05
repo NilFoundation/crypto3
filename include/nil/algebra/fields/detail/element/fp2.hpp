@@ -175,7 +175,40 @@ namespace nil {
 
                     element_fp2 sqrt() const {
 
+                        element_fp2 one = one();
+
+                        size_t v = policy_type::s;
+                        element_fp2 z (policy_type::nqr_to_t);
+                        element_fp2 w ((*this) ^ policy_type::t_minus_1_over_2);
+                        element_fp2 x ((*this) * w);
+                        element_fp2 b = x * w; // b = (*this)^t
+
                         // compute square root with Tonelli--Shanks
+                        // (does not terminate if not a square!)
+
+                        while (b != one) {
+                            size_t m = 0;
+                            element_fp2 b2m = b;
+                            while (b2m != one) {
+                                /* invariant: b2m = b^(2^m) after entering this loop */
+                                b2m = b2m.square();
+                                m += 1;
+                            }
+
+                            int j = v - m - 1;
+                            w = z;
+                            while (j > 0) {
+                                w = w.square();
+                                --j;
+                            } // w = z^2^(v-m-1)
+
+                            z = w.square();
+                            b = b * z;
+                            x = x * w;
+                            v = m;
+                        }
+
+                        return x;
                     }
 
                     element_fp2 squared() const {
