@@ -57,6 +57,17 @@ namespace nil {
             return r;
         }
 
+        /** @brief casts a vector to another type
+         *  @param v an N-vector of type U
+         *  @return an N-vector of type T containing the casted elements of \f$ \textbf{v} \f$
+         *
+         *  Casts a vector to another type by `static_cast`ing each element.
+         */
+        template<typename T, typename U, std::size_t N>
+        constexpr vector<T, N> cast(const vector<U, N> &v) {
+            return elementwise([](const U u) { return static_cast<T>(u); }, v);
+        }
+
         /** @brief generates a vector containing consecutive elements
          *  @param value the value of the first element of the vector
          *  @return an N-vector of type T such that \f$ \textbf{v}_i = \textrm{start} + i - 1 \f$
@@ -71,6 +82,18 @@ namespace nil {
                 value += 1;    // equivalent to value++, see GCC Bug 91705
             }
             return seq;
+        }
+
+        /** @brief generates a vector of equally spaced elements
+         *  @param min the value of the first element of the vector
+         *  @param max the value of the last element of the vector
+         *  @return an N-vector of type T with elements spaced by \f$ \frac{\textbf{v}_N - \textbf{v}_1}{N-1} \f$
+         *
+         *  Generates a vector of equally spaced elements.
+         */
+        template<std::size_t N, typename T>
+        constexpr vector<T, N> linspace(T min, T max) {
+            return ((max - min) / (N - 1)) * iota<N, T>() + min;
         }
 
         /** @brief generates a vector containing a single value
@@ -98,6 +121,25 @@ namespace nil {
             return elementwise(f, iota<N, std::size_t>());
         }
 
+        /** @brief shifts vector elements
+         *  @param v an N-vector of type T
+         *  @param n the amount to shift each element
+         *  @return an N-vector of type T \f$ \textbf{v} \gg n \f$ such that
+         *  \f$ \left(\textbf{v} \gg n\right)_i = \textbf{v}_{(i + n)\ \textrm{mod}\ N} \f$
+         *
+         *  Rotates a vector by shifting its elements.
+         */
+        template<std::size_t N, typename T>
+        constexpr vector<T, N> rotate(vector<T, N> v, int n) {
+            vector<T, N> rotated = {};
+            // add N (the modulus) to n until it is positive
+            while (n < 0)
+                n += N;
+            for (std::size_t i = 0; i < N; ++i)
+                rotated[i] = v[(i + n) % N];
+            return rotated;
+        }
+
         /** @brief slices a vector into a subvector
          *  @param v an N-vector of type T
          *  @param start the first index of the subvector
@@ -115,6 +157,25 @@ namespace nil {
                 sliced[i] = v[i + start];
 
             return sliced;
+        }
+
+        /** @brief concatenates two vectors
+         *  @param a an N-vector of type T
+         *  @param b an M-vector of type T
+         *  @return an N+M-vector \f$ \left[\textbf{a} \textbf{b}\right] \f$ such that
+         *  \f$ \left(\left[\textbf{a} \textbf{b}\right]\right)_i = \begin{cases} \textbf{a}_i & i < N\\ \textbf{b}_{i -
+         * N} & i \ge N \end{cases} \f$
+         *
+         *  Slices a vector into a subvector.
+         */
+        template<typename T, std::size_t N, std::size_t M>
+        constexpr vector<T, N + M> concat(vector<T, N> a, vector<T, M> b) {
+            vector<T, N + M> concatted = {};
+            for (std::size_t i = 0; i < N; ++i)
+                concatted[i] = a[i];
+            for (std::size_t i = 0; i < M; ++i)
+                concatted[i + N] = b[i];
+            return concatted;
         }
 
         /** }@*/

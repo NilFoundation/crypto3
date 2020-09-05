@@ -45,6 +45,17 @@ namespace nil {
             return op_applied;
         }
 
+        /** @brief casts a vector to another type
+         *  @param m an \f$ N \times M \f$ matrix of type U
+         *  @return an \f$ N \times M \f$ matrix of type T containing the casted elements of \f$ \textbf{M} \f$
+         *
+         *  Casts a matrix to another type by `static_cast`ing each element.
+         */
+        template<typename T, typename U, std::size_t N, std::size_t M>
+        constexpr matrix<T, N, M> cast(const matrix<U, N, M> &m) {
+            return elementwise([](const U u) { return static_cast<T>(u); }, m);
+        }
+
         /** @brief generates a matrix as a function of its indices
          *  @param f a function that operates on two integer indices
          *  @return an \f$ N \times M \f$ matrix with type matching the return type of f such that \f$ \textbf{m}_{ij} =
@@ -80,9 +91,64 @@ namespace nil {
          *  The matrix identity \f$ I_N \f$.
          */
         template<typename T, std::size_t N>
-        constexpr matrix<T, N, N> identity
-            // const matrix<T, N, N> identity
-            = generate<N, N>([](std::size_t i, std::size_t j) { return T(i == j ? 1 : 0); });
+        constexpr matrix<T, N, N> identity = generate<N, N>([](std::size_t i, std::size_t j) {
+            return T(i == j ? 1 : 0);
+        });
+
+        /** @brief repeats a matrix
+         *  @tparam Row the number of times to repeat in the row direction
+         *  @tparam Col the number of times to repeat in the column direction
+         *  @param m an \f$ M \times N \f$ matrix of type T
+         *  @return an \f$ \left(M\times\textrm{Row}\right) \times \left(N\times\textrm{Col}\right) \f$
+         *  matrix \f$ \textbf{m}' \f$ of type T such that
+         * \f$ \textbf{m}'_{ij} = \textbf{m}_{\left(i\ \textrm{mod}\ M\right),\ \left(j\ \textrm{mod}\ N \right)} \f$
+         *
+         *  Repeats copies of a matrix.
+         */
+        template<std::size_t Row, std::size_t Col, std::size_t M, std::size_t N, typename T>
+        constexpr matrix<T, M * Row, N * Col> repmat(const matrix<T, M, N> &m) {
+            return generate<M * Row, N * Col>([&m](std::size_t i, std::size_t j) { return m[i % M][j % N]; });
+        }
+
+        /** @brief swaps rows of a matrix
+         *  @param m an \f$ M \times N \f$ matrix of type T
+         *  @param a the index of a row to swap
+         *  @param b the index of a row to swap
+         *  @return an \f$ M \times N \f$ matrix \f$ \textbf{m}' \f$ of type T such that
+         *  \f$ {\textbf{m}'}_{ij} = \begin{cases} \textbf{m}_{bj} & i = a\\ \textbf{m}_{aj} & i = b\\ \textbf{m}_{ij} &
+         * \textrm{otherwise} \end{cases} \f$
+         *
+         *  Swap two rows of a matrix.
+         */
+        template<std::size_t M, std::size_t N, typename T>
+        constexpr matrix<T, M, N> swaprow(matrix<T, M, N> m, std::size_t a, std::size_t b) {
+            for (int i = 0; i < N; i++) {
+                T tmp = m[a][i];
+                m[a][i] = m[b][i];
+                m[b][i] = tmp;
+            }
+            return m;
+        }
+
+        /** @brief swaps columns of a matrix
+         *  @param m an \f$ M \times N \f$ matrix of type T
+         *  @param a the index of a column to swap
+         *  @param b the index of a column to swap
+         *  @return an \f$ M \times N \f$ matrix \f$ \textbf{m}' \f$ of type T such that
+         *  \f$ {\textbf{m}'}_{ij} = \begin{cases} \textbf{m}_{ib} & j = a\\ \textbf{m}_{ia} & j = b\\ \textbf{m}_{ij} &
+         * \textrm{otherwise} \end{cases} \f$
+         *
+         *  Swap two rows of a matrix.
+         */
+        template<std::size_t M, std::size_t N, typename T>
+        constexpr matrix<T, M, N> swapcol(matrix<T, M, N> m, std::size_t a, std::size_t b) {
+            for (int i = 0; i < N; i++) {
+                T tmp = m[i][a];
+                m[i][a] = m[i][b];
+                m[i][b] = tmp;
+            }
+            return m;
+        }
 
         /** @brief horizontally concatenates two matrices
          *  @param a an \f$ M \times N \f$ matrix of type T
@@ -96,6 +162,20 @@ namespace nil {
         template<std::size_t M, std::size_t N, std::size_t P, typename T>
         constexpr matrix<T, M, N + P> horzcat(const matrix<T, M, N> &a, const matrix<T, M, P> &b) {
             return generate<M, N + P>([&a, &b](std::size_t i, std::size_t j) { return j < N ? a[i][j] : b[i][j - N]; });
+        }
+
+        /** @brief vertically concatenates two matrices
+         *  @param a an \f$ M \times P \f$ matrix of type T
+         *  @param b an \f$ N \times P \f$ matrix of type T
+         *  @return an \f$ \left(M+N\right) \times P \f$ matrix of type T \f$ \left[\textbf{a}; \textbf{b}\right] \f$
+         * such that \f$ \left(\left[\textbf{a}; \textbf{b}\right]\right)_{ij} = \begin{cases} \textbf{a}_{ij} & i < M\\
+         * \textbf{b}_{\left(i - M\right),\ j} & i \ge M \end{cases} \f$
+         *
+         *  Vertically concatenates two matrices.
+         */
+        template<std::size_t M, std::size_t N, std::size_t P, typename T>
+        constexpr matrix<T, M + N, P> vertcat(const matrix<T, M, P> &a, const matrix<T, N, P> &b) {
+            return generate<M + N, P>([&a, &b](std::size_t i, std::size_t j) { return i < M ? a[i][j] : b[i - M][j]; });
         }
 
         /** @brief extracts the submatrix of a matrix
@@ -112,6 +192,40 @@ namespace nil {
             if ((a + P > M) || (b + Q > N))
                 throw "index out of range";
             return generate<P, Q>([&m, &a, &b](std::size_t i, std::size_t j) { return m[a + i][b + j]; });
+        }
+
+        /** @brief reshapes a matrix
+         *  @param m an \f$ M \times N \f$ matrix of type T
+         *  @return a \f$ P \times Q \f$ matrix of type T
+         *
+         *  Reshapes a matrix without changing the order of the elements in memory (in row-major order).
+         */
+        template<std::size_t P, std::size_t Q, std::size_t M, std::size_t N, typename T>
+        constexpr matrix<T, P, Q> reshape(const matrix<T, M, N> &m) {
+            static_assert(P * Q == M * N, "Reshaped matrix must preserve size! P*Q != M*N");
+            return generate<P, Q>([&m](std::size_t i, std::size_t j) { return m[(i * Q + j) / N][(i * Q + j) % N]; });
+        }
+
+        /** @brief converts a vector into a column vector
+         *  @param v an N-vector of type T
+         *  @returns an \f$ N \times 1 \f$ matrix of type T
+         *
+         *  Converts a vector into a column vector.
+         */
+        template<typename T, std::size_t N>
+        constexpr matrix<T, N, 1> as_column(const vector<T, N> &v) {
+            return generate<N, 1>([&v](auto i, auto) { return v[i]; });
+        }
+
+        /** @brief converts a vector into a row vector
+         *  @param v an N-vector of type T
+         *  @returns a \f$ 1 \times N \f$ matrix of type T
+         *
+         *  Converts a vector into a row vector.
+         */
+        template<typename T, std::size_t N>
+        constexpr matrix<T, 1, N> as_row(const vector<T, N> &v) {
+            return generate<1, N>([&v](auto, auto j) { return v[j]; });
         }
 
         /** }@*/
