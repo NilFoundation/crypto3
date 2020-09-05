@@ -19,7 +19,7 @@ namespace nil {
             namespace detail {
 
                 template<typename FieldParams>
-                struct element_fp2{
+                struct element_fp2 {
                 private:
                     typedef FieldParams policy_type;
 
@@ -27,12 +27,12 @@ namespace nil {
                     typedef typename policy_type::modulus_type modulus_type;
 
                     constexpr static const modulus_type modulus = policy_type::modulus;
-                public:
 
+                public:
                     using underlying_type = element_fp<FieldParams>;
 
-                    const typename policy_type::fp2_non_residue_type 
-                        non_residue = underlying_type( typename policy_type::fp2_non_residue_type(policy_type::fp2_non_residue) );
+                    const typename policy_type::fp2_non_residue_type non_residue =
+                        underlying_type(typename policy_type::fp2_non_residue_type(policy_type::fp2_non_residue));
 
                     using value_type = std::array<underlying_type, 2>;
 
@@ -79,7 +79,7 @@ namespace nil {
                         return (data[0] != B.data[0]) || (data[1] != B.data[1]);
                     }
 
-                    element_fp2& operator=(const element_fp2 &B) {
+                    element_fp2 &operator=(const element_fp2 &B) {
                         data[0] = B.data[0];
                         data[1] = B.data[1];
 
@@ -94,14 +94,14 @@ namespace nil {
                         return element_fp2({data[0] - B.data[0], data[1] - B.data[1]});
                     }
 
-                    element_fp2& operator-=(const element_fp2 &B) {
+                    element_fp2 &operator-=(const element_fp2 &B) {
                         data[0] -= B.data[0];
                         data[1] -= B.data[1];
 
                         return *this;
                     }
 
-                    element_fp2& operator+=(const element_fp2 &B) {
+                    element_fp2 &operator+=(const element_fp2 &B) {
                         data[0] += B.data[0];
                         data[1] += B.data[1];
 
@@ -115,7 +115,8 @@ namespace nil {
                     element_fp2 operator*(const element_fp2 &B) const {
                         const underlying_type A0B0 = data[0] * B.data[0], A1B1 = data[1] * B.data[1];
 
-                        return element_fp2({A0B0 + non_residue * A1B1, (data[0] + data[1]) * (B.data[0] + B.data[1]) - A0B0 - A1B1});
+                        return element_fp2(
+                            {A0B0 + non_residue * A1B1, (data[0] + data[1]) * (B.data[0] + B.data[1]) - A0B0 - A1B1});
                     }
 
                     /*
@@ -126,7 +127,8 @@ namespace nil {
                         (a + bu)(9 + u) = (9a - b) + (a + 9b)u
                     */
                     element_fp2 mul_xi() {
-                        return element_fp2({data[0].dbl().dbl().dbl() + data[0] - data[1], data[1].dbl().dbl().dbl() + data[1] + data[0]});
+                        return element_fp2({data[0].doubled().doubled().doubled() + data[0] - data[1],
+                                            data[1].doubled().doubled().doubled() + data[1] + data[0]});
                     }
 
                     /*
@@ -136,7 +138,7 @@ namespace nil {
                     1 * Fp neg
                     */
                     element_fp2 mul_x() {
-                        return element_fp2({- data[1], data[0]});
+                        return element_fp2({-data[1], data[0]});
                     }
 
                     // z = x * b
@@ -167,8 +169,8 @@ namespace nil {
                         return element_fp2({divBy4(data[0]), divBy4(data[1])});
                     }
 
-                    element_fp2 dbl() const {
-                        return element_fp2({data[0].dbl(), data[1].dbl()});
+                    element_fp2 doubled() const {
+                        return element_fp2({data[0].doubled(), data[1].doubled()});
                     }
 
                     element_fp2 sqrt() const {
@@ -209,7 +211,7 @@ namespace nil {
                         return x;
                     }
 
-                    element_fp2 square() const {
+                    element_fp2 squared() const {
                         return (*this) * (*this);    // maybe can be done more effective
                     }
 
@@ -218,37 +220,35 @@ namespace nil {
                         return element_fp2(power(*this, pwr));
                     }
 
-                    element_fp2 inverse() const {
+                    element_fp2 inversed() const {
 
-                        /* From "High-Speed Software Implementation of the Optimal Ate Pairing over Barreto-Naehrig Curves";
-                         * Algorithm 8 */
+                        /* From "High-Speed Software Implementation of the Optimal Ate Pairing over Barreto-Naehrig
+                         * Curves"; Algorithm 8 */
 
                         const underlying_type &A0 = data[0], &A1 = data[1];
 
-                        const underlying_type t0 = A0.square();
-                        const underlying_type t1 = A1.square();
+                        const underlying_type t0 = A0.squared();
+                        const underlying_type t1 = A1.squared();
                         const underlying_type t2 = t0 - non_residue * t1;
-                        const underlying_type t3 = t2.inverse();
+                        const underlying_type t3 = t2.inversed();
                         const underlying_type c0 = A0 * t3;
                         const underlying_type c1 = -(A1 * t3);
 
                         return element_fp2({c0, c1});
                     }
-
-
                 };
 
-                template <typename FieldParams>
+                template<typename FieldParams>
                 element_fp2<FieldParams> addNC(const element_fp2<FieldParams> &A, const element_fp2<FieldParams> &B) {
                 }
 
-                template <typename FieldParams>
+                template<typename FieldParams>
                 element_fp2<FieldParams> subNC(const element_fp2<FieldParams> &A, const element_fp2<FieldParams> &B) {
                 }
-                
-            }   // namespace detail
-        }   // namespace fields
-    }    // namespace algebra
+
+            }    // namespace detail
+        }        // namespace fields
+    }            // namespace algebra
 }    // namespace nil
 
 #endif    // ALGEBRA_FIELDS_ELEMENT_FP2_HPP

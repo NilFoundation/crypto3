@@ -10,9 +10,6 @@
 #ifndef ALGEBRA_FILEDS_FP12_2OVER3OVER2_DOUBLE_HPP
 #define ALGEBRA_FILEDS_FP12_2OVER3OVER2_DOUBLE_HPP
 
-#include <boost/multiprecision/number.hpp>
-#include <boost/multiprecision/cpp_int.hpp>
-
 #include <nil/algebra/fields/fp.hpp>
 
 namespace nil {
@@ -21,7 +18,8 @@ namespace nil {
             namespace detail {
 
                 template<std::size_t ModulusBits, std::size_t GeneratorBits>
-                struct double_element_fp12_2over3over2 : public double_element<fp12_2over3over2<ModulusBits, GeneratorBits>> {
+                struct double_element_fp12_2over3over2
+                    : public double_element<fp12_2over3over2<ModulusBits, GeneratorBits>> {
 
                     using underlying_type = double_element_fp6_3over2<ModulusBits, GeneratorBits>;
 
@@ -30,7 +28,7 @@ namespace nil {
                     value_type data;
 
                     double_element_fp12_2over3over2(type data) : data(data);
-                        
+
                     inline static double_element_fp12_2over3over2 zero() const {
                         return {underlying_type::zero(), underlying_type::zero()};
                     }
@@ -52,28 +50,29 @@ namespace nil {
                     }
 
                     double_element_fp12_2over3over2 operator-() const {
-                        return zero()-data;
-                    }
-                    
-                    //data + data
-                    double_element_fp12_2over3over2 dbl() const {
-                        return {data[0].dbl(), data[1].dbl()};
+                        return zero() - data;
                     }
 
-                    double_element_fp12_2over3over2 addNC(const double_element_fp12_2over3over2 &B){
+                    // data + data
+                    double_element_fp12_2over3over2 doubled() const {
+                        return {data[0].doubled(), data[1].doubled()};
+                    }
+
+                    double_element_fp12_2over3over2 addNC(const double_element_fp12_2over3over2 &B) {
                         return {addNC(data[0] + B.data[0]), addNC(data[1] + B.data[1])};
                     }
 
-                    double_element_fp12_2over3over2 subNC(const double_element_fp12_2over3over2 &B){
+                    double_element_fp12_2over3over2 subNC(const double_element_fp12_2over3over2 &B) {
                         return {subNC(data[0] + B.data[0]), subNC(data[1] + B.data[1])};
                     }
 
-                    element<fp12_2over3over2> mod(){
+                    element<fp12_2over3over2> mod() {
                         return {data[0].mod(), data[1].mod()};
                     }
                 };
 
-                double_element_fp12_2over3over2 mul(const element<fp12_2over3over2> &A, const element<fp12_2over3over2> &B) {
+                double_element_fp12_2over3over2 mul(const element<fp12_2over3over2> &A,
+                                                    const element<fp12_2over3over2> &B) {
                 }
 
                 /*
@@ -186,7 +185,8 @@ namespace nil {
                     26 * Fp2::add/sub
                     call:2
                 */
-                double_element_fp12_2over3over2 mul_Fp2_024_Fp2_024(const element_fp6_3over2 &B1, const element_fp6_3over2 &B2) {
+                double_element_fp12_2over3over2 mul_Fp2_024_Fp2_024(const element_fp6_3over2 &B1,
+                                                                    const element_fp6_3over2 &B2) {
                     element<fp2> &z0 = z.a_.a_;
                     element<fp2> &z1 = z.a_.b_;
                     element<fp2> &z2 = z.a_.c_;
@@ -249,22 +249,22 @@ namespace nil {
                  */
                 static inline void sq_Fp4UseDbl(Fp2 &z0, Fp2 &z1, const Fp2 &x0, const Fp2 &x1) {
                     Fp2Dbl T0, T1, T2;
-                    Fp2Dbl::square(T0, x0);
-                    Fp2Dbl::square(T1, x1);
+                    T0 = x0.squared();
+                    T1 = x1.squared();
                     Fp2Dbl::mul_xi(T2, T1);
                     T2 += T0;
                     z1 = x0 + x1;
                     Fp2Dbl::mod(z0, T2);
                     // overwrite z[0] (position 0).
-                    Fp2Dbl::square(T2, z1);
+                    T2 = z1.squared();
                     T2 -= T0;
                     T2 -= T1;
                     Fp2Dbl::mod(z1, T2);
                 }
 
             }    // namespace detail
-        }   // namespace fields
-    }    // namespace algebra
+        }        // namespace fields
+    }            // namespace algebra
 }    // namespace nil
 
 #endif    // ALGEBRA_FILEDS_FP12_2OVER3OVER2_DOUBLE_HPP

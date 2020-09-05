@@ -62,7 +62,7 @@ void fields_fp_basic_math_examples()
     std::cout << "e3 value: ";
     print_field_element(e3);
 
-    value_type e1e2 = e1 * e2, e1sqr = e1.square();
+    value_type e1e2 = e1 * e2, e1sqr = e1.squared();
 
     std::cout << "e1 * e2 value: ";
     print_field_element(e1e2);
@@ -72,7 +72,7 @@ void fields_fp_basic_math_examples()
 
     std::cout << "e1 square square value: " ;
 
-    print_field_element(e1.square().square());
+    print_field_element(e1.squared().squared());
 
     std::cout << "e1 pow 4 value: " ;
 
@@ -97,9 +97,9 @@ void fields_fp_basic_math_examples()
 
     print_field_element(complex_eq1);
 
-    std::cout << "Double e1 value: " ;
+    std::cout << "Doubled e1 value: " ;
 
-    print_field_element(e1.dbl());
+    print_field_element(e1.doubled());
 
     e1 += e2;
 
@@ -109,7 +109,7 @@ void fields_fp_basic_math_examples()
 
     //std::cout << "e1 inversed value: " ;
 
-    //print_field_element(e1.inverse());
+    //print_field_element(e1.inversed());
 }
 
 template <typename Fp2Field>
@@ -146,7 +146,7 @@ void fields_fp2_basic_math_examples()
     std::cout << "e3 value: ";
     print_field_element(e3);
 
-    value_type e1e2 = e1 * e2, e1sqr = e1.square();
+    value_type e1e2 = e1 * e2, e1sqr = e1.squared();
 
     std::cout << "e1 * e2 value: ";
     print_field_element(e1e2);
@@ -156,7 +156,7 @@ void fields_fp2_basic_math_examples()
 
     std::cout << "e1 square square value: " ;
 
-    print_field_element(e1.square().square());
+    print_field_element(e1.squared().squared());
 
     std::cout << "e1 pow 4 value: " ;
 
@@ -181,9 +181,9 @@ void fields_fp2_basic_math_examples()
 
     print_field_element(complex_eq1);
 
-    std::cout << "Double e1 value: " ;
+    std::cout << "Doubled e1 value: " ;
 
-    print_field_element(e1.dbl());
+    print_field_element(e1.doubled());
 
     e1 += e2;
 
@@ -193,7 +193,7 @@ void fields_fp2_basic_math_examples()
 
     //std::cout << "e1 inversed value: " ;
 
-    //print_field_element(e1.inverse());
+    //print_field_element(e1.inversed());
 }
 
 int main()

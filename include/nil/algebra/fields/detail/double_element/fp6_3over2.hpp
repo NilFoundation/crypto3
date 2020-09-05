@@ -10,9 +10,6 @@
 #ifndef ALGEBRA_FIELDS_FP6_3OVER2_DOUBLE_HPP
 #define ALGEBRA_FIELDS_FP6_3OVER2_DOUBLE_HPP
 
-#include <boost/multiprecision/number.hpp>
-#include <boost/multiprecision/cpp_int.hpp>
-
 #include <nil/algebra/fields/fp.hpp>
 
 namespace nil {
@@ -21,7 +18,7 @@ namespace nil {
             namespace detail {
 
                 template<std::size_t ModulusBits, std::size_t GeneratorBits>
-                struct double_element_fp6_3over2: public double_element<fp6_3over2<ModulusBits, GeneratorBits>> {
+                struct double_element_fp6_3over2 : public double_element<fp6_3over2<ModulusBits, GeneratorBits>> {
 
                     using underlying_type = double_element_fp2<ModulusBits, GeneratorBits>;
 
@@ -31,7 +28,6 @@ namespace nil {
 
                     double_element_fp6_3over2(type data) : data(data);
 
-                        
                     inline static double_element_fp6_3over2 zero() const {
                         return {underlying_type::zero(), underlying_type::zero(), underlying_type::zero()};
                     }
@@ -53,27 +49,25 @@ namespace nil {
                     }
 
                     double_element_fp6_3over2 operator-() const {
-                        return zero()-data;
-                    }
-                    
-                    //data + data
-                    double_element_fp6_3over2 dbl() const {
-                        return {data[0].dbl(), data[1].dbl(), data[2].dbl()};
+                        return zero() - data;
                     }
 
-                    double_element_fp6_3over2 addNC(const double_element_fp6_3over2 &B){
+                    // data + data
+                    double_element_fp6_3over2 doubled() const {
+                        return {data[0].doubled(), data[1].doubled(), data[2].doubled()};
+                    }
+
+                    double_element_fp6_3over2 addNC(const double_element_fp6_3over2 &B) {
                         return {addNC(data[0] + B.data[0]), addNC(data[1] + B.data[1]), addNC(data[2] + B.data[2])};
                     }
 
-                    double_element_fp6_3over2 subNC(const double_element_fp6_3over2 &B){
+                    double_element_fp6_3over2 subNC(const double_element_fp6_3over2 &B) {
                         return {subNC(data[0] + B.data[0]), subNC(data[1] + B.data[1]), subNC(data[2] + B.data[2])};
                     }
 
-                    element_fp6_3over2 mod(){
+                    element_fp6_3over2 mod() {
                         return {data[0].mod(), data[1].mod(), B.data[2].mod()};
                     }
-
-
                 };
 
                 double_element_fp6_3over2 mul(const element<fp6_3over2> &A, const element<fp6_3over2> &B) {
@@ -122,7 +116,7 @@ namespace nil {
                     // # 19
                     T2 = addNC(T2, T0);
                     // # 20
-                    z.c_.a_ = z.c_.a_- T2.a_;
+                    z.c_.a_ = z.c_.a_ - T2.a_;
                     // # 22
                     z.c_.a_ = z.c_.a_ + T1.a_;
                     // # 21
@@ -151,11 +145,11 @@ namespace nil {
                     // xp, yp = P[0], P[1]
 
                     // # 1
-                    t0 = R[2].square();
+                    t0 = R[2].squared();
                     t4 = R[0] * R[1];
-                    t1 = R[1].square();
+                    t1 = R[1].squared();
                     // # 2
-                    t3 = t0.dbl();
+                    t3 = t0.doubled();
                     t4 = t4.divBy2();
                     t5 = t0 + t1;
                     // # 3
@@ -174,8 +168,8 @@ namespace nil {
                         t2 = t0 * ParamT<Fp2>::b_invxi;
                     }
                     // # 5
-                    t0 = R[0].square();
-                    t3 = t2.dbl();
+                    t0 = R[0].squared();
+                    t3 = t2.doubled();
                     // ## 6
                     t3 += t2;
                     l.c_ = addNC(t0, t0);
@@ -187,15 +181,15 @@ namespace nil {
                     R[0] *= t4;
                     t3 = t3.divBy2();
                     // ## 9
-                    T0 = t3.square();
-                    T1 = t2.square();
+                    T0 = t3.squared();
+                    T1 = t2.squared();
                     // # 10
                     T2 = addNC(T1, T1);
                     t3 = R[1] + R[2];
                     // # 11
                     T2 = T2 + T1;
 
-                    t3 = t3.square();
+                    t3 = t3.squared();
                     // # 12
                     t3 -= t5;
                     // # 13
@@ -232,10 +226,10 @@ namespace nil {
                     t1 = R[0] - t1;
                     t2 = R[1] - t2;
                     // # 3
-                    t3 = t1.square();
+                    t3 = t1.squared();
                     // # 4
                     R[0] = t3 * R[0];
-                    t4 = t2.square();
+                    t4 = t2.squared();
                     // # 5
                     t3 *= t1;
                     t4 *= R[2];
@@ -257,7 +251,7 @@ namespace nil {
                     R[0] = t1 * t4;
                     R[2] = t3 * R[2];
                     // # 14
-                    l.c_ = - t2;
+                    l.c_ = -t2;
                     // # 15
                     T1 = mulOpt1(t2, Q[0]);
                     T2 = mulOpt1(t1, Q[1]);
@@ -270,14 +264,14 @@ namespace nil {
                     l.a_ = t2.mul_xi();
                     l.b_ = t1;
                 }
-                
+
                 double_element_fp6_3over2 pointAddLineEval(element_fp2 *R, const element_fp2 *Q, const element<fp> *P) {
                     return pointAddLineEvalWithoutP(R, Q).mulFp6_24_Fp_01(P);
                 }
 
             }    // namespace detail
-        }   // namespace fields
-    }    // namespace algebra
+        }        // namespace fields
+    }            // namespace algebra
 }    // namespace nil
 
 #endif    // ALGEBRA_FF_FP6_3OVER2_DOUBLE_HPP

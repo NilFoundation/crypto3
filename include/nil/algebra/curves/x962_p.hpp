@@ -10,7 +10,8 @@
 #ifndef ALGEBRA_CURVES_X962_P_HPP
 #define ALGEBRA_CURVES_X962_P_HPP
 
-#include <nil/crypto3/algebra/curves/detail/element/curve_weierstrass.hpp>
+#include <nil/crypto3/algebra/curves/detail/x962_p/g1.hpp>
+#include <nil/crypto3/algebra/curves/detail/x962_p/g2.hpp>
 
 #include <nil/algebra/fields/x962_p/fq.hpp>
 #include <nil/algebra/fields/x962_p/fr.hpp>
@@ -41,8 +42,6 @@ namespace nil {
                 typedef fields::x962_p_v2_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
                 constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
 
-                typedef typename detail::element_curve_weierstrass<base_field_type::value_type> value_type;
-
                 constexpr static const number_type p = base_field_modulus;
                 constexpr static const number_type q = scalar_field_modulus;
 
@@ -63,8 +62,6 @@ namespace nil {
                 typedef fields::x962_p_v2_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
                 constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
 
-                typedef typename detail::element_curve_weierstrass<base_field_type::value_type> value_type;
-
                 constexpr static const number_type p = base_field_modulus;
                 constexpr static const number_type q = scalar_field_modulus;
 
@@ -84,8 +81,6 @@ namespace nil {
                 constexpr static const std::size_t scalar_field_bits = 239;
                 typedef fields::x962_p_v1_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
                 constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
-
-                typedef typename detail::element_curve_weierstrass<base_field_type::value_type> value_type;
 
                 constexpr static const number_type p = base_field_modulus;
                 constexpr static const number_type q = scalar_field_modulus;
@@ -111,8 +106,6 @@ namespace nil {
                 typedef fields::x962_p_v2_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
                 constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
 
-                typedef typename detail::element_curve_weierstrass<base_field_type::value_type> value_type;
-
                 constexpr static const number_type p = base_field_modulus;
                 constexpr static const number_type q = scalar_field_modulus;
 
@@ -136,8 +129,6 @@ namespace nil {
                 constexpr static const std::size_t scalar_field_bits = 239;
                 typedef fields::x962_p_v3_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
                 constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
-
-                typedef typename detail::element_curve_weierstrass<base_field_type::value_type> value_type;
 
                 constexpr static const number_type p = base_field_modulus;
                 constexpr static const number_type q = scalar_field_modulus;

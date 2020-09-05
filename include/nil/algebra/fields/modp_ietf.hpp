@@ -29,7 +29,7 @@ namespace nil {
             template<std::size_t ModulusBits, std::size_t GeneratorBits = CHAR_BIT>
             struct modp_ietf : public field<ModulusBits, GeneratorBits> { };
 
-            template <>
+            template<>
             struct modp_ietf<1024, CHAR_BIT> : public field<1024, CHAR_BIT> {
                 typedef field<1024, CHAR_BIT> policy_type;
 
@@ -44,12 +44,13 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x02;
 
-                typedef typename detail::element_fp<detail::arithmetic_params<modp_ietf<modulus_bits, generator_bits>>> value_type;
+                typedef typename detail::element_fp<detail::arithmetic_params<modp_ietf<modulus_bits, generator_bits>>>
+                    value_type;
 
                 constexpr static const std::size_t arity = 1;
             };
 
-            template <>
+            template<>
             struct modp_ietf<1536, CHAR_BIT> : public field<1536, CHAR_BIT> {
                 typedef field<1536, CHAR_BIT> policy_type;
 
@@ -64,12 +65,13 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x02;
 
-                typedef typename detail::element_fp<detail::arithmetic_params<modp_ietf<modulus_bits, generator_bits>>> value_type;
+                typedef typename detail::element_fp<detail::arithmetic_params<modp_ietf<modulus_bits, generator_bits>>>
+                    value_type;
 
                 constexpr static const std::size_t arity = 1;
             };
 
-            template <>
+            template<>
             struct modp_ietf<2048, CHAR_BIT> : public field<2048, CHAR_BIT> {
                 typedef field<2048, CHAR_BIT> policy_type;
 
@@ -84,12 +86,13 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x02;
 
-                typedef typename detail::element_fp<detail::arithmetic_params<modp_ietf<modulus_bits, generator_bits>>> value_type;
+                typedef typename detail::element_fp<detail::arithmetic_params<modp_ietf<modulus_bits, generator_bits>>>
+                    value_type;
 
                 constexpr static const std::size_t arity = 1;
             };
 
-            template <>
+            template<>
             struct modp_ietf<3072, CHAR_BIT> : public field<3072, CHAR_BIT> {
                 typedef field<3072, CHAR_BIT> policy_type;
 
@@ -104,12 +107,13 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x02;
 
-                typedef typename detail::element_fp<detail::arithmetic_params<modp_ietf<modulus_bits, generator_bits>>> value_type;
+                typedef typename detail::element_fp<detail::arithmetic_params<modp_ietf<modulus_bits, generator_bits>>>
+                    value_type;
 
                 constexpr static const std::size_t arity = 1;
             };
 
-            template <>
+            template<>
             struct modp_ietf<4096, CHAR_BIT> : public field<4096, CHAR_BIT> {
                 typedef field<4096, CHAR_BIT> policy_type;
 
@@ -124,12 +128,13 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x02;
 
-                typedef typename detail::element_fp<detail::arithmetic_params<modp_ietf<modulus_bits, generator_bits>>> value_type;
+                typedef typename detail::element_fp<detail::arithmetic_params<modp_ietf<modulus_bits, generator_bits>>>
+                    value_type;
 
                 constexpr static const std::size_t arity = 1;
             };
 
-            template <>
+            template<>
             struct modp_ietf<6144, CHAR_BIT> : public field<6144, CHAR_BIT> {
                 typedef field<6144, CHAR_BIT> policy_type;
 
@@ -144,12 +149,13 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x02;
 
-                typedef typename detail::element_fp<detail::arithmetic_params<modp_ietf<modulus_bits, generator_bits>>> value_type;
+                typedef typename detail::element_fp<detail::arithmetic_params<modp_ietf<modulus_bits, generator_bits>>>
+                    value_type;
 
                 constexpr static const std::size_t arity = 1;
             };
 
-            template <>
+            template<>
             struct modp_ietf<8192, CHAR_BIT> : public field<8192, CHAR_BIT> {
                 typedef field<8192, CHAR_BIT> policy_type;
 
@@ -164,16 +170,19 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x02;
 
-                typedef typename detail::element_fp<detail::arithmetic_params<modp_ietf<modulus_bits, generator_bits>>> value_type;
+                typedef typename detail::element_fp<detail::arithmetic_params<modp_ietf<modulus_bits, generator_bits>>>
+                    value_type;
 
                 constexpr static const std::size_t arity = 1;
             };
 
             template<std::size_t ModulusBits, std::size_t GeneratorBits>
-            constexpr typename modp_ietf<ModulusBits, GeneratorBits>::modulus_type const modp_ietf<ModulusBits, GeneratorBits>::modulus;
+            constexpr typename modp_ietf<ModulusBits, GeneratorBits>::modulus_type const
+                modp_ietf<ModulusBits, GeneratorBits>::modulus;
 
             template<std::size_t ModulusBits, std::size_t GeneratorBits>
-            constexpr typename modp_ietf<ModulusBits, GeneratorBits>::generator_type const modp_ietf<ModulusBits, GeneratorBits>::mul_generator;
+            constexpr typename modp_ietf<ModulusBits, GeneratorBits>::generator_type const
+                modp_ietf<ModulusBits, GeneratorBits>::mul_generator;
 
             constexpr typename modp_ietf<1024, CHAR_BIT>::modulus_type const modp_ietf<1024, CHAR_BIT>::modulus;
             constexpr typename modp_ietf<1536, CHAR_BIT>::modulus_type const modp_ietf<1536, CHAR_BIT>::modulus;
@@ -190,7 +199,7 @@ namespace nil {
             constexpr typename modp_ietf<4096, CHAR_BIT>::generator_type const modp_ietf<4096, CHAR_BIT>::mul_generator;
             constexpr typename modp_ietf<6144, CHAR_BIT>::generator_type const modp_ietf<6144, CHAR_BIT>::mul_generator;
             constexpr typename modp_ietf<8192, CHAR_BIT>::generator_type const modp_ietf<8192, CHAR_BIT>::mul_generator;
-    }    // namespace algebra
-}    // namespace nil
+        }    // namespace algebra
+    }        // namespace nil
 
 #endif    // ALGEBRA_FIELDS_MODP_IETF_HPP

@@ -42,12 +42,11 @@ macro(define_algebra_test name)
 
 endmacro()
 
-set(TESTS_NAMES
-    "curves"
-    "fields"
-    #"groups"
-    #"bilinearity"
-    )
+set(TESTS_NAMES 
+"curves"
+"fields"
+"pairing"
+)
 
 foreach(TEST_NAME ${TESTS_NAMES})
     define_algebra_test(${TEST_NAME})

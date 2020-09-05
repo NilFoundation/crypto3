@@ -29,7 +29,7 @@ namespace nil {
             template<std::size_t ModulusBits, std::size_t GeneratorBits = CHAR_BIT>
             struct ffdhe_ietf : public field<ModulusBits, GeneratorBits> { };
 
-            template <>
+            template<>
             struct ffdhe_ietf<2048, CHAR_BIT> : public field<2048, CHAR_BIT> {
                 typedef field<2048, CHAR_BIT> policy_type;
 
@@ -44,7 +44,8 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x02;
 
-                typedef typename detail::element_fp<detail::arithmetic_params<ffdhe_ietf<modulus_bits, generator_bits>>> value_type;
+                typedef typename detail::element_fp<detail::arithmetic_params<ffdhe_ietf<modulus_bits, generator_bits>>>
+                    value_type;
 
                 constexpr static const std::size_t arity = 1;
             };
@@ -64,12 +65,13 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x02;
 
-                typedef typename detail::element_fp<detail::arithmetic_params<ffdhe_ietf<modulus_bits, generator_bits>>> value_type;
+                typedef typename detail::element_fp<detail::arithmetic_params<ffdhe_ietf<modulus_bits, generator_bits>>>
+                    value_type;
 
                 constexpr static const std::size_t arity = 1;
             };
 
-            template <>
+            template<>
             struct ffdhe_ietf<4096, CHAR_BIT> : public field<4096, CHAR_BIT> {
                 typedef field<4096, CHAR_BIT> policy_type;
 
@@ -84,12 +86,13 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x02;
 
-                typedef typename detail::element_fp<detail::arithmetic_params<ffdhe_ietf<modulus_bits, generator_bits>>> value_type;
+                typedef typename detail::element_fp<detail::arithmetic_params<ffdhe_ietf<modulus_bits, generator_bits>>>
+                    value_type;
 
                 constexpr static const std::size_t arity = 1;
             };
 
-            template <>
+            template<>
             struct ffdhe_ietf<6144, CHAR_BIT> : public field<6144, CHAR_BIT> {
                 typedef field<6144, CHAR_BIT> policy_type;
 
@@ -104,12 +107,13 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x02;
 
-                typedef typename detail::element_fp<detail::arithmetic_params<ffdhe_ietf<modulus_bits, generator_bits>>> value_type;
+                typedef typename detail::element_fp<detail::arithmetic_params<ffdhe_ietf<modulus_bits, generator_bits>>>
+                    value_type;
 
                 constexpr static const std::size_t arity = 1;
             };
 
-            template <>
+            template<>
             struct ffdhe_ietf<8192, CHAR_BIT> : public field<8192, CHAR_BIT> {
                 typedef field<8192, CHAR_BIT> policy_type;
 
@@ -124,7 +128,8 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x02;
 
-                typedef typename detail::element_fp<detail::arithmetic_params<ffdhe_ietf<modulus_bits, generator_bits>>> value_type;
+                typedef typename detail::element_fp<detail::arithmetic_params<ffdhe_ietf<modulus_bits, generator_bits>>>
+                    value_type;
 
                 constexpr static const std::size_t arity = 1;
             };
@@ -135,14 +140,19 @@ namespace nil {
             constexpr typename ffdhe_ietf<6144, CHAR_BIT>::modulus_type const ffdhe_ietf<6144, CHAR_BIT>::modulus;
             constexpr typename ffdhe_ietf<8192, CHAR_BIT>::modulus_type const ffdhe_ietf<8192, CHAR_BIT>::modulus;
 
-            constexpr typename ffdhe_ietf<2048, CHAR_BIT>::generator_type const ffdhe_ietf<2048, CHAR_BIT>::mul_generator;
-            constexpr typename ffdhe_ietf<3072, CHAR_BIT>::generator_type const ffdhe_ietf<3072, CHAR_BIT>::mul_generator;
-            constexpr typename ffdhe_ietf<4096, CHAR_BIT>::generator_type const ffdhe_ietf<4096, CHAR_BIT>::mul_generator;
-            constexpr typename ffdhe_ietf<6144, CHAR_BIT>::generator_type const ffdhe_ietf<6144, CHAR_BIT>::mul_generator;
-            constexpr typename ffdhe_ietf<8192, CHAR_BIT>::generator_type const ffdhe_ietf<8192, CHAR_BIT>::mul_generator;
+            constexpr
+                typename ffdhe_ietf<2048, CHAR_BIT>::generator_type const ffdhe_ietf<2048, CHAR_BIT>::mul_generator;
+            constexpr
+                typename ffdhe_ietf<3072, CHAR_BIT>::generator_type const ffdhe_ietf<3072, CHAR_BIT>::mul_generator;
+            constexpr
+                typename ffdhe_ietf<4096, CHAR_BIT>::generator_type const ffdhe_ietf<4096, CHAR_BIT>::mul_generator;
+            constexpr
+                typename ffdhe_ietf<6144, CHAR_BIT>::generator_type const ffdhe_ietf<6144, CHAR_BIT>::mul_generator;
+            constexpr
+                typename ffdhe_ietf<8192, CHAR_BIT>::generator_type const ffdhe_ietf<8192, CHAR_BIT>::mul_generator;
 
-        }   // namespace fields
-    }    // namespace algebra
+        }    // namespace fields
+    }        // namespace algebra
 }    // namespace nil
 
 #endif    // ALGEBRA_FIELDS_FFDHE_IETF_HPP

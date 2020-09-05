@@ -29,7 +29,7 @@ namespace nil {
             template<std::size_t ModulusBits, std::size_t GeneratorBits = ModulusBits>
             struct dsa_jce : public field<ModulusBits, GeneratorBits> { };
 
-            template <>
+            template<>
             struct dsa_jce<1024, 1024> : public field<1024, 1024> {
                 typedef field<1024, 1024> policy_type;
 
@@ -44,8 +44,9 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator =
                     0x469603512E30278CD3947595DB22EEC9826A6322ADC97344F41D740C325724C8F9EFBAA7D4D803FF8C609DCD100EBC5BDFCFAD7C6A425FAEA786EA2050EBE98351EA1FDA1FDF24D6947AA6B9AA23766953802F4D7D4A8ECBA06D19768A2491FFB16D0EF9C43A99B5F71672FF6F0A24B444D0736D04D38A1A1322DAF6CDD88C9D_cppui1024;
-                
-                typedef typename detail::element_fp<detail::arithmetic_params<dsa_jce<modulus_bits, generator_bits>>> value_type;
+
+                typedef typename detail::element_fp<detail::arithmetic_params<dsa_jce<modulus_bits, generator_bits>>>
+                    value_type;
 
                 constexpr static const std::size_t arity = 1;
             };
@@ -53,8 +54,8 @@ namespace nil {
             constexpr typename dsa_jce<1024, 1024>::modulus_type const dsa_jce<1024, 1024>::modulus;
 
             constexpr typename dsa_jce<1024, 1024>::generator_type const dsa_jce<1024, 1024>::mul_generator;
-        }   // namespace fields
-    }    // namespace algebra
+        }    // namespace fields
+    }        // namespace algebra
 }    // namespace nil
 
 #endif    // ALGEBRA_FIELDS_DSA_JCE_HPP

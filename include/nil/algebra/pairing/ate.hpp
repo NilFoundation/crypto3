@@ -14,8 +14,10 @@
 #include <vector>
 
 namespace nil {
-    namespace algebra{
-        namespace pairing{
+    namespace algebra {
+        namespace pairing {
+
+            using nil::algebra;
 
             /*
                 calc optimal ate pairing
@@ -24,31 +26,34 @@ namespace nil {
                 @param P [in] affine coord. (P[0], P[1])
                 @note not defined for infinity point
             */
-            void opt_atePairing(fp12 &f, const element_fp2 Q[2], const element_fp P[2]) {
-                element_fp2 T[3];
+            template<typename Params>
+            void opt_atePairing(element_fp12<Params> &f, const element_fp2<Params> Q[2],
+                                const element_fp<Params> P[2]) {
+                element_fp2<Params> T[3];
                 T[0] = Q[0];
                 T[1] = Q[1];
-                T[2] = element_fp2({1,0});
-                element_fp2 Qneg[2];
-                if (Param::useNAF) {
+                T[2] = element_fp2({1, 0});
+                element_fp2<Params> Qneg[2];
+
+                if (useNAF) {
                     Qneg[0] = Q[0];
                     Qneg[1] = -Q[1];
                 }
                 // at 1.
-                element_fp6 d;
-                d = pointDblLineEval(T, P);
+                element_fp6<Params> d;
+                d = fields::detail::pointDblLineEval(T, P);
                 element_fp6 e;
                 assert(Param::siTbl[1] == 1);
-                e = pointAddLineEval(T, Q, P);
-                f = mul_Fp2_024_Fp2_024(d, e);
+                e = fields::detail::pointAddLineEval(T, Q, P);
+                f = fields::detail::mul_Fp2_024_Fp2_024(d, e);
                 // loop from 2.
                 element_fp6 l;
                 // 844kclk
                 for (size_t i = 2; i < Param::siTbl.size(); i++) {
                     // 3.6k x 63
-                    l = pointDblLineEval(T, P);
+                    l = fields::detail::pointDblLineEval(T, P);
                     // 4.7k x 63
-                    f = f.square();
+                    f = f.squared();
                     // 4.48k x 63
                     f = mul_Fp2_024(l);
 
@@ -72,10 +77,10 @@ namespace nil {
                 Q2[1] = -Q2[1];
 
                 element_fp12 ft;
-                d = pointAddLineEval(T, Q1, P);          // 5k
-                e = pointAddLineEval(T, Q2, P);          // 5k
+                d = pointAddLineEval(T, Q1, P);    // 5k
+                e = pointAddLineEval(T, Q2, P);    // 5k
                 ft = mul_Fp2_024_Fp2_024(d, e);    // 2.7k
-                f = f * ft;                         // 6.4k
+                f = f * ft;                        // 6.4k
                 // final exponentiation
                 f.final_exp();
             }
@@ -109,9 +114,9 @@ namespace nil {
                 }
                 opt_atePairing<Fp>(f, Q.p, P.p);
             }
-                /*
-                    inQ[3] : permit not-normalized
-                */
+            /*
+                inQ[3] : permit not-normalized
+            */
             inline void precomputeG2(std::vector<element_fp6> &coeff, element_fp2 Q[3], const element_fp2 inQ[3]) {
                 detail::NormalizeJac(Q, inQ);
 
@@ -125,11 +130,11 @@ namespace nil {
                     Qneg[1] = -Q[1];
                 }
 
-                coeff.push_back(pointDblLineEvalWithoutP(T));
+                coeff.push_back(fields::detail::pointDblLineEvalWithoutP(T));
                 coeff.push_back(pointAddLineEvalWithoutP(T, Q));
 
                 for (size_t i = 2; i < Param::siTbl.size(); i++) {
-                    coeff.push_back(pointDblLineEvalWithoutP(T));
+                    coeff.push_back(fields::detail::pointDblLineEvalWithoutP(T));
 
                     if (Param::siTbl[i] > 0) {
                         coeff.push_back(pointAddLineEvalWithoutP(T, Q));
@@ -154,7 +159,7 @@ namespace nil {
                 precP : normalized point
             */
             inline void millerLoop(Fp12 &f, const std::vector<element_fp6> &Qcoeff, const element_fp precP[2]) {
-                
+
                 size_t idx = 0;
 
                 element_fp6_3over2 d = Qcoeff[idx];
@@ -170,7 +175,7 @@ namespace nil {
                 for (size_t i = 2; i < Param::siTbl.size(); i++) {
                     l = Qcoeff[idx].mulFp6_24_Fp_01(precP);
                     idx++;
-                    f = f.square();
+                    f = f.squared();
 
                     f = mul_Fp2_024(l);
 
@@ -204,11 +209,11 @@ namespace nil {
 
                 element_fp12 f1;
                 element_fp6 e1 = Q1coeff[idx].mulFp6_24_Fp_01(precP1);
-                f1 = mul_Fp2_024_Fp2_024(d1, e1);
+                f1 = fields::detail::mul_Fp2_024_Fp2_024(d1, e1);
 
                 element_fp12 f2;
                 element_fp6 e2 = Q2coeff[idx].mulFp6_24_Fp_01(precP2);
-                f2 = mul_Fp2_024_Fp2_024(d2, e2);
+                f2 = fields::detail::mul_Fp2_024_Fp2_024(d2, e2);
                 f = f1 * f2;
 
                 idx++;
@@ -217,7 +222,7 @@ namespace nil {
                     l1 = Q1coeff[idx];
                     l2 = Q2coeff[idx];
                     idx++;
-                    f = f.square();
+                    f = f.squared();
 
                     l1 = l1.mulFp6_24_Fp_01(precP1);
                     l2 = l2.mulFp6_24_Fp_01(precP2);
@@ -250,8 +255,8 @@ namespace nil {
                 f *= f2;
             }
 
-        }       // namespace pairing
-    }       // namespace algebra
+        }    // namespace pairing
+    }        // namespace algebra
 }    // namespace nil
 
 #endif    // ALGEBRA_PAIRING_ATE_HPP
