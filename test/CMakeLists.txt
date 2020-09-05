@@ -19,7 +19,7 @@ cm_test_link_libraries(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
                        ${Boost_LIBRARIES})
 
 
-macro(define_algebra_test name)
+macro(define_runtime_algebra_test name)
     cm_test(NAME algebra_${name}_test SOURCES ${name}.cpp)
 
     target_include_directories(algebra_${name}_test PRIVATE
@@ -38,16 +38,44 @@ macro(define_algebra_test name)
     endif()
 
     cm_test(NAME algebra_${name}_examples_test SOURCES ../example/${name}.cpp)
-    target_link_libraries(algebra_${name}_examples_test no_eh_support)
+    target_link_libraries(algebra_${name}_examples_test)
 
 endmacro()
 
-set(TESTS_NAMES 
-"curves"
-"fields"
-"pairing"
-)
+macro(define_compile_time_algebra_test name)
+    cm_test(NAME algebra_${name}_compile_test SOURCES ${name}.cpp COMPILE_ONLY)
 
-foreach(TEST_NAME ${TESTS_NAMES})
-    define_algebra_test(${TEST_NAME})
+    target_include_directories(algebra_${name}_compile_test PRIVATE
+                               "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+                               "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>"
+
+                               ${Boost_INCLUDE_DIRS})
+
+    set_target_properties(algebra_${name}_compile_test PROPERTIES CXX_STANDARD 17)
+
+    get_target_property(target_type Boost::unit_test_framework TYPE)
+    if(target_type STREQUAL "SHARED_LIB")
+        target_compile_definitions(algebra_${name}_compile_test PRIVATE BOOST_TEST_DYN_LINK)
+    elseif(target_type STREQUAL "STATIC_LIB")
+
+    endif()
+endmacro()
+
+set(RUNTIME_TESTS_NAMES
+    "curves"
+    "fields"
+    #"groups"
+    #"bilinearity"
+    )
+
+set(COMPILE_TIME_TESTS_NAMES
+    "matrix"
+    "vector")
+
+foreach(TEST_NAME ${RUNTIME_TESTS_NAMES})
+    define_runtime_algebra_test(${TEST_NAME})
+endforeach()
+
+foreach(TEST_NAME ${COMPILE_TIME_TESTS_NAMES})
+    define_compile_time_algebra_test(${TEST_NAME})
 endforeach()

@@ -14,7 +14,6 @@
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/multiprecision/modular/modular_adaptor.hpp>
 
-
 #include <nil/algebra/curves/bn128.hpp>
 #include <nil/algebra/curves/edwards.hpp>
 //#include <nil/algebra/curves/mnt4.hpp>
@@ -28,26 +27,28 @@
 
 using namespace nil::algebra;
 
-template <typename FpCurveGroup>
-void print_fp_curve_group_element (FpCurveGroup e){
+template<typename FpCurveGroup>
+void print_fp_curve_group_element(FpCurveGroup e) {
     std::cout << e.p[0].data << " " << e.p[1].data << " " << e.p[2].data << std::endl;
 }
 
-template <typename Fp2CurveGroup>
-void print_fp2_curve_group_element (Fp2CurveGroup e){
-    std::cout << "(" << e.p[0].data[0].data << " " << e.p[0].data[1].data << ") (" <<  e.p[1].data[0].data << " " << e.p[1].data[1].data << ") (" << e.p[2].data[0].data << " " << e.p[2].data[1].data << ")" << std::endl;
+template<typename Fp2CurveGroup>
+void print_fp2_curve_group_element(Fp2CurveGroup e) {
+    std::cout << "(" << e.p[0].data[0].data << " " << e.p[0].data[1].data << ") (" << e.p[1].data[0].data << " "
+              << e.p[1].data[1].data << ") (" << e.p[2].data[0].data << " " << e.p[2].data[1].data << ")" << std::endl;
 }
 
-template <typename Fp3CurveGroup>
-void print_fp3_curve_group_element (Fp3CurveGroup e){
-    std::cout << "(" << e.p[0].data[0].data << " " << e.p[0].data[1].data << e.p[0].data[2].data << ") (" <<  e.p[1].data[0].data << " " << e.p[1].data[1].data << e.p[1].data[2].data << ") (" << e.p[2].data[0].data << " " << e.p[2].data[1].data << e.p[2].data[2].data << ")" << std::endl;
+template<typename Fp3CurveGroup>
+void print_fp3_curve_group_element(Fp3CurveGroup e) {
+    std::cout << "(" << e.p[0].data[0].data << " " << e.p[0].data[1].data << e.p[0].data[2].data << ") ("
+              << e.p[1].data[0].data << " " << e.p[1].data[1].data << e.p[1].data[2].data << ") ("
+              << e.p[2].data[0].data << " " << e.p[2].data[1].data << e.p[2].data[2].data << ")" << std::endl;
 }
 
-//print dunctions can be made using arity in fields
+// print dunctions can be made using arity in fields
 
-template <typename FpCurveGroup>
-void fp_curve_group_basic_math_examples()
-{  
+template<typename FpCurveGroup>
+void fp_curve_group_basic_math_examples() {
     using policy_type = FpCurveGroup;
     using field_value_type = typename policy_type::underlying_field_type_value;
 
@@ -72,16 +73,14 @@ void fp_curve_group_basic_math_examples()
 
     policy_type cd = c1.doubled();
 
-    //policy_type cn = c1.normalize();
-    
-    //std::cout << "c1 normalized value: ";
-    //print_fp_curve_group_element(cn);
+    // policy_type cn = c1.normalize();
 
+    // std::cout << "c1 normalized value: ";
+    // print_fp_curve_group_element(cn);
 }
 
-template <typename Fp2CurveGroup>
-void fp2_curve_group_basic_math_examples()
-{  
+template<typename Fp2CurveGroup>
+void fp2_curve_group_basic_math_examples() {
     using policy_type = Fp2CurveGroup;
     using field_value_type = typename policy_type::underlying_field_type_value;
 
@@ -104,17 +103,15 @@ void fp2_curve_group_basic_math_examples()
     print_fp2_curve_group_element(c1.doubled());
 
     policy_type cd = c1.doubled();
-    
-    //policy_type cn = c1.normalize();
-    
-    //std::cout << "c1 normalized value: ";
-    //print_fp2_curve_group_element(cn);
 
+    // policy_type cn = c1.normalize();
+
+    // std::cout << "c1 normalized value: ";
+    // print_fp2_curve_group_element(cn);
 }
 
-template <typename Fp3CurveGroup>
-void fp3_curve_group_basic_math_examples()
-{  
+template<typename Fp3CurveGroup>
+void fp3_curve_group_basic_math_examples() {
     using policy_type = Fp3CurveGroup;
     using field_value_type = typename policy_type::underlying_field_type_value;
 
@@ -137,16 +134,14 @@ void fp3_curve_group_basic_math_examples()
     print_fp3_curve_group_element(c1.doubled());
 
     policy_type cd = c1.doubled();
-    
-    //policy_type cn = c1.normalize();
-    
-    //std::cout << "c1 normalized value: ";
-    //print_fp3_curve_group_element(cn);
 
+    // policy_type cn = c1.normalize();
+
+    // std::cout << "c1 normalized value: ";
+    // print_fp3_curve_group_element(cn);
 }
 
-int main()
-{
+int main() {
     std::cout << "BN128-254 curve g1 group basic math:" << std::endl;
     fp_curve_group_basic_math_examples<curves::bn128<254>::g1_type>();
 

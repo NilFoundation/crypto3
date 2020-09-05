@@ -48,7 +48,7 @@ using namespace nil::algebra;
 BOOST_AUTO_TEST_SUITE(fields_manual_tests)
 
 BOOST_AUTO_TEST_CASE(fields_manual_test1) {
-    
+
     using value_type = fields::dsa_botan<2048, 2048>::value_type;
 
     const fields::dsa_botan<2048, 2048>::modulus_type m = fields::dsa_botan<2048, 2048>::modulus;
@@ -71,14 +71,14 @@ BOOST_AUTO_TEST_CASE(fields_manual_test1) {
 
     std::cout << (e4 == e3);
 
-    //assert(e4 == e3);
+    // assert(e4 == e3);
     BOOST_CHECK_EQUAL(e4.data, e3.data);
 }
 BOOST_AUTO_TEST_SUITE_END()
 /*
 BOOST_AUTO_TEST_SUITE(fields_dsa_botan_tests)
 BOOST_AUTO_TEST_CASE(fields_dsa_botan_test1) {
-    
+
     using value_type = fields::dsa_botan<2048, 2048>::value_type;
 
     const fields::dsa_botan<2048, 2048>::modulus_type m = fields::dsa_botan<2048, 2048>::modulus;
@@ -105,7 +105,6 @@ BOOST_AUTO_TEST_CASE(fields_dsa_botan_test1) {
     BOOST_CHECK_EQUAL(value_type(4).data, e3.data);
 }
 BOOST_AUTO_TEST_SUITE_END()*/
-
 
 /*
 template<typename FieldType, typename NumberType>
@@ -280,13 +279,13 @@ void test_Fp4_tom_cook() {
         assert(v3 == -FieldType(15) * u * c0 - FieldType(30) * u * c1 - FieldType(3) * (FieldType(4) + beta) * u * c2 -
                          FieldType(6) * (FieldType(4) + beta) * u * c3 +
                          (FieldType(24) - FieldType(3) * beta * FieldType(2).inversed()) * u * v1 +
-                         (-FieldType(8) + beta * FieldType(2).inversed()) * u * v2 - FieldType(3) * (-FieldType(16) + beta) * v6);
-        assert(v4 == -FieldType(15) * u * c0 + FieldType(30) * u * c1 - FieldType(3) * (FieldType(4) + beta) * u * c2 +
-                         FieldType(6) * (FieldType(4) + beta) * u * c3 +
-                         (FieldType(24) - FieldType(3) * beta * FieldType(2).inversed()) * u * v2 +
-                         (-FieldType(8) + beta * FieldType(2).inversed()) * u * v1 - FieldType(3) * (-FieldType(16) + beta) * v6);
-        assert(v5 == -FieldType(80) * u * c0 - FieldType(240) * u * c1 - FieldType(8) * (FieldType(9) + beta) * u * c2 -
-                         FieldType(24) * (FieldType(9) + beta) * u * c3 - FieldType(2) * (-FieldType(81) + beta) * u * v1 +
+                         (-FieldType(8) + beta * FieldType(2).inversed()) * u * v2 - FieldType(3) * (-FieldType(16) +
+beta) * v6); assert(v4 == -FieldType(15) * u * c0 + FieldType(30) * u * c1 - FieldType(3) * (FieldType(4) + beta) * u *
+c2 + FieldType(6) * (FieldType(4) + beta) * u * c3 + (FieldType(24) - FieldType(3) * beta * FieldType(2).inversed()) * u
+* v2 +
+                         (-FieldType(8) + beta * FieldType(2).inversed()) * u * v1 - FieldType(3) * (-FieldType(16) +
+beta) * v6); assert(v5 == -FieldType(80) * u * c0 - FieldType(240) * u * c1 - FieldType(8) * (FieldType(9) + beta) * u *
+c2 - FieldType(24) * (FieldType(9) + beta) * u * c3 - FieldType(2) * (-FieldType(81) + beta) * u * v1 +
                          (-FieldType(81) + beta) * u * v2 - FieldType(8) * (-FieldType(81) + beta) * v6);
 
         // c0 + beta c2 - (beta v1)/2 - (beta v2)/ 2 - (-1 + beta) beta v6,
