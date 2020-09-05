@@ -44,7 +44,7 @@ namespace nil {
                         g2_field_type_value;
 
                     using underlying_field_type_value = g1_field_type_value;
-                    
+
                     underlying_field_type_value p[3];
 
                     edwards_g1() : edwards_g1(underlying_field_type_value::zero(), underlying_field_type_value::one(),
@@ -97,6 +97,14 @@ namespace nil {
                         }
 
                         return true;
+                    }
+
+                    bool operator!=(const edwards_g1& other) const {
+                        return !(operator==(other));
+                    }
+
+                    bool is_zero() const {
+                        return (this->p[1].is_zero() && this->p[2].is_zero());
                     }
 
                     edwards_g1 operator+(const edwards_g1 &other) const {
@@ -215,8 +223,8 @@ namespace nil {
 
                 private:
 
-                    constexpr static const typename policy_type::number_type a = policy_type::a;
-                    constexpr static const typename policy_type::number_type d = policy_type::d;
+                    /*constexpr static */const g1_field_type_value a = g1_field_type_value(policy_type::a);
+                    /*constexpr static */const g1_field_type_value d = g1_field_type_value(policy_type::d);
 
                     /*constexpr static const g2_field_type_value
                         twist = g2_field_type_value(typename g2_field_type_value::underlying_type::zero(),

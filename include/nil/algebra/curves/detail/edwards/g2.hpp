@@ -44,7 +44,7 @@ namespace nil {
                         g2_field_type_value;
 
                     using underlying_field_type_value = g2_field_type_value;
-                    
+
                     underlying_field_type_value p[3];
 
                     edwards_g2() : edwards_g2(underlying_field_type_value(0x2F501F9482C0D0D6E80AC55A79FD4D4594CAF187952660_cppui182,
@@ -88,6 +88,38 @@ namespace nil {
                         // when constexpr fields will be finished
                     }
 
+                    bool operator==(const edwards_g2 &other) const {
+                        if (this->is_zero()) {
+                            return other.is_zero();
+                        }
+
+                        if (other.is_zero()) {
+                            return false;
+                        }
+
+                        /* now neither is O */
+
+                        // X1/Z1 = X2/Z2 <=> X1*Z2 = X2*Z1
+                        if ((this->p[0] * other.p[2]) != (other.p[0] * this->p[2])) {
+                            return false;
+                        }
+
+                        // Y1/Z1 = Y2/Z2 <=> Y1*Z2 = Y2*Z1
+                        if ((this->p[1] * other.p[2]) != (other.p[1] * this->p[2])) {
+                            return false;
+                        }
+
+                        return true;
+                    }
+
+                    bool operator!=(const edwards_g2& other) const {
+                        return !(operator==(other));
+                    }
+
+                    bool is_zero() const {
+                        return (this->p[1].is_zero() && this->p[2].is_zero());
+                    }
+
                     edwards_g2 operator+(const edwards_g2 &other) const {
 
                         // NOTE: does not handle O and pts of order 2,4
@@ -126,13 +158,13 @@ namespace nil {
 
                             const underlying_field_type_value A = (this->p[0]).squared();    // A = X1^2
                             const underlying_field_type_value B = (this->p[1]).squared();    // B = Y1^2
-                            const underlying_field_type_value U = this->mul_by_a(B);         // U = a*B
+                            const underlying_field_type_value U = mul_by_a(B);         // U = a*B
                             const underlying_field_type_value C = A + U;                     // C = A+U
                             const underlying_field_type_value D = A - U;                     // D = A-U
                             const underlying_field_type_value E =
                                 (this->p[0] + this->p[1]).squared() - A - B;    // E = (X1+Y1)^2-A-B
                             const underlying_field_type_value X3 = C * D;       // X3 = C*D
-                            const underlying_field_type_value dZZ = this->mul_by_d(this->p[2].squared());
+                            const underlying_field_type_value dZZ = mul_by_d(this->p[2].squared());
                             const underlying_field_type_value Y3 = E * (C - dZZ - dZZ);    // Y3 = E*(C-2*d*Z1^2)
                             const underlying_field_type_value Z3 = D * E;                  // Z3 = D*E
 
@@ -220,8 +252,8 @@ namespace nil {
 
                 private:
 
-                    constexpr static const typename policy_type::number_type a = policy_type::a;
-                    constexpr static const typename policy_type::number_type d = policy_type::d;
+                    /*constexpr static */const g1_field_type_value a = g1_field_type_value(policy_type::a);
+                    /*constexpr static */const g1_field_type_value d = g1_field_type_value(policy_type::d);
 
                     /*constexpr static */const g2_field_type_value
                         twist = g2_field_type_value(typename g2_field_type_value::underlying_type::zero(),
