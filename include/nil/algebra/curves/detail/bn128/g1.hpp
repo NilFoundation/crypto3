@@ -274,7 +274,7 @@ namespace nil {
                         return *this;
                     }
 
-                    bn128_g1 normalize() const {
+                    bn128_g1 to_affine_coordinates() const {
                         underlying_field_type_value p_out[3];
 
                         if (is_zero() || p[2] == 1)
@@ -287,6 +287,14 @@ namespace nil {
                         p_out[2] = underlying_field_type_value::one();
 
                         return bn128_g1(p_out[0], p_out[1], p_out[2]);
+                    }
+
+                    void to_special() const {
+                        return to_affine_coordinates();
+                    }
+
+                    bool is_special() const {
+                        return (this->is_zero() || this->p[2] == 1);
                     }
 
                 private:
