@@ -44,8 +44,18 @@ namespace nil {
                         g2_field_type_value;
 
                     using underlying_field_type_value = g2_field_type_value;
+                    
+                    underlying_field_type_value p[3];
 
-                    edwards_g2() : edwards_g2(one_fill[0], one_fill[1]) {};
+                    edwards_g2() : edwards_g2(underlying_field_type_value(0x2F501F9482C0D0D6E80AC55A79FD4D4594CAF187952660_cppui182,
+                                                    0x37BF8F1B1CDA11A81E8BB8F41B5FF462C9A13DC7DE1578_cppui182,
+                                                    0x2962F0DA0C7928B2CFBBACE3D0354652B6922A764C12D8_cppui182),
+                        underlying_field_type_value(0x3CE954C85AD30F53B1BB4C4F87029780F4141927FEB19_cppui178,
+                                                    0x2214EB976DE3A4D9DF9C8D5F7AEDFEC337E03A20B32FFF_cppui182,
+                                                    0x249774AB0EDC7FE2E665DDBFE08594F3071E0B3AC994C3_cppui182)) {};
+                    // must be
+                    // edwards_g2() : edwards_g2(one_fill[0], one_fill[1]) {};
+                    // when constexpr fields will be finished
 
                     edwards_g2(underlying_field_type_value X, underlying_field_type_value Y,
                                underlying_field_type_value Z) {
@@ -58,14 +68,27 @@ namespace nil {
                         edwards_g2(X, Y, X * Y) {};
 
                     static edwards_g2 zero() {
-                        return edwards_g2(zero_fill[0], zero_fill[1], zero_fill[2]);
+                        return edwards_g2(underlying_field_type_value::zero(), 
+                        underlying_field_type_value::one(),
+                        underlying_field_type_value::zero());
+                        // must be
+                        // return edwards_g2(zero_fill[0], zero_fill[1], zero_fill[2]);
+                        // when constexpr fields will be finished
                     }
 
                     static edwards_g2 one() {
-                        return edwards_g2(one_fill[0], one_fill[1]);    // it's better to precompute also one_fill[2]
+                        return edwards_g2(underlying_field_type_value(0x2F501F9482C0D0D6E80AC55A79FD4D4594CAF187952660_cppui182,
+                                                    0x37BF8F1B1CDA11A81E8BB8F41B5FF462C9A13DC7DE1578_cppui182,
+                                                    0x2962F0DA0C7928B2CFBBACE3D0354652B6922A764C12D8_cppui182),
+                        underlying_field_type_value(0x3CE954C85AD30F53B1BB4C4F87029780F4141927FEB19_cppui178,
+                                                    0x2214EB976DE3A4D9DF9C8D5F7AEDFEC337E03A20B32FFF_cppui182,
+                                                    0x249774AB0EDC7FE2E665DDBFE08594F3071E0B3AC994C3_cppui182));    // it's better to precompute also one_fill[2]
+                        // must be
+                        // return edwards_g2(one_fill[0], one_fill[1]);    // it's better to precompute also one_fill[2]
+                        // when constexpr fields will be finished
                     }
 
-                    edwards_g2 add(const edwards_g2 &other) const {
+                    edwards_g2 operator+(const edwards_g2 &other) const {
 
                         // NOTE: does not handle O and pts of order 2,4
                         // http://www.hyperelliptic.org/EFD/g1p/auto-twisted-inverted.html#addition-add-2008-bbjlp
@@ -146,48 +169,81 @@ namespace nil {
                         return edwards_g2(X3, Y3, Z3);
                     }
 
+
+                    void to_affine_coordinates() {
+                        if (this->is_zero()) {
+                            this->p[0] = underlying_field_type_value::zero();
+                            this->p[1] = underlying_field_type_value::one();
+                            this->p[2] = underlying_field_type_value::one();
+                        }
+                        else {
+                            // go from inverted coordinates to projective coordinates
+                            underlying_field_type_value tX = this->p[1] * this->p[2];
+                            underlying_field_type_value tY = this->p[0] * this->p[2];
+                            underlying_field_type_value tZ = this->p[0] * this->p[1];
+                            // go from projective coordinates to affine coordinates
+                            underlying_field_type_value tZ_inv = tZ.inverse();
+                            this->p[0] = tX * tZ_inv;
+                            this->p[1] = tY * tZ_inv;
+                            this->p[2] = underlying_field_type_value::one();
+                        }
+                    }
+
+                    void to_special() {
+                        if (this->p[2].is_zero()) {
+                            return;
+                        }
+
+                        underlying_field_type_value Z_inv = this->p[2].inverse();
+                        this->p[0] = this->p[0] * Z_inv;
+                        this->p[1] = this->p[1] * Z_inv;
+                        this->p[2] = underlying_field_type_value::one();
+                    }
+
+                    bool is_special() const {
+                        return (this->is_zero() || this->p[2] == underlying_field_type_value::one());
+                    }
+
                     underlying_field_type_value mul_by_a(const underlying_field_type_value &elt) {
                         // should be
                         //  underlying_field_type_value(edwards_twist_mul_by_a_c0 * elt.c2, edwards_twist_mul_by_a_c1 *
                         //  elt.c0, edwards_twist_mul_by_a_c2 * elt.c1)
                         // but optimizing the fact that edwards_twist_mul_by_a_c1 = edwards_twist_mul_by_a_c2 = 1
-                        return underlying_field_type_value(edwards_twist_mul_by_a_c0 * elt.c2, elt.c0, elt.c1);
+                        return underlying_field_type_value(twist_mul_by_a_c0 * elt.c2, elt.c0, elt.c1);
                     }
 
                     underlying_field_type_value mul_by_d(const underlying_field_type_value &elt) {
-                        return underlying_field_type_value(edwards_twist_mul_by_d_c0 * elt.c2,
-                                                           edwards_twist_mul_by_d_c1 * elt.c0,
-                                                           edwards_twist_mul_by_d_c2 * elt.c1);
+                        return underlying_field_type_value(twist_mul_by_d_c0 * elt.c2,
+                                                           twist_mul_by_d_c1 * elt.c0,
+                                                           twist_mul_by_d_c2 * elt.c1);
                     }
 
                 private:
-                    underlying_field_type_value p[3];
 
                     constexpr static const typename policy_type::number_type a = policy_type::a;
                     constexpr static const typename policy_type::number_type d = policy_type::d;
 
-                    constexpr static const g2_field_type_value
-                        edwards_twist(typename g2_field_type_value::underlying_type::zero(),
-                                      typename g2_field_type_value::underlying_type::one(),
-                                      typename g2_field_type_value::underlying_type::zero());
-                    constexpr static const g2_field_type_value edwards_twist_coeff_a = edwards_twist.mul_by_Fp(a);
-                    constexpr static const g2_field_type_value edwards_twist_coeff_d = edwards_twist.mul_by_Fp(d);
+                    /*constexpr static */const g2_field_type_value
+                        twist = g2_field_type_value(typename g2_field_type_value::underlying_type::zero(),
+                                                    typename g2_field_type_value::underlying_type::one(),
+                                                    typename g2_field_type_value::underlying_type::zero());
+                    /*constexpr static */const g2_field_type_value twist_coeff_a = twist.mul_by_Fp(a);
+                    /*constexpr static */const g2_field_type_value twist_coeff_d = twist.mul_by_Fp(d);
 
-                    constexpr static const g1_field_type_value edwards_twist_mul_by_a_c0 =
-                        a * g2_field_type_value::non_residue;
-                    constexpr static const g1_field_type_value edwards_twist_mul_by_a_c1 = a;
-                    constexpr static const g1_field_type_value edwards_twist_mul_by_a_c2 = a;
-                    constexpr static const g1_field_type_value edwards_twist_mul_by_d_c0 =
-                        d * g2_field_type_value::non_residue;
-                    constexpr static const g1_field_type_value edwards_twist_mul_by_d_c1 = d;
-                    constexpr static const g1_field_type_value edwards_twist_mul_by_d_c2 = d;
-                    constexpr static const g1_field_type_value
-                        edwards_twist_mul_by_q_Y(0xB35E3665A18365954D018902935D4419423F84321BC3E_cppui180);
-                    constexpr static const g1_field_type_value
-                        edwards_twist_mul_by_q_Z(0xB35E3665A18365954D018902935D4419423F84321BC3E_cppui180);
+                    /*constexpr static */const g1_field_type_value twist_mul_by_a_c0 = a * g2_field_type_value::non_residue;
+                    /*constexpr static */const g1_field_type_value twist_mul_by_a_c1 = a;
+                    /*constexpr static */const g1_field_type_value twist_mul_by_a_c2 = a;
+                    /*constexpr static */const g1_field_type_value twist_mul_by_d_c0 = d * g2_field_type_value::non_residue;
+                    /*constexpr static */const g1_field_type_value twist_mul_by_d_c1 = d;
+                    /*constexpr static */const g1_field_type_value twist_mul_by_d_c2 = d;
+                    /*constexpr static */const g1_field_type_value
+                        twist_mul_by_q_Y = g1_field_type_value(0xB35E3665A18365954D018902935D4419423F84321BC3E_cppui180);
+                    /*constexpr static */const g1_field_type_value
+                        twist_mul_by_q_Z = g1_field_type_value(0xB35E3665A18365954D018902935D4419423F84321BC3E_cppui180);
 
-                    constexpr static const underlying_field_type_value zero_fill = {
-                        underlying_field_type_value::zero(), underlying_field_type_value::one(),
+                    /*constexpr static const underlying_field_type_value zero_fill = {
+                        underlying_field_type_value::zero(), 
+                        underlying_field_type_value::one(),
                         underlying_field_type_value::zero()};
 
                     constexpr static const underlying_field_type_value one_fill = {
@@ -196,7 +252,7 @@ namespace nil {
                                                     0x2962F0DA0C7928B2CFBBACE3D0354652B6922A764C12D8_cppui182),
                         underlying_field_type_value(0x3CE954C85AD30F53B1BB4C4F87029780F4141927FEB19_cppui178,
                                                     0x2214EB976DE3A4D9DF9C8D5F7AEDFEC337E03A20B32FFF_cppui182,
-                                                    0x249774AB0EDC7FE2E665DDBFE08594F3071E0B3AC994C3_cppui182)};
+                                                    0x249774AB0EDC7FE2E665DDBFE08594F3071E0B3AC994C3_cppui182)};*/
                 };
 
             }    // namespace detail

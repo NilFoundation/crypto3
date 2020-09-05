@@ -23,22 +23,37 @@ namespace nil {
                 private:
                     typedef FieldParams policy_type;
 
+                    typedef typename policy_type::number_type number_type;
+                    typedef typename policy_type::modulus_type modulus_type;
+
+                    constexpr static const modulus_type modulus = policy_type::modulus;
                 public:
-                    static const typename policy_type::fp3_non_residue_type non_residue =
-                        policy_type::fp3_non_residue_type(policy_type::fp3_non_residue);
 
                     using underlying_type = element_fp<FieldParams>;
+
+                    const typename policy_type::fp3_non_residue_type non_residue =
+                        underlying_type(typename policy_type::fp3_non_residue_type(policy_type::fp3_non_residue));
 
                     using value_type = std::array<underlying_type, 3>;
 
                     value_type data;
 
-                    element_fp3(value_type data) : data(data) {};
+                    element_fp3() {
+                        data = {underlying_type::zero(), underlying_type::zero(), underlying_type::zero()};
+                    }
 
-                    element_fp3(const element_fp3 &B) {
-                        data[0] = underlying_type(B.data[0]);
-                        data[1] = underlying_type(B.data[1]);
-                        data[2] = underlying_type(B.data[2]);
+                    element_fp3(value_type in_data) {
+                        data = value_type(in_data);
+                    }
+
+                    element_fp3(modulus_type in_data0, modulus_type in_data1, modulus_type in_data2) {
+                        data = value_type({underlying_type(in_data0), underlying_type(in_data1), underlying_type(in_data2)});
+                    }
+
+                    element_fp3(const element_fp3 &other) {
+                        data[0] = underlying_type(other.data[0]);
+                        data[1] = underlying_type(other.data[1]);
+                        data[2] = underlying_type(other.data[2]);
                     };
 
                     inline static element_fp3 zero() {
@@ -52,6 +67,10 @@ namespace nil {
                     bool is_zero() const {
                         return (data[0] == underlying_type::zero()) && (data[1] == underlying_type::zero()) &&
                                (data[2] == underlying_type::zero());
+                    }
+
+                    bool is_one() const {
+                        return (data[0] == underlying_type::one()) && (data[1] == underlying_type::zero()) && (data[2] == underlying_type::zero());
                     }
 
                     bool operator==(const element_fp3 &B) const {

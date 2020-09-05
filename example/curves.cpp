@@ -16,8 +16,8 @@
 
 
 #include <nil/algebra/curves/bn128.hpp>
-//#include <nil/algebra/curves/edwards.hpp>
-#include <nil/algebra/curves/mnt4.hpp>
+#include <nil/algebra/curves/edwards.hpp>
+//#include <nil/algebra/curves/mnt4.hpp>
 
 #include <nil/algebra/fields/bn128/fq.hpp>
 #include <nil/algebra/fields/bn128/fr.hpp>
@@ -72,10 +72,10 @@ void fp_curve_group_basic_math_examples()
 
     policy_type cd = c1.doubled();
 
-    policy_type cn = c1.normalize();
+    //policy_type cn = c1.normalize();
     
-    std::cout << "c1 normalized value: ";
-    print_fp_curve_group_element(cn);
+    //std::cout << "c1 normalized value: ";
+    //print_fp_curve_group_element(cn);
 
 }
 
@@ -105,10 +105,10 @@ void fp2_curve_group_basic_math_examples()
 
     policy_type cd = c1.doubled();
     
-    policy_type cn = c1.normalize();
+    //policy_type cn = c1.normalize();
     
-    std::cout << "c1 normalized value: ";
-    print_fp2_curve_group_element(cn);
+    //std::cout << "c1 normalized value: ";
+    //print_fp2_curve_group_element(cn);
 
 }
 
@@ -138,10 +138,10 @@ void fp3_curve_group_basic_math_examples()
 
     policy_type cd = c1.doubled();
     
-    policy_type cn = c1.normalize();
+    //policy_type cn = c1.normalize();
     
-    std::cout << "c1 normalized value: ";
-    print_fp3_curve_group_element(cn);
+    //std::cout << "c1 normalized value: ";
+    //print_fp3_curve_group_element(cn);
 
 }
 
@@ -156,7 +156,7 @@ int main()
     fp2_curve_group_basic_math_examples<curves::bn128<254>::g2_type>();
 
     std::cout << "----------------------------" << std::endl;
-/*
+
     std::cout << "Edwards curve g1 group basic math:" << std::endl;
     fp_curve_group_basic_math_examples<curves::edwards<183>::g1_type>();
 
@@ -165,9 +165,9 @@ int main()
     std::cout << "Edwards curve g2 group basic math:" << std::endl;
     fp3_curve_group_basic_math_examples<curves::edwards<183>::g2_type>();
 
-    std::cout << "----------------------------" << std::endl;*/
+    std::cout << "----------------------------" << std::endl;
 
-    std::cout << "Mnt4 curve g1 group basic math:" << std::endl;
+    /*std::cout << "Mnt4 curve g1 group basic math:" << std::endl;
     fp_curve_group_basic_math_examples<curves::mnt4<298>::g1_type>();
 
     std::cout << "----------------------------" << std::endl;
@@ -175,7 +175,7 @@ int main()
     std::cout << "Mnt4 curve g2 group basic math:" << std::endl;
     fp2_curve_group_basic_math_examples<curves::mnt4<298>::g2_type>();
 
-    std::cout << "----------------------------" << std::endl;
+    std::cout << "----------------------------" << std::endl;*/
 
     return 0;
 }

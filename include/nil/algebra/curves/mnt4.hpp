@@ -58,8 +58,8 @@ namespace nil {
                     nil::algebra::fields::detail::arithmetic_params<mnt4<298, CHAR_BIT>>>
                     gt_type;
 
-                typedef std::vector<typename g1_type> g1_vector;
-                typedef std::vector<typename g2_type> g2_vector;
+                typedef std::vector<g1_type> g1_vector;
+                typedef std::vector<g2_type> g2_vector;
 
                 constexpr static const number_type p = base_field_modulus;
                 constexpr static const number_type q = scalar_field_modulus;

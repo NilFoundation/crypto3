@@ -213,9 +213,9 @@ namespace nil {
 
                 private:
                     constexpr static const g2_field_type_value
-                        twist(typename g2_field_type_value::underlying_type::zero(),
-                              typename g2_field_type_value::underlying_type::one(),
-                              typename g2_field_type_value::underlying_type::zero());
+                        twist = g2_field_type_value(typename g2_field_type_value::underlying_type::zero(),
+                                                    typename g2_field_type_value::underlying_type::one(),
+                                                    typename g2_field_type_value::underlying_type::zero());
 
                     static const g2_field_type_value twist_coeff_a = mnt6_g2<ModulusBits, GeneratorBits>::a;
                     static const g2_field_type_value twist_coeff_b = mnt6_g2<ModulusBits, GeneratorBits>::b;
