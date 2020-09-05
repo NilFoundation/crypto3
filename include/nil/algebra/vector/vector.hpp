@@ -28,12 +28,13 @@ namespace nil {
          *    It is an aggregate type similar to `std::array`, and can be initialized with
          *    aggregate initialization or with the `make_vector` function.
          */
-        template <typename T, std::size_t N> struct vector {
+        template<typename T, std::size_t N>
+        struct vector {
             static_assert(N != 0, "vector must contain at least one element");
 
             using value_type = T;
             using size_type = std::size_t;
-            static constexpr size_type size = N; ///< @brief size of the vector
+            static constexpr size_type size = N;    ///< @brief size of the vector
 
             /** @name Element access */
             ///@{
@@ -43,10 +44,14 @@ namespace nil {
              *
              *    Returns a reference to the scalar element in position `i`, without bounds checking.
              */
-            constexpr T &operator[](size_type i) noexcept { return array[i]; }
+            constexpr T &operator[](size_type i) noexcept {
+                return array[i];
+            }
 
             /// @copydoc operator[]
-            constexpr const T &operator[](size_type i) const noexcept { return array[i]; }
+            constexpr const T &operator[](size_type i) const noexcept {
+                return array[i];
+            }
             ///@}
 
             /** @name Iterators */
@@ -56,23 +61,31 @@ namespace nil {
              *
              *    Returns an iterator to the beginning of the vector.
              */
-            constexpr T *begin() noexcept { return array; }
+            constexpr T *begin() noexcept {
+                return array;
+            }
 
             /** @brief returns an iterator to the end
              *    @return an iterator past the end
              *
              *    Returns an iterator to the end of the vector.
              */
-            constexpr T *end() noexcept { return array + N; }
+            constexpr T *end() noexcept {
+                return array + N;
+            }
 
             /// @copydoc begin
-            constexpr const T *cbegin() const noexcept { return array; }
+            constexpr const T *cbegin() const noexcept {
+                return array;
+            }
 
             /// @copydoc end
-            constexpr const T *cend() const noexcept { return array + N; }
+            constexpr const T *cend() const noexcept {
+                return array + N;
+            }
             ///@}
 
-            T array[N]; ///< @private
+            T array[N];    ///< @private
         };
 
         /** \addtogroup vector
@@ -87,8 +100,9 @@ namespace nil {
          *    Constructs a vector from its arguments, checking that all arguments are of
          *    the same type.
          */
-        template <typename... Args> constexpr decltype(auto) make_vector(Args... args) {
-            return vector{args...};
+        template<typename... Args>
+        constexpr decltype(auto) make_vector(Args... args) {
+            return vector {args...};
         }
 
         /** @name vector deduction guides */
@@ -102,10 +116,8 @@ namespace nil {
          *    vector v{1., 2.}; // deduces the type of v to be vector<double, 2>
          *    \endcode
          */
-        template <typename T, typename... U>
-        vector(T, U...)
-                ->vector<std::enable_if_t<(std::is_same_v<T, U> && ...), T>,
-                                 1 + sizeof...(U)>;
+        template<typename T, typename... U>
+        vector(T, U...) -> vector<std::enable_if_t<(std::is_same_v<T, U> && ...), T>, 1 + sizeof...(U)>;
 
         /** @brief deduction guide for aggregate initialization
          *    @relatesalso vector
@@ -115,7 +127,8 @@ namespace nil {
          *    vector v{{1., 2.}}; // deduces the type of v to be vector<double, 2>
          *    \endcode
          */
-        template <typename T, std::size_t N> vector(const T (&)[N])->vector<T, N>;
+        template<typename T, std::size_t N>
+        vector(const T (&)[N]) -> vector<T, N>;
 
         ///@}
 
@@ -124,4 +137,4 @@ namespace nil {
     }    // namespace algebra
 }    // namespace nil
 
-#endif // ALGEBRA_VECTOR_CLASS_HPP
+#endif    // ALGEBRA_VECTOR_CLASS_HPP

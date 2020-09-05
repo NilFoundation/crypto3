@@ -29,14 +29,14 @@ namespace nil {
          *    It is an aggregate type containing a single member array of type
          *    `T[N][M]` which can be initialized with aggregate initialization.
          */
-        template <typename T, std::size_t N, std::size_t M> struct matrix {
-            static_assert(N != 0 && M != 0,
-                                        "matrix must have have positive dimensions");
+        template<typename T, std::size_t N, std::size_t M>
+        struct matrix {
+            static_assert(N != 0 && M != 0, "matrix must have have positive dimensions");
 
             using value_type = T;
             using size_type = std::size_t;
-            static constexpr size_type column_size = N; ///< Number of rows
-            static constexpr size_type row_size = M;        ///< Number of columns
+            static constexpr size_type column_size = N;    ///< Number of rows
+            static constexpr size_type row_size = M;       ///< Number of columns
 
             /** @name Element access */
             ///@{
@@ -73,13 +73,17 @@ namespace nil {
              *    row pointer.    For a matrix `m`, accessing the element in the 5th row
              *    and 3rd column can be done with `m[5][3]`.
              */
-            constexpr T *operator[](std::size_t i) { return arrays[i]; }
+            constexpr T *operator[](std::size_t i) {
+                return arrays[i];
+            }
 
             /// @copydoc operator[]
-            constexpr T const *operator[](std::size_t i) const { return arrays[i]; }
+            constexpr T const *operator[](std::size_t i) const {
+                return arrays[i];
+            }
             ///@}
 
-            T arrays[N][M]; ///< @private
+            T arrays[N][M];    ///< @private
         };
 
         /** \addtogroup matrix
@@ -97,8 +101,8 @@ namespace nil {
          *    matrix m{{{1., 2.}, {3., 4.}}}; // deduces the type of m to be matrix<double, 2, 2>
          *    \endcode
          */
-        template <typename T, std::size_t M, std::size_t N>
-        matrix(const T (&)[M][N])->matrix<T, M, N>;
+        template<typename T, std::size_t M, std::size_t N>
+        matrix(const T (&)[M][N]) -> matrix<T, M, N>;
 
         ///@}
 
@@ -107,4 +111,4 @@ namespace nil {
     }    // namespace algebra
 }    // namespace nil
 
-#endif // ALGEBRA_MATRIX_CLASS_HPP
+#endif    // ALGEBRA_MATRIX_CLASS_HPP

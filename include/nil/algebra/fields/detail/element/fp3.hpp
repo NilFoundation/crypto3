@@ -27,8 +27,8 @@ namespace nil {
                     typedef typename policy_type::modulus_type modulus_type;
 
                     constexpr static const modulus_type modulus = policy_type::modulus;
-                public:
 
+                public:
                     using underlying_type = element_fp<FieldParams>;
 
                     const typename policy_type::fp3_non_residue_type non_residue =
@@ -47,7 +47,8 @@ namespace nil {
                     }
 
                     element_fp3(modulus_type in_data0, modulus_type in_data1, modulus_type in_data2) {
-                        data = value_type({underlying_type(in_data0), underlying_type(in_data1), underlying_type(in_data2)});
+                        data = value_type(
+                            {underlying_type(in_data0), underlying_type(in_data1), underlying_type(in_data2)});
                     }
 
                     element_fp3(const element_fp3 &other) {
@@ -70,7 +71,8 @@ namespace nil {
                     }
 
                     bool is_one() const {
-                        return (data[0] == underlying_type::one()) && (data[1] == underlying_type::zero()) && (data[2] == underlying_type::zero());
+                        return (data[0] == underlying_type::one()) && (data[1] == underlying_type::zero()) &&
+                               (data[2] == underlying_type::zero());
                     }
 
                     bool operator==(const element_fp3 &B) const {
@@ -134,10 +136,10 @@ namespace nil {
                         element_fp3 one = one();
 
                         size_t v = policy_type::s;
-                        element_fp3 z (policy_type::nqr_to_t);
-                        element_fp3 w ((*this) ^ policy_type::t_minus_1_over_2);
-                        element_fp3 x ((*this) * w);
-                        element_fp3 b = x * w; // b = (*this)^t
+                        element_fp3 z(policy_type::nqr_to_t);
+                        element_fp3 w((*this) ^ policy_type::t_minus_1_over_2);
+                        element_fp3 x((*this) * w);
+                        element_fp3 b = x * w;    // b = (*this)^t
 
                         // compute square root with Tonelli--Shanks
                         // (does not terminate if not a square!)
@@ -156,7 +158,7 @@ namespace nil {
                             while (j > 0) {
                                 w = w.square();
                                 --j;
-                            } // w = z^2^(v-m-1)
+                            }    // w = z^2^(v-m-1)
 
                             z = w.square();
                             b = b * z;

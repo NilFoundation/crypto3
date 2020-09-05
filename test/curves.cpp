@@ -44,7 +44,7 @@ using namespace nil::algebra;
 BOOST_AUTO_TEST_SUITE(curves_manual_tests)
 
 BOOST_AUTO_TEST_CASE(curves_manual_test1) {
-    
+
     BOOST_CHECK_EQUAL("", "");
 }
 BOOST_AUTO_TEST_SUITE_END()

@@ -20,7 +20,7 @@
 #include <nil/algebra/fields/detail/element/fp3.hpp>
 #include <nil/algebra/fields/detail/params/edwards/fq.hpp>
 
-#include <nil/algebra/detail/mp_def.hpp>
+#include <nil/algebra/detail/literals.hpp>
 
 namespace nil {
     namespace algebra {
@@ -47,8 +47,9 @@ namespace nil {
 
                     underlying_field_type_value p[3];
 
-                    edwards_g1() : edwards_g1(underlying_field_type_value::zero(), underlying_field_type_value::one(),
-                        underlying_field_type_value::zero()) {};
+                    edwards_g1() :
+                        edwards_g1(underlying_field_type_value::zero(), underlying_field_type_value::one(),
+                                   underlying_field_type_value::zero()) {};
                     // must be
                     // edwards_g1() : edwards_g1(zero_fill[0], zero_fill[1], zero_fill[2]) {};
                     // when constexpr fields will be finished
@@ -68,8 +69,12 @@ namespace nil {
                     }
 
                     static edwards_g1 one() {
-                        return edwards_g1(underlying_field_type_value(0x26C5DF4587AA6A5D345EFC9F2D47F8B1656517EF618F7A_cppui182),
-                        underlying_field_type_value(0x32D83D8AAA0C500F57B15FDA90B1AD111067F812C7DD27_cppui182));    // it's better to precompute also one_fill[2]
+                        return edwards_g1(
+                            underlying_field_type_value(0x26C5DF4587AA6A5D345EFC9F2D47F8B1656517EF618F7A_cppui182),
+                            underlying_field_type_value(
+                                0x32D83D8AAA0C500F57B15FDA90B1AD111067F812C7DD27_cppui182));    // it's better to
+                                                                                                // precompute also
+                                                                                                // one_fill[2]
                         // must be
                         // return edwards_g1(one_fill[0], one_fill[1]);    // it's better to precompute also one_fill[2]
                         // when constexpr fields will be finished
@@ -99,7 +104,7 @@ namespace nil {
                         return true;
                     }
 
-                    bool operator!=(const edwards_g1& other) const {
+                    bool operator!=(const edwards_g1 &other) const {
                         return !(operator==(other));
                     }
 
@@ -192,8 +197,7 @@ namespace nil {
                             this->p[0] = underlying_field_type_value::zero();
                             this->p[1] = underlying_field_type_value::one();
                             this->p[2] = underlying_field_type_value::one();
-                        }
-                        else {
+                        } else {
                             // go from inverted coordinates to projective coordinates
                             underlying_field_type_value tX = this->p[1] * this->p[2];
                             underlying_field_type_value tY = this->p[0] * this->p[2];
@@ -206,7 +210,7 @@ namespace nil {
                         }
                     }
 
-                    void to_special(){
+                    void to_special() {
                         if (this->p[2].is_zero()) {
                             return;
                         }
@@ -222,9 +226,8 @@ namespace nil {
                     }
 
                 private:
-
-                    /*constexpr static */const g1_field_type_value a = g1_field_type_value(policy_type::a);
-                    /*constexpr static */const g1_field_type_value d = g1_field_type_value(policy_type::d);
+                    /*constexpr static */ const g1_field_type_value a = g1_field_type_value(policy_type::a);
+                    /*constexpr static */ const g1_field_type_value d = g1_field_type_value(policy_type::d);
 
                     /*constexpr static const g2_field_type_value
                         twist = g2_field_type_value(typename g2_field_type_value::underlying_type::zero(),
@@ -240,9 +243,10 @@ namespace nil {
                     constexpr static const g1_field_type_value twist_mul_by_d_c1 = d;
                     constexpr static const g1_field_type_value twist_mul_by_d_c2 = d;
                     constexpr static const g1_field_type_value
-                        twist_mul_by_q_Y = g1_field_type_value(0xB35E3665A18365954D018902935D4419423F84321BC3E_cppui180);
-                    constexpr static const g1_field_type_value
-                        twist_mul_by_q_Z = g1_field_type_value(0xB35E3665A18365954D018902935D4419423F84321BC3E_cppui180);
+                        twist_mul_by_q_Y =
+                    g1_field_type_value(0xB35E3665A18365954D018902935D4419423F84321BC3E_cppui180); constexpr static
+                    const g1_field_type_value twist_mul_by_q_Z =
+                    g1_field_type_value(0xB35E3665A18365954D018902935D4419423F84321BC3E_cppui180);
 
                     constexpr static const underlying_field_type_value zero_fill = {
                         underlying_field_type_value::zero(), underlying_field_type_value::one(),

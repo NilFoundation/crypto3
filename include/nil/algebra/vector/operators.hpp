@@ -27,7 +27,7 @@ namespace nil {
          *
          *  Checks the equality of two vectors.
          */
-        template <typename T, std::size_t N>
+        template<typename T, std::size_t N>
         constexpr bool operator==(const vector<T, N> &a, const vector<T, N> &b) {
             for (std::size_t i = 0; i < vector<T, N>::size; ++i) {
                 if (a[i] != b[i])
@@ -43,7 +43,7 @@ namespace nil {
          *
          *  Checks the inequality of two vectors.
          */
-        template <typename T, std::size_t N>
+        template<typename T, std::size_t N>
         constexpr bool operator!=(const vector<T, N> &a, const vector<T, N> &b) {
             return !(a == b);
         }
@@ -51,26 +51,26 @@ namespace nil {
         /** @brief computes the vector sum
          *  @param a an N-vector of type T
          *  @param b an N-vector of type T
-         *  @return \f$ \textbf{a} + \textbf{b} \f$ such that \f$ \left(\textbf{a} + \textbf{b}\right)_i = \textbf{a}_i + \textbf{b}_i \f$
+         *  @return \f$ \textbf{a} + \textbf{b} \f$ such that \f$ \left(\textbf{a} + \textbf{b}\right)_i = \textbf{a}_i
+         * + \textbf{b}_i \f$
          *
          *  Computes the vector sum.
          */
-        template <typename T, std::size_t N>
-        constexpr vector<T, N> operator+(const vector<T, N> &a,
-                                         const vector<T, N> &b) {
+        template<typename T, std::size_t N>
+        constexpr vector<T, N> operator+(const vector<T, N> &a, const vector<T, N> &b) {
             return elementwise(std::plus<T>(), a, b);
         }
 
         /** @brief computes the Hadamard product
          *  @param a an N-vector of type T
          *  @param b an N-vector of type T
-         *  @return \f$ \textbf{a} \circ \textbf{b} \f$ such that \f$ \left(\textbf{a} \circ \textbf{b}\right)_i = \textbf{a}_i \textbf{b}_i \f$
+         *  @return \f$ \textbf{a} \circ \textbf{b} \f$ such that \f$ \left(\textbf{a} \circ \textbf{b}\right)_i =
+         * \textbf{a}_i \textbf{b}_i \f$
          *
          *  Computes the Hadamard, or elementwise, product of two vectors.
          */
-        template <typename T, std::size_t N>
-        constexpr vector<T, N> operator*(const vector<T, N> &a,
-                                         const vector<T, N> &b) {
+        template<typename T, std::size_t N>
+        constexpr vector<T, N> operator*(const vector<T, N> &a, const vector<T, N> &b) {
             return elementwise(std::multiplies<T>(), a, b);
         }
 
@@ -79,4 +79,4 @@ namespace nil {
     }    // namespace algebra
 }    // namespace nil
 
-#endif // ALGEBRA_VECTOR_OPERATORS_HPP
+#endif    // ALGEBRA_VECTOR_OPERATORS_HPP

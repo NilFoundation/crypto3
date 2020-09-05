@@ -16,7 +16,7 @@
 #include <nil/algebra/fields/bls12/fq.hpp>
 #include <nil/algebra/fields/bls12/fr.hpp>
 
-#include <nil/algebra/detail/mp_def.hpp>
+#include <nil/algebra/detail/literals.hpp>
 
 namespace nil {
     namespace algebra {

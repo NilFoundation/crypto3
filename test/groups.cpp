@@ -63,9 +63,9 @@ void test_mixed_add() {
 
 template<typename GroupT, typename NumberType>
 void test_group() {
-    NumberType rand1 = NumberType ("76749407");
-    NumberType rand2 = NumberType ("44410867");
-    NumberType randsum = NumberType ("121160274");
+    NumberType rand1 = NumberType("76749407");
+    NumberType rand2 = NumberType("44410867");
+    NumberType randsum = NumberType("121160274");
 
     GroupT zero = GroupT::zero();
     assert(zero == zero);

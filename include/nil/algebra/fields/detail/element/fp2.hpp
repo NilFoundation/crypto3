@@ -178,10 +178,10 @@ namespace nil {
                         element_fp2 one = one();
 
                         size_t v = policy_type::s;
-                        element_fp2 z (policy_type::nqr_to_t);
-                        element_fp2 w ((*this) ^ policy_type::t_minus_1_over_2);
-                        element_fp2 x ((*this) * w);
-                        element_fp2 b = x * w; // b = (*this)^t
+                        element_fp2 z(policy_type::nqr_to_t);
+                        element_fp2 w((*this) ^ policy_type::t_minus_1_over_2);
+                        element_fp2 x((*this) * w);
+                        element_fp2 b = x * w;    // b = (*this)^t
 
                         // compute square root with Tonelli--Shanks
                         // (does not terminate if not a square!)
@@ -200,7 +200,7 @@ namespace nil {
                             while (j > 0) {
                                 w = w.square();
                                 --j;
-                            } // w = z^2^(v-m-1)
+                            }    // w = z^2^(v-m-1)
 
                             z = w.square();
                             b = b * z;

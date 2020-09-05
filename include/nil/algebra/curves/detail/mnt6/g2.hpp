@@ -18,7 +18,7 @@
 #include <nil/algebra/fields/detail/element/fp3.hpp>
 #include <nil/algebra/fields/detail/params/mnt6/fq.hpp>
 
-#include <nil/algebra/detail/mp_def.hpp>
+#include <nil/algebra/detail/literals.hpp>
 
 namespace nil {
     namespace algebra {
@@ -212,10 +212,10 @@ namespace nil {
                     }
 
                 private:
-                    constexpr static const g2_field_type_value
-                        twist = g2_field_type_value(typename g2_field_type_value::underlying_type::zero(),
-                                                    typename g2_field_type_value::underlying_type::one(),
-                                                    typename g2_field_type_value::underlying_type::zero());
+                    constexpr static const g2_field_type_value twist =
+                        g2_field_type_value(typename g2_field_type_value::underlying_type::zero(),
+                                            typename g2_field_type_value::underlying_type::one(),
+                                            typename g2_field_type_value::underlying_type::zero());
 
                     static const g2_field_type_value twist_coeff_a = mnt6_g2<ModulusBits, GeneratorBits>::coeff_a;
                     static const g2_field_type_value twist_coeff_b = mnt6_g2<ModulusBits, GeneratorBits>::coeff_b;
@@ -232,14 +232,13 @@ namespace nil {
                     static const g1_field_type_value twist_mul_by_b_c2 =
                         mnt6_g1<ModulusBits, GeneratorBits>::coeff_b * g2_field_type_value::non_residue;
 
-                    static const g1_field_type_value twist_mul_by_q_X = 
-                        g1_field_type_value(0x8696C330D743F33B572CEF4DF62CE7ECB178EE24E48D1A53736E86448E74CB48DAACBB414_cppui298);
-                    static const g1_field_type_value twist_mul_by_q_Y = 
-                        g1_field_type_value(0x3BCF7BCD473A266249DA7B0548ECAEEC9635CF44194FB494C07925D6AD3BB4334A400000000_cppui298);
+                    static const g1_field_type_value twist_mul_by_q_X = g1_field_type_value(
+                        0x8696C330D743F33B572CEF4DF62CE7ECB178EE24E48D1A53736E86448E74CB48DAACBB414_cppui298);
+                    static const g1_field_type_value twist_mul_by_q_Y = g1_field_type_value(
+                        0x3BCF7BCD473A266249DA7B0548ECAEEC9635CF44194FB494C07925D6AD3BB4334A400000000_cppui298);
 
                     constexpr static const underlying_field_type_value zero_fill = {
-                        underlying_field_type_value::zero(), 
-                        underlying_field_type_value::one(),
+                        underlying_field_type_value::zero(), underlying_field_type_value::one(),
                         underlying_field_type_value::zero()};
 
                     constexpr static const underlying_field_type_value one_fill = {

@@ -14,7 +14,7 @@
 #include <nil/algebra/fields/edwards/fr.hpp>
 #include <nil/algebra/fields/detail/params/edwards/fq.hpp>
 
-#include <nil/algebra/detail/mp_def.hpp>
+#include <nil/algebra/detail/literals.hpp>
 
 namespace nil {
     namespace algebra {

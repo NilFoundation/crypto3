@@ -180,14 +180,31 @@ namespace nil {
 
             template<typename T>
             struct is_curve {
-                static const bool value = has_base_field_bits<T>::value && has_base_field_type<T>::value && 
-                                          has_number_type<T>::value && has_base_field_modulus<T>::value &&
-                                          has_scalar_field_bits<T>::value && has_scalar_field_type<T>::value &&
-                                          has_scalar_field_modulus<T>::value && has_g1_type<T>::value &&
-                                          has_g2_type<T>::value && has_gt_type<T>::value &&
-                                          has_p<T>::value && has_q<T>::value;
+                static const bool value =
+                    has_base_field_bits<T>::value && has_base_field_type<T>::value && has_number_type<T>::value &&
+                    has_base_field_modulus<T>::value && has_scalar_field_bits<T>::value &&
+                    has_scalar_field_type<T>::value && has_scalar_field_modulus<T>::value && has_g1_type<T>::value &&
+                    has_g2_type<T>::value && has_gt_type<T>::value && has_p<T>::value && has_q<T>::value;
                 typedef T type;
             };
+
+            template<typename T>
+            struct is_complex : std::false_type { };
+            template<typename T>
+            struct is_complex<std::complex<T>> : std::true_type { };
+            template<typename T>
+            constexpr bool is_complex_v = is_complex<T>::value;
+
+            template<typename T>
+            struct remove_complex {
+                using type = T;
+            };
+            template<typename T>
+            struct remove_complex<std::complex<T>> {
+                using type = T;
+            };
+            template<typename T>
+            using remove_complex_t = typename remove_complex<T>::type;
 
         }    // namespace detail
     }        // namespace algebra

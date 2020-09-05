@@ -27,9 +27,8 @@ namespace nil {
          *
          *  Checks the equality of two matrices.
          */
-        template <typename T, std::size_t N, std::size_t M>
-        constexpr bool operator==(const matrix<T, N, M> &a,
-                                  const matrix<T, N, M> &b) {
+        template<typename T, std::size_t N, std::size_t M>
+        constexpr bool operator==(const matrix<T, N, M> &a, const matrix<T, N, M> &b) {
             for (std::size_t i = 0; i < N; ++i) {
                 for (std::size_t j = 0; j < M; ++j) {
                     if (a[i][j] != b[i][j])
@@ -46,9 +45,8 @@ namespace nil {
          *
          *  Checks the inequality of two matrices.
          */
-        template <typename T, std::size_t N, std::size_t M>
-        constexpr bool operator!=(const matrix<T, N, M> &a,
-                                  const matrix<T, N, M> &b) {
+        template<typename T, std::size_t N, std::size_t M>
+        constexpr bool operator!=(const matrix<T, N, M> &a, const matrix<T, N, M> &b) {
             return !(a == b);
         }
 
@@ -57,4 +55,4 @@ namespace nil {
     }    // namespace algebra
 }    // namespace nil
 
-#endif // ALGEBRA_MATRIX_OPERATORS_HPP
+#endif    // ALGEBRA_MATRIX_OPERATORS_HPP

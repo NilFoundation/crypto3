@@ -13,6 +13,8 @@
 
 #include <algorithm>
 
+#include <nil/algebra/detail/assert.hpp>
+
 #include <nil/algebra/vector/vector.hpp>
 #include <nil/algebra/vector/math.hpp>
 
@@ -36,22 +38,19 @@ namespace nil {
          *
          *  Computes the product of two matrices.
          */
-        template <typename T, std::size_t M, std::size_t N, std::size_t P>
-        constexpr matrix<T, M, P> matmul(const matrix<T, M, N> &a,
-                                                                        const matrix<T, N, P> &b) {
-            return generate<M, P>([&a, &b](auto i, auto j){return sum(a.row(i)*b.column(j));});
+        template<typename T, std::size_t M, std::size_t N, std::size_t P>
+        constexpr matrix<T, M, P> matmul(const matrix<T, M, N> &a, const matrix<T, N, P> &b) {
+            return generate<M, P>([&a, &b](auto i, auto j) { return sum(a.row(i) * b.column(j)); });
         }
 
-        template <typename T, std::size_t M, std::size_t N>
-        constexpr vector<T, N> vectmatmul(const vector<T, M> &v,
-                                                                            const matrix<T, M, N> &m) {
-            return generate<N>([&v, &m](auto i){return sum(v*m.column(i));});
+        template<typename T, std::size_t M, std::size_t N>
+        constexpr vector<T, N> vectmatmul(const vector<T, M> &v, const matrix<T, M, N> &m) {
+            return generate<N>([&v, &m](auto i) { return sum(v * m.column(i)); });
         }
 
         /// @private
-        template <typename T, std::size_t M, std::size_t N>
-        constexpr std::tuple<matrix<T, M, N>, std::size_t, T>
-        gauss_jordan_impl(matrix<T, M, N> m) {
+        template<typename T, std::size_t M, std::size_t N>
+        constexpr std::tuple<matrix<T, M, N>, std::size_t, T> gauss_jordan_impl(matrix<T, M, N> m) {
 
             // Define function for determining if an element is negligible
             auto negligible = [](const T &v) { return abs(v) <= 0; };
@@ -87,7 +86,7 @@ namespace nil {
                             continue;
                         if (!negligible(m[ip][j])) {
                             auto s = m[ip][j];
-                            [&]() { // wrap this in a lambda to get around a gcc bug
+                            [&]() {    // wrap this in a lambda to get around a gcc bug
                                 for (std::size_t jp = 0; jp < N; ++jp)
                                     m[ip][jp] -= s * m[i][jp];
                             }();
@@ -116,7 +115,7 @@ namespace nil {
          * \max\left(N, M\right) \cdot \epsilon \cdot {\left\lVert \textbf{m}
          * \right\rVert}_\infty \f$.
          */
-        template <typename T, std::size_t M, std::size_t N>
+        template<typename T, std::size_t M, std::size_t N>
         constexpr matrix<T, M, N> rref(const matrix<T, M, N> &m) {
             return std::get<0>(gauss_jordan_impl(m));
         }
@@ -127,7 +126,7 @@ namespace nil {
          *
          *  Computes the rank using the reduced row echelon form.
          */
-        template <typename T, std::size_t M, std::size_t N>
+        template<typename T, std::size_t M, std::size_t N>
         constexpr std::size_t rank(const matrix<T, M, N> &m) {
             return std::get<1>(gauss_jordan_impl(m));
         }
@@ -140,7 +139,7 @@ namespace nil {
          *
          *  Computes the inverse of a matrix using the reduced row echelon form.
          */
-        template <typename T, std::size_t M>
+        template<typename T, std::size_t M>
         constexpr matrix<T, M, M> inverse(const matrix<T, M, M> &m) {
             if (rank(m) < M)
                 throw "matrix is not invertible";
@@ -152,4 +151,4 @@ namespace nil {
     }    // namespace algebra
 }    // namespace nil
 
-#endif // ALGEBRA_MATRIX_MATH_HPP
+#endif    // ALGEBRA_MATRIX_MATH_HPP

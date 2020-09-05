@@ -29,7 +29,7 @@ namespace nil {
          *
          *  Computes the dot (inner) product of two vectors.
          */
-        template <typename T, std::size_t N>
+        template<typename T, std::size_t N>
         constexpr T dot(const vector<T, N> &a, const vector<T, N> &b) {
             T r = 0;
             for (std::size_t i = 0; i < vector<T, N>::size; ++i)
@@ -43,7 +43,8 @@ namespace nil {
          *
          *  Computes the sum of the elements of a vector.
          */
-        template <typename T, std::size_t N> constexpr T sum(const vector<T, N> &v) {
+        template<typename T, std::size_t N>
+        constexpr T sum(const vector<T, N> &v) {
             return accumulate(v, T(0), std::plus<T>());
         }
 
@@ -52,4 +53,4 @@ namespace nil {
     }    // namespace algebra
 }    // namespace nil
 
-#endif // ALGEBRA_VECTOR_MATH_HPP
+#endif    // ALGEBRA_VECTOR_MATH_HPP

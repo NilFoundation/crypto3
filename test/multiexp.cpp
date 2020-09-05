@@ -67,7 +67,7 @@ run_result_t<GroupT> profile_multiexp(test_instances_t<GroupT> group_elements, t
     std::vector<GroupT> answers;
     for (size_t i = 0; i < group_elements.size(); i++) {
         answers.push_back(multi_exp<GroupT, FieldType, Method>(group_elements[i].cbegin(), group_elements[i].cend(),
-                                                            scalars[i].cbegin(), scalars[i].cend(), 1));
+                                                               scalars[i].cbegin(), scalars[i].cend(), 1));
     }
 
     long long time_delta = get_nsec_time() - start_time;

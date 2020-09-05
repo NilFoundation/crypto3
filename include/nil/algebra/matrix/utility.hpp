@@ -23,27 +23,23 @@ namespace nil {
          */
 
         /** @brief applies a function elementwise between many matrices
-            *  @param f a function of type F that operates on many scalars of type T and returns a scalar of type U
-            *  @param m an \f$ N \times M \f$ matrix of type T
-            *  @param matrices additional \f$ N \times M \f$ matrices of type T
-            *  @return an \f$ N \times M \f$ matrix of type T with elements described by \f$ f\left(\textbf{m}_{ij}, \ldots\right) \f$
-            *
-            *  Applies a function elementwise between many matrices.
-            */
-        template <
-                typename F, typename T, typename... Matrices,
-                typename U = std::invoke_result_t<F, T, typename Matrices::value_type...>,
-                std::size_t N =
-                        detail::all_same_value<std::size_t, Matrices::column_size...>::value,
-                std::size_t M =
-                        detail::all_same_value<std::size_t, Matrices::row_size...>::value>
-        constexpr matrix<U, N, M> elementwise(F f, const matrix<T, N, M> &m,
-                                                                                    const Matrices &... matrices) {
+         *  @param f a function of type F that operates on many scalars of type T and returns a scalar of type U
+         *  @param m an \f$ N \times M \f$ matrix of type T
+         *  @param matrices additional \f$ N \times M \f$ matrices of type T
+         *  @return an \f$ N \times M \f$ matrix of type T with elements described by \f$ f\left(\textbf{m}_{ij},
+         * \ldots\right) \f$
+         *
+         *  Applies a function elementwise between many matrices.
+         */
+        template<typename F, typename T, typename... Matrices,
+                 typename U = std::invoke_result_t<F, T, typename Matrices::value_type...>,
+                 std::size_t N = detail::all_same_value<std::size_t, Matrices::column_size...>::value,
+                 std::size_t M = detail::all_same_value<std::size_t, Matrices::row_size...>::value>
+        constexpr matrix<U, N, M> elementwise(F f, const matrix<T, N, M> &m, const Matrices &... matrices) {
             matrix<U, N, M> op_applied = {};
             for (std::size_t i = 0; i < N; ++i) {
                 for (std::size_t j = 0; j < M; ++j) {
-                    op_applied[i][j] =
-                            std::apply(f, std::forward_as_tuple(m[i][j], matrices[i][j]...));
+                    op_applied[i][j] = std::apply(f, std::forward_as_tuple(m[i][j], matrices[i][j]...));
                 }
             }
             return op_applied;
@@ -51,14 +47,14 @@ namespace nil {
 
         /** @brief generates a matrix as a function of its indices
          *  @param f a function that operates on two integer indices
-         *  @return an \f$ N \times M \f$ matrix with type matching the return type of f such that \f$ \textbf{m}_{ij} = f(i, j) \f$
+         *  @return an \f$ N \times M \f$ matrix with type matching the return type of f such that \f$ \textbf{m}_{ij} =
+         * f(i, j) \f$
          *
          *  Generates a matrix as a function of its indices.
          */
-        template <std::size_t N, std::size_t M, typename F>
+        template<std::size_t N, std::size_t M, typename F>
         constexpr decltype(auto) generate(F &&f) {
-            matrix<std::invoke_result_t<F, std::size_t, std::size_t>, N, M> generated =
-                    {};
+            matrix<std::invoke_result_t<F, std::size_t, std::size_t>, N, M> generated = {};
             for (std::size_t i = 0; i < N; ++i) {
                 for (std::size_t j = 0; j < M; ++j) {
                     generated[i][j] = std::apply(f, std::forward_as_tuple(i, j));
@@ -69,11 +65,12 @@ namespace nil {
 
         /** @brief generates a matrix containing a single value
          *  @param value the scalar value of all elements
-         *  @return an \f$ N \times M \f$ matrix of type T such that \f$ \textbf{m}_{ij} = \textrm{value}\ \forall i,j \f$
+         *  @return an \f$ N \times M \f$ matrix of type T such that \f$ \textbf{m}_{ij} = \textrm{value}\ \forall i,j
+         * \f$
          *
          *  Generates a matrix with all elements equal to a single value.
          */
-        template <std::size_t N, std::size_t M, typename T>
+        template<std::size_t N, std::size_t M, typename T>
         constexpr matrix<T, N, M> fill(T value) {
             return generate<N, M>([value](std::size_t, std::size_t) { return value; });
         }
@@ -82,24 +79,23 @@ namespace nil {
          *
          *  The matrix identity \f$ I_N \f$.
          */
-        template <typename T, std::size_t N>
+        template<typename T, std::size_t N>
         constexpr matrix<T, N, N> identity
-        // const matrix<T, N, N> identity
+            // const matrix<T, N, N> identity
             = generate<N, N>([](std::size_t i, std::size_t j) { return T(i == j ? 1 : 0); });
 
         /** @brief horizontally concatenates two matrices
          *  @param a an \f$ M \times N \f$ matrix of type T
          *  @param b an \f$ M \times P \f$ matrix of type T
-         *  @return an \f$ M \times \left(N+P\right) \f$ matrix of type T \f$ \left[\textbf{a} \textbf{b}\right] \f$ such that
-         *  \f$ \left(\left[\textbf{a} \textbf{b}\right]\right)_{ij} = \begin{cases} \textbf{a}_{ij} & j < N\\ \textbf{b}_{i,\ \left(j - N\right)} & j \ge N \end{cases} \f$
+         *  @return an \f$ M \times \left(N+P\right) \f$ matrix of type T \f$ \left[\textbf{a} \textbf{b}\right] \f$
+         * such that \f$ \left(\left[\textbf{a} \textbf{b}\right]\right)_{ij} = \begin{cases} \textbf{a}_{ij} & j < N\\
+         * \textbf{b}_{i,\ \left(j - N\right)} & j \ge N \end{cases} \f$
          *
          *  Horizontally concatenates two matrices.
          */
         template<std::size_t M, std::size_t N, std::size_t P, typename T>
-        constexpr matrix<T, M, N + P> horzcat(const matrix<T, M, N> &a, const matrix<T, M, P> &b){
-                return generate<M, N+P>([&a, &b](std::size_t i, std::size_t j){
-                        return j < N ? a[i][j] : b[i][j - N];
-                });
+        constexpr matrix<T, M, N + P> horzcat(const matrix<T, M, N> &a, const matrix<T, M, P> &b) {
+            return generate<M, N + P>([&a, &b](std::size_t i, std::size_t j) { return j < N ? a[i][j] : b[i][j - N]; });
         }
 
         /** @brief extracts the submatrix of a matrix
@@ -112,11 +108,10 @@ namespace nil {
          *  Extracts the submatrix of a matrix.
          */
         template<std::size_t P, std::size_t Q, std::size_t M, std::size_t N, typename T>
-        constexpr matrix<T, P, Q> submat(const matrix<T, M, N> &m, std::size_t a, std::size_t b){
-                if ((a + P > M) || (b + Q > N)) throw "index out of range";
-                return generate<P, Q>([&m, &a, &b](std::size_t i, std::size_t j){
-                        return m[a + i][b + j];
-                });
+        constexpr matrix<T, P, Q> submat(const matrix<T, M, N> &m, std::size_t a, std::size_t b) {
+            if ((a + P > M) || (b + Q > N))
+                throw "index out of range";
+            return generate<P, Q>([&m, &a, &b](std::size_t i, std::size_t j) { return m[a + i][b + j]; });
         }
 
         /** }@*/
@@ -124,4 +119,4 @@ namespace nil {
     }    // namespace algebra
 }    // namespace nil
 
-#endif // ALGEBRA_MATRIX_UTILITY_HPP
+#endif    // ALGEBRA_MATRIX_UTILITY_HPP
