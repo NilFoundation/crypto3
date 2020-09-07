@@ -10,6 +10,7 @@
 #ifndef ALGEBRA_CURVES_MNT6_G1_HPP
 #define ALGEBRA_CURVES_MNT6_G1_HPP
 
+#include <nil/algebra/curves/detail/mnt6/basic_policy.hpp>
 #include <nil/algebra/curves/detail/mnt6/g1.hpp>
 
 #include <nil/algebra/fields/mnt6/fq.hpp>
@@ -30,6 +31,7 @@ namespace nil {
                 template<std::size_t ModulusBits>
                 struct mnt6_g1 {
 
+                    using policy_type = mnt6_basic_policy<ModulusBits, GeneratorBits>;
                     constexpr static const std::size_t g1_field_bits = ModulusBits;
                     typedef typename fields::detail::element_fp<
                         fields::detail::arithmetic_params<fields::mnt6_fq<g1_field_bits, CHAR_BIT>>>
@@ -42,11 +44,10 @@ namespace nil {
 
                     using underlying_field_type_value = g1_field_type_value;
 
-                    constexpr static const underlying_field_type_value a(0x0B);
-                    constexpr static const underlying_field_type_value
-                        b(0xD68C7B1DC5DD042E957B71C44D3D6C24E683FC09B420B1A2D263FDE47DDBA59463D0C65282_cppui296);
-                    constexpr static const underlying_field_type_value x(0x00);    //?
-                    constexpr static const underlying_field_type_value y(0x00);    //?
+                    underlying_field_type_value p[3];
+
+                    /*constexpr static */const underlying_field_type_value x = underlying_field_type_value(0x00);    //?
+                    /*constexpr static */const underlying_field_type_value y = underlying_field_type_value(0x00);    //?
 
                     mnt6_g1() : mnt6_g1(zero_fill[0], zero_fill[1], zero_fill[2]) {};
 
@@ -92,6 +93,10 @@ namespace nil {
 
                     bool operator!=(const mnt6_g1 &other) const {
                         return !(operator==(other));
+                    }
+
+                    bool is_zero() const {
+                        return (this->p[0].is_zero() && this->p[2].is_zero());
                     }
 
                     mnt6_g1 operator-() const {
@@ -211,8 +216,30 @@ namespace nil {
                         return mnt6_g1(X3, Y3, Z3);
                     }
 
+                    void to_affine_coordinates() {
+                        if (this->is_zero()) {
+                            this->p[0] = underlying_field_type_value::zero();
+                            this->p[1] = underlying_field_type_value::one();
+                            this->p[2] = underlying_field_type_value::zero();
+                        }
+                        else {
+                            const underlying_field_type_value Z_inv = this->p[2].inversed();
+                            this->p[0] = this->p[0] * Z_inv;
+                            this->p[1] = this->p[1] * Z_inv;
+                            this->p[2] = underlying_field_type_value::one();
+                        }
+                    }
+
+                    void to_special() {
+                        this->to_affine_coordinates();
+                    }
+
+                    bool is_special() const {
+                        return (this->is_zero() || this->p[2] == underlying_field_type_value::one());
+                    }
+
                 private:
-                    constexpr static const g2_field_type_value twist =
+                    /*constexpr static const g2_field_type_value twist =
                         g2_field_type_value(typename g2_field_type_value::underlying_type::zero(),
                                             typename g2_field_type_value::underlying_type::one(),
                                             typename g2_field_type_value::underlying_type::zero());
@@ -235,9 +262,9 @@ namespace nil {
                     static const g1_field_type_value twist_mul_by_q_X(
                         0x8696C330D743F33B572CEF4DF62CE7ECB178EE24E48D1A53736E86448E74CB48DAACBB414_cppui298);
                     static const g1_field_type_value twist_mul_by_q_Y(
-                        0x3BCF7BCD473A266249DA7B0548ECAEEC9635CF44194FB494C07925D6AD3BB4334A400000000_cppui298);
+                        0x3BCF7BCD473A266249DA7B0548ECAEEC9635CF44194FB494C07925D6AD3BB4334A400000000_cppui298);*/
 
-                    constexpr static const underlying_field_type_value zero_fill = {
+                    /*constexpr static const underlying_field_type_value zero_fill = {
                         underlying_field_type_value::zero(), underlying_field_type_value::one(),
                         underlying_field_type_value::zero()};
 
@@ -246,7 +273,7 @@ namespace nil {
                             0x2A4FEEE24FD2C69D1D90471B2BA61ED56F9BAD79B57E0B4C671392584BDADEBC01ABBC0447D_cppui298),
                         underlying_field_type_value(
                             0x32986C245F6DB2F82F4E037BF7AFD69CBFCBFF07FC25D71E9C75E1B97208A333D73D91D3028_cppui298),
-                        underlying_field_type_value::one()};
+                        underlying_field_type_value::one()};*/
                 };
 
             }    // namespace detail
