@@ -6,10 +6,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ACCUMULATORS_PUBKEY_SCHEME_KEYS_HPP
-#define CRYPTO3_ACCUMULATORS_PUBKEY_SCHEME_KEYS_HPP
-
-#include <unordered_map>
+#ifndef CRYPTO3_ACCUMULATORS_PUBKEY_SCHEME_SIGS_HPP
+#define CRYPTO3_ACCUMULATORS_PUBKEY_SCHEME_SIGS_HPP
 
 #include <boost/container/static_vector.hpp>
 
@@ -36,7 +34,7 @@ namespace nil {
         namespace accumulators {
             namespace impl {
                 template<typename Mode>
-                struct scheme_keys_impl : boost::accumulators::accumulator_base {
+                struct scheme_sigs_impl : boost::accumulators::accumulator_base {
                 protected:
                     typedef Mode mode_type;
                     typedef typename Mode::scheme_type scheme_type;
@@ -53,18 +51,16 @@ namespace nil {
                     constexpr static const std::size_t scheme_key_bits = mode_type::scheme_key_bits;
                     typedef typename mode_type::key_type scheme_key_type;
 
-                    typedef std::pair<private_key_type, private_key_type> input_type;
-
                 public:
                     typedef std::pair<public_key_type, private_key_type> result_type;
 
                     template<typename Args>
-                    scheme_keys_impl(const Args &args) : mode(args[boost::accumulators::sample]) {
+                    scheme_sigs_impl(const Args &args) : mode(args[boost::accumulators::sample]) {
                     }
 
                     template<typename ArgumentPack>
                     inline void operator()(const ArgumentPack &args) {
-                        process(args[boost::accumulators::sample]);
+                        resolve_type(args[boost::accumulators::sample]);
                     }
 
                     inline result_type result(boost::accumulators::dont_care) const {
@@ -76,12 +72,8 @@ namespace nil {
                     }
 
                 protected:
-                    inline void process(const input_type &value) {
-                        cache.insert(value);
+                    inline void resolve_type(const scheme_key_type &value) {
                     }
-
-                    std::unordered_map<private_key_type, private_key_type> cache;
-
                     mode_type mode;
 
                     result_type dgst;
@@ -90,21 +82,21 @@ namespace nil {
 
             namespace tag {
                 template<typename Mode>
-                struct scheme_keys : boost::accumulators::depends_on<bits_count> {
+                struct scheme_sigs : boost::accumulators::depends_on<bits_count> {
                     typedef Mode mode_type;
 
                     /// INTERNAL ONLY
                     ///
 
-                    typedef boost::mpl::always<accumulators::impl::scheme_keys_impl<mode_type>> impl;
+                    typedef boost::mpl::always<accumulators::impl::scheme_sigs_impl<mode_type>> impl;
                 };
             }    // namespace tag
 
             namespace extract {
                 template<typename Mode, typename AccumulatorSet>
-                typename boost::mpl::apply<AccumulatorSet, tag::scheme_keys<Mode>>::type::result_type
-                    scheme_keys(const AccumulatorSet &acc) {
-                    return boost::accumulators::extract_result<tag::scheme_keys<Mode>>(acc);
+                typename boost::mpl::apply<AccumulatorSet, tag::scheme_sigs<Mode>>::type::result_type
+                    scheme_sigs(const AccumulatorSet &acc) {
+                    return boost::accumulators::extract_result<tag::scheme_sigs<Mode>>(acc);
                 }
             }    // namespace extract
         }        // namespace accumulators

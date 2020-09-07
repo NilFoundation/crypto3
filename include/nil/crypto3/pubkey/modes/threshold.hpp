@@ -125,8 +125,8 @@ namespace nil {
                     };
                 };
             }    // namespace modes
-        }
-    }
-}
+        }        // namespace pubkey
+    }            // namespace crypto3
+}    // namespace nil
 
 #endif    // CRYPTO3_MODE_HPP

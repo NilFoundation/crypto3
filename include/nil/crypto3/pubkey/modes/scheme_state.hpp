@@ -14,6 +14,7 @@
 
 #include <nil/crypto3/pubkey/accumulators/scheme.hpp>
 #include <nil/crypto3/pubkey/modes/accumulators/keys.hpp>
+#include <nil/crypto3/pubkey/modes/accumulators/signatures.hpp>
 
 namespace nil {
     namespace crypto3 {
