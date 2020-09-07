@@ -10,6 +10,7 @@
 #define CRYPTO3_PUBKEY_BLS_HPP
 
 #include <nil/algebra/curves/bls12.hpp>
+#include <nil/algebra/pairing/bls12.hpp>
 
 #include <nil/crypto3/hash/algorithm/hash.hpp>
 #include <nil/crypto3/hash/sha2.hpp>
@@ -50,8 +51,8 @@ namespace nil {
 
                     signature_type hash = Hashing(val);
 
-                    return (algebra::alt_bn128_ate_reduced_pairing(sign, key_type::value_type::one()) ==
-                            algebra::alt_bn128_ate_reduced_pairing(hash, key));
+                    return (algebra::pairing_policy<CurveType>::reduced_pairing(sign, key_type::value_type::one()) ==
+                            algebra::pairing_policy<CurveType>::reduced_pairing(hash, key));
                 }
             };
 
