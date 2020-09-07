@@ -28,7 +28,7 @@ namespace nil {
 
                 using namespace nil::algebra;
 
-                template<std::size_t ModulusBits>
+                template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
                 struct mnt6_g2 {
 
                     using policy_type = mnt6_basic_policy<ModulusBits, GeneratorBits>;
@@ -49,7 +49,11 @@ namespace nil {
                     /*constexpr static */const underlying_field_type_value x = underlying_field_type_value(0x00, 0x00, 0x00);    //?
                     /*constexpr static */const underlying_field_type_value y = underlying_field_type_value(0x00, 0x00, 0x00);    //?
 
-                    mnt6_g2() : mnt6_g2(zero_fill[0], zero_fill[1], zero_fill[2]) {};
+                    mnt6_g2() : mnt6_g2(underlying_field_type_value::zero(), underlying_field_type_value::one(),
+                        underlying_field_type_value::zero()) {};
+                    // must be
+                    // mnt6_g2() : mnt6_g2(zero_fill[0], zero_fill[1], zero_fill[2]) {};
+                    // when constexpr fields will be finished
 
                     mnt6_g2(underlying_field_type_value X,
                             underlying_field_type_value Y,
@@ -64,7 +68,18 @@ namespace nil {
                     }
 
                     static mnt6_g2 one() {
-                        return mnt6_g2(one_fill[0], one_fill[1], one_fill[2]);
+                        return mnt6_g2(underlying_field_type_value(
+                                    0x34F7320A12B56CE532BCCB3B44902CBAA723CD60035ADA7404B743AD2E644AD76257E4C6813_cppui298,
+                                    0xCF41620BAA52EEC50E61A70AB5B45F681952E0109340FEC84F1B2890ABA9B15CAC5A0C80FA_cppui296,
+                                    0x11F99170E10E326433CCCB8032FB48007CA3C4E105CF31B056AC767E2CB01258391BD4917CE_cppui297),
+                                underlying_field_type_value(
+                                    0x3A65968F03CC64D62AD05C79C415E07EBD38B363EC48309487C0B83E1717A582C1B60FECC91_cppui298,
+                                    0xCA5E8427E5DB1506C1A24CEFC2451AB3ACCAEA5DB82DCB0C7117CC74402FAA5B2C37685C6E_cppui296,
+                                    0xF75D2DD88302C9A4EF941307629A1B3E197277D83ABB715F647C2E55A27BAF782F5C60E7F7_cppui296),
+                                underlying_field_type_value::one());
+                        // must be
+                        // return mnt6_g2(one_fill[0], one_fill[1], one_fill[2]);
+                        // when constexpr fields will be finished
                     }
 
                     bool operator==(const mnt6_g2 &other) const {
@@ -235,36 +250,55 @@ namespace nil {
 
                 private:
 
+                    underlying_field_type_value mul_by_a(const underlying_field_type_value &elt) const {
+                        return underlying_field_type_value({twist_mul_by_a_c0 * elt.data[1], twist_mul_by_a_c1 * elt.data[2], twist_mul_by_a_c2 * elt.data[0]});
+                    }
 
-                    /*constexpr static */const underlying_field_type_value a =
-                        underlying_field_type_value({typename g2_field_type_value::underlying_type::zero(),
-                                                    typename g2_field_type_value::underlying_type::zero(),
-                                                    mnt6_g1::a});
-                    /*constexpr static */const underlying_field_type_value b =
-                        underlying_field_type_value({mnt6_g1::b * underlying_field_type_value::non_residue,
-                                                    g2_field_type_value::underlying_type::zero(),
-                                                    g2_field_type_value::underlying_type::zero()});
+                    underlying_field_type_value mul_by_b(const underlying_field_type_value &elt) const {
+                        return underlying_field_type_value({twist_mul_by_a_c0 * elt.data[0], twist_mul_by_a_c1 * elt.data[1], twist_mul_by_a_c2 * elt.data[2]});
+                    }
 
+                    /*mnt6_g2 mul_by_q() const {
+                        return mnt6_g2(twist_mul_by_q_X * (this->p[0]).Frobenius_map(1),
+                                       twist_mul_by_q_Y * (this->p[1]).Frobenius_map(1),
+                                       (this->p[2]).Frobenius_map(1));
+                    }*/
+
+                    /*constexpr static */ const g1_field_type_value g1_a = g1_field_type_value(policy_type::a);
+                    /*constexpr static */ const g1_field_type_value g1_b = g1_field_type_value(policy_type::b);
 
                     /*constexpr static */const g2_field_type_value twist =
-                        g2_field_type_value({typename g2_field_type_value::underlying_type::zero(),
-                                            typename g2_field_type_value::underlying_type::one(),
-                                            typename g2_field_type_value::underlying_type::zero()});
+                        g2_field_type_value({g2_field_type_value::underlying_type::zero(),
+                                            g2_field_type_value::underlying_type::one(),
+                                            g2_field_type_value::underlying_type::zero()});
 
-                    /*constexpr static */const g2_field_type_value twist_coeff_a = mnt6_g2<ModulusBits, GeneratorBits>::a;
-                    /*constexpr static */const g2_field_type_value twist_coeff_b = mnt6_g2<ModulusBits, GeneratorBits>::b;
+                    /*constexpr static */const underlying_field_type_value a =
+                        underlying_field_type_value({g2_field_type_value::underlying_type::zero(),
+                                                    g2_field_type_value::underlying_type::zero(),
+                                                    g1_a});
+                    
+                    /*constexpr static */const underlying_field_type_value b =
+                        underlying_field_type_value({g1_b * twist.non_residue,
+                                                    g2_field_type_value::underlying_type::zero(),
+                                                    g2_field_type_value::underlying_type::zero()});
+                    // must be
+                    // underlying_field_type_value({g1_b * twist.non_residue,
+                    // when constexpr fields will be finished
+
+                    /*constexpr static */const g2_field_type_value twist_coeff_a = a;
+                    /*constexpr static */const g2_field_type_value twist_coeff_b = b;
 
                     /*constexpr static */const g1_field_type_value twist_mul_by_a_c0 =
-                        mnt6_g1<ModulusBits, GeneratorBits>::a * g2_field_type_value::non_residue;
+                        g1_a * twist.non_residue;
                     /*constexpr static */const g1_field_type_value twist_mul_by_a_c1 =
-                        mnt6_g1<ModulusBits, GeneratorBits>::a * g2_field_type_value::non_residue;
-                    /*constexpr static */const g1_field_type_value twist_mul_by_a_c2 = mnt6_g1<ModulusBits, GeneratorBits>::a;
+                        g1_a * twist.non_residue;
+                    /*constexpr static */const g1_field_type_value twist_mul_by_a_c2 = g1_a;
                     /*constexpr static */const g1_field_type_value twist_mul_by_b_c0 =
-                        mnt6_g1<ModulusBits, GeneratorBits>::b * g2_field_type_value::non_residue;
+                        g1_b * twist.non_residue;
                     /*constexpr static */const g1_field_type_value twist_mul_by_b_c1 =
-                        mnt6_g1<ModulusBits, GeneratorBits>::b * g2_field_type_value::non_residue;
+                        g1_b * twist.non_residue;
                     /*constexpr static */const g1_field_type_value twist_mul_by_b_c2 =
-                        mnt6_g1<ModulusBits, GeneratorBits>::b * g2_field_type_value::non_residue;
+                        g1_b * twist.non_residue;
 
                     /*constexpr static */const g1_field_type_value twist_mul_by_q_X = g1_field_type_value(
                         0x8696C330D743F33B572CEF4DF62CE7ECB178EE24E48D1A53736E86448E74CB48DAACBB414_cppui298);

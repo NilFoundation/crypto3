@@ -41,7 +41,8 @@ namespace nil {
                     constexpr static const number_type q = scalar_field_modulus;
 
                     constexpr static const number_type a = number_type(0x02);
-                    constexpr static const number_type b = number_type(0x3545A27639415585EA4D523234FC3EDD2A2070A085C7B980F4E9CD21A515D4B0EF528EC0FD5_cppui298);
+                    constexpr static const number_type b = number_type(
+                        0x3545A27639415585EA4D523234FC3EDD2A2070A085C7B980F4E9CD21A515D4B0EF528EC0FD5_cppui298);
                     constexpr static const number_type x = 0x00;    //?
                     constexpr static const number_type y = 0x00;    //?
                 };

@@ -40,8 +40,9 @@ namespace nil {
                     constexpr static const number_type p = base_field_modulus;
                     constexpr static const number_type q = scalar_field_modulus;
 
-                    constexpr static const number_type a = a(0x0B);
-                    constexpr static const number_type b(0xD68C7B1DC5DD042E957B71C44D3D6C24E683FC09B420B1A2D263FDE47DDBA59463D0C65282_cppui296);
+                    constexpr static const number_type a = number_type(0x0B);
+                    constexpr static const number_type b = number_type(
+                        0xD68C7B1DC5DD042E957B71C44D3D6C24E683FC09B420B1A2D263FDE47DDBA59463D0C65282_cppui296);
                     constexpr static const number_type x = 0x00;    //?
                     constexpr static const number_type y = 0x00;    //?
                 };

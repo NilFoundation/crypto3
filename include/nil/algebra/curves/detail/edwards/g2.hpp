@@ -246,10 +246,6 @@ namespace nil {
 
                 private:
                     underlying_field_type_value mul_by_a(const underlying_field_type_value &elt) const {
-                        // should be
-                        //  underlying_field_type_value(edwards_twist_mul_by_a_c0 * elt.c2, edwards_twist_mul_by_a_c1 *
-                        //  elt.c0, edwards_twist_mul_by_a_c2 * elt.c1)
-                        // but optimizing the fact that edwards_twist_mul_by_a_c1 = edwards_twist_mul_by_a_c2 = 1
                         return underlying_field_type_value({twist_mul_by_a_c0 * elt.data[0], elt.data[1], elt.data[2]});
                     }
 

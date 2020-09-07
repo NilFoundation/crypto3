@@ -28,7 +28,7 @@ namespace nil {
 
                 using namespace nil::algebra;
 
-                template<std::size_t ModulusBits>
+                template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
                 struct mnt6_g1 {
 
                     using policy_type = mnt6_basic_policy<ModulusBits, GeneratorBits>;
@@ -49,7 +49,11 @@ namespace nil {
                     /*constexpr static */const underlying_field_type_value x = underlying_field_type_value(0x00);    //?
                     /*constexpr static */const underlying_field_type_value y = underlying_field_type_value(0x00);    //?
 
-                    mnt6_g1() : mnt6_g1(zero_fill[0], zero_fill[1], zero_fill[2]) {};
+                    mnt6_g1() : mnt6_g1(underlying_field_type_value::zero(), underlying_field_type_value::one(),
+                        underlying_field_type_value::zero()) {};
+                    // must be
+                    // mnt6_g1() : mnt6_g1(zero_fill[0], zero_fill[1], zero_fill[2]) {};
+                    // when constexpr fields will be finished
 
                     mnt6_g1(underlying_field_type_value X,
                             underlying_field_type_value Y,
@@ -64,7 +68,14 @@ namespace nil {
                     }
 
                     static mnt6_g1 one() {
-                        return mnt6_g1(one_fill[0], one_fill[1], one_fill[2]);
+                        return mnt6_g1(underlying_field_type_value(
+                            0x2A4FEEE24FD2C69D1D90471B2BA61ED56F9BAD79B57E0B4C671392584BDADEBC01ABBC0447D_cppui298),
+                                underlying_field_type_value(
+                                    0x32986C245F6DB2F82F4E037BF7AFD69CBFCBFF07FC25D71E9C75E1B97208A333D73D91D3028_cppui298),
+                                underlying_field_type_value::one());
+                        // must be
+                        // return mnt6_g1(one_fill[0], one_fill[1], one_fill[2]);
+                        // when constexpr fields will be finished
                     }
 
                     bool operator==(const mnt6_g1 &other) const {
@@ -239,6 +250,10 @@ namespace nil {
                     }
 
                 private:
+
+                    /*constexpr static */ const g1_field_type_value a = g1_field_type_value(policy_type::a);
+                    /*constexpr static */ const g1_field_type_value b = g1_field_type_value(policy_type::b);
+                    
                     /*constexpr static const g2_field_type_value twist =
                         g2_field_type_value(typename g2_field_type_value::underlying_type::zero(),
                                             typename g2_field_type_value::underlying_type::one(),
