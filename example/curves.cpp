@@ -142,7 +142,7 @@ void fp3_curve_group_basic_math_examples() {
 }
 
 int main() {
-    /*std::cout << "BN128-254 curve g1 group basic math:" << std::endl;
+    std::cout << "BN128-254 curve g1 group basic math:" << std::endl;
     fp_curve_group_basic_math_examples<curves::bn128<254>::g1_type>();
 
     std::cout << "----------------------------" << std::endl;
@@ -150,7 +150,7 @@ int main() {
     std::cout << "BN128-254 curve g2 group basic math:" << std::endl;
     fp2_curve_group_basic_math_examples<curves::bn128<254>::g2_type>();
 
-    std::cout << "----------------------------" << std::endl;*/
+    std::cout << "----------------------------" << std::endl;
 
     std::cout << "Edwards curve g1 group basic math:" << std::endl;
     fp_curve_group_basic_math_examples<curves::edwards<183>::g1_type>();

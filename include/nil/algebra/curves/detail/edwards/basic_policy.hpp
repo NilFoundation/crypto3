@@ -46,6 +46,18 @@ namespace nil {
                     constexpr static const number_type y = 0x00;    //?
                 };
 
+                constexpr typename edwards_basic_policy<183, CHAR_BIT>::number_type const
+                    edwards_basic_policy<183, CHAR_BIT>::a;
+
+                constexpr typename edwards_basic_policy<183, CHAR_BIT>::number_type const
+                    edwards_basic_policy<183, CHAR_BIT>::d;
+
+                constexpr typename edwards_basic_policy<183, CHAR_BIT>::number_type const
+                    edwards_basic_policy<183, CHAR_BIT>::p;
+
+                constexpr typename edwards_basic_policy<183, CHAR_BIT>::number_type const
+                    edwards_basic_policy<183, CHAR_BIT>::q;
+
             }    // namespace detail
         }        // namespace curves
     }            // namespace algebra
