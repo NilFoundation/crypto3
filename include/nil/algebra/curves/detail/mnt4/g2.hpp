@@ -46,11 +46,14 @@ namespace nil {
 
                     underlying_field_type_value p[3];
 
-                    /*constexpr static */const underlying_field_type_value x = underlying_field_type_value(0x00, 0x00);    //?
-                    /*constexpr static */const underlying_field_type_value y = underlying_field_type_value(0x00, 0x00);    //?
+                    /*constexpr static */ const underlying_field_type_value x =
+                        underlying_field_type_value(0x00, 0x00);    //?
+                    /*constexpr static */ const underlying_field_type_value y =
+                        underlying_field_type_value(0x00, 0x00);    //?
 
-                    mnt4_g2() : mnt4_g2(underlying_field_type_value::zero(), underlying_field_type_value::one(),
-                        underlying_field_type_value::zero()) {};
+                    mnt4_g2() :
+                        mnt4_g2(underlying_field_type_value::zero(), underlying_field_type_value::one(),
+                                underlying_field_type_value::zero()) {};
                     // must be
                     // mnt4_g2() : mnt4_g2(zero_fill[0], zero_fill[1], zero_fill[2]) {};
                     // when constexpr fields will be finished
@@ -68,13 +71,14 @@ namespace nil {
                     }
 
                     static mnt4_g2 one() {
-                        return mnt4_g2(underlying_field_type_value(
-                                            0x371780491C5660571FF542F2EF89001F205151E12A72CB14F01A931E72DBA7903DF6C09A9A4_cppui298,
-                                            0x4BA59A3F72DA165DEF838081AF697C851F002F576303302BB6C02C712C968BE32C0AE0A989_cppui295),
-                                        underlying_field_type_value(
-                                            0x4B471F33FFAAD868A1C47D6605D31E5C4B3B2E0B60EC98F0F610A5AAFD0D9522BCA4E79F22_cppui295,
-                                            0x355D05A1C69A5031F3F81A5C100CB7D982F78EC9CFC3B5168ED8D75C7C484FB61A3CBF0E0F1_cppui298),
-                                        underlying_field_type_value::one());
+                        return mnt4_g2(
+                            underlying_field_type_value(
+                                0x371780491C5660571FF542F2EF89001F205151E12A72CB14F01A931E72DBA7903DF6C09A9A4_cppui298,
+                                0x4BA59A3F72DA165DEF838081AF697C851F002F576303302BB6C02C712C968BE32C0AE0A989_cppui295),
+                            underlying_field_type_value(
+                                0x4B471F33FFAAD868A1C47D6605D31E5C4B3B2E0B60EC98F0F610A5AAFD0D9522BCA4E79F22_cppui295,
+                                0x355D05A1C69A5031F3F81A5C100CB7D982F78EC9CFC3B5168ED8D75C7C484FB61A3CBF0E0F1_cppui298),
+                            underlying_field_type_value::one());
                         // must be
                         // return mnt4_g2(one_fill[0], one_fill[1], one_fill[2]);
                         // when constexpr fields will be finished
@@ -104,7 +108,7 @@ namespace nil {
                         return true;
                     }
 
-                    bool operator!=(const mnt4_g2& other) const {
+                    bool operator!=(const mnt4_g2 &other) const {
                         return !(operator==(other));
                     }
 
@@ -235,8 +239,7 @@ namespace nil {
                             this->p[0] = underlying_field_type_value::zero();
                             this->p[1] = underlying_field_type_value::one();
                             this->p[2] = underlying_field_type_value::zero();
-                        }
-                        else {
+                        } else {
                             const underlying_field_type_value Z_inv = this->p[2].inversed();
                             this->p[0] = this->p[0] * Z_inv;
                             this->p[1] = this->p[1] * Z_inv;
@@ -253,41 +256,42 @@ namespace nil {
                     }
 
                 private:
-
                     /*constexpr static */ const g1_field_type_value g1_a = g1_field_type_value(policy_type::a);
                     /*constexpr static */ const g1_field_type_value g1_b = g1_field_type_value(policy_type::b);
 
-                    /*constexpr static */const g2_field_type_value twist =
-                        g2_field_type_value({g2_field_type_value::underlying_type::zero(),
-                                            g2_field_type_value::underlying_type::one()});
+                    /*constexpr static */ const g2_field_type_value twist = g2_field_type_value(
+                        {g2_field_type_value::underlying_type::zero(), g2_field_type_value::underlying_type::one()});
 
-                    /*constexpr static */const underlying_field_type_value a =
+                    /*constexpr static */ const underlying_field_type_value a =
                         underlying_field_type_value({g1_a * twist.non_residue, g1_field_type_value::zero()});
                     // must be
                     // underlying_field_type_value(g1_a * underlying_field_type_value::non_residue, 0);
                     // when constexpr fields will be finished
 
-                    /*constexpr static */const underlying_field_type_value b =
-                        underlying_field_type_value({g1_field_type_value::zero(), g1_b * twist.non_residue});
+                    /*constexpr static */ const underlying_field_type_value b =
+                        underlying_field_type_value({g1_field_type_value::zero(), g1_b *twist.non_residue});
                     // must be
                     // underlying_field_type_value(0, g1_b * underlying_field_type_value::non_residue);
                     // when constexpr fields will be finished
 
+                    /*constexpr static */ const g2_field_type_value twist_coeff_a = a;
+                    /*constexpr static */ const g2_field_type_value twist_coeff_b = b;
 
-                    /*constexpr static */const g2_field_type_value twist_coeff_a = a;
-                    /*constexpr static */const g2_field_type_value twist_coeff_b = b;
-
-                    /*constexpr static */const g1_field_type_value twist_mul_by_a_c0 =
-                        g1_a * twist.non_residue;            // we must receive non_residue in a better way, when constexpr fields will be finished
-                    /*constexpr static */const g1_field_type_value twist_mul_by_a_c1 =
-                        g1_a * twist.non_residue;            // we must receive non_residue in a better way, when constexpr fields will be finished
-                    /*constexpr static */const g1_field_type_value twist_mul_by_b_c0 =
-                        g1_b * twist.non_residue.squared();  // we must receive non_residue in a better way, when constexpr fields will be finished
-                    /*constexpr static */const g1_field_type_value twist_mul_by_b_c1 =
-                        g1_b * twist.non_residue;            // we must receive non_residue in a better way, when constexpr fields will be finished
-                    /*constexpr static */const g1_field_type_value twist_mul_by_q_X = g1_field_type_value(
+                    /*constexpr static */ const g1_field_type_value twist_mul_by_a_c0 =
+                        g1_a * twist.non_residue;    // we must receive non_residue in a better way, when constexpr
+                                                     // fields will be finished
+                    /*constexpr static */ const g1_field_type_value twist_mul_by_a_c1 =
+                        g1_a * twist.non_residue;    // we must receive non_residue in a better way, when constexpr
+                                                     // fields will be finished
+                    /*constexpr static */ const g1_field_type_value twist_mul_by_b_c0 =
+                        g1_b * twist.non_residue.squared();    // we must receive non_residue in a better way, when
+                                                               // constexpr fields will be finished
+                    /*constexpr static */ const g1_field_type_value twist_mul_by_b_c1 =
+                        g1_b * twist.non_residue;    // we must receive non_residue in a better way, when constexpr
+                                                     // fields will be finished
+                    /*constexpr static */ const g1_field_type_value twist_mul_by_q_X = g1_field_type_value(
                         0x3BCF7BCD473A266249DA7B0548ECAEEC9635D1330EA41A9E35E51200E12C90CD65A71660000_cppui298);
-                    /*constexpr static */const g1_field_type_value twist_mul_by_q_Y = g1_field_type_value(
+                    /*constexpr static */ const g1_field_type_value twist_mul_by_q_Y = g1_field_type_value(
                         0xF73779FE09916DFDCC2FD1F968D534BEB17DAF7518CD9FAE5C1F7BDCF94DD5D7DEF6980C4_cppui292);
 
                     /*constexpr static const underlying_field_type_value zero_fill = {

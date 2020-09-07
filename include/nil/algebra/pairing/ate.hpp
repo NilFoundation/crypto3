@@ -17,8 +17,6 @@ namespace nil {
     namespace algebra {
         namespace pairing {
 
-            using nil::algebra;
-
             /*
                 calc optimal ate pairing
                 @param f [out] e(Q, P)

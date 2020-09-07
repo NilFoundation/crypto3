@@ -27,8 +27,8 @@ namespace nil {
                 using other_curve = curves::mnt4<ModulusBits, GeneratorBits>;
 
                 typedef typename curves::mnt6::scalar_field_type FieldType;
-                typedef algebra::Fqe<algebra::curves::mnt6> FqeT;
-                typedef algebra::Fqk<algebra::curves::mnt6> FqkT;
+                typedef algebra::Fqe<algebra::curves::mnt6> fqe_type;
+                typedef algebra::Fqk<algebra::curves::mnt6> fqk_type;
 
                 using g1_precomp = detail::mnt6_g1_precomp<ModulusBits, GeneratorBits>;
                 using g2_precomp = detail::mnt6_g2_precomp<ModulusBits, GeneratorBits>;

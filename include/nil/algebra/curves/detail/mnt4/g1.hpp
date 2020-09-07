@@ -46,11 +46,14 @@ namespace nil {
 
                     underlying_field_type_value p[3];
 
-                    /*constexpr static */const underlying_field_type_value x = underlying_field_type_value(0x00);    //?
-                    /*constexpr static */const underlying_field_type_value y = underlying_field_type_value(0x00);    //?
+                    /*constexpr static */ const underlying_field_type_value x =
+                        underlying_field_type_value(0x00);    //?
+                    /*constexpr static */ const underlying_field_type_value y =
+                        underlying_field_type_value(0x00);    //?
 
-                    mnt4_g1() : mnt4_g1(underlying_field_type_value::zero(), underlying_field_type_value::one(),
-                        underlying_field_type_value::zero()) {};
+                    mnt4_g1() :
+                        mnt4_g1(underlying_field_type_value::zero(), underlying_field_type_value::one(),
+                                underlying_field_type_value::zero()) {};
                     // must be
                     // mnt4_g1() : mnt4_g1(zero_fill[0], zero_fill[1], zero_fill[2]) {};
                     // when constexpr fields will be finished
@@ -68,11 +71,12 @@ namespace nil {
                     }
 
                     static mnt4_g1 one() {
-                        return mnt4_g1(underlying_field_type_value(
-                                            0x7A2CAF82A1BA85213FE6CA3875AEE86ABA8F73D69060C4079492B948DEA216B5B9C8D2AF46_cppui295),
-                                        underlying_field_type_value(
-                                            0x2DB619461CC82672F7F159FEC2E89D0148DCC9862D36778C1AFD96A71E29CBA48E710A48AB2_cppui298),
-                                        underlying_field_type_value::one());
+                        return mnt4_g1(
+                            underlying_field_type_value(
+                                0x7A2CAF82A1BA85213FE6CA3875AEE86ABA8F73D69060C4079492B948DEA216B5B9C8D2AF46_cppui295),
+                            underlying_field_type_value(
+                                0x2DB619461CC82672F7F159FEC2E89D0148DCC9862D36778C1AFD96A71E29CBA48E710A48AB2_cppui298),
+                            underlying_field_type_value::one());
                         // must be
                         // mnt4_g1() : mnt4_g1(zero_fill[0], zero_fill[1], zero_fill[2]) {};
                         // when constexpr fields will be finished
@@ -102,7 +106,7 @@ namespace nil {
                         return true;
                     }
 
-                    bool operator!=(const mnt4_g1& other) const {
+                    bool operator!=(const mnt4_g1 &other) const {
                         return !(operator==(other));
                     }
 
@@ -170,8 +174,7 @@ namespace nil {
 
                             const underlying_field_type_value XX = (this->p[0]).squared();    // XX  = X1^2
                             const underlying_field_type_value ZZ = (this->p[2]).squared();    // ZZ  = Z1^2
-                            const underlying_field_type_value w =
-                                a * ZZ + (XX + XX + XX);    // w   = a*ZZ + 3*XX
+                            const underlying_field_type_value w = a * ZZ + (XX + XX + XX);    // w   = a*ZZ + 3*XX
                             const underlying_field_type_value Y1Z1 = (this->p[1]) * (this->p[2]);
                             const underlying_field_type_value s = Y1Z1 + Y1Z1;         // s   = 2*Y1*Z1
                             const underlying_field_type_value ss = s.squared();        // ss  = s^2
@@ -236,8 +239,7 @@ namespace nil {
                             this->p[0] = underlying_field_type_value::zero();
                             this->p[1] = underlying_field_type_value::one();
                             this->p[2] = underlying_field_type_value::zero();
-                        }
-                        else {
+                        } else {
                             const underlying_field_type_value Z_inv = this->p[2].inverse();
                             this->p[0] = this->p[0] * Z_inv;
                             this->p[1] = this->p[1] * Z_inv;
@@ -254,7 +256,6 @@ namespace nil {
                     }
 
                 private:
-
                     /*constexpr static */ const g1_field_type_value a = g1_field_type_value(policy_type::a);
                     /*constexpr static */ const g1_field_type_value b = g1_field_type_value(policy_type::b);
 

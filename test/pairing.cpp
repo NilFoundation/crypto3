@@ -20,6 +20,8 @@
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
 
+#include <nil/algebra/algorithms/pair.hpp>
+
 #include <nil/algebra/curves/detail/bn128/g1.hpp>
 
 //#include <nil/algebra/fields/detail/params/dsa_jce.hpp>

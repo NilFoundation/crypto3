@@ -21,16 +21,11 @@
 namespace nil {
     namespace algebra {
         namespace curves {
-
-            using namespace nil::algebra;
-
             /*
                 The curve equation for a BN curve is:
 
                 E/Fp: y^2 = x^3 + b.
-            */
 
-            /*
                 Over Fp12_2over3over2
                 y^2 = x^3 + b
                 u^2 = -1
@@ -54,9 +49,9 @@ namespace nil {
 
                 typedef typename detail::mnt6_g1<298, CHAR_BIT> g1_type;
                 typedef typename detail::mnt6_g2<298, CHAR_BIT> g2_type;
-                typedef typename nil::algebra::fields::detail::element_fp6_2over3<
-                    nil::algebra::fields::detail::arithmetic_params<mnt6<298, CHAR_BIT>>>
-                    gt_type;
+                typedef
+                    typename fields::detail::element_fp6_2over3<fields::detail::arithmetic_params<mnt6<298, CHAR_BIT>>>
+                        gt_type;
 
                 typedef std::vector<g1_type> g1_vector;
                 typedef std::vector<g2_type> g2_vector;

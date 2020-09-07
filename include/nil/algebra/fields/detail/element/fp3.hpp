@@ -201,15 +201,15 @@ namespace nil {
                 };
 
                 template<typename FieldParams>
-                element_fp3<FieldParams> operator*(const element_fp<FieldParams> &lhs, const element_fp3<FieldParams> &rhs) {
-                    return element_fp3<FieldParams>({lhs*rhs.data[0],
-                                                lhs*rhs.data[1],
-                                                lhs*rhs.data[2]});
+                element_fp3<FieldParams> operator*(const element_fp<FieldParams> &lhs,
+                                                   const element_fp3<FieldParams> &rhs) {
+                    return element_fp3<FieldParams>({lhs * rhs.data[0], lhs * rhs.data[1], lhs * rhs.data[2]});
                 }
 
                 template<typename FieldParams>
-                element_fp3<FieldParams> operator*(const element_fp3<FieldParams> &lhs, const element_fp<FieldParams> &rhs) {
-                    return rhs*lhs;
+                element_fp3<FieldParams> operator*(const element_fp3<FieldParams> &lhs,
+                                                   const element_fp<FieldParams> &rhs) {
+                    return rhs * lhs;
                 }
 
             }    // namespace detail

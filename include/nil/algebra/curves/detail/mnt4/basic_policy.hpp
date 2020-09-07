@@ -47,17 +47,17 @@ namespace nil {
                     constexpr static const number_type y = 0x00;    //?
                 };
 
-                constexpr typename mnt4_basic_policy<298, CHAR_BIT>::number_type const
-                    mnt4_basic_policy<298, CHAR_BIT>::a;
+                constexpr
+                    typename mnt4_basic_policy<298, CHAR_BIT>::number_type const mnt4_basic_policy<298, CHAR_BIT>::a;
 
-                constexpr typename mnt4_basic_policy<298, CHAR_BIT>::number_type const
-                    mnt4_basic_policy<298, CHAR_BIT>::b;
+                constexpr
+                    typename mnt4_basic_policy<298, CHAR_BIT>::number_type const mnt4_basic_policy<298, CHAR_BIT>::b;
 
-                constexpr typename mnt4_basic_policy<298, CHAR_BIT>::number_type const
-                    mnt4_basic_policy<298, CHAR_BIT>::p;
+                constexpr
+                    typename mnt4_basic_policy<298, CHAR_BIT>::number_type const mnt4_basic_policy<298, CHAR_BIT>::p;
 
-                constexpr typename mnt4_basic_policy<298, CHAR_BIT>::number_type const
-                    mnt4_basic_policy<298, CHAR_BIT>::q;
+                constexpr
+                    typename mnt4_basic_policy<298, CHAR_BIT>::number_type const mnt4_basic_policy<298, CHAR_BIT>::q;
 
             }    // namespace detail
         }        // namespace curves
