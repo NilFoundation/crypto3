@@ -46,18 +46,18 @@ namespace nil {
                 class pairing_selector<algebra::curves::mnt4> {
                 public:
                     typedef typename algebra::curves::mnt4::scalar_field_type FieldType;
-                    typedef algebra::Fqe<algebra::curves::mnt6> FqeT;
-                    typedef algebra::Fqk<algebra::curves::mnt6> FqkT;
+                    typedef algebra::Fqe<algebra::curves::mnt6> fqe_type;
+                    typedef algebra::Fqk<algebra::curves::mnt6> fqk_type;
 
-                    typedef Fp3_variable<FqeT> Fqe_variable_type;
-                    typedef Fp3_mul_gadget<FqeT> Fqe_mul_gadget_type;
-                    typedef Fp3_mul_by_lc_gadget<FqeT> Fqe_mul_by_lc_gadget_type;
-                    typedef Fp3_sqr_gadget<FqeT> Fqe_sqr_gadget_type;
+                    typedef Fp3_variable<fqe_type> Fqe_variable_type;
+                    typedef Fp3_mul_gadget<fqe_type> Fqe_mul_gadget_type;
+                    typedef Fp3_mul_by_lc_gadget<fqe_type> Fqe_mul_by_lc_gadget_type;
+                    typedef Fp3_sqr_gadget<fqe_type> Fqe_sqr_gadget_type;
 
-                    typedef Fp6_variable<FqkT> Fqk_variable_type;
-                    typedef Fp6_mul_gadget<FqkT> Fqk_mul_gadget_type;
-                    typedef Fp6_mul_by_2345_gadget<FqkT> Fqk_special_mul_gadget_type;
-                    typedef Fp6_sqr_gadget<FqkT> Fqk_sqr_gadget_type;
+                    typedef Fp6_variable<fqk_type> Fqk_variable_type;
+                    typedef Fp6_mul_gadget<fqk_type> Fqk_mul_gadget_type;
+                    typedef Fp6_mul_by_2345_gadget<fqk_type> Fqk_special_mul_gadget_type;
+                    typedef Fp6_sqr_gadget<fqk_type> Fqk_sqr_gadget_type;
 
                     typedef algebra::curves::mnt6 other_curve_type;
 
@@ -78,18 +78,18 @@ namespace nil {
                 public:
                     typedef typename algebra::curves::mnt6::scalar_field_type FieldType;
 
-                    typedef algebra::Fqe<algebra::curves::mnt4> FqeT;
-                    typedef algebra::Fqk<algebra::curves::mnt4> FqkT;
+                    typedef algebra::Fqe<algebra::curves::mnt4> fqe_type;
+                    typedef algebra::Fqk<algebra::curves::mnt4> fqk_type;
 
-                    typedef Fp2_variable<FqeT> Fqe_variable_type;
-                    typedef Fp2_mul_gadget<FqeT> Fqe_mul_gadget_type;
-                    typedef Fp2_mul_by_lc_gadget<FqeT> Fqe_mul_by_lc_gadget_type;
-                    typedef Fp2_sqr_gadget<FqeT> Fqe_sqr_gadget_type;
+                    typedef Fp2_variable<fqe_type> Fqe_variable_type;
+                    typedef Fp2_mul_gadget<fqe_type> Fqe_mul_gadget_type;
+                    typedef Fp2_mul_by_lc_gadget<fqe_type> Fqe_mul_by_lc_gadget_type;
+                    typedef Fp2_sqr_gadget<fqe_type> Fqe_sqr_gadget_type;
 
-                    typedef Fp4_variable<FqkT> Fqk_variable_type;
-                    typedef Fp4_mul_gadget<FqkT> Fqk_mul_gadget_type;
-                    typedef Fp4_mul_gadget<FqkT> Fqk_special_mul_gadget_type;
-                    typedef Fp4_sqr_gadget<FqkT> Fqk_sqr_gadget_type;
+                    typedef Fp4_variable<fqk_type> Fqk_variable_type;
+                    typedef Fp4_mul_gadget<fqk_type> Fqk_mul_gadget_type;
+                    typedef Fp4_mul_gadget<fqk_type> Fqk_special_mul_gadget_type;
+                    typedef Fp4_sqr_gadget<fqk_type> Fqk_sqr_gadget_type;
 
                     typedef algebra::curves::mnt4 other_curve_type;
 

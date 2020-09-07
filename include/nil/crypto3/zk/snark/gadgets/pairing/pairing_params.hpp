@@ -25,8 +25,8 @@ namespace nil {
                  * Moreover, one must provide a template specialization for the class
                  * pairing_selector (below), containing typedefs for the typenames
                  * - FieldType
-                 * - FqeT
-                 * - FqkT
+                 * - fqe_type
+                 * - fqk_type
                  * - Fqe_variable_type;
                  * - Fqe_mul_gadget_type
                  * - Fqe_mul_by_lc_gadget_type
@@ -53,8 +53,8 @@ namespace nil {
                  *   template<>
                  *   class pairing_selector<my_ec_pp> {
                  *       typedef my_Field FieldType;
-                 *       typedef my_Fqe FqeT;
-                 *       typedef my_Fqk FqkT;
+                 *       typedef my_Fqe fqe_type;
+                 *       typedef my_Fqk fqk_type;
                  *       typedef my_Fqe_variable_type Fqe_variable_type;
                  *       typedef my_Fqe_mul_gadget_type Fqe_mul_gadget_type;
                  *       typedef my_Fqe_mul_by_lc_gadget_type Fqe_mul_by_lc_gadget_type;
@@ -84,7 +84,7 @@ namespace nil {
                  */
 
                 template<typename CurveType>
-                using FqkT = typename pairing_selector<CurveType>::FqkT;    // TODO: better name when stable
+                using fqk_type = typename pairing_selector<CurveType>::fqk_type;    // TODO: better name when stable
 
                 template<typename CurveType>
                 using Fqe_variable = typename pairing_selector<CurveType>::Fqe_variable_type;

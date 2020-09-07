@@ -43,8 +43,8 @@ namespace nil {
                 class mnt_miller_loop_dbl_line_eval : public gadget<typename CurveType::scalar_field_type> {
                 public:
                     typedef typename CurveType::scalar_field_type FieldType;
-                    typedef algebra::Fqe<other_curve<CurveType>> FqeT;
-                    typedef algebra::Fqk<other_curve<CurveType>> FqkT;
+                    typedef algebra::Fqe<other_curve<CurveType>> fqe_type;
+                    typedef algebra::Fqk<other_curve<CurveType>> fqk_type;
 
                     G1_precomputation<CurveType> prec_P;
                     precompute_G2_gadget_coeffs<CurveType> c;
@@ -78,8 +78,8 @@ namespace nil {
                 class mnt_miller_loop_add_line_eval : public gadget<typename CurveType::scalar_field_type> {
                 public:
                     typedef typename CurveType::scalar_field_type FieldType;
-                    typedef algebra::Fqe<other_curve<CurveType>> FqeT;
-                    typedef algebra::Fqk<other_curve<CurveType>> FqkT;
+                    typedef algebra::Fqe<other_curve<CurveType>> fqe_type;
+                    typedef algebra::Fqk<other_curve<CurveType>> fqk_type;
 
                     bool invert_Q;
                     G1_precomputation<CurveType> prec_P;
@@ -108,8 +108,8 @@ namespace nil {
                 class mnt_miller_loop_gadget : public gadget<typename CurveType::scalar_field_type> {
                 public:
                     typedef typename CurveType::scalar_field_type FieldType;
-                    typedef algebra::Fqe<other_curve<CurveType>> FqeT;
-                    typedef algebra::Fqk<other_curve<CurveType>> FqkT;
+                    typedef algebra::Fqe<other_curve<CurveType>> fqe_type;
+                    typedef algebra::Fqk<other_curve<CurveType>> fqk_type;
 
                     std::vector<std::shared_ptr<Fqk_variable<CurveType>>> g_RR_at_Ps;
                     std::vector<std::shared_ptr<Fqk_variable<CurveType>>> g_RQ_at_Ps;
@@ -148,8 +148,8 @@ namespace nil {
                 class mnt_e_over_e_miller_loop_gadget : public gadget<typename CurveType::scalar_field_type> {
                 public:
                     typedef typename CurveType::scalar_field_type FieldType;
-                    typedef algebra::Fqe<other_curve<CurveType>> FqeT;
-                    typedef algebra::Fqk<other_curve<CurveType>> FqkT;
+                    typedef algebra::Fqe<other_curve<CurveType>> fqe_type;
+                    typedef algebra::Fqk<other_curve<CurveType>> fqk_type;
 
                     std::vector<std::shared_ptr<Fqk_variable<CurveType>>> g_RR_at_P1s;
                     std::vector<std::shared_ptr<Fqk_variable<CurveType>>> g_RQ_at_P1s;
@@ -198,8 +198,8 @@ namespace nil {
                 class mnt_e_times_e_over_e_miller_loop_gadget : public gadget<typename CurveType::scalar_field_type> {
                 public:
                     typedef typename CurveType::scalar_field_type FieldType;
-                    typedef algebra::Fqe<other_curve<CurveType>> FqeT;
-                    typedef algebra::Fqk<other_curve<CurveType>> FqkT;
+                    typedef algebra::Fqe<other_curve<CurveType>> fqe_type;
+                    typedef algebra::Fqk<other_curve<CurveType>> fqk_type;
 
                     std::vector<std::shared_ptr<Fqk_variable<CurveType>>> g_RR_at_P1s;
                     std::vector<std::shared_ptr<Fqk_variable<CurveType>>> g_RQ_at_P1s;
@@ -273,7 +273,7 @@ namespace nil {
                     // prec_P.PX * c.gamma_twist = c.gamma_X - c.old_RY - g_RR_at_P_c1
                     if (gamma_twist->is_constant()) {
                         gamma_twist->evaluate();
-                        const FqeT gamma_twist_const = gamma_twist->get_element();
+                        const fqe_type gamma_twist_const = gamma_twist->get_element();
                         g_RR_at_P_c1.reset(
                             new Fqe_variable<CurveType>(Fqe_variable<CurveType>(this->pb, -gamma_twist_const, prec_P.P->X) +
                                                   *(c.gamma_X) + *(c.RY) * (-FieldType::one())));
@@ -301,11 +301,11 @@ namespace nil {
                 template<typename CurveType>
                 void mnt_miller_loop_dbl_line_eval<CurveType>::generate_r1cs_witness() {
                     gamma_twist->evaluate();
-                    const FqeT gamma_twist_val = gamma_twist->get_element();
+                    const fqe_type gamma_twist_val = gamma_twist->get_element();
                     const FieldType PX_val = this->pb.lc_val(prec_P.P->X);
-                    const FqeT gamma_X_val = c.gamma_X->get_element();
-                    const FqeT RY_val = c.RY->get_element();
-                    const FqeT g_RR_at_P_c1_val = -PX_val * gamma_twist_val + gamma_X_val - RY_val;
+                    const fqe_type gamma_X_val = c.gamma_X->get_element();
+                    const fqe_type RY_val = c.RY->get_element();
+                    const fqe_type g_RR_at_P_c1_val = -PX_val * gamma_twist_val + gamma_X_val - RY_val;
                     g_RR_at_P_c1->generate_r1cs_witness(g_RR_at_P_c1_val);
 
                     if (!gamma_twist->is_constant() && !prec_P.P->X.is_constant()) {
@@ -339,7 +339,7 @@ namespace nil {
                     // prec_P.PX * c.gamma_twist = c.gamma_X - prec_Q.QY - g_RQ_at_P_c1
                     if (gamma_twist->is_constant()) {
                         gamma_twist->evaluate();
-                        const FqeT gamma_twist_const = gamma_twist->get_element();
+                        const fqe_type gamma_twist_const = gamma_twist->get_element();
                         g_RQ_at_P_c1.reset(new Fqe_variable<CurveType>(
                             Fqe_variable<CurveType>(this->pb, -gamma_twist_const, prec_P.P->X) + *(c.gamma_X) +
                             *(Q.Y) * (!invert_Q ? -FieldType::one() : FieldType::one())));
@@ -369,11 +369,11 @@ namespace nil {
                 template<typename CurveType>
                 void mnt_miller_loop_add_line_eval<CurveType>::generate_r1cs_witness() {
                     gamma_twist->evaluate();
-                    const FqeT gamma_twist_val = gamma_twist->get_element();
+                    const fqe_type gamma_twist_val = gamma_twist->get_element();
                     const FieldType PX_val = this->pb.lc_val(prec_P.P->X);
-                    const FqeT gamma_X_val = c.gamma_X->get_element();
-                    const FqeT QY_val = Q.Y->get_element();
-                    const FqeT g_RQ_at_P_c1_val =
+                    const fqe_type gamma_X_val = c.gamma_X->get_element();
+                    const fqe_type QY_val = Q.Y->get_element();
+                    const fqe_type g_RQ_at_P_c1_val =
                         -PX_val * gamma_twist_val + gamma_X_val + (!invert_Q ? -QY_val : QY_val);
                     g_RQ_at_P_c1->generate_r1cs_witness(g_RQ_at_P_c1_val);
 
@@ -463,7 +463,7 @@ namespace nil {
 
                 template<typename CurveType>
                 void mnt_miller_loop_gadget<CurveType>::generate_r1cs_constraints() {
-                    fs[0]->generate_r1cs_equals_const_constraints(FqkT::one());
+                    fs[0]->generate_r1cs_equals_const_constraints(fqk_type::one());
 
                     for (std::size_t i = 0; i < dbl_count; ++i) {
                         doubling_steps[i]->generate_r1cs_constraints();
@@ -479,7 +479,7 @@ namespace nil {
 
                 template<typename CurveType>
                 void mnt_miller_loop_gadget<CurveType>::generate_r1cs_witness() {
-                    fs[0]->generate_r1cs_witness(FqkT::one());
+                    fs[0]->generate_r1cs_witness(fqk_type::one());
 
                     std::size_t add_id = 0;
                     std::size_t dbl_id = 0;
@@ -658,7 +658,7 @@ namespace nil {
 
                 template<typename CurveType>
                 void mnt_e_over_e_miller_loop_gadget<CurveType>::generate_r1cs_constraints() {
-                    fs[0]->generate_r1cs_equals_const_constraints(FqkT::one());
+                    fs[0]->generate_r1cs_equals_const_constraints(fqk_type::one());
 
                     for (std::size_t i = 0; i < dbl_count; ++i) {
                         doubling_steps1[i]->generate_r1cs_constraints();
@@ -678,7 +678,7 @@ namespace nil {
 
                 template<typename CurveType>
                 void mnt_e_over_e_miller_loop_gadget<CurveType>::generate_r1cs_witness() {
-                    fs[0]->generate_r1cs_witness(FqkT::one());
+                    fs[0]->generate_r1cs_witness(fqk_type::one());
 
                     std::size_t add_id = 0;
                     std::size_t dbl_id = 0;
@@ -914,7 +914,7 @@ namespace nil {
 
                 template<typename CurveType>
                 void mnt_e_times_e_over_e_miller_loop_gadget<CurveType>::generate_r1cs_constraints() {
-                    fs[0]->generate_r1cs_equals_const_constraints(FqkT::one());
+                    fs[0]->generate_r1cs_equals_const_constraints(fqk_type::one());
 
                     for (std::size_t i = 0; i < dbl_count; ++i) {
                         doubling_steps1[i]->generate_r1cs_constraints();
@@ -938,7 +938,7 @@ namespace nil {
 
                 template<typename CurveType>
                 void mnt_e_times_e_over_e_miller_loop_gadget<CurveType>::generate_r1cs_witness() {
-                    fs[0]->generate_r1cs_witness(FqkT::one());
+                    fs[0]->generate_r1cs_witness(fqk_type::one());
 
                     std::size_t add_id = 0;
                     std::size_t dbl_id = 0;

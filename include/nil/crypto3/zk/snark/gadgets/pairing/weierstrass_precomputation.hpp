@@ -39,8 +39,8 @@ namespace nil {
                 class G1_precomputation {
                 public:
                     typedef typename CurveType::scalar_field_type FieldType;
-                    typedef algebra::Fqe<other_curve<CurveType>> FqeT;
-                    typedef algebra::Fqk<other_curve<CurveType>> FqkT;
+                    typedef algebra::Fqe<other_curve<CurveType>> fqe_type;
+                    typedef algebra::Fqk<other_curve<CurveType>> fqk_type;
 
                     std::shared_ptr<G1_variable<CurveType>> P;
                     std::shared_ptr<Fqe_variable<CurveType>> PY_twist_squared;
@@ -55,8 +55,8 @@ namespace nil {
                 template<typename CurveType>
                 class precompute_G1_gadget : public gadget<typename CurveType::scalar_field_type> {
                 public:
-                    typedef algebra::Fqe<other_curve<CurveType>> FqeT;
-                    typedef algebra::Fqk<other_curve<CurveType>> FqkT;
+                    typedef algebra::Fqe<other_curve<CurveType>> fqe_type;
+                    typedef algebra::Fqk<other_curve<CurveType>> fqk_type;
 
                     G1_precomputation<CurveType> &precomp;    // must be a reference.
 
@@ -113,8 +113,8 @@ namespace nil {
                 class precompute_G2_gadget_coeffs {
                 public:
                     typedef typename CurveType::scalar_field_type FieldType;
-                    typedef algebra::Fqe<other_curve<CurveType>> FqeT;
-                    typedef algebra::Fqk<other_curve<CurveType>> FqkT;
+                    typedef algebra::Fqe<other_curve<CurveType>> fqe_type;
+                    typedef algebra::Fqk<other_curve<CurveType>> fqk_type;
 
                     std::shared_ptr<Fqe_variable<CurveType>> RX;
                     std::shared_ptr<Fqe_variable<CurveType>> RY;
@@ -133,8 +133,8 @@ namespace nil {
                 class G2_precomputation {
                 public:
                     typedef typename CurveType::scalar_field_type FieldType;
-                    typedef algebra::Fqe<other_curve<CurveType>> FqeT;
-                    typedef algebra::Fqk<other_curve<CurveType>> FqkT;
+                    typedef algebra::Fqe<other_curve<CurveType>> fqe_type;
+                    typedef algebra::Fqk<other_curve<CurveType>> fqk_type;
 
                     std::shared_ptr<G2_variable<CurveType>> Q;
 
@@ -167,8 +167,8 @@ namespace nil {
                 class precompute_G2_gadget_doubling_step : public gadget<typename CurveType::scalar_field_type> {
                 public:
                     typedef typename CurveType::scalar_field_type FieldType;
-                    typedef algebra::Fqe<other_curve<CurveType>> FqeT;
-                    typedef algebra::Fqk<other_curve<CurveType>> FqkT;
+                    typedef algebra::Fqe<other_curve<CurveType>> fqe_type;
+                    typedef algebra::Fqk<other_curve<CurveType>> fqk_type;
 
                     precompute_G2_gadget_coeffs<CurveType> cur;
                     precompute_G2_gadget_coeffs<CurveType> next;
@@ -215,8 +215,8 @@ namespace nil {
                 class precompute_G2_gadget_addition_step : public gadget<typename CurveType::scalar_field_type> {
                 public:
                     typedef typename CurveType::scalar_field_type FieldType;
-                    typedef algebra::Fqe<other_curve<CurveType>> FqeT;
-                    typedef algebra::Fqk<other_curve<CurveType>> FqkT;
+                    typedef algebra::Fqe<other_curve<CurveType>> fqe_type;
+                    typedef algebra::Fqk<other_curve<CurveType>> fqk_type;
 
                     bool invert_Q;
                     precompute_G2_gadget_coeffs<CurveType> cur;
@@ -251,8 +251,8 @@ namespace nil {
                 class precompute_G2_gadget : public gadget<typename CurveType::scalar_field_type> {
                 public:
                     typedef typename CurveType::scalar_field_type FieldType;
-                    typedef algebra::Fqe<other_curve<CurveType>> FqeT;
-                    typedef algebra::Fqk<other_curve<CurveType>> FqkT;
+                    typedef algebra::Fqe<other_curve<CurveType>> fqe_type;
+                    typedef algebra::Fqk<other_curve<CurveType>> fqk_type;
 
                     std::vector<std::shared_ptr<precompute_G2_gadget_addition_step<CurveType>>> addition_steps;
                     std::vector<std::shared_ptr<precompute_G2_gadget_doubling_step<CurveType>>> doubling_steps;
@@ -422,18 +422,18 @@ namespace nil {
                     two_RY->evaluate();
                     three_RXsquared_plus_a->evaluate();
 
-                    const FqeT three_RXsquared_plus_a_val = three_RXsquared_plus_a->get_element();
-                    const FqeT two_RY_val = two_RY->get_element();
-                    const FqeT gamma_val = three_RXsquared_plus_a_val * two_RY_val.inverse();
+                    const fqe_type three_RXsquared_plus_a_val = three_RXsquared_plus_a->get_element();
+                    const fqe_type two_RY_val = two_RY->get_element();
+                    const fqe_type gamma_val = three_RXsquared_plus_a_val * two_RY_val.inverse();
                     cur.gamma->generate_r1cs_witness(gamma_val);
 
                     compute_gamma->generate_r1cs_witness();
                     compute_gamma_X->generate_r1cs_witness();
 
-                    const FqeT RX_val = cur.RX->get_element();
-                    const FqeT RY_val = cur.RY->get_element();
-                    const FqeT next_RX_val = gamma_val.squared() - RX_val - RX_val;
-                    const FqeT next_RY_val = gamma_val * (RX_val - next_RX_val) - RY_val;
+                    const fqe_type RX_val = cur.RX->get_element();
+                    const fqe_type RY_val = cur.RY->get_element();
+                    const fqe_type next_RX_val = gamma_val.squared() - RX_val - RX_val;
+                    const fqe_type next_RY_val = gamma_val * (RX_val - next_RX_val) - RY_val;
 
                     next.RX->generate_r1cs_witness(next_RX_val);
                     next.RY->generate_r1cs_witness(next_RY_val);
@@ -498,19 +498,19 @@ namespace nil {
                     RY_minus_QY->evaluate();
                     RX_minus_QX->evaluate();
 
-                    const FqeT RY_minus_QY_val = RY_minus_QY->get_element();
-                    const FqeT RX_minus_QX_val = RX_minus_QX->get_element();
-                    const FqeT gamma_val = RY_minus_QY_val * RX_minus_QX_val.inverse();
+                    const fqe_type RY_minus_QY_val = RY_minus_QY->get_element();
+                    const fqe_type RX_minus_QX_val = RX_minus_QX->get_element();
+                    const fqe_type gamma_val = RY_minus_QY_val * RX_minus_QX_val.inverse();
                     cur.gamma->generate_r1cs_witness(gamma_val);
 
                     compute_gamma->generate_r1cs_witness();
                     compute_gamma_X->generate_r1cs_witness();
 
-                    const FqeT RX_val = cur.RX->get_element();
-                    const FqeT RY_val = cur.RY->get_element();
-                    const FqeT QX_val = Q.X->get_element();
-                    const FqeT next_RX_val = gamma_val.squared() - RX_val - QX_val;
-                    const FqeT next_RY_val = gamma_val * (RX_val - next_RX_val) - RY_val;
+                    const fqe_type RX_val = cur.RX->get_element();
+                    const fqe_type RY_val = cur.RY->get_element();
+                    const fqe_type QX_val = Q.X->get_element();
+                    const fqe_type next_RX_val = gamma_val.squared() - RX_val - QX_val;
+                    const fqe_type next_RY_val = gamma_val * (RX_val - next_RX_val) - RY_val;
 
                     next.RX->generate_r1cs_witness(next_RX_val);
                     next.RY->generate_r1cs_witness(next_RY_val);

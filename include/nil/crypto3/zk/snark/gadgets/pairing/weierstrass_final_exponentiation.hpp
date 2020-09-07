@@ -55,13 +55,13 @@ namespace nil {
                     std::shared_ptr<Fqk_mul_gadget<CurveType>> compute_el_inv_q_3_minus_1;
                     std::shared_ptr<Fqk_mul_gadget<CurveType>> compute_inv_beta;
 
-                    std::shared_ptr<exponentiation_gadget<FqkT<CurveType>,
+                    std::shared_ptr<exponentiation_gadget<fqk_type<CurveType>,
                                                           Fp6_variable,
                                                           Fp6_mul_gadget,
                                                           Fp6_cyclotomic_sqr_gadget,
                                                           algebra::mnt6_q_limbs>>
                         compute_w1;
-                    std::shared_ptr<exponentiation_gadget<FqkT<CurveType>,
+                    std::shared_ptr<exponentiation_gadget<fqk_type<CurveType>,
                                                           Fp6_variable,
                                                           Fp6_mul_gadget,
                                                           Fp6_cyclotomic_sqr_gadget,
@@ -102,13 +102,13 @@ namespace nil {
                     std::shared_ptr<Fqk_mul_gadget<CurveType>> compute_el_q_2_minus_1;
                     std::shared_ptr<Fqk_mul_gadget<CurveType>> compute_el_inv_q_2_minus_1;
 
-                    std::shared_ptr<exponentiation_gadget<FqkT<CurveType>,
+                    std::shared_ptr<exponentiation_gadget<fqk_type<CurveType>,
                                                           Fp4_variable,
                                                           Fp4_mul_gadget,
                                                           Fp4_cyclotomic_sqr_gadget,
                                                           algebra::mnt4_q_limbs>>
                         compute_w1;
-                    std::shared_ptr<exponentiation_gadget<FqkT<CurveType>,
+                    std::shared_ptr<exponentiation_gadget<fqk_type<CurveType>,
                                                           Fp4_variable,
                                                           Fp4_mul_gadget,
                                                           Fp4_cyclotomic_sqr_gadget,
@@ -154,14 +154,14 @@ namespace nil {
                     compute_el_inv_q_3_minus_1.reset(new Fqk_mul_gadget<CurveType>(pb, *el_inv_q_3, el, *el_inv_q_3_minus_1));
                     compute_inv_beta.reset(new Fqk_mul_gadget<CurveType>(pb, *inv_alpha, *el_inv_q_3_minus_1, *inv_beta));
 
-                    compute_w1.reset(new exponentiation_gadget<FqkT<CurveType>,
+                    compute_w1.reset(new exponentiation_gadget<fqk_type<CurveType>,
                                                                Fp6_variable,
                                                                Fp6_mul_gadget,
                                                                Fp6_cyclotomic_sqr_gadget,
                                                                algebra::mnt6_q_limbs>(
                         pb, *beta_q, algebra::mnt6_final_exponent_last_chunk_w1, *w1));
 
-                    compute_w0.reset(new exponentiation_gadget<FqkT<CurveType>,
+                    compute_w0.reset(new exponentiation_gadget<fqk_type<CurveType>,
                                                                Fp6_variable,
                                                                Fp6_mul_gadget,
                                                                Fp6_cyclotomic_sqr_gadget,
@@ -244,13 +244,13 @@ namespace nil {
                     compute_el_q_2_minus_1.reset(new Fqk_mul_gadget<CurveType>(pb, *el_q_2, *el_inv, *el_q_2_minus_1));
                     compute_el_inv_q_2_minus_1.reset(new Fqk_mul_gadget<CurveType>(pb, *el_inv_q_2, el, *el_inv_q_2_minus_1));
 
-                    compute_w1.reset(new exponentiation_gadget<FqkT<CurveType>,
+                    compute_w1.reset(new exponentiation_gadget<fqk_type<CurveType>,
                                                                Fp4_variable,
                                                                Fp4_mul_gadget,
                                                                Fp4_cyclotomic_sqr_gadget,
                                                                algebra::mnt4_q_limbs>(
                         pb, *el_q_3_minus_q, algebra::mnt4_final_exponent_last_chunk_w1, *w1));
-                    compute_w0.reset(new exponentiation_gadget<FqkT<CurveType>,
+                    compute_w0.reset(new exponentiation_gadget<fqk_type<CurveType>,
                                                                Fp4_variable,
                                                                Fp4_mul_gadget,
                                                                Fp4_cyclotomic_sqr_gadget,

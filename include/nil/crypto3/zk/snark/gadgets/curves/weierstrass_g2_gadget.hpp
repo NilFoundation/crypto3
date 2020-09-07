@@ -32,8 +32,8 @@ namespace nil {
                 class G2_variable : public gadget<typename CurveType::scalar_field_type> {
                 public:
                     typedef typename CurveType::scalar_field_type FieldType;
-                    typedef algebra::Fqe<other_curve<CurveType>> FqeT;
-                    typedef algebra::Fqk<other_curve<CurveType>> FqkT;
+                    typedef algebra::Fqe<other_curve<CurveType>> fqe_type;
+                    typedef algebra::Fqk<other_curve<CurveType>> fqk_type;
 
                     std::shared_ptr<Fqe_variable<CurveType>> X;
                     std::shared_ptr<Fqe_variable<CurveType>> Y;
@@ -58,8 +58,8 @@ namespace nil {
                 class G2_checker_gadget : public gadget<typename CurveType::scalar_field_type> {
                 public:
                     typedef typename CurveType::scalar_field_type FieldType;
-                    typedef algebra::Fqe<other_curve<CurveType>> FqeT;
-                    typedef algebra::Fqk<other_curve<CurveType>> FqkT;
+                    typedef algebra::Fqe<other_curve<CurveType>> fqe_type;
+                    typedef algebra::Fqk<other_curve<CurveType>> fqk_type;
 
                     G2_variable<CurveType> Q;
 
