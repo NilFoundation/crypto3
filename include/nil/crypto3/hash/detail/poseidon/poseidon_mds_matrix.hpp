@@ -9,10 +9,11 @@
 #ifndef CRYPTO3_HASH_POSEIDON_MDS_MATRIX_HPP
 #define CRYPTO3_HASH_POSEIDON_MDS_MATRIX_HPP
 
+#include <nil/algebra/matrix/math.hpp>
+
 #include <nil/crypto3/hash/detail/poseidon/poseidon_policy.hpp>
 
 #include <boost/assert.hpp>
-// #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/lu.hpp>
@@ -30,21 +31,21 @@ namespace nil {
                     constexpr static const std::size_t half_full_rounds = policy_type::half_full_rounds;
                     constexpr static const std::size_t part_rounds = policy_type::part_rounds;
 
-                    typedef cotila::matrix<element_type, state_words, state_words> mds_matrix_type;
-                    typedef cotila::vector<element_type, state_words> state_vector_type;
-                    typedef cotila::vector<element_type, state_words - 1> substate_vector_type;
-                    typedef cotila::matrix<element_type, state_words - 1, state_words - 1> mds_submatrix_type;
+                    typedef algebra::matrix<element_type, state_words, state_words> mds_matrix_type;
+                    typedef algebra::vector<element_type, state_words> state_vector_type;
+                    typedef algebra::vector<element_type, state_words - 1> substate_vector_type;
+                    typedef algebra::matrix<element_type, state_words - 1, state_words - 1> mds_submatrix_type;
                     typedef std::array<substate_vector_type, part_rounds> subvectors_collection;
 
                     static inline state_vector_type vect_matr_mul(const state_vector_type &A_vect,
                                                                   const mds_matrix_type &matr) {
-                        typedef cotila::matrix<element_type, 1, state_words> state_vect_by_matr_type;
+                        typedef algebra::matrix<element_type, 1, state_words> state_vect_by_matr_type;
 
                         state_vect_by_matr_type state_vect_by_matr;
                         for (std::size_t i = 0; i < state_words; i++) {
                             state_vect_by_matr[0][i] = A_vect[i];
                         }
-                        state_vect_by_matr = cotila::matmul(state_vect_by_matr, matr);
+                        state_vect_by_matr = algebra::matmul(state_vect_by_matr, matr);
                         state_vector_type A_out;
                         for (std::size_t i = 0; i < state_words; i++) {
                             A_out[i] = state_vect_by_matr[0][i];
@@ -107,15 +108,15 @@ namespace nil {
                     }
                     // add constexpr
                     static inline const mds_matrix_type mds_matrix = generate_mds_matrix();
-                    static inline const mds_matrix_type mds_matrix_inverse = cotila::inverse(mds_matrix);
+                    static inline const mds_matrix_type mds_matrix_inverse = algebra::inverse(mds_matrix);
 
                     struct equivalent_mds_matrix_type {
                         typedef std::array<substate_vector_type, part_rounds> subvectors_array;
 
                         constexpr equivalent_mds_matrix_type(const mds_matrix_type &mds_matrix) :
-                            M_i(cotila::identity<element_type, state_words>), w_hat_list(), v_list(), M_0_0() {
+                            M_i(algebra::identity<element_type, state_words>), w_hat_list(), v_list(), M_0_0() {
 
-                            typedef cotila::matrix<element_type, state_words - 1, 1> M_mul_column_slice_matr_type;
+                            typedef algebra::matrix<element_type, state_words - 1, 1> M_mul_column_slice_matr_type;
                             mds_matrix_type M_mul(mds_matrix);
                             mds_submatrix_type M_hat_inverse;
                             substate_vector_type M_mul_column_slice;
@@ -123,19 +124,19 @@ namespace nil {
 
                             for (std::size_t i = 0; i < part_rounds; i++) {
                                 M_hat_inverse =
-                                    cotila::inverse(cotila::submat<state_words - 1, state_words - 1>(M_mul, 1, 1));
-                                M_mul_column_slice = cotila::slice<state_words - 1>(M_mul.column(0), 1);
+                                    algebra::inverse(algebra::submat<state_words - 1, state_words - 1>(M_mul, 1, 1));
+                                M_mul_column_slice = algebra::slice<state_words - 1>(M_mul.column(0), 1);
                                 for (std::size_t j = 0; j < state_words - 1; j++) {
                                     M_mul_column_slice_matr[j][0] = M_mul_column_slice[j];
                                 }
-                                w_hat_list[i] = cotila::matmul(M_hat_inverse, M_mul_column_slice_matr).column(0);
-                                v_list[i] = cotila::slice<state_words - 1>(M_mul.row(0), 1);
+                                w_hat_list[i] = algebra::matmul(M_hat_inverse, M_mul_column_slice_matr).column(0);
+                                v_list[i] = algebra::slice<state_words - 1>(M_mul.row(0), 1);
                                 for (std::size_t j = 1; j < state_words; j++) {
                                     for (std::size_t k = 1; k < state_words; k++) {
                                         M_i[j][k] = M_mul[j][k];
                                     }
                                 }
-                                M_mul = cotila::matmul(mds_matrix, M_i);
+                                M_mul = algebra::matmul(mds_matrix, M_i);
                             }
                             M_0_0 = mds_matrix[0][0];
                         }

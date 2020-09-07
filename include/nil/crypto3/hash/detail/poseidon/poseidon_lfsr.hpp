@@ -17,6 +17,8 @@ using namespace boost::multiprecision::literals;
 
 BOOST_MP_DEFINE_SIZED_CPP_INT_LITERAL(POSEIDON_LFSR_GENERATOR_LEN);
 
+#include <nil/algebra/vector/vector.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace hashes {
@@ -119,8 +121,8 @@ namespace nil {
                         state_type;
 
                     constexpr static const std::size_t constants_number = (full_rounds + part_rounds) * state_words;
-                    typedef cotila::vector<ElementType, constants_number> round_constants_type;
-                    typedef cotila::vector<ElementType, state_words> round_constants_arity_slice_type;
+                    typedef algebra::vector<ElementType, constants_number> round_constants_type;
+                    typedef algebra::vector<ElementType, state_words> round_constants_arity_slice_type;
 
                     constexpr void generate_round_constants() {
                         modulus_type constant = 0;

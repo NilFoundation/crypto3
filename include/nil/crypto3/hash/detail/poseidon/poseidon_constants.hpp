@@ -40,8 +40,8 @@ namespace nil {
                     constexpr static const std::size_t round_constants_size = (full_rounds + part_rounds) * state_words;
                     constexpr static const std::size_t equivalent_round_constants_size =
                         (full_rounds + 1) * state_words + part_rounds - 1;
-                    typedef cotila::vector<element_type, round_constants_size> round_constants_type;
-                    typedef cotila::vector<element_type, equivalent_round_constants_size>
+                    typedef algebra::vector<element_type, round_constants_size> round_constants_type;
+                    typedef algebra::vector<element_type, equivalent_round_constants_size>
                         equivalent_round_constants_type;
 
                     /*
@@ -148,7 +148,7 @@ namespace nil {
                     }
                     constexpr static inline const state_vector_type
                         get_round_constants_slice(std::size_t constants_number_base) {
-                        return cotila::slice<state_words>(round_constants_generator.round_constants,
+                        return algebra::slice<state_words>(round_constants_generator.round_constants,
                                                           constants_number_base);
                     }
 
