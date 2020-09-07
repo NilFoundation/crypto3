@@ -78,17 +78,33 @@ namespace nil {
                     }
 
                     bool operator==(const bn128_g2 &other) const {
-                        bn128_g2 t0 = normalize();
-                        bn128_g2 t1 = other.normalize();
-                        if (t0.is_zero()) {
-                            if (t1.is_zero())
-                                return true;
+                        if (this->is_zero()) {
+                            return other.is_zero();
+                        }
+
+                        if (other.is_zero()) {
                             return false;
                         }
-                        if (t1.is_zero())
-                            return false;
 
-                        return t0.p[0] == t1.p[0] && t0.p[1] == t1.p[1];
+                        /* now neither is O */
+
+                        underlying_field_type_value Z1sq, Z2sq, lhs, rhs;
+                        Z1sq = (this->p[2]).squared();
+                        Z2sq = other.p[2].squared();
+                        lhs = Z2sq * this->p[0];
+                        rhs = Z1sq * other.p[0];
+
+                        if (lhs != rhs) {
+                            return false;
+                        }
+
+                        underlying_field_type_value Z1cubed, Z2cubed;
+                        Z1cubed = Z1sq * this->p[2];
+                        Z2cubed = Z2sq * other.p[2];
+                        lhs = Z2cubed * this->p[1];
+                        rhs = Z1cubed * other.p[1];
+
+                        return (lhs == rhs);
                     }
 
                     bool operator!=(const bn128_g2 &other) const {

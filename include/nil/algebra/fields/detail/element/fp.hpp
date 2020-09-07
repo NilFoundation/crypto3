@@ -11,7 +11,7 @@
 #define ALGEBRA_FIELDS_ELEMENT_FP_HPP
 
 #include <nil/algebra/fields/detail/exponentiation.hpp>
-#icnlude < boost / multiprecision / ressol.hpp>
+#include <boost/multiprecision/ressol.hpp>
 
 namespace nil {
     namespace algebra {

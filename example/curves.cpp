@@ -152,7 +152,7 @@ int main() {
 
     std::cout << "----------------------------" << std::endl;
 
-    std::cout << "Edwards curve g1 group basic math:" << std::endl;
+    /*std::cout << "Edwards curve g1 group basic math:" << std::endl;
     fp_curve_group_basic_math_examples<curves::edwards<183>::g1_type>();
 
     std::cout << "----------------------------" << std::endl;
@@ -160,7 +160,7 @@ int main() {
     std::cout << "Edwards curve g2 group basic math:" << std::endl;
     fp3_curve_group_basic_math_examples<curves::edwards<183>::g2_type>();
 
-    std::cout << "----------------------------" << std::endl;
+    std::cout << "----------------------------" << std::endl;*/
 
     /*std::cout << "Mnt4 curve g1 group basic math:" << std::endl;
     fp_curve_group_basic_math_examples<curves::mnt4<298>::g1_type>();
