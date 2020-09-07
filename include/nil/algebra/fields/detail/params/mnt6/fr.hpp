@@ -16,7 +16,7 @@
 
 #include <nil/algebra/fields/mnt6/fr.hpp>
 
-#include <nil/algebra/detail/mp_def.hpp>
+#include <nil/algebra/detail/literals.hpp>
 
 namespace nil {
     namespace algebra {

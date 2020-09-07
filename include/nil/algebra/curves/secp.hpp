@@ -13,7 +13,7 @@
 #include <nil/algebra/fields/secp/fq.hpp>
 #include <nil/algebra/fields/secp/fr.hpp>
 
-#include <nil/algebra/detail/mp_def.hpp>
+#include <nil/algebra/detail/literals.hpp>
 
 namespace nil {
     namespace algebra {

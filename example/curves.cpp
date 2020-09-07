@@ -16,7 +16,7 @@
 
 #include <nil/algebra/curves/bn128.hpp>
 #include <nil/algebra/curves/edwards.hpp>
-//#include <nil/algebra/curves/mnt4.hpp>
+#include <nil/algebra/curves/mnt4.hpp>
 
 #include <nil/algebra/fields/bn128/fq.hpp>
 #include <nil/algebra/fields/bn128/fr.hpp>
@@ -162,7 +162,7 @@ int main() {
 
     std::cout << "----------------------------" << std::endl;
 
-    /*std::cout << "Mnt4 curve g1 group basic math:" << std::endl;
+    std::cout << "Mnt4 curve g1 group basic math:" << std::endl;
     fp_curve_group_basic_math_examples<curves::mnt4<298>::g1_type>();
 
     std::cout << "----------------------------" << std::endl;
@@ -170,7 +170,7 @@ int main() {
     std::cout << "Mnt4 curve g2 group basic math:" << std::endl;
     fp2_curve_group_basic_math_examples<curves::mnt4<298>::g2_type>();
 
-    std::cout << "----------------------------" << std::endl;*/
+    std::cout << "----------------------------" << std::endl;
 
     return 0;
 }

@@ -10,6 +10,7 @@
 #ifndef ALGEBRA_CURVES_MNT4_G1_HPP
 #define ALGEBRA_CURVES_MNT4_G1_HPP
 
+#include <nil/algebra/curves/detail/mnt4/basic_policy.hpp>
 #include <nil/algebra/curves/detail/mnt4/g2.hpp>
 
 #include <nil/algebra/fields/mnt4/fq.hpp>
@@ -27,9 +28,10 @@ namespace nil {
 
                 using namespace nil::algebra;
 
-                template<std::size_t ModulusBits>
+                template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
                 struct mnt4_g1 {
 
+                    using policy_type = mnt4_basic_policy<ModulusBits, GeneratorBits>;
                     constexpr static const std::size_t g1_field_bits = ModulusBits;
                     typedef typename fields::detail::element_fp<
                         fields::detail::arithmetic_params<fields::mnt4_fq<g1_field_bits, CHAR_BIT>>>
@@ -42,13 +44,16 @@ namespace nil {
 
                     using underlying_field_type_value = g1_field_type_value;
 
-                    constexpr static const underlying_field_type_value a(2);
-                    constexpr static const underlying_field_type_value
-                        b(0x3545A27639415585EA4D523234FC3EDD2A2070A085C7B980F4E9CD21A515D4B0EF528EC0FD5_cppui298);
-                    constexpr static const underlying_field_type_value x(0x00);    //?
-                    constexpr static const underlying_field_type_value y(0x00);    //?
+                    underlying_field_type_value p[3];
 
-                    mnt4_g1() : mnt4_g1(zero_fill[0], zero_fill[1], zero_fill[2]) {};
+                    /*constexpr static */const underlying_field_type_value x = underlying_field_type_value(0x00);    //?
+                    /*constexpr static */const underlying_field_type_value y = underlying_field_type_value(0x00);    //?
+
+                    mnt4_g1() : mnt4_g1(underlying_field_type_value::zero(), underlying_field_type_value::one(),
+                        underlying_field_type_value::zero()) {};
+                    // must be
+                    // mnt4_g1() : mnt4_g1(zero_fill[0], zero_fill[1], zero_fill[2]) {};
+                    // when constexpr fields will be finished
 
                     mnt4_g1(underlying_field_type_value X,
                             underlying_field_type_value Y,
@@ -63,10 +68,17 @@ namespace nil {
                     }
 
                     static mnt4_g1 one() {
-                        return mnt4_g1(one_fill[0], one_fill[1], one_fill[2]);
+                        return mnt4_g1(underlying_field_type_value(
+                                            0x7A2CAF82A1BA85213FE6CA3875AEE86ABA8F73D69060C4079492B948DEA216B5B9C8D2AF46_cppui295),
+                                        underlying_field_type_value(
+                                            0x2DB619461CC82672F7F159FEC2E89D0148DCC9862D36778C1AFD96A71E29CBA48E710A48AB2_cppui298),
+                                        underlying_field_type_value::one());
+                        // must be
+                        // mnt4_g1() : mnt4_g1(zero_fill[0], zero_fill[1], zero_fill[2]) {};
+                        // when constexpr fields will be finished
                     }
 
-                    bool mnt4_g1::operator==(const mnt4_g1 &other) const {
+                    bool operator==(const mnt4_g1 &other) const {
                         if (this->is_zero()) {
                             return other.is_zero();
                         }
@@ -88,6 +100,14 @@ namespace nil {
                         }
 
                         return true;
+                    }
+
+                    bool operator!=(const mnt4_g1& other) const {
+                        return !(operator==(other));
+                    }
+
+                    bool is_zero() const {
+                        return (this->p[0].is_zero() && this->p[2].is_zero());
                     }
 
                     mnt4_g1 operator+(const mnt4_g1 &other) const {
@@ -151,7 +171,7 @@ namespace nil {
                             const underlying_field_type_value XX = (this->p[0]).squared();    // XX  = X1^2
                             const underlying_field_type_value ZZ = (this->p[2]).squared();    // ZZ  = Z1^2
                             const underlying_field_type_value w =
-                                mnt4_g1::coeff_a * ZZ + (XX + XX + XX);    // w   = a*ZZ + 3*XX
+                                a * ZZ + (XX + XX + XX);    // w   = a*ZZ + 3*XX
                             const underlying_field_type_value Y1Z1 = (this->p[1]) * (this->p[2]);
                             const underlying_field_type_value s = Y1Z1 + Y1Z1;         // s   = 2*Y1*Z1
                             const underlying_field_type_value ss = s.squared();        // ss  = s^2
@@ -211,28 +231,54 @@ namespace nil {
                         return mnt4_g1(X3, Y3, Z3);
                     }
 
+                    void to_affine_coordinates() {
+                        if (this->is_zero()) {
+                            this->p[0] = underlying_field_type_value::zero();
+                            this->p[1] = underlying_field_type_value::one();
+                            this->p[2] = underlying_field_type_value::zero();
+                        }
+                        else {
+                            const underlying_field_type_value Z_inv = this->p[2].inverse();
+                            this->p[0] = this->p[0] * Z_inv;
+                            this->p[1] = this->p[1] * Z_inv;
+                            this->p[2] = underlying_field_type_value::one();
+                        }
+                    }
+
+                    void to_special() {
+                        this->to_affine_coordinates();
+                    }
+
+                    bool is_special() const {
+                        return (this->is_zero() || this->p[2] == underlying_field_type_value::one());
+                    }
+
                 private:
-                    constexpr static const g2_field_type_value twist =
+
+                    /*constexpr static */ const g1_field_type_value a = g1_field_type_value(policy_type::a);
+                    /*constexpr static */ const g1_field_type_value b = g1_field_type_value(policy_type::b);
+
+                    /*constexpr static const g2_field_type_value twist =
                         g2_field_type_value(typename g2_field_type_value::underlying_type::zero(),
                                             typename g2_field_type_value::underlying_type::one());
 
-                    static const g2_field_type_value twist_coeff_a = mnt4_g2<ModulusBits, GeneratorBits>::coeff_a;
-                    static const g2_field_type_value twist_coeff_b = mnt4_g2<ModulusBits, GeneratorBits>::coeff_b;
+                    static const g2_field_type_value twist_coeff_a = mnt4_g2<ModulusBits, GeneratorBits>::a;
+                    static const g2_field_type_value twist_coeff_b = mnt4_g2<ModulusBits, GeneratorBits>::b;
 
                     static const g1_field_type_value twist_mul_by_a_c0 =
-                        mnt4_g1<ModulusBits, GeneratorBits>::coeff_a * g2_field_type_value::non_residue;
+                        mnt4_g1<ModulusBits, GeneratorBits>::a * g2_field_type_value::non_residue;
                     static const g1_field_type_value twist_mul_by_a_c1 =
-                        mnt4_g1<ModulusBits, GeneratorBits>::coeff_a * g2_field_type_value::non_residue;
+                        mnt4_g1<ModulusBits, GeneratorBits>::a * g2_field_type_value::non_residue;
                     static const g1_field_type_value twist_mul_by_b_c0 =
-                        mnt4_g1<ModulusBits, GeneratorBits>::coeff_b * g2_field_type_value::non_residue.squared();
+                        mnt4_g1<ModulusBits, GeneratorBits>::b * g2_field_type_value::non_residue.squared();
                     static const g1_field_type_value twist_mul_by_b_c1 =
-                        mnt4_g1<ModulusBits, GeneratorBits>::coeff_b * g2_field_type_value::non_residue;
+                        mnt4_g1<ModulusBits, GeneratorBits>::b * g2_field_type_value::non_residue;
                     static const g1_field_type_value twist_mul_by_q_X = g1_field_type_value(
                         0x3BCF7BCD473A266249DA7B0548ECAEEC9635D1330EA41A9E35E51200E12C90CD65A71660000_cppui298);
                     static const g1_field_type_value twist_mul_by_q_Y = g1_field_type_value(
-                        0xF73779FE09916DFDCC2FD1F968D534BEB17DAF7518CD9FAE5C1F7BDCF94DD5D7DEF6980C4_cppui292);
+                        0xF73779FE09916DFDCC2FD1F968D534BEB17DAF7518CD9FAE5C1F7BDCF94DD5D7DEF6980C4_cppui292);*/
 
-                    constexpr static const underlying_field_type_value zero_fill = {
+                    /*constexpr static const underlying_field_type_value zero_fill = {
                         underlying_field_type_value::zero(), underlying_field_type_value::one(),
                         underlying_field_type_value::zero()};
 
@@ -241,7 +287,7 @@ namespace nil {
                             0x7A2CAF82A1BA85213FE6CA3875AEE86ABA8F73D69060C4079492B948DEA216B5B9C8D2AF46_cppui295),
                         underlying_field_type_value(
                             0x2DB619461CC82672F7F159FEC2E89D0148DCC9862D36778C1AFD96A71E29CBA48E710A48AB2_cppui298),
-                        underlying_field_type_value::one()};
+                        underlying_field_type_value::one()};*/
                 };
 
             }    // namespace detail

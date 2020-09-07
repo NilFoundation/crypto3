@@ -11,7 +11,6 @@
 #define ALGEBRA_CURVES_EDWARDS_G1_HPP
 
 #include <nil/algebra/curves/detail/edwards/basic_policy.hpp>
-
 #include <nil/algebra/curves/detail/edwards/g2.hpp>
 
 #include <nil/algebra/fields/edwards/fq.hpp>

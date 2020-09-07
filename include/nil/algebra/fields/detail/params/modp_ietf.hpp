@@ -14,7 +14,7 @@
 
 #include <nil/algebra/fields/modp_ietf.hpp>
 
-#include <nil/algebra/detail/mp_def.hpp>
+#include <nil/algebra/detail/literals.hpp>
 
 namespace nil {
     namespace algebra {

@@ -13,7 +13,7 @@
 #include <nil/algebra/fields/gost_A/fq.hpp>
 #include <nil/algebra/fields/gost_A/fr.hpp>
 
-#include <nil/algebra/detail/mp_def.hpp>
+#include <nil/algebra/detail/literals.hpp>
 
 namespace nil {
     namespace algebra {

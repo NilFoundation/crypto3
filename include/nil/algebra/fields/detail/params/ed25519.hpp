@@ -14,7 +14,7 @@
 
 #include <nil/algebra/fields/ed25519.hpp>
 
-#include <nil/algebra/detail/mp_def.hpp>
+#include <nil/algebra/detail/literals.hpp>
 
 namespace nil {
     namespace algebra {
