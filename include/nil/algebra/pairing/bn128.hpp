@@ -10,9 +10,6 @@
 #ifndef ALGEBRA_PAIRING_BN128_POLICY_HPP
 #define ALGEBRA_PAIRING_BN128_POLICY_HPP
 
-#include <sstream>
-
-#include <nil/algebra/pairing/ate.hpp>
 #include <nil/algebra/pairing/detail/bn128/functions.hpp>
 
 #include <nil/algebra/curves/bn128.hpp>

@@ -10,9 +10,6 @@
 #ifndef ALGEBRA_PAIRING_MNT4_POLICY_HPP
 #define ALGEBRA_PAIRING_MNT4_POLICY_HPP
 
-#include <sstream>
-
-#include <nil/algebra/pairing/ate.hpp>
 #include <nil/algebra/pairing/detail/mnt4/functions.hpp>
 
 #include <nil/algebra/curves/mnt4.hpp>
