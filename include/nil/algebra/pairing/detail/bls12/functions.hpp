@@ -30,215 +30,375 @@ namespace nil {
                 using bls12_Fq2 = curves::bls12_g2<ModulusBits, GeneratorBits>::underlying_field_type_value;
 
                 template<std::size_t ModulusBits = 381, std::size_t GeneratorBits = CHAR_BIT>
-                struct bls12_Fq_conic_coefficients {
+                struct bls12_381_ate_g1_precomp {
+                    bls12_Fq<ModulusBits, GeneratorBits> PX;
+                    bls12_Fq<ModulusBits, GeneratorBits> PY;
 
-                    bls12_Fq<ModulusBits, GeneratorBits> c_ZZ;
-                    bls12_Fq<ModulusBits, GeneratorBits> c_XY;
-                    bls12_Fq<ModulusBits, GeneratorBits> c_XZ;
-
-                    bool operator==(const bls12_Fq_conic_coefficients &other) const {
-                        return (this->c_ZZ == other.c_ZZ && this->c_XY == other.c_XY && this->c_XZ == other.c_XZ);
+                    bool operator==(const bls12_381_ate_g1_precomp &other) const {
+                        return (this->PX == other.PX &&
+                                this->PY == other.PY);
                     }
                 };
 
-                template<typename ppT>
-                struct MillerTriple {
-                    typename ppT::Fqe_type a;
-                    typename ppT::Fqe_type b;
-                    typename ppT::Fqe_type c;
+                template<std::size_t ModulusBits = 381, std::size_t GeneratorBits = CHAR_BIT>
+                struct bls12_381_ate_ell_coeffs {
+                    bls12_Fq2<ModulusBits, GeneratorBits> ell_0;
+                    bls12_Fq2<ModulusBits, GeneratorBits> ell_VW;
+                    bls12_Fq2<ModulusBits, GeneratorBits> ell_VV;
+
+                    bool operator==(const bls12_381_ate_ell_coeffs &other) const {
+                        return (this->ell_0 == other.ell_0 &&
+                                this->ell_VW == other.ell_VW &&
+                                this->ell_VV == other.ell_VV);
+                    }
                 };
 
+                template<std::size_t ModulusBits = 381, std::size_t GeneratorBits = CHAR_BIT>
+                struct bls12_381_ate_g2_precomp {
+                    bls12_Fq2<ModulusBits, GeneratorBits> QX;
+                    bls12_Fq2<ModulusBits, GeneratorBits> QY;
+                    std::vector<bls12_381_ate_ell_coeffs> coeffs;
 
-                template<typename ppT, typename Fqk_type>
-                static inline Fqk_type exp_by_x(const Fqk_type &a) {
-                    auto res = Fqk_type::one();
+                    bool operator==(const bls12_381_ate_g2_precomp &other) const {
+                        return (this->QX == other.QX &&
+                                this->QY == other.QY &&
+                                this->coeffs == other.coeffs);
+                    }
+                };
+
+                /* final exponentiations */
+
+                template<std::size_t ModulusBits = 381, std::size_t GeneratorBits = CHAR_BIT>
+                bls12_gt<ModulusBits, GeneratorBits> bls12_381_final_exponentiation_first_chunk(const bls12_gt<ModulusBits, GeneratorBits> &elt) {
+
+                    /*
+                      Computes result = elt^((q^6-1)*(q^2+1)).
+                      Follows, e.g., Beuchat et al page 9, by computing result as follows:
+                         elt^((q^6-1)*(q^2+1)) = (conj(elt) * elt^(-1))^(q^2+1)
+                      More precisely:
+                      A = conj(elt)
+                      B = elt.inversed()
+                      C = A * B
+                      D = C.Frobenius_map(2)
+                      result = D * C
+                    */
+
+                    const bls12_gt<ModulusBits, GeneratorBits> A = bls12_gt<ModulusBits, GeneratorBits>(elt.c0,-elt.c1);
+                    const bls12_gt<ModulusBits, GeneratorBits> B = elt.inversed();
+                    const bls12_gt<ModulusBits, GeneratorBits> C = A * B;
+                    const bls12_gt<ModulusBits, GeneratorBits> D = C.Frobenius_map(2);
+                    const bls12_gt<ModulusBits, GeneratorBits> result = D * C;
+
+
+                    return result;
+                }
+
+                template<std::size_t ModulusBits = 381, std::size_t GeneratorBits = CHAR_BIT>
+                bls12_gt<ModulusBits, GeneratorBits> bls12_381_exp_by_z(const bls12_gt<ModulusBits, GeneratorBits> &elt) {
+
+                    bls12_gt<ModulusBits, GeneratorBits> result = elt.cyclotomic_exp(bls12_381_final_exponent_z);
+                    if (bls12_381_final_exponent_is_z_neg) {
+                        result = result.unitary_inverse();
+                    }
+
+
+                    return result;
+                }
+
+                template<std::size_t ModulusBits = 381, std::size_t GeneratorBits = CHAR_BIT>
+                bls12_gt<ModulusBits, GeneratorBits> bls12_381_final_exponentiation_last_chunk(const bls12_gt<ModulusBits, GeneratorBits> &elt) {
+
+                    const bls12_gt<ModulusBits, GeneratorBits> A = elt.cyclotomic_squared();   // elt^2
+                    const bls12_gt<ModulusBits, GeneratorBits> B = A.unitary_inverse();        // elt^(-2)
+                    const bls12_gt<ModulusBits, GeneratorBits> C = bls12_381_exp_by_z(elt);    // elt^z
+                    const bls12_gt<ModulusBits, GeneratorBits> D = C.cyclotomic_squared();     // elt^(2z)
+                    const bls12_gt<ModulusBits, GeneratorBits> E = B * C;                      // elt^(z-2)
+                    const bls12_gt<ModulusBits, GeneratorBits> F = bls12_381_exp_by_z(E);      // elt^(z^2-2z)
+                    const bls12_gt<ModulusBits, GeneratorBits> G = bls12_381_exp_by_z(F);      // elt^(z^3-2z^2)
+                    const bls12_gt<ModulusBits, GeneratorBits> H = bls12_381_exp_by_z(G);      // elt^(z^4-2z^3)
+                    const bls12_gt<ModulusBits, GeneratorBits> I = H * D;                      // elt^(z^4-2z^3+2z)
+                    const bls12_gt<ModulusBits, GeneratorBits> J = bls12_381_exp_by_z(I);      // elt^(z^5-2z^4+2z^2)
+                    const bls12_gt<ModulusBits, GeneratorBits> K = E.unitary_inverse();        // elt^(-z+2)
+                    const bls12_gt<ModulusBits, GeneratorBits> L = K * J;                      // elt^(z^5-2z^4+2z^2) * elt^(-z+2)
+                    const bls12_gt<ModulusBits, GeneratorBits> M = elt * L;                    // elt^(z^5-2z^4+2z^2) * elt^(-z+2) * elt
+                    const bls12_gt<ModulusBits, GeneratorBits> N = elt.unitary_inverse();      // elt^(-1)
+                    const bls12_gt<ModulusBits, GeneratorBits> O = F * elt;                    // elt^(z^2-2z) * elt
+                    const bls12_gt<ModulusBits, GeneratorBits> P = O.Frobenius_map(3);         // (elt^(z^2-2z) * elt)^(q^3)
+                    const bls12_gt<ModulusBits, GeneratorBits> Q = I * N;                      // elt^(z^4-2z^3+2z) * elt^(-1)
+                    const bls12_gt<ModulusBits, GeneratorBits> R = Q.Frobenius_map(1);         // (elt^(z^4-2z^3+2z) * elt^(-1))^q
+                    const bls12_gt<ModulusBits, GeneratorBits> S = C * G;                      // elt^(z^3-2z^2) * elt^z
+                    const bls12_gt<ModulusBits, GeneratorBits> T = S.Frobenius_map(2);         // (elt^(z^3-2z^2) * elt^z)^(q^2)
+                    const bls12_gt<ModulusBits, GeneratorBits> U = T * P;                      // (elt^(z^2-2z) * elt)^(q^3) * (elt^(z^3-2z^2) * elt^z)^(q^2)
+                    const bls12_gt<ModulusBits, GeneratorBits> V = U * R;                      // (elt^(z^2-2z) * elt)^(q^3) * (elt^(z^3-2z^2) * elt^z)^(q^2) * (elt^(z^4-2z^3+2z) * elt^(-1))^q
+                    const bls12_gt<ModulusBits, GeneratorBits> W = V * M;                      // (elt^(z^2-2z) * elt)^(q^3) * (elt^(z^3-2z^2) * elt^z)^(q^2) * (elt^(z^4-2z^3+2z) * elt^(-1))^q * elt^(z^5-2z^4+2z^2) * elt^(-z+2) * elt
+
+                    const bls12_gt<ModulusBits, GeneratorBits> result = W;
+
+
+                    return result;
+                }
+
+                template<std::size_t ModulusBits = 381, std::size_t GeneratorBits = CHAR_BIT>
+                bls12_gt<ModulusBits, GeneratorBits> bls12_381_final_exponentiation(const bls12_gt<ModulusBits, GeneratorBits> &elt) {
+                    /* OLD naive version:
+                        bls12_gt<ModulusBits, GeneratorBits> result = elt^bls12_381_final_exponent;
+                    */
+                    bls12_gt<ModulusBits, GeneratorBits> A = bls12_381_final_exponentiation_first_chunk(elt);
+                    bls12_gt<ModulusBits, GeneratorBits> result = bls12_381_final_exponentiation_last_chunk(A);
+
+                    return result;
+                }
+
+                /* ate pairing */
+
+                template<std::size_t ModulusBits = 381, std::size_t GeneratorBits = CHAR_BIT>
+                void doubling_step_for_miller_loop(const bls12_381_Fq two_inv,
+                                                           bls12_g2<ModulusBits, GeneratorBits> &current,
+                                                           bls12_381_ate_ell_coeffs &c) {
+                    const bls12_Fq2<ModulusBits, GeneratorBits> X = current.X, Y = current.Y, Z = current.Z;
+
+                    const bls12_Fq2<ModulusBits, GeneratorBits> A = two_inv * (X * Y);                     // A = X1 * Y1 / 2
+                    const bls12_Fq2<ModulusBits, GeneratorBits> B = Y.squared();                           // B = Y1^2
+                    const bls12_Fq2<ModulusBits, GeneratorBits> C = Z.squared();                           // C = Z1^2
+                    const bls12_Fq2<ModulusBits, GeneratorBits> D = C+C+C;                                 // D = 3 * C
+                    const bls12_Fq2<ModulusBits, GeneratorBits> E = bls12_381_twist_coeff_b * D;           // E = twist_b * D
+                    const bls12_Fq2<ModulusBits, GeneratorBits> F = E+E+E;                                 // F = 3 * E
+                    const bls12_Fq2<ModulusBits, GeneratorBits> G = two_inv * (B+F);                       // G = (B+F)/2
+                    const bls12_Fq2<ModulusBits, GeneratorBits> H = (Y+Z).squared() - (B+C);               // H = (Y1+Z1)^2-(B+C)
+                    const bls12_Fq2<ModulusBits, GeneratorBits> I = E-B;                                   // I = E-B
+                    const bls12_Fq2<ModulusBits, GeneratorBits> J = X.squared();                           // J = X1^2
+                    const bls12_Fq2<ModulusBits, GeneratorBits> E_squared = E.squared();                   // E_squared = E^2
+
+                    current.X = A * (B-F);                                       // X3 = A * (B-F)
+                    current.Y = G.squared() - (E_squared+E_squared+E_squared);   // Y3 = G^2 - 3*E^2
+                    current.Z = B * H;                                           // Z3 = B * H
+                    c.ell_0 = I;                               // ell_0 = xi * I
+                    c.ell_VW = -bls12_381_twist * H;                                               // ell_VW = - H (later: * yP)
+                    c.ell_VV = J+J+J;                                            // ell_VV = 3*J (later: * xP)
+                }
+
+                template<std::size_t ModulusBits = 381, std::size_t GeneratorBits = CHAR_BIT>
+                void mixed_addition_step_for_miller_loop(const bls12_g2<ModulusBits, GeneratorBits> base,
+                                                                 bls12_g2<ModulusBits, GeneratorBits> &current,
+                                                                 bls12_381_ate_ell_coeffs &c) {
+                    const bls12_Fq2<ModulusBits, GeneratorBits> X1 = current.X, Y1 = current.Y, Z1 = current.Z;
+                    const bls12_Fq2<ModulusBits, GeneratorBits> &x2 = base.X, &y2 = base.Y;
+
+                    const bls12_Fq2<ModulusBits, GeneratorBits> D = X1 - x2 * Z1;          // D = X1 - X2*Z1
+                    const bls12_Fq2<ModulusBits, GeneratorBits> E = Y1 - y2 * Z1;          // E = Y1 - Y2*Z1
+                    const bls12_Fq2<ModulusBits, GeneratorBits> F = D.squared();           // F = D^2
+                    const bls12_Fq2<ModulusBits, GeneratorBits> G = E.squared();           // G = E^2
+                    const bls12_Fq2<ModulusBits, GeneratorBits> H = D*F;                   // H = D*F
+                    const bls12_Fq2<ModulusBits, GeneratorBits> I = X1 * F;                // I = X1 * F
+                    const bls12_Fq2<ModulusBits, GeneratorBits> J = H + Z1*G - (I+I);      // J = H + Z1*G - (I+I)
+
+                    current.X = D * J;                           // X3 = D*J
+                    current.Y = E * (I-J)-(H * Y1);              // Y3 = E*(I-J)-(H*Y1)
+                    current.Z = Z1 * H;                          // Z3 = Z1*H
+                    c.ell_0 = E * x2 - D * y2;                  // ell_0 = xi * (E * X2 - D * Y2)
+                    c.ell_VV = - E;                              // ell_VV = - E (later: * xP)
+                    c.ell_VW = bls12_381_twist * D;                                // ell_VW = D (later: * yP    )
+                }
+
+                template<std::size_t ModulusBits = 381, std::size_t GeneratorBits = CHAR_BIT>
+                bls12_381_ate_g1_precomp bls12_381_ate_precompute_g1(const bls12_g1<ModulusBits, GeneratorBits>& P) {
+
+                    bls12_g1<ModulusBits, GeneratorBits> Pcopy = P;
+                    Pcopy.to_affine_coordinates();
+
+                    bls12_381_ate_g1_precomp result;
+                    result.PX = Pcopy.X;
+                    result.PY = Pcopy.Y;
+
+                    return result;
+                }
+
+                template<std::size_t ModulusBits = 381, std::size_t GeneratorBits = CHAR_BIT>
+                bls12_381_ate_g2_precomp bls12_381_ate_precompute_g2(const bls12_g2<ModulusBits, GeneratorBits>& Q) {
+
+                    bls12_g2<ModulusBits, GeneratorBits> Qcopy(Q);
+                    Qcopy.to_affine_coordinates();
+
+                    bls12_381_Fq two_inv = (bls12_381_Fq("2").inversed()); // could add to global params if needed
+
+                    bls12_381_ate_g2_precomp result;
+                    result.QX = Qcopy.X;
+                    result.QY = Qcopy.Y;
+
+                    bls12_g2<ModulusBits, GeneratorBits> R;
+                    R.X = Qcopy.X;
+                    R.Y = Qcopy.Y;
+                    R.Z = bls12_Fq2<ModulusBits, GeneratorBits>::one();
+
+                    const bigint<bls12_381_Fq::num_limbs> &loop_count = bls12_381_ate_loop_count;
                     bool found_one = false;
-                    for( int i = 63; i >= 0; i-- ) {
-                        if( found_one ) {
-                            res = res.squared();
+                    bls12_381_ate_ell_coeffs c;
+
+                    for (long i = loop_count.max_bits(); i >= 0; --i) {
+                        const bool bit = loop_count.test_bit(i);
+                        if (!found_one) {
+                            /* this skips the MSB itself */
+                            found_one |= bit;
+                            continue;
                         }
 
-                        if( ppT::X & (1ul<<i) ) {
-                            found_one = true;
-                            res = res * a;
-                        }
-                    }
+                        doubling_step_for_miller_loop(two_inv, R, c);
+                        result.coeffs.push_back(c);
 
-                    if constexpr(ppT::X_IS_NEG) {
-                        return res.unitary_inverse();
-                    }
-
-                    return res;
-                }
-
-                template<typename ppT, typename Fqk_type>
-                static Fqk_type bls12_final_exponentiation(const Fqk_type &f) {
-                    Fqk_type r = f.Frobenius_map(6) * f.inverse();
-                    r = r.Frobenius_map(2) * r;
-                    // Hard part of the final exponentation is below:
-                    // From https://eprint.iacr.org/2016/130.pdf, Table 1
-                    auto y0 = r.cyclotomic_squared().unitary_inverse();
-
-                    const auto y5 = exp_by_x<ppT>(r);
-                    const auto y3 = y0 * y5;
-                    y0 = exp_by_x<ppT>(y3);
-
-                    const auto y2 = exp_by_x<ppT>(y0);
-                    const auto y4 = exp_by_x<ppT>(y2) * y5.cyclotomic_squared();
-                    return (  (y0 * r).Frobenius_map(3)
-                            * (y5 * y2).Frobenius_map(2)
-                            * (y4 * r.unitary_inverse()).Frobenius_map(1)
-                            * exp_by_x<ppT>(y4)
-                            * y3.unitary_inverse()
-                            * r);
-                }
-
-                template<typename ppT>
-                static void doubling_step_for_miller_loop(MillerTriple<ppT> &result, typename ppT::G2_type &r, 
-                        const typename ppT::Fq_type &two_inv) {
-                    // Formula for line function when working with homogeneous projective coordinates.
-                    const auto b = r.Y.squared();
-                    const auto c = r.Z.squared();
-                    const auto e = ppT::TWIST_COEFF_B * c.multiply3();
-                    const auto f = e.multiply3();
-                    const auto h = (r.Y + r.Z).squared() - (b + c);
-
-                    if constexpr( ppT::TWIST_TYPE == TwistType::M ) {
-                        result.a = e - b;
-                        result.b = r.X.squared().multiply3();
-                        result.c = -h;
-                    }
-                    else {
-                        result.a = -h;
-                        result.b = r.X.squared().multiply3();
-                        result.c = e - b;
-                    }
-
-                    r.X = ((two_inv * r.X) * r.Y) * (b - f);
-                    r.Y = (two_inv * (b + f)).squared() - e.squared().multiply3();
-                    r.Z = b * h;
-                }
-
-                template<typename ppT>
-                static void addition_step_for_miller_loop(MillerTriple<ppT> &result, typename ppT::G2_type &r, 
-                        const typename ppT::G2_type &q) {
-                    // Formula for line function when working with homogeneous projective coordinates.
-                    const auto theta = r.Y - (q.Y * r.Z);
-                    const auto lambda = r.X - (q.X * r.Z);
-                    const auto d = lambda.squared();
-                    const auto e = lambda * d;
-                    const auto g = r.X * d;
-                    const auto h = e + (r.Z * theta.squared()) - g.multiply2();
-                    const auto j = (theta * q.X) - (lambda * q.Y);
-
-                    r.X = lambda * h;
-                    r.Y = theta * (g - h) - (e * r.Y);
-                    r.Z = r.Z * e;
-
-                    if constexpr( ppT::TWIST_TYPE == TwistType::M ) {
-                        result.a = j;
-                        result.b = -theta;
-                        result.c = lambda;
-                    }
-                    else {
-                        result.a = lambda;
-                        result.b = -theta;
-                        result.c = j;
-                    }
-                }
-
-
-                /* NOTE: This structure is approximately 20 KiB in size, so use with caution. */
-                template<typename ppT>
-                struct G2Prepared {
-                    static constexpr unsigned int num_coeffs = ppT::X_HIGHEST_BIT + ppT::X_NUM_ONES - 1;
-                    using G2_type = typename ppT::G2_type;
-
-                    std::array<MillerTriple<ppT>, num_coeffs> coeffs;
-                    const bool infinity;
-
-                    bool is_zero() const {
-                        return this->infinity;
-                    }
-
-                    G2Prepared( const G2_type &g2 )
-                    :
-                        infinity(g2.is_zero()) {
-                        if( ! infinity ) {
-                            _prepare(g2);
+                        if (bit) {
+                            mixed_addition_step_for_miller_loop(Qcopy, R, c);
+                            result.coeffs.push_back(c);
                         }
                     }
 
-                    void _prepare(const G2_type &input_point) {
-                        G2_type q = input_point;
-                        q.to_affine_coordinates();
-
-                        G2_type r = q;
-                        int coeff_idx = 0;
-
-                        // TODO: pre-compute two_inv... rather than every time it's prepared
-                        const auto two_inv = ppT::Fq_type::one().multiply2().inverse();
-
-                        // Skip the 1st bit
-                        for (int i = 62; i >= 0; i--) {
-                            doubling_step_for_miller_loop(this->coeffs[coeff_idx++], r, two_inv);
-
-                            if ( ppT::X & (1ul<<i) ) {
-                                addition_step_for_miller_loop(this->coeffs[coeff_idx++], r, q);
-                            }
-                        }
-                    }
-                };
-
-
-                template<typename ppT>
-                struct PreparedPair {
-                    typename ppT::G1_type g1;
-                    const G2Prepared<ppT> g2;
-
-                    PreparedPair( const decltype(g1) &a, const decltype(g2) &b )
-                    :
-                        g1(a), g2(b) {
-                        g1.to_affine_coordinates();
-                    }
-                };
-
-
-                // Twisting isomorphism from E to E'
-                template<typename ppT>
-                static inline void ell(typename ppT::Fqk_type &f, const MillerTriple<ppT> &coeffs, const typename ppT::G1_type &g1) {
-                    if constexpr( ppT::TWIST_TYPE == TwistType::M ) {
-                        f.multiply_by_c014(f, coeffs.a, g1.X * coeffs.b, g1.Y * coeffs.c);       
-                    }
-                    else {
-                        f.multiply_by_c034(f, g1.Y * coeffs.a, g1.X * coeffs.b, coeffs.c);       
-                    }
+                    return result;
                 }
 
+                template<std::size_t ModulusBits = 381, std::size_t GeneratorBits = CHAR_BIT>
+                bls12_gt<ModulusBits, GeneratorBits> bls12_381_ate_miller_loop(const bls12_381_ate_g1_precomp &prec_P,
+                                                     const bls12_381_ate_g2_precomp &prec_Q) {
 
-                template<typename ppT>
-                static typename ppT::Fqk_type bls12_miller_loop( const typename ppT::G1_type &P, const typename ppT::G2_type &Q ) {
-                    const PreparedPair<ppT> pair(P, Q);
-                    int coeff_idx = 0;
-                    auto f = ppT::Fqk_type::one();
+                    bls12_gt<ModulusBits, GeneratorBits> f = bls12_gt<ModulusBits, GeneratorBits>::one();
 
-                    for( int i = 62; i >= 0; i-- ) {
-                        f.square(f);
+                    bool found_one = false;
+                    size_t idx = 0;
 
-                        ell<ppT>(f, pair.g2.coeffs[coeff_idx++], pair.g1);
+                    const bigint<bls12_381_Fq::num_limbs> &loop_count = bls12_381_ate_loop_count;
+                    bls12_381_ate_ell_coeffs c;
 
-                        if ( ppT::X & (1ul<<i) ) {
-                            ell<ppT>(f, pair.g2.coeffs[coeff_idx++], pair.g1);
+                    for (long i = loop_count.max_bits(); i >= 0; --i) {
+                        const bool bit = loop_count.test_bit(i);
+                        if (!found_one) {
+                            /* this skips the MSB itself */
+                            found_one |= bit;
+                            continue;
                         }
+
+                        /* code below gets executed for all bits (EXCEPT the MSB itself) of
+                           bls12_381_param_p (skipping leading zeros) in MSB to LSB
+                           order */
+
+                        c = prec_Q.coeffs[idx++];
+                        f = f.squared();
+                        f = f.mul_by_045(c.ell_0, prec_P.PY * c.ell_VW, prec_P.PX * c.ell_VV);
+
+                        if (bit) {
+                            c = prec_Q.coeffs[idx++];
+                            f = f.mul_by_045(c.ell_0, prec_P.PY * c.ell_VW, prec_P.PX * c.ell_VV);
+                        }
+
                     }
 
-                    if constexpr( ppT::X_IS_NEG ) {
-                        f.conjugate(f);
+                    if (bls12_381_ate_is_loop_count_neg) {
+                        f = f.inversed();
                     }
 
                     return f;
                 }
 
+                template<std::size_t ModulusBits = 381, std::size_t GeneratorBits = CHAR_BIT>
+                bls12_gt<ModulusBits, GeneratorBits> bls12_381_ate_double_miller_loop(const bls12_381_ate_g1_precomp &prec_P1,
+                                                     const bls12_381_ate_g2_precomp &prec_Q1,
+                                                     const bls12_381_ate_g1_precomp &prec_P2,
+                                                     const bls12_381_ate_g2_precomp &prec_Q2) {
+
+                    bls12_gt<ModulusBits, GeneratorBits> f = bls12_gt<ModulusBits, GeneratorBits>::one();
+
+                    bool found_one = false;
+                    size_t idx = 0;
+
+                    const bigint<bls12_381_Fq::num_limbs> &loop_count = bls12_381_ate_loop_count;
+                    for (long i = loop_count.max_bits(); i >= 0; --i) {
+                        const bool bit = loop_count.test_bit(i);
+                        if (!found_one) {
+                            /* this skips the MSB itself */
+                            found_one |= bit;
+                            continue;
+                        }
+
+                        /* code below gets executed for all bits (EXCEPT the MSB itself) of
+                           bls12_381_param_p (skipping leading zeros) in MSB to LSB
+                           order */
+
+                        bls12_381_ate_ell_coeffs c1 = prec_Q1.coeffs[idx];
+                        bls12_381_ate_ell_coeffs c2 = prec_Q2.coeffs[idx];
+                        ++idx;
+
+                        f = f.squared();
+
+                        f = f.mul_by_045(c1.ell_0, prec_P1.PY * c1.ell_VW, prec_P1.PX * c1.ell_VV);
+                        f = f.mul_by_045(c2.ell_0, prec_P2.PY * c2.ell_VW, prec_P2.PX * c2.ell_VV);
+
+                        if (bit) {
+                            bls12_381_ate_ell_coeffs c1 = prec_Q1.coeffs[idx];
+                            bls12_381_ate_ell_coeffs c2 = prec_Q2.coeffs[idx];
+                            ++idx;
+
+                            f = f.mul_by_045(c1.ell_0, prec_P1.PY * c1.ell_VW, prec_P1.PX * c1.ell_VV);
+                            f = f.mul_by_045(c2.ell_0, prec_P2.PY * c2.ell_VW, prec_P2.PX * c2.ell_VV);
+                        }
+                    }
+
+                    if (bls12_381_ate_is_loop_count_neg) {
+                        f = f.inversed();
+                    }
+
+
+                    return f;
+                }
+
+                template<std::size_t ModulusBits = 381, std::size_t GeneratorBits = CHAR_BIT>
+                bls12_gt<ModulusBits, GeneratorBits> bls12_381_ate_pairing(const bls12_g1<ModulusBits, GeneratorBits>& P, const bls12_g2<ModulusBits, GeneratorBits> &Q) {
+                    bls12_381_ate_g1_precomp prec_P = bls12_381_ate_precompute_g1(P);
+                    bls12_381_ate_g2_precomp prec_Q = bls12_381_ate_precompute_g2(Q);
+                    bls12_gt<ModulusBits, GeneratorBits> result = bls12_381_ate_miller_loop(prec_P, prec_Q);
+                    return result;
+                }
+
+                template<std::size_t ModulusBits = 381, std::size_t GeneratorBits = CHAR_BIT>
+                bls12_gt<ModulusBits, GeneratorBits> bls12_381_ate_reduced_pairing(const bls12_g1<ModulusBits, GeneratorBits> &P, const bls12_g2<ModulusBits, GeneratorBits> &Q) {
+                    const bls12_gt<ModulusBits, GeneratorBits> f = bls12_381_ate_pairing(P, Q);
+                    const bls12_gt<ModulusBits, GeneratorBits> result = bls12_381_final_exponentiation(f);
+                    return result;
+                }
+
+                /* choice of pairing */
+
+                template<std::size_t ModulusBits = 381, std::size_t GeneratorBits = CHAR_BIT>
+                bls12_g1<ModulusBits, GeneratorBits>_precomp bls12_381_precompute_g1(const bls12_g1<ModulusBits, GeneratorBits>& P) {
+                    return bls12_381_ate_precompute_g1(P);
+                }
+
+                template<std::size_t ModulusBits = 381, std::size_t GeneratorBits = CHAR_BIT>
+                bls12_g2<ModulusBits, GeneratorBits>_precomp bls12_381_precompute_g2(const bls12_g2<ModulusBits, GeneratorBits>& Q) {
+                    return bls12_381_ate_precompute_g2(Q);
+                }
+
+                template<std::size_t ModulusBits = 381, std::size_t GeneratorBits = CHAR_BIT>
+                bls12_gt<ModulusBits, GeneratorBits> bls12_381_miller_loop(const bls12_g1<ModulusBits, GeneratorBits>_precomp &prec_P,
+                                          const bls12_g2<ModulusBits, GeneratorBits>_precomp &prec_Q) {
+                    return bls12_381_ate_miller_loop(prec_P, prec_Q);
+                }
+
+                template<std::size_t ModulusBits = 381, std::size_t GeneratorBits = CHAR_BIT>
+                bls12_gt<ModulusBits, GeneratorBits> bls12_381_double_miller_loop(const bls12_g1<ModulusBits, GeneratorBits>_precomp &prec_P1,
+                                                 const bls12_g2<ModulusBits, GeneratorBits>_precomp &prec_Q1,
+                                                 const bls12_g1<ModulusBits, GeneratorBits>_precomp &prec_P2,
+                                                 const bls12_g2<ModulusBits, GeneratorBits>_precomp &prec_Q2) {
+                    return bls12_381_ate_double_miller_loop(prec_P1, prec_Q1, prec_P2, prec_Q2);
+                }
+
+                template<std::size_t ModulusBits = 381, std::size_t GeneratorBits = CHAR_BIT>
+                bls12_gt<ModulusBits, GeneratorBits> bls12_381_pairing(const bls12_g1<ModulusBits, GeneratorBits>& P,
+                                      const bls12_g2<ModulusBits, GeneratorBits> &Q) {
+                    return bls12_381_ate_pairing(P, Q);
+                }
+
+                template<std::size_t ModulusBits = 381, std::size_t GeneratorBits = CHAR_BIT>
+                bls12_gt<ModulusBits, GeneratorBits> bls12_381_reduced_pairing(const bls12_g1<ModulusBits, GeneratorBits> &P,
+                                             const bls12_g2<ModulusBits, GeneratorBits> &Q) {
+                    return bls12_381_ate_reduced_pairing(P, Q);
+                }
 
             }    // namespace detail
         }        // namespace pairing
