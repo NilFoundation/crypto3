@@ -41,198 +41,202 @@ namespace nil {
                     }
                 };
 
-                struct bls12_pairing_engine {
-                    bls12_g1<ModulusBits, GeneratorBits> G1;
-                    bls12_g2<ModulusBits, GeneratorBits> G2;
-                    bls12_gt<ModulusBits, GeneratorBits> fp12;
-                    bls12_Fq2<ModulusBits, GeneratorBits> fp2;
-                }
+                template<typename ppT>
+                struct MillerTriple {
+                    typename ppT::Fqe_type a;
+                    typename ppT::Fqe_type b;
+                    typename ppT::Fqe_type c;
+                };
 
-                func (e *Engine) doublingStep(coeff *[3]fe2, r *PointG2) {
-                    // Adaptation of Formula 3 in https://eprint.iacr.org/2010/526.pdf
-                    fp2 := e.fp2
-                    t := e.t2
-                    t[0] = &r[0] * &r[1];
-                    t[0] = t[0].mulByFq(twoInv);
-                    t[1] = r[1].squared();
-                    t[2] = r[2].squared();
-                    
-                    t[7] = t[2].doubled();
-                    t[7] = t[7] + t[2];
-                    t[3] = t[7].mulByB();
-                    t[4] = t[3].doubled();
-                    t[4] = t[4] + t[3];
-                    t[5] = t[1] + t[4];
-                    t[5] = t[5].mulByFq(twoInv);
-                    t[6] = r[1] + r[2];
-                    t[6] = t[6].squared();
-                    t[7] = t[2] + t[1];
-                    t[6] = t[6] - t[7];
-                    coeff[0] = t[3] - t[1];
-                    t[7] = r[0].squared();
-                    t[4] = t[1] - t[4];
-                    r[0] = t[4]  * t[0];
-                    t[2] = t[3].squared();
-                    t[3] = t[2].doubled();
-                    t[3] = t[3] + t[2];
-                    t[5] = t[5].squared();
-                    r[1] = t[5] - t[3];
-                    r[2] = t[1] * t[6];
-                    t[0] = t[7].doubled();
-                    coeff[1] = t[0] + t[7];
-                    coeff[2] = -t[6];
-                }
 
-                func (e *Engine) additionStep(coeff *[3]fe2, r, q *PointG2) {
-                    // Algorithm 12 in https://eprint.iacr.org/2010/526.pdf
-                    fp2 := e.fp2
-                    t := e.t2
-                    t[0] = q[1] * r[2];
-                    t[0] = -t[0];
-                    t[0] = t[0] + r[1];
-                    t[1] = q[0] * r[2];
-                    t[1] = -t[1];
-                    t[1] = t[1] + r[0];
-                    t[2] = t[0].squared();
-                    t[3] = t[1].squared();
-                    t[4] = t[1] * t[3];
-                    t[2] = r[2] * t[2];
-                    t[3] = r[0] * t[3];
-                    t[5] = t[3].double();
-                    t[5] = t[4] - t[5];
-                    t[5] = t[5] + t[2];
-                    r[0] = t[1] * t[5];
-                    t[2] = t[3] - t[5];
-                    t[2] = t[2] * t[0];
-                    t[3] = r[1] * t[4];
-                    r[1] = t[2] - t[3];
-                    r[2] = r[2] * t[4];
-                    t[2] = t[1] * q[1];
-                    t[3] = t[0] * q[0];
-                    coeff[0] = t[3] - t[2];
-                    coeff[1] = -t[0];
-                    coeff[2].set(t[1]);
-                }
-
-                func (e *Engine) preCompute(ellCoeffs *[68][3]fe2, twistPoint *PointG2) {
-                    // Algorithm 5 in https://eprint.iacr.org/2019/077.pdf
-                    if e.G2.IsZero(twistPoint) {
-                        return;
-                    }
-                    r := new(PointG2).Set(twistPoint);
-                    j := 0;
-                    for i := int(x.BitLen() - 2); i >= 0; i-- {
-                        e.doublingStep(&ellCoeffs[j], r);
-                        if x.Bit(i) != 0 {
-                            j++;
-                            ellCoeffs[j] = fe6{};
-                            e.additionStep(&ellCoeffs[j], r, twistPoint);
+                template<typename ppT, typename Fqk_type>
+                static inline Fqk_type exp_by_x(const Fqk_type &a) {
+                    auto res = Fqk_type::one();
+                    bool found_one = false;
+                    for( int i = 63; i >= 0; i-- ) {
+                        if( found_one ) {
+                            res = res.squared();
                         }
-                        j++;
+
+                        if( ppT::X & (1ul<<i) ) {
+                            found_one = true;
+                            res = res * a;
+                        }
+                    }
+
+                    if constexpr(ppT::X_IS_NEG) {
+                        return res.unitary_inverse();
+                    }
+
+                    return res;
+                }
+
+                template<typename ppT, typename Fqk_type>
+                static Fqk_type bls12_final_exponentiation(const Fqk_type &f) {
+                    Fqk_type r = f.Frobenius_map(6) * f.inverse();
+                    r = r.Frobenius_map(2) * r;
+                    // Hard part of the final exponentation is below:
+                    // From https://eprint.iacr.org/2016/130.pdf, Table 1
+                    auto y0 = r.cyclotomic_squared().unitary_inverse();
+
+                    const auto y5 = exp_by_x<ppT>(r);
+                    const auto y3 = y0 * y5;
+                    y0 = exp_by_x<ppT>(y3);
+
+                    const auto y2 = exp_by_x<ppT>(y0);
+                    const auto y4 = exp_by_x<ppT>(y2) * y5.cyclotomic_squared();
+                    return (  (y0 * r).Frobenius_map(3)
+                            * (y5 * y2).Frobenius_map(2)
+                            * (y4 * r.unitary_inverse()).Frobenius_map(1)
+                            * exp_by_x<ppT>(y4)
+                            * y3.unitary_inverse()
+                            * r);
+                }
+
+                template<typename ppT>
+                static void doubling_step_for_miller_loop(MillerTriple<ppT> &result, typename ppT::G2_type &r, 
+                        const typename ppT::Fq_type &two_inv) {
+                    // Formula for line function when working with homogeneous projective coordinates.
+                    const auto b = r.Y.squared();
+                    const auto c = r.Z.squared();
+                    const auto e = ppT::TWIST_COEFF_B * c.multiply3();
+                    const auto f = e.multiply3();
+                    const auto h = (r.Y + r.Z).squared() - (b + c);
+
+                    if constexpr( ppT::TWIST_TYPE == TwistType::M ) {
+                        result.a = e - b;
+                        result.b = r.X.squared().multiply3();
+                        result.c = -h;
+                    }
+                    else {
+                        result.a = -h;
+                        result.b = r.X.squared().multiply3();
+                        result.c = e - b;
+                    }
+
+                    r.X = ((two_inv * r.X) * r.Y) * (b - f);
+                    r.Y = (two_inv * (b + f)).squared() - e.squared().multiply3();
+                    r.Z = b * h;
+                }
+
+                template<typename ppT>
+                static void addition_step_for_miller_loop(MillerTriple<ppT> &result, typename ppT::G2_type &r, 
+                        const typename ppT::G2_type &q) {
+                    // Formula for line function when working with homogeneous projective coordinates.
+                    const auto theta = r.Y - (q.Y * r.Z);
+                    const auto lambda = r.X - (q.X * r.Z);
+                    const auto d = lambda.squared();
+                    const auto e = lambda * d;
+                    const auto g = r.X * d;
+                    const auto h = e + (r.Z * theta.squared()) - g.multiply2();
+                    const auto j = (theta * q.X) - (lambda * q.Y);
+
+                    r.X = lambda * h;
+                    r.Y = theta * (g - h) - (e * r.Y);
+                    r.Z = r.Z * e;
+
+                    if constexpr( ppT::TWIST_TYPE == TwistType::M ) {
+                        result.a = j;
+                        result.b = -theta;
+                        result.c = lambda;
+                    }
+                    else {
+                        result.a = lambda;
+                        result.b = -theta;
+                        result.c = j;
                     }
                 }
 
-                func (e *Engine) bls12_millerLoop(f *fe12) {
-                    pairs := e.pairs;
-                    ellCoeffs := make([][68][3]fe2, len(pairs));
-                    for (i := 0; i < len(pairs); i++) {
-                        e.preCompute(&ellCoeffs[i], pairs[i].g2);
+
+                /* NOTE: This structure is approximately 20 KiB in size, so use with caution. */
+                template<typename ppT>
+                struct G2Prepared {
+                    static constexpr unsigned int num_coeffs = ppT::X_HIGHEST_BIT + ppT::X_NUM_ONES - 1;
+                    using G2_type = typename ppT::G2_type;
+
+                    std::array<MillerTriple<ppT>, num_coeffs> coeffs;
+                    const bool infinity;
+
+                    bool is_zero() const {
+                        return this->infinity;
                     }
-                    fp12, fp2 := e.fp12, e.fp2;
-                    t := e.t2;
-                    f.one();
-                    j := 0
-                    for (i := 62; i >= 0; i--) {
-                        if (i != 62) {
-                            f = f.squared();
+
+                    G2Prepared( const G2_type &g2 )
+                    :
+                        infinity(g2.is_zero()) {
+                        if( ! infinity ) {
+                            _prepare(g2);
                         }
-                        for (i := 0; i <= len(pairs)-1; i++) {
-                            t[0] = &ellCoeffs[i][j][2].mulByFq(&pairs[i].g1[1]);
-                            t[1] = &ellCoeffs[i][j][1].mulByFq(&pairs[i].g1[0]);
-                            f = mulBy014Assign(&ellCoeffs[i][j][0], t[1], t[0]);
-                        }
-                        if (x.Bit(i) != 0) {
-                            j++;
-                            for (i := 0; i <= len(pairs)-1; i++) {
-                                t[0] = &ellCoeffs[i][j][2].mulByFq(&pairs[i].g1[1]);
-                                t[1] = &ellCoeffs[i][j][1].mulByFq(pairs[i].g1[0]);
-                                f = mulBy014Assign(&ellCoeffs[i][j][0], t[1], t[0]);
+                    }
+
+                    void _prepare(const G2_type &input_point) {
+                        G2_type q = input_point;
+                        q.to_affine_coordinates();
+
+                        G2_type r = q;
+                        int coeff_idx = 0;
+
+                        // TODO: pre-compute two_inv... rather than every time it's prepared
+                        const auto two_inv = ppT::Fq_type::one().multiply2().inverse();
+
+                        // Skip the 1st bit
+                        for (int i = 62; i >= 0; i--) {
+                            doubling_step_for_miller_loop(this->coeffs[coeff_idx++], r, two_inv);
+
+                            if ( ppT::X & (1ul<<i) ) {
+                                addition_step_for_miller_loop(this->coeffs[coeff_idx++], r, q);
                             }
                         }
-                        j++;
                     }
-                    f = f.conjugate();
-                }
+                };
 
-                func bls12_final_exponentiation_internal1(n int) {
-                    fp12.mulAssign(c, a);
-                    for (i := 0; i < n; i++) {
-                        c = c.cyclotomicSquare();
+
+                template<typename ppT>
+                struct PreparedPair {
+                    typename ppT::G1_type g1;
+                    const G2Prepared<ppT> g2;
+
+                    PreparedPair( const decltype(g1) &a, const decltype(g2) &b )
+                    :
+                        g1(a), g2(b) {
+                        g1.to_affine_coordinates();
+                    }
+                };
+
+
+                // Twisting isomorphism from E to E'
+                template<typename ppT>
+                static inline void ell(typename ppT::Fqk_type &f, const MillerTriple<ppT> &coeffs, const typename ppT::G1_type &g1) {
+                    if constexpr( ppT::TWIST_TYPE == TwistType::M ) {
+                        f.multiply_by_c014(f, coeffs.a, g1.X * coeffs.b, g1.Y * coeffs.c);       
+                    }
+                    else {
+                        f.multiply_by_c034(f, g1.Y * coeffs.a, g1.X * coeffs.b, coeffs.c);       
                     }
                 }
 
-                // exp raises element by x = -15132376222941642752
-                func (e *Engine) bls12_final_exponentiation_internal2(c, a *fe12) {
-                    // Adapted from https://github.com/supranational/blst/blob/master/src/pairing.c
-                    fp12 := e.fp12;
-                    chain := bls12_final_exponentiation_internal1
-                    fp12.cyclotomicSquare(c, a) // (a ^ 2)
-                    chain(2)                    // (a ^ (2 + 1)) ^ (2 ^ 2) = a ^ 12
-                    chain(3)                    // (a ^ (12 + 1)) ^ (2 ^ 3) = a ^ 104
-                    chain(9)                    // (a ^ (104 + 1)) ^ (2 ^ 9) = a ^ 53760
-                    chain(32)                   // (a ^ (53760 + 1)) ^ (2 ^ 32) = a ^ 230901736800256
-                    chain(16)                   // (a ^ (230901736800256 + 1)) ^ (2 ^ 16) = a ^ 15132376222941642752
-                    // invert chain result since x is negative
-                    fp12.conjugate(c, c)
-                }
-                
-                func (e *Engine) bls12_final_exponentiation(f *fe12) {
-                    fp12, t := e.fp12, e.t12
-                    // easy part
 
-                    t[1] = f.inversed();             // t1 = f0 ^ -1
-                    conjugate(t[0], f);             // t0 = f0 ^ p6
-                    t[2] =t[0] * t[1];              // t2 = f0 ^ (p6 - 1)
-                    t[1] = t[2];                     // t1 = f0 ^ (p6 - 1)
-                    t[2] = t[2].frobeniusMap2();     // t2 = f0 ^ ((p6 - 1) * p2)
-                    mulAssign(t[2], t[1])     // t2 = f0 ^ ((p6 - 1) * (p2 + 1))
+                template<typename ppT>
+                static typename ppT::Fqk_type bls12_miller_loop( const typename ppT::G1_type &P, const typename ppT::G2_type &Q ) {
+                    const PreparedPair<ppT> pair(P, Q);
+                    int coeff_idx = 0;
+                    auto f = ppT::Fqk_type::one();
 
-                    // f = f0 ^ ((p6 - 1) * (p2 + 1))
+                    for( int i = 62; i >= 0; i-- ) {
+                        f.square(f);
 
-                    // hard part
-                    // https://eprint.iacr.org/2016/130
-                    // On the Computation of the Optimal Ate Pairing at the 192-bit Security Level
-                    // Section 3
-                    // f ^ d = λ_0 + λ_1 * p + λ_2 * p^2 + λ_3 * p^3
+                        ell<ppT>(f, pair.g2.coeffs[coeff_idx++], pair.g1);
 
-                    conjugate(t[1], t[2]);
-                    cyclotomicSquare(t[1], t[1]);                               // t1 = f ^ (-2)
-                    e.bls12_final_exponentiation_internal2(t[3], t[2]);         // t3 = f ^ (u)
-                    cyclotomicSquare(t[4], t[3]);                               // t4 = f ^ (2u)
-                    t[5] = t[1] * t[3];                                         // t5 = f ^ (u - 2)
-                    e.bls12_final_exponentiation_internal2(t[1], t[5]);         // t1 = f ^ (u^2 - 2 * u)
-                    e.bls12_final_exponentiation_internal2(t[0], t[1]);         // t0 = f ^ (u^3 - 2 * u^2)
-                    e.bls12_final_exponentiation_internal2(t[6], t[0]);         // t6 = f ^ (u^4 - 2 * u^3)
-                    mulAssign(t[6], t[4]);                                      // t6 = f ^ (u^4 - 2 * u^3 + 2 * u)
-                    e.bls12_final_exponentiation_internal2(t[4], t[6]);         // t4 = f ^ (u^4 - 2 * u^3 + 2 * u^2)
-                    conjugate(t[5], t[5]);                                      // t5 = f ^ (2 - u)
-                    mulAssign(t[4], t[5]);                                      // t4 = f ^ (u^4 - 2 * u^3 + 2 * u^2 - u + 2)
-                    mulAssign(t[4], t[2]);                                      // f_λ_0 = t4 = f ^ (u^4 - 2 * u^3 + 2 * u^2 - u + 3)
+                        if ( ppT::X & (1ul<<i) ) {
+                            ell<ppT>(f, pair.g2.coeffs[coeff_idx++], pair.g1);
+                        }
+                    }
 
-                    conjugate(t[5], t[2]);                                      // t5 = f ^ (-1)
-                    mulAssign(t[5], t[6]);                                      // t1  = f ^ (u^4 - 2 * u^3 + 2 * u - 1)
-                    frobeniusMap1(t[5]);                                        // f_λ_1 = t1 = f ^ ((u^4 - 2 * u^3 + 2 * u - 1) ^ p)
+                    if constexpr( ppT::X_IS_NEG ) {
+                        f.conjugate(f);
+                    }
 
-                    mulAssign(t[3], t[0]);                                       // t3 = f ^ (u^3 - 2 * u^2 + u)
-                    frobeniusMap2(t[3]);                                         // f_λ_2 = t3 = f ^ ((u^3 - 2 * u^2 + u) ^ p^2)
-
-                    mulAssign(t[1], t[2]);                                       // t1 = f ^ (u^2 - 2 * u + 1)
-                    frobeniusMap3(t[1]);                                         // f_λ_3 = t1 = f ^ ((u^2 - 2 * u + 1) ^ p^3)
-
-                    // out = f ^ (λ_0 + λ_1 + λ_2 + λ_3)
-                    mulAssign(&t[3], &t[1]);
-                    mulAssign(&t[3], &t[5]);
-                    f = &t[3] * &t[4];
+                    return f;
                 }
 
 

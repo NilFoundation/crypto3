@@ -27,8 +27,8 @@ namespace nil {
                 using precompute_g1 = detail::bls12_ate_precompute_g1<ModulusBits, GeneratorBits>;
                 using precompute_g2 = detail::bls12_ate_precompute_g2<ModulusBits, GeneratorBits>;
 
-                using reduced_pairing = detail::reduced_pairing<ModulusBits, GeneratorBits>;
-                using pairing = detail::pairing<ModulusBits, GeneratorBits>;
+                using reduced_pairing = detail::bls12_reduced_pairing<ModulusBits, GeneratorBits>;
+                using pairing = detail::bls12_pairing<ModulusBits, GeneratorBits>;
 
                 using miller_loop = detail::bls12_ate_miller_loop<ModulusBits, GeneratorBits>;
                 using double_miller_loop = detail::bls12_double_ate_miller_loop<ModulusBits, GeneratorBits>;
