@@ -318,352 +318,354 @@ namespace nil {
                                     cc.c_ZZ * prec_Q.eta);
                             f = f * g_RP_at_Q;
                         }
-
-                        return f;
                     }
 
-                    template<std::size_t ModulusBits = 183, std::size_t GeneratorBits = CHAR_BIT>
-                    curves::edwards_gt<ModulusBits, GeneratorBits> edwards_tate_pairing(const edwards_g1 &P,
-                                                                                        const edwards_g2 &Q) {
-                        edwards_tate_g1_precomp prec_P = edwards_tate_precompute_g1(P);
-                        edwards_tate_g2_precomp prec_Q = edwards_tate_precompute_g2(Q);
-                        curves::edwards_gt<ModulusBits, GeneratorBits> result = edwards_tate_miller_loop(prec_P, prec_Q)
+                    return f;
+                }
 
-                            return result;
-                    }
-
-                    template<std::size_t ModulusBits = 183, std::size_t GeneratorBits = CHAR_BIT>
-                    curves::edwards_gt<ModulusBits, GeneratorBits> edwards_tate_reduced_pairing(const edwards_g1 &P,
-                                                                                                const edwards_g2 &Q) {
-                        const curves::edwards_gt<ModulusBits, GeneratorBits> f = edwards_tate_pairing(P, Q);
-                        const curves::edwards_gt<ModulusBits, GeneratorBits> result = edwards_final_exponentiation(f)
-
-                            return result;
-                    }
-
-                    template<std::size_t ModulusBits = 183, std::size_t GeneratorBits = CHAR_BIT>
-                    struct extended_edwards_g2_projective {
-                        edwards_Fq3<ModulusBits, GeneratorBits> X;
-                        edwards_Fq3<ModulusBits, GeneratorBits> Y;
-                        edwards_Fq3<ModulusBits, GeneratorBits> Z;
-                        edwards_Fq3<ModulusBits, GeneratorBits> T;
-                    };
-
-                    template<std::size_t ModulusBits = 183, std::size_t GeneratorBits = CHAR_BIT>
-                    void doubling_step_for_flipped_miller_loop(
-                        extended_edwards_g2_projective<ModulusBits, GeneratorBits> & current,
-                        edwards_Fq3_conic_coefficients & cc) {
-                        const edwards_Fq3<ModulusBits, GeneratorBits> &X = current.X, &Y = current.Y, &Z = current.Z,
-                                                                      &T = current.T;
-                        const edwards_Fq3<ModulusBits, GeneratorBits> A = X.squared();          // A    = X1^2
-                        const edwards_Fq3<ModulusBits, GeneratorBits> B = Y.squared();          // B    = Y1^2
-                        const edwards_Fq3<ModulusBits, GeneratorBits> C = Z.squared();          // C    = Z1^2
-                        const edwards_Fq3<ModulusBits, GeneratorBits> D = (X + Y).squared();    // D    = (X1+Y1)^2
-                        const edwards_Fq3<ModulusBits, GeneratorBits> E = (Y + Z).squared();    // E    = (Y1+Z1)^2
-                        const edwards_Fq3<ModulusBits, GeneratorBits> F = D - (A + B);          // F    = D-(A+B)
-                        const edwards_Fq3<ModulusBits, GeneratorBits> G = E - (B + C);          // G    = E-(B+C)
-                        const edwards_Fq3<ModulusBits, GeneratorBits> H =
-                            edwards_g2::mul_by_a(A);    // edwards_param_twist_coeff_a is 1 * X for us
-                                                        // H    = twisted_a * A
-                        const edwards_Fq3<ModulusBits, GeneratorBits> I = H + B;    // I    = H+B
-                        const edwards_Fq3<ModulusBits, GeneratorBits> J = C - I;    // J    = C-I
-                        const edwards_Fq3<ModulusBits, GeneratorBits> K = J + C;    // K    = J+C
-
-                        cc.c_ZZ = Y * (T - X);    // c_ZZ = 2*Y1*(T1-X1)
-                        cc.c_ZZ = cc.c_ZZ + cc.c_ZZ;
-
-                        // c_XY = 2*(C-edwards_a * A * delta_3-B)+G (edwards_a = 1 for us)
-                        cc.c_XY = C - edwards_g2::mul_by_a(A) - B;    // edwards_param_twist_coeff_a is 1 * X for us
-                        cc.c_XY = cc.c_XY + cc.c_XY + G;
-
-                        // c_XZ = 2*(edwards_a*X1*T1*delta_3-B) (edwards_a = 1 for us)
-                        cc.c_XZ = edwards_g2::mul_by_a(X * T) - B;    // edwards_param_twist_coeff_a is 1 * X for us
-                        cc.c_XZ = cc.c_XZ + cc.c_XZ;
-
-                        current.X = F * K;          // X3 = F*K
-                        current.Y = I * (B - H);    // Y3 = I*(B-H)
-                        current.Z = I * K;          // Z3 = I*K
-                        current.T = F * (B - H);    // T3 = F*(B-H)
-                    }
-
-                    template<std::size_t ModulusBits = 183, std::size_t GeneratorBits = CHAR_BIT>
-                    void full_addition_step_for_flipped_miller_loop(
-                        const extended_edwards_g2_projective<ModulusBits, GeneratorBits> &base,
-                        extended_edwards_g2_projective<ModulusBits, GeneratorBits> &current,
-                        edwards_Fq3_conic_coefficients c) {
-                        const edwards_Fq3<ModulusBits, GeneratorBits> &X1 = current.X, &Y1 = current.Y, &Z1 = current.Z,
-                                                                      &T1 = current.T;
-                        const edwards_Fq3<ModulusBits, GeneratorBits> &X2 = base.X, &Y2 = base.Y, &Z2 = base.Z,
-                                                                      &T2 = base.T;
-
-                        const edwards_Fq3<ModulusBits, GeneratorBits> A = X1 * X2;    // A    = X1*X2
-                        const edwards_Fq3<ModulusBits, GeneratorBits> B = Y1 * Y2;    // B    = Y1*Y2
-                        const edwards_Fq3<ModulusBits, GeneratorBits> C = Z1 * T2;    // C    = Z1*T2
-                        const edwards_Fq3<ModulusBits, GeneratorBits> D = T1 * Z2;    // D    = T1*Z2
-                        const edwards_Fq3<ModulusBits, GeneratorBits> E = D + C;      // E    = D+C
-                        const edwards_Fq3<ModulusBits, GeneratorBits> F =
-                            (X1 - Y1) * (X2 + Y2) + B - A;    // F    = (X1-Y1)*(X2+Y2)+B-A
-                        // G = B + twisted_edwards_a * A
-                        const edwards_Fq3<ModulusBits, GeneratorBits> G =
-                            B + edwards_g2::mul_by_a(A);    // edwards_param_twist_coeff_a is 1*X for us
-                        const edwards_Fq3<ModulusBits, GeneratorBits> H = D - C;      // H    = D-C
-                        const edwards_Fq3<ModulusBits, GeneratorBits> I = T1 * T2;    // I    = T1*T2
-
-                        // c_ZZ = delta_3* ((T1-X1)*(T2+X2)-I+A)
-                        cc.c_ZZ = edwards_g2::mul_by_a((T1 - X1) * (T2 + X2) - I +
-                                                       A);    // edwards_param_twist_coeff_a is 1*X for us
-
-                        cc.c_XY = X1 * Z2 - X2 * Z1 + F;                // c_XY = X1*Z2-X2*Z1+F
-                        cc.c_XZ = (Y1 - T1) * (Y2 + T2) - B + I - H;    // c_XZ = (Y1-T1)*(Y2+T2)-B+I-H
-                        current.X = E * F;                              // X3   = E*F
-                        current.Y = G * H;                              // Y3   = G*H
-                        current.Z = F * G;                              // Z3   = F*G
-                        current.T = E * H;                              // T3   = E*H
-                    }
-
-                    template<std::size_t ModulusBits = 183, std::size_t GeneratorBits = CHAR_BIT>
-                    void mixed_addition_step_for_flipped_miller_loop(
-                        const extended_edwards_g2_projective<ModulusBits, GeneratorBits> &base,
-                        extended_edwards_g2_projective<ModulusBits, GeneratorBits> &current,
-                        edwards_Fq3_conic_coefficients &cc) {
-                        const edwards_Fq3<ModulusBits, GeneratorBits> &X1 = current.X, &Y1 = current.Y, &Z1 = current.Z,
-                                                                      &T1 = current.T;
-                        const edwards_Fq3<ModulusBits, GeneratorBits> &X2 = base.X, &Y2 = base.Y, &T2 = base.T;
-
-                        const edwards_Fq3<ModulusBits, GeneratorBits> A = X1 * X2;    // A    = X1*X2
-                        const edwards_Fq3<ModulusBits, GeneratorBits> B = Y1 * Y2;    // B    = Y1*Y2
-                        const edwards_Fq3<ModulusBits, GeneratorBits> C = Z1 * T2;    // C    = Z1*T2
-                        const edwards_Fq3<ModulusBits, GeneratorBits> E = T1 + C;     // E    = T1+C
-                        const edwards_Fq3<ModulusBits, GeneratorBits> F =
-                            (X1 - Y1) * (X2 + Y2) + B - A;    // F    = (X1-Y1)*(X2+Y2)+B-A
-                        // G = B + twisted_edwards_a * A
-                        const edwards_Fq3<ModulusBits, GeneratorBits> G =
-                            B + edwards_g2::mul_by_a(A);    // edwards_param_twist_coeff_a is 1*X for us
-                        const edwards_Fq3<ModulusBits, GeneratorBits> H = T1 - C;     // H    = T1-C
-                        const edwards_Fq3<ModulusBits, GeneratorBits> I = T1 * T2;    // I    = T1*T2
-
-                        // c_ZZ = delta_3* ((T1-X1)*(T2+X2)-I+A)
-                        cc.c_ZZ = edwards_g2::mul_by_a((T1 - X1) * (T2 + X2) - I +
-                                                       A);    // edwards_param_twist_coeff_a is 1*X for us
-
-                        cc.c_XY = X1 - X2 * Z1 + F;                     // c_XY = X1*Z2-X2*Z1+F
-                        cc.c_XZ = (Y1 - T1) * (Y2 + T2) - B + I - H;    // c_XZ = (Y1-T1)*(Y2+T2)-B+I-H
-                        current.X = E * F;                              // X3   = E*F
-                        current.Y = G * H;                              // Y3   = G*H
-                        current.Z = F * G;                              // Z3   = F*G
-                        current.T = E * H;                              // T3   = E*H
-                    }
-
-                    template<std::size_t ModulusBits = 183, std::size_t GeneratorBits = CHAR_BIT>
-                    edwards_ate_g1_precomp<ModulusBits, GeneratorBits> edwards_ate_precompute_g1(const edwards_g1 &P) {
-                        edwards_g1 Pcopy = P;
-                        Pcopy.to_affine_coordinates();
-                        edwards_ate_g1_precomp<ModulusBits, GeneratorBits> result;
-                        result.P_XY = Pcopy.X * Pcopy.Y;
-                        result.P_XZ = Pcopy.X;                                // P.X * P.Z but P.Z = 1
-                        result.P_ZZplusYZ = (edwards_Fq::one() + Pcopy.Y);    // (P.Z + P.Y) * P.Z but P.Z =
+                template<std::size_t ModulusBits = 183, std::size_t GeneratorBits = CHAR_BIT>
+                curves::edwards_gt<ModulusBits, GeneratorBits> edwards_tate_pairing(const edwards_g1 &P,
+                                                                                    const edwards_g2 &Q) {
+                    edwards_tate_g1_precomp prec_P = edwards_tate_precompute_g1(P);
+                    edwards_tate_g2_precomp prec_Q = edwards_tate_precompute_g2(Q);
+                    curves::edwards_gt<ModulusBits, GeneratorBits> result = edwards_tate_miller_loop(prec_P, prec_Q)
 
                         return result;
-                    }
+                }
 
-                    template<std::size_t ModulusBits = 183, std::size_t GeneratorBits = CHAR_BIT>
-                    edwards_ate_g2_precomp<ModulusBits, GeneratorBits> edwards_ate_precompute_g2(const edwards_g2 &Q) {
-                        const bigint<edwards_Fr::num_limbs> &loop_count = edwards_ate_loop_count;
-                        edwards_ate_g2_precomp<ModulusBits, GeneratorBits> result;
+                template<std::size_t ModulusBits = 183, std::size_t GeneratorBits = CHAR_BIT>
+                curves::edwards_gt<ModulusBits, GeneratorBits> edwards_tate_reduced_pairing(const edwards_g1 &P,
+                                                                                            const edwards_g2 &Q) {
+                    const curves::edwards_gt<ModulusBits, GeneratorBits> f = edwards_tate_pairing(P, Q);
+                    const curves::edwards_gt<ModulusBits, GeneratorBits> result = edwards_final_exponentiation(f)
 
-                        edwards_g2 Qcopy(Q);
-                        Qcopy.to_affine_coordinates();
+                        return result;
+                }
 
-                        extended_edwards_g2_projective<ModulusBits, GeneratorBits> Q_ext;
-                        Q_ext.X = Qcopy.X;
-                        Q_ext.Y = Qcopy.Y;
-                        Q_ext.Z = Qcopy.Z;
-                        Q_ext.T = Qcopy.X * Qcopy.Y;
+                template<std::size_t ModulusBits = 183, std::size_t GeneratorBits = CHAR_BIT>
+                struct extended_edwards_g2_projective {
+                    edwards_Fq3<ModulusBits, GeneratorBits> X;
+                    edwards_Fq3<ModulusBits, GeneratorBits> Y;
+                    edwards_Fq3<ModulusBits, GeneratorBits> Z;
+                    edwards_Fq3<ModulusBits, GeneratorBits> T;
+                };
 
-                        extended_edwards_g2_projective<ModulusBits, GeneratorBits> R = Q_ext;
+                template<std::size_t ModulusBits = 183, std::size_t GeneratorBits = CHAR_BIT>
+                void doubling_step_for_flipped_miller_loop(
+                    extended_edwards_g2_projective<ModulusBits, GeneratorBits> & current,
+                    edwards_Fq3_conic_coefficients & cc) {
+                    const edwards_Fq3<ModulusBits, GeneratorBits> &X = current.X, &Y = current.Y, &Z = current.Z,
+                                                                  &T = current.T;
+                    const edwards_Fq3<ModulusBits, GeneratorBits> A = X.squared();          // A    = X1^2
+                    const edwards_Fq3<ModulusBits, GeneratorBits> B = Y.squared();          // B    = Y1^2
+                    const edwards_Fq3<ModulusBits, GeneratorBits> C = Z.squared();          // C    = Z1^2
+                    const edwards_Fq3<ModulusBits, GeneratorBits> D = (X + Y).squared();    // D    = (X1+Y1)^2
+                    const edwards_Fq3<ModulusBits, GeneratorBits> E = (Y + Z).squared();    // E    = (Y1+Z1)^2
+                    const edwards_Fq3<ModulusBits, GeneratorBits> F = D - (A + B);          // F    = D-(A+B)
+                    const edwards_Fq3<ModulusBits, GeneratorBits> G = E - (B + C);          // G    = E-(B+C)
+                    const edwards_Fq3<ModulusBits, GeneratorBits> H =
+                        edwards_g2::mul_by_a(A);    // edwards_param_twist_coeff_a is 1 * X for us
+                                                    // H    = twisted_a * A
+                    const edwards_Fq3<ModulusBits, GeneratorBits> I = H + B;    // I    = H+B
+                    const edwards_Fq3<ModulusBits, GeneratorBits> J = C - I;    // J    = C-I
+                    const edwards_Fq3<ModulusBits, GeneratorBits> K = J + C;    // K    = J+C
 
-                        bool found_one = false;
-                        for (long i = loop_count.max_bits() - 1; i >= 0; --i) {
-                            const bool bit = loop_count.test_bit(i);
-                            if (!found_one) {
-                                /* this skips the MSB itself */
-                                found_one |= bit;
-                                continue;
-                            }
+                    cc.c_ZZ = Y * (T - X);    // c_ZZ = 2*Y1*(T1-X1)
+                    cc.c_ZZ = cc.c_ZZ + cc.c_ZZ;
 
-                            edwards_Fq3_conic_coefficients<ModulusBits, GeneratorBits> cc;
-                            doubling_step_for_flipped_miller_loop<ModulusBits, GeneratorBits>(R, cc);
+                    // c_XY = 2*(C-edwards_a * A * delta_3-B)+G (edwards_a = 1 for us)
+                    cc.c_XY = C - edwards_g2::mul_by_a(A) - B;    // edwards_param_twist_coeff_a is 1 * X for us
+                    cc.c_XY = cc.c_XY + cc.c_XY + G;
+
+                    // c_XZ = 2*(edwards_a*X1*T1*delta_3-B) (edwards_a = 1 for us)
+                    cc.c_XZ = edwards_g2::mul_by_a(X * T) - B;    // edwards_param_twist_coeff_a is 1 * X for us
+                    cc.c_XZ = cc.c_XZ + cc.c_XZ;
+
+                    current.X = F * K;          // X3 = F*K
+                    current.Y = I * (B - H);    // Y3 = I*(B-H)
+                    current.Z = I * K;          // Z3 = I*K
+                    current.T = F * (B - H);    // T3 = F*(B-H)
+                }
+
+                template<std::size_t ModulusBits = 183, std::size_t GeneratorBits = CHAR_BIT>
+                void full_addition_step_for_flipped_miller_loop(
+                    const extended_edwards_g2_projective<ModulusBits, GeneratorBits> &base,
+                    extended_edwards_g2_projective<ModulusBits, GeneratorBits> &current,
+                    edwards_Fq3_conic_coefficients c) {
+                    const edwards_Fq3<ModulusBits, GeneratorBits> &X1 = current.X, &Y1 = current.Y, &Z1 = current.Z,
+                                                                  &T1 = current.T;
+                    const edwards_Fq3<ModulusBits, GeneratorBits> &X2 = base.X, &Y2 = base.Y, &Z2 = base.Z,
+                                                                  &T2 = base.T;
+
+                    const edwards_Fq3<ModulusBits, GeneratorBits> A = X1 * X2;    // A    = X1*X2
+                    const edwards_Fq3<ModulusBits, GeneratorBits> B = Y1 * Y2;    // B    = Y1*Y2
+                    const edwards_Fq3<ModulusBits, GeneratorBits> C = Z1 * T2;    // C    = Z1*T2
+                    const edwards_Fq3<ModulusBits, GeneratorBits> D = T1 * Z2;    // D    = T1*Z2
+                    const edwards_Fq3<ModulusBits, GeneratorBits> E = D + C;      // E    = D+C
+                    const edwards_Fq3<ModulusBits, GeneratorBits> F =
+                        (X1 - Y1) * (X2 + Y2) + B - A;    // F    = (X1-Y1)*(X2+Y2)+B-A
+                    // G = B + twisted_edwards_a * A
+                    const edwards_Fq3<ModulusBits, GeneratorBits> G =
+                        B + edwards_g2::mul_by_a(A);    // edwards_param_twist_coeff_a is 1*X for us
+                    const edwards_Fq3<ModulusBits, GeneratorBits> H = D - C;      // H    = D-C
+                    const edwards_Fq3<ModulusBits, GeneratorBits> I = T1 * T2;    // I    = T1*T2
+
+                    // c_ZZ = delta_3* ((T1-X1)*(T2+X2)-I+A)
+                    cc.c_ZZ = edwards_g2::mul_by_a((T1 - X1) * (T2 + X2) - I +
+                                                   A);    // edwards_param_twist_coeff_a is 1*X for us
+
+                    cc.c_XY = X1 * Z2 - X2 * Z1 + F;                // c_XY = X1*Z2-X2*Z1+F
+                    cc.c_XZ = (Y1 - T1) * (Y2 + T2) - B + I - H;    // c_XZ = (Y1-T1)*(Y2+T2)-B+I-H
+                    current.X = E * F;                              // X3   = E*F
+                    current.Y = G * H;                              // Y3   = G*H
+                    current.Z = F * G;                              // Z3   = F*G
+                    current.T = E * H;                              // T3   = E*H
+                }
+
+                template<std::size_t ModulusBits = 183, std::size_t GeneratorBits = CHAR_BIT>
+                void mixed_addition_step_for_flipped_miller_loop(
+                    const extended_edwards_g2_projective<ModulusBits, GeneratorBits> &base,
+                    extended_edwards_g2_projective<ModulusBits, GeneratorBits> &current,
+                    edwards_Fq3_conic_coefficients &cc) {
+                    const edwards_Fq3<ModulusBits, GeneratorBits> &X1 = current.X, &Y1 = current.Y, &Z1 = current.Z,
+                                                                  &T1 = current.T;
+                    const edwards_Fq3<ModulusBits, GeneratorBits> &X2 = base.X, &Y2 = base.Y, &T2 = base.T;
+
+                    const edwards_Fq3<ModulusBits, GeneratorBits> A = X1 * X2;    // A    = X1*X2
+                    const edwards_Fq3<ModulusBits, GeneratorBits> B = Y1 * Y2;    // B    = Y1*Y2
+                    const edwards_Fq3<ModulusBits, GeneratorBits> C = Z1 * T2;    // C    = Z1*T2
+                    const edwards_Fq3<ModulusBits, GeneratorBits> E = T1 + C;     // E    = T1+C
+                    const edwards_Fq3<ModulusBits, GeneratorBits> F =
+                        (X1 - Y1) * (X2 + Y2) + B - A;    // F    = (X1-Y1)*(X2+Y2)+B-A
+                    // G = B + twisted_edwards_a * A
+                    const edwards_Fq3<ModulusBits, GeneratorBits> G =
+                        B + edwards_g2::mul_by_a(A);    // edwards_param_twist_coeff_a is 1*X for us
+                    const edwards_Fq3<ModulusBits, GeneratorBits> H = T1 - C;     // H    = T1-C
+                    const edwards_Fq3<ModulusBits, GeneratorBits> I = T1 * T2;    // I    = T1*T2
+
+                    // c_ZZ = delta_3* ((T1-X1)*(T2+X2)-I+A)
+                    cc.c_ZZ = edwards_g2::mul_by_a((T1 - X1) * (T2 + X2) - I +
+                                                   A);    // edwards_param_twist_coeff_a is 1*X for us
+
+                    cc.c_XY = X1 - X2 * Z1 + F;                     // c_XY = X1*Z2-X2*Z1+F
+                    cc.c_XZ = (Y1 - T1) * (Y2 + T2) - B + I - H;    // c_XZ = (Y1-T1)*(Y2+T2)-B+I-H
+                    current.X = E * F;                              // X3   = E*F
+                    current.Y = G * H;                              // Y3   = G*H
+                    current.Z = F * G;                              // Z3   = F*G
+                    current.T = E * H;                              // T3   = E*H
+                }
+
+                template<std::size_t ModulusBits = 183, std::size_t GeneratorBits = CHAR_BIT>
+                edwards_ate_g1_precomp<ModulusBits, GeneratorBits> edwards_ate_precompute_g1(const edwards_g1 &P) {
+                    edwards_g1 Pcopy = P;
+                    Pcopy.to_affine_coordinates();
+                    edwards_ate_g1_precomp<ModulusBits, GeneratorBits> result;
+                    result.P_XY = Pcopy.X * Pcopy.Y;
+                    result.P_XZ = Pcopy.X;                                // P.X * P.Z but P.Z = 1
+                    result.P_ZZplusYZ = (edwards_Fq::one() + Pcopy.Y);    // (P.Z + P.Y) * P.Z but P.Z =
+
+                    return result;
+                }
+
+                template<std::size_t ModulusBits = 183, std::size_t GeneratorBits = CHAR_BIT>
+                edwards_ate_g2_precomp<ModulusBits, GeneratorBits> edwards_ate_precompute_g2(const edwards_g2 &Q) {
+                    const bigint<edwards_Fr::num_limbs> &loop_count = edwards_ate_loop_count;
+                    edwards_ate_g2_precomp<ModulusBits, GeneratorBits> result;
+
+                    edwards_g2 Qcopy(Q);
+                    Qcopy.to_affine_coordinates();
+
+                    extended_edwards_g2_projective<ModulusBits, GeneratorBits> Q_ext;
+                    Q_ext.X = Qcopy.X;
+                    Q_ext.Y = Qcopy.Y;
+                    Q_ext.Z = Qcopy.Z;
+                    Q_ext.T = Qcopy.X * Qcopy.Y;
+
+                    extended_edwards_g2_projective<ModulusBits, GeneratorBits> R = Q_ext;
+
+                    bool found_one = false;
+                    for (long i = loop_count.max_bits() - 1; i >= 0; --i) {
+                        const bool bit = loop_count.test_bit(i);
+                        if (!found_one) {
+                            /* this skips the MSB itself */
+                            found_one |= bit;
+                            continue;
+                        }
+
+                        edwards_Fq3_conic_coefficients<ModulusBits, GeneratorBits> cc;
+                        doubling_step_for_flipped_miller_loop<ModulusBits, GeneratorBits>(R, cc);
+                        result.push_back(cc);
+                        if (bit) {
+                            mixed_addition_step_for_flipped_miller_loop<ModulusBits, GeneratorBits>(Q_ext, R, cc);
                             result.push_back(cc);
-                            if (bit) {
-                                mixed_addition_step_for_flipped_miller_loop<ModulusBits, GeneratorBits>(Q_ext, R, cc);
-                                result.push_back(cc);
-                            }
                         }
-
-                        return result;
                     }
 
-                    template<std::size_t ModulusBits = 183, std::size_t GeneratorBits = CHAR_BIT>
-                    curves::edwards_gt<ModulusBits, GeneratorBits> edwards_ate_miller_loop(
-                        const edwards_ate_g1_precomp<ModulusBits, GeneratorBits> &prec_P,
-                        const edwards_ate_g2_precomp<ModulusBits, GeneratorBits> &prec_Q) {
-                        const bigint<edwards_Fr::num_limbs> &loop_count = edwards_ate_loop_count;
+                    return result;
+                }
 
-                        curves::edwards_gt<ModulusBits, GeneratorBits> f =
-                            curves::edwards_gt<ModulusBits, GeneratorBits>::one();
+                template<std::size_t ModulusBits = 183, std::size_t GeneratorBits = CHAR_BIT>
+                curves::edwards_gt<ModulusBits, GeneratorBits> edwards_ate_miller_loop(
+                    const edwards_ate_g1_precomp<ModulusBits, GeneratorBits> &prec_P,
+                    const edwards_ate_g2_precomp<ModulusBits, GeneratorBits> &prec_Q) {
+                    const bigint<edwards_Fr::num_limbs> &loop_count = edwards_ate_loop_count;
 
-                        bool found_one = false;
-                        size_t idx = 0;
-                        for (long i = loop_count.max_bits() - 1; i >= 0; --i) {
-                            const bool bit = loop_count.test_bit(i);
-                            if (!found_one) {
-                                /* this skips the MSB itself */
-                                found_one |= bit;
-                                continue;
-                            }
+                    curves::edwards_gt<ModulusBits, GeneratorBits> f =
+                        curves::edwards_gt<ModulusBits, GeneratorBits>::one();
 
-                            /* code below gets executed for all bits (EXCEPT the MSB itself) of
-                               edwards_param_p (skipping leading zeros) in MSB to LSB
-                               order */
-                            edwards_Fq3_conic_coefficients cc = prec_Q[idx++];
+                    bool found_one = false;
+                    size_t idx = 0;
+                    for (long i = loop_count.max_bits() - 1; i >= 0; --i) {
+                        const bool bit = loop_count.test_bit(i);
+                        if (!found_one) {
+                            /* this skips the MSB itself */
+                            found_one |= bit;
+                            continue;
+                        }
 
-                            curves::edwards_gt<ModulusBits, GeneratorBits> g_RR_at_P =
+                        /* code below gets executed for all bits (EXCEPT the MSB itself) of
+                           edwards_param_p (skipping leading zeros) in MSB to LSB
+                           order */
+                        edwards_Fq3_conic_coefficients cc = prec_Q[idx++];
+
+                        curves::edwards_gt<ModulusBits, GeneratorBits> g_RR_at_P =
+                            curves::edwards_gt<ModulusBits, GeneratorBits>(
+                                prec_P.P_XY * cc.c_XY + prec_P.P_XZ * cc.c_XZ, prec_P.P_ZZplusYZ * cc.c_ZZ);
+                        f = f.squared() * g_RR_at_P;
+                        if (bit) {
+                            cc = prec_Q[idx++];
+                            curves::edwards_gt<ModulusBits, GeneratorBits> g_RQ_at_P =
                                 curves::edwards_gt<ModulusBits, GeneratorBits>(
-                                    prec_P.P_XY * cc.c_XY + prec_P.P_XZ * cc.c_XZ, prec_P.P_ZZplusYZ * cc.c_ZZ);
-                            f = f.squared() * g_RR_at_P;
-                            if (bit) {
-                                cc = prec_Q[idx++];
-                                curves::edwards_gt<ModulusBits, GeneratorBits> g_RQ_at_P =
-                                    curves::edwards_gt<ModulusBits, GeneratorBits>(
-                                        prec_P.P_ZZplusYZ * cc.c_ZZ, prec_P.P_XY * cc.c_XY + prec_P.P_XZ * cc.c_XZ);
-                                f = f * g_RQ_at_P;
-                            }
+                                    prec_P.P_ZZplusYZ * cc.c_ZZ, prec_P.P_XY * cc.c_XY + prec_P.P_XZ * cc.c_XZ);
+                            f = f * g_RQ_at_P;
+                        }
+                    }
 
-                            return f;
+                    return f;
+                }
+
+                template<std::size_t ModulusBits = 183, std::size_t GeneratorBits = CHAR_BIT>
+                curves::edwards_gt<ModulusBits, GeneratorBits> edwards_ate_double_miller_loop(
+                    const edwards_ate_g1_precomp<ModulusBits, GeneratorBits> &prec_P1,
+                    const edwards_ate_g2_precomp<ModulusBits, GeneratorBits> &prec_Q1,
+                    const edwards_ate_g1_precomp<ModulusBits, GeneratorBits> &prec_P2,
+                    const edwards_ate_g2_precomp<ModulusBits, GeneratorBits> &prec_Q2) {
+                    const bigint<edwards_Fr::num_limbs> &loop_count = edwards_ate_loop_count;
+
+                    curves::edwards_gt<ModulusBits, GeneratorBits> f =
+                        curves::edwards_gt<ModulusBits, GeneratorBits>::one();
+
+                    bool found_one = false;
+                    size_t idx = 0;
+                    for (long i = loop_count.max_bits() - 1; i >= 0; --i) {
+                        const bool bit = loop_count.test_bit(i);
+                        if (!found_one) {
+                            /* this skips the MSB itself */
+                            found_one |= bit;
+                            continue;
                         }
 
-                        template<std::size_t ModulusBits = 183, std::size_t GeneratorBits = CHAR_BIT>
-                        curves::edwards_gt<ModulusBits, GeneratorBits> edwards_ate_double_miller_loop(
-                            const edwards_ate_g1_precomp<ModulusBits, GeneratorBits> &prec_P1,
-                            const edwards_ate_g2_precomp<ModulusBits, GeneratorBits> &prec_Q1,
-                            const edwards_ate_g1_precomp<ModulusBits, GeneratorBits> &prec_P2,
-                            const edwards_ate_g2_precomp<ModulusBits, GeneratorBits> &prec_Q2) {
-                            const bigint<edwards_Fr::num_limbs> &loop_count = edwards_ate_loop_count;
+                        /* code below gets executed for all bits (EXCEPT the MSB itself) of
+                           edwards_param_p (skipping leading zeros) in MSB to LSB
+                           order */
+                        edwards_Fq3_conic_coefficients cc1 = prec_Q1[idx];
+                        edwards_Fq3_conic_coefficients cc2 = prec_Q2[idx];
+                        ++idx;
 
-                            curves::edwards_gt<ModulusBits, GeneratorBits> f =
-                                curves::edwards_gt<ModulusBits, GeneratorBits>::one();
+                        curves::edwards_gt<ModulusBits, GeneratorBits> g_RR_at_P1 =
+                            curves::edwards_gt<ModulusBits, GeneratorBits>(prec_P1.P_XY * cc1.c_XY +
+                                                                               prec_P1.P_XZ * cc1.c_XZ,
+                                                                           prec_P1.P_ZZplusYZ * cc1.c_ZZ);
 
-                            bool found_one = false;
-                            size_t idx = 0;
-                            for (long i = loop_count.max_bits() - 1; i >= 0; --i) {
-                                const bool bit = loop_count.test_bit(i);
-                                if (!found_one) {
-                                    /* this skips the MSB itself */
-                                    found_one |= bit;
-                                    continue;
-                                }
+                        curves::edwards_gt<ModulusBits, GeneratorBits> g_RR_at_P2 =
+                            curves::edwards_gt<ModulusBits, GeneratorBits>(prec_P2.P_XY * cc2.c_XY +
+                                                                               prec_P2.P_XZ * cc2.c_XZ,
+                                                                           prec_P2.P_ZZplusYZ * cc2.c_ZZ);
+                        f = f.squared() * g_RR_at_P1 * g_RR_at_P2;
 
-                                /* code below gets executed for all bits (EXCEPT the MSB itself) of
-                                   edwards_param_p (skipping leading zeros) in MSB to LSB
-                                   order */
-                                edwards_Fq3_conic_coefficients cc1 = prec_Q1[idx];
-                                edwards_Fq3_conic_coefficients cc2 = prec_Q2[idx];
-                                ++idx;
-
-                                curves::edwards_gt<ModulusBits, GeneratorBits> g_RR_at_P1 =
-                                    curves::edwards_gt<ModulusBits, GeneratorBits>(prec_P1.P_XY * cc1.c_XY +
-                                                                                       prec_P1.P_XZ * cc1.c_XZ,
-                                                                                   prec_P1.P_ZZplusYZ * cc1.c_ZZ);
-
-                                curves::edwards_gt<ModulusBits, GeneratorBits> g_RR_at_P2 =
-                                    curves::edwards_gt<ModulusBits, GeneratorBits>(prec_P2.P_XY * cc2.c_XY +
-                                                                                       prec_P2.P_XZ * cc2.c_XZ,
-                                                                                   prec_P2.P_ZZplusYZ * cc2.c_ZZ);
-                                f = f.squared() * g_RR_at_P1 * g_RR_at_P2;
-
-                                if (bit) {
-                                    cc1 = prec_Q1[idx];
-                                    cc2 = prec_Q2[idx];
-                                    ++idx;
-                                    curves::edwards_gt<ModulusBits, GeneratorBits> g_RQ_at_P1 =
-                                        curves::edwards_gt<ModulusBits, GeneratorBits>(prec_P1.P_ZZplusYZ * cc1.c_ZZ,
-                                                                                       prec_P1.P_XY * cc1.c_XY +
-                                                                                           prec_P1.P_XZ * cc1.c_XZ);
-                                    curves::edwards_gt<ModulusBits, GeneratorBits> g_RQ_at_P2 =
-                                        curves::edwards_gt<ModulusBits, GeneratorBits>(prec_P2.P_ZZplusYZ * cc2.c_ZZ,
-                                                                                       prec_P2.P_XY * cc2.c_XY +
-                                                                                           prec_P2.P_XZ * cc2.c_XZ);
-                                    f = f * g_RQ_at_P1 * g_RQ_at_P2;
-                                }
-                            }
-
-                            return f;
+                        if (bit) {
+                            cc1 = prec_Q1[idx];
+                            cc2 = prec_Q2[idx];
+                            ++idx;
+                            curves::edwards_gt<ModulusBits, GeneratorBits> g_RQ_at_P1 =
+                                curves::edwards_gt<ModulusBits, GeneratorBits>(prec_P1.P_ZZplusYZ * cc1.c_ZZ,
+                                                                               prec_P1.P_XY * cc1.c_XY +
+                                                                                   prec_P1.P_XZ * cc1.c_XZ);
+                            curves::edwards_gt<ModulusBits, GeneratorBits> g_RQ_at_P2 =
+                                curves::edwards_gt<ModulusBits, GeneratorBits>(prec_P2.P_ZZplusYZ * cc2.c_ZZ,
+                                                                               prec_P2.P_XY * cc2.c_XY +
+                                                                                   prec_P2.P_XZ * cc2.c_XZ);
+                            f = f * g_RQ_at_P1 * g_RQ_at_P2;
                         }
+                    }
 
-                        template<std::size_t ModulusBits = 183, std::size_t GeneratorBits = CHAR_BIT>
-                        curves::edwards_gt<ModulusBits, GeneratorBits> edwards_ate_pairing(const edwards_g1 &P,
-                                                                                           const edwards_g2 &Q) {
-                            edwards_ate_g1_precomp<ModulusBits, GeneratorBits> prec_P =
-                                edwards_ate_precompute_g1<ModulusBits, GeneratorBits>(P);
-                            edwards_ate_g2_precomp<ModulusBits, GeneratorBits> prec_Q =
-                                edwards_ate_precompute_g2<ModulusBits, GeneratorBits>(Q);
-                            curves::edwards_gt<ModulusBits, GeneratorBits> result =
-                                edwards_ate_miller_loop<ModulusBits, GeneratorBits>(prec_P, prec_Q);
-                            return result;
-                        }
+                    return f;
+                }
 
-                        template<std::size_t ModulusBits = 183, std::size_t GeneratorBits = CHAR_BIT>
-                        curves::edwards_gt<ModulusBits, GeneratorBits> edwards_ate_reduced_pairing(
-                            const edwards_g1 &P, const edwards_g2 &Q) {
-                            const curves::edwards_gt<ModulusBits, GeneratorBits> f =
-                                edwards_ate_pairing<ModulusBits, GeneratorBits>(P, Q);
-                            const curves::edwards_gt<ModulusBits, GeneratorBits> result =
-                                edwards_final_exponentiation<ModulusBits, GeneratorBits>(f);
+                template<std::size_t ModulusBits = 183, std::size_t GeneratorBits = CHAR_BIT>
+                curves::edwards_gt<ModulusBits, GeneratorBits> edwards_ate_pairing(const edwards_g1 &P,
+                                                                                   const edwards_g2 &Q) {
+                    edwards_ate_g1_precomp<ModulusBits, GeneratorBits> prec_P =
+                        edwards_ate_precompute_g1<ModulusBits, GeneratorBits>(P);
+                    edwards_ate_g2_precomp<ModulusBits, GeneratorBits> prec_Q =
+                        edwards_ate_precompute_g2<ModulusBits, GeneratorBits>(Q);
+                    curves::edwards_gt<ModulusBits, GeneratorBits> result =
+                        edwards_ate_miller_loop<ModulusBits, GeneratorBits>(prec_P, prec_Q);
+                    return result;
+                }
 
-                            return result;
-                        }
+                template<std::size_t ModulusBits = 183, std::size_t GeneratorBits = CHAR_BIT>
+                curves::edwards_gt<ModulusBits, GeneratorBits> edwards_ate_reduced_pairing(
+                    const edwards_g1 &P, const edwards_g2 &Q) {
+                    const curves::edwards_gt<ModulusBits, GeneratorBits> f =
+                        edwards_ate_pairing<ModulusBits, GeneratorBits>(P, Q);
+                    const curves::edwards_gt<ModulusBits, GeneratorBits> result =
+                        edwards_final_exponentiation<ModulusBits, GeneratorBits>(f);
 
-                        template<std::size_t ModulusBits = 183, std::size_t GeneratorBits = CHAR_BIT>
-                        edwards_g1_precomp<ModulusBits, GeneratorBits> edwards_precompute_g1(const edwards_g1 &P) {
-                            return edwards_ate_precompute_g1<ModulusBits, GeneratorBits>(P);
-                        }
+                    return result;
+                }
 
-                        template<std::size_t ModulusBits = 183, std::size_t GeneratorBits = CHAR_BIT>
-                        edwards_g2_precomp<ModulusBits, GeneratorBits> edwards_precompute_g2(const edwards_g2 &Q) {
-                            return edwards_ate_precompute_g2<ModulusBits, GeneratorBits>(Q);
-                        }
+                template<std::size_t ModulusBits = 183, std::size_t GeneratorBits = CHAR_BIT>
+                edwards_g1_precomp<ModulusBits, GeneratorBits> edwards_precompute_g1(const edwards_g1 &P) {
+                    return edwards_ate_precompute_g1<ModulusBits, GeneratorBits>(P);
+                }
 
-                        template<std::size_t ModulusBits = 183, std::size_t GeneratorBits = CHAR_BIT>
-                        curves::edwards_gt<ModulusBits, GeneratorBits> edwards_miller_loop(
-                            const edwards_g1_precomp<ModulusBits, GeneratorBits> &prec_P,
-                            const edwards_g2_precomp<ModulusBits, GeneratorBits> &prec_Q) {
-                            return edwards_ate_miller_loop(prec_P, prec_Q);
-                        }
+                template<std::size_t ModulusBits = 183, std::size_t GeneratorBits = CHAR_BIT>
+                edwards_g2_precomp<ModulusBits, GeneratorBits> edwards_precompute_g2(const edwards_g2 &Q) {
+                    return edwards_ate_precompute_g2<ModulusBits, GeneratorBits>(Q);
+                }
 
-                        template<std::size_t ModulusBits = 183, std::size_t GeneratorBits = CHAR_BIT>
-                        curves::edwards_gt<ModulusBits, GeneratorBits> edwards_double_miller_loop(
-                            const edwards_g1_precomp<ModulusBits, GeneratorBits> &prec_P1,
-                            const edwards_g2_precomp<ModulusBits, GeneratorBits> &prec_Q1,
-                            const edwards_g1_precomp<ModulusBits, GeneratorBits> &prec_P2,
-                            const edwards_g2_precomp<ModulusBits, GeneratorBits> &prec_Q2) {
-                            return edwards_ate_double_miller_loop<ModulusBits, GeneratorBits>(
-                                prec_P1, prec_Q1, prec_P2, prec_Q2);
-                        }
+                template<std::size_t ModulusBits = 183, std::size_t GeneratorBits = CHAR_BIT>
+                curves::edwards_gt<ModulusBits, GeneratorBits> edwards_miller_loop(
+                    const edwards_g1_precomp<ModulusBits, GeneratorBits> &prec_P,
+                    const edwards_g2_precomp<ModulusBits, GeneratorBits> &prec_Q) {
+                    return edwards_ate_miller_loop(prec_P, prec_Q);
+                }
 
-                        template<std::size_t ModulusBits = 183, std::size_t GeneratorBits = CHAR_BIT>
-                        curves::edwards_gt<ModulusBits, GeneratorBits> edwards_pairing(const edwards_g1 &P,
+                template<std::size_t ModulusBits = 183, std::size_t GeneratorBits = CHAR_BIT>
+                curves::edwards_gt<ModulusBits, GeneratorBits> edwards_double_miller_loop(
+                    const edwards_g1_precomp<ModulusBits, GeneratorBits> &prec_P1,
+                    const edwards_g2_precomp<ModulusBits, GeneratorBits> &prec_Q1,
+                    const edwards_g1_precomp<ModulusBits, GeneratorBits> &prec_P2,
+                    const edwards_g2_precomp<ModulusBits, GeneratorBits> &prec_Q2) {
+                    return edwards_ate_double_miller_loop<ModulusBits, GeneratorBits>(
+                        prec_P1, prec_Q1, prec_P2, prec_Q2);
+                }
+
+                template<std::size_t ModulusBits = 183, std::size_t GeneratorBits = CHAR_BIT>
+                curves::edwards_gt<ModulusBits, GeneratorBits> edwards_pairing(const edwards_g1 &P,
+                                                                               const edwards_g2 &Q) {
+                    return edwards_ate_pairing<ModulusBits, GeneratorBits>(P, Q);
+                }
+
+                template<std::size_t ModulusBits = 183, std::size_t GeneratorBits = CHAR_BIT>
+                curves::edwards_gt<ModulusBits, GeneratorBits> edwards_reduced_pairing(const edwards_g1 &P,
                                                                                        const edwards_g2 &Q) {
-                            return edwards_ate_pairing<ModulusBits, GeneratorBits>(P, Q);
-                        }
+                    return edwards_ate_reduced_pairing<ModulusBits, GeneratorBits>(P, Q);
+                }
 
-                        template<std::size_t ModulusBits = 183, std::size_t GeneratorBits = CHAR_BIT>
-                        curves::edwards_gt<ModulusBits, GeneratorBits> edwards_reduced_pairing(const edwards_g1 &P,
-                                                                                               const edwards_g2 &Q) {
-                            return edwards_ate_reduced_pairing<ModulusBits, GeneratorBits>(P, Q);
-                        }
-
-                    }    // namespace detail
-                }        // namespace pairing
-            }            // namespace algebra
-        }                // namespace nil
+            }    // namespace detail
+        }        // namespace pairing
+    }            // namespace algebra
+}                // namespace nil
 #endif                   // ALGEBRA_PAIRING_EDWARDS_FUNCTIONS_HPP
