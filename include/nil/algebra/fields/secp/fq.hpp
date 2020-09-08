@@ -49,7 +49,7 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x03;
 
-                typedef typename detail::element_fp<detail::arithmetic_params<secp_k1_fq<160, CHAR_BIT>>> value_type;
+                typedef typename detail::element_fp<detail::extension_params<secp_k1_fq<160, CHAR_BIT>>> value_type;
 
                 constexpr static const std::size_t arity = 1;
             };
@@ -68,7 +68,7 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x03;
 
-                typedef typename detail::element_fp<detail::arithmetic_params<secp_r1_fq<160, CHAR_BIT>>> value_type;
+                typedef typename detail::element_fp<detail::extension_params<secp_r1_fq<160, CHAR_BIT>>> value_type;
 
                 constexpr static const std::size_t arity = 1;
             };
@@ -87,7 +87,7 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x03;
 
-                typedef typename detail::element_fp<detail::arithmetic_params<secp_r2_fq<160, CHAR_BIT>>> value_type;
+                typedef typename detail::element_fp<detail::extension_params<secp_r2_fq<160, CHAR_BIT>>> value_type;
 
                 constexpr static const std::size_t arity = 1;
             };
@@ -107,7 +107,7 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x03;
 
-                typedef typename detail::element_fp<detail::arithmetic_params<secp_k1_fq<192, CHAR_BIT>>> value_type;
+                typedef typename detail::element_fp<detail::extension_params<secp_k1_fq<192, CHAR_BIT>>> value_type;
 
                 constexpr static const std::size_t arity = 1;
             };
@@ -127,7 +127,7 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x03;
 
-                typedef typename detail::element_fp<detail::arithmetic_params<secp_r1_fq<192, CHAR_BIT>>> value_type;
+                typedef typename detail::element_fp<detail::extension_params<secp_r1_fq<192, CHAR_BIT>>> value_type;
 
                 constexpr static const std::size_t arity = 1;
             };
@@ -147,7 +147,7 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x03;
 
-                typedef typename detail::element_fp<detail::arithmetic_params<secp_k1_fq<224, CHAR_BIT>>> value_type;
+                typedef typename detail::element_fp<detail::extension_params<secp_k1_fq<224, CHAR_BIT>>> value_type;
 
                 constexpr static const std::size_t arity = 1;
             };
@@ -167,7 +167,7 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x03;
 
-                typedef typename detail::element_fp<detail::arithmetic_params<secp_r1_fq<224, CHAR_BIT>>> value_type;
+                typedef typename detail::element_fp<detail::extension_params<secp_r1_fq<224, CHAR_BIT>>> value_type;
 
                 constexpr static const std::size_t arity = 1;
             };
@@ -187,7 +187,7 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x03;
 
-                typedef typename detail::element_fp<detail::arithmetic_params<secp_k1_fq<256, CHAR_BIT>>> value_type;
+                typedef typename detail::element_fp<detail::extension_params<secp_k1_fq<256, CHAR_BIT>>> value_type;
 
                 constexpr static const std::size_t arity = 1;
             };

@@ -64,9 +64,10 @@ endmacro()
 set(RUNTIME_TESTS_NAMES
     "curves"
     "fields"
-    "groups"
-    "bilinearity"
-    "pairing")
+#    "groups"
+#    "bilinearity"
+#    "pairing"
+    )
 
 set(COMPILE_TIME_TESTS_NAMES
     "matrix"

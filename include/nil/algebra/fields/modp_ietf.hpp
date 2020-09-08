@@ -44,7 +44,7 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x02;
 
-                typedef typename detail::element_fp<detail::arithmetic_params<modp_ietf<modulus_bits, generator_bits>>>
+                typedef typename detail::element_fp<detail::extension_params<modp_ietf<modulus_bits, generator_bits>>>
                     value_type;
 
                 constexpr static const std::size_t arity = 1;
@@ -65,7 +65,7 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x02;
 
-                typedef typename detail::element_fp<detail::arithmetic_params<modp_ietf<modulus_bits, generator_bits>>>
+                typedef typename detail::element_fp<detail::extension_params<modp_ietf<modulus_bits, generator_bits>>>
                     value_type;
 
                 constexpr static const std::size_t arity = 1;
@@ -86,7 +86,7 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x02;
 
-                typedef typename detail::element_fp<detail::arithmetic_params<modp_ietf<modulus_bits, generator_bits>>>
+                typedef typename detail::element_fp<detail::extension_params<modp_ietf<modulus_bits, generator_bits>>>
                     value_type;
 
                 constexpr static const std::size_t arity = 1;
@@ -107,7 +107,7 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x02;
 
-                typedef typename detail::element_fp<detail::arithmetic_params<modp_ietf<modulus_bits, generator_bits>>>
+                typedef typename detail::element_fp<detail::extension_params<modp_ietf<modulus_bits, generator_bits>>>
                     value_type;
 
                 constexpr static const std::size_t arity = 1;
@@ -128,7 +128,7 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x02;
 
-                typedef typename detail::element_fp<detail::arithmetic_params<modp_ietf<modulus_bits, generator_bits>>>
+                typedef typename detail::element_fp<detail::extension_params<modp_ietf<modulus_bits, generator_bits>>>
                     value_type;
 
                 constexpr static const std::size_t arity = 1;
@@ -149,7 +149,7 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x02;
 
-                typedef typename detail::element_fp<detail::arithmetic_params<modp_ietf<modulus_bits, generator_bits>>>
+                typedef typename detail::element_fp<detail::extension_params<modp_ietf<modulus_bits, generator_bits>>>
                     value_type;
 
                 constexpr static const std::size_t arity = 1;
@@ -170,7 +170,7 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x02;
 
-                typedef typename detail::element_fp<detail::arithmetic_params<modp_ietf<modulus_bits, generator_bits>>>
+                typedef typename detail::element_fp<detail::extension_params<modp_ietf<modulus_bits, generator_bits>>>
                     value_type;
 
                 constexpr static const std::size_t arity = 1;

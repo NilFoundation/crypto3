@@ -12,11 +12,11 @@
 
 #include <nil/algebra/curves/detail/mnt4/g1.hpp>
 #include <nil/algebra/curves/detail/mnt4/g2.hpp>
+#include <nil/algebra/curves/detail/mnt4/basic_policy.hpp>
 
 #include <nil/algebra/fields/mnt4/fq.hpp>
 #include <nil/algebra/fields/mnt4/fr.hpp>
-#include <nil/algebra/fields/detail/element/fp4.hpp>
-#include <nil/algebra/fields/detail/params/mnt4/fq.hpp>
+#include <nil/algebra/fields/fp4.hpp>
 
 namespace nil {
     namespace algebra {
@@ -54,9 +54,8 @@ namespace nil {
 
                 typedef typename detail::mnt4_g1<298, CHAR_BIT> g1_type;
                 typedef typename detail::mnt4_g2<298, CHAR_BIT> g2_type;
-                typedef typename nil::algebra::fields::detail::element_fp4<
-                    nil::algebra::fields::detail::arithmetic_params<mnt4<298, CHAR_BIT>>>
-                    gt_type;
+
+                typedef typename fields::fp4<base_field_type>::value_type gt_type;
 
                 typedef std::vector<g1_type> g1_vector;
                 typedef std::vector<g2_type> g2_vector;

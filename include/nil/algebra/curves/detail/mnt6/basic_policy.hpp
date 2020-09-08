@@ -12,7 +12,6 @@
 
 #include <nil/algebra/fields/mnt6/fq.hpp>
 #include <nil/algebra/fields/mnt6/fr.hpp>
-#include <nil/algebra/fields/detail/params/mnt6/fq.hpp>
 
 #include <nil/algebra/detail/literals.hpp>
 

@@ -24,11 +24,11 @@ namespace nil {
             namespace detail {
 
                 template<std::size_t ModulusBits, std::size_t GeneratorBits>
-                struct arithmetic_params<mnt6_fr<ModulusBits, GeneratorBits>>
+                struct extension_params<mnt6_fr<ModulusBits, GeneratorBits>>
                     : public params<mnt6_fr<ModulusBits, GeneratorBits>> {
                 private:
                     typedef params<mnt6_fr<ModulusBits, GeneratorBits>> policy_type;
-                    typedef arithmetic_params<mnt6_fr<ModulusBits, GeneratorBits>> element_policy_type;
+                    typedef extension_params<mnt6_fr<ModulusBits, GeneratorBits>> element_policy_type;
 
                 public:
                     typedef typename policy_type::number_type number_type;

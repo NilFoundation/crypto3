@@ -18,10 +18,7 @@
 
 #include <nil/algebra/curves/bn128.hpp>
 
-#include <nil/algebra/fields/detail/params/bn128/fq.hpp>
-#include <nil/algebra/fields/detail/element/fp.hpp>
-#include <nil/algebra/fields/detail/element/fp2.hpp>
-#include <nil/algebra/fields/detail/element/fp6_3over2.hpp>
+#include <nil/algebra/fields/fp6_3over2.hpp>
 
 namespace nil {
     namespace algebra {
@@ -31,7 +28,7 @@ namespace nil {
                 using nil::algebra;
 
                 template<std::size_t ModulusBits = 254, std::size_t GeneratorBits = CHAR_BIT>
-                using bn128_Fq6 = element_fp6_3over2<detail::arithmetic_params<bn128_fq<ModulusBits, GeneratorBits>>>;
+                using bn128_Fq6 = fields::fp6_3over2<bn128_fq<<ModulusBits, GeneratorBits>>>::value_type;
 
                 template<std::size_t ModulusBits = 254, std::size_t GeneratorBits = CHAR_BIT>
                 struct bn128_ate_g1_precomp {

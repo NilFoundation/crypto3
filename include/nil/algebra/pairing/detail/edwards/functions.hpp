@@ -16,11 +16,6 @@
 
 #include <nil/algebra/curves/edwards.hpp>
 
-#include <nil/algebra/fields/detail/params/edwards/fq.hpp>
-#include <nil/algebra/fields/detail/element/fp.hpp>
-#include <nil/algebra/fields/detail/element/fp2.hpp>
-#include <nil/algebra/fields/detail/element/fp6_3over2.hpp>
-
 namespace nil {
     namespace algebra {
         namespace pairing {

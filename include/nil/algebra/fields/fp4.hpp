@@ -7,10 +7,10 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef ALGEBRA_FIELDS_FP2_EXTENSION_HPP
-#define ALGEBRA_FIELDS_FP2_EXTENSION_HPP
+#ifndef ALGEBRA_FIELDS_FP4_EXTENSION_HPP
+#define ALGEBRA_FIELDS_FP4_EXTENSION_HPP
 
-#include <nil/algebra/fields/detail/element/fp2.hpp>
+#include <nil/algebra/fields/detail/element/fp4.hpp>
 #include <nil/algebra/fields/detail/params/params.hpp>
 #include <nil/algebra/fields/detail/params/alt_bn128/fq.hpp>
 #include <nil/algebra/fields/detail/params/alt_bn128/fr.hpp>
@@ -45,7 +45,7 @@ namespace nil {
              * @tparam GeneratorBits
              */
             template <typename BaseField>
-            struct fp2 {
+            struct fp4 {
                 typedef BaseField field_type;
                 typedef detail::extension_params<field_type> policy_type;
 
@@ -62,22 +62,22 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = policy_type::mul_generator;
 
-                typedef typename detail::element_fp2<policy_type> value_type;
+                typedef typename detail::element_fp4<policy_type> value_type;
 
-                constexpr static const std::size_t arity = 2;
+                constexpr static const std::size_t arity = 4;
             };
 
             template <typename BaseField>
-            constexpr typename fp2<BaseField>::modulus_type const fp2<BaseField>::modulus;
+            constexpr typename fp4<BaseField>::modulus_type const fp4<BaseField>::modulus;
 
             template <typename BaseField>
-            constexpr typename fp2<BaseField>::generator_type const fp2<BaseField>::mul_generator;
+            constexpr typename fp4<BaseField>::generator_type const fp4<BaseField>::mul_generator;
 
             template <typename BaseField>
-            constexpr typename std::size_t const fp2<BaseField>::arity;
+            constexpr typename std::size_t const fp4<BaseField>::arity;
 
         }    // namespace fields
     }        // namespace algebra
 }    // namespace nil
 
-#endif    // ALGEBRA_FIELDS_FP2_EXTENSION_HPP
+#endif    // ALGEBRA_FIELDS_FP4_EXTENSION_HPP

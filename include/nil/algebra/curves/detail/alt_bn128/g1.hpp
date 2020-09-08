@@ -14,9 +14,7 @@
 
 #include <nil/algebra/fields/alt_bn128/fq.hpp>
 #include <nil/algebra/fields/alt_bn128/fr.hpp>
-#include <nil/algebra/fields/detail/element/fp.hpp>
-#include <nil/algebra/fields/detail/element/fp3.hpp>
-#include <nil/algebra/fields/detail/params/alt_bn128/fq.hpp>
+#include <nil/algebra/fields/fp3.hpp>
 
 #include <nil/algebra/detail/literals.hpp>
 
@@ -28,16 +26,12 @@ namespace nil {
                 template<std::size_t ModulusBits, std::size_t GeneratorBits>
                 struct alt_bn128_g1 {
 
-                    using policy_type = edwards<ModulusBits>;
+                    using policy_type = alt_bn128_basic_policy<ModulusBits>;
                     constexpr static const std::size_t g1_field_bits = ModulusBits;
-                    typedef typename fields::detail::element_fp<
-                        fields::detail::arithmetic_params<fields::alt_bn128_fq<g1_field_bits, CHAR_BIT>>>
-                        g1_field_type_value;
+                    typedef typename fields::alt_bn128_fq<g1_field_bits, CHAR_BIT>::value_type g1_field_type_value;
 
                     constexpr static const std::size_t g2_field_bits = ModulusBits;
-                    typedef typename fields::detail::element_fp3<
-                        fields::detail::arithmetic_params<fields::alt_bn128_fq<g2_field_bits, CHAR_BIT>>>
-                        g2_field_type_value;
+                    typedef typename fields::fp3<fields::alt_bn128_fq<g2_field_bits, CHAR_BIT>>::value_type g2_field_type_value;
 
                     using underlying_field_type = g1_field_type_value;
 

@@ -22,10 +22,10 @@ namespace nil {
             namespace detail {
 
                 template<>
-                struct arithmetic_params<dsa_botan<2048, 2048>> : public params<dsa_botan<2048, 2048>> {
+                struct extension_params<dsa_botan<2048, 2048>> : public params<dsa_botan<2048, 2048>> {
                 private:
                     typedef params<dsa_botan<2048, 2048>> policy_type;
-                    typedef arithmetic_params<dsa_botan<2048, 2048>> element_policy_type;
+                    typedef extension_params<dsa_botan<2048, 2048>> element_policy_type;
 
                 public:
                     typedef typename policy_type::number_type number_type;
@@ -35,10 +35,10 @@ namespace nil {
                 };
 
                 template<>
-                struct arithmetic_params<dsa_botan<3072, 3072>> : public params<dsa_botan<3072, 3072>> {
+                struct extension_params<dsa_botan<3072, 3072>> : public params<dsa_botan<3072, 3072>> {
                 private:
                     typedef params<dsa_botan<3072, 3072>> policy_type;
-                    typedef arithmetic_params<dsa_botan<3072, 3072>> element_policy_type;
+                    typedef extension_params<dsa_botan<3072, 3072>> element_policy_type;
 
                 public:
                     typedef typename policy_type::number_type number_type;

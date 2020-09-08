@@ -15,6 +15,7 @@
 
 #include <nil/algebra/fields/bls12/fq.hpp>
 #include <nil/algebra/fields/bls12/fr.hpp>
+#include <nil/algebra/fields/fp12_2over3over2.hpp>
 
 #include <nil/algebra/detail/literals.hpp>
 
@@ -42,9 +43,8 @@ namespace nil {
 
                 typedef typename detail::bls12_g1<254> g1_type;
                 typedef typename detail::bls12_g2<254> g2_type;
-                typedef typename nil::algebra::fields::detail::element_fp12_2over3over2<
-                    nil::algebra::fields::detail::arithmetic_params<bls_fq<381, CHAR_BIT>>>
-                    gt_type;
+
+                typedef typename fields::fp12_2over3over2<base_field_type>::value_type gt_type;
 
                 constexpr static const number_type p = base_field_modulus;
                 constexpr static const number_type q = scalar_field_modulus;

@@ -20,22 +20,20 @@
 #include <nil/algebra/fields/detail/params/bn128/fr.hpp>
 #include <nil/algebra/fields/detail/params/edwards/fq.hpp>
 #include <nil/algebra/fields/detail/params/edwards/fr.hpp>
-#include <nil/algebra/fields/detail/params/frp_v1/fq.hpp>
+/*#include <nil/algebra/fields/detail/params/frp_v1/fq.hpp>
 #include <nil/algebra/fields/detail/params/frp_v1/fr.hpp>
 #include <nil/algebra/fields/detail/params/gost_A/fq.hpp>
-#include <nil/algebra/fields/detail/params/gost_A/fr.hpp>
+#include <nil/algebra/fields/detail/params/gost_A/fr.hpp>*/
 #include <nil/algebra/fields/detail/params/mnt4/fq.hpp>
 #include <nil/algebra/fields/detail/params/mnt4/fr.hpp>
 #include <nil/algebra/fields/detail/params/mnt6/fq.hpp>
 #include <nil/algebra/fields/detail/params/mnt6/fr.hpp>
-#include <nil/algebra/fields/detail/params/secp/fq.hpp>
+/*#include <nil/algebra/fields/detail/params/secp/fq.hpp>
 #include <nil/algebra/fields/detail/params/secp/fr.hpp>
 #include <nil/algebra/fields/detail/params/sm2p_v1/fq.hpp>
 #include <nil/algebra/fields/detail/params/sm2p_v1/fr.hpp>
 #include <nil/algebra/fields/detail/params/x962_p/fq.hpp>
-#include <nil/algebra/fields/detail/params/x962_p/fr.hpp>
-
-#include <nil/algebra/detail/literals.hpp>
+#include <nil/algebra/fields/detail/params/x962_p/fr.hpp>*/
 
 namespace nil {
     namespace algebra {
@@ -49,7 +47,7 @@ namespace nil {
             template <typename BaseField>
             struct fp3 {
                 typedef BaseField field_type;
-                typedef detail::arithmetic_params<field_type> policy_type;
+                typedef detail::extension_params<field_type> policy_type;
 
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                 typedef typename policy_type::modulus_type modulus_type;

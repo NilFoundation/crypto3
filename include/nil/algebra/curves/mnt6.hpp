@@ -12,11 +12,11 @@
 
 #include <nil/algebra/curves/detail/mnt6/g1.hpp>
 #include <nil/algebra/curves/detail/mnt6/g2.hpp>
+#include <nil/algebra/curves/detail/mnt6/basic_policy.hpp>
 
 #include <nil/algebra/fields/mnt6/fq.hpp>
 #include <nil/algebra/fields/mnt6/fr.hpp>
-#include <nil/algebra/fields/detail/element/fp6_2over3.hpp>
-#include <nil/algebra/fields/detail/params/mnt6/fq.hpp>
+#include <nil/algebra/fields/fp6_2over3.hpp>
 
 namespace nil {
     namespace algebra {
@@ -49,9 +49,8 @@ namespace nil {
 
                 typedef typename detail::mnt6_g1<298, CHAR_BIT> g1_type;
                 typedef typename detail::mnt6_g2<298, CHAR_BIT> g2_type;
-                typedef
-                    typename fields::detail::element_fp6_2over3<fields::detail::arithmetic_params<mnt6<298, CHAR_BIT>>>
-                        gt_type;
+
+                typedef typename fields::fp6_2over3<base_field_type>::value_type gt_type;
 
                 typedef std::vector<g1_type> g1_vector;
                 typedef std::vector<g2_type> g2_vector;

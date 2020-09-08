@@ -15,8 +15,7 @@
 
 #include <nil/algebra/fields/bn128/fq.hpp>
 #include <nil/algebra/fields/bn128/fr.hpp>
-#include <nil/algebra/fields/detail/element/fp12_2over3over2.hpp>
-#include <nil/algebra/fields/detail/params/bn128/fq.hpp>
+#include <nil/algebra/fields/fp12_2over3over2.hpp>
 
 #include <nil/algebra/detail/literals.hpp>
 
@@ -56,9 +55,8 @@ namespace nil {
 
                 typedef typename detail::bn128_g1<254, CHAR_BIT> g1_type;
                 typedef typename detail::bn128_g2<254, CHAR_BIT> g2_type;
-                typedef typename nil::algebra::fields::detail::element_fp12_2over3over2<
-                    fields::detail::arithmetic_params<fields::bn128_fq<254, CHAR_BIT>>>
-                    gt_type;
+                
+                typedef typename fields::fp12_2over3over2<base_field_type>::value_type gt_type;
 
                 typedef std::vector<g1_type> g1_vector;
                 typedef std::vector<g2_type> g2_vector;

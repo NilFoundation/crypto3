@@ -117,7 +117,7 @@ A field policy describes its essential parameters such as `modulus`, `arity` or 
 
 Other field parameters are kept in the specific structures. All this structures inherit from basic `params` structure, containing all the basic parameters.
 
-For example, `arithmetic_params` structure keeps all the parameters needed for arithmetical operation evaluations.
+For example, `extension_params` structure keeps all the parameters needed for field and field extensions arithmetical operation evaluations.
 
 ### Field Element Algorithms ### {#field_element_algorithms}
 

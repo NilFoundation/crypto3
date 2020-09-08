@@ -35,10 +35,10 @@ namespace nil {
                 constexpr typename params<FieldType>::modulus_type const params<FieldType>::modulus;
 
                 template<typename FieldType>
-                struct arithmetic_params : public params<FieldType> {
+                struct extension_params : public params<FieldType> {
                 private:
                     typedef params<FieldType> policy_type;
-                    typedef arithmetic_params<FieldType> element_policy_type;
+                    typedef extension_params<FieldType> element_policy_type;
 
                 public:
                     typedef typename policy_type::number_type number_type;
@@ -50,10 +50,10 @@ namespace nil {
 
                 template<typename FieldType>
                 constexpr
-                    typename arithmetic_params<FieldType>::modulus_type const arithmetic_params<FieldType>::modulus;
+                    typename extension_params<FieldType>::modulus_type const extension_params<FieldType>::modulus;
 
                 template<typename FieldType>
-                constexpr typename arithmetic_params<FieldType>::modulus_type const arithmetic_params<FieldType>::q;
+                constexpr typename extension_params<FieldType>::modulus_type const extension_params<FieldType>::q;
 
             }    // namespace detail
         }        // namespace fields

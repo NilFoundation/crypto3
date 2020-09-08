@@ -16,8 +16,7 @@
 
 #include <nil/algebra/fields/edwards/fq.hpp>
 #include <nil/algebra/fields/edwards/fr.hpp>
-#include <nil/algebra/fields/detail/element/fp6_2over3.hpp>
-#include <nil/algebra/fields/detail/params/edwards/fq.hpp>
+#include <nil/algebra/fields/fp6_2over3.hpp>
 
 #include <nil/algebra/detail/literals.hpp>
 
@@ -41,9 +40,8 @@ namespace nil {
 
                 typedef typename detail::edwards_g1<183> g1_type;
                 typedef typename detail::edwards_g2<183> g2_type;
-                typedef typename nil::algebra::fields::detail::element_fp6_2over3<
-                    nil::algebra::fields::detail::arithmetic_params<edwards<183, CHAR_BIT>>>
-                    gt_type;
+
+                typedef typename fields::fp6_2over3<base_field_type>::value_type gt_type;
 
                 typedef std::vector<g1_type> g1_vector;
                 typedef std::vector<g2_type> g2_vector;

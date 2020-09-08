@@ -39,10 +39,8 @@ namespace nil {
 
                 typedef typename detail::brainpool_r1_g1<160> g1_type;
                 typedef typename detail::brainpool_r1_g2<160> g2_type;
-                typedef typename nil::algebra::fields::detail::element_fp ? ? <nil::algebra::fields::detail::
-                                                                                   arithmetic_params<
-                                                                                       brainpool_r1_fq<160, CHAR_BIT>>>
-                                                                                  gt_type;
+
+                typedef typename fields::fp??<base_field_type>::value_type gt_type;
 
                 constexpr static const number_type p = base_field_modulus;
                 constexpr static const number_type q = scalar_field_modulus;
@@ -67,10 +65,8 @@ namespace nil {
 
                 typedef typename detail::brainpool_r1_g1<192> g1_type;
                 typedef typename detail::brainpool_r1_g2<192> g2_type;
-                typedef typename nil::algebra::fields::detail::element_fp ? ? <nil::algebra::fields::detail::
-                                                                                   arithmetic_params<
-                                                                                       brainpool_r1_fq<192, CHAR_BIT>>>
-                                                                                  gt_type;
+                
+                typedef typename fields::fp??<base_field_type>::value_type gt_type;
 
                 constexpr static const number_type p = base_field_modulus;
                 constexpr static const number_type q = scalar_field_modulus;
@@ -95,10 +91,8 @@ namespace nil {
 
                 typedef typename detail::brainpool_r1_g1<224> g1_type;
                 typedef typename detail::brainpool_r1_g2<224> g2_type;
-                typedef typename nil::algebra::fields::detail::element_fp ? ? <nil::algebra::fields::detail::
-                                                                                   arithmetic_params<
-                                                                                       brainpool_r1_fq<224, CHAR_BIT>>>
-                                                                                  gt_type;
+                
+                typedef typename fields::fp??<base_field_type>::value_type gt_type;
 
                 constexpr static const number_type p = base_field_modulus;
                 constexpr static const number_type q = scalar_field_modulus;
@@ -127,10 +121,8 @@ namespace nil {
 
                 typedef typename detail::brainpool_r1_g1<256> g1_type;
                 typedef typename detail::brainpool_r1_g2<256> g2_type;
-                typedef typename nil::algebra::fields::detail::element_fp ? ? <nil::algebra::fields::detail::
-                                                                                   arithmetic_params<
-                                                                                       brainpool_r1_fq<256, CHAR_BIT>>>
-                                                                                  gt_type;
+                
+                typedef typename fields::fp??<base_field_type>::value_type gt_type;
 
                 constexpr static const number_type p = base_field_modulus;
                 constexpr static const number_type q = scalar_field_modulus;
@@ -158,10 +150,8 @@ namespace nil {
 
                 typedef typename detail::brainpool_r1_g1<320> g1_type;
                 typedef typename detail::brainpool_r1_g2<320> g2_type;
-                typedef typename nil::algebra::fields::detail::element_fp ? ? <nil::algebra::fields::detail::
-                                                                                   arithmetic_params<
-                                                                                       brainpool_r1_fq<320, CHAR_BIT>>>
-                                                                                  gt_type;
+                
+                typedef typename fields::fp??<base_field_type>::value_type gt_type;
 
                 constexpr static const number_type p = base_field_modulus;
                 constexpr static const number_type q = scalar_field_modulus;
@@ -189,10 +179,8 @@ namespace nil {
 
                 typedef typename detail::brainpool_r1_g1<384> g1_type;
                 typedef typename detail::brainpool_r1_g2<384> g2_type;
-                typedef typename nil::algebra::fields::detail::element_fp ? ? <nil::algebra::fields::detail::
-                                                                                   arithmetic_params<
-                                                                                       brainpool_r1_fq<384, CHAR_BIT>>>
-                                                                                  gt_type;
+                
+                typedef typename fields::fp??<base_field_type>::value_type gt_type;
 
                 constexpr static const number_type p = base_field_modulus;
                 constexpr static const number_type q = scalar_field_modulus;
@@ -220,10 +208,8 @@ namespace nil {
 
                 typedef typename detail::brainpool_r1_g1<512> g1_type;
                 typedef typename detail::brainpool_r1_g2<512> g2_type;
-                typedef typename nil::algebra::fields::detail::element_fp ? ? <nil::algebra::fields::detail::
-                                                                                   arithmetic_params<
-                                                                                       brainpool_r1_fq<512, CHAR_BIT>>>
-                                                                                  gt_type;
+                
+                typedef typename fields::fp??<base_field_type>::value_type gt_type;
 
                 constexpr static const number_type p = base_field_modulus;
                 constexpr static const number_type q = scalar_field_modulus;

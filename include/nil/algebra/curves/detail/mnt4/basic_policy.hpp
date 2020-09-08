@@ -12,7 +12,6 @@
 
 #include <nil/algebra/fields/mnt4/fq.hpp>
 #include <nil/algebra/fields/mnt4/fr.hpp>
-#include <nil/algebra/fields/detail/params/mnt4/fq.hpp>
 
 #include <nil/algebra/detail/literals.hpp>
 

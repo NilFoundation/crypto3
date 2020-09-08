@@ -14,9 +14,7 @@
 
 #include <nil/algebra/fields/bn128/fq.hpp>
 #include <nil/algebra/fields/bn128/fr.hpp>
-#include <nil/algebra/fields/detail/element/fp.hpp>
-#include <nil/algebra/fields/detail/element/fp2.hpp>
-#include <nil/algebra/fields/detail/params/bn128/fq.hpp>
+#include <nil/algebra/fields/fp2.hpp>
 
 #include <nil/algebra/detail/literals.hpp>
 
@@ -31,14 +29,10 @@ namespace nil {
                 struct bn128_g1 {
 
                     constexpr static const std::size_t g1_field_bits = ModulusBits;
-                    typedef typename fields::detail::element_fp<
-                        fields::detail::arithmetic_params<fields::bn128_fq<g1_field_bits, CHAR_BIT>>>
-                        g1_field_type_value;
+                    typedef typename fields::bn128_fq<g1_field_bits, CHAR_BIT>::value_type g1_field_type_value;
 
                     constexpr static const std::size_t g2_field_bits = ModulusBits;
-                    typedef typename fields::detail::element_fp2<
-                        fields::detail::arithmetic_params<fields::bn128_fq<g2_field_bits, CHAR_BIT>>>
-                        g2_field_type_value;
+                    typedef typename fields::fp2<fields::bn128_fq<g2_field_bits, CHAR_BIT>>::value_type g2_field_type_value;
 
                     using underlying_field_type_value = g1_field_type_value;
 

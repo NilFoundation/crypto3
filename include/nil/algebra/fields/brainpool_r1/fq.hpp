@@ -43,7 +43,7 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x03;
 
-                typedef typename detail::element_fp<detail::arithmetic_params<brainpool_r1_fq<160, CHAR_BIT>>>
+                typedef typename detail::element_fp<detail::extension_params<brainpool_r1_fq<160, CHAR_BIT>>>
                     value_type;
 
                 constexpr static const std::size_t arity = 1;
@@ -64,7 +64,7 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x03;
 
-                typedef typename detail::element_fp<detail::arithmetic_params<brainpool_r1_fq<192, CHAR_BIT>>>
+                typedef typename detail::element_fp<detail::extension_params<brainpool_r1_fq<192, CHAR_BIT>>>
                     value_type;
 
                 constexpr static const std::size_t arity = 1;
@@ -85,7 +85,7 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x03;
 
-                typedef typename detail::element_fp<detail::arithmetic_params<brainpool_r1_fq<224, CHAR_BIT>>>
+                typedef typename detail::element_fp<detail::extension_params<brainpool_r1_fq<224, CHAR_BIT>>>
                     value_type;
 
                 constexpr static const std::size_t arity = 1;
@@ -106,7 +106,7 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x03;
 
-                typedef typename detail::element_fp<detail::arithmetic_params<brainpool_r1_fq<256, CHAR_BIT>>>
+                typedef typename detail::element_fp<detail::extension_params<brainpool_r1_fq<256, CHAR_BIT>>>
                     value_type;
 
                 constexpr static const std::size_t arity = 1;
@@ -127,7 +127,7 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x03;
 
-                typedef typename detail::element_fp<detail::arithmetic_params<brainpool_r1_fq<320, CHAR_BIT>>>
+                typedef typename detail::element_fp<detail::extension_params<brainpool_r1_fq<320, CHAR_BIT>>>
                     value_type;
 
                 constexpr static const std::size_t arity = 1;
@@ -148,7 +148,7 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x03;
 
-                typedef typename detail::element_fp<detail::arithmetic_params<brainpool_r1_fq<384, CHAR_BIT>>>
+                typedef typename detail::element_fp<detail::extension_params<brainpool_r1_fq<384, CHAR_BIT>>>
                     value_type;
 
                 constexpr static const std::size_t arity = 1;
@@ -169,7 +169,7 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x03;
 
-                typedef typename detail::element_fp<detail::arithmetic_params<brainpool_r1_fq<512, CHAR_BIT>>>
+                typedef typename detail::element_fp<detail::extension_params<brainpool_r1_fq<512, CHAR_BIT>>>
                     value_type;
 
                 constexpr static const std::size_t arity = 1;

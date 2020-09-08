@@ -24,11 +24,11 @@ namespace nil {
             namespace detail {
 
                 template<std::size_t ModulusBits, std::size_t GeneratorBits>
-                struct arithmetic_params<mnt6_fq<ModulusBits, GeneratorBits>>
+                struct extension_params<mnt6_fq<ModulusBits, GeneratorBits>>
                     : public params<mnt6_fq<ModulusBits, GeneratorBits>> {
                 private:
                     typedef params<mnt6_fq<ModulusBits, GeneratorBits>> policy_type;
-                    typedef arithmetic_params<mnt6_fq<ModulusBits, GeneratorBits>> element_policy_type;
+                    typedef extension_params<mnt6_fq<ModulusBits, GeneratorBits>> element_policy_type;
 
                 public:
                     typedef typename policy_type::number_type number_type;
@@ -50,11 +50,11 @@ namespace nil {
 
                 template<std::size_t ModulusBits, std::size_t GeneratorBits>
                 constexpr typename params<mnt6_fq<ModulusBits, GeneratorBits>>::modulus_type const
-                    arithmetic_params<mnt6_fq<ModulusBits, GeneratorBits>>::fp3_non_residue;
+                    extension_params<mnt6_fq<ModulusBits, GeneratorBits>>::fp3_non_residue;
 
                 template<std::size_t ModulusBits, std::size_t GeneratorBits>
                 constexpr typename params<mnt6_fq<ModulusBits, GeneratorBits>>::modulus_type const
-                    arithmetic_params<mnt6_fq<ModulusBits, GeneratorBits>>::fp6_2over3_non_residue;
+                    extension_params<mnt6_fq<ModulusBits, GeneratorBits>>::fp6_2over3_non_residue;
 
             }    // namespace detail
         }        // namespace fields

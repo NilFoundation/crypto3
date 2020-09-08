@@ -22,10 +22,10 @@ namespace nil {
             namespace detail {
 
                 template<>
-                struct arithmetic_params<dsa_jce<1024, 1024>> : public params<dsa_jce<1024, 1024>> {
+                struct extension_params<dsa_jce<1024, 1024>> : public params<dsa_jce<1024, 1024>> {
                 private:
                     typedef params<dsa_jce<1024, 1024>> policy_type;
-                    typedef arithmetic_params<dsa_jce<1024, 1024>> element_policy_type;
+                    typedef extension_params<dsa_jce<1024, 1024>> element_policy_type;
 
                 public:
                     typedef typename policy_type::number_type number_type;

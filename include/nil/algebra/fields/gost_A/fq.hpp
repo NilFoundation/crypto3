@@ -44,7 +44,7 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x03;
 
-                typedef typename detail::element_fp<detail::arithmetic_params<gost_A_fq<256, CHAR_BIT>>> value_type;
+                typedef typename detail::element_fp<detail::extension_params<gost_A_fq<256, CHAR_BIT>>> value_type;
 
                 constexpr static const std::size_t arity = 1;
             };
