@@ -215,7 +215,7 @@ namespace nil {
                             underlying_field_type_value tY = this->p[0] * this->p[2];
                             underlying_field_type_value tZ = this->p[0] * this->p[1];
                             // go from projective coordinates to affine coordinates
-                            underlying_field_type_value tZ_inv = tZ.inverse();
+                            underlying_field_type_value tZ_inv = tZ.inversed();
                             this->p[0] = tX * tZ_inv;
                             this->p[1] = tY * tZ_inv;
                             this->p[2] = underlying_field_type_value::one();
@@ -227,7 +227,7 @@ namespace nil {
                             return;
                         }
 
-                        underlying_field_type_value Z_inv = this->p[2].inverse();
+                        underlying_field_type_value Z_inv = this->p[2].inversed();
                         this->p[0] = this->p[0] * Z_inv;
                         this->p[1] = this->p[1] * Z_inv;
                         this->p[2] = underlying_field_type_value::one();

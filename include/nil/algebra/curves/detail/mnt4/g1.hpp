@@ -234,7 +234,7 @@ namespace nil {
                             this->p[1] = underlying_field_type_value::one();
                             this->p[2] = underlying_field_type_value::zero();
                         } else {
-                            const underlying_field_type_value Z_inv = this->p[2].inverse();
+                            const underlying_field_type_value Z_inv = this->p[2].inversed();
                             this->p[0] = this->p[0] * Z_inv;
                             this->p[1] = this->p[1] * Z_inv;
                             this->p[2] = underlying_field_type_value::one();
