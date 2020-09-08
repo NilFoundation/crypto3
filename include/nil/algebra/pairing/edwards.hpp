@@ -32,8 +32,8 @@ namespace nil {
                 using g1_conic_coefficients = detail::edwards_Fq_conic_coefficients<ModulusBits, GeneratorBits>;
                 using g2_conic_coefficients = detail::edwards_Fq3_conic_coefficients<ModulusBits, GeneratorBits>;
 
-                using reduced_pairing = detail::reduced_pairing<ModulusBits, GeneratorBits>;
-                using pairing = detail::pairing<ModulusBits, GeneratorBits>;
+                using reduced_pairing = detail::edwards_reduced_pairing<ModulusBits, GeneratorBits>;
+                using pairing = detail::edwards_pairing<ModulusBits, GeneratorBits>;
 
                 using miller_loop = detail::edwards_miller_loop<ModulusBits, GeneratorBits>;
                 using double_miller_loop = detail::edwards_double_miller_loop<ModulusBits, GeneratorBits>;

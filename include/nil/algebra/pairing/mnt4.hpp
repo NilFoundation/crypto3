@@ -36,8 +36,8 @@ namespace nil {
                 using precompute_g1 = detail::mnt4_precompute_g1<ModulusBits, GeneratorBits>;
                 using precompute_g2 = detail::mnt4_precompute_g2<ModulusBits, GeneratorBits>;
 
-                using reduced_pairing = detail::reduced_pairing<ModulusBits, GeneratorBits>;
-                using pairing = detail::pairing<ModulusBits, GeneratorBits>;
+                using reduced_pairing = detail::edwards_reduced_pairing<ModulusBits, GeneratorBits>;
+                using pairing = detail::edwards_pairing<ModulusBits, GeneratorBits>;
 
                 using miller_loop = detail::mnt4_miller_loop<ModulusBits, GeneratorBits>;
                 using double_miller_loop = detail::mnt4_double_miller_loop<ModulusBits, GeneratorBits>;
