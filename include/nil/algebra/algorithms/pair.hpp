@@ -14,25 +14,24 @@
 
 namespace nil {
     namespace algebra {
-
         template<typename PairingCurveType>
         typename PairingCurveType::gt_type pair(typename PairingCurveType::g1_type &v1,
                                                 typename PairingCurveType::g2_type &v2) {
-        	return pairing::pairing_policy<PairingCurveType>::pairing(v1, v2);
+            return pairing::pairing_policy<PairingCurveType>::pairing(v1, v2);
         }
 
         template<typename PairingCurveType>
         typename PairingCurveType::gt_type reduced_pair(typename PairingCurveType::g1_type &v1,
-                                                typename PairingCurveType::g2_type &v2) {
-        	return pairing::pairing_policy<PairingCurveType>::reduced_pairing(v1, v2);
+                                                        typename PairingCurveType::g2_type &v2) {
+            return pairing::pairing_policy<PairingCurveType>::reduced_pairing(v1, v2);
         }
 
         template<typename PairingCurveType>
         typename PairingCurveType::gt_type final_exp(typename PairingCurveType::gt_type &elt) {
-        	return pairing::pairing_policy<PairingCurveType>::final_exponentiation(elt);
+            return pairing::pairing_policy<PairingCurveType>::final_exponentiation(elt);
         }
 
-    }    // namespace crypto3
+    }    // namespace algebra
 }    // namespace nil
 
 #endif    // CRYPTO3_PAIR_HPP

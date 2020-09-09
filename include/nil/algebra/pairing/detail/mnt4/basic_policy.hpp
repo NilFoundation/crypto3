@@ -20,7 +20,7 @@ namespace nil {
                 using namespace nil::algebra;
 
                 template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
-                    struct mnt4_basic_policy;
+                struct mnt4_basic_policy;
 
                 template<>
                 struct mnt4_basic_policy<298, CHAR_BIT> {
@@ -38,10 +38,10 @@ namespace nil {
                     constexpr static const typename number_type final_exponent_last_chunk_is_w0_neg = false;
                     constexpr static const typename number_type final_exponent_last_chunk_w1 = number_type(0x1);
                 };
-                
+
             }    // namespace detail
-        }    // namespace pairing
-    }        // namespace algebra
+        }        // namespace pairing
+    }            // namespace algebra
 }    // namespace nil
 
 #endif    // ALGEBRA_PAIRING_MNT4_BASIC_POLICY_HPP

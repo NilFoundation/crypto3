@@ -32,8 +32,10 @@ namespace nil {
 
                 public:
                     typedef typename policy_type::number_type number_type;
+                    typedef typename policy_type::modulus_type modulus_type;
 
-                    constexpr static const number_type group_order =
+                    constexpr static const modulus_type modulus = policy_type::modulus;
+                    constexpr static const modulus_type group_order =
                         0x183227397098D014DC2822DB40C0AC2E9419F4243CDCB848A1F0FAC9F8000000_cppui254;
                 };
 

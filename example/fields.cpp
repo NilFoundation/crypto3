@@ -14,10 +14,10 @@
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/multiprecision/modular/modular_adaptor.hpp>
 
+#include <nil/algebra/fields/fp2.hpp>
 #include <nil/algebra/fields/bls12/fq.hpp>
 #include <nil/algebra/fields/bls12/fr.hpp>
 #include <nil/algebra/fields/bn128/fq.hpp>
-#include <nil/algebra/fields/bn128/fq2.hpp>
 #include <nil/algebra/fields/bn128/fr.hpp>
 #include <nil/algebra/fields/dsa_botan.hpp>
 #include <nil/algebra/fields/dsa_jce.hpp>
@@ -211,7 +211,7 @@ int main() {
     std::cout << "----------------------------" << std::endl;
 
     std::cout << "BLS12-381 Fr basic math:" << std::endl;
-    fields_fp_basic_math_examples<fields::bls12_fr<255>>();
+    fields_fp_basic_math_examples<fields::bls12_fr<381>>();
 
     std::cout << "----------------------------" << std::endl;
 
@@ -241,7 +241,7 @@ int main() {
     std::cout << "----------------------------" << std::endl;
 
     std::cout << "BN128-254 Fq2 basic math:" << std::endl;
-    fields_fp2_basic_math_examples<fields::bn128_fq2<254>>();
+    fields_fp2_basic_math_examples<fields::fp2<fields::bn128_fq<254>>>();
 
     return 0;
 }

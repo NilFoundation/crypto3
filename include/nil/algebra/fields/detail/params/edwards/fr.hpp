@@ -32,8 +32,11 @@ namespace nil {
 
                 public:
                     typedef typename policy_type::number_type number_type;
+                    typedef typename policy_type::modulus_type modulus_type;
 
-                    constexpr static const number_type group_order = 0x81ABF93A5472B62717249DC9709660EF2A993C0000000_cppui181;
+                    constexpr static const modulus_type modulus = policy_type::modulus;
+                    constexpr static const modulus_type group_order =
+                        0x81ABF93A5472B62717249DC9709660EF2A993C0000000_cppui181;
                 };
 
             }    // namespace detail

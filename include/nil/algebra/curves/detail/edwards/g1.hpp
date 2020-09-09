@@ -32,7 +32,7 @@ namespace nil {
                     typedef typename policy_type::base_field_type::value_type g1_field_type_value;
 
                     constexpr static const std::size_t g2_field_bits = policy_type::base_field_bits;
-                    typedef typename fields::fp3<policy_type::base_field_type>::value_type g2_field_type_value;
+                    typedef typename fields::fp3<typename policy_type::base_field_type>::value_type g2_field_type_value;
 
                     using underlying_field_type_value = g1_field_type_value;
 

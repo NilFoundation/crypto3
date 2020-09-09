@@ -36,7 +36,7 @@ namespace nil {
                 typedef typename detail::gost_A_g1<256> g1_type;
                 typedef typename detail::gost_A_g2<256> g2_type;
 
-                typedef typename fields::fp??<base_field_type>::value_type gt_type;
+                typedef typename fields::fp ? ? <base_field_type>::value_type gt_type;
 
                 constexpr static const number_type p = base_field_modulus;
                 constexpr static const number_type q = scalar_field_modulus;

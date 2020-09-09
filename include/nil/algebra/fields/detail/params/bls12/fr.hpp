@@ -24,21 +24,22 @@ namespace nil {
             namespace detail {
 
                 template<>
-                struct extension_params<bls12_fr<381, CHAR_BIT>>
-                    : public params<bls12_fr<381, CHAR_BIT>> {
+                struct extension_params<bls12_fr<381, CHAR_BIT>> : public params<bls12_fr<381, CHAR_BIT>> {
                 private:
                     typedef params<bls12_fr<381, CHAR_BIT>> policy_type;
                     typedef extension_params<bls12_fr<381, CHAR_BIT>> element_policy_type;
 
                 public:
                     typedef typename policy_type::number_type number_type;
+                    typedef typename policy_type::modulus_type modulus_type;
 
-                    constexpr static const number_type group_order = number_type (0x39F6D3A994CEBEA4199CEC0404D0EC02A9DED2017FFF2DFF7FFFFFFF80000000_cppui254);
+                    constexpr static const modulus_type modulus = policy_type::modulus;
+                    constexpr static const modulus_type group_order =
+                        0x39F6D3A994CEBEA4199CEC0404D0EC02A9DED2017FFF2DFF7FFFFFFF80000000_cppui254;
                 };
 
                 template<>
-                struct extension_params<bls12_fr<377, CHAR_BIT>>
-                    : public params<bls12_fr<377, CHAR_BIT>> {
+                struct extension_params<bls12_fr<377, CHAR_BIT>> : public params<bls12_fr<377, CHAR_BIT>> {
                 private:
                     typedef params<bls12_fr<377, CHAR_BIT>> policy_type;
                     typedef extension_params<bls12_fr<377, CHAR_BIT>> element_policy_type;
@@ -46,7 +47,8 @@ namespace nil {
                 public:
                     typedef typename policy_type::number_type number_type;
 
-                    constexpr static const number_type group_order = 0x955B2AF4D1652AB305A268F2E1BD800ACD53B7F680000008508C00000000000_cppui252;
+                    constexpr static const number_type group_order =
+                        0x955B2AF4D1652AB305A268F2E1BD800ACD53B7F680000008508C00000000000_cppui252;
                 };
 
             }    // namespace detail
