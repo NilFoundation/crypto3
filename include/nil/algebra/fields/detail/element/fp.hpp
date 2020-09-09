@@ -113,9 +113,9 @@ namespace nil {
                         return *this;
                     }
 
-                    element_fp inverse() const {
+                    element_fp inversed() const {
 
-                        boost::multiprecision::cpp_int_backend<> mod = modulus.backend(), tmp;
+                        /*boost::multiprecision::cpp_int_backend<> mod = modulus.backend(), tmp;
                         tmp = boost::multiprecision::inverse_extended_euclidean_algorithm(data.backend().base_data(),
                                                                                           mod);
                         value_type res;
@@ -134,11 +134,6 @@ namespace nil {
                     template<typename PowerType>
                     element_fp pow(const PowerType &pwr) const {
                         return element_fp(power(*this, pwr));
-                    }
-
-                    element_fp inversed() const {
-                        // return element_fp(boost::multiprecision::inverse(data));
-                        return *this;
                     }
                 };
 
