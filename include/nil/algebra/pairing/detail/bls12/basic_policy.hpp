@@ -17,10 +17,15 @@ namespace nil {
         namespace pairing {
             namespace detail {
 
-                template<>
-                struct basic_policy<bls12<381, CHAR_BIT>> {
+                using namespace nil::algebra;
 
-                    using number_type = bls12<381, CHAR_BIT>::number_type;
+                template<std::size_t ModulusBits = 381, std::size_t GeneratorBits = CHAR_BIT>
+                struct bls12_basic_policy;
+
+                template<>
+                struct bls12_basic_policy<381, CHAR_BIT> {
+
+                    using number_type = curves::bls12<381, CHAR_BIT>::number_type;
 
                     constexpr static const typename number_type ate_loop_count = number_type(0xD201000000010000_cppui64);
                     constexpr static const bool ate_is_loop_count_neg = true;
@@ -33,7 +38,7 @@ namespace nil {
                 };
 
                 template<>
-                struct basic_policy<bls12<377, CHAR_BIT>> {
+                struct bls12_basic_policy<377, CHAR_BIT> {
 
                     using number_type = bls12<377, GeneratorBits>::number_type;
 

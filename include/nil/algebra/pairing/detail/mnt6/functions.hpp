@@ -112,14 +112,14 @@ namespace nil {
                                                          const curves::mnt6_gt<ModulusBits, GeneratorBits> &elt_inv) {
                     const curves::mnt6_gt<ModulusBits, GeneratorBits> elt_q = elt.Frobenius_map(1);
                     curves::mnt6_gt<ModulusBits, GeneratorBits> w1_part = elt_q.cyclotomic_exp(
-                        basic_policy<mnt4<ModulusBits, GeneratorBits>>::final_exponent_last_chunk_w1);
+                        mnt6_basic_policy<ModulusBits, GeneratorBits>::final_exponent_last_chunk_w1);
                     curves::mnt6_gt<ModulusBits, GeneratorBits> w0_part;
-                    if (basic_policy<mnt4<ModulusBits, GeneratorBits>>::mnt6_final_exponent_last_chunk_is_w0_neg) {
+                    if (mnt6_basic_policy<ModulusBits, GeneratorBits>::mnt6_final_exponent_last_chunk_is_w0_neg) {
                         w0_part = elt_inv.cyclotomic_exp(
-                            basic_policy<mnt4<ModulusBits, GeneratorBits>>::final_exponent_last_chunk_abs_of_w0);
+                            mnt6_basic_policy<ModulusBits, GeneratorBits>::final_exponent_last_chunk_abs_of_w0);
                     } else {
                         w0_part = elt.cyclotomic_exp(
-                            basic_policy<mnt4<ModulusBits, GeneratorBits>>::final_exponent_last_chunk_abs_of_w0);
+                            mnt6_basic_policy<ModulusBits, GeneratorBits>::final_exponent_last_chunk_abs_of_w0);
                     }
                     curves::mnt6_gt<ModulusBits, GeneratorBits> result = w1_part * w0_part;
 
@@ -186,8 +186,8 @@ namespace nil {
                     mnt6_Fq3<ModulusBits, GeneratorBits> RX = Qcopy.X;
                     mnt6_Fq3<ModulusBits, GeneratorBits> RY = Qcopy.Y;
 
-                    const typename basic_policy<mnt6<ModulusBits, GeneratorBits>>::number_type &loop_count =
-                        basic_policy<mnt6<ModulusBits, GeneratorBits>>::ate_loop_count;
+                    const typename mnt6_basic_policy<ModulusBits, GeneratorBits>::number_type &loop_count =
+                        mnt6_basic_policy<ModulusBits, GeneratorBits>::ate_loop_count;
                     bool found_nonzero = false;
 
                     std::vector<long> NAF = find_wnaf(1, loop_count);
@@ -239,8 +239,8 @@ namespace nil {
 
                     curves::mnt6_gt<ModulusBits, GeneratorBits> f = curves::mnt6_gt<ModulusBits, GeneratorBits>::one();
 
-                    const typename basic_policy<mnt6<ModulusBits, GeneratorBits>>::number_type &loop_count =
-                        basic_policy<mnt6<ModulusBits, GeneratorBits>>::ate_loop_count;
+                    const typename mnt6_basic_policy<ModulusBits, GeneratorBits>::number_type &loop_count =
+                        mnt6_basic_policy<ModulusBits, GeneratorBits>::ate_loop_count;
                     bool found_nonzero = false;
                     size_t idx = 0;
 
@@ -381,8 +381,8 @@ namespace nil {
                     R.Z = mnt6_Fq3::one();
                     R.T = mnt6_Fq3::one();
 
-                    const typename basic_policy<mnt6<ModulusBits, GeneratorBits>>::number_type &loop_count =
-                        basic_policy<mnt6<ModulusBits, GeneratorBits>>::ate_loop_count;
+                    const typename mnt6_basic_policy<ModulusBits, GeneratorBits>::number_type &loop_count =
+                        mnt6_basic_policy<ModulusBits, GeneratorBits>::ate_loop_count;
                     bool found_one = false;
                     for (long i = loop_count.max_bits() - 1; i >= 0; --i) {
                         const bool bit = loop_count.test_bit(i);
@@ -434,8 +434,8 @@ namespace nil {
                     size_t dbl_idx = 0;
                     size_t add_idx = 0;
 
-                    const typename basic_policy<mnt6<ModulusBits, GeneratorBits>>::number_type &loop_count =
-                        basic_policy<mnt6<ModulusBits, GeneratorBits>>::ate_loop_count;
+                    const typename mnt6_basic_policy<ModulusBits, GeneratorBits>::number_type &loop_count =
+                        mnt6_basic_policy<ModulusBits, GeneratorBits>::ate_loop_count;
 
                     for (long i = loop_count.max_bits() - 1; i >= 0; --i) {
                         const bool bit = loop_count.test_bit(i);
@@ -494,8 +494,8 @@ namespace nil {
                     size_t dbl_idx = 0;
                     size_t add_idx = 0;
 
-                    const typename basic_policy<mnt6<ModulusBits, GeneratorBits>>::number_type &loop_count =
-                        basic_policy<mnt6<ModulusBits, GeneratorBits>>::ate_loop_count;
+                    const typename mnt6_basic_policy<ModulusBits, GeneratorBits>::number_type &loop_count =
+                        mnt6_basic_policy<ModulusBits, GeneratorBits>::ate_loop_count;
 
                     for (long i = loop_count.max_bits() - 1; i >= 0; --i) {
                         const bool bit = loop_count.test_bit(i);
