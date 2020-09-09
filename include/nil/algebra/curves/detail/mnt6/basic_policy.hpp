@@ -52,11 +52,9 @@ namespace nil {
                 constexpr
                     typename mnt6_basic_policy<298, CHAR_BIT>::number_type const mnt6_basic_policy<298, CHAR_BIT>::b;
 
-                constexpr
-                    typename std::size_t const mnt6_basic_policy<298, CHAR_BIT>::base_field_bits;
+                constexpr typename std::size_t const mnt6_basic_policy<298, CHAR_BIT>::base_field_bits;
 
-                constexpr
-                    typename std::size_t const mnt6_basic_policy<298, CHAR_BIT>::scalar_field_bits;
+                constexpr typename std::size_t const mnt6_basic_policy<298, CHAR_BIT>::scalar_field_bits;
 
                 constexpr
                     typename mnt6_basic_policy<298, CHAR_BIT>::number_type const mnt6_basic_policy<298, CHAR_BIT>::p;

@@ -40,23 +40,21 @@ namespace nil {
                     constexpr static const number_type b = number_type(0x03);
                 };
 
-                constexpr
-                    typename alt_bn128_basic_policy<254, CHAR_BIT>::number_type const alt_bn128_basic_policy<254, CHAR_BIT>::a;
+                constexpr typename alt_bn128_basic_policy<254, CHAR_BIT>::number_type const
+                    alt_bn128_basic_policy<254, CHAR_BIT>::a;
 
-                constexpr
-                    typename alt_bn128_basic_policy<254, CHAR_BIT>::number_type const alt_bn128_basic_policy<254, CHAR_BIT>::b;
+                constexpr typename alt_bn128_basic_policy<254, CHAR_BIT>::number_type const
+                    alt_bn128_basic_policy<254, CHAR_BIT>::b;
 
-                constexpr
-                    typename std::size_t const alt_bn128_basic_policy<254, CHAR_BIT>::base_field_bits;
+                constexpr typename std::size_t const alt_bn128_basic_policy<254, CHAR_BIT>::base_field_bits;
 
-                constexpr
-                    typename std::size_t const alt_bn128_basic_policy<254, CHAR_BIT>::scalar_field_bits;
+                constexpr typename std::size_t const alt_bn128_basic_policy<254, CHAR_BIT>::scalar_field_bits;
 
-                constexpr
-                    typename alt_bn128_basic_policy<254, CHAR_BIT>::number_type const alt_bn128_basic_policy<254, CHAR_BIT>::p;
+                constexpr typename alt_bn128_basic_policy<254, CHAR_BIT>::number_type const
+                    alt_bn128_basic_policy<254, CHAR_BIT>::p;
 
-                constexpr
-                    typename alt_bn128_basic_policy<254, CHAR_BIT>::number_type const alt_bn128_basic_policy<254, CHAR_BIT>::q;
+                constexpr typename alt_bn128_basic_policy<254, CHAR_BIT>::number_type const
+                    alt_bn128_basic_policy<254, CHAR_BIT>::q;
 
             }    // namespace detail
         }        // namespace curves

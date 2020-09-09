@@ -32,9 +32,9 @@ namespace nil {
                     constexpr static const typename number_type final_exponent_z = number_type(0x44E992B44A6909F1);
                     constexpr static const typename number_type final_exponent_is_z_neg = false;
                 };
-                
+
             }    // namespace detail
-        }    // namespace pairing
-    }        // namespace algebra
+        }        // namespace pairing
+    }            // namespace algebra
 }    // namespace nil
 #endif    // ALGEBRA_PAIRING_ALT_BN128_BASIC_POLICY_HPP

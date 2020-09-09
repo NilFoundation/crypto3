@@ -114,8 +114,10 @@ namespace nil {
                     }
 
                     element_fp inverse() const {
-                        /*boost::multiprecision::cpp_int_backend<> mod = modulus.backend(), tmp;
-                        tmp = boost::multiprecision::inverse_extended_euclidean_algorithm(data.backend().base_data(), mod);
+
+                        boost::multiprecision::cpp_int_backend<> mod = modulus.backend(), tmp;
+                        tmp = boost::multiprecision::inverse_extended_euclidean_algorithm(data.backend().base_data(),
+                                                                                          mod);
                         value_type res;
                         assign_components(res.backend(), tmp, mod);
                         return element_fp(res);*/

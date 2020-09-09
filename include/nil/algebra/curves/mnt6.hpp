@@ -19,7 +19,7 @@
 namespace nil {
     namespace algebra {
         namespace curves {
-            
+
             using namespace nil::algebra;
 
             template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>

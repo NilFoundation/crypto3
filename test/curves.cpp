@@ -111,8 +111,7 @@ void binary_operators_test_fp_init(const PointsSetType &points_set) {
     for (auto &point : points_set.second) {
         auto i = 0;
         for (auto &coordinate : point.second) {
-            coordinates[i++] = field_value_type(typename field_value_type::modulus_type(
-                coordinate.second.data()));
+            coordinates[i++] = field_value_type(typename field_value_type::modulus_type(coordinate.second.data()));
         }
         points.emplace_back(FpCurveGroup(coordinates[0], coordinates[1], coordinates[2]));
     }

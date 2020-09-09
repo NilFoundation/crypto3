@@ -24,7 +24,7 @@ namespace nil {
                 using namespace nil::algebra;
 
                 template<std::size_t ModulusBits = 381, std::size_t GeneratorBits = CHAR_BIT>
-                struct bls12_g2{};
+                struct bls12_g2 { };
 
                 template<>
                 struct bls12_g2<381, CHAR_BIT> {
@@ -47,14 +47,14 @@ namespace nil {
 
                     bls12_g2() :
                         bls12_g2(underlying_field_type_value::zero(), underlying_field_type_value::one(),
-                                underlying_field_type_value::zero()) {};
+                                 underlying_field_type_value::zero()) {};
                     // must be
                     // bls12_g2() : bls12_g2(zero_fill[0], zero_fill[1], zero_fill[2]) {};
                     // when constexpr fields will be finished
 
                     bls12_g2(underlying_field_type_value X,
-                            underlying_field_type_value Y,
-                            underlying_field_type_value Z) {
+                             underlying_field_type_value Y,
+                             underlying_field_type_value Z) {
                         p[0] = X;
                         p[1] = Y;
                         p[2] = Z;
@@ -78,7 +78,6 @@ namespace nil {
                         // when constexpr fields will be finished
                     }
 
-                    
                 private:
                     /*constexpr static */ const g1_field_type_value a = g1_field_type_value(policy_type::a);
                     /*constexpr static */ const g1_field_type_value b = g1_field_type_value(policy_type::b);
@@ -118,14 +117,14 @@ namespace nil {
 
                     bls12_g2() :
                         bls12_g2(underlying_field_type_value::zero(), underlying_field_type_value::one(),
-                                underlying_field_type_value::zero()) {};
+                                 underlying_field_type_value::zero()) {};
                     // must be
                     // bls12_g2() : bls12_g2(zero_fill[0], zero_fill[1], zero_fill[2]) {};
                     // when constexpr fields will be finished
 
                     bls12_g2(underlying_field_type_value X,
-                            underlying_field_type_value Y,
-                            underlying_field_type_value Z) {
+                             underlying_field_type_value Y,
+                             underlying_field_type_value Z) {
                         p[0] = X;
                         p[1] = Y;
                         p[2] = Z;
@@ -149,7 +148,6 @@ namespace nil {
                         // when constexpr fields will be finished
                     }
 
-                    
                 private:
                     /*constexpr static */ const g1_field_type_value a = g1_field_type_value(policy_type::a);
                     /*constexpr static */ const g1_field_type_value b = g1_field_type_value(policy_type::b);

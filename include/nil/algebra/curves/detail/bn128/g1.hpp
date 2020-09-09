@@ -32,7 +32,8 @@ namespace nil {
                     typedef typename fields::bn128_fq<g1_field_bits, CHAR_BIT>::value_type g1_field_type_value;
 
                     constexpr static const std::size_t g2_field_bits = ModulusBits;
-                    typedef typename fields::fp2<fields::bn128_fq<g2_field_bits, CHAR_BIT>>::value_type g2_field_type_value;
+                    typedef
+                        typename fields::fp2<fields::bn128_fq<g2_field_bits, CHAR_BIT>>::value_type g2_field_type_value;
 
                     using underlying_field_type_value = g1_field_type_value;
 

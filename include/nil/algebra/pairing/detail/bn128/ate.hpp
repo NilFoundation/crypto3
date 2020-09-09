@@ -252,9 +252,9 @@ namespace nil {
                     f *= f1;
                     f *= f2;
                 }
-            }
-        }    // namespace pairing
-    }        // namespace algebra
+            }    // namespace detail
+        }        // namespace pairing
+    }            // namespace algebra
 }    // namespace nil
 
 #endif    // ALGEBRA_PAIRING_ATE_HPP
