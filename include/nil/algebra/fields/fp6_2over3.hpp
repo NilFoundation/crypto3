@@ -40,11 +40,11 @@ namespace nil {
         namespace fields {
 
             /*!
-             * @brief 
+             * @brief
              * @tparam ModulusBits
              * @tparam GeneratorBits
              */
-            template <typename BaseField>
+            template<typename BaseField>
             struct fp6_2over3 {
                 typedef BaseField field_type;
                 typedef detail::extension_params<field_type> policy_type;
@@ -67,13 +67,13 @@ namespace nil {
                 constexpr static const std::size_t arity = 6;
             };
 
-            template <typename BaseField>
+            template<typename BaseField>
             constexpr typename fp6_2over3<BaseField>::modulus_type const fp6_2over3<BaseField>::modulus;
 
-            template <typename BaseField>
+            template<typename BaseField>
             constexpr typename fp6_2over3<BaseField>::generator_type const fp6_2over3<BaseField>::mul_generator;
 
-            template <typename BaseField>
+            template<typename BaseField>
             constexpr typename std::size_t const fp6_2over3<BaseField>::arity;
 
         }    // namespace fields

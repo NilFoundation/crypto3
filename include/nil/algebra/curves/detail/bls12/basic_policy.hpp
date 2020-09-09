@@ -32,7 +32,7 @@ namespace nil {
                     typedef typename base_field_type::modulus_type number_type;
                     constexpr static const number_type p = base_field_type::modulus;
 
-                    constexpr static const std::size_t scalar_field_bits = 381;  // actually, 255
+                    constexpr static const std::size_t scalar_field_bits = 381;    // actually, 255
                     typedef fields::bls12_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
                     constexpr static const number_type q = scalar_field_type::modulus;
 
@@ -47,7 +47,7 @@ namespace nil {
                     typedef typename base_field_type::modulus_type number_type;
                     constexpr static const number_type p = base_field_type::modulus;
 
-                    constexpr static const std::size_t scalar_field_bits = 377;  // actually, 253
+                    constexpr static const std::size_t scalar_field_bits = 377;    // actually, 253
                     typedef fields::bls12_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
                     constexpr static const number_type q = scalar_field_type::modulus;
 
@@ -65,15 +65,11 @@ namespace nil {
                 constexpr
                     typename bls12_basic_policy<377, CHAR_BIT>::number_type const bls12_basic_policy<377, CHAR_BIT>::b;
 
-                constexpr
-                    typename std::size_t const bls12_basic_policy<381, CHAR_BIT>::base_field_bits;
-                constexpr
-                    typename std::size_t const bls12_basic_policy<377, CHAR_BIT>::base_field_bits;
+                constexpr typename std::size_t const bls12_basic_policy<381, CHAR_BIT>::base_field_bits;
+                constexpr typename std::size_t const bls12_basic_policy<377, CHAR_BIT>::base_field_bits;
 
-                constexpr
-                    typename std::size_t const bls12_basic_policy<381, CHAR_BIT>::scalar_field_bits;
-                constexpr
-                    typename std::size_t const bls12_basic_policy<377, CHAR_BIT>::scalar_field_bits;
+                constexpr typename std::size_t const bls12_basic_policy<381, CHAR_BIT>::scalar_field_bits;
+                constexpr typename std::size_t const bls12_basic_policy<377, CHAR_BIT>::scalar_field_bits;
 
                 constexpr
                     typename bls12_basic_policy<381, CHAR_BIT>::number_type const bls12_basic_policy<381, CHAR_BIT>::p;

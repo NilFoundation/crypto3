@@ -49,8 +49,7 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                constexpr
-                    typename extension_params<FieldType>::modulus_type const extension_params<FieldType>::modulus;
+                constexpr typename extension_params<FieldType>::modulus_type const extension_params<FieldType>::modulus;
 
                 template<typename FieldType>
                 constexpr typename extension_params<FieldType>::modulus_type const extension_params<FieldType>::q;

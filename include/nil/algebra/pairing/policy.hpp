@@ -13,10 +13,8 @@
 namespace nil {
     namespace algebra {
         namespace pairing {
-
             template<typename PairingCurveType>
-            struct pairing_policy{
-            };
+            struct pairing_policy { };
         }    // namespace pairing
     }        // namespace algebra
 }    // namespace nil
