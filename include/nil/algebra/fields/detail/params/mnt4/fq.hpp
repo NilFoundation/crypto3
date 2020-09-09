@@ -35,10 +35,10 @@ namespace nil {
                     typedef typename policy_type::modulus_type modulus_type;
 
                     constexpr static const modulus_type modulus = policy_type::modulus;
-                    constexpr static const modulus_type q =
+                    constexpr static const modulus_type group_order =
                         0x1DE7BDE6A39D133124ED3D82A47657764B1AE89987520D4F1AF2890070964866B2D38B30000_cppui297;
 
-                    constexpr static const modulus_type q2 =
+                    constexpr static const modulus_type group2_order =
                         0x6FCA59D085672643469AF74C5C58E6A2A78D1A6BEF46259B6308A20619652FE76EE42CF5090E067AAEE541DED7D53794C0321FFC39B6C85F1141FE5DFEF4D47501FA0040670AC71660000_cppui595;
 
                     typedef element_fp<element_policy_type> fp2_non_residue_type;

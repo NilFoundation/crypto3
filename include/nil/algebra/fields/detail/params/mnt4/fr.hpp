@@ -33,7 +33,7 @@ namespace nil {
                 public:
                     typedef typename policy_type::number_type number_type;
 
-                    constexpr static const number_type q =
+                    constexpr static const number_type group_order =
                         0x1DE7BDE6A39D133124ED3D82A47657764B1AE7A20CA7DA4A603C92EB569DDA19A5200000000_cppui297;
                 };
 

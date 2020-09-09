@@ -12,10 +12,10 @@
 
 #include <nil/algebra/fields/detail/element/fp6_3over2.hpp>
 #include <nil/algebra/fields/detail/params/params.hpp>
-#include <nil/algebra/fields/detail/params/alt_bn128/fq.hpp>
-#include <nil/algebra/fields/detail/params/alt_bn128/fr.hpp>
-#include <nil/algebra/fields/detail/params/bls12/fq.hpp>
-#include <nil/algebra/fields/detail/params/bls12/fr.hpp>
+//#include <nil/algebra/fields/detail/params/alt_bn128/fq.hpp>
+//#include <nil/algebra/fields/detail/params/alt_bn128/fr.hpp>
+//#include <nil/algebra/fields/detail/params/bls12/fq.hpp>
+//#include <nil/algebra/fields/detail/params/bls12/fr.hpp>
 #include <nil/algebra/fields/detail/params/bn128/fq.hpp>
 #include <nil/algebra/fields/detail/params/bn128/fr.hpp>
 #include <nil/algebra/fields/detail/params/edwards/fq.hpp>

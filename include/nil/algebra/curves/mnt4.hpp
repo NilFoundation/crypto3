@@ -14,8 +14,6 @@
 #include <nil/algebra/curves/detail/mnt4/g2.hpp>
 #include <nil/algebra/curves/detail/mnt4/basic_policy.hpp>
 
-#include <nil/algebra/fields/mnt4/fq.hpp>
-#include <nil/algebra/fields/mnt4/fr.hpp>
 #include <nil/algebra/fields/fp4.hpp>
 
 namespace nil {
@@ -24,44 +22,31 @@ namespace nil {
 
             using namespace nil::algebra;
 
-            /*
-                The curve equation for a BN curve is:
-
-                E/Fp: y^2 = x^3 + b.
-            */
-
-            /*
-                Over Fp12_2over3over2
-                y^2 = x^3 + b
-                u^2 = -1
-                xi = xi_a + xi_b u
-                v^3 = xi
-                w^2 = v
-            */
-            template<std::size_t ModulusBits, std::size_t GeneratorBits = CHAR_BIT>
+            template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
             struct mnt4 { };
 
             template<>
             struct mnt4<298, CHAR_BIT> {
-                constexpr static const std::size_t base_field_bits = 298;
-                typedef fields::mnt4_fq<base_field_bits, CHAR_BIT> base_field_type;
-                typedef typename base_field_type::modulus_type number_type;
-                constexpr static const number_type base_field_modulus = base_field_type::modulus;
 
-                constexpr static const std::size_t scalar_field_bits = 298;
-                typedef fields::mnt4_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
-                constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
+                using policy_type = detail::mnt4_basic_policy<298>;
 
-                typedef typename detail::mnt4_g1<298, CHAR_BIT> g1_type;
-                typedef typename detail::mnt4_g2<298, CHAR_BIT> g2_type;
+                typedef typename policy_type::base_field_type base_field_type;
+                typedef typename policy_type::scalar_field_type scalar_field_type;
+                typedef typename policy_type::number_type number_type;
+
+                constexpr static const std::size_t base_field_bits = policy_type::base_field_bits;
+                constexpr static const number_type p = policy_type::p;
+
+                constexpr static const std::size_t scalar_field_bits = policy_type::scalar_field_bits;
+                constexpr static const number_type q = policy_type::q;
+
+                typedef typename detail::mnt4_g1<base_field_bits, CHAR_BIT> g1_type;
+                typedef typename detail::mnt4_g2<base_field_bits, CHAR_BIT> g2_type;
 
                 typedef typename fields::fp4<base_field_type>::value_type gt_type;
 
                 typedef std::vector<g1_type> g1_vector;
                 typedef std::vector<g2_type> g2_vector;
-
-                constexpr static const number_type p = base_field_modulus;
-                constexpr static const number_type q = scalar_field_modulus;
             };
 
             template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>

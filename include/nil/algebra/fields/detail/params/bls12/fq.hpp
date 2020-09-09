@@ -35,7 +35,7 @@ namespace nil {
                     typedef typename policy_type::modulus_type modulus_type;
 
                     constexpr static const modulus_type modulus = policy_type::modulus;
-                    constexpr static const modulus_type q = 
+                    constexpr static const modulus_type group_order = 
                         0xD0088F51CBFF34D258DD3DB21A5D66BB23BA5C279C2895FB39869507B587B120F55FFFF58A9FFFFDCFF7FFFFFFFD555_cppui380;
                 };
 
@@ -51,7 +51,7 @@ namespace nil {
                     typedef typename policy_type::modulus_type modulus_type;
 
                     constexpr static const modulus_type modulus = policy_type::modulus;
-                    constexpr static const modulus_type q = 
+                    constexpr static const modulus_type group_order = 
                         0xD71D230BE28875631D82E03650A49D8D116CF9807A89C78F79B117DD04A4000B85AEA2180000004284600000000000_cppui376;
                 };
 
