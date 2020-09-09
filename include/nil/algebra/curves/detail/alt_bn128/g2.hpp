@@ -7,13 +7,12 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef ALGEBRA_CURVES_BN128_G2_HPP
-#define ALGEBRA_CURVES_BN128_G2_HPP
+#ifndef ALGEBRA_CURVES_ALT_BN128_G2_HPP
+#define ALGEBRA_CURVES_ALT_BN128_G2_HPP
 
+#include <nil/algebra/curves/detail/alt_bn128/basic_policy.hpp>
 #include <nil/algebra/curves/detail/alt_bn128/g1.hpp>
 
-#include <nil/algebra/fields/alt_bn128/fq.hpp>
-#include <nil/algebra/fields/alt_bn128/fr.hpp>
 #include <nil/algebra/fields/fp3.hpp>
 
 #include <nil/algebra/detail/literals.hpp>
@@ -27,12 +26,12 @@ namespace nil {
                 template<std::size_t ModulusBits>
                 struct alt_bn128_g2 {
 
-                    using policy_type = alt_bn128_basic_policy<ModulusBits>;
-                    constexpr static const std::size_t g1_field_bits = ModulusBits;
-                    typedef typename fields::alt_bn128_fq<g1_field_bits, CHAR_BIT>::value_type g1_field_type_value;
+                    using policy_type = alt_bn128_basic_policy<ModulusBits, GeneratorBits>;
+                    constexpr static const std::size_t g1_field_bits = policy_type::base_field_bits;
+                    typedef typename policy_type::base_field_type::value_type g1_field_type_value;
 
-                    constexpr static const std::size_t g2_field_bits = ModulusBits;
-                    typedef typename fields::fp3<fields::alt_bn128_fq<g2_field_bits, CHAR_BIT>>::value_type g2_field_type_value;
+                    constexpr static const std::size_t g2_field_bits = policy_type::base_field_bits;
+                    typedef typename fields::fp3<policy_type::base_field_type>::value_type g2_field_type_value;
 
                     using underlying_field_type = g2_field_type_value;
 
@@ -251,4 +250,4 @@ namespace nil {
         }        // namespace curves
     }            // namespace algebra
 }    // namespace nil
-#endif    // ALGEBRA_CURVES_BN128_G2_HPP
+#endif    // ALGEBRA_CURVES_ALT_BN128_G2_HPP

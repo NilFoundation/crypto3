@@ -13,8 +13,6 @@
 #include <nil/algebra/curves/detail/mnt4/basic_policy.hpp>
 #include <nil/algebra/curves/detail/mnt4/g1.hpp>
 
-#include <nil/algebra/fields/mnt4/fq.hpp>
-#include <nil/algebra/fields/mnt4/fr.hpp>
 #include <nil/algebra/fields/fp2.hpp>
 
 #include <nil/algebra/detail/literals.hpp>
@@ -30,11 +28,11 @@ namespace nil {
                 struct mnt4_g2 {
 
                     using policy_type = mnt4_basic_policy<ModulusBits, GeneratorBits>;
-                    constexpr static const std::size_t g1_field_bits = ModulusBits;
-                    typedef typename fields::mnt4_fq<g1_field_bits, CHAR_BIT>::value_type g1_field_type_value;
+                    constexpr static const std::size_t g1_field_bits = policy_type::base_field_bits;
+                    typedef typename policy_type::base_field_type::value_type g1_field_type_value;
 
-                    constexpr static const std::size_t g2_field_bits = ModulusBits;
-                    typedef typename fields::fp2<fields::mnt4_fq<g2_field_bits, CHAR_BIT>>::value_type g2_field_type_value;
+                    constexpr static const std::size_t g2_field_bits = policy_type::base_field_bits;
+                    typedef typename fields::fp2<policy_type::base_field_type>::value_type g2_field_type_value;
 
                     using underlying_field_type_value = g2_field_type_value;
 

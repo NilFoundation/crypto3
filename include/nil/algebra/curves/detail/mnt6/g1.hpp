@@ -11,10 +11,7 @@
 #define ALGEBRA_CURVES_MNT6_G1_HPP
 
 #include <nil/algebra/curves/detail/mnt6/basic_policy.hpp>
-#include <nil/algebra/curves/detail/mnt6/g1.hpp>
 
-#include <nil/algebra/fields/mnt6/fq.hpp>
-#include <nil/algebra/fields/mnt6/fr.hpp>
 #include <nil/algebra/fields/fp3.hpp>
 
 #include <nil/algebra/detail/literals.hpp>
@@ -30,11 +27,11 @@ namespace nil {
                 struct mnt6_g1 {
 
                     using policy_type = mnt6_basic_policy<ModulusBits, GeneratorBits>;
-                    constexpr static const std::size_t g1_field_bits = ModulusBits;
-                    typedef typename fields::mnt6_fq<g1_field_bits, CHAR_BIT>::value_type g1_field_type_value;
+                    constexpr static const std::size_t g1_field_bits = policy_type::base_field_bits;
+                    typedef typename policy_type::base_field_type::value_type g1_field_type_value;
 
-                    constexpr static const std::size_t g2_field_bits = ModulusBits;
-                    typedef typename fields::fp3<fields::mnt6_fq<g2_field_bits, CHAR_BIT>>::value_type g2_field_type_value;
+                    constexpr static const std::size_t g2_field_bits = policy_type::base_field_bits;
+                    typedef typename fields::fp3<policy_type::base_field_type>::value_type g2_field_type_value;
 
                     using underlying_field_type_value = g1_field_type_value;
 
