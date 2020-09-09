@@ -268,8 +268,8 @@ namespace nil {
                     R.Y = Qcopy.Y;
                     R.Z = alt_bn128_Fq2<ModulusBits, GeneratorBits>::one();
 
-                    const typename basic_policy<bn128<ModulusBits, GeneratorBits>>::number_type &loop_count =
-                        basic_policy<bn128<ModulusBits, GeneratorBits>>::ate_loop_count;
+                    const typename basic_policy<alt_bn128<ModulusBits, GeneratorBits>>::number_type &loop_count =
+                        basic_policy<alt_bn128<ModulusBits, GeneratorBits>>::ate_loop_count;
 
                     bool found_one = false;
                     alt_bn128_ate_ell_coeffs c;
@@ -319,8 +319,8 @@ namespace nil {
                     bool found_one = false;
                     size_t idx = 0;
 
-                    const typename basic_policy<bn128<ModulusBits, GeneratorBits>>::number_type &loop_count =
-                        basic_policy<bn128<ModulusBits, GeneratorBits>>::ate_loop_count;
+                    const typename basic_policy<alt_bn128<ModulusBits, GeneratorBits>>::number_type &loop_count =
+                        basic_policy<alt_bn128<ModulusBits, GeneratorBits>>::ate_loop_count;
 
                     alt_bn128_ate_ell_coeffs c;
 
@@ -371,8 +371,8 @@ namespace nil {
                     bool found_one = false;
                     size_t idx = 0;
 
-                    const typename basic_policy<bn128<ModulusBits, GeneratorBits>>::number_type &loop_count =
-                        basic_policy<bn128<ModulusBits, GeneratorBits>>::ate_loop_count;
+                    const typename basic_policy<alt_bn128<ModulusBits, GeneratorBits>>::number_type &loop_count =
+                        basic_policy<alt_bn128<ModulusBits, GeneratorBits>>::ate_loop_count;
 
                     for (long i = loop_count.max_bits(); i >= 0; --i) {
                         const bool bit = loop_count.test_bit(i);
