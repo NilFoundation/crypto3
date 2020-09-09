@@ -11,6 +11,7 @@
 #define ALGEBRA_PAIRING_EDWARDS_POLICY_HPP
 
 #include <nil/algebra/pairing/detail/edwards/functions.hpp>
+#include <nil/algebra/pairing/policy.hpp>
 
 #include <nil/algebra/curves/edwards.hpp>
 

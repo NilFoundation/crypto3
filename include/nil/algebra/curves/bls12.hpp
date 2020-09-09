@@ -32,49 +32,43 @@ namespace nil {
             template<>
             struct bls12<381> {
 
-                constexpr static const std::size_t base_field_bits = 381;
-                typedef fields::bls12_fq<base_field_bits, CHAR_BIT> base_field_type;
-                typedef typename base_field_type::modulus_type number_type;
-                constexpr static const number_type base_field_modulus = base_field_type::modulus;
+                using policy_type = detail::bls12_basic_policy<381>;
 
-                constexpr static const std::size_t scalar_field_bits = 381; // actually, 255
-                typedef fields::bls12_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
-                constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
+                typedef typename policy_type::base_field_type base_field_type;
+                typedef typename policy_type::scalar_field_type scalar_field_type;
+                typedef typename policy_type::number_type number_type;
+
+                constexpr static const std::size_t base_field_bits = policy_type::base_field_bits;
+                constexpr static const number_type p = policy_type::p;
+
+                constexpr static const std::size_t scalar_field_bits = policy_type::scalar_field_bits;
+                constexpr static const number_type q = policy_type::q;
 
                 typedef typename detail::bls12_g1<base_field_bits> g1_type;
                 typedef typename detail::bls12_g2<base_field_bits> g2_type;
 
                 typedef typename fields::fp12_2over3over2<base_field_type>::value_type gt_type;
-
-                constexpr static const number_type p = base_field_modulus;
-                constexpr static const number_type q = scalar_field_modulus;
-
-                constexpr static const number_type a = 0;
-                constexpr static const number_type b = 0x04;
             };
 
             template<>
             struct bls12<377> {
 
-                constexpr static const std::size_t base_field_bits = 377;
-                typedef fields::bls12_fq<base_field_bits, CHAR_BIT> base_field_type;
-                typedef typename base_field_type::modulus_type number_type;
-                constexpr static const number_type base_field_modulus = base_field_type::modulus;
+                using policy_type = detail::bls12_basic_policy<377>;
 
-                constexpr static const std::size_t scalar_field_bits = 377; // actually, 253
-                typedef fields::bls12_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
-                constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
+                typedef typename policy_type::base_field_type base_field_type;
+                typedef typename policy_type::scalar_field_type scalar_field_type;
+                typedef typename policy_type::number_type number_type;
+
+                constexpr static const std::size_t base_field_bits = policy_type::base_field_bits;
+                constexpr static const number_type p = policy_type::p;
+
+                constexpr static const std::size_t scalar_field_bits = policy_type::scalar_field_bits;
+                constexpr static const number_type q = policy_type::q;
 
                 typedef typename detail::bls12_g1<base_field_bits> g1_type;
                 typedef typename detail::bls12_g2<base_field_bits> g2_type;
 
                 typedef typename fields::fp12_2over3over2<base_field_type>::value_type gt_type;
-
-                constexpr static const number_type p = base_field_modulus;
-                constexpr static const number_type q = scalar_field_modulus;
-
-                constexpr static const number_type a = 0;
-                constexpr static const number_type b = 0x01;
             };
 
             typedef bls12<381> bls12_381;

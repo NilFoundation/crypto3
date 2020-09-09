@@ -11,6 +11,7 @@
 #define ALGEBRA_PAIRING_MNT4_POLICY_HPP
 
 #include <nil/algebra/pairing/detail/mnt4/functions.hpp>
+#include <nil/algebra/pairing/policy.hpp>
 
 #include <nil/algebra/curves/mnt4.hpp>
 
