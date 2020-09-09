@@ -17,10 +17,10 @@ namespace nil {
         namespace pairing {
             namespace detail {
 
-                template<std::size_t GeneratorBits = CHAR_BIT>
-                struct basic_policy<bls12<381, GeneratorBits>> {
+                template<>
+                struct basic_policy<bls12<381, CHAR_BIT>> {
 
-                    using number_type = bls12<381, GeneratorBits>::number_type;
+                    using number_type = bls12<381, CHAR_BIT>::number_type;
 
                     constexpr static const typename number_type ate_loop_count = number_type(0xD201000000010000_cppui64);
                     constexpr static const bool ate_is_loop_count_neg = true;
@@ -32,8 +32,8 @@ namespace nil {
 
                 };
 
-                template<std::size_t GeneratorBits = CHAR_BIT>
-                struct basic_policy<bls12<377, GeneratorBits>> {
+                template<>
+                struct basic_policy<bls12<377, CHAR_BIT>> {
 
                     using number_type = bls12<377, GeneratorBits>::number_type;
 

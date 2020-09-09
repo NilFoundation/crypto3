@@ -25,20 +25,6 @@ namespace nil {
 
             using namespace algebra;
 
-            /*
-                The curve equation for a BN curve is:
-
-                E/Fp: y^2 = x^3 + b.
-            */
-
-            /*
-                Over Fp12_2over3over2
-                y^2 = x^3 + b
-                u^2 = -1
-                xi = xi_a + xi_b u
-                v^3 = xi
-                w^2 = v
-            */
             template<std::size_t ModulusBits = 254, std::size_t GeneratorBits = CHAR_BIT>
             struct alt_bn128 { };
 
@@ -68,8 +54,6 @@ namespace nil {
 
                 constexpr static const number_type a = 0;
                 constexpr static const number_type b = 0x03;
-                constexpr static const number_type x = 0x09;
-                constexpr static const number_type y = 0x01;
             };
 
             template<std::size_t ModulusBits = 254, std::size_t GeneratorBits = CHAR_BIT>

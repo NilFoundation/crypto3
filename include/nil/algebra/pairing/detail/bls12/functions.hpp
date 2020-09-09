@@ -10,8 +10,6 @@
 #ifndef ALGEBRA_PAIRING_BLS12_FUNCTIONS_HPP
 #define ALGEBRA_PAIRING_BLS12_FUNCTIONS_HPP
 
-#include <sstream>
-
 #include <nil/algebra/pairing/detail/bls12/basic_policy.hpp>
 
 #include <nil/algebra/curves/bls12.hpp>

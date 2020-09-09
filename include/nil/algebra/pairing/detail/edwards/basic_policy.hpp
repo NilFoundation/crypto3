@@ -16,8 +16,8 @@ namespace nil {
     namespace algebra {
         namespace pairing {
 
-            template<std::size_t ModulusBits = 183, std::size_t GeneratorBits = CHAR_BIT>
-            struct basic_policy<edwards<ModulusBits, GeneratorBits>> {
+            template<>
+            struct basic_policy<edwards<183, CHAR_BIT>> {
 
                 using number_type = edwards<ModulusBits, GeneratorBits>::number_type;
 

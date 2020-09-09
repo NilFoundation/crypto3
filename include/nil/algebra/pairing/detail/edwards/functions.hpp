@@ -10,8 +10,6 @@
 #ifndef ALGEBRA_PAIRING_EDWARDS_FUNCTIONS_HPP
 #define ALGEBRA_PAIRING_EDWARDS_FUNCTIONS_HPP
 
-#include <sstream>
-
 #include <nil/algebra/pairing/detail/edwards/basic_policy.hpp>
 
 #include <nil/algebra/curves/edwards.hpp>

@@ -10,15 +10,9 @@
 #ifndef ALGEBRA_PAIRING_ALT_BN128_FUNCTIONS_HPP
 #define ALGEBRA_PAIRING_ALT_BN128_FUNCTIONS_HPP
 
-#include <sstream>
-
-#include <nil/algebra/pairing/ate.hpp>
-#include <nil/algebra/pairing/basic_functions.hpp>
-#include <nil/algebra/pairing/basic_policy.hpp>
+#include <nil/algebra/pairing/detail/alt_bn128/basic_policy.hpp>
 
 #include <nil/algebra/curves/alt_bn128.hpp>
-
-#include <nil/algebra/fields/fp6_3over2.hpp>
 
 namespace nil {
     namespace algebra {
