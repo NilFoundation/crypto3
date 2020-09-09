@@ -95,11 +95,19 @@ boost::property_tree::ptree string_data(std::string test_name) {
     return string_data.get_child(test_name);
 }
 
-enum binary_operators_tests_members : std::size_t {
+enum binary_operator_test_constants : std::size_t {
+    C1,
+    C2
+};
+
+enum binary_operator_test_points : std::size_t {
     p1,
     p2,
     p1_plus_p2,
     p1_minus_p2,
+    p1_mul_C1,
+    p2_mul_C1_plus_p2_mul_C2,
+    p1_dbl
 };
 
 template<typename FpCurveGroup, typename PointsSetType>
