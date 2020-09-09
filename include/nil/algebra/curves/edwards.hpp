@@ -14,11 +14,7 @@
 #include <nil/algebra/curves/detail/edwards/g2.hpp>
 #include <nil/algebra/curves/detail/edwards/basic_policy.hpp>
 
-#include <nil/algebra/fields/edwards/fq.hpp>
-#include <nil/algebra/fields/edwards/fr.hpp>
 #include <nil/algebra/fields/fp6_2over3.hpp>
-
-#include <nil/algebra/detail/literals.hpp>
 
 namespace nil {
     namespace algebra {
@@ -30,7 +26,7 @@ namespace nil {
             struct edwards { };
 
             template<>
-            struct edwards<183, CHAR_BIT> : public detail::edwards_basic_policy<183, CHAR_BIT> {
+            struct edwards<183, CHAR_BIT> {
 
                 using policy_type = detail::edwards_basic_policy<183>;
 
@@ -38,8 +34,14 @@ namespace nil {
                 typedef typename policy_type::scalar_field_type scalar_field_type;
                 typedef typename policy_type::number_type number_type;
 
-                typedef typename detail::edwards_g1<183> g1_type;
-                typedef typename detail::edwards_g2<183> g2_type;
+                constexpr static const std::size_t base_field_bits = policy_type::base_field_bits;
+                constexpr static const number_type p = policy_type::p;
+
+                constexpr static const std::size_t scalar_field_bits = policy_type::scalar_field_bits;
+                constexpr static const number_type q = policy_type::q;
+
+                typedef typename detail::edwards_g1<base_field_bits> g1_type;
+                typedef typename detail::edwards_g2<base_field_bits> g2_type;
 
                 typedef typename fields::fp6_2over3<base_field_type>::value_type gt_type;
 

@@ -11,6 +11,7 @@
 #define ALGEBRA_PAIRING_BLS12_POLICY_HPP
 
 #include <nil/algebra/pairing/detail/bls12/functions.hpp>
+#include <nil/algebra/pairing/policy.hpp>
 
 #include <nil/algebra/curves/bls12.hpp>
 

@@ -37,21 +37,43 @@ namespace nil {
                 typedef typename policy_type::modulus_type modulus_type;
 
                 constexpr static const modulus_type modulus =
-                    0x1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaaab_cppui381;
+                    0x1A0111EA397FE69A4B1BA7B6434BACD764774B84F38512BF6730D2A0F6B0F6241EABFFFEB153FFFFB9FEFFFFFFFFAAAB_cppui381;
 
                 constexpr static const std::size_t generator_bits = policy_type::generator_bits;
                 typedef typename policy_type::generator_type generator_type;
 
-                constexpr static const generator_type mul_generator = 0x03;
+                constexpr static const generator_type mul_generator = 0x02;
 
                 typedef typename detail::element_fp<detail::extension_params<bls12_fq<381, CHAR_BIT>>> value_type;
 
                 constexpr static const std::size_t arity = 1;
             };
 
+            template<>
+            struct bls12_fq<377, CHAR_BIT> : public field<377, CHAR_BIT> {
+                typedef field<377, CHAR_BIT> policy_type;
+
+                constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
+                typedef typename policy_type::modulus_type modulus_type;
+
+                constexpr static const modulus_type modulus =
+                    0x1AE3A4617C510EAC63B05C06CA1493B1A22D9F300F5138F1EF3622FBA094800170B5D44300000008508C00000000001_cppui377;
+
+                constexpr static const std::size_t generator_bits = policy_type::generator_bits;
+                typedef typename policy_type::generator_type generator_type;
+
+                constexpr static const generator_type mul_generator = 0x0F;
+
+                typedef typename detail::element_fp<detail::extension_params<bls12_fq<377, CHAR_BIT>>> value_type;
+
+                constexpr static const std::size_t arity = 1;
+            };
+
             constexpr typename bls12_fq<381, CHAR_BIT>::modulus_type const bls12_fq<381, CHAR_BIT>::modulus;
+            constexpr typename bls12_fq<377, CHAR_BIT>::modulus_type const bls12_fq<377, CHAR_BIT>::modulus;
 
             constexpr typename bls12_fq<381, CHAR_BIT>::generator_type const bls12_fq<381, CHAR_BIT>::mul_generator;
+            constexpr typename bls12_fq<377, CHAR_BIT>::generator_type const bls12_fq<377, CHAR_BIT>::mul_generator;
 
         }    // namespace fields
     }        // namespace algebra

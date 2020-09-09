@@ -12,9 +12,9 @@
 
 #include <sstream>
 
-#include <nil/algebra/pairing/ate.hpp>
-#include <nil/algebra/pairing/basic_functions.hpp>
-#include <nil/algebra/pairing/basic_policy.hpp>
+#include <nil/algebra/pairing/detail/bn128/ate.hpp>
+#include <nil/algebra/pairing/detail/bn128/basic_functions.hpp>
+#include <nil/algebra/pairing/detail/bn128/basic_policy.hpp>
 
 #include <nil/algebra/curves/bn128.hpp>
 

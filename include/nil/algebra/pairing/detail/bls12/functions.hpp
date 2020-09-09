@@ -10,8 +10,6 @@
 #ifndef ALGEBRA_PAIRING_BLS12_FUNCTIONS_HPP
 #define ALGEBRA_PAIRING_BLS12_FUNCTIONS_HPP
 
-#include <sstream>
-
 #include <nil/algebra/pairing/detail/bls12/basic_policy.hpp>
 
 #include <nil/algebra/curves/bls12.hpp>
@@ -96,8 +94,8 @@ namespace nil {
                 template<std::size_t ModulusBits = 381, std::size_t GeneratorBits = CHAR_BIT>
                 bls12_gt<ModulusBits, GeneratorBits> bls12_381_exp_by_z(const bls12_gt<ModulusBits, GeneratorBits> &elt) {
 
-                    bls12_gt<ModulusBits, GeneratorBits> result = elt.cyclotomic_exp(bls12_381_final_exponent_z);
-                    if (bls12_381_final_exponent_is_z_neg) {
+                    bls12_gt<ModulusBits, GeneratorBits> result = elt.cyclotomic_exp(bls12_basic_policy<ModulusBits, GeneratorBits>::final_exponent_z);
+                    if (bls12_basic_policy<ModulusBits, GeneratorBits>::final_exponent_is_z_neg) {
                         result = result.unitary_inverse();
                     }
 
@@ -230,7 +228,9 @@ namespace nil {
                     R.Y = Qcopy.Y;
                     R.Z = bls12_Fq2<ModulusBits, GeneratorBits>::one();
 
-                    const bigint<bls12_381_Fq::num_limbs> &loop_count = bls12_381_ate_loop_count;
+                    const typename bls12_basic_policy<ModulusBits, GeneratorBits>::number_type &loop_count =
+                        bls12_basic_policy<ModulusBits, GeneratorBits>::ate_loop_count;
+
                     bool found_one = false;
                     bls12_381_ate_ell_coeffs c;
 
@@ -263,7 +263,9 @@ namespace nil {
                     bool found_one = false;
                     size_t idx = 0;
 
-                    const bigint<bls12_381_Fq::num_limbs> &loop_count = bls12_381_ate_loop_count;
+                    const typename bls12_basic_policy<ModulusBits, GeneratorBits>::number_type &loop_count =
+                        bls12_basic_policy<ModulusBits, GeneratorBits>::ate_loop_count;
+
                     bls12_381_ate_ell_coeffs c;
 
                     for (long i = loop_count.max_bits(); i >= 0; --i) {
@@ -289,7 +291,7 @@ namespace nil {
 
                     }
 
-                    if (bls12_381_ate_is_loop_count_neg) {
+                    if (bls12_basic_policy<ModulusBits, GeneratorBits>::ate_is_loop_count_neg) {
                         f = f.inversed();
                     }
 
@@ -307,7 +309,9 @@ namespace nil {
                     bool found_one = false;
                     size_t idx = 0;
 
-                    const bigint<bls12_381_Fq::num_limbs> &loop_count = bls12_381_ate_loop_count;
+                    const typename bls12_basic_policy<ModulusBits, GeneratorBits>::number_type &loop_count =
+                        bls12_basic_policy<ModulusBits, GeneratorBits>::ate_loop_count;
+                        
                     for (long i = loop_count.max_bits(); i >= 0; --i) {
                         const bool bit = loop_count.test_bit(i);
                         if (!found_one) {
@@ -339,7 +343,7 @@ namespace nil {
                         }
                     }
 
-                    if (bls12_381_ate_is_loop_count_neg) {
+                    if (bls12_basic_policy<ModulusBits, GeneratorBits>::ate_is_loop_count_neg) {
                         f = f.inversed();
                     }
 

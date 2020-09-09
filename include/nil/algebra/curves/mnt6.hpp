@@ -14,49 +14,39 @@
 #include <nil/algebra/curves/detail/mnt6/g2.hpp>
 #include <nil/algebra/curves/detail/mnt6/basic_policy.hpp>
 
-#include <nil/algebra/fields/mnt6/fq.hpp>
-#include <nil/algebra/fields/mnt6/fr.hpp>
 #include <nil/algebra/fields/fp6_2over3.hpp>
 
 namespace nil {
     namespace algebra {
         namespace curves {
-            /*
-                The curve equation for a BN curve is:
+            
+            using namespace nil::algebra;
 
-                E/Fp: y^2 = x^3 + b.
-
-                Over Fp12_2over3over2
-                y^2 = x^3 + b
-                u^2 = -1
-                xi = xi_a + xi_b u
-                v^3 = xi
-                w^2 = v
-            */
             template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
             struct mnt6 { };
 
             template<>
             struct mnt6<298, CHAR_BIT> {
-                constexpr static const std::size_t base_field_bits = 298;
-                typedef fields::mnt6_fq<base_field_bits, CHAR_BIT> base_field_type;
-                typedef typename base_field_type::modulus_type number_type;
-                constexpr static const number_type base_field_modulus = base_field_type::modulus;
 
-                constexpr static const std::size_t scalar_field_bits = 298;
-                typedef fields::mnt6_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
-                constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
+                using policy_type = detail::mnt6_basic_policy<298>;
 
-                typedef typename detail::mnt6_g1<298, CHAR_BIT> g1_type;
-                typedef typename detail::mnt6_g2<298, CHAR_BIT> g2_type;
+                typedef typename policy_type::base_field_type base_field_type;
+                typedef typename policy_type::scalar_field_type scalar_field_type;
+                typedef typename policy_type::number_type number_type;
+
+                constexpr static const std::size_t base_field_bits = policy_type::base_field_bits;
+                constexpr static const number_type p = policy_type::p;
+
+                constexpr static const std::size_t scalar_field_bits = policy_type::scalar_field_bits;
+                constexpr static const number_type q = policy_type::q;
+
+                typedef typename detail::mnt6_g1<base_field_bits, CHAR_BIT> g1_type;
+                typedef typename detail::mnt6_g2<base_field_bits, CHAR_BIT> g2_type;
 
                 typedef typename fields::fp6_2over3<base_field_type>::value_type gt_type;
 
                 typedef std::vector<g1_type> g1_vector;
                 typedef std::vector<g2_type> g2_vector;
-
-                constexpr static const number_type p = base_field_modulus;
-                constexpr static const number_type q = scalar_field_modulus;
             };
 
             template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>

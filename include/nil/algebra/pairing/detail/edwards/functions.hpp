@@ -10,8 +10,6 @@
 #ifndef ALGEBRA_PAIRING_EDWARDS_FUNCTIONS_HPP
 #define ALGEBRA_PAIRING_EDWARDS_FUNCTIONS_HPP
 
-#include <sstream>
-
 #include <nil/algebra/pairing/detail/edwards/basic_policy.hpp>
 
 #include <nil/algebra/curves/edwards.hpp>
@@ -86,15 +84,15 @@ namespace nil {
                     const curves::edwards_gt<ModulusBits, GeneratorBits> elt_q = elt.Frobenius_map(1);
 
                     curves::edwards_gt<ModulusBits, GeneratorBits> w1_part = elt_q.cyclotomic_exp(
-                        basic_policy<edwards<ModulusBits, GeneratorBits>>::final_exponent_last_chunk_w1);
+                        edwards_basic_policy<ModulusBits, GeneratorBits>::final_exponent_last_chunk_w1);
                     curves::edwards_gt<ModulusBits, GeneratorBits> w0_part;
 
-                    if (basic_policy<edwards<ModulusBits, GeneratorBits>>::final_exponent_last_chunk_is_w0_neg) {
+                    if (edwards_basic_policy<ModulusBits, GeneratorBits>::final_exponent_last_chunk_is_w0_neg) {
                         w0_part = elt_inv.cyclotomic_exp(
-                            basic_policy<edwards<ModulusBits, GeneratorBits>>::final_exponent_last_chunk_abs_of_w0);
+                            edwards_basic_policy<ModulusBits, GeneratorBits>::final_exponent_last_chunk_abs_of_w0);
                     } else {
                         w0_part = elt.cyclotomic_exp(
-                            basic_policy<edwards<ModulusBits, GeneratorBits>>::final_exponent_last_chunk_abs_of_w0);
+                            edwards_basic_policy<ModulusBits, GeneratorBits>::final_exponent_last_chunk_abs_of_w0);
                     }
 
                     curves::edwards_gt<ModulusBits, GeneratorBits> result = w1_part * w0_part;

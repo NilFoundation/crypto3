@@ -10,15 +10,9 @@
 #ifndef ALGEBRA_PAIRING_ALT_BN128_FUNCTIONS_HPP
 #define ALGEBRA_PAIRING_ALT_BN128_FUNCTIONS_HPP
 
-#include <sstream>
-
-#include <nil/algebra/pairing/ate.hpp>
-#include <nil/algebra/pairing/basic_functions.hpp>
-#include <nil/algebra/pairing/basic_policy.hpp>
+#include <nil/algebra/pairing/detail/alt_bn128/basic_policy.hpp>
 
 #include <nil/algebra/curves/alt_bn128.hpp>
-
-#include <nil/algebra/fields/fp6_3over2.hpp>
 
 namespace nil {
     namespace algebra {
@@ -97,9 +91,9 @@ namespace nil {
                 template<std::size_t ModulusBits = 254, std::size_t GeneratorBits = CHAR_BIT>
                 curves::alt_bn128_gt<ModulusBits, GeneratorBits> alt_bn128_exp_by_neg_z(const curves::alt_bn128_gt<ModulusBits, GeneratorBits> &elt) {
 
-                    curves::alt_bn128_gt<ModulusBits, GeneratorBits> result = elt.cyclotomic_exp(basic_policy<edwards<ModulusBits, GeneratorBits>>::alt_bn128_final_exponent_z);
+                    curves::alt_bn128_gt<ModulusBits, GeneratorBits> result = elt.cyclotomic_exp(alt_bn128_basic_policy<ModulusBits, GeneratorBits>::alt_bn128_final_exponent_z);
                     
-                    if (!basic_policy<edwards<ModulusBits, GeneratorBits>>::alt_bn128_final_exponent_is_z_neg) {
+                    if (!alt_bn128_basic_policy<ModulusBits, GeneratorBits>::alt_bn128_final_exponent_is_z_neg) {
                         result = result.unitary_inversed();
                     }
 
@@ -268,8 +262,8 @@ namespace nil {
                     R.Y = Qcopy.Y;
                     R.Z = alt_bn128_Fq2<ModulusBits, GeneratorBits>::one();
 
-                    const typename basic_policy<bn128<ModulusBits, GeneratorBits>>::number_type &loop_count =
-                        basic_policy<bn128<ModulusBits, GeneratorBits>>::ate_loop_count;
+                    const typename alt_bn128_basic_policy<ModulusBits, GeneratorBits>::number_type &loop_count =
+                        alt_bn128_basic_policy<ModulusBits, GeneratorBits>::ate_loop_count;
 
                     bool found_one = false;
                     alt_bn128_ate_ell_coeffs c;
@@ -296,7 +290,7 @@ namespace nil {
                     alt_bn128_g2<ModulusBits, GeneratorBits> Q2 = Q1.mul_by_q();
                     assert(Q2.Z == alt_bn128_Fq2::one());
 
-                    if (basic_policy<mnt4<ModulusBits, GeneratorBits>>::ate_is_loop_count_neg) {
+                    if (alt_bn128_basic_policy<ModulusBits, GeneratorBits>::ate_is_loop_count_neg) {
                         R.Y = - R.Y;
                     }
                     Q2.Y = - Q2.Y;
@@ -319,8 +313,8 @@ namespace nil {
                     bool found_one = false;
                     size_t idx = 0;
 
-                    const typename basic_policy<bn128<ModulusBits, GeneratorBits>>::number_type &loop_count =
-                        basic_policy<bn128<ModulusBits, GeneratorBits>>::ate_loop_count;
+                    const typename alt_bn128_basic_policy<ModulusBits, GeneratorBits>::number_type &loop_count =
+                        alt_bn128_basic_policy<ModulusBits, GeneratorBits>::ate_loop_count;
 
                     alt_bn128_ate_ell_coeffs c;
 
@@ -347,7 +341,7 @@ namespace nil {
 
                     }
 
-                    if (basic_policy<mnt4<ModulusBits, GeneratorBits>>::ate_is_loop_count_neg) {
+                    if (alt_bn128_basic_policy<ModulusBits, GeneratorBits>::ate_is_loop_count_neg) {
                         f = f.inversed();
                     }
 
@@ -371,8 +365,8 @@ namespace nil {
                     bool found_one = false;
                     size_t idx = 0;
 
-                    const typename basic_policy<bn128<ModulusBits, GeneratorBits>>::number_type &loop_count =
-                        basic_policy<bn128<ModulusBits, GeneratorBits>>::ate_loop_count;
+                    const typename alt_bn128_basic_policy<ModulusBits, GeneratorBits>::number_type &loop_count =
+                        alt_bn128_basic_policy<ModulusBits, GeneratorBits>::ate_loop_count;
 
                     for (long i = loop_count.max_bits(); i >= 0; --i) {
                         const bool bit = loop_count.test_bit(i);
@@ -405,7 +399,7 @@ namespace nil {
                         }
                     }
 
-                    if (basic_policy<mnt4<ModulusBits, GeneratorBits>>::ate_is_loop_count_neg) {
+                    if (alt_bn128_basic_policy<ModulusBits, GeneratorBits>::ate_is_loop_count_neg) {
                         f = f.inversed();
                     }
 
