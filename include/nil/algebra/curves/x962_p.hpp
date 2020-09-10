@@ -13,7 +13,7 @@
 #include <nil/crypto3/algebra/curves/detail/x962_p/g1.hpp>
 #include <nil/crypto3/algebra/curves/detail/x962_p/g2.hpp>
 
-#include <nil/algebra/fields/x962_p/fq.hpp>
+#include <nil/algebra/fields/x962_p/base_field.hpp>
 #include <nil/algebra/fields/x962_p/fr.hpp>
 
 #include <nil/algebra/detail/literals.hpp>

@@ -13,7 +13,7 @@
 #include <nil/algebra/curves/detail/mnt4/basic_policy.hpp>
 #include <nil/algebra/curves/detail/mnt4/g2.hpp>
 
-#include <nil/algebra/fields/mnt4/fq.hpp>
+#include <nil/algebra/fields/mnt4/base_field.hpp>
 #include <nil/algebra/fields/mnt4/fr.hpp>
 #include <nil/algebra/fields/fp2.hpp>
 

@@ -15,13 +15,13 @@
 #include <boost/multiprecision/modular/modular_adaptor.hpp>
 
 #include <nil/algebra/fields/fp2.hpp>
-#include <nil/algebra/fields/bls12/fq.hpp>
+#include <nil/algebra/fields/bls12/base_field.hpp>
 #include <nil/algebra/fields/bls12/fr.hpp>
-#include <nil/algebra/fields/bn128/fq.hpp>
+#include <nil/algebra/fields/bn128/base_field.hpp>
 #include <nil/algebra/fields/bn128/fr.hpp>
 #include <nil/algebra/fields/dsa_botan.hpp>
 #include <nil/algebra/fields/dsa_jce.hpp>
-#include <nil/algebra/fields/detail/params/bn128/fq.hpp>
+#include <nil/algebra/fields/detail/params/bn128/base_field.hpp>
 //#include <nil/algebra/fields/ed25519_fe.hpp>
 //#include <nil/algebra/fields/ffdhe_ietf.hpp>
 //#include <nil/algebra/fields/modp_ietf.hpp>

@@ -10,7 +10,7 @@
 #ifndef ALGEBRA_CURVES_GOST_A_HPP
 #define ALGEBRA_CURVES_GOST_A_HPP
 
-#include <nil/algebra/fields/gost_A/fq.hpp>
+#include <nil/algebra/fields/gost_A/base_field.hpp>
 #include <nil/algebra/fields/gost_A/fr.hpp>
 
 #include <nil/algebra/detail/literals.hpp>

@@ -10,7 +10,7 @@
 #ifndef ALGEBRA_CURVES_MNT4_BASIC_POLICY_HPP
 #define ALGEBRA_CURVES_MNT4_BASIC_POLICY_HPP
 
-#include <nil/algebra/fields/mnt4/fq.hpp>
+#include <nil/algebra/fields/mnt4/base_field.hpp>
 #include <nil/algebra/fields/mnt4/fr.hpp>
 
 #include <nil/algebra/detail/literals.hpp>

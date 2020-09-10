@@ -10,7 +10,7 @@
 #ifndef ALGEBRA_CURVES_EDWARDS_BASIC_POLICY_HPP
 #define ALGEBRA_CURVES_EDWARDS_BASIC_POLICY_HPP
 
-#include <nil/algebra/fields/edwards/fq.hpp>
+#include <nil/algebra/fields/edwards/base_field.hpp>
 #include <nil/algebra/fields/edwards/fr.hpp>
 
 #include <nil/algebra/detail/literals.hpp>

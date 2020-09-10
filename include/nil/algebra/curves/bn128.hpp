@@ -13,7 +13,7 @@
 #include <nil/algebra/curves/detail/bn128/g1.hpp>
 #include <nil/algebra/curves/detail/bn128/g2.hpp>
 
-#include <nil/algebra/fields/bn128/fq.hpp>
+#include <nil/algebra/fields/bn128/base_field.hpp>
 #include <nil/algebra/fields/bn128/fr.hpp>
 #include <nil/algebra/fields/fp12_2over3over2.hpp>
 
@@ -45,7 +45,7 @@ namespace nil {
             template<>
             struct bn128<254, CHAR_BIT> {
                 constexpr static const std::size_t base_field_bits = 254;
-                typedef fields::bn128_fq<base_field_bits, CHAR_BIT> base_field_type;
+                typedef fields::bn128_base_field<base_field_bits, CHAR_BIT> base_field_type;
                 typedef typename base_field_type::modulus_type number_type;
                 constexpr static const number_type base_field_modulus = base_field_type::modulus;
 

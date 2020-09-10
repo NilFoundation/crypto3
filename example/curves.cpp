@@ -19,13 +19,6 @@
 #include <nil/algebra/curves/mnt4.hpp>
 #include <nil/algebra/curves/mnt6.hpp>
 
-#include <nil/algebra/fields/bn128/fq.hpp>
-#include <nil/algebra/fields/bn128/fr.hpp>
-#include <nil/algebra/fields/edwards/fq.hpp>
-#include <nil/algebra/fields/edwards/fr.hpp>
-#include <nil/algebra/fields/mnt4/fq.hpp>
-#include <nil/algebra/fields/mnt4/fr.hpp>
-
 using namespace nil::algebra;
 
 template<typename FpCurveGroup>

@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef ALGEBRA_FIELDS_MNT4_FQ_HPP
-#define ALGEBRA_FIELDS_MNT4_FQ_HPP
+#ifndef ALGEBRA_FIELDS_SM2P_V1_FQ_HPP
+#define ALGEBRA_FIELDS_SM2P_V1_FQ_HPP
 
 #include <nil/algebra/fields/detail/element/fp.hpp>
 #include <nil/algebra/fields/detail/params/params.hpp>
@@ -26,38 +26,41 @@ namespace nil {
              * @tparam ModulusBits
              * @tparam GeneratorBits
              */
-            template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
-            struct mnt4_fq : public field<ModulusBits, GeneratorBits> { };
+            template<std::size_t ModulusBits, std::size_t GeneratorBits = CHAR_BIT>
+            struct sm2p_v1_base_field : public field<ModulusBits, GeneratorBits> { };
 
             template<>
-            struct mnt4_fq<298, CHAR_BIT> : public field<298, CHAR_BIT> {
-                typedef field<298, CHAR_BIT> policy_type;
+            struct sm2p_v1_base_field<256, CHAR_BIT> : public field<256, CHAR_BIT> {
+                typedef field<256, CHAR_BIT> policy_type;
 
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                 typedef typename policy_type::modulus_type modulus_type;
 
-                constexpr static const std::size_t number_bits = policy_type::number_bits;
-                typedef typename policy_type::number_type number_type;
-
                 constexpr static const modulus_type modulus =
-                    0x3BCF7BCD473A266249DA7B0548ECAEEC9635D1330EA41A9E35E51200E12C90CD65A71660001_cppui298;
+                    0xFFFFFFFEFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF00000000FFFFFFFFFFFFFFFF_cppui256;
 
                 constexpr static const std::size_t generator_bits = policy_type::generator_bits;
                 typedef typename policy_type::generator_type generator_type;
 
-                constexpr static const generator_type mul_generator = 0x11;
+                constexpr static const generator_type mul_generator = 0x03;
 
-                typedef typename detail::element_fp<detail::extension_params<mnt4_fq<298, CHAR_BIT>>> value_type;
+                typedef typename detail::element_fp<detail::extension_params<sm2p_v1_base_field<256, CHAR_BIT>>> value_type;
 
                 constexpr static const std::size_t arity = 1;
             };
 
-            constexpr typename mnt4_fq<298, CHAR_BIT>::modulus_type const mnt4_fq<298, CHAR_BIT>::modulus;
+            constexpr typename sm2p_v1_base_field<256, CHAR_BIT>::modulus_type const sm2p_v1_base_field<256, CHAR_BIT>::modulus;
 
-            constexpr typename mnt4_fq<298, CHAR_BIT>::generator_type const mnt4_fq<298, CHAR_BIT>::mul_generator;
+            constexpr typename sm2p_v1_base_field<256, CHAR_BIT>::generator_type const sm2p_v1_base_field<256, CHAR_BIT>::mul_generator;
+
+            template<std::size_t ModulusBits = 256, std::size_t GeneratorBits = CHAR_BIT>
+            using sm2p_v1_fq = sm2p_v1_base_field<ModulusBits, GeneratorBits>;
+
+            template<std::size_t ModulusBits = 256, std::size_t GeneratorBits = CHAR_BIT>
+            using sm2p_v1 = sm2p_v1_base_field<ModulusBits, GeneratorBits>;
 
         }    // namespace fields
     }        // namespace algebra
 }    // namespace nil
 
-#endif    // ALGEBRA_FIELDS_MNT4_FQ_HPP
+#endif    // ALGEBRA_FIELDS_SM2P_V1_FQ_HPP

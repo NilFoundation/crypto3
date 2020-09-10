@@ -10,7 +10,7 @@
 #ifndef ALGEBRA_CURVES_FRP_V1_HPP
 #define ALGEBRA_CURVES_FRP_V1_HPP
 
-#include <nil/algebra/fields/frp_v1/fq.hpp>
+#include <nil/algebra/fields/frp_v1/base_field.hpp>
 #include <nil/algebra/fields/frp_v1/fr.hpp>
 
 #include <nil/algebra/detail/literals.hpp>

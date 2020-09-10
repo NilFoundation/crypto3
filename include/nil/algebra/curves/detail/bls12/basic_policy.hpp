@@ -10,7 +10,7 @@
 #ifndef ALGEBRA_CURVES_BLS12_BASIC_POLICY_HPP
 #define ALGEBRA_CURVES_BLS12_BASIC_POLICY_HPP
 
-#include <nil/algebra/fields/bls12/fq.hpp>
+#include <nil/algebra/fields/bls12/base_field.hpp>
 #include <nil/algebra/fields/bls12/fr.hpp>
 
 #include <nil/algebra/detail/literals.hpp>

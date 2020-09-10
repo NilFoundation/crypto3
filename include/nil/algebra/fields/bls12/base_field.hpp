@@ -27,10 +27,10 @@ namespace nil {
              * @tparam GeneratorBits
              */
             template<std::size_t ModulusBits, std::size_t GeneratorBits = CHAR_BIT>
-            struct bls12_fq : public field<ModulusBits, GeneratorBits> { };
+            struct bls12_base_field : public field<ModulusBits, GeneratorBits> { };
 
             template<>
-            struct bls12_fq<381, CHAR_BIT> : public field<381, CHAR_BIT> {
+            struct bls12_base_field<381, CHAR_BIT> : public field<381, CHAR_BIT> {
                 typedef field<381, CHAR_BIT> policy_type;
 
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
@@ -44,13 +44,13 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x02;
 
-                typedef typename detail::element_fp<detail::extension_params<bls12_fq<381, CHAR_BIT>>> value_type;
+                typedef typename detail::element_fp<detail::extension_params<bls12_base_field<381, CHAR_BIT>>> value_type;
 
                 constexpr static const std::size_t arity = 1;
             };
 
             template<>
-            struct bls12_fq<377, CHAR_BIT> : public field<377, CHAR_BIT> {
+            struct bls12_base_field<377, CHAR_BIT> : public field<377, CHAR_BIT> {
                 typedef field<377, CHAR_BIT> policy_type;
 
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
@@ -64,16 +64,26 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x0F;
 
-                typedef typename detail::element_fp<detail::extension_params<bls12_fq<377, CHAR_BIT>>> value_type;
+                typedef typename detail::element_fp<detail::extension_params<bls12_base_field<377, CHAR_BIT>>> value_type;
 
                 constexpr static const std::size_t arity = 1;
             };
 
-            constexpr typename bls12_fq<381, CHAR_BIT>::modulus_type const bls12_fq<381, CHAR_BIT>::modulus;
-            constexpr typename bls12_fq<377, CHAR_BIT>::modulus_type const bls12_fq<377, CHAR_BIT>::modulus;
+            constexpr typename bls12_base_field<381, CHAR_BIT>::modulus_type const bls12_base_field<381, CHAR_BIT>::modulus;
+            constexpr typename bls12_base_field<377, CHAR_BIT>::modulus_type const bls12_base_field<377, CHAR_BIT>::modulus;
 
-            constexpr typename bls12_fq<381, CHAR_BIT>::generator_type const bls12_fq<381, CHAR_BIT>::mul_generator;
-            constexpr typename bls12_fq<377, CHAR_BIT>::generator_type const bls12_fq<377, CHAR_BIT>::mul_generator;
+            constexpr typename bls12_base_field<381, CHAR_BIT>::generator_type const bls12_base_field<381, CHAR_BIT>::mul_generator;
+            constexpr typename bls12_base_field<377, CHAR_BIT>::generator_type const bls12_base_field<377, CHAR_BIT>::mul_generator;
+
+            template<std::size_t ModulusBits = 381, std::size_t GeneratorBits = CHAR_BIT>
+            using bls12_fq = bls12_base_field<ModulusBits, GeneratorBits>;
+            template<std::size_t ModulusBits = 377, std::size_t GeneratorBits = CHAR_BIT>
+            using bls12_fq = bls12_base_field<ModulusBits, GeneratorBits>;
+
+            template<std::size_t ModulusBits = 381, std::size_t GeneratorBits = CHAR_BIT>
+            using bls12 = bls12_base_field<ModulusBits, GeneratorBits>;
+            template<std::size_t ModulusBits = 377, std::size_t GeneratorBits = CHAR_BIT>
+            using bls12 = bls12_base_field<ModulusBits, GeneratorBits>;
 
         }    // namespace fields
     }        // namespace algebra
