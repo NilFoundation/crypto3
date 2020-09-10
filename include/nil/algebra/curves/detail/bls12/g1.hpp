@@ -134,7 +134,7 @@ namespace nil {
 
                         // handle double case
                         if (this->operator==(other)) {
-                            return this->dbl();
+                            return this->doubled();
                         }
 
                         // NOTE: does not handle O and pts of order 2,4
@@ -169,7 +169,7 @@ namespace nil {
                         return (*this) + (-other);
                     }
 
-                    bls12_g1 dbl() const {
+                    bls12_g1 doubled() const {
 
                         // handle point at infinity
                         if (this->is_zero()) {
@@ -237,7 +237,7 @@ namespace nil {
 
                         if (U1 == U2 && S1 == S2) {
                             // dbl case; nothing of above can be reused
-                            return this->dbl();
+                            return this->doubled();
                         }
 
                         // NOTE: does not handle O and pts of order 2,4
@@ -265,7 +265,7 @@ namespace nil {
                             this->p[1] = underlying_field_type_value::one();
                             this->p[2] = underlying_field_type_value::zero();
                         } else {
-                            underlying_field_type_value Z_inv = Z.inverse();
+                            underlying_field_type_value Z_inv = Z.inversed();
                             underlying_field_type_value Z2_inv = Z_inv.squared();
                             underlying_field_type_value Z3_inv = Z2_inv * Z_inv;
                             this->p[0] = this->p[0] * Z2_inv;
@@ -404,7 +404,7 @@ namespace nil {
 
                         // handle double case
                         if (this->operator==(other)) {
-                            return this->dbl();
+                            return this->doubled();
                         }
 
                         // NOTE: does not handle O and pts of order 2,4
@@ -439,7 +439,7 @@ namespace nil {
                         return (*this) + (-other);
                     }
 
-                    bls12_g1 dbl() const {
+                    bls12_g1 doubled() const {
 
                         // handle point at infinity
                         if (this->is_zero()) {
@@ -507,7 +507,7 @@ namespace nil {
 
                         if (U1 == U2 && S1 == S2) {
                             // dbl case; nothing of above can be reused
-                            return this->dbl();
+                            return this->doubled();
                         }
 
                         // NOTE: does not handle O and pts of order 2,4
@@ -535,7 +535,7 @@ namespace nil {
                             this->p[1] = underlying_field_type_value::one();
                             this->p[2] = underlying_field_type_value::zero();
                         } else {
-                            underlying_field_type_value Z_inv = Z.inverse();
+                            underlying_field_type_value Z_inv = Z.inversed();
                             underlying_field_type_value Z2_inv = Z_inv.squared();
                             underlying_field_type_value Z3_inv = Z2_inv * Z_inv;
                             this->p[0] = this->p[0] * Z2_inv;
