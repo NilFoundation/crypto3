@@ -11,8 +11,8 @@
 #define ALGEBRA_FIELDS_ELEMENT_FP_HPP
 
 #include <nil/algebra/fields/detail/exponentiation.hpp>
-//#include <boost/multiprecision/ressol.hpp>
-//#include <boost/multiprecision/modular/inverse.hpp>
+#include <boost/multiprecision/ressol.hpp>
+#include <boost/multiprecision/modular/inverse.hpp>
 
 namespace nil {
     namespace algebra {
@@ -109,19 +109,12 @@ namespace nil {
                     }
 
                     element_fp sqrt() const {
-                        //return element_fp(ressol(data, modulus), modulus);
-                        return *this;
+                        return element_fp(ressol(data));
                     }
 
                     element_fp inversed() const {
 
-                        /*boost::multiprecision::cpp_int_backend<> mod = modulus.backend(), tmp;
-                        tmp = boost::multiprecision::inverse_extended_euclidean_algorithm(data.backend().base_data(),
-                                                                                          mod);
-                        value_type res;
-                        assign_components(res.backend(), tmp, mod);
-                        return element_fp(res);*/
-                        return *this;
+                        return element_fp(inverse_extended_euclidean_algorithm(data));
                     }
 
                     element_fp _2z_add_3x() {
