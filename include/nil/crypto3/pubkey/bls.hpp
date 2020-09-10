@@ -9,6 +9,7 @@
 #ifndef CRYPTO3_PUBKEY_BLS_HPP
 #define CRYPTO3_PUBKEY_BLS_HPP
 
+#include <nil/algebra/algorithms/pair.hpp>
 #include <nil/algebra/curves/bls12.hpp>
 #include <nil/algebra/pairing/bls12.hpp>
 
@@ -51,8 +52,8 @@ namespace nil {
 
                     signature_type hash = Hashing(val);
 
-                    return (algebra::pairing_policy<CurveType>::reduced_pairing(sign, key_type::value_type::one()) ==
-                            algebra::pairing_policy<CurveType>::reduced_pairing(hash, key));
+                    return (algebra::reduced_pair<CurveType>(sign, key_type::value_type::one()) ==
+                            algebra::reduced_pair<CurveType>(hash, key));
                 }
             };
 
