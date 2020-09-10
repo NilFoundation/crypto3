@@ -11,7 +11,7 @@
 #define ALGEBRA_CURVES_SM2P_V1_HPP
 
 #include <nil/algebra/fields/sm2p_v1/base_field.hpp>
-#include <nil/algebra/fields/sm2p_v1/fr.hpp>
+#include <nil/algebra/fields/sm2p_v1/scalar_field.hpp>
 
 #include <nil/algebra/detail/literals.hpp>
 

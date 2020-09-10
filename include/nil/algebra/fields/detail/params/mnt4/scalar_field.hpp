@@ -7,14 +7,14 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef ALGEBRA_FIELDS_EDWARDS_FR_PARAMS_HPP
-#define ALGEBRA_FIELDS_EDWARDS_FR_PARAMS_HPP
+#ifndef ALGEBRA_FIELDS_MNT4_FR_PARAMS_HPP
+#define ALGEBRA_FIELDS_MNT4_FR_PARAMS_HPP
 
 #include <nil/algebra/fields/detail/element/fp.hpp>
 #include <nil/algebra/fields/detail/element/fp2.hpp>
 #include <nil/algebra/fields/detail/params/params.hpp>
 
-#include <nil/algebra/fields/edwards/fr.hpp>
+#include <nil/algebra/fields/mnt4/scalar_field.hpp>
 
 #include <nil/algebra/detail/literals.hpp>
 
@@ -24,11 +24,11 @@ namespace nil {
             namespace detail {
 
                 template<std::size_t ModulusBits, std::size_t GeneratorBits>
-                struct extension_params<edwards_fr<ModulusBits, GeneratorBits>>
-                    : public params<edwards_fr<ModulusBits, GeneratorBits>> {
+                struct extension_params<mnt4_scalar_field<ModulusBits, GeneratorBits>>
+                    : public params<mnt4_scalar_field<ModulusBits, GeneratorBits>> {
                 private:
-                    typedef params<edwards_fr<ModulusBits, GeneratorBits>> policy_type;
-                    typedef extension_params<edwards_fr<ModulusBits, GeneratorBits>> element_policy_type;
+                    typedef params<mnt4_scalar_field<ModulusBits, GeneratorBits>> policy_type;
+                    typedef extension_params<mnt4_scalar_field<ModulusBits, GeneratorBits>> element_policy_type;
 
                 public:
                     typedef typename policy_type::number_type number_type;
@@ -36,7 +36,7 @@ namespace nil {
 
                     constexpr static const modulus_type modulus = policy_type::modulus;
                     constexpr static const modulus_type group_order =
-                        0x81ABF93A5472B62717249DC9709660EF2A993C0000000_cppui181;
+                        0x1DE7BDE6A39D133124ED3D82A47657764B1AE7A20CA7DA4A603C92EB569DDA19A5200000000_cppui297;
                 };
 
             }    // namespace detail
@@ -44,4 +44,4 @@ namespace nil {
     }            // namespace algebra
 }    // namespace nil
 
-#endif    // ALGEBRA_FIELDS_EDWARDS_FR_PARAMS_HPP
+#endif    // ALGEBRA_FIELDS_MNT4_FR_PARAMS_HPP

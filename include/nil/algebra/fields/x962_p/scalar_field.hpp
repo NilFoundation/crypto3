@@ -27,16 +27,16 @@ namespace nil {
              * @tparam GeneratorBits
              */
             template<std::size_t ModulusBits, std::size_t GeneratorBits = CHAR_BIT>
-            struct x962_p_v1_fr : public field<ModulusBits, GeneratorBits> { };
+            struct x962_p_v1_scalar_field : public field<ModulusBits, GeneratorBits> { };
 
             template<std::size_t ModulusBits, std::size_t GeneratorBits = CHAR_BIT>
-            struct x962_p_v2_fr : public field<ModulusBits, GeneratorBits> { };
+            struct x962_p_v2_scalar_field : public field<ModulusBits, GeneratorBits> { };
 
             template<std::size_t ModulusBits, std::size_t GeneratorBits = CHAR_BIT>
-            struct x962_p_v3_fr : public field<ModulusBits, GeneratorBits> { };
+            struct x962_p_v3_scalar_field : public field<ModulusBits, GeneratorBits> { };
 
             template<>
-            struct x962_p_v2_fr<192, CHAR_BIT> : public field<192, CHAR_BIT> {
+            struct x962_p_v2_scalar_field<192, CHAR_BIT> : public field<192, CHAR_BIT> {
                 typedef field<192, CHAR_BIT> policy_type;
 
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
@@ -50,13 +50,13 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x03;
 
-                typedef typename detail::element_fp<detail::extension_params<x962_p_v2_fr<192, CHAR_BIT>>> value_type;
+                typedef typename detail::element_fp<detail::extension_params<x962_p_v2_scalar_field<192, CHAR_BIT>>> value_type;
 
                 constexpr static const std::size_t arity = 1;
             };
 
             template<>
-            struct x962_p_v3_fr<192, CHAR_BIT> : public field<192, CHAR_BIT> {
+            struct x962_p_v3_scalar_field<192, CHAR_BIT> : public field<192, CHAR_BIT> {
                 typedef field<192, CHAR_BIT> policy_type;
 
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
@@ -70,13 +70,13 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x03;
 
-                typedef typename detail::element_fp<detail::extension_params<x962_p_v3_fr<192, CHAR_BIT>>> value_type;
+                typedef typename detail::element_fp<detail::extension_params<x962_p_v3_scalar_field<192, CHAR_BIT>>> value_type;
 
                 constexpr static const std::size_t arity = 1;
             };
 
             template<>
-            struct x962_p_v1_fr<239, CHAR_BIT> : public field<239, CHAR_BIT> {
+            struct x962_p_v1_scalar_field<239, CHAR_BIT> : public field<239, CHAR_BIT> {
                 typedef field<239, CHAR_BIT> policy_type;
 
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
@@ -90,13 +90,13 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x03;
 
-                typedef typename detail::element_fp<detail::extension_params<x962_p_v1_fr<239, CHAR_BIT>>> value_type;
+                typedef typename detail::element_fp<detail::extension_params<x962_p_v1_scalar_field<239, CHAR_BIT>>> value_type;
 
                 constexpr static const std::size_t arity = 1;
             };
 
             template<>
-            struct x962_p_v2_fr<239, CHAR_BIT> : public field<239, CHAR_BIT> {
+            struct x962_p_v2_scalar_field<239, CHAR_BIT> : public field<239, CHAR_BIT> {
                 typedef field<239, CHAR_BIT> policy_type;
 
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
@@ -110,13 +110,13 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x03;
 
-                typedef typename detail::element_fp<detail::extension_params<x962_p_v2_fr<239, CHAR_BIT>>> value_type;
+                typedef typename detail::element_fp<detail::extension_params<x962_p_v2_scalar_field<239, CHAR_BIT>>> value_type;
 
                 constexpr static const std::size_t arity = 1;
             };
 
             template<>
-            struct x962_p_v3_fr<239, CHAR_BIT> : public field<239, CHAR_BIT> {
+            struct x962_p_v3_scalar_field<239, CHAR_BIT> : public field<239, CHAR_BIT> {
                 typedef field<239, CHAR_BIT> policy_type;
 
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
@@ -130,27 +130,39 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x03;
 
-                typedef typename detail::element_fp<detail::extension_params<x962_p_v3_fr<239, CHAR_BIT>>> value_type;
+                typedef typename detail::element_fp<detail::extension_params<x962_p_v3_scalar_field<239, CHAR_BIT>>> value_type;
 
                 constexpr static const std::size_t arity = 1;
             };
 
-            constexpr typename x962_p_v2_fr<192, CHAR_BIT>::modulus_type const x962_p_v2_fr<192, CHAR_BIT>::modulus;
-            constexpr typename x962_p_v3_fr<192, CHAR_BIT>::modulus_type const x962_p_v3_fr<192, CHAR_BIT>::modulus;
-            constexpr typename x962_p_v1_fr<239, CHAR_BIT>::modulus_type const x962_p_v1_fr<239, CHAR_BIT>::modulus;
-            constexpr typename x962_p_v2_fr<239, CHAR_BIT>::modulus_type const x962_p_v2_fr<239, CHAR_BIT>::modulus;
-            constexpr typename x962_p_v3_fr<239, CHAR_BIT>::modulus_type const x962_p_v3_fr<239, CHAR_BIT>::modulus;
+            constexpr typename x962_p_v2_scalar_field<192, CHAR_BIT>::modulus_type const x962_p_v2_scalar_field<192, CHAR_BIT>::modulus;
+            constexpr typename x962_p_v3_scalar_field<192, CHAR_BIT>::modulus_type const x962_p_v3_scalar_field<192, CHAR_BIT>::modulus;
+            constexpr typename x962_p_v1_scalar_field<239, CHAR_BIT>::modulus_type const x962_p_v1_scalar_field<239, CHAR_BIT>::modulus;
+            constexpr typename x962_p_v2_scalar_field<239, CHAR_BIT>::modulus_type const x962_p_v2_scalar_field<239, CHAR_BIT>::modulus;
+            constexpr typename x962_p_v3_scalar_field<239, CHAR_BIT>::modulus_type const x962_p_v3_scalar_field<239, CHAR_BIT>::modulus;
 
             constexpr
-                typename x962_p_v2_fr<192, CHAR_BIT>::generator_type const x962_p_v1_fr<192, CHAR_BIT>::mul_generator;
+                typename x962_p_v2_scalar_field<192, CHAR_BIT>::generator_type const x962_p_v1_scalar_field<192, CHAR_BIT>::mul_generator;
             constexpr
-                typename x962_p_v3_fr<192, CHAR_BIT>::generator_type const x962_p_v3_fr<192, CHAR_BIT>::mul_generator;
+                typename x962_p_v3_scalar_field<192, CHAR_BIT>::generator_type const x962_p_v3_scalar_field<192, CHAR_BIT>::mul_generator;
             constexpr
-                typename x962_p_v1_fr<239, CHAR_BIT>::generator_type const x962_p_v1_fr<239, CHAR_BIT>::mul_generator;
+                typename x962_p_v1_scalar_field<239, CHAR_BIT>::generator_type const x962_p_v1_scalar_field<239, CHAR_BIT>::mul_generator;
             constexpr
-                typename x962_p_v2_fr<239, CHAR_BIT>::generator_type const x962_p_v2_fr<239, CHAR_BIT>::mul_generator;
+                typename x962_p_v2_scalar_field<239, CHAR_BIT>::generator_type const x962_p_v2_scalar_field<239, CHAR_BIT>::mul_generator;
             constexpr
-                typename x962_p_v3_fr<239, CHAR_BIT>::generator_type const x962_p_v3_fr<239, CHAR_BIT>::mul_generator;
+                typename x962_p_v3_scalar_field<239, CHAR_BIT>::generator_type const x962_p_v3_scalar_field<239, CHAR_BIT>::mul_generator;
+
+            template<std::size_t ModulusBits = 192, std::size_t GeneratorBits = CHAR_BIT>
+            using x962_p_v2_fr = x962_p_v2_scalar_field_field<ModulusBits, GeneratorBits>;
+            template<std::size_t ModulusBits = 192, std::size_t GeneratorBits = CHAR_BIT>
+            using x962_p_v3_fr = x962_p_v3_scalar_field_field<ModulusBits, GeneratorBits>;
+            template<std::size_t ModulusBits = 239, std::size_t GeneratorBits = CHAR_BIT>
+            using x962_p_v1_fr = x962_p_v1_scalar_field_field<ModulusBits, GeneratorBits>;
+            template<std::size_t ModulusBits = 239, std::size_t GeneratorBits = CHAR_BIT>
+            using x962_p_v2_fr = x962_p_v2_scalar_field_field<ModulusBits, GeneratorBits>;
+            template<std::size_t ModulusBits = 239, std::size_t GeneratorBits = CHAR_BIT>
+            using x962_p_v3_fr = x962_p_v3_scalar_field_field<ModulusBits, GeneratorBits>;
+
         }    // namespace fields
     }        // namespace algebra
 }    // namespace nil

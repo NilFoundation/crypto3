@@ -11,7 +11,7 @@
 #define ALGEBRA_CURVES_SECP_HPP
 
 #include <nil/algebra/fields/secp/base_field.hpp>
-#include <nil/algebra/fields/secp/fr.hpp>
+#include <nil/algebra/fields/secp/scalar_field.hpp>
 
 #include <nil/algebra/detail/literals.hpp>
 

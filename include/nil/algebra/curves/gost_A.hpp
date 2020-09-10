@@ -11,7 +11,7 @@
 #define ALGEBRA_CURVES_GOST_A_HPP
 
 #include <nil/algebra/fields/gost_A/base_field.hpp>
-#include <nil/algebra/fields/gost_A/fr.hpp>
+#include <nil/algebra/fields/gost_A/scalar_field.hpp>
 
 #include <nil/algebra/detail/literals.hpp>
 

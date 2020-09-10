@@ -16,9 +16,9 @@
 
 #include <nil/algebra/fields/fp2.hpp>
 #include <nil/algebra/fields/bls12/base_field.hpp>
-#include <nil/algebra/fields/bls12/fr.hpp>
+#include <nil/algebra/fields/bls12/scalar_field.hpp>
 #include <nil/algebra/fields/bn128/base_field.hpp>
-#include <nil/algebra/fields/bn128/fr.hpp>
+#include <nil/algebra/fields/bn128/scalar_field.hpp>
 #include <nil/algebra/fields/dsa_botan.hpp>
 #include <nil/algebra/fields/dsa_jce.hpp>
 #include <nil/algebra/fields/detail/params/bn128/base_field.hpp>

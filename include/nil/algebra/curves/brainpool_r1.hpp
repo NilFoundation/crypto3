@@ -14,7 +14,7 @@
 #include <nil/algebra/curves/detail/brainpool_r1/g2.hpp>
 
 #include <nil/algebra/fields/brainpool_r1/base_field.hpp>
-#include <nil/algebra/fields/brainpool_r1/fr.hpp>
+#include <nil/algebra/fields/brainpool_r1/scalar_field.hpp>
 
 #include <nil/algebra/detail/literals.hpp>
 

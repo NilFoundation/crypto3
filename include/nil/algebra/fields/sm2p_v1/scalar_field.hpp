@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef ALGEBRA_FIELDS_BN128_FR_HPP
-#define ALGEBRA_FIELDS_BN128_FR_HPP
+#ifndef ALGEBRA_FIELDS_SM2P_V1_FR_HPP
+#define ALGEBRA_FIELDS_SM2P_V1_FR_HPP
 
 #include <nil/algebra/fields/detail/element/fp.hpp>
 #include <nil/algebra/fields/detail/params/params.hpp>
@@ -27,34 +27,37 @@ namespace nil {
              * @tparam GeneratorBits
              */
             template<std::size_t ModulusBits, std::size_t GeneratorBits = CHAR_BIT>
-            struct bn128_fr : public field<ModulusBits, GeneratorBits> { };
+            struct sm2p_v1_scalar_field : public field<ModulusBits, GeneratorBits> { };
 
             template<>
-            struct bn128_fr<254, CHAR_BIT> : public field<254, CHAR_BIT> {
-                typedef field<254, CHAR_BIT> policy_type;
+            struct sm2p_v1_scalar_field<256, CHAR_BIT> : public field<256, CHAR_BIT> {
+                typedef field<256, CHAR_BIT> policy_type;
 
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                 typedef typename policy_type::modulus_type modulus_type;
 
                 constexpr static const modulus_type modulus =
-                    0x30644E72E131A029B85045B68181585D2833E84879B9709143E1F593F0000001_cppui254;
+                    0xFFFFFFFEFFFFFFFFFFFFFFFFFFFFFFFF7203DF6B21C6052B53BBF40939D54123_cppui256;
 
                 constexpr static const std::size_t generator_bits = policy_type::generator_bits;
                 typedef typename policy_type::generator_type generator_type;
 
-                constexpr static const generator_type mul_generator = 0x05;
+                constexpr static const generator_type mul_generator = 0x03;
 
-                typedef typename detail::element_fp<detail::extension_params<bn128_fr<254, CHAR_BIT>>> value_type;
+                typedef typename detail::element_fp<detail::extension_params<sm2p_v1_scalar_field<256, CHAR_BIT>>> value_type;
 
                 constexpr static const std::size_t arity = 1;
             };
 
-            constexpr typename bn128_fr<254, CHAR_BIT>::modulus_type const bn128_fr<254, CHAR_BIT>::modulus;
+            constexpr typename sm2p_v1_scalar_field<256, CHAR_BIT>::modulus_type const sm2p_v1_scalar_field<256, CHAR_BIT>::modulus;
 
-            constexpr typename bn128_fr<254, CHAR_BIT>::generator_type const bn128_fr<254, CHAR_BIT>::mul_generator;
-
+            constexpr typename sm2p_v1_scalar_field<256, CHAR_BIT>::generator_type const sm2p_v1_scalar_field<256, CHAR_BIT>::mul_generator;
+            
+            template<std::size_t ModulusBits = 256, std::size_t GeneratorBits = CHAR_BIT>
+            using sm2p_v1_fr = sm2p_v1_scalar_field<ModulusBits, GeneratorBits>;
+            
         }    // namespace fields
     }        // namespace algebra
 }    // namespace nil
 
-#endif    // ALGEBRA_FIELDS_BN128_FR_HPP
+#endif    // ALGEBRA_FIELDS_SM2P_V1_FR_HPP

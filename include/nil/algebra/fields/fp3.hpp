@@ -13,27 +13,27 @@
 #include <nil/algebra/fields/detail/element/fp3.hpp>
 #include <nil/algebra/fields/detail/params/params.hpp>
 //#include <nil/algebra/fields/detail/params/alt_bn128/base_field.hpp>
-//#include <nil/algebra/fields/detail/params/alt_bn128/fr.hpp>
+//#include <nil/algebra/fields/detail/params/alt_bn128/scalar_field.hpp>
 //#include <nil/algebra/fields/detail/params/bls12/base_field.hpp>
-//#include <nil/algebra/fields/detail/params/bls12/fr.hpp>
+//#include <nil/algebra/fields/detail/params/bls12/scalar_field.hpp>
 #include <nil/algebra/fields/detail/params/bn128/base_field.hpp>
-#include <nil/algebra/fields/detail/params/bn128/fr.hpp>
+#include <nil/algebra/fields/detail/params/bn128/scalar_field.hpp>
 #include <nil/algebra/fields/detail/params/edwards/base_field.hpp>
-#include <nil/algebra/fields/detail/params/edwards/fr.hpp>
+#include <nil/algebra/fields/detail/params/edwards/scalar_field.hpp>
 /*#include <nil/algebra/fields/detail/params/frp_v1/base_field.hpp>
-#include <nil/algebra/fields/detail/params/frp_v1/fr.hpp>
+#include <nil/algebra/fields/detail/params/frp_v1/scalar_field.hpp>
 #include <nil/algebra/fields/detail/params/gost_A/base_field.hpp>
-#include <nil/algebra/fields/detail/params/gost_A/fr.hpp>*/
+#include <nil/algebra/fields/detail/params/gost_A/scalar_field.hpp>*/
 #include <nil/algebra/fields/detail/params/mnt4/base_field.hpp>
-#include <nil/algebra/fields/detail/params/mnt4/fr.hpp>
+#include <nil/algebra/fields/detail/params/mnt4/scalar_field.hpp>
 #include <nil/algebra/fields/detail/params/mnt6/base_field.hpp>
-#include <nil/algebra/fields/detail/params/mnt6/fr.hpp>
+#include <nil/algebra/fields/detail/params/mnt6/scalar_field.hpp>
 /*#include <nil/algebra/fields/detail/params/secp/base_field.hpp>
-#include <nil/algebra/fields/detail/params/secp/fr.hpp>
+#include <nil/algebra/fields/detail/params/secp/scalar_field.hpp>
 #include <nil/algebra/fields/detail/params/sm2p_v1/base_field.hpp>
-#include <nil/algebra/fields/detail/params/sm2p_v1/fr.hpp>
+#include <nil/algebra/fields/detail/params/sm2p_v1/scalar_field.hpp>
 #include <nil/algebra/fields/detail/params/x962_p/base_field.hpp>
-#include <nil/algebra/fields/detail/params/x962_p/fr.hpp>*/
+#include <nil/algebra/fields/detail/params/x962_p/scalar_field.hpp>*/
 
 namespace nil {
     namespace algebra {

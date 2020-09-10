@@ -27,16 +27,16 @@ namespace nil {
              * @tparam GeneratorBits
              */
             template<std::size_t ModulusBits, std::size_t GeneratorBits = CHAR_BIT>
-            struct secp_k1_fr : public field<ModulusBits, GeneratorBits> { };
+            struct secp_k1_scalar_field : public field<ModulusBits, GeneratorBits> { };
 
             template<std::size_t ModulusBits, std::size_t GeneratorBits = CHAR_BIT>
-            struct secp_r1_fr : public field<ModulusBits, GeneratorBits> { };
+            struct secp_r1_scalar_field : public field<ModulusBits, GeneratorBits> { };
 
             template<std::size_t ModulusBits, std::size_t GeneratorBits = CHAR_BIT>
-            struct secp_r2_fr : public field<ModulusBits, GeneratorBits> { };
+            struct secp_r2_scalar_field : public field<ModulusBits, GeneratorBits> { };
 
             template<>
-            struct secp_k1_fr<160, CHAR_BIT> : public field<160, CHAR_BIT> {
+            struct secp_k1_scalar_field<160, CHAR_BIT> : public field<160, CHAR_BIT> {
                 typedef field<160, CHAR_BIT> policy_type;
 
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
@@ -49,13 +49,13 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x03;
 
-                typedef typename detail::element_fp<detail::extension_params<secp_k1_fr<160, CHAR_BIT>>> value_type;
+                typedef typename detail::element_fp<detail::extension_params<secp_k1_scalar_field<160, CHAR_BIT>>> value_type;
 
                 constexpr static const std::size_t arity = 1;
             };
 
             template<>
-            struct secp_r1_fr<160, CHAR_BIT> : public field<160, CHAR_BIT> {
+            struct secp_r1_scalar_field<160, CHAR_BIT> : public field<160, CHAR_BIT> {
                 typedef field<160, CHAR_BIT> policy_type;
 
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
@@ -68,13 +68,13 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x03;
 
-                typedef typename detail::element_fp<detail::extension_params<secp_r1_fr<160, CHAR_BIT>>> value_type;
+                typedef typename detail::element_fp<detail::extension_params<secp_r1_scalar_field<160, CHAR_BIT>>> value_type;
 
                 constexpr static const std::size_t arity = 1;
             };
 
             template<>
-            struct secp_r2_fr<160, CHAR_BIT> : public field<160, CHAR_BIT> {
+            struct secp_r2_scalar_field<160, CHAR_BIT> : public field<160, CHAR_BIT> {
                 typedef field<160, CHAR_BIT> policy_type;
 
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
@@ -87,13 +87,13 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x03;
 
-                typedef typename detail::element_fp<detail::extension_params<secp_r2_fr<160, CHAR_BIT>>> value_type;
+                typedef typename detail::element_fp<detail::extension_params<secp_r2_scalar_field<160, CHAR_BIT>>> value_type;
 
                 constexpr static const std::size_t arity = 1;
             };
 
             template<>
-            struct secp_k1_fr<192, CHAR_BIT> : public field<192, CHAR_BIT> {
+            struct secp_k1_scalar_field<192, CHAR_BIT> : public field<192, CHAR_BIT> {
                 typedef field<192, CHAR_BIT> policy_type;
 
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
@@ -107,13 +107,13 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x03;
 
-                typedef typename detail::element_fp<detail::extension_params<secp_k1_fr<192, CHAR_BIT>>> value_type;
+                typedef typename detail::element_fp<detail::extension_params<secp_k1_scalar_field<192, CHAR_BIT>>> value_type;
 
                 constexpr static const std::size_t arity = 1;
             };
 
             template<>
-            struct secp_r1_fr<192, CHAR_BIT> : public field<192, CHAR_BIT> {
+            struct secp_r1_scalar_field<192, CHAR_BIT> : public field<192, CHAR_BIT> {
                 typedef field<192, CHAR_BIT> policy_type;
 
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
@@ -127,13 +127,13 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x03;
 
-                typedef typename detail::element_fp<detail::extension_params<secp_r1_fr<192, CHAR_BIT>>> value_type;
+                typedef typename detail::element_fp<detail::extension_params<secp_r1_scalar_field<192, CHAR_BIT>>> value_type;
 
                 constexpr static const std::size_t arity = 1;
             };
 
             template<>
-            struct secp_k1_fr<224, CHAR_BIT> : public field<224, CHAR_BIT> {
+            struct secp_k1_scalar_field<224, CHAR_BIT> : public field<224, CHAR_BIT> {
                 typedef field<224, CHAR_BIT> policy_type;
 
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
@@ -147,13 +147,13 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x03;
 
-                typedef typename detail::element_fp<detail::extension_params<secp_k1_fr<224, CHAR_BIT>>> value_type;
+                typedef typename detail::element_fp<detail::extension_params<secp_k1_scalar_field<224, CHAR_BIT>>> value_type;
 
                 constexpr static const std::size_t arity = 1;
             };
 
             template<>
-            struct secp_r1_fr<224, CHAR_BIT> : public field<224, CHAR_BIT> {
+            struct secp_r1_scalar_field<224, CHAR_BIT> : public field<224, CHAR_BIT> {
                 typedef field<224, CHAR_BIT> policy_type;
 
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
@@ -167,13 +167,13 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x03;
 
-                typedef typename detail::element_fp<detail::extension_params<secp_r1_fr<224, CHAR_BIT>>> value_type;
+                typedef typename detail::element_fp<detail::extension_params<secp_r1_scalar_field<224, CHAR_BIT>>> value_type;
 
                 constexpr static const std::size_t arity = 1;
             };
 
             template<>
-            struct secp_k1_fr<256, CHAR_BIT> : public field<256, CHAR_BIT> {
+            struct secp_k1_scalar_field<256, CHAR_BIT> : public field<256, CHAR_BIT> {
                 typedef field<256, CHAR_BIT> policy_type;
 
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
@@ -187,28 +187,45 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x03;
 
-                typedef typename detail::element_fp<detail::extension_params<secp_k1_fr<256, CHAR_BIT>>> value_type;
+                typedef typename detail::element_fp<detail::extension_params<secp_k1_scalar_field<256, CHAR_BIT>>> value_type;
 
                 constexpr static const std::size_t arity = 1;
             };
 
-            constexpr typename secp_k1_fr<160, CHAR_BIT>::modulus_type const secp_k1_fr<160, CHAR_BIT>::modulus;
-            constexpr typename secp_r1_fr<160, CHAR_BIT>::modulus_type const secp_r1_fr<160, CHAR_BIT>::modulus;
-            constexpr typename secp_r2_fr<160, CHAR_BIT>::modulus_type const secp_r2_fr<160, CHAR_BIT>::modulus;
-            constexpr typename secp_k1_fr<192, CHAR_BIT>::modulus_type const secp_k1_fr<192, CHAR_BIT>::modulus;
-            constexpr typename secp_r1_fr<192, CHAR_BIT>::modulus_type const secp_r1_fr<192, CHAR_BIT>::modulus;
-            constexpr typename secp_k1_fr<224, CHAR_BIT>::modulus_type const secp_k1_fr<224, CHAR_BIT>::modulus;
-            constexpr typename secp_r1_fr<224, CHAR_BIT>::modulus_type const secp_r1_fr<224, CHAR_BIT>::modulus;
-            constexpr typename secp_k1_fr<256, CHAR_BIT>::modulus_type const secp_k1_fr<256, CHAR_BIT>::modulus;
+            constexpr typename secp_k1_scalar_field<160, CHAR_BIT>::modulus_type const secp_k1_scalar_field<160, CHAR_BIT>::modulus;
+            constexpr typename secp_r1_scalar_field<160, CHAR_BIT>::modulus_type const secp_r1_scalar_field<160, CHAR_BIT>::modulus;
+            constexpr typename secp_r2_scalar_field<160, CHAR_BIT>::modulus_type const secp_r2_scalar_field<160, CHAR_BIT>::modulus;
+            constexpr typename secp_k1_scalar_field<192, CHAR_BIT>::modulus_type const secp_k1_scalar_field<192, CHAR_BIT>::modulus;
+            constexpr typename secp_r1_scalar_field<192, CHAR_BIT>::modulus_type const secp_r1_scalar_field<192, CHAR_BIT>::modulus;
+            constexpr typename secp_k1_scalar_field<224, CHAR_BIT>::modulus_type const secp_k1_scalar_field<224, CHAR_BIT>::modulus;
+            constexpr typename secp_r1_scalar_field<224, CHAR_BIT>::modulus_type const secp_r1_scalar_field<224, CHAR_BIT>::modulus;
+            constexpr typename secp_k1_scalar_field<256, CHAR_BIT>::modulus_type const secp_k1_scalar_field<256, CHAR_BIT>::modulus;
 
-            constexpr typename secp_k1_fr<160, CHAR_BIT>::generator_type const secp_k1_fr<160, CHAR_BIT>::mul_generator;
-            constexpr typename secp_r1_fr<160, CHAR_BIT>::generator_type const secp_r1_fr<160, CHAR_BIT>::mul_generator;
-            constexpr typename secp_r2_fr<160, CHAR_BIT>::generator_type const secp_r2_fr<160, CHAR_BIT>::mul_generator;
-            constexpr typename secp_k1_fr<192, CHAR_BIT>::generator_type const secp_k1_fr<192, CHAR_BIT>::mul_generator;
-            constexpr typename secp_r1_fr<192, CHAR_BIT>::generator_type const secp_r1_fr<192, CHAR_BIT>::mul_generator;
-            constexpr typename secp_k1_fr<224, CHAR_BIT>::generator_type const secp_k1_fr<224, CHAR_BIT>::mul_generator;
-            constexpr typename secp_r1_fr<224, CHAR_BIT>::generator_type const secp_r1_fr<224, CHAR_BIT>::mul_generator;
-            constexpr typename secp_k1_fr<256, CHAR_BIT>::generator_type const secp_k1_fr<256, CHAR_BIT>::mul_generator;
+            constexpr typename secp_k1_scalar_field<160, CHAR_BIT>::generator_type const secp_k1_scalar_field<160, CHAR_BIT>::mul_generator;
+            constexpr typename secp_r1_scalar_field<160, CHAR_BIT>::generator_type const secp_r1_scalar_field<160, CHAR_BIT>::mul_generator;
+            constexpr typename secp_r2_scalar_field<160, CHAR_BIT>::generator_type const secp_r2_scalar_field<160, CHAR_BIT>::mul_generator;
+            constexpr typename secp_k1_scalar_field<192, CHAR_BIT>::generator_type const secp_k1_scalar_field<192, CHAR_BIT>::mul_generator;
+            constexpr typename secp_r1_scalar_field<192, CHAR_BIT>::generator_type const secp_r1_scalar_field<192, CHAR_BIT>::mul_generator;
+            constexpr typename secp_k1_scalar_field<224, CHAR_BIT>::generator_type const secp_k1_scalar_field<224, CHAR_BIT>::mul_generator;
+            constexpr typename secp_r1_scalar_field<224, CHAR_BIT>::generator_type const secp_r1_scalar_field<224, CHAR_BIT>::mul_generator;
+            constexpr typename secp_k1_scalar_field<256, CHAR_BIT>::generator_type const secp_k1_scalar_field<256, CHAR_BIT>::mul_generator;
+
+            template<std::size_t ModulusBits = 160, std::size_t GeneratorBits = CHAR_BIT>
+            using secp_k1_fr = secp_k1_scalar_field<ModulusBits, GeneratorBits>;
+            template<std::size_t ModulusBits = 160, std::size_t GeneratorBits = CHAR_BIT>
+            using secp_r1_fr = secp_r1_scalar_field<ModulusBits, GeneratorBits>;
+            template<std::size_t ModulusBits = 160, std::size_t GeneratorBits = CHAR_BIT>
+            using secp_r2_fr = secp_r2_scalar_field<ModulusBits, GeneratorBits>;
+            template<std::size_t ModulusBits = 192, std::size_t GeneratorBits = CHAR_BIT>
+            using secp_k1_fr = secp_k1_scalar_field<ModulusBits, GeneratorBits>;
+            template<std::size_t ModulusBits = 192, std::size_t GeneratorBits = CHAR_BIT>
+            using secp_r1_fr = secp_r1_scalar_field<ModulusBits, GeneratorBits>;
+            template<std::size_t ModulusBits = 224, std::size_t GeneratorBits = CHAR_BIT>
+            using secp_k1_fr = secp_k1_scalar_field<ModulusBits, GeneratorBits>;
+            template<std::size_t ModulusBits = 224, std::size_t GeneratorBits = CHAR_BIT>
+            using secp_r1_fr = secp_r1_scalar_field<ModulusBits, GeneratorBits>;
+            template<std::size_t ModulusBits = 256, std::size_t GeneratorBits = CHAR_BIT>
+            using secp_k1_fr = secp_k1_scalar_field<ModulusBits, GeneratorBits>;
 
         }    // namespace fields
     }        // namespace algebra

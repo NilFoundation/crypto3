@@ -11,7 +11,7 @@
 #define ALGEBRA_CURVES_MNT6_BASIC_POLICY_HPP
 
 #include <nil/algebra/fields/mnt6/base_field.hpp>
-#include <nil/algebra/fields/mnt6/fr.hpp>
+#include <nil/algebra/fields/mnt6/scalar_field.hpp>
 
 #include <nil/algebra/detail/literals.hpp>
 

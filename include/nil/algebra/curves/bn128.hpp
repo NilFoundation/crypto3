@@ -14,7 +14,7 @@
 #include <nil/algebra/curves/detail/bn128/g2.hpp>
 
 #include <nil/algebra/fields/bn128/base_field.hpp>
-#include <nil/algebra/fields/bn128/fr.hpp>
+#include <nil/algebra/fields/bn128/scalar_field.hpp>
 #include <nil/algebra/fields/fp12_2over3over2.hpp>
 
 #include <nil/algebra/detail/literals.hpp>

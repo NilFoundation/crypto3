@@ -14,7 +14,7 @@
 #include <nil/algebra/fields/detail/element/fp2.hpp>
 #include <nil/algebra/fields/detail/params/params.hpp>
 
-#include <nil/algebra/fields/bls12/fr.hpp>
+#include <nil/algebra/fields/bls12/scalar_field.hpp>
 
 #include <nil/algebra/detail/literals.hpp>
 
@@ -24,10 +24,10 @@ namespace nil {
             namespace detail {
 
                 template<>
-                struct extension_params<bls12_fr<381, CHAR_BIT>> : public params<bls12_fr<381, CHAR_BIT>> {
+                struct extension_params<bls12_scalar_field<381, CHAR_BIT>> : public params<bls12_scalar_field<381, CHAR_BIT>> {
                 private:
-                    typedef params<bls12_fr<381, CHAR_BIT>> policy_type;
-                    typedef extension_params<bls12_fr<381, CHAR_BIT>> element_policy_type;
+                    typedef params<bls12_scalar_field<381, CHAR_BIT>> policy_type;
+                    typedef extension_params<bls12_scalar_field<381, CHAR_BIT>> element_policy_type;
 
                 public:
                     typedef typename policy_type::number_type number_type;
@@ -39,10 +39,10 @@ namespace nil {
                 };
 
                 template<>
-                struct extension_params<bls12_fr<377, CHAR_BIT>> : public params<bls12_fr<377, CHAR_BIT>> {
+                struct extension_params<bls12_scalar_field<377, CHAR_BIT>> : public params<bls12_scalar_field<377, CHAR_BIT>> {
                 private:
-                    typedef params<bls12_fr<377, CHAR_BIT>> policy_type;
-                    typedef extension_params<bls12_fr<377, CHAR_BIT>> element_policy_type;
+                    typedef params<bls12_scalar_field<377, CHAR_BIT>> policy_type;
+                    typedef extension_params<bls12_scalar_field<377, CHAR_BIT>> element_policy_type;
 
                 public:
                     typedef typename policy_type::number_type number_type;

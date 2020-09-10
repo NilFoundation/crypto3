@@ -11,7 +11,7 @@
 #define ALGEBRA_CURVES_ALT_BN128_BASIC_POLICY_HPP
 
 #include <nil/algebra/fields/alt_bn128/base_field.hpp>
-#include <nil/algebra/fields/alt_bn128/fr.hpp>
+#include <nil/algebra/fields/alt_bn128/scalar_field.hpp>
 
 #include <nil/algebra/detail/literals.hpp>
 

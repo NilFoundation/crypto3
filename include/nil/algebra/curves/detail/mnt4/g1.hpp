@@ -14,7 +14,7 @@
 #include <nil/algebra/curves/detail/mnt4/g2.hpp>
 
 #include <nil/algebra/fields/mnt4/base_field.hpp>
-#include <nil/algebra/fields/mnt4/fr.hpp>
+#include <nil/algebra/fields/mnt4/scalar_field.hpp>
 #include <nil/algebra/fields/fp2.hpp>
 
 #include <nil/algebra/detail/literals.hpp>
