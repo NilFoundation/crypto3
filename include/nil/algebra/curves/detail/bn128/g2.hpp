@@ -170,7 +170,7 @@ namespace nil {
                         Z1Z1 = p[2].squared();
                         Z2Z2 = other.p[2].squared();
                         U1 = p[0] * Z2Z2;
-                        U2 = other.p[0] * Z2Z2;
+                        U2 = other.p[0] * Z1Z1;
 
                         S1 = p[1] * other.p[2] * Z2Z2;
                         S2 = other.p[1] * p[2] * Z1Z1;
