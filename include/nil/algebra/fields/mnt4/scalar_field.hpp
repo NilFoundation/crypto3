@@ -27,10 +27,10 @@ namespace nil {
              * @tparam GeneratorBits
              */
             template<std::size_t ModulusBits, std::size_t GeneratorBits = CHAR_BIT>
-            struct mnt4_dscalar_field : public field<ModulusBits, GeneratorBits> { };
+            struct mnt4_scalar_field : public field<ModulusBits, GeneratorBits> { };
 
             template<>
-            struct mnt4_dscalar_field<298, CHAR_BIT> : public field<298, CHAR_BIT> {
+            struct mnt4_scalar_field<298, CHAR_BIT> : public field<298, CHAR_BIT> {
                 typedef field<298, CHAR_BIT> policy_type;
 
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
@@ -44,17 +44,17 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x0A;
 
-                typedef typename detail::element_fp<detail::extension_params<mnt4_dscalar_field<298, CHAR_BIT>>> value_type;
+                typedef typename detail::element_fp<detail::extension_params<mnt4_scalar_field<298, CHAR_BIT>>> value_type;
 
                 constexpr static const std::size_t arity = 1;
             };
 
-            constexpr typename mnt4_dscalar_field<298, CHAR_BIT>::modulus_type const mnt4_dscalar_field<298, CHAR_BIT>::modulus;
+            constexpr typename mnt4_scalar_field<298, CHAR_BIT>::modulus_type const mnt4_scalar_field<298, CHAR_BIT>::modulus;
 
-            constexpr typename mnt4_dscalar_field<298, CHAR_BIT>::generator_type const mnt4_dscalar_field<298, CHAR_BIT>::mul_generator;
+            constexpr typename mnt4_scalar_field<298, CHAR_BIT>::generator_type const mnt4_scalar_field<298, CHAR_BIT>::mul_generator;
 
             template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
-            using mn4_fr = mn4_scalar_field<ModulusBits, GeneratorBits>;
+            using mn4_fr = mnt4_scalar_field<ModulusBits, GeneratorBits>;
 
         }    // namespace fields
     }        // namespace algebra
