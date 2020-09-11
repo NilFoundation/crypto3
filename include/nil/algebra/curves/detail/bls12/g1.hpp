@@ -265,7 +265,7 @@ namespace nil {
                             this->p[1] = underlying_field_type_value::one();
                             this->p[2] = underlying_field_type_value::zero();
                         } else {
-                            underlying_field_type_value Z_inv = Z.inversed();
+                            underlying_field_type_value Z_inv = this->p[2].inversed();
                             underlying_field_type_value Z2_inv = Z_inv.squared();
                             underlying_field_type_value Z3_inv = Z2_inv * Z_inv;
                             this->p[0] = this->p[0] * Z2_inv;
@@ -535,7 +535,7 @@ namespace nil {
                             this->p[1] = underlying_field_type_value::one();
                             this->p[2] = underlying_field_type_value::zero();
                         } else {
-                            underlying_field_type_value Z_inv = Z.inversed();
+                            underlying_field_type_value Z_inv = this->p[2].inversed();
                             underlying_field_type_value Z2_inv = Z_inv.squared();
                             underlying_field_type_value Z3_inv = Z2_inv * Z_inv;
                             this->p[0] = this->p[0] * Z2_inv;
