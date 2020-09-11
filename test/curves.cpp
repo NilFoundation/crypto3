@@ -154,22 +154,20 @@ enum binary_operator_test_points : std::size_t {
 };
 
 template<typename CurveGroup>
-void do_binary_operators_checks(const std::vector<CurveGroup> &points, const std::vector<std::size_t> &constants) {
+void check_curve_operations(const std::vector<CurveGroup> &points, const std::vector<std::size_t> &constants) {
     BOOST_CHECK_EQUAL(points[p1] + points[p2], points[p1_plus_p2]);
     BOOST_CHECK_EQUAL(points[p1] - points[p2], points[p1_minus_p2]);
     BOOST_CHECK_EQUAL(points[p1].doubled(), points[p1_dbl]);
 }
 
-
-template<typename FpCurveGroup, typename PointsSetType>
-void binary_operators_test_fp_init(const PointsSetType &data_set) {
+template<typename FpCurveGroup, typename TestSet>
+void fp_curve_test_init(std::vector<FpCurveGroup> &points,
+                   std::vector<std::size_t> &constants,
+                   const TestSet &test_set) {
     using field_value_type = typename FpCurveGroup::underlying_field_type_value;
-
     std::array<field_value_type, 3> coordinates;
-    std::vector<FpCurveGroup> points;
-    std::vector<std::size_t> constants;
 
-    for (auto &point : data_set.second.get_child("point_coordinates")) {
+    for (auto &point : test_set.second.get_child("point_coordinates")) {
         auto i = 0;
         for (auto &coordinate : point.second) {
             coordinates[i++] = field_value_type(typename field_value_type::modulus_type(coordinate.second.data()));
@@ -177,23 +175,20 @@ void binary_operators_test_fp_init(const PointsSetType &data_set) {
         points.emplace_back(FpCurveGroup(coordinates[0], coordinates[1], coordinates[2]));
     }
 
-    for (auto &constant : data_set.second.get_child("constants")) {
+    for (auto &constant : test_set.second.get_child("constants")) {
         constants.emplace_back(std::stoul(constant.second.data()));
     }
-
-    do_binary_operators_checks(points, constants);
 }
 
-template<typename Fp2CurveGroup, typename PointsSetType>
-void binary_operators_test_fp2_init(const PointsSetType &data_set) {
+template<typename Fp2CurveGroup, typename TestSet>
+void fp2_curve_test_init(std::vector<Fp2CurveGroup> &points,
+                    std::vector<std::size_t> &constants,
+                    const TestSet &test_set) {
     using fp2_value_type = typename Fp2CurveGroup::underlying_field_type_value;
     using modulus_type = typename fp2_value_type::underlying_type::modulus_type;
-
     std::array<modulus_type, 6> coordinates;
-    std::vector<Fp2CurveGroup> points;
-    std::vector<std::size_t> constants;
 
-    for (auto &point : data_set.second.get_child("point_coordinates")) {
+    for (auto &point : test_set.second.get_child("point_coordinates")) {
         auto i = 0;
         for (auto &coordinate_pairs : point.second) {
             for (auto &coordinate : coordinate_pairs.second) {
@@ -206,23 +201,21 @@ void binary_operators_test_fp2_init(const PointsSetType &data_set) {
                                           fp2_value_type(coordinates[4], coordinates[5])));
     }
 
-    for (auto &constant : data_set.second.get_child("constants")) {
+    for (auto &constant : test_set.second.get_child("constants")) {
         constants.emplace_back(std::stoul(constant.second.data()));
     }
-
-    do_binary_operators_checks(points, constants);
 }
 
-template<typename Fp3CurveGroup, typename PointsSetType>
-void binary_operators_test_fp3_init(const PointsSetType &data_set) {
+template<typename Fp3CurveGroup, typename TestSet>
+void fp3_curve_test_init(std::vector<Fp3CurveGroup> &points,
+                    std::vector<std::size_t> &constants,
+                    const TestSet &test_set) {
     using fp3_value_type = typename Fp3CurveGroup::underlying_field_type_value;
     using modulus_type = typename fp3_value_type::underlying_type::modulus_type;
 
     std::array<modulus_type, 9> coordinates;
-    std::vector<Fp3CurveGroup> points;
-    std::vector<std::size_t> constants;
 
-    for (auto &point : data_set.second.get_child("point_coordinates")) {
+    for (auto &point : test_set.second.get_child("point_coordinates")) {
         auto i = 0;
         for (auto &coordinate_pairs : point.second) {
             for (auto &coordinate : coordinate_pairs.second) {
@@ -235,11 +228,22 @@ void binary_operators_test_fp3_init(const PointsSetType &data_set) {
                                           fp3_value_type(coordinates[6], coordinates[7], coordinates[8])));
     }
 
-    for (auto &constant : data_set.second.get_child("constants")) {
+    for (auto &constant : test_set.second.get_child("constants")) {
         constants.emplace_back(std::stoul(constant.second.data()));
     }
+}
 
-    do_binary_operators_checks(points, constants);
+template<typename CurveGroup, typename TestSet>
+void curve_operation_test(const TestSet &test_set,
+                          void (&test_init)(std::vector<CurveGroup> &,
+                                            std::vector<std::size_t> &,
+                                            const TestSet &)) {
+    std::vector<CurveGroup> points;
+    std::vector<std::size_t> constants;
+
+    test_init(points, constants, test_set);
+
+    check_curve_operations(points, constants);
 }
 
 BOOST_AUTO_TEST_SUITE(curves_manual_tests)
@@ -247,49 +251,49 @@ BOOST_AUTO_TEST_SUITE(curves_manual_tests)
 BOOST_DATA_TEST_CASE(binary_operators_test_bn128_g1, string_data("binary_operators_test_bn128_g1"), data_set) {
     using policy_type = curves::bn128<254>::g1_type;
 
-    binary_operators_test_fp_init<policy_type>(data_set);
+    curve_operation_test<policy_type>(data_set, fp_curve_test_init);
 }
 
 BOOST_DATA_TEST_CASE(binary_operators_test_edwards_g1, string_data("binary_operators_test_edwards_g1"), data_set) {
     using policy_type = curves::edwards<183>::g1_type;
 
-    binary_operators_test_fp_init<policy_type>(data_set);
+    curve_operation_test<policy_type>(data_set, fp_curve_test_init);
 }
 
 BOOST_DATA_TEST_CASE(binary_operators_test_mnt4_g1, string_data("binary_operators_test_mnt4_g1"), data_set) {
     using policy_type = curves::mnt4<298>::g1_type;
 
-    binary_operators_test_fp_init<policy_type>(data_set);
+    curve_operation_test<policy_type>(data_set, fp_curve_test_init);
 }
 
 BOOST_DATA_TEST_CASE(binary_operators_test_mnt6_g1, string_data("binary_operators_test_mnt6_g1"), data_set) {
     using policy_type = curves::mnt6<298>::g1_type;
 
-    binary_operators_test_fp_init<policy_type>(data_set);
+    curve_operation_test<policy_type>(data_set, fp_curve_test_init);
 }
 
 BOOST_DATA_TEST_CASE(binary_operators_test_mnt4_g2, string_data("binary_operators_test_mnt4_g2"), data_set) {
     using policy_type = curves::mnt4<298>::g2_type;
 
-    binary_operators_test_fp2_init<policy_type>(data_set);
+    curve_operation_test<policy_type>(data_set, fp2_curve_test_init);
 }
 
 BOOST_DATA_TEST_CASE(binary_operators_test_bn128_g2, string_data("binary_operators_test_bn128_g2"), data_set) {
     using policy_type = curves::bn128<254>::g2_type;
 
-    binary_operators_test_fp2_init<policy_type>(data_set);
+    curve_operation_test<policy_type>(data_set, fp2_curve_test_init);
 }
 
 BOOST_DATA_TEST_CASE(binary_operators_test_edwards_g2, string_data("binary_operators_test_edwards_g2"), data_set) {
     using policy_type = curves::edwards<183>::g2_type;
 
-    binary_operators_test_fp3_init<policy_type>(data_set);
+    curve_operation_test<policy_type>(data_set, fp3_curve_test_init);
 }
 
 BOOST_DATA_TEST_CASE(binary_operators_test_mnt6_g2, string_data("binary_operators_test_mnt6_g2"), data_set) {
     using policy_type = curves::mnt6<298>::g2_type;
 
-    binary_operators_test_fp3_init<policy_type>(data_set);
+    curve_operation_test<policy_type>(data_set, fp3_curve_test_init);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
