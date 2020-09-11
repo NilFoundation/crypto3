@@ -40,28 +40,28 @@
 
 using namespace nil::algebra;
 
+template<typename FpCurveGroup>
+void print_fp_curve_group_element(std::ostream &os, FpCurveGroup e) {
+    os << "( " << e.p[0].data << " : " << e.p[1].data << " : " << e.p[2].data << " )";
+}
+
+template<typename Fp2CurveGroup>
+void print_fp2_curve_group_element(std::ostream &os, Fp2CurveGroup e) {
+    os << "(" << e.p[0].data[0].data << " , " << e.p[0].data[1].data << ") : ("
+       << e.p[1].data[0].data << " , " << e.p[1].data[1].data << ") : ("
+       << e.p[2].data[0].data << " , " << e.p[2].data[1].data << ")" << std::endl;
+}
+
+template<typename Fp3CurveGroup>
+void print_fp3_curve_group_element(std::ostream &os, Fp3CurveGroup e) {
+    std::cout << "(" << e.p[0].data[0].data << " , " << e.p[0].data[1].data << " , " << e.p[0].data[2].data << ") : ("
+              << e.p[1].data[0].data << " , " << e.p[1].data[1].data << " , " << e.p[1].data[2].data << ") : ("
+              << e.p[2].data[0].data << " , " << e.p[2].data[1].data << " , " << e.p[2].data[2].data << ")" << std::endl;
+}
+
 namespace boost {
     namespace test_tools {
         namespace tt_detail {
-            template<typename FpCurveGroup>
-            void print_fp_curve_group_element(std::ostream &os, FpCurveGroup e) {
-                os << "( " << e.p[0].data << " : " << e.p[1].data << " : " << e.p[2].data << " )";
-            }
-
-            template<typename Fp2CurveGroup>
-            void print_fp2_curve_group_element(std::ostream &os, Fp2CurveGroup e) {
-                os << "(" << e.p[0].data[0].data << " , " << e.p[0].data[1].data << ") : ("
-                   << e.p[1].data[0].data << " , " << e.p[1].data[1].data << ") : ("
-                   << e.p[2].data[0].data << " , " << e.p[2].data[1].data << ")" << std::endl;
-            }
-
-            template<typename Fp3CurveGroup>
-            void print_fp3_curve_group_element(std::ostream &os, Fp3CurveGroup e) {
-                std::cout << "(" << e.p[0].data[0].data << " , " << e.p[0].data[1].data << " , " << e.p[0].data[2].data << ") : ("
-                          << e.p[1].data[0].data << " , " << e.p[1].data[1].data << " , " << e.p[1].data[2].data << ") : ("
-                          << e.p[2].data[0].data << " , " << e.p[2].data[1].data << " , " << e.p[2].data[2].data << ")" << std::endl;
-            }
-
             template<>
             struct print_log_value<typename curves::bn128<254>::g1_type> {
                 void operator()(std::ostream &os, typename curves::bn128<254>::g1_type const &e) {
