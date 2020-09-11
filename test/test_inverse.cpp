@@ -90,6 +90,7 @@ void test_cpp_int_backend()
 
    using namespace boost::multiprecision;
    number<T> res;
+
    number<backends::modular_adaptor<T> > modular;
 
    modular = number<backends::modular_adaptor<T> >(10, 37);

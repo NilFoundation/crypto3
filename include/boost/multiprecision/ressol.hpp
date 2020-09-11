@@ -75,6 +75,7 @@ inline Backend eval_ressol(const Backend& a, const Backend& p)
 
    if (eval_jacobi(a, p) != 1)
    { // not a quadratic residue
+      std::cout<<"\n FLAG \n";
       return negone;
    }
 
@@ -201,15 +202,19 @@ ressol(const number<Backend, ExpressionTemplates>& a,
  */
 
 template <typename Backend, expression_template_option ExpressionTemplates>
-inline number<modular_adaptor<Backend>, ExpressionTemplates>
-ressol(const number<modular_adaptor<Backend>, ExpressionTemplates>& modular)
+number<modular_adaptor<Backend>, ExpressionTemplates> ressol(
+    const number<modular_adaptor<Backend>, ExpressionTemplates>& modular)
 {
-   number<Backend, ExpressionTemplates> mod =  modular.backend().mod_data().get_mod();
-   number<Backend, ExpressionTemplates> res = eval_ressol(modular.backend().base_data(), mod.backend());
+   number<Backend, ExpressionTemplates> new_base, res;
    number<modular_adaptor<Backend>, ExpressionTemplates> res_mod;
-   assign_components(res_mod.backend(), res.backend(), mod.backend());
+
+   modular.backend().mod_data().adjust_regular(new_base.backend(), modular.backend().base_data());
+   res = eval_ressol(new_base.backend(), modular.backend().mod_data().get_mod().backend());
+   assign_components(res_mod.backend(), res.backend(), modular.backend().mod_data().get_mod().backend());
+
    return res_mod;
 }
+
 
 }
 } // namespace boost::multiprecision
