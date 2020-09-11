@@ -127,7 +127,7 @@ namespace nil {
                         // http://www.hyperelliptic.org/EFD/g1p/auto-twisted-inverted.html#addition-add-2008-bbjlp
 
                         const underlying_field_type_value A = (this->p[2]) * (other.p[2]);             // A = Z1*Z2
-                        const underlying_field_type_value B = this->mul_by_d(this->p[0].squared());    // B = d*A^2
+                        const underlying_field_type_value B = this->mul_by_d(A.squared());    // B = d*A^2
                         const underlying_field_type_value C = (this->p[0]) * (other.p[0]);             // C = X1*X2
                         const underlying_field_type_value D = (this->p[1]) * (other.p[1]);             // D = Y1*Y2
                         const underlying_field_type_value E = C * D;                                   // E = C*D
@@ -237,7 +237,7 @@ namespace nil {
 
                 private:
                     underlying_field_type_value mul_by_a(const underlying_field_type_value &elt) const {
-                        return underlying_field_type_value({twist_mul_by_a_c0 * elt.data[0], elt.data[1], elt.data[2]});
+                        return underlying_field_type_value({twist_mul_by_a_c0 * elt.data[2], elt.data[0], elt.data[1]});
                     }
 
                     underlying_field_type_value mul_by_d(const underlying_field_type_value &elt) const {

@@ -126,7 +126,7 @@ namespace nil {
                                               A2B2 = data[2] * B.data[2];
 
                         return element_fp3(
-                            {A0B0 + non_residue * (data[1] + data[2]) * (B.data[1] + B.data[2]) - A1B1 - A2B2,
+                            {A0B0 + non_residue * ((data[1] + data[2]) * (B.data[1] + B.data[2]) - A1B1 - A2B2),
                              (data[0] + data[1]) * (B.data[0] + B.data[1]) - A0B0 - A1B1 + non_residue * A2B2,
                              (data[0] + data[2]) * (B.data[0] + B.data[2]) - A0B0 + A1B1 - A2B2});
                     }
