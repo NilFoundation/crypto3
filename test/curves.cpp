@@ -150,7 +150,8 @@ enum binary_operator_test_points : std::size_t {
     p1_minus_p2,
     p1_mul_C1,
     p2_mul_C1_plus_p2_mul_C2,
-    p1_dbl
+    p1_dbl,
+    p1_mixed_add_g2
 };
 
 template<typename CurveGroup>
@@ -158,6 +159,7 @@ void check_curve_operations(const std::vector<CurveGroup> &points, const std::ve
     BOOST_CHECK_EQUAL(points[p1] + points[p2], points[p1_plus_p2]);
     BOOST_CHECK_EQUAL(points[p1] - points[p2], points[p1_minus_p2]);
     BOOST_CHECK_EQUAL(points[p1].doubled(), points[p1_dbl]);
+    BOOST_CHECK_EQUAL(points[p1].mixed_add(points[p2]), points[p1_mixed_add_g2]);
 }
 
 template<typename FpCurveGroup, typename TestSet>
