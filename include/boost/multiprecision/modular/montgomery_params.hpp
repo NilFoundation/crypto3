@@ -30,7 +30,6 @@ template <typename Backend>
 class montgomery_params : public base_params<Backend>
 {
    typedef number<Backend> number_type;
-
    typedef typename mpl::front<typename Backend::unsigned_types>::type ui_type;
 
  protected:
@@ -58,7 +57,7 @@ class montgomery_params : public base_params<Backend>
 
       m_p_words = this->m_mod.backend().size();
 
-      m_p_dash = monty_inverse<Backend>(this->m_mod.backend().limbs()[0]);
+      m_p_dash = eval_monty_inverse<Backend>(this->m_mod.backend().limbs()[0]);
 
       number_type r;
 

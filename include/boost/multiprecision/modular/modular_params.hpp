@@ -106,6 +106,7 @@ class modular_params : public backends::montgomery_params<Backend>, public backe
       return o;
    }
 };
+
 }
 } // namespace boost::multiprecision
 #endif //_MULTIPRECISION_MODULAR_PARAMS_HPP
