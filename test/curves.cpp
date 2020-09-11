@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2020 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2020 Ilias Khairullin <ilias@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -106,6 +107,13 @@ namespace boost {
             template<>
             struct print_log_value<typename curves::edwards<183>::g2_type> {
                 void operator()(std::ostream &os, typename curves::edwards<183>::g2_type const &e) {
+                    print_fp3_curve_group_element(os, e);
+                }
+            };
+
+            template<>
+            struct print_log_value<typename curves::mnt6<298>::g2_type> {
+                void operator()(std::ostream &os, typename curves::mnt6<298>::g2_type const &e) {
                     print_fp3_curve_group_element(os, e);
                 }
             };
@@ -274,6 +282,12 @@ BOOST_DATA_TEST_CASE(binary_operators_test_bn128_g2, string_data("binary_operato
 
 BOOST_DATA_TEST_CASE(binary_operators_test_edwards_g2, string_data("binary_operators_test_edwards_g2"), data_set) {
     using policy_type = curves::edwards<183>::g2_type;
+
+    binary_operators_test_fp3_init<policy_type>(data_set);
+}
+
+BOOST_DATA_TEST_CASE(binary_operators_test_mnt6_g2, string_data("binary_operators_test_mnt6_g2"), data_set) {
+    using policy_type = curves::mnt6<298>::g2_type;
 
     binary_operators_test_fp3_init<policy_type>(data_set);
 }
