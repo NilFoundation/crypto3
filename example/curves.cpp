@@ -14,8 +14,8 @@
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/multiprecision/modular/modular_adaptor.hpp>
 
-
-#include <nil/algebra/curves/bls12.hpp>
+#include <nil/algebra/curves/alt_bn128.hpp>
+//#include <nil/algebra/curves/bls12.hpp>
 #include <nil/algebra/curves/bn128.hpp>
 #include <nil/algebra/curves/edwards.hpp>
 #include <nil/algebra/curves/mnt4.hpp>
@@ -138,16 +138,25 @@ void fp3_curve_group_basic_math_examples() {
 }
 
 int main() {
+    std::cout << "ALT_BN128-254 curve g1 group basic math:" << std::endl;
+    fp_curve_group_basic_math_examples<curves::alt_bn128<254>::g1_type>();
 
-    std::cout << "BN128-254 curve g1 group basic math:" << std::endl;
+    std::cout << "----------------------------" << std::endl;
+
+    std::cout << "ALT_BN128-254 curve g2 group basic math:" << std::endl;
+    fp2_curve_group_basic_math_examples<curves::alt_bn128<254>::g2_type>();
+
+    std::cout << "----------------------------" << std::endl;
+
+    /*std::cout << "BLS12-381 curve g1 group basic math:" << std::endl;
     fp_curve_group_basic_math_examples<curves::bls12<381>::g1_type>();
 
     std::cout << "----------------------------" << std::endl;
 
-    std::cout << "BN128-254 curve g2 group basic math:" << std::endl;
+    std::cout << "BLS12-381 curve g2 group basic math:" << std::endl;
     fp2_curve_group_basic_math_examples<curves::bls12<381>::g2_type>();
 
-    std::cout << "----------------------------" << std::endl;
+    std::cout << "----------------------------" << std::endl;*/
 
     std::cout << "BN128-254 curve g1 group basic math:" << std::endl;
     fp_curve_group_basic_math_examples<curves::bn128<254>::g1_type>();

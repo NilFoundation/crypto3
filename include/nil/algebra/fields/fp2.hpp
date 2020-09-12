@@ -12,7 +12,7 @@
 
 #include <nil/algebra/fields/detail/element/fp2.hpp>
 #include <nil/algebra/fields/detail/params/params.hpp>
-//#include <nil/algebra/fields/detail/params/alt_bn128/base_field.hpp>
+#include <nil/algebra/fields/detail/params/alt_bn128/base_field.hpp>
 //#include <nil/algebra/fields/detail/params/alt_bn128/scalar_field.hpp>
 //#include <nil/algebra/fields/detail/params/bls12/base_field.hpp>
 //#include <nil/algebra/fields/detail/params/bls12/scalar_field.hpp>

@@ -15,8 +15,10 @@
 #include <boost/multiprecision/modular/modular_adaptor.hpp>
 
 #include <nil/algebra/fields/fp2.hpp>
-#include <nil/algebra/fields/bls12/base_field.hpp>
-#include <nil/algebra/fields/bls12/scalar_field.hpp>
+#include <nil/algebra/fields/alt_bn128/base_field.hpp>
+#include <nil/algebra/fields/alt_bn128/scalar_field.hpp>
+//#include <nil/algebra/fields/bls12/base_field.hpp>
+//#include <nil/algebra/fields/bls12/scalar_field.hpp>
 #include <nil/algebra/fields/bn128/base_field.hpp>
 #include <nil/algebra/fields/bn128/scalar_field.hpp>
 #include <nil/algebra/fields/dsa_botan.hpp>
@@ -157,6 +159,14 @@ void fields_fp2_basic_math_examples() {
     std::cout << "e3 value: ";
     print_field_element(e3);
 
+    value_type e1inv = e1.inversed();
+
+    std::cout << "e1 inversed value: ";
+    print_field_element(e1inv);
+
+    std::cout << "e1 * e1^(-1) \n";
+    print_field_element(e1 * e1inv);
+    
     value_type e1e2 = e1 * e2, e1sqr = e1.squared();
 
     std::cout << "e1 * e2 value: ";
@@ -218,7 +228,7 @@ int main() {
 
     std::cout << "----------------------------" << std::endl;
 
-    std::cout << "BLS12-381 Fq basic math:" << std::endl;
+    /*std::cout << "BLS12-381 Fq basic math:" << std::endl;
     fields_fp_basic_math_examples<fields::bls12_fq<381>>();
 
     std::cout << "----------------------------" << std::endl;
@@ -226,7 +236,7 @@ int main() {
     std::cout << "BLS12-381 Fr basic math:" << std::endl;
     fields_fp_basic_math_examples<fields::bls12_fr<381>>();
 
-    std::cout << "----------------------------" << std::endl;
+    std::cout << "----------------------------" << std::endl;*/
 
     std::cout << "DSA Botan 2048 basic math:" << std::endl;
     fields_fp_basic_math_examples<fields::dsa_botan<2048>>();
