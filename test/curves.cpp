@@ -91,6 +91,13 @@ namespace boost {
             };
 
             // template<>
+            // struct print_log_value<typename curves::alt_bn128<254>::g1_type> {
+            //     void operator()(std::ostream &os, typename curves::alt_bn128<254>::g1_type const &e) {
+            //         print_fp_curve_group_element(os, e);
+            //     }
+            // };
+
+            // template<>
             // struct print_log_value<typename curves::bls12<381>::g1_type> {
             //     void operator()(std::ostream &os, typename curves::bls12<381>::g1_type const &e) {
             //         print_fp_curve_group_element(os, e);
@@ -125,6 +132,13 @@ namespace boost {
                 }
             };
 
+            // template<>
+            // struct print_log_value<typename curves::alt_bn128<254>::g2_type> {
+            //     void operator()(std::ostream &os, typename curves::alt_bn128<254>::g2_type const &e) {
+            //         print_fp3_curve_group_element(os, e);
+            //     }
+            // };
+
             template<template<typename, typename> class P, typename K, typename V>
             struct print_log_value<P<K, V>> {
                 void operator()(std::ostream &, P<K, V> const &) {
@@ -158,7 +172,9 @@ enum curve_operation_test_points : std::size_t {
     p1_mul_C1,
     p2_mul_C1_plus_p2_mul_C2,
     p1_dbl,
-    p1_mixed_add_g2
+    p1_mixed_add_p2,
+    p1_to_affine_coordinates,
+    p2_to_special
 };
 
 template<typename CurveGroup>
@@ -166,7 +182,11 @@ void check_curve_operations(const std::vector<CurveGroup> &points, const std::ve
     BOOST_CHECK_EQUAL(points[p1] + points[p2], points[p1_plus_p2]);
     BOOST_CHECK_EQUAL(points[p1] - points[p2], points[p1_minus_p2]);
     BOOST_CHECK_EQUAL(points[p1].doubled(), points[p1_dbl]);
-    BOOST_CHECK_EQUAL(points[p1].mixed_add(points[p2]), points[p1_mixed_add_g2]);
+    BOOST_CHECK_EQUAL(points[p1].mixed_add(points[p2]), points[p1_mixed_add_p2]);
+    CurveGroup p1_copy(points[p1]); p1_copy.to_affine_coordinates();
+    BOOST_CHECK_EQUAL(p1_copy, points[p1_to_affine_coordinates]);
+    CurveGroup p2_copy(points[p2]); p2_copy.to_special();
+    BOOST_CHECK_EQUAL(p2_copy, points[p2_to_special]);
 }
 
 template<typename FpCurveGroup, typename TestSet>
@@ -304,6 +324,12 @@ BOOST_DATA_TEST_CASE(curve_operation_test_mnt6_g2, string_data("curve_operation_
 
     curve_operation_test<policy_type>(data_set, fp3_curve_test_init);
 }
+
+// BOOST_DATA_TEST_CASE(curve_operation_test_alt_bn128_g1, string_data("curve_operation_test_alt_bn128_g1"), data_set) {
+//     using policy_type = curves::alt_bn128<254>::g1_type;
+
+//     curve_operation_test<policy_type>(data_set, fp_curve_test_init);
+// }
 
 // BOOST_DATA_TEST_CASE(curve_operation_test_bls12_381_g1, string_data("curve_operation_test_bls12_381_g1"), data_set) {
 //     using policy_type = curves::bls12<381>::g1_type;
