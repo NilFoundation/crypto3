@@ -35,6 +35,15 @@ namespace nil {
                 constexpr typename params<FieldType>::modulus_type const params<FieldType>::modulus;
 
                 template<typename FieldType>
+                constexpr typename params<FieldType>::generator_type const params<FieldType>::mul_generator;
+
+                template<typename FieldType>
+                constexpr typename std::size_t const params<FieldType>::modulus_bits;
+
+                template<typename FieldType>
+                constexpr typename std::size_t const params<FieldType>::generator_bits;
+
+                template<typename FieldType>
                 struct extension_params : public params<FieldType> {
                 private:
                     typedef params<FieldType> policy_type;

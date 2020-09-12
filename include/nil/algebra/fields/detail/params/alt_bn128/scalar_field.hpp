@@ -7,14 +7,14 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef ALGEBRA_FIELDS_BN128_FR_PARAMS_HPP
-#define ALGEBRA_FIELDS_BN128_FR_PARAMS_HPP
+#ifndef ALGEBRA_FIELDS_ALT_BN128_FR_PARAMS_HPP
+#define ALGEBRA_FIELDS_ALT_BN128_FR_PARAMS_HPP
 
 #include <nil/algebra/fields/detail/element/fp.hpp>
 #include <nil/algebra/fields/detail/element/fp2.hpp>
 #include <nil/algebra/fields/detail/params/params.hpp>
 
-#include <nil/algebra/fields/bn128/scalar_field.hpp>
+#include <nil/algebra/fields/alt_bn128/scalar_field.hpp>
 
 #include <nil/algebra/detail/literals.hpp>
 
@@ -24,11 +24,11 @@ namespace nil {
             namespace detail {
 
                 template<std::size_t ModulusBits, std::size_t GeneratorBits>
-                struct extension_params<bn128_scalar_field<ModulusBits, GeneratorBits>>
-                    : public params<bn128_scalar_field<ModulusBits, GeneratorBits>> {
+                struct extension_params<alt_bn128_scalar_field<ModulusBits, GeneratorBits>>
+                    : public params<alt_bn128_scalar_field<ModulusBits, GeneratorBits>> {
                 private:
-                    typedef params<bn128_scalar_field<ModulusBits, GeneratorBits>> policy_type;
-                    typedef extension_params<bn128_scalar_field<ModulusBits, GeneratorBits>> element_policy_type;
+                    typedef params<alt_bn128_scalar_field<ModulusBits, GeneratorBits>> policy_type;
+                    typedef extension_params<alt_bn128_scalar_field<ModulusBits, GeneratorBits>> element_policy_type;
 
                 public:
                     typedef typename policy_type::number_type number_type;
@@ -44,4 +44,4 @@ namespace nil {
     }            // namespace algebra
 }    // namespace nil
 
-#endif    // ALGEBRA_FIELDS_BN128_FR_PARAMS_HPP
+#endif    // ALGEBRA_FIELDS_ALT_BN128_FR_PARAMS_HPP
