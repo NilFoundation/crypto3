@@ -75,7 +75,6 @@ inline Backend eval_ressol(const Backend& a, const Backend& p)
 
    if (eval_jacobi(a, p) != 1)
    { // not a quadratic residue
-      std::cout<<"\n FLAG \n";
       return negone;
    }
 
