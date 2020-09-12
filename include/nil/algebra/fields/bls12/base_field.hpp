@@ -36,6 +36,9 @@ namespace nil {
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                 typedef typename policy_type::modulus_type modulus_type;
 
+                constexpr static const std::size_t number_bits = policy_type::number_bits;
+                typedef typename policy_type::number_type number_type;
+
                 constexpr static const modulus_type modulus =
                     0x1A0111EA397FE69A4B1BA7B6434BACD764774B84F38512BF6730D2A0F6B0F6241EABFFFEB153FFFFB9FEFFFFFFFFAAAB_cppui381;
 
@@ -43,6 +46,7 @@ namespace nil {
                 typedef typename policy_type::generator_type generator_type;
 
                 constexpr static const generator_type mul_generator = 0x02;
+
 
                 typedef typename detail::element_fp<detail::extension_params<bls12_base_field<381, CHAR_BIT>>> value_type;
 
@@ -56,6 +60,9 @@ namespace nil {
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                 typedef typename policy_type::modulus_type modulus_type;
 
+                constexpr static const std::size_t number_bits = policy_type::number_bits;
+                typedef typename policy_type::number_type number_type;
+                
                 constexpr static const modulus_type modulus =
                     0x1AE3A4617C510EAC63B05C06CA1493B1A22D9F300F5138F1EF3622FBA094800170B5D44300000008508C00000000001_cppui377;
 

@@ -36,6 +36,9 @@ namespace nil {
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                 typedef typename policy_type::modulus_type modulus_type;
 
+                constexpr static const std::size_t number_bits = policy_type::number_bits;
+                typedef typename policy_type::number_type number_type;
+                
                 constexpr static const modulus_type modulus = 0x10357F274A8E56C4E2E493B92E12CC1DE5532780000001_cppui181;
 
                 constexpr static const std::size_t generator_bits = policy_type::generator_bits;
