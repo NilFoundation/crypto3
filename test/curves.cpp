@@ -90,6 +90,13 @@ namespace boost {
                 }
             };
 
+            // template<>
+            // struct print_log_value<typename curves::bls12<381>::g1_type> {
+            //     void operator()(std::ostream &os, typename curves::bls12<381>::g1_type const &e) {
+            //         print_fp_curve_group_element(os, e);
+            //     }
+            // };
+
             template<>
             struct print_log_value<typename curves::mnt4<298>::g2_type> {
                 void operator()(std::ostream &os, typename curves::mnt4<298>::g2_type const &e) {
@@ -138,12 +145,12 @@ boost::property_tree::ptree string_data(std::string test_name) {
     return string_data.get_child(test_name);
 }
 
-enum binary_operator_test_constants : std::size_t {
+enum curve_operation_test_constants : std::size_t {
     C1,
     C2
 };
 
-enum binary_operator_test_points : std::size_t {
+enum curve_operation_test_points : std::size_t {
     p1,
     p2,
     p1_plus_p2,
@@ -250,52 +257,58 @@ void curve_operation_test(const TestSet &test_set,
 
 BOOST_AUTO_TEST_SUITE(curves_manual_tests)
 
-BOOST_DATA_TEST_CASE(binary_operators_test_bn128_g1, string_data("binary_operators_test_bn128_g1"), data_set) {
+BOOST_DATA_TEST_CASE(curve_operation_test_bn128_g1, string_data("curve_operation_test_bn128_g1"), data_set) {
     using policy_type = curves::bn128<254>::g1_type;
 
     curve_operation_test<policy_type>(data_set, fp_curve_test_init);
 }
 
-BOOST_DATA_TEST_CASE(binary_operators_test_edwards_g1, string_data("binary_operators_test_edwards_g1"), data_set) {
+BOOST_DATA_TEST_CASE(curve_operation_test_edwards_g1, string_data("curve_operation_test_edwards_g1"), data_set) {
     using policy_type = curves::edwards<183>::g1_type;
 
     curve_operation_test<policy_type>(data_set, fp_curve_test_init);
 }
 
-BOOST_DATA_TEST_CASE(binary_operators_test_mnt4_g1, string_data("binary_operators_test_mnt4_g1"), data_set) {
+BOOST_DATA_TEST_CASE(curve_operation_test_mnt4_g1, string_data("curve_operation_test_mnt4_g1"), data_set) {
     using policy_type = curves::mnt4<298>::g1_type;
 
     curve_operation_test<policy_type>(data_set, fp_curve_test_init);
 }
 
-BOOST_DATA_TEST_CASE(binary_operators_test_mnt6_g1, string_data("binary_operators_test_mnt6_g1"), data_set) {
+BOOST_DATA_TEST_CASE(curve_operation_test_mnt6_g1, string_data("curve_operation_test_mnt6_g1"), data_set) {
     using policy_type = curves::mnt6<298>::g1_type;
 
     curve_operation_test<policy_type>(data_set, fp_curve_test_init);
 }
 
-BOOST_DATA_TEST_CASE(binary_operators_test_mnt4_g2, string_data("binary_operators_test_mnt4_g2"), data_set) {
+BOOST_DATA_TEST_CASE(curve_operation_test_mnt4_g2, string_data("curve_operation_test_mnt4_g2"), data_set) {
     using policy_type = curves::mnt4<298>::g2_type;
 
     curve_operation_test<policy_type>(data_set, fp2_curve_test_init);
 }
 
-BOOST_DATA_TEST_CASE(binary_operators_test_bn128_g2, string_data("binary_operators_test_bn128_g2"), data_set) {
+BOOST_DATA_TEST_CASE(curve_operation_test_bn128_g2, string_data("curve_operation_test_bn128_g2"), data_set) {
     using policy_type = curves::bn128<254>::g2_type;
 
     curve_operation_test<policy_type>(data_set, fp2_curve_test_init);
 }
 
-BOOST_DATA_TEST_CASE(binary_operators_test_edwards_g2, string_data("binary_operators_test_edwards_g2"), data_set) {
+BOOST_DATA_TEST_CASE(curve_operation_test_edwards_g2, string_data("curve_operation_test_edwards_g2"), data_set) {
     using policy_type = curves::edwards<183>::g2_type;
 
     curve_operation_test<policy_type>(data_set, fp3_curve_test_init);
 }
 
-BOOST_DATA_TEST_CASE(binary_operators_test_mnt6_g2, string_data("binary_operators_test_mnt6_g2"), data_set) {
+BOOST_DATA_TEST_CASE(curve_operation_test_mnt6_g2, string_data("curve_operation_test_mnt6_g2"), data_set) {
     using policy_type = curves::mnt6<298>::g2_type;
 
     curve_operation_test<policy_type>(data_set, fp3_curve_test_init);
 }
+
+// BOOST_DATA_TEST_CASE(curve_operation_test_bls12_381_g1, string_data("curve_operation_test_bls12_381_g1"), data_set) {
+//     using policy_type = curves::bls12<381>::g1_type;
+
+//     curve_operation_test<policy_type>(data_set, fp_curve_test_init);
+// }
 
 BOOST_AUTO_TEST_SUITE_END()
