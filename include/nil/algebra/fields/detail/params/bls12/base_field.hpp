@@ -71,17 +71,21 @@ namespace nil {
                     constexpr static const std::array<modulus_type, 2> fp12_2over3over2_non_residue = {0, 1};
                 };
 
-                template<std::size_t ModulusBits, std::size_t GeneratorBits>
-                constexpr typename params<bls12_base_field<ModulusBits, GeneratorBits>>::modulus_type const
-                    extension_params<bls12_base_field<ModulusBits, GeneratorBits>>::fp2_non_residue;
+                constexpr typename extension_params<bls12_base_field<381, CHAR_BIT>>::modulus_type const
+                    extension_params<bls12_base_field<381, CHAR_BIT>>::fp2_non_residue;
+                constexpr typename extension_params<bls12_base_field<377, CHAR_BIT>>::modulus_type const
+                    extension_params<bls12_base_field<377, CHAR_BIT>>::fp2_non_residue;
 
-                template<std::size_t ModulusBits, std::size_t GeneratorBits>
-                constexpr std::array<typename params<bls12_base_field<ModulusBits, GeneratorBits>>::modulus_type, 2> const
-                    extension_params<bls12_base_field<ModulusBits, GeneratorBits>>::fp6_3over2_non_residue;
+                constexpr std::array<typename extension_params<bls12_base_field<381, CHAR_BIT>>::modulus_type, 2> const
+                    extension_params<bls12_base_field<381, CHAR_BIT>>::fp6_3over2_non_residue;
+                constexpr std::array<typename extension_params<bls12_base_field<377, CHAR_BIT>>::modulus_type, 2> const
+                    extension_params<bls12_base_field<377, CHAR_BIT>>::fp6_3over2_non_residue;
 
-                template<std::size_t ModulusBits, std::size_t GeneratorBits>
-                constexpr std::array<typename params<bls12_base_field<ModulusBits, GeneratorBits>>::modulus_type, 2> const
-                    extension_params<bls12_base_field<ModulusBits, GeneratorBits>>::fp12_2over3over2_non_residue;
+                constexpr std::array<typename extension_params<bls12_base_field<381, CHAR_BIT>>::modulus_type, 2> const
+                    extension_params<bls12_base_field<381, CHAR_BIT>>::fp12_2over3over2_non_residue;
+                constexpr std::array<typename extension_params<bls12_base_field<377, CHAR_BIT>>::modulus_type, 2> const
+                    extension_params<bls12_base_field<377, CHAR_BIT>>::fp12_2over3over2_non_residue;
+
             }    // namespace detail
         }        // namespace fields
     }            // namespace algebra
