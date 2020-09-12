@@ -12,14 +12,10 @@
 #include <boost/container/vector.hpp>
 
 #include <boost/type_traits/is_integral.hpp>
-#include <boost/multiprecision/detail/default_ops.hpp>
 
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/multiprecision/cpp_int/cpp_int_config.hpp>
 #include <boost/multiprecision/modular/modular_adaptor.hpp>
-#include <boost/multiprecision/modular/modular_params.hpp>
-#include <boost/multiprecision/modular/base_params.hpp>
-#include <boost/multiprecision/modular/barrett_params.hpp>
 #include <boost/multiprecision/modular/inverse.hpp>
 
 namespace boost {
@@ -40,7 +36,7 @@ number<modular_adaptor<Backend>, ExpressionTemplates> inverse_extended_euclidean
    number<modular_adaptor<Backend>, ExpressionTemplates> res_mod;
 
    modular.backend().mod_data().adjust_regular(new_base.backend(), modular.backend().base_data());
-   res = eval_inverse_extended_euclidean_algorithm(new_base.backend(), modular.backend().mod_data().get_mod().backend());
+   res = backends::eval_inverse_extended_euclidean_algorithm(new_base.backend(), modular.backend().mod_data().get_mod().backend());
    assign_components(res_mod.backend(), res.backend(), modular.backend().mod_data().get_mod().backend());
 
    return res_mod;
