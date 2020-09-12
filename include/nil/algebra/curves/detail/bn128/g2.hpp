@@ -306,7 +306,7 @@ namespace nil {
                     }
 
                     void to_special() const {
-                        return to_affine_coordinates();
+                        this->to_affine_coordinates();
                     }
 
                     bool is_special() const {
