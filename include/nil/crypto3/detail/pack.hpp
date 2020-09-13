@@ -6,13 +6,14 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_PACK_HPP
-#define CRYPTO3_PACK_HPP
+#ifndef CRYPTO3_DETAIL_PACK_HPP
+#define CRYPTO3_DETAIL_PACK_HPP
 
 #include <nil/crypto3/detail/type_traits.hpp>
 #include <nil/crypto3/detail/stream_endian.hpp>
 #include <nil/crypto3/detail/exploder.hpp>
 #include <nil/crypto3/detail/imploder.hpp>
+#include <nil/crypto3/detail/predef.hpp>
 
 #include <boost/assert.hpp>
 #include <boost/static_assert.hpp>
