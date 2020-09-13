@@ -252,7 +252,7 @@ namespace nil {
                         }
                         else
                         {
-                            underlying_field_type_value Z_inv = this->p[2].inverse();
+                            underlying_field_type_value Z_inv = this->p[2].inversed();
                             underlying_field_type_value Z2_inv = Z_inv.squared();
                             underlying_field_type_value Z3_inv = Z2_inv * Z_inv;
                             this->p[0] = this->p[0] * Z2_inv;
