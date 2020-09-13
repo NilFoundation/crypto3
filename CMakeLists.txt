@@ -41,9 +41,6 @@ cm_project(algebra WORKSPACE_NAME ${CMAKE_WORKSPACE_NAME} LANGUAGES ASM C CXX)
 cm_find_package(CM)
 include(CMDeploy)
 
-include(CheckSSE)
-include(CheckAVX)
-
 option(BUILD_TESTS "Build unit tests" FALSE)
 option(BUILD_EXAMPLES "Build examples" FALSE)
 
