@@ -24,7 +24,8 @@ namespace nil {
             namespace detail {
 
                 template<>
-                struct extension_params<bls12_base_field<381, CHAR_BIT>> : public params<bls12_base_field<381, CHAR_BIT>> {
+                struct extension_params<bls12_base_field<381, CHAR_BIT>>
+                    : public params<bls12_base_field<381, CHAR_BIT>> {
                 private:
                     typedef params<bls12_base_field<381, CHAR_BIT>> policy_type;
                     typedef extension_params<bls12_base_field<381, CHAR_BIT>> element_policy_type;
@@ -41,14 +42,15 @@ namespace nil {
                     typedef element_fp2<element_policy_type> fp6_3over2_non_residue_type;
                     typedef element_fp2<element_policy_type> fp12_2over3over2_non_residue_type;
 
-                    constexpr static const modulus_type fp2_non_residue =
-                        modulus_type(0x1A0111EA397FE69A4B1BA7B6434BACD764774B84F38512BF6730D2A0F6B0F6241EABFFFEB153FFFFB9FEFFFFFFFFAAAA_cppui381);
+                    constexpr static const modulus_type fp2_non_residue = modulus_type(
+                        0x1A0111EA397FE69A4B1BA7B6434BACD764774B84F38512BF6730D2A0F6B0F6241EABFFFEB153FFFFB9FEFFFFFFFFAAAA_cppui381);
                     constexpr static const std::array<modulus_type, 2> fp6_3over2_non_residue = {1, 1};
                     constexpr static const std::array<modulus_type, 2> fp12_2over3over2_non_residue = {1, 1};
                 };
 
                 template<>
-                struct extension_params<bls12_base_field<377, CHAR_BIT>> : public params<bls12_base_field<377, CHAR_BIT>> {
+                struct extension_params<bls12_base_field<377, CHAR_BIT>>
+                    : public params<bls12_base_field<377, CHAR_BIT>> {
                 private:
                     typedef params<bls12_base_field<377, CHAR_BIT>> policy_type;
                     typedef extension_params<bls12_base_field<377, CHAR_BIT>> element_policy_type;
@@ -65,8 +67,8 @@ namespace nil {
                     typedef element_fp2<element_policy_type> fp6_3over2_non_residue_type;
                     typedef element_fp2<element_policy_type> fp12_2over3over2_non_residue_type;
 
-                    constexpr static const modulus_type fp2_non_residue =
-                        modulus_type(0x1AE3A4617C510EAC63B05C06CA1493B1A22D9F300F5138F1EF3622FBA094800170B5D44300000008508BFFFFFFFFFFC_cppui377);
+                    constexpr static const modulus_type fp2_non_residue = modulus_type(
+                        0x1AE3A4617C510EAC63B05C06CA1493B1A22D9F300F5138F1EF3622FBA094800170B5D44300000008508BFFFFFFFFFFC_cppui377);
                     constexpr static const std::array<modulus_type, 2> fp6_3over2_non_residue = {0, 1};
                     constexpr static const std::array<modulus_type, 2> fp12_2over3over2_non_residue = {0, 1};
                 };

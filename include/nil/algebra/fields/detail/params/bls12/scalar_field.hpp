@@ -24,7 +24,8 @@ namespace nil {
             namespace detail {
 
                 template<>
-                struct extension_params<bls12_scalar_field<381, CHAR_BIT>> : public params<bls12_scalar_field<381, CHAR_BIT>> {
+                struct extension_params<bls12_scalar_field<381, CHAR_BIT>>
+                    : public params<bls12_scalar_field<381, CHAR_BIT>> {
                 private:
                     typedef params<bls12_scalar_field<381, CHAR_BIT>> policy_type;
                     typedef extension_params<bls12_scalar_field<381, CHAR_BIT>> element_policy_type;
@@ -39,7 +40,8 @@ namespace nil {
                 };
 
                 template<>
-                struct extension_params<bls12_scalar_field<377, CHAR_BIT>> : public params<bls12_scalar_field<377, CHAR_BIT>> {
+                struct extension_params<bls12_scalar_field<377, CHAR_BIT>>
+                    : public params<bls12_scalar_field<377, CHAR_BIT>> {
                 private:
                     typedef params<bls12_scalar_field<377, CHAR_BIT>> policy_type;
                     typedef extension_params<bls12_scalar_field<377, CHAR_BIT>> element_policy_type;

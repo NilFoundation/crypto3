@@ -44,7 +44,7 @@ namespace nil {
 
                 constexpr static const std::size_t number_bits = policy_type::number_bits;
                 typedef typename policy_type::number_type number_type;
-                
+
                 constexpr static const modulus_type modulus = 0x100000000000000000001B8FA16DFAB9ACA16B6B3_cppui160;
 
                 constexpr static const std::size_t generator_bits = policy_type::generator_bits;
@@ -52,7 +52,8 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x03;
 
-                typedef typename detail::element_fp<detail::extension_params<secp_k1_scalar_field<160, CHAR_BIT>>> value_type;
+                typedef typename detail::element_fp<detail::extension_params<secp_k1_scalar_field<160, CHAR_BIT>>>
+                    value_type;
 
                 constexpr static const std::size_t arity = 1;
             };
@@ -71,7 +72,8 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x03;
 
-                typedef typename detail::element_fp<detail::extension_params<secp_r1_scalar_field<160, CHAR_BIT>>> value_type;
+                typedef typename detail::element_fp<detail::extension_params<secp_r1_scalar_field<160, CHAR_BIT>>>
+                    value_type;
 
                 constexpr static const std::size_t arity = 1;
             };
@@ -90,7 +92,8 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x03;
 
-                typedef typename detail::element_fp<detail::extension_params<secp_r2_scalar_field<160, CHAR_BIT>>> value_type;
+                typedef typename detail::element_fp<detail::extension_params<secp_r2_scalar_field<160, CHAR_BIT>>>
+                    value_type;
 
                 constexpr static const std::size_t arity = 1;
             };
@@ -110,7 +113,8 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x03;
 
-                typedef typename detail::element_fp<detail::extension_params<secp_k1_scalar_field<192, CHAR_BIT>>> value_type;
+                typedef typename detail::element_fp<detail::extension_params<secp_k1_scalar_field<192, CHAR_BIT>>>
+                    value_type;
 
                 constexpr static const std::size_t arity = 1;
             };
@@ -130,7 +134,8 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x03;
 
-                typedef typename detail::element_fp<detail::extension_params<secp_r1_scalar_field<192, CHAR_BIT>>> value_type;
+                typedef typename detail::element_fp<detail::extension_params<secp_r1_scalar_field<192, CHAR_BIT>>>
+                    value_type;
 
                 constexpr static const std::size_t arity = 1;
             };
@@ -150,7 +155,8 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x03;
 
-                typedef typename detail::element_fp<detail::extension_params<secp_k1_scalar_field<224, CHAR_BIT>>> value_type;
+                typedef typename detail::element_fp<detail::extension_params<secp_k1_scalar_field<224, CHAR_BIT>>>
+                    value_type;
 
                 constexpr static const std::size_t arity = 1;
             };
@@ -170,7 +176,8 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x03;
 
-                typedef typename detail::element_fp<detail::extension_params<secp_r1_scalar_field<224, CHAR_BIT>>> value_type;
+                typedef typename detail::element_fp<detail::extension_params<secp_r1_scalar_field<224, CHAR_BIT>>>
+                    value_type;
 
                 constexpr static const std::size_t arity = 1;
             };
@@ -190,28 +197,45 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x03;
 
-                typedef typename detail::element_fp<detail::extension_params<secp_k1_scalar_field<256, CHAR_BIT>>> value_type;
+                typedef typename detail::element_fp<detail::extension_params<secp_k1_scalar_field<256, CHAR_BIT>>>
+                    value_type;
 
                 constexpr static const std::size_t arity = 1;
             };
 
-            constexpr typename secp_k1_scalar_field<160, CHAR_BIT>::modulus_type const secp_k1_scalar_field<160, CHAR_BIT>::modulus;
-            constexpr typename secp_r1_scalar_field<160, CHAR_BIT>::modulus_type const secp_r1_scalar_field<160, CHAR_BIT>::modulus;
-            constexpr typename secp_r2_scalar_field<160, CHAR_BIT>::modulus_type const secp_r2_scalar_field<160, CHAR_BIT>::modulus;
-            constexpr typename secp_k1_scalar_field<192, CHAR_BIT>::modulus_type const secp_k1_scalar_field<192, CHAR_BIT>::modulus;
-            constexpr typename secp_r1_scalar_field<192, CHAR_BIT>::modulus_type const secp_r1_scalar_field<192, CHAR_BIT>::modulus;
-            constexpr typename secp_k1_scalar_field<224, CHAR_BIT>::modulus_type const secp_k1_scalar_field<224, CHAR_BIT>::modulus;
-            constexpr typename secp_r1_scalar_field<224, CHAR_BIT>::modulus_type const secp_r1_scalar_field<224, CHAR_BIT>::modulus;
-            constexpr typename secp_k1_scalar_field<256, CHAR_BIT>::modulus_type const secp_k1_scalar_field<256, CHAR_BIT>::modulus;
+            constexpr typename secp_k1_scalar_field<160, CHAR_BIT>::modulus_type const
+                secp_k1_scalar_field<160, CHAR_BIT>::modulus;
+            constexpr typename secp_r1_scalar_field<160, CHAR_BIT>::modulus_type const
+                secp_r1_scalar_field<160, CHAR_BIT>::modulus;
+            constexpr typename secp_r2_scalar_field<160, CHAR_BIT>::modulus_type const
+                secp_r2_scalar_field<160, CHAR_BIT>::modulus;
+            constexpr typename secp_k1_scalar_field<192, CHAR_BIT>::modulus_type const
+                secp_k1_scalar_field<192, CHAR_BIT>::modulus;
+            constexpr typename secp_r1_scalar_field<192, CHAR_BIT>::modulus_type const
+                secp_r1_scalar_field<192, CHAR_BIT>::modulus;
+            constexpr typename secp_k1_scalar_field<224, CHAR_BIT>::modulus_type const
+                secp_k1_scalar_field<224, CHAR_BIT>::modulus;
+            constexpr typename secp_r1_scalar_field<224, CHAR_BIT>::modulus_type const
+                secp_r1_scalar_field<224, CHAR_BIT>::modulus;
+            constexpr typename secp_k1_scalar_field<256, CHAR_BIT>::modulus_type const
+                secp_k1_scalar_field<256, CHAR_BIT>::modulus;
 
-            constexpr typename secp_k1_scalar_field<160, CHAR_BIT>::generator_type const secp_k1_scalar_field<160, CHAR_BIT>::mul_generator;
-            constexpr typename secp_r1_scalar_field<160, CHAR_BIT>::generator_type const secp_r1_scalar_field<160, CHAR_BIT>::mul_generator;
-            constexpr typename secp_r2_scalar_field<160, CHAR_BIT>::generator_type const secp_r2_scalar_field<160, CHAR_BIT>::mul_generator;
-            constexpr typename secp_k1_scalar_field<192, CHAR_BIT>::generator_type const secp_k1_scalar_field<192, CHAR_BIT>::mul_generator;
-            constexpr typename secp_r1_scalar_field<192, CHAR_BIT>::generator_type const secp_r1_scalar_field<192, CHAR_BIT>::mul_generator;
-            constexpr typename secp_k1_scalar_field<224, CHAR_BIT>::generator_type const secp_k1_scalar_field<224, CHAR_BIT>::mul_generator;
-            constexpr typename secp_r1_scalar_field<224, CHAR_BIT>::generator_type const secp_r1_scalar_field<224, CHAR_BIT>::mul_generator;
-            constexpr typename secp_k1_scalar_field<256, CHAR_BIT>::generator_type const secp_k1_scalar_field<256, CHAR_BIT>::mul_generator;
+            constexpr typename secp_k1_scalar_field<160, CHAR_BIT>::generator_type const
+                secp_k1_scalar_field<160, CHAR_BIT>::mul_generator;
+            constexpr typename secp_r1_scalar_field<160, CHAR_BIT>::generator_type const
+                secp_r1_scalar_field<160, CHAR_BIT>::mul_generator;
+            constexpr typename secp_r2_scalar_field<160, CHAR_BIT>::generator_type const
+                secp_r2_scalar_field<160, CHAR_BIT>::mul_generator;
+            constexpr typename secp_k1_scalar_field<192, CHAR_BIT>::generator_type const
+                secp_k1_scalar_field<192, CHAR_BIT>::mul_generator;
+            constexpr typename secp_r1_scalar_field<192, CHAR_BIT>::generator_type const
+                secp_r1_scalar_field<192, CHAR_BIT>::mul_generator;
+            constexpr typename secp_k1_scalar_field<224, CHAR_BIT>::generator_type const
+                secp_k1_scalar_field<224, CHAR_BIT>::mul_generator;
+            constexpr typename secp_r1_scalar_field<224, CHAR_BIT>::generator_type const
+                secp_r1_scalar_field<224, CHAR_BIT>::mul_generator;
+            constexpr typename secp_k1_scalar_field<256, CHAR_BIT>::generator_type const
+                secp_k1_scalar_field<256, CHAR_BIT>::mul_generator;
 
             template<std::size_t ModulusBits = 160, std::size_t GeneratorBits = CHAR_BIT>
             using secp_k1_fr = secp_k1_scalar_field<ModulusBits, GeneratorBits>;

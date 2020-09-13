@@ -47,21 +47,24 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x03;
 
-                typedef typename detail::element_fp<detail::extension_params<bn128_base_field<254, CHAR_BIT>>> value_type;
+                typedef typename detail::element_fp<detail::extension_params<bn128_base_field<254, CHAR_BIT>>>
+                    value_type;
 
                 constexpr static const std::size_t arity = 1;
             };
 
-            constexpr typename bn128_base_field<254, CHAR_BIT>::modulus_type const bn128_base_field<254, CHAR_BIT>::modulus;
+            constexpr
+                typename bn128_base_field<254, CHAR_BIT>::modulus_type const bn128_base_field<254, CHAR_BIT>::modulus;
 
-            constexpr typename bn128_base_field<254, CHAR_BIT>::generator_type const bn128_base_field<254, CHAR_BIT>::mul_generator;
+            constexpr typename bn128_base_field<254, CHAR_BIT>::generator_type const
+                bn128_base_field<254, CHAR_BIT>::mul_generator;
 
             template<std::size_t ModulusBits = 254, std::size_t GeneratorBits = CHAR_BIT>
             using bn128_fq = bn128_base_field<ModulusBits, GeneratorBits>;
 
             template<std::size_t ModulusBits = 254, std::size_t GeneratorBits = CHAR_BIT>
             using bn128 = bn128_base_field<ModulusBits, GeneratorBits>;
-            
+
         }    // namespace fields
     }        // namespace algebra
 }    // namespace nil

@@ -36,13 +36,15 @@ namespace nil {
 
                     underlying_field_type_value p[3];
 
-                    alt_bn128_g2() : alt_bn128_g2(underlying_field_type_value::zero(), underlying_field_type_value::one(),
-                        underlying_field_type_value::zero()) {};
+                    alt_bn128_g2() :
+                        alt_bn128_g2(underlying_field_type_value::zero(), underlying_field_type_value::one(),
+                                     underlying_field_type_value::zero()) {};
                     // must be
                     // alt_bn128_g2() : alt_bn128_g2(zero_fill[0], zero_fill[1], zero_fill[2]) {};
                     // when constexpr fields will be finished
 
-                    alt_bn128_g2(underlying_field_type_value X, underlying_field_type_value Y, underlying_field_type_value Z) {
+                    alt_bn128_g2(underlying_field_type_value X, underlying_field_type_value Y,
+                                 underlying_field_type_value Z) {
                         p[0] = X;
                         p[1] = Y;
                         p[2] = Z;
@@ -53,13 +55,14 @@ namespace nil {
                     }
 
                     static alt_bn128_g2 one() {
-                        return alt_bn128_g2(underlying_field_type_value(
-                                                0x1800DEEF121F1E76426A00665E5C4479674322D4F75EDADD46DEBD5CD992F6ED_cppui254,
-                                                0x198E9393920D483A7260BFB731FB5D25F1AA493335A9E71297E485B7AEF312C2_cppui254),
-                                            underlying_field_type_value(
-                                                0x12C85EA5DB8C6DEB4AAB71808DCB408FE3D1E7690C43D37B4CE6CC0166FA7DAA_cppui254,
-                                                0x90689D0585FF075EC9E99AD690C3395BC4B313370B38EF355ACDADCD122975B_cppui254),
-                                            underlying_field_type_value::one());
+                        return alt_bn128_g2(
+                            underlying_field_type_value(
+                                0x1800DEEF121F1E76426A00665E5C4479674322D4F75EDADD46DEBD5CD992F6ED_cppui254,
+                                0x198E9393920D483A7260BFB731FB5D25F1AA493335A9E71297E485B7AEF312C2_cppui254),
+                            underlying_field_type_value(
+                                0x12C85EA5DB8C6DEB4AAB71808DCB408FE3D1E7690C43D37B4CE6CC0166FA7DAA_cppui254,
+                                0x90689D0585FF075EC9E99AD690C3395BC4B313370B38EF355ACDADCD122975B_cppui254),
+                            underlying_field_type_value::one());
                         // must be
                         // return alt_bn128_g2(one_fill[0], one_fill[1], one_fill[2]);
                         // when constexpr fields will be finished
@@ -104,8 +107,7 @@ namespace nil {
                         return !(operator==(other));
                     }
 
-                    bool is_zero() const
-                    {
+                    bool is_zero() const {
                         return (this->p[2].is_zero());
                     }
 
@@ -154,7 +156,7 @@ namespace nil {
                         underlying_field_type_value S1_J = S1 * J;
                         underlying_field_type_value Y3 = r * (V - X3) - S1_J.doubled();    // Y3 = r * (V-X3)-2 S1 J
                         underlying_field_type_value Z3 = ((this->p[2] + other.p[2]).squared() - Z1Z1 - Z2Z2) *
-                                                   H;    // Z3 = ((Z1+Z2)^2-Z1Z1-Z2Z2) * H
+                                                         H;    // Z3 = ((Z1+Z2)^2-Z1Z1-Z2Z2) * H
 
                         return alt_bn128_g2(X3, Y3, Z3);
                     }
@@ -172,7 +174,7 @@ namespace nil {
                         underlying_field_type_value B = (this->p[1]).squared();    // B = Y1^2
                         underlying_field_type_value C = B.squared();               // C = B^2
                         underlying_field_type_value D = (this->p[0] + B).squared() - A - C;
-                        D = D + D;                                     // D = 2 * ((X1 + B)^2 - A - C)
+                        D = D + D;                                           // D = 2 * ((X1 + B)^2 - A - C)
                         underlying_field_type_value E = A.doubled() + A;     // E = 3 * A
                         underlying_field_type_value F = E.squared();         // F = E^2
                         underlying_field_type_value X3 = F - D.doubled();    // X3 = F - 2 D
@@ -237,21 +239,18 @@ namespace nil {
                         underlying_field_type_value X3 = r.squared() - J - V - V;    // X3 = r^2-J-2*V
                         underlying_field_type_value Y3 = (this->p[1]) * J;           // Y3 = r*(V-X3)-2*Y1*J
                         Y3 = r * (V - X3) - Y3 - Y3;
-                        underlying_field_type_value Z3 = ((this->p[2]) + H).squared() - Z1Z1 - HH;    // Z3 = (Z1+H)^2-Z1Z1-HH
+                        underlying_field_type_value Z3 =
+                            ((this->p[2]) + H).squared() - Z1Z1 - HH;    // Z3 = (Z1+H)^2-Z1Z1-HH
 
                         return alt_bn128_g2(X3, Y3, Z3);
                     }
 
-                    void to_affine_coordinates()
-                    {
-                        if (this->is_zero())
-                        {
+                    void to_affine_coordinates() {
+                        if (this->is_zero()) {
                             this->p[0] = underlying_field_type_value::zero();
                             this->p[1] = underlying_field_type_value::one();
                             this->p[2] = underlying_field_type_value::zero();
-                        }
-                        else
-                        {
+                        } else {
                             underlying_field_type_value Z_inv = this->p[2].inversed();
                             underlying_field_type_value Z2_inv = Z_inv.squared();
                             underlying_field_type_value Z3_inv = Z2_inv * Z_inv;
@@ -261,17 +260,15 @@ namespace nil {
                         }
                     }
 
-                    void to_special()
-                    {
+                    void to_special() {
                         this->to_affine_coordinates();
                     }
 
-                    bool is_special() const
-                    {
+                    bool is_special() const {
                         return (this->is_zero() || this->p[2] == underlying_field_type_value::one());
                     }
-                private:
 
+                private:
                     /*alt_bn128_g2 mul_by_q() const {
                         return alt_bn128_g2(twist_mul_by_q_X * (this->p[0]).Frobenius_map(1),
                                             twist_mul_by_q_Y * (this->p[1]).Frobenius_map(1),
@@ -281,16 +278,18 @@ namespace nil {
                     /*constexpr static */ const g1_field_type_value a = g1_field_type_value(policy_type::a);
                     /*constexpr static */ const g1_field_type_value b = g1_field_type_value(policy_type::b);
 
-                    /*constexpr static */ const g2_field_type_value twist = g2_field_type_value( 0x09, 0x01);
+                    /*constexpr static */ const g2_field_type_value twist = g2_field_type_value(0x09, 0x01);
 
                     /*constexpr static */ const g2_field_type_value twist_coeff_b = b * twist.inversed();
 
                     /*constexpr static */ const g1_field_type_value twist_mul_by_b_c0 = b * twist.non_residue;
                     /*constexpr static */ const g1_field_type_value twist_mul_by_b_c1 = b * twist.non_residue;
-                    /*constexpr static */ const g2_field_type_value twist_mul_by_q_X = g2_field_type_value({0x2FB347984F7911F74C0BEC3CF559B143B78CC310C2C3330C99E39557176F553D_cppui254,
-                                                           0x16C9E55061EBAE204BA4CC8BD75A079432AE2A1D0B7C9DCE1665D51C640FCBA2_cppui253});
-                    /*constexpr static */ const g2_field_type_value twist_mul_by_q_Y = g2_field_type_value({0x63CF305489AF5DCDC5EC698B6E2F9B9DBAAE0EDA9C95998DC54014671A0135A_cppui251,
-                                                           0x7C03CBCAC41049A0704B5A7EC796F2B21807DC98FA25BD282D37F632623B0E3_cppui251});
+                    /*constexpr static */ const g2_field_type_value twist_mul_by_q_X = g2_field_type_value(
+                        {0x2FB347984F7911F74C0BEC3CF559B143B78CC310C2C3330C99E39557176F553D_cppui254,
+                         0x16C9E55061EBAE204BA4CC8BD75A079432AE2A1D0B7C9DCE1665D51C640FCBA2_cppui253});
+                    /*constexpr static */ const g2_field_type_value twist_mul_by_q_Y = g2_field_type_value(
+                        {0x63CF305489AF5DCDC5EC698B6E2F9B9DBAAE0EDA9C95998DC54014671A0135A_cppui251,
+                         0x7C03CBCAC41049A0704B5A7EC796F2B21807DC98FA25BD282D37F632623B0E3_cppui251});
 
                     /*constexpr static const underlying_field_type_value zero_fill = {
                         underlying_field_type_value::zero(), underlying_field_type_value::one(),

@@ -47,21 +47,24 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x11;
 
-                typedef typename detail::element_fp<detail::extension_params<mnt4_base_field<298, CHAR_BIT>>> value_type;
+                typedef typename detail::element_fp<detail::extension_params<mnt4_base_field<298, CHAR_BIT>>>
+                    value_type;
 
                 constexpr static const std::size_t arity = 1;
             };
 
-            constexpr typename mnt4_base_field<298, CHAR_BIT>::modulus_type const mnt4_base_field<298, CHAR_BIT>::modulus;
+            constexpr
+                typename mnt4_base_field<298, CHAR_BIT>::modulus_type const mnt4_base_field<298, CHAR_BIT>::modulus;
 
-            constexpr typename mnt4_base_field<298, CHAR_BIT>::generator_type const mnt4_base_field<298, CHAR_BIT>::mul_generator;
+            constexpr typename mnt4_base_field<298, CHAR_BIT>::generator_type const
+                mnt4_base_field<298, CHAR_BIT>::mul_generator;
 
             template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
             using mnt4_fq = mnt4_base_field<ModulusBits, GeneratorBits>;
 
             template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
             using mnt4 = mnt4_base_field<ModulusBits, GeneratorBits>;
-            
+
         }    // namespace fields
     }        // namespace algebra
 }    // namespace nil

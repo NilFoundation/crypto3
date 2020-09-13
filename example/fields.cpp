@@ -122,7 +122,6 @@ void fields_fp_basic_math_examples() {
     std::cout << "e1 += e2 value: ";
 
     print_field_element(e1);
-
 }
 
 template<typename Fp2Field>
@@ -165,7 +164,7 @@ void fields_fp2_basic_math_examples() {
 
     std::cout << "e1 * e1^(-1) \n";
     print_field_element(e1 * e1inv);
-    
+
     value_type e1e2 = e1 * e2, e1sqr = e1.squared();
 
     std::cout << "e1 * e2 value: ";

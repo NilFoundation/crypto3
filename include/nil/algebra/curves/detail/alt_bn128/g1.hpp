@@ -35,13 +35,15 @@ namespace nil {
 
                     underlying_field_type_value p[3];
 
-                    alt_bn128_g1() : alt_bn128_g1(underlying_field_type_value::zero(), underlying_field_type_value::one(),
-                        underlying_field_type_value::zero()) {};
+                    alt_bn128_g1() :
+                        alt_bn128_g1(underlying_field_type_value::zero(), underlying_field_type_value::one(),
+                                     underlying_field_type_value::zero()) {};
                     // must be
                     // alt_bn128_g1() : alt_bn128_g1(zero_fill[0], zero_fill[1], zero_fill[2]) {};
                     // when constexpr fields will be finished
 
-                    alt_bn128_g1(underlying_field_type_value X, underlying_field_type_value Y, underlying_field_type_value Z) {
+                    alt_bn128_g1(underlying_field_type_value X, underlying_field_type_value Y,
+                                 underlying_field_type_value Z) {
                         p[0] = X;
                         p[1] = Y;
                         p[2] = Z;
@@ -52,7 +54,8 @@ namespace nil {
                     }
 
                     static alt_bn128_g1 one() {
-                        return alt_bn128_g1(underlying_field_type_value(1), underlying_field_type_value(2), underlying_field_type_value(1));
+                        return alt_bn128_g1(underlying_field_type_value(1), underlying_field_type_value(2),
+                                            underlying_field_type_value(1));
                         // must be
                         // return alt_bn128_g1(one_fill[0], one_fill[1], one_fill[2]);
                         // when constexpr fields will be finished
@@ -97,8 +100,7 @@ namespace nil {
                         return !(operator==(other));
                     }
 
-                    bool is_zero() const
-                    {
+                    bool is_zero() const {
                         return (this->p[2].is_zero());
                     }
 
@@ -147,7 +149,7 @@ namespace nil {
                         underlying_field_type_value S1_J = S1 * J;
                         underlying_field_type_value Y3 = r * (V - X3) - S1_J.doubled();    // Y3 = r * (V-X3)-2 S1 J
                         underlying_field_type_value Z3 = ((this->p[2] + other.p[2]).squared() - Z1Z1 - Z2Z2) *
-                                                   H;    // Z3 = ((Z1+Z2)^2-Z1Z1-Z2Z2) * H
+                                                         H;    // Z3 = ((Z1+Z2)^2-Z1Z1-Z2Z2) * H
 
                         return alt_bn128_g1(X3, Y3, Z3);
                     }
@@ -169,7 +171,7 @@ namespace nil {
                         underlying_field_type_value B = (this->p[1]).squared();    // B = Y1^2
                         underlying_field_type_value C = B.squared();               // C = B^2
                         underlying_field_type_value D = (this->p[0] + B).squared() - A - C;
-                        D = D + D;                                     // D = 2 * ((X1 + B)^2 - A - C)
+                        D = D + D;                                           // D = 2 * ((X1 + B)^2 - A - C)
                         underlying_field_type_value E = A.doubled() + A;     // E = 3 * A
                         underlying_field_type_value F = E.squared();         // F = E^2
                         underlying_field_type_value X3 = F - D.doubled();    // X3 = F - 2 D
@@ -234,21 +236,18 @@ namespace nil {
                         underlying_field_type_value X3 = r.squared() - J - V - V;    // X3 = r^2-J-2*V
                         underlying_field_type_value Y3 = (this->p[1]) * J;           // Y3 = r*(V-X3)-2*Y1*J
                         Y3 = r * (V - X3) - Y3 - Y3;
-                        underlying_field_type_value Z3 = ((this->p[2]) + H).squared() - Z1Z1 - HH;    // Z3 = (Z1+H)^2-Z1Z1-HH
+                        underlying_field_type_value Z3 =
+                            ((this->p[2]) + H).squared() - Z1Z1 - HH;    // Z3 = (Z1+H)^2-Z1Z1-HH
 
                         return alt_bn128_g1(X3, Y3, Z3);
                     }
 
-                    void to_affine_coordinates()
-                    {
-                        if (this->is_zero())
-                        {
+                    void to_affine_coordinates() {
+                        if (this->is_zero()) {
                             this->p[0] = underlying_field_type_value::zero();
                             this->p[1] = underlying_field_type_value::one();
                             this->p[2] = underlying_field_type_value::zero();
-                        }
-                        else
-                        {
+                        } else {
                             underlying_field_type_value Z_inv = this->p[2].inversed();
                             underlying_field_type_value Z2_inv = Z_inv.squared();
                             underlying_field_type_value Z3_inv = Z2_inv * Z_inv;
@@ -258,24 +257,22 @@ namespace nil {
                         }
                     }
 
-                    void to_special()
-                    {
+                    void to_special() {
                         this->to_affine_coordinates();
                     }
 
-                    bool is_special() const
-                    {
+                    bool is_special() const {
                         return (this->is_zero() || this->p[2] == underlying_field_type_value::one());
                     }
 
                 private:
-
                     /*constexpr static const underlying_field_type_value zero_fill = {
                         underlying_field_type_value::zero(), underlying_field_type_value::one(),
                         underlying_field_type_value::zero()};
 
                     constexpr static const underlying_field_type_value one_fill = {
-                        underlying_field_type_value(1), underlying_field_type_value(2), underlying_field_type_value(1)};*/
+                        underlying_field_type_value(1), underlying_field_type_value(2),
+                    underlying_field_type_value(1)};*/
                 };
 
             }    // namespace detail

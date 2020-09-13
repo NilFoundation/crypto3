@@ -53,11 +53,13 @@ namespace nil {
                     extension_params<alt_bn128_base_field<ModulusBits, GeneratorBits>>::fp2_non_residue;
 
                 template<std::size_t ModulusBits, std::size_t GeneratorBits>
-                constexpr std::array<typename params<alt_bn128_base_field<ModulusBits, GeneratorBits>>::modulus_type, 2> const
+                constexpr std::array<typename params<alt_bn128_base_field<ModulusBits, GeneratorBits>>::modulus_type,
+                                     2> const
                     extension_params<alt_bn128_base_field<ModulusBits, GeneratorBits>>::fp6_3over2_non_residue;
 
                 template<std::size_t ModulusBits, std::size_t GeneratorBits>
-                constexpr std::array<typename params<alt_bn128_base_field<ModulusBits, GeneratorBits>>::modulus_type, 2> const
+                constexpr std::array<typename params<alt_bn128_base_field<ModulusBits, GeneratorBits>>::modulus_type,
+                                     2> const
                     extension_params<alt_bn128_base_field<ModulusBits, GeneratorBits>>::fp12_2over3over2_non_residue;
 
             }    // namespace detail

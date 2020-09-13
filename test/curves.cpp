@@ -47,16 +47,15 @@ void print_fp_curve_group_element(std::ostream &os, const FpCurveGroup &e) {
 
 template<typename Fp2CurveGroup>
 void print_fp2_curve_group_element(std::ostream &os, const Fp2CurveGroup &e) {
-    os << "(" << e.p[0].data[0].data << " , " << e.p[0].data[1].data << ") : ("
-              << e.p[1].data[0].data << " , " << e.p[1].data[1].data << ") : ("
-              << e.p[2].data[0].data << " , " << e.p[2].data[1].data << ")" << std::endl;
+    os << "(" << e.p[0].data[0].data << " , " << e.p[0].data[1].data << ") : (" << e.p[1].data[0].data << " , "
+       << e.p[1].data[1].data << ") : (" << e.p[2].data[0].data << " , " << e.p[2].data[1].data << ")" << std::endl;
 }
 
 template<typename Fp3CurveGroup>
 void print_fp3_curve_group_element(std::ostream &os, const Fp3CurveGroup &e) {
     os << "(" << e.p[0].data[0].data << " , " << e.p[0].data[1].data << " , " << e.p[0].data[2].data << ") : ("
-              << e.p[1].data[0].data << " , " << e.p[1].data[1].data << " , " << e.p[1].data[2].data << ") : ("
-              << e.p[2].data[0].data << " , " << e.p[2].data[1].data << " , " << e.p[2].data[2].data << ")" << std::endl;
+       << e.p[1].data[0].data << " , " << e.p[1].data[1].data << " , " << e.p[1].data[2].data << ") : ("
+       << e.p[2].data[0].data << " , " << e.p[2].data[1].data << " , " << e.p[2].data[2].data << ")" << std::endl;
 }
 
 namespace boost {
@@ -180,10 +179,7 @@ boost::property_tree::ptree string_data(std::string test_name) {
     return string_data.get_child(test_name);
 }
 
-enum curve_operation_test_constants : std::size_t {
-    C1,
-    C2
-};
+enum curve_operation_test_constants : std::size_t { C1, C2 };
 
 enum curve_operation_test_points : std::size_t {
     p1,
@@ -204,16 +200,18 @@ void check_curve_operations(const std::vector<CurveGroup> &points, const std::ve
     BOOST_CHECK_EQUAL(points[p1] - points[p2], points[p1_minus_p2]);
     BOOST_CHECK_EQUAL(points[p1].doubled(), points[p1_dbl]);
     BOOST_CHECK_EQUAL(points[p1].mixed_add(points[p2]), points[p1_mixed_add_p2]);
-    CurveGroup p1_copy(points[p1]); p1_copy.to_affine_coordinates();
+    CurveGroup p1_copy(points[p1]);
+    p1_copy.to_affine_coordinates();
     BOOST_CHECK_EQUAL(p1_copy, points[p1_to_affine_coordinates]);
-    CurveGroup p2_copy(points[p2]); p2_copy.to_special();
+    CurveGroup p2_copy(points[p2]);
+    p2_copy.to_special();
     BOOST_CHECK_EQUAL(p2_copy, points[p2_to_special]);
 }
 
 template<typename FpCurveGroup, typename TestSet>
 void fp_curve_test_init(std::vector<FpCurveGroup> &points,
-                   std::vector<std::size_t> &constants,
-                   const TestSet &test_set) {
+                        std::vector<std::size_t> &constants,
+                        const TestSet &test_set) {
     using field_value_type = typename FpCurveGroup::underlying_field_type_value;
     std::array<field_value_type, 3> coordinates;
 
@@ -232,8 +230,8 @@ void fp_curve_test_init(std::vector<FpCurveGroup> &points,
 
 template<typename Fp2CurveGroup, typename TestSet>
 void fp2_curve_test_init(std::vector<Fp2CurveGroup> &points,
-                    std::vector<std::size_t> &constants,
-                    const TestSet &test_set) {
+                         std::vector<std::size_t> &constants,
+                         const TestSet &test_set) {
     using fp2_value_type = typename Fp2CurveGroup::underlying_field_type_value;
     using modulus_type = typename fp2_value_type::underlying_type::modulus_type;
     std::array<modulus_type, 6> coordinates;
@@ -242,8 +240,7 @@ void fp2_curve_test_init(std::vector<Fp2CurveGroup> &points,
         auto i = 0;
         for (auto &coordinate_pairs : point.second) {
             for (auto &coordinate : coordinate_pairs.second) {
-                coordinates[i++] = modulus_type(
-                    coordinate.second.data());
+                coordinates[i++] = modulus_type(coordinate.second.data());
             }
         }
         points.emplace_back(Fp2CurveGroup(fp2_value_type(coordinates[0], coordinates[1]),
@@ -258,8 +255,8 @@ void fp2_curve_test_init(std::vector<Fp2CurveGroup> &points,
 
 template<typename Fp3CurveGroup, typename TestSet>
 void fp3_curve_test_init(std::vector<Fp3CurveGroup> &points,
-                    std::vector<std::size_t> &constants,
-                    const TestSet &test_set) {
+                         std::vector<std::size_t> &constants,
+                         const TestSet &test_set) {
     using fp3_value_type = typename Fp3CurveGroup::underlying_field_type_value;
     using modulus_type = typename fp3_value_type::underlying_type::modulus_type;
 
@@ -269,8 +266,7 @@ void fp3_curve_test_init(std::vector<Fp3CurveGroup> &points,
         auto i = 0;
         for (auto &coordinate_pairs : point.second) {
             for (auto &coordinate : coordinate_pairs.second) {
-                coordinates[i++] = modulus_type(
-                    coordinate.second.data());
+                coordinates[i++] = modulus_type(coordinate.second.data());
             }
         }
         points.emplace_back(Fp3CurveGroup(fp3_value_type(coordinates[0], coordinates[1], coordinates[2]),
@@ -285,9 +281,7 @@ void fp3_curve_test_init(std::vector<Fp3CurveGroup> &points,
 
 template<typename CurveGroup, typename TestSet>
 void curve_operation_test(const TestSet &test_set,
-                          void (&test_init)(std::vector<CurveGroup> &,
-                                            std::vector<std::size_t> &,
-                                            const TestSet &)) {
+                          void (&test_init)(std::vector<CurveGroup> &, std::vector<std::size_t> &, const TestSet &)) {
     std::vector<CurveGroup> points;
     std::vector<std::size_t> constants;
 

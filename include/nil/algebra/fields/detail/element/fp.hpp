@@ -107,7 +107,7 @@ namespace nil {
                     element_fp doubled() const {
                         return element_fp(data + data);
                     }
-                    
+
                     element_fp sqrt() const {
                         return element_fp(ressol(data));
                     }
@@ -115,7 +115,7 @@ namespace nil {
                     element_fp inversed() const {
                         return element_fp(inverse_extended_euclidean_algorithm(data));
                     }
-                    
+
                     element_fp _2z_add_3x() {
                     }
 

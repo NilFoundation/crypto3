@@ -126,12 +126,12 @@ namespace nil {
                         // NOTE: does not handle O and pts of order 2,4
                         // http://www.hyperelliptic.org/EFD/g1p/auto-twisted-inverted.html#addition-add-2008-bbjlp
 
-                        const underlying_field_type_value A = (this->p[2]) * (other.p[2]);             // A = Z1*Z2
+                        const underlying_field_type_value A = (this->p[2]) * (other.p[2]);    // A = Z1*Z2
                         const underlying_field_type_value B = this->mul_by_d(A.squared());    // B = d*A^2
-                        const underlying_field_type_value C = (this->p[0]) * (other.p[0]);             // C = X1*X2
-                        const underlying_field_type_value D = (this->p[1]) * (other.p[1]);             // D = Y1*Y2
-                        const underlying_field_type_value E = C * D;                                   // E = C*D
-                        const underlying_field_type_value H = C - this->mul_by_a(D);                   // H = C-a*D
+                        const underlying_field_type_value C = (this->p[0]) * (other.p[0]);    // C = X1*X2
+                        const underlying_field_type_value D = (this->p[1]) * (other.p[1]);    // D = Y1*Y2
+                        const underlying_field_type_value E = C * D;                          // E = C*D
+                        const underlying_field_type_value H = C - this->mul_by_a(D);          // H = C-a*D
                         const underlying_field_type_value I =
                             (this->p[0] + this->p[1]) * (other.p[0] + other.p[1]) - C - D;    // I = (X1+Y1)*(X2+Y2)-C-D
                         const underlying_field_type_value X3 = (E + B) * H;                   // X3 = (E+B)*H
