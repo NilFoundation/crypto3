@@ -29,7 +29,7 @@ namespace nil {
                 typedef typename cipher_type::key_type key_type;
 
                 template<typename SinglePassRange>
-                cipher_key(const SinglePassRange &r) {
+                explicit cipher_key(const SinglePassRange &r) {
                     using namespace nil::crypto3::detail;
 
                     BOOST_RANGE_CONCEPT_ASSERT((boost::SinglePassRangeConcept<const SinglePassRange>));
@@ -45,7 +45,7 @@ namespace nil {
                 }
 
                 template<typename InputIterator>
-                cipher_key(InputIterator first, InputIterator last) {
+                explicit cipher_key(InputIterator first, InputIterator last) {
                     using namespace nil::crypto3::detail;
 
                     BOOST_CONCEPT_ASSERT((boost::InputIteratorConcept<InputIterator>));
