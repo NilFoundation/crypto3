@@ -13,6 +13,7 @@
 #include <nil/crypto3/detail/stream_endian.hpp>
 #include <nil/crypto3/detail/exploder.hpp>
 #include <nil/crypto3/detail/imploder.hpp>
+#include <nil/crypto3/detail/predef.hpp>
 
 #include <boost/assert.hpp>
 #include <boost/static_assert.hpp>
