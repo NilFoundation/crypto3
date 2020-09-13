@@ -24,6 +24,8 @@
 #include <nil/crypto3/codec/algorithm/encode.hpp>
 #include <nil/crypto3/codec/algorithm/decode.hpp>
 
+#include <nil/crypto3/codec/adaptor/coded.hpp>
+
 #include <nil/crypto3/codec/hex.hpp>
 
 using namespace nil::crypto3;
@@ -185,22 +187,14 @@ BOOST_DATA_TEST_CASE(hex_lower_single_range_random_encode_decode,
 
 BOOST_AUTO_TEST_SUITE_END()
 
-// BOOST_AUTO_TEST_SUITE(hex_codec_adaptor_test_suite)
+//BOOST_AUTO_TEST_SUITE(hex_codec_adaptor_test_suite)
 //
 //    BOOST_DATA_TEST_CASE(hex_upper_range_encode, mode_data("upper_mode"), array_element) {
-//        typedef hex<mode::upper> Codec;
-//        typedef typename range_compressor_traits<typename Codec::stream_encoder_type,
-//                decltype(array_element.first)>::type CompressorState;
-//
-//        BOOST_CHECK_EQUAL((array_element.first | adaptors::encoded<Codec, CompressorState>()), array_element.second.data());
+//        BOOST_CHECK((array_element.first | adaptors::encoded<codec::hex<>>) == array_element.second);
 //    }
 //
 //    BOOST_DATA_TEST_CASE(hex_upper_range_decode, mode_data("upper_mode"), array_element) {
-//        typedef hex<mode::upper> Codec;
-//        typedef typename range_compressor_traits<typename Codec::stream_encoder_type,
-//                decltype(array_element.first)>::type CompressorState;
-//
-//        BOOST_CHECK_EQUAL((array_element.second.data() | adaptors::decoded<Codec, CompressorState>()), array_element.first);
+//        BOOST_CHECK((array_element.second | adaptors::decoded<codec::hex<>>) == array_element.first);
 //    }
 //
-// BOOST_AUTO_TEST_SUITE_END()
+//BOOST_AUTO_TEST_SUITE_END()
