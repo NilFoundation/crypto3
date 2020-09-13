@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------//
 // Copyright (c) 2020 Mikhail Komarov <nemo@nil.foundation>
 // Copyright (c) 2020 Nikita Kaskov <nbering@nil.foundation>
+// Copyright (c) 2020 Ilias Khairullin <ilias@nil.foundation>
 //
 // Distributed under the Boost Software License, Version 1.0
 // See accompanying file LICENSE_1_0.txt or copy at
@@ -10,305 +11,180 @@
 #define BOOST_TEST_MODULE fields_algebra_test
 
 #include <iostream>
+#include <cstdint>
+#include <string>
 
-#include <boost/multiprecision/cpp_modular.hpp>
-#include <boost/multiprecision/number.hpp>
-#include <boost/multiprecision/cpp_int.hpp>
-#include <boost/multiprecision/modular/modular_adaptor.hpp>
+// #include <boost/multiprecision/cpp_modular.hpp>
+// #include <boost/multiprecision/number.hpp>
+// #include <boost/multiprecision/cpp_int.hpp>
+// #include <boost/multiprecision/modular/modular_adaptor.hpp>
 
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
 
-#include <nil/algebra/fields/bn128/base_field.hpp>
-#include <nil/algebra/fields/bn128/scalar_field.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
 
+#include <nil/algebra/fields/fp2.hpp>
+
+// #include <nil/algebra/fields/bn128/base_field.hpp>
+// #include <nil/algebra/fields/bn128/scalar_field.hpp>
 #include <nil/algebra/fields/bls12/base_field.hpp>
 #include <nil/algebra/fields/bls12/scalar_field.hpp>
+// #include <nil/algebra/fields/dsa_botan.hpp>
+// #include <nil/algebra/fields/dsa_jce.hpp>
+// #include <nil/algebra/fields/ed25519_fe.hpp>
+// #include <nil/algebra/fields/ffdhe_ietf.hpp>
+// #include <nil/algebra/fields/field.hpp>
+// #include <nil/algebra/fields/modp_ietf.hpp>
+// #include <nil/algebra/fields/modp_srp.hpp>
 
-#include <nil/algebra/fields/dsa_botan.hpp>
-#include <nil/algebra/fields/dsa_jce.hpp>
-#include <nil/algebra/fields/ed25519_fe.hpp>
-#include <nil/algebra/fields/ffdhe_ietf.hpp>
-#include <nil/algebra/fields/field.hpp>
-#include <nil/algebra/fields/modp_ietf.hpp>
-#include <nil/algebra/fields/modp_srp.hpp>
+#include <nil/algebra/fields/detail/element/fp.hpp>
+#include <nil/algebra/fields/detail/element/fp2.hpp>
 
 using namespace nil::algebra;
 
+template<typename FieldParams>
+void print_field_element(std::ostream &os, const typename fields::detail::element_fp<FieldParams> &e) {
+    os << e.data << std::endl;
+}
+
+template<typename FieldParams>
+void print_field_element(std::ostream &os, const typename fields::detail::element_fp2<FieldParams> &e) {
+    os << e.data[0].data << " " << e.data[1].data << std::endl;
+}
+
+namespace boost {
+    namespace test_tools {
+        namespace tt_detail {
+            template<typename FieldParams>
+            struct print_log_value<typename fields::detail::element_fp<FieldParams>> {
+                void operator()(std::ostream &os, typename fields::detail::element_fp<FieldParams> const &e) {
+                    print_field_element(os, e);
+                }
+            };
+
+            template<typename FieldParams>
+            struct print_log_value<typename fields::detail::element_fp2<FieldParams>> {
+                void operator()(std::ostream &os, typename fields::detail::element_fp2<FieldParams> const &e) {
+                    print_field_element(os, e);
+                }
+            };
+
+            template<template<typename, typename> class P, typename K, typename V>
+            struct print_log_value<P<K, V>> {
+                void operator()(std::ostream &, P<K, V> const &) {
+                }
+            };
+        }    // namespace tt_detail
+    }        // namespace test_tools
+}    // namespace boost
+
+typedef int64_t constant_type;
+enum field_operation_test_constants : std::size_t {
+    C1
+};
+
+enum field_operation_test_elements : std::size_t {
+    e1,
+    e2,
+    e1_plus_e2,
+    e1_minus_e2,
+    e1_mul_e2,
+    e1_dbl,
+    e2_inv,
+    e1_pow_C1,
+    e2_pow_2,
+    e2_pow_2_sqrt
+};
+
+// if target == check-algebra just data/fields.json
+const char *test_data = "libs/algebra/test/data/fields.json";
+
+boost::property_tree::ptree string_data(std::string test_name) {
+    boost::property_tree::ptree string_data;
+    boost::property_tree::read_json(test_data, string_data);
+
+    return string_data.get_child(test_name);
+}
+
+template<typename element_type>
+void check_field_operations(const std::vector<element_type> &elements,
+                            const std::vector<constant_type> &constants) {
+    BOOST_CHECK_EQUAL(elements[e1] + elements[e2], elements[e1_plus_e2]);
+    BOOST_CHECK_EQUAL(elements[e1] - elements[e2], elements[e1_minus_e2]);
+    BOOST_CHECK_EQUAL(elements[e1] * elements[e2], elements[e1_mul_e2]);
+    BOOST_CHECK_EQUAL(elements[e1].doubled(), elements[e1_dbl]);
+    BOOST_CHECK_EQUAL(elements[e2].inversed(), elements[e2_inv]);
+    BOOST_CHECK_EQUAL(elements[e1].pow(constants[C1]), elements[e1_pow_C1]);
+    BOOST_CHECK_EQUAL(elements[e2].squared(), elements[e2_pow_2]);
+    BOOST_CHECK_EQUAL((elements[e2].squared()).sqrt(), elements[e2_pow_2_sqrt]);
+}
+
+template<typename FieldParams, typename TestSet>
+void field_test_init(std::vector<typename fields::detail::element_fp<FieldParams>> &elements,
+                     std::vector<constant_type> &constants,
+                     const TestSet &test_set) {
+    using element_type = typename fields::detail::element_fp<FieldParams>;
+
+    for (auto &element : test_set.second.get_child("elements_values")) {
+        elements.emplace_back(
+            element_type(
+                typename element_type::modulus_type(element.second.data())
+            )
+        );
+    }
+
+    for (auto &constant : test_set.second.get_child("constants")) {
+        constants.emplace_back(std::stoll(constant.second.data()));
+    }
+}
+
+template<typename FieldParams, typename TestSet>
+void field_test_init(std::vector<typename fields::detail::element_fp2<FieldParams>> &elements,
+                     std::vector<constant_type> &constants,
+                     const TestSet &test_set) {
+    using element_type = typename fields::detail::element_fp2<FieldParams>;
+    using modulus_type = typename element_type::underlying_type::modulus_type;
+
+    std::array<modulus_type, 2> element_values;
+
+    for (auto &element : test_set.second.get_child("elements_values")) {
+        auto i = 0;
+        for (auto &element_value : element.second) {
+            element_values[i++] = modulus_type(element_value.second.data());
+        }
+        elements.emplace_back(element_type(element_values[0], element_values[1]));
+    }
+
+    for (auto &constant : test_set.second.get_child("constants")) {
+        constants.emplace_back(std::stoll(constant.second.data()));
+    }
+}
+
+template<typename FieldType, typename TestSet>
+void curve_operation_test(const TestSet &test_set) {
+    std::vector<typename FieldType::value_type> elements;
+    std::vector<constant_type> constants;
+
+    field_test_init(elements, constants, test_set);
+
+    check_field_operations(elements, constants);
+}
+
 BOOST_AUTO_TEST_SUITE(fields_manual_tests)
 
-BOOST_AUTO_TEST_CASE(fields_manual_test1) {
+BOOST_DATA_TEST_CASE(field_operation_test_bls12_381_fr, string_data("field_operation_test_bls12_381_fr"), data_set) {
+    using policy_type = fields::bls12_fr<381>;
 
-    using value_type = fields::dsa_botan<2048, 2048>::value_type;
-
-    const fields::dsa_botan<2048, 2048>::modulus_type m = fields::dsa_botan<2048, 2048>::modulus;
-
-    value_type e1 = value_type::one(), e2(3);
-
-    std::cout << e1.is_one() << e2.is_one() << e2.is_zero() << std::endl;
-
-    value_type e3 = e1.doubled() * e2.squared();
-
-    value_type e4 = e1 * e2 * e2 + e1 * e2 * e2;
-
-    std::cout << "4 == e1 + e2 ? : " << (value_type(4) == e1 + e2) << std::endl;
-
-    std::cout << "4 == e3 ? : " << (value_type(4) == e3) << std::endl;
-
-    std::cout << "E2 value: " << e2.data << std::endl;
-
-    std::cout << "Modulus value: " << m << std::endl;
-
-    std::cout << (e4 == e3);
-
-    // assert(e4 == e3);
-    BOOST_CHECK_EQUAL(e4.data, e3.data);
+    curve_operation_test<policy_type>(data_set);
 }
+
+// BOOST_DATA_TEST_CASE(field_operation_test_bls12_381_fq2, string_data("field_operation_test_bls12_381_fq2"), data_set) {
+//     using policy_type = fields::fp2<fields::bls12_fq<381>>;
+
+//     curve_operation_test<policy_type>(data_set);
+// }
+
 BOOST_AUTO_TEST_SUITE_END()
-/*
-BOOST_AUTO_TEST_SUITE(fields_dsa_botan_tests)
-BOOST_AUTO_TEST_CASE(fields_dsa_botan_test1) {
-
-    using value_type = fields::dsa_botan<2048, 2048>::value_type;
-
-    const fields::dsa_botan<2048, 2048>::modulus_type m = fields::dsa_botan<2048, 2048>::modulus;
-
-    value_type e1 = value_type::one(), e2(3);
-
-    std::cout << e1.is_one() << e2.is_one() << e2.is_zero() << std::endl;
-
-    value_type e3 = e1.doubled() * e2.squared();
-
-    value_type e4 = e1 * e2 * e2 + e1 * e2 * e2;
-
-    std::cout << "4 == e1 + e2 ? : " << (value_type(4) == e1 + e2) << std::endl;
-
-    std::cout << "4 == e3 ? : " << (value_type(4) == e3) << std::endl;
-
-    std::cout << "E2 value: " << e2.data << std::endl;
-
-    std::cout << "Modulus value: " << m << std::endl;
-
-    std::cout << (e4 == e3);
-
-    //assert(value_type(4) == e3);
-    BOOST_CHECK_EQUAL(value_type(4).data, e3.data);
-}
-BOOST_AUTO_TEST_SUITE_END()*/
-
-/*
-template<typename FieldType, typename NumberType>
-void test_field() {
-    NumberType rand1  = NumberType ("76749407");
-    NumberType rand2 = NumberType ("44410867");
-    NumberType randsum = NumberType ("121160274");
-
-    FieldType zero = FieldType::zero();
-    FieldType one = FieldType::one();
-    FieldType a = FieldType::random_element();
-    FieldType a_ser;
-    a_ser = reserialize<FieldType>(a);
-    assert(a_ser == a);
-
-    FieldType b = FieldType::random_element();
-    FieldType c = FieldType::random_element();
-    FieldType d = FieldType::random_element();
-
-    assert(a != zero);
-    assert(a != one);
-
-    assert(a * a == a.squared());
-    assert((a + b).squared() == a.squared() + a * b + b * a + b.squared());
-    assert((a + b) * (c + d) == a * c + a * d + b * c + b * d);
-    assert(a - b == a + (-b));
-    assert(a - b == (-b) + a);
-
-    assert((a ^ rand1) * (a ^ rand2) == (a ^ randsum));
-
-    assert(a * a.inversed() == one);
-    assert((a + b) * c.inversed() == a * c.inversed() + (b.inversed() * c).inversed());
-}
-
-template<typename FieldType>
-void test_sqrt() {
-    for (std::size_t i = 0; i < 100; ++i) {
-        FieldType a = FieldType::random_element();
-        FieldType asq = a.squared();
-        assert(asq.sqrt() == a || asq.sqrt() == -a);
-    }
-}
-
-template<typename FieldType>
-void test_two_squarings() {
-    FieldType a = FieldType::random_element();
-    assert(a.squared() == a * a);
-    assert(a.squared() == a.squared_complex());
-    assert(a.squared() == a.squared_karatsuba());
-}
-
-template<typename FieldType>
-void test_Frobenius() {
-    FieldType a = FieldType::random_element();
-    assert(a.Frobenius_map(0) == a);
-    FieldType a_q = a ^ FieldType::base_field_char();
-    for (std::size_t power = 1; power < 10; ++power) {
-        const FieldType a_qi = a.Frobenius_map(power);
-        assert(a_qi == a_q);
-
-        a_q = a_q ^ FieldType::base_field_char();
-    }
-}
-
-template<typename FieldType>
-void test_unitary_inverse() {
-    assert(FieldType::extension_degree() % 2 == 0);
-    FieldType a = FieldType::random_element();
-    FieldType aqcubed_minus1 = a.Frobenius_map(FieldType::extension_degree() / 2) * a.inversed();
-    assert(aqcubed_minus1.inversed() == aqcubed_minus1.unitary_inverse());
-}
-
-template<typename FieldType>
-void test_cyclotomic_squaring();
-
-template<>
-void test_cyclotomic_squaring<Fqk<edwards_pp>>() {
-    typedef Fqk<edwards_pp> FieldType;
-    assert(FieldType::extension_degree() % 2 == 0);
-    FieldType a = FieldType::random_element();
-    FieldType a_unitary = a.Frobenius_map(FieldType::extension_degree() / 2) * a.inversed();
-    // beta = a^((q^(k/2)-1)*(q+1))
-    FieldType beta = a_unitary.Frobenius_map(1) * a_unitary;
-    assert(beta.cyclotomic_squared() == beta.squared());
-}
-
-template<>
-void test_cyclotomic_squaring<Fqk<mnt4_pp>>() {
-    typedef Fqk<mnt4_pp> FieldType;
-    assert(FieldType::extension_degree() % 2 == 0);
-    FieldType a = FieldType::random_element();
-    FieldType a_unitary = a.Frobenius_map(FieldType::extension_degree() / 2) * a.inversed();
-    // beta = a^(q^(k/2)-1)
-    FieldType beta = a_unitary;
-    assert(beta.cyclotomic_squared() == beta.squared());
-}
-
-template<>
-void test_cyclotomic_squaring<Fqk<mnt6_pp>>() {
-    typedef Fqk<mnt6_pp> FieldType;
-    assert(FieldType::extension_degree() % 2 == 0);
-    FieldType a = FieldType::random_element();
-    FieldType a_unitary = a.Frobenius_map(FieldType::extension_degree() / 2) * a.inversed();
-    // beta = a^((q^(k/2)-1)*(q+1))
-    FieldType beta = a_unitary.Frobenius_map(1) * a_unitary;
-    assert(beta.cyclotomic_squared() == beta.squared());
-}
-
-template<typename CurveType>
-void test_all_fields() {
-    test_field<Fr<CurveType>>();
-    test_field<Fq<CurveType>>();
-    test_field<Fqe<CurveType>>();
-    test_field<Fqk<CurveType>>();
-
-    test_sqrt<Fr<CurveType>>();
-    test_sqrt<Fq<CurveType>>();
-    test_sqrt<Fqe<CurveType>>();
-
-    test_Frobenius<Fqe<CurveType>>();
-    test_Frobenius<Fqk<CurveType>>();
-
-    test_unitary_inverse<Fqk<CurveType>>();
-}
-
-template<typename Fp4T>
-void test_Fp4_tom_cook() {
-    typedef typename Fp4T::my_Fp FieldType;
-    for (size_t i = 0; i < 100; ++i) {
-        const Fp4T a = Fp4T::random_element();
-        const Fp4T b = Fp4T::random_element();
-        const Fp4T correct_res = a * b;
-
-        Fp4T res;
-
-        const FieldType &a0 = a.c0.c0, &a1 = a.c1.c0, &a2 = a.c0.c1, &a3 = a.c1.c1;
-
-        const FieldType &b0 = b.c0.c0, &b1 = b.c1.c0, &b2 = b.c0.c1, &b3 = b.c1.c1;
-
-        FieldType &c0 = res.c0.c0, &c1 = res.c1.c0, &c2 = res.c0.c1, &c3 = res.c1.c1;
-
-        const FieldType v0 = a0 * b0;
-        const FieldType v1 = (a0 + a1 + a2 + a3) * (b0 + b1 + b2 + b3);
-        const FieldType v2 = (a0 - a1 + a2 - a3) * (b0 - b1 + b2 - b3);
-        const FieldType v3 = (a0 + FieldType(2) * a1 + FieldType(4) * a2 + FieldType(8) * a3) *
-                          (b0 + FieldType(2) * b1 + FieldType(4) * b2 + FieldType(8) * b3);
-        const FieldType v4 = (a0 - FieldType(2) * a1 + FieldType(4) * a2 - FieldType(8) * a3) *
-                          (b0 - FieldType(2) * b1 + FieldType(4) * b2 - FieldType(8) * b3);
-        const FieldType v5 = (a0 + FieldType(3) * a1 + FieldType(9) * a2 + FieldType(27) * a3) *
-                          (b0 + FieldType(3) * b1 + FieldType(9) * b2 + FieldType(27) * b3);
-        const FieldType v6 = a3 * b3;
-
-        const FieldType beta = Fp4T::non_residue;
-
-        c0 = v0 + beta * (FieldType(4).inversed() * v0 - FieldType(6).inversed() * (v1 + v2) +
-                          FieldType(24).inversed() * (v3 + v4) - FieldType(5) * v6);
-        c1 = -FieldType(3).inversed() * v0 + v1 - FieldType(2).inversed() * v2 - FieldType(4).inversed() * v3 +
-             FieldType(20).inversed() * v4 + FieldType(30).inversed() * v5 - FieldType(12) * v6 +
-             beta * (-FieldType(12).inversed() * (v0 - v1) + FieldType(24).inversed() * (v2 - v3) -
-                     FieldType(120).inversed() * (v4 - v5) - FieldType(3) * v6);
-        c2 = -(FieldType(5) * (FieldType(4).inversed())) * v0 + (FieldType(2) * (FieldType(3).inversed())) * (v1 + v2) -
-             FieldType(24).inversed() * (v3 + v4) + FieldType(4) * v6 + beta * v6;
-        c3 = FieldType(12).inversed() * (FieldType(5) * v0 - FieldType(7) * v1) -
-             FieldType(24).inversed() * (v2 - FieldType(7) * v3 + v4 + v5) + FieldType(15) * v6;
-
-        assert(res == correct_res);
-
-        // {v0, v3, v4, v5}
-        const FieldType u = (FieldType::one() - beta).inversed();
-        assert(v0 == u * c0 + beta * u * c2 - beta * u * FieldType(2).inversed() * v1 -
-                         beta * u * FieldType(2).inversed() * v2 + beta * v6);
-        assert(v3 == -FieldType(15) * u * c0 - FieldType(30) * u * c1 - FieldType(3) * (FieldType(4) + beta) * u * c2 -
-                         FieldType(6) * (FieldType(4) + beta) * u * c3 +
-                         (FieldType(24) - FieldType(3) * beta * FieldType(2).inversed()) * u * v1 +
-                         (-FieldType(8) + beta * FieldType(2).inversed()) * u * v2 - FieldType(3) * (-FieldType(16) +
-beta) * v6); assert(v4 == -FieldType(15) * u * c0 + FieldType(30) * u * c1 - FieldType(3) * (FieldType(4) + beta) * u *
-c2 + FieldType(6) * (FieldType(4) + beta) * u * c3 + (FieldType(24) - FieldType(3) * beta * FieldType(2).inversed()) * u
-* v2 +
-                         (-FieldType(8) + beta * FieldType(2).inversed()) * u * v1 - FieldType(3) * (-FieldType(16) +
-beta) * v6); assert(v5 == -FieldType(80) * u * c0 - FieldType(240) * u * c1 - FieldType(8) * (FieldType(9) + beta) * u *
-c2 - FieldType(24) * (FieldType(9) + beta) * u * c3 - FieldType(2) * (-FieldType(81) + beta) * u * v1 +
-                         (-FieldType(81) + beta) * u * v2 - FieldType(8) * (-FieldType(81) + beta) * v6);
-
-        // c0 + beta c2 - (beta v1)/2 - (beta v2)/ 2 - (-1 + beta) beta v6,
-        // -15 c0 - 30 c1 - 3 (4 + beta) c2 - 6 (4 + beta) c3 + (24 - (3 beta)/2) v1 + (-8 + beta/2) v2 + 3 (-16 + beta)
-        // (-1 + beta) v6, -15 c0 + 30 c1 - 3 (4 + beta) c2 + 6 (4 + beta) c3 + (-8 + beta/2) v1 + (24 - (3 beta)/2) v2
-        // + 3 (-16 + beta) (-1 + beta) v6, -80 c0 - 240 c1 - 8 (9 + beta) c2 - 24 (9 + beta) c3 - 2 (-81 + beta) v1 +
-        // (-81 + beta) v2 + 8 (-81 + beta) (-1 + beta) v6
-    }
-}
-
-int main(void) {
-    edwards_pp::init_public_params();
-    test_all_fields<edwards_pp>();
-    test_cyclotomic_squaring<Fqk<edwards_pp>>();
-
-    mnt4_pp::init_public_params();
-    test_all_fields<mnt4_pp>();
-    test_Fp4_tom_cook<mnt4_Fq4>();
-    test_two_squarings<Fqe<mnt4_pp>>();
-    test_cyclotomic_squaring<Fqk<mnt4_pp>>();
-
-    mnt6_pp::init_public_params();
-    test_all_fields<mnt6_pp>();
-    test_cyclotomic_squaring<Fqk<mnt6_pp>>();
-
-    alt_bn128_pp::init_public_params();
-    test_field<alt_bn128_Fq6>();
-    test_Frobenius<alt_bn128_Fq6>();
-    test_all_fields<alt_bn128_pp>();
-
-    bn128_pp::init_public_params();
-    test_field<Fr<bn128_pp>>();
-    test_field<Fq<bn128_pp>>();
-}
-*/
