@@ -17,10 +17,10 @@
 #include <boost/integer.hpp>
 #include <boost/static_assert.hpp>
 #include <boost/endian/conversion.hpp>
-#include <boost/predef/architecture.h>
 
 #include <nil/crypto3/detail/unbounded_shift.hpp>
 #include <nil/crypto3/detail/stream_endian.hpp>
+#include <nil/crypto3/detail/predef.hpp>
 
 namespace nil {
     namespace crypto3 {
