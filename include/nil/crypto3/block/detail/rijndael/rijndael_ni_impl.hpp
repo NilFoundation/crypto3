@@ -13,10 +13,9 @@
 
 #include <wmmintrin.h>
 
-#include <boost/config.hpp>
-
 #include <nil/crypto3/detail/make_uint_t.hpp>
 #include <nil/crypto3/detail/pack.hpp>
+#include <nil/crypto3/detail/config.hpp>
 
 namespace nil {
     namespace crypto3 {

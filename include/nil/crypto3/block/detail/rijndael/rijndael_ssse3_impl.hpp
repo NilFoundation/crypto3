@@ -5,6 +5,13 @@
 // See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
+// @file AES using SSSE3
+//
+// @brief This is more or less a direct translation of public domain x86-64
+// assembly written by Mike Hamburg, described in "Accelerating AES
+// with Vector Permute Instructions" (CHES 2009). His original code is
+// available at https://crypto.stanford.edu/vpaes/
+//---------------------------------------------------------------------------//
 
 #ifndef CRYPTO3_SSSE3_RIJNDAEL_IMPL_HPP
 #define CRYPTO3_SSSE3_RIJNDAEL_IMPL_HPP
@@ -15,14 +22,7 @@
 
 #include <boost/static_assert.hpp>
 
-/*
- * AES using SSSE3
- *
- * This is more or less a direct translation of public domain x86-64
- * assembly written by Mike Hamburg, described in "Accelerating AES
- * with Vector Permute Instructions" (CHES 2009). His original code is
- * available at https://crypto.stanford.edu/vpaes/
- */
+#include <nil/crypto3/detail/config.hpp>
 
 namespace nil {
     namespace crypto3 {

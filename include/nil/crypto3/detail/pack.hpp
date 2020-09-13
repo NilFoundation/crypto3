@@ -15,6 +15,7 @@
 #include <nil/crypto3/detail/exploder.hpp>
 #include <nil/crypto3/detail/imploder.hpp>
 #include <nil/crypto3/detail/reverser.hpp>
+#include <nil/crypto3/detail/predef.hpp>
 
 #include <boost/static_assert.hpp>
 #include <boost/predef/other/endian.h>
