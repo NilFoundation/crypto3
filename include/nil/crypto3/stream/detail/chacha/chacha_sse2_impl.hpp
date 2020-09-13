@@ -9,7 +9,7 @@
 #ifndef CRYPTO3_STREAM_CHACHA_SSE2_IMPL_HPP
 #define CRYPTO3_STREAM_CHACHA_SSE2_IMPL_HPP
 
-#include <boost/config.hpp>
+#include <nil/crypto3/detail/config.hpp>
 
 #include <nil/crypto3/stream/detail/chacha/chacha_policy.hpp>
 
