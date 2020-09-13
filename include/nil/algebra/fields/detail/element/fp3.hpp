@@ -31,8 +31,8 @@ namespace nil {
                 public:
                     using underlying_type = element_fp<FieldParams>;
 
-                    const typename policy_type::fp3_non_residue_type non_residue =
-                        underlying_type(typename policy_type::fp3_non_residue_type(policy_type::fp3_non_residue));
+                    const typename policy_type::fp3::non_residue_type non_residue =
+                        underlying_type(typename policy_type::fp3::non_residue_type(policy_type::fp3::non_residue));
 
                     using value_type = std::array<underlying_type, 3>;
 
@@ -135,9 +135,9 @@ namespace nil {
 
                         element_fp3 one = one();
 
-                        size_t v = policy_type::s;
-                        element_fp3 z(policy_type::nqr_to_t);
-                        element_fp3 w((*this) ^ policy_type::t_minus_1_over_2);
+                        size_t v = policy_type::fp3::s;
+                        element_fp3 z(policy_type::fp3::nqr_to_t);
+                        element_fp3 w((*this) ^ policy_type::fp3::t_minus_1_over_2);
                         element_fp3 x((*this) * w);
                         element_fp3 b = x * w;    // b = (*this)^t
 
@@ -149,18 +149,18 @@ namespace nil {
                             element_fp3 b2m = b;
                             while (b2m != one) {
                                 /* invariant: b2m = b^(2^m) after entering this loop */
-                                b2m = b2m.square();
+                                b2m = b2m.squared();
                                 m += 1;
                             }
 
                             int j = v - m - 1;
                             w = z;
                             while (j > 0) {
-                                w = w.square();
+                                w = w.squared();
                                 --j;
                             }    // w = z^2^(v-m-1)
 
-                            z = w.square();
+                            z = w.squared();
                             b = b * z;
                             x = x * w;
                             v = m;

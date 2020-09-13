@@ -31,7 +31,7 @@
 // #include <nil/algebra/fields/bn128/base_field.hpp>
 // #include <nil/algebra/fields/bn128/scalar_field.hpp>
 #include <nil/algebra/fields/bls12/base_field.hpp>
-#include <nil/algebra/fields/bls12/scalar_field.hpp>
+//#include <nil/algebra/fields/bls12/scalar_field.hpp>
 // #include <nil/algebra/fields/dsa_botan.hpp>
 // #include <nil/algebra/fields/dsa_jce.hpp>
 // #include <nil/algebra/fields/ed25519_fe.hpp>
@@ -95,12 +95,12 @@ enum field_operation_test_elements : std::size_t {
     e1_dbl,
     e2_inv,
     e1_pow_C1,
-    e2_pow_2,
-    e2_pow_2_sqrt
+    e2_pow_2
+    //e2_pow_2_sqrt
 };
 
 // if target == check-algebra just data/fields.json
-const char *test_data = "libs/algebra/test/data/fields.json";
+const char *test_data = "libs/crypto3-algebra/test/data/fields.json";
 
 boost::property_tree::ptree string_data(std::string test_name) {
     boost::property_tree::ptree string_data;
@@ -119,7 +119,7 @@ void check_field_operations(const std::vector<element_type> &elements,
     BOOST_CHECK_EQUAL(elements[e2].inversed(), elements[e2_inv]);
     BOOST_CHECK_EQUAL(elements[e1].pow(constants[C1]), elements[e1_pow_C1]);
     BOOST_CHECK_EQUAL(elements[e2].squared(), elements[e2_pow_2]);
-    BOOST_CHECK_EQUAL((elements[e2].squared()).sqrt(), elements[e2_pow_2_sqrt]);
+    //BOOST_CHECK_EQUAL((elements[e2].squared()).sqrt(), elements[e2_pow_2_sqrt]);
 }
 
 template<typename FieldParams, typename TestSet>
@@ -175,16 +175,16 @@ void curve_operation_test(const TestSet &test_set) {
 
 BOOST_AUTO_TEST_SUITE(fields_manual_tests)
 
-BOOST_DATA_TEST_CASE(field_operation_test_bls12_381_fr, string_data("field_operation_test_bls12_381_fr"), data_set) {
+/*BOOST_DATA_TEST_CASE(field_operation_test_bls12_381_fr, string_data("field_operation_test_bls12_381_fr"), data_set) {
     using policy_type = fields::bls12_fr<381>;
 
     curve_operation_test<policy_type>(data_set);
+}*/
+
+BOOST_DATA_TEST_CASE(field_operation_test_bls12_381_fq2, string_data("field_operation_test_bls12_381_fq2"), data_set) {
+    using policy_type = fields::fp2<fields::bls12_fq<381>>;
+
+    curve_operation_test<policy_type>(data_set);
 }
-
-// BOOST_DATA_TEST_CASE(field_operation_test_bls12_381_fq2, string_data("field_operation_test_bls12_381_fq2"), data_set) {
-//     using policy_type = fields::fp2<fields::bls12_fq<381>>;
-
-//     curve_operation_test<policy_type>(data_set);
-// }
 
 BOOST_AUTO_TEST_SUITE_END()

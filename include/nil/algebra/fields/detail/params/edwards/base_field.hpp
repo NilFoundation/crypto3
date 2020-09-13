@@ -38,30 +38,29 @@ namespace nil {
                     constexpr static const modulus_type group_order =
                         0x206AFE4E951CAD89C5C9276B1A16A0DB75B485C0000000_cppui182;
 
-                    constexpr static const modulus_type group3_order =
+                    struct fp3{
+                        constexpr static const modulus_type group_order =
                         0x214530CDE421990256A87901DDC6307E4ED27FAF4F877968EFCA129EF23243B915EF074F565027DAA0127ECF4EC788245754250524EA78AD2C1A16B28F2611D9140000000_cppui546;
 
-                    typedef element_fp<element_policy_type> fp2_non_residue_type;
-                    typedef element_fp<element_policy_type> fp3_non_residue_type;
-                    typedef element_fp<element_policy_type> fp6_2over3_non_residue_type;
-                    typedef element_fp2<element_policy_type> fp12_2over3over2_non_residue_type;
+                        typedef element_fp<element_policy_type> non_residue_type;
 
-                    constexpr static const modulus_type fp2_non_residue = modulus_type(0x3D);
-                    constexpr static const modulus_type fp3_non_residue = modulus_type(0x3D);
-                    constexpr static const modulus_type fp6_2over3_non_residue = modulus_type(0x3D);
+                        constexpr static const modulus_type non_residue = modulus_type(0x3D);
+                    };
+
+                    struct fp6_2over3{
+                        typedef element_fp<element_policy_type> non_residue_type;
+
+                        constexpr static const modulus_type non_residue = modulus_type(0x3D);
+                    };
                 };
 
                 template<std::size_t ModulusBits, std::size_t GeneratorBits>
                 constexpr typename params<edwards_base_field<ModulusBits, GeneratorBits>>::modulus_type const
-                    extension_params<edwards_base_field<ModulusBits, GeneratorBits>>::fp2_non_residue;
+                    extension_params<edwards_base_field<ModulusBits, GeneratorBits>>::fp3::non_residue;
 
                 template<std::size_t ModulusBits, std::size_t GeneratorBits>
                 constexpr typename params<edwards_base_field<ModulusBits, GeneratorBits>>::modulus_type const
-                    extension_params<edwards_base_field<ModulusBits, GeneratorBits>>::fp3_non_residue;
-
-                template<std::size_t ModulusBits, std::size_t GeneratorBits>
-                constexpr typename params<edwards_base_field<ModulusBits, GeneratorBits>>::modulus_type const
-                    extension_params<edwards_base_field<ModulusBits, GeneratorBits>>::fp6_2over3_non_residue;
+                    extension_params<edwards_base_field<ModulusBits, GeneratorBits>>::fp6_2over3::non_residue;
 
             }    // namespace detail
         }        // namespace fields

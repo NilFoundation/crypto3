@@ -38,29 +38,39 @@ namespace nil {
                     constexpr static const modulus_type group_order =
                         0x183227397098D014DC2822DB40C0AC2ECBC0B548B438E5469E10460B6C3E7EA3_cppui254;
 
-                    typedef element_fp<element_policy_type> fp2_non_residue_type;
-                    typedef element_fp2<element_policy_type> fp6_3over2_non_residue_type;
-                    typedef element_fp2<element_policy_type> fp12_2over3over2_non_residue_type;
+                    struct fp2{
+                        typedef element_fp<element_policy_type> non_residue_type;
 
-                    constexpr static const modulus_type fp2_non_residue =
-                        modulus_type(0x30644E72E131A029B85045B68181585D97816A916871CA8D3C208C16D87CFD46_cppui254);
-                    constexpr static const std::array<modulus_type, 2> fp6_3over2_non_residue = {9, 1};
-                    constexpr static const std::array<modulus_type, 2> fp12_2over3over2_non_residue = {9, 1};
+                        constexpr static const modulus_type non_residue = modulus_type(
+                        0x30644E72E131A029B85045B68181585D97816A916871CA8D3C208C16D87CFD46_cppui254);
+                    };
+
+                    struct fp6_3over2{
+                        typedef element_fp2<element_policy_type> non_residue_type;
+
+                        constexpr static const std::array<modulus_type, 2> non_residue = {9, 1};
+                    };
+
+                    struct fp12_2over3over2{
+                        typedef element_fp2<element_policy_type> non_residue_type;
+
+                        constexpr static const std::array<modulus_type, 2> non_residue = {9, 1};
+                    };
                 };
 
                 template<std::size_t ModulusBits, std::size_t GeneratorBits>
                 constexpr typename params<alt_bn128_base_field<ModulusBits, GeneratorBits>>::modulus_type const
-                    extension_params<alt_bn128_base_field<ModulusBits, GeneratorBits>>::fp2_non_residue;
+                    extension_params<alt_bn128_base_field<ModulusBits, GeneratorBits>>::fp2::non_residue;
 
                 template<std::size_t ModulusBits, std::size_t GeneratorBits>
                 constexpr std::array<typename params<alt_bn128_base_field<ModulusBits, GeneratorBits>>::modulus_type,
                                      2> const
-                    extension_params<alt_bn128_base_field<ModulusBits, GeneratorBits>>::fp6_3over2_non_residue;
+                    extension_params<alt_bn128_base_field<ModulusBits, GeneratorBits>>::fp6_3over2::non_residue;
 
                 template<std::size_t ModulusBits, std::size_t GeneratorBits>
                 constexpr std::array<typename params<alt_bn128_base_field<ModulusBits, GeneratorBits>>::modulus_type,
                                      2> const
-                    extension_params<alt_bn128_base_field<ModulusBits, GeneratorBits>>::fp12_2over3over2_non_residue;
+                    extension_params<alt_bn128_base_field<ModulusBits, GeneratorBits>>::fp12_2over3over2::non_residue;
 
             }    // namespace detail
         }        // namespace fields
