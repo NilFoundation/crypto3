@@ -40,11 +40,6 @@ namespace nil {
 
                     underlying_field_type_value p[3];
 
-                    /*constexpr static */ const underlying_field_type_value x =
-                        underlying_field_type_value(0x00);    //?
-                    /*constexpr static */ const underlying_field_type_value y =
-                        underlying_field_type_value(0x00);    //?
-
                     bls12_g1() :
                         bls12_g1(underlying_field_type_value::zero(), underlying_field_type_value::one(),
                                  underlying_field_type_value::zero()) {};
@@ -309,11 +304,6 @@ namespace nil {
                     using underlying_field_type_value = g1_field_type_value;
 
                     underlying_field_type_value p[3];
-
-                    /*constexpr static */ const underlying_field_type_value x =
-                        underlying_field_type_value(0x00);    //?
-                    /*constexpr static */ const underlying_field_type_value y =
-                        underlying_field_type_value(0x00);    //?
 
                     bls12_g1() :
                         bls12_g1(underlying_field_type_value::zero(), underlying_field_type_value::one(),

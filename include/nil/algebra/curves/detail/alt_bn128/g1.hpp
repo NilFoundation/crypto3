@@ -97,6 +97,11 @@ namespace nil {
                         return !(operator==(other));
                     }
 
+                    bool is_zero() const
+                    {
+                        return (this->p[2].is_zero());
+                    }
+
                     alt_bn128_g1 operator-() const {
                         return alt_bn128_g1(this->p[0], -(this->p[1]), this->p[2]);
                     }
@@ -232,6 +237,35 @@ namespace nil {
                         underlying_field_type_value Z3 = ((this->p[2]) + H).squared() - Z1Z1 - HH;    // Z3 = (Z1+H)^2-Z1Z1-HH
 
                         return alt_bn128_g1(X3, Y3, Z3);
+                    }
+
+                    void to_affine_coordinates()
+                    {
+                        if (this->is_zero())
+                        {
+                            this->p[0] = underlying_field_type_value::zero();
+                            this->p[1] = underlying_field_type_value::one();
+                            this->p[2] = underlying_field_type_value::zero();
+                        }
+                        else
+                        {
+                            underlying_field_type_value Z_inv = this->p[2].inverse();
+                            underlying_field_type_value Z2_inv = Z_inv.squared();
+                            underlying_field_type_value Z3_inv = Z2_inv * Z_inv;
+                            this->p[0] = this->p[0] * Z2_inv;
+                            this->p[1] = this->p[1] * Z3_inv;
+                            this->p[2] = underlying_field_type_value::one();
+                        }
+                    }
+
+                    void to_special()
+                    {
+                        this->to_affine_coordinates();
+                    }
+
+                    bool is_special() const
+                    {
+                        return (this->is_zero() || this->p[2] == underlying_field_type_value::one());
                     }
 
                 private:

@@ -104,6 +104,11 @@ namespace nil {
                         return !(operator==(other));
                     }
 
+                    bool is_zero() const
+                    {
+                        return (this->p[2].is_zero());
+                    }
+
                     alt_bn128_g2 operator-() const {
                         return alt_bn128_g2(this->p[0], -(this->p[1]), this->p[2]);
                     }
@@ -150,6 +155,31 @@ namespace nil {
                         underlying_field_type_value Y3 = r * (V - X3) - S1_J.doubled();    // Y3 = r * (V-X3)-2 S1 J
                         underlying_field_type_value Z3 = ((this->p[2] + other.p[2]).squared() - Z1Z1 - Z2Z2) *
                                                    H;    // Z3 = ((Z1+Z2)^2-Z1Z1-Z2Z2) * H
+
+                        return alt_bn128_g2(X3, Y3, Z3);
+                    }
+
+                    alt_bn128_g2 doubled() const {
+                        // handle point at infinity
+                        if (this->is_zero()) {
+                            return (*this);
+                        }
+
+                        // NOTE: does not handle O and pts of order 2,4
+                        // http://www.hyperelliptic.org/EFD/g1p/auto-shortw-projective.html#doubling-dbl-2007-bl
+
+                        underlying_field_type_value A = (this->p[0]).squared();    // A = X1^2
+                        underlying_field_type_value B = (this->p[1]).squared();    // B = Y1^2
+                        underlying_field_type_value C = B.squared();               // C = B^2
+                        underlying_field_type_value D = (this->p[0] + B).squared() - A - C;
+                        D = D + D;                                     // D = 2 * ((X1 + B)^2 - A - C)
+                        underlying_field_type_value E = A.doubled() + A;     // E = 3 * A
+                        underlying_field_type_value F = E.squared();         // F = E^2
+                        underlying_field_type_value X3 = F - D.doubled();    // X3 = F - 2 D
+                        underlying_field_type_value eightC = C.doubled().doubled().doubled();
+                        underlying_field_type_value Y3 = E * (D - X3) - eightC;    // Y3 = E * (D - X3) - 8 * C
+                        underlying_field_type_value Y1Z1 = (this->p[1]) * (this->p[2]);
+                        underlying_field_type_value Z3 = Y1Z1 + Y1Z1;    // Z3 = 2 * Y1 * Z1
 
                         return alt_bn128_g2(X3, Y3, Z3);
                     }
@@ -212,31 +242,34 @@ namespace nil {
                         return alt_bn128_g2(X3, Y3, Z3);
                     }
 
-                    alt_bn128_g2 doubled() const {
-                        // handle point at infinity
-                        if (this->is_zero()) {
-                            return (*this);
+                    void to_affine_coordinates()
+                    {
+                        if (this->is_zero())
+                        {
+                            this->p[0] = underlying_field_type_value::zero();
+                            this->p[1] = underlying_field_type_value::one();
+                            this->p[2] = underlying_field_type_value::zero();
                         }
-
-                        // NOTE: does not handle O and pts of order 2,4
-                        // http://www.hyperelliptic.org/EFD/g1p/auto-shortw-projective.html#doubling-dbl-2007-bl
-
-                        underlying_field_type_value A = (this->p[0]).squared();    // A = X1^2
-                        underlying_field_type_value B = (this->p[1]).squared();    // B = Y1^2
-                        underlying_field_type_value C = B.squared();               // C = B^2
-                        underlying_field_type_value D = (this->p[0] + B).squared() - A - C;
-                        D = D + D;                                     // D = 2 * ((X1 + B)^2 - A - C)
-                        underlying_field_type_value E = A.doubled() + A;     // E = 3 * A
-                        underlying_field_type_value F = E.squared();         // F = E^2
-                        underlying_field_type_value X3 = F - D.doubled();    // X3 = F - 2 D
-                        underlying_field_type_value eightC = C.doubled().doubled().doubled();
-                        underlying_field_type_value Y3 = E * (D - X3) - eightC;    // Y3 = E * (D - X3) - 8 * C
-                        underlying_field_type_value Y1Z1 = (this->p[1]) * (this->p[2]);
-                        underlying_field_type_value Z3 = Y1Z1 + Y1Z1;    // Z3 = 2 * Y1 * Z1
-
-                        return alt_bn128_g2(X3, Y3, Z3);
+                        else
+                        {
+                            underlying_field_type_value Z_inv = this->p[2].inverse();
+                            underlying_field_type_value Z2_inv = Z_inv.squared();
+                            underlying_field_type_value Z3_inv = Z2_inv * Z_inv;
+                            this->p[0] = this->p[0] * Z2_inv;
+                            this->p[1] = this->p[1] * Z3_inv;
+                            this->p[2] = underlying_field_type_value::one();
+                        }
                     }
 
+                    void to_special()
+                    {
+                        this->to_affine_coordinates();
+                    }
+
+                    bool is_special() const
+                    {
+                        return (this->is_zero() || this->p[2] == underlying_field_type_value::one());
+                    }
                 private:
 
                     /*alt_bn128_g2 mul_by_q() const {
@@ -248,8 +281,7 @@ namespace nil {
                     /*constexpr static */ const g1_field_type_value a = g1_field_type_value(policy_type::a);
                     /*constexpr static */ const g1_field_type_value b = g1_field_type_value(policy_type::b);
 
-                    /*constexpr static */ const g2_field_type_value twist = g2_field_type_value(
-                        {g2_field_type_value::underlying_type(0x09), g2_field_type_value::underlying_type(0x01)});
+                    /*constexpr static */ const g2_field_type_value twist = g2_field_type_value( 0x09, 0x01);
 
                     /*constexpr static */ const g2_field_type_value twist_coeff_b = b * twist.inversed();
 
