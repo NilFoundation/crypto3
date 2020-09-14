@@ -29,8 +29,8 @@
 // <http://eprint.iacr.org/2012/215>
 //---------------------------------------------------------------------------//
 
-#ifndef R1CS_TO_QAP_HPP_
-#define R1CS_TO_QAP_HPP_
+#ifndef CRYPTO3_R1CS_TO_QAP_HPP
+#define CRYPTO3_R1CS_TO_QAP_HPP
 
 #include <nil/algebra/fft/coset.hpp>
 #include <nil/algebra/fft/evaluation_domain.hpp>
@@ -55,7 +55,7 @@ namespace nil {
                 template<typename FieldType>
                 qap_instance_evaluation<FieldType>
                     r1cs_to_qap_instance_map_with_evaluation(const r1cs_constraint_system<FieldType> &cs,
-                                                             const FieldType &t);
+                                                             const FieldType::value_type &t);
 
                 /**
                  * Witness map for the R1CS-to-QAP reduction.
@@ -66,9 +66,9 @@ namespace nil {
                 qap_witness<FieldType> r1cs_to_qap_witness_map(const r1cs_constraint_system<FieldType> &cs,
                                                                const r1cs_primary_input<FieldType> &primary_input,
                                                                const r1cs_auxiliary_input<FieldType> &auxiliary_input,
-                                                               const FieldType &d1,
-                                                               const FieldType &d2,
-                                                               const FieldType &d3);
+                                                               const FieldType::value_type &d1,
+                                                               const FieldType::value_type &d2,
+                                                               const FieldType::value_type &d3);
 
                 /**
                  * Instance map for the R1CS-to-QAP reduction.
@@ -330,4 +330,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // R1CS_TO_QAP_HPP_
+#endif    // CRYPTO3_R1CS_TO_QAP_HPP

@@ -14,8 +14,8 @@
 // Above, USCS stands for "Unitary-Square Constraint System".
 //---------------------------------------------------------------------------//
 
-#ifndef USCS_HPP_
-#define USCS_HPP_
+#ifndef CRYPTO3_USCS_HPP
+#define CRYPTO3_USCS_HPP
 
 #include <cstdlib>
 #include <iostream>
@@ -61,15 +61,6 @@ namespace nil {
 
                 /************************* USCS constraint system ****************************/
 
-                template<typename FieldType>
-                class uscs_constraint_system;
-
-                template<typename FieldType>
-                std::ostream &operator<<(std::ostream &out, const uscs_constraint_system<FieldType> &cs);
-
-                template<typename FieldType>
-                std::istream &operator>>(std::istream &in, uscs_constraint_system<FieldType> &cs);
-
                 /**
                  * A system of USCS constraints looks like
                  *
@@ -83,8 +74,8 @@ namespace nil {
                  * Thus, the 0-th variable is not included in num_variables.
                  */
                 template<typename FieldType>
-                class uscs_constraint_system {
-                public:
+                struct uscs_constraint_system {
+
                     std::size_t primary_input_size;
                     std::size_t auxiliary_input_size;
 
@@ -92,156 +83,83 @@ namespace nil {
 
                     uscs_constraint_system() : primary_input_size(0), auxiliary_input_size(0) {};
 
-                    std::size_t num_inputs() const;
-                    std::size_t num_variables() const;
-                    std::size_t num_constraints() const;
+                    std::size_t num_inputs() const {
+                        return primary_input_size;
+                    }
 
-                    bool is_valid() const;
+                    std::size_t num_variables() const {
+                        return primary_input_size + auxiliary_input_size;
+                    }
+
+                    std::size_t num_constraints() const {
+                        return constraints.size();
+                    }
+
+                    bool is_valid() const {
+                        if (this->num_inputs() > this->num_variables())
+                            return false;
+
+                        for (std::size_t c = 0; c < constraints.size(); ++c) {
+                            if (!valid_vector(constraints[c], this->num_variables())) {
+                                return false;
+                            }
+                        }
+
+                        return true;
+                    }
+
                     bool is_satisfied(const uscs_primary_input<FieldType> &primary_input,
-                                      const uscs_auxiliary_input<FieldType> &auxiliary_input) const;
+                                      const uscs_auxiliary_input<FieldType> &auxiliary_input) const {
+                        assert(primary_input.size() == num_inputs());
+                        assert(primary_input.size() + auxiliary_input.size() == num_variables());
 
-                    void add_constraint(const uscs_constraint<FieldType> &constraint);
+                        uscs_variable_assignment<FieldType> full_variable_assignment = primary_input;
+                        full_variable_assignment.insert(
+                            full_variable_assignment.end(), auxiliary_input.begin(), auxiliary_input.end());
 
-                    bool operator==(const uscs_constraint_system<FieldType> &other) const;
-
-                    friend std::ostream &operator<<<FieldType>(std::ostream &out,
-                                                               const uscs_constraint_system<FieldType> &cs);
-                    friend std::istream &operator>><FieldType>(std::istream &in, uscs_constraint_system<FieldType> &cs);
-
-                    void report_linear_constraint_statistics() const;
-                };
-
-                template<typename FieldType>
-                std::size_t uscs_constraint_system<FieldType>::num_inputs() const {
-                    return primary_input_size;
-                }
-
-                template<typename FieldType>
-                std::size_t uscs_constraint_system<FieldType>::num_variables() const {
-                    return primary_input_size + auxiliary_input_size;
-                }
-
-                template<typename FieldType>
-                std::size_t uscs_constraint_system<FieldType>::num_constraints() const {
-                    return constraints.size();
-                }
-
-                template<typename FieldType>
-                bool uscs_constraint_system<FieldType>::is_valid() const {
-                    if (this->num_inputs() > this->num_variables())
-                        return false;
-
-                    for (std::size_t c = 0; c < constraints.size(); ++c) {
-                        if (!valid_vector(constraints[c], this->num_variables())) {
-                            return false;
+                        for (std::size_t c = 0; c < constraints.size(); ++c) {
+                            FieldType::value_type res = constraints[c].evaluate(full_variable_assignment);
+                            if (!(res.squared() == FieldType::value_type_one())) {
+                                return false;
+                            }
                         }
+
+                        return true;
                     }
 
-                    return true;
-                }
-
-                template<typename FieldType>
-                void dump_uscs_constraint(const uscs_constraint<FieldType> &constraint,
-                                          const uscs_variable_assignment<FieldType> &full_variable_assignment,
-                                          const std::map<std::size_t, std::string> &variable_annotations) {
-                    printf("terms:\n");
-                    constraint.print_with_assignment(full_variable_assignment, variable_annotations);
-                }
-
-                template<typename FieldType>
-                bool uscs_constraint_system<FieldType>::is_satisfied(
-                    const uscs_primary_input<FieldType> &primary_input,
-                    const uscs_auxiliary_input<FieldType> &auxiliary_input) const {
-                    assert(primary_input.size() == num_inputs());
-                    assert(primary_input.size() + auxiliary_input.size() == num_variables());
-
-                    uscs_variable_assignment<FieldType> full_variable_assignment = primary_input;
-                    full_variable_assignment.insert(
-                        full_variable_assignment.end(), auxiliary_input.begin(), auxiliary_input.end());
-
-                    for (std::size_t c = 0; c < constraints.size(); ++c) {
-                        FieldType res = constraints[c].evaluate(full_variable_assignment);
-                        if (!(res.squared() == FieldType::one())) {
-                            return false;
-                        }
+                    void add_constraint(const uscs_constraint<FieldType> &constraint) {
+                        constraints.emplace_back(c);
                     }
 
-                    return true;
-                }
-
-                template<typename FieldType>
-                void uscs_constraint_system<FieldType>::add_constraint(const uscs_constraint<FieldType> &c) {
-                    constraints.emplace_back(c);
-                }
-
-                template<typename FieldType>
-                bool uscs_constraint_system<FieldType>::operator==(
-                    const uscs_constraint_system<FieldType> &other) const {
-                    return (this->constraints == other.constraints &&
-                            this->primary_input_size == other.primary_input_size &&
-                            this->auxiliary_input_size == other.auxiliary_input_size);
-                }
-
-                template<typename FieldType>
-                std::ostream &operator<<(std::ostream &out, const uscs_constraint_system<FieldType> &cs) {
-                    out << cs.primary_input_size << "\n";
-                    out << cs.auxiliary_input_size << "\n";
-
-                    out << cs.num_constraints() << "\n";
-                    for (const uscs_constraint<FieldType> &c : cs.constraints) {
-                        out << c;
+                    bool operator==(const uscs_constraint_system<FieldType> &other) const {
+                        return (this->constraints == other.constraints &&
+                                this->primary_input_size == other.primary_input_size &&
+                                this->auxiliary_input_size == other.auxiliary_input_size);
                     }
 
-                    return out;
-                }
-
-                template<typename FieldType>
-                std::istream &operator>>(std::istream &in, uscs_constraint_system<FieldType> &cs) {
-                    in >> cs.primary_input_size;
-                    in >> cs.auxiliary_input_size;
-
-                    cs.constraints.clear();
-
-                    std::size_t s;
-                    in >> s;
-
-                    char b;
-                    in.read(&b, 1);
-
-                    cs.constraints.reserve(s);
-
-                    for (std::size_t i = 0; i < s; ++i) {
-                        uscs_constraint<FieldType> c;
-                        in >> c;
-                        cs.constraints.emplace_back(c);
-                    }
-
-                    return in;
-                }
-
-                template<typename FieldType>
-                void uscs_constraint_system<FieldType>::report_linear_constraint_statistics() const {
+                    void report_linear_constraint_statistics() const {
 #ifdef DEBUG
-                    for (std::size_t i = 0; i < constraints.size(); ++i) {
-                        auto &constr = constraints[i];
-                        bool a_is_const = true;
-                        for (auto &t : constr.terms) {
-                            a_is_const = a_is_const && (t.index == 0);
-                        }
+                        for (std::size_t i = 0; i < constraints.size(); ++i) {
+                            auto &constr = constraints[i];
+                            bool a_is_const = true;
+                            for (auto &t : constr.terms) {
+                                a_is_const = a_is_const && (t.index == 0);
+                            }
 
-                        if (a_is_const) {
-                            auto it = constraint_annotations.find(i);
-                            printf("%s\n",
-                                   (it == constraint_annotations.end() ? FMT("", "constraint_%zu", i) : it->second)
-                                       .c_str());
+                            if (a_is_const) {
+                                auto it = constraint_annotations.find(i);
+                                printf("%s\n",
+                                       (it == constraint_annotations.end() ? FMT("", "constraint_%zu", i) : it->second)
+                                           .c_str());
+                            }
                         }
-                    }
 #endif
-                }
+                    }
+                };
 
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // USCS_HPP_
+#endif    // CRYPTO3_USCS_HPP
