@@ -26,24 +26,24 @@ namespace nil {
              * Output: Polynomial G, Polynomial U, Polynomial V, such that G = (A * U) + (B * V).
              */
 
-            template<typename FieldType>
-            void _polynomial_xgcd(const std::vector<typename FieldType::value_type> &a, const std::vector<typename FieldType::value_type> &b, std::vector<typename FieldType::value_type> &g,
-                                  std::vector<typename FieldType::value_type> &u, std::vector<typename FieldType::value_type> &v) {
+            template<typename FieldValueType>
+            void _polynomial_xgcd(const std::vector<FieldValueType> &a, const std::vector<FieldValueType> &b, std::vector<FieldValueType> &g,
+                                  std::vector<FieldValueType> &u, std::vector<FieldValueType> &v) {
                 if (_is_zero(b)) {
                     g = a;
-                    u = std::vector<typename FieldType::value_type>(1, FieldType::one());
-                    v = std::vector<typename FieldType::value_type>(1, FieldType::zero());
+                    u = std::vector<FieldValueType>(1, FieldValueType::one());
+                    v = std::vector<FieldValueType>(1, FieldValueType::zero());
                     return;
                 }
 
-                std::vector<typename FieldType::value_type> U(1, FieldType::one());
-                std::vector<typename FieldType::value_type> V1(1, FieldType::zero());
-                std::vector<typename FieldType::value_type> G(a);
-                std::vector<typename FieldType::value_type> V3(b);
+                std::vector<FieldValueType> U(1, FieldValueType::one());
+                std::vector<FieldValueType> V1(1, FieldValueType::zero());
+                std::vector<FieldValueType> G(a);
+                std::vector<FieldValueType> V3(b);
 
-                std::vector<typename FieldType::value_type> Q(1, FieldType::zero());
-                std::vector<typename FieldType::value_type> R(1, FieldType::zero());
-                std::vector<typename FieldType::value_type> T(1, FieldType::zero());
+                std::vector<FieldValueType> Q(1, FieldValueType::zero());
+                std::vector<FieldValueType> R(1, FieldValueType::zero());
+                std::vector<FieldValueType> T(1, FieldValueType::zero());
 
                 while (!_is_zero(V3)) {
                     _polynomial_division(Q, R, G, V3);
@@ -60,10 +60,10 @@ namespace nil {
                 _polynomial_subtraction(V3, G, V3);
                 _polynomial_division(V1, R, V3, b);
 
-                FieldType lead_coeff = G.back().inverse();
-                std::transform(G.begin(), G.end(), G.begin(), std::bind1st(std::multiplies<FieldType>(), lead_coeff));
-                std::transform(U.begin(), U.end(), U.begin(), std::bind1st(std::multiplies<FieldType>(), lead_coeff));
-                std::transform(V1.begin(), V1.end(), V1.begin(), std::bind1st(std::multiplies<FieldType>(), lead_coeff));
+                FieldValueType lead_coeff = G.back().inverse();
+                std::transform(G.begin(), G.end(), G.begin(), std::bind1st(std::multiplies<FieldValueType>(), lead_coeff));
+                std::transform(U.begin(), U.end(), U.begin(), std::bind1st(std::multiplies<FieldValueType>(), lead_coeff));
+                std::transform(V1.begin(), V1.end(), V1.begin(), std::bind1st(std::multiplies<FieldValueType>(), lead_coeff));
 
                 g = G;
                 u = U;

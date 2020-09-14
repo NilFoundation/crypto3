@@ -27,12 +27,12 @@ namespace nil {
              * - a field element element t
              * The output is the polynomial P(x) evaluated at x = t.
              */    
-            template<typename FieldType>
-            FieldType evaluate_polynomial(const size_t &m, const std::vector<typename FieldType::value_type> &coeff, const FieldType &t) {
+            template<typename FieldValueType>
+            FieldValueType evaluate_polynomial(const size_t &m, const std::vector<FieldValueType> &coeff, const FieldValueType &t) {
                 if (m != coeff.size())
                     throw DomainSizeException("expected m == coeff.size()");
 
-                FieldType result = FieldType::zero();
+                FieldValueType result = FieldValueType::zero();
 
                 /* NB: unsigned reverse iteration: cannot do i >= 0, but can do i < m
                    because unsigned integers are guaranteed to wrap around */
@@ -54,16 +54,16 @@ namespace nil {
              * - an index idx in {0,...,m-1}
              * The output is the polynomial L_{idx,S}(z) evaluated at z = t.
              */
-            template<typename FieldType>
-            FieldType evaluate_lagrange_polynomial(const size_t &m, const std::vector<typename FieldType::value_type> &domain, const FieldType &t,
+            template<typename FieldValueType>
+            FieldValueType evaluate_lagrange_polynomial(const size_t &m, const std::vector<FieldValueType> &domain, const FieldValueType &t,
                                                 const size_t &idx) {
                 if (m != domain.size())
                     throw DomainSizeException("expected m == domain.size()");
                 if (idx >= m)
                     throw InvalidSizeException("expected idx < m");
 
-                FieldType num = FieldType::one();
-                FieldType denom = FieldType::one();
+                FieldValueType num = FieldValueType::one();
+                FieldValueType denom = FieldValueType::one();
 
                 for (size_t k = 0; k < m; ++k) {
                     if (k == idx) {

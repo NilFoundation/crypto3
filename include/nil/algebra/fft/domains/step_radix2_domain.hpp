@@ -19,15 +19,16 @@ namespace nil {
     namespace algebra {
         namespace fft {
             template<typename FieldType>
-            class step_radix2_domain : public evaluation_domain<FieldType> {
+            class step_radix2_domain : public evaluation_domain<FieldType::value_type> {
+                using value_type = typename FieldType::value_type;
             public:
                 size_t big_m;
                 size_t small_m;
-                FieldType omega;
-                FieldType big_omega;
-                FieldType small_omega;
+                value_type omega;
+                value_type big_omega;
+                value_type small_omega;
 
-                step_radix2_domain(const size_t m) : evaluation_domain<FieldType>(m) {
+                step_radix2_domain(const size_t m) : evaluation_domain<value_type>(m) {
                     if (m <= 1)
                         throw std::invalid_argument("step_radix2(): expected m > 1");
 
@@ -47,21 +48,21 @@ namespace nil {
                     small_omega = unity_root<FieldType>(small_m);
                 }
 
-                void FFT(std::vector<typename FieldType::value_type> &a) {
+                void FFT(std::vector<value_type> &a) {
                     if (a.size() != this->m)
                         throw std::invalid_argument("step_radix2: expected a.size() == this->m");
 
-                    std::vector<typename FieldType::value_type> c(big_m, FieldType::zero());
-                    std::vector<typename FieldType::value_type> d(big_m, FieldType::zero());
+                    std::vector<value_type> c(big_m, value_type::zero());
+                    std::vector<value_type> d(big_m, value_type::zero());
 
-                    FieldType omega_i = FieldType::one();
+                    value_type omega_i = value_type::one();
                     for (size_t i = 0; i < big_m; ++i) {
                         c[i] = (i < small_m ? a[i] + a[i + big_m] : a[i]);
                         d[i] = omega_i * (i < small_m ? a[i] - a[i + big_m] : a[i]);
                         omega_i *= omega;
                     }
 
-                    std::vector<typename FieldType::value_type> e(small_m, FieldType::zero());
+                    std::vector<value_type> e(small_m, value_type::zero());
                     const size_t compr = 1ul << (static_cast<std::size_t>(std::ceil(std::log2(big_m))) - static_cast<std::size_t>(std::ceil(std::log2(small_m))));
                     for (size_t i = 0; i < small_m; ++i) {
                         for (size_t j = 0; j < compr; ++j) {
@@ -80,28 +81,28 @@ namespace nil {
                         a[i + big_m] = e[i];
                     }
                 }
-                void iFFT(std::vector<typename FieldType::value_type> &a) {
+                void iFFT(std::vector<value_type> &a) {
                     if (a.size() != this->m)
                         throw std::invalid_argument("step_radix2: expected a.size() == this->m");
 
-                    std::vector<typename FieldType::value_type> U0(a.begin(), a.begin() + big_m);
-                    std::vector<typename FieldType::value_type> U1(a.begin() + big_m, a.end());
+                    std::vector<value_type> U0(a.begin(), a.begin() + big_m);
+                    std::vector<value_type> U1(a.begin() + big_m, a.end());
 
-                    _basic_radix2_FFT(U0, omega.squared().inverse());
-                    _basic_radix2_FFT(U1, unity_root<FieldType>(small_m).inverse());
+                    _basic_radix2_FFT(U0, omega.squared().inversed());
+                    _basic_radix2_FFT(U1, unity_root<FieldType>(small_m).inversed());
 
-                    const FieldType U0_size_inv = FieldType(big_m).inverse();
+                    const value_type U0_size_inv = value_type(big_m).inversed();
                     for (size_t i = 0; i < big_m; ++i) {
                         U0[i] *= U0_size_inv;
                     }
 
-                    const FieldType U1_size_inv = FieldType(small_m).inverse();
+                    const value_type U1_size_inv = value_type(small_m).inversed();
                     for (size_t i = 0; i < small_m; ++i) {
                         U1[i] *= U1_size_inv;
                     }
 
-                    std::vector<typename FieldType::value_type> tmp = U0;
-                    FieldType omega_i = FieldType::one();
+                    std::vector<value_type> tmp = U0;
+                    value_type omega_i = value_type::one();
                     for (size_t i = 0; i < big_m; ++i) {
                         tmp[i] *= omega_i;
                         omega_i *= omega;
@@ -119,15 +120,15 @@ namespace nil {
                         }
                     }
 
-                    const FieldType omega_inv = omega.inverse();
-                    FieldType omega_inv_i = FieldType::one();
+                    const value_type omega_inv = omega.inversed();
+                    value_type omega_inv_i = value_type::one();
                     for (size_t i = 0; i < small_m; ++i) {
                         U1[i] *= omega_inv_i;
                         omega_inv_i *= omega_inv;
                     }
 
                     // compute A_prefix
-                    const FieldType over_two = FieldType(2).inverse();
+                    const value_type over_two = value_type(2).inversed();
                     for (size_t i = 0; i < small_m; ++i) {
                         a[i] = (U0[i] + U1[i]) * over_two;
                     }
@@ -138,23 +139,23 @@ namespace nil {
                     }
                 }
 
-                std::vector<typename FieldType::value_type> evaluate_all_lagrange_polynomials(const FieldType &t) {
-                    std::vector<typename FieldType::value_type> inner_big = basic_radix2_evaluate_all_lagrange_polynomials(big_m, t);
-                    std::vector<typename FieldType::value_type> inner_small =
-                        basic_radix2_evaluate_all_lagrange_polynomials(small_m, t * omega.inverse());
+                std::vector<value_type> evaluate_all_lagrange_polynomials(const value_type &t) {
+                    std::vector<value_type> inner_big = basic_radix2_evaluate_all_lagrange_polynomials(big_m, t);
+                    std::vector<value_type> inner_small =
+                        basic_radix2_evaluate_all_lagrange_polynomials(small_m, t * omega.inversed());
 
-                    std::vector<typename FieldType::value_type> result(this->m, FieldType::zero());
+                    std::vector<value_type> result(this->m, value_type::zero());
 
-                    const FieldType L0 = (t ^ small_m) - (omega ^ small_m);
-                    const FieldType omega_to_small_m = omega ^ small_m;
-                    const FieldType big_omega_to_small_m = big_omega ^ small_m;
-                    FieldType elt = FieldType::one();
+                    const value_type L0 = (t ^ small_m) - (omega ^ small_m);
+                    const value_type omega_to_small_m = omega ^ small_m;
+                    const value_type big_omega_to_small_m = big_omega ^ small_m;
+                    value_type elt = value_type::one();
                     for (size_t i = 0; i < big_m; ++i) {
-                        result[i] = inner_big[i] * L0 * (elt - omega_to_small_m).inverse();
+                        result[i] = inner_big[i] * L0 * (elt - omega_to_small_m).inversed();
                         elt *= big_omega_to_small_m;
                     }
 
-                    const FieldType L1 = ((t ^ big_m) - FieldType::one()) * ((omega ^ big_m) - FieldType::one()).inverse();
+                    const value_type L1 = ((t ^ big_m) - value_type::one()) * ((omega ^ big_m) - value_type::one()).inversed();
 
                     for (size_t i = 0; i < small_m; ++i) {
                         result[big_m + i] = L1 * inner_small[i];
@@ -163,7 +164,7 @@ namespace nil {
                     return result;
                 }
 
-                FieldType get_domain_element(const size_t idx) {
+                value_type get_domain_element(const size_t idx) {
                     if (idx < big_m) {
                         return big_omega ^ idx;
                     } else {
@@ -171,41 +172,41 @@ namespace nil {
                     }
                 }
 
-                FieldType compute_vanishing_polynomial(const FieldType &t) {
-                    return ((t ^ big_m) - FieldType::one()) * ((t ^ small_m) - (omega ^ small_m));
+                value_type compute_vanishing_polynomial(const value_type &t) {
+                    return ((t ^ big_m) - value_type::one()) * ((t ^ small_m) - (omega ^ small_m));
                 }
 
-                void add_poly_Z(const FieldType &coeff, std::vector<typename FieldType::value_type> &H) {
+                void add_poly_Z(const value_type &coeff, std::vector<value_type> &H) {
                     if (H.size() != this->m + 1)
                         throw std::invalid_argument("step_radix2: expected H.size() == this->m+1");
 
-                    const FieldType omega_to_small_m = omega ^ small_m;
+                    const value_type omega_to_small_m = omega ^ small_m;
 
                     H[this->m] += coeff;
                     H[big_m] -= coeff * omega_to_small_m;
                     H[small_m] -= coeff;
                     H[0] += coeff * omega_to_small_m;
                 }
-                void divide_by_Z_on_coset(std::vector<typename FieldType::value_type> &P) {
+                void divide_by_Z_on_coset(std::vector<value_type> &P) {
                     // (c^{2^k}-1) * (c^{2^r} * w^{2^{r+1}*i) - w^{2^r})
-                    const FieldType coset = FieldType::multiplicative_generator;
+                    const value_type coset = FieldType::multiplicative_generator;
 
-                    const FieldType Z0 = (coset ^ big_m) - FieldType::one();
-                    const FieldType coset_to_small_m_times_Z0 = (coset ^ small_m) * Z0;
-                    const FieldType omega_to_small_m_times_Z0 = (omega ^ small_m) * Z0;
-                    const FieldType omega_to_2small_m = omega ^ (2 * small_m);
-                    FieldType elt = FieldType::one();
+                    const value_type Z0 = (coset ^ big_m) - value_type::one();
+                    const value_type coset_to_small_m_times_Z0 = (coset ^ small_m) * Z0;
+                    const value_type omega_to_small_m_times_Z0 = (omega ^ small_m) * Z0;
+                    const value_type omega_to_2small_m = omega ^ (2 * small_m);
+                    value_type elt = value_type::one();
 
                     for (size_t i = 0; i < big_m; ++i) {
-                        P[i] *= (coset_to_small_m_times_Z0 * elt - omega_to_small_m_times_Z0).inverse();
+                        P[i] *= (coset_to_small_m_times_Z0 * elt - omega_to_small_m_times_Z0).inversed();
                         elt *= omega_to_2small_m;
                     }
 
                     // (c^{2^k}*w^{2^k}-1) * (c^{2^k} * w^{2^r} - w^{2^r})
 
-                    const FieldType Z1 = ((((coset * omega) ^ big_m) - FieldType::one()) *
+                    const value_type Z1 = ((((coset * omega) ^ big_m) - value_type::one()) *
                                           (((coset * omega) ^ small_m) - (omega ^ small_m)));
-                    const FieldType Z1_inverse = Z1.inverse();
+                    const value_type Z1_inverse = Z1.inversed();
 
                     for (size_t i = 0; i < small_m; ++i) {
                         P[big_m + i] *= Z1_inverse;

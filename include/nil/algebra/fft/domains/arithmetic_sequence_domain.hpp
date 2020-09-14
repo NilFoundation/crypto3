@@ -25,11 +25,12 @@ namespace nil {
         namespace fft {
 
             template<typename FieldType>
-            class arithmetic_sequence_domain : public evaluation_domain<FieldType> {
+            class arithmetic_sequence_domain : public evaluation_domain<FieldType::value_type> {
+                using value_type = typename FieldType::value_type;
             public:
                 bool precomputation_sentinel;
-                std::vector<std::vector<std::vector<typename FieldType::value_type>>> subproduct_tree;
-                std::vector<typename FieldType::value_type> arithmetic_sequence;
+                std::vector<std::vector<std::vector<value_type>>> subproduct_tree;
+                std::vector<value_type> arithmetic_sequence;
                 FieldType arithmetic_generator;
 
                 void do_precomputation() {
@@ -37,26 +38,25 @@ namespace nil {
 
                     this->arithmetic_generator = FieldType::arithmetic_generator();
 
-                    this->arithmetic_sequence = std::vector<typename FieldType::value_type>(this->m);
+                    this->arithmetic_sequence = std::vector<value_type>(this->m);
                     for (size_t i = 0; i < this->m; i++) {
-                        this->arithmetic_sequence[i] = this->arithmetic_generator * FieldType(i);
+                        this->arithmetic_sequence[i] = this->arithmetic_generator * value_type(i);
                     }
 
                     this->precomputation_sentinel = 1;
                 }
 
-                arithmetic_sequence_domain(const size_t m) :
-                    evaluation_domain<FieldType>(m) {
+                arithmetic_sequence_domain(const size_t m) : evaluation_domain<value_type>(m) {
                     if (m <= 1)
                         throw std::invalid_argument("arithmetic(): expected m > 1");
-                    if (FieldType::arithmetic_generator() == FieldType::zero())
+                    if (FieldType::arithmetic_generator() == value_type::zero())
                         throw std::invalid_argument(
                             "arithmetic(): expected FieldType::arithmetic_generator() != FieldType::zero()");
 
                     precomputation_sentinel = 0;
                 }
 
-                void FFT(std::vector<typename FieldType::value_type> &a) {
+                void FFT(std::vector<value_type> &a) {
                     if (a.size() != this->m)
                         throw std::invalid_argument("arithmetic: expected a.size() == this->m");
 
@@ -67,13 +67,13 @@ namespace nil {
                     monomial_to_newton_basis(a, this->subproduct_tree, this->m);
 
                     /* Newton to Evaluation */
-                    std::vector<typename FieldType::value_type> S(this->m); /* i! * arithmetic_generator */
-                    S[0] = FieldType::one();
+                    std::vector<value_type> S(this->m); /* i! * arithmetic_generator */
+                    S[0] = value_type::one();
 
-                    FieldType factorial = FieldType::one();
+                    value_type factorial = value_type::one();
                     for (size_t i = 1; i < this->m; i++) {
-                        factorial *= FieldType(i);
-                        S[i] = (factorial * this->arithmetic_generator).inverse();
+                        factorial *= value_type(i);
+                        S[i] = (factorial * this->arithmetic_generator).inversed();
                     }
 
                     _polynomial_multiplication(a, a, S);
@@ -83,10 +83,10 @@ namespace nil {
 #pragma omp parallel for
 #endif
                     for (size_t i = 0; i < this->m; i++) {
-                        a[i] *= S[i].inverse();
+                        a[i] *= S[i].inversed();
                     }
                 }
-                void iFFT(std::vector<typename FieldType::value_type> &a) {
+                void iFFT(std::vector<value_type> &a) {
                     if (a.size() != this->m)
                         throw std::invalid_argument("arithmetic: expected a.size() == this->m");
 
@@ -94,16 +94,16 @@ namespace nil {
                         do_precomputation();
 
                     /* Interpolation to Newton */
-                    std::vector<typename FieldType::value_type> S(this->m); /* i! * arithmetic_generator */
-                    S[0] = FieldType::one();
+                    std::vector<value_type> S(this->m); /* i! * arithmetic_generator */
+                    S[0] = value_type::one();
 
-                    std::vector<typename FieldType::value_type> W(this->m);
+                    std::vector<value_type> W(this->m);
                     W[0] = a[0] * S[0];
 
-                    FieldType factorial = FieldType::one();
+                    value_type factorial = value_type::one();
                     for (size_t i = 1; i < this->m; i++) {
-                        factorial *= FieldType(i);
-                        S[i] = (factorial * this->arithmetic_generator).inverse();
+                        factorial *= value_type(i);
+                        S[i] = (factorial * this->arithmetic_generator).inversed();
                         W[i] = a[i] * S[i];
                         if (i % 2 == 1)
                             S[i] = -S[i];
@@ -116,7 +116,7 @@ namespace nil {
                     newton_to_monomial_basis(a, this->subproduct_tree, this->m);
                 }
 
-                std::vector<typename FieldType::value_type> evaluate_all_lagrange_polynomials(const FieldType &t) {
+                std::vector<value_type> evaluate_all_lagrange_polynomials(const value_type &t) {
                     /* Compute Lagrange polynomial of size m, with m+1 points (x_0, y_0), ... ,(x_m, y_m) */
                     /* Evaluate for x = t */
                     /* Return coeffs for each l_j(x) = (l / l_i[j]) * w[j] */
@@ -131,8 +131,8 @@ namespace nil {
                     for (size_t i = 0; i < this->m; ++i) {
                         if (this->arithmetic_sequence[i] == t)    // i.e., t equals this->arithmetic_sequence[i]
                         {
-                            std::vector<typename FieldType::value_type> res(this->m, FieldType::zero());
-                            res[i] = FieldType::one();
+                            std::vector<value_type> res(this->m, value_type::zero());
+                            res[i] = value_type::one();
                             return res;
                         }
                     }
@@ -141,11 +141,11 @@ namespace nil {
                      * Otherwise, if t does not equal any of the arithmetic progression values,
                      * then compute each Lagrange coefficient.
                      */
-                    std::vector<typename FieldType::value_type> l(this->m);
+                    std::vector<value_type> l(this->m);
                     l[0] = t - this->arithmetic_sequence[0];
 
-                    FieldType l_vanish = l[0];
-                    FieldType g_vanish = FieldType::one();
+                    value_type l_vanish = l[0];
+                    value_type g_vanish = value_type::one();
 
                     for (size_t i = 1; i < this->m; i++) {
                         l[i] = t - this->arithmetic_sequence[i];
@@ -153,51 +153,51 @@ namespace nil {
                         g_vanish *= -this->arithmetic_sequence[i];
                     }
 
-                    std::vector<typename FieldType::value_type> w(this->m);
-                    w[0] = g_vanish.inverse() * (this->arithmetic_generator ^ (this->m - 1));
+                    std::vector<value_type> w(this->m);
+                    w[0] = g_vanish.inversed() * (this->arithmetic_generator ^ (this->m - 1));
 
-                    l[0] = l_vanish * l[0].inverse() * w[0];
+                    l[0] = l_vanish * l[0].inversed() * w[0];
                     for (size_t i = 1; i < this->m; i++) {
-                        FieldType num = this->arithmetic_sequence[i - 1] - this->arithmetic_sequence[this->m - 1];
-                        w[i] = w[i - 1] * num * this->arithmetic_sequence[i].inverse();
-                        l[i] = l_vanish * l[i].inverse() * w[i];
+                        value_type num = this->arithmetic_sequence[i - 1] - this->arithmetic_sequence[this->m - 1];
+                        w[i] = w[i - 1] * num * this->arithmetic_sequence[i].inversed();
+                        l[i] = l_vanish * l[i].inversed() * w[i];
                     }
 
                     return l;
                 }
-                FieldType get_domain_element(const size_t idx) {
+                value_type get_domain_element(const size_t idx) {
                     if (!this->precomputation_sentinel)
                         do_precomputation();
 
                     return this->arithmetic_sequence[idx];
                 }
-                FieldType compute_vanishing_polynomial(const FieldType &t) {
+                value_type compute_vanishing_polynomial(const value_type &t) {
                     if (!this->precomputation_sentinel)
                         do_precomputation();
 
                     /* Notes: Z = prod_{i = 0 to m} (t - a[i]) */
-                    FieldType Z = FieldType::one();
+                    value_type Z = value_type::one();
                     for (size_t i = 0; i < this->m; i++) {
                         Z *= (t - this->arithmetic_sequence[i]);
                     }
                     return Z;
                 }
-                void add_poly_Z(const FieldType &coeff, std::vector<typename FieldType::value_type> &H) {
+                void add_poly_Z(const value_type &coeff, std::vector<value_type> &H) {
                     if (H.size() != this->m + 1)
                         throw std::invalid_argument("arithmetic: expected H.size() == this->m+1");
 
                     if (!this->precomputation_sentinel)
                         do_precomputation();
 
-                    std::vector<typename FieldType::value_type> x(2, FieldType::zero());
+                    std::vector<value_type> x(2, value_type::zero());
                     x[0] = -this->arithmetic_sequence[0];
-                    x[1] = FieldType::one();
+                    x[1] = value_type::one();
 
-                    std::vector<typename FieldType::value_type> t(2, FieldType::zero());
+                    std::vector<value_type> t(2, value_type::zero());
 
                     for (size_t i = 1; i < this->m + 1; i++) {
                         t[0] = -this->arithmetic_sequence[i];
-                        t[1] = FieldType::one();
+                        t[1] = value_type::one();
 
                         _polynomial_multiplication(x, x, t);
                     }
@@ -209,9 +209,9 @@ namespace nil {
                         H[i] += (x[i] * coeff);
                     }
                 }
-                void divide_by_Z_on_coset(std::vector<typename FieldType::value_type> &P) {
-                    const FieldType coset = this->arithmetic_generator; /* coset in arithmetic sequence? */
-                    const FieldType Z_inverse_at_coset = this->compute_vanishing_polynomial(coset).inverse();
+                void divide_by_Z_on_coset(std::vector<value_type> &P) {
+                    const value_type coset = this->arithmetic_generator; /* coset in arithmetic sequence? */
+                    const value_type Z_inverse_at_coset = this->compute_vanishing_polynomial(coset).inversed();
                     for (size_t i = 0; i < this->m; ++i) {
                         P[i] *= Z_inverse_at_coset;
                     }

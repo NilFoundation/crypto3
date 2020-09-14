@@ -26,10 +26,10 @@ namespace nil {
              * [Harvey 07, Multipoint Kronecker Substitution, Section 2.1] and
              * [Gathen and Gerhard, Modern Computer Algebra 3rd Ed., Section 8.4].
              */
-            template<typename FieldType>
-            void kronecker_substitution(const boost::math::tools::polynomial<typename FieldType::value_type>& v3,
-                                        const boost::math::tools::polynomial<typename FieldType::value_type>& v1,
-                                        const boost::math::tools::polynomial<typename FieldType::value_type>& v2) {
+            template<typename FieldValueType>
+            void kronecker_substitution(const boost::math::tools::polynomial<FieldValueType>& v3,
+                                        const boost::math::tools::polynomial<FieldValueType>& v1,
+                                        const boost::math::tools::polynomial<FieldValueType>& v2) {
                 /* Initialize */
                 bool square = (v1 == v2) ? 1 : 0;
 
@@ -39,8 +39,8 @@ namespace nil {
                 size_t n3 = n1 + n2 - 1;
 
                 /* Determine number of bits needed */
-                FieldType v1_max = *max_element(std::begin(v1), std::end(v1));
-                FieldType v2_max = *max_element(std::begin(v2), std::end(v2));
+                FieldValueType v1_max = *max_element(std::begin(v1), std::end(v1));
+                FieldValueType v2_max = *max_element(std::begin(v2), std::end(v2));
                 size_t b = 2 * (v1_max * v2_max).as_bigint().num_bits() + 1;
 
                 /* Number of limbs needed in total */
@@ -48,7 +48,7 @@ namespace nil {
                 size_t k2 = (n2 * b + (GMP_NUMB_BITS)-1) / GMP_NUMB_BITS;
 
                 /* Output polynomial */
-                v3.resize(n3, FieldType::zero());
+                v3.resize(n3, FieldValueType::zero());
 
                 /*
                  * Allocate all MP_LIMB_T space once and store the reference pointer M1
@@ -125,7 +125,7 @@ namespace nil {
                 /* Perfect alignment case: bits B is equivalent to GMP_LIMB_BITS */
                 if (b == GMP_LIMB_BITS)
                     for (size_t i = 0; i < n3; i++)
-                        v3[i] = FieldType(*p3++);
+                        v3[i] = FieldValueType(*p3++);
                 /* Non-alignment case */
                 else {
                     /* Mask of 2^b - 1 */
@@ -140,7 +140,7 @@ namespace nil {
                          * by B bits.
                          */
                         if (b <= limb_b) {
-                            v3[i] = FieldType(limb & mask);
+                            v3[i] = FieldValueType(limb & mask);
 
                             delta = b;
                             delta_b = limb_b - delta;
@@ -152,8 +152,8 @@ namespace nil {
                          * upper portion bit length.
                          */
                         else {
-                            v3[i] = FieldType(limb);
-                            v3[i] += FieldType(((limb = *p3++) << limb_b) & mask);
+                            v3[i] = FieldValueType(limb);
+                            v3[i] += FieldValueType(((limb = *p3++) << limb_b) & mask);
 
                             delta = b - limb_b;
                             delta_b = GMP_LIMB_BITS - delta;
@@ -174,9 +174,9 @@ namespace nil {
              * Perform the multiplication of two polynomials, polynomial A * polynomial B, using Kronecker Substitution,
              * and stores result in polynomial C.
              */
-            template<typename FieldType>
-            void _polynomial_multiplication_on_kronecker(std::vector<typename FieldType::value_type>& c, const std::vector<typename FieldType::value_type>& a,
-                                                         const std::vector<typename FieldType::value_type>& b) {
+            template<typename FieldValueType>
+            void _polynomial_multiplication_on_kronecker(std::vector<FieldValueType>& c, const std::vector<FieldValueType>& a,
+                                                         const std::vector<FieldValueType>& b) {
                 kronecker_substitution(c, a, b);
             }
 

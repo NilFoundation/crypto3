@@ -28,8 +28,8 @@ namespace nil {
              * Below we make use of the Subproduct Tree description from
              * [Bostan and Schost 2005. Polynomial Evaluation and Interpolation on Special Sets of Points], on page 7.
              */
-            template<typename FieldType>
-            void compute_subproduct_tree(const size_t &m, std::vector<std::vector<std::vector<typename FieldType::value_type>>> &T) {
+            template<typename FieldValueType>
+            void compute_subproduct_tree(const size_t &m, std::vector<std::vector<std::vector<FieldValueType>>> &T) {
                 if (T.size() != m + 1)
                     T.resize(m + 1);
 
@@ -40,18 +40,18 @@ namespace nil {
                  */
 
                 /* Precompute the first row. */
-                T[0] = std::vector<std::vector<typename FieldType::value_type>>(1u << m);
+                T[0] = std::vector<std::vector<FieldValueType>>(1u << m);
                 for (size_t j = 0; j < (1u << m); j++) {
-                    T[0][j] = std::vector<typename FieldType::value_type>(2, FieldType::one());
-                    T[0][j][0] = FieldType(-j);
+                    T[0][j] = std::vector<FieldValueType>(2, FieldValueType::one());
+                    T[0][j][0] = FieldValueType(-j);
                 }
 
-                std::vector<typename FieldType::value_type> a;
-                std::vector<typename FieldType::value_type> b;
+                std::vector<FieldValueType> a;
+                std::vector<FieldValueType> b;
 
                 size_t index = 0;
                 for (size_t i = 1; i <= m; i++) {
-                    T[i] = std::vector<std::vector<typename FieldType::value_type>>(1u << (m - i));
+                    T[i] = std::vector<std::vector<FieldValueType>>(1u << (m - i));
                     for (size_t j = 0; j < (1u << (m - i)); j++) {
                         a = T[i - 1][index];
                         index++;
@@ -71,30 +71,30 @@ namespace nil {
              * [Bostan and Schost 2005. Polynomial Evaluation and Interpolation on Special Sets of Points], on page 12
              * and 14.
              */
-            template<typename FieldType>
-            void monomial_to_newton_basis(std::vector<typename FieldType::value_type> &a,
-                                          const std::vector<std::vector<std::vector<typename FieldType::value_type>>> &T,
+            template<typename FieldValueType>
+            void monomial_to_newton_basis(std::vector<FieldValueType> &a,
+                                          const std::vector<std::vector<std::vector<FieldValueType>>> &T,
                                           const size_t &n) {
                 size_t m = log2(n);
                 // if (T.size() != m + 1u)
                 // throw DomainSizeException("expected T.size() == m + 1");
 
                 /* MonomialToNewton */
-                std::vector<typename FieldType::value_type> I(T[m][0]);
+                std::vector<FieldValueType> I(T[m][0]);
                 _reverse(I, n);
 
-                std::vector<typename FieldType::value_type> mod(n + 1, FieldType::zero());
-                mod[n] = FieldType::one();
+                std::vector<FieldValueType> mod(n + 1, FieldValueType::zero());
+                mod[n] = FieldValueType::one();
 
                 _polynomial_xgcd(mod, I, mod, mod, I);
 
                 I.resize(n);
 
-                std::vector<typename FieldType::value_type> Q(_polynomial_multiplication_transpose(n - 1, I, a));
+                std::vector<FieldValueType> Q(_polynomial_multiplication_transpose(n - 1, I, a));
                 _reverse(Q, n);
 
                 /* TNewtonToMonomial */
-                std::vector<std::vector<typename FieldType::value_type>> c(n);
+                std::vector<std::vector<FieldValueType>> c(n);
                 c[0] = Q;
 
                 size_t row_length;
@@ -127,21 +127,21 @@ namespace nil {
              * Below we make use of the NewtonToMonomial pseudocode from
              * [Bostan and Schost 2005. Polynomial Evaluation and Interpolation on Special Sets of Points], on page 11.
              */
-            template<typename FieldType>
-            void newton_to_monomial_basis(std::vector<typename FieldType::value_type> &a,
-                                          const std::vector<std::vector<std::vector<typename FieldType::value_type>>> &T,
+            template<typename FieldValueType>
+            void newton_to_monomial_basis(std::vector<FieldValueType> &a,
+                                          const std::vector<std::vector<std::vector<FieldValueType>>> &T,
                                           const size_t &n) {
                 size_t m = log2(n);
                 // if (T.size() != m + 1u)
                 // throw DomainSizeException("expected T.size() == m + 1");
 
-                std::vector<std::vector<typename FieldType::value_type>> f(n);
+                std::vector<std::vector<FieldValueType>> f(n);
                 for (size_t i = 0; i < n; i++) {
-                    f[i] = std::vector<typename FieldType::value_type>(1, a[i]);
+                    f[i] = std::vector<FieldValueType>(1, a[i]);
                 }
 
                 /* NewtonToMonomial */
-                std::vector<typename FieldType::value_type> temp(1, FieldType::zero());
+                std::vector<FieldValueType> temp(1, FieldValueType::zero());
                 for (size_t i = 0; i < m; i++) {
                     for (size_t j = 0; j < (1u << (m - i - 1)); j++) {
                         _polynomial_multiplication(temp, T[i][2 * j], f[2 * j + 1]);
@@ -157,24 +157,24 @@ namespace nil {
              * Below we make use of the psuedocode from
              * [Bostan & Schost 2005. Polynomial Evaluation and Interpolation on Special Sets of Points] on page 26.
              */
-            template<typename FieldType>
-            void monomial_to_newton_basis_geometric(std::vector<typename FieldType::value_type> &a,
-                                                    const std::vector<typename FieldType::value_type> &geometric_sequence,
-                                                    const std::vector<typename FieldType::value_type> &geometric_triangular_sequence,
+            template<typename FieldValueType>
+            void monomial_to_newton_basis_geometric(std::vector<FieldValueType> &a,
+                                                    const std::vector<FieldValueType> &geometric_sequence,
+                                                    const std::vector<FieldValueType> &geometric_triangular_sequence,
                                                     const size_t &n) {
-                std::vector<typename FieldType::value_type> u(n, FieldType::zero());
-                std::vector<typename FieldType::value_type> w(n, FieldType::zero());
-                std::vector<typename FieldType::value_type> z(n, FieldType::zero());
-                std::vector<typename FieldType::value_type> f(n, FieldType::zero());
-                u[0] = FieldType::one();
+                std::vector<FieldValueType> u(n, FieldValueType::zero());
+                std::vector<FieldValueType> w(n, FieldValueType::zero());
+                std::vector<FieldValueType> z(n, FieldValueType::zero());
+                std::vector<FieldValueType> f(n, FieldValueType::zero());
+                u[0] = FieldValueType::one();
                 w[0] = a[0];
-                z[0] = FieldType::one();
+                z[0] = FieldValueType::one();
                 f[0] = a[0];
 
                 for (size_t i = 1; i < n; i++) {
-                    u[i] = u[i - 1] * geometric_sequence[i] * (FieldType::one() - geometric_sequence[i]).inverse();
-                    w[i] = a[i] * (u[i].inverse());
-                    z[i] = u[i] * geometric_triangular_sequence[i].inverse();
+                    u[i] = u[i - 1] * geometric_sequence[i] * (FieldValueType::one() - geometric_sequence[i]).inversed();
+                    w[i] = a[i] * (u[i].inversed());
+                    z[i] = u[i] * geometric_triangular_sequence[i].inversed();
                     f[i] = w[i] * geometric_triangular_sequence[i];
 
                     if (i % 2 == 1) {
@@ -198,29 +198,29 @@ namespace nil {
              * Below we make use of the psuedocode from
              * [Bostan & Schost 2005. Polynomial Evaluation and Interpolation on Special Sets of Points] on page 26.
              */
-            template<typename FieldType>
-            void newton_to_monomial_basis_geometric(std::vector<typename FieldType::value_type> &a,
-                                                    const std::vector<typename FieldType::value_type> &geometric_sequence,
-                                                    const std::vector<typename FieldType::value_type> &geometric_triangular_sequence,
+            template<typename FieldValueType>
+            void newton_to_monomial_basis_geometric(std::vector<FieldValueType> &a,
+                                                    const std::vector<FieldValueType> &geometric_sequence,
+                                                    const std::vector<FieldValueType> &geometric_triangular_sequence,
                                                     const size_t &n) {
-                std::vector<typename FieldType::value_type> v(n, FieldType::zero());
-                std::vector<typename FieldType::value_type> u(n, FieldType::zero());
-                std::vector<typename FieldType::value_type> w(n, FieldType::zero());
-                std::vector<typename FieldType::value_type> z(n, FieldType::zero());
+                std::vector<FieldValueType> v(n, FieldValueType::zero());
+                std::vector<FieldValueType> u(n, FieldValueType::zero());
+                std::vector<FieldValueType> w(n, FieldValueType::zero());
+                std::vector<FieldValueType> z(n, FieldValueType::zero());
                 v[0] = a[0];
-                u[0] = FieldType::one();
+                u[0] = FieldValueType::one();
                 w[0] = a[0];
-                z[0] = FieldType::one();
+                z[0] = FieldValueType::one();
 
                 for (size_t i = 1; i < n; i++) {
                     v[i] = a[i] * geometric_triangular_sequence[i];
                     if (i % 2 == 1)
                         v[i] = -v[i];
 
-                    u[i] = u[i - 1] * geometric_sequence[i] * (FieldType::one() - geometric_sequence[i]).inverse();
-                    w[i] = v[i] * u[i].inverse();
+                    u[i] = u[i - 1] * geometric_sequence[i] * (FieldValueType::one() - geometric_sequence[i]).inversed();
+                    w[i] = v[i] * u[i].inversed();
 
-                    z[i] = u[i] * geometric_triangular_sequence[i].inverse();
+                    z[i] = u[i] * geometric_triangular_sequence[i].inversed();
                     if (i % 2 == 1)
                         z[i] = -z[i];
                 }

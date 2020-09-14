@@ -16,9 +16,9 @@ namespace nil {
         /**
          * Translate the vector a to a coset defined by g.
          */
-        template<typename FieldType>
-        void multiply_by_coset(std::vector<typename FieldType::value_type> &a, const FieldType &g) {
-            FieldType u = g;
+        template<typename FieldValueType>
+        void multiply_by_coset(std::vector<FieldValueType> &a, const FieldValueType &g) {
+            FieldValueType u = g;
             for (size_t i = 1; i < a.size(); ++i) {
                 a[i] *= u;
                 u *= g;

@@ -21,13 +21,13 @@ namespace nil {
                 return FieldType::multiplicative_generator.squared();
             }
 
-            template<typename FieldType>
-            typename std::enable_if<std::is_same<typename FieldType::value_type, std::complex<double>>::value,
-                                    FieldType>::type
+            template<typename FieldValueType>
+            typename std::enable_if<std::is_same<FieldValueType, std::complex<double>>::value,
+                                    FieldValueType>::type
                 unity_root(const size_t n) {
                 const double PI = 3.141592653589793238460264338328L;
 
-                return typename FieldType::value_type(cos(2 * PI / n), sin(2 * PI / n));
+                return typename FieldValueType(cos(2 * PI / n), sin(2 * PI / n));
             }
 
             template<typename FieldType>
