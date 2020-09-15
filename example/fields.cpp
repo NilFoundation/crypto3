@@ -50,6 +50,11 @@ void print_field_element(typename fields::detail::element_fp2<FieldParams> e) {
     std::cout << e.data[0].data << " " << e.data[1].data << std::endl;
 }
 
+template<typename FieldParams>
+void print_field_element(typename fields::detail::element_fp3<FieldParams> e) {
+    std::cout << e.data[0].data << " " << e.data[1].data << " " << e.data[2].data << std::endl;
+}
+
 template<typename FpField>
 void fields_fp_basic_math_examples() {
     using policy_type = FpField;
@@ -222,6 +227,97 @@ void fields_fp2_basic_math_examples() {
     // print_field_element(e1.inversed());
 }
 
+template<typename Fp3Field>
+void fields_fp3_basic_math_examples() {
+    using policy_type = Fp3Field;
+    using value_type = typename policy_type::value_type;
+
+    std::cout << "Field module value: " << policy_type::modulus << std::endl;
+
+    value_type e1 = value_type(76749407, 44410867, 44410867), e2(44410867, 44410867, 1), e3 = value_type::one(), e4(121160274, 7, 121160274);
+
+    value_type ee(e1);
+
+    std::cout << "ee value: ";
+    print_field_element(ee);
+
+    std::cout << "Non residue: " << e1.non_residue.data << std::endl;
+
+    std::cout << "Field element values: " << std::endl;
+    std::cout << "e1 value: ";
+    print_field_element(e1);
+
+    e1 += e2;
+
+    std::cout << "e1 value: ";
+    print_field_element(e1);
+    std::cout << "ee value: ";
+    print_field_element(ee);
+
+    std::cout << "e2 value: ";
+    print_field_element(e2);
+
+    std::cout << "e3 value: ";
+    print_field_element(e3);
+
+    value_type e1inv = e1.inversed();
+
+    std::cout << "e1 inversed value: ";
+    print_field_element(e1inv);
+
+    std::cout << "e1 * e1^(-1) \n";
+    print_field_element(e1 * e1inv);
+
+    value_type e1e2 = e1 * e2, e1sqr = e1.squared();
+
+    std::cout << "e1 * e2 value: ";
+    print_field_element(e1e2);
+
+    std::cout << "e1 square value: ";
+    print_field_element(e1sqr);
+
+    std::cout << "e1 square square value: ";
+
+    print_field_element(e1.squared().squared());
+
+    std::cout << "e1 pow 4 value: ";
+
+    print_field_element(e1.pow(4));
+
+    std::cout << "e1 pow 11 value: ";
+
+    print_field_element(e1.pow(11));
+
+    std::cout << "e1 pow 44410867 value: ";
+
+    print_field_element(e1.pow(44410867));
+
+    value_type complex_eq = e1 * e3 + e1 * e4 + e2 * e3 + e2 * e4;
+    value_type complex_eq1 = (e1 + e2) * (e3 + e4);
+
+    std::cout << "e1 * e3 + e1 * e4 + e2 * e3 + e2 * e4 value: ";
+
+    print_field_element(complex_eq);
+
+    std::cout << "(e1 + e2) * (e3 + e4) value: ";
+
+    print_field_element(complex_eq1);
+
+    std::cout << "Doubled e1 value: ";
+
+    print_field_element(e1.doubled());
+
+    e1 += e2;
+
+    std::cout << "e1 += e2 value: ";
+
+    print_field_element(e1);
+
+    // std::cout << "e1 inversed value: " ;
+
+    // print_field_element(e1.inversed());
+}
+
 int main() {
     std::cout << "ALT_BN128-254 Fq basic math:" << std::endl;
     fields_fp_basic_math_examples<fields::alt_bn128_fq<254>>();
@@ -289,7 +385,7 @@ int main() {
     std::cout << "----------------------------" << std::endl;
 
     std::cout << "Edwards Fq3 basic math:" << std::endl;
-    fields_fp2_basic_math_examples<fields::fp3<fields::edwards_fq<183>>>();
+    fields_fp3_basic_math_examples<fields::fp3<fields::edwards_fq<183>>>();
 
     std::cout << "----------------------------" << std::endl;
 
@@ -319,7 +415,7 @@ int main() {
     std::cout << "----------------------------" << std::endl;
 
     std::cout << "MNT6 Fq3 basic math:" << std::endl;
-    fields_fp2_basic_math_examples<fields::fp3<fields::mnt6_fq<298>>>();
+    fields_fp3_basic_math_examples<fields::fp3<fields::mnt6_fq<298>>>();
 
     std::cout << "----------------------------" << std::endl;
 

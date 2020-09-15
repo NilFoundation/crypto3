@@ -26,11 +26,11 @@ namespace nil {
              * @tparam ModulusBits
              * @tparam GeneratorBits
              */
-            template<std::size_t ModulusBits = 181, std::size_t GeneratorBits = CHAR_BIT>
+            template<std::size_t ModulusBits = 183, std::size_t GeneratorBits = CHAR_BIT>
             struct edwards_scalar_field : public field<ModulusBits, GeneratorBits> { };
 
             template<>
-            struct edwards_scalar_field<181, CHAR_BIT> : public field<181, CHAR_BIT> {
+            struct edwards_scalar_field<183, CHAR_BIT> : public field<181, CHAR_BIT> {
                 typedef field<181, CHAR_BIT> policy_type;
 
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
@@ -46,19 +46,19 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x13;
 
-                typedef typename detail::element_fp<params<edwards_scalar_field<181, CHAR_BIT>>>
+                typedef typename detail::element_fp<params<edwards_scalar_field<183, CHAR_BIT>>>
                     value_type;
 
                 constexpr static const std::size_t arity = 1;
             };
 
-            constexpr typename edwards_scalar_field<181, CHAR_BIT>::modulus_type const
-                edwards_scalar_field<181, CHAR_BIT>::modulus;
+            constexpr typename edwards_scalar_field<183, CHAR_BIT>::modulus_type const
+                edwards_scalar_field<183, CHAR_BIT>::modulus;
 
-            constexpr typename edwards_scalar_field<181, CHAR_BIT>::generator_type const
-                edwards_scalar_field<181, CHAR_BIT>::mul_generator;
+            constexpr typename edwards_scalar_field<183, CHAR_BIT>::generator_type const
+                edwards_scalar_field<183, CHAR_BIT>::mul_generator;
 
-            template<std::size_t ModulusBits = 181, std::size_t GeneratorBits = CHAR_BIT>
+            template<std::size_t ModulusBits = 183, std::size_t GeneratorBits = CHAR_BIT>
             using edwards_fr = edwards_scalar_field<ModulusBits, GeneratorBits>;
         }    // namespace fields
     }        // namespace algebra
