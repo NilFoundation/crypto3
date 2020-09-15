@@ -24,7 +24,7 @@
 #include <nil/algebra/fields/detail/params/frp_v1/scalar_field.hpp>
 #include <nil/algebra/fields/detail/params/gost_A/base_field.hpp>
 #include <nil/algebra/fields/detail/params/gost_A/scalar_field.hpp>*/
-//#include <nil/algebra/fields/detail/params/mnt4/base_field.hpp>
+#include <nil/algebra/fields/detail/params/mnt4/base_field.hpp>
 //#include <nil/algebra/fields/detail/params/mnt4/scalar_field.hpp>
 //#include <nil/algebra/fields/detail/params/mnt6/base_field.hpp>
 //#include <nil/algebra/fields/detail/params/mnt6/scalar_field.hpp>

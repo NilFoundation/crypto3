@@ -15,6 +15,7 @@
 #include <nil/algebra/fields/detail/params/params.hpp>
 
 #include <nil/algebra/fields/mnt4/base_field.hpp>
+#include <nil/algebra/fields/fp2.hpp>
 
 #include <nil/algebra/detail/literals.hpp>
 
@@ -24,6 +25,9 @@ namespace nil {
             namespace detail {
 
                 using namespace nil::algebra;
+
+                template<typename FieldType>
+                struct fp2_extension_params;
 
                 template<std::size_t ModulusBits, std::size_t GeneratorBits>
                 class fp2_extension_params<fields::mnt4_base_field<ModulusBits, GeneratorBits>>
@@ -42,6 +46,9 @@ namespace nil {
                     constexpr static const modulus_type non_residue = modulus_type(0x11);
                 };
 
+                template<typename FieldType>
+                struct fp4_extension_params;
+
                 template<std::size_t ModulusBits, std::size_t GeneratorBits>
                 class fp4_extension_params<fields::mnt4_base_field<ModulusBits, GeneratorBits>>
                     : public params<fields::mnt4_base_field<ModulusBits, GeneratorBits>> {
@@ -58,6 +65,9 @@ namespace nil {
 
                     constexpr static const modulus_type non_residue = modulus_type(0x11);
                 };
+
+                template<typename FieldType>
+                struct arithmetic_params;
 
                 template<std::size_t ModulusBits, std::size_t GeneratorBits>
                 struct arithmetic_params<fields::mnt4_base_field<ModulusBits, GeneratorBits>>
@@ -76,7 +86,7 @@ namespace nil {
                 };
 
                 template<std::size_t ModulusBits, std::size_t GeneratorBits>
-                struct arithmetic_params<field::fp2<fields::mnt4_base_field<ModulusBits, GeneratorBits>>>
+                struct arithmetic_params<fields::fp2<fields::mnt4_base_field<ModulusBits, GeneratorBits>>>
                     : public params<fields::mnt4_base_field<ModulusBits, GeneratorBits>> {
                 private:
                     typedef params<fields::mnt4_base_field<ModulusBits, GeneratorBits>> policy_type;

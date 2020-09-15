@@ -29,10 +29,10 @@ namespace nil {
                     constexpr static const modulus_type modulus = policy_type::modulus;
 
                 public:
-                    using underlying_type = element_fp<FieldParams>;
+                    using underlying_type = typename policy_type::underlying_type;
 
                     const typename policy_type::fp3::non_residue_type non_residue =
-                        underlying_type(typename policy_type::fp3::non_residue_type(policy_type::fp3::non_residue));
+                        typename policy_type::non_residue_type(policy_type::non_residue);
 
                     using value_type = std::array<underlying_type, 3>;
 
