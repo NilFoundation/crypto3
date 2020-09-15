@@ -12,8 +12,8 @@
 
 #include <nil/algebra/fields/params.hpp>
 
-#include <nil/algebra/fields/bn128/base_field.hpp>
-#include <nil/algebra/fields/bn128/scalar_field.hpp>
+#include <nil/algebra/fields/alt_bn128/base_field.hpp>
+#include <nil/algebra/fields/alt_bn128/scalar_field.hpp>
 
 #include <nil/algebra/detail/literals.hpp>
 
@@ -22,10 +22,10 @@ namespace nil {
         namespace fields {
 
             template<std::size_t ModulusBits, std::size_t GeneratorBits>
-            struct arithmetic_params<bn128_base_field<ModulusBits, GeneratorBits>>
-                : public params<bn128_base_field<ModulusBits, GeneratorBits>> {
+            struct arithmetic_params<alt_bn128_base_field<ModulusBits, GeneratorBits>>
+                : public params<alt_bn128_base_field<ModulusBits, GeneratorBits>> {
             private:
-                typedef params<bn128_base_field<ModulusBits, GeneratorBits>> policy_type;
+                typedef params<alt_bn128_base_field<ModulusBits, GeneratorBits>> policy_type;
 
             public:
                 typedef typename policy_type::number_type number_type;
@@ -37,10 +37,10 @@ namespace nil {
             };
 
             template<std::size_t ModulusBits, std::size_t GeneratorBits>
-            struct arithmetic_params<fp2<bn128_base_field<ModulusBits, GeneratorBits>>>
-                : public params<bn128_base_field<ModulusBits, GeneratorBits>> {
+            struct arithmetic_params<fp2<alt_bn128_base_field<ModulusBits, GeneratorBits>>>
+                : public params<alt_bn128_base_field<ModulusBits, GeneratorBits>> {
             private:
-                typedef params<bn128_base_field<ModulusBits, GeneratorBits>> policy_type;
+                typedef params<alt_bn128_base_field<ModulusBits, GeneratorBits>> policy_type;
 
             public:
                 typedef typename policy_type::number_type number_type;
@@ -52,10 +52,10 @@ namespace nil {
             };
 
             template<std::size_t ModulusBits, std::size_t GeneratorBits>
-            struct arithmetic_params<bn128_scalar_field<ModulusBits, GeneratorBits>>
-                : public params<bn128_scalar_field<ModulusBits, GeneratorBits>> {
+            struct arithmetic_params<alt_bn128_scalar_field<ModulusBits, GeneratorBits>>
+                : public params<alt_bn128_scalar_field<ModulusBits, GeneratorBits>> {
             private:
-                typedef params<bn128_scalar_field<ModulusBits, GeneratorBits>> policy_type;
+                typedef params<alt_bn128_scalar_field<ModulusBits, GeneratorBits>> policy_type;
 
             public:
                 typedef typename policy_type::number_type number_type;

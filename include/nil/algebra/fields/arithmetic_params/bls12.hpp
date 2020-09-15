@@ -39,10 +39,10 @@ namespace nil {
             };
 
             template<>
-            struct arithmetic_params<fp2<bl12_base_field<381, CHAR_BIT>>>
-                : public params<bl12_base_field<381, CHAR_BIT>> {
+            struct arithmetic_params<fp2<bls12_base_field<381, CHAR_BIT>>>
+                : public params<bls12_base_field<381, CHAR_BIT>> {
             private:
-                typedef params<bl12_base_field<381, CHAR_BIT>> policy_type;
+                typedef params<bls12_base_field<381, CHAR_BIT>> policy_type;
 
             public:
                 typedef typename policy_type::number_type number_type;
