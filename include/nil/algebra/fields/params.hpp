@@ -42,6 +42,11 @@ namespace nil {
 
                 template<typename FieldType>
                 constexpr typename std::size_t const params<FieldType>::generator_bits;
+
+
+                template<typename FieldType>
+                struct arithmetic_params;
+                
                 /*
                 template<typename FieldType>
                 struct fp2_extension_params : public params<FieldType> {

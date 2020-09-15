@@ -12,7 +12,7 @@
 
 #include <nil/algebra/fields/detail/element/fp.hpp>
 #include <nil/algebra/fields/detail/element/fp2.hpp>
-#include <nil/algebra/fields/detail/params/params.hpp>
+#include <nil/algebra/fields/params.hpp>
 
 #include <nil/algebra/fields/bls12/base_field.hpp>
 
@@ -24,6 +24,8 @@ namespace nil {
             namespace detail {
 
                 using namespace nil::algebra;
+
+                /************************* BLS12-381 ***********************************/
 
                 template<typename FieldType>
                 struct fp2_extension_params;
@@ -100,75 +102,88 @@ namespace nil {
                     constexpr static const std::array<modulus_type, 2> non_residue = {1, 1};
                 };
 
+                /************************* BLS12-377 ***********************************/
+
                 template<typename FieldType>
-                struct arithmetic_params;
+                struct fp2_extension_params;
 
                 template<>
-                struct arithmetic_params<fields::bls12<381, CHAR_BIT>>
-                    : public params<fields::bls12<381, CHAR_BIT>> {
-                private:
-                    typedef params<fields::bls12<381, CHAR_BIT>> policy_type;
+                class fp2_extension_params<fields::bls12<377, CHAR_BIT>>
+                    : public params<fields::bls12<377, CHAR_BIT>> {
+
+                    typedef params<fields::bls12<377, CHAR_BIT>> policy_type;
 
                 public:
                     typedef typename policy_type::number_type number_type;
                     typedef typename policy_type::modulus_type modulus_type;
 
                     constexpr static const modulus_type modulus = policy_type::modulus;
-                    constexpr static const modulus_type group_order =
-                        0xD0088F51CBFF34D258DD3DB21A5D66BB23BA5C279C2895FB39869507B587B120F55FFFF58A9FFFFDCFF7FFFFFFFD555_cppui380;
-                };
-/*
-                template<>
-                struct extension_params<bls12_base_field<377, CHAR_BIT>>
-                    : public params<bls12_base_field<377, CHAR_BIT>> {
-                private:
-                    typedef params<bls12_base_field<377, CHAR_BIT>> policy_type;
-                    typedef extension_params<bls12_base_field<377, CHAR_BIT>> element_policy_type;
 
-                public:
-                    typedef typename policy_type::number_type number_type;
-                    typedef typename policy_type::modulus_type modulus_type;
+                    typedef element_fp<policy_type> non_residue_type;
+                    typedef element_fp<policy_type> underlying_type;
 
-                    constexpr static const modulus_type modulus = policy_type::modulus;
-                    constexpr static const modulus_type group_order =
-                        0xD71D230BE28875631D82E03650A49D8D116CF9807A89C78F79B117DD04A4000B85AEA2180000004284600000000000_cppui376;
-
-                    struct fp2{
-                        typedef element_fp<element_policy_type> non_residue_type;
-
-                        constexpr static const modulus_type non_residue = modulus_type(
+                    constexpr static const modulus_type non_residue = modulus_type(
                         0x1AE3A4617C510EAC63B05C06CA1493B1A22D9F300F5138F1EF3622FBA094800170B5D44300000008508BFFFFFFFFFFC_cppui377);
-                    };
+                };
 
-                    struct fp6_3over2{
-                        typedef element_fp2<element_policy_type> non_residue_type;
+                template<typename FieldType>
+                struct fp6_3over2_extension_params;
 
-                        constexpr static const std::array<modulus_type, 2> non_residue = {0, 1};
-                    };
+                template<>
+                class fp6_3over2_extension_params<fields::bls12<377, CHAR_BIT>>
+                    : public params<fields::bls12<377, CHAR_BIT>> {
 
-                    struct fp12_2over3over2{
-                        typedef element_fp2<element_policy_type> non_residue_type;
+                    typedef fields::bls12<377, CHAR_BIT> field_type;
+                    typedef params<field_type> policy_type;
 
-                        constexpr static const std::array<modulus_type, 2> non_residue = {0, 1};
-                    };
+                public:
+                    typedef typename policy_type::number_type number_type;
+                    typedef typename policy_type::modulus_type modulus_type;
 
-                };*/
+                    constexpr static const modulus_type modulus = policy_type::modulus;
+
+                    typedef element_fp2<field_type> non_residue_type;
+                    typedef element_fp<fp2_extension_params<field_type>> underlying_type;
+
+                    constexpr static const std::array<modulus_type, 2> non_residue = {0, 1};
+                };
+
+                template<typename FieldType>
+                struct fp12_2over3over2_extension_params;
+
+                template<>
+                class fp12_2over3over2_extension_params<fields::bls12<377, CHAR_BIT>>
+                    : public params<fields::bls12<377, CHAR_BIT>> {
+
+                    typedef fields::bls12<377, CHAR_BIT> field_type;
+                    typedef params<field_type> policy_type;
+
+                public:
+                    typedef typename policy_type::number_type number_type;
+                    typedef typename policy_type::modulus_type modulus_type;
+
+                    constexpr static const modulus_type modulus = policy_type::modulus;
+
+                    typedef element_fp2<field_type> non_residue_type;
+                    typedef element_fp<fp6_3over2_extension_params<field_type>> underlying_type;
+
+                    constexpr static const std::array<modulus_type, 2> non_residue = {0, 1};
+                };
 
                 constexpr typename fp2_extension_params<bls12_base_field<381, CHAR_BIT>>::modulus_type const
                     fp2_extension_params<bls12_base_field<381, CHAR_BIT>>::non_residue;
-                //constexpr typename extension_params<bls12_base_field<377, CHAR_BIT>>::modulus_type const
-                //    extension_params<bls12_base_field<377, CHAR_BIT>>::fp2::non_residue;
-                
+                constexpr typename fp2_extension_params<bls12_base_field<377, CHAR_BIT>>::modulus_type const
+                    fp2_extension_params<bls12_base_field<377, CHAR_BIT>>::non_residue;
 
                 constexpr std::array<typename fp6_3over2_extension_params<bls12_base_field<381, CHAR_BIT>>::modulus_type, 2> const
                     fp6_3over2_extension_params<bls12_base_field<381, CHAR_BIT>>::non_residue;
-                //constexpr std::array<typename extension_params<bls12_base_field<377, CHAR_BIT>>::modulus_type, 2> const
-                //    extension_params<bls12_base_field<377, CHAR_BIT>>::fp6_3over2::non_residue;
+                constexpr std::array<typename fp6_3over2_extension_params<bls12_base_field<377, CHAR_BIT>>::modulus_type, 2> const
+                    fp6_3over2_extension_params<bls12_base_field<377, CHAR_BIT>>::non_residue;
 
                 constexpr std::array<typename fp12_2over3over2_extension_params<bls12_base_field<381, CHAR_BIT>>::modulus_type, 2> const
                     fp12_2over3over2_extension_params<bls12_base_field<381, CHAR_BIT>>::non_residue;
-                //constexpr std::array<typename extension_params<bls12_base_field<377, CHAR_BIT>>::modulus_type, 2> const
-                //    extension_params<bls12_base_field<377, CHAR_BIT>>::fp12_2over3over2::non_residue;
+                constexpr std::array<typename fp12_2over3over2_extension_params<bls12_base_field<377, CHAR_BIT>>::modulus_type, 2> const
+                    fp12_2over3over2_extension_params<bls12_base_field<377, CHAR_BIT>>::non_residue;
 
             }    // namespace detail
         }        // namespace fields
