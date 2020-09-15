@@ -42,26 +42,40 @@ namespace nil {
 
                 template<typename FieldType>
                 constexpr typename std::size_t const params<FieldType>::generator_bits;
-
+                /*
                 template<typename FieldType>
-                struct extension_params : public params<FieldType> {
+                struct fp2_extension_params : public params<FieldType> {
                 private:
                     typedef params<FieldType> policy_type;
-                    typedef extension_params<FieldType> element_policy_type;
 
                 public:
                     typedef typename policy_type::number_type number_type;
                     typedef typename policy_type::modulus_type modulus_type;
 
                     constexpr static const modulus_type modulus = policy_type::modulus;
-                    constexpr static const modulus_type q = (policy_type::modulus - 1) / 2;
                 };
+
+                template<typename FieldType>
+                struct fp3_extension_params : public params<FieldType> {
+                private:
+                    typedef params<FieldType> policy_type;
+
+                public:
+                    typedef typename policy_type::number_type number_type;
+                    typedef typename policy_type::modulus_type modulus_type;
+
+                    constexpr static const modulus_type modulus = policy_type::modulus;
+                };
+
+                template<typename FieldType>
+                struct extension_params : public params<FieldType>;
+
 
                 template<typename FieldType>
                 constexpr typename extension_params<FieldType>::modulus_type const extension_params<FieldType>::modulus;
 
                 template<typename FieldType>
-                constexpr typename extension_params<FieldType>::modulus_type const extension_params<FieldType>::q;
+                constexpr typename extension_params<FieldType>::modulus_type const extension_params<FieldType>::q;*/
 
             }    // namespace detail
         }        // namespace fields

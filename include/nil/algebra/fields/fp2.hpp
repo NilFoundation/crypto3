@@ -12,22 +12,22 @@
 
 #include <nil/algebra/fields/detail/element/fp2.hpp>
 #include <nil/algebra/fields/detail/params/params.hpp>
-#include <nil/algebra/fields/detail/params/alt_bn128/base_field.hpp>
-#include <nil/algebra/fields/detail/params/alt_bn128/scalar_field.hpp>
+//#include <nil/algebra/fields/detail/params/alt_bn128/base_field.hpp>
+//#include <nil/algebra/fields/detail/params/alt_bn128/scalar_field.hpp>
 #include <nil/algebra/fields/detail/params/bls12/base_field.hpp>
-#include <nil/algebra/fields/detail/params/bls12/scalar_field.hpp>
-#include <nil/algebra/fields/detail/params/bn128/base_field.hpp>
-#include <nil/algebra/fields/detail/params/bn128/scalar_field.hpp>
-#include <nil/algebra/fields/detail/params/edwards/base_field.hpp>
-#include <nil/algebra/fields/detail/params/edwards/scalar_field.hpp>
+//#include <nil/algebra/fields/detail/params/bls12/scalar_field.hpp>
+//#include <nil/algebra/fields/detail/params/bn128/base_field.hpp>
+//#include <nil/algebra/fields/detail/params/bn128/scalar_field.hpp>
+//#include <nil/algebra/fields/detail/params/edwards/base_field.hpp>
+//#include <nil/algebra/fields/detail/params/edwards/scalar_field.hpp>
 /*#include <nil/algebra/fields/detail/params/frp_v1/base_field.hpp>
 #include <nil/algebra/fields/detail/params/frp_v1/scalar_field.hpp>
 #include <nil/algebra/fields/detail/params/gost_A/base_field.hpp>
 #include <nil/algebra/fields/detail/params/gost_A/scalar_field.hpp>*/
-#include <nil/algebra/fields/detail/params/mnt4/base_field.hpp>
-#include <nil/algebra/fields/detail/params/mnt4/scalar_field.hpp>
-#include <nil/algebra/fields/detail/params/mnt6/base_field.hpp>
-#include <nil/algebra/fields/detail/params/mnt6/scalar_field.hpp>
+//#include <nil/algebra/fields/detail/params/mnt4/base_field.hpp>
+//#include <nil/algebra/fields/detail/params/mnt4/scalar_field.hpp>
+//#include <nil/algebra/fields/detail/params/mnt6/base_field.hpp>
+//#include <nil/algebra/fields/detail/params/mnt6/scalar_field.hpp>
 /*#include <nil/algebra/fields/detail/params/secp/base_field.hpp>
 #include <nil/algebra/fields/detail/params/secp/scalar_field.hpp>
 #include <nil/algebra/fields/detail/params/sm2p_v1/base_field.hpp>
@@ -47,7 +47,7 @@ namespace nil {
             template<typename BaseField>
             struct fp2 {
                 typedef BaseField field_type;
-                typedef detail::extension_params<field_type> policy_type;
+                typedef detail::fp2_extension_params<field_type> policy_type;
 
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                 typedef typename policy_type::modulus_type modulus_type;

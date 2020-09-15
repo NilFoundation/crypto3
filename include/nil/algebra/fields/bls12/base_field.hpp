@@ -47,7 +47,7 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x02;
 
-                typedef typename detail::element_fp<detail::extension_params<bls12_base_field<381, CHAR_BIT>>>
+                typedef typename detail::element_fp<detail::params<bls12_base_field<381, CHAR_BIT>>>
                     value_type;
 
                 constexpr static const std::size_t arity = 1;
@@ -71,7 +71,7 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x0F;
 
-                typedef typename detail::element_fp<detail::extension_params<bls12_base_field<377, CHAR_BIT>>>
+                typedef typename detail::element_fp<detail::params<bls12_base_field<377, CHAR_BIT>>>
                     value_type;
 
                 constexpr static const std::size_t arity = 1;

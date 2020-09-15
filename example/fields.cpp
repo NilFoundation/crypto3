@@ -15,14 +15,14 @@
 #include <boost/multiprecision/modular/modular_adaptor.hpp>
 
 #include <nil/algebra/fields/fp2.hpp>
-#include <nil/algebra/fields/alt_bn128/base_field.hpp>
-#include <nil/algebra/fields/alt_bn128/scalar_field.hpp>
+//#include <nil/algebra/fields/alt_bn128/base_field.hpp>
+//#include <nil/algebra/fields/alt_bn128/scalar_field.hpp>
 #include <nil/algebra/fields/bls12/base_field.hpp>
-#include <nil/algebra/fields/bls12/scalar_field.hpp>
-#include <nil/algebra/fields/bn128/base_field.hpp>
-#include <nil/algebra/fields/bn128/scalar_field.hpp>
-#include <nil/algebra/fields/dsa_botan.hpp>
-#include <nil/algebra/fields/dsa_jce.hpp>
+//#include <nil/algebra/fields/bls12/scalar_field.hpp>
+//#include <nil/algebra/fields/bn128/base_field.hpp>
+//#include <nil/algebra/fields/bn128/scalar_field.hpp>
+//#include <nil/algebra/fields/dsa_botan.hpp>
+//#include <nil/algebra/fields/dsa_jce.hpp>
 //#include <nil/algebra/fields/ed25519_fe.hpp>
 //#include <nil/algebra/fields/ffdhe_ietf.hpp>
 //#include <nil/algebra/fields/modp_ietf.hpp>
@@ -216,7 +216,7 @@ void fields_fp2_basic_math_examples() {
 }
 
 int main() {
-    std::cout << "ALT_BN128-254 Fq basic math:" << std::endl;
+    /*std::cout << "ALT_BN128-254 Fq basic math:" << std::endl;
     fields_fp_basic_math_examples<fields::alt_bn128_fq<254>>();
 
     std::cout << "----------------------------" << std::endl;
@@ -244,7 +244,7 @@ int main() {
     std::cout << "BN128-254 Fr basic math:" << std::endl;
     fields_fp_basic_math_examples<fields::bn128_fr<254>>();
 
-    std::cout << "----------------------------" << std::endl;
+    std::cout << "----------------------------" << std::endl;*/
 
     std::cout << "BLS12-381 Fq basic math:" << std::endl;
     fields_fp_basic_math_examples<fields::bls12_fq<381>>();
@@ -256,7 +256,7 @@ int main() {
 
     std::cout << "----------------------------" << std::endl;
 
-    std::cout << "BLS12-381 Fr basic math:" << std::endl;
+    /*std::cout << "BLS12-381 Fr basic math:" << std::endl;
     fields_fp_basic_math_examples<fields::bls12_fr<381>>();
 
     std::cout << "----------------------------" << std::endl;
@@ -282,7 +282,7 @@ int main() {
     std::cout << "----------------------------" << std::endl;
 
     std::cout << "DSA JCE 1024 basic math:" << std::endl;
-    fields_fp_basic_math_examples<fields::dsa_jce<1024>>();
+    fields_fp_basic_math_examples<fields::dsa_jce<1024>>();*/
 
     /*    std::cout << "----------------------------" << std::endl;
 
