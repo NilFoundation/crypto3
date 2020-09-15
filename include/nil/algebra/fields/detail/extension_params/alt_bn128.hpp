@@ -12,8 +12,9 @@
 
 #include <nil/algebra/fields/detail/element/fp.hpp>
 #include <nil/algebra/fields/detail/element/fp2.hpp>
-#include <nil/algebra/fields/params.hpp>
+#include <nil/algebra/fields/detail/element/fp6_3over2.hpp>
 
+#include <nil/algebra/fields/params.hpp>
 #include <nil/algebra/fields/alt_bn128/base_field.hpp>
 
 #include <nil/algebra/detail/literals.hpp>

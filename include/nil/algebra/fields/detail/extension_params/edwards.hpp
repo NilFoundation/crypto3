@@ -11,9 +11,9 @@
 #define ALGEBRA_FIELDS_EDWARDS_EXTENSION_PARAMS_HPP
 
 #include <nil/algebra/fields/detail/element/fp.hpp>
-#include <nil/algebra/fields/detail/element/fp2.hpp>
-#include <nil/algebra/fields/params.hpp>
+#include <nil/algebra/fields/detail/element/fp3.hpp>
 
+#include <nil/algebra/fields/params.hpp>
 #include <nil/algebra/fields/edwards/base_field.hpp>
 #include <nil/algebra/fields/fp2.hpp>
 
@@ -56,7 +56,8 @@ namespace nil {
                 class fp6_2over3_extension_params<fields::edwards_base_field<ModulusBits, GeneratorBits>>
                     : public params<fields::edwards_base_field<ModulusBits, GeneratorBits>> {
 
-                    typedef params<fields::edwards_base_field<ModulusBits, GeneratorBits>> policy_type;
+                    typedef fields::edwards_base_field<ModulusBits, GeneratorBits> field_type;
+                    typedef params<field_type> policy_type;
 
                 public:
                     typedef typename policy_type::number_type number_type;
@@ -79,10 +80,10 @@ namespace nil {
 
                 template<std::size_t ModulusBits, std::size_t GeneratorBits>
                 constexpr typename fp3_extension_params<edwards_base_field<ModulusBits, GeneratorBits>>::modulus_type const
-                    fp3_extension_params<edwards_base_field<ModulusBits, GeneratorBits>>modulus;
+                    fp3_extension_params<edwards_base_field<ModulusBits, GeneratorBits>>::modulus;
                 template<std::size_t ModulusBits, std::size_t GeneratorBits>
                 constexpr typename fp6_2over3_extension_params<edwards_base_field<ModulusBits, GeneratorBits>>::modulus_type const
-                    fp6_2over3_extension_params<edwards_base_field<ModulusBits, GeneratorBits>>modulus;
+                    fp6_2over3_extension_params<edwards_base_field<ModulusBits, GeneratorBits>>::modulus;
 
             }    // namespace detail
         }        // namespace fields

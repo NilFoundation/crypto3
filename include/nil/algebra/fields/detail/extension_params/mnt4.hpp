@@ -12,8 +12,8 @@
 
 #include <nil/algebra/fields/detail/element/fp.hpp>
 #include <nil/algebra/fields/detail/element/fp2.hpp>
-#include <nil/algebra/fields/params.hpp>
 
+#include <nil/algebra/fields/params.hpp>
 #include <nil/algebra/fields/mnt4/base_field.hpp>
 #include <nil/algebra/fields/fp2.hpp>
 

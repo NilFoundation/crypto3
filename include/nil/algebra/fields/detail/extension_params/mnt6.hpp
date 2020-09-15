@@ -11,9 +11,9 @@
 #define ALGEBRA_FIELDS_MNT6_EXTENSION_PARAMS_HPP
 
 #include <nil/algebra/fields/detail/element/fp.hpp>
-#include <nil/algebra/fields/detail/element/fp2.hpp>
-#include <nil/algebra/fields/params.hpp>
+#include <nil/algebra/fields/detail/element/fp3.hpp>
 
+#include <nil/algebra/fields/params.hpp>
 #include <nil/algebra/fields/mnt6/base_field.hpp>
 #include <nil/algebra/fields/fp2.hpp>
 

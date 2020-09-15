@@ -45,6 +45,9 @@ namespace nil {
 
             template<typename FieldType>
             struct arithmetic_params;
+
+            template<typename FieldType>
+            struct fp2_extension_params;
             
             /*
             template<typename FieldType>
