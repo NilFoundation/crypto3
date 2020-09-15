@@ -1,6 +1,12 @@
 # =nil; Foundation's Algebraic Constructions Module
 
-=nil; Foundation's Algebraic Constructions (finite fields, curves) module.
+=nil; Foundation's Algebraic Constructions module.
+
+Contains: 
+* Finite fields
+* Curves
+* Pairing
+* Constexpr BLAS.
 
 ## Building
 
