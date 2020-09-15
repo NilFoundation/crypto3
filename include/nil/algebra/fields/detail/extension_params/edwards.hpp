@@ -7,14 +7,14 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef ALGEBRA_FIELDS_MNT4_FQ_PARAMS_HPP
-#define ALGEBRA_FIELDS_MNT4_FQ_PARAMS_HPP
+#ifndef ALGEBRA_FIELDS_EDWARDS_EXTENSION_PARAMS_HPP
+#define ALGEBRA_FIELDS_EDWARDS_EXTENSION_PARAMS_HPP
 
 #include <nil/algebra/fields/detail/element/fp.hpp>
 #include <nil/algebra/fields/detail/element/fp2.hpp>
-#include <nil/algebra/fields/detail/params/params.hpp>
+#include <nil/algebra/fields/params.hpp>
 
-#include <nil/algebra/fields/mnt4/base_field.hpp>
+#include <nil/algebra/fields/edwards/base_field.hpp>
 #include <nil/algebra/fields/fp2.hpp>
 
 #include <nil/algebra/detail/literals.hpp>
@@ -27,16 +27,16 @@ namespace nil {
                 using namespace nil::algebra;
 
                 template<typename FieldType>
-                struct fp2_extension_params;
+                struct fp3_extension_params;
 
                 template<typename FieldType>
-                struct fp4_extension_params;
-                
-                template<std::size_t ModulusBits, std::size_t GeneratorBits>
-                class fp2_extension_params<fields::mnt4_base_field<ModulusBits, GeneratorBits>>
-                    : public params<fields::mnt4_base_field<ModulusBits, GeneratorBits>> {
+                struct fp6_2over3_extension_params;
 
-                    typedef params<fields::mnt4_base_field<ModulusBits, GeneratorBits>> policy_type;
+                template<std::size_t ModulusBits, std::size_t GeneratorBits>
+                class fp3_extension_params<fields::edwards_base_field<ModulusBits, GeneratorBits>>
+                    : public params<fields::edwards_base_field<ModulusBits, GeneratorBits>> {
+
+                    typedef params<fields::edwards_base_field<ModulusBits, GeneratorBits>> policy_type;
 
                 public:
                     typedef typename policy_type::number_type number_type;
@@ -47,14 +47,14 @@ namespace nil {
                     typedef element_fp<policy_type> non_residue_type;
                     typedef element_fp<policy_type> underlying_type;
 
-                    constexpr static const modulus_type non_residue = modulus_type(0x11);
+                    constexpr static const modulus_type non_residue = modulus_type(0x3D);
                 };
 
                 template<std::size_t ModulusBits, std::size_t GeneratorBits>
-                class fp4_extension_params<fields::mnt4_base_field<ModulusBits, GeneratorBits>>
-                    : public params<fields::mnt4_base_field<ModulusBits, GeneratorBits>> {
+                class fp6_2over3_extension_params<fields::edwards_base_field<ModulusBits, GeneratorBits>>
+                    : public params<fields::edwards_base_field<ModulusBits, GeneratorBits>> {
 
-                    typedef params<fields::mnt4_base_field<ModulusBits, GeneratorBits>> policy_type;
+                    typedef params<fields::edwards_base_field<ModulusBits, GeneratorBits>> policy_type;
 
                 public:
                     typedef typename policy_type::number_type number_type;
@@ -63,28 +63,28 @@ namespace nil {
                     constexpr static const modulus_type modulus = policy_type::modulus;
 
                     typedef element_fp<policy_type> non_residue_type;
-                    typedef element_fp2<fp2_extension_params<field_type>> underlying_type;
+                    typedef element_fp3<fp3_extension_params<field_type>> underlying_type;
 
-                    constexpr static const modulus_type non_residue = modulus_type(0x11);
+                    constexpr static const modulus_type non_residue = modulus_type(0x3D);
                 };
 
                 template<std::size_t ModulusBits, std::size_t GeneratorBits>
-                constexpr typename fp2_extension_params<mnt4_base_field<ModulusBits, GeneratorBits>>::modulus_type const
-                    fp2_extension_params<mnt4_base_field<ModulusBits, GeneratorBits>>::non_residue;
+                constexpr typename fp3_extension_params<edwards_base_field<ModulusBits, GeneratorBits>>::modulus_type const
+                    fp3_extension_params<edwards_base_field<ModulusBits, GeneratorBits>>::non_residue;
                 template<std::size_t ModulusBits, std::size_t GeneratorBits>
-                constexpr typename fp4_extension_params<mnt4_base_field<ModulusBits, GeneratorBits>>::modulus_type const
-                    fp4_extension_params<mnt4_base_field<ModulusBits, GeneratorBits>>::non_residue;
+                constexpr typename fp6_2over3_extension_params<edwards_base_field<ModulusBits, GeneratorBits>>::modulus_type const
+                    fp6_2over3_extension_params<edwards_base_field<ModulusBits, GeneratorBits>>::non_residue;
 
                 template<std::size_t ModulusBits, std::size_t GeneratorBits>
-                constexpr typename fp2_extension_params<mnt4_base_field<ModulusBits, GeneratorBits>>::modulus_type const
-                    fp2_extension_params<mnt4_base_field<ModulusBits, GeneratorBits>>modulus;
+                constexpr typename fp3_extension_params<edwards_base_field<ModulusBits, GeneratorBits>>::modulus_type const
+                    fp3_extension_params<edwards_base_field<ModulusBits, GeneratorBits>>modulus;
                 template<std::size_t ModulusBits, std::size_t GeneratorBits>
-                constexpr typename fp4_extension_params<mnt4_base_field<ModulusBits, GeneratorBits>>::modulus_type const
-                    fp4_extension_params<mnt4_base_field<ModulusBits, GeneratorBits>>modulus;
+                constexpr typename fp6_2over3_extension_params<edwards_base_field<ModulusBits, GeneratorBits>>::modulus_type const
+                    fp6_2over3_extension_params<edwards_base_field<ModulusBits, GeneratorBits>>modulus;
 
             }    // namespace detail
         }        // namespace fields
     }            // namespace algebra
 }    // namespace nil
 
-#endif    // ALGEBRA_FIELDS_MNT4_FQ_PARAMS_HPP
+#endif    // ALGEBRA_FIELDS_EDWARDS_EXTENSION_PARAMS_HPP

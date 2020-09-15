@@ -7,12 +7,12 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef ALGEBRA_FIELDS_MNT6_FQ_PARAMS_HPP
-#define ALGEBRA_FIELDS_MNT6_FQ_PARAMS_HPP
+#ifndef ALGEBRA_FIELDS_MNT6_EXTENSION_PARAMS_HPP
+#define ALGEBRA_FIELDS_MNT6_EXTENSION_PARAMS_HPP
 
 #include <nil/algebra/fields/detail/element/fp.hpp>
 #include <nil/algebra/fields/detail/element/fp2.hpp>
-#include <nil/algebra/fields/detail/params/params.hpp>
+#include <nil/algebra/fields/params.hpp>
 
 #include <nil/algebra/fields/mnt6/base_field.hpp>
 #include <nil/algebra/fields/fp2.hpp>
@@ -28,6 +28,9 @@ namespace nil {
 
                 template<typename FieldType>
                 struct fp3_extension_params;
+
+                template<typename FieldType>
+                struct fp6_2over3_extension_params;
 
                 template<std::size_t ModulusBits, std::size_t GeneratorBits>
                 class fp3_extension_params<fields::mnt6_base_field<ModulusBits, GeneratorBits>>
@@ -46,9 +49,6 @@ namespace nil {
 
                     constexpr static const modulus_type non_residue = modulus_type(0x05);
                 };
-
-                template<typename FieldType>
-                struct fp6_2over3_extension_params;
 
                 template<std::size_t ModulusBits, std::size_t GeneratorBits>
                 class fp6_2over3_extension_params<fields::mnt6_base_field<ModulusBits, GeneratorBits>>
@@ -87,4 +87,4 @@ namespace nil {
     }            // namespace algebra
 }    // namespace nil
 
-#endif    // ALGEBRA_FIELDS_MNT6_FQ_PARAMS_HPP
+#endif    // ALGEBRA_FIELDS_MNT6_EXTENSION_PARAMS_HPP
