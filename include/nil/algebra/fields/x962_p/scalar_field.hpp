@@ -7,12 +7,12 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef ALGEBRA_FIELDS_X962_P_FR_HPP
-#define ALGEBRA_FIELDS_X962_P_FR_HPP
+#ifndef ALGEBRA_FIELDS_X962_P_SCALAR_FIELD_HPP
+#define ALGEBRA_FIELDS_X962_P_SCALAR_FIELD_HPP
 
 #include <nil/algebra/fields/detail/element/fp.hpp>
-#include <nil/algebra/fields/detail/params/params.hpp>
 
+#include <nil/algebra/fields/params.hpp>
 #include <nil/algebra/fields/field.hpp>
 
 #include <nil/algebra/detail/literals.hpp>
@@ -53,7 +53,7 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x03;
 
-                typedef typename detail::element_fp<detail::extension_params<x962_p_v2_scalar_field<192, CHAR_BIT>>>
+                typedef typename detail::element_fp<params<x962_p_v2_scalar_field<192, CHAR_BIT>>>
                     value_type;
 
                 constexpr static const std::size_t arity = 1;
@@ -74,7 +74,7 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x03;
 
-                typedef typename detail::element_fp<detail::extension_params<x962_p_v3_scalar_field<192, CHAR_BIT>>>
+                typedef typename detail::element_fp<params<x962_p_v3_scalar_field<192, CHAR_BIT>>>
                     value_type;
 
                 constexpr static const std::size_t arity = 1;
@@ -95,7 +95,7 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x03;
 
-                typedef typename detail::element_fp<detail::extension_params<x962_p_v1_scalar_field<239, CHAR_BIT>>>
+                typedef typename detail::element_fp<params<x962_p_v1_scalar_field<239, CHAR_BIT>>>
                     value_type;
 
                 constexpr static const std::size_t arity = 1;
@@ -116,7 +116,7 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x03;
 
-                typedef typename detail::element_fp<detail::extension_params<x962_p_v2_scalar_field<239, CHAR_BIT>>>
+                typedef typename detail::element_fp<params<x962_p_v2_scalar_field<239, CHAR_BIT>>>
                     value_type;
 
                 constexpr static const std::size_t arity = 1;
@@ -137,7 +137,7 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x03;
 
-                typedef typename detail::element_fp<detail::extension_params<x962_p_v3_scalar_field<239, CHAR_BIT>>>
+                typedef typename detail::element_fp<params<x962_p_v3_scalar_field<239, CHAR_BIT>>>
                     value_type;
 
                 constexpr static const std::size_t arity = 1;
@@ -180,4 +180,4 @@ namespace nil {
     }        // namespace algebra
 }    // namespace nil
 
-#endif    // ALGEBRA_FIELDS_X962_P_FR_HPP
+#endif    // ALGEBRA_FIELDS_X962_P_SCALAR_FIELD_HPP

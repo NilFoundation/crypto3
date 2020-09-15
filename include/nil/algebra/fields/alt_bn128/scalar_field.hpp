@@ -7,12 +7,12 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef ALGEBRA_FIELDS_ALT_BN128_FR_HPP
-#define ALGEBRA_FIELDS_ALT_BN128_FR_HPP
+#ifndef ALGEBRA_FIELDS_ALT_BN128_SCALAR_FIELD_HPP
+#define ALGEBRA_FIELDS_ALT_BN128_SCALAR_FIELD_HPP
 
 #include <nil/algebra/fields/detail/element/fp.hpp>
-#include <nil/algebra/fields/detail/params/params.hpp>
 
+#include <nil/algebra/fields/params.hpp>
 #include <nil/algebra/fields/field.hpp>
 
 #include <nil/algebra/detail/literals.hpp>
@@ -47,7 +47,7 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x05;
 
-                typedef typename detail::element_fp<detail::extension_params<alt_bn128_scalar_field<254, CHAR_BIT>>>
+                typedef typename detail::element_fp<params<alt_bn128_scalar_field<254, CHAR_BIT>>>
                     value_type;
 
                 constexpr static const std::size_t arity = 1;
@@ -66,4 +66,4 @@ namespace nil {
     }        // namespace algebra
 }    // namespace nil
 
-#endif    // ALGEBRA_FIELDS_ALT_BN128_FR_HPP
+#endif    // ALGEBRA_FIELDS_ALT_BN128_SCALAR_FIELD_HPP

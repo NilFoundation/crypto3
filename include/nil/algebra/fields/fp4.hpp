@@ -11,7 +11,6 @@
 #define ALGEBRA_FIELDS_FP4_EXTENSION_HPP
 
 #include <nil/algebra/fields/detail/element/fp4.hpp>
-#include <nil/algebra/fields/detail/params/params.hpp>
 //#include <nil/algebra/fields/detail/params/alt_bn128/base_field.hpp>
 //#include <nil/algebra/fields/detail/params/alt_bn128/scalar_field.hpp>
 //#include <nil/algebra/fields/detail/params/bls12/base_field.hpp>
@@ -34,6 +33,8 @@
 #include <nil/algebra/fields/detail/params/sm2p_v1/scalar_field.hpp>
 #include <nil/algebra/fields/detail/params/x962_p/base_field.hpp>
 #include <nil/algebra/fields/detail/params/x962_p/scalar_field.hpp>*/
+
+#include <nil/algebra/fields/params.hpp>
 
 namespace nil {
     namespace algebra {
