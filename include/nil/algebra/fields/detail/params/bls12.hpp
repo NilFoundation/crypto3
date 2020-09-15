@@ -25,10 +25,16 @@ namespace nil {
 
                 using namespace nil::algebra;
 
-                /************************* BLS12-381 ***********************************/
-
                 template<typename FieldType>
                 struct fp2_extension_params;
+
+                template<typename FieldType>
+                struct fp6_3over2_extension_params;
+
+                template<typename FieldType>
+                struct fp12_2over3over2_extension_params;
+                
+                /************************* BLS12-381 ***********************************/
 
                 template<>
                 class fp2_extension_params<fields::bls12<381, CHAR_BIT>>
@@ -58,9 +64,6 @@ namespace nil {
                         0x1A0111EA397FE69A4B1BA7B6434BACD764774B84F38512BF6730D2A0F6B0F6241EABFFFEB153FFFFB9FEFFFFFFFFAAAA_cppui381);
                 };
 
-                template<typename FieldType>
-                struct fp6_3over2_extension_params;
-
                 template<>
                 class fp6_3over2_extension_params<fields::bls12<381, CHAR_BIT>>
                     : public params<fields::bls12<381, CHAR_BIT>> {
@@ -75,13 +78,10 @@ namespace nil {
                     constexpr static const modulus_type modulus = policy_type::modulus;
 
                     typedef element_fp2<field_type> non_residue_type;
-                    typedef element_fp<fp2_extension_params<field_type>> underlying_type;
+                    typedef element_fp2<fp2_extension_params<field_type>> underlying_type;
 
                     constexpr static const std::array<modulus_type, 2> non_residue = {1, 1};
                 };
-
-                template<typename FieldType>
-                struct fp12_2over3over2_extension_params;
 
                 template<>
                 class fp12_2over3over2_extension_params<fields::bls12<381, CHAR_BIT>>
@@ -97,15 +97,12 @@ namespace nil {
                     constexpr static const modulus_type modulus = policy_type::modulus;
 
                     typedef element_fp2<field_type> non_residue_type;
-                    typedef element_fp<fp6_3over2_extension_params<field_type>> underlying_type;
+                    typedef element_fp6_3over2<fp6_3over2_extension_params<field_type>> underlying_type;
 
                     constexpr static const std::array<modulus_type, 2> non_residue = {1, 1};
                 };
 
                 /************************* BLS12-377 ***********************************/
-
-                template<typename FieldType>
-                struct fp2_extension_params;
 
                 template<>
                 class fp2_extension_params<fields::bls12<377, CHAR_BIT>>
@@ -126,9 +123,6 @@ namespace nil {
                         0x1AE3A4617C510EAC63B05C06CA1493B1A22D9F300F5138F1EF3622FBA094800170B5D44300000008508BFFFFFFFFFFC_cppui377);
                 };
 
-                template<typename FieldType>
-                struct fp6_3over2_extension_params;
-
                 template<>
                 class fp6_3over2_extension_params<fields::bls12<377, CHAR_BIT>>
                     : public params<fields::bls12<377, CHAR_BIT>> {
@@ -143,13 +137,10 @@ namespace nil {
                     constexpr static const modulus_type modulus = policy_type::modulus;
 
                     typedef element_fp2<field_type> non_residue_type;
-                    typedef element_fp<fp2_extension_params<field_type>> underlying_type;
+                    typedef element_fp2<fp2_extension_params<field_type>> underlying_type;
 
                     constexpr static const std::array<modulus_type, 2> non_residue = {0, 1};
                 };
-
-                template<typename FieldType>
-                struct fp12_2over3over2_extension_params;
 
                 template<>
                 class fp12_2over3over2_extension_params<fields::bls12<377, CHAR_BIT>>
@@ -165,7 +156,7 @@ namespace nil {
                     constexpr static const modulus_type modulus = policy_type::modulus;
 
                     typedef element_fp2<field_type> non_residue_type;
-                    typedef element_fp<fp6_3over2_extension_params<field_type>> underlying_type;
+                    typedef element_fp6_3over2<fp6_3over2_extension_params<field_type>> underlying_type;
 
                     constexpr static const std::array<modulus_type, 2> non_residue = {0, 1};
                 };
