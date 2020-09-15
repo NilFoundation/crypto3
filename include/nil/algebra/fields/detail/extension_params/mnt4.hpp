@@ -31,6 +31,8 @@ namespace nil {
 
                 template<typename FieldType>
                 struct fp4_extension_params;
+
+                /************************* MNT4 ***********************************/
                 
                 template<std::size_t ModulusBits, std::size_t GeneratorBits>
                 class fp2_extension_params<fields::mnt4_base_field<ModulusBits, GeneratorBits>>

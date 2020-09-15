@@ -32,6 +32,8 @@ namespace nil {
                 template<typename FieldType>
                 struct fp6_2over3_extension_params;
 
+                /************************* MNT6 ***********************************/
+
                 template<std::size_t ModulusBits, std::size_t GeneratorBits>
                 class fp3_extension_params<fields::mnt6_base_field<ModulusBits, GeneratorBits>>
                     : public params<fields::mnt6_base_field<ModulusBits, GeneratorBits>> {
