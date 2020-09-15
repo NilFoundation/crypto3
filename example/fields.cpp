@@ -18,11 +18,11 @@
 //#include <nil/algebra/fields/alt_bn128/base_field.hpp>
 //#include <nil/algebra/fields/alt_bn128/scalar_field.hpp>
 #include <nil/algebra/fields/bls12/base_field.hpp>
-//#include <nil/algebra/fields/bls12/scalar_field.hpp>
-//#include <nil/algebra/fields/bn128/base_field.hpp>
-//#include <nil/algebra/fields/bn128/scalar_field.hpp>
+#include <nil/algebra/fields/bls12/scalar_field.hpp>
+#include <nil/algebra/fields/bn128/base_field.hpp>
+#include <nil/algebra/fields/bn128/scalar_field.hpp>
 #include <nil/algebra/fields/mnt4/base_field.hpp>
-//#include <nil/algebra/fields/mnt4/scalar_field.hpp>
+#include <nil/algebra/fields/mnt4/scalar_field.hpp>
 //#include <nil/algebra/fields/mnt6/base_field.hpp>
 //#include <nil/algebra/fields/mnt6/scalar_field.hpp>
 //#include <nil/algebra/fields/dsa_botan.hpp>
@@ -245,7 +245,7 @@ int main() {
 
     std::cout << "----------------------------" << std::endl;
 
-    /*std::cout << "BLS12-381 Fr basic math:" << std::endl;
+    std::cout << "BLS12-381 Fr basic math:" << std::endl;
     fields_fp_basic_math_examples<fields::bls12_fr<381>>();
 
     std::cout << "----------------------------" << std::endl;
@@ -276,7 +276,7 @@ int main() {
     std::cout << "----------------------------" << std::endl;
 
     std::cout << "BN128-254 Fr basic math:" << std::endl;
-    fields_fp_basic_math_examples<fields::bn128_fr<254>>();*/
+    fields_fp_basic_math_examples<fields::bn128_fr<254>>();
 
     std::cout << "MNT4 Fq basic math:" << std::endl;
     fields_fp_basic_math_examples<fields::mnt4_fq<298>>();
@@ -287,11 +287,11 @@ int main() {
     fields_fp2_basic_math_examples<fields::fp2<fields::mnt4_fq<298>>>();
 
     std::cout << "----------------------------" << std::endl;
-/*
+
     std::cout << "MNT4 Fr basic math:" << std::endl;
     fields_fp_basic_math_examples<fields::mnt4_fr<298>>();
 
-    std::cout << "----------------------------" << std::endl;*/
+    std::cout << "----------------------------" << std::endl;
 
     /*
 

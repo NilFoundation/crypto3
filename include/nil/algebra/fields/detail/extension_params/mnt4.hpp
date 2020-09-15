@@ -56,7 +56,8 @@ namespace nil {
                 class fp4_extension_params<fields::mnt4_base_field<ModulusBits, GeneratorBits>>
                     : public params<fields::mnt4_base_field<ModulusBits, GeneratorBits>> {
 
-                    typedef params<fields::mnt4_base_field<ModulusBits, GeneratorBits>> policy_type;
+                    typedef fields::mnt4_base_field<ModulusBits, GeneratorBits> field_type;
+                    typedef params<field_type> policy_type;
 
                 public:
                     typedef typename policy_type::number_type number_type;
@@ -79,10 +80,10 @@ namespace nil {
 
                 template<std::size_t ModulusBits, std::size_t GeneratorBits>
                 constexpr typename fp2_extension_params<mnt4_base_field<ModulusBits, GeneratorBits>>::modulus_type const
-                    fp2_extension_params<mnt4_base_field<ModulusBits, GeneratorBits>>modulus;
+                    fp2_extension_params<mnt4_base_field<ModulusBits, GeneratorBits>>::modulus;
                 template<std::size_t ModulusBits, std::size_t GeneratorBits>
                 constexpr typename fp4_extension_params<mnt4_base_field<ModulusBits, GeneratorBits>>::modulus_type const
-                    fp4_extension_params<mnt4_base_field<ModulusBits, GeneratorBits>>modulus;
+                    fp4_extension_params<mnt4_base_field<ModulusBits, GeneratorBits>>::modulus;
 
             }    // namespace detail
         }        // namespace fields

@@ -60,7 +60,7 @@ namespace nil {
                 mnt4_scalar_field<298, CHAR_BIT>::mul_generator;
 
             template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
-            using mn4_fr = mnt4_scalar_field<ModulusBits, GeneratorBits>;
+            using mnt4_fr = mnt4_scalar_field<ModulusBits, GeneratorBits>;
 
         }    // namespace fields
     }        // namespace algebra

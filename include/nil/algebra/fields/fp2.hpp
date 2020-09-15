@@ -11,28 +11,17 @@
 #define ALGEBRA_FIELDS_FP2_EXTENSION_HPP
 
 #include <nil/algebra/fields/detail/element/fp2.hpp>
-//#include <nil/algebra/fields/detail/params/alt_bn128/base_field.hpp>
-//#include <nil/algebra/fields/detail/params/alt_bn128/scalar_field.hpp>
-#include <nil/algebra/fields/detail/params/bls12/base_field.hpp>
-//#include <nil/algebra/fields/detail/params/bls12/scalar_field.hpp>
-//#include <nil/algebra/fields/detail/params/bn128/base_field.hpp>
-//#include <nil/algebra/fields/detail/params/bn128/scalar_field.hpp>
-//#include <nil/algebra/fields/detail/params/edwards/base_field.hpp>
-//#include <nil/algebra/fields/detail/params/edwards/scalar_field.hpp>
-/*#include <nil/algebra/fields/detail/params/frp_v1/base_field.hpp>
-#include <nil/algebra/fields/detail/params/frp_v1/scalar_field.hpp>
-#include <nil/algebra/fields/detail/params/gost_A/base_field.hpp>
-#include <nil/algebra/fields/detail/params/gost_A/scalar_field.hpp>*/
-#include <nil/algebra/fields/detail/params/mnt4/base_field.hpp>
-//#include <nil/algebra/fields/detail/params/mnt4/scalar_field.hpp>
-//#include <nil/algebra/fields/detail/params/mnt6/base_field.hpp>
-//#include <nil/algebra/fields/detail/params/mnt6/scalar_field.hpp>
-/*#include <nil/algebra/fields/detail/params/secp/base_field.hpp>
-#include <nil/algebra/fields/detail/params/secp/scalar_field.hpp>
-#include <nil/algebra/fields/detail/params/sm2p_v1/base_field.hpp>
-#include <nil/algebra/fields/detail/params/sm2p_v1/scalar_field.hpp>
-#include <nil/algebra/fields/detail/params/x962_p/base_field.hpp>
-#include <nil/algebra/fields/detail/params/x962_p/scalar_field.hpp>*/
+//#include <nil/algebra/fields/detail/extension_params/alt_bn128/base_field.hpp>
+#include <nil/algebra/fields/detail/extension_params/bls12.hpp>
+//#include <nil/algebra/fields/detail/extension_params/bn128.hpp>
+//#include <nil/algebra/fields/detail/extension_params/edwards.hpp>
+/*#include <nil/algebra/fields/detail/extension_params/frp_v1.hpp>
+#include <nil/algebra/fields/detail/extension_params/gost_A.hpp>*/
+#include <nil/algebra/fields/detail/extension_params/mnt4.hpp>
+//#include <nil/algebra/fields/detail/extension_params/mnt6.hpp>
+/*#include <nil/algebra/fields/detail/extension_params/secp.hpp>
+#include <nil/algebra/fields/detail/extension_params/sm2p_v1.hpp>
+#include <nil/algebra/fields/detail/extension_params/x962_p.hpp>*/
 
 #include <nil/algebra/fields/params.hpp>
 
