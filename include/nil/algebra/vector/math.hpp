@@ -105,7 +105,7 @@ namespace nil {
          */
         template<typename T, std::size_t N>
         constexpr T sum(const vector<T, N> &v) {
-            return accumulate(v, 0, std::plus<T>());
+            return accumulate(v, T(0), std::plus<T>());
         }
 
         /** @brief computes the minimum valued element

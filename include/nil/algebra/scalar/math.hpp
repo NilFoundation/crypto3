@@ -57,7 +57,7 @@ namespace nil {
          */
         template<typename T>
         constexpr detail::remove_complex_t<T> abs(T x) {
-            CRYPTO3_DETAIL_ASSERT_ARITHMETIC(T);
+            // CRYPTO3_DETAIL_ASSERT_ARITHMETIC(T);
             if constexpr (detail::is_complex_v<T>)
                 return sqrt(x.real() * x.real() + x.imag() * x.imag());
             else
@@ -119,7 +119,7 @@ namespace nil {
          */
         template<typename T>
         constexpr T conj(T x) {
-            CRYPTO3_DETAIL_ASSERT_ARITHMETIC(T);
+            // CRYPTO3_DETAIL_ASSERT_ARITHMETIC(T);
             if constexpr (detail::is_complex_v<T>)
                 return {x.real(), -x.imag()};
             else

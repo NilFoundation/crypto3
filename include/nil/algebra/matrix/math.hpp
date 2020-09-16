@@ -160,8 +160,8 @@ namespace nil {
         /// @private
         template<typename T, std::size_t M, std::size_t N>
         constexpr std::tuple<matrix<T, M, N>, std::size_t, T> gauss_jordan_impl(matrix<T, M, N> m, T tolerance) {
-            CRYPTO3_DETAIL_ASSERT_FLOATING_POINT(T)
-            CRYPTO3_DETAIL_ASSERT_REAL(T)
+            // CRYPTO3_DETAIL_ASSERT_FLOATING_POINT(T)
+            // CRYPTO3_DETAIL_ASSERT_REAL(T)
 
             // Define function for determining if an element is negligible
             auto negligible = [&tolerance](const T &v) { return abs(v) < tolerance; };
