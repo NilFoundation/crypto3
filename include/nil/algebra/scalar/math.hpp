@@ -11,6 +11,9 @@
 #ifndef ALGEBRA_SCALAR_MATH_HPP
 #define ALGEBRA_SCALAR_MATH_HPP
 
+#include <nil/algebra/detail/type_traits.hpp>
+#include <nil/algebra/detail/assert.hpp>
+
 namespace nil {
     namespace algebra {
 

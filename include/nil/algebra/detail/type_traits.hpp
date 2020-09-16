@@ -10,6 +10,8 @@
 #ifndef ALGEBRA_TYPE_TRAITS_HPP
 #define ALGEBRA_TYPE_TRAITS_HPP
 
+#include <complex>
+
 #define GENERATE_HAS_MEMBER_TYPE(Type)                                                \
                                                                                       \
     template<class T>                                                                 \

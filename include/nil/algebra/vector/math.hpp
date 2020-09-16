@@ -13,6 +13,7 @@
 
 #include <nil/algebra/vector/utility.hpp>
 #include <nil/algebra/vector/vector.hpp>
+#include <nil/algebra/scalar/math.hpp>
 
 namespace nil {
     namespace algebra {

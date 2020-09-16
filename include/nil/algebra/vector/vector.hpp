@@ -12,6 +12,7 @@
 #define ALGEBRA_VECTOR_CLASS_HPP
 
 #include <nil/algebra/detail/same_value.hpp>
+#include <nil/algebra/detail/assert.hpp>
 
 #include <array>
 #include <cstddef>
