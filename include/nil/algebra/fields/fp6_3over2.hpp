@@ -12,28 +12,17 @@
 
 #include <nil/algebra/fields/detail/element/fp6_3over2.hpp>
 
-//#include <nil/algebra/fields/detail/params/alt_bn128/base_field.hpp>
-//#include <nil/algebra/fields/detail/params/alt_bn128/scalar_field.hpp>
-//#include <nil/algebra/fields/detail/params/bls12/base_field.hpp>
-//#include <nil/algebra/fields/detail/params/bls12/scalar_field.hpp>
-#include <nil/algebra/fields/detail/params/bn128/base_field.hpp>
-#include <nil/algebra/fields/detail/params/bn128/scalar_field.hpp>
-#include <nil/algebra/fields/detail/params/edwards/base_field.hpp>
-#include <nil/algebra/fields/detail/params/edwards/scalar_field.hpp>
-/*#include <nil/algebra/fields/detail/params/frp_v1/base_field.hpp>
-#include <nil/algebra/fields/detail/params/frp_v1/scalar_field.hpp>
-#include <nil/algebra/fields/detail/params/gost_A/base_field.hpp>
-#include <nil/algebra/fields/detail/params/gost_A/scalar_field.hpp>*/
-#include <nil/algebra/fields/detail/params/mnt4/base_field.hpp>
-#include <nil/algebra/fields/detail/params/mnt4/scalar_field.hpp>
-#include <nil/algebra/fields/detail/params/mnt6/base_field.hpp>
-#include <nil/algebra/fields/detail/params/mnt6/scalar_field.hpp>
-/*#include <nil/algebra/fields/detail/params/secp/base_field.hpp>
-#include <nil/algebra/fields/detail/params/secp/scalar_field.hpp>
-#include <nil/algebra/fields/detail/params/sm2p_v1/base_field.hpp>
-#include <nil/algebra/fields/detail/params/sm2p_v1/scalar_field.hpp>
-#include <nil/algebra/fields/detail/params/x962_p/base_field.hpp>
-#include <nil/algebra/fields/detail/params/x962_p/scalar_field.hpp>*/
+#include <nil/algebra/fields/detail/extension_params/alt_bn128.hpp>
+#include <nil/algebra/fields/detail/extension_params/bls12.hpp>
+#include <nil/algebra/fields/detail/extension_params/bn128.hpp>
+#include <nil/algebra/fields/detail/extension_params/edwards.hpp>
+//#include <nil/algebra/fields/detail/extension_params/frp_v1.hpp>
+//#include <nil/algebra/fields/detail/extension_params/gost_A.hpp>
+#include <nil/algebra/fields/detail/extension_params/mnt4.hpp>
+#include <nil/algebra/fields/detail/extension_params/mnt6.hpp>
+/*#include <nil/algebra/fields/detail/extension_params/secp.hpp>
+#include <nil/algebra/fields/detail/extension_params/sm2p_v1.hpp>
+#include <nil/algebra/fields/detail/extension_params/x962_p.hpp>*/
 
 #include <nil/algebra/fields/params.hpp>
 
@@ -49,7 +38,7 @@ namespace nil {
             template<typename BaseField>
             struct fp6_3over2 {
                 typedef BaseField field_type;
-                typedef detail::extension_params<field_type> policy_type;
+                typedef field_type policy_type;
 
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                 typedef typename policy_type::modulus_type modulus_type;
@@ -64,7 +53,7 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = policy_type::mul_generator;
 
-                typedef typename detail::element_fp6_3over2<policy_type> value_type;
+                typedef typename detail::element_fp6_3over2<detail::fp6_3over2_extension_params<field_type>> value_type;
 
                 constexpr static const std::size_t arity = 6;
             };

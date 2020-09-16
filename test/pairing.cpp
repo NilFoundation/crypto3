@@ -24,8 +24,8 @@
 
 #include <nil/algebra/curves/detail/bn128/g1.hpp>
 
-//#include <nil/algebra/fields/detail/params/dsa_jce.hpp>
-//#include <nil/algebra/fields/detail/params/modp_srp.hpp>
+//#include <nil/algebra/fields/detail/extension_params/dsa_jce.hpp>
+//#include <nil/algebra/fields/detail/extension_params/modp_srp.hpp>
 //#include <nil/algebra/fields/params.hpp>
 //#include <nil/algebra/fields/bn128/scalar_field.hpp>
 //#include <nil/algebra/fields/dsa_jce.hpp>

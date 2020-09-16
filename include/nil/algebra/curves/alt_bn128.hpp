@@ -15,7 +15,6 @@
 #include <nil/algebra/curves/detail/alt_bn128/g1.hpp>
 #include <nil/algebra/curves/detail/alt_bn128/g2.hpp>
 
-#include <nil/algebra/fields/detail/params/alt_bn128/base_field.hpp>
 #include <nil/algebra/fields/fp12_2over3over2.hpp>
 
 namespace nil {

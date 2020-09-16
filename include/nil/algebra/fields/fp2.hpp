@@ -37,21 +37,22 @@ namespace nil {
             template<typename BaseField>
             struct fp2 {
                 typedef BaseField field_type;
+                typedef field_type policy_type;
 
-                constexpr static const std::size_t modulus_bits = field_type::modulus_bits;
-                typedef typename field_type::modulus_type modulus_type;
+                constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
+                typedef typename policy_type::modulus_type modulus_type;
 
-                constexpr static const std::size_t number_bits = field_type::number_bits;
-                typedef typename field_type::number_type number_type;
+                constexpr static const std::size_t number_bits = policy_type::number_bits;
+                typedef typename policy_type::number_type number_type;
 
-                constexpr static const modulus_type modulus = field_type::modulus;
+                constexpr static const modulus_type modulus = policy_type::modulus;
 
-                constexpr static const std::size_t generator_bits = field_type::generator_bits;
-                typedef typename field_type::generator_type generator_type;
+                constexpr static const std::size_t generator_bits = policy_type::generator_bits;
+                typedef typename policy_type::generator_type generator_type;
 
-                //constexpr static const generator_type mul_generator = field_type::mul_generator;
+                //constexpr static const generator_type mul_generator = policy_type::mul_generator;
 
-                typedef typename detail::element_fp2<detail::fp2_extension_params<field_type>> value_type;
+                typedef typename detail::element_fp2<detail::fp2_extension_params<policy_type>> value_type;
 
                 constexpr static const std::size_t arity = 2;
             };
