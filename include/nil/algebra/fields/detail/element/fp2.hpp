@@ -239,14 +239,14 @@ namespace nil {
                 };
 
                 template<typename FieldParams>
-                element_fp2<FieldParams> operator*(const element_fp<FieldParams> &lhs,
+                element_fp2<FieldParams> operator*(const typename FieldParams::underlying_type &lhs,
                                                    const element_fp2<FieldParams> &rhs) {
                     return element_fp2<FieldParams>({lhs * rhs.data[0], lhs * rhs.data[1]});
                 }
 
                 template<typename FieldParams>
                 element_fp2<FieldParams> operator*(const element_fp2<FieldParams> &lhs,
-                                                   const element_fp<FieldParams> &rhs) {
+                                                   const typename FieldParams::underlying_type &rhs) {
                     return rhs * lhs;
                 }
 
