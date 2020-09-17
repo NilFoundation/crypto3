@@ -69,9 +69,6 @@ namespace nil {
                     0x5486F497186BF8E97A4F1D5445E4BD3C5B921CA1CE08D68CDCB3C92693D17A0A14C59FA2DBB94DDEA62926612F1DE023AD0C3390C30B8F6525D0B50E1234092CD7F23DA7CE36E862C586706C42279FAF9DAD63AEC705D564D54000038E31C7_cppui759;
                 constexpr static const modulus_type t_minus_1_over_2 =
                     0x2A437A4B8C35FC74BD278EAA22F25E9E2DC90E50E7046B466E59E49349E8BD050A62CFD16DDCA6EF53149330978EF011D68619C86185C7B292E85A87091A04966BF91ED3E71B743162C338362113CFD7CED6B1D76382EAB26AA00001C718E3_cppui758;
-                constexpr static const modulus_type multiplicative_generator = 0x02;
-                constexpr static const modulus_type root_of_unity = 
-                    0x1A0111EA397FE69A4B1BA7B6434BACD764774B84F38512BF6730D2A0F6B0F6241EABFFFEB153FFFFB9FEFFFFFFFFAAAA_cppui381;
                 constexpr static const modulus_type nqr = {1, 1};
                 constexpr static const modulus_type nqr_to_t = 
                     {0x6AF0E0437FF400B6831E36D6BD17FFE48395DABC2D3435E77F76E17009241C5EE67992F72EC05F4C81084FBEDE3CC09_cppui379,
@@ -126,6 +123,22 @@ namespace nil {
                 typedef typename policy_type::number_type number_type;
                 typedef typename policy_type::modulus_type modulus_type;
 
+                constexpr static const std::size_t s = 0x2E;
+                constexpr static const modulus_type t =
+                    0x6B8E9185F1443AB18EC1701B28524EC688B67CC03D44E3C7BCD88BEE82520005C2D7510C00000021423_cppui331;
+                constexpr static const modulus_type t_minus_1_over_2 =
+                    0x35C748C2F8A21D58C760B80D94292763445B3E601EA271E3DE6C45F741290002E16BA88600000010A11_cppui330;
+                constexpr static const modulus_type multiplicative_generator = 0x0F;
+                constexpr static const modulus_type root_of_unity = 
+                    0x36A92E05198A8030F152488AEFFC9B40FBE05B4512A3D4B44D994A0DDFF8C606DF0A4306FE0BC37ECA603CC563B9A1_cppui374;
+                constexpr static const modulus_type nqr = 0x05;
+                constexpr static const modulus_type nqr_to_t = 
+                    0x382D3D99CDBC5D8FE9DEE6AA914B0AD14FCACA7022110EC6EAA2BC56228AC41EA03D28CC795186BA6B5EF26B00BBE8_cppui374;
+                constexpr static const modulus_type Rsquared = 
+                    0x6DFCCB1E914B88837E92F041790BF9BFDF7D03827DC3AC22A5F11162D6B46D0329FCAAB00431B1B786686C9400CD22_cppui375;
+                constexpr static const modulus_type Rcubed = 
+                    0x1065AB4C0E7DDA53F72540713590CB96A2A9516C804A20E2BE8B1180449F513E50F4148BE329585581F532F8815DE20_cppui377;
+
                 constexpr static const modulus_type modulus = policy_type::modulus;
                 constexpr static const modulus_type group_order =
                     0xD71D230BE28875631D82E03650A49D8D116CF9807A89C78F79B117DD04A4000B85AEA2180000004284600000000000_cppui376;
@@ -140,6 +153,16 @@ namespace nil {
             public:
                 typedef typename policy_type::number_type number_type;
                 typedef typename policy_type::modulus_type modulus_type;
+
+                constexpr static const std::size_t s = 0x2F;
+                constexpr static const modulus_type t =
+                    0x5A60FA1775FF644AD227766C24C78977170FB495DD27E3EBCE2827BB49AB813A0315F720CC19B8029CE24A0549AD88C155555176E15C063064972B0C7193AD797F7A46BE3813495B44D1E5C37B000E671A4A9E00000021423_cppui707;
+                constexpr static const modulus_type t_minus_1_over_2 =
+                    0x2D307D0BBAFFB2256913BB361263C4BB8B87DA4AEE93F1F5E71413DDA4D5C09D018AFB90660CDC014E712502A4D6C460AAAAA8BB70AE0318324B958638C9D6BCBFBD235F1C09A4ADA268F2E1BD8007338D254F00000010A11_cppui706;
+                
+                constexpr static const modulus_type nqr = {0x00, 0x01};
+                constexpr static const modulus_type nqr_to_t = 
+                    {0x00, 0x1ABEF7237D62007BB9B2EDA5AFCB52F9D179F23DBD49B8D1B24CF7C1BF8066791317689172D0F4CB90CF47182B7D7B2_cppui377};
 
                 constexpr static const modulus_type modulus = policy_type::modulus;
                 constexpr static const modulus_type group_order =
@@ -156,6 +179,22 @@ namespace nil {
             public:
                 typedef typename policy_type::number_type number_type;
                 typedef typename policy_type::modulus_type modulus_type;
+
+                constexpr static const std::size_t s = 0x20;
+                constexpr static const modulus_type t =
+                    0x73EDA753299D7D483339D80809A1D80553BDA402FFFE5BFEFFFFFFFF_cppui223;
+                constexpr static const modulus_type t_minus_1_over_2 =
+                    0x39F6D3A994CEBEA4199CEC0404D0EC02A9DED2017FFF2DFF7FFFFFFF_cppui222;
+                constexpr static const modulus_type multiplicative_generator = 0x07;
+                constexpr static const modulus_type root_of_unity = 
+                    0x16A2A19EDFE81F20D09B681922C813B4B63683508C2280B93829971F439F0D2B_cppui253;
+                constexpr static const modulus_type nqr = 0x05;
+                constexpr static const modulus_type nqr_to_t = 
+                    0x212D79E5B416B6F0FD56DC8D168D6C0C4024FF270B3E0941B788F500B912F1F_cppui250;
+                constexpr static const modulus_type Rsquared = 
+                    0x748D9D99F59FF1105D314967254398F2B6CEDCB87925C23C999E990F3F29C6D_cppui251;
+                constexpr static const modulus_type Rcubed = 
+                    0x6E2A5BB9C8DB33E973D13C71C7B5F4181B3E0D188CF06990C62C1807439B73AF_cppui255;
 
                 constexpr static const modulus_type modulus = policy_type::modulus;
                 constexpr static const modulus_type group_order =
