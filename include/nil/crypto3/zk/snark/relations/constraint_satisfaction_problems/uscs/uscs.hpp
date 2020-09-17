@@ -118,8 +118,8 @@ namespace nil {
                             full_variable_assignment.end(), auxiliary_input.begin(), auxiliary_input.end());
 
                         for (std::size_t c = 0; c < constraints.size(); ++c) {
-                            FieldType::value_type res = constraints[c].evaluate(full_variable_assignment);
-                            if (!(res.squared() == FieldType::value_type_one())) {
+                            typename FieldType::value_type res = constraints[c].evaluate(full_variable_assignment);
+                            if (!(res.squared() == typename FieldType::value_type_one())) {
                                 return false;
                             }
                         }

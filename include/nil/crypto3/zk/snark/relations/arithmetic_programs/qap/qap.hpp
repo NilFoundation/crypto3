@@ -59,17 +59,17 @@ namespace nil {
 
                     std::shared_ptr<algebra::fft::evaluation_domain<FieldType>> domain;
 
-                    std::vector<std::map<std::size_t, FieldType::value_type>> A_in_Lagrange_basis;
-                    std::vector<std::map<std::size_t, FieldType::value_type>> B_in_Lagrange_basis;
-                    std::vector<std::map<std::size_t, FieldType::value_type>> C_in_Lagrange_basis;
+                    std::vector<std::map<std::size_t, typename FieldType::value_type>> A_in_Lagrange_basis;
+                    std::vector<std::map<std::size_t, typename FieldType::value_type>> B_in_Lagrange_basis;
+                    std::vector<std::map<std::size_t, typename FieldType::value_type>> C_in_Lagrange_basis;
 
                     qap_instance(const std::shared_ptr<algebra::fft::evaluation_domain<FieldType>> &domain,
                                  const std::size_t num_variables,
                                  const std::size_t degree,
                                  const std::size_t num_inputs,
-                                 const std::vector<std::map<std::size_t, FieldType::value_type>> &A_in_Lagrange_basis,
-                                 const std::vector<std::map<std::size_t, FieldType::value_type>> &B_in_Lagrange_basis,
-                                 const std::vector<std::map<std::size_t, FieldType::value_type>> &C_in_Lagrange_basis) :
+                                 const std::vector<std::map<std::size_t, typename FieldType::value_type>> &A_in_Lagrange_basis,
+                                 const std::vector<std::map<std::size_t, typename FieldType::value_type>> &B_in_Lagrange_basis,
+                                 const std::vector<std::map<std::size_t, typename FieldType::value_type>> &C_in_Lagrange_basis) :
                         num_variables(num_variables), degree(degree), num_inputs(num_inputs), domain(domain),
                         A_in_Lagrange_basis(A_in_Lagrange_basis), B_in_Lagrange_basis(B_in_Lagrange_basis),
                         C_in_Lagrange_basis(C_in_Lagrange_basis) {}
@@ -78,9 +78,9 @@ namespace nil {
                                  const std::size_t num_variables,
                                  const std::size_t degree,
                                  const std::size_t num_inputs,
-                                 std::vector<std::map<std::size_t, FieldType::value_type>> &&A_in_Lagrange_basis,
-                                 std::vector<std::map<std::size_t, FieldType::value_type>> &&B_in_Lagrange_basis,
-                                 std::vector<std::map<std::size_t, FieldType::value_type>> &&C_in_Lagrange_basis) :
+                                 std::vector<std::map<std::size_t, typename FieldType::value_type>> &&A_in_Lagrange_basis,
+                                 std::vector<std::map<std::size_t, typename FieldType::value_type>> &&B_in_Lagrange_basis,
+                                 std::vector<std::map<std::size_t, typename FieldType::value_type>> &&C_in_Lagrange_basis) :
                         num_variables(num_variables), degree(degree), num_inputs(num_inputs), domain(domain),
                         A_in_Lagrange_basis(std::move(A_in_Lagrange_basis)), 
                         B_in_Lagrange_basis(std::move(B_in_Lagrange_basis)),

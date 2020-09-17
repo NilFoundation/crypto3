@@ -60,15 +60,15 @@ namespace nil {
 
                     std::shared_ptr<algebra::fft::evaluation_domain<FieldType>> domain;
 
-                    std::vector<std::map<std::size_t, FieldType::value_type>> A_in_Lagrange_basis;
-                    std::vector<std::map<std::size_t, FieldType::value_type>> C_in_Lagrange_basis;
+                    std::vector<std::map<std::size_t, typename FieldType::value_type>> A_in_Lagrange_basis;
+                    std::vector<std::map<std::size_t, typename FieldType::value_type>> C_in_Lagrange_basis;
 
                     sap_instance(const std::shared_ptr<algebra::fft::evaluation_domain<FieldType>> &domain,
                                  const std::size_t num_variables,
                                  const std::size_t degree,
                                  const std::size_t num_inputs,
-                                 const std::vector<std::map<std::size_t, FieldType::value_type>> &A_in_Lagrange_basis,
-                                 const std::vector<std::map<std::size_t, FieldType::value_type>> &C_in_Lagrange_basis) :
+                                 const std::vector<std::map<std::size_t, typename FieldType::value_type>> &A_in_Lagrange_basis,
+                                 const std::vector<std::map<std::size_t, typename FieldType::value_type>> &C_in_Lagrange_basis) :
                         num_variables(num_variables),
                         degree(degree), num_inputs(num_inputs), domain(domain), A_in_Lagrange_basis(A_in_Lagrange_basis),
                         C_in_Lagrange_basis(C_in_Lagrange_basis) {
@@ -78,8 +78,8 @@ namespace nil {
                                  const std::size_t num_variables,
                                  const std::size_t degree,
                                  const std::size_t num_inputs,
-                                 std::vector<std::map<std::size_t, FieldType::value_type>> &&A_in_Lagrange_basis,
-                                 std::vector<std::map<std::size_t, FieldType::value_type>> &&C_in_Lagrange_basis) :
+                                 std::vector<std::map<std::size_t, typename FieldType::value_type>> &&A_in_Lagrange_basis,
+                                 std::vector<std::map<std::size_t, typename FieldType::value_type>> &&C_in_Lagrange_basis) :
                         num_variables(num_variables),
                         degree(degree), num_inputs(num_inputs), domain(domain),
                         A_in_Lagrange_basis(std::move(A_in_Lagrange_basis)),
@@ -94,8 +94,10 @@ namespace nil {
                     bool is_satisfied(const sap_witness<FieldType> &witness) const {
                         const typename FieldType::value_type t = random_element<FieldType>();
 
-                        std::vector<typename FieldType::value_type> At(this->num_variables + 1, FieldType::value_type::zero());
-                        std::vector<typename FieldType::value_type> Ct(this->num_variables + 1, FieldType::value_type::zero());
+                        std::vector<typename FieldType::value_type> At(this->num_variables + 1,
+                                                                       typename FieldType::value_type::zero());
+                        std::vector<typename FieldType::value_type> Ct(this->num_variables + 1,
+                                                                       typename FieldType::value_type::zero());
                         std::vector<typename FieldType::value_type> Ht(this->degree + 1);
 
                         const FieldType Zt = this->domain->compute_vanishing_polynomial(t);
@@ -112,7 +114,7 @@ namespace nil {
                             }
                         }
 
-                        FieldType::value_type ti = FieldType::value_type::one();
+                        typename FieldType::value_type ti = typename FieldType::value_type::one();
                         for (std::size_t i = 0; i < this->degree + 1; ++i) {
                             Ht[i] = ti;
                             ti *= t;
@@ -223,7 +225,7 @@ namespace nil {
 
                         FieldType ans_A = this->At[0] + witness.d1 * this->Zt;
                         FieldType ans_C = this->Ct[0] + witness.d2 * this->Zt;
-                        FieldType ans_H = FieldType::value_type::zero();
+                        FieldType ans_H = typename FieldType::value_type::zero();
 
                         ans_A = ans_A + algebra::inner_product<FieldType>(this->At.begin() + 1,
                                                                           this->At.begin() + 1 + this->num_variables,

@@ -75,8 +75,8 @@ namespace nil {
                     cs.auxiliary_input_size = 2 + num_constraints - num_inputs;    // TODO: explain this
 
                     r1cs_variable_assignment<FieldType> full_variable_assignment;
-                    FieldType::value_type a = random_element<FieldType>();
-                    FieldType::value_type b = random_element<FieldType>();
+                    typename FieldType::value_type a = random_element<FieldType>();
+                    typename FieldType::value_type b = random_element<FieldType>();
                     full_variable_assignment.push_back(a);
                     full_variable_assignment.push_back(b);
 
@@ -88,7 +88,7 @@ namespace nil {
                             A.add_term(i + 1, 1);
                             B.add_term(i + 2, 1);
                             C.add_term(i + 3, 1);
-                            FieldType::value_type tmp = a * b;
+                            typename FieldType::value_type tmp = a * b;
                             full_variable_assignment.push_back(tmp);
                             a = b;
                             b = tmp;
@@ -98,7 +98,7 @@ namespace nil {
                             A.add_term(i + 1, 1);
                             A.add_term(i + 2, 1);
                             C.add_term(i + 3, 1);
-                            FieldType::value_type tmp = a + b;
+                            typename FieldType::value_type tmp = a + b;
                             full_variable_assignment.push_back(tmp);
                             a = b;
                             b = tmp;
@@ -108,7 +108,7 @@ namespace nil {
                     }
 
                     linear_combination<FieldType> A, B, C;
-                    FieldType::value_type fin = FieldType::value_type::zero();
+                    typename FieldType::value_type fin = typename FieldType::value_type::zero();
                     for (std::size_t i = 1; i < cs.num_variables(); ++i) {
                         A.add_term(i, 1);
                         B.add_term(i, 1);
@@ -169,7 +169,7 @@ namespace nil {
                             C.add_term(u + 1, 1);
                             C.add_term(v + 1, 1);
                         }
-                        C.add_term(lastvar + 1, -FieldType::value_type::one());
+                        C.add_term(lastvar + 1, -typename FieldType::value_type::one());
 
                         cs.add_constraint(r1cs_constraint<FieldType>(A, B, C));
                         full_variable_assignment.push_back(full_variable_assignment[u] + full_variable_assignment[v] -
