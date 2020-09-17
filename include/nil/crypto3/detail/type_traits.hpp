@@ -217,6 +217,11 @@ namespace nil {
                 constexpr static bool value = std::is_same<decltype(test(std::declval<T>())), long>::value;
             };
 
+            template<typename Range>
+            struct is_range {
+                static const bool value = has_begin<Range>::value && has_end<Range>::value;
+            };
+
             template<typename Container>
             struct is_container {
                 static const bool value =
