@@ -647,9 +647,9 @@ namespace nil {
                         }
                     }
 
-                    algebra::Fr_vector<CurveType> At = std::move(sap_inst.At);
-                    algebra::Fr_vector<CurveType> Ct = std::move(sap_inst.Ct);
-                    algebra::Fr_vector<CurveType> Ht = std::move(sap_inst.Ht);
+                    std::vector<typename CurveType::scalar_field_type::value_type> At = std::move(sap_inst.At);
+                    std::vector<typename CurveType::scalar_field_type::value_type> Ct = std::move(sap_inst.Ct);
+                    std::vector<typename CurveType::scalar_field_type::value_type> Ht = std::move(sap_inst.Ht);
                     /**
                      * sap_inst.{A,C,H}t are now in an unspecified state,
                      * but we do not use them below
@@ -682,7 +682,7 @@ namespace nil {
                     typename CurveType::g1_type G_alpha = alpha * G;
                     typename CurveType::g2_type H_beta = beta * H;
 
-                    algebra::Fr_vector<CurveType> tmp_exponents;
+                    std::vector<typename CurveType::scalar_field_type::value_type> tmp_exponents;
                     tmp_exponents.reserve(sap_inst.num_inputs() + 1);
                     for (std::size_t i = 0; i <= sap_inst.num_inputs(); ++i) {
                         tmp_exponents.emplace_back(gamma * Ct[i] + (alpha + beta) * At[i]);

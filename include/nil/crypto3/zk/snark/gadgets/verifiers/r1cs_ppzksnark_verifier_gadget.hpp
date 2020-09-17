@@ -53,10 +53,70 @@ namespace nil {
 
                     pb_variable_array<FieldType> proof_contents;
 
-                    r1cs_ppzksnark_proof_variable(protoboard<FieldType> &pb);
-                    void generate_r1cs_constraints();
-                    void generate_r1cs_witness(const r1cs_ppzksnark_proof<other_curve<CurveType>> &proof);
-                    static std::size_t size();
+                    r1cs_ppzksnark_proof_variable(protoboard<FieldType> &pb) : gadget<FieldType>(pb) {
+                        const std::size_t num_G1 = 7;
+                        const std::size_t num_G2 = 1;
+
+                        g_A_g.reset(new G1_variable<CurveType>(pb));
+                        g_A_h.reset(new G1_variable<CurveType>(pb));
+                        g_B_g.reset(new G2_variable<CurveType>(pb));
+                        g_B_h.reset(new G1_variable<CurveType>(pb));
+                        g_C_g.reset(new G1_variable<CurveType>(pb));
+                        g_C_h.reset(new G1_variable<CurveType>(pb));
+                        g_H.reset(new G1_variable<CurveType>(pb));
+                        g_K.reset(new G1_variable<CurveType>(pb));
+
+                        all_G1_vars = {g_A_g, g_A_h, g_B_h, g_C_g, g_C_h, g_H, g_K};
+                        all_G2_vars = {g_B_g};
+
+                        all_G1_checkers.resize(all_G1_vars.size());
+
+                        for (std::size_t i = 0; i < all_G1_vars.size(); ++i) {
+                            all_G1_checkers[i].reset(new G1_checker_gadget<CurveType>(pb, *all_G1_vars[i]));
+                        }
+                        G2_checker.reset(new G2_checker_gadget<CurveType>(pb, *g_B_g));
+
+                        assert(all_G1_vars.size() == num_G1);
+                        assert(all_G2_vars.size() == num_G2);
+                    }
+                    void generate_r1cs_constraints() {
+                        for (auto &G1_checker : all_G1_checkers) {
+                            G1_checker->generate_r1cs_constraints();
+                        }
+
+                        G2_checker->generate_r1cs_constraints();
+                    }
+                    void generate_r1cs_witness(const r1cs_ppzksnark_proof<other_curve<CurveType>> &proof) {
+                        std::vector<other_curve<CurveType>::g1_type> G1_elems;
+                        std::vector<other_curve<CurveType>::g2_type> G2_elems;
+
+                        G1_elems = {proof.g_A.g, proof.g_A.h, proof.g_B.h, proof.g_C.g,
+                                    proof.g_C.h, proof.g_H,   proof.g_K};
+                        G2_elems = {proof.g_B.g};
+
+                        assert(G1_elems.size() == all_G1_vars.size());
+                        assert(G2_elems.size() == all_G2_vars.size());
+
+                        for (std::size_t i = 0; i < G1_elems.size(); ++i) {
+                            all_G1_vars[i]->generate_r1cs_witness(G1_elems[i]);
+                        }
+
+                        for (std::size_t i = 0; i < G2_elems.size(); ++i) {
+                            all_G2_vars[i]->generate_r1cs_witness(G2_elems[i]);
+                        }
+
+                        for (auto &G1_checker : all_G1_checkers) {
+                            G1_checker->generate_r1cs_witness();
+                        }
+
+                        G2_checker->generate_r1cs_witness();
+                    }
+                    static std::size_t size() {
+                        const std::size_t num_G1 = 7;
+                        const std::size_t num_G2 = 1;
+                        return (num_G1 * G1_variable<CurveType>::num_field_elems +
+                                num_G2 * G2_variable<CurveType>::num_field_elems);
+                    }
                 };
 
                 template<typename CurveType>
@@ -96,14 +156,90 @@ namespace nil {
                     __attribute__((noinline))
                     r1cs_ppzksnark_verification_key_variable(protoboard<FieldType> &pb,
                                                              const pb_variable_array<FieldType> &all_bits,
-                                                             const std::size_t input_size);
-                    void generate_r1cs_constraints(const bool enforce_bitness);
-                    void generate_r1cs_witness(const r1cs_ppzksnark_verification_key<other_curve<CurveType>> &vk);
-                    void generate_r1cs_witness(const std::vector<bool> &vk_bits);
+                                                             const std::size_t input_size) :
+                        gadget<FieldType>(pb),
+                        all_bits(all_bits), input_size(input_size) {
+                        const std::size_t num_G1 = 2 + (input_size + 1);
+                        const std::size_t num_G2 = 5;
+
+                        assert(all_bits.size() == (G1_variable<CurveType>::size_in_bits() * num_G1 +
+                                                   G2_variable<CurveType>::size_in_bits() * num_G2));
+
+                        this->alphaA_g2.reset(new G2_variable<CurveType>(pb));
+                        this->alphaB_g1.reset(new G1_variable<CurveType>(pb));
+                        this->alphaC_g2.reset(new G2_variable<CurveType>(pb));
+                        this->gamma_g2.reset(new G2_variable<CurveType>(pb));
+                        this->gamma_beta_g1.reset(new G1_variable<CurveType>(pb));
+                        this->gamma_beta_g2.reset(new G2_variable<CurveType>(pb));
+                        this->rC_Z_g2.reset(new G2_variable<CurveType>(pb));
+
+                        all_G1_vars = {this->alphaB_g1, this->gamma_beta_g1};
+                        all_G2_vars = {this->alphaA_g2, this->alphaC_g2, this->gamma_g2, this->gamma_beta_g2,
+                                       this->rC_Z_g2};
+
+                        this->encoded_IC_query.resize(input_size);
+                        this->encoded_IC_base.reset(new G1_variable<CurveType>(pb));
+                        this->all_G1_vars.emplace_back(this->encoded_IC_base);
+
+                        for (std::size_t i = 0; i < input_size; ++i) {
+                            this->encoded_IC_query[i].reset(new G1_variable<CurveType>(pb));
+                            all_G1_vars.emplace_back(this->encoded_IC_query[i]);
+                        }
+
+                        for (auto &G1_var : all_G1_vars) {
+                            all_vars.insert(all_vars.end(), G1_var->all_vars.begin(), G1_var->all_vars.end());
+                        }
+
+                        for (auto &G2_var : all_G2_vars) {
+                            all_vars.insert(all_vars.end(), G2_var->all_vars.begin(), G2_var->all_vars.end());
+                        }
+
+                        assert(all_G1_vars.size() == num_G1);
+                        assert(all_G2_vars.size() == num_G2);
+                        assert(all_vars.size() == (num_G1 * G1_variable<CurveType>::num_variables() +
+                                                   num_G2 * G2_variable<CurveType>::num_variables()));
+
+                        packer.reset(
+                            new multipacking_gadget<FieldType>(pb, all_bits, all_vars, FieldType::size_in_bits()));
+                    }
+                    void generate_r1cs_constraints(const bool enforce_bitness) {
+                        packer->generate_r1cs_constraints(enforce_bitness);
+                    }
+                    void generate_r1cs_witness(const r1cs_ppzksnark_verification_key<other_curve<CurveType>> &vk) {
+                        std::vector<other_curve<CurveType>::g1_type> G1_elems;
+                        std::vector<other_curve<CurveType>::g2_type> G2_elems;
+
+                        G1_elems = {vk.alphaB_g1, vk.gamma_beta_g1};
+                        G2_elems = {vk.alphaA_g2, vk.alphaC_g2, vk.gamma_g2, vk.gamma_beta_g2, vk.rC_Z_g2};
+
+                        assert(vk.encoded_IC_query.rest.indices.size() == input_size);
+                        G1_elems.emplace_back(vk.encoded_IC_query.first);
+                        for (std::size_t i = 0; i < input_size; ++i) {
+                            assert(vk.encoded_IC_query.rest.indices[i] == i);
+                            G1_elems.emplace_back(vk.encoded_IC_query.rest.values[i]);
+                        }
+
+                        assert(G1_elems.size() == all_G1_vars.size());
+                        assert(G2_elems.size() == all_G2_vars.size());
+
+                        for (std::size_t i = 0; i < G1_elems.size(); ++i) {
+                            all_G1_vars[i]->generate_r1cs_witness(G1_elems[i]);
+                        }
+
+                        for (std::size_t i = 0; i < G2_elems.size(); ++i) {
+                            all_G2_vars[i]->generate_r1cs_witness(G2_elems[i]);
+                        }
+
+                        packer->generate_r1cs_witness_from_packed();
+                    }
+                    void generate_r1cs_witness(const std::vector<bool> &vk_bits) {
+                        all_bits.fill_with_bits(this->pb, vk_bits);
+                        packer->generate_r1cs_witness_from_bits();
+                    }
                     std::vector<bool> get_bits() const;
                     static std::size_t __attribute__((noinline)) size_in_bits(const std::size_t input_size);
-                    static std::vector<bool>
-                        get_verification_key_bits(const r1cs_ppzksnark_verification_key<other_curve<CurveType>> &r1cs_vk);
+                    static std::vector<bool> get_verification_key_bits(
+                        const r1cs_ppzksnark_verification_key<other_curve<CurveType>> &r1cs_vk);
                 };
 
                 template<typename CurveType>
@@ -232,7 +368,8 @@ namespace nil {
                 public:
                     typedef typename CurveType::scalar_field_type FieldType;
 
-                    std::shared_ptr<r1cs_ppzksnark_preprocessed_r1cs_ppzksnark_verification_key_variable<CurveType>> pvk;
+                    std::shared_ptr<r1cs_ppzksnark_preprocessed_r1cs_ppzksnark_verification_key_variable<CurveType>>
+                        pvk;
                     std::shared_ptr<r1cs_ppzksnark_verifier_process_vk_gadget<CurveType>> compute_pvk;
                     std::shared_ptr<r1cs_ppzksnark_online_verifier_gadget<CurveType>> online_verifier;
 
@@ -248,181 +385,17 @@ namespace nil {
                 };
 
                 template<typename CurveType>
-                r1cs_ppzksnark_proof_variable<CurveType>::r1cs_ppzksnark_proof_variable(protoboard<FieldType> &pb) :
-                    gadget<FieldType>(pb) {
-                    const std::size_t num_G1 = 7;
-                    const std::size_t num_G2 = 1;
-
-                    g_A_g.reset(new G1_variable<CurveType>(pb));
-                    g_A_h.reset(new G1_variable<CurveType>(pb));
-                    g_B_g.reset(new G2_variable<CurveType>(pb));
-                    g_B_h.reset(new G1_variable<CurveType>(pb));
-                    g_C_g.reset(new G1_variable<CurveType>(pb));
-                    g_C_h.reset(new G1_variable<CurveType>(pb));
-                    g_H.reset(new G1_variable<CurveType>(pb));
-                    g_K.reset(new G1_variable<CurveType>(pb));
-
-                    all_G1_vars = {g_A_g, g_A_h, g_B_h, g_C_g, g_C_h, g_H, g_K};
-                    all_G2_vars = {g_B_g};
-
-                    all_G1_checkers.resize(all_G1_vars.size());
-
-                    for (std::size_t i = 0; i < all_G1_vars.size(); ++i) {
-                        all_G1_checkers[i].reset(new G1_checker_gadget<CurveType>(pb, *all_G1_vars[i]));
-                    }
-                    G2_checker.reset(new G2_checker_gadget<CurveType>(pb, *g_B_g));
-
-                    assert(all_G1_vars.size() == num_G1);
-                    assert(all_G2_vars.size() == num_G2);
-                }
-
-                template<typename CurveType>
-                void r1cs_ppzksnark_proof_variable<CurveType>::generate_r1cs_constraints() {
-                    for (auto &G1_checker : all_G1_checkers) {
-                        G1_checker->generate_r1cs_constraints();
-                    }
-
-                    G2_checker->generate_r1cs_constraints();
-                }
-
-                template<typename CurveType>
-                void r1cs_ppzksnark_proof_variable<CurveType>::generate_r1cs_witness(
-                    const r1cs_ppzksnark_proof<other_curve<CurveType>> &proof) {
-                    std::vector<other_curve<CurveType>::g1_type> G1_elems;
-                    std::vector<other_curve<CurveType>::g2_type> G2_elems;
-
-                    G1_elems = {proof.g_A.g, proof.g_A.h, proof.g_B.h, proof.g_C.g, proof.g_C.h, proof.g_H, proof.g_K};
-                    G2_elems = {proof.g_B.g};
-
-                    assert(G1_elems.size() == all_G1_vars.size());
-                    assert(G2_elems.size() == all_G2_vars.size());
-
-                    for (std::size_t i = 0; i < G1_elems.size(); ++i) {
-                        all_G1_vars[i]->generate_r1cs_witness(G1_elems[i]);
-                    }
-
-                    for (std::size_t i = 0; i < G2_elems.size(); ++i) {
-                        all_G2_vars[i]->generate_r1cs_witness(G2_elems[i]);
-                    }
-
-                    for (auto &G1_checker : all_G1_checkers) {
-                        G1_checker->generate_r1cs_witness();
-                    }
-
-                    G2_checker->generate_r1cs_witness();
-                }
-
-                template<typename CurveType>
-                std::size_t r1cs_ppzksnark_proof_variable<CurveType>::size() {
-                    const std::size_t num_G1 = 7;
-                    const std::size_t num_G2 = 1;
-                    return (num_G1 * G1_variable<CurveType>::num_field_elems + num_G2 * G2_variable<CurveType>::num_field_elems);
-                }
-
-                template<typename CurveType>
-                r1cs_ppzksnark_verification_key_variable<CurveType>::r1cs_ppzksnark_verification_key_variable(
-                    protoboard<FieldType> &pb,
-                    const pb_variable_array<FieldType> &all_bits,
-                    const std::size_t input_size) :
-                    gadget<FieldType>(pb),
-                    all_bits(all_bits), input_size(input_size) {
-                    const std::size_t num_G1 = 2 + (input_size + 1);
-                    const std::size_t num_G2 = 5;
-
-                    assert(all_bits.size() ==
-                           (G1_variable<CurveType>::size_in_bits() * num_G1 + G2_variable<CurveType>::size_in_bits() * num_G2));
-
-                    this->alphaA_g2.reset(new G2_variable<CurveType>(pb));
-                    this->alphaB_g1.reset(new G1_variable<CurveType>(pb));
-                    this->alphaC_g2.reset(new G2_variable<CurveType>(pb));
-                    this->gamma_g2.reset(new G2_variable<CurveType>(pb));
-                    this->gamma_beta_g1.reset(new G1_variable<CurveType>(pb));
-                    this->gamma_beta_g2.reset(new G2_variable<CurveType>(pb));
-                    this->rC_Z_g2.reset(new G2_variable<CurveType>(pb));
-
-                    all_G1_vars = {this->alphaB_g1, this->gamma_beta_g1};
-                    all_G2_vars = {this->alphaA_g2, this->alphaC_g2, this->gamma_g2, this->gamma_beta_g2,
-                                   this->rC_Z_g2};
-
-                    this->encoded_IC_query.resize(input_size);
-                    this->encoded_IC_base.reset(new G1_variable<CurveType>(pb));
-                    this->all_G1_vars.emplace_back(this->encoded_IC_base);
-
-                    for (std::size_t i = 0; i < input_size; ++i) {
-                        this->encoded_IC_query[i].reset(new G1_variable<CurveType>(pb));
-                        all_G1_vars.emplace_back(this->encoded_IC_query[i]);
-                    }
-
-                    for (auto &G1_var : all_G1_vars) {
-                        all_vars.insert(all_vars.end(), G1_var->all_vars.begin(), G1_var->all_vars.end());
-                    }
-
-                    for (auto &G2_var : all_G2_vars) {
-                        all_vars.insert(all_vars.end(), G2_var->all_vars.begin(), G2_var->all_vars.end());
-                    }
-
-                    assert(all_G1_vars.size() == num_G1);
-                    assert(all_G2_vars.size() == num_G2);
-                    assert(all_vars.size() ==
-                           (num_G1 * G1_variable<CurveType>::num_variables() + num_G2 * G2_variable<CurveType>::num_variables()));
-
-                    packer.reset(new multipacking_gadget<FieldType>(pb, all_bits, all_vars, FieldType::size_in_bits()));
-                }
-
-                template<typename CurveType>
-                void r1cs_ppzksnark_verification_key_variable<CurveType>::generate_r1cs_constraints(
-                    const bool enforce_bitness) {
-                    packer->generate_r1cs_constraints(enforce_bitness);
-                }
-
-                template<typename CurveType>
-                void r1cs_ppzksnark_verification_key_variable<CurveType>::generate_r1cs_witness(
-                    const r1cs_ppzksnark_verification_key<other_curve<CurveType>> &vk) {
-                    std::vector<other_curve<CurveType>::g1_type> G1_elems;
-                    std::vector<other_curve<CurveType>::g2_type> G2_elems;
-
-                    G1_elems = {vk.alphaB_g1, vk.gamma_beta_g1};
-                    G2_elems = {vk.alphaA_g2, vk.alphaC_g2, vk.gamma_g2, vk.gamma_beta_g2, vk.rC_Z_g2};
-
-                    assert(vk.encoded_IC_query.rest.indices.size() == input_size);
-                    G1_elems.emplace_back(vk.encoded_IC_query.first);
-                    for (std::size_t i = 0; i < input_size; ++i) {
-                        assert(vk.encoded_IC_query.rest.indices[i] == i);
-                        G1_elems.emplace_back(vk.encoded_IC_query.rest.values[i]);
-                    }
-
-                    assert(G1_elems.size() == all_G1_vars.size());
-                    assert(G2_elems.size() == all_G2_vars.size());
-
-                    for (std::size_t i = 0; i < G1_elems.size(); ++i) {
-                        all_G1_vars[i]->generate_r1cs_witness(G1_elems[i]);
-                    }
-
-                    for (std::size_t i = 0; i < G2_elems.size(); ++i) {
-                        all_G2_vars[i]->generate_r1cs_witness(G2_elems[i]);
-                    }
-
-                    packer->generate_r1cs_witness_from_packed();
-                }
-
-                template<typename CurveType>
-                void r1cs_ppzksnark_verification_key_variable<CurveType>::generate_r1cs_witness(
-                    const std::vector<bool> &vk_bits) {
-                    all_bits.fill_with_bits(this->pb, vk_bits);
-                    packer->generate_r1cs_witness_from_bits();
-                }
-
-                template<typename CurveType>
                 std::vector<bool> r1cs_ppzksnark_verification_key_variable<CurveType>::get_bits() const {
                     return all_bits.get_bits(this->pb);
                 }
 
                 template<typename CurveType>
-                std::size_t r1cs_ppzksnark_verification_key_variable<CurveType>::size_in_bits(const std::size_t input_size) {
+                std::size_t
+                    r1cs_ppzksnark_verification_key_variable<CurveType>::size_in_bits(const std::size_t input_size) {
                     const std::size_t num_G1 = 2 + (input_size + 1);
                     const std::size_t num_G2 = 5;
-                    const std::size_t result =
-                        G1_variable<CurveType>::size_in_bits() * num_G1 + G2_variable<CurveType>::size_in_bits() * num_G2;
+                    const std::size_t result = G1_variable<CurveType>::size_in_bits() * num_G1 +
+                                               G2_variable<CurveType>::size_in_bits() * num_G2;
                     return result;
                 }
 
@@ -462,13 +435,15 @@ namespace nil {
                     encoded_IC_query.resize(r1cs_vk.encoded_IC_query.rest.indices.size());
                     for (std::size_t i = 0; i < r1cs_vk.encoded_IC_query.rest.indices.size(); ++i) {
                         assert(r1cs_vk.encoded_IC_query.rest.indices[i] == i);
-                        encoded_IC_query[i].reset(new G1_variable<CurveType>(pb, r1cs_vk.encoded_IC_query.rest.values[i]));
+                        encoded_IC_query[i].reset(
+                            new G1_variable<CurveType>(pb, r1cs_vk.encoded_IC_query.rest.values[i]));
                     }
 
                     vk_alphaB_g1_precomp.reset(new G1_precomputation<CurveType>(pb, r1cs_vk.alphaB_g1));
                     vk_gamma_beta_g1_precomp.reset(new G1_precomputation<CurveType>(pb, r1cs_vk.gamma_beta_g1));
 
-                    pp_G2_one_precomp.reset(new G2_precomputation<CurveType>(pb, other_curve<CurveType>::g2_type::one()));
+                    pp_G2_one_precomp.reset(
+                        new G2_precomputation<CurveType>(pb, other_curve<CurveType>::g2_type::one()));
                     vk_alphaA_g2_precomp.reset(new G2_precomputation<CurveType>(pb, r1cs_vk.alphaA_g2));
                     vk_alphaC_g2_precomp.reset(new G2_precomputation<CurveType>(pb, r1cs_vk.alphaC_g2));
                     vk_gamma_beta_g2_precomp.reset(new G2_precomputation<CurveType>(pb, r1cs_vk.gamma_beta_g2));
@@ -501,7 +476,8 @@ namespace nil {
                     compute_vk_gamma_beta_g1_precomp.reset(
                         new precompute_G1_gadget<CurveType>(pb, *vk.gamma_beta_g1, *pvk.vk_gamma_beta_g1_precomp));
 
-                    pvk.pp_G2_one_precomp.reset(new G2_precomputation<CurveType>(pb, other_curve<CurveType>::g2_type::one()));
+                    pvk.pp_G2_one_precomp.reset(
+                        new G2_precomputation<CurveType>(pb, other_curve<CurveType>::g2_type::one()));
                     compute_vk_alphaA_g2_precomp.reset(
                         new precompute_G2_gadget<CurveType>(pb, *vk.alphaA_g2, *pvk.vk_alphaA_g2_precomp));
                     compute_vk_alphaC_g2_precomp.reset(
@@ -573,7 +549,8 @@ namespace nil {
                     // do the necessary precomputations
                     // compute things not available in plain from proof/vk
                     proof_g_A_g_acc.reset(new G1_variable<CurveType>(pb));
-                    compute_proof_g_A_g_acc.reset(new G1_add_gadget<CurveType>(pb, *(proof.g_A_g), *acc, *proof_g_A_g_acc));
+                    compute_proof_g_A_g_acc.reset(
+                        new G1_add_gadget<CurveType>(pb, *(proof.g_A_g), *acc, *proof_g_A_g_acc));
                     proof_g_A_g_acc_C.reset(new G1_variable<CurveType>(pb));
                     compute_proof_g_A_g_acc_C.reset(
                         new G1_add_gadget<CurveType>(pb, *proof_g_A_g_acc, *(proof.g_C_g), *proof_g_A_g_acc_C));
@@ -604,51 +581,51 @@ namespace nil {
                     // check validity of A knowledge commitment
                     kc_A_valid.allocate(pb);
                     check_kc_A_valid.reset(new check_e_equals_e_gadget<CurveType>(pb,
-                                                                            *proof_g_A_g_precomp,
-                                                                            *(pvk.vk_alphaA_g2_precomp),
-                                                                            *proof_g_A_h_precomp,
-                                                                            *(pvk.pp_G2_one_precomp),
-                                                                            kc_A_valid));
+                                                                                  *proof_g_A_g_precomp,
+                                                                                  *(pvk.vk_alphaA_g2_precomp),
+                                                                                  *proof_g_A_h_precomp,
+                                                                                  *(pvk.pp_G2_one_precomp),
+                                                                                  kc_A_valid));
 
                     // check validity of B knowledge commitment
                     kc_B_valid.allocate(pb);
                     check_kc_B_valid.reset(new check_e_equals_e_gadget<CurveType>(pb,
-                                                                            *(pvk.vk_alphaB_g1_precomp),
-                                                                            *proof_g_B_g_precomp,
-                                                                            *proof_g_B_h_precomp,
-                                                                            *(pvk.pp_G2_one_precomp),
-                                                                            kc_B_valid));
+                                                                                  *(pvk.vk_alphaB_g1_precomp),
+                                                                                  *proof_g_B_g_precomp,
+                                                                                  *proof_g_B_h_precomp,
+                                                                                  *(pvk.pp_G2_one_precomp),
+                                                                                  kc_B_valid));
 
                     // check validity of C knowledge commitment
                     kc_C_valid.allocate(pb);
                     check_kc_C_valid.reset(new check_e_equals_e_gadget<CurveType>(pb,
-                                                                            *proof_g_C_g_precomp,
-                                                                            *(pvk.vk_alphaC_g2_precomp),
-                                                                            *proof_g_C_h_precomp,
-                                                                            *(pvk.pp_G2_one_precomp),
-                                                                            kc_C_valid));
+                                                                                  *proof_g_C_g_precomp,
+                                                                                  *(pvk.vk_alphaC_g2_precomp),
+                                                                                  *proof_g_C_h_precomp,
+                                                                                  *(pvk.pp_G2_one_precomp),
+                                                                                  kc_C_valid));
 
                     // check QAP divisibility
                     QAP_valid.allocate(pb);
                     check_QAP_valid.reset(new check_e_equals_ee_gadget<CurveType>(pb,
-                                                                            *proof_g_A_g_acc_precomp,
-                                                                            *proof_g_B_g_precomp,
-                                                                            *proof_g_H_precomp,
-                                                                            *(pvk.vk_rC_Z_g2_precomp),
-                                                                            *proof_g_C_g_precomp,
-                                                                            *(pvk.pp_G2_one_precomp),
-                                                                            QAP_valid));
+                                                                                  *proof_g_A_g_acc_precomp,
+                                                                                  *proof_g_B_g_precomp,
+                                                                                  *proof_g_H_precomp,
+                                                                                  *(pvk.vk_rC_Z_g2_precomp),
+                                                                                  *proof_g_C_g_precomp,
+                                                                                  *(pvk.pp_G2_one_precomp),
+                                                                                  QAP_valid));
 
                     // check coefficients
                     CC_valid.allocate(pb);
                     check_CC_valid.reset(new check_e_equals_ee_gadget<CurveType>(pb,
-                                                                           *proof_g_K_precomp,
-                                                                           *(pvk.vk_gamma_g2_precomp),
-                                                                           *proof_g_A_g_acc_C_precomp,
-                                                                           *(pvk.vk_gamma_beta_g2_precomp),
-                                                                           *(pvk.vk_gamma_beta_g1_precomp),
-                                                                           *proof_g_B_g_precomp,
-                                                                           CC_valid));
+                                                                                 *proof_g_K_precomp,
+                                                                                 *(pvk.vk_gamma_g2_precomp),
+                                                                                 *proof_g_A_g_acc_C_precomp,
+                                                                                 *(pvk.vk_gamma_beta_g2_precomp),
+                                                                                 *(pvk.vk_gamma_beta_g1_precomp),
+                                                                                 *proof_g_B_g_precomp,
+                                                                                 CC_valid));
 
                     // final constraint
                     all_test_results.emplace_back(kc_A_valid);

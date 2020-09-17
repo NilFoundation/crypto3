@@ -77,7 +77,8 @@ namespace nil {
                     typename CurveType::g1_type delta_g1;
                     typename CurveType::g2_type delta_g2;
 
-                    typename CurveType::g1_vector A_query;    // this could be a sparse vector if we had multiexp for those
+                    typename CurveType::g1_vector
+                        A_query;    // this could be a sparse vector if we had multiexp for those
                     knowledge_commitment_vector<typename CurveType::g2_type, typename CurveType::g1_type> B_query;
                     typename CurveType::g1_vector H_query;
                     typename CurveType::g1_vector L_query;
@@ -444,13 +445,13 @@ namespace nil {
                     }
 
                     /* qap.{At,Bt,Ct,Ht} are now in unspecified state, but we do not use them later */
-                    algebra::Fr_vector<CurveType> At = std::move(qap.At);
-                    algebra::Fr_vector<CurveType> Bt = std::move(qap.Bt);
-                    algebra::Fr_vector<CurveType> Ct = std::move(qap.Ct);
-                    algebra::Fr_vector<CurveType> Ht = std::move(qap.Ht);
+                    std::vector<typename CurveType::scalar_field_type::value_type> At = std::move(qap.At);
+                    std::vector<typename CurveType::scalar_field_type::value_type> Bt = std::move(qap.Bt);
+                    std::vector<typename CurveType::scalar_field_type::value_type> Ct = std::move(qap.Ct);
+                    std::vector<typename CurveType::scalar_field_type::value_type> Ht = std::move(qap.Ht);
 
                     /* The gamma inverse product component: (beta*A_i(t) + alpha*B_i(t) + C_i(t)) * gamma^{-1}. */
-                    algebra::Fr_vector<CurveType> gamma_ABC;
+                    std::vector<typename CurveType::scalar_field_type::value_type> gamma_ABC;
                     gamma_ABC.reserve(qap.num_inputs());
 
                     const typename CurveType::scalar_field_type gamma_ABC_0 =
@@ -460,7 +461,7 @@ namespace nil {
                     }
 
                     /* The delta inverse product component: (beta*A_i(t) + alpha*B_i(t) + C_i(t)) * delta^{-1}. */
-                    algebra::Fr_vector<CurveType> Lt;
+                    std::vector<typename CurveType::scalar_field_type::value_type> Lt;
                     Lt.reserve(qap.num_variables() - qap.num_inputs());
 
                     const std::size_t Lt_offset = qap.num_inputs() + 1;
@@ -495,7 +496,8 @@ namespace nil {
                     const typename CurveType::g2_type G2_gen = random_element<typename CurveType::g2_type>();
                     const std::size_t g2_scalar_count = non_zero_Bt;
                     const std::size_t g2_scalar_size = CurveType::scalar_field_type::size_in_bits;
-                    std::size_t g2_window_size = algebra::get_exp_window_size<typename CurveType::g2_type>(g2_scalar_count);
+                    std::size_t g2_window_size =
+                        algebra::get_exp_window_size<typename CurveType::g2_type>(g2_scalar_count);
 
                     algebra::window_table<typename CurveType::g2_type> g2_table =
                         algebra::get_window_table(g2_scalar_size, g2_window_size, G2_gen);
@@ -511,9 +513,10 @@ namespace nil {
                     algebra::batch_to_special<typename CurveType::g1_type>(A_query);
 #endif
 
-                    knowledge_commitment_vector<typename CurveType::g2_type, typename CurveType::g1_type> B_query = kc_batch_exp(
-                        CurveType::scalar_field_type::size_in_bits(), g2_window_size, g1_window_size, g2_table,
-                        g1_table, CurveType::scalar_field_type::one(), CurveType::scalar_field_type::one(), Bt, chunks);
+                    knowledge_commitment_vector<typename CurveType::g2_type, typename CurveType::g1_type> B_query =
+                        kc_batch_exp(CurveType::scalar_field_type::size_in_bits(), g2_window_size, g1_window_size,
+                                     g2_table, g1_table, CurveType::scalar_field_type::one(),
+                                     CurveType::scalar_field_type::one(), Bt, chunks);
                     // NOTE: if USE_MIXED_ADDITION is defined,
                     // kc_batch_exp will convert its output to special form internally
 
@@ -590,7 +593,8 @@ namespace nil {
 #endif
 
                     // TODO: sort out indexing
-                    algebra::Fr_vector<CurveType> const_padded_assignment(1, CurveType::scalar_field_type::one());
+                    std::vector<typename CurveType::scalar_field_type::value_type> const_padded_assignment(
+                        1, CurveType::scalar_field_type::one());
                     const_padded_assignment.insert(const_padded_assignment.end(), qap_wit.coefficients_for_ABCs.begin(),
                                                    qap_wit.coefficients_for_ABCs.end());
 
@@ -688,7 +692,8 @@ namespace nil {
                     const algebra::Fqk<CurveType> QAP1 = miller_loop<CurveType>(proof_g_A_precomp, proof_g_B_precomp);
                     const algebra::Fqk<CurveType> QAP2 = double_miller_loop<CurveType>(
                         acc_precomp, pvk.vk_gamma_g2_precomp, proof_g_C_precomp, pvk.vk_delta_g2_precomp);
-                    const typename CurveType::gt_type QAP = final_exponentiation<CurveType>(QAP1 * QAP2.unitary_inverse());
+                    const typename CurveType::gt_type QAP =
+                        final_exponentiation<CurveType>(QAP1 * QAP2.unitary_inverse());
 
                     if (QAP != pvk.vk_alpha_g1_beta_g2) {
                         result = false;
@@ -769,7 +774,8 @@ namespace nil {
                     const algebra::Fqk<CurveType> QAP_miller = CurveType::affine_ate_e_times_e_over_e_miller_loop(
                         acc_precomp, pvk_vk_gamma_g2_precomp, proof_g_C_precomp, pvk_vk_delta_g2_precomp,
                         proof_g_A_precomp, proof_g_B_precomp);
-                    const typename CurveType::gt_type QAP = final_exponentiation<CurveType>(QAP_miller.unitary_inverse());
+                    const typename CurveType::gt_type QAP =
+                        final_exponentiation<CurveType>(QAP_miller.unitary_inverse());
 
                     if (QAP != vk.alpha_g1_beta_g2) {
                         result = false;

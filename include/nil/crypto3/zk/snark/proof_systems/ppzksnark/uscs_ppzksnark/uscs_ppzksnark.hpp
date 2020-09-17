@@ -588,17 +588,17 @@ namespace nil {
 
                     /* construct various tables of FieldType elements */
 
-                    algebra::Fr_vector<CurveType> Vt_table = std::move(
+                    std::vector<typename CurveType::scalar_field_type::value_type> Vt_table = std::move(
                         ssp_inst.Vt);    // ssp_inst.Vt is now in unspecified state, but we do not use it later
-                    algebra::Fr_vector<CurveType> Ht_table = std::move(
+                    std::vector<typename CurveType::scalar_field_type::value_type> Ht_table = std::move(
                         ssp_inst.Ht);    // ssp_inst.Ht is now in unspecified state, but we do not use it later
 
                     Vt_table.emplace_back(ssp_inst.Zt);
 
-                    algebra::Fr_vector<CurveType> Xt_table =
-                        algebra::Fr_vector<CurveType>(Vt_table.begin(), Vt_table.begin() + ssp_inst.num_inputs() + 1);
-                    algebra::Fr_vector<CurveType> Vt_table_minus_Xt_table =
-                        algebra::Fr_vector<CurveType>(Vt_table.begin() + ssp_inst.num_inputs() + 1, Vt_table.end());
+                    std::vector<typename CurveType::scalar_field_type::value_type> Xt_table =
+                        std::vector<typename CurveType::scalar_field_type::value_type>(Vt_table.begin(), Vt_table.begin() + ssp_inst.num_inputs() + 1);
+                    std::vector<typename CurveType::scalar_field_type::value_type> Vt_table_minus_Xt_table =
+                        std::vector<typename CurveType::scalar_field_type::value_type>(Vt_table.begin() + ssp_inst.num_inputs() + 1, Vt_table.end());
 
                     /* sanity checks */
 
@@ -655,7 +655,7 @@ namespace nil {
                     typename CurveType::g1_type encoded_IC_base = Xt_table[0] * typename CurveType::g1_type::one();
                     typename CurveType::g1_vector encoded_IC_values =
                         batch_exp(typename CurveType::scalar_field_type::size_in_bits(), g1_window, g1_table,
-                                  algebra::Fr_vector<CurveType>(Xt_table.begin() + 1, Xt_table.end()));
+                                  std::vector<typename CurveType::scalar_field_type::value_type>(Xt_table.begin() + 1, Xt_table.end()));
 
                     accumulation_vector<typename CurveType::g1_type> encoded_IC_query(std::move(encoded_IC_base),
                                                                            std::move(encoded_IC_values));

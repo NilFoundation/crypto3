@@ -675,13 +675,13 @@ namespace nil {
                         }
                     }
 
-                    algebra::Fr_vector<CurveType> At = std::move(
+                    std::vector<typename CurveType::scalar_field_type::value_type> At = std::move(
                         qap_inst.At);    // qap_inst.At is now in unspecified state, but we do not use it later
-                    algebra::Fr_vector<CurveType> Bt = std::move(
+                    std::vector<typename CurveType::scalar_field_type::value_type> Bt = std::move(
                         qap_inst.Bt);    // qap_inst.Bt is now in unspecified state, but we do not use it later
-                    algebra::Fr_vector<CurveType> Ct = std::move(
+                    std::vector<typename CurveType::scalar_field_type::value_type> Ct = std::move(
                         qap_inst.Ct);    // qap_inst.Ct is now in unspecified state, but we do not use it later
-                    algebra::Fr_vector<CurveType> Ht = std::move(
+                    std::vector<typename CurveType::scalar_field_type::value_type> Ht = std::move(
                         qap_inst.Ht);    // qap_inst.Ht is now in unspecified state, but we do not use it later
 
                     /* append Zt to At,Bt,Ct with */
@@ -699,7 +699,7 @@ namespace nil {
                     const typename CurveType::scalar_field_type rC = rA * rB;
 
                     // consrtuct the same-coefficient-check query (must happen before zeroing out the prefix of At)
-                    algebra::Fr_vector<CurveType> Kt;
+                    std::vector<typename CurveType::scalar_field_type::value_type> Kt;
                     Kt.reserve(qap_inst.num_variables() + 4);
                     for (std::size_t i = 0; i < qap_inst.num_variables() + 1; ++i) {
                         Kt.emplace_back(beta * (rA * At[i] + rB * Bt[i] + rC * Ct[i]));
@@ -709,7 +709,7 @@ namespace nil {
                     Kt.emplace_back(beta * rC * qap_inst.Zt);
 
                     /* zero out prefix of At and stick it into IC coefficients */
-                    algebra::Fr_vector<CurveType> IC_coefficients;
+                    std::vector<typename CurveType::scalar_field_type::value_type> IC_coefficients;
                     IC_coefficients.reserve(qap_inst.num_inputs() + 1);
                     for (std::size_t i = 0; i < qap_inst.num_inputs() + 1; ++i) {
                         IC_coefficients.emplace_back(At[i]);
@@ -770,7 +770,7 @@ namespace nil {
                     typename CurveType::g2_type rC_Z_g2 = (rC * qap_inst.Zt) * typename CurveType::g2_type::one();
 
                     typename CurveType::g1_type encoded_IC_base = (rA * IC_coefficients[0]) * typename CurveType::g1_type::one();
-                    algebra::Fr_vector<CurveType> multiplied_IC_coefficients;
+                    std::vector<typename CurveType::scalar_field_type::value_type> multiplied_IC_coefficients;
                     multiplied_IC_coefficients.reserve(qap_inst.num_inputs());
                     for (std::size_t i = 1; i < qap_inst.num_inputs() + 1; ++i) {
                         multiplied_IC_coefficients.emplace_back(rA * IC_coefficients[i]);
