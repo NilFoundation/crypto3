@@ -9,8 +9,8 @@
 // @file Declaration of public-parameter selector for the R1CS GG-ppzkSNARK.
 //---------------------------------------------------------------------------//
 
-#ifndef R1CS_GG_PPZKSNARK_PARAMS_HPP_
-#define R1CS_GG_PPZKSNARK_PARAMS_HPP_
+#ifndef CRYPTO3_ZK_R1CS_GG_PPZKSNARK_PARAMS_HPP_
+#define CRYPTO3_ZK_R1CS_GG_PPZKSNARK_PARAMS_HPP_
 
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs/r1cs.hpp>
 

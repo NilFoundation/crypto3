@@ -9,8 +9,8 @@
 // @file Declaration of public-parameter selector for the TBCS ppzkSNARK.
 //---------------------------------------------------------------------------//
 
-#ifndef TBCS_PPZKSNARK_PARAMS_HPP_
-#define TBCS_PPZKSNARK_PARAMS_HPP_
+#ifndef CRYPTO3_ZK_TBCS_PPZKSNARK_PARAMS_HPP_
+#define CRYPTO3_ZK_TBCS_PPZKSNARK_PARAMS_HPP_
 
 #include <nil/crypto3/zk/snark/relations/circuit_satisfaction_problems/tbcs/tbcs.hpp>
 

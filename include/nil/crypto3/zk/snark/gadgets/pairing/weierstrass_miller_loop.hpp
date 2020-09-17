@@ -11,8 +11,8 @@
 // The gadgets verify computations of (single or multiple simultaneous) Miller loops.
 //---------------------------------------------------------------------------//
 
-#ifndef WEIERSTRASS_MILLER_LOOP_HPP_
-#define WEIERSTRASS_MILLER_LOOP_HPP_
+#ifndef CRYPTO3_ZK_WEIERSTRASS_MILLER_LOOP_HPP_
+#define CRYPTO3_ZK_WEIERSTRASS_MILLER_LOOP_HPP_
 
 #include <memory>
 

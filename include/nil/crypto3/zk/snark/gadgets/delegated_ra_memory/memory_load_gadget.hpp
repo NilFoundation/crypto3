@@ -10,8 +10,8 @@
 // The gadget can be used to verify a memory load from a "delegated memory".
 //---------------------------------------------------------------------------//
 
-#ifndef MEMORY_LOAD_GADGET_HPP_
-#define MEMORY_LOAD_GADGET_HPP_
+#ifndef CRYPTO3_ZK_MEMORY_LOAD_GADGET_HPP_
+#define CRYPTO3_ZK_MEMORY_LOAD_GADGET_HPP_
 
 #include <nil/crypto3/zk/snark/gadgets/merkle_tree/merkle_tree_check_read_gadget.hpp>
 

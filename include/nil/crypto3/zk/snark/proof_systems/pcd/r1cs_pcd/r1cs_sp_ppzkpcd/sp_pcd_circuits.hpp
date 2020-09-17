@@ -23,8 +23,8 @@
 // <http://eprint.iacr.org/2014/595>
 //---------------------------------------------------------------------------//
 
-#ifndef SP_PCD_CIRCUITS_HPP_
-#define SP_PCD_CIRCUITS_HPP_
+#ifndef CRYPTO3_ZK_SP_PCD_CIRCUITS_HPP_
+#define CRYPTO3_ZK_SP_PCD_CIRCUITS_HPP_
 
 #include <nil/crypto3/zk/snark/gadgets/gadget_from_r1cs.hpp>
 #include <nil/crypto3/zk/snark/gadgets/hashes/crh_gadget.hpp>

@@ -12,8 +12,8 @@
 // by use of a Benes network.
 //---------------------------------------------------------------------------//
 
-#ifndef BENES_ROUTING_GADGET_HPP_
-#define BENES_ROUTING_GADGET_HPP_
+#ifndef CRYPTO3_ZK_BENES_ROUTING_GADGET_HPP_
+#define CRYPTO3_ZK_BENES_ROUTING_GADGET_HPP_
 
 #include <nil/crypto3/zk/snark/integer_permutation.hpp>
 #include <nil/crypto3/zk/snark/routing_algorithms/benes_routing_algorithm.hpp>

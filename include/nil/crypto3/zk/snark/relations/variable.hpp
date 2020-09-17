@@ -12,8 +12,8 @@
 // - a linear combination (i.e., sum_i a_i * x_i).
 //---------------------------------------------------------------------------//
 
-#ifndef VARIABLE_HPP_
-#define VARIABLE_HPP_
+#ifndef CRYPTO3_ZK_VARIABLE_HPP_
+#define CRYPTO3_ZK_VARIABLE_HPP_
 
 #include <cstddef>
 #include <map>

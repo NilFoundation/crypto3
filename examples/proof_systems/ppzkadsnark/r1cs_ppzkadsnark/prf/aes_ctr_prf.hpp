@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef AESCTRPRF_HPP_
-#define AESCTRPRF_HPP_
+#ifndef CRYPTO3_ZK_AESCTRPRF_HPP_
+#define CRYPTO3_ZK_AESCTRPRF_HPP_
 
 #include <nil/crypto3/zk/snark/proof_systems/ppzkadsnark/r1cs_ppzkadsnark/r1cs_ppzkadsnark_prf.hpp>
 
@@ -31,7 +31,7 @@ namespace nil {
 
                 template<>
                 algebra::Fr<snark_pp<default_r1cs_ppzkadsnark_pp>>
-                prfCompute<default_r1cs_ppzkadsnark_pp>(const aesPrfKeyT &key, const labelT &label) {
+                prfCompute<default_r1cs_ppzkadsnark_pp>(const aesPrfKeyT &key, const label_type &label) {
                     unsigned char seed_bytes[16];
                     mpz_t aux, Fr_mod;
                     unsigned char random_bytes[16 * 3];

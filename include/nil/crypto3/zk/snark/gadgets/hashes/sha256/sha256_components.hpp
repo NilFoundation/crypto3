@@ -9,8 +9,8 @@
 // @file Declaration of interfaces for gadgets for the SHA256 message schedule and round function.
 //---------------------------------------------------------------------------//
 
-#ifndef SHA256_COMPONENTS_HPP_
-#define SHA256_COMPONENTS_HPP_
+#ifndef CRYPTO3_ZK_SHA256_COMPONENTS_HPP_
+#define CRYPTO3_ZK_SHA256_COMPONENTS_HPP_
 
 #include <nil/crypto3/hash/sha2.hpp>
 

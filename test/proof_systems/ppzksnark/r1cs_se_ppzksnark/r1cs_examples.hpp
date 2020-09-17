@@ -10,8 +10,8 @@
 // R1CS examples with prescribed parameters (according to some distribution).
 //---------------------------------------------------------------------------//
 
-#ifndef R1CS_EXAMPLES_HPP_
-#define R1CS_EXAMPLES_HPP_
+#ifndef CRYPTO3_ZK_R1CS_EXAMPLES_HPP_
+#define CRYPTO3_ZK_R1CS_EXAMPLES_HPP_
 
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs/r1cs.hpp>
 

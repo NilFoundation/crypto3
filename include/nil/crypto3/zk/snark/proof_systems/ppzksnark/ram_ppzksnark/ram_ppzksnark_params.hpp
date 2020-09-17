@@ -9,8 +9,8 @@
 // @file Declaration of public-parameter selector for the RAM ppzkSNARK.
 //---------------------------------------------------------------------------//
 
-#ifndef RAM_PPZKSNARK_PARAMS_HPP_
-#define RAM_PPZKSNARK_PARAMS_HPP_
+#ifndef CRYPTO3_ZK_RAM_PPZKSNARK_PARAMS_HPP_
+#define CRYPTO3_ZK_RAM_PPZKSNARK_PARAMS_HPP_
 
 #include <nil/crypto3/zk/snark/relations/ram_computations/rams/ram_params.hpp>
 

@@ -10,8 +10,8 @@
 // USCS examples with prescribed parameters (according to some distribution).
 //---------------------------------------------------------------------------//
 
-#ifndef USCS_EXAMPLES_HPP_
-#define USCS_EXAMPLES_HPP_
+#ifndef CRYPTO3_ZK_USCS_EXAMPLES_HPP_
+#define CRYPTO3_ZK_USCS_EXAMPLES_HPP_
 
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/uscs/uscs.hpp>
 

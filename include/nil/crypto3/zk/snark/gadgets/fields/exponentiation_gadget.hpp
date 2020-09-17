@@ -9,8 +9,8 @@
 // @file Declaration of interfaces for the exponentiation gadget.
 //---------------------------------------------------------------------------//
 
-#ifndef EXPONENTIATION_GADGET_HPP_
-#define EXPONENTIATION_GADGET_HPP_
+#ifndef CRYPTO3_ZK_EXPONENTIATION_GADGET_HPP_
+#define CRYPTO3_ZK_EXPONENTIATION_GADGET_HPP_
 
 #include <memory>
 #include <vector>

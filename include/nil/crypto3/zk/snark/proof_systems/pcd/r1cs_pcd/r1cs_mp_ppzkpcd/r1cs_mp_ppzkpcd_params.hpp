@@ -9,8 +9,8 @@
 // @file Parameters for *multi-predicate* ppzkPCD for R1CS.
 //---------------------------------------------------------------------------//
 
-#ifndef R1CS_MP_PPZKPCD_PARAMS_HPP_
-#define R1CS_MP_PPZKPCD_PARAMS_HPP_
+#ifndef CRYPTO3_ZK_R1CS_MP_PPZKPCD_PARAMS_HPP_
+#define CRYPTO3_ZK_R1CS_MP_PPZKPCD_PARAMS_HPP_
 
 #include <nil/crypto3/zk/snark/proof_systems/pcd/r1cs_pcd/compliance_predicate/compliance_predicate.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/pcd/r1cs_pcd/r1cs_pcd_params.hpp>

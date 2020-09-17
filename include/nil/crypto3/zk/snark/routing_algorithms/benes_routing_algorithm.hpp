@@ -22,8 +22,8 @@
 // Academic Press 1965
 //---------------------------------------------------------------------------//
 
-#ifndef BENES_ROUTING_ALGORITHM_HPP_
-#define BENES_ROUTING_ALGORITHM_HPP_
+#ifndef CRYPTO3_ZK_BENES_ROUTING_ALGORITHM_HPP_
+#define CRYPTO3_ZK_BENES_ROUTING_ALGORITHM_HPP_
 
 #include <vector>
 

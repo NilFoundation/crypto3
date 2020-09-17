@@ -14,8 +14,8 @@
 // - P is a valid authentication path for the value V2 as the A-th leaf in a Merkle tree with root R2.
 //---------------------------------------------------------------------------//
 
-#ifndef MERKLE_TREE_CHECK_UPDATE_GADGET_HPP_
-#define MERKLE_TREE_CHECK_UPDATE_GADGET_HPP_
+#ifndef CRYPTO3_ZK_MERKLE_TREE_CHECK_UPDATE_GADGET_HPP_
+#define CRYPTO3_ZK_MERKLE_TREE_CHECK_UPDATE_GADGET_HPP_
 
 #include <nil/crypto3/zk/snark/merkle_tree.hpp>
 #include <nil/crypto3/zk/snark/gadget.hpp>

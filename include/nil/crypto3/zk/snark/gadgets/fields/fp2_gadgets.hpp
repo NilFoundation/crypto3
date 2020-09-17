@@ -12,8 +12,8 @@
 // where non_residue is in Fp.
 //---------------------------------------------------------------------------//
 
-#ifndef FP2_GADGETS_HPP_
-#define FP2_GADGETS_HPP_
+#ifndef CRYPTO3_ZK_FP2_GADGETS_HPP_
+#define CRYPTO3_ZK_FP2_GADGETS_HPP_
 
 #include <memory>
 

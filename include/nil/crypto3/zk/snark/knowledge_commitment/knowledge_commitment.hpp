@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef KNOWLEDGE_COMMITMENT_HPP_
-#define KNOWLEDGE_COMMITMENT_HPP_
+#ifndef CRYPTO3_ZK_KNOWLEDGE_COMMITMENT_HPP_
+#define CRYPTO3_ZK_KNOWLEDGE_COMMITMENT_HPP_
 
 #include <nil/algebra/fields/fp.hpp>
 

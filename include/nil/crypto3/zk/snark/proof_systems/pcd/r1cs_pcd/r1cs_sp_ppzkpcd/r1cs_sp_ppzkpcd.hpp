@@ -37,8 +37,8 @@
 // <http://eprint.iacr.org/2014/595>
 //---------------------------------------------------------------------------//
 
-#ifndef R1CS_SP_PPZKPCD_HPP_
-#define R1CS_SP_PPZKPCD_HPP_
+#ifndef CRYPTO3_ZK_R1CS_SP_PPZKPCD_HPP_
+#define CRYPTO3_ZK_R1CS_SP_PPZKPCD_HPP_
 
 #include <memory>
 

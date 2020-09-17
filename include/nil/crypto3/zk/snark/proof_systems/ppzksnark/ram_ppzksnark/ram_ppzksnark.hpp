@@ -43,8 +43,8 @@
 // <http://eprint.iacr.org/2013/879>
 //---------------------------------------------------------------------------///** @file
 
-#ifndef RAM_PPZKSNARK_HPP_
-#define RAM_PPZKSNARK_HPP_
+#ifndef CRYPTO3_ZK_RAM_PPZKSNARK_HPP_
+#define CRYPTO3_ZK_RAM_PPZKSNARK_HPP_
 
 #include <memory>
 

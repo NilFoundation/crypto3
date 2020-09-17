@@ -9,8 +9,8 @@
 // @file Declaration of interfaces for the TinyRAM argument decoder gadget.
 //---------------------------------------------------------------------------//
 
-#ifndef ARGUMENT_DECODER_GADGET_HPP_
-#define ARGUMENT_DECODER_GADGET_HPP_
+#ifndef CRYPTO3_ZK_ARGUMENT_DECODER_GADGET_HPP_
+#define CRYPTO3_ZK_ARGUMENT_DECODER_GADGET_HPP_
 
 #include <nil/crypto3/zk/snark/gadgets/cpu_checkers/tinyram/components/tinyram_protoboard.hpp>
 

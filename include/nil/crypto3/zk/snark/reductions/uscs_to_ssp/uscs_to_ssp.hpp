@@ -29,8 +29,8 @@
 // <http://eprint.iacr.org/2014/718>
 //---------------------------------------------------------------------------//
 
-#ifndef USCS_TO_SSP_HPP_
-#define USCS_TO_SSP_HPP_
+#ifndef CRYPTO3_ZK_USCS_TO_SSP_HPP_
+#define CRYPTO3_ZK_USCS_TO_SSP_HPP_
 
 #include <nil/algebra/fft/evaluation_domain.hpp>
 

@@ -52,10 +52,10 @@ namespace nil {
 
                     std::vector<algebra::Fr<snark_pp<CurveType>>> data;
                     data.reserve(example.constraint_system.num_inputs());
-                    std::vector<labelT> labels;
+                    std::vector<label_type> labels;
                     labels.reserve(example.constraint_system.num_inputs());
                     for (std::size_t i = 0; i < example.constraint_system.num_inputs(); i++) {
-                        labels.emplace_back(labelT());
+                        labels.emplace_back(label_type());
                         data.emplace_back(example.primary_input[i]);
                     }
                     std::vector<r1cs_ppzkadsnark_auth_data<CurveType>> auth_data =

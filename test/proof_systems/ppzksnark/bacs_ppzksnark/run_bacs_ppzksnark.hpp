@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_RUN_BACS_PPZKSNARK_HPP
-#define CRYPTO3_RUN_BACS_PPZKSNARK_HPP
+#ifndef CRYPTO3_ZK_RUN_BACS_PPZKSNARK_HPP
+#define CRYPTO3_ZK_RUN_BACS_PPZKSNARK_HPP
 
 #include "bacs_examples.hpp"
 

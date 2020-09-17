@@ -9,8 +9,8 @@
 // @file Declaration of interfaces for an auxiliarry gadget for the FOORAM CPU.
 //---------------------------------------------------------------------------//
 
-#ifndef BAR_GADGET_HPP_
-#define BAR_GADGET_HPP_
+#ifndef CRYPTO3_ZK_BAR_GADGET_HPP_
+#define CRYPTO3_ZK_BAR_GADGET_HPP_
 
 #include <nil/crypto3/zk/snark/gadget.hpp>
 #include <nil/crypto3/zk/snark/gadgets/basic_gadgets.hpp>

@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRH_GADGET_HPP_
-#define CRH_GADGET_HPP_
+#ifndef CRYPTO3_ZK_CRH_GADGET_HPP_
+#define CRYPTO3_ZK_CRH_GADGET_HPP_
 
 #include <nil/crypto3/zk/snark/gadgets/hashes/knapsack/knapsack_gadget.hpp>
 

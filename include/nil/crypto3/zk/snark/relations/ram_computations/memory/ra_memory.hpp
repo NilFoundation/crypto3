@@ -9,8 +9,8 @@
 // @file Declaration of interfaces for a random-access memory.
 //---------------------------------------------------------------------------//
 
-#ifndef RA_MEMORY_HPP_
-#define RA_MEMORY_HPP_
+#ifndef CRYPTO3_ZK_RA_MEMORY_HPP_
+#define CRYPTO3_ZK_RA_MEMORY_HPP_
 
 #include <nil/crypto3/zk/snark/relations/ram_computations/memory/memory_interface.hpp>
 

@@ -10,8 +10,8 @@
 // for a compliance predicate example.
 //---------------------------------------------------------------------------//
 
-#ifndef RUN_R1CS_MP_PPZKPCD_HPP_
-#define RUN_R1CS_MP_PPZKPCD_HPP_
+#ifndef CRYPTO3_ZK_RUN_R1CS_MP_PPZKPCD_HPP_
+#define CRYPTO3_ZK_RUN_R1CS_MP_PPZKPCD_HPP_
 
 #include <cstddef>
 #include <vector>

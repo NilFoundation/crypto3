@@ -9,8 +9,8 @@
 // @file Declaration of selector for the pairing gadget.
 //---------------------------------------------------------------------------//
 
-#ifndef PAIRING_PARAMS_HPP_
-#define PAIRING_PARAMS_HPP_
+#ifndef CRYPTO3_ZK_PAIRING_PARAMS_HPP_
+#define CRYPTO3_ZK_PAIRING_PARAMS_HPP_
 
 namespace nil {
     namespace crypto3 {

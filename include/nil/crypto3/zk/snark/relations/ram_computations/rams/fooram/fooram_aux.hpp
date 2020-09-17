@@ -9,8 +9,8 @@
 // @file Declaration of auxiliary functions for FOORAM.
 //---------------------------------------------------------------------------//
 
-#ifndef FOORAM_AUX_HPP_
-#define FOORAM_AUX_HPP_
+#ifndef CRYPTO3_ZK_FOORAM_AUX_HPP_
+#define CRYPTO3_ZK_FOORAM_AUX_HPP_
 
 #include <iostream>
 #include <vector>

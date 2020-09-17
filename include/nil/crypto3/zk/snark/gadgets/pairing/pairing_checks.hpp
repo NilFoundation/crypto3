@@ -13,8 +13,8 @@
 // - the gadget "check_e_equals_ee_gadget" checks the equation "e(P1,Q1)=e(P2,Q2)*e(P3,Q3)".
 //---------------------------------------------------------------------------//
 
-#ifndef PAIRING_CHECKS_HPP_
-#define PAIRING_CHECKS_HPP_
+#ifndef CRYPTO3_ZK_PAIRING_CHECKS_HPP_
+#define CRYPTO3_ZK_PAIRING_CHECKS_HPP_
 
 #include <memory>
 

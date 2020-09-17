@@ -9,8 +9,8 @@
 // @file Declaration of public parameters for FOORAM.
 //---------------------------------------------------------------------------//
 
-#ifndef FOORAM_PARAMS_HPP_
-#define FOORAM_PARAMS_HPP_
+#ifndef CRYPTO3_ZK_FOORAM_PARAMS_HPP_
+#define CRYPTO3_ZK_FOORAM_PARAMS_HPP_
 
 #include <nil/crypto3/zk/snark/gadgets/cpu_checkers/fooram/fooram_cpu_checker.hpp>
 #include <nil/crypto3/zk/snark/relations/ram_computations/rams/fooram/fooram_aux.hpp>

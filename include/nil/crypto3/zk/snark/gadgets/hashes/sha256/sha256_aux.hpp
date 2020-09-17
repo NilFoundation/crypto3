@@ -9,8 +9,8 @@
 // @file Declaration of interfaces for auxiliary gadgets for the SHA256 gadget.
 //---------------------------------------------------------------------------//
 
-#ifndef SHA256_AUX_HPP_
-#define SHA256_AUX_HPP_
+#ifndef CRYPTO3_ZK_SHA256_AUX_HPP_
+#define CRYPTO3_ZK_SHA256_AUX_HPP_
 
 #include <nil/crypto3/zk/snark/gadgets/basic_gadgets.hpp>
 

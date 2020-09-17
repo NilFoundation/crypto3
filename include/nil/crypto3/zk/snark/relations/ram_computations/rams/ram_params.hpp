@@ -9,8 +9,8 @@
 // @file Declaration of public-parameter selector for RAMs.
 //---------------------------------------------------------------------------//
 
-#ifndef RAM_PARAMS_HPP_
-#define RAM_PARAMS_HPP_
+#ifndef CRYPTO3_ZK_RAM_PARAMS_HPP_
+#define CRYPTO3_ZK_RAM_PARAMS_HPP_
 
 #include <vector>
 

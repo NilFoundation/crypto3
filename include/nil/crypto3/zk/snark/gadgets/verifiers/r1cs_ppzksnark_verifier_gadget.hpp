@@ -16,8 +16,8 @@
 // r1cs_ppzksnark_online_verifier_strong_IC. See r1cs_ppzksnark.hpp for description of the aforementioned functions.
 //---------------------------------------------------------------------------//
 
-#ifndef R1CS_PPZKSNARK_VERIFIER_GADGET_HPP_
-#define R1CS_PPZKSNARK_VERIFIER_GADGET_HPP_
+#ifndef CRYPTO3_ZK_R1CS_PPZKSNARK_VERIFIER_GADGET_HPP_
+#define CRYPTO3_ZK_R1CS_PPZKSNARK_VERIFIER_GADGET_HPP_
 
 #include <nil/crypto3/zk/snark/gadgets/basic_gadgets.hpp>
 #include <nil/crypto3/zk/snark/gadgets/curves/weierstrass_g1_gadget.hpp>

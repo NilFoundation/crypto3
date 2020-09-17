@@ -9,8 +9,8 @@
 // @file Declaration of interfaces for a protoboard for TinyRAM.
 //---------------------------------------------------------------------------//
 
-#ifndef TINYRAM_PROTOBOARD_HPP_
-#define TINYRAM_PROTOBOARD_HPP_
+#ifndef CRYPTO3_ZK_TINYRAM_PROTOBOARD_HPP_
+#define CRYPTO3_ZK_TINYRAM_PROTOBOARD_HPP_
 
 #include <nil/crypto3/zk/snark/gadgets/basic_gadgets.hpp>
 #include <nil/crypto3/zk/snark/protoboard.hpp>

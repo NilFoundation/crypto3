@@ -14,8 +14,8 @@
 // other auxiliary information), and then either accepts or rejects.
 //---------------------------------------------------------------------------//
 
-#ifndef COMPLIANCE_PREDICATE_HPP_
-#define COMPLIANCE_PREDICATE_HPP_
+#ifndef CRYPTO3_ZK_COMPLIANCE_PREDICATE_HPP_
+#define CRYPTO3_ZK_COMPLIANCE_PREDICATE_HPP_
 
 #include <memory>
 

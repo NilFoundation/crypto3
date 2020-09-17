@@ -10,8 +10,8 @@
 // prover, then verifier) on a synthetic R1CS instance.
 //---------------------------------------------------------------------------//
 
-#ifndef SET_MEMBERSHIP_PROOF_VARIABLE_HPP_
-#define SET_MEMBERSHIP_PROOF_VARIABLE_HPP_
+#ifndef CRYPTO3_ZK_SET_MEMBERSHIP_PROOF_VARIABLE_HPP_
+#define CRYPTO3_ZK_SET_MEMBERSHIP_PROOF_VARIABLE_HPP_
 
 #include <nil/crypto3/zk/snark/data_structures/set_commitment.hpp>
 #include <nil/crypto3/zk/snark/gadget.hpp>

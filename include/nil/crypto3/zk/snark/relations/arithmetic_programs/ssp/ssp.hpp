@@ -19,8 +19,8 @@
 // <http://eprint.iacr.org/2014/718>
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_SSP_HPP
-#define CRYPTO3_SSP_HPP
+#ifndef CRYPTO3_ZK_SSP_HPP
+#define CRYPTO3_ZK_SSP_HPP
 
 #include <map>
 #include <memory>

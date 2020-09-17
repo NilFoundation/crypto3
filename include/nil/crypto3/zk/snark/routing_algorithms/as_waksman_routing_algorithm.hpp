@@ -35,8 +35,8 @@
 // Parallel Processing Letters 2002
 //---------------------------------------------------------------------------//
 
-#ifndef AS_WAKSMAN_ROUTING_ALGORITHM_HPP_
-#define AS_WAKSMAN_ROUTING_ALGORITHM_HPP_
+#ifndef CRYPTO3_ZK_AS_WAKSMAN_ROUTING_ALGORITHM_HPP_
+#define CRYPTO3_ZK_AS_WAKSMAN_ROUTING_ALGORITHM_HPP_
 
 #include <cstddef>
 #include <map>

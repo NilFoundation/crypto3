@@ -11,8 +11,8 @@
 // The gadget checks the correct execution of a given TinyRAM instruction.
 //---------------------------------------------------------------------------//
 
-#ifndef ALU_GADGET_HPP_
-#define ALU_GADGET_HPP_
+#ifndef CRYPTO3_ZK_ALU_GADGET_HPP_
+#define CRYPTO3_ZK_ALU_GADGET_HPP_
 
 #include <nil/crypto3/zk/snark/gadgets/cpu_checkers/tinyram/components/alu_arithmetic.hpp>
 #include <nil/crypto3/zk/snark/gadgets/cpu_checkers/tinyram/components/alu_control_flow.hpp>

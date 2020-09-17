@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef PB_VARIABLE_HPP_
-#define PB_VARIABLE_HPP_
+#ifndef CRYPTO3_ZK_PB_VARIABLE_HPP_
+#define CRYPTO3_ZK_PB_VARIABLE_HPP_
 
 #include <cstddef>
 #include <string>

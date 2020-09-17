@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef MEMORY_CONTENTS_EXAMPLES_HPP_
-#define MEMORY_CONTENTS_EXAMPLES_HPP_
+#ifndef CRYPTO3_ZK_MEMORY_CONTENTS_EXAMPLES_HPP_
+#define CRYPTO3_ZK_MEMORY_CONTENTS_EXAMPLES_HPP_
 
 #include <nil/crypto3/zk/snark/relations/ram_computations/memory/memory_interface.hpp>
 

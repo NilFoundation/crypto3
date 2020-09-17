@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef SET_COMMITMENT_GADGET_HPP_
-#define SET_COMMITMENT_GADGET_HPP_
+#ifndef CRYPTO3_ZK_SET_COMMITMENT_GADGET_HPP_
+#define CRYPTO3_ZK_SET_COMMITMENT_GADGET_HPP_
 
 #include <nil/crypto3/zk/snark/gadget.hpp>
 #include <nil/crypto3/zk/snark/gadgets/basic_gadgets.hpp>

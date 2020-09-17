@@ -9,8 +9,8 @@
 // @file Declaration of interfaces for a memory interface.
 //---------------------------------------------------------------------------//
 
-#ifndef MEMORY_INTERFACE_HPP_
-#define MEMORY_INTERFACE_HPP_
+#ifndef CRYPTO3_ZK_MEMORY_INTERFACE_HPP_
+#define CRYPTO3_ZK_MEMORY_INTERFACE_HPP_
 
 #include <cstddef>
 #include <map>

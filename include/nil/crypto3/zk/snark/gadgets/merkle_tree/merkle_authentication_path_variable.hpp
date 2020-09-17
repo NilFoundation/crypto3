@@ -10,8 +10,8 @@
 // prover, then verifier) on a synthetic R1CS instance.
 //---------------------------------------------------------------------------//
 
-#ifndef MERKLE_AUTHENTICATION_PATH_VARIABLE_HPP_
-#define MERKLE_AUTHENTICATION_PATH_VARIABLE_HPP_
+#ifndef CRYPTO3_ZK_MERKLE_AUTHENTICATION_PATH_VARIABLE_HPP_
+#define CRYPTO3_ZK_MERKLE_AUTHENTICATION_PATH_VARIABLE_HPP_
 
 #include <nil/crypto3/zk/snark/merkle_tree.hpp>
 #include <nil/crypto3/zk/snark/gadget.hpp>

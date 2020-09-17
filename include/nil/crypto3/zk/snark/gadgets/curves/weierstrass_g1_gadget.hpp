@@ -12,8 +12,8 @@
 // is an elliptic curve over F in short Weierstrass form.
 //---------------------------------------------------------------------------//
 
-#ifndef WEIERSTRASS_G1_GADGET_HPP_
-#define WEIERSTRASS_G1_GADGET_HPP_
+#ifndef CRYPTO3_ZK_WEIERSTRASS_G1_GADGET_HPP_
+#define CRYPTO3_ZK_WEIERSTRASS_G1_GADGET_HPP_
 
 #include <nil/crypto3/zk/snark/gadget.hpp>
 #include <nil/crypto3/zk/snark/gadgets/pairing/pairing_params.hpp>

@@ -14,8 +14,8 @@
 // Above, TBCS stands for "Two-input Boolean Circuit Satisfiability".
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_TBCS_HPP
-#define CRYPTO3_TBCS_HPP
+#ifndef CRYPTO3_ZK_TBCS_HPP
+#define CRYPTO3_ZK_TBCS_HPP
 
 #include <nil/crypto3/zk/snark/relations/variable.hpp>
 

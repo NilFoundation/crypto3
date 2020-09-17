@@ -9,8 +9,8 @@
 // @file Generic PRF interface for ADSNARK.
 //---------------------------------------------------------------------------//
 
-#ifndef PRF_HPP_
-#define PRF_HPP_
+#ifndef CRYPTO3_ZK_PRF_HPP_
+#define CRYPTO3_ZK_PRF_HPP_
 
 #include <nil/crypto3/zk/snark/proof_systems/ppzkadsnark/r1cs_ppzkadsnark/r1cs_ppzkadsnark_params.hpp>
 
@@ -20,10 +20,10 @@ namespace nil {
             namespace snark {
 
                 template<typename CurveType>
-                r1cs_ppzkadsnark_prfKeyT<CurveType> prfGen();
+                r1cs_ppzkadsnark_prf_key<CurveType> prfGen();
 
                 template<typename CurveType>
-                CurveType::scalar_field_type::value_type prfCompute(const r1cs_ppzkadsnark_prfKeyT<CurveType> &key, const labelT &label);
+                CurveType::scalar_field_type::value_type prfCompute(const r1cs_ppzkadsnark_prf_key<CurveType> &key, const label_type &label);
 
             }    // namespace snark
         }        // namespace zk

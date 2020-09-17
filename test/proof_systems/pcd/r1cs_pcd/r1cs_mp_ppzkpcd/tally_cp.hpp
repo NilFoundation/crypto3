@@ -18,8 +18,8 @@
 // for code that uses the tally compliance predicate.
 //---------------------------------------------------------------------------//
 
-#ifndef TALLY_CP_HPP_
-#define TALLY_CP_HPP_
+#ifndef CRYPTO3_ZK_TALLY_CP_HPP_
+#define CRYPTO3_ZK_TALLY_CP_HPP_
 
 #include <nil/crypto3/zk/snark/gadgets/basic_gadgets.hpp>
 

@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef KC_MULTIEXP_HPP_
-#define KC_MULTIEXP_HPP_
+#ifndef CRYPTO3_ZK_KC_MULTIEXP_HPP_
+#define CRYPTO3_ZK_KC_MULTIEXP_HPP_
 
 /*
   Split out from multiexp to prevent cyclical

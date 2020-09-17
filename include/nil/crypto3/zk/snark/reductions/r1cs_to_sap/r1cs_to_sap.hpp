@@ -30,8 +30,8 @@
 // <https://eprint.iacr.org/2017/540>
 //---------------------------------------------------------------------------//
 
-#ifndef R1CS_TO_SAP_HPP_
-#define R1CS_TO_SAP_HPP_
+#ifndef CRYPTO3_ZK_R1CS_TO_SAP_HPP_
+#define CRYPTO3_ZK_R1CS_TO_SAP_HPP_
 
 #include <nil/algebra/fft/evaluation_domain.hpp>
 

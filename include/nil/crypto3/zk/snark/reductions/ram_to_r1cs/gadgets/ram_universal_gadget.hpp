@@ -39,8 +39,8 @@
 // <http://eprint.iacr.org/2013/879>
 //---------------------------------------------------------------------------//
 
-#ifndef RAM_UNIVERSAL_GADGET_HPP_
-#define RAM_UNIVERSAL_GADGET_HPP_
+#ifndef CRYPTO3_ZK_RAM_UNIVERSAL_GADGET_HPP_
+#define CRYPTO3_ZK_RAM_UNIVERSAL_GADGET_HPP_
 
 #include <nil/crypto3/zk/snark/gadgets/routing/as_waksman_routing_gadget.hpp>
 #include <nil/crypto3/zk/snark/reductions/ram_to_r1cs/gadgets/memory_checker_gadget.hpp>

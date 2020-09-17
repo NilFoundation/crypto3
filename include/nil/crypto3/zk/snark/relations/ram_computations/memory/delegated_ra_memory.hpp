@@ -9,8 +9,8 @@
 // @file Declaration of interfaces for a delegated random-access memory.
 //---------------------------------------------------------------------------//
 
-#ifndef DELEGATED_RA_MEMORY_HPP_
-#define DELEGATED_RA_MEMORY_HPP_
+#ifndef CRYPTO3_ZK_DELEGATED_RA_MEMORY_HPP_
+#define CRYPTO3_ZK_DELEGATED_RA_MEMORY_HPP_
 
 #include <map>
 #include <memory>

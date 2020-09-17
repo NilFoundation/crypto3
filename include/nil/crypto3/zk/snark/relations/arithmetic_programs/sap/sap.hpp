@@ -20,8 +20,8 @@
 // <https://eprint.iacr.org/2017/540>
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_SAP_HPP
-#define CRYPTO3_SAP_HPP
+#ifndef CRYPTO3_ZK_SAP_HPP
+#define CRYPTO3_ZK_SAP_HPP
 
 #include <map>
 #include <memory>

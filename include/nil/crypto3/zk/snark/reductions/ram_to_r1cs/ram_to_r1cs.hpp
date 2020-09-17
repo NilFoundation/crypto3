@@ -13,8 +13,8 @@
 // where most of the work is done. See gadgets/ram_universal_gadget.hpp for details.
 //---------------------------------------------------------------------------//
 
-#ifndef RAM_TO_R1CS_HPP_
-#define RAM_TO_R1CS_HPP_
+#ifndef CRYPTO3_ZK_RAM_TO_R1CS_HPP_
+#define CRYPTO3_ZK_RAM_TO_R1CS_HPP_
 
 #include <nil/crypto3/zk/snark/reductions/ram_to_r1cs/gadgets/ram_universal_gadget.hpp>
 

@@ -12,8 +12,8 @@
 // Fp2 = Fp[U]/(U^2-non_residue) and non_residue is in Fp.
 //---------------------------------------------------------------------------//
 
-#ifndef FP4_GADGETS_HPP_
-#define FP4_GADGETS_HPP_
+#ifndef CRYPTO3_ZK_FP4_GADGETS_HPP_
+#define CRYPTO3_ZK_FP4_GADGETS_HPP_
 
 #include <nil/crypto3/zk/snark/gadget.hpp>
 #include <nil/crypto3/zk/snark/gadgets/fields/fp2_gadgets.hpp>

@@ -11,8 +11,8 @@
 // This gadget check the correct execution of control-flow TinyRAM instructions.
 //---------------------------------------------------------------------------//
 
-#ifndef ALU_CONTROL_FLOW_HPP_
-#define ALU_CONTROL_FLOW_HPP_
+#ifndef CRYPTO3_ZK_ALU_CONTROL_FLOW_HPP_
+#define CRYPTO3_ZK_ALU_CONTROL_FLOW_HPP_
 
 #include <nil/crypto3/zk/snark/gadgets/basic_gadgets.hpp>
 #include <nil/crypto3/zk/snark/gadgets/cpu_checkers/tinyram/components/tinyram_protoboard.hpp>

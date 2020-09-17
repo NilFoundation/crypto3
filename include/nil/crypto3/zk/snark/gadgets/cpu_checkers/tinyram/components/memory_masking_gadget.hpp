@@ -9,8 +9,8 @@
 // @file Declaration of interfaces for the TinyRAM consistency enforcer gadget.
 //---------------------------------------------------------------------------//
 
-#ifndef MEMORY_MASKING_GADGET_HPP_
-#define MEMORY_MASKING_GADGET_HPP_
+#ifndef CRYPTO3_ZK_MEMORY_MASKING_GADGET_HPP_
+#define CRYPTO3_ZK_MEMORY_MASKING_GADGET_HPP_
 
 #include <nil/crypto3/zk/snark/gadgets/cpu_checkers/tinyram/components/tinyram_protoboard.hpp>
 #include <nil/crypto3/zk/snark/gadgets/cpu_checkers/tinyram/components/word_variable_gadget.hpp>

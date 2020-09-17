@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef ED25519SIG_HPP_
-#define ED25519SIG_HPP_
+#ifndef CRYPTO3_ZK_ED25519SIG_HPP_
+#define CRYPTO3_ZK_ED25519SIG_HPP_
 
 #include <nil/crypto3/zk/snark/proof_systems/ppzkadsnark/r1cs_ppzkadsnark/r1cs_ppzkadsnark_signature.hpp>
 
@@ -41,7 +41,7 @@ namespace nil {
 
                 template<>
                 ed25519_sigT sigSign<default_r1cs_ppzkadsnark_pp>(
-                    const ed25519_skT &sk, const labelT &label,
+                    const ed25519_skT &sk, const label_type &label,
                     const snark_pp<default_r1cs_ppzkadsnark_pp>::g2_type &Lambda) {
                     ed25519_sigT sigma;
                     unsigned long long sigmalen;
@@ -74,7 +74,7 @@ namespace nil {
 
                 template<>
                 bool sigVerif<default_r1cs_ppzkadsnark_pp>(
-                    const ed25519_vkT &vk, const labelT &label,
+                    const ed25519_vkT &vk, const label_type &label,
                     const snark_pp<default_r1cs_ppzkadsnark_pp>::g2_type &Lambda, const ed25519_sigT &sig) {
                     unsigned long long msglen;
                     unsigned char message[64 + 16 + 320];
@@ -104,7 +104,7 @@ namespace nil {
 
                 template<>
                 bool sigBatchVerif<default_r1cs_ppzkadsnark_pp>(
-                    const ed25519_vkT &vk, const std::vector<labelT> &labels,
+                    const ed25519_vkT &vk, const std::vector<label_type> &labels,
                     const std::vector<snark_pp<default_r1cs_ppzkadsnark_pp>::g2_type> &Lambdas,
                     const std::vector<ed25519_sigT> &sigs) {
                     std::stringstream stream;

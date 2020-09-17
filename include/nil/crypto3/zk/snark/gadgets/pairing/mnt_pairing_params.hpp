@@ -13,8 +13,8 @@
 // See pairing_params.hpp .
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_MNT_PAIRING_PARAMS_HPP
-#define CRYPTO3_MNT_PAIRING_PARAMS_HPP
+#ifndef CRYPTO3_ZK_MNT_PAIRING_PARAMS_HPP
+#define CRYPTO3_ZK_MNT_PAIRING_PARAMS_HPP
 
 #include <nil/crypto3/zk/snark/gadgets/fields/fp2_gadgets.hpp>
 #include <nil/crypto3/zk/snark/gadgets/fields/fp3_gadgets.hpp>

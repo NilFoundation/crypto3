@@ -9,8 +9,8 @@
 // @file Declaration of interfaces for a memory store trace.
 //---------------------------------------------------------------------------//
 
-#ifndef MEMORY_STORE_TRACE_HPP_
-#define MEMORY_STORE_TRACE_HPP_
+#ifndef CRYPTO3_ZK_MEMORY_STORE_TRACE_HPP_
+#define CRYPTO3_ZK_MEMORY_STORE_TRACE_HPP_
 
 #include <nil/crypto3/zk/snark/relations/ram_computations/memory/memory_interface.hpp>
 

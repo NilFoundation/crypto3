@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef DIGEST_SELECTOR_GADGET_HPP_
-#define DIGEST_SELECTOR_GADGET_HPP_
+#ifndef CRYPTO3_ZK_DIGEST_SELECTOR_GADGET_HPP_
+#define CRYPTO3_ZK_DIGEST_SELECTOR_GADGET_HPP_
 
 #include <vector>
 

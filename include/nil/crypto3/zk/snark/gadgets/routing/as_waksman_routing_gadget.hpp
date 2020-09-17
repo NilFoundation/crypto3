@@ -12,8 +12,8 @@
 // by use of an AS-Waksman network.
 //---------------------------------------------------------------------------//
 
-#ifndef AS_WAKSMAN_ROUTING_GADGET_HPP_
-#define AS_WAKSMAN_ROUTING_GADGET_HPP_
+#ifndef CRYPTO3_ZK_AS_WAKSMAN_ROUTING_GADGET_HPP_
+#define CRYPTO3_ZK_AS_WAKSMAN_ROUTING_GADGET_HPP_
 
 #include <nil/crypto3/zk/snark/integer_permutation.hpp>
 #include <nil/crypto3/zk/snark/routing_algorithms/as_waksman_routing_algorithm.hpp>

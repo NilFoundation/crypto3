@@ -26,8 +26,8 @@
 // <http://www0.cs.ucl.ac.uk/staff/J.Groth/NIZKJournal.pdf>
 //---------------------------------------------------------------------------//
 
-#ifndef TBCS_TO_USCS_HPP_
-#define TBCS_TO_USCS_HPP_
+#ifndef CRYPTO3_ZK_TBCS_TO_USCS_HPP_
+#define CRYPTO3_ZK_TBCS_TO_USCS_HPP_
 
 #include <nil/crypto3/zk/snark/relations/circuit_satisfaction_problems/tbcs/tbcs.hpp>
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/uscs/uscs.hpp>

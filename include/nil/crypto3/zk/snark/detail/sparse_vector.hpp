@@ -9,8 +9,8 @@
 // @file Declaration of interfaces for a sparse vector.
 //---------------------------------------------------------------------------//
 
-#ifndef SPARSE_VECTOR_HPP_
-#define SPARSE_VECTOR_HPP_
+#ifndef CRYPTO3_ZK_SPARSE_VECTOR_HPP_
+#define CRYPTO3_ZK_SPARSE_VECTOR_HPP_
 
 #include <iostream>
 #include <vector>

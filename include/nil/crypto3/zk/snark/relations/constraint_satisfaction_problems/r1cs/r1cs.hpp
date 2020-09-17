@@ -15,8 +15,8 @@
 // Above, R1CS stands for "Rank-1 Constraint System".
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_R1CS_HPP
-#define CRYPTO3_R1CS_HPP
+#ifndef CRYPTO3_ZK_R1CS_HPP
+#define CRYPTO3_ZK_R1CS_HPP
 
 #include <cstdlib>
 #include <iostream>

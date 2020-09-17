@@ -12,8 +12,8 @@
 // It relies on classes declared in gadgets.
 //---------------------------------------------------------------------------//
 
-#ifndef CP_HANDLER_HPP_
-#define CP_HANDLER_HPP_
+#ifndef CRYPTO3_ZK_CP_HANDLER_HPP_
+#define CRYPTO3_ZK_CP_HANDLER_HPP_
 
 #include <numeric>
 

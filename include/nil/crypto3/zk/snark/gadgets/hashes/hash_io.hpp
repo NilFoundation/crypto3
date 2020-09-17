@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef HASH_IO_HPP_
-#define HASH_IO_HPP_
+#ifndef CRYPTO3_ZK_HASH_IO_HPP_
+#define CRYPTO3_ZK_HASH_IO_HPP_
 
 #include <cstddef>
 #include <vector>

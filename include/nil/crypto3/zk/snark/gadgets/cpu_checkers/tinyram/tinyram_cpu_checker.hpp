@@ -11,8 +11,8 @@
 // The gadget checks the correct operation for the CPU of the TinyRAM architecture.
 //---------------------------------------------------------------------------//
 
-#ifndef TINYRAM_CPU_CHECKER_HPP_
-#define TINYRAM_CPU_CHECKER_HPP_
+#ifndef CRYPTO3_ZK_TINYRAM_CPU_CHECKER_HPP_
+#define CRYPTO3_ZK_TINYRAM_CPU_CHECKER_HPP_
 
 #include <nil/crypto3/zk/snark/gadgets/cpu_checkers/tinyram/components/alu_gadget.hpp>
 #include <nil/crypto3/zk/snark/gadgets/cpu_checkers/tinyram/components/argument_decoder_gadget.hpp>

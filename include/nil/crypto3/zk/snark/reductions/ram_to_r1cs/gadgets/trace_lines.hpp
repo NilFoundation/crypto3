@@ -9,8 +9,8 @@
 // @file Declaration of interfaces for trace-line variables.
 //---------------------------------------------------------------------------//
 
-#ifndef TRACE_LINES_HPP_
-#define TRACE_LINES_HPP_
+#ifndef CRYPTO3_ZK_TRACE_LINES_HPP_
+#define CRYPTO3_ZK_TRACE_LINES_HPP_
 
 #include <memory>
 

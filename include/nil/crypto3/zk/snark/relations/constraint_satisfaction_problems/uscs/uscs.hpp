@@ -14,8 +14,8 @@
 // Above, USCS stands for "Unitary-Square Constraint System".
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_USCS_HPP
-#define CRYPTO3_USCS_HPP
+#ifndef CRYPTO3_ZK_USCS_HPP
+#define CRYPTO3_ZK_USCS_HPP
 
 #include <cstdlib>
 #include <iostream>

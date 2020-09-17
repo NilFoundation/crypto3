@@ -34,8 +34,8 @@
 // <http://eprint.iacr.org/2014/595>
 //---------------------------------------------------------------------------//
 
-#ifndef RAM_COMPLIANCE_PREDICATE_HPP_
-#define RAM_COMPLIANCE_PREDICATE_HPP_
+#ifndef CRYPTO3_ZK_RAM_COMPLIANCE_PREDICATE_HPP_
+#define CRYPTO3_ZK_RAM_COMPLIANCE_PREDICATE_HPP_
 
 #include <numeric>
 

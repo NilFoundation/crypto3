@@ -16,8 +16,8 @@
 // Above, BACS stands for "Bilinear Arithmetic Circuit Satisfiability".
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_BACS_HPP
-#define CRYPTO3_BACS_HPP
+#ifndef CRYPTO3_ZK_BACS_HPP
+#define CRYPTO3_ZK_BACS_HPP
 
 #include <vector>
 

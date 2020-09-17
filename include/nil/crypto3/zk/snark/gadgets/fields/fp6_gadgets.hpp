@@ -12,8 +12,8 @@
 // Fp3 = Fp[X]/(X^3-non_residue) and non_residue is in Fp.
 //---------------------------------------------------------------------------//
 
-#ifndef FP6_GADGETS_HPP_
-#define FP6_GADGETS_HPP_
+#ifndef CRYPTO3_ZK_FP6_GADGETS_HPP_
+#define CRYPTO3_ZK_FP6_GADGETS_HPP_
 
 #include <nil/crypto3/zk/snark/gadget.hpp>
 #include <nil/crypto3/zk/snark/gadgets/fields/fp2_gadgets.hpp>

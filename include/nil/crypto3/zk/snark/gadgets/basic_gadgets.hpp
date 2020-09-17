@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef BASIC_GADGETS_HPP_
-#define BASIC_GADGETS_HPP_
+#ifndef CRYPTO3_ZK_BASIC_GADGETS_HPP_
+#define CRYPTO3_ZK_BASIC_GADGETS_HPP_
 
 #include <cassert>
 #include <memory>

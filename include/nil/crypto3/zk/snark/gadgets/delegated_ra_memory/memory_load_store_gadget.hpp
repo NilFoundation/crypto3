@@ -12,8 +12,8 @@
 // same address, from a "delegated memory".
 //---------------------------------------------------------------------------//
 
-#ifndef MEMORY_LOAD_STORE_GADGET_HPP_
-#define MEMORY_LOAD_STORE_GADGET_HPP_
+#ifndef CRYPTO3_ZK_MEMORY_LOAD_STORE_GADGET_HPP_
+#define CRYPTO3_ZK_MEMORY_LOAD_STORE_GADGET_HPP_
 
 #include <nil/crypto3/zk/snark/gadgets/merkle_tree/merkle_tree_check_update_gadget.hpp>
 

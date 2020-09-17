@@ -9,8 +9,8 @@
 // @file Declaration of interfaces for a gadget that can be created from an R1CS constraint system.
 //---------------------------------------------------------------------------//
 
-#ifndef GADGET_FROM_R1CS_HPP_
-#define GADGET_FROM_R1CS_HPP_
+#ifndef CRYPTO3_ZK_GADGET_FROM_R1CS_HPP_
+#define CRYPTO3_ZK_GADGET_FROM_R1CS_HPP_
 
 #include <map>
 

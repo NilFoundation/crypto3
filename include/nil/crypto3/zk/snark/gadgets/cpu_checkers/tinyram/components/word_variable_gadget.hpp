@@ -9,8 +9,8 @@
 // @file Declaration of interfaces for (single and double) word gadgets.
 //---------------------------------------------------------------------------//
 
-#ifndef WORD_VARIABLE_GADGET_HPP_
-#define WORD_VARIABLE_GADGET_HPP_
+#ifndef CRYPTO3_ZK_WORD_VARIABLE_GADGET_HPP_
+#define CRYPTO3_ZK_WORD_VARIABLE_GADGET_HPP_
 
 #include <nil/crypto3/zk/snark/gadgets/cpu_checkers/tinyram/components/tinyram_protoboard.hpp>
 

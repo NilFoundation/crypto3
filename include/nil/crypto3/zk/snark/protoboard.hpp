@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef PROTOBOARD_HPP_
-#define PROTOBOARD_HPP_
+#ifndef CRYPTO3_ZK_PROTOBOARD_HPP_
+#define CRYPTO3_ZK_PROTOBOARD_HPP_
 
 #include <algorithm>
 #include <cassert>

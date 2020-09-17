@@ -29,8 +29,8 @@
 // <http://eprint.iacr.org/2012/215>
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_R1CS_TO_QAP_HPP
-#define CRYPTO3_R1CS_TO_QAP_HPP
+#ifndef CRYPTO3_ZK_R1CS_TO_QAP_HPP
+#define CRYPTO3_ZK_R1CS_TO_QAP_HPP
 
 #include <nil/algebra/fft/coset.hpp>
 #include <nil/algebra/fft/evaluation_domain.hpp>

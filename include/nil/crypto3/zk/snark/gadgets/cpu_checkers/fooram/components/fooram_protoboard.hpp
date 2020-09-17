@@ -9,8 +9,8 @@
 // @file Declaration of interfaces for a protoboard for the FOORAM CPU.
 //---------------------------------------------------------------------------//
 
-#ifndef FOORAM_PROTOBOARD_HPP_
-#define FOORAM_PROTOBOARD_HPP_
+#ifndef CRYPTO3_ZK_FOORAM_PROTOBOARD_HPP_
+#define CRYPTO3_ZK_FOORAM_PROTOBOARD_HPP_
 
 #include <nil/crypto3/zk/snark/gadget.hpp>
 #include <nil/crypto3/zk/snark/relations/ram_computations/rams/fooram/fooram_aux.hpp>

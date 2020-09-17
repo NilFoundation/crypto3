@@ -9,8 +9,8 @@
 // @file Generic signature interface for ADSNARK.
 //---------------------------------------------------------------------------//
 
-#ifndef SIGNATURE_HPP_
-#define SIGNATURE_HPP_
+#ifndef CRYPTO3_ZK_SIGNATURE_HPP_
+#define CRYPTO3_ZK_SIGNATURE_HPP_
 
 #include <nil/crypto3/zk/snark/proof_systems/ppzkadsnark/r1cs_ppzkadsnark/r1cs_ppzkadsnark_params.hpp>
 
@@ -22,7 +22,7 @@ namespace nil {
                 template<typename CurveType>
                 class kpT {
                 public:
-                    r1cs_ppzkadsnark_skT<CurveType> sk;
+                    r1cs_ppzkadsnark_secret_key<CurveType> sk;
                     r1cs_ppzkadsnark_vkT<CurveType> vk;
                 };
 
@@ -30,17 +30,17 @@ namespace nil {
                 kpT<CurveType> sigGen(void);
 
                 template<typename CurveType>
-                r1cs_ppzkadsnark_sigT<CurveType> sigSign(const r1cs_ppzkadsnark_skT<CurveType> &sk, const labelT &label,
-                                                   const CurveType::g2_type &Lambda);
+                r1cs_ppzkadsnark_signature<CurveType> sigSign(const r1cs_ppzkadsnark_secret_key<CurveType> &sk, const label_type &label,
+                                                   const typename CurveType::g2_type &Lambda);
 
                 template<typename CurveType>
-                bool sigVerif(const r1cs_ppzkadsnark_vkT<CurveType> &vk, const labelT &label,
-                              const CurveType::g2_type &Lambda, const r1cs_ppzkadsnark_sigT<CurveType> &sig);
+                bool sigVerif(const r1cs_ppzkadsnark_vkT<CurveType> &vk, const label_type &label,
+                              const typename CurveType::g2_type &Lambda, const r1cs_ppzkadsnark_signature<CurveType> &sig);
 
                 template<typename CurveType>
-                bool sigBatchVerif(const r1cs_ppzkadsnark_vkT<CurveType> &vk, const std::vector<labelT> &labels,
-                                   const std::vector<CurveType::g2_type> &Lambdas,
-                                   const std::vector<r1cs_ppzkadsnark_sigT<CurveType>> &sigs);
+                bool sigBatchVerif(const r1cs_ppzkadsnark_vkT<CurveType> &vk, const std::vector<label_type> &labels,
+                                   const std::vector<typename CurveType::g2_type> &Lambdas,
+                                   const std::vector<r1cs_ppzkadsnark_signature<CurveType>> &sigs);
 
             }    // namespace snark
         }        // namespace zk

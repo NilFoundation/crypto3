@@ -19,8 +19,8 @@
 // <http://eprint.iacr.org/2012/215>
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_QAP_HPP
-#define CRYPTO3_QAP_HPP
+#ifndef CRYPTO3_ZK_QAP_HPP
+#define CRYPTO3_ZK_QAP_HPP
 
 #include <map>
 #include <memory>

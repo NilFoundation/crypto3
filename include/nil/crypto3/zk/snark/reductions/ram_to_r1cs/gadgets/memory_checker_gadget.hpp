@@ -10,8 +10,8 @@
 // consistency of two accesses to memory that are adjacent in a "memory sort".
 //---------------------------------------------------------------------------//
 
-#ifndef MEMORY_CHECKER_GADGET_HPP_
-#define MEMORY_CHECKER_GADGET_HPP_
+#ifndef CRYPTO3_ZK_MEMORY_CHECKER_GADGET_HPP_
+#define CRYPTO3_ZK_MEMORY_CHECKER_GADGET_HPP_
 
 #include <nil/crypto3/zk/snark/reductions/ram_to_r1cs/gadgets/trace_lines.hpp>
 

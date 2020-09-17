@@ -22,8 +22,8 @@
 // E.g. for the first 200 steps on 16 cell machine we get 93 different memory configurations.
 //---------------------------------------------------------------------------//
 
-#ifndef FOORAM_CPU_CHECKER_HPP_
-#define FOORAM_CPU_CHECKER_HPP_
+#ifndef CRYPTO3_ZK_FOORAM_CPU_CHECKER_HPP_
+#define CRYPTO3_ZK_FOORAM_CPU_CHECKER_HPP_
 
 #include <cstddef>
 #include <memory>

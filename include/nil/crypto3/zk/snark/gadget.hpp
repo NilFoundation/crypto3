@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef GADGET_HPP_
-#define GADGET_HPP_
+#ifndef CRYPTO3_ZK_GADGET_HPP_
+#define CRYPTO3_ZK_GADGET_HPP_
 
 #include <nil/crypto3/zk/snark/protoboard.hpp>
 

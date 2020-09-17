@@ -31,8 +31,8 @@
 // - ppzkSNARK = "PreProcessing Zero-Knowledge Succinct Non-interactive ARgument of Knowledge"
 //---------------------------------------------------------------------------//
 
-#ifndef TBCS_PPZKSNARK_HPP_
-#define TBCS_PPZKSNARK_HPP_
+#ifndef CRYPTO3_ZK_TBCS_PPZKSNARK_HPP_
+#define CRYPTO3_ZK_TBCS_PPZKSNARK_HPP_
 
 #include <nil/crypto3/zk/snark/relations/circuit_satisfaction_problems/tbcs/tbcs.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/tbcs_ppzksnark/tbcs_ppzksnark_params.hpp>

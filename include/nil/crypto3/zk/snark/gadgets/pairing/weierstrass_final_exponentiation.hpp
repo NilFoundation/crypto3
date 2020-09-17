@@ -12,8 +12,8 @@
 // degrees 4 and 6.
 //---------------------------------------------------------------------------//
 
-#ifndef WEIERSTRASS_FINAL_EXPONENTIATION_HPP_
-#define WEIERSTRASS_FINAL_EXPONENTIATION_HPP_
+#ifndef CRYPTO3_ZK_WEIERSTRASS_FINAL_EXPONENTIATION_HPP_
+#define CRYPTO3_ZK_WEIERSTRASS_FINAL_EXPONENTIATION_HPP_
 
 #include <memory>
 

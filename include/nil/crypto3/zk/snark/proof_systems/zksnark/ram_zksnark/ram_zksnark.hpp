@@ -37,8 +37,8 @@
 // <http://eprint.iacr.org/2014/595>
 //---------------------------------------------------------------------------//
 
-#ifndef RAM_ZKSNARK_HPP_
-#define RAM_ZKSNARK_HPP_
+#ifndef CRYPTO3_ZK_RAM_ZKSNARK_HPP_
+#define CRYPTO3_ZK_RAM_ZKSNARK_HPP_
 
 #include <memory>
 

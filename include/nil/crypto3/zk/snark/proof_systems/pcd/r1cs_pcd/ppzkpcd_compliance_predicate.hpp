@@ -9,8 +9,8 @@
 // @file Template aliasing for prettifying R1CS PCD interfaces.
 //---------------------------------------------------------------------------//
 
-#ifndef PPZKPCD_COMPLIANCE_PREDICATE_HPP_
-#define PPZKPCD_COMPLIANCE_PREDICATE_HPP_
+#ifndef CRYPTO3_ZK_PPZKPCD_COMPLIANCE_PREDICATE_HPP_
+#define CRYPTO3_ZK_PPZKPCD_COMPLIANCE_PREDICATE_HPP_
 
 #include <nil/crypto3/zk/snark/proof_systems/pcd/r1cs_pcd/compliance_predicate/compliance_predicate.hpp>
 

@@ -9,8 +9,8 @@
 // @file Declaration of auxiliary functions for TinyRAM.
 //---------------------------------------------------------------------------//
 
-#ifndef TINYRAM_AUX_HPP_
-#define TINYRAM_AUX_HPP_
+#ifndef CRYPTO3_ZK_TINYRAM_AUX_HPP_
+#define CRYPTO3_ZK_TINYRAM_AUX_HPP_
 
 #include <cassert>
 #include <iostream>
