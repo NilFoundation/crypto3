@@ -111,15 +111,15 @@ namespace nil {
                             gate.is_circuit_output = true;
                             const var_index_t var_idx =
                                 std::rand() % (1 + primary_input_size + std::min(num_gates - num_outputs, i));
-                            const FieldType var_val = (var_idx == 0 ? FieldType::one() : all_vals[var_idx - 1]);
+                            const FieldType::value_type var_val = (var_idx == 0 ? FieldType::value_type::zero() : all_vals[var_idx - 1]);
 
                             if (std::rand() % 2 == 0) {
-                                const FieldType lhs_val = gate.lhs.evaluate(all_vals);
-                                const FieldType coeff = -(lhs_val * var_val.inverse());
+                                const FieldType::value_type lhs_val = gate.lhs.evaluate(all_vals);
+                                const FieldType::value_type coeff = -(lhs_val * var_val.inverse());
                                 gate.lhs = gate.lhs + coeff * variable<FieldType>(var_idx);
                             } else {
-                                const FieldType rhs_val = gate.rhs.evaluate(all_vals);
-                                const FieldType coeff = -(rhs_val * var_val.inverse());
+                                const FieldType::value_type rhs_val = gate.rhs.evaluate(all_vals);
+                                const FieldType::value_type coeff = -(rhs_val * var_val.inverse());
                                 gate.rhs = gate.rhs + coeff * variable<FieldType>(var_idx);
                             }
 

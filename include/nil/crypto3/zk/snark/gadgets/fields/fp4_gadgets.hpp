@@ -398,7 +398,7 @@ namespace nil {
                 template<typename Fp4T>
                 void Fp4_direct_mul_gadget<Fp4T>::generate_r1cs_constraints() {
                     const typename FieldType::value_type beta = Fp4T::non_residue;
-                    const typename FieldType::value_type u = (FieldType::one() - beta).inverse();
+                    const typename FieldType::value_type u = (FieldType::value_type::zero() - beta).inverse();
 
                     const pb_linear_combination<FieldType> &a0 = A.c0.c0, &a1 = A.c1.c0, &a2 = A.c0.c1, &a3 = A.c1.c1,
                                                            &b0 = B.c0.c0, &b1 = B.c1.c0, &b2 = B.c0.c1, &b3 = B.c1.c1,

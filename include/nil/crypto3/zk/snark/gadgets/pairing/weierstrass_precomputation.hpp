@@ -401,7 +401,7 @@ namespace nil {
                     next_RX_plus_two_RX.reset(new Fqe_variable<CurveType>(*(next.RX) + *(cur.RX) * typename FieldType::value_type(2)));
                     compute_next_RX.reset(new Fqe_sqr_gadget<CurveType>(pb, *(cur.gamma), *next_RX_plus_two_RX));
 
-                    RX_minus_next_RX.reset(new Fqe_variable<CurveType>(*(cur.RX) + *(next.RX) * (-FieldType::one())));
+                    RX_minus_next_RX.reset(new Fqe_variable<CurveType>(*(cur.RX) + *(next.RX) * (-FieldType::value_type::zero())));
                     RY_plus_next_RY.reset(new Fqe_variable<CurveType>(*(cur.RY) + *(next.RY)));
                     compute_next_RY.reset(
                         new Fqe_mul_gadget<CurveType>(pb, *(cur.gamma), *RX_minus_next_RX, *RY_plus_next_RY));
@@ -470,16 +470,16 @@ namespace nil {
                     gadget<FieldType>(pb),
                     invert_Q(invert_Q), cur(cur), next(next), Q(Q) {
                     RY_minus_QY.reset(
-                        new Fqe_variable<CurveType>(*(cur.RY) + *(Q.Y) * (!invert_Q ? -FieldType::one() : FieldType::one())));
+                        new Fqe_variable<CurveType>(*(cur.RY) + *(Q.Y) * (!invert_Q ? -FieldType::value_type::zero() : FieldType::value_type::zero())));
 
-                    RX_minus_QX.reset(new Fqe_variable<CurveType>(*(cur.RX) + *(Q.X) * (-FieldType::one())));
+                    RX_minus_QX.reset(new Fqe_variable<CurveType>(*(cur.RX) + *(Q.X) * (-FieldType::value_type::zero())));
                     compute_gamma.reset(new Fqe_mul_gadget<CurveType>(pb, *(cur.gamma), *RX_minus_QX, *RY_minus_QY));
                     compute_gamma_X.reset(new Fqe_mul_gadget<CurveType>(pb, *(cur.gamma), *(Q.X), *(cur.gamma_X)));
 
                     next_RX_plus_RX_plus_QX.reset(new Fqe_variable<CurveType>(*(next.RX) + *(cur.RX) + *(Q.X)));
                     compute_next_RX.reset(new Fqe_sqr_gadget<CurveType>(pb, *(cur.gamma), *next_RX_plus_RX_plus_QX));
 
-                    RX_minus_next_RX.reset(new Fqe_variable<CurveType>(*(cur.RX) + *(next.RX) * (-FieldType::one())));
+                    RX_minus_next_RX.reset(new Fqe_variable<CurveType>(*(cur.RX) + *(next.RX) * (-FieldType::value_type::zero())));
                     RY_plus_next_RY.reset(new Fqe_variable<CurveType>(*(cur.RY) + *(next.RY)));
                     compute_next_RY.reset(
                         new Fqe_mul_gadget<CurveType>(pb, *(cur.gamma), *RX_minus_next_RX, *RY_plus_next_RY));

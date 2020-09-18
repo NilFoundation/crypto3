@@ -54,7 +54,7 @@ namespace nil {
                 template<typename FieldType>
                 ssp_instance_evaluation<FieldType>
                     uscs_to_ssp_instance_map_with_evaluation(const uscs_constraint_system<FieldType> &cs,
-                                                             const FieldType &t);
+                                                             const FieldType::value_type &t);
 
                 /**
                  * Witness map for the USCS-to-SSP reduction.
@@ -65,7 +65,7 @@ namespace nil {
                 ssp_witness<FieldType> uscs_to_ssp_witness_map(const uscs_constraint_system<FieldType> &cs,
                                                                const uscs_primary_input<FieldType> &primary_input,
                                                                const uscs_auxiliary_input<FieldType> &auxiliary_input,
-                                                               const FieldType &d);
+                                                               const FieldType::value_type &d);
 
                 /**
                  * Instance map for the USCS-to-SSP reduction.
@@ -89,7 +89,7 @@ namespace nil {
                         }
                     }
                     for (std::size_t i = cs.num_constraints(); i < domain->m; ++i) {
-                        V_in_Lagrange_basis[0][i] += FieldType::one();
+                        V_in_Lagrange_basis[0][i] += FieldType::value_type::zero();
                     }
 
                     return ssp_instance<FieldType>(
@@ -111,14 +111,14 @@ namespace nil {
                 template<typename FieldType>
                 ssp_instance_evaluation<FieldType>
                     uscs_to_ssp_instance_map_with_evaluation(const uscs_constraint_system<FieldType> &cs,
-                                                             const FieldType &t) {
+                                                             const FieldType::value_type &t) {
                     const std::shared_ptr<algebra::fft::evaluation_domain<FieldType>> domain =
                         algebra::fft::make_evaluation_domain<FieldType>(cs.num_constraints());
 
-                    std::vector<typename FieldType::value_type> Vt(cs.num_variables() + 1, FieldType::zero());
+                    std::vector<typename FieldType::value_type> Vt(cs.num_variables() + 1, FieldType::value_type::zero());
                     std::vector<typename FieldType::value_type> Ht(domain->m + 1);
 
-                    const FieldType Zt = domain->compute_vanishing_polynomial(t);
+                    const FieldType::value_type Zt = domain->compute_vanishing_polynomial(t);
 
                     const std::vector<typename FieldType::value_type> u = domain->evaluate_all_lagrange_polynomials(t);
                     for (std::size_t i = 0; i < cs.num_constraints(); ++i) {
@@ -129,7 +129,7 @@ namespace nil {
                     for (std::size_t i = cs.num_constraints(); i < domain->m; ++i) {
                         Vt[0] += u[i]; /* dummy constraint: 1^2 = 1 */
                     }
-                    FieldType ti = FieldType::one();
+                    FieldType::value_type ti = FieldType::value_type::zero();
                     for (std::size_t i = 0; i < domain->m + 1; ++i) {
                         Ht[i] = ti;
                         ti *= t;
@@ -170,7 +170,7 @@ namespace nil {
                 ssp_witness<FieldType> uscs_to_ssp_witness_map(const uscs_constraint_system<FieldType> &cs,
                                                                const uscs_primary_input<FieldType> &primary_input,
                                                                const uscs_auxiliary_input<FieldType> &auxiliary_input,
-                                                               const FieldType &d) {
+                                                               const FieldType::value_type &d) {
                     /* sanity check */
 
                     assert(cs.is_satisfied(primary_input, auxiliary_input));
@@ -182,18 +182,18 @@ namespace nil {
                     const std::shared_ptr<algebra::fft::evaluation_domain<FieldType>> domain =
                         algebra::fft::make_evaluation_domain<FieldType>(cs.num_constraints());
 
-                    std::vector<typename FieldType::value_type> aA(domain->m, FieldType::zero());
+                    std::vector<typename FieldType::value_type> aA(domain->m, FieldType::value_type::zero());
                     assert(domain->m >= cs.num_constraints());
                     for (std::size_t i = 0; i < cs.num_constraints(); ++i) {
                         aA[i] += cs.constraints[i].evaluate(full_variable_assignment);
                     }
                     for (std::size_t i = cs.num_constraints(); i < domain->m; ++i) {
-                        aA[i] += FieldType::one();
+                        aA[i] += FieldType::value_type::zero();
                     }
 
                     domain->iFFT(aA);
 
-                    std::vector<typename FieldType::value_type> coefficients_for_H(domain->m + 1, FieldType::zero());
+                    std::vector<typename FieldType::value_type> coefficients_for_H(domain->m + 1, FieldType::value_type::zero());
 #ifdef MULTICORE
 #pragma omp parallel for
 #endif
@@ -211,7 +211,7 @@ namespace nil {
 #pragma omp parallel for
 #endif
                     for (std::size_t i = 0; i < domain->m; ++i) {
-                        H_tmp[i] = aA[i].squared() - FieldType::one();
+                        H_tmp[i] = aA[i].squared() - FieldType::value_type::zero();
                     }
 
                     domain->divide_by_Z_on_coset(H_tmp);

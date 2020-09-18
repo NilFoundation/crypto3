@@ -435,7 +435,7 @@ namespace nil {
                         verifier[i].generate_r1cs_constraints();
                     }
 
-                    generate_r1cs_equals_const_constraint<FieldType>(pb, zero, FieldType::zero());
+                    generate_r1cs_equals_const_constraint<FieldType>(pb, zero, FieldType::value_type::zero());
 
                     for (std::size_t i = 0; i < compliance_predicate.max_arity; ++i) {
                         generate_boolean_r1cs_constraint<FieldType>(pb, verification_results[i]);
@@ -504,8 +504,9 @@ namespace nil {
                     const r1cs_pcd_compliance_predicate_auxiliary_input<FieldType>
                         &compliance_predicate_auxiliary_input,
                     const std::vector<r1cs_ppzksnark_proof<other_curve<CurveType>>> &translation_step_proofs) {
+
                     this->pb.clear_values();
-                    this->pb.val(zero) = FieldType::zero();
+                    this->pb.val(zero) = FieldType::value_type::zero();
 
                     compliance_predicate_as_gadget->generate_r1cs_witness(
                         compliance_predicate_primary_input.as_r1cs_primary_input(),
@@ -525,7 +526,7 @@ namespace nil {
 
                     if (compliance_predicate.relies_on_same_type_inputs) {
                         /* all messages (except base case) must be of the same type */
-                        this->pb.val(common_type) = FieldType::zero();
+                        this->pb.val(common_type) = FieldType::value_type::zero();
                         std::size_t nonzero_type_idx = 0;
                         for (std::size_t i = 0; i < compliance_predicate.max_arity; ++i) {
                             if (this->pb.val(incoming_message_types[i]) == 0) {
@@ -541,7 +542,7 @@ namespace nil {
                         }
 
                         this->pb.val(membership_check_results[0]) =
-                            (this->pb.val(common_type).is_zero() ? FieldType::zero() : FieldType::one());
+                            (this->pb.val(common_type).is_zero() ? FieldType::value_type::zero() : FieldType::value_type::zero());
                         membership_proofs[0].generate_r1cs_witness(vk_membership_proofs[nonzero_type_idx]);
                         membership_checkers[0].generate_r1cs_witness();
 
@@ -551,11 +552,12 @@ namespace nil {
                                 ((i == 0 ? pb.val(common_type) : pb.val(common_type_check_aux[i - 1])) *
                                  (pb.val(common_type) - typename FieldType::value_type(*it)));
                         }
+                        
                     } else {
                         for (std::size_t i = 0; i < membership_checkers.size(); ++i) {
                             this->pb.val(membership_check_results[i]) =
-                                (this->pb.val(incoming_message_types[i]).is_zero() ? FieldType::zero() :
-                                                                                     FieldType::one());
+                                (this->pb.val(incoming_message_types[i]).is_zero() ? FieldType::value_type::zero() :
+                                                                                     FieldType::value_type::zero());
                             membership_proofs[i].generate_r1cs_witness(vk_membership_proofs[i]);
                             membership_checkers[i].generate_r1cs_witness();
                         }
@@ -705,7 +707,7 @@ namespace nil {
                     const r1cs_variable_assignment<FieldType> outgoing_message_as_va =
                         primary_input.outgoing_message->as_r1cs_variable_assignment();
                     std::vector<bool> msg_bits;
-                    for (const FieldType &elt : outgoing_message_as_va) {
+                    for (const FieldType::value_type &elt : outgoing_message_as_va) {
                         const std::vector<bool> elt_bits = algebra::convert_field_element_to_bit_vector(elt);
                         msg_bits.insert(msg_bits.end(), elt_bits.begin(), elt_bits.end());
                     }

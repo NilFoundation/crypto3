@@ -334,7 +334,7 @@ namespace nil {
                     /* fill in the opcode indicators */
                     const std::size_t opcode_val = opcode.get_field_element_from_bits(this->pb).as_ulong();
                     for (std::size_t i = 0; i < 1ul << this->pb.ap.opcode_width(); ++i) {
-                        this->pb.val(opcode_indicators[i]) = (i == opcode_val ? FieldType::one() : FieldType::zero());
+                        this->pb.val(opcode_indicators[i]) = (i == opcode_val ? FieldType::value_type::zero() : FieldType::value_type::zero());
                     }
 
                     /* execute the ALU */
@@ -357,21 +357,21 @@ namespace nil {
                         this->pb.val(ls_prev_val_as_doubleword_variable->packed).as_ulong();
                     const std::size_t subaddress = this->pb.val(memory_subaddress->packed).as_ulong();
 
-                    if (this->pb.val(opcode_indicators[tinyram_opcode_LOADB]) == FieldType::one()) {
+                    if (this->pb.val(opcode_indicators[tinyram_opcode_LOADB]) == FieldType::value_type::zero()) {
                         const std::size_t loaded_byte = (prev_doubleword >> (8u * subaddress)) & 0xFF;
                         this->pb.val(instruction_results[tinyram_opcode_LOADB]) =
                             typename FieldType::value_type(loaded_byte);
                         this->pb.val(memory_subcontents) = typename FieldType::value_type(loaded_byte);
-                    } else if (this->pb.val(opcode_indicators[tinyram_opcode_STOREB]) == FieldType::one()) {
+                    } else if (this->pb.val(opcode_indicators[tinyram_opcode_STOREB]) == FieldType::value_type::zero()) {
                         const std::size_t stored_byte = (static_cast<unsigned long>(this->pb.val(desval->packed))
                                                                            ) & 0xFF;
                         this->pb.val(memory_subcontents) = typename FieldType::value_type(stored_byte);
-                    } else if (this->pb.val(opcode_indicators[tinyram_opcode_STOREW]) == FieldType::one()) {
+                    } else if (this->pb.val(opcode_indicators[tinyram_opcode_STOREW]) == FieldType::value_type::zero()) {
                         const std::size_t stored_word = (static_cast<unsigned long>(this->pb.val(desval->packed)));
                         this->pb.val(memory_subcontents) = typename FieldType::value_type(stored_word);
                     } else {
                         const bool access_is_word0 =
-                            (this->pb.val(*memory_subaddress->bits.rbegin()) == FieldType::zero());
+                            (this->pb.val(*memory_subaddress->bits.rbegin()) == FieldType::value_type::zero());
                         const std::size_t loaded_word =
                             (prev_doubleword >> (access_is_word0 ? 0 : this->pb.ap.w)) & ((1ul << this->pb.ap.w) - 1);
                         this->pb.val(instruction_results[tinyram_opcode_LOADW]) = typename FieldType::value_type(
@@ -385,26 +385,26 @@ namespace nil {
                     check_memory->generate_r1cs_witness();
 
                     /* handle reads */
-                    if (this->pb.val(prev_tape1_exhausted) == FieldType::one()) {
+                    if (this->pb.val(prev_tape1_exhausted) == FieldType::value_type::zero()) {
                         /* if tape was exhausted before, it will always be
                            exhausted. we also need to only handle reads from tape 1,
                            so we can safely set flag here */
-                        this->pb.val(next_tape1_exhausted) = FieldType::one();
-                        this->pb.val(instruction_flags[tinyram_opcode_READ]) = FieldType::one();
+                        this->pb.val(next_tape1_exhausted) = FieldType::value_type::zero();
+                        this->pb.val(instruction_flags[tinyram_opcode_READ]) = FieldType::value_type::zero();
                     }
 
                     this->pb.val(read_not1) = this->pb.val(opcode_indicators[tinyram_opcode_READ]) *
-                                              (FieldType::one() - this->pb.val(arg2val->packed));
-                    if (this->pb.val(read_not1) != FieldType::one()) {
+                                              (FieldType::value_type::zero() - this->pb.val(arg2val->packed));
+                    if (this->pb.val(read_not1) != FieldType::value_type::zero()) {
                         /* reading from tape other than 0 raises the flag */
-                        this->pb.val(instruction_flags[tinyram_opcode_READ]) = FieldType::one();
+                        this->pb.val(instruction_flags[tinyram_opcode_READ]) = FieldType::value_type::zero();
                     } else {
                         /* otherwise perform the actual read */
                         if (aux_it != aux_end) {
                             this->pb.val(instruction_results[tinyram_opcode_READ]) = typename FieldType::value_type(*aux_it);
                             if (++aux_it == aux_end) {
                                 /* tape has ended! */
-                                this->pb.val(next_tape1_exhausted) = FieldType::one();
+                                this->pb.val(next_tape1_exhausted) = FieldType::value_type::zero();
                             }
                         } else {
                             /* handled above, so nothing to do here */
@@ -412,8 +412,8 @@ namespace nil {
                     }
 
                     /* flag implies result zero */
-                    if (this->pb.val(instruction_flags[tinyram_opcode_READ]) == FieldType::one()) {
-                        this->pb.val(instruction_results[tinyram_opcode_READ]) = FieldType::zero();
+                    if (this->pb.val(instruction_flags[tinyram_opcode_READ]) == FieldType::value_type::zero()) {
+                        this->pb.val(instruction_results[tinyram_opcode_READ]) = FieldType::value_type::zero();
                     }
 
                     /* execute consistency enforcer */
@@ -426,10 +426,10 @@ namespace nil {
 
                     /* finally set has_accepted to 1 if both the opcode is ANSWER and arg2val is 0 */
                     this->pb.val(next_has_accepted) =
-                        (this->pb.val(opcode_indicators[tinyram_opcode_ANSWER]) == FieldType::one() &&
-                         this->pb.val(arg2val->packed) == FieldType::zero()) ?
-                            FieldType::one() :
-                            FieldType::zero();
+                        (this->pb.val(opcode_indicators[tinyram_opcode_ANSWER]) == FieldType::value_type::zero() &&
+                         this->pb.val(arg2val->packed) == FieldType::value_type::zero()) ?
+                            FieldType::value_type::zero() :
+                            FieldType::value_type::zero();
                 }
 
                 template<typename FieldType>
@@ -449,7 +449,7 @@ namespace nil {
                            tinyram_opcode_names[static_cast<tinyram_opcode>(opcode_val)].c_str(),
                            desidx.get_field_element_from_bits(this->pb).as_ulong(),
                            arg1idx.get_field_element_from_bits(this->pb).as_ulong(),
-                           (this->pb.val(arg2_is_imm) == FieldType::one() ? "" : "r"),
+                           (this->pb.val(arg2_is_imm) == FieldType::value_type::zero() ? "" : "r"),
                            arg2idx.get_field_element_from_bits(this->pb).as_ulong());
                 }
 

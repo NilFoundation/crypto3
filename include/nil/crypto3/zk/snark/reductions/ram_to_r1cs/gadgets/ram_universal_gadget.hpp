@@ -244,7 +244,7 @@ namespace nil {
                     /* ensure that we start with all zeros state */
                     for (std::size_t i = 0; i < this->pb.ap.cpu_state_size(); ++i) {
                         generate_r1cs_equals_const_constraint<FieldType>(this->pb, execution_lines[0].cpu_state[i],
-                                                                         FieldType::zero());
+                                                                         FieldType::value_type::zero());
                     }
 
                     /* ensure increasing timestamps */
@@ -294,7 +294,7 @@ namespace nil {
 
                     /* ensure that the last state was an accepting one */
                     generate_r1cs_equals_const_constraint<FieldType>(this->pb, execution_lines[time_bound].has_accepted,
-                                                                     FieldType::one());
+                                                                     FieldType::value_type::zero());
 
                     /* print constraint profiling */
                     const std::size_t num_constraints = this->pb.num_constraints();

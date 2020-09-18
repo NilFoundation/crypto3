@@ -209,7 +209,7 @@ namespace nil {
                     /* get indicator variables is_subaddress */
                     for (std::size_t i = 0; i < 2 * this->pb.ap.bytes_in_word(); ++i) {
                         this->pb.val(is_subaddress[i]) =
-                            (this->pb.val(subaddress.packed) == typename FieldType::value_type(i)) ? FieldType::one() : FieldType::zero();
+                            (this->pb.val(subaddress.packed) == typename FieldType::value_type(i)) ? FieldType::value_type::zero() : FieldType::value_type::zero();
                     }
 
                     /* get indicator variables is_byte_X */
@@ -219,7 +219,7 @@ namespace nil {
 
                     /* get indicator variables is_word_0/is_word_1 */
                     this->pb.val(is_word0) =
-                        (FieldType::one() - this->pb.val(subaddress.bits[this->pb.ap.subaddr_len() - 1])) *
+                        (FieldType::value_type::zero() - this->pb.val(subaddress.bits[this->pb.ap.subaddr_len() - 1])) *
                         this->pb.lc_val(access_is_word);
                     this->pb.val(is_word1) =
                         this->pb.val(subaddress.bits[this->pb.ap.subaddr_len() - 1]) * this->pb.lc_val(access_is_word);

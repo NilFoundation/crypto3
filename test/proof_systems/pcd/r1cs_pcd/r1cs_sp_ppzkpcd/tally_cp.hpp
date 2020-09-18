@@ -118,7 +118,7 @@ namespace nil {
                 r1cs_variable_assignment<FieldType>
                 tally_pcd_message<FieldType>::payload_as_r1cs_variable_assignment() const {
                     std::function<FieldType(bool)> bit_to_FieldT = [](const bool bit) {
-                        return bit ? FieldType::one() : FieldType::zero();
+                        return bit ? FieldType::value_type::zero() : FieldType::value_type::zero();
                     };
 
                     const std::vector<bool> sum_bits =
@@ -344,7 +344,7 @@ namespace nil {
 
                     for (std::size_t i = 0; i < this->max_arity + 1; ++i) {
                         this->pb.val(arity_indicators[i]) =
-                            (incoming_messages.size() == i ? FieldType::one() : FieldType::zero());
+                            (incoming_messages.size() == i ? FieldType::value_type::zero() : FieldType::value_type::zero());
                     }
 
                     compute_type_val_inner_product->generate_r1cs_witness();
@@ -353,7 +353,7 @@ namespace nil {
                             ->summand) +
                         this->pb.val(type_val_inner_product);
 
-                    this->pb.val(count_out_packed) = FieldType::one();
+                    this->pb.val(count_out_packed) = FieldType::value_type::zero();
                     for (std::size_t i = 0; i < this->max_arity; ++i) {
                         this->pb.val(count_out_packed) += this->pb.val(count_in_packed[i]);
                     }

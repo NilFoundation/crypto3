@@ -234,7 +234,7 @@ namespace nil {
                         outbits[packet_idx].allocate(pb, packet_size);
 
                         for (std::size_t bit_idx = 0; bit_idx < packet_size; ++bit_idx) {
-                            pb.val(randbits[packet_idx][bit_idx]) = (rand() % 2) ? FieldType::one() : FieldType::zero();
+                            pb.val(randbits[packet_idx][bit_idx]) = (rand() % 2) ? FieldType::value_type::zero() : FieldType::value_type::zero();
                         }
                     }
 

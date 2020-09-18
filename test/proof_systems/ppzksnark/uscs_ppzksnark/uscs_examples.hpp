@@ -63,7 +63,7 @@ namespace nil {
 
                     uscs_variable_assignment<FieldType> full_variable_assignment;
                     for (std::size_t i = 0; i < num_constraints; ++i) {
-                        full_variable_assignment.emplace_back(FieldType(std::rand()));
+                        full_variable_assignment.emplace_back(FieldType::value_type(std::rand()));
                     }
 
                     for (std::size_t i = 0; i < num_constraints; ++i) {
@@ -75,10 +75,10 @@ namespace nil {
                             z = std::rand() % num_constraints;
                         } while (x == z || y == z);
 
-                        const FieldType x_coeff = FieldType(std::rand());
-                        const FieldType y_coeff = FieldType(std::rand());
-                        const FieldType val = (std::rand() % 2 == 0 ? FieldType::one() : -FieldType::one());
-                        const FieldType z_coeff =
+                        const FieldType::value_type x_coeff = FieldTyp::value_type(std::rand());
+                        const FieldType::value_type y_coeff = FieldType::value_type(std::rand());
+                        const FieldType::value_type val = (std::rand() % 2 == 0 ? FieldType::value_type::zero() : -FieldType::value_type::zero());
+                        const FieldType::value_type z_coeff =
                             (val - x_coeff * full_variable_assignment[x] - y_coeff * full_variable_assignment[y]) *
                             full_variable_assignment[z].inverse();
 
@@ -139,7 +139,7 @@ namespace nil {
                         constr.add_term(u + 1, 1);
                         constr.add_term(v + 1, 1);
                         constr.add_term(lastvar + 1, 1);
-                        constr.add_term(0, -FieldType::one());    // shift constant term (which is 0) by 1
+                        constr.add_term(0, -FieldType::value_type::zero());    // shift constant term (which is 0) by 1
 
                         cs.add_constraint(constr);
                         full_variable_assignment.push_back(full_variable_assignment[u] + full_variable_assignment[v] -

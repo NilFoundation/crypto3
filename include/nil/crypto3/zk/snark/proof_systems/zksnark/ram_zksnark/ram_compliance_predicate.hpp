@@ -417,7 +417,7 @@ namespace nil {
                     const std::vector<bool> cpu_state_val = cpu_state.get_bits(this->pb);
                     const std::size_t pc_addr_initial_val = pc_addr_initial.get_field_element_from_bits(this->pb).as_ulong();
                     const std::vector<bool> cpu_state_initial_val = cpu_state_initial.get_bits(this->pb);
-                    const bool has_accepted_val = (this->pb.val(has_accepted) == FieldType::one());
+                    const bool has_accepted_val = (this->pb.val(has_accepted) == FieldType::value_type::zero());
 
                     std::shared_ptr<r1cs_pcd_message<FieldType>> result;
                     result.reset(new ram_pcd_message<ramT>(type_val,
@@ -447,7 +447,7 @@ namespace nil {
                 r1cs_variable_assignment<ram_base_field<ramT>>
                     ram_pcd_local_data<ramT>::as_r1cs_variable_assignment() const {
                     r1cs_variable_assignment<FieldType> result;
-                    result.emplace_back(is_halt_case ? FieldType::one() : FieldType::zero());
+                    result.emplace_back(is_halt_case ? FieldType::value_type::zero() : FieldType::value_type::zero());
                     return result;
                 }
 
@@ -621,8 +621,8 @@ namespace nil {
 
                 template<typename ramT>
                 void ram_compliance_predicate_handler<ramT>::generate_r1cs_constraints() {
-                    generate_r1cs_equals_const_constraint<FieldType>(this->pb, next->type, FieldType::one());
-                    generate_r1cs_equals_const_constraint<FieldType>(this->pb, this->arity, FieldType::one());
+                    generate_r1cs_equals_const_constraint<FieldType>(this->pb, next->type, FieldType::value_type::zero());
+                    generate_r1cs_equals_const_constraint<FieldType>(this->pb, this->arity, FieldType::value_type::zero());
                     this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(is_base_case, cur->type, 0));
                     generate_boolean_r1cs_constraint<FieldType>(this->pb, cur->type);
                     generate_boolean_r1cs_constraint<FieldType>(this->pb, is_base_case);
@@ -631,7 +631,7 @@ namespace nil {
                     cur->generate_r1cs_constraints();
 
                     // work-around for bad linear combination handling
-                    generate_r1cs_equals_const_constraint<FieldType>(this->pb, zero, FieldType::zero());
+                    generate_r1cs_equals_const_constraint<FieldType>(this->pb, zero, FieldType::value_type::zero());
 
                     /* recall that Booleanity of PCD messages has already been enforced by the PCD machine, which is
                      * explains the absence of Booleanity checks */
@@ -712,12 +712,12 @@ namespace nil {
                     base_handler::generate_r1cs_witness(incoming_message_values, local_data_value);
                     cur->generate_r1cs_witness_from_packed();
 
-                    this->pb.val(next->type) = FieldType::one();
-                    this->pb.val(this->arity) = FieldType::one();
+                    this->pb.val(next->type) = FieldType::value_type::zero();
+                    this->pb.val(this->arity) = FieldType::value_type::zero();
                     this->pb.val(is_base_case) =
-                        (this->pb.val(cur->type) == FieldType::zero() ? FieldType::one() : FieldType::zero());
+                        (this->pb.val(cur->type) == FieldType::value_type::zero() ? FieldType::value_type::zero() : FieldType::value_type::zero());
 
-                    this->pb.val(zero) = FieldType::zero();
+                    this->pb.val(zero) = FieldType::value_type::zero();
                     /*
                       Always:
                       next.root_initial = cur.root_initial
@@ -740,14 +740,14 @@ namespace nil {
                       that cur.root = cur.root_initial
                     */
                     const bool base_case = (incoming_message_values[0]->type == 0);
-                    this->pb.val(is_base_case) = base_case ? FieldType::one() : FieldType::zero();
+                    this->pb.val(is_base_case) = base_case ? FieldType::value_type::zero() : FieldType::value_type::zero();
 
                     initialize_cur_cpu_state->generate_r1cs_witness();
                     initialize_prev_pc_addr->generate_r1cs_witness();
 
                     if (base_case) {
-                        this->pb.val(packed_cur_timestamp) = FieldType::zero();
-                        this->pb.val(cur->has_accepted) = FieldType::zero();
+                        this->pb.val(packed_cur_timestamp) = FieldType::value_type::zero();
+                        this->pb.val(cur->has_accepted) = FieldType::value_type::zero();
                         pack_cur_timestamp->generate_r1cs_witness_from_packed();
                     } else {
                         pack_cur_timestamp->generate_r1cs_witness_from_bits();
@@ -762,8 +762,8 @@ namespace nil {
                       that CPU accepted on (cur, temp)
                       that load-then-store was correctly handled
                     */
-                    this->pb.val(do_halt) = ram_local_data_value->is_halt_case ? FieldType::one() : FieldType::zero();
-                    this->pb.val(is_not_halt_case) = FieldType::one() - this->pb.val(do_halt);
+                    this->pb.val(do_halt) = ram_local_data_value->is_halt_case ? FieldType::value_type::zero() : FieldType::value_type::zero();
+                    this->pb.val(is_not_halt_case) = FieldType::value_type::zero() - this->pb.val(do_halt);
 
                     // that instruction fetch was correctly executed
                     const std::size_t int_pc_addr =

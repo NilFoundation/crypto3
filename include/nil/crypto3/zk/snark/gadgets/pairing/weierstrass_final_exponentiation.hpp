@@ -220,7 +220,7 @@ namespace nil {
                     compute_result->generate_r1cs_witness();
 
                     this->pb.val(result_is_one) =
-                        (result->get_element() == one->get_element() ? FieldType::one() : FieldType::zero());
+                        (result->get_element() == one->get_element() ? FieldType::value_type::zero() : FieldType::value_type::zero());
                 }
 
                 template<typename CurveType>
@@ -296,7 +296,7 @@ namespace nil {
                     compute_result->generate_r1cs_witness();
 
                     this->pb.val(result_is_one) =
-                        (result->get_element() == one->get_element() ? FieldType::one() : FieldType::zero());
+                        (result->get_element() == one->get_element() ? FieldType::value_type::zero() : FieldType::value_type::zero());
                 }
 
             }    // namespace snark

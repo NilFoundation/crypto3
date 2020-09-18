@@ -35,7 +35,7 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-
+              
                 /* forward declaration */
                 template<typename FieldType>
                 struct ssp_witness;
@@ -90,7 +90,7 @@ namespace nil {
                         std::vector<typename FieldType::value_type> Vt(this->num_variables + 1, FieldType::value_type::zero());
                         std::vector<typename FieldType::value_type> Ht(this->degree + 1);
 
-                        const FieldType Zt = this->domain->compute_vanishing_polynomial(t);
+                        const FieldType::value_type Zt = this->domain->compute_vanishing_polynomial(t);
 
                         const std::vector<typename FieldType::value_type> u = this->domain->evaluate_all_lagrange_polynomials(t);
 
@@ -136,20 +136,20 @@ namespace nil {
 
                     std::shared_ptr<algebra::fft::evaluation_domain<FieldType>> domain;
 
-                    FieldType t;
+                    FieldType::value_type t;
 
                     std::vector<typename FieldType::value_type> Vt, Ht;
 
-                    FieldType Zt;
+                    FieldType::value_type Zt;
 
                     ssp_instance_evaluation(const std::shared_ptr<algebra::fft::evaluation_domain<FieldType>> &domain,
                                             const std::size_t num_variables,
                                             const std::size_t degree,
                                             const std::size_t num_inputs,
-                                            const FieldType &t,
+                                            const FieldType::value_type &t,
                                             const std::vector<typename FieldType::value_type> &Vt,
                                             const std::vector<typename FieldType::value_type> &Ht,
-                                            const FieldType &Zt) :
+                                            const FieldType::value_type &Zt) :
                         num_variables(num_variables),
                         degree(degree), num_inputs(num_inputs), domain(domain), t(t), Vt(Vt), Ht(Ht), Zt(Zt) {
                     }
@@ -158,10 +158,10 @@ namespace nil {
                                             const std::size_t num_variables,
                                             const std::size_t degree,
                                             const std::size_t num_inputs,
-                                            const FieldType &t,
+                                            const FieldType::value_type &t,
                                             std::vector<typename FieldType::value_type> &&Vt,
                                             std::vector<typename FieldType::value_type> &&Ht,
-                                            const FieldType &Zt) :
+                                            const FieldType::value_type &Zt) :
                         num_variables(num_variables),
                         degree(degree), num_inputs(num_inputs), domain(domain), t(t), Vt(std::move(Vt)),
                         Ht(std::move(Ht)), Zt(Zt) {
@@ -237,7 +237,7 @@ namespace nil {
                     std::size_t degree;
                     std::size_t num_inputs;
 
-                    FieldType d;
+                    FieldType::value_type d;
 
                     std::vector<typename FieldType::value_type> coefficients_for_Vs;
                     std::vector<typename FieldType::value_type> coefficients_for_H;
@@ -245,7 +245,7 @@ namespace nil {
                     ssp_witness(const std::size_t num_variables,
                                 const std::size_t degree,
                                 const std::size_t num_inputs,
-                                const FieldType &d,
+                                const FieldType::value_type &d,
                                 const std::vector<typename FieldType::value_type> &coefficients_for_Vs,
                                 const std::vector<typename FieldType::value_type> &coefficients_for_H) :
                         num_variables(num_variables),
@@ -256,7 +256,7 @@ namespace nil {
                     ssp_witness(const std::size_t num_variables,
                                 const std::size_t degree,
                                 const std::size_t num_inputs,
-                                const FieldType &d,
+                                const FieldType::value_type &d,
                                 const std::vector<typename FieldType::value_type> &coefficients_for_Vs,
                                 std::vector<typename FieldType::value_type> &&coefficients_for_H) :
                         num_variables(num_variables),

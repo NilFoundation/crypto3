@@ -586,7 +586,7 @@ namespace nil {
                     ssp_instance_evaluation<typename CurveType::scalar_field_type> ssp_inst =
                         uscs_to_ssp_instance_map_with_evaluation(cs, t);
 
-                    /* construct various tables of FieldType elements */
+                    /* construct various tables of FieldType::value_type elements */
 
                     std::vector<typename CurveType::scalar_field_type::value_type> Vt_table = std::move(
                         ssp_inst.Vt);    // ssp_inst.Vt is now in unspecified state, but we do not use it later

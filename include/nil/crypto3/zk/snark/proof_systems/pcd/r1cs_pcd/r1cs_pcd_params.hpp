@@ -78,7 +78,7 @@ namespace nil {
 
                     /* pad with dummy messages of appropriate size */
                     for (std::size_t i = arity; i < max_arity; ++i) {
-                        result.resize(result.size() + (1 + incoming_message_payload_lengths[i]), FieldType::zero());
+                        result.resize(result.size() + (1 + incoming_message_payload_lengths[i]), FieldType::value_type::zero());
                     }
 
                     const r1cs_variable_assignment<FieldType> local_data_as_r1cs_va =

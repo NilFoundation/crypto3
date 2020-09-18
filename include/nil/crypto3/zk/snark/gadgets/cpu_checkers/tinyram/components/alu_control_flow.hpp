@@ -161,9 +161,9 @@ namespace nil {
                 template<typename FieldType>
                 void ALU_cjmp_gadget<FieldType>::generate_r1cs_witness() {
                     this->pb.val(this->result) =
-                        ((this->pb.val(this->flag) == FieldType::one()) ?
+                        ((this->pb.val(this->flag) == FieldType::value_type::zero()) ?
                              typename FieldType::value_type(this->pb.val(this->argval2.packed).as_ulong() >> this->pb.ap.subaddr_len()) :
-                             this->pb.val(this->pc.packed) + FieldType::one());
+                             this->pb.val(this->pc.packed) + FieldType::value_type::zero());
                 }
 
                 template<typename FieldType>
@@ -235,8 +235,8 @@ namespace nil {
                 template<typename FieldType>
                 void ALU_cnjmp_gadget<FieldType>::generate_r1cs_witness() {
                     this->pb.val(this->result) =
-                        ((this->pb.val(this->flag) == FieldType::one()) ?
-                             this->pb.val(this->pc.packed) + FieldType::one() :
+                        ((this->pb.val(this->flag) == FieldType::value_type::zero()) ?
+                             this->pb.val(this->pc.packed) + FieldType::value_type::zero() :
                              typename FieldType::value_type(this->pb.val(this->argval2.packed).as_ulong() >> this->pb.ap.subaddr_len()));
                 }
 

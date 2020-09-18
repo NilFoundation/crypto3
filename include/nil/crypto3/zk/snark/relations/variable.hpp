@@ -77,7 +77,7 @@ namespace nil {
                     }
 
                     linear_term<FieldType> operator-() const {
-                        return linear_term<FieldType>(*this, -FieldType::one());
+                        return linear_term<FieldType>(*this, -FieldType::value_type::zero());
                     }
 
                     bool operator==(const variable<FieldType> &other) const {
@@ -134,7 +134,7 @@ namespace nil {
                     value_type coeff;
 
                     linear_term() {};
-                    linear_term(const variable<FieldType> &var) : index(var.index), coeff(FieldType::one()) {
+                    linear_term(const variable<FieldType> &var) : index(var.index), coeff(FieldType::value_type::zero()) {
                     }
 
                     linear_term(const variable<FieldType> &var, const integer_coeff_t int_coeff) :
@@ -184,7 +184,7 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                linear_combination<FieldType> operator+(const FieldType &field_coeff,
+                linear_combination<FieldType> operator+(const FieldType::value_type &field_coeff,
                                                         const linear_term<FieldType> &lt) {
                     return linear_combination<FieldType>(field_coeff) + lt;
                 }
@@ -240,7 +240,7 @@ namespace nil {
 
                     void add_term(const linear_term<FieldType> &lt);
 
-                    FieldType evaluate(const std::vector<typename FieldType::value_type> &assignment) const;
+                    FieldType::value_type evaluate(const std::vector<typename FieldType::value_type> &assignment) const;
 
                     linear_combination<FieldType> operator*(integer_coeff_t int_coeff) const;
                     linear_combination<FieldType> operator*(const value_type &field_coeff) const;
@@ -333,7 +333,7 @@ namespace nil {
 
                 template<typename FieldType>
                 void linear_combination<FieldType>::add_term(const variable<FieldType> &var) {
-                    this->terms.emplace_back(linear_term<FieldType>(var.index, FieldType::one()));
+                    this->terms.emplace_back(linear_term<FieldType>(var.index, FieldType::value_type::zero()));
                 }
 
                 template<typename FieldType>
@@ -359,10 +359,10 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                FieldType linear_combination<FieldType>::evaluate(const std::vector<typename FieldType::value_type> &assignment) const {
-                    FieldType acc = FieldType::zero();
+                FieldType::value_type linear_combination<FieldType>::evaluate(const std::vector<typename FieldType::value_type> &assignment) const {
+                    FieldType::value_type acc = FieldType::value_type::zero();
                     for (auto &lt : terms) {
-                        acc += (lt.index == 0 ? FieldType::one() : assignment[lt.index - 1]) * lt.coeff;
+                        acc += (lt.index == 0 ? FieldType::value_type::zero() : assignment[lt.index - 1]) * lt.coeff;
                     }
                     return acc;
                 }
@@ -421,7 +421,7 @@ namespace nil {
 
                 template<typename FieldType>
                 linear_combination<FieldType> linear_combination<FieldType>::operator-() const {
-                    return (*this) * (-FieldType::one());
+                    return (*this) * (-FieldType::value_type::zero());
                 }
 
                 template<typename FieldType>

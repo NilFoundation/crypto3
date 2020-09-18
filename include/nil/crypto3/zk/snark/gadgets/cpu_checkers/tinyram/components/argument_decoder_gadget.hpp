@@ -148,7 +148,7 @@ namespace nil {
 
                     /* handle arg2val */
                     this->pb.val(packed_arg2val) =
-                        (this->pb.val(arg2_is_imm) == FieldType::one() ? this->pb.val(packed_arg2idx) :
+                        (this->pb.val(arg2_is_imm) == FieldType::value_type::zero() ? this->pb.val(packed_arg2idx) :
                                                                          this->pb.val(arg2_demux_result));
                 }
 
@@ -185,7 +185,7 @@ namespace nil {
                     pb.val(desidx.packed) = typename FieldType::value_type(2);
                     pb.val(arg1idx.packed) = typename FieldType::value_type(5);
                     pb.val(arg2idx.packed) = typename FieldType::value_type(7);
-                    pb.val(arg2_is_imm) = FieldType::zero();
+                    pb.val(arg2_is_imm) = FieldType::value_type::zero();
 
                     desidx.generate_r1cs_witness_from_packed();
                     arg1idx.generate_r1cs_witness_from_packed();
@@ -199,7 +199,7 @@ namespace nil {
                     assert(pb.is_satisfied());
                     printf("positive test (get reg) successful\n");
 
-                    pb.val(arg2_is_imm) = FieldType::one();
+                    pb.val(arg2_is_imm) = FieldType::value_type::zero();
                     g.generate_r1cs_witness();
 
                     assert(pb.val(packed_desval) == typename FieldType::value_type(1002));

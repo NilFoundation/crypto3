@@ -156,22 +156,22 @@ namespace nil {
 
                     std::shared_ptr<algebra::fft::evaluation_domain<FieldType>> domain;
 
-                    FieldType t;
+                    FieldType::value_type t;
 
                     std::vector<typename FieldType::value_type> At, Bt, Ct, Ht;
 
-                    FieldType Zt;
+                    FieldType::value_type Zt;
 
                     qap_instance_evaluation(const std::shared_ptr<algebra::fft::evaluation_domain<FieldType>> &domain,
                                             const std::size_t num_variables,
                                             const std::size_t degree,
                                             const std::size_t num_inputs,
-                                            const FieldType &t,
+                                            const FieldType::value_type &t,
                                             const std::vector<typename FieldType::value_type> &At,
                                             const std::vector<typename FieldType::value_type> &Bt,
                                             const std::vector<typename FieldType::value_type> &Ct,
                                             const std::vector<typename FieldType::value_type> &Ht,
-                                            const FieldType &Zt) :
+                                            const FieldType::value_type &Zt) :
                         num_variables(num_variables),
                         degree(degree),
                         num_inputs(num_inputs),
@@ -187,12 +187,12 @@ namespace nil {
                                             const std::size_t num_variables,
                                             const std::size_t degree,
                                             const std::size_t num_inputs,
-                                            const FieldType &t,
+                                            const FieldType::value_type &t,
                                             std::vector<typename FieldType::value_type> &&At,
                                             std::vector<typename FieldType::value_type> &&Bt,
                                             std::vector<typename FieldType::value_type> &&Ct,
                                             std::vector<typename FieldType::value_type> &&Ht,
-                                            const FieldType &Zt) :
+                                            const FieldType::value_type &Zt) :
                         num_variables(num_variables),
                         degree(degree),
                         num_inputs(num_inputs),
@@ -282,7 +282,7 @@ namespace nil {
                     std::size_t degree;
                     std::size_t num_inputs;
 
-                    FieldType d1, d2, d3;
+                    FieldType::value_type d1, d2, d3;
 
                     std::vector<typename FieldType::value_type> coefficients_for_ABCs;
                     std::vector<typename FieldType::value_type> coefficients_for_H;
@@ -290,9 +290,9 @@ namespace nil {
                     qap_witness(const std::size_t num_variables,
                                 const std::size_t degree,
                                 const std::size_t num_inputs,
-                                const FieldType &d1,
-                                const FieldType &d2,
-                                const FieldType &d3,
+                                const FieldType::value_type &d1,
+                                const FieldType::value_type &d2,
+                                const FieldType::value_type &d3,
                                 const std::vector<typename FieldType::value_type> &coefficients_for_ABCs,
                                 const std::vector<typename FieldType::value_type> &coefficients_for_H) :
                         num_variables(num_variables),
@@ -303,9 +303,9 @@ namespace nil {
                     qap_witness(const std::size_t num_variables,
                                 const std::size_t degree,
                                 const std::size_t num_inputs,
-                                const FieldType &d1,
-                                const FieldType &d2,
-                                const FieldType &d3,
+                                const FieldType::value_type &d1,
+                                const FieldType::value_type &d2,
+                                const FieldType::value_type &d3,
                                 const std::vector<typename FieldType::value_type> &coefficients_for_ABCs,
                                 std::vector<typename FieldType::value_type> &&coefficients_for_H) :
                         num_variables(num_variables),

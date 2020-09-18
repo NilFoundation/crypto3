@@ -702,7 +702,7 @@ namespace nil {
                     pb_variable_array<FieldType> opcode_indicators;
                     opcode_indicators.allocate(pb, 1ul << ap.opcode_width());
                     for (std::size_t i = 0; i < 1ul << ap.opcode_width(); ++i) {
-                        pb.val(opcode_indicators[i]) = (i == opcode ? FieldType::one() : FieldType::zero());
+                        pb.val(opcode_indicators[i]) = (i == opcode ? FieldType::value_type::zero() : FieldType::value_type::zero());
                     }
 
                     word_variable_gadget<FieldType> desval(pb);
@@ -727,7 +727,7 @@ namespace nil {
                         desval.generate_r1cs_witness_from_packed();
 
                         for (char f = 0; f <= 1; ++f) {
-                            pb.val(flag) = (f ? FieldType::one() : FieldType::zero());
+                            pb.val(flag) = (f ? FieldType::value_type::zero() : FieldType::value_type::zero());
 
                             for (std::size_t arg1 = 0; arg1 < (1u << w); ++arg1) {
                                 pb.val(arg1val.packed) = typename FieldType::value_type(arg1);
@@ -744,7 +744,7 @@ namespace nil {
 
                                     assert(pb.is_satisfied());
                                     assert(pb.val(result) == typename FieldType::value_type(res));
-                                    assert(pb.val(result_flag) == (res_f ? FieldType::one() : FieldType::zero()));
+                                    assert(pb.val(result_flag) == (res_f ? FieldType::value_type::zero() : FieldType::value_type::zero()));
                                 }
                             }
                         }
@@ -771,15 +771,15 @@ namespace nil {
                 template<typename FieldType>
                 void ALU_and_gadget<FieldType>::generate_r1cs_witness() {
                     for (std::size_t i = 0; i < this->pb.ap.w; ++i) {
-                        bool b1 = this->pb.val(this->arg1val.bits[i]) == FieldType::one();
-                        bool b2 = this->pb.val(this->arg2val.bits[i]) == FieldType::one();
+                        bool b1 = this->pb.val(this->arg1val.bits[i]) == FieldType::value_type::zero();
+                        bool b2 = this->pb.val(this->arg2val.bits[i]) == FieldType::value_type::zero();
 
-                        this->pb.val(this->res_word[i]) = (b1 && b2 ? FieldType::one() : FieldType::zero());
+                        this->pb.val(this->res_word[i]) = (b1 && b2 ? FieldType::value_type::zero() : FieldType::value_type::zero());
                     }
 
                     pack_result->generate_r1cs_witness_from_bits();
                     not_all_zeros->generate_r1cs_witness();
-                    this->pb.val(this->result_flag) = FieldType::one() - this->pb.val(not_all_zeros_result);
+                    this->pb.val(this->result_flag) = FieldType::value_type::zero() - this->pb.val(not_all_zeros_result);
                 }
 
                 template<typename FieldType>
@@ -823,15 +823,15 @@ namespace nil {
                 template<typename FieldType>
                 void ALU_or_gadget<FieldType>::generate_r1cs_witness() {
                     for (std::size_t i = 0; i < this->pb.ap.w; ++i) {
-                        bool b1 = this->pb.val(this->arg1val.bits[i]) == FieldType::one();
-                        bool b2 = this->pb.val(this->arg2val.bits[i]) == FieldType::one();
+                        bool b1 = this->pb.val(this->arg1val.bits[i]) == FieldType::value_type::zero();
+                        bool b2 = this->pb.val(this->arg2val.bits[i]) == FieldType::value_type::zero();
 
-                        this->pb.val(this->res_word[i]) = (b1 || b2 ? FieldType::one() : FieldType::zero());
+                        this->pb.val(this->res_word[i]) = (b1 || b2 ? FieldType::value_type::zero() : FieldType::value_type::zero());
                     }
 
                     pack_result->generate_r1cs_witness_from_bits();
                     not_all_zeros->generate_r1cs_witness();
-                    this->pb.val(this->result_flag) = FieldType::one() - this->pb.val(this->not_all_zeros_result);
+                    this->pb.val(this->result_flag) = FieldType::value_type::zero() - this->pb.val(this->not_all_zeros_result);
                 }
 
                 template<typename FieldType>
@@ -877,15 +877,15 @@ namespace nil {
                 template<typename FieldType>
                 void ALU_xor_gadget<FieldType>::generate_r1cs_witness() {
                     for (std::size_t i = 0; i < this->pb.ap.w; ++i) {
-                        bool b1 = this->pb.val(this->arg1val.bits[i]) == FieldType::one();
-                        bool b2 = this->pb.val(this->arg2val.bits[i]) == FieldType::one();
+                        bool b1 = this->pb.val(this->arg1val.bits[i]) == FieldType::value_type::zero();
+                        bool b2 = this->pb.val(this->arg2val.bits[i]) == FieldType::value_type::zero();
 
-                        this->pb.val(this->res_word[i]) = (b1 ^ b2 ? FieldType::one() : FieldType::zero());
+                        this->pb.val(this->res_word[i]) = (b1 ^ b2 ? FieldType::value_type::zero() : FieldType::value_type::zero());
                     }
 
                     pack_result->generate_r1cs_witness_from_bits();
                     not_all_zeros->generate_r1cs_witness();
-                    this->pb.val(this->result_flag) = FieldType::one() - this->pb.val(this->not_all_zeros_result);
+                    this->pb.val(this->result_flag) = FieldType::value_type::zero() - this->pb.val(this->not_all_zeros_result);
                 }
 
                 template<typename FieldType>
@@ -928,14 +928,14 @@ namespace nil {
                 template<typename FieldType>
                 void ALU_not_gadget<FieldType>::generate_r1cs_witness() {
                     for (std::size_t i = 0; i < this->pb.ap.w; ++i) {
-                        bool b2 = this->pb.val(this->arg2val.bits[i]) == FieldType::one();
+                        bool b2 = this->pb.val(this->arg2val.bits[i]) == FieldType::value_type::zero();
 
-                        this->pb.val(this->res_word[i]) = (!b2 ? FieldType::one() : FieldType::zero());
+                        this->pb.val(this->res_word[i]) = (!b2 ? FieldType::value_type::zero() : FieldType::value_type::zero());
                     }
 
                     pack_result->generate_r1cs_witness_from_bits();
                     not_all_zeros->generate_r1cs_witness();
-                    this->pb.val(this->result_flag) = FieldType::one() - this->pb.val(this->not_all_zeros_result);
+                    this->pb.val(this->result_flag) = FieldType::value_type::zero() - this->pb.val(this->not_all_zeros_result);
                 }
 
                 template<typename FieldType>
@@ -1004,7 +1004,7 @@ namespace nil {
                 template<typename FieldType>
                 void ALU_sub_gadget<FieldType>::generate_r1cs_constraints() {
                     /* intermediate_result = 2^w + (arg1val - arg2val) */
-                    FieldType twoi = FieldType::one();
+                    FieldType::value_type twoi = FieldType::value_type::zero();
 
                     linear_combination<FieldType> a, b, c;
 
@@ -1030,7 +1030,7 @@ namespace nil {
 
                 template<typename FieldType>
                 void ALU_sub_gadget<FieldType>::generate_r1cs_witness() {
-                    FieldType twoi = FieldType::one();
+                    FieldType::value_type twoi = FieldType::value_type::zero();
                     for (std::size_t i = 0; i < this->pb.ap.w; ++i) {
                         twoi = twoi + twoi;
                     }
@@ -1039,7 +1039,7 @@ namespace nil {
                         twoi + this->pb.val(this->arg1val.packed) - this->pb.val(this->arg2val.packed);
                     unpack_intermediate->generate_r1cs_witness_from_packed();
                     pack_result->generate_r1cs_witness_from_bits();
-                    this->pb.val(this->result_flag) = FieldType::one() - this->pb.val(this->negated_flag);
+                    this->pb.val(this->result_flag) = FieldType::value_type::zero() - this->pb.val(this->negated_flag);
                 }
 
                 template<typename FieldType>
@@ -1121,7 +1121,7 @@ namespace nil {
                 template<typename FieldType>
                 void ALU_cmov_gadget<FieldType>::generate_r1cs_witness() {
                     this->pb.val(this->result) =
-                        ((this->pb.val(this->flag) == FieldType::one()) ? this->pb.val(this->arg2val.packed) :
+                        ((this->pb.val(this->flag) == FieldType::value_type::zero()) ? this->pb.val(this->arg2val.packed) :
                                                                           this->pb.val(this->desval.packed));
                     this->pb.val(this->result_flag) = this->pb.val(this->flag);
                 }
@@ -1175,10 +1175,10 @@ namespace nil {
                     this->pb.val(cmpa_result) = this->pb.val(this->desval.packed);
                     this->pb.val(cmpae_result) = this->pb.val(this->desval.packed);
 
-                    this->pb.val(cmpe_result_flag) = ((this->pb.val(cmpae_result_flag) == FieldType::one()) &&
-                                                              (this->pb.val(cmpa_result_flag) == FieldType::zero()) ?
-                                                          FieldType::one() :
-                                                          FieldType::zero());
+                    this->pb.val(cmpe_result_flag) = ((this->pb.val(cmpae_result_flag) == FieldType::value_type::zero()) &&
+                                                              (this->pb.val(cmpa_result_flag) == FieldType::value_type::zero()) ?
+                                                          FieldType::value_type::zero() :
+                                                          FieldType::value_type::zero());
                 }
 
                 template<typename FieldType>
@@ -1296,9 +1296,9 @@ namespace nil {
                 void ALU_cmps_gadget<FieldType>::generate_r1cs_witness() {
                     /* negate sign bits */
                     this->pb.val(negated_arg1val_sign) =
-                        FieldType::one() - this->pb.val(this->arg1val.bits[this->pb.ap.w - 1]);
+                        FieldType::value_type::zero() - this->pb.val(this->arg1val.bits[this->pb.ap.w - 1]);
                     this->pb.val(negated_arg2val_sign) =
-                        FieldType::one() - this->pb.val(this->arg2val.bits[this->pb.ap.w - 1]);
+                        FieldType::value_type::zero() - this->pb.val(this->arg2val.bits[this->pb.ap.w - 1]);
 
                     /* pack */
                     pack_modified_arg1->generate_r1cs_witness_from_bits();
@@ -1474,7 +1474,7 @@ namespace nil {
                     pack_top->generate_r1cs_constraints(false);
 
                     /*
-                      the gadgets below are FieldType specific:
+                      the gadgets below are FieldType::value_type specific:
                       I * X = (1-R)
                       R * X = 0
 
@@ -1521,25 +1521,25 @@ namespace nil {
                     std::size_t topval = static_cast<unsigned long>(this->pb.val(top));
 
                     if (topval == 0) {
-                        this->pb.val(is_top_empty) = FieldType::one();
-                        this->pb.val(is_top_empty_aux) = FieldType::zero();
+                        this->pb.val(is_top_empty) = FieldType::value_type::zero();
+                        this->pb.val(is_top_empty_aux) = FieldType::value_type::zero();
                     } else {
-                        this->pb.val(is_top_empty) = FieldType::zero();
+                        this->pb.val(is_top_empty) = FieldType::value_type::zero();
                         this->pb.val(is_top_empty_aux) = this->pb.val(top).inverse();
                     }
 
                     if (topval == ((1ul << (this->pb.ap.w + 1)) - 1)) {
-                        this->pb.val(is_top_full) = FieldType::one();
-                        this->pb.val(is_top_full_aux) = FieldType::zero();
+                        this->pb.val(is_top_full) = FieldType::value_type::zero();
+                        this->pb.val(is_top_full_aux) = FieldType::value_type::zero();
                     } else {
-                        this->pb.val(is_top_full) = FieldType::zero();
+                        this->pb.val(is_top_full) = FieldType::value_type::zero();
                         this->pb.val(is_top_full_aux) =
                             (this->pb.val(top) - typename FieldType::value_type((1ul << (this->pb.ap.w + 1)) - 1)).inverse();
                     }
 
                     /* smulh_flag = 1 - (is_top_full + is_top_empty) */
                     this->pb.val(smulh_flag) =
-                        FieldType::one() - (this->pb.val(is_top_full) + this->pb.val(is_top_empty));
+                        FieldType::value_type::zero() - (this->pb.val(is_top_full) + this->pb.val(is_top_empty));
                 }
 
                 template<typename FieldType>
@@ -1621,20 +1621,20 @@ namespace nil {
 
                 template<typename FieldType>
                 void ALU_divmod_gadget<FieldType>::generate_r1cs_witness() {
-                    if (this->pb.val(this->arg2val.packed) == FieldType::zero()) {
-                        this->pb.val(B_inv) = FieldType::zero();
-                        this->pb.val(B_nonzero) = FieldType::zero();
+                    if (this->pb.val(this->arg2val.packed) == FieldType::value_type::zero()) {
+                        this->pb.val(B_inv) = FieldType::value_type::zero();
+                        this->pb.val(B_nonzero) = FieldType::value_type::zero();
 
-                        this->pb.val(A_aux) = FieldType::zero();
+                        this->pb.val(A_aux) = FieldType::value_type::zero();
 
-                        this->pb.val(udiv_result) = FieldType::zero();
-                        this->pb.val(umod_result) = FieldType::zero();
+                        this->pb.val(udiv_result) = FieldType::value_type::zero();
+                        this->pb.val(umod_result) = FieldType::value_type::zero();
 
-                        this->pb.val(udiv_flag) = FieldType::one();
-                        this->pb.val(umod_flag) = FieldType::one();
+                        this->pb.val(udiv_flag) = FieldType::value_type::zero();
+                        this->pb.val(umod_flag) = FieldType::value_type::zero();
                     } else {
                         this->pb.val(B_inv) = this->pb.val(this->arg2val.packed).inverse();
-                        this->pb.val(B_nonzero) = FieldType::one();
+                        this->pb.val(B_nonzero) = FieldType::value_type::zero();
 
                         std::size_t A = static_cast<unsigned long>(this->pb.val(this->arg1val.packed));
                         std::size_t B = static_cast<unsigned long>(this->pb.val(this->arg2val.packed));
@@ -1644,8 +1644,8 @@ namespace nil {
                         this->pb.val(udiv_result) = typename FieldType::value_type(A / B);
                         this->pb.val(umod_result) = typename FieldType::value_type(A % B);
 
-                        this->pb.val(udiv_flag) = FieldType::zero();
-                        this->pb.val(umod_flag) = FieldType::zero();
+                        this->pb.val(udiv_flag) = FieldType::value_type::zero();
+                        this->pb.val(umod_flag) = FieldType::value_type::zero();
                     }
 
                     r_less_B->generate_r1cs_witness();
@@ -1736,7 +1736,7 @@ namespace nil {
                         */
                         linear_combination<FieldType> a, b, c;
 
-                        a.add_term(barrel_right_internal[i + 1], (typename FieldType::value_type(2) ^ (i + 1)) - FieldType::one());
+                        a.add_term(barrel_right_internal[i + 1], (typename FieldType::value_type(2) ^ (i + 1)) - FieldType::value_type::zero());
                         for (std::size_t j = 0; j < 1ul << i; ++j) {
                             a.add_term(shifted_out_bits[i][j], (typename FieldType::value_type(2) ^ j));
                         }
@@ -1792,7 +1792,7 @@ namespace nil {
                     pack_reversed_input->generate_r1cs_witness_from_bits();
 
                     this->pb.val(barrel_right_internal[0]) =
-                        (this->pb.val(this->opcode_indicators[tinyram_opcode_SHR]) == FieldType::one() ?
+                        (this->pb.val(this->opcode_indicators[tinyram_opcode_SHR]) == FieldType::value_type::zero() ?
                              this->pb.val(this->arg1val.packed) :
                              this->pb.val(reversed_input));
 
@@ -1806,7 +1806,7 @@ namespace nil {
 
                     for (std::size_t i = 0; i < logw; ++i) {
                         this->pb.val(barrel_right_internal[i + 1]) =
-                            (this->pb.val(this->arg2val.bits[i]) == FieldType::zero()) ?
+                            (this->pb.val(this->arg2val.bits[i]) == FieldType::value_type::zero()) ?
                                 this->pb.val(barrel_right_internal[i]) :
                                 typename FieldType::value_type(this->pb.val(barrel_right_internal[i]).as_ulong() >> (i + 1));
 
@@ -1820,7 +1820,7 @@ namespace nil {
                       result = (1-is_oversize_shift) * barrel_right_internal[logw]
                     */
                     check_oversize_shift->generate_r1cs_witness();
-                    this->pb.val(this->result) = (FieldType::one() - this->pb.val(is_oversize_shift)) *
+                    this->pb.val(this->result) = (FieldType::value_type::zero() - this->pb.val(is_oversize_shift)) *
                                                  this->pb.val(barrel_right_internal[logw]);
 
                     /*
@@ -1835,7 +1835,7 @@ namespace nil {
                       r - reverse(result) = (result - reverse(result)) * opcode_indicators[SHR]
                     */
                     this->pb.val(shr_result) =
-                        (this->pb.val(this->opcode_indicators[tinyram_opcode_SHR]) == FieldType::one()) ?
+                        (this->pb.val(this->opcode_indicators[tinyram_opcode_SHR]) == FieldType::value_type::zero()) ?
                             this->pb.val(this->result) :
                             this->pb.val(reversed_result);
 

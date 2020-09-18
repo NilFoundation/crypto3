@@ -88,7 +88,7 @@ namespace nil {
                             A.add_term(i + 1, 1);
                             B.add_term(i + 2, 1);
                             C.add_term(i + 3, 1);
-                            FieldType tmp = a * b;
+                            FieldType::value_type tmp = a * b;
                             full_variable_assignment.push_back(tmp);
                             a = b;
                             b = tmp;
@@ -98,7 +98,7 @@ namespace nil {
                             A.add_term(i + 1, 1);
                             A.add_term(i + 2, 1);
                             C.add_term(i + 3, 1);
-                            FieldType tmp = a + b;
+                            FieldType::value_type tmp = a + b;
                             full_variable_assignment.push_back(tmp);
                             a = b;
                             b = tmp;
@@ -108,7 +108,7 @@ namespace nil {
                     }
 
                     linear_combination<FieldType> A, B, C;
-                    FieldType fin = FieldType::zero();
+                    FieldType::value_type fin = FieldType::value_type::zero();
                     for (std::size_t i = 1; i < cs.num_variables(); ++i) {
                         A.add_term(i, 1);
                         B.add_term(i, 1);
@@ -167,7 +167,7 @@ namespace nil {
                             C.add_term(u + 1, 1);
                             C.add_term(v + 1, 1);
                         }
-                        C.add_term(lastvar + 1, -FieldType::one());
+                        C.add_term(lastvar + 1, -FieldType::value_type::zero());
 
                         cs.add_constraint(r1cs_constraint<FieldType>(A, B, C));
                         full_variable_assignment.push_back(full_variable_assignment[u] + full_variable_assignment[v] -

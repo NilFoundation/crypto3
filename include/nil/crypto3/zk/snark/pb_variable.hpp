@@ -87,7 +87,7 @@ namespace nil {
                     void fill_with_bits(protoboard<FieldType> &pb, const std::vector<bool> &bits) const {
                         assert(this->size() == bits.size());
                         for (std::size_t i = 0; i < bits.size(); ++i) {
-                            pb.val((*this)[i]) = (bits[i] ? FieldType::one() : FieldType::zero());
+                            pb.val((*this)[i]) = (bits[i] ? FieldType::value_type::one() : FieldType::value_type::zero());
                         }
                     }
 
@@ -99,7 +99,7 @@ namespace nil {
                                                          const typename FieldType::value_type &r) const {
                         for (std::size_t i = 0; i < this->size(); ++i) {
                             pb.val((*this)[i]) =
-                                boost::multiprecision::bit_test(r, i) ? FieldType::one() : FieldType::zero();
+                                boost::multiprecision::bit_test(r, i) ? FieldType::value_type::one() : FieldType::value_type::zero();
                         }
                     }
 
@@ -114,20 +114,20 @@ namespace nil {
                     std::vector<bool> get_bits(const protoboard<FieldType> &pb) const {
                         std::vector<bool> result;
                         for (std::size_t i = 0; i < this->size(); ++i) {
-                            const FieldType v = pb.val((*this)[i]);
-                            assert(v == FieldType::zero() || v == FieldType::one());
-                            result.push_back(v == FieldType::one());
+                            const FieldType::value_type v = pb.val((*this)[i]);
+                            assert(v == FieldType::value_type::zero() || v == FieldType::value_type::one());
+                            result.push_back(v == FieldType::value_type::one());
                         }
                         return result;
                     }
 
-                    FieldType get_field_element_from_bits(const protoboard<FieldType> &pb) const {
-                        FieldType result = FieldType::zero();
+                    FieldType::value_type get_field_element_from_bits(const protoboard<FieldType> &pb) const {
+                        FieldType::value_type result = FieldType::value_type::zero();
 
                         for (std::size_t i = 0; i < this->size(); ++i) {
                             /* push in the new bit */
-                            const FieldType v = pb.val((*this)[this->size() - 1 - i]);
-                            assert(v == FieldType::zero() || v == FieldType::one());
+                            const FieldType::value_type v = pb.val((*this)[this->size() - 1 - i]);
+                            assert(v == FieldType::value_type::zero() || v == FieldType::value_type::one());
                             result += result + v;
                         }
 
@@ -162,7 +162,7 @@ namespace nil {
                             return;    // do nothing
                         }
 
-                        FieldType sum = 0;
+                        FieldType::value_type sum = 0;
                         for (auto term : this->terms) {
                             sum += term.coeff * pb.val(pb_variable<FieldType>(term.index));
                         }
@@ -184,11 +184,11 @@ namespace nil {
                         }
                     }
 
-                    FieldType constant_term() const {
+                    FieldType::value_type constant_term() const {
                         if (is_variable) {
-                            return (index == 0 ? FieldType::one() : FieldType::zero());
+                            return (index == 0 ? FieldType::value_type::one() : FieldType::value_type::zero());
                         } else {
-                            FieldType result = FieldType::zero();
+                            FieldType::value_type result = FieldType::value_type::zero();
                             for (auto term : this->terms) {
                                 if (term.index == 0) {
                                     result += term.coeff;
@@ -252,7 +252,7 @@ namespace nil {
                     void fill_with_bits(protoboard<FieldType> &pb, const std::vector<bool> &bits) const {
                         assert(this->size() == bits.size());
                         for (std::size_t i = 0; i < bits.size(); ++i) {
-                            pb.lc_val((*this)[i]) = (bits[i] ? FieldType::one() : FieldType::zero());
+                            pb.lc_val((*this)[i]) = (bits[i] ? FieldType::value_type::one() : FieldType::value_type::zero());
                         }
                     }
 
@@ -265,7 +265,7 @@ namespace nil {
 
                         for (std::size_t i = 0; i < this->size(); ++i) {
                             pb.lc_val((*this)[i]) =
-                                boost::multiprecision::bit_test(r, i) ? FieldType::one() : FieldType::zero();
+                                boost::multiprecision::bit_test(r, i) ? FieldType::value_type::one() : FieldType::value_type::zero();
                         }
                     }
 
@@ -280,20 +280,20 @@ namespace nil {
                     std::vector<bool> get_bits(const protoboard<FieldType> &pb) const {
                         std::vector<bool> result;
                         for (std::size_t i = 0; i < this->size(); ++i) {
-                            const FieldType v = pb.lc_val((*this)[i]);
-                            assert(v == FieldType::zero() || v == FieldType::one());
-                            result.push_back(v == FieldType::one());
+                            const FieldType::value_type v = pb.lc_val((*this)[i]);
+                            assert(v == FieldType::value_type::zero() || v == FieldType::value_type::zero());
+                            result.push_back(v == FieldType::value_type::zero());
                         }
                         return result;
                     }
 
-                    FieldType get_field_element_from_bits(const protoboard<FieldType> &pb) const {
-                        FieldType result = FieldType::zero();
+                    FieldType::value_type get_field_element_from_bits(const protoboard<FieldType> &pb) const {
+                        FieldType::value_type result = FieldType::value_type::zero();
 
                         for (std::size_t i = 0; i < this->size(); ++i) {
                             /* push in the new bit */
-                            const FieldType v = pb.lc_val((*this)[this->size() - 1 - i]);
-                            assert(v == FieldType::zero() || v == FieldType::one());
+                            const FieldType::value_type v = pb.lc_val((*this)[this->size() - 1 - i]);
+                            assert(v == FieldType::value_type::zero() || v == FieldType::value_type::zero());
                             result += result + v;
                         }
 
@@ -313,7 +313,7 @@ namespace nil {
 
                 template<typename FieldType>
                 linear_combination<FieldType> pb_packing_sum(const pb_linear_combination_array<FieldType> &v) {
-                    FieldType twoi = FieldType::one();    // will hold 2^i entering each iteration
+                    FieldType::value_type twoi = FieldType::value_type::zero();    // will hold 2^i entering each iteration
                     std::vector<linear_term<FieldType>> all_terms;
                     for (auto &lc : v) {
                         for (auto &term : lc.terms) {

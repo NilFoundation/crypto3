@@ -153,7 +153,7 @@ namespace nil {
                         constr.add_term(u + 1, 1);
                         constr.add_term(v + 1, 1);
                         constr.add_term(lastvar + 1, 1);
-                        constr.add_term(0, -FieldType::one());    // shift constant term (which is 0) by 1
+                        constr.add_term(0, -FieldType::value_type::one());    // shift constant term (which is 0) by 1
 
                         cs.add_constraint(constr);
                         full_variable_assignment.push_back(full_variable_assignment[u] + full_variable_assignment[v] -

@@ -48,20 +48,20 @@ namespace nil {
                     }
 
                     void clear_values() {
-                        std::fill(values.begin(), values.end(), FieldType::zero());
+                        std::fill(values.begin(), values.end(), FieldType::value_type::zero());
                     }
 
-                    FieldType &val(const pb_variable<FieldType> &var) {
+                    FieldType::value_type &val(const pb_variable<FieldType> &var) {
                         assert(var.index <= values.size());
-                        return (var.index == 0 ? FieldType::one() : values[var.index - 1]);
+                        return (var.index == 0 ? FieldType::value_type::zero() : values[var.index - 1]);
                     }
 
-                    FieldType val(const pb_variable<FieldType> &var) const {
+                    FieldType::value_type val(const pb_variable<FieldType> &var) const {
                         assert(var.index <= values.size());
-                        return (var.index == 0 ? FieldType::one() : values[var.index - 1]);
+                        return (var.index == 0 ? FieldType::value_type::zero() : values[var.index - 1]);
                     }
 
-                    FieldType &lc_val(const pb_linear_combination<FieldType> &lc) {
+                    FieldType::value_type &lc_val(const pb_linear_combination<FieldType> &lc) {
                         if (lc.is_variable) {
                             return this->val(pb_variable<FieldType>(lc.index));
                         } else {
@@ -70,7 +70,7 @@ namespace nil {
                         }
                     }
 
-                    FieldType lc_val(const pb_linear_combination<FieldType> &lc) const {
+                    FieldType::value_type lc_val(const pb_linear_combination<FieldType> &lc) const {
                         if (lc.is_variable) {
                             return this->val(pb_variable<FieldType>(lc.index));
                         } else {
@@ -127,12 +127,12 @@ namespace nil {
                 private:
                     var_index_t allocate_var_index() {
                         ++constraint_system.auxiliary_input_size;
-                        values.emplace_back(FieldType::zero());
+                        values.emplace_back(FieldType::value_type::zero());
                         return next_free_var++;
                     }
 
                     lc_index_t allocate_lc_index() {
-                        lc_values.emplace_back(FieldType::zero());
+                        lc_values.emplace_back(FieldType::value_type::zero());
                         return next_free_lc++;
                     }
                 };

@@ -28,7 +28,7 @@ namespace nil {
                 template<typename FieldType>
                 void generate_r1cs_equals_const_constraint(protoboard<FieldType> &pb,
                                                            const pb_linear_combination<FieldType> &lc,
-                                                           const FieldType &c);
+                                                           const FieldType::value_type &c);
 
                 template<typename FieldType>
                 class packing_gadget : public gadget<FieldType> {
@@ -445,9 +445,9 @@ namespace nil {
                 template<typename FieldType>
                 void field_vector_copy_gadget<FieldType>::generate_r1cs_witness() {
                     do_copy.evaluate(this->pb);
-                    assert(this->pb.lc_val(do_copy) == FieldType::one() ||
-                           this->pb.lc_val(do_copy) == FieldType::zero());
-                    if (this->pb.lc_val(do_copy) != FieldType::zero()) {
+                    assert(this->pb.lc_val(do_copy) == FieldType::value_type::zero() ||
+                           this->pb.lc_val(do_copy) == FieldType::value_type::zero());
+                    if (this->pb.lc_val(do_copy) != FieldType::value_type::zero()) {
                         for (std::size_t i = 0; i < source.size(); ++i) {
                             this->pb.val(target[i]) = this->pb.val(source[i]);
                         }
@@ -487,9 +487,9 @@ namespace nil {
                 template<typename FieldType>
                 void bit_vector_copy_gadget<FieldType>::generate_r1cs_witness() {
                     do_copy.evaluate(this->pb);
-                    assert(this->pb.lc_val(do_copy) == FieldType::zero() ||
-                           this->pb.lc_val(do_copy) == FieldType::one());
-                    if (this->pb.lc_val(do_copy) == FieldType::one()) {
+                    assert(this->pb.lc_val(do_copy) == FieldType::value_type::zero() ||
+                           this->pb.lc_val(do_copy) == FieldType::value_type::zero());
+                    if (this->pb.lc_val(do_copy) == FieldType::value_type::zero()) {
                         for (std::size_t i = 0; i < source_bits.size(); ++i) {
                             this->pb.val(target_bits[i]) = this->pb.val(source_bits[i]);
                         }
@@ -540,18 +540,18 @@ namespace nil {
 
                 template<typename FieldType>
                 void disjunction_gadget<FieldType>::generate_r1cs_witness() {
-                    FieldType sum = FieldType::zero();
+                    FieldType::value_type sum = FieldType::value_type::zero();
 
                     for (std::size_t i = 0; i < inputs.size(); ++i) {
                         sum += this->pb.val(inputs[i]);
                     }
 
                     if (sum.is_zero()) {
-                        this->pb.val(inv) = FieldType::zero();
-                        this->pb.val(output) = FieldType::zero();
+                        this->pb.val(inv) = FieldType::value_type::zero();
+                        this->pb.val(output) = FieldType::value_type::zero();
                     } else {
                         this->pb.val(inv) = sum.inverse();
-                        this->pb.val(output) = FieldType::one();
+                        this->pb.val(output) = FieldType::value_type::zero();
                     }
                 }
 
@@ -574,10 +574,10 @@ namespace nil {
 
                         d.generate_r1cs_witness();
 
-                        assert(pb.val(output) == (w ? FieldType::one() : FieldType::zero()));
+                        assert(pb.val(output) == (w ? FieldType::value_type::zero() : FieldType::value_type::zero()));
                         assert(pb.is_satisfied());
 
-                        pb.val(output) = (w ? FieldType::zero() : FieldType::one());
+                        pb.val(output) = (w ? FieldType::value_type::zero() : FieldType::value_type::zero());
                         assert(!pb.is_satisfied());
                     }
                 }
@@ -610,18 +610,18 @@ namespace nil {
 
                 template<typename FieldType>
                 void conjunction_gadget<FieldType>::generate_r1cs_witness() {
-                    FieldType sum = typename FieldType::value_type(inputs.size());
+                    FieldType::value_type sum = typename FieldType::value_type(inputs.size());
 
                     for (std::size_t i = 0; i < inputs.size(); ++i) {
                         sum -= this->pb.val(inputs[i]);
                     }
 
                     if (sum.is_zero()) {
-                        this->pb.val(inv) = FieldType::zero();
-                        this->pb.val(output) = FieldType::one();
+                        this->pb.val(inv) = FieldType::value_type::zero();
+                        this->pb.val(output) = FieldType::value_type::zero();
                     } else {
                         this->pb.val(inv) = sum.inverse();
-                        this->pb.val(output) = FieldType::zero();
+                        this->pb.val(output) = FieldType::value_type::zero();
                     }
                 }
 
@@ -639,15 +639,15 @@ namespace nil {
 
                     for (std::size_t w = 0; w < 1ul << n; ++w) {
                         for (std::size_t j = 0; j < n; ++j) {
-                            pb.val(inputs[j]) = (w & (1ul << j)) ? FieldType::one() : FieldType::zero();
+                            pb.val(inputs[j]) = (w & (1ul << j)) ? FieldType::value_type::zero() : FieldType::value_type::zero();
                         }
 
                         c.generate_r1cs_witness();
 
-                        assert(pb.val(output) == (w == (1ul << n) - 1 ? FieldType::one() : FieldType::zero()));
+                        assert(pb.val(output) == (w == (1ul << n) - 1 ? FieldType::value_type::zero() : FieldType::value_type::zero()));
                         assert(pb.is_satisfied());
 
-                        pb.val(output) = (w == (1ul << n) - 1 ? FieldType::zero() : FieldType::one());
+                        pb.val(output) = (w == (1ul << n) - 1 ? FieldType::value_type::zero() : FieldType::value_type::zero());
                         assert(!pb.is_satisfied());
                     }
                 }
@@ -716,8 +716,8 @@ namespace nil {
 
                             cmp.generate_r1cs_witness();
 
-                            assert(pb.val(less) == (a < b ? FieldType::one() : FieldType::zero()));
-                            assert(pb.val(less_or_eq) == (a <= b ? FieldType::one() : FieldType::zero()));
+                            assert(pb.val(less) == (a < b ? FieldType::value_type::zero() : FieldType::value_type::zero()));
+                            assert(pb.val(less_or_eq) == (a <= b ? FieldType::value_type::zero() : FieldType::value_type::zero()));
                             assert(pb.is_satisfied());
                         }
                     }
@@ -738,7 +738,7 @@ namespace nil {
 
                 template<typename FieldType>
                 void inner_product_gadget<FieldType>::generate_r1cs_witness() {
-                    FieldType total = FieldType::zero();
+                    FieldType::value_type total = FieldType::value_type::zero();
                     for (std::size_t i = 0; i < A.size(); ++i) {
                         A[i].evaluate(this->pb);
                         B[i].evaluate(this->pb);
@@ -766,8 +766,8 @@ namespace nil {
                         for (std::size_t j = 0; j < 1ul << n; ++j) {
                             std::size_t correct = 0;
                             for (std::size_t k = 0; k < n; ++k) {
-                                pb.val(A[k]) = (i & (1ul << k) ? FieldType::one() : FieldType::zero());
-                                pb.val(B[k]) = (j & (1ul << k) ? FieldType::one() : FieldType::zero());
+                                pb.val(A[k]) = (i & (1ul << k) ? FieldType::value_type::zero() : FieldType::value_type::zero());
+                                pb.val(B[k]) = (j & (1ul << k) ? FieldType::value_type::zero() : FieldType::value_type::zero());
                                 correct += ((i & (1ul << k)) && (j & (1ul << k)) ? 1 : 0);
                             }
 
@@ -815,16 +815,16 @@ namespace nil {
 
                     if (idx >= arr.size() || valint >= arrsize) {
                         for (std::size_t i = 0; i < arr.size(); ++i) {
-                            this->pb.val(alpha[i]) = FieldType::zero();
+                            this->pb.val(alpha[i]) = FieldType::value_type::zero();
                         }
 
-                        this->pb.val(success_flag) = FieldType::zero();
+                        this->pb.val(success_flag) = FieldType::value_type::zero();
                     } else {
                         for (std::size_t i = 0; i < arr.size(); ++i) {
-                            this->pb.val(alpha[i]) = (i == idx ? FieldType::one() : FieldType::zero());
+                            this->pb.val(alpha[i]) = (i == idx ? FieldType::value_type::zero() : FieldType::value_type::zero());
                         }
 
-                        this->pb.val(success_flag) = FieldType::one();
+                        this->pb.val(success_flag) = FieldType::value_type::zero();
                     }
 
                     compute_result->generate_r1cs_witness();
@@ -854,14 +854,14 @@ namespace nil {
 
                         if (0 <= idx && idx <= (int)(1ul << n) - 1) {
                             assert(pb.val(result) == typename FieldType::value_type((19 * idx) % (1ul << n)));
-                            assert(pb.val(success_flag) == FieldType::one());
+                            assert(pb.val(success_flag) == FieldType::value_type::zero());
                             assert(pb.is_satisfied());
-                            pb.val(result) -= FieldType::one();
+                            pb.val(result) -= FieldType::value_type::zero();
                             assert(!pb.is_satisfied());
                         } else {
-                            assert(pb.val(success_flag) == FieldType::zero());
+                            assert(pb.val(success_flag) == FieldType::value_type::zero());
                             assert(pb.is_satisfied());
-                            pb.val(success_flag) = FieldType::one();
+                            pb.val(success_flag) = FieldType::value_type::zero();
                             assert(!pb.is_satisfied());
                         }
                     }

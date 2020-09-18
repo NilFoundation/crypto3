@@ -156,9 +156,9 @@ namespace nil {
                             full_variable_assignment.end(), auxiliary_input.begin(), auxiliary_input.end());
 
                         for (std::size_t c = 0; c < constraints.size(); ++c) {
-                            const FieldType ares = constraints[c].a.evaluate(full_variable_assignment);
-                            const FieldType bres = constraints[c].b.evaluate(full_variable_assignment);
-                            const FieldType cres = constraints[c].c.evaluate(full_variable_assignment);
+                            const FieldType::value_type ares = constraints[c].a.evaluate(full_variable_assignment);
+                            const FieldType::value_type bres = constraints[c].b.evaluate(full_variable_assignment);
+                            const FieldType::value_type cres = constraints[c].c.evaluate(full_variable_assignment);
 
                             if (!(ares * bres == cres)) {
                                 return false;

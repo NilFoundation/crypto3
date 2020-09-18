@@ -97,7 +97,7 @@ namespace nil {
                      * to ensure soundness of input consistency
                      */
                     for (std::size_t i = 0; i <= cs.num_inputs(); ++i) {
-                        A_in_Lagrange_basis[i][cs.num_constraints() + i] = FieldType::one();
+                        A_in_Lagrange_basis[i][cs.num_constraints() + i] = FieldType::value_type::zero();
                     }
                     /* process all other constraints */
                     for (std::size_t i = 0; i < cs.num_constraints(); ++i) {
@@ -143,18 +143,18 @@ namespace nil {
                 template<typename FieldType>
                 qap_instance_evaluation<FieldType>
                     r1cs_to_qap_instance_map_with_evaluation(const r1cs_constraint_system<FieldType> &cs,
-                                                             const FieldType &t) {
+                                                             const FieldType::value_type &t) {
                     const std::shared_ptr<algebra::fft::evaluation_domain<FieldType>> domain =
                         algebra::fft::make_evaluation_domain<FieldType>(cs.num_constraints() + cs.num_inputs() + 1);
 
                     std::vector<typename FieldType::value_type> At, Bt, Ct, Ht;
 
-                    At.resize(cs.num_variables() + 1, FieldType::zero());
-                    Bt.resize(cs.num_variables() + 1, FieldType::zero());
-                    Ct.resize(cs.num_variables() + 1, FieldType::zero());
+                    At.resize(cs.num_variables() + 1, FieldType::value_type::zero());
+                    Bt.resize(cs.num_variables() + 1, FieldType::value_type::zero());
+                    Ct.resize(cs.num_variables() + 1, FieldType::value_type::zero());
                     Ht.reserve(domain->m + 1);
 
-                    const FieldType Zt = domain->compute_vanishing_polynomial(t);
+                    const FieldType::value_type Zt = domain->compute_vanishing_polynomial(t);
 
                     const std::vector<typename FieldType::value_type> u = domain->evaluate_all_lagrange_polynomials(t);
                     /**
@@ -180,7 +180,7 @@ namespace nil {
                         }
                     }
 
-                    FieldType ti = FieldType::one();
+                    FieldType::value_type ti = FieldType::value_type::zero();
                     for (std::size_t i = 0; i < domain->m + 1; ++i) {
                         Ht.emplace_back(ti);
                         ti *= t;
@@ -232,9 +232,9 @@ namespace nil {
                 qap_witness<FieldType> r1cs_to_qap_witness_map(const r1cs_constraint_system<FieldType> &cs,
                                                                const r1cs_primary_input<FieldType> &primary_input,
                                                                const r1cs_auxiliary_input<FieldType> &auxiliary_input,
-                                                               const FieldType &d1,
-                                                               const FieldType &d2,
-                                                               const FieldType &d3) {
+                                                               const FieldType::value_type &d1,
+                                                               const FieldType::value_type &d2,
+                                                               const FieldType::value_type &d3) {
                     /* sanity check */
                     assert(cs.is_satisfied(primary_input, auxiliary_input));
 
@@ -245,11 +245,11 @@ namespace nil {
                     full_variable_assignment.insert(
                         full_variable_assignment.end(), auxiliary_input.begin(), auxiliary_input.end());
 
-                    std::vector<typename FieldType::value_type> aA(domain->m, FieldType::zero()), aB(domain->m, FieldType::zero());
+                    std::vector<typename FieldType::value_type> aA(domain->m, FieldType::value_type::zero()), aB(domain->m, FieldType::value_type::zero());
 
                     /* account for the additional constraints input_i * 0 = 0 */
                     for (std::size_t i = 0; i <= cs.num_inputs(); ++i) {
-                        aA[i + cs.num_constraints()] = (i > 0 ? full_variable_assignment[i - 1] : FieldType::one());
+                        aA[i + cs.num_constraints()] = (i > 0 ? full_variable_assignment[i - 1] : FieldType::value_type::zero());
                     }
                     /* account for all other constraints */
                     for (std::size_t i = 0; i < cs.num_constraints(); ++i) {
@@ -261,7 +261,7 @@ namespace nil {
 
                     domain->iFFT(aB);
 
-                    std::vector<typename FieldType::value_type> coefficients_for_H(domain->m + 1, FieldType::zero());
+                    std::vector<typename FieldType::value_type> coefficients_for_H(domain->m + 1, FieldType::value_type::zero());
 #ifdef MULTICORE
 #pragma omp parallel for
 #endif
@@ -287,7 +287,7 @@ namespace nil {
                     }
                     std::vector<typename FieldType::value_type>().swap(aB);    // destroy aB
 
-                    std::vector<typename FieldType::value_type> aC(domain->m, FieldType::zero());
+                    std::vector<typename FieldType::value_type> aC(domain->m, FieldType::value_type::zero());
                     for (std::size_t i = 0; i < cs.num_constraints(); ++i) {
                         aC[i] += cs.constraints[i].c.evaluate(full_variable_assignment);
                     }

@@ -140,7 +140,7 @@ namespace nil {
                     /* test all elements from set */
                     for (std::size_t i = 0; i < max_set_size; ++i) {
                         element_bits.fill_with_bits(pb, set_elems[i]);
-                        pb.val(check_succesful) = FieldType::one();
+                        pb.val(check_succesful) = FieldType::value_type::zero();
                         proof.generate_r1cs_witness(accumulator.get_membership_proof(set_elems[i]));
                         sc.generate_r1cs_witness();
                         root_digest.generate_r1cs_witness(accumulator.get_commitment());
@@ -153,14 +153,14 @@ namespace nil {
                         pb.val(element_bits[i]) = typename FieldType::value_type(std::rand() % 2);
                     }
 
-                    pb.val(check_succesful) = FieldType::zero(); /* do not require the check result to be successful */
+                    pb.val(check_succesful) = FieldType::value_type::zero(); /* do not require the check result to be successful */
                     proof.generate_r1cs_witness(
                         accumulator.get_membership_proof(set_elems[0])); /* try it with invalid proof */
                     sc.generate_r1cs_witness();
                     root_digest.generate_r1cs_witness(accumulator.get_commitment());
                     assert(pb.is_satisfied());
 
-                    pb.val(check_succesful) = FieldType::one(); /* now require the check result to be succesful */
+                    pb.val(check_succesful) = FieldType::value_type::zero(); /* now require the check result to be succesful */
                     proof.generate_r1cs_witness(
                         accumulator.get_membership_proof(set_elems[0])); /* try it with invalid proof */
                     sc.generate_r1cs_witness();

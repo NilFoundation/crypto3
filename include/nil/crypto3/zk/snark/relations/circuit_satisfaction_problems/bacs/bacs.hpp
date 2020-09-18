@@ -53,7 +53,7 @@ namespace nil {
                     variable<FieldType> output;
                     bool is_circuit_output;
 
-                    FieldType evaluate(const bacs_variable_assignment<FieldType> &input) const {
+                    FieldType::value_type evaluate(const bacs_variable_assignment<FieldType> &input) const {
                         return lhs.evaluate(input) * rhs.evaluate(input);
                     }
 
@@ -202,7 +202,7 @@ namespace nil {
                         assert(result.size() == num_inputs());
 
                         for (auto &g : gates) {
-                            const FieldType gate_output = g.evaluate(result);
+                            const FieldType::value_type gate_output = g.evaluate(result);
                             result.emplace_back(gate_output);
                         }
 

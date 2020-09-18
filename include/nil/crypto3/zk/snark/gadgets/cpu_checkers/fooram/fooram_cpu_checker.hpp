@@ -130,17 +130,17 @@ namespace nil {
 
                     /* packed_next_pc_addr = prev_pc_addr + one_as_addr */
                     increment_pc.reset(new bar_gadget<FieldType>(
-                        pb, prev_pc_addr, FieldType::one(), one_as_addr, FieldType::one(), packed_next_pc_addr));
+                        pb, prev_pc_addr, FieldType::value_type::zero(), one_as_addr, FieldType::value_type::zero(), packed_next_pc_addr));
 
                     /* packed_store_addr = prev_pc_addr + prev_pc_val */
                     packed_store_addr.allocate(pb);
                     compute_packed_store_addr.reset(new bar_gadget<FieldType>(
-                        pb, prev_pc_addr, FieldType::one(), prev_pc_val, FieldType::one(), packed_store_addr));
+                        pb, prev_pc_addr, FieldType::value_type::zero(), prev_pc_val, FieldType::value_type::zero(), packed_store_addr));
 
                     /* packed_load_addr = 2 * x + next_pc_addr */
                     packed_load_addr.allocate(pb);
                     compute_packed_load_addr.reset(new bar_gadget<FieldType>(
-                        pb, prev_pc_val, typename FieldType::value_type(2), next_pc_addr, FieldType::one(), packed_load_addr));
+                        pb, prev_pc_val, typename FieldType::value_type(2), next_pc_addr, FieldType::value_type::zero(), packed_load_addr));
 
                     /*
                       packed_ls_addr = x0 * packed_load_addr + (1-x0) * packed_store_addr
@@ -152,7 +152,7 @@ namespace nil {
                     /* packed_store_val = prev_state_bits + prev_pc_addr */
                     packed_store_val.allocate(pb);
                     compute_packed_store_val.reset(new bar_gadget<FieldType>(
-                        pb, prev_state, FieldType::one(), prev_pc_addr, FieldType::one(), packed_store_val));
+                        pb, prev_state, FieldType::value_type::zero(), prev_pc_addr, FieldType::value_type::zero(), packed_store_val));
 
                     /*
                       packed_ls_next_val = x0 * packed_ls_prev_val + (1-x0) * packed_store_val
@@ -247,7 +247,7 @@ namespace nil {
                     */
                     this->pb.val(packed_ls_addr) =
                         (this->pb.val(prev_pc_val[0]) * this->pb.val(packed_load_addr) +
-                         (FieldType::one() - this->pb.val(prev_pc_val[0])) * this->pb.val(packed_store_addr));
+                         (FieldType::value_type::zero() - this->pb.val(prev_pc_val[0])) * this->pb.val(packed_store_addr));
                     pack_ls_addr->generate_r1cs_witness_from_packed();
                 }
 
@@ -268,7 +268,7 @@ namespace nil {
                     pack_ls_prev_val->generate_r1cs_witness_from_bits();
                     this->pb.val(packed_ls_next_val) =
                         (this->pb.val(prev_pc_val[0]) * this->pb.val(packed_ls_prev_val) +
-                         (FieldType::one() - this->pb.val(prev_pc_val[0])) * this->pb.val(packed_store_val));
+                         (FieldType::value_type::zero() - this->pb.val(prev_pc_val[0])) * this->pb.val(packed_store_val));
                     pack_ls_next_val->generate_r1cs_witness_from_packed();
 
                     /*
@@ -280,11 +280,11 @@ namespace nil {
                     pack_prev_state->generate_r1cs_witness_from_bits();
                     this->pb.val(packed_next_state) =
                         (this->pb.val(prev_pc_val[0]) * this->pb.val(packed_ls_prev_val) +
-                         (FieldType::one() - this->pb.val(prev_pc_val[0])) * this->pb.val(packed_prev_state));
+                         (FieldType::value_type::zero() - this->pb.val(prev_pc_val[0])) * this->pb.val(packed_prev_state));
                     pack_next_state->generate_r1cs_witness_from_packed();
 
                     /* next_has_accepted = 1 */
-                    this->pb.val(next_has_accepted) = FieldType::one();
+                    this->pb.val(next_has_accepted) = FieldType::value_type::zero();
                 }
 
                 template<typename FieldType>

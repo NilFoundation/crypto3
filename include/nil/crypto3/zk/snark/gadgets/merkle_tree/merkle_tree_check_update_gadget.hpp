@@ -188,7 +188,7 @@ namespace nil {
                     /* do the hash computations bottom-up */
                     for (int i = tree_depth - 1; i >= 0; --i) {
                         /* ensure consistency of prev_path and next_path */
-                        if (this->pb.val(address_bits[tree_depth - 1 - i]) == FieldType::one()) {
+                        if (this->pb.val(address_bits[tree_depth - 1 - i]) == FieldType::value_type::zero()) {
                             next_path.left_digests[i].generate_r1cs_witness(prev_path.left_digests[i].get_digest());
                         } else {
                             next_path.right_digests[i].generate_r1cs_witness(prev_path.right_digests[i].get_digest());

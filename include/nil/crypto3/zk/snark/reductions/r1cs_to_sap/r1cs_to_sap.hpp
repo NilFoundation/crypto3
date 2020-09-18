@@ -63,7 +63,7 @@ namespace nil {
                 template<typename FieldType>
                 sap_instance_evaluation<FieldType>
                     r1cs_to_sap_instance_map_with_evaluation(const r1cs_constraint_system<FieldType> &cs,
-                                                             const FieldType &t);
+                                                             const FieldType::value_type &t);
 
                 /**
                  * Witness map for the R1CS-to-QAP reduction.
@@ -74,15 +74,15 @@ namespace nil {
                 sap_witness<FieldType> r1cs_to_sap_witness_map(const r1cs_constraint_system<FieldType> &cs,
                                                                const r1cs_primary_input<FieldType> &primary_input,
                                                                const r1cs_auxiliary_input<FieldType> &auxiliary_input,
-                                                               const FieldType &d1,
-                                                               const FieldType &d2);
+                                                               const FieldType::value_type &d1,
+                                                               const FieldType::value_type &d2);
 
                 /**
                  * Helper function to multiply a field element by 4 efficiently
                  */
                 template<typename FieldType>
-                FieldType times_four(FieldType x) {
-                    FieldType times_two = x + x;
+                FieldType::value_type times_four(FieldType::value_type x) {
+                    FieldType::value_type times_two = x + x;
                     return times_two + times_two;
                 }
 
@@ -153,8 +153,8 @@ namespace nil {
                                 times_four(cs.constraints[i].c.terms[j].coeff);
                         }
 
-                        C_in_Lagrange_basis[extra_var_offset + i][2 * i] += FieldType::one();
-                        C_in_Lagrange_basis[extra_var_offset + i][2 * i + 1] += FieldType::one();
+                        C_in_Lagrange_basis[extra_var_offset + i][2 * i] += FieldType::value_type::zero();
+                        C_in_Lagrange_basis[extra_var_offset + i][2 * i + 1] += FieldType::value_type::zero();
                     }
 
                     /**
@@ -185,19 +185,19 @@ namespace nil {
                      *     1 below
                      */
 
-                    A_in_Lagrange_basis[0][extra_constr_offset] = FieldType::one();
-                    C_in_Lagrange_basis[0][extra_constr_offset] = FieldType::one();
+                    A_in_Lagrange_basis[0][extra_constr_offset] = FieldType::value_type::zero();
+                    C_in_Lagrange_basis[0][extra_constr_offset] = FieldType::value_type::zero();
 
                     for (std::size_t i = 1; i <= cs.num_inputs(); ++i) {
-                        A_in_Lagrange_basis[i][extra_constr_offset + 2 * i - 1] += FieldType::one();
-                        A_in_Lagrange_basis[0][extra_constr_offset + 2 * i - 1] += FieldType::one();
-                        C_in_Lagrange_basis[i][extra_constr_offset + 2 * i - 1] += times_four(FieldType::one());
-                        C_in_Lagrange_basis[extra_var_offset2 + i][extra_constr_offset + 2 * i - 1] += FieldType::one();
+                        A_in_Lagrange_basis[i][extra_constr_offset + 2 * i - 1] += FieldType::value_type::zero();
+                        A_in_Lagrange_basis[0][extra_constr_offset + 2 * i - 1] += FieldType::value_type::zero();
+                        C_in_Lagrange_basis[i][extra_constr_offset + 2 * i - 1] += times_four(FieldType::value_type::zero());
+                        C_in_Lagrange_basis[extra_var_offset2 + i][extra_constr_offset + 2 * i - 1] += FieldType::value_type::zero();
 
-                        A_in_Lagrange_basis[i][extra_constr_offset + 2 * i] += FieldType::one();
-                        A_in_Lagrange_basis[0][extra_constr_offset + 2 * i] -= FieldType::one();
+                        A_in_Lagrange_basis[i][extra_constr_offset + 2 * i] += FieldType::value_type::zero();
+                        A_in_Lagrange_basis[0][extra_constr_offset + 2 * i] -= FieldType::value_type::zero();
                         C_in_Lagrange_basis[extra_var_offset2 + i][2 * cs.num_constraints() + 2 * i] +=
-                            FieldType::one();
+                            FieldType::value_type::zero();
                     }
 
                     return sap_instance<FieldType>(domain,
@@ -216,7 +216,7 @@ namespace nil {
                 sap_instance_evaluation<FieldType>
 
                     r1cs_to_sap_instance_map_with_evaluation(const r1cs_constraint_system<FieldType> &cs,
-                                                             const FieldType &t) {
+                                                             const FieldType::value_type &t) {
                     const std::shared_ptr<algebra::fft::evaluation_domain<FieldType>> domain =
                         r1cs_to_sap_get_domain(cs);
 
@@ -224,11 +224,11 @@ namespace nil {
 
                     std::vector<typename FieldType::value_type> At, Ct, Ht;
 
-                    At.resize(sap_num_variables + 1, FieldType::zero());
-                    Ct.resize(sap_num_variables + 1, FieldType::zero());
+                    At.resize(sap_num_variables + 1, FieldType::value_type::zero());
+                    Ct.resize(sap_num_variables + 1, FieldType::value_type::zero());
                     Ht.reserve(domain->m + 1);
 
-                    const FieldType Zt = domain->compute_vanishing_polynomial(t);
+                    const FieldType::value_type Zt = domain->compute_vanishing_polynomial(t);
 
                     const std::vector<typename FieldType::value_type> u = domain->evaluate_all_lagrange_polynomials(t);
                     /**
@@ -272,7 +272,7 @@ namespace nil {
                         Ct[extra_var_offset2 + i] += u[extra_constr_offset + 2 * i];
                     }
 
-                    FieldType ti = FieldType::one();
+                    FieldType::value_type ti = FieldType::value_type::zero();
                     for (std::size_t i = 0; i < domain->m + 1; ++i) {
                         Ht.emplace_back(ti);
                         ti *= t;
@@ -322,8 +322,8 @@ namespace nil {
                 sap_witness<FieldType> r1cs_to_sap_witness_map(const r1cs_constraint_system<FieldType> &cs,
                                                                const r1cs_primary_input<FieldType> &primary_input,
                                                                const r1cs_auxiliary_input<FieldType> &auxiliary_input,
-                                                               const FieldType &d1,
-                                                               const FieldType &d2) {
+                                                               const FieldType::value_type &d1,
+                                                               const FieldType::value_type &d2) {
                     /* sanity check */
                     assert(cs.is_satisfied(primary_input, auxiliary_input));
 
@@ -350,7 +350,7 @@ namespace nil {
                          * we introduced that is not present in the input.
                          * its value is (a - b)^2
                          */
-                        FieldType extra_var = cs.constraints[i].a.evaluate(full_variable_assignment) -
+                        FieldType::value_type extra_var = cs.constraints[i].a.evaluate(full_variable_assignment) -
                                               cs.constraints[i].b.evaluate(full_variable_assignment);
                         extra_var = extra_var * extra_var;
                         full_variable_assignment.push_back(extra_var);
@@ -361,12 +361,12 @@ namespace nil {
                          * we introduced that is not present in the input.
                          * its value is (x_i - 1)^2
                          */
-                        FieldType extra_var = full_variable_assignment[i - 1] - FieldType::one();
+                        FieldType::value_type extra_var = full_variable_assignment[i - 1] - FieldType::value_type::zero();
                         extra_var = extra_var * extra_var;
                         full_variable_assignment.push_back(extra_var);
                     }
 
-                    std::vector<typename FieldType::value_type> aA(domain->m, FieldType::zero());
+                    std::vector<typename FieldType::value_type> aA(domain->m, FieldType::value_type::zero());
 
                     /* account for all constraints, as in r1cs_to_sap_instance_map */
                     for (std::size_t i = 0; i < cs.num_constraints(); ++i) {
@@ -379,19 +379,19 @@ namespace nil {
 
                     std::size_t extra_constr_offset = 2 * cs.num_constraints();
 
-                    aA[extra_constr_offset] += FieldType::one();
+                    aA[extra_constr_offset] += FieldType::value_type::zero();
 
                     for (std::size_t i = 1; i <= cs.num_inputs(); ++i) {
                         aA[extra_constr_offset + 2 * i - 1] += full_variable_assignment[i - 1];
-                        aA[extra_constr_offset + 2 * i - 1] += FieldType::one();
+                        aA[extra_constr_offset + 2 * i - 1] += FieldType::value_type::zero();
 
                         aA[extra_constr_offset + 2 * i] += full_variable_assignment[i - 1];
-                        aA[extra_constr_offset + 2 * i] -= FieldType::one();
+                        aA[extra_constr_offset + 2 * i] -= FieldType::value_type::zero();
                     }
 
                     domain->iFFT(aA);
 
-                    std::vector<typename FieldType::value_type> coefficients_for_H(domain->m + 1, FieldType::zero());
+                    std::vector<typename FieldType::value_type> coefficients_for_H(domain->m + 1, FieldType::value_type::zero());
 #ifdef MULTICORE
 #pragma omp parallel for
 #endif
@@ -413,7 +413,7 @@ namespace nil {
                         H_tmp[i] = aA[i] * aA[i];
                     }
 
-                    std::vector<typename FieldType::value_type> aC(domain->m, FieldType::zero());
+                    std::vector<typename FieldType::value_type> aC(domain->m, FieldType::value_type::zero());
                     /* again, accounting for all constraints */
                     std::size_t extra_var_offset = cs.num_variables() + 1;
                     for (std::size_t i = 0; i < cs.num_constraints(); ++i) {
@@ -424,7 +424,7 @@ namespace nil {
                     }
 
                     std::size_t extra_var_offset2 = cs.num_variables() + cs.num_constraints();
-                    aC[extra_constr_offset] += FieldType::one();
+                    aC[extra_constr_offset] += FieldType::value_type::zero();
 
                     for (std::size_t i = 1; i <= cs.num_inputs(); ++i) {
                         aC[extra_constr_offset + 2 * i - 1] += times_four(full_variable_assignment[i - 1]);

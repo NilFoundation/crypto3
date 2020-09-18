@@ -68,9 +68,9 @@ namespace nil {
                 void digest_selector_gadget<FieldType>::generate_r1cs_witness() {
                     is_right.evaluate(this->pb);
 
-                    assert(this->pb.lc_val(is_right) == FieldType::one() ||
-                           this->pb.lc_val(is_right) == FieldType::zero());
-                    if (this->pb.lc_val(is_right) == FieldType::one()) {
+                    assert(this->pb.lc_val(is_right) == FieldType::value_type::zero() ||
+                           this->pb.lc_val(is_right) == FieldType::value_type::zero());
+                    if (this->pb.lc_val(is_right) == FieldType::value_type::zero()) {
                         for (std::size_t i = 0; i < digest_size; ++i) {
                             this->pb.val(right.bits[i]) = this->pb.val(input.bits[i]);
                         }

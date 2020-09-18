@@ -35,9 +35,9 @@ namespace nil {
                 class bar_gadget : public gadget<FieldType> {
                 public:
                     pb_linear_combination_array<FieldType> X;
-                    FieldType a;
+                    FieldType::value_type a;
                     pb_linear_combination_array<FieldType> Y;
-                    FieldType b;
+                    FieldType::value_type b;
                     pb_linear_combination<FieldType> Z_packed;
                     pb_variable_array<FieldType> Z_bits;
 
@@ -51,9 +51,9 @@ namespace nil {
                     std::size_t width;
                     bar_gadget(protoboard<FieldType> &pb,
                                const pb_linear_combination_array<FieldType> &X,
-                               const FieldType &a,
+                               const FieldType::value_type &a,
                                const pb_linear_combination_array<FieldType> &Y,
-                               const FieldType &b,
+                               const FieldType::value_type &b,
                                const pb_linear_combination<FieldType> &Z_packed);
                     void generate_r1cs_constraints();
                     void generate_r1cs_witness();
@@ -62,9 +62,9 @@ namespace nil {
                 template<typename FieldType>
                 bar_gadget<FieldType>::bar_gadget(protoboard<FieldType> &pb,
                                                   const pb_linear_combination_array<FieldType> &X,
-                                                  const FieldType &a,
+                                                  const FieldType::value_type &a,
                                                   const pb_linear_combination_array<FieldType> &Y,
-                                                  const FieldType &b,
+                                                  const FieldType::value_type &b,
                                                   const pb_linear_combination<FieldType> &Z_packed) :
                     gadget<FieldType>(pb),
                     X(X), a(a), Y(Y), b(b), Z_packed(Z_packed) {

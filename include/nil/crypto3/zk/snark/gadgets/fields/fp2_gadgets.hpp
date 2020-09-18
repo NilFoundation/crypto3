@@ -50,7 +50,7 @@ namespace nil {
                     void generate_r1cs_witness(const Fp2T &el);
                     Fp2T get_element();
 
-                    Fp2_variable<Fp2T> operator*(const FieldType &coeff) const;
+                    Fp2_variable<Fp2T> operator*(const FieldType::value_type &coeff) const;
                     Fp2_variable<Fp2T> operator+(const Fp2_variable<Fp2T> &other) const;
                     Fp2_variable<Fp2T> operator+(const Fp2T &other) const;
                     Fp2_variable<Fp2T> mul_by_X() const;
@@ -189,7 +189,7 @@ namespace nil {
                 }
 
                 template<typename Fp2T>
-                Fp2_variable<Fp2T> Fp2_variable<Fp2T>::operator*(const FieldType &coeff) const {
+                Fp2_variable<Fp2T> Fp2_variable<Fp2T>::operator*(const FieldType::value_type &coeff) const {
                     pb_linear_combination<FieldType> new_c0, new_c1;
                     new_c0.assign(this->pb, this->c0 * coeff);
                     new_c1.assign(this->pb, this->c1 * coeff);
@@ -273,12 +273,12 @@ namespace nil {
                     this->pb.add_r1cs_constraint(
                         r1cs_constraint<FieldType>(A.c0, B.c0, result.c0 + v1 * (-Fp2T::non_residue)));
                     this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(
-                        A.c0 + A.c1, B.c0 + B.c1, result.c1 + result.c0 + v1 * (FieldType::one() - Fp2T::non_residue)));
+                        A.c0 + A.c1, B.c0 + B.c1, result.c1 + result.c0 + v1 * (FieldType::value_type::zero() - Fp2T::non_residue)));
                 }
 
                 template<typename Fp2T>
                 void Fp2_mul_gadget<Fp2T>::generate_r1cs_witness() {
-                    const FieldType aA = this->pb.lc_val(A.c0) * this->pb.lc_val(B.c0);
+                    const FieldType::value_type aA = this->pb.lc_val(A.c0) * this->pb.lc_val(B.c0);
                     this->pb.val(v1) = this->pb.lc_val(A.c1) * this->pb.lc_val(B.c1);
                     this->pb.lc_val(result.c0) = aA + Fp2T::non_residue * this->pb.val(v1);
                     this->pb.lc_val(result.c1) = (this->pb.lc_val(A.c0) + this->pb.lc_val(A.c1)) *
@@ -335,7 +335,7 @@ namespace nil {
                     this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(
                         A.c0 + A.c1,
                         A.c0 + Fp2T::non_residue * A.c1,
-                        result.c0 + result.c1 * (FieldType::one() + Fp2T::non_residue) * typename FieldType::value_type(2).inverse()));
+                        result.c0 + result.c1 * (FieldType::value_type::zero() + Fp2T::non_residue) * typename FieldType::value_type(2).inverse()));
                 }
 
                 template<typename Fp2T>

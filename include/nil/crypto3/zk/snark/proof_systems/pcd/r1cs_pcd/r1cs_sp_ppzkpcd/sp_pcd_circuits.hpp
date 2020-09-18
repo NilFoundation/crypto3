@@ -357,7 +357,7 @@ namespace nil {
                         verifiers[i].generate_r1cs_constraints();
                     }
 
-                    generate_r1cs_equals_const_constraint<FieldType>(pb, zero, FieldType::zero());
+                    generate_r1cs_equals_const_constraint<FieldType>(pb, zero, FieldType::value_type::zero());
                     generate_boolean_r1cs_constraint<FieldType>(pb, verification_result);
 
                     /* type * (1-verification_result) = 0 */
@@ -402,7 +402,7 @@ namespace nil {
                     const std::vector<r1cs_ppzksnark_proof<other_curve<CurveType>>> &incoming_proofs) {
                     const std::size_t compliance_predicate_arity = compliance_predicate.max_arity;
                     this->pb.clear_values();
-                    this->pb.val(zero) = FieldType::zero();
+                    this->pb.val(zero) = FieldType::value_type::zero();
 
                     compliance_predicate_as_gadget->generate_r1cs_witness(
                         compliance_predicate_primary_input.as_r1cs_primary_input(),
@@ -427,8 +427,8 @@ namespace nil {
                         verifiers[i].generate_r1cs_witness();
                     }
 
-                    if (this->pb.val(incoming_message_types[0]) != FieldType::zero()) {
-                        this->pb.val(verification_result) = FieldType::one();
+                    if (this->pb.val(incoming_message_types[0]) != FieldType::value_type::zero()) {
+                        this->pb.val(verification_result) = FieldType::value_type::zero();
                     }
                 }
 
@@ -563,7 +563,7 @@ namespace nil {
                     const r1cs_variable_assignment<FieldType> outgoing_message_as_va =
                         primary_input.outgoing_message->as_r1cs_variable_assignment();
                     std::vector<bool> msg_bits;
-                    for (const FieldType &elt : outgoing_message_as_va) {
+                    for (const FieldType::value_type &elt : outgoing_message_as_va) {
                         const std::vector<bool> elt_bits = algebra::convert_field_element_to_bit_vector(elt);
                         msg_bits.insert(msg_bits.end(), elt_bits.begin(), elt_bits.end());
                     }

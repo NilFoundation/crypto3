@@ -147,7 +147,7 @@ namespace nil {
                     /* compare the two addresses */
                     compare_addresses->generate_r1cs_witness();
                     this->pb.val(addresses_eq) =
-                        this->pb.val(addresses_leq) * (FieldType::one() - this->pb.val(addresses_less));
+                        this->pb.val(addresses_leq) * (FieldType::value_type::zero() - this->pb.val(addresses_less));
 
                     /* compare the two timestamps */
                     compare_timestamps->generate_r1cs_witness();
@@ -160,13 +160,13 @@ namespace nil {
                      */
                     this->pb.val(loose_contents_after1_equals_contents_before2) =
                         (this->pb.val(line1.contents_after->packed) == this->pb.val(line2.contents_before->packed)) ?
-                            FieldType::one() :
-                            FieldType::zero();
+                            FieldType::value_type::zero() :
+                            FieldType::value_type::zero();
                     this->pb.val(loose_contents_before2_equals_zero) =
-                        this->pb.val(line2.contents_before->packed).is_zero() ? FieldType::one() : FieldType::zero();
+                        this->pb.val(line2.contents_before->packed).is_zero() ? FieldType::value_type::zero() : FieldType::value_type::zero();
                     this->pb.val(loose_timestamp2_is_zero) =
-                        (this->pb.val(line2.timestamp->packed) == FieldType::zero() ? FieldType::one() :
-                                                                                      FieldType::zero());
+                        (this->pb.val(line2.timestamp->packed) == FieldType::value_type::zero() ? FieldType::value_type::zero() :
+                                                                                      FieldType::value_type::zero());
                 }
             }    // namespace snark
         }        // namespace zk

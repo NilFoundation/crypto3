@@ -213,7 +213,7 @@ namespace nil {
                     pack_desidx->generate_r1cs_witness_from_bits();
 
                     /* is_register_instruction */
-                    this->pb.val(is_register_instruction) = FieldType::zero();
+                    this->pb.val(is_register_instruction) = FieldType::value_type::zero();
 
                     for (std::size_t i = 0; i < ARRAY_SIZE(tinyram_opcodes_register); ++i) {
                         this->pb.val(is_register_instruction) +=
@@ -221,7 +221,7 @@ namespace nil {
                     }
 
                     /* is_control_flow_instruction */
-                    this->pb.val(is_control_flow_instruction) = FieldType::zero();
+                    this->pb.val(is_control_flow_instruction) = FieldType::value_type::zero();
 
                     for (std::size_t i = 0; i < ARRAY_SIZE(tinyram_opcodes_control_flow); ++i) {
                         this->pb.val(is_control_flow_instruction) +=
@@ -229,7 +229,7 @@ namespace nil {
                     }
 
                     /* is_stall_instruction */
-                    this->pb.val(is_stall_instruction) = FieldType::zero();
+                    this->pb.val(is_stall_instruction) = FieldType::value_type::zero();
 
                     for (std::size_t i = 0; i < ARRAY_SIZE(tinyram_opcodes_stall); ++i) {
                         this->pb.val(is_stall_instruction) += this->pb.val(opcode_indicators[tinyram_opcodes_stall[i]]);
@@ -251,8 +251,8 @@ namespace nil {
                     this->pb.val(packed_outgoing_pc) =
                         this->pb.val(pc_from_cf_or_zero) +
                         this->pb.val(packed_incoming_pc) * this->pb.val(is_stall_instruction) +
-                        (this->pb.val(packed_incoming_pc) + FieldType::one()) *
-                            (FieldType::one() - this->pb.val(is_control_flow_instruction) -
+                        (this->pb.val(packed_incoming_pc) + FieldType::value_type::zero()) *
+                            (FieldType::value_type::zero() - this->pb.val(is_control_flow_instruction) -
                              this->pb.val(is_stall_instruction));
 
                     /*
@@ -263,7 +263,7 @@ namespace nil {
                     */
                     this->pb.val(outgoing_flag) =
                         this->pb.val(computed_flag) * this->pb.val(is_register_instruction) +
-                        this->pb.val(incoming_flag) * (FieldType::one() - this->pb.val(is_register_instruction));
+                        this->pb.val(incoming_flag) * (FieldType::value_type::zero() - this->pb.val(is_register_instruction));
 
                     /*
                       update registers (changed and unchanged)
@@ -271,10 +271,10 @@ namespace nil {
                       next_desval = computed_result * is_register_instruction + packed_incoming_desval *
                       (1-is_register_instruction)
                     */
-                    FieldType changed_register_contents =
+                    FieldType::value_type changed_register_contents =
                         this->pb.val(computed_result) * this->pb.val(is_register_instruction) +
                         this->pb.val(packed_incoming_desval) *
-                            (FieldType::one() - this->pb.val(is_register_instruction));
+                            (FieldType::value_type::zero() - this->pb.val(is_register_instruction));
 
                     for (std::size_t i = 0; i < this->pb.ap.k; ++i) {
                         this->pb.val(packed_outgoing_registers[i]) = (this->pb.val(packed_desidx).as_ulong() == i) ?
@@ -332,7 +332,7 @@ void test_arithmetic_consistency_enforcer_gadget()
     }
 
     this->pb.val(incoming_pc) = typename FieldType::value_type(12345);
-    this->pb.val(incoming_load_flag) = FieldType::zero();
+    this->pb.val(incoming_load_flag) = FieldType::value_type::zero();
 
     for (std::size_t i = 0; i < ap.k; ++i)
     {
@@ -341,10 +341,10 @@ void test_arithmetic_consistency_enforcer_gadget()
 
     for (std::size_t t = 0; t < 1ul<<ap.opcode_width(); ++t)
     {
-        this->pb.val(opcode_indicators[t]) = FieldType::zero();
+        this->pb.val(opcode_indicators[t]) = FieldType::value_type::zero();
     }
 
-    this->pb.val(opcode_indicators[tinyram_opcode_AND]) = FieldType::one();
+    this->pb.val(opcode_indicators[tinyram_opcode_AND]) = FieldType::value_type::zero();
 
     for (std::size_t i = 0; i < ap.k; ++i)
     {
@@ -370,25 +370,25 @@ void test_arithmetic_consistency_enforcer_gadget()
     printf("arithmetic test successful\n");
     for (std::size_t t = 0; t < 1ul<<ap.opcode_width(); ++t)
     {
-        this->pb.val(opcode_indicators[t]) = FieldType::zero();
+        this->pb.val(opcode_indicators[t]) = FieldType::value_type::zero();
     }
-    this->pb.val(opcode_indicators[tinyram_opcode_LOAD]) = FieldType::one();
-    this->pb.val(incoming_load_flag) = FieldType::one();
+    this->pb.val(opcode_indicators[tinyram_opcode_LOAD]) = FieldType::value_type::zero();
+    this->pb.val(incoming_load_flag) = FieldType::value_type::zero();
 
     g.generate_r1cs_witness();
 
     this->pb.val(outgoing_pc) == typename FieldType::value_type(12345);
     assert(pb.is_satisfied());
 
-    this->pb.val(incoming_load_flag) = FieldType::zero();
+    this->pb.val(incoming_load_flag) = FieldType::value_type::zero();
     printf("test that firstload doesn't increment PC successful\n");
 
     for (std::size_t t = 0; t < 1ul<<ap.opcode_width(); ++t)
     {
-        this->pb.val(opcode_indicators[t]) = FieldType::zero();
+        this->pb.val(opcode_indicators[t]) = FieldType::value_type::zero();
     }
 
-    this->pb.val(opcode_indicators[tinyram_opcode_JMP]) = FieldType::one();
+    this->pb.val(opcode_indicators[tinyram_opcode_JMP]) = FieldType::value_type::zero();
 
     for (std::size_t i = 0; i < ap.k; ++i)
     {
@@ -455,9 +455,9 @@ void test_control_flow_consistency_enforcer_gadget()
 
     for (std::size_t t = 0; t < 1ul<<ap.opcode_width(); ++t)
     {
-        this->pb.val(opcode_indicators[t]) = FieldType::zero();
+        this->pb.val(opcode_indicators[t]) = FieldType::value_type::zero();
     }
-    this->pb.val(opcode_indicators[tinyram_opcode_JMP]) = FieldType::one();
+    this->pb.val(opcode_indicators[tinyram_opcode_JMP]) = FieldType::value_type::zero();
 
     for (int flag = 0; flag <= 1; ++flag)
     {
@@ -515,17 +515,17 @@ void test_special_consistency_enforcer_gadget()
     {
         this->pb.val(packed_incoming_registers[i]) = typename FieldType::value_type(1000+i);
     }
-    this->pb.val(incoming_flag) = FieldType::zero();
-    this->pb.val(incoming_load_flag) = FieldType::zero();
+    this->pb.val(incoming_flag) = FieldType::value_type::zero();
+    this->pb.val(incoming_load_flag) = FieldType::value_type::zero();
 
     /* test that accept stalls */
     printf("test that ACCEPT stalls\n");
 
     for (std::size_t t = 0; t < 1ul<<ap.opcode_width(); ++t)
     {
-        this->pb.val(opcode_indicators[t]) = FieldType::zero();
+        this->pb.val(opcode_indicators[t]) = FieldType::value_type::zero();
     }
-    this->pb.val(opcode_indicators[tinyram_opcode_ACCEPT]) = FieldType::one();
+    this->pb.val(opcode_indicators[tinyram_opcode_ACCEPT]) = FieldType::value_type::zero();
 
     g.generate_r1cs_witness();
 
@@ -539,7 +539,7 @@ void test_special_consistency_enforcer_gadget()
     assert(pb.is_satisfied());
 
     printf("test that ACCEPT preserves registers\n");
-    this->pb.val(packed_outgoing_registers[0]) = FieldType::zero();
+    this->pb.val(packed_outgoing_registers[0]) = FieldType::value_type::zero();
     assert(!pb.is_satisfied());
 
     /* test that other special instructions (e.g. STORE) don't and also preserve registers */
@@ -547,9 +547,9 @@ void test_special_consistency_enforcer_gadget()
 
     for (std::size_t t = 0; t < 1ul<<ap.opcode_width(); ++t)
     {
-        this->pb.val(opcode_indicators[t]) = FieldType::zero();
+        this->pb.val(opcode_indicators[t]) = FieldType::value_type::zero();
     }
-    this->pb.val(opcode_indicators[tinyram_opcode_STORE]) = FieldType::one();
+    this->pb.val(opcode_indicators[tinyram_opcode_STORE]) = FieldType::value_type::zero();
 
     g.generate_r1cs_witness();
 
@@ -559,16 +559,16 @@ void test_special_consistency_enforcer_gadget()
         assert(this->pb.val(packed_outgoing_registers[j]) == this->pb.val(packed_incoming_registers[j]));
     }
 
-    assert(this->pb.val(outgoing_pc) == this->pb.val(incoming_pc) + FieldType::one());
+    assert(this->pb.val(outgoing_pc) == this->pb.val(incoming_pc) + FieldType::value_type::zero());
     assert(pb.is_satisfied());
 
     printf("test that STORE preserves registers\n");
-    this->pb.val(packed_outgoing_registers[0]) = FieldType::zero();
+    this->pb.val(packed_outgoing_registers[0]) = FieldType::value_type::zero();
     assert(!pb.is_satisfied());
 
     printf("test that STORE can't have load_flag\n");
     g.generate_r1cs_witness();
-    this->pb.val(incoming_load_flag) = FieldType::one();
+    this->pb.val(incoming_load_flag) = FieldType::value_type::zero();
 
     assert(!pb.is_satisfied());
 
@@ -577,18 +577,18 @@ void test_special_consistency_enforcer_gadget()
 
     for (std::size_t t = 0; t < 1ul<<ap.opcode_width(); ++t)
     {
-        this->pb.val(opcode_indicators[t]) = FieldType::zero();
+        this->pb.val(opcode_indicators[t]) = FieldType::value_type::zero();
     }
-    this->pb.val(opcode_indicators[tinyram_opcode_LOAD]) = FieldType::one();
-    this->pb.val(incoming_load_flag) = FieldType::zero();
+    this->pb.val(opcode_indicators[tinyram_opcode_LOAD]) = FieldType::value_type::zero();
+    this->pb.val(incoming_load_flag) = FieldType::value_type::zero();
 
     g.generate_r1cs_witness();
 
-    assert(this->pb.val(outgoing_load_flag) == FieldType::one());
+    assert(this->pb.val(outgoing_load_flag) == FieldType::value_type::zero());
     assert(pb.is_satisfied());
 
     printf("test that LOAD can modify registers\n");
-    this->pb.val(packed_outgoing_registers[0]) = FieldType::zero();
+    this->pb.val(packed_outgoing_registers[0]) = FieldType::value_type::zero();
     assert(pb.is_satisfied());
 
     /* test that postload clears load_flag */
@@ -596,14 +596,14 @@ void test_special_consistency_enforcer_gadget()
 
     for (std::size_t t = 0; t < 1ul<<ap.opcode_width(); ++t)
     {
-        this->pb.val(opcode_indicators[t]) = FieldType::zero();
+        this->pb.val(opcode_indicators[t]) = FieldType::value_type::zero();
     }
-    this->pb.val(opcode_indicators[tinyram_opcode_LOAD]) = FieldType::one();
-    this->pb.val(incoming_load_flag) = FieldType::one();
+    this->pb.val(opcode_indicators[tinyram_opcode_LOAD]) = FieldType::value_type::zero();
+    this->pb.val(incoming_load_flag) = FieldType::value_type::zero();
 
     g.generate_r1cs_witness();
 
-    assert(this->pb.val(outgoing_load_flag) == FieldType::zero());
+    assert(this->pb.val(outgoing_load_flag) == FieldType::value_type::zero());
     assert(pb.is_satisfied());
 
     /* test non-special instructions */
@@ -611,17 +611,17 @@ void test_special_consistency_enforcer_gadget()
 
     for (std::size_t t = 0; t < 1ul<<ap.opcode_width(); ++t)
     {
-        this->pb.val(opcode_indicators[t]) = FieldType::zero();
+        this->pb.val(opcode_indicators[t]) = FieldType::value_type::zero();
     }
-    this->pb.val(opcode_indicators[tinyram_opcode_JMP]) = FieldType::one();
-    this->pb.val(incoming_load_flag) = FieldType::zero();
+    this->pb.val(opcode_indicators[tinyram_opcode_JMP]) = FieldType::value_type::zero();
+    this->pb.val(incoming_load_flag) = FieldType::value_type::zero();
     g.generate_r1cs_witness();
 
     assert(pb.is_satisfied());
 
     printf("test that non-special can't have load_flag\n");
     g.generate_r1cs_witness();
-    this->pb.val(incoming_load_flag) = FieldType::one();
+    this->pb.val(incoming_load_flag) = FieldType::value_type::zero();
 
     assert(!pb.is_satisfied());
 
