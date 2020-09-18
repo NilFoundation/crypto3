@@ -21,19 +21,19 @@
 
 using namespace nil::algebra::fft;
 
-typedef nil::algebra::Double FieldT;
+typedef nil::algebra::Double FieldType;
 
 BOOST_AUTO_TEST_SUITE(kronecker_substitution_test_suite)
 
 BOOST_AUTO_TEST_CASE(standard_polynomial_multiplication) {
 
-    std::vector<FieldT> a = {1, 2, 3, 1};
-    std::vector<FieldT> b = {1, 2, 1, 1};
-    std::vector<FieldT> c(1, FieldT::zero());
+    std::vector<FieldType> a = {1, 2, 3, 1};
+    std::vector<FieldType> b = {1, 2, 1, 1};
+    std::vector<FieldType> c(1, FieldType::zero());
 
     _polynomial_multiplication_on_kronecker(c, a, b);
 
-    std::vector<FieldT> c_answer(1, FieldT::zero());
+    std::vector<FieldType> c_answer(1, FieldType::zero());
     _polynomial_multiplication(c_answer, a, b);
 
     for (size_t i = 0; i < c_answer.size(); i++) {
@@ -43,13 +43,13 @@ BOOST_AUTO_TEST_CASE(standard_polynomial_multiplication) {
 
 BOOST_AUTO_TEST_CASE(squared_polynomial_multiplication) {
 
-    std::vector<FieldT> a = {1, 2, 3, 1};
-    std::vector<FieldT> b = a;
-    std::vector<FieldT> c(1, FieldT::zero());
+    std::vector<FieldType> a = {1, 2, 3, 1};
+    std::vector<FieldType> b = a;
+    std::vector<FieldType> c(1, FieldType::zero());
 
     _polynomial_multiplication_on_kronecker(c, a, b);
 
-    std::vector<FieldT> c_answer(1, FieldT::zero());
+    std::vector<FieldType> c_answer(1, FieldType::zero());
     _polynomial_multiplication(c_answer, a, b);
 
     for (size_t i = 0; i < c_answer.size(); i++) {
