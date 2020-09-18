@@ -165,16 +165,19 @@
 namespace nil {
     namespace algebra {
         namespace detail {
+          
+            using namespace nil::algebra;
+
             template<std::size_t m>
             struct is_basic_radix2_domain {
                 constexpr static bool const value =
-                    (m > 1) && !(m & (m - 1)) && (boost::static_log2<m>::value <= FieldType::s);
+                    (m > 1) && !(m & (m - 1)) && (boost::static_log2<m>::value <= fields::arithmetic_params<FieldType>::s);
             }
 
             template<std::size_t m>
             struct is_extended_radix2_domain {
                 constexpr static bool const value =
-                    (m > 1) && !(m & (m - 1)) && (boost::static_log2<m>::value == FieldType::s + 1);
+                    (m > 1) && !(m & (m - 1)) && (boost::static_log2<m>::value == fields::arithmetic_params<FieldType>::s + 1);
             }
 
             template<std::size_t m>
@@ -184,7 +187,7 @@ namespace nil {
 
             public:
                 constexpr static bool const value =
-                    (m > 1) && (m & (m - 1)) && (boost::static_log2<m> <= FieldType::s) && !(small_m & (small_m - 1));
+                    (m > 1) && (m & (m - 1)) && (boost::static_log2<m> <= fields::arithmetic_params<FieldType>::s) && !(small_m & (small_m - 1));
             }
         }    // namespace detail
     }        // namespace algebra

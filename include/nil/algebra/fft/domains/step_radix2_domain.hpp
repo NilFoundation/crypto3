@@ -18,6 +18,9 @@
 namespace nil {
     namespace algebra {
         namespace fft {
+
+            using namespace nil::algebra;
+            
             template<typename FieldType>
             class step_radix2_domain : public evaluation_domain<FieldType::value_type> {
                 using value_type = typename FieldType::value_type;
@@ -189,7 +192,7 @@ namespace nil {
                 }
                 void divide_by_Z_on_coset(std::vector<value_type> &P) {
                     // (c^{2^k}-1) * (c^{2^r} * w^{2^{r+1}*i) - w^{2^r})
-                    const value_type coset = FieldType::multiplicative_generator;
+                    const value_type coset = fields::arithmetic_params<FieldType>::multiplicative_generator;
 
                     const value_type Z0 = (coset ^ big_m) - value_type::one();
                     const value_type coset_to_small_m_times_Z0 = (coset ^ small_m) * Z0;

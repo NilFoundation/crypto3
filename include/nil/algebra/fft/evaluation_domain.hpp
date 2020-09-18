@@ -27,7 +27,10 @@ namespace nil {
     namespace algebra {
         namespace fft {
             namespace detail {
-                template<typename FieldValueType, typename FieldType, std::size_t MinSize>
+
+                using namespace nil::algebra;
+
+                template<typename FieldType, typename FieldType, std::size_t MinSize>
                 struct domain_switch_impl {
                     constexpr static const std::size_t big = 1ul << (boost::static_log2<MinSize>::value - 1);
                     constexpr static const std::size_t rounded_small =
@@ -53,10 +56,9 @@ namespace nil {
                         !detail::is_step_radix2_domain<MinSize>::value &&
                         detail::is_step_radix2_domain<big + rounded_small>::value,
                         step_radix2_domain<FieldType, big + rounded_small>,
-                    std::conditional<
-                        FieldType::geometric_generator() != FieldType::zero(),
+                    std::conditional<!(fields::arithmetic_params<FieldType>::geometric_generator.is_zero()),
                         geometric_sequence_domain<FieldType, MinSize>,
-                    std::conditional<FieldType::arithmetic_generator() != FieldType::zero(),
+                    std::conditional<!(fields::arithmetic_params<FieldType>::arithmetic_generator.is_zero()),
                                      arithmetic_sequence_domain<FieldType, MinSize>, void>::
                     type>::type>::type>::type>::type>::type>::type>::type domain_type;
                 };
@@ -91,12 +93,12 @@ namespace nil {
                 /**
                  * Compute the FFT, over the domain S, of the vector a.
                  */
-                virtual void FFT(std::vector<typename FieldValueType> &a) = 0;
+                virtual void FFT(std::vector<FieldValueType> &a) = 0;
 
                 /**
                  * Compute the inverse FFT, over the domain S, of the vector a.
                  */
-                virtual void iFFT(std::vector<typename FieldValueType> &a) = 0;
+                virtual void iFFT(std::vector<FieldValueType> &a) = 0;
 
                 /**
                  * Evaluate all Lagrange polynomials.
@@ -107,7 +109,7 @@ namespace nil {
                  * The output is a vector (b_{0},...,b_{m-1})
                  * where b_{i} is the evaluation of L_{i,S}(z) at z = t.
                  */
-                virtual std::vector<typename FieldValueType> evaluate_all_lagrange_polynomials(const FieldValueType &t) = 0;
+                virtual std::vector<FieldValueType> evaluate_all_lagrange_polynomials(const FieldValueType &t) = 0;
 
                 /**
                  * Evaluate the vanishing polynomial of S at the field element t.
@@ -117,12 +119,12 @@ namespace nil {
                 /**
                  * Add the coefficients of the vanishing polynomial of S to the coefficients of the polynomial H.
                  */
-                virtual void add_poly_Z(const FieldValueType &coeff, std::vector<typename FieldValueType> &H) = 0;
+                virtual void add_poly_Z(const FieldValueType &coeff, std::vector<FieldValueType> &H) = 0;
 
                 /**
                  * Multiply by the evaluation, on a coset of S, of the inverse of the vanishing polynomial of S.
                  */
-                virtual void divide_by_Z_on_coset(std::vector<typename FieldValueType> &P) = 0;
+                virtual void divide_by_Z_on_coset(std::vector<FieldValueType> &P) = 0;
             };
 
             /*!

@@ -25,6 +25,8 @@ namespace nil {
     namespace algebra {
         namespace fft {
 
+            using namespace nil::algebra;
+
             template<typename FieldType>
             class geometric_sequence_domain : public evaluation_domain<FieldType::value_type> {
                 using value_type = typename FieldType::value_type;
@@ -41,7 +43,7 @@ namespace nil {
                     this->geometric_triangular_sequence[0] = value_type::one();
 
                     for (size_t i = 1; i < this->m; i++) {
-                        this->geometric_sequence[i] = this->geometric_sequence[i - 1] * FieldType::geometric_generator();
+                        this->geometric_sequence[i] = this->geometric_sequence[i - 1] * fields::arithmetic_params<FieldType>::geometric_generator;
                         this->geometric_triangular_sequence[i] =
                             this->geometric_triangular_sequence[i - 1] * this->geometric_sequence[i - 1];
                     }
@@ -51,11 +53,14 @@ namespace nil {
 
                 geometric_sequence_domain(const size_t m) :
                     evaluation_domain<value_type>(m) {
-                    if (m <= 1)
+                    if (m <= 1){
                         throw std::invalid_argument("geometric(): expected m > 1");
-                    if (FieldType::geometric_generator() == value_type::zero())
+                    }
+
+                    if (!(value_type(fields::arithmetic_params<FieldType>::geometric_generator).is_zero())){
                         throw std::invalid_argument(
-                            "geometric(): expected FieldType::geometric_generator() != value_type::zero()");
+                            "geometric(): expected value_type(fields::arithmetic_params<FieldType>::geometric_generator).is_zero() != true");
+                    }
 
                     precomputation_sentinel = 0;
                 }
@@ -233,7 +238,7 @@ namespace nil {
                     }
                 }
                 void divide_by_Z_on_coset(std::vector<value_type> &P) {
-                    const value_type coset = FieldType::multiplicative_generator; /* coset in geometric sequence? */
+                    const value_type coset = value_type(fields::arithmetic_params<FieldType>::multiplicative_generator); /* coset in geometric sequence? */
                     const value_type Z_inverse_at_coset = this->compute_vanishing_polynomial(coset).inversed();
                     for (size_t i = 0; i < this->m; ++i) {
                         P[i] *= Z_inverse_at_coset;

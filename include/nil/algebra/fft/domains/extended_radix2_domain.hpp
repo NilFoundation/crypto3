@@ -19,6 +19,8 @@ namespace nil {
     namespace algebra {
         namespace fft {
 
+            using namespace nil::algebra;
+            
             template<typename FieldType>
             class extended_radix2_domain : public evaluation_domain<FieldType::value_type> {
                 using value_type = typename FieldType::value_type;
@@ -33,8 +35,8 @@ namespace nil {
 
                     if (!std::is_same<value_type, std::complex<double>>::value) {
                         const size_t logm = static_cast<std::size_t>(std::ceil(std::log2(m)));
-                        if (logm != (FieldType::s + 1))
-                            throw std::invalid_argument("extended_radix2(): expected logm == FieldType::s + 1");
+                        if (logm != (fields::arithmetic_params<FieldType>::s + 1))
+                            throw std::invalid_argument("extended_radix2(): expected logm == fields::arithmetic_params<FieldType>::s + 1");
                     }
 
                     small_m = m / 2;
@@ -142,7 +144,7 @@ namespace nil {
                 }
 
                 void divide_by_Z_on_coset(std::vector<value_type> &P) {
-                    const value_type coset = FieldType::multiplicative_generator;
+                    const value_type coset = fields::arithmetic_params<FieldType>::multiplicative_generator;
 
                     const value_type coset_to_small_m = coset ^ small_m;
                     const value_type shift_to_small_m = shift ^ small_m;

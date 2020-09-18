@@ -16,9 +16,12 @@
 namespace nil {
     namespace algebra {
         namespace fft {
+
+            using namespace nil::algebra;
+
             template<typename FieldType>
-            FieldType coset_shift() {
-                return FieldType::multiplicative_generator.squared();
+            FieldType::value_type coset_shift() {
+                return value_type(fields::arithmetic_params<FieldType>::multiplicative_generator).squared();
             }
 
             template<typename FieldValueType>
@@ -32,16 +35,19 @@ namespace nil {
 
             template<typename FieldType>
             typename std::enable_if<!std::is_same<typename FieldType::value_type, std::complex<double>>::value,
-                                    FieldType>::type
+                                    typename FieldType::value_type>::type
                 unity_root(const size_t n) {
+
+                using value_type = typename FieldType::value_type;
+
                 const std::size_t logn = std::ceil(std::log2(n));
                 if (n != (1u << logn))
                     throw std::invalid_argument("expected n == (1u << logn)");
-                if (logn > FieldType::s)
-                    throw std::invalid_argument("expected logn <= FieldType::s");
+                if (logn > fields::arithmetic_params<FieldType>::s)
+                    throw std::invalid_argument("expected logn <= arithmetic_params<FieldType>::s");
 
-                typename FieldType::value_type omega = FieldType::root_of_unity;
-                for (size_t i = FieldType::s; i > logn; --i) {
+                value_type omega = value_type( fields::arithmetic_params<FieldType>::root_of_unity );
+                for (size_t i = fields::arithmetic_params<FieldType>::s; i > logn; --i) {
                     omega *= omega;
                 }
 

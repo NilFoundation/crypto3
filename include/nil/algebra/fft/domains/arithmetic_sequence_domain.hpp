@@ -24,6 +24,8 @@ namespace nil {
     namespace algebra {
         namespace fft {
 
+            using namespace nil::algebra;
+            
             template<typename FieldType>
             class arithmetic_sequence_domain : public evaluation_domain<FieldType::value_type> {
                 using value_type = typename FieldType::value_type;
@@ -31,12 +33,12 @@ namespace nil {
                 bool precomputation_sentinel;
                 std::vector<std::vector<std::vector<value_type>>> subproduct_tree;
                 std::vector<value_type> arithmetic_sequence;
-                FieldType arithmetic_generator;
+                value_type arithmetic_generator;
 
                 void do_precomputation() {
                     compute_subproduct_tree(log2(this->m), this->subproduct_tree);
 
-                    this->arithmetic_generator = FieldType::arithmetic_generator();
+                    this->arithmetic_generator = value_type(fields::arithmetic_params<FieldType>::arithmetic_generator);
 
                     this->arithmetic_sequence = std::vector<value_type>(this->m);
                     for (size_t i = 0; i < this->m; i++) {
@@ -47,21 +49,26 @@ namespace nil {
                 }
 
                 arithmetic_sequence_domain(const size_t m) : evaluation_domain<value_type>(m) {
-                    if (m <= 1)
+                    if (m <= 1){
                         throw std::invalid_argument("arithmetic(): expected m > 1");
-                    if (FieldType::arithmetic_generator() == value_type::zero())
+                    }
+
+                    if (!(value_type(fields::arithmetic_params<FieldType>::arithmetic_generator).is_zero())){
                         throw std::invalid_argument(
-                            "arithmetic(): expected FieldType::arithmetic_generator() != FieldType::zero()");
+                            "arithmetic(): expected arithmetic_params<FieldType>::arithmetic_generator.is_zero() != true");
+                    }
 
                     precomputation_sentinel = 0;
                 }
 
                 void FFT(std::vector<value_type> &a) {
-                    if (a.size() != this->m)
+                    if (a.size() != this->m){
                         throw std::invalid_argument("arithmetic: expected a.size() == this->m");
+                    }
 
-                    if (!this->precomputation_sentinel)
+                    if (!this->precomputation_sentinel){
                         do_precomputation();
+                    }
 
                     /* Monomial to Newton */
                     monomial_to_newton_basis(a, this->subproduct_tree, this->m);

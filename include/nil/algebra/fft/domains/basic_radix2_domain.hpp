@@ -20,11 +20,14 @@
 namespace nil {
     namespace algebra {
         namespace fft {
+
+            using namespace nil::algebra;
+
             template<typename FieldType>
             class basic_radix2_domain : public evaluation_domain<FieldType::value_type> {
                 using value_type = typename FieldType::value_type;
             public:
-                FieldType omega;
+                value_type omega;
 
                 basic_radix2_domain(const size_t m) {
                     if (m <= 1)
@@ -32,8 +35,8 @@ namespace nil {
 
                     if (!std::is_same<value_type, std::complex<double>>::value) {
                         const size_t logm = static_cast<std::size_t>(std::ceil(std::log2(m)));
-                        if (logm > (FieldType::s))
-                            throw std::invalid_argument("basic_radix2(): expected logm <= FieldType::s");
+                        if (logm > (fields::arithmetic_params<FieldType>::s))
+                            throw std::invalid_argument("basic_radix2(): expected logm <= fields::arithmetic_params<FieldType>::s");
                     }
 
                     try {
@@ -83,7 +86,7 @@ namespace nil {
                 }
 
                 void divide_by_Z_on_coset(std::vector<value_type> &P) {
-                    const value_type coset = FieldType::multiplicative_generator;
+                    const value_type coset = fields::arithmetic_params<FieldType>::multiplicative_generator;
                     const value_type Z_inverse_at_coset = this->compute_vanishing_polynomial(coset).inversed();
                     for (size_t i = 0; i < this->m; ++i) {
                         P[i] *= Z_inverse_at_coset;
