@@ -51,7 +51,7 @@ namespace nil {
                     r1cs_constraint() {};
                     r1cs_constraint(const linear_combination<FieldType> &a,
                                     const linear_combination<FieldType> &b,
-                                    const linear_combination<FieldType> &c):
+                                    const linear_combination<FieldType> &c) :
                         a(a),
                         b(b), c(c) {
                     }
@@ -73,7 +73,6 @@ namespace nil {
                     bool operator==(const r1cs_constraint<FieldType> &other) const {
                         return (this->a == other.a && this->b == other.b && this->c == other.c);
                     }
-
                 };
 
                 /************************* R1CS variable assignment **************************/
@@ -91,7 +90,7 @@ namespace nil {
                 using r1cs_auxiliary_input = std::vector<typename FieldType::value_type>;
 
                 template<typename FieldType>
-                using r1cs_variable_assignment = std::vector<typename FieldType::value_type>; 
+                using r1cs_variable_assignment = std::vector<typename FieldType::value_type>;
                 /* note the changed name! (TODO: remove this comment * after primary_input transition is complete) */
 
                 /************************* R1CS constraint system ****************************/
@@ -110,7 +109,7 @@ namespace nil {
                  */
                 template<typename FieldType>
                 struct r1cs_constraint_system {
-                    
+
                     std::size_t primary_input_size;
                     std::size_t auxiliary_input_size;
 
@@ -156,9 +155,12 @@ namespace nil {
                             full_variable_assignment.end(), auxiliary_input.begin(), auxiliary_input.end());
 
                         for (std::size_t c = 0; c < constraints.size(); ++c) {
-                            const FieldType::value_type ares = constraints[c].a.evaluate(full_variable_assignment);
-                            const FieldType::value_type bres = constraints[c].b.evaluate(full_variable_assignment);
-                            const FieldType::value_type cres = constraints[c].c.evaluate(full_variable_assignment);
+                            const typename FieldType::value_type ares =
+                                constraints[c].a.evaluate(full_variable_assignment);
+                            const typename FieldType::value_type bres =
+                                constraints[c].b.evaluate(full_variable_assignment);
+                            const typename FieldType::value_type cres =
+                                constraints[c].c.evaluate(full_variable_assignment);
 
                             if (!(ares * bres == cres)) {
                                 return false;
@@ -204,7 +206,6 @@ namespace nil {
                                 this->primary_input_size == other.primary_input_size &&
                                 this->auxiliary_input_size == other.auxiliary_input_size);
                     }
-
                 };
 
             }    // namespace snark

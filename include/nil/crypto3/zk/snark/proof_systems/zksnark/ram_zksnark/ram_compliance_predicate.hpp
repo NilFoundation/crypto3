@@ -39,8 +39,8 @@
 
 #include <numeric>
 
-#include <nil/crypto3/zk/snark/gadgets/delegated_ra_memory/memory_load_gadget.hpp>
-#include <nil/crypto3/zk/snark/gadgets/delegated_ra_memory/memory_load_store_gadget.hpp>
+#include <nil/crypto3/zk/snark/components/delegated_ra_memory/memory_load_component.hpp>
+#include <nil/crypto3/zk/snark/components/delegated_ra_memory/memory_load_store_component.hpp>
 #include <nil/crypto3/zk/snark/relations/ram_computations/memory/delegated_ra_memory.hpp>
 #include <nil/crypto3/zk/snark/relations/ram_computations/rams/ram_params.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/pcd/r1cs_pcd/compliance_predicate/compliance_predicate.hpp>
@@ -112,13 +112,13 @@ namespace nil {
                     pb_variable_array<FieldType> cpu_state;
                     pb_variable_array<FieldType> pc_addr_initial;
                     pb_variable_array<FieldType> cpu_state_initial;
-                    pb_variable<FieldType> has_accepted;
+                    variable<FieldType> has_accepted;
 
                     pb_variable_array<FieldType> all_unpacked_vars;
 
-                    std::shared_ptr<multipacking_gadget<FieldType>> unpack_payload;
+                    std::shared_ptr<multipacking_component<FieldType>> unpack_payload;
 
-                    ram_pcd_message_variable(protoboard<FieldType> &pb, const ram_architecture_params<ramT> &ap);
+                    ram_pcd_message_variable(blueprint<FieldType> &pb, const ram_architecture_params<ramT> &ap);
 
                     void allocate_unpacked_part();
                     void generate_r1cs_constraints();
@@ -135,12 +135,12 @@ namespace nil {
 
                     bool is_halt_case;
 
-                    delegated_ra_memory<CRH_with_bit_out_gadget<FieldType>> &mem;
+                    delegated_ra_memory<CRH_with_bit_out_component<FieldType>> &mem;
                     typename ram_input_tape<ramT>::const_iterator &aux_it;
                     const typename ram_input_tape<ramT>::const_iterator &aux_end;
 
                     ram_pcd_local_data(const bool is_halt_case,
-                                       delegated_ra_memory<CRH_with_bit_out_gadget<FieldType>> &mem,
+                                       delegated_ra_memory<CRH_with_bit_out_component<FieldType>> &mem,
                                        typename ram_input_tape<ramT>::const_iterator &aux_it,
                                        const typename ram_input_tape<ramT>::const_iterator &aux_end);
 
@@ -152,9 +152,9 @@ namespace nil {
                 public:
                     typedef ram_base_field<ramT> FieldType;
 
-                    pb_variable<FieldType> is_halt_case;
+                    variable<FieldType> is_halt_case;
 
-                    ram_pcd_local_data_variable(protoboard<FieldType> &pb);
+                    ram_pcd_local_data_variable(blueprint<FieldType> &pb);
                 };
 
                 /**
@@ -168,34 +168,34 @@ namespace nil {
 
                 public:
                     typedef ram_base_field<ramT> FieldType;
-                    typedef CRH_with_bit_out_gadget<FieldType> Hash;
+                    typedef CRH_with_bit_out_component<FieldType> Hash;
                     typedef compliance_predicate_handler<ram_base_field<ramT>, ram_protoboard<ramT>> base_handler;
 
                     std::shared_ptr<ram_pcd_message_variable<ramT>> next;
                     std::shared_ptr<ram_pcd_message_variable<ramT>> cur;
 
                 private:
-                    pb_variable<FieldType> zero;    // TODO: promote linear combinations to first class objects
-                    std::shared_ptr<bit_vector_copy_gadget<FieldType>> copy_root_initial;
-                    std::shared_ptr<bit_vector_copy_gadget<FieldType>> copy_pc_addr_initial;
-                    std::shared_ptr<bit_vector_copy_gadget<FieldType>> copy_cpu_state_initial;
+                    variable<FieldType> zero;    // TODO: promote linear combinations to first class objects
+                    std::shared_ptr<bit_vector_copy_component<FieldType>> copy_root_initial;
+                    std::shared_ptr<bit_vector_copy_component<FieldType>> copy_pc_addr_initial;
+                    std::shared_ptr<bit_vector_copy_component<FieldType>> copy_cpu_state_initial;
 
-                    pb_variable<FieldType> is_base_case;
-                    pb_variable<FieldType> is_not_halt_case;
+                    variable<FieldType> is_base_case;
+                    variable<FieldType> is_not_halt_case;
 
-                    pb_variable<FieldType> packed_cur_timestamp;
-                    std::shared_ptr<packing_gadget<FieldType>> pack_cur_timestamp;
-                    pb_variable<FieldType> packed_next_timestamp;
-                    std::shared_ptr<packing_gadget<FieldType>> pack_next_timestamp;
+                    variable<FieldType> packed_cur_timestamp;
+                    std::shared_ptr<packing_component<FieldType>> pack_cur_timestamp;
+                    variable<FieldType> packed_next_timestamp;
+                    std::shared_ptr<packing_component<FieldType>> pack_next_timestamp;
 
                     pb_variable_array<FieldType> zero_cpu_state;
                     pb_variable_array<FieldType> zero_pc_addr;
                     pb_variable_array<FieldType> zero_root;
 
-                    std::shared_ptr<bit_vector_copy_gadget<FieldType>> initialize_cur_cpu_state;
-                    std::shared_ptr<bit_vector_copy_gadget<FieldType>> initialize_prev_pc_addr;
+                    std::shared_ptr<bit_vector_copy_component<FieldType>> initialize_cur_cpu_state;
+                    std::shared_ptr<bit_vector_copy_component<FieldType>> initialize_prev_pc_addr;
 
-                    std::shared_ptr<bit_vector_copy_gadget<FieldType>> initialize_root;
+                    std::shared_ptr<bit_vector_copy_component<FieldType>> initialize_root;
 
                     pb_variable_array<FieldType> prev_pc_val;
                     std::shared_ptr<digest_variable<FieldType>> prev_pc_val_digest;
@@ -219,14 +219,14 @@ namespace nil {
                     pb_variable_array<FieldType> temp_next_cpu_state;
                     std::shared_ptr<ram_cpu_checker<ramT>> cpu_checker;
 
-                    pb_variable<FieldType> do_halt;
-                    std::shared_ptr<bit_vector_copy_gadget<FieldType>> clear_next_root;
-                    std::shared_ptr<bit_vector_copy_gadget<FieldType>> clear_next_pc_addr;
-                    std::shared_ptr<bit_vector_copy_gadget<FieldType>> clear_next_cpu_state;
+                    variable<FieldType> do_halt;
+                    std::shared_ptr<bit_vector_copy_component<FieldType>> clear_next_root;
+                    std::shared_ptr<bit_vector_copy_component<FieldType>> clear_next_pc_addr;
+                    std::shared_ptr<bit_vector_copy_component<FieldType>> clear_next_cpu_state;
 
-                    std::shared_ptr<bit_vector_copy_gadget<FieldType>> copy_temp_next_root;
-                    std::shared_ptr<bit_vector_copy_gadget<FieldType>> copy_temp_next_pc_addr;
-                    std::shared_ptr<bit_vector_copy_gadget<FieldType>> copy_temp_next_cpu_state;
+                    std::shared_ptr<bit_vector_copy_component<FieldType>> copy_temp_next_root;
+                    std::shared_ptr<bit_vector_copy_component<FieldType>> copy_temp_next_pc_addr;
+                    std::shared_ptr<bit_vector_copy_component<FieldType>> copy_temp_next_cpu_state;
 
                 public:
                     const std::size_t addr_size;
@@ -269,7 +269,7 @@ namespace nil {
                     ap(ap), timestamp(timestamp), root_initial(root_initial), root(root), pc_addr(pc_addr),
                     cpu_state(cpu_state), pc_addr_initial(pc_addr_initial), cpu_state_initial(cpu_state_initial),
                     has_accepted(has_accepted) {
-                    const std::size_t digest_size = CRH_with_bit_out_gadget<FieldType>::get_digest_len();
+                    const std::size_t digest_size = CRH_with_bit_out_component<FieldType>::get_digest_len();
                     assert(static_cast<std::size_t>(std::ceil(std::log2(timestamp))) < ramT::timestamp_length);
                     assert(root_initial.size() == digest_size);
                     assert(root.size() == digest_size);
@@ -341,7 +341,7 @@ namespace nil {
 
                 template<typename ramT>
                 std::size_t ram_pcd_message<ramT>::unpacked_payload_size_in_bits(const ram_architecture_params<ramT> &ap) {
-                    const std::size_t digest_size = CRH_with_bit_out_gadget<FieldType>::get_digest_len();
+                    const std::size_t digest_size = CRH_with_bit_out_component<FieldType>::get_digest_len();
 
                     return (ramT::timestamp_length +     // timestamp
                             2 * digest_size +            // root, root_initial
@@ -351,7 +351,7 @@ namespace nil {
                 }
 
                 template<typename ramT>
-                ram_pcd_message_variable<ramT>::ram_pcd_message_variable(protoboard<FieldType> &pb,
+                ram_pcd_message_variable<ramT>::ram_pcd_message_variable(blueprint<FieldType> &pb,
                                                                          const ram_architecture_params<ramT> &ap) :
                     r1cs_pcd_message_variable<ram_base_field<ramT>>(pb),
                     ap(ap) {
@@ -366,7 +366,7 @@ namespace nil {
 
                 template<typename ramT>
                 void ram_pcd_message_variable<ramT>::allocate_unpacked_part() {
-                    const std::size_t digest_size = CRH_with_bit_out_gadget<FieldType>::get_digest_len();
+                    const std::size_t digest_size = CRH_with_bit_out_component<FieldType>::get_digest_len();
 
                     timestamp.allocate(this->pb, ramT::timestamp_length);
                     root_initial.allocate(this->pb, digest_size);
@@ -387,7 +387,7 @@ namespace nil {
                                              cpu_state_initial.end());
                     all_unpacked_vars.insert(all_unpacked_vars.end(), has_accepted);
 
-                    unpack_payload.reset(new multipacking_gadget<FieldType>(this->pb, all_unpacked_vars, packed_payload,
+                    unpack_payload.reset(new multipacking_component<FieldType>(this->pb, all_unpacked_vars, packed_payload,
                                                                             FieldType::capacity()));
                 }
 
@@ -436,7 +436,7 @@ namespace nil {
                 template<typename ramT>
                 ram_pcd_local_data<ramT>::ram_pcd_local_data(
                     const bool is_halt_case,
-                    delegated_ra_memory<CRH_with_bit_out_gadget<FieldType>> &mem,
+                    delegated_ra_memory<CRH_with_bit_out_component<FieldType>> &mem,
                     typename ram_input_tape<ramT>::const_iterator &aux_it,
                     const typename ram_input_tape<ramT>::const_iterator &aux_end) :
                     is_halt_case(is_halt_case),
@@ -452,7 +452,7 @@ namespace nil {
                 }
 
                 template<typename ramT>
-                ram_pcd_local_data_variable<ramT>::ram_pcd_local_data_variable(protoboard<FieldType> &pb) :
+                ram_pcd_local_data_variable<ramT>::ram_pcd_local_data_variable(blueprint<FieldType> &pb) :
                     r1cs_pcd_local_data_variable<ram_base_field<ramT>>(pb) {
                     is_halt_case.allocate(pb);
 
@@ -494,7 +494,7 @@ namespace nil {
                                                                                              true,
                                                                                              std::set<std::size_t> {1}),
                     ap(ap), addr_size(ap.address_size()), value_size(ap.value_size()),
-                    digest_size(CRH_with_bit_out_gadget<FieldType>::get_digest_len()) {
+                    digest_size(CRH_with_bit_out_component<FieldType>::get_digest_len()) {
                     // TODO: assert that message has fields of lengths consistent with num_addresses/value_size (as a
                     // method for ram_message) choose a constant for timestamp_len check that value_size <= digest_size;
                     // digest_size is not assumed to fit in chunk size (more precisely, it is handled correctly in the
@@ -529,13 +529,13 @@ namespace nil {
                       next.pc_addr_init = cur.pc_addr_initial
                       next.cpu_state_initial = cur.cpu_state_initial
                     */
-                    copy_root_initial.reset(new bit_vector_copy_gadget<FieldType>(
-                        this->pb, cur->root_initial, next->root_initial, pb_variable<FieldType>(0), chunk_size));
-                    copy_pc_addr_initial.reset(new bit_vector_copy_gadget<FieldType>(
-                        this->pb, cur->pc_addr_initial, next->pc_addr_initial, pb_variable<FieldType>(0), chunk_size));
+                    copy_root_initial.reset(new bit_vector_copy_component<FieldType>(
+                        this->pb, cur->root_initial, next->root_initial, variable<FieldType>(0), chunk_size));
+                    copy_pc_addr_initial.reset(new bit_vector_copy_component<FieldType>(
+                        this->pb, cur->pc_addr_initial, next->pc_addr_initial, variable<FieldType>(0), chunk_size));
                     copy_cpu_state_initial.reset(
-                        new bit_vector_copy_gadget<FieldType>(this->pb, cur->cpu_state_initial, next->cpu_state_initial,
-                                                              pb_variable<FieldType>(0), chunk_size));
+                        new bit_vector_copy_component<FieldType>(this->pb, cur->cpu_state_initial, next->cpu_state_initial,
+                                                              variable<FieldType>(0), chunk_size));
 
                     /*
                       If is_base_case = 1: (base case)
@@ -544,17 +544,17 @@ namespace nil {
                     */
                     packed_cur_timestamp.allocate(this->pb);
                     pack_cur_timestamp.reset(
-                        new packing_gadget<FieldType>(this->pb, cur->timestamp, packed_cur_timestamp));
+                        new packing_component<FieldType>(this->pb, cur->timestamp, packed_cur_timestamp));
 
                     zero_cpu_state = pb_variable_array<FieldType>(cur->cpu_state.size(), zero);
                     zero_pc_addr = pb_variable_array<FieldType>(cur->pc_addr.size(), zero);
 
-                    initialize_cur_cpu_state.reset(new bit_vector_copy_gadget<FieldType>(
+                    initialize_cur_cpu_state.reset(new bit_vector_copy_component<FieldType>(
                         this->pb, cur->cpu_state_initial, cur->cpu_state, is_base_case, chunk_size));
-                    initialize_prev_pc_addr.reset(new bit_vector_copy_gadget<FieldType>(
+                    initialize_prev_pc_addr.reset(new bit_vector_copy_component<FieldType>(
                         this->pb, cur->pc_addr_initial, cur->pc_addr, is_base_case, chunk_size));
 
-                    initialize_root.reset(new bit_vector_copy_gadget<FieldType>(this->pb, cur->root_initial, cur->root,
+                    initialize_root.reset(new bit_vector_copy_component<FieldType>(this->pb, cur->root_initial, cur->root,
                                                                                 is_base_case, chunk_size));
                     /*
                       If do_halt = 0: (regular case)
@@ -572,12 +572,12 @@ namespace nil {
                         new merkle_authentication_path_variable<FieldType, Hash>(this->pb, addr_size));
                     instruction_fetch.reset(new memory_load_gadget<FieldType, Hash>(
                         this->pb, addr_size, cur->pc_addr, *prev_pc_val_digest, *cur_root_digest,
-                        *instruction_fetch_merkle_proof, pb_variable<FieldType>(0)));
+                        *instruction_fetch_merkle_proof, variable<FieldType>(0)));
 
                     // for next.timestamp = cur.timestamp + 1
                     packed_next_timestamp.allocate(this->pb);
                     pack_next_timestamp.reset(
-                        new packing_gadget<FieldType>(this->pb, next->timestamp, packed_next_timestamp));
+                        new packing_component<FieldType>(this->pb, next->timestamp, packed_next_timestamp));
 
                     // that CPU accepted on (cur, temp)
                     ls_addr.allocate(this->pb, addr_size);
@@ -607,15 +607,15 @@ namespace nil {
                     do_halt.allocate(this->pb);
                     zero_root = pb_variable_array<FieldType>(next->root.size(), zero);
                     clear_next_root.reset(
-                        new bit_vector_copy_gadget<FieldType>(this->pb, zero_root, next->root, do_halt, chunk_size));
-                    clear_next_pc_addr.reset(new bit_vector_copy_gadget<FieldType>(this->pb, zero_pc_addr,
+                        new bit_vector_copy_component<FieldType>(this->pb, zero_root, next->root, do_halt, chunk_size));
+                    clear_next_pc_addr.reset(new bit_vector_copy_component<FieldType>(this->pb, zero_pc_addr,
                                                                                    next->pc_addr, do_halt, chunk_size));
-                    clear_next_cpu_state.reset(new bit_vector_copy_gadget<FieldType>(
+                    clear_next_cpu_state.reset(new bit_vector_copy_component<FieldType>(
                         this->pb, zero_cpu_state, next->cpu_state, do_halt, chunk_size));
 
-                    copy_temp_next_pc_addr.reset(new bit_vector_copy_gadget<FieldType>(
+                    copy_temp_next_pc_addr.reset(new bit_vector_copy_component<FieldType>(
                         this->pb, temp_next_pc_addr, next->pc_addr, is_not_halt_case, chunk_size));
-                    copy_temp_next_cpu_state.reset(new bit_vector_copy_gadget<FieldType>(
+                    copy_temp_next_cpu_state.reset(new bit_vector_copy_component<FieldType>(
                         this->pb, temp_next_cpu_state, next->cpu_state, is_not_halt_case, chunk_size));
                 }
 
@@ -839,7 +839,7 @@ namespace nil {
                         const ram_boot_trace<ramT> &primary_input) {
                     const std::size_t num_addresses = 1ul << ap.address_size();
                     const std::size_t value_size = ap.value_size();
-                    delegated_ra_memory<CRH_with_bit_out_gadget<FieldType>> mem(num_addresses, value_size,
+                    delegated_ra_memory<CRH_with_bit_out_component<FieldType>> mem(num_addresses, value_size,
                                                                                 primary_input.as_memory_contents());
 
                     const std::size_t type = 0;
@@ -870,7 +870,7 @@ namespace nil {
                         const std::size_t time_bound) {
                     const std::size_t num_addresses = 1ul << ap.address_size();
                     const std::size_t value_size = ap.value_size();
-                    delegated_ra_memory<CRH_with_bit_out_gadget<FieldType>> mem(num_addresses, value_size,
+                    delegated_ra_memory<CRH_with_bit_out_component<FieldType>> mem(num_addresses, value_size,
                                                                                 primary_input.as_memory_contents());
 
                     const std::size_t type = 1;

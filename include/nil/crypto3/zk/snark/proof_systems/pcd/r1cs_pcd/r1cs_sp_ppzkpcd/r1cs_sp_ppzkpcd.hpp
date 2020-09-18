@@ -425,7 +425,6 @@ namespace nil {
                     compliance_step_pcd_circuit.generate_r1cs_constraints();
                     const r1cs_constraint_system<FieldT_A> compliance_step_pcd_circuit_cs =
                         compliance_step_pcd_circuit.get_circuit();
-                    compliance_step_pcd_circuit_cs.report_linear_constraint_statistics();
 
                     r1cs_ppzksnark_keypair<curve_A_pp> compliance_step_keypair =
                         r1cs_ppzksnark_generator<curve_A_pp>(compliance_step_pcd_circuit_cs);
@@ -435,7 +434,6 @@ namespace nil {
                     translation_step_pcd_circuit.generate_r1cs_constraints();
                     const r1cs_constraint_system<FieldT_B> translation_step_pcd_circuit_cs =
                         translation_step_pcd_circuit.get_circuit();
-                    translation_step_pcd_circuit_cs.report_linear_constraint_statistics();
 
                     r1cs_ppzksnark_keypair<curve_B_pp> translation_step_keypair =
                         r1cs_ppzksnark_generator<curve_B_pp>(translation_step_pcd_circuit_cs);

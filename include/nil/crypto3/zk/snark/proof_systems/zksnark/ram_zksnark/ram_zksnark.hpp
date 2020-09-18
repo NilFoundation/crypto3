@@ -340,7 +340,7 @@ namespace nil {
                     const std::size_t num_addresses = 1ul << pk.ap.address_size();
                     const std::size_t value_size = pk.ap.value_size();
 
-                    delegated_ra_memory<CRH_with_bit_out_gadget<FieldType>> mem(
+                    delegated_ra_memory<CRH_with_bit_out_component<FieldType>> mem(
                         num_addresses, value_size, primary_input.as_memory_contents());
                     std::shared_ptr<r1cs_pcd_message<FieldType>> msg =
                         ram_compliance_predicate_handler<ramT>::get_base_case_message(pk.ap, primary_input);

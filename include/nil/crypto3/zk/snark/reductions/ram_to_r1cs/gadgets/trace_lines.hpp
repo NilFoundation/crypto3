@@ -14,7 +14,7 @@
 
 #include <memory>
 
-#include <nil/crypto3/zk/snark/gadgets/basic_gadgets.hpp>
+#include <nil/crypto3/zk/snark/components/basic_components.hpp>
 #include <nil/crypto3/zk/snark/relations/ram_computations/rams/ram_params.hpp>
 
 namespace nil {
@@ -36,10 +36,10 @@ namespace nil {
                 public:
                     typedef ram_base_field<ramT> FieldType;
 
-                    std::shared_ptr<dual_variable_gadget<FieldType>> timestamp;
-                    std::shared_ptr<dual_variable_gadget<FieldType>> address;
-                    std::shared_ptr<dual_variable_gadget<FieldType>> contents_before;
-                    std::shared_ptr<dual_variable_gadget<FieldType>> contents_after;
+                    std::shared_ptr<dual_variable_component<FieldType>> timestamp;
+                    std::shared_ptr<dual_variable_component<FieldType>> address;
+                    std::shared_ptr<dual_variable_component<FieldType>> contents_before;
+                    std::shared_ptr<dual_variable_component<FieldType>> contents_after;
 
                 public:
                     memory_line_variable_gadget(ram_protoboard<ramT> &pb,
@@ -65,7 +65,7 @@ namespace nil {
                     typedef ram_base_field<ramT> FieldType;
 
                     pb_variable_array<FieldType> cpu_state;
-                    pb_variable<FieldType> has_accepted;
+                    variable<FieldType> has_accepted;
 
                     execution_line_variable_gadget(ram_protoboard<ramT> &pb,
                                                    const std::size_t timestamp_size,
@@ -81,10 +81,10 @@ namespace nil {
                     const std::size_t address_size = ap.address_size();
                     const std::size_t value_size = ap.value_size();
 
-                    timestamp.reset(new dual_variable_gadget<FieldType>(pb, timestamp_size));
-                    address.reset(new dual_variable_gadget<FieldType>(pb, address_size));
-                    contents_before.reset(new dual_variable_gadget<FieldType>(pb, value_size));
-                    contents_after.reset(new dual_variable_gadget<FieldType>(pb, value_size));
+                    timestamp.reset(new dual_variable_component<FieldType>(pb, timestamp_size));
+                    address.reset(new dual_variable_component<FieldType>(pb, address_size));
+                    contents_before.reset(new dual_variable_component<FieldType>(pb, value_size));
+                    contents_after.reset(new dual_variable_component<FieldType>(pb, value_size));
                 }
 
                 template<typename ramT>

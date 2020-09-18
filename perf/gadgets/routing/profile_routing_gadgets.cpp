@@ -14,14 +14,14 @@
 #include <nil/algebra/common/default_types/ec_pp.hpp>
 #include <nil/algebra/common/profiling.hpp>
 
-#include <nil/crypto3/zk/snark/gadgets/routing/as_waksman_routing_gadget.hpp>
-#include <nil/crypto3/zk/snark/gadgets/routing/benes_routing_gadget.hpp>
+#include <nil/crypto3/zk/snark/components/routing/as_waksman_routing_components.hpp>
+#include <nil/crypto3/zk/snark/components/routing/benes_routing_components.hpp>
 
 using namespace nil::crypto3::zk::snark;
 
 template<typename FieldType>
 void get_as_waksman_size(const std::size_t n, const std::size_t l, std::size_t &num_constraints, std::size_t &num_variables) {
-    protoboard<FieldType> pb;
+    blueprint<FieldType> pb;
 
     std::vector<pb_variable_array<FieldType>> randbits(n), outbits(n);
     for (std::size_t y = 0; y < n; ++y) {
@@ -29,7 +29,7 @@ void get_as_waksman_size(const std::size_t n, const std::size_t l, std::size_t &
         outbits[y].allocate(pb, l);
     }
 
-    as_waksman_routing_gadget<FieldType> r(pb, n, randbits, outbits);
+    as_waksman_routing_component<FieldType> r(pb, n, randbits, outbits);
     r.generate_r1cs_constraints();
 
     num_constraints = pb.num_constraints();
@@ -41,7 +41,7 @@ void get_benes_size(const std::size_t n, const std::size_t l, std::size_t &num_c
     const std::size_t t = static_cast<std::size_t>(std::ceil(std::log2(n)));
     assert(n == 1ul << t);
 
-    protoboard<FieldType> pb;
+    blueprint<FieldType> pb;
 
     std::vector<pb_variable_array<FieldType>> randbits(1ul << t), outbits(1ul << t);
     for (std::size_t y = 0; y < 1ul << t; ++y) {
@@ -49,7 +49,7 @@ void get_benes_size(const std::size_t n, const std::size_t l, std::size_t &num_c
         outbits[y].allocate(pb, l);
     }
 
-    benes_routing_gadget<FieldType> r(pb, n, randbits, outbits, n);
+    benes_routing_component<FieldType> r(pb, n, randbits, outbits, n);
     r.generate_r1cs_constraints();
 
     num_constraints = pb.num_constraints();

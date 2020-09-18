@@ -128,7 +128,7 @@ namespace nil {
                     }
 
                     void add_constraint(const uscs_constraint<FieldType> &constraint) {
-                        constraints.emplace_back(c);
+                        constraints.emplace_back(constraint);
                     }
 
                     bool operator==(const uscs_constraint_system<FieldType> &other) const {
@@ -136,27 +136,7 @@ namespace nil {
                                 this->primary_input_size == other.primary_input_size &&
                                 this->auxiliary_input_size == other.auxiliary_input_size);
                     }
-
-                    void report_linear_constraint_statistics() const {
-#ifdef DEBUG
-                        for (std::size_t i = 0; i < constraints.size(); ++i) {
-                            auto &constr = constraints[i];
-                            bool a_is_const = true;
-                            for (auto &t : constr.terms) {
-                                a_is_const = a_is_const && (t.index == 0);
-                            }
-
-                            if (a_is_const) {
-                                auto it = constraint_annotations.find(i);
-                                printf("%s\n",
-                                       (it == constraint_annotations.end() ? FMT("", "constraint_%zu", i) : it->second)
-                                           .c_str());
-                            }
-                        }
-#endif
-                    }
                 };
-
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3

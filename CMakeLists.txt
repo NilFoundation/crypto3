@@ -112,7 +112,7 @@ list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
 
      include/nil/crypto3/zk/snark/gadgets/verifiers/r1cs_ppzksnark_verifier_gadget.hpp
      include/nil/crypto3/zk/snark/gadgets/basic_gadgets.hpp
-     include/nil/crypto3/zk/snark/gadgets/gadget_from_r1cs.hpp
+     include/nil/crypto3/zk/snark/gadgets/component_from_r1cs.hpp
 
      include/nil/crypto3/zk/snark/knowledge_commitment/kc_multiexp.hpp
      include/nil/crypto3/zk/snark/knowledge_commitment/knowledge_commitment.hpp
@@ -204,11 +204,11 @@ list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
      include/nil/crypto3/zk/snark/routing_algorithms/as_waksman_routing_algorithm.hpp
      include/nil/crypto3/zk/snark/routing_algorithms/benes_routing_algorithm.hpp
      include/nil/crypto3/zk/snark/constraint_profiling.hpp
-     include/nil/crypto3/zk/snark/gadget.hpp
+     include/nil/crypto3/zk/snark/component.hpp
      include/nil/crypto3/zk/snark/integer_permutation.hpp
      include/nil/crypto3/zk/snark/merkle_tree.hpp
-     include/nil/crypto3/zk/snark/pb_variable.hpp
-     include/nil/crypto3/zk/snark/protoboard.hpp)
+     include/nil/crypto3/zk/snark/variable.hpp
+     include/nil/crypto3/zk/snark/blueprint.hpp)
 
 list(APPEND ${CURRENT_PROJECT_NAME}_UNGROUPED_SOURCES)
 

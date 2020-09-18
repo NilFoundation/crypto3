@@ -42,7 +42,7 @@
 #ifndef CRYPTO3_ZK_RAM_UNIVERSAL_GADGET_HPP_
 #define CRYPTO3_ZK_RAM_UNIVERSAL_GADGET_HPP_
 
-#include <nil/crypto3/zk/snark/gadgets/routing/as_waksman_routing_gadget.hpp>
+#include <nil/crypto3/zk/snark/components/routing/as_waksman_routing_components.hpp>
 #include <nil/crypto3/zk/snark/reductions/ram_to_r1cs/gadgets/memory_checker_gadget.hpp>
 #include <nil/crypto3/zk/snark/reductions/ram_to_r1cs/gadgets/trace_lines.hpp>
 #include <nil/crypto3/zk/snark/relations/ram_computations/rams/ram_params.hpp>
@@ -93,7 +93,7 @@ namespace nil {
 
                     std::vector<memory_line_variable_gadget<ramT>> boot_lines;
                     std::vector<pb_variable_array<FieldType>> boot_line_bits;
-                    std::vector<multipacking_gadget<FieldType>> unpack_boot_lines;
+                    std::vector<multipacking_component<FieldType>> unpack_boot_lines;
 
                     std::vector<memory_line_variable_gadget<ramT>> load_instruction_lines;
                     std::vector<execution_line_variable_gadget<ramT>>
@@ -108,7 +108,7 @@ namespace nil {
                     std::vector<pb_variable_array<FieldType>> routing_inputs;
                     std::vector<pb_variable_array<FieldType>> routing_outputs;
 
-                    std::shared_ptr<as_waksman_routing_gadget<FieldType>> routing_network;
+                    std::shared_ptr<as_waksman_routing_component<FieldType>> routing_network;
 
                 public:
                     std::size_t boot_trace_size_bound;
@@ -191,7 +191,7 @@ namespace nil {
                         std::advance(input_it, packed_line_size);
 
                         unpack_boot_lines.emplace_back(
-                            multipacking_gadget<FieldType>(pb, boot_line_bits, packed_boot_line, max_chunk_size));
+                            multipacking_component<FieldType>(pb, boot_line_bits, packed_boot_line, max_chunk_size));
                     }
 
                     /* deal with routing */
@@ -207,7 +207,7 @@ namespace nil {
                         routing_outputs.emplace_back(routed_memory_lines[i].all_vars());
                     }
 
-                    routing_network.reset(new as_waksman_routing_gadget<FieldType>(pb, num_memory_lines, routing_inputs,
+                    routing_network.reset(new as_waksman_routing_component<FieldType>(pb, num_memory_lines, routing_inputs,
                                                                                    routing_outputs));
 
                     /* deal with all checkers */

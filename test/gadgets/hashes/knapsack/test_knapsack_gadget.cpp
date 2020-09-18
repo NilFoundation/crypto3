@@ -12,7 +12,7 @@
 #include <nil/algebra/curves/mnt/mnt4/mnt4_pp.hpp>
 #include <nil/algebra/curves/mnt/mnt6/mnt6_pp.hpp>
 
-#include <nil/crypto3/zk/snark/gadgets/hashes/knapsack/knapsack_gadget.hpp>
+#include <nil/crypto3/zk/snark/components/hashes/knapsack/knapsack_component.hpp>
 
 namespace nil {
     namespace crypto3 {

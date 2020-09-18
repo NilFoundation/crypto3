@@ -21,7 +21,7 @@
 #ifndef CRYPTO3_ZK_TALLY_CP_HPP_
 #define CRYPTO3_ZK_TALLY_CP_HPP_
 
-#include <nil/crypto3/zk/snark/gadgets/basic_gadgets.hpp>
+#include <nil/crypto3/zk/snark/components/basic_components.hpp>
 
 #include <nil/crypto3/zk/snark/proof_systems/pcd/r1cs_pcd/compliance_predicate/compliance_predicate.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/pcd/r1cs_pcd/compliance_predicate/cp_handler.hpp>
@@ -66,26 +66,26 @@ namespace nil {
                  * Subclass a R1CS compliance predicate handler to the tally compliance predicate handler.
                  */
                 template<typename FieldType>
-                class tally_cp_handler : public compliance_predicate_handler<FieldType, protoboard<FieldType>> {
+                class tally_cp_handler : public compliance_predicate_handler<FieldType, blueprint<FieldType>> {
                 public:
-                    typedef compliance_predicate_handler<FieldType, protoboard<FieldType>> base_handler;
+                    typedef compliance_predicate_handler<FieldType, blueprint<FieldType>> base_handler;
                     pb_variable_array<FieldType> incoming_types;
 
-                    pb_variable<FieldType> sum_out_packed;
-                    pb_variable<FieldType> count_out_packed;
+                    variable<FieldType> sum_out_packed;
+                    variable<FieldType> count_out_packed;
                     pb_variable_array<FieldType> sum_in_packed;
                     pb_variable_array<FieldType> count_in_packed;
 
                     pb_variable_array<FieldType> sum_in_packed_aux;
                     pb_variable_array<FieldType> count_in_packed_aux;
 
-                    std::shared_ptr<packing_gadget<FieldType>> unpack_sum_out;
-                    std::shared_ptr<packing_gadget<FieldType>> unpack_count_out;
-                    std::vector<packing_gadget<FieldType>> pack_sum_in;
-                    std::vector<packing_gadget<FieldType>> pack_count_in;
+                    std::shared_ptr<packing_component<FieldType>> unpack_sum_out;
+                    std::shared_ptr<packing_component<FieldType>> unpack_count_out;
+                    std::vector<packing_component<FieldType>> pack_sum_in;
+                    std::vector<packing_component<FieldType>> pack_count_in;
 
-                    pb_variable<FieldType> type_val_inner_product;
-                    std::shared_ptr<inner_product_gadget<FieldType>> compute_type_val_inner_product;
+                    variable<FieldType> type_val_inner_product;
+                    std::shared_ptr<inner_product_component<FieldType>> compute_type_val_inner_product;
 
                     pb_variable_array<FieldType> arity_indicators;
 
@@ -165,7 +165,7 @@ namespace nil {
                     pb_variable_array<FieldType> count_bits;
                     std::size_t wordsize;
 
-                    tally_pcd_message_variable(protoboard<FieldType> &pb, const std::size_t wordsize) :
+                    tally_pcd_message_variable(blueprint<FieldType> &pb, const std::size_t wordsize) :
                         r1cs_pcd_message_variable<FieldType>(pb), wordsize(wordsize) {
                         sum_bits.allocate(pb, wordsize);
                         count_bits.allocate(pb, wordsize);
@@ -189,9 +189,9 @@ namespace nil {
                 template<typename FieldType>
                 class tally_pcd_local_data_variable : public r1cs_pcd_local_data_variable<FieldType> {
                 public:
-                    pb_variable<FieldType> summand;
+                    variable<FieldType> summand;
 
-                    tally_pcd_local_data_variable(protoboard<FieldType> &pb) :
+                    tally_pcd_local_data_variable(blueprint<FieldType> &pb) :
                         r1cs_pcd_local_data_variable<FieldType>(pb) {
                         summand.allocate(pb);
 
@@ -213,7 +213,7 @@ namespace nil {
                 tally_cp_handler<FieldType>::tally_cp_handler(std::size_t type, std::size_t max_arity,
                                                               std::size_t wordsize, bool relies_on_same_type_inputs,
                                                               const std::set<std::size_t> &accepted_input_types) :
-                    compliance_predicate_handler<FieldType, protoboard<FieldType>>(protoboard<FieldType>(),
+                    compliance_predicate_handler<FieldType, blueprint<FieldType>>(blueprint<FieldType>(),
                                                                                    type * 100,
                                                                                    type,
                                                                                    max_arity,
@@ -243,27 +243,27 @@ namespace nil {
                         incoming_types.emplace_back(msg->type);
                     }
 
-                    compute_type_val_inner_product.reset(new inner_product_gadget<FieldType>(
+                    compute_type_val_inner_product.reset(new inner_product_component<FieldType>(
                         this->pb, incoming_types, sum_in_packed, type_val_inner_product));
 
-                    unpack_sum_out.reset(new packing_gadget<FieldType>(
+                    unpack_sum_out.reset(new packing_component<FieldType>(
                         this->pb,
                         std::dynamic_pointer_cast<tally_pcd_message_variable<FieldType>>(this->outgoing_message)
                             ->sum_bits,
                         sum_out_packed));
-                    unpack_count_out.reset(new packing_gadget<FieldType>(
+                    unpack_count_out.reset(new packing_component<FieldType>(
                         this->pb,
                         std::dynamic_pointer_cast<tally_pcd_message_variable<FieldType>>(this->outgoing_message)
                             ->count_bits,
                         count_out_packed));
 
                     for (std::size_t i = 0; i < max_arity; ++i) {
-                        pack_sum_in.emplace_back(packing_gadget<FieldType>(
+                        pack_sum_in.emplace_back(packing_component<FieldType>(
                             this->pb,
                             std::dynamic_pointer_cast<tally_pcd_message_variable<FieldType>>(this->incoming_messages[i])
                                 ->sum_bits,
                             sum_in_packed[i]));
-                        pack_count_in.emplace_back(packing_gadget<FieldType>(
+                        pack_count_in.emplace_back(packing_component<FieldType>(
                             this->pb,
                             std::dynamic_pointer_cast<tally_pcd_message_variable<FieldType>>(this->incoming_messages[i])
                                 ->sum_bits,

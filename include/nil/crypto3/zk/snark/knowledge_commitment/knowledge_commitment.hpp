@@ -10,7 +10,7 @@
 #ifndef CRYPTO3_ZK_KNOWLEDGE_COMMITMENT_HPP_
 #define CRYPTO3_ZK_KNOWLEDGE_COMMITMENT_HPP_
 
-#include <nil/algebra/fields/fp.hpp>
+#include <nil/algebra/fields/field.hpp>
 
 #include <nil/crypto3/zk/snark/detail/sparse_vector.hpp>
 

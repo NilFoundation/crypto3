@@ -12,7 +12,7 @@
 #ifndef CRYPTO3_ZK_FOORAM_PARAMS_HPP_
 #define CRYPTO3_ZK_FOORAM_PARAMS_HPP_
 
-#include <nil/crypto3/zk/snark/gadgets/cpu_checkers/fooram/fooram_cpu_checker.hpp>
+#include <nil/crypto3/zk/snark/components/cpu_checkers/fooram/fooram_cpu_checker.hpp>
 #include <nil/crypto3/zk/snark/relations/ram_computations/rams/fooram/fooram_aux.hpp>
 #include <nil/crypto3/zk/snark/relations/ram_computations/rams/ram_params.hpp>
 
@@ -26,7 +26,7 @@ namespace nil {
                 public:
                     typedef FieldType base_field_type;
                     typedef fooram_protoboard<FieldType> protoboard_type;
-                    typedef fooram_gadget<FieldType> gadget_base_type;
+                    typedef fooram_component<FieldType> gadget_base_type;
                     typedef fooram_cpu_checker<FieldType> cpu_checker_type;
                     typedef fooram_architecture_params architecture_params_type;
 

@@ -100,7 +100,7 @@ namespace nil {
                                                                        typename FieldType::value_type::zero());
                         std::vector<typename FieldType::value_type> Ht(this->degree + 1);
 
-                        const FieldType::value_type Zt = this->domain->compute_vanishing_polynomial(t);
+                        const typename FieldType::value_type Zt = this->domain->compute_vanishing_polynomial(t);
 
                         const std::vector<typename FieldType::value_type> u = this->domain->evaluate_all_lagrange_polynomials(t);
 
@@ -152,21 +152,21 @@ namespace nil {
 
                     std::shared_ptr<algebra::fft::evaluation_domain<FieldType>> domain;
 
-                    FieldType::value_type t;
+                    typename FieldType::value_type t;
 
                     std::vector<typename FieldType::value_type> At, Ct, Ht;
 
-                    FieldType::value_type Zt;
+                    typename FieldType::value_type Zt;
 
                     sap_instance_evaluation(const std::shared_ptr<algebra::fft::evaluation_domain<FieldType>> &domain,
                                             const std::size_t num_variables,
                                             const std::size_t degree,
                                             const std::size_t num_inputs,
-                                            const FieldType::value_type &t,
+                                            const typename FieldType::value_type &t,
                                             const std::vector<typename FieldType::value_type> &At,
                                             const std::vector<typename FieldType::value_type> &Ct,
                                             const std::vector<typename FieldType::value_type> &Ht,
-                                            const FieldType::value_type &Zt) :
+                                            const typename FieldType::value_type &Zt) :
                         num_variables(num_variables),
                         degree(degree), num_inputs(num_inputs), domain(domain), t(t), At(At), Ct(Ct), Ht(Ht), Zt(Zt) {
                     }
@@ -175,11 +175,11 @@ namespace nil {
                                             const std::size_t num_variables,
                                             const std::size_t degree,
                                             const std::size_t num_inputs,
-                                            const FieldType::value_type &t,
+                                            const typename FieldType::value_type &t,
                                             std::vector<typename FieldType::value_type> &&At,
                                             std::vector<typename FieldType::value_type> &&Ct,
                                             std::vector<typename FieldType::value_type> &&Ht,
-                                            const FieldType::value_type &Zt) :
+                                            const typename FieldType::value_type &Zt) :
                         num_variables(num_variables),
                         degree(degree), num_inputs(num_inputs), domain(domain), t(t), At(std::move(At)),
                         Ct(std::move(Ct)), Ht(std::move(Ht)), Zt(Zt) {
@@ -223,9 +223,9 @@ namespace nil {
                             return false;
                         }
 
-                        FieldType::value_type ans_A = this->At[0] + witness.d1 * this->Zt;
-                        FieldType::value_type ans_C = this->Ct[0] + witness.d2 * this->Zt;
-                        FieldType::value_type ans_H = typename FieldType::value_type::zero();
+                        typename FieldType::value_type ans_A = this->At[0] + witness.d1 * this->Zt;
+                        typename FieldType::value_type ans_C = this->Ct[0] + witness.d2 * this->Zt;
+                        typename FieldType::value_type ans_H = typename FieldType::value_type::zero();
 
                         ans_A = ans_A + algebra::inner_product<FieldType>(this->At.begin() + 1,
                                                                           this->At.begin() + 1 + this->num_variables,
@@ -260,7 +260,7 @@ namespace nil {
                     std::size_t degree;
                     std::size_t num_inputs;
 
-                    FieldType::value_type d1, d2;
+                    typename FieldType::value_type d1, d2;
 
                     std::vector<typename FieldType::value_type> coefficients_for_ACs;
                     std::vector<typename FieldType::value_type> coefficients_for_H;
@@ -268,8 +268,8 @@ namespace nil {
                     sap_witness(const std::size_t num_variables,
                                 const std::size_t degree,
                                 const std::size_t num_inputs,
-                                const FieldType::value_type &d1,
-                                const FieldType::value_type &d2,
+                                const typename FieldType::value_type &d1,
+                                const typename FieldType::value_type &d2,
                                 const std::vector<typename FieldType::value_type> &coefficients_for_ACs,
                                 const std::vector<typename FieldType::value_type> &coefficients_for_H) :
                         num_variables(num_variables),
@@ -280,8 +280,8 @@ namespace nil {
                     sap_witness(const std::size_t num_variables,
                                 const std::size_t degree,
                                 const std::size_t num_inputs,
-                                const FieldType::value_type &d1,
-                                const FieldType::value_type &d2,
+                                const typename FieldType::value_type &d1,
+                                const typename FieldType::value_type &d2,
                                 const std::vector<typename FieldType::value_type> &coefficients_for_ACs,
                                 std::vector<typename FieldType::value_type> &&coefficients_for_H) :
                         num_variables(num_variables),

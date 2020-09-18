@@ -12,11 +12,11 @@
 
 #include <nil/algebra/utils/random_element.hpp>
 
-#include <nil/crypto3/zk/snark/gadgets/fields/fp2_gadgets.hpp>
-#include <nil/crypto3/zk/snark/gadgets/fields/fp3_gadgets.hpp>
-#include <nil/crypto3/zk/snark/gadgets/fields/fp4_gadgets.hpp>
-#include <nil/crypto3/zk/snark/gadgets/fields/fp6_gadgets.hpp>
-#include <nil/crypto3/zk/snark/gadgets/verifiers/r1cs_ppzksnark_verifier_gadget.hpp>
+#include <nil/crypto3/zk/snark/components/fields/fp2_components.hpp>
+#include <nil/crypto3/zk/snark/components/fields/fp3_components.hpp>
+#include <nil/crypto3/zk/snark/components/fields/fp4_components.hpp>
+#include <nil/crypto3/zk/snark/components/fields/fp6_components.hpp>
+#include <nil/crypto3/zk/snark/components/verifiers/r1cs_ppzksnark_verifier_gadget.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_ppzksnark/r1cs_ppzksnark.hpp>
 
 using namespace nil::crypto3::zk::snark;
@@ -24,7 +24,7 @@ using namespace nil::crypto3::zk::snark;
 #ifndef NDEBUG
 
 template<typename FieldType>
-void dump_constraints(const protoboard<FieldType> &pb) {
+void dump_constraints(const blueprint<FieldType> &pb) {
 #ifdef DEBUG
     for (auto s : pb.constraint_system.constraint_annotations) {
         printf("constraint: %s\n", s.second.c_str());
@@ -55,7 +55,7 @@ void test_verifier(const std::string &annotation_A, const std::string &annotatio
     const size_t primary_input_size_in_bits = elt_size * primary_input_size;
     const size_t vk_size_in_bits = r1cs_ppzksnark_verification_key_variable<ppT_B>::size_in_bits(primary_input_size);
 
-    protoboard<FieldT_B> pb;
+    blueprint<FieldT_B> pb;
     pb_variable_array<FieldT_B> vk_bits;
     vk_bits.allocate(pb, vk_size_in_bits, "vk_bits");
 
@@ -66,7 +66,7 @@ void test_verifier(const std::string &annotation_A, const std::string &annotatio
 
     r1cs_ppzksnark_verification_key_variable<ppT_B> vk(pb, vk_bits, primary_input_size, "vk");
 
-    pb_variable<FieldT_B> result;
+    variable<FieldT_B> result;
     result.allocate(pb, "result");
 
     r1cs_ppzksnark_verifier_gadget<ppT_B> verifier(pb, vk, primary_input_bits, elt_size, proof, result, "verifier");
@@ -126,7 +126,7 @@ void test_hardcoded_verifier(const std::string &annotation_A, const std::string 
     const size_t elt_size = FieldT_A::size_in_bits();
     const size_t primary_input_size_in_bits = elt_size * primary_input_size;
 
-    protoboard<FieldT_B> pb;
+    blueprint<FieldT_B> pb;
     r1cs_ppzksnark_preprocessed_r1cs_ppzksnark_verification_key_variable<ppT_B> hardcoded_vk(pb, keypair.vk,
                                                                                              "hardcoded_vk");
     pb_variable_array<FieldT_B> primary_input_bits;
@@ -134,7 +134,7 @@ void test_hardcoded_verifier(const std::string &annotation_A, const std::string 
 
     r1cs_ppzksnark_proof_variable<ppT_B> proof(pb, "proof");
 
-    pb_variable<FieldT_B> result;
+    variable<FieldT_B> result;
     result.allocate(pb, "result");
 
     r1cs_ppzksnark_online_verifier_gadget<ppT_B> online_verifier(pb, hardcoded_vk, primary_input_bits, elt_size, proof,
@@ -176,7 +176,7 @@ template<typename FpExtT, template<class> class VarT, template<class> class MulT
 void test_mul(const std::string &annotation) {
     typedef typename FpExtT::my_Fp FieldType;
 
-    protoboard<FieldType> pb;
+    blueprint<FieldType> pb;
     VarT<FpExtT> x(pb, "x");
     VarT<FpExtT> y(pb, "y");
     VarT<FpExtT> xy(pb, "xy");
@@ -200,7 +200,7 @@ template<typename FpExtT, template<class> class VarT, template<class> class SqrT
 void test_sqr(const std::string &annotation) {
     typedef typename FpExtT::my_Fp FieldType;
 
-    protoboard<FieldType> pb;
+    blueprint<FieldType> pb;
     VarT<FpExtT> x(pb, "x");
     VarT<FpExtT> xsq(pb, "xsq");
     SqrT<FpExtT> sqr(pb, x, xsq, "sqr");
@@ -222,7 +222,7 @@ void test_cyclotomic_sqr(const std::string &annotation) {
     typedef algebra::Fqk<CurveType> FpExtT;
     typedef typename FpExtT::my_Fp FieldType;
 
-    protoboard<FieldType> pb;
+    blueprint<FieldType> pb;
     VarT<FpExtT> x(pb, "x");
     VarT<FpExtT> xsq(pb, "xsq");
     CycloSqrT<FpExtT> sqr(pb, x, xsq, "sqr");
@@ -246,7 +246,7 @@ void test_Frobenius(const std::string &annotation) {
     typedef typename FpExtT::my_Fp FieldType;
 
     for (size_t i = 0; i < 100; ++i) {
-        protoboard<FieldType> pb;
+        blueprint<FieldType> pb;
         VarT<FpExtT> x(pb, "x");
         VarT<FpExtT> x_frob = x.Frobenius_map(i);
 
@@ -265,7 +265,7 @@ template<typename CurveType>
 void test_full_pairing(const std::string &annotation) {
     typedef typename CurveType::scalar_field_type FieldType;
 
-    protoboard<FieldType> pb;
+    blueprint<FieldType> pb;
     other_curve<CurveType>::g1_type P_val =
         random_element<other_curve<CurveType>::scalar_field_type>() * other_curve<CurveType>::g1_type::one();
     other_curve<CurveType>::g2_type Q_val =
@@ -281,7 +281,7 @@ void test_full_pairing(const std::string &annotation) {
 
     Fqk_variable<CurveType> miller_result(pb, "miller_result");
     mnt_miller_loop_gadget<CurveType> miller(pb, prec_P, prec_Q, miller_result, "miller");
-    pb_variable<FieldType> result_is_one;
+    variable<FieldType> result_is_one;
     result_is_one.allocate(pb, "result_is_one");
     final_exp_gadget<CurveType> finexp(pb, miller_result, result_is_one, "finexp");
 
@@ -326,7 +326,7 @@ template<typename CurveType>
 void test_full_precomputed_pairing(const std::string &annotation) {
     typedef typename CurveType::scalar_field_type FieldType;
 
-    protoboard<FieldType> pb;
+    blueprint<FieldType> pb;
     other_curve<CurveType>::g1_type P_val =
         random_element<other_curve<CurveType>::scalar_field_type>() * other_curve<CurveType>::g1_type::one();
     other_curve<CurveType>::g2_type Q_val =
@@ -337,7 +337,7 @@ void test_full_precomputed_pairing(const std::string &annotation) {
 
     Fqk_variable<CurveType> miller_result(pb, "miller_result");
     mnt_miller_loop_gadget<CurveType> miller(pb, prec_P, prec_Q, miller_result, "miller");
-    pb_variable<FieldType> result_is_one;
+    variable<FieldType> result_is_one;
     result_is_one.allocate(pb, "result_is_one");
     final_exp_gadget<CurveType> finexp(pb, miller_result, result_is_one, "finexp");
 

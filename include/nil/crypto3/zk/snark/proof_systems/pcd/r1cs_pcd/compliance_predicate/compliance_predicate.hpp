@@ -40,9 +40,14 @@ namespace nil {
                 public:
                     std::size_t type;
 
-                    r1cs_pcd_message(std::size_t type);
+                    r1cs_pcd_message(std::size_t type) : type(type) {
+                    }
                     virtual r1cs_variable_assignment<FieldType> payload_as_r1cs_variable_assignment() const = 0;
-                    r1cs_variable_assignment<FieldType> as_r1cs_variable_assignment() const;
+                    r1cs_variable_assignment<FieldType> as_r1cs_variable_assignment() const {
+                        r1cs_variable_assignment<FieldType> result = this->payload_as_r1cs_variable_assignment();
+                        result.insert(result.begin(), typename FieldType::value_type(this->type));
+                        return result;
+                    }
 
                     virtual void print() const;
                     virtual ~r1cs_pcd_message() = default;
@@ -165,17 +170,6 @@ namespace nil {
 
                 template<typename FieldType>
                 class r1cs_pcd_compliance_predicate_auxiliary_input;
-
-                template<typename FieldType>
-                r1cs_variable_assignment<FieldType> r1cs_pcd_message<FieldType>::as_r1cs_variable_assignment() const {
-                    r1cs_variable_assignment<FieldType> result = this->payload_as_r1cs_variable_assignment();
-                    result.insert(result.begin(), typename FieldType::value_type(this->type));
-                    return result;
-                }
-
-                template<typename FieldType>
-                r1cs_pcd_message<FieldType>::r1cs_pcd_message(std::size_t type) : type(type) {
-                }
 
                 template<typename FieldType>
                 void r1cs_pcd_message<FieldType>::print() const {
@@ -339,7 +333,6 @@ namespace nil {
                         cp_primary_input.as_r1cs_primary_input(),
                         cp_auxiliary_input.as_r1cs_auxiliary_input(incoming_message_payload_lengths));
                 }
-
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3

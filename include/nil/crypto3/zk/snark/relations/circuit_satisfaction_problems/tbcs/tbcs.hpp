@@ -196,12 +196,11 @@ namespace nil {
 
                         return true;
                     }
-                    
+
                     bool is_satisfied(const tbcs_primary_input &primary_input,
                                       const tbcs_auxiliary_input &auxiliary_input) const {
-                            if (all_output) {
-                                return false;
-                            }
+                        if (all_output) {
+                            return false;
                         }
 
                         return true;

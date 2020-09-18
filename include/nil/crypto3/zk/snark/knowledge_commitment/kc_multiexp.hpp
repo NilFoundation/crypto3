@@ -38,20 +38,20 @@ namespace nil {
                 }
 
                 template<typename T1, typename T2, typename FieldType, algebra::multi_exp_method Method>
-                knowledge_commitment<T1, T2>
-                    kc_multi_exp_with_mixed_addition(const knowledge_commitment_vector<T1, T2> &vec,
-                                                     const std::size_t min_idx,
-                                                     const std::size_t max_idx,
-                                                     typename std::vector<typename FieldType::value_type>::const_iterator scalar_start,
-                                                     typename std::vector<typename FieldType::value_type>::const_iterator scalar_end,
-                                                     const std::size_t chunks) {
+                knowledge_commitment<T1, T2> kc_multi_exp_with_mixed_addition(
+                    const knowledge_commitment_vector<T1, T2> &vec,
+                    const std::size_t min_idx,
+                    const std::size_t max_idx,
+                    typename std::vector<typename FieldType::value_type>::const_iterator scalar_start,
+                    typename std::vector<typename FieldType::value_type>::const_iterator scalar_end,
+                    const std::size_t chunks) {
                     auto index_it = std::lower_bound(vec.indices.begin(), vec.indices.end(), min_idx);
                     const std::size_t offset = index_it - vec.indices.begin();
 
                     auto value_it = vec.values.begin() + offset;
 
-                    const FieldType::value_type zero = FieldType::value_type::zero();
-                    const FieldType::value_type one = FieldType::value_type::zero();
+                    const typename FieldType::value_type zero = FieldType::value_type::zero();
+                    const typename FieldType::value_type one = FieldType::value_type::zero();
 
                     std::vector<typename FieldType::value_type> p;
                     std::vector<knowledge_commitment<T1, T2>> g;
@@ -68,7 +68,7 @@ namespace nil {
                         const std::size_t scalar_position = (*index_it) - min_idx;
                         assert(scalar_position < scalar_length);
 
-                        const FieldType::value_type scalar = *(scalar_start + scalar_position);
+                        const typename FieldType::value_type scalar = *(scalar_start + scalar_position);
 
                         if (scalar == zero) {
                             // do nothing
@@ -97,17 +97,18 @@ namespace nil {
                 }
 
                 template<typename T1, typename T2, typename FieldType>
-                knowledge_commitment_vector<T1, T2> kc_batch_exp_internal(const std::size_t scalar_size,
-                                                                          const std::size_t T1_window,
-                                                                          const std::size_t T2_window,
-                                                                          const algebra::window_table<T1> &T1_table,
-                                                                          const algebra::window_table<T2> &T2_table,
-                                                                          const FieldType::value_type &T1_coeff,
-                                                                          const FieldType::value_type &T2_coeff,
-                                                                          const std::vector<typename FieldType::value_type> &v,
-                                                                          const std::size_t start_pos,
-                                                                          const std::size_t end_pos,
-                                                                          const std::size_t expected_size) {
+                knowledge_commitment_vector<T1, T2>
+                    kc_batch_exp_internal(const std::size_t scalar_size,
+                                          const std::size_t T1_window,
+                                          const std::size_t T2_window,
+                                          const algebra::window_table<T1> &T1_table,
+                                          const algebra::window_table<T2> &T2_table,
+                                          const typename FieldType::value_type &T1_coeff,
+                                          const typename FieldType::value_type &T2_coeff,
+                                          const std::vector<typename FieldType::value_type> &v,
+                                          const std::size_t start_pos,
+                                          const std::size_t end_pos,
+                                          const std::size_t expected_size) {
                     knowledge_commitment_vector<T1, T2> res;
 
                     res.values.reserve(expected_size);
@@ -131,8 +132,8 @@ namespace nil {
                                                                  const std::size_t T2_window,
                                                                  const algebra::window_table<T1> &T1_table,
                                                                  const algebra::window_table<T2> &T2_table,
-                                                                 const FieldType::value_type &T1_coeff,
-                                                                 const FieldType::value_type &T2_coeff,
+                                                                 const typename FieldType::value_type &T1_coeff,
+                                                                 const typename FieldType::value_type &T2_coeff,
                                                                  const std::vector<typename FieldType::value_type> &v,
                                                                  const std::size_t suggested_num_chunks) {
                     knowledge_commitment_vector<T1, T2> res;

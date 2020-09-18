@@ -11,7 +11,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include <nil/crypto3/zk/snark/gadgets/hashes/sha256/sha256_gadget.hpp>
+#include <nil/crypto3/zk/snark/components/hashes/sha256/sha256_component.hpp>
 
 using namespace nil::algebra;
 using namespace nil::crypto3;
@@ -19,13 +19,13 @@ using namespace nil::crypto3::zk::snark;
 
 template<typename FieldType>
 void test_two_to_one() {
-    protoboard<FieldType> pb;
+    blueprint<FieldType> pb;
 
     digest_variable<FieldType> left(pb, hashes::sha2<256>::digest_bits);
     digest_variable<FieldType> right(pb, hashes::sha2<256>::digest_bits);
     digest_variable<FieldType> output(pb, hashes::sha2<256>::digest_bits);
 
-    sha256_two_to_one_hash_gadget<FieldType> f(pb, left, right, output);
+    sha256_two_to_one_hash_component<FieldType> f(pb, left, right, output);
     f.generate_r1cs_constraints();
     printf("Number of constraints for sha256_two_to_one_hash_gadget: %zu\n", pb.num_constraints());
 

@@ -25,18 +25,18 @@ namespace nil {
                 private:
                     typedef ram_base_field<ramT> FieldType;
 
-                    pb_variable<FieldType> timestamps_leq;
-                    pb_variable<FieldType> timestamps_less;
-                    std::shared_ptr<comparison_gadget<FieldType>> compare_timestamps;
+                    variable<FieldType> timestamps_leq;
+                    variable<FieldType> timestamps_less;
+                    std::shared_ptr<comparison_component<FieldType>> compare_timestamps;
 
-                    pb_variable<FieldType> addresses_eq;
-                    pb_variable<FieldType> addresses_leq;
-                    pb_variable<FieldType> addresses_less;
-                    std::shared_ptr<comparison_gadget<FieldType>> compare_addresses;
+                    variable<FieldType> addresses_eq;
+                    variable<FieldType> addresses_leq;
+                    variable<FieldType> addresses_less;
+                    std::shared_ptr<comparison_component<FieldType>> compare_addresses;
 
-                    pb_variable<FieldType> loose_contents_after1_equals_contents_before2;
-                    pb_variable<FieldType> loose_contents_before2_equals_zero;
-                    pb_variable<FieldType> loose_timestamp2_is_zero;
+                    variable<FieldType> loose_contents_after1_equals_contents_before2;
+                    variable<FieldType> loose_contents_before2_equals_zero;
+                    variable<FieldType> loose_timestamp2_is_zero;
 
                 public:
                     memory_line_variable_gadget<ramT> line1;
@@ -62,7 +62,7 @@ namespace nil {
                     timestamps_leq.allocate(pb);
                     timestamps_less.allocate(pb);
                     compare_timestamps.reset(
-                        new comparison_gadget<FieldType>(pb, timestamp_size, line1.timestamp->packed,
+                        new comparison_component<FieldType>(pb, timestamp_size, line1.timestamp->packed,
                                                          line2.timestamp->packed, timestamps_less, timestamps_leq));
 
                     /* compare the two addresses */
@@ -70,7 +70,7 @@ namespace nil {
                     addresses_eq.allocate(pb);
                     addresses_leq.allocate(pb);
                     addresses_less.allocate(pb);
-                    compare_addresses.reset(new comparison_gadget<FieldType>(
+                    compare_addresses.reset(new comparison_component<FieldType>(
                         pb, address_size, line1.address->packed, line2.address->packed, addresses_less, addresses_leq));
 
                     /*

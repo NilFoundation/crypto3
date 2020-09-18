@@ -17,8 +17,8 @@
 
 #include <numeric>
 
-#include <nil/crypto3/zk/snark/gadget.hpp>
-#include <nil/crypto3/zk/snark/protoboard.hpp>
+#include <nil/crypto3/zk/snark/component.hpp>
+#include <nil/crypto3/zk/snark/blueprint.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/pcd/r1cs_pcd/compliance_predicate/compliance_predicate.hpp>
 
 namespace nil {
@@ -32,16 +32,16 @@ namespace nil {
                  * A variable to represent an r1cs_pcd_message.
                  */
                 template<typename FieldType>
-                class r1cs_pcd_message_variable : public gadget<FieldType> {
+                class r1cs_pcd_message_variable : public component<FieldType> {
                 protected:
                     std::size_t num_vars_at_construction;
 
                 public:
-                    pb_variable<FieldType> type;
+                    variable<FieldType> type;
 
                     pb_variable_array<FieldType> all_vars;
 
-                    r1cs_pcd_message_variable(protoboard<FieldType> &pb);
+                    r1cs_pcd_message_variable(blueprint<FieldType> &pb);
                     void update_all_vars();
 
                     void generate_r1cs_witness(const std::shared_ptr<r1cs_pcd_message<FieldType>> &message);
@@ -55,14 +55,14 @@ namespace nil {
                  * A variable to represent an r1cs_pcd_local_data.
                  */
                 template<typename FieldType>
-                class r1cs_pcd_local_data_variable : public gadget<FieldType> {
+                class r1cs_pcd_local_data_variable : public component<FieldType> {
                 protected:
                     std::size_t num_vars_at_construction;
 
                 public:
                     pb_variable_array<FieldType> all_vars;
 
-                    r1cs_pcd_local_data_variable(protoboard<FieldType> &pb);
+                    r1cs_pcd_local_data_variable(blueprint<FieldType> &pb);
                     void update_all_vars();
 
                     void generate_r1cs_witness(const std::shared_ptr<r1cs_pcd_local_data<FieldType>> &local_data);
@@ -75,13 +75,13 @@ namespace nil {
                 /**
                  * A base class for creating compliance predicates.
                  */
-                template<typename FieldType, typename protoboardT>
+                template<typename FieldType, typename BlueprintType>
                 class compliance_predicate_handler {
                 protected:
-                    protoboardT pb;
+                    BlueprintType pb;
 
                     std::shared_ptr<r1cs_pcd_message_variable<FieldType>> outgoing_message;
-                    pb_variable<FieldType> arity;
+                    variable<FieldType> arity;
                     std::vector<std::shared_ptr<r1cs_pcd_message_variable<FieldType>>> incoming_messages;
                     std::shared_ptr<r1cs_pcd_local_data_variable<FieldType>> local_data;
 
@@ -92,7 +92,7 @@ namespace nil {
                     const bool relies_on_same_type_inputs;
                     const std::set<std::size_t> accepted_input_types;
 
-                    compliance_predicate_handler(const protoboardT &pb,
+                    compliance_predicate_handler(const BlueprintType &pb,
                                                  const std::size_t name,
                                                  const std::size_t type,
                                                  const std::size_t max_arity,
@@ -114,8 +114,8 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                r1cs_pcd_message_variable<FieldType>::r1cs_pcd_message_variable(protoboard<FieldType> &pb) :
-                    gadget<FieldType>(pb) {
+                r1cs_pcd_message_variable<FieldType>::r1cs_pcd_message_variable(blueprint<FieldType> &pb) :
+                    component<FieldType>(pb) {
                     type.allocate(pb);
                     all_vars.emplace_back(type);
 
@@ -130,7 +130,7 @@ namespace nil {
 
                     for (std::size_t var_idx = num_vars_at_construction + 1; var_idx <= this->pb.num_variables();
                          ++var_idx) {
-                        all_vars.emplace_back(pb_variable<FieldType>(var_idx));
+                        all_vars.emplace_back(variable<FieldType>(var_idx));
                     }
                 }
 
@@ -141,8 +141,8 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                r1cs_pcd_local_data_variable<FieldType>::r1cs_pcd_local_data_variable(protoboard<FieldType> &pb) :
-                    gadget<FieldType>(pb) {
+                r1cs_pcd_local_data_variable<FieldType>::r1cs_pcd_local_data_variable(blueprint<FieldType> &pb) :
+                    component<FieldType>(pb) {
                     num_vars_at_construction = pb.num_variables();
                 }
 
@@ -152,7 +152,7 @@ namespace nil {
 
                     for (std::size_t var_idx = num_vars_at_construction + 1; var_idx <= this->pb.num_variables();
                          ++var_idx) {
-                        all_vars.emplace_back(pb_variable<FieldType>(var_idx));
+                        all_vars.emplace_back(variable<FieldType>(var_idx));
                     }
                 }
 
@@ -162,9 +162,9 @@ namespace nil {
                     all_vars.fill_with_field_elements(this->pb, local_data->as_r1cs_variable_assignment());
                 }
 
-                template<typename FieldType, typename protoboardT>
-                compliance_predicate_handler<FieldType, protoboardT>::compliance_predicate_handler(
-                    const protoboardT &pb,
+                template<typename FieldType, typename BlueprintType>
+                compliance_predicate_handler<FieldType, BlueprintType>::compliance_predicate_handler(
+                    const BlueprintType &pb,
                     const std::size_t name,
                     const std::size_t type,
                     const std::size_t max_arity,
@@ -176,8 +176,8 @@ namespace nil {
                     incoming_messages.resize(max_arity);
                 }
 
-                template<typename FieldType, typename protoboardT>
-                void compliance_predicate_handler<FieldType, protoboardT>::generate_r1cs_witness(
+                template<typename FieldType, typename BlueprintType>
+                void compliance_predicate_handler<FieldType, BlueprintType>::generate_r1cs_witness(
                     const std::vector<std::shared_ptr<r1cs_pcd_message<FieldType>>> &incoming_message_values,
                     const std::shared_ptr<r1cs_pcd_local_data<FieldType>> &local_data_value) {
                     pb.clear_values();
@@ -191,9 +191,9 @@ namespace nil {
                     local_data->generate_r1cs_witness(local_data_value);
                 }
 
-                template<typename FieldType, typename protoboardT>
+                template<typename FieldType, typename BlueprintType>
                 r1cs_pcd_compliance_predicate<FieldType>
-                    compliance_predicate_handler<FieldType, protoboardT>::get_compliance_predicate() const {
+                    compliance_predicate_handler<FieldType, BlueprintType>::get_compliance_predicate() const {
                     assert(incoming_messages.size() == max_arity);
 
                     const std::size_t outgoing_message_payload_length = outgoing_message->all_vars.size() - 1;
@@ -230,39 +230,39 @@ namespace nil {
                                                                     accepted_input_types);
                 }
 
-                template<typename FieldType, typename protoboardT>
+                template<typename FieldType, typename BlueprintType>
                 r1cs_variable_assignment<FieldType>
-                    compliance_predicate_handler<FieldType, protoboardT>::get_full_variable_assignment() const {
+                    compliance_predicate_handler<FieldType, BlueprintType>::get_full_variable_assignment() const {
                     return pb.full_variable_assignment();
                 }
 
-                template<typename FieldType, typename protoboardT>
+                template<typename FieldType, typename BlueprintType>
                 std::shared_ptr<r1cs_pcd_message<FieldType>>
-                    compliance_predicate_handler<FieldType, protoboardT>::get_outgoing_message() const {
+                    compliance_predicate_handler<FieldType, BlueprintType>::get_outgoing_message() const {
                     return outgoing_message->get_message();
                 }
 
-                template<typename FieldType, typename protoboardT>
-                std::size_t compliance_predicate_handler<FieldType, protoboardT>::get_arity() const {
+                template<typename FieldType, typename BlueprintType>
+                std::size_t compliance_predicate_handler<FieldType, BlueprintType>::get_arity() const {
                     return pb.val(arity).as_ulong();
                 }
 
-                template<typename FieldType, typename protoboardT>
+                template<typename FieldType, typename BlueprintType>
                 std::shared_ptr<r1cs_pcd_message<FieldType>>
-                    compliance_predicate_handler<FieldType, protoboardT>::get_incoming_message(
+                    compliance_predicate_handler<FieldType, BlueprintType>::get_incoming_message(
                         const std::size_t message_idx) const {
                     assert(message_idx < max_arity);
                     return incoming_messages[message_idx]->get_message();
                 }
 
-                template<typename FieldType, typename protoboardT>
+                template<typename FieldType, typename BlueprintType>
                 std::shared_ptr<r1cs_pcd_local_data<FieldType>>
-                    compliance_predicate_handler<FieldType, protoboardT>::get_local_data() const {
+                    compliance_predicate_handler<FieldType, BlueprintType>::get_local_data() const {
                     return local_data->get_local_data();
                 }
 
-                template<typename FieldType, typename protoboardT>
-                r1cs_pcd_witness<FieldType> compliance_predicate_handler<FieldType, protoboardT>::get_witness() const {
+                template<typename FieldType, typename BlueprintType>
+                r1cs_pcd_witness<FieldType> compliance_predicate_handler<FieldType, BlueprintType>::get_witness() const {
                     const r1cs_variable_assignment<FieldType> va = pb.full_variable_assignment();
                     // outgoing_message + arity + incoming_messages + local_data
                     const std::size_t witness_pos =

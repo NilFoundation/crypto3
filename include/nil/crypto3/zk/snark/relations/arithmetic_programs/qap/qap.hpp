@@ -63,28 +63,34 @@ namespace nil {
                     std::vector<std::map<std::size_t, typename FieldType::value_type>> B_in_Lagrange_basis;
                     std::vector<std::map<std::size_t, typename FieldType::value_type>> C_in_Lagrange_basis;
 
-                    qap_instance(const std::shared_ptr<algebra::fft::evaluation_domain<FieldType>> &domain,
-                                 const std::size_t num_variables,
-                                 const std::size_t degree,
-                                 const std::size_t num_inputs,
-                                 const std::vector<std::map<std::size_t, typename FieldType::value_type>> &A_in_Lagrange_basis,
-                                 const std::vector<std::map<std::size_t, typename FieldType::value_type>> &B_in_Lagrange_basis,
-                                 const std::vector<std::map<std::size_t, typename FieldType::value_type>> &C_in_Lagrange_basis) :
-                        num_variables(num_variables), degree(degree), num_inputs(num_inputs), domain(domain),
+                    qap_instance(
+                        const std::shared_ptr<algebra::fft::evaluation_domain<FieldType>> &domain,
+                        const std::size_t num_variables,
+                        const std::size_t degree,
+                        const std::size_t num_inputs,
+                        const std::vector<std::map<std::size_t, typename FieldType::value_type>> &A_in_Lagrange_basis,
+                        const std::vector<std::map<std::size_t, typename FieldType::value_type>> &B_in_Lagrange_basis,
+                        const std::vector<std::map<std::size_t, typename FieldType::value_type>> &C_in_Lagrange_basis) :
+                        num_variables(num_variables),
+                        degree(degree), num_inputs(num_inputs), domain(domain),
                         A_in_Lagrange_basis(A_in_Lagrange_basis), B_in_Lagrange_basis(B_in_Lagrange_basis),
-                        C_in_Lagrange_basis(C_in_Lagrange_basis) {}
+                        C_in_Lagrange_basis(C_in_Lagrange_basis) {
+                    }
 
-                    qap_instance(const std::shared_ptr<algebra::fft::evaluation_domain<FieldType>> &domain,
-                                 const std::size_t num_variables,
-                                 const std::size_t degree,
-                                 const std::size_t num_inputs,
-                                 std::vector<std::map<std::size_t, typename FieldType::value_type>> &&A_in_Lagrange_basis,
-                                 std::vector<std::map<std::size_t, typename FieldType::value_type>> &&B_in_Lagrange_basis,
-                                 std::vector<std::map<std::size_t, typename FieldType::value_type>> &&C_in_Lagrange_basis) :
-                        num_variables(num_variables), degree(degree), num_inputs(num_inputs), domain(domain),
-                        A_in_Lagrange_basis(std::move(A_in_Lagrange_basis)), 
+                    qap_instance(
+                        const std::shared_ptr<algebra::fft::evaluation_domain<FieldType>> &domain,
+                        const std::size_t num_variables,
+                        const std::size_t degree,
+                        const std::size_t num_inputs,
+                        std::vector<std::map<std::size_t, typename FieldType::value_type>> &&A_in_Lagrange_basis,
+                        std::vector<std::map<std::size_t, typename FieldType::value_type>> &&B_in_Lagrange_basis,
+                        std::vector<std::map<std::size_t, typename FieldType::value_type>> &&C_in_Lagrange_basis) :
+                        num_variables(num_variables),
+                        degree(degree), num_inputs(num_inputs), domain(domain),
+                        A_in_Lagrange_basis(std::move(A_in_Lagrange_basis)),
                         B_in_Lagrange_basis(std::move(B_in_Lagrange_basis)),
-                        C_in_Lagrange_basis(std::move(C_in_Lagrange_basis)) {}
+                        C_in_Lagrange_basis(std::move(C_in_Lagrange_basis)) {
+                    }
 
                     qap_instance(const qap_instance<FieldType> &other) = default;
                     qap_instance(qap_instance<FieldType> &&other) = default;
@@ -92,18 +98,21 @@ namespace nil {
                     qap_instance &operator=(qap_instance<FieldType> &&other) = default;
 
                     bool is_satisfied(const qap_witness<FieldType> &witness) const {
-                        const FieldT t = random_element<FieldT>();
+                        const typename FieldType::value_type t = random_element<FieldType>();
 
-                        std::vector<FieldT::value_type> At(this->num_variables+1, FieldT::value_type::zero());
-                        std::vector<FieldT::value_type> Bt(this->num_variables+1, FieldT::value_type::zero());
-                        std::vector<FieldT::value_type> Ct(this->num_variables+1, FieldT::value_type::zero());
-                        std::vector<FieldT::value_type> Ht(this->degree+1);
+                        std::vector<typename FieldType::value_type> At(this->num_variables + 1,
+                                                                       FieldType::value_type::zero());
+                        std::vector<typename FieldType::value_type> Bt(this->num_variables + 1,
+                                                                       FieldType::value_type::zero());
+                        std::vector<typename FieldType::value_type> Ct(this->num_variables + 1,
+                                                                       FieldType::value_type::zero());
+                        std::vector<typename FieldType::value_type> Ht(this->degree + 1);
 
-                        const FieldT Zt = this->domain->compute_vanishing_polynomial(t);
+                        const FieldType Zt = this->domain->compute_vanishing_polynomial(t);
 
-                        const std::vector<FieldT> u = this->domain->evaluate_all_lagrange_polynomials(t);
+                        const std::vector<FieldType> u = this->domain->evaluate_all_lagrange_polynomials(t);
 
-                        for (size_t i = 0; i < this->num_variables+1; ++i) {
+                        for (size_t i = 0; i < this->num_variables + 1; ++i) {
                             for (auto &el : A_in_Lagrange_basis[i]) {
                                 At[i] += u[el.first] * el.second;
                             }
@@ -117,22 +126,22 @@ namespace nil {
                             }
                         }
 
-                        FieldT::value_type ti = FieldT::value_type::one();
-                        for (size_t i = 0; i < this->degree+1; ++i) {
+                        typename FieldType::value_type ti = FieldType::value_type::one();
+                        for (size_t i = 0; i < this->degree + 1; ++i) {
                             Ht[i] = ti;
                             ti *= t;
                         }
 
-                        const qap_instance_evaluation<FieldT> eval_qap_inst(this->domain,
-                                                                            this->num_variables,
-                                                                            this->degree,
-                                                                            this->num_inputs,
-                                                                            t,
-                                                                            std::move(At),
-                                                                            std::move(Bt),
-                                                                            std::move(Ct),
-                                                                            std::move(Ht),
-                                                                            Zt);
+                        const qap_instance_evaluation<FieldType> eval_qap_inst(this->domain,
+                                                                               this->num_variables,
+                                                                               this->degree,
+                                                                               this->num_inputs,
+                                                                               t,
+                                                                               std::move(At),
+                                                                               std::move(Bt),
+                                                                               std::move(Ct),
+                                                                               std::move(Ht),
+                                                                               Zt);
                         return eval_qap_inst.is_satisfied(witness);
                     }
                 };
@@ -156,53 +165,41 @@ namespace nil {
 
                     std::shared_ptr<algebra::fft::evaluation_domain<FieldType>> domain;
 
-                    FieldType::value_type t;
+                    typename FieldType::value_type t;
 
                     std::vector<typename FieldType::value_type> At, Bt, Ct, Ht;
 
-                    FieldType::value_type Zt;
+                    typename FieldType::value_type Zt;
 
                     qap_instance_evaluation(const std::shared_ptr<algebra::fft::evaluation_domain<FieldType>> &domain,
                                             const std::size_t num_variables,
                                             const std::size_t degree,
                                             const std::size_t num_inputs,
-                                            const FieldType::value_type &t,
+                                            const typename FieldType::value_type &t,
                                             const std::vector<typename FieldType::value_type> &At,
                                             const std::vector<typename FieldType::value_type> &Bt,
                                             const std::vector<typename FieldType::value_type> &Ct,
                                             const std::vector<typename FieldType::value_type> &Ht,
-                                            const FieldType::value_type &Zt) :
+                                            const typename FieldType::value_type &Zt) :
                         num_variables(num_variables),
-                        degree(degree),
-                        num_inputs(num_inputs),
-                        domain(domain),
-                        t(t),
-                        At(At),
-                        Bt(Bt),
-                        Ct(Ct),
-                        Ht(Ht),
-                        Zt(Zt) {}
+                        degree(degree), num_inputs(num_inputs), domain(domain), t(t), At(At), Bt(Bt), Ct(Ct), Ht(Ht),
+                        Zt(Zt) {
+                    }
 
                     qap_instance_evaluation(const std::shared_ptr<algebra::fft::evaluation_domain<FieldType>> &domain,
                                             const std::size_t num_variables,
                                             const std::size_t degree,
                                             const std::size_t num_inputs,
-                                            const FieldType::value_type &t,
+                                            const typename FieldType::value_type &t,
                                             std::vector<typename FieldType::value_type> &&At,
                                             std::vector<typename FieldType::value_type> &&Bt,
                                             std::vector<typename FieldType::value_type> &&Ct,
                                             std::vector<typename FieldType::value_type> &&Ht,
-                                            const FieldType::value_type &Zt) :
+                                            const typename FieldType::value_type &Zt) :
                         num_variables(num_variables),
-                        degree(degree),
-                        num_inputs(num_inputs),
-                        domain(domain),
-                        t(t),
-                        At(std::move(At)),
-                        Bt(std::move(Bt)),
-                        Ct(std::move(Ct)),
-                        Ht(std::move(Ht)),
-                        Zt(Zt) {}
+                        degree(degree), num_inputs(num_inputs), domain(domain), t(t), At(std::move(At)),
+                        Bt(std::move(Bt)), Ct(std::move(Ct)), Ht(std::move(Ht)), Zt(Zt) {
+                    }
 
                     qap_instance_evaluation(const qap_instance_evaluation<FieldType> &other) = default;
                     qap_instance_evaluation(qap_instance_evaluation<FieldType> &&other) = default;
@@ -227,15 +224,16 @@ namespace nil {
                             return false;
                         }
 
-                        if (this->degree+1 != witness.coefficients_for_H.size()) {
+                        if (this->degree + 1 != witness.coefficients_for_H.size()) {
                             return false;
                         }
 
-                        if (this->At.size() != this->num_variables+1 || this->Bt.size() != this->num_variables+1 || this->Ct.size() != this->num_variables+1) {
+                        if (this->At.size() != this->num_variables + 1 || this->Bt.size() != this->num_variables + 1 ||
+                            this->Ct.size() != this->num_variables + 1) {
                             return false;
                         }
 
-                        if (this->Ht.size() != this->degree+1) {
+                        if (this->Ht.size() != this->degree + 1) {
                             return false;
                         }
 
@@ -243,27 +241,31 @@ namespace nil {
                             return false;
                         }
 
-                        FieldT ans_A = this->At[0] + witness.d1*this->Zt;
-                        FieldT ans_B = this->Bt[0] + witness.d2*this->Zt;
-                        FieldT ans_C = this->Ct[0] + witness.d3*this->Zt;
-                        FieldT ans_H = FieldT::value_type::zero();
+                        FieldType ans_A = this->At[0] + witness.d1 * this->Zt;
+                        FieldType ans_B = this->Bt[0] + witness.d2 * this->Zt;
+                        FieldType ans_C = this->Ct[0] + witness.d3 * this->Zt;
+                        FieldType ans_H = FieldType::value_type::zero();
 
-                        ans_A = ans_A + libff::inner_product<FieldT>(this->At.begin()+1,
-                                                                     this->At.begin()+1+this->num_variables,
-                                                                     witness.coefficients_for_ABCs.begin(),
-                                                                     witness.coefficients_for_ABCs.begin()+this->num_variables);
-                        ans_B = ans_B + libff::inner_product<FieldT>(this->Bt.begin()+1,
-                                                                     this->Bt.begin()+1+this->num_variables,
-                                                                     witness.coefficients_for_ABCs.begin(),
-                                                                     witness.coefficients_for_ABCs.begin()+this->num_variables);
-                        ans_C = ans_C + libff::inner_product<FieldT>(this->Ct.begin()+1,
-                                                                     this->Ct.begin()+1+this->num_variables,
-                                                                     witness.coefficients_for_ABCs.begin(),
-                                                                     witness.coefficients_for_ABCs.begin()+this->num_variables);
-                        ans_H = ans_H + libff::inner_product<FieldT>(this->Ht.begin(),
-                                                                     this->Ht.begin()+this->degree+1,
-                                                                     witness.coefficients_for_H.begin(),
-                                                                     witness.coefficients_for_H.begin()+this->degree+1);
+                        ans_A = ans_A + algebra::inner_product<FieldType>(this->At.begin() + 1,
+                                                                        this->At.begin() + 1 + this->num_variables,
+                                                                        witness.coefficients_for_ABCs.begin(),
+                                                                        witness.coefficients_for_ABCs.begin() +
+                                                                            this->num_variables);
+                        ans_B = ans_B + algebra::inner_product<FieldType>(this->Bt.begin() + 1,
+                                                                        this->Bt.begin() + 1 + this->num_variables,
+                                                                        witness.coefficients_for_ABCs.begin(),
+                                                                        witness.coefficients_for_ABCs.begin() +
+                                                                            this->num_variables);
+                        ans_C = ans_C + algebra::inner_product<FieldType>(this->Ct.begin() + 1,
+                                                                        this->Ct.begin() + 1 + this->num_variables,
+                                                                        witness.coefficients_for_ABCs.begin(),
+                                                                        witness.coefficients_for_ABCs.begin() +
+                                                                            this->num_variables);
+                        ans_H = ans_H +
+                                algebra::inner_product<FieldType>(this->Ht.begin(),
+                                                                this->Ht.begin() + this->degree + 1,
+                                                                witness.coefficients_for_H.begin(),
+                                                                witness.coefficients_for_H.begin() + this->degree + 1);
 
                         if (ans_A * ans_B - ans_C != ans_H * this->Zt) {
                             return false;
@@ -282,7 +284,7 @@ namespace nil {
                     std::size_t degree;
                     std::size_t num_inputs;
 
-                    FieldType::value_type d1, d2, d3;
+                    typename FieldType::value_type d1, d2, d3;
 
                     std::vector<typename FieldType::value_type> coefficients_for_ABCs;
                     std::vector<typename FieldType::value_type> coefficients_for_H;
@@ -290,9 +292,9 @@ namespace nil {
                     qap_witness(const std::size_t num_variables,
                                 const std::size_t degree,
                                 const std::size_t num_inputs,
-                                const FieldType::value_type &d1,
-                                const FieldType::value_type &d2,
-                                const FieldType::value_type &d3,
+                                const typename FieldType::value_type &d1,
+                                const typename FieldType::value_type &d2,
+                                const typename FieldType::value_type &d3,
                                 const std::vector<typename FieldType::value_type> &coefficients_for_ABCs,
                                 const std::vector<typename FieldType::value_type> &coefficients_for_H) :
                         num_variables(num_variables),
@@ -303,14 +305,15 @@ namespace nil {
                     qap_witness(const std::size_t num_variables,
                                 const std::size_t degree,
                                 const std::size_t num_inputs,
-                                const FieldType::value_type &d1,
-                                const FieldType::value_type &d2,
-                                const FieldType::value_type &d3,
+                                const typename FieldType::value_type &d1,
+                                const typename FieldType::value_type &d2,
+                                const typename FieldType::value_type &d3,
                                 const std::vector<typename FieldType::value_type> &coefficients_for_ABCs,
                                 std::vector<typename FieldType::value_type> &&coefficients_for_H) :
                         num_variables(num_variables),
                         degree(degree), num_inputs(num_inputs), d1(d1), d2(d2), d3(d3),
-                        coefficients_for_ABCs(coefficients_for_ABCs), coefficients_for_H(std::move(coefficients_for_H)) {
+                        coefficients_for_ABCs(coefficients_for_ABCs),
+                        coefficients_for_H(std::move(coefficients_for_H)) {
                     }
 
                     qap_witness(const qap_witness<FieldType> &other) = default;

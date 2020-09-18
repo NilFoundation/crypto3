@@ -12,7 +12,7 @@
 #ifndef CRYPTO3_ZK_TINYRAM_PARAMS_HPP_
 #define CRYPTO3_ZK_TINYRAM_PARAMS_HPP_
 
-#include <nil/crypto3/zk/snark/gadgets/cpu_checkers/tinyram/tinyram_cpu_checker.hpp>
+#include <nil/crypto3/zk/snark/components/cpu_checkers/tinyram/tinyram_cpu_checker.hpp>
 #include <nil/crypto3/zk/snark/relations/ram_computations/rams/ram_params.hpp>
 #include <nil/crypto3/zk/snark/relations/ram_computations/rams/tinyram/tinyram_aux.hpp>
 
@@ -27,8 +27,8 @@ namespace nil {
                     static std::size_t timestamp_length;
 
                     typedef FieldType base_field_type;
-                    typedef tinyram_protoboard<FieldType> protoboard_type;
-                    typedef tinyram_gadget<FieldType> gadget_base_type;
+                    typedef tinyram_blueprint<FieldType> protoboard_type;
+                    typedef tinyram_component<FieldType> gadget_base_type;
                     typedef tinyram_cpu_checker<FieldType> cpu_checker_type;
                     typedef tinyram_architecture_params architecture_params_type;
                 };
