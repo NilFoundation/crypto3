@@ -35,9 +35,9 @@ namespace nil {
                          template<class>
                          class Fpk_variableT,
                          template<class>
-                         class Fpk_mul_gadgetT,
+                         class Fpk_mul_componentT,
                          template<class>
-                         class Fpk_sqr_gadgetT,
+                         class Fpk_sqr_componentT,
                          typename NumberType = typename FpkT::number_type>
                 class exponentiation_component : component<typename FpkT::my_Fp> {
                 public:
@@ -46,9 +46,9 @@ namespace nil {
                     std::vector<long> NAF;
 
                     std::vector<std::shared_ptr<Fpk_variableT<FpkT>>> intermediate;
-                    std::vector<std::shared_ptr<Fpk_mul_gadgetT<FpkT>>> addition_steps;
-                    std::vector<std::shared_ptr<Fpk_mul_gadgetT<FpkT>>> subtraction_steps;
-                    std::vector<std::shared_ptr<Fpk_sqr_gadgetT<FpkT>>> doubling_steps;
+                    std::vector<std::shared_ptr<Fpk_mul_componentT<FpkT>>> addition_steps;
+                    std::vector<std::shared_ptr<Fpk_mul_componentT<FpkT>>> subtraction_steps;
+                    std::vector<std::shared_ptr<Fpk_sqr_componentT<FpkT>>> doubling_steps;
 
                     Fpk_variableT<FpkT> elt;
                     number_type power;
@@ -109,7 +109,7 @@ namespace nil {
 
                         for (long i = NAF.size() - 1; i >= 0; --i) {
                             if (found_nonzero) {
-                                doubling_steps[dbl_id].reset(new Fpk_sqr_gadgetT<FpkT>(
+                                doubling_steps[dbl_id].reset(new Fpk_sqr_componentT<FpkT>(
                                     pb,
                                     *intermediate[intermed_id],
                                     (intermed_id + 1 == intermed_count ? result : *intermediate[intermed_id + 1])));
@@ -122,7 +122,7 @@ namespace nil {
 
                                 if (NAF[i] > 0) {
                                     /* next = cur * elt */
-                                    addition_steps[add_id].reset(new Fpk_mul_gadgetT<FpkT>(
+                                    addition_steps[add_id].reset(new Fpk_mul_componentT<FpkT>(
                                         pb,
                                         *intermediate[intermed_id],
                                         elt,
@@ -131,7 +131,7 @@ namespace nil {
                                     ++intermed_id;
                                 } else {
                                     /* next = cur / elt, i.e. next * elt = cur */
-                                    subtraction_steps[sub_id].reset(new Fpk_mul_gadgetT<FpkT>(
+                                    subtraction_steps[sub_id].reset(new Fpk_mul_componentT<FpkT>(
                                         pb,
                                         (intermed_id + 1 == intermed_count ? result : *intermediate[intermed_id + 1]),
                                         elt,
@@ -197,12 +197,12 @@ namespace nil {
                          template<class>
                          class Fpk_variableT,
                          template<class>
-                         class Fpk_mul_gadgetT,
+                         class Fpk_mul_componentT,
                          template<class>
-                         class Fpk_sqr_gadgetT,
+                         class Fpk_sqr_componentT,
                          typename Backend,
                          boost::multiprecision::expression_template_option ExpressionTemplates>
-                void test_exponentiation_gadget(
+                void test_exponentiation_component(
                     const boost::multiprecision::number<Backend, ExpressionTemplates> &power) {
                     typedef typename FpkT::my_Fp FieldType;
 
@@ -211,16 +211,16 @@ namespace nil {
                     Fpk_variableT<FpkT> x_to_power(pb);
                     exponentiation_component<FpkT,
                                           Fpk_variableT,
-                                          Fpk_mul_gadgetT,
-                                          Fpk_sqr_gadgetT,
+                                          Fpk_mul_componentT,
+                                          Fpk_sqr_componentT,
                                           boost::multiprecision::number<Backend, ExpressionTemplates>>
-                        exp_gadget(pb, x, power, x_to_power);
-                    exp_gadget.generate_r1cs_constraints();
+                        exp_component(pb, x, power, x_to_power);
+                    exp_component.generate_r1cs_constraints();
 
                     for (std::size_t i = 0; i < 10; ++i) {
                         const FpkT x_val = random_element<FpkT>();
                         x.generate_r1cs_witness(x_val);
-                        exp_gadget.generate_r1cs_witness();
+                        exp_component.generate_r1cs_witness();
                         const FpkT res = x_to_power.get_element();
                         assert(pb.is_satisfied());
                         assert(res == (x_val ^ power));

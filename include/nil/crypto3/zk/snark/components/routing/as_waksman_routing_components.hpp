@@ -26,7 +26,7 @@ namespace nil {
             namespace snark {
 
                 template<typename FieldType>
-                class as_waksman_routing_gadget : public component<FieldType> {
+                class as_waksman_routing_component : public component<FieldType> {
                 private:
                     /*
                       Indexing conventions:
@@ -67,7 +67,7 @@ namespace nil {
 
                     const std::size_t packet_size, num_subpackets;
 
-                    as_waksman_routing_gadget(blueprint<FieldType> &pb,
+                    as_waksman_routing_component(blueprint<FieldType> &pb,
                                               const std::size_t num_packets,
                                               const std::vector<pb_variable_array<FieldType>> &routing_input_bits,
                                               const std::vector<pb_variable_array<FieldType>> &routing_output_bits);
@@ -76,10 +76,10 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                void test_as_waksman_routing_gadget(const std::size_t num_packets, const std::size_t packet_size);
+                void test_as_waksman_routing_component(const std::size_t num_packets, const std::size_t packet_size);
 
                 template<typename FieldType>
-                as_waksman_routing_component<FieldType>::as_waksman_routing_gadget(
+                as_waksman_routing_component<FieldType>::as_waksman_routing_component(
                     blueprint<FieldType> &pb,
                     const std::size_t num_packets,
                     const std::vector<pb_variable_array<FieldType>> &routing_input_bits,
@@ -269,7 +269,7 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                void test_as_waksman_routing_gadget(const std::size_t num_packets, const std::size_t packet_size) {
+                void test_as_waksman_routing_component(const std::size_t num_packets, const std::size_t packet_size) {
                     blueprint<FieldType> pb;
                     integer_permutation permutation(num_packets);
                     permutation.random_shuffle();

@@ -31,19 +31,19 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                class tinyram_gadget : public component<FieldType> {
+                class tinyram_component : public component<FieldType> {
                 protected:
                     tinyram_blueprint<FieldType> &pb;
 
                 public:
-                    tinyram_gadget(tinyram_blueprint<FieldType> &pb);
+                    tinyram_component(tinyram_blueprint<FieldType> &pb);
                 };
 
                 // standard gadgets provide two methods: generate_r1cs_constraints and generate_r1cs_witness
                 template<typename FieldType>
-                class tinyram_standard_gadget : public tinyram_component<FieldType> {
+                class tinyram_standard_component : public tinyram_component<FieldType> {
                 public:
-                    tinyram_standard_gadget(tinyram_blueprint<FieldType> &pb);
+                    tinyram_standard_component(tinyram_blueprint<FieldType> &pb);
 
                     virtual void generate_r1cs_constraints() = 0;
                     virtual void generate_r1cs_witness() = 0;
@@ -54,12 +54,12 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                tinyram_component<FieldType>::tinyram_gadget(tinyram_protoboard<FieldType> &pb) :
+                tinyram_component<FieldType>::tinyram_component(tinyram_protoboard<FieldType> &pb) :
                     component<FieldType>(pb), pb(pb) {
                 }
 
                 template<typename FieldType>
-                tinyram_standard_component<FieldType>::tinyram_standard_gadget(tinyram_protoboard<FieldType> &pb) :
+                tinyram_standard_component<FieldType>::tinyram_standard_component(tinyram_protoboard<FieldType> &pb) :
                     tinyram_component<FieldType>(pb) {
                 }
 

@@ -17,33 +17,33 @@ namespace nil {
         namespace zk {
             namespace snark {
 
-                template<typename ramT>
+                template<typename RAMType>
                 struct ram_example {
-                    ram_architecture_params<ramT> ap;
+                    ram_architecture_params<RAMType> ap;
                     std::size_t boot_trace_size_bound;
                     std::size_t time_bound;
-                    ram_boot_trace<ramT> boot_trace;
-                    ram_input_tape<ramT> auxiliary_input;
+                    ram_boot_trace<RAMType> boot_trace;
+                    ram_input_tape<RAMType> auxiliary_input;
                 };
 
                 /**
                  * For now: only specialized to TinyRAM
                  */
-                template<typename ramT>
-                ram_example<ramT> gen_ram_example_simple(const ram_architecture_params<ramT> &ap,
+                template<typename RAMType>
+                ram_example<RAMType> gen_ram_example_simple(const ram_architecture_params<RAMType> &ap,
                                                          const std::size_t boot_trace_size_bound, const std::size_t time_bound,
                                                          const bool satisfiable = true);
 
                 /**
                  * For now: only specialized to TinyRAM
                  */
-                template<typename ramT>
-                ram_example<ramT> gen_ram_example_complex(const ram_architecture_params<ramT> &ap,
+                template<typename RAMType>
+                ram_example<RAMType> gen_ram_example_complex(const ram_architecture_params<RAMType> &ap,
                                                           const std::size_t boot_trace_size_bound, const std::size_t time_bound,
                                                           const bool satisfiable = true);
 
-                template<typename ramT>
-                ram_example<ramT> gen_ram_example_simple(const ram_architecture_params<ramT> &ap,
+                template<typename RAMType>
+                ram_example<RAMType> gen_ram_example_simple(const ram_architecture_params<RAMType> &ap,
                                                          const std::size_t boot_trace_size_bound, const std::size_t time_bound,
                                                          const bool satisfiable) {
                     std::cout << "Call to gen_ram_example_simple" << std::endl;
@@ -51,7 +51,7 @@ namespace nil {
                     const std::size_t program_size = boot_trace_size_bound / 2;
                     const std::size_t input_size = boot_trace_size_bound - program_size;
 
-                    ram_example<ramT> result;
+                    ram_example<RAMType> result;
 
                     result.ap = ap;
                     result.boot_trace_size_bound = boot_trace_size_bound;
@@ -85,8 +85,8 @@ namespace nil {
                     return result;
                 }
 
-                template<typename ramT>
-                ram_example<ramT> gen_ram_example_complex(const ram_architecture_params<ramT> &ap,
+                template<typename RAMType>
+                ram_example<RAMType> gen_ram_example_complex(const ram_architecture_params<RAMType> &ap,
                                                           const std::size_t boot_trace_size_bound, const std::size_t time_bound,
                                                           const bool satisfiable) {
                     std::cout << "Call to gen_ram_example_complex" <<std::endl;
@@ -97,7 +97,7 @@ namespace nil {
                     assert(2 * ap.w / 8 * program_size < 1ul << (ap.w - 1));
                     assert(ap.w / 8 * input_size < 1ul << (ap.w - 1));
 
-                    ram_example<ramT> result;
+                    ram_example<RAMType> result;
 
                     result.ap = ap;
                     result.boot_trace_size_bound = boot_trace_size_bound;

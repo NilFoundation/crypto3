@@ -29,12 +29,12 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                class fooram_gadget : public component<FieldType> {
+                class fooram_component : public component<FieldType> {
                 protected:
                     fooram_protoboard<FieldType> &pb;
 
                 public:
-                    fooram_gadget(fooram_protoboard<FieldType> &pb);
+                    fooram_component(fooram_protoboard<FieldType> &pb);
                 };
 
                 template<typename FieldType>
@@ -43,7 +43,7 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                fooram_component<FieldType>::fooram_gadget(fooram_protoboard<FieldType> &pb) :
+                fooram_component<FieldType>::fooram_component(fooram_protoboard<FieldType> &pb) :
                     component<FieldType>(pb), pb(pb) {
                 }
 

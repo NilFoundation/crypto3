@@ -7,7 +7,7 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#define BOOST_TEST_MODULE r1cs_ppzksnark_verifier_gadget_test
+#define BOOST_TEST_MODULE r1cs_ppzksnark_verifier_component_test
 
 #include <boost/test/unit_test.hpp>
 
@@ -20,7 +20,7 @@
 #include <nil/crypto3/zk/snark/components/fields/fp3_components.hpp>
 #include <nil/crypto3/zk/snark/components/fields/fp4_components.hpp>
 #include <nil/crypto3/zk/snark/components/fields/fp6_components.hpp>
-#include <nil/crypto3/zk/snark/components/verifiers/r1cs_ppzksnark_verifier_gadget.hpp>
+#include <nil/crypto3/zk/snark/components/verifiers/r1cs_ppzksnark_verifier_component.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_ppzksnark/r1cs_ppzksnark.hpp>
 
 using namespace nil::crypto3::zk::snark;
@@ -71,7 +71,7 @@ void test_verifier(const std::string &annotation_A, const std::string &annotatio
     variable<FieldT_B> result;
     result.allocate(pb);
 
-    r1cs_ppzksnark_verifier_gadget<ppT_B> verifier(pb, vk, primary_input_bits, elt_size, proof, result);
+    r1cs_ppzksnark_verifier_component<ppT_B> verifier(pb, vk, primary_input_bits, elt_size, proof, result);
 
         proof.generate_r1cs_constraints();
     verifier.generate_r1cs_constraints();
@@ -135,7 +135,7 @@ void test_hardcoded_verifier(const std::string &annotation_A, const std::string 
     variable<FieldT_B> result;
     result.allocate(pb);
 
-    r1cs_ppzksnark_online_verifier_gadget<ppT_B> online_verifier(pb, hardcoded_vk, primary_input_bits, elt_size, proof,
+    r1cs_ppzksnark_online_verifier_component<ppT_B> online_verifier(pb, hardcoded_vk, primary_input_bits, elt_size, proof,
                                                                  result);
 
         proof.generate_r1cs_constraints();
@@ -271,14 +271,14 @@ void test_full_pairing(const std::string &annotation) {
     G1_precomputation<CurveType> prec_P;
     G2_precomputation<CurveType> prec_Q;
 
-    precompute_G1_gadget<CurveType> compute_prec_P(pb, P, prec_P);
-    precompute_G2_gadget<CurveType> compute_prec_Q(pb, Q, prec_Q);
+    precompute_G1_component<CurveType> compute_prec_P(pb, P, prec_P);
+    precompute_G2_component<CurveType> compute_prec_Q(pb, Q, prec_Q);
 
     Fqk_variable<CurveType> miller_result(pb);
-    mnt_miller_loop_gadget<CurveType> miller(pb, prec_P, prec_Q, miller_result);
+    mnt_miller_loop_component<CurveType> miller(pb, prec_P, prec_Q, miller_result);
     variable<FieldType> result_is_one;
     result_is_one.allocate(pb);
-    final_exp_gadget<CurveType> finexp(pb, miller_result, result_is_one);
+    final_exp_component<CurveType> finexp(pb, miller_result, result_is_one);
 
         compute_prec_P.generate_r1cs_constraints();
         compute_prec_Q.generate_r1cs_constraints();
@@ -322,10 +322,10 @@ void test_full_precomputed_pairing(const std::string &annotation) {
     G2_precomputation<CurveType> prec_Q(pb, Q_val);
 
     Fqk_variable<CurveType> miller_result(pb);
-    mnt_miller_loop_gadget<CurveType> miller(pb, prec_P, prec_Q, miller_result);
+    mnt_miller_loop_component<CurveType> miller(pb, prec_P, prec_Q, miller_result);
     variable<FieldType> result_is_one;
     result_is_one.allocate(pb);
-    final_exp_gadget<CurveType> finexp(pb, miller_result, result_is_one);
+    final_exp_component<CurveType> finexp(pb, miller_result, result_is_one);
 
         miller.generate_r1cs_constraints();
         finexp.generate_r1cs_constraints();
@@ -351,28 +351,28 @@ void test_full_precomputed_pairing(const std::string &annotation) {
 }
 
 int main() {
-    test_mul<algebra::mnt4_Fq2, Fp2_variable, Fp2_mul_gadget>("mnt4_Fp2");
-    test_sqr<algebra::mnt4_Fq2, Fp2_variable, Fp2_sqr_gadget>("mnt4_Fp2");
+    test_mul<algebra::mnt4_Fq2, Fp2_variable, Fp2_mul_component>("mnt4_Fp2");
+    test_sqr<algebra::mnt4_Fq2, Fp2_variable, Fp2_sqr_component>("mnt4_Fp2");
 
-    test_mul<algebra::mnt4_Fq4, Fp4_variable, Fp4_mul_gadget>("mnt4_Fp4");
-    test_sqr<algebra::mnt4_Fq4, Fp4_variable, Fp4_sqr_gadget>("mnt4_Fp4");
-    test_cyclotomic_sqr<algebra::curves::mnt4, Fp4_variable, Fp4_cyclotomic_sqr_gadget>("mnt4_Fp4");
-    test_exponentiation_gadget<algebra::mnt4_Fq4, Fp4_variable, Fp4_mul_gadget, Fp4_sqr_gadget, algebra::mnt4_q_limbs>(
+    test_mul<algebra::mnt4_Fq4, Fp4_variable, Fp4_mul_component>("mnt4_Fp4");
+    test_sqr<algebra::mnt4_Fq4, Fp4_variable, Fp4_sqr_component>("mnt4_Fp4");
+    test_cyclotomic_sqr<algebra::curves::mnt4, Fp4_variable, Fp4_cyclotomic_sqr_component>("mnt4_Fp4");
+    test_exponentiation_component<algebra::mnt4_Fq4, Fp4_variable, Fp4_mul_component, Fp4_sqr_component, algebra::mnt4_q_limbs>(
         algebra::mnt4_final_exponent_last_chunk_abs_of_w0, "mnt4_Fq4");
     test_Frobenius<algebra::mnt4_Fq4, Fp4_variable>("mnt4_Fq4");
 
-    test_mul<algebra::mnt6_Fq3, Fp3_variable, Fp3_mul_gadget>("mnt6_Fp3");
-    test_sqr<algebra::mnt6_Fq3, Fp3_variable, Fp3_sqr_gadget>("mnt6_Fp3");
+    test_mul<algebra::mnt6_Fq3, Fp3_variable, Fp3_mul_component>("mnt6_Fp3");
+    test_sqr<algebra::mnt6_Fq3, Fp3_variable, Fp3_sqr_component>("mnt6_Fp3");
 
-    test_mul<algebra::mnt6_Fq6, Fp6_variable, Fp6_mul_gadget>("mnt6_Fp6");
-    test_sqr<algebra::mnt6_Fq6, Fp6_variable, Fp6_sqr_gadget>("mnt6_Fp6");
-    test_cyclotomic_sqr<algebra::curves::mnt6, Fp6_variable, Fp6_cyclotomic_sqr_gadget>("mnt6_Fp6");
-    test_exponentiation_gadget<algebra::mnt6_Fq6, Fp6_variable, Fp6_mul_gadget, Fp6_sqr_gadget, algebra::mnt6_q_limbs>(
+    test_mul<algebra::mnt6_Fq6, Fp6_variable, Fp6_mul_component>("mnt6_Fp6");
+    test_sqr<algebra::mnt6_Fq6, Fp6_variable, Fp6_sqr_component>("mnt6_Fp6");
+    test_cyclotomic_sqr<algebra::curves::mnt6, Fp6_variable, Fp6_cyclotomic_sqr_component>("mnt6_Fp6");
+    test_exponentiation_component<algebra::mnt6_Fq6, Fp6_variable, Fp6_mul_component, Fp6_sqr_component, algebra::mnt6_q_limbs>(
         algebra::mnt6_final_exponent_last_chunk_abs_of_w0, "mnt6_Fq6");
     test_Frobenius<algebra::mnt6_Fq6, Fp6_variable>("mnt6_Fq6");
 
-    test_G2_checker_gadget<algebra::curves::mnt4>("mnt4");
-    test_G2_checker_gadget<algebra::curves::mnt6>("mnt6");
+    test_G2_checker_component<algebra::curves::mnt4>("mnt4");
+    test_G2_checker_component<algebra::curves::mnt6>("mnt6");
 
     test_G1_variable_precomp<algebra::curves::mnt4>("mnt4");
     test_G1_variable_precomp<algebra::curves::mnt6>("mnt6");

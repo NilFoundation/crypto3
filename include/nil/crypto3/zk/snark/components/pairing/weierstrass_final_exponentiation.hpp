@@ -29,7 +29,7 @@ namespace nil {
                  * Gadget for final exponentiation with embedding degree 4.
                  */
                 template<typename CurveType>
-                class mnt4_final_exp_gadget : public component<typename CurveType::scalar_field_type> {
+                class mnt4_final_exp_component : public component<typename CurveType::scalar_field_type> {
                 public:
                     typedef typename CurveType::scalar_field_type FieldType;
 
@@ -49,29 +49,29 @@ namespace nil {
                     std::shared_ptr<Fqk_variable<CurveType>> w0;
                     std::shared_ptr<Fqk_variable<CurveType>> result;
 
-                    std::shared_ptr<Fqk_mul_gadget<CurveType>> compute_el_inv;
-                    std::shared_ptr<Fqk_mul_gadget<CurveType>> compute_el_q_3_minus_1;
-                    std::shared_ptr<Fqk_mul_gadget<CurveType>> compute_beta;
-                    std::shared_ptr<Fqk_mul_gadget<CurveType>> compute_el_inv_q_3_minus_1;
-                    std::shared_ptr<Fqk_mul_gadget<CurveType>> compute_inv_beta;
+                    std::shared_ptr<Fqk_mul_component<CurveType>> compute_el_inv;
+                    std::shared_ptr<Fqk_mul_component<CurveType>> compute_el_q_3_minus_1;
+                    std::shared_ptr<Fqk_mul_component<CurveType>> compute_beta;
+                    std::shared_ptr<Fqk_mul_component<CurveType>> compute_el_inv_q_3_minus_1;
+                    std::shared_ptr<Fqk_mul_component<CurveType>> compute_inv_beta;
 
                     std::shared_ptr<exponentiation_component<fqk_type<CurveType>,
                                                           Fp6_variable,
-                                                          Fp6_mul_gadget,
-                                                          Fp6_cyclotomic_sqr_gadget,
+                                                          Fp6_mul_component,
+                                                          Fp6_cyclotomic_sqr_component,
                                                           algebra::mnt6_q_limbs>>
                         compute_w1;
                     std::shared_ptr<exponentiation_component<fqk_type<CurveType>,
                                                           Fp6_variable,
-                                                          Fp6_mul_gadget,
-                                                          Fp6_cyclotomic_sqr_gadget,
+                                                          Fp6_mul_component,
+                                                          Fp6_cyclotomic_sqr_component,
                                                           algebra::mnt6_q_limbs>>
                         compute_w0;
-                    std::shared_ptr<Fqk_mul_gadget<CurveType>> compute_result;
+                    std::shared_ptr<Fqk_mul_component<CurveType>> compute_result;
 
                     variable<FieldType> result_is_one;
 
-                    mnt4_final_exp_gadget(blueprint<FieldType> &pb,
+                    mnt4_final_exp_component(blueprint<FieldType> &pb,
                                           const Fqk_variable<CurveType> &el,
                                           const variable<FieldType> &result_is_one);
                     void generate_r1cs_constraints();
@@ -82,7 +82,7 @@ namespace nil {
                  * Gadget for final exponentiation with embedding degree 6.
                  */
                 template<typename CurveType>
-                class mnt6_final_exp_gadget : public component<typename CurveType::scalar_field_type> {
+                class mnt6_final_exp_component : public component<typename CurveType::scalar_field_type> {
                 public:
                     typedef typename CurveType::scalar_field_type FieldType;
 
@@ -98,27 +98,27 @@ namespace nil {
                     std::shared_ptr<Fqk_variable<CurveType>> w0;
                     std::shared_ptr<Fqk_variable<CurveType>> result;
 
-                    std::shared_ptr<Fqk_mul_gadget<CurveType>> compute_el_inv;
-                    std::shared_ptr<Fqk_mul_gadget<CurveType>> compute_el_q_2_minus_1;
-                    std::shared_ptr<Fqk_mul_gadget<CurveType>> compute_el_inv_q_2_minus_1;
+                    std::shared_ptr<Fqk_mul_component<CurveType>> compute_el_inv;
+                    std::shared_ptr<Fqk_mul_component<CurveType>> compute_el_q_2_minus_1;
+                    std::shared_ptr<Fqk_mul_component<CurveType>> compute_el_inv_q_2_minus_1;
 
                     std::shared_ptr<exponentiation_component<fqk_type<CurveType>,
                                                           Fp4_variable,
-                                                          Fp4_mul_gadget,
-                                                          Fp4_cyclotomic_sqr_gadget,
+                                                          Fp4_mul_component,
+                                                          Fp4_cyclotomic_sqr_component,
                                                           algebra::mnt4_q_limbs>>
                         compute_w1;
                     std::shared_ptr<exponentiation_component<fqk_type<CurveType>,
                                                           Fp4_variable,
-                                                          Fp4_mul_gadget,
-                                                          Fp4_cyclotomic_sqr_gadget,
+                                                          Fp4_mul_component,
+                                                          Fp4_cyclotomic_sqr_component,
                                                           algebra::mnt4_q_limbs>>
                         compute_w0;
-                    std::shared_ptr<Fqk_mul_gadget<CurveType>> compute_result;
+                    std::shared_ptr<Fqk_mul_component<CurveType>> compute_result;
 
                     variable<FieldType> result_is_one;
 
-                    mnt6_final_exp_gadget(blueprint<FieldType> &pb,
+                    mnt6_final_exp_component(blueprint<FieldType> &pb,
                                           const Fqk_variable<CurveType> &el,
                                           const variable<FieldType> &result_is_one);
                     void generate_r1cs_constraints();
@@ -126,7 +126,7 @@ namespace nil {
                 };
 
                 template<typename CurveType>
-                mnt4_final_exp_gadget<CurveType>::mnt4_final_exp_gadget(blueprint<FieldType> &pb,
+                mnt4_final_exp_component<CurveType>::mnt4_final_exp_component(blueprint<FieldType> &pb,
                                                                   const Fqk_variable<CurveType> &el,
                                                                   const variable<FieldType> &result_is_one) :
                     component<FieldType>(pb),
@@ -147,35 +147,35 @@ namespace nil {
                     w0.reset(new Fqk_variable<CurveType>(pb));
                     result.reset(new Fqk_variable<CurveType>(pb));
 
-                    compute_el_inv.reset(new Fqk_mul_gadget<CurveType>(pb, el, *el_inv, *one));
-                    compute_el_q_3_minus_1.reset(new Fqk_mul_gadget<CurveType>(pb, *el_q_3, *el_inv, *el_q_3_minus_1));
-                    compute_beta.reset(new Fqk_mul_gadget<CurveType>(pb, *alpha, *el_q_3_minus_1, *beta));
+                    compute_el_inv.reset(new Fqk_mul_component<CurveType>(pb, el, *el_inv, *one));
+                    compute_el_q_3_minus_1.reset(new Fqk_mul_component<CurveType>(pb, *el_q_3, *el_inv, *el_q_3_minus_1));
+                    compute_beta.reset(new Fqk_mul_component<CurveType>(pb, *alpha, *el_q_3_minus_1, *beta));
 
-                    compute_el_inv_q_3_minus_1.reset(new Fqk_mul_gadget<CurveType>(pb, *el_inv_q_3, el, *el_inv_q_3_minus_1));
-                    compute_inv_beta.reset(new Fqk_mul_gadget<CurveType>(pb, *inv_alpha, *el_inv_q_3_minus_1, *inv_beta));
+                    compute_el_inv_q_3_minus_1.reset(new Fqk_mul_component<CurveType>(pb, *el_inv_q_3, el, *el_inv_q_3_minus_1));
+                    compute_inv_beta.reset(new Fqk_mul_component<CurveType>(pb, *inv_alpha, *el_inv_q_3_minus_1, *inv_beta));
 
                     compute_w1.reset(new exponentiation_component<fqk_type<CurveType>,
                                                                Fp6_variable,
-                                                               Fp6_mul_gadget,
-                                                               Fp6_cyclotomic_sqr_gadget,
+                                                               Fp6_mul_component,
+                                                               Fp6_cyclotomic_sqr_component,
                                                                algebra::mnt6_q_limbs>(
                         pb, *beta_q, algebra::mnt6_final_exponent_last_chunk_w1, *w1));
 
                     compute_w0.reset(new exponentiation_component<fqk_type<CurveType>,
                                                                Fp6_variable,
-                                                               Fp6_mul_gadget,
-                                                               Fp6_cyclotomic_sqr_gadget,
+                                                               Fp6_mul_component,
+                                                               Fp6_cyclotomic_sqr_component,
                                                                algebra::mnt6_q_limbs>(
                         pb,
                         (algebra::mnt6_final_exponent_last_chunk_is_w0_neg ? *inv_beta : *beta),
                         algebra::mnt6_final_exponent_last_chunk_abs_of_w0,
                         *w0));
 
-                    compute_result.reset(new Fqk_mul_gadget<CurveType>(pb, *w1, *w0, *result));
+                    compute_result.reset(new Fqk_mul_component<CurveType>(pb, *w1, *w0, *result));
                 }
 
                 template<typename CurveType>
-                void mnt4_final_exp_gadget<CurveType>::generate_r1cs_constraints() {
+                void mnt4_final_exp_component<CurveType>::generate_r1cs_constraints() {
                     one->generate_r1cs_equals_const_constraints(algebra::Fqk<other_curve<CurveType>>::one());
 
                     compute_el_inv->generate_r1cs_constraints();
@@ -199,7 +199,7 @@ namespace nil {
                 }
 
                 template<typename CurveType>
-                void mnt4_final_exp_gadget<CurveType>::generate_r1cs_witness() {
+                void mnt4_final_exp_component<CurveType>::generate_r1cs_witness() {
                     one->generate_r1cs_witness(algebra::Fqk<other_curve<CurveType>>::one());
                     el_inv->generate_r1cs_witness(el.get_element().inverse());
 
@@ -224,7 +224,7 @@ namespace nil {
                 }
 
                 template<typename CurveType>
-                mnt6_final_exp_gadget<CurveType>::mnt6_final_exp_gadget(blueprint<FieldType> &pb,
+                mnt6_final_exp_component<CurveType>::mnt6_final_exp_component(blueprint<FieldType> &pb,
                                                                   const Fqk_variable<CurveType> &el,
                                                                   const variable<FieldType> &result_is_one) :
                     component<FieldType>(pb),
@@ -240,30 +240,30 @@ namespace nil {
                     w0.reset(new Fqk_variable<CurveType>(pb));
                     result.reset(new Fqk_variable<CurveType>(pb));
 
-                    compute_el_inv.reset(new Fqk_mul_gadget<CurveType>(pb, el, *el_inv, *one));
-                    compute_el_q_2_minus_1.reset(new Fqk_mul_gadget<CurveType>(pb, *el_q_2, *el_inv, *el_q_2_minus_1));
-                    compute_el_inv_q_2_minus_1.reset(new Fqk_mul_gadget<CurveType>(pb, *el_inv_q_2, el, *el_inv_q_2_minus_1));
+                    compute_el_inv.reset(new Fqk_mul_component<CurveType>(pb, el, *el_inv, *one));
+                    compute_el_q_2_minus_1.reset(new Fqk_mul_component<CurveType>(pb, *el_q_2, *el_inv, *el_q_2_minus_1));
+                    compute_el_inv_q_2_minus_1.reset(new Fqk_mul_component<CurveType>(pb, *el_inv_q_2, el, *el_inv_q_2_minus_1));
 
                     compute_w1.reset(new exponentiation_component<fqk_type<CurveType>,
                                                                Fp4_variable,
-                                                               Fp4_mul_gadget,
-                                                               Fp4_cyclotomic_sqr_gadget,
+                                                               Fp4_mul_component,
+                                                               Fp4_cyclotomic_sqr_component,
                                                                algebra::mnt4_q_limbs>(
                         pb, *el_q_3_minus_q, algebra::mnt4_final_exponent_last_chunk_w1, *w1));
                     compute_w0.reset(new exponentiation_component<fqk_type<CurveType>,
                                                                Fp4_variable,
-                                                               Fp4_mul_gadget,
-                                                               Fp4_cyclotomic_sqr_gadget,
+                                                               Fp4_mul_component,
+                                                               Fp4_cyclotomic_sqr_component,
                                                                algebra::mnt4_q_limbs>(
                         pb,
                         (algebra::mnt4_final_exponent_last_chunk_is_w0_neg ? *el_inv_q_2_minus_1 : *el_q_2_minus_1),
                         algebra::mnt4_final_exponent_last_chunk_abs_of_w0,
                         *w0));
-                    compute_result.reset(new Fqk_mul_gadget<CurveType>(pb, *w1, *w0, *result));
+                    compute_result.reset(new Fqk_mul_component<CurveType>(pb, *w1, *w0, *result));
                 }
 
                 template<typename CurveType>
-                void mnt6_final_exp_gadget<CurveType>::generate_r1cs_constraints() {
+                void mnt6_final_exp_component<CurveType>::generate_r1cs_constraints() {
                     one->generate_r1cs_equals_const_constraints(algebra::Fqk<other_curve<CurveType>>::one());
 
                     compute_el_inv->generate_r1cs_constraints();
@@ -281,7 +281,7 @@ namespace nil {
                 }
 
                 template<typename CurveType>
-                void mnt6_final_exp_gadget<CurveType>::generate_r1cs_witness() {
+                void mnt6_final_exp_component<CurveType>::generate_r1cs_witness() {
                     one->generate_r1cs_witness(algebra::Fqk<other_curve<CurveType>>::one());
                     el_inv->generate_r1cs_witness(el.get_element().inverse());
 

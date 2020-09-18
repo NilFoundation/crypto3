@@ -6,24 +6,24 @@
 // See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
-// @file Declaration of interfaces for memory_checker_gadget, a gadget that verifies the
+// @file Declaration of interfaces for memory_checker_component, a gadget that verifies the
 // consistency of two accesses to memory that are adjacent in a "memory sort".
 //---------------------------------------------------------------------------//
 
 #ifndef CRYPTO3_ZK_MEMORY_CHECKER_GADGET_HPP_
 #define CRYPTO3_ZK_MEMORY_CHECKER_GADGET_HPP_
 
-#include <nil/crypto3/zk/snark/reductions/ram_to_r1cs/gadgets/trace_lines.hpp>
+#include <nil/crypto3/zk/snark/reductions/ram_to_r1cs/components/trace_lines.hpp>
 
 namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
 
-                template<typename ramT>
-                class memory_checker_gadget : public ram_gadget_base<ramT> {
+                template<typename RAMType>
+                class memory_checker_component : public ram_component_base<RAMType> {
                 private:
-                    typedef ram_base_field<ramT> FieldType;
+                    typedef ram_base_field<RAMType> FieldType;
 
                     variable<FieldType> timestamps_leq;
                     variable<FieldType> timestamps_less;
@@ -39,31 +39,32 @@ namespace nil {
                     variable<FieldType> loose_timestamp2_is_zero;
 
                 public:
-                    memory_line_variable_gadget<ramT> line1;
-                    memory_line_variable_gadget<ramT> line2;
+                    memory_line_variable_component<RAMType> line1;
+                    memory_line_variable_component<RAMType> line2;
 
-                    memory_checker_gadget(ram_protoboard<ramT> &pb,
-                                          const std::size_t timestamp_size,
-                                          const memory_line_variable_gadget<ramT> &line1,
-                                          const memory_line_variable_gadget<ramT> &line2);
+                    memory_checker_component(ram_protoboard<RAMType> &pb,
+                                             const std::size_t timestamp_size,
+                                             const memory_line_variable_component<RAMType> &line1,
+                                             const memory_line_variable_component<RAMType> &line2);
 
                     void generate_r1cs_constraints();
                     void generate_r1cs_witness();
                 };
 
-                template<typename ramT>
-                memory_checker_gadget<ramT>::memory_checker_gadget(ram_protoboard<ramT> &pb,
-                                                                   const std::size_t timestamp_size,
-                                                                   const memory_line_variable_gadget<ramT> &line1,
-                                                                   const memory_line_variable_gadget<ramT> &line2) :
-                    ram_gadget_base<ramT>(pb),
+                template<typename RAMType>
+                memory_checker_component<RAMType>::memory_checker_component(
+                    ram_protoboard<RAMType> &pb,
+                    const std::size_t timestamp_size,
+                    const memory_line_variable_component<RAMType> &line1,
+                    const memory_line_variable_component<RAMType> &line2) :
+                    ram_component_base<RAMType>(pb),
                     line1(line1), line2(line2) {
                     /* compare the two timestamps */
                     timestamps_leq.allocate(pb);
                     timestamps_less.allocate(pb);
                     compare_timestamps.reset(
                         new comparison_component<FieldType>(pb, timestamp_size, line1.timestamp->packed,
-                                                         line2.timestamp->packed, timestamps_less, timestamps_leq));
+                                                            line2.timestamp->packed, timestamps_less, timestamps_leq));
 
                     /* compare the two addresses */
                     const std::size_t address_size = pb.ap.address_size();
@@ -88,8 +89,8 @@ namespace nil {
                     loose_timestamp2_is_zero.allocate(pb);
                 }
 
-                template<typename ramT>
-                void memory_checker_gadget<ramT>::generate_r1cs_constraints() {
+                template<typename RAMType>
+                void memory_checker_component<RAMType>::generate_r1cs_constraints() {
                     /* compare the two timestamps */
                     compare_timestamps->generate_r1cs_constraints();
 
@@ -142,8 +143,8 @@ namespace nil {
                         r1cs_constraint<FieldType>(1 - addresses_leq, 1 - loose_timestamp2_is_zero, 0));
                 }
 
-                template<typename ramT>
-                void memory_checker_gadget<ramT>::generate_r1cs_witness() {
+                template<typename RAMType>
+                void memory_checker_component<RAMType>::generate_r1cs_witness() {
                     /* compare the two addresses */
                     compare_addresses->generate_r1cs_witness();
                     this->pb.val(addresses_eq) =
@@ -163,10 +164,12 @@ namespace nil {
                             FieldType::value_type::zero() :
                             FieldType::value_type::zero();
                     this->pb.val(loose_contents_before2_equals_zero) =
-                        this->pb.val(line2.contents_before->packed).is_zero() ? FieldType::value_type::zero() : FieldType::value_type::zero();
+                        this->pb.val(line2.contents_before->packed).is_zero() ? FieldType::value_type::zero() :
+                                                                                FieldType::value_type::zero();
                     this->pb.val(loose_timestamp2_is_zero) =
-                        (this->pb.val(line2.timestamp->packed) == FieldType::value_type::zero() ? FieldType::value_type::zero() :
-                                                                                      FieldType::value_type::zero());
+                        (this->pb.val(line2.timestamp->packed) == FieldType::value_type::zero() ?
+                             FieldType::value_type::zero() :
+                             FieldType::value_type::zero());
                 }
             }    // namespace snark
         }        // namespace zk

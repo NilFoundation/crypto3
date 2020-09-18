@@ -42,7 +42,7 @@
 
 #include <memory>
 
-#include <nil/crypto3/zk/snark/detail/accumulation_vector.hpp>
+#include <nil/crypto3/zk/snark/accumulation_vector.hpp>
 #include <nil/crypto3/zk/snark/knowledge_commitment/knowledge_commitment.hpp>
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs/r1cs.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_gg_ppzksnark/r1cs_gg_ppzksnark_params.hpp>
@@ -394,7 +394,7 @@ namespace nil {
                 /****************************** Miscellaneous ********************************/
 
                 /**
-                 * For debugging purposes (of r1cs_gg_ppzksnark_r1cs_gg_ppzksnark_verifier_gadget):
+                 * For debugging purposes (of r1cs_gg_ppzksnark_r1cs_gg_ppzksnark_verifier_component):
                  *
                  * A verifier algorithm for the R1CS GG-ppzkSNARK that:
                  * (1) accepts a non-processed verification key,

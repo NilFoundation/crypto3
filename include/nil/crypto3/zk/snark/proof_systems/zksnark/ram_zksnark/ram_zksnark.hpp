@@ -302,10 +302,10 @@ namespace nil {
                 template<typename ram_zksnark_ppT>
                 ram_zksnark_keypair<ram_zksnark_ppT>
                     ram_zksnark_generator(const ram_zksnark_architecture_params<ram_zksnark_ppT> &ap) {
-                    typedef ram_zksnark_machine_pp<ram_zksnark_ppT> ramT;
+                    typedef ram_zksnark_machine_pp<ram_zksnark_ppT> RAMType;
                     typedef ram_zksnark_PCD_pp<ram_zksnark_ppT> pcdT;
 
-                    ram_compliance_predicate_handler<ramT> cp_handler(ap);
+                    ram_compliance_predicate_handler<RAMType> cp_handler(ap);
                     cp_handler.generate_r1cs_constraints();
                     r1cs_sp_ppzkpcd_compliance_predicate<pcdT> ram_compliance_predicate =
                         cp_handler.get_compliance_predicate();
@@ -326,13 +326,13 @@ namespace nil {
                                        const ram_zksnark_primary_input<ram_zksnark_ppT> &primary_input,
                                        const std::size_t time_bound,
                                        const ram_zksnark_auxiliary_input<ram_zksnark_ppT> &auxiliary_input) {
-                    typedef ram_zksnark_machine_pp<ram_zksnark_ppT> ramT;
+                    typedef ram_zksnark_machine_pp<ram_zksnark_ppT> RAMType;
                     typedef ram_zksnark_PCD_pp<ram_zksnark_ppT> pcdT;
                     typedef algebra::Fr<typename pcdT::curve_A_pp> FieldType;    // XXX
 
-                    assert(static_cast<std::size_t>(std::ceil(std::log2(time_bound))) <= ramT::timestamp_length);
+                    assert(static_cast<std::size_t>(std::ceil(std::log2(time_bound))) <= RAMType::timestamp_length);
 
-                    ram_compliance_predicate_handler<ramT> cp_handler(pk.ap);
+                    ram_compliance_predicate_handler<RAMType> cp_handler(pk.ap);
 
                     r1cs_sp_ppzkpcd_proof<pcdT> cur_proof;    // start out with an empty proof
 
@@ -340,18 +340,18 @@ namespace nil {
                     const std::size_t num_addresses = 1ul << pk.ap.address_size();
                     const std::size_t value_size = pk.ap.value_size();
 
-                    delegated_ra_memory<CRH_with_bit_out_component<FieldType>> mem(
+                    delegated_ra_memory<crh_with_bit_out_component<FieldType>> mem(
                         num_addresses, value_size, primary_input.as_memory_contents());
                     std::shared_ptr<r1cs_pcd_message<FieldType>> msg =
-                        ram_compliance_predicate_handler<ramT>::get_base_case_message(pk.ap, primary_input);
+                        ram_compliance_predicate_handler<RAMType>::get_base_case_message(pk.ap, primary_input);
 
-                    typename ram_input_tape<ramT>::const_iterator aux_it = auxiliary_input.begin();
+                    typename ram_input_tape<RAMType>::const_iterator aux_it = auxiliary_input.begin();
 
                     bool want_halt = false;
                     for (std::size_t step = 1; step <= time_bound; ++step) {
 
                         std::shared_ptr<r1cs_pcd_local_data<FieldType>> local_data;
-                        local_data.reset(new ram_pcd_local_data<ramT>(want_halt, mem, aux_it, auxiliary_input.end()));
+                        local_data.reset(new ram_pcd_local_data<RAMType>(want_halt, mem, aux_it, auxiliary_input.end()));
 
                         cp_handler.generate_r1cs_witness({msg}, local_data);
 
@@ -370,7 +370,7 @@ namespace nil {
                     want_halt = true;
 
                     std::shared_ptr<r1cs_pcd_local_data<FieldType>> local_data;
-                    local_data.reset(new ram_pcd_local_data<ramT>(want_halt, mem, aux_it, auxiliary_input.end()));
+                    local_data.reset(new ram_pcd_local_data<RAMType>(want_halt, mem, aux_it, auxiliary_input.end()));
 
                     cp_handler.generate_r1cs_witness({msg}, local_data);
 
@@ -389,12 +389,12 @@ namespace nil {
                                           const ram_zksnark_primary_input<ram_zksnark_ppT> &primary_input,
                                           const std::size_t time_bound,
                                           const ram_zksnark_proof<ram_zksnark_ppT> &proof) {
-                    typedef ram_zksnark_machine_pp<ram_zksnark_ppT> ramT;
+                    typedef ram_zksnark_machine_pp<ram_zksnark_ppT> RAMType;
                     typedef ram_zksnark_PCD_pp<ram_zksnark_ppT> pcdT;
                     typedef algebra::Fr<typename pcdT::curve_A_pp> FieldType;    // XXX
 
                     const r1cs_pcd_compliance_predicate_primary_input<FieldType> cp_primary_input(
-                        ram_compliance_predicate_handler<ramT>::get_final_case_msg(vk.ap, primary_input, time_bound));
+                        ram_compliance_predicate_handler<RAMType>::get_final_case_msg(vk.ap, primary_input, time_bound));
                     bool ans = r1cs_sp_ppzkpcd_verifier<pcdT>(vk.pcd_vk, cp_primary_input, proof.PCD_proof);
 
                     return ans;

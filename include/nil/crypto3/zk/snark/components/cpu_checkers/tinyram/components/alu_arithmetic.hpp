@@ -41,7 +41,7 @@ namespace nil {
 
                 /* arithmetic gadgets */
                 template<typename FieldType>
-                class ALU_arithmetic_gadget : public tinyram_standard_component<FieldType> {
+                class ALU_arithmetic_component : public tinyram_standard_component<FieldType> {
                 public:
                     const pb_variable_array<FieldType> opcode_indicators;
                     const word_variable_component<FieldType> desval;
@@ -51,7 +51,7 @@ namespace nil {
                     const variable<FieldType> result;
                     const variable<FieldType> result_flag;
 
-                    ALU_arithmetic_gadget(tinyram_protoboard<FieldType> &pb,
+                    ALU_arithmetic_component(tinyram_protoboard<FieldType> &pb,
                                           const pb_variable_array<FieldType> &opcode_indicators,
                                           const word_variable_component<FieldType> &desval,
                                           const word_variable_component<FieldType> &arg1val,
@@ -66,7 +66,7 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                class ALU_and_gadget : public ALU_arithmetic_component<FieldType> {
+                class ALU_and_component : public ALU_arithmetic_component<FieldType> {
                 private:
                     pb_variable_array<FieldType> res_word;
                     std::shared_ptr<packing_component<FieldType>> pack_result;
@@ -74,7 +74,7 @@ namespace nil {
                     variable<FieldType> not_all_zeros_result;
 
                 public:
-                    ALU_and_gadget(tinyram_protoboard<FieldType> &pb,
+                    ALU_and_component(tinyram_protoboard<FieldType> &pb,
                                    const pb_variable_array<FieldType> &opcode_indicators,
                                    const word_variable_component<FieldType> &desval,
                                    const word_variable_component<FieldType> &arg1val,
@@ -96,10 +96,10 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                void test_ALU_and_gadget(const std::size_t w);
+                void test_ALU_and_component(const std::size_t w);
 
                 template<typename FieldType>
-                class ALU_or_gadget : public ALU_arithmetic_component<FieldType> {
+                class ALU_or_component : public ALU_arithmetic_component<FieldType> {
                 private:
                     pb_variable_array<FieldType> res_word;
                     std::shared_ptr<packing_component<FieldType>> pack_result;
@@ -107,7 +107,7 @@ namespace nil {
                     variable<FieldType> not_all_zeros_result;
 
                 public:
-                    ALU_or_gadget(tinyram_protoboard<FieldType> &pb,
+                    ALU_or_component(tinyram_protoboard<FieldType> &pb,
                                   const pb_variable_array<FieldType> &opcode_indicators,
                                   const word_variable_component<FieldType> &desval,
                                   const word_variable_component<FieldType> &arg1val,
@@ -129,10 +129,10 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                void test_ALU_or_gadget(const std::size_t w);
+                void test_ALU_or_component(const std::size_t w);
 
                 template<typename FieldType>
-                class ALU_xor_gadget : public ALU_arithmetic_component<FieldType> {
+                class ALU_xor_component : public ALU_arithmetic_component<FieldType> {
                 private:
                     pb_variable_array<FieldType> res_word;
                     std::shared_ptr<packing_component<FieldType>> pack_result;
@@ -140,7 +140,7 @@ namespace nil {
                     variable<FieldType> not_all_zeros_result;
 
                 public:
-                    ALU_xor_gadget(tinyram_protoboard<FieldType> &pb,
+                    ALU_xor_component(tinyram_protoboard<FieldType> &pb,
                                    const pb_variable_array<FieldType> &opcode_indicators,
                                    const word_variable_component<FieldType> &desval,
                                    const word_variable_component<FieldType> &arg1val,
@@ -162,10 +162,10 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                void test_ALU_xor_gadget(const std::size_t w);
+                void test_ALU_xor_component(const std::size_t w);
 
                 template<typename FieldType>
-                class ALU_not_gadget : public ALU_arithmetic_component<FieldType> {
+                class ALU_not_component : public ALU_arithmetic_component<FieldType> {
                     /* we do bitwise not, because we need to compute flag */
                 private:
                     pb_variable_array<FieldType> res_word;
@@ -174,7 +174,7 @@ namespace nil {
                     variable<FieldType> not_all_zeros_result;
 
                 public:
-                    ALU_not_gadget(tinyram_protoboard<FieldType> &pb,
+                    ALU_not_component(tinyram_protoboard<FieldType> &pb,
                                    const pb_variable_array<FieldType> &opcode_indicators,
                                    const word_variable_component<FieldType> &desval,
                                    const word_variable_component<FieldType> &arg1val,
@@ -196,10 +196,10 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                void test_ALU_not_gadget(const std::size_t w);
+                void test_ALU_not_component(const std::size_t w);
 
                 template<typename FieldType>
-                class ALU_add_gadget : public ALU_arithmetic_component<FieldType> {
+                class ALU_add_component : public ALU_arithmetic_component<FieldType> {
                 private:
                     variable<FieldType> addition_result;
                     pb_variable_array<FieldType> res_word;
@@ -207,7 +207,7 @@ namespace nil {
                     std::shared_ptr<packing_component<FieldType>> unpack_addition, pack_result;
 
                 public:
-                    ALU_add_gadget(tinyram_protoboard<FieldType> &pb,
+                    ALU_add_component(tinyram_protoboard<FieldType> &pb,
                                    const pb_variable_array<FieldType> &opcode_indicators,
                                    const word_variable_component<FieldType> &desval,
                                    const word_variable_component<FieldType> &arg1val,
@@ -231,10 +231,10 @@ namespace nil {
                     void generate_r1cs_witness();
                 };
 
-                void test_ALU_add_gadget(const std::size_t w);
+                void test_ALU_add_component(const std::size_t w);
 
                 template<typename FieldType>
-                class ALU_sub_gadget : public ALU_arithmetic_component<FieldType> {
+                class ALU_sub_component : public ALU_arithmetic_component<FieldType> {
                 private:
                     variable<FieldType> intermediate_result;
                     variable<FieldType> negated_flag;
@@ -244,7 +244,7 @@ namespace nil {
                     std::shared_ptr<packing_component<FieldType>> unpack_intermediate, pack_result;
 
                 public:
-                    ALU_sub_gadget(tinyram_protoboard<FieldType> &pb,
+                    ALU_sub_component(tinyram_protoboard<FieldType> &pb,
                                    const pb_variable_array<FieldType> &opcode_indicators,
                                    const word_variable_component<FieldType> &desval,
                                    const word_variable_component<FieldType> &arg1val,
@@ -270,12 +270,12 @@ namespace nil {
                     void generate_r1cs_witness();
                 };
 
-                void test_ALU_sub_gadget(const std::size_t w);
+                void test_ALU_sub_component(const std::size_t w);
 
                 template<typename FieldType>
-                class ALU_mov_gadget : public ALU_arithmetic_component<FieldType> {
+                class ALU_mov_component : public ALU_arithmetic_component<FieldType> {
                 public:
-                    ALU_mov_gadget(tinyram_protoboard<FieldType> &pb,
+                    ALU_mov_component(tinyram_protoboard<FieldType> &pb,
                                    const pb_variable_array<FieldType> &opcode_indicators,
                                    const word_variable_component<FieldType> &desval,
                                    const word_variable_component<FieldType> &arg1val,
@@ -292,12 +292,12 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                void test_ALU_mov_gadget(const std::size_t w);
+                void test_ALU_mov_component(const std::size_t w);
 
                 template<typename FieldType>
-                class ALU_cmov_gadget : public ALU_arithmetic_component<FieldType> {
+                class ALU_cmov_component : public ALU_arithmetic_component<FieldType> {
                 public:
-                    ALU_cmov_gadget(tinyram_protoboard<FieldType> &pb,
+                    ALU_cmov_component(tinyram_protoboard<FieldType> &pb,
                                     const pb_variable_array<FieldType> &opcode_indicators,
                                     const word_variable_component<FieldType> &desval,
                                     const word_variable_component<FieldType> &arg1val,
@@ -314,10 +314,10 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                void test_ALU_cmov_gadget(const std::size_t w);
+                void test_ALU_cmov_component(const std::size_t w);
 
                 template<typename FieldType>
-                class ALU_cmp_gadget : public ALU_arithmetic_component<FieldType> {
+                class ALU_cmp_component : public ALU_arithmetic_component<FieldType> {
                 private:
                     comparison_component<FieldType> comparator;
 
@@ -329,7 +329,7 @@ namespace nil {
                     const variable<FieldType> cmpae_result;
                     const variable<FieldType> cmpae_result_flag;
 
-                    ALU_cmp_gadget(tinyram_protoboard<FieldType> &pb,
+                    ALU_cmp_component(tinyram_protoboard<FieldType> &pb,
                                    const pb_variable_array<FieldType> &opcode_indicators,
                                    const word_variable_component<FieldType> &desval,
                                    const word_variable_component<FieldType> &arg1val,
@@ -354,16 +354,16 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                void test_ALU_cmpe_gadget(const std::size_t w);
+                void test_ALU_cmpe_component(const std::size_t w);
 
                 template<typename FieldType>
-                void test_ALU_cmpa_gadget(const std::size_t w);
+                void test_ALU_cmpa_component(const std::size_t w);
 
                 template<typename FieldType>
-                void test_ALU_cmpae_gadget(const std::size_t w);
+                void test_ALU_cmpae_component(const std::size_t w);
 
                 template<typename FieldType>
-                class ALU_cmps_gadget : public ALU_arithmetic_component<FieldType> {
+                class ALU_cmps_component : public ALU_arithmetic_component<FieldType> {
                 private:
                     variable<FieldType> negated_arg1val_sign;
                     variable<FieldType> negated_arg2val_sign;
@@ -381,7 +381,7 @@ namespace nil {
                     const variable<FieldType> cmpge_result;
                     const variable<FieldType> cmpge_result_flag;
 
-                    ALU_cmps_gadget(tinyram_protoboard<FieldType> &pb,
+                    ALU_cmps_component(tinyram_protoboard<FieldType> &pb,
                                     const pb_variable_array<FieldType> &opcode_indicators,
                                     const word_variable_component<FieldType> &desval,
                                     const word_variable_component<FieldType> &arg1val,
@@ -421,13 +421,13 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                void test_ALU_cmpg_gadget(const std::size_t w);
+                void test_ALU_cmpg_component(const std::size_t w);
 
                 template<typename FieldType>
-                void test_ALU_cmpge_gadget(const std::size_t w);
+                void test_ALU_cmpge_component(const std::size_t w);
 
                 template<typename FieldType>
-                class ALU_umul_gadget : public ALU_arithmetic_component<FieldType> {
+                class ALU_umul_component : public ALU_arithmetic_component<FieldType> {
                 private:
                     dual_variable_component<FieldType> mul_result;
                     pb_variable_array<FieldType> mull_bits;
@@ -443,7 +443,7 @@ namespace nil {
                     const variable<FieldType> umulh_result;
                     const variable<FieldType> umulh_flag;
 
-                    ALU_umul_gadget(tinyram_protoboard<FieldType> &pb,
+                    ALU_umul_component(tinyram_protoboard<FieldType> &pb,
                                     const pb_variable_array<FieldType> &opcode_indicators,
                                     const word_variable_component<FieldType> &desval,
                                     const word_variable_component<FieldType> &arg1val,
@@ -472,13 +472,13 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                void test_ALU_mull_gadget(const std::size_t w);
+                void test_ALU_mull_component(const std::size_t w);
 
                 template<typename FieldType>
-                void test_ALU_umulh_gadget(const std::size_t w);
+                void test_ALU_umulh_component(const std::size_t w);
 
                 template<typename FieldType>
-                class ALU_smul_gadget : public ALU_arithmetic_component<FieldType> {
+                class ALU_smul_component : public ALU_arithmetic_component<FieldType> {
                 private:
                     dual_variable_component<FieldType> mul_result;
                     pb_variable_array<FieldType> smulh_bits;
@@ -496,7 +496,7 @@ namespace nil {
                     const variable<FieldType> smulh_result;
                     const variable<FieldType> smulh_flag;
 
-                    ALU_smul_gadget(tinyram_protoboard<FieldType> &pb,
+                    ALU_smul_component(tinyram_protoboard<FieldType> &pb,
                                     const pb_variable_array<FieldType> &opcode_indicators,
                                     const word_variable_component<FieldType> &desval,
                                     const word_variable_component<FieldType> &arg1val,
@@ -533,10 +533,10 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                void test_ALU_smulh_gadget(const std::size_t w);
+                void test_ALU_smulh_component(const std::size_t w);
 
                 template<typename FieldType>
-                class ALU_divmod_gadget : public ALU_arithmetic_component<FieldType> {
+                class ALU_divmod_component : public ALU_arithmetic_component<FieldType> {
                     /*
                       <<<<<<< Updated upstream
                       B * q + r = A_aux = A * B_nonzero
@@ -560,7 +560,7 @@ namespace nil {
                     const variable<FieldType> umod_result;
                     const variable<FieldType> umod_flag;
 
-                    ALU_divmod_gadget(tinyram_protoboard<FieldType> &pb,
+                    ALU_divmod_component(tinyram_protoboard<FieldType> &pb,
                                       const pb_variable_array<FieldType> &opcode_indicators,
                                       const word_variable_component<FieldType> &desval,
                                       const word_variable_component<FieldType> &arg1val,
@@ -584,13 +584,13 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                void test_ALU_udiv_gadget(const std::size_t w);
+                void test_ALU_udiv_component(const std::size_t w);
 
                 template<typename FieldType>
-                void test_ALU_umod_gadget(const std::size_t w);
+                void test_ALU_umod_component(const std::size_t w);
 
                 template<typename FieldType>
-                class ALU_shr_shl_gadget : public ALU_arithmetic_component<FieldType> {
+                class ALU_shr_shl_component : public ALU_arithmetic_component<FieldType> {
                 private:
                     variable<FieldType> reversed_input;
                     std::shared_ptr<packing_component<FieldType>> pack_reversed_input;
@@ -615,7 +615,7 @@ namespace nil {
 
                     std::size_t logw;
 
-                    ALU_shr_shl_gadget(tinyram_protoboard<FieldType> &pb,
+                    ALU_shr_shl_component(tinyram_protoboard<FieldType> &pb,
                                        const pb_variable_array<FieldType> &opcode_indicators,
                                        const word_variable_component<FieldType> &desval,
                                        const word_variable_component<FieldType> &arg1val,
@@ -662,10 +662,10 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                void test_ALU_shr_gadget(const std::size_t w);
+                void test_ALU_shr_component(const std::size_t w);
 
                 template<typename FieldType>
-                void test_ALU_shl_gadget(const std::size_t w);
+                void test_ALU_shl_component(const std::size_t w);
 
                 /* the code here is full of template lambda magic, but it is better to
                    have limited presence of such code than to have code duplication in
@@ -684,7 +684,7 @@ namespace nil {
                                                          )>;
 
                 template<class T, typename FieldType>
-                void brute_force_arithmetic_gadget(const std::size_t w,
+                void brute_force_arithmetic_component(const std::size_t w,
                                                    const std::size_t opcode,
                                                    initializer_fn<T, FieldType>
                                                        initializer,
@@ -783,8 +783,8 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                void test_ALU_and_gadget(const std::size_t w) {
-                    brute_force_arithmetic_gadget<ALU_and_component<FieldType>, FieldType>(
+                void test_ALU_and_component(const std::size_t w) {
+                    brute_force_arithmetic_component<ALU_and_component<FieldType>, FieldType>(
                         w,
                         tinyram_opcode_AND,
                         [](tinyram_protoboard<FieldType> &pb,
@@ -835,8 +835,8 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                void test_ALU_or_gadget(const std::size_t w) {
-                    brute_force_arithmetic_gadget<ALU_or_component<FieldType>, FieldType>(
+                void test_ALU_or_component(const std::size_t w) {
+                    brute_force_arithmetic_component<ALU_or_component<FieldType>, FieldType>(
                         w,
                         tinyram_opcode_OR,
                         [](tinyram_protoboard<FieldType> &pb,
@@ -889,8 +889,8 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                void test_ALU_xor_gadget(const std::size_t w) {
-                    brute_force_arithmetic_gadget<ALU_xor_component<FieldType>, FieldType>(
+                void test_ALU_xor_component(const std::size_t w) {
+                    brute_force_arithmetic_component<ALU_xor_component<FieldType>, FieldType>(
                         w,
                         tinyram_opcode_XOR,
                         [](tinyram_protoboard<FieldType> &pb,
@@ -939,8 +939,8 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                void test_ALU_not_gadget(const std::size_t w) {
-                    brute_force_arithmetic_gadget<ALU_not_component<FieldType>, FieldType>(
+                void test_ALU_not_component(const std::size_t w) {
+                    brute_force_arithmetic_component<ALU_not_component<FieldType>, FieldType>(
                         w,
                         tinyram_opcode_NOT,
                         [](tinyram_protoboard<FieldType> &pb,
@@ -981,8 +981,8 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                void test_ALU_add_gadget(const std::size_t w) {
-                    brute_force_arithmetic_gadget<ALU_add_component<FieldType>, FieldType>(
+                void test_ALU_add_component(const std::size_t w) {
+                    brute_force_arithmetic_component<ALU_add_component<FieldType>, FieldType>(
                         w,
                         tinyram_opcode_ADD,
                         [](tinyram_protoboard<FieldType> &pb,
@@ -1043,8 +1043,8 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                void test_ALU_sub_gadget(const std::size_t w) {
-                    brute_force_arithmetic_gadget<ALU_sub_component<FieldType>, FieldType>(
+                void test_ALU_sub_component(const std::size_t w) {
+                    brute_force_arithmetic_component<ALU_sub_component<FieldType>, FieldType>(
                         w,
                         tinyram_opcode_SUB,
                         [](tinyram_protoboard<FieldType> &pb,
@@ -1084,8 +1084,8 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                void test_ALU_mov_gadget(const std::size_t w) {
-                    brute_force_arithmetic_gadget<ALU_mov_component<FieldType>, FieldType>(
+                void test_ALU_mov_component(const std::size_t w) {
+                    brute_force_arithmetic_component<ALU_mov_component<FieldType>, FieldType>(
                         w,
                         tinyram_opcode_MOV,
                         [](tinyram_protoboard<FieldType> &pb,
@@ -1127,8 +1127,8 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                void test_ALU_cmov_gadget(const std::size_t w) {
-                    brute_force_arithmetic_gadget<ALU_cmov_component<FieldType>, FieldType>(
+                void test_ALU_cmov_component(const std::size_t w) {
+                    brute_force_arithmetic_component<ALU_cmov_component<FieldType>, FieldType>(
                         w,
                         tinyram_opcode_CMOV,
                         [](tinyram_protoboard<FieldType> &pb,
@@ -1182,8 +1182,8 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                void test_ALU_cmpe_gadget(const std::size_t w) {
-                    brute_force_arithmetic_gadget<ALU_cmp_component<FieldType>, FieldType>(
+                void test_ALU_cmpe_component(const std::size_t w) {
+                    brute_force_arithmetic_component<ALU_cmp_component<FieldType>, FieldType>(
                         w,
                         tinyram_opcode_CMPE,
                         [](tinyram_protoboard<FieldType> &pb,
@@ -1211,8 +1211,8 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                void test_ALU_cmpa_gadget(const std::size_t w) {
-                    brute_force_arithmetic_gadget<ALU_cmp_component<FieldType>, FieldType>(
+                void test_ALU_cmpa_component(const std::size_t w) {
+                    brute_force_arithmetic_component<ALU_cmp_component<FieldType>, FieldType>(
                         w,
                         tinyram_opcode_CMPA,
                         [](tinyram_protoboard<FieldType> &pb,
@@ -1240,8 +1240,8 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                void test_ALU_cmpae_gadget(const std::size_t w) {
-                    brute_force_arithmetic_gadget<ALU_cmp_component<FieldType>, FieldType>(
+                void test_ALU_cmpae_component(const std::size_t w) {
+                    brute_force_arithmetic_component<ALU_cmp_component<FieldType>, FieldType>(
                         w,
                         tinyram_opcode_CMPAE,
                         [](tinyram_protoboard<FieldType> &pb,
@@ -1312,8 +1312,8 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                void test_ALU_cmpg_gadget(const std::size_t w) {
-                    brute_force_arithmetic_gadget<ALU_cmps_component<FieldType>, FieldType>(
+                void test_ALU_cmpg_component(const std::size_t w) {
+                    brute_force_arithmetic_component<ALU_cmps_component<FieldType>, FieldType>(
                         w,
                         tinyram_opcode_CMPG,
                         [](tinyram_protoboard<FieldType> &pb,
@@ -1338,8 +1338,8 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                void test_ALU_cmpge_gadget(const std::size_t w) {
-                    brute_force_arithmetic_gadget<ALU_cmps_component<FieldType>, FieldType>(
+                void test_ALU_cmpge_component(const std::size_t w) {
+                    brute_force_arithmetic_component<ALU_cmps_component<FieldType>, FieldType>(
                         w,
                         tinyram_opcode_CMPGE,
                         [](tinyram_protoboard<FieldType> &pb,
@@ -1401,8 +1401,8 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                void test_ALU_mull_gadget(const std::size_t w) {
-                    brute_force_arithmetic_gadget<ALU_umul_component<FieldType>, FieldType>(
+                void test_ALU_mull_component(const std::size_t w) {
+                    brute_force_arithmetic_component<ALU_umul_component<FieldType>, FieldType>(
                         w,
                         tinyram_opcode_MULL,
                         [](tinyram_protoboard<FieldType> &pb,
@@ -1425,8 +1425,8 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                void test_ALU_umulh_gadget(const std::size_t w) {
-                    brute_force_arithmetic_gadget<ALU_umul_component<FieldType>, FieldType>(
+                void test_ALU_umulh_component(const std::size_t w) {
+                    brute_force_arithmetic_component<ALU_umul_component<FieldType>, FieldType>(
                         w,
                         tinyram_opcode_UMULH,
                         [](tinyram_protoboard<FieldType> &pb,
@@ -1543,8 +1543,8 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                void test_ALU_smulh_gadget(const std::size_t w) {
-                    brute_force_arithmetic_gadget<ALU_smul_component<FieldType>, FieldType>(
+                void test_ALU_smulh_component(const std::size_t w) {
+                    brute_force_arithmetic_component<ALU_smul_component<FieldType>, FieldType>(
                         w,
                         tinyram_opcode_SMULH,
                         [](tinyram_protoboard<FieldType> &pb,
@@ -1652,8 +1652,8 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                void test_ALU_udiv_gadget(const std::size_t w) {
-                    brute_force_arithmetic_gadget<ALU_divmod_component<FieldType>, FieldType>(
+                void test_ALU_udiv_component(const std::size_t w) {
+                    brute_force_arithmetic_component<ALU_divmod_component<FieldType>, FieldType>(
                         w,
                         tinyram_opcode_UDIV,
                         [](tinyram_protoboard<FieldType> &pb,
@@ -1676,8 +1676,8 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                void test_ALU_umod_gadget(const std::size_t w) {
-                    brute_force_arithmetic_gadget<ALU_divmod_component<FieldType>, FieldType>(
+                void test_ALU_umod_component(const std::size_t w) {
+                    brute_force_arithmetic_component<ALU_divmod_component<FieldType>, FieldType>(
                         w,
                         tinyram_opcode_UMOD,
                         [](tinyram_protoboard<FieldType> &pb,
@@ -1845,8 +1845,8 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                void test_ALU_shr_gadget(const std::size_t w) {
-                    brute_force_arithmetic_gadget<ALU_shr_shl_component<FieldType>, FieldType>(
+                void test_ALU_shr_component(const std::size_t w) {
+                    brute_force_arithmetic_component<ALU_shr_shl_component<FieldType>, FieldType>(
                         w,
                         tinyram_opcode_SHR,
                         [](tinyram_protoboard<FieldType> &pb,
@@ -1869,8 +1869,8 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                void test_ALU_shl_gadget(const std::size_t w) {
-                    brute_force_arithmetic_gadget<ALU_shr_shl_component<FieldType>, FieldType>(
+                void test_ALU_shl_component(const std::size_t w) {
+                    brute_force_arithmetic_component<ALU_shr_shl_component<FieldType>, FieldType>(
                         w,
                         tinyram_opcode_SHL,
                         [](tinyram_protoboard<FieldType> &pb,

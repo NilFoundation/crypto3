@@ -94,7 +94,7 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                memory_masking_component<FieldType>::memory_masking_gadget(
+                memory_masking_component<FieldType>::memory_masking_component(
                     tinyram_protoboard<FieldType> &pb,
                     const doubleword_variable_component<FieldType> &dw_contents_prev,
                     const dual_variable_component<FieldType> &subaddress,

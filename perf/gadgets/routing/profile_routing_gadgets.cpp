@@ -57,7 +57,7 @@ void get_benes_size(const std::size_t n, const std::size_t l, std::size_t &num_c
 }
 
 template<typename FieldType>
-void profile_routing_gadgets(const std::size_t l) {
+void profile_routing_components(const std::size_t l) {
     for (std::size_t n = 2; n <= 65; ++n) {
         std::size_t as_waksman_constr, as_waksman_vars;
         get_as_waksman_size<FieldType>(n, l, as_waksman_constr, as_waksman_vars);
@@ -87,6 +87,6 @@ void profile_num_switches(const std::size_t l) {
 int main() {
 
 
-    profile_routing_gadgets<typename algebra::default_ec_pp::scalar_field_type>(32 + 16 + 3 + 2);
+    profile_routing_components<typename algebra::default_ec_pp::scalar_field_type>(32 + 16 + 3 + 2);
     profile_num_switches<typename algebra::default_ec_pp::scalar_field_type>(1);
 }

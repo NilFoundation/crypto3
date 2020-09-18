@@ -28,16 +28,16 @@ namespace nil {
             namespace snark {
 
                 template<typename CurveType>
-                class mnt_e_over_e_miller_loop_gadget;
+                class mnt_e_over_e_miller_loop_component;
 
                 template<typename CurveType>
-                class mnt_e_times_e_over_e_miller_loop_gadget;
+                class mnt_e_times_e_over_e_miller_loop_component;
 
                 template<typename CurveType>
-                class mnt4_final_exp_gadget;
+                class mnt4_final_exp_component;
 
                 template<typename CurveType>
-                class mnt6_final_exp_gadget;
+                class mnt6_final_exp_component;
 
                 /**
                  * Specialization for MNT4.
@@ -50,21 +50,21 @@ namespace nil {
                     typedef algebra::Fqk<algebra::curves::mnt6> fqk_type;
 
                     typedef Fp3_variable<fqe_type> Fqe_variable_type;
-                    typedef Fp3_mul_gadget<fqe_type> Fqe_mul_gadget_type;
-                    typedef Fp3_mul_by_lc_gadget<fqe_type> Fqe_mul_by_lc_gadget_type;
-                    typedef Fp3_sqr_gadget<fqe_type> Fqe_sqr_gadget_type;
+                    typedef Fp3_mul_component<fqe_type> Fqe_mul_component_type;
+                    typedef Fp3_mul_by_lc_component<fqe_type> Fqe_mul_by_lc_component_type;
+                    typedef Fp3_sqr_component<fqe_type> Fqe_sqr_component_type;
 
                     typedef Fp6_variable<fqk_type> Fqk_variable_type;
-                    typedef Fp6_mul_gadget<fqk_type> Fqk_mul_gadget_type;
-                    typedef Fp6_mul_by_2345_gadget<fqk_type> Fqk_special_mul_gadget_type;
-                    typedef Fp6_sqr_gadget<fqk_type> Fqk_sqr_gadget_type;
+                    typedef Fp6_mul_component<fqk_type> Fqk_mul_component_type;
+                    typedef Fp6_mul_by_2345_component<fqk_type> Fqk_special_mul_component_type;
+                    typedef Fp6_sqr_component<fqk_type> Fqk_sqr_component_type;
 
                     typedef algebra::curves::mnt6 other_curve_type;
 
-                    typedef mnt_e_over_e_miller_loop_gadget<algebra::curves::mnt4> e_over_e_miller_loop_gadget_type;
-                    typedef mnt_e_times_e_over_e_miller_loop_gadget<algebra::curves::mnt4>
-                        e_times_e_over_e_miller_loop_gadget_type;
-                    typedef mnt4_final_exp_gadget<algebra::curves::mnt4> final_exp_gadget_type;
+                    typedef mnt_e_over_e_miller_loop_component<algebra::curves::mnt4> e_over_e_miller_loop_component_type;
+                    typedef mnt_e_times_e_over_e_miller_loop_component<algebra::curves::mnt4>
+                        e_times_e_over_e_miller_loop_component_type;
+                    typedef mnt4_final_exp_component<algebra::curves::mnt4> final_exp_component_type;
 
                     static const constexpr algebra::bigint<algebra::mnt6_Fr::num_limbs> &pairing_loop_count =
                         algebra::mnt6_ate_loop_count;
@@ -82,21 +82,21 @@ namespace nil {
                     typedef algebra::Fqk<algebra::curves::mnt4> fqk_type;
 
                     typedef Fp2_variable<fqe_type> Fqe_variable_type;
-                    typedef Fp2_mul_gadget<fqe_type> Fqe_mul_gadget_type;
-                    typedef Fp2_mul_by_lc_gadget<fqe_type> Fqe_mul_by_lc_gadget_type;
-                    typedef Fp2_sqr_gadget<fqe_type> Fqe_sqr_gadget_type;
+                    typedef Fp2_mul_component<fqe_type> Fqe_mul_component_type;
+                    typedef Fp2_mul_by_lc_component<fqe_type> Fqe_mul_by_lc_component_type;
+                    typedef Fp2_sqr_component<fqe_type> Fqe_sqr_component_type;
 
                     typedef Fp4_variable<fqk_type> Fqk_variable_type;
-                    typedef Fp4_mul_gadget<fqk_type> Fqk_mul_gadget_type;
-                    typedef Fp4_mul_gadget<fqk_type> Fqk_special_mul_gadget_type;
-                    typedef Fp4_sqr_gadget<fqk_type> Fqk_sqr_gadget_type;
+                    typedef Fp4_mul_component<fqk_type> Fqk_mul_component_type;
+                    typedef Fp4_mul_component<fqk_type> Fqk_special_mul_component_type;
+                    typedef Fp4_sqr_component<fqk_type> Fqk_sqr_component_type;
 
                     typedef algebra::curves::mnt4 other_curve_type;
 
-                    typedef mnt_e_over_e_miller_loop_gadget<algebra::curves::mnt6> e_over_e_miller_loop_gadget_type;
-                    typedef mnt_e_times_e_over_e_miller_loop_gadget<algebra::curves::mnt6>
-                        e_times_e_over_e_miller_loop_gadget_type;
-                    typedef mnt6_final_exp_gadget<algebra::curves::mnt6> final_exp_gadget_type;
+                    typedef mnt_e_over_e_miller_loop_component<algebra::curves::mnt6> e_over_e_miller_loop_component_type;
+                    typedef mnt_e_times_e_over_e_miller_loop_component<algebra::curves::mnt6>
+                        e_times_e_over_e_miller_loop_component_type;
+                    typedef mnt6_final_exp_component<algebra::curves::mnt6> final_exp_component_type;
 
                     static const constexpr algebra::bigint<algebra::mnt4_Fr::num_limbs> &pairing_loop_count =
                         algebra::mnt4_ate_loop_count;

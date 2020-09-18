@@ -29,7 +29,7 @@
 #include <nil/crypto3/zk/snark/components/component_from_r1cs.hpp>
 #include <nil/crypto3/zk/snark/components/hashes/crh_component.hpp>
 #include <nil/crypto3/zk/snark/components/pairing/pairing_params.hpp>
-#include <nil/crypto3/zk/snark/components/verifiers/r1cs_ppzksnark_verifier_gadget.hpp>
+#include <nil/crypto3/zk/snark/components/verifiers/r1cs_ppzksnark_verifier_component.hpp>
 #include <nil/crypto3/zk/snark/blueprint.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/pcd/r1cs_pcd/compliance_predicate/cp_handler.hpp>
 
@@ -58,7 +58,7 @@ namespace nil {
                     variable<FieldType> zero;
 
                     std::shared_ptr<block_variable<FieldType>> block_for_outgoing_message;
-                    std::shared_ptr<CRH_with_field_out_component<FieldType>> hash_outgoing_message;
+                    std::shared_ptr<crh_with_field_out_component<FieldType>> hash_outgoing_message;
 
                     std::vector<block_variable<FieldType>> blocks_for_incoming_messages;
                     std::vector<pb_variable_array<FieldType>>
@@ -67,7 +67,7 @@ namespace nil {
                         unpack_sp_translation_step_vk_and_incoming_message_payload_digests;
                     std::vector<pb_variable_array<FieldType>>
                         sp_translation_step_vk_and_incoming_message_payload_digest_bits;
-                    std::vector<CRH_with_field_out_component<FieldType>> hash_incoming_messages;
+                    std::vector<crh_with_field_out_component<FieldType>> hash_incoming_messages;
 
                     std::shared_ptr<r1cs_ppzksnark_verification_key_variable<CurveType>> sp_translation_step_vk;
                     pb_variable_array<FieldType> sp_translation_step_vk_bits;
@@ -83,7 +83,7 @@ namespace nil {
 
                     pb_variable_array<FieldType> local_data;
                     pb_variable_array<FieldType> cp_witness;
-                    std::shared_ptr<component_from_r1cs<FieldType>> compliance_predicate_as_gadget;
+                    std::shared_ptr<component_from_r1cs<FieldType>> compliance_predicate_as_component;
 
                     pb_variable_array<FieldType> outgoing_message_bits;
                     std::shared_ptr<multipacking_component<FieldType>> unpack_outgoing_message;
@@ -98,7 +98,7 @@ namespace nil {
                     std::vector<pb_variable_array<FieldType>> verifier_input;
                     std::vector<r1cs_ppzksnark_proof_variable<CurveType>> proof;
                     variable<FieldType> verification_result;
-                    std::vector<r1cs_ppzksnark_verifier_gadget<CurveType>> verifiers;
+                    std::vector<r1cs_ppzksnark_verifier_component<CurveType>> verifiers;
 
                     sp_compliance_step_pcd_circuit_maker(
                         const r1cs_pcd_compliance_predicate<FieldType> &compliance_predicate);
@@ -144,7 +144,7 @@ namespace nil {
                     std::shared_ptr<r1cs_ppzksnark_preprocessed_r1cs_ppzksnark_verification_key_variable<CurveType>>
                         hardcoded_sp_compliance_step_vk;
                     std::shared_ptr<r1cs_ppzksnark_proof_variable<CurveType>> proof;
-                    std::shared_ptr<r1cs_ppzksnark_online_verifier_gadget<CurveType>> online_verifier;
+                    std::shared_ptr<r1cs_ppzksnark_online_verifier_component<CurveType>> online_verifier;
 
                     sp_translation_step_pcd_circuit_maker(
                         const r1cs_ppzksnark_verification_key<other_curve<CurveType>> &compliance_step_vk);
@@ -190,7 +190,7 @@ namespace nil {
                     assert(compliance_predicate.has_equal_input_and_output_lengths());
 
                     const std::size_t compliance_predicate_arity = compliance_predicate.max_arity;
-                    const std::size_t digest_size = CRH_with_field_out_component<FieldType>::get_digest_len();
+                    const std::size_t digest_size = crh_with_field_out_component<FieldType>::get_digest_len();
                     const std::size_t msg_size_in_bits =
                         field_logsize() * (1 + compliance_predicate.outgoing_message_payload_length);
                     const std::size_t sp_translation_step_vk_size_in_bits =
@@ -200,7 +200,7 @@ namespace nil {
                         sp_translation_step_pcd_circuit_maker<other_curve<CurveType>>::input_capacity_in_bits();
 
                     const std::size_t block_size = msg_size_in_bits + sp_translation_step_vk_size_in_bits;
-                    CRH_with_bit_out_component<FieldType>::sample_randomness(block_size);
+                    crh_with_bit_out_component<FieldType>::sample_randomness(block_size);
 
                     /* allocate input of the compliance PCD circuit */
                     sp_compliance_step_pcd_circuit_input.allocate(pb, input_size_in_elts());
@@ -239,7 +239,7 @@ namespace nil {
                                                         incoming_message_vars[i].end());
                     }
 
-                    compliance_predicate_as_gadget.reset(
+                    compliance_predicate_as_component.reset(
                         new component_from_r1cs<FieldType>(pb,
                                                         {outgoing_message_vars, pb_variable_array<FieldType>(1, arity),
                                                          incoming_messages_concat, local_data, cp_witness},
@@ -275,11 +275,11 @@ namespace nil {
                     }
 
                     /* allocate hash checkers */
-                    hash_outgoing_message.reset(new CRH_with_field_out_component<FieldType>(
+                    hash_outgoing_message.reset(new crh_with_field_out_component<FieldType>(
                         pb, block_size, *block_for_outgoing_message, sp_compliance_step_pcd_circuit_input));
 
                     for (std::size_t i = 0; i < compliance_predicate_arity; ++i) {
-                        hash_incoming_messages.emplace_back(CRH_with_field_out_component<FieldType>(
+                        hash_incoming_messages.emplace_back(crh_with_field_out_component<FieldType>(
                             pb, block_size, blocks_for_incoming_messages[i],
                             sp_translation_step_vk_and_incoming_message_payload_digests[i]));
                     }
@@ -311,7 +311,7 @@ namespace nil {
                         }
 
                         proof.emplace_back(r1cs_ppzksnark_proof_variable<CurveType>(pb));
-                        verifiers.emplace_back(r1cs_ppzksnark_verifier_gadget<CurveType>(
+                        verifiers.emplace_back(r1cs_ppzksnark_verifier_component<CurveType>(
                             pb,
                             *sp_translation_step_vk,
                             verifier_input[i],
@@ -325,7 +325,7 @@ namespace nil {
 
                 template<typename CurveType>
                 void sp_compliance_step_pcd_circuit_maker<CurveType>::generate_r1cs_constraints() {
-                    const std::size_t digest_size = CRH_with_bit_out_component<FieldType>::get_digest_len();
+                    const std::size_t digest_size = crh_with_bit_out_component<FieldType>::get_digest_len();
                     const std::size_t dimension = knapsack_dimension<FieldType>::dimension;
                     const std::size_t compliance_predicate_arity = compliance_predicate.max_arity;
                     unpack_outgoing_message->generate_r1cs_constraints(true);
@@ -347,7 +347,7 @@ namespace nil {
                             true);
                     }
 
-                    compliance_predicate_as_gadget->generate_r1cs_constraints();
+                    compliance_predicate_as_component->generate_r1cs_constraints();
 
                     for (std::size_t i = 0; i < compliance_predicate_arity; ++i) {
                         proof[i].generate_r1cs_constraints();
@@ -404,7 +404,7 @@ namespace nil {
                     this->pb.clear_values();
                     this->pb.val(zero) = FieldType::value_type::zero();
 
-                    compliance_predicate_as_gadget->generate_r1cs_witness(
+                    compliance_predicate_as_component->generate_r1cs_witness(
                         compliance_predicate_primary_input.as_r1cs_primary_input(),
                         compliance_predicate_auxiliary_input.as_r1cs_auxiliary_input(
                             compliance_predicate.incoming_message_payload_lengths));
@@ -444,7 +444,7 @@ namespace nil {
 
                 template<typename CurveType>
                 std::size_t sp_compliance_step_pcd_circuit_maker<CurveType>::input_size_in_elts() {
-                    const std::size_t digest_size = CRH_with_field_out_component<FieldType>::get_digest_len();
+                    const std::size_t digest_size = crh_with_field_out_component<FieldType>::get_digest_len();
                     return digest_size;
                 }
 
@@ -478,7 +478,7 @@ namespace nil {
                     proof.reset(new r1cs_ppzksnark_proof_variable<CurveType>(pb));
 
                     /* verify previous proof */
-                    online_verifier.reset(new r1cs_ppzksnark_online_verifier_gadget<CurveType>(
+                    online_verifier.reset(new r1cs_ppzksnark_online_verifier_component<CurveType>(
                         pb,
                         *hardcoded_sp_compliance_step_vk,
                         unpacked_sp_translation_step_pcd_circuit_input,
@@ -572,9 +572,9 @@ namespace nil {
                     block.insert(block.end(), sp_translation_step_vk_bits.begin(), sp_translation_step_vk_bits.end());
                     block.insert(block.end(), msg_bits.begin(), msg_bits.end());
 
-                    CRH_with_field_out_component<FieldType>::sample_randomness(block.size());
+                    crh_with_field_out_component<FieldType>::sample_randomness(block.size());
 
-                    const std::vector<typename FieldType::value_type> digest = CRH_with_field_out_component<FieldType>::get_hash(block);
+                    const std::vector<typename FieldType::value_type> digest = crh_with_field_out_component<FieldType>::get_hash(block);
 
                     return digest;
                 }

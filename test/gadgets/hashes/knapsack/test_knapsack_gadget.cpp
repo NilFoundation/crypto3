@@ -24,7 +24,7 @@ namespace nil {
                  * generate_knapsack_tests.py) and contain hard-to-read constants. */
 
                 template<>
-                void test_knapsack_CRH_with_bit_out_gadget<typename algebra::curves::bn128::scalar_field_type>() {
+                void test_knapsack_crh_with_bit_out_component<typename algebra::curves::bn128::scalar_field_type>() {
                     typedef typename algebra::curves::bn128::scalar_field_type FieldType;
                     const std::size_t dimension = knapsack_dimension<FieldType>::dimension;
                     const std::vector<bool> input_bits = {1, 1, 0, 0, 1, 0, 1, 0, 0, 1};
@@ -79,11 +79,11 @@ namespace nil {
                         return;
                     }
 
-                    test_knapsack_CRH_with_bit_out_gadget_internal<FieldType>(dimension, input_bits, digest_bits);
+                    test_knapsack_crh_with_bit_out_component_internal<FieldType>(dimension, input_bits, digest_bits);
                 }
 
                 template<>
-                void test_knapsack_CRH_with_bit_out_gadget<typename algebra::curves::edwards::scalar_field_type>() {
+                void test_knapsack_crh_with_bit_out_component<typename algebra::curves::edwards::scalar_field_type>() {
                     typedef typename algebra::curves::edwards::scalar_field_type FieldType;
                     const std::size_t dimension = knapsack_dimension<FieldType>::dimension;
                     const std::vector<bool> input_bits = {1, 1, 0, 0, 1, 0, 1, 0, 0, 1};
@@ -126,11 +126,11 @@ namespace nil {
                         return;
                     }
 
-                    test_knapsack_CRH_with_bit_out_gadget_internal<FieldType>(dimension, input_bits, digest_bits);
+                    test_knapsack_crh_with_bit_out_component_internal<FieldType>(dimension, input_bits, digest_bits);
                 }
 
                 template<>
-                void test_knapsack_CRH_with_bit_out_gadget<typename algebra::curves::mnt4::scalar_field_type>() {
+                void test_knapsack_crh_with_bit_out_component<typename algebra::curves::mnt4::scalar_field_type>() {
                     typedef typename algebra::curves::mnt4::scalar_field_type FieldType;
                     const std::size_t dimension = knapsack_dimension<FieldType>::dimension;
                     const std::vector<bool> input_bits = {1, 1, 0, 0, 1, 0, 1, 0, 0, 1};
@@ -192,11 +192,11 @@ namespace nil {
                         return;
                     }
 
-                    test_knapsack_CRH_with_bit_out_gadget_internal<FieldType>(dimension, input_bits, digest_bits);
+                    test_knapsack_crh_with_bit_out_component_internal<FieldType>(dimension, input_bits, digest_bits);
                 }
 
                 template<>
-                void test_knapsack_CRH_with_bit_out_gadget<typename algebra::curves::mnt6::scalar_field_type>() {
+                void test_knapsack_crh_with_bit_out_component<typename algebra::curves::mnt6::scalar_field_type>() {
                     typedef typename algebra::curves::mnt6::scalar_field_type FieldType;
                     const std::size_t dimension = knapsack_dimension<FieldType>::dimension;
                     const std::vector<bool> input_bits = {1, 1, 0, 0, 1, 0, 1, 0, 0, 1};
@@ -258,7 +258,7 @@ namespace nil {
                         return;
                     }
 
-                    test_knapsack_CRH_with_bit_out_gadget_internal<FieldType>(dimension, input_bits, digest_bits);
+                    test_knapsack_crh_with_bit_out_component_internal<FieldType>(dimension, input_bits, digest_bits);
                 }
 
             }    // namespace snark
@@ -270,8 +270,8 @@ using namespace nil::algebra;
 using namespace nil::crypto3::zk::snark;
 
 int main(void) {
-    test_knapsack_CRH_with_bit_out_gadget<typename algebra::curves::bn128::scalar_field_type>();
-    test_knapsack_CRH_with_bit_out_gadget<typename algebra::curves::edwards::scalar_field_type>();
-    test_knapsack_CRH_with_bit_out_gadget<typename algebra::curves::mnt4::scalar_field_type>();
-    test_knapsack_CRH_with_bit_out_gadget<typename algebra::curves::mnt6::scalar_field_type>();
+    test_knapsack_crh_with_bit_out_component<typename algebra::curves::bn128::scalar_field_type>();
+    test_knapsack_crh_with_bit_out_component<typename algebra::curves::edwards::scalar_field_type>();
+    test_knapsack_crh_with_bit_out_component<typename algebra::curves::mnt4::scalar_field_type>();
+    test_knapsack_crh_with_bit_out_component<typename algebra::curves::mnt6::scalar_field_type>();
 }

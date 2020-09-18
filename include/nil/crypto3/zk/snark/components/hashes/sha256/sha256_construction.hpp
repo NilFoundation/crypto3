@@ -26,7 +26,7 @@ namespace nil {
                 pb_linear_combination_array<FieldType> SHA256_default_IV(blueprint<FieldType> &pb);
 
                 template<typename FieldType>
-                class sha256_message_schedule_gadget : public component<FieldType> {
+                class sha256_message_schedule_component : public component<FieldType> {
                 public:
                     std::vector<pb_variable_array<FieldType>> W_bits;
                     std::vector<std::shared_ptr<packing_component<FieldType>>> pack_W;
@@ -41,7 +41,7 @@ namespace nil {
                 public:
                     pb_variable_array<FieldType> M;
                     pb_variable_array<FieldType> packed_W;
-                    sha256_message_schedule_gadget(blueprint<FieldType> &pb,
+                    sha256_message_schedule_component(blueprint<FieldType> &pb,
                                                    const pb_variable_array<FieldType> &M,
                                                    const pb_variable_array<FieldType> &packed_W);
                     void generate_r1cs_constraints();
@@ -49,7 +49,7 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                class sha256_round_function_gadget : public component<FieldType> {
+                class sha256_round_function_component : public component<FieldType> {
                 public:
                     variable<FieldType> sigma0;
                     variable<FieldType> sigma1;
@@ -84,7 +84,7 @@ namespace nil {
                     pb_linear_combination_array<FieldType> new_a;
                     pb_linear_combination_array<FieldType> new_e;
 
-                    sha256_round_function_gadget(blueprint<FieldType> &pb,
+                    sha256_round_function_component(blueprint<FieldType> &pb,
                                                  const pb_linear_combination_array<FieldType> &a,
                                                  const pb_linear_combination_array<FieldType> &b,
                                                  const pb_linear_combination_array<FieldType> &c,
@@ -126,7 +126,7 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                sha256_message_schedule_component<FieldType>::sha256_message_schedule_gadget(
+                sha256_message_schedule_component<FieldType>::sha256_message_schedule_component(
                     blueprint<FieldType> &pb,
                     const pb_variable_array<FieldType> &M,
                     const pb_variable_array<FieldType> &packed_W) :
@@ -206,7 +206,7 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                sha256_round_function_component<FieldType>::sha256_round_function_gadget(
+                sha256_round_function_component<FieldType>::sha256_round_function_component(
                     blueprint<FieldType> &pb,
                     const pb_linear_combination_array<FieldType> &a,
                     const pb_linear_combination_array<FieldType> &b,

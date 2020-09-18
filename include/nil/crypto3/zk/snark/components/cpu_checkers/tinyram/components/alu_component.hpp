@@ -23,7 +23,7 @@ namespace nil {
             namespace snark {
 
                 template<typename FieldType>
-                class ALU_gadget : public tinyram_standard_component<FieldType> {
+                class ALU_component : public tinyram_standard_component<FieldType> {
                 private:
                     std::vector<std::shared_ptr<tinyram_standard_component<FieldType>>> components;
 

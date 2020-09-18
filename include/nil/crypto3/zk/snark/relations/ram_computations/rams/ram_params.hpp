@@ -22,7 +22,7 @@ namespace nil {
             namespace snark {
 
                 /*
-                  When declaring a new ramT one should do a make it a class that declares typedefs for:
+                  When declaring a new RAMType one should do a make it a class that declares typedefs for:
 
                   base_field_type
                   ram_cpu_checker_type
@@ -33,33 +33,33 @@ namespace nil {
                   gadget_base_type (e.g. tinyram_component<FieldType>)
                   cpu_state_variable_type (must have pb_variable_array<FieldType> all_vars)
 
-                  The ramT class must also have a static std::size_t variable
+                  The RAMType class must also have a static std::size_t variable
                   timestamp_length, which specifies the zk-SNARK reduction timestamp
                   length.
                 */
 
-                template<typename ramT>
-                using ram_base_field = typename ramT::base_field_type;
+                template<typename RAMType>
+                using ram_base_field = typename RAMType::base_field_type;
 
-                template<typename ramT>
+                template<typename RAMType>
                 using ram_cpu_state = std::vector<bool>;
 
-                template<typename ramT>
+                template<typename RAMType>
                 using ram_boot_trace = memory_store_trace;
 
-                template<typename ramT>
-                using ram_protoboard = typename ramT::protoboard_type;
+                template<typename RAMType>
+                using ram_protoboard = typename RAMType::protoboard_type;
 
-                template<typename ramT>
-                using ram_gadget_base = typename ramT::gadget_base_type;
+                template<typename RAMType>
+                using ram_component_base = typename RAMType::gadget_base_type;
 
-                template<typename ramT>
-                using ram_cpu_checker = typename ramT::cpu_checker_type;
+                template<typename RAMType>
+                using ram_cpu_checker = typename RAMType::cpu_checker_type;
 
-                template<typename ramT>
-                using ram_architecture_params = typename ramT::architecture_params_type;
+                template<typename RAMType>
+                using ram_architecture_params = typename RAMType::architecture_params_type;
 
-                template<typename ramT>
+                template<typename RAMType>
                 using ram_input_tape = std::vector<std::size_t>;
 
                 /*

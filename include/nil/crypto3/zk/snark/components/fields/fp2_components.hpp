@@ -65,7 +65,7 @@ namespace nil {
                  * Gadget that creates constraints for Fp2 by Fp2 multiplication.
                  */
                 template<typename Fp2T>
-                class Fp2_mul_gadget : public component<typename Fp2T::my_Fp> {
+                class Fp2_mul_component : public component<typename Fp2T::my_Fp> {
                 public:
                     typedef typename Fp2T::my_Fp FieldType;
 
@@ -75,7 +75,7 @@ namespace nil {
 
                     variable<FieldType> v1;
 
-                    Fp2_mul_gadget(blueprint<FieldType> &pb,
+                    Fp2_mul_component(blueprint<FieldType> &pb,
                                    const Fp2_variable<Fp2T> &A,
                                    const Fp2_variable<Fp2T> &B,
                                    const Fp2_variable<Fp2T> &result);
@@ -87,7 +87,7 @@ namespace nil {
                  * Gadget that creates constraints for Fp2 multiplication by a linear combination.
                  */
                 template<typename Fp2T>
-                class Fp2_mul_by_lc_gadget : public component<typename Fp2T::my_Fp> {
+                class Fp2_mul_by_lc_component : public component<typename Fp2T::my_Fp> {
                 public:
                     typedef typename Fp2T::my_Fp FieldType;
 
@@ -95,7 +95,7 @@ namespace nil {
                     pb_linear_combination<FieldType> lc;
                     Fp2_variable<Fp2T> result;
 
-                    Fp2_mul_by_lc_gadget(blueprint<FieldType> &pb,
+                    Fp2_mul_by_lc_component(blueprint<FieldType> &pb,
                                          const Fp2_variable<Fp2T> &A,
                                          const pb_linear_combination<FieldType> &lc,
                                          const Fp2_variable<Fp2T> &result);
@@ -107,14 +107,14 @@ namespace nil {
                  * Gadget that creates constraints for Fp2 squaring.
                  */
                 template<typename Fp2T>
-                class Fp2_sqr_gadget : public component<typename Fp2T::my_Fp> {
+                class Fp2_sqr_component : public component<typename Fp2T::my_Fp> {
                 public:
                     typedef typename Fp2T::my_Fp FieldType;
 
                     Fp2_variable<Fp2T> A;
                     Fp2_variable<Fp2T> result;
 
-                    Fp2_sqr_gadget(blueprint<FieldType> &pb,
+                    Fp2_sqr_component(blueprint<FieldType> &pb,
                                    const Fp2_variable<Fp2T> &A,
                                    const Fp2_variable<Fp2T> &result);
                     void generate_r1cs_constraints();
@@ -242,7 +242,7 @@ namespace nil {
                 }
 
                 template<typename Fp2T>
-                Fp2_mul_gadget<Fp2T>::Fp2_mul_gadget(blueprint<FieldType> &pb,
+                Fp2_mul_component<Fp2T>::Fp2_mul_component(blueprint<FieldType> &pb,
                                                      const Fp2_variable<Fp2T> &A,
                                                      const Fp2_variable<Fp2T> &B,
                                                      const Fp2_variable<Fp2T> &result) :
@@ -252,7 +252,7 @@ namespace nil {
                 }
 
                 template<typename Fp2T>
-                void Fp2_mul_gadget<Fp2T>::generate_r1cs_constraints() {
+                void Fp2_mul_component<Fp2T>::generate_r1cs_constraints() {
                     /*
                         Karatsuba multiplication for Fp2:
                             v0 = A.c0 * B.c0
@@ -277,7 +277,7 @@ namespace nil {
                 }
 
                 template<typename Fp2T>
-                void Fp2_mul_gadget<Fp2T>::generate_r1cs_witness() {
+                void Fp2_mul_component<Fp2T>::generate_r1cs_witness() {
                     const FieldType::value_type aA = this->pb.lc_val(A.c0) * this->pb.lc_val(B.c0);
                     this->pb.val(v1) = this->pb.lc_val(A.c1) * this->pb.lc_val(B.c1);
                     this->pb.lc_val(result.c0) = aA + Fp2T::non_residue * this->pb.val(v1);
@@ -287,7 +287,7 @@ namespace nil {
                 }
 
                 template<typename Fp2T>
-                Fp2_mul_by_lc_gadget<Fp2T>::Fp2_mul_by_lc_gadget(blueprint<FieldType> &pb,
+                Fp2_mul_by_lc_component<Fp2T>::Fp2_mul_by_lc_component(blueprint<FieldType> &pb,
                                                                  const Fp2_variable<Fp2T> &A,
                                                                  const pb_linear_combination<FieldType> &lc,
                                                                  const Fp2_variable<Fp2T> &result) :
@@ -296,19 +296,19 @@ namespace nil {
                 }
 
                 template<typename Fp2T>
-                void Fp2_mul_by_lc_gadget<Fp2T>::generate_r1cs_constraints() {
+                void Fp2_mul_by_lc_component<Fp2T>::generate_r1cs_constraints() {
                     this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(A.c0, lc, result.c0));
                     this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(A.c1, lc, result.c1));
                 }
 
                 template<typename Fp2T>
-                void Fp2_mul_by_lc_gadget<Fp2T>::generate_r1cs_witness() {
+                void Fp2_mul_by_lc_component<Fp2T>::generate_r1cs_witness() {
                     this->pb.lc_val(result.c0) = this->pb.lc_val(A.c0) * this->pb.lc_val(lc);
                     this->pb.lc_val(result.c1) = this->pb.lc_val(A.c1) * this->pb.lc_val(lc);
                 }
 
                 template<typename Fp2T>
-                Fp2_sqr_gadget<Fp2T>::Fp2_sqr_gadget(blueprint<FieldType> &pb,
+                Fp2_sqr_component<Fp2T>::Fp2_sqr_component(blueprint<FieldType> &pb,
                                                      const Fp2_variable<Fp2T> &A,
                                                      const Fp2_variable<Fp2T> &result) :
                     component<FieldType>(pb),
@@ -316,7 +316,7 @@ namespace nil {
                 }
 
                 template<typename Fp2T>
-                void Fp2_sqr_gadget<Fp2T>::generate_r1cs_constraints() {
+                void Fp2_sqr_component<Fp2T>::generate_r1cs_constraints() {
                     /*
                         Complex multiplication for Fp2:
                             v0 = A.c0 * A.c1
@@ -339,7 +339,7 @@ namespace nil {
                 }
 
                 template<typename Fp2T>
-                void Fp2_sqr_gadget<Fp2T>::generate_r1cs_witness() {
+                void Fp2_sqr_component<Fp2T>::generate_r1cs_witness() {
                     const typename FieldType::value_type a = this->pb.lc_val(A.c0);
                     const typename FieldType::value_type b = this->pb.lc_val(A.c1);
                     this->pb.lc_val(result.c1) = typename FieldType::value_type(2) * a * b;

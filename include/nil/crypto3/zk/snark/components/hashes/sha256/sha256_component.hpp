@@ -26,7 +26,7 @@ namespace nil {
                  * Gadget for the SHA256 compression function.
                  */
                 template<typename FieldType>
-                class sha256_compression_function_gadget : public component<FieldType> {
+                class sha256_compression_function_component : public component<FieldType> {
                 public:
                     std::vector<pb_linear_combination_array<FieldType>> round_a;
                     std::vector<pb_linear_combination_array<FieldType>> round_b;
@@ -50,7 +50,7 @@ namespace nil {
                     pb_variable_array<FieldType> new_block;
                     digest_variable<FieldType> output;
 
-                    sha256_compression_function_gadget(blueprint<FieldType> &pb,
+                    sha256_compression_function_component(blueprint<FieldType> &pb,
                                                        const pb_linear_combination_array<FieldType> &prev_output,
                                                        const pb_variable_array<FieldType> &new_block,
                                                        const digest_variable<FieldType> &output);
@@ -62,22 +62,22 @@ namespace nil {
                  * Gadget for the SHA256 compression function, viewed as a 2-to-1 hash
                  * function, and using the same initialization vector as in SHA256
                  * specification. Thus, any collision for
-                 * sha256_two_to_one_hash_gadget trivially extends to a collision for
+                 * sha256_two_to_one_hash_component trivially extends to a collision for
                  * full SHA256 (by appending the same padding).
                  */
                 template<typename FieldType>
-                class sha256_two_to_one_hash_gadget : public component<FieldType> {
+                class sha256_two_to_one_hash_component : public component<FieldType> {
                 public:
                     typedef std::vector<bool> hash_value_type;
                     typedef merkle_authentication_path merkle_authentication_path_type;
 
                     std::shared_ptr<sha256_compression_function_component<FieldType>> f;
 
-                    sha256_two_to_one_hash_gadget(blueprint<FieldType> &pb,
+                    sha256_two_to_one_hash_component(blueprint<FieldType> &pb,
                                                   const digest_variable<FieldType> &left,
                                                   const digest_variable<FieldType> &right,
                                                   const digest_variable<FieldType> &output);
-                    sha256_two_to_one_hash_gadget(blueprint<FieldType> &pb,
+                    sha256_two_to_one_hash_component(blueprint<FieldType> &pb,
                                                   size_t block_length,
                                                   const block_variable<FieldType> &input_block,
                                                   const digest_variable<FieldType> &output);
@@ -94,7 +94,7 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                sha256_compression_function_component<FieldType>::sha256_compression_function_gadget(
+                sha256_compression_function_component<FieldType>::sha256_compression_function_component(
                     blueprint<FieldType> &pb,
                     const pb_linear_combination_array<FieldType> &prev_output,
                     const pb_variable_array<FieldType> &new_block,
@@ -214,7 +214,7 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                sha256_two_to_one_hash_component<FieldType>::sha256_two_to_one_hash_gadget(
+                sha256_two_to_one_hash_component<FieldType>::sha256_two_to_one_hash_component(
                     blueprint<FieldType> &pb,
                     const digest_variable<FieldType> &left,
                     const digest_variable<FieldType> &right,
@@ -231,7 +231,7 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                sha256_two_to_one_hash_component<FieldType>::sha256_two_to_one_hash_gadget(
+                sha256_two_to_one_hash_component<FieldType>::sha256_two_to_one_hash_component(
                     blueprint<FieldType> &pb,
                     size_t block_length,
                     const block_variable<FieldType> &input_block,

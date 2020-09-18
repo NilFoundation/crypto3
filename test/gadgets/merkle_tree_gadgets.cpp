@@ -7,7 +7,7 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#define BOOST_TEST_MODULE merkle_tree_gadgets_test
+#define BOOST_TEST_MODULE merkle_tree_components_test
 
 #include <boost/test/unit_test.hpp>
 
@@ -24,22 +24,22 @@ using namespace nil::crypto3;
 using namespace nil::crypto3::zk::snark;
 
 template<typename CurveType>
-void test_all_merkle_tree_gadgets() {
+void test_all_merkle_tree_components() {
     typedef typename CurveType::scalar_field_type FieldType;
-    test_merkle_tree_check_read_gadget<FieldType, CRH_with_bit_out_component<FieldType>>();
-    test_merkle_tree_check_read_gadget<FieldType, sha256_two_to_one_hash_component<FieldType>>();
+    test_merkle_tree_check_read_component<FieldType, crh_with_bit_out_component<FieldType>>();
+    test_merkle_tree_check_read_component<FieldType, sha256_two_to_one_hash_component<FieldType>>();
 
-    test_merkle_tree_check_update_gadget<FieldType, CRH_with_bit_out_component<FieldType>>();
-    test_merkle_tree_check_update_gadget<FieldType, sha256_two_to_one_hash_component<FieldType>>();
+    test_merkle_tree_check_update_component<FieldType, crh_with_bit_out_component<FieldType>>();
+    test_merkle_tree_check_update_component<FieldType, sha256_two_to_one_hash_component<FieldType>>();
 }
 
-BOOST_AUTO_TEST_SUITE(merkle_tree_gadgets_test_suite)
+BOOST_AUTO_TEST_SUITE(merkle_tree_components_test_suite)
 
-BOOST_AUTO_TEST_CASE(merkle_tree_gadgets_test) {
-    test_all_merkle_tree_gadgets<algebra::curves::bn128>();
-    test_all_merkle_tree_gadgets<algebra::curves::edwards>();
-    test_all_merkle_tree_gadgets<algebra::curves::mnt4>();
-    test_all_merkle_tree_gadgets<algebra::curves::mnt6>();
+BOOST_AUTO_TEST_CASE(merkle_tree_components_test) {
+    test_all_merkle_tree_components<algebra::curves::bn128>();
+    test_all_merkle_tree_components<algebra::curves::edwards>();
+    test_all_merkle_tree_components<algebra::curves::mnt4>();
+    test_all_merkle_tree_components<algebra::curves::mnt6>();
 }
 
 BOOST_AUTO_TEST_SUITE_END()

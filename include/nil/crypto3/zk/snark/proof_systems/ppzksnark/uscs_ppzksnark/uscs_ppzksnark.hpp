@@ -48,7 +48,7 @@
 
 #include <memory>
 
-#include <nil/crypto3/zk/snark/detail/accumulation_vector.hpp>
+#include <nil/crypto3/zk/snark/accumulation_vector.hpp>
 #include <nil/crypto3/zk/snark/knowledge_commitment/knowledge_commitment.hpp>
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/uscs/uscs.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/uscs_ppzksnark/uscs_ppzksnark_params.hpp>

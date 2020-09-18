@@ -7,7 +7,7 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#define BOOST_TEST_MODULE sha2_256_gadget_test
+#define BOOST_TEST_MODULE sha2_256_component_test
 
 #include <boost/test/unit_test.hpp>
 
@@ -27,7 +27,7 @@ void test_two_to_one() {
 
     sha256_two_to_one_hash_component<FieldType> f(pb, left, right, output);
     f.generate_r1cs_constraints();
-    printf("Number of constraints for sha256_two_to_one_hash_gadget: %zu\n", pb.num_constraints());
+    printf("Number of constraints for sha256_two_to_one_hash_component: %zu\n", pb.num_constraints());
 
     const std::vector<bool> left_bv, right_bv, hash_bv;
     detail::pack_to<stream_endian::little_octet_big_bit, 32, 1, std::array<std::uint32_t, 8>>(
@@ -50,9 +50,9 @@ void test_two_to_one() {
     BOOST_CHECK(pb.is_satisfied());
 }
 
-BOOST_AUTO_TEST_SUITE(sha2_256_gadget_test_suite)
+BOOST_AUTO_TEST_SUITE(sha2_256_component_test_suite)
 
-BOOST_AUTO_TEST_CASE(sha2_256_gadget_test_case) {
+BOOST_AUTO_TEST_CASE(sha2_256_component_test_case) {
     test_two_to_one<typename curves::bn128::scalar_field_type>();
 }
 

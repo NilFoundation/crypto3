@@ -20,7 +20,7 @@ namespace nil {
             namespace snark {
 
                 template<typename FieldType>
-                class lastbits_gadget : public component<FieldType> {
+                class lastbits_component : public component<FieldType> {
                 public:
                     variable<FieldType> X;
                     std::size_t X_bits;
@@ -31,7 +31,7 @@ namespace nil {
                     std::shared_ptr<packing_component<FieldType>> unpack_bits;
                     std::shared_ptr<packing_component<FieldType>> pack_result;
 
-                    lastbits_gadget(blueprint<FieldType> &pb,
+                    lastbits_component(blueprint<FieldType> &pb,
                                     const variable<FieldType> &X,
                                     std::size_t X_bits,
                                     const variable<FieldType> &result,
@@ -42,7 +42,7 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                class XOR3_gadget : public component<FieldType> {
+                class XOR3_component : public component<FieldType> {
                 private:
                     variable<FieldType> tmp;
 
@@ -53,7 +53,7 @@ namespace nil {
                     bool assume_C_is_zero;
                     pb_linear_combination<FieldType> out;
 
-                    XOR3_gadget(blueprint<FieldType> &pb,
+                    XOR3_component(blueprint<FieldType> &pb,
                                 const pb_linear_combination<FieldType> &A,
                                 const pb_linear_combination<FieldType> &B,
                                 const pb_linear_combination<FieldType> &C,
@@ -66,7 +66,7 @@ namespace nil {
 
                 /* Page 10 of http://csrc.nist.gov/publications/fips/fips180-4/fips-180-4.pdf */
                 template<typename FieldType>
-                class small_sigma_gadget : public component<FieldType> {
+                class small_sigma_component : public component<FieldType> {
                 private:
                     pb_variable_array<FieldType> W;
                     variable<FieldType> result;
@@ -76,7 +76,7 @@ namespace nil {
                     std::vector<std::shared_ptr<XOR3_component<FieldType>>> compute_bits;
                     std::shared_ptr<packing_component<FieldType>> pack_result;
 
-                    small_sigma_gadget(blueprint<FieldType> &pb,
+                    small_sigma_component(blueprint<FieldType> &pb,
                                        const pb_variable_array<FieldType> &W,
                                        const variable<FieldType> &result,
                                        std::size_t rot1,
@@ -89,7 +89,7 @@ namespace nil {
 
                 /* Page 10 of http://csrc.nist.gov/publications/fips/fips180-4/fips-180-4.pdf */
                 template<typename FieldType>
-                class big_sigma_gadget : public component<FieldType> {
+                class big_sigma_component : public component<FieldType> {
                 private:
                     pb_linear_combination_array<FieldType> W;
                     variable<FieldType> result;
@@ -99,7 +99,7 @@ namespace nil {
                     std::vector<std::shared_ptr<XOR3_component<FieldType>>> compute_bits;
                     std::shared_ptr<packing_component<FieldType>> pack_result;
 
-                    big_sigma_gadget(blueprint<FieldType> &pb,
+                    big_sigma_component(blueprint<FieldType> &pb,
                                      const pb_linear_combination_array<FieldType> &W,
                                      const variable<FieldType> &result,
                                      std::size_t rot1,
@@ -112,7 +112,7 @@ namespace nil {
 
                 /* Page 10 of http://csrc.nist.gov/publications/fips/fips180-4/fips-180-4.pdf */
                 template<typename FieldType>
-                class choice_gadget : public component<FieldType> {
+                class choice_component : public component<FieldType> {
                 private:
                     pb_variable_array<FieldType> result_bits;
 
@@ -123,7 +123,7 @@ namespace nil {
                     variable<FieldType> result;
                     std::shared_ptr<packing_component<FieldType>> pack_result;
 
-                    choice_gadget(blueprint<FieldType> &pb, const pb_linear_combination_array<FieldType> &X,
+                    choice_component(blueprint<FieldType> &pb, const pb_linear_combination_array<FieldType> &X,
                                   const pb_linear_combination_array<FieldType> &Y,
                                   const pb_linear_combination_array<FieldType> &Z,
                                   const variable<FieldType> &result);
@@ -134,7 +134,7 @@ namespace nil {
 
                 /* Page 10 of http://csrc.nist.gov/publications/fips/fips180-4/fips-180-4.pdf */
                 template<typename FieldType>
-                class majority_gadget : public component<FieldType> {
+                class majority_component : public component<FieldType> {
                 private:
                     pb_variable_array<FieldType> result_bits;
                     std::shared_ptr<packing_component<FieldType>> pack_result;
@@ -145,7 +145,7 @@ namespace nil {
                     pb_linear_combination_array<FieldType> Z;
                     variable<FieldType> result;
 
-                    majority_gadget(blueprint<FieldType> &pb,
+                    majority_component(blueprint<FieldType> &pb,
                                     const pb_linear_combination_array<FieldType> &X,
                                     const pb_linear_combination_array<FieldType> &Y,
                                     const pb_linear_combination_array<FieldType> &Z,
@@ -156,7 +156,7 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                lastbits_component<FieldType>::lastbits_gadget(blueprint<FieldType> &pb,
+                lastbits_component<FieldType>::lastbits_component(blueprint<FieldType> &pb,
                                                             const variable<FieldType> &X,
                                                             std::size_t X_bits,
                                                             const variable<FieldType> &result,
@@ -187,7 +187,7 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                XOR3_component<FieldType>::XOR3_gadget(blueprint<FieldType> &pb,
+                XOR3_component<FieldType>::XOR3_component(blueprint<FieldType> &pb,
                                                     const pb_linear_combination<FieldType> &A,
                                                     const pb_linear_combination<FieldType> &B,
                                                     const pb_linear_combination<FieldType> &C,
@@ -231,7 +231,7 @@ namespace nil {
 
                 /* Page 10 of http://csrc.nist.gov/publications/fips/fips180-4/fips-180-4.pdf */
                 template<typename FieldType>
-                small_sigma_component<FieldType>::small_sigma_gadget(blueprint<FieldType> &pb,
+                small_sigma_component<FieldType>::small_sigma_component(blueprint<FieldType> &pb,
                                                                   const pb_variable_array<FieldType> &W,
                                                                   const variable<FieldType> &result,
                                                                   std::size_t rot1,
@@ -268,7 +268,7 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                big_sigma_component<FieldType>::big_sigma_gadget(blueprint<FieldType> &pb,
+                big_sigma_component<FieldType>::big_sigma_component(blueprint<FieldType> &pb,
                                                               const pb_linear_combination_array<FieldType> &W,
                                                               const variable<FieldType> &result,
                                                               std::size_t rot1,
@@ -307,7 +307,7 @@ namespace nil {
 
                 /* Page 10 of http://csrc.nist.gov/publications/fips/fips180-4/fips-180-4.pdf */
                 template<typename FieldType>
-                choice_component<FieldType>::choice_gadget(blueprint<FieldType> &pb,
+                choice_component<FieldType>::choice_component(blueprint<FieldType> &pb,
                                                         const pb_linear_combination_array<FieldType> &X,
                                                         const pb_linear_combination_array<FieldType> &Y,
                                                         const pb_linear_combination_array<FieldType> &Z,
@@ -343,7 +343,7 @@ namespace nil {
 
                 /* Page 10 of http://csrc.nist.gov/publications/fips/fips180-4/fips-180-4.pdf */
                 template<typename FieldType>
-                majority_component<FieldType>::majority_gadget(blueprint<FieldType> &pb,
+                majority_component<FieldType>::majority_component(blueprint<FieldType> &pb,
                                                             const pb_linear_combination_array<FieldType> &X,
                                                             const pb_linear_combination_array<FieldType> &Y,
                                                             const pb_linear_combination_array<FieldType> &Z,

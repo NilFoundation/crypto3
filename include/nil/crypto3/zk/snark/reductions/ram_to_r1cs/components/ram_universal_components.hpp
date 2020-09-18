@@ -6,7 +6,7 @@
 // See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
-// @file Declaration of interfaces for ram_universal_gadget.
+// @file Declaration of interfaces for ram_universal_component.
 //
 // Given bounds on a RAM computation size (program size bound, primary input
 // size bound, and time bound), the "RAM universal gadget" checks the correct
@@ -14,7 +14,7 @@
 //
 // The implementation follows, extends, and optimizes the approach described
 // in \[BCTV14] (itself building on \[BCGTV13]). The code is parameterized by
-// the template parameter ramT, in order to support any RAM that fits certain
+// the template parameter RAMType, in order to support any RAM that fits certain
 // abstract interfaces.
 //
 // Roughly, the gadget has three main components:
@@ -43,8 +43,8 @@
 #define CRYPTO3_ZK_RAM_UNIVERSAL_GADGET_HPP_
 
 #include <nil/crypto3/zk/snark/components/routing/as_waksman_routing_components.hpp>
-#include <nil/crypto3/zk/snark/reductions/ram_to_r1cs/gadgets/memory_checker_gadget.hpp>
-#include <nil/crypto3/zk/snark/reductions/ram_to_r1cs/gadgets/trace_lines.hpp>
+#include <nil/crypto3/zk/snark/reductions/ram_to_r1cs/components/memory_checker_component.hpp>
+#include <nil/crypto3/zk/snark/reductions/ram_to_r1cs/components/trace_lines.hpp>
 #include <nil/crypto3/zk/snark/relations/ram_computations/rams/ram_params.hpp>
 
 namespace nil {
@@ -84,26 +84,26 @@ namespace nil {
                   verifier.
                 */
 
-                template<typename ramT>
-                class ram_universal_gadget : public ram_gadget_base<ramT> {
+                template<typename RAMType>
+                class ram_universal_component : public ram_component_base<RAMType> {
                 public:
-                    typedef ram_base_field<ramT> FieldType;
+                    typedef ram_base_field<RAMType> FieldType;
 
                     std::size_t num_memory_lines;
 
-                    std::vector<memory_line_variable_gadget<ramT>> boot_lines;
+                    std::vector<memory_line_variable_component<RAMType>> boot_lines;
                     std::vector<pb_variable_array<FieldType>> boot_line_bits;
                     std::vector<multipacking_component<FieldType>> unpack_boot_lines;
 
-                    std::vector<memory_line_variable_gadget<ramT>> load_instruction_lines;
-                    std::vector<execution_line_variable_gadget<ramT>>
+                    std::vector<memory_line_variable_component<RAMType>> load_instruction_lines;
+                    std::vector<execution_line_variable_component<RAMType>>
                         execution_lines; /* including the initial execution line */
 
-                    std::vector<memory_line_variable_gadget<ramT> *> unrouted_memory_lines;
-                    std::vector<memory_line_variable_gadget<ramT>> routed_memory_lines;
+                    std::vector<memory_line_variable_component<RAMType> *> unrouted_memory_lines;
+                    std::vector<memory_line_variable_component<RAMType>> routed_memory_lines;
 
-                    std::vector<ram_cpu_checker<ramT>> execution_checkers;
-                    std::vector<memory_checker_gadget<ramT>> memory_checkers;
+                    std::vector<ram_cpu_checker<RAMType>> execution_checkers;
+                    std::vector<memory_checker_component<RAMType>> memory_checkers;
 
                     std::vector<pb_variable_array<FieldType>> routing_inputs;
                     std::vector<pb_variable_array<FieldType>> routing_outputs;
@@ -115,30 +115,30 @@ namespace nil {
                     std::size_t time_bound;
                     pb_variable_array<FieldType> packed_input;
 
-                    ram_universal_gadget(ram_protoboard<ramT> &pb,
+                    ram_universal_component(ram_protoboard<RAMType> &pb,
                                          const std::size_t boot_trace_size_bound,
                                          const std::size_t time_bound,
                                          const pb_variable_array<FieldType> &packed_input);
 
                     void generate_r1cs_constraints();
-                    void generate_r1cs_witness(const ram_boot_trace<ramT> &boot_trace,
-                                               const ram_input_tape<ramT> &auxiliary_input);
+                    void generate_r1cs_witness(const ram_boot_trace<RAMType> &boot_trace,
+                                               const ram_input_tape<RAMType> &auxiliary_input);
 
                     /* both methods assume that generate_r1cs_witness has been called */
                     void print_execution_trace() const;
                     void print_memory_trace() const;
 
-                    static std::size_t packed_input_element_size(const ram_architecture_params<ramT> &ap);
-                    static std::size_t packed_input_size(const ram_architecture_params<ramT> &ap,
+                    static std::size_t packed_input_element_size(const ram_architecture_params<RAMType> &ap);
+                    static std::size_t packed_input_size(const ram_architecture_params<RAMType> &ap,
                                                     const std::size_t boot_trace_size_bound);
                 };
 
-                template<typename ramT>
-                ram_universal_gadget<ramT>::ram_universal_gadget(ram_protoboard<ramT> &pb,
+                template<typename RAMType>
+                ram_universal_component<RAMType>::ram_universal_component(ram_protoboard<RAMType> &pb,
                                                                  const std::size_t boot_trace_size_bound,
                                                                  const std::size_t time_bound,
                                                                  const pb_variable_array<FieldType> &packed_input) :
-                    ram_gadget_base<ramT>(pb),
+                    ram_component_base<RAMType>(pb),
                     boot_trace_size_bound(boot_trace_size_bound), time_bound(time_bound), packed_input(packed_input) {
                     num_memory_lines = boot_trace_size_bound + (time_bound + 1) +
                                        time_bound; /* boot lines, (time_bound + 1) execution lines (including initial)
@@ -147,12 +147,12 @@ namespace nil {
 
                     /* allocate all lines on the execution side of the routing network */
                     execution_lines.reserve(1 + time_bound);
-                    execution_lines.emplace_back(execution_line_variable_gadget<ramT>(pb, timestamp_size, pb.ap));
+                    execution_lines.emplace_back(execution_line_variable_component<RAMType>(pb, timestamp_size, pb.ap));
                     unrouted_memory_lines.emplace_back(&execution_lines[0]);
 
                     boot_lines.reserve(boot_trace_size_bound);
                     for (std::size_t i = 0; i < boot_trace_size_bound; ++i) {
-                        boot_lines.emplace_back(memory_line_variable_gadget<ramT>(pb, timestamp_size, pb.ap));
+                        boot_lines.emplace_back(memory_line_variable_component<RAMType>(pb, timestamp_size, pb.ap));
                         unrouted_memory_lines.emplace_back(&boot_lines[i]);
                     }
 
@@ -161,13 +161,13 @@ namespace nil {
                                                           coding (i.e. the (unused) result of next PC) */
                     for (std::size_t i = 0; i < time_bound; ++i) {
                         load_instruction_lines.emplace_back(
-                            memory_line_variable_gadget<ramT>(pb, timestamp_size, pb.ap));
+                            memory_line_variable_component<RAMType>(pb, timestamp_size, pb.ap));
                         unrouted_memory_lines.emplace_back(&load_instruction_lines[i]);
 
-                        execution_lines.emplace_back(execution_line_variable_gadget<ramT>(pb, timestamp_size, pb.ap));
+                        execution_lines.emplace_back(execution_line_variable_component<RAMType>(pb, timestamp_size, pb.ap));
                         unrouted_memory_lines.emplace_back(&execution_lines[i + 1]);
                     }
-                    load_instruction_lines.emplace_back(memory_line_variable_gadget<ramT>(pb, timestamp_size, pb.ap));
+                    load_instruction_lines.emplace_back(memory_line_variable_component<RAMType>(pb, timestamp_size, pb.ap));
 
                     /* deal with packing of the input */
                     const std::size_t line_size_bits = pb.ap.address_size() + pb.ap.value_size();
@@ -196,7 +196,7 @@ namespace nil {
 
                     /* deal with routing */
                     for (std::size_t i = 0; i < num_memory_lines; ++i) {
-                        routed_memory_lines.emplace_back(memory_line_variable_gadget<ramT>(pb, timestamp_size, pb.ap));
+                        routed_memory_lines.emplace_back(memory_line_variable_component<RAMType>(pb, timestamp_size, pb.ap));
                     }
 
                     routing_inputs.reserve(num_memory_lines);
@@ -214,7 +214,7 @@ namespace nil {
                     execution_checkers.reserve(time_bound);
                     for (std::size_t i = 0; i < time_bound; ++i) {
                         execution_checkers.emplace_back(
-                            ram_cpu_checker<ramT>(pb,
+                            ram_cpu_checker<RAMType>(pb,
                                                   load_instruction_lines[i].address->bits,           // prev_pc_addr
                                                   load_instruction_lines[i].contents_after->bits,    // prev_pc_val
                                                   execution_lines[i].cpu_state,                      // prev_state
@@ -229,14 +229,14 @@ namespace nil {
 
                     memory_checkers.reserve(num_memory_lines);
                     for (std::size_t i = 0; i < num_memory_lines; ++i) {
-                        memory_checkers.emplace_back(memory_checker_gadget<ramT>(
+                        memory_checkers.emplace_back(memory_checker_component<RAMType>(
                             pb, timestamp_size, *unrouted_memory_lines[i], routed_memory_lines[i]));
                     }
                     /* done */
                 }
 
-                template<typename ramT>
-                void ram_universal_gadget<ramT>::generate_r1cs_constraints() {
+                template<typename RAMType>
+                void ram_universal_component<RAMType>::generate_r1cs_constraints() {
                     for (std::size_t i = 0; i < boot_trace_size_bound; ++i) {
                         unpack_boot_lines[i].generate_r1cs_constraints(false);
                     }
@@ -301,9 +301,9 @@ namespace nil {
                     const std::size_t num_variables = this->pb.num_variables();
                 }
 
-                template<typename ramT>
-                void ram_universal_gadget<ramT>::generate_r1cs_witness(const ram_boot_trace<ramT> &boot_trace,
-                                                                       const ram_input_tape<ramT> &auxiliary_input) {
+                template<typename RAMType>
+                void ram_universal_component<RAMType>::generate_r1cs_witness(const ram_boot_trace<RAMType> &boot_trace,
+                                                                       const ram_input_tape<RAMType> &auxiliary_input) {
                     /* assign correct timestamps to all lines */
                     for (std::size_t i = 0; i < num_memory_lines; ++i) {
                         this->pb.val(unrouted_memory_lines[i]->timestamp->packed) = typename FieldType::value_type(i);
@@ -311,7 +311,7 @@ namespace nil {
                     }
 
                     /* fill in the initial state */
-                    const ram_cpu_state<ramT> initial_state = this->pb.ap.initial_cpu_state();
+                    const ram_cpu_state<RAMType> initial_state = this->pb.ap.initial_cpu_state();
                     execution_lines[0].cpu_state.fill_with_bits(this->pb, initial_state);
 
                     /* fill in the boot section */
@@ -333,7 +333,7 @@ namespace nil {
                     /* do the actual execution */
                     ra_memory mem_backend(1ul << (this->pb.ap.address_size()), this->pb.ap.value_size(),
                                           memory_after_boot);
-                    typename ram_input_tape<ramT>::const_iterator auxiliary_input_it = auxiliary_input.begin();
+                    typename ram_input_tape<RAMType>::const_iterator auxiliary_input_it = auxiliary_input.begin();
 
                     this->pb.val(load_instruction_lines[0].address->packed) =
                         typename FieldType::value_type(this->pb.ap.initial_pc_addr(), true);
@@ -425,8 +425,8 @@ namespace nil {
                     }
                 }
 
-                template<typename ramT>
-                void ram_universal_gadget<ramT>::print_execution_trace() const {
+                template<typename RAMType>
+                void ram_universal_component<RAMType>::print_execution_trace() const {
                     for (std::size_t i = 0; i < boot_trace_size_bound; ++i) {
                         printf("Boot process at t=#%zu: store %zu at %zu\n",
                                i,
@@ -456,8 +456,8 @@ namespace nil {
                     }
                 }
 
-                template<typename ramT>
-                void ram_universal_gadget<ramT>::print_memory_trace() const {
+                template<typename RAMType>
+                void ram_universal_component<RAMType>::print_memory_trace() const {
                     for (std::size_t i = 0; i < num_memory_lines; ++i) {
                         printf("Memory access #%zu:\n", i);
                         printf("  Time side  : ts = %zu, address = %zu, contents_before = %zu, contents_after = %zu\n",
@@ -473,8 +473,8 @@ namespace nil {
                     }
                 }
 
-                template<typename ramT>
-                std::size_t ram_universal_gadget<ramT>::packed_input_element_size(const ram_architecture_params<ramT> &ap) {
+                template<typename RAMType>
+                std::size_t ram_universal_component<RAMType>::packed_input_element_size(const ram_architecture_params<RAMType> &ap) {
                     const std::size_t line_size_bits = ap.address_size() + ap.value_size();
                     const std::size_t max_chunk_size = FieldType::capacity();
                     const std::size_t packed_line_size = (line_size_bits + (max_chunk_size - 1)) / max_chunk_size;
@@ -482,8 +482,8 @@ namespace nil {
                     return packed_line_size;
                 }
 
-                template<typename ramT>
-                std::size_t ram_universal_gadget<ramT>::packed_input_size(const ram_architecture_params<ramT> &ap,
+                template<typename RAMType>
+                std::size_t ram_universal_component<RAMType>::packed_input_size(const ram_architecture_params<RAMType> &ap,
                                                                      const std::size_t boot_trace_size_bound) {
                     return packed_input_element_size(ap) * boot_trace_size_bound;
                 }

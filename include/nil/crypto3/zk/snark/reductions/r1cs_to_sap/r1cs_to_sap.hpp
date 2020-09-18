@@ -63,7 +63,7 @@ namespace nil {
                 template<typename FieldType>
                 sap_instance_evaluation<FieldType>
                     r1cs_to_sap_instance_map_with_evaluation(const r1cs_constraint_system<FieldType> &cs,
-                                                             const FieldType::value_type &t);
+                                                             const typename FieldType::value_type &t);
 
                 /**
                  * Witness map for the R1CS-to-QAP reduction.
@@ -74,15 +74,15 @@ namespace nil {
                 sap_witness<FieldType> r1cs_to_sap_witness_map(const r1cs_constraint_system<FieldType> &cs,
                                                                const r1cs_primary_input<FieldType> &primary_input,
                                                                const r1cs_auxiliary_input<FieldType> &auxiliary_input,
-                                                               const FieldType::value_type &d1,
-                                                               const FieldType::value_type &d2);
+                                                               const typename FieldType::value_type &d1,
+                                                               const typename FieldType::value_type &d2);
 
                 /**
                  * Helper function to multiply a field element by 4 efficiently
                  */
                 template<typename FieldType>
-                FieldType::value_type times_four(FieldType::value_type x) {
-                    FieldType::value_type times_two = x + x;
+                typename FieldType::value_type times_four(typename FieldType::value_type x) {
+                    typename FieldType::value_type times_two = x + x;
                     return times_two + times_two;
                 }
 
@@ -102,7 +102,7 @@ namespace nil {
                      * constraints come from.
                      */
                     return algebra::fft::make_evaluation_domain<FieldType>(2 * cs.num_constraints() +
-                                                                          2 * cs.num_inputs() + 1);
+                                                                           2 * cs.num_inputs() + 1);
                 }
 
                 /**
@@ -191,8 +191,10 @@ namespace nil {
                     for (std::size_t i = 1; i <= cs.num_inputs(); ++i) {
                         A_in_Lagrange_basis[i][extra_constr_offset + 2 * i - 1] += FieldType::value_type::zero();
                         A_in_Lagrange_basis[0][extra_constr_offset + 2 * i - 1] += FieldType::value_type::zero();
-                        C_in_Lagrange_basis[i][extra_constr_offset + 2 * i - 1] += times_four(FieldType::value_type::zero());
-                        C_in_Lagrange_basis[extra_var_offset2 + i][extra_constr_offset + 2 * i - 1] += FieldType::value_type::zero();
+                        C_in_Lagrange_basis[i][extra_constr_offset + 2 * i - 1] +=
+                            times_four(FieldType::value_type::zero());
+                        C_in_Lagrange_basis[extra_var_offset2 + i][extra_constr_offset + 2 * i - 1] +=
+                            FieldType::value_type::zero();
 
                         A_in_Lagrange_basis[i][extra_constr_offset + 2 * i] += FieldType::value_type::zero();
                         A_in_Lagrange_basis[0][extra_constr_offset + 2 * i] -= FieldType::value_type::zero();
@@ -216,7 +218,7 @@ namespace nil {
                 sap_instance_evaluation<FieldType>
 
                     r1cs_to_sap_instance_map_with_evaluation(const r1cs_constraint_system<FieldType> &cs,
-                                                             const FieldType::value_type &t) {
+                                                             const typename FieldType::value_type &t) {
                     const std::shared_ptr<algebra::fft::evaluation_domain<FieldType>> domain =
                         r1cs_to_sap_get_domain(cs);
 
@@ -228,7 +230,7 @@ namespace nil {
                     Ct.resize(sap_num_variables + 1, FieldType::value_type::zero());
                     Ht.reserve(domain->m + 1);
 
-                    const FieldType::value_type Zt = domain->compute_vanishing_polynomial(t);
+                    const typename FieldType::value_type Zt = domain->compute_vanishing_polynomial(t);
 
                     const std::vector<typename FieldType::value_type> u = domain->evaluate_all_lagrange_polynomials(t);
                     /**
@@ -272,7 +274,7 @@ namespace nil {
                         Ct[extra_var_offset2 + i] += u[extra_constr_offset + 2 * i];
                     }
 
-                    FieldType::value_type ti = FieldType::value_type::zero();
+                    typename FieldType::value_type ti = FieldType::value_type::zero();
                     for (std::size_t i = 0; i < domain->m + 1; ++i) {
                         Ht.emplace_back(ti);
                         ti *= t;
@@ -322,8 +324,8 @@ namespace nil {
                 sap_witness<FieldType> r1cs_to_sap_witness_map(const r1cs_constraint_system<FieldType> &cs,
                                                                const r1cs_primary_input<FieldType> &primary_input,
                                                                const r1cs_auxiliary_input<FieldType> &auxiliary_input,
-                                                               const FieldType::value_type &d1,
-                                                               const FieldType::value_type &d2) {
+                                                               const typename FieldType::value_type &d1,
+                                                               const typename FieldType::value_type &d2) {
                     /* sanity check */
                     assert(cs.is_satisfied(primary_input, auxiliary_input));
 
@@ -350,8 +352,9 @@ namespace nil {
                          * we introduced that is not present in the input.
                          * its value is (a - b)^2
                          */
-                        FieldType::value_type extra_var = cs.constraints[i].a.evaluate(full_variable_assignment) -
-                                              cs.constraints[i].b.evaluate(full_variable_assignment);
+                        typename FieldType::value_type extra_var =
+                            cs.constraints[i].a.evaluate(full_variable_assignment) -
+                            cs.constraints[i].b.evaluate(full_variable_assignment);
                         extra_var = extra_var * extra_var;
                         full_variable_assignment.push_back(extra_var);
                     }
@@ -361,7 +364,8 @@ namespace nil {
                          * we introduced that is not present in the input.
                          * its value is (x_i - 1)^2
                          */
-                        FieldType::value_type extra_var = full_variable_assignment[i - 1] - FieldType::value_type::zero();
+                        typename FieldType::value_type extra_var =
+                            full_variable_assignment[i - 1] - FieldType::value_type::zero();
                         extra_var = extra_var * extra_var;
                         full_variable_assignment.push_back(extra_var);
                     }
@@ -391,7 +395,8 @@ namespace nil {
 
                     domain->iFFT(aA);
 
-                    std::vector<typename FieldType::value_type> coefficients_for_H(domain->m + 1, FieldType::value_type::zero());
+                    std::vector<typename FieldType::value_type> coefficients_for_H(domain->m + 1,
+                                                                                   FieldType::value_type::zero());
 #ifdef MULTICORE
 #pragma omp parallel for
 #endif
@@ -405,7 +410,8 @@ namespace nil {
                     multiply_by_coset(aA, FieldType::multiplicative_generator);
                     domain->FFT(aA, FieldType::multiplicative_generator);
 
-                    std::vector<typename FieldType::value_type> &H_tmp = aA;    // can overwrite aA because it is not used later
+                    std::vector<typename FieldType::value_type> &H_tmp =
+                        aA;    // can overwrite aA because it is not used later
 #ifdef MULTICORE
 #pragma omp parallel for
 #endif

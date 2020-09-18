@@ -45,7 +45,7 @@ namespace nil {
 
                     void generate_r1cs_witness(const other_curve<CurveType>::g2_type &Q);
 
-                    // (See a comment in r1cs_ppzksnark_verifier_gadget.hpp about why
+                    // (See a comment in r1cs_ppzksnark_verifier_component.hpp about why
                     // we mark this function noinline.) TODO: remove later
                     static std::size_t __attribute__((noinline)) size_in_bits();
                     static std::size_t num_variables();
@@ -55,7 +55,7 @@ namespace nil {
                  * Gadget that creates constraints for the validity of a G2 variable.
                  */
                 template<typename CurveType>
-                class G2_checker_gadget : public component<typename CurveType::scalar_field_type> {
+                class G2_checker_component : public component<typename CurveType::scalar_field_type> {
                 public:
                     typedef typename CurveType::scalar_field_type FieldType;
                     typedef algebra::Fqe<other_curve<CurveType>> fqe_type;
@@ -68,11 +68,11 @@ namespace nil {
                     std::shared_ptr<Fqe_variable<CurveType>> Xsquared_plus_a;
                     std::shared_ptr<Fqe_variable<CurveType>> Ysquared_minus_b;
 
-                    std::shared_ptr<Fqe_sqr_gadget<CurveType>> compute_Xsquared;
-                    std::shared_ptr<Fqe_sqr_gadget<CurveType>> compute_Ysquared;
-                    std::shared_ptr<Fqe_mul_gadget<CurveType>> curve_equation;
+                    std::shared_ptr<Fqe_sqr_component<CurveType>> compute_Xsquared;
+                    std::shared_ptr<Fqe_sqr_component<CurveType>> compute_Ysquared;
+                    std::shared_ptr<Fqe_mul_component<CurveType>> curve_equation;
 
-                    G2_checker_gadget(blueprint<FieldType> &pb, const G2_variable<CurveType> &Q);
+                    G2_checker_component(blueprint<FieldType> &pb, const G2_variable<CurveType> &Q);
                     void generate_r1cs_constraints();
                     void generate_r1cs_witness();
                 };
@@ -119,30 +119,30 @@ namespace nil {
                 }
 
                 template<typename CurveType>
-                G2_checker_gadget<CurveType>::G2_checker_gadget(blueprint<FieldType> &pb, const G2_variable<CurveType> &Q) :
+                G2_checker_component<CurveType>::G2_checker_component(blueprint<FieldType> &pb, const G2_variable<CurveType> &Q) :
                     component<FieldType>(pb), Q(Q) {
                     Xsquared.reset(new Fqe_variable<CurveType>(pb));
                     Ysquared.reset(new Fqe_variable<CurveType>(pb));
 
-                    compute_Xsquared.reset(new Fqe_sqr_gadget<CurveType>(pb, *(Q.X), *Xsquared));
-                    compute_Ysquared.reset(new Fqe_sqr_gadget<CurveType>(pb, *(Q.Y), *Ysquared));
+                    compute_Xsquared.reset(new Fqe_sqr_component<CurveType>(pb, *(Q.X), *Xsquared));
+                    compute_Ysquared.reset(new Fqe_sqr_component<CurveType>(pb, *(Q.Y), *Ysquared));
 
                     Xsquared_plus_a.reset(new Fqe_variable<CurveType>((*Xsquared) + other_curve<CurveType>::g2_type::a));
                     Ysquared_minus_b.reset(
                         new Fqe_variable<CurveType>((*Ysquared) + (-other_curve<CurveType>::g2_type::b)));
 
-                    curve_equation.reset(new Fqe_mul_gadget<CurveType>(pb, *(Q.X), *Xsquared_plus_a, *Ysquared_minus_b));
+                    curve_equation.reset(new Fqe_mul_component<CurveType>(pb, *(Q.X), *Xsquared_plus_a, *Ysquared_minus_b));
                 }
 
                 template<typename CurveType>
-                void G2_checker_gadget<CurveType>::generate_r1cs_constraints() {
+                void G2_checker_component<CurveType>::generate_r1cs_constraints() {
                     compute_Xsquared->generate_r1cs_constraints();
                     compute_Ysquared->generate_r1cs_constraints();
                     curve_equation->generate_r1cs_constraints();
                 }
 
                 template<typename CurveType>
-                void G2_checker_gadget<CurveType>::generate_r1cs_witness() {
+                void G2_checker_component<CurveType>::generate_r1cs_witness() {
                     compute_Xsquared->generate_r1cs_witness();
                     compute_Ysquared->generate_r1cs_witness();
                     Xsquared_plus_a->evaluate();
@@ -150,10 +150,10 @@ namespace nil {
                 }
 
                 template<typename CurveType>
-                void test_G2_checker_gadget(const std::string &annotation) {
+                void test_G2_checker_component(const std::string &annotation) {
                     blueprint<typename CurveType::scalar_field_type> pb;
                     G2_variable<CurveType> g(pb);
-                    G2_checker_gadget<CurveType> g_check(pb, g);
+                    G2_checker_component<CurveType> g_check(pb, g);
                     g_check.generate_r1cs_constraints();
 
                     printf("positive test\n");

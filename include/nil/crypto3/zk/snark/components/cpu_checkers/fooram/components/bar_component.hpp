@@ -32,7 +32,7 @@ namespace nil {
                  * - store_addr = x + PC
                  */
                 template<typename FieldType>
-                class bar_gadget : public component<FieldType> {
+                class bar_component : public component<FieldType> {
                 public:
                     pb_linear_combination_array<FieldType> X;
                     FieldType::value_type a;
@@ -49,7 +49,7 @@ namespace nil {
                     std::shared_ptr<packing_component<FieldType>> pack_Z;
 
                     std::size_t width;
-                    bar_gadget(blueprint<FieldType> &pb,
+                    bar_component(blueprint<FieldType> &pb,
                                const pb_linear_combination_array<FieldType> &X,
                                const FieldType::value_type &a,
                                const pb_linear_combination_array<FieldType> &Y,
@@ -60,7 +60,7 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                bar_component<FieldType>::bar_gadget(blueprint<FieldType> &pb,
+                bar_component<FieldType>::bar_component(blueprint<FieldType> &pb,
                                                   const pb_linear_combination_array<FieldType> &X,
                                                   const FieldType::value_type &a,
                                                   const pb_linear_combination_array<FieldType> &Y,

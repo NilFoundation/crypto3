@@ -45,12 +45,12 @@ endmacro()
 set(TESTS_NAMES
     "routing_algorithms/test_routing_algorithms"
 
-    "gadgets/hashes/knapsack/test_knapsack_gadget"
-    "gadgets/hashes/sha256/test_sha256_gadget"
+    "gadgets/hashes/knapsack/test_knapsack_component"
+    "gadgets/hashes/sha256/test_sha256_component"
 
-    "gadgets/r1cs_ppzksnark_verifier_gadget"
-    "gadgets/merkle_tree_gadgets"
-    "gadgets/set_commitment_gadget"
+    "gadgets/r1cs_ppzksnark_verifier_component"
+    "gadgets/merkle_tree_components"
+    "gadgets/set_commitment_component"
 
     "relations/numeric/qap/qap"
     "relations/numeric/sap/sap"

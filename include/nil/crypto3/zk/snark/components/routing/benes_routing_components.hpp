@@ -26,7 +26,7 @@ namespace nil {
             namespace snark {
 
                 template<typename FieldType>
-                class benes_routing_gadget : public component<FieldType> {
+                class benes_routing_component : public component<FieldType> {
                 private:
                     /*
                       Indexing conventions:
@@ -63,7 +63,7 @@ namespace nil {
 
                     const std::size_t packet_size, num_subpackets;
 
-                    benes_routing_gadget(blueprint<FieldType> &pb,
+                    benes_routing_component(blueprint<FieldType> &pb,
                                          const std::size_t num_packets,
                                          const std::vector<pb_variable_array<FieldType>> &routing_input_bits,
                                          const std::vector<pb_variable_array<FieldType>> &routing_output_bits,
@@ -75,10 +75,10 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                void test_benes_routing_gadget(const std::size_t num_packets, const std::size_t packet_size);
+                void test_benes_routing_component(const std::size_t num_packets, const std::size_t packet_size);
 
                 template<typename FieldType>
-                benes_routing_component<FieldType>::benes_routing_gadget(
+                benes_routing_component<FieldType>::benes_routing_component(
                     blueprint<FieldType> &pb,
                     const std::size_t num_packets,
                     const std::vector<pb_variable_array<FieldType>> &routing_input_bits,
@@ -220,7 +220,7 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                void test_benes_routing_gadget(const std::size_t num_packets, const std::size_t packet_size) {
+                void test_benes_routing_component(const std::size_t num_packets, const std::size_t packet_size) {
                     const std::size_t dimension = static_cast<std::size_t>(std::ceil(std::log2(num_packets)));
                     assert(num_packets == 1ul << dimension);
 

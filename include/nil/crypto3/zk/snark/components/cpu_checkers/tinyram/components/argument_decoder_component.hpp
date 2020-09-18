@@ -62,10 +62,10 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                void test_argument_decoder_gadget();
+                void test_argument_decoder_component();
 
                 template<typename FieldType>
-                argument_decoder_component<FieldType>::argument_decoder_gadget(
+                argument_decoder_component<FieldType>::argument_decoder_component(
                     tinyram_protoboard<FieldType> &pb,
                     const variable<FieldType> &arg2_is_imm,
                     const pb_variable_array<FieldType> &desidx,
@@ -153,7 +153,7 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                void test_argument_decoder_gadget() {
+                void test_argument_decoder_component() {
                     tinyram_architecture_params ap(16, 16);
                     tinyram_program P;
                     P.instructions = generate_tinyram_prelude(ap);

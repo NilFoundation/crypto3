@@ -67,7 +67,7 @@ namespace nil {
                  * Gadget that creates constraints for Fp3 by Fp3 multiplication.
                  */
                 template<typename Fp3T>
-                class Fp3_mul_gadget : public component<typename Fp3T::my_Fp> {
+                class Fp3_mul_component : public component<typename Fp3T::my_Fp> {
                 public:
                     typedef typename Fp3T::my_Fp FieldType;
 
@@ -78,7 +78,7 @@ namespace nil {
                     variable<FieldType> v0;
                     variable<FieldType> v4;
 
-                    Fp3_mul_gadget(blueprint<FieldType> &pb,
+                    Fp3_mul_component(blueprint<FieldType> &pb,
                                    const Fp3_variable<Fp3T> &A,
                                    const Fp3_variable<Fp3T> &B,
                                    const Fp3_variable<Fp3T> &result);
@@ -90,7 +90,7 @@ namespace nil {
                  * Gadget that creates constraints for Fp3 multiplication by a linear combination.
                  */
                 template<typename Fp3T>
-                class Fp3_mul_by_lc_gadget : public component<typename Fp3T::my_Fp> {
+                class Fp3_mul_by_lc_component : public component<typename Fp3T::my_Fp> {
                 public:
                     typedef typename Fp3T::my_Fp FieldType;
 
@@ -98,7 +98,7 @@ namespace nil {
                     pb_linear_combination<FieldType> lc;
                     Fp3_variable<Fp3T> result;
 
-                    Fp3_mul_by_lc_gadget(blueprint<FieldType> &pb,
+                    Fp3_mul_by_lc_component(blueprint<FieldType> &pb,
                                          const Fp3_variable<Fp3T> &A,
                                          const pb_linear_combination<FieldType> &lc,
                                          const Fp3_variable<Fp3T> &result);
@@ -110,16 +110,16 @@ namespace nil {
                  * Gadget that creates constraints for Fp3 squaring.
                  */
                 template<typename Fp3T>
-                class Fp3_sqr_gadget : public component<typename Fp3T::my_Fp> {
+                class Fp3_sqr_component : public component<typename Fp3T::my_Fp> {
                 public:
                     typedef typename Fp3T::my_Fp FieldType;
 
                     Fp3_variable<Fp3T> A;
                     Fp3_variable<Fp3T> result;
 
-                    std::shared_ptr<Fp3_mul_gadget<Fp3T>> mul;
+                    std::shared_ptr<Fp3_mul_component<Fp3T>> mul;
 
-                    Fp3_sqr_gadget(blueprint<FieldType> &pb,
+                    Fp3_sqr_component(blueprint<FieldType> &pb,
                                    const Fp3_variable<Fp3T> &A,
                                    const Fp3_variable<Fp3T> &result);
                     void generate_r1cs_constraints();
@@ -265,7 +265,7 @@ namespace nil {
                 }
 
                 template<typename Fp3T>
-                Fp3_mul_gadget<Fp3T>::Fp3_mul_gadget(blueprint<FieldType> &pb,
+                Fp3_mul_component<Fp3T>::Fp3_mul_component(blueprint<FieldType> &pb,
                                                      const Fp3_variable<Fp3T> &A,
                                                      const Fp3_variable<Fp3T> &B,
                                                      const Fp3_variable<Fp3T> &result) :
@@ -276,7 +276,7 @@ namespace nil {
                 }
 
                 template<typename Fp3T>
-                void Fp3_mul_gadget<Fp3T>::generate_r1cs_constraints() {
+                void Fp3_mul_component<Fp3T>::generate_r1cs_constraints() {
                     /*
                         Tom-Cook-3x for Fp3:
                             v0 = A.c0 * B.c0
@@ -337,7 +337,7 @@ namespace nil {
                 }
 
                 template<typename Fp3T>
-                void Fp3_mul_gadget<Fp3T>::generate_r1cs_witness() {
+                void Fp3_mul_component<Fp3T>::generate_r1cs_witness() {
                     this->pb.val(v0) = this->pb.lc_val(A.c0) * this->pb.lc_val(B.c0);
                     this->pb.val(v4) = this->pb.lc_val(A.c2) * this->pb.lc_val(B.c2);
 
@@ -348,7 +348,7 @@ namespace nil {
                 }
 
                 template<typename Fp3T>
-                Fp3_mul_by_lc_gadget<Fp3T>::Fp3_mul_by_lc_gadget(blueprint<FieldType> &pb,
+                Fp3_mul_by_lc_component<Fp3T>::Fp3_mul_by_lc_component(blueprint<FieldType> &pb,
                                                                  const Fp3_variable<Fp3T> &A,
                                                                  const pb_linear_combination<FieldType> &lc,
                                                                  const Fp3_variable<Fp3T> &result) :
@@ -357,36 +357,36 @@ namespace nil {
                 }
 
                 template<typename Fp3T>
-                void Fp3_mul_by_lc_gadget<Fp3T>::generate_r1cs_constraints() {
+                void Fp3_mul_by_lc_component<Fp3T>::generate_r1cs_constraints() {
                     this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(A.c0, lc, result.c0));
                     this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(A.c1, lc, result.c1));
                     this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(A.c2, lc, result.c2));
                 }
 
                 template<typename Fp3T>
-                void Fp3_mul_by_lc_gadget<Fp3T>::generate_r1cs_witness() {
+                void Fp3_mul_by_lc_component<Fp3T>::generate_r1cs_witness() {
                     this->pb.lc_val(result.c0) = this->pb.lc_val(A.c0) * this->pb.lc_val(lc);
                     this->pb.lc_val(result.c1) = this->pb.lc_val(A.c1) * this->pb.lc_val(lc);
                     this->pb.lc_val(result.c2) = this->pb.lc_val(A.c2) * this->pb.lc_val(lc);
                 }
 
                 template<typename Fp3T>
-                Fp3_sqr_gadget<Fp3T>::Fp3_sqr_gadget(blueprint<FieldType> &pb,
+                Fp3_sqr_component<Fp3T>::Fp3_sqr_component(blueprint<FieldType> &pb,
                                                      const Fp3_variable<Fp3T> &A,
                                                      const Fp3_variable<Fp3T> &result) :
                     component<FieldType>(pb),
                     A(A), result(result) {
-                    mul.reset(new Fp3_mul_gadget<Fp3T>(pb, A, A, result));
+                    mul.reset(new Fp3_mul_component<Fp3T>(pb, A, A, result));
                 }
 
                 template<typename Fp3T>
-                void Fp3_sqr_gadget<Fp3T>::generate_r1cs_constraints() {
+                void Fp3_sqr_component<Fp3T>::generate_r1cs_constraints() {
                     // We can't do better than 5 constraints for squaring, so we just use multiplication.
                     mul->generate_r1cs_constraints();
                 }
 
                 template<typename Fp3T>
-                void Fp3_sqr_gadget<Fp3T>::generate_r1cs_witness() {
+                void Fp3_sqr_component<Fp3T>::generate_r1cs_witness() {
                     mul->generate_r1cs_witness();
                 }
 

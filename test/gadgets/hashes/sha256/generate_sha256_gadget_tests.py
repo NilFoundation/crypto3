@@ -41,7 +41,7 @@ def H_bytes(x):
     return words_to_bytes(bytes_to_words(words_to_bytes(state['digest'])))
 
 
-def generate_sha256_gadget_tests():
+def generate_sha256_component_tests():
     left = gen_random_bytes(HASH_BYTES)
     right = gen_random_bytes(HASH_BYTES)
     hash = H_bytes(left + right)
@@ -56,4 +56,4 @@ def generate_sha256_gadget_tests():
 
 if __name__ == '__main__':
     random.seed(0)  # for reproducibility
-    generate_sha256_gadget_tests()
+    generate_sha256_component_tests()

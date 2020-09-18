@@ -29,12 +29,12 @@ namespace nil {
                  * - contents_before
                  * - contents_after
                  *
-                 * Memory lines are used by memory_checker_gadget.
+                 * Memory lines are used by memory_checker_component.
                  */
-                template<typename ramT>
-                class memory_line_variable_gadget : public ram_gadget_base<ramT> {
+                template<typename RAMType>
+                class memory_line_variable_component : public ram_component_base<RAMType> {
                 public:
-                    typedef ram_base_field<ramT> FieldType;
+                    typedef ram_base_field<RAMType> FieldType;
 
                     std::shared_ptr<dual_variable_component<FieldType>> timestamp;
                     std::shared_ptr<dual_variable_component<FieldType>> address;
@@ -42,9 +42,9 @@ namespace nil {
                     std::shared_ptr<dual_variable_component<FieldType>> contents_after;
 
                 public:
-                    memory_line_variable_gadget(ram_protoboard<ramT> &pb,
+                    memory_line_variable_component(ram_protoboard<RAMType> &pb,
                                                 const std::size_t timestamp_size,
-                                                const ram_architecture_params<ramT> &ap);
+                                                const ram_architecture_params<RAMType> &ap);
 
                     void generate_r1cs_constraints(const bool enforce_bitness = false);
                     void generate_r1cs_witness_from_bits();
@@ -57,27 +57,27 @@ namespace nil {
                  * An execution line inherits from a memory line and, in addition, contains
                  * variables for a CPU state and for a flag denoting if the machine has accepted.
                  *
-                 * Execution lines are used by execution_checker_gadget.
+                 * Execution lines are used by execution_checker_component.
                  */
-                template<typename ramT>
-                class execution_line_variable_gadget : public memory_line_variable_gadget<ramT> {
+                template<typename RAMType>
+                class execution_line_variable_component : public memory_line_variable_component<RAMType> {
                 public:
-                    typedef ram_base_field<ramT> FieldType;
+                    typedef ram_base_field<RAMType> FieldType;
 
                     pb_variable_array<FieldType> cpu_state;
                     variable<FieldType> has_accepted;
 
-                    execution_line_variable_gadget(ram_protoboard<ramT> &pb,
+                    execution_line_variable_component(ram_protoboard<RAMType> &pb,
                                                    const std::size_t timestamp_size,
-                                                   const ram_architecture_params<ramT> &ap);
+                                                   const ram_architecture_params<RAMType> &ap);
                 };
 
-                template<typename ramT>
-                memory_line_variable_gadget<ramT>::memory_line_variable_gadget(
-                    ram_protoboard<ramT> &pb,
+                template<typename RAMType>
+                memory_line_variable_component<RAMType>::memory_line_variable_component(
+                    ram_protoboard<RAMType> &pb,
                     const std::size_t timestamp_size,
-                    const ram_architecture_params<ramT> &ap) :
-                    ram_gadget_base<ramT>(pb) {
+                    const ram_architecture_params<RAMType> &ap) :
+                    ram_component_base<RAMType>(pb) {
                     const std::size_t address_size = ap.address_size();
                     const std::size_t value_size = ap.value_size();
 
@@ -87,32 +87,32 @@ namespace nil {
                     contents_after.reset(new dual_variable_component<FieldType>(pb, value_size));
                 }
 
-                template<typename ramT>
-                void memory_line_variable_gadget<ramT>::generate_r1cs_constraints(const bool enforce_bitness) {
+                template<typename RAMType>
+                void memory_line_variable_component<RAMType>::generate_r1cs_constraints(const bool enforce_bitness) {
                     timestamp->generate_r1cs_constraints(enforce_bitness);
                     address->generate_r1cs_constraints(enforce_bitness);
                     contents_before->generate_r1cs_constraints(enforce_bitness);
                     contents_after->generate_r1cs_constraints(enforce_bitness);
                 }
 
-                template<typename ramT>
-                void memory_line_variable_gadget<ramT>::generate_r1cs_witness_from_bits() {
+                template<typename RAMType>
+                void memory_line_variable_component<RAMType>::generate_r1cs_witness_from_bits() {
                     timestamp->generate_r1cs_witness_from_bits();
                     address->generate_r1cs_witness_from_bits();
                     contents_before->generate_r1cs_witness_from_bits();
                     contents_after->generate_r1cs_witness_from_bits();
                 }
 
-                template<typename ramT>
-                void memory_line_variable_gadget<ramT>::generate_r1cs_witness_from_packed() {
+                template<typename RAMType>
+                void memory_line_variable_component<RAMType>::generate_r1cs_witness_from_packed() {
                     timestamp->generate_r1cs_witness_from_packed();
                     address->generate_r1cs_witness_from_packed();
                     contents_before->generate_r1cs_witness_from_packed();
                     contents_after->generate_r1cs_witness_from_packed();
                 }
 
-                template<typename ramT>
-                pb_variable_array<ram_base_field<ramT>> memory_line_variable_gadget<ramT>::all_vars() const {
+                template<typename RAMType>
+                pb_variable_array<ram_base_field<RAMType>> memory_line_variable_component<RAMType>::all_vars() const {
                     pb_variable_array<FieldType> r;
                     r.insert(r.end(), timestamp->bits.begin(), timestamp->bits.end());
                     r.insert(r.end(), address->bits.begin(), address->bits.end());
@@ -122,12 +122,12 @@ namespace nil {
                     return r;
                 }
 
-                template<typename ramT>
-                execution_line_variable_gadget<ramT>::execution_line_variable_gadget(
-                    ram_protoboard<ramT> &pb,
+                template<typename RAMType>
+                execution_line_variable_component<RAMType>::execution_line_variable_component(
+                    ram_protoboard<RAMType> &pb,
                     const std::size_t timestamp_size,
-                    const ram_architecture_params<ramT> &ap) :
-                    memory_line_variable_gadget<ramT>(pb, timestamp_size, ap) {
+                    const ram_architecture_params<RAMType> &ap) :
+                    memory_line_variable_component<RAMType>(pb, timestamp_size, ap) {
                     const std::size_t cpu_state_size = ap.cpu_state_size();
 
                     cpu_state.allocate(pb, cpu_state_size);

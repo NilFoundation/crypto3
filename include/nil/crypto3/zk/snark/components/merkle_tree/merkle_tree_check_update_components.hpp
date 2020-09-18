@@ -83,7 +83,7 @@ namespace nil {
                 };
 
                 template<typename FieldType, typename Hash>
-                void test_merkle_tree_check_update_gadget();
+                void test_merkle_tree_check_update_component();
 
                 template<typename FieldType, typename Hash>
                 merkle_tree_check_update_components<FieldType, Hash>::merkle_tree_check_update_components(
@@ -229,7 +229,7 @@ namespace nil {
                 }
 
                 template<typename FieldType, typename Hash>
-                void test_merkle_tree_check_update_gadget() {
+                void test_merkle_tree_check_update_component() {
                     /* prepare test */
                     const std::size_t digest_len = Hash::get_digest_len();
 

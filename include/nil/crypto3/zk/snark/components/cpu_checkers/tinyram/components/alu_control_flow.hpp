@@ -25,14 +25,14 @@ namespace nil {
 
                 /* control flow gadgets */
                 template<typename FieldType>
-                class ALU_control_flow_gadget : public tinyram_standard_component<FieldType> {
+                class ALU_control_flow_component : public tinyram_standard_component<FieldType> {
                 public:
                     const word_variable_component<FieldType> pc;
                     const word_variable_component<FieldType> argval2;
                     const variable<FieldType> flag;
                     const variable<FieldType> result;
 
-                    ALU_control_flow_gadget(tinyram_blueprint<FieldType> &pb,
+                    ALU_control_flow_component(tinyram_blueprint<FieldType> &pb,
                                             const word_variable_component<FieldType> &pc,
                                             const word_variable_component<FieldType> &argval2,
                                             const variable<FieldType> &flag,
@@ -42,9 +42,9 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                class ALU_jmp_gadget : public ALU_control_flow_component<FieldType> {
+                class ALU_jmp_component : public ALU_control_flow_component<FieldType> {
                 public:
-                    ALU_jmp_gadget(tinyram_blueprint<FieldType> &pb,
+                    ALU_jmp_component(tinyram_blueprint<FieldType> &pb,
                                    const word_variable_component<FieldType> &pc,
                                    const word_variable_component<FieldType> &argval2,
                                    const variable<FieldType> &flag,
@@ -57,12 +57,12 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                void test_ALU_jmp_gadget();
+                void test_ALU_jmp_component();
 
                 template<typename FieldType>
-                class ALU_cjmp_gadget : public ALU_control_flow_component<FieldType> {
+                class ALU_cjmp_component : public ALU_control_flow_component<FieldType> {
                 public:
-                    ALU_cjmp_gadget(tinyram_blueprint<FieldType> &pb,
+                    ALU_cjmp_component(tinyram_blueprint<FieldType> &pb,
                                     const word_variable_component<FieldType> &pc,
                                     const word_variable_component<FieldType> &argval2,
                                     const variable<FieldType> &flag,
@@ -75,12 +75,12 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                void test_ALU_cjmp_gadget();
+                void test_ALU_cjmp_component();
 
                 template<typename FieldType>
-                class ALU_cnjmp_gadget : public ALU_control_flow_component<FieldType> {
+                class ALU_cnjmp_component : public ALU_control_flow_component<FieldType> {
                 public:
-                    ALU_cnjmp_gadget(tinyram_blueprint<FieldType> &pb,
+                    ALU_cnjmp_component(tinyram_blueprint<FieldType> &pb,
                                      const word_variable_component<FieldType> &pc,
                                      const word_variable_component<FieldType> &argval2,
                                      const variable<FieldType> &flag,
@@ -93,7 +93,7 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                void test_ALU_cnjmp_gadget();
+                void test_ALU_cnjmp_component();
 
                 /* jmp */
                 template<typename FieldType>
@@ -108,7 +108,7 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                void test_ALU_jmp_gadget() {
+                void test_ALU_jmp_component() {
                     tinyram_architecture_params ap(16, 16);
                     tinyram_program P;
                     P.instructions = generate_tinyram_prelude(ap);
@@ -167,7 +167,7 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                void test_ALU_cjmp_gadget() {
+                void test_ALU_cjmp_component() {
                     // TODO: update
                     tinyram_architecture_params ap(16, 16);
                     tinyram_program P;
@@ -241,7 +241,7 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                void test_ALU_cnjmp_gadget() {
+                void test_ALU_cnjmp_component() {
                     // TODO: update
 
                     tinyram_architecture_params ap(16, 16);

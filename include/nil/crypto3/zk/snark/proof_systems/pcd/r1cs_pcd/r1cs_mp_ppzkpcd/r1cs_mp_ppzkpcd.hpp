@@ -41,7 +41,7 @@
 #include <memory>
 #include <vector>
 
-#include <nil/crypto3/zk/snark/detail/set_commitment.hpp>
+#include <nil/crypto3/zk/snark/set_commitment.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/pcd/r1cs_pcd/ppzkpcd_compliance_predicate.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/pcd/r1cs_pcd/r1cs_mp_ppzkpcd/r1cs_mp_ppzkpcd_params.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_ppzksnark/r1cs_ppzksnark.hpp>
@@ -544,7 +544,7 @@ namespace nil {
                         r1cs_ppzksnark_verification_key_variable<curve_A_pp>::size_in_bits(translation_input_size);
                     printf("%zu %zu\n", translation_input_size, vk_size_in_bits);
 
-                    set_commitment_accumulator<CRH_with_bit_out_gadget<FieldT_A>> all_translation_vks(
+                    set_commitment_accumulator<crh_with_bit_out_component<FieldT_A>> all_translation_vks(
                         compliance_predicates.size(), vk_size_in_bits);
 
                     std::cout << "Perform type checks" << std::endl;

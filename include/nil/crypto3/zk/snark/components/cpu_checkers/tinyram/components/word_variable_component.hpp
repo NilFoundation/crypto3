@@ -40,16 +40,16 @@ namespace nil {
                  * Holds both binary and field representaton of a double word.
                  */
                 template<typename FieldType>
-                class doubleword_variable_gadget : public dual_variable_component<FieldType> {
+                class doubleword_variable_component : public dual_variable_component<FieldType> {
                 public:
-                    doubleword_variable_gadget(tinyram_blueprint<FieldType> &pb) :
+                    doubleword_variable_component(tinyram_blueprint<FieldType> &pb) :
                         dual_variable_component<FieldType>(pb, 2 * pb.ap.w) {
                     }
-                    doubleword_variable_gadget(tinyram_blueprint<FieldType> &pb,
+                    doubleword_variable_component(tinyram_blueprint<FieldType> &pb,
                                                const pb_variable_array<FieldType> &bits) :
                         dual_variable_component<FieldType>(pb, bits) {
                     }
-                    doubleword_variable_gadget(tinyram_blueprint<FieldType> &pb,
+                    doubleword_variable_component(tinyram_blueprint<FieldType> &pb,
                                                const variable<FieldType> &packed) :
                         dual_variable_component<FieldType>(pb, packed, 2 * pb.ap.w) {
                     }

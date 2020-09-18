@@ -47,16 +47,16 @@ namespace nil {
                     typedef algebra::Fqk<other_curve<CurveType>> fqk_type;
 
                     G1_precomputation<CurveType> prec_P;
-                    precompute_G2_gadget_coeffs<CurveType> c;
+                    precompute_G2_component_coeffs<CurveType> c;
                     std::shared_ptr<Fqk_variable<CurveType>> &g_RR_at_P;    // reference from outside
 
                     std::shared_ptr<Fqe_variable<CurveType>> gamma_twist;
                     std::shared_ptr<Fqe_variable<CurveType>> g_RR_at_P_c1;
-                    std::shared_ptr<Fqe_mul_by_lc_gadget<CurveType>> compute_g_RR_at_P_c1;
+                    std::shared_ptr<Fqe_mul_by_lc_component<CurveType>> compute_g_RR_at_P_c1;
 
                     mnt_miller_loop_dbl_line_eval(blueprint<FieldType> &pb,
                                                   const G1_precomputation<CurveType> &prec_P,
-                                                  const precompute_G2_gadget_coeffs<CurveType> &c,
+                                                  const precompute_G2_component_coeffs<CurveType> &c,
                                                   std::shared_ptr<Fqk_variable<CurveType>> &g_RR_at_P);
                     void generate_r1cs_constraints();
                     void generate_r1cs_witness();
@@ -83,18 +83,18 @@ namespace nil {
 
                     bool invert_Q;
                     G1_precomputation<CurveType> prec_P;
-                    precompute_G2_gadget_coeffs<CurveType> c;
+                    precompute_G2_component_coeffs<CurveType> c;
                     G2_variable<CurveType> Q;
                     std::shared_ptr<Fqk_variable<CurveType>> &g_RQ_at_P;    // reference from outside
 
                     std::shared_ptr<Fqe_variable<CurveType>> gamma_twist;
                     std::shared_ptr<Fqe_variable<CurveType>> g_RQ_at_P_c1;
-                    std::shared_ptr<Fqe_mul_by_lc_gadget<CurveType>> compute_g_RQ_at_P_c1;
+                    std::shared_ptr<Fqe_mul_by_lc_component<CurveType>> compute_g_RQ_at_P_c1;
 
                     mnt_miller_loop_add_line_eval(blueprint<FieldType> &pb,
                                                   const bool invert_Q,
                                                   const G1_precomputation<CurveType> &prec_P,
-                                                  const precompute_G2_gadget_coeffs<CurveType> &c,
+                                                  const precompute_G2_component_coeffs<CurveType> &c,
                                                   const G2_variable<CurveType> &Q,
                                                   std::shared_ptr<Fqk_variable<CurveType>> &g_RQ_at_P);
                     void generate_r1cs_constraints();
@@ -105,7 +105,7 @@ namespace nil {
                  * Gadget for verifying a single Miller loop.
                  */
                 template<typename CurveType>
-                class mnt_miller_loop_gadget : public component<typename CurveType::scalar_field_type> {
+                class mnt_miller_loop_component : public component<typename CurveType::scalar_field_type> {
                 public:
                     typedef typename CurveType::scalar_field_type FieldType;
                     typedef algebra::Fqe<other_curve<CurveType>> fqe_type;
@@ -118,9 +118,9 @@ namespace nil {
                     std::vector<std::shared_ptr<mnt_miller_loop_add_line_eval<CurveType>>> addition_steps;
                     std::vector<std::shared_ptr<mnt_miller_loop_dbl_line_eval<CurveType>>> doubling_steps;
 
-                    std::vector<std::shared_ptr<Fqk_special_mul_gadget<CurveType>>> dbl_muls;
-                    std::vector<std::shared_ptr<Fqk_sqr_gadget<CurveType>>> dbl_sqrs;
-                    std::vector<std::shared_ptr<Fqk_special_mul_gadget<CurveType>>> add_muls;
+                    std::vector<std::shared_ptr<Fqk_special_mul_component<CurveType>>> dbl_muls;
+                    std::vector<std::shared_ptr<Fqk_sqr_component<CurveType>>> dbl_sqrs;
+                    std::vector<std::shared_ptr<Fqk_special_mul_component<CurveType>>> add_muls;
 
                     std::size_t f_count;
                     std::size_t add_count;
@@ -130,7 +130,7 @@ namespace nil {
                     G2_precomputation<CurveType> prec_Q;
                     Fqk_variable<CurveType> result;
 
-                    mnt_miller_loop_gadget(blueprint<FieldType> &pb,
+                    mnt_miller_loop_component(blueprint<FieldType> &pb,
                                            const G1_precomputation<CurveType> &prec_P,
                                            const G2_precomputation<CurveType> &prec_Q,
                                            const Fqk_variable<CurveType> &result);
@@ -145,7 +145,7 @@ namespace nil {
                  * Gadget for verifying a double Miller loop (where the second is inverted).
                  */
                 template<typename CurveType>
-                class mnt_e_over_e_miller_loop_gadget : public component<typename CurveType::scalar_field_type> {
+                class mnt_e_over_e_miller_loop_component : public component<typename CurveType::scalar_field_type> {
                 public:
                     typedef typename CurveType::scalar_field_type FieldType;
                     typedef algebra::Fqe<other_curve<CurveType>> fqe_type;
@@ -162,11 +162,11 @@ namespace nil {
                     std::vector<std::shared_ptr<mnt_miller_loop_add_line_eval<CurveType>>> addition_steps2;
                     std::vector<std::shared_ptr<mnt_miller_loop_dbl_line_eval<CurveType>>> doubling_steps2;
 
-                    std::vector<std::shared_ptr<Fqk_sqr_gadget<CurveType>>> dbl_sqrs;
-                    std::vector<std::shared_ptr<Fqk_special_mul_gadget<CurveType>>> dbl_muls1;
-                    std::vector<std::shared_ptr<Fqk_special_mul_gadget<CurveType>>> add_muls1;
-                    std::vector<std::shared_ptr<Fqk_special_mul_gadget<CurveType>>> dbl_muls2;
-                    std::vector<std::shared_ptr<Fqk_special_mul_gadget<CurveType>>> add_muls2;
+                    std::vector<std::shared_ptr<Fqk_sqr_component<CurveType>>> dbl_sqrs;
+                    std::vector<std::shared_ptr<Fqk_special_mul_component<CurveType>>> dbl_muls1;
+                    std::vector<std::shared_ptr<Fqk_special_mul_component<CurveType>>> add_muls1;
+                    std::vector<std::shared_ptr<Fqk_special_mul_component<CurveType>>> dbl_muls2;
+                    std::vector<std::shared_ptr<Fqk_special_mul_component<CurveType>>> add_muls2;
 
                     std::size_t f_count;
                     std::size_t add_count;
@@ -178,7 +178,7 @@ namespace nil {
                     G2_precomputation<CurveType> prec_Q2;
                     Fqk_variable<CurveType> result;
 
-                    mnt_e_over_e_miller_loop_gadget(blueprint<FieldType> &pb,
+                    mnt_e_over_e_miller_loop_component(blueprint<FieldType> &pb,
                                                     const G1_precomputation<CurveType> &prec_P1,
                                                     const G2_precomputation<CurveType> &prec_Q1,
                                                     const G1_precomputation<CurveType> &prec_P2,
@@ -195,7 +195,7 @@ namespace nil {
                  * Gadget for verifying a triple Miller loop (where the third is inverted).
                  */
                 template<typename CurveType>
-                class mnt_e_times_e_over_e_miller_loop_gadget : public component<typename CurveType::scalar_field_type> {
+                class mnt_e_times_e_over_e_miller_loop_component : public component<typename CurveType::scalar_field_type> {
                 public:
                     typedef typename CurveType::scalar_field_type FieldType;
                     typedef algebra::Fqe<other_curve<CurveType>> fqe_type;
@@ -216,13 +216,13 @@ namespace nil {
                     std::vector<std::shared_ptr<mnt_miller_loop_add_line_eval<CurveType>>> addition_steps3;
                     std::vector<std::shared_ptr<mnt_miller_loop_dbl_line_eval<CurveType>>> doubling_steps3;
 
-                    std::vector<std::shared_ptr<Fqk_sqr_gadget<CurveType>>> dbl_sqrs;
-                    std::vector<std::shared_ptr<Fqk_special_mul_gadget<CurveType>>> dbl_muls1;
-                    std::vector<std::shared_ptr<Fqk_special_mul_gadget<CurveType>>> add_muls1;
-                    std::vector<std::shared_ptr<Fqk_special_mul_gadget<CurveType>>> dbl_muls2;
-                    std::vector<std::shared_ptr<Fqk_special_mul_gadget<CurveType>>> add_muls2;
-                    std::vector<std::shared_ptr<Fqk_special_mul_gadget<CurveType>>> dbl_muls3;
-                    std::vector<std::shared_ptr<Fqk_special_mul_gadget<CurveType>>> add_muls3;
+                    std::vector<std::shared_ptr<Fqk_sqr_component<CurveType>>> dbl_sqrs;
+                    std::vector<std::shared_ptr<Fqk_special_mul_component<CurveType>>> dbl_muls1;
+                    std::vector<std::shared_ptr<Fqk_special_mul_component<CurveType>>> add_muls1;
+                    std::vector<std::shared_ptr<Fqk_special_mul_component<CurveType>>> dbl_muls2;
+                    std::vector<std::shared_ptr<Fqk_special_mul_component<CurveType>>> add_muls2;
+                    std::vector<std::shared_ptr<Fqk_special_mul_component<CurveType>>> dbl_muls3;
+                    std::vector<std::shared_ptr<Fqk_special_mul_component<CurveType>>> add_muls3;
 
                     std::size_t f_count;
                     std::size_t add_count;
@@ -236,7 +236,7 @@ namespace nil {
                     G2_precomputation<CurveType> prec_Q3;
                     Fqk_variable<CurveType> result;
 
-                    mnt_e_times_e_over_e_miller_loop_gadget(blueprint<FieldType> &pb,
+                    mnt_e_times_e_over_e_miller_loop_component(blueprint<FieldType> &pb,
                                                             const G1_precomputation<CurveType> &prec_P1,
                                                             const G2_precomputation<CurveType> &prec_Q1,
                                                             const G1_precomputation<CurveType> &prec_P2,
@@ -265,7 +265,7 @@ namespace nil {
                 mnt_miller_loop_dbl_line_eval<CurveType>::mnt_miller_loop_dbl_line_eval(
                     blueprint<FieldType> &pb,
                     const G1_precomputation<CurveType> &prec_P,
-                    const precompute_G2_gadget_coeffs<CurveType> &c,
+                    const precompute_G2_component_coeffs<CurveType> &c,
                     std::shared_ptr<Fqk_variable<CurveType>> &g_RR_at_P) :
                     component<FieldType>(pb),
                     prec_P(prec_P), c(c), g_RR_at_P(g_RR_at_P) {
@@ -284,7 +284,7 @@ namespace nil {
                                                                  *(c.RY) * (-FieldType::value_type::zero())));
                     } else {
                         g_RR_at_P_c1.reset(new Fqe_variable<CurveType>(pb));
-                        compute_g_RR_at_P_c1.reset(new Fqe_mul_by_lc_gadget<CurveType>(
+                        compute_g_RR_at_P_c1.reset(new Fqe_mul_by_lc_component<CurveType>(
                             pb, *gamma_twist, prec_P.P->X,
                             *(c.gamma_X) + *(c.RY) * (-FieldType::value_type::zero()) + (*g_RR_at_P_c1) * (-FieldType::value_type::zero())));
                     }
@@ -330,7 +330,7 @@ namespace nil {
                     blueprint<FieldType> &pb,
                     const bool invert_Q,
                     const G1_precomputation<CurveType> &prec_P,
-                    const precompute_G2_gadget_coeffs<CurveType> &c,
+                    const precompute_G2_component_coeffs<CurveType> &c,
                     const G2_variable<CurveType> &Q,
                     std::shared_ptr<Fqk_variable<CurveType>> &g_RQ_at_P) :
                     component<FieldType>(pb),
@@ -351,7 +351,7 @@ namespace nil {
                                                   *(Q.Y) * (!invert_Q ? -FieldType::value_type::zero() : FieldType::value_type::zero())));
                     } else {
                         g_RQ_at_P_c1.reset(new Fqe_variable<CurveType>(pb));
-                        compute_g_RQ_at_P_c1.reset(new Fqe_mul_by_lc_gadget<CurveType>(
+                        compute_g_RQ_at_P_c1.reset(new Fqe_mul_by_lc_component<CurveType>(
                             pb, *gamma_twist, prec_P.P->X,
                             *(c.gamma_X) + *(Q.Y) * (!invert_Q ? -FieldType::value_type::zero() : FieldType::value_type::zero()) +
                                 (*g_RQ_at_P_c1) * (-FieldType::value_type::zero())));
@@ -384,7 +384,7 @@ namespace nil {
                 }
 
                 template<typename CurveType>
-                mnt_miller_loop_gadget<CurveType>::mnt_miller_loop_gadget(blueprint<FieldType> &pb,
+                mnt_miller_loop_component<CurveType>::mnt_miller_loop_component(blueprint<FieldType> &pb,
                                                                     const G1_precomputation<CurveType> &prec_P,
                                                                     const G2_precomputation<CurveType> &prec_Q,
                                                                     const Fqk_variable<CurveType> &result) :
@@ -442,9 +442,9 @@ namespace nil {
                         doubling_steps[dbl_id].reset(new mnt_miller_loop_dbl_line_eval<CurveType>(
                             pb, prec_P, *prec_Q.coeffs[prec_id], g_RR_at_Ps[dbl_id]));
                         ++prec_id;
-                        dbl_sqrs[dbl_id].reset(new Fqk_sqr_gadget<CurveType>(pb, *fs[f_id], *fs[f_id + 1]));
+                        dbl_sqrs[dbl_id].reset(new Fqk_sqr_component<CurveType>(pb, *fs[f_id], *fs[f_id + 1]));
                         ++f_id;
-                        dbl_muls[dbl_id].reset(new Fqk_special_mul_gadget<CurveType>(
+                        dbl_muls[dbl_id].reset(new Fqk_special_mul_component<CurveType>(
                             pb, *fs[f_id], *g_RR_at_Ps[dbl_id], (f_id + 1 == f_count ? result : *fs[f_id + 1])));
                         ++f_id;
                         ++dbl_id;
@@ -453,7 +453,7 @@ namespace nil {
                             addition_steps[add_id].reset(new mnt_miller_loop_add_line_eval<CurveType>(
                                 pb, NAF[i] < 0, prec_P, *prec_Q.coeffs[prec_id], *prec_Q.Q, g_RQ_at_Ps[add_id]));
                             ++prec_id;
-                            add_muls[add_id].reset(new Fqk_special_mul_gadget<CurveType>(
+                            add_muls[add_id].reset(new Fqk_special_mul_component<CurveType>(
                                 pb, *fs[f_id], *g_RQ_at_Ps[add_id], (f_id + 1 == f_count ? result : *fs[f_id + 1])));
                             ++f_id;
                             ++add_id;
@@ -462,7 +462,7 @@ namespace nil {
                 }
 
                 template<typename CurveType>
-                void mnt_miller_loop_gadget<CurveType>::generate_r1cs_constraints() {
+                void mnt_miller_loop_component<CurveType>::generate_r1cs_constraints() {
                     fs[0]->generate_r1cs_equals_const_constraints(fqk_type::one());
 
                     for (std::size_t i = 0; i < dbl_count; ++i) {
@@ -478,7 +478,7 @@ namespace nil {
                 }
 
                 template<typename CurveType>
-                void mnt_miller_loop_gadget<CurveType>::generate_r1cs_witness() {
+                void mnt_miller_loop_component<CurveType>::generate_r1cs_witness() {
                     fs[0]->generate_r1cs_witness(fqk_type::one());
 
                     std::size_t add_id = 0;
@@ -522,11 +522,11 @@ namespace nil {
                     G1_precomputation<CurveType> prec_P;
                     G2_precomputation<CurveType> prec_Q;
 
-                    precompute_G1_gadget<CurveType> compute_prec_P(pb, P, prec_P);
-                    precompute_G2_gadget<CurveType> compute_prec_Q(pb, Q, prec_Q);
+                    precompute_G1_component<CurveType> compute_prec_P(pb, P, prec_P);
+                    precompute_G2_component<CurveType> compute_prec_Q(pb, Q, prec_Q);
 
                     Fqk_variable<CurveType> result(pb);
-                    mnt_miller_loop_gadget<CurveType> miller(pb, prec_P, prec_Q, result);
+                    mnt_miller_loop_component<CurveType> miller(pb, prec_P, prec_Q, result);
 
                     PROFILE_CONSTRAINTS(pb, "precompute P") {
                         compute_prec_P.generate_r1cs_constraints();
@@ -559,7 +559,7 @@ namespace nil {
                 }
 
                 template<typename CurveType>
-                mnt_e_over_e_miller_loop_gadget<CurveType>::mnt_e_over_e_miller_loop_gadget(
+                mnt_e_over_e_miller_loop_component<CurveType>::mnt_e_over_e_miller_loop_component(
                     blueprint<FieldType> &pb,
                     const G1_precomputation<CurveType> &prec_P1,
                     const G2_precomputation<CurveType> &prec_Q1,
@@ -629,12 +629,12 @@ namespace nil {
                             pb, prec_P2, *prec_Q2.coeffs[prec_id], g_RR_at_P2s[dbl_id]));
                         ++prec_id;
 
-                        dbl_sqrs[dbl_id].reset(new Fqk_sqr_gadget<CurveType>(pb, *fs[f_id], *fs[f_id + 1]));
+                        dbl_sqrs[dbl_id].reset(new Fqk_sqr_component<CurveType>(pb, *fs[f_id], *fs[f_id + 1]));
                         ++f_id;
                         dbl_muls1[dbl_id].reset(
-                            new Fqk_special_mul_gadget<CurveType>(pb, *fs[f_id], *g_RR_at_P1s[dbl_id], *fs[f_id + 1]));
+                            new Fqk_special_mul_component<CurveType>(pb, *fs[f_id], *g_RR_at_P1s[dbl_id], *fs[f_id + 1]));
                         ++f_id;
-                        dbl_muls2[dbl_id].reset(new Fqk_special_mul_gadget<CurveType>(
+                        dbl_muls2[dbl_id].reset(new Fqk_special_mul_component<CurveType>(
                             pb, (f_id + 1 == f_count ? result : *fs[f_id + 1]), *g_RR_at_P2s[dbl_id], *fs[f_id]));
                         ++f_id;
                         ++dbl_id;
@@ -646,9 +646,9 @@ namespace nil {
                                 pb, NAF[i] < 0, prec_P2, *prec_Q2.coeffs[prec_id], *prec_Q2.Q, g_RQ_at_P2s[add_id]));
                             ++prec_id;
                             add_muls1[add_id].reset(
-                                new Fqk_special_mul_gadget<CurveType>(pb, *fs[f_id], *g_RQ_at_P1s[add_id], *fs[f_id + 1]));
+                                new Fqk_special_mul_component<CurveType>(pb, *fs[f_id], *g_RQ_at_P1s[add_id], *fs[f_id + 1]));
                             ++f_id;
-                            add_muls2[add_id].reset(new Fqk_special_mul_gadget<CurveType>(
+                            add_muls2[add_id].reset(new Fqk_special_mul_component<CurveType>(
                                 pb, (f_id + 1 == f_count ? result : *fs[f_id + 1]), *g_RQ_at_P2s[add_id], *fs[f_id]));
                             ++f_id;
                             ++add_id;
@@ -657,7 +657,7 @@ namespace nil {
                 }
 
                 template<typename CurveType>
-                void mnt_e_over_e_miller_loop_gadget<CurveType>::generate_r1cs_constraints() {
+                void mnt_e_over_e_miller_loop_component<CurveType>::generate_r1cs_constraints() {
                     fs[0]->generate_r1cs_equals_const_constraints(fqk_type::one());
 
                     for (std::size_t i = 0; i < dbl_count; ++i) {
@@ -677,7 +677,7 @@ namespace nil {
                 }
 
                 template<typename CurveType>
-                void mnt_e_over_e_miller_loop_gadget<CurveType>::generate_r1cs_witness() {
+                void mnt_e_over_e_miller_loop_component<CurveType>::generate_r1cs_witness() {
                     fs[0]->generate_r1cs_witness(fqk_type::one());
 
                     std::size_t add_id = 0;
@@ -742,16 +742,16 @@ namespace nil {
                     G2_variable<CurveType> Q2(pb, "Q2");
 
                     G1_precomputation<CurveType> prec_P1;
-                    precompute_G1_gadget<CurveType> compute_prec_P1(pb, P1, prec_P1, "compute_prec_P1");
+                    precompute_G1_component<CurveType> compute_prec_P1(pb, P1, prec_P1, "compute_prec_P1");
                     G1_precomputation<CurveType> prec_P2;
-                    precompute_G1_gadget<CurveType> compute_prec_P2(pb, P2, prec_P2, "compute_prec_P2");
+                    precompute_G1_component<CurveType> compute_prec_P2(pb, P2, prec_P2, "compute_prec_P2");
                     G2_precomputation<CurveType> prec_Q1;
-                    precompute_G2_gadget<CurveType> compute_prec_Q1(pb, Q1, prec_Q1, "compute_prec_Q1");
+                    precompute_G2_component<CurveType> compute_prec_Q1(pb, Q1, prec_Q1, "compute_prec_Q1");
                     G2_precomputation<CurveType> prec_Q2;
-                    precompute_G2_gadget<CurveType> compute_prec_Q2(pb, Q2, prec_Q2, "compute_prec_Q2");
+                    precompute_G2_component<CurveType> compute_prec_Q2(pb, Q2, prec_Q2, "compute_prec_Q2");
 
                     Fqk_variable<CurveType> result(pb, "result");
-                    mnt_e_over_e_miller_loop_gadget<CurveType> miller(pb, prec_P1, prec_Q1, prec_P2, prec_Q2, result,
+                    mnt_e_over_e_miller_loop_component<CurveType> miller(pb, prec_P1, prec_Q1, prec_P2, prec_Q2, result,
                                                                 "miller");
 
                     PROFILE_CONSTRAINTS(pb, "precompute P") {
@@ -796,7 +796,7 @@ namespace nil {
                 }
 
                 template<typename CurveType>
-                mnt_e_times_e_over_e_miller_loop_gadget<CurveType>::mnt_e_times_e_over_e_miller_loop_gadget(
+                mnt_e_times_e_over_e_miller_loop_component<CurveType>::mnt_e_times_e_over_e_miller_loop_component(
                     blueprint<FieldType> &pb,
                     const G1_precomputation<CurveType> &prec_P1,
                     const G2_precomputation<CurveType> &prec_Q1,
@@ -877,15 +877,15 @@ namespace nil {
                             pb, prec_P3, *prec_Q3.coeffs[prec_id], g_RR_at_P3s[dbl_id]));
                         ++prec_id;
 
-                        dbl_sqrs[dbl_id].reset(new Fqk_sqr_gadget<CurveType>(pb, *fs[f_id], *fs[f_id + 1]));
+                        dbl_sqrs[dbl_id].reset(new Fqk_sqr_component<CurveType>(pb, *fs[f_id], *fs[f_id + 1]));
                         ++f_id;
                         dbl_muls1[dbl_id].reset(
-                            new Fqk_special_mul_gadget<CurveType>(pb, *fs[f_id], *g_RR_at_P1s[dbl_id], *fs[f_id + 1]));
+                            new Fqk_special_mul_component<CurveType>(pb, *fs[f_id], *g_RR_at_P1s[dbl_id], *fs[f_id + 1]));
                         ++f_id;
                         dbl_muls2[dbl_id].reset(
-                            new Fqk_special_mul_gadget<CurveType>(pb, *fs[f_id], *g_RR_at_P2s[dbl_id], *fs[f_id + 1]));
+                            new Fqk_special_mul_component<CurveType>(pb, *fs[f_id], *g_RR_at_P2s[dbl_id], *fs[f_id + 1]));
                         ++f_id;
-                        dbl_muls3[dbl_id].reset(new Fqk_special_mul_gadget<CurveType>(
+                        dbl_muls3[dbl_id].reset(new Fqk_special_mul_component<CurveType>(
                             pb, (f_id + 1 == f_count ? result : *fs[f_id + 1]), *g_RR_at_P3s[dbl_id], *fs[f_id]));
                         ++f_id;
                         ++dbl_id;
@@ -899,12 +899,12 @@ namespace nil {
                                 pb, NAF[i] < 0, prec_P3, *prec_Q3.coeffs[prec_id], *prec_Q3.Q, g_RQ_at_P3s[add_id]));
                             ++prec_id;
                             add_muls1[add_id].reset(
-                                new Fqk_special_mul_gadget<CurveType>(pb, *fs[f_id], *g_RQ_at_P1s[add_id], *fs[f_id + 1]));
+                                new Fqk_special_mul_component<CurveType>(pb, *fs[f_id], *g_RQ_at_P1s[add_id], *fs[f_id + 1]));
                             ++f_id;
                             add_muls2[add_id].reset(
-                                new Fqk_special_mul_gadget<CurveType>(pb, *fs[f_id], *g_RQ_at_P2s[add_id], *fs[f_id + 1]));
+                                new Fqk_special_mul_component<CurveType>(pb, *fs[f_id], *g_RQ_at_P2s[add_id], *fs[f_id + 1]));
                             ++f_id;
-                            add_muls3[add_id].reset(new Fqk_special_mul_gadget<CurveType>(
+                            add_muls3[add_id].reset(new Fqk_special_mul_component<CurveType>(
                                 pb, (f_id + 1 == f_count ? result : *fs[f_id + 1]), *g_RQ_at_P3s[add_id], *fs[f_id]));
                             ++f_id;
                             ++add_id;
@@ -913,7 +913,7 @@ namespace nil {
                 }
 
                 template<typename CurveType>
-                void mnt_e_times_e_over_e_miller_loop_gadget<CurveType>::generate_r1cs_constraints() {
+                void mnt_e_times_e_over_e_miller_loop_component<CurveType>::generate_r1cs_constraints() {
                     fs[0]->generate_r1cs_equals_const_constraints(fqk_type::one());
 
                     for (std::size_t i = 0; i < dbl_count; ++i) {
@@ -937,7 +937,7 @@ namespace nil {
                 }
 
                 template<typename CurveType>
-                void mnt_e_times_e_over_e_miller_loop_gadget<CurveType>::generate_r1cs_witness() {
+                void mnt_e_times_e_over_e_miller_loop_component<CurveType>::generate_r1cs_witness() {
                     fs[0]->generate_r1cs_witness(fqk_type::one());
 
                     std::size_t add_id = 0;
@@ -1015,20 +1015,20 @@ namespace nil {
                     G2_variable<CurveType> Q3(pb);
 
                     G1_precomputation<CurveType> prec_P1;
-                    precompute_G1_gadget<CurveType> compute_prec_P1(pb, P1, prec_P1);
+                    precompute_G1_component<CurveType> compute_prec_P1(pb, P1, prec_P1);
                     G1_precomputation<CurveType> prec_P2;
-                    precompute_G1_gadget<CurveType> compute_prec_P2(pb, P2, prec_P2);
+                    precompute_G1_component<CurveType> compute_prec_P2(pb, P2, prec_P2);
                     G1_precomputation<CurveType> prec_P3;
-                    precompute_G1_gadget<CurveType> compute_prec_P3(pb, P3, prec_P3);
+                    precompute_G1_component<CurveType> compute_prec_P3(pb, P3, prec_P3);
                     G2_precomputation<CurveType> prec_Q1;
-                    precompute_G2_gadget<CurveType> compute_prec_Q1(pb, Q1, prec_Q1);
+                    precompute_G2_component<CurveType> compute_prec_Q1(pb, Q1, prec_Q1);
                     G2_precomputation<CurveType> prec_Q2;
-                    precompute_G2_gadget<CurveType> compute_prec_Q2(pb, Q2, prec_Q2);
+                    precompute_G2_component<CurveType> compute_prec_Q2(pb, Q2, prec_Q2);
                     G2_precomputation<CurveType> prec_Q3;
-                    precompute_G2_gadget<CurveType> compute_prec_Q3(pb, Q3, prec_Q3);
+                    precompute_G2_component<CurveType> compute_prec_Q3(pb, Q3, prec_Q3);
 
                     Fqk_variable<CurveType> result(pb);
-                    mnt_e_times_e_over_e_miller_loop_gadget<CurveType> miller(pb, prec_P1, prec_Q1, prec_P2, prec_Q2, prec_P3,
+                    mnt_e_times_e_over_e_miller_loop_component<CurveType> miller(pb, prec_P1, prec_Q1, prec_P2, prec_Q2, prec_P3,
                                                                         prec_Q3, result);
 
                     PROFILE_CONSTRAINTS(pb, "precompute P") {

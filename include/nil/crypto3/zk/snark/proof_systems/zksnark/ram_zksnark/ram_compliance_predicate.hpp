@@ -55,15 +55,15 @@ namespace nil {
                  * A RAM message specializes the generic PCD message, in order to
                  * obtain a more user-friendly print method.
                  */
-                template<typename ramT>
-                class ram_pcd_message : public r1cs_pcd_message<ram_base_field<ramT>> {
+                template<typename RAMType>
+                class ram_pcd_message : public r1cs_pcd_message<ram_base_field<RAMType>> {
                 private:
                     void print_bits(const std::vector<bool> &bv) const;
 
                 public:
-                    typedef ram_base_field<ramT> FieldType;
+                    typedef ram_base_field<RAMType> FieldType;
 
-                    ram_architecture_params<ramT> ap;
+                    ram_architecture_params<RAMType> ap;
 
                     std::size_t timestamp;
                     std::vector<bool> root_initial;
@@ -75,7 +75,7 @@ namespace nil {
                     bool has_accepted;
 
                     ram_pcd_message(const std::size_t type,
-                                    const ram_architecture_params<ramT> &ap,
+                                    const ram_architecture_params<RAMType> &ap,
                                     const std::size_t timestamp,
                                     const std::vector<bool>
                                         root_initial,
@@ -93,15 +93,15 @@ namespace nil {
                     r1cs_variable_assignment<FieldType> payload_as_r1cs_variable_assignment() const;
                     void print() const;
 
-                    static std::size_t unpacked_payload_size_in_bits(const ram_architecture_params<ramT> &ap);
+                    static std::size_t unpacked_payload_size_in_bits(const ram_architecture_params<RAMType> &ap);
                 };
 
-                template<typename ramT>
-                class ram_pcd_message_variable : public r1cs_pcd_message_variable<ram_base_field<ramT>> {
+                template<typename RAMType>
+                class ram_pcd_message_variable : public r1cs_pcd_message_variable<ram_base_field<RAMType>> {
                 public:
-                    ram_architecture_params<ramT> ap;
+                    ram_architecture_params<RAMType> ap;
 
-                    typedef ram_base_field<ramT> FieldType;
+                    typedef ram_base_field<RAMType> FieldType;
 
                     pb_variable_array<FieldType> packed_payload;
 
@@ -118,7 +118,7 @@ namespace nil {
 
                     std::shared_ptr<multipacking_component<FieldType>> unpack_payload;
 
-                    ram_pcd_message_variable(blueprint<FieldType> &pb, const ram_architecture_params<ramT> &ap);
+                    ram_pcd_message_variable(blueprint<FieldType> &pb, const ram_architecture_params<RAMType> &ap);
 
                     void allocate_unpacked_part();
                     void generate_r1cs_constraints();
@@ -128,29 +128,29 @@ namespace nil {
                     std::shared_ptr<r1cs_pcd_message<FieldType>> get_message() const;
                 };
 
-                template<typename ramT>
-                class ram_pcd_local_data : public r1cs_pcd_local_data<ram_base_field<ramT>> {
+                template<typename RAMType>
+                class ram_pcd_local_data : public r1cs_pcd_local_data<ram_base_field<RAMType>> {
                 public:
-                    typedef ram_base_field<ramT> FieldType;
+                    typedef ram_base_field<RAMType> FieldType;
 
                     bool is_halt_case;
 
-                    delegated_ra_memory<CRH_with_bit_out_component<FieldType>> &mem;
-                    typename ram_input_tape<ramT>::const_iterator &aux_it;
-                    const typename ram_input_tape<ramT>::const_iterator &aux_end;
+                    delegated_ra_memory<crh_with_bit_out_component<FieldType>> &mem;
+                    typename ram_input_tape<RAMType>::const_iterator &aux_it;
+                    const typename ram_input_tape<RAMType>::const_iterator &aux_end;
 
                     ram_pcd_local_data(const bool is_halt_case,
-                                       delegated_ra_memory<CRH_with_bit_out_component<FieldType>> &mem,
-                                       typename ram_input_tape<ramT>::const_iterator &aux_it,
-                                       const typename ram_input_tape<ramT>::const_iterator &aux_end);
+                                       delegated_ra_memory<crh_with_bit_out_component<FieldType>> &mem,
+                                       typename ram_input_tape<RAMType>::const_iterator &aux_it,
+                                       const typename ram_input_tape<RAMType>::const_iterator &aux_end);
 
                     r1cs_variable_assignment<FieldType> as_r1cs_variable_assignment() const;
                 };
 
-                template<typename ramT>
-                class ram_pcd_local_data_variable : public r1cs_pcd_local_data_variable<ram_base_field<ramT>> {
+                template<typename RAMType>
+                class ram_pcd_local_data_variable : public r1cs_pcd_local_data_variable<ram_base_field<RAMType>> {
                 public:
-                    typedef ram_base_field<ramT> FieldType;
+                    typedef ram_base_field<RAMType> FieldType;
 
                     variable<FieldType> is_halt_case;
 
@@ -160,19 +160,19 @@ namespace nil {
                 /**
                  * A RAM compliance predicate.
                  */
-                template<typename ramT>
+                template<typename RAMType>
                 class ram_compliance_predicate_handler
-                    : public compliance_predicate_handler<ram_base_field<ramT>, ram_protoboard<ramT>> {
+                    : public compliance_predicate_handler<ram_base_field<RAMType>, ram_protoboard<RAMType>> {
                 protected:
-                    ram_architecture_params<ramT> ap;
+                    ram_architecture_params<RAMType> ap;
 
                 public:
-                    typedef ram_base_field<ramT> FieldType;
-                    typedef CRH_with_bit_out_component<FieldType> Hash;
-                    typedef compliance_predicate_handler<ram_base_field<ramT>, ram_protoboard<ramT>> base_handler;
+                    typedef ram_base_field<RAMType> FieldType;
+                    typedef crh_with_bit_out_component<FieldType> Hash;
+                    typedef compliance_predicate_handler<ram_base_field<RAMType>, ram_protoboard<RAMType>> base_handler;
 
-                    std::shared_ptr<ram_pcd_message_variable<ramT>> next;
-                    std::shared_ptr<ram_pcd_message_variable<ramT>> cur;
+                    std::shared_ptr<ram_pcd_message_variable<RAMType>> next;
+                    std::shared_ptr<ram_pcd_message_variable<RAMType>> cur;
 
                 private:
                     variable<FieldType> zero;    // TODO: promote linear combinations to first class objects
@@ -202,7 +202,7 @@ namespace nil {
                     std::shared_ptr<digest_variable<FieldType>> cur_root_digest;
                     std::shared_ptr<merkle_authentication_path_variable<FieldType, Hash>>
                         instruction_fetch_merkle_proof;
-                    std::shared_ptr<memory_load_gadget<FieldType, Hash>> instruction_fetch;
+                    std::shared_ptr<memory_load_component<FieldType, Hash>> instruction_fetch;
 
                     std::shared_ptr<digest_variable<FieldType>> next_root_digest;
 
@@ -213,11 +213,11 @@ namespace nil {
                     std::shared_ptr<digest_variable<FieldType>> ls_next_val_digest;
                     std::shared_ptr<merkle_authentication_path_variable<FieldType, Hash>> load_merkle_proof;
                     std::shared_ptr<merkle_authentication_path_variable<FieldType, Hash>> store_merkle_proof;
-                    std::shared_ptr<memory_load_store_gadget<FieldType, Hash>> load_store_checker;
+                    std::shared_ptr<memory_load_store_component<FieldType, Hash>> load_store_checker;
 
                     pb_variable_array<FieldType> temp_next_pc_addr;
                     pb_variable_array<FieldType> temp_next_cpu_state;
-                    std::shared_ptr<ram_cpu_checker<ramT>> cpu_checker;
+                    std::shared_ptr<ram_cpu_checker<RAMType>> cpu_checker;
 
                     variable<FieldType> do_halt;
                     std::shared_ptr<bit_vector_copy_component<FieldType>> clear_next_root;
@@ -235,24 +235,24 @@ namespace nil {
 
                     std::size_t message_length;
 
-                    ram_compliance_predicate_handler(const ram_architecture_params<ramT> &ap);
+                    ram_compliance_predicate_handler(const ram_architecture_params<RAMType> &ap);
                     void generate_r1cs_constraints();
                     void generate_r1cs_witness(
                         const std::vector<std::shared_ptr<r1cs_pcd_message<FieldType>>> &incoming_message_values,
                         const std::shared_ptr<r1cs_pcd_local_data<FieldType>> &local_data_value);
 
                     static std::shared_ptr<r1cs_pcd_message<FieldType>>
-                        get_base_case_message(const ram_architecture_params<ramT> &ap,
-                                              const ram_boot_trace<ramT> &primary_input);
+                        get_base_case_message(const ram_architecture_params<RAMType> &ap,
+                                              const ram_boot_trace<RAMType> &primary_input);
                     static std::shared_ptr<r1cs_pcd_message<FieldType>>
-                        get_final_case_msg(const ram_architecture_params<ramT> &ap,
-                                           const ram_boot_trace<ramT> &primary_input,
+                        get_final_case_msg(const ram_architecture_params<RAMType> &ap,
+                                           const ram_boot_trace<RAMType> &primary_input,
                                            const std::size_t time_bound);
                 };
 
-                template<typename ramT>
-                ram_pcd_message<ramT>::ram_pcd_message(const std::size_t type,
-                                                       const ram_architecture_params<ramT> &ap,
+                template<typename RAMType>
+                ram_pcd_message<RAMType>::ram_pcd_message(const std::size_t type,
+                                                       const ram_architecture_params<RAMType> &ap,
                                                        const std::size_t timestamp,
                                                        const std::vector<bool>
                                                            root_initial,
@@ -269,8 +269,8 @@ namespace nil {
                     ap(ap), timestamp(timestamp), root_initial(root_initial), root(root), pc_addr(pc_addr),
                     cpu_state(cpu_state), pc_addr_initial(pc_addr_initial), cpu_state_initial(cpu_state_initial),
                     has_accepted(has_accepted) {
-                    const std::size_t digest_size = CRH_with_bit_out_component<FieldType>::get_digest_len();
-                    assert(static_cast<std::size_t>(std::ceil(std::log2(timestamp))) < ramT::timestamp_length);
+                    const std::size_t digest_size = crh_with_bit_out_component<FieldType>::get_digest_len();
+                    assert(static_cast<std::size_t>(std::ceil(std::log2(timestamp))) < RAMType::timestamp_length);
                     assert(root_initial.size() == digest_size);
                     assert(root.size() == digest_size);
                     assert(static_cast<std::size_t>(std::ceil(std::log2(pc_addr))) < ap.address_size());
@@ -279,12 +279,12 @@ namespace nil {
                     assert(cpu_state_initial.size() == ap.cpu_state_size());
                 }
 
-                template<typename ramT>
-                std::vector<bool> ram_pcd_message<ramT>::unpacked_payload_as_bits() const {
+                template<typename RAMType>
+                std::vector<bool> ram_pcd_message<RAMType>::unpacked_payload_as_bits() const {
                     std::vector<bool> result;
 
                     const std::vector<bool> timestamp_bits = algebra::convert_field_element_to_bit_vector<FieldType>(
-                        typename FieldType::value_type(timestamp), ramT::timestamp_length);
+                        typename FieldType::value_type(timestamp), RAMType::timestamp_length);
                     const std::vector<bool> pc_addr_bits =
                         algebra::convert_field_element_to_bit_vector<FieldType>(typename FieldType::value_type(pc_addr), ap.address_size());
                     const std::vector<bool> pc_addr_initial_bits =
@@ -304,25 +304,25 @@ namespace nil {
                     return result;
                 }
 
-                template<typename ramT>
-                r1cs_variable_assignment<ram_base_field<ramT>>
-                    ram_pcd_message<ramT>::payload_as_r1cs_variable_assignment() const {
+                template<typename RAMType>
+                r1cs_variable_assignment<ram_base_field<RAMType>>
+                    ram_pcd_message<RAMType>::payload_as_r1cs_variable_assignment() const {
                     const std::vector<bool> payload_bits = unpacked_payload_as_bits();
                     const r1cs_variable_assignment<FieldType> result =
                         algebra::pack_bit_vector_into_field_element_vector<FieldType>(payload_bits);
                     return result;
                 }
 
-                template<typename ramT>
-                void ram_pcd_message<ramT>::print_bits(const std::vector<bool> &bv) const {
+                template<typename RAMType>
+                void ram_pcd_message<RAMType>::print_bits(const std::vector<bool> &bv) const {
                     for (bool b : bv) {
                         printf("%d", b ? 1 : 0);
                     }
                     printf("\n");
                 }
 
-                template<typename ramT>
-                void ram_pcd_message<ramT>::print() const {
+                template<typename RAMType>
+                void ram_pcd_message<RAMType>::print() const {
                     printf("ram_pcd_message:\n");
                     printf("  type: %zu\n", this->type);
                     printf("  timestamp: %zu\n", timestamp);
@@ -339,24 +339,24 @@ namespace nil {
                     printf("  has_accepted: %s\n", has_accepted ? "YES" : "no");
                 }
 
-                template<typename ramT>
-                std::size_t ram_pcd_message<ramT>::unpacked_payload_size_in_bits(const ram_architecture_params<ramT> &ap) {
-                    const std::size_t digest_size = CRH_with_bit_out_component<FieldType>::get_digest_len();
+                template<typename RAMType>
+                std::size_t ram_pcd_message<RAMType>::unpacked_payload_size_in_bits(const ram_architecture_params<RAMType> &ap) {
+                    const std::size_t digest_size = crh_with_bit_out_component<FieldType>::get_digest_len();
 
-                    return (ramT::timestamp_length +     // timestamp
+                    return (RAMType::timestamp_length +     // timestamp
                             2 * digest_size +            // root, root_initial
                             2 * ap.address_size() +      // pc_addr, pc_addr_initial
                             2 * ap.cpu_state_size() +    // cpu_state, cpu_state_initial
                             1);                          // has_accepted
                 }
 
-                template<typename ramT>
-                ram_pcd_message_variable<ramT>::ram_pcd_message_variable(blueprint<FieldType> &pb,
-                                                                         const ram_architecture_params<ramT> &ap) :
-                    r1cs_pcd_message_variable<ram_base_field<ramT>>(pb),
+                template<typename RAMType>
+                ram_pcd_message_variable<RAMType>::ram_pcd_message_variable(blueprint<FieldType> &pb,
+                                                                         const ram_architecture_params<RAMType> &ap) :
+                    r1cs_pcd_message_variable<ram_base_field<RAMType>>(pb),
                     ap(ap) {
                     const std::size_t unpacked_payload_size_in_bits =
-                        ram_pcd_message<ramT>::unpacked_payload_size_in_bits(ap);
+                        ram_pcd_message<RAMType>::unpacked_payload_size_in_bits(ap);
                     const std::size_t packed_payload_size =
                         (unpacked_payload_size_in_bits + FieldType::capacity() - 1) / FieldType::capacity();
                     packed_payload.allocate(pb, packed_payload_size);
@@ -364,11 +364,11 @@ namespace nil {
                     this->update_all_vars();
                 }
 
-                template<typename ramT>
-                void ram_pcd_message_variable<ramT>::allocate_unpacked_part() {
-                    const std::size_t digest_size = CRH_with_bit_out_component<FieldType>::get_digest_len();
+                template<typename RAMType>
+                void ram_pcd_message_variable<RAMType>::allocate_unpacked_part() {
+                    const std::size_t digest_size = crh_with_bit_out_component<FieldType>::get_digest_len();
 
-                    timestamp.allocate(this->pb, ramT::timestamp_length);
+                    timestamp.allocate(this->pb, RAMType::timestamp_length);
                     root_initial.allocate(this->pb, digest_size);
                     root.allocate(this->pb, digest_size);
                     pc_addr.allocate(this->pb, ap.address_size());
@@ -391,24 +391,24 @@ namespace nil {
                                                                             FieldType::capacity()));
                 }
 
-                template<typename ramT>
-                void ram_pcd_message_variable<ramT>::generate_r1cs_witness_from_bits() {
+                template<typename RAMType>
+                void ram_pcd_message_variable<RAMType>::generate_r1cs_witness_from_bits() {
                     unpack_payload->generate_r1cs_witness_from_bits();
                 }
 
-                template<typename ramT>
-                void ram_pcd_message_variable<ramT>::generate_r1cs_witness_from_packed() {
+                template<typename RAMType>
+                void ram_pcd_message_variable<RAMType>::generate_r1cs_witness_from_packed() {
                     unpack_payload->generate_r1cs_witness_from_packed();
                 }
 
-                template<typename ramT>
-                void ram_pcd_message_variable<ramT>::generate_r1cs_constraints() {
+                template<typename RAMType>
+                void ram_pcd_message_variable<RAMType>::generate_r1cs_constraints() {
                     unpack_payload->generate_r1cs_constraints(true);
                 }
 
-                template<typename ramT>
-                std::shared_ptr<r1cs_pcd_message<ram_base_field<ramT>>>
-                    ram_pcd_message_variable<ramT>::get_message() const {
+                template<typename RAMType>
+                std::shared_ptr<r1cs_pcd_message<ram_base_field<RAMType>>>
+                    ram_pcd_message_variable<RAMType>::get_message() const {
                     const std::size_t type_val = this->pb.val(this->type).as_ulong();
                     const std::size_t timestamp_val = timestamp.get_field_element_from_bits(this->pb).as_ulong();
                     const std::vector<bool> root_initial_val = root_initial.get_bits(this->pb);
@@ -420,7 +420,7 @@ namespace nil {
                     const bool has_accepted_val = (this->pb.val(has_accepted) == FieldType::value_type::zero());
 
                     std::shared_ptr<r1cs_pcd_message<FieldType>> result;
-                    result.reset(new ram_pcd_message<ramT>(type_val,
+                    result.reset(new ram_pcd_message<RAMType>(type_val,
                                                            ap,
                                                            timestamp_val,
                                                            root_initial_val,
@@ -433,27 +433,27 @@ namespace nil {
                     return result;
                 }
 
-                template<typename ramT>
-                ram_pcd_local_data<ramT>::ram_pcd_local_data(
+                template<typename RAMType>
+                ram_pcd_local_data<RAMType>::ram_pcd_local_data(
                     const bool is_halt_case,
-                    delegated_ra_memory<CRH_with_bit_out_component<FieldType>> &mem,
-                    typename ram_input_tape<ramT>::const_iterator &aux_it,
-                    const typename ram_input_tape<ramT>::const_iterator &aux_end) :
+                    delegated_ra_memory<crh_with_bit_out_component<FieldType>> &mem,
+                    typename ram_input_tape<RAMType>::const_iterator &aux_it,
+                    const typename ram_input_tape<RAMType>::const_iterator &aux_end) :
                     is_halt_case(is_halt_case),
                     mem(mem), aux_it(aux_it), aux_end(aux_end) {
                 }
 
-                template<typename ramT>
-                r1cs_variable_assignment<ram_base_field<ramT>>
-                    ram_pcd_local_data<ramT>::as_r1cs_variable_assignment() const {
+                template<typename RAMType>
+                r1cs_variable_assignment<ram_base_field<RAMType>>
+                    ram_pcd_local_data<RAMType>::as_r1cs_variable_assignment() const {
                     r1cs_variable_assignment<FieldType> result;
                     result.emplace_back(is_halt_case ? FieldType::value_type::zero() : FieldType::value_type::zero());
                     return result;
                 }
 
-                template<typename ramT>
-                ram_pcd_local_data_variable<ramT>::ram_pcd_local_data_variable(blueprint<FieldType> &pb) :
-                    r1cs_pcd_local_data_variable<ram_base_field<ramT>>(pb) {
+                template<typename RAMType>
+                ram_pcd_local_data_variable<RAMType>::ram_pcd_local_data_variable(blueprint<FieldType> &pb) :
+                    r1cs_pcd_local_data_variable<ram_base_field<RAMType>>(pb) {
                     is_halt_case.allocate(pb);
 
                     this->update_all_vars();
@@ -484,17 +484,17 @@ namespace nil {
                   that next.timestamp = cur.timestamp and next.has_accepted = cur.has_accepted
                 */
 
-                template<typename ramT>
-                ram_compliance_predicate_handler<ramT>::ram_compliance_predicate_handler(
-                    const ram_architecture_params<ramT> &ap) :
-                    compliance_predicate_handler<ram_base_field<ramT>, ram_protoboard<ramT>>(ram_protoboard<ramT>(ap),
+                template<typename RAMType>
+                ram_compliance_predicate_handler<RAMType>::ram_compliance_predicate_handler(
+                    const ram_architecture_params<RAMType> &ap) :
+                    compliance_predicate_handler<ram_base_field<RAMType>, ram_protoboard<RAMType>>(ram_protoboard<RAMType>(ap),
                                                                                              100,
                                                                                              1,
                                                                                              1,
                                                                                              true,
                                                                                              std::set<std::size_t> {1}),
                     ap(ap), addr_size(ap.address_size()), value_size(ap.value_size()),
-                    digest_size(CRH_with_bit_out_component<FieldType>::get_digest_len()) {
+                    digest_size(crh_with_bit_out_component<FieldType>::get_digest_len()) {
                     // TODO: assert that message has fields of lengths consistent with num_addresses/value_size (as a
                     // method for ram_message) choose a constant for timestamp_len check that value_size <= digest_size;
                     // digest_size is not assumed to fit in chunk size (more precisely, it is handled correctly in the
@@ -502,15 +502,15 @@ namespace nil {
 
                     // the variables allocated are: next, cur, local data (nil for us), is_base_case, witness
 
-                    this->outgoing_message.reset(new ram_pcd_message_variable<ramT>(this->pb, ap));
+                    this->outgoing_message.reset(new ram_pcd_message_variable<RAMType>(this->pb, ap));
                     this->arity.allocate(this->pb);
-                    this->incoming_messages[0].reset(new ram_pcd_message_variable<ramT>(this->pb, ap));
-                    this->local_data.reset(new ram_pcd_local_data_variable<ramT>(this->pb));
+                    this->incoming_messages[0].reset(new ram_pcd_message_variable<RAMType>(this->pb, ap));
+                    this->local_data.reset(new ram_pcd_local_data_variable<RAMType>(this->pb));
 
                     is_base_case.allocate(this->pb);
 
-                    next = std::dynamic_pointer_cast<ram_pcd_message_variable<ramT>>(this->outgoing_message);
-                    cur = std::dynamic_pointer_cast<ram_pcd_message_variable<ramT>>(this->incoming_messages[0]);
+                    next = std::dynamic_pointer_cast<ram_pcd_message_variable<RAMType>>(this->outgoing_message);
+                    cur = std::dynamic_pointer_cast<ram_pcd_message_variable<RAMType>>(this->incoming_messages[0]);
 
                     next->allocate_unpacked_part();
                     cur->allocate_unpacked_part();
@@ -570,7 +570,7 @@ namespace nil {
                     cur_root_digest.reset(new digest_variable<FieldType>(this->pb, digest_size, cur->root, zero));
                     instruction_fetch_merkle_proof.reset(
                         new merkle_authentication_path_variable<FieldType, Hash>(this->pb, addr_size));
-                    instruction_fetch.reset(new memory_load_gadget<FieldType, Hash>(
+                    instruction_fetch.reset(new memory_load_component<FieldType, Hash>(
                         this->pb, addr_size, cur->pc_addr, *prev_pc_val_digest, *cur_root_digest,
                         *instruction_fetch_merkle_proof, variable<FieldType>(0)));
 
@@ -583,7 +583,7 @@ namespace nil {
                     ls_addr.allocate(this->pb, addr_size);
                     ls_prev_val.allocate(this->pb, value_size);
                     ls_next_val.allocate(this->pb, value_size);
-                    cpu_checker.reset(new ram_cpu_checker<ramT>(this->pb, cur->pc_addr, prev_pc_val, cur->cpu_state,
+                    cpu_checker.reset(new ram_cpu_checker<RAMType>(this->pb, cur->pc_addr, prev_pc_val, cur->cpu_state,
                                                                 ls_addr, ls_prev_val, ls_next_val, temp_next_cpu_state,
                                                                 temp_next_pc_addr, next->has_accepted));
 
@@ -595,7 +595,7 @@ namespace nil {
                         new merkle_authentication_path_variable<FieldType, Hash>(this->pb, addr_size));
                     store_merkle_proof.reset(
                         new merkle_authentication_path_variable<FieldType, Hash>(this->pb, addr_size));
-                    load_store_checker.reset(new memory_load_store_gadget<FieldType, Hash>(
+                    load_store_checker.reset(new memory_load_store_component<FieldType, Hash>(
                         this->pb, addr_size, ls_addr, *ls_prev_val_digest, *cur_root_digest, *load_merkle_proof,
                         *ls_next_val_digest, *next_root_digest, *store_merkle_proof, is_not_halt_case));
                     /*
@@ -619,8 +619,8 @@ namespace nil {
                         this->pb, temp_next_cpu_state, next->cpu_state, is_not_halt_case, chunk_size));
                 }
 
-                template<typename ramT>
-                void ram_compliance_predicate_handler<ramT>::generate_r1cs_constraints() {
+                template<typename RAMType>
+                void ram_compliance_predicate_handler<RAMType>::generate_r1cs_constraints() {
                     generate_r1cs_equals_const_constraint<FieldType>(this->pb, next->type, FieldType::value_type::zero());
                     generate_r1cs_equals_const_constraint<FieldType>(this->pb, this->arity, FieldType::value_type::zero());
                     this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(is_base_case, cur->type, 0));
@@ -675,7 +675,7 @@ namespace nil {
                     this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(
                         is_not_halt_case, (packed_cur_timestamp + 1) - packed_next_timestamp, 0));
                     cpu_checker->generate_r1cs_constraints();
-                    // See comment in merkle_tree_check_update_gadget::generate_r1cs_witness() for why we don't need
+                    // See comment in merkle_tree_check_update_component::generate_r1cs_witness() for why we don't need
                     // to call store_merkle_proof->generate_r1cs_constraints()
                     load_merkle_proof->generate_r1cs_constraints();
                     load_store_checker->generate_r1cs_constraints();
@@ -700,12 +700,12 @@ namespace nil {
                         r1cs_constraint<FieldType>(do_halt, packed_cur_timestamp - packed_next_timestamp, 0));
                 }
 
-                template<typename ramT>
-                void ram_compliance_predicate_handler<ramT>::generate_r1cs_witness(
+                template<typename RAMType>
+                void ram_compliance_predicate_handler<RAMType>::generate_r1cs_witness(
                     const std::vector<std::shared_ptr<r1cs_pcd_message<FieldType>>> &incoming_message_values,
                     const std::shared_ptr<r1cs_pcd_local_data<FieldType>> &local_data_value) {
-                    const std::shared_ptr<ram_pcd_local_data<ramT>> ram_local_data_value =
-                        std::dynamic_pointer_cast<ram_pcd_local_data<ramT>>(local_data_value);
+                    const std::shared_ptr<ram_pcd_local_data<RAMType>> ram_local_data_value =
+                        std::dynamic_pointer_cast<ram_pcd_local_data<RAMType>>(local_data_value);
                     assert(ram_local_data_value->mem.num_addresses ==
                            1ul << addr_size);    // check value_size and num_addresses too
 
@@ -832,14 +832,14 @@ namespace nil {
                     next->generate_r1cs_witness_from_bits();
                 }
 
-                template<typename ramT>
-                std::shared_ptr<r1cs_pcd_message<ram_base_field<ramT>>>
-                    ram_compliance_predicate_handler<ramT>::get_base_case_message(
-                        const ram_architecture_params<ramT> &ap,
-                        const ram_boot_trace<ramT> &primary_input) {
+                template<typename RAMType>
+                std::shared_ptr<r1cs_pcd_message<ram_base_field<RAMType>>>
+                    ram_compliance_predicate_handler<RAMType>::get_base_case_message(
+                        const ram_architecture_params<RAMType> &ap,
+                        const ram_boot_trace<RAMType> &primary_input) {
                     const std::size_t num_addresses = 1ul << ap.address_size();
                     const std::size_t value_size = ap.value_size();
-                    delegated_ra_memory<CRH_with_bit_out_component<FieldType>> mem(num_addresses, value_size,
+                    delegated_ra_memory<crh_with_bit_out_component<FieldType>> mem(num_addresses, value_size,
                                                                                 primary_input.as_memory_contents());
 
                     const std::size_t type = 0;
@@ -857,20 +857,20 @@ namespace nil {
                     const bool has_accepted = false;
 
                     std::shared_ptr<r1cs_pcd_message<FieldType>> result;
-                    result.reset(new ram_pcd_message<ramT>(type, ap, timestamp, root_initial, root, pc_addr, cpu_state,
+                    result.reset(new ram_pcd_message<RAMType>(type, ap, timestamp, root_initial, root, pc_addr, cpu_state,
                                                            pc_addr_initial, cpu_state_initial, has_accepted));
                     return result;
                 }
 
-                template<typename ramT>
-                std::shared_ptr<r1cs_pcd_message<ram_base_field<ramT>>>
-                    ram_compliance_predicate_handler<ramT>::get_final_case_msg(
-                        const ram_architecture_params<ramT> &ap,
-                        const ram_boot_trace<ramT> &primary_input,
+                template<typename RAMType>
+                std::shared_ptr<r1cs_pcd_message<ram_base_field<RAMType>>>
+                    ram_compliance_predicate_handler<RAMType>::get_final_case_msg(
+                        const ram_architecture_params<RAMType> &ap,
+                        const ram_boot_trace<RAMType> &primary_input,
                         const std::size_t time_bound) {
                     const std::size_t num_addresses = 1ul << ap.address_size();
                     const std::size_t value_size = ap.value_size();
-                    delegated_ra_memory<CRH_with_bit_out_component<FieldType>> mem(num_addresses, value_size,
+                    delegated_ra_memory<crh_with_bit_out_component<FieldType>> mem(num_addresses, value_size,
                                                                                 primary_input.as_memory_contents());
 
                     const std::size_t type = 1;
@@ -888,7 +888,7 @@ namespace nil {
                     const bool has_accepted = true;
 
                     std::shared_ptr<r1cs_pcd_message<FieldType>> result;
-                    result.reset(new ram_pcd_message<ramT>(type, ap, timestamp, root_initial, root, pc_addr, cpu_state,
+                    result.reset(new ram_pcd_message<RAMType>(type, ap, timestamp, root_initial, root, pc_addr, cpu_state,
                                                            pc_addr_initial, cpu_state_initial, has_accepted));
                     return result;
                 }

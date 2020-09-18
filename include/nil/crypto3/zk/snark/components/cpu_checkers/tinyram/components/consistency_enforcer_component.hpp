@@ -70,7 +70,7 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                consistency_enforcer_component<FieldType>::consistency_enforcer_gadget(
+                consistency_enforcer_component<FieldType>::consistency_enforcer_component(
                     tinyram_protoboard<FieldType> &pb,
                     const pb_variable_array<FieldType> &opcode_indicators,
                     const pb_variable_array<FieldType> &instruction_results,
@@ -290,7 +290,7 @@ namespace nil {
 
 #if 0
                 template<typename FieldType>
-void test_arithmetic_consistency_enforcer_gadget()
+void test_arithmetic_consistency_enforcer_component()
 {
     algebra::print_time("starting arithmetic_consistency_enforcer test");
 
@@ -320,7 +320,7 @@ void test_arithmetic_consistency_enforcer_gadget()
     pb_variable_array<FieldType> packed_outgoing_registers;
     packed_outgoing_registers.allocate(pb, ap.k);
 
-    arithmetic_consistency_enforcer_gadget g(pb, opcode_indicators, instruction_results, instruction_flags,
+    arithmetic_consistency_enforcer_component g(pb, opcode_indicators, instruction_results, instruction_flags,
                                              desidx.bits, incoming_pc, packed_incoming_registers,
                                              incoming_load_flag, outgoing_pc, packed_outgoing_registers, outgoing_flag, "g");
     g.generate_r1cs_constraints();
@@ -411,7 +411,7 @@ void test_arithmetic_consistency_enforcer_gadget()
 }
 
 template<typename FieldType>
-void test_control_flow_consistency_enforcer_gadget()
+void test_control_flow_consistency_enforcer_component()
 {
     algebra::print_time("starting control_flow_consistency_enforcer test");
 
@@ -436,7 +436,7 @@ void test_control_flow_consistency_enforcer_gadget()
     pb_variable_array<FieldType> packed_outgoing_registers;
     packed_outgoing_registers.allocate(pb, ap.k);
 
-    control_flow_consistency_enforcer_gadget g(pb, opcode_indicators, instruction_results,
+    control_flow_consistency_enforcer_component g(pb, opcode_indicators, instruction_results,
                                                incoming_pc, packed_incoming_registers, incoming_flag,
                                                outgoing_pc, packed_outgoing_registers, outgoing_flag, "g");
     g.generate_r1cs_constraints();
@@ -479,9 +479,9 @@ void test_control_flow_consistency_enforcer_gadget()
 }
 
 template<typename FieldType>
-void test_special_consistency_enforcer_gadget()
+void test_special_consistency_enforcer_component()
 {
-    algebra::print_time("starting special_consistency_enforcer_gadget test");
+    algebra::print_time("starting special_consistency_enforcer_component test");
 
     tinyram_architecture_params ap(16, 16);
     tinyram_protoboard<FieldType> pb(ap);
@@ -505,7 +505,7 @@ void test_special_consistency_enforcer_gadget()
     pb_variable_array<FieldType> packed_outgoing_registers;
     packed_outgoing_registers.allocate(pb, ap.k);
 
-    special_consistency_enforcer_gadget g(pb, opcode_indicators,
+    special_consistency_enforcer_component g(pb, opcode_indicators,
                                           incoming_pc, packed_incoming_registers, incoming_flag, incoming_load_flag,
                                           outgoing_pc, packed_outgoing_registers, outgoing_flag, outgoing_load_flag, "g");
     g.generate_r1cs_constraints();
@@ -625,7 +625,7 @@ void test_special_consistency_enforcer_gadget()
 
     assert(!pb.is_satisfied());
 
-    algebra::print_time("special_consistency_enforcer_gadget tests successful");
+    algebra::print_time("special_consistency_enforcer_component tests successful");
 }
 #endif
 

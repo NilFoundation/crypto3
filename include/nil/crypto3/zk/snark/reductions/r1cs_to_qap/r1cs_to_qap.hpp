@@ -55,7 +55,7 @@ namespace nil {
                 template<typename FieldType>
                 qap_instance_evaluation<FieldType>
                     r1cs_to_qap_instance_map_with_evaluation(const r1cs_constraint_system<FieldType> &cs,
-                                                             const FieldType::value_type &t);
+                                                             const typename FieldType::value_type &t);
 
                 /**
                  * Witness map for the R1CS-to-QAP reduction.
@@ -66,9 +66,9 @@ namespace nil {
                 qap_witness<FieldType> r1cs_to_qap_witness_map(const r1cs_constraint_system<FieldType> &cs,
                                                                const r1cs_primary_input<FieldType> &primary_input,
                                                                const r1cs_auxiliary_input<FieldType> &auxiliary_input,
-                                                               const FieldType::value_type &d1,
-                                                               const FieldType::value_type &d2,
-                                                               const FieldType::value_type &d3);
+                                                               const typename FieldType::value_type &d1,
+                                                               const typename FieldType::value_type &d2,
+                                                               const typename FieldType::value_type &d3);
 
                 /**
                  * Instance map for the R1CS-to-QAP reduction.
@@ -143,7 +143,7 @@ namespace nil {
                 template<typename FieldType>
                 qap_instance_evaluation<FieldType>
                     r1cs_to_qap_instance_map_with_evaluation(const r1cs_constraint_system<FieldType> &cs,
-                                                             const FieldType::value_type &t) {
+                                                             const typename FieldType::value_type &t) {
                     const std::shared_ptr<algebra::fft::evaluation_domain<FieldType>> domain =
                         algebra::fft::make_evaluation_domain<FieldType>(cs.num_constraints() + cs.num_inputs() + 1);
 
@@ -180,7 +180,7 @@ namespace nil {
                         }
                     }
 
-                    FieldType::value_type ti = FieldType::value_type::zero();
+                    typename FieldType::value_type ti = FieldType::value_type::zero();
                     for (std::size_t i = 0; i < domain->m + 1; ++i) {
                         Ht.emplace_back(ti);
                         ti *= t;
@@ -232,9 +232,9 @@ namespace nil {
                 qap_witness<FieldType> r1cs_to_qap_witness_map(const r1cs_constraint_system<FieldType> &cs,
                                                                const r1cs_primary_input<FieldType> &primary_input,
                                                                const r1cs_auxiliary_input<FieldType> &auxiliary_input,
-                                                               const FieldType::value_type &d1,
-                                                               const FieldType::value_type &d2,
-                                                               const FieldType::value_type &d3) {
+                                                               const typename FieldType::value_type &d1,
+                                                               const typename FieldType::value_type &d2,
+                                                               const typename FieldType::value_type &d3) {
                     /* sanity check */
                     assert(cs.is_satisfied(primary_input, auxiliary_input));
 

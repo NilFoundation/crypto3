@@ -70,7 +70,7 @@ namespace nil {
                         this->pb.lc_val(Y) = el_normalized.Y();
                     }
 
-                    // (See a comment in r1cs_ppzksnark_verifier_gadget.hpp about why
+                    // (See a comment in r1cs_ppzksnark_verifier_component.hpp about why
                     // we mark this function noinline.) TODO: remove later
                     static std::size_t __attribute__((noinline)) size_in_bits() {
                         return 2 * FieldType::modulus_bits;
@@ -84,7 +84,7 @@ namespace nil {
                  * Gadget that creates constraints for the validity of a G1 variable.
                  */
                 template<typename CurveType>
-                class G1_checker_gadget : public component<typename CurveType::scalar_field_type> {
+                class G1_checker_component : public component<typename CurveType::scalar_field_type> {
                 public:
                     typedef typename CurveType::scalar_field_type FieldType;
 
@@ -92,7 +92,7 @@ namespace nil {
                     variable<FieldType> P_X_squared;
                     variable<FieldType> P_Y_squared;
 
-                    G1_checker_gadget(blueprint<FieldType> &pb, const G1_variable<CurveType> &P) :
+                    G1_checker_component(blueprint<FieldType> &pb, const G1_variable<CurveType> &P) :
                         component<FieldType>(pb), P(P) {
                         P_X_squared.allocate(pb);
                         P_Y_squared.allocate(pb);
@@ -115,7 +115,7 @@ namespace nil {
                  * Gadget that creates constraints for G1 addition.
                  */
                 template<typename CurveType>
-                class G1_add_gadget : public component<typename CurveType::scalar_field_type> {
+                class G1_add_component : public component<typename CurveType::scalar_field_type> {
                 public:
                     typedef typename CurveType::scalar_field_type FieldType;
 
@@ -126,7 +126,7 @@ namespace nil {
                     G1_variable<CurveType> B;
                     G1_variable<CurveType> C;
 
-                    G1_add_gadget(blueprint<FieldType> &pb,
+                    G1_add_component(blueprint<FieldType> &pb,
                                   const G1_variable<CurveType> &A,
                                   const G1_variable<CurveType> &B,
                                   const G1_variable<CurveType> &C) :
@@ -178,7 +178,7 @@ namespace nil {
                  * Gadget that creates constraints for G1 doubling.
                  */
                 template<typename CurveType>
-                class G1_dbl_gadget : public component<typename CurveType::scalar_field_type> {
+                class G1_dbl_component : public component<typename CurveType::scalar_field_type> {
                 public:
                     typedef typename CurveType::scalar_field_type FieldType;
 
@@ -188,7 +188,7 @@ namespace nil {
                     G1_variable<CurveType> A;
                     G1_variable<CurveType> B;
 
-                    G1_dbl_gadget(blueprint<FieldType> &pb,
+                    G1_dbl_component(blueprint<FieldType> &pb,
                                   const G1_variable<CurveType> &A,
                                   const G1_variable<CurveType> &B) :
                         component<FieldType>(pb),
@@ -225,14 +225,14 @@ namespace nil {
                  * Gadget that creates constraints for G1 multi-scalar multiplication.
                  */
                 template<typename CurveType>
-                class G1_multiscalar_mul_gadget : public component<typename CurveType::scalar_field_type> {
+                class G1_multiscalar_mul_component : public component<typename CurveType::scalar_field_type> {
                 public:
                     typedef typename CurveType::scalar_field_type FieldType;
 
                     std::vector<G1_variable<CurveType>> computed_results;
                     std::vector<G1_variable<CurveType>> chosen_results;
-                    std::vector<G1_add_gadget<CurveType>> adders;
-                    std::vector<G1_dbl_gadget<CurveType>> doublers;
+                    std::vector<G1_add_component<CurveType>> adders;
+                    std::vector<G1_dbl_component<CurveType>> doublers;
 
                     G1_variable<CurveType> base;
                     pb_variable_array<FieldType> scalars;
@@ -244,7 +244,7 @@ namespace nil {
                     const std::size_t num_points;
                     const std::size_t scalar_size;
 
-                    G1_multiscalar_mul_gadget(blueprint<FieldType> &pb,
+                    G1_multiscalar_mul_component(blueprint<FieldType> &pb,
                                               const G1_variable<CurveType> &base,
                                               const pb_variable_array<FieldType> &scalars,
                                               const std::size_t elt_size,
@@ -260,7 +260,7 @@ namespace nil {
                             points_and_powers.emplace_back(points[i]);
                             for (std::size_t j = 0; j < elt_size - 1; ++j) {
                                 points_and_powers.emplace_back(G1_variable<CurveType>(pb));
-                                doublers.emplace_back(G1_dbl_gadget<CurveType>(
+                                doublers.emplace_back(G1_dbl_component<CurveType>(
                                     pb, points_and_powers[i * elt_size + j], points_and_powers[i * elt_size + j + 1]));
                             }
                         }
@@ -274,7 +274,7 @@ namespace nil {
                                 chosen_results.emplace_back(result);
                             }
 
-                            adders.emplace_back(G1_add_gadget<CurveType>(
+                            adders.emplace_back(G1_add_component<CurveType>(
                                 pb, chosen_results[i], points_and_powers[i], computed_results[i]));
                         }
                     }

@@ -269,7 +269,7 @@ namespace nil {
                     ram_ppzksnark_verification_key<ram_ppzksnark_ppT> result(*this);
 
                     const std::size_t packed_input_element_size =
-                        ram_universal_gadget<ram_ppT>::packed_input_element_size(ap);
+                        ram_universal_component<ram_ppT>::packed_input_element_size(ap);
 
                     for (auto it : primary_input.get_all_trace_entries()) {
                         const std::size_t input_pos = it.first;

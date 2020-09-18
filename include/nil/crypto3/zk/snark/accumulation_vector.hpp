@@ -12,7 +12,7 @@
 
 #include <iostream>
 
-#include <nil/crypto3/zk/snark/detail/sparse_vector.hpp>
+#include <nil/crypto3/zk/snark/sparse_vector.hpp>
 
 namespace nil {
     namespace crypto3 {

@@ -13,7 +13,7 @@
 #ifndef CRYPTO3_ZK_SET_MEMBERSHIP_PROOF_VARIABLE_HPP_
 #define CRYPTO3_ZK_SET_MEMBERSHIP_PROOF_VARIABLE_HPP_
 
-#include <nil/crypto3/zk/snark/data_structures/set_commitment.hpp>
+#include <nil/crypto3/zk/snark/set_commitment.hpp>
 #include <nil/crypto3/zk/snark/component.hpp>
 #include <nil/crypto3/zk/snark/components/hashes/hash_io.hpp>
 #include <nil/crypto3/zk/snark/components/merkle_tree/merkle_authentication_path_variable.hpp>

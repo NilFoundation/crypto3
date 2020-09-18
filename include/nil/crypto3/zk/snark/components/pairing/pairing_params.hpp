@@ -28,17 +28,17 @@ namespace nil {
                  * - fqe_type
                  * - fqk_type
                  * - Fqe_variable_type;
-                 * - Fqe_mul_gadget_type
-                 * - Fqe_mul_by_lc_gadget_type
-                 * - Fqe_sqr_gadget_type
+                 * - Fqe_mul_component_type
+                 * - Fqe_mul_by_lc_component_type
+                 * - Fqe_sqr_component_type
                  * - Fqk_variable_type
-                 * - Fqk_mul_gadget_type
-                 * - Fqk_special_mul_gadget_type
-                 * - Fqk_sqr_gadget_type
+                 * - Fqk_mul_component_type
+                 * - Fqk_special_mul_component_type
+                 * - Fqk_sqr_component_type
                  * - other_curve_type
-                 * - e_over_e_miller_loop_gadget_type
-                 * - e_times_e_over_e_miller_loop_gadget_type
-                 * - final_exp_gadget_type
+                 * - e_over_e_miller_loop_component_type
+                 * - e_times_e_over_e_miller_loop_component_type
+                 * - final_exp_component_type
                  * and also containing a static constant
                  * - const constexpr algebra::algebra::bigint<m> pairing_loop_count
                  *
@@ -56,17 +56,17 @@ namespace nil {
                  *       typedef my_Fqe fqe_type;
                  *       typedef my_Fqk fqk_type;
                  *       typedef my_Fqe_variable_type Fqe_variable_type;
-                 *       typedef my_Fqe_mul_gadget_type Fqe_mul_gadget_type;
-                 *       typedef my_Fqe_mul_by_lc_gadget_type Fqe_mul_by_lc_gadget_type;
-                 *       typedef my_Fqe_sqr_gadget_type Fqe_sqr_gadget_type;
+                 *       typedef my_Fqe_mul_component_type Fqe_mul_component_type;
+                 *       typedef my_Fqe_mul_by_lc_component_type Fqe_mul_by_lc_component_type;
+                 *       typedef my_Fqe_sqr_component_type Fqe_sqr_component_type;
                  *       typedef my_Fqk_variable_type Fqk_variable_type;
-                 *       typedef my_Fqk_mul_gadget_type Fqk_mul_gadget_type;
-                 *       typedef my_Fqk_special_mul_gadget_type Fqk_special_mul_gadget_type;
-                 *       typedef my_Fqk_sqr_gadget_type Fqk_sqr_gadget_type;
+                 *       typedef my_Fqk_mul_component_type Fqk_mul_component_type;
+                 *       typedef my_Fqk_special_mul_component_type Fqk_special_mul_component_type;
+                 *       typedef my_Fqk_sqr_component_type Fqk_sqr_component_type;
                  *       typedef my_other_curve_type other_curve_type;
-                 *       typedef my_e_over_e_miller_loop_gadget_type e_over_e_miller_loop_gadget_type;
-                 *       typedef my_e_times_e_over_e_miller_loop_gadget_type e_times_e_over_e_miller_loop_gadget_type;
-                 *       typedef my_final_exp_gadget_type final_exp_gadget_type;
+                 *       typedef my_e_over_e_miller_loop_component_type e_over_e_miller_loop_component_type;
+                 *       typedef my_e_times_e_over_e_miller_loop_component_type e_times_e_over_e_miller_loop_component_type;
+                 *       typedef my_final_exp_component_type final_exp_component_type;
                  *       static const constexpr algebra::algebra::bigint<...> &pairing_loop_count = ...;
                  *   };
                  *
@@ -89,31 +89,31 @@ namespace nil {
                 template<typename CurveType>
                 using Fqe_variable = typename pairing_selector<CurveType>::Fqe_variable_type;
                 template<typename CurveType>
-                using Fqe_mul_gadget = typename pairing_selector<CurveType>::Fqe_mul_gadget_type;
+                using Fqe_mul_component = typename pairing_selector<CurveType>::Fqe_mul_component_type;
                 template<typename CurveType>
-                using Fqe_mul_by_lc_gadget = typename pairing_selector<CurveType>::Fqe_mul_by_lc_gadget_type;
+                using Fqe_mul_by_lc_component = typename pairing_selector<CurveType>::Fqe_mul_by_lc_component_type;
                 template<typename CurveType>
-                using Fqe_sqr_gadget = typename pairing_selector<CurveType>::Fqe_sqr_gadget_type;
+                using Fqe_sqr_component = typename pairing_selector<CurveType>::Fqe_sqr_component_type;
 
                 template<typename CurveType>
                 using Fqk_variable = typename pairing_selector<CurveType>::Fqk_variable_type;
                 template<typename CurveType>
-                using Fqk_mul_gadget = typename pairing_selector<CurveType>::Fqk_mul_gadget_type;
+                using Fqk_mul_component = typename pairing_selector<CurveType>::Fqk_mul_component_type;
                 template<typename CurveType>
-                using Fqk_special_mul_gadget = typename pairing_selector<CurveType>::Fqk_special_mul_gadget_type;
+                using Fqk_special_mul_component = typename pairing_selector<CurveType>::Fqk_special_mul_component_type;
                 template<typename CurveType>
-                using Fqk_sqr_gadget = typename pairing_selector<CurveType>::Fqk_sqr_gadget_type;
+                using Fqk_sqr_component = typename pairing_selector<CurveType>::Fqk_sqr_component_type;
 
                 template<typename CurveType>
                 using other_curve = typename pairing_selector<CurveType>::other_curve_type;
 
                 template<typename CurveType>
-                using e_over_e_miller_loop_gadget = typename pairing_selector<CurveType>::e_over_e_miller_loop_gadget_type;
+                using e_over_e_miller_loop_component = typename pairing_selector<CurveType>::e_over_e_miller_loop_component_type;
                 template<typename CurveType>
-                using e_times_e_over_e_miller_loop_gadget =
-                    typename pairing_selector<CurveType>::e_times_e_over_e_miller_loop_gadget_type;
+                using e_times_e_over_e_miller_loop_component =
+                    typename pairing_selector<CurveType>::e_times_e_over_e_miller_loop_component_type;
                 template<typename CurveType>
-                using final_exp_gadget = typename pairing_selector<CurveType>::final_exp_gadget_type;
+                using final_exp_component = typename pairing_selector<CurveType>::final_exp_component_type;
 
             }    // namespace snark
         }        // namespace zk

@@ -23,7 +23,7 @@ namespace nil {
             namespace snark {
 
                 template<typename FieldType, typename Hash>
-                using memory_load_store_gadget = merkle_tree_check_update_gadget<FieldType, Hash>;
+                using memory_load_store_component = merkle_tree_check_update_component<FieldType, Hash>;
 
             }
         }    // namespace zk

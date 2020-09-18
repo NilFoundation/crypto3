@@ -8,11 +8,11 @@
 //---------------------------------------------------------------------------//
 // @file Declaration of interfaces for the the R1CS ppzkSNARK verifier gadget.
 //
-// The gadget r1cs_ppzksnark_verifier_gadget verifiers correct computation of r1cs_ppzksnark_verifier_strong_IC.
+// The gadget r1cs_ppzksnark_verifier_component verifiers correct computation of r1cs_ppzksnark_verifier_strong_IC.
 // The gadget is built from two main sub-gadgets:
-// - r1cs_ppzksnark_verifier_process_vk_gadget, which verifies correct computation of
+// - r1cs_ppzksnark_verifier_process_vk_component, which verifies correct computation of
 // r1cs_ppzksnark_verifier_process_vk, and
-// - r1cs_ppzksnark_online_verifier_gadget, which verifies correct computation of
+// - r1cs_ppzksnark_online_verifier_component, which verifies correct computation of
 // r1cs_ppzksnark_online_verifier_strong_IC. See r1cs_ppzksnark.hpp for description of the aforementioned functions.
 //---------------------------------------------------------------------------//
 
@@ -48,8 +48,8 @@ namespace nil {
                     std::vector<std::shared_ptr<G1_variable<CurveType>>> all_G1_vars;
                     std::vector<std::shared_ptr<G2_variable<CurveType>>> all_G2_vars;
 
-                    std::vector<std::shared_ptr<G1_checker_gadget<CurveType>>> all_G1_checkers;
-                    std::shared_ptr<G2_checker_gadget<CurveType>> G2_checker;
+                    std::vector<std::shared_ptr<G1_checker_component<CurveType>>> all_G1_checkers;
+                    std::shared_ptr<G2_checker_component<CurveType>> G2_checker;
 
                     pb_variable_array<FieldType> proof_contents;
 
@@ -72,9 +72,9 @@ namespace nil {
                         all_G1_checkers.resize(all_G1_vars.size());
 
                         for (std::size_t i = 0; i < all_G1_vars.size(); ++i) {
-                            all_G1_checkers[i].reset(new G1_checker_gadget<CurveType>(pb, *all_G1_vars[i]));
+                            all_G1_checkers[i].reset(new G1_checker_component<CurveType>(pb, *all_G1_vars[i]));
                         }
-                        G2_checker.reset(new G2_checker_gadget<CurveType>(pb, *g_B_g));
+                        G2_checker.reset(new G2_checker_component<CurveType>(pb, *g_B_g));
 
                         assert(all_G1_vars.size() == num_G1);
                         assert(all_G2_vars.size() == num_G2);
@@ -120,7 +120,8 @@ namespace nil {
                 };
 
                 template<typename CurveType>
-                class r1cs_ppzksnark_verification_key_variable : public component<typename CurveType::scalar_field_type> {
+                class r1cs_ppzksnark_verification_key_variable
+                    : public component<typename CurveType::scalar_field_type> {
                 public:
                     typedef typename CurveType::scalar_field_type FieldType;
 
@@ -267,24 +268,25 @@ namespace nil {
                 };
 
                 template<typename CurveType>
-                class r1cs_ppzksnark_verifier_process_vk_gadget : public component<typename CurveType::scalar_field_type> {
+                class r1cs_ppzksnark_verifier_process_vk_component
+                    : public component<typename CurveType::scalar_field_type> {
                 public:
                     typedef typename CurveType::scalar_field_type FieldType;
 
-                    std::shared_ptr<precompute_G1_gadget<CurveType>> compute_vk_alphaB_g1_precomp;
-                    std::shared_ptr<precompute_G1_gadget<CurveType>> compute_vk_gamma_beta_g1_precomp;
+                    std::shared_ptr<precompute_G1_component<CurveType>> compute_vk_alphaB_g1_precomp;
+                    std::shared_ptr<precompute_G1_component<CurveType>> compute_vk_gamma_beta_g1_precomp;
 
-                    std::shared_ptr<precompute_G2_gadget<CurveType>> compute_vk_alphaA_g2_precomp;
-                    std::shared_ptr<precompute_G2_gadget<CurveType>> compute_vk_alphaC_g2_precomp;
-                    std::shared_ptr<precompute_G2_gadget<CurveType>> compute_vk_gamma_beta_g2_precomp;
-                    std::shared_ptr<precompute_G2_gadget<CurveType>> compute_vk_gamma_g2_precomp;
-                    std::shared_ptr<precompute_G2_gadget<CurveType>> compute_vk_rC_Z_g2_precomp;
+                    std::shared_ptr<precompute_G2_component<CurveType>> compute_vk_alphaA_g2_precomp;
+                    std::shared_ptr<precompute_G2_component<CurveType>> compute_vk_alphaC_g2_precomp;
+                    std::shared_ptr<precompute_G2_component<CurveType>> compute_vk_gamma_beta_g2_precomp;
+                    std::shared_ptr<precompute_G2_component<CurveType>> compute_vk_gamma_g2_precomp;
+                    std::shared_ptr<precompute_G2_component<CurveType>> compute_vk_rC_Z_g2_precomp;
 
                     r1cs_ppzksnark_verification_key_variable<CurveType> vk;
                     r1cs_ppzksnark_preprocessed_r1cs_ppzksnark_verification_key_variable<CurveType>
                         &pvk;    // important to have a reference here
 
-                    r1cs_ppzksnark_verifier_process_vk_gadget(
+                    r1cs_ppzksnark_verifier_process_vk_component(
                         blueprint<FieldType> &pb,
                         const r1cs_ppzksnark_verification_key_variable<CurveType> &vk,
                         r1cs_ppzksnark_preprocessed_r1cs_ppzksnark_verification_key_variable<CurveType> &pvk);
@@ -293,7 +295,8 @@ namespace nil {
                 };
 
                 template<typename CurveType>
-                class r1cs_ppzksnark_online_verifier_gadget : public component<typename CurveType::scalar_field_type> {
+                class r1cs_ppzksnark_online_verifier_component
+                    : public component<typename CurveType::scalar_field_type> {
                 public:
                     typedef typename CurveType::scalar_field_type FieldType;
 
@@ -306,12 +309,12 @@ namespace nil {
                     const std::size_t input_len;
 
                     std::shared_ptr<G1_variable<CurveType>> acc;
-                    std::shared_ptr<G1_multiscalar_mul_gadget<CurveType>> accumulate_input;
+                    std::shared_ptr<G1_multiscalar_mul_component<CurveType>> accumulate_input;
 
                     std::shared_ptr<G1_variable<CurveType>> proof_g_A_g_acc;
-                    std::shared_ptr<G1_add_gadget<CurveType>> compute_proof_g_A_g_acc;
+                    std::shared_ptr<G1_add_component<CurveType>> compute_proof_g_A_g_acc;
                     std::shared_ptr<G1_variable<CurveType>> proof_g_A_g_acc_C;
-                    std::shared_ptr<G1_add_gadget<CurveType>> compute_proof_g_A_g_acc_C;
+                    std::shared_ptr<G1_add_component<CurveType>> compute_proof_g_A_g_acc_C;
 
                     std::shared_ptr<G1_precomputation<CurveType>> proof_g_A_h_precomp;
                     std::shared_ptr<G1_precomputation<CurveType>> proof_g_A_g_acc_C_precomp;
@@ -325,23 +328,23 @@ namespace nil {
 
                     std::shared_ptr<G2_precomputation<CurveType>> proof_g_B_g_precomp;
 
-                    std::shared_ptr<precompute_G1_gadget<CurveType>> compute_proof_g_A_h_precomp;
-                    std::shared_ptr<precompute_G1_gadget<CurveType>> compute_proof_g_A_g_acc_C_precomp;
-                    std::shared_ptr<precompute_G1_gadget<CurveType>> compute_proof_g_A_g_acc_precomp;
-                    std::shared_ptr<precompute_G1_gadget<CurveType>> compute_proof_g_A_g_precomp;
-                    std::shared_ptr<precompute_G1_gadget<CurveType>> compute_proof_g_B_h_precomp;
-                    std::shared_ptr<precompute_G1_gadget<CurveType>> compute_proof_g_C_h_precomp;
-                    std::shared_ptr<precompute_G1_gadget<CurveType>> compute_proof_g_C_g_precomp;
-                    std::shared_ptr<precompute_G1_gadget<CurveType>> compute_proof_g_K_precomp;
-                    std::shared_ptr<precompute_G1_gadget<CurveType>> compute_proof_g_H_precomp;
+                    std::shared_ptr<precompute_G1_component<CurveType>> compute_proof_g_A_h_precomp;
+                    std::shared_ptr<precompute_G1_component<CurveType>> compute_proof_g_A_g_acc_C_precomp;
+                    std::shared_ptr<precompute_G1_component<CurveType>> compute_proof_g_A_g_acc_precomp;
+                    std::shared_ptr<precompute_G1_component<CurveType>> compute_proof_g_A_g_precomp;
+                    std::shared_ptr<precompute_G1_component<CurveType>> compute_proof_g_B_h_precomp;
+                    std::shared_ptr<precompute_G1_component<CurveType>> compute_proof_g_C_h_precomp;
+                    std::shared_ptr<precompute_G1_component<CurveType>> compute_proof_g_C_g_precomp;
+                    std::shared_ptr<precompute_G1_component<CurveType>> compute_proof_g_K_precomp;
+                    std::shared_ptr<precompute_G1_component<CurveType>> compute_proof_g_H_precomp;
 
-                    std::shared_ptr<precompute_G2_gadget<CurveType>> compute_proof_g_B_g_precomp;
+                    std::shared_ptr<precompute_G2_component<CurveType>> compute_proof_g_B_g_precomp;
 
-                    std::shared_ptr<check_e_equals_e_gadget<CurveType>> check_kc_A_valid;
-                    std::shared_ptr<check_e_equals_e_gadget<CurveType>> check_kc_B_valid;
-                    std::shared_ptr<check_e_equals_e_gadget<CurveType>> check_kc_C_valid;
-                    std::shared_ptr<check_e_equals_ee_gadget<CurveType>> check_QAP_valid;
-                    std::shared_ptr<check_e_equals_ee_gadget<CurveType>> check_CC_valid;
+                    std::shared_ptr<check_e_equals_e_component<CurveType>> check_kc_A_valid;
+                    std::shared_ptr<check_e_equals_e_component<CurveType>> check_kc_B_valid;
+                    std::shared_ptr<check_e_equals_e_component<CurveType>> check_kc_C_valid;
+                    std::shared_ptr<check_e_equals_ee_component<CurveType>> check_QAP_valid;
+                    std::shared_ptr<check_e_equals_ee_component<CurveType>> check_CC_valid;
 
                     variable<FieldType> kc_A_valid;
                     variable<FieldType> kc_B_valid;
@@ -352,7 +355,7 @@ namespace nil {
                     pb_variable_array<FieldType> all_test_results;
                     std::shared_ptr<conjunction_component<FieldType>> all_tests_pass;
 
-                    r1cs_ppzksnark_online_verifier_gadget(
+                    r1cs_ppzksnark_online_verifier_component(
                         blueprint<FieldType> &pb,
                         const r1cs_ppzksnark_preprocessed_r1cs_ppzksnark_verification_key_variable<CurveType> &pvk,
                         const pb_variable_array<FieldType> &input,
@@ -364,21 +367,21 @@ namespace nil {
                 };
 
                 template<typename CurveType>
-                class r1cs_ppzksnark_verifier_gadget : public component<typename CurveType::scalar_field_type> {
+                class r1cs_ppzksnark_verifier_component : public component<typename CurveType::scalar_field_type> {
                 public:
                     typedef typename CurveType::scalar_field_type FieldType;
 
                     std::shared_ptr<r1cs_ppzksnark_preprocessed_r1cs_ppzksnark_verification_key_variable<CurveType>>
                         pvk;
-                    std::shared_ptr<r1cs_ppzksnark_verifier_process_vk_gadget<CurveType>> compute_pvk;
-                    std::shared_ptr<r1cs_ppzksnark_online_verifier_gadget<CurveType>> online_verifier;
+                    std::shared_ptr<r1cs_ppzksnark_verifier_process_vk_component<CurveType>> compute_pvk;
+                    std::shared_ptr<r1cs_ppzksnark_online_verifier_component<CurveType>> online_verifier;
 
-                    r1cs_ppzksnark_verifier_gadget(blueprint<FieldType> &pb,
-                                                   const r1cs_ppzksnark_verification_key_variable<CurveType> &vk,
-                                                   const pb_variable_array<FieldType> &input,
-                                                   const std::size_t elt_size,
-                                                   const r1cs_ppzksnark_proof_variable<CurveType> &proof,
-                                                   const variable<FieldType> &result);
+                    r1cs_ppzksnark_verifier_component(blueprint<FieldType> &pb,
+                                                      const r1cs_ppzksnark_verification_key_variable<CurveType> &vk,
+                                                      const pb_variable_array<FieldType> &input,
+                                                      const std::size_t elt_size,
+                                                      const r1cs_ppzksnark_proof_variable<CurveType> &proof,
+                                                      const variable<FieldType> &result);
 
                     void generate_r1cs_constraints();
                     void generate_r1cs_witness();
@@ -452,7 +455,7 @@ namespace nil {
                 }
 
                 template<typename CurveType>
-                r1cs_ppzksnark_verifier_process_vk_gadget<CurveType>::r1cs_ppzksnark_verifier_process_vk_gadget(
+                r1cs_ppzksnark_verifier_process_vk_component<CurveType>::r1cs_ppzksnark_verifier_process_vk_component(
                     blueprint<FieldType> &pb,
                     const r1cs_ppzksnark_verification_key_variable<CurveType> &vk,
                     r1cs_ppzksnark_preprocessed_r1cs_ppzksnark_verification_key_variable<CurveType> &pvk) :
@@ -472,26 +475,26 @@ namespace nil {
                     pvk.vk_rC_Z_g2_precomp.reset(new G2_precomputation<CurveType>());
 
                     compute_vk_alphaB_g1_precomp.reset(
-                        new precompute_G1_gadget<CurveType>(pb, *vk.alphaB_g1, *pvk.vk_alphaB_g1_precomp));
+                        new precompute_G1_component<CurveType>(pb, *vk.alphaB_g1, *pvk.vk_alphaB_g1_precomp));
                     compute_vk_gamma_beta_g1_precomp.reset(
-                        new precompute_G1_gadget<CurveType>(pb, *vk.gamma_beta_g1, *pvk.vk_gamma_beta_g1_precomp));
+                        new precompute_G1_component<CurveType>(pb, *vk.gamma_beta_g1, *pvk.vk_gamma_beta_g1_precomp));
 
                     pvk.pp_G2_one_precomp.reset(
                         new G2_precomputation<CurveType>(pb, other_curve<CurveType>::g2_type::one()));
                     compute_vk_alphaA_g2_precomp.reset(
-                        new precompute_G2_gadget<CurveType>(pb, *vk.alphaA_g2, *pvk.vk_alphaA_g2_precomp));
+                        new precompute_G2_component<CurveType>(pb, *vk.alphaA_g2, *pvk.vk_alphaA_g2_precomp));
                     compute_vk_alphaC_g2_precomp.reset(
-                        new precompute_G2_gadget<CurveType>(pb, *vk.alphaC_g2, *pvk.vk_alphaC_g2_precomp));
+                        new precompute_G2_component<CurveType>(pb, *vk.alphaC_g2, *pvk.vk_alphaC_g2_precomp));
                     compute_vk_gamma_beta_g2_precomp.reset(
-                        new precompute_G2_gadget<CurveType>(pb, *vk.gamma_beta_g2, *pvk.vk_gamma_beta_g2_precomp));
+                        new precompute_G2_component<CurveType>(pb, *vk.gamma_beta_g2, *pvk.vk_gamma_beta_g2_precomp));
                     compute_vk_gamma_g2_precomp.reset(
-                        new precompute_G2_gadget<CurveType>(pb, *vk.gamma_g2, *pvk.vk_gamma_g2_precomp));
+                        new precompute_G2_component<CurveType>(pb, *vk.gamma_g2, *pvk.vk_gamma_g2_precomp));
                     compute_vk_rC_Z_g2_precomp.reset(
-                        new precompute_G2_gadget<CurveType>(pb, *vk.rC_Z_g2, *pvk.vk_rC_Z_g2_precomp));
+                        new precompute_G2_component<CurveType>(pb, *vk.rC_Z_g2, *pvk.vk_rC_Z_g2_precomp));
                 }
 
                 template<typename CurveType>
-                void r1cs_ppzksnark_verifier_process_vk_gadget<CurveType>::generate_r1cs_constraints() {
+                void r1cs_ppzksnark_verifier_process_vk_component<CurveType>::generate_r1cs_constraints() {
                     compute_vk_alphaB_g1_precomp->generate_r1cs_constraints();
                     compute_vk_gamma_beta_g1_precomp->generate_r1cs_constraints();
 
@@ -503,7 +506,7 @@ namespace nil {
                 }
 
                 template<typename CurveType>
-                void r1cs_ppzksnark_verifier_process_vk_gadget<CurveType>::generate_r1cs_witness() {
+                void r1cs_ppzksnark_verifier_process_vk_component<CurveType>::generate_r1cs_witness() {
                     compute_vk_alphaB_g1_precomp->generate_r1cs_witness();
                     compute_vk_gamma_beta_g1_precomp->generate_r1cs_witness();
 
@@ -515,7 +518,7 @@ namespace nil {
                 }
 
                 template<typename CurveType>
-                r1cs_ppzksnark_online_verifier_gadget<CurveType>::r1cs_ppzksnark_online_verifier_gadget(
+                r1cs_ppzksnark_online_verifier_component<CurveType>::r1cs_ppzksnark_online_verifier_component(
                     blueprint<FieldType> &pb,
                     const r1cs_ppzksnark_preprocessed_r1cs_ppzksnark_verification_key_variable<CurveType> &pvk,
                     const pb_variable_array<FieldType> &input,
@@ -530,7 +533,7 @@ namespace nil {
                     for (std::size_t i = 0; i < pvk.encoded_IC_query.size(); ++i) {
                         IC_terms.emplace_back(*(pvk.encoded_IC_query[i]));
                     }
-                    accumulate_input.reset(new G1_multiscalar_mul_gadget<CurveType>(
+                    accumulate_input.reset(new G1_multiscalar_mul_component<CurveType>(
                         pb, *(pvk.encoded_IC_base), input, elt_size, IC_terms, *acc));
 
                     // allocate results for precomputation
@@ -550,82 +553,82 @@ namespace nil {
                     // compute things not available in plain from proof/vk
                     proof_g_A_g_acc.reset(new G1_variable<CurveType>(pb));
                     compute_proof_g_A_g_acc.reset(
-                        new G1_add_gadget<CurveType>(pb, *(proof.g_A_g), *acc, *proof_g_A_g_acc));
+                        new G1_add_component<CurveType>(pb, *(proof.g_A_g), *acc, *proof_g_A_g_acc));
                     proof_g_A_g_acc_C.reset(new G1_variable<CurveType>(pb));
                     compute_proof_g_A_g_acc_C.reset(
-                        new G1_add_gadget<CurveType>(pb, *proof_g_A_g_acc, *(proof.g_C_g), *proof_g_A_g_acc_C));
+                        new G1_add_component<CurveType>(pb, *proof_g_A_g_acc, *(proof.g_C_g), *proof_g_A_g_acc_C));
 
                     compute_proof_g_A_g_acc_precomp.reset(
-                        new precompute_G1_gadget<CurveType>(pb, *proof_g_A_g_acc, *proof_g_A_g_acc_precomp));
+                        new precompute_G1_component<CurveType>(pb, *proof_g_A_g_acc, *proof_g_A_g_acc_precomp));
                     compute_proof_g_A_g_acc_C_precomp.reset(
-                        new precompute_G1_gadget<CurveType>(pb, *proof_g_A_g_acc_C, *proof_g_A_g_acc_C_precomp));
+                        new precompute_G1_component<CurveType>(pb, *proof_g_A_g_acc_C, *proof_g_A_g_acc_C_precomp));
 
                     // do other precomputations
                     compute_proof_g_A_h_precomp.reset(
-                        new precompute_G1_gadget<CurveType>(pb, *(proof.g_A_h), *proof_g_A_h_precomp));
+                        new precompute_G1_component<CurveType>(pb, *(proof.g_A_h), *proof_g_A_h_precomp));
                     compute_proof_g_A_g_precomp.reset(
-                        new precompute_G1_gadget<CurveType>(pb, *(proof.g_A_g), *proof_g_A_g_precomp));
+                        new precompute_G1_component<CurveType>(pb, *(proof.g_A_g), *proof_g_A_g_precomp));
                     compute_proof_g_B_h_precomp.reset(
-                        new precompute_G1_gadget<CurveType>(pb, *(proof.g_B_h), *proof_g_B_h_precomp));
+                        new precompute_G1_component<CurveType>(pb, *(proof.g_B_h), *proof_g_B_h_precomp));
                     compute_proof_g_C_h_precomp.reset(
-                        new precompute_G1_gadget<CurveType>(pb, *(proof.g_C_h), *proof_g_C_h_precomp));
+                        new precompute_G1_component<CurveType>(pb, *(proof.g_C_h), *proof_g_C_h_precomp));
                     compute_proof_g_C_g_precomp.reset(
-                        new precompute_G1_gadget<CurveType>(pb, *(proof.g_C_g), *proof_g_C_g_precomp));
+                        new precompute_G1_component<CurveType>(pb, *(proof.g_C_g), *proof_g_C_g_precomp));
                     compute_proof_g_H_precomp.reset(
-                        new precompute_G1_gadget<CurveType>(pb, *(proof.g_H), *proof_g_H_precomp));
+                        new precompute_G1_component<CurveType>(pb, *(proof.g_H), *proof_g_H_precomp));
                     compute_proof_g_K_precomp.reset(
-                        new precompute_G1_gadget<CurveType>(pb, *(proof.g_K), *proof_g_K_precomp));
+                        new precompute_G1_component<CurveType>(pb, *(proof.g_K), *proof_g_K_precomp));
                     compute_proof_g_B_g_precomp.reset(
-                        new precompute_G2_gadget<CurveType>(pb, *(proof.g_B_g), *proof_g_B_g_precomp));
+                        new precompute_G2_component<CurveType>(pb, *(proof.g_B_g), *proof_g_B_g_precomp));
 
                     // check validity of A knowledge commitment
                     kc_A_valid.allocate(pb);
-                    check_kc_A_valid.reset(new check_e_equals_e_gadget<CurveType>(pb,
-                                                                                  *proof_g_A_g_precomp,
-                                                                                  *(pvk.vk_alphaA_g2_precomp),
-                                                                                  *proof_g_A_h_precomp,
-                                                                                  *(pvk.pp_G2_one_precomp),
-                                                                                  kc_A_valid));
+                    check_kc_A_valid.reset(new check_e_equals_e_component<CurveType>(pb,
+                                                                                     *proof_g_A_g_precomp,
+                                                                                     *(pvk.vk_alphaA_g2_precomp),
+                                                                                     *proof_g_A_h_precomp,
+                                                                                     *(pvk.pp_G2_one_precomp),
+                                                                                     kc_A_valid));
 
                     // check validity of B knowledge commitment
                     kc_B_valid.allocate(pb);
-                    check_kc_B_valid.reset(new check_e_equals_e_gadget<CurveType>(pb,
-                                                                                  *(pvk.vk_alphaB_g1_precomp),
-                                                                                  *proof_g_B_g_precomp,
-                                                                                  *proof_g_B_h_precomp,
-                                                                                  *(pvk.pp_G2_one_precomp),
-                                                                                  kc_B_valid));
+                    check_kc_B_valid.reset(new check_e_equals_e_component<CurveType>(pb,
+                                                                                     *(pvk.vk_alphaB_g1_precomp),
+                                                                                     *proof_g_B_g_precomp,
+                                                                                     *proof_g_B_h_precomp,
+                                                                                     *(pvk.pp_G2_one_precomp),
+                                                                                     kc_B_valid));
 
                     // check validity of C knowledge commitment
                     kc_C_valid.allocate(pb);
-                    check_kc_C_valid.reset(new check_e_equals_e_gadget<CurveType>(pb,
-                                                                                  *proof_g_C_g_precomp,
-                                                                                  *(pvk.vk_alphaC_g2_precomp),
-                                                                                  *proof_g_C_h_precomp,
-                                                                                  *(pvk.pp_G2_one_precomp),
-                                                                                  kc_C_valid));
+                    check_kc_C_valid.reset(new check_e_equals_e_component<CurveType>(pb,
+                                                                                     *proof_g_C_g_precomp,
+                                                                                     *(pvk.vk_alphaC_g2_precomp),
+                                                                                     *proof_g_C_h_precomp,
+                                                                                     *(pvk.pp_G2_one_precomp),
+                                                                                     kc_C_valid));
 
                     // check QAP divisibility
                     QAP_valid.allocate(pb);
-                    check_QAP_valid.reset(new check_e_equals_ee_gadget<CurveType>(pb,
-                                                                                  *proof_g_A_g_acc_precomp,
-                                                                                  *proof_g_B_g_precomp,
-                                                                                  *proof_g_H_precomp,
-                                                                                  *(pvk.vk_rC_Z_g2_precomp),
-                                                                                  *proof_g_C_g_precomp,
-                                                                                  *(pvk.pp_G2_one_precomp),
-                                                                                  QAP_valid));
+                    check_QAP_valid.reset(new check_e_equals_ee_component<CurveType>(pb,
+                                                                                     *proof_g_A_g_acc_precomp,
+                                                                                     *proof_g_B_g_precomp,
+                                                                                     *proof_g_H_precomp,
+                                                                                     *(pvk.vk_rC_Z_g2_precomp),
+                                                                                     *proof_g_C_g_precomp,
+                                                                                     *(pvk.pp_G2_one_precomp),
+                                                                                     QAP_valid));
 
                     // check coefficients
                     CC_valid.allocate(pb);
-                    check_CC_valid.reset(new check_e_equals_ee_gadget<CurveType>(pb,
-                                                                                 *proof_g_K_precomp,
-                                                                                 *(pvk.vk_gamma_g2_precomp),
-                                                                                 *proof_g_A_g_acc_C_precomp,
-                                                                                 *(pvk.vk_gamma_beta_g2_precomp),
-                                                                                 *(pvk.vk_gamma_beta_g1_precomp),
-                                                                                 *proof_g_B_g_precomp,
-                                                                                 CC_valid));
+                    check_CC_valid.reset(new check_e_equals_ee_component<CurveType>(pb,
+                                                                                    *proof_g_K_precomp,
+                                                                                    *(pvk.vk_gamma_g2_precomp),
+                                                                                    *proof_g_A_g_acc_C_precomp,
+                                                                                    *(pvk.vk_gamma_beta_g2_precomp),
+                                                                                    *(pvk.vk_gamma_beta_g1_precomp),
+                                                                                    *proof_g_B_g_precomp,
+                                                                                    CC_valid));
 
                     // final constraint
                     all_test_results.emplace_back(kc_A_valid);
@@ -638,7 +641,7 @@ namespace nil {
                 }
 
                 template<typename CurveType>
-                void r1cs_ppzksnark_online_verifier_gadget<CurveType>::generate_r1cs_constraints() {
+                void r1cs_ppzksnark_online_verifier_component<CurveType>::generate_r1cs_constraints() {
                     accumulate_input->generate_r1cs_constraints();
 
                     compute_proof_g_A_g_acc->generate_r1cs_constraints();
@@ -666,7 +669,7 @@ namespace nil {
                 }
 
                 template<typename CurveType>
-                void r1cs_ppzksnark_online_verifier_gadget<CurveType>::generate_r1cs_witness() {
+                void r1cs_ppzksnark_online_verifier_component<CurveType>::generate_r1cs_witness() {
                     accumulate_input->generate_r1cs_witness();
 
                     compute_proof_g_A_g_acc->generate_r1cs_witness();
@@ -694,7 +697,7 @@ namespace nil {
                 }
 
                 template<typename CurveType>
-                r1cs_ppzksnark_verifier_gadget<CurveType>::r1cs_ppzksnark_verifier_gadget(
+                r1cs_ppzksnark_verifier_component<CurveType>::r1cs_ppzksnark_verifier_component(
                     blueprint<FieldType> &pb,
                     const r1cs_ppzksnark_verification_key_variable<CurveType> &vk,
                     const pb_variable_array<FieldType> &input,
@@ -703,20 +706,20 @@ namespace nil {
                     const variable<FieldType> &result) :
                     component<FieldType>(pb) {
                     pvk.reset(new r1cs_ppzksnark_preprocessed_r1cs_ppzksnark_verification_key_variable<CurveType>());
-                    compute_pvk.reset(new r1cs_ppzksnark_verifier_process_vk_gadget<CurveType>(pb, vk, *pvk));
-                    online_verifier.reset(
-                        new r1cs_ppzksnark_online_verifier_gadget<CurveType>(pb, *pvk, input, elt_size, proof, result));
+                    compute_pvk.reset(new r1cs_ppzksnark_verifier_process_vk_component<CurveType>(pb, vk, *pvk));
+                    online_verifier.reset(new r1cs_ppzksnark_online_verifier_component<CurveType>(
+                        pb, *pvk, input, elt_size, proof, result));
                 }
 
                 template<typename CurveType>
-                void r1cs_ppzksnark_verifier_gadget<CurveType>::generate_r1cs_constraints() {
+                void r1cs_ppzksnark_verifier_component<CurveType>::generate_r1cs_constraints() {
                     compute_pvk->generate_r1cs_constraints();
 
                     online_verifier->generate_r1cs_constraints();
                 }
 
                 template<typename CurveType>
-                void r1cs_ppzksnark_verifier_gadget<CurveType>::generate_r1cs_witness() {
+                void r1cs_ppzksnark_verifier_component<CurveType>::generate_r1cs_witness() {
                     compute_pvk->generate_r1cs_witness();
                     online_verifier->generate_r1cs_witness();
                 }
