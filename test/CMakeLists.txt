@@ -31,7 +31,7 @@ macro(define_hash_test name)
                                ${Boost_INCLUDE_DIRS})
 
     set_target_properties(hash_${name}_test PROPERTIES
-                          CXX_STANDARD 14
+                          CXX_STANDARD 17
                           CXX_STANDARD_REQUIRED TRUE)
 
     get_target_property(target_type Boost::unit_test_framework TYPE)

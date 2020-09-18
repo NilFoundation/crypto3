@@ -11,11 +11,6 @@
 
 #include <nil/crypto3/hash/detail/poseidon/poseidon_policy.hpp>
 #include <nil/crypto3/hash/detail/poseidon/poseidon_constants.hpp>
-#include <nil/crypto3/hash/detail/poseidon/poseidon_mds_matrix.hpp>
-// #include <nil/algebra/fields/element.hpp>
-// #include <nil/algebra/fields/fp.hpp>
-// #include <nil/algebra/fields/operations.hpp>
-// #include <nil/algebra/fields/detail/operations/fp.hpp>
 
 namespace nil {
     namespace crypto3 {
