@@ -7,12 +7,12 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef ALGEBRA_FIELDS_BLS12_FR_HPP
-#define ALGEBRA_FIELDS_BLS12_FR_HPP
+#ifndef ALGEBRA_FIELDS_BLS12_SCALAR_FIELD_HPP
+#define ALGEBRA_FIELDS_BLS12_SCALAR_FIELD_HPP
 
 #include <nil/algebra/fields/detail/element/fp.hpp>
-#include <nil/algebra/fields/detail/params/params.hpp>
 
+#include <nil/algebra/fields/params.hpp>
 #include <nil/algebra/fields/field.hpp>
 
 #include <nil/algebra/detail/literals.hpp>
@@ -36,6 +36,8 @@ namespace nil {
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                 typedef typename policy_type::modulus_type modulus_type;
 
+                typedef typename policy_type::extended_modulus_type extended_modulus_type;
+
                 constexpr static const std::size_t number_bits = policy_type::number_bits;
                 typedef typename policy_type::number_type number_type;
 
@@ -47,7 +49,7 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x07;
 
-                typedef typename detail::element_fp<detail::extension_params<bls12_scalar_field<381, CHAR_BIT>>>
+                typedef typename detail::element_fp<params<bls12_scalar_field<381, CHAR_BIT>>>
                     value_type;
 
                 constexpr static const std::size_t arity = 1;
@@ -60,6 +62,8 @@ namespace nil {
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                 typedef typename policy_type::modulus_type modulus_type;
 
+                typedef typename policy_type::extended_modulus_type extended_modulus_type;
+
                 constexpr static const modulus_type modulus =
                     0x12AB655E9A2CA55660B44D1E5C37B00159AA76FED00000010A11800000000001_cppui253;
 
@@ -68,7 +72,7 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x16;
 
-                typedef typename detail::element_fp<detail::extension_params<bls12_scalar_field<377, CHAR_BIT>>>
+                typedef typename detail::element_fp<params<bls12_scalar_field<377, CHAR_BIT>>>
                     value_type;
 
                 constexpr static const std::size_t arity = 1;
@@ -93,4 +97,4 @@ namespace nil {
     }        // namespace algebra
 }    // namespace nil
 
-#endif    // ALGEBRA_FIELDS_BLS12_FR_HPP
+#endif    // ALGEBRA_FIELDS_BLS12_SCALAR_FIELD_HPP

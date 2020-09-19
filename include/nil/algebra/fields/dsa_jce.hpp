@@ -11,8 +11,8 @@
 #define ALGEBRA_FIELDS_DSA_JCE_HPP
 
 #include <nil/algebra/fields/detail/element/fp.hpp>
-#include <nil/algebra/fields/detail/params/params.hpp>
 
+#include <nil/algebra/fields/params.hpp>
 #include <nil/algebra/fields/field.hpp>
 
 #include <nil/algebra/detail/literals.hpp>
@@ -36,6 +36,8 @@ namespace nil {
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                 typedef typename policy_type::modulus_type modulus_type;
 
+                typedef typename policy_type::extended_modulus_type extended_modulus_type;
+
                 constexpr static const std::size_t number_bits = policy_type::number_bits;
                 typedef typename policy_type::number_type number_type;
 
@@ -48,7 +50,7 @@ namespace nil {
                 constexpr static const generator_type mul_generator =
                     0x469603512E30278CD3947595DB22EEC9826A6322ADC97344F41D740C325724C8F9EFBAA7D4D803FF8C609DCD100EBC5BDFCFAD7C6A425FAEA786EA2050EBE98351EA1FDA1FDF24D6947AA6B9AA23766953802F4D7D4A8ECBA06D19768A2491FFB16D0EF9C43A99B5F71672FF6F0A24B444D0736D04D38A1A1322DAF6CDD88C9D_cppui1024;
 
-                typedef typename detail::element_fp<detail::extension_params<dsa_jce<modulus_bits, generator_bits>>>
+                typedef typename detail::element_fp<params<dsa_jce<modulus_bits, generator_bits>>>
                     value_type;
 
                 constexpr static const std::size_t arity = 1;

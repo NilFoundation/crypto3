@@ -7,12 +7,12 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef ALGEBRA_FIELDS_SECP_FQ_HPP
-#define ALGEBRA_FIELDS_SECP_FQ_HPP
+#ifndef ALGEBRA_FIELDS_SECP_BASE_FIELD_HPP
+#define ALGEBRA_FIELDS_SECP_BASE_FIELD_HPP
 
 #include <nil/algebra/fields/detail/element/fp.hpp>
-#include <nil/algebra/fields/detail/params/params.hpp>
 
+#include <nil/algebra/fields/params.hpp>
 #include <nil/algebra/fields/field.hpp>
 
 #include <nil/algebra/detail/literals.hpp>
@@ -42,6 +42,8 @@ namespace nil {
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                 typedef typename policy_type::modulus_type modulus_type;
 
+                typedef typename policy_type::extended_modulus_type extended_modulus_type;
+
                 constexpr static const std::size_t number_bits = policy_type::number_bits;
                 typedef typename policy_type::number_type number_type;
 
@@ -52,7 +54,7 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x03;
 
-                typedef typename detail::element_fp<detail::extension_params<secp_k1_base_field<160, CHAR_BIT>>>
+                typedef typename detail::element_fp<params<secp_k1_base_field<160, CHAR_BIT>>>
                     value_type;
 
                 constexpr static const std::size_t arity = 1;
@@ -65,6 +67,8 @@ namespace nil {
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                 typedef typename policy_type::modulus_type modulus_type;
 
+                typedef typename policy_type::extended_modulus_type extended_modulus_type;
+
                 constexpr static const modulus_type modulus = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF7FFFFFFF_cppui160;
 
                 constexpr static const std::size_t generator_bits = policy_type::generator_bits;
@@ -72,7 +76,7 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x03;
 
-                typedef typename detail::element_fp<detail::extension_params<secp_r1_base_field<160, CHAR_BIT>>>
+                typedef typename detail::element_fp<params<secp_r1_base_field<160, CHAR_BIT>>>
                     value_type;
 
                 constexpr static const std::size_t arity = 1;
@@ -85,6 +89,8 @@ namespace nil {
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                 typedef typename policy_type::modulus_type modulus_type;
 
+                typedef typename policy_type::extended_modulus_type extended_modulus_type;
+
                 constexpr static const modulus_type modulus = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFAC73_cppui160;
 
                 constexpr static const std::size_t generator_bits = policy_type::generator_bits;
@@ -92,7 +98,7 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x03;
 
-                typedef typename detail::element_fp<detail::extension_params<secp_r2_base_field<160, CHAR_BIT>>>
+                typedef typename detail::element_fp<params<secp_r2_base_field<160, CHAR_BIT>>>
                     value_type;
 
                 constexpr static const std::size_t arity = 1;
@@ -105,6 +111,8 @@ namespace nil {
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                 typedef typename policy_type::modulus_type modulus_type;
 
+                typedef typename policy_type::extended_modulus_type extended_modulus_type;
+
                 constexpr static const modulus_type modulus =
                     0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFEE37_cppui192;
 
@@ -113,7 +121,7 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x03;
 
-                typedef typename detail::element_fp<detail::extension_params<secp_k1_base_field<192, CHAR_BIT>>>
+                typedef typename detail::element_fp<params<secp_k1_base_field<192, CHAR_BIT>>>
                     value_type;
 
                 constexpr static const std::size_t arity = 1;
@@ -126,6 +134,8 @@ namespace nil {
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                 typedef typename policy_type::modulus_type modulus_type;
 
+                typedef typename policy_type::extended_modulus_type extended_modulus_type;
+
                 constexpr static const modulus_type modulus =
                     0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFEE37_cppui192;
 
@@ -134,7 +144,7 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x03;
 
-                typedef typename detail::element_fp<detail::extension_params<secp_r1_base_field<192, CHAR_BIT>>>
+                typedef typename detail::element_fp<params<secp_r1_base_field<192, CHAR_BIT>>>
                     value_type;
 
                 constexpr static const std::size_t arity = 1;
@@ -147,6 +157,8 @@ namespace nil {
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                 typedef typename policy_type::modulus_type modulus_type;
 
+                typedef typename policy_type::extended_modulus_type extended_modulus_type;
+
                 constexpr static const modulus_type modulus =
                     0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFE56D_cppui224;
 
@@ -155,7 +167,7 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x03;
 
-                typedef typename detail::element_fp<detail::extension_params<secp_k1_base_field<224, CHAR_BIT>>>
+                typedef typename detail::element_fp<params<secp_k1_base_field<224, CHAR_BIT>>>
                     value_type;
 
                 constexpr static const std::size_t arity = 1;
@@ -168,6 +180,8 @@ namespace nil {
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                 typedef typename policy_type::modulus_type modulus_type;
 
+                typedef typename policy_type::extended_modulus_type extended_modulus_type;
+
                 constexpr static const modulus_type modulus =
                     0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF000000000000000000000001_cppui224;
 
@@ -176,7 +190,7 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x03;
 
-                typedef typename detail::element_fp<detail::extension_params<secp_r1_base_field<224, CHAR_BIT>>>
+                typedef typename detail::element_fp<params<secp_r1_base_field<224, CHAR_BIT>>>
                     value_type;
 
                 constexpr static const std::size_t arity = 1;
@@ -189,6 +203,8 @@ namespace nil {
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                 typedef typename policy_type::modulus_type modulus_type;
 
+                typedef typename policy_type::extended_modulus_type extended_modulus_type;
+
                 constexpr static const modulus_type modulus =
                     0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F_cppui256;
 
@@ -197,7 +213,7 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x03;
 
-                typedef typename detail::element_fp<detail::extension_params<secp_k1_base_field<256, CHAR_BIT>>>
+                typedef typename detail::element_fp<params<secp_k1_base_field<256, CHAR_BIT>>>
                     value_type;
 
                 constexpr static const std::size_t arity = 1;
@@ -274,4 +290,4 @@ namespace nil {
     }        // namespace algebra
 }    // namespace nil
 
-#endif    // ALGEBRA_FIELDS_SECP_FQ_HPP
+#endif    // ALGEBRA_FIELDS_SECP_BASE_FIELD_HPP

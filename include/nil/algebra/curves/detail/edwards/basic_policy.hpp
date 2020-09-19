@@ -32,7 +32,7 @@ namespace nil {
                     typedef typename base_field_type::modulus_type number_type;
                     constexpr static const number_type base_field_modulus = base_field_type::modulus;
 
-                    constexpr static const std::size_t scalar_field_bits = 181;
+                    constexpr static const std::size_t scalar_field_bits = 183;
                     typedef fields::edwards_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
                     constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
 

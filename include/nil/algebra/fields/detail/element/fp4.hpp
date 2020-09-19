@@ -24,10 +24,10 @@ namespace nil {
                     typedef FieldParams policy_type;
 
                 public:
-                    static const typename policy_type::fp4::non_residue_type non_residue =
-                        policy_type::fp4::non_residue_type(policy_type::fp4::non_residue);
+                    static const typename policy_type::non_residue_type non_residue =
+                        policy_type::non_residue_type(policy_type::non_residue);
 
-                    using underlying_type = element_fp2<FieldParams>;
+                    using underlying_type = typename policy_type::underlying_type;
 
                     using value_type = std::array<underlying_type, 2>;
 

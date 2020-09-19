@@ -7,12 +7,12 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef ALGEBRA_FIELDS_BRAINPOOL_R1_FR_HPP
-#define ALGEBRA_FIELDS_BRAINPOOL_R1_FR_HPP
+#ifndef ALGEBRA_FIELDS_BRAINPOOL_R1_SCALAR_FIELD_HPP
+#define ALGEBRA_FIELDS_BRAINPOOL_R1_SCALAR_FIELD_HPP
 
 #include <nil/algebra/fields/detail/element/fp.hpp>
-#include <nil/algebra/fields/detail/params/params.hpp>
 
+#include <nil/algebra/fields/params.hpp>
 #include <nil/algebra/fields/field.hpp>
 
 #include <nil/algebra/detail/literals.hpp>
@@ -36,6 +36,8 @@ namespace nil {
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                 typedef typename policy_type::modulus_type modulus_type;
 
+                typedef typename policy_type::extended_modulus_type extended_modulus_type;
+
                 constexpr static const std::size_t number_bits = policy_type::number_bits;
                 typedef typename policy_type::number_type number_type;
 
@@ -46,7 +48,7 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x03;
 
-                typedef typename detail::element_fp<detail::extension_params<brainpool_r1_scalar_field<160, CHAR_BIT>>>
+                typedef typename detail::element_fp<params<brainpool_r1_scalar_field<160, CHAR_BIT>>>
                     value_type;
 
                 constexpr static const std::size_t arity = 1;
@@ -59,6 +61,8 @@ namespace nil {
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                 typedef typename policy_type::modulus_type modulus_type;
 
+                typedef typename policy_type::extended_modulus_type extended_modulus_type;
+
                 constexpr static const modulus_type modulus =
                     0xC302F41D932A36CDA7A3462F9E9E916B5BE8F1029AC4ACC1_cppui192;
 
@@ -67,7 +71,7 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x03;
 
-                typedef typename detail::element_fp<detail::extension_params<brainpool_r1_scalar_field<192, CHAR_BIT>>>
+                typedef typename detail::element_fp<params<brainpool_r1_scalar_field<192, CHAR_BIT>>>
                     value_type;
 
                 constexpr static const std::size_t arity = 1;
@@ -80,6 +84,8 @@ namespace nil {
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                 typedef typename policy_type::modulus_type modulus_type;
 
+                typedef typename policy_type::extended_modulus_type extended_modulus_type;
+
                 constexpr static const modulus_type modulus =
                     0xD7C134AA264366862A18302575D0FB98D116BC4B6DDEBCA3A5A7939F_cppui224;
 
@@ -88,7 +94,7 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x03;
 
-                typedef typename detail::element_fp<detail::extension_params<brainpool_r1_scalar_field<224, CHAR_BIT>>>
+                typedef typename detail::element_fp<params<brainpool_r1_scalar_field<224, CHAR_BIT>>>
                     value_type;
 
                 constexpr static const std::size_t arity = 1;
@@ -101,6 +107,8 @@ namespace nil {
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                 typedef typename policy_type::modulus_type modulus_type;
 
+                typedef typename policy_type::extended_modulus_type extended_modulus_type;
+
                 constexpr static const modulus_type modulus =
                     0xA9FB57DBA1EEA9BC3E660A909D838D718C397AA3B561A6F7901E0E82974856A7_cppui256;
 
@@ -109,7 +117,7 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x03;
 
-                typedef typename detail::element_fp<detail::extension_params<brainpool_r1_scalar_field<256, CHAR_BIT>>>
+                typedef typename detail::element_fp<params<brainpool_r1_scalar_field<256, CHAR_BIT>>>
                     value_type;
 
                 constexpr static const std::size_t arity = 1;
@@ -122,6 +130,8 @@ namespace nil {
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                 typedef typename policy_type::modulus_type modulus_type;
 
+                typedef typename policy_type::extended_modulus_type extended_modulus_type;
+
                 constexpr static const modulus_type modulus =
                     0xD35E472036BC4FB7E13C785ED201E065F98FCFA5B68F12A32D482EC7EE8658E98691555B44C59311_cppui320;
 
@@ -130,7 +140,7 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x03;
 
-                typedef typename detail::element_fp<detail::extension_params<brainpool_r1_scalar_field<320, CHAR_BIT>>>
+                typedef typename detail::element_fp<params<brainpool_r1_scalar_field<320, CHAR_BIT>>>
                     value_type;
 
                 constexpr static const std::size_t arity = 1;
@@ -143,6 +153,8 @@ namespace nil {
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                 typedef typename policy_type::modulus_type modulus_type;
 
+                typedef typename policy_type::extended_modulus_type extended_modulus_type;
+
                 constexpr static const modulus_type modulus =
                     0x8CB91E82A3386D280F5D6F7E50E641DF152F7109ED5456B31F166E6CAC0425A7CF3AB6AF6B7FC3103B883202E9046565_cppui384;
 
@@ -151,7 +163,7 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x03;
 
-                typedef typename detail::element_fp<detail::extension_params<brainpool_r1_scalar_field<384, CHAR_BIT>>>
+                typedef typename detail::element_fp<params<brainpool_r1_scalar_field<384, CHAR_BIT>>>
                     value_type;
 
                 constexpr static const std::size_t arity = 1;
@@ -164,6 +176,8 @@ namespace nil {
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                 typedef typename policy_type::modulus_type modulus_type;
 
+                typedef typename policy_type::extended_modulus_type extended_modulus_type;
+
                 constexpr static const modulus_type modulus =
                     0xAADD9DB8DBE9C48B3FD4E6AE33C9FC07CB308DB3B3C9D20ED6639CCA70330870553E5C414CA92619418661197FAC10471DB1D381085DDADDB58796829CA90069_cppui512;
 
@@ -172,7 +186,7 @@ namespace nil {
 
                 constexpr static const generator_type mul_generator = 0x03;
 
-                typedef typename detail::element_fp<detail::extension_params<brainpool_r1_scalar_field<512, CHAR_BIT>>>
+                typedef typename detail::element_fp<params<brainpool_r1_scalar_field<512, CHAR_BIT>>>
                     value_type;
 
                 constexpr static const std::size_t arity = 1;
@@ -227,4 +241,4 @@ namespace nil {
     }        // namespace algebra
 }    // namespace nil
 
-#endif    // ALGEBRA_FIELDS_BRAINPOOL_R1_FR_HPP
+#endif    // ALGEBRA_FIELDS_BRAINPOOL_R1_SCALAR_FIELD_HPP

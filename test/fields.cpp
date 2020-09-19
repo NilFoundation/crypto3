@@ -101,6 +101,7 @@ enum field_operation_test_elements : std::size_t {
 
 // if target == check-algebra just data/fields.json
 const char *test_data = "libs/crypto3-algebra/test/data/fields.json";
+//const char *test_data = "libs/algebra/test/data/fields.json";
 
 boost::property_tree::ptree string_data(std::string test_name) {
     boost::property_tree::ptree string_data;

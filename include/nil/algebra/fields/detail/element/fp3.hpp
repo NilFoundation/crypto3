@@ -29,10 +29,10 @@ namespace nil {
                     constexpr static const modulus_type modulus = policy_type::modulus;
 
                 public:
-                    using underlying_type = element_fp<FieldParams>;
+                    using underlying_type = typename policy_type::underlying_type;
 
-                    const typename policy_type::fp3::non_residue_type non_residue =
-                        underlying_type(typename policy_type::fp3::non_residue_type(policy_type::fp3::non_residue));
+                    const typename policy_type::non_residue_type non_residue =
+                        typename policy_type::non_residue_type(policy_type::non_residue);
 
                     using value_type = std::array<underlying_type, 3>;
 
@@ -133,11 +133,11 @@ namespace nil {
 
                     element_fp3 sqrt() const {
 
-                        element_fp3 one = one();
+                        element_fp3 one = this->one();
 
-                        size_t v = policy_type::fp3::s;
-                        element_fp3 z(policy_type::fp3::nqr_to_t);
-                        element_fp3 w((*this) ^ policy_type::fp3::t_minus_1_over_2);
+                        size_t v = policy_type::s;
+                        element_fp3 z(policy_type::nqr_to_t[0], policy_type::nqr_to_t[1], policy_type::nqr_to_t[2]);
+                        element_fp3 w = this->pow(policy_type::t_minus_1_over_2);
                         element_fp3 x((*this) * w);
                         element_fp3 b = x * w;    // b = (*this)^t
 
@@ -201,14 +201,14 @@ namespace nil {
                 };
 
                 template<typename FieldParams>
-                element_fp3<FieldParams> operator*(const element_fp<FieldParams> &lhs,
+                element_fp3<FieldParams> operator*(const typename FieldParams::underlying_type &lhs,
                                                    const element_fp3<FieldParams> &rhs) {
                     return element_fp3<FieldParams>({lhs * rhs.data[0], lhs * rhs.data[1], lhs * rhs.data[2]});
                 }
 
                 template<typename FieldParams>
                 element_fp3<FieldParams> operator*(const element_fp3<FieldParams> &lhs,
-                                                   const element_fp<FieldParams> &rhs) {
+                                                   const typename FieldParams::underlying_type &rhs) {
                     return rhs * lhs;
                 }
 
