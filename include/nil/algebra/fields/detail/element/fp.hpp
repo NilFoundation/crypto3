@@ -96,12 +96,37 @@ namespace nil {
                         return *this;
                     }
 
+                    element_fp &operator*=(const element_fp &B) {
+                        data *= B.data;
+
+                        return *this;
+                    }
+
+                    element_fp &operator/=(const element_fp &B) {
+                        data *= B.inversed().data;
+
+                        return *this;
+                    }
+
                     element_fp operator-() const {
                         return element_fp(-data);
                     }
 
                     element_fp operator*(const element_fp &B) const {
                         return element_fp(data * B.data);
+                    }
+
+                    const element_fp operator/(const element_fp &B) const {
+//                        return element_fp(data / B.data);
+                        return element_fp(data * B.inversed().data);
+                    }
+
+                    const bool operator<(const element_fp &B) const {
+                        return data < B.data;
+                    }
+
+                    const bool operator>(const element_fp &B) const {
+                        return data > B.data;
                     }
 
                     element_fp doubled() const {
