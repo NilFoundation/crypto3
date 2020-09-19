@@ -45,15 +45,6 @@ namespace nil {
 
                 /******************************** Proving key ********************************/
 
-                template<typename CurveType>
-                class bacs_ppzksnark_proving_key;
-
-                template<typename CurveType>
-                std::ostream &operator<<(std::ostream &out, const bacs_ppzksnark_proving_key<CurveType> &pk);
-
-                template<typename CurveType>
-                std::istream &operator>>(std::istream &in, bacs_ppzksnark_proving_key<CurveType> &pk);
-
                 /**
                  * A proving key for the BACS ppzkSNARK.
                  */
@@ -99,13 +90,7 @@ namespace nil {
                         return r1cs_pk.size_in_bits();
                     }
 
-                    void print_size() const {
-                        r1cs_pk.print_size();
-                    }
-
                     bool operator==(const bacs_ppzksnark_proving_key<CurveType> &other) const;
-                    friend std::ostream &operator<<<CurveType>(std::ostream &out, const bacs_ppzksnark_proving_key<CurveType> &pk);
-                    friend std::istream &operator>><CurveType>(std::istream &in, bacs_ppzksnark_proving_key<CurveType> &pk);
                 };
 
                 /******************************* Verification key ****************************/
@@ -250,24 +235,6 @@ namespace nil {
                 template<typename CurveType>
                 bool bacs_ppzksnark_proving_key<CurveType>::operator==(const bacs_ppzksnark_proving_key<CurveType> &other) const {
                     return (this->circuit == other.circuit && this->r1cs_pk == other.r1cs_pk);
-                }
-
-                template<typename CurveType>
-                std::ostream &operator<<(std::ostream &out, const bacs_ppzksnark_proving_key<CurveType> &pk) {
-                    out << pk.circuit << OUTPUT_NEWLINE;
-                    out << pk.r1cs_pk << OUTPUT_NEWLINE;
-
-                    return out;
-                }
-
-                template<typename CurveType>
-                std::istream &operator>>(std::istream &in, bacs_ppzksnark_proving_key<CurveType> &pk) {
-                    in >> pk.circuit;
-                    algebra::consume_OUTPUT_NEWLINE(in);
-                    in >> pk.r1cs_pk;
-                    algebra::consume_OUTPUT_NEWLINE(in);
-
-                    return in;
                 }
 
                 template<typename CurveType>

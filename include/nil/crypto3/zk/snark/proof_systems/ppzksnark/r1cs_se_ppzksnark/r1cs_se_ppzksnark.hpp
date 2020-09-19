@@ -73,21 +73,11 @@ namespace nil {
 
                 /******************************** Proving key ********************************/
 
-                template<typename CurveType>
-                class r1cs_se_ppzksnark_proving_key;
-
-                template<typename CurveType>
-                std::ostream &operator<<(std::ostream &out, const r1cs_se_ppzksnark_proving_key<CurveType> &pk);
-
-                template<typename CurveType>
-                std::istream &operator>>(std::istream &in, r1cs_se_ppzksnark_proving_key<CurveType> &pk);
-
                 /**
                  * A proving key for the R1CS SEppzkSNARK.
                  */
                 template<typename CurveType>
-                class r1cs_se_ppzksnark_proving_key {
-                public:
+                struct r1cs_se_ppzksnark_proving_key {
                     // G^{gamma * A_i(t)} for 0 <= i <= sap.num_variables()
                     typename CurveType::g1_vector A_query;
 
@@ -152,38 +142,16 @@ namespace nil {
                                G2_size() * typename CurveType::g2_type::size_in_bits();
                     }
 
-                    void print_size() const {
-                        algebra::print_indent();
-                        printf("* G1 elements in PK: %zu\n", this->G1_size());
-                        algebra::print_indent();
-                        printf("* G2 elements in PK: %zu\n", this->G2_size());
-                        algebra::print_indent();
-                        printf("* PK size in bits: %zu\n", this->size_in_bits());
-                    }
-
                     bool operator==(const r1cs_se_ppzksnark_proving_key<CurveType> &other) const;
-                    friend std::ostream &operator<<<CurveType>(std::ostream &out,
-                                                         const r1cs_se_ppzksnark_proving_key<CurveType> &pk);
-                    friend std::istream &operator>><CurveType>(std::istream &in, r1cs_se_ppzksnark_proving_key<CurveType> &pk);
                 };
 
                 /******************************* Verification key ****************************/
-
-                template<typename CurveType>
-                class r1cs_se_ppzksnark_verification_key;
-
-                template<typename CurveType>
-                std::ostream &operator<<(std::ostream &out, const r1cs_se_ppzksnark_verification_key<CurveType> &vk);
-
-                template<typename CurveType>
-                std::istream &operator>>(std::istream &in, r1cs_se_ppzksnark_verification_key<CurveType> &vk);
 
                 /**
                  * A verification key for the R1CS SEppzkSNARK.
                  */
                 template<typename CurveType>
-                class r1cs_se_ppzksnark_verification_key {
-                public:
+                struct r1cs_se_ppzksnark_verification_key {
                     // H
                     typename CurveType::g2_type H;
 
@@ -227,34 +195,12 @@ namespace nil {
                                 G2_size() * typename CurveType::g2_type::size_in_bits());
                     }
 
-                    void print_size() const {
-                        algebra::print_indent();
-                        printf("* G1 elements in VK: %zu\n", this->G1_size());
-                        algebra::print_indent();
-                        printf("* G2 elements in VK: %zu\n", this->G2_size());
-                        algebra::print_indent();
-                        printf("* VK size in bits: %zu\n", this->size_in_bits());
-                    }
-
                     bool operator==(const r1cs_se_ppzksnark_verification_key<CurveType> &other) const;
-                    friend std::ostream &operator<<<CurveType>(std::ostream &out,
-                                                         const r1cs_se_ppzksnark_verification_key<CurveType> &vk);
-                    friend std::istream &operator>><CurveType>(std::istream &in, r1cs_se_ppzksnark_verification_key<CurveType> &vk);
 
                     static r1cs_se_ppzksnark_verification_key<CurveType> dummy_verification_key(const std::size_t input_size);
                 };
 
                 /************************ Processed verification key *************************/
-
-                template<typename CurveType>
-                class r1cs_se_ppzksnark_processed_verification_key;
-
-                template<typename CurveType>
-                std::ostream &operator<<(std::ostream &out,
-                                         const r1cs_se_ppzksnark_processed_verification_key<CurveType> &pvk);
-
-                template<typename CurveType>
-                std::istream &operator>>(std::istream &in, r1cs_se_ppzksnark_processed_verification_key<CurveType> &pvk);
 
                 /**
                  * A processed verification key for the R1CS SEppzkSNARK.
@@ -264,8 +210,7 @@ namespace nil {
                  * enables a faster verification time.
                  */
                 template<typename CurveType>
-                class r1cs_se_ppzksnark_processed_verification_key {
-                public:
+                struct r1cs_se_ppzksnark_processed_verification_key {
                     typename CurveType::g1_type G_alpha;
                     typename CurveType::g2_type H_beta;
                     algebra::Fqk<CurveType> G_alpha_H_beta_ml;
@@ -276,10 +221,6 @@ namespace nil {
                     typename CurveType::g1_vector query;
 
                     bool operator==(const r1cs_se_ppzksnark_processed_verification_key &other) const;
-                    friend std::ostream &operator<<<CurveType>(std::ostream &out,
-                                                         const r1cs_se_ppzksnark_processed_verification_key<CurveType> &pvk);
-                    friend std::istream &operator>>
-                        <CurveType>(std::istream &in, r1cs_se_ppzksnark_processed_verification_key<CurveType> &pvk);
                 };
 
                 /********************************** Key pair *********************************/
@@ -306,15 +247,6 @@ namespace nil {
 
                 /*********************************** Proof ***********************************/
 
-                template<typename CurveType>
-                class r1cs_se_ppzksnark_proof;
-
-                template<typename CurveType>
-                std::ostream &operator<<(std::ostream &out, const r1cs_se_ppzksnark_proof<CurveType> &proof);
-
-                template<typename CurveType>
-                std::istream &operator>>(std::istream &in, r1cs_se_ppzksnark_proof<CurveType> &proof);
-
                 /**
                  * A proof for the R1CS SEppzkSNARK.
                  *
@@ -323,8 +255,7 @@ namespace nil {
                  * about the structure for statistics purposes.
                  */
                 template<typename CurveType>
-                class r1cs_se_ppzksnark_proof {
-                public:
+                struct r1cs_se_ppzksnark_proof {
                     typename CurveType::g1_type A;
                     typename CurveType::g2_type B;
                     typename CurveType::g1_type C;
@@ -347,22 +278,11 @@ namespace nil {
                                G2_size() * typename CurveType::g2_type::size_in_bits();
                     }
 
-                    void print_size() const {
-                        algebra::print_indent();
-                        printf("* G1 elements in proof: %zu\n", this->G1_size());
-                        algebra::print_indent();
-                        printf("* G2 elements in proof: %zu\n", this->G2_size());
-                        algebra::print_indent();
-                        printf("* Proof size in bits: %zu\n", this->size_in_bits());
-                    }
-
                     bool is_well_formed() const {
                         return (A.is_well_formed() && B.is_well_formed() && C.is_well_formed());
                     }
 
                     bool operator==(const r1cs_se_ppzksnark_proof<CurveType> &other) const;
-                    friend std::ostream &operator<<<CurveType>(std::ostream &out, const r1cs_se_ppzksnark_proof<CurveType> &proof);
-                    friend std::istream &operator>><CurveType>(std::istream &in, r1cs_se_ppzksnark_proof<CurveType> &proof);
                 };
 
                 /***************************** Main algorithms *******************************/
@@ -465,73 +385,11 @@ namespace nil {
                 }
 
                 template<typename CurveType>
-                std::ostream &operator<<(std::ostream &out, const r1cs_se_ppzksnark_proving_key<CurveType> &pk) {
-                    out << pk.A_query;
-                    out << pk.B_query;
-                    out << pk.C_query_1;
-                    out << pk.C_query_2;
-                    out << pk.G_gamma_Z;
-                    out << pk.H_gamma_Z;
-                    out << pk.G_ab_gamma_Z;
-                    out << pk.G_gamma2_Z2;
-                    out << pk.G_gamma2_Z_t;
-                    out << pk.constraint_system;
-
-                    return out;
-                }
-
-                template<typename CurveType>
-                std::istream &operator>>(std::istream &in, r1cs_se_ppzksnark_proving_key<CurveType> &pk) {
-                    in >> pk.A_query;
-                    in >> pk.B_query;
-                    in >> pk.C_query_1;
-                    in >> pk.C_query_2;
-                    in >> pk.G_gamma_Z;
-                    in >> pk.H_gamma_Z;
-                    in >> pk.G_ab_gamma_Z;
-                    in >> pk.G_gamma2_Z2;
-                    in >> pk.G_gamma2_Z_t;
-                    in >> pk.constraint_system;
-
-                    return in;
-                }
-
-                template<typename CurveType>
                 bool r1cs_se_ppzksnark_verification_key<CurveType>::operator==(
                     const r1cs_se_ppzksnark_verification_key<CurveType> &other) const {
                     return (this->H == other.H && this->G_alpha == other.G_alpha && this->H_beta == other.H_beta &&
                             this->G_gamma == other.G_gamma && this->H_gamma == other.H_gamma &&
                             this->query == other.query);
-                }
-
-                template<typename CurveType>
-                std::ostream &operator<<(std::ostream &out, const r1cs_se_ppzksnark_verification_key<CurveType> &vk) {
-                    out << vk.H << OUTPUT_NEWLINE;
-                    out << vk.G_alpha << OUTPUT_NEWLINE;
-                    out << vk.H_beta << OUTPUT_NEWLINE;
-                    out << vk.G_gamma << OUTPUT_NEWLINE;
-                    out << vk.H_gamma << OUTPUT_NEWLINE;
-                    out << vk.query << OUTPUT_NEWLINE;
-
-                    return out;
-                }
-
-                template<typename CurveType>
-                std::istream &operator>>(std::istream &in, r1cs_se_ppzksnark_verification_key<CurveType> &vk) {
-                    in >> vk.H;
-                    algebra::consume_OUTPUT_NEWLINE(in);
-                    in >> vk.G_alpha;
-                    algebra::consume_OUTPUT_NEWLINE(in);
-                    in >> vk.H_beta;
-                    algebra::consume_OUTPUT_NEWLINE(in);
-                    in >> vk.G_gamma;
-                    algebra::consume_OUTPUT_NEWLINE(in);
-                    in >> vk.H_gamma;
-                    algebra::consume_OUTPUT_NEWLINE(in);
-                    in >> vk.query;
-                    algebra::consume_OUTPUT_NEWLINE(in);
-
-                    return in;
                 }
 
                 template<typename CurveType>
@@ -544,63 +402,8 @@ namespace nil {
                 }
 
                 template<typename CurveType>
-                std::ostream &operator<<(std::ostream &out,
-                                         const r1cs_se_ppzksnark_processed_verification_key<CurveType> &pvk) {
-                    out << pvk.G_alpha << OUTPUT_NEWLINE;
-                    out << pvk.H_beta << OUTPUT_NEWLINE;
-                    out << pvk.G_alpha_H_beta_ml << OUTPUT_NEWLINE;
-                    out << pvk.G_gamma_pc << OUTPUT_NEWLINE;
-                    out << pvk.H_gamma_pc << OUTPUT_NEWLINE;
-                    out << pvk.H_pc << OUTPUT_NEWLINE;
-                    out << pvk.query << OUTPUT_NEWLINE;
-
-                    return out;
-                }
-
-                template<typename CurveType>
-                std::istream &operator>>(std::istream &in, r1cs_se_ppzksnark_processed_verification_key<CurveType> &pvk) {
-                    in >> pvk.G_alpha;
-                    algebra::consume_OUTPUT_NEWLINE(in);
-                    in >> pvk.H_beta;
-                    algebra::consume_OUTPUT_NEWLINE(in);
-                    in >> pvk.G_alpha_H_beta_ml;
-                    algebra::consume_OUTPUT_NEWLINE(in);
-                    in >> pvk.G_gamma_pc;
-                    algebra::consume_OUTPUT_NEWLINE(in);
-                    in >> pvk.H_gamma_pc;
-                    algebra::consume_OUTPUT_NEWLINE(in);
-                    in >> pvk.H_pc;
-                    algebra::consume_OUTPUT_NEWLINE(in);
-                    in >> pvk.query;
-                    algebra::consume_OUTPUT_NEWLINE(in);
-
-                    return in;
-                }
-
-                template<typename CurveType>
                 bool r1cs_se_ppzksnark_proof<CurveType>::operator==(const r1cs_se_ppzksnark_proof<CurveType> &other) const {
                     return (this->A == other.A && this->B == other.B && this->C == other.C);
-                }
-
-                template<typename CurveType>
-                std::ostream &operator<<(std::ostream &out, const r1cs_se_ppzksnark_proof<CurveType> &proof) {
-                    out << proof.A << OUTPUT_NEWLINE;
-                    out << proof.B << OUTPUT_NEWLINE;
-                    out << proof.C << OUTPUT_NEWLINE;
-
-                    return out;
-                }
-
-                template<typename CurveType>
-                std::istream &operator>>(std::istream &in, r1cs_se_ppzksnark_proof<CurveType> &proof) {
-                    in >> proof.A;
-                    algebra::consume_OUTPUT_NEWLINE(in);
-                    in >> proof.B;
-                    algebra::consume_OUTPUT_NEWLINE(in);
-                    in >> proof.C;
-                    algebra::consume_OUTPUT_NEWLINE(in);
-
-                    return in;
                 }
 
                 template<typename CurveType>

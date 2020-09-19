@@ -53,15 +53,6 @@ namespace nil {
 
                 /******************************** Proving key ********************************/
 
-                template<typename PCD_ppT>
-                class r1cs_mp_ppzkpcd_proving_key;
-
-                template<typename PCD_ppT>
-                std::ostream &operator<<(std::ostream &out, const r1cs_mp_ppzkpcd_proving_key<PCD_ppT> &pk);
-
-                template<typename PCD_ppT>
-                std::istream &operator>>(std::istream &in, r1cs_mp_ppzkpcd_proving_key<PCD_ppT> &pk);
-
                 /**
                  * A proving key for the R1CS (multi-predicate) ppzkPCD.
                  */
@@ -114,22 +105,10 @@ namespace nil {
                     bool is_well_formed() const;
 
                     bool operator==(const r1cs_mp_ppzkpcd_proving_key<PCD_ppT> &other) const;
-                    friend std::ostream &operator<<<PCD_ppT>(std::ostream &out,
-                                                             const r1cs_mp_ppzkpcd_proving_key<PCD_ppT> &pk);
-                    friend std::istream &operator>>
-                        <PCD_ppT>(std::istream &in, r1cs_mp_ppzkpcd_proving_key<PCD_ppT> &pk);
+
                 };
 
                 /******************************* Verification key ****************************/
-
-                template<typename PCD_ppT>
-                class r1cs_mp_ppzkpcd_verification_key;
-
-                template<typename PCD_ppT>
-                std::ostream &operator<<(std::ostream &out, const r1cs_mp_ppzkpcd_verification_key<PCD_ppT> &vk);
-
-                template<typename PCD_ppT>
-                std::istream &operator>>(std::istream &in, r1cs_mp_ppzkpcd_verification_key<PCD_ppT> &vk);
 
                 /**
                  * A verification key for the R1CS (multi-predicate) ppzkPCD.
@@ -162,23 +141,9 @@ namespace nil {
                     std::size_t size_in_bits() const;
 
                     bool operator==(const r1cs_mp_ppzkpcd_verification_key<PCD_ppT> &other) const;
-                    friend std::ostream &operator<<<PCD_ppT>(std::ostream &out,
-                                                             const r1cs_mp_ppzkpcd_verification_key<PCD_ppT> &vk);
-                    friend std::istream &operator>>
-                        <PCD_ppT>(std::istream &in, r1cs_mp_ppzkpcd_verification_key<PCD_ppT> &vk);
                 };
 
                 /************************* Processed verification key **************************/
-
-                template<typename PCD_ppT>
-                class r1cs_mp_ppzkpcd_processed_verification_key;
-
-                template<typename PCD_ppT>
-                std::ostream &operator<<(std::ostream &out,
-                                         const r1cs_mp_ppzkpcd_processed_verification_key<PCD_ppT> &pvk);
-
-                template<typename PCD_ppT>
-                std::istream &operator>>(std::istream &in, r1cs_mp_ppzkpcd_processed_verification_key<PCD_ppT> &pvk);
 
                 /**
                  * A processed verification key for the R1CS (multi-predicate) ppzkPCD.
@@ -216,11 +181,7 @@ namespace nil {
                     std::size_t size_in_bits() const;
 
                     bool operator==(const r1cs_mp_ppzkpcd_processed_verification_key<PCD_ppT> &other) const;
-                    friend std::ostream &
-                        operator<<<PCD_ppT>(std::ostream &out,
-                                            const r1cs_mp_ppzkpcd_processed_verification_key<PCD_ppT> &pvk);
-                    friend std::istream &operator>>
-                        <PCD_ppT>(std::istream &in, r1cs_mp_ppzkpcd_processed_verification_key<PCD_ppT> &pvk);
+
                 };
 
                 /********************************** Key pair *********************************/
@@ -245,15 +206,6 @@ namespace nil {
 
                 /*********************************** Proof ***********************************/
 
-                template<typename CurveType>
-                class r1cs_mp_ppzkpcd_proof;
-
-                template<typename CurveType>
-                std::ostream &operator<<(std::ostream &out, const r1cs_mp_ppzkpcd_proof<CurveType> &proof);
-
-                template<typename CurveType>
-                std::istream &operator>>(std::istream &in, r1cs_mp_ppzkpcd_proof<CurveType> &proof);
-
                 /**
                  * A proof for the R1CS (multi-predicate) ppzkPCD.
                  */
@@ -273,9 +225,7 @@ namespace nil {
                     std::size_t size_in_bits() const;
 
                     bool operator==(const r1cs_mp_ppzkpcd_proof<PCD_ppT> &other) const;
-                    friend std::ostream &operator<<<PCD_ppT>(std::ostream &out,
-                                                             const r1cs_mp_ppzkpcd_proof<PCD_ppT> &proof);
-                    friend std::istream &operator>><PCD_ppT>(std::istream &in, r1cs_mp_ppzkpcd_proof<PCD_ppT> &proof);
+
                 };
 
                 /***************************** Main algorithms *******************************/
@@ -386,34 +336,6 @@ namespace nil {
                 }
 
                 template<typename PCD_ppT>
-                std::ostream &operator<<(std::ostream &out, const r1cs_mp_ppzkpcd_proving_key<PCD_ppT> &pk) {
-                    out << pk.compliance_predicates;
-                    out << pk.compliance_step_r1cs_pks;
-                    out << pk.translation_step_r1cs_pks;
-                    out << pk.compliance_step_r1cs_vks;
-                    out << pk.translation_step_r1cs_vks;
-                    output_bool_vector(out, pk.commitment_to_translation_step_r1cs_vks);
-                    out << pk.compliance_step_r1cs_vk_membership_proofs;
-                    out << pk.compliance_predicate_name_to_idx;
-
-                    return out;
-                }
-
-                template<typename PCD_ppT>
-                std::istream &operator>>(std::istream &in, r1cs_mp_ppzkpcd_proving_key<PCD_ppT> &pk) {
-                    in >> pk.compliance_predicates;
-                    in >> pk.compliance_step_r1cs_pks;
-                    in >> pk.translation_step_r1cs_pks;
-                    in >> pk.compliance_step_r1cs_vks;
-                    in >> pk.translation_step_r1cs_vks;
-                    input_bool_vector(in, pk.commitment_to_translation_step_r1cs_vks);
-                    in >> pk.compliance_step_r1cs_vk_membership_proofs;
-                    in >> pk.compliance_predicate_name_to_idx;
-
-                    return in;
-                }
-
-                template<typename PCD_ppT>
                 std::size_t r1cs_mp_ppzkpcd_verification_key<PCD_ppT>::size_in_bits() const {
                     const std::size_t num_predicates = compliance_step_r1cs_vks.size();
 
@@ -435,24 +357,6 @@ namespace nil {
                             this->translation_step_r1cs_vks == other.translation_step_r1cs_vks &&
                             this->commitment_to_translation_step_r1cs_vks ==
                                 other.commitment_to_translation_step_r1cs_vks);
-                }
-
-                template<typename PCD_ppT>
-                std::ostream &operator<<(std::ostream &out, const r1cs_mp_ppzkpcd_verification_key<PCD_ppT> &vk) {
-                    out << vk.compliance_step_r1cs_vks;
-                    out << vk.translation_step_r1cs_vks;
-                    algebra::output_bool_vector(out, vk.commitment_to_translation_step_r1cs_vks);
-
-                    return out;
-                }
-
-                template<typename PCD_ppT>
-                std::istream &operator>>(std::istream &in, r1cs_mp_ppzkpcd_verification_key<PCD_ppT> &vk) {
-                    in >> vk.compliance_step_r1cs_vks;
-                    in >> vk.translation_step_r1cs_vks;
-                    algebra::input_bool_vector(in, vk.commitment_to_translation_step_r1cs_vks);
-
-                    return in;
                 }
 
                 template<typename PCD_ppT>
@@ -480,45 +384,9 @@ namespace nil {
                 }
 
                 template<typename PCD_ppT>
-                std::ostream &operator<<(std::ostream &out,
-                                         const r1cs_mp_ppzkpcd_processed_verification_key<PCD_ppT> &pvk) {
-                    out << pvk.compliance_step_r1cs_pvks;
-                    out << pvk.translation_step_r1cs_pvks;
-                    algebra::output_bool_vector(out, pvk.commitment_to_translation_step_r1cs_vks);
-
-                    return out;
-                }
-
-                template<typename PCD_ppT>
-                std::istream &operator>>(std::istream &in, r1cs_mp_ppzkpcd_processed_verification_key<PCD_ppT> &pvk) {
-                    in >> pvk.compliance_step_r1cs_pvks;
-                    in >> pvk.translation_step_r1cs_pvks;
-                    algebra::input_bool_vector(in, pvk.commitment_to_translation_step_r1cs_vks);
-
-                    return in;
-                }
-
-                template<typename PCD_ppT>
                 bool r1cs_mp_ppzkpcd_proof<PCD_ppT>::operator==(const r1cs_mp_ppzkpcd_proof<PCD_ppT> &other) const {
                     return (this->compliance_predicate_idx == other.compliance_predicate_idx &&
                             this->r1cs_proof == other.r1cs_proof);
-                }
-
-                template<typename PCD_ppT>
-                std::ostream &operator<<(std::ostream &out, const r1cs_mp_ppzkpcd_proof<PCD_ppT> &proof) {
-                    out << proof.compliance_predicate_idx << "\n";
-                    out << proof.r1cs_proof;
-
-                    return out;
-                }
-
-                template<typename PCD_ppT>
-                std::istream &operator>>(std::istream &in, r1cs_mp_ppzkpcd_proof<PCD_ppT> &proof) {
-                    in >> proof.compliance_predicate_idx;
-                    algebra::consume_newline(in);
-                    in >> proof.r1cs_proof;
-
-                    return in;
                 }
 
                 template<typename PCD_ppT>
@@ -647,17 +515,9 @@ namespace nil {
 
                     std::cout << "Call to r1cs_mp_ppzkpcd_prover" << std::endl;
 
-#ifdef DEBUG
-                    printf("Compliance predicate name: %zu\n", compliance_predicate_name);
-#endif
                     auto it = pk.compliance_predicate_name_to_idx.find(compliance_predicate_name);
                     assert(it != pk.compliance_predicate_name_to_idx.end());
                     const std::size_t compliance_predicate_idx = it->second;
-
-#ifdef DEBUG
-                    printf("Outgoing message:\n");
-                    primary_input.outgoing_message->print();
-#endif
 
                     std::cout << "Prove compliance step" << std::endl;
                     assert(compliance_predicate_idx < pk.compliance_predicates.size());

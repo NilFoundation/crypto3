@@ -37,8 +37,8 @@
 // <http://eprint.iacr.org/2014/595>
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_RAM_ZKSNARK_HPP_
-#define CRYPTO3_ZK_RAM_ZKSNARK_HPP_
+#ifndef CRYPTO3_ZK_RAM_ZKSNARK_HPP
+#define CRYPTO3_ZK_RAM_ZKSNARK_HPP
 
 #include <memory>
 
@@ -52,15 +52,6 @@ namespace nil {
             namespace snark {
 
                 /******************************** Proving key ********************************/
-
-                template<typename ram_zksnark_ppT>
-                class ram_zksnark_proving_key;
-
-                template<typename ram_zksnark_ppT>
-                std::ostream &operator<<(std::ostream &out, const ram_zksnark_proving_key<ram_zksnark_ppT> &pk);
-
-                template<typename ram_zksnark_ppT>
-                std::istream &operator>>(std::istream &in, ram_zksnark_proving_key<ram_zksnark_ppT> &pk);
 
                 /**
                  * A proving key for the RAM zkSNARK.
@@ -84,23 +75,9 @@ namespace nil {
                         operator=(const ram_zksnark_proving_key<ram_zksnark_ppT> &other) = default;
 
                     bool operator==(const ram_zksnark_proving_key<ram_zksnark_ppT> &other) const;
-                    friend std::ostream &
-                        operator<<<ram_zksnark_ppT>(std::ostream &out,
-                                                    const ram_zksnark_proving_key<ram_zksnark_ppT> &pk);
-                    friend std::istream &operator>>
-                        <ram_zksnark_ppT>(std::istream &in, ram_zksnark_proving_key<ram_zksnark_ppT> &pk);
                 };
 
                 /******************************* Verification key ****************************/
-
-                template<typename ram_zksnark_ppT>
-                class ram_zksnark_verification_key;
-
-                template<typename ram_zksnark_ppT>
-                std::ostream &operator<<(std::ostream &out, const ram_zksnark_verification_key<ram_zksnark_ppT> &vk);
-
-                template<typename ram_zksnark_ppT>
-                std::istream &operator>>(std::istream &in, ram_zksnark_verification_key<ram_zksnark_ppT> &vk);
 
                 /**
                  * A verification key for the RAM zkSNARK.
@@ -124,11 +101,6 @@ namespace nil {
                         operator=(const ram_zksnark_verification_key<ram_zksnark_ppT> &other) = default;
 
                     bool operator==(const ram_zksnark_verification_key<ram_zksnark_ppT> &other) const;
-                    friend std::ostream &
-                        operator<<<ram_zksnark_ppT>(std::ostream &out,
-                                                    const ram_zksnark_verification_key<ram_zksnark_ppT> &vk);
-                    friend std::istream &operator>>
-                        <ram_zksnark_ppT>(std::istream &in, ram_zksnark_verification_key<ram_zksnark_ppT> &vk);
 
                     static ram_zksnark_verification_key<ram_zksnark_ppT>
                         dummy_verification_key(const ram_zksnark_architecture_params<ram_zksnark_ppT> &ap);
@@ -155,15 +127,6 @@ namespace nil {
 
                 /*********************************** Proof ***********************************/
 
-                template<typename ram_zksnark_ppT>
-                class ram_zksnark_proof;
-
-                template<typename ram_zksnark_ppT>
-                std::ostream &operator<<(std::ostream &out, const ram_zksnark_proof<ram_zksnark_ppT> &proof);
-
-                template<typename ram_zksnark_ppT>
-                std::istream &operator>>(std::istream &in, ram_zksnark_proof<ram_zksnark_ppT> &proof);
-
                 /**
                  * A proof for the RAM zkSNARK.
                  */
@@ -183,10 +146,6 @@ namespace nil {
                     }
 
                     bool operator==(const ram_zksnark_proof<ram_zksnark_ppT> &other) const;
-                    friend std::ostream &operator<<<ram_zksnark_ppT>(std::ostream &out,
-                                                                     const ram_zksnark_proof<ram_zksnark_ppT> &proof);
-                    friend std::istream &operator>>
-                        <ram_zksnark_ppT>(std::istream &in, ram_zksnark_proof<ram_zksnark_ppT> &proof);
                 };
 
                 /***************************** Main algorithms *******************************/
@@ -234,59 +193,15 @@ namespace nil {
                 }
 
                 template<typename ram_zksnark_ppT>
-                std::ostream &operator<<(std::ostream &out, const ram_zksnark_proving_key<ram_zksnark_ppT> &pk) {
-                    out << pk.ap;
-                    out << pk.pcd_pk;
-
-                    return out;
-                }
-
-                template<typename ram_zksnark_ppT>
-                std::istream &operator>>(std::istream &in, ram_zksnark_proving_key<ram_zksnark_ppT> &pk) {
-                    in >> pk.ap;
-                    in >> pk.pcd_pk;
-
-                    return in;
-                }
-
-                template<typename ram_zksnark_ppT>
                 bool ram_zksnark_verification_key<ram_zksnark_ppT>::operator==(
                     const ram_zksnark_verification_key<ram_zksnark_ppT> &other) const {
                     return (this->ap == other.ap && this->pcd_vk == other.pcd_vk);
                 }
 
                 template<typename ram_zksnark_ppT>
-                std::ostream &operator<<(std::ostream &out, const ram_zksnark_verification_key<ram_zksnark_ppT> &vk) {
-                    out << vk.ap;
-                    out << vk.pcd_vk;
-
-                    return out;
-                }
-
-                template<typename ram_zksnark_ppT>
-                std::istream &operator>>(std::istream &in, ram_zksnark_verification_key<ram_zksnark_ppT> &vk) {
-                    in >> vk.ap;
-                    in >> vk.pcd_vk;
-
-                    return in;
-                }
-
-                template<typename ram_zksnark_ppT>
                 bool ram_zksnark_proof<ram_zksnark_ppT>::operator==(
                     const ram_zksnark_proof<ram_zksnark_ppT> &other) const {
                     return (this->PCD_proof == other.PCD_proof);
-                }
-
-                template<typename ram_zksnark_ppT>
-                std::ostream &operator<<(std::ostream &out, const ram_zksnark_proof<ram_zksnark_ppT> &proof) {
-                    out << proof.PCD_proof;
-                    return out;
-                }
-
-                template<typename ram_zksnark_ppT>
-                std::istream &operator>>(std::istream &in, ram_zksnark_proof<ram_zksnark_ppT> &proof) {
-                    in >> proof.PCD_proof;
-                    return in;
                 }
 
                 template<typename ram_zksnark_ppT>
@@ -404,4 +319,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // RAM_ZKSNARK_HPP_
+#endif    // CRYPTO3_ZK_RAM_ZKSNARK_HPP

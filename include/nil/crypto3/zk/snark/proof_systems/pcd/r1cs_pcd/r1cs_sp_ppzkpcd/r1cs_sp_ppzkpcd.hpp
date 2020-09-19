@@ -37,8 +37,8 @@
 // <http://eprint.iacr.org/2014/595>
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_R1CS_SP_PPZKPCD_HPP_
-#define CRYPTO3_ZK_R1CS_SP_PPZKPCD_HPP_
+#ifndef CRYPTO3_ZK_R1CS_SP_PPZKPCD_HPP
+#define CRYPTO3_ZK_R1CS_SP_PPZKPCD_HPP
 
 #include <memory>
 
@@ -51,15 +51,6 @@ namespace nil {
             namespace snark {
 
                 /******************************** Proving key ********************************/
-
-                template<typename PCD_ppT>
-                class r1cs_sp_ppzkpcd_proving_key;
-
-                template<typename PCD_ppT>
-                std::ostream &operator<<(std::ostream &out, const r1cs_sp_ppzkpcd_proving_key<PCD_ppT> &pk);
-
-                template<typename PCD_ppT>
-                std::istream &operator>>(std::istream &in, r1cs_sp_ppzkpcd_proving_key<PCD_ppT> &pk);
 
                 /**
                  * A proving key for the R1CS (single-predicate) ppzkPCD.
@@ -102,22 +93,9 @@ namespace nil {
                     }
 
                     bool operator==(const r1cs_sp_ppzkpcd_proving_key<PCD_ppT> &other) const;
-                    friend std::ostream &operator<<<PCD_ppT>(std::ostream &out,
-                                                             const r1cs_sp_ppzkpcd_proving_key<PCD_ppT> &pk);
-                    friend std::istream &operator>>
-                        <PCD_ppT>(std::istream &in, r1cs_sp_ppzkpcd_proving_key<PCD_ppT> &pk);
                 };
 
                 /******************************* Verification key ****************************/
-
-                template<typename PCD_ppT>
-                class r1cs_sp_ppzkpcd_verification_key;
-
-                template<typename PCD_ppT>
-                std::ostream &operator<<(std::ostream &out, const r1cs_sp_ppzkpcd_verification_key<PCD_ppT> &vk);
-
-                template<typename PCD_ppT>
-                std::istream &operator>>(std::istream &in, r1cs_sp_ppzkpcd_verification_key<PCD_ppT> &vk);
 
                 /**
                  * A verification key for the R1CS (single-predicate) ppzkPCD.
@@ -148,25 +126,11 @@ namespace nil {
                     }
 
                     bool operator==(const r1cs_sp_ppzkpcd_verification_key<PCD_ppT> &other) const;
-                    friend std::ostream &operator<<<PCD_ppT>(std::ostream &out,
-                                                             const r1cs_sp_ppzkpcd_verification_key<PCD_ppT> &vk);
-                    friend std::istream &operator>>
-                        <PCD_ppT>(std::istream &in, r1cs_sp_ppzkpcd_verification_key<PCD_ppT> &vk);
 
                     static r1cs_sp_ppzkpcd_verification_key<PCD_ppT> dummy_verification_key();
                 };
 
                 /************************ Processed verification key *************************/
-
-                template<typename PCD_ppT>
-                class r1cs_sp_ppzkpcd_processed_verification_key;
-
-                template<typename PCD_ppT>
-                std::ostream &operator<<(std::ostream &out,
-                                         const r1cs_sp_ppzkpcd_processed_verification_key<PCD_ppT> &pvk);
-
-                template<typename PCD_ppT>
-                std::istream &operator>>(std::istream &in, r1cs_sp_ppzkpcd_processed_verification_key<PCD_ppT> &pvk);
 
                 /**
                  * A processed verification key for the R1CS (single-predicate) ppzkPCD.
@@ -207,11 +171,6 @@ namespace nil {
                     }
 
                     bool operator==(const r1cs_sp_ppzkpcd_processed_verification_key<PCD_ppT> &other) const;
-                    friend std::ostream &
-                        operator<<<PCD_ppT>(std::ostream &out,
-                                            const r1cs_sp_ppzkpcd_processed_verification_key<PCD_ppT> &pvk);
-                    friend std::istream &operator>>
-                        <PCD_ppT>(std::istream &in, r1cs_sp_ppzkpcd_processed_verification_key<PCD_ppT> &pvk);
                 };
 
                 /********************************* Key pair **********************************/
@@ -317,48 +276,10 @@ namespace nil {
                 }
 
                 template<typename PCD_ppT>
-                std::ostream &operator<<(std::ostream &out, const r1cs_sp_ppzkpcd_proving_key<PCD_ppT> &pk) {
-                    out << pk.compliance_predicate;
-                    out << pk.compliance_step_r1cs_pk;
-                    out << pk.translation_step_r1cs_pk;
-                    out << pk.compliance_step_r1cs_vk;
-                    out << pk.translation_step_r1cs_vk;
-
-                    return out;
-                }
-
-                template<typename PCD_ppT>
-                std::istream &operator>>(std::istream &in, r1cs_sp_ppzkpcd_proving_key<PCD_ppT> &pk) {
-                    in >> pk.compliance_predicate;
-                    in >> pk.compliance_step_r1cs_pk;
-                    in >> pk.translation_step_r1cs_pk;
-                    in >> pk.compliance_step_r1cs_vk;
-                    in >> pk.translation_step_r1cs_vk;
-
-                    return in;
-                }
-
-                template<typename PCD_ppT>
                 bool r1cs_sp_ppzkpcd_verification_key<PCD_ppT>::operator==(
                     const r1cs_sp_ppzkpcd_verification_key<PCD_ppT> &other) const {
                     return (this->compliance_step_r1cs_vk == other.compliance_step_r1cs_vk &&
                             this->translation_step_r1cs_vk == other.translation_step_r1cs_vk);
-                }
-
-                template<typename PCD_ppT>
-                std::ostream &operator<<(std::ostream &out, const r1cs_sp_ppzkpcd_verification_key<PCD_ppT> &vk) {
-                    out << vk.compliance_step_r1cs_vk;
-                    out << vk.translation_step_r1cs_vk;
-
-                    return out;
-                }
-
-                template<typename PCD_ppT>
-                std::istream &operator>>(std::istream &in, r1cs_sp_ppzkpcd_verification_key<PCD_ppT> &vk) {
-                    in >> vk.compliance_step_r1cs_vk;
-                    in >> vk.translation_step_r1cs_vk;
-
-                    return in;
                 }
 
                 template<typename PCD_ppT>
@@ -384,25 +305,6 @@ namespace nil {
                     return (this->compliance_step_r1cs_pvk == other.compliance_step_r1cs_pvk &&
                             this->translation_step_r1cs_pvk == other.translation_step_r1cs_pvk &&
                             this->translation_step_r1cs_vk_bits == other.translation_step_r1cs_vk_bits);
-                }
-
-                template<typename PCD_ppT>
-                std::ostream &operator<<(std::ostream &out,
-                                         const r1cs_sp_ppzkpcd_processed_verification_key<PCD_ppT> &pvk) {
-                    out << pvk.compliance_step_r1cs_pvk;
-                    out << pvk.translation_step_r1cs_pvk;
-                    algebra::serialize_bit_vector(out, pvk.translation_step_r1cs_vk_bits);
-
-                    return out;
-                }
-
-                template<typename PCD_ppT>
-                std::istream &operator>>(std::istream &in, r1cs_sp_ppzkpcd_processed_verification_key<PCD_ppT> &pvk) {
-                    in >> pvk.compliance_step_r1cs_pvk;
-                    in >> pvk.translation_step_r1cs_pvk;
-                    algebra::deserialize_bit_vector(in, pvk.translation_step_r1cs_vk_bits);
-
-                    return in;
                 }
 
                 template<typename PCD_ppT>
@@ -545,4 +447,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // R1CS_SP_PPZKPCD_HPP_
+#endif    // CRYPTO3_ZK_R1CS_SP_PPZKPCD_HPP

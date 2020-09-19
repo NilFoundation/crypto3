@@ -31,8 +31,8 @@
 // - ppzkSNARK = "PreProcessing Zero-Knowledge Succinct Non-interactive ARgument of Knowledge"
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_TBCS_PPZKSNARK_HPP_
-#define CRYPTO3_ZK_TBCS_PPZKSNARK_HPP_
+#ifndef CRYPTO3_ZK_TBCS_PPZKSNARK_HPP
+#define CRYPTO3_ZK_TBCS_PPZKSNARK_HPP
 
 #include <nil/crypto3/zk/snark/relations/circuit_satisfaction_problems/tbcs/tbcs.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/tbcs_ppzksnark/tbcs_ppzksnark_params.hpp>
@@ -45,15 +45,6 @@ namespace nil {
             namespace snark {
 
                 /******************************** Proving key ********************************/
-
-                template<typename CurveType>
-                class tbcs_ppzksnark_proving_key;
-
-                template<typename CurveType>
-                std::ostream &operator<<(std::ostream &out, const tbcs_ppzksnark_proving_key<CurveType> &pk);
-
-                template<typename CurveType>
-                std::istream &operator>>(std::istream &in, tbcs_ppzksnark_proving_key<CurveType> &pk);
 
                 /**
                  * A proving key for the TBCS ppzkSNARK.
@@ -102,13 +93,7 @@ namespace nil {
                         return uscs_pk.size_in_bits();
                     }
 
-                    void print_size() const {
-                        uscs_pk.print_size();
-                    }
-
                     bool operator==(const tbcs_ppzksnark_proving_key<CurveType> &other) const;
-                    friend std::ostream &operator<<<CurveType>(std::ostream &out, const tbcs_ppzksnark_proving_key<CurveType> &pk);
-                    friend std::istream &operator>><CurveType>(std::istream &in, tbcs_ppzksnark_proving_key<CurveType> &pk);
                 };
 
                 /******************************* Verification key ****************************/
@@ -255,24 +240,6 @@ namespace nil {
                 }
 
                 template<typename CurveType>
-                std::ostream &operator<<(std::ostream &out, const tbcs_ppzksnark_proving_key<CurveType> &pk) {
-                    out << pk.circuit << OUTPUT_NEWLINE;
-                    out << pk.uscs_pk << OUTPUT_NEWLINE;
-
-                    return out;
-                }
-
-                template<typename CurveType>
-                std::istream &operator>>(std::istream &in, tbcs_ppzksnark_proving_key<CurveType> &pk) {
-                    in >> pk.circuit;
-                    algebra::consume_OUTPUT_NEWLINE(in);
-                    in >> pk.uscs_pk;
-                    algebra::consume_OUTPUT_NEWLINE(in);
-
-                    return in;
-                }
-
-                template<typename CurveType>
                 tbcs_ppzksnark_keypair<CurveType> tbcs_ppzksnark_generator(const tbcs_ppzksnark_circuit &circuit) {
                     typedef typename CurveType::scalar_field_type FieldType;
 
@@ -368,4 +335,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // TBCS_PPZKSNARK_HPP_
+#endif    // CRYPTO3_ZK_TBCS_PPZKSNARK_HPP

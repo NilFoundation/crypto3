@@ -43,8 +43,8 @@
 // <http://eprint.iacr.org/2013/879>
 //---------------------------------------------------------------------------///** @file
 
-#ifndef CRYPTO3_ZK_RAM_PPZKSNARK_HPP_
-#define CRYPTO3_ZK_RAM_PPZKSNARK_HPP_
+#ifndef CRYPTO3_ZK_RAM_PPZKSNARK_HPP
+#define CRYPTO3_ZK_RAM_PPZKSNARK_HPP
 
 #include <memory>
 
@@ -58,15 +58,6 @@ namespace nil {
             namespace snark {
 
                 /******************************** Proving key ********************************/
-
-                template<typename ram_ppzksnark_ppT>
-                class ram_ppzksnark_proving_key;
-
-                template<typename ram_ppzksnark_ppT>
-                std::ostream &operator<<(std::ostream &out, const ram_ppzksnark_proving_key<ram_ppzksnark_ppT> &pk);
-
-                template<typename ram_ppzksnark_ppT>
-                std::istream &operator>>(std::istream &in, ram_ppzksnark_proving_key<ram_ppzksnark_ppT> &pk);
 
                 /**
                  * A proving key for the RAM ppzkSNARK.
@@ -97,24 +88,9 @@ namespace nil {
                         operator=(const ram_ppzksnark_proving_key<ram_ppzksnark_ppT> &other) = default;
 
                     bool operator==(const ram_ppzksnark_proving_key<ram_ppzksnark_ppT> &other) const;
-                    friend std::ostream &
-                        operator<<<ram_ppzksnark_ppT>(std::ostream &out,
-                                                      const ram_ppzksnark_proving_key<ram_ppzksnark_ppT> &pk);
-                    friend std::istream &operator>>
-                        <ram_ppzksnark_ppT>(std::istream &in, ram_ppzksnark_proving_key<ram_ppzksnark_ppT> &pk);
                 };
 
                 /******************************* Verification key ****************************/
-
-                template<typename ram_ppzksnark_ppT>
-                class ram_ppzksnark_verification_key;
-
-                template<typename ram_ppzksnark_ppT>
-                std::ostream &operator<<(std::ostream &out,
-                                         const ram_ppzksnark_verification_key<ram_ppzksnark_ppT> &vk);
-
-                template<typename ram_ppzksnark_ppT>
-                std::istream &operator>>(std::istream &in, ram_ppzksnark_verification_key<ram_ppzksnark_ppT> &vk);
 
                 /**
                  * A verification key for the RAM ppzkSNARK.
@@ -150,11 +126,6 @@ namespace nil {
                         bind_primary_input(const ram_ppzksnark_primary_input<ram_ppzksnark_ppT> &primary_input) const;
 
                     bool operator==(const ram_ppzksnark_verification_key<ram_ppzksnark_ppT> &other) const;
-                    friend std::ostream &
-                        operator<<<ram_ppzksnark_ppT>(std::ostream &out,
-                                                      const ram_ppzksnark_verification_key<ram_ppzksnark_ppT> &vk);
-                    friend std::istream &operator>>
-                        <ram_ppzksnark_ppT>(std::istream &in, ram_ppzksnark_verification_key<ram_ppzksnark_ppT> &vk);
                 };
 
                 /********************************** Key pair *********************************/
@@ -238,28 +209,6 @@ namespace nil {
                 }
 
                 template<typename ram_ppzksnark_ppT>
-                std::ostream &operator<<(std::ostream &out, const ram_ppzksnark_proving_key<ram_ppzksnark_ppT> &pk) {
-                    out << pk.r1cs_pk;
-                    out << pk.ap;
-                    out << pk.primary_input_size_bound << "\n";
-                    out << pk.time_bound << "\n";
-
-                    return out;
-                }
-
-                template<typename ram_ppzksnark_ppT>
-                std::istream &operator>>(std::istream &in, ram_ppzksnark_proving_key<ram_ppzksnark_ppT> &pk) {
-                    in >> pk.r1cs_pk;
-                    in >> pk.ap;
-                    in >> pk.primary_input_size_bound;
-                    algebra::consume_newline(in);
-                    in >> pk.time_bound;
-                    algebra::consume_newline(in);
-
-                    return in;
-                }
-
-                template<typename ram_ppzksnark_ppT>
                 ram_ppzksnark_verification_key<ram_ppzksnark_ppT>
                     ram_ppzksnark_verification_key<ram_ppzksnark_ppT>::bind_primary_input(
                         const ram_ppzksnark_primary_input<ram_ppzksnark_ppT> &primary_input) const {
@@ -299,29 +248,6 @@ namespace nil {
                     return (this->r1cs_vk == other.r1cs_vk && this->ap == other.ap &&
                             this->primary_input_size_bound == other.primary_input_size_bound &&
                             this->time_bound == other.time_bound);
-                }
-
-                template<typename ram_ppzksnark_ppT>
-                std::ostream &operator<<(std::ostream &out,
-                                         const ram_ppzksnark_verification_key<ram_ppzksnark_ppT> &vk) {
-                    out << vk.r1cs_vk;
-                    out << vk.ap;
-                    out << vk.primary_input_size_bound << "\n";
-                    out << vk.time_bound << "\n";
-
-                    return out;
-                }
-
-                template<typename ram_ppzksnark_ppT>
-                std::istream &operator>>(std::istream &in, ram_ppzksnark_verification_key<ram_ppzksnark_ppT> &vk) {
-                    in >> vk.r1cs_vk;
-                    in >> vk.ap;
-                    in >> vk.primary_input_size_bound;
-                    algebra::consume_newline(in);
-                    in >> vk.time_bound;
-                    algebra::consume_newline(in);
-
-                    return in;
                 }
 
                 template<typename ram_ppzksnark_ppT>
@@ -386,4 +312,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // RAM_PPZKSNARK_HPP_
+#endif    // CRYPTO3_ZK_RAM_PPZKSNARK_HPP
