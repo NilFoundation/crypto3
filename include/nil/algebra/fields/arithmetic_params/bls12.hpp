@@ -12,6 +12,7 @@
 
 #include <nil/algebra/fields/params.hpp>
 
+#include <nil/algebra/fields/fp2.hpp>
 #include <nil/algebra/fields/bls12/base_field.hpp>
 #include <nil/algebra/fields/bls12/scalar_field.hpp>
 
@@ -78,8 +79,8 @@ namespace nil {
                      0x135203E60180A68EE2E9C448D77A2CD91C3DEDD930B1CF60EF396489F61EB45E304466CF3E67FA0AF1EE7B04121BDEA2_cppui381};
 
                 constexpr static const modulus_type modulus = policy_type::modulus;
-                constexpr static const modulus_type group_order =
-                0x1521BD25C61AFE3A5E93C75511792F4F16E48728738235A3372CF249A4F45E82853167E8B6EE5377A98A49984BC77808EB430CE430C2E3D949742D43848D024B35FC8F69F38DBA18B1619C1B1089E7EBE76B58EBB1C1755935500000E38C71C_cppui761;
+                constexpr static const extended_modulus_type group_order =
+                    0x1521BD25C61AFE3A5E93C75511792F4F16E48728738235A3372CF249A4F45E82853167E8B6EE5377A98A49984BC77808EB430CE430C2E3D949742D43848D024B35FC8F69F38DBA18B1619C1B1089E7EBE76B58EBB1C1755935500000E38C71C_cppui761;
 
             };
 
@@ -172,7 +173,7 @@ namespace nil {
                     {0x00, 0x1ABEF7237D62007BB9B2EDA5AFCB52F9D179F23DBD49B8D1B24CF7C1BF8066791317689172D0F4CB90CF47182B7D7B2_cppui377};
 
                 constexpr static const modulus_type modulus = policy_type::modulus;
-                constexpr static const modulus_type group_order =
+                constexpr static const extended_modulus_type group_order =
                     0x16983E85DD7FD912B489DD9B0931E25DC5C3ED257749F8FAF38A09EED26AE04E80C57DC833066E00A7389281526B62305555545DB857018C1925CAC31C64EB5E5FDE91AF8E04D256D1347970DEC00399C692A780000008508C00000000000_cppui753;
 
             };

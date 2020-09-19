@@ -12,9 +12,9 @@
 
 #include <nil/algebra/fields/params.hpp>
 
+#include <nil/algebra/fields/fp3.hpp>
 #include <nil/algebra/fields/edwards/base_field.hpp>
 #include <nil/algebra/fields/edwards/scalar_field.hpp>
-#include <nil/algebra/fields/fp3.hpp>
 
 #include <nil/algebra/detail/literals.hpp>
 
@@ -77,7 +77,7 @@ namespace nil {
                     {0x118228ECB464A2F6EB8DACC18FA757E45B3989330150C_cppui177, 0x00, 0x00};
 
                 constexpr static const modulus_type modulus = policy_type::modulus;
-                constexpr static const modulus_type group_order =
+                constexpr static const extended_modulus_type group_order =
                     0x214530CDE421990256A87901DDC6307E4ED27FAF4F877968EFCA129EF23243B915EF074F565027DAA0127ECF4EC788245754250524EA78AD2C1A16B28F2611D9140000000_cppui546;
 
             };
