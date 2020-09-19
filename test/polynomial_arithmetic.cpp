@@ -19,20 +19,24 @@
 #include <nil/algebra/fft/polynomial_arithmetic/basic_operations.hpp>
 #include <nil/algebra/fft/polynomial_arithmetic/xgcd.hpp>
 
+#include <nil/algebra/fields/bls12/base_field.hpp>
+#include <nil/algebra/fields/arithmetic_params/bls12.hpp>
+
+using namespace nil::algebra;
 using namespace nil::algebra::fft;
 
-typedef nil::algebra::Double FieldType;
+typedef fields::bls12<381> FieldType;
 
 BOOST_AUTO_TEST_SUITE(polynomial_addition_test_suite)
 
 BOOST_AUTO_TEST_CASE(polynomial_addition_equal) {
-    std::vector<FieldType> a = {1, 3, 4, 25, 6, 7, 7, 2};
-    std::vector<FieldType> b = {9, 3, 11, 14, 7, 1, 5, 8};
-    std::vector<FieldType> c(1, FieldType::zero());
+    std::vector<FieldType::value_type> a = {1, 3, 4, 25, 6, 7, 7, 2};
+    std::vector<FieldType::value_type> b = {9, 3, 11, 14, 7, 1, 5, 8};
+    std::vector<FieldType::value_type> c(1, FieldType::value_type::zero());
 
     _polynomial_addition(c, a, b);
 
-    std::vector<FieldType> c_ans = {10, 6, 15, 39, 13, 8, 12, 10};
+    std::vector<FieldType::value_type> c_ans = {10, 6, 15, 39, 13, 8, 12, 10};
 
     for (size_t i = 0; i < c.size(); ++i) {
         BOOST_CHECK(c_ans[i] == c[i]);
@@ -41,13 +45,13 @@ BOOST_AUTO_TEST_CASE(polynomial_addition_equal) {
 
 BOOST_AUTO_TEST_CASE(polynomial_addition_long_a) {
 
-    std::vector<FieldType> a = {1, 3, 4, 25, 6, 7, 7, 2};
-    std::vector<FieldType> b = {9, 3, 11, 14, 7};
-    std::vector<FieldType> c(1, FieldType::zero());
+    std::vector<FieldType::value_type> a = {1, 3, 4, 25, 6, 7, 7, 2};
+    std::vector<FieldType::value_type> b = {9, 3, 11, 14, 7};
+    std::vector<FieldType::value_type> c(1, FieldType::value_type::zero());
 
     _polynomial_addition(c, a, b);
 
-    std::vector<FieldType> c_ans = {10, 6, 15, 39, 13, 7, 7, 2};
+    std::vector<FieldType::value_type> c_ans = {10, 6, 15, 39, 13, 7, 7, 2};
 
     for (size_t i = 0; i < c.size(); i++) {
         BOOST_CHECK(c_ans[i] == c[i]);
@@ -56,13 +60,13 @@ BOOST_AUTO_TEST_CASE(polynomial_addition_long_a) {
 
 BOOST_AUTO_TEST_CASE(polynomial_addition_long_b) {
 
-    std::vector<FieldType> a = {1, 3, 4, 25, 6};
-    std::vector<FieldType> b = {9, 3, 11, 14, 7, 1, 5, 8};
-    std::vector<FieldType> c(1, FieldType::zero());
+    std::vector<FieldType::value_type> a = {1, 3, 4, 25, 6};
+    std::vector<FieldType::value_type> b = {9, 3, 11, 14, 7, 1, 5, 8};
+    std::vector<FieldType::value_type> c(1, FieldType::value_type::zero());
 
     _polynomial_addition(c, a, b);
 
-    std::vector<FieldType> c_ans = {10, 6, 15, 39, 13, 1, 5, 8};
+    std::vector<FieldType::value_type> c_ans = {10, 6, 15, 39, 13, 1, 5, 8};
 
     for (size_t i = 0; i < c.size(); i++) {
         BOOST_CHECK(c_ans[i] == c[i]);
@@ -71,13 +75,13 @@ BOOST_AUTO_TEST_CASE(polynomial_addition_long_b) {
 
 BOOST_AUTO_TEST_CASE(polynomial_addition_zero_a) {
 
-    std::vector<FieldType> a = {0, 0, 0};
-    std::vector<FieldType> b = {1, 3, 4, 25, 6, 7, 7, 2};
-    std::vector<FieldType> c(1, FieldType::zero());
+    std::vector<FieldType::value_type> a = {0, 0, 0};
+    std::vector<FieldType::value_type> b = {1, 3, 4, 25, 6, 7, 7, 2};
+    std::vector<FieldType::value_type> c(1, FieldType::value_type::zero());
 
     _polynomial_addition(c, a, b);
 
-    std::vector<FieldType> c_ans = {1, 3, 4, 25, 6, 7, 7, 2};
+    std::vector<FieldType::value_type> c_ans = {1, 3, 4, 25, 6, 7, 7, 2};
 
     for (size_t i = 0; i < c.size(); i++) {
         BOOST_CHECK(c_ans[i] == c[i]);
@@ -86,13 +90,13 @@ BOOST_AUTO_TEST_CASE(polynomial_addition_zero_a) {
 
 BOOST_AUTO_TEST_CASE(polynomial_addition_zero_b) {
 
-    std::vector<FieldType> a = {1, 3, 4, 25, 6, 7, 7, 2};
-    std::vector<FieldType> b = {0, 0, 0};
-    std::vector<FieldType> c(1, FieldType::zero());
+    std::vector<FieldType::value_type> a = {1, 3, 4, 25, 6, 7, 7, 2};
+    std::vector<FieldType::value_type> b = {0, 0, 0};
+    std::vector<FieldType::value_type> c(1, FieldType::value_type::zero());
 
     _polynomial_addition(c, a, b);
 
-    std::vector<FieldType> c_ans = {1, 3, 4, 25, 6, 7, 7, 2};
+    std::vector<FieldType::value_type> c_ans = {1, 3, 4, 25, 6, 7, 7, 2};
 
     for (size_t i = 0; i < c.size(); i++) {
         BOOST_CHECK(c_ans[i] == c[i]);

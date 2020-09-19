@@ -23,6 +23,9 @@
 
 #include <nil/algebra/fft/polynomial_arithmetic/naive_evaluate.hpp>
 
+#include <nil/algebra/fields/bls12/base_field.hpp>
+#include <nil/algebra/fields/arithmetic_params/bls12.hpp>
+
 using namespace nil::algebra;
 using namespace nil::algebra::fft;
 
@@ -230,20 +233,20 @@ void test_compute_z() {
 BOOST_AUTO_TEST_SUITE(fft_evaluation_domain_test_suite)
 
 BOOST_AUTO_TEST_CASE(fft) {
-    test_fft<algebra::mnt4>();
+    test_fft<fields::bls12<381>>();
 }
 
 BOOST_AUTO_TEST_CASE(inverse_fft_to_fft) {
-    test_inverse_fft_to_fft<algebra::mnt4>();
+    test_inverse_fft_to_fft<fields::bls12<381>>();
 }
 BOOST_AUTO_TEST_CASE(inverse_coset_ftt_to_coset_fft) {
-    test_inverse_coset_ftt_to_coset_fft<algebra::mnt4>();
+    test_inverse_coset_ftt_to_coset_fft<fields::bls12<381>>();
 }
 BOOST_AUTO_TEST_CASE(lagrange_coefficients) {
-    test_lagrange_coefficients<algebra::mnt4>();
+    test_lagrange_coefficients<fields::bls12<381>>();
 }
 BOOST_AUTO_TEST_CASE(compute_z) {
-    test_compute_z<algebra::mnt4>();
+    test_compute_z<fields::bls12<381>>();
 }
 
 BOOST_AUTO_TEST_SUITE_END()
