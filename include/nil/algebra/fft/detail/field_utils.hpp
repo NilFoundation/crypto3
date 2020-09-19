@@ -13,6 +13,8 @@
 #include <type_traits>
 #include <complex>
 
+#include <nil/algebra/fields/params.hpp>
+
 namespace nil {
     namespace algebra {
         namespace fft {
@@ -20,17 +22,17 @@ namespace nil {
             using namespace nil::algebra;
 
             template<typename FieldType>
-            FieldType::value_type coset_shift() {
+            typename FieldType::value_type coset_shift() {
                 return value_type(fields::arithmetic_params<FieldType>::multiplicative_generator).squared();
             }
 
-            template<typename FieldValueType>
-            typename std::enable_if<std::is_same<FieldValueType, std::complex<double>>::value,
-                                    FieldValueType>::type
+            template<typename FieldType>
+            typename std::enable_if<std::is_same<typename FieldType::value_type, std::complex<double>>::value,
+                                    typename FieldType::value_type>::type
                 unity_root(const size_t n) {
                 const double PI = 3.141592653589793238460264338328L;
 
-                return typename FieldValueType(cos(2 * PI / n), sin(2 * PI / n));
+                return FieldType::value_type(cos(2 * PI / n), sin(2 * PI / n));
             }
 
             template<typename FieldType>
