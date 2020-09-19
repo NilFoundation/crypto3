@@ -59,7 +59,7 @@ namespace nil {
                         b = T[i - 1][index];
                         index++;
 
-                        _polynomial_multiplication(T[i][j], a, b);
+                        _polynomial_multiplication<FieldType>(T[i][j], a, b);
                     }
                     index = 0;
                 }
@@ -144,8 +144,8 @@ namespace nil {
                 std::vector<FieldValueType> temp(1, FieldValueType::zero());
                 for (size_t i = 0; i < m; i++) {
                     for (size_t j = 0; j < (1u << (m - i - 1)); j++) {
-                        _polynomial_multiplication(temp, T[i][2 * j], f[2 * j + 1]);
-                        _polynomial_addition(f[j], f[2 * j], temp);
+                        _polynomial_multiplication<FieldType>(temp, T[i][2 * j], f[2 * j + 1]);
+                        _polynomial_addition<FieldType>(f[j], f[2 * j], temp);
                     }
                 }
 

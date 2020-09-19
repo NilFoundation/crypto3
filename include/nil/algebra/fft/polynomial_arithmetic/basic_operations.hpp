@@ -59,9 +59,12 @@ namespace nil {
              * Computes the standard polynomial addition, polynomial A + polynomial B, and stores result in polynomial
              * C.
              */
-            template<typename FieldValueType>
-            void _polynomial_addition(std::vector<FieldValueType> &c, const std::vector<FieldValueType> &a,
-                                      const std::vector<FieldValueType> &b) {
+            template<typename FieldType>
+            void _polynomial_addition(std::vector<typename FieldType::value_type> &c, const std::vector<typename FieldType::value_type> &a,
+                                      const std::vector<typename FieldType::value_type> &b) {
+
+                using value_type = typename FieldType::value_type;
+
                 if (_is_zero(a)) {
                     c = b;
                 } else if (_is_zero(b)) {
@@ -72,11 +75,11 @@ namespace nil {
 
                     if (a_size > b_size) {
                         c.resize(a_size);
-                        std::transform(b.begin(), b.end(), a.begin(), c.begin(), std::plus<FieldValueType>());
+                        std::transform(b.begin(), b.end(), a.begin(), c.begin(), std::plus<value_type>());
                         std::copy(a.begin() + b_size, a.end(), c.begin() + b_size);
                     } else {
                         c.resize(b_size);
-                        std::transform(a.begin(), a.end(), b.begin(), c.begin(), std::plus<FieldValueType>());
+                        std::transform(a.begin(), a.end(), b.begin(), c.begin(), std::plus<value_type>());
                         std::copy(b.begin() + a_size, b.end(), c.begin() + a_size);
                     }
                 }
@@ -88,26 +91,29 @@ namespace nil {
              * Computes the standard polynomial subtraction, polynomial A - polynomial B, and stores result in
              * polynomial C.
              */
-            template<typename FieldValueType>
-            void _polynomial_subtraction(std::vector<FieldValueType> &c, const std::vector<FieldValueType> &a,
-                                         const std::vector<FieldValueType> &b) {
+            template<typename FieldType>
+            void _polynomial_subtraction(std::vector<typename FieldType::value_type> &c, const std::vector<typename FieldType::value_type> &a,
+                                         const std::vector<typename FieldType::value_type> &b) {
+
+                using value_type = typename FieldType::value_type;
+
                 if (_is_zero(b)) {
                     c = a;
                 } else if (_is_zero(a)) {
                     c.resize(b.size());
-                    std::transform(b.begin(), b.end(), c.begin(), std::negate<FieldValueType>());
+                    std::transform(b.begin(), b.end(), c.begin(), std::negate<value_type>());
                 } else {
                     size_t a_size = a.size();
                     size_t b_size = b.size();
 
                     if (a_size > b_size) {
                         c.resize(a_size);
-                        std::transform(a.begin(), a.begin() + b_size, b.begin(), c.begin(), std::minus<FieldValueType>());
+                        std::transform(a.begin(), a.begin() + b_size, b.begin(), c.begin(), std::minus<value_type>());
                         std::copy(a.begin() + b_size, a.end(), c.begin() + b_size);
                     } else {
                         c.resize(b_size);
-                        std::transform(a.begin(), a.end(), b.begin(), c.begin(), std::minus<FieldValueType>());
-                        std::transform(b.begin() + a_size, b.end(), c.begin() + a_size, std::negate<FieldValueType>());
+                        std::transform(a.begin(), a.end(), b.begin(), c.begin(), std::minus<value_type>());
+                        std::transform(b.begin() + a_size, b.end(), c.begin() + a_size, std::negate<value_type>());
                     }
                 }
 
@@ -118,36 +124,39 @@ namespace nil {
              * Perform the multiplication of two polynomials, polynomial A * polynomial B, using FFT, and stores result
              * in polynomial C.
              */
-            template<typename FieldValueType>
-            void _polynomial_multiplication_on_fft(std::vector<FieldValueType> &c, const std::vector<FieldValueType> &a,
-                                                   const std::vector<FieldValueType> &b) {
+            template<typename FieldType>
+            void _polynomial_multiplication_on_fft(std::vector<typename FieldType::value_type> &c, const std::vector<typename FieldType::value_type> &a,
+                                                   const std::vector<typename FieldType::value_type> &b) {
+
+                using value_type = typename FieldType::value_type;
+
                 const size_t n = detail::get_power_of_two(a.size() + b.size() - 1);
-                FieldValueType omega = detail::unity_root<FieldValueType>(n);
+                value_type omega = detail::unity_root<value_type>(n);
 
-                std::vector<FieldValueType> u(a);
-                std::vector<FieldValueType> v(b);
-                u.resize(n, FieldValueType::zero());
-                v.resize(n, FieldValueType::zero());
-                c.resize(n, FieldValueType::zero());
-
-#ifdef MULTICORE
-                detail::basic_parallel_radix2_FFT(u, omega);
-                detail::basic_parallel_radix2_FFT(v, omega);
-#else
-                detail::basic_serial_radix2_FFT(u, omega);
-                detail::basic_serial_radix2_FFT(v, omega);
-#endif
-
-                std::transform(u.begin(), u.end(), v.begin(), c.begin(), std::multiplies<FieldValueType>());
+                std::vector<value_type> u(a);
+                std::vector<value_type> v(b);
+                u.resize(n, value_type::zero());
+                v.resize(n, value_type::zero());
+                c.resize(n, value_type::zero());
 
 #ifdef MULTICORE
-                detail::basic_parallel_radix2_FFT(c, omega.inversed());
+                detail::basic_parallel_radix2_FFT<FieldType>(u, omega);
+                detail::basic_parallel_radix2_FFT<FieldType>(v, omega);
 #else
-                detail::basic_serial_radix2_FFT(c, omega.inversed());
+                detail::basic_serial_radix2_FFT<FieldType>(u, omega);
+                detail::basic_serial_radix2_FFT<FieldType>(v, omega);
 #endif
 
-                const FieldValueType sconst = FieldValueType(n).inversed();
-                std::transform(c.begin(), c.end(), c.begin(), std::bind1st(std::multiplies<FieldValueType>(), sconst));
+                std::transform(u.begin(), u.end(), v.begin(), c.begin(), std::multiplies<value_type>());
+
+#ifdef MULTICORE
+                detail::basic_parallel_radix2_FFT<FieldType>(c, omega.inversed());
+#else
+                detail::basic_serial_radix2_FFT<FieldType>(c, omega.inversed());
+#endif
+
+                const value_type sconst = value_type(n).inversed();
+                std::transform(c.begin(), c.end(), c.begin(), std::bind1st(std::multiplies<value_type>(), sconst));
                 _condense(c);
             }
 
@@ -155,10 +164,10 @@ namespace nil {
              * Perform the multiplication of two polynomials, polynomial A * polynomial B, and stores result in
              * polynomial C.
              */
-            template<typename FieldValueType>
-            void _polynomial_multiplication(std::vector<FieldValueType> &c, const std::vector<FieldValueType> &a,
-                                            const std::vector<FieldValueType> &b) {
-                _polynomial_multiplication_on_fft(c, a, b);
+            template<typename FieldType>
+            void _polynomial_multiplication(std::vector<typename FieldType::value_type> &c, const std::vector<typename FieldType::value_type> &a,
+                                            const std::vector<typename FieldType::value_type> &b) {
+                _polynomial_multiplication_on_fft<FieldType>(c, a, b);
             }
 
             /**
@@ -166,20 +175,23 @@ namespace nil {
              * Below we make use of the transposed multiplication definition from
              * [Bostan, Lecerf, & Schost, 2003. Tellegen's Principle in Practice, on page 39].
              */
-            template<typename FieldValueType>
-            std::vector<FieldValueType> _polynomial_multiplication_transpose(const size_t &n,
-                                                                        const std::vector<FieldValueType> &a,
-                                                                        const std::vector<FieldValueType> &c) {
+            template<typename FieldType>
+            std::vector<typename FieldType::value_type> _polynomial_multiplication_transpose(const size_t &n,
+                                                                        const std::vector<typename FieldType::value_type> &a,
+                                                                        const std::vector<typename FieldType::value_type> &c) {
+
+                using value_type = typename FieldType::value_type;
+
                 const size_t m = a.size();
                 // if (c.size() - 1 > m + n)
                 // throw InvalidSizeException("expected c.size() - 1 <= m + n");
 
-                std::vector<FieldValueType> r(a);
+                std::vector<value_type> r(a);
                 _reverse(r, m);
-                _polynomial_multiplication(r, r, c);
+                _polynomial_multiplication<FieldType>(r, r, c);
 
                 /* Determine Middle Product */
-                std::vector<FieldValueType> result;
+                std::vector<value_type> result;
                 for (size_t i = m - 1; i < n + m; i++) {
                     result.emplace_back(r[i]);
                 }
@@ -191,14 +203,17 @@ namespace nil {
              * Input: Polynomial A, Polynomial B, where A / B
              * Output: Polynomial Q, Polynomial R, such that A = (Q * B) + R.
              */
-            template<typename FieldValueType>
-            void _polynomial_division(std::vector<FieldValueType> &q, std::vector<FieldValueType> &r,
-                                      const std::vector<FieldValueType> &a, const std::vector<FieldValueType> &b) {
-                size_t d = b.size() - 1;          /* Degree of B */
-                FieldValueType c = b.back().inversed(); /* Inverse of Leading Coefficient of B */
+            template<typename FieldType>
+            void _polynomial_division(std::vector<typename FieldType::value_type> &q, std::vector<typename FieldType::value_type> &r,
+                                      const std::vector<typename FieldType::value_type> &a, const std::vector<typename FieldType::value_type> &b) {
 
-                r = std::vector<FieldValueType>(a);
-                q = std::vector<FieldValueType>(r.size(), FieldValueType::zero());
+                using value_type = typename FieldType::value_type;
+
+                size_t d = b.size() - 1;          /* Degree of B */
+                value_type c = b.back().inversed(); /* Inverse of Leading Coefficient of B */
+
+                r = std::vector<value_type>(a);
+                q = std::vector<value_type>(r.size(), value_type::zero());
 
                 size_t r_deg = r.size() - 1;
                 size_t shift;
@@ -209,13 +224,13 @@ namespace nil {
                     else
                         shift = 0;
 
-                    FieldValueType lead_coeff = r.back() * c;
+                    value_type lead_coeff = r.back() * c;
 
                     q[shift] += lead_coeff;
 
                     if (b.size() + shift + 1 > r.size())
                         r.resize(b.size() + shift + 1);
-                    auto glambda = [=](FieldValueType x, FieldValueType y) { return y - (x * lead_coeff); };
+                    auto glambda = [=](value_type x, value_type y) { return y - (x * lead_coeff); };
                     std::transform(b.begin(), b.end(), r.begin() + shift, r.begin() + shift, glambda);
                     _condense(r);
 

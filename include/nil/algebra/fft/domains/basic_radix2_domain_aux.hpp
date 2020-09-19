@@ -82,7 +82,7 @@ namespace nil {
                         throw std::invalid_argument("expected m == 1ul<<log_m");
 
                     if (log_m < log_cpus) {
-                        basic_serial_radix2_FFT(a, omega);
+                        basic_serial_radix2_FFT<FieldType>(a, omega);
                         return;
                     }
 
@@ -116,7 +116,7 @@ namespace nil {
 #pragma omp parallel for
 #endif
                     for (size_t j = 0; j < num_cpus; ++j) {
-                        basic_serial_radix2_FFT(tmp[j], omega_num_cpus);
+                        basic_serial_radix2_FFT<FieldType>(tmp[j], omega_num_cpus);
                     }
 
 #ifdef MULTICORE
@@ -141,7 +141,7 @@ namespace nil {
                     const size_t log_cpus = ((num_cpus & (num_cpus - 1)) == 0 ? log2(num_cpus) : log2(num_cpus) - 1);
 
                     if (log_cpus == 0) {
-                        basic_serial_radix2_FFT(a, omega);
+                        basic_serial_radix2_FFT<FieldType>(a, omega);
                     } else {
                         basic_parallel_radix2_FFT_inner(a, omega, log_cpus);
                     }
