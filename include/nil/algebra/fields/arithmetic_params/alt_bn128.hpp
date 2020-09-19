@@ -36,6 +36,8 @@ namespace nil {
                     0x183227397098D014DC2822DB40C0AC2ECBC0B548B438E5469E10460B6C3E7EA3_cppui253;
                 constexpr static const modulus_type t_minus_1_over_2 =
                     0xC19139CB84C680A6E14116DA060561765E05AA45A1C72A34F082305B61F3F51_cppui252;
+                constexpr static const modulus_type arithmetic_generator = 0x00;
+                constexpr static const modulus_type geometric_generator = 0x00;
                 constexpr static const modulus_type multiplicative_generator = 0x03;
                 constexpr static const modulus_type root_of_unity = 
                     0x30644E72E131A029B85045B68181585D97816A916871CA8D3C208C16D87CFD46_cppui254;
@@ -93,6 +95,8 @@ namespace nil {
                     0x30644E72E131A029B85045B68181585D2833E84879B9709143E1F593F_cppui226;
                 constexpr static const modulus_type t_minus_1_over_2 =
                     0x183227397098D014DC2822DB40C0AC2E9419F4243CDCB848A1F0FAC9F_cppui225;
+                constexpr static const modulus_type arithmetic_generator = 0x00;
+                constexpr static const modulus_type geometric_generator = 0x00;
                 constexpr static const modulus_type multiplicative_generator = 0x05;
                 constexpr static const modulus_type root_of_unity = 
                     0x2A3C09F0A58A7E8500E0A7EB8EF62ABC402D111E41112ED49BD61B6E725B19F0_cppui254;

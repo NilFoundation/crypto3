@@ -37,6 +37,8 @@ namespace nil {
                     0x1DE7BDE6A39D133124ED3D82A47657764B1AE89987520D4F1AF2890070964866B2D38B3_cppui281;
                 constexpr static const modulus_type t_minus_1_over_2 =
                     0xEF3DEF351CE899892769EC1523B2BBB258D744CC3A906A78D794480384B24335969C59_cppui280;
+                constexpr static const modulus_type arithmetic_generator = 0x00;
+                constexpr static const modulus_type geometric_generator = 0x00;
                 constexpr static const modulus_type multiplicative_generator = 0x11;
                 constexpr static const modulus_type root_of_unity = 
                     0x214431121152176339675F00F9D465A3C037F18735DB28205F2A5F57D155F151CEC101EEC43_cppui298;
