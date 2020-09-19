@@ -63,11 +63,12 @@ namespace nil {
             public:
                 typedef typename policy_type::number_type number_type;
                 typedef typename policy_type::modulus_type modulus_type;
+                typedef typename policy_type::extended_modulus_type extended_modulus_type;
 
                 constexpr static const std::size_t s = 0x03;
-                constexpr static const modulus_type t =
+                constexpr static const extended_modulus_type t =
                     0x5486F497186BF8E97A4F1D5445E4BD3C5B921CA1CE08D68CDCB3C92693D17A0A14C59FA2DBB94DDEA62926612F1DE023AD0C3390C30B8F6525D0B50E1234092CD7F23DA7CE36E862C586706C42279FAF9DAD63AEC705D564D54000038E31C7_cppui759;
-                constexpr static const modulus_type t_minus_1_over_2 =
+                constexpr static const extended_modulus_type t_minus_1_over_2 =
                     0x2A437A4B8C35FC74BD278EAA22F25E9E2DC90E50E7046B466E59E49349E8BD050A62CFD16DDCA6EF53149330978EF011D68619C86185C7B292E85A87091A04966BF91ED3E71B743162C338362113CFD7CED6B1D76382EAB26AA00001C718E3_cppui758;
                 constexpr static const modulus_type nqr = {1, 1};
                 constexpr static const modulus_type nqr_to_t = 
@@ -153,11 +154,12 @@ namespace nil {
             public:
                 typedef typename policy_type::number_type number_type;
                 typedef typename policy_type::modulus_type modulus_type;
+                typedef typename policy_type::extended_modulus_type extended_modulus_type;
 
                 constexpr static const std::size_t s = 0x2F;
-                constexpr static const modulus_type t =
+                constexpr static const extended_modulus_type t =
                     0x5A60FA1775FF644AD227766C24C78977170FB495DD27E3EBCE2827BB49AB813A0315F720CC19B8029CE24A0549AD88C155555176E15C063064972B0C7193AD797F7A46BE3813495B44D1E5C37B000E671A4A9E00000021423_cppui707;
-                constexpr static const modulus_type t_minus_1_over_2 =
+                constexpr static const extended_modulus_type t_minus_1_over_2 =
                     0x2D307D0BBAFFB2256913BB361263C4BB8B87DA4AEE93F1F5E71413DDA4D5C09D018AFB90660CDC014E712502A4D6C460AAAAA8BB70AE0318324B958638C9D6BCBFBD235F1C09A4ADA268F2E1BD8007338D254F00000010A11_cppui706;
                 
                 constexpr static const modulus_type nqr = {0x00, 0x01};

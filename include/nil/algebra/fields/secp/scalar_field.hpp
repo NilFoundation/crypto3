@@ -42,6 +42,8 @@ namespace nil {
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                 typedef typename policy_type::modulus_type modulus_type;
 
+                typedef typename policy_type::extended_modulus_type extended_modulus_type;
+
                 constexpr static const std::size_t number_bits = policy_type::number_bits;
                 typedef typename policy_type::number_type number_type;
 
@@ -65,6 +67,8 @@ namespace nil {
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                 typedef typename policy_type::modulus_type modulus_type;
 
+                typedef typename policy_type::extended_modulus_type extended_modulus_type;
+
                 constexpr static const modulus_type modulus = 0x100000000000000000001F4C8F927AED3CA752257_cppui160;
 
                 constexpr static const std::size_t generator_bits = policy_type::generator_bits;
@@ -85,6 +89,8 @@ namespace nil {
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                 typedef typename policy_type::modulus_type modulus_type;
 
+                typedef typename policy_type::extended_modulus_type extended_modulus_type;
+
                 constexpr static const modulus_type modulus = 0x100000000000000000000351EE786A818F3A1A16B_cppui160;
 
                 constexpr static const std::size_t generator_bits = policy_type::generator_bits;
@@ -104,6 +110,8 @@ namespace nil {
 
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                 typedef typename policy_type::modulus_type modulus_type;
+
+                typedef typename policy_type::extended_modulus_type extended_modulus_type;
 
                 constexpr static const modulus_type modulus =
                     0xFFFFFFFFFFFFFFFFFFFFFFFE26F2FC170F69466A74DEFD8D_cppui192;
@@ -126,6 +134,8 @@ namespace nil {
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                 typedef typename policy_type::modulus_type modulus_type;
 
+                typedef typename policy_type::extended_modulus_type extended_modulus_type;
+
                 constexpr static const modulus_type modulus =
                     0xFFFFFFFFFFFFFFFFFFFFFFFE26F2FC170F69466A74DEFD8D_cppui192;
 
@@ -146,6 +156,8 @@ namespace nil {
 
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                 typedef typename policy_type::modulus_type modulus_type;
+
+                typedef typename policy_type::extended_modulus_type extended_modulus_type;
 
                 constexpr static const modulus_type modulus =
                     0x10000000000000000000000000001DCE8D2EC6184CAF0A971769FB1F7_cppui224;
@@ -168,6 +180,8 @@ namespace nil {
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                 typedef typename policy_type::modulus_type modulus_type;
 
+                typedef typename policy_type::extended_modulus_type extended_modulus_type;
+
                 constexpr static const modulus_type modulus =
                     0xFFFFFFFFFFFFFFFFFFFFFFFFFFFF16A2E0B8F03E13DD29455C5C2A3D_cppui224;
 
@@ -188,6 +202,8 @@ namespace nil {
 
                 constexpr static const std::size_t modulus_bits = policy_type::modulus_bits;
                 typedef typename policy_type::modulus_type modulus_type;
+
+                typedef typename policy_type::extended_modulus_type extended_modulus_type;
 
                 constexpr static const modulus_type modulus =
                     0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141_cppui256;
