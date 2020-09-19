@@ -133,11 +133,11 @@ namespace nil {
 
                     element_fp3 sqrt() const {
 
-                        element_fp3 one = one();
+                        element_fp3 one = this->one();
 
-                        size_t v = policy_type::fp3::s;
-                        element_fp3 z(policy_type::fp3::nqr_to_t);
-                        element_fp3 w((*this) ^ policy_type::fp3::t_minus_1_over_2);
+                        size_t v = policy_type::s;
+                        element_fp3 z(policy_type::nqr_to_t[0], policy_type::nqr_to_t[1], policy_type::nqr_to_t[2]);
+                        element_fp3 w = this->pow(policy_type::t_minus_1_over_2);
                         element_fp3 x((*this) * w);
                         element_fp3 b = x * w;    // b = (*this)^t
 

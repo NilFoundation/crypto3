@@ -116,8 +116,18 @@ namespace nil {
                 public:
                     typedef typename policy_type::number_type number_type;
                     typedef typename policy_type::modulus_type modulus_type;
+                    typedef typename policy_type::extended_modulus_type extended_modulus_type;
 
                     constexpr static const modulus_type modulus = policy_type::modulus;
+
+                    constexpr static const std::size_t s = 0x2F;
+                constexpr static const extended_modulus_type t =
+                    0x5A60FA1775FF644AD227766C24C78977170FB495DD27E3EBCE2827BB49AB813A0315F720CC19B8029CE24A0549AD88C155555176E15C063064972B0C7193AD797F7A46BE3813495B44D1E5C37B000E671A4A9E00000021423_cppui707;
+                constexpr static const extended_modulus_type t_minus_1_over_2 =
+                    0x2D307D0BBAFFB2256913BB361263C4BB8B87DA4AEE93F1F5E71413DDA4D5C09D018AFB90660CDC014E712502A4D6C460AAAAA8BB70AE0318324B958638C9D6BCBFBD235F1C09A4ADA268F2E1BD8007338D254F00000010A11_cppui706;
+                constexpr static const std::array<modulus_type, 2> nqr = {0x00, 0x01};
+                constexpr static const std::array<modulus_type, 2> nqr_to_t = 
+                    {0x00, 0x1ABEF7237D62007BB9B2EDA5AFCB52F9D179F23DBD49B8D1B24CF7C1BF8066791317689172D0F4CB90CF47182B7D7B2_cppui377};
 
                     typedef element_fp<policy_type> non_residue_type;
                     typedef element_fp<policy_type> underlying_type;
@@ -171,18 +181,28 @@ namespace nil {
 
                 constexpr typename std::size_t const
                     fp2_extension_params<bls12_base_field<381, CHAR_BIT>>::s;
+                constexpr typename std::size_t const
+                    fp2_extension_params<bls12_base_field<377, CHAR_BIT>>::s;
 
                 constexpr typename fp2_extension_params<bls12_base_field<381, CHAR_BIT>>::extended_modulus_type const
                     fp2_extension_params<bls12_base_field<381, CHAR_BIT>>::t;
+                constexpr typename fp2_extension_params<bls12_base_field<377, CHAR_BIT>>::extended_modulus_type const
+                    fp2_extension_params<bls12_base_field<377, CHAR_BIT>>::t;
 
                 constexpr typename fp2_extension_params<bls12_base_field<381, CHAR_BIT>>::extended_modulus_type const
                     fp2_extension_params<bls12_base_field<381, CHAR_BIT>>::t_minus_1_over_2;
+                constexpr typename fp2_extension_params<bls12_base_field<377, CHAR_BIT>>::extended_modulus_type const
+                    fp2_extension_params<bls12_base_field<377, CHAR_BIT>>::t_minus_1_over_2;
 
-                constexpr typename std::array<fp2_extension_params<bls12_base_field<381, CHAR_BIT>>::modulus_type, 2> const
+                constexpr std::array<typename fp2_extension_params<bls12_base_field<381, CHAR_BIT>>::modulus_type, 2> const
                     fp2_extension_params<bls12_base_field<381, CHAR_BIT>>::nqr;
+                constexpr std::array<typename fp2_extension_params<bls12_base_field<377, CHAR_BIT>>::modulus_type, 2> const
+                    fp2_extension_params<bls12_base_field<377, CHAR_BIT>>::nqr;
 
-                constexpr typename std::array<fp2_extension_params<bls12_base_field<381, CHAR_BIT>>::modulus_type, 2> const
+                constexpr std::array<typename fp2_extension_params<bls12_base_field<381, CHAR_BIT>>::modulus_type, 2> const
                     fp2_extension_params<bls12_base_field<381, CHAR_BIT>>::nqr_to_t;
+                constexpr std::array<typename fp2_extension_params<bls12_base_field<377, CHAR_BIT>>::modulus_type, 2> const
+                    fp2_extension_params<bls12_base_field<377, CHAR_BIT>>::nqr_to_t;
 
                 constexpr std::array<typename fp6_3over2_extension_params<bls12_base_field<381, CHAR_BIT>>::modulus_type, 2> const
                     fp6_3over2_extension_params<bls12_base_field<381, CHAR_BIT>>::non_residue;

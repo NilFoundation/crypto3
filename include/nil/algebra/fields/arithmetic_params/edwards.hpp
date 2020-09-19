@@ -63,15 +63,16 @@ namespace nil {
             public:
                 typedef typename policy_type::number_type number_type;
                 typedef typename policy_type::modulus_type modulus_type;
+                typedef typename policy_type::extended_modulus_type extended_modulus_type;
 
                 constexpr static const std::size_t s = 0x1F;
-                constexpr static const modulus_type t =
+                constexpr static const extended_modulus_type t =
                     0x8514C337908664095AA1E4077718C1F93B49FEBD3E1DE5A3BF284A7BC8C90EE457BC1D3D59409F6A8049FB3D3B1E20915D50941493A9E2B4B0685ACA3C9847645_cppui516;
-                constexpr static const modulus_type t_minus_1_over_2 =
+                constexpr static const extended_modulus_type t_minus_1_over_2 =
                     0x428A619BC8433204AD50F203BB8C60FC9DA4FF5E9F0EF2D1DF94253DE46487722BDE0E9EACA04FB54024FD9E9D8F1048AEA84A0A49D4F15A58342D651E4C23B22_cppui515;
                 constexpr static const std::array<modulus_type, 3> nqr = {0x17, 0x00, 0x00};
                 constexpr static const std::array<modulus_type, 3> nqr_to_t = 
-                    {0x118228ECB464A2F6EB8DACC18FA757E45B3989330150C_cppui1177, 0x00, 0x00};
+                    {0x118228ECB464A2F6EB8DACC18FA757E45B3989330150C_cppui177, 0x00, 0x00};
 
                 constexpr static const modulus_type modulus = policy_type::modulus;
                 constexpr static const modulus_type group_order =

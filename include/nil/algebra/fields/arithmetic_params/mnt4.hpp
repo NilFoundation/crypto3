@@ -63,11 +63,12 @@ namespace nil {
             public:
                 typedef typename policy_type::number_type number_type;
                 typedef typename policy_type::modulus_type modulus_type;
+                typedef typename policy_type::extended_modulus_type extended_modulus_type;
 
                 constexpr static const std::size_t s = 0x12;
-                constexpr static const modulus_type t =
+                constexpr static const extended_modulus_type t =
                     0x37E52CE842B39321A34D7BA62E2C735153C68D35F7A312CDB18451030CB297F3B772167A8487033D5772A0EF6BEA9BCA60190FFE1CDB642F88A0FF2EFF7A6A3A80FD00203385638B3_cppui578;
-                constexpr static const modulus_type t_minus_1_over_2 =
+                constexpr static const extended_modulus_type t_minus_1_over_2 =
                     0x1BF296742159C990D1A6BDD3171639A8A9E3469AFBD18966D8C2288186594BF9DBB90B3D4243819EABB95077B5F54DE5300C87FF0E6DB217C4507F977FBD351D407E801019C2B1C59_cppui577;
                 constexpr static const std::array<modulus_type, 2> nqr = {0x08, 0x01};
                 constexpr static const std::array<modulus_type, 2> nqr_to_t = 
