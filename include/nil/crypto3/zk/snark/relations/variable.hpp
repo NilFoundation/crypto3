@@ -203,15 +203,6 @@ namespace nil {
 
                 /***************************** Linear combination ****************************/
 
-                template<typename FieldType>
-                class linear_combination;
-
-                template<typename FieldType>
-                std::ostream &operator<<(std::ostream &out, const linear_combination<FieldType> &lc);
-
-                template<typename FieldType>
-                std::istream &operator>>(std::istream &in, linear_combination<FieldType> &lc);
-
                 /**
                  * A linear combination represents a formal expression of the form "sum_i coeff_i * x_{index_i}".
                  */
@@ -254,15 +245,9 @@ namespace nil {
 
                     bool is_valid(size_t num_variables) const;
 
-                    void print(const std::map<std::size_t, std::string> &variable_annotations =
-                                   std::map<std::size_t, std::string>()) const;
                     void print_with_assignment(const std::vector<typename FieldType::value_type> &full_assignment,
                                                const std::map<std::size_t, std::string> &variable_annotations =
                                                    std::map<std::size_t, std::string>()) const;
-
-                    friend std::ostream &operator<<<FieldType>(std::ostream &out,
-                                                               const linear_combination<FieldType> &lc);
-                    friend std::istream &operator>><FieldType>(std::istream &in, linear_combination<FieldType> &lc);
                 };
 
                 template<typename FieldType>
@@ -448,22 +433,6 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                void linear_combination<FieldType>::print(
-                    const std::map<std::size_t, std::string> &variable_annotations) const {
-                    for (auto &lt : terms) {
-                        if (lt.index == 0) {
-                            printf("    1 * ");
-                            lt.coeff.print();
-                        } else {
-                            auto it = variable_annotations.find(lt.index);
-                            printf("    x_%zu (%s) * ", lt.index,
-                                   (it == variable_annotations.end() ? "no annotation" : it->second.c_str()));
-                            lt.coeff.print();
-                        }
-                    }
-                }
-
-                template<typename FieldType>
                 void linear_combination<FieldType>::print_with_assignment(
                     const std::vector<typename FieldType::value_type> &full_assignment,
                     const std::map<std::size_t, std::string> &variable_annotations) const {
@@ -483,40 +452,6 @@ namespace nil {
                             (-full_assignment[lt.index - 1]).print();
                         }
                     }
-                }
-
-                template<typename FieldType>
-                std::ostream &operator<<(std::ostream &out, const linear_combination<FieldType> &lc) {
-                    out << lc.terms.size() << "\n";
-                    for (const linear_term<FieldType> &lt : lc.terms) {
-                        out << lt.index << "\n";
-                        out << lt.coeff << OUTPUT_NEWLINE;
-                    }
-
-                    return out;
-                }
-
-                template<typename FieldType>
-                std::istream &operator>>(std::istream &in, linear_combination<FieldType> &lc) {
-                    lc.terms.clear();
-
-                    std::size_t s;
-                    in >> s;
-
-                    algebra::consume_newline(in);
-
-                    lc.terms.reserve(s);
-
-                    for (std::size_t i = 0; i < s; ++i) {
-                        linear_term<FieldType> lt;
-                        in >> lt.index;
-                        algebra::consume_newline(in);
-                        in >> lt.coeff;
-                        algebra::consume_OUTPUT_NEWLINE(in);
-                        lc.terms.emplace_back(lt);
-                    }
-
-                    return in;
                 }
 
                 template<typename FieldType>

@@ -41,11 +41,7 @@ namespace nil {
                                                             const fooram_input_tape &primary_input) const;
 
                     std::vector<bool> initial_cpu_state() const;
-                    void print() const;
                     bool operator==(const fooram_architecture_params &other) const;
-
-                    friend std::ostream &operator<<(std::ostream &out, const fooram_architecture_params &ap);
-                    friend std::istream &operator>>(std::istream &in, fooram_architecture_params &ap);
                 };
 
                 fooram_architecture_params::fooram_architecture_params(const std::size_t w) : w(w) {
@@ -86,23 +82,8 @@ namespace nil {
                     return state;
                 }
 
-                void fooram_architecture_params::print() const {
-                    printf("w = %zu\n", w);
-                }
-
                 bool fooram_architecture_params::operator==(const fooram_architecture_params &other) const {
                     return (this->w == other.w);
-                }
-
-                std::ostream &operator<<(std::ostream &out, const fooram_architecture_params &ap) {
-                    out << ap.w << "\n";
-                    return out;
-                }
-
-                std::istream &operator>>(std::istream &in, fooram_architecture_params &ap) {
-                    in >> ap.w;
-                    algebra::consume_newline(in);
-                    return in;
                 }
             }    // namespace snark
         }        // namespace zk

@@ -287,22 +287,6 @@ namespace nil {
                     this->pb.val(next_has_accepted) = FieldType::value_type::zero();
                 }
 
-                template<typename FieldType>
-                void fooram_cpu_checker<FieldType>::dump() const {
-                    printf("packed_store_addr: ");
-                    this->pb.val(packed_store_addr).print();
-                    printf("packed_load_addr: ");
-                    this->pb.val(packed_load_addr).print();
-                    printf("packed_ls_addr: ");
-                    this->pb.val(packed_ls_addr).print();
-                    printf("packed_store_val: ");
-                    this->pb.val(packed_store_val).print();
-                    printf("packed_ls_next_val: ");
-                    this->pb.val(packed_ls_next_val).print();
-                    printf("packed_next_state: ");
-                    this->pb.val(packed_next_state).print();
-                }
-
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3

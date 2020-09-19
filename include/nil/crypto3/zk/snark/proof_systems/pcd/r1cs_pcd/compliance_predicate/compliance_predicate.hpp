@@ -49,7 +49,6 @@ namespace nil {
                         return result;
                     }
 
-                    virtual void print() const;
                     virtual ~r1cs_pcd_message() = default;
                 };
 
@@ -72,15 +71,6 @@ namespace nil {
                 using r1cs_pcd_witness = std::vector<typename FieldType::value_type>;
 
                 /*************************** Compliance predicate ****************************/
-
-                template<typename FieldType>
-                class r1cs_pcd_compliance_predicate;
-
-                template<typename FieldType>
-                std::ostream &operator<<(std::ostream &out, const r1cs_pcd_compliance_predicate<FieldType> &cp);
-
-                template<typename FieldType>
-                std::istream &operator>>(std::istream &in, r1cs_pcd_compliance_predicate<FieldType> &cp);
 
                 /**
                  * A compliance predicate for R1CS PCD.
@@ -159,10 +149,6 @@ namespace nil {
                                      const r1cs_pcd_witness<FieldType> &witness) const;
 
                     bool operator==(const r1cs_pcd_compliance_predicate<FieldType> &other) const;
-                    friend std::ostream &operator<<<FieldType>(std::ostream &out,
-                                                               const r1cs_pcd_compliance_predicate<FieldType> &cp);
-                    friend std::istream &operator>>
-                        <FieldType>(std::istream &in, r1cs_pcd_compliance_predicate<FieldType> &cp);
                 };
 
                 template<typename FieldType>
@@ -170,18 +156,6 @@ namespace nil {
 
                 template<typename FieldType>
                 class r1cs_pcd_compliance_predicate_auxiliary_input;
-
-                template<typename FieldType>
-                void r1cs_pcd_message<FieldType>::print() const {
-                    printf("PCD message (default print routines):\n");
-                    printf("  Type: %zu\n", this->type);
-
-                    printf("  Payload\n");
-                    const r1cs_variable_assignment<FieldType> payload = this->payload_as_r1cs_variable_assignment();
-                    for (auto &elt : payload) {
-                        elt.print();
-                    }
-                }
 
                 template<typename FieldType>
                 r1cs_pcd_compliance_predicate<FieldType>::r1cs_pcd_compliance_predicate(
@@ -261,53 +235,6 @@ namespace nil {
                             this->witness_length == other.witness_length &&
                             this->relies_on_same_type_inputs == other.relies_on_same_type_inputs &&
                             this->accepted_input_types == other.accepted_input_types);
-                }
-
-                template<typename FieldType>
-                std::ostream &operator<<(std::ostream &out, const r1cs_pcd_compliance_predicate<FieldType> &cp) {
-                    out << cp.name << "\n";
-                    out << cp.type << "\n";
-                    out << cp.max_arity << "\n";
-                    assert(cp.max_arity == cp.incoming_message_payload_lengths.size());
-                    for (std::size_t i = 0; i < cp.max_arity; ++i) {
-                        out << cp.incoming_message_payload_lengths[i] << "\n";
-                    }
-                    out << cp.outgoing_message_payload_length << "\n";
-                    out << cp.local_data_length << "\n";
-                    out << cp.witness_length << "\n";
-                    algebra::output_bool(out, cp.relies_on_same_type_inputs);
-                    algebra::operator<<(out, cp.accepted_input_types);
-                    out << "\n" << cp.constraint_system << "\n";
-
-                    return out;
-                }
-
-                template<typename FieldType>
-                std::istream &operator>>(std::istream &in, r1cs_pcd_compliance_predicate<FieldType> &cp) {
-                    in >> cp.name;
-                    algebra::consume_newline(in);
-                    in >> cp.type;
-                    algebra::consume_newline(in);
-                    in >> cp.max_arity;
-                    algebra::consume_newline(in);
-                    cp.incoming_message_payload_lengths.resize(cp.max_arity);
-                    for (std::size_t i = 0; i < cp.max_arity; ++i) {
-                        in >> cp.incoming_message_payload_lengths[i];
-                        algebra::consume_newline(in);
-                    }
-                    in >> cp.outgoing_message_payload_length;
-                    algebra::consume_newline(in);
-                    in >> cp.local_data_length;
-                    algebra::consume_newline(in);
-                    in >> cp.witness_length;
-                    algebra::consume_newline(in);
-                    algebra::input_bool(in, cp.relies_on_same_type_inputs);
-                    algebra::operator>>(in, cp.accepted_input_types);
-                    algebra::consume_newline(in);
-                    in >> cp.constraint_system;
-                    algebra::consume_newline(in);
-
-                    return in;
                 }
 
                 template<typename FieldType>

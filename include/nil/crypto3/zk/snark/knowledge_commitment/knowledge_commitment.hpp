@@ -57,8 +57,6 @@ namespace nil {
                     static knowledge_commitment<T1, T2> zero();
                     static knowledge_commitment<T1, T2> one();
 
-                    void print() const;
-
                     static std::size_t size_in_bits();
 
                     static void batch_to_special_all_non_zeros(std::vector<knowledge_commitment<T1, T2>> &vec);
@@ -77,12 +75,6 @@ namespace nil {
                                                        const knowledge_commitment<T1, T2> &rhs) {
                     return lhs * rhs;
                 }
-
-                template<typename T1, typename T2>
-                std::ostream &operator<<(std::ostream &out, const knowledge_commitment<T1, T2> &kc);
-
-                template<typename T1, typename T2>
-                std::istream &operator>>(std::istream &in, knowledge_commitment<T1, T2> &kc);
 
                 /******************** Knowledge commitment vector ****************************/
 
@@ -150,30 +142,8 @@ namespace nil {
                 }
 
                 template<typename T1, typename T2>
-                void knowledge_commitment<T1, T2>::print() const {
-                    printf("knowledge_commitment.g:\n");
-                    g.print();
-                    printf("knowledge_commitment.h:\n");
-                    h.print();
-                }
-
-                template<typename T1, typename T2>
                 std::size_t knowledge_commitment<T1, T2>::size_in_bits() {
                     return T1::size_in_bits() + T2::size_in_bits();
-                }
-
-                template<typename T1, typename T2>
-                std::ostream &operator<<(std::ostream &out, const knowledge_commitment<T1, T2> &kc) {
-                    out << kc.g << OUTPUT_SEPARATOR << kc.h;
-                    return out;
-                }
-
-                template<typename T1, typename T2>
-                std::istream &operator>>(std::istream &in, knowledge_commitment<T1, T2> &kc) {
-                    in >> kc.g;
-                    algebra::consume_OUTPUT_SEPARATOR(in);
-                    in >> kc.h;
-                    return in;
                 }
 
                 template<typename T1, typename T2>

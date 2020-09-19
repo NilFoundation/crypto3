@@ -154,11 +154,6 @@ namespace nil {
                     std::size_t instr_size() const;
 
                     bool operator==(const tinyram_architecture_params &other) const;
-
-                    friend std::ostream &operator<<(std::ostream &out, const tinyram_architecture_params &ap);
-                    friend std::istream &operator>>(std::istream &in, tinyram_architecture_params &ap);
-
-                    void print() const;
                 };
 
                 /* order everywhere is reversed (i.e. MSB comes first),
@@ -401,20 +396,6 @@ namespace nil {
                     return (this->w == other.w && this->k == other.k);
                 }
 
-                std::ostream &operator<<(std::ostream &out, const tinyram_architecture_params &ap) {
-                    out << ap.w << "\n";
-                    out << ap.k << "\n";
-                    return out;
-                }
-
-                std::istream &operator>>(std::istream &in, tinyram_architecture_params &ap) {
-                    in >> ap.w;
-                    algebra::consume_newline(in);
-                    in >> ap.k;
-                    algebra::consume_newline(in);
-                    return in;
-                }
-
                 tinyram_instruction::tinyram_instruction(const tinyram_opcode &opcode,
                                                          const bool arg2_is_imm,
                                                          const std::size_t &desidx,
@@ -432,11 +413,6 @@ namespace nil {
                     result = (result << (2 * ap.w - ap.opcode_width() - 1 - 2 * algebra::log2(ap.k))) | arg2idx_or_imm;
 
                     return result;
-                }
-
-                void tinyram_architecture_params::print() const {
-                    printf("* Number of registers (k): %zu\n", k);
-                    printf("* Word size (w): %zu\n", w);
                 }
 
                 tinyram_instruction random_tinyram_instruction(const tinyram_architecture_params &ap) {

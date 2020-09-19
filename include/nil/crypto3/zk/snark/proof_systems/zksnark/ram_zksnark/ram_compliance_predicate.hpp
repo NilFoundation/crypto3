@@ -56,11 +56,8 @@ namespace nil {
                  * obtain a more user-friendly print method.
                  */
                 template<typename RAMType>
-                class ram_pcd_message : public r1cs_pcd_message<ram_base_field<RAMType>> {
-                private:
-                    void print_bits(const std::vector<bool> &bv) const;
+                struct ram_pcd_message : public r1cs_pcd_message<ram_base_field<RAMType>> {
 
-                public:
                     typedef ram_base_field<RAMType> FieldType;
 
                     ram_architecture_params<RAMType> ap;
@@ -91,7 +88,6 @@ namespace nil {
 
                     std::vector<bool> unpacked_payload_as_bits() const;
                     r1cs_variable_assignment<FieldType> payload_as_r1cs_variable_assignment() const;
-                    void print() const;
 
                     static std::size_t unpacked_payload_size_in_bits(const ram_architecture_params<RAMType> &ap);
                 };
@@ -311,32 +307,6 @@ namespace nil {
                     const r1cs_variable_assignment<FieldType> result =
                         algebra::pack_bit_vector_into_field_element_vector<FieldType>(payload_bits);
                     return result;
-                }
-
-                template<typename RAMType>
-                void ram_pcd_message<RAMType>::print_bits(const std::vector<bool> &bv) const {
-                    for (bool b : bv) {
-                        printf("%d", b ? 1 : 0);
-                    }
-                    printf("\n");
-                }
-
-                template<typename RAMType>
-                void ram_pcd_message<RAMType>::print() const {
-                    printf("ram_pcd_message:\n");
-                    printf("  type: %zu\n", this->type);
-                    printf("  timestamp: %zu\n", timestamp);
-                    printf("  root_initial: ");
-                    print_bits(root_initial);
-                    printf("  root: ");
-                    print_bits(root);
-                    printf("  pc_addr: %zu\n", pc_addr);
-                    printf("  cpu_state: ");
-                    print_bits(cpu_state);
-                    printf("  pc_addr_initial: %zu\n", pc_addr_initial);
-                    printf("  cpu_state_initial: ");
-                    print_bits(cpu_state_initial);
-                    printf("  has_accepted: %s\n", has_accepted ? "YES" : "no");
                 }
 
                 template<typename RAMType>

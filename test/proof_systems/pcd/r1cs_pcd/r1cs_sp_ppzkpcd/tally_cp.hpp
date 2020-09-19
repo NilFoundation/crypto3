@@ -18,8 +18,8 @@
 // for code that uses the tally compliance predicate.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_TALLY_CP_HPP_
-#define CRYPTO3_ZK_TALLY_CP_HPP_
+#ifndef CRYPTO3_ZK_TALLY_CP_HPP
+#define CRYPTO3_ZK_TALLY_CP_HPP
 
 #include <nil/crypto3/zk/snark/components/basic_components.hpp>
 
@@ -44,7 +44,6 @@ namespace nil {
 
                     tally_pcd_message(const std::size_t type, const std::size_t wordsize, const std::size_t sum, const std::size_t count);
                     r1cs_variable_assignment<FieldType> payload_as_r1cs_variable_assignment() const;
-                    void print() const;
 
                     ~tally_pcd_message() = default;
                 };
@@ -56,7 +55,6 @@ namespace nil {
 
                     tally_pcd_local_data(const std::size_t summand);
                     r1cs_variable_assignment<FieldType> as_r1cs_variable_assignment() const;
-                    void print() const;
 
                     ~tally_pcd_local_data() = default;
                 };
@@ -134,26 +132,12 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                void tally_pcd_message<FieldType>::print() const {
-                    printf("Tally message of type %zu:\n", this->type);
-                    printf("  wordsize: %zu\n", wordsize);
-                    printf("  sum: %zu\n", sum);
-                    printf("  count: %zu\n", count);
-                }
-
-                template<typename FieldType>
                 tally_pcd_local_data<FieldType>::tally_pcd_local_data(const std::size_t summand) : summand(summand) {
                 }
 
                 template<typename FieldType>
                 r1cs_variable_assignment<FieldType> tally_pcd_local_data<FieldType>::as_r1cs_variable_assignment() const {
                     return {FieldType(summand)};
-                }
-
-                template<typename FieldType>
-                void tally_pcd_local_data<FieldType>::print() const {
-                    printf("Tally PCD local data:\n");
-                    printf("  summand: %zu\n", summand);
                 }
 
                 template<typename FieldType>
@@ -379,4 +363,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // TALLY_CP_HPP_
+#endif    // CRYPTO3_ZK_TALLY_CP_HPP
