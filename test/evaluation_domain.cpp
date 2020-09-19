@@ -136,7 +136,7 @@ void test_inverse_coset_ftt_to_coset_fft() {
             multiply_by_coset(a, coset);
             domain->FFT(a, coset);
             domain->iFFT(a, coset);
-            multiply_by_coset(a, coset.inverse());
+            multiply_by_coset(a, coset.inversed());
 
             for (size_t i = 0; i < m; i++) {
                 BOOST_CHECK(f[i] == a[i]);

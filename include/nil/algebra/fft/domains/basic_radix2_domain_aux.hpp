@@ -19,10 +19,6 @@
 
 #include <nil/algebra/fft/detail/field_utils.hpp>
 
-#ifdef DEBUG
-#include <nil/algebra/algebra/common/profiling.hpp>
-#endif
-
 #ifdef MULTICORE
 #define _basic_radix2_FFT detail::basic_parallel_radix2_FFT
 #else
@@ -48,7 +44,7 @@ namespace nil {
 
                     /* swapping in place (from Storer's book) */
                     for (size_t k = 0; k < n; ++k) {
-                        const size_t rk = algebra::bitreverse(k, logn);
+                        const size_t rk = bitreverse(k, logn);
                         if (k < rk)
                             std::swap(a[k], a[rk]);
                     }
@@ -144,11 +140,6 @@ namespace nil {
 #endif
                     const size_t log_cpus = ((num_cpus & (num_cpus - 1)) == 0 ? log2(num_cpus) : log2(num_cpus) - 1);
 
-#ifdef DEBUG
-                    algebra::print_indent();
-                    printf("* Invoking parallel FFT on 2^%zu CPUs (omp_get_max_threads = %zu)\n", log_cpus, num_cpus);
-#endif
-
                     if (log_cpus == 0) {
                         basic_serial_radix2_FFT(a, omega);
                     } else {
@@ -203,10 +194,10 @@ namespace nil {
                      */
 
                     const value_type Z = (t ^ m) - value_type::one();
-                    value_type l = Z * value_type(m).inverse();
+                    value_type l = Z * value_type(m).inversed();
                     value_type r = value_type::one();
                     for (size_t i = 0; i < m; ++i) {
-                        u[i] = l * (t - r).inverse();
+                        u[i] = l * (t - r).inversed();
                         l *= omega;
                         r *= omega;
                     }

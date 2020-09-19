@@ -60,7 +60,7 @@ namespace nil {
                 _polynomial_subtraction(V3, G, V3);
                 _polynomial_division(V1, R, V3, b);
 
-                FieldValueType lead_coeff = G.back().inverse();
+                FieldValueType lead_coeff = G.back().inversed();
                 std::transform(G.begin(), G.end(), G.begin(), std::bind1st(std::multiplies<FieldValueType>(), lead_coeff));
                 std::transform(U.begin(), U.end(), U.begin(), std::bind1st(std::multiplies<FieldValueType>(), lead_coeff));
                 std::transform(V1.begin(), V1.end(), V1.begin(), std::bind1st(std::multiplies<FieldValueType>(), lead_coeff));

@@ -74,7 +74,7 @@ namespace nil {
                     denom *= domain[idx] - domain[k];
                 }
 
-                return num * denom.inverse();
+                return num * denom.inversed();
             }
             
         }    // namespace fft

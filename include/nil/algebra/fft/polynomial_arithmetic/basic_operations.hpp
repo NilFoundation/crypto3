@@ -121,8 +121,8 @@ namespace nil {
             template<typename FieldValueType>
             void _polynomial_multiplication_on_fft(std::vector<FieldValueType> &c, const std::vector<FieldValueType> &a,
                                                    const std::vector<FieldValueType> &b) {
-                const size_t n = algebra::get_power_of_two(a.size() + b.size() - 1);
-                FieldValueType omega = unity_root<FieldValueType>(n);
+                const size_t n = detail::get_power_of_two(a.size() + b.size() - 1);
+                FieldValueType omega = detail::unity_root<FieldValueType>(n);
 
                 std::vector<FieldValueType> u(a);
                 std::vector<FieldValueType> v(b);
