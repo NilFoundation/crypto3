@@ -48,9 +48,9 @@ set(TESTS_NAMES
     "gadgets/hashes/knapsack/test_knapsack_component"
     "gadgets/hashes/sha256/test_sha256_component"
 
-    "gadgets/r1cs_ppzksnark_verifier_component"
-    "gadgets/merkle_tree_components"
-    "gadgets/set_commitment_component"
+    "components/r1cs_ppzksnark_verifier_component"
+    "components/merkle_tree_components"
+    "components/set_commitment_component"
 
     "relations/numeric/qap/qap"
     "relations/numeric/sap/sap"
