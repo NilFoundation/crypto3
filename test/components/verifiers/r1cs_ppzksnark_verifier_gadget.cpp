@@ -10,7 +10,7 @@
 #include <nil/algebra/curves/mnt4.hpp>
 #include <nil/algebra/curves/mnt6.hpp>
 
-#include <nil/algebra/utils/random_element.hpp>
+#include <nil/algebra/random_element.hpp>
 
 #include <nil/crypto3/zk/snark/components/fields/fp2_components.hpp>
 #include <nil/crypto3/zk/snark/components/fields/fp3_components.hpp>
@@ -20,6 +20,7 @@
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_ppzksnark/r1cs_ppzksnark.hpp>
 
 using namespace nil::crypto3::zk::snark;
+using namespace nil::algebra;
 
 #ifndef NDEBUG
 
@@ -375,7 +376,7 @@ int main() {
 
     test_mul<algebra::mnt4_Fq4, Fp4_variable, Fp4_mul_component>("mnt4_Fp4");
     test_sqr<algebra::mnt4_Fq4, Fp4_variable, Fp4_sqr_component>("mnt4_Fp4");
-    test_cyclotomic_sqr<algebra::curves::mnt4, Fp4_variable, Fp4_cyclotomic_sqr_component>("mnt4_Fp4");
+    test_cyclotomic_sqr<curves::mnt4, Fp4_variable, Fp4_cyclotomic_sqr_component>("mnt4_Fp4");
     test_exponentiation_component<algebra::mnt4_Fq4, Fp4_variable, Fp4_mul_component, Fp4_sqr_component, algebra::mnt4_q_limbs>(
         algebra::mnt4_final_exponent_last_chunk_abs_of_w0, "mnt4_Fq4");
     test_Frobenius<algebra::mnt4_Fq4, Fp4_variable>("mnt4_Fq4");
@@ -385,40 +386,40 @@ int main() {
 
     test_mul<algebra::mnt6_Fq6, Fp6_variable, Fp6_mul_component>("mnt6_Fp6");
     test_sqr<algebra::mnt6_Fq6, Fp6_variable, Fp6_sqr_component>("mnt6_Fp6");
-    test_cyclotomic_sqr<algebra::curves::mnt6, Fp6_variable, Fp6_cyclotomic_sqr_component>("mnt6_Fp6");
+    test_cyclotomic_sqr<curves::mnt6, Fp6_variable, Fp6_cyclotomic_sqr_component>("mnt6_Fp6");
     test_exponentiation_component<algebra::mnt6_Fq6, Fp6_variable, Fp6_mul_component, Fp6_sqr_component, algebra::mnt6_q_limbs>(
         algebra::mnt6_final_exponent_last_chunk_abs_of_w0, "mnt6_Fq6");
     test_Frobenius<algebra::mnt6_Fq6, Fp6_variable>("mnt6_Fq6");
 
-    test_G2_checker_component<algebra::curves::mnt4>("mnt4");
-    test_G2_checker_component<algebra::curves::mnt6>("mnt6");
+    test_G2_checker_component<curves::mnt4>("mnt4");
+    test_G2_checker_component<curves::mnt6>("mnt6");
 
-    test_G1_variable_precomp<algebra::curves::mnt4>("mnt4");
-    test_G1_variable_precomp<algebra::curves::mnt6>("mnt6");
+    test_G1_variable_precomp<curves::mnt4>("mnt4");
+    test_G1_variable_precomp<curves::mnt6>("mnt6");
 
-    test_G2_variable_precomp<algebra::curves::mnt4>("mnt4");
-    test_G2_variable_precomp<algebra::curves::mnt6>("mnt6");
+    test_G2_variable_precomp<curves::mnt4>("mnt4");
+    test_G2_variable_precomp<curves::mnt6>("mnt6");
 
-    test_mnt_miller_loop<algebra::curves::mnt4>("mnt4");
-    test_mnt_miller_loop<algebra::curves::mnt6>("mnt6");
+    test_mnt_miller_loop<curves::mnt4>("mnt4");
+    test_mnt_miller_loop<curves::mnt6>("mnt6");
 
-    test_mnt_e_over_e_miller_loop<algebra::curves::mnt4>("mnt4");
-    test_mnt_e_over_e_miller_loop<algebra::curves::mnt6>("mnt6");
+    test_mnt_e_over_e_miller_loop<curves::mnt4>("mnt4");
+    test_mnt_e_over_e_miller_loop<curves::mnt6>("mnt6");
 
-    test_mnt_e_times_e_over_e_miller_loop<algebra::curves::mnt4>("mnt4");
-    test_mnt_e_times_e_over_e_miller_loop<algebra::curves::mnt6>("mnt6");
+    test_mnt_e_times_e_over_e_miller_loop<curves::mnt4>("mnt4");
+    test_mnt_e_times_e_over_e_miller_loop<curves::mnt6>("mnt6");
 
-    test_full_pairing<algebra::curves::mnt4>("mnt4");
-    test_full_pairing<algebra::curves::mnt6>("mnt6");
+    test_full_pairing<curves::mnt4>("mnt4");
+    test_full_pairing<curves::mnt6>("mnt6");
 
-    test_full_precomputed_pairing<algebra::curves::mnt4>("mnt4");
-    test_full_precomputed_pairing<algebra::curves::mnt6>("mnt6");
+    test_full_precomputed_pairing<curves::mnt4>("mnt4");
+    test_full_precomputed_pairing<curves::mnt6>("mnt6");
 
-    test_verifier<algebra::curves::mnt4, algebra::curves::mnt6>("mnt4", "mnt6");
-    test_verifier<algebra::curves::mnt6, algebra::curves::mnt4>("mnt6", "mnt4");
+    test_verifier<curves::mnt4, curves::mnt6>("mnt4", "mnt6");
+    test_verifier<curves::mnt6, curves::mnt4>("mnt6", "mnt4");
 
-    test_hardcoded_verifier<algebra::curves::mnt4, algebra::curves::mnt6>("mnt4", "mnt6");
-    test_hardcoded_verifier<algebra::curves::mnt6, algebra::curves::mnt4>("mnt6", "mnt4");
+    test_hardcoded_verifier<curves::mnt4, curves::mnt6>("mnt4", "mnt6");
+    test_hardcoded_verifier<curves::mnt6, curves::mnt4>("mnt6", "mnt4");
 }
 
 #else    // NDEBUG

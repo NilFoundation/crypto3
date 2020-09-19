@@ -36,10 +36,6 @@ namespace nil {
         namespace zk {
             namespace snark {
 
-                /* forward declaration */
-                template<typename FieldType>
-                struct qap_witness;
-
                 /**
                  * A QAP instance.
                  *

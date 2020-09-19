@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_HASH_IO_HPP_
-#define CRYPTO3_ZK_HASH_IO_HPP_
+#ifndef CRYPTO3_ZK_HASH_IO_HPP
+#define CRYPTO3_ZK_HASH_IO_HPP
 
 #include <cstddef>
 #include <vector>
@@ -133,4 +133,4 @@ namespace nil {
         }        // namespace zk
     }            // namespace crypto3
 }    // namespace nil
-#endif    // HASH_IO_HPP_
+#endif    // CRYPTO3_ZK_HASH_IO_HPP

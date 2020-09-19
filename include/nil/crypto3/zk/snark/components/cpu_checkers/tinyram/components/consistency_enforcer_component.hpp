@@ -9,8 +9,8 @@
 // @file Declaration of interfaces for the TinyRAM consistency enforcer gadget.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_CONSISTENCY_ENFORCER_GADGET_HPP_
-#define CRYPTO3_ZK_CONSISTENCY_ENFORCER_GADGET_HPP_
+#ifndef CRYPTO3_ZK_CONSISTENCY_ENFORCER_GADGET_HPP
+#define CRYPTO3_ZK_CONSISTENCY_ENFORCER_GADGET_HPP
 
 #include <nil/crypto3/zk/snark/components/cpu_checkers/tinyram/components/tinyram_blueprint.hpp>
 
@@ -292,7 +292,6 @@ namespace nil {
                 template<typename FieldType>
 void test_arithmetic_consistency_enforcer_component()
 {
-    algebra::print_time("starting arithmetic_consistency_enforcer test");
 
     tinyram_architecture_params ap(16, 16);
     tinyram_protoboard<FieldType> pb(ap);
@@ -407,13 +406,11 @@ void test_arithmetic_consistency_enforcer_component()
 
     printf("non-arithmetic test successful\n");
 
-    algebra::print_time("arithmetic_consistency_enforcer tests successful");
 }
 
 template<typename FieldType>
 void test_control_flow_consistency_enforcer_component()
 {
-    algebra::print_time("starting control_flow_consistency_enforcer test");
 
     tinyram_architecture_params ap(16, 16);
     tinyram_protoboard<FieldType> pb(ap);
@@ -474,14 +471,11 @@ void test_control_flow_consistency_enforcer_component()
         }
         assert(pb.is_satisfied());
     }
-
-    algebra::print_time("control_flow_consistency_enforcer tests successful");
 }
 
 template<typename FieldType>
 void test_special_consistency_enforcer_component()
-{
-    algebra::print_time("starting special_consistency_enforcer_component test");
+
 
     tinyram_architecture_params ap(16, 16);
     tinyram_protoboard<FieldType> pb(ap);
@@ -624,8 +618,6 @@ void test_special_consistency_enforcer_component()
     this->pb.val(incoming_load_flag) = FieldType::value_type::zero();
 
     assert(!pb.is_satisfied());
-
-    algebra::print_time("special_consistency_enforcer_component tests successful");
 }
 #endif
 
@@ -634,4 +626,4 @@ void test_special_consistency_enforcer_component()
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // CONSISTENCY_ENFORCER_GADGET_HPP_
+#endif    // CRYPTO3_ZK_CONSISTENCY_ENFORCER_GADGET_HPP

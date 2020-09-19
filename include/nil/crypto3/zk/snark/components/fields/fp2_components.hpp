@@ -12,8 +12,8 @@
 // where non_residue is in Fp.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_FP2_GADGETS_HPP_
-#define CRYPTO3_ZK_FP2_GADGETS_HPP_
+#ifndef CRYPTO3_ZK_FP2_GADGETS_HPP
+#define CRYPTO3_ZK_FP2_GADGETS_HPP
 
 #include <memory>
 
@@ -352,4 +352,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // FP2_GADGETS_HPP_
+#endif    // CRYPTO3_ZK_FP2_GADGETS_HPP

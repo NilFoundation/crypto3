@@ -9,8 +9,8 @@
 // @file Declaration of interfaces for an auxiliarry gadget for the FOORAM CPU.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BAR_GADGET_HPP_
-#define CRYPTO3_ZK_BAR_GADGET_HPP_
+#ifndef CRYPTO3_ZK_BAR_GADGET_HPP
+#define CRYPTO3_ZK_BAR_GADGET_HPP
 
 #include <nil/crypto3/zk/snark/component.hpp>
 #include <nil/crypto3/zk/snark/components/basic_components.hpp>
@@ -54,55 +54,43 @@ namespace nil {
                                const FieldType::value_type &a,
                                const pb_linear_combination_array<FieldType> &Y,
                                const FieldType::value_type &b,
-                               const pb_linear_combination<FieldType> &Z_packed);
-                    void generate_r1cs_constraints();
-                    void generate_r1cs_witness();
+                               const pb_linear_combination<FieldType> &Z_packed) :
+                        component<FieldType>(pb),
+                        X(X), a(a), Y(Y), b(b), Z_packed(Z_packed) {
+                        assert(X.size() == Y.size());
+                        width = X.size();
+
+                        result.allocate(pb);
+                        Z_bits.allocate(pb, width);
+                        overflow.allocate(pb, 2 * width);
+
+                        unpacked_result.insert(unpacked_result.end(), Z_bits.begin(), Z_bits.end());
+                        unpacked_result.insert(unpacked_result.end(), overflow.begin(), overflow.end());
+
+                        unpack_result.reset(new packing_component<FieldType>(pb, unpacked_result, result));
+                        pack_Z.reset(new packing_component<FieldType>(pb, Z_bits, Z_packed));
+                    }
+
+                    void generate_r1cs_constraints() {
+                        unpack_result->generate_r1cs_constraints(true);
+                        pack_Z->generate_r1cs_constraints(false);
+
+                        this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(
+                            1, a * pb_packing_sum<FieldType>(X) + b * pb_packing_sum<FieldType>(Y), result));
+                    }
+
+                    void generate_r1cs_witness() {
+                        this->pb.val(result) =
+                            X.get_field_element_from_bits(this->pb) * a + Y.get_field_element_from_bits(this->pb) * b;
+                        unpack_result->generate_r1cs_witness_from_packed();
+
+                        pack_Z->generate_r1cs_witness_from_bits();
+                    }
                 };
-
-                template<typename FieldType>
-                bar_component<FieldType>::bar_component(blueprint<FieldType> &pb,
-                                                  const pb_linear_combination_array<FieldType> &X,
-                                                  const FieldType::value_type &a,
-                                                  const pb_linear_combination_array<FieldType> &Y,
-                                                  const FieldType::value_type &b,
-                                                  const pb_linear_combination<FieldType> &Z_packed) :
-                    component<FieldType>(pb),
-                    X(X), a(a), Y(Y), b(b), Z_packed(Z_packed) {
-                    assert(X.size() == Y.size());
-                    width = X.size();
-
-                    result.allocate(pb);
-                    Z_bits.allocate(pb, width);
-                    overflow.allocate(pb, 2 * width);
-
-                    unpacked_result.insert(unpacked_result.end(), Z_bits.begin(), Z_bits.end());
-                    unpacked_result.insert(unpacked_result.end(), overflow.begin(), overflow.end());
-
-                    unpack_result.reset(new packing_component<FieldType>(pb, unpacked_result, result));
-                    pack_Z.reset(new packing_component<FieldType>(pb, Z_bits, Z_packed));
-                }
-
-                template<typename FieldType>
-                void bar_component<FieldType>::generate_r1cs_constraints() {
-                    unpack_result->generate_r1cs_constraints(true);
-                    pack_Z->generate_r1cs_constraints(false);
-
-                    this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(
-                        1, a * pb_packing_sum<FieldType>(X) + b * pb_packing_sum<FieldType>(Y), result));
-                }
-
-                template<typename FieldType>
-                void bar_component<FieldType>::generate_r1cs_witness() {
-                    this->pb.val(result) =
-                        X.get_field_element_from_bits(this->pb) * a + Y.get_field_element_from_bits(this->pb) * b;
-                    unpack_result->generate_r1cs_witness_from_packed();
-
-                    pack_Z->generate_r1cs_witness_from_bits();
-                }
 
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // BAR_GADGET_HPP_
+#endif    // CRYPTO3_ZK_BAR_GADGET_HPP

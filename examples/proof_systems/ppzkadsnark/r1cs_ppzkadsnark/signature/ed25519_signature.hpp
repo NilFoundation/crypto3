@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_ED25519SIG_HPP_
-#define CRYPTO3_ZK_ED25519SIG_HPP_
+#ifndef CRYPTO3_ZK_ED25519SIG_HPP
+#define CRYPTO3_ZK_ED25519SIG_HPP
 
 #include <nil/crypto3/zk/snark/proof_systems/ppzkadsnark/r1cs_ppzkadsnark/r1cs_ppzkadsnark_signature.hpp>
 
@@ -162,4 +162,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // ED25519SIG_HPP_
+#endif    // CRYPTO3_ZK_ED25519SIG_HPP

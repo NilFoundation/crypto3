@@ -9,8 +9,8 @@
 // @file Declaration of interfaces for auxiliary gadgets for the SHA256 gadget.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_SHA256_AUX_HPP_
-#define CRYPTO3_ZK_SHA256_AUX_HPP_
+#ifndef CRYPTO3_ZK_SHA256_AUX_HPP
+#define CRYPTO3_ZK_SHA256_AUX_HPP
 
 #include <nil/crypto3/zk/snark/components/basic_components.hpp>
 
@@ -385,4 +385,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // SHA256_AUX_HPP_
+#endif    // CRYPTO3_ZK_SHA256_AUX_HPP

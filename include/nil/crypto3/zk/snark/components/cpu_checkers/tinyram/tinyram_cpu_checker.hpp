@@ -11,8 +11,8 @@
 // The gadget checks the correct operation for the CPU of the TinyRAM architecture.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_TINYRAM_CPU_CHECKER_HPP_
-#define CRYPTO3_ZK_TINYRAM_CPU_CHECKER_HPP_
+#ifndef CRYPTO3_ZK_TINYRAM_CPU_CHECKER_HPP
+#define CRYPTO3_ZK_TINYRAM_CPU_CHECKER_HPP
 
 #include <nil/crypto3/zk/snark/components/cpu_checkers/tinyram/components/alu_component.hpp>
 #include <nil/crypto3/zk/snark/components/cpu_checkers/tinyram/components/argument_decoder_component.hpp>
@@ -458,4 +458,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // TINYRAM_CPU_CHECKER_HPP_
+#endif    // CRYPTO3_ZK_TINYRAM_CPU_CHECKER_HPP

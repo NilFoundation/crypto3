@@ -12,8 +12,8 @@
 // is an elliptic curve over F^e in short Weierstrass form.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_WEIERSTRASS_G2_GADGET_HPP_
-#define CRYPTO3_ZK_WEIERSTRASS_G2_GADGET_HPP_
+#ifndef CRYPTO3_ZK_WEIERSTRASS_G2_GADGET_HPP
+#define CRYPTO3_ZK_WORD_VARIABLE_GADGET_HPP
 
 #include <memory>
 
@@ -176,4 +176,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // WEIERSTRASS_G2_GADGET_HPP_
+#endif    // CRYPTO3_ZK_WORD_VARIABLE_GADGET_HPP

@@ -40,8 +40,8 @@
 // ECCC TR95-042
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_KNAPSACK_GADGET_HPP_
-#define CRYPTO3_ZK_KNAPSACK_GADGET_HPP_
+#ifndef CRYPTO3_ZK_KNAPSACK_GADGET_HPP
+#define CRYPTO3_ZK_KNAPSACK_GADGET_HPP
 
 #include <nil/crypto3/zk/snark/merkle_tree.hpp>
 #include <nil/crypto3/zk/snark/components/basic_components.hpp>
@@ -347,4 +347,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // KNAPSACK_GADGET_HPP_
+#endif    // CRYPTO3_ZK_KNAPSACK_GADGET_HPP

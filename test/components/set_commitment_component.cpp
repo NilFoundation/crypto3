@@ -15,8 +15,8 @@
 #include <nil/crypto3/zk/snark/components/hashes/sha256/sha256_component.hpp>
 #include <nil/crypto3/zk/snark/components/set_commitment/set_commitment_component.hpp>
 
-using namespace nil::crypto3;
 using namespace nil::crypto3::zk::snark;
+using namespace nil::algebra;
 
 template<typename CurveType>
 void test_all_set_commitment_components() {
@@ -26,8 +26,8 @@ void test_all_set_commitment_components() {
 }
 
 int main(void) {
-    test_all_set_commitment_components<algebra::bn128>();
-    test_all_set_commitment_components<algebra::edwards>();
-    test_all_set_commitment_components<algebra::mnt4>();
-    test_all_set_commitment_components<algebra::mnt6>();
+    test_all_set_commitment_components<curves::bn128>();
+    test_all_set_commitment_components<curves::edwards>();
+    test_all_set_commitment_components<curves::mnt4>();
+    test_all_set_commitment_components<curves::mnt6>();
 }

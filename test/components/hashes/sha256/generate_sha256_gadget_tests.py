@@ -30,7 +30,7 @@ def cpp_val(s, log_radix=32):
         s = bytes_to_words(s)
     else:
         raise
-    return 'algebra::algebra::int_list_to_bits({%s}, %d)' % (', '.join(hexfmt % x for x in s), log_radix)
+    return 'algebra::int_list_to_bits({%s}, %d)' % (', '.join(hexfmt % x for x in s), log_radix)
 
 
 def H_bytes(x):

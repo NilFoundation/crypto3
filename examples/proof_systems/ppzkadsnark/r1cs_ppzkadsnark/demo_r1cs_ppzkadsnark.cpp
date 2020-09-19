@@ -20,7 +20,6 @@ using namespace nil::crypto3::zk::snark;
 
 int main(int argc, const char *argv[]) {
     if (argc == 2 && strcmp(argv[1], "-v") == 0) {
-        algebra::print_compilation_info();
         return 0;
     }
 

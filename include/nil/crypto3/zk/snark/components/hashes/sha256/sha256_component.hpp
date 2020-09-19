@@ -9,8 +9,8 @@
 // @file Declaration of interfaces for top-level SHA256 gadgets.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_SHA256_GADGET_HPP_
-#define CRYPTO3_ZK_SHA256_GADGET_HPP_
+#ifndef CRYPTO3_ZK_SHA256_GADGET_HPP
+#define CRYPTO3_ZK_SHA256_GADGET_HPP
 
 #include <nil/crypto3/zk/snark/merkle_tree.hpp>
 #include <nil/crypto3/zk/snark/components/basic_components.hpp>
@@ -291,4 +291,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // SHA256_GADGET_HPP_
+#endif    // CRYPTO3_ZK_SHA256_GADGET_HPP

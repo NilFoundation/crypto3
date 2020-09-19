@@ -22,6 +22,7 @@
 
 using namespace nil::crypto3;
 using namespace nil::crypto3::zk::snark;
+using namespace nil::algebra;
 
 template<typename CurveType>
 void test_all_merkle_tree_components() {
@@ -36,10 +37,10 @@ void test_all_merkle_tree_components() {
 BOOST_AUTO_TEST_SUITE(merkle_tree_components_test_suite)
 
 BOOST_AUTO_TEST_CASE(merkle_tree_components_test) {
-    test_all_merkle_tree_components<algebra::curves::bn128>();
-    test_all_merkle_tree_components<algebra::curves::edwards>();
-    test_all_merkle_tree_components<algebra::curves::mnt4>();
-    test_all_merkle_tree_components<algebra::curves::mnt6>();
+    test_all_merkle_tree_components<curves::bn128>();
+    test_all_merkle_tree_components<curves::edwards>();
+    test_all_merkle_tree_components<curves::mnt4>();
+    test_all_merkle_tree_components<curves::mnt6>();
 }
 
 BOOST_AUTO_TEST_SUITE_END()

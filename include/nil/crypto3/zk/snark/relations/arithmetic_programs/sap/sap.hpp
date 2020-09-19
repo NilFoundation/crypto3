@@ -37,10 +37,6 @@ namespace nil {
         namespace zk {
             namespace snark {
 
-                /* forward declaration */
-                template<typename FieldType>
-                struct sap_witness;
-
                 /**
                  * A SAP instance.
                  *

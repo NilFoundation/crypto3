@@ -35,10 +35,6 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-              
-                /* forward declaration */
-                template<typename FieldType>
-                struct ssp_witness;
 
                 /**
                  * A SSP instance.

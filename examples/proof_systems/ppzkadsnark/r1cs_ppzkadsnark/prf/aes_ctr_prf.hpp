@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_AESCTRPRF_HPP_
-#define CRYPTO3_ZK_AESCTRPRF_HPP_
+#ifndef CRYPTO3_ZK_AESCTRPRF_HPP
+#define CRYPTO3_ZK_RUN_R1CS_MP_PPZKPCD_HPP
 
 #include <nil/crypto3/zk/snark/proof_systems/ppzkadsnark/r1cs_ppzkadsnark/r1cs_ppzkadsnark_prf.hpp>
 
@@ -76,4 +76,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // AESCTRPRF_HPP_
+#endif    // CRYPTO3_ZK_RUN_R1CS_MP_PPZKPCD_HPP

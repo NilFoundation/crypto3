@@ -11,8 +11,8 @@
 // This gadget check the correct execution of control-flow TinyRAM instructions.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_ALU_CONTROL_FLOW_HPP_
-#define CRYPTO3_ZK_ALU_CONTROL_FLOW_HPP_
+#ifndef CRYPTO3_ZK_ALU_CONTROL_FLOW_HPP
+#define CRYPTO3_ZK_ALU_CONTROL_FLOW_HPP
 
 #include <nil/crypto3/zk/snark/components/basic_components.hpp>
 #include <nil/crypto3/zk/snark/components/cpu_checkers/tinyram/components/tinyram_blueprint.hpp>
@@ -288,4 +288,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // ALU_CONTROL_FLOW_HPP_
+#endif    // CRYPTO3_ZK_ALU_CONTROL_FLOW_HPP

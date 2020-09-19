@@ -9,8 +9,8 @@
 // @file Declaration of interfaces for a protoboard for the FOORAM CPU.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_FOORAM_PROTOBOARD_HPP_
-#define CRYPTO3_ZK_FOORAM_PROTOBOARD_HPP_
+#ifndef CRYPTO3_ZK_FOORAM_PROTOBOARD_HPP
+#define CRYPTO3_ZK_FOORAM_PROTOBOARD_HPP
 
 #include <nil/crypto3/zk/snark/component.hpp>
 #include <nil/crypto3/zk/snark/relations/ram_computations/rams/fooram/fooram_aux.hpp>
@@ -52,4 +52,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // FOORAM_PROTOBOARD_HPP_
+#endif    // CRYPTO3_ZK_FOORAM_PROTOBOARD_HPP

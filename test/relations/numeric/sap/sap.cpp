@@ -20,9 +20,13 @@
 #include <nil/crypto3/zk/snark/reductions/r1cs_to_sap/r1cs_to_sap.hpp>
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs/r1cs.hpp>
 
-#include <nil/algebra/utils/random_element.hpp>
+#include <nil/algebra/random_element.hpp>
+#include <nil/algebra/curves/mnt4.hpp>
+#include <nil/algebra/curves/mnt6.hpp>
+
 
 using namespace nil::crypto3::zk::snark;
+using namespace nil::algebra;
 
 template<typename FieldType>
 void test_sap(const std::size_t sap_degree, const std::size_t num_inputs, const bool binary_input) {
@@ -71,13 +75,13 @@ BOOST_AUTO_TEST_CASE(sap_test) {
     const std::size_t step_domain_size_special = (1ul << 10) + (1ul << 8) - 1ul;
     const std::size_t extended_domain_size_special = (1ul << (algebra::mnt6_Fr::s + 1)) - 1ul;
 
-    test_sap<typename algebra::curves::mnt6::scalar_field_type>(basic_domain_size_special, num_inputs, true);
-    test_sap<typename algebra::curves::mnt6::scalar_field_type>(step_domain_size_special, num_inputs, true);
-    test_sap<typename algebra::curves::mnt6::scalar_field_type>(extended_domain_size_special, num_inputs, true);
+    test_sap<typename curves::mnt6::scalar_field_type>(basic_domain_size_special, num_inputs, true);
+    test_sap<typename curves::mnt6::scalar_field_type>(step_domain_size_special, num_inputs, true);
+    test_sap<typename curves::mnt6::scalar_field_type>(extended_domain_size_special, num_inputs, true);
 
-    test_sap<typename algebra::curves::mnt6::scalar_field_type>(basic_domain_size_special, num_inputs, false);
-    test_sap<typename algebra::curves::mnt6::scalar_field_type>(step_domain_size_special, num_inputs, false);
-    test_sap<typename algebra::curves::mnt6::scalar_field_type>(extended_domain_size_special, num_inputs, false);
+    test_sap<typename curves::mnt6::scalar_field_type>(basic_domain_size_special, num_inputs, false);
+    test_sap<typename curves::mnt6::scalar_field_type>(step_domain_size_special, num_inputs, false);
+    test_sap<typename curves::mnt6::scalar_field_type>(extended_domain_size_special, num_inputs, false);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

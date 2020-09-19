@@ -240,4 +240,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // MERKLE_TREE_HPP_
+#endif    // CRYPTO3_ZK_SNARK_MERKLE_TREE_HPP

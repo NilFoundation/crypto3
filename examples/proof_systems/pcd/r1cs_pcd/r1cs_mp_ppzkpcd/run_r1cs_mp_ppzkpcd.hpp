@@ -10,8 +10,8 @@
 // for a compliance predicate example.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_RUN_R1CS_MP_PPZKPCD_HPP_
-#define CRYPTO3_ZK_RUN_R1CS_MP_PPZKPCD_HPP_
+#ifndef CRYPTO3_ZK_RUN_R1CS_MP_PPZKPCD_HPP
+#define CRYPTO3_ZK_RUN_R1CS_MP_PPZKPCD_HPP
 
 #include <cstddef>
 #include <vector>
@@ -174,4 +174,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // RUN_R1CS_MP_PPZKPCD_HPP_
+#endif    // CRYPTO3_ZK_RUN_R1CS_MP_PPZKPCD_HPP

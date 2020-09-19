@@ -45,7 +45,7 @@ namespace nil {
                     example.ap.print();
                     printf("* Primary input size bound (L): %zu\n", example.boot_trace_size_bound);
                     printf("* Time bound (T): %zu\n", example.time_bound);
-                    printf("Hence, algebra::algebra::log2(L+2*T) equals %zu\n",
+                    printf("Hence, algebra::log2(L+2*T) equals %zu\n",
                         algebra::log2(example.boot_trace_size_bound + 2 * example.time_bound));
 
                     std::cout << "RAM ppzkSNARK Generator" << std::endl;

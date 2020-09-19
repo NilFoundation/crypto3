@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_PB_VARIABLE_HPP_
-#define CRYPTO3_ZK_PB_VARIABLE_HPP_
+#ifndef CRYPTO3_ZK_MEMORY_CONTENTS_EXAMPLES_HPP
+#define CRYPTO3_ZK_MEMORY_CONTENTS_EXAMPLES_HPP
 
 #include <cstddef>
 #include <string>
@@ -347,4 +347,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // PB_VARIABLE_HPP_
+#endif    // CRYPTO3_ZK_MEMORY_CONTENTS_EXAMPLES_HPP

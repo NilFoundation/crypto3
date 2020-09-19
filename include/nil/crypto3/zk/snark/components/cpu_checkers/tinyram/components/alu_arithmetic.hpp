@@ -11,8 +11,8 @@
 // This gadget check the correct execution of arithmetic TinyRAM instructions.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_ALU_ARITHMETIC_HPP_
-#define CRYPTO3_ZK_ALU_ARITHMETIC_HPP_
+#ifndef CRYPTO3_ZK_ALU_ARITHMETIC_HPP
+#define CRYPTO3_ZK_ALU_ARITHMETIC_HPP
 
 #include <memory>
 
@@ -1896,4 +1896,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // ALU_ARITHMETIC_HPP_
+#endif    // CRYPTO3_ZK_ALU_ARITHMETIC_HPP

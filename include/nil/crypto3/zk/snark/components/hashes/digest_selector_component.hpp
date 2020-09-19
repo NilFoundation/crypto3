@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_DIGEST_SELECTOR_GADGET_HPP_
-#define CRYPTO3_ZK_DIGEST_SELECTOR_GADGET_HPP_
+#ifndef CRYPTO3_ZK_DIGEST_SELECTOR_GADGET_HPP
+#define CRYPTO3_ZK_DIGEST_SELECTOR_GADGET_HPP
 
 #include <vector>
 
@@ -70,4 +70,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // DIGEST_SELECTOR_GADGET_HPP_
+#endif    // CRYPTO3_ZK_DIGEST_SELECTOR_GADGET_HPP

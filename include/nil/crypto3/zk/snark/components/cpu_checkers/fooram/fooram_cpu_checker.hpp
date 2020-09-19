@@ -22,8 +22,8 @@
 // E.g. for the first 200 steps on 16 cell machine we get 93 different memory configurations.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_FOORAM_CPU_CHECKER_HPP_
-#define CRYPTO3_ZK_FOORAM_CPU_CHECKER_HPP_
+#ifndef CRYPTO3_ZK_FOORAM_CPU_CHECKER_HPP
+#define CRYPTO3_ZK_FOORAM_CPU_CHECKER_HPP
 
 #include <cstddef>
 #include <memory>
@@ -292,4 +292,4 @@ namespace nil {
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // FORAM_CPU_CHECKER_HPP_
+#endif    // CRYPTO3_ZK_FOORAM_CPU_CHECKER_HPP

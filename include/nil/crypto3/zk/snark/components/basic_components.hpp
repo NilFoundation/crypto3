@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_BASIC_GADGETS_HPP_
-#define CRYPTO3_ZK_BASIC_GADGETS_HPP_
+#ifndef CRYPTO3_ZK_BASIC_GADGETS_HPP
+#define CRYPTO3_ZK_BASIC_GADGETS_HPP
 
 #include <cassert>
 #include <memory>
@@ -918,4 +918,4 @@ namespace nil {
         }        // namespace zk
     }            // namespace crypto3
 }    // namespace nil
-#endif    // BASIC_GADGETS_HPP_
+#endif    // CRYPTO3_ZK_BASIC_GADGETS_HPP
