@@ -34,7 +34,6 @@ namespace nil {
                     boost::multiprecision::unchecked, void>>
                     modulus_type;
 
-                constexpr static const std::size_t modulus_bits = ModulusBits;
                 typedef boost::multiprecision::number<boost::multiprecision::backends::cpp_int_backend<
                     8*modulus_bits, 8*modulus_bits, boost::multiprecision::unsigned_magnitude,
                     boost::multiprecision::unchecked, void>>

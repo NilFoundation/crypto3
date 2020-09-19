@@ -15,21 +15,21 @@
 #include <boost/multiprecision/modular/modular_adaptor.hpp>
 
 #include <nil/algebra/fields/fp2.hpp>
-#include <nil/algebra/fields/fp3.hpp>
-#include <nil/algebra/fields/alt_bn128/base_field.hpp>
-#include <nil/algebra/fields/alt_bn128/scalar_field.hpp>
+//#include <nil/algebra/fields/fp3.hpp>
+//#include <nil/algebra/fields/alt_bn128/base_field.hpp>
+//#include <nil/algebra/fields/alt_bn128/scalar_field.hpp>
 #include <nil/algebra/fields/bls12/base_field.hpp>
-#include <nil/algebra/fields/bls12/scalar_field.hpp>
-#include <nil/algebra/fields/bn128/base_field.hpp>
-#include <nil/algebra/fields/bn128/scalar_field.hpp>
-#include <nil/algebra/fields/edwards/base_field.hpp>
-#include <nil/algebra/fields/edwards/scalar_field.hpp>
-#include <nil/algebra/fields/mnt4/base_field.hpp>
-#include <nil/algebra/fields/mnt4/scalar_field.hpp>
-#include <nil/algebra/fields/mnt6/base_field.hpp>
-#include <nil/algebra/fields/mnt6/scalar_field.hpp>
-#include <nil/algebra/fields/dsa_botan.hpp>
-#include <nil/algebra/fields/dsa_jce.hpp>
+//#include <nil/algebra/fields/bls12/scalar_field.hpp>
+//#include <nil/algebra/fields/bn128/base_field.hpp>
+//#include <nil/algebra/fields/bn128/scalar_field.hpp>
+//#include <nil/algebra/fields/edwards/base_field.hpp>
+//#include <nil/algebra/fields/edwards/scalar_field.hpp>
+//#include <nil/algebra/fields/mnt4/base_field.hpp>
+//#include <nil/algebra/fields/mnt4/scalar_field.hpp>
+//#include <nil/algebra/fields/mnt6/base_field.hpp>
+//#include <nil/algebra/fields/mnt6/scalar_field.hpp>
+//#include <nil/algebra/fields/dsa_botan.hpp>
+//#include <nil/algebra/fields/dsa_jce.hpp>
 //#include <nil/algebra/fields/ed25519_fe.hpp>
 //#include <nil/algebra/fields/ffdhe_ietf.hpp>
 //#include <nil/algebra/fields/modp_ietf.hpp>
@@ -76,13 +76,13 @@ void fields_fp_basic_math_examples() {
 
     value_type e1e2 = e1 * e2, e1sqr = e1.squared();
 
-    value_type e1sqrt = e1.sqrt();
+    value_type e1sqrsqrt = e1sqr.sqrt();
 
-    std::cout << "e1sqrt value: ";
-    print_field_element(e1sqrt);
+    std::cout << "e1sqrsqrt value: ";
+    print_field_element(e1sqrsqrt);
 
-    std::cout << "e1sqrt * e1sqrt \n";
-    print_field_element(e1sqrt * e1sqrt);
+    std::cout << "e1sqrsqrt * e1sqrsqrt \n";
+    print_field_element(e1sqrsqrt * e1sqrsqrt);
 
     value_type e1inv = e1.inversed();
 
@@ -182,8 +182,13 @@ void fields_fp2_basic_math_examples() {
     std::cout << "e1 * e2 value: ";
     print_field_element(e1e2);
 
+    value_type e1sqrsqrt = e1sqr.sqrt();
+
     std::cout << "e1 square value: ";
     print_field_element(e1sqr);
+
+    std::cout << "e1 square sqrt value: ";
+    print_field_element(e1sqrsqrt);
 
     std::cout << "e1 square square value: ";
 
@@ -272,9 +277,14 @@ void fields_fp3_basic_math_examples() {
 
     std::cout << "e1 * e2 value: ";
     print_field_element(e1e2);
+    
+    value_type e1sqrsqrt = e1sqr.sqrt();
 
     std::cout << "e1 square value: ";
     print_field_element(e1sqr);
+
+    std::cout << "e1 square sqrt value: ";
+    print_field_element(e1sqrsqrt);
 
     std::cout << "e1 square square value: ";
 
@@ -319,7 +329,7 @@ void fields_fp3_basic_math_examples() {
 }
 
 int main() {
-    std::cout << "ALT_BN128-254 Fq basic math:" << std::endl;
+    /*std::cout << "ALT_BN128-254 Fq basic math:" << std::endl;
     fields_fp_basic_math_examples<fields::alt_bn128_fq<254>>();
 
     std::cout << "----------------------------" << std::endl;
@@ -332,18 +342,18 @@ int main() {
     std::cout << "ALT_BN128-254 Fr basic math:" << std::endl;
     fields_fp_basic_math_examples<fields::alt_bn128_fr<254>>();
 
-    std::cout << "----------------------------" << std::endl;
+    std::cout << "----------------------------" << std::endl;*/
 
-    std::cout << "BLS12-381 Fq basic math:" << std::endl;
+    /*std::cout << "BLS12-381 Fq basic math:" << std::endl;
     fields_fp_basic_math_examples<fields::bls12_fq<381>>();
 
-    std::cout << "----------------------------" << std::endl;
+    std::cout << "----------------------------" << std::endl;*/
 
     std::cout << "BLS12-381 Fq2 basic math:" << std::endl;
     fields_fp2_basic_math_examples<fields::fp2<fields::bls12_fq<381>>>();
 
     std::cout << "----------------------------" << std::endl;
-
+/*
     std::cout << "BLS12-381 Fr basic math:" << std::endl;
     fields_fp_basic_math_examples<fields::bls12_fr<381>>();
 
@@ -430,7 +440,7 @@ int main() {
     std::cout << "----------------------------" << std::endl;
 
     std::cout << "DSA JCE 1024 basic math:" << std::endl;
-    fields_fp_basic_math_examples<fields::dsa_jce<1024>>();
+    fields_fp_basic_math_examples<fields::dsa_jce<1024>>();*/
 
     /*    std::cout << "----------------------------" << std::endl;
 

@@ -22,6 +22,8 @@ namespace nil {
                 constexpr static const std::size_t modulus_bits = field_type::modulus_bits;
                 typedef typename field_type::modulus_type modulus_type;
 
+                typedef typename field_type::extended_modulus_type extended_modulus_type;
+
                 constexpr static const modulus_type modulus = field_type::modulus;
 
                 constexpr static const std::size_t generator_bits = field_type::generator_bits;

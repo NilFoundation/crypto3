@@ -69,8 +69,8 @@ namespace nil {
                     0xD0F1EB0C5D321E87BF885ACDEBEDB4C0D6B30E63AB6E7BF6417A7990679AA640A7D58FB90CC708D572D32DFD6443366D2F92F48FF1A02FDB0CC11573BAB71F8E5E05B07DEA208A7E11F3E61C9968CC65F379EFCEF9472C7FC6DEE40194CA1DF9F801DC0D24656EACC72677B_cppui860;
                 constexpr static const modulus_type t_minus_1_over_2 =
                     0x6878F5862E990F43DFC42D66F5F6DA606B598731D5B73DFB20BD3CC833CD532053EAC7DC8663846AB96996FEB2219B3697C97A47F8D017ED86608AB9DD5B8FC72F02D83EF510453F08F9F30E4CB46632F9BCF7E77CA3963FE36F7200CA650EFCFC00EE069232B75663933BD_cppui859;
-                constexpr static const modulus_type nqr = {0x05, 0x00, 0x00};
-                constexpr static const modulus_type nqr_to_t = 
+                constexpr static const std::array<modulus_type, 3> nqr = {0x05, 0x00, 0x00};
+                constexpr static const std::array<modulus_type, 3> nqr_to_t = 
                     {0x1366271F76AB41CEEEE8C1E5E972F3CEC14A25F18B3F4B93642FAD4972356D977470E0FA674_cppui297, 0x00, 0x00};
 
                 constexpr static const modulus_type modulus = policy_type::modulus;
