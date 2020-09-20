@@ -17,10 +17,16 @@
 
 namespace nil {
     namespace algebra {
+        namespace curves {
+            template<std::size_t ModulusBits, std::size_t GeneratorBits>
+            struct mnt4;
+        }    // namespace curves
         namespace pairing {
 
+            using namespace nil::algebra;
+            
             template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
-            class pairing_policy<mnt4<ModulusBits, GeneratorBits>> {
+            class pairing_policy<curves::mnt4<ModulusBits, GeneratorBits>> {
                 using policy_type = detail::mnt4_pairing_functions<ModulusBits, GeneratorBits>;
             public:
 

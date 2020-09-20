@@ -25,7 +25,7 @@ namespace nil {
 
                 public:
                     /*constexpr static*/ const typename policy_type::non_residue_type non_residue =
-                        policy_type::non_residue_type(policy_type::non_residue);
+                        typename policy_type::non_residue_type(policy_type::non_residue);
 
                     using underlying_type = typename policy_type::underlying_type;
 
@@ -34,6 +34,15 @@ namespace nil {
                     value_type data;
 
                     element_fp12_2over3over2(value_type data) : data(data) {};
+
+                    element_fp12_2over3over2(underlying_type in_data0, underlying_type in_data1) {
+                        data = value_type({in_data0, in_data1});
+                    }
+
+                    element_fp12_2over3over2(const element_fp12_2over3over2 &other) {
+                        data[0] = underlying_type(other.data[0]);
+                        data[1] = underlying_type(other.data[1]);
+                    };
 
                     inline static element_fp12_2over3over2 zero() {
                         return element_fp12_2over3over2({underlying_type::zero(), underlying_type::zero()});
@@ -132,7 +141,7 @@ namespace nil {
                         //return element_fp12_2over3over2({data[0].Frobenius_map(pwr),
                         //                                 policy_type::Frobenius_coeffs_c1[pwr % 12] * data[1].Frobenius_map(pwr)});
                         return element_fp12_2over3over2({data[0].Frobenius_map(pwr),
-                                                         non_residue_type(policy_type::Frobenius_coeffs_c1[(pwr % 12) * 2], policy_type::Frobenius_coeffs_c1[(pwr % 12) * 2 + 1]) * data[1].Frobenius_map(pwr)});
+                                                         typename policy_type::non_residue_type(policy_type::Frobenius_coeffs_c1[(pwr % 12) * 2], policy_type::Frobenius_coeffs_c1[(pwr % 12) * 2 + 1]) * data[1].Frobenius_map(pwr)});
                     }
 
                     element_fp12_2over3over2 unitary_inverse() const {

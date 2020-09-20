@@ -353,8 +353,10 @@ namespace nil {
                         const Fq3 E = (Y + Z).squared();    // E    = (Y1+Z1)^2
                         const Fq3 F = D - (A + B);          // F    = D-(A+B)
                         const Fq3 G = E - (B + C);          // G    = E-(B+C)
-                        const Fq3 H =
-                            g2::mul_by_a(A);    // param_twist_coeff_a is 1 * X for us
+                        const Fq3 H = g2::one().mul_by_a(A);    // param_twist_coeff_a is 1 * X for us
+                        // must be 
+                        // const Fq3 H = g2::mul_by_a(A);    // param_twist_coeff_a is 1 * X for us
+                        // when constexpr will be ready
                                                         // H    = twisted_a * A
                         const Fq3 I = H + B;    // I    = H+B
                         const Fq3 J = C - I;    // J    = C-I
@@ -364,11 +366,17 @@ namespace nil {
                         cc.c_ZZ = cc.c_ZZ + cc.c_ZZ;
 
                         // c_XY = 2*(C-a * A * delta_3-B)+G (a = 1 for us)
-                        cc.c_XY = C - g2::mul_by_a(A) - B;    // param_twist_coeff_a is 1 * X for us
+                        cc.c_XY = C - g2::one().mul_by_a(A) - B;    // param_twist_coeff_a is 1 * X for us
+                        // must be 
+                        // cc.c_XY = C - g2::mul_by_a(A) - B;    // param_twist_coeff_a is 1 * X for us
+                        // when constexpr will be ready
                         cc.c_XY = cc.c_XY + cc.c_XY + G;
 
                         // c_XZ = 2*(a*X1*T1*delta_3-B) (a = 1 for us)
-                        cc.c_XZ = g2::mul_by_a(X * T) - B;    // param_twist_coeff_a is 1 * X for us
+                        cc.c_XZ = g2::one().mul_by_a(X * T) - B;    // param_twist_coeff_a is 1 * X for us
+                        // must be 
+                        // cc.c_XZ = g2::mul_by_a(X * T) - B;    // param_twist_coeff_a is 1 * X for us
+                        // when constexpr will be ready
                         cc.c_XZ = cc.c_XZ + cc.c_XZ;
 
                         current.X = F * K;          // X3 = F*K
@@ -394,14 +402,18 @@ namespace nil {
                         const Fq3 F =
                             (X1 - Y1) * (X2 + Y2) + B - A;    // F    = (X1-Y1)*(X2+Y2)+B-A
                         // G = B + twisted_a * A
-                        const Fq3 G =
-                            B + g2::mul_by_a(A);    // param_twist_coeff_a is 1*X for us
+                        const Fq3 G = B + g2::one().mul_by_a(A);    // param_twist_coeff_a is 1*X for us
+                        // must be 
+                        // const Fq3 G = B + g2::mul_by_a(A);    // param_twist_coeff_a is 1*X for us
+                        // when constexpr will be ready
                         const Fq3 H = D - C;      // H    = D-C
                         const Fq3 I = T1 * T2;    // I    = T1*T2
 
                         // c_ZZ = delta_3* ((T1-X1)*(T2+X2)-I+A)
-                        cc.c_ZZ = g2::mul_by_a((T1 - X1) * (T2 + X2) - I +
-                                                       A);    // param_twist_coeff_a is 1*X for us
+                        cc.c_ZZ = g2::one().mul_by_a((T1 - X1) * (T2 + X2) - I + A);    // param_twist_coeff_a is 1*X for us
+                        // must be 
+                        // cc.c_ZZ = g2::mul_by_a((T1 - X1) * (T2 + X2) - I + A);    // param_twist_coeff_a is 1*X for us
+                        // when constexpr will be ready
 
                         cc.c_XY = X1 * Z2 - X2 * Z1 + F;                // c_XY = X1*Z2-X2*Z1+F
                         cc.c_XZ = (Y1 - T1) * (Y2 + T2) - B + I - H;    // c_XZ = (Y1-T1)*(Y2+T2)-B+I-H
@@ -426,14 +438,18 @@ namespace nil {
                         const Fq3 F =
                             (X1 - Y1) * (X2 + Y2) + B - A;    // F    = (X1-Y1)*(X2+Y2)+B-A
                         // G = B + twisted_a * A
-                        const Fq3 G =
-                            B + g2::mul_by_a(A);    // param_twist_coeff_a is 1*X for us
+                        const Fq3 G = B + g2::one().mul_by_a(A);    // param_twist_coeff_a is 1*X for us
+                        // must be 
+                        // const Fq3 G = B + g2::mul_by_a(A);    // param_twist_coeff_a is 1*X for us
+                        // when constexpr will be ready
                         const Fq3 H = T1 - C;     // H    = T1-C
                         const Fq3 I = T1 * T2;    // I    = T1*T2
 
                         // c_ZZ = delta_3* ((T1-X1)*(T2+X2)-I+A)
-                        cc.c_ZZ = g2::mul_by_a((T1 - X1) * (T2 + X2) - I +
-                                                       A);    // param_twist_coeff_a is 1*X for us
+                        cc.c_ZZ = g2::one().mul_by_a((T1 - X1) * (T2 + X2) - I + A);    // param_twist_coeff_a is 1*X for us
+                        // must be 
+                        // cc.c_ZZ = g2::mul_by_a((T1 - X1) * (T2 + X2) - I + A);    // param_twist_coeff_a is 1*X for us
+                        // when constexpr will be ready
 
                         cc.c_XY = X1 - X2 * Z1 + F;                     // c_XY = X1*Z2-X2*Z1+F
                         cc.c_XZ = (Y1 - T1) * (Y2 + T2) - B + I - H;    // c_XZ = (Y1-T1)*(Y2+T2)-B+I-H

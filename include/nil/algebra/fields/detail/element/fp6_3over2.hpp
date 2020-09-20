@@ -25,7 +25,7 @@ namespace nil {
 
                 public:
                     /*constexpr static*/ const typename policy_type::non_residue_type non_residue =
-                        policy_type::non_residue_type(policy_type::non_residue);
+                        typename policy_type::non_residue_type(policy_type::non_residue);
 
                     using underlying_type = typename policy_type::underlying_type;
 
@@ -34,6 +34,16 @@ namespace nil {
                     value_type data;
 
                     element_fp6_3over2(value_type data) : data(data) {};
+
+                    element_fp6_3over2(underlying_type in_data0, underlying_type in_data1, underlying_type in_data2) {
+                        data = value_type({in_data0, in_data1, in_data2});
+                    }
+
+                    element_fp6_3over2(const element_fp6_3over2 &other) {
+                        data[0] = underlying_type(other.data[0]);
+                        data[1] = underlying_type(other.data[1]);
+                        data[2] = underlying_type(other.data[2]);
+                    };
 
                     inline static element_fp6_3over2 zero() {
                         return element_fp6_3over2(
@@ -156,8 +166,8 @@ namespace nil {
                         //                           policy_type::Frobenius_coeffs_c1[pwr % 6] * data[1].Frobenius_map(pwr),
                         //                           policy_type::Frobenius_coeffs_c2[pwr % 6] * data[2].Frobenius_map(pwr)});
                         return element_fp6_3over2({data[0].Frobenius_map(pwr),
-                                                   non_residue_type(policy_type::Frobenius_coeffs_c1[(pwr % 6) * 2], policy_type::Frobenius_coeffs_c1[(pwr % 6) * 2 + 1]) * data[1].Frobenius_map(pwr),
-                                                   non_residue_type(policy_type::Frobenius_coeffs_c2[(pwr % 6) * 2], policy_type::Frobenius_coeffs_c2[(pwr % 6) * 2 + 1]) * data[2].Frobenius_map(pwr)});
+                                                   typename policy_type::non_residue_type(policy_type::Frobenius_coeffs_c1[(pwr % 6) * 2], policy_type::Frobenius_coeffs_c1[(pwr % 6) * 2 + 1]) * data[1].Frobenius_map(pwr),
+                                                   typename policy_type::non_residue_type(policy_type::Frobenius_coeffs_c2[(pwr % 6) * 2], policy_type::Frobenius_coeffs_c2[(pwr % 6) * 2 + 1]) * data[2].Frobenius_map(pwr)});
                     }
 
                     /*inline static*/ underlying_type mul_by_non_residue(const underlying_type &A) {

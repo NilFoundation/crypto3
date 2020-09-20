@@ -247,16 +247,18 @@ namespace nil {
                         return (this->is_zero() || this->p[2] == underlying_field_type_value::one());
                     }
 
-                private:
-                    underlying_field_type_value mul_by_a(const underlying_field_type_value &elt) const {
+                    /*inline static */underlying_field_type_value mul_by_a(const underlying_field_type_value &elt) const {
                         return underlying_field_type_value({twist_mul_by_a_c0 * elt.data[2], elt.data[0], elt.data[1]});
                     }
 
-                    underlying_field_type_value mul_by_d(const underlying_field_type_value &elt) const {
+                    /*inline static */underlying_field_type_value mul_by_d(const underlying_field_type_value &elt) const {
                         return underlying_field_type_value({twist_mul_by_d_c0 * elt.data[2],
                                                             twist_mul_by_d_c1 * elt.data[0],
                                                             twist_mul_by_d_c2 * elt.data[1]});
                     }
+
+                private:
+                    
 
                     /*constexpr static */ const g1_field_type_value a = g1_field_type_value(policy_type::a);
                     /*constexpr static */ const g1_field_type_value d = g1_field_type_value(policy_type::d);

@@ -52,6 +52,10 @@ namespace nil {
                             {underlying_type(in_data0), underlying_type(in_data1), underlying_type(in_data2)});
                     }
 
+                    element_fp3(underlying_type in_data0, underlying_type in_data1, underlying_type in_data2) {
+                        data = value_type({in_data0, in_data1, in_data2});
+                    }
+
                     element_fp3(const element_fp3 &other) {
                         data[0] = underlying_type(other.data[0]);
                         data[1] = underlying_type(other.data[1]);
@@ -203,8 +207,8 @@ namespace nil {
                     template<typename PowerType>
                     element_fp3 Frobenius_map(const PowerType &pwr) const {
                         return element_fp3({data[0], 
-                                            non_residue_type(policy_type::Frobenius_coeffs_c1[pwr % 3]) * data[1],
-                                            non_residue_type(policy_type::Frobenius_coeffs_c2[pwr % 3]) * data[2]});
+                                            typename policy_type::non_residue_type(policy_type::Frobenius_coeffs_c1[pwr % 3]) * data[1],
+                                            typename policy_type::non_residue_type(policy_type::Frobenius_coeffs_c2[pwr % 3]) * data[2]});
                         //return element_fp3({data[0], 
                         //                    policy_type::Frobenius_coeffs_c1[pwr % 3] * data[1],
                         //                    policy_type::Frobenius_coeffs_c2[pwr % 3] * data[2]});
