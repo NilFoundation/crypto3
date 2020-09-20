@@ -41,7 +41,7 @@ namespace nil {
                 template<>
                 struct bls12_basic_policy<377, CHAR_BIT> {
 
-                    using number_type = bls12<377, GeneratorBits>::number_type;
+                    using number_type = bls12<377, CHAR_BIT>::number_type;
 
                     constexpr static const typename number_type ate_loop_count =
                         number_type(0x8508C00000000001_cppui64);
