@@ -11,9 +11,11 @@
 #ifndef ALGEBRA_CURVES_EDWARDS_HPP
 #define ALGEBRA_CURVES_EDWARDS_HPP
 
+#include <nil/algebra/curves/detail/edwards/basic_policy.hpp>
 #include <nil/algebra/curves/detail/edwards/g1.hpp>
 #include <nil/algebra/curves/detail/edwards/g2.hpp>
-#include <nil/algebra/curves/detail/edwards/basic_policy.hpp>
+
+#include <nil/algebra/pairing/edwards.hpp>
 
 #include <nil/algebra/fields/fp6_2over3.hpp>
 
@@ -31,6 +33,7 @@ namespace nil {
                 typedef typename policy_type::base_field_type base_field_type;
                 typedef typename policy_type::scalar_field_type scalar_field_type;
                 typedef typename policy_type::number_type number_type;
+                typedef typename policy_type::extended_number_type extended_number_type;
 
                 constexpr static const std::size_t base_field_bits = policy_type::base_field_bits;
                 constexpr static const number_type p = policy_type::p;
@@ -41,7 +44,7 @@ namespace nil {
                 typedef typename detail::edwards_g1<base_field_bits> g1_type;
                 typedef typename detail::edwards_g2<base_field_bits> g2_type;
 
-                //typedef typename pairing::pairing_policy<edwards<ModulusBits, GeneratorBits>> pairing_policy;
+                typedef typename pairing::pairing_policy<edwards<ModulusBits, GeneratorBits>> pairing_policy;
 
                 typedef typename fields::fp6_2over3<base_field_type>::value_type gt_type;
 

@@ -30,6 +30,8 @@ namespace nil {
                     constexpr static const std::size_t base_field_bits = 381;
                     typedef fields::bls12_fq<base_field_bits, CHAR_BIT> base_field_type;
                     typedef typename base_field_type::modulus_type number_type;
+                    typedef typename base_field_type::extended_modulus_type extended_number_type;
+
                     constexpr static const number_type p = base_field_type::modulus;
 
                     constexpr static const std::size_t scalar_field_bits = 381;    // actually, 255
@@ -46,6 +48,7 @@ namespace nil {
                     typedef fields::bls12_fq<base_field_bits, CHAR_BIT> base_field_type;
                     typedef typename base_field_type::modulus_type number_type;
                     constexpr static const number_type p = base_field_type::modulus;
+                    typedef typename base_field_type::extended_modulus_type extended_number_type;
 
                     constexpr static const std::size_t scalar_field_bits = 377;    // actually, 253
                     typedef fields::bls12_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;

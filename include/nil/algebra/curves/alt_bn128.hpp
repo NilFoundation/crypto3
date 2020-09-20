@@ -15,6 +15,8 @@
 #include <nil/algebra/curves/detail/alt_bn128/g1.hpp>
 #include <nil/algebra/curves/detail/alt_bn128/g2.hpp>
 
+#include <nil/algebra/pairing/alt_bn128.hpp>
+
 #include <nil/algebra/fields/fp12_2over3over2.hpp>
 
 namespace nil {
@@ -31,6 +33,7 @@ namespace nil {
                 typedef typename policy_type::base_field_type base_field_type;
                 typedef typename policy_type::scalar_field_type scalar_field_type;
                 typedef typename policy_type::number_type number_type;
+                typedef typename policy_type::extended_number_type extended_number_type;
 
                 constexpr static const std::size_t base_field_bits = policy_type::base_field_bits;
                 constexpr static const number_type p = policy_type::p;

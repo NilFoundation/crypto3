@@ -11,9 +11,11 @@
 #ifndef ALGEBRA_CURVES_MNT6_HPP
 #define ALGEBRA_CURVES_MNT6_HPP
 
+#include <nil/algebra/curves/detail/mnt6/basic_policy.hpp>
 #include <nil/algebra/curves/detail/mnt6/g1.hpp>
 #include <nil/algebra/curves/detail/mnt6/g2.hpp>
-#include <nil/algebra/curves/detail/mnt6/basic_policy.hpp>
+
+#include <nil/algebra/pairing/mnt6.hpp>
 
 #include <nil/algebra/fields/fp6_2over3.hpp>
 
@@ -31,6 +33,7 @@ namespace nil {
                 typedef typename policy_type::base_field_type base_field_type;
                 typedef typename policy_type::scalar_field_type scalar_field_type;
                 typedef typename policy_type::number_type number_type;
+                typedef typename policy_type::extended_number_type extended_number_type;
 
                 constexpr static const std::size_t base_field_bits = policy_type::base_field_bits;
                 constexpr static const number_type p = policy_type::p;
