@@ -134,9 +134,93 @@ namespace nil {
                                                    non_residue_type(policy_type::Frobenius_coeffs_c1[pwr % 6]) * data[1].Frobenius_map(pwr)});
                     }
 
+                    element_fp6_2over3 unitary_inverse() const {
+                        return element_fp6_2over3({data[0], -data[1]});
+                    }
+
+                    element_fp6_2over3 cyclotomic_squared() const {
+                        my_Fp2 a = my_Fp2(c0.c0, c1.c1);
+                        //my_Fp a_a = c0.c0; // a = Fp2([c0[0],c1[1]])
+                        //my_Fp a_b = c1.c1;
+
+                        my_Fp2 b = my_Fp2(c1.c0, c0.c2);
+                        //my_Fp b_a = c1.c0; // b = Fp2([c1[0],c0[2]])
+                        //my_Fp b_b = c0.c2;
+
+                        my_Fp2 c = my_Fp2(c0.c1, c1.c2);
+                        //my_Fp c_a = c0.c1; // c = Fp2([c0[1],c1[2]])
+                        //my_Fp c_b = c1.c2;
+
+                        my_Fp2 asq = a.squared();
+                        my_Fp2 bsq = b.squared();
+                        my_Fp2 csq = c.squared();
+
+                        // A = vector(3*a^2 - 2*Fp2([vector(a)[0],-vector(a)[1]]))
+                        //my_Fp A_a = my_Fp(3l) * asq_a - my_Fp(2l) * a_a;
+                        my_Fp A_a = asq.c0 - a.c0;
+                        A_a = A_a + A_a + asq.c0;
+                        //my_Fp A_b = my_Fp(3l) * asq_b + my_Fp(2l) * a_b;
+                        my_Fp A_b = asq.c1 + a.c1;
+                        A_b = A_b + A_b + asq.c1;
+
+                        // B = vector(3*Fp2([non_residue*c2[1],c2[0]]) + 2*Fp2([vector(b)[0],-vector(b)[1]]))
+                        //my_Fp B_a = my_Fp(3l) * my_Fp3::non_residue * csq_b + my_Fp(2l) * b_a;
+                        my_Fp B_tmp = my_Fp3::non_residue * csq.c1;
+                        my_Fp B_a = B_tmp + b.c0;
+                        B_a = B_a + B_a + B_tmp;
+
+                        //my_Fp B_b = my_Fp(3l) * csq_a - my_Fp(2l) * b_b;
+                        my_Fp B_b = csq.c0 - b.c1;
+                        B_b = B_b + B_b + csq.c0;
+
+                        // C = vector(3*b^2 - 2*Fp2([vector(c)[0],-vector(c)[1]]))
+                        //my_Fp C_a = my_Fp(3l) * bsq_a - my_Fp(2l) * c_a;
+                        my_Fp C_a = bsq.c0 - c.c0;
+                        C_a = C_a + C_a + bsq.c0;
+                        // my_Fp C_b = my_Fp(3l) * bsq_b + my_Fp(2l) * c_b;
+                        my_Fp C_b = bsq.c1 + c.c1;
+                        C_b = C_b + C_b + bsq.c1;
+
+                        // e0 = Fp3([A[0],C[0],B[1]])
+                        // e1 = Fp3([B[0],A[1],C[1]])
+                        // fin = Fp6e([e0,e1])
+                        // return fin
+
+                        return element_fp6_2over3(underlying_type({A_a, C_a, B_b}),
+                                                            underlying_type({B_a, A_b, C_b}));
+                    }
+
+                    template<typename PowerType>
+                    element_fp6_2over3 cyclotomic_exp(const PowerType &exponent) const {
+                        element_fp6_2over3 res = one();
+                        element_fp6_2over3 this_inverse = this->unitary_inverse();
+
+                        bool found_nonzero = false;
+                        std::vector<long> NAF = find_wnaf(1, exponent);
+
+                        for (long i = static_cast<long>(NAF.size() - 1); i >= 0; --i) {
+                            if (found_nonzero) {
+                                res = res.cyclotomic_squared();
+                            }
+
+                            if (NAF[i] != 0) {
+                                found_nonzero = true;
+
+                                if (NAF[i] > 0) {
+                                    res = res * (*this);
+                                }
+                                else {
+                                    res = res * this_inverse;
+                                }
+                            }
+                        }
+
+                        return res;
+                    }
+
                 private:
                     /*inline static*/ underlying_type mul_by_non_residue(const underlying_type &A) {
-                        return element_fp6_2over3({non_residue * A.data[2], A.data[1], A.data[0]});
+                        return underlying_type({non_residue * A.data[2], A.data[1], A.data[0]});
                     }
                 };
 

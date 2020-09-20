@@ -134,6 +134,50 @@ namespace nil {
                         //                    policy_type::Frobenius_coeffs_c1[pwr % 4] * data[1].Frobenius_map(pwr)});
                     }
 
+                    element_fp4  unitary_inversed() const {
+                        return element_fp4({data[0], -data[1]});
+                    }
+
+                    element_fp4  cyclotomic_squared() const {
+                        const underlying_type A = data[1].squared();
+                        const underlying_type B = data[0] + data[1];
+                        const underlying_type C = B.squared() - A;
+                        const underlying_type D = mul_by_non_residue(A); // Fp2(A.c1 * non_residue, A.c0)
+                        const underlying_type E = C - D;
+                        const underlying_type F = D + D + underlying_type::one();
+                        const underlying_type G = E - underlying_type::one();
+
+                        return element_fp4 (F, G);
+                    }
+
+                    template<typename PowerType>
+                    element_fp4 cyclotomic_exp(const PowerType &exponent) const {
+                        element_fp4  res = this->one();
+                        element_fp4  this_inverse = this->unitary_inverse();
+
+                        bool found_nonzero = false;
+                        std::vector<long> NAF = find_wnaf(1, exponent);
+
+                        for (long i = static_cast<long>(NAF.size() - 1); i >= 0; --i) {
+                            if (found_nonzero) {
+                                res = res.cyclotomic_squared();
+                            }
+
+                            if (NAF[i] != 0) {
+                                found_nonzero = true;
+
+                                if (NAF[i] > 0) {
+                                    res = res * (*this);
+                                }
+                                else {
+                                    res = res * this_inverse;
+                                }
+                            }
+                        }
+
+                        return res;
+                    }
+
                 private:
                     /*inline static*/ underlying_type mul_by_non_residue(const underlying_type &A) {
                         return element_fp4({non_residue * A.data[1], A.data[0]});

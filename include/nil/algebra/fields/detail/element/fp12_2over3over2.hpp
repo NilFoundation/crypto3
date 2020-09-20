@@ -135,6 +135,96 @@ namespace nil {
                                                          non_residue_type(policy_type::Frobenius_coeffs_c1[(pwr % 12) * 2], policy_type::Frobenius_coeffs_c1[(pwr % 12) * 2 + 1]) * data[1].Frobenius_map(pwr)});
                     }
 
+                    element_fp12_2over3over2 unitary_inverse() const {
+                        return element_fp12_2over3over2({data[0], -data[1]});
+                    }
+
+                    element_fp12_2over3over2 cyclotomic_squared() const {
+                        /* OLD: naive implementation
+                           return (*this).squared();
+                        */
+                        my_Fp2 z0 = this->c0.c0;
+                        my_Fp2 z4 = this->c0.c1;
+                        my_Fp2 z3 = this->c0.c2;
+                        my_Fp2 z2 = this->c1.c0;
+                        my_Fp2 z1 = this->c1.c1;
+                        my_Fp2 z5 = this->c1.c2;
+
+                        my_Fp2 t0, t1, t2, t3, t4, t5, tmp;
+
+                        // t0 + t1*y = (z0 + z1*y)^2 = a^2
+                        tmp = z0 * z1;
+                        t0 = (z0 + z1) * (z0 + my_Fp6::non_residue * z1) - tmp - my_Fp6::non_residue * tmp;
+                        t1 = tmp + tmp;
+                        // t2 + t3*y = (z2 + z3*y)^2 = b^2
+                        tmp = z2 * z3;
+                        t2 = (z2 + z3) * (z2 + my_Fp6::non_residue * z3) - tmp - my_Fp6::non_residue * tmp;
+                        t3 = tmp + tmp;
+                        // t4 + t5*y = (z4 + z5*y)^2 = c^2
+                        tmp = z4 * z5;
+                        t4 = (z4 + z5) * (z4 + my_Fp6::non_residue * z5) - tmp - my_Fp6::non_residue * tmp;
+                        t5 = tmp + tmp;
+
+                        // for A
+
+                        // z0 = 3 * t0 - 2 * z0
+                        z0 = t0 - z0;
+                        z0 = z0 + z0;
+                        z0 = z0 + t0;
+                        // z1 = 3 * t1 + 2 * z1
+                        z1 = t1 + z1;
+                        z1 = z1 + z1;
+                        z1 = z1 + t1;
+
+                        // for B
+
+                        // z2 = 3 * (xi * t5) + 2 * z2
+                        tmp = my_Fp6::non_residue * t5;
+                        z2 = tmp + z2;
+                        z2 = z2 + z2;
+                        z2 = z2 + tmp;
+
+                        // z3 = 3 * t4 - 2 * z3
+                        z3 = t4 - z3;
+                        z3 = z3 + z3;
+                        z3 = z3 + t4;
+
+                        // for C
+
+                        // z4 = 3 * t2 - 2 * z4
+                        z4 = t2 - z4;
+                        z4 = z4 + z4;
+                        z4 = z4 + t2;
+
+                        // z5 = 3 * t3 + 2 * z5
+                        z5 = t3 + z5;
+                        z5 = z5 + z5;
+                        z5 = z5 + t3;
+
+                        return element_fp12_2over3over2(my_Fp6(z0,z4,z3),my_Fp6(z2,z1,z5));
+                    }
+
+                    template<typename PowerType>
+                    element_fp12_2over3over2 cyclotomic_exp(const PowerType &exponent) const {
+                        element_fp12_2over3over2 res = one();
+
+                        bool found_one = false;
+                        for (long i = m-1; i >= 0; --i) {
+                            for (long j = GMP_NUMB_BITS - 1; j >= 0; --j) {
+                                if (found_one) {
+                                    res = res.cyclotomic_squared();
+                                }
+
+                                if (exponent.data[i] & (1ul<<j)) {
+                                    found_one = true;
+                                    res = res * (*this);
+                                }
+                            }
+                        }
+
+                        return res;
+                    }
+
                     /*element_fp12_2over3over2 sqru() {
                         element_fp2<FieldParams> &z0(a_.a_);
                         element_fp2<FieldParams> &z4(a_.b_);
