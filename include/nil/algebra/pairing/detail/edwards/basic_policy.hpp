@@ -23,10 +23,21 @@ namespace nil {
                 struct edwards_basic_policy;
 
                 template<>
-                struct edwards_basic_policy<183, CHAR_BIT> {
+                class edwards_basic_policy<183, CHAR_BIT> {
+                    using policy_type = curves::detail::edwards_basic_policy<183, CHAR_BIT>;
+                public:
 
-                    using number_type = curves::detail::edwards_basic_policy<183, CHAR_BIT>::number_type;
-                    using extended_number_type = curves::detail::edwards_basic_policy<183, CHAR_BIT>::extended_number_type;
+                    using number_type = typename policy_type::number_type;
+                    using extended_number_type = typename policy_type::extended_number_type;
+
+                    using g1 = curves::detail::edwards_g1<183, CHAR_BIT>;
+                    using g2 = curves::detail::edwards_g2<183, CHAR_BIT>;
+                    using Fq = typename g1::underlying_field_type_value;
+                    using Fq3 = typename g2::underlying_field_type_value;
+                    using gt = policy_type::gt_type;
+
+                    constexpr static const number_type base_field_modulus = policy_type::base_field_modulus;
+                    constexpr static const number_type scalar_field_modulus = policy_type::scalar_field_modulus;
 
                     constexpr static const number_type final_exponent_last_chunk_abs_of_w0 =
                         number_type(0x3A1077BB02A78E4A00000003_cppui94);

@@ -24,14 +24,22 @@ namespace nil {
 
                 template<>
                 struct mnt4_basic_policy<298, CHAR_BIT> {
+                    using policy_type = curves::detail::mnt4_basic_policy<298, CHAR_BIT>;
+                public:
 
-                    using number_type = curves::detail::mnt4_basic_policy<298, CHAR_BIT>::number_type;
-                    using extended_number_type = curves::detail::mnt4_basic_policy<298, CHAR_BIT>::extended_number_type;
+                    using number_type = typename policy_type::number_type;
+                    using extended_number_type = typename policy_type::extended_number_type;
+
+                    using g1 = curves::detail::mnt4_g1<298, CHAR_BIT>;
+                    using g2 = curves::detail::mnt4_g2<298, CHAR_BIT>;
+                    using Fq = typename mnt4_g1::underlying_field_type_value;
+                    using Fq3 = typename mnt4_g2::underlying_field_type_value;
+                    using gt = policy_type::gt_type;
 
                     constexpr static const number_type ate_loop_count =
                         number_type(0x1EEF5546609756BEC2A33F0DC9A1B671660000_cppui149);
                     constexpr static const bool ate_is_loop_count_neg = false;
-                    constexpr static const number_type final_exponent = number_type(
+                    constexpr static const extended_number_type final_exponent = extended_number_type(
                         0x343C7AC3174C87A1EFE216B37AFB6D3035ACCA5A07B2394F42E0029264C0324A95E87DCB6C97234CBA7385B8D20FEA4E85074066818687634E61F58B68EA590B11CEE431BE8348DEB351384D8485E987A57004BB9A1E7A6036C7A5801F55AC8E065E41B012422619E7E69541C5980000_cppui894);
 
                     constexpr static const number_type final_exponent_last_chunk_abs_of_w0 =

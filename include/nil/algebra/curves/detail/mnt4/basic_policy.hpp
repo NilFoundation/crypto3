@@ -13,6 +13,8 @@
 #include <nil/algebra/fields/mnt4/base_field.hpp>
 #include <nil/algebra/fields/mnt4/scalar_field.hpp>
 
+#include <nil/algebra/fields/fp4.hpp>
+
 #include <nil/algebra/detail/literals.hpp>
 
 namespace nil {
@@ -37,6 +39,8 @@ namespace nil {
                     constexpr static const std::size_t scalar_field_bits = 298;
                     typedef fields::mnt4_scalar_field<scalar_field_bits, CHAR_BIT> scalar_field_type;
                     constexpr static const number_type q = scalar_field_type::modulus;
+
+                    typedef typename fields::fp4<base_field_type>::value_type gt_type;
 
                     constexpr static const number_type a = number_type(0x02);
                     constexpr static const number_type b = number_type(

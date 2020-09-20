@@ -13,6 +13,8 @@
 #include <nil/algebra/fields/alt_bn128/base_field.hpp>
 #include <nil/algebra/fields/alt_bn128/scalar_field.hpp>
 
+#include <nil/algebra/fields/fp12_2over3over2.hpp>
+
 #include <nil/algebra/detail/literals.hpp>
 
 namespace nil {
@@ -31,12 +33,14 @@ namespace nil {
                     typedef fields::alt_bn128_fq<base_field_bits, CHAR_BIT> base_field_type;
                     typedef typename base_field_type::modulus_type number_type;
                     typedef typename base_field_type::extended_modulus_type extended_number_type;
-                    
+
                     constexpr static const number_type p = base_field_type::modulus;
 
                     constexpr static const std::size_t scalar_field_bits = 254;
                     typedef fields::alt_bn128_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
                     constexpr static const number_type q = scalar_field_type::modulus;
+
+                    typedef typename fields::fp12_2over3over2<base_field_type>::value_type gt_type;
 
                     constexpr static const number_type a = number_type(0x00);
                     constexpr static const number_type b = number_type(0x03);

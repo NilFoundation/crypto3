@@ -24,22 +24,22 @@ namespace nil {
 
                 using other_curve = curves::mnt6<ModulusBits, GeneratorBits>;
 
-                typedef typename curves::mnt4::scalar_field_type FieldType;
+                typedef typename mnt4_basic_policy::scalar_field_type FieldType;
                 typedef algebra::Fqe<algebra::curves::mnt6> fqe_type;
                 typedef algebra::Fqk<algebra::curves::mnt6> fqk_type;
 
-                using g1_precomp = detail::mnt4_g1_precomp<ModulusBits, GeneratorBits>;
-                using g2_precomp = detail::mnt4_g2_precomp<ModulusBits, GeneratorBits>;
+                using g1_precomp = detail::g1_precomp<ModulusBits, GeneratorBits>;
+                using g2_precomp = detail::g2_precomp<ModulusBits, GeneratorBits>;
 
-                using precompute_g1 = detail::mnt4_precompute_g1<ModulusBits, GeneratorBits>;
-                using precompute_g2 = detail::mnt4_precompute_g2<ModulusBits, GeneratorBits>;
+                using precompute_g1 = detail::precompute_g1<ModulusBits, GeneratorBits>;
+                using precompute_g2 = detail::precompute_g2<ModulusBits, GeneratorBits>;
 
-                using reduced_pairing = detail::edwards_reduced_pairing<ModulusBits, GeneratorBits>;
-                using pairing = detail::edwards_pairing<ModulusBits, GeneratorBits>;
+                using reduced_pairing = detail::reduced_pairing<ModulusBits, GeneratorBits>;
+                using pairing = detail::pairing<ModulusBits, GeneratorBits>;
 
-                using miller_loop = detail::mnt4_miller_loop<ModulusBits, GeneratorBits>;
-                using double_miller_loop = detail::mnt4_double_miller_loop<ModulusBits, GeneratorBits>;
-                using final_exponentiation = detail::mnt4_final_exponentiation<ModulusBits, GeneratorBits>;
+                using miller_loop = detail::miller_loop<ModulusBits, GeneratorBits>;
+                using double_miller_loop = detail::double_miller_loop<ModulusBits, GeneratorBits>;
+                using final_exponentiation = detail::final_exponentiation<ModulusBits, GeneratorBits>;
             };
         }    // namespace pairing
     }        // namespace algebra
