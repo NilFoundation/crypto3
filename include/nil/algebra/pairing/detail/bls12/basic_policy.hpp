@@ -29,6 +29,12 @@ namespace nil {
                     using number_type = curves::detail::bls12_basic_policy<381, CHAR_BIT>::number_type;
                     using extended_number_type = curves::detail::bls12_basic_policy<381, CHAR_BIT>::extended_number_type;
 
+                    using g1 = curves::detail::bls12_g1<381, CHAR_BIT>;
+                    using g2 = curves::detail::bls12_g2<381, CHAR_BIT>;
+                    using Fq = typename g1::underlying_field_type_value;
+                    using Fq2 = typename g2::underlying_field_type_value;
+                    using gt = policy_type::gt_type;
+
                     constexpr static const number_type ate_loop_count =
                         number_type(0xD201000000010000_cppui64);
                     constexpr static const bool ate_is_loop_count_neg = true;
@@ -44,6 +50,13 @@ namespace nil {
                 struct bls12_basic_policy<377, CHAR_BIT> {
 
                     using number_type = bls12<377, GeneratorBits>::number_type;
+                    using extended_number_type = curves::detail::bls12_basic_policy<377, CHAR_BIT>::extended_number_type;
+
+                    using g1 = curves::detail::bls12_g1<377, CHAR_BIT>;
+                    using g2 = curves::detail::bls12_g2<377, CHAR_BIT>;
+                    using Fq = typename g1::underlying_field_type_value;
+                    using Fq2 = typename g2::underlying_field_type_value;
+                    using gt = policy_type::gt_type;
 
                     constexpr static const number_type ate_loop_count =
                         number_type(0x8508C00000000001_cppui64);

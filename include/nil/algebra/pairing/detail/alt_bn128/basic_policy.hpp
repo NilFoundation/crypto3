@@ -28,6 +28,12 @@ namespace nil {
                     using number_type = curves::detail::alt_bn128_basic_policy<254, CHAR_BIT>::number_type;
                     using extended_number_type = curves::detail::alt_bn128_basic_policy<254, CHAR_BIT>::extended_number_type;
 
+                    using g1 = curves::detail::alt_bn128_g1<254, CHAR_BIT>;
+                    using g2 = curves::detail::alt_bn128_g2<254, CHAR_BIT>;
+                    using Fq = typename g1::underlying_field_type_value;
+                    using Fq2 = typename g2::underlying_field_type_value;
+                    using gt = policy_type::gt_type;
+
                     constexpr static const number_type ate_loop_count = number_type(0x19D797039BE763BA8);
                     constexpr static const bool ate_is_loop_count_neg = false;
                     constexpr static const extended_number_type final_exponent = extended_number_type(
