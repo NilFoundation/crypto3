@@ -166,6 +166,9 @@ namespace nil {
                     typedef element_fp<policy_type> non_residue_type;
                     typedef element_fp<policy_type> underlying_type;
 
+                    constexpr static const std::array<underlying_type, 2> Frobenius_coeffs_c1 = {underlying_type(0x01),
+                        underlying_type(0x1AE3A4617C510EAC63B05C06CA1493B1A22D9F300F5138F1EF3622FBA094800170B5D44300000008508C00000000000_cppui377)};
+
                     constexpr static const modulus_type non_residue = modulus_type(
                         0x1AE3A4617C510EAC63B05C06CA1493B1A22D9F300F5138F1EF3622FBA094800170B5D44300000008508BFFFFFFFFFFC_cppui377);
                 };
@@ -186,6 +189,22 @@ namespace nil {
                     typedef element_fp2<field_type> non_residue_type;
                     typedef element_fp2<fp2_extension_params<field_type>> underlying_type;
 
+                    constexpr static const std::array<underlying_type, 6> Frobenius_coeffs_c1 = {underlying_type(0x01, 0x00),
+                        underlying_type(0x9B3AF05DD14F6EC619AAF7D34594AABC5ED1347970DEC00452217CC900000008508C00000000002_cppui316, 0x00),
+                        underlying_type(0x9B3AF05DD14F6EC619AAF7D34594AABC5ED1347970DEC00452217CC900000008508C00000000001_cppui316, 0x00),
+                        underlying_type(0x1AE3A4617C510EAC63B05C06CA1493B1A22D9F300F5138F1EF3622FBA094800170B5D44300000008508C00000000000_cppui377, 0x00),
+                        underlying_type(0x1AE3A4617C510EABC8756BA8F8C524EB8882A75CC9BC8E359064EE822FB5BFFD1E945779FFFFFFFFFFFFFFFFFFFFFFF_cppui377, 0x00),
+                        underlying_type(0x1AE3A4617C510EABC8756BA8F8C524EB8882A75CC9BC8E359064EE822FB5BFFD1E94577A00000000000000000000000_cppui377, 0x00)
+                    };
+
+                    constexpr static const std::array<underlying_type, 6> Frobenius_coeffs_c1 = {underlying_type(0x01, 0x00),
+                        underlying_type(0x9B3AF05DD14F6EC619AAF7D34594AABC5ED1347970DEC00452217CC900000008508C00000000001_cppui316, 0x00),
+                        underlying_type(0x1AE3A4617C510EABC8756BA8F8C524EB8882A75CC9BC8E359064EE822FB5BFFD1E945779FFFFFFFFFFFFFFFFFFFFFFF_cppui377, 0x00),
+                        underlying_type(0x01, 0x00),
+                        underlying_type(0x9B3AF05DD14F6EC619AAF7D34594AABC5ED1347970DEC00452217CC900000008508C00000000001_cppui316, 0x00),
+                        underlying_type(0x1AE3A4617C510EABC8756BA8F8C524EB8882A75CC9BC8E359064EE822FB5BFFD1E945779FFFFFFFFFFFFFFFFFFFFFFF_cppui377, 0x00)
+                    };
+
                     constexpr static const std::array<modulus_type, 2> non_residue = {0, 1};
                 };
 
@@ -204,6 +223,21 @@ namespace nil {
 
                     typedef element_fp2<field_type> non_residue_type;
                     typedef element_fp6_3over2<fp6_3over2_extension_params<field_type>> underlying_type;
+
+                    constexpr static const std::array<underlying_type, 12> Frobenius_coeffs_c1 = {underlying_type(0x01, 0x00),
+                        underlying_type(0x9A9975399C019633C1E30682567F915C8A45E0F94EBC8EC681BF34A3AA559DB57668E558EB0188E938A9D1104F2031_cppui376, 0x00),
+                        underlying_type(0x9B3AF05DD14F6EC619AAF7D34594AABC5ED1347970DEC00452217CC900000008508C00000000002_cppui316, 0x00),
+                        underlying_type(0x1680A40796537CAC0C534DB1A79BEB1400398F50AD1DEC1BCE649CF436B0F6299588459BFF27D8E6E76D5ECF1391C63_cppui377, 0x00),
+                        underlying_type(0x9B3AF05DD14F6EC619AAF7D34594AABC5ED1347970DEC00452217CC900000008508C00000000001_cppui316, 0x00),
+                        underlying_type(0xCD70CB3FC936348D0351D498233F1FE379531411832232F6648A9A9FC0B9C4E3E21B7467077C05853E2C1BE0E9FC32_cppui376, 0x00),
+
+                        underlying_type(0x1AE3A4617C510EAC63B05C06CA1493B1A22D9F300F5138F1EF3622FBA094800170B5D44300000008508C00000000000_cppui377, 0x00),
+                        underlying_type(0x165715080792691229252027773188420350858440463845631411558924158284924566418821255823372982649037525009328560463824_cppui377, 0x00),
+                        underlying_type(0x1AE3A4617C510EABC8756BA8F8C524EB8882A75CC9BC8E359064EE822FB5BFFD1E945779FFFFFFFFFFFFFFFFFFFFFFF_cppui377, 0x00),
+                        underlying_type(0x4630059E5FD9200575D0E552278A89DA1F40FDF62334CD620D1860769E389D7DB2D8EA700D82721691EA130EC6E39E_cppui375, 0x00),
+                        underlying_type(0x1AE3A4617C510EABC8756BA8F8C524EB8882A75CC9BC8E359064EE822FB5BFFD1E94577A00000000000000000000000_cppui377, 0x00),
+                        underlying_type(0xE0C97AD7FBDAB63937B3EBD47E0A1B36A986DEEF71F15C288ED7951A488E3B332941CFC8F883FAFFCA93E41F1603CF_cppui376, 0x00)
+                    };
 
                     constexpr static const std::array<modulus_type, 2> non_residue = {0, 1};
                 };
