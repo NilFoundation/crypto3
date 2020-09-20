@@ -59,13 +59,13 @@ namespace nil {
                     constexpr static const std::array<modulus_type, 3> nqr_to_t = 
                         {0x118228ECB464A2F6EB8DACC18FA757E45B3989330150C_cppui177, 0x00, 0x00};
 
-                    constexpr static const std::array<underlying_type, 3> Frobenius_coeffs_c1 = {underlying_type(0x01),
-                        underlying_type(0xB35E3665A18365954D018902935D4419423F84321BC3D_cppui180),
-                        underlying_type(0x35A01936D02124BA36C236460AF76D755745133CDE43C3_cppui182)};
+                    constexpr static const std::array<non_residue_type, 3> Frobenius_coeffs_c1 = {non_residue_type(0x01),
+                        non_residue_type(0xB35E3665A18365954D018902935D4419423F84321BC3D_cppui180),
+                        non_residue_type(0x35A01936D02124BA36C236460AF76D755745133CDE43C3_cppui182)};
 
-                    constexpr static const std::array<underlying_type, 3> Frobenius_coeffs_c2 = {underlying_type(0x01),
-                        underlying_type(0x35A01936D02124BA36C236460AF76D755745133CDE43C3_cppui182),
-                        underlying_type(0xB35E3665A18365954D018902935D4419423F84321BC3D_cppui180)};
+                    constexpr static const std::array<non_residue_type, 3> Frobenius_coeffs_c2 = {non_residue_type(0x01),
+                        non_residue_type(0x35A01936D02124BA36C236460AF76D755745133CDE43C3_cppui182),
+                        non_residue_type(0xB35E3665A18365954D018902935D4419423F84321BC3D_cppui180)};
 
                     constexpr static const modulus_type non_residue = modulus_type(0x3D);
                 };
@@ -86,12 +86,12 @@ namespace nil {
                     typedef element_fp<policy_type> non_residue_type;
                     typedef element_fp3<fp3_extension_params<field_type>> underlying_type;
 
-                    constexpr static const std::array<underlying_type, 6> Frobenius_coeffs_c1 = {underlying_type(0x01),
-                        underlying_type(0xB35E3665A18365954D018902935D4419423F84321BC3E_cppui180),
-                        underlying_type(0xB35E3665A18365954D018902935D4419423F84321BC3D_cppui180),
-                        underlying_type(0x40D5FC9D2A395B138B924ED6342D41B6EB690B80000000_cppui183),
-                        underlying_type(0x35A01936D02124BA36C236460AF76D755745133CDE43C3_cppui182),
-                        underlying_type(0x35A01936D02124BA36C236460AF76D755745133CDE43C4_cppui182)};
+                    constexpr static const std::array<non_residue_type, 6> Frobenius_coeffs_c1 = {non_residue_type(0x01),
+                        non_residue_type(0xB35E3665A18365954D018902935D4419423F84321BC3E_cppui180),
+                        non_residue_type(0xB35E3665A18365954D018902935D4419423F84321BC3D_cppui180),
+                        non_residue_type(0x40D5FC9D2A395B138B924ED6342D41B6EB690B80000000_cppui183),
+                        non_residue_type(0x35A01936D02124BA36C236460AF76D755745133CDE43C3_cppui182),
+                        non_residue_type(0x35A01936D02124BA36C236460AF76D755745133CDE43C4_cppui182)};
 
                     constexpr static const modulus_type non_residue = modulus_type(0x3D);
                 };
