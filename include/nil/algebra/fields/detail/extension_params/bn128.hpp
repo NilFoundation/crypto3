@@ -103,14 +103,14 @@ namespace nil {
                         non_residue_type(0x00, 0x00),
                         non_residue_type(0x00, 0x00)};*/
 
-                    constexpr static const std::array<modulus_type, 6> Frobenius_coeffs_c1 = {0x00, 0x00,
+                    constexpr static const std::array<modulus_type, 6*2> Frobenius_coeffs_c1 = {0x00, 0x00,
                         0x00, 0x00,
                         0x00, 0x00,
                         0x00, 0x00,
                         0x00, 0x00,
                         0x00, 0x00};
 
-                    constexpr static const std::array<modulus_type, 6> Frobenius_coeffs_c2 = {0x00, 0x00,
+                    constexpr static const std::array<modulus_type, 6*2> Frobenius_coeffs_c2 = {0x00, 0x00,
                         0x00, 0x00,
                         0x00, 0x00,
                         0x00, 0x00,
@@ -149,7 +149,7 @@ namespace nil {
                         non_residue_type(0x00, 0x00),
                         non_residue_type(0x00, 0x00)};*/
 
-                    constexpr static const std::array<modulus_type, 12> Frobenius_coeffs_c1 = {0x00, 0x00,
+                    constexpr static const std::array<modulus_type, 12*2> Frobenius_coeffs_c1 = {0x00, 0x00,
                         0x00, 0x00,
                         0x00, 0x00,
                         0x00, 0x00,

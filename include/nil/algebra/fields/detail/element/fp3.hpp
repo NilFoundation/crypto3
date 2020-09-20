@@ -205,6 +205,9 @@ namespace nil {
                         return element_fp3({data[0], 
                                             non_residue_type(policy_type::Frobenius_coeffs_c1[pwr % 3]) * data[1],
                                             non_residue_type(policy_type::Frobenius_coeffs_c2[pwr % 3]) * data[2]});
+                        //return element_fp3({data[0], 
+                        //                    policy_type::Frobenius_coeffs_c1[pwr % 3] * data[1],
+                        //                    policy_type::Frobenius_coeffs_c2[pwr % 3] * data[2]});
                     }
 
                 };
