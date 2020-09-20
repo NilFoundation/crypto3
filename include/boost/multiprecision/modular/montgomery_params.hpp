@@ -97,15 +97,13 @@ class montgomery_params : public base_params<Backend>
  public:
    constexpr montgomery_params() : base_params<Backend>(), m_p_dash(), m_p_words() {}
 
-
-
    template <typename Number>
    constexpr explicit montgomery_params(const Number& p) : base_params<Backend>(p), m_p_dash(), m_p_words()
    {
       initialize_montgomery_params(p);
    }
 
-   constexpr  const number_type& r2() const { return m_r2; }
+   constexpr const number_type& r2() const { return m_r2; }
 
    constexpr limb_type p_dash() const { return m_p_dash; }
 
@@ -138,7 +136,7 @@ class montgomery_params : public base_params<Backend>
       {
          z[i] = result.limbs()[i];
       }
-/*
+      /*
       if (result.size() < z_size)
       {
          result.resize(z_size, z_size);
@@ -194,94 +192,94 @@ class montgomery_params : public base_params<Backend>
       result.normalize();
    }
 
-    //template<bool c, typename Dummy>
-    //inline typename std::enable_if<c && sizeof(Dummy)>::type eval_montgomery_reduce (Backend& result) const
+   //template<bool c, typename Dummy>
+   //inline typename std::enable_if<c && sizeof(Dummy)>::type eval_montgomery_reduce (Backend& result) const
 
-    inline void eval_montgomery_reduce_run_time (Backend& result) const
-    {
-        using default_ops::eval_lt;
-        using default_ops::eval_multiply_add;
+   inline void eval_montgomery_reduce_run_time(Backend& result) const
+   {
+      using default_ops::eval_lt;
+      using default_ops::eval_multiply_add;
 
-        typedef cpp_int_backend<sizeof(limb_type) * CHAR_BIT * 3, sizeof(limb_type) * CHAR_BIT * 3, unsigned_magnitude, unchecked, void> cpp_three_int_backend;
+      typedef cpp_int_backend<sizeof(limb_type) * CHAR_BIT * 3, sizeof(limb_type) * CHAR_BIT * 3, unsigned_magnitude, unchecked, void> cpp_three_int_backend;
 
-        const size_t    p_size = m_p_words;
-        const limb_type p_dash = m_p_dash;
-        const size_t    z_size = 2 * (p_words() + 1);
+      const size_t    p_size = m_p_words;
+      const limb_type p_dash = m_p_dash;
+      const size_t    z_size = 2 * (p_words() + 1);
 
-        container::vector<limb_type> z(result.size(), 0); //container::vector<limb_type, alloc> z(result.size(), 0);
-        for (size_t i = 0; i < result.size(); ++i)
-        {
-            z[i] = result.limbs()[i];
-        }
+      container::vector<limb_type> z(result.size(), 0); //container::vector<limb_type, alloc> z(result.size(), 0);
+      for (size_t i = 0; i < result.size(); ++i)
+      {
+         z[i] = result.limbs()[i];
+      }
 
-        if (result.size() < z_size)
-        {
-            result.resize(z_size, z_size);
-            z.resize(z_size, 0);
-        }
+      if (result.size() < z_size)
+      {
+         result.resize(z_size, z_size);
+         z.resize(z_size, 0);
+      }
 
-        cpp_three_int_backend w(z[0]);
+      cpp_three_int_backend w(z[0]);
 
-        result.limbs()[0] = w.limbs()[0] * p_dash;
+      result.limbs()[0] = w.limbs()[0] * p_dash;
 
-        eval_multiply_add(w, result.limbs()[0], this->m_mod.backend().limbs()[0]);
-        eval_right_shift(w, sizeof(limb_type) * CHAR_BIT);
+      eval_multiply_add(w, result.limbs()[0], this->m_mod.backend().limbs()[0]);
+      eval_right_shift(w, sizeof(limb_type) * CHAR_BIT);
 
-        for (size_t i = 1; i != p_size; ++i)
-        {
-            for (size_t j = 0; j < i; ++j)
-            {
-                eval_multiply_add(w, result.limbs()[j], this->m_mod.backend().limbs()[i - j]);
-            }
+      for (size_t i = 1; i != p_size; ++i)
+      {
+         for (size_t j = 0; j < i; ++j)
+         {
+            eval_multiply_add(w, result.limbs()[j], this->m_mod.backend().limbs()[i - j]);
+         }
 
-            eval_add(w, z[i]);
+         eval_add(w, z[i]);
 
-            result.limbs()[i] = w.limbs()[0] * p_dash;
+         result.limbs()[i] = w.limbs()[0] * p_dash;
 
-            eval_multiply_add(w, result.limbs()[i], this->m_mod.backend().limbs()[0]);
+         eval_multiply_add(w, result.limbs()[i], this->m_mod.backend().limbs()[0]);
 
-            eval_right_shift(w, sizeof(limb_type) * CHAR_BIT);
-        }
+         eval_right_shift(w, sizeof(limb_type) * CHAR_BIT);
+      }
 
-        for (size_t i = 0; i != p_size; ++i)
-        {
-            for (size_t j = i + 1; j != p_size; ++j)
-            {
-                eval_multiply_add(w, result.limbs()[j], this->m_mod.backend().limbs()[p_size + i - j]);
-            }
+      for (size_t i = 0; i != p_size; ++i)
+      {
+         for (size_t j = i + 1; j != p_size; ++j)
+         {
+            eval_multiply_add(w, result.limbs()[j], this->m_mod.backend().limbs()[p_size + i - j]);
+         }
 
-            eval_add(w, z[p_size + i]);
+         eval_add(w, z[p_size + i]);
 
-            result.limbs()[i] = w.limbs()[0];
+         result.limbs()[i] = w.limbs()[0];
 
-            eval_right_shift(w, sizeof(limb_type) * CHAR_BIT);
-        }
+         eval_right_shift(w, sizeof(limb_type) * CHAR_BIT);
+      }
 
-        eval_add(w, z[z_size - 1]);
+      eval_add(w, z[z_size - 1]);
 
-        result.limbs()[p_size]     = w.limbs()[0];
-        result.limbs()[p_size + 1] = w.limbs()[1];
+      result.limbs()[p_size]     = w.limbs()[0];
+      result.limbs()[p_size + 1] = w.limbs()[1];
 
-        if (result.size() != p_size + 1)
-        {
-            result.resize(p_size + 1, p_size + 1);
-        }
-        result.normalize();
-    }
+      if (result.size() != p_size + 1)
+      {
+         result.resize(p_size + 1, p_size + 1);
+      }
+      result.normalize();
+   }
 
-    template<bool c, typename Dummy>
-    constexpr typename std::enable_if<!(c && sizeof(Dummy))>::type eval_montgomery_reduce (Backend& result) const
-    {
-        eval_montgomery_reduce_compile_time(result);
-    }
+   template <bool c, typename Dummy>
+   constexpr typename std::enable_if<!(c && sizeof(Dummy))>::type eval_montgomery_reduce(Backend& result) const
+   {
+      eval_montgomery_reduce_compile_time(result);
+   }
 
-    template<bool c, typename Dummy>
-    constexpr typename std::enable_if<c && sizeof(Dummy)>::type eval_montgomery_reduce (Backend& result) const
-    {
-        eval_montgomery_reduce_run_time(result);
-    }
+   template <bool c, typename Dummy>
+   constexpr typename std::enable_if<c && sizeof(Dummy)>::type eval_montgomery_reduce(Backend& result) const
+   {
+      eval_montgomery_reduce_run_time(result);
+   }
 
-protected:
+ protected:
    number_type m_r2;
    limb_type   m_p_dash;
    size_t      m_p_words;

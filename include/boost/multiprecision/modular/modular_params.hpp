@@ -80,7 +80,7 @@ class modular_params : public backends::montgomery_params<Backend>, public backe
       result = input;
       if (get_mod() % 2 != 0)
       {
-         this->template eval_montgomery_reduce<std::integral_constant<int, eval_montgomery_reduce_compile_time(result)>::value, int>(result);
+         this->template eval_montgomery_reduce<std::integral_constant<int, backends::montgomery_params<Backend>::eval_montgomery_reduce_compile_time(result)>::value, int>(result);
       }
    }
 
