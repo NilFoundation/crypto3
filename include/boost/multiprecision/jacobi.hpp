@@ -15,7 +15,7 @@ namespace boost {
 namespace multiprecision {
 
 template <typename Backend>
-inline int eval_jacobi(const Backend& a, const Backend& n)
+constexpr int eval_jacobi(const Backend& a, const Backend& n)
 {
    using default_ops::eval_divide;
    using default_ops::eval_get_sign;
@@ -90,7 +90,7 @@ inline int eval_jacobi(const Backend& a, const Backend& n)
  * @return (n / m)
  */
 template <typename Backend, expression_template_option ExpressionTemplates>
-inline typename enable_if_c<number_category<Backend>::value == number_kind_integer, int>::type jacobi(
+constexpr typename enable_if_c<number_category<Backend>::value == number_kind_integer, int>::type jacobi(
     const number<Backend, ExpressionTemplates>& a, const number<Backend, ExpressionTemplates>& n)
 {
    return eval_jacobi(a.backend(), n.backend());

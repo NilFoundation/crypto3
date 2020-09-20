@@ -29,11 +29,11 @@ class modular_params<tommath_int> : public backends::base_params<tommath_int>
    modular_params() : backends::base_params<tommath_int>(){};
 
    template <typename Number>
-   explicit modular_params(const Number& p) : backends::base_params<tommath_int>(number_type(p))
+   constexpr explicit modular_params(const Number& p) : backends::base_params<tommath_int>(number_type(p))
    {
    }
 
-   modular_params& operator=(const modular_params<tommath_int>& v) {
+   constexpr modular_params& operator=(const modular_params<tommath_int>& v) {
       backends::base_params<tommath_int>::m_mod = v.get_mod();
       return *this;
    }
@@ -56,7 +56,7 @@ class modular_params<tommath_int> : public backends::base_params<tommath_int>
       backends::detail::check_tommath_result(mp_mod(const_cast< ::mp_int*>(&result.data()), const_cast< ::mp_int*>(&get_mod().backend().data()), &result.data()));
    }
 
-   inline void adjust_regular(tommath_int& result, const tommath_int& input) const
+   constexpr  void adjust_regular(tommath_int& result, const tommath_int& input) const
    {
       result = input;
    }
@@ -67,7 +67,7 @@ class modular_params<tommath_int> : public backends::base_params<tommath_int>
    }
 
    template <typename BackendT, expression_template_option ExpressionTemplates>
-   operator number<BackendT, ExpressionTemplates>()
+   constexpr operator number<BackendT, ExpressionTemplates>()
    {
       return this->m_mod;
    };

@@ -21,21 +21,21 @@ class base_params
 
  protected:
    template <typename Number>
-   inline void initialize_base_params(const Number& mod)
+   constexpr void initialize_base_params(const Number& mod)
    {
       m_mod = mod;
    }
 
  public:
-   base_params() {}
+   constexpr base_params() {}
 
    template <typename Number>
-   explicit base_params(const Number& p)
+   constexpr explicit base_params(const Number& p)
    {
       initialize_base_params(p);
    }
 
-   inline const number_type& mod() const { return m_mod; }
+   constexpr const number_type& mod() const { return m_mod; }
 
  protected:
    number_type m_mod;

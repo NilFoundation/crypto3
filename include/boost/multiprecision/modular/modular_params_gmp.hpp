@@ -29,11 +29,11 @@ class modular_params<gmp_int> : public backends::base_params<gmp_int>
    modular_params() : backends::base_params<gmp_int>(){};
 
    template <typename Number>
-   explicit modular_params(const Number& p) : backends::base_params<gmp_int>(number_type(p))
+   constexpr explicit modular_params(const Number& p) : backends::base_params<gmp_int>(number_type(p))
    {
    }
 
-   modular_params& operator=(const modular_params<gmp_int>& v) {
+    constexpr modular_params& operator=(const modular_params<gmp_int>& v) {
       backends::base_params<gmp_int>::m_mod = v.get_mod();
       return *this;
    }
@@ -56,7 +56,7 @@ class modular_params<gmp_int> : public backends::base_params<gmp_int>
       mpz_mod(result.data(), result.data(), get_mod().backend().data());
    }
 
-   inline void adjust_regular(gmp_int& result, const gmp_int& input) const
+   constexpr void adjust_regular(gmp_int& result, const gmp_int& input) const
    {
       result = input;
    }
@@ -67,7 +67,7 @@ class modular_params<gmp_int> : public backends::base_params<gmp_int>
    }
 
    template <typename BackendType, expression_template_option ExpressionTemplates>
-   inline operator number<BackendType, ExpressionTemplates>()
+   constexpr operator number<BackendType, ExpressionTemplates>()
    {
       return this->m_mod;
    };

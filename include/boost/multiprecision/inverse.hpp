@@ -22,14 +22,14 @@ namespace boost {
 namespace multiprecision {
 
 template <typename Backend, expression_template_option ExpressionTemplates>
-number<Backend, ExpressionTemplates> inverse_extended_euclidean_algorithm(
+constexpr number<Backend, ExpressionTemplates> inverse_extended_euclidean_algorithm(
     const number<Backend, ExpressionTemplates>& n, const number<Backend, ExpressionTemplates>& mod)
 {
    return number<Backend, ExpressionTemplates>(backends::eval_inverse_extended_euclidean_algorithm(n.backend(), mod.backend()));
 }
 
 template <typename Backend, expression_template_option ExpressionTemplates>
-number<modular_adaptor<Backend>, ExpressionTemplates> inverse_extended_euclidean_algorithm(
+constexpr number<modular_adaptor<Backend>, ExpressionTemplates> inverse_extended_euclidean_algorithm(
     const number<modular_adaptor<Backend>, ExpressionTemplates>& modular)
 {
    number<Backend, ExpressionTemplates> new_base, res;
@@ -43,7 +43,7 @@ number<modular_adaptor<Backend>, ExpressionTemplates> inverse_extended_euclidean
 }
 
 template <typename Backend, expression_template_option ExpressionTemplates>
-number<Backend, ExpressionTemplates> monty_inverse(const number<Backend, ExpressionTemplates>& a,
+constexpr number<Backend, ExpressionTemplates> monty_inverse(const number<Backend, ExpressionTemplates>& a,
                                                    const number<Backend, ExpressionTemplates>& p,
                                                    const number<Backend, ExpressionTemplates>& k)
 {

@@ -34,52 +34,52 @@ class modular_adaptor
    modular_params<Backend> m_mod;
 
  public:
-   inline Backend& base_data() { return m_base; }
+   constexpr Backend& base_data() { return m_base; }
 
-   inline Backend const& base_data() const { return m_base; }
+   constexpr Backend const& base_data() const { return m_base; }
 
-   inline modular_params<Backend>& mod_data() { return m_mod; }
+   constexpr modular_params<Backend>& mod_data() { return m_mod; }
 
-   inline const modular_params<Backend>& mod_data() const { return m_mod; }
+   constexpr const modular_params<Backend>& mod_data() const { return m_mod; }
 
    typedef typename Backend::signed_types   signed_types;
    typedef typename Backend::unsigned_types unsigned_types;
 
-   modular_adaptor() {}
+   constexpr modular_adaptor() {}
 
-   modular_adaptor(const modular_adaptor& o) : m_base(o.base_data()), m_mod(o.mod_data())
+   constexpr modular_adaptor(const modular_adaptor& o) : m_base(o.base_data()), m_mod(o.mod_data())
    {
    }
 
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
 
-   modular_adaptor(modular_adaptor&& o)
+   constexpr modular_adaptor(modular_adaptor&& o)
        : m_base(std::move(o.base_data())), m_mod(std::move(o.mod_data()))
    {}
 
 #endif
-   modular_adaptor(const Backend& val, const modular_params<Backend>& mod) : m_mod(mod), m_base(mod.create_internal_representation(val))
+   constexpr modular_adaptor(const Backend& val, const modular_params<Backend>& mod) : m_mod(mod), m_base(mod.create_internal_representation(val))
    {
 
    }
 
-   modular_adaptor(const Backend& val, const Backend& mod)
+   constexpr modular_adaptor(const Backend& val, const Backend& mod)
        : m_base(val), m_mod(mod)
    {
    }
 
-   modular_adaptor(Backend& val, Backend& mod)
+   constexpr modular_adaptor(Backend& val, Backend& mod)
        : m_base(val), m_mod(mod) {}
 
-   modular_adaptor(const Backend& val) : m_base(val), m_mod(typename mpl::front<unsigned_types>::type(0u))
+   constexpr modular_adaptor(const Backend& val) : m_base(val), m_mod(typename mpl::front<unsigned_types>::type(0u))
    {
    }
 
-   modular_adaptor(const modular_params<Backend>& mod) : m_base(typename mpl::front<unsigned_types>::type(0u)), m_mod(mod)
+   constexpr modular_adaptor(const modular_params<Backend>& mod) : m_base(typename mpl::front<unsigned_types>::type(0u)), m_mod(mod)
    {
    }
 
-   modular_adaptor& operator=(const modular_adaptor& o)
+   constexpr modular_adaptor& operator=(const modular_adaptor& o)
    {
       m_base = o.base_data();
       m_mod = o.mod_data();
@@ -88,7 +88,7 @@ class modular_adaptor
 
 #ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
 
-   modular_adaptor& operator=(modular_adaptor&& o)
+   constexpr modular_adaptor& operator=(modular_adaptor&& o)
 
        BOOST_NOEXCEPT
    {
@@ -139,7 +139,7 @@ class modular_adaptor
       return *this;
    }
 
-   int compare(const modular_adaptor& o) const
+   constexpr int compare(const modular_adaptor& o) const
    {
       // They are either equal or not:<
       if (m_mod.compare(o.mod_data()) != 0)
@@ -153,7 +153,7 @@ class modular_adaptor
    }
 
    template <class T>
-   int compare(const T& val) const
+   constexpr int compare(const T& val) const
    {
       using default_ops::eval_lt;
       if (!eval_lt(m_mod, val))
@@ -165,7 +165,7 @@ class modular_adaptor
       return tmp.compare(val);
    }
 
-   inline void swap(modular_adaptor& o)
+   constexpr void swap(modular_adaptor& o)
    {
       base_data().swap(o.base_data());
       std::swap(mod_data(), o.mod_data());
@@ -178,28 +178,28 @@ class modular_adaptor
       return tmp.str(dig, f);
    }
 
-   inline void negate()
+   constexpr void negate()
    {
       base_data().negate();
       eval_add(base_data(), mod_data().get_mod().backend());
    }
 
    template <typename BackendT, expression_template_option ExpressionTemplates>
-   operator number<BackendT, ExpressionTemplates>()
+   constexpr operator number<BackendT, ExpressionTemplates>()
    {
       return base_data();
    };
 };
 
 template <class Result, class Backend>
-inline void eval_convert_to(Result* result, const modular_adaptor<Backend>& val)
+constexpr void eval_convert_to(Result* result, const modular_adaptor<Backend>& val)
 {
    using default_ops::eval_convert_to;
    eval_convert_to(result, val.base_data());
 }
 
 template <class Backend, class T>
-inline typename enable_if<is_arithmetic<T>, bool>
+constexpr typename enable_if<is_arithmetic<T>, bool>
 
     ::type eval_eq(const modular_adaptor<Backend>& a,
                    const T&                        b)
@@ -210,13 +210,13 @@ inline typename enable_if<is_arithmetic<T>, bool>
 }
 
 template <class Backend>
-inline void eval_redc(Backend& result, const modular_params<Backend>& mod)
+constexpr void eval_redc(Backend& result, const modular_params<Backend>& mod)
 {
    mod.reduce(result);
 }
 
 template <class Backend>
-inline void eval_add(modular_adaptor<Backend>&       result,
+constexpr void eval_add(modular_adaptor<Backend>&       result,
                      const modular_adaptor<Backend>& o)
 {
    BOOST_ASSERT(result.mod_data().get_mod() == o.mod_data().get_mod());
@@ -229,7 +229,7 @@ inline void eval_add(modular_adaptor<Backend>&       result,
 }
 
 template <class Backend>
-inline void eval_subtract(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& o)
+constexpr void eval_subtract(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& o)
 {
    BOOST_ASSERT(result.mod_data().get_mod() == o.mod_data().get_mod());
    typedef typename mpl::front<typename Backend::unsigned_types>::type ui_type;
@@ -242,7 +242,7 @@ inline void eval_subtract(modular_adaptor<Backend>& result, const modular_adapto
 }
 
 template <class Backend>
-inline void eval_multiply(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& o)
+constexpr void eval_multiply(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& o)
 {
    BOOST_ASSERT(result.mod_data().get_mod() == o.mod_data().get_mod());
    eval_multiply(result.base_data(), o.base_data());
@@ -250,7 +250,7 @@ inline void eval_multiply(modular_adaptor<Backend>& result, const modular_adapto
 }
 
 template <class Backend>
-inline void eval_divide(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& o)
+constexpr void eval_divide(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& o)
 {
    BOOST_ASSERT(result.mod_data().get_mod() == o.mod_data().get_mod());
    Backend tmp1, tmp2;
@@ -263,7 +263,7 @@ inline void eval_divide(modular_adaptor<Backend>& result, const modular_adaptor<
 }
 
 template <class Backend>
-inline void eval_modulus(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& o)
+constexpr void eval_modulus(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& o)
 {
    BOOST_ASSERT(result.mod_data().get_mod() == o.mod_data().get_mod());
    Backend tmp1, tmp2;
@@ -276,7 +276,7 @@ inline void eval_modulus(modular_adaptor<Backend>& result, const modular_adaptor
 }
 
 template <class Backend>
-inline bool eval_is_zero(const modular_adaptor<Backend>& val)
+constexpr bool eval_is_zero(const modular_adaptor<Backend>& val)
 
     BOOST_NOEXCEPT
 {
@@ -285,13 +285,13 @@ inline bool eval_is_zero(const modular_adaptor<Backend>& val)
 }
 
 template <class Backend>
-inline int eval_get_sign(const modular_adaptor<Backend>&)
+constexpr int eval_get_sign(const modular_adaptor<Backend>&)
 {
    return 1;
 }
 
 template <class Result, class Backend>
-inline typename disable_if_c<boost::is_complex<Result>::value>::type
+constexpr typename disable_if_c<boost::is_complex<Result>::value>::type
 eval_convert_to(Result* result, const modular_adaptor<Backend>& val)
 {
    using default_ops::eval_convert_to;
@@ -299,7 +299,7 @@ eval_convert_to(Result* result, const modular_adaptor<Backend>& val)
 }
 
 template <class Backend, class T, class V>
-inline void assign_components(modular_adaptor<Backend>& result,
+constexpr void assign_components(modular_adaptor<Backend>& result,
                               const T& a, const V& b)
 {
    result.base_data() = a;
@@ -308,14 +308,14 @@ inline void assign_components(modular_adaptor<Backend>& result,
 }
 
 template <class Backend>
-inline void eval_sqrt(modular_adaptor<Backend>&       result,
+constexpr void eval_sqrt(modular_adaptor<Backend>&       result,
                       const modular_adaptor<Backend>& val)
 {
    eval_sqrt(result.base_data(), val.base_data());
 }
 
 template <class Backend>
-inline void eval_abs(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& val)
+constexpr void eval_abs(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& val)
 {
    result = val;
 }
@@ -421,7 +421,7 @@ inline void find_modular_pow(modular_adaptor<Backend>&       result,
 }
 
 template <class Backend>
-inline void eval_pow(modular_adaptor<Backend>&       result,
+constexpr void eval_pow(modular_adaptor<Backend>&       result,
                      const modular_adaptor<Backend>& b,
                      const modular_adaptor<Backend>& e)
 {
@@ -431,7 +431,7 @@ inline void eval_pow(modular_adaptor<Backend>&       result,
 }
 
 template <class Backend>
-inline void eval_pow(modular_adaptor<Backend>&       result,
+constexpr void eval_pow(modular_adaptor<Backend>&       result,
                      const modular_adaptor<Backend>& b,
                      const Backend&                  e)
 {
@@ -440,7 +440,7 @@ inline void eval_pow(modular_adaptor<Backend>&       result,
 }
 
 template <class Backend, class UI>
-inline void eval_left_shift(modular_adaptor<Backend>& t, UI i)
+constexpr void eval_left_shift(modular_adaptor<Backend>& t, UI i)
 {
    using default_ops::eval_left_shift;
    Backend tmp;
@@ -449,8 +449,9 @@ inline void eval_left_shift(modular_adaptor<Backend>& t, UI i)
    t.base_data() = tmp;
    t.mod_data().adjust_modular(t.base_data());
 }
+
 template <class Backend, class UI>
-inline void eval_right_shift(modular_adaptor<Backend>& t, UI i)
+constexpr void eval_right_shift(modular_adaptor<Backend>& t, UI i)
 {
    using default_ops::eval_right_shift;
    Backend tmp;
@@ -459,8 +460,9 @@ inline void eval_right_shift(modular_adaptor<Backend>& t, UI i)
    t.base_data() = tmp;
    t.mod_data().adjust_modular(t.base_data());
 }
+
 template <class Backend, class UI>
-inline void eval_left_shift(modular_adaptor<Backend>& t, const modular_adaptor<Backend>& v, UI i)
+constexpr void eval_left_shift(modular_adaptor<Backend>& t, const modular_adaptor<Backend>& v, UI i)
 {
    using default_ops::eval_left_shift;
    Backend tmp1, tmp2;
@@ -470,8 +472,9 @@ inline void eval_left_shift(modular_adaptor<Backend>& t, const modular_adaptor<B
    t.base_data() = tmp1;
    t.mod_data().adjust_modular(t.base_data());
 }
+
 template <class Backend, class UI>
-inline void eval_right_shift(modular_adaptor<Backend>& t, const modular_adaptor<Backend>& v, UI i)
+constexpr void eval_right_shift(modular_adaptor<Backend>& t, const modular_adaptor<Backend>& v, UI i)
 {
    using default_ops::eval_right_shift;
    Backend tmp1, tmp2;
@@ -483,7 +486,7 @@ inline void eval_right_shift(modular_adaptor<Backend>& t, const modular_adaptor<
 }
 
 template <class Backend>
-inline void eval_bitwise_and(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& v)
+constexpr void eval_bitwise_and(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& v)
 {
    using default_ops::eval_bitwise_and;
    Backend tmp1, tmp2;
@@ -495,7 +498,7 @@ inline void eval_bitwise_and(modular_adaptor<Backend>& result, const modular_ada
 }
 
 template <class Backend>
-inline void eval_bitwise_or(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& v)
+constexpr void eval_bitwise_or(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& v)
 {
    using default_ops::eval_bitwise_or;
    Backend tmp1, tmp2;
@@ -507,7 +510,7 @@ inline void eval_bitwise_or(modular_adaptor<Backend>& result, const modular_adap
 }
 
 template <class Backend>
-inline void eval_bitwise_xor(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& v)
+constexpr void eval_bitwise_xor(modular_adaptor<Backend>& result, const modular_adaptor<Backend>& v)
 {
    using default_ops::eval_bitwise_xor;
    Backend tmp1, tmp2;

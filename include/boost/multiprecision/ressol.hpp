@@ -20,7 +20,7 @@ namespace boost {
 namespace multiprecision {
 
 template <typename Backend>
-inline Backend eval_ressol(const Backend& a, const Backend& p)
+constexpr Backend eval_ressol(const Backend& a, const Backend& p)
 {
 
    using default_ops::eval_add;
@@ -185,7 +185,7 @@ inline Backend eval_ressol(const Backend& a, const Backend& p)
  * @return y such that (y*y)%p == x, or -1 if no such integer
  */
 template <typename Backend, expression_template_option ExpressionTemplates>
-inline number<Backend, ExpressionTemplates>
+constexpr number<Backend, ExpressionTemplates>
 ressol(const number<Backend, ExpressionTemplates>& a,
        const number<Backend, ExpressionTemplates>& p)
 {
@@ -202,7 +202,7 @@ ressol(const number<Backend, ExpressionTemplates>& a,
  */
 
 template <typename Backend, expression_template_option ExpressionTemplates>
-number<modular_adaptor<Backend>, ExpressionTemplates> ressol(
+constexpr number<modular_adaptor<Backend>, ExpressionTemplates> ressol(
     const number<modular_adaptor<Backend>, ExpressionTemplates>& modular)
 {
    number<Backend, ExpressionTemplates> new_base, res;
