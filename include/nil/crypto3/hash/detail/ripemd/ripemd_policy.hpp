@@ -33,11 +33,14 @@ namespace nil {
                     constexpr static const std::size_t digest_bits = DigestBits;
                     typedef static_digest<digest_bits> digest_type;
 
-                    constexpr static const std::uint8_t ieee1363_hash_id = 0x33;
-                    typedef std::array<std::uint8_t, 15> pkcs_id_type;
+                    constexpr static const std::uint8_t ieee1363_hash_id = 0x00;
 
-                    constexpr static const pkcs_id_type pkcs_id = {0x30, 0x21, 0x30, 0x09, 0x06, 0x05, 0x2B, 0x0E,
-                                                                   0x03, 0x02, 0x1A, 0x05, 0x00, 0x04, 0x14};
+                    constexpr static const std::size_t pkcs_id_size = 15;
+                    constexpr static const std::size_t pkcs_id_bits = pkcs_id_size * CHAR_BIT;
+                    typedef std::array<std::uint8_t, pkcs_id_size> pkcs_id_type;
+
+                    constexpr static const pkcs_id_type pkcs_id = {0x30, 0x21, 0x30, 0x09, 0x06, 0x05, 0x2B, 0x24,
+                                                                   0x03, 0x02, 0x01, 0x05, 0x00, 0x04, 0x14};
 
                     constexpr static const std::size_t key_indexes_size = 80;
                     typedef std::array<byte_type, key_indexes_size> key_indexes_type;
@@ -85,17 +88,23 @@ namespace nil {
                 constexpr typename basic_ripemd_policy<DigestSize>::key_indexes_type const
                     basic_ripemd_policy<DigestSize>::s2;
 
+                template<std::size_t DigestSize>
+                constexpr typename basic_ripemd_policy<DigestSize>::pkcs_id_type const
+                    basic_ripemd_policy<DigestSize>::pkcs_id;
+
                 template<std::size_t DigestBits>
                 struct ripemd_policy : public basic_ripemd_policy<DigestBits> { };
 
                 template<>
                 struct ripemd_policy<128> : public basic_ripemd_policy<128> {
                     constexpr static const std::size_t word_bits = basic_ripemd_policy<128>::word_bits;
-                    // typedef basic_ripemd_policy<128>::word_type word_type;
+                    typedef typename basic_ripemd_policy<128>::word_type word_type;
 
                     constexpr static const std::size_t state_words = 4;
                     constexpr static const std::size_t state_bits = state_words * word_bits;
                     typedef std::array<word_type, state_words> state_type;
+
+                    constexpr static const std::uint8_t ieee1363_hash_id = 0x00;
 
                     struct iv_generator {
                         state_type const &operator()() const {
@@ -108,11 +117,13 @@ namespace nil {
                 template<>
                 struct ripemd_policy<160> : public basic_ripemd_policy<160> {
                     constexpr static const std::size_t word_bits = basic_ripemd_policy<160>::word_bits;
-                    // typedef basic_ripemd_policy<160>::word_type word_type;
+                     typedef typename basic_ripemd_policy<160>::word_type word_type;
 
                     constexpr static const std::size_t state_words = 5;
                     constexpr static const std::size_t state_bits = state_words * word_bits;
                     typedef std::array<word_type, state_words> state_type;
+
+                    constexpr static const std::uint8_t ieee1363_hash_id = 0x31;
 
                     struct iv_generator {
                         state_type const &operator()() const {
@@ -125,11 +136,13 @@ namespace nil {
                 template<>
                 struct ripemd_policy<256> : public basic_ripemd_policy<256> {
                     constexpr static const std::size_t word_bits = basic_ripemd_policy<256>::word_bits;
-                    // typedef basic_ripemd_policy<256>::word_type word_type;
+                     typedef typename basic_ripemd_policy<256>::word_type word_type;
 
                     constexpr static const std::size_t state_words = 8;
                     constexpr static const std::size_t state_bits = state_words * word_bits;
                     typedef std::array<word_type, state_words> state_type;
+
+                    constexpr static const std::uint8_t ieee1363_hash_id = 0x00;
 
                     struct iv_generator {
                         state_type const &operator()() const {
@@ -143,11 +156,13 @@ namespace nil {
                 template<>
                 struct ripemd_policy<320> : public basic_ripemd_policy<320> {
                     constexpr static const std::size_t word_bits = basic_ripemd_policy<320>::word_bits;
-                    // typedef basic_ripemd_policy<320>::word_type word_type;
+                     typedef typename basic_ripemd_policy<320>::word_type word_type;
 
                     constexpr static const std::size_t state_words = 10;
                     constexpr static const std::size_t state_bits = state_words * word_bits;
                     typedef std::array<word_type, state_words> state_type;
+
+                    constexpr static const std::uint8_t ieee1363_hash_id = 0x00;
 
                     struct iv_generator {
                         state_type const &operator()() const {

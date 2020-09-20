@@ -40,6 +40,13 @@ namespace nil {
                     constexpr static const std::size_t digest_bits = state_bits;
                     typedef static_digest<digest_bits> digest_type;
 
+                    constexpr static const std::size_t pkcs_id_size = 18;
+                    constexpr static const std::size_t pkcs_id_bits = pkcs_id_size * CHAR_BIT;
+                    typedef std::array<std::uint8_t, pkcs_id_size> pkcs_id_type;
+
+                    constexpr static const pkcs_id_type pkcs_id = {0x30, 0x20, 0x30, 0x0C, 0x06, 0x08, 0x2A, 0x86, 0x48,
+                                                                   0x86, 0xF7, 0x0D, 0x02, 0x05, 0x05, 0x00, 0x04, 0x10};
+
                     struct iv_generator {
                         state_type const &operator()() const {
                             // Same as MD4

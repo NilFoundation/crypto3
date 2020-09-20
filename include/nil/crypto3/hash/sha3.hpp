@@ -61,7 +61,7 @@ namespace nil {
              */
             template<std::size_t DigestBits = 512>
             class sha3 {
-                typedef detail::sha3_policy<DigestBits> policy_type;
+                typedef detail::sha3_functions<DigestBits> policy_type;
 
             public:
                 constexpr static const std::size_t word_bits = policy_type::word_bits;
@@ -73,6 +73,12 @@ namespace nil {
 
                 constexpr static const std::size_t digest_bits = policy_type::digest_bits;
                 typedef typename policy_type::digest_type digest_type;
+
+                constexpr static const std::size_t pkcs_id_size = policy_type::pkcs_id_size;
+                constexpr static const std::size_t pkcs_id_bits = policy_type::pkcs_id_bits;
+                typedef typename policy_type::pkcs_id_type pkcs_id_type;
+
+                constexpr static const pkcs_id_type pkcs_id = policy_type::pkcs_id;
 
                 struct construction {
                     struct params_type {

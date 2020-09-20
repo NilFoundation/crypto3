@@ -36,11 +36,7 @@ macro(cm_find_package NAME)
 endmacro()
 
 if(NOT Boost_FOUND)
-    if(BUILD_TESTS)
-        cm_find_package(Boost REQUIRED COMPONENTS container unit_test_framework)
-    else()
-        cm_find_package(Boost REQUIRED COMPONENTS container)
-    endif()
+    cm_find_package(Boost REQUIRED COMPONENTS container)
 endif()
 
 include(TargetArchitecture)
@@ -214,9 +210,6 @@ target_include_directories(${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME} INTER
 cm_deploy(TARGETS ${CMAKE_WORKSPACE_NAME}_${CURRENT_PROJECT_NAME}
           INCLUDE include
           NAMESPACE ${CMAKE_WORKSPACE_NAME}::)
-
-add_subdirectories("${CMAKE_CURRENT_LIST_DIR}/libs"
-                   SUBMODULE_DEFINITION_HEADER "cm_project\\(")
 
 if(BUILD_TESTS)
     add_subdirectory(test)
