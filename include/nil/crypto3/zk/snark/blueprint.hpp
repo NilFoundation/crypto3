@@ -16,7 +16,7 @@
 #include <string>
 #include <vector>
 
-#include <nil/crypto3/zk/snark/variable.hpp>
+#include <nil/crypto3/zk/snark/blueprint_variable.hpp>
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs/r1cs.hpp>
 
 namespace nil {
@@ -51,28 +51,28 @@ namespace nil {
                         std::fill(values.begin(), values.end(), FieldType::value_type::zero());
                     }
 
-                    FieldType::value_type &val(const variable<FieldType> &var) {
+                    typename FieldType::value_type &val(const blueprint_variable<FieldType> &var) {
                         assert(var.index <= values.size());
                         return (var.index == 0 ? FieldType::value_type::zero() : values[var.index - 1]);
                     }
 
-                    FieldType::value_type val(const variable<FieldType> &var) const {
+                    typename FieldType::value_type val(const blueprint_variable<FieldType> &var) const {
                         assert(var.index <= values.size());
                         return (var.index == 0 ? FieldType::value_type::zero() : values[var.index - 1]);
                     }
 
-                    FieldType::value_type &lc_val(const pb_linear_combination<FieldType> &lc) {
+                    typename FieldType::value_type &lc_val(const pb_linear_combination<FieldType> &lc) {
                         if (lc.is_variable) {
-                            return this->val(variable<FieldType>(lc.index));
+                            return this->val(blueprint_variable<FieldType>(lc.index));
                         } else {
                             assert(lc.index < lc_values.size());
                             return lc_values[lc.index];
                         }
                     }
 
-                    FieldType::value_type lc_val(const pb_linear_combination<FieldType> &lc) const {
+                    typename FieldType::value_type lc_val(const pb_linear_combination<FieldType> &lc) const {
                         if (lc.is_variable) {
-                            return this->val(variable<FieldType>(lc.index));
+                            return this->val(blueprint_variable<FieldType>(lc.index));
                         } else {
                             assert(lc.index < lc_values.size());
                             return lc_values[lc.index];

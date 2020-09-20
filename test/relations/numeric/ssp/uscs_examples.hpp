@@ -63,7 +63,7 @@ namespace nil {
 
                     uscs_variable_assignment<FieldType> full_variable_assignment;
                     for (std::size_t i = 0; i < num_constraints; ++i) {
-                        full_variable_assignment.emplace_back(FieldType::value_type(std::rand()));
+                        full_variable_assignment.emplace_back(typename FieldType::value_type(std::rand()));
                     }
 
                     for (std::size_t i = 0; i < num_constraints; ++i) {
@@ -75,10 +75,10 @@ namespace nil {
                             z = std::rand() % num_constraints;
                         } while (x == z || y == z);
 
-                        const FieldType::value_type x_coeff = FieldType::value_type(std::rand());
-                        const FieldType::value_type y_coeff = FieldType::value_type(std::rand());
-                        const FieldType::value_type val = (std::rand() % 2 == 0 ? FieldType::value_type::zero() : -FieldType::value_type::zero());
-                        const FieldType::value_type z_coeff =
+                        const typename FieldType::value_type x_coeff = typename FieldType::value_type(std::rand());
+                        const typename FieldType::value_type y_coeff = typename FieldType::value_type(std::rand());
+                        const typename FieldType::value_type val = (std::rand() % 2 == 0 ? FieldType::value_type::zero() : -FieldType::value_type::zero());
+                        const typename FieldType::value_type z_coeff =
                             (val - x_coeff * full_variable_assignment[x] - y_coeff * full_variable_assignment[y]) *
                             full_variable_assignment[z].inverse();
 
@@ -124,7 +124,7 @@ namespace nil {
 
                     uscs_variable_assignment<FieldType> full_variable_assignment;
                     for (std::size_t i = 0; i < num_inputs; ++i) {
-                        full_variable_assignment.push_back(FieldType::value_type(std::rand() % 2));
+                        full_variable_assignment.push_back(typename FieldType::value_type(std::rand() % 2));
                     }
 
                     std::size_t lastvar = num_inputs - 1;

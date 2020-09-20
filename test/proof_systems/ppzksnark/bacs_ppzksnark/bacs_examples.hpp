@@ -56,7 +56,7 @@ namespace nil {
 
                     for (std::size_t i = 0; i < terms; ++i) {
                         const typename FieldType::value_type coeff = random_element<FieldType>();
-                        result = result + coeff * variable<FieldType>(std::rand() % (num_variables + 1));
+                        result = result + coeff * blueprint_variable<FieldType>(std::rand() % (num_variables + 1));
                     }
 
                     return result;
@@ -104,23 +104,23 @@ namespace nil {
                         bacs_gate<FieldType> gate;
                         gate.lhs = random_linear_combination<FieldType>(num_variables);
                         gate.rhs = random_linear_combination<FieldType>(num_variables);
-                        gate.output = variable<FieldType>(num_variables + 1);
+                        gate.output = blueprint_variable<FieldType>(num_variables + 1);
 
                         if (i >= num_gates - num_outputs) {
                             /* make gate a circuit output and fix */
                             gate.is_circuit_output = true;
                             const var_index_t var_idx =
                                 std::rand() % (1 + primary_input_size + std::min(num_gates - num_outputs, i));
-                            const FieldType::value_type var_val = (var_idx == 0 ? FieldType::value_type::zero() : all_vals[var_idx - 1]);
+                            const typename FieldType::value_type var_val = (var_idx == 0 ? FieldType::value_type::zero() : all_vals[var_idx - 1]);
 
                             if (std::rand() % 2 == 0) {
-                                const FieldType::value_type lhs_val = gate.lhs.evaluate(all_vals);
-                                const FieldType::value_type coeff = -(lhs_val * var_val.inverse());
-                                gate.lhs = gate.lhs + coeff * variable<FieldType>(var_idx);
+                                const typename FieldType::value_type lhs_val = gate.lhs.evaluate(all_vals);
+                                const typename FieldType::value_type coeff = -(lhs_val * var_val.inverse());
+                                gate.lhs = gate.lhs + coeff * blueprint_variable<FieldType>(var_idx);
                             } else {
-                                const FieldType::value_type rhs_val = gate.rhs.evaluate(all_vals);
-                                const FieldType::value_type coeff = -(rhs_val * var_val.inverse());
-                                gate.rhs = gate.rhs + coeff * variable<FieldType>(var_idx);
+                                const typename FieldType::value_type rhs_val = gate.rhs.evaluate(all_vals);
+                                const typename FieldType::value_type coeff = -(rhs_val * var_val.inverse());
+                                gate.rhs = gate.rhs + coeff * blueprint_variable<FieldType>(var_idx);
                             }
 
                             assert(gate.evaluate(all_vals).is_zero());

@@ -47,18 +47,18 @@ namespace nil {
                     const word_variable_component<FieldType> desval;
                     const word_variable_component<FieldType> arg1val;
                     const word_variable_component<FieldType> arg2val;
-                    const variable<FieldType> flag;
-                    const variable<FieldType> result;
-                    const variable<FieldType> result_flag;
+                    const blueprint_variable<FieldType> flag;
+                    const blueprint_variable<FieldType> result;
+                    const blueprint_variable<FieldType> result_flag;
 
                     ALU_arithmetic_component(tinyram_protoboard<FieldType> &pb,
                                           const pb_variable_array<FieldType> &opcode_indicators,
                                           const word_variable_component<FieldType> &desval,
                                           const word_variable_component<FieldType> &arg1val,
                                           const word_variable_component<FieldType> &arg2val,
-                                          const variable<FieldType> &flag,
-                                          const variable<FieldType> &result,
-                                          const variable<FieldType> &result_flag) :
+                                          const blueprint_variable<FieldType> &flag,
+                                          const blueprint_variable<FieldType> &result,
+                                          const blueprint_variable<FieldType> &result_flag) :
                         tinyram_standard_component<FieldType>(pb),
                         opcode_indicators(opcode_indicators), desval(desval), arg1val(arg1val), arg2val(arg2val),
                         flag(flag), result(result), result_flag(result_flag) {
@@ -71,7 +71,7 @@ namespace nil {
                     pb_variable_array<FieldType> res_word;
                     std::shared_ptr<packing_component<FieldType>> pack_result;
                     std::shared_ptr<disjunction_component<FieldType>> not_all_zeros;
-                    variable<FieldType> not_all_zeros_result;
+                    blueprint_variable<FieldType> not_all_zeros_result;
 
                 public:
                     ALU_and_component(tinyram_protoboard<FieldType> &pb,
@@ -79,9 +79,9 @@ namespace nil {
                                    const word_variable_component<FieldType> &desval,
                                    const word_variable_component<FieldType> &arg1val,
                                    const word_variable_component<FieldType> &arg2val,
-                                   const variable<FieldType> &flag,
-                                   const variable<FieldType> &result,
-                                   const variable<FieldType> &result_flag) :
+                                   const blueprint_variable<FieldType> &flag,
+                                   const blueprint_variable<FieldType> &result,
+                                   const blueprint_variable<FieldType> &result_flag) :
                         ALU_arithmetic_component<FieldType>(pb, opcode_indicators, desval, arg1val, arg2val, flag, result,
                                                          result_flag) {
                         res_word.allocate(pb, pb.ap.w);
@@ -104,7 +104,7 @@ namespace nil {
                     pb_variable_array<FieldType> res_word;
                     std::shared_ptr<packing_component<FieldType>> pack_result;
                     std::shared_ptr<disjunction_component<FieldType>> not_all_zeros;
-                    variable<FieldType> not_all_zeros_result;
+                    blueprint_variable<FieldType> not_all_zeros_result;
 
                 public:
                     ALU_or_component(tinyram_protoboard<FieldType> &pb,
@@ -112,9 +112,9 @@ namespace nil {
                                   const word_variable_component<FieldType> &desval,
                                   const word_variable_component<FieldType> &arg1val,
                                   const word_variable_component<FieldType> &arg2val,
-                                  const variable<FieldType> &flag,
-                                  const variable<FieldType> &result,
-                                  const variable<FieldType> &result_flag) :
+                                  const blueprint_variable<FieldType> &flag,
+                                  const blueprint_variable<FieldType> &result,
+                                  const blueprint_variable<FieldType> &result_flag) :
                         ALU_arithmetic_component<FieldType>(pb, opcode_indicators, desval, arg1val, arg2val, flag, result,
                                                          result_flag) {
                         res_word.allocate(pb, pb.ap.w);
@@ -137,7 +137,7 @@ namespace nil {
                     pb_variable_array<FieldType> res_word;
                     std::shared_ptr<packing_component<FieldType>> pack_result;
                     std::shared_ptr<disjunction_component<FieldType>> not_all_zeros;
-                    variable<FieldType> not_all_zeros_result;
+                    blueprint_variable<FieldType> not_all_zeros_result;
 
                 public:
                     ALU_xor_component(tinyram_protoboard<FieldType> &pb,
@@ -145,9 +145,9 @@ namespace nil {
                                    const word_variable_component<FieldType> &desval,
                                    const word_variable_component<FieldType> &arg1val,
                                    const word_variable_component<FieldType> &arg2val,
-                                   const variable<FieldType> &flag,
-                                   const variable<FieldType> &result,
-                                   const variable<FieldType> &result_flag) :
+                                   const blueprint_variable<FieldType> &flag,
+                                   const blueprint_variable<FieldType> &result,
+                                   const blueprint_variable<FieldType> &result_flag) :
                         ALU_arithmetic_component<FieldType>(pb, opcode_indicators, desval, arg1val, arg2val, flag, result,
                                                          result_flag) {
                         res_word.allocate(pb, pb.ap.w);
@@ -171,7 +171,7 @@ namespace nil {
                     pb_variable_array<FieldType> res_word;
                     std::shared_ptr<packing_component<FieldType>> pack_result;
                     std::shared_ptr<disjunction_component<FieldType>> not_all_zeros;
-                    variable<FieldType> not_all_zeros_result;
+                    blueprint_variable<FieldType> not_all_zeros_result;
 
                 public:
                     ALU_not_component(tinyram_protoboard<FieldType> &pb,
@@ -179,9 +179,9 @@ namespace nil {
                                    const word_variable_component<FieldType> &desval,
                                    const word_variable_component<FieldType> &arg1val,
                                    const word_variable_component<FieldType> &arg2val,
-                                   const variable<FieldType> &flag,
-                                   const variable<FieldType> &result,
-                                   const variable<FieldType> &result_flag) :
+                                   const blueprint_variable<FieldType> &flag,
+                                   const blueprint_variable<FieldType> &result,
+                                   const blueprint_variable<FieldType> &result_flag) :
                         ALU_arithmetic_component<FieldType>(pb, opcode_indicators, desval, arg1val, arg2val, flag, result,
                                                          result_flag) {
                         res_word.allocate(pb, pb.ap.w);
@@ -201,7 +201,7 @@ namespace nil {
                 template<typename FieldType>
                 class ALU_add_component : public ALU_arithmetic_component<FieldType> {
                 private:
-                    variable<FieldType> addition_result;
+                    blueprint_variable<FieldType> addition_result;
                     pb_variable_array<FieldType> res_word;
                     pb_variable_array<FieldType> res_word_and_flag;
                     std::shared_ptr<packing_component<FieldType>> unpack_addition, pack_result;
@@ -212,9 +212,9 @@ namespace nil {
                                    const word_variable_component<FieldType> &desval,
                                    const word_variable_component<FieldType> &arg1val,
                                    const word_variable_component<FieldType> &arg2val,
-                                   const variable<FieldType> &flag,
-                                   const variable<FieldType> &result,
-                                   const variable<FieldType> &result_flag) :
+                                   const blueprint_variable<FieldType> &flag,
+                                   const blueprint_variable<FieldType> &result,
+                                   const blueprint_variable<FieldType> &result_flag) :
                         ALU_arithmetic_component<FieldType>(pb, opcode_indicators, desval, arg1val, arg2val, flag, result,
                                                          result_flag) {
                         addition_result.allocate(pb);
@@ -236,8 +236,8 @@ namespace nil {
                 template<typename FieldType>
                 class ALU_sub_component : public ALU_arithmetic_component<FieldType> {
                 private:
-                    variable<FieldType> intermediate_result;
-                    variable<FieldType> negated_flag;
+                    blueprint_variable<FieldType> intermediate_result;
+                    blueprint_variable<FieldType> negated_flag;
                     pb_variable_array<FieldType> res_word;
                     pb_variable_array<FieldType> res_word_and_negated_flag;
 
@@ -249,9 +249,9 @@ namespace nil {
                                    const word_variable_component<FieldType> &desval,
                                    const word_variable_component<FieldType> &arg1val,
                                    const word_variable_component<FieldType> &arg2val,
-                                   const variable<FieldType> &flag,
-                                   const variable<FieldType> &result,
-                                   const variable<FieldType> &result_flag) :
+                                   const blueprint_variable<FieldType> &flag,
+                                   const blueprint_variable<FieldType> &result,
+                                   const blueprint_variable<FieldType> &result_flag) :
                         ALU_arithmetic_component<FieldType>(pb, opcode_indicators, desval, arg1val, arg2val, flag, result,
                                                          result_flag) {
                         intermediate_result.allocate(pb);
@@ -280,9 +280,9 @@ namespace nil {
                                    const word_variable_component<FieldType> &desval,
                                    const word_variable_component<FieldType> &arg1val,
                                    const word_variable_component<FieldType> &arg2val,
-                                   const variable<FieldType> &flag,
-                                   const variable<FieldType> &result,
-                                   const variable<FieldType> &result_flag) :
+                                   const blueprint_variable<FieldType> &flag,
+                                   const blueprint_variable<FieldType> &result,
+                                   const blueprint_variable<FieldType> &result_flag) :
                         ALU_arithmetic_component<FieldType>(pb, opcode_indicators, desval, arg1val, arg2val, flag, result,
                                                          result_flag) {
                     }
@@ -302,9 +302,9 @@ namespace nil {
                                     const word_variable_component<FieldType> &desval,
                                     const word_variable_component<FieldType> &arg1val,
                                     const word_variable_component<FieldType> &arg2val,
-                                    const variable<FieldType> &flag,
-                                    const variable<FieldType> &result,
-                                    const variable<FieldType> &result_flag) :
+                                    const blueprint_variable<FieldType> &flag,
+                                    const blueprint_variable<FieldType> &result,
+                                    const blueprint_variable<FieldType> &result_flag) :
                         ALU_arithmetic_component<FieldType>(pb, opcode_indicators, desval, arg1val, arg2val, flag, result,
                                                          result_flag) {
                     }
@@ -322,25 +322,25 @@ namespace nil {
                     comparison_component<FieldType> comparator;
 
                 public:
-                    const variable<FieldType> cmpe_result;
-                    const variable<FieldType> cmpe_result_flag;
-                    const variable<FieldType> cmpa_result;
-                    const variable<FieldType> cmpa_result_flag;
-                    const variable<FieldType> cmpae_result;
-                    const variable<FieldType> cmpae_result_flag;
+                    const blueprint_variable<FieldType> cmpe_result;
+                    const blueprint_variable<FieldType> cmpe_result_flag;
+                    const blueprint_variable<FieldType> cmpa_result;
+                    const blueprint_variable<FieldType> cmpa_result_flag;
+                    const blueprint_variable<FieldType> cmpae_result;
+                    const blueprint_variable<FieldType> cmpae_result_flag;
 
                     ALU_cmp_component(tinyram_protoboard<FieldType> &pb,
                                    const pb_variable_array<FieldType> &opcode_indicators,
                                    const word_variable_component<FieldType> &desval,
                                    const word_variable_component<FieldType> &arg1val,
                                    const word_variable_component<FieldType> &arg2val,
-                                   const variable<FieldType> &flag,
-                                   const variable<FieldType> &cmpe_result,
-                                   const variable<FieldType> &cmpe_result_flag,
-                                   const variable<FieldType> &cmpa_result,
-                                   const variable<FieldType> &cmpa_result_flag,
-                                   const variable<FieldType> &cmpae_result,
-                                   const variable<FieldType> &cmpae_result_flag) :
+                                   const blueprint_variable<FieldType> &flag,
+                                   const blueprint_variable<FieldType> &cmpe_result,
+                                   const blueprint_variable<FieldType> &cmpe_result_flag,
+                                   const blueprint_variable<FieldType> &cmpa_result,
+                                   const blueprint_variable<FieldType> &cmpa_result_flag,
+                                   const blueprint_variable<FieldType> &cmpae_result,
+                                   const blueprint_variable<FieldType> &cmpae_result_flag) :
                         ALU_arithmetic_component<FieldType>(pb, opcode_indicators, desval, arg1val, arg2val, flag,
                                                          cmpa_result, cmpa_result_flag),
                         comparator(pb, pb.ap.w, arg2val.packed, arg1val.packed, cmpa_result_flag, cmpae_result_flag),
@@ -365,32 +365,32 @@ namespace nil {
                 template<typename FieldType>
                 class ALU_cmps_component : public ALU_arithmetic_component<FieldType> {
                 private:
-                    variable<FieldType> negated_arg1val_sign;
-                    variable<FieldType> negated_arg2val_sign;
+                    blueprint_variable<FieldType> negated_arg1val_sign;
+                    blueprint_variable<FieldType> negated_arg2val_sign;
                     pb_variable_array<FieldType> modified_arg1;
                     pb_variable_array<FieldType> modified_arg2;
-                    variable<FieldType> packed_modified_arg1;
-                    variable<FieldType> packed_modified_arg2;
+                    blueprint_variable<FieldType> packed_modified_arg1;
+                    blueprint_variable<FieldType> packed_modified_arg2;
                     std::shared_ptr<packing_component<FieldType>> pack_modified_arg1;
                     std::shared_ptr<packing_component<FieldType>> pack_modified_arg2;
                     std::shared_ptr<comparison_component<FieldType>> comparator;
 
                 public:
-                    const variable<FieldType> cmpg_result;
-                    const variable<FieldType> cmpg_result_flag;
-                    const variable<FieldType> cmpge_result;
-                    const variable<FieldType> cmpge_result_flag;
+                    const blueprint_variable<FieldType> cmpg_result;
+                    const blueprint_variable<FieldType> cmpg_result_flag;
+                    const blueprint_variable<FieldType> cmpge_result;
+                    const blueprint_variable<FieldType> cmpge_result_flag;
 
                     ALU_cmps_component(tinyram_protoboard<FieldType> &pb,
                                     const pb_variable_array<FieldType> &opcode_indicators,
                                     const word_variable_component<FieldType> &desval,
                                     const word_variable_component<FieldType> &arg1val,
                                     const word_variable_component<FieldType> &arg2val,
-                                    const variable<FieldType> &flag,
-                                    const variable<FieldType> &cmpg_result,
-                                    const variable<FieldType> &cmpg_result_flag,
-                                    const variable<FieldType> &cmpge_result,
-                                    const variable<FieldType> &cmpge_result_flag) :
+                                    const blueprint_variable<FieldType> &flag,
+                                    const blueprint_variable<FieldType> &cmpg_result,
+                                    const blueprint_variable<FieldType> &cmpg_result_flag,
+                                    const blueprint_variable<FieldType> &cmpge_result,
+                                    const blueprint_variable<FieldType> &cmpge_result_flag) :
                         ALU_arithmetic_component<FieldType>(pb, opcode_indicators, desval, arg1val, arg2val, flag,
                                                          cmpg_result, cmpg_result_flag),
                         cmpg_result(cmpg_result), cmpg_result_flag(cmpg_result_flag), cmpge_result(cmpge_result),
@@ -432,27 +432,27 @@ namespace nil {
                     dual_variable_component<FieldType> mul_result;
                     pb_variable_array<FieldType> mull_bits;
                     pb_variable_array<FieldType> umulh_bits;
-                    variable<FieldType> result_flag;
+                    blueprint_variable<FieldType> result_flag;
                     std::shared_ptr<packing_component<FieldType>> pack_mull_result;
                     std::shared_ptr<packing_component<FieldType>> pack_umulh_result;
                     std::shared_ptr<disjunction_component<FieldType>> compute_flag;
 
                 public:
-                    const variable<FieldType> mull_result;
-                    const variable<FieldType> mull_flag;
-                    const variable<FieldType> umulh_result;
-                    const variable<FieldType> umulh_flag;
+                    const blueprint_variable<FieldType> mull_result;
+                    const blueprint_variable<FieldType> mull_flag;
+                    const blueprint_variable<FieldType> umulh_result;
+                    const blueprint_variable<FieldType> umulh_flag;
 
                     ALU_umul_component(tinyram_protoboard<FieldType> &pb,
                                     const pb_variable_array<FieldType> &opcode_indicators,
                                     const word_variable_component<FieldType> &desval,
                                     const word_variable_component<FieldType> &arg1val,
                                     const word_variable_component<FieldType> &arg2val,
-                                    const variable<FieldType> &flag,
-                                    const variable<FieldType> &mull_result,
-                                    const variable<FieldType> &mull_flag,
-                                    const variable<FieldType> &umulh_result,
-                                    const variable<FieldType> &umulh_flag) :
+                                    const blueprint_variable<FieldType> &flag,
+                                    const blueprint_variable<FieldType> &mull_result,
+                                    const blueprint_variable<FieldType> &mull_flag,
+                                    const blueprint_variable<FieldType> &umulh_result,
+                                    const blueprint_variable<FieldType> &umulh_flag) :
                         ALU_arithmetic_component<FieldType>(pb, opcode_indicators, desval, arg1val, arg2val, flag,
                                                          mull_result, mull_flag),
                         mul_result(pb, 2 * pb.ap.w), mull_result(mull_result), mull_flag(mull_flag),
@@ -483,27 +483,27 @@ namespace nil {
                     dual_variable_component<FieldType> mul_result;
                     pb_variable_array<FieldType> smulh_bits;
 
-                    variable<FieldType> top;
+                    blueprint_variable<FieldType> top;
                     std::shared_ptr<packing_component<FieldType>> pack_top;
 
-                    variable<FieldType> is_top_empty, is_top_empty_aux;
-                    variable<FieldType> is_top_full, is_top_full_aux;
+                    blueprint_variable<FieldType> is_top_empty, is_top_empty_aux;
+                    blueprint_variable<FieldType> is_top_full, is_top_full_aux;
 
-                    variable<FieldType> result_flag;
+                    blueprint_variable<FieldType> result_flag;
                     std::shared_ptr<packing_component<FieldType>> pack_smulh_result;
 
                 public:
-                    const variable<FieldType> smulh_result;
-                    const variable<FieldType> smulh_flag;
+                    const blueprint_variable<FieldType> smulh_result;
+                    const blueprint_variable<FieldType> smulh_flag;
 
                     ALU_smul_component(tinyram_protoboard<FieldType> &pb,
                                     const pb_variable_array<FieldType> &opcode_indicators,
                                     const word_variable_component<FieldType> &desval,
                                     const word_variable_component<FieldType> &arg1val,
                                     const word_variable_component<FieldType> &arg2val,
-                                    const variable<FieldType> &flag,
-                                    const variable<FieldType> &smulh_result,
-                                    const variable<FieldType> &smulh_flag) :
+                                    const blueprint_variable<FieldType> &flag,
+                                    const blueprint_variable<FieldType> &smulh_result,
+                                    const blueprint_variable<FieldType> &smulh_flag) :
                         ALU_arithmetic_component<FieldType>(pb, opcode_indicators, desval, arg1val, arg2val, flag,
                                                          smulh_result, smulh_flag),
                         mul_result(pb, 2 * pb.ap.w + 1), /* see witness map for explanation for 2w+1 */
@@ -549,27 +549,27 @@ namespace nil {
                       >>>>>>> Stashed changes
                     */
                 private:
-                    variable<FieldType> B_inv;
-                    variable<FieldType> B_nonzero;
-                    variable<FieldType> A_aux;
+                    blueprint_variable<FieldType> B_inv;
+                    blueprint_variable<FieldType> B_nonzero;
+                    blueprint_variable<FieldType> A_aux;
                     std::shared_ptr<comparison_component<FieldType>> r_less_B;
 
                 public:
-                    const variable<FieldType> udiv_result;
-                    const variable<FieldType> udiv_flag;
-                    const variable<FieldType> umod_result;
-                    const variable<FieldType> umod_flag;
+                    const blueprint_variable<FieldType> udiv_result;
+                    const blueprint_variable<FieldType> udiv_flag;
+                    const blueprint_variable<FieldType> umod_result;
+                    const blueprint_variable<FieldType> umod_flag;
 
                     ALU_divmod_component(tinyram_protoboard<FieldType> &pb,
                                       const pb_variable_array<FieldType> &opcode_indicators,
                                       const word_variable_component<FieldType> &desval,
                                       const word_variable_component<FieldType> &arg1val,
                                       const word_variable_component<FieldType> &arg2val,
-                                      const variable<FieldType> &flag,
-                                      const variable<FieldType> &udiv_result,
-                                      const variable<FieldType> &udiv_flag,
-                                      const variable<FieldType> &umod_result,
-                                      const variable<FieldType> &umod_flag) :
+                                      const blueprint_variable<FieldType> &flag,
+                                      const blueprint_variable<FieldType> &udiv_result,
+                                      const blueprint_variable<FieldType> &udiv_flag,
+                                      const blueprint_variable<FieldType> &umod_result,
+                                      const blueprint_variable<FieldType> &umod_flag) :
                         ALU_arithmetic_component<FieldType>(pb, opcode_indicators, desval, arg1val, arg2val, flag,
                                                          udiv_result, udiv_flag),
                         udiv_result(udiv_result), udiv_flag(udiv_flag), umod_result(umod_result), umod_flag(umod_flag) {
@@ -577,7 +577,7 @@ namespace nil {
                         B_nonzero.allocate(pb);
                         A_aux.allocate(pb);
                         r_less_B.reset(
-                            new comparison_component<FieldType>(pb, pb.ap.w, umod_result, arg2val.packed, B_nonzero, variable<FieldType>(0)));
+                            new comparison_component<FieldType>(pb, pb.ap.w, umod_result, arg2val.packed, B_nonzero, blueprint_variable<FieldType>(0)));
                     }
                     void generate_r1cs_constraints();
                     void generate_r1cs_witness();
@@ -592,26 +592,26 @@ namespace nil {
                 template<typename FieldType>
                 class ALU_shr_shl_component : public ALU_arithmetic_component<FieldType> {
                 private:
-                    variable<FieldType> reversed_input;
+                    blueprint_variable<FieldType> reversed_input;
                     std::shared_ptr<packing_component<FieldType>> pack_reversed_input;
 
                     pb_variable_array<FieldType> barrel_right_internal;
                     std::vector<pb_variable_array<FieldType>> shifted_out_bits;
 
-                    variable<FieldType> is_oversize_shift;
+                    blueprint_variable<FieldType> is_oversize_shift;
                     std::shared_ptr<disjunction_component<FieldType>> check_oversize_shift;
-                    variable<FieldType> result;
+                    blueprint_variable<FieldType> result;
 
                     pb_variable_array<FieldType> result_bits;
                     std::shared_ptr<packing_component<FieldType>> unpack_result;
-                    variable<FieldType> reversed_result;
+                    blueprint_variable<FieldType> reversed_result;
                     std::shared_ptr<packing_component<FieldType>> pack_reversed_result;
 
                 public:
-                    variable<FieldType> shr_result;
-                    variable<FieldType> shr_flag;
-                    variable<FieldType> shl_result;
-                    variable<FieldType> shl_flag;
+                    blueprint_variable<FieldType> shr_result;
+                    blueprint_variable<FieldType> shr_flag;
+                    blueprint_variable<FieldType> shl_result;
+                    blueprint_variable<FieldType> shl_flag;
 
                     std::size_t logw;
 
@@ -620,11 +620,11 @@ namespace nil {
                                        const word_variable_component<FieldType> &desval,
                                        const word_variable_component<FieldType> &arg1val,
                                        const word_variable_component<FieldType> &arg2val,
-                                       const variable<FieldType> &flag,
-                                       const variable<FieldType> &shr_result,
-                                       const variable<FieldType> &shr_flag,
-                                       const variable<FieldType> &shl_result,
-                                       const variable<FieldType> &shl_flag) :
+                                       const blueprint_variable<FieldType> &flag,
+                                       const blueprint_variable<FieldType> &shr_result,
+                                       const blueprint_variable<FieldType> &shr_flag,
+                                       const blueprint_variable<FieldType> &shl_result,
+                                       const blueprint_variable<FieldType> &shl_flag) :
                         ALU_arithmetic_component<FieldType>(pb, opcode_indicators, desval, arg1val, arg2val, flag,
                                                          shr_result, shr_flag),
                         shr_result(shr_result), shr_flag(shr_flag), shl_result(shl_result), shl_flag(shl_flag) {
@@ -711,11 +711,11 @@ namespace nil {
                     arg1val.generate_r1cs_constraints(true);
                     word_variable_component<FieldType> arg2val(pb);
                     arg2val.generate_r1cs_constraints(true);
-                    variable<FieldType> flag;
+                    blueprint_variable<FieldType> flag;
                     flag.allocate(pb);
-                    variable<FieldType> result;
+                    blueprint_variable<FieldType> result;
                     result.allocate(pb);
-                    variable<FieldType> result_flag;
+                    blueprint_variable<FieldType> result_flag;
                     result_flag.allocate(pb);
 
                     std::unique_ptr<T> g;
@@ -765,7 +765,7 @@ namespace nil {
 
                     /* result_flag = 1 - not_all_zeros = result is 0^w */
                     this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(
-                        {variable<FieldType>(0)}, {variable<FieldType>(0), this->not_all_zeros_result * (-1)}, {this->result_flag}));
+                        {blueprint_variable<FieldType>(0)}, {blueprint_variable<FieldType>(0), this->not_all_zeros_result * (-1)}, {this->result_flag}));
                 }
 
                 template<typename FieldType>
@@ -792,9 +792,9 @@ namespace nil {
                            word_variable_component<FieldType> &desval,
                            word_variable_component<FieldType> &arg1val,
                            word_variable_component<FieldType> &arg2val,
-                           variable<FieldType> &flag,
-                           variable<FieldType> &result,
-                           variable<FieldType> &result_flag) -> ALU_and_component<FieldType> * {
+                           blueprint_variable<FieldType> &flag,
+                           blueprint_variable<FieldType> &result,
+                           blueprint_variable<FieldType> &result_flag) -> ALU_and_component<FieldType> * {
                             return new ALU_and_component<FieldType>(pb, opcode_indicators, desval, arg1val, arg2val, flag,
                                                                  result, result_flag);
                         },
@@ -806,9 +806,9 @@ namespace nil {
                 template<typename FieldType>
                 void ALU_or_component<FieldType>::generate_r1cs_constraints() {
                     for (std::size_t i = 0; i < this->pb.ap.w; ++i) {
-                        this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>({variable<FieldType>(0), this->arg1val.bits[i] * (-1)},
-                                                                                {variable<FieldType>(0), this->arg2val.bits[i] * (-1)},
-                                                                                {variable<FieldType>(0), this->res_word[i] * (-1)}));
+                        this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>({blueprint_variable<FieldType>(0), this->arg1val.bits[i] * (-1)},
+                                                                                {blueprint_variable<FieldType>(0), this->arg2val.bits[i] * (-1)},
+                                                                                {blueprint_variable<FieldType>(0), this->res_word[i] * (-1)}));
                     }
 
                     /* generate result */
@@ -817,7 +817,7 @@ namespace nil {
 
                     /* result_flag = 1 - not_all_zeros = result is 0^w */
                     this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(
-                        {variable<FieldType>(0)}, {variable<FieldType>(0), this->not_all_zeros_result * (-1)}, {this->result_flag}));
+                        {blueprint_variable<FieldType>(0)}, {blueprint_variable<FieldType>(0), this->not_all_zeros_result * (-1)}, {this->result_flag}));
                 }
 
                 template<typename FieldType>
@@ -844,9 +844,9 @@ namespace nil {
                            word_variable_component<FieldType> &desval,
                            word_variable_component<FieldType> &arg1val,
                            word_variable_component<FieldType> &arg2val,
-                           variable<FieldType> &flag,
-                           variable<FieldType> &result,
-                           variable<FieldType> &result_flag) -> ALU_or_component<FieldType> * {
+                           blueprint_variable<FieldType> &flag,
+                           blueprint_variable<FieldType> &result,
+                           blueprint_variable<FieldType> &result_flag) -> ALU_or_component<FieldType> * {
                             return new ALU_or_component<FieldType>(pb, opcode_indicators, desval, arg1val, arg2val, flag,
                                                                 result, result_flag);
                         },
@@ -871,7 +871,7 @@ namespace nil {
 
                     /* result_flag = 1 - not_all_zeros = result is 0^w */
                     this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(
-                        {variable<FieldType>(0)}, {variable<FieldType>(0), this->not_all_zeros_result * (-1)}, {this->result_flag}));
+                        {blueprint_variable<FieldType>(0)}, {blueprint_variable<FieldType>(0), this->not_all_zeros_result * (-1)}, {this->result_flag}));
                 }
 
                 template<typename FieldType>
@@ -898,9 +898,9 @@ namespace nil {
                            word_variable_component<FieldType> &desval,
                            word_variable_component<FieldType> &arg1val,
                            word_variable_component<FieldType> &arg2val,
-                           variable<FieldType> &flag,
-                           variable<FieldType> &result,
-                           variable<FieldType> &result_flag) -> ALU_xor_component<FieldType> * {
+                           blueprint_variable<FieldType> &flag,
+                           blueprint_variable<FieldType> &result,
+                           blueprint_variable<FieldType> &result_flag) -> ALU_xor_component<FieldType> * {
                             return new ALU_xor_component<FieldType>(pb, opcode_indicators, desval, arg1val, arg2val, flag,
                                                                  result, result_flag);
                         },
@@ -913,7 +913,7 @@ namespace nil {
                 void ALU_not_component<FieldType>::generate_r1cs_constraints() {
                     for (std::size_t i = 0; i < this->pb.ap.w; ++i) {
                         this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(
-                            {variable<FieldType>(0)}, {variable<FieldType>(0), this->arg2val.bits[i] * (-1)}, {this->res_word[i]}));
+                            {blueprint_variable<FieldType>(0)}, {blueprint_variable<FieldType>(0), this->arg2val.bits[i] * (-1)}, {this->res_word[i]}));
                     }
 
                     /* generate result */
@@ -922,7 +922,7 @@ namespace nil {
 
                     /* result_flag = 1 - not_all_zeros = result is 0^w */
                     this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(
-                        {variable<FieldType>(0)}, {variable<FieldType>(0), this->not_all_zeros_result * (-1)}, {this->result_flag}));
+                        {blueprint_variable<FieldType>(0)}, {blueprint_variable<FieldType>(0), this->not_all_zeros_result * (-1)}, {this->result_flag}));
                 }
 
                 template<typename FieldType>
@@ -948,9 +948,9 @@ namespace nil {
                            word_variable_component<FieldType> &desval,
                            word_variable_component<FieldType> &arg1val,
                            word_variable_component<FieldType> &arg2val,
-                           variable<FieldType> &flag,
-                           variable<FieldType> &result,
-                           variable<FieldType> &result_flag) -> ALU_not_component<FieldType> * {
+                           blueprint_variable<FieldType> &flag,
+                           blueprint_variable<FieldType> &result,
+                           blueprint_variable<FieldType> &result_flag) -> ALU_not_component<FieldType> * {
                             return new ALU_not_component<FieldType>(pb, opcode_indicators, desval, arg1val, arg2val, flag,
                                                                  result, result_flag);
                         },
@@ -963,7 +963,7 @@ namespace nil {
                 void ALU_add_component<FieldType>::generate_r1cs_constraints() {
                     /* addition_result = 1 * (arg1val + arg2val) */
                     this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(
-                        {variable<FieldType>(0)}, {this->arg1val.packed, this->arg2val.packed}, {this->addition_result}));
+                        {blueprint_variable<FieldType>(0)}, {this->arg1val.packed, this->arg2val.packed}, {this->addition_result}));
 
                     /* unpack into bits */
                     unpack_addition->generate_r1cs_constraints(true);
@@ -990,9 +990,9 @@ namespace nil {
                            word_variable_component<FieldType> &desval,
                            word_variable_component<FieldType> &arg1val,
                            word_variable_component<FieldType> &arg2val,
-                           variable<FieldType> &flag,
-                           variable<FieldType> &result,
-                           variable<FieldType> &result_flag) -> ALU_add_component<FieldType> * {
+                           blueprint_variable<FieldType> &flag,
+                           blueprint_variable<FieldType> &result,
+                           blueprint_variable<FieldType> &result_flag) -> ALU_add_component<FieldType> * {
                             return new ALU_add_component<FieldType>(pb, opcode_indicators, desval, arg1val, arg2val, flag,
                                                                  result, result_flag);
                         },
@@ -1004,7 +1004,7 @@ namespace nil {
                 template<typename FieldType>
                 void ALU_sub_component<FieldType>::generate_r1cs_constraints() {
                     /* intermediate_result = 2^w + (arg1val - arg2val) */
-                    FieldType::value_type twoi = FieldType::value_type::zero();
+                    typename FieldType::value_type twoi = FieldType::value_type::zero();
 
                     linear_combination<FieldType> a, b, c;
 
@@ -1025,12 +1025,12 @@ namespace nil {
                     /* generate result */
                     pack_result->generate_r1cs_constraints(false);
                     this->pb.add_r1cs_constraint(
-                        r1cs_constraint<FieldType>({variable<FieldType>(0)}, {variable<FieldType>(0), this->negated_flag * (-1)}, {this->result_flag}));
+                        r1cs_constraint<FieldType>({blueprint_variable<FieldType>(0)}, {blueprint_variable<FieldType>(0), this->negated_flag * (-1)}, {this->result_flag}));
                 }
 
                 template<typename FieldType>
                 void ALU_sub_component<FieldType>::generate_r1cs_witness() {
-                    FieldType::value_type twoi = FieldType::value_type::zero();
+                    typename FieldType::value_type twoi = FieldType::value_type::zero();
                     for (std::size_t i = 0; i < this->pb.ap.w; ++i) {
                         twoi = twoi + twoi;
                     }
@@ -1052,9 +1052,9 @@ namespace nil {
                            word_variable_component<FieldType> &desval,
                            word_variable_component<FieldType> &arg1val,
                            word_variable_component<FieldType> &arg2val,
-                           variable<FieldType> &flag,
-                           variable<FieldType> &result,
-                           variable<FieldType> &result_flag) -> ALU_sub_component<FieldType> * {
+                           blueprint_variable<FieldType> &flag,
+                           blueprint_variable<FieldType> &result,
+                           blueprint_variable<FieldType> &result_flag) -> ALU_sub_component<FieldType> * {
                             return new ALU_sub_component<FieldType>(pb, opcode_indicators, desval, arg1val, arg2val, flag,
                                                                  result, result_flag);
                         },
@@ -1072,9 +1072,9 @@ namespace nil {
                 template<typename FieldType>
                 void ALU_mov_component<FieldType>::generate_r1cs_constraints() {
                     this->pb.add_r1cs_constraint(
-                        r1cs_constraint<FieldType>({variable<FieldType>(0)}, {this->arg2val.packed}, {this->result}));
+                        r1cs_constraint<FieldType>({blueprint_variable<FieldType>(0)}, {this->arg2val.packed}, {this->result}));
 
-                    this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>({variable<FieldType>(0)}, {this->flag}, {this->result_flag}));
+                    this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>({blueprint_variable<FieldType>(0)}, {this->flag}, {this->result_flag}));
                 }
 
                 template<typename FieldType>
@@ -1093,9 +1093,9 @@ namespace nil {
                            word_variable_component<FieldType> &desval,
                            word_variable_component<FieldType> &arg1val,
                            word_variable_component<FieldType> &arg2val,
-                           variable<FieldType> &flag,
-                           variable<FieldType> &result,
-                           variable<FieldType> &result_flag) -> ALU_mov_component<FieldType> * {
+                           blueprint_variable<FieldType> &flag,
+                           blueprint_variable<FieldType> &result,
+                           blueprint_variable<FieldType> &result_flag) -> ALU_mov_component<FieldType> * {
                             return new ALU_mov_component<FieldType>(pb, opcode_indicators, desval, arg1val, arg2val, flag,
                                                                  result, result_flag);
                         },
@@ -1115,7 +1115,7 @@ namespace nil {
                                                    {this->arg2val.packed, this->desval.packed * (-1)},
                                                    {this->result, this->desval.packed * (-1)}));
 
-                    this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>({variable<FieldType>(0)}, {this->flag}, {this->result_flag}));
+                    this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>({blueprint_variable<FieldType>(0)}, {this->flag}, {this->result_flag}));
                 }
 
                 template<typename FieldType>
@@ -1136,9 +1136,9 @@ namespace nil {
                            word_variable_component<FieldType> &desval,
                            word_variable_component<FieldType> &arg1val,
                            word_variable_component<FieldType> &arg2val,
-                           variable<FieldType> &flag,
-                           variable<FieldType> &result,
-                           variable<FieldType> &result_flag) -> ALU_cmov_component<FieldType> * {
+                           blueprint_variable<FieldType> &flag,
+                           blueprint_variable<FieldType> &result,
+                           blueprint_variable<FieldType> &result_flag) -> ALU_cmov_component<FieldType> * {
                             return new ALU_cmov_component<FieldType>(pb, opcode_indicators, desval, arg1val, arg2val, flag,
                                                                   result, result_flag);
                         },
@@ -1154,17 +1154,17 @@ namespace nil {
                       cmpe = cmpae * (1-cmpa)
                     */
                     this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(
-                        {cmpae_result_flag}, {variable<FieldType>(0), cmpa_result_flag * (-1)}, {cmpe_result_flag}));
+                        {cmpae_result_flag}, {blueprint_variable<FieldType>(0), cmpa_result_flag * (-1)}, {cmpe_result_flag}));
 
                     /* copy over results */
                     this->pb.add_r1cs_constraint(
-                        r1cs_constraint<FieldType>({variable<FieldType>(0)}, {this->desval.packed}, {cmpe_result}));
+                        r1cs_constraint<FieldType>({blueprint_variable<FieldType>(0)}, {this->desval.packed}, {cmpe_result}));
 
                     this->pb.add_r1cs_constraint(
-                        r1cs_constraint<FieldType>({variable<FieldType>(0)}, {this->desval.packed}, {cmpa_result}));
+                        r1cs_constraint<FieldType>({blueprint_variable<FieldType>(0)}, {this->desval.packed}, {cmpa_result}));
 
                     this->pb.add_r1cs_constraint(
-                        r1cs_constraint<FieldType>({variable<FieldType>(0)}, {this->desval.packed}, {cmpae_result}));
+                        r1cs_constraint<FieldType>({blueprint_variable<FieldType>(0)}, {this->desval.packed}, {cmpae_result}));
                 }
 
                 template<typename FieldType>
@@ -1191,16 +1191,16 @@ namespace nil {
                            word_variable_component<FieldType> &desval,
                            word_variable_component<FieldType> &arg1val,
                            word_variable_component<FieldType> &arg2val,
-                           variable<FieldType> &flag,
-                           variable<FieldType> &result,
-                           variable<FieldType> &result_flag) -> ALU_cmp_component<FieldType> * {
-                            variable<FieldType> cmpa_result;
+                           blueprint_variable<FieldType> &flag,
+                           blueprint_variable<FieldType> &result,
+                           blueprint_variable<FieldType> &result_flag) -> ALU_cmp_component<FieldType> * {
+                            blueprint_variable<FieldType> cmpa_result;
                             cmpa_result.allocate(pb);
-                            variable<FieldType> cmpa_result_flag;
+                            blueprint_variable<FieldType> cmpa_result_flag;
                             cmpa_result_flag.allocate(pb);
-                            variable<FieldType> cmpae_result;
+                            blueprint_variable<FieldType> cmpae_result;
                             cmpae_result.allocate(pb);
-                            variable<FieldType> cmpae_result_flag;
+                            blueprint_variable<FieldType> cmpae_result_flag;
                             cmpae_result_flag.allocate(pb);
                             return new ALU_cmp_component<FieldType>(pb, opcode_indicators, desval, arg1val, arg2val, flag,
                                                                  result, result_flag, cmpa_result, cmpa_result_flag,
@@ -1220,16 +1220,16 @@ namespace nil {
                            word_variable_component<FieldType> &desval,
                            word_variable_component<FieldType> &arg1val,
                            word_variable_component<FieldType> &arg2val,
-                           variable<FieldType> &flag,
-                           variable<FieldType> &result,
-                           variable<FieldType> &result_flag) -> ALU_cmp_component<FieldType> * {
-                            variable<FieldType> cmpe_result;
+                           blueprint_variable<FieldType> &flag,
+                           blueprint_variable<FieldType> &result,
+                           blueprint_variable<FieldType> &result_flag) -> ALU_cmp_component<FieldType> * {
+                            blueprint_variable<FieldType> cmpe_result;
                             cmpe_result.allocate(pb);
-                            variable<FieldType> cmpe_result_flag;
+                            blueprint_variable<FieldType> cmpe_result_flag;
                             cmpe_result_flag.allocate(pb);
-                            variable<FieldType> cmpae_result;
+                            blueprint_variable<FieldType> cmpae_result;
                             cmpae_result.allocate(pb);
-                            variable<FieldType> cmpae_result_flag;
+                            blueprint_variable<FieldType> cmpae_result_flag;
                             cmpae_result_flag.allocate(pb);
                             return new ALU_cmp_component<FieldType>(pb, opcode_indicators, desval, arg1val, arg2val, flag,
                                                                  cmpe_result, cmpe_result_flag, result, result_flag,
@@ -1249,16 +1249,16 @@ namespace nil {
                            word_variable_component<FieldType> &desval,
                            word_variable_component<FieldType> &arg1val,
                            word_variable_component<FieldType> &arg2val,
-                           variable<FieldType> &flag,
-                           variable<FieldType> &result,
-                           variable<FieldType> &result_flag) -> ALU_cmp_component<FieldType> * {
-                            variable<FieldType> cmpe_result;
+                           blueprint_variable<FieldType> &flag,
+                           blueprint_variable<FieldType> &result,
+                           blueprint_variable<FieldType> &result_flag) -> ALU_cmp_component<FieldType> * {
+                            blueprint_variable<FieldType> cmpe_result;
                             cmpe_result.allocate(pb);
-                            variable<FieldType> cmpe_result_flag;
+                            blueprint_variable<FieldType> cmpe_result_flag;
                             cmpe_result_flag.allocate(pb);
-                            variable<FieldType> cmpa_result;
+                            blueprint_variable<FieldType> cmpa_result;
                             cmpa_result.allocate(pb);
-                            variable<FieldType> cmpa_result_flag;
+                            blueprint_variable<FieldType> cmpa_result_flag;
                             cmpa_result_flag.allocate(pb);
                             return new ALU_cmp_component<FieldType>(
                                 pb, opcode_indicators, desval, arg1val, arg2val, flag, cmpe_result, cmpe_result_flag,
@@ -1273,9 +1273,9 @@ namespace nil {
                 void ALU_cmps_component<FieldType>::generate_r1cs_constraints() {
                     /* negate sign bits */
                     this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(
-                        {variable<FieldType>(0)}, {variable<FieldType>(0), this->arg1val.bits[this->pb.ap.w - 1] * (-1)}, {negated_arg1val_sign}));
+                        {blueprint_variable<FieldType>(0)}, {blueprint_variable<FieldType>(0), this->arg1val.bits[this->pb.ap.w - 1] * (-1)}, {negated_arg1val_sign}));
                     this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(
-                        {variable<FieldType>(0)}, {variable<FieldType>(0), this->arg2val.bits[this->pb.ap.w - 1] * (-1)}, {negated_arg2val_sign}));
+                        {blueprint_variable<FieldType>(0)}, {blueprint_variable<FieldType>(0), this->arg2val.bits[this->pb.ap.w - 1] * (-1)}, {negated_arg2val_sign}));
 
                     /* pack */
                     pack_modified_arg1->generate_r1cs_constraints(false);
@@ -1286,10 +1286,10 @@ namespace nil {
 
                     /* copy over results */
                     this->pb.add_r1cs_constraint(
-                        r1cs_constraint<FieldType>({variable<FieldType>(0)}, {this->desval.packed}, {cmpg_result}));
+                        r1cs_constraint<FieldType>({blueprint_variable<FieldType>(0)}, {this->desval.packed}, {cmpg_result}));
 
                     this->pb.add_r1cs_constraint(
-                        r1cs_constraint<FieldType>({variable<FieldType>(0)}, {this->desval.packed}, {cmpge_result}));
+                        r1cs_constraint<FieldType>({blueprint_variable<FieldType>(0)}, {this->desval.packed}, {cmpge_result}));
                 }
 
                 template<typename FieldType>
@@ -1321,12 +1321,12 @@ namespace nil {
                            word_variable_component<FieldType> &desval,
                            word_variable_component<FieldType> &arg1val,
                            word_variable_component<FieldType> &arg2val,
-                           variable<FieldType> &flag,
-                           variable<FieldType> &result,
-                           variable<FieldType> &result_flag) -> ALU_cmps_component<FieldType> * {
-                            variable<FieldType> cmpge_result;
+                           blueprint_variable<FieldType> &flag,
+                           blueprint_variable<FieldType> &result,
+                           blueprint_variable<FieldType> &result_flag) -> ALU_cmps_component<FieldType> * {
+                            blueprint_variable<FieldType> cmpge_result;
                             cmpge_result.allocate(pb);
-                            variable<FieldType> cmpge_result_flag;
+                            blueprint_variable<FieldType> cmpge_result_flag;
                             cmpge_result_flag.allocate(pb);
                             return new ALU_cmps_component<FieldType>(pb, opcode_indicators, desval, arg1val, arg2val, flag,
                                                                   result, result_flag, cmpge_result, cmpge_result_flag);
@@ -1347,12 +1347,12 @@ namespace nil {
                            word_variable_component<FieldType> &desval,
                            word_variable_component<FieldType> &arg1val,
                            word_variable_component<FieldType> &arg2val,
-                           variable<FieldType> &flag,
-                           variable<FieldType> &result,
-                           variable<FieldType> &result_flag) -> ALU_cmps_component<FieldType> * {
-                            variable<FieldType> cmpg_result;
+                           blueprint_variable<FieldType> &flag,
+                           blueprint_variable<FieldType> &result,
+                           blueprint_variable<FieldType> &result_flag) -> ALU_cmps_component<FieldType> * {
+                            blueprint_variable<FieldType> cmpg_result;
                             cmpg_result.allocate(pb);
-                            variable<FieldType> cmpg_result_flag;
+                            blueprint_variable<FieldType> cmpg_result_flag;
                             cmpg_result_flag.allocate(pb);
                             return new ALU_cmps_component<FieldType>(pb, opcode_indicators, desval, arg1val, arg2val, flag,
                                                                   cmpg_result, cmpg_result_flag, result, result_flag);
@@ -1377,9 +1377,9 @@ namespace nil {
                     /* compute flag */
                     compute_flag->generate_r1cs_constraints();
 
-                    this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>({variable<FieldType>(0)}, {this->result_flag}, {mull_flag}));
+                    this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>({blueprint_variable<FieldType>(0)}, {this->result_flag}, {mull_flag}));
 
-                    this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>({variable<FieldType>(0)}, {this->result_flag}, {umulh_flag}));
+                    this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>({blueprint_variable<FieldType>(0)}, {this->result_flag}, {umulh_flag}));
                 }
 
                 template<typename FieldType>
@@ -1410,12 +1410,12 @@ namespace nil {
                            word_variable_component<FieldType> &desval,
                            word_variable_component<FieldType> &arg1val,
                            word_variable_component<FieldType> &arg2val,
-                           variable<FieldType> &flag,
-                           variable<FieldType> &result,
-                           variable<FieldType> &result_flag) -> ALU_umul_component<FieldType> * {
-                            variable<FieldType> umulh_result;
+                           blueprint_variable<FieldType> &flag,
+                           blueprint_variable<FieldType> &result,
+                           blueprint_variable<FieldType> &result_flag) -> ALU_umul_component<FieldType> * {
+                            blueprint_variable<FieldType> umulh_result;
                             umulh_result.allocate(pb);
-                            variable<FieldType> umulh_flag;
+                            blueprint_variable<FieldType> umulh_flag;
                             umulh_flag.allocate(pb);
                             return new ALU_umul_component<FieldType>(pb, opcode_indicators, desval, arg1val, arg2val, flag,
                                                                   result, result_flag, umulh_result, umulh_flag);
@@ -1434,12 +1434,12 @@ namespace nil {
                            word_variable_component<FieldType> &desval,
                            word_variable_component<FieldType> &arg1val,
                            word_variable_component<FieldType> &arg2val,
-                           variable<FieldType> &flag,
-                           variable<FieldType> &result,
-                           variable<FieldType> &result_flag) -> ALU_umul_component<FieldType> * {
-                            variable<FieldType> mull_result;
+                           blueprint_variable<FieldType> &flag,
+                           blueprint_variable<FieldType> &result,
+                           blueprint_variable<FieldType> &result_flag) -> ALU_umul_component<FieldType> * {
+                            blueprint_variable<FieldType> mull_result;
                             mull_result.allocate(pb);
-                            variable<FieldType> mull_flag;
+                            blueprint_variable<FieldType> mull_flag;
                             mull_flag.allocate(pb);
                             return new ALU_umul_component<FieldType>(pb, opcode_indicators, desval, arg1val, arg2val, flag,
                                                                   mull_result, mull_flag, result, result_flag);
@@ -1462,7 +1462,7 @@ namespace nil {
                     b.add_term(this->arg2val.packed, 1);
                     b.add_term(this->arg2val.bits[this->pb.ap.w - 1], -(typename FieldType::value_type(2) ^ this->pb.ap.w));
                     c.add_term(mul_result.packed, 1);
-                    c.add_term(variable<FieldType>(0), -(typename FieldType::value_type(2) ^ (2 * this->pb.ap.w)));
+                    c.add_term(blueprint_variable<FieldType>(0), -(typename FieldType::value_type(2) ^ (2 * this->pb.ap.w)));
                     this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(a, b, c));
 
                     mul_result.generate_r1cs_constraints(true);
@@ -1474,7 +1474,7 @@ namespace nil {
                     pack_top->generate_r1cs_constraints(false);
 
                     /*
-                      the gadgets below are FieldType::value_type specific:
+                      the gadgets below are typename FieldType::value_type specific:
                       I * X = (1-R)
                       R * X = 0
 
@@ -1482,19 +1482,19 @@ namespace nil {
                       if X != 0 then R = 0 and I = X^{-1}
                     */
                     this->pb.add_r1cs_constraint(
-                        r1cs_constraint<FieldType>({is_top_empty_aux}, {top}, {variable<FieldType>(0), is_top_empty * (-1)}));
-                    this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>({is_top_empty}, {top}, {variable<FieldType>(0) * 0}));
+                        r1cs_constraint<FieldType>({is_top_empty_aux}, {top}, {blueprint_variable<FieldType>(0), is_top_empty * (-1)}));
+                    this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>({is_top_empty}, {top}, {blueprint_variable<FieldType>(0) * 0}));
 
                     this->pb.add_r1cs_constraint(
                         r1cs_constraint<FieldType>({is_top_full_aux},
-                                                   {top, variable<FieldType>(0) * (1l - (1ul << (this->pb.ap.w + 1)))},
-                                                   {variable<FieldType>(0), is_top_full * (-1)}));
+                                                   {top, blueprint_variable<FieldType>(0) * (1l - (1ul << (this->pb.ap.w + 1)))},
+                                                   {blueprint_variable<FieldType>(0), is_top_full * (-1)}));
                     this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(
-                        {is_top_full}, {top, variable<FieldType>(0) * (1l - (1ul << (this->pb.ap.w + 1)))}, {variable<FieldType>(0) * 0}));
+                        {is_top_full}, {top, blueprint_variable<FieldType>(0) * (1l - (1ul << (this->pb.ap.w + 1)))}, {blueprint_variable<FieldType>(0) * 0}));
 
                     /* smulh_flag = 1 - (is_top_full + is_top_empty) */
                     this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(
-                        {variable<FieldType>(0)}, {variable<FieldType>(0), is_top_full * (-1), is_top_empty * (-1)}, {smulh_flag}));
+                        {blueprint_variable<FieldType>(0)}, {blueprint_variable<FieldType>(0), is_top_full * (-1), is_top_empty * (-1)}, {smulh_flag}));
                 }
 
                 template<typename FieldType>
@@ -1552,9 +1552,9 @@ namespace nil {
                            word_variable_component<FieldType> &desval,
                            word_variable_component<FieldType> &arg1val,
                            word_variable_component<FieldType> &arg2val,
-                           variable<FieldType> &flag,
-                           variable<FieldType> &result,
-                           variable<FieldType> &result_flag) -> ALU_smul_component<FieldType> * {
+                           blueprint_variable<FieldType> &flag,
+                           blueprint_variable<FieldType> &result,
+                           blueprint_variable<FieldType> &result_flag) -> ALU_smul_component<FieldType> * {
                             return new ALU_smul_component<FieldType>(pb, opcode_indicators, desval, arg1val, arg2val, flag,
                                                                   result, result_flag);
                         },
@@ -1583,10 +1583,10 @@ namespace nil {
 
                     /* (1-B_nonzero) * B = 0 */
                     linear_combination<FieldType> a2, b2, c2;
-                    a2.add_term(variable<FieldType>(0), 1);
+                    a2.add_term(blueprint_variable<FieldType>(0), 1);
                     a2.add_term(B_nonzero, -1);
                     b2.add_term(this->arg2val.packed, 1);
-                    c2.add_term(variable<FieldType>(0), 0);
+                    c2.add_term(blueprint_variable<FieldType>(0), 0);
 
                     this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(a2, b2, c2));
 
@@ -1609,9 +1609,9 @@ namespace nil {
                     /* q * (1-B_nonzero) = 0 */
                     linear_combination<FieldType> a5, b5, c5;
                     a5.add_term(udiv_result, 1);
-                    b5.add_term(variable<FieldType>(0), 1);
+                    b5.add_term(blueprint_variable<FieldType>(0), 1);
                     b5.add_term(B_nonzero, -1);
-                    c5.add_term(variable<FieldType>(0), 0);
+                    c5.add_term(blueprint_variable<FieldType>(0), 0);
 
                     this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(a5, b5, c5));
 
@@ -1661,12 +1661,12 @@ namespace nil {
                            word_variable_component<FieldType> &desval,
                            word_variable_component<FieldType> &arg1val,
                            word_variable_component<FieldType> &arg2val,
-                           variable<FieldType> &flag,
-                           variable<FieldType> &result,
-                           variable<FieldType> &result_flag) -> ALU_divmod_component<FieldType> * {
-                            variable<FieldType> umod_result;
+                           blueprint_variable<FieldType> &flag,
+                           blueprint_variable<FieldType> &result,
+                           blueprint_variable<FieldType> &result_flag) -> ALU_divmod_component<FieldType> * {
+                            blueprint_variable<FieldType> umod_result;
                             umod_result.allocate(pb);
-                            variable<FieldType> umod_flag;
+                            blueprint_variable<FieldType> umod_flag;
                             umod_flag.allocate(pb);
                             return new ALU_divmod_component<FieldType>(pb, opcode_indicators, desval, arg1val, arg2val,
                                                                     flag, result, result_flag, umod_result, umod_flag);
@@ -1685,12 +1685,12 @@ namespace nil {
                            word_variable_component<FieldType> &desval,
                            word_variable_component<FieldType> &arg1val,
                            word_variable_component<FieldType> &arg2val,
-                           variable<FieldType> &flag,
-                           variable<FieldType> &result,
-                           variable<FieldType> &result_flag) -> ALU_divmod_component<FieldType> * {
-                            variable<FieldType> udiv_result;
+                           blueprint_variable<FieldType> &flag,
+                           blueprint_variable<FieldType> &result,
+                           blueprint_variable<FieldType> &result_flag) -> ALU_divmod_component<FieldType> * {
+                            blueprint_variable<FieldType> udiv_result;
                             udiv_result.allocate(pb);
-                            variable<FieldType> udiv_flag;
+                            blueprint_variable<FieldType> udiv_flag;
                             udiv_flag.allocate(pb);
                             return new ALU_divmod_component<FieldType>(pb, opcode_indicators, desval, arg1val, arg2val,
                                                                     flag, udiv_result, udiv_flag, result, result_flag);
@@ -1756,7 +1756,7 @@ namespace nil {
                     */
                     check_oversize_shift->generate_r1cs_constraints();
                     this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(
-                        {variable<FieldType>(0), is_oversize_shift * (-1)}, {barrel_right_internal[logw]}, {this->result}));
+                        {blueprint_variable<FieldType>(0), is_oversize_shift * (-1)}, {barrel_right_internal[logw]}, {this->result}));
 
                     /*
                       get reversed result for SHL
@@ -1780,10 +1780,10 @@ namespace nil {
                                                    {shr_result, reversed_result * (-1)}));
 
                     this->pb.add_r1cs_constraint(
-                        r1cs_constraint<FieldType>({variable<FieldType>(0)}, {this->arg1val.bits[0]}, {shr_flag}));
+                        r1cs_constraint<FieldType>({blueprint_variable<FieldType>(0)}, {this->arg1val.bits[0]}, {shr_flag}));
 
                     this->pb.add_r1cs_constraint(
-                        r1cs_constraint<FieldType>({variable<FieldType>(0)}, {this->arg1val.bits[this->pb.ap.w - 1]}, {shl_flag}));
+                        r1cs_constraint<FieldType>({blueprint_variable<FieldType>(0)}, {this->arg1val.bits[this->pb.ap.w - 1]}, {shl_flag}));
                 }
 
                 template<typename FieldType>
@@ -1854,12 +1854,12 @@ namespace nil {
                            word_variable_component<FieldType> &desval,
                            word_variable_component<FieldType> &arg1val,
                            word_variable_component<FieldType> &arg2val,
-                           variable<FieldType> &flag,
-                           variable<FieldType> &result,
-                           variable<FieldType> &result_flag) -> ALU_shr_shl_component<FieldType> * {
-                            variable<FieldType> shl_result;
+                           blueprint_variable<FieldType> &flag,
+                           blueprint_variable<FieldType> &result,
+                           blueprint_variable<FieldType> &result_flag) -> ALU_shr_shl_component<FieldType> * {
+                            blueprint_variable<FieldType> shl_result;
                             shl_result.allocate(pb);
-                            variable<FieldType> shl_flag;
+                            blueprint_variable<FieldType> shl_flag;
                             shl_flag.allocate(pb);
                             return new ALU_shr_shl_component<FieldType>(pb, opcode_indicators, desval, arg1val, arg2val,
                                                                      flag, result, result_flag, shl_result, shl_flag);
@@ -1878,12 +1878,12 @@ namespace nil {
                            word_variable_component<FieldType> &desval,
                            word_variable_component<FieldType> &arg1val,
                            word_variable_component<FieldType> &arg2val,
-                           variable<FieldType> &flag,
-                           variable<FieldType> &result,
-                           variable<FieldType> &result_flag) -> ALU_shr_shl_component<FieldType> * {
-                            variable<FieldType> shr_result;
+                           blueprint_variable<FieldType> &flag,
+                           blueprint_variable<FieldType> &result,
+                           blueprint_variable<FieldType> &result_flag) -> ALU_shr_shl_component<FieldType> * {
+                            blueprint_variable<FieldType> shr_result;
                             shr_result.allocate(pb);
-                            variable<FieldType> shr_flag;
+                            blueprint_variable<FieldType> shr_flag;
                             shr_flag.allocate(pb);
                             return new ALU_shr_shl_component<FieldType>(pb, opcode_indicators, desval, arg1val, arg2val,
                                                                      flag, shr_result, shr_flag, result, result_flag);

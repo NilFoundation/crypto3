@@ -22,19 +22,19 @@ namespace nil {
                 template<typename FieldType>
                 class consistency_enforcer_component : public tinyram_standard_component<FieldType> {
                 private:
-                    variable<FieldType> is_register_instruction;
-                    variable<FieldType> is_control_flow_instruction;
-                    variable<FieldType> is_stall_instruction;
+                    blueprint_variable<FieldType> is_register_instruction;
+                    blueprint_variable<FieldType> is_control_flow_instruction;
+                    blueprint_variable<FieldType> is_stall_instruction;
 
-                    variable<FieldType> packed_desidx;
+                    blueprint_variable<FieldType> packed_desidx;
                     std::shared_ptr<packing_component<FieldType>> pack_desidx;
 
-                    variable<FieldType> computed_result;
-                    variable<FieldType> computed_flag;
+                    blueprint_variable<FieldType> computed_result;
+                    blueprint_variable<FieldType> computed_flag;
                     std::shared_ptr<inner_product_component<FieldType>> compute_computed_result;
                     std::shared_ptr<inner_product_component<FieldType>> compute_computed_flag;
 
-                    variable<FieldType> pc_from_cf_or_zero;
+                    blueprint_variable<FieldType> pc_from_cf_or_zero;
 
                     std::shared_ptr<loose_multiplexing_component<FieldType>> demux_packed_outgoing_desval;
 
@@ -43,27 +43,27 @@ namespace nil {
                     pb_variable_array<FieldType> instruction_results;
                     pb_variable_array<FieldType> instruction_flags;
                     pb_variable_array<FieldType> desidx;
-                    variable<FieldType> packed_incoming_pc;
+                    blueprint_variable<FieldType> packed_incoming_pc;
                     pb_variable_array<FieldType> packed_incoming_registers;
-                    variable<FieldType> packed_incoming_desval;
-                    variable<FieldType> incoming_flag;
-                    variable<FieldType> packed_outgoing_pc;
+                    blueprint_variable<FieldType> packed_incoming_desval;
+                    blueprint_variable<FieldType> incoming_flag;
+                    blueprint_variable<FieldType> packed_outgoing_pc;
                     pb_variable_array<FieldType> packed_outgoing_registers;
-                    variable<FieldType> outgoing_flag;
-                    variable<FieldType> packed_outgoing_desval;
+                    blueprint_variable<FieldType> outgoing_flag;
+                    blueprint_variable<FieldType> packed_outgoing_desval;
 
                     consistency_enforcer_component(tinyram_blueprint<FieldType> &pb,
                                                 const pb_variable_array<FieldType> &opcode_indicators,
                                                 const pb_variable_array<FieldType> &instruction_results,
                                                 const pb_variable_array<FieldType> &instruction_flags,
                                                 const pb_variable_array<FieldType> &desidx,
-                                                const variable<FieldType> &packed_incoming_pc,
+                                                const blueprint_variable<FieldType> &packed_incoming_pc,
                                                 const pb_variable_array<FieldType> &packed_incoming_registers,
-                                                const variable<FieldType> &packed_incoming_desval,
-                                                const variable<FieldType> &incoming_flag,
-                                                const variable<FieldType> &packed_outgoing_pc,
+                                                const blueprint_variable<FieldType> &packed_incoming_desval,
+                                                const blueprint_variable<FieldType> &incoming_flag,
+                                                const blueprint_variable<FieldType> &packed_outgoing_pc,
                                                 const pb_variable_array<FieldType> &packed_outgoing_registers,
-                                                const variable<FieldType> &outgoing_flag);
+                                                const blueprint_variable<FieldType> &outgoing_flag);
 
                     void generate_r1cs_constraints();
                     void generate_r1cs_witness();
@@ -76,13 +76,13 @@ namespace nil {
                     const pb_variable_array<FieldType> &instruction_results,
                     const pb_variable_array<FieldType> &instruction_flags,
                     const pb_variable_array<FieldType> &desidx,
-                    const variable<FieldType> &packed_incoming_pc,
+                    const blueprint_variable<FieldType> &packed_incoming_pc,
                     const pb_variable_array<FieldType> &packed_incoming_registers,
-                    const variable<FieldType> &packed_incoming_desval,
-                    const variable<FieldType> &incoming_flag,
-                    const variable<FieldType> &packed_outgoing_pc,
+                    const blueprint_variable<FieldType> &packed_incoming_desval,
+                    const blueprint_variable<FieldType> &incoming_flag,
+                    const blueprint_variable<FieldType> &packed_outgoing_pc,
                     const pb_variable_array<FieldType> &packed_outgoing_registers,
-                    const variable<FieldType> &outgoing_flag) :
+                    const blueprint_variable<FieldType> &outgoing_flag) :
                     tinyram_standard_component<FieldType>(pb),
                     opcode_indicators(opcode_indicators), instruction_results(instruction_results),
                     instruction_flags(instruction_flags), desidx(desidx), packed_incoming_pc(packed_incoming_pc),
@@ -111,7 +111,8 @@ namespace nil {
                     pc_from_cf_or_zero.allocate(pb);
 
                     demux_packed_outgoing_desval.reset(new loose_multiplexing_component<FieldType>(
-                        pb, packed_outgoing_registers, packed_desidx, packed_outgoing_desval, variable<FieldType>(0)));
+                        pb, packed_outgoing_registers, packed_desidx, packed_outgoing_desval,
+                                                                    blueprint_variable<FieldType>(0)));
                 }
 
                 template<typename FieldType>
@@ -124,7 +125,7 @@ namespace nil {
 
                     /* is_register_instruction */
                     linear_combination<FieldType> reg_a, reg_b, reg_c;
-                    reg_a.add_term(variable<FieldType>(0), 1);
+                    reg_a.add_term(blueprint_variable<FieldType>(0), 1);
                     for (std::size_t i = 0; i < ARRAY_SIZE(tinyram_opcodes_register); ++i) {
                         reg_b.add_term(opcode_indicators[tinyram_opcodes_register[i]], 1);
                     }
@@ -133,7 +134,7 @@ namespace nil {
 
                     /* is_control_flow_instruction */
                     linear_combination<FieldType> cf_a, cf_b, cf_c;
-                    cf_a.add_term(variable<FieldType>(0), 1);
+                    cf_a.add_term(blueprint_variable<FieldType>(0), 1);
                     for (std::size_t i = 0; i < ARRAY_SIZE(tinyram_opcodes_control_flow); ++i) {
                         cf_b.add_term(opcode_indicators[tinyram_opcodes_control_flow[i]], 1);
                     }
@@ -142,7 +143,7 @@ namespace nil {
 
                     /* is_stall_instruction */
                     linear_combination<FieldType> stall_a, stall_b, stall_c;
-                    stall_a.add_term(variable<FieldType>(0), 1);
+                    stall_a.add_term(blueprint_variable<FieldType>(0), 1);
                     for (std::size_t i = 0; i < ARRAY_SIZE(tinyram_opcodes_stall); ++i) {
                         stall_b.add_term(opcode_indicators[tinyram_opcodes_stall[i]], 1);
                     }
@@ -189,9 +190,9 @@ namespace nil {
                     */
                     for (std::size_t i = 0; i < this->pb.ap.k; ++i) {
                         this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(
-                            {variable<FieldType>(0), demux_packed_outgoing_desval->alpha[i] * (-1)},
+                            {blueprint_variable<FieldType>(0), demux_packed_outgoing_desval->alpha[i] * (-1)},
                             {packed_outgoing_registers[i], packed_incoming_registers[i] * (-1)},
-                            {variable<FieldType>(0) * 0}));
+                            {blueprint_variable<FieldType>(0) * 0}));
                     }
 
                     /*
@@ -271,7 +272,7 @@ namespace nil {
                       next_desval = computed_result * is_register_instruction + packed_incoming_desval *
                       (1-is_register_instruction)
                     */
-                    FieldType::value_type changed_register_contents =
+                    typename FieldType::value_type changed_register_contents =
                         this->pb.val(computed_result) * this->pb.val(is_register_instruction) +
                         this->pb.val(packed_incoming_desval) *
                             (FieldType::value_type::zero() - this->pb.val(is_register_instruction));

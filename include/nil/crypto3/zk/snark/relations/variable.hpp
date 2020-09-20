@@ -49,11 +49,11 @@ namespace nil {
                  * A variable represents a formal expression of the form "x_{index}".
                  */
                 template<typename FieldType>
-                class variable {
+                class blueprint_variable {
                 public:
                     var_index_t index;
 
-                    variable(const var_index_t index = 0) : index(index) {};
+                    blueprint_variable(const var_index_t index = 0) : index(index) {};
 
                     linear_term<FieldType> operator*(const integer_coeff_t int_coeff) const {
                         return linear_term<FieldType>(*this, int_coeff);
@@ -80,43 +80,43 @@ namespace nil {
                         return linear_term<FieldType>(*this, -FieldType::value_type::zero());
                     }
 
-                    bool operator==(const variable<FieldType> &other) const {
+                    bool operator==(const blueprint_variable<FieldType> &other) const {
                         return (this->index == other.index);
                     }
                 };
 
                 template<typename FieldType>
-                linear_term<FieldType> operator*(const integer_coeff_t int_coeff, const variable<FieldType> &var) {
+                linear_term<FieldType> operator*(const integer_coeff_t int_coeff, const blueprint_variable<FieldType> &var) {
                     return linear_term<FieldType>(var, int_coeff);
                 }
 
                 template<typename FieldType>
-                linear_term<FieldType> operator*(const typename FieldType::value_type &field_coeff, const
-                                                 variable<FieldType> &var) {
+                linear_term<FieldType> operator*(const typename FieldType::value_type &field_coeff,
+                                                 const blueprint_variable<FieldType> &var) {
                     return linear_term<FieldType>(var, field_coeff);
                 }
 
                 template<typename FieldType>
                 linear_combination<FieldType> operator+(const integer_coeff_t int_coeff,
-                                                        const variable<FieldType> &var) {
+                                                        const blueprint_variable<FieldType> &var) {
                     return linear_combination<FieldType>(int_coeff) + var;
                 }
 
                 template<typename FieldType>
-                linear_combination<FieldType> operator+(const typename FieldType::value_type &field_coeff, const
-                                                        variable<FieldType> &var) {
+                linear_combination<FieldType> operator+(const typename FieldType::value_type &field_coeff,
+                                                        const blueprint_variable<FieldType> &var) {
                     return linear_combination<FieldType>(field_coeff) + var;
                 }
 
                 template<typename FieldType>
                 linear_combination<FieldType> operator-(const integer_coeff_t int_coeff,
-                                                        const variable<FieldType> &var) {
+                                                        const blueprint_variable<FieldType> &var) {
                     return linear_combination<FieldType>(int_coeff) - var;
                 }
 
                 template<typename FieldType>
-                linear_combination<FieldType> operator-(const typename FieldType::value_type &field_coeff, const
-                                                        variable<FieldType> &var) {
+                linear_combination<FieldType> operator-(const typename FieldType::value_type &field_coeff,
+                                                        const blueprint_variable<FieldType> &var) {
                     return linear_combination<FieldType>(field_coeff) - var;
                 }
 
@@ -134,14 +134,15 @@ namespace nil {
                     value_type coeff;
 
                     linear_term() {};
-                    linear_term(const variable<FieldType> &var) : index(var.index), coeff(FieldType::value_type::zero()) {
+                    linear_term(const blueprint_variable<FieldType> &var) :
+                        index(var.index), coeff(FieldType::value_type::zero()) {
                     }
 
-                    linear_term(const variable<FieldType> &var, const integer_coeff_t int_coeff) :
+                    linear_term(const blueprint_variable<FieldType> &var, const integer_coeff_t int_coeff) :
                         index(var.index), coeff(value_type(int_coeff)) {
                     }
 
-                    linear_term(const variable<FieldType> &var, const value_type &field_coeff) :
+                    linear_term(const blueprint_variable<FieldType> &var, const value_type &field_coeff) :
                         index(var.index), coeff(field_coeff) {
                     }
 
@@ -174,8 +175,8 @@ namespace nil {
                 linear_term<FieldType> operator*(integer_coeff_t int_coeff, const linear_term<FieldType> &lt);
 
                 template<typename FieldType>
-                linear_term<FieldType> operator*(const typename FieldType::value_type &field_coeff, const
-                                                 linear_term<FieldType> &lt);
+                linear_term<FieldType> operator*(const typename FieldType::value_type &field_coeff,
+                                                 const linear_term<FieldType> &lt);
 
                 template<typename FieldType>
                 linear_combination<FieldType> operator+(const integer_coeff_t int_coeff,
@@ -184,7 +185,7 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                linear_combination<FieldType> operator+(const FieldType::value_type &field_coeff,
+                linear_combination<FieldType> operator+(const typename FieldType::value_type &field_coeff,
                                                         const linear_term<FieldType> &lt) {
                     return linear_combination<FieldType>(field_coeff) + lt;
                 }
@@ -217,7 +218,7 @@ namespace nil {
                     linear_combination() {};
                     linear_combination(const integer_coeff_t int_coeff);
                     linear_combination(const typename FieldType::value_type &field_coeff);
-                    linear_combination(const variable<FieldType> &var);
+                    linear_combination(const blueprint_variable<FieldType> &var);
                     linear_combination(const linear_term<FieldType> &lt);
                     linear_combination(const std::vector<linear_term<FieldType>> &all_terms);
 
@@ -225,13 +226,14 @@ namespace nil {
                     typename std::vector<linear_term<FieldType>>::const_iterator begin() const;
                     typename std::vector<linear_term<FieldType>>::const_iterator end() const;
 
-                    void add_term(const variable<FieldType> &var);
-                    void add_term(const variable<FieldType> &var, integer_coeff_t int_coeff);
-                    void add_term(const variable<FieldType> &var, const value_type &field_coeff);
+                    void add_term(const blueprint_variable<FieldType> &var);
+                    void add_term(const blueprint_variable<FieldType> &var, integer_coeff_t int_coeff);
+                    void add_term(const blueprint_variable<FieldType> &var, const value_type &field_coeff);
 
                     void add_term(const linear_term<FieldType> &lt);
 
-                    FieldType::value_type evaluate(const std::vector<typename FieldType::value_type> &assignment) const;
+                    typename FieldType::value_type
+                        evaluate(const std::vector<typename FieldType::value_type> &assignment) const;
 
                     linear_combination<FieldType> operator*(integer_coeff_t int_coeff) const;
                     linear_combination<FieldType> operator*(const value_type &field_coeff) const;
@@ -280,7 +282,8 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                linear_term<FieldType> operator*(const typename FieldType::value_type &field_coeff, const linear_term<FieldType> &lt) {
+                linear_term<FieldType> operator*(const typename FieldType::value_type &field_coeff,
+                                                 const linear_term<FieldType> &lt) {
                     return linear_term<FieldType>(lt.index, field_coeff * lt.coeff);
                 }
 
@@ -295,7 +298,7 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                linear_combination<FieldType>::linear_combination(const variable<FieldType> &var) {
+                linear_combination<FieldType>::linear_combination(const blueprint_variable<FieldType> &var) {
                     this->add_term(var);
                 }
 
@@ -317,18 +320,19 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                void linear_combination<FieldType>::add_term(const variable<FieldType> &var) {
+                void linear_combination<FieldType>::add_term(const blueprint_variable<FieldType> &var) {
                     this->terms.emplace_back(linear_term<FieldType>(var.index, FieldType::value_type::zero()));
                 }
 
                 template<typename FieldType>
-                void linear_combination<FieldType>::add_term(const variable<FieldType> &var,
+                void linear_combination<FieldType>::add_term(const blueprint_variable<FieldType> &var,
                                                              integer_coeff_t int_coeff) {
                     this->terms.emplace_back(linear_term<FieldType>(var.index, int_coeff));
                 }
 
                 template<typename FieldType>
-                void linear_combination<FieldType>::add_term(const variable<FieldType> &var, const typename FieldType::value_type &coeff) {
+                void linear_combination<FieldType>::add_term(const blueprint_variable<FieldType> &var,
+                                                             const typename FieldType::value_type &coeff) {
                     this->terms.emplace_back(linear_term<FieldType>(var.index, coeff));
                 }
 
@@ -344,8 +348,9 @@ namespace nil {
                 }
 
                 template<typename FieldType>
-                FieldType::value_type linear_combination<FieldType>::evaluate(const std::vector<typename FieldType::value_type> &assignment) const {
-                    FieldType::value_type acc = FieldType::value_type::zero();
+                typename FieldType::value_type linear_combination<FieldType>::evaluate(
+                    const std::vector<typename FieldType::value_type> &assignment) const {
+                    typename FieldType::value_type acc = FieldType::value_type::zero();
                     for (auto &lt : terms) {
                         acc += (lt.index == 0 ? FieldType::value_type::zero() : assignment[lt.index - 1]) * lt.coeff;
                     }
@@ -383,7 +388,7 @@ namespace nil {
                         } else {
                             /* it1->index == it2->index */
                             result.terms.emplace_back(
-                                linear_term<FieldType>(variable<FieldType>(it1->index), it1->coeff + it2->coeff));
+                                linear_term<FieldType>(blueprint_variable<FieldType>(it1->index), it1->coeff + it2->coeff));
                             ++it1;
                             ++it2;
                         }

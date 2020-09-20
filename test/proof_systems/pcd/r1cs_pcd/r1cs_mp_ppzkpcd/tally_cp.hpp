@@ -69,8 +69,8 @@ namespace nil {
                     typedef compliance_predicate_handler<FieldType, blueprint<FieldType>> base_handler;
                     pb_variable_array<FieldType> incoming_types;
 
-                    variable<FieldType> sum_out_packed;
-                    variable<FieldType> count_out_packed;
+                    blueprint_variable<FieldType> sum_out_packed;
+                    blueprint_variable<FieldType> count_out_packed;
                     pb_variable_array<FieldType> sum_in_packed;
                     pb_variable_array<FieldType> count_in_packed;
 
@@ -82,7 +82,7 @@ namespace nil {
                     std::vector<packing_component<FieldType>> pack_sum_in;
                     std::vector<packing_component<FieldType>> pack_count_in;
 
-                    variable<FieldType> type_val_inner_product;
+                    blueprint_variable<FieldType> type_val_inner_product;
                     std::shared_ptr<inner_product_component<FieldType>> compute_type_val_inner_product;
 
                     pb_variable_array<FieldType> arity_indicators;
@@ -173,7 +173,7 @@ namespace nil {
                 template<typename FieldType>
                 class tally_pcd_local_data_variable : public r1cs_pcd_local_data_variable<FieldType> {
                 public:
-                    variable<FieldType> summand;
+                    blueprint_variable<FieldType> summand;
 
                     tally_pcd_local_data_variable(blueprint<FieldType> &pb) :
                         r1cs_pcd_local_data_variable<FieldType>(pb) {

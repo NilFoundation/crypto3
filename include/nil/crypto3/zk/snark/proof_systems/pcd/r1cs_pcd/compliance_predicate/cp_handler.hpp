@@ -37,7 +37,7 @@ namespace nil {
                     std::size_t num_vars_at_construction;
 
                 public:
-                    variable<FieldType> type;
+                    blueprint_variable<FieldType> type;
 
                     pb_variable_array<FieldType> all_vars;
 
@@ -81,7 +81,7 @@ namespace nil {
                     BlueprintType pb;
 
                     std::shared_ptr<r1cs_pcd_message_variable<FieldType>> outgoing_message;
-                    variable<FieldType> arity;
+                    blueprint_variable<FieldType> arity;
                     std::vector<std::shared_ptr<r1cs_pcd_message_variable<FieldType>>> incoming_messages;
                     std::shared_ptr<r1cs_pcd_local_data_variable<FieldType>> local_data;
 
@@ -130,7 +130,7 @@ namespace nil {
 
                     for (std::size_t var_idx = num_vars_at_construction + 1; var_idx <= this->pb.num_variables();
                          ++var_idx) {
-                        all_vars.emplace_back(variable<FieldType>(var_idx));
+                        all_vars.emplace_back(blueprint_variable<FieldType>(var_idx));
                     }
                 }
 
@@ -152,7 +152,7 @@ namespace nil {
 
                     for (std::size_t var_idx = num_vars_at_construction + 1; var_idx <= this->pb.num_variables();
                          ++var_idx) {
-                        all_vars.emplace_back(variable<FieldType>(var_idx));
+                        all_vars.emplace_back(blueprint_variable<FieldType>(var_idx));
                     }
                 }
 

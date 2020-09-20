@@ -29,14 +29,14 @@ namespace nil {
                 public:
                     const word_variable_component<FieldType> pc;
                     const word_variable_component<FieldType> argval2;
-                    const variable<FieldType> flag;
-                    const variable<FieldType> result;
+                    const blueprint_variable<FieldType> flag;
+                    const blueprint_variable<FieldType> result;
 
                     ALU_control_flow_component(tinyram_blueprint<FieldType> &pb,
                                             const word_variable_component<FieldType> &pc,
                                             const word_variable_component<FieldType> &argval2,
-                                            const variable<FieldType> &flag,
-                                            const variable<FieldType> &result) :
+                                            const blueprint_variable<FieldType> &flag,
+                                            const blueprint_variable<FieldType> &result) :
                         tinyram_standard_component<FieldType>(pb),
                         pc(pc), argval2(argval2), flag(flag), result(result) {};
                 };
@@ -47,8 +47,8 @@ namespace nil {
                     ALU_jmp_component(tinyram_blueprint<FieldType> &pb,
                                    const word_variable_component<FieldType> &pc,
                                    const word_variable_component<FieldType> &argval2,
-                                   const variable<FieldType> &flag,
-                                   const variable<FieldType> &result) :
+                                   const blueprint_variable<FieldType> &flag,
+                                   const blueprint_variable<FieldType> &result) :
                         ALU_control_flow_component<FieldType>(pb, pc, argval2, flag, result) {
                     }
 
@@ -65,8 +65,8 @@ namespace nil {
                     ALU_cjmp_component(tinyram_blueprint<FieldType> &pb,
                                     const word_variable_component<FieldType> &pc,
                                     const word_variable_component<FieldType> &argval2,
-                                    const variable<FieldType> &flag,
-                                    const variable<FieldType> &result) :
+                                    const blueprint_variable<FieldType> &flag,
+                                    const blueprint_variable<FieldType> &result) :
                         ALU_control_flow_component<FieldType>(pb, pc, argval2, flag, result) {
                     }
 
@@ -83,8 +83,8 @@ namespace nil {
                     ALU_cnjmp_component(tinyram_blueprint<FieldType> &pb,
                                      const word_variable_component<FieldType> &pc,
                                      const word_variable_component<FieldType> &argval2,
-                                     const variable<FieldType> &flag,
-                                     const variable<FieldType> &result) :
+                                     const blueprint_variable<FieldType> &flag,
+                                     const blueprint_variable<FieldType> &result) :
                         ALU_control_flow_component<FieldType>(pb, pc, argval2, flag, result) {
                     }
 
@@ -99,7 +99,7 @@ namespace nil {
                 template<typename FieldType>
                 void ALU_jmp_component<FieldType>::generate_r1cs_constraints() {
                     this->pb.add_r1cs_constraint(
-                        r1cs_constraint<FieldType>({variable<FieldType>(0)}, {this->argval2.packed}, {this->result}));
+                        r1cs_constraint<FieldType>({blueprint_variable<FieldType>(0)}, {this->argval2.packed}, {this->result}));
                 }
 
                 template<typename FieldType>
@@ -115,7 +115,7 @@ namespace nil {
                     tinyram_blueprint<FieldType> pb(ap, P.size(), 0, 10);
 
                     word_variable_component<FieldType> pc(pb), argval2(pb);
-                    variable<FieldType> flag, result;
+                    blueprint_variable<FieldType> flag, result;
 
                     pc.generate_r1cs_constraints(true);
                     argval2.generate_r1cs_constraints(true);
@@ -175,7 +175,7 @@ namespace nil {
                     tinyram_blueprint<FieldType> pb(ap, P.size(), 0, 10);
 
                     word_variable_component<FieldType> pc(pb), argval2(pb);
-                    variable<FieldType> flag, result;
+                    blueprint_variable<FieldType> flag, result;
 
                     pc.generate_r1cs_constraints(true);
                     argval2.generate_r1cs_constraints(true);
@@ -250,7 +250,7 @@ namespace nil {
                     tinyram_blueprint<FieldType> pb(ap, P.size(), 0, 10);
 
                     word_variable_component<FieldType> pc(pb), argval2(pb);
-                    variable<FieldType> flag, result;
+                    blueprint_variable<FieldType> flag, result;
 
                     pc.generate_r1cs_constraints(true);
                     argval2.generate_r1cs_constraints(true);

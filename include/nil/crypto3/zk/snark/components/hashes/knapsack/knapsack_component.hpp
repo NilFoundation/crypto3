@@ -56,7 +56,7 @@ namespace nil {
 
                 template<typename FieldType>
                 struct knapsack_dimension {
-                    // the size of FieldType::value_type should be (approximately) at least 200 bits
+                    // the size of typename FieldType::value_type should be (approximately) at least 200 bits
                     static const std::size_t dimension = 1;
                 };
 
@@ -169,7 +169,7 @@ namespace nil {
                     const std::vector<bool> input = input_block.get_block();
 
                     for (std::size_t i = 0; i < dimension; ++i) {
-                        FieldType::value_type sum = FieldType::value_type::zero();
+                        typename FieldType::value_type sum = FieldType::value_type::zero();
                         for (std::size_t k = 0; k < input_len; ++k) {
                             if (input[k]) {
                                 sum += knapsack_coefficients[input_len * i + k];
@@ -294,7 +294,7 @@ namespace nil {
                         knapsack_CRH_with_field_out_component<FieldType>::get_hash(input);
                     hash_value_type result;
 
-                    for (const FieldType::value_type &elt : hash_elems) {
+                    for (const typename FieldType::value_type &elt : hash_elems) {
                         std::vector<bool> elt_bits = algebra::convert_field_element_to_bit_vector<FieldType>(elt);
                         result.insert(result.end(), elt_bits.begin(), elt_bits.end());
                     }

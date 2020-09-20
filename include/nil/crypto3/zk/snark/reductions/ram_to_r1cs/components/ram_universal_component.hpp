@@ -46,6 +46,7 @@
 #include <nil/crypto3/zk/snark/reductions/ram_to_r1cs/components/memory_checker_component.hpp>
 #include <nil/crypto3/zk/snark/reductions/ram_to_r1cs/components/trace_lines.hpp>
 #include <nil/crypto3/zk/snark/relations/ram_computations/rams/ram_params.hpp>
+#include <nil/crypto3/zk/snark/relations/ram_computations/memory/ra_memory.hpp>
 
 namespace nil {
     namespace crypto3 {

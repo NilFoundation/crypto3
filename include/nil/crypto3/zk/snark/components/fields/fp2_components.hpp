@@ -50,7 +50,7 @@ namespace nil {
                     void generate_r1cs_witness(const Fp2T &el);
                     Fp2T get_element();
 
-                    Fp2_variable<Fp2T> operator*(const FieldType::value_type &coeff) const;
+                    Fp2_variable<Fp2T> operator*(const typename FieldType::value_type &coeff) const;
                     Fp2_variable<Fp2T> operator+(const Fp2_variable<Fp2T> &other) const;
                     Fp2_variable<Fp2T> operator+(const Fp2T &other) const;
                     Fp2_variable<Fp2T> mul_by_X() const;
@@ -189,7 +189,7 @@ namespace nil {
                 }
 
                 template<typename Fp2T>
-                Fp2_variable<Fp2T> Fp2_variable<Fp2T>::operator*(const FieldType::value_type &coeff) const {
+                Fp2_variable<Fp2T> Fp2_variable<Fp2T>::operator*(const typename FieldType::value_type &coeff) const {
                     pb_linear_combination<FieldType> new_c0, new_c1;
                     new_c0.assign(this->pb, this->c0 * coeff);
                     new_c1.assign(this->pb, this->c1 * coeff);
@@ -278,7 +278,7 @@ namespace nil {
 
                 template<typename Fp2T>
                 void Fp2_mul_component<Fp2T>::generate_r1cs_witness() {
-                    const FieldType::value_type aA = this->pb.lc_val(A.c0) * this->pb.lc_val(B.c0);
+                    const typename FieldType::value_type aA = this->pb.lc_val(A.c0) * this->pb.lc_val(B.c0);
                     this->pb.val(v1) = this->pb.lc_val(A.c1) * this->pb.lc_val(B.c1);
                     this->pb.lc_val(result.c0) = aA + Fp2T::non_residue * this->pb.val(v1);
                     this->pb.lc_val(result.c1) = (this->pb.lc_val(A.c0) + this->pb.lc_val(A.c1)) *

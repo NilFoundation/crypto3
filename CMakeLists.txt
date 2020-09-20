@@ -207,7 +207,7 @@ list(APPEND ${CURRENT_PROJECT_NAME}_PUBLIC_HEADERS
      include/nil/crypto3/zk/snark/component.hpp
      include/nil/crypto3/zk/snark/integer_permutation.hpp
      include/nil/crypto3/zk/snark/merkle_tree.hpp
-     include/nil/crypto3/zk/snark/variable.hpp
+     include/nil/crypto3/zk/snark/blueprint_variable.hpp
      include/nil/crypto3/zk/snark/blueprint.hpp)
 
 list(APPEND ${CURRENT_PROJECT_NAME}_UNGROUPED_SOURCES)

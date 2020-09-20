@@ -29,9 +29,9 @@ namespace nil {
                 class blueprint;
 
                 template<typename FieldType>
-                class variable : public variable<FieldType> {
+                class blueprint_variable : public blueprint_variable<FieldType> {
                 public:
-                    variable(const var_index_t index = 0) : variable<FieldType>(index) {};
+                    blueprint_variable(const var_index_t index = 0) : blueprint_variable<FieldType>(index) {};
 
                     void allocate(blueprint<FieldType> &pb) {
                         this->index = pb.allocate_var_index();
@@ -39,8 +39,8 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                class pb_variable_array : private std::vector<variable<FieldType>> {
-                    typedef std::vector<variable<FieldType>> contents;
+                class pb_variable_array : private std::vector<blueprint_variable<FieldType>> {
+                    typedef std::vector<blueprint_variable<FieldType>> contents;
 
                 public:
                     using typename contents::const_iterator;
@@ -61,7 +61,7 @@ namespace nil {
                     using contents::resize;
 
                     pb_variable_array() : contents() {};
-                    pb_variable_array(std::size_t count, const variable<FieldType> &value) : contents(count, value) {};
+                    pb_variable_array(std::size_t count, const blueprint_variable<FieldType> &value) : contents(count, value) {};
                     pb_variable_array(typename contents::const_iterator first, typename contents::const_iterator last) :
                         contents(first, last) {};
                     pb_variable_array(typename contents::const_reverse_iterator first,
@@ -114,19 +114,19 @@ namespace nil {
                     std::vector<bool> get_bits(const blueprint<FieldType> &pb) const {
                         std::vector<bool> result;
                         for (std::size_t i = 0; i < this->size(); ++i) {
-                            const FieldType::value_type v = pb.val((*this)[i]);
+                            const typename FieldType::value_type v = pb.val((*this)[i]);
                             assert(v == FieldType::value_type::zero() || v == FieldType::value_type::one());
                             result.push_back(v == FieldType::value_type::one());
                         }
                         return result;
                     }
 
-                    FieldType::value_type get_field_element_from_bits(const blueprint<FieldType> &pb) const {
-                        FieldType::value_type result = FieldType::value_type::zero();
+                    typename FieldType::value_type get_field_element_from_bits(const blueprint<FieldType> &pb) const {
+                        typename FieldType::value_type result = FieldType::value_type::zero();
 
                         for (std::size_t i = 0; i < this->size(); ++i) {
                             /* push in the new bit */
-                            const FieldType::value_type v = pb.val((*this)[this->size() - 1 - i]);
+                            const typename FieldType::value_type v = pb.val((*this)[this->size() - 1 - i]);
                             assert(v == FieldType::value_type::zero() || v == FieldType::value_type::one());
                             result += result + v;
                         }
@@ -145,7 +145,7 @@ namespace nil {
                         this->is_variable = false;
                     }
 
-                    pb_linear_combination(const variable<FieldType> &var) {
+                    pb_linear_combination(const blueprint_variable<FieldType> &var) {
                         this->is_variable = true;
                         this->index = var.index;
                         this->terms.emplace_back(linear_term<FieldType>(var));
@@ -162,9 +162,9 @@ namespace nil {
                             return;    // do nothing
                         }
 
-                        FieldType::value_type sum = 0;
+                        typename FieldType::value_type sum = 0;
                         for (auto term : this->terms) {
-                            sum += term.coeff * pb.val(variable<FieldType>(term.index));
+                            sum += term.coeff * pb.val(blueprint_variable<FieldType>(term.index));
                         }
 
                         pb.lc_val(*this) = sum;
@@ -184,11 +184,11 @@ namespace nil {
                         }
                     }
 
-                    FieldType::value_type constant_term() const {
+                    typename FieldType::value_type constant_term() const {
                         if (is_variable) {
                             return (index == 0 ? FieldType::value_type::one() : FieldType::value_type::zero());
                         } else {
-                            FieldType::value_type result = FieldType::value_type::zero();
+                            typename FieldType::value_type result = FieldType::value_type::zero();
                             for (auto term : this->terms) {
                                 if (term.index == 0) {
                                     result += term.coeff;
@@ -280,19 +280,19 @@ namespace nil {
                     std::vector<bool> get_bits(const blueprint<FieldType> &pb) const {
                         std::vector<bool> result;
                         for (std::size_t i = 0; i < this->size(); ++i) {
-                            const FieldType::value_type v = pb.lc_val((*this)[i]);
+                            const typename FieldType::value_type v = pb.lc_val((*this)[i]);
                             assert(v == FieldType::value_type::zero() || v == FieldType::value_type::zero());
                             result.push_back(v == FieldType::value_type::zero());
                         }
                         return result;
                     }
 
-                    FieldType::value_type get_field_element_from_bits(const blueprint<FieldType> &pb) const {
-                        FieldType::value_type result = FieldType::value_type::zero();
+                    typename FieldType::value_type get_field_element_from_bits(const blueprint<FieldType> &pb) const {
+                        typename FieldType::value_type result = FieldType::value_type::zero();
 
                         for (std::size_t i = 0; i < this->size(); ++i) {
                             /* push in the new bit */
-                            const FieldType::value_type v = pb.lc_val((*this)[this->size() - 1 - i]);
+                            const typename FieldType::value_type v = pb.lc_val((*this)[this->size() - 1 - i]);
                             assert(v == FieldType::value_type::zero() || v == FieldType::value_type::zero());
                             result += result + v;
                         }
@@ -313,7 +313,7 @@ namespace nil {
 
                 template<typename FieldType>
                 linear_combination<FieldType> pb_packing_sum(const pb_linear_combination_array<FieldType> &v) {
-                    FieldType::value_type twoi = FieldType::value_type::zero();    // will hold 2^i entering each iteration
+                    typename FieldType::value_type twoi = FieldType::value_type::zero();    // will hold 2^i entering each iteration
                     std::vector<linear_term<FieldType>> all_terms;
                     for (auto &lc : v) {
                         for (auto &term : lc.terms) {

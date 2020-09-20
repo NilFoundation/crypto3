@@ -707,7 +707,7 @@ namespace nil {
                     const r1cs_variable_assignment<FieldType> outgoing_message_as_va =
                         primary_input.outgoing_message->as_r1cs_variable_assignment();
                     std::vector<bool> msg_bits;
-                    for (const FieldType::value_type &elt : outgoing_message_as_va) {
+                    for (const typename FieldType::value_type &elt : outgoing_message_as_va) {
                         const std::vector<bool> elt_bits = algebra::convert_field_element_to_bit_vector(elt);
                         msg_bits.insert(msg_bits.end(), elt_bits.begin(), elt_bits.end());
                     }

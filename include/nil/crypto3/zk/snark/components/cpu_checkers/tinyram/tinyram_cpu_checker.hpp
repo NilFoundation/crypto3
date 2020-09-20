@@ -30,17 +30,17 @@ namespace nil {
                 class tinyram_cpu_checker : public tinyram_standard_component<FieldType> {
                 private:
                     pb_variable_array<FieldType> opcode;
-                    variable<FieldType> arg2_is_imm;
+                    blueprint_variable<FieldType> arg2_is_imm;
                     pb_variable_array<FieldType> desidx;
                     pb_variable_array<FieldType> arg1idx;
                     pb_variable_array<FieldType> arg2idx;
 
                     std::vector<word_variable_component<FieldType>> prev_registers;
                     std::vector<word_variable_component<FieldType>> next_registers;
-                    variable<FieldType> prev_flag;
-                    variable<FieldType> next_flag;
-                    variable<FieldType> prev_tape1_exhausted;
-                    variable<FieldType> next_tape1_exhausted;
+                    blueprint_variable<FieldType> prev_flag;
+                    blueprint_variable<FieldType> next_flag;
+                    blueprint_variable<FieldType> prev_tape1_exhausted;
+                    blueprint_variable<FieldType> next_tape1_exhausted;
 
                     std::shared_ptr<word_variable_component<FieldType>> prev_pc_addr_as_word_variable;
                     std::shared_ptr<word_variable_component<FieldType>> desval;
@@ -54,7 +54,7 @@ namespace nil {
                     std::shared_ptr<doubleword_variable_component<FieldType>> ls_prev_val_as_doubleword_variable;
                     std::shared_ptr<doubleword_variable_component<FieldType>> ls_next_val_as_doubleword_variable;
                     std::shared_ptr<dual_variable_component<FieldType>> memory_subaddress;
-                    variable<FieldType> memory_subcontents;
+                    blueprint_variable<FieldType> memory_subcontents;
                     pb_linear_combination<FieldType> memory_access_is_word;
                     pb_linear_combination<FieldType> memory_access_is_byte;
                     std::shared_ptr<memory_masking_component<FieldType>> check_memory;
@@ -65,7 +65,7 @@ namespace nil {
                     pb_variable_array<FieldType> instruction_results;
                     pb_variable_array<FieldType> instruction_flags;
 
-                    variable<FieldType> read_not1;
+                    blueprint_variable<FieldType> read_not1;
 
                 public:
                     pb_variable_array<FieldType> prev_pc_addr;
@@ -76,7 +76,7 @@ namespace nil {
                     pb_variable_array<FieldType> ls_next_val;
                     pb_variable_array<FieldType> next_state;
                     pb_variable_array<FieldType> next_pc_addr;
-                    variable<FieldType> next_has_accepted;
+                    blueprint_variable<FieldType> next_has_accepted;
 
                     tinyram_cpu_checker(tinyram_blueprint<FieldType> &pb,
                                         pb_variable_array<FieldType> &prev_pc_addr,
@@ -87,7 +87,7 @@ namespace nil {
                                         pb_variable_array<FieldType> &ls_next_val,
                                         pb_variable_array<FieldType> &next_state,
                                         pb_variable_array<FieldType> &next_pc_addr,
-                                        variable<FieldType> &next_has_accepted);
+                                        blueprint_variable<FieldType> &next_has_accepted);
 
                     void generate_r1cs_constraints();
                     void generate_r1cs_witness() {
@@ -109,7 +109,7 @@ namespace nil {
                                                                     pb_variable_array<FieldType> &ls_next_val,
                                                                     pb_variable_array<FieldType> &next_state,
                                                                     pb_variable_array<FieldType> &next_pc_addr,
-                                                                    variable<FieldType> &next_has_accepted) :
+                                                                    blueprint_variable<FieldType> &next_has_accepted) :
                     tinyram_standard_component<FieldType>(pb),
                     prev_pc_addr(prev_pc_addr), prev_pc_val(prev_pc_val), prev_state(prev_state), ls_addr(ls_addr),
                     ls_prev_val(ls_prev_val), ls_next_val(ls_next_val), next_state(next_state),

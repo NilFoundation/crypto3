@@ -35,9 +35,9 @@ namespace nil {
                 class bar_component : public component<FieldType> {
                 public:
                     pb_linear_combination_array<FieldType> X;
-                    FieldType::value_type a;
+                    typename FieldType::value_type a;
                     pb_linear_combination_array<FieldType> Y;
-                    FieldType::value_type b;
+                    typename FieldType::value_type b;
                     pb_linear_combination<FieldType> Z_packed;
                     pb_variable_array<FieldType> Z_bits;
 
@@ -51,9 +51,9 @@ namespace nil {
                     std::size_t width;
                     bar_component(blueprint<FieldType> &pb,
                                const pb_linear_combination_array<FieldType> &X,
-                               const FieldType::value_type &a,
+                               const typename FieldType::value_type &a,
                                const pb_linear_combination_array<FieldType> &Y,
-                               const FieldType::value_type &b,
+                               const typename FieldType::value_type &b,
                                const pb_linear_combination<FieldType> &Z_packed) :
                         component<FieldType>(pb),
                         X(X), a(a), Y(Y), b(b), Z_packed(Z_packed) {

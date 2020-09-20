@@ -22,40 +22,40 @@ namespace nil {
                 template<typename FieldType>
                 class argument_decoder_component : public tinyram_standard_component<FieldType> {
                 private:
-                    variable<FieldType> packed_desidx;
-                    variable<FieldType> packed_arg1idx;
-                    variable<FieldType> packed_arg2idx;
+                    blueprint_variable<FieldType> packed_desidx;
+                    blueprint_variable<FieldType> packed_arg1idx;
+                    blueprint_variable<FieldType> packed_arg2idx;
 
                     std::shared_ptr<packing_component<FieldType>> pack_desidx;
                     std::shared_ptr<packing_component<FieldType>> pack_arg1idx;
                     std::shared_ptr<packing_component<FieldType>> pack_arg2idx;
 
-                    variable<FieldType> arg2_demux_result;
-                    variable<FieldType> arg2_demux_success;
+                    blueprint_variable<FieldType> arg2_demux_result;
+                    blueprint_variable<FieldType> arg2_demux_success;
 
                     std::shared_ptr<loose_multiplexing_component<FieldType>> demux_des;
                     std::shared_ptr<loose_multiplexing_component<FieldType>> demux_arg1;
                     std::shared_ptr<loose_multiplexing_component<FieldType>> demux_arg2;
 
                 public:
-                    variable<FieldType> arg2_is_imm;
+                    blueprint_variable<FieldType> arg2_is_imm;
                     pb_variable_array<FieldType> desidx;
                     pb_variable_array<FieldType> arg1idx;
                     pb_variable_array<FieldType> arg2idx;
                     pb_variable_array<FieldType> packed_registers;
-                    variable<FieldType> packed_desval;
-                    variable<FieldType> packed_arg1val;
-                    variable<FieldType> packed_arg2val;
+                    blueprint_variable<FieldType> packed_desval;
+                    blueprint_variable<FieldType> packed_arg1val;
+                    blueprint_variable<FieldType> packed_arg2val;
 
                     argument_decoder_component(tinyram_blueprint<FieldType> &pb,
-                                            const variable<FieldType> &arg2_is_imm,
+                                            const blueprint_variable<FieldType> &arg2_is_imm,
                                             const pb_variable_array<FieldType> &desidx,
                                             const pb_variable_array<FieldType> &arg1idx,
                                             const pb_variable_array<FieldType> &arg2idx,
                                             const pb_variable_array<FieldType> &packed_registers,
-                                            const variable<FieldType> &packed_desval,
-                                            const variable<FieldType> &packed_arg1val,
-                                            const variable<FieldType> &packed_arg2val);
+                                            const blueprint_variable<FieldType> &packed_desval,
+                                            const blueprint_variable<FieldType> &packed_arg1val,
+                                            const blueprint_variable<FieldType> &packed_arg2val);
 
                     void generate_r1cs_constraints();
                     void generate_r1cs_witness();
@@ -67,14 +67,14 @@ namespace nil {
                 template<typename FieldType>
                 argument_decoder_component<FieldType>::argument_decoder_component(
                     tinyram_protoboard<FieldType> &pb,
-                    const variable<FieldType> &arg2_is_imm,
+                    const blueprint_variable<FieldType> &arg2_is_imm,
                     const pb_variable_array<FieldType> &desidx,
                     const pb_variable_array<FieldType> &arg1idx,
                     const pb_variable_array<FieldType> &arg2idx,
                     const pb_variable_array<FieldType> &packed_registers,
-                    const variable<FieldType> &packed_desval,
-                    const variable<FieldType> &packed_arg1val,
-                    const variable<FieldType> &packed_arg2val) :
+                    const blueprint_variable<FieldType> &packed_desval,
+                    const blueprint_variable<FieldType> &packed_arg1val,
+                    const blueprint_variable<FieldType> &packed_arg2val) :
                     tinyram_standard_component<FieldType>(pb),
                     arg2_is_imm(arg2_is_imm), desidx(desidx), arg1idx(arg1idx), arg2idx(arg2idx),
                     packed_registers(packed_registers), packed_desval(packed_desval), packed_arg1val(packed_arg1val),
@@ -96,9 +96,9 @@ namespace nil {
                     arg2_demux_success.allocate(pb);
 
                     demux_des.reset(new loose_multiplexing_component<FieldType>(pb, packed_registers, packed_desidx,
-                                                                             packed_desval, variable<FieldType>(0)));
+                                                                             packed_desval, blueprint_variable<FieldType>(0)));
                     demux_arg1.reset(new loose_multiplexing_component<FieldType>(pb, packed_registers, packed_arg1idx,
-                                                                              packed_arg1val, variable<FieldType>(0)));
+                                                                              packed_arg1val, blueprint_variable<FieldType>(0)));
                     demux_arg2.reset(new loose_multiplexing_component<FieldType>(pb, packed_registers, packed_arg2idx,
                                                                               arg2_demux_result, arg2_demux_success));
                 }
@@ -120,7 +120,7 @@ namespace nil {
                     /* it is false that arg2 is reg and demux failed:
                        (1 - arg2_is_imm) * (1 - arg2_demux_success) = 0 */
                     this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(
-                        {variable<FieldType>(0), arg2_is_imm * (-1)}, {variable<FieldType>(0), arg2_demux_success * (-1)}, {variable<FieldType>(0) * 0}));
+                        {blueprint_variable<FieldType>(0), arg2_is_imm * (-1)}, {blueprint_variable<FieldType>(0), arg2_demux_success * (-1)}, {blueprint_variable<FieldType>(0) * 0}));
 
                     /*
                       arg2val = arg2_is_imm * packed_arg2idx +
@@ -162,14 +162,14 @@ namespace nil {
                     pb_variable_array<FieldType> packed_registers;
                     packed_registers.allocate(pb, ap.k);
 
-                    variable<FieldType> arg2_is_imm;
+                    blueprint_variable<FieldType> arg2_is_imm;
                     arg2_is_imm.allocate(pb);
 
                     dual_variable_component<FieldType> desidx(pb, ap.reg_arg_width());
                     dual_variable_component<FieldType> arg1idx(pb, ap.reg_arg_width());
                     dual_variable_component<FieldType> arg2idx(pb, ap.reg_arg_or_imm_width());
 
-                    variable<FieldType> packed_desval, packed_arg1val, packed_arg2val;
+                    blueprint_variable<FieldType> packed_desval, packed_arg1val, packed_arg2val;
                     packed_desval.allocate(pb);
                     packed_arg1val.allocate(pb);
                     packed_arg2val.allocate(pb);

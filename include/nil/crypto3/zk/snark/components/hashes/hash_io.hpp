@@ -31,7 +31,7 @@ namespace nil {
                     digest_variable<FieldType>(blueprint<FieldType> &pb,
                                                std::size_t digest_size,
                                                const pb_variable_array<FieldType> &partial_bits,
-                                               const variable<FieldType> &padding);
+                                               const blueprint_variable<FieldType> &padding);
 
                     void generate_r1cs_constraints();
                     void generate_r1cs_witness(const std::vector<bool> &contents);
@@ -67,7 +67,7 @@ namespace nil {
                 digest_variable<FieldType>::digest_variable(blueprint<FieldType> &pb,
                                                             std::size_t digest_size,
                                                             const pb_variable_array<FieldType> &partial_bits,
-                                                            const variable<FieldType> &padding) :
+                                                            const blueprint_variable<FieldType> &padding) :
                     component<FieldType>(pb),
                     digest_size(digest_size) {
                     assert(bits.size() <= digest_size);

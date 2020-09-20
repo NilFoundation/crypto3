@@ -52,7 +52,7 @@ namespace nil {
                     void generate_r1cs_witness(const Fp3T &el);
                     Fp3T get_element();
 
-                    Fp3_variable<Fp3T> operator*(const FieldType::value_type &coeff) const;
+                    Fp3_variable<Fp3T> operator*(const typename FieldType::value_type &coeff) const;
                     Fp3_variable<Fp3T> operator+(const Fp3_variable<Fp3T> &other) const;
                     Fp3_variable<Fp3T> operator+(const Fp3T &other) const;
                     Fp3_variable<Fp3T> mul_by_X() const;
@@ -207,7 +207,7 @@ namespace nil {
                 }
 
                 template<typename Fp3T>
-                Fp3_variable<Fp3T> Fp3_variable<Fp3T>::operator*(const FieldType::value_type &coeff) const {
+                Fp3_variable<Fp3T> Fp3_variable<Fp3T>::operator*(const typename FieldType::value_type &coeff) const {
                     pb_linear_combination<FieldType> new_c0, new_c1, new_c2;
                     new_c0.assign(this->pb, this->c0 * coeff);
                     new_c1.assign(this->pb, this->c1 * coeff);

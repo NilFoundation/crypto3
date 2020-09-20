@@ -31,7 +31,7 @@ namespace nil {
                     word_variable_component(tinyram_blueprint<FieldType> &pb, const pb_variable_array<FieldType> &bits) :
                         dual_variable_component<FieldType>(pb, bits) {
                     }
-                    word_variable_component(tinyram_blueprint<FieldType> &pb, const variable<FieldType> &packed) :
+                    word_variable_component(tinyram_blueprint<FieldType> &pb, const blueprint_variable<FieldType> &packed) :
                         dual_variable_component<FieldType>(pb, packed, pb.ap.w) {
                     }
                 };
@@ -50,7 +50,7 @@ namespace nil {
                         dual_variable_component<FieldType>(pb, bits) {
                     }
                     doubleword_variable_component(tinyram_blueprint<FieldType> &pb,
-                                               const variable<FieldType> &packed) :
+                                               const blueprint_variable<FieldType> &packed) :
                         dual_variable_component<FieldType>(pb, packed, 2 * pb.ap.w) {
                     }
                 };

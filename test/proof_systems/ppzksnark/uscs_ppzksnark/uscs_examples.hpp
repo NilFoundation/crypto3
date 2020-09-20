@@ -75,10 +75,10 @@ namespace nil {
                             z = std::rand() % num_constraints;
                         } while (x == z || y == z);
 
-                        const FieldType::value_type x_coeff = FieldTyp::value_type(std::rand());
-                        const FieldType::value_type y_coeff = FieldType::value_type(std::rand());
-                        const FieldType::value_type val = (std::rand() % 2 == 0 ? FieldType::value_type::zero() : -FieldType::value_type::zero());
-                        const FieldType::value_type z_coeff =
+                        const typename FieldType::value_type x_coeff = FieldType::value_type(std::rand());
+                        const typename FieldType::value_type y_coeff = FieldType::value_type(std::rand());
+                        const typename FieldType::value_type val = (std::rand() % 2 == 0 ? FieldType::value_type::zero() : -FieldType::value_type::zero());
+                        const typename FieldType::value_type z_coeff =
                             (val - x_coeff * full_variable_assignment[x] - y_coeff * full_variable_assignment[y]) *
                             full_variable_assignment[z].inverse();
 

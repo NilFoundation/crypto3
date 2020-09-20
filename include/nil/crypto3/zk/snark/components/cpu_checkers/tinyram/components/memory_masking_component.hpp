@@ -60,8 +60,8 @@ namespace nil {
                 class memory_masking_component : public tinyram_standard_component<FieldType> {
                 private:
                     pb_linear_combination<FieldType> shift;
-                    variable<FieldType> is_word0;
-                    variable<FieldType> is_word1;
+                    blueprint_variable<FieldType> is_word0;
+                    blueprint_variable<FieldType> is_word1;
                     pb_variable_array<FieldType> is_subaddress;
                     pb_variable_array<FieldType> is_byte;
 
@@ -71,8 +71,8 @@ namespace nil {
 
                     std::shared_ptr<inner_product_component<FieldType>> get_masked_out_dw_contents_prev;
 
-                    variable<FieldType> masked_out_dw_contents_prev;
-                    variable<FieldType> expected_dw_contents_next;
+                    blueprint_variable<FieldType> masked_out_dw_contents_prev;
+                    blueprint_variable<FieldType> expected_dw_contents_next;
 
                 public:
                     doubleword_variable_component<FieldType> dw_contents_prev;

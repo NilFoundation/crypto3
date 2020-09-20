@@ -33,7 +33,7 @@ namespace nil {
                     word_variable_component<FieldType> desval;
                     word_variable_component<FieldType> arg1val;
                     word_variable_component<FieldType> arg2val;
-                    variable<FieldType> flag;
+                    blueprint_variable<FieldType> flag;
                     pb_variable_array<FieldType> instruction_results;
                     pb_variable_array<FieldType> instruction_flags;
 
@@ -43,7 +43,7 @@ namespace nil {
                                           const word_variable_component<FieldType> &desval,
                                           const word_variable_component<FieldType> &arg1val,
                                           const word_variable_component<FieldType> &arg2val,
-                                          const variable<FieldType> &flag,
+                                          const blueprint_variable<FieldType> &flag,
                                           const pb_variable_array<FieldType> &instruction_results,
                                           const pb_variable_array<FieldType> &instruction_flags) :
                         tinyram_standard_component<FieldType>(pb),

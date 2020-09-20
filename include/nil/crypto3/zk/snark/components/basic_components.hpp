@@ -120,7 +120,7 @@ namespace nil {
                     std::shared_ptr<packing_component<FieldType>> consistency_check;
 
                 public:
-                    variable<FieldType> packed;
+                    blueprint_variable<FieldType> packed;
                     pb_variable_array<FieldType> bits;
 
                     dual_variable_component(blueprint<FieldType> &pb, size_t width) : component<FieldType>(pb) {
@@ -135,7 +135,7 @@ namespace nil {
                         consistency_check.reset(new packing_component<FieldType>(pb, bits, packed));
                     }
 
-                    dual_variable_component(blueprint<FieldType> &pb, const variable<FieldType> &packed, size_t width) :
+                    dual_variable_component(blueprint<FieldType> &pb, const blueprint_variable<FieldType> &packed, size_t width) :
                         component<FieldType>(pb), packed(packed) {
                         bits.allocate(pb, width);
                         consistency_check.reset(new packing_component<FieldType>(pb, bits, packed));
@@ -158,15 +158,15 @@ namespace nil {
                 template<typename FieldType>
                 class disjunction_component : public component<FieldType> {
                 private:
-                    variable<FieldType> inv;
+                    blueprint_variable<FieldType> inv;
 
                 public:
                     const pb_variable_array<FieldType> inputs;
-                    const variable<FieldType> output;
+                    const blueprint_variable<FieldType> output;
 
                     disjunction_component(blueprint<FieldType> &pb,
                                           const pb_variable_array<FieldType> &inputs,
-                                          const variable<FieldType> &output) :
+                                          const blueprint_variable<FieldType> &output) :
                         component<FieldType>(pb),
                         inputs(inputs), output(output) {
                         assert(inputs.size() >= 1);
@@ -183,15 +183,15 @@ namespace nil {
                 template<typename FieldType>
                 class conjunction_component : public component<FieldType> {
                 private:
-                    variable<FieldType> inv;
+                    blueprint_variable<FieldType> inv;
 
                 public:
                     const pb_variable_array<FieldType> inputs;
-                    const variable<FieldType> output;
+                    const blueprint_variable<FieldType> output;
 
                     conjunction_component(blueprint<FieldType> &pb,
                                           const pb_variable_array<FieldType> &inputs,
-                                          const variable<FieldType> &output) :
+                                          const blueprint_variable<FieldType> &output) :
                         component<FieldType>(pb),
                         inputs(inputs), output(output) {
                         assert(inputs.size() >= 1);
@@ -209,25 +209,25 @@ namespace nil {
                 class comparison_component : public component<FieldType> {
                 private:
                     pb_variable_array<FieldType> alpha;
-                    variable<FieldType> alpha_packed;
+                    blueprint_variable<FieldType> alpha_packed;
                     std::shared_ptr<packing_component<FieldType>> pack_alpha;
 
                     std::shared_ptr<disjunction_component<FieldType>> all_zeros_test;
-                    variable<FieldType> not_all_zeros;
+                    blueprint_variable<FieldType> not_all_zeros;
 
                 public:
                     const std::size_t n;
                     const pb_linear_combination<FieldType> A;
                     const pb_linear_combination<FieldType> B;
-                    const variable<FieldType> less;
-                    const variable<FieldType> less_or_eq;
+                    const blueprint_variable<FieldType> less;
+                    const blueprint_variable<FieldType> less_or_eq;
 
                     comparison_component(blueprint<FieldType> &pb,
                                          size_t n,
                                          const pb_linear_combination<FieldType> &A,
                                          const pb_linear_combination<FieldType> &B,
-                                         const variable<FieldType> &less,
-                                         const variable<FieldType> &less_or_eq) :
+                                         const blueprint_variable<FieldType> &less,
+                                         const blueprint_variable<FieldType> &less_or_eq) :
                         component<FieldType>(pb),
                         n(n), A(A), B(B), less(less), less_or_eq(less_or_eq) {
                         alpha.allocate(pb, n);
@@ -258,12 +258,12 @@ namespace nil {
                 public:
                     const pb_linear_combination_array<FieldType> A;
                     const pb_linear_combination_array<FieldType> B;
-                    const variable<FieldType> result;
+                    const blueprint_variable<FieldType> result;
 
                     inner_product_component(blueprint<FieldType> &pb,
                                             const pb_linear_combination_array<FieldType> &A,
                                             const pb_linear_combination_array<FieldType> &B,
-                                            const variable<FieldType> &result) :
+                                            const blueprint_variable<FieldType> &result) :
                         component<FieldType>(pb),
                         A(A), B(B), result(result) {
                         assert(A.size() >= 1);
@@ -296,15 +296,15 @@ namespace nil {
 
                 public:
                     const pb_linear_combination_array<FieldType> arr;
-                    const variable<FieldType> index;
-                    const variable<FieldType> result;
-                    const variable<FieldType> success_flag;
+                    const blueprint_variable<FieldType> index;
+                    const blueprint_variable<FieldType> result;
+                    const blueprint_variable<FieldType> success_flag;
 
                     loose_multiplexing_component(blueprint<FieldType> &pb,
                                                  const pb_linear_combination_array<FieldType> &arr,
-                                                 const variable<FieldType> &index,
-                                                 const variable<FieldType> &result,
-                                                 const variable<FieldType> &success_flag) :
+                                                 const blueprint_variable<FieldType> &index,
+                                                 const blueprint_variable<FieldType> &result,
+                                                 const blueprint_variable<FieldType> &success_flag) :
                         component<FieldType>(pb),
                         arr(arr), index(index), result(result), success_flag(success_flag) {
                         alpha.allocate(pb, arr.size());
@@ -529,12 +529,12 @@ namespace nil {
 
                     /* (1-output) * sum = 0 */
                     linear_combination<FieldType> a2, b2, c2;
-                    a2.add_term(variable<FieldType>(0));
+                    a2.add_term(blueprint_variable<FieldType>(0));
                     a2.add_term(output, -1);
                     for (std::size_t i = 0; i < inputs.size(); ++i) {
                         b2.add_term(inputs[i]);
                     }
-                    c2.add_term(variable<FieldType>(0), 0);
+                    c2.add_term(blueprint_variable<FieldType>(0), 0);
 
                     this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(a2, b2, c2));
                 }
@@ -562,7 +562,7 @@ namespace nil {
                     pb_variable_array<FieldType> inputs;
                     inputs.allocate(pb, n);
 
-                    variable<FieldType> output;
+                    blueprint_variable<FieldType> output;
                     output.allocate(pb);
 
                     disjunction_component<FieldType> d(pb, inputs, output);
@@ -588,11 +588,11 @@ namespace nil {
                     /* inv * (n-sum) = 1-output */
                     linear_combination<FieldType> a1, b1, c1;
                     a1.add_term(inv);
-                    b1.add_term(variable<FieldType>(0), inputs.size());
+                    b1.add_term(blueprint_variable<FieldType>(0), inputs.size());
                     for (std::size_t i = 0; i < inputs.size(); ++i) {
                         b1.add_term(inputs[i], -1);
                     }
-                    c1.add_term(variable<FieldType>(0));
+                    c1.add_term(blueprint_variable<FieldType>(0));
                     c1.add_term(output, -1);
 
                     this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(a1, b1, c1));
@@ -600,11 +600,11 @@ namespace nil {
                     /* output * (n-sum) = 0 */
                     linear_combination<FieldType> a2, b2, c2;
                     a2.add_term(output);
-                    b2.add_term(variable<FieldType>(0), inputs.size());
+                    b2.add_term(blueprint_variable<FieldType>(0), inputs.size());
                     for (std::size_t i = 0; i < inputs.size(); ++i) {
                         b2.add_term(inputs[i], -1);
                     }
-                    c2.add_term(variable<FieldType>(0), 0);
+                    c2.add_term(blueprint_variable<FieldType>(0), 0);
 
                     this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(a2, b2, c2));
                 }
@@ -632,7 +632,7 @@ namespace nil {
                     pb_variable_array<FieldType> inputs;
                     inputs.allocate(pb, n);
 
-                    variable<FieldType> output;
+                    blueprint_variable<FieldType> output;
                     output.allocate(pb);
 
                     conjunction_component<FieldType> c(pb, inputs, output);
@@ -705,7 +705,7 @@ namespace nil {
                 void test_comparison_component(size_t n) {
                     blueprint<FieldType> pb;
 
-                    variable<FieldType> A, B, less, less_or_eq;
+                    blueprint_variable<FieldType> A, B, less, less_or_eq;
                     A.allocate(pb);
                     B.allocate(pb);
                     less.allocate(pb);
@@ -740,7 +740,7 @@ namespace nil {
                     for (std::size_t i = 0; i < A.size(); ++i) {
                         this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(
                             A[i], B[i],
-                            (i == A.size() - 1 ? result : S[i]) + (i == 0 ? 0 * variable<FieldType>(0) : -S[i - 1])));
+                            (i == A.size() - 1 ? result : S[i]) + (i == 0 ? 0 * blueprint_variable<FieldType>(0) : -S[i - 1])));
                     }
                 }
 
@@ -764,7 +764,7 @@ namespace nil {
                     pb_variable_array<FieldType> B;
                     B.allocate(pb, n);
 
-                    variable<FieldType> result;
+                    blueprint_variable<FieldType> result;
                     result.allocate(pb);
 
                     inner_product_component<FieldType> g(pb, A, B, result);
@@ -801,7 +801,7 @@ namespace nil {
 
                     /* 1 * (\sum \alpha_i) = success_flag */
                     linear_combination<FieldType> a, b, c;
-                    a.add_term(variable<FieldType>(0));
+                    a.add_term(blueprint_variable<FieldType>(0));
                     for (std::size_t i = 0; i < arr.size(); ++i) {
                         b.add_term(alpha[i]);
                     }
@@ -847,7 +847,7 @@ namespace nil {
 
                     pb_variable_array<FieldType> arr;
                     arr.allocate(pb, 1ul << n);
-                    variable<FieldType> index, result, success_flag;
+                    blueprint_variable<FieldType> index, result, success_flag;
                     index.allocate(pb);
                     result.allocate(pb);
                     success_flag.allocate(pb);
@@ -887,8 +887,8 @@ namespace nil {
                     for (std::size_t i = 0; i < base.size(); ++i) {
                         linear_combination<FieldType> a, b, c;
 
-                        a.add_term(variable<FieldType>(0));
-                        b.add_term(variable<FieldType>(0), base[i]);
+                        a.add_term(blueprint_variable<FieldType>(0));
+                        b.add_term(blueprint_variable<FieldType>(0), base[i]);
 
                         for (auto &p : v) {
                             b.add_term(p.first.all_vars[i], p.second);
