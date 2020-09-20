@@ -143,26 +143,27 @@ namespace nil {
                         /* OLD: naive implementation
                            return (*this).squared();
                         */
-                        my_Fp2 z0 = this->c0.c0;
-                        my_Fp2 z4 = this->c0.c1;
-                        my_Fp2 z3 = this->c0.c2;
-                        my_Fp2 z2 = this->c1.c0;
-                        my_Fp2 z1 = this->c1.c1;
-                        my_Fp2 z5 = this->c1.c2;
+                        typename underlying_type::underlying_type z0 = data[0].data[0];
+                        typename underlying_type::underlying_type z4 = data[0].data[1];
+                        typename underlying_type::underlying_type z3 = data[0].data[2];
 
-                        my_Fp2 t0, t1, t2, t3, t4, t5, tmp;
+                        typename underlying_type::underlying_type z2 = data[1].data[0];
+                        typename underlying_type::underlying_type z1 = data[1].data[1];
+                        typename underlying_type::underlying_type z5 = data[1].data[2];
+
+                        typename underlying_type::underlying_type t0, t1, t2, t3, t4, t5, tmp;
 
                         // t0 + t1*y = (z0 + z1*y)^2 = a^2
                         tmp = z0 * z1;
-                        t0 = (z0 + z1) * (z0 + my_Fp6::non_residue * z1) - tmp - my_Fp6::non_residue * tmp;
+                        t0 = (z0 + z1) * (z0 + underlying_type::non_residue * z1) - tmp - underlying_type::non_residue * tmp;
                         t1 = tmp + tmp;
                         // t2 + t3*y = (z2 + z3*y)^2 = b^2
                         tmp = z2 * z3;
-                        t2 = (z2 + z3) * (z2 + my_Fp6::non_residue * z3) - tmp - my_Fp6::non_residue * tmp;
+                        t2 = (z2 + z3) * (z2 + underlying_type::non_residue * z3) - tmp - underlying_type::non_residue * tmp;
                         t3 = tmp + tmp;
                         // t4 + t5*y = (z4 + z5*y)^2 = c^2
                         tmp = z4 * z5;
-                        t4 = (z4 + z5) * (z4 + my_Fp6::non_residue * z5) - tmp - my_Fp6::non_residue * tmp;
+                        t4 = (z4 + z5) * (z4 + underlying_type::non_residue * z5) - tmp - underlying_type::non_residue * tmp;
                         t5 = tmp + tmp;
 
                         // for A
@@ -179,7 +180,7 @@ namespace nil {
                         // for B
 
                         // z2 = 3 * (xi * t5) + 2 * z2
-                        tmp = my_Fp6::non_residue * t5;
+                        tmp = underlying_type::non_residue * t5;
                         z2 = tmp + z2;
                         z2 = z2 + z2;
                         z2 = z2 + tmp;
@@ -206,7 +207,7 @@ namespace nil {
 
                     template<typename PowerType>
                     element_fp12_2over3over2 cyclotomic_exp(const PowerType &exponent) const {
-                        element_fp12_2over3over2 res = one();
+                        /*element_fp12_2over3over2 res = one();
 
                         bool found_one = false;
                         for (long i = m-1; i >= 0; --i) {
@@ -222,7 +223,8 @@ namespace nil {
                             }
                         }
 
-                        return res;
+                        return res;*/
+                        return *this;
                     }
 
                     /*element_fp12_2over3over2 sqru() {

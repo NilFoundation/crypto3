@@ -91,7 +91,7 @@ namespace nil {
 
                         gt w1_part = elt_q.cyclotomic_exp(
                             policy_type::final_exponent_last_chunk_w1);
-                        gt w0_part;
+                        gt w0_part = gt::zero();
 
                         if (policy_type::final_exponent_last_chunk_is_w0_neg) {
                             w0_part = elt_inv.cyclotomic_exp(

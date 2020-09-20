@@ -203,11 +203,13 @@ namespace nil {
                         return edwards_g2(X3, Y3, Z3);
                     }
 
-                    void to_affine_coordinates() {
+                    edwards_g2 to_affine_coordinates() const {
+                        underlying_field_type_value p_out[3];
+
                         if (this->is_zero()) {
-                            this->p[0] = underlying_field_type_value::zero();
-                            this->p[1] = underlying_field_type_value::one();
-                            this->p[2] = underlying_field_type_value::one();
+                            this->p_out[0] = underlying_field_type_value::zero();
+                            this->p_out[1] = underlying_field_type_value::one();
+                            this->p_out[2] = underlying_field_type_value::one();
                         } else {
                             // go from inverted coordinates to projective coordinates
                             underlying_field_type_value tX = this->p[1] * this->p[2];
@@ -215,21 +217,27 @@ namespace nil {
                             underlying_field_type_value tZ = this->p[0] * this->p[1];
                             // go from projective coordinates to affine coordinates
                             underlying_field_type_value tZ_inv = tZ.inversed();
-                            this->p[0] = tX * tZ_inv;
-                            this->p[1] = tY * tZ_inv;
-                            this->p[2] = underlying_field_type_value::one();
+                            this->p_out[0] = tX * tZ_inv;
+                            this->p_out[1] = tY * tZ_inv;
+                            this->p_out[2] = underlying_field_type_value::one();
                         }
+
+                        return edwards_g2(p_out[0], p_out[1], p_out[2]);
                     }
 
-                    void to_special() {
+                    edwards_g2 to_special() const {
+                        underlying_field_type_value p_out[3];
+
                         if (this->p[2].is_zero()) {
-                            return;
+                            return *this;
                         }
 
                         underlying_field_type_value Z_inv = this->p[2].inversed();
-                        this->p[0] = this->p[0] * Z_inv;
-                        this->p[1] = this->p[1] * Z_inv;
-                        this->p[2] = underlying_field_type_value::one();
+                        this->p_out[0] = this->p[0] * Z_inv;
+                        this->p_out[1] = this->p[1] * Z_inv;
+                        this->p_out[2] = underlying_field_type_value::one();
+
+                        return edwards_g2(p_out[0], p_out[1], p_out[2]);
                     }
 
                     bool is_special() const {

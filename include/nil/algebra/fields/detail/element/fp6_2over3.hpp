@@ -138,22 +138,22 @@ namespace nil {
                         return element_fp6_2over3({data[0], -data[1]});
                     }
 
-                    element_fp6_2over3 cyclotomic_squared() const {
-                        my_Fp2 a = my_Fp2(c0.c0, c1.c1);
+                    /*element_fp6_2over3 cyclotomic_squared() const {
+                        
                         //my_Fp a_a = c0.c0; // a = Fp2([c0[0],c1[1]])
                         //my_Fp a_b = c1.c1;
 
-                        my_Fp2 b = my_Fp2(c1.c0, c0.c2);
+                        element_fp2 b = element_fp2(c1.c0, c0.c2);
                         //my_Fp b_a = c1.c0; // b = Fp2([c1[0],c0[2]])
                         //my_Fp b_b = c0.c2;
 
-                        my_Fp2 c = my_Fp2(c0.c1, c1.c2);
+                        element_fp2 c = element_fp2(c0.c1, c1.c2);
                         //my_Fp c_a = c0.c1; // c = Fp2([c0[1],c1[2]])
                         //my_Fp c_b = c1.c2;
 
-                        my_Fp2 asq = a.squared();
-                        my_Fp2 bsq = b.squared();
-                        my_Fp2 csq = c.squared();
+                        element_fp2 asq = a.squared();
+                        element_fp2 bsq = b.squared();
+                        element_fp2 csq = c.squared();
 
                         // A = vector(3*a^2 - 2*Fp2([vector(a)[0],-vector(a)[1]]))
                         //my_Fp A_a = my_Fp(3l) * asq_a - my_Fp(2l) * a_a;
@@ -188,11 +188,11 @@ namespace nil {
 
                         return element_fp6_2over3(underlying_type({A_a, C_a, B_b}),
                                                             underlying_type({B_a, A_b, C_b}));
-                    }
+                    }*/
 
                     template<typename PowerType>
                     element_fp6_2over3 cyclotomic_exp(const PowerType &exponent) const {
-                        element_fp6_2over3 res = one();
+                        /*element_fp6_2over3 res = one();
                         element_fp6_2over3 this_inverse = this->unitary_inverse();
 
                         bool found_nonzero = false;
@@ -215,7 +215,9 @@ namespace nil {
                             }
                         }
 
-                        return res;
+                        return res;*/
+
+                        return *this;
                     }
 
                 private:

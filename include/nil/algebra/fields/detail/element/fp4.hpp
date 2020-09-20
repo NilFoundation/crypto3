@@ -152,7 +152,7 @@ namespace nil {
 
                     template<typename PowerType>
                     element_fp4 cyclotomic_exp(const PowerType &exponent) const {
-                        element_fp4  res = this->one();
+                        /*element_fp4  res = this->one();
                         element_fp4  this_inverse = this->unitary_inverse();
 
                         bool found_nonzero = false;
@@ -175,7 +175,9 @@ namespace nil {
                             }
                         }
 
-                        return res;
+                        return res;*/
+
+                        return *this;
                     }
 
                 private:
