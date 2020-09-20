@@ -86,7 +86,7 @@ namespace nil {
                     typedef element_fp<policy_type> non_residue_type;
                     typedef element_fp3<fp3_extension_params<field_type>> underlying_type;
 
-                    constexpr static const std::array<underlying_type, 3> Frobenius_coeffs_c1 = {underlying_type(0x01),
+                    constexpr static const std::array<underlying_type, 6> Frobenius_coeffs_c1 = {underlying_type(0x01),
                         underlying_type(0x3B48E50A1662E26F0E834E15FAF68204A9845655F46B277A6D05B75068AD3F6801655344BED_cppui298),
                         underlying_type(0x3B48E50A1662E26F0E834E15FAF68204A9845655F46B277A6D05B75068AD3F6801655344BEC_cppui298),
                         underlying_type(0x3BCF7BCD473A266249DA7B0548ECAEEC9635CF44194FB494C07925D6AD3BB4334A400000000_cppui298),
