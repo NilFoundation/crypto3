@@ -220,10 +220,10 @@ namespace nil {
                         return *this;
                     }
 
-                private:
                     /*inline static*/ underlying_type mul_by_non_residue(const underlying_type &A) {
                         return underlying_type({non_residue * A.data[2], A.data[1], A.data[0]});
                     }
+                    
                 };
 
             }    // namespace detail

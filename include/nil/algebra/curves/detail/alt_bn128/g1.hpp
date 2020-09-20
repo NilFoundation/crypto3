@@ -35,6 +35,9 @@ namespace nil {
                     using underlying_field_type_value = g1_field_type_value;
 
                     underlying_field_type_value p[3];
+                    underlying_field_type_value &X = p[0];
+                    underlying_field_type_value &Y = p[1];
+                    underlying_field_type_value &Z = p[2];
 
                     alt_bn128_g1() :
                         alt_bn128_g1(underlying_field_type_value::zero(), underlying_field_type_value::one(),

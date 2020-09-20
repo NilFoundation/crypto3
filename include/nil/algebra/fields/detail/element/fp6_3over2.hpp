@@ -160,7 +160,6 @@ namespace nil {
                                                    non_residue_type(policy_type::Frobenius_coeffs_c2[(pwr % 6) * 2], policy_type::Frobenius_coeffs_c2[(pwr % 6) * 2 + 1]) * data[2].Frobenius_map(pwr)});
                     }
 
-                private:
                     /*inline static*/ underlying_type mul_by_non_residue(const underlying_type &A) {
                         return element_fp6_3over2({non_residue * A});
                     }

@@ -37,6 +37,9 @@ namespace nil {
                     using underlying_field_type_value = g2_field_type_value;
 
                     underlying_field_type_value p[3];
+                    underlying_field_type_value &X = p[0];
+                    underlying_field_type_value &Y = p[1];
+                    underlying_field_type_value &Z = p[2];
 
                     /*constexpr static */ const underlying_field_type_value x =
                         underlying_field_type_value(0x00, 0x00, 0x00);    //?

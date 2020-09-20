@@ -12,6 +12,9 @@
 
 #include <nil/algebra/pairing/detail/edwards/basic_policy.hpp>
 
+#include <boost/multiprecision/number.hpp>
+#include <boost/multiprecision/cpp_int.hpp>
+
 namespace nil {
     namespace algebra {
         namespace pairing {
@@ -141,7 +144,11 @@ namespace nil {
                         tate_g2_precomp result;
                         result.y0 = Qcopy.Y * Qcopy.Z.inversed();
                         result.eta = (Qcopy.Z + Qcopy.Y) *
-                            gt::mul_by_non_residue(Qcopy.X).inversed();
+                            gt::one().mul_by_non_residue(Qcopy.X).inversed();
+                        // must be 
+                        // gt::mul_by_non_residue(Qcopy.X).inversed();
+                        // when constexpr will be ready
+
 
                         return result;
                     }
@@ -252,8 +259,8 @@ namespace nil {
                         extended_g1_projective R = P_ext;
 
                         bool found_one = false;
-                        for (long i = policy_type::scalar_field_modulus.max_bits(); i >= 0; --i) {
-                            const bool bit = policy_type::scalar_field_modulus.test_bit(i);
+                        for (long i = policy_type::scalar_field_bits; i >= 0; --i) {
+                            const bool bit = boost::multiprecision::bit_test(policy_type::scalar_field_modulus, i);
                             if (!found_one) {
                                 /* this skips the MSB itself */
                                 found_one |= bit;
@@ -284,8 +291,8 @@ namespace nil {
 
                         bool found_one = false;
                         size_t idx = 0;
-                        for (long i = policy_type::scalar_field_modulus.max_bits() - 1; i >= 0; --i) {
-                            const bool bit = policy_type::scalar_field_modulus.test_bit(i);
+                        for (long i = policy_type::scalar_field_bits - 1; i >= 0; --i) {
+                            const bool bit = boost::multiprecision::bit_test(policy_type::scalar_field_modulus, i);
                             if (!found_one) {
                                 /* this skips the MSB itself */
                                 found_one |= bit;
@@ -447,7 +454,8 @@ namespace nil {
                     }
 
                     ate_g2_precomp ate_precompute_g2(const g2 &Q) {
-                        const bigint<Fr::num_limbs> &loop_count = ate_loop_count;
+                        const typename policy_type::number_type &loop_count = policy_type::ate_loop_count;
+
                         ate_g2_precomp result;
 
                         g2 Qcopy = Q.to_affine_coordinates();
@@ -461,8 +469,8 @@ namespace nil {
                         extended_g2_projective R = Q_ext;
 
                         bool found_one = false;
-                        for (long i = loop_count.max_bits() - 1; i >= 0; --i) {
-                            const bool bit = loop_count.test_bit(i);
+                        for (long i = policy_type::number_type_max_bits - 1; i >= 0; --i) {
+                            const bool bit = boost::multiprecision::bit_test(loop_count, i);
                             if (!found_one) {
                                 /* this skips the MSB itself */
                                 found_one |= bit;
@@ -481,16 +489,15 @@ namespace nil {
                         return result;
                     }
 
-                    gt ate_miller_loop(const ate_g1_precomp &prec_P,
-                                                const ate_g2_precomp &prec_Q) {
-                        const bigint<Fr::num_limbs> &loop_count = ate_loop_count;
+                    gt ate_miller_loop(const ate_g1_precomp &prec_P, const ate_g2_precomp &prec_Q) {
+                        const typename policy_type::number_type &loop_count = policy_type::ate_loop_count;
 
                         gt f = gt::one();
 
                         bool found_one = false;
                         size_t idx = 0;
-                        for (long i = loop_count.max_bits() - 1; i >= 0; --i) {
-                            const bool bit = loop_count.test_bit(i);
+                        for (long i = number_type_max_bits - 1; i >= 0; --i) {
+                            const bool bit = boost::multiprecision::bit_test(loop_count, i);
                             if (!found_one) {
                                 /* this skips the MSB itself */
                                 found_one |= bit;
@@ -518,19 +525,16 @@ namespace nil {
                         return f;
                     }
 
-                    gt ate_double_miller_loop(const ate_g1_precomp &prec_P1,
-                                                       const ate_g2_precomp &prec_Q1,
-                                                       const ate_g1_precomp &prec_P2,
-                                                       const ate_g2_precomp &prec_Q2) {
-                        const bigint<Fr::num_limbs> &loop_count = ate_loop_count;
+                    gt ate_double_miller_loop(const ate_g1_precomp &prec_P1, const ate_g2_precomp &prec_Q1,
+                                              const ate_g1_precomp &prec_P2, const ate_g2_precomp &prec_Q2) {
+                        const typename policy_type::number_type &loop_count = policy_type::ate_loop_count;
 
-                        gt f =
-                            gt::one();
+                        gt f = gt::one();
 
                         bool found_one = false;
                         size_t idx = 0;
-                        for (long i = loop_count.max_bits() - 1; i >= 0; --i) {
-                            const bool bit = loop_count.test_bit(i);
+                        for (long i = number_type_max_bits - 1; i >= 0; --i) {
+                            const bool bit = boost::multiprecision::bit_test(loop_count, i);
                             if (!found_one) {
                                 /* this skips the MSB itself */
                                 found_one |= bit;

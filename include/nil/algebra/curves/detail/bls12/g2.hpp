@@ -40,6 +40,9 @@ namespace nil {
                     using underlying_field_type_value = g2_field_type_value;
 
                     underlying_field_type_value p[3];
+                    underlying_field_type_value &X = p[0];
+                    underlying_field_type_value &Y = p[1];
+                    underlying_field_type_value &Z = p[2];
 
                     bls12_g2() :
                         bls12_g2(underlying_field_type_value::zero(), underlying_field_type_value::one(),
