@@ -59,6 +59,14 @@ namespace nil {
                     constexpr static const std::array<modulus_type, 3> nqr_to_t = 
                         {0x1366271F76AB41CEEEE8C1E5E972F3CEC14A25F18B3F4B93642FAD4972356D977470E0FA674_cppui297, 0x00, 0x00};
 
+                    constexpr static const std::array<underlying_type, 3> Frobenius_coeffs_c1 = {underlying_type(0x01),
+                        underlying_type(0x3B48E50A1662E26F0E834E15FAF68204A9845655F46B277A6D05B75068AD3F6801655344BEC_cppui298),
+                        underlying_type(0x8696C330D743F33B572CEF4DF62CE7ECB178EE24E48D1A53736E86448E74CB48DAACBB414_cppui292)};
+
+                    constexpr static const std::array<underlying_type, 3> Frobenius_coeffs_c2 = {underlying_type(0x01),
+                        underlying_type(0x8696C330D743F33B572CEF4DF62CE7ECB178EE24E48D1A53736E86448E74CB48DAACBB414_cppui292),
+                        underlying_type(0x3B48E50A1662E26F0E834E15FAF68204A9845655F46B277A6D05B75068AD3F6801655344BEC_cppui298)};
+
                     constexpr static const modulus_type non_residue = modulus_type(0x05);
                 };
 
@@ -77,6 +85,13 @@ namespace nil {
 
                     typedef element_fp<policy_type> non_residue_type;
                     typedef element_fp3<fp3_extension_params<field_type>> underlying_type;
+
+                    constexpr static const std::array<underlying_type, 3> Frobenius_coeffs_c1 = {underlying_type(0x01),
+                        underlying_type(0x3B48E50A1662E26F0E834E15FAF68204A9845655F46B277A6D05B75068AD3F6801655344BED_cppui298),
+                        underlying_type(0x3B48E50A1662E26F0E834E15FAF68204A9845655F46B277A6D05B75068AD3F6801655344BEC_cppui298),
+                        underlying_type(0x3BCF7BCD473A266249DA7B0548ECAEEC9635CF44194FB494C07925D6AD3BB4334A400000000_cppui298),
+                        underlying_type(0x8696C330D743F33B572CEF4DF62CE7ECB178EE24E48D1A53736E86448E74CB48DAACBB414_cppui292),
+                        underlying_type(0x8696C330D743F33B572CEF4DF62CE7ECB178EE24E48D1A53736E86448E74CB48DAACBB414_cppui293)};
 
                     constexpr static const modulus_type non_residue = modulus_type(0x05);
                 };
