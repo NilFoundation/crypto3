@@ -32,8 +32,8 @@ namespace nil {
 
                     using g1 = curves::detail::mnt4_g1<298, CHAR_BIT>;
                     using g2 = curves::detail::mnt4_g2<298, CHAR_BIT>;
-                    using Fq = typename mnt4_g1::underlying_field_type_value;
-                    using Fq3 = typename mnt4_g2::underlying_field_type_value;
+                    using Fq = typename g1::underlying_field_type_value;
+                    using Fq3 = typename g2::underlying_field_type_value;
                     using gt = policy_type::gt_type;
 
                     constexpr static const number_type ate_loop_count =

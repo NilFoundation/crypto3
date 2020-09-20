@@ -24,10 +24,10 @@ namespace nil {
                     typedef FieldParams policy_type;
 
                 public:
-                    static const typename policy_type::non_residue_type non_residue =
+                    /*constexpr static*/ const typename policy_type::non_residue_type non_residue =
                         policy_type::non_residue_type(policy_type::non_residue);
 
-                    using underlying_type = element_fp6_3over2<FieldParams>;
+                    using underlying_type = typename policy_type::underlying_type;
 
                     using value_type = std::array<underlying_type, 2>;
 
@@ -163,7 +163,7 @@ namespace nil {
                     }*/
 
                 private:
-                    inline static underlying_type mul_by_non_residue(const underlying_type &A) {
+                    /*inline static*/ underlying_type mul_by_non_residue(const underlying_type &A) {
                         return element_fp12_2over3over2({non_residue * A.data[2], A.data[1], A.data[0]});
                     }
                 };
