@@ -24,12 +24,9 @@ namespace nil {
             using namespace algebra;
 
             template<std::size_t ModulusBits = 183, std::size_t GeneratorBits = CHAR_BIT>
-            struct edwards { };
+            struct edwards {
 
-            template<>
-            struct edwards<183, CHAR_BIT> {
-
-                using policy_type = detail::edwards_basic_policy<183>;
+                using policy_type = detail::edwards_basic_policy<ModulusBits, GeneratorBits>;
 
                 typedef typename policy_type::base_field_type base_field_type;
                 typedef typename policy_type::scalar_field_type scalar_field_type;
@@ -43,6 +40,8 @@ namespace nil {
 
                 typedef typename detail::edwards_g1<base_field_bits> g1_type;
                 typedef typename detail::edwards_g2<base_field_bits> g2_type;
+
+                //typedef typename pairing::pairing_policy<edwards<ModulusBits, GeneratorBits>> pairing_policy;
 
                 typedef typename fields::fp6_2over3<base_field_type>::value_type gt_type;
 

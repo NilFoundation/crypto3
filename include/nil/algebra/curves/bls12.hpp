@@ -25,13 +25,10 @@ namespace nil {
                 E/Fp: y^2 = x^3 + 4.
             */
 
-            template<std::size_t ModulusBits>
-            struct bls12 { };
+            template<std::size_t ModulusBits, std::size_t GeneratorBits = CHAR_BIT>
+            struct bls12 {
 
-            template<>
-            struct bls12<381> {
-
-                using policy_type = detail::bls12_basic_policy<381>;
+                using policy_type = detail::bls12_basic_policy<ModulusBits, GeneratorBits>;
 
                 typedef typename policy_type::base_field_type base_field_type;
                 typedef typename policy_type::scalar_field_type scalar_field_type;
@@ -46,26 +43,7 @@ namespace nil {
                 typedef typename detail::bls12_g1<base_field_bits> g1_type;
                 typedef typename detail::bls12_g2<base_field_bits> g2_type;
 
-                typedef typename fields::fp12_2over3over2<base_field_type>::value_type gt_type;
-            };
-
-            template<>
-            struct bls12<377> {
-
-                using policy_type = detail::bls12_basic_policy<377>;
-
-                typedef typename policy_type::base_field_type base_field_type;
-                typedef typename policy_type::scalar_field_type scalar_field_type;
-                typedef typename policy_type::number_type number_type;
-
-                constexpr static const std::size_t base_field_bits = policy_type::base_field_bits;
-                constexpr static const number_type p = policy_type::p;
-
-                constexpr static const std::size_t scalar_field_bits = policy_type::scalar_field_bits;
-                constexpr static const number_type q = policy_type::q;
-
-                typedef typename detail::bls12_g1<base_field_bits> g1_type;
-                typedef typename detail::bls12_g2<base_field_bits> g2_type;
+                //typedef typename pairing::pairing_policy<bls12<ModulusBits, GeneratorBits>> pairing_policy;
 
                 typedef typename fields::fp12_2over3over2<base_field_type>::value_type gt_type;
             };

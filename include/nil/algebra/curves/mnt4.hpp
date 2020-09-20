@@ -24,12 +24,9 @@ namespace nil {
             using namespace nil::algebra;
 
             template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
-            struct mnt4 { };
+            struct mnt4 {
 
-            template<>
-            struct mnt4<298, CHAR_BIT> {
-
-                using policy_type = detail::mnt4_basic_policy<298>;
+                using policy_type = detail::mnt4_basic_policy<ModulusBits, GeneratorBits>;
 
                 typedef typename policy_type::base_field_type base_field_type;
                 typedef typename policy_type::scalar_field_type scalar_field_type;
@@ -43,6 +40,8 @@ namespace nil {
 
                 typedef typename detail::mnt4_g1<base_field_bits, CHAR_BIT> g1_type;
                 typedef typename detail::mnt4_g2<base_field_bits, CHAR_BIT> g2_type;
+
+                //typedef typename pairing::pairing_policy<mnt4<ModulusBits, GeneratorBits>> pairing_policy;
 
                 typedef typename fields::fp4<base_field_type>::value_type gt_type;
 

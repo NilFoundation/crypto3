@@ -57,6 +57,8 @@ namespace nil {
                 typedef typename detail::bn128_g1<254, CHAR_BIT> g1_type;
                 typedef typename detail::bn128_g2<254, CHAR_BIT> g2_type;
 
+                //typedef typename pairing::pairing_policy<bn128<ModulusBits, GeneratorBits>> pairing_policy;
+
                 typedef typename fields::fp12_2over3over2<base_field_type>::value_type gt_type;
 
                 typedef std::vector<g1_type> g1_vector;
