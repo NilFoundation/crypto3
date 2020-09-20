@@ -41,18 +41,6 @@ namespace nil {
                  * Instance map for the TBCS-to-USCS reduction.
                  */
                 template<typename FieldType>
-                uscs_constraint_system<FieldType> tbcs_to_uscs_instance_map(const tbcs_circuit &circuit);
-
-                /**
-                 * Witness map for the TBCS-to-USCS reduction.
-                 */
-                template<typename FieldType>
-                uscs_variable_assignment<FieldType>
-                    tbcs_to_uscs_witness_map(const tbcs_circuit &circuit,
-                                             const tbcs_primary_input &primary_input,
-                                             const tbcs_auxiliary_input &auxiliary_input);
-
-                template<typename FieldType>
                 uscs_constraint_system<FieldType> tbcs_to_uscs_instance_map(const tbcs_circuit &circuit) {
                     assert(circuit.is_valid());
                     uscs_constraint_system<FieldType> result;
@@ -169,6 +157,9 @@ namespace nil {
                     return result;
                 }
 
+                /**
+                 * Witness map for the TBCS-to-USCS reduction.
+                 */
                 template<typename FieldType>
                 uscs_variable_assignment<FieldType>
                     tbcs_to_uscs_witness_map(const tbcs_circuit &circuit,
@@ -179,7 +170,6 @@ namespace nil {
                         algebra::convert_bit_vector_to_field_element_vector<FieldType>(all_wires);
                     return result;
                 }
-
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3

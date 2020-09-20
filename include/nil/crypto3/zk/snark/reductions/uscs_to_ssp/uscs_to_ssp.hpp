@@ -41,32 +41,6 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-
-                /**
-                 * Instance map for the USCS-to-SSP reduction.
-                 */
-                template<typename FieldType>
-                ssp_instance<FieldType> uscs_to_ssp_instance_map(const uscs_constraint_system<FieldType> &cs);
-
-                /**
-                 * Instance map for the USCS-to-SSP reduction followed by evaluation of the resulting SSP instance.
-                 */
-                template<typename FieldType>
-                ssp_instance_evaluation<FieldType>
-                    uscs_to_ssp_instance_map_with_evaluation(const uscs_constraint_system<FieldType> &cs,
-                                                             const typename FieldType::value_type &t);
-
-                /**
-                 * Witness map for the USCS-to-SSP reduction.
-                 *
-                 * The witness map takes zero knowledge into account when d is random.
-                 */
-                template<typename FieldType>
-                ssp_witness<FieldType> uscs_to_ssp_witness_map(const uscs_constraint_system<FieldType> &cs,
-                                                               const uscs_primary_input<FieldType> &primary_input,
-                                                               const uscs_auxiliary_input<FieldType> &auxiliary_input,
-                                                               const typename FieldType::value_type &d);
-
                 /**
                  * Instance map for the USCS-to-SSP reduction.
                  *
@@ -236,7 +210,6 @@ namespace nil {
                                                   full_variable_assignment,
                                                   std::move(coefficients_for_H));
                 }
-
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3

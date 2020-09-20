@@ -317,7 +317,6 @@ namespace nil {
                     qap_witness &operator=(const qap_witness<FieldType> &other) = default;
                     qap_witness &operator=(qap_witness<FieldType> &&other) = default;
                 };
-
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3

@@ -42,41 +42,6 @@ namespace nil {
     namespace crypto3 {
         namespace zk {
             namespace snark {
-
-                /**
-                 * Helper function to find evaluation domain that will be used by the reduction
-                 * for a given R1CS instance.
-                 */
-                template<typename FieldType>
-                std::shared_ptr<algebra::fft::evaluation_domain<FieldType>>
-                    r1cs_to_sap_get_domain(const r1cs_constraint_system<FieldType> &cs);
-
-                /**
-                 * Instance map for the R1CS-to-QAP reduction.
-                 */
-                template<typename FieldType>
-                sap_instance<FieldType> r1cs_to_sap_instance_map(const r1cs_constraint_system<FieldType> &cs);
-
-                /**
-                 * Instance map for the R1CS-to-QAP reduction followed by evaluation of the resulting QAP instance.
-                 */
-                template<typename FieldType>
-                sap_instance_evaluation<FieldType>
-                    r1cs_to_sap_instance_map_with_evaluation(const r1cs_constraint_system<FieldType> &cs,
-                                                             const typename FieldType::value_type &t);
-
-                /**
-                 * Witness map for the R1CS-to-QAP reduction.
-                 *
-                 * The witness map takes zero knowledge into account when d1,d2 are random.
-                 */
-                template<typename FieldType>
-                sap_witness<FieldType> r1cs_to_sap_witness_map(const r1cs_constraint_system<FieldType> &cs,
-                                                               const r1cs_primary_input<FieldType> &primary_input,
-                                                               const r1cs_auxiliary_input<FieldType> &auxiliary_input,
-                                                               const typename FieldType::value_type &d1,
-                                                               const typename FieldType::value_type &d2);
-
                 /**
                  * Helper function to multiply a field element by 4 efficiently
                  */

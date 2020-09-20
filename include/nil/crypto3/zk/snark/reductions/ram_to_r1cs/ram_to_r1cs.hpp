@@ -58,8 +58,8 @@ namespace nil {
 
                 template<typename RAMType>
                 ram_to_r1cs<RAMType>::ram_to_r1cs(const ram_architecture_params<RAMType> &ap,
-                                               const std::size_t boot_trace_size_bound,
-                                               const std::size_t time_bound) :
+                                                  const std::size_t boot_trace_size_bound,
+                                                  const std::size_t time_bound) :
                     boot_trace_size_bound(boot_trace_size_bound),
                     main_protoboard(ap) {
                     const std::size_t r1cs_input_size =
@@ -83,7 +83,7 @@ namespace nil {
                 template<typename RAMType>
                 r1cs_primary_input<ram_base_field<RAMType>>
                     ram_to_r1cs<RAMType>::auxiliary_input_map(const ram_boot_trace<RAMType> &boot_trace,
-                                                           const ram_input_tape<RAMType> &auxiliary_input) {
+                                                              const ram_input_tape<RAMType> &auxiliary_input) {
                     universal_component->generate_r1cs_witness(boot_trace, auxiliary_input);
                     return main_protoboard.auxiliary_input();
                 }
@@ -99,9 +99,9 @@ namespace nil {
                 }
 
                 template<typename RAMType>
-                std::vector<ram_base_field<RAMType>>
-                    ram_to_r1cs<RAMType>::pack_primary_input_address_and_value(const ram_architecture_params<RAMType> &ap,
-                                                                            const address_and_value &av) {
+                std::vector<ram_base_field<RAMType>> ram_to_r1cs<RAMType>::pack_primary_input_address_and_value(
+                    const ram_architecture_params<RAMType> &ap,
+                    const address_and_value &av) {
                     typedef ram_base_field<RAMType> FieldType;
 
                     const std::size_t address = av.first;
@@ -125,11 +125,12 @@ namespace nil {
                 template<typename RAMType>
                 r1cs_primary_input<ram_base_field<RAMType>>
                     ram_to_r1cs<RAMType>::primary_input_map(const ram_architecture_params<RAMType> &ap,
-                                                         const std::size_t boot_trace_size_bound,
-                                                         const ram_boot_trace<RAMType> &boot_trace) {
+                                                            const std::size_t boot_trace_size_bound,
+                                                            const ram_boot_trace<RAMType> &boot_trace) {
                     typedef ram_base_field<RAMType> FieldType;
 
-                    const std::size_t packed_input_element_size = ram_universal_component<RAMType>::packed_input_element_size(ap);
+                    const std::size_t packed_input_element_size =
+                        ram_universal_component<RAMType>::packed_input_element_size(ap);
                     r1cs_primary_input<FieldType> result(
                         ram_universal_component<RAMType>::packed_input_size(ap, boot_trace_size_bound));
 

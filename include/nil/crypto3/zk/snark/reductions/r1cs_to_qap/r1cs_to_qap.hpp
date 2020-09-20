@@ -45,33 +45,6 @@ namespace nil {
 
                 /**
                  * Instance map for the R1CS-to-QAP reduction.
-                 */
-                template<typename FieldType>
-                qap_instance<FieldType> r1cs_to_qap_instance_map(const r1cs_constraint_system<FieldType> &cs);
-
-                /**
-                 * Instance map for the R1CS-to-QAP reduction followed by evaluation of the resulting QAP instance.
-                 */
-                template<typename FieldType>
-                qap_instance_evaluation<FieldType>
-                    r1cs_to_qap_instance_map_with_evaluation(const r1cs_constraint_system<FieldType> &cs,
-                                                             const typename FieldType::value_type &t);
-
-                /**
-                 * Witness map for the R1CS-to-QAP reduction.
-                 *
-                 * The witness map takes zero knowledge into account when d1,d2,d3 are random.
-                 */
-                template<typename FieldType>
-                qap_witness<FieldType> r1cs_to_qap_witness_map(const r1cs_constraint_system<FieldType> &cs,
-                                                               const r1cs_primary_input<FieldType> &primary_input,
-                                                               const r1cs_auxiliary_input<FieldType> &auxiliary_input,
-                                                               const typename FieldType::value_type &d1,
-                                                               const typename FieldType::value_type &d2,
-                                                               const typename FieldType::value_type &d3);
-
-                /**
-                 * Instance map for the R1CS-to-QAP reduction.
                  *
                  * Namely, given a R1CS constraint system cs, construct a QAP instance for which:
                  *   A := (A_0(z),A_1(z),...,A_m(z))
@@ -154,7 +127,7 @@ namespace nil {
                     Ct.resize(cs.num_variables() + 1, FieldType::value_type::zero());
                     Ht.reserve(domain->m + 1);
 
-                    const FieldType::value_type Zt = domain->compute_vanishing_polynomial(t);
+                    const typename FieldType::value_type Zt = domain->compute_vanishing_polynomial(t);
 
                     const std::vector<typename FieldType::value_type> u = domain->evaluate_all_lagrange_polynomials(t);
                     /**

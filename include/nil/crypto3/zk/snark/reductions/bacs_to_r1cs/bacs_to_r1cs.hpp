@@ -30,18 +30,6 @@ namespace nil {
                  * Instance map for the BACS-to-R1CS reduction.
                  */
                 template<typename FieldType>
-                r1cs_constraint_system<FieldType> bacs_to_r1cs_instance_map(const bacs_circuit<FieldType> &circuit);
-
-                /**
-                 * Witness map for the BACS-to-R1CS reduction.
-                 */
-                template<typename FieldType>
-                r1cs_variable_assignment<FieldType>
-                    bacs_to_r1cs_witness_map(const bacs_circuit<FieldType> &circuit,
-                                             const bacs_primary_input<FieldType> &primary_input,
-                                             const bacs_auxiliary_input<FieldType> &auxiliary_input);
-
-                template<typename FieldType>
                 r1cs_constraint_system<FieldType> bacs_to_r1cs_instance_map(const bacs_circuit<FieldType> &circuit) {
                     assert(circuit.is_valid());
                     r1cs_constraint_system<FieldType> result;
@@ -62,6 +50,9 @@ namespace nil {
                     return result;
                 }
 
+                /**
+                 * Witness map for the BACS-to-R1CS reduction.
+                 */
                 template<typename FieldType>
                 r1cs_variable_assignment<FieldType>
                     bacs_to_r1cs_witness_map(const bacs_circuit<FieldType> &circuit,

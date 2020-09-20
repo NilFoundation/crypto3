@@ -43,8 +43,8 @@ namespace nil {
 
                 public:
                     memory_line_variable_component(ram_protoboard<RAMType> &pb,
-                                                const std::size_t timestamp_size,
-                                                const ram_architecture_params<RAMType> &ap);
+                                                   const std::size_t timestamp_size,
+                                                   const ram_architecture_params<RAMType> &ap);
 
                     void generate_r1cs_constraints(const bool enforce_bitness = false);
                     void generate_r1cs_witness_from_bits();
@@ -68,8 +68,8 @@ namespace nil {
                     variable<FieldType> has_accepted;
 
                     execution_line_variable_component(ram_protoboard<RAMType> &pb,
-                                                   const std::size_t timestamp_size,
-                                                   const ram_architecture_params<RAMType> &ap);
+                                                      const std::size_t timestamp_size,
+                                                      const ram_architecture_params<RAMType> &ap);
                 };
 
                 template<typename RAMType>
