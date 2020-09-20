@@ -119,7 +119,7 @@ class montgomery_params : public base_params<Backend>
    //template <bool c, typename Dummy>
    //constexpr typename std::enable_if<!(c && sizeof(Dummy))>::type eval_montgomery_reduce(Backend& result) const
 
-   constexpr void eval_montgomery_reduce_compile_time(Backend& result) const
+   constexpr int eval_montgomery_reduce_compile_time(Backend& result) const
    {
       using default_ops::eval_lt;
       using default_ops::eval_multiply_add;
@@ -190,12 +190,13 @@ class montgomery_params : public base_params<Backend>
          result.resize(p_size + 1, p_size + 1);
       }
       result.normalize();
+      return 0;
    }
 
    //template<bool c, typename Dummy>
    //inline typename std::enable_if<c && sizeof(Dummy)>::type eval_montgomery_reduce (Backend& result) const
 
-   inline void eval_montgomery_reduce_run_time(Backend& result) const
+   inline int eval_montgomery_reduce_run_time(Backend& result) const
    {
       using default_ops::eval_lt;
       using default_ops::eval_multiply_add;
@@ -265,6 +266,7 @@ class montgomery_params : public base_params<Backend>
          result.resize(p_size + 1, p_size + 1);
       }
       result.normalize();
+      return 0;
    }
 
    template <bool c, typename Dummy>
