@@ -15,11 +15,7 @@
 #include <nil/algebra/curves/detail/bls12/g1.hpp>
 #include <nil/algebra/curves/detail/bls12/g2.hpp>
 
-#include <nil/algebra/fields/fp12_2over3over2.hpp>
-
 //#include <nil/algebra/pairing/bls12.hpp>
-
-#include <nil/algebra/detail/literals.hpp>
 
 namespace nil {
     namespace algebra {
@@ -51,7 +47,7 @@ namespace nil {
 
                 //typedef typename pairing::pairing_policy<bls12<ModulusBits, GeneratorBits>> pairing_policy;
 
-                typedef typename fields::fp12_2over3over2<base_field_type>::value_type gt_type;
+                typedef typename policy_type::gt_type gt_type;
             };
 
             typedef bls12<381> bls12_381;

@@ -13,6 +13,8 @@
 #include <nil/algebra/fields/mnt6/base_field.hpp>
 #include <nil/algebra/fields/mnt6/scalar_field.hpp>
 
+#include <nil/algebra/fields/fp6_2over3.hpp>
+
 #include <nil/algebra/detail/literals.hpp>
 
 namespace nil {
@@ -40,6 +42,8 @@ namespace nil {
 
                     constexpr static const number_type p = base_field_modulus;
                     constexpr static const number_type q = scalar_field_modulus;
+
+                    typedef typename fields::fp6_2over3<base_field_type>::value_type gt_type;
 
                     constexpr static const number_type a = number_type(0x0B);
                     constexpr static const number_type b = number_type(

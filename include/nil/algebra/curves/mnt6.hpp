@@ -17,8 +17,6 @@
 
 //#include <nil/algebra/pairing/mnt6.hpp>
 
-#include <nil/algebra/fields/fp6_2over3.hpp>
-
 namespace nil {
     namespace algebra {
         namespace curves {
@@ -46,7 +44,7 @@ namespace nil {
 
                 //typedef typename pairing::pairing_policy<mnt6<ModulusBits, GeneratorBits>> pairing_policy;
 
-                typedef typename fields::fp6_2over3<base_field_type>::value_type gt_type;
+                typedef typename policy_type::gt_type gt_type;
 
                 typedef std::vector<g1_type> g1_vector;
                 typedef std::vector<g2_type> g2_vector;

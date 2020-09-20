@@ -22,21 +22,21 @@ namespace nil {
             template<std::size_t ModulusBits = 183, std::size_t GeneratorBits = CHAR_BIT>
             struct pairing_policy<edwards<ModulusBits, GeneratorBits>> {
 
-                using g1_precomp = detail::edwards_g1_precomp<ModulusBits, GeneratorBits>;
-                using g2_precomp = detail::edwards_g2_precomp<ModulusBits, GeneratorBits>;
+                using g1_precomp = detail::edwards_pairing_functions<ModulusBits, GeneratorBits>::edwards_g1_precomp;
+                using g2_precomp = detail::edwards_pairing_functions<ModulusBits, GeneratorBits>::edwards_g2_precomp;
 
-                using precompute_g1 = detail::edwards_precompute_g1<ModulusBits, GeneratorBits>;
-                using precompute_g2 = detail::edwards_precompute_g2<ModulusBits, GeneratorBits>;
+                using precompute_g1 = detail::edwards_pairing_functions<ModulusBits, GeneratorBits>::edwards_precompute_g1;
+                using precompute_g2 = detail::edwards_pairing_functions<ModulusBits, GeneratorBits>::edwards_precompute_g2;
 
-                using g1_conic_coefficients = detail::edwards_Fq_conic_coefficients<ModulusBits, GeneratorBits>;
-                using g2_conic_coefficients = detail::edwards_Fq3_conic_coefficients<ModulusBits, GeneratorBits>;
+                using g1_conic_coefficients = detail::edwards_pairing_functions<ModulusBits, GeneratorBits>::edwards_Fq_conic_coefficients;
+                using g2_conic_coefficients = detail::edwards_pairing_functions<ModulusBits, GeneratorBits>::edwards_Fq3_conic_coefficients;
 
-                using reduced_pairing = detail::edwards_reduced_pairing<ModulusBits, GeneratorBits>;
-                using pairing = detail::edwards_pairing<ModulusBits, GeneratorBits>;
+                using reduced_pairing = detail::edwards_pairing_functions<ModulusBits, GeneratorBits>::edwards_reduced_pairing;
+                using pairing = detail::edwards_pairing_functions<ModulusBits, GeneratorBits>::edwards_pairing;
 
-                using miller_loop = detail::edwards_miller_loop<ModulusBits, GeneratorBits>;
-                using double_miller_loop = detail::edwards_double_miller_loop<ModulusBits, GeneratorBits>;
-                using final_exponentiation = detail::edwards_final_exponentiation<ModulusBits, GeneratorBits>;
+                using miller_loop = detail::edwards_pairing_functions<ModulusBits, GeneratorBits>::edwards_miller_loop;
+                using double_miller_loop = detail::edwards_pairing_functions<ModulusBits, GeneratorBits>::edwards_double_miller_loop;
+                using final_exponentiation = detail::edwards_pairing_functions<ModulusBits, GeneratorBits>::edwards_final_exponentiation;
             };
         }    // namespace pairing
     }        // namespace algebra

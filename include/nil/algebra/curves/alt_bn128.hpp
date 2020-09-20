@@ -17,8 +17,6 @@
 
 //#include <nil/algebra/pairing/alt_bn128.hpp>
 
-#include <nil/algebra/fields/fp12_2over3over2.hpp>
-
 namespace nil {
     namespace algebra {
         namespace curves {
@@ -46,7 +44,7 @@ namespace nil {
 
                 //typedef typename pairing::pairing_policy<alt_bn128<ModulusBits, GeneratorBits>> pairing_policy;
 
-                typedef typename fields::fp12_2over3over2<base_field_type>::value_type gt_type;
+                typedef typename policy_type::gt_type gt_type;
 
                 typedef std::vector<g1_type> g1_vector;
                 typedef std::vector<g2_type> g2_vector;

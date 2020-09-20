@@ -13,6 +13,8 @@
 #include <nil/algebra/fields/bls12/base_field.hpp>
 #include <nil/algebra/fields/bls12/scalar_field.hpp>
 
+#include <nil/algebra/fields/fp12_2over3over2.hpp>
+
 #include <nil/algebra/detail/literals.hpp>
 
 namespace nil {
@@ -38,6 +40,8 @@ namespace nil {
                     typedef fields::bls12_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
                     constexpr static const number_type q = scalar_field_type::modulus;
 
+                    typedef typename fields::fp12_2over3over2<base_field_type>::value_type gt_type;
+
                     constexpr static const number_type a = number_type(0x00);
                     constexpr static const number_type b = number_type(0x04);
                 };
@@ -54,6 +58,8 @@ namespace nil {
                     typedef fields::bls12_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
                     constexpr static const number_type q = scalar_field_type::modulus;
 
+                    typedef typename fields::fp12_2over3over2<base_field_type>::value_type gt_type;
+                    
                     constexpr static const number_type a = number_type(0x00);
                     constexpr static const number_type b = number_type(0x01);
                 };
