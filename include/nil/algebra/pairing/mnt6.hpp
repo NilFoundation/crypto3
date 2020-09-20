@@ -20,7 +20,9 @@ namespace nil {
         namespace pairing {
 
             template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
-            struct pairing_policy<mnt6<ModulusBits, GeneratorBits>> {
+            class pairing_policy<mnt6<ModulusBits, GeneratorBits>> {
+                using policy_type = detail::mnt6_pairing_functions<ModulusBits, GeneratorBits>;
+            public:
 
                 using other_curve = curves::mnt4<ModulusBits, GeneratorBits>;
 
@@ -28,18 +30,18 @@ namespace nil {
                 typedef algebra::Fqe<algebra::curves::mnt6> fqe_type;
                 typedef algebra::Fqk<algebra::curves::mnt6> fqk_type;
 
-                using g1_precomp = detail::mnt6_g1_precomp<ModulusBits, GeneratorBits>;
-                using g2_precomp = detail::mnt6_g2_precomp<ModulusBits, GeneratorBits>;
+                using g1_precomp = policy_type::g1_precomp;
+                using g2_precomp = policy_type::g2_precomp;
 
-                using precompute_g1 = detail::mnt6_precompute_g1<ModulusBits, GeneratorBits>;
-                using precompute_g2 = detail::mnt6_precompute_g2<ModulusBits, GeneratorBits>;
+                using precompute_g1 = policy_type::precompute_g1;
+                using precompute_g2 = policy_type::precompute_g2;
 
-                using reduced_pairing = detail::mnt6_reduced_pairing<ModulusBits, GeneratorBits>;
-                using pairing = detail::mnt6_pairing<ModulusBits, GeneratorBits>;
+                using reduced_pairing = policy_type::reduced_pairing;
+                using pairing = policy_type::pairing;
 
-                using miller_loop = detail::mnt6_miller_loop<ModulusBits, GeneratorBits>;
-                using double_miller_loop = detail::mnt6_double_miller_loop<ModulusBits, GeneratorBits>;
-                using final_exponentiation = detail::mnt6_final_exponentiation<ModulusBits, GeneratorBits>;
+                using miller_loop = policy_type::miller_loop;
+                using double_miller_loop = policy_type::double_miller_loop;
+                using final_exponentiation = policy_type::final_exponentiation;
             };
         }    // namespace pairing
     }        // namespace algebra

@@ -11,6 +11,8 @@
 #define ALGEBRA_PAIRING_EDWARDS_BASIC_POLICY_HPP
 
 #include <nil/algebra/curves/detail/edwards/basic_policy.hpp>
+#include <nil/algebra/curves/detail/edwards/g1.hpp>
+#include <nil/algebra/curves/detail/edwards/g2.hpp>
 
 namespace nil {
     namespace algebra {

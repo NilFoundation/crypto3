@@ -11,6 +11,8 @@
 #define ALGEBRA_PAIRING_MNT6_BASIC_POLICY_HPP
 
 #include <nil/algebra/curves/detail/mnt6/basic_policy.hpp>
+#include <nil/algebra/curves/detail/mnt6/g1.hpp>
+#include <nil/algebra/curves/detail/mnt6/g2.hpp>
 
 namespace nil {
     namespace algebra {
@@ -20,13 +22,21 @@ namespace nil {
                 using namespace nil::algebra;
 
                 template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
-                struct mnt6_basic_policy;
+                class mnt6_basic_policy;
 
                 template<>
-                struct mnt6_basic_policy<298, CHAR_BIT> {
+                class mnt6_basic_policy<298, CHAR_BIT> {
+                    using policy_type = curves::detail::mnt6_basic_policy<298, CHAR_BIT>;
+                public:
 
-                    using number_type = curves::detail::mnt6_basic_policy<298, CHAR_BIT>::number_type;
-                    using extended_number_type = curves::detail::mnt6_basic_policy<298, CHAR_BIT>::extended_number_type;
+                    using number_type = typename policy_type::number_type;
+                    using extended_number_type = typename policy_type::extended_number_type;
+
+                    using g1 = curves::detail::mnt6_g1<298, CHAR_BIT>;
+                    using g2 = curves::detail::mnt6_g2<298, CHAR_BIT>;
+                    using Fq = typename g1::underlying_field_type_value;
+                    using Fq3 = typename g2::underlying_field_type_value;
+                    using gt = policy_type::gt_type;
 
                     constexpr static const number_type ate_loop_count =
                         number_type(0x1EEF5546609756BEC2A33F0DC9A1B671660000_cppui149);

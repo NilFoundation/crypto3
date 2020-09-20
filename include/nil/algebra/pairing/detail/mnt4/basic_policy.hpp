@@ -11,6 +11,8 @@
 #define ALGEBRA_PAIRING_MNT4_BASIC_POLICY_HPP
 
 #include <nil/algebra/curves/detail/mnt4/basic_policy.hpp>
+#include <nil/algebra/curves/detail/mnt4/g1.hpp>
+#include <nil/algebra/curves/detail/mnt4/g2.hpp>
 
 namespace nil {
     namespace algebra {
@@ -20,10 +22,10 @@ namespace nil {
                 using namespace nil::algebra;
 
                 template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
-                struct mnt4_basic_policy;
+                class mnt4_basic_policy;
 
                 template<>
-                struct mnt4_basic_policy<298, CHAR_BIT> {
+                class mnt4_basic_policy<298, CHAR_BIT> {
                     using policy_type = curves::detail::mnt4_basic_policy<298, CHAR_BIT>;
                 public:
 
