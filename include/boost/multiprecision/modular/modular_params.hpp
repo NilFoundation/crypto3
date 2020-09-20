@@ -54,13 +54,14 @@ class modular_params : public backends::montgomery_params<Backend>, public backe
 
    constexpr void reduce(Backend& result) const
    {
+
       if (get_mod() % 2 == 0)
       {
          this->eval_barret_reduce(result);
       }
       else
       {
-         this->template eval_montgomery_reduce<std::integral_constant<int, eval_montgomery_reduce_compile_time(result)>::value, int>(result);
+         //this->template eval_montgomery_reduce<std::integral_constant<int, eval_montgomery_reduce_compile_time(result)>::value, int>(result);
       }
    }
 
@@ -70,7 +71,7 @@ class modular_params : public backends::montgomery_params<Backend>, public backe
       if (get_mod() % 2 != 0)
       {
          eval_multiply(result, this->r2().backend());
-         this->template eval_montgomery_reduce<std::integral_constant<int, eval_montgomery_reduce_compile_time(result)>::value, int>(result);
+         //this->template eval_montgomery_reduce<std::integral_constant<int, eval_montgomery_reduce_compile_time(result)>::value, int>(result);
       }
    }
 

@@ -276,7 +276,7 @@ class montgomery_params : public base_params<Backend>
     }
 
     template<bool c, typename Dummy>
-    inline typename std::enable_if<c && sizeof(Dummy)>::type eval_montgomery_reduce (Backend& result) const
+    constexpr typename std::enable_if<c && sizeof(Dummy)>::type eval_montgomery_reduce (Backend& result) const
     {
         eval_montgomery_reduce_run_time(result);
     }
