@@ -311,105 +311,7 @@ namespace nil {
                  */
                 template<typename CurveType>
                 r1cs_gg_ppzksnark_keypair<CurveType>
-                    r1cs_gg_ppzksnark_generator(const r1cs_gg_ppzksnark_constraint_system<CurveType> &cs);
-
-                /**
-                 * A prover algorithm for the R1CS GG-ppzkSNARK.
-                 *
-                 * Given a R1CS primary input X and a R1CS auxiliary input Y, this algorithm
-                 * produces a proof (of knowledge) that attests to the following statement:
-                 *               ``there exists Y such that CS(X,Y)=0''.
-                 * Above, CS is the R1CS constraint system that was given as input to the generator algorithm.
-                 */
-                template<typename CurveType>
-                r1cs_gg_ppzksnark_proof<CurveType>
-                    r1cs_gg_ppzksnark_prover(const r1cs_gg_ppzksnark_proving_key<CurveType> &pk,
-                                             const r1cs_gg_ppzksnark_primary_input<CurveType> &primary_input,
-                                             const r1cs_gg_ppzksnark_auxiliary_input<CurveType> &auxiliary_input);
-
-                /*
-                  Below are four variants of verifier algorithm for the R1CS GG-ppzkSNARK.
-
-                  These are the four cases that arise from the following two choices:
-
-                  (1) The verifier accepts a (non-processed) verification key or, instead, a processed verification key.
-                  In the latter case, we call the algorithm an "online verifier".
-
-                  (2) The verifier checks for "weak" input consistency or, instead, "strong" input consistency.
-                  Strong input consistency requires that |primary_input| = CS.num_inputs, whereas
-                  weak input consistency requires that |primary_input| <= CS.num_inputs (and
-                  the primary input is implicitly padded with zeros up to length CS.num_inputs).
-                */
-
-                /**
-                 * A verifier algorithm for the R1CS GG-ppzkSNARK that:
-                 * (1) accepts a non-processed verification key, and
-                 * (2) has weak input consistency.
-                 */
-                template<typename CurveType>
-                bool r1cs_gg_ppzksnark_verifier_weak_IC(const r1cs_gg_ppzksnark_verification_key<CurveType> &vk,
-                                                        const r1cs_gg_ppzksnark_primary_input<CurveType> &primary_input,
-                                                        const r1cs_gg_ppzksnark_proof<CurveType> &proof);
-
-                /**
-                 * A verifier algorithm for the R1CS GG-ppzkSNARK that:
-                 * (1) accepts a non-processed verification key, and
-                 * (2) has strong input consistency.
-                 */
-                template<typename CurveType>
-                bool r1cs_gg_ppzksnark_verifier_strong_IC(
-                    const r1cs_gg_ppzksnark_verification_key<CurveType> &vk,
-                    const r1cs_gg_ppzksnark_primary_input<CurveType> &primary_input,
-                    const r1cs_gg_ppzksnark_proof<CurveType> &proof);
-
-                /**
-                 * Convert a (non-processed) verification key into a processed verification key.
-                 */
-                template<typename CurveType>
-                r1cs_gg_ppzksnark_processed_verification_key<CurveType>
-                    r1cs_gg_ppzksnark_verifier_process_vk(const r1cs_gg_ppzksnark_verification_key<CurveType> &vk);
-
-                /**
-                 * A verifier algorithm for the R1CS GG-ppzkSNARK that:
-                 * (1) accepts a processed verification key, and
-                 * (2) has weak input consistency.
-                 */
-                template<typename CurveType>
-                bool r1cs_gg_ppzksnark_online_verifier_weak_IC(
-                    const r1cs_gg_ppzksnark_processed_verification_key<CurveType> &pvk,
-                    const r1cs_gg_ppzksnark_primary_input<CurveType> &input,
-                    const r1cs_gg_ppzksnark_proof<CurveType> &proof);
-
-                /**
-                 * A verifier algorithm for the R1CS GG-ppzkSNARK that:
-                 * (1) accepts a processed verification key, and
-                 * (2) has strong input consistency.
-                 */
-                template<typename CurveType>
-                bool r1cs_gg_ppzksnark_online_verifier_strong_IC(
-                    const r1cs_gg_ppzksnark_processed_verification_key<CurveType> &pvk,
-                    const r1cs_gg_ppzksnark_primary_input<CurveType> &primary_input,
-                    const r1cs_gg_ppzksnark_proof<CurveType> &proof);
-
-                /****************************** Miscellaneous ********************************/
-
-                /**
-                 * For debugging purposes (of r1cs_gg_ppzksnark_r1cs_gg_ppzksnark_verifier_component):
-                 *
-                 * A verifier algorithm for the R1CS GG-ppzkSNARK that:
-                 * (1) accepts a non-processed verification key,
-                 * (2) has weak input consistency, and
-                 * (3) uses affine coordinates for elliptic-curve computations.
-                 */
-                template<typename CurveType>
-                bool r1cs_gg_ppzksnark_affine_verifier_weak_IC(
-                    const r1cs_gg_ppzksnark_verification_key<CurveType> &vk,
-                    const r1cs_gg_ppzksnark_primary_input<CurveType> &primary_input,
-                    const r1cs_gg_ppzksnark_proof<CurveType> &proof);
-
-                template<typename CurveType>
-                r1cs_gg_ppzksnark_keypair<CurveType>
-                    r1cs_gg_ppzksnark_generator(const r1cs_gg_ppzksnark_constraint_system<CurveType> &r1cs) {
+                    r1cs_gg_ppzksnark_generator(const r1cs_gg_ppzksnark_constraint_system<CurveType> &cs) {
 
                     /* Make the B_query "lighter" if possible */
                     r1cs_gg_ppzksnark_constraint_system<CurveType> r1cs_copy(r1cs);
@@ -562,6 +464,14 @@ namespace nil {
                     return r1cs_gg_ppzksnark_keypair<CurveType>(std::move(pk), std::move(vk));
                 }
 
+                /**
+                 * A prover algorithm for the R1CS GG-ppzkSNARK.
+                 *
+                 * Given a R1CS primary input X and a R1CS auxiliary input Y, this algorithm
+                 * produces a proof (of knowledge) that attests to the following statement:
+                 *               ``there exists Y such that CS(X,Y)=0''.
+                 * Above, CS is the R1CS constraint system that was given as input to the generator algorithm.
+                 */
                 template<typename CurveType>
                 r1cs_gg_ppzksnark_proof<CurveType>
                     r1cs_gg_ppzksnark_prover(const r1cs_gg_ppzksnark_proving_key<CurveType> &pk,
@@ -596,7 +506,7 @@ namespace nil {
                     std::vector<typename CurveType::scalar_field_type::value_type> const_padded_assignment(
                         1, CurveType::scalar_field_type::one());
                     const_padded_assignment.insert(const_padded_assignment.end(), qap_wit.coefficients_for_ABCs.begin(),
-                                                   qap_wit.coefficients_for_ABCs.end());
+                        qap_wit.coefficients_for_ABCs.end());
 
                     typename CurveType::g1_type evaluation_At =
                         algebra::multi_exp_with_mixed_addition<typename CurveType::g1_type,
@@ -653,6 +563,86 @@ namespace nil {
 
                     return proof;
                 }
+
+                /*
+                  Below are four variants of verifier algorithm for the R1CS GG-ppzkSNARK.
+
+                  These are the four cases that arise from the following two choices:
+
+                  (1) The verifier accepts a (non-processed) verification key or, instead, a processed verification key.
+                  In the latter case, we call the algorithm an "online verifier".
+
+                  (2) The verifier checks for "weak" input consistency or, instead, "strong" input consistency.
+                  Strong input consistency requires that |primary_input| = CS.num_inputs, whereas
+                  weak input consistency requires that |primary_input| <= CS.num_inputs (and
+                  the primary input is implicitly padded with zeros up to length CS.num_inputs).
+                */
+
+                /**
+                 * A verifier algorithm for the R1CS GG-ppzkSNARK that:
+                 * (1) accepts a non-processed verification key, and
+                 * (2) has weak input consistency.
+                 */
+                template<typename CurveType>
+                bool r1cs_gg_ppzksnark_verifier_weak_IC(const r1cs_gg_ppzksnark_verification_key<CurveType> &vk,
+                                                        const r1cs_gg_ppzksnark_primary_input<CurveType> &primary_input,
+                                                        const r1cs_gg_ppzksnark_proof<CurveType> &proof);
+
+                /**
+                 * A verifier algorithm for the R1CS GG-ppzkSNARK that:
+                 * (1) accepts a non-processed verification key, and
+                 * (2) has strong input consistency.
+                 */
+                template<typename CurveType>
+                bool r1cs_gg_ppzksnark_verifier_strong_IC(
+                    const r1cs_gg_ppzksnark_verification_key<CurveType> &vk,
+                    const r1cs_gg_ppzksnark_primary_input<CurveType> &primary_input,
+                    const r1cs_gg_ppzksnark_proof<CurveType> &proof);
+
+                /**
+                 * Convert a (non-processed) verification key into a processed verification key.
+                 */
+                template<typename CurveType>
+                r1cs_gg_ppzksnark_processed_verification_key<CurveType>
+                    r1cs_gg_ppzksnark_verifier_process_vk(const r1cs_gg_ppzksnark_verification_key<CurveType> &vk);
+
+                /**
+                 * A verifier algorithm for the R1CS GG-ppzkSNARK that:
+                 * (1) accepts a processed verification key, and
+                 * (2) has weak input consistency.
+                 */
+                template<typename CurveType>
+                bool r1cs_gg_ppzksnark_online_verifier_weak_IC(
+                    const r1cs_gg_ppzksnark_processed_verification_key<CurveType> &pvk,
+                    const r1cs_gg_ppzksnark_primary_input<CurveType> &input,
+                    const r1cs_gg_ppzksnark_proof<CurveType> &proof);
+
+                /**
+                 * A verifier algorithm for the R1CS GG-ppzkSNARK that:
+                 * (1) accepts a processed verification key, and
+                 * (2) has strong input consistency.
+                 */
+                template<typename CurveType>
+                bool r1cs_gg_ppzksnark_online_verifier_strong_IC(
+                    const r1cs_gg_ppzksnark_processed_verification_key<CurveType> &pvk,
+                    const r1cs_gg_ppzksnark_primary_input<CurveType> &primary_input,
+                    const r1cs_gg_ppzksnark_proof<CurveType> &proof);
+
+                /****************************** Miscellaneous ********************************/
+
+                /**
+                 * For debugging purposes (of r1cs_gg_ppzksnark_r1cs_gg_ppzksnark_verifier_component):
+                 *
+                 * A verifier algorithm for the R1CS GG-ppzkSNARK that:
+                 * (1) accepts a non-processed verification key,
+                 * (2) has weak input consistency, and
+                 * (3) uses affine coordinates for elliptic-curve computations.
+                 */
+                template<typename CurveType>
+                bool r1cs_gg_ppzksnark_affine_verifier_weak_IC(
+                    const r1cs_gg_ppzksnark_verification_key<CurveType> &vk,
+                    const r1cs_gg_ppzksnark_primary_input<CurveType> &primary_input,
+                    const r1cs_gg_ppzksnark_proof<CurveType> &proof);
 
                 template<typename CurveType>
                 r1cs_gg_ppzksnark_processed_verification_key<CurveType>
