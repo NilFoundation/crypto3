@@ -314,7 +314,7 @@ namespace nil {
                     r1cs_gg_ppzksnark_generator(const r1cs_gg_ppzksnark_constraint_system<CurveType> &cs) {
 
                     /* Make the B_query "lighter" if possible */
-                    r1cs_gg_ppzksnark_constraint_system<CurveType> r1cs_copy(r1cs);
+                    r1cs_gg_ppzksnark_constraint_system<CurveType> r1cs_copy(cs);
                     r1cs_copy.swap_AB_if_beneficial();
 
                     /* Generate secret randomness */
@@ -506,7 +506,7 @@ namespace nil {
                     std::vector<typename CurveType::scalar_field_type::value_type> const_padded_assignment(
                         1, CurveType::scalar_field_type::one());
                     const_padded_assignment.insert(const_padded_assignment.end(), qap_wit.coefficients_for_ABCs.begin(),
-                        qap_wit.coefficients_for_ABCs.end());
+                                                   qap_wit.coefficients_for_ABCs.end());
 
                     typename CurveType::g1_type evaluation_At =
                         algebra::multi_exp_with_mixed_addition<typename CurveType::g1_type,
