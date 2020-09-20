@@ -19,8 +19,7 @@ namespace nil {
             namespace detail {
 
                 template<typename FieldParams>
-                struct element_fp2 {
-                private:
+                class element_fp2 {
                     typedef FieldParams policy_type;
 
                     typedef typename policy_type::number_type number_type;

@@ -19,13 +19,12 @@ namespace nil {
             namespace detail {
 
                 template<typename FieldParams>
-                struct element_fp12_2over3over2 {
-                private:
+                class element_fp12_2over3over2 {
                     typedef FieldParams policy_type;
 
                 public:
                     static const typename policy_type::non_residue_type non_residue =
-                        policy_type::non_residue_type(policy_type::non_residue);
+                        typename policy_type::non_residue_type(policy_type::non_residue);
 
                     using underlying_type = element_fp6_3over2<FieldParams>;
 
