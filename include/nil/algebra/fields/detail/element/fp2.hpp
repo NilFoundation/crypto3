@@ -240,7 +240,7 @@ namespace nil {
 
                     template<typename PowerType>
                     element_fp2 Frobenius_map(const PowerType &pwr) const {
-                        return element_fp2({data[0], policy_type::Frobenius_coeffs_c1[pwr % 2] * data[1]});
+                        return element_fp2({data[0], non_residue_type(policy_type::Frobenius_coeffs_c1[pwr % 2]) * data[1]});
                     }
                 };
 

@@ -129,7 +129,7 @@ namespace nil {
                     template<typename PowerType>
                     element_fp6_2over3 Frobenius_map(const PowerType &pwr) const {
                         return element_fp6_2over3({data[0].Frobenius_map(pwr),
-                                                   policy_type::Frobenius_coeffs_c1[pwr % 6] * data[1].Frobenius_map(pwr)});
+                                                   non_residue_type(policy_type::Frobenius_coeffs_c1[pwr % 6]) * data[1].Frobenius_map(pwr)});
                     }
 
                 private:

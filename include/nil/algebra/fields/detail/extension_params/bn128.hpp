@@ -63,8 +63,11 @@ namespace nil {
                         {0xB20DCB5704E326A0DD3ECD4F30515275398A41A4E1DC5D347CFBBEDDA71CF82_cppui252,
                          0xB1FFEFD8885BF22252522C29527D19F05CFC50E9715370AB0F3A6CA462390C_cppui248};
 
-                    constexpr static const std::array<non_residue_type, 2> Frobenius_coeffs_c1 = {non_residue_type(0x00),
-                        non_residue_type(0x00)};
+                    /*constexpr static const std::array<non_residue_type, 2> Frobenius_coeffs_c1 = {non_residue_type(0x00),
+                        non_residue_type(0x00)};*/
+
+                     constexpr static const std::array<modulus_type, 2> Frobenius_coeffs_c1 = {0x00,
+                        0x00};
 
                     constexpr static const modulus_type non_residue = modulus_type(
                         0x30644E72E131A029B85045B68181585D97816A916871CA8D3C208C16D87CFD46_cppui254);
@@ -86,7 +89,7 @@ namespace nil {
                     typedef element_fp2<field_type> non_residue_type;
                     typedef element_fp2<fp2_extension_params<field_type>> underlying_type;
 
-                    constexpr static const std::array<non_residue_type, 6> Frobenius_coeffs_c1 = {non_residue_type(0x00, 0x00),
+                    /*constexpr static const std::array<non_residue_type, 6> Frobenius_coeffs_c1 = {non_residue_type(0x00, 0x00),
                         non_residue_type(0x00, 0x00),
                         non_residue_type(0x00, 0x00),
                         non_residue_type(0x00, 0x00),
@@ -98,7 +101,21 @@ namespace nil {
                         non_residue_type(0x00, 0x00),
                         non_residue_type(0x00, 0x00),
                         non_residue_type(0x00, 0x00),
-                        non_residue_type(0x00, 0x00)};
+                        non_residue_type(0x00, 0x00)};*/
+
+                    constexpr static const std::array<modulus_type, 6> Frobenius_coeffs_c1 = {0x00, 0x00,
+                        0x00, 0x00,
+                        0x00, 0x00,
+                        0x00, 0x00,
+                        0x00, 0x00,
+                        0x00, 0x00};
+
+                    constexpr static const std::array<modulus_type, 6> Frobenius_coeffs_c2 = {0x00, 0x00,
+                        0x00, 0x00,
+                        0x00, 0x00,
+                        0x00, 0x00,
+                        0x00, 0x00,
+                        0x00, 0x00};
 
                     constexpr static const std::array<modulus_type, 2> non_residue = {9, 1};
                 };
@@ -119,7 +136,7 @@ namespace nil {
                     typedef element_fp2<field_type> non_residue_type;
                     typedef element_fp6_3over2<fp6_3over2_extension_params<field_type>> underlying_type;
 
-                    constexpr static const std::array<non_residue_type, 12> Frobenius_coeffs_c1 = {non_residue_type(0x00, 0x00),
+                    /*constexpr static const std::array<non_residue_type, 12> Frobenius_coeffs_c1 = {non_residue_type(0x00, 0x00),
                         non_residue_type(0x00, 0x00),
                         non_residue_type(0x00, 0x00),
                         non_residue_type(0x00, 0x00),
@@ -130,7 +147,20 @@ namespace nil {
                         non_residue_type(0x00, 0x00),
                         non_residue_type(0x00, 0x00),
                         non_residue_type(0x00, 0x00),
-                        non_residue_type(0x00, 0x00)};
+                        non_residue_type(0x00, 0x00)};*/
+
+                    constexpr static const std::array<modulus_type, 12> Frobenius_coeffs_c1 = {0x00, 0x00,
+                        0x00, 0x00,
+                        0x00, 0x00,
+                        0x00, 0x00,
+                        0x00, 0x00,
+                        0x00, 0x00,
+                        0x00, 0x00,
+                        0x00, 0x00,
+                        0x00, 0x00,
+                        0x00, 0x00,
+                        0x00, 0x00,
+                        0x00, 0x00};
 
                     constexpr static const std::array<modulus_type, 2> non_residue = {9, 1};
                 };
