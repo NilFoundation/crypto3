@@ -13,7 +13,7 @@
 namespace nil {
     namespace algebra {
 
-        template<typename Type1, Type2>
+        template<typename Type1, typename Type2>
         Type2 random_element();
 
         template<typename CurveGType>    // use curve croup element type_trait
@@ -22,7 +22,7 @@ namespace nil {
         };
 
         template<typename FieldType>    // use field element type_trait
-        FieldType::value_type random_element<FieldType, FieldType::value_type>() {
+        typename FieldType::value_type random_element<FieldType, FieldType::value_type>() {
             return FieldType::value_type::one();
         };
 
