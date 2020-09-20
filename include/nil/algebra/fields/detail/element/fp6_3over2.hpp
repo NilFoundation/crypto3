@@ -150,6 +150,13 @@ namespace nil {
                         return element_fp6_3over2({t6 * c0, t6 * c1, t6 * c2});
                     }
 
+                    template<typename PowerType>
+                    element_fp6_3over2 Frobenius_map(const PowerType &pwr) const {
+                        return element_fp6_3over2({data[0].Frobenius_map(pwr),
+                                                   policy_type::Frobenius_coeffs_c1[pwr % 6] * data[1].Frobenius_map(pwr),
+                                                   policy_type::Frobenius_coeffs_c2[pwr % 6] * data[2].Frobenius_map(pwr)});
+                    }
+
                 private:
                     /*inline static*/ underlying_type mul_by_non_residue(const underlying_type &A) {
                         return element_fp6_3over2({non_residue * A});

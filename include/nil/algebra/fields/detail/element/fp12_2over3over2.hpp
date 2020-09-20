@@ -127,6 +127,12 @@ namespace nil {
                         return element_fp12_2over3over2({c0, c1});
                     }
 
+                    template<typename PowerType>
+                    element_fp12_2over3over2 Frobenius_map(const PowerType &pwr) const {
+                        return element_fp12_2over3over2({data[0].Frobenius_map(pwr),
+                                                         policy_type::Frobenius_coeffs_c1[pwr % 12] * data[1].Frobenius_map(pwr)});
+                    }
+
                     /*element_fp12_2over3over2 sqru() {
                         element_fp2<FieldParams> &z0(a_.a_);
                         element_fp2<FieldParams> &z4(a_.b_);

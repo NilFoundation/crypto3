@@ -199,6 +199,14 @@ namespace nil {
                         const underlying_type t6 = (A0 * c0 + non_residue * (A2 * c1 + A1 * c2)).inversed();
                         return element_fp3({t6 * c0, t6 * c1, t6 * c2});
                     }
+
+                    template<typename PowerType>
+                    element_fp3 Frobenius_map(const PowerType &pwr) const {
+                        return element_fp3({data[0], 
+                                            policy_type::Frobenius_coeffs_c1[pwr % 3] * data[1],
+                                            policy_type::Frobenius_coeffs_c2[pwr % 3] * data[2]});
+                    }
+
                 };
 
                 template<typename FieldParams>

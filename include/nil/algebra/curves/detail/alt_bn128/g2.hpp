@@ -270,11 +270,11 @@ namespace nil {
                     }
 
                 private:
-                    /*alt_bn128_g2 mul_by_q() const {
+                    alt_bn128_g2 mul_by_q() const {
                         return alt_bn128_g2(twist_mul_by_q_X * (this->p[0]).Frobenius_map(1),
                                             twist_mul_by_q_Y * (this->p[1]).Frobenius_map(1),
                                             (this->p[2]).Frobenius_map(1));
-                    }*/
+                    }
 
                     /*constexpr static */ const g1_field_type_value a = g1_field_type_value(policy_type::a);
                     /*constexpr static */ const g1_field_type_value b = g1_field_type_value(policy_type::b);

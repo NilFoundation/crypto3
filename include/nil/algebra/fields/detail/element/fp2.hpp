@@ -32,7 +32,7 @@ namespace nil {
 
                     /*constexpr static*/ const typename policy_type::non_residue_type non_residue =
                         typename policy_type::non_residue_type(policy_type::non_residue);
-                    
+
                     using underlying_type = typename policy_type::underlying_type;
 
                     using value_type = std::array<underlying_type, 2>;
@@ -236,6 +236,11 @@ namespace nil {
                         const underlying_type c1 = -(A1 * t3);
 
                         return element_fp2({c0, c1});
+                    }
+
+                    template<typename PowerType>
+                    element_fp2 Frobenius_map(const PowerType &pwr) const {
+                        return element_fp2({data[0], policy_type::Frobenius_coeffs_c1[pwr % 2] * data[1]});
                     }
                 };
 
