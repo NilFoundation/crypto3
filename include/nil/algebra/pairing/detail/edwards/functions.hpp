@@ -264,6 +264,7 @@ namespace nil {
                                policy_type::scalar_field_modulus (skipping leading zeros) in MSB to LSB
                                order */
                             Fq_conic_coefficients cc;
+
                             doubling_step_for_miller_loop(R, cc);
                             result.push_back(cc);
 
@@ -295,18 +296,15 @@ namespace nil {
                                policy_type::scalar_field_modulus (skipping leading zeros) in MSB to LSB
                                order */
                             Fq_conic_coefficients cc = prec_P[idx++];
-                            gt g_RR_at_Q =
-                                gt(
-                                    Fq3(cc.c_XZ, Fq(0l), Fq(0l)) + cc.c_XY * prec_Q.y0,
-                                    cc.c_ZZ * prec_Q.eta);
+                            gt g_RR_at_Q = gt(Fq3(cc.c_XZ, Fq(0l), Fq(0l)) + cc.c_XY * prec_Q.y0,
+                                              cc.c_ZZ * prec_Q.eta);
                             f = f.squared() * g_RR_at_Q;
                             if (bit) {
                                 cc = prec_P[idx++];
 
                                 gt g_RP_at_Q =
-                                    gt(
-                                        Fq3(cc.c_XZ, Fq(0l), Fq(0l)) + cc.c_XY * prec_Q.y0,
-                                        cc.c_ZZ * prec_Q.eta);
+                                    gt(Fq3(cc.c_XZ, Fq(0l), Fq(0l)) + cc.c_XY * prec_Q.y0,
+                                       cc.c_ZZ * prec_Q.eta);
                                 f = f * g_RP_at_Q;
                             }
                         }
