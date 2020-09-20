@@ -45,8 +45,8 @@ endmacro()
 set(TESTS_NAMES
     "routing_algorithms/test_routing_algorithms"
 
-    "gadgets/hashes/knapsack/test_knapsack_component"
-    "gadgets/hashes/sha256/test_sha256_component"
+    "components/hashes/knapsack/test_knapsack_component"
+    "components/hashes/sha256/test_sha256_component"
 
     "components/r1cs_ppzksnark_verifier_component"
     "components/merkle_tree_components"

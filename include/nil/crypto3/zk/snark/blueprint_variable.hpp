@@ -29,9 +29,9 @@ namespace nil {
                 class blueprint;
 
                 template<typename FieldType>
-                class blueprint_variable : public blueprint_variable<FieldType> {
+                class blueprint_variable : public variable<FieldType> {
                 public:
-                    blueprint_variable(const var_index_t index = 0) : blueprint_variable<FieldType>(index) {};
+                    blueprint_variable(const var_index_t index = 0) : variable<FieldType>(index) {};
 
                     void allocate(blueprint<FieldType> &pb) {
                         this->index = pb.allocate_var_index();
@@ -61,7 +61,8 @@ namespace nil {
                     using contents::resize;
 
                     pb_variable_array() : contents() {};
-                    pb_variable_array(std::size_t count, const blueprint_variable<FieldType> &value) : contents(count, value) {};
+                    pb_variable_array(std::size_t count, const blueprint_variable<FieldType> &value) :
+                        contents(count, value) {};
                     pb_variable_array(typename contents::const_iterator first, typename contents::const_iterator last) :
                         contents(first, last) {};
                     pb_variable_array(typename contents::const_reverse_iterator first,
@@ -77,7 +78,8 @@ namespace nil {
                         }
                     }
 
-                    void fill_with_field_elements(blueprint<FieldType> &pb, const std::vector<typename FieldType::value_type> &vals) const {
+                    void fill_with_field_elements(blueprint<FieldType> &pb,
+                                                  const std::vector<typename FieldType::value_type> &vals) const {
                         assert(this->size() == vals.size());
                         for (std::size_t i = 0; i < vals.size(); ++i) {
                             pb.val((*this)[i]) = vals[i];
@@ -87,7 +89,8 @@ namespace nil {
                     void fill_with_bits(blueprint<FieldType> &pb, const std::vector<bool> &bits) const {
                         assert(this->size() == bits.size());
                         for (std::size_t i = 0; i < bits.size(); ++i) {
-                            pb.val((*this)[i]) = (bits[i] ? FieldType::value_type::one() : FieldType::value_type::zero());
+                            pb.val((*this)[i]) =
+                                (bits[i] ? FieldType::value_type::one() : FieldType::value_type::zero());
                         }
                     }
 
@@ -98,8 +101,8 @@ namespace nil {
                     void fill_with_bits_of_field_element(blueprint<FieldType> &pb,
                                                          const typename FieldType::value_type &r) const {
                         for (std::size_t i = 0; i < this->size(); ++i) {
-                            pb.val((*this)[i]) =
-                                boost::multiprecision::bit_test(r, i) ? FieldType::value_type::one() : FieldType::value_type::zero();
+                            pb.val((*this)[i]) = boost::multiprecision::bit_test(r, i) ? FieldType::value_type::one() :
+                                                                                         FieldType::value_type::zero();
                         }
                     }
 
@@ -242,7 +245,8 @@ namespace nil {
                         }
                     }
 
-                    void fill_with_field_elements(blueprint<FieldType> &pb, const std::vector<typename FieldType::value_type> &vals) const {
+                    void fill_with_field_elements(blueprint<FieldType> &pb,
+                                                  const std::vector<typename FieldType::value_type> &vals) const {
                         assert(this->size() == vals.size());
                         for (std::size_t i = 0; i < vals.size(); ++i) {
                             pb.lc_val((*this)[i]) = vals[i];
@@ -252,7 +256,8 @@ namespace nil {
                     void fill_with_bits(blueprint<FieldType> &pb, const std::vector<bool> &bits) const {
                         assert(this->size() == bits.size());
                         for (std::size_t i = 0; i < bits.size(); ++i) {
-                            pb.lc_val((*this)[i]) = (bits[i] ? FieldType::value_type::one() : FieldType::value_type::zero());
+                            pb.lc_val((*this)[i]) =
+                                (bits[i] ? FieldType::value_type::one() : FieldType::value_type::zero());
                         }
                     }
 
@@ -264,8 +269,9 @@ namespace nil {
                                                          const typename FieldType::value_type &r) const {
 
                         for (std::size_t i = 0; i < this->size(); ++i) {
-                            pb.lc_val((*this)[i]) =
-                                boost::multiprecision::bit_test(r, i) ? FieldType::value_type::one() : FieldType::value_type::zero();
+                            pb.lc_val((*this)[i]) = boost::multiprecision::bit_test(r, i) ?
+                                                        FieldType::value_type::one() :
+                                                        FieldType::value_type::zero();
                         }
                     }
 
@@ -313,7 +319,8 @@ namespace nil {
 
                 template<typename FieldType>
                 linear_combination<FieldType> pb_packing_sum(const pb_linear_combination_array<FieldType> &v) {
-                    typename FieldType::value_type twoi = FieldType::value_type::zero();    // will hold 2^i entering each iteration
+                    typename FieldType::value_type twoi =
+                        FieldType::value_type::zero();    // will hold 2^i entering each iteration
                     std::vector<linear_term<FieldType>> all_terms;
                     for (auto &lc : v) {
                         for (auto &term : lc.terms) {
