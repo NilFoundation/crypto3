@@ -15,7 +15,7 @@
 #include <nil/algebra/curves/detail/mnt4/g1.hpp>
 #include <nil/algebra/curves/detail/mnt4/g2.hpp>
 
-#include <nil/algebra/pairing/mnt4.hpp>
+//#include <nil/algebra/pairing/mnt4.hpp>
 
 #include <nil/algebra/fields/fp4.hpp>
 

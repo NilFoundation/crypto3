@@ -17,7 +17,7 @@
 
 #include <nil/algebra/fields/fp12_2over3over2.hpp>
 
-#include <nil/algebra/pairing/bls12.hpp>
+//#include <nil/algebra/pairing/bls12.hpp>
 
 #include <nil/algebra/detail/literals.hpp>
 

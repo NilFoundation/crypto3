@@ -18,7 +18,7 @@
 #include <nil/algebra/fields/bn128/scalar_field.hpp>
 #include <nil/algebra/fields/fp12_2over3over2.hpp>
 
-#include <nil/algebra/pairing/bn128.hpp>
+//#include <nil/algebra/pairing/bn128.hpp>
 
 #include <nil/algebra/detail/literals.hpp>
 

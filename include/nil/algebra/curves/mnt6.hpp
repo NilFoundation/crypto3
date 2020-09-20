@@ -15,7 +15,7 @@
 #include <nil/algebra/curves/detail/mnt6/g1.hpp>
 #include <nil/algebra/curves/detail/mnt6/g2.hpp>
 
-#include <nil/algebra/pairing/mnt6.hpp>
+//#include <nil/algebra/pairing/mnt6.hpp>
 
 #include <nil/algebra/fields/fp6_2over3.hpp>
 
