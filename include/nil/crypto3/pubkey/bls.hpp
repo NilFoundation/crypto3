@@ -9,9 +9,9 @@
 #ifndef CRYPTO3_PUBKEY_BLS_HPP
 #define CRYPTO3_PUBKEY_BLS_HPP
 
-#include <nil/algebra/algorithms/pair.hpp>
-#include <nil/algebra/curves/bls12.hpp>
-#include <nil/algebra/pairing/bls12.hpp>
+#include <nil/crypto3/algebra/algorithms/pair.hpp>
+#include <nil/crypto3/algebra/curves/bls12.hpp>
+#include <nil/crypto3/algebra/pairing/bls12.hpp>
 
 #include <nil/crypto3/hash/algorithm/hash.hpp>
 #include <nil/crypto3/hash/sha2.hpp>
