@@ -35,7 +35,7 @@ BOOST_AUTO_TEST_CASE(standard_polynomial_multiplication) {
     std::vector<FieldType::value_type> b = {1, 2, 1, 1};
     std::vector<FieldType::value_type> c(1, FieldType::value_type::zero());
 
-    _polynomial_multiplication_on_kronecker(c, a, b);
+    _polynomial_multiplication_on_kronecker<FieldType>(c, a, b);
 
     std::vector<FieldType::value_type> c_answer(1, FieldType::value_type::zero());
     _polynomial_multiplication<FieldType>(c_answer, a, b);
@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE(squared_polynomial_multiplication) {
     std::vector<FieldType::value_type> b = a;
     std::vector<FieldType::value_type> c(1, FieldType::value_type::zero());
 
-    _polynomial_multiplication_on_kronecker(c, a, b);
+    _polynomial_multiplication_on_kronecker<FieldType>(c, a, b);
 
     std::vector<FieldType::value_type> c_answer(1, FieldType::value_type::zero());
     _polynomial_multiplication<FieldType>(c_answer, a, b);
