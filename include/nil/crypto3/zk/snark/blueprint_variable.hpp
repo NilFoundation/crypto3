@@ -26,11 +26,11 @@ namespace nil {
                 typedef std::size_t lc_index_t;
 
                 template<typename FieldType>
-                struct blueprint;
+                class blueprint;
 
                 template<typename FieldType>
-                struct blueprint_variable : public variable<FieldType> {
-
+                class blueprint_variable : public variable<FieldType> {
+                public:
                     blueprint_variable(const var_index_t index = 0) : variable<FieldType>(index) {};
 
                     void allocate(blueprint<FieldType> &pb) {
@@ -39,9 +39,10 @@ namespace nil {
                 };
 
                 template<typename FieldType>
-                struct pb_variable_array : private std::vector<blueprint_variable<FieldType>> {
+                class pb_variable_array : private std::vector<blueprint_variable<FieldType>> {
                     typedef std::vector<blueprint_variable<FieldType>> contents;
 
+                public:
                     using typename contents::const_iterator;
                     using typename contents::const_reverse_iterator;
                     using typename contents::iterator;

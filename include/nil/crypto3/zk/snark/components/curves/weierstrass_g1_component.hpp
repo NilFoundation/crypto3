@@ -50,8 +50,7 @@ namespace nil {
 
                     G1_variable(blueprint<FieldType> &pb, const other_curve<CurveType>::g1_type &P) :
                         component<FieldType>(pb) {
-                        other_curve<CurveType>::g1_type Pcopy = P;
-                        Pcopy.to_affine_coordinates();
+                        other_curve<CurveType>::g1_type Pcopy = P.to_affine_coordinates();
 
                         X.assign(pb, Pcopy.X());
                         Y.assign(pb, Pcopy.Y());
@@ -63,8 +62,7 @@ namespace nil {
 
                     template<typename CurveType1>
                     void generate_r1cs_witness(const CurveType1::g1_type &elt) {
-                        other_curve<CurveType>::g1_type el_normalized = el;
-                        el_normalized.to_affine_coordinates();
+                        other_curve<CurveType>::g1_type el_normalized = el.to_affine_coordinates();
 
                         this->pb.lc_val(X) = el_normalized.X();
                         this->pb.lc_val(Y) = el_normalized.Y();
@@ -202,7 +200,7 @@ namespace nil {
                         this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>(
                             {lambda * 2},
                             {A.Y},
-                            {Xsquared * 3, variable<FieldType>(0) * other_curve<CurveType>::g1_type::a}));
+                            {Xsquared * 3, variable<FieldType>(0x00) * other_curve<CurveType>::g1_type::a}));
 
                         this->pb.add_r1cs_constraint(r1cs_constraint<FieldType>({lambda}, {lambda}, {B.X, A.X * 2}));
 
@@ -211,11 +209,11 @@ namespace nil {
                     }
                     void generate_r1cs_witness() {
                         this->pb.val(Xsquared) = this->pb.lc_val(A.X).squared();
-                        this->pb.val(lambda) = (typename FieldType::value_type(3) * this->pb.val(Xsquared) +
+                        this->pb.val(lambda) = (typename FieldType::value_type(0x03) * this->pb.val(Xsquared) +
                                                 other_curve<CurveType>::g1_type::a) *
-                                               (typename FieldType::value_type(2) * this->pb.lc_val(A.Y)).inverse();
+                                               (typename FieldType::value_type(0x02) * this->pb.lc_val(A.Y)).inverse();
                         this->pb.lc_val(B.X) =
-                            this->pb.val(lambda).squared() - typename FieldType::value_type(2) * this->pb.lc_val(A.X);
+                            this->pb.val(lambda).squared() - typename FieldType::value_type(0x02) * this->pb.lc_val(A.X);
                         this->pb.lc_val(B.Y) =
                             this->pb.val(lambda) * (this->pb.lc_val(A.X) - this->pb.lc_val(B.X)) - this->pb.lc_val(A.Y);
                     }
