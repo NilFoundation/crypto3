@@ -44,12 +44,16 @@ namespace nil {
                 /**
                  * Specialization for MNT4.
                  */
-                template<>
-                class pairing_selector<curves::mnt4> {
+                template<std::size_t ModulusBits, std::size_t GeneratorBits>
+                class pairing_selector<curves::mnt4<ModulusBits, GeneratorBits>> {
+                    using curve_type = typename curves::mnt4<ModulusBits, GeneratorBits>;
                 public:
-                    typedef typename curves::mnt4::scalar_field_type FieldType;
-                    typedef algebra::Fqe<curves::mnt6> fqe_type;
-                    typedef algebra::Fqk<curves::mnt6> fqk_type;
+                    
+                    using other_curve_type = typename curve_type::pairing_policy::other_curve;  // mnt6
+
+                    using FieldType = typename curve_type::pairing_policy::Fp_type;
+                    using fqe_type = typename other_curve::pairing_policy::Fqe_type;
+                    using fqk_type = typename other_curve::pairing_policy::Fqk_type;
 
                     typedef Fp3_variable<fqe_type> Fqe_variable_type;
                     typedef Fp3_mul_component<fqe_type> Fqe_mul_component_type;
@@ -61,12 +65,10 @@ namespace nil {
                     typedef Fp6_mul_by_2345_component<fqk_type> Fqk_special_mul_component_type;
                     typedef Fp6_sqr_component<fqk_type> Fqk_sqr_component_type;
 
-                    typedef curves::mnt6 other_curve_type;
-
-                    typedef mnt_e_over_e_miller_loop_component<curves::mnt4> e_over_e_miller_loop_component_type;
-                    typedef mnt_e_times_e_over_e_miller_loop_component<curves::mnt4>
+                    typedef mnt_e_over_e_miller_loop_component<curve_type> e_over_e_miller_loop_component_type;
+                    typedef mnt_e_times_e_over_e_miller_loop_component<curve_type>
                         e_times_e_over_e_miller_loop_component_type;
-                    typedef mnt4_final_exp_component<curves::mnt4> final_exp_component_type;
+                    typedef mnt4_final_exp_component<curve_type> final_exp_component_type;
 
                     static const constexpr algebra::bigint<algebra::mnt6_Fr::num_limbs> &pairing_loop_count =
                         algebra::mnt6_ate_loop_count;
@@ -75,13 +77,16 @@ namespace nil {
                 /**
                  * Specialization for MNT6.
                  */
-                template<>
-                class pairing_selector<curves::mnt6> {
+                template<std::size_t ModulusBits, std::size_t GeneratorBits>
+                class pairing_selector<curves::mnt6<ModulusBits, GeneratorBits>> {
+                    using curve_type = typename curves::mnt6<ModulusBits, GeneratorBits>;
                 public:
-                    typedef typename curves::mnt6::scalar_field_type FieldType;
 
-                    typedef algebra::Fqe<curves::mnt4> fqe_type;
-                    typedef algebra::Fqk<curves::mnt4> fqk_type;
+                    using other_curve_type = typename curve_type::pairing_policy::other_curve;  // mnt4
+
+                    using FieldType = typename curve_type::pairing_policy::Fp_type;
+                    using fqe_type = typename other_curve::pairing_policy::Fqe_type;
+                    using fqk_type = typename other_curve::pairing_policy::Fqk_type;
 
                     typedef Fp2_variable<fqe_type> Fqe_variable_type;
                     typedef Fp2_mul_component<fqe_type> Fqe_mul_component_type;
@@ -93,12 +98,10 @@ namespace nil {
                     typedef Fp4_mul_component<fqk_type> Fqk_special_mul_component_type;
                     typedef Fp4_sqr_component<fqk_type> Fqk_sqr_component_type;
 
-                    typedef curves::mnt4 other_curve_type;
-
-                    typedef mnt_e_over_e_miller_loop_component<curves::mnt6> e_over_e_miller_loop_component_type;
-                    typedef mnt_e_times_e_over_e_miller_loop_component<curves::mnt6>
+                    typedef mnt_e_over_e_miller_loop_component<curve_type> e_over_e_miller_loop_component_type;
+                    typedef mnt_e_times_e_over_e_miller_loop_component<curve_type>
                         e_times_e_over_e_miller_loop_component_type;
-                    typedef mnt6_final_exp_component<curves::mnt6> final_exp_component_type;
+                    typedef mnt6_final_exp_component<curve_type> final_exp_component_type;
 
                     static const constexpr algebra::bigint<algebra::mnt4_Fr::num_limbs> &pairing_loop_count =
                         algebra::mnt4_ate_loop_count;
