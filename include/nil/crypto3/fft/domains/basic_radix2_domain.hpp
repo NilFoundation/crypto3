@@ -12,12 +12,13 @@
 
 #include <vector>
 
-#include <nil/crypto3/algebra/fft/detail/field_utils.hpp>
+#include <nil/crypto3/fft/detail/field_utils.hpp>
 
-#include <nil/crypto3/algebra/fft/evaluation_domain.hpp>
-#include <nil/crypto3/algebra/fft/domains/basic_radix2_domain_aux.hpp>
+#include <nil/crypto3/fft/evaluation_domain.hpp>
+#include <nil/crypto3/fft/domains/basic_radix2_domain_aux.hpp>
 
-namespace nil { namespace crypto3 { namespace algebra {
+namespace nil {
+    namespace crypto3 {
         namespace fft {
 
             using namespace nil::crypto3::algebra;
@@ -25,6 +26,7 @@ namespace nil { namespace crypto3 { namespace algebra {
             template<typename FieldType>
             class basic_radix2_domain : public evaluation_domain<FieldType::value_type> {
                 using value_type = typename FieldType::value_type;
+
             public:
                 value_type omega;
 
@@ -35,7 +37,8 @@ namespace nil { namespace crypto3 { namespace algebra {
                     if (!std::is_same<value_type, std::complex<double>>::value) {
                         const size_t logm = static_cast<std::size_t>(std::ceil(std::log2(m)));
                         if (logm > (fields::arithmetic_params<FieldType>::s))
-                            throw std::invalid_argument("basic_radix2(): expected logm <= fields::arithmetic_params<FieldType>::s");
+                            throw std::invalid_argument(
+                                "basic_radix2(): expected logm <= fields::arithmetic_params<FieldType>::s");
                     }
 
                     try {
@@ -93,7 +96,7 @@ namespace nil { namespace crypto3 { namespace algebra {
                 }
             };
         }    // namespace fft
-    }}        // namespace algebra
+    }        // namespace crypto3
 }    // namespace nil
 
 #endif    // ALGEBRA_FFT_BASIC_RADIX2_DOMAIN_HPP

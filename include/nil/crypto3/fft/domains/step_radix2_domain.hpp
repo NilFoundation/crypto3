@@ -12,17 +12,19 @@
 
 #include <vector>
 
-#include <nil/crypto3/algebra/fft/evaluation_domain.hpp>
-#include <nil/crypto3/algebra/fft/domains/basic_radix2_domain_aux.hpp>
+#include <nil/crypto3/fft/evaluation_domain.hpp>
+#include <nil/crypto3/fft/domains/basic_radix2_domain_aux.hpp>
 
-namespace nil { namespace crypto3 { namespace algebra {
+namespace nil {
+    namespace crypto3 {
         namespace fft {
 
             using namespace nil::crypto3::algebra;
-            
+
             template<typename FieldType>
             class step_radix2_domain : public evaluation_domain<FieldType::value_type> {
                 using value_type = typename FieldType::value_type;
+
             public:
                 size_t big_m;
                 size_t small_m;
@@ -65,7 +67,8 @@ namespace nil { namespace crypto3 { namespace algebra {
                     }
 
                     std::vector<value_type> e(small_m, value_type::zero());
-                    const size_t compr = 1ul << (static_cast<std::size_t>(std::ceil(std::log2(big_m))) - static_cast<std::size_t>(std::ceil(std::log2(small_m))));
+                    const size_t compr = 1ul << (static_cast<std::size_t>(std::ceil(std::log2(big_m))) -
+                                                 static_cast<std::size_t>(std::ceil(std::log2(small_m))));
                     for (size_t i = 0; i < small_m; ++i) {
                         for (size_t j = 0; j < compr; ++j) {
                             e[i] += d[i + j * small_m];
@@ -115,7 +118,8 @@ namespace nil { namespace crypto3 { namespace algebra {
                         a[i] = U0[i];
                     }
 
-                    const size_t compr = 1ul << (static_cast<std::size_t>(std::ceil(std::log2(big_m))) - static_cast<std::size_t>(std::ceil(std::log2(small_m))));
+                    const size_t compr = 1ul << (static_cast<std::size_t>(std::ceil(std::log2(big_m))) -
+                                                 static_cast<std::size_t>(std::ceil(std::log2(small_m))));
                     for (size_t i = 0; i < small_m; ++i) {
                         for (size_t j = 1; j < compr; ++j) {
                             U1[i] -= tmp[i + j * small_m];
@@ -157,7 +161,8 @@ namespace nil { namespace crypto3 { namespace algebra {
                         elt *= big_omega_to_small_m;
                     }
 
-                    const value_type L1 = ((t ^ big_m) - value_type::one()) * ((omega ^ big_m) - value_type::one()).inversed();
+                    const value_type L1 =
+                        ((t ^ big_m) - value_type::one()) * ((omega ^ big_m) - value_type::one()).inversed();
 
                     for (size_t i = 0; i < small_m; ++i) {
                         result[big_m + i] = L1 * inner_small[i];
@@ -207,7 +212,7 @@ namespace nil { namespace crypto3 { namespace algebra {
                     // (c^{2^k}*w^{2^k}-1) * (c^{2^k} * w^{2^r} - w^{2^r})
 
                     const value_type Z1 = ((((coset * omega) ^ big_m) - value_type::one()) *
-                                          (((coset * omega) ^ small_m) - (omega ^ small_m)));
+                                           (((coset * omega) ^ small_m) - (omega ^ small_m)));
                     const value_type Z1_inverse = Z1.inversed();
 
                     for (size_t i = 0; i < small_m; ++i) {
@@ -216,7 +221,7 @@ namespace nil { namespace crypto3 { namespace algebra {
                 }
             };
         }    // namespace fft
-    }}        // namespace algebra
+    }        // namespace crypto3
 }    // namespace nil
 
 #endif    // ALGEBRA_FFT_STEP_RADIX2_DOMAIN_HPP

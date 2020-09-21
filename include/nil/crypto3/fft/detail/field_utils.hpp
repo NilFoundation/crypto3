@@ -15,7 +15,8 @@
 
 #include <nil/crypto3/algebra/fields/params.hpp>
 
-namespace nil { namespace crypto3 { namespace algebra {
+namespace nil {
+    namespace crypto3 {
         namespace fft {
             namespace detail {
 
@@ -69,16 +70,16 @@ namespace nil { namespace crypto3 { namespace algebra {
                     if (logn > fields::arithmetic_params<FieldType>::s)
                         throw std::invalid_argument("expected logn <= arithmetic_params<FieldType>::s");
 
-                    value_type omega = value_type( fields::arithmetic_params<FieldType>::root_of_unity );
+                    value_type omega = value_type(fields::arithmetic_params<FieldType>::root_of_unity);
                     for (size_t i = fields::arithmetic_params<FieldType>::s; i > logn; --i) {
                         omega *= omega;
                     }
 
                     return omega;
                 }
-            }
-        }    // namespace fft
-    }}        // namespace algebra
+            }    // namespace detail
+        }        // namespace fft
+    }            // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_FIELD_UTILS_HPP

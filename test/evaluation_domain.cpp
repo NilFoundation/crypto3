@@ -15,19 +15,19 @@
 #include <vector>
 #include <cstdint>
 
-#include <nil/crypto3/algebra/fft/domains/arithmetic_sequence_domain.hpp>
-#include <nil/crypto3/algebra/fft/domains/basic_radix2_domain.hpp>
-#include <nil/crypto3/algebra/fft/domains/extended_radix2_domain.hpp>
-#include <nil/crypto3/algebra/fft/domains/geometric_sequence_domain.hpp>
-#include <nil/crypto3/algebra/fft/domains/step_radix2_domain.hpp>
+#include <nil/crypto3/fft/domains/arithmetic_sequence_domain.hpp>
+#include <nil/crypto3/fft/domains/basic_radix2_domain.hpp>
+#include <nil/crypto3/fft/domains/extended_radix2_domain.hpp>
+#include <nil/crypto3/fft/domains/geometric_sequence_domain.hpp>
+#include <nil/crypto3/fft/domains/step_radix2_domain.hpp>
 
-#include <nil/crypto3/algebra/fft/polynomial_arithmetic/naive_evaluate.hpp>
+#include <nil/crypto3/fft/polynomial_arithmetic/naive_evaluate.hpp>
 
 #include <nil/crypto3/algebra/fields/bls12/base_field.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/bls12.hpp>
 
 using namespace nil::crypto3::algebra;
-using namespace nil::crypto3::algebra::fft;
+using namespace nil::crypto3::fft;
 
 /**
  * Note: Templatized type referenced with FieldType (instead of canonical FieldType)
@@ -195,7 +195,7 @@ void test_lagrange_coefficients() {
 template<typename FieldType>
 void test_compute_z() {
     using value_type = typename FieldType::value_type;
-    
+
     const size_t m = 8;
     value_type t = value_type(10);
 

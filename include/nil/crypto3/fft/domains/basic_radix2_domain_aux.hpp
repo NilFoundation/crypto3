@@ -17,7 +17,7 @@
 #include <omp.h>
 #endif
 
-#include <nil/crypto3/algebra/fft/detail/field_utils.hpp>
+#include <nil/crypto3/fft/detail/field_utils.hpp>
 
 #ifdef MULTICORE
 #define _basic_radix2_FFT detail::basic_parallel_radix2_FFT
@@ -25,7 +25,8 @@
 #define _basic_radix2_FFT detail::basic_serial_radix2_FFT
 #endif
 
-namespace nil { namespace crypto3 { namespace algebra {
+namespace nil {
+    namespace crypto3 {
         namespace fft {
             namespace detail {
 
@@ -34,7 +35,8 @@ namespace nil { namespace crypto3 { namespace algebra {
                  * Also, note that it's the caller's responsibility to multiply by 1/N.
                  */
                 template<typename FieldType>
-                void basic_serial_radix2_FFT(std::vector<typename FieldType::value_type> &a, const typename FieldType::value_type &omega) {
+                void basic_serial_radix2_FFT(std::vector<typename FieldType::value_type> &a,
+                                             const typename FieldType::value_type &omega) {
                     using value_type = typename FieldType::value_type;
 
                     const size_t n = a.size(), logn = log2(n);
@@ -69,8 +71,9 @@ namespace nil { namespace crypto3 { namespace algebra {
                 }
 
                 template<typename FieldType>
-                void basic_parallel_radix2_FFT_inner(std::vector<typename FieldType::value_type> &a, const typename FieldType::value_type &omega,
-                                                      const size_t log_cpus) {
+                void basic_parallel_radix2_FFT_inner(std::vector<typename FieldType::value_type> &a,
+                                                     const typename FieldType::value_type &omega,
+                                                     const size_t log_cpus) {
                     using value_type = typename FieldType::value_type;
 
                     const size_t num_cpus = 1ul << log_cpus;
@@ -123,7 +126,8 @@ namespace nil { namespace crypto3 { namespace algebra {
 #endif
                     for (size_t i = 0; i < num_cpus; ++i) {
                         for (size_t j = 0; j < 1ul << (log_m - log_cpus); ++j) {
-                            // now: i = idx >> (log_m - log_cpus) and j = idx % (1u << (log_m - log_cpus)), for idx =
+                            // now: i = idx >> (log_m - log_cpus) and j = idx % (1u << (log_m - log_cpus)), for idx
+                            // =
                             // ((i<<(log_m-log_cpus))+j) % (1u << log_m)
                             a[(j << log_cpus) + i] = tmp[i][j];
                         }
@@ -131,7 +135,8 @@ namespace nil { namespace crypto3 { namespace algebra {
                 }
 
                 template<typename FieldType>
-                void basic_parallel_radix2_FFT(std::vector<typename FieldType::value_type> &a, const typename FieldType::value_type &omega) {
+                void basic_parallel_radix2_FFT(std::vector<typename FieldType::value_type> &a,
+                                               const typename FieldType::value_type &omega) {
 #ifdef MULTICORE
                     const size_t num_cpus = omp_get_max_threads();
 #else
@@ -147,11 +152,13 @@ namespace nil { namespace crypto3 { namespace algebra {
                 }
 
                 /**
-                 * Compute the m Lagrange coefficients, relative to the set S={omega^{0},...,omega^{m-1}}, at the field
-                 * element t.
+                 * Compute the m Lagrange coefficients, relative to the set S={omega^{0},...,omega^{m-1}}, at the
+                 * field element t.
                  */
                 template<typename FieldType>
-                std::vector<typename FieldType::value_type> basic_radix2_evaluate_all_lagrange_polynomials(const size_t m, const typename FieldType::value_type &t) {
+                std::vector<typename FieldType::value_type>
+                    basic_radix2_evaluate_all_lagrange_polynomials(const size_t m,
+                                                                   const typename FieldType::value_type &t) {
                     using value_type = typename FieldType::value_type;
 
                     if (m == 1) {
@@ -205,7 +212,6 @@ namespace nil { namespace crypto3 { namespace algebra {
                 }
             }    // namespace detail
         }        // namespace fft
-    }            // namespace algebra
-}    // namespace nil
+    }            // namespace nil
 
 #endif    // ALGEBRA_FFT_BASIC_RADIX2_DOMAIN_AUX_HPP

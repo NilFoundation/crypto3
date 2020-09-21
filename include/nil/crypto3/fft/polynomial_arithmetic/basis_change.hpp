@@ -15,17 +15,19 @@
 
 #include <boost/math/tools/polynomial.hpp>
 
-#include <nil/crypto3/algebra/fft/domains/basic_radix2_domain_aux.hpp>
-#include <nil/crypto3/algebra/fft/polynomial_arithmetic/basic_operations.hpp>
-#include <nil/crypto3/algebra/fft/polynomial_arithmetic/xgcd.hpp>
+#include <nil/crypto3/fft/domains/basic_radix2_domain_aux.hpp>
+#include <nil/crypto3/fft/polynomial_arithmetic/basic_operations.hpp>
+#include <nil/crypto3/fft/polynomial_arithmetic/xgcd.hpp>
 
-namespace nil { namespace crypto3 { namespace algebra {
+namespace nil {
+    namespace crypto3 {
         namespace fft {
 
             /**
              * Compute the Subproduct Tree of degree 2^M and store it in Tree T.
              * Below we make use of the Subproduct Tree description from
-             * [Bostan and Schost 2005. Polynomial Evaluation and Interpolation on Special Sets of Points], on page 7.
+             * [Bostan and Schost 2005. Polynomial Evaluation and Interpolation on Special Sets of Points], on
+             * page 7.
              */
             template<typename FieldValueType>
             void compute_subproduct_tree(const size_t &m, std::vector<std::vector<std::vector<FieldValueType>>> &T) {
@@ -67,8 +69,8 @@ namespace nil { namespace crypto3 { namespace algebra {
             /**
              * Perform the general change of basis from Monomial to Newton Basis with Subproduct Tree T.
              * Below we make use of the MonomialToNewton and TNewtonToMonomial pseudocode from
-             * [Bostan and Schost 2005. Polynomial Evaluation and Interpolation on Special Sets of Points], on page 12
-             * and 14.
+             * [Bostan and Schost 2005. Polynomial Evaluation and Interpolation on Special Sets of Points], on page
+             * 12 and 14.
              */
             template<typename FieldValueType>
             void monomial_to_newton_basis(std::vector<FieldValueType> &a,
@@ -124,7 +126,8 @@ namespace nil { namespace crypto3 { namespace algebra {
             /**
              * Perform the general change of basis from Newton to Monomial Basis with Subproduct Tree T.
              * Below we make use of the NewtonToMonomial pseudocode from
-             * [Bostan and Schost 2005. Polynomial Evaluation and Interpolation on Special Sets of Points], on page 11.
+             * [Bostan and Schost 2005. Polynomial Evaluation and Interpolation on Special Sets of Points], on
+             * page 11.
              */
             template<typename FieldValueType>
             void newton_to_monomial_basis(std::vector<FieldValueType> &a,
@@ -171,7 +174,8 @@ namespace nil { namespace crypto3 { namespace algebra {
                 f[0] = a[0];
 
                 for (size_t i = 1; i < n; i++) {
-                    u[i] = u[i - 1] * geometric_sequence[i] * (FieldValueType::one() - geometric_sequence[i]).inversed();
+                    u[i] =
+                        u[i - 1] * geometric_sequence[i] * (FieldValueType::one() - geometric_sequence[i]).inversed();
                     w[i] = a[i] * (u[i].inversed());
                     z[i] = u[i] * geometric_triangular_sequence[i].inversed();
                     f[i] = w[i] * geometric_triangular_sequence[i];
@@ -216,7 +220,8 @@ namespace nil { namespace crypto3 { namespace algebra {
                     if (i % 2 == 1)
                         v[i] = -v[i];
 
-                    u[i] = u[i - 1] * geometric_sequence[i] * (FieldValueType::one() - geometric_sequence[i]).inversed();
+                    u[i] =
+                        u[i - 1] * geometric_sequence[i] * (FieldValueType::one() - geometric_sequence[i]).inversed();
                     w[i] = v[i] * u[i].inversed();
 
                     z[i] = u[i] * geometric_triangular_sequence[i].inversed();
@@ -235,7 +240,7 @@ namespace nil { namespace crypto3 { namespace algebra {
             }
 
         }    // namespace fft
-    }}        // namespace algebra
+    }        // namespace crypto3
 }    // namespace nil
 
 #endif    // ALGEBRA_FFT_BASIS_CHANGE_HPP

@@ -16,7 +16,8 @@
 
 #include <boost/math/tools/polynomial.hpp>
 
-namespace nil { namespace crypto3 { namespace algebra {
+namespace nil {
+    namespace crypto3 {
         namespace fft {
             /*!
              * @brief Given two polynomial vectors, A and B, the function performs
@@ -170,17 +171,18 @@ namespace nil { namespace crypto3 { namespace algebra {
             }
 
             /**
-             * Perform the multiplication of two polynomials, polynomial A * polynomial B, using Kronecker Substitution,
-             * and stores result in polynomial C.
+             * Perform the multiplication of two polynomials, polynomial A * polynomial B, using Kronecker
+             * Substitution, and stores result in polynomial C.
              */
             template<typename FieldValueType>
-            void _polynomial_multiplication_on_kronecker(std::vector<FieldValueType>& c, const std::vector<FieldValueType>& a,
+            void _polynomial_multiplication_on_kronecker(std::vector<FieldValueType>& c,
+                                                         const std::vector<FieldValueType>& a,
                                                          const std::vector<FieldValueType>& b) {
                 kronecker_substitution(c, a, b);
             }
 
         }    // namespace fft
-    }}        // namespace algebra
+    }        // namespace crypto3
 }    // namespace nil
 
 #endif    // ALGEBRA_FFT_KRONECKER_SUBSTITUTION_HPP

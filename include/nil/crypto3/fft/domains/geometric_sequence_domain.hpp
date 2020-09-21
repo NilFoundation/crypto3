@@ -12,16 +12,17 @@
 
 #include <vector>
 
-#include <nil/crypto3/algebra/fft/evaluation_domain.hpp>
-#include <nil/crypto3/algebra/fft/domains/basic_radix2_domain_aux.hpp>
+#include <nil/crypto3/fft/evaluation_domain.hpp>
+#include <nil/crypto3/fft/domains/basic_radix2_domain_aux.hpp>
 
-#include <nil/crypto3/algebra/fft/polynomial_arithmetic/basis_change.hpp>
+#include <nil/crypto3/fft/polynomial_arithmetic/basis_change.hpp>
 
 #ifdef MULTICORE
 #include <omp.h>
 #endif
 
-namespace nil { namespace crypto3 { namespace algebra {
+namespace nil {
+    namespace crypto3 {
         namespace fft {
 
             using namespace nil::crypto3::algebra;
@@ -29,6 +30,7 @@ namespace nil { namespace crypto3 { namespace algebra {
             template<typename FieldType>
             class geometric_sequence_domain : public evaluation_domain<FieldType::value_type> {
                 using value_type = typename FieldType::value_type;
+
             public:
                 bool precomputation_sentinel;
                 std::vector<value_type> geometric_sequence;
@@ -42,7 +44,8 @@ namespace nil { namespace crypto3 { namespace algebra {
                     this->geometric_triangular_sequence[0] = value_type::one();
 
                     for (size_t i = 1; i < this->m; i++) {
-                        this->geometric_sequence[i] = this->geometric_sequence[i - 1] * fields::arithmetic_params<FieldType>::geometric_generator;
+                        this->geometric_sequence[i] =
+                            this->geometric_sequence[i - 1] * fields::arithmetic_params<FieldType>::geometric_generator;
                         this->geometric_triangular_sequence[i] =
                             this->geometric_triangular_sequence[i - 1] * this->geometric_sequence[i - 1];
                     }
@@ -50,15 +53,16 @@ namespace nil { namespace crypto3 { namespace algebra {
                     this->precomputation_sentinel = 1;
                 }
 
-                geometric_sequence_domain(const size_t m) :
-                    evaluation_domain<value_type>(m) {
-                    if (m <= 1){
+                geometric_sequence_domain(const size_t m) : evaluation_domain<value_type>(m) {
+                    if (m <= 1) {
                         throw std::invalid_argument("geometric(): expected m > 1");
                     }
 
-                    if (!(value_type(fields::arithmetic_params<FieldType>::geometric_generator).is_zero())){
+                    if (!(value_type(fields::arithmetic_params<FieldType>::geometric_generator).is_zero())) {
                         throw std::invalid_argument(
-                            "geometric(): expected value_type(fields::arithmetic_params<FieldType>::geometric_generator).is_zero() != true");
+                            "geometric(): expected "
+                            "value_type(fields::arithmetic_params<FieldType>::geometric_generator).is_zero() != "
+                            "true");
                     }
 
                     precomputation_sentinel = 0;
@@ -72,7 +76,7 @@ namespace nil { namespace crypto3 { namespace algebra {
                         do_precomputation();
 
                     monomial_to_newton_basis_geometric(a, this->geometric_sequence, this->geometric_triangular_sequence,
-                        this->m);
+                                                       this->m);
 
                     /* Newton to Evaluation */
                     std::vector<value_type> T(this->m);
@@ -131,7 +135,7 @@ namespace nil { namespace crypto3 { namespace algebra {
                     }
 
                     newton_to_monomial_basis_geometric(a, this->geometric_sequence, this->geometric_triangular_sequence,
-                        this->m);
+                                                       this->m);
                 }
                 std::vector<value_type> evaluate_all_lagrange_polynomials(const value_type &t) {
                     /* Compute Lagrange polynomial of size m, with m+1 points (x_0, y_0), ... ,(x_m, y_m) */
@@ -237,7 +241,9 @@ namespace nil { namespace crypto3 { namespace algebra {
                     }
                 }
                 void divide_by_Z_on_coset(std::vector<value_type> &P) {
-                    const value_type coset = value_type(fields::arithmetic_params<FieldType>::multiplicative_generator); /* coset in geometric sequence? */
+                    const value_type coset = value_type(
+                        fields::arithmetic_params<FieldType>::multiplicative_generator); /* coset in geometric
+                                                                                            sequence? */
                     const value_type Z_inverse_at_coset = this->compute_vanishing_polynomial(coset).inversed();
                     for (size_t i = 0; i < this->m; ++i) {
                         P[i] *= Z_inverse_at_coset;
@@ -245,7 +251,7 @@ namespace nil { namespace crypto3 { namespace algebra {
                 }
             };
         }    // namespace fft
-    }}        // namespace algebra
+    }        // namespace crypto3
 }    // namespace nil
 
 #endif    // ALGEBRA_FFT_GEOMETRIC_SEQUENCE_DOMAIN_HPP

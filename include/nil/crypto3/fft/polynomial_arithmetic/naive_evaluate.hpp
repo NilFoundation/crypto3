@@ -13,7 +13,8 @@
 #include <algorithm>
 #include <vector>
 
-namespace nil { namespace crypto3 { namespace algebra {
+namespace nil {
+    namespace crypto3 {
         namespace fft {
 
             /*!
@@ -25,9 +26,10 @@ namespace nil { namespace crypto3 { namespace algebra {
              * - a vector coeff representing monomial P of size m
              * - a field element element t
              * The output is the polynomial P(x) evaluated at x = t.
-             */    
+             */
             template<typename FieldValueType>
-            FieldValueType evaluate_polynomial(const size_t &m, const std::vector<FieldValueType> &coeff, const FieldValueType &t) {
+            FieldValueType evaluate_polynomial(const size_t &m, const std::vector<FieldValueType> &coeff,
+                                               const FieldValueType &t) {
                 if (m != coeff.size())
                     throw DomainSizeException("expected m == coeff.size()");
 
@@ -54,8 +56,8 @@ namespace nil { namespace crypto3 { namespace algebra {
              * The output is the polynomial L_{idx,S}(z) evaluated at z = t.
              */
             template<typename FieldValueType>
-            FieldValueType evaluate_lagrange_polynomial(const size_t &m, const std::vector<FieldValueType> &domain, const FieldValueType &t,
-                                                const size_t &idx) {
+            FieldValueType evaluate_lagrange_polynomial(const size_t &m, const std::vector<FieldValueType> &domain,
+                                                        const FieldValueType &t, const size_t &idx) {
                 if (m != domain.size())
                     throw DomainSizeException("expected m == domain.size()");
                 if (idx >= m)
@@ -75,10 +77,9 @@ namespace nil { namespace crypto3 { namespace algebra {
 
                 return num * denom.inversed();
             }
-            
-        }    // namespace fft
-    }}        // namespace algebra
-}    // namespace nil
 
+        }    // namespace fft
+    }        // namespace crypto3
+}    // namespace nil
 
 #endif    // ALGEBRA_FFT_NAIVE_EVALUATE_HPP

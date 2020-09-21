@@ -12,22 +12,24 @@
 
 #include <vector>
 
-#include <nil/crypto3/algebra/fft/evaluation_domain.hpp>
-#include <nil/crypto3/algebra/fft/domains/basic_radix2_domain_aux.hpp>
-#include <nil/crypto3/algebra/fft/polynomial_arithmetic/basis_change.hpp>
+#include <nil/crypto3/fft/evaluation_domain.hpp>
+#include <nil/crypto3/fft/domains/basic_radix2_domain_aux.hpp>
+#include <nil/crypto3/fft/polynomial_arithmetic/basis_change.hpp>
 
 #ifdef MULTICORE
 #include <omp.h>
 #endif
 
-namespace nil { namespace crypto3 { namespace algebra {
+namespace nil {
+    namespace crypto3 {
         namespace fft {
 
             using namespace nil::crypto3::algebra;
-            
+
             template<typename FieldType>
             class arithmetic_sequence_domain : public evaluation_domain<FieldType::value_type> {
                 using value_type = typename FieldType::value_type;
+
             public:
                 bool precomputation_sentinel;
                 std::vector<std::vector<std::vector<value_type>>> subproduct_tree;
@@ -48,24 +50,25 @@ namespace nil { namespace crypto3 { namespace algebra {
                 }
 
                 arithmetic_sequence_domain(const size_t m) : evaluation_domain<value_type>(m) {
-                    if (m <= 1){
+                    if (m <= 1) {
                         throw std::invalid_argument("arithmetic(): expected m > 1");
                     }
 
-                    if (!(value_type(fields::arithmetic_params<FieldType>::arithmetic_generator).is_zero())){
+                    if (!(value_type(fields::arithmetic_params<FieldType>::arithmetic_generator).is_zero())) {
                         throw std::invalid_argument(
-                            "arithmetic(): expected arithmetic_params<FieldType>::arithmetic_generator.is_zero() != true");
+                            "arithmetic(): expected arithmetic_params<FieldType>::arithmetic_generator.is_zero() "
+                            "!= true");
                     }
 
                     precomputation_sentinel = 0;
                 }
 
                 void FFT(std::vector<value_type> &a) {
-                    if (a.size() != this->m){
+                    if (a.size() != this->m) {
                         throw std::invalid_argument("arithmetic: expected a.size() == this->m");
                     }
 
-                    if (!this->precomputation_sentinel){
+                    if (!this->precomputation_sentinel) {
                         do_precomputation();
                     }
 
@@ -224,7 +227,7 @@ namespace nil { namespace crypto3 { namespace algebra {
                 }
             };
         }    // namespace fft
-    }}        // namespace algebra
+    }        // namespace crypto3
 }    // namespace nil
 
 #endif    // ALGEBRA_FFT_ARITHMETIC_SEQUENCE_DOMAIN_HPP

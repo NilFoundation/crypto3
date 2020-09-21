@@ -13,10 +13,11 @@
 #include <algorithm>
 #include <vector>
 
-#include <nil/crypto3/algebra/fft/domains/basic_radix2_domain_aux.hpp>
-#include <nil/crypto3/algebra/fft/polynomial_arithmetic/basic_operations.hpp>
+#include <nil/crypto3/fft/domains/basic_radix2_domain_aux.hpp>
+#include <nil/crypto3/fft/polynomial_arithmetic/basic_operations.hpp>
 
-namespace nil { namespace crypto3 { namespace algebra {
+namespace nil {
+    namespace crypto3 {
         namespace fft {
 
             /*!
@@ -26,8 +27,11 @@ namespace nil { namespace crypto3 { namespace algebra {
              */
 
             template<typename FieldType>
-            void _polynomial_xgcd(const std::vector<typename FieldType::value_type> &a, const std::vector<typename FieldType::value_type> &b, std::vector<typename FieldType::value_type> &g,
-                                  std::vector<typename FieldType::value_type> &u, std::vector<typename FieldType::value_type> &v) {
+            void _polynomial_xgcd(const std::vector<typename FieldType::value_type> &a,
+                                  const std::vector<typename FieldType::value_type> &b,
+                                  std::vector<typename FieldType::value_type> &g,
+                                  std::vector<typename FieldType::value_type> &u,
+                                  std::vector<typename FieldType::value_type> &v) {
 
                 using value_type = typename FieldType::value_type;
 
@@ -65,7 +69,8 @@ namespace nil { namespace crypto3 { namespace algebra {
                 value_type lead_coeff = G.back().inversed();
                 std::transform(G.begin(), G.end(), G.begin(), std::bind1st(std::multiplies<value_type>(), lead_coeff));
                 std::transform(U.begin(), U.end(), U.begin(), std::bind1st(std::multiplies<value_type>(), lead_coeff));
-                std::transform(V1.begin(), V1.end(), V1.begin(), std::bind1st(std::multiplies<value_type>(), lead_coeff));
+                std::transform(V1.begin(), V1.end(), V1.begin(),
+                               std::bind1st(std::multiplies<value_type>(), lead_coeff));
 
                 g = G;
                 u = U;
@@ -73,7 +78,7 @@ namespace nil { namespace crypto3 { namespace algebra {
             }
 
         }    // namespace fft
-    }}        // namespace algebra
+    }        // namespace crypto3
 }    // namespace nil
 
 #endif    // ALGEBRA_FFT_XGCD_HPP

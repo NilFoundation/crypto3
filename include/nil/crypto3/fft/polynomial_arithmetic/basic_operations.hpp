@@ -13,15 +13,16 @@
 #include <algorithm>
 #include <vector>
 
-#include <nil/crypto3/algebra/fft/detail/field_utils.hpp>
+#include <nil/crypto3/fft/detail/field_utils.hpp>
 
-#include <nil/crypto3/algebra/fft/domains/basic_radix2_domain_aux.hpp>
+#include <nil/crypto3/fft/domains/basic_radix2_domain_aux.hpp>
 
 #ifdef MULTICORE
 #include <omp.h>
 #endif
 
-namespace nil { namespace crypto3 { namespace algebra {
+namespace nil {
+    namespace crypto3 {
         namespace fft {
 
             /**
@@ -55,11 +56,12 @@ namespace nil { namespace crypto3 { namespace algebra {
             }
 
             /**
-             * Computes the standard polynomial addition, polynomial A + polynomial B, and stores result in polynomial
-             * C.
+             * Computes the standard polynomial addition, polynomial A + polynomial B, and stores result in
+             * polynomial C.
              */
             template<typename FieldType>
-            void _polynomial_addition(std::vector<typename FieldType::value_type> &c, const std::vector<typename FieldType::value_type> &a,
+            void _polynomial_addition(std::vector<typename FieldType::value_type> &c,
+                                      const std::vector<typename FieldType::value_type> &a,
                                       const std::vector<typename FieldType::value_type> &b) {
 
                 using value_type = typename FieldType::value_type;
@@ -91,7 +93,8 @@ namespace nil { namespace crypto3 { namespace algebra {
              * polynomial C.
              */
             template<typename FieldType>
-            void _polynomial_subtraction(std::vector<typename FieldType::value_type> &c, const std::vector<typename FieldType::value_type> &a,
+            void _polynomial_subtraction(std::vector<typename FieldType::value_type> &c,
+                                         const std::vector<typename FieldType::value_type> &a,
                                          const std::vector<typename FieldType::value_type> &b) {
 
                 using value_type = typename FieldType::value_type;
@@ -120,11 +123,12 @@ namespace nil { namespace crypto3 { namespace algebra {
             }
 
             /**
-             * Perform the multiplication of two polynomials, polynomial A * polynomial B, using FFT, and stores result
-             * in polynomial C.
+             * Perform the multiplication of two polynomials, polynomial A * polynomial B, using FFT, and stores
+             * result in polynomial C.
              */
             template<typename FieldType>
-            void _polynomial_multiplication_on_fft(std::vector<typename FieldType::value_type> &c, const std::vector<typename FieldType::value_type> &a,
+            void _polynomial_multiplication_on_fft(std::vector<typename FieldType::value_type> &c,
+                                                   const std::vector<typename FieldType::value_type> &a,
                                                    const std::vector<typename FieldType::value_type> &b) {
 
                 using value_type = typename FieldType::value_type;
@@ -164,7 +168,8 @@ namespace nil { namespace crypto3 { namespace algebra {
              * polynomial C.
              */
             template<typename FieldType>
-            void _polynomial_multiplication(std::vector<typename FieldType::value_type> &c, const std::vector<typename FieldType::value_type> &a,
+            void _polynomial_multiplication(std::vector<typename FieldType::value_type> &c,
+                                            const std::vector<typename FieldType::value_type> &a,
                                             const std::vector<typename FieldType::value_type> &b) {
                 _polynomial_multiplication_on_fft<FieldType>(c, a, b);
             }
@@ -175,9 +180,10 @@ namespace nil { namespace crypto3 { namespace algebra {
              * [Bostan, Lecerf, & Schost, 2003. Tellegen's Principle in Practice, on page 39].
              */
             template<typename FieldType>
-            std::vector<typename FieldType::value_type> _polynomial_multiplication_transpose(const size_t &n,
-                                                                        const std::vector<typename FieldType::value_type> &a,
-                                                                        const std::vector<typename FieldType::value_type> &c) {
+            std::vector<typename FieldType::value_type>
+                _polynomial_multiplication_transpose(const size_t &n,
+                                                     const std::vector<typename FieldType::value_type> &a,
+                                                     const std::vector<typename FieldType::value_type> &c) {
 
                 using value_type = typename FieldType::value_type;
 
@@ -203,12 +209,14 @@ namespace nil { namespace crypto3 { namespace algebra {
              * Output: Polynomial Q, Polynomial R, such that A = (Q * B) + R.
              */
             template<typename FieldType>
-            void _polynomial_division(std::vector<typename FieldType::value_type> &q, std::vector<typename FieldType::value_type> &r,
-                                      const std::vector<typename FieldType::value_type> &a, const std::vector<typename FieldType::value_type> &b) {
+            void _polynomial_division(std::vector<typename FieldType::value_type> &q,
+                                      std::vector<typename FieldType::value_type> &r,
+                                      const std::vector<typename FieldType::value_type> &a,
+                                      const std::vector<typename FieldType::value_type> &b) {
 
                 using value_type = typename FieldType::value_type;
 
-                size_t d = b.size() - 1;          /* Degree of B */
+                size_t d = b.size() - 1;            /* Degree of B */
                 value_type c = b.back().inversed(); /* Inverse of Leading Coefficient of B */
 
                 r = std::vector<value_type>(a);
@@ -239,7 +247,7 @@ namespace nil { namespace crypto3 { namespace algebra {
             }
 
         }    // namespace fft
-    }}        // namespace algebra
+    }        // namespace crypto3
 }    // namespace nil
 
 #endif    // ALGEBRA_FFT_BASIC_OPERATIONS_HPP

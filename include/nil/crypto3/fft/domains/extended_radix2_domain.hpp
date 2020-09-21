@@ -12,17 +12,19 @@
 
 #include <vector>
 
-#include <nil/crypto3/algebra/fft/evaluation_domain.hpp>
-#include <nil/crypto3/algebra/fft/domains/basic_radix2_domain_aux.hpp>
+#include <nil/crypto3/fft/evaluation_domain.hpp>
+#include <nil/crypto3/fft/domains/basic_radix2_domain_aux.hpp>
 
-namespace nil { namespace crypto3 { namespace algebra {
+namespace nil {
+    namespace crypto3 {
         namespace fft {
 
             using namespace nil::crypto3::algebra;
-            
+
             template<typename FieldType>
             class extended_radix2_domain : public evaluation_domain<FieldType::value_type> {
                 using value_type = typename FieldType::value_type;
+
             public:
                 size_t small_m;
                 value_type omega;
@@ -35,7 +37,8 @@ namespace nil { namespace crypto3 { namespace algebra {
                     if (!std::is_same<value_type, std::complex<double>>::value) {
                         const size_t logm = static_cast<std::size_t>(std::ceil(std::log2(m)));
                         if (logm != (fields::arithmetic_params<FieldType>::s + 1))
-                            throw std::invalid_argument("extended_radix2(): expected logm == fields::arithmetic_params<FieldType>::s + 1");
+                            throw std::invalid_argument(
+                                "extended_radix2(): expected logm == fields::arithmetic_params<FieldType>::s + 1");
                     }
 
                     small_m = m / 2;
@@ -148,9 +151,10 @@ namespace nil { namespace crypto3 { namespace algebra {
                     const value_type coset_to_small_m = coset ^ small_m;
                     const value_type shift_to_small_m = shift ^ small_m;
 
-                    const value_type Z0 = (coset_to_small_m - value_type::one()) * (coset_to_small_m - shift_to_small_m);
+                    const value_type Z0 =
+                        (coset_to_small_m - value_type::one()) * (coset_to_small_m - shift_to_small_m);
                     const value_type Z1 = (coset_to_small_m * shift_to_small_m - value_type::one()) *
-                                         (coset_to_small_m * shift_to_small_m - shift_to_small_m);
+                                          (coset_to_small_m * shift_to_small_m - shift_to_small_m);
 
                     const value_type Z0_inverse = Z0.inversed();
                     const value_type Z1_inverse = Z1.inversed();
@@ -162,7 +166,7 @@ namespace nil { namespace crypto3 { namespace algebra {
                 }
             };
         }    // namespace fft
-    }}        // namespace algebra
+    }        // namespace crypto3
 }    // namespace nil
 
 #endif    // ALGEBRA_FFT_EXTENDED_RADIX2_DOMAIN_HPP

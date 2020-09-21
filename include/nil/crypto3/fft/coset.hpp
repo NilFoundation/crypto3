@@ -11,19 +11,22 @@
 
 #include <vector>
 
-namespace nil { namespace crypto3 { namespace algebra {
-        /**
-         * Translate the vector a to a coset defined by g.
-         */
-        template<typename FieldValueType>
-        void multiply_by_coset(std::vector<FieldValueType> &a, const FieldValueType &g) {
-            FieldValueType u = g;
-            for (size_t i = 1; i < a.size(); ++i) {
-                a[i] *= u;
-                u *= g;
+namespace nil {
+    namespace crypto3 {
+        namespace fft {
+            /**
+             * Translate the vector a to a coset defined by g.
+             */
+            template<typename FieldValueType>
+            void multiply_by_coset(std::vector<FieldValueType> &a, const FieldValueType &g) {
+                FieldValueType u = g;
+                for (size_t i = 1; i < a.size(); ++i) {
+                    a[i] *= u;
+                    u *= g;
+                }
             }
-        }
-    }    // namespace algebra
+        }    // namespace fft
+    }        // namespace crypto3
 }    // namespace nil
 
 #endif    // CRYPTO3_COSET_HPP

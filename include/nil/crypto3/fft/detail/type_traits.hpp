@@ -162,34 +162,41 @@
         static bool const value = sizeof(f<Derived>(0)) == 2;                                \
     };
 
-namespace nil { namespace crypto3 { namespace algebra {
-        namespace detail {
-          
-            using namespace nil::crypto3::algebra;
+namespace nil {
+    namespace crypto3 {
+        namespace algebra {
+            namespace detail {
 
-            template<std::size_t m>
-            struct is_basic_radix2_domain {
-                constexpr static bool const value =
-                    (m > 1) && !(m & (m - 1)) && (boost::static_log2<m>::value <= fields::arithmetic_params<FieldType>::s);
-            }
+                using namespace nil::crypto3::algebra;
 
-            template<std::size_t m>
-            struct is_extended_radix2_domain {
-                constexpr static bool const value =
-                    (m > 1) && !(m & (m - 1)) && (boost::static_log2<m>::value == fields::arithmetic_params<FieldType>::s + 1);
-            }
+                template<std::size_t m>
+                struct is_basic_radix2_domain {
+                    constexpr static bool const value =
+                        (m > 1) && !(m & (m - 1)) &&
+                        (boost::static_log2<m>::value <= fields::arithmetic_params<FieldType>::s);
+                }
 
-            template<std::size_t m>
-            struct is_step_radix2_domain {
-            private:
-                constexpr std::size_t const small_m = m - (1ul << (boost::static_log2<m>::value - 1));
+                template<std::size_t m>
+                struct is_extended_radix2_domain {
+                    constexpr static bool const value =
+                        (m > 1) && !(m & (m - 1)) &&
+                        (boost::static_log2<m>::value == fields::arithmetic_params<FieldType>::s + 1);
+                }
 
-            public:
-                constexpr static bool const value =
-                    (m > 1) && (m & (m - 1)) && (boost::static_log2<m> <= fields::arithmetic_params<FieldType>::s) && !(small_m & (small_m - 1));
-            }
-        }    // namespace detail
-    }}        // namespace algebra
+                template<std::size_t m>
+                struct is_step_radix2_domain {
+                private:
+                    constexpr std::size_t const small_m = m - (1ul << (boost::static_log2<m>::value - 1));
+
+                public:
+                    constexpr static bool const value =
+                        (m > 1) && (m & (m - 1)) &&
+                        (boost::static_log2<m> <= fields::arithmetic_params<FieldType>::s) &&
+                        !(small_m & (small_m - 1));
+                }
+            }    // namespace detail
+        }        // namespace algebra
+    }            // namespace crypto3
 }    // namespace nil
 
 #endif    // ALGEBRA_TYPE_TRAITS_HPP
