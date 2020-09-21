@@ -12,7 +12,7 @@
 
 #include "relations/constraint_satisfaction_problems/r1cs/examples/r1cs_examples.hpp"
 
-#include <nil/algebra/utils/random_element.hpp>
+#include <nil/crypto3/algebra/utils/random_element.hpp>
 
 namespace nil {
     namespace crypto3 {

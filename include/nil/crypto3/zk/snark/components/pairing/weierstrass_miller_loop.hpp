@@ -16,8 +16,8 @@
 
 #include <memory>
 
-#include <nil/algebra/fields/field.hpp>
-#include <nil/algebra/utils/random_element.hpp>
+#include <nil/crypto3/algebra/fields/field.hpp>
+#include <nil/crypto3/algebra/utils/random_element.hpp>
 
 #include <nil/crypto3/zk/snark/components/pairing/pairing_params.hpp>
 #include <nil/crypto3/zk/snark/components/pairing/weierstrass_precomputation.hpp>

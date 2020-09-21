@@ -32,8 +32,8 @@
 #ifndef CRYPTO3_ZK_R1CS_TO_QAP_HPP
 #define CRYPTO3_ZK_R1CS_TO_QAP_HPP
 
-#include <nil/algebra/fft/coset.hpp>
-#include <nil/algebra/fft/evaluation_domain.hpp>
+#include <nil/crypto3/fft/coset.hpp>
+#include <nil/crypto3/fft/evaluation_domain.hpp>
 
 #include <nil/crypto3/zk/snark/relations/arithmetic_programs/qap/qap.hpp>
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs/r1cs.hpp>
@@ -57,8 +57,8 @@ namespace nil {
                  */
                 template<typename FieldType>
                 qap_instance<FieldType> r1cs_to_qap_instance_map(const r1cs_constraint_system<FieldType> &cs) {
-                    const std::shared_ptr<algebra::fft::evaluation_domain<FieldType>> domain =
-                        algebra::fft::make_evaluation_domain<FieldType>(cs.num_constraints() + cs.num_inputs() + 1);
+                    const std::shared_ptr<fft::evaluation_domain<FieldType>> domain =
+                        fft::make_evaluation_domain<FieldType>(cs.num_constraints() + cs.num_inputs() + 1);
 
                     std::vector<std::map<std::size_t, FieldType>> A_in_Lagrange_basis(cs.num_variables() + 1);
                     std::vector<std::map<std::size_t, FieldType>> B_in_Lagrange_basis(cs.num_variables() + 1);
@@ -117,8 +117,8 @@ namespace nil {
                 qap_instance_evaluation<FieldType>
                     r1cs_to_qap_instance_map_with_evaluation(const r1cs_constraint_system<FieldType> &cs,
                                                              const typename FieldType::value_type &t) {
-                    const std::shared_ptr<algebra::fft::evaluation_domain<FieldType>> domain =
-                        algebra::fft::make_evaluation_domain<FieldType>(cs.num_constraints() + cs.num_inputs() + 1);
+                    const std::shared_ptr<fft::evaluation_domain<FieldType>> domain =
+                        fft::make_evaluation_domain<FieldType>(cs.num_constraints() + cs.num_inputs() + 1);
 
                     std::vector<typename FieldType::value_type> At, Bt, Ct, Ht;
 
@@ -211,18 +211,20 @@ namespace nil {
                     /* sanity check */
                     assert(cs.is_satisfied(primary_input, auxiliary_input));
 
-                    const std::shared_ptr<algebra::fft::evaluation_domain<FieldType>> domain =
-                        algebra::fft::make_evaluation_domain<FieldType>(cs.num_constraints() + cs.num_inputs() + 1);
+                    const std::shared_ptr<fft::evaluation_domain<FieldType>> domain =
+                        fft::make_evaluation_domain<FieldType>(cs.num_constraints() + cs.num_inputs() + 1);
 
                     r1cs_variable_assignment<FieldType> full_variable_assignment = primary_input;
                     full_variable_assignment.insert(
                         full_variable_assignment.end(), auxiliary_input.begin(), auxiliary_input.end());
 
-                    std::vector<typename FieldType::value_type> aA(domain->m, FieldType::value_type::zero()), aB(domain->m, FieldType::value_type::zero());
+                    std::vector<typename FieldType::value_type> aA(domain->m, FieldType::value_type::zero()),
+                        aB(domain->m, FieldType::value_type::zero());
 
                     /* account for the additional constraints input_i * 0 = 0 */
                     for (std::size_t i = 0; i <= cs.num_inputs(); ++i) {
-                        aA[i + cs.num_constraints()] = (i > 0 ? full_variable_assignment[i - 1] : FieldType::value_type::zero());
+                        aA[i + cs.num_constraints()] =
+                            (i > 0 ? full_variable_assignment[i - 1] : FieldType::value_type::zero());
                     }
                     /* account for all other constraints */
                     for (std::size_t i = 0; i < cs.num_constraints(); ++i) {
@@ -234,7 +236,8 @@ namespace nil {
 
                     domain->iFFT(aB);
 
-                    std::vector<typename FieldType::value_type> coefficients_for_H(domain->m + 1, FieldType::value_type::zero());
+                    std::vector<typename FieldType::value_type> coefficients_for_H(domain->m + 1,
+                                                                                   FieldType::value_type::zero());
 #ifdef MULTICORE
 #pragma omp parallel for
 #endif
@@ -245,13 +248,14 @@ namespace nil {
                     coefficients_for_H[0] -= d3;
                     domain->add_poly_Z(d1 * d2, coefficients_for_H);
 
-                    algebra::multiply_by_coset(aA, FieldType::multiplicative_generator);
+                    fft::multiply_by_coset(aA, FieldType::multiplicative_generator);
                     domain->FFT(aA, FieldType::multiplicative_generator);
 
-                    algebra::multiply_by_coset(aB, FieldType::multiplicative_generator);
+                    fft::multiply_by_coset(aB, FieldType::multiplicative_generator);
                     domain->FFT(aB, FieldType::multiplicative_generator);
 
-                    std::vector<typename FieldType::value_type> &H_tmp = aA;    // can overwrite aA because it is not used later
+                    std::vector<typename FieldType::value_type> &H_tmp =
+                        aA;    // can overwrite aA because it is not used later
 #ifdef MULTICORE
 #pragma omp parallel for
 #endif
@@ -267,7 +271,7 @@ namespace nil {
 
                     domain->iFFT(aC);
 
-                    algebra::multiply_by_coset(aC, FieldType::multiplicative_generator);
+                    fft::multiply_by_coset(aC, FieldType::multiplicative_generator);
                     domain->FFT(aC, FieldType::multiplicative_generator);
 
 #ifdef MULTICORE

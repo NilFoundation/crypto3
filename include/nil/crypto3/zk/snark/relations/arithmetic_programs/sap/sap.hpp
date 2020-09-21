@@ -26,11 +26,11 @@
 #include <map>
 #include <memory>
 
-#include <nil/algebra/multiexp/multiexp.hpp>
+#include <nil/crypto3/algebra/multiexp/multiexp.hpp>
 
-#include <nil/algebra/utils/random_element.hpp>
+#include <nil/crypto3/algebra/utils/random_element.hpp>
 
-#include <nil/algebra/fft/evaluation_domain.hpp>
+#include <nil/crypto3/fft/evaluation_domain.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -54,12 +54,12 @@ namespace nil {
                     std::size_t degree;
                     std::size_t num_inputs;
 
-                    std::shared_ptr<algebra::fft::evaluation_domain<FieldType>> domain;
+                    std::shared_ptr<fft::evaluation_domain<FieldType>> domain;
 
                     std::vector<std::map<std::size_t, typename FieldType::value_type>> A_in_Lagrange_basis;
                     std::vector<std::map<std::size_t, typename FieldType::value_type>> C_in_Lagrange_basis;
 
-                    sap_instance(const std::shared_ptr<algebra::fft::evaluation_domain<FieldType>> &domain,
+                    sap_instance(const std::shared_ptr<fft::evaluation_domain<FieldType>> &domain,
                                  const std::size_t num_variables,
                                  const std::size_t degree,
                                  const std::size_t num_inputs,
@@ -70,7 +70,7 @@ namespace nil {
                         C_in_Lagrange_basis(C_in_Lagrange_basis) {
                     }
 
-                    sap_instance(const std::shared_ptr<algebra::fft::evaluation_domain<FieldType>> &domain,
+                    sap_instance(const std::shared_ptr<fft::evaluation_domain<FieldType>> &domain,
                                  const std::size_t num_variables,
                                  const std::size_t degree,
                                  const std::size_t num_inputs,
@@ -146,7 +146,7 @@ namespace nil {
                     std::size_t degree;
                     std::size_t num_inputs;
 
-                    std::shared_ptr<algebra::fft::evaluation_domain<FieldType>> domain;
+                    std::shared_ptr<fft::evaluation_domain<FieldType>> domain;
 
                     typename FieldType::value_type t;
 
@@ -154,7 +154,7 @@ namespace nil {
 
                     typename FieldType::value_type Zt;
 
-                    sap_instance_evaluation(const std::shared_ptr<algebra::fft::evaluation_domain<FieldType>> &domain,
+                    sap_instance_evaluation(const std::shared_ptr<fft::evaluation_domain<FieldType>> &domain,
                                             const std::size_t num_variables,
                                             const std::size_t degree,
                                             const std::size_t num_inputs,
@@ -167,7 +167,7 @@ namespace nil {
                         degree(degree), num_inputs(num_inputs), domain(domain), t(t), At(At), Ct(Ct), Ht(Ht), Zt(Zt) {
                     }
 
-                    sap_instance_evaluation(const std::shared_ptr<algebra::fft::evaluation_domain<FieldType>> &domain,
+                    sap_instance_evaluation(const std::shared_ptr<fft::evaluation_domain<FieldType>> &domain,
                                             const std::size_t num_variables,
                                             const std::size_t degree,
                                             const std::size_t num_inputs,

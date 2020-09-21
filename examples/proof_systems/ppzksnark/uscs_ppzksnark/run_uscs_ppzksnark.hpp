@@ -10,7 +10,7 @@
 #ifndef CRYPTO3_RUN_USCS_PPZKSNARK_HPP
 #define CRYPTO3_RUN_USCS_PPZKSNARK_HPP
 
-#include <nil/algebra/curves/public_params.hpp>
+#include <nil/crypto3/algebra/curves/public_params.hpp>
 
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/uscs/examples/uscs_examples.hpp>
 

@@ -11,10 +11,10 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include <nil/algebra/curves/bn128.hpp>
-#include <nil/algebra/curves/edwards.hpp>
-#include <nil/algebra/curves/mnt4.hpp>
-#include <nil/algebra/curves/mnt6.hpp>
+#include <nil/crypto3/algebra/curves/bn128.hpp>
+#include <nil/crypto3/algebra/curves/edwards.hpp>
+#include <nil/crypto3/algebra/curves/mnt4.hpp>
+#include <nil/crypto3/algebra/curves/mnt6.hpp>
 
 #include <nil/crypto3/zk/snark/components/hashes/sha256/sha256_component.hpp>
 #include <nil/crypto3/zk/snark/components/merkle_tree/merkle_tree_check_read_component.hpp>
@@ -22,7 +22,7 @@
 
 using namespace nil::crypto3;
 using namespace nil::crypto3::zk::snark;
-using namespace nil::algebra;
+using namespace nil::crypto3::algebra;
 
 template<typename CurveType>
 void test_all_merkle_tree_components() {

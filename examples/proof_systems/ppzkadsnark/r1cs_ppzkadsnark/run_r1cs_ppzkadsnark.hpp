@@ -18,7 +18,7 @@ namespace nil {
         namespace zk {
             namespace snark {
 
-              using nil::algebra;
+              using nil::crypto3::algebra;
 
                 /**
                  * Runs the ppzkADSNARK (generator, prover, and verifier) for a given

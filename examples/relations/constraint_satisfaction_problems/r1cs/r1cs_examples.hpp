@@ -17,8 +17,8 @@ namespace nil {
         namespace zk {
             namespace snark {
 
-                using nil::algebra::fields;
-                using nil::algebra;
+                using nil::crypto3::algebra::fields;
+                using nil::crypto3::algebra;
 
                 /**
                  * A R1CS example comprises a R1CS constraint system, R1CS input, and R1CS witness.

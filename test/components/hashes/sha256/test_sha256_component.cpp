@@ -13,7 +13,7 @@
 
 #include <nil/crypto3/zk/snark/components/hashes/sha256/sha256_component.hpp>
 
-using namespace nil::algebra;
+using namespace nil::crypto3::algebra;
 using namespace nil::crypto3;
 using namespace nil::crypto3::zk::snark;
 

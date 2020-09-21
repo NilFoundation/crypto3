@@ -47,9 +47,9 @@
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs/r1cs.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_gg_ppzksnark/r1cs_gg_ppzksnark_params.hpp>
 
-#include <nil/algebra/multiexp/default.hpp>
+#include <nil/crypto3/algebra/multiexp/default.hpp>
 
-#include <nil/algebra/random_element.hpp>
+#include <nil/crypto3/algebra/random_element.hpp>
 
 #ifdef MULTICORE
 #include <omp.h>

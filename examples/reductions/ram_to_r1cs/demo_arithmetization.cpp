@@ -16,8 +16,8 @@
 #include <boost/program_options.hpp>
 #endif
 
-#include <nil/algebra/common/default_types/ec_pp.hpp>
-#include <nil/algebra/common/profiling.hpp>
+#include <nil/crypto3/algebra/common/default_types/ec_pp.hpp>
+#include <nil/crypto3/algebra/common/profiling.hpp>
 
 #include <nil/crypto3/zk/snark/default_types/tinyram_ppzksnark_pp.hpp>
 #include <nil/crypto3/zk/snark/reductions/ram_to_r1cs/ram_to_r1cs.hpp>

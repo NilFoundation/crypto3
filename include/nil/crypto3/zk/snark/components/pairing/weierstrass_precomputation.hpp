@@ -16,10 +16,10 @@
 
 #include <memory>
 
-#include <nil/algebra/curves/mnt4.hpp>
-#include <nil/algebra/curves/mnt6.hpp>
+#include <nil/crypto3/algebra/curves/mnt4.hpp>
+#include <nil/crypto3/algebra/curves/mnt6.hpp>
 
-#include <nil/algebra/utils/random_element.hpp>
+#include <nil/crypto3/algebra/utils/random_element.hpp>
 
 #include <nil/crypto3/zk/snark/components/curves/weierstrass_g1_component.hpp>
 #include <nil/crypto3/zk/snark/components/curves/weierstrass_g2_component.hpp>

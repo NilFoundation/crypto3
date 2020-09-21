@@ -52,9 +52,9 @@
 #include <nil/crypto3/zk/snark/proof_systems/ppzkadsnark/r1cs_ppzkadsnark/r1cs_ppzkadsnark_prf.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/ppzkadsnark/r1cs_ppzkadsnark/r1cs_ppzkadsnark_signature.hpp>
 
-#include <nil/algebra/multiexp/multiexp.hpp>
+#include <nil/crypto3/algebra/multiexp/multiexp.hpp>
 
-#include <nil/algebra/utils/random_element.hpp>
+#include <nil/crypto3/algebra/utils/random_element.hpp>
 
 #ifdef MULTICORE
 #include <omp.h>

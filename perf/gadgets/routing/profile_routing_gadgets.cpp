@@ -11,8 +11,8 @@
 
 #include <algorithm>
 
-#include <nil/algebra/common/default_types/ec_pp.hpp>
-#include <nil/algebra/common/profiling.hpp>
+#include <nil/crypto3/algebra/common/default_types/ec_pp.hpp>
+#include <nil/crypto3/algebra/common/profiling.hpp>
 
 #include <nil/crypto3/zk/snark/components/routing/as_waksman_routing_components.hpp>
 #include <nil/crypto3/zk/snark/components/routing/benes_routing_components.hpp>

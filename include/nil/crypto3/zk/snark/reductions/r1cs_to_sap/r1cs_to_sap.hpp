@@ -33,7 +33,7 @@
 #ifndef CRYPTO3_ZK_R1CS_TO_SAP_HPP_
 #define CRYPTO3_ZK_R1CS_TO_SAP_HPP_
 
-#include <nil/algebra/fft/evaluation_domain.hpp>
+#include <nil/crypto3/fft/evaluation_domain.hpp>
 
 #include <nil/crypto3/zk/snark/relations/arithmetic_programs/sap/sap.hpp>
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs/r1cs.hpp>
@@ -56,7 +56,7 @@ namespace nil {
                  * for a given R1CS instance.
                  */
                 template<typename FieldType>
-                std::shared_ptr<algebra::fft::evaluation_domain<FieldType>>
+                std::shared_ptr<fft::evaluation_domain<FieldType>>
                     r1cs_to_sap_get_domain(const r1cs_constraint_system<FieldType> &cs) {
                     /*
                      * the SAP instance will have:
@@ -66,7 +66,7 @@ namespace nil {
                      * see comments in r1cs_to_sap_instance_map for details on where these
                      * constraints come from.
                      */
-                    return algebra::fft::make_evaluation_domain<FieldType>(2 * cs.num_constraints() +
+                    return fft::make_evaluation_domain<FieldType>(2 * cs.num_constraints() +
                                                                            2 * cs.num_inputs() + 1);
                 }
 
@@ -75,7 +75,7 @@ namespace nil {
                  */
                 template<typename FieldType>
                 sap_instance<FieldType> r1cs_to_sap_instance_map(const r1cs_constraint_system<FieldType> &cs) {
-                    const std::shared_ptr<algebra::fft::evaluation_domain<FieldType>> domain =
+                    const std::shared_ptr<fft::evaluation_domain<FieldType>> domain =
                         r1cs_to_sap_get_domain(cs);
 
                     std::size_t sap_num_variables = cs.num_variables() + cs.num_constraints() + cs.num_inputs();
@@ -184,7 +184,7 @@ namespace nil {
 
                     r1cs_to_sap_instance_map_with_evaluation(const r1cs_constraint_system<FieldType> &cs,
                                                              const typename FieldType::value_type &t) {
-                    const std::shared_ptr<algebra::fft::evaluation_domain<FieldType>> domain =
+                    const std::shared_ptr<fft::evaluation_domain<FieldType>> domain =
                         r1cs_to_sap_get_domain(cs);
 
                     std::size_t sap_num_variables = cs.num_variables() + cs.num_constraints() + cs.num_inputs();
@@ -294,7 +294,7 @@ namespace nil {
                     /* sanity check */
                     assert(cs.is_satisfied(primary_input, auxiliary_input));
 
-                    const std::shared_ptr<algebra::fft::evaluation_domain<FieldType>> domain =
+                    const std::shared_ptr<fft::evaluation_domain<FieldType>> domain =
                         r1cs_to_sap_get_domain(cs);
 
                     std::size_t sap_num_variables = cs.num_variables() + cs.num_constraints() + cs.num_inputs();

@@ -20,14 +20,14 @@
 #include <nil/crypto3/zk/snark/reductions/uscs_to_ssp/uscs_to_ssp.hpp>
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/uscs/uscs.hpp>
 
-#include <nil/algebra/random_element.hpp>
-#include <nil/algebra/curves/mnt4.hpp>
-#include <nil/algebra/curves/mnt6.hpp>
+#include <nil/crypto3/algebra/random_element.hpp>
+#include <nil/crypto3/algebra/curves/mnt4.hpp>
+#include <nil/crypto3/algebra/curves/mnt6.hpp>
 
 #include "uscs_examples.hpp"
 
 using namespace nil::crypto3::zk::snark;
-using namespace nil::algebra;
+using namespace nil::crypto3::algebra;
 
 template<typename FieldType>
 void test_ssp(const std::size_t num_constraints, const std::size_t num_inputs, const bool binary_input) {

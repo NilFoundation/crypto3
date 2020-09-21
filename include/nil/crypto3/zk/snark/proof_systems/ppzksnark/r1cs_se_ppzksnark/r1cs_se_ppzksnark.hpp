@@ -55,9 +55,9 @@
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs/r1cs.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_se_ppzksnark/r1cs_se_ppzksnark_params.hpp>
 
-#include <nil/algebra/multiexp/multiexp.hpp>
+#include <nil/crypto3/algebra/multiexp/multiexp.hpp>
 
-#include <nil/algebra/utils/random_element.hpp>
+#include <nil/crypto3/algebra/utils/random_element.hpp>
 
 #ifdef MULTICORE
 #include <omp.h>
@@ -433,7 +433,7 @@ namespace nil {
                      * draw random element t at which the SAP is evaluated.
                      * it should be the case that Z(t) != 0
                      */
-                    const std::shared_ptr<algebra::fft::evaluation_domain<typename CurveType::scalar_field_type>> domain =
+                    const std::shared_ptr<fft::evaluation_domain<typename CurveType::scalar_field_type>> domain =
                         r1cs_to_sap_get_domain(cs);
                     typename CurveType::scalar_field_type t;
                     do {

@@ -11,10 +11,10 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include <nil/algebra/curves/mnt4.hpp>
-#include <nil/algebra/curves/mnt6.hpp>
+#include <nil/crypto3/algebra/curves/mnt4.hpp>
+#include <nil/crypto3/algebra/curves/mnt6.hpp>
 
-#include <nil/algebra/random_element.hpp>
+#include <nil/crypto3/algebra/random_element.hpp>
 
 #include <nil/crypto3/zk/snark/components/fields/fp2_components.hpp>
 #include <nil/crypto3/zk/snark/components/fields/fp3_components.hpp>
@@ -24,7 +24,7 @@
 #include <nil/crypto3/zk/snark/proof_systems/ppzksnark/r1cs_ppzksnark/r1cs_ppzksnark.hpp>
 
 using namespace nil::crypto3::zk::snark;
-using namespace nil::algebra;
+using namespace nil::crypto3::algebra;
 
 template<typename FieldType>
 void dump_constraints(const blueprint<FieldType> &pb) {

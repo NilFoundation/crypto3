@@ -20,12 +20,12 @@
 #include <nil/crypto3/zk/snark/reductions/r1cs_to_qap/r1cs_to_qap.hpp>
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs/r1cs.hpp>
 
-#include <nil/algebra/random_element.hpp>
-#include <nil/algebra/curves/mnt4.hpp>
-#include <nil/algebra/curves/mnt6.hpp>
+#include <nil/crypto3/algebra/random_element.hpp>
+#include <nil/crypto3/algebra/curves/mnt4.hpp>
+#include <nil/crypto3/algebra/curves/mnt6.hpp>
 
 using namespace nil::crypto3::zk::snark;
-using namespace nil::algebra;
+using namespace nil::crypto3::algebra;
 
 template<typename FieldType>
 void test_qap(const std::size_t qap_degree, const std::size_t num_inputs, const bool binary_input) {
