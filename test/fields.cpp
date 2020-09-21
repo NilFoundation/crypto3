@@ -82,9 +82,7 @@ namespace boost {
 }    // namespace boost
 
 typedef int64_t constant_type;
-enum field_operation_test_constants : std::size_t {
-    C1
-};
+enum field_operation_test_constants : std::size_t { C1 };
 
 enum field_operation_test_elements : std::size_t {
     e1,
@@ -96,12 +94,12 @@ enum field_operation_test_elements : std::size_t {
     e2_inv,
     e1_pow_C1,
     e2_pow_2
-    //e2_pow_2_sqrt
+    // e2_pow_2_sqrt
 };
 
 // if target == check-algebra just data/fields.json
 const char *test_data = "libs/crypto3-algebra/test/data/fields.json";
-//const char *test_data = "libs/algebra/test/data/fields.json";
+// const char *test_data = "libs/algebra/test/data/fields.json";
 
 boost::property_tree::ptree string_data(std::string test_name) {
     boost::property_tree::ptree string_data;
@@ -111,8 +109,7 @@ boost::property_tree::ptree string_data(std::string test_name) {
 }
 
 template<typename element_type>
-void check_field_operations(const std::vector<element_type> &elements,
-                            const std::vector<constant_type> &constants) {
+void check_field_operations(const std::vector<element_type> &elements, const std::vector<constant_type> &constants) {
     BOOST_CHECK_EQUAL(elements[e1] + elements[e2], elements[e1_plus_e2]);
     BOOST_CHECK_EQUAL(elements[e1] - elements[e2], elements[e1_minus_e2]);
     BOOST_CHECK_EQUAL(elements[e1] * elements[e2], elements[e1_mul_e2]);
@@ -120,7 +117,7 @@ void check_field_operations(const std::vector<element_type> &elements,
     BOOST_CHECK_EQUAL(elements[e2].inversed(), elements[e2_inv]);
     BOOST_CHECK_EQUAL(elements[e1].pow(constants[C1]), elements[e1_pow_C1]);
     BOOST_CHECK_EQUAL(elements[e2].squared(), elements[e2_pow_2]);
-    //BOOST_CHECK_EQUAL((elements[e2].squared()).sqrt(), elements[e2_pow_2_sqrt]);
+    // BOOST_CHECK_EQUAL((elements[e2].squared()).sqrt(), elements[e2_pow_2_sqrt]);
 }
 
 template<typename FieldParams, typename TestSet>
@@ -130,11 +127,7 @@ void field_test_init(std::vector<typename fields::detail::element_fp<FieldParams
     using element_type = typename fields::detail::element_fp<FieldParams>;
 
     for (auto &element : test_set.second.get_child("elements_values")) {
-        elements.emplace_back(
-            element_type(
-                typename element_type::modulus_type(element.second.data())
-            )
-        );
+        elements.emplace_back(element_type(typename element_type::modulus_type(element.second.data())));
     }
 
     for (auto &constant : test_set.second.get_child("constants")) {
