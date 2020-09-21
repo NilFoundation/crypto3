@@ -163,7 +163,7 @@ namespace nil {
                     template<typename PowerType>
                     element_fp4 cyclotomic_exp(const PowerType &exponent) const {
                         /*element_fp4  res = this->one();
-                        element_fp4  this_inverse = this->unitary_inverse();
+                        element_fp4  this_inverse = this->unitary_inversed();
 
                         bool found_nonzero = false;
                         std::vector<long> NAF = find_wnaf(1, exponent);
@@ -192,7 +192,7 @@ namespace nil {
 
                 private:
                     /*inline static*/ underlying_type mul_by_non_residue(const underlying_type &A) const {
-                        return element_fp4(non_residue * A.data[1], A.data[0]);
+                        return underlying_type(non_residue * A.data[1], A.data[0]);
                     }
                 };
 

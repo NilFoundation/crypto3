@@ -82,8 +82,7 @@ namespace nil {
                           result = D * C
                         */
 
-                        const gt A =
-                            gt(elt.c0, -elt.c1);
+                        const gt A = elt.unitary_inversed();
                         const gt B = elt.inversed();
                         const gt C = A * B;
                         const gt D = C.Frobenius_map(2);
@@ -95,9 +94,9 @@ namespace nil {
                     gt exp_by_z(const gt &elt) {
 
                         gt result =
-                            elt.cyclotomic_exp(basic_policy::final_exponent_z);
-                        if (basic_policy::final_exponent_is_z_neg) {
-                            result = result.unitary_inverse();
+                            elt.cyclotomic_exp(policy_type::final_exponent_z);
+                        if (policy_type::final_exponent_is_z_neg) {
+                            result = result.unitary_inversed();
                         }
 
                         return result;
@@ -106,7 +105,7 @@ namespace nil {
                     gt final_exponentiation_last_chunk(const gt &elt) {
 
                         const gt A = elt.cyclotomic_squared();    // elt^2
-                        const gt B = A.unitary_inverse();         // elt^(-2)
+                        const gt B = A.unitary_inversed();         // elt^(-2)
                         const gt C = exp_by_z(elt);     // elt^z
                         const gt D = C.cyclotomic_squared();      // elt^(2z)
                         const gt E = B * C;                       // elt^(z-2)
@@ -115,10 +114,10 @@ namespace nil {
                         const gt H = exp_by_z(G);       // elt^(z^4-2z^3)
                         const gt I = H * D;                       // elt^(z^4-2z^3+2z)
                         const gt J = exp_by_z(I);       // elt^(z^5-2z^4+2z^2)
-                        const gt K = E.unitary_inverse();         // elt^(-z+2)
+                        const gt K = E.unitary_inversed();         // elt^(-z+2)
                         const gt L = K * J;      // elt^(z^5-2z^4+2z^2) * elt^(-z+2)
                         const gt M = elt * L;    // elt^(z^5-2z^4+2z^2) * elt^(-z+2) * elt
-                        const gt N = elt.unitary_inverse();    // elt^(-1)
+                        const gt N = elt.unitary_inversed();    // elt^(-1)
                         const gt O = F * elt;                  // elt^(z^2-2z) * elt
                         const gt P = O.Frobenius_map(3);    // (elt^(z^2-2z) * elt)^(q^3)
                         const gt Q = I * N;    // elt^(z^4-2z^3+2z) * elt^(-1)
@@ -161,7 +160,11 @@ namespace nil {
                         const Fq2 B = Y.squared();                    // B = Y1^2
                         const Fq2 C = Z.squared();                    // C = Z1^2
                         const Fq2 D = C + C + C;                      // D = 3 * C
-                        const Fq2 E = twist_coeff_b * D;    // E = twist_b * D
+                        const Fq2 E = current.twist_coeff_b * D;    // E = twist_b * D
+                        // msut be
+                        // const Fq2 E = g2::twist_coeff_b * D;    // E = twist_b * D
+                        // when constexpr will be ready
+
                         const Fq2 F = E + E + E;                      // F = 3 * E
                         const Fq2 G = two_inv * (B + F);              // G = (B+F)/2
                         const Fq2 H =
@@ -174,7 +177,10 @@ namespace nil {
                         current.Y = G.squared() - (E_squared + E_squared + E_squared);    // Y3 = G^2 - 3*E^2
                         current.Z = B * H;                                                // Z3 = B * H
                         c.ell_0 = I;                                                      // ell_0 = xi * I
-                        c.ell_VW = -twist * H;                                  // ell_VW = - H (later: * yP)
+                        c.ell_VW = -current.twist * H;                                  // ell_VW = - H (later: * yP)
+                        // msut be
+                        // c.ell_VW = -g2::twist * H;                                  // ell_VW = - H (later: * yP)
+                        // when constexpr will be ready
                         c.ell_VV = J + J + J;                                             // ell_VV = 3*J (later: * xP)
                     }
 
@@ -196,7 +202,10 @@ namespace nil {
                         current.Z = Z1 * H;                    // Z3 = Z1*H
                         c.ell_0 = E * x2 - D * y2;             // ell_0 = xi * (E * X2 - D * Y2)
                         c.ell_VV = -E;                         // ell_VV = - E (later: * xP)
-                        c.ell_VW = twist * D;        // ell_VW = D (later: * yP    )
+                        c.ell_VW = current.twist * D;        // ell_VW = D (later: * yP    )
+                        // msut be
+                        // c.ell_VW = g2::twist * D;        // ell_VW = D (later: * yP    )
+                        // when constexpr will be ready
                     }
 
                     ate_g1_precomp ate_precompute_g1(const g1 &P) {
@@ -216,7 +225,7 @@ namespace nil {
                         g2 Qcopy(Q);
                         Qcopy.to_affine_coordinates();
 
-                        Fq two_inv = (Fq("2").inversed());    // could add to global params if needed
+                        Fq two_inv = (Fq(0x02).inversed());    // could add to global params if needed
 
                         ate_g2_precomp result;
                         result.QX = Qcopy.X;
@@ -227,14 +236,13 @@ namespace nil {
                         R.Y = Qcopy.Y;
                         R.Z = Fq2::one();
 
-                        const typename basic_policy::number_type &loop_count =
-                            basic_policy::ate_loop_count;
+                        const typename policy_type::number_type &loop_count = policy_type::ate_loop_count;
 
                         bool found_one = false;
                         ate_ell_coeffs c;
 
-                        for (long i = loop_count.max_bits(); i >= 0; --i) {
-                            const bool bit = loop_count.test_bit(i);
+                        for (long i = policy_type::number_type_max_bits; i >= 0; --i) {
+                            const bool bit = boost::multiprecision::bit_test(loop_count, i);
                             if (!found_one) {
                                 /* this skips the MSB itself */
                                 found_one |= bit;
@@ -260,13 +268,12 @@ namespace nil {
                         bool found_one = false;
                         size_t idx = 0;
 
-                        const typename basic_policy::number_type &loop_count =
-                            basic_policy::ate_loop_count;
+                        const typename policy_type::number_type &loop_count = policy_type::ate_loop_count;
 
                         ate_ell_coeffs c;
 
-                        for (long i = loop_count.max_bits(); i >= 0; --i) {
-                            const bool bit = loop_count.test_bit(i);
+                        for (long i = policy_type::number_type_max_bits; i >= 0; --i) {
+                            const bool bit = boost::multiprecision::bit_test(loop_count, i);
                             if (!found_one) {
                                 /* this skips the MSB itself */
                                 found_one |= bit;
@@ -287,7 +294,7 @@ namespace nil {
                             }
                         }
 
-                        if (basic_policy::ate_is_loop_count_neg) {
+                        if (policy_type::ate_is_loop_count_neg) {
                             f = f.inversed();
                         }
 
@@ -302,11 +309,10 @@ namespace nil {
                         bool found_one = false;
                         size_t idx = 0;
 
-                        const typename basic_policy::number_type &loop_count =
-                            basic_policy::ate_loop_count;
+                        const typename policy_type::number_type &loop_count = policy_type::ate_loop_count;
 
-                        for (long i = loop_count.max_bits(); i >= 0; --i) {
-                            const bool bit = loop_count.test_bit(i);
+                        for (long i = policy_type::number_type_max_bits; i >= 0; --i) {
+                            const bool bit = boost::multiprecision::bit_test(loop_count, i);
                             if (!found_one) {
                                 /* this skips the MSB itself */
                                 found_one |= bit;
@@ -336,7 +342,7 @@ namespace nil {
                             }
                         }
 
-                        if (basic_policy::ate_is_loop_count_neg) {
+                        if (policy_type::ate_is_loop_count_neg) {
                             f = f.inversed();
                         }
 

@@ -24,7 +24,7 @@ namespace nil {
 
                 public:
                     /*constexpr static*/ const typename policy_type::non_residue_type non_residue =
-                        typename policy_type::non_residue_type(policy_type::non_residue);
+                        typename policy_type::non_residue_type(policy_type::non_residue[0], policy_type::non_residue[1]);
 
                     using underlying_type = typename policy_type::underlying_type;
 
@@ -32,7 +32,9 @@ namespace nil {
 
                     value_type data;
 
-                    element_fp12_2over3over2(value_type data) : data(data) {};
+                    element_fp12_2over3over2() {
+                        data = value_type({underlying_type::zero(), underlying_type::zero()});
+                    }
 
                     element_fp12_2over3over2(underlying_type in_data0, underlying_type in_data1) {
                         data = value_type({in_data0, in_data1});
@@ -44,11 +46,11 @@ namespace nil {
                     };
 
                     inline static element_fp12_2over3over2 zero() {
-                        return element_fp12_2over3over2({underlying_type::zero(), underlying_type::zero()});
+                        return element_fp12_2over3over2(underlying_type::zero(), underlying_type::zero());
                     }
 
                     inline static element_fp12_2over3over2 one() {
-                        return element_fp12_2over3over2({underlying_type::one(), underlying_type::zero()});
+                        return element_fp12_2over3over2(underlying_type::one(), underlying_type::zero());
                     }
 
                     bool operator==(const element_fp12_2over3over2 &B) const {
@@ -67,15 +69,15 @@ namespace nil {
                     }
 
                     element_fp12_2over3over2 operator+(const element_fp12_2over3over2 &B) const {
-                        return element_fp12_2over3over2({data[0] + B.data[0], data[1] + B.data[1]});
+                        return element_fp12_2over3over2(data[0] + B.data[0], data[1] + B.data[1]);
                     }
 
                     element_fp12_2over3over2 doubled() const {
-                        return element_fp12_2over3over2({data[0].doubled(), data[1].doubled()});
+                        return element_fp12_2over3over2(data[0].doubled(), data[1].doubled());
                     }
 
                     element_fp12_2over3over2 operator-(const element_fp12_2over3over2 &B) const {
-                        return element_fp12_2over3over2({data[0] - B.data[0], data[1] - B.data[1]});
+                        return element_fp12_2over3over2(data[0] - B.data[0], data[1] - B.data[1]);
                     }
 
                     element_fp12_2over3over2 &operator-=(const element_fp12_2over3over2 &B) {
@@ -99,8 +101,8 @@ namespace nil {
                     element_fp12_2over3over2 operator*(const element_fp12_2over3over2 &B) const {
                         const underlying_type A0B0 = data[0] * B.data[0], A1B1 = data[1] * B.data[1];
 
-                        return element_fp12_2over3over2({A0B0 + mul_by_non_residue(A1B1),
-                                                         (data[0] + data[1]) * (B.data[0] + B.data[1]) - A0B0 - A1B1});
+                        return element_fp12_2over3over2(A0B0 + mul_by_non_residue(A1B1),
+                                                         (data[0] + data[1]) * (B.data[0] + B.data[1]) - A0B0 - A1B1);
                     }
 
                     element_fp12_2over3over2 sqrt() const {
@@ -132,26 +134,26 @@ namespace nil {
                         const underlying_type c0 = A0 * t3;
                         const underlying_type c1 = -(A1 * t3);
 
-                        return element_fp12_2over3over2({c0, c1});
+                        return element_fp12_2over3over2(c0, c1);
                     }
 
                     template<typename PowerType>
                     element_fp12_2over3over2 Frobenius_map(const PowerType &pwr) const {
-                        //return element_fp12_2over3over2({data[0].Frobenius_map(pwr),
+                        //return element_fp12_2over3over2(data[0].Frobenius_map(pwr),
                         //                                 policy_type::Frobenius_coeffs_c1[pwr % 12] * data[1].Frobenius_map(pwr)});
-                        return element_fp12_2over3over2({data[0].Frobenius_map(pwr),
-                                                         typename policy_type::non_residue_type(policy_type::Frobenius_coeffs_c1[(pwr % 12) * 2], policy_type::Frobenius_coeffs_c1[(pwr % 12) * 2 + 1]) * data[1].Frobenius_map(pwr)});
+                        return element_fp12_2over3over2(data[0].Frobenius_map(pwr),
+                                                         typename policy_type::non_residue_type(policy_type::Frobenius_coeffs_c1[(pwr % 12) * 2], policy_type::Frobenius_coeffs_c1[(pwr % 12) * 2 + 1]) * data[1].Frobenius_map(pwr));
                     }
 
-                    element_fp12_2over3over2 unitary_inverse() const {
-                        return element_fp12_2over3over2({data[0], -data[1]});
+                    element_fp12_2over3over2 unitary_inversed() const {
+                        return element_fp12_2over3over2(data[0], -data[1]);
                     }
 
                     element_fp12_2over3over2 cyclotomic_squared() const {
-                        /* OLD: naive implementation
-                           return (*this).squared();
-                        */
-                        typename underlying_type::underlying_type z0 = data[0].data[0];
+                        // naive implementation
+                        return this->squared();
+                        
+                        /*typename underlying_type::underlying_type z0 = data[0].data[0];
                         typename underlying_type::underlying_type z4 = data[0].data[1];
                         typename underlying_type::underlying_type z3 = data[0].data[2];
 
@@ -210,7 +212,7 @@ namespace nil {
                         z5 = z5 + z5;
                         z5 = z5 + t3;
 
-                        return element_fp12_2over3over2(my_Fp6(z0,z4,z3),my_Fp6(z2,z1,z5));
+                        return element_fp12_2over3over2(my_Fp6(z0,z4,z3),my_Fp6(z2,z1,z5));*/
                     }
 
                     template<typename PowerType>
@@ -233,6 +235,28 @@ namespace nil {
 
                         return res;*/
                         return *this;
+                    }
+
+                    element_fp12_2over3over2  mul_by_045(const typename underlying_type::underlying_type &ell_0,
+                                                         const typename underlying_type::underlying_type &ell_VW,
+                                                         const typename underlying_type::underlying_type &ell_VV) const {
+                        
+                        element_fp12_2over3over2  a (underlying_type (ell_VW, underlying_type::underlying_type::zero(), 
+                                                                      underlying_type::underlying_type::zero()),
+                                                     underlying_type (underlying_type::underlying_type::zero(), ell_0, ell_VV));
+
+                        return (*this) * a;
+                        
+                    }
+
+                    element_fp12_2over3over2  mul_by_024(const typename underlying_type::underlying_type &ell_0,
+                                                         const typename underlying_type::underlying_type &ell_VW,
+                                                         const typename underlying_type::underlying_type &ell_VV) const {
+                           element_fp12_2over3over2  a (underlying_type(ell_0, underlying_type::underlying_type::zero(), ell_VV),
+                                                        underlying_type(underlying_type::underlying_type::zero(), 
+                                                                        ell_VW, underlying_type::underlying_type::zero()));
+
+                           return (*this) * a;
                     }
 
                     /*element_fp12_2over3over2 sqru() {
@@ -270,11 +294,52 @@ namespace nil {
                         z3 = (t2 - z3).doubled() + t2;
                     }*/
 
-                private:
                     /*inline static*/ underlying_type mul_by_non_residue(const underlying_type &A) const {
-                        return element_fp12_2over3over2({non_residue * A.data[2], A.data[1], A.data[0]});
+                        return underlying_type(non_residue * A.data[2], A.data[1], A.data[0]);
                     }
                 };
+
+                template<typename FieldParams>
+                element_fp12_2over3over2<FieldParams> operator*(const typename FieldParams::underlying_type::underlying_type::underlying_type &lhs,
+                                                   const element_fp12_2over3over2<FieldParams> &rhs) {
+
+                    return element_fp12_2over3over2<FieldParams>(lhs * rhs.data[0], lhs * rhs.data[1]);
+                }
+
+                template<typename FieldParams>
+                element_fp12_2over3over2<FieldParams> operator*(const element_fp12_2over3over2<FieldParams> &lhs,
+                                                   const typename FieldParams::underlying_type::underlying_type::underlying_type &rhs) {
+
+                    return rhs * lhs;
+                }
+
+                template<typename FieldParams>
+                element_fp12_2over3over2<FieldParams> operator*(const typename FieldParams::underlying_type::underlying_type &lhs,
+                                                   const element_fp12_2over3over2<FieldParams> &rhs) {
+
+                    return element_fp12_2over3over2<FieldParams>(lhs * rhs.data[0], lhs * rhs.data[1]);
+                }
+
+                template<typename FieldParams>
+                element_fp12_2over3over2<FieldParams> operator*(const element_fp12_2over3over2<FieldParams> &lhs,
+                                                   const typename FieldParams::underlying_type::underlying_type &rhs) {
+
+                    return rhs * lhs;
+                }
+
+                template<typename FieldParams>
+                element_fp12_2over3over2<FieldParams> operator*(const typename FieldParams::underlying_type &lhs,
+                                                   const element_fp12_2over3over2<FieldParams> &rhs) {
+
+                    return element_fp12_2over3over2<FieldParams>(lhs * rhs.data[0], lhs * rhs.data[1]);
+                }
+
+                template<typename FieldParams>
+                element_fp12_2over3over2<FieldParams> operator*(const element_fp12_2over3over2<FieldParams> &lhs,
+                                                   const typename FieldParams::underlying_type &rhs) {
+
+                    return rhs * lhs;
+                }
 
                 /*
                     (a + bw) -> (a - bw) gammar

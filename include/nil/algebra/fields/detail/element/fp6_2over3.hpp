@@ -32,7 +32,9 @@ namespace nil {
 
                     value_type data;
 
-                    element_fp6_2over3(value_type data) : data(data) {};
+                    element_fp6_2over3() {
+                        data = value_type({underlying_type::zero(), underlying_type::zero()});
+                    }
 
                     element_fp6_2over3(underlying_type in_data0, underlying_type in_data1) {
                         data = value_type({in_data0, in_data1});
@@ -142,7 +144,7 @@ namespace nil {
                                                    typename policy_type::non_residue_type(policy_type::Frobenius_coeffs_c1[pwr % 6]) * data[1].Frobenius_map(pwr));
                     }
 
-                    element_fp6_2over3 unitary_inverse() const {
+                    element_fp6_2over3 unitary_inversed() const {
                         return element_fp6_2over3(data[0], -data[1]);
                     }
 
@@ -194,14 +196,17 @@ namespace nil {
                         // fin = Fp6e([e0,e1])
                         // return fin
 
-                        return element_fp6_2over3(underlying_type({A_a, C_a, B_b}),
-                                                            underlying_type({B_a, A_b, C_b}));
+                        return element_fp6_2over3(underlying_type(A_a, C_a, B_b),
+                                                            underlying_type(B_a, A_b, C_b));
                     }*/
 
                     template<typename PowerType>
                     element_fp6_2over3 cyclotomic_exp(const PowerType &exponent) const {
+                        // naive implementation
+                        return this->squared();
+
                         /*element_fp6_2over3 res = one();
-                        element_fp6_2over3 this_inverse = this->unitary_inverse();
+                        element_fp6_2over3 this_inverse = this->unitary_inversed();
 
                         bool found_nonzero = false;
                         std::vector<long> NAF = find_wnaf(1, exponent);
@@ -224,8 +229,6 @@ namespace nil {
                         }
 
                         return res;*/
-
-                        return *this;
                     }
 
                     /*inline static*/ underlying_type mul_by_non_residue(const underlying_type &A) const {
@@ -233,6 +236,20 @@ namespace nil {
                     }
                     
                 };
+
+                template<typename FieldParams>
+                element_fp6_2over3<FieldParams> operator*(const typename FieldParams::underlying_type::underlying_type &lhs,
+                                                   const element_fp6_2over3<FieldParams> &rhs) {
+
+                    return element_fp6_2over3<FieldParams>(lhs * rhs.data[0], lhs * rhs.data[1]);
+                }
+
+                template<typename FieldParams>
+                element_fp6_2over3<FieldParams> operator*(const element_fp6_2over3<FieldParams> &lhs,
+                                                   const typename FieldParams::underlying_type::underlying_type &rhs) {
+
+                    return rhs * lhs;
+                }
 
             }    // namespace detail
         }        // namespace fields

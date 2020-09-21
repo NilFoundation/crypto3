@@ -38,6 +38,13 @@ namespace nil {
                     using Fq3 = typename g2::underlying_field_type_value;
                     using gt = policy_type::gt_type;
 
+                    constexpr static const std::size_t base_field_bits = policy_type::base_field_bits;
+                    constexpr static const number_type base_field_modulus = policy_type::base_field_modulus;
+                    constexpr static const std::size_t scalar_field_bits = policy_type::scalar_field_bits;
+                    constexpr static const number_type scalar_field_modulus = policy_type::scalar_field_modulus;
+
+                    constexpr static const std::size_t number_type_max_bits = policy_type::base_field_bits;
+                    
                     constexpr static const number_type ate_loop_count =
                         number_type(0x1EEF5546609756BEC2A33F0DC9A1B671660000_cppui149);
                     constexpr static const bool ate_is_loop_count_neg = true;

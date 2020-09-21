@@ -37,6 +37,15 @@ namespace nil {
                     using Fq2 = typename g2::underlying_field_type_value;
                     using gt = policy_type::gt_type;
 
+                    constexpr static const std::size_t base_field_bits = policy_type::base_field_bits;
+                    constexpr static const number_type base_field_modulus = policy_type::base_field_modulus;
+                    constexpr static const std::size_t scalar_field_bits = policy_type::scalar_field_bits;
+                    constexpr static const number_type scalar_field_modulus = policy_type::scalar_field_modulus;
+
+                    constexpr static const std::size_t number_type_max_bits = policy_type::base_field_bits;
+
+                    constexpr static const number_type coef_b = policy_type::b;
+
                     constexpr static const number_type ate_loop_count =
                         number_type(0xD201000000010000_cppui64);
                     constexpr static const bool ate_is_loop_count_neg = true;
@@ -61,6 +70,13 @@ namespace nil {
                     using Fq = typename g1::underlying_field_type_value;
                     using Fq2 = typename g2::underlying_field_type_value;
                     using gt = policy_type::gt_type;
+
+                    constexpr static const std::size_t base_field_bits = policy_type::base_field_bits;
+                    constexpr static const number_type base_field_modulus = policy_type::base_field_modulus;
+                    constexpr static const std::size_t scalar_field_bits = policy_type::scalar_field_bits;
+                    constexpr static const number_type scalar_field_modulus = policy_type::scalar_field_modulus;
+
+                    constexpr static const std::size_t number_type_max_bits = policy_type::base_field_bits;
 
                     constexpr static const number_type ate_loop_count =
                         number_type(0x8508C00000000001_cppui64);

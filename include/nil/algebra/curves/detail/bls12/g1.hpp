@@ -286,7 +286,7 @@ namespace nil {
                     }
 
                 private:
-                    /*constexpr static */ const g1_field_type_value a = g1_field_type_value(policy_type::a);
+                    
                     /*constexpr static */ const g1_field_type_value b = g1_field_type_value(policy_type::b);
 
                     /*constexpr static const underlying_field_type_value zero_fill = {
