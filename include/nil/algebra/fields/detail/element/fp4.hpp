@@ -194,8 +194,7 @@ namespace nil {
                         return underlying_type(non_residue * A.data[1], A.data[0]);
                     }
 
-                    element_fp4 mul_by_023(const element_fp4 &other) const
-                    {
+                    element_fp4 mul_by_023(const element_fp4 &other) const {
                         /* Devegili OhEig Scott Dahab --- Multiplication and Squaring on Pairing-Friendly Fields.pdf; Section 3 (Karatsuba) */
                         assert(other.data[0].data[1].is_zero());
 

@@ -108,6 +108,9 @@ namespace nil {
                         }
                     };
 
+                    typedef ate_g1_precomp g1_precomp;
+                    typedef ate_g2_precomp g2_precomp;
+
                     /* final exponentiations */
                     gt final_exponentiation_last_chunk(const gt &elt, const gt &elt_inv) {
                         const gt elt_q = elt.Frobenius_map(1);
@@ -162,7 +165,10 @@ namespace nil {
                         affine_ate_g1_precomputation result;
                         result.PX = Pcopy.X;
                         result.PY = Pcopy.Y;
-                        result.PY_twist_squared = Pcopy.Y * twist.squared();
+                        result.PY_twist_squared = Pcopy.Y * g2::one().twist.squared();
+                        // must be
+                        // result.PY_twist_squared = Pcopy.Y * g2::twist.squared();
+                        // when constexpr ready
 
                         return result;
                     }
@@ -179,8 +185,8 @@ namespace nil {
                         Fq3 RX = Qcopy.X;
                         Fq3 RY = Qcopy.Y;
 
-                        const typename basic_policy::number_type &loop_count =
-                            basic_policy::ate_loop_count;
+                        const typename policy_type::number_type &loop_count =
+                            policy_type::ate_loop_count;
                         bool found_nonzero = false;
 
                         std::vector<long> NAF = find_wnaf(1, loop_count);
@@ -196,8 +202,15 @@ namespace nil {
                             c.old_RY = RY;
                             Fq3 old_RX_2 = c.old_RX.squared();
                             c.gamma =
-                                (old_RX_2 + old_RX_2 + old_RX_2 + twist_coeff_a) * (c.old_RY + c.old_RY).inversed();
-                            c.gamma_twist = c.gamma * twist;
+                                (old_RX_2 + old_RX_2 + old_RX_2 + g2::one().twist_coeff_a) * (c.old_RY + c.old_RY).inversed();
+                            // must be
+                            // (old_RX_2 + old_RX_2 + old_RX_2 + g2::twist_coeff_a) * (c.old_RY + c.old_RY).inversed();
+                            // when constexpr ready
+                            c.gamma_twist = c.gamma * g2::one().twist;
+                            // must be
+                            // c.gamma_twist = c.gamma * g2::twist;
+                            // when constexpr ready
+
                             c.gamma_X = c.gamma * c.old_RX;
                             result.coeffs.push_back(c);
 
@@ -213,7 +226,11 @@ namespace nil {
                                 } else {
                                     c.gamma = (c.old_RY + result.QY) * (c.old_RX - result.QX).inversed();
                                 }
-                                c.gamma_twist = c.gamma * twist;
+                                c.gamma_twist = c.gamma * g2::one().twist;
+                                // must be
+                                //c.gamma_twist = c.gamma * g2::twist;
+                                // when constexpr ready
+
                                 c.gamma_X = c.gamma * result.QX;
                                 result.coeffs.push_back(c);
 
@@ -230,8 +247,8 @@ namespace nil {
 
                         gt f = gt::one();
 
-                        const typename basic_policy::number_type &loop_count =
-                            basic_policy::ate_loop_count;
+                        const typename policy_type::number_type &loop_count =
+                            policy_type::ate_loop_count;
                         bool found_nonzero = false;
                         size_t idx = 0;
 
@@ -289,12 +306,15 @@ namespace nil {
                         const Fq3 C = Y.squared();                  // C = Y1^2
                         const Fq3 D = C.squared();                  // D = C^2
                         const Fq3 E = (X + C).squared() - B - D;    // E = (X1+C)^2-B-D
-                        const Fq3 F =
-                            (B + B + B) + twist_coeff_a * A;                      // F = 3*B +  a  *A
+                        const Fq3 F = (B + B + B) + g2::one().twist_coeff_a * A;              // F = 3*B +  a  *A
+                        // must be
+                        // const Fq3 F = (B + B + B) + g2::twist_coeff_a * A;              // F = 3*B +  a  *A
+                        // when constexpr ready
+
                         const Fq3 G = F.squared();    // G = F^2
 
                         current.X = -(E + E + E + E) + G;                           // X3 = -4*E+G
-                        current.Y = -Fq("8") * D + F * (E + E - current.X);    // Y3 = -8*D+F*(2*E-X3)
+                        current.Y = -Fq(0x08) * D + F * (E + E - current.X);    // Y3 = -8*D+F*(2*E-X3)
                         current.Z = (Y + Z).squared() - C - Z.squared();            // Z3 = (Y1+Z1)^2-C-Z1^2
                         current.T = current.Z.squared();                            // T3 = Z3^2
 
@@ -340,8 +360,14 @@ namespace nil {
                         ate_g1_precomp result;
                         result.PX = Pcopy.X;
                         result.PY = Pcopy.Y;
-                        result.PX_twist = Pcopy.X * twist;
-                        result.PY_twist = Pcopy.Y * twist;
+                        result.PX_twist = Pcopy.X * g2::one().twist;
+                        // must be
+                        // result.PX_twist = Pcopy.X * g2::twist;
+                        // when constexpr ready
+                        result.PY_twist = Pcopy.Y * g2::one().twist;
+                        // must be
+                        // result.PY_twist = Pcopy.Y * g2::twist;
+                        // when constexpr ready
 
                         return result;
                     }
@@ -351,8 +377,10 @@ namespace nil {
                         g2 Qcopy(Q);
                         Qcopy.to_affine_coordinates();
 
-                        Fq3 twist_inv =
-                            twist.inversed();    // could add to global params if needed
+                        Fq3 twist_inv = g2::one().twist.inversed();    // could add to global params if needed
+                        // must be
+                        // Fq3 twist_inv = g2::twist.inversed();    // could add to global params if needed
+                        // when constexpr ready
 
                         ate_g2_precomp result;
                         result.QX = Qcopy.X;
@@ -367,8 +395,8 @@ namespace nil {
                         R.Z = Fq3::one();
                         R.T = Fq3::one();
 
-                        const typename basic_policy::number_type &loop_count =
-                            basic_policy::ate_loop_count;
+                        const typename policy_type::number_type &loop_count =
+                            policy_type::ate_loop_count;
                         bool found_one = false;
                         for (long i = policy_type::number_type_max_bits - 1; i >= 0; --i) {
                             const bool bit = boost::multiprecision::bit_test(loop_count, i);
@@ -417,8 +445,8 @@ namespace nil {
                         size_t dbl_idx = 0;
                         size_t add_idx = 0;
 
-                        const typename basic_policy::number_type &loop_count =
-                            basic_policy::ate_loop_count;
+                        const typename policy_type::number_type &loop_count =
+                            policy_type::ate_loop_count;
 
                         for (long i = policy_type::number_type_max_bits - 1; i >= 0; --i) {
                             const bool bit = boost::multiprecision::bit_test(loop_count, i);
@@ -471,8 +499,8 @@ namespace nil {
                         size_t dbl_idx = 0;
                         size_t add_idx = 0;
 
-                        const typename basic_policy::number_type &loop_count =
-                            basic_policy::ate_loop_count;
+                        const typename policy_type::number_type &loop_count =
+                            policy_type::ate_loop_count;
 
                         for (long i = policy_type::number_type_max_bits - 1; i >= 0; --i) {
                             const bool bit = boost::multiprecision::bit_test(loop_count, i);

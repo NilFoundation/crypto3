@@ -15,7 +15,7 @@
 #include <nil/algebra/curves/detail/mnt6/g1.hpp>
 #include <nil/algebra/curves/detail/mnt6/g2.hpp>
 
-//#include <nil/algebra/pairing/mnt6.hpp>
+#include <nil/algebra/pairing/mnt6.hpp>
 
 namespace nil {
     namespace algebra {
@@ -42,7 +42,7 @@ namespace nil {
                 typedef typename detail::mnt6_g1<base_field_bits, CHAR_BIT> g1_type;
                 typedef typename detail::mnt6_g2<base_field_bits, CHAR_BIT> g2_type;
 
-                //typedef typename pairing::pairing_policy<mnt6<ModulusBits, GeneratorBits>> pairing_policy;
+                typedef typename pairing::pairing_policy<mnt6<ModulusBits, GeneratorBits>> pairing_policy;
 
                 typedef typename policy_type::gt_type gt_type;
 

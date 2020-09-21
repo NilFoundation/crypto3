@@ -256,7 +256,6 @@ namespace nil {
                         return (this->is_zero() || this->p[2] == underlying_field_type_value::one());
                     }
 
-                private:
                     underlying_field_type_value mul_by_a(const underlying_field_type_value &elt) const {
                         return underlying_field_type_value(twist_mul_by_a_c0 * elt.data[1],
                                                             twist_mul_by_a_c1 * elt.data[2],
@@ -296,6 +295,8 @@ namespace nil {
                     /*constexpr static */ const g2_field_type_value twist_coeff_a = a;
                     /*constexpr static */ const g2_field_type_value twist_coeff_b = b;
 
+                private:
+                    
                     /*constexpr static */ const g1_field_type_value twist_mul_by_a_c0 = g1_a * twist.non_residue;
                     /*constexpr static */ const g1_field_type_value twist_mul_by_a_c1 = g1_a * twist.non_residue;
                     /*constexpr static */ const g1_field_type_value twist_mul_by_a_c2 = g1_a;

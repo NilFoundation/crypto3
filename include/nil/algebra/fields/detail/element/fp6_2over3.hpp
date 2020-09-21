@@ -150,16 +150,16 @@ namespace nil {
 
                     /*element_fp6_2over3 cyclotomic_squared() const {
                         
-                        //my_Fp a_a = c0.c0; // a = Fp2([c0[0],c1[1]])
-                        //my_Fp a_b = c1.c1;
+                        //my_Fp a_a = c0.data[0]; // a = Fp2([c0[0],c1[1]])
+                        //my_Fp a_b = c1.data[1];
 
-                        element_fp2 b = element_fp2(c1.c0, c0.c2);
-                        //my_Fp b_a = c1.c0; // b = Fp2([c1[0],c0[2]])
-                        //my_Fp b_b = c0.c2;
+                        element_fp2 b = element_fp2(c1.data[0], c0.data[2]);
+                        //my_Fp b_a = c1.data[0]; // b = Fp2([c1[0],c0[2]])
+                        //my_Fp b_b = c0.data[2];
 
-                        element_fp2 c = element_fp2(c0.c1, c1.c2);
-                        //my_Fp c_a = c0.c1; // c = Fp2([c0[1],c1[2]])
-                        //my_Fp c_b = c1.c2;
+                        element_fp2 c = element_fp2(c0.data[1], c1.data[2]);
+                        //my_Fp c_a = c0.data[1]; // c = Fp2([c0[1],c1[2]])
+                        //my_Fp c_b = c1.data[2];
 
                         element_fp2 asq = a.squared();
                         element_fp2 bsq = b.squared();
@@ -167,29 +167,29 @@ namespace nil {
 
                         // A = vector(3*a^2 - 2*Fp2([vector(a)[0],-vector(a)[1]]))
                         //my_Fp A_a = my_Fp(3l) * asq_a - my_Fp(2l) * a_a;
-                        my_Fp A_a = asq.c0 - a.c0;
-                        A_a = A_a + A_a + asq.c0;
+                        my_Fp A_a = asq.data[0] - a.data[0];
+                        A_a = A_a + A_a + asq.data[0];
                         //my_Fp A_b = my_Fp(3l) * asq_b + my_Fp(2l) * a_b;
-                        my_Fp A_b = asq.c1 + a.c1;
-                        A_b = A_b + A_b + asq.c1;
+                        my_Fp A_b = asq.data[1] + a.data[1];
+                        A_b = A_b + A_b + asq.data[1];
 
                         // B = vector(3*Fp2([non_residue*c2[1],c2[0]]) + 2*Fp2([vector(b)[0],-vector(b)[1]]))
-                        //my_Fp B_a = my_Fp(3l) * my_Fp3::non_residue * csq_b + my_Fp(2l) * b_a;
-                        my_Fp B_tmp = my_Fp3::non_residue * csq.c1;
-                        my_Fp B_a = B_tmp + b.c0;
+                        //my_Fp B_a = my_Fp(3l) * underlying_type::non_residue * csq_b + my_Fp(2l) * b_a;
+                        my_Fp B_tmp = underlying_type::non_residue * csq.data[1];
+                        my_Fp B_a = B_tmp + b.data[0];
                         B_a = B_a + B_a + B_tmp;
 
                         //my_Fp B_b = my_Fp(3l) * csq_a - my_Fp(2l) * b_b;
-                        my_Fp B_b = csq.c0 - b.c1;
-                        B_b = B_b + B_b + csq.c0;
+                        my_Fp B_b = csq.data[0] - b.data[1];
+                        B_b = B_b + B_b + csq.data[0];
 
                         // C = vector(3*b^2 - 2*Fp2([vector(c)[0],-vector(c)[1]]))
                         //my_Fp C_a = my_Fp(3l) * bsq_a - my_Fp(2l) * c_a;
-                        my_Fp C_a = bsq.c0 - c.c0;
-                        C_a = C_a + C_a + bsq.c0;
+                        my_Fp C_a = bsq.data[0] - c.data[0];
+                        C_a = C_a + C_a + bsq.data[0];
                         // my_Fp C_b = my_Fp(3l) * bsq_b + my_Fp(2l) * c_b;
-                        my_Fp C_b = bsq.c1 + c.c1;
-                        C_b = C_b + C_b + bsq.c1;
+                        my_Fp C_b = bsq.data[1] + c.data[1];
+                        C_b = C_b + C_b + bsq.data[1];
 
                         // e0 = Fp3([A[0],C[0],B[1]])
                         // e1 = Fp3([B[0],A[1],C[1]])
@@ -233,6 +233,18 @@ namespace nil {
 
                     /*inline static*/ underlying_type mul_by_non_residue(const underlying_type &A) const {
                         return underlying_type(non_residue * A.data[2], A.data[1], A.data[0]);
+                    }
+
+                    element_fp6_2over3 mul_by_2345(const element_fp6_2over3 &other) const {
+                        /* Devegili OhEig Scott Dahab --- Multiplication and Squaring on Pairing-Friendly Fields.pdf; Section 3 (Karatsuba) */
+
+                        const underlying_type &B = other.data[1], &A = other.data[0],
+                                     &b = this->data[1], &a = this->data[0];
+                        const underlying_type aA = underlying_type(a.data[1] * A.data[2] * non_residue, a.data[2] * A.data[2] * non_residue, a.data[0] * A.data[2]);
+                        const underlying_type bB = b*B;
+                        const underlying_type beta_bB = element_fp6_2over3::mul_by_non_residue(bB);
+
+                        return element_fp6_2over3(aA + beta_bB, (a+b)*(A+B) - aA  - bB);
                     }
                     
                 };
