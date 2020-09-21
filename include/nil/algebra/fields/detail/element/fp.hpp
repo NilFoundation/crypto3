@@ -20,8 +20,7 @@ namespace nil {
             namespace detail {
 
                 template<typename FieldParams>
-                struct element_fp {
-                private:
+                class element_fp {
                     typedef FieldParams policy_type;
 
                 public:

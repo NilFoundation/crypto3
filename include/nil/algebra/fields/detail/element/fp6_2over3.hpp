@@ -18,11 +18,11 @@ namespace nil {
             namespace detail {
 
                 template<typename FieldParams>
-                struct element_fp6_2over3 {
-                private:
+                class element_fp6_2over3 {
                     typedef FieldParams policy_type;
 
                 public:
+
                     /*constexpr static*/ const typename policy_type::non_residue_type non_residue =
                         typename policy_type::non_residue_type(policy_type::non_residue);
 
