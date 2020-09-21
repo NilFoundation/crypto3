@@ -17,26 +17,34 @@
 
 namespace nil {
     namespace algebra {
+        namespace curves {
+            template<std::size_t ModulusBits, std::size_t GeneratorBits>
+            struct edwards;
+        }    // namespace curves
         namespace pairing {
 
-            template<std::size_t ModulusBits = 183, std::size_t GeneratorBits = CHAR_BIT>
-            struct pairing_policy<edwards<ModulusBits, GeneratorBits>> {
+            using namespace nil::algebra;
 
-                using g1_precomp = detail::edwards_g1_precomp<ModulusBits, GeneratorBits>;
-                using g2_precomp = detail::edwards_g2_precomp<ModulusBits, GeneratorBits>;
+            template<std::size_t ModulusBits, std::size_t GeneratorBits>
+            class pairing_policy<curves::edwards<ModulusBits, GeneratorBits>> {
+                using policy_type = detail::edwards_pairing_functions<ModulusBits, GeneratorBits>;
+            public:
 
-                using precompute_g1 = detail::edwards_precompute_g1<ModulusBits, GeneratorBits>;
-                using precompute_g2 = detail::edwards_precompute_g2<ModulusBits, GeneratorBits>;
+                using g1_precomp = typename policy_type::g1_precomp;
+                using g2_precomp = typename policy_type::g2_precomp;
 
-                using g1_conic_coefficients = detail::edwards_Fq_conic_coefficients<ModulusBits, GeneratorBits>;
-                using g2_conic_coefficients = detail::edwards_Fq3_conic_coefficients<ModulusBits, GeneratorBits>;
+                using precompute_g1 = typename policy_type::precompute_g1;
+                using precompute_g2 = typename policy_type::precompute_g2;
 
-                using reduced_pairing = detail::edwards_reduced_pairing<ModulusBits, GeneratorBits>;
-                using pairing = detail::edwards_pairing<ModulusBits, GeneratorBits>;
+                using g1_conic_coefficients = typename policy_type::Fq_conic_coefficients;
+                using g2_conic_coefficients = typename policy_type::Fq3_conic_coefficients;
 
-                using miller_loop = detail::edwards_miller_loop<ModulusBits, GeneratorBits>;
-                using double_miller_loop = detail::edwards_double_miller_loop<ModulusBits, GeneratorBits>;
-                using final_exponentiation = detail::edwards_final_exponentiation<ModulusBits, GeneratorBits>;
+                using reduced_pairing = typename policy_type::reduced_pairing;
+                using pairing = typename policy_type::pairing;
+
+                using miller_loop = typename policy_type::miller_loop;
+                using double_miller_loop = typename policy_type::double_miller_loop;
+                using final_exponentiation = typename policy_type::final_exponentiation;
             };
         }    // namespace pairing
     }        // namespace algebra

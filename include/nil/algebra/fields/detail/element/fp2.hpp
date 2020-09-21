@@ -10,7 +10,6 @@
 #ifndef ALGEBRA_FIELDS_ELEMENT_FP2_HPP
 #define ALGEBRA_FIELDS_ELEMENT_FP2_HPP
 
-#include <nil/algebra/fields/detail/element/fp.hpp>
 #include <nil/algebra/fields/detail/exponentiation.hpp>
 
 namespace nil {
@@ -28,25 +27,30 @@ namespace nil {
                     constexpr static const modulus_type modulus = policy_type::modulus;
 
                 public:
-                    using underlying_type = typename policy_type::underlying_type;
 
-                    const typename policy_type::non_residue_type non_residue =
+                    /*constexpr static*/ const typename policy_type::non_residue_type non_residue =
                         typename policy_type::non_residue_type(policy_type::non_residue);
+
+                    using underlying_type = typename policy_type::underlying_type;
 
                     using value_type = std::array<underlying_type, 2>;
 
                     value_type data;
 
                     element_fp2() {
-                        data = {underlying_type::zero(), underlying_type::zero()};
+                        data = value_type({underlying_type::zero(), underlying_type::zero()});
                     }
 
-                    element_fp2(value_type in_data) {
-                        data = value_type(in_data);
+                    element_fp2(int in_data0, int in_data1) {
+                        data = value_type({underlying_type(in_data0), underlying_type(in_data1)});
                     }
 
                     element_fp2(modulus_type in_data0, modulus_type in_data1) {
                         data = value_type({underlying_type(in_data0), underlying_type(in_data1)});
+                    }
+
+                    element_fp2(underlying_type in_data0, underlying_type in_data1) {
+                        data = value_type({in_data0, in_data1});
                     }
 
                     element_fp2(const element_fp2 &B) {
@@ -55,11 +59,11 @@ namespace nil {
                     };
 
                     inline static element_fp2 zero() {
-                        return element_fp2({underlying_type::zero(), underlying_type::zero()});
+                        return element_fp2(underlying_type::zero(), underlying_type::zero());
                     }
 
                     inline static element_fp2 one() {
-                        return element_fp2({underlying_type::one(), underlying_type::zero()});
+                        return element_fp2(underlying_type::one(), underlying_type::zero());
                     }
 
                     bool is_zero() const {
@@ -86,11 +90,11 @@ namespace nil {
                     }
 
                     element_fp2 operator+(const element_fp2 &B) const {
-                        return element_fp2({data[0] + B.data[0], data[1] + B.data[1]});
+                        return element_fp2(data[0] + B.data[0], data[1] + B.data[1]);
                     }
 
                     element_fp2 operator-(const element_fp2 &B) const {
-                        return element_fp2({data[0] - B.data[0], data[1] - B.data[1]});
+                        return element_fp2(data[0] - B.data[0], data[1] - B.data[1]);
                     }
 
                     element_fp2 &operator-=(const element_fp2 &B) {
@@ -126,8 +130,8 @@ namespace nil {
                         (a + bu)(9 + u) = (9a - b) + (a + 9b)u
                     */
                     element_fp2 mul_xi() {
-                        return element_fp2({data[0].doubled().doubled().doubled() + data[0] - data[1],
-                                            data[1].doubled().doubled().doubled() + data[1] + data[0]});
+                        return element_fp2(data[0].doubled().doubled().doubled() + data[0] - data[1],
+                                            data[1].doubled().doubled().doubled() + data[1] + data[0]);
                     }
 
                     /*
@@ -137,12 +141,12 @@ namespace nil {
                     1 * Fp neg
                     */
                     element_fp2 mul_x() {
-                        return element_fp2({-data[1], data[0]});
+                        return element_fp2(-data[1], data[0]);
                     }
 
                     // z = x * b
                     element_fp2 mul_Fp_0(const underlying_type &b) {
-                        return element_fp2({data[0] * b, data[1] * b});
+                        return element_fp2(data[0] * b, data[1] * b);
                     }
 
                     /*
@@ -153,23 +157,23 @@ namespace nil {
                         1 * Fp neg
                     */
                     element_fp2 mul_Fp_1(const underlying_type &y_b) {
-                        return element_fp2({-(data[1] * y_b), data[0] * y_b});
+                        return element_fp2(-(data[1] * y_b), data[0] * y_b);
                     }
 
                     element_fp2 _2z_add_3x() {
-                        return element_fp2({data[0]._2z_add_3x(), data[1]._2z_add_3x()});
+                        return element_fp2(data[0]._2z_add_3x(), data[1]._2z_add_3x());
                     }
 
                     element_fp2 divBy2() const {
-                        return element_fp2({divBy2(data[0]), divBy2(data[1])});
+                        return element_fp2(divBy2(data[0]), divBy2(data[1]));
                     }
 
                     element_fp2 divBy4() const {
-                        return element_fp2({divBy4(data[0]), divBy4(data[1])});
+                        return element_fp2(divBy4(data[0]), divBy4(data[1]));
                     }
 
                     element_fp2 doubled() const {
-                        return element_fp2({data[0].doubled(), data[1].doubled()});
+                        return element_fp2(data[0].doubled(), data[1].doubled());
                     }
 
                     element_fp2 sqrt() const {
@@ -233,14 +237,20 @@ namespace nil {
                         const underlying_type c0 = A0 * t3;
                         const underlying_type c1 = -(A1 * t3);
 
-                        return element_fp2({c0, c1});
+                        return element_fp2(c0, c1);
+                    }
+
+                    template<typename PowerType>
+                    element_fp2 Frobenius_map(const PowerType &pwr) const {
+                        return element_fp2(data[0], typename policy_type::non_residue_type(policy_type::Frobenius_coeffs_c1[pwr % 2])  * data[1]);
+                        //return element_fp2(data[0], policy_type::Frobenius_coeffs_c1[pwr % 2] * data[1]});
                     }
                 };
 
                 template<typename FieldParams>
                 element_fp2<FieldParams> operator*(const typename FieldParams::underlying_type &lhs,
                                                    const element_fp2<FieldParams> &rhs) {
-                    return element_fp2<FieldParams>({lhs * rhs.data[0], lhs * rhs.data[1]});
+                    return element_fp2<FieldParams>(lhs * rhs.data[0], lhs * rhs.data[1]);
                 }
 
                 template<typename FieldParams>

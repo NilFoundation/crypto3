@@ -17,29 +17,40 @@
 
 namespace nil {
     namespace algebra {
+        namespace curves {
+            template<std::size_t ModulusBits, std::size_t GeneratorBits>
+            struct mnt4;
+
+            template<std::size_t ModulusBits, std::size_t GeneratorBits>
+            struct mnt6;
+        }    // namespace curves
         namespace pairing {
 
-            template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
-            struct pairing_policy<mnt4<ModulusBits, GeneratorBits>> {
+            using namespace nil::algebra;
+            
+            template<std::size_t ModulusBits, std::size_t GeneratorBits>
+            class pairing_policy<curves::mnt4<ModulusBits, GeneratorBits>> {
+                using policy_type = detail::mnt4_pairing_functions<ModulusBits, GeneratorBits>;
+            public:
 
                 using other_curve = curves::mnt6<ModulusBits, GeneratorBits>;
 
-                typedef typename curves::mnt4::scalar_field_type FieldType;
-                typedef algebra::Fqe<algebra::curves::mnt6> fqe_type;
-                typedef algebra::Fqk<algebra::curves::mnt6> fqk_type;
+                //typedef typename policy_type::scalar_field_type FieldType;
+                //typedef algebra::Fqe<algebra::curves::mnt6> fqe_type;
+                //typedef algebra::Fqk<algebra::curves::mnt6> fqk_type;
 
-                using g1_precomp = detail::mnt4_g1_precomp<ModulusBits, GeneratorBits>;
-                using g2_precomp = detail::mnt4_g2_precomp<ModulusBits, GeneratorBits>;
+                using g1_precomp = typename policy_type::g1_precomp;
+                using g2_precomp = typename policy_type::g2_precomp;
 
-                using precompute_g1 = detail::mnt4_precompute_g1<ModulusBits, GeneratorBits>;
-                using precompute_g2 = detail::mnt4_precompute_g2<ModulusBits, GeneratorBits>;
+                using precompute_g1 = typename policy_type::precompute_g1;
+                using precompute_g2 = typename policy_type::precompute_g2;
 
-                using reduced_pairing = detail::edwards_reduced_pairing<ModulusBits, GeneratorBits>;
-                using pairing = detail::edwards_pairing<ModulusBits, GeneratorBits>;
+                using reduced_pairing = typename policy_type::reduced_pairing;
+                using pairing = typename policy_type::pairing;
 
-                using miller_loop = detail::mnt4_miller_loop<ModulusBits, GeneratorBits>;
-                using double_miller_loop = detail::mnt4_double_miller_loop<ModulusBits, GeneratorBits>;
-                using final_exponentiation = detail::mnt4_final_exponentiation<ModulusBits, GeneratorBits>;
+                using miller_loop = typename policy_type::miller_loop;
+                using double_miller_loop = typename policy_type::double_miller_loop;
+                using final_exponentiation = typename policy_type::final_exponentiation;
             };
         }    // namespace pairing
     }        // namespace algebra

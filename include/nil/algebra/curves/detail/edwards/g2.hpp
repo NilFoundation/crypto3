@@ -38,6 +38,9 @@ namespace nil {
                     using underlying_field_type_value = g2_field_type_value;
 
                     underlying_field_type_value p[3];
+                    underlying_field_type_value &X = p[0];
+                    underlying_field_type_value &Y = p[1];
+                    underlying_field_type_value &Z = p[2];
 
                     edwards_g2() :
                         edwards_g2(
@@ -203,11 +206,13 @@ namespace nil {
                         return edwards_g2(X3, Y3, Z3);
                     }
 
-                    void to_affine_coordinates() {
+                    edwards_g2 to_affine_coordinates() const {
+                        underlying_field_type_value p_out[3];
+
                         if (this->is_zero()) {
-                            this->p[0] = underlying_field_type_value::zero();
-                            this->p[1] = underlying_field_type_value::one();
-                            this->p[2] = underlying_field_type_value::one();
+                            p_out[0] = underlying_field_type_value::zero();
+                            p_out[1] = underlying_field_type_value::one();
+                            p_out[2] = underlying_field_type_value::one();
                         } else {
                             // go from inverted coordinates to projective coordinates
                             underlying_field_type_value tX = this->p[1] * this->p[2];
@@ -215,37 +220,45 @@ namespace nil {
                             underlying_field_type_value tZ = this->p[0] * this->p[1];
                             // go from projective coordinates to affine coordinates
                             underlying_field_type_value tZ_inv = tZ.inversed();
-                            this->p[0] = tX * tZ_inv;
-                            this->p[1] = tY * tZ_inv;
-                            this->p[2] = underlying_field_type_value::one();
+                            p_out[0] = tX * tZ_inv;
+                            p_out[1] = tY * tZ_inv;
+                            p_out[2] = underlying_field_type_value::one();
                         }
+
+                        return edwards_g2(p_out[0], p_out[1], p_out[2]);
                     }
 
-                    void to_special() {
+                    edwards_g2 to_special() const {
+                        underlying_field_type_value p_out[3];
+
                         if (this->p[2].is_zero()) {
-                            return;
+                            return *this;
                         }
 
                         underlying_field_type_value Z_inv = this->p[2].inversed();
-                        this->p[0] = this->p[0] * Z_inv;
-                        this->p[1] = this->p[1] * Z_inv;
-                        this->p[2] = underlying_field_type_value::one();
+                        p_out[0] = this->p[0] * Z_inv;
+                        p_out[1] = this->p[1] * Z_inv;
+                        p_out[2] = underlying_field_type_value::one();
+
+                        return edwards_g2(p_out[0], p_out[1], p_out[2]);
                     }
 
                     bool is_special() const {
                         return (this->is_zero() || this->p[2] == underlying_field_type_value::one());
                     }
 
-                private:
-                    underlying_field_type_value mul_by_a(const underlying_field_type_value &elt) const {
-                        return underlying_field_type_value({twist_mul_by_a_c0 * elt.data[2], elt.data[0], elt.data[1]});
+                    /*inline static */underlying_field_type_value mul_by_a(const underlying_field_type_value &elt) const {
+                        return underlying_field_type_value(twist_mul_by_a_c0 * elt.data[2], elt.data[0], elt.data[1]);
                     }
 
-                    underlying_field_type_value mul_by_d(const underlying_field_type_value &elt) const {
-                        return underlying_field_type_value({twist_mul_by_d_c0 * elt.data[2],
+                    /*inline static */underlying_field_type_value mul_by_d(const underlying_field_type_value &elt) const {
+                        return underlying_field_type_value(twist_mul_by_d_c0 * elt.data[2],
                                                             twist_mul_by_d_c1 * elt.data[0],
-                                                            twist_mul_by_d_c2 * elt.data[1]});
+                                                            twist_mul_by_d_c2 * elt.data[1]);
                     }
+
+                private:
+                    
 
                     /*constexpr static */ const g1_field_type_value a = g1_field_type_value(policy_type::a);
                     /*constexpr static */ const g1_field_type_value d = g1_field_type_value(policy_type::d);

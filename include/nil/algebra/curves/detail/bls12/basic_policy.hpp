@@ -13,6 +13,8 @@
 #include <nil/algebra/fields/bls12/base_field.hpp>
 #include <nil/algebra/fields/bls12/scalar_field.hpp>
 
+#include <nil/algebra/fields/fp12_2over3over2.hpp>
+
 #include <nil/algebra/detail/literals.hpp>
 
 namespace nil {
@@ -30,11 +32,18 @@ namespace nil {
                     constexpr static const std::size_t base_field_bits = 381;
                     typedef fields::bls12_fq<base_field_bits, CHAR_BIT> base_field_type;
                     typedef typename base_field_type::modulus_type number_type;
-                    constexpr static const number_type p = base_field_type::modulus;
+                    typedef typename base_field_type::extended_modulus_type extended_number_type;
+
+                    constexpr static const number_type base_field_modulus = base_field_type::modulus;
 
                     constexpr static const std::size_t scalar_field_bits = 381;    // actually, 255
                     typedef fields::bls12_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
-                    constexpr static const number_type q = scalar_field_type::modulus;
+                    constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
+
+                    constexpr static const number_type p = base_field_modulus;
+                    constexpr static const number_type q = scalar_field_modulus;
+
+                    typedef typename fields::fp12_2over3over2<base_field_type>::value_type gt_type;
 
                     constexpr static const number_type a = number_type(0x00);
                     constexpr static const number_type b = number_type(0x04);
@@ -45,12 +54,18 @@ namespace nil {
                     constexpr static const std::size_t base_field_bits = 377;
                     typedef fields::bls12_fq<base_field_bits, CHAR_BIT> base_field_type;
                     typedef typename base_field_type::modulus_type number_type;
-                    constexpr static const number_type p = base_field_type::modulus;
+                    constexpr static const number_type base_field_modulus = base_field_type::modulus;
+                    typedef typename base_field_type::extended_modulus_type extended_number_type;
 
                     constexpr static const std::size_t scalar_field_bits = 377;    // actually, 253
                     typedef fields::bls12_fr<scalar_field_bits, CHAR_BIT> scalar_field_type;
-                    constexpr static const number_type q = scalar_field_type::modulus;
+                    constexpr static const number_type scalar_field_modulus = scalar_field_type::modulus;
 
+                    constexpr static const number_type p = base_field_modulus;
+                    constexpr static const number_type q = scalar_field_modulus;
+
+                    typedef typename fields::fp12_2over3over2<base_field_type>::value_type gt_type;
+                    
                     constexpr static const number_type a = number_type(0x00);
                     constexpr static const number_type b = number_type(0x01);
                 };

@@ -39,6 +39,9 @@ namespace nil {
                     using underlying_field_type_value = g1_field_type_value;
 
                     underlying_field_type_value p[3];
+                    underlying_field_type_value &X = p[0];
+                    underlying_field_type_value &Y = p[1];
+                    underlying_field_type_value &Z = p[2];
 
                     bn128_g1() :
                         bn128_g1(underlying_field_type_value::one(), underlying_field_type_value::one(),
@@ -128,7 +131,7 @@ namespace nil {
                     }
 
                     bn128_g1 operator-() const {
-                        return bn128_g1({p[0], -p[1], p[2]});
+                        return bn128_g1(p[0], -p[1], p[2]);
                     }
 
                     /*
@@ -301,8 +304,8 @@ namespace nil {
                         return bn128_g1(p_out[0], p_out[1], p_out[2]);
                     }
 
-                    void to_special() const {
-                        this->to_affine_coordinates();
+                    bn128_g1 to_special() const {
+                        return this->to_affine_coordinates();
                     }
 
                     bool is_special() const {

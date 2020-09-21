@@ -11,20 +11,21 @@
 #ifndef ALGEBRA_CURVES_BLS12_HPP
 #define ALGEBRA_CURVES_BLS12_HPP
 
+#include <nil/algebra/curves/detail/bls12/basic_policy.hpp>
 #include <nil/algebra/curves/detail/bls12/g1.hpp>
 #include <nil/algebra/curves/detail/bls12/g2.hpp>
 
-#include <nil/algebra/fields/fp12_2over3over2.hpp>
-
-#include <nil/algebra/detail/literals.hpp>
+#include <nil/algebra/pairing/bls12.hpp>
 
 namespace nil {
     namespace algebra {
         namespace curves {
+
+            using namespace nil::algebra;
+
             /*
                 E/Fp: y^2 = x^3 + 4.
             */
-
             template<std::size_t ModulusBits, std::size_t GeneratorBits = CHAR_BIT>
             struct bls12 {
 
@@ -33,6 +34,7 @@ namespace nil {
                 typedef typename policy_type::base_field_type base_field_type;
                 typedef typename policy_type::scalar_field_type scalar_field_type;
                 typedef typename policy_type::number_type number_type;
+                typedef typename policy_type::extended_number_type extended_number_type;
 
                 constexpr static const std::size_t base_field_bits = policy_type::base_field_bits;
                 constexpr static const number_type p = policy_type::p;
@@ -43,9 +45,9 @@ namespace nil {
                 typedef typename detail::bls12_g1<base_field_bits> g1_type;
                 typedef typename detail::bls12_g2<base_field_bits> g2_type;
 
-                //typedef typename pairing::pairing_policy<bls12<ModulusBits, GeneratorBits>> pairing_policy;
+                typedef typename pairing::pairing_policy<bls12<ModulusBits, GeneratorBits>> pairing_policy;
 
-                typedef typename fields::fp12_2over3over2<base_field_type>::value_type gt_type;
+                typedef typename policy_type::gt_type gt_type;
             };
 
             typedef bls12<381> bls12_381;

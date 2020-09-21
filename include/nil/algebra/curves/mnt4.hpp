@@ -11,11 +11,11 @@
 #ifndef ALGEBRA_CURVES_MNT4_HPP
 #define ALGEBRA_CURVES_MNT4_HPP
 
+#include <nil/algebra/curves/detail/mnt4/basic_policy.hpp>
 #include <nil/algebra/curves/detail/mnt4/g1.hpp>
 #include <nil/algebra/curves/detail/mnt4/g2.hpp>
-#include <nil/algebra/curves/detail/mnt4/basic_policy.hpp>
 
-#include <nil/algebra/fields/fp4.hpp>
+#include <nil/algebra/pairing/mnt4.hpp>
 
 namespace nil {
     namespace algebra {
@@ -31,6 +31,7 @@ namespace nil {
                 typedef typename policy_type::base_field_type base_field_type;
                 typedef typename policy_type::scalar_field_type scalar_field_type;
                 typedef typename policy_type::number_type number_type;
+                typedef typename policy_type::extended_number_type extended_number_type;
 
                 constexpr static const std::size_t base_field_bits = policy_type::base_field_bits;
                 constexpr static const number_type p = policy_type::p;
@@ -41,9 +42,9 @@ namespace nil {
                 typedef typename detail::mnt4_g1<base_field_bits, CHAR_BIT> g1_type;
                 typedef typename detail::mnt4_g2<base_field_bits, CHAR_BIT> g2_type;
 
-                //typedef typename pairing::pairing_policy<mnt4<ModulusBits, GeneratorBits>> pairing_policy;
+                typedef typename pairing::pairing_policy<mnt4<ModulusBits, GeneratorBits>> pairing_policy;
 
-                typedef typename fields::fp4<base_field_type>::value_type gt_type;
+                typedef typename policy_type::gt_type gt_type;
 
                 typedef std::vector<g1_type> g1_vector;
                 typedef std::vector<g2_type> g2_vector;

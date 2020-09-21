@@ -40,6 +40,9 @@ namespace nil {
                     using underlying_field_type_value = g1_field_type_value;
 
                     underlying_field_type_value p[3];
+                    underlying_field_type_value &X = p[0];
+                    underlying_field_type_value &Y = p[1];
+                    underlying_field_type_value &Z = p[2];
 
                     bls12_g1() :
                         bls12_g1(underlying_field_type_value::zero(), underlying_field_type_value::one(),
@@ -255,23 +258,27 @@ namespace nil {
                         return bls12_g1(X3, Y3, Z3);
                     }
 
-                    void to_affine_coordinates() {
+                    bls12_g1 to_affine_coordinates() const {
+                        underlying_field_type_value p_out[3];
+
                         if (this->is_zero()) {
-                            this->p[0] = underlying_field_type_value::zero();
-                            this->p[1] = underlying_field_type_value::one();
-                            this->p[2] = underlying_field_type_value::zero();
+                            p_out[0] = underlying_field_type_value::zero();
+                            p_out[1] = underlying_field_type_value::one();
+                            p_out[2] = underlying_field_type_value::zero();
                         } else {
                             underlying_field_type_value Z_inv = this->p[2].inversed();
                             underlying_field_type_value Z2_inv = Z_inv.squared();
                             underlying_field_type_value Z3_inv = Z2_inv * Z_inv;
-                            this->p[0] = this->p[0] * Z2_inv;
-                            this->p[1] = this->p[1] * Z3_inv;
-                            this->p[2] = underlying_field_type_value::one();
+                            p_out[0] = this->p[0] * Z2_inv;
+                            p_out[1] = this->p[1] * Z3_inv;
+                            p_out[2] = underlying_field_type_value::one();
                         }
+
+                        return bls12_g1(p_out[0], p_out[1], p_out[2]);
                     }
 
-                    void to_special() {
-                        this->to_affine_coordinates();
+                    bls12_g1 to_special() const {
+                        return this->to_affine_coordinates();
                     }
 
                     bool is_special() const {
@@ -279,7 +286,7 @@ namespace nil {
                     }
 
                 private:
-                    /*constexpr static */ const g1_field_type_value a = g1_field_type_value(policy_type::a);
+                    
                     /*constexpr static */ const g1_field_type_value b = g1_field_type_value(policy_type::b);
 
                     /*constexpr static const underlying_field_type_value zero_fill = {
@@ -520,23 +527,27 @@ namespace nil {
                         return bls12_g1(X3, Y3, Z3);
                     }
 
-                    void to_affine_coordinates() {
+                    bls12_g1 to_affine_coordinates() const {
+                        underlying_field_type_value p_out[3];
+
                         if (this->is_zero()) {
-                            this->p[0] = underlying_field_type_value::zero();
-                            this->p[1] = underlying_field_type_value::one();
-                            this->p[2] = underlying_field_type_value::zero();
+                            p_out[0] = underlying_field_type_value::zero();
+                            p_out[1] = underlying_field_type_value::one();
+                            p_out[2] = underlying_field_type_value::zero();
                         } else {
                             underlying_field_type_value Z_inv = this->p[2].inversed();
                             underlying_field_type_value Z2_inv = Z_inv.squared();
                             underlying_field_type_value Z3_inv = Z2_inv * Z_inv;
-                            this->p[0] = this->p[0] * Z2_inv;
-                            this->p[1] = this->p[1] * Z3_inv;
-                            this->p[2] = underlying_field_type_value::one();
+                            p_out[0] = this->p[0] * Z2_inv;
+                            p_out[1] = this->p[1] * Z3_inv;
+                            p_out[2] = underlying_field_type_value::one();
                         }
+
+                        return bls12_g1(p_out[0], p_out[1], p_out[2]);
                     }
 
-                    void to_special() {
-                        this->to_affine_coordinates();
+                    bls12_g1 to_special() const {
+                        return this->to_affine_coordinates();
                     }
 
                     bool is_special() const {

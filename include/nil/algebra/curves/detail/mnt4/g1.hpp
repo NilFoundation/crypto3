@@ -40,6 +40,9 @@ namespace nil {
                     using underlying_field_type_value = g1_field_type_value;
 
                     underlying_field_type_value p[3];
+                    underlying_field_type_value &X = p[0];
+                    underlying_field_type_value &Y = p[1];
+                    underlying_field_type_value &Z = p[2];
 
                     /*constexpr static */ const underlying_field_type_value x =
                         underlying_field_type_value(0x00);    //?
@@ -229,21 +232,25 @@ namespace nil {
                         return mnt4_g1(X3, Y3, Z3);
                     }
 
-                    void to_affine_coordinates() {
+                    mnt4_g1 to_affine_coordinates() const {
+                        underlying_field_type_value p_out[3];
+
                         if (this->is_zero()) {
-                            this->p[0] = underlying_field_type_value::zero();
-                            this->p[1] = underlying_field_type_value::one();
-                            this->p[2] = underlying_field_type_value::zero();
+                            p_out[0] = underlying_field_type_value::zero();
+                            p_out[1] = underlying_field_type_value::one();
+                            p_out[2] = underlying_field_type_value::zero();
                         } else {
                             const underlying_field_type_value Z_inv = this->p[2].inversed();
-                            this->p[0] = this->p[0] * Z_inv;
-                            this->p[1] = this->p[1] * Z_inv;
-                            this->p[2] = underlying_field_type_value::one();
+                            p_out[0] = this->p[0] * Z_inv;
+                            p_out[1] = this->p[1] * Z_inv;
+                            p_out[2] = underlying_field_type_value::one();
                         }
+
+                        return mnt4_g1(p_out[0], p_out[1], p_out[2]);
                     }
 
-                    void to_special() {
-                        this->to_affine_coordinates();
+                    mnt4_g1 to_special() const {
+                        return this->to_affine_coordinates();
                     }
 
                     bool is_special() const {

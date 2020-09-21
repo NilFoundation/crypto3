@@ -10,7 +10,9 @@
 #ifndef ALGEBRA_PAIRING_MNT4_BASIC_POLICY_HPP
 #define ALGEBRA_PAIRING_MNT4_BASIC_POLICY_HPP
 
-#include <nil/algebra/curves/mnt4.hpp>
+#include <nil/algebra/curves/detail/mnt4/basic_policy.hpp>
+#include <nil/algebra/curves/detail/mnt4/g1.hpp>
+#include <nil/algebra/curves/detail/mnt4/g2.hpp>
 
 namespace nil {
     namespace algebra {
@@ -20,23 +22,39 @@ namespace nil {
                 using namespace nil::algebra;
 
                 template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
-                struct mnt4_basic_policy;
+                class mnt4_basic_policy;
 
                 template<>
-                struct mnt4_basic_policy<298, CHAR_BIT> {
+                class mnt4_basic_policy<298, CHAR_BIT> {
+                    using policy_type = curves::detail::mnt4_basic_policy<298, CHAR_BIT>;
+                public:
 
-                    using number_type = curves::mnt4<ModulusBits, GeneratorBits>::number_type;
+                    using number_type = typename policy_type::number_type;
+                    using extended_number_type = typename policy_type::extended_number_type;
 
-                    constexpr static const typename number_type ate_loop_count =
+                    using g1 = curves::detail::mnt4_g1<298, CHAR_BIT>;
+                    using g2 = curves::detail::mnt4_g2<298, CHAR_BIT>;
+                    using Fq = typename g1::underlying_field_type_value;
+                    using Fq2 = typename g2::underlying_field_type_value;
+                    using gt = policy_type::gt_type;
+
+                    constexpr static const std::size_t base_field_bits = policy_type::base_field_bits;
+                    constexpr static const number_type base_field_modulus = policy_type::base_field_modulus;
+                    constexpr static const std::size_t scalar_field_bits = policy_type::scalar_field_bits;
+                    constexpr static const number_type scalar_field_modulus = policy_type::scalar_field_modulus;
+
+                    constexpr static const std::size_t number_type_max_bits = policy_type::base_field_bits;
+
+                    constexpr static const number_type ate_loop_count =
                         number_type(0x1EEF5546609756BEC2A33F0DC9A1B671660000_cppui149);
                     constexpr static const bool ate_is_loop_count_neg = false;
-                    constexpr static const typename number_type final_exponent = number_type(
+                    constexpr static const extended_number_type final_exponent = extended_number_type(
                         0x343C7AC3174C87A1EFE216B37AFB6D3035ACCA5A07B2394F42E0029264C0324A95E87DCB6C97234CBA7385B8D20FEA4E85074066818687634E61F58B68EA590B11CEE431BE8348DEB351384D8485E987A57004BB9A1E7A6036C7A5801F55AC8E065E41B012422619E7E69541C5980000_cppui894);
 
-                    constexpr static const typename number_type final_exponent_last_chunk_abs_of_w0 =
+                    constexpr static const number_type final_exponent_last_chunk_abs_of_w0 =
                         number_type(0x1EEF5546609756BEC2A33F0DC9A1B671660001_cppui149);
-                    constexpr static const typename number_type final_exponent_last_chunk_is_w0_neg = false;
-                    constexpr static const typename number_type final_exponent_last_chunk_w1 = number_type(0x1);
+                    constexpr static const number_type final_exponent_last_chunk_is_w0_neg = false;
+                    constexpr static const number_type final_exponent_last_chunk_w1 = number_type(0x1);
                 };
 
             }    // namespace detail

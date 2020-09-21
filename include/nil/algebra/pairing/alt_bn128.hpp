@@ -7,27 +7,27 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef ALGEBRA_PAIRING_BLS12_POLICY_HPP
-#define ALGEBRA_PAIRING_BLS12_POLICY_HPP
+#ifndef ALGEBRA_PAIRING_ALT_BN128_POLICY_HPP
+#define ALGEBRA_PAIRING_ALT_BN128_POLICY_HPP
 
-#include <nil/algebra/pairing/detail/bls12/functions.hpp>
+#include <nil/algebra/pairing/detail/alt_bn128/functions.hpp>
 #include <nil/algebra/pairing/policy.hpp>
 
-#include <nil/algebra/curves/bls12.hpp>
+#include <nil/algebra/curves/alt_bn128.hpp>
 
 namespace nil {
     namespace algebra {
         namespace curves {
             template<std::size_t ModulusBits, std::size_t GeneratorBits>
-            struct bls12;
+            struct alt_bn128;
         }    // namespace curves
         namespace pairing {
 
             using namespace nil::algebra;
-
+            
             template<std::size_t ModulusBits, std::size_t GeneratorBits>
-            class pairing_policy<curves::bls12<ModulusBits, GeneratorBits>> {
-                using policy_type = detail::bls12_pairing_functions<ModulusBits, GeneratorBits>;
+            class pairing_policy<curves::alt_bn128<ModulusBits, GeneratorBits>> {
+                using policy_type = detail::alt_bn128_pairing_functions<ModulusBits, GeneratorBits>;
             public:
 
                 using g1_precomp = typename policy_type::ate_g1_precomp;
@@ -46,4 +46,4 @@ namespace nil {
         }    // namespace pairing
     }        // namespace algebra
 }    // namespace nil
-#endif    // ALGEBRA_PAIRING_BLS12_POLICY_HPP
+#endif    // ALGEBRA_PAIRING_ALT_BN128_POLICY_HPP
