@@ -40,11 +40,11 @@ namespace nil {
                     value_type data;
 
                     element_fp3() {
-                        data = {underlying_type::zero(), underlying_type::zero(), underlying_type::zero()};
+                        data = value_type({underlying_type::zero(), underlying_type::zero(), underlying_type::zero()});
                     }
 
-                    element_fp3(value_type in_data) {
-                        data = value_type(in_data);
+                    element_fp3(int in_data0, int in_data1, int in_data2) {
+                        data = value_type({underlying_type(in_data0), underlying_type(in_data1), underlying_type(in_data2)});
                     }
 
                     element_fp3(modulus_type in_data0, modulus_type in_data1, modulus_type in_data2) {
@@ -63,11 +63,11 @@ namespace nil {
                     };
 
                     inline static element_fp3 zero() {
-                        return element_fp3({underlying_type::zero(), underlying_type::zero(), underlying_type::zero()});
+                        return element_fp3(underlying_type::zero(), underlying_type::zero(), underlying_type::zero());
                     }
 
                     inline static element_fp3 one() {
-                        return element_fp3({underlying_type::one(), underlying_type::zero(), underlying_type::zero()});
+                        return element_fp3(underlying_type::one(), underlying_type::zero(), underlying_type::zero());
                     }
 
                     bool is_zero() const {
@@ -97,15 +97,15 @@ namespace nil {
                     }
 
                     element_fp3 operator+(const element_fp3 &B) const {
-                        return element_fp3({data[0] + B.data[0], data[1] + B.data[1], data[2] + B.data[2]});
+                        return element_fp3(data[0] + B.data[0], data[1] + B.data[1], data[2] + B.data[2]);
                     }
 
                     element_fp3 doubled() const {
-                        return element_fp3({data[0].doubled(), data[1].doubled(), data[2].doubled()});
+                        return element_fp3(data[0].doubled(), data[1].doubled(), data[2].doubled());
                     }
 
                     element_fp3 operator-(const element_fp3 &B) const {
-                        return element_fp3({data[0] - B.data[0], data[1] - B.data[1], data[2] - B.data[2]});
+                        return element_fp3(data[0] - B.data[0], data[1] - B.data[1], data[2] - B.data[2]);
                     }
 
                     element_fp3 &operator-=(const element_fp3 &B) {
@@ -131,9 +131,9 @@ namespace nil {
                                               A2B2 = data[2] * B.data[2];
 
                         return element_fp3(
-                            {A0B0 + non_residue * ((data[1] + data[2]) * (B.data[1] + B.data[2]) - A1B1 - A2B2),
+                            A0B0 + non_residue * ((data[1] + data[2]) * (B.data[1] + B.data[2]) - A1B1 - A2B2),
                              (data[0] + data[1]) * (B.data[0] + B.data[1]) - A0B0 - A1B1 + non_residue * A2B2,
-                             (data[0] + data[2]) * (B.data[0] + B.data[2]) - A0B0 + A1B1 - A2B2});
+                             (data[0] + data[2]) * (B.data[0] + B.data[2]) - A0B0 + A1B1 - A2B2);
                     }
 
                     element_fp3 sqrt() const {
@@ -201,15 +201,15 @@ namespace nil {
                         const underlying_type c2 =
                             t1 - t4;    // typo in paper referenced above. should be "-" as per Scott, but is "*"
                         const underlying_type t6 = (A0 * c0 + non_residue * (A2 * c1 + A1 * c2)).inversed();
-                        return element_fp3({t6 * c0, t6 * c1, t6 * c2});
+                        return element_fp3(t6 * c0, t6 * c1, t6 * c2);
                     }
 
                     template<typename PowerType>
                     element_fp3 Frobenius_map(const PowerType &pwr) const {
-                        return element_fp3({data[0], 
+                        return element_fp3(data[0], 
                                             typename policy_type::non_residue_type(policy_type::Frobenius_coeffs_c1[pwr % 3]) * data[1],
-                                            typename policy_type::non_residue_type(policy_type::Frobenius_coeffs_c2[pwr % 3]) * data[2]});
-                        //return element_fp3({data[0], 
+                                            typename policy_type::non_residue_type(policy_type::Frobenius_coeffs_c2[pwr % 3]) * data[2]);
+                        //return element_fp3(data[0], 
                         //                    policy_type::Frobenius_coeffs_c1[pwr % 3] * data[1],
                         //                    policy_type::Frobenius_coeffs_c2[pwr % 3] * data[2]});
                     }
@@ -219,7 +219,7 @@ namespace nil {
                 template<typename FieldParams>
                 element_fp3<FieldParams> operator*(const typename FieldParams::underlying_type &lhs,
                                                    const element_fp3<FieldParams> &rhs) {
-                    return element_fp3<FieldParams>({lhs * rhs.data[0], lhs * rhs.data[1], lhs * rhs.data[2]});
+                    return element_fp3<FieldParams>(lhs * rhs.data[0], lhs * rhs.data[1], lhs * rhs.data[2]);
                 }
 
                 template<typename FieldParams>

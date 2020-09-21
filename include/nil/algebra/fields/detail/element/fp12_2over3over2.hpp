@@ -272,7 +272,7 @@ namespace nil {
                     }*/
 
                 private:
-                    /*inline static*/ underlying_type mul_by_non_residue(const underlying_type &A) {
+                    /*inline static*/ underlying_type mul_by_non_residue(const underlying_type &A) const {
                         return element_fp12_2over3over2({non_residue * A.data[2], A.data[1], A.data[0]});
                     }
                 };

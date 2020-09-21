@@ -137,7 +137,7 @@ namespace nil {
                     }
 
                     bn128_g2 operator-() const {
-                        return bn128_g2({p[0], -p[1], p[2]});
+                        return bn128_g2(p[0], -p[1], p[2]);
                     }
 
                     /*

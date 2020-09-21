@@ -33,7 +33,9 @@ namespace nil {
 
                     value_type data;
 
-                    element_fp4(value_type data) : data(data) {};
+                    element_fp4() {
+                        data = value_type({underlying_type::zero(), underlying_type::zero()});
+                    }
 
                     element_fp4(underlying_type in_data0, underlying_type in_data1) {
                         data = value_type({in_data0, in_data1});
@@ -45,7 +47,7 @@ namespace nil {
                     };
 
                     inline static element_fp4 zero() {
-                        return element_fp4({underlying_type::zero(), underlying_type::zero()});
+                        return element_fp4(underlying_type::zero(), underlying_type::zero());
                     }
 
                     inline static element_fp4 one() {
@@ -68,15 +70,15 @@ namespace nil {
                     }
 
                     element_fp4 operator+(const element_fp4 &B) const {
-                        return element_fp4({data[0] + B.data[0], data[1] + B.data[1]});
+                        return element_fp4(data[0] + B.data[0], data[1] + B.data[1]);
                     }
 
                     element_fp4 doubled() const {
-                        return element_fp4({data[0].doubled(), data[1].doubled()});
+                        return element_fp4(data[0].doubled(), data[1].doubled());
                     }
 
                     element_fp4 operator-(const element_fp4 &B) const {
-                        return element_fp4({data[0] - B.data[0], data[1] - B.data[1]});
+                        return element_fp4(data[0] - B.data[0], data[1] - B.data[1]);
                     }
 
                     element_fp4 &operator-=(const element_fp4 &B) {
@@ -100,8 +102,8 @@ namespace nil {
                     element_fp4 operator*(const element_fp4 &B) const {
                         const underlying_type A0B0 = data[0] * B.data[0], A1B1 = data[1] * B.data[1];
 
-                        return element_fp4({A0B0 + mul_by_non_residue(A1B1),
-                                            (data[0] + data[1]) * (B.data[0] + B.data[1]) - A0B0 - A1B1});
+                        return element_fp4(A0B0 + mul_by_non_residue(A1B1),
+                                            (data[0] + data[1]) * (B.data[0] + B.data[1]) - A0B0 - A1B1);
                     }
 
                     element_fp4 sqrt() const {
@@ -132,19 +134,19 @@ namespace nil {
                         const underlying_type c0 = A0 * t3;
                         const underlying_type c1 = -(A1 * t3);
 
-                        return element_fp4({c0, c1});
+                        return element_fp4(c0, c1);
                     }
 
                     template<typename PowerType>
                     element_fp4 Frobenius_map(const PowerType &pwr) const {
-                        return element_fp4({data[0].Frobenius_map(pwr),
-                                            typename policy_type::non_residue_type(policy_type::Frobenius_coeffs_c1[pwr % 4]) * data[1].Frobenius_map(pwr)});
-                        //return element_fp4({data[0].Frobenius_map(pwr),
+                        return element_fp4(data[0].Frobenius_map(pwr),
+                                            typename policy_type::non_residue_type(policy_type::Frobenius_coeffs_c1[pwr % 4]) * data[1].Frobenius_map(pwr));
+                        //return element_fp4(data[0].Frobenius_map(pwr),
                         //                    policy_type::Frobenius_coeffs_c1[pwr % 4] * data[1].Frobenius_map(pwr)});
                     }
 
                     element_fp4  unitary_inversed() const {
-                        return element_fp4({data[0], -data[1]});
+                        return element_fp4(data[0], -data[1]);
                     }
 
                     element_fp4  cyclotomic_squared() const {
@@ -190,8 +192,8 @@ namespace nil {
                     }
 
                 private:
-                    /*inline static*/ underlying_type mul_by_non_residue(const underlying_type &A) {
-                        return element_fp4({non_residue * A.data[1], A.data[0]});
+                    /*inline static*/ underlying_type mul_by_non_residue(const underlying_type &A) const {
+                        return element_fp4(non_residue * A.data[1], A.data[0]);
                     }
                 };
 

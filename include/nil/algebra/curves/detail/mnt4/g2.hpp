@@ -263,13 +263,13 @@ namespace nil {
                         {g2_field_type_value::underlying_type::zero(), g2_field_type_value::underlying_type::one()});
 
                     /*constexpr static */ const underlying_field_type_value a =
-                        underlying_field_type_value({g1_a * twist.non_residue, g1_field_type_value::zero()});
+                        underlying_field_type_value(g1_a * twist.non_residue, g1_field_type_value::zero());
                     // must be
                     // underlying_field_type_value(g1_a * underlying_field_type_value::non_residue, 0);
                     // when constexpr fields will be finished
 
                     /*constexpr static */ const underlying_field_type_value b =
-                        underlying_field_type_value({g1_field_type_value::zero(), g1_b *twist.non_residue});
+                        underlying_field_type_value(g1_field_type_value::zero(), g1_b *twist.non_residue);
                     // must be
                     // underlying_field_type_value(0, g1_b * underlying_field_type_value::non_residue);
                     // when constexpr fields will be finished
