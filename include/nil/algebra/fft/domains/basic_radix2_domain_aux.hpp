@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef ALGEBRA_FFT_BASIC_RADIX2_DOMAIN_AUX_HPP
-#define ALGEBRA_FFT_BASIC_RADIX2_DOMAIN_AUX_HPP
+#ifndef CRYPTO3_ALGEBRA_FFT_BASIC_RADIX2_DOMAIN_AUX_HPP
+#define CRYPTO3_ALGEBRA_FFT_BASIC_RADIX2_DOMAIN_AUX_HPP
 
 #include <algorithm>
 #include <vector>
@@ -17,7 +17,7 @@
 #include <omp.h>
 #endif
 
-#include <nil/algebra/fft/detail/field_utils.hpp>
+#include <nil/crypto3/algebra/fft/detail/field_utils.hpp>
 
 #ifdef MULTICORE
 #define _basic_radix2_FFT detail::basic_parallel_radix2_FFT
@@ -25,8 +25,7 @@
 #define _basic_radix2_FFT detail::basic_serial_radix2_FFT
 #endif
 
-namespace nil {
-    namespace algebra {
+namespace nil { namespace crypto3 { namespace algebra {
         namespace fft {
             namespace detail {
 

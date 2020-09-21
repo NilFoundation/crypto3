@@ -7,20 +7,19 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef ALGEBRA_FFT_BASIS_CHANGE_HPP
-#define ALGEBRA_FFT_BASIS_CHANGE_HPP
+#ifndef CRYPTO3_ALGEBRA_FFT_BASIS_CHANGE_HPP
+#define CRYPTO3_ALGEBRA_FFT_BASIS_CHANGE_HPP
 
 #include <algorithm>
 #include <vector>
 
 #include <boost/math/tools/polynomial.hpp>
 
-#include <nil/algebra/fft/domains/basic_radix2_domain_aux.hpp>
-#include <nil/algebra/fft/polynomial_arithmetic/basic_operations.hpp>
-#include <nil/algebra/fft/polynomial_arithmetic/xgcd.hpp>
+#include <nil/crypto3/algebra/fft/domains/basic_radix2_domain_aux.hpp>
+#include <nil/crypto3/algebra/fft/polynomial_arithmetic/basic_operations.hpp>
+#include <nil/crypto3/algebra/fft/polynomial_arithmetic/xgcd.hpp>
 
-namespace nil {
-    namespace algebra {
+namespace nil { namespace crypto3 { namespace algebra {
         namespace fft {
 
             /**
@@ -236,7 +235,7 @@ namespace nil {
             }
 
         }    // namespace fft
-    }        // namespace algebra
+    }}        // namespace algebra
 }    // namespace nil
 
 #endif    // ALGEBRA_FFT_BASIS_CHANGE_HPP

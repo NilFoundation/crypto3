@@ -6,13 +6,12 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef ALGEBRA_FFT_COSET_HPP
-#define ALGEBRA_FFT_COSET_HPP
+#ifndef CRYPTO3_ALGEBRA_FFT_COSET_HPP
+#define CRYPTO3_ALGEBRA_FFT_COSET_HPP
 
 #include <vector>
 
-namespace nil {
-    namespace algebra {
+namespace nil { namespace crypto3 { namespace algebra {
         /**
          * Translate the vector a to a coset defined by g.
          */

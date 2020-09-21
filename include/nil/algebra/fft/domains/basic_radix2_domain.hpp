@@ -7,21 +7,20 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef ALGEBRA_FFT_BASIC_RADIX2_DOMAIN_HPP
-#define ALGEBRA_FFT_BASIC_RADIX2_DOMAIN_HPP
+#ifndef CRYPTO3_ALGEBRA_FFT_BASIC_RADIX2_DOMAIN_HPP
+#define CRYPTO3_ALGEBRA_FFT_BASIC_RADIX2_DOMAIN_HPP
 
 #include <vector>
 
-#include <nil/algebra/fft/detail/field_utils.hpp>
+#include <nil/crypto3/algebra/fft/detail/field_utils.hpp>
 
-#include <nil/algebra/fft/evaluation_domain.hpp>
-#include <nil/algebra/fft/domains/basic_radix2_domain_aux.hpp>
+#include <nil/crypto3/algebra/fft/evaluation_domain.hpp>
+#include <nil/crypto3/algebra/fft/domains/basic_radix2_domain_aux.hpp>
 
-namespace nil {
-    namespace algebra {
+namespace nil { namespace crypto3 { namespace algebra {
         namespace fft {
 
-            using namespace nil::algebra;
+            using namespace nil::crypto3::algebra;
 
             template<typename FieldType>
             class basic_radix2_domain : public evaluation_domain<FieldType::value_type> {
@@ -94,7 +93,7 @@ namespace nil {
                 }
             };
         }    // namespace fft
-    }        // namespace algebra
+    }}        // namespace algebra
 }    // namespace nil
 
 #endif    // ALGEBRA_FFT_BASIC_RADIX2_DOMAIN_HPP

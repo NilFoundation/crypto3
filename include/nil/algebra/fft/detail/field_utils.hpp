@@ -7,20 +7,19 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef ALGEBRA_FIELD_UTILS_HPP
-#define ALGEBRA_FIELD_UTILS_HPP
+#ifndef CRYPTO3_ALGEBRA_FIELD_UTILS_HPP
+#define CRYPTO3_ALGEBRA_FIELD_UTILS_HPP
 
 #include <type_traits>
 #include <complex>
 
-#include <nil/algebra/fields/params.hpp>
+#include <nil/crypto3/algebra/fields/params.hpp>
 
-namespace nil {
-    namespace algebra {
+namespace nil { namespace crypto3 { namespace algebra {
         namespace fft {
             namespace detail {
 
-                using namespace nil::algebra;
+                using namespace nil::crypto3::algebra;
 
                 size_t bitreverse(size_t n, const size_t l) {
                     size_t r = 0;
@@ -84,7 +83,7 @@ namespace nil {
                 }
             }
         }    // namespace fft
-    }        // namespace algebra
+    }}        // namespace algebra
 }    // namespace nil
 
 #endif    // CRYPTO3_FIELD_UTILS_HPP

@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef ALGEBRA_TYPE_TRAITS_HPP
-#define ALGEBRA_TYPE_TRAITS_HPP
+#ifndef CRYPTO3_ALGEBRA_TYPE_TRAITS_HPP
+#define CRYPTO3_ALGEBRA_TYPE_TRAITS_HPP
 
 #include <boost/integer/static_log2.hpp>
 
@@ -162,11 +162,10 @@
         static bool const value = sizeof(f<Derived>(0)) == 2;                                \
     };
 
-namespace nil {
-    namespace algebra {
+namespace nil { namespace crypto3 { namespace algebra {
         namespace detail {
           
-            using namespace nil::algebra;
+            using namespace nil::crypto3::algebra;
 
             template<std::size_t m>
             struct is_basic_radix2_domain {
@@ -190,7 +189,7 @@ namespace nil {
                     (m > 1) && (m & (m - 1)) && (boost::static_log2<m> <= fields::arithmetic_params<FieldType>::s) && !(small_m & (small_m - 1));
             }
         }    // namespace detail
-    }        // namespace algebra
+    }}        // namespace algebra
 }    // namespace nil
 
 #endif    // ALGEBRA_TYPE_TRAITS_HPP
