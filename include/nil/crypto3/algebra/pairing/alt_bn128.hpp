@@ -29,10 +29,19 @@ namespace nil {
                 template<std::size_t ModulusBits, std::size_t GeneratorBits>
                 class pairing_policy<curves::alt_bn128<ModulusBits, GeneratorBits>> {
                     using policy_type = detail::alt_bn128_pairing_functions<ModulusBits, GeneratorBits>;
-
+                    using basic_policy = detail::alt_bn128_basic_policy<ModulusBits, GeneratorBits>;
                 public:
-                    using g1_precomp = typename policy_type::ate_g1_precomp;
-                    using g2_precomp = typename policy_type::ate_g2_precomp;
+
+                    using Fp_type = typename basic_policy::Fp_field;
+                    using G1_type = typename basic_policy::g1;
+                    using G2_type = typename basic_policy::g2;
+                    using Fq_type = typename basic_policy::Fq_field;
+                    using Fqe_type = typename basic_policy::Fqe_field;
+                    using Fqk_type = typename basic_policy::gt_field;
+                    using GT_type = typename basic_policy::gt;
+
+                    using G1_precomp_type = typename policy_type::ate_g1_precomp;
+                    using G2_precomp_type = typename policy_type::ate_g2_precomp;
 
                     using precompute_g1 = typename policy_type::ate_precompute_g1;
                     using precompute_g2 = typename policy_type::ate_precompute_g2;

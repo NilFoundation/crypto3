@@ -13,8 +13,6 @@
 
 #include <nil/crypto3/algebra/curves/detail/alt_bn128/basic_policy.hpp>
 
-#include <nil/crypto3/algebra/fields/fp2.hpp>
-
 #include <nil/crypto3/algebra/detail/literals.hpp>
 
 namespace nil {

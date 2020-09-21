@@ -32,16 +32,20 @@ namespace nil {
                 template<std::size_t ModulusBits, std::size_t GeneratorBits>
                 class pairing_policy<curves::mnt6<ModulusBits, GeneratorBits>> {
                     using policy_type = detail::mnt6_pairing_functions<ModulusBits, GeneratorBits>;
-
+                    using basic_policy = detail::mnt6_basic_policy<ModulusBits, GeneratorBits>;
                 public:
                     using other_curve = curves::mnt4<ModulusBits, GeneratorBits>;
 
-                    // typedef typename curves::mnt6::scalar_field_type FieldType;
-                    // typedef algebra::Fqe<algebra::curves::mnt6> fqe_type;
-                    // typedef algebra::Fqk<algebra::curves::mnt6> fqk_type;
+                    using Fp_type = typename basic_policy::Fp_field;
+                    using G1_type = typename basic_policy::g1;
+                    using G2_type = typename basic_policy::g2;
+                    using Fq_type = typename basic_policy::Fq_field;
+                    using Fqe_type = typename basic_policy::Fqe_field;
+                    using Fqk_type = typename basic_policy::gt_field;
+                    using GT_type = typename basic_policy::gt;
 
-                    using g1_precomp = typename policy_type::g1_precomp;
-                    using g2_precomp = typename policy_type::g2_precomp;
+                    using G1_precomp_type = typename policy_type::g1_precomp;
+                    using G2_precomp_type = typename policy_type::g2_precomp;
 
                     using precompute_g1 = typename policy_type::precompute_g1;
                     using precompute_g2 = typename policy_type::precompute_g2;
