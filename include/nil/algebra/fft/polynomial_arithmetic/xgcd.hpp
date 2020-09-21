@@ -7,17 +7,16 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef ALGEBRA_FFT_XGCD_HPP
-#define ALGEBRA_FFT_XGCD_HPP
+#ifndef CRYPTO3_ALGEBRA_FFT_XGCD_HPP
+#define CRYPTO3_ALGEBRA_FFT_XGCD_HPP
 
 #include <algorithm>
 #include <vector>
 
-#include <nil/algebra/fft/domains/basic_radix2_domain_aux.hpp>
-#include <nil/algebra/fft/polynomial_arithmetic/basic_operations.hpp>
+#include <nil/crypto3/algebra/fft/domains/basic_radix2_domain_aux.hpp>
+#include <nil/crypto3/algebra/fft/polynomial_arithmetic/basic_operations.hpp>
 
-namespace nil {
-    namespace algebra {
+namespace nil { namespace crypto3 { namespace algebra {
         namespace fft {
 
             /*!
@@ -74,7 +73,7 @@ namespace nil {
             }
 
         }    // namespace fft
-    }        // namespace algebra
+    }}        // namespace algebra
 }    // namespace nil
 
 #endif    // ALGEBRA_FFT_XGCD_HPP

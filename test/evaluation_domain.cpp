@@ -15,19 +15,19 @@
 #include <vector>
 #include <cstdint>
 
-#include <nil/algebra/fft/domains/arithmetic_sequence_domain.hpp>
-#include <nil/algebra/fft/domains/basic_radix2_domain.hpp>
-#include <nil/algebra/fft/domains/extended_radix2_domain.hpp>
-#include <nil/algebra/fft/domains/geometric_sequence_domain.hpp>
-#include <nil/algebra/fft/domains/step_radix2_domain.hpp>
+#include <nil/crypto3/algebra/fft/domains/arithmetic_sequence_domain.hpp>
+#include <nil/crypto3/algebra/fft/domains/basic_radix2_domain.hpp>
+#include <nil/crypto3/algebra/fft/domains/extended_radix2_domain.hpp>
+#include <nil/crypto3/algebra/fft/domains/geometric_sequence_domain.hpp>
+#include <nil/crypto3/algebra/fft/domains/step_radix2_domain.hpp>
 
-#include <nil/algebra/fft/polynomial_arithmetic/naive_evaluate.hpp>
+#include <nil/crypto3/algebra/fft/polynomial_arithmetic/naive_evaluate.hpp>
 
-#include <nil/algebra/fields/bls12/base_field.hpp>
-#include <nil/algebra/fields/arithmetic_params/bls12.hpp>
+#include <nil/crypto3/algebra/fields/bls12/base_field.hpp>
+#include <nil/crypto3/algebra/fields/arithmetic_params/bls12.hpp>
 
-using namespace nil::algebra;
-using namespace nil::algebra::fft;
+using namespace nil::crypto3::algebra;
+using namespace nil::crypto3::algebra::fft;
 
 /**
  * Note: Templatized type referenced with FieldType (instead of canonical FieldType)

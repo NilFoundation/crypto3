@@ -7,28 +7,27 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef ALGEBRA_FFT_EVALUATION_DOMAIN_HPP
-#define ALGEBRA_FFT_EVALUATION_DOMAIN_HPP
+#ifndef CRYPTO3_ALGEBRA_FFT_EVALUATION_DOMAIN_HPP
+#define CRYPTO3_ALGEBRA_FFT_EVALUATION_DOMAIN_HPP
 
 #include <vector>
 
 #include <boost/math/tools/polynomial.hpp>
 
-#include <nil/algebra/fft/domains/arithmetic_sequence_domain.hpp>
-#include <nil/algebra/fft/domains/basic_radix2_domain.hpp>
-#include <nil/algebra/fft/domains/extended_radix2_domain.hpp>
-#include <nil/algebra/fft/domains/geometric_sequence_domain.hpp>
-#include <nil/algebra/fft/domains/step_radix2_domain.hpp>
+#include <nil/crypto3/algebra/fft/domains/arithmetic_sequence_domain.hpp>
+#include <nil/crypto3/algebra/fft/domains/basic_radix2_domain.hpp>
+#include <nil/crypto3/algebra/fft/domains/extended_radix2_domain.hpp>
+#include <nil/crypto3/algebra/fft/domains/geometric_sequence_domain.hpp>
+#include <nil/crypto3/algebra/fft/domains/step_radix2_domain.hpp>
 
-#include <nil/algebra/fft/detail/field_utils.hpp>
-#include <nil/algebra/fft/detail/type_traits.hpp>
+#include <nil/crypto3/algebra/fft/detail/field_utils.hpp>
+#include <nil/crypto3/algebra/fft/detail/type_traits.hpp>
 
-namespace nil {
-    namespace algebra {
+namespace nil { namespace crypto3 { namespace algebra {
         namespace fft {
             namespace detail {
 
-                using namespace nil::algebra;
+                using namespace nil::crypto3::algebra;
 
                 template<typename FieldType, typename FieldType, std::size_t MinSize>
                 struct domain_switch_impl {
@@ -148,7 +147,7 @@ namespace nil {
 
             }
         }    // namespace fft
-    }        // namespace algebra
+    }}        // namespace algebra
 }    // namespace nil
 
 #endif    // ALGEBRA_FFT_EVALUATION_DOMAIN_HPP

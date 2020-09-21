@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef ALGEBRA_FFT_KRONECKER_SUBSTITUTION_HPP
-#define ALGEBRA_FFT_KRONECKER_SUBSTITUTION_HPP
+#ifndef CRYPTO3_ALGEBRA_FFT_KRONECKER_SUBSTITUTION_HPP
+#define CRYPTO3_ALGEBRA_FFT_KRONECKER_SUBSTITUTION_HPP
 
 #include <vector>
 #include <algorithm>
@@ -16,8 +16,7 @@
 
 #include <boost/math/tools/polynomial.hpp>
 
-namespace nil {
-    namespace algebra {
+namespace nil { namespace crypto3 { namespace algebra {
         namespace fft {
             /*!
              * @brief Given two polynomial vectors, A and B, the function performs
@@ -181,7 +180,7 @@ namespace nil {
             }
 
         }    // namespace fft
-    }        // namespace algebra
+    }}        // namespace algebra
 }    // namespace nil
 
 #endif    // ALGEBRA_FFT_KRONECKER_SUBSTITUTION_HPP
