@@ -19,13 +19,16 @@ namespace nil {
     namespace algebra {
         namespace curves {
             template<std::size_t ModulusBits, std::size_t GeneratorBits>
+            struct mnt4;
+            
+            template<std::size_t ModulusBits, std::size_t GeneratorBits>
             struct mnt6;
         }    // namespace curves
         namespace pairing {
 
             using namespace nil::algebra;
             
-            template<std::size_t ModulusBits = 298, std::size_t GeneratorBits = CHAR_BIT>
+            template<std::size_t ModulusBits, std::size_t GeneratorBits>
             class pairing_policy<curves::mnt6<ModulusBits, GeneratorBits>> {
                 using policy_type = detail::mnt6_pairing_functions<ModulusBits, GeneratorBits>;
             public:

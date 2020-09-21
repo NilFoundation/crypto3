@@ -190,9 +190,23 @@ namespace nil {
                         return *this;
                     }
 
-                private:
                     /*inline static*/ underlying_type mul_by_non_residue(const underlying_type &A) const {
                         return underlying_type(non_residue * A.data[1], A.data[0]);
+                    }
+
+                    element_fp4 mul_by_023(const element_fp4 &other) const
+                    {
+                        /* Devegili OhEig Scott Dahab --- Multiplication and Squaring on Pairing-Friendly Fields.pdf; Section 3 (Karatsuba) */
+                        assert(other.data[0].data[1].is_zero());
+
+                        const underlying_type &A = other.data[0], &B = other.data[1], 
+                            &a = this->data[0], &b = this->data[1];
+                        const underlying_type aA = underlying_type(a.data[0] * A.data[0], a.data[1] * A.data[0]);
+                        const underlying_type bB = b*B;
+
+                        const underlying_type beta_bB = element_fp4::mul_by_non_residue(bB);
+                        return element_fp4(aA + beta_bB,
+                                                    (a+b)*(A+B) - aA  - bB);
                     }
                 };
 

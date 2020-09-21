@@ -11,6 +11,7 @@
 #define ALGEBRA_PAIRING_MNT6_FUNCTIONS_HPP
 
 #include <nil/algebra/pairing/detail/mnt6/basic_policy.hpp>
+#include <nil/algebra/pairing/detail/wnaf.hpp>
 
 #include <boost/multiprecision/number.hpp>
 #include <boost/multiprecision/cpp_int.hpp>
