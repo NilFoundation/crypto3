@@ -20,25 +20,25 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 
-#include <nil/algebra/curves/alt_bn128.hpp>
-#include <nil/algebra/curves/bls12.hpp>
-#include <nil/algebra/curves/bn128.hpp>
-// #include <nil/algebra/curves/brainpool_r1.hpp>
-#include <nil/algebra/curves/edwards.hpp>
-// #include <nil/algebra/curves/frp_v1.hpp>
-// #include <nil/algebra/curves/gost_A.hpp>
-#include <nil/algebra/curves/mnt4.hpp>
-#include <nil/algebra/curves/mnt6.hpp>
-// #include <nil/algebra/curves/p192.hpp>
-// #include <nil/algebra/curves/p224.hpp>
-// #include <nil/algebra/curves/p256.hpp>
-// #include <nil/algebra/curves/p384.hpp>
-// #include <nil/algebra/curves/p521.hpp>
-// #include <nil/algebra/curves/secp.hpp>
-// #include <nil/algebra/curves/sm2p_v1.hpp>
-// #include <nil/algebra/curves/x962_p.hpp>
+#include <nil/crypto3/algebra/curves/alt_bn128.hpp>
+#include <nil/crypto3/algebra/curves/bls12.hpp>
+#include <nil/crypto3/algebra/curves/bn128.hpp>
+// #include <nil/crypto3/algebra/curves/brainpool_r1.hpp>
+#include <nil/crypto3/algebra/curves/edwards.hpp>
+// #include <nil/crypto3/algebra/curves/frp_v1.hpp>
+// #include <nil/crypto3/algebra/curves/gost_A.hpp>
+#include <nil/crypto3/algebra/curves/mnt4.hpp>
+#include <nil/crypto3/algebra/curves/mnt6.hpp>
+// #include <nil/crypto3/algebra/curves/p192.hpp>
+// #include <nil/crypto3/algebra/curves/p224.hpp>
+// #include <nil/crypto3/algebra/curves/p256.hpp>
+// #include <nil/crypto3/algebra/curves/p384.hpp>
+// #include <nil/crypto3/algebra/curves/p521.hpp>
+// #include <nil/crypto3/algebra/curves/secp.hpp>
+// #include <nil/crypto3/algebra/curves/sm2p_v1.hpp>
+// #include <nil/crypto3/algebra/curves/x962_p.hpp>
 
-using namespace nil::algebra;
+using namespace nil::crypto3::algebra;
 
 template<typename FpCurveGroup>
 void print_fp_curve_group_element(std::ostream &os, const FpCurveGroup &e) {

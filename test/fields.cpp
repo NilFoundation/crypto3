@@ -26,24 +26,24 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 
-#include <nil/algebra/fields/fp2.hpp>
+#include <nil/crypto3/algebra/fields/fp2.hpp>
 
-// #include <nil/algebra/fields/bn128/base_field.hpp>
-// #include <nil/algebra/fields/bn128/scalar_field.hpp>
-#include <nil/algebra/fields/bls12/base_field.hpp>
-//#include <nil/algebra/fields/bls12/scalar_field.hpp>
-// #include <nil/algebra/fields/dsa_botan.hpp>
-// #include <nil/algebra/fields/dsa_jce.hpp>
-// #include <nil/algebra/fields/ed25519_fe.hpp>
-// #include <nil/algebra/fields/ffdhe_ietf.hpp>
-// #include <nil/algebra/fields/field.hpp>
-// #include <nil/algebra/fields/modp_ietf.hpp>
-// #include <nil/algebra/fields/modp_srp.hpp>
+// #include <nil/crypto3/algebra/fields/bn128/base_field.hpp>
+// #include <nil/crypto3/algebra/fields/bn128/scalar_field.hpp>
+#include <nil/crypto3/algebra/fields/bls12/base_field.hpp>
+//#include <nil/crypto3/algebra/fields/bls12/scalar_field.hpp>
+// #include <nil/crypto3/algebra/fields/dsa_botan.hpp>
+// #include <nil/crypto3/algebra/fields/dsa_jce.hpp>
+// #include <nil/crypto3/algebra/fields/ed25519_fe.hpp>
+// #include <nil/crypto3/algebra/fields/ffdhe_ietf.hpp>
+// #include <nil/crypto3/algebra/fields/field.hpp>
+// #include <nil/crypto3/algebra/fields/modp_ietf.hpp>
+// #include <nil/crypto3/algebra/fields/modp_srp.hpp>
 
-#include <nil/algebra/fields/detail/element/fp.hpp>
-#include <nil/algebra/fields/detail/element/fp2.hpp>
+#include <nil/crypto3/algebra/fields/detail/element/fp.hpp>
+#include <nil/crypto3/algebra/fields/detail/element/fp2.hpp>
 
-using namespace nil::algebra;
+using namespace nil::crypto3::algebra;
 
 template<typename FieldParams>
 void print_field_element(std::ostream &os, const typename fields::detail::element_fp<FieldParams> &e) {

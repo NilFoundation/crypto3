@@ -13,18 +13,18 @@
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
 
-#include <nil/algebra/curves/edwards/edwards_pp.hpp>
-#include <nil/algebra/curves/mnt/mnt4/mnt4_pp.hpp>
-#include <nil/algebra/curves/mnt/mnt6/mnt6_pp.hpp>
-#include <nil/algebra/curves/bn128/bn128_pp.hpp>
+#include <nil/crypto3/algebra/curves/edwards/edwards_pp.hpp>
+#include <nil/crypto3/algebra/curves/mnt/mnt4/mnt4_pp.hpp>
+#include <nil/crypto3/algebra/curves/mnt/mnt6/mnt6_pp.hpp>
+#include <nil/crypto3/algebra/curves/bn128/bn128_pp.hpp>
 #endif
 #include <sstream>
 
-#include <nil/algebra/curves/alt_bn128/alt_bn128_pp.hpp>
+#include <nil/crypto3/algebra/curves/alt_bn128/alt_bn128_pp.hpp>
 
 #include <boost/multiprecision/modular/base_params.hpp>
 
-using namespace nil::algebra;
+using namespace nil::crypto3::algebra;
 
 template<typename GroupT>
 void test_mixed_add() {

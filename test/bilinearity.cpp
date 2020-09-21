@@ -13,13 +13,13 @@
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
 
-#include <nil/algebra/curves/edwards.hpp>
-#include <nil/algebra/curves/bn128.hpp>
-#include <nil/algebra/curves/alt_bn128.hpp>
-#include <nil/algebra/curves/mnt4.hpp>
-#include <nil/algebra/curves/mnt6.hpp>
+#include <nil/crypto3/algebra/curves/edwards.hpp>
+#include <nil/crypto3/algebra/curves/bn128.hpp>
+#include <nil/crypto3/algebra/curves/alt_bn128.hpp>
+#include <nil/crypto3/algebra/curves/mnt4.hpp>
+#include <nil/crypto3/algebra/curves/mnt6.hpp>
 
-using namespace nil::algebra;
+using namespace nil::crypto3::algebra;
 
 template<typename CurveType>
 void pairing_test() {

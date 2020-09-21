@@ -20,28 +20,28 @@
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
 
-#include <nil/algebra/algorithms/pair.hpp>
+#include <nil/crypto3/algebra/algorithms/pair.hpp>
 
-#include <nil/algebra/curves/detail/bn128/g1.hpp>
+#include <nil/crypto3/algebra/curves/detail/bn128/g1.hpp>
 
-//#include <nil/algebra/fields/detail/extension_params/dsa_jce.hpp>
-//#include <nil/algebra/fields/detail/extension_params/modp_srp.hpp>
-//#include <nil/algebra/fields/params.hpp>
-//#include <nil/algebra/fields/bn128/scalar_field.hpp>
-//#include <nil/algebra/fields/dsa_jce.hpp>
-//#include <nil/algebra/fields/ed25519_fe.hpp>
-//#include <nil/algebra/fields/ffdhe_ietf.hpp>
-//#include <nil/algebra/fields/fp.hpp>
-//#include <nil/algebra/fields/fp2.hpp>
-//#include <nil/algebra/fields/fp3.hpp>
-//#include <nil/algebra/fields/fp4.hpp>
-//#include <nil/algebra/fields/fp6_2over3.hpp>
-//#include <nil/algebra/fields/fp6_3over2.hpp>
-//#include <nil/algebra/fields/fp12_2over3over2.hpp>
-//#include <nil/algebra/fields/modp_ietf.hpp>
-//#include <nil/algebra/fields/modp_srp.hpp>
+//#include <nil/crypto3/algebra/fields/detail/extension_params/dsa_jce.hpp>
+//#include <nil/crypto3/algebra/fields/detail/extension_params/modp_srp.hpp>
+//#include <nil/crypto3/algebra/fields/params.hpp>
+//#include <nil/crypto3/algebra/fields/bn128/scalar_field.hpp>
+//#include <nil/crypto3/algebra/fields/dsa_jce.hpp>
+//#include <nil/crypto3/algebra/fields/ed25519_fe.hpp>
+//#include <nil/crypto3/algebra/fields/ffdhe_ietf.hpp>
+//#include <nil/crypto3/algebra/fields/fp.hpp>
+//#include <nil/crypto3/algebra/fields/fp2.hpp>
+//#include <nil/crypto3/algebra/fields/fp3.hpp>
+//#include <nil/crypto3/algebra/fields/fp4.hpp>
+//#include <nil/crypto3/algebra/fields/fp6_2over3.hpp>
+//#include <nil/crypto3/algebra/fields/fp6_3over2.hpp>
+//#include <nil/crypto3/algebra/fields/fp12_2over3over2.hpp>
+//#include <nil/crypto3/algebra/fields/modp_ietf.hpp>
+//#include <nil/crypto3/algebra/fields/modp_srp.hpp>
 
-using namespace nil::algebra;
+using namespace nil::crypto3::algebra;
 
 BOOST_AUTO_TEST_SUITE(curves_manual_tests)
 

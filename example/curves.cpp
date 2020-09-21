@@ -14,14 +14,14 @@
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/multiprecision/modular/modular_adaptor.hpp>
 
-#include <nil/algebra/curves/alt_bn128.hpp>
-#include <nil/algebra/curves/bls12.hpp>
-#include <nil/algebra/curves/bn128.hpp>
-#include <nil/algebra/curves/edwards.hpp>
-#include <nil/algebra/curves/mnt4.hpp>
-#include <nil/algebra/curves/mnt6.hpp>
+#include <nil/crypto3/algebra/curves/alt_bn128.hpp>
+#include <nil/crypto3/algebra/curves/bls12.hpp>
+#include <nil/crypto3/algebra/curves/bn128.hpp>
+#include <nil/crypto3/algebra/curves/edwards.hpp>
+#include <nil/crypto3/algebra/curves/mnt4.hpp>
+#include <nil/crypto3/algebra/curves/mnt6.hpp>
 
-using namespace nil::algebra;
+using namespace nil::crypto3::algebra;
 
 template<typename FpCurveGroup>
 void print_fp_curve_group_element(FpCurveGroup e) {

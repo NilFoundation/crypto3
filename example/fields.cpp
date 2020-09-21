@@ -14,31 +14,31 @@
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/multiprecision/modular/modular_adaptor.hpp>
 
-#include <nil/algebra/fields/fp2.hpp>
-#include <nil/algebra/fields/fp3.hpp>
-#include <nil/algebra/fields/alt_bn128/base_field.hpp>
-#include <nil/algebra/fields/alt_bn128/scalar_field.hpp>
-#include <nil/algebra/fields/bls12/base_field.hpp>
-#include <nil/algebra/fields/bls12/scalar_field.hpp>
-#include <nil/algebra/fields/bn128/base_field.hpp>
-#include <nil/algebra/fields/bn128/scalar_field.hpp>
-#include <nil/algebra/fields/edwards/base_field.hpp>
-#include <nil/algebra/fields/edwards/scalar_field.hpp>
-#include <nil/algebra/fields/mnt4/base_field.hpp>
-#include <nil/algebra/fields/mnt4/scalar_field.hpp>
-#include <nil/algebra/fields/mnt6/base_field.hpp>
-#include <nil/algebra/fields/mnt6/scalar_field.hpp>
-#include <nil/algebra/fields/dsa_botan.hpp>
-#include <nil/algebra/fields/dsa_jce.hpp>
-//#include <nil/algebra/fields/ed25519_fe.hpp>
-//#include <nil/algebra/fields/ffdhe_ietf.hpp>
-//#include <nil/algebra/fields/modp_ietf.hpp>
-//#include <nil/algebra/fields/modp_srp.hpp>
+#include <nil/crypto3/algebra/fields/fp2.hpp>
+#include <nil/crypto3/algebra/fields/fp3.hpp>
+#include <nil/crypto3/algebra/fields/alt_bn128/base_field.hpp>
+#include <nil/crypto3/algebra/fields/alt_bn128/scalar_field.hpp>
+#include <nil/crypto3/algebra/fields/bls12/base_field.hpp>
+#include <nil/crypto3/algebra/fields/bls12/scalar_field.hpp>
+#include <nil/crypto3/algebra/fields/bn128/base_field.hpp>
+#include <nil/crypto3/algebra/fields/bn128/scalar_field.hpp>
+#include <nil/crypto3/algebra/fields/edwards/base_field.hpp>
+#include <nil/crypto3/algebra/fields/edwards/scalar_field.hpp>
+#include <nil/crypto3/algebra/fields/mnt4/base_field.hpp>
+#include <nil/crypto3/algebra/fields/mnt4/scalar_field.hpp>
+#include <nil/crypto3/algebra/fields/mnt6/base_field.hpp>
+#include <nil/crypto3/algebra/fields/mnt6/scalar_field.hpp>
+#include <nil/crypto3/algebra/fields/dsa_botan.hpp>
+#include <nil/crypto3/algebra/fields/dsa_jce.hpp>
+//#include <nil/crypto3/algebra/fields/ed25519_fe.hpp>
+//#include <nil/crypto3/algebra/fields/ffdhe_ietf.hpp>
+//#include <nil/crypto3/algebra/fields/modp_ietf.hpp>
+//#include <nil/crypto3/algebra/fields/modp_srp.hpp>
 
-#include <nil/algebra/fields/detail/element/fp.hpp>
-#include <nil/algebra/fields/detail/element/fp2.hpp>
+#include <nil/crypto3/algebra/fields/detail/element/fp.hpp>
+#include <nil/crypto3/algebra/fields/detail/element/fp2.hpp>
 
-using namespace nil::algebra;
+using namespace nil::crypto3::algebra;
 
 template<typename FieldParams>
 void print_field_element(typename fields::detail::element_fp<FieldParams> e) {
@@ -236,7 +236,8 @@ void fields_fp3_basic_math_examples() {
 
     std::cout << "Field module value: " << policy_type::modulus << std::endl;
 
-    value_type e1 = value_type(76749407, 44410867, 44410867), e2(44410867, 44410867, 1), e3 = value_type::one(), e4(121160274, 7, 121160274);
+    value_type e1 = value_type(76749407, 44410867, 44410867), e2(44410867, 44410867, 1), e3 = value_type::one(),
+               e4(121160274, 7, 121160274);
 
     value_type ee(e1);
 
@@ -274,14 +275,14 @@ void fields_fp3_basic_math_examples() {
 
     std::cout << "e1 * e2 value: ";
     print_field_element(e1e2);
-    
-    //value_type e1sqrsqrt = e1sqr.sqrt();
+
+    // value_type e1sqrsqrt = e1sqr.sqrt();
 
     std::cout << "e1 square value: ";
     print_field_element(e1sqr);
 
-    //std::cout << "e1 square sqrt value: ";
-    //print_field_element(e1sqrsqrt);
+    // std::cout << "e1 square sqrt value: ";
+    // print_field_element(e1sqrsqrt);
 
     std::cout << "e1 square square value: ";
 

@@ -16,10 +16,10 @@
 #include <cstdio>
 #include <vector>
 
-#include <nil/algebra/curves/bn128.hpp>
-#include <nil/algebra/scalar_multiplication/multiexp.hpp>
+#include <nil/crypto3/algebra/curves/bn128.hpp>
+#include <nil/crypto3/algebra/scalar_multiplication/multiexp.hpp>
 
-using namespace nil::algebra;
+using namespace nil::crypto3::algebra;
 
 template<typename GroupT>
 using run_result_t = std::pair<long long, std::vector<GroupT>>;

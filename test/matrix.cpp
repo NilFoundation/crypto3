@@ -13,14 +13,14 @@
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
 
-#include <nil/algebra/matrix/matrix.hpp>
-#include <nil/algebra/matrix/math.hpp>
-#include <nil/algebra/matrix/operators.hpp>
-#include <nil/algebra/matrix/utility.hpp>
-#include <nil/algebra/vector/vector.hpp>
-#include <nil/algebra/vector/operators.hpp>
+#include <nil/crypto3/algebra/matrix/matrix.hpp>
+#include <nil/crypto3/algebra/matrix/math.hpp>
+#include <nil/crypto3/algebra/matrix/operators.hpp>
+#include <nil/crypto3/algebra/matrix/utility.hpp>
+#include <nil/crypto3/algebra/vector/vector.hpp>
+#include <nil/crypto3/algebra/vector/operators.hpp>
 
-using namespace nil::algebra;
+using namespace nil::crypto3::algebra;
 
 // Uniform initialization
 constexpr matrix<double, 3, 3> m1 = {1., 2., 3., 4., 5., 6., 7., 8., 9.};

@@ -13,12 +13,12 @@
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
 
-#include <nil/algebra/vector/vector.hpp>
-#include <nil/algebra/vector/math.hpp>
-#include <nil/algebra/vector/operators.hpp>
-#include <nil/algebra/vector/utility.hpp>
+#include <nil/crypto3/algebra/vector/vector.hpp>
+#include <nil/crypto3/algebra/vector/math.hpp>
+#include <nil/crypto3/algebra/vector/operators.hpp>
+#include <nil/crypto3/algebra/vector/utility.hpp>
 
-using namespace nil::algebra;
+using namespace nil::crypto3::algebra;
 
 static_assert(make_vector(1, 2, 3) == vector {1, 2, 3}, "make_vector and uniform initialization deduction guide");
 
