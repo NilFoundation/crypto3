@@ -15,7 +15,7 @@
 #include <nil/algebra/curves/detail/bls12/g1.hpp>
 #include <nil/algebra/curves/detail/bls12/g2.hpp>
 
-//#include <nil/algebra/pairing/bls12.hpp>
+#include <nil/algebra/pairing/bls12.hpp>
 
 namespace nil {
     namespace algebra {
@@ -45,7 +45,7 @@ namespace nil {
                 typedef typename detail::bls12_g1<base_field_bits> g1_type;
                 typedef typename detail::bls12_g2<base_field_bits> g2_type;
 
-                //typedef typename pairing::pairing_policy<bls12<ModulusBits, GeneratorBits>> pairing_policy;
+                typedef typename pairing::pairing_policy<bls12<ModulusBits, GeneratorBits>> pairing_policy;
 
                 typedef typename policy_type::gt_type gt_type;
             };

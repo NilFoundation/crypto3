@@ -10,7 +10,6 @@
 #ifndef ALGEBRA_FIELDS_ELEMENT_FP6_2OVER3_HPP
 #define ALGEBRA_FIELDS_ELEMENT_FP6_2OVER3_HPP
 
-#include <nil/algebra/fields/detail/element/fp3.hpp>
 #include <nil/algebra/fields/detail/exponentiation.hpp>
 
 namespace nil {

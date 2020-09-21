@@ -86,7 +86,7 @@ namespace nil {
 
                     constexpr static const modulus_type modulus = policy_type::modulus;
 
-                    typedef element_fp2<field_type> non_residue_type;
+                    typedef element_fp2<fp2_extension_params<field_type>> non_residue_type;
                     typedef element_fp2<fp2_extension_params<field_type>> underlying_type;
 
                     /*constexpr static const std::array<non_residue_type, 6> Frobenius_coeffs_c1 = {non_residue_type(0x01, 0x00),
@@ -133,7 +133,7 @@ namespace nil {
 
                     constexpr static const modulus_type modulus = policy_type::modulus;
 
-                    typedef element_fp2<field_type> non_residue_type;
+                    typedef element_fp2<fp2_extension_params<field_type>> non_residue_type;
                     typedef element_fp6_3over2<fp6_3over2_extension_params<field_type>> underlying_type;
 
                     /*constexpr static const std::array<non_residue_type, 12> Frobenius_coeffs_c1 = {non_residue_type(0x01, 0x00),

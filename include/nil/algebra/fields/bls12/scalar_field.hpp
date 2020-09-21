@@ -90,8 +90,6 @@ namespace nil {
 
             template<std::size_t ModulusBits = 381, std::size_t GeneratorBits = CHAR_BIT>
             using bls12_fr = bls12_scalar_field<ModulusBits, GeneratorBits>;
-            template<std::size_t ModulusBits = 377, std::size_t GeneratorBits = CHAR_BIT>
-            using bls12_fr = bls12_scalar_field<ModulusBits, GeneratorBits>;
 
         }    // namespace fields
     }        // namespace algebra

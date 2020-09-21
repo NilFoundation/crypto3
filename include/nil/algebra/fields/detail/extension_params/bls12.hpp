@@ -86,7 +86,7 @@ namespace nil {
 
                     constexpr static const modulus_type modulus = policy_type::modulus;
 
-                    typedef element_fp2<field_type> non_residue_type;
+                    typedef element_fp2<fp2_extension_params<field_type>> non_residue_type;
                     typedef element_fp2<fp2_extension_params<field_type>> underlying_type;
 
                     /*constexpr static const std::array<non_residue_type, 6> Frobenius_coeffs_c1 = {non_residue_type(0x01, 0x00),
@@ -117,7 +117,7 @@ namespace nil {
                         0x5F19672FDF76CE51BA69C6076A0F77EADDB3A93BE6F89688DE17D813620A00022E01FFFFFFFEFFFE_cppui319, 0x00,
                         0x5F19672FDF76CE51BA69C6076A0F77EADDB3A93BE6F89688DE17D813620A00022E01FFFFFFFEFFFF_cppui319, 0x00};
 
-                    constexpr static const std::array<modulus_type, 2> non_residue = {1, 1};
+                    constexpr static const std::array<modulus_type, 2> non_residue = {0x01, 0x01};
                 };
 
                 template<>
@@ -133,7 +133,7 @@ namespace nil {
 
                     constexpr static const modulus_type modulus = policy_type::modulus;
 
-                    typedef element_fp2<field_type> non_residue_type;
+                    typedef element_fp2<fp2_extension_params<field_type>> non_residue_type;
                     typedef element_fp6_3over2<fp6_3over2_extension_params<field_type>> underlying_type;
 
                     /*constexpr static const std::array<non_residue_type, 12> Frobenius_coeffs_c1 = {non_residue_type(0x01, 0x00),
@@ -164,7 +164,7 @@ namespace nil {
                         0x1A0111EA397FE699EC02408663D4DE85AA0D857D89759AD4897D29650FB85F9B409427EB4F49FFFD8BFD00000000AAAD_cppui381, 0x00,
                         0x5B2CFD9013A5FD8DF47FA6B48B1E045F39816240C0B8FEE8BEADF4D8E9C0566C63A3E6E257F87329B18FAE980078116_cppui379, 0x144E4211384586C16BD3AD4AFA99CC9170DF3560E77982D0DB45F3536814F0BD5871C1908BD478CD1EE605167FF82995_cppui381};
 
-                    constexpr static const std::array<modulus_type, 2> non_residue = {1, 1};
+                    constexpr static const std::array<modulus_type, 2> non_residue = {0x01, 0x01};
                 };
 
                 /************************* BLS12-377 ***********************************/
@@ -217,7 +217,7 @@ namespace nil {
 
                     constexpr static const modulus_type modulus = policy_type::modulus;
 
-                    typedef element_fp2<field_type> non_residue_type;
+                    typedef element_fp2<fp2_extension_params<field_type>> non_residue_type;
                     typedef element_fp2<fp2_extension_params<field_type>> underlying_type;
 
                     /*constexpr static const std::array<non_residue_type, 6> Frobenius_coeffs_c1 = {non_residue_type(0x01, 0x00),
@@ -248,7 +248,7 @@ namespace nil {
                         0x9B3AF05DD14F6EC619AAF7D34594AABC5ED1347970DEC00452217CC900000008508C00000000001_cppui316, 0x00,
                         0x1AE3A4617C510EABC8756BA8F8C524EB8882A75CC9BC8E359064EE822FB5BFFD1E945779FFFFFFFFFFFFFFFFFFFFFFF_cppui377, 0x00};
 
-                    constexpr static const std::array<modulus_type, 2> non_residue = {0, 1};
+                    constexpr static const std::array<modulus_type, 2> non_residue = {0x00, 0x01};
                 };
 
                 template<>
@@ -264,7 +264,7 @@ namespace nil {
 
                     constexpr static const modulus_type modulus = policy_type::modulus;
 
-                    typedef element_fp2<field_type> non_residue_type;
+                    typedef element_fp2<fp2_extension_params<field_type>> non_residue_type;
                     typedef element_fp6_3over2<fp6_3over2_extension_params<field_type>> underlying_type;
 
                     /*constexpr static const std::array<non_residue_type, 12> Frobenius_coeffs_c1 = {non_residue_type(0x01, 0x00),
@@ -295,7 +295,7 @@ namespace nil {
                         0x1AE3A4617C510EABC8756BA8F8C524EB8882A75CC9BC8E359064EE822FB5BFFD1E94577A00000000000000000000000_cppui377, 0x00,
                         0xE0C97AD7FBDAB63937B3EBD47E0A1B36A986DEEF71F15C288ED7951A488E3B332941CFC8F883FAFFCA93E41F1603CF_cppui376, 0x00};
 
-                    constexpr static const std::array<modulus_type, 2> non_residue = {0, 1};
+                    constexpr static const std::array<modulus_type, 2> non_residue = {0x00, 0x01};
                 };
 
                 constexpr typename fp2_extension_params<bls12_base_field<381, CHAR_BIT>>::modulus_type const

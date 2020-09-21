@@ -63,7 +63,10 @@ namespace nil {
                         }
                     };
 
-                    /* final exponentiations */
+                    typedef ate_g1_precomp g1_precomp;
+                    typedef ate_g2_precomp g2_precomp;
+
+                    /*************************  FINAL EXPONENTIATIONS  ***********************************/
 
                     gt final_exponentiation_first_chunk(const gt &elt) {
 
@@ -148,11 +151,10 @@ namespace nil {
                         return result;
                     }
 
-                    /* ate pairing */
+                    /*************************  ATE PAIRING ***********************************/
 
-                    void doubling_step_for_miller_loop(const Fq two_inv,
-                                                       g2 &current,
-                                                       ate_ell_coeffs &c) {
+                    void doubling_step_for_miller_loop(const Fq two_inv, g2 &current, ate_ell_coeffs &c) {
+                        
                         const Fq2 X = current.X, Y = current.Y, Z = current.Z;
 
                         const Fq2 A = two_inv * (X * Y);              // A = X1 * Y1 / 2
@@ -176,9 +178,7 @@ namespace nil {
                         c.ell_VV = J + J + J;                                             // ell_VV = 3*J (later: * xP)
                     }
 
-                    void mixed_addition_step_for_miller_loop(const g2 base,
-                                                             g2 &current,
-                                                             ate_ell_coeffs &c) {
+                    void mixed_addition_step_for_miller_loop(const g2 base, g2 &current, ate_ell_coeffs &c) {
                         
                         const Fq2 X1 = current.X, Y1 = current.Y, Z1 = current.Z;
                         const Fq2 &x2 = base.X, &y2 = base.Y;
@@ -356,7 +356,7 @@ namespace nil {
                         return result;
                     }
 
-                    /* choice of pairing */
+                    /*************************  CHOICE OF PAIRING ***********************************/
 
                     g1_precomp precompute_g1(const g1 &P) {
                         return ate_precompute_g1(P);
@@ -366,19 +366,13 @@ namespace nil {
                         return ate_precompute_g2(Q);
                     }
 
-                    gt miller_loop(const g1 _precomp &prec_P,
-                                              const g2
-                                                  _precomp &prec_Q) {
+                    gt miller_loop(const g1_precomp &prec_P,
+                                              const g2_precomp &prec_Q) {
                         return ate_miller_loop(prec_P, prec_Q);
                     }
 
-                    gt double_miller_loop(const g1 _precomp &prec_P1,
-                                                     const g2
-                                                         _precomp &prec_Q1,
-                                                     const g1
-                                                         _precomp &prec_P2,
-                                                     const g2
-                                                         _precomp &prec_Q2) {
+                    gt double_miller_loop(const g1_precomp &prec_P1, const g2_precomp &prec_Q1,
+                                          const g1_precomp &prec_P2, const g2_precomp &prec_Q2) {
                         return ate_double_miller_loop(prec_P1, prec_Q1, prec_P2, prec_Q2);
                     }
 

@@ -93,12 +93,8 @@ namespace nil {
 
             template<std::size_t ModulusBits = 381, std::size_t GeneratorBits = CHAR_BIT>
             using bls12_fq = bls12_base_field<ModulusBits, GeneratorBits>;
-            template<std::size_t ModulusBits = 377, std::size_t GeneratorBits = CHAR_BIT>
-            using bls12_fq = bls12_base_field<ModulusBits, GeneratorBits>;
 
             template<std::size_t ModulusBits = 381, std::size_t GeneratorBits = CHAR_BIT>
-            using bls12 = bls12_base_field<ModulusBits, GeneratorBits>;
-            template<std::size_t ModulusBits = 377, std::size_t GeneratorBits = CHAR_BIT>
             using bls12 = bls12_base_field<ModulusBits, GeneratorBits>;
 
         }    // namespace fields
