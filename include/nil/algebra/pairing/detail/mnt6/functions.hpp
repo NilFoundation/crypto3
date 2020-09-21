@@ -12,6 +12,9 @@
 
 #include <nil/algebra/pairing/detail/mnt6/basic_policy.hpp>
 
+#include <boost/multiprecision/number.hpp>
+#include <boost/multiprecision/cpp_int.hpp>
+
 namespace nil {
     namespace algebra {
         namespace pairing {
@@ -23,7 +26,7 @@ namespace nil {
                 class mnt6_pairing_functions;
 
                 template<>
-                class mnt6_pairing_functions<298, CHAR_BIT> : public mnt6_policy_type<298, CHAR_BIT>{
+                class mnt6_pairing_functions<298, CHAR_BIT> : public mnt6_basic_policy<298, CHAR_BIT>{
                     using policy_type = mnt6_basic_policy<298, CHAR_BIT>;
                 public:
 
@@ -366,8 +369,8 @@ namespace nil {
                         const typename basic_policy::number_type &loop_count =
                             basic_policy::ate_loop_count;
                         bool found_one = false;
-                        for (long i = loop_count.max_bits() - 1; i >= 0; --i) {
-                            const bool bit = loop_count.test_bit(i);
+                        for (long i = policy_type::number_type_max_bits - 1; i >= 0; --i) {
+                            const bool bit = boost::multiprecision::bit_test(loop_count, i);
 
                             if (!found_one) {
                                 /* this skips the MSB itself */
@@ -416,8 +419,8 @@ namespace nil {
                         const typename basic_policy::number_type &loop_count =
                             basic_policy::ate_loop_count;
 
-                        for (long i = loop_count.max_bits() - 1; i >= 0; --i) {
-                            const bool bit = loop_count.test_bit(i);
+                        for (long i = policy_type::number_type_max_bits - 1; i >= 0; --i) {
+                            const bool bit = boost::multiprecision::bit_test(loop_count, i);
 
                             if (!found_one) {
                                 /* this skips the MSB itself */
@@ -470,8 +473,8 @@ namespace nil {
                         const typename basic_policy::number_type &loop_count =
                             basic_policy::ate_loop_count;
 
-                        for (long i = loop_count.max_bits() - 1; i >= 0; --i) {
-                            const bool bit = loop_count.test_bit(i);
+                        for (long i = policy_type::number_type_max_bits - 1; i >= 0; --i) {
+                            const bool bit = boost::multiprecision::bit_test(loop_count, i);
 
                             if (!found_one) {
                                 /* this skips the MSB itself */

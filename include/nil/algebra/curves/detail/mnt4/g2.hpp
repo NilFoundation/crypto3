@@ -230,7 +230,7 @@ namespace nil {
                         return mnt4_g2(X3, Y3, Z3);
                     }
 
-                    mnt4_g2 to_affine_coordinates() {
+                    mnt4_g2 to_affine_coordinates() const {
                         underlying_field_type_value p_out[3];
 
                         if (this->is_zero()) {
@@ -247,7 +247,7 @@ namespace nil {
                         return mnt4_g2(p_out[0], p_out[1], p_out[2]);
                     }
 
-                    mnt4_g2 to_special() {
+                    mnt4_g2 to_special() const {
                         return this->to_affine_coordinates();
                     }
 
@@ -255,7 +255,6 @@ namespace nil {
                         return (this->is_zero() || this->p[2] == underlying_field_type_value::one());
                     }
 
-                private:
                     /*constexpr static */ const g1_field_type_value g1_a = g1_field_type_value(policy_type::a);
                     /*constexpr static */ const g1_field_type_value g1_b = g1_field_type_value(policy_type::b);
 
@@ -277,6 +276,7 @@ namespace nil {
                     /*constexpr static */ const g2_field_type_value twist_coeff_a = a;
                     /*constexpr static */ const g2_field_type_value twist_coeff_b = b;
 
+                private:
                     /*constexpr static */ const g1_field_type_value twist_mul_by_a_c0 =
                         g1_a * twist.non_residue;    // we must receive non_residue in a better way, when constexpr
                                                      // fields will be finished

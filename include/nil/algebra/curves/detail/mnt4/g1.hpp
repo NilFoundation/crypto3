@@ -232,7 +232,7 @@ namespace nil {
                         return mnt4_g1(X3, Y3, Z3);
                     }
 
-                    mnt4_g1 to_affine_coordinates() {
+                    mnt4_g1 to_affine_coordinates() const {
                         underlying_field_type_value p_out[3];
 
                         if (this->is_zero()) {
@@ -249,7 +249,7 @@ namespace nil {
                         return mnt4_g1(p_out[0], p_out[1], p_out[2]);
                     }
 
-                    mnt4_g1 to_special() {
+                    mnt4_g1 to_special() const {
                         return this->to_affine_coordinates();
                     }
 

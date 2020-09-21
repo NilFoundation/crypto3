@@ -12,6 +12,9 @@
 
 #include <nil/algebra/pairing/detail/bls12/basic_policy.hpp>
 
+#include <boost/multiprecision/number.hpp>
+#include <boost/multiprecision/cpp_int.hpp>
+
 namespace nil {
     namespace algebra {
         namespace pairing {

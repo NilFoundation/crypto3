@@ -12,6 +12,9 @@
 
 #include <nil/algebra/pairing/detail/mnt4/basic_policy.hpp>
 
+#include <boost/multiprecision/number.hpp>
+#include <boost/multiprecision/cpp_int.hpp>
+
 namespace nil {
     namespace algebra {
         namespace pairing {
@@ -23,7 +26,7 @@ namespace nil {
                 class mnt4_pairing_functions;
 
                 template<>
-                class mnt4_pairing_functions<298, CHAR_BIT> : public mnt4_policy_type<298, CHAR_BIT>{
+                class mnt4_pairing_functions<298, CHAR_BIT> : public mnt4_basic_policy<298, CHAR_BIT>{
                     using policy_type = mnt4_basic_policy<298, CHAR_BIT>;
                 public:
 
@@ -53,13 +56,6 @@ namespace nil {
                         Fq2 QY;
                         std::vector<affine_ate_coeffs> coeffs;
                     };
-
-                    affine_ate_g1_precomputation affine_ate_precompute_g1(const g1 &P);
-                    affine_ate_g2_precomputation affine_ate_precompute_g2(const g2 &Q);
-
-                    gt
-                        affine_ate_miller_loop(const affine_ate_g1_precomputation &prec_P,
-                                                    const affine_ate_g2_precomputation &prec_Q);
 
                     /* ate pairing */
 
@@ -171,7 +167,10 @@ namespace nil {
                         affine_ate_g1_precomputation result;
                         result.PX = Pcopy.X;
                         result.PY = Pcopy.Y;
-                        result.PY_twist_squared = Pcopy.Y * twist.squared();
+                        result.PY_twist_squared = Pcopy.Y * g2::one().twist.squared();
+                        // must be
+                        // result.PY_twist_squared = Pcopy.Y * g1::twist.squared();
+                        // when constexpr ready
 
                         return result;
                     }
@@ -204,8 +203,15 @@ namespace nil {
                             c.old_RY = RY;
                             Fq2 old_RX_2 = c.old_RX.squared();
                             c.gamma =
-                                (old_RX_2 + old_RX_2 + old_RX_2 + twist_coeff_a) * (c.old_RY + c.old_RY).inversed();
-                            c.gamma_twist = c.gamma * twist;
+                                (old_RX_2 + old_RX_2 + old_RX_2 + g2::one().twist_coeff_a) * (c.old_RY + c.old_RY).inversed();
+                            // must be
+                            // (old_RX_2 + old_RX_2 + old_RX_2 + g2::twist_coeff_a) * (c.old_RY + c.old_RY).inversed();
+                            // when constexpr ready
+                            c.gamma_twist = c.gamma * g2::one().twist;
+                            // must be
+                            // c.gamma_twist = c.gamma * g2::twist;
+                            // when constexpr ready
+
                             c.gamma_X = c.gamma * c.old_RX;
                             result.coeffs.push_back(c);
 
@@ -221,7 +227,11 @@ namespace nil {
                                 } else {
                                     c.gamma = (c.old_RY + result.QY) * (c.old_RX - result.QX).inversed();
                                 }
-                                c.gamma_twist = c.gamma * twist;
+                                c.gamma_twist = c.gamma * g2::one().twist;
+                                // must be
+                                // c.gamma_twist = c.gamma * g2::twist;
+                                // when constexpr ready
+
                                 c.gamma_X = c.gamma * result.QX;
                                 result.coeffs.push_back(c);
 
@@ -233,8 +243,7 @@ namespace nil {
                         return result;
                     }
 
-                    gt affine_ate_miller_loop(const affine_ate_g1_precomputation &prec_P,
-                                               const affine_ate_g2_precomputation &prec_Q) {
+                    gt affine_ate_miller_loop(const affine_ate_g1_precomputation &prec_P, const affine_ate_g2_precomputation &prec_Q) {
 
                         gt f = gt::one();
 
@@ -287,8 +296,7 @@ namespace nil {
                         Fq2 T;
                     };
 
-                    void doubling_step_for_flipped_miller_loop(extended_g2_projective &current,
-                                                               ate_dbl_coeffs &dc) {
+                    void doubling_step_for_flipped_miller_loop(extended_g2_projective &current, ate_dbl_coeffs &dc) {
                         const Fq2 X = current.X, Y = current.Y, Z = current.Z, T = current.T;
 
                         const Fq2 A = T.squared();                             // A = T1^2
@@ -296,7 +304,10 @@ namespace nil {
                         const Fq2 C = Y.squared();                             // C = Y1^2
                         const Fq2 D = C.squared();                             // D = C^2
                         const Fq2 E = (X + C).squared() - B - D;               // E = (X1+C)^2-B-D
-                        const Fq2 F = (B + B + B) + twist_coeff_a * A;    // F = 3*B +  a  *A
+                        const Fq2 F = (B + B + B) + g2::one().twist_coeff_a * A;    // F = 3*B +  a  *A
+                        // must be
+                        // const Fq2 F = (B + B + B) + g2::twist_coeff_a * A;    // F = 3*B +  a  *A
+                        // when constexpr ready
                         const Fq2 G = F.squared();                             // G = F^2
 
                         current.X = -E.doubled().doubled() + G;                     // X3 = -4*E+G
@@ -343,8 +354,14 @@ namespace nil {
                         ate_g1_precomp result;
                         result.PX = Pcopy.X;
                         result.PY = Pcopy.Y;
-                        result.PX_twist = Pcopy.X * twist;
-                        result.PY_twist = Pcopy.Y * twist;
+                        result.PX_twist = Pcopy.X * g2::one().twist;
+                        // must be
+                        // result.PX_twist = Pcopy.X * g2::twist;
+                        // when constexpr ready 
+                        result.PY_twist = Pcopy.Y * g2::one().twist;
+                        // must be
+                        // result.PY_twist = Pcopy.Y * g2::twist;
+                        // when constexpr ready 
 
                         return result;
                     }
@@ -357,8 +374,14 @@ namespace nil {
                         result.QX = Qcopy.X;
                         result.QY = Qcopy.Y;
                         result.QY2 = Qcopy.Y.squared();
-                        result.QX_over_twist = Qcopy.X * twist.inversed();
-                        result.QY_over_twist = Qcopy.Y * twist.inversed();
+                        result.QX_over_twist = Qcopy.X * g2::one().twist.inversed();
+                        // must be
+                        // result.QX_over_twist = Qcopy.X * g2::twist.inversed();
+                        // when constexpr ready 
+                        result.QY_over_twist = Qcopy.Y * g2::one().twist.inversed();
+                        // must be
+                        // result.QY_over_twist = Qcopy.Y * g2::twist.inversed();
+                        // when constexpr ready 
 
                         extended_g2_projective R;
                         R.X = Qcopy.X;
@@ -370,8 +393,8 @@ namespace nil {
                             policy_type::ate_loop_count;
                         bool found_one = false;
 
-                        for (long i = loop_count.max_bits() - 1; i >= 0; --i) {
-                            const bool bit = loop_count.test_bit(i);
+                        for (long i = policy_type::number_type_max_bits - 1; i >= 0; --i) {
+                            const bool bit = boost::multiprecision::bit_test(loop_count, i);
                             if (!found_one) {
                                 /* this skips the MSB itself */
                                 found_one |= bit;
@@ -416,8 +439,8 @@ namespace nil {
 
                         const typename policy_type::number_type &loop_count =
                             policy_type::ate_loop_count;
-                        for (long i = loop_count.max_bits() - 1; i >= 0; --i) {
-                            const bool bit = loop_count.test_bit(i);
+                        for (long i = policy_type::number_type_max_bits - 1; i >= 0; --i) {
+                            const bool bit = boost::multiprecision::bit_test(loop_count, i);
 
                             if (!found_one) {
                                 /* this skips the MSB itself */
@@ -455,10 +478,8 @@ namespace nil {
                         return f;
                     }
 
-                    gt ate_double_miller_loop(const ate_g1_precomp &prec_P1,
-                                              const ate_g2_precomp &prec_Q1,
-                                              const ate_g1_precomp &prec_P2,
-                                              const ate_g2_precomp &prec_Q2) {
+                    gt ate_double_miller_loop(const ate_g1_precomp &prec_P1, const ate_g2_precomp &prec_Q1,
+                                              const ate_g1_precomp &prec_P2, const ate_g2_precomp &prec_Q2) {
 
                         Fq2 L1_coeff1 = Fq2(prec_P1.PX, Fq::zero()) - prec_Q1.QX_over_twist;
                         Fq2 L1_coeff2 = Fq2(prec_P2.PX, Fq::zero()) - prec_Q2.QX_over_twist;
@@ -472,8 +493,8 @@ namespace nil {
                         const typename policy_type::number_type &loop_count =
                             policy_type::ate_loop_count;
 
-                        for (long i = loop_count.max_bits() - 1; i >= 0; --i) {
-                            const bool bit = loop_count.test_bit(i);
+                        for (long i = policy_type::number_type_max_bits - 1; i >= 0; --i) {
+                            const bool bit = boost::multiprecision::bit_test(loop_count, i);
 
                             if (!found_one) {
                                 /* this skips the MSB itself */
@@ -543,8 +564,7 @@ namespace nil {
                         return result;
                     }
 
-                    gt ate_reduced_pairing(const g1 &P,
-                                                                                         const g2 &Q) {
+                    gt ate_reduced_pairing(const g1 &P, const g2 &Q) {
 
                         const gt f = ate_pairing(P, Q);
                         const gt result = final_exponentiation(f);
@@ -563,10 +583,8 @@ namespace nil {
                         return ate_miller_loop(prec_P, prec_Q);
                     }
 
-                    gt double_miller_loop(const g1_precomp &prec_P1,
-                                               const g2_precomp &prec_Q1,
-                                               const g1_precomp &prec_P2,
-                                               const g2_precomp &prec_Q2) {
+                    gt double_miller_loop(const g1_precomp &prec_P1, const g2_precomp &prec_Q1,
+                                          const g1_precomp &prec_P2, const g2_precomp &prec_Q2) {
                         return ate_double_miller_loop(prec_P1, prec_Q1, prec_P2, prec_Q2);
                     }
 
