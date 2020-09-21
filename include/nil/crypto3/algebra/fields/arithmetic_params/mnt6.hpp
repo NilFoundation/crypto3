@@ -86,16 +86,56 @@ namespace nil {
                 using arithmetic_params<mnt6_scalar_field<ModulusBits, GeneratorBits>> =
                     arithmetic_params<mnt4_base_field<ModulusBits, GeneratorBits>>;
 
-                template<std::size_t ModulusBits, std::size_t GeneratorBits>
-                constexpr typename arithmetic_params<mnt6_base_field<ModulusBits, GeneratorBits>>::modulus_type const
-                    arithmetic_params<mnt6_base_field<ModulusBits, GeneratorBits>>::group_order;
-                template<std::size_t ModulusBits, std::size_t GeneratorBits>
-                constexpr typename arithmetic_params<mnt6_scalar_field<ModulusBits, GeneratorBits>>::modulus_type const
-                    arithmetic_params<mnt6_scalar_field<ModulusBits, GeneratorBits>>::group_order;
-                template<std::size_t ModulusBits, std::size_t GeneratorBits>
-                constexpr
-                    typename arithmetic_params<fp3<mnt6_base_field<ModulusBits, GeneratorBits>>>::modulus_type const
-                        arithmetic_params<fp3<mnt6_base_field<ModulusBits, GeneratorBits>>>::group_order;
+                constexpr std::size_t const arithmetic_params<mnt6_base_field<298, CHAR_BIT>>::s;
+                constexpr std::size_t const arithmetic_params<fp3<mnt6_base_field<298, CHAR_BIT>>>::s;
+
+                constexpr typename arithmetic_params<mnt6_base_field<298, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<mnt6_base_field<298, CHAR_BIT>>::t;
+                constexpr typename arithmetic_params<fp3<mnt6_base_field<298, CHAR_BIT>>>::extended_modulus_type 
+                    const arithmetic_params<fp3<mnt6_base_field<298, CHAR_BIT>>>::t;
+
+                constexpr typename arithmetic_params<mnt6_base_field<298, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<mnt6_base_field<298, CHAR_BIT>>::t_minus_1_over_2;
+                constexpr typename arithmetic_params<fp3<mnt6_base_field<298, CHAR_BIT>>>::extended_modulus_type 
+                    const arithmetic_params<fp3<mnt6_base_field<298, CHAR_BIT>>>::t_minus_1_over_2;
+
+                constexpr typename arithmetic_params<mnt6_base_field<298, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<mnt6_base_field<298, CHAR_BIT>>::arithmetic_generator;
+
+                constexpr typename arithmetic_params<mnt6_base_field<298, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<mnt6_base_field<298, CHAR_BIT>>::geometric_generator;
+
+                constexpr typename arithmetic_params<mnt6_base_field<298, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<mnt6_base_field<298, CHAR_BIT>>::multiplicative_generator;
+
+                constexpr typename arithmetic_params<mnt6_base_field<298, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<mnt6_base_field<298, CHAR_BIT>>::root_of_unity;
+
+                constexpr typename arithmetic_params<mnt6_base_field<298, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<mnt6_base_field<298, CHAR_BIT>>::nqr;
+                constexpr std::array<typename arithmetic_params<fp3<mnt6_base_field<298, CHAR_BIT>>>::modulus_type, 3> 
+                    const arithmetic_params<fp3<mnt6_base_field<298, CHAR_BIT>>>::nqr;
+
+                constexpr typename arithmetic_params<mnt6_base_field<298, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<mnt6_base_field<298, CHAR_BIT>>::nqr_to_t;
+                constexpr std::array<typename arithmetic_params<fp3<mnt6_base_field<298, CHAR_BIT>>>::modulus_type, 3> 
+                    const arithmetic_params<fp3<mnt6_base_field<298, CHAR_BIT>>>::nqr_to_t;
+
+                constexpr typename arithmetic_params<mnt6_base_field<298, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<mnt6_base_field<298, CHAR_BIT>>::Rsquared;
+
+                constexpr typename arithmetic_params<mnt6_base_field<298, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<mnt6_base_field<298, CHAR_BIT>>::Rcubed;
+
+                constexpr typename arithmetic_params<mnt6_base_field<298, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<mnt6_base_field<298, CHAR_BIT>>::modulus;
+                constexpr typename arithmetic_params<fp3<mnt6_base_field<298, CHAR_BIT>>>::modulus_type 
+                    const arithmetic_params<fp3<mnt6_base_field<298, CHAR_BIT>>>::modulus;
+
+                constexpr typename arithmetic_params<mnt6_base_field<298, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<mnt6_base_field<298, CHAR_BIT>>::group_order;
+                constexpr typename arithmetic_params<fp3<mnt6_base_field<298, CHAR_BIT>>>::extended_modulus_type 
+                    const arithmetic_params<fp3<mnt6_base_field<298, CHAR_BIT>>>::group_order;
 
             }    // namespace fields
         }        // namespace algebra

@@ -115,6 +115,82 @@ namespace nil {
                         0x183227397098D014DC2822DB40C0AC2E9419F4243CDCB848A1F0FAC9F8000000_cppui254;
                 };
 
+                constexpr std::size_t const arithmetic_params<bn128_base_field<254, CHAR_BIT>>::s;
+                constexpr std::size_t const arithmetic_params<fp2<bn128_base_field<254, CHAR_BIT>>>::s;
+                constexpr std::size_t const arithmetic_params<bn128_scalar_field<254, CHAR_BIT>>::s;
+
+                constexpr typename arithmetic_params<bn128_base_field<254, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bn128_base_field<254, CHAR_BIT>>::t;
+                constexpr typename arithmetic_params<fp2<bn128_base_field<254, CHAR_BIT>>>::extended_modulus_type 
+                    const arithmetic_params<fp2<bn128_base_field<254, CHAR_BIT>>>::t;
+                constexpr typename arithmetic_params<bn128_scalar_field<254, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bn128_scalar_field<254, CHAR_BIT>>::t;
+
+                constexpr typename arithmetic_params<bn128_base_field<254, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bn128_base_field<254, CHAR_BIT>>::t_minus_1_over_2;
+                constexpr typename arithmetic_params<fp2<bn128_base_field<254, CHAR_BIT>>>::extended_modulus_type 
+                    const arithmetic_params<fp2<bn128_base_field<254, CHAR_BIT>>>::t_minus_1_over_2;
+                constexpr typename arithmetic_params<bn128_scalar_field<254, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bn128_scalar_field<254, CHAR_BIT>>::t_minus_1_over_2;
+
+                constexpr typename arithmetic_params<bn128_base_field<254, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bn128_base_field<254, CHAR_BIT>>::arithmetic_generator;
+                constexpr typename arithmetic_params<bn128_scalar_field<254, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bn128_scalar_field<254, CHAR_BIT>>::arithmetic_generator;
+
+                constexpr typename arithmetic_params<bn128_base_field<254, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bn128_base_field<254, CHAR_BIT>>::geometric_generator;
+                constexpr typename arithmetic_params<bn128_scalar_field<254, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bn128_scalar_field<254, CHAR_BIT>>::geometric_generator;
+
+                constexpr typename arithmetic_params<bn128_base_field<254, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bn128_base_field<254, CHAR_BIT>>::multiplicative_generator;
+                constexpr typename arithmetic_params<bn128_scalar_field<254, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bn128_scalar_field<254, CHAR_BIT>>::multiplicative_generator;
+
+                constexpr typename arithmetic_params<bn128_base_field<254, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bn128_base_field<254, CHAR_BIT>>::root_of_unity;
+                constexpr typename arithmetic_params<bn128_scalar_field<254, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bn128_scalar_field<254, CHAR_BIT>>::root_of_unity;
+
+                constexpr typename arithmetic_params<bn128_base_field<254, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bn128_base_field<254, CHAR_BIT>>::nqr;
+                constexpr std::array<typename arithmetic_params<fp2<bn128_base_field<254, CHAR_BIT>>>::modulus_type, 2> 
+                    const arithmetic_params<fp2<bn128_base_field<254, CHAR_BIT>>>::nqr;
+                constexpr typename arithmetic_params<bn128_scalar_field<254, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bn128_scalar_field<254, CHAR_BIT>>::nqr;
+
+                constexpr typename arithmetic_params<bn128_base_field<254, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bn128_base_field<254, CHAR_BIT>>::nqr_to_t;
+                constexpr std::array<typename arithmetic_params<fp2<bn128_base_field<254, CHAR_BIT>>>::modulus_type, 2> 
+                    const arithmetic_params<fp2<bn128_base_field<254, CHAR_BIT>>>::nqr_to_t;
+                constexpr typename arithmetic_params<bn128_scalar_field<254, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bn128_scalar_field<254, CHAR_BIT>>::nqr_to_t;
+
+                constexpr typename arithmetic_params<bn128_base_field<254, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bn128_base_field<254, CHAR_BIT>>::Rsquared;
+                constexpr typename arithmetic_params<bn128_scalar_field<254, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bn128_scalar_field<254, CHAR_BIT>>::Rsquared;
+
+                constexpr typename arithmetic_params<bn128_base_field<254, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bn128_base_field<254, CHAR_BIT>>::Rcubed;
+                constexpr typename arithmetic_params<bn128_scalar_field<254, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bn128_scalar_field<254, CHAR_BIT>>::Rcubed;
+
+                constexpr typename arithmetic_params<bn128_base_field<254, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bn128_base_field<254, CHAR_BIT>>::modulus;
+                constexpr typename arithmetic_params<fp2<bn128_base_field<254, CHAR_BIT>>>::modulus_type 
+                    const arithmetic_params<fp2<bn128_base_field<254, CHAR_BIT>>>::modulus;
+                constexpr typename arithmetic_params<bn128_scalar_field<254, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bn128_scalar_field<254, CHAR_BIT>>::modulus;
+
+                constexpr typename arithmetic_params<bn128_base_field<254, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bn128_base_field<254, CHAR_BIT>>::group_order;
+                constexpr typename arithmetic_params<fp2<bn128_base_field<254, CHAR_BIT>>>::extended_modulus_type 
+                    const arithmetic_params<fp2<bn128_base_field<254, CHAR_BIT>>>::group_order;
+                constexpr typename arithmetic_params<bn128_scalar_field<254, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bn128_scalar_field<254, CHAR_BIT>>::group_order;
+
             }    // namespace fields
         }        // namespace algebra
     }            // namespace crypto3

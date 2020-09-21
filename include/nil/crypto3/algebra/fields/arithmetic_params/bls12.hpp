@@ -211,6 +211,162 @@ namespace nil {
                         0x955B2AF4D1652AB305A268F2E1BD800ACD53B7F680000008508C00000000000_cppui252;
                 };
 
+                /************************* BLS12-381 definitions ***********************************/
+
+                constexpr std::size_t const arithmetic_params<bls12_base_field<381, CHAR_BIT>>::s;
+                constexpr std::size_t const arithmetic_params<fp2<bls12_base_field<381, CHAR_BIT>>>::s;
+                constexpr std::size_t const arithmetic_params<bls12_scalar_field<381, CHAR_BIT>>::s;
+
+                constexpr typename arithmetic_params<bls12_base_field<381, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bls12_base_field<381, CHAR_BIT>>::t;
+                constexpr typename arithmetic_params<fp2<bls12_base_field<381, CHAR_BIT>>>::extended_modulus_type 
+                    const arithmetic_params<fp2<bls12_base_field<381, CHAR_BIT>>>::t;
+                constexpr typename arithmetic_params<bls12_scalar_field<381, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bls12_scalar_field<381, CHAR_BIT>>::t;
+
+                constexpr typename arithmetic_params<bls12_base_field<381, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bls12_base_field<381, CHAR_BIT>>::t_minus_1_over_2;
+                constexpr typename arithmetic_params<fp2<bls12_base_field<381, CHAR_BIT>>>::extended_modulus_type 
+                    const arithmetic_params<fp2<bls12_base_field<381, CHAR_BIT>>>::t_minus_1_over_2;
+                constexpr typename arithmetic_params<bls12_scalar_field<381, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bls12_scalar_field<381, CHAR_BIT>>::t_minus_1_over_2;
+
+                constexpr typename arithmetic_params<bls12_base_field<381, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bls12_base_field<381, CHAR_BIT>>::arithmetic_generator;
+                constexpr typename arithmetic_params<bls12_scalar_field<381, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bls12_scalar_field<381, CHAR_BIT>>::arithmetic_generator;
+
+                constexpr typename arithmetic_params<bls12_base_field<381, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bls12_base_field<381, CHAR_BIT>>::geometric_generator;
+                constexpr typename arithmetic_params<bls12_scalar_field<381, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bls12_scalar_field<381, CHAR_BIT>>::geometric_generator;
+
+                constexpr typename arithmetic_params<bls12_base_field<381, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bls12_base_field<381, CHAR_BIT>>::multiplicative_generator;
+                constexpr typename arithmetic_params<bls12_scalar_field<381, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bls12_scalar_field<381, CHAR_BIT>>::multiplicative_generator;
+
+                constexpr typename arithmetic_params<bls12_base_field<381, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bls12_base_field<381, CHAR_BIT>>::root_of_unity;
+                constexpr typename arithmetic_params<bls12_scalar_field<381, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bls12_scalar_field<381, CHAR_BIT>>::root_of_unity;
+
+                constexpr typename arithmetic_params<bls12_base_field<381, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bls12_base_field<381, CHAR_BIT>>::nqr;
+                constexpr std::array<typename arithmetic_params<fp2<bls12_base_field<381, CHAR_BIT>>>::modulus_type, 2> 
+                    const arithmetic_params<fp2<bls12_base_field<381, CHAR_BIT>>>::nqr;
+                constexpr typename arithmetic_params<bls12_scalar_field<381, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bls12_scalar_field<381, CHAR_BIT>>::nqr;
+
+                constexpr typename arithmetic_params<bls12_base_field<381, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bls12_base_field<381, CHAR_BIT>>::nqr_to_t;
+                constexpr std::array<typename arithmetic_params<fp2<bls12_base_field<381, CHAR_BIT>>>::modulus_type, 2> 
+                    const arithmetic_params<fp2<bls12_base_field<381, CHAR_BIT>>>::nqr_to_t;
+                constexpr typename arithmetic_params<bls12_scalar_field<381, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bls12_scalar_field<381, CHAR_BIT>>::nqr_to_t;
+
+                constexpr typename arithmetic_params<bls12_base_field<381, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bls12_base_field<381, CHAR_BIT>>::Rsquared;
+                constexpr typename arithmetic_params<bls12_scalar_field<381, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bls12_scalar_field<381, CHAR_BIT>>::Rsquared;
+
+                constexpr typename arithmetic_params<bls12_base_field<381, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bls12_base_field<381, CHAR_BIT>>::Rcubed;
+                constexpr typename arithmetic_params<bls12_scalar_field<381, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bls12_scalar_field<381, CHAR_BIT>>::Rcubed;
+
+                constexpr typename arithmetic_params<bls12_base_field<381, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bls12_base_field<381, CHAR_BIT>>::modulus;
+                constexpr typename arithmetic_params<fp2<bls12_base_field<381, CHAR_BIT>>>::modulus_type 
+                    const arithmetic_params<fp2<bls12_base_field<381, CHAR_BIT>>>::modulus;
+                constexpr typename arithmetic_params<bls12_scalar_field<381, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bls12_scalar_field<381, CHAR_BIT>>::modulus;
+
+                constexpr typename arithmetic_params<bls12_base_field<381, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bls12_base_field<381, CHAR_BIT>>::group_order;
+                constexpr typename arithmetic_params<fp2<bls12_base_field<381, CHAR_BIT>>>::extended_modulus_type 
+                    const arithmetic_params<fp2<bls12_base_field<381, CHAR_BIT>>>::group_order;
+                constexpr typename arithmetic_params<bls12_scalar_field<381, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bls12_scalar_field<381, CHAR_BIT>>::group_order;
+
+                /************************* BLS12-377 definitions ***********************************/
+
+                constexpr std::size_t const arithmetic_params<bls12_base_field<377, CHAR_BIT>>::s;
+                constexpr std::size_t const arithmetic_params<fp2<bls12_base_field<377, CHAR_BIT>>>::s;
+                constexpr std::size_t const arithmetic_params<bls12_scalar_field<377, CHAR_BIT>>::s;
+
+                constexpr typename arithmetic_params<bls12_base_field<377, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bls12_base_field<377, CHAR_BIT>>::t;
+                constexpr typename arithmetic_params<fp2<bls12_base_field<377, CHAR_BIT>>>::extended_modulus_type 
+                    const arithmetic_params<fp2<bls12_base_field<377, CHAR_BIT>>>::t;
+                constexpr typename arithmetic_params<bls12_scalar_field<377, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bls12_scalar_field<377, CHAR_BIT>>::t;
+
+                constexpr typename arithmetic_params<bls12_base_field<377, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bls12_base_field<377, CHAR_BIT>>::t_minus_1_over_2;
+                constexpr typename arithmetic_params<fp2<bls12_base_field<377, CHAR_BIT>>>::extended_modulus_type 
+                    const arithmetic_params<fp2<bls12_base_field<377, CHAR_BIT>>>::t_minus_1_over_2;
+                constexpr typename arithmetic_params<bls12_scalar_field<377, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bls12_scalar_field<377, CHAR_BIT>>::t_minus_1_over_2;
+
+                constexpr typename arithmetic_params<bls12_base_field<377, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bls12_base_field<377, CHAR_BIT>>::arithmetic_generator;
+                constexpr typename arithmetic_params<bls12_scalar_field<377, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bls12_scalar_field<377, CHAR_BIT>>::arithmetic_generator;
+
+                constexpr typename arithmetic_params<bls12_base_field<377, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bls12_base_field<377, CHAR_BIT>>::geometric_generator;
+                constexpr typename arithmetic_params<bls12_scalar_field<377, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bls12_scalar_field<377, CHAR_BIT>>::geometric_generator;
+
+                constexpr typename arithmetic_params<bls12_base_field<377, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bls12_base_field<377, CHAR_BIT>>::multiplicative_generator;
+                constexpr typename arithmetic_params<bls12_scalar_field<377, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bls12_scalar_field<377, CHAR_BIT>>::multiplicative_generator;
+
+                constexpr typename arithmetic_params<bls12_base_field<377, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bls12_base_field<377, CHAR_BIT>>::root_of_unity;
+                constexpr typename arithmetic_params<bls12_scalar_field<377, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bls12_scalar_field<377, CHAR_BIT>>::root_of_unity;
+
+                constexpr typename arithmetic_params<bls12_base_field<377, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bls12_base_field<377, CHAR_BIT>>::nqr;
+                constexpr std::array<typename arithmetic_params<fp2<bls12_base_field<377, CHAR_BIT>>>::modulus_type, 2> 
+                    const arithmetic_params<fp2<bls12_base_field<377, CHAR_BIT>>>::nqr;
+                constexpr typename arithmetic_params<bls12_scalar_field<377, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bls12_scalar_field<377, CHAR_BIT>>::nqr;
+
+                constexpr typename arithmetic_params<bls12_base_field<377, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bls12_base_field<377, CHAR_BIT>>::nqr_to_t;
+                constexpr std::array<typename arithmetic_params<fp2<bls12_base_field<377, CHAR_BIT>>>::modulus_type, 2> 
+                    const arithmetic_params<fp2<bls12_base_field<377, CHAR_BIT>>>::nqr_to_t;
+                constexpr typename arithmetic_params<bls12_scalar_field<377, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bls12_scalar_field<377, CHAR_BIT>>::nqr_to_t;
+
+                constexpr typename arithmetic_params<bls12_base_field<377, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bls12_base_field<377, CHAR_BIT>>::Rsquared;
+                constexpr typename arithmetic_params<bls12_scalar_field<377, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bls12_scalar_field<377, CHAR_BIT>>::Rsquared;
+
+                constexpr typename arithmetic_params<bls12_base_field<377, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bls12_base_field<377, CHAR_BIT>>::Rcubed;
+                constexpr typename arithmetic_params<bls12_scalar_field<377, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bls12_scalar_field<377, CHAR_BIT>>::Rcubed;
+
+                constexpr typename arithmetic_params<bls12_base_field<377, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bls12_base_field<377, CHAR_BIT>>::modulus;
+                constexpr typename arithmetic_params<fp2<bls12_base_field<377, CHAR_BIT>>>::modulus_type 
+                    const arithmetic_params<fp2<bls12_base_field<377, CHAR_BIT>>>::modulus;
+                constexpr typename arithmetic_params<bls12_scalar_field<377, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bls12_scalar_field<377, CHAR_BIT>>::modulus;
+
+                constexpr typename arithmetic_params<bls12_base_field<377, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bls12_base_field<377, CHAR_BIT>>::group_order;
+                constexpr typename arithmetic_params<fp2<bls12_base_field<377, CHAR_BIT>>>::extended_modulus_type 
+                    const arithmetic_params<fp2<bls12_base_field<377, CHAR_BIT>>>::group_order;
+                constexpr typename arithmetic_params<bls12_scalar_field<377, CHAR_BIT>>::modulus_type 
+                    const arithmetic_params<bls12_scalar_field<377, CHAR_BIT>>::group_order;
+
             }    // namespace fields
         }        // namespace algebra
     }            // namespace crypto3
