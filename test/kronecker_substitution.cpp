@@ -16,14 +16,14 @@
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
 
-#include <nil/crypto3/algebra/fft/polynomial_arithmetic/basic_operations.hpp>
-#include <nil/crypto3/algebra/fft/kronecker_substitution.hpp>
+#include <nil/crypto3/fft/polynomial_arithmetic/basic_operations.hpp>
+#include <nil/crypto3/fft/kronecker_substitution.hpp>
 
 #include <nil/crypto3/algebra/fields/bls12/base_field.hpp>
 #include <nil/crypto3/algebra/fields/arithmetic_params/bls12.hpp>
 
 using namespace nil::crypto3::algebra;
-using namespace nil::crypto3::algebra::fft;
+using namespace nil::crypto3::fft;
 
 typedef fields::bls12<381> FieldType;
 

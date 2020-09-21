@@ -11,9 +11,9 @@
 
 #include <vector>
 
-namespace nil { 
-    namespace crypto3 { 
-        namespace algebra {
+namespace nil {
+    namespace crypto3 {
+        namespace fft {
             /**
              * Translate the vector a to a coset defined by g.
              */
@@ -25,7 +25,7 @@ namespace nil {
                     u *= g;
                 }
             }
-        }    // namespace algebra
+        }    // namespace fft
     }        // namespace crypto3
 }    // namespace nil
 
