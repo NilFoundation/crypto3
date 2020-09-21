@@ -70,8 +70,8 @@ namespace nil {
                         e_times_e_over_e_miller_loop_component_type;
                     typedef mnt4_final_exp_component<curve_type> final_exp_component_type;
 
-                    static const constexpr algebra::bigint<algebra::mnt6_Fr::num_limbs> &pairing_loop_count =
-                        algebra::mnt6_ate_loop_count;
+                    constexpr static const typename curve_type::pairing_policy::number_type &pairing_loop_count = 
+                        curve_type::pairing_policy::pairing_loop_count;
                 };
 
                 /**
@@ -103,8 +103,8 @@ namespace nil {
                         e_times_e_over_e_miller_loop_component_type;
                     typedef mnt6_final_exp_component<curve_type> final_exp_component_type;
 
-                    static const constexpr algebra::bigint<algebra::mnt4_Fr::num_limbs> &pairing_loop_count =
-                        algebra::mnt4_ate_loop_count;
+                    constexpr static const typename curve_type::pairing_policy::number_type &pairing_loop_count = 
+                        curve_type::pairing_policy::pairing_loop_count;
                 };
 
             }    // namespace snark

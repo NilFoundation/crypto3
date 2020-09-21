@@ -38,9 +38,9 @@ namespace nil {
                 template<typename CurveType>
                 class G1_precomputation {
                 public:
-                    typedef typename CurveType::scalar_field_type FieldType;
-                    typedef algebra::Fqe<other_curve<CurveType>> fqe_type;
-                    typedef algebra::Fqk<other_curve<CurveType>> fqk_type;
+                    using FieldType = typename CurveType::pairing_policy::Fp_type;
+                    using fqe_type = typename other_curve<CurveType>::pairing_policy::Fqe_type;
+                    using fqk_type = typename other_curve<CurveType>::pairing_policy::Fqk_type;
 
                     std::shared_ptr<G1_variable<CurveType>> P;
                     std::shared_ptr<Fqe_variable<CurveType>> PY_twist_squared;
@@ -55,8 +55,8 @@ namespace nil {
                 template<typename CurveType>
                 class precompute_G1_component : public component<typename CurveType::scalar_field_type> {
                 public:
-                    typedef algebra::Fqe<other_curve<CurveType>> fqe_type;
-                    typedef algebra::Fqk<other_curve<CurveType>> fqk_type;
+                    using fqe_type = typename other_curve<CurveType>::pairing_policy::Fqe_type;
+                    using fqk_type = typename other_curve<CurveType>::pairing_policy::Fqk_type;
 
                     G1_precomputation<CurveType> &precomp;    // must be a reference.
 
@@ -66,8 +66,11 @@ namespace nil {
                         blueprint<FieldType> &pb,
                         const G1_variable<CurveType> &P,
                         G1_precomputation<CurveType> &precomp,    // will allocate this inside
+using FieldType = typename CurveType::pairing_policy::Fp_type;
+using fqe_type = typename other_curve<CurveType>::pairing_policy::Fqe_type;
+using fqk_type = typename ;
 
-                        const typename std::enable_if<algebra::Fqk<other_curve<CurveType>>::extension_degree() == 4,
+                        const typename std::enable_if<other_curve<CurveType>::pairing_policy::Fqk_type::extension_degree() == 4,
                                                       FieldType>::type & = typename FieldType::value_type()) :
                         component<FieldType>(pb),
                         precomp(precomp) {
@@ -84,7 +87,7 @@ namespace nil {
                         blueprint<FieldType> &pb,
                         const G1_variable<CurveType> &P,
                         G1_precomputation<CurveType> &precomp,    // will allocate this inside
-                        const typename std::enable_if<algebra::Fqk<other_curve<CurveType>>::extension_degree() == 6,
+                        const typename std::enable_if<other_curve<CurveType>::pairing_policy::Fqk_type::extension_degree() == 6,
                                                       FieldType>::type & = typename FieldType::value_type()) :
                         component<FieldType>(pb),
                         precomp(precomp) {

@@ -11,13 +11,10 @@
 // The gadgets verify computations of (single or multiple simultaneous) Miller loops.
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ZK_WEIERSTRASS_MILLER_LOOP_HPP_
-#define CRYPTO3_ZK_WEIERSTRASS_MILLER_LOOP_HPP_
+#ifndef CRYPTO3_ZK_WEIERSTRASS_MILLER_LOOP_HPP
+#define CRYPTO3_ZK_WEIERSTRASS_MILLER_LOOP_HPP
 
 #include <memory>
-
-#include <nil/crypto3/algebra/fields/field.hpp>
-#include <nil/crypto3/algebra/utils/random_element.hpp>
 
 #include <nil/crypto3/zk/snark/components/pairing/pairing_params.hpp>
 #include <nil/crypto3/zk/snark/components/pairing/weierstrass_precomputation.hpp>
@@ -42,9 +39,9 @@ namespace nil {
                 template<typename CurveType>
                 class mnt_miller_loop_dbl_line_eval : public component<typename CurveType::scalar_field_type> {
                 public:
-                    typedef typename CurveType::scalar_field_type FieldType;
-                    typedef algebra::Fqe<other_curve<CurveType>> fqe_type;
-                    typedef algebra::Fqk<other_curve<CurveType>> fqk_type;
+                    using FieldType = typename CurveType::pairing_policy::Fp_type;
+                    using fqe_type = typename other_curve<CurveType>::pairing_policy::Fqe_type;
+                    using fqk_type = typename other_curve<CurveType>::pairing_policy::Fqk_type;
 
                     G1_precomputation<CurveType> prec_P;
                     precompute_G2_component_coeffs<CurveType> c;
@@ -77,9 +74,9 @@ namespace nil {
                 template<typename CurveType>
                 class mnt_miller_loop_add_line_eval : public component<typename CurveType::scalar_field_type> {
                 public:
-                    typedef typename CurveType::scalar_field_type FieldType;
-                    typedef algebra::Fqe<other_curve<CurveType>> fqe_type;
-                    typedef algebra::Fqk<other_curve<CurveType>> fqk_type;
+                    using FieldType = typename CurveType::pairing_policy::Fp_type;
+                    using fqe_type = typename other_curve<CurveType>::pairing_policy::Fqe_type;
+                    using fqk_type = typename other_curve<CurveType>::pairing_policy::Fqk_type;
 
                     bool invert_Q;
                     G1_precomputation<CurveType> prec_P;
@@ -107,9 +104,9 @@ namespace nil {
                 template<typename CurveType>
                 class mnt_miller_loop_component : public component<typename CurveType::scalar_field_type> {
                 public:
-                    typedef typename CurveType::scalar_field_type FieldType;
-                    typedef algebra::Fqe<other_curve<CurveType>> fqe_type;
-                    typedef algebra::Fqk<other_curve<CurveType>> fqk_type;
+                    using FieldType = typename CurveType::pairing_policy::Fp_type;
+                    using fqe_type = typename other_curve<CurveType>::pairing_policy::Fqe_type;
+                    using fqk_type = typename other_curve<CurveType>::pairing_policy::Fqk_type;
 
                     std::vector<std::shared_ptr<Fqk_variable<CurveType>>> g_RR_at_Ps;
                     std::vector<std::shared_ptr<Fqk_variable<CurveType>>> g_RQ_at_Ps;
@@ -147,9 +144,9 @@ namespace nil {
                 template<typename CurveType>
                 class mnt_e_over_e_miller_loop_component : public component<typename CurveType::scalar_field_type> {
                 public:
-                    typedef typename CurveType::scalar_field_type FieldType;
-                    typedef algebra::Fqe<other_curve<CurveType>> fqe_type;
-                    typedef algebra::Fqk<other_curve<CurveType>> fqk_type;
+                    using FieldType = typename CurveType::pairing_policy::Fp_type;
+                    using fqe_type = typename other_curve<CurveType>::pairing_policy::Fqe_type;
+                    using fqk_type = typename other_curve<CurveType>::pairing_policy::Fqk_type;
 
                     std::vector<std::shared_ptr<Fqk_variable<CurveType>>> g_RR_at_P1s;
                     std::vector<std::shared_ptr<Fqk_variable<CurveType>>> g_RQ_at_P1s;
@@ -197,9 +194,9 @@ namespace nil {
                 template<typename CurveType>
                 class mnt_e_times_e_over_e_miller_loop_component : public component<typename CurveType::scalar_field_type> {
                 public:
-                    typedef typename CurveType::scalar_field_type FieldType;
-                    typedef algebra::Fqe<other_curve<CurveType>> fqe_type;
-                    typedef algebra::Fqk<other_curve<CurveType>> fqk_type;
+                    using FieldType = typename CurveType::pairing_policy::Fp_type;
+                    using fqe_type = typename other_curve<CurveType>::pairing_policy::Fqe_type;
+                    using fqk_type = typename other_curve<CurveType>::pairing_policy::Fqk_type;
 
                     std::vector<std::shared_ptr<Fqk_variable<CurveType>>> g_RR_at_P1s;
                     std::vector<std::shared_ptr<Fqk_variable<CurveType>>> g_RQ_at_P1s;
@@ -509,56 +506,6 @@ namespace nil {
                 }
 
                 template<typename CurveType>
-                void test_mnt_miller_loop(const std::string &annotation) {
-                    blueprint<typename CurveType::scalar_field_type> pb;
-                    other_curve<CurveType>::g1_type P_val =
-                        random_element<other_curve<CurveType>::scalar_field_type :: scalar_field_type>() * other_curve<CurveType>::g1_type::one();
-                    other_curve<CurveType>::g2_type Q_val =
-                        random_element<other_curve<CurveType>::scalar_field_type>() * other_curve<CurveType>::g2_type::one();
-
-                    G1_variable<CurveType> P(pb);
-                    G2_variable<CurveType> Q(pb);
-
-                    G1_precomputation<CurveType> prec_P;
-                    G2_precomputation<CurveType> prec_Q;
-
-                    precompute_G1_component<CurveType> compute_prec_P(pb, P, prec_P);
-                    precompute_G2_component<CurveType> compute_prec_Q(pb, Q, prec_Q);
-
-                    Fqk_variable<CurveType> result(pb);
-                    mnt_miller_loop_component<CurveType> miller(pb, prec_P, prec_Q, result);
-
-                    PROFILE_CONSTRAINTS(pb, "precompute P") {
-                        compute_prec_P.generate_r1cs_constraints();
-                    }
-                    PROFILE_CONSTRAINTS(pb, "precompute Q") {
-                        compute_prec_Q.generate_r1cs_constraints();
-                    }
-                    PROFILE_CONSTRAINTS(pb, "Miller loop") {
-                        miller.generate_r1cs_constraints();
-                    }
-                    PRINT_CONSTRAINT_PROFILING();
-
-                    P.generate_r1cs_witness(P_val);
-                    compute_prec_P.generate_r1cs_witness();
-                    Q.generate_r1cs_witness(Q_val);
-                    compute_prec_Q.generate_r1cs_witness();
-                    miller.generate_r1cs_witness();
-                    assert(pb.is_satisfied());
-
-                    algebra::affine_ate_G1_precomp<other_curve<CurveType>> native_prec_P =
-                        other_curve<CurveType>::affine_ate_precompute_G1(P_val);
-                    algebra::affine_ate_G2_precomp<other_curve<CurveType>> native_prec_Q =
-                        other_curve<CurveType>::affine_ate_precompute_G2(Q_val);
-                    algebra::Fqk<other_curve<CurveType>> native_result =
-                        other_curve<CurveType>::affine_ate_miller_loop(native_prec_P, native_prec_Q);
-
-                    assert(result.get_element() == native_result);
-                    printf("number of constraints for Miller loop (Fr is %s)  = %zu\n", annotation.c_str(),
-                           pb.num_constraints());
-                }
-
-                template<typename CurveType>
                 mnt_e_over_e_miller_loop_component<CurveType>::mnt_e_over_e_miller_loop_component(
                     blueprint<FieldType> &pb,
                     const G1_precomputation<CurveType> &prec_P1,
@@ -721,78 +668,6 @@ namespace nil {
                             ++add_id;
                         }
                     }
-                }
-
-                template<typename CurveType>
-                void test_mnt_e_over_e_miller_loop(const std::string &annotation) {
-                    blueprint<typename CurveType::scalar_field_type> pb;
-                    other_curve<CurveType>::g1_type P1_val =
-                        random_element<other_curve<CurveType>::scalar_field_type>() * other_curve<CurveType>::g1_type::one();
-                    other_curve<CurveType>::g2_type Q1_val =
-                        random_element<other_curve<CurveType>::scalar_field_type>() * other_curve<CurveType>::g2_type::one();
-
-                    other_curve<CurveType>::g1_type P2_val =
-                        random_element<other_curve<CurveType>::scalar_field_type>() * other_curve<CurveType>::g1_type::one();
-                    other_curve<CurveType>::g2_type Q2_val =
-                        random_element<other_curve<CurveType>::scalar_field_type>() * other_curve<CurveType>::g2_type::one();
-
-                    G1_variable<CurveType> P1(pb, "P1");
-                    G2_variable<CurveType> Q1(pb, "Q1");
-                    G1_variable<CurveType> P2(pb, "P2");
-                    G2_variable<CurveType> Q2(pb, "Q2");
-
-                    G1_precomputation<CurveType> prec_P1;
-                    precompute_G1_component<CurveType> compute_prec_P1(pb, P1, prec_P1, "compute_prec_P1");
-                    G1_precomputation<CurveType> prec_P2;
-                    precompute_G1_component<CurveType> compute_prec_P2(pb, P2, prec_P2, "compute_prec_P2");
-                    G2_precomputation<CurveType> prec_Q1;
-                    precompute_G2_component<CurveType> compute_prec_Q1(pb, Q1, prec_Q1, "compute_prec_Q1");
-                    G2_precomputation<CurveType> prec_Q2;
-                    precompute_G2_component<CurveType> compute_prec_Q2(pb, Q2, prec_Q2, "compute_prec_Q2");
-
-                    Fqk_variable<CurveType> result(pb, "result");
-                    mnt_e_over_e_miller_loop_component<CurveType> miller(pb, prec_P1, prec_Q1, prec_P2, prec_Q2, result,
-                                                                "miller");
-
-                    PROFILE_CONSTRAINTS(pb, "precompute P") {
-                        compute_prec_P1.generate_r1cs_constraints();
-                        compute_prec_P2.generate_r1cs_constraints();
-                    }
-                    PROFILE_CONSTRAINTS(pb, "precompute Q") {
-                        compute_prec_Q1.generate_r1cs_constraints();
-                        compute_prec_Q2.generate_r1cs_constraints();
-                    }
-                    PROFILE_CONSTRAINTS(pb, "Miller loop") {
-                        miller.generate_r1cs_constraints();
-                    }
-                    PRINT_CONSTRAINT_PROFILING();
-
-                    P1.generate_r1cs_witness(P1_val);
-                    compute_prec_P1.generate_r1cs_witness();
-                    Q1.generate_r1cs_witness(Q1_val);
-                    compute_prec_Q1.generate_r1cs_witness();
-                    P2.generate_r1cs_witness(P2_val);
-                    compute_prec_P2.generate_r1cs_witness();
-                    Q2.generate_r1cs_witness(Q2_val);
-                    compute_prec_Q2.generate_r1cs_witness();
-                    miller.generate_r1cs_witness();
-                    assert(pb.is_satisfied());
-
-                    algebra::affine_ate_G1_precomp<other_curve<CurveType>> native_prec_P1 =
-                        other_curve<CurveType>::affine_ate_precompute_G1(P1_val);
-                    algebra::affine_ate_G2_precomp<other_curve<CurveType>> native_prec_Q1 =
-                        other_curve<CurveType>::affine_ate_precompute_G2(Q1_val);
-                    algebra::affine_ate_G1_precomp<other_curve<CurveType>> native_prec_P2 =
-                        other_curve<CurveType>::affine_ate_precompute_G1(P2_val);
-                    algebra::affine_ate_G2_precomp<other_curve<CurveType>> native_prec_Q2 =
-                        other_curve<CurveType>::affine_ate_precompute_G2(Q2_val);
-                    algebra::Fqk<other_curve<CurveType>> native_result =
-                        (other_curve<CurveType>::affine_ate_miller_loop(native_prec_P1, native_prec_Q1) *
-                         other_curve<CurveType>::affine_ate_miller_loop(native_prec_P2, native_prec_Q2).inverse());
-
-                    assert(result.get_element() == native_result);
-                    printf("number of constraints for e over e Miller loop (Fr is %s)  = %zu\n", annotation.c_str(),
-                           pb.num_constraints());
                 }
 
                 template<typename CurveType>
@@ -989,103 +864,9 @@ namespace nil {
                     }
                 }
 
-                template<typename CurveType>
-                void test_mnt_e_times_e_over_e_miller_loop(const std::string &annotation) {
-                    blueprint<typename CurveType::scalar_field_type> pb;
-                    other_curve<CurveType>::g1_type P1_val =
-                        random_element<other_curve<CurveType>::scalar_field_type>() * other_curve<CurveType>::g1_type::one();
-                    other_curve<CurveType>::g2_type Q1_val =
-                        random_element<other_curve<CurveType>::scalar_field_type>() * other_curve<CurveType>::g2_type::one();
-
-                    other_curve<CurveType>::g1_type P2_val =
-                        random_element<other_curve<CurveType>::scalar_field_type>() * other_curve<CurveType>::g1_type::one();
-                    other_curve<CurveType>::g2_type Q2_val =
-                        random_element<other_curve<CurveType>::scalar_field_type>() * other_curve<CurveType>::g2_type::one();
-
-                    other_curve<CurveType>::g1_type P3_val =
-                        random_element<other_curve<CurveType>::scalar_field_type>() * other_curve<CurveType>::g1_type::one();
-                    other_curve<CurveType>::g2_type Q3_val =
-                        random_element<other_curve<CurveType>::scalar_field_type>() * other_curve<CurveType>::g2_type::one();
-
-                    G1_variable<CurveType> P1(pb);
-                    G2_variable<CurveType> Q1(pb);
-                    G1_variable<CurveType> P2(pb);
-                    G2_variable<CurveType> Q2(pb);
-                    G1_variable<CurveType> P3(pb);
-                    G2_variable<CurveType> Q3(pb);
-
-                    G1_precomputation<CurveType> prec_P1;
-                    precompute_G1_component<CurveType> compute_prec_P1(pb, P1, prec_P1);
-                    G1_precomputation<CurveType> prec_P2;
-                    precompute_G1_component<CurveType> compute_prec_P2(pb, P2, prec_P2);
-                    G1_precomputation<CurveType> prec_P3;
-                    precompute_G1_component<CurveType> compute_prec_P3(pb, P3, prec_P3);
-                    G2_precomputation<CurveType> prec_Q1;
-                    precompute_G2_component<CurveType> compute_prec_Q1(pb, Q1, prec_Q1);
-                    G2_precomputation<CurveType> prec_Q2;
-                    precompute_G2_component<CurveType> compute_prec_Q2(pb, Q2, prec_Q2);
-                    G2_precomputation<CurveType> prec_Q3;
-                    precompute_G2_component<CurveType> compute_prec_Q3(pb, Q3, prec_Q3);
-
-                    Fqk_variable<CurveType> result(pb);
-                    mnt_e_times_e_over_e_miller_loop_component<CurveType> miller(pb, prec_P1, prec_Q1, prec_P2, prec_Q2, prec_P3,
-                                                                        prec_Q3, result);
-
-                    PROFILE_CONSTRAINTS(pb, "precompute P") {
-                        compute_prec_P1.generate_r1cs_constraints();
-                        compute_prec_P2.generate_r1cs_constraints();
-                        compute_prec_P3.generate_r1cs_constraints();
-                    }
-                    PROFILE_CONSTRAINTS(pb, "precompute Q") {
-                        compute_prec_Q1.generate_r1cs_constraints();
-                        compute_prec_Q2.generate_r1cs_constraints();
-                        compute_prec_Q3.generate_r1cs_constraints();
-                    }
-                    PROFILE_CONSTRAINTS(pb, "Miller loop") {
-                        miller.generate_r1cs_constraints();
-                    }
-                    PRINT_CONSTRAINT_PROFILING();
-
-                    P1.generate_r1cs_witness(P1_val);
-                    compute_prec_P1.generate_r1cs_witness();
-                    Q1.generate_r1cs_witness(Q1_val);
-                    compute_prec_Q1.generate_r1cs_witness();
-                    P2.generate_r1cs_witness(P2_val);
-                    compute_prec_P2.generate_r1cs_witness();
-                    Q2.generate_r1cs_witness(Q2_val);
-                    compute_prec_Q2.generate_r1cs_witness();
-                    P3.generate_r1cs_witness(P3_val);
-                    compute_prec_P3.generate_r1cs_witness();
-                    Q3.generate_r1cs_witness(Q3_val);
-                    compute_prec_Q3.generate_r1cs_witness();
-                    miller.generate_r1cs_witness();
-                    assert(pb.is_satisfied());
-
-                    algebra::affine_ate_G1_precomp<other_curve<CurveType>> native_prec_P1 =
-                        other_curve<CurveType>::affine_ate_precompute_G1(P1_val);
-                    algebra::affine_ate_G2_precomp<other_curve<CurveType>> native_prec_Q1 =
-                        other_curve<CurveType>::affine_ate_precompute_G2(Q1_val);
-                    algebra::affine_ate_G1_precomp<other_curve<CurveType>> native_prec_P2 =
-                        other_curve<CurveType>::affine_ate_precompute_G1(P2_val);
-                    algebra::affine_ate_G2_precomp<other_curve<CurveType>> native_prec_Q2 =
-                        other_curve<CurveType>::affine_ate_precompute_G2(Q2_val);
-                    algebra::affine_ate_G1_precomp<other_curve<CurveType>> native_prec_P3 =
-                        other_curve<CurveType>::affine_ate_precompute_G1(P3_val);
-                    algebra::affine_ate_G2_precomp<other_curve<CurveType>> native_prec_Q3 =
-                        other_curve<CurveType>::affine_ate_precompute_G2(Q3_val);
-                    algebra::Fqk<other_curve<CurveType>> native_result =
-                        (other_curve<CurveType>::affine_ate_miller_loop(native_prec_P1, native_prec_Q1) *
-                         other_curve<CurveType>::affine_ate_miller_loop(native_prec_P2, native_prec_Q2) *
-                         other_curve<CurveType>::affine_ate_miller_loop(native_prec_P3, native_prec_Q3).inverse());
-
-                    assert(result.get_element() == native_result);
-                    printf("number of constraints for e times e over e Miller loop (Fr is %s)  = %zu\n",
-                           annotation.c_str(), pb.num_constraints());
-                }
-
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // WEIERSTRASS_MILLER_LOOP_HPP_
+#endif    // CRYPTO3_ZK_WEIERSTRASS_MILLER_LOOP_HPP
