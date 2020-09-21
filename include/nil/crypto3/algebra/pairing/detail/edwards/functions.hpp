@@ -86,7 +86,9 @@ namespace nil {
 
                         using g2_precomp = ate_g2_precomp;
 
-                        /* final exponentiations */
+                    private:
+
+                        /*************************  FINAL EXPONENTIATIONS  ***********************************/
 
                         gt final_exponentiation_last_chunk(const gt &elt, const gt &elt_inv) {
 
@@ -122,6 +124,8 @@ namespace nil {
                             return beta;
                         }
 
+                    public:
+
                         gt final_exponentiation(const gt &elt) {
                             const gt elt_inv = elt.inversed();
                             const gt elt_to_first_chunk = final_exponentiation_first_chunk(elt, elt_inv);
@@ -131,6 +135,8 @@ namespace nil {
                             return result;
                         }
 
+                    private:
+                        
                         tate_g2_precomp tate_precompute_g2(const g2 &Q) {
                             g2 Qcopy = Q.to_affine_coordinates();
                             tate_g2_precomp result;
@@ -573,6 +579,10 @@ namespace nil {
 
                             return result;
                         }
+
+                        /*************************  CHOICE OF PAIRING ***********************************/
+
+                    public:
 
                         g1_precomp precompute_g1(const g1 &P) {
                             return ate_precompute_g1(P);

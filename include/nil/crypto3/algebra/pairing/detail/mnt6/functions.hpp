@@ -112,7 +112,10 @@ namespace nil {
                         typedef ate_g1_precomp g1_precomp;
                         typedef ate_g2_precomp g2_precomp;
 
-                        /* final exponentiations */
+                    private:
+                        
+                        /*************************  FINAL EXPONENTIATIONS  ***********************************/
+
                         gt final_exponentiation_last_chunk(const gt &elt, const gt &elt_inv) {
                             const gt elt_q = elt.Frobenius_map(1);
                             gt w1_part = elt_q.cyclotomic_exp(policy_type::final_exponent_last_chunk_w1);
@@ -142,6 +145,8 @@ namespace nil {
                             return beta;
                         }
 
+                    public:
+
                         gt final_exponentiation(const gt &elt) {
                             const gt elt_inv = elt.inversed();
                             const gt elt_to_first_chunk = final_exponentiation_first_chunk(elt, elt_inv);
@@ -151,6 +156,8 @@ namespace nil {
                             return result;
                         }
 
+                    private:
+                        
                         /* affine ate miller loop */
                         affine_ate_g1_precomputation affine_ate_precompute_g1(const g1 &P) {
 
@@ -550,6 +557,10 @@ namespace nil {
                             const gt result = final_exponentiation(f);
                             return result;
                         }
+
+                        /*************************  CHOICE OF PAIRING ***********************************/
+
+                    public:
 
                         g1_precomp precompute_g1(const g1 &P) {
                             return ate_precompute_g1(P);

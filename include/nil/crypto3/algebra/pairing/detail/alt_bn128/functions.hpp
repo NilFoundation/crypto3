@@ -66,6 +66,10 @@ namespace nil {
                             }
                         };
 
+                    private:
+
+                        /*************************  FINAL EXPONENTIATIONS  ***********************************/
+
                         gt final_exponentiation_first_chunk(const gt &elt) {
 
                             /*
@@ -171,6 +175,8 @@ namespace nil {
                             return result;
                         }
 
+                    public:
+
                         gt final_exponentiation(const gt &elt) {
                             /* OLD naive version:
                                 gt result = elt^final_exponent;
@@ -180,6 +186,8 @@ namespace nil {
 
                             return result;
                         }
+
+                    private:
 
                         /* ate pairing */
 
@@ -415,7 +423,9 @@ namespace nil {
                             return result;
                         }
 
-                        /* choice of pairing */
+                        /*************************  CHOICE OF PAIRING ***********************************/
+
+                    public:
 
                         g1_precomp precompute_g1(const g1 &P) {
                             return ate_precompute_g1(P);

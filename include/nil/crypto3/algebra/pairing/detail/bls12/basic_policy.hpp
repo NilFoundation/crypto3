@@ -96,6 +96,11 @@ namespace nil {
                         constexpr static const number_type final_exponent_is_z_neg = false;
                     };
 
+                    constexpr typename bls12_basic_policy<381, CHAR_BIT>::number_type 
+                        const bls12_basic_policy<381, CHAR_BIT>::ate_loop_count;
+                    constexpr typename bls12_basic_policy<377, CHAR_BIT>::number_type 
+                        const bls12_basic_policy<377, CHAR_BIT>::ate_loop_count;
+
                 }    // namespace detail
             }        // namespace pairing
         }            // namespace algebra

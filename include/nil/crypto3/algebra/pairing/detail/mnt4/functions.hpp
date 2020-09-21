@@ -115,7 +115,9 @@ namespace nil {
 
                         typedef ate_g2_precomp g2_precomp;
 
-                        /* final exponentiations */
+                    private:
+
+                        /*************************  FINAL EXPONENTIATIONS  ***********************************/
 
                         gt final_exponentiation_last_chunk(const gt &elt, const gt &elt_inv) {
 
@@ -144,6 +146,8 @@ namespace nil {
                             return elt_q2_over_elt;
                         }
 
+                    public:
+
                         gt final_exponentiation(const gt &elt) {
 
                             const gt elt_inv = elt.inversed();
@@ -153,6 +157,8 @@ namespace nil {
 
                             return result;
                         }
+
+                    private:
 
                         /* affine ate miller loop */
 
@@ -550,6 +556,10 @@ namespace nil {
                             const gt result = final_exponentiation(f);
                             return result;
                         }
+
+                        /*************************  CHOICE OF PAIRING ***********************************/
+
+                    public:
 
                         g1_precomp precompute_g1(const g1 &P) {
                             return ate_precompute_g1(P);

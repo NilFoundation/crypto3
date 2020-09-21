@@ -28,32 +28,40 @@ namespace nil {
                 using namespace nil::crypto3::algebra;
 
                 template<std::size_t ModulusBits, std::size_t GeneratorBits>
-                class pairing_policy<curves::bls12<ModulusBits, GeneratorBits>> {
+                class pairing_policy<curves::bls12<ModulusBits, GeneratorBits>> : public detail::bls12_pairing_functions<ModulusBits, GeneratorBits>{
                     using policy_type = detail::bls12_pairing_functions<ModulusBits, GeneratorBits>;
                     using basic_policy = detail::bls12_basic_policy<ModulusBits, GeneratorBits>;
                 public:
+
+                    using number_type = typename basic_policy::number_type;
+
+                    constexpr static const typename basic_policy::number_type pairing_loop_count = basic_policy::ate_loop_count;
 
                     using Fp_type = typename basic_policy::Fp_field;
                     using G1_type = typename basic_policy::g1;
                     using G2_type = typename basic_policy::g2;
                     using Fq_type = typename basic_policy::Fq_field;
                     using Fqe_type = typename basic_policy::Fqe_field;
-                    using Fqk_type = typename basic_policy::gt_field;
+                    using Fqk_type = typename basic_policy::Fqk_field;
                     using GT_type = typename basic_policy::gt;
 
                     using G1_precomp_type = typename policy_type::ate_g1_precomp;
                     using G2_precomp_type = typename policy_type::ate_g2_precomp;
 
-                    using precompute_g1 = typename policy_type::ate_precompute_g1;
-                    using precompute_g2 = typename policy_type::ate_precompute_g2;
+                    using policy_type::precompute_g1;
+                    using policy_type::precompute_g2;
 
-                    using reduced_pairing = typename policy_type::reduced_pairing;
-                    using pairing = typename policy_type::pairing;
+                    using policy_type::reduced_pairing;
+                    using policy_type::pairing;
 
-                    using miller_loop = typename policy_type::ate_miller_loop;
-                    using double_miller_loop = typename policy_type::double_ate_miller_loop;
-                    using final_exponentiation = typename policy_type::final_exponentiation;
+                    using policy_type::miller_loop;
+                    using policy_type::double_miller_loop;
+                    using policy_type::final_exponentiation;
                 };
+
+                template<std::size_t ModulusBits, std::size_t GeneratorBits>
+                constexpr typename pairing_policy<curves::bls12<ModulusBits, GeneratorBits>>::number_type 
+                    const pairing_policy<curves::bls12<ModulusBits, GeneratorBits>>::pairing_loop_count;
             }    // namespace pairing
         }        // namespace algebra
     }            // namespace crypto3

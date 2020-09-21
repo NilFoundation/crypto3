@@ -57,6 +57,8 @@ namespace nil {
                         constexpr static const number_type final_exponent_is_z_neg = false;
                     };
 
+                    constexpr typename alt_bn128_basic_policy<254, CHAR_BIT>::number_type 
+                        const alt_bn128_basic_policy<254, CHAR_BIT>::ate_loop_count;
                 }    // namespace detail
             }        // namespace pairing
         }            // namespace algebra

@@ -69,6 +69,8 @@ namespace nil {
 
                         typedef ate_g1_precomp g1_precomp;
                         typedef ate_g2_precomp g2_precomp;
+                    
+                    private:
 
                         /*************************  FINAL EXPONENTIATIONS  ***********************************/
 
@@ -139,6 +141,8 @@ namespace nil {
                             return result;
                         }
 
+                    public:
+
                         gt final_exponentiation(const gt &elt) {
                             /* OLD naive version:
                                 gt result = elt^final_exponent;
@@ -148,6 +152,8 @@ namespace nil {
 
                             return result;
                         }
+
+                    private:
 
                         /*************************  ATE PAIRING ***********************************/
 
@@ -362,6 +368,7 @@ namespace nil {
 
                         /*************************  CHOICE OF PAIRING ***********************************/
 
+                    public:
                         g1_precomp precompute_g1(const g1 &P) {
                             return ate_precompute_g1(P);
                         }
