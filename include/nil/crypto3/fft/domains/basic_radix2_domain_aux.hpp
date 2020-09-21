@@ -212,6 +212,7 @@ namespace nil {
                 }
             }    // namespace detail
         }        // namespace fft
-    }            // namespace nil
+    }            // namespace crypto3
+}    // namespace nil
 
 #endif    // ALGEBRA_FFT_BASIC_RADIX2_DOMAIN_AUX_HPP
