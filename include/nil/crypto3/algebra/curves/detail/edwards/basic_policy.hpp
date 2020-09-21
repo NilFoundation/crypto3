@@ -13,6 +13,7 @@
 #include <nil/crypto3/algebra/fields/edwards/base_field.hpp>
 #include <nil/crypto3/algebra/fields/edwards/scalar_field.hpp>
 
+#include <nil/crypto3/algebra/fields/fp3.hpp>
 #include <nil/crypto3/algebra/fields/fp6_2over3.hpp>
 
 #include <nil/crypto3/algebra/detail/literals.hpp>
@@ -31,7 +32,11 @@ namespace nil {
                     template<>
                     struct edwards_basic_policy<183, CHAR_BIT> {
                         constexpr static const std::size_t base_field_bits = 183;
-                        typedef fields::edwards_fq<base_field_bits, CHAR_BIT> base_field_type;
+                        typedef fields::edwards_fq<base_field_bits, CHAR_BIT> g1_field_type;
+                        using base_field_type = g1_field_type;
+                        typedef typename fields::fp3<base_field_type> g2_field_type;
+                        typedef typename fields::fp6_2over3<base_field_type> gt_field_type;
+
                         typedef typename base_field_type::modulus_type number_type;
                         typedef typename base_field_type::extended_modulus_type extended_number_type;
 
@@ -44,12 +49,8 @@ namespace nil {
                         constexpr static const number_type p = base_field_modulus;
                         constexpr static const number_type q = scalar_field_modulus;
 
-                        typedef typename fields::fp6_2over3<base_field_type>::value_type gt_type;
-
                         constexpr static const number_type a = 0x01;
                         constexpr static const number_type d = 0x64536D55979879327CF1306BB5A6277D254EF9776CE70_cppui179;
-                        constexpr static const number_type x = 0x00;    //?
-                        constexpr static const number_type y = 0x00;    //?
                     };
 
                     constexpr typename edwards_basic_policy<183, CHAR_BIT>::number_type const

@@ -13,6 +13,7 @@
 #include <nil/crypto3/algebra/fields/mnt6/base_field.hpp>
 #include <nil/crypto3/algebra/fields/mnt6/scalar_field.hpp>
 
+#include <nil/crypto3/algebra/fields/fp3.hpp>
 #include <nil/crypto3/algebra/fields/fp6_2over3.hpp>
 
 #include <nil/crypto3/algebra/detail/literals.hpp>
@@ -31,7 +32,11 @@ namespace nil {
                     template<>
                     struct mnt6_basic_policy<298, CHAR_BIT> {
                         constexpr static const std::size_t base_field_bits = 298;
-                        typedef fields::mnt6_fq<base_field_bits, CHAR_BIT> base_field_type;
+                        typedef fields::mnt6_fq<base_field_bits, CHAR_BIT> g1_field_type;
+                        using base_field_type = g1_field_type;
+                        typedef typename fields::fp3<base_field_type> g2_field_type;
+                        typedef typename fields::fp6_2over3<base_field_type> gt_field_type;
+
                         typedef typename base_field_type::modulus_type number_type;
                         typedef typename base_field_type::extended_modulus_type extended_number_type;
 
@@ -44,13 +49,9 @@ namespace nil {
                         constexpr static const number_type p = base_field_modulus;
                         constexpr static const number_type q = scalar_field_modulus;
 
-                        typedef typename fields::fp6_2over3<base_field_type>::value_type gt_type;
-
                         constexpr static const number_type a = number_type(0x0B);
                         constexpr static const number_type b = number_type(
                             0xD68C7B1DC5DD042E957B71C44D3D6C24E683FC09B420B1A2D263FDE47DDBA59463D0C65282_cppui296);
-                        constexpr static const number_type x = 0x00;    //?
-                        constexpr static const number_type y = 0x00;    //?
                     };
 
                     constexpr typename mnt6_basic_policy<298, CHAR_BIT>::number_type const

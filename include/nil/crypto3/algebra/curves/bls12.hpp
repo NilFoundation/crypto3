@@ -48,7 +48,7 @@ namespace nil {
 
                     typedef typename pairing::pairing_policy<bls12<ModulusBits, GeneratorBits>> pairing_policy;
 
-                    typedef typename policy_type::gt_type gt_type;
+                    typedef typename policy_type::gt_field_type::value_type gt_type;
                 };
 
                 typedef bls12<381> bls12_381;

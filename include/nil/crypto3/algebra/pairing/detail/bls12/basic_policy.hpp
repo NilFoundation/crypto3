@@ -32,11 +32,16 @@ namespace nil {
                         using number_type = typename policy_type::number_type;
                         using extended_number_type = typename policy_type::extended_number_type;
 
+                        using Fp_field = typename policy_type::scalar_field_type;
+                        using Fq_field = typename policy_type::g1_field_type;
+                        using Fqe_field = typename policy_type::g2_field_type;
+                        using Fqk_field = typename policy_type::gt_field_type;
+
                         using g1 = curves::detail::bls12_g1<381, CHAR_BIT>;
                         using g2 = curves::detail::bls12_g2<381, CHAR_BIT>;
-                        using Fq = typename g1::underlying_field_type_value;
-                        using Fq2 = typename g2::underlying_field_type_value;
-                        using gt = policy_type::gt_type;
+                        using Fq = typename Fq_field::value_type;
+                        using Fq2 = typename Fqe_field::value_type;
+                        using gt = typename Fqk_field::value_type;
 
                         constexpr static const std::size_t base_field_bits = policy_type::base_field_bits;
                         constexpr static const number_type base_field_modulus = policy_type::base_field_modulus;
@@ -64,11 +69,16 @@ namespace nil {
                         using number_type = typename policy_type::number_type;
                         using extended_number_type = typename policy_type::extended_number_type;
 
+                        using Fp_field = typename policy_type::scalar_field_type;
+                        using Fq_field = typename policy_type::g1_field_type;
+                        using Fqe_field = typename policy_type::g2_field_type;
+                        using Fqk_field = typename policy_type::gt_field_type;
+
                         using g1 = curves::detail::bls12_g1<377, CHAR_BIT>;
                         using g2 = curves::detail::bls12_g2<377, CHAR_BIT>;
-                        using Fq = typename g1::underlying_field_type_value;
-                        using Fq2 = typename g2::underlying_field_type_value;
-                        using gt = policy_type::gt_type;
+                        using Fq = typename Fq_field::value_type;
+                        using Fq2 = typename Fqe_field::value_type;
+                        using gt = typename Fqk_field::value_type;
 
                         constexpr static const std::size_t base_field_bits = policy_type::base_field_bits;
                         constexpr static const number_type base_field_modulus = policy_type::base_field_modulus;

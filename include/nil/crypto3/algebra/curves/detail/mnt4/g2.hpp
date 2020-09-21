@@ -14,8 +14,6 @@
 #include <nil/crypto3/algebra/curves/detail/mnt4/basic_policy.hpp>
 #include <nil/crypto3/algebra/curves/detail/mnt4/g1.hpp>
 
-#include <nil/crypto3/algebra/fields/fp2.hpp>
-
 #include <nil/crypto3/algebra/detail/literals.hpp>
 
 namespace nil {
@@ -31,11 +29,8 @@ namespace nil {
 
                         using policy_type = mnt4_basic_policy<ModulusBits, GeneratorBits>;
                         constexpr static const std::size_t g1_field_bits = policy_type::base_field_bits;
-                        typedef typename policy_type::base_field_type::value_type g1_field_type_value;
-
-                        constexpr static const std::size_t g2_field_bits = policy_type::base_field_bits;
-                        typedef
-                            typename fields::fp2<typename policy_type::base_field_type>::value_type g2_field_type_value;
+                        typedef typename policy_type::g1_field_type::value_type g1_field_type_value;
+                        typedef typename policy_type::g2_field_type::value_type g2_field_type_value;
 
                         using underlying_field_type_value = g2_field_type_value;
 

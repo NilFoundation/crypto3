@@ -13,6 +13,7 @@
 #include <nil/crypto3/algebra/fields/mnt4/base_field.hpp>
 #include <nil/crypto3/algebra/fields/mnt4/scalar_field.hpp>
 
+#include <nil/crypto3/algebra/fields/fp2.hpp>
 #include <nil/crypto3/algebra/fields/fp4.hpp>
 
 #include <nil/crypto3/algebra/detail/literals.hpp>
@@ -31,7 +32,11 @@ namespace nil {
                     template<>
                     struct mnt4_basic_policy<298, CHAR_BIT> {
                         constexpr static const std::size_t base_field_bits = 298;
-                        typedef fields::mnt4_fq<base_field_bits, CHAR_BIT> base_field_type;
+                        typedef fields::mnt4_fq<base_field_bits, CHAR_BIT> g1_field_type;
+                        using base_field_type = g1_field_type;
+                        typedef typename fields::fp2<base_field_type> g2_field_type;
+                        typedef typename fields::fp4<base_field_type> gt_field_type;
+
                         typedef typename base_field_type::modulus_type number_type;
                         typedef typename base_field_type::extended_modulus_type extended_number_type;
 
@@ -43,8 +48,6 @@ namespace nil {
 
                         constexpr static const number_type p = base_field_modulus;
                         constexpr static const number_type q = scalar_field_modulus;
-
-                        typedef typename fields::fp4<base_field_type>::value_type gt_type;
 
                         constexpr static const number_type a = number_type(0x02);
                         constexpr static const number_type b = number_type(

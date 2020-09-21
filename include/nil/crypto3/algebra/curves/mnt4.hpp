@@ -45,7 +45,7 @@ namespace nil {
 
                     typedef typename pairing::pairing_policy<mnt4<ModulusBits, GeneratorBits>> pairing_policy;
 
-                    typedef typename policy_type::gt_type gt_type;
+                    typedef typename policy_type::gt_field_type::value_type gt_type;
 
                     typedef std::vector<g1_type> g1_vector;
                     typedef std::vector<g2_type> g2_vector;
