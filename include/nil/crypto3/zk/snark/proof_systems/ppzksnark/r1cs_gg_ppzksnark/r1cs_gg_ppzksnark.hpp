@@ -402,8 +402,11 @@ namespace nil {
                         // uncomment
                         // when get_exp_window_size ready
 
-                    algebra::window_table<typename CurveType::g1_type> g1_table =
-                        algebra::get_window_table(g1_scalar_size, g1_window_size, g1_generator);
+                    std::vector<std::vector<typename CurveType::g1_type>> g1_table;
+                    /*algebra::window_table<typename CurveType::g1_type> g1_table =
+                        algebra::get_window_table(g1_scalar_size, g1_window_size, g1_generator);*/
+                    // uncomment
+                    // when get_window_table ready
 
                     const typename CurveType::g2_type G2_gen = curve_random_element<typename CurveType::g2_type>();
                     const std::size_t g2_scalar_count = non_zero_Bt;
@@ -412,9 +415,12 @@ namespace nil {
                         //algebra::get_exp_window_size<typename CurveType::g2_type>(g2_scalar_count);
                         // uncomment
                         // when get_exp_window_size ready
-                    
-                    algebra::window_table<typename CurveType::g2_type> g2_table =
-                        algebra::get_window_table(g2_scalar_size, g2_window_size, G2_gen);
+
+                    std::vector<std::vector<typename CurveType::g2_type>> g2_table;
+                    /*algebra::window_table<typename CurveType::g2_type> g2_table =
+                        algebra::get_window_table(g2_scalar_size, g2_window_size, G2_gen);*/
+                    // uncomment
+                    // when get_window_table ready
 
                     typename CurveType::g1_type alpha_g1 = alpha * g1_generator;
                     typename CurveType::g1_type beta_g1 = beta * g1_generator;
@@ -520,17 +526,22 @@ namespace nil {
                     const_padded_assignment.insert(const_padded_assignment.end(), qap_wit.coefficients_for_ABCs.begin(),
                                                    qap_wit.coefficients_for_ABCs.end());
 
-                    typename CurveType::g1_type evaluation_At =
-                        algebra::multi_exp_with_mixed_addition<typename CurveType::g1_type,
+                    typename CurveType::g1_type evaluation_At = CurveType::g1_type::zero();
+                        /*algebra::multi_exp_with_mixed_addition<typename CurveType::g1_type,
                                                                typename CurveType::scalar_field_type,
                                                                algebra::multi_exp_method_BDLO12>(
                             pk.A_query.begin(),
                             pk.A_query.begin() + qap_wit.num_variables() + 1,
                             const_padded_assignment.begin(),
                             const_padded_assignment.begin() + qap_wit.num_variables() + 1,
-                            chunks);
-                    knowledge_commitment<typename CurveType::g2_type, typename CurveType::g1_type> evaluation_Bt =
-                        kc_multi_exp_with_mixed_addition<typename CurveType::g2_type, typename CurveType::g1_type,
+                            chunks);*/
+
+                           // uncomment
+                            // when multi_exp_with_mixed_addition ready
+
+                    knowledge_commitment<typename CurveType::g2_type, typename CurveType::g1_type> evaluation_Bt;
+
+                        /*kc_multi_exp_with_mixed_addition<typename CurveType::g2_type, typename CurveType::g1_type,
                                                          typename CurveType::scalar_field_type,
                                                          algebra::multi_exp_method_BDLO12>(
                             pk.B_query,
@@ -538,24 +549,33 @@ namespace nil {
                             qap_wit.num_variables() + 1,
                             const_padded_assignment.begin(),
                             const_padded_assignment.begin() + qap_wit.num_variables() + 1,
-                            chunks);
-                    typename CurveType::g1_type evaluation_Ht =
-                        algebra::multi_exp<typename CurveType::g1_type, typename CurveType::scalar_field_type,
+                            chunks);*/
+
+                             // uncomment
+                            // when kc_multi_exp_with_mixed_addition ready
+                    typename CurveType::g1_type evaluation_Ht = CurveType::g1_type::zero();
+                        /*algebra::multi_exp<typename CurveType::g1_type, typename CurveType::scalar_field_type,
                                            algebra::multi_exp_method_BDLO12>(
                             pk.H_query.begin(),
                             pk.H_query.begin() + (qap_wit.degree() - 1),
                             qap_wit.coefficients_for_H.begin(),
                             qap_wit.coefficients_for_H.begin() + (qap_wit.degree() - 1),
-                            chunks);
-                    typename CurveType::g1_type evaluation_Lt =
-                        algebra::multi_exp_with_mixed_addition<typename CurveType::g1_type,
+                            chunks);*/
+
+                           // uncomment
+                            // when multi_exp ready
+                    typename CurveType::g1_type evaluation_Lt = CurveType::g1_type::zero();
+                        /*algebra::multi_exp_with_mixed_addition<typename CurveType::g1_type,
                                                                typename CurveType::scalar_field_type,
                                                                algebra::multi_exp_method_BDLO12>(
                             pk.L_query.begin(),
                             pk.L_query.end(),
                             const_padded_assignment.begin() + qap_wit.num_inputs() + 1,
                             const_padded_assignment.begin() + qap_wit.num_variables() + 1,
-                            chunks);
+                            chunks);*/
+
+                           // uncomment
+                            // when multi_exp_with_mixed_addition ready
 
                     /* A = alpha + sum_i(a_i*A_i(t)) + r*delta */
                     typename CurveType::g1_type g1_A = pk.alpha_g1 + evaluation_At + r * pk.delta_g1;
@@ -672,13 +692,12 @@ namespace nil {
                 }
 
                 template<typename CurveType>
-                bool r1cs_gg_ppzksnark_online_verifier_weak_IC(
+                bool r1cs_gg_ppzksnark_online_verifier_weak_IC( const r1cs_gg_ppzksnark_processed_verification_key<CurveType> &pvk,
+                                                                const r1cs_gg_ppzksnark_primary_input<CurveType> &primary_input,
+                                                                const r1cs_gg_ppzksnark_proof<CurveType> &proof) {
 
                     using pairing_policy = typename CurveType::pairing_policy;
 
-                    const r1cs_gg_ppzksnark_processed_verification_key<CurveType> &pvk,
-                    const r1cs_gg_ppzksnark_primary_input<CurveType> &primary_input,
-                    const r1cs_gg_ppzksnark_proof<CurveType> &proof) {
                     assert(pvk.gamma_ABC_g1.domain_size() >= primary_input.size());
 
                     const accumulation_vector<typename CurveType::g1_type> accumulated_IC =
@@ -691,13 +710,13 @@ namespace nil {
                     if (!proof.is_well_formed()) {
                         result = false;
                     }
-                    const pairing_policy::G1_precomp proof_g_A_precomp = pairing_policy::precompute_G1(proof.g_A);
-                    const pairing_policy::G2_precomp proof_g_B_precomp = pairing_policy::precompute_G2(proof.g_B);
-                    const pairing_policy::G1_precomp proof_g_C_precomp = pairing_policy::precompute_G1(proof.g_C);
-                    const pairing_policy::G1_precomp acc_precomp = pairing_policy::precompute_G1(acc);
+                    const typename pairing_policy::G1_precomp proof_g_A_precomp = pairing_policy::precompute_G1(proof.g_A);
+                    const typename pairing_policy::G2_precomp proof_g_B_precomp = pairing_policy::precompute_G2(proof.g_B);
+                    const typename pairing_policy::G1_precomp proof_g_C_precomp = pairing_policy::precompute_G1(proof.g_C);
+                    const typename pairing_policy::G1_precomp acc_precomp = pairing_policy::precompute_G1(acc);
 
-                    const pairing_policy::Fqk::value_type QAP1 = pairing_policy::miller_loop(proof_g_A_precomp, proof_g_B_precomp);
-                    const pairing_policy::Fqk::value_type QAP2 = pairing_policy::double_miller_loop(
+                    const typename pairing_policy::Fqk::value_type QAP1 = pairing_policy::miller_loop(proof_g_A_precomp, proof_g_B_precomp);
+                    const typename pairing_policy::Fqk::value_type QAP2 = pairing_policy::double_miller_loop(
                         acc_precomp, pvk.vk_gamma_g2_precomp, proof_g_C_precomp, pvk.vk_delta_g2_precomp);
                     const typename CurveType::gt_type QAP =
                         pairing_policy::final_exponentiation(QAP1 * QAP2.unitary_inversed());
@@ -747,13 +766,12 @@ namespace nil {
                 }
 
                 template<typename CurveType>
-                bool r1cs_gg_ppzksnark_affine_verifier_weak_IC(
+                bool r1cs_gg_ppzksnark_affine_verifier_weak_IC( const r1cs_gg_ppzksnark_verification_key<CurveType> &vk,
+                                                                const r1cs_gg_ppzksnark_primary_input<CurveType> &primary_input,
+                                                                const r1cs_gg_ppzksnark_proof<CurveType> &proof) {
 
                     using pairing_policy = typename CurveType::pairing_policy;
-
-                    const r1cs_gg_ppzksnark_verification_key<CurveType> &vk,
-                    const r1cs_gg_ppzksnark_primary_input<CurveType> &primary_input,
-                    const r1cs_gg_ppzksnark_proof<CurveType> &proof) {
+                    
                     assert(vk.gamma_ABC_g1.domain_size() >= primary_input.size());
 
                     typename pairing_policy::affine_ate_G2_precomp pvk_vk_gamma_g2_precomp =
@@ -772,16 +790,16 @@ namespace nil {
                         result = false;
                     }
 
-                    const pairing_policy::affine_ate_G1_precomp proof_g_A_precomp =
+                    const typename pairing_policy::affine_ate_G1_precomp proof_g_A_precomp =
                         pairing_policy::affine_ate_precompute_G1(proof.g_A);
-                    const pairing_policy::affine_ate_G2_precomp proof_g_B_precomp =
+                    const typename pairing_policy::affine_ate_G2_precomp proof_g_B_precomp =
                         pairing_policy::affine_ate_precompute_G2(proof.g_B);
-                    const pairing_policy::affine_ate_G1_precomp proof_g_C_precomp =
+                    const typename pairing_policy::affine_ate_G1_precomp proof_g_C_precomp =
                         pairing_policy::affine_ate_precompute_G1(proof.g_C);
-                    const pairing_policy::affine_ate_G1_precomp acc_precomp =
+                    const typename pairing_policy::affine_ate_G1_precomp acc_precomp =
                         pairing_policy::affine_ate_precompute_G1(acc);
 
-                    const pairing_policy::Fqk::value_type QAP_miller = CurveType::affine_ate_e_times_e_over_e_miller_loop(
+                    const typename pairing_policy::Fqk::value_type QAP_miller = CurveType::affine_ate_e_times_e_over_e_miller_loop(
                         acc_precomp, pvk_vk_gamma_g2_precomp, proof_g_C_precomp, pvk_vk_delta_g2_precomp,
                         proof_g_A_precomp, proof_g_B_precomp);
                     const typename CurveType::gt_type QAP =
