@@ -25,7 +25,7 @@
 #include <map>
 #include <memory>
 
-#include <nil/crypto3/algebra/multiexp/multiexp.hpp>
+//#include <nil/crypto3/algebra/multiexp/multiexp.hpp>
 
 #include <nil/crypto3/algebra/random_element.hpp>
 
@@ -82,7 +82,7 @@ namespace nil {
                     ssp_instance &operator=(ssp_instance<FieldType> &&other) = default;
 
                     bool is_satisfied(const ssp_witness<FieldType> &witness) const {
-                        const typename FieldType::value_type t = random_element<FieldType>();
+                        const typename FieldType::value_type t = field_random_element<FieldType>();
                         std::vector<typename FieldType::value_type> Vt(this->num_variables + 1, FieldType::value_type::zero());
                         std::vector<typename FieldType::value_type> Ht(this->degree + 1);
 

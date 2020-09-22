@@ -14,6 +14,7 @@
 
 #include <iostream>
 #include <vector>
+#include <numeric>
 
 namespace nil {
     namespace crypto3 {
@@ -187,7 +188,7 @@ namespace nil {
                                     copy_over = true;
 
                                     accumulated_value =
-                                        accumulated_value +
+                                        accumulated_value /*+
                                         algebra::multi_exp<
                                             T,
                                             typename std::iterator_traits<InputIterator>::value_type::field_type,
@@ -196,7 +197,9 @@ namespace nil {
                                                                                   it_begin + (indices[first_pos] - offset),
                                                                                   it_begin + (indices[last_pos] - offset) +
                                                                                       1,
-                                                                                  chunks);
+                                                                                  chunks)*/;
+                                    // uncomment when multiexp
+                                    // will be ready
                                 }
                             } else {
                                 if (matching_pos) {
@@ -218,7 +221,7 @@ namespace nil {
 
                         if (in_block) {
                             accumulated_value =
-                                accumulated_value +
+                                accumulated_value /*+
                                 algebra::multi_exp<T,
                                                    typename std::iterator_traits<InputIterator>::value_type::field_type,
                                                    algebra::multi_exp_method_bos_coster>(
@@ -226,7 +229,9 @@ namespace nil {
                                     values.begin() + last_pos + 1,
                                     it_begin + (indices[first_pos] - offset),
                                     it_begin + (indices[last_pos] - offset) + 1,
-                                    chunks);
+                                    chunks)*/;
+                            // uncomment when multiexp
+                            // will be ready
                         }
 
                         return std::make_pair(accumulated_value, resulting_vector);

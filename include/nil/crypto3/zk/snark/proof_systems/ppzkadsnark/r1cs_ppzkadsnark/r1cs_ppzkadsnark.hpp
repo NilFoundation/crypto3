@@ -52,7 +52,7 @@
 #include <nil/crypto3/zk/snark/proof_systems/ppzkadsnark/r1cs_ppzkadsnark/r1cs_ppzkadsnark_prf.hpp>
 #include <nil/crypto3/zk/snark/proof_systems/ppzkadsnark/r1cs_ppzkadsnark/r1cs_ppzkadsnark_signature.hpp>
 
-#include <nil/crypto3/algebra/multiexp/multiexp.hpp>
+//#include <nil/crypto3/algebra/multiexp/multiexp.hpp>
 
 #include <nil/crypto3/algebra/random_element.hpp>
 

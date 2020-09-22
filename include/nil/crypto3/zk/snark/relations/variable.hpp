@@ -268,10 +268,10 @@ namespace nil {
                         this->terms.emplace_back(linear_term<FieldType>(var.index, int_coeff));
                     }
                     void add_term(const variable<FieldType> &var, const value_type &field_coeff) {
-                        this->terms.emplace_back(linear_term<FieldType>(var.index, coeff));
+                        this->terms.emplace_back(linear_term<FieldType>(var.index, field_coeff));
                     }
                     void add_term(const linear_term<FieldType> &lt) {
-                        this->terms.emplace_back(other);
+                        this->terms.emplace_back(lt);
                     }
 
                     value_type evaluate(const std::vector<value_type> &assignment) const {
