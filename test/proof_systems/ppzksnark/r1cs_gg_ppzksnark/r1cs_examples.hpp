@@ -142,7 +142,7 @@ namespace nil {
 
                     r1cs_variable_assignment<FieldType> full_variable_assignment;
                     for (std::size_t i = 0; i < num_inputs; ++i) {
-                        full_variable_assignment.push_back(FieldType(std::rand() % 2));
+                        full_variable_assignment.push_back(typename FieldType::value_type(std::rand() % 2));
                     }
 
                     std::size_t lastvar = num_inputs - 1;

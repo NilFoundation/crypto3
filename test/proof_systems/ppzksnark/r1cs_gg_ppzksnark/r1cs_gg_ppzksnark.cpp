@@ -20,7 +20,12 @@
 #include "r1cs_examples.hpp"
 #include "run_r1cs_gg_ppzksnark.hpp"
 
+#include <nil/crypto3/algebra/curves/bls12.hpp>
+#include <nil/crypto3/algebra/fields/bls12/base_field.hpp>
+#include <nil/crypto3/algebra/fields/arithmetic_params/bls12.hpp>
+
 using namespace nil::crypto3::zk::snark;
+using namespace nil::crypto3::algebra;
 
 template<typename CurveType>
 void test_r1cs_gg_ppzksnark(std::size_t num_constraints, std::size_t input_size) {
@@ -33,7 +38,7 @@ void test_r1cs_gg_ppzksnark(std::size_t num_constraints, std::size_t input_size)
 BOOST_AUTO_TEST_SUITE(r1cs_gg_ppzksnark_test_suite)
 
 BOOST_AUTO_TEST_CASE(r1cs_gg_ppzksnark_test){
-    test_r1cs_gg_ppzksnark<default_r1cs_gg_ppzksnark_pp>(1000, 100);
+    test_r1cs_gg_ppzksnark<curves::bls12<381>>(1000, 100);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

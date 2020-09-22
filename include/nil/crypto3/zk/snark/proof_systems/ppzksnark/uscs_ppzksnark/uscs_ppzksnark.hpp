@@ -565,12 +565,12 @@ namespace nil {
                     uscs_ppzksnark_verifier_process_vk(const uscs_ppzksnark_verification_key<CurveType> &vk) {
                     uscs_ppzksnark_processed_verification_key<CurveType> pvk;
 
-                    pvk.pp_G1_one_precomp = CurveType::precompute_G1(typename CurveType::g1_type::one());
-                    pvk.pp_G2_one_precomp = CurveType::precompute_G2(typename CurveType::g2_type::one());
+                    pvk.pp_G1_one_precomp = CurveType::precompute_g1(typename CurveType::g1_type::one());
+                    pvk.pp_G2_one_precomp = CurveType::precompute_g2(typename CurveType::g2_type::one());
 
-                    pvk.vk_tilde_g2_precomp = CurveType::precompute_G2(vk.tilde_g2);
-                    pvk.vk_alpha_tilde_g2_precomp = CurveType::precompute_G2(vk.alpha_tilde_g2);
-                    pvk.vk_Z_g2_precomp = CurveType::precompute_G2(vk.Z_g2);
+                    pvk.vk_tilde_g2_precomp = CurveType::precompute_g2(vk.tilde_g2);
+                    pvk.vk_alpha_tilde_g2_precomp = CurveType::precompute_g2(vk.alpha_tilde_g2);
+                    pvk.vk_Z_g2_precomp = CurveType::precompute_g2(vk.Z_g2);
 
                     pvk.pairing_of_g1_and_g2 = miller_loop<CurveType>(pvk.pp_G1_one_precomp, pvk.pp_G2_one_precomp);
 
@@ -597,8 +597,8 @@ namespace nil {
                         result = false;
                     }
 
-                    algebra::G1_precomp<CurveType> proof_V_g1_with_acc_precomp = CurveType::precompute_G1(proof.V_g1 + acc);
-                    algebra::G2_precomp<CurveType> proof_V_g2_precomp = CurveType::precompute_G2(proof.V_g2);
+                    algebra::G1_precomp<CurveType> proof_V_g1_with_acc_precomp = CurveType::precompute_g1(proof.V_g1 + acc);
+                    algebra::G2_precomp<CurveType> proof_V_g2_precomp = CurveType::precompute_g2(proof.V_g2);
                     algebra::Fqk<CurveType> V_1 = miller_loop<CurveType>(proof_V_g1_with_acc_precomp, pvk.pp_G2_one_precomp);
                     algebra::Fqk<CurveType> V_2 = miller_loop<CurveType>(pvk.pp_G1_one_precomp, proof_V_g2_precomp);
                     typename CurveType::gt_type V = final_exponentiation<CurveType>(V_1 * V_2.unitary_inversed());
@@ -606,7 +606,7 @@ namespace nil {
                         result = false;
                     }
 
-                    algebra::G1_precomp<CurveType> proof_H_g1_precomp = CurveType::precompute_G1(proof.H_g1);
+                    algebra::G1_precomp<CurveType> proof_H_g1_precomp = CurveType::precompute_g1(proof.H_g1);
                     algebra::Fqk<CurveType> SSP_1 = miller_loop<CurveType>(proof_V_g1_with_acc_precomp, proof_V_g2_precomp);
                     algebra::Fqk<CurveType> SSP_2 = miller_loop<CurveType>(proof_H_g1_precomp, pvk.vk_Z_g2_precomp);
                     typename CurveType::gt_type SSP =
@@ -615,8 +615,8 @@ namespace nil {
                         result = false;
                     }
 
-                    algebra::G1_precomp<CurveType> proof_V_g1_precomp = CurveType::precompute_G1(proof.V_g1);
-                    algebra::G1_precomp<CurveType> proof_alpha_V_g1_precomp = CurveType::precompute_G1(proof.alpha_V_g1);
+                    algebra::G1_precomp<CurveType> proof_V_g1_precomp = CurveType::precompute_g1(proof.V_g1);
+                    algebra::G1_precomp<CurveType> proof_alpha_V_g1_precomp = CurveType::precompute_g1(proof.alpha_V_g1);
                     algebra::Fqk<CurveType> alpha_V_1 = miller_loop<CurveType>(proof_V_g1_precomp, pvk.vk_alpha_tilde_g2_precomp);
                     algebra::Fqk<CurveType> alpha_V_2 = miller_loop<CurveType>(proof_alpha_V_g1_precomp, pvk.vk_tilde_g2_precomp);
                     typename CurveType::gt_type alpha_V = final_exponentiation<CurveType>(alpha_V_1 * alpha_V_2.unitary_inversed());

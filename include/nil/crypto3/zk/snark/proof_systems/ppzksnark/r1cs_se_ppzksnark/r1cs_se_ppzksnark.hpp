@@ -663,16 +663,16 @@ namespace nil {
                 r1cs_se_ppzksnark_processed_verification_key<CurveType>
                     r1cs_se_ppzksnark_verifier_process_vk(const r1cs_se_ppzksnark_verification_key<CurveType> &vk) {
 
-                    algebra::G1_precomp<CurveType> G_alpha_pc = CurveType::precompute_G1(vk.G_alpha);
-                    algebra::G2_precomp<CurveType> H_beta_pc = CurveType::precompute_G2(vk.H_beta);
+                    algebra::G1_precomp<CurveType> G_alpha_pc = CurveType::precompute_g1(vk.G_alpha);
+                    algebra::G2_precomp<CurveType> H_beta_pc = CurveType::precompute_g2(vk.H_beta);
 
                     r1cs_se_ppzksnark_processed_verification_key<CurveType> pvk;
                     pvk.G_alpha = vk.G_alpha;
                     pvk.H_beta = vk.H_beta;
                     pvk.G_alpha_H_beta_ml = miller_loop<CurveType>(G_alpha_pc, H_beta_pc);
-                    pvk.G_gamma_pc = CurveType::precompute_G1(vk.G_gamma);
-                    pvk.H_gamma_pc = CurveType::precompute_G2(vk.H_gamma);
-                    pvk.H_pc = CurveType::precompute_G2(vk.H);
+                    pvk.G_gamma_pc = CurveType::precompute_g1(vk.G_gamma);
+                    pvk.H_gamma_pc = CurveType::precompute_g2(vk.H_gamma);
+                    pvk.H_pc = CurveType::precompute_g2(vk.H);
 
                     pvk.query = vk.query;
 
@@ -708,11 +708,11 @@ namespace nil {
                         algebra::multi_exp<typename CurveType::g1_type, typename CurveType::scalar_field_type, algebra::multi_exp_method_bos_coster>(
                             pvk.query.begin() + 1, pvk.query.end(), primary_input.begin(), primary_input.end(), chunks);
 
-                    algebra::Fqk<CurveType> test1_l = miller_loop<CurveType>(CurveType::precompute_G1(proof.A + pvk.G_alpha),
-                                                                 CurveType::precompute_G2(proof.B + pvk.H_beta)),
+                    algebra::Fqk<CurveType> test1_l = miller_loop<CurveType>(CurveType::precompute_g1(proof.A + pvk.G_alpha),
+                                                                 CurveType::precompute_g2(proof.B + pvk.H_beta)),
                                       test1_r1 = pvk.G_alpha_H_beta_ml,
-                                      test1_r2 = miller_loop<CurveType>(CurveType::precompute_G1(G_psi), pvk.H_gamma_pc),
-                                      test1_r3 = miller_loop<CurveType>(CurveType::precompute_G1(proof.C), pvk.H_pc);
+                                      test1_r2 = miller_loop<CurveType>(CurveType::precompute_g1(G_psi), pvk.H_gamma_pc),
+                                      test1_r3 = miller_loop<CurveType>(CurveType::precompute_g1(proof.C), pvk.H_pc);
                     typename CurveType::gt_type test1 =
                         final_exponentiation<CurveType>(test1_l.unitary_inversed() * test1_r1 * test1_r2 * test1_r3);
 
@@ -723,8 +723,8 @@ namespace nil {
                     /**
                      * e(A, H^{gamma}) = e(G^{gamma}, B)
                      */
-                    algebra::Fqk<CurveType> test2_l = miller_loop<CurveType>(CurveType::precompute_G1(proof.A), pvk.H_gamma_pc),
-                                      test2_r = miller_loop<CurveType>(pvk.G_gamma_pc, CurveType::precompute_G2(proof.B));
+                    algebra::Fqk<CurveType> test2_l = miller_loop<CurveType>(CurveType::precompute_g1(proof.A), pvk.H_gamma_pc),
+                                      test2_r = miller_loop<CurveType>(pvk.G_gamma_pc, CurveType::precompute_g2(proof.B));
                     typename CurveType::gt_type test2 = final_exponentiation<CurveType>(test2_l * test2_r.unitary_inversed());
 
                     if (test2 != typename CurveType::gt_type::one()) {
