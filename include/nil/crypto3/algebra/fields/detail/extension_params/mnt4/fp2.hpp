@@ -7,15 +7,11 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_FIELDS_MNT4_EXTENSION_PARAMS_HPP
-#define CRYPTO3_ALGEBRA_FIELDS_MNT4_EXTENSION_PARAMS_HPP
-
-#include <nil/crypto3/algebra/fields/detail/element/fp.hpp>
-#include <nil/crypto3/algebra/fields/detail/element/fp2.hpp>
+#ifndef CRYPTO3_ALGEBRA_FIELDS_MNT4_FP2_EXTENSION_PARAMS_HPP
+#define CRYPTO3_ALGEBRA_FIELDS_MNT4_FP2_EXTENSION_PARAMS_HPP
 
 #include <nil/crypto3/algebra/fields/params.hpp>
 #include <nil/crypto3/algebra/fields/mnt4/base_field.hpp>
-#include <nil/crypto3/algebra/fields/fp2.hpp>
 
 #include <nil/crypto3/algebra/detail/literals.hpp>
 
@@ -30,16 +26,14 @@ namespace nil {
                     template<typename FieldType>
                     struct fp2_extension_params;
 
-                    template<typename FieldType>
-                    struct fp4_extension_params;
-
                     /************************* MNT4 ***********************************/
 
                     template<std::size_t ModulusBits, std::size_t GeneratorBits>
                     class fp2_extension_params<fields::mnt4_base_field<ModulusBits, GeneratorBits>>
                         : public params<fields::mnt4_base_field<ModulusBits, GeneratorBits>> {
 
-                        typedef params<fields::mnt4_base_field<ModulusBits, GeneratorBits>> policy_type;
+                        typedef fields::mnt4_base_field<ModulusBits, GeneratorBits> base_field_type;
+                        typedef params<base_field_type> policy_type;
 
                     public:
                         typedef typename policy_type::number_type number_type;
@@ -48,8 +42,10 @@ namespace nil {
 
                         constexpr static const modulus_type modulus = policy_type::modulus;
 
-                        typedef element_fp<policy_type> non_residue_type;
-                        typedef element_fp<policy_type> underlying_type;
+                        typedef base_field_type non_residue_field_type;
+                        typedef typename non_residue_field_type::value_type non_residue_type;
+                        typedef base_field_type underlying_field_type;
+                        typedef typename underlying_field_type::value_type underlying_type;
 
                         constexpr static const std::size_t s = 0x12;
                         constexpr static const extended_modulus_type t =
@@ -73,43 +69,9 @@ namespace nil {
                     };
 
                     template<std::size_t ModulusBits, std::size_t GeneratorBits>
-                    class fp4_extension_params<fields::mnt4_base_field<ModulusBits, GeneratorBits>>
-                        : public params<fields::mnt4_base_field<ModulusBits, GeneratorBits>> {
-
-                        typedef fields::mnt4_base_field<ModulusBits, GeneratorBits> field_type;
-                        typedef params<field_type> policy_type;
-
-                    public:
-                        typedef typename policy_type::number_type number_type;
-                        typedef typename policy_type::modulus_type modulus_type;
-
-                        constexpr static const modulus_type modulus = policy_type::modulus;
-
-                        typedef element_fp<policy_type> non_residue_type;
-                        typedef element_fp2<fp2_extension_params<field_type>> underlying_type;
-
-                        /*constexpr static const std::array<non_residue_type, 4> Frobenius_coeffs_c1 =
-                           {non_residue_type(0x01),
-                            non_residue_type(0xF73779FE09916DFDCC2FD1F968D534BEB17DAF7518CD9FAE5C1F7BDCF94DD5D7DEF6980C4_cppui292),
-                            non_residue_type(0x3BCF7BCD473A266249DA7B0548ECAEEC9635D1330EA41A9E35E51200E12C90CD65A71660000_cppui298),
-                            non_residue_type(0x3AD84453493094F44C0E4B334F83D9B7D7845383998B4CFE8788F285043342F78DC81FC7F3D_cppui298)};*/
-
-                        constexpr static const std::array<modulus_type, 4> Frobenius_coeffs_c1 = {
-                            0x01, 0xF73779FE09916DFDCC2FD1F968D534BEB17DAF7518CD9FAE5C1F7BDCF94DD5D7DEF6980C4_cppui292,
-                            0x3BCF7BCD473A266249DA7B0548ECAEEC9635D1330EA41A9E35E51200E12C90CD65A71660000_cppui298,
-                            0x3AD84453493094F44C0E4B334F83D9B7D7845383998B4CFE8788F285043342F78DC81FC7F3D_cppui298};
-
-                        constexpr static const modulus_type non_residue = modulus_type(0x11);
-                    };
-
-                    template<std::size_t ModulusBits, std::size_t GeneratorBits>
                     constexpr
                         typename fp2_extension_params<mnt4_base_field<ModulusBits, GeneratorBits>>::modulus_type const
                             fp2_extension_params<mnt4_base_field<ModulusBits, GeneratorBits>>::non_residue;
-                    template<std::size_t ModulusBits, std::size_t GeneratorBits>
-                    constexpr
-                        typename fp4_extension_params<mnt4_base_field<ModulusBits, GeneratorBits>>::modulus_type const
-                            fp4_extension_params<mnt4_base_field<ModulusBits, GeneratorBits>>::non_residue;
 
                     template<std::size_t ModulusBits, std::size_t GeneratorBits>
                     constexpr
@@ -139,10 +101,6 @@ namespace nil {
                     constexpr
                         typename fp2_extension_params<mnt4_base_field<ModulusBits, GeneratorBits>>::modulus_type const
                             fp2_extension_params<mnt4_base_field<ModulusBits, GeneratorBits>>::modulus;
-                    template<std::size_t ModulusBits, std::size_t GeneratorBits>
-                    constexpr
-                        typename fp4_extension_params<mnt4_base_field<ModulusBits, GeneratorBits>>::modulus_type const
-                            fp4_extension_params<mnt4_base_field<ModulusBits, GeneratorBits>>::modulus;
 
                 }    // namespace detail
             }        // namespace fields
@@ -150,4 +108,4 @@ namespace nil {
     }                // namespace crypto3
 }    // namespace nil
 
-#endif    // ALGEBRA_FIELDS_MNT4_EXTENSION_PARAMS_HPP
+#endif    // CRYPTO3_ALGEBRA_FIELDS_MNT4_FP2_EXTENSION_PARAMS_HPP

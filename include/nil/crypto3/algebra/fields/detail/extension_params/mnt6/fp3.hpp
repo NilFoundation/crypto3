@@ -7,15 +7,11 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_FIELDS_MNT6_EXTENSION_PARAMS_HPP
-#define CRYPTO3_ALGEBRA_FIELDS_MNT6_EXTENSION_PARAMS_HPP
-
-#include <nil/crypto3/algebra/fields/detail/element/fp.hpp>
-#include <nil/crypto3/algebra/fields/detail/element/fp3.hpp>
+#ifndef CRYPTO3_ALGEBRA_FIELDS_MNT6_FP3_EXTENSION_PARAMS_HPP
+#define CRYPTO3_ALGEBRA_FIELDS_MNT6_FP3_EXTENSION_PARAMS_HPP
 
 #include <nil/crypto3/algebra/fields/params.hpp>
 #include <nil/crypto3/algebra/fields/mnt6/base_field.hpp>
-#include <nil/crypto3/algebra/fields/fp2.hpp>
 
 #include <nil/crypto3/algebra/detail/literals.hpp>
 
@@ -30,16 +26,15 @@ namespace nil {
                     template<typename FieldType>
                     struct fp3_extension_params;
 
-                    template<typename FieldType>
-                    struct fp6_2over3_extension_params;
-
                     /************************* MNT6 ***********************************/
 
                     template<std::size_t ModulusBits, std::size_t GeneratorBits>
                     class fp3_extension_params<fields::mnt6_base_field<ModulusBits, GeneratorBits>>
                         : public params<fields::mnt6_base_field<ModulusBits, GeneratorBits>> {
 
-                        typedef params<fields::mnt6_base_field<ModulusBits, GeneratorBits>> policy_type;
+
+                        typedef fields::mnt6_base_field<ModulusBits, GeneratorBits> base_field_type;
+                        typedef params<base_field_type> policy_type;
 
                     public:
                         typedef typename policy_type::number_type number_type;
@@ -48,8 +43,10 @@ namespace nil {
 
                         constexpr static const modulus_type modulus = policy_type::modulus;
 
-                        typedef element_fp<policy_type> non_residue_type;
-                        typedef element_fp<policy_type> underlying_type;
+                        typedef base_field_type non_residue_field_type;
+                        typedef typename non_residue_field_type::value_type non_residue_type;
+                        typedef base_field_type underlying_field_type;
+                        typedef typename underlying_field_type::value_type underlying_type;
 
                         constexpr static const std::size_t s = 0x22;
                         constexpr static const extended_modulus_type t =
@@ -84,48 +81,9 @@ namespace nil {
                     };
 
                     template<std::size_t ModulusBits, std::size_t GeneratorBits>
-                    class fp6_2over3_extension_params<fields::mnt6_base_field<ModulusBits, GeneratorBits>>
-                        : public params<fields::mnt6_base_field<ModulusBits, GeneratorBits>> {
-
-                        typedef fields::mnt6_base_field<ModulusBits, GeneratorBits> field_type;
-                        typedef params<field_type> policy_type;
-
-                    public:
-                        typedef typename policy_type::number_type number_type;
-                        typedef typename policy_type::modulus_type modulus_type;
-
-                        constexpr static const modulus_type modulus = policy_type::modulus;
-
-                        typedef element_fp<policy_type> non_residue_type;
-                        typedef element_fp3<fp3_extension_params<field_type>> underlying_type;
-
-                        /*constexpr static const std::array<non_residue_type, 6> Frobenius_coeffs_c1 =
-                           {non_residue_type(0x01),
-                            non_residue_type(0x3B48E50A1662E26F0E834E15FAF68204A9845655F46B277A6D05B75068AD3F6801655344BED_cppui298),
-                            non_residue_type(0x3B48E50A1662E26F0E834E15FAF68204A9845655F46B277A6D05B75068AD3F6801655344BEC_cppui298),
-                            non_residue_type(0x3BCF7BCD473A266249DA7B0548ECAEEC9635CF44194FB494C07925D6AD3BB4334A400000000_cppui298),
-                            non_residue_type(0x8696C330D743F33B572CEF4DF62CE7ECB178EE24E48D1A53736E86448E74CB48DAACBB414_cppui292),
-                            non_residue_type(0x8696C330D743F33B572CEF4DF62CE7ECB178EE24E48D1A53736E86448E74CB48DAACBB414_cppui293)};*/
-
-                        constexpr static const std::array<modulus_type, 6> Frobenius_coeffs_c1 = {
-                            0x01,
-                            0x3B48E50A1662E26F0E834E15FAF68204A9845655F46B277A6D05B75068AD3F6801655344BED_cppui298,
-                            0x3B48E50A1662E26F0E834E15FAF68204A9845655F46B277A6D05B75068AD3F6801655344BEC_cppui298,
-                            0x3BCF7BCD473A266249DA7B0548ECAEEC9635CF44194FB494C07925D6AD3BB4334A400000000_cppui298,
-                            0x8696C330D743F33B572CEF4DF62CE7ECB178EE24E48D1A53736E86448E74CB48DAACBB414_cppui292,
-                            0x8696C330D743F33B572CEF4DF62CE7ECB178EE24E48D1A53736E86448E74CB48DAACBB414_cppui293};
-
-                        constexpr static const modulus_type non_residue = modulus_type(0x05);
-                    };
-
-                    template<std::size_t ModulusBits, std::size_t GeneratorBits>
                     constexpr
                         typename fp3_extension_params<mnt6_base_field<ModulusBits, GeneratorBits>>::modulus_type const
                             fp3_extension_params<mnt6_base_field<ModulusBits, GeneratorBits>>::non_residue;
-                    template<std::size_t ModulusBits, std::size_t GeneratorBits>
-                    constexpr typename fp6_2over3_extension_params<
-                        mnt6_base_field<ModulusBits, GeneratorBits>>::modulus_type const
-                        fp6_2over3_extension_params<mnt6_base_field<ModulusBits, GeneratorBits>>::non_residue;
 
                     template<std::size_t ModulusBits, std::size_t GeneratorBits>
                     constexpr
@@ -155,10 +113,6 @@ namespace nil {
                     constexpr
                         typename fp3_extension_params<mnt6_base_field<ModulusBits, GeneratorBits>>::modulus_type const
                             fp3_extension_params<mnt6_base_field<ModulusBits, GeneratorBits>>::modulus;
-                    template<std::size_t ModulusBits, std::size_t GeneratorBits>
-                    constexpr typename fp6_2over3_extension_params<
-                        mnt6_base_field<ModulusBits, GeneratorBits>>::modulus_type const
-                        fp6_2over3_extension_params<mnt6_base_field<ModulusBits, GeneratorBits>>::modulus;
 
                 }    // namespace detail
             }        // namespace fields
@@ -166,4 +120,4 @@ namespace nil {
     }                // namespace crypto3
 }    // namespace nil
 
-#endif    // ALGEBRA_FIELDS_MNT6_EXTENSION_PARAMS_HPP
+#endif    // CRYPTO3_ALGEBRA_FIELDS_MNT6_FP3_EXTENSION_PARAMS_HPP
