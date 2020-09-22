@@ -366,13 +366,13 @@ namespace nil {
                     RXsquared.reset(new Fqe_variable<CurveType>(pb));
                     compute_RXsquared.reset(new Fqe_sqr_component<CurveType>(pb, *(cur.RX), *RXsquared));
                     three_RXsquared_plus_a.reset(
-                        new Fqe_variable<CurveType>((*RXsquared) * typename FieldType::value_type(3) + other_curve<CurveType>::g2_type::a));
-                    two_RY.reset(new Fqe_variable<CurveType>(*(cur.RY) * typename FieldType::value_type(2)));
+                        new Fqe_variable<CurveType>((*RXsquared) * typename FieldType::value_type(0x03) + other_curve<CurveType>::g2_type::a));
+                    two_RY.reset(new Fqe_variable<CurveType>(*(cur.RY) * typename FieldType::value_type(0x02)));
 
                     compute_gamma.reset(new Fqe_mul_component<CurveType>(pb, *(cur.gamma), *two_RY, *three_RXsquared_plus_a));
                     compute_gamma_X.reset(new Fqe_mul_component<CurveType>(pb, *(cur.gamma), *(cur.RX), *(cur.gamma_X)));
 
-                    next_RX_plus_two_RX.reset(new Fqe_variable<CurveType>(*(next.RX) + *(cur.RX) * typename FieldType::value_type(2)));
+                    next_RX_plus_two_RX.reset(new Fqe_variable<CurveType>(*(next.RX) + *(cur.RX) * typename FieldType::value_type(0x02)));
                     compute_next_RX.reset(new Fqe_sqr_component<CurveType>(pb, *(cur.gamma), *next_RX_plus_two_RX));
 
                     RX_minus_next_RX.reset(new Fqe_variable<CurveType>(*(cur.RX) + *(next.RX) * (-FieldType::value_type::zero())));

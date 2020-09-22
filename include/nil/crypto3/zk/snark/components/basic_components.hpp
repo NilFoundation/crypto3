@@ -23,12 +23,16 @@ namespace nil {
                 /* forces lc to take value 0 or 1 by adding constraint lc * (1-lc) = 0 */
                 template<typename FieldType>
                 void generate_boolean_r1cs_constraint(blueprint<FieldType> &pb,
-                                                      const blueprint_linear_combination<FieldType> &lc);
+                                                      const blueprint_linear_combination<FieldType> &lc){
+                    pb.add_r1cs_constraint(r1cs_constraint<FieldType>(lc, 1 - lc, 0));
+                }
 
                 template<typename FieldType>
                 void generate_r1cs_equals_const_constraint(blueprint<FieldType> &pb,
                                                            const blueprint_linear_combination<FieldType> &lc,
-                                                           const typename FieldType::value_type &c);
+                                                           const typename FieldType::value_type &c) {
+                    pb.add_r1cs_constraint(r1cs_constraint<FieldType>(1, lc, c));
+                }
 
                 template<typename FieldType>
                 class packing_component : public component<FieldType> {
@@ -313,28 +317,36 @@ namespace nil {
                     blueprint<FieldType> &pb,
                     const std::vector<typename FieldType::value_type> &base,
                     const std::vector<std::pair<VarT, typename FieldType::value_type>> &v,
-                    const VarT &target);
+                    const VarT &target) {
+                    for (std::size_t i = 0; i < base.size(); ++i) {
+                        linear_combination<FieldType> a, b, c;
+
+                        a.add_term(blueprint_variable<FieldType>(0));
+                        b.add_term(blueprint_variable<FieldType>(0), base[i]);
+
+                        for (auto &p : v) {
+                            b.add_term(p.first.all_vars[i], p.second);
+                        }
+
+                        c.add_term(target.all_vars[i]);
+
+                        pb.add_r1cs_constraint(r1cs_constraint<FieldType>(a, b, c));
+                    }
+                }
 
                 template<typename FieldType, typename VarT>
                 void create_linear_combination_witness(
                     blueprint<FieldType> &pb,
                     const std::vector<typename FieldType::value_type> &base,
                     const std::vector<std::pair<VarT, typename FieldType::value_type>> &v,
-                    const VarT &target);
+                    const VarT &target) {
+                    for (std::size_t i = 0; i < base.size(); ++i) {
+                        pb.val(target.all_vars[i]) = base[i];
 
-                template<typename FieldType>
-                void generate_boolean_r1cs_constraint(blueprint<FieldType> &pb,
-                                                      const blueprint_linear_combination<FieldType> &lc)
-                /* forces lc to take value 0 or 1 by adding constraint lc * (1-lc) = 0 */
-                {
-                    pb.add_r1cs_constraint(r1cs_constraint<FieldType>(lc, 1 - lc, 0));
-                }
-
-                template<typename FieldType>
-                void generate_r1cs_equals_const_constraint(blueprint<FieldType> &pb,
-                                                           const blueprint_linear_combination<FieldType> &lc,
-                                                           const typename FieldType::value_type &c) {
-                    pb.add_r1cs_constraint(r1cs_constraint<FieldType>(1, lc, c));
+                        for (auto &p : v) {
+                            pb.val(target.all_vars[i]) += p.second * pb.val(p.first.all_vars[i]);
+                        }
+                    }
                 }
 
                 template<typename FieldType>
@@ -710,42 +722,7 @@ namespace nil {
                     compute_result->generate_r1cs_witness();
                 }
 
-                template<typename FieldType, typename VarT>
-                void create_linear_combination_constraints(
-                    blueprint<FieldType> &pb,
-                    const std::vector<typename FieldType::value_type> &base,
-                    const std::vector<std::pair<VarT, typename FieldType::value_type>> &v,
-                    const VarT &target) {
-                    for (std::size_t i = 0; i < base.size(); ++i) {
-                        linear_combination<FieldType> a, b, c;
-
-                        a.add_term(blueprint_variable<FieldType>(0));
-                        b.add_term(blueprint_variable<FieldType>(0), base[i]);
-
-                        for (auto &p : v) {
-                            b.add_term(p.first.all_vars[i], p.second);
-                        }
-
-                        c.add_term(target.all_vars[i]);
-
-                        pb.add_r1cs_constraint(r1cs_constraint<FieldType>(a, b, c));
-                    }
-                }
-
-                template<typename FieldType, typename VarT>
-                void create_linear_combination_witness(
-                    blueprint<FieldType> &pb,
-                    const std::vector<typename FieldType::value_type> &base,
-                    const std::vector<std::pair<VarT, typename FieldType::value_type>> &v,
-                    const VarT &target) {
-                    for (std::size_t i = 0; i < base.size(); ++i) {
-                        pb.val(target.all_vars[i]) = base[i];
-
-                        for (auto &p : v) {
-                            pb.val(target.all_vars[i]) += p.second * pb.val(p.first.all_vars[i]);
-                        }
-                    }
-                }
+                
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3

@@ -218,12 +218,12 @@ namespace nil {
                 void XOR3_component<FieldType>::generate_r1cs_witness() {
                     if (assume_C_is_zero) {
                         this->pb.lc_val(out) = this->pb.lc_val(A) + this->pb.lc_val(B) -
-                                               typename FieldType::value_type(2) * this->pb.lc_val(A) * this->pb.lc_val(B);
+                                               typename FieldType::value_type(0x02) * this->pb.lc_val(A) * this->pb.lc_val(B);
                     } else {
                         this->pb.val(tmp) = this->pb.lc_val(A) + this->pb.lc_val(B) -
-                                            typename FieldType::value_type(2) * this->pb.lc_val(A) * this->pb.lc_val(B);
+                                            typename FieldType::value_type(0x02) * this->pb.lc_val(A) * this->pb.lc_val(B);
                         this->pb.lc_val(out) = this->pb.val(tmp) + this->pb.lc_val(C) -
-                                               typename FieldType::value_type(2) * this->pb.val(tmp) * this->pb.lc_val(C);
+                                               typename FieldType::value_type(0x02) * this->pb.val(tmp) * this->pb.lc_val(C);
                     }
                 }
 
