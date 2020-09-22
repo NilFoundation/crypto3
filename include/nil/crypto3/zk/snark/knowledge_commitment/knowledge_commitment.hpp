@@ -36,30 +36,108 @@ namespace nil {
                     T1 g;
                     T2 h;
 
-                    knowledge_commitment<T1, T2>() = default;
-                    knowledge_commitment<T1, T2>(const knowledge_commitment<T1, T2> &other) = default;
-                    knowledge_commitment<T1, T2>(knowledge_commitment<T1, T2> &&other) = default;
-                    knowledge_commitment<T1, T2>(const T1 &g, const T2 &h);
+                    knowledge_commitment() = default;
+                    knowledge_commitment(const knowledge_commitment &other) = default;
+                    knowledge_commitment(knowledge_commitment &&other) = default;
+                    knowledge_commitment(const T1 &g, const T2 &h) : g(g), h(h) {
+                    }
 
-                    knowledge_commitment<T1, T2> &operator=(const knowledge_commitment<T1, T2> &other) = default;
-                    knowledge_commitment<T1, T2> &operator=(knowledge_commitment<T1, T2> &&other) noexcept = default;
-                    knowledge_commitment<T1, T2> operator+(const knowledge_commitment<T1, T2> &other) const;
-                    knowledge_commitment<T1, T2> mixed_add(const knowledge_commitment<T1, T2> &other) const;
-                    knowledge_commitment<T1, T2> dbl() const;
+                    knowledge_commitment &operator=(const knowledge_commitment &other) = default;
+                    knowledge_commitment &operator=(knowledge_commitment &&other) noexcept = default;
+                    knowledge_commitment operator+(const knowledge_commitment &other) const {
+                        return knowledge_commitment(this->g + other.g, this->h + other.h);
+                    }
+                    knowledge_commitment mixed_add(const knowledge_commitment &other) const {
+                        return knowledge_commitment(this->g.mixed_add(other.g), this->h.mixed_add(other.h));
+                    }
+                    knowledge_commitment doubled() const {
+                        return knowledge_commitment(this->g.doubled(), this->h.doubled());
+                    }
 
-                    void to_special();
-                    bool is_special() const;
+                    knowledge_commitment to_special() {
+                        return knowledge_commitment(this->g.to_special(), this->h.to_special());
+                    }
+                    bool is_special() const {
+                        return this->g->is_special() && this->h->is_special();
+                    }
 
-                    bool is_zero() const;
-                    bool operator==(const knowledge_commitment<T1, T2> &other) const;
-                    bool operator!=(const knowledge_commitment<T1, T2> &other) const;
+                    bool is_zero() const {
+                        return (g.is_zero() && h.is_zero());
+                    }
+                    bool operator==(const knowledge_commitment &other) const {
+                        return (this->g == other.g && this->h == other.h);
+                    }
+                    bool operator!=(const knowledge_commitment &other) const {
+                        return !((*this) == other);
+                    }
 
-                    static knowledge_commitment<T1, T2> zero();
-                    static knowledge_commitment<T1, T2> one();
+                    static knowledge_commitment zero() {
+                        return knowledge_commitment(T1::zero(), T2::zero());
+                    }
+                    static knowledge_commitment one() {
+                        return knowledge_commitment(T1::one(), T2::one());
+                    }
 
-                    static std::size_t size_in_bits();
+                    static std::size_t size_in_bits() {
+                        return T1::size_in_bits() + T2::size_in_bits();
+                    }
 
-                    static void batch_to_special_all_non_zeros(std::vector<knowledge_commitment<T1, T2>> &vec);
+                    static void batch_to_special_all_non_zeros(std::vector<knowledge_commitment> &vec) {
+                        // it is guaranteed that every vec[i] is non-zero,
+                        // but, for any i, *one* of vec[i].g and vec[i].h might still be zero,
+                        // so we still have to handle zeros separately
+
+                        // we separately process g's first, then h's
+                        // to lower memory consumption
+                        std::vector<T1> g_vec;
+                        g_vec.reserve(vec.size());
+
+                        for (std::size_t i = 0; i < vec.size(); ++i) {
+                            if (!vec[i].g.is_zero()) {
+                                g_vec.emplace_back(vec[i].g);
+                            }
+                        }
+
+                        T1::batch_to_special_all_non_zeros(g_vec);
+                        auto g_it = g_vec.begin();
+                        T1 T1_zero_special = T1::zero().to_special();
+
+                        for (std::size_t i = 0; i < vec.size(); ++i) {
+                            if (!vec[i].g.is_zero()) {
+                                vec[i].g = *g_it;
+                                ++g_it;
+                            } else {
+                                vec[i].g = T1_zero_special;
+                            }
+                        }
+
+                        g_vec.clear();
+
+                        // exactly the same thing, but for h:
+                        std::vector<T2> h_vec;
+                        h_vec.reserve(vec.size());
+
+                        for (std::size_t i = 0; i < vec.size(); ++i) {
+                            if (!vec[i].h.is_zero()) {
+                                h_vec.emplace_back(vec[i].h);
+                            }
+                        }
+
+                        T2::batch_to_special_all_non_zeros(h_vec);
+                        auto h_it = h_vec.begin();
+                        T2 T2_zero_special = T2::zero().to_special();
+
+                        for (std::size_t i = 0; i < vec.size(); ++i) {
+                            if (!vec[i].h.is_zero()) {
+                                vec[i].h = *h_it;
+                                ++h_it;
+                            } else {
+                                vec[i].h = T2_zero_special;
+                            }
+                        }
+
+                        h_vec.clear();
+                    }
                 };
 
                 template<typename T1, typename T2, typename Backend,
@@ -84,128 +162,6 @@ namespace nil {
                 template<typename T1, typename T2>
                 using knowledge_commitment_vector = sparse_vector<knowledge_commitment<T1, T2>>;
 
-                template<typename T1, typename T2>
-                knowledge_commitment<T1, T2>::knowledge_commitment(const T1 &g, const T2 &h) : g(g), h(h) {
-                }
-
-                template<typename T1, typename T2>
-                knowledge_commitment<T1, T2> knowledge_commitment<T1, T2>::zero() {
-                    return knowledge_commitment<T1, T2>(T1::zero(), T2::zero());
-                }
-
-                template<typename T1, typename T2>
-                knowledge_commitment<T1, T2> knowledge_commitment<T1, T2>::one() {
-                    return knowledge_commitment<T1, T2>(T1::one(), T2::one());
-                }
-
-                template<typename T1, typename T2>
-                knowledge_commitment<T1, T2>
-                    knowledge_commitment<T1, T2>::operator+(const knowledge_commitment<T1, T2> &other) const {
-                    return knowledge_commitment<T1, T2>(this->g + other.g, this->h + other.h);
-                }
-
-                template<typename T1, typename T2>
-                knowledge_commitment<T1, T2>
-                    knowledge_commitment<T1, T2>::mixed_add(const knowledge_commitment<T1, T2> &other) const {
-                    return knowledge_commitment<T1, T2>(this->g.mixed_add(other.g), this->h.mixed_add(other.h));
-                }
-
-                template<typename T1, typename T2>
-                knowledge_commitment<T1, T2> knowledge_commitment<T1, T2>::dbl() const {
-                    return knowledge_commitment<T1, T2>(this->g.dbl(), this->h.dbl());
-                }
-
-                template<typename T1, typename T2>
-                void knowledge_commitment<T1, T2>::to_special() {
-                    this->g.to_special();
-                    this->h.to_special();
-                }
-
-                template<typename T1, typename T2>
-                bool knowledge_commitment<T1, T2>::is_special() const {
-                    return this->g->is_special() && this->h->is_special();
-                }
-
-                template<typename T1, typename T2>
-                bool knowledge_commitment<T1, T2>::is_zero() const {
-                    return (g.is_zero() && h.is_zero());
-                }
-
-                template<typename T1, typename T2>
-                bool knowledge_commitment<T1, T2>::operator==(const knowledge_commitment<T1, T2> &other) const {
-                    return (this->g == other.g && this->h == other.h);
-                }
-
-                template<typename T1, typename T2>
-                bool knowledge_commitment<T1, T2>::operator!=(const knowledge_commitment<T1, T2> &other) const {
-                    return !((*this) == other);
-                }
-
-                template<typename T1, typename T2>
-                std::size_t knowledge_commitment<T1, T2>::size_in_bits() {
-                    return T1::size_in_bits() + T2::size_in_bits();
-                }
-
-                template<typename T1, typename T2>
-                void knowledge_commitment<T1, T2>::batch_to_special_all_non_zeros(
-                    std::vector<knowledge_commitment<T1, T2>> &vec) {
-                    // it is guaranteed that every vec[i] is non-zero,
-                    // but, for any i, *one* of vec[i].g and vec[i].h might still be zero,
-                    // so we still have to handle zeros separately
-
-                    // we separately process g's first, then h's
-                    // to lower memory consumption
-                    std::vector<T1> g_vec;
-                    g_vec.reserve(vec.size());
-
-                    for (std::size_t i = 0; i < vec.size(); ++i) {
-                        if (!vec[i].g.is_zero()) {
-                            g_vec.emplace_back(vec[i].g);
-                        }
-                    }
-
-                    T1::batch_to_special_all_non_zeros(g_vec);
-                    auto g_it = g_vec.begin();
-                    T1 T1_zero_special = T1::zero();
-                    T1_zero_special.to_special();
-
-                    for (std::size_t i = 0; i < vec.size(); ++i) {
-                        if (!vec[i].g.is_zero()) {
-                            vec[i].g = *g_it;
-                            ++g_it;
-                        } else {
-                            vec[i].g = T1_zero_special;
-                        }
-                    }
-
-                    g_vec.clear();
-
-                    // exactly the same thing, but for h:
-                    std::vector<T2> h_vec;
-                    h_vec.reserve(vec.size());
-
-                    for (std::size_t i = 0; i < vec.size(); ++i) {
-                        if (!vec[i].h.is_zero()) {
-                            h_vec.emplace_back(vec[i].h);
-                        }
-                    }
-
-                    T2::batch_to_special_all_non_zeros(h_vec);
-                    auto h_it = h_vec.begin();
-                    T2 T2_zero_special = T2::zero();
-                    T2_zero_special.to_special();
-
-                    for (std::size_t i = 0; i < vec.size(); ++i) {
-                        if (!vec[i].h.is_zero()) {
-                            vec[i].h = *h_it;
-                            ++h_it;
-                        } else {
-                            vec[i].h = T2_zero_special;
-                        }
-                    }
-
-                    h_vec.clear();
-                }
             }    // namespace snark
         }        // namespace zk
     }            // namespace crypto3
