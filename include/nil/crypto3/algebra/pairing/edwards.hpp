@@ -44,8 +44,8 @@ namespace nil {
                     using Fqk_type = typename basic_policy::Fqk_field;
                     using GT_type = typename basic_policy::gt;
 
-                    using G1_precomp_type = typename policy_type::g1_precomp;
-                    using G2_precomp_type = typename policy_type::g2_precomp;
+                    using G1_precomp = typename policy_type::g1_precomp;
+                    using G2_precomp = typename policy_type::g2_precomp;
 
                     using policy_type::precompute_g1;
                     using policy_type::precompute_g2;

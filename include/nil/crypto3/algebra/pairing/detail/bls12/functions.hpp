@@ -74,7 +74,7 @@ namespace nil {
 
                         /*************************  FINAL EXPONENTIATIONS  ***********************************/
 
-                        gt final_exponentiation_first_chunk(const gt &elt) {
+                        static gt final_exponentiation_first_chunk(const gt &elt) {
 
                             /*
                               Computes result = elt^((q^6-1)*(q^2+1)).
@@ -97,7 +97,7 @@ namespace nil {
                             return result;
                         }
 
-                        gt exp_by_z(const gt &elt) {
+                        static gt exp_by_z(const gt &elt) {
 
                             gt result = elt.cyclotomic_exp(policy_type::final_exponent_z);
                             if (policy_type::final_exponent_is_z_neg) {
@@ -107,7 +107,7 @@ namespace nil {
                             return result;
                         }
 
-                        gt final_exponentiation_last_chunk(const gt &elt) {
+                        static gt final_exponentiation_last_chunk(const gt &elt) {
 
                             const gt A = elt.cyclotomic_squared();    // elt^2
                             const gt B = A.unitary_inversed();        // elt^(-2)
@@ -143,7 +143,7 @@ namespace nil {
 
                     public:
 
-                        gt final_exponentiation(const gt &elt) {
+                        static gt final_exponentiation(const gt &elt) {
                             /* OLD naive version:
                                 gt result = elt^final_exponent;
                             */
@@ -157,7 +157,7 @@ namespace nil {
 
                         /*************************  ATE PAIRING ***********************************/
 
-                        void doubling_step_for_miller_loop(const Fq two_inv, g2 &current, ate_ell_coeffs &c) {
+                        static void doubling_step_for_miller_loop(const Fq two_inv, g2 &current, ate_ell_coeffs &c) {
 
                             const Fq2 X = current.X, Y = current.Y, Z = current.Z;
 
@@ -188,7 +188,7 @@ namespace nil {
                             c.ell_VV = J + J + J;    // ell_VV = 3*J (later: * xP)
                         }
 
-                        void mixed_addition_step_for_miller_loop(const g2 base, g2 &current, ate_ell_coeffs &c) {
+                        static void mixed_addition_step_for_miller_loop(const g2 base, g2 &current, ate_ell_coeffs &c) {
 
                             const Fq2 X1 = current.X, Y1 = current.Y, Z1 = current.Z;
                             const Fq2 &x2 = base.X, &y2 = base.Y;
@@ -212,7 +212,7 @@ namespace nil {
                             // when constexpr will be ready
                         }
 
-                        ate_g1_precomp ate_precompute_g1(const g1 &P) {
+                        static ate_g1_precomp ate_precompute_g1(const g1 &P) {
 
                             g1 Pcopy = P;
                             Pcopy.to_affine_coordinates();
@@ -224,7 +224,7 @@ namespace nil {
                             return result;
                         }
 
-                        ate_g2_precomp ate_precompute_g2(const g2 &Q) {
+                        static ate_g2_precomp ate_precompute_g2(const g2 &Q) {
 
                             g2 Qcopy(Q);
                             Qcopy.to_affine_coordinates();
@@ -265,7 +265,7 @@ namespace nil {
                             return result;
                         }
 
-                        gt ate_miller_loop(const ate_g1_precomp &prec_P, const ate_g2_precomp &prec_Q) {
+                        static gt ate_miller_loop(const ate_g1_precomp &prec_P, const ate_g2_precomp &prec_Q) {
 
                             gt f = gt::one();
 
@@ -305,7 +305,7 @@ namespace nil {
                             return f;
                         }
 
-                        gt ate_double_miller_loop(const ate_g1_precomp &prec_P1, const ate_g2_precomp &prec_Q1,
+                        static gt ate_double_miller_loop(const ate_g1_precomp &prec_P1, const ate_g2_precomp &prec_Q1,
                                                   const ate_g1_precomp &prec_P2, const ate_g2_precomp &prec_Q2) {
 
                             gt f = gt::one();
@@ -353,14 +353,14 @@ namespace nil {
                             return f;
                         }
 
-                        gt ate_pairing(const g1 &P, const g2 &Q) {
+                        static gt ate_pairing(const g1 &P, const g2 &Q) {
                             ate_g1_precomp prec_P = ate_precompute_g1(P);
                             ate_g2_precomp prec_Q = ate_precompute_g2(Q);
                             gt result = ate_miller_loop(prec_P, prec_Q);
                             return result;
                         }
 
-                        gt ate_reduced_pairing(const g1 &P, const g2 &Q) {
+                        static gt ate_reduced_pairing(const g1 &P, const g2 &Q) {
                             const gt f = ate_pairing(P, Q);
                             const gt result = final_exponentiation(f);
                             return result;
@@ -369,28 +369,28 @@ namespace nil {
                         /*************************  CHOICE OF PAIRING ***********************************/
 
                     public:
-                        g1_precomp precompute_g1(const g1 &P) {
+                        static g1_precomp precompute_g1(const g1 &P) {
                             return ate_precompute_g1(P);
                         }
 
-                        g2_precomp precompute_g2(const g2 &Q) {
+                        static g2_precomp precompute_g2(const g2 &Q) {
                             return ate_precompute_g2(Q);
                         }
 
-                        gt miller_loop(const g1_precomp &prec_P, const g2_precomp &prec_Q) {
+                        static gt miller_loop(const g1_precomp &prec_P, const g2_precomp &prec_Q) {
                             return ate_miller_loop(prec_P, prec_Q);
                         }
 
-                        gt double_miller_loop(const g1_precomp &prec_P1, const g2_precomp &prec_Q1,
+                        static gt double_miller_loop(const g1_precomp &prec_P1, const g2_precomp &prec_Q1,
                                               const g1_precomp &prec_P2, const g2_precomp &prec_Q2) {
                             return ate_double_miller_loop(prec_P1, prec_Q1, prec_P2, prec_Q2);
                         }
 
-                        gt pairing(const g1 &P, const g2 &Q) {
+                        static gt pairing(const g1 &P, const g2 &Q) {
                             return ate_pairing(P, Q);
                         }
 
-                        gt reduced_pairing(const g1 &P, const g2 &Q) {
+                        static gt reduced_pairing(const g1 &P, const g2 &Q) {
                             return ate_reduced_pairing(P, Q);
                         }
                     };
