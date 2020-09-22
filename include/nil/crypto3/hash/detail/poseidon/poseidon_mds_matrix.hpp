@@ -78,7 +78,7 @@ namespace nil {
                         mds_matrix_type mds_matrix;
                         for (std::size_t i = 0; i < state_words; i++) {
                             for (std::size_t j = 0; j < state_words; j++) {
-                                mds_matrix[i][j] = element_type(i + j + Arity).inversed();
+                                mds_matrix[i][j] = element_type(i + j + state_words).inversed();
                             }
                         }
                         return mds_matrix;
@@ -89,21 +89,15 @@ namespace nil {
 
                         constexpr equivalent_mds_matrix_type(const mds_matrix_type &mds_matrix)
                             : M_i(algebra::get_identity<element_type, state_words>()), w_hat_list(), v_list(), M_0_0() {
-
-                            typedef algebra::matrix<element_type, state_words - 1, 1> M_mul_column_slice_matr_type;
                             mds_matrix_type M_mul(mds_matrix);
                             mds_submatrix_type M_hat_inverse;
                             substate_vector_type M_mul_column_slice;
-                            M_mul_column_slice_matr_type M_mul_column_slice_matr;
 
                             for (std::size_t i = 0; i < part_rounds; i++) {
                                 M_hat_inverse =
                                     algebra::inverse(algebra::submat<state_words - 1, state_words - 1>(M_mul, 1, 1));
-                                M_mul_column_slice = algebra::slice<state_words - 1>(M_mul.column(0), 1);
-                                for (std::size_t j = 0; j < state_words - 1; j++) {
-                                    M_mul_column_slice_matr[j][0] = M_mul_column_slice[j];
-                                }
-                                w_hat_list[i] = algebra::matmul(M_hat_inverse, M_mul_column_slice_matr).column(0);
+                                w_hat_list[i] = algebra::matvectmul(M_hat_inverse,
+                                    algebra::slice<state_words - 1>(M_mul.column(0), 1));
                                 v_list[i] = algebra::slice<state_words - 1>(M_mul.row(0), 1);
                                 for (std::size_t j = 1; j < state_words; j++) {
                                     for (std::size_t k = 1; k < state_words; k++) {
