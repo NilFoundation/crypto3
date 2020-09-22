@@ -10,7 +10,8 @@
 #define CRYPTO3_HASH_POSEIDON_FUNCTIONS_HPP
 
 #include <nil/crypto3/hash/detail/poseidon/poseidon_policy.hpp>
-#include <nil/crypto3/hash/detail/poseidon/poseidon_constants.hpp>
+#include <nil/crypto3/hash/detail/poseidon/poseidon_mds_matrix.hpp>
+#include <nil/crypto3/hash/detail/poseidon/poseidon_constants_operator.hpp>
 
 namespace nil {
     namespace crypto3 {
@@ -20,9 +21,9 @@ namespace nil {
                 template<typename FieldType, std::size_t Arity, bool strength>
                 struct poseidon_functions {
                     typedef poseidon_policy<FieldType, Arity, strength> policy_type;
-                    typedef poseidon_constants<FieldType, Arity, strength> policy_constants_type;
+                    typedef poseidon_constants_operator<FieldType, Arity, strength> policy_constants_operator_t;
                     typedef typename FieldType::value_type element_type;
-                    typedef typename policy_constants_type::state_vector_type state_vector_type;
+                    typedef typename policy_constants_operator_t::state_vector_type state_vector_type;
 
                     constexpr static const std::size_t state_bits = policy_type::state_bits;
                     constexpr static const std::size_t state_words = policy_type::state_words;
@@ -41,6 +42,13 @@ namespace nil {
 
                     constexpr static const std::size_t grain_lfsr_state_len = 80;
 
+                    constexpr static const policy_constants_operator_t get_policy_constant_operator() {
+                        return policy_constants_operator_t();
+                    }
+
+                    // add constexpr
+                    static inline policy_constants_operator_t policy_constants_operator = get_policy_constant_operator();
+
                     static inline void permute(state_type &A) {
                         std::size_t round_number = 0;
 
@@ -51,17 +59,17 @@ namespace nil {
 
                         // first half of full rounds
                         for (std::size_t i = 0; i < half_full_rounds; i++) {
-                            policy_constants_type::arc_sbox_mds_full_round(A_vector, round_number++);
+                            policy_constants_operator.arc_sbox_mds_full_round(A_vector, round_number++);
                         }
 
                         // partial rounds
                         for (std::size_t i = 0; i < part_rounds; i++) {
-                            policy_constants_type::arc_sbox_mds_part_round(A_vector, round_number++);
+                            policy_constants_operator.arc_sbox_mds_part_round(A_vector, round_number++);
                         }
 
                         // second half of full rounds
                         for (std::size_t i = 0; i < half_full_rounds; i++) {
-                            policy_constants_type::arc_sbox_mds_full_round(A_vector, round_number++);
+                            policy_constants_operator.arc_sbox_mds_full_round(A_vector, round_number++);
                         }
 
                         for (std::size_t i = 0; i < state_words; i++) {
@@ -79,20 +87,20 @@ namespace nil {
 
                         // first half of full rounds
                         for (std::size_t i = 0; i < half_full_rounds; i++) {
-                            policy_constants_type::arc_sbox_mds_full_round_optimized_first(A_vector, round_number++);
+                            policy_constants_operator.arc_sbox_mds_full_round_optimized_first(A_vector, round_number++);
                         }
 
                         // partial rounds
-                        policy_constants_type::arc_mds_part_round_optimized_init(A_vector, round_number);
+                        policy_constants_operator.arc_mds_part_round_optimized_init(A_vector, round_number);
                         for (std::size_t i = 0; i < part_rounds - 1; i++) {
-                            policy_constants_type::sbox_arc_mds_part_round_optimized(A_vector, round_number++);
+                            policy_constants_operator.sbox_arc_mds_part_round_optimized(A_vector, round_number++);
                         }
                         // last partial round
-                        policy_constants_type::sbox_mds_part_round_optimized_last(A_vector, round_number++);
+                        policy_constants_operator.sbox_mds_part_round_optimized_last(A_vector, round_number++);
 
                         // second half of full rounds
                         for (std::size_t i = 0; i < half_full_rounds; i++) {
-                            policy_constants_type::arc_sbox_mds_full_round_optimized_last(A_vector, round_number++);
+                            policy_constants_operator.arc_sbox_mds_full_round_optimized_last(A_vector, round_number++);
                         }
 
                         for (std::size_t i = 0; i < state_words; i++) {

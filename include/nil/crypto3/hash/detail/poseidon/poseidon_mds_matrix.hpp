@@ -9,12 +9,12 @@
 #ifndef CRYPTO3_HASH_POSEIDON_MDS_MATRIX_HPP
 #define CRYPTO3_HASH_POSEIDON_MDS_MATRIX_HPP
 
-#include <nil/algebra/matrix/matrix.hpp>
-#include <nil/algebra/matrix/math.hpp>
-#include <nil/algebra/matrix/operators.hpp>
-#include <nil/algebra/vector/vector.hpp>
-#include <nil/algebra/vector/math.hpp>
-#include <nil/algebra/vector/operators.hpp>
+#include <nil/crypto3/algebra/matrix/matrix.hpp>
+#include <nil/crypto3/algebra/matrix/math.hpp>
+#include <nil/crypto3/algebra/matrix/operators.hpp>
+#include <nil/crypto3/algebra/vector/vector.hpp>
+#include <nil/crypto3/algebra/vector/math.hpp>
+#include <nil/crypto3/algebra/vector/operators.hpp>
 
 #include <nil/crypto3/hash/detail/poseidon/poseidon_policy.hpp>
 
@@ -38,23 +38,23 @@ namespace nil {
                     typedef algebra::vector<element_type, state_words - 1> substate_vector_type;
                     typedef algebra::matrix<element_type, state_words - 1, state_words - 1> mds_submatrix_type;
 
-                    static inline void product_with_mds_matrix(state_vector_type &A_vector) {
+                    inline void product_with_mds_matrix(state_vector_type &A_vector) {
                         A_vector = algebra::vectmatmul(A_vector, mds_matrix);
                     }
 
-                    static inline void product_with_inverse_mds_matrix_noalias(const state_vector_type &A_vector_in,
+                    inline void product_with_inverse_mds_matrix_noalias(const state_vector_type &A_vector_in,
                                                                                state_vector_type &A_vector_out) {
                         A_vector_out = algebra::vectmatmul(A_vector_in, mds_matrix_inverse);
                     }
 
-                    static inline void product_with_equivalent_mds_matrix_init(state_vector_type &A_vector,
+                    inline void product_with_equivalent_mds_matrix_init(state_vector_type &A_vector,
                                                                                std::size_t round_number) {
                         BOOST_ASSERT_MSG(round_number == half_full_rounds,
                                          "wrong using: product_with_equivalent_mds_matrix_init");
                         A_vector = algebra::vectmatmul(A_vector, get_M_i());
                     }
 
-                    static inline void product_with_equivalent_mds_matrix(state_vector_type &A_vector,
+                    inline void product_with_equivalent_mds_matrix(state_vector_type &A_vector,
                                                                           std::size_t round_number) {
                         BOOST_ASSERT_MSG(round_number >= half_full_rounds &&
                                             round_number < half_full_rounds + part_rounds,
@@ -74,7 +74,7 @@ namespace nil {
                     }
 
                 // private:
-                    constexpr static inline mds_matrix_type generate_mds_matrix() {
+                    constexpr inline mds_matrix_type generate_mds_matrix() {
                         mds_matrix_type mds_matrix;
                         for (std::size_t i = 0; i < state_words; i++) {
                             for (std::size_t j = 0; j < state_words; j++) {
@@ -83,15 +83,12 @@ namespace nil {
                         }
                         return mds_matrix;
                     }
-                    // add constexpr
-                    static inline const mds_matrix_type mds_matrix = generate_mds_matrix();
-                    static inline const mds_matrix_type mds_matrix_inverse = algebra::inverse(mds_matrix);
 
                     struct equivalent_mds_matrix_type {
                         typedef std::array<substate_vector_type, part_rounds> subvectors_array;
 
                         constexpr equivalent_mds_matrix_type(const mds_matrix_type &mds_matrix)
-                            : M_i(algebra::identity<element_type, state_words>), w_hat_list(), v_list(), M_0_0() {
+                            : M_i(algebra::get_identity<element_type, state_words>()), w_hat_list(), v_list(), M_0_0() {
 
                             typedef algebra::matrix<element_type, state_words - 1, 1> M_mul_column_slice_matr_type;
                             mds_matrix_type M_mul(mds_matrix);
@@ -123,25 +120,29 @@ namespace nil {
                         subvectors_array v_list;
                         element_type M_0_0;
                     };
-                    constexpr static inline equivalent_mds_matrix_type generate_equivalent_mds_matrix() {
-                        return equivalent_mds_matrix_type(mds_matrix);
-                    }
-                    // add constexpr
-                    static inline const equivalent_mds_matrix_type equivalent_mds_matrix =
-                        generate_equivalent_mds_matrix();
 
-                    static inline const substate_vector_type &get_w_hat(std::size_t w_hat_number) {
+                    inline const substate_vector_type &get_w_hat(std::size_t w_hat_number) {
                         return equivalent_mds_matrix.w_hat_list[w_hat_number];
                     }
-                    static inline const substate_vector_type &get_v(std::size_t v_number) {
+                    inline const substate_vector_type &get_v(std::size_t v_number) {
                         return equivalent_mds_matrix.v_list[v_number];
                     }
-                    static inline const element_type &get_M_0_0() {
+                    inline const element_type &get_M_0_0() {
                         return equivalent_mds_matrix.M_0_0;
                     }
-                    static inline const mds_matrix_type &get_M_i() {
+                    inline const mds_matrix_type &get_M_i() {
                         return equivalent_mds_matrix.M_i;
                     }
+
+                    constexpr poseidon_mds_matrix()
+                        : mds_matrix(generate_mds_matrix()),
+                          mds_matrix_inverse(algebra::inverse(mds_matrix)),
+                          equivalent_mds_matrix(mds_matrix)
+                    {}
+
+                    mds_matrix_type mds_matrix;
+                    mds_matrix_type mds_matrix_inverse;
+                    equivalent_mds_matrix_type equivalent_mds_matrix;
                 };
             }    // namespace detail
         }        // namespace hashes

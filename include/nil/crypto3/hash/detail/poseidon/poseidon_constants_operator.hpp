@@ -22,7 +22,7 @@ namespace nil {
         namespace hashes {
             namespace detail {
                 template<typename FieldType, std::size_t Arity, bool strength>
-                struct poseidon_constants {
+                struct poseidon_constants_operator {
                     typedef poseidon_policy<FieldType, Arity, strength> policy_type;
                     typedef poseidon_mds_matrix<FieldType, Arity, strength> policy_matrix_type;
                     typedef poseidon_lfsr<FieldType, Arity, strength> policy_constants_generator_type;
@@ -47,7 +47,7 @@ namespace nil {
                      * =============================================================================================================
                      */
 
-                    static inline void arc_sbox_mds_full_round_optimized_first(state_vector_type &A,
+                    inline void arc_sbox_mds_full_round_optimized_first(state_vector_type &A,
                                                                                std::size_t round_number) {
                         BOOST_ASSERT_MSG(round_number < half_full_rounds,
                                          "wrong using: arc_sbox_mds_full_round_optimized_first");
@@ -56,10 +56,10 @@ namespace nil {
                             A[i] += get_equivalent_round_constant(constant_number_base + i);
                             A[i] = A[i] * A[i] * A[i] * A[i] * A[i];
                         }
-                        policy_matrix_type::product_with_mds_matrix(A);
+                        policy_matrix.product_with_mds_matrix(A);
                     }
 
-                    static inline void arc_sbox_mds_full_round_optimized_last(state_vector_type &A,
+                    inline void arc_sbox_mds_full_round_optimized_last(state_vector_type &A,
                                                                               std::size_t round_number) {
                         BOOST_ASSERT_MSG(round_number >= half_full_rounds + part_rounds,
                                          "wrong using: arc_sbox_mds_full_round_optimized_last");
@@ -70,10 +70,10 @@ namespace nil {
                             A[i] += get_equivalent_round_constant(constant_number_base + i);
                             A[i] = A[i] * A[i] * A[i] * A[i] * A[i];
                         }
-                        policy_matrix_type::product_with_mds_matrix(A);
+                        policy_matrix.product_with_mds_matrix(A);
                     }
 
-                    static inline void arc_mds_part_round_optimized_init(state_vector_type &A,
+                    inline void arc_mds_part_round_optimized_init(state_vector_type &A,
                                                                          std::size_t round_number) {
                         BOOST_ASSERT_MSG(round_number == half_full_rounds,
                                          "wrong using: arc_mds_part_round_optimized_init");
@@ -81,10 +81,10 @@ namespace nil {
                         for (std::size_t i = 0; i < state_words; i++) {
                             A[i] += get_equivalent_round_constant(constant_number_base + i);
                         }
-                        policy_matrix_type::product_with_equivalent_mds_matrix_init(A, round_number);
+                        policy_matrix.product_with_equivalent_mds_matrix_init(A, round_number);
                     }
 
-                    static inline void sbox_arc_mds_part_round_optimized(state_vector_type &A,
+                    inline void sbox_arc_mds_part_round_optimized(state_vector_type &A,
                                                                          std::size_t round_number) {
                         BOOST_ASSERT_MSG(round_number >= half_full_rounds &&
                                              round_number < half_full_rounds + part_rounds - 1,
@@ -93,15 +93,15 @@ namespace nil {
                             (half_full_rounds + 1) * state_words + (round_number - half_full_rounds - 1) + 1;
                         A[0] = A[0] * A[0] * A[0] * A[0] * A[0];
                         A[0] += get_equivalent_round_constant(constant_number_base);
-                        policy_matrix_type::product_with_equivalent_mds_matrix(A, round_number);
+                        policy_matrix.product_with_equivalent_mds_matrix(A, round_number);
                     }
 
-                    static inline void sbox_mds_part_round_optimized_last(state_vector_type &A,
+                    inline void sbox_mds_part_round_optimized_last(state_vector_type &A,
                                                                           std::size_t round_number) {
                         BOOST_ASSERT_MSG(round_number == half_full_rounds + part_rounds - 1,
                                          "wrong using: sbox_mds_part_round_optimized_last");
                         A[0] = A[0] * A[0] * A[0] * A[0] * A[0];
-                        policy_matrix_type::product_with_equivalent_mds_matrix(A, round_number);
+                        policy_matrix.product_with_equivalent_mds_matrix(A, round_number);
                     }
 
                     /*
@@ -110,7 +110,7 @@ namespace nil {
                      * =============================================================================================================
                      */
 
-                    static inline void arc_sbox_mds_full_round(state_vector_type &A, std::size_t round_number) {
+                    inline void arc_sbox_mds_full_round(state_vector_type &A, std::size_t round_number) {
                         BOOST_ASSERT_MSG(round_number < half_full_rounds ||
                                              round_number >= half_full_rounds + part_rounds,
                                          "wrong using: arc_sbox_mds_full_round");
@@ -118,10 +118,10 @@ namespace nil {
                             A[i] += get_round_constant(round_number * state_words + i);
                             A[i] = A[i] * A[i] * A[i] * A[i] * A[i];
                         }
-                        policy_matrix_type::product_with_mds_matrix(A);
+                        policy_matrix.product_with_mds_matrix(A);
                     }
 
-                    static inline void arc_sbox_mds_part_round(state_vector_type &A, std::size_t round_number) {
+                    inline void arc_sbox_mds_part_round(state_vector_type &A, std::size_t round_number) {
                         BOOST_ASSERT_MSG(round_number >= half_full_rounds &&
                                              round_number < half_full_rounds + part_rounds,
                                          "wrong using: arc_sbox_mds_part_round");
@@ -129,32 +129,21 @@ namespace nil {
                             A[i] += get_round_constant(round_number * state_words + i);
                         }
                         A[0] = A[0] * A[0] * A[0] * A[0] * A[0];
-                        policy_matrix_type::product_with_mds_matrix(A);
+                        policy_matrix.product_with_mds_matrix(A);
                     }
 
                     // private:
-                    constexpr static inline const policy_constants_generator_type generate_round_constants() {
-                        return policy_constants_generator_type();
-                    }
-
-                    // add constexpr
-                    static inline const policy_constants_generator_type round_constants_generator =
-                        generate_round_constants();
-
-                    constexpr static inline const element_type &get_round_constant(std::size_t constant_number) {
+                    constexpr inline const element_type &get_round_constant(std::size_t constant_number) {
                         return round_constants_generator.round_constants[constant_number];
                     }
 
-                    constexpr static inline const state_vector_type
+                    constexpr inline const state_vector_type
                         get_round_constants_slice(std::size_t constants_number_base) {
                         return algebra::slice<state_words>(round_constants_generator.round_constants,
                                                            constants_number_base);
                     }
 
-                    constexpr static inline const equivalent_round_constants_type
-                        generate_equivalent_round_constants() {
-                        equivalent_round_constants_type equivalent_round_constants;
-                        policy_matrix_type mds_matrix;
+                    constexpr inline const void generate_equivalent_round_constants() {
                         state_vector_type inv_cip1;
                         state_vector_type agregated_round_constants;
                         std::size_t equivalent_constant_number_base =
@@ -174,29 +163,35 @@ namespace nil {
 
                         for (std::size_t r = half_full_rounds + part_rounds - 2; r >= half_full_rounds; r--) {
                             agregated_round_constants = get_round_constants_slice((r + 1) * state_words) + inv_cip1;
-                            policy_matrix_type::product_with_inverse_mds_matrix_noalias(agregated_round_constants,
+                            policy_matrix.product_with_inverse_mds_matrix_noalias(agregated_round_constants,
                                                                                         inv_cip1);
                             equivalent_round_constants[equivalent_constant_number_base + r] = inv_cip1[0];
                             inv_cip1[0] = 0;
                         }
 
-                        policy_matrix_type::product_with_inverse_mds_matrix_noalias(
+                        policy_matrix.product_with_inverse_mds_matrix_noalias(
                             agregated_round_constants, inv_cip1);
                         inv_cip1[0] = 0;
                         for (std::size_t i = 0; i < state_words; i++) {
                             equivalent_round_constants[half_full_rounds * state_words + i] += inv_cip1[i];
                         }
-
-                        return equivalent_round_constants;
                     }
 
-                    // add constexpr
-                    static inline const equivalent_round_constants_type equivalent_round_constants =
-                        generate_equivalent_round_constants();
-
-                    static inline const element_type &get_equivalent_round_constant(std::size_t constant_number) {
+                    inline const element_type &get_equivalent_round_constant(std::size_t constant_number) {
                         return equivalent_round_constants[constant_number];
                     }
+
+                    constexpr poseidon_constants_operator()
+                        : policy_matrix(),
+                          round_constants_generator(),
+                          equivalent_round_constants()
+                    {
+                        generate_equivalent_round_constants();
+                    }
+
+                    policy_matrix_type policy_matrix;
+                    policy_constants_generator_type round_constants_generator;
+                    equivalent_round_constants_type equivalent_round_constants;
                 };
             }    // namespace detail
         }        // namespace hashes

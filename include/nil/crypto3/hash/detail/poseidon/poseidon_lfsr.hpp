@@ -10,7 +10,7 @@
 #define CRYPTO3_HASH_POSEIDON_LFSR_HPP
 
 #include <boost/multiprecision/cpp_int.hpp>
-#include <nil/algebra/vector/vector.hpp>
+#include <nil/crypto3/algebra/vector/vector.hpp>
 
 using namespace boost::multiprecision::literals;
 
@@ -63,7 +63,7 @@ namespace nil {
                         }
                     }
 
-                    constexpr static lfsr_state_type get_lfsr_init_state() {
+                    constexpr lfsr_state_type get_lfsr_init_state() {
                         lfsr_state_type state = 0;
                         int i = 0;
                         for (i = 1; i >= 0; i--)
@@ -86,7 +86,7 @@ namespace nil {
                         return state;
                     }
 
-                    constexpr static lfsr_state_type update_lfsr_state(lfsr_state_type state) {
+                    constexpr lfsr_state_type update_lfsr_state(lfsr_state_type state) {
                         while (true) {
                             state = update_lfsr_state_raw(state);
                             if (get_lfsr_state_bit(state, lfsr_state_bits - 1))
@@ -97,21 +97,21 @@ namespace nil {
                         return update_lfsr_state_raw(state);
                     }
 
-                    constexpr static lfsr_state_type update_lfsr_state_raw(lfsr_state_type state) {
+                    constexpr lfsr_state_type update_lfsr_state_raw(lfsr_state_type state) {
                         bool new_bit = get_lfsr_state_bit(state, 0) != get_lfsr_state_bit(state, 13) !=
                                        get_lfsr_state_bit(state, 23) != get_lfsr_state_bit(state, 38) !=
                                        get_lfsr_state_bit(state, 51) != get_lfsr_state_bit(state, 62);
                         return set_new_bit(state, new_bit);
                     }
 
-                    constexpr static bool get_lfsr_state_bit(lfsr_state_type state, std::size_t pos) {
+                    constexpr bool get_lfsr_state_bit(lfsr_state_type state, std::size_t pos) {
                         lfsr_state_type bit_getter = 1;
                         bit_getter <<= (lfsr_state_bits - 1 - pos);
                         return (state & bit_getter) ? true : false;
                     }
 
                     template<typename T>
-                    constexpr static T set_new_bit(T var, bool new_bit) {
+                    constexpr T set_new_bit(T var, bool new_bit) {
                         return (var << 1) | (new_bit ? 1 : 0);
                     }
 

@@ -24,10 +24,10 @@
 // #include <nil/crypto3/hash/adaptor/hashed.hpp>
 
 #include <nil/crypto3/hash/poseidon.hpp>
-#include <nil/algebra/fields/bls12/scalar_field.hpp>
+#include <nil/crypto3/algebra/fields/bls12/scalar_field.hpp>
 
 using namespace nil::crypto3;
-using namespace nil::algebra;
+using namespace nil::crypto3::algebra;
 // using namespace nil::crypto3::accumulators;
 
 using poseidon_default_field_t = fields::bls12_fr<381>;
@@ -109,23 +109,23 @@ BOOST_DATA_TEST_CASE(poseidon_strengthen_2, string_data("internal", "strengthen"
     hash_test_data<poseidon_functions_t>(data_set);
 }
 
-BOOST_DATA_TEST_CASE(poseidon_standart_2, string_data("internal", "standart", "2"), data_set) {
-    using poseidon_functions_t = hashes::detail::poseidon_functions<poseidon_default_field_t, 3, false>;
-
-    hash_test_data<poseidon_functions_t>(data_set);
-}
-
-BOOST_DATA_TEST_CASE(poseidon_standart_4, string_data("internal", "standart", "4"), data_set) {
-    using poseidon_functions_t = hashes::detail::poseidon_functions<poseidon_default_field_t, 5, false>;
-
-    hash_test_data<poseidon_functions_t>(data_set);
-}
-
-BOOST_DATA_TEST_CASE(poseidon_strengthen_4, string_data("internal", "strengthen", "4"), data_set) {
-    using poseidon_functions_t = hashes::detail::poseidon_functions<poseidon_default_field_t, 5, true>;
-
-    hash_test_data<poseidon_functions_t>(data_set);
-}
+//BOOST_DATA_TEST_CASE(poseidon_standart_2, string_data("internal", "standart", "2"), data_set) {
+//    using poseidon_functions_t = hashes::detail::poseidon_functions<poseidon_default_field_t, 3, false>;
+//
+//    hash_test_data<poseidon_functions_t>(data_set);
+//}
+//
+//BOOST_DATA_TEST_CASE(poseidon_standart_4, string_data("internal", "standart", "4"), data_set) {
+//    using poseidon_functions_t = hashes::detail::poseidon_functions<poseidon_default_field_t, 5, false>;
+//
+//    hash_test_data<poseidon_functions_t>(data_set);
+//}
+//
+//BOOST_DATA_TEST_CASE(poseidon_strengthen_4, string_data("internal", "strengthen", "4"), data_set) {
+//    using poseidon_functions_t = hashes::detail::poseidon_functions<poseidon_default_field_t, 5, true>;
+//
+//    hash_test_data<poseidon_functions_t>(data_set);
+//}
 
 
 // BOOST_AUTO_TEST_CASE(poseidon_manual_test1) {
