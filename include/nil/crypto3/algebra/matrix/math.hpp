@@ -104,17 +104,25 @@ namespace nil {
             }
 
             /*!
-             * @brief
-             * @tparam T
-             * @tparam M
-             * @tparam N
-             * @param v
-             * @param m
-             * @return
+             * @brief computes the product of vector and matrix
+             * @param v an M-vector
+             * @param m an \f$M \times N\f$ matrix
+             * @return an N-vector of type T
              */
             template<typename T, std::size_t M, std::size_t N>
             constexpr vector<T, N> vectmatmul(const vector<T, M> &v, const matrix<T, M, N> &m) {
                 return generate<N>([&v, &m](auto i) { return sum(v * m.column(i)); });
+            }
+
+            /*!
+             * @brief computes the product of matrix and vector
+             * @param m an \f$M \times N\f$ matrix
+             * @param v an N-vector
+             * @return an M-vector of type T
+             */
+            template<typename T, std::size_t M, std::size_t N>
+            constexpr vector<T, M> matvectmul(const matrix<T, M, N> &m, const vector<T, N> &v) {
+                return generate<M>([&v, &m](auto i) { return sum(m.row(i) * v); });
             }
 
             /** @brief Computes the kronecker tensor product
