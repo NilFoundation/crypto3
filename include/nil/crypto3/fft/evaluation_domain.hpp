@@ -30,46 +30,46 @@ namespace nil {
 
                 using namespace nil::crypto3::algebra;
 
-                template<typename FieldType, typename FieldType, std::size_t MinSize>
+                /*template<typename FieldType, std::size_t MinSize>
                 struct domain_switch_impl {
                     constexpr static const std::size_t big = 1ul << (boost::static_log2<MinSize>::value - 1);
                     constexpr static const std::size_t rounded_small =
                         (1ul << boost::static_log2<MinSize - big>::value);
 
                     typedef std::conditional<
-                        detail::is_basic_radix2_domain<MinSize>::value, basic_radix2_domain<FieldType, MinSize>,
+                        detail::is_basic_radix2_domain<FieldType, MinSize>::value, basic_radix2_domain<FieldType>,
                         std::conditional<
-                            !detail::is_basic_radix2_domain<MinSize>::value &&
-                                detail::is_basic_radix2_domain<big + rounded_small>::value,
-                            basic_radix2_domain<FieldType, big + rounded_small>,
+                            !detail::is_basic_radix2_domain<FieldType,MinSize>::value &&
+                                detail::is_basic_radix2_domain<FieldType, big + rounded_small>::value,
+                            basic_radix2_domain<FieldType>,
                             std::conditional<
-                                detail::is_extended_radix2_domain<MinSize>::value,
-                                extended_radix2_domain<FieldType, MinSize>,
+                                detail::is_extended_radix2_domain<FieldType, MinSize>::value,
+                                extended_radix2_domain<FieldType>,
                                 std::conditional<
-                                    !detail::is_extended_radix2_domain<MinSize>::value &&
-                                        detail::is_extended_radix2_domain<big + rounded_small>::value,
-                                    extended_radix2_domain<FieldType, big + rounded_small>,
+                                    !detail::is_extended_radix2_domain<FieldType, MinSize>::value &&
+                                        detail::is_extended_radix2_domain<FieldType, big + rounded_small>::value,
+                                    extended_radix2_domain<FieldType>,
                                     std::conditional<
-                                        detail::is_step_radix2_domain<MinSize>::value,
-                                        step_radix2_domain<FieldType, MinSize>,
+                                        detail::is_step_radix2_domain<FieldType, MinSize>::value,
+                                        step_radix2_domain<FieldType>,
                                         std::conditional<
-                                            !detail::is_step_radix2_domain<MinSize>::value &&
-                                                detail::is_step_radix2_domain<big + rounded_small>::value,
-                                            step_radix2_domain<FieldType, big + rounded_small>,
+                                            !detail::is_step_radix2_domain<FieldType, MinSize>::value &&
+                                                detail::is_step_radix2_domain<FieldType, big + rounded_small>::value,
+                                            step_radix2_domain<FieldType>,
                                             std::conditional<
                                                 !(fields::arithmetic_params<FieldType>::geometric_generator.is_zero()),
-                                                geometric_sequence_domain<FieldType, MinSize>,
+                                                geometric_sequence_domain<FieldType>,
                                                 std::conditional<!(fields::arithmetic_params<
                                                                        FieldType>::arithmetic_generator.is_zero()),
-                                                                 arithmetic_sequence_domain<FieldType, MinSize>, void>::
+                                                                 arithmetic_sequence_domain<FieldType>, void>::
                                                     type>::type>::type>::type>::type>::type>::type>::type domain_type;
-                };
+                };*/
 
-                template<typename FieldType, std::size_t MinSize>
+                /*template<typename FieldType, std::size_t MinSize>
                 struct domain_switch_impl<std::complex<double>> {
                     typedef std::conditional<is_basic_radix2_domain<MinSize>::value,
                                              basic_radix2_domain<FieldType, MinSize>, void>::type domain_type;
-                };
+                };*/
             }    // namespace detail
 
             /**
@@ -142,12 +142,12 @@ namespace nil {
              depending on MinSize.
             */
 
-            template<typename FieldType, std::size_t MinSize>
+            /*template<typename FieldType, std::size_t MinSize>
             struct domain_switch {
                 typedef
-                    typename detail::domain_switch_impl<typename FieldType::value_type, FieldType, MinSize>::domain_type
+                    typename detail::domain_switch_impl<FieldType, MinSize>::domain_type
                         domain_type;
-            };
+            };*/
 
             template<typename FieldValueType>
             std::shared_ptr<evaluation_domain<FieldValueType>> make_evaluation_domain(std::size_t m) {

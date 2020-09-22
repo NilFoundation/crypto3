@@ -27,6 +27,9 @@ namespace nil {
             using namespace nil::crypto3::algebra;
 
             template<typename FieldType>
+            class evaluation_domain;
+
+            template<typename FieldType>
             class arithmetic_sequence_domain : public evaluation_domain<FieldType> {
                 using value_type = typename FieldType::value_type;
 
@@ -49,7 +52,7 @@ namespace nil {
                     this->precomputation_sentinel = 1;
                 }
 
-                arithmetic_sequence_domain(const size_t m) : evaluation_domain<value_type>(m) {
+                arithmetic_sequence_domain(const size_t m) : evaluation_domain<FieldType>(m) {
                     if (m <= 1) {
                         throw std::invalid_argument("arithmetic(): expected m > 1");
                     }

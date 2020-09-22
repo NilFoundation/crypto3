@@ -22,6 +22,9 @@ namespace nil {
             using namespace nil::crypto3::algebra;
 
             template<typename FieldType>
+            class evaluation_domain;
+
+            template<typename FieldType>
             class step_radix2_domain : public evaluation_domain<FieldType> {
                 using value_type = typename FieldType::value_type;
 
@@ -32,7 +35,7 @@ namespace nil {
                 value_type big_omega;
                 value_type small_omega;
 
-                step_radix2_domain(const size_t m) : evaluation_domain<value_type>(m) {
+                step_radix2_domain(const size_t m) : evaluation_domain<FieldType>(m) {
                     if (m <= 1)
                         throw std::invalid_argument("step_radix2(): expected m > 1");
 
@@ -43,13 +46,13 @@ namespace nil {
                         throw std::invalid_argument("step_radix2(): expected small_m == 1ul<<log2(small_m)");
 
                     try {
-                        omega = unity_root<FieldType>(1ul << static_cast<std::size_t>(std::ceil(std::log2(m))));
+                        omega = detail::unity_root<FieldType>(1ul << static_cast<std::size_t>(std::ceil(std::log2(m))));
                     } catch (const std::invalid_argument &e) {
                         throw std::invalid_argument(e.what());
                     }
 
                     big_omega = omega.squared();
-                    small_omega = unity_root<FieldType>(small_m);
+                    small_omega = detail::unity_root<FieldType>(small_m);
                 }
 
                 void FFT(std::vector<value_type> &a) {
@@ -76,7 +79,7 @@ namespace nil {
                     }
 
                     _basic_radix2_FFT(c, omega.squared());
-                    _basic_radix2_FFT(e, unity_root<FieldType>(small_m));
+                    _basic_radix2_FFT(e, detail::unity_root<FieldType>(small_m));
 
                     for (size_t i = 0; i < big_m; ++i) {
                         a[i] = c[i];
@@ -94,7 +97,7 @@ namespace nil {
                     std::vector<value_type> U1(a.begin() + big_m, a.end());
 
                     _basic_radix2_FFT(U0, omega.squared().inversed());
-                    _basic_radix2_FFT(U1, unity_root<FieldType>(small_m).inversed());
+                    _basic_radix2_FFT(U1, detail::unity_root<FieldType>(small_m).inversed());
 
                     const value_type U0_size_inv = value_type(big_m).inversed();
                     for (size_t i = 0; i < big_m; ++i) {

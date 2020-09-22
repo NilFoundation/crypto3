@@ -24,6 +24,9 @@ namespace nil {
             using namespace nil::crypto3::algebra;
 
             template<typename FieldType>
+            class evaluation_domain;
+
+            template<typename FieldType>
             class basic_radix2_domain : public evaluation_domain<FieldType> {
                 using value_type = typename FieldType::value_type;
 
@@ -42,7 +45,7 @@ namespace nil {
                     }
 
                     try {
-                        omega = unity_root<FieldType>(m);
+                        omega = detail::unity_root<FieldType>(m);
                     } catch (const std::invalid_argument &e) {
                         throw std::invalid_argument(e.what());
                     }

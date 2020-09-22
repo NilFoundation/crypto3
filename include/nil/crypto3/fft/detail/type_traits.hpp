@@ -7,8 +7,8 @@
 // http://www.boost.org/LICENSE_1_0.txt
 //---------------------------------------------------------------------------//
 
-#ifndef CRYPTO3_ALGEBRA_TYPE_TRAITS_HPP
-#define CRYPTO3_ALGEBRA_TYPE_TRAITS_HPP
+#ifndef CRYPTO3_ALGEBRA_FFT_TYPE_TRAITS_HPP
+#define CRYPTO3_ALGEBRA_FFT_TYPE_TRAITS_HPP
 
 #include <boost/integer/static_log2.hpp>
 
@@ -164,39 +164,39 @@
 
 namespace nil {
     namespace crypto3 {
-        namespace algebra {
+        namespace fft {
             namespace detail {
 
                 using namespace nil::crypto3::algebra;
 
-                template<std::size_t m>
+                template<typename FieldType, std::size_t m>
                 struct is_basic_radix2_domain {
                     constexpr static bool const value =
                         (m > 1) && !(m & (m - 1)) &&
                         (boost::static_log2<m>::value <= fields::arithmetic_params<FieldType>::s);
-                }
+                };
 
-                template<std::size_t m>
+                template<typename FieldType, std::size_t m>
                 struct is_extended_radix2_domain {
                     constexpr static bool const value =
                         (m > 1) && !(m & (m - 1)) &&
                         (boost::static_log2<m>::value == fields::arithmetic_params<FieldType>::s + 1);
-                }
+                };
 
-                template<std::size_t m>
+                template<typename FieldType, std::size_t m>
                 struct is_step_radix2_domain {
                 private:
-                    constexpr std::size_t const small_m = m - (1ul << (boost::static_log2<m>::value - 1));
+                    constexpr static std::size_t const small_m = m - (1ul << (boost::static_log2<m>::value - 1));
 
                 public:
                     constexpr static bool const value =
                         (m > 1) && (m & (m - 1)) &&
-                        (boost::static_log2<m> <= fields::arithmetic_params<FieldType>::s) &&
+                        //(boost::static_log2<m> <= fields::arithmetic_params<FieldType>::s) &&
                         !(small_m & (small_m - 1));
-                }
+                };
             }    // namespace detail
-        }        // namespace algebra
+        }        // namespace fft
     }            // namespace crypto3
 }    // namespace nil
 
-#endif    // ALGEBRA_TYPE_TRAITS_HPP
+#endif    // CRYPTO3_ALGEBRA_FFT_TYPE_TRAITS_HPP

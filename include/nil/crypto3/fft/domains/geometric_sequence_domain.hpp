@@ -28,6 +28,9 @@ namespace nil {
             using namespace nil::crypto3::algebra;
 
             template<typename FieldType>
+            class evaluation_domain;
+            
+            template<typename FieldType>
             class geometric_sequence_domain : public evaluation_domain<FieldType> {
                 using value_type = typename FieldType::value_type;
 
@@ -53,7 +56,7 @@ namespace nil {
                     this->precomputation_sentinel = 1;
                 }
 
-                geometric_sequence_domain(const size_t m) : evaluation_domain<value_type>(m) {
+                geometric_sequence_domain(const size_t m) : evaluation_domain<FieldType>(m) {
                     if (m <= 1) {
                         throw std::invalid_argument("geometric(): expected m > 1");
                     }
