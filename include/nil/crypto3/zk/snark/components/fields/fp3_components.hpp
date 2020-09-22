@@ -25,12 +25,12 @@ namespace nil {
             namespace snark {
 
                 /**
-                 * Gadget that represents an Fp3 variable.
+                 * Component that represents an Fp3 variable.
                  */
                 template<typename Fp3T>
-                class Fp3_variable : public component<typename Fp3T::my_Fp> {
+                class Fp3_variable : public component<typename Fp3T::underlying_field_type> {
                 public:
-                    typedef typename Fp3T::my_Fp FieldType;
+                    typedef typename Fp3T::underlying_field_type FieldType;
 
                     blueprint_linear_combination<FieldType> c0;
                     blueprint_linear_combination<FieldType> c1;
@@ -64,12 +64,12 @@ namespace nil {
                 };
 
                 /**
-                 * Gadget that creates constraints for Fp3 by Fp3 multiplication.
+                 * Component that creates constraints for Fp3 by Fp3 multiplication.
                  */
                 template<typename Fp3T>
-                class Fp3_mul_component : public component<typename Fp3T::my_Fp> {
+                class Fp3_mul_component : public component<typename Fp3T::underlying_field_type> {
                 public:
-                    typedef typename Fp3T::my_Fp FieldType;
+                    typedef typename Fp3T::underlying_field_type FieldType;
 
                     Fp3_variable<Fp3T> A;
                     Fp3_variable<Fp3T> B;
@@ -87,12 +87,12 @@ namespace nil {
                 };
 
                 /**
-                 * Gadget that creates constraints for Fp3 multiplication by a linear combination.
+                 * Component that creates constraints for Fp3 multiplication by a linear combination.
                  */
                 template<typename Fp3T>
-                class Fp3_mul_by_lc_component : public component<typename Fp3T::my_Fp> {
+                class Fp3_mul_by_lc_component : public component<typename Fp3T::underlying_field_type> {
                 public:
-                    typedef typename Fp3T::my_Fp FieldType;
+                    typedef typename Fp3T::underlying_field_type FieldType;
 
                     Fp3_variable<Fp3T> A;
                     blueprint_linear_combination<FieldType> lc;
@@ -107,12 +107,12 @@ namespace nil {
                 };
 
                 /**
-                 * Gadget that creates constraints for Fp3 squaring.
+                 * Component that creates constraints for Fp3 squaring.
                  */
                 template<typename Fp3T>
-                class Fp3_sqr_component : public component<typename Fp3T::my_Fp> {
+                class Fp3_sqr_component : public component<typename Fp3T::underlying_field_type> {
                 public:
-                    typedef typename Fp3T::my_Fp FieldType;
+                    typedef typename Fp3T::underlying_field_type FieldType;
 
                     Fp3_variable<Fp3T> A;
                     Fp3_variable<Fp3T> result;

@@ -16,7 +16,6 @@
 #include <vector>
 
 #include <nil/crypto3/algebra/scalar_multiplication/wnaf.hpp>
-#include <nil/crypto3/algebra/random_element.hpp>
 
 #include <nil/crypto3/zk/snark/component.hpp>
 
@@ -38,9 +37,9 @@ namespace nil {
                          template<class>
                          class Fpk_sqr_componentT,
                          typename NumberType = typename FpkT::number_type>
-                class exponentiation_component : component<typename FpkT::my_Fp> {
+                class exponentiation_component : component<typename FpkT::base_field_type> {
                 public:
-                    typedef typename FpkT::my_Fp FieldType;
+                    typedef typename FpkT::base_field_type FieldType;
                     typedef NumberType number_type;
                     std::vector<long> NAF;
 

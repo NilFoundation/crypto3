@@ -302,7 +302,7 @@ namespace nil {
                 G2_precomputation<CurveType>::G2_precomputation(blueprint<FieldType> &pb,
                                                           const other_curve<CurveType>::g2_type &Q_val) {
                     Q.reset(new G2_variable<CurveType>(pb, Q_val));
-                    const algebra::affine_ate_G2_precomp<other_curve<CurveType>> native_precomp =
+                    const other_curve<CurveType>::pairing_policy::affine_ate_G2_precomp native_precomp =
                         other_curve<CurveType>::affine_ate_precompute_G2(Q_val);
 
                     coeffs.resize(native_precomp.coeffs.size() +

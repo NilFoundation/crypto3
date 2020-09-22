@@ -24,12 +24,12 @@ namespace nil {
             namespace snark {
 
                 /**
-                 * Gadget that represents an Fp4 variable.
+                 * Component that represents an Fp4 variable.
                  */
                 template<typename Fp4T>
-                struct Fp4_variable : public component<typename Fp4T::my_Fp> {
-                    typedef typename Fp4T::my_Fp FieldType;
-                    typedef typename Fp4T::my_Fpe Fp2T;
+                struct Fp4_variable : public component<typename Fp4T::base_field_type> {
+                    typedef typename Fp4T::base_field_type FieldType;
+                    typedef typename Fp4T::underlying_field_type Fp2T;
 
                     Fp2_variable<Fp2T> c0;
                     Fp2_variable<Fp2T> c1;
@@ -46,13 +46,13 @@ namespace nil {
                 };
 
                 /**
-                 * Gadget that creates constraints for Fp4 multiplication (towering formulas).
+                 * Component that creates constraints for Fp4 multiplication (towering formulas).
                  */
                 template<typename Fp4T>
-                class Fp4_tower_mul_component : public component<typename Fp4T::my_Fp> {
+                class Fp4_tower_mul_component : public component<typename Fp4T::base_field_type> {
                 public:
-                    typedef typename Fp4T::my_Fp FieldType;
-                    typedef typename Fp4T::my_Fpe Fp2T;
+                    typedef typename Fp4T::base_field_type FieldType;
+                    typedef typename Fp4T::underlying_field_type Fp2T;
 
                     Fp4_variable<Fp4T> A;
                     Fp4_variable<Fp4T> B;
@@ -90,13 +90,13 @@ namespace nil {
                 };
 
                 /**
-                 * Gadget that creates constraints for Fp4 multiplication (direct formulas).
+                 * Component that creates constraints for Fp4 multiplication (direct formulas).
                  */
                 template<typename Fp4T>
-                class Fp4_direct_mul_component : public component<typename Fp4T::my_Fp> {
+                class Fp4_direct_mul_component : public component<typename Fp4T::base_field_type> {
                 public:
-                    typedef typename Fp4T::my_Fp FieldType;
-                    typedef typename Fp4T::my_Fpe Fp2T;
+                    typedef typename Fp4T::base_field_type FieldType;
+                    typedef typename Fp4T::underlying_field_type Fp2T;
 
                     Fp4_variable<Fp4T> A;
                     Fp4_variable<Fp4T> B;
@@ -121,13 +121,13 @@ namespace nil {
                 using Fp4_mul_component = Fp4_direct_mul_component<Fp4T>;
 
                 /**
-                 * Gadget that creates constraints for Fp4 squaring.
+                 * Component that creates constraints for Fp4 squaring.
                  */
                 template<typename Fp4T>
-                class Fp4_sqr_component : public component<typename Fp4T::my_Fp> {
+                class Fp4_sqr_component : public component<typename Fp4T::base_field_type> {
                 public:
-                    typedef typename Fp4T::my_Fp FieldType;
-                    typedef typename Fp4T::my_Fpe Fp2T;
+                    typedef typename Fp4T::base_field_type FieldType;
+                    typedef typename Fp4T::underlying_field_type Fp2T;
 
                     Fp4_variable<Fp4T> A;
                     Fp4_variable<Fp4T> result;
@@ -160,15 +160,15 @@ namespace nil {
                 };
 
                 /**
-                 * Gadget that creates constraints for Fp4 cyclotomic squaring
+                 * Component that creates constraints for Fp4 cyclotomic squaring
                  */
                 template<typename Fp4T>
-                class Fp4_cyclotomic_sqr_component : public component<typename Fp4T::my_Fp> {
+                class Fp4_cyclotomic_sqr_component : public component<typename Fp4T::base_field_type> {
                 public:
                     /*
                      */
-                    typedef typename Fp4T::my_Fp FieldType;
-                    typedef typename Fp4T::my_Fpe Fp2T;
+                    typedef typename Fp4T::base_field_type FieldType;
+                    typedef typename Fp4T::underlying_field_type Fp2T;
 
                     Fp4_variable<Fp4T> A;
                     Fp4_variable<Fp4T> result;
@@ -570,9 +570,9 @@ namespace nil {
 
                       Corresponding test code:
 
-                        assert(B.squared() == A + G + my_Fp2(A.c1 * non_residue + my_Fp::one(), A.c0));
-                        assert(this->c1.squared().c0 == F.c1 * my_Fp(2).inversed());
-                        assert(this->c1.squared().c1 == (F.c0 - my_Fp(1)) * (my_Fp(2) * non_residue).inversed());
+                        assert(B.squared() == A + G + underlying_field_type(A.c1 * non_residue + base_field_type::one(), A.c0));
+                        assert(this->c1.squared().c0 == F.c1 * base_field_type(2).inversed());
+                        assert(this->c1.squared().c1 == (F.c0 - base_field_type(1)) * (base_field_type(2) * non_residue).inversed());
                     */
                     c0_expr_c0.assign(pb, result.c0.c1 * typename FieldType::value_type(2).inversed());
                     c0_expr_c1.assign(pb,

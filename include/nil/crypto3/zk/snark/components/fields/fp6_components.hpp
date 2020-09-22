@@ -25,12 +25,12 @@ namespace nil {
             namespace snark {
 
                 /**
-                 * Gadget that represents an Fp6 variable.
+                 * Component that represents an Fp6 variable.
                  */
                 template<typename Fp6T>
-                struct Fp6_variable : public component<typename Fp6T::my_Fp> {
-                    typedef typename Fp6T::my_Fp FieldType;
-                    typedef typename Fp6T::my_Fpe Fp3T;
+                struct Fp6_variable : public component<typename Fp6T::base_field_type> {
+                    typedef typename Fp6T::base_field_type FieldType;
+                    typedef typename Fp6T::underlying_field_type Fp3T;
 
                     Fp3_variable<Fp3T> c0;
                     Fp3_variable<Fp3T> c1;
@@ -46,12 +46,12 @@ namespace nil {
                 };
 
                 /**
-                 * Gadget that creates constraints for Fp6 multiplication.
+                 * Component that creates constraints for Fp6 multiplication.
                  */
                 template<typename Fp6T>
-                struct Fp6_mul_component : public component<typename Fp6T::my_Fp> {
-                    typedef typename Fp6T::my_Fp FieldType;
-                    typedef typename Fp6T::my_Fpe Fp3T;
+                struct Fp6_mul_component : public component<typename Fp6T::base_field_type> {
+                    typedef typename Fp6T::base_field_type FieldType;
+                    typedef typename Fp6T::underlying_field_type Fp3T;
 
                     Fp6_variable<Fp6T> A;
                     Fp6_variable<Fp6T> B;
@@ -92,13 +92,13 @@ namespace nil {
                 };
 
                 /**
-                 * Gadget that creates constraints for Fp6 multiplication by a Fp6 element B for which B.c0.c0 = B.c0.c1
+                 * Component that creates constraints for Fp6 multiplication by a Fp6 element B for which B.c0.c0 = B.c0.c1
                  * = 0.
                  */
                 template<typename Fp6T>
-                struct Fp6_mul_by_2345_component : public component<typename Fp6T::my_Fp> {
-                    typedef typename Fp6T::my_Fp FieldType;
-                    typedef typename Fp6T::my_Fpe Fp3T;
+                struct Fp6_mul_by_2345_component : public component<typename Fp6T::base_field_type> {
+                    typedef typename Fp6T::base_field_type FieldType;
+                    typedef typename Fp6T::underlying_field_type Fp3T;
 
                     Fp6_variable<Fp6T> A;
                     Fp6_variable<Fp6T> B;
@@ -138,11 +138,11 @@ namespace nil {
                 };
 
                 /**
-                 * Gadget that creates constraints for Fp6 squaring.
+                 * Component that creates constraints for Fp6 squaring.
                  */
                 template<typename Fp6T>
-                struct Fp6_sqr_component : public component<typename Fp6T::my_Fp> {
-                    typedef typename Fp6T::my_Fp FieldType;
+                struct Fp6_sqr_component : public component<typename Fp6T::base_field_type> {
+                    typedef typename Fp6T::base_field_type FieldType;
 
                     Fp6_variable<Fp6T> A;
                     Fp6_variable<Fp6T> result;
@@ -157,12 +157,12 @@ namespace nil {
                 };
 
                 /**
-                 * Gadget that creates constraints for Fp6 cyclotomic squaring
+                 * Component that creates constraints for Fp6 cyclotomic squaring
                  */
                 template<typename Fp6T>
-                struct Fp6_cyclotomic_sqr_component : public component<typename Fp6T::my_Fp> {
-                    typedef typename Fp6T::my_Fp FieldType;
-                    typedef typename Fp6T::my_Fp2 Fp2T;
+                struct Fp6_cyclotomic_sqr_component : public component<typename Fp6T::base_field_type> {
+                    typedef typename Fp6T::base_field_type FieldType;
+                    typedef typename Fp6T::underlying_field_type Fp2T;
 
                     Fp6_variable<Fp6T> A;
                     Fp6_variable<Fp6T> result;
@@ -478,13 +478,13 @@ namespace nil {
                     component<FieldType>(pb),
                     A(A), result(result) {
                     /*
-                        my_Fp2 a = my_Fp2(c0.c0, c1.c1);
-                        my_Fp2 b = my_Fp2(c1.c0, c0.c2);
-                        my_Fp2 c = my_Fp2(c0.c1, c1.c2);
+                        underlying_field_type a = underlying_field_type(c0.c0, c1.c1);
+                        underlying_field_type b = underlying_field_type(c1.c0, c0.c2);
+                        underlying_field_type c = underlying_field_type(c0.c1, c1.c2);
 
-                        my_Fp2 asq = a.squared();
-                        my_Fp2 bsq = b.squared();
-                        my_Fp2 csq = c.squared();
+                        underlying_field_type asq = a.squared();
+                        underlying_field_type bsq = b.squared();
+                        underlying_field_type csq = c.squared();
 
                         result.c0.c0 = 3 * asq_a - 2 * a_a;
                         result.c1.c1 = 3 * asq_b + 2 * a_b;

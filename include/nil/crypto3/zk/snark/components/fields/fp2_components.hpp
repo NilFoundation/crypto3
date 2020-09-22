@@ -25,12 +25,12 @@ namespace nil {
             namespace snark {
 
                 /**
-                 * Gadget that represents an Fp2 variable.
+                 * Component that represents an Fp2 variable.
                  */
                 template<typename Fp2T>
-                class Fp2_variable : public component<typename Fp2T::my_Fp> {
+                class Fp2_variable : public component<typename Fp2T::underlying_field_type> {
                 public:
-                    typedef typename Fp2T::my_Fp FieldType;
+                    typedef typename Fp2T::underlying_field_type FieldType;
 
                     blueprint_linear_combination<FieldType> c0;
                     blueprint_linear_combination<FieldType> c1;
@@ -62,12 +62,12 @@ namespace nil {
                 };
 
                 /**
-                 * Gadget that creates constraints for Fp2 by Fp2 multiplication.
+                 * Component that creates constraints for Fp2 by Fp2 multiplication.
                  */
                 template<typename Fp2T>
-                class Fp2_mul_component : public component<typename Fp2T::my_Fp> {
+                class Fp2_mul_component : public component<typename Fp2T::underlying_field_type> {
                 public:
-                    typedef typename Fp2T::my_Fp FieldType;
+                    typedef typename Fp2T::underlying_field_type FieldType;
 
                     Fp2_variable<Fp2T> A;
                     Fp2_variable<Fp2T> B;
@@ -84,12 +84,12 @@ namespace nil {
                 };
 
                 /**
-                 * Gadget that creates constraints for Fp2 multiplication by a linear combination.
+                 * Component that creates constraints for Fp2 multiplication by a linear combination.
                  */
                 template<typename Fp2T>
-                class Fp2_mul_by_lc_component : public component<typename Fp2T::my_Fp> {
+                class Fp2_mul_by_lc_component : public component<typename Fp2T::underlying_field_type> {
                 public:
-                    typedef typename Fp2T::my_Fp FieldType;
+                    typedef typename Fp2T::underlying_field_type FieldType;
 
                     Fp2_variable<Fp2T> A;
                     blueprint_linear_combination<FieldType> lc;
@@ -104,12 +104,12 @@ namespace nil {
                 };
 
                 /**
-                 * Gadget that creates constraints for Fp2 squaring.
+                 * Component that creates constraints for Fp2 squaring.
                  */
                 template<typename Fp2T>
-                class Fp2_sqr_component : public component<typename Fp2T::my_Fp> {
+                class Fp2_sqr_component : public component<typename Fp2T::underlying_field_type> {
                 public:
-                    typedef typename Fp2T::my_Fp FieldType;
+                    typedef typename Fp2T::underlying_field_type FieldType;
 
                     Fp2_variable<Fp2T> A;
                     Fp2_variable<Fp2T> result;
