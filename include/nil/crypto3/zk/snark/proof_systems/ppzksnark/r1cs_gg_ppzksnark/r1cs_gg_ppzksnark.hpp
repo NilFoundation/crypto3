@@ -124,10 +124,13 @@ namespace nil {
                     }
 
                     std::size_t size_in_bits() const {
-                        return (algebra::size_in_bits(A_query) + B_query.size_in_bits() +
+                        return 128 /*(algebra::size_in_bits(A_query) + B_query.size_in_bits() +
                                 algebra::size_in_bits(H_query) + algebra::size_in_bits(L_query) +
                                 1 * typename CurveType::g1_type::size_in_bits() +
-                                1 * typename CurveType::g2_type::size_in_bits());
+                                1 * typename CurveType::g2_type::size_in_bits())*/;
+
+                        // uncomment
+                        // when size_in_bits ready
                     }
 
                     bool operator==(const r1cs_gg_ppzksnark_proving_key<CurveType> &other) const {
@@ -187,15 +190,15 @@ namespace nil {
                     static r1cs_gg_ppzksnark_verification_key<CurveType>
                         dummy_verification_key(const std::size_t input_size) {
                         r1cs_gg_ppzksnark_verification_key<CurveType> result;
-                        result.alpha_g1_beta_g2 = random_element<typename CurveType::scalar_field_type>() *
-                                                  random_element<typename CurveType::gt_type>();
-                        result.gamma_g2 = random_element<typename CurveType::g2_type>();
-                        result.delta_g2 = random_element<typename CurveType::g2_type>();
+                        result.alpha_g1_beta_g2 = field_random_element<typename CurveType::scalar_field_type>() *
+                                                  field_random_element<typename CurveType::gt_type>();
+                        result.gamma_g2 = curve_random_element<typename CurveType::g2_type>();
+                        result.delta_g2 = curve_random_element<typename CurveType::g2_type>();
 
-                        typename CurveType::g1_type base = random_element<typename CurveType::g1_type>();
+                        typename CurveType::g1_type base = curve_random_element<typename CurveType::g1_type>();
                         typename CurveType::g1_vector v;
                         for (std::size_t i = 0; i < input_size; ++i) {
-                            v.emplace_back(random_element<typename CurveType::g1_type>());
+                            v.emplace_back(curve_random_element<typename CurveType::g1_type>());
                         }
 
                         result.gamma_ABC_g1 =
@@ -215,7 +218,10 @@ namespace nil {
                  * enables a faster verification time.
                  */
                 template<typename CurveType>
-                struct r1cs_gg_ppzksnark_processed_verification_key {
+                class r1cs_gg_ppzksnark_processed_verification_key {
+                    using pairing_policy = typename CurveType::pairing_policy;
+                public:
+
 
                     typename CurveType::gt_type vk_alpha_g1_beta_g2;
                     typename pairing_policy::G2_precomp vk_gamma_g2_precomp;
@@ -321,15 +327,15 @@ namespace nil {
 
                     /* Generate secret randomness */
                     const typename CurveType::scalar_field_type::value_type t =
-                        random_element<typename CurveType::scalar_field_type>();
+                        field_random_element<typename CurveType::scalar_field_type>();
                     const typename CurveType::scalar_field_type::value_type alpha =
-                        random_element<typename CurveType::scalar_field_type>();
+                        field_random_element<typename CurveType::scalar_field_type>();
                     const typename CurveType::scalar_field_type::value_type beta =
-                        random_element<typename CurveType::scalar_field_type>();
+                        field_random_element<typename CurveType::scalar_field_type>();
                     const typename CurveType::scalar_field_type::value_type gamma =
-                        random_element<typename CurveType::scalar_field_type>();
+                        field_random_element<typename CurveType::scalar_field_type>();
                     const typename CurveType::scalar_field_type::value_type delta =
-                        random_element<typename CurveType::scalar_field_type>();
+                        field_random_element<typename CurveType::scalar_field_type>();
                     const typename CurveType::scalar_field_type::value_type gamma_inverse = gamma.inversed();
                     const typename CurveType::scalar_field_type::value_type delta_inverse = delta.inversed();
 
@@ -388,21 +394,25 @@ namespace nil {
                     const std::size_t chunks = 1;
 #endif
 
-                    const typename CurveType::g1_type g1_generator = random_element<typename CurveType::g1_type>();
+                    const typename CurveType::g1_type g1_generator = curve_random_element<typename CurveType::g1_type>();
                     const std::size_t g1_scalar_count = non_zero_At + non_zero_Bt + qap.num_variables();
                     const std::size_t g1_scalar_size = CurveType::scalar_field_type::size_in_bits;
-                    const std::size_t g1_window_size =
-                        algebra::get_exp_window_size<typename CurveType::g1_type>(g1_scalar_count);
+                    const std::size_t g1_window_size = 128;
+                        //algebra::get_exp_window_size<typename CurveType::g1_type>(g1_scalar_count);
+                        // uncomment
+                        // when get_exp_window_size ready
 
                     algebra::window_table<typename CurveType::g1_type> g1_table =
                         algebra::get_window_table(g1_scalar_size, g1_window_size, g1_generator);
 
-                    const typename CurveType::g2_type G2_gen = random_element<typename CurveType::g2_type>();
+                    const typename CurveType::g2_type G2_gen = curve_random_element<typename CurveType::g2_type>();
                     const std::size_t g2_scalar_count = non_zero_Bt;
                     const std::size_t g2_scalar_size = CurveType::scalar_field_type::size_in_bits;
-                    std::size_t g2_window_size =
-                        algebra::get_exp_window_size<typename CurveType::g2_type>(g2_scalar_count);
-
+                    std::size_t g2_window_size = 128;
+                        //algebra::get_exp_window_size<typename CurveType::g2_type>(g2_scalar_count);
+                        // uncomment
+                        // when get_exp_window_size ready
+                    
                     algebra::window_table<typename CurveType::g2_type> g2_table =
                         algebra::get_window_table(g2_scalar_size, g2_window_size, G2_gen);
 
@@ -494,8 +504,8 @@ namespace nil {
                     assert(qap_wit.coefficients_for_H[qap_wit.degree()].is_zero());
 
                     /* Choose two random field elements for prover zero-knowledge. */
-                    const typename CurveType::scalar_field_type r = random_element<CurveType::scalar_field_type>();
-                    const typename CurveType::scalar_field_type s = random_element<CurveType::scalar_field_type>();
+                    const typename CurveType::scalar_field_type r = field_random_element<CurveType::scalar_field_type>();
+                    const typename CurveType::scalar_field_type s = field_random_element<CurveType::scalar_field_type>();
 
 #ifdef MULTICORE
                     const std::size_t chunks = omp_get_max_threads();    // to override, set OMP_NUM_THREADS env var or
