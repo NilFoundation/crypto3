@@ -14,16 +14,13 @@ namespace nil {
     namespace crypto3 {
         namespace algebra {
 
-            template<typename Type1, typename Type2>
-            Type2 random_element();
-
             template<typename CurveGType>    // use curve croup element type_trait
-            CurveGType random_element<CurveGType, CurveGType>() {
+            CurveGType curve_random_element() {
                 return CurveGType::one();
             };
 
             template<typename FieldType>    // use field element type_trait
-            typename FieldType::value_type random_element<FieldType, FieldType::value_type>() {
+            typename FieldType::value_type field_random_element() {
                 return FieldType::value_type::one();
             };
 

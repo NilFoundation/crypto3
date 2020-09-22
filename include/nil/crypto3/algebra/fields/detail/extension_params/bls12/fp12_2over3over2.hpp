@@ -188,6 +188,11 @@ namespace nil {
                         typename fp12_2over3over2_extension_params<bls12_base_field<377, CHAR_BIT>>::modulus_type,
                         2> const fp12_2over3over2_extension_params<bls12_base_field<377, CHAR_BIT>>::non_residue;
 
+
+                    constexpr std::array<typename fp12_2over3over2_extension_params<bls12_base_field<381, CHAR_BIT>>::modulus_type,
+                                        12 *2> const fp12_2over3over2_extension_params<bls12_base_field<381, CHAR_BIT>>::Frobenius_coeffs_c1;
+                    constexpr std::array<typename fp12_2over3over2_extension_params<bls12_base_field<377, CHAR_BIT>>::modulus_type,
+                                        12 *2> const fp12_2over3over2_extension_params<bls12_base_field<377, CHAR_BIT>>::Frobenius_coeffs_c1;
                 }    // namespace detail
             }        // namespace fields
         }            // namespace algebra
