@@ -28,7 +28,7 @@ namespace nil {
             using namespace nil::crypto3::algebra;
 
             template<typename FieldType>
-            class geometric_sequence_domain : public evaluation_domain<FieldType::value_type> {
+            class geometric_sequence_domain : public evaluation_domain<FieldType> {
                 using value_type = typename FieldType::value_type;
 
             public:

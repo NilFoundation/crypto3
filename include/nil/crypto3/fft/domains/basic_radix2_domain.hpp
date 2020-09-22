@@ -24,7 +24,7 @@ namespace nil {
             using namespace nil::crypto3::algebra;
 
             template<typename FieldType>
-            class basic_radix2_domain : public evaluation_domain<FieldType::value_type> {
+            class basic_radix2_domain : public evaluation_domain<FieldType> {
                 using value_type = typename FieldType::value_type;
 
             public:
