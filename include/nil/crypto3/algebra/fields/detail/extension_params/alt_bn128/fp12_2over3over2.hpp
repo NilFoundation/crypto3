@@ -107,6 +107,9 @@ namespace nil {
                         fp12_2over3over2_extension_params<
                             alt_bn128_base_field<ModulusBits, GeneratorBits>>::non_residue;
 
+                    constexpr std::array<typename fp12_2over3over2_extension_params<alt_bn128_base_field<254, CHAR_BIT>>::modulus_type,
+                                        12 *2> const fp12_2over3over2_extension_params<alt_bn128_base_field<254, CHAR_BIT>>::Frobenius_coeffs_c1;
+
                 }    // namespace detail
             }        // namespace fields
         }            // namespace algebra

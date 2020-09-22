@@ -74,6 +74,11 @@ namespace nil {
                                          2> const
                         fp6_3over2_extension_params<bn128_base_field<ModulusBits, GeneratorBits>>::non_residue;
 
+                    constexpr std::array<typename fp6_3over2_extension_params<bn128_base_field<254, CHAR_BIT>>::modulus_type,
+                                        6 *2> const fp6_3over2_extension_params<bn128_base_field<254, CHAR_BIT>>::Frobenius_coeffs_c1;
+                    constexpr std::array<typename fp6_3over2_extension_params<bn128_base_field<254, CHAR_BIT>>::modulus_type,
+                                        6 *2> const fp6_3over2_extension_params<bn128_base_field<254, CHAR_BIT>>::Frobenius_coeffs_c2;
+
                 }    // namespace detail
             }        // namespace fields
         }            // namespace algebra
