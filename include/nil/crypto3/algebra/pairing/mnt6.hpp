@@ -51,6 +51,9 @@ namespace nil {
                     using G1_precomp = typename policy_type::g1_precomp;
                     using G2_precomp = typename policy_type::g2_precomp;
 
+                    using affine_ate_G1_precomp = typename policy_type::affine_ate_g1_precomputation;
+                    using affine_ate_G2_precomp = typename policy_type::affine_ate_g2_precomputation;
+                    
                     using policy_type::precompute_g1;
                     using policy_type::precompute_g2;
 
