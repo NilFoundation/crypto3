@@ -158,8 +158,6 @@ namespace nil {
                             return result;
                         }
 
-                    private:
-
                         /* affine ate miller loop */
 
                         static affine_ate_g1_precomputation affine_ate_precompute_g1(const g1 &P) {
@@ -244,6 +242,8 @@ namespace nil {
                             return result;
                         }
 
+                    private:
+                        
                         static gt affine_ate_miller_loop(const affine_ate_g1_precomputation &prec_P,
                                                   const affine_ate_g2_precomputation &prec_Q) {
 

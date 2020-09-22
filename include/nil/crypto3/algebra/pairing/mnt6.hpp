@@ -53,10 +53,13 @@ namespace nil {
 
                     using affine_ate_G1_precomp = typename policy_type::affine_ate_g1_precomputation;
                     using affine_ate_G2_precomp = typename policy_type::affine_ate_g2_precomputation;
-                    
+
                     using policy_type::precompute_g1;
                     using policy_type::precompute_g2;
 
+                    using policy_type::affine_ate_precompute_g1;
+                    using policy_type::affine_ate_precompute_g2;
+                    
                     using policy_type::reduced_pairing;
                     using policy_type::pairing;
 

@@ -57,6 +57,9 @@ namespace nil {
                     using policy_type::precompute_g1;
                     using policy_type::precompute_g2;
 
+                    using policy_type::affine_ate_precompute_g1;
+                    using policy_type::affine_ate_precompute_g2;
+
                     using policy_type::reduced_pairing;
                     using policy_type::pairing;
 
