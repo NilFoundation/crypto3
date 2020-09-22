@@ -299,7 +299,11 @@ namespace nil {
                     }
 
                     bool is_well_formed() const {
-                        return (g_A.is_well_formed() && g_B.is_well_formed() && g_C.is_well_formed());
+                        //return (g_A.is_well_formed() && g_B.is_well_formed() && g_C.is_well_formed());
+                        // uncomment
+                        // when is_well_formed ready
+                        return true;
+
                     }
 
                     bool operator==(const r1cs_gg_ppzksnark_proof<CurveType> &other) const {
@@ -608,16 +612,25 @@ namespace nil {
                             // when multi_exp_with_mixed_addition ready
 
                     /* A = alpha + sum_i(a_i*A_i(t)) + r*delta */
-                    typename CurveType::g1_type g1_A = pk.alpha_g1 + evaluation_At + r * pk.delta_g1;
+                    typename CurveType::g1_type g1_A = pk.alpha_g1 + evaluation_At;
+                    //typename CurveType::g1_type g1_A = pk.alpha_g1 + evaluation_At + r * pk.delta_g1;
+                    // uncomment
+                    // when multiplication ready
 
                     /* B = beta + sum_i(a_i*B_i(t)) + s*delta */
-                    typename CurveType::g1_type g1_B = pk.beta_g1 + evaluation_Bt.h + s * pk.delta_g1;
-                    typename CurveType::g2_type g2_B = pk.beta_g2 + evaluation_Bt.g + s * pk.delta_g2;
+                    typename CurveType::g1_type g1_B = pk.beta_g1 + evaluation_Bt.h;
+                    typename CurveType::g2_type g2_B = pk.beta_g2 + evaluation_Bt.g;
+                    //typename CurveType::g1_type g1_B = pk.beta_g1 + evaluation_Bt.h + s * pk.delta_g1;
+                    //typename CurveType::g2_type g2_B = pk.beta_g2 + evaluation_Bt.g + s * pk.delta_g2;
+                    // uncomment
+                    // when multiplication ready
 
                     /* C = sum_i(a_i*((beta*A_i(t) + alpha*B_i(t) + C_i(t)) + H(t)*Z(t))/delta) + A*s + r*b - r*s*delta
                      */
-                    typename CurveType::g1_type g1_C =
-                        evaluation_Ht + evaluation_Lt + s * g1_A + r * g1_B - (r * s) * pk.delta_g1;
+                    typename CurveType::g1_type g1_C;
+                    //     = evaluation_Ht + evaluation_Lt + s * g1_A + r * g1_B - (r * s) * pk.delta_g1;
+                    // uncomment
+                    // when multiplication ready
 
                     r1cs_gg_ppzksnark_proof<CurveType> proof =
                         r1cs_gg_ppzksnark_proof<CurveType>(std::move(g1_A), std::move(g2_B), std::move(g1_C));
@@ -730,9 +743,12 @@ namespace nil {
 
                     assert(pvk.gamma_ABC_g1.domain_size() >= primary_input.size());
 
-                    const accumulation_vector<typename CurveType::g1_type> accumulated_IC =
-                        pvk.gamma_ABC_g1.template accumulate_chunk<typename CurveType::scalar_field_type>(
-                            primary_input.begin(), primary_input.end(), 0);
+                    accumulation_vector<typename CurveType::g1_type> accumulated_IC ;
+                        /*const accumulation_vector<typename CurveType::g1_type> accumulated_IC 
+                         = pvk.gamma_ABC_g1.template accumulate_chunk<typename CurveType::scalar_field_type>(
+                            primary_input.begin(), primary_input.end(), 0);*/
+                    // uncomment
+                    // when accumulate_chunk ready
                     const typename CurveType::g1_type &acc = accumulated_IC.first;
 
                     bool result = true;
@@ -745,8 +761,8 @@ namespace nil {
                     const typename pairing_policy::G1_precomp proof_g_C_precomp = pairing_policy::precompute_g1(proof.g_C);
                     const typename pairing_policy::G1_precomp acc_precomp = pairing_policy::precompute_g1(acc);
 
-                    const typename pairing_policy::Fqk::value_type QAP1 = pairing_policy::miller_loop(proof_g_A_precomp, proof_g_B_precomp);
-                    const typename pairing_policy::Fqk::value_type QAP2 = pairing_policy::double_miller_loop(
+                    const typename pairing_policy::Fqk_type::value_type QAP1 = pairing_policy::miller_loop(proof_g_A_precomp, proof_g_B_precomp);
+                    const typename pairing_policy::Fqk_type::value_type QAP2 = pairing_policy::double_miller_loop(
                         acc_precomp, pvk.vk_gamma_g2_precomp, proof_g_C_precomp, pvk.vk_delta_g2_precomp);
                     const typename CurveType::gt_type QAP =
                         pairing_policy::final_exponentiation(QAP1 * QAP2.unitary_inversed());

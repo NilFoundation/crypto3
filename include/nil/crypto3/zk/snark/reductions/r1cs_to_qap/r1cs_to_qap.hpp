@@ -38,6 +38,8 @@
 #include <nil/crypto3/zk/snark/relations/arithmetic_programs/qap/qap.hpp>
 #include <nil/crypto3/zk/snark/relations/constraint_satisfaction_problems/r1cs/r1cs.hpp>
 
+#include <nil/crypto3/algebra/fields/params.hpp>
+
 namespace nil {
     namespace crypto3 {
         namespace zk {
@@ -248,11 +250,14 @@ namespace nil {
                     coefficients_for_H[0] -= d3;
                     domain->add_poly_Z(d1 * d2, coefficients_for_H);
 
-                    fft::multiply_by_coset(aA, FieldType::multiplicative_generator);
-                    domain->FFT(aA, FieldType::multiplicative_generator);
+                    /*fft::multiply_by_coset(aA, fields::arithmetic_params<FieldType>::multiplicative_generator);
+                    domain->FFT(aA, fields::arithmetic_params<FieldType>::multiplicative_generator);
 
-                    fft::multiply_by_coset(aB, FieldType::multiplicative_generator);
-                    domain->FFT(aB, FieldType::multiplicative_generator);
+                    fft::multiply_by_coset(aB, fields::arithmetic_params<FieldType>::multiplicative_generator);
+                    domain->FFT(aB, fields::arithmetic_params<FieldType>::multiplicative_generator);*/
+
+                    // uncomment
+                    // when fft ready
 
                     std::vector<typename FieldType::value_type> &H_tmp =
                         aA;    // can overwrite aA because it is not used later
@@ -271,8 +276,11 @@ namespace nil {
 
                     domain->iFFT(aC);
 
-                    fft::multiply_by_coset(aC, FieldType::multiplicative_generator);
-                    domain->FFT(aC, FieldType::multiplicative_generator);
+                    /*fft::multiply_by_coset(aC, fields::arithmetic_params<FieldType>::multiplicative_generator);
+                    domain->FFT(aC, fields::arithmetic_params<FieldType>::multiplicative_generator);*/
+
+                    // uncomment
+                    // when fft ready
 
 #ifdef MULTICORE
 #pragma omp parallel for
@@ -283,8 +291,10 @@ namespace nil {
 
                     domain->divide_by_Z_on_coset(H_tmp);
 
-                    domain->iFFT(H_tmp, FieldType::multiplicative_generator);
-                    multiply_by_coset(H_tmp, FieldType::multiplicative_generator.inversed());
+                    /*domain->iFFT(H_tmp, fields::arithmetic_params<FieldType>::multiplicative_generator);
+                    multiply_by_coset(H_tmp, fields::arithmetic_params<FieldType>::multiplicative_generator.inversed());*/
+                    // uncomment
+                    // when fft ready
 
 #ifdef MULTICORE
 #pragma omp parallel for
